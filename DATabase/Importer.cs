@@ -3,6 +3,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Xml.Linq;
 
 using System.Reflection;
 
@@ -29,7 +30,7 @@ namespace DATabase
 		private static string _defaultDatePattern = @"(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})";
 		private static string _nointroDatePattern = @"(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})";
 		private static string _redumpDatePattern = @"(\d{4})(\d{2})(\d{2}) (\d{2})-(\d{2})-(\d{2})";
-		private static string _tosecDatePattern = @"(\d{4})-(\d{2})-(\d{2}))";
+		private static string _tosecDatePattern = @"(\d{4})-(\d{2})-(\d{2})";
 
 		private enum DatType
 		{
@@ -104,7 +105,7 @@ namespace DATabase
 			// If the type is still unmatched, the data can't be imported yet
 			else
 			{
-				Console.WriteLine("File " + filename + " cannot be imported at this time.");
+				Console.WriteLine("File " + filename + " cannot be imported at this time because it is not a known pattern.\nPlease try again with an unrenamed version.");
 				return false;
 			}
 
@@ -178,11 +179,6 @@ namespace DATabase
 					break;
 			}
 
-			/*
-			Console.WriteLine(manufacturer + " - " + system + " (" + source + " " + date + ")");
-			return true;
-			*/
-
 			// Check to make sure that the manufacturer and system are valid according to the database
 			int sysid = -1;
 			string query = "SELECT id FROM systems WHERE manufacturer='" + manufacturer + "' AND system='" + system +"'";
@@ -232,153 +228,152 @@ namespace DATabase
 			}
 
 			// Attempt to open the given file
-			StreamReader sr;
 			try
 			{
 				FileStream fs = File.OpenRead(_filepath);
-				sr = new StreamReader(fs);
+				StreamReader sr = new StreamReader(fs);
+
+				// Set necessary dat values
+				string format = "";
+				bool machinefound = false;
+				string machinename = "";
+				string description = "";
+				long gameid = 0;
+				bool comment = false;
+
+				// Parse the file for its rom information
+				while (sr.Peek() > 0)
+				{
+					string line = sr.ReadLine();
+
+					// First each string has to be normalized
+					line = Style.NormalizeChars(line);
+
+					// If the input style hasn't been set, set it according to the header
+					if (format == "")
+					{
+						if (line.IndexOf("<!DOCTYPE datafile") != -1)
+						{
+							format = "logiqx";
+						}
+						else if (line.IndexOf("<!DOCTYPE softwarelist") != -1)
+						{
+							format = "softwarelist";
+						}
+						else if (line.IndexOf("clrmamepro (") != -1 || line.IndexOf("romvault (") != -1)
+						{
+							format = "romvault";
+						}
+					}
+
+					// If there's an XML-style comment, stop the presses and skip until it's over
+					else if (line.IndexOf("-->") != -1)
+					{
+						comment = false;
+					}
+					else if (line.IndexOf("<!--") != -1)
+					{
+						comment = true;
+					}
+
+					// Process Logiqx XML-derived DATs
+					else if(format == "logiqx" && !comment)
+					{
+						if (line.IndexOf("<machine") != -1 || line.IndexOf("<game") != -1)
+						{
+							machinefound = true;
+
+							XElement xml = XElement.Parse(line + (line.IndexOf("<machine") != -1 ? "</machine>" : "</game>"));
+							machinename = xml.Attribute("name").Value;
+
+							gameid = AddGame(sysid, machinename, srcid);
+						}
+						else if (line.IndexOf("<rom") != -1 && machinefound)
+						{
+							AddRom(line, machinename, "rom", gameid, date);
+						}
+						else if (line.IndexOf("<disk") != -1 && machinefound)
+						{
+							AddRom(line, machinename, "disk", gameid, date);
+						}
+						else if (line.IndexOf("</machine>") != -1 || line.IndexOf("</game>") != -1)
+						{
+							machinefound = false;
+							machinename = "";
+							description = "";
+							gameid = 0;
+						}
+					}
+
+					// Process SoftwareList XML-derived DATs
+					else if (format == "softwarelist" && !comment)
+					{
+						if (line.IndexOf("<software") != -1)
+						{
+							machinefound = true;
+
+							XElement xml = XElement.Parse(line + (line.IndexOf("<machine") != -1 ? "</machine>" : "</game>"));
+							machinename = xml.Attribute("name").Value;
+							gameid = AddGame(sysid, machinename, srcid);
+						}
+						else if (line.IndexOf("<rom") != -1 && machinefound)
+						{
+							AddRom(line, machinename, "rom", gameid, date);
+						}
+						else if (line.IndexOf("<disk") != -1 && machinefound)
+						{
+							AddRom(line, machinename, "disk", gameid, date);
+						}
+						else if (line.IndexOf("</software>") != -1)
+						{
+							machinefound = false;
+							machinename = "";
+							description = "";
+							gameid = 0;
+						}
+					}
+
+					// Process original style RomVault DATs
+					else if (format == "romvault")
+					{
+						if (line.IndexOf("game") != -1 && !machinefound)
+						{
+							machinefound = true;
+						}
+						else if (line.IndexOf("rom (") != -1 && machinefound)
+						{
+							AddRomOld(line, machinename, "rom", gameid, date);
+						}
+						else if (line.IndexOf("disk (") != -1 && machinefound)
+						{
+							AddRomOld(line, machinename, "disk", gameid, date);
+						}
+						else if (line.IndexOf("name \"") != -1 && machinefound)
+						{
+							string machineNamePattern = "^\\s*name \"(.*)\"";
+							Regex machineNameRegex = new Regex(machineNamePattern);
+							Match machineNameMatch = machineNameRegex.Match(line);
+							machinename = machineNameMatch.Groups[1].Value;
+
+							gameid = AddGame(sysid, machinename, srcid);
+						}
+						else if (line.IndexOf("description \"") == -1 && line.IndexOf(")") != -1)
+						{
+							machinefound = false;
+							machinename = "";
+							description = "";
+							gameid = 0;
+						}
+					}
+				}
+
+				sr.Close();
+				fs.Close();
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex);
 				return false;
-			}
-
-			// Set necessary dat values
-			string format = "";
-			bool machinefound = false;
-			string machinename = "";
-			string description = "";
-			long gameid = 0;
-			bool comment = false;
-
-			// Parse the file for its rom information
-			while (sr.Peek() > 0)
-			{
-				string line = sr.ReadLine();
-
-				// First each string has to be normalized
-				line = Style.NormalizeChars(line);
-
-				// If the input style hasn't been set, set it according to the header
-				if (format == "")
-				{
-					if (line.IndexOf("<!DOCTYPE datafile") != -1)
-					{
-						format = "logiqx";
-					}
-					else if (line.IndexOf("<!DOCTYPE softwarelist") != -1)
-					{
-						format = "softwarelist";
-					}
-					else if (line.IndexOf("clrmamepro (") != -1 || line.IndexOf("romvault (") != -1)
-	                {
-						format = "romvault";
-					}
-					else
-					{
-						format = "unknown";
-					}
-				}
-
-				// If there's an XML-style comment, stop the presses and skip until it's over
-				else if (line.IndexOf("-->") != -1)
-				{
-					comment = false;
-				}
-				else if (line.IndexOf("<!--") != -1)
-				{
-					comment = true;
-				}
-
-				// Process Logiqx XML-derived DATs
-				else if(format == "logiqx" && !comment)
-				{
-					if (line.IndexOf("<machine") != -1 || line.IndexOf("<game") != -1)
-					{
-						machinefound = true;
-
-						XmlReader xml = XmlReader.Create(new StringReader(line + (line.IndexOf("<machine") != -1 ? "</machine>" : "</game>")));
-						machinename = xml.GetAttribute("name");
-						gameid = AddGame(sysid, machinename, srcid);
-					}
-					else if (line.IndexOf("<rom") != -1 && machinefound)
-					{
-						AddRom(line, machinename, "rom", gameid, date);
-					}
-					else if (line.IndexOf("<disk") != -1 && machinefound)
-					{
-						AddRom(line, machinename, "disk", gameid, date);
-					}
-					else if (line.IndexOf("</machine>") != -1 || line.IndexOf("</game>") != -1)
-					{
-						machinefound = false;
-						machinename = "";
-						description = "";
-						gameid = 0;
-					}
-				}
-
-				// Process SoftwareList XML-derived DATs
-				else if (format == "softwarelist" && !comment)
-				{
-					if (line.IndexOf("<software") != -1)
-					{
-						machinefound = true;
-
-						XmlReader xml = XmlReader.Create(new StringReader(line + "</software>"));
-						machinename = xml.GetAttribute("name");
-						gameid = AddGame(sysid, machinename, srcid);
-					}
-					else if (line.IndexOf("<rom") != -1 && machinefound)
-					{
-						AddRom(line, machinename, "rom", gameid, date);
-					}
-					else if (line.IndexOf("<disk") != -1 && machinefound)
-					{
-						AddRom(line, machinename, "disk", gameid, date);
-					}
-					else if (line.IndexOf("</software>") != -1)
-					{
-						machinefound = false;
-						machinename = "";
-						description = "";
-						gameid = 0;
-					}
-				}
-
-				// Process original style RomVault DATs
-				else if (format == "romvault")
-				{
-					if (line.IndexOf("game") != -1 && !machinefound)
-					{
-						machinefound = true;
-					}
-					else if (line.IndexOf("rom (") != -1 && machinefound)
-					{
-						AddRomOld(line, machinename, "rom", gameid, date);
-					}
-					else if (line.IndexOf("disk (") != -1 && machinefound)
-					{
-						AddRomOld(line, machinename, "disk", gameid, date);
-					}
-					else if (line.IndexOf("name \"") != -1 && machinefound)
-					{
-						string machineNamePattern = "^\\s*name \"(.*)\"";
-                        Regex machineNameRegex = new Regex(machineNamePattern);
-						Match machineNameMatch = machineNameRegex.Match(line);
-						machinename = machineNameMatch.Groups[1].Value;
-
-						gameid = AddGame(sysid, machinename, srcid);
-					}
-					else if (line.IndexOf(")") != -1)
-					{
-						machinefound = false;
-						machinename = "";
-						description = "";
-						gameid = 0;
-					}
-				}
 			}
 
 			return true;
@@ -442,10 +437,10 @@ namespace DATabase
 
 		private bool AddRom(string line, string machinename, string romtype, long gameid, string date)
 		{
-			XmlReader xml = XmlReader.Create(new StringReader(line));
-			return AddRomHelper(machinename, romtype, gameid, xml.GetAttribute("name"),
-				date, Int32.Parse(xml.GetAttribute("size")), xml.GetAttribute("crc"),
-				xml.GetAttribute("md5"), xml.GetAttribute("sha1"));
+			XElement xml = XElement.Parse(line);
+			return AddRomHelper(machinename, romtype, gameid, xml.Attribute("name").Value,
+				date, Int32.Parse(xml.Attribute("size").Value), xml.Attribute("crc").Value,
+				xml.Attribute("md5").Value, xml.Attribute("sha1").Value);
 		}
 
 		private bool AddRomOld(string line, string machinename, string romtype, long gameid, string date)

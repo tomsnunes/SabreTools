@@ -103,6 +103,12 @@ namespace DATabase
 			// Retrieve the list of processed roms
 			List<RomData> roms = ProcessRoms();
 
+			// If the output is null, nothing was found so return false
+			if (roms == null)
+			{
+				return false;
+			}
+
 			// Create a name for the file based on the retrieved information
 			string version = DateTime.Now.ToString("yyyyMMddHHmmss");
 			string datname = systemname + " (" + sourcename + " " + version + ")";
@@ -234,7 +240,7 @@ JOIN checksums
 	(!srcmerged ? " sources.id=" + _source : "") +
 	(!srcmerged && !sysmerged ? " AND" : "") +
 	(!sysmerged ? " systems.id=" + _system : "") +
-(merged ? " GROUP BY checksums.size, checksums.crc, checksums.md5, checksums.sha1" : "") +
+(merged ? "\nGROUP BY checksums.size, checksums.crc, checksums.md5, checksums.sha1" : "") +
 "\nORDER BY systems.id, sources.id, games.name, files.name";
 			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 			{
