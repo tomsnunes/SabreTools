@@ -1,4 +1,6 @@
-.vs
-basetables
-DATabase\bin
-DATabase\obj
+/.vs
+/basetables
+/DATabase/bin
+/DATabase/obj
+/DATabase/bin/Debug
+/DATabase/obj/Debug
