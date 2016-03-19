@@ -514,14 +514,13 @@ namespace DATabase
 
 		private bool AddRomHelper(string machinename, string romtype, long gameid, string name, string date, int size, string crc, string md5, string sha1)
 		{
+			// WOD origninally stripped out any subdirs from the imported files, we do the same
+			name = Path.GetFileName(name);
+
 			// Run the name through the filters to make sure that it's correct
 			name = Style.NormalizeChars(name);
 			name = Style.RussianToLatin(name);
-			name = Style.SearchPattern(name);
-
-			// WOD origninally stripped out any subdirs from the imported files, we do the same
-			string[] fullname = name.Split('\\');
-			name = fullname[fullname.Length - 1];
+			name = Regex.Replace(name, @"(.*) \.(.*)", "$1.$2");
 
 			if (romtype != "rom" && romtype != "disk")
 			{

@@ -300,7 +300,7 @@ JOIN checksums
 							// If the name and set are the same, rename it with whatever is different
 							if (samename && samegame)
 							{
-								temp.Name = Regex.Replace(temp.Name, @"^(.*)(\..*)", "$1 (" +
+								temp.Name = Regex.Replace(temp.Name, @"^(.*)(\..*)", "$1(" +
 										(temp.CRC != "" ? temp.CRC :
 												(temp.MD5 != "" ? temp.MD5 :
 														(temp.SHA1 != "" ? temp.SHA1 : "Alt"))) +
