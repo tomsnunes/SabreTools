@@ -265,18 +265,21 @@ namespace DATabase
 
 			// Experimental looping using only XML parsing
 			XmlNode node = doc.FirstChild;
+			Console.WriteLine(node.Name);
 			if (node != null && node.Name == "xml")
 			{
 				node = node.NextSibling;
             }
-			if (node != null && node.Name == "softwarelist")
-			{
-				node = node.NextSibling;
-			}
+			Console.WriteLine(node.Name);
 			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
 			{
+				if (node.NextSibling != null && node.NextSibling.Name == node.Name)
+				{
+					node = node.NextSibling;
+				}
 				node = node.FirstChild;
 			}
+			Console.WriteLine(node.Name);
 			if (node != null && node.Name == "header")
 			{
 				node = node.NextSibling;
@@ -286,8 +289,16 @@ namespace DATabase
 			{
 				if (node.Name == "machine" || node.Name == "game" || node.Name == "software")
 				{
-					long gameid = AddGame(sysid, node.Attributes["name"].Value, srcid);
-
+					long gameid = -1;
+                    if (node.Name == "software")
+					{
+						gameid = AddGame(sysid, node.SelectSingleNode("description").InnerText, srcid);
+                    }
+					else
+					{
+						gameid = AddGame(sysid, node.Attributes["name"].Value, srcid);
+					}
+					
 					// Get the roms from the machine
 					if (node.HasChildNodes)
 					{
@@ -302,10 +313,10 @@ namespace DATabase
 									gameid,
 									child.Attributes["name"].Value,
 									date,
-									(child.Attributes["size"].Value != "" ? Int32.Parse(child.Attributes["size"].Value) : -1),
-									(child.Attributes["crc"].Value != "" ? child.Attributes["crc"].Value : ""),
-									(child.Attributes["md5"].Value != "" ? child.Attributes["md5"].Value : ""),
-									(child.Attributes["sha1"].Value != "" ? child.Attributes["sha1"].Value : "")
+									(child.Attributes["size"] != null ? Int32.Parse(child.Attributes["size"].Value) : -1),
+									(child.Attributes["crc"] != null ? child.Attributes["crc"].Value : ""),
+									(child.Attributes["md5"] != null ? child.Attributes["md5"].Value : ""),
+									(child.Attributes["sha1"] != null ? child.Attributes["sha1"].Value : "")
                                 );
 							}
 							// If we find the signs of a software list, traverse the children
