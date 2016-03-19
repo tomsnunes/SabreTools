@@ -253,6 +253,7 @@ namespace DATabase
 			}
 
 			// Attempt to load the current file as XML
+			bool superdat = false;
 			XmlDocument doc = new XmlDocument();
 			try
 			{
@@ -282,6 +283,10 @@ namespace DATabase
 			Console.WriteLine(node.Name);
 			if (node != null && node.Name == "header")
 			{
+				if (node.SelectSingleNode("name").InnerText.Contains(" - SuperDAT"))
+				{
+					superdat = true;
+				}
 				node = node.NextSibling;
 			}
 
@@ -290,14 +295,24 @@ namespace DATabase
 				if (node.Name == "machine" || node.Name == "game" || node.Name == "software")
 				{
 					long gameid = -1;
-                    if (node.Name == "software")
+					string tempname = "";
+					Console.WriteLine(tempname);
+					if (node.Name == "software")
 					{
-						gameid = AddGame(sysid, node.SelectSingleNode("description").InnerText, srcid);
+						tempname = node.SelectSingleNode("description").InnerText;
                     }
 					else
 					{
-						gameid = AddGame(sysid, node.Attributes["name"].Value, srcid);
+						tempname = node.Attributes["name"].Value;
 					}
+
+					if (superdat)
+					{
+						tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
+					}
+					Console.Read();
+
+					gameid = AddGame(sysid, tempname, srcid);
 					
 					// Get the roms from the machine
 					if (node.HasChildNodes)
