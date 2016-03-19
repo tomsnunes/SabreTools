@@ -119,6 +119,11 @@ namespace DATabase
 			switch (type)
 			{
 				case DatType.mame:
+					if (!Remapping.MAME.ContainsKey(fileinfo[1].Value))
+					{
+						Console.WriteLine("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						return false;
+					}
 					GroupCollection mameInfo = Regex.Match(Remapping.MAME[fileinfo[1].Value], _remappedPattern).Groups;
 
 					manufacturer = mameInfo[1].Value;
@@ -127,6 +132,11 @@ namespace DATabase
 					date = File.GetLastWriteTime(_filepath).ToString("Y-m-d G:i:s");
 					break;
 				case DatType.nointro:
+					if (!Remapping.NoIntro.ContainsKey(fileinfo[1].Value))
+					{
+						Console.WriteLine("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						return false;
+					}
 					GroupCollection nointroInfo = Regex.Match(Remapping.NoIntro[fileinfo[1].Value], _remappedPattern).Groups;
 
 					manufacturer = nointroInfo[1].Value;
@@ -138,6 +148,11 @@ namespace DATabase
 						niDateInfo[4].Value + ":" + niDateInfo[5].Value + ":" + niDateInfo[6].Value;
 					break;
 				case DatType.redump:
+					if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
+					{
+						Console.WriteLine("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						return false;
+					}
 					GroupCollection redumpInfo = Regex.Match(Remapping.Redump[fileinfo[1].Value], _remappedPattern).Groups;
 
 					manufacturer = redumpInfo[1].Value;
@@ -149,6 +164,11 @@ namespace DATabase
 						rdDateInfo[4].Value + ":" + rdDateInfo[5].Value + ":" + rdDateInfo[6].Value;
 					break;
 				case DatType.tosec:
+					if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
+					{
+						Console.WriteLine("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						return false;
+					}
 					GroupCollection tosecInfo = Regex.Match(Remapping.TOSEC[fileinfo[1].Value], _remappedPattern).Groups;
 
 					manufacturer = tosecInfo[1].Value;
@@ -159,6 +179,11 @@ namespace DATabase
 					date = toDateInfo[1].Value + "-" + toDateInfo[2].Value + "-" + toDateInfo[3].Value + " 00:00:00";
 					break;
 				case DatType.trurip:
+					if (!Remapping.TruRip.ContainsKey(fileinfo[1].Value))
+					{
+						Console.WriteLine("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						return false;
+					}
 					GroupCollection truripInfo = Regex.Match(Remapping.TruRip[fileinfo[1].Value], _remappedPattern).Groups;
 
 					manufacturer = truripInfo[1].Value;
@@ -308,12 +333,14 @@ namespace DATabase
 					// Process SoftwareList XML-derived DATs
 					else if (format == "softwarelist" && !comment)
 					{
-						if (line.IndexOf("<software") != -1)
+						if (line.IndexOf("<software ") != -1)
 						{
 							machinefound = true;
-
-							XElement xml = XElement.Parse(line + (line.IndexOf("<machine") != -1 ? "</machine>" : "</game>"));
-							machinename = xml.Attribute("name").Value;
+						}
+						else if (line.IndexOf("<description") != -1 && machinefound)
+						{
+							XElement xml = XElement.Parse(line);
+							machinename = xml.Value;
 							gameid = AddGame(sysid, machinename, srcid);
 						}
 						else if (line.IndexOf("<rom") != -1 && machinefound)
@@ -438,9 +465,14 @@ namespace DATabase
 		private bool AddRom(string line, string machinename, string romtype, long gameid, string date)
 		{
 			XElement xml = XElement.Parse(line);
-			return AddRomHelper(machinename, romtype, gameid, xml.Attribute("name").Value,
-				date, Int32.Parse(xml.Attribute("size").Value), xml.Attribute("crc").Value,
-				xml.Attribute("md5").Value, xml.Attribute("sha1").Value);
+
+			string name = (xml.Attribute("name") != null ? xml.Attribute("name").Value : "");
+			int size = (xml.Attribute("size") != null ? Int32.Parse(xml.Attribute("size").Value) : -1);
+			string crc = (xml.Attribute("crc") != null ? xml.Attribute("crc").Value : "");
+			string md5 = (xml.Attribute("md5") != null ? xml.Attribute("md5").Value : "");
+			string sha1 = (xml.Attribute("sha1") != null ? xml.Attribute("sha1").Value : "");
+
+			return AddRomHelper(machinename, romtype, gameid, name, date, size, crc, md5, sha1);
 		}
 
 		private bool AddRomOld(string line, string machinename, string romtype, long gameid, string date)
@@ -504,10 +536,10 @@ SELECT files.id FROM files
 	WHERE files.name='" + name.Replace("'", "''") + @"'
 		AND files.type='" + romtype + @"' 
 		AND files.setid=" + gameid + " " + 
-        (size != -1 ? " AND checksums.size=" + size : "") +
-        (crc != "" ? " AND checksums.crc='" + crc + "'" : "") +
-        (md5 != "" ? " AND checksums.md5='" + md5 + "'" : "") +
-        (sha1 != "" ? " AND checksums.sha1='" + sha1 + "'" : "");
+        " AND checksums.size=" + size +
+        " AND checksums.crc='" + crc + "'" +
+        " AND checksums.md5='" + md5 + "'" +
+        " AND checksums.sha1='" + sha1 + "'";
 			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 			{
 				dbc.Open();
@@ -535,16 +567,8 @@ INSERT INTO files (setid, name, type, lastupdated)
 										romid = (long)slc3.ExecuteScalar();
 									}
 
-									query = @"INSERT INTO checksums (file" +
-										(size != -1 ? ", size" : "") +
-										(crc != "" ? ", crc" : "") +
-										(md5 != "" ? ", md5" : "") +
-										(sha1 != "" ? ", sha1" : "") +
-									") VALUES (" + romid +
-										(size != -1 ? ", " + size : "") +
-										(crc != "" ? ", '" + crc + "'" : "") +
-										(md5 != "" ? ", '" + md5 + "'" : "") +
-										(sha1 != "" ? ", '" + sha1 + "'" : "") + ")";
+									query = @"INSERT INTO checksums (file, size, crc, md5, sha1) VALUES (" +
+										romid + ", " + size + ", '" + crc + "'" + ", '" + md5 + "'" + ", '" + sha1 + "')";
 									using (SQLiteCommand slc3 = new SQLiteCommand(query, dbc))
 									{
 										affected = slc3.ExecuteNonQuery();
