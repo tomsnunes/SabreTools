@@ -296,7 +296,6 @@ namespace DATabase
 				{
 					long gameid = -1;
 					string tempname = "";
-					Console.WriteLine(tempname);
 					if (node.Name == "software")
 					{
 						tempname = node.SelectSingleNode("description").InnerText;
@@ -310,7 +309,6 @@ namespace DATabase
 					{
 						tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
 					}
-					Console.Read();
 
 					gameid = AddGame(sysid, tempname, srcid);
 					
