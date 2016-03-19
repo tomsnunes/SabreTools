@@ -129,7 +129,7 @@ namespace DATabase
 					manufacturer = mameInfo[1].Value;
 					system = mameInfo[2].Value;
 					source = "MAME";
-					date = File.GetLastWriteTime(_filepath).ToString("Y-m-d G:i:s");
+					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					break;
 				case DatType.nointro:
 					if (!Remapping.NoIntro.ContainsKey(fileinfo[1].Value))
@@ -189,7 +189,7 @@ namespace DATabase
 					manufacturer = truripInfo[1].Value;
 					system = truripInfo[2].Value;
 					source = "trurip";
-					date = File.GetLastWriteTime(_filepath).ToString("Y-m-d G:i:s");
+					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					break;
 				case DatType.custom:
 				default:
@@ -258,6 +258,8 @@ namespace DATabase
 				FileStream fs = File.OpenRead(_filepath);
 				StreamReader sr = new StreamReader(fs);
 
+				Console.WriteLine("got here");
+
 				// Set necessary dat values
 				string format = "";
 				bool machinefound = false;
@@ -277,18 +279,18 @@ namespace DATabase
 					// If the input style hasn't been set, set it according to the header
 					if (format == "")
 					{
-						if (line.IndexOf("<!DOCTYPE datafile") != -1)
-						{
+						if (line.IndexOf("<?xml version=\"1.0\" encoding=\"utf-8\"?>") != -1)
+                        {
 							format = "logiqx";
-						}
-						else if (line.IndexOf("<!DOCTYPE softwarelist") != -1)
-						{
-							format = "softwarelist";
 						}
 						else if (line.IndexOf("clrmamepro (") != -1 || line.IndexOf("romvault (") != -1)
 						{
 							format = "romvault";
 						}
+					}
+					else if (line.IndexOf("<!DOCTYPE softwarelist") != -1)
+					{
+						format = "softwarelist";
 					}
 
 					// If there's an XML-style comment, stop the presses and skip until it's over
