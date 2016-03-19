@@ -252,79 +252,85 @@ namespace DATabase
 				}
 			}
 
-			// Attempt to open the given file
+			// Attempt to load the current file as XML
+			XmlDocument doc = new XmlDocument();
 			try
 			{
-				FileStream fs = File.OpenRead(_filepath);
-				StreamReader sr = new StreamReader(fs);
+				doc.LoadXml(File.ReadAllText(_filepath));
+			}
+			catch (XmlException ex)
+			{
+				doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(_filepath)).ToString());
+			}
 
-				XmlDocument doc = new XmlDocument();
-				try
-				{
-					doc.LoadXml(sr.ReadToEnd());
-				}
-				catch (XmlException ex)
-				{
-					doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(_filepath)).ToString());
-				}
+			// Experimental looping using only XML parsing
+			XmlNode node = doc.FirstChild;
+			if (node != null && node.Name == "xml")
+			{
+				node = node.NextSibling;
+            }
+			if (node != null && node.Name == "softwarelist")
+			{
+				node = node.NextSibling;
+			}
+			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
+			{
+				node = node.FirstChild;
+			}
+			if (node != null && node.Name == "header")
+			{
+				node = node.NextSibling;
+			}
 
-				// Experimental looping using only XML parsing
-				XmlNode node = doc.FirstChild.FirstChild;
-				if (node.Name == "header")
+			while (node != null)
+			{
+				if (node.Name == "machine" || node.Name == "game" || node.Name == "software")
 				{
-					node = node.NextSibling;
-                }
+					long gameid = AddGame(sysid, node.Attributes["name"].Value, srcid);
 
-				while (node != null)
-				{
-					if (node.Name == "machine" || node.Name == "game" || node.Name == "software")
+					// Get the roms from the machine
+					if (node.HasChildNodes)
 					{
-						long gameid = AddGame(sysid, node.Attributes["name"].Value, srcid);
-
-						// Get the roms from the machine
-						if (node.HasChildNodes)
+						// If this node has children, traverse the children
+						foreach (XmlNode child in node.ChildNodes)
 						{
-							// If this node has children, traverse the children
-							foreach (XmlNode child in node.ChildNodes)
+							// If we find a rom or disk, add it
+							if (child.Name == "rom" || child.Name == "disk")
 							{
-								// If we find a rom or disk, add it
-								if (child.Name == "rom" || child.Name == "disk")
+								AddRomHelper(
+									child.Name,
+									gameid,
+									child.Attributes["name"].Value,
+									date,
+									(child.Attributes["size"].Value != "" ? Int32.Parse(child.Attributes["size"].Value) : -1),
+									(child.Attributes["crc"].Value != "" ? child.Attributes["crc"].Value : ""),
+									(child.Attributes["md5"].Value != "" ? child.Attributes["md5"].Value : ""),
+									(child.Attributes["sha1"].Value != "" ? child.Attributes["sha1"].Value : "")
+                                );
+							}
+							// If we find the signs of a software list, traverse the children
+							else if (child.Name == "part" && child.HasChildNodes)
+							{
+								foreach (XmlNode part in child.ChildNodes)
 								{
-									AddRomHelper(
-										child.Name,
-										gameid,
-										child.Attributes["name"].Value,
-										date,
-										(child.Attributes["size"].Value != "" ? Int32.Parse(child.Attributes["size"].Value) : -1),
-										(child.Attributes["crc"].Value != "" ? child.Attributes["crc"].Value : ""),
-										(child.Attributes["md5"].Value != "" ? child.Attributes["md5"].Value : ""),
-										(child.Attributes["sha1"].Value != "" ? child.Attributes["sha1"].Value : "")
-                                    );
-								}
-								// If we find the signs of a software list, traverse the children
-								else if (child.Name == "part" && child.HasChildNodes)
-								{
-									foreach (XmlNode part in child.ChildNodes)
+									// If we find a dataarea, traverse the children
+									if (part.Name == "dataarea")
 									{
-										// If we find a dataarea, traverse the children
-										if (part.Name == "dataarea")
+										foreach (XmlNode data in part.ChildNodes)
 										{
-											foreach (XmlNode data in part.ChildNodes)
+											// If we find a rom or disk, add it
+											if (data.Name == "rom" || data.Name == "disk")
 											{
-												// If we find a rom or disk, add it
-												if (data.Name == "rom" || data.Name == "disk")
-												{
-													AddRomHelper(
-														data.Name,
-														gameid,
-														data.Attributes["name"].Value,
-														date,
-														(data.Attributes["size"].Value != "" ? Int32.Parse(data.Attributes["size"].Value) : -1),
-														(data.Attributes["crc"].Value != "" ? data.Attributes["crc"].Value : ""),
-														(data.Attributes["md5"].Value != "" ? data.Attributes["md5"].Value : ""),
-														(data.Attributes["sha1"].Value != "" ? data.Attributes["sha1"].Value : "")
-													);
-												}
+												AddRomHelper(
+													data.Name,
+													gameid,
+													data.Attributes["name"].Value,
+													date,
+													(data.Attributes["size"] != null ? Int32.Parse(data.Attributes["size"].Value) : -1),
+													(data.Attributes["crc"] != null ? data.Attributes["crc"].Value : ""),
+													(data.Attributes["md5"] != null ? data.Attributes["md5"].Value : ""),
+													(data.Attributes["sha1"] != null ? data.Attributes["sha1"].Value : "")
+												);
 											}
 										}
 									}
@@ -332,16 +338,8 @@ namespace DATabase
 							}
 						}
 					}
-					node = node.NextSibling;
 				}
-
-				sr.Close();
-				fs.Close();
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex);
-				return false;
+				node = node.NextSibling;
 			}
 
 			return true;
