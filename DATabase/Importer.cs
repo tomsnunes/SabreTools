@@ -266,12 +266,10 @@ namespace DATabase
 
 			// Experimental looping using only XML parsing
 			XmlNode node = doc.FirstChild;
-			Console.WriteLine(node.Name);
 			if (node != null && node.Name == "xml")
 			{
 				node = node.NextSibling;
             }
-			Console.WriteLine(node.Name);
 			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
 			{
 				if (node.NextSibling != null && node.NextSibling.Name == node.Name)
@@ -280,7 +278,6 @@ namespace DATabase
 				}
 				node = node.FirstChild;
 			}
-			Console.WriteLine(node.Name);
 			if (node != null && node.Name == "header")
 			{
 				if (node.SelectSingleNode("name").InnerText.Contains(" - SuperDAT"))
@@ -327,9 +324,9 @@ namespace DATabase
 									child.Attributes["name"].Value,
 									date,
 									(child.Attributes["size"] != null ? Int32.Parse(child.Attributes["size"].Value) : -1),
-									(child.Attributes["crc"] != null ? child.Attributes["crc"].Value : ""),
-									(child.Attributes["md5"] != null ? child.Attributes["md5"].Value : ""),
-									(child.Attributes["sha1"] != null ? child.Attributes["sha1"].Value : "")
+									(child.Attributes["crc"] != null ? child.Attributes["crc"].Value.ToLowerInvariant() : ""),
+									(child.Attributes["md5"] != null ? child.Attributes["md5"].Value.ToLowerInvariant() : ""),
+									(child.Attributes["sha1"] != null ? child.Attributes["sha1"].Value.ToLowerInvariant() : "")
                                 );
 							}
 							// If we find the signs of a software list, traverse the children

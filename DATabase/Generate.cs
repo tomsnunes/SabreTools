@@ -236,12 +236,20 @@ JOIN files
 	ON games.id=files.setid
 JOIN checksums
 	ON files.id=checksums.file" +
-    (!sysmerged || !srcmerged ? "\nWHERE" : "") +
+	(!sysmerged || !srcmerged ? "\nWHERE" : "") +
 	(!srcmerged ? " sources.id=" + _source : "") +
 	(!srcmerged && !sysmerged ? " AND" : "") +
-	(!sysmerged ? " systems.id=" + _system : "") +
-(merged ? "\nGROUP BY checksums.size, checksums.crc, checksums.md5, checksums.sha1" : "") +
+	(!sysmerged ? " systems.id=" + _system : "") + "\n" +
+	(sysmerged && srcmerged ? "\nWHERE" : " AND") +
+" files.id IN ( SELECT file from checksums WHERE file IN (" +
+" SELECT file FROM checksums WHERE file IN (" +
+" SELECT file FROM checksums" +
+	(merged ? "\nGROUP BY size, sha1" : "") + " )" +
+	(merged ? "\nGROUP BY size, md5" : "") + " )" +
+	(merged ? "\nGROUP BY size, crc" : "") + " )" +
+  (merged ? "\nGROUP BY checksums.size, checksums.md5, checksums.sha1" : "") +
 "\nORDER BY systems.id, sources.id, games.name, files.name";
+
 			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 			{
 				dbc.Open();
