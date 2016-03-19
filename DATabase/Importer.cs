@@ -258,142 +258,81 @@ namespace DATabase
 				FileStream fs = File.OpenRead(_filepath);
 				StreamReader sr = new StreamReader(fs);
 
-				Console.WriteLine("got here");
-
-				// Set necessary dat values
-				string format = "";
-				bool machinefound = false;
-				string machinename = "";
-				string description = "";
-				long gameid = 0;
-				bool comment = false;
-
-				// Parse the file for its rom information
-				while (sr.Peek() > 0)
+				XmlDocument doc = new XmlDocument();
+				try
 				{
-					string line = sr.ReadLine();
+					doc.LoadXml(sr.ReadToEnd());
+				}
+				catch (XmlException ex)
+				{
+					doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(_filepath)).ToString());
+				}
 
-					// First each string has to be normalized
-					line = Style.NormalizeChars(line);
+				// Experimental looping using only XML parsing
+				XmlNode node = doc.FirstChild.FirstChild;
+				if (node.Name == "header")
+				{
+					node = node.NextSibling;
+                }
 
-					// If the input style hasn't been set, set it according to the header
-					if (format == "")
+				while (node != null)
+				{
+					if (node.Name == "machine" || node.Name == "game" || node.Name == "software")
 					{
-						if (line.IndexOf("<?xml version=\"1.0\" encoding=\"utf-8\"?>") != -1)
-                        {
-							format = "logiqx";
-						}
-						else if (line.IndexOf("clrmamepro (") != -1 || line.IndexOf("romvault (") != -1)
+						long gameid = AddGame(sysid, node.Attributes["name"].Value, srcid);
+
+						// Get the roms from the machine
+						if (node.HasChildNodes)
 						{
-							format = "romvault";
+							// If this node has children, traverse the children
+							foreach (XmlNode child in node.ChildNodes)
+							{
+								// If we find a rom or disk, add it
+								if (child.Name == "rom" || child.Name == "disk")
+								{
+									AddRomHelper(
+										child.Name,
+										gameid,
+										child.Attributes["name"].Value,
+										date,
+										(child.Attributes["size"].Value != "" ? Int32.Parse(child.Attributes["size"].Value) : -1),
+										(child.Attributes["crc"].Value != "" ? child.Attributes["crc"].Value : ""),
+										(child.Attributes["md5"].Value != "" ? child.Attributes["md5"].Value : ""),
+										(child.Attributes["sha1"].Value != "" ? child.Attributes["sha1"].Value : "")
+                                    );
+								}
+								// If we find the signs of a software list, traverse the children
+								else if (child.Name == "part" && child.HasChildNodes)
+								{
+									foreach (XmlNode part in child.ChildNodes)
+									{
+										// If we find a dataarea, traverse the children
+										if (part.Name == "dataarea")
+										{
+											foreach (XmlNode data in part.ChildNodes)
+											{
+												// If we find a rom or disk, add it
+												if (data.Name == "rom" || data.Name == "disk")
+												{
+													AddRomHelper(
+														data.Name,
+														gameid,
+														data.Attributes["name"].Value,
+														date,
+														(data.Attributes["size"].Value != "" ? Int32.Parse(data.Attributes["size"].Value) : -1),
+														(data.Attributes["crc"].Value != "" ? data.Attributes["crc"].Value : ""),
+														(data.Attributes["md5"].Value != "" ? data.Attributes["md5"].Value : ""),
+														(data.Attributes["sha1"].Value != "" ? data.Attributes["sha1"].Value : "")
+													);
+												}
+											}
+										}
+									}
+								}
+							}
 						}
 					}
-					else if (line.IndexOf("<!DOCTYPE softwarelist") != -1)
-					{
-						format = "softwarelist";
-					}
-
-					// If there's an XML-style comment, stop the presses and skip until it's over
-					else if (line.IndexOf("-->") != -1)
-					{
-						comment = false;
-					}
-					else if (line.IndexOf("<!--") != -1)
-					{
-						comment = true;
-					}
-
-					// Process Logiqx XML-derived DATs
-					else if(format == "logiqx" && !comment)
-					{
-						if (line.IndexOf("<machine") != -1 || line.IndexOf("<game") != -1)
-						{
-							machinefound = true;
-
-							XElement xml = XElement.Parse(line + (line.IndexOf("<machine") != -1 ? "</machine>" : "</game>"));
-							machinename = xml.Attribute("name").Value;
-
-							gameid = AddGame(sysid, machinename, srcid);
-						}
-						else if (line.IndexOf("<rom") != -1 && machinefound)
-						{
-							AddRom(line, machinename, "rom", gameid, date);
-						}
-						else if (line.IndexOf("<disk") != -1 && machinefound)
-						{
-							AddRom(line, machinename, "disk", gameid, date);
-						}
-						else if (line.IndexOf("</machine>") != -1 || line.IndexOf("</game>") != -1)
-						{
-							machinefound = false;
-							machinename = "";
-							description = "";
-							gameid = 0;
-						}
-					}
-
-					// Process SoftwareList XML-derived DATs
-					else if (format == "softwarelist" && !comment)
-					{
-						if (line.IndexOf("<software ") != -1)
-						{
-							machinefound = true;
-						}
-						else if (line.IndexOf("<description") != -1 && machinefound)
-						{
-							XElement xml = XElement.Parse(line);
-							machinename = xml.Value;
-							gameid = AddGame(sysid, machinename, srcid);
-						}
-						else if (line.IndexOf("<rom") != -1 && machinefound)
-						{
-							AddRom(line, machinename, "rom", gameid, date);
-						}
-						else if (line.IndexOf("<disk") != -1 && machinefound)
-						{
-							AddRom(line, machinename, "disk", gameid, date);
-						}
-						else if (line.IndexOf("</software>") != -1)
-						{
-							machinefound = false;
-							machinename = "";
-							description = "";
-							gameid = 0;
-						}
-					}
-
-					// Process original style RomVault DATs
-					else if (format == "romvault")
-					{
-						if (line.IndexOf("game") != -1 && !machinefound)
-						{
-							machinefound = true;
-						}
-						else if (line.IndexOf("rom (") != -1 && machinefound)
-						{
-							AddRomOld(line, machinename, "rom", gameid, date);
-						}
-						else if (line.IndexOf("disk (") != -1 && machinefound)
-						{
-							AddRomOld(line, machinename, "disk", gameid, date);
-						}
-						else if (line.IndexOf("name \"") != -1 && machinefound)
-						{
-							string machineNamePattern = "^\\s*name \"(.*)\"";
-							Regex machineNameRegex = new Regex(machineNamePattern);
-							Match machineNameMatch = machineNameRegex.Match(line);
-							machinename = machineNameMatch.Groups[1].Value;
-
-							gameid = AddGame(sysid, machinename, srcid);
-						}
-						else if (line.IndexOf("description \"") == -1 && line.IndexOf(")") != -1)
-						{
-							machinefound = false;
-							machinename = "";
-							description = "";
-							gameid = 0;
-						}
-					}
+					node = node.NextSibling;
 				}
 
 				sr.Close();
@@ -464,57 +403,7 @@ namespace DATabase
 			return gameid;
 		}
 
-		private bool AddRom(string line, string machinename, string romtype, long gameid, string date)
-		{
-			XElement xml = XElement.Parse(line);
-
-			string name = (xml.Attribute("name") != null ? xml.Attribute("name").Value : "");
-			int size = (xml.Attribute("size") != null ? Int32.Parse(xml.Attribute("size").Value) : -1);
-			string crc = (xml.Attribute("crc") != null ? xml.Attribute("crc").Value : "");
-			string md5 = (xml.Attribute("md5") != null ? xml.Attribute("md5").Value : "");
-			string sha1 = (xml.Attribute("sha1") != null ? xml.Attribute("sha1").Value : "");
-
-			return AddRomHelper(machinename, romtype, gameid, name, date, size, crc, md5, sha1);
-		}
-
-		private bool AddRomOld(string line, string machinename, string romtype, long gameid, string date)
-		{
-			string infoPattern = "name \"(.*)\"";
-			Regex infoRegex = new Regex(infoPattern);
-			Match infoMatch = infoRegex.Match(line);
-			string name = infoMatch.Groups[1].Value;
-
-			string[] rominfo = line.Split(' ');
-			int size = -1;
-			string crc = "";
-			string md5 = "";
-			string sha1 = "";
-
-			string next = "";
-			foreach (string info in rominfo)
-			{
-				if (info == "size" || info == "crc" || info == "md5" || info == "sha1")
-				{
-					next = info;
-				}
-				else if (next != "")
-				{
-					switch (next)
-					{
-						case "size": size = Int32.Parse(info); break;
-						case "crc": crc = info; break;
-						case "md5": md5 = info; break;
-						case "sha1": sha1 = info; break;
-						default: break;
-					}
-					next = "";
-				}
-			}
-
-			return AddRomHelper(machinename, romtype, gameid, name, date, size, crc, md5, sha1);
-		}
-
-		private bool AddRomHelper(string machinename, string romtype, long gameid, string name, string date, int size, string crc, string md5, string sha1)
+		private bool AddRomHelper(string romtype, long gameid, string name, string date, int size, string crc, string md5, string sha1)
 		{
 			// WOD origninally stripped out any subdirs from the imported files, we do the same
 			name = Path.GetFileName(name);

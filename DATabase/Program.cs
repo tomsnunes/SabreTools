@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 
+using System.Xml.Linq;
+
 namespace DATabase
 {
 	class Program
@@ -158,6 +160,36 @@ ORDER BY systems.manufacturer, systems.system";
 
 					break;
 
+				case "-c":
+				case "--convert":
+					// Check if there are enough arguments
+					if (args.Length > 1)
+					{
+						// Check to see if the second argument is a file that exists
+						if (args.Length > 1 && File.Exists(args[1]))
+						{
+							Console.WriteLine("Converting " + args[1]);
+							XElement conv = Converters.RomVaultToXML(File.ReadAllLines(args[1]));
+							FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(args[1]) + ".new.xml");
+							StreamWriter sw = new StreamWriter(fs);
+							sw.Write(conv);
+							sw.Close();
+							fs.Close();
+							Console.WriteLine("Converted file: " + Path.GetFileNameWithoutExtension(args[1]) + ".new.xml");
+						}
+						// If it's invalid, show the help
+						else
+						{
+							Help();
+						}
+					}
+					// If there aren't enough arguments
+					else
+					{
+						Help();
+					}
+					break;
+
 				// Invalid argument
 				default:
 					Help();
@@ -264,9 +296,10 @@ Usage: DATabase <option> (<filename>|<dirname>) | (system=sy) (source=so)
 	-g, --generate	Start tool in generate mode
 	-lso		List all sources (id <= name)
 	-lsy		List all systems (id <= name)
+	-c, --convert	Convert a RV DAT to XML
 
-If started in import mode, either a filename or directory
-name is required  in order to run.
+If started in import or convert mode, either a filename
+or directory name is required  in order to run.
 
 If started in generate mode, here are the possible states:
 	system blank,	source blank	Create MEGAMERGED
