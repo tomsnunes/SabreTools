@@ -268,28 +268,38 @@ namespace DATabase
 			XmlNode node = doc.FirstChild;
 			if (node != null && node.Name == "xml")
 			{
-				node = node.NextSibling;
-            }
-			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
-			{
-				if (node.NextSibling != null && node.NextSibling.Name == node.Name)
+				// Skip over everything that's not an element
+				while (node.NodeType != XmlNodeType.Element)
 				{
 					node = node.NextSibling;
 				}
+            }
+
+			// Once we find the main body, enter it
+			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
+			{
 				node = node.FirstChild;
 			}
+
+			// Skip the header if it exists
 			if (node != null && node.Name == "header")
 			{
+				// Check for SuperDAT mode
 				if (node.SelectSingleNode("name").InnerText.Contains(" - SuperDAT"))
 				{
 					superdat = true;
 				}
-				node = node.NextSibling;
+
+				// SKip over anything that's not an element
+				while (node.NodeType != XmlNodeType.Element)
+				{
+					node = node.NextSibling;
+				}
 			}
 
 			while (node != null)
 			{
-				if (node.Name == "machine" || node.Name == "game" || node.Name == "software")
+				if (node.NodeType == XmlNodeType.Element && (node.Name == "machine" || node.Name == "game" || node.Name == "software"))
 				{
 					long gameid = -1;
 					string tempname = "";
@@ -316,7 +326,7 @@ namespace DATabase
 						foreach (XmlNode child in node.ChildNodes)
 						{
 							// If we find a rom or disk, add it
-							if (child.Name == "rom" || child.Name == "disk")
+							if (node.NodeType == XmlNodeType.Element && (child.Name == "rom" || child.Name == "disk"))
 							{
 								AddRomHelper(
 									child.Name,
@@ -330,17 +340,17 @@ namespace DATabase
                                 );
 							}
 							// If we find the signs of a software list, traverse the children
-							else if (child.Name == "part" && child.HasChildNodes)
+							else if (child.NodeType == XmlNodeType.Element && child.Name == "part" && child.HasChildNodes)
 							{
 								foreach (XmlNode part in child.ChildNodes)
 								{
 									// If we find a dataarea, traverse the children
-									if (part.Name == "dataarea")
+									if (part.NodeType == XmlNodeType.Element && part.Name == "dataarea")
 									{
 										foreach (XmlNode data in part.ChildNodes)
 										{
 											// If we find a rom or disk, add it
-											if (data.Name == "rom" || data.Name == "disk")
+											if (data.NodeType == XmlNodeType.Element && (data.Name == "rom" || data.Name == "disk"))
 											{
 												AddRomHelper(
 													data.Name,
