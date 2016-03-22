@@ -324,9 +324,9 @@ namespace DATabase
 									child.Attributes["name"].Value,
 									date,
 									(child.Attributes["size"] != null ? Int32.Parse(child.Attributes["size"].Value) : -1),
-									(child.Attributes["crc"] != null ? child.Attributes["crc"].Value.ToLowerInvariant() : ""),
-									(child.Attributes["md5"] != null ? child.Attributes["md5"].Value.ToLowerInvariant() : ""),
-									(child.Attributes["sha1"] != null ? child.Attributes["sha1"].Value.ToLowerInvariant() : "")
+									(child.Attributes["crc"] != null ? child.Attributes["crc"].Value.ToUpperInvariant() : ""),
+									(child.Attributes["md5"] != null ? child.Attributes["md5"].Value.ToUpperInvariant() : ""),
+									(child.Attributes["sha1"] != null ? child.Attributes["sha1"].Value.ToUpperInvariant() : "")
                                 );
 							}
 							// If we find the signs of a software list, traverse the children
@@ -348,9 +348,9 @@ namespace DATabase
 													data.Attributes["name"].Value,
 													date,
 													(data.Attributes["size"] != null ? Int32.Parse(data.Attributes["size"].Value) : -1),
-													(data.Attributes["crc"] != null ? data.Attributes["crc"].Value : ""),
-													(data.Attributes["md5"] != null ? data.Attributes["md5"].Value : ""),
-													(data.Attributes["sha1"] != null ? data.Attributes["sha1"].Value : "")
+													(data.Attributes["crc"] != null ? data.Attributes["crc"].Value.ToUpperInvariant() : ""),
+													(data.Attributes["md5"] != null ? data.Attributes["md5"].Value.ToUpperInvariant() : ""),
+													(data.Attributes["sha1"] != null ? data.Attributes["sha1"].Value.ToUpperInvariant() : "")
 												);
 											}
 										}
@@ -378,7 +378,7 @@ namespace DATabase
 			machinename = Style.NormalizeChars(machinename);
 			machinename = Style.RussianToLatin(machinename);
 			machinename = Style.SearchPattern(machinename);
-			machinename.Trim();
+			machinename = machinename.Trim();
 
 			long gameid = -1;
 			string query = "SELECT id FROM games WHERE system=" + sysid +
