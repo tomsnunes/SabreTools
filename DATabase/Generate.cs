@@ -271,20 +271,22 @@ JOIN checksums
 						string lastname = "", lastgame = "";
 						while (sldr.Read())
 						{
-							RomData temp = new RomData();
-							temp.Manufacturer = sldr.GetString(0);
-							temp.System = sldr.GetString(1);
-							temp.SystemID = sldr.GetInt32(2);
-							temp.Source = sldr.GetString(3);
-							temp.URL = sldr.GetString(4);
-							temp.SourceID = sldr.GetInt32(5);
-							temp.Game = sldr.GetString(6);
-							temp.Name = sldr.GetString(7);
-							temp.Type = sldr.GetString(8);
-							temp.Size = sldr.GetInt32(9);
-							temp.CRC = sldr.GetString(10);
-							temp.MD5 = sldr.GetString(11);
-							temp.SHA1 = sldr.GetString(12);
+							RomData temp = new RomData
+							{
+								Manufacturer = sldr.GetString(0),
+								System = sldr.GetString(1),
+								SystemID = sldr.GetInt32(2),
+								Source = sldr.GetString(3),
+								URL = sldr.GetString(4),
+								SourceID = sldr.GetInt32(5),
+								Game = sldr.GetString(6),
+								Name = sldr.GetString(7),
+								Type = sldr.GetString(8),
+								Size = sldr.GetInt32(9),
+								CRC = sldr.GetString(10),
+								MD5 = sldr.GetString(11),
+								SHA1 = sldr.GetString(12),
+							};
 
 							// If we're in merged mode, rename the game associated
 							if (merged)
