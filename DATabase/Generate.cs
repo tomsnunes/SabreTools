@@ -179,18 +179,18 @@ namespace DATabase
 					{
 						state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
 							(rom.Size != 0 ? " size " + rom.Size : "") +
-							(rom.CRC != "" ? " crc " + rom.CRC : "") +
-							(rom.MD5 != "" ? " md5 " + rom.MD5 : "") +
-							(rom.SHA1 != "" ? " sha1 " + rom.SHA1 : "") +
+							(rom.CRC != "" ? " crc " + rom.CRC.ToUpperInvariant() : "") +
+							(rom.MD5 != "" ? " md5 " + rom.MD5.ToUpperInvariant() : "") +
+							(rom.SHA1 != "" ? " sha1 " + rom.SHA1.ToUpperInvariant() : "") +
 							" )\n";
 					}
 					else
 					{
 						state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
 							(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
-							(rom.CRC != "" ? " crc=\"" + rom.CRC + "\"" : "") +
-							(rom.MD5 != "" ? " md5=\"" + rom.MD5 + "\"" : "") +
-							(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1 + "\"" : "") +
+							(rom.CRC != "" ? " crc=\"" + rom.CRC.ToUpperInvariant() + "\"" : "") +
+							(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToUpperInvariant() + "\"" : "") +
+							(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToUpperInvariant() + "\"" : "") +
 							" />\n";
 					}
 
