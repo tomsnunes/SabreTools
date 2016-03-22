@@ -243,6 +243,12 @@ JOIN checksums
 	(sysmerged && srcmerged ? "\nWHERE" : " AND") +
 "\n files.id IN ( SELECT checksums.file FROM checksums JOIN files ON checksums.file=files.id WHERE files.type='rom'" +
 	(merged ? "\nGROUP BY checksums.size, checksums.crc" : "") + " )" +
+"\n OR files.id IN ( SELECT checksums.file FROM checksums JOIN files ON checksums.file=files.id WHERE files.type='rom'" +
+	(merged ? "\nGROUP BY checksums.size, checksums.md5" : "") + " )" +
+"\n OR files.id IN ( SELECT checksums.file FROM checksums JOIN files ON checksums.file=files.id WHERE files.type='rom'" +
+	(merged ? "\nGROUP BY checksums.size, checksums.sha1" : "") + " )" +
+"\n OR files.id IN ( SELECT checksums.file FROM checksums JOIN files ON checksums.file=files.id WHERE files.type='disk'" +
+	(merged ? "\nGROUP BY checksums.md5" : "") + " )" +
 "\n OR files.id IN ( SELECT checksums.file FROM checksums JOIN files ON checksums.file=files.id WHERE files.type='disk'" +
 	(merged ? "\nGROUP BY checksums.sha1" : "") + " )" +
 "\nORDER BY systems.id, sources.id, games.name, files.name";
