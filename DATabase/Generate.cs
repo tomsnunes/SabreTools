@@ -162,6 +162,11 @@ namespace DATabase
 				string lastgame = "";
 				foreach (RomData rom in roms)
 				{
+					if (lastgame.Contains("Adventures of Batman"))
+					{
+						Console.WriteLine(lastgame + ", " + rom.Game);
+					}
+
 					string state = "";
 					if (lastgame != "" && lastgame != rom.Game)
 					{
@@ -194,7 +199,7 @@ namespace DATabase
 							" />\n";
 					}
 
-					lastgame = HttpUtility.HtmlEncode(rom.Game);
+					lastgame = rom.Game;
 
 					sw.Write(state);
 				}
