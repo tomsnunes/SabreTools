@@ -223,7 +223,7 @@ namespace DATabase
 			bool merged = sysmerged || srcmerged;
 
 			string query = @"
-SELECT systems.manufacturer AS manufacturer, systems.system AS system, systems.id AS systemid,
+SELECT DISTINCT systems.manufacturer AS manufacturer, systems.system AS system, systems.id AS systemid,
 	sources.name AS source, sources.url AS url, sources.id AS sourceid,
 	games.name AS game, files.name AS name, files.type AS type, checksums.size AS size, checksums.crc AS crc,
 	checksums.md5 AS md5, checksums.sha1 AS sha1
@@ -240,18 +240,9 @@ JOIN checksums
 	(!srcmerged ? " sources.id=" + _source : "") +
 	(!srcmerged && !sysmerged ? " AND" : "") +
 	(!sysmerged ? " systems.id=" + _system : "") + "\n" +
-	(sysmerged && srcmerged ? "\nWHERE" : " AND") +
-"\n files.id IN ( SELECT checksums.file FROM checksums JOIN files ON checksums.file=files.id WHERE files.type='rom'" +
-	(merged ? "\nGROUP BY checksums.size, checksums.crc" : "") + " )" +
-"\n OR files.id IN ( SELECT checksums.file FROM checksums JOIN files ON checksums.file=files.id WHERE files.type='rom'" +
-	(merged ? "\nGROUP BY checksums.size, checksums.md5" : "") + " )" +
-"\n OR files.id IN ( SELECT checksums.file FROM checksums JOIN files ON checksums.file=files.id WHERE files.type='rom'" +
-	(merged ? "\nGROUP BY checksums.size, checksums.sha1" : "") + " )" +
-"\n OR files.id IN ( SELECT checksums.file FROM checksums JOIN files ON checksums.file=files.id WHERE files.type='disk'" +
-	(merged ? "\nGROUP BY checksums.md5" : "") + " )" +
-"\n OR files.id IN ( SELECT checksums.file FROM checksums JOIN files ON checksums.file=files.id WHERE files.type='disk'" +
-	(merged ? "\nGROUP BY checksums.sha1" : "") + " )" +
-"\nORDER BY systems.id, sources.id, games.name, files.name";
+"\nORDER BY " +
+	(merged ? "checksums.size, checksums.crc, checksums.md5, checksums.sha1"
+			: "systems.id, sources.id, games.name, files.name");
 
 			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 			{
@@ -267,8 +258,9 @@ JOIN checksums
 							return null;
 						}
 
-						// Retrieve and process the roms
-						string lastname = "", lastgame = "";
+						// Retrieve and process the roms for merging
+						string lasttype = "", lastcrc = "", lastmd5 = "", lastsha1 = "";
+						int lastsize = -1;
 						while (sldr.Read())
 						{
 							RomData temp = new RomData
@@ -288,42 +280,101 @@ JOIN checksums
 								SHA1 = sldr.GetString(12),
 							};
 
-							// If we're in merged mode, rename the game associated
 							if (merged)
 							{
+								// Check if the rom is a duplicate
+								bool shouldcont = false;
+								if (temp.Type == "rom" && lasttype == "rom")
+								{
+									shouldcont = ((temp.Size != -1 && temp.Size == lastsize) && (
+											(temp.CRC != "" && lastcrc != "" && temp.CRC == lastcrc) ||
+											(temp.MD5 != "" && lastmd5 != "" && temp.MD5 == lastmd5) ||
+											(temp.SHA1 != "" && lastsha1 != "" && temp.SHA1 == lastsha1)
+											)
+										);
+								}
+								else if (temp.Type == "disk" && lasttype == "disk")
+								{
+									shouldcont = ((temp.MD5 != "" && lastmd5 != "" && temp.MD5 == lastmd5) ||
+											(temp.SHA1 != "" && lastsha1 != "" && temp.SHA1 == lastsha1)
+										);
+								}
+
+								// Set the next variables
+								lasttype = temp.Type;
+								lastsize = temp.Size;
+								lastcrc = temp.CRC;
+								lastmd5 = temp.MD5;
+								lastsha1 = temp.SHA1;
+
+								// If it's a duplicate, skip adding it to the output
+								if (shouldcont)
+								{
+									continue;
+								}
+
+								// Rename the game associated if it's still valid
 								temp.Game = temp.Game +
 									(sysmerged ? " [" + temp.Manufacturer + " - " + temp.System + "]" : "") +
 									(srcmerged ? " [" + temp.Source + "]" : "");
-							}
-
-							// Now relable any roms that have the same name inside of the same game
-							bool samename = false, samegame = false;
-							if (temp.Name != "")
-							{
-								samename = (lastname == temp.Name);
-							}
-							if (temp.Game != "")
-							{
-								samegame = (lastgame == temp.Game);
-							}
-		
-							lastname = temp.Name;
-							lastgame = temp.Game;
-
-							// If the name and set are the same, rename it with whatever is different
-							if (samename && samegame)
-							{
-								temp.Name = Regex.Replace(temp.Name, @"^(.*)(\..*)", "$1(" +
-										(temp.CRC != "" ? temp.CRC :
-												(temp.MD5 != "" ? temp.MD5 :
-														(temp.SHA1 != "" ? temp.SHA1 : "Alt"))) +
-										")$2");
 							}
 
 							roms.Add(temp);
 						}
 					}
 				}
+			}
+
+			// If we're in a merged mode, resort by the correct parameters
+			roms.Sort(delegate (RomData x, RomData y)
+			{
+				if (x.SystemID == y.SystemID)
+				{
+					if (x.SourceID == y.SourceID)
+					{
+						if (x.Game == y.Game)
+						{
+							return String.Compare(x.Name, y.Name);
+						}
+						return String.Compare(x.Name, y.Name);
+					}
+					return x.SourceID - y.SourceID;
+				}
+				return x.SystemID - y.SystemID;
+			});
+
+			// Now check rename within games
+			string lastname = "", lastgame = "";
+			for (int i = 0; i < roms.Count; i++)
+			{
+				RomData rom = roms[i];
+
+				// Now relable any roms that have the same name inside of the same game
+				bool samename = false, samegame = false;
+				if (rom.Name != "")
+				{
+					samename = (lastname == rom.Name);
+				}
+				if (rom.Game != "")
+				{
+					samegame = (lastgame == rom.Game);
+				}
+
+				lastname = rom.Name;
+				lastgame = rom.Game;
+
+				// If the name and set are the same, rename it with whatever is different
+				if (samename && samegame)
+				{
+					rom.Name = Regex.Replace(rom.Name, @"^(.*)(\..*)", "$1(" +
+							(rom.CRC != "" ? rom.CRC :
+									(rom.MD5 != "" ? rom.MD5 :
+											(rom.SHA1 != "" ? rom.SHA1 : "Alt"))) +
+							")$2");
+				}
+
+				// Assign back just in case
+				roms[i] = rom;
 			}
 
 			return roms;
