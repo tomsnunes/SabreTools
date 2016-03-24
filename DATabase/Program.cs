@@ -277,7 +277,7 @@ CREATE TABLE IF NOT EXISTS systems (
 			Console.Write(@"
 DATabase - Import and Generate DAT files
 -----------------------------------------
-Usage: DATabase <option> (input=<filename>|<dirname>) | (system=sy) (source=so)
+Usage: DATabase <option> (<filename>|<dirname>) | (system=sy) (source=so)
 
 <option> can be one of the following:
 	-h, -?, --help		Show this help
@@ -291,6 +291,7 @@ Usage: DATabase <option> (input=<filename>|<dirname>) | (system=sy) (source=so)
 
 If started in import or convert mode, either a filename
 or directory name is required in order to run.
+Filenames and directories can't start with '-' or contain '='
 
 If started in generate mode, here are the possible states:
 	system blank,	source blank	Create MEGAMERGED
