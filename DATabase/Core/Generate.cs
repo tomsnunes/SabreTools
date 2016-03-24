@@ -10,8 +10,8 @@ namespace DATabase
 	class Generate
 	{
 		// Private instance variables
-		private int _system;
-		private int _source;
+		private int _systems;
+		private int _sources;
 		private string _connectionString;
 		private bool _norename;
 		private bool _old;
@@ -19,20 +19,10 @@ namespace DATabase
 		// Private required variables
 		private Dictionary<int, string> _headers;
 
-		// Public instance variables
-		public int System
+		public Generate(int systems, int sources, string connectionString, bool norename = false, bool old = false)
 		{
-			get { return _system; }
-		}
-		public int Source
-		{
-			get { return _source; }
-		}
-
-		public Generate(int system, int source, string connectionString, bool norename = false, bool old = false)
-		{
-			_system = system;
-			_source = source;
+			_systems = systems;
+			_sources = sources;
 			_connectionString = connectionString;
 			_norename = norename;
 			_old = old;
@@ -51,9 +41,9 @@ namespace DATabase
 		{
 			// Get the system name, if applicable
 			string systemname = "ALL";
-			if (_system != -1)
+			if (_systems != -1)
 			{
-				string query = "SELECT manufacturer, system FROM systems WHERE id=" + _system;
+				string query = "SELECT manufacturer, system FROM systems WHERE id=" + _systems;
 				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 				{
 					dbc.Open();
@@ -64,7 +54,7 @@ namespace DATabase
 							// If there are no games for this combination, return nothing
 							if (!sldr.HasRows)
 							{
-								Console.WriteLine("No system could be found with id " + _system + ". Please check and try again.");
+								Console.WriteLine("No system could be found with id " + _systems + ". Please check and try again.");
 								return false;
 							}
 
@@ -77,9 +67,9 @@ namespace DATabase
 			}
 
 			string sourcename = "Merged";
-			if (_source != -1)
+			if (_sources != -1)
 			{
-				string query = "SELECT name FROM sources WHERE id=" + _source;
+				string query = "SELECT name FROM sources WHERE id=" + _sources;
 				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 				{
 					dbc.Open();
@@ -90,7 +80,7 @@ namespace DATabase
 							// If there are no games for this combination, return nothing
 							if (!sldr.HasRows)
 							{
-								Console.WriteLine("No source could be found with id " + _source + ". Please check and try again.");
+								Console.WriteLine("No source could be found with id " + _sources + ". Please check and try again.");
 								return false;
 							}
 
@@ -124,16 +114,16 @@ namespace DATabase
 				StreamWriter sw = new StreamWriter(fs);
 
 				// Temporarilly set _system if we're in MEGAMERGED mode to get the right header skip XML
-				if (_system == -1 && _source == -1)
+				if (_systems == -1 && _sources == -1)
 				{
-					_system = 0;
+					_systems = 0;
 				}
 
 				string header_old = "clrmamepro (\n" +
 					"\tname \"" + HttpUtility.HtmlEncode(datname) + "\"\n" +
 					"\tdescription \"" + HttpUtility.HtmlEncode(datname) + "\"\n" +
 					"\tversion \"" + version + "\"\n" +
-					(_system >= 0 && _headers.ContainsKey(_system) ? " header \"" + _headers[_system] + "\"\n" : "") +
+					(_systems >= 0 && _headers.ContainsKey(_systems) ? " header \"" + _headers[_systems] + "\"\n" : "") +
 					"\tcomment \"\"\n" +
 					"\tauthor \"The Wizard of DATz\"\n" +
 					")\n";
@@ -148,13 +138,13 @@ namespace DATabase
 					"\t\t\t<version>" + version + "</version>\n" +
 					"\t\t\t<date>" + version + "</date>\n" +
 					"\t\t\t<author>The Wizard of DATz</author>\n" +
-					"\t\t\t<clrmamepro" + (_system >= 0 && _headers.ContainsKey(_system) ? " header=\"" + _headers[_system] + "\"" : "") + "/>\n" +
+					"\t\t\t<clrmamepro" + (_systems >= 0 && _headers.ContainsKey(_systems) ? " header=\"" + _headers[_systems] + "\"" : "") + "/>\n" +
 					"\t\t</header>\n";
 
 				// Unset _system again if we're in MEGAMERGED mode
-				if (_system == 0 && _source == -1)
+				if (_systems == 0 && _sources == -1)
 				{
-					_system = -1;
+					_systems = -1;
 				}
 
 				// Write the header out
@@ -220,8 +210,8 @@ namespace DATabase
 			List<RomData> roms = new List<RomData>();
 
 			// Check if we're in a merged mode
-			bool sysmerged = (_system == -1);
-			bool srcmerged = (_source == -1);
+			bool sysmerged = (_systems == -1);
+			bool srcmerged = (_sources == -1);
 			bool merged = sysmerged || srcmerged;
 
 			string query = @"
@@ -239,9 +229,9 @@ JOIN files
 JOIN checksums
 	ON files.id=checksums.file" +
 	(!sysmerged || !srcmerged ? "\nWHERE" : "") +
-	(!srcmerged ? " sources.id=" + _source : "") +
+	(!srcmerged ? " sources.id=" + _sources : "") +
 	(!srcmerged && !sysmerged ? " AND" : "") +
-	(!sysmerged ? " systems.id=" + _system : "") + "\n" +
+	(!sysmerged ? " systems.id=" + _systems : "") + "\n" +
 "\nORDER BY " +
 	(merged ? "checksums.size, checksums.crc, checksums.md5, checksums.sha1"
 			: "systems.id, sources.id, games.name, files.name");
