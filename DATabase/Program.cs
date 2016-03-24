@@ -40,13 +40,15 @@ namespace DATabase
 				listsrc = listsrc || (arg == "-lsy");
 				norename = norename || (arg == "-nr" || arg == "--no-rename");
 				old = old || (arg == "-old" || arg == "--old");
-				systems = (arg.Split('=')[0] == "system" && systems == "" ? arg.Split('=')[1] : systems);
-				sources = (arg.Split('=')[0] == "source" && sources == "" ? arg.Split('=')[1] : sources);
+				systems = (arg.StartsWith("system=") && systems == "" ? arg.Split('=')[1] : systems);
+				sources = (arg.StartsWith("source=") && sources == "" ? arg.Split('=')[1] : sources);
 
 				// Take care of the two distinct input name possibilites; prioritize the input tag
-				input = (arg.Split('=')[0] == "input" && input == "" ? arg.Split('=')[1] : input);
-				input = (!arg.StartsWith("-") && !arg.StartsWith("source=") && !arg.StartsWith("system=") && input != "" ? arg : input);
+				input = (arg.StartsWith("input=") && input == "" ? arg.Split('=')[1] : input);
+				input = (!arg.StartsWith("-") && !arg.StartsWith("source=") && !arg.StartsWith("system=") && !arg.StartsWith("input=") && input == "" ? arg : input);
 			}
+
+			Console.WriteLine(input);
 
 			// If more than one switch is enabled, show the help screen
 			if (!(help ^ import ^ generate ^ listsys ^ listsrc) || help)
