@@ -36,8 +36,8 @@ namespace DATabase
 				import = import || (arg == "-i" || arg == "--import");
 				generate = generate || (arg == "-g" || arg == "--generate");
 				convert = convert || (arg == "-c" || arg == "--convert");
-				listsys = listsys || (arg == "-lsy");
-				listsrc = listsrc || (arg == "-lso");
+				listsys = listsys || (arg == "-lsy" || arg == "--list-systems");
+				listsrc = listsrc || (arg == "-lso" || arg == "--list-sources");
 				norename = norename || (arg == "-nr" || arg == "--no-rename");
 				old = old || (arg == "-old" || arg == "--old");
 				systems = (arg.StartsWith("system=") && systems == "" ? arg.Split('=')[1] : systems);
@@ -280,20 +280,22 @@ CREATE TABLE IF NOT EXISTS systems (
 			Console.Write(@"
 DATabase - Import and Generate DAT files
 -----------------------------------------
-Usage: DATabase <option> (<filename>|<dirname>) | (system=sy) (source=so)
+Usage: DATabase [option] [filename|dirname|<system=sy> <source=so>]
 
-<option> can be one of the following:
-	-h, -?, --help		Show this help
-	-i, --import		Start tool in import mode
-	-g, --generate		Start tool in generate mode
-	-lso			List all sources (id <= name)
-	-lsy			List all systems (id <= name)
-	-c, --convert		Convert a RV DAT to XML
-	-nr, --no-rename	Do not rename games according to source/system
-	-old			Use RV datfile format
+Options:
+  -h, -?, --help	Show this help
+  -i, --import		Start tool in import mode
+			  A filename or folder is required to run
+  -g, --generate	Start tool in generate mode
+			  system=sy		Filter by system ID 'sy'
+			  source=so		Filter by source ID 'so'
+			  -nr, --no-rename	don't rename games
+			  -old	produces a DAT in RV format
+  -lso, --list-sources	List all sources (id <= name)
+  -lsy, --list-systems	List all systems (id <= name)
+  -c, --convert		Convert a RV DAT to XML
+			  A filename or folder is required to run
 
-If started in import or convert mode, either a filename
-or directory name is required in order to run.
 Filenames and directories can't start with '-', 'system=', or 'source='
 unless prefixed by 'input='
 ");
