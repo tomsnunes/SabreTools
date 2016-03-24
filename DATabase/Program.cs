@@ -42,7 +42,7 @@ namespace DATabase
 				old = old || (arg == "-old" || arg == "--old");
 				systems = (arg.Split('=')[0] == "system" && systems == "" ? arg.Split('=')[1] : systems);
 				sources = (arg.Split('=')[0] == "source" && sources == "" ? arg.Split('=')[1] : sources);
-				input = (arg.Split('=')[0] == "input" ? arg.Split('=')[1] : input);
+				input = (!arg.StartsWith("-") && !arg.Contains("=") ? arg : "");
 			}
 
 			// If more than one switch is enabled, show the help screen
