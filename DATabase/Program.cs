@@ -49,7 +49,7 @@ namespace DATabase
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (!(import ^ generate ^ listsys ^ listsrc) || help)
+			if (help || !(import ^ generate ^ listsys ^ listsrc))
 			{
 				Help();
 				return;
