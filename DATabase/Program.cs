@@ -42,7 +42,7 @@ namespace DATabase
 				old = old || (arg == "-old" || arg == "--old");
 				systems = (arg.Split('=')[0] == "system" && systems == "" ? arg.Split('=')[1] : systems);
 				sources = (arg.Split('=')[0] == "source" && sources == "" ? arg.Split('=')[1] : sources);
-				input = (!arg.StartsWith("-") && !arg.Contains("=") ? arg : "");
+				input = (!arg.StartsWith("-") && !arg.StartsWith("source=") && !arg.StartsWith("system=") ? arg : "");
 			}
 
 			// If more than one switch is enabled, show the help screen
@@ -291,7 +291,7 @@ Usage: DATabase <option> (<filename>|<dirname>) | (system=sy) (source=so)
 
 If started in import or convert mode, either a filename
 or directory name is required in order to run.
-Filenames and directories can't start with '-' or contain '='
+Filenames and directories can't start with '-', 'system=', or 'source='
 
 If started in generate mode, here are the possible states:
 	system blank,	source blank	Create MEGAMERGED
