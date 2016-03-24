@@ -42,7 +42,10 @@ namespace DATabase
 				old = old || (arg == "-old" || arg == "--old");
 				systems = (arg.Split('=')[0] == "system" && systems == "" ? arg.Split('=')[1] : systems);
 				sources = (arg.Split('=')[0] == "source" && sources == "" ? arg.Split('=')[1] : sources);
-				input = (!arg.StartsWith("-") && !arg.StartsWith("source=") && !arg.StartsWith("system=") ? arg : "");
+
+				// Take care of the two distinct input name possibilites; prioritize the input tag
+				input = (arg.Split('=')[0] == "input" && input == "" ? arg.Split('=')[1] : input);
+				input = (!arg.StartsWith("-") && !arg.StartsWith("source=") && !arg.StartsWith("system=") && input != "" ? arg : input);
 			}
 
 			// If more than one switch is enabled, show the help screen
@@ -277,7 +280,7 @@ CREATE TABLE IF NOT EXISTS systems (
 			Console.Write(@"
 DATabase - Import and Generate DAT files
 -----------------------------------------
-Usage: DATabase <option> (<filename>|<dirname>) | (system=sy) (source=so)
+Usage: DATabase <option> (<input=><filename>|<dirname>) | (system=sy) (source=so)
 
 <option> can be one of the following:
 	-h, -?, --help		Show this help
@@ -292,6 +295,7 @@ Usage: DATabase <option> (<filename>|<dirname>) | (system=sy) (source=so)
 If started in import or convert mode, either a filename
 or directory name is required in order to run.
 Filenames and directories can't start with '-', 'system=', or 'source='
+unless prefixed by 'input='
 
 If started in generate mode, here are the possible states:
 	system blank,	source blank	Create MEGAMERGED
