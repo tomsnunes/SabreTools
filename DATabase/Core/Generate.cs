@@ -343,9 +343,9 @@ JOIN checksums
 						}
 						return String.Compare(x.Game, y.Game);
 					}
-					return x.SourceID - y.SourceID;
+					return (_norename ? String.Compare(x.Game, y.Game) : x.SourceID - y.SourceID);
 				}
-				return x.SystemID - y.SystemID;
+				return (_norename ? String.Compare(x.Game, y.Game) : x.SystemID - y.SystemID);
 			});
 
 			// Now check rename within games

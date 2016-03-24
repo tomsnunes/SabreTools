@@ -87,8 +87,14 @@ namespace DATabase
 			{
 				int sysid = -1, srcid = -1;
 
-				Int32.TryParse(system, out sysid);
-				Int32.TryParse(source, out srcid);
+				if (system != "")
+				{
+					Int32.TryParse(system, out sysid);
+				}
+				if (source != "")
+				{
+					Int32.TryParse(source, out srcid);
+				}
 
 				Generate gen = new Generate(sysid, srcid, _connectionString, norename, old);
 				gen.Export();
