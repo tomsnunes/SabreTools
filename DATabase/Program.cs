@@ -296,12 +296,6 @@ If started in import or convert mode, either a filename
 or directory name is required in order to run.
 Filenames and directories can't start with '-', 'system=', or 'source='
 unless prefixed by 'input='
-
-If started in generate mode, here are the possible states:
-	system blank,	source blank	Create MEGAMERGED
-	system blank,	source		Create source-merged
-	system,		source blank	Create system-merged
-	system,		source		Create custom
 ");
 		}
 	}
