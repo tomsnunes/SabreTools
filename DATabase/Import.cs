@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace DATabase
 {
-	public class Importer
+	public class Import
 	{
 		// Private instance variables
 		private string _filepath;
@@ -50,7 +50,7 @@ namespace DATabase
 		}
 
 		// Constructor
-		public Importer(string filepath, string connectionString)
+		public Import(string filepath, string connectionString)
 		{
 			if (File.Exists(filepath))
 			{

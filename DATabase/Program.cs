@@ -39,7 +39,7 @@ namespace DATabase
 						if (args.Length > 1 && File.Exists(args[1]))
 						{
 							Console.WriteLine(args[1]);
-							Importer imp = new Importer(args[1], _connectionString);
+							Import imp = new Import(args[1], _connectionString);
 							imp.ImportData();
 						}
 						// Check to see if the second argument is a directory that exists
@@ -48,7 +48,7 @@ namespace DATabase
 							foreach (string filename in Directory.GetFiles(args[1], "*", SearchOption.TopDirectoryOnly))
 							{
 								Console.WriteLine(filename);
-								Importer imp = new Importer(filename, _connectionString);
+								Import imp = new Import(filename, _connectionString);
 								imp.ImportData();
 							}
 						}
