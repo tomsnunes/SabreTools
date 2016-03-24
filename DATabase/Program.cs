@@ -48,8 +48,6 @@ namespace DATabase
 				input = (!arg.StartsWith("-") && !arg.StartsWith("source=") && !arg.StartsWith("system=") && !arg.StartsWith("input=") && input == "" ? arg : input);
 			}
 
-			Console.WriteLine(input);
-
 			// If more than one switch is enabled, show the help screen
 			if (!(help ^ import ^ generate ^ listsys ^ listsrc) || help)
 			{
