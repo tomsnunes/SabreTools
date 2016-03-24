@@ -17,6 +17,7 @@ namespace DATabase
 			// Perform initial setup and verification
 			Database.EnsureDatabase(_dbName, _connectionString);
 			Remapping.CreateRemappings();
+			Console.Clear();
 
 			// If there's not enough arguments, show the help screen
 			if (args.Length == 0)
