@@ -48,7 +48,7 @@ namespace DATabase
 				input = (!arg.StartsWith("-") && !arg.StartsWith("source=") && !arg.StartsWith("system=") && !arg.StartsWith("input=") && input == "" ? arg : input);
 			}
 
-			// If more than one switch is enabled, show the help screen
+			// If more than one switch is enabled or help is set, show the help screen
 			if (!(import ^ generate ^ listsys ^ listsrc) || help)
 			{
 				Help();
