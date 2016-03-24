@@ -336,7 +336,7 @@ JOIN checksums
 						{
 							return String.Compare(x.Name, y.Name);
 						}
-						return String.Compare(x.Name, y.Name);
+						return String.Compare(x.Game, y.Game);
 					}
 					return x.SourceID - y.SourceID;
 				}
