@@ -11,7 +11,9 @@ namespace DATabase
 	{
 		// Private instance variables
 		private int _systems;
+		//private string _systems;
 		private int _sources;
+		//private string _sources;
 		private string _connectionString;
 		private bool _norename;
 		private bool _old;
@@ -19,6 +21,7 @@ namespace DATabase
 		// Private required variables
 		private Dictionary<int, string> _headers;
 
+		//public Generate(string systems, string sources, string connectionString, bool norename = false, bool old = false)
 		public Generate(int systems, int sources, string connectionString, bool norename = false, bool old = false)
 		{
 			_systems = systems;
@@ -41,8 +44,10 @@ namespace DATabase
 		{
 			// Get the system name, if applicable
 			string systemname = "ALL";
+			//if (_systems != "")
 			if (_systems != -1)
 			{
+				//string query = "SELECT manufacturer, system FROM systems WHERE id in (" + _systems + ")";
 				string query = "SELECT manufacturer, system FROM systems WHERE id=" + _systems;
 				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 				{
@@ -54,6 +59,7 @@ namespace DATabase
 							// If there are no games for this combination, return nothing
 							if (!sldr.HasRows)
 							{
+								//Console.WriteLine("No system could be found with id in \"" + _systems + "\". Please check and try again.");
 								Console.WriteLine("No system could be found with id " + _systems + ". Please check and try again.");
 								return false;
 							}
@@ -67,8 +73,10 @@ namespace DATabase
 			}
 
 			string sourcename = "Merged";
+			// if (_sources != "")
 			if (_sources != -1)
 			{
+				//string query = "SELECT name FROM sources WHERE id in (" + _sources + ")";
 				string query = "SELECT name FROM sources WHERE id=" + _sources;
 				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 				{
@@ -80,6 +88,7 @@ namespace DATabase
 							// If there are no games for this combination, return nothing
 							if (!sldr.HasRows)
 							{
+								//Console.WriteLine("No source could be found with id in \"" + _sources + "\". Please check and try again.");
 								Console.WriteLine("No source could be found with id " + _sources + ". Please check and try again.");
 								return false;
 							}
@@ -229,8 +238,10 @@ JOIN files
 JOIN checksums
 	ON files.id=checksums.file" +
 	(!sysmerged || !srcmerged ? "\nWHERE" : "") +
+	//(!srcmerged ? " sources.id in (" + _sources + ")" : "") +
 	(!srcmerged ? " sources.id=" + _sources : "") +
 	(!srcmerged && !sysmerged ? " AND" : "") +
+	//(!sysmerged ? " systems.id in (" + _systems + ")" : "") + "\n" +
 	(!sysmerged ? " systems.id=" + _systems : "") + "\n" +
 "\nORDER BY " +
 	(merged ? "checksums.size, checksums.crc, checksums.md5, checksums.sha1"
