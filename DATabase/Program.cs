@@ -29,7 +29,7 @@ namespace DATabase
 			// Determine which switches are enabled (with values if necessary)
 			bool help = false, import = false, generate = false, convert = false,
 				listsys = false, listsrc = false, norename = false, old = false; ;
-			string system = "", source = "", input = "";
+			string systems = "", sources = "", input = "";
 			foreach (string arg in args)
 			{
 				help = help || (arg == "-h" || arg == "-?" || arg == "--help");
@@ -40,8 +40,8 @@ namespace DATabase
 				listsrc = listsrc || (arg == "-lsy");
 				norename = norename || (arg == "-nr" || arg == "--no-rename");
 				old = old || (arg == "-old" || arg == "--old");
-				system = (arg.Split('=')[0] == "system" && system == "" ? arg.Split('=')[1] : system);
-				source = (arg.Split('=')[0] == "source" && source == "" ? arg.Split('=')[1] : source);
+				systems = (arg.Split('=')[0] == "system" && systems == "" ? arg.Split('=')[1] : systems);
+				sources = (arg.Split('=')[0] == "source" && sources == "" ? arg.Split('=')[1] : sources);
 				input = (arg.Split('=')[0] == "input" ? arg.Split('=')[1] : input);
 			}
 
@@ -87,13 +87,13 @@ namespace DATabase
 			{
 				int sysid = -1, srcid = -1;
 
-				if (system != "")
+				if (systems != "")
 				{
-					Int32.TryParse(system, out sysid);
+					Int32.TryParse(systems, out sysid);
 				}
-				if (source != "")
+				if (sources != "")
 				{
-					Int32.TryParse(source, out srcid);
+					Int32.TryParse(sources, out srcid);
 				}
 
 				Generate gen = new Generate(sysid, srcid, _connectionString, norename, old);
