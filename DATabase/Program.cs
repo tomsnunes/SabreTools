@@ -20,180 +20,162 @@ namespace DATabase
 			Remapping.CreateRemappings();
 
 			// If there's not enough arguments, show the help screen
-			if (args.Length == 0 || args[0] == "-h" || args[0] == "-?" || args[0] == "--help")
+			if (args.Length == 0)
 			{
 				Help();
 				return;
 			}
 
-			// Determine what mode we are in from the first argument
-			switch (args[0])
+			// Determine which switches are enabled (with values if necessary)
+			bool help = false, import = false, generate = false, convert = false,
+				listsys = false, listsrc = false, norename = false, old = false; ;
+			string system = "", source = "", input = "";
+			foreach (string arg in args)
 			{
-				// Import a file or folder
-				case "-i":
-				case "--import":
-					// Check if there are enough arguments
-					if (args.Length > 1)
-					{
-						// Check to see if the second argument is a file that exists
-						if (args.Length > 1 && File.Exists(args[1]))
-						{
-							Console.WriteLine(args[1]);
-							Import imp = new Import(args[1], _connectionString);
-							imp.ImportData();
-						}
-						// Check to see if the second argument is a directory that exists
-						else if (args.Length > 1 && Directory.Exists(args[1]))
-						{
-							foreach (string filename in Directory.GetFiles(args[1], "*", SearchOption.TopDirectoryOnly))
-							{
-								Console.WriteLine(filename);
-								Import imp = new Import(filename, _connectionString);
-								imp.ImportData();
-							}
-						}
-						// If it's invalid for either, show the help
-						else
-						{
-							Help();
-						}
-					}
-					// If there aren't enough arguments
-					else
-					{
-						Help();
-					}
-					break;
-				// Generate a DAT
-				case "-g":
-				case "--generate":
-					Generate gen;
-					if (args.Length > 1)
-					{
-						int system = -1, source = -1;
+				help = help || (arg == "-h" || arg == "-?" || arg == "--help");
+				import = import || (arg == "-i" || arg == "--import");
+				generate = generate || (arg == "-g" || arg == "--generate");
+				convert = convert || (arg == "-c" || arg == "--convert");
+				listsys = listsys || (arg == "-lso");
+				listsrc = listsrc || (arg == "-lsy");
+				norename = norename || (arg == "-nr" || arg == "--no-rename");
+				old = old || (arg == "-old" || arg == "--old");
+				system = (arg.Split('=')[0] == "system" && system == "" ? arg.Split('=')[1] : system);
+				source = (arg.Split('=')[0] == "source" && source == "" ? arg.Split('=')[1] : source);
+				input = (arg.Split('=')[0] == "input" ? arg.Split('=')[1] : input);
+			}
 
-						for (int i = 1; i < args.Length; i++)
-						{
-							if (args[i].StartsWith("system=") && system == -1)
-							{
-								Int32.TryParse(args[i].Split('=')[1], out system);
-							}
-							else if (args[i].StartsWith("source=") && source == -1)
-							{
-								Int32.TryParse(args[i].Split('=')[1], out source);
-							}
-							else
-							{
-								Help();
-								return;
-							}
-						}
+			// If more than one switch is enabled, show the help screen
+			if (!(help ^ import ^ generate ^ listsys ^ listsrc) || help)
+			{
+				Help();
+				return;
+			}
 
-						gen = new Generate(system, source, _connectionString);
-					}
-					else
+			// Now take care of each mode in succesion
+
+			// Import a file or folder
+			if (import)
+			{
+				// Check to see if the second argument is a file that exists
+				if (input != "" && File.Exists(input))
+				{
+					Console.WriteLine(input);
+					Import imp = new Import(input, _connectionString);
+					imp.ImportData();
+				}
+				// Check to see if the second argument is a directory that exists
+				else if (input != "" && Directory.Exists(input))
+				{
+					foreach (string filename in Directory.GetFiles(input, "*", SearchOption.TopDirectoryOnly))
 					{
-						gen = new Generate(-1, -1, _connectionString);
+						Console.WriteLine(filename);
+						Import imp = new Import(filename, _connectionString);
+						imp.ImportData();
 					}
-					gen.Export();
-					break;
+				}
+				// Otherwise, show help
+				else
+				{
+					Help();
+					return;
+				}
+			}
 
-				// List all available sources
-				case "-lso":
-					string query = @"
+			// Generate a DAT
+			else if (generate)
+			{
+				int sysid = -1, srcid = -1;
+
+				Int32.TryParse(system, out sysid);
+				Int32.TryParse(source, out srcid);
+
+				Generate gen = new Generate(sysid, srcid, _connectionString, norename, old);
+				gen.Export();
+			}
+
+			// List all available sources
+			else if (listsrc)
+			{
+				string query = @"
 SELECT DISTINCT sources.id, sources.name
 FROM sources JOIN games on sources.id=games.source
 ORDER BY sources.name COLLATE NOCASE";
-					using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+				{
+					dbc.Open();
+					using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
 					{
-						dbc.Open();
-						using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+						using (SQLiteDataReader sldr = slc.ExecuteReader())
 						{
-							using (SQLiteDataReader sldr = slc.ExecuteReader())
+							// If nothing is found, tell the user and exit
+							if (!sldr.HasRows)
 							{
-								// If nothing is found, tell the user and exit
-								if (!sldr.HasRows)
-								{
-									Console.WriteLine("Error: No sources found! Please add a source and then try again.");
-									return;
-								}
+								Console.WriteLine("Error: No sources found! Please add a source and then try again.");
+								return;
+							}
 
-								Console.WriteLine("Available Sources (id <= name):");
-								while (sldr.Read())
-								{
-									Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1));
-								}
+							Console.WriteLine("Available Sources (id <= name):");
+							while (sldr.Read())
+							{
+								Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1));
 							}
 						}
 					}
+				}
+			}
 
-					break;
-
-				// List all available systems
-				case "-lsy":
-					query = @"
+			// List all available systems
+			else if (listsys)
+			{
+				string query = @"
 SELECT DISTINCT systems.id, systems.manufacturer, systems.system
 FROM systems JOIN games ON systems.id=games.system
 ORDER BY systems.manufacturer, systems.system";
-					using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+				{
+					dbc.Open();
+					using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
 					{
-						dbc.Open();
-						using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+						using (SQLiteDataReader sldr = slc.ExecuteReader())
 						{
-							using (SQLiteDataReader sldr = slc.ExecuteReader())
+							// If nothing is found, tell the user and exit
+							if (!sldr.HasRows)
 							{
-								// If nothing is found, tell the user and exit
-								if (!sldr.HasRows)
-								{
-									Console.WriteLine("Error: No systems found! Please add a system and then try again.");
-									return;
-								}
+								Console.WriteLine("Error: No systems found! Please add a system and then try again.");
+								return;
+							}
 
-								Console.WriteLine("Available Systems (id <= name):");
-								while (sldr.Read())
-								{
-									Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1) + " - " + sldr.GetString(2));
-								}
+							Console.WriteLine("Available Systems (id <= name):");
+							while (sldr.Read())
+							{
+								Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1) + " - " + sldr.GetString(2));
 							}
 						}
 					}
+				}
+			}
 
-					break;
-
-				case "-c":
-				case "--convert":
-					// Check if there are enough arguments
-					if (args.Length > 1)
-					{
-						// Check to see if the second argument is a file that exists
-						if (args.Length > 1 && File.Exists(args[1]))
-						{
-							Console.WriteLine("Converting " + args[1]);
-							XElement conv = Converters.RomVaultToXML(File.ReadAllLines(args[1]));
-							FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(args[1]) + ".new.xml");
-							StreamWriter sw = new StreamWriter(fs);
-							sw.Write(conv);
-							sw.Close();
-							fs.Close();
-							Console.WriteLine("Converted file: " + Path.GetFileNameWithoutExtension(args[1]) + ".new.xml");
-						}
-						// If it's invalid, show the help
-						else
-						{
-							Help();
-						}
-					}
-					// If there aren't enough arguments
-					else
-					{
-						Help();
-					}
-					break;
-
-				// Invalid argument
-				default:
+			// Convert RV DAT to XML DAT
+			else if (convert)
+			{
+				if (File.Exists(input))
+				{
+					Console.WriteLine("Converting " + input);
+					XElement conv = Converters.RomVaultToXML(File.ReadAllLines(input));
+					FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(input) + ".new.xml");
+					StreamWriter sw = new StreamWriter(fs);
+					sw.Write(conv);
+					sw.Close();
+					fs.Close();
+					Console.WriteLine("Converted file: " + Path.GetFileNameWithoutExtension(input) + ".new.xml");
+				}
+				// Otherwise, show help
+				else
+				{
 					Help();
-					break;
+					return;
+				}
 			}
 			return;
 		}
@@ -288,18 +270,20 @@ CREATE TABLE IF NOT EXISTS systems (
 			Console.Write(@"
 DATabase - Import and Generate DAT files
 -----------------------------------------
-Usage: DATabase <option> (<filename>|<dirname>) | (system=sy) (source=so)
+Usage: DATabase <option> (input=<filename>|<dirname>) | (system=sy) (source=so)
 
 <option> can be one of the following:
-	-h, -?, --help	Show this help
-	-i, --import	Start tool in import mode
-	-g, --generate	Start tool in generate mode
-	-lso		List all sources (id <= name)
-	-lsy		List all systems (id <= name)
-	-c, --convert	Convert a RV DAT to XML
+	-h, -?, --help		Show this help
+	-i, --import		Start tool in import mode
+	-g, --generate		Start tool in generate mode
+	-lso			List all sources (id <= name)
+	-lsy			List all systems (id <= name)
+	-c, --convert		Convert a RV DAT to XML
+	-nr, --no-rename	Do not rename games according to source/system
+	-old			Use RV datfile format
 
 If started in import or convert mode, either a filename
-or directory name is required  in order to run.
+or directory name is required in order to run.
 
 If started in generate mode, here are the possible states:
 	system blank,	source blank	Create MEGAMERGED
