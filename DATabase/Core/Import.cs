@@ -3,9 +3,8 @@ using System.Data.SQLite;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Xml.Linq;
 
-using System.Reflection;
+using DATabase.Helper;
 
 namespace DATabase
 {
