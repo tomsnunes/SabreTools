@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 
@@ -155,8 +156,10 @@ namespace DATabase
 				StreamWriter sw = new StreamWriter(fs);
 
 				// Temporarilly set _system if we're in MEGAMERGED mode to get the right header skip XML
+				//if (_systems == "" && _sources == "")
 				if (_systems == -1 && _sources == -1)
 				{
+					//_systems == "0";
 					_systems = 0;
 				}
 
@@ -164,6 +167,7 @@ namespace DATabase
 					"\tname \"" + HttpUtility.HtmlEncode(datname) + "\"\n" +
 					"\tdescription \"" + HttpUtility.HtmlEncode(datname) + "\"\n" +
 					"\tversion \"" + version + "\"\n" +
+					//(_systems != "" && _systems.Count(c => c == ',') == 0 && _headers.ContainsKey(Int32.Parse(_systems)) ? " header \"" + _headers[Int32.Parse(_systems)] + "\"\n" : "") +
 					(_systems >= 0 && _headers.ContainsKey(_systems) ? " header \"" + _headers[_systems] + "\"\n" : "") +
 					"\tcomment \"\"\n" +
 					"\tauthor \"The Wizard of DATz\"\n" +
@@ -179,12 +183,15 @@ namespace DATabase
 					"\t\t\t<version>" + version + "</version>\n" +
 					"\t\t\t<date>" + version + "</date>\n" +
 					"\t\t\t<author>The Wizard of DATz</author>\n" +
+					//(_systems != "" && _systems.Count(c => c == ',') == 0 && _headers.ContainsKey(Int32.Parse(_systems)) ? " header=\"" + _headers[Int32.Parse(_systems)] + "\"\n" : "") +
 					"\t\t\t<clrmamepro" + (_systems >= 0 && _headers.ContainsKey(_systems) ? " header=\"" + _headers[_systems] + "\"" : "") + "/>\n" +
 					"\t\t</header>\n";
 
 				// Unset _system again if we're in MEGAMERGED mode
+				//if (_systems == "0" && _sources == "")
 				if (_systems == 0 && _sources == -1)
 				{
+					//_systems = "";
 					_systems = -1;
 				}
 
