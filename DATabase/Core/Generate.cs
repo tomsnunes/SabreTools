@@ -13,6 +13,7 @@ namespace DATabase
 		private int _system;
 		private int _source;
 		private string _connectionString;
+		private bool _norename;
 		private bool _old;
 
 		// Private required variables
@@ -28,11 +29,12 @@ namespace DATabase
 			get { return _source; }
 		}
 
-		public Generate(int system, int source, string connectionString, bool old = false)
+		public Generate(int system, int source, string connectionString, bool norename = false, bool old = false)
 		{
 			_system = system;
 			_source = source;
 			_connectionString = connectionString;
+			_norename = norename;
 			_old = old;
 
 			_headers = new Dictionary<int, string>();
@@ -313,10 +315,13 @@ JOIN checksums
 									continue;
 								}
 
-								// Rename the game associated if it's still valid
-								temp.Game = temp.Game +
-									(sysmerged ? " [" + temp.Manufacturer + " - " + temp.System + "]" : "") +
-									(srcmerged ? " [" + temp.Source + "]" : "");
+								// Rename the game associated if it's still valid and we allow renames
+								if (!_norename)
+								{
+									temp.Game = temp.Game +
+										(sysmerged ? " [" + temp.Manufacturer + " - " + temp.System + "]" : "") +
+										(srcmerged ? " [" + temp.Source + "]" : "");
+								}
 							}
 
 							roms.Add(temp);
