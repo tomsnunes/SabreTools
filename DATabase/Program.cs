@@ -96,6 +96,7 @@ namespace DATabase
 					Int32.TryParse(sources, out srcid);
 				}
 
+				//Generate gen = new Generate(systems, sources, _connectionString, norename, old);
 				Generate gen = new Generate(sysid, srcid, _connectionString, norename, old);
 				gen.Export();
 			}
