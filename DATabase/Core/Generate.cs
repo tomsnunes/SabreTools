@@ -67,6 +67,23 @@ namespace DATabase
 							// Retieve and build the system name
 							sldr.Read();
 							systemname = sldr.GetString(0) + " - " + sldr.GetString(1);
+							/*
+							// Retrieve and build the system name from all retrieved
+							int tempsize = 0;
+							while (sldr.Read() && tempsize < 3)
+							{
+								systemname += (tempsize == 0 ?
+									sldr.GetString(0) + " - " + sldr.GetString(1) :
+									", " + sldr.GetString(0) + " - " + sldr.GetString(1));
+								tempsize++;
+							}
+
+							// If there are more than 3 systems, just put "etc." on the end
+							if (sldr.Read())
+							{
+								systemname += ", etc.";
+							}
+							*/
 						}
 					}
 				}
@@ -96,6 +113,21 @@ namespace DATabase
 							// Retieve and build the system name
 							sldr.Read();
 							sourcename = sldr.GetString(0);
+							/*
+							// Retrieve and build the source name from all retrieved
+							int tempsize = 0;
+							while (sldr.Read() && tempsize < 3)
+							{
+								sourcename += (tempsize == 0 ? sldr.GetString(0) : ", " + sldr.GetString(0));
+								tempsize++;
+							}
+
+							// If there are more than 3 systems, just put "etc." on the end
+							if (sldr.Read())
+							{
+								sourcename += ", etc.";
+							}
+							*/
 						}
 					}
 				}
