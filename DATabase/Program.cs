@@ -36,8 +36,8 @@ namespace DATabase
 				import = import || (arg == "-i" || arg == "--import");
 				generate = generate || (arg == "-g" || arg == "--generate");
 				convert = convert || (arg == "-c" || arg == "--convert");
-				listsys = listsys || (arg == "-lso");
-				listsrc = listsrc || (arg == "-lsy");
+				listsys = listsys || (arg == "-lsy");
+				listsrc = listsrc || (arg == "-lso");
 				norename = norename || (arg == "-nr" || arg == "--no-rename");
 				old = old || (arg == "-old" || arg == "--old");
 				systems = (arg.StartsWith("system=") && systems == "" ? arg.Split('=')[1] : systems);
