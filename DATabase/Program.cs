@@ -280,7 +280,7 @@ CREATE TABLE IF NOT EXISTS systems (
 			Console.Write(@"
 DATabase - Import and Generate DAT files
 -----------------------------------------
-Usage: DATabase <option> (<input=><filename>|<dirname>) | (system=sy) (source=so)
+Usage: DATabase <option> (<filename>|<dirname>) | (system=sy) (source=so)
 
 <option> can be one of the following:
 	-h, -?, --help		Show this help
