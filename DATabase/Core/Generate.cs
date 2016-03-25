@@ -40,6 +40,14 @@ namespace DATabase
 
 		public bool Export()
 		{
+			// Check to see if the source is an import-only. If so, tell the user and exit
+			int id = 0;
+			if (_sources != "" && Int32.TryParse(_sources, out id) && id <= 14)
+            {
+				Console.WriteLine("This source is import-only so a DAT cannot be created. We apologize for the inconvenience.");
+				return false;
+			}
+
 			// Get the system name, if applicable
 			string systemname = "";
 			if (_systems != "")
