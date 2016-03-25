@@ -13,7 +13,7 @@ namespace DATabase
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
 		private static string _header =
 @"+-------------------------------------------------------------------+
-|                        DATabase 0.0.4.1                           |
+|                        DATabase 0.0.5.0                           |
 |                                                                   |
 |                 by Matt Nadareski (darksabre76)                   |
 +-------------------------------------------------------------------+";
