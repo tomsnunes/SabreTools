@@ -26,6 +26,7 @@ namespace DATabase
 			DBTools.EnsureDatabase(_dbName, _connectionString);
 			Remapping.CreateRemappings();
 			Console.Clear();
+			Console.Title = "DATabase " + _version;
 
 			// If there's no arguments, show the menu
 			if (args.Length == 0)
