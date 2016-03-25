@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 
@@ -150,7 +151,7 @@ namespace DATabase
 			try
 			{
 				FileStream fs = File.Create(datname + (_old ? ".dat" : ".xml"));
-				StreamWriter sw = new StreamWriter(fs);
+				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
 				// Temporarilly set _system if we're in MEGAMERGED mode to get the right header skip XML
 				if (_systems == "" && _sources == "")
