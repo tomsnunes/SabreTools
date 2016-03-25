@@ -202,7 +202,8 @@ namespace DATabase
 					
 					if (lastgame != rom.Game)
 					{
-						state += (_old ? "game (\n\tname \"" + rom.Game + "\"\n" :
+						state += (_old ? "game (\n\tname \"" + rom.Game + "\"\n" +
+							"\tdescription \"" + rom.Game + "\"\n" :
 							"\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
 							"\t\t<description>" + HttpUtility.HtmlEncode(rom.Game) + "</description>\n");
 					}
