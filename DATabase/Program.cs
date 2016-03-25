@@ -341,6 +341,8 @@ or 'b' to go back to the previous menu:
 				XElement conv = Converters.RomVaultToXML(File.ReadAllLines(filename));
 				FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(filename) + ".new.xml");
 				StreamWriter sw = new StreamWriter(fs);
+				sw.Write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+					"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n");
 				sw.Write(conv);
 				sw.Close();
 				fs.Close();

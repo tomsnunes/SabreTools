@@ -197,7 +197,7 @@ namespace DATabase
 					string state = "";
 					if (lastgame != "" && lastgame != rom.Game)
 					{
-						state += (_old ? "}\n" : "\t</machine>\n");
+						state += (_old ? ")\n" : "\t</machine>\n");
 					}
 					
 					if (lastgame != rom.Game)
