@@ -119,13 +119,13 @@ namespace DATabase
 ===========================
 Make a selection:
 
-    1) Show help
+    1) Show command line usage
     2) Import a DAT file or folder
     3) Generate a DAT file
     4) Convert a DAT file from RV to XML
     5) List all available sources
     6) List all available systems
-    X) Exit
+    X) Exit Program
 ");
 				Console.Write("Enter selection: ");
 				selection = Console.ReadLine();
