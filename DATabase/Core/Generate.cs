@@ -250,8 +250,8 @@ namespace DATabase
 			List<RomData> roms = new List<RomData>();
 
 			// Check if we have listed sources or systems
-			bool sysmerged = (_systems != "" && _systems.Split(',').Length > 1);
-			bool srcmerged = (_sources != "" && _sources.Split(',').Length > 1);
+			bool sysmerged = (_systems == "" || _systems.Split(',').Length > 1);
+			bool srcmerged = (_sources == "" || _sources.Split(',').Length > 1);
 			bool merged = sysmerged || srcmerged;
 
 			string query = @"

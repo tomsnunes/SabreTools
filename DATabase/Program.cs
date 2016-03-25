@@ -28,7 +28,7 @@ namespace DATabase
 
 			// Determine which switches are enabled (with values if necessary)
 			bool help = false, import = false, generate = false, convert = false,
-				listsys = false, listsrc = false, norename = false, old = false; ;
+				listsys = false, listsrc = false, norename = false, old = false;
 			string systems = "", sources = "", input = "";
 			foreach (string arg in args)
 			{
