@@ -12,11 +12,12 @@ namespace DATabase
 		private static string _dbName = "DATabase.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
 		private static string _header =
-@"+-------------------------------------------------------------------+
-|                        DATabase 0.0.5.0                           |
-|                                                                   |
-|                 by Matt Nadareski (darksabre76)                   |
-+-------------------------------------------------------------------+";
+@"+-----------------------------------------------------------------------------+
+|                             DATabase 0.0.5.0                                |
+|                                                                             |
+|                      by Matt Nadareski (darksabre76)                        |
++-----------------------------------------------------------------------------+
+";
 
 		static void Main(string[] args)
 		{
@@ -95,14 +96,26 @@ namespace DATabase
 			return;
 		}
 
+		private static void PrintHeader()
+		{
+			ConsoleColor formertext = Console.ForegroundColor;
+			ConsoleColor formerback = Console.BackgroundColor;
+			Console.ForegroundColor = ConsoleColor.Yellow;
+			Console.BackgroundColor = ConsoleColor.Blue;
+			Console.WriteLine(_header);
+			Console.ForegroundColor = formertext;
+			Console.BackgroundColor = formerback;
+		}
+
 		private static void ShowMainMenu()
 		{
+			Console.Clear();
 			string selection = "";
 			while (selection.ToLowerInvariant() != "x")
 			{
 				Console.Clear();
-				Console.WriteLine(_header + @"
-MAIN MENU
+				PrintHeader();
+				Console.WriteLine(@"MAIN MENU
 ===========================
 Make a selection:
 
@@ -145,6 +158,7 @@ Make a selection:
 			}
 			Console.Clear();
 			Console.WriteLine("Thank you for using DATabase!");
+			Console.ResetColor();
 		}
 
 		private static void Help()
@@ -184,8 +198,8 @@ unless prefixed by 'input='
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
-				Console.WriteLine(_header + @"
-IMPORT MENU
+				PrintHeader();
+				Console.WriteLine( @"IMPORT MENU
 ===========================
 Enter the name of a DAT file or folder containing DAT files
 or 'b' to go back to the previous menu:");
@@ -238,8 +252,8 @@ or 'b' to go back to the previous menu:");
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
-				Console.WriteLine(_header + @"
-GENERATE MENU
+				PrintHeader();
+				Console.WriteLine(@"GENERATE MENU
 ===========================
 Make a selection:
 
@@ -296,8 +310,8 @@ Make a selection:
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
-				Console.WriteLine(_header + @"
-CONVERT MENU
+				PrintHeader();
+				Console.WriteLine(@"CONVERT MENU
 ===========================
 Enter the name of a DAT file to convert from RV to XML
 or 'b' to go back to the previous menu:
