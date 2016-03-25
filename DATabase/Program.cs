@@ -145,11 +145,15 @@ Make a selection:
 						ConvertMenu();
 						break;
 					case "5":
+						Console.Clear();
+						PrintHeader();
 						ListSources();
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
 					case "6":
+						Console.Clear();
+						PrintHeader();
 						ListSystems();
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
