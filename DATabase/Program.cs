@@ -158,7 +158,6 @@ Make a selection:
 			}
 			Console.Clear();
 			Console.WriteLine("Thank you for using DATabase!");
-			Console.ResetColor();
 		}
 
 		private static void Help()
