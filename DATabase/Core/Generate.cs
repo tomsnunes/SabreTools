@@ -11,10 +11,8 @@ namespace DATabase
 	class Generate
 	{
 		// Private instance variables
-		private int _systems;
-		//private string _systems;
-		private int _sources;
-		//private string _sources;
+		private string _systems;
+		private string _sources;
 		private string _connectionString;
 		private bool _norename;
 		private bool _old;
@@ -22,8 +20,7 @@ namespace DATabase
 		// Private required variables
 		private Dictionary<int, string> _headers;
 
-		//public Generate(string systems, string sources, string connectionString, bool norename = false, bool old = false)
-		public Generate(int systems, int sources, string connectionString, bool norename = false, bool old = false)
+		public Generate(string systems, string sources, string connectionString, bool norename = false, bool old = false)
 		{
 			_systems = systems;
 			_sources = sources;
@@ -44,12 +41,10 @@ namespace DATabase
 		public bool Export()
 		{
 			// Get the system name, if applicable
-			string systemname = "ALL";
-			//if (_systems != "")
-			if (_systems != -1)
+			string systemname = "";
+			if (_systems != "")
 			{
-				//string query = "SELECT manufacturer, system FROM systems WHERE id in (" + _systems + ")";
-				string query = "SELECT manufacturer, system FROM systems WHERE id=" + _systems;
+				string query = "SELECT manufacturer, system FROM systems WHERE id in (" + _systems + ")";
 				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 				{
 					dbc.Open();
@@ -60,42 +55,38 @@ namespace DATabase
 							// If there are no games for this combination, return nothing
 							if (!sldr.HasRows)
 							{
-								//Console.WriteLine("No system could be found with id in \"" + _systems + "\". Please check and try again.");
-								Console.WriteLine("No system could be found with id " + _systems + ". Please check and try again.");
+								Console.WriteLine("No system could be found with id in \"" + _systems + "\". Please check and try again.");
 								return false;
 							}
 
-							// Retieve and build the system name
-							sldr.Read();
-							systemname = sldr.GetString(0) + " - " + sldr.GetString(1);
-							/*
 							// Retrieve and build the system name from all retrieved
 							int tempsize = 0;
 							while (sldr.Read() && tempsize < 3)
 							{
 								systemname += (tempsize == 0 ?
 									sldr.GetString(0) + " - " + sldr.GetString(1) :
-									", " + sldr.GetString(0) + " - " + sldr.GetString(1));
+									"; " + sldr.GetString(0) + " - " + sldr.GetString(1));
 								tempsize++;
 							}
 
 							// If there are more than 3 systems, just put "etc." on the end
 							if (sldr.Read())
 							{
-								systemname += ", etc.";
+								systemname += "; etc.";
 							}
-							*/
 						}
 					}
 				}
 			}
-
-			string sourcename = "Merged";
-			// if (_sources != "")
-			if (_sources != -1)
+			else
 			{
-				//string query = "SELECT name FROM sources WHERE id in (" + _sources + ")";
-				string query = "SELECT name FROM sources WHERE id=" + _sources;
+				systemname = "ALL";
+			}
+
+			string sourcename = "";
+			if (_sources != "")
+			{
+				string query = "SELECT name FROM sources WHERE id in (" + _sources + ")";
 				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 				{
 					dbc.Open();
@@ -106,32 +97,30 @@ namespace DATabase
 							// If there are no games for this combination, return nothing
 							if (!sldr.HasRows)
 							{
-								//Console.WriteLine("No source could be found with id in \"" + _sources + "\". Please check and try again.");
-								Console.WriteLine("No source could be found with id " + _sources + ". Please check and try again.");
+								Console.WriteLine("No source could be found with id in \"" + _sources + "\". Please check and try again.");
 								return false;
 							}
 
-							// Retieve and build the system name
-							sldr.Read();
-							sourcename = sldr.GetString(0);
-							/*
 							// Retrieve and build the source name from all retrieved
 							int tempsize = 0;
 							while (sldr.Read() && tempsize < 3)
 							{
-								sourcename += (tempsize == 0 ? sldr.GetString(0) : ", " + sldr.GetString(0));
+								sourcename += (tempsize == 0 ? sldr.GetString(0) : "; " + sldr.GetString(0));
 								tempsize++;
 							}
 
 							// If there are more than 3 systems, just put "etc." on the end
 							if (sldr.Read())
 							{
-								sourcename += ", etc.";
+								sourcename += "; etc.";
 							}
-							*/
 						}
 					}
 				}
+			}
+			else
+			{
+				sourcename = "Merged";
 			}
 
 			// Retrieve the list of processed roms
@@ -156,19 +145,16 @@ namespace DATabase
 				StreamWriter sw = new StreamWriter(fs);
 
 				// Temporarilly set _system if we're in MEGAMERGED mode to get the right header skip XML
-				//if (_systems == "" && _sources == "")
-				if (_systems == -1 && _sources == -1)
+				if (_systems == "" && _sources == "")
 				{
-					//_systems == "0";
-					_systems = 0;
+					_systems = "0";
 				}
 
 				string header_old = "clrmamepro (\n" +
 					"\tname \"" + HttpUtility.HtmlEncode(datname) + "\"\n" +
 					"\tdescription \"" + HttpUtility.HtmlEncode(datname) + "\"\n" +
 					"\tversion \"" + version + "\"\n" +
-					//(_systems != "" && _systems.Count(c => c == ',') == 0 && _headers.ContainsKey(Int32.Parse(_systems)) ? " header \"" + _headers[Int32.Parse(_systems)] + "\"\n" : "") +
-					(_systems >= 0 && _headers.ContainsKey(_systems) ? " header \"" + _headers[_systems] + "\"\n" : "") +
+					(_systems != "" && _systems.Split(',').Length == 1 && _headers.ContainsKey(Int32.Parse(_systems)) ? " header \"" + _headers[Int32.Parse(_systems)] + "\"\n" : "") +
 					"\tcomment \"\"\n" +
 					"\tauthor \"The Wizard of DATz\"\n" +
 					")\n";
@@ -183,16 +169,14 @@ namespace DATabase
 					"\t\t\t<version>" + version + "</version>\n" +
 					"\t\t\t<date>" + version + "</date>\n" +
 					"\t\t\t<author>The Wizard of DATz</author>\n" +
-					//(_systems != "" && _systems.Count(c => c == ',') == 0 && _headers.ContainsKey(Int32.Parse(_systems)) ? " header=\"" + _headers[Int32.Parse(_systems)] + "\"\n" : "") +
-					"\t\t\t<clrmamepro" + (_systems >= 0 && _headers.ContainsKey(_systems) ? " header=\"" + _headers[_systems] + "\"" : "") + "/>\n" +
+					"\t\t\t<clrmamepro" + 
+					(_systems != "" && _systems.Split(',').Length == 1 && _headers.ContainsKey(Int32.Parse(_systems)) ? " header=\"" + _headers[Int32.Parse(_systems)] + "\"\n" : "") + "/>\n" +
 					"\t\t</header>\n";
 
 				// Unset _system again if we're in MEGAMERGED mode
-				//if (_systems == "0" && _sources == "")
-				if (_systems == 0 && _sources == -1)
+				if (_systems == "0" && _sources == "")
 				{
-					//_systems = "";
-					_systems = -1;
+					_systems = "";
 				}
 
 				// Write the header out
@@ -257,9 +241,9 @@ namespace DATabase
 		{
 			List<RomData> roms = new List<RomData>();
 
-			// Check if we're in a merged mode
-			bool sysmerged = (_systems == -1);
-			bool srcmerged = (_sources == -1);
+			// Check if we have listed sources or systems
+			bool sysmerged = (_systems != "" && _systems.Split(',').Length > 1);
+			bool srcmerged = (_sources != "" && _sources.Split(',').Length > 1);
 			bool merged = sysmerged || srcmerged;
 
 			string query = @"
@@ -276,12 +260,10 @@ JOIN files
 	ON games.id=files.setid
 JOIN checksums
 	ON files.id=checksums.file" +
-	(!sysmerged || !srcmerged ? "\nWHERE" : "") +
-	//(!srcmerged ? " sources.id in (" + _sources + ")" : "") +
-	(!srcmerged ? " sources.id=" + _sources : "") +
-	(!srcmerged && !sysmerged ? " AND" : "") +
-	//(!sysmerged ? " systems.id in (" + _systems + ")" : "") + "\n" +
-	(!sysmerged ? " systems.id=" + _systems : "") + "\n" +
+	(_systems != "" || _sources != "" ? "\nWHERE" : "") +
+	(_sources != "" ? " sources.id in (" + _sources + ")" : "") +
+	(_systems != "" && _sources != "" ? " AND" : "") +
+	(_systems != "" ? " systems.id in (" + _systems + ")" : "") +
 "\nORDER BY " +
 	(merged ? "checksums.size, checksums.crc, checksums.md5, checksums.sha1"
 			: "systems.id, sources.id, games.name, files.name");

@@ -88,19 +88,7 @@ namespace DATabase
 			// Generate a DAT
 			else if (generate)
 			{
-				int sysid = -1, srcid = -1;
-
-				if (systems != "")
-				{
-					Int32.TryParse(systems, out sysid);
-				}
-				if (sources != "")
-				{
-					Int32.TryParse(sources, out srcid);
-				}
-
-				//Generate gen = new Generate(systems, sources, _connectionString, norename, old);
-				Generate gen = new Generate(sysid, srcid, _connectionString, norename, old);
+				Generate gen = new Generate(systems, sources, _connectionString, norename, old);
 				gen.Export();
 			}
 
@@ -195,16 +183,16 @@ ORDER BY systems.manufacturer, systems.system";
 			Console.Write(@"
 DATabase - Import and Generate DAT files
 -----------------------------------------
-Usage: DATabase [option] [filename|dirname|<system=sy> <source=so>]
+Usage: DATabase [option] [filename|dirname|<system=sy,...> <source=so,...>]
 
 Options:
   -h, -?, --help	Show this help
   -i, --import		Start tool in import mode
 			  A filename or folder is required to run
   -g, --generate	Start tool in generate mode
-			  system=sy		Filter by system ID 'sy'
-			  source=so		Filter by source ID 'so'
-			  -nr, --no-rename	don't rename games
+			  system=sy,...		List of system IDs
+			  source=so,...		List of source IDs
+			  -nr, --no-rename	Don't auto-rename games
 			  -old	produces a DAT in RV format
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
