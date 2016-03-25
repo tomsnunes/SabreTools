@@ -19,6 +19,18 @@ namespace DATabase
 			Remapping.CreateRemappings();
 			Console.Clear();
 
+			/*
+			// Show runtime header
+			Console.WriteLine(@"
++-------------------------------------------------------------------+
+|                                                                   |
+|                        DATabase 0.0.4.1                           |
+|                                                                   |
+|                 by Matt Nadareski (darksabre76)                   |
+|                                                                   |
++-------------------------------------------------------------------+");
+			*/
+
 			// If there's not enough arguments, show the help screen
 			if (args.Length == 0)
 			{
@@ -39,7 +51,7 @@ namespace DATabase
 				listsys = listsys || (arg == "-lsy" || arg == "--list-systems");
 				listsrc = listsrc || (arg == "-lso" || arg == "--list-sources");
 				norename = norename || (arg == "-nr" || arg == "--no-rename");
-				old = old || (arg == "-old" || arg == "--old");
+				old = old || (arg == "-old" || arg == "--romvault");
 				systems = (arg.StartsWith("system=") && systems == "" ? arg.Split('=')[1] : systems);
 				sources = (arg.StartsWith("source=") && sources == "" ? arg.Split('=')[1] : sources);
 
@@ -180,6 +192,7 @@ ORDER BY systems.manufacturer, systems.system";
 
 		private static void Help ()
 		{
+			Console.Clear();
 			Console.Write(@"
 DATabase - Import and Generate DAT files
 -----------------------------------------
@@ -193,7 +206,7 @@ Options:
 			  system=sy,...		List of system IDs
 			  source=so,...		List of source IDs
 			  -nr, --no-rename	Don't auto-rename games
-			  -old	produces a DAT in RV format
+			  -old, --romvault	Produce a DAT in RV format
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
   -c, --convert		Convert a RV DAT to XML
