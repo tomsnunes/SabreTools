@@ -11,6 +11,12 @@ namespace DATabase
 	{
 		private static string _dbName = "DATabase.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
+		private static string _header =
+@"+-------------------------------------------------------------------+
+|                        DATabase 0.0.4.1                           |
+|                                                                   |
+|                 by Matt Nadareski (darksabre76)                   |
++-------------------------------------------------------------------+";
 
 		static void Main(string[] args)
 		{
@@ -19,23 +25,10 @@ namespace DATabase
 			Remapping.CreateRemappings();
 			Console.Clear();
 
-			/*
-			// Show runtime header
-			Console.WriteLine(
-@"+-------------------------------------------------------------------+
-|                                                                   |
-|                        DATabase 0.0.4.1                           |
-|                                                                   |
-|                 by Matt Nadareski (darksabre76)                   |
-|                                                                   |
-+-------------------------------------------------------------------+
-");
-			*/
-
-			// If there's not enough arguments, show the help screen
+			// If there's no arguments, show the menu
 			if (args.Length == 0)
 			{
-				Help();
+				ShowMainMenu();
 				return;
 			}
 
@@ -73,125 +66,88 @@ namespace DATabase
 			// Import a file or folder
 			if (import)
 			{
-				// Check to see if the second argument is a file that exists
-				if (input != "" && File.Exists(input))
-				{
-					Console.WriteLine(input);
-					Import imp = new Import(input, _connectionString);
-					imp.ImportData();
-				}
-				// Check to see if the second argument is a directory that exists
-				else if (input != "" && Directory.Exists(input))
-				{
-					foreach (string filename in Directory.GetFiles(input, "*", SearchOption.TopDirectoryOnly))
-					{
-						Console.WriteLine(filename);
-						Import imp = new Import(filename, _connectionString);
-						imp.ImportData();
-					}
-				}
-				// Otherwise, show help
-				else
-				{
-					Help();
-					return;
-				}
+				InitImport(input);
 			}
 
 			// Generate a DAT
 			else if (generate)
 			{
-				Generate gen = new Generate(systems, sources, _connectionString, norename, old);
-				gen.Export();
+				InitGenerate(systems, sources, norename, old);
 			}
 
 			// List all available sources
 			else if (listsrc)
 			{
-				string query = @"
-SELECT DISTINCT sources.id, sources.name
-FROM sources JOIN games on sources.id=games.source
-ORDER BY sources.name COLLATE NOCASE";
-				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
-				{
-					dbc.Open();
-					using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
-					{
-						using (SQLiteDataReader sldr = slc.ExecuteReader())
-						{
-							// If nothing is found, tell the user and exit
-							if (!sldr.HasRows)
-							{
-								Console.WriteLine("Error: No sources found! Please add a source and then try again.");
-								return;
-							}
-
-							Console.WriteLine("Available Sources (id <= name):");
-							while (sldr.Read())
-							{
-								Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1));
-							}
-						}
-					}
-				}
+				ListSources();
 			}
 
 			// List all available systems
 			else if (listsys)
 			{
-				string query = @"
-SELECT DISTINCT systems.id, systems.manufacturer, systems.system
-FROM systems JOIN games ON systems.id=games.system
-ORDER BY systems.manufacturer, systems.system";
-				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
-				{
-					dbc.Open();
-					using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
-					{
-						using (SQLiteDataReader sldr = slc.ExecuteReader())
-						{
-							// If nothing is found, tell the user and exit
-							if (!sldr.HasRows)
-							{
-								Console.WriteLine("Error: No systems found! Please add a system and then try again.");
-								return;
-							}
-
-							Console.WriteLine("Available Systems (id <= name):");
-							while (sldr.Read())
-							{
-								Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1) + " - " + sldr.GetString(2));
-							}
-						}
-					}
-				}
+				ListSystems();
 			}
 
 			// Convert RV DAT to XML DAT
 			else if (convert)
 			{
-				if (File.Exists(input))
-				{
-					Console.WriteLine("Converting " + input);
-					XElement conv = Converters.RomVaultToXML(File.ReadAllLines(input));
-					FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(input) + ".new.xml");
-					StreamWriter sw = new StreamWriter(fs);
-					sw.Write(conv);
-					sw.Close();
-					fs.Close();
-					Console.WriteLine("Converted file: " + Path.GetFileNameWithoutExtension(input) + ".new.xml");
-				}
-				// Otherwise, show help
-				else
-				{
-					Help();
-					return;
-				}
+				InitConvert(input);
 			}
 			return;
 		}
 
-		private static void Help ()
+		private static void ShowMainMenu()
+		{
+			string selection = "";
+			while (selection.ToLowerInvariant() != "x")
+			{
+				Console.Clear();
+				Console.WriteLine(_header + @"
+MAIN MENU
+===========================
+Make a selection:
+
+    1) Show help
+    2) Import a DAT file or folder
+    3) Generate a DAT file
+    4) Convert a DAT file from RV to XML
+    5) List all available sources
+    6) List all available systems
+    X) Exit
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+
+				switch (selection)
+				{
+					case "1":
+						Help();
+						break;
+					case "2":
+						ImportMenu();
+						break;
+					case "3":
+						GenerateMenu();
+						break;
+					case "4":
+						ConvertMenu();
+						break;
+					case "5":
+						ListSources();
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+					case "6":
+						ListSystems();
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+				}
+			}
+			Console.Clear();
+			Console.WriteLine("Thank you for using DATabase!");
+		}
+
+		private static void Help()
 		{
 			Console.Clear();
 			Console.Write(@"
@@ -216,6 +172,228 @@ Options:
 Filenames and directories can't start with '-', 'system=', or 'source='
 unless prefixed by 'input='
 ");
+
+			Console.Write("\nPress any key to continue...");
+			Console.ReadKey();
+			return;
+		}
+
+		private static void ImportMenu()
+		{
+			string selection = "";
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Console.WriteLine(_header + @"
+IMPORT MENU
+===========================
+Enter the name of a DAT file or folder containing DAT files
+or 'b' to go back to the previous menu:");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				if (selection.ToLowerInvariant() != "b")
+				{
+					InitImport(selection);
+					Console.Write("\nPress any key to continue...");
+					Console.ReadKey();
+				}
+			}
+			return;
+		}
+
+		private static void InitImport(string filename)
+		{
+			Console.Clear();
+
+			// Check to see if the second argument is a file that exists
+			if (filename != "" && File.Exists(filename))
+			{
+				Console.WriteLine("Beginning import of " + filename);
+				Import imp = new Import(filename, _connectionString);
+				imp.ImportData();
+				Console.WriteLine(filename + " imported!");
+			}
+			// Check to see if the second argument is a directory that exists
+			else if (filename != "" && Directory.Exists(filename))
+			{
+				foreach (string file in Directory.GetFiles(filename, "*", SearchOption.TopDirectoryOnly))
+				{
+					Console.WriteLine("Beginning import of " + file);
+					Import imp = new Import(file, _connectionString);
+					imp.ImportData();
+					Console.WriteLine(file + " imported!");
+				}
+			}
+			else
+			{
+				Console.WriteLine("I'm sorry but " + filename + "doesn't exist!");
+			}
+			return;
+		}
+
+		private static void GenerateMenu()
+		{
+			string selection = "", systems = "", sources = "";
+			bool norename = false, old = false;
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Console.WriteLine(_header + @"
+GENERATE MENU
+===========================
+Make a selection:
+
+    1) " + (norename ? "Enable game renaming" : "Disable game renaming") + @"
+    2) " + (old ? "Enable XML output" : "Enable RomVault output") + @"
+    3) Enter a list of systems to generate from
+    4) Enter a list of sources to generate from
+    5) Generate the DAT file
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						norename = !norename;
+						break;
+					case "2":
+						old = !old;
+						break;
+					case "3":
+						Console.Clear();
+						ListSystems();
+						Console.Write("Please enter the systems separated by commas: ");
+						systems = Console.ReadLine();
+						break;
+					case "4":
+						Console.Clear();
+						ListSources();
+						Console.Write("Please enter the sources separated by commas: ");
+						sources = Console.ReadLine();
+						break;
+					case "5":
+						Console.Clear();
+						InitGenerate(systems, sources, norename, old);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+				}
+			}
+			return;
+		}
+
+		private static void InitGenerate(string systems, string sources, bool norename, bool old)
+		{
+			Generate gen = new Generate(systems, sources, _connectionString, norename, old);
+			gen.Export();
+			return;
+		}
+
+		private static void ConvertMenu()
+		{
+			string selection = "";
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Console.WriteLine(_header + @"
+CONVERT MENU
+===========================
+Enter the name of a DAT file to convert from RV to XML
+or 'b' to go back to the previous menu:
+");
+				selection = Console.ReadLine();
+				if (selection.ToLowerInvariant() != "b")
+				{
+					Console.Clear();
+					InitConvert(selection);
+					Console.Write("\nPress any key to continue...");
+					Console.ReadKey();
+				}
+			}
+			return;
+		}
+
+		private static void InitConvert(string filename)
+		{
+			if (File.Exists(filename))
+			{
+				Console.WriteLine("Converting " + filename);
+				XElement conv = Converters.RomVaultToXML(File.ReadAllLines(filename));
+				FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(filename) + ".new.xml");
+				StreamWriter sw = new StreamWriter(fs);
+				sw.Write(conv);
+				sw.Close();
+				fs.Close();
+				Console.WriteLine("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.xml");
+			}
+			else
+			{
+				Console.WriteLine("I'm sorry but " + filename + "doesn't exist!");
+			}
+			return;
+		}
+
+		private static void ListSources()
+		{
+			string query = @"
+SELECT DISTINCT sources.id, sources.name
+FROM sources JOIN games on sources.id=games.source
+ORDER BY sources.name COLLATE NOCASE";
+			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			{
+				dbc.Open();
+				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				{
+					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					{
+						// If nothing is found, tell the user and exit
+						if (!sldr.HasRows)
+						{
+							Console.WriteLine("Error: No sources found! Please add a source and then try again.");
+							return;
+						}
+
+						Console.WriteLine("Available Sources (id <= name):\n");
+						while (sldr.Read())
+						{
+							Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1));
+						}
+					}
+				}
+			}
+			return;
+		}
+
+		private static void ListSystems()
+		{
+			string query = @"
+SELECT DISTINCT systems.id, systems.manufacturer, systems.system
+FROM systems JOIN games ON systems.id=games.system
+ORDER BY systems.manufacturer, systems.system";
+			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			{
+				dbc.Open();
+				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				{
+					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					{
+						// If nothing is found, tell the user and exit
+						if (!sldr.HasRows)
+						{
+							Console.WriteLine("Error: No systems found! Please add a system and then try again.");
+							return;
+						}
+
+						Console.WriteLine("Available Systems (id <= name):\n");
+						while (sldr.Read())
+						{
+							Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1) + " - " + sldr.GetString(2));
+						}
+					}
+				}
+			}
+			return;
 		}
 	}
 }
