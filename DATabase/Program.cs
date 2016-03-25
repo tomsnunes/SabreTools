@@ -15,7 +15,7 @@ namespace DATabase
 		static void Main(string[] args)
 		{
 			// Perform initial setup and verification
-			Database.EnsureDatabase(_dbName, _connectionString);
+			DBTools.EnsureDatabase(_dbName, _connectionString);
 			Remapping.CreateRemappings();
 			Console.Clear();
 

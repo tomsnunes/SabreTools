@@ -4,7 +4,7 @@ using System.IO;
 
 namespace DATabase.Helper
 {
-	class Database
+	class DBTools
 	{
 		public static void EnsureDatabase(string db, string connectionString)
 		{
