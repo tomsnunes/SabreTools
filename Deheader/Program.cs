@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Deheader
+namespace WoD
 {
-	class Program
+	class Deheader
 	{
 		private static Dictionary<string, int> types;
 		private static string help = @"Deheader.exe filename|dirname";

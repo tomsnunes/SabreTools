@@ -3,11 +3,11 @@ using System.Data.SQLite;
 using System.IO;
 using System.Xml.Linq;
 
-using DATabase.Helper;
+using WoD.Helper;
 
-namespace DATabase
+namespace WoD
 {
-	class Program
+	class DATabase
 	{
 		private static string _dbName = "DATabase.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";

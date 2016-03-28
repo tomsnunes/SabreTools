@@ -2,7 +2,7 @@
 using System.Data.SQLite;
 using System.IO;
 
-namespace DATabase.Helper
+namespace WoD.Helper
 {
 	class DBTools
 	{

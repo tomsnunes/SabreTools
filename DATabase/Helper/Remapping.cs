@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DATabase.Helper
+namespace WoD.Helper
 {
 	class Remapping
 	{

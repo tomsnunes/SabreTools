@@ -4,9 +4,9 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
 
-using DATabase.Helper;
+using WoD.Helper;
 
-namespace DATabase
+namespace WoD
 {
 	public class Import
 	{

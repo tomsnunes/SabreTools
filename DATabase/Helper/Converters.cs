@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
-namespace DATabase.Helper
+namespace WoD.Helper
 {
 	class Converters
 	{

@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace DATabase.Helper
+namespace WoD.Helper
 {
 	public class Style
 	{
