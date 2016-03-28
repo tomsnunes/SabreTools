@@ -11,12 +11,13 @@ namespace WoD
 	{
 		private static string _dbName = "DATabase.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
-		private static string _version = "0.0.6.1";
+		private static string _version = "0.1.0.0";
 		private static string _header =
 @"+-----------------------------------------------------------------------------+
 |                             DATabase " + _version + @"                                |
 |                                                                             |
-|                      by Matt Nadareski (darksabre76)                        |
+|                    Programmed by Matt Nadareski (darksabre76)               |
+|                               Tested by @tractivo                           |
 +-----------------------------------------------------------------------------+
 ";
 
