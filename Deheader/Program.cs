@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Deheader
@@ -8,10 +9,7 @@ namespace Deheader
 	class Program
 	{
 		private static Dictionary<string, int> types;
-        private static string help = @"Deheader.exe type filename|dirname
-
-Type can be one of the following:
-	a7800, fds, lynx, nes, snes";
+		private static string help = @"Deheader.exe filename|dirname";
 
 		static void Main(string[] args)
 		{
@@ -23,21 +21,19 @@ Type can be one of the following:
 			types.Add("nes", 16);
 			types.Add("snes", 512);
 
-			if (args.Length != 2 || !types.ContainsKey(args[0]))
+			if (args.Length != 1)
 			{
 				Console.WriteLine(help);
 				return;
 			}
 
-			// Get type of file and the filename (or foldername) itself
-			string type = args[0];
-			string file = args[1];
-			int hs = types[type];
+			// Get the filename (or foldername)
+			string file = args[0];
 
 			// If it's a single file, just check it
 			if (File.Exists(file))
 			{
-				DetectRemoveHeader(type, file, hs);
+				DetectRemoveHeader(file);
 			}
 			// If it's a directory, recursively check all
 			else if (Directory.Exists(file))
@@ -46,7 +42,7 @@ Type can be one of the following:
 				{
 					if (sub != ".." && sub != ".")
 					{
-						DetectRemoveHeader(type, sub, hs);
+						DetectRemoveHeader(sub);
 					}
 				}
 			}
@@ -57,51 +53,57 @@ Type can be one of the following:
 			}
 		}
 
-		private static void DetectRemoveHeader(string type, string file, int hs)
+		private static void DetectRemoveHeader(string file)
 		{
 			// Open the file in read mode
 			BinaryReader br = new BinaryReader(File.OpenRead(file));
 
-			// Extract the header from the file
-			byte[] hbin = br.ReadBytes(hs);
+			// Extract the first 1024 bytes of the file
+			byte[] hbin = br.ReadBytes(1024);
 			string header = BitConverter.ToString(hbin).Replace("-", string.Empty);
 
-			Console.WriteLine("Possible header: " + header);
-
-			// Deal with each possible type
-			bool hasHeader = false;
-			switch (type)
+			// Determine the type of the file from the header, if possible
+			string type = "";
+			if (Regex.IsMatch(header, "^.415441524937383030") || Regex.IsMatch(header, "^.{64}41435455414C20434152542044415441205354415254532048455245"))
 			{
-				case "a7800":
-					hasHeader = Regex.IsMatch(header, "^.415441524937383030") || Regex.IsMatch(header, "^.{64}41435455414C20434152542044415441205354415254532048455245");
-					break;
-				case "fds":
-					hasHeader = Regex.IsMatch(header, "^4644531A0[1-4]0000000000000000000000");
-					break;
-				case "lynx":
-					hasHeader = Regex.IsMatch(header, "^4C594E58") || Regex.IsMatch(header, "^425339");
-					break;
-				case "nes":
-					hasHeader = Regex.IsMatch(header, "^4E45531A");
-					break;
-				case "snes":
-					// fig, smc, ufo
-					hasHeader = Regex.IsMatch(header, "^.{16}0000000000000000") || Regex.IsMatch(header, "^.{16}AABB040000000000") || Regex.IsMatch(header, "^.{16}535550455255464F");
-					break;
+				type = "a7800";
+			}
+			else if (Regex.IsMatch(header, "^4644531A0[1-4]0000000000000000000000"))
+			{
+				type = "fds";
+			}
+			else if (Regex.IsMatch(header, "^4C594E58") || Regex.IsMatch(header, "^425339"))
+			{
+				type = "lynx";
+			}
+			else if (Regex.IsMatch(header, "^4E45531A"))
+			{
+				type = "nes";
+			}
+			else if (Regex.IsMatch(header, "^.{16}0000000000000000") || Regex.IsMatch(header, "^.{16}AABB040000000000") || Regex.IsMatch(header, "^.{16}535550455255464F")) // fig, smc, ufo
+			{
+				type = "snes";
 			}
 
-			Console.WriteLine("File has header: " + hasHeader);
+			Console.WriteLine("File has header: " + (type != ""));
 
-			if (hasHeader)
+			if (type != "")
 			{
+				Console.WriteLine("Deteched header type: " + type);
+				int hs = types[type];
+
+				// Get the bytes that aren't from the header from the extracted bit so they can be written before the rest of the file
+				hbin = hbin.Skip(hs).ToArray();
+
+				// Write out the new file
 				Console.WriteLine("Creating unheadered file: " + file + ".new");
 				BinaryWriter bw = new BinaryWriter(File.OpenWrite(file + ".new"));
 				FileInfo fi = new FileInfo(file);
+				bw.Write(hbin);
 				bw.Write(br.ReadBytes((int)fi.Length - hs));
 				bw.Close();
 				Console.WriteLine("Unheadered file created!");
 			}
-
 			br.Close();
 		}
 	}
