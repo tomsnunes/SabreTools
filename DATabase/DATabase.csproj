@@ -70,7 +70,7 @@
     <Compile Include="Core\Generate.cs" />
     <Compile Include="Core\Import.cs" />
     <Compile Include="Helper\DBTools.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="DATabase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helper\Remapping.cs" />
     <Compile Include="Helper\Style.cs" />
