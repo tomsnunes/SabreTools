@@ -275,7 +275,7 @@ JOIN checksums
 	(_systems != "" && _sources != "" ? " AND" : "") +
 	(_systems != "" ? " systems.id in (" + _systems + ")" : "") +
 "\nORDER BY " +
-	(merged ? "checksums.size, checksums.crc, checksums.md5, checksums.sha1"
+	(merged ? "checksums.size, checksums.crc, systems.id, sources.id, checksums.md5, checksums.sha1"
 			: "systems.id, sources.id, games.name, files.name");
 
 			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
@@ -314,35 +314,41 @@ JOIN checksums
 
 							if (merged)
 							{
-								// Check if the rom is a duplicate
-								RomData last = (roms.Count == 0 ? new RomData() : roms[roms.Count - 1]);
-								bool shouldcont = false;
-								if (temp.Type == "rom" && last.Type == "rom")
+								// If it's the first rom in the list, don't touch it
+								if (roms.Count != 0)
 								{
-									shouldcont = ((temp.Size != -1 && temp.Size == last.Size) && (
-											(temp.CRC != "" && last.CRC != "" && temp.CRC == last.CRC) ||
-											(temp.MD5 != "" && last.MD5 != "" && temp.MD5 == last.MD5) ||
-											(temp.SHA1 != "" && last.SHA1 != "" && temp.SHA1 == last.SHA1)
-											)
-										);
-								}
-								else if (temp.Type == "disk" && last.Type == "disk")
-								{
-									shouldcont = ((temp.MD5 != "" && last.MD5 != "" && temp.MD5 == last.MD5) ||
-											(temp.SHA1 != "" && last.SHA1 != "" && temp.SHA1 == last.SHA1)
-										);
-								}
+									// Check if the rom is a duplicate
+									RomData last = roms[roms.Count - 1];
 
-								// If it's a duplicate, skip adding it to the output but add any missing information
-								if (shouldcont)
-								{
-									last.CRC = (last.CRC == "" && temp.CRC != "" ? temp.CRC : last.CRC);
-									last.MD5 = (last.MD5 == "" && temp.MD5 != "" ? temp.MD5 : last.MD5);
-									last.SHA1 = (last.SHA1 == "" && temp.SHA1 != "" ? temp.SHA1 : last.SHA1);
-									roms.RemoveAt(roms.Count - 1);
-									roms.Insert(roms.Count - 1, last);
+									bool shouldcont = false;
+									if (temp.Type == "rom" && last.Type == "rom")
+									{
+										shouldcont = ((temp.Size != -1 && temp.Size == last.Size) && (
+												(temp.CRC != "" && last.CRC != "" && temp.CRC == last.CRC) ||
+												(temp.MD5 != "" && last.MD5 != "" && temp.MD5 == last.MD5) ||
+												(temp.SHA1 != "" && last.SHA1 != "" && temp.SHA1 == last.SHA1)
+												)
+											);
+									}
+									else if (temp.Type == "disk" && last.Type == "disk")
+									{
+										shouldcont = ((temp.MD5 != "" && last.MD5 != "" && temp.MD5 == last.MD5) ||
+												(temp.SHA1 != "" && last.SHA1 != "" && temp.SHA1 == last.SHA1)
+											);
+									}
 
-									continue;
+									// If it's a duplicate, skip adding it to the output but add any missing information
+									if (shouldcont)
+									{
+										last.CRC = (last.CRC == "" && temp.CRC != "" ? temp.CRC : last.CRC);
+										last.MD5 = (last.MD5 == "" && temp.MD5 != "" ? temp.MD5 : last.MD5);
+										last.SHA1 = (last.SHA1 == "" && temp.SHA1 != "" ? temp.SHA1 : last.SHA1);
+
+										roms.RemoveAt(roms.Count - 1);
+										roms.Insert(roms.Count, last);
+
+										continue;
+									}
 								}
 
 								// Rename the game associated if it's still valid and we allow renames
@@ -361,22 +367,25 @@ JOIN checksums
 			}
 
 			// If we're in a merged mode, resort by the correct parameters
-			roms.Sort(delegate (RomData x, RomData y)
+			if (merged)
 			{
-				if (x.SystemID == y.SystemID)
+				roms.Sort(delegate (RomData x, RomData y)
 				{
-					if (x.SourceID == y.SourceID)
+					if (x.SystemID == y.SystemID)
 					{
-						if (x.Game == y.Game)
+						if (x.SourceID == y.SourceID)
 						{
-							return String.Compare(x.Name, y.Name);
+							if (x.Game == y.Game)
+							{
+								return String.Compare(x.Name, y.Name);
+							}
+							return String.Compare(x.Game, y.Game);
 						}
-						return String.Compare(x.Game, y.Game);
+						return (_norename ? String.Compare(x.Game, y.Game) : x.SourceID - y.SourceID);
 					}
-					return (_norename ? String.Compare(x.Game, y.Game) : x.SourceID - y.SourceID);
-				}
-				return (_norename ? String.Compare(x.Game, y.Game) : x.SystemID - y.SystemID);
-			});
+					return (_norename ? String.Compare(x.Game, y.Game) : x.SystemID - y.SystemID);
+				});
+			}
 
 			// Now check rename within games
 			string lastname = "", lastgame = "";
