@@ -64,7 +64,7 @@ namespace Deheader
 
 			// Determine the type of the file from the header, if possible
 			string type = "";
-			if (Regex.IsMatch(header, "^.415441524937383030") || Regex.IsMatch(header, "^.{64}41435455414C20434152542044415441205354415254532048455245"))
+			if (Regex.IsMatch(header, "^.415441524937383030") || Regex.IsMatch(header, "^.{200}41435455414C20434152542044415441205354415254532048455245"))
 			{
 				type = "a7800";
 			}
