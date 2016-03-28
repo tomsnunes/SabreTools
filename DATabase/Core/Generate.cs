@@ -315,7 +315,7 @@ JOIN checksums
 							if (merged)
 							{
 								// Check if the rom is a duplicate
-								RomData last = roms[roms.Count - 1];
+								RomData last = (roms.Count == 0 ? new RomData() : roms[roms.Count - 1]);
 								bool shouldcont = false;
 								if (temp.Type == "rom" && last.Type == "rom")
 								{
@@ -339,6 +339,7 @@ JOIN checksums
 									last.CRC = (last.CRC == "" && temp.CRC != "" ? temp.CRC : last.CRC);
 									last.MD5 = (last.MD5 == "" && temp.MD5 != "" ? temp.MD5 : last.MD5);
 									last.SHA1 = (last.SHA1 == "" && temp.SHA1 != "" ? temp.SHA1 : last.SHA1);
+									roms.RemoveAt(roms.Count - 1);
 									roms.Insert(roms.Count - 1, last);
 
 									continue;
