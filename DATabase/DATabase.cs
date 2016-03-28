@@ -16,8 +16,8 @@ namespace WoD
 @"+-----------------------------------------------------------------------------+
 |                             DATabase " + _version + @"                                |
 |                                                                             |
-|                    Programmed by Matt Nadareski (darksabre76)               |
-|                               Tested by @tractivo                           |
+|                 Programmed by Matt Nadareski (darksabre76)                  |
+|                            Tested by @tractivo                              |
 +-----------------------------------------------------------------------------+
 ";
 
