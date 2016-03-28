@@ -293,8 +293,6 @@ JOIN checksums
 						}
 
 						// Retrieve and process the roms for merging
-						string lasttype = "", lastcrc = "", lastmd5 = "", lastsha1 = "";
-						int lastsize = -1;
 						while (sldr.Read())
 						{
 							RomData temp = new RomData
@@ -317,33 +315,32 @@ JOIN checksums
 							if (merged)
 							{
 								// Check if the rom is a duplicate
+								RomData last = roms[roms.Count - 1];
 								bool shouldcont = false;
-								if (temp.Type == "rom" && lasttype == "rom")
+								if (temp.Type == "rom" && last.Type == "rom")
 								{
-									shouldcont = ((temp.Size != -1 && temp.Size == lastsize) && (
-											(temp.CRC != "" && lastcrc != "" && temp.CRC == lastcrc) ||
-											(temp.MD5 != "" && lastmd5 != "" && temp.MD5 == lastmd5) ||
-											(temp.SHA1 != "" && lastsha1 != "" && temp.SHA1 == lastsha1)
+									shouldcont = ((temp.Size != -1 && temp.Size == last.Size) && (
+											(temp.CRC != "" && last.CRC != "" && temp.CRC == last.CRC) ||
+											(temp.MD5 != "" && last.MD5 != "" && temp.MD5 == last.MD5) ||
+											(temp.SHA1 != "" && last.SHA1 != "" && temp.SHA1 == last.SHA1)
 											)
 										);
 								}
-								else if (temp.Type == "disk" && lasttype == "disk")
+								else if (temp.Type == "disk" && last.Type == "disk")
 								{
-									shouldcont = ((temp.MD5 != "" && lastmd5 != "" && temp.MD5 == lastmd5) ||
-											(temp.SHA1 != "" && lastsha1 != "" && temp.SHA1 == lastsha1)
+									shouldcont = ((temp.MD5 != "" && last.MD5 != "" && temp.MD5 == last.MD5) ||
+											(temp.SHA1 != "" && last.SHA1 != "" && temp.SHA1 == last.SHA1)
 										);
 								}
 
-								// Set the next variables
-								lasttype = temp.Type;
-								lastsize = temp.Size;
-								lastcrc = temp.CRC;
-								lastmd5 = temp.MD5;
-								lastsha1 = temp.SHA1;
-
-								// If it's a duplicate, skip adding it to the output
+								// If it's a duplicate, skip adding it to the output but add any missing information
 								if (shouldcont)
 								{
+									last.CRC = (last.CRC == "" && temp.CRC != "" ? temp.CRC : last.CRC);
+									last.MD5 = (last.MD5 == "" && temp.MD5 != "" ? temp.MD5 : last.MD5);
+									last.SHA1 = (last.SHA1 == "" && temp.SHA1 != "" ? temp.SHA1 : last.SHA1);
+									roms.Insert(roms.Count - 1, last);
+
 									continue;
 								}
 
