@@ -7,7 +7,8 @@ namespace Deheader
 {
 	class Program
 	{
-		private static string help = @"Deheader.exe type filename|dirname
+		private static Dictionary<string, int> types;
+        private static string help = @"Deheader.exe type filename|dirname
 
 Type can be one of the following:
 	a7800, fds, lynx, nes, snes";
@@ -15,7 +16,7 @@ Type can be one of the following:
 		static void Main(string[] args)
 		{
 			// Type mapped to header size (in decimal bytes)
-			Dictionary<string, int> types = new Dictionary<string, int>();
+			types = new Dictionary<string, int>();
 			types.Add("a7800", 128);
 			types.Add("fds", 16);
 			types.Add("lynx", 64);
@@ -72,26 +73,20 @@ Type can be one of the following:
 			switch (type)
 			{
 				case "a7800":
-					bool a7800a = Regex.IsMatch(header, "^.415441524937383030");
-					bool a7800b = Regex.IsMatch(header, "^.{64}41435455414C20434152542044415441205354415254532048455245");
-					hasHeader = a7800a || a7800b;
+					hasHeader = Regex.IsMatch(header, "^.415441524937383030") || Regex.IsMatch(header, "^.{64}41435455414C20434152542044415441205354415254532048455245");
 					break;
 				case "fds":
 					hasHeader = Regex.IsMatch(header, "^4644531A0[1-4]0000000000000000000000");
 					break;
 				case "lynx":
-					bool lynxa = Regex.IsMatch(header, "^4C594E58");
-					bool lynxb = Regex.IsMatch(header, "^425339");
-					hasHeader = lynxa || lynxb;
+					hasHeader = Regex.IsMatch(header, "^4C594E58") || Regex.IsMatch(header, "^425339");
 					break;
 				case "nes":
 					hasHeader = Regex.IsMatch(header, "^4E45531A");
 					break;
 				case "snes":
-					bool fig = Regex.IsMatch(header, "^.{16}0000000000000000");
-					bool smc = Regex.IsMatch(header, "^.{16}AABB040000000000");
-					bool ufo = Regex.IsMatch(header, "^.{16}535550455255464F");
-					hasHeader = fig || smc || ufo;
+					// fig, smc, ufo
+					hasHeader = Regex.IsMatch(header, "^.{16}0000000000000000") || Regex.IsMatch(header, "^.{16}AABB040000000000") || Regex.IsMatch(header, "^.{16}535550455255464F");
 					break;
 			}
 
