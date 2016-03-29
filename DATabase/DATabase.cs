@@ -12,7 +12,7 @@ namespace WoD
 		private static Logger logger;
 		private static string _dbName = "DATabase.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
-		private static string _version = "0.1.4.0";
+		private static string _version = "0.1.4.1";
 		private static string _header =
 @"+-----------------------------------------------------------------------------+
 |                             DATabase " + _version + @"                                |
@@ -30,6 +30,7 @@ namespace WoD
 			logger = new Logger(false, "database.log");
 			logger.Start();
 			Console.Clear();
+			Console.SetBufferSize(Console.BufferWidth, 999);
 			Console.Title = "DATabase " + _version;
 
 			// If there's no arguments, show the menu
@@ -566,11 +567,11 @@ or 'b' to go back to the previous menu:
 			return;
 		}
 
-		private static void ListSources()
+		private static void ListSources(bool all = false)
 		{
 			string query = @"
 SELECT DISTINCT sources.id, sources.name
-FROM sources JOIN games on sources.id=games.source
+FROM sources " + (!all ? "JOIN games on sources.id=games.source" : "") + @"
 ORDER BY sources.name COLLATE NOCASE";
 			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 			{
@@ -597,11 +598,11 @@ ORDER BY sources.name COLLATE NOCASE";
 			return;
 		}
 
-		private static void ListSystems()
+		private static void ListSystems(bool all = false)
 		{
 			string query = @"
 SELECT DISTINCT systems.id, systems.manufacturer, systems.system
-FROM systems JOIN games ON systems.id=games.system
+FROM systems " + (!all ? "JOIN games ON systems.id=games.system" : "") + @"
 ORDER BY systems.manufacturer, systems.system";
 			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 			{
@@ -661,7 +662,7 @@ Make a selection:
 						break;
 					case "2":
 						Console.Clear();
-						ListSources();
+						ListSources(true);
 						Console.Write("Please enter the source: ");
 						InitRemoveSource(Console.ReadLine());
 						Console.Write("\nPress any key to continue...");
@@ -679,7 +680,7 @@ Make a selection:
 						break;
 					case "4":
 						Console.Clear();
-						ListSystems();
+						ListSystems(true);
 						Console.Write("Please enter the source: ");
 						InitRemoveSystem(Console.ReadLine());
 						Console.Write("\nPress any key to continue...");
