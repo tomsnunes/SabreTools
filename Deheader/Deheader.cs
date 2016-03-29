@@ -13,7 +13,12 @@ namespace SabreTools
 	{
 		private static Dictionary<string, int> types;
 		private static bool save;
-		private static string help = @"Deheader.exe [-s] filename|dirname";
+		private static string help = @"Deheader - Remove headers from roms
+-----------------------------------------
+Usage: Deheader [option] [filename|dirname]
+
+Options:
+  -s			Enable saving of the extracted header";
 
 		/// <summary>
 		/// Start deheader operation with supplied parameters
