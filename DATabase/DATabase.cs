@@ -49,18 +49,23 @@ namespace WoD
 			string systems = "", sources = "", input = "", manu = "", url = "";
 			foreach (string arg in args)
 			{
+				// Main functions
 				help = help || (arg == "-h" || arg == "-?" || arg == "--help");
 				import = import || (arg == "-i" || arg == "--import");
 				generate = generate || (arg == "-g" || arg == "--generate");
+				genall = genall || (arg == "-ga" || arg == "--generate-all");
 				convert = convert || (arg == "-c" || arg == "--convert");
 				listsys = listsys || (arg == "-lsy" || arg == "--list-systems");
 				listsrc = listsrc || (arg == "-lso" || arg == "--list-sources");
 				norename = norename || (arg == "-nr" || arg == "--no-rename");
-				old = old || (arg == "-old" || arg == "--romvault");
-				log = log || (arg == "-l" || arg == "--log");
-				genall = genall || (arg == "-ga" || arg == "--generate-all");
 				add = add || (arg == "-a" || arg == "--add");
 				rem = rem || (arg == "-r" || arg == "--remove");
+
+				// General switches
+				old = old || (arg == "-old" || arg == "--romvault");
+				log = log || (arg == "-l" || arg == "--log");
+				
+				// User input strings
 				systems = (arg.StartsWith("system=") && systems == "" ? arg.Split('=')[1] : systems);
 				sources = (arg.StartsWith("source=") && sources == "" ? arg.Split('=')[1] : sources);
 				manu = (arg.StartsWith("manu=") && manu == "" ? arg.Split('=')[1] : manu);
@@ -68,7 +73,13 @@ namespace WoD
 
 				// Take care of the two distinct input name possibilites; prioritize the input tag
 				input = (arg.StartsWith("input=") && input == "" ? arg.Split('=')[1] : input);
-				input = (!arg.StartsWith("-") && !arg.StartsWith("source=") && !arg.StartsWith("system=") && !arg.StartsWith("input=") && input == "" ? arg : input);
+				input = (!arg.StartsWith("-") && 
+					!arg.StartsWith("source=") &&
+					!arg.StartsWith("system=") &&
+					!arg.StartsWith("manu=") &&
+					!arg.StartsWith("url=") &&
+					!arg.StartsWith("input=") &&
+					input == "" ? arg : input);
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
