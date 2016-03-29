@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 
+using WoD.Helper;
+
 namespace WoD
 {
 	class Generate
@@ -20,14 +22,16 @@ namespace WoD
 
 		// Private required variables
 		private Dictionary<int, string> _headers;
+		private Logging _logger;
 
-		public Generate(string systems, string sources, string connectionString, bool norename = false, bool old = false)
+		public Generate(string systems, string sources, string connectionString, Logging logger, bool norename = false, bool old = false)
 		{
 			_systems = systems;
 			_sources = sources;
 			_connectionString = connectionString;
 			_norename = norename;
 			_old = old;
+			_logger = logger;
 
 			_headers = new Dictionary<int, string>();
 			_headers.Add(25, "a7800.xml");
@@ -45,7 +49,7 @@ namespace WoD
 			int id = 0;
 			if (_sources != "" && Int32.TryParse(_sources, out id) && id <= 14)
             {
-				Console.WriteLine("This source is import-only so a DAT cannot be created. We apologize for the inconvenience.");
+				_logger.Log("This source is import-only so a DAT cannot be created. We apologize for the inconvenience.");
 				return false;
 			}
 
@@ -64,7 +68,7 @@ namespace WoD
 							// If there are no games for this combination, return nothing
 							if (!sldr.HasRows)
 							{
-								Console.WriteLine("No system could be found with id in \"" + _systems + "\". Please check and try again.");
+								_logger.Log("No system could be found with id in \"" + _systems + "\". Please check and try again.");
 								return false;
 							}
 
@@ -106,7 +110,7 @@ namespace WoD
 							// If there are no games for this combination, return nothing
 							if (!sldr.HasRows)
 							{
-								Console.WriteLine("No source could be found with id in \"" + _sources + "\". Please check and try again.");
+								_logger.Log("No source could be found with id in \"" + _sources + "\". Please check and try again.");
 								return false;
 							}
 
@@ -146,7 +150,7 @@ namespace WoD
 			string datname = systemname + " (" + sourcename + " " + version + ")";
 
 			// Create and open an output file for writing (currently uses current time, change to "last updated time"
-			Console.WriteLine("Opening file for writing: " + datname + (_old ? ".dat" : ".xml"));
+			_logger.Log("Opening file for writing: " + datname + (_old ? ".dat" : ".xml"));
 			
 			try
 			{
@@ -234,13 +238,13 @@ namespace WoD
 				}
 
 				sw.Write((_old ? ")" : "\t</machine>\n</datafile>"));
-				Console.WriteLine("File written!");
+				_logger.Log("File written!");
                 sw.Close();
 				fs.Close();
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex);
+				_logger.Log(ex.ToString());
 				return false;
 			}
 
@@ -288,7 +292,7 @@ JOIN checksums
 						// If there are no games for this combination, return nothing
 						if (!sldr.HasRows)
 						{
-							Console.WriteLine("No games could be found with those inputs. Please check and try again.");
+							_logger.Log("No games could be found with those inputs. Please check and try again.");
 							return null;
 						}
 

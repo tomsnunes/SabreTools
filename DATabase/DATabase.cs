@@ -9,15 +9,16 @@ namespace WoD
 {
 	class DATabase
 	{
+		private static Logging logger;
 		private static string _dbName = "DATabase.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
-		private static string _version = "0.1.0.0";
+		private static string _version = "0.1.1.0";
 		private static string _header =
 @"+-----------------------------------------------------------------------------+
 |                             DATabase " + _version + @"                                |
 |                                                                             |
-|                 Programmed by Matt Nadareski (darksabre76)                  |
-|                            Tested by @tractivo                              |
+|                 Programming: Matt Nadareski (darksabre76)                   |
+|                            Testing: @tractivo                               |
 +-----------------------------------------------------------------------------+
 ";
 
@@ -26,6 +27,8 @@ namespace WoD
 			// Perform initial setup and verification
 			DBTools.EnsureDatabase(_dbName, _connectionString);
 			Remapping.CreateRemappings();
+			logger = new Logging(false, "database.log");
+			logger.Start();
 			Console.Clear();
 			Console.Title = "DATabase " + _version;
 
@@ -33,12 +36,14 @@ namespace WoD
 			if (args.Length == 0)
 			{
 				ShowMainMenu();
+				logger.Close();
 				return;
 			}
 
 			// Determine which switches are enabled (with values if necessary)
 			bool help = false, import = false, generate = false, convert = false,
-				listsys = false, listsrc = false, norename = false, old = false;
+				listsys = false, listsrc = false, norename = false, old = false,
+				log = false;
 			string systems = "", sources = "", input = "";
 			foreach (string arg in args)
 			{
@@ -50,6 +55,7 @@ namespace WoD
 				listsrc = listsrc || (arg == "-lso" || arg == "--list-sources");
 				norename = norename || (arg == "-nr" || arg == "--no-rename");
 				old = old || (arg == "-old" || arg == "--romvault");
+				log = log || (arg == "-l" || arg == "--log");
 				systems = (arg.StartsWith("system=") && systems == "" ? arg.Split('=')[1] : systems);
 				sources = (arg.StartsWith("source=") && sources == "" ? arg.Split('=')[1] : sources);
 
@@ -62,8 +68,12 @@ namespace WoD
 			if (help || !(import ^ generate ^ listsys ^ listsrc))
 			{
 				Help();
+				logger.Close();
 				return;
 			}
+
+			// Update the logger with the new value
+			logger.ToFile = log;
 
 			// Now take care of each mode in succesion
 
@@ -96,6 +106,7 @@ namespace WoD
 			{
 				InitConvert(input);
 			}
+			logger.Close();
 			return;
 		}
 
@@ -128,6 +139,7 @@ Make a selection:
     4) Convert a DAT file from RV to XML
     5) List all available sources
     6) List all available systems
+    7) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
     X) Exit Program
 ");
 				Console.Write("Enter selection: ");
@@ -161,6 +173,9 @@ Make a selection:
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
+					case "7":
+						logger.ToFile = !logger.ToFile;
+						break;
 				}
 			}
 			Console.Clear();
@@ -188,6 +203,7 @@ Options:
   -lsy, --list-systems	List all systems (id <= name)
   -c, --convert		Convert a RV DAT to XML
 			  A filename or folder is required to run
+  -l, --log		Enable logging of program output
 
 Filenames and directories can't start with '-', 'system=', or 'source='
 unless prefixed by 'input='
@@ -229,7 +245,7 @@ or 'b' to go back to the previous menu:");
 			if (filename != "" && File.Exists(filename))
 			{
 				Console.WriteLine("Beginning import of " + filename);
-				Import imp = new Import(filename, _connectionString);
+				Import imp = new Import(filename, _connectionString, logger);
 				imp.ImportData();
 				Console.WriteLine(filename + " imported!");
 			}
@@ -239,7 +255,7 @@ or 'b' to go back to the previous menu:");
 				foreach (string file in Directory.GetFiles(filename, "*", SearchOption.TopDirectoryOnly))
 				{
 					Console.WriteLine("Beginning import of " + file);
-					Import imp = new Import(file, _connectionString);
+					Import imp = new Import(file, _connectionString, logger);
 					imp.ImportData();
 					Console.WriteLine(file + " imported!");
 				}
@@ -305,7 +321,7 @@ Make a selection:
 
 		private static void InitGenerate(string systems, string sources, bool norename, bool old)
 		{
-			Generate gen = new Generate(systems, sources, _connectionString, norename, old);
+			Generate gen = new Generate(systems, sources, _connectionString, logger, norename, old);
 			gen.Export();
 			return;
 		}

@@ -13,6 +13,7 @@ namespace WoD
 		// Private instance variables
 		private string _filepath;
 		private string _connectionString;
+		private Logging _logger;
 
 		// Regex File Name Patterns
 		private static string _defaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
@@ -49,7 +50,7 @@ namespace WoD
 		}
 
 		// Constructor
-		public Import(string filepath, string connectionString)
+		public Import(string filepath, string connectionString, Logging logger)
 		{
 			if (File.Exists(filepath))
 			{
@@ -61,6 +62,7 @@ namespace WoD
 			}
 
 			_connectionString = connectionString;
+			_logger = logger;
 		}
 
 		// Import the data from file into the database
@@ -104,7 +106,7 @@ namespace WoD
 			// If the type is still unmatched, the data can't be imported yet
 			else
 			{
-				Console.WriteLine("File " + filename + " cannot be imported at this time because it is not a known pattern.\nPlease try again with an unrenamed version.");
+				_logger.Log("File " + filename + " cannot be imported at this time because it is not a known pattern.\nPlease try again with an unrenamed version.");
 				return false;
 			}
 
@@ -120,7 +122,7 @@ namespace WoD
 				case DatType.mame:
 					if (!Remapping.MAME.ContainsKey(fileinfo[1].Value))
 					{
-						Console.WriteLine("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection mameInfo = Regex.Match(Remapping.MAME[fileinfo[1].Value], _remappedPattern).Groups;
@@ -133,7 +135,7 @@ namespace WoD
 				case DatType.nointro:
 					if (!Remapping.NoIntro.ContainsKey(fileinfo[1].Value))
 					{
-						Console.WriteLine("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection nointroInfo = Regex.Match(Remapping.NoIntro[fileinfo[1].Value], _remappedPattern).Groups;
@@ -149,7 +151,7 @@ namespace WoD
 				case DatType.redump:
 					if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
 					{
-						Console.WriteLine("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection redumpInfo = Regex.Match(Remapping.Redump[fileinfo[1].Value], _remappedPattern).Groups;
@@ -165,7 +167,7 @@ namespace WoD
 				case DatType.tosec:
 					if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
 					{
-						Console.WriteLine("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection tosecInfo = Regex.Match(Remapping.TOSEC[fileinfo[1].Value], _remappedPattern).Groups;
@@ -180,7 +182,7 @@ namespace WoD
 				case DatType.trurip:
 					if (!Remapping.TruRip.ContainsKey(fileinfo[1].Value))
 					{
-						Console.WriteLine("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection truripInfo = Regex.Match(Remapping.TruRip[fileinfo[1].Value], _remappedPattern).Groups;
@@ -216,7 +218,7 @@ namespace WoD
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							Console.WriteLine("Error: No suitable system found! Please add the system and then try again.");
+							_logger.Log("Error: No suitable system found! Please add the system and then try again.");
 							return false;
 						}
 
@@ -240,7 +242,7 @@ namespace WoD
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							Console.WriteLine("Error: No suitable source found! Please add the source and then try again.");
+							_logger.Log("Error: No suitable source found! Please add the source and then try again.");
 							return false;
 						}
 
@@ -495,14 +497,14 @@ INSERT INTO files (setid, name, type, lastupdated)
 									// If the insert of the checksums failed, that's bad
 									if (affected < 1)
 									{
-										Console.WriteLine("There was an error adding checksums for " + name + " to the database!");
+										_logger.Log("There was an error adding checksums for " + name + " to the database!");
 										return false;
 									}
 								}
 								// Otherwise, something happened which is bad
 								else
 								{
-									Console.WriteLine("There was an error adding " + name + " to the database!");
+									_logger.Log("There was an error adding " + name + " to the database!");
 									return false;
 								}
 							}
