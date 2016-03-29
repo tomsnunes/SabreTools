@@ -9,7 +9,8 @@ namespace WoD
 	class Deheader
 	{
 		private static Dictionary<string, int> types;
-		private static string help = @"Deheader.exe filename|dirname";
+		private static bool save;
+		private static string help = @"Deheader.exe [-s] filename|dirname";
 
 		static void Main(string[] args)
 		{
@@ -21,14 +22,25 @@ namespace WoD
 			types.Add("nes", 16);
 			types.Add("snes", 512);
 
-			if (args.Length != 1)
+			if (args.Length == 0 || args.Length > 2)
 			{
 				Console.WriteLine(help);
 				return;
 			}
 
 			// Get the filename (or foldername)
-			string file = args[0];
+			string file = "";
+			if (args.Length == 1)
+			{
+				file = args[0];
+				save = false;
+			}
+			else
+			{
+				file = args[1];
+				save = true;
+			}			
+			
 
 			// If it's a single file, just check it
 			if (File.Exists(file))
@@ -91,6 +103,18 @@ namespace WoD
 			{
 				Console.WriteLine("Deteched header type: " + type);
 				int hs = types[type];
+
+				// Write out the header if we're saving it
+				if (save)
+				{
+					Console.WriteLine("Writing header to file: " + file + ".header");
+					BinaryWriter bwh = new BinaryWriter(File.OpenWrite(file + ".header"));
+					for (int i = 0; i < hs; i++)
+					{
+						bwh.Write(hbin[i]);
+					}
+					bwh.Close();
+				}
 
 				// Get the bytes that aren't from the header from the extracted bit so they can be written before the rest of the file
 				hbin = hbin.Skip(hs).ToArray();
