@@ -132,8 +132,15 @@ CREATE TABLE IF NOT EXISTS systems (
 
 		public static bool RemoveSource(int id, string connectionString)
 		{
-
-			return true;
+			string query = "DELETE FROM sources WHERE id=" + id;
+			using (SQLiteConnection dbc = new SQLiteConnection(connectionString))
+			{
+				dbc.Open();
+				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				{
+					return slc.ExecuteNonQuery() >= 1;
+				}
+			}
 		}
 
 		public static bool AddSystem(string manufacturer, string system, string connectionString)
@@ -163,8 +170,15 @@ CREATE TABLE IF NOT EXISTS systems (
 
 		public static bool RemoveSystem(int id, string connectionString)
 		{
-
-			return true;
+			string query = "DELETE FROM systems WHERE id=" + id;
+			using (SQLiteConnection dbc = new SQLiteConnection(connectionString))
+			{
+				dbc.Open();
+				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				{
+					return slc.ExecuteNonQuery() >= 1;
+				}
+			}
 		}
 	}
 }
