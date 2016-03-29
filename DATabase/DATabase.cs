@@ -57,13 +57,13 @@ namespace WoD
 				convert = convert || (arg == "-c" || arg == "--convert");
 				listsys = listsys || (arg == "-lsy" || arg == "--list-systems");
 				listsrc = listsrc || (arg == "-lso" || arg == "--list-sources");
-				norename = norename || (arg == "-nr" || arg == "--no-rename");
 				add = add || (arg == "-a" || arg == "--add");
 				rem = rem || (arg == "-r" || arg == "--remove");
 
-				// General switches
-				old = old || (arg == "-old" || arg == "--romvault");
+				// Switches
 				log = log || (arg == "-l" || arg == "--log");
+				old = old || (arg == "-old" || arg == "--romvault");
+				norename = norename || (arg == "-nr" || arg == "--no-rename");
 				
 				// User input strings
 				systems = (arg.StartsWith("system=") && systems == "" ? arg.Split('=')[1] : systems);
