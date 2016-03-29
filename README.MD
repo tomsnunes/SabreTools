@@ -9,6 +9,7 @@ This project is a desktop port of some core features of Wizard of DATz Redux. Fo
 Currently, SabreTools consists of two main programs: DATabase and Deheader.
 
 <b>DATabase</b>
+<p/>
 The main tool of the SabreTools suite. Performs the majority of the core features of the parent project, including the following:
 <ul>
 	<li>Importing and Generating DAT files in RomVault and XML formats</li>
@@ -19,6 +20,7 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 This tool can both be used with command line parameters or with the built-in text menu system.
 
 <b>Deheader</b>
+<p/>
 A simple auxilary tool that detects and removes headers from the following systems:
 <ul>
 	<li>Atari 7800</li>
