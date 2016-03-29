@@ -90,5 +90,29 @@ CREATE TABLE IF NOT EXISTS systems (
 				dbc.Close();
 			}
 		}
+
+		public static bool AddSource(string name, string url)
+		{
+
+			return true;
+		}
+
+		public static bool RemoveSource(int id)
+		{
+
+			return true;
+		}
+
+		public static bool AddSystem(string manufacturer, string system)
+		{
+
+			return true;
+		}
+
+		public static bool RemoveSystem(int id)
+		{
+
+			return true;
+		}
 	}
 }
