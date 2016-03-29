@@ -43,11 +43,7 @@ namespace WoD.Helper
 
 			try
 			{
-				if (!File.Exists(_filename))
-				{
-					File.Create(_filename);
-				}
-				_log = new StreamWriter(File.OpenWrite(_filename));
+				_log = new StreamWriter(File.Open(_filename, FileMode.OpenOrCreate | FileMode.Append));
 				_log.WriteLine("Logging started " + DateTime.Now);
 			}
 			catch
