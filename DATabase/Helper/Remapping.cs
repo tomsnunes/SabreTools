@@ -588,6 +588,7 @@ namespace WoD.Helper
 			TOSEC.Add("Atari ST", "Atari - ST");
 			TOSEC.Add("Bally Professional Arcade & Astrocade", "Bally Professional - Arcade, Astrocade");
 			TOSEC.Add("Bandai Pippin @World & Pippin Atmark", "Bandai - Pippin");
+			TOSEC.Add("Bandai Pippin Atmark", "Bandai - Pippin");
 			TOSEC.Add("Bandai Playdia", "Bandai - Playdia");
 			TOSEC.Add("Bandai WonderSwan", "Bandai - WonderSwan");
 			TOSEC.Add("Bandai WonderSwan Color", "Bandai - WonderSwan Color");
