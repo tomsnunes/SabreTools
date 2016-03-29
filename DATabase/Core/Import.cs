@@ -4,9 +4,9 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
 
-using WoD.Helper;
+using SabreTools.Helper;
 
-namespace WoD
+namespace SabreTools
 {
 	public class Import
 	{

@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace WoD.Helper
+namespace SabreTools.Helper
 {
 	public class Style
 	{

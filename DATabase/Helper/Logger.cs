@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace WoD.Helper
+namespace SabreTools.Helper
 {
 	public class Logger
 	{

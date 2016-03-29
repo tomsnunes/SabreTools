@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
-namespace WoD.Helper
+namespace SabreTools.Helper
 {
 	class Converters
 	{

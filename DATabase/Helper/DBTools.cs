@@ -2,7 +2,7 @@
 using System.Data.SQLite;
 using System.IO;
 
-namespace WoD.Helper
+namespace SabreTools.Helper
 {
 	class DBTools
 	{

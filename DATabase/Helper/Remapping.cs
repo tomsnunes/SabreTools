@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 
-namespace WoD.Helper
+namespace SabreTools.Helper
 {
 	class Remapping
 	{

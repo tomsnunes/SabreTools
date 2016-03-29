@@ -3,9 +3,9 @@ using System.Data.SQLite;
 using System.IO;
 using System.Xml.Linq;
 
-using WoD.Helper;
+using SabreTools.Helper;
 
-namespace WoD
+namespace SabreTools
 {
 	class DATabase
 	{

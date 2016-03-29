@@ -7,9 +7,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 
-using WoD.Helper;
+using SabreTools.Helper;
 
-namespace WoD
+namespace SabreTools
 {
 	class Generate
 	{
