@@ -77,7 +77,6 @@ namespace WoD.Helper
 						TruRip.Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
 						break;
 				}
-				
 
 				// Get the next node and skip over anything that's not an element
 				node = node.NextSibling;
