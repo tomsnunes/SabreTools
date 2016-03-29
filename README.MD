@@ -29,6 +29,7 @@ A simple auxilary tool that detects and removes headers from the following syste
 	<li>Nintendo Entertainment System / Famicom</li>
 	<li>Super Nintendo Entertainment System</li>
 </ul>
+It can also save the removed header, in case you need to reconstruct the original file.
 
 <h3>Contributions</h3>
 
