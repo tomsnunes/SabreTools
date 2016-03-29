@@ -49,7 +49,7 @@ namespace WoD
 			int id = 0;
 			if (_sources != "" && Int32.TryParse(_sources, out id) && id <= 14)
             {
-				_logger.Log("This source is import-only so a DAT cannot be created. We apologize for the inconvenience.");
+				_logger.Log("This source (" + id + ") is import-only so a DAT cannot be created. We apologize for the inconvenience.");
 				return false;
 			}
 
