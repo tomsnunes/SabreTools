@@ -12,7 +12,7 @@ namespace WoD
 		private static Logger logger;
 		private static string _dbName = "DATabase.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
-		private static string _version = "0.1.1.0";
+		private static string _version = "0.1.2.0";
 		private static string _header =
 @"+-----------------------------------------------------------------------------+
 |                             DATabase " + _version + @"                                |
@@ -43,7 +43,7 @@ namespace WoD
 			// Determine which switches are enabled (with values if necessary)
 			bool help = false, import = false, generate = false, convert = false,
 				listsys = false, listsrc = false, norename = false, old = false,
-				log = false;
+				log = false, genall = false;
 			string systems = "", sources = "", input = "";
 			foreach (string arg in args)
 			{
@@ -56,6 +56,7 @@ namespace WoD
 				norename = norename || (arg == "-nr" || arg == "--no-rename");
 				old = old || (arg == "-old" || arg == "--romvault");
 				log = log || (arg == "-l" || arg == "--log");
+				genall = genall || (arg == "-ga" || arg == "--generate-all");
 				systems = (arg.StartsWith("system=") && systems == "" ? arg.Split('=')[1] : systems);
 				sources = (arg.StartsWith("source=") && sources == "" ? arg.Split('=')[1] : sources);
 
@@ -65,7 +66,7 @@ namespace WoD
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(import ^ generate ^ listsys ^ listsrc))
+			if (help || !(import ^ generate ^ listsys ^ listsrc ^ genall))
 			{
 				Help();
 				logger.Close();
@@ -87,6 +88,12 @@ namespace WoD
 			else if (generate)
 			{
 				InitGenerate(systems, sources, norename, old);
+			}
+
+			// Generate all DATs
+			else if (genall)
+			{
+				InitGenerateAll(norename, old);
 			}
 
 			// List all available sources
@@ -136,10 +143,11 @@ Make a selection:
     1) Show command line usage
     2) Import a DAT file or folder
     3) Generate a DAT file
-    4) Convert a DAT file from RV to XML
-    5) List all available sources
-    6) List all available systems
-    7) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
+    4) Generate all DAT files
+    5) Convert a DAT file from RV to XML
+    6) List all available sources
+    7) List all available systems
+    8) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
     X) Exit Program
 ");
 				Console.Write("Enter selection: ");
@@ -157,23 +165,26 @@ Make a selection:
 						GenerateMenu();
 						break;
 					case "4":
-						ConvertMenu();
+						GenerateAllMenu();
 						break;
 					case "5":
+						ConvertMenu();
+						break;
+					case "6":
 						Console.Clear();
 						PrintHeader();
 						ListSources();
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
-					case "6":
+					case "7":
 						Console.Clear();
 						PrintHeader();
 						ListSystems();
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
-					case "7":
+					case "8":
 						logger.ToFile = !logger.ToFile;
 						break;
 				}
@@ -199,6 +210,7 @@ Options:
 			  source=so,...		List of source IDs
 			  -nr, --no-rename	Don't auto-rename games
 			  -old, --romvault	Produce a DAT in RV format
+  -ga, --generate-all	Start tool in generate all mode
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
   -c, --convert		Convert a RV DAT to XML
@@ -319,11 +331,137 @@ Make a selection:
 			return;
 		}
 
+		private static void GenerateAllMenu()
+		{
+			string selection = "";
+			bool norename = false, old = false;
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				PrintHeader();
+				Console.WriteLine(@"GENERATE ALL MENU
+===========================
+Make a selection:
+
+    1) " + (norename ? "Enable game renaming" : "Disable game renaming") + @"
+    2) " + (old ? "Enable XML output" : "Enable RomVault output") + @"
+    3) Generate all DAT files
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						norename = !norename;
+						break;
+					case "2":
+						old = !old;
+						break;
+					case "3":
+						Console.Clear();
+						InitGenerateAll(norename, old);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+				}
+			}
+			return;
+		}
+
 		/// TODO: Make this safe for auto-generating multiple files (such as auto-generate)
 		private static void InitGenerate(string systems, string sources, bool norename, bool old)
 		{
 			Generate gen = new Generate(systems, sources, _connectionString, logger, norename, old);
 			gen.Export();
+			return;
+		}
+
+		private static void InitGenerateAll(bool norename, bool old)
+		{
+			// Generate system-merged
+			string query = @"SELECT DISTINCT systems.id
+		FROM systems
+		JOIN games
+			ON systems.id=games.system
+		ORDER BY systems.manufacturer, systems.system";
+			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			{
+				dbc.Open();
+				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				{
+					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					{
+						// If nothing is found, tell the user and exit
+						if (!sldr.HasRows)
+						{
+							logger.Log("Error: No systems found! Please add a source and then try again.");
+							return;
+						}
+
+						while (sldr.Read())
+						{
+							InitGenerate(sldr.GetInt32(0).ToString(), "", norename, old);
+
+							// Generate custom
+							string squery = @"SELECT DISTINCT sources.id
+		FROM systems
+		JOIN games
+			ON systems.id=games.system
+		JOIN sources
+			ON games.source=sources.id
+		WHERE systems.id=" + sldr.GetInt32(0).ToString() + @"
+        ORDER BY sources.name";
+
+							using (SQLiteCommand sslc = new SQLiteCommand(squery, dbc))
+							{
+								using (SQLiteDataReader ssldr = sslc.ExecuteReader())
+								{
+									// If nothing is found, tell the user and exit
+									if (!ssldr.HasRows)
+									{
+										logger.Log("Error: No sources found! Please add a source and then try again.");
+										return;
+									}
+
+									while (ssldr.Read())
+									{
+										InitGenerate(sldr.GetInt32(0).ToString(), ssldr.GetInt32(0).ToString(), norename, old);
+									}
+								}
+							}
+						}
+					}
+				}
+
+				// Generate source-merged
+				query = @"SELECT DISTINCT sources.id, sources.name
+		FROM sources
+		JOIN games
+			ON sources.id=games.source
+		ORDER BY sources.name";
+
+				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				{
+					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					{
+						// If nothing is found, tell the user and exit
+						if (!sldr.HasRows)
+						{
+							logger.Log("Error: No systems found! Please add a source and then try again.");
+							return;
+						}
+
+						while (sldr.Read())
+						{
+							InitGenerate("", sldr.GetInt32(0).ToString(), norename, old);
+						}
+					}
+				}
+			}
+
+			// Generate MEGAMERGED
+			InitGenerate("", "", norename, old);
 			return;
 		}
 
