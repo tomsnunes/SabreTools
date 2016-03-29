@@ -4,13 +4,22 @@ using System.Xml.Linq;
 
 namespace SabreTools.Helper
 {
+	/// <summary>
+	/// Provide DAT conversion functionality
+	/// </summary>
 	class Converters
 	{
+		// Regex matching patterns
 		private static string _headerPattern = @"(^.*?) \($";
 		private static string _romPattern = @"^\s+((?:rom)|(?:disk)) \( (name) ""(.*?)"" (?:(size) (.*?) )?(?:(crc) (.*?))?(?:(md5) (.*?) )?(?:(sha1) (.*?) )?\)";
 		private static string _itemPattern = @"^\s+(.*?) ""(.*?)""";
 		private static string _endPattern = @"^\s*\)\s*$";
 
+		/// <summary>
+		/// Convert a RomVault style DAT to an XML derived DAT
+		/// </summary>
+		/// <param name="filecontents">Array of strings representing the input file</param>
+		/// <returns>XElement representing the output XML DAT file</returns>
 		public static XElement RomVaultToXML (string[] filecontents)
 		{
 			XElement elem = new XElement("datafile");

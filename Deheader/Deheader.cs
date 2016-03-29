@@ -6,12 +6,19 @@ using System.Text.RegularExpressions;
 
 namespace SabreTools
 {
+	/// <summary>
+	/// Entry class for the Deheader application
+	/// </summary>
 	class Deheader
 	{
 		private static Dictionary<string, int> types;
 		private static bool save;
 		private static string help = @"Deheader.exe [-s] filename|dirname";
 
+		/// <summary>
+		/// Start deheader operation with supplied parameters
+		/// </summary>
+		/// <param name="args">String array representing command line parameters</param>
 		static void Main(string[] args)
 		{
 			// Type mapped to header size (in decimal bytes)
@@ -65,6 +72,10 @@ namespace SabreTools
 			}
 		}
 
+		/// <summary>
+		/// Detect and remove header from the given file
+		/// </summary>
+		/// <param name="file">Name of the file to be parsed</param>
 		private static void DetectRemoveHeader(string file)
 		{
 			// Open the file in read mode

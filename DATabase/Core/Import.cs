@@ -32,6 +32,10 @@ namespace SabreTools
 	7) You should be done! Unless your DAT is of a custom format, it should be taken care of on import.
 		i. If custom handling is needed on import, look for "SuperDAT" for an example
 	*/
+
+	/// <summary>
+	/// Import data into the database from existing DATs
+	/// </summary>
 	public class Import
 	{
 		// Private instance variables
@@ -56,6 +60,9 @@ namespace SabreTools
 		private static string _redumpDatePattern = @"(\d{4})(\d{2})(\d{2}) (\d{2})-(\d{2})-(\d{2})";
 		private static string _tosecDatePattern = @"(\d{4})-(\d{2})-(\d{2})";
 
+		/// <summary>
+		/// Possible DAT import classes
+		/// </summary>
 		private enum DatType
 		{
 			none = 0,
@@ -73,7 +80,12 @@ namespace SabreTools
 			get { return _filepath; }
 		}
 
-		// Constructor
+		/// <summary>
+		/// Initialize an Import object with the given information
+		/// </summary>
+		/// <param name="filepath">Path to the file that is going to be imported</param>
+		/// <param name="connectionString">Connection string for SQLite</param>
+		/// <param name="logger">Logger object for file or console output</param>
 		public Import(string filepath, string connectionString, Logger logger)
 		{
 			if (File.Exists(filepath))
@@ -89,7 +101,10 @@ namespace SabreTools
 			_logger = logger;
 		}
 
-		// Import the data from file into the database
+		/// <summary>
+		/// Import the data from file into the database
+		/// </summary>
+		/// <returns>True if the data was imported, false otherwise</returns>
 		public bool ImportData ()
 		{
 			// Determine which dattype we have
@@ -353,7 +368,7 @@ namespace SabreTools
 							// If we find a rom or disk, add it
 							if (node.NodeType == XmlNodeType.Element && (child.Name == "rom" || child.Name == "disk"))
 							{
-								AddRomHelper(
+								AddRom(
 									child.Name,
 									gameid,
 									child.Attributes["name"].Value,
@@ -377,7 +392,7 @@ namespace SabreTools
 											// If we find a rom or disk, add it
 											if (data.NodeType == XmlNodeType.Element && (data.Name == "rom" || data.Name == "disk"))
 											{
-												AddRomHelper(
+												AddRom(
 													data.Name,
 													gameid,
 													data.Attributes["name"].Value,
@@ -401,6 +416,13 @@ namespace SabreTools
 			return true;
 		}
 
+		/// <summary>
+		/// Add a game to the database if it doesn't already exist
+		/// </summary>
+		/// <param name="sysid">System ID for the game to be added with</param>
+		/// <param name="machinename">Name of the game to be added</param>
+		/// <param name="srcid">Source ID for the game to be added with</param>
+		/// <returns>Game ID of the inserted (or found) game, -1 on error</returns>
 		private long AddGame(int sysid, string machinename, int srcid)
 		{
 			// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
@@ -457,7 +479,19 @@ namespace SabreTools
 			return gameid;
 		}
 
-		private bool AddRomHelper(string romtype, long gameid, string name, string date, int size, string crc, string md5, string sha1)
+		/// <summary>
+		/// Add a file to the database if it doesn't already exist
+		/// </summary>
+		/// <param name="romtype">File type (either "rom" or "disk")</param>
+		/// <param name="gameid">ID of the parent game to be mapped to</param>
+		/// <param name="name">File name</param>
+		/// <param name="date">Last updated date</param>
+		/// <param name="size">File size in bytes</param>
+		/// <param name="crc">CRC32 hash of the file</param>
+		/// <param name="md5">MD5 hash of the file</param>
+		/// <param name="sha1">SHA-1 hash of the file</param>
+		/// <returns>True if the file exists or could be added, false on error</returns>
+		private bool AddRom(string romtype, long gameid, string name, string date, int size, string crc, string md5, string sha1)
 		{
 			// WOD origninally stripped out any subdirs from the imported files, we do the same
 			name = Path.GetFileName(name);

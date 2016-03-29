@@ -5,14 +5,21 @@ using System.Xml;
 
 namespace SabreTools.Helper
 {
+	/// <summary>
+	/// Contains all remappings of known import classes
+	/// </summary>
 	class Remapping
 	{
+		// Remapping classes represented by dictionaries
 		public static Dictionary<string, string> MAME = new Dictionary<string, string>();
 		public static Dictionary<string, string> NoIntro = new Dictionary<string, string>();
 		public static Dictionary<string, string> Redump = new Dictionary<string, string>();
 		public static Dictionary<string, string> TOSEC = new Dictionary<string, string>();
 		public static Dictionary<string, string> TruRip = new Dictionary<string, string>();
 
+		/// <summary>
+		/// Create all remappings to be used by the program
+		/// </summary>
 		public static void CreateRemappings()
 		{
 			// Create array of dictionary names
@@ -28,6 +35,10 @@ namespace SabreTools.Helper
 			}
         }
 
+		/// <summary>
+		/// Create a remapping from XML
+		/// </summary>
+		/// <param name="mapping">Name of the mapping to be populated</param>
 		private static void RemappingHelper(string mapping)
 		{
 			// Read in remapping from file

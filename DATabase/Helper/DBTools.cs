@@ -4,8 +4,16 @@ using System.IO;
 
 namespace SabreTools.Helper
 {
+	/// <summary>
+	/// All general database operations
+	/// </summary>
 	class DBTools
 	{
+		/// <summary>
+		/// Ensure that the databse exists and has the proper schema
+		/// </summary>
+		/// <param name="db">Name of the databse</param>
+		/// <param name="connectionString">Connection string for SQLite</param>
 		public static void EnsureDatabase(string db, string connectionString)
 		{
 			// Make sure the file exists
@@ -91,6 +99,13 @@ CREATE TABLE IF NOT EXISTS systems (
 			}
 		}
 
+		/// <summary>
+		/// Add a new source to the database if it doesn't already exist
+		/// </summary>
+		/// <param name="name">Source name</param>
+		/// <param name="url">Source URL(s)</param>
+		/// <param name="connectionString">Connection string for SQLite</param>
+		/// <returns>True if the source existed or could be added, false otherwise</returns>
 		public static bool AddSource(string name, string url, string connectionString)
 		{
 			string query = "SELECT id, name, url FROM sources WHERE name='" + name + "'";
@@ -130,6 +145,12 @@ CREATE TABLE IF NOT EXISTS systems (
 			return true;
 		}
 
+		/// <summary>
+		/// Remove an existing source from the database
+		/// </summary>
+		/// <param name="id">Source ID to be removed from the database</param>
+		/// <param name="connectionString">Connection string for SQLite</param>
+		/// <returns>True if the source was removed, false otherwise</returns>
 		public static bool RemoveSource(int id, string connectionString)
 		{
 			string query = "DELETE FROM sources WHERE id=" + id;
@@ -143,6 +164,13 @@ CREATE TABLE IF NOT EXISTS systems (
 			}
 		}
 
+		/// <summary>
+		/// Add a new system to the database if it doesn't already exist
+		/// </summary>
+		/// <param name="manufacturer">Manufacturer name</param>
+		/// <param name="system">System name</param>
+		/// <param name="connectionString">Connection string for SQLite</param>
+		/// <returns>True if the system existed or could be added, false otherwise</returns>
 		public static bool AddSystem(string manufacturer, string system, string connectionString)
 		{
 			string query = "SELECT id, manufacturer, system FROM systems WHERE manufacturer='" + manufacturer + "' AND system='" + system + "'";
@@ -168,6 +196,12 @@ CREATE TABLE IF NOT EXISTS systems (
 			return true;
 		}
 
+		/// <summary>
+		/// Remove an existing system from the database
+		/// </summary>
+		/// <param name="id">System ID to be removed from the database</param>
+		/// <param name="connectionString">Connection string for SQLite</param>
+		/// <returns>True if the system was removed, false otherwise</returns>
 		public static bool RemoveSystem(int id, string connectionString)
 		{
 			string query = "DELETE FROM systems WHERE id=" + id;

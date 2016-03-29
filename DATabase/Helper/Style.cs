@@ -2,9 +2,16 @@
 
 namespace SabreTools.Helper
 {
+	/// <summary>
+	/// Include character normalization and replacement mappings
+	/// </summary>
 	public class Style
 	{
-		// Replace accented characters
+		/// <summary>
+		/// Replace accented characters
+		/// </summary>
+		/// <param name="input">String to be parsed</param>
+		/// <returns>String with characters replaced</returns>
 		public static string NormalizeChars(string input)
 		{
 			string[,] charmap = {
@@ -53,7 +60,11 @@ namespace SabreTools.Helper
 			return input;
 		}
 
-		// Replace special characters and patterns
+		/// <summary>
+		/// Replace special characters and patterns
+		/// </summary>
+		/// <param name="input">String to be parsed</param>
+		/// <returns>String with characters replaced</returns>
 		public static string SearchPattern(string input)
 		{
 			string[,] charmap = {
@@ -93,8 +104,12 @@ namespace SabreTools.Helper
 			return input;
 		}
 
-		// Convert Cyrillic lettering to Latin lettering
-		public static string RussianToLatin (string input)
+		/// <summary>
+		/// Convert Cyrillic lettering to Latin lettering
+		/// </summary>
+		/// <param name="input">String to be parsed</param>
+		/// <returns>String with characters replaced</returns>
+		public static string RussianToLatin(string input)
 		{
 			string [,] charmap = {
 					{ "А", "A" }, { "Б", "B" }, { "В", "V" }, { "Г", "G" }, { "Д", "D" },

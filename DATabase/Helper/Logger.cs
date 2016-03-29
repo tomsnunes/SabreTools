@@ -3,6 +3,9 @@ using System.IO;
 
 namespace SabreTools.Helper
 {
+	/// <summary>
+	/// Log either to file or to the console
+	/// </summary>
 	public class Logger
 	{
 		// Private instance variables
@@ -28,12 +31,21 @@ namespace SabreTools.Helper
 			}
 		}
 
+		/// <summary>
+		/// Initialize a Logger object with the given information
+		/// </summary>
+		/// <param name="tofile">True if file should be written to instead of console</param>
+		/// <param name="filename">Optional filename representing log location</param>
 		public Logger(bool tofile, string filename = "")
 		{
 			_tofile = tofile;
 			_filename = filename;
 		}
 
+		/// <summary>
+		/// Start logging by opening output file (if necessary)
+		/// </summary>
+		/// <returns>True if the logging was started correctly, false otherwise</returns>
 		public bool Start()
 		{
 			if (!_tofile)
@@ -54,6 +66,10 @@ namespace SabreTools.Helper
 			return true;
 		}
 
+		/// <summary>
+		/// End logging by closing output file (if necessary)
+		/// </summary>
+		/// <returns>True if the logging was ended correctly, false otherwise</returns>
 		public bool Close()
 		{
 			if (!_tofile)
@@ -74,6 +90,11 @@ namespace SabreTools.Helper
 			return true;
 		}
 
+		/// <summary>
+		/// Write the given string to the log output
+		/// </summary>
+		/// <param name="output">String to be written log</param>
+		/// <returns>True if the output could be written, false otherwise</returns>
 		public bool Log(string output)
 		{
 			// If we're writing to console, just write the string

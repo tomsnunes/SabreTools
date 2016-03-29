@@ -7,6 +7,9 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
+	/// <summary>
+	/// Entry class for the DATabase application
+	/// </summary>
 	class DATabase
 	{
 		private static Logger logger;
@@ -22,7 +25,11 @@ namespace SabreTools
 +-----------------------------------------------------------------------------+
 ";
 
-		static void Main(string[] args)
+		/// <summary>
+		/// Start menu or use supplied parameters
+		/// </summary>
+		/// <param name="args">String array representing command line parameters</param>
+		public static void Main(string[] args)
 		{
 			// Perform initial setup and verification
 			logger = new Logger(false, "database.log");
@@ -169,6 +176,9 @@ namespace SabreTools
 			return;
 		}
 
+		/// <summary>
+		/// Print the program header
+		/// </summary>
 		private static void PrintHeader()
 		{
 			ConsoleColor formertext = Console.ForegroundColor;
@@ -180,6 +190,9 @@ namespace SabreTools
 			Console.BackgroundColor = formerback;
 		}
 
+		/// <summary>
+		/// Show the text-based main menu
+		/// </summary>
 		private static void ShowMainMenu()
 		{
 			Console.Clear();
@@ -249,6 +262,9 @@ Make a selection:
 			Console.WriteLine("Thank you for using DATabase!");
 		}
 
+		/// <summary>
+		/// Show the help dialog
+		/// </summary>
 		private static void Help()
 		{
 			Console.Clear();
@@ -294,6 +310,9 @@ Database Options:
 			return;
 		}
 
+		/// <summary>
+		/// Show the text-based import menu
+		/// </summary>
 		private static void ImportMenu()
 		{
 			string selection = "";
@@ -317,6 +336,10 @@ or 'b' to go back to the previous menu:");
 			return;
 		}
 
+		/// <summary>
+		/// Wrap importing a file or folder into the database
+		/// </summary>
+		/// <param name="filename">File or folder to be imported</param>
 		private static void InitImport(string filename)
 		{
 			Console.Clear();
@@ -347,6 +370,9 @@ or 'b' to go back to the previous menu:");
 			return;
 		}
 
+		/// <summary>
+		/// Show the text-based generate menu
+		/// </summary>
 		private static void GenerateMenu()
 		{
 			string selection = "", systems = "", sources = "";
@@ -399,6 +425,23 @@ Make a selection:
 			return;
 		}
 
+		/// <summary>
+		/// Wrap generating a DAT from the database
+		/// </summary>
+		/// <param name="systems">Comma-separated list of systems to be included in the DAT (blank means all)</param>
+		/// <param name="sources">Comma-separated list of sources to be included in the DAT (blank means all)</param>
+		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
+		/// <param name="old">True if the output file should be in RomVault format (default false)</param>
+		private static void InitGenerate(string systems, string sources, bool norename, bool old)
+		{
+			Generate gen = new Generate(systems, sources, _connectionString, logger, norename, old);
+			gen.Export();
+			return;
+		}
+
+		/// <summary>
+		/// Show the text-based generate all menu
+		/// </summary>
 		private static void GenerateAllMenu()
 		{
 			string selection = "";
@@ -437,14 +480,11 @@ Make a selection:
 			return;
 		}
 
-		/// TODO: Make this safe for auto-generating multiple files (such as auto-generate)
-		private static void InitGenerate(string systems, string sources, bool norename, bool old)
-		{
-			Generate gen = new Generate(systems, sources, _connectionString, logger, norename, old);
-			gen.Export();
-			return;
-		}
-
+		/// <summary>
+		/// Wrap generating all standard DATs from the database
+		/// </summary>
+		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
+		/// <param name="old">True if the output file should be in RomVault format (default false)</param>
 		private static void InitGenerateAll(bool norename, bool old)
 		{
 			// Generate system-merged
@@ -533,6 +573,9 @@ Make a selection:
 			return;
 		}
 
+		/// <summary>
+		/// Show the text-based conversion menu
+		/// </summary>
 		private static void ConvertMenu()
 		{
 			string selection = "";
@@ -557,6 +600,10 @@ or 'b' to go back to the previous menu:
 			return;
 		}
 
+		/// <summary>
+		/// Wrap converting DAT file from RomValut to XML
+		/// </summary>
+		/// <param name="filename"></param>
 		private static void InitConvert(string filename)
 		{
 			if (File.Exists(filename))
@@ -579,6 +626,10 @@ or 'b' to go back to the previous menu:
 			return;
 		}
 
+		/// <summary>
+		/// List sources in the database
+		/// </summary>
+		/// <param name="all">True to list all sources regardless if there is a game associated or not</param>
 		private static void ListSources(bool all = false)
 		{
 			string query = @"
@@ -610,6 +661,10 @@ ORDER BY sources.name COLLATE NOCASE";
 			return;
 		}
 
+		/// <summary>
+		/// List systems in the database
+		/// </summary>
+		/// <param name="all">True to list all systems regardless if there is a game associated or not</param>
 		private static void ListSystems(bool all = false)
 		{
 			string query = @"
@@ -641,6 +696,9 @@ ORDER BY systems.manufacturer, systems.system";
 			return;
 		}
 
+		/// <summary>
+		/// Show the text-based add and remove menu
+		/// </summary>
 		private static void AddRemoveMenu()
 		{
 			string selection = "", manufacturer = "", system = "", name = "", url = "";
@@ -703,6 +761,11 @@ Make a selection:
 			return;
 		}
 
+		/// <summary>
+		/// Wrap adding a new source to the database
+		/// </summary>
+		/// <param name="name">Source name</param>
+		/// <param name="url">Source URL(s)</param>
 		private static void InitAddSource(string name, string url)
 		{
 			if (DBTools.AddSource(name, url, _connectionString))
@@ -715,6 +778,10 @@ Make a selection:
 			}
 		}
 
+		/// <summary>
+		/// Wrap removing an existing source from the database
+		/// </summary>
+		/// <param name="id">Source ID to be removed from the database</param>
 		private static void InitRemoveSource(string sourceid)
 		{
 			int srcid = -1;
@@ -735,6 +802,11 @@ Make a selection:
 			}
 		}
 
+		/// <summary>
+		/// Wrap adding a new system to the database
+		/// </summary>
+		/// <param name="manufacturer">Manufacturer name</param>
+		/// <param name="system">System name</param>
 		private static void InitAddSystem(string manufacturer, string system)
 		{
 			if (DBTools.AddSystem(manufacturer, system, _connectionString))
@@ -747,6 +819,10 @@ Make a selection:
 			}
 		}
 
+		/// <summary>
+		/// Wrap removing an existing system from the database
+		/// </summary>
+		/// <param name="id">System ID to be removed from the database</param>
 		private static void InitRemoveSystem(string systemid)
 		{
 			int sysid = -1;
