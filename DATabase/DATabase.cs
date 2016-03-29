@@ -147,7 +147,8 @@ Make a selection:
     5) Convert a DAT file from RV to XML
     6) List all available sources
     7) List all available systems
-    8) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
+    8) Add and Remove from database
+    9) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
     X) Exit Program
 ");
 				Console.Write("Enter selection: ");
@@ -185,6 +186,9 @@ Make a selection:
 						Console.ReadKey();
 						break;
 					case "8":
+						AddRemoveMenu();
+						break;
+					case "9":
 						logger.ToFile = !logger.ToFile;
 						break;
 				}
@@ -221,6 +225,16 @@ Filenames and directories can't start with '-', 'system=', or 'source='
 unless prefixed by 'input='
 ");
 
+			Console.Write("\nPress any key to continue...");
+			Console.ReadKey();
+			Console.Write(@"
+Database Options:
+  -a, --add		Add a new system or source to the database
+			  system=sy		System ID
+			  source=so			Source ID
+  -r, --remove	Remove a system or source from the database
+			  system=sy		System ID
+			  source=so			Source ID");
 			Console.Write("\nPress any key to continue...");
 			Console.ReadKey();
 			return;
@@ -568,6 +582,73 @@ ORDER BY systems.manufacturer, systems.system";
 							Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1) + " - " + sldr.GetString(2));
 						}
 					}
+				}
+			}
+			return;
+		}
+
+		private static void AddRemoveMenu()
+		{
+			string selection = "", manufacturer = "", system = "", name = "", url = "";
+			bool norename = false, old = false;
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				PrintHeader();
+				Console.WriteLine(@"GENERATE MENU
+===========================
+Make a selection:
+
+    1) Add a source
+    2) Remove a source
+    3) Add a system
+    4) Remove a system
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						Console.Clear();
+						Console.Write("Please enter the source name: ");
+						name = Console.ReadLine();
+						Console.Write("\nPlease enter the source URL: ");
+						url = Console.ReadLine();
+						if (DBTools.AddSource(name, url, _connectionString))
+						{
+							Console.Write("Source " + name + " added!");
+						}
+						else
+						{
+							Console.Write("Source " + name + " could not be added!");
+						}
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+					case "2":
+
+						break;
+					case "3":
+						Console.Clear();
+						Console.Write("Please enter the manufacturer: ");
+						manufacturer = Console.ReadLine();
+						Console.Write("\nPlease enter the system: ");
+						system = Console.ReadLine();
+						if (DBTools.AddSystem(manufacturer, system, _connectionString))
+						{
+							Console.Write("System " + manufacturer + " - " + system + " added!");
+						}
+						else
+						{
+							Console.Write("System " + manufacturer + " - " + system + " could not be added!");
+						}
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+					case "4":
+
+						break;
 				}
 			}
 			return;
