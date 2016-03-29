@@ -91,25 +91,77 @@ CREATE TABLE IF NOT EXISTS systems (
 			}
 		}
 
-		public static bool AddSource(string name, string url)
+		public static bool AddSource(string name, string url, string connectionString)
+		{
+			string query = "SELECT id, name, url FROM sources WHERE name='" + name + "'";
+			using (SQLiteConnection dbc = new SQLiteConnection(connectionString))
+			{
+				dbc.Open();
+				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				{
+					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					{
+						// If nothing is found, add the source
+						if (!sldr.HasRows)
+						{
+							string squery = "INSERT INTO sources (name, url) VALUES ('" + name + "', '" + url + "')";
+							using (SQLiteCommand sslc = new SQLiteCommand(squery, dbc))
+							{
+								return sslc.ExecuteNonQuery() >= 1;
+							}
+						}
+						// Otherwise, update the source URL if it's different
+						else
+						{
+							sldr.Read();
+							if (url != sldr.GetString(2))
+							{
+								string squery = "UPDATE sources SET url='" + url + "' WHERE id=" + sldr.GetInt32(0);
+								using (SQLiteCommand sslc = new SQLiteCommand(squery, dbc))
+								{
+									return sslc.ExecuteNonQuery() >= 1;
+								}
+							}							
+						}
+					}
+				}
+			}
+
+			return true;
+		}
+
+		public static bool RemoveSource(int id, string connectionString)
 		{
 
 			return true;
 		}
 
-		public static bool RemoveSource(int id)
+		public static bool AddSystem(string manufacturer, string system, string connectionString)
 		{
-
+			string query = "SELECT id, manufacturer, system FROM systems WHERE manufacturer='" + manufacturer + "' AND system='" + system + "'";
+			using (SQLiteConnection dbc = new SQLiteConnection(connectionString))
+			{
+				dbc.Open();
+				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				{
+					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					{
+						// If nothing is found, add the system
+						if (!sldr.HasRows)
+						{
+							string squery = "INSERT INTO systems (manufacturer, system) VALUES ('" + manufacturer + "', '" + system + "')";
+							using (SQLiteCommand sslc = new SQLiteCommand(squery, dbc))
+							{
+								return sslc.ExecuteNonQuery() >= 1;
+							}
+						}
+					}
+				}
+			}
 			return true;
 		}
 
-		public static bool AddSystem(string manufacturer, string system)
-		{
-
-			return true;
-		}
-
-		public static bool RemoveSystem(int id)
+		public static bool RemoveSystem(int id, string connectionString)
 		{
 
 			return true;
