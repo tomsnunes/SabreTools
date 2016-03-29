@@ -8,6 +8,29 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
+	/*
+	Instructions on how to add a new "import class":
+	------------------------
+	0) Unless otherwise specified, try to keep all names and mappings in alphabetical order
+	1) If the filename pattern for your DATs is not already represented, include it under "Regex File Name Patterns"
+		a - If it overlaps with an existing pattern, check to see if that pattern will work for your needs
+		b - Otherwise, make sure it has enough distinct literals that it will not interfere with the other pattern
+	2) Check if your filename includes the correct system and source.
+		a - If it does, make sure to include the correct capture groups in the filename regex
+		b - If it doesn't, create a new remapping:
+			i. Create an XML file in the Mappings folder with the name of your mapping class
+			ii. Create a new dictionary in Remapping.cs and add the class to the list of dicts
+			iii. Populate the XML file according to the other remappers
+	3) If your filename includes the date that is not already represented, include it under "Regex Date Patterns"
+	4) Include your new class under the DatType enum (add to the end, do not insert)
+	5) Add an extra "else if" under the  "Determine which dattype we have" of the Import method
+		a - Follow the pattern of the other classes to make sure there are no issues
+	6) Under "switch (type)" create a new case for your class
+		i. If it requires remapping, see NoIntro for a design pattern
+		ii. If it requires a date to be created from modified time, see TruRip
+		iii. If it doesn't require either, see Custom for a design pattern
+	7) You should be done! Unless your DAT is of a custom format, it should be taken care of on import.
+	*/
 	public class Import
 	{
 		// Private instance variables
