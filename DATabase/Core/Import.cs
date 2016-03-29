@@ -30,6 +30,7 @@ namespace SabreTools
 		ii. If it requires a date to be created from modified time, see TruRip
 		iii. If it doesn't require either, see Custom for a design pattern
 	7) You should be done! Unless your DAT is of a custom format, it should be taken care of on import.
+		i. If custom handling is needed on import, look for "SuperDAT" for an example
 	*/
 	public class Import
 	{
