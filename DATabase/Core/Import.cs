@@ -35,12 +35,12 @@ namespace WoD
 		private enum DatType
 		{
 			none = 0,
-			custom,
-			mame,
-			nointro,
-			redump,
-			tosec,
-			trurip,
+			Custom,
+			MAME,
+			NoIntro,
+			Redump,
+			TOSEC,
+			TruRip,
 		}
 
 		// Public instance variables
@@ -76,32 +76,32 @@ namespace WoD
 			if (Regex.IsMatch(filename, _mamePattern))
 			{
 				fileinfo = Regex.Match(filename, _mamePattern).Groups;
-				type = DatType.mame;
+				type = DatType.MAME;
 			}
 			else if (Regex.IsMatch(filename, _nointroPattern))
 			{
 				fileinfo = Regex.Match(filename, _nointroPattern).Groups;
-				type = DatType.nointro;
+				type = DatType.NoIntro;
 			}
 			else if (Regex.IsMatch(filename, _redumpPattern))
 			{
 				fileinfo = Regex.Match(filename, _redumpPattern).Groups;
-				type = DatType.redump;
+				type = DatType.Redump;
 			}
 			else if (Regex.IsMatch(filename, _tosecPattern))
 			{
 				fileinfo = Regex.Match(filename, _tosecPattern).Groups;
-				type = DatType.tosec;
+				type = DatType.TOSEC;
 			}
 			else if (Regex.IsMatch(filename, _truripPattern))
 			{
 				fileinfo = Regex.Match(filename, _truripPattern).Groups;
-				type = DatType.trurip;
+				type = DatType.TruRip;
 			}
 			else if (Regex.IsMatch(filename, _defaultPattern))
 			{
 				fileinfo = Regex.Match(filename, _defaultPattern).Groups;
-				type = DatType.custom;
+				type = DatType.Custom;
 			}
 			// If the type is still unmatched, the data can't be imported yet
 			else
@@ -119,7 +119,7 @@ namespace WoD
 
 			switch (type)
 			{
-				case DatType.mame:
+				case DatType.MAME:
 					if (!Remapping.MAME.ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
@@ -132,7 +132,7 @@ namespace WoD
 					source = "MAME";
 					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					break;
-				case DatType.nointro:
+				case DatType.NoIntro:
 					if (!Remapping.NoIntro.ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
@@ -148,7 +148,7 @@ namespace WoD
 					date = niDateInfo[1].Value + "-" + niDateInfo[2].Value + "-" + niDateInfo[3].Value + " " +
 						niDateInfo[4].Value + ":" + niDateInfo[5].Value + ":" + niDateInfo[6].Value;
 					break;
-				case DatType.redump:
+				case DatType.Redump:
 					if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
@@ -164,7 +164,7 @@ namespace WoD
 					date = rdDateInfo[1].Value + "-" + rdDateInfo[2].Value + "-" + rdDateInfo[3].Value + " " +
 						rdDateInfo[4].Value + ":" + rdDateInfo[5].Value + ":" + rdDateInfo[6].Value;
 					break;
-				case DatType.tosec:
+				case DatType.TOSEC:
 					if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
@@ -179,7 +179,7 @@ namespace WoD
 					GroupCollection toDateInfo = Regex.Match(datestring, _tosecDatePattern).Groups;
 					date = toDateInfo[1].Value + "-" + toDateInfo[2].Value + "-" + toDateInfo[3].Value + " 00:00:00";
 					break;
-				case DatType.trurip:
+				case DatType.TruRip:
 					if (!Remapping.TruRip.ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
@@ -192,7 +192,7 @@ namespace WoD
 					source = "trurip";
 					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					break;
-				case DatType.custom:
+				case DatType.Custom:
 				default:
 					manufacturer = fileinfo[1].Value;
 					system = fileinfo[2].Value;
