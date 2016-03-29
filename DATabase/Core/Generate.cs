@@ -22,9 +22,9 @@ namespace WoD
 
 		// Private required variables
 		private Dictionary<int, string> _headers;
-		private Logging _logger;
+		private Logger _logger;
 
-		public Generate(string systems, string sources, string connectionString, Logging logger, bool norename = false, bool old = false)
+		public Generate(string systems, string sources, string connectionString, Logger logger, bool norename = false, bool old = false)
 		{
 			_systems = systems;
 			_sources = sources;

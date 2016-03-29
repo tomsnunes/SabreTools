@@ -9,7 +9,7 @@ namespace WoD
 {
 	class DATabase
 	{
-		private static Logging logger;
+		private static Logger logger;
 		private static string _dbName = "DATabase.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
 		private static string _version = "0.1.1.0";
@@ -27,7 +27,7 @@ namespace WoD
 			// Perform initial setup and verification
 			DBTools.EnsureDatabase(_dbName, _connectionString);
 			Remapping.CreateRemappings();
-			logger = new Logging(false, "database.log");
+			logger = new Logger(false, "database.log");
 			logger.Start();
 			Console.Clear();
 			Console.Title = "DATabase " + _version;
@@ -319,6 +319,7 @@ Make a selection:
 			return;
 		}
 
+		/// TODO: Make this safe for auto-generating multiple files (such as auto-generate)
 		private static void InitGenerate(string systems, string sources, bool norename, bool old)
 		{
 			Generate gen = new Generate(systems, sources, _connectionString, logger, norename, old);

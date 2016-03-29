@@ -13,7 +13,7 @@ namespace WoD
 		// Private instance variables
 		private string _filepath;
 		private string _connectionString;
-		private Logging _logger;
+		private Logger _logger;
 
 		// Regex File Name Patterns
 		private static string _defaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
@@ -50,7 +50,7 @@ namespace WoD
 		}
 
 		// Constructor
-		public Import(string filepath, string connectionString, Logging logger)
+		public Import(string filepath, string connectionString, Logger logger)
 		{
 			if (File.Exists(filepath))
 			{

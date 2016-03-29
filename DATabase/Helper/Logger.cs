@@ -3,7 +3,7 @@ using System.IO;
 
 namespace WoD.Helper
 {
-	public class Logging
+	public class Logger
 	{
 		// Private instance variables
 		private bool _tofile;
@@ -28,7 +28,7 @@ namespace WoD.Helper
 			}
 		}
 
-		public Logging(bool tofile, string filename = "")
+		public Logger(bool tofile, string filename = "")
 		{
 			_tofile = tofile;
 			_filename = filename;
