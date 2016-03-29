@@ -70,7 +70,7 @@ namespace WoD
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(import ^ generate ^ listsys ^ listsrc ^ genall ^ add ^ rem)
+			if (help || !(import ^ generate ^ listsys ^ listsrc ^ genall ^ add ^ rem))
 			{
 				Help();
 				logger.Close();
@@ -631,7 +631,6 @@ ORDER BY systems.manufacturer, systems.system";
 		private static void AddRemoveMenu()
 		{
 			string selection = "", manufacturer = "", system = "", name = "", url = "";
-			int sysid = -1, srcid = -1;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
@@ -714,7 +713,7 @@ Make a selection:
 				}
 				else
 				{
-					logger.Log("Source with id '" + srcid + "' could not be removed.")
+					logger.Log("Source with id '" + srcid + "' could not be removed.");
                 }
 			}
 			else
@@ -746,7 +745,7 @@ Make a selection:
 				}
 				else
 				{
-					Console.WriteLine("System with id '" + sysid + "' could not be removed.")
+					Console.WriteLine("System with id '" + sysid + "' could not be removed.");
                             }
 			}
 			else
