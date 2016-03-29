@@ -43,8 +43,8 @@ namespace WoD
 			// Determine which switches are enabled (with values if necessary)
 			bool help = false, import = false, generate = false, convert = false,
 				listsys = false, listsrc = false, norename = false, old = false,
-				log = false, genall = false;
-			string systems = "", sources = "", input = "";
+				log = false, genall = false, add = false, rem = false;
+			string systems = "", sources = "", input = "", manu = "", url = "";
 			foreach (string arg in args)
 			{
 				help = help || (arg == "-h" || arg == "-?" || arg == "--help");
@@ -57,8 +57,12 @@ namespace WoD
 				old = old || (arg == "-old" || arg == "--romvault");
 				log = log || (arg == "-l" || arg == "--log");
 				genall = genall || (arg == "-ga" || arg == "--generate-all");
+				add = add || (arg == "-a" || arg == "--add");
+				rem = rem || (arg == "-r" || arg == "--remove");
 				systems = (arg.StartsWith("system=") && systems == "" ? arg.Split('=')[1] : systems);
 				sources = (arg.StartsWith("source=") && sources == "" ? arg.Split('=')[1] : sources);
+				manu = (arg.StartsWith("manu=") && manu == "" ? arg.Split('=')[1] : manu);
+				url = (arg.StartsWith("url=") && url == "" ? arg.Split('=')[1] : url);
 
 				// Take care of the two distinct input name possibilites; prioritize the input tag
 				input = (arg.StartsWith("input=") && input == "" ? arg.Split('=')[1] : input);
@@ -66,7 +70,7 @@ namespace WoD
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(import ^ generate ^ listsys ^ listsrc ^ genall))
+			if (help || !(import ^ generate ^ listsys ^ listsrc ^ genall ^ add ^ rem)
 			{
 				Help();
 				logger.Close();
@@ -113,6 +117,41 @@ namespace WoD
 			{
 				InitConvert(input);
 			}
+
+			// Add a source or system
+			else if (add)
+			{
+				if (manu != "" && systems != "")
+				{
+					InitAddSystem(manu, systems);
+				}
+				else if (sources != "" && url != "")
+				{
+					InitAddSource(manu, systems);
+				}
+				else
+				{
+					Help();
+				}
+			} 
+			
+			// Remove a source or system
+			else if (rem)
+			{
+				if (systems != "")
+				{
+					InitRemoveSystem(systems);
+				}
+				else if (sources != "")
+				{
+					InitRemoveSource(sources);
+				}
+				else
+				{
+					Help();
+				}
+			}
+
 			logger.Close();
 			return;
 		}
@@ -230,8 +269,10 @@ unless prefixed by 'input='
 			Console.Write(@"
 Database Options:
   -a, --add		Add a new system or source to the database
-			  system=sy		System ID
-			  source=so			Source ID
+			  manu=mn		Manufacturer name (system only)
+			  system=sy		System name (system only)
+			  source=sr		Source name (source only)
+			  url=ul		URL (source only)
   -r, --remove	Remove a system or source from the database
 			  system=sy		System ID
 			  source=so			Source ID");
@@ -590,12 +631,12 @@ ORDER BY systems.manufacturer, systems.system";
 		private static void AddRemoveMenu()
 		{
 			string selection = "", manufacturer = "", system = "", name = "", url = "";
-			bool norename = false, old = false;
+			int sysid = -1, srcid = -1;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
 				PrintHeader();
-				Console.WriteLine(@"GENERATE MENU
+				Console.WriteLine(@"ADD AND REMOVE MENU
 ===========================
 Make a selection:
 
@@ -615,19 +656,17 @@ Make a selection:
 						name = Console.ReadLine();
 						Console.Write("\nPlease enter the source URL: ");
 						url = Console.ReadLine();
-						if (DBTools.AddSource(name, url, _connectionString))
-						{
-							Console.Write("Source " + name + " added!");
-						}
-						else
-						{
-							Console.Write("Source " + name + " could not be added!");
-						}
+						InitAddSource(name, url);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
 					case "2":
-
+						Console.Clear();
+						ListSources();
+						Console.Write("Please enter the source: ");
+						InitRemoveSource(Console.ReadLine());
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
 						break;
 					case "3":
 						Console.Clear();
@@ -635,23 +674,85 @@ Make a selection:
 						manufacturer = Console.ReadLine();
 						Console.Write("\nPlease enter the system: ");
 						system = Console.ReadLine();
-						if (DBTools.AddSystem(manufacturer, system, _connectionString))
-						{
-							Console.Write("System " + manufacturer + " - " + system + " added!");
-						}
-						else
-						{
-							Console.Write("System " + manufacturer + " - " + system + " could not be added!");
-						}
+						InitAddSystem(manufacturer, system);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
 					case "4":
-
+						Console.Clear();
+						ListSystems();
+						Console.Write("Please enter the source: ");
+						InitRemoveSystem(Console.ReadLine());
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
 						break;
 				}
 			}
 			return;
+		}
+
+		private static void InitAddSource(string name, string url)
+		{
+			if (DBTools.AddSource(name, url, _connectionString))
+			{
+				logger.Log("Source " + name + " added!");
+			}
+			else
+			{
+				logger.Log("Source " + name + " could not be added!");
+			}
+		}
+
+		private static void InitRemoveSource(string sourceid)
+		{
+			int srcid = -1;
+			if (Int32.TryParse(sourceid, out srcid))
+			{
+				if (DBTools.RemoveSource(srcid, _connectionString))
+				{
+					logger.Log("Source '" + srcid + "' removed!");
+				}
+				else
+				{
+					logger.Log("Source with id '" + srcid + "' could not be removed.")
+                }
+			}
+			else
+			{
+				logger.Log("Invalid input");
+			}
+		}
+
+		private static void InitAddSystem(string manufacturer, string system)
+		{
+			if (DBTools.AddSystem(manufacturer, system, _connectionString))
+			{
+				logger.Log("System " + manufacturer + " - " + system + " added!");
+			}
+			else
+			{
+				logger.Log("System " + manufacturer + " - " + system + " could not be added!");
+			}
+		}
+
+		private static void InitRemoveSystem(string systemid)
+		{
+			int sysid = -1;
+			if (Int32.TryParse(systemid, out sysid))
+			{
+				if (DBTools.RemoveSource(sysid, _connectionString))
+				{
+					Console.WriteLine("System '" + sysid + "' removed!");
+				}
+				else
+				{
+					Console.WriteLine("System with id '" + sysid + "' could not be removed.")
+                            }
+			}
+			else
+			{
+				Console.WriteLine("Invalid input");
+			}
 		}
 	}
 }
