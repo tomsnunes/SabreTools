@@ -1,6 +1,7 @@
 /.vs
-/basetables
-/DATabase/bin
 /DATabase/obj
-/DATabase/bin/Debug
 /DATabase/obj/Debug
+/DATabase/obj/Release
+/Deheader/obj
+/Deheader/obj/Debug
+/Deheader/obj/Release
