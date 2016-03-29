@@ -25,10 +25,11 @@ namespace WoD
 		static void Main(string[] args)
 		{
 			// Perform initial setup and verification
-			DBTools.EnsureDatabase(_dbName, _connectionString);
-			Remapping.CreateRemappings();
 			logger = new Logger(false, "database.log");
 			logger.Start();
+			DBTools.EnsureDatabase(_dbName, _connectionString);
+			Remapping.CreateRemappings();
+
 			Console.Clear();
 			Console.SetBufferSize(Console.BufferWidth, 999);
 			Console.Title = "DATabase " + _version;

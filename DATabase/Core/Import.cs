@@ -291,7 +291,7 @@ namespace WoD
 					superdat = true;
 				}
 
-				// SKip over anything that's not an element
+				// Skip over anything that's not an element
 				while (node.NodeType != XmlNodeType.Element)
 				{
 					node = node.NextSibling;
