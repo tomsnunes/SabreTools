@@ -261,7 +261,7 @@
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "SabreToolsUI";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "SabreTools UI 0.2.2.1";
+			this.Text = "SabreTools UI 0.2.3.0";
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.ResumeLayout(false);
