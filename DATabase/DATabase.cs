@@ -758,7 +758,7 @@ Make a selection:
 					case "4":
 						Console.Clear();
 						ListSystems(true);
-						Console.Write("Please enter the source: ");
+						Console.Write("Please enter the system: ");
 						InitRemoveSystem(Console.ReadLine());
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
@@ -842,7 +842,7 @@ Make a selection:
 				else
 				{
 					Console.WriteLine("System with id '" + sysid + "' could not be removed.");
-                            }
+                }
 			}
 			else
 			{
