@@ -123,6 +123,7 @@
 			// systemsCheckedListBox
 			// 
 			this.systemsCheckedListBox.FormattingEnabled = true;
+			this.systemsCheckedListBox.Items.AddRange(Helper.GetAllSystems());
 			this.systemsCheckedListBox.Location = new System.Drawing.Point(77, 65);
 			this.systemsCheckedListBox.Name = "systemsCheckedListBox";
 			this.systemsCheckedListBox.Size = new System.Drawing.Size(260, 34);
@@ -131,6 +132,7 @@
 			// sourcesCheckedListBox
 			// 
 			this.sourcesCheckedListBox.FormattingEnabled = true;
+			this.sourcesCheckedListBox.Items.AddRange(Helper.GetAllSources());
 			this.sourcesCheckedListBox.Location = new System.Drawing.Point(415, 65);
 			this.sourcesCheckedListBox.Name = "sourcesCheckedListBox";
 			this.sourcesCheckedListBox.Size = new System.Drawing.Size(244, 34);
