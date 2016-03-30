@@ -52,7 +52,7 @@ namespace SabreTools
 			// Determine which switches are enabled (with values if necessary)
 			bool help = false, import = false, generate = false, convert = false,
 				listsys = false, listsrc = false, norename = false, old = false,
-				log = false, genall = false, add = false, rem = false;
+				log = false, genall = false, add = false, rem = false, skip = false;
 			string systems = "", sources = "", input = "", manu = "", url = "";
 			foreach (string arg in args)
 			{
@@ -71,6 +71,7 @@ namespace SabreTools
 				log = log || (arg == "-l" || arg == "--log");
 				old = old || (arg == "-old" || arg == "--romvault");
 				norename = norename || (arg == "-nr" || arg == "--no-rename");
+				skip = skip || (arg == "--skip");
 				
 				// User input strings
 				systems = (arg.StartsWith("system=") && systems == "" ? arg.Split('=')[1] : systems);
@@ -87,6 +88,12 @@ namespace SabreTools
 					!arg.StartsWith("url=") &&
 					!arg.StartsWith("input=") &&
 					input == "" ? arg : input);
+			}
+
+			// If skip is set, it's being called from the UI so we just exit
+			if (skip)
+			{
+				return;
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
