@@ -124,7 +124,7 @@ namespace SabreTools.Helper
 		/// <returns>True if the output could be written, false otherwise</returns>
 		public bool Error(string output)
 		{
-			return Log("Error: " + output);
+			return Log("ERROR: " + output);
 		}
 	}
 }
