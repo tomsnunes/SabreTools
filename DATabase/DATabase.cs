@@ -510,7 +510,7 @@ Make a selection:
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							logger.Error("Error: No systems found! Please add a source and then try again.");
+							logger.Error("No systems found! Please add a source and then try again.");
 							return;
 						}
 
@@ -535,7 +535,7 @@ Make a selection:
 									// If nothing is found, tell the user and exit
 									if (!ssldr.HasRows)
 									{
-										logger.Error("Error: No sources found! Please add a source and then try again.");
+										logger.Error("No sources found! Please add a source and then try again.");
 										return;
 									}
 
@@ -563,7 +563,7 @@ Make a selection:
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							logger.Error("Error: No sources found! Please add a source and then try again.");
+							logger.Error("No sources found! Please add a source and then try again.");
 							return;
 						}
 
@@ -653,7 +653,7 @@ ORDER BY sources.name COLLATE NOCASE";
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							Console.WriteLine("Error: No sources found! Please add a source and then try again.");
+							logger.Warning("No sources found! Please add a source and then try again.");
 							return;
 						}
 
@@ -688,7 +688,7 @@ ORDER BY systems.manufacturer, systems.system";
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							Console.WriteLine("Error: No systems found! Please add a system and then try again.");
+							logger.Warning("No systems found! Please add a system and then try again.");
 							return;
 						}
 
