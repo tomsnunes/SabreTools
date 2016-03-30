@@ -43,6 +43,11 @@
 			this.generateAllButton = new System.Windows.Forms.Button();
 			this.oldCheckBox = new System.Windows.Forms.CheckBox();
 			this.renameCheckBox = new System.Windows.Forms.CheckBox();
+			this.importDatLabel = new System.Windows.Forms.Label();
+			this.fileOrFolderLabel = new System.Windows.Forms.Label();
+			this.importTextBox = new System.Windows.Forms.TextBox();
+			this.exploreButton = new System.Windows.Forms.Button();
+			this.importButton = new System.Windows.Forms.Button();
 			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -118,11 +123,18 @@
 			// systemsCheckedListBox
 			// 
 			this.systemsCheckedListBox.FormattingEnabled = true;
-			this.systemsCheckedListBox.Items.AddRange(GetAllSystems());
 			this.systemsCheckedListBox.Location = new System.Drawing.Point(77, 65);
 			this.systemsCheckedListBox.Name = "systemsCheckedListBox";
 			this.systemsCheckedListBox.Size = new System.Drawing.Size(260, 34);
 			this.systemsCheckedListBox.TabIndex = 4;
+			// 
+			// sourcesCheckedListBox
+			// 
+			this.sourcesCheckedListBox.FormattingEnabled = true;
+			this.sourcesCheckedListBox.Location = new System.Drawing.Point(415, 65);
+			this.sourcesCheckedListBox.Name = "sourcesCheckedListBox";
+			this.sourcesCheckedListBox.Size = new System.Drawing.Size(244, 34);
+			this.sourcesCheckedListBox.TabIndex = 7;
 			// 
 			// sourcesLabel
 			// 
@@ -134,34 +146,25 @@
 			this.sourcesLabel.TabIndex = 6;
 			this.sourcesLabel.Text = "Sources:";
 			// 
-			// sourcesCheckedListBox
-			// 
-			this.sourcesCheckedListBox.FormattingEnabled = true;
-			this.sourcesCheckedListBox.Items.AddRange(GetAllSources());
-			this.sourcesCheckedListBox.Location = new System.Drawing.Point(415, 65);
-			this.sourcesCheckedListBox.Name = "sourcesCheckedListBox";
-			this.sourcesCheckedListBox.Size = new System.Drawing.Size(244, 34);
-			this.sourcesCheckedListBox.TabIndex = 7;
-			// 
 			// generateButton
 			// 
-			this.generateButton.Location = new System.Drawing.Point(18, 145);
+			this.generateButton.Location = new System.Drawing.Point(18, 128);
 			this.generateButton.Name = "generateButton";
 			this.generateButton.Size = new System.Drawing.Size(75, 23);
 			this.generateButton.TabIndex = 8;
 			this.generateButton.Text = "Generate";
 			this.generateButton.UseVisualStyleBackColor = true;
-			this.generateButton.Click += new System.EventHandler(this.button1_Click);
+			this.generateButton.Click += new System.EventHandler(this.generateButton_Click);
 			// 
 			// generateAllButton
 			// 
-			this.generateAllButton.Location = new System.Drawing.Point(100, 145);
+			this.generateAllButton.Location = new System.Drawing.Point(100, 128);
 			this.generateAllButton.Name = "generateAllButton";
 			this.generateAllButton.Size = new System.Drawing.Size(97, 23);
 			this.generateAllButton.TabIndex = 9;
 			this.generateAllButton.Text = "Generate All";
 			this.generateAllButton.UseVisualStyleBackColor = true;
-			this.generateAllButton.Click += new System.EventHandler(this.button2_Click);
+			this.generateAllButton.Click += new System.EventHandler(this.generateAllButton_Click);
 			// 
 			// oldCheckBox
 			// 
@@ -185,11 +188,61 @@
 			this.renameCheckBox.Text = "Rename Games";
 			this.renameCheckBox.UseVisualStyleBackColor = true;
 			// 
+			// importDatLabel
+			// 
+			this.importDatLabel.AutoSize = true;
+			this.importDatLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.importDatLabel.Location = new System.Drawing.Point(12, 168);
+			this.importDatLabel.Name = "importDatLabel";
+			this.importDatLabel.Size = new System.Drawing.Size(89, 17);
+			this.importDatLabel.TabIndex = 12;
+			this.importDatLabel.Text = "Import DAT";
+			// 
+			// fileOrFolderLabel
+			// 
+			this.fileOrFolderLabel.AutoSize = true;
+			this.fileOrFolderLabel.Location = new System.Drawing.Point(15, 197);
+			this.fileOrFolderLabel.Name = "fileOrFolderLabel";
+			this.fileOrFolderLabel.Size = new System.Drawing.Size(70, 13);
+			this.fileOrFolderLabel.TabIndex = 13;
+			this.fileOrFolderLabel.Text = "File or Folder:";
+			// 
+			// importTextBox
+			// 
+			this.importTextBox.Location = new System.Drawing.Point(91, 194);
+			this.importTextBox.Name = "importTextBox";
+			this.importTextBox.Size = new System.Drawing.Size(264, 20);
+			this.importTextBox.TabIndex = 14;
+			// 
+			// exploreButton
+			// 
+			this.exploreButton.Location = new System.Drawing.Point(361, 192);
+			this.exploreButton.Name = "exploreButton";
+			this.exploreButton.Size = new System.Drawing.Size(58, 23);
+			this.exploreButton.TabIndex = 15;
+			this.exploreButton.Text = "Explore";
+			this.exploreButton.UseVisualStyleBackColor = true;
+			this.exploreButton.Click += new System.EventHandler(this.exploreButton_Click);
+			// 
+			// importButton
+			// 
+			this.importButton.Location = new System.Drawing.Point(426, 192);
+			this.importButton.Name = "importButton";
+			this.importButton.Size = new System.Drawing.Size(75, 23);
+			this.importButton.TabIndex = 16;
+			this.importButton.Text = "Import";
+			this.importButton.UseVisualStyleBackColor = true;
+			// 
 			// SabreToolsUI
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(681, 477);
+			this.Controls.Add(this.importButton);
+			this.Controls.Add(this.exploreButton);
+			this.Controls.Add(this.importTextBox);
+			this.Controls.Add(this.fileOrFolderLabel);
+			this.Controls.Add(this.importDatLabel);
 			this.Controls.Add(this.renameCheckBox);
 			this.Controls.Add(this.oldCheckBox);
 			this.Controls.Add(this.generateAllButton);
@@ -227,6 +280,11 @@
 		private System.Windows.Forms.Button generateAllButton;
 		private System.Windows.Forms.CheckBox oldCheckBox;
 		private System.Windows.Forms.CheckBox renameCheckBox;
+		private System.Windows.Forms.Label importDatLabel;
+		private System.Windows.Forms.Label fileOrFolderLabel;
+		private System.Windows.Forms.TextBox importTextBox;
+		private System.Windows.Forms.Button exploreButton;
+		private System.Windows.Forms.Button importButton;
 	}
 }
 

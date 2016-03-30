@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SQLite;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -16,9 +16,6 @@ namespace SabreTools
 {
 	public partial class SabreToolsUI : Form
 	{
-		private static string _dbName = "DATabase.sqlite";
-		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
-
 		public SabreToolsUI()
 		{
 			AllocConsole();
@@ -39,71 +36,7 @@ namespace SabreTools
 			MessageBox.Show("SabreTools designed and coded by: Matt Nadareski (darksabre76)\nTested by: @tractivo", "About");
 		}
 
-		private static object[] GetAllSystems()
-		{
-			List<object> objs = new List<object>();
-
-			Process.Start("DATabase.exe", "--skip");
-
-			string query = @"
-SELECT DISTINCT systems.id, systems.manufacturer, systems.system
-FROM systems JOIN games ON systems.id=games.system
-ORDER BY systems.manufacturer, systems.system";
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
-			{
-				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
-				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
-					{
-						// If nothing is found, tell the user and exit
-						if (sldr.HasRows)
-						{
-							while (sldr.Read())
-							{
-								objs.Add(sldr.GetString(1) + " - " + sldr.GetString(2) + " (" + sldr.GetInt32(0) + ")");
-							}
-						}
-					}
-				}
-			}
-
-			return objs.ToArray();
-		}
-
-		private static object[] GetAllSources()
-		{
-			List<object> objs = new List<object>();
-
-			Process.Start("DATabase.exe", "--skip");
-
-			string query = @"
-SELECT DISTINCT sources.id, sources.name
-FROM sources JOIN games on sources.id=games.source
-ORDER BY sources.name COLLATE NOCASE";
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
-			{
-				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
-				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
-					{
-						// If nothing is found, tell the user and exit
-						if (sldr.HasRows)
-						{
-							while (sldr.Read())
-							{
-								objs.Add(sldr.GetString(1) + " (" + sldr.GetInt32(0) + ")");
-							}
-						}
-					}
-				}
-			}
-
-			return objs.ToArray();
-		}
-
-		private void button1_Click(object sender, EventArgs e)
+		private void generateButton_Click(object sender, EventArgs e)
 		{
 			string systems = "";
 			string sources = "";
@@ -136,9 +69,30 @@ ORDER BY sources.name COLLATE NOCASE";
 			Process.Start("DATabase.exe", args);
 		}
 
-		private void button2_Click(object sender, EventArgs e)
+		private void generateAllButton_Click(object sender, EventArgs e)
 		{
 			Process.Start("DATabase.exe", "-l -ga");
+		}
+
+		private void exploreButton_Click(object sender, EventArgs e)
+		{
+			OpenFileDialog ofd = new OpenFileDialog();
+
+			// Set the proper starting folder
+			if (importTextBox.Text != "")
+			{
+				ofd.InitialDirectory = Path.GetDirectoryName(importTextBox.Text);
+			}
+			else
+			{
+				ofd.InitialDirectory = Environment.CurrentDirectory;
+			}
+
+			// Set the new folder, if applicable
+			if (ofd.ShowDialog() == DialogResult.OK)
+			{
+				importTextBox.Text = ofd.FileName;
+			}
 		}
 	}
 }
