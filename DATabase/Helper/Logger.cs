@@ -13,6 +13,13 @@ namespace SabreTools.Helper
 		private string _filename;
 		private StreamWriter _log;
 
+		public enum LogLevel
+		{
+			VERBOSE = 0,
+			WARNING,
+			ERROR,
+		}
+
 		// Public wrappers
 		public bool ToFile
 		{
@@ -94,18 +101,19 @@ namespace SabreTools.Helper
 		/// Write the given string to the log output
 		/// </summary>
 		/// <param name="output">String to be written log</param>
+		/// <param name="loglevel">Severity of the information being logged</param>
 		/// <returns>True if the output could be written, false otherwise</returns>
-		public bool Log(string output)
+		public bool Log(string output, LogLevel loglevel = LogLevel.VERBOSE)
 		{
 			// Everything writes to console
-			Console.WriteLine(output);
+			Console.WriteLine(loglevel.ToString() + " " + output);
 
 			// If we're writing to file, use the existing stream
 			if (_tofile)
 			{
 				try
 				{
-					_log.WriteLine(output);
+					_log.WriteLine(loglevel.ToString() + " " + output);
 				}
 				catch
 				{
@@ -118,13 +126,23 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Write the given string as a warning to the log output
+		/// </summary>
+		/// <param name="output">String to be written log</param>
+		/// <returns>True if the output could be written, false otherwise</returns>
+		public bool Warning(string output)
+		{
+			return Log(output, LogLevel.WARNING);
+		}
+
+		/// <summary>
 		/// Writes the given string as an error in the log
 		/// </summary>
 		/// <param name="output">String to be written log</param>
 		/// <returns>True if the output could be written, false otherwise</returns>
 		public bool Error(string output)
 		{
-			return Log("ERROR: " + output);
+			return Log(output, LogLevel.ERROR);
 		}
 	}
 }
