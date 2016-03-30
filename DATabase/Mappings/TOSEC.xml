@@ -64,10 +64,11 @@
 	<mapping from="DEC PDP-11" to="DEC - PDP-11" />
 	<mapping from="DEC PDP-12" to="DEC - PDP-12" />
 	<mapping from="DEC PDP-15" to="DEC - PDP-15" />
+	<mapping from="Dragon 32 &amp; 64" to="Dragon Data - Dragon" />
 	<mapping from="Dragon Data Dragon" to="Dragon Data - Dragon" />
 	<mapping from="EACA EG2000 Colour Genie" to="EACA - EG2000 Colour Genie" />
-	<mapping from="Elektronika BK-0010-0011M" to="Elektronika BK-0010" />
-	<mapping from="Elektronika BK-0011-411" to="Elektronika BK-0010" />
+	<mapping from="Elektronika BK-0010-0011M" to="Elektronika - BK-0010" />
+	<mapping from="Elektronika BK-0011-411" to="Elektronika - BK-0011" />
 	<mapping from="Elektronska Industrija Nis PECOM 32 &amp; 64" to="Elektronska Industrija Nis - PECOM 32, 64" />
 	<mapping from="Emerson Arcadia 2001" to="Emerson - Arcadia 2001" />
 	<mapping from="Enterprise 64 &amp; 128" to="Enterprise - 64, 128" />
@@ -84,6 +85,7 @@
 	<mapping from="Front Fareast Magic Drive" to="Front Fareast - Magic Drive" />
 	<mapping from="Fuji Photo Film FUJIC" to="Fuji Photo Film - FUJIC" />
 	<mapping from="Fujitsu FM Towns" to="Fujitsu - FM Towns" />
+	<mapping from="FM Towns Marty" to="Fujitsu - FM Towns" />
 	<mapping from="Fujitsu FM-7" to="Fujitsu - FM-7" />
 	<mapping from="Funtech Super Acan" to="Funtech - Super Acan" />
 	<mapping from="Galaksija Galaksija" to="Galaksija - Galaksija, Galaksija Plus" />
@@ -94,6 +96,7 @@
 	<mapping from="Hewlett-Packard HP49" to="Hewlett-Packard - HP49" />
 	<mapping from="HomeLab BraiLab" to="HomeLab - BraiLab" />
 	<mapping from="HomeLab HomeLab" to="HomeLab - HomeLab" />
+	<mapping from="IBM PC Compatible" to="IBM - PC Compatibles" />
 	<mapping from="IBM PC Compatibles" to="IBM - PC Compatibles" />
 	<mapping from="IBM PCjr" to="IBM - PC Jr" />
 	<mapping from="Incredible Technologies Eagle" to="Incredible Technologies - Eagle" />
@@ -125,6 +128,7 @@
 	<mapping from="MSX TurboR" to="Microsoft - MSX, MSX 2" />
 	<mapping from="Nascom I &amp; II" to="Nascom - I, II" />
 	<mapping from="NCR Decision Mate V" to="NCR - Decision Mate V" />
+	<mapping from="NEC PC6001" to="NEC - PC-6001" />
 	<mapping from="NEC PC-88VA" to="NEC - PC-88VA" />
 	<mapping from="NEC PC-6001" to="NEC - PC-6001" />
 	<mapping from="NEC PC-8001" to="NEC - PC-8001" />
@@ -145,6 +149,7 @@
 	<mapping from="Nintendo Game Boy Advance" to="Nintendo - Game Boy Advance" />
 	<mapping from="Nintendo Game Boy Color" to="Nintendo - Game Boy Color" />
 	<mapping from="Nintendo GameCube" to="Nintendo - GameCube" />
+	<mapping from="Nintendo N64" to="Nintendo - Nintendo 64" />
 	<mapping from="Nintendo Pokemon Mini" to="Nintendo - Pokemon Mini" />
 	<mapping from="Nintendo Super Famicom &amp; Super Entertainment System" to="Nintendo - Super Nintendo Entertainment System" />
 	<mapping from="Nintendo Virtual Boy" to="Nintendo - Virtual Boy" />
@@ -167,7 +172,9 @@
 	<mapping from="RCA Chip-8" to="RCA - Chip-8" />
 	<mapping from="RCA Studio II" to="RCA - Studio II" />
 	<mapping from="RCA Superchip" to="RCA - Superchip" />
+	<mapping from="REAL 3DO Interactive Multiplayer" to="Panasonic - 3DO Interactive Multiplayer" />
 	<mapping from="RM Nimbus PC" to="RM - Nimbus PC" />
+	<mapping from="RM Nimbus PC-186" to="RM - Nimbus PC" />
 	<mapping from="Robotron HC900, KC85 2, KC85 3 &amp; KC85 4" to="Robotron - KC85" />
 	<mapping from="Robotron KC Compact" to="Robotron - KC Compact" />
 	<mapping from="Robotron Z1013" to="Robotron - Z1013" />
@@ -179,14 +186,17 @@
 	<mapping from="Sega Game 1000" to="Sega - SG-1000, SC-3000, SF-7000, Othello Multivision" />
 	<mapping from="Sega Game Gear" to="Sega - Game Gear" />
 	<mapping from="Sega Mark III &amp; Master System" to="Sega - Master System, Mark III" />
+	<mapping from="Sega Master System &amp; Mark III" to="Sega - Master System, Mark III" />
 	<mapping from="Sega Mega Drive &amp; Genesis" to="Sega - Mega Drive, Genesis" />
 	<mapping from="Sega Mega-CD and Sega CD" to="Sega - Mega-CD, Sega CD" />
+	<mapping from="Sega Mega-CD &amp; Sega CD" to="Sega - Mega-CD, Sega CD" />
 	<mapping from="Sega NAOMI" to="Sega - Naomi, Naomi 2, Atomiswave" />
 	<mapping from="Sega NAOMI 2" to="Sega - Naomi, Naomi 2, Atomiswave" />
 	<mapping from="Sega Pico" to="Sega - PICO" />
 	<mapping from="Sega Saturn" to="Sega - Saturn" />
 	<mapping from="Sega Super Control Station" to="Sega - SG-1000, SC-3000, SF-7000, Othello Multivision" />
 	<mapping from="Sega Visual Memory System" to="Sega - Visual Memory System" />
+	<mapping from="Sega Visual Memory Unit" to="Sega - Visual Memory System" />
 	<mapping from="Sega WonderMega" to="Sega - Mega-CD, Sega CD" />
 	<mapping from="Sharp MZ-700" to="Sharp - MZ-700" />
 	<mapping from="Sharp MZ-800 &amp; MZ-1500" to="Sharp - MZ-800, MZ-1500" />
@@ -207,15 +217,20 @@
 	<mapping from="Spectravideo SVI-318 &amp; SVI-328" to="Spectravideo - SVI-318, SVI-328" />
 	<mapping from="Tandy Radio Shack TRS-80 Color Computer" to="Tandy Radio Shack - TRS-80 Color Computer" />
 	<mapping from="Tandy Radio Shack TRS-80 MC-10" to="Tandy Radio Shack - TRS-80 MC-10" />
-	<mapping from="Tandy Radio Shack TRS-80 Model 4" to="Tandy Radio Shack - TRS-80 Model 4" />
+	<mapping from="Tandy Radio Shack TRS-80 Model 4" to="Tandy Radio Shack - TRS-80 Model IV" />
 	<mapping from="Tandy Radio Shack TRS-80 Model 100" to="Tandy Radio Shack - TRS-80 Model 100" />
 	<mapping from="Tandy Radio Shack TRS-80 Model I" to="Tandy Radio Shack - TRS-80 Model I" />
 	<mapping from="Tandy Radio Shack TRS-80 Model III" to="Tandy Radio Shack - TRS-80 Model III" />
+	<mapping from="Tandy Radio Shack - TRS-80 - Model 1" to="Tandy Radio Shack - TRS-80 Model I" />
+	<mapping from="Tandy Radio Shack - TRS-80 - Model 3" to="Tandy Radio Shack - TRS-80 Model III" />
+	<mapping from="Tandy Radio Shack - TRS-80 - Model 4" to="Tandy Radio Shack - TRS-80 Model IV" />
 	<mapping from="Tangerine Microtan 65" to="Tangerine - Microtan 65" />
 	<mapping from="Tangerine Oric-1 &amp; Oric Atmos" to="Tangerine - Oric-1, Oric Atmos" />
 	<mapping from="Tatung Einstein TC-01" to="Tatung - Einstein TC-01" />
 	<mapping from="Technosys Aamber Pegasus" to="Technosys - Aamber Pegasus" />
 	<mapping from="Tesla PMD 85" to="Tesla - PMD 85" />
+	<mapping from="Texas Instruments TI73" to="Texas Instruments - TI-73" />
+	<mapping from="Texas Instruments TI80" to="Texas Instruments - TI-80" />
 	<mapping from="Texas Instruments CC-40" to="Texas Instruments - CC-40" />
 	<mapping from="Texas Instruments TI-73" to="Texas Instruments - TI-73" />
 	<mapping from="Texas Instruments TI-80" to="Texas Instruments - TI-80" />
