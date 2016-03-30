@@ -239,7 +239,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(681, 477);
+			this.ClientSize = new System.Drawing.Size(681, 257);
 			this.Controls.Add(this.folderButton);
 			this.Controls.Add(this.importButton);
 			this.Controls.Add(this.fileButton);
@@ -255,8 +255,10 @@
 			this.Controls.Add(this.systemsLabel);
 			this.Controls.Add(this.generateDatLabel);
 			this.Controls.Add(this.menuStrip1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "SabreToolsUI";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "SabreTools UI 0.2.0.0";
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
