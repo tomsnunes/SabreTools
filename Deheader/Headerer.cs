@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace SabreTools
@@ -11,14 +13,17 @@ namespace SabreTools
 	/// </summary>
 	class Headerer
 	{
+		private static string _version = "0.2.2.0";
+		private static string _dbName = "Headerer.sqlite";
+		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
 		private static Dictionary<string, int> types;
-		private static bool save;
 		private static string help = @"Deheader - Remove headers from roms
 -----------------------------------------
 Usage: Deheader [option] [filename|dirname]
 
 Options:
-  -s			Enable saving of the extracted header";
+  -e			Detect and remove mode
+  -r			Restore header to file based on SHA-1";
 
 		/// <summary>
 		/// Start deheader operation with supplied parameters
@@ -34,6 +39,9 @@ Options:
 			types.Add("nes", 16);
 			types.Add("snes", 512);
 
+			// Ensure that the header database is set up
+			EnsureDatabase(_dbName, _connectionString);
+
 			if (args.Length == 0 || args.Length > 2)
 			{
 				Console.WriteLine(help);
@@ -42,38 +50,73 @@ Options:
 
 			// Get the filename (or foldername)
 			string file = "";
+			bool deheader = true;
 			if (args.Length == 1)
 			{
 				file = args[0];
-				save = false;
 			}
 			else
 			{
-				file = args[1];
-				save = true;
-			}			
-			
-
-			// If it's a single file, just check it
-			if (File.Exists(file))
-			{
-				DetectRemoveHeader(file);
-			}
-			// If it's a directory, recursively check all
-			else if (Directory.Exists(file))
-			{
-				foreach (string sub in Directory.GetFiles(file))
+				
+				if (args[0] == "-e")
 				{
-					if (sub != ".." && sub != ".")
+					deheader = true;
+				}
+				else if (args[0] == "-r")
+				{
+					deheader = false;
+				}
+
+				file = args[1];
+			}
+
+			if (deheader)
+			{
+				// If it's a single file, just check it
+				if (File.Exists(file))
+				{
+					DetectRemoveHeader(file);
+				}
+				// If it's a directory, recursively check all
+				else if (Directory.Exists(file))
+				{
+					foreach (string sub in Directory.GetFiles(file))
 					{
-						DetectRemoveHeader(sub);
+						if (sub != ".." && sub != ".")
+						{
+							DetectRemoveHeader(sub);
+						}
 					}
 				}
+				// Else, show that help text
+				else
+				{
+					Console.WriteLine(help);
+				}
 			}
-			// Else, show that help text
 			else
 			{
-				Console.WriteLine(help);
+				// If it's a single file, just check it
+				if (File.Exists(file))
+				{
+					ReplaceHeader(file);
+				}
+				// If it's a directory, recursively check all
+				else if (Directory.Exists(file))
+				{
+					foreach (string sub in Directory.GetFiles(file))
+					{
+						if (sub != ".." && sub != ".")
+						{
+							ReplaceHeader(sub);
+						}
+					}
+				}
+				// Else, show that help text
+				else
+				{
+					Console.WriteLine(help);
+				}
 			}
 		}
 
@@ -120,16 +163,11 @@ Options:
 				Console.WriteLine("Deteched header type: " + type);
 				int hs = types[type];
 
-				// Write out the header if we're saving it
-				if (save)
+				// Save header as string in the database
+				string realhead = "";
+				for (int i = 0; i < hs; i++)
 				{
-					Console.WriteLine("Writing header to file: " + file + ".header");
-					BinaryWriter bwh = new BinaryWriter(File.OpenWrite(file + ".header"));
-					for (int i = 0; i < hs; i++)
-					{
-						bwh.Write(hbin[i]);
-					}
-					bwh.Close();
+					realhead += BitConverter.ToString(new byte[] { hbin[i] });
 				}
 
 				// Get the bytes that aren't from the header from the extracted bit so they can be written before the rest of the file
@@ -143,8 +181,133 @@ Options:
 				bw.Write(br.ReadBytes((int)fi.Length - hs));
 				bw.Close();
 				Console.WriteLine("Unheadered file created!");
+
+				// Now add the information to the database if it's not already there
+				SHA1 sha1 = SHA1.Create();
+				sha1.ComputeHash(File.ReadAllBytes(file + ".new"));
+				bool exists = false;
+
+				string query = @"SELECT * FROM data WHERE sha1='" + BitConverter.ToString(sha1.Hash) + "'";
+				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+				{
+					dbc.Open();
+					using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+					{
+						using (SQLiteDataReader sldr = slc.ExecuteReader())
+						{
+							exists = sldr.HasRows;
+						}
+					}
+				}
+
+				if (!exists)
+				{
+					query = @"INSERT INTO data (sha1, header, type) VALUES ('" +
+					BitConverter.ToString(sha1.Hash) + "', " +
+					"'" + realhead + "', " +
+					"'" + type + "')";
+					using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+					{
+						dbc.Open();
+						using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+						{
+							Console.WriteLine("Result of inserting header: " + slc.ExecuteNonQuery());
+						}
+					}
+				}
 			}
 			br.Close();
+		}
+
+		/// <summary>
+		/// Detect and replace header to the given file
+		/// </summary>
+		/// <param name="file">Name of the file to be parsed</param>
+		private static void ReplaceHeader(string file)
+		{
+			// First, get the SHA-1 hash of the file
+			SHA1 sha1 = SHA1.Create();
+			sha1.ComputeHash(File.ReadAllBytes(file));
+			string hash = BitConverter.ToString(sha1.Hash);
+
+			// Then try to pull the corresponding thing from the database
+			string header = "";
+
+			string query = @"SELECT header, type FROM data WHERE sha1='" + hash + "'";
+			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			{
+				dbc.Open();
+				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				{
+					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					{
+						if (sldr.HasRows)
+						{
+							sldr.Read();
+							Console.WriteLine("Found match with rom type " + sldr.GetString(1));
+							header = sldr.GetString(0);
+						}
+					}
+				}
+			}
+
+			// If the header isn't null, add it to the file. Otherwise tell the user
+			if (header == "")
+			{
+				Console.WriteLine("No matching header could be found!");
+				return;
+			}
+
+			Console.WriteLine("Creating reheadered file: " + file + ".new");
+			BinaryWriter bw = new BinaryWriter(File.OpenWrite(file + ".new"));
+
+			// Source: http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
+			for (int i = 0; i < header.Length; i += 2)
+			{
+				bw.Write(Convert.ToByte(header.Substring(i, 2), 16));
+			}
+			bw.Write(File.ReadAllBytes(file));
+			bw.Close();
+			Console.WriteLine("Reheadered file created!");
+		}
+
+		/// <summary>
+		/// Ensure that the databse exists and has the proper schema
+		/// </summary>
+		/// <param name="db">Name of the databse</param>
+		/// <param name="connectionString">Connection string for SQLite</param>
+		public static void EnsureDatabase(string db, string connectionString)
+		{
+			// Make sure the file exists
+			if (!File.Exists(db))
+			{
+				SQLiteConnection.CreateFile(db);
+			}
+
+			// Connect to the file
+			SQLiteConnection dbc = new SQLiteConnection(connectionString);
+			dbc.Open();
+			try
+			{
+				// Make sure the database has the correct schema
+				string query = @"
+CREATE TABLE IF NOT EXISTS data (
+	'sha1'		TEXT PRIMARY KEY		NOT NULL,
+	'header'	TEXT					NOT NULL,
+	'type'		TEXT					NOT NULL
+)";
+				SQLiteCommand slc = new SQLiteCommand(query, dbc);
+				slc.ExecuteNonQuery();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+			}
+			finally
+			{
+				// Close and return the database connection
+				dbc.Close();
+			}
 		}
 	}
 }
