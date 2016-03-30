@@ -115,5 +115,15 @@ namespace SabreTools
 				importTextBox.Text = fbd.SelectedPath;
 			}
 		}
+
+		private void importButton_Click(object sender, EventArgs e)
+		{
+			string path = importTextBox.Text;
+
+			if (path != "")
+			{
+				Process.Start("DATabase.exe", "-l -i input=\"" + path + "\"");
+			}
+        }
 	}
 }
