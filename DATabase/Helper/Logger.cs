@@ -97,21 +97,21 @@ namespace SabreTools.Helper
 		/// <returns>True if the output could be written, false otherwise</returns>
 		public bool Log(string output)
 		{
-			// If we're writing to console, just write the string
-			if (!_tofile)
-			{
-				Console.WriteLine(output);
-				return true;
-			}
+			// Everything writes to console
+			Console.WriteLine(output);
+
 			// If we're writing to file, use the existing stream
-			try
+			if (_tofile)
 			{
-				_log.WriteLine(output);
-			}
-			catch
-			{
-				Console.WriteLine("Could not write to log file!");
-				return false;
+				try
+				{
+					_log.WriteLine(output);
+				}
+				catch
+				{
+					Console.WriteLine("Could not write to log file!");
+					return false;
+				}
 			}
 
 			return true;
