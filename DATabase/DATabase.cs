@@ -563,7 +563,7 @@ Make a selection:
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							logger.Error("Error: No systems found! Please add a source and then try again.");
+							logger.Error("Error: No sources found! Please add a source and then try again.");
 							return;
 						}
 
