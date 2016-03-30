@@ -257,7 +257,7 @@
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "SabreToolsUI";
-			this.Text = "SabreTools UI";
+			this.Text = "SabreTools UI 0.2.0.0";
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.ResumeLayout(false);
