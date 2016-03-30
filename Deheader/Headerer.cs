@@ -9,7 +9,7 @@ namespace SabreTools
 	/// <summary>
 	/// Entry class for the Deheader application
 	/// </summary>
-	class Deheader
+	class Headerer
 	{
 		private static Dictionary<string, int> types;
 		private static bool save;
