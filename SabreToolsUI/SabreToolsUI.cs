@@ -108,32 +108,28 @@ ORDER BY sources.name COLLATE NOCASE";
 			string systems = "";
 			string sources = "";
 
-			CheckedListBox.CheckedItemCollection cil = this.checkedListBox1.CheckedItems;
-			Console.WriteLine(cil.Count);
+			CheckedListBox.CheckedItemCollection cil = this.systemsCheckedListBox.CheckedItems;
 			foreach (object ci in cil)
 			{
 				string id = Regex.Match(ci.ToString(), @".*? \((.*?)\)").Groups[1].Value;
 
-				systems += (systems == "" ? id : ", " + id);
-				Console.WriteLine(systems);
+				systems += (systems == "" ? id : "," + id);
 			}
 
-			cil = this.checkedListBox2.CheckedItems;
-			Console.WriteLine(cil.Count);
+			cil = this.sourcesCheckedListBox.CheckedItems;
 			foreach (object ci in cil)
 			{
 				string id = Regex.Match(ci.ToString(), @".*? \((.*?)\)").Groups[1].Value;
 
-				sources += (sources == "" ? id : ", " + id);
-				Console.WriteLine(systems);
+				sources += (sources == "" ? id : "," + id);
 			}
 
-			Process.Start("DATabase.exe", "-g" + (systems != "" ? " systems=" + systems : "") + (sources != "" ? " sources=" + sources : ""));
+			Process.Start("DATabase.exe", "-l -g" + (systems != "" ? " system=" + systems : "") + (sources != "" ? " source=" + sources : ""));
 		}
 
 		private void button2_Click(object sender, EventArgs e)
 		{
-			Process.Start("DATabase.exe", "-ga");
+			Process.Start("DATabase.exe", "-l -ga");
 		}
 	}
 }

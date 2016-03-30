@@ -116,6 +116,8 @@ namespace SabreTools
 			if (_sources != "")
 			{
 				string query = "SELECT name FROM sources WHERE id in (" + _sources + ")";
+				Console.WriteLine(query);
+
 				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 				{
 					dbc.Open();
