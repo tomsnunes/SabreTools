@@ -116,5 +116,15 @@ namespace SabreTools.Helper
 
 			return true;
 		}
+
+		/// <summary>
+		/// Writes the given string as an error in the log
+		/// </summary>
+		/// <param name="output">String to be written log</param>
+		/// <returns>True if the output could be written, false otherwise</returns>
+		public bool Error(string output)
+		{
+			return Log("Error: " + output);
+		}
 	}
 }

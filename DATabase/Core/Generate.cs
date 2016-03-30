@@ -84,7 +84,7 @@ namespace SabreTools
 							// If there are no games for this combination, return nothing
 							if (!sldr.HasRows)
 							{
-								_logger.Log("No system could be found with id in \"" + _systems + "\". Please check and try again.");
+								_logger.Error("No system could be found with id in \"" + _systems + "\". Please check and try again.");
 								return false;
 							}
 
@@ -128,7 +128,7 @@ namespace SabreTools
 							// If there are no games for this combination, return nothing
 							if (!sldr.HasRows)
 							{
-								_logger.Log("No source could be found with id in \"" + _sources + "\". Please check and try again.");
+								_logger.Error("No source could be found with id in \"" + _sources + "\". Please check and try again.");
 								return false;
 							}
 
@@ -262,7 +262,7 @@ namespace SabreTools
 			}
 			catch (Exception ex)
 			{
-				_logger.Log(ex.ToString());
+				_logger.Error(ex.ToString());
 				return false;
 			}
 
@@ -314,7 +314,7 @@ JOIN checksums
 						// If there are no games for this combination, return nothing
 						if (!sldr.HasRows)
 						{
-							_logger.Log("No games could be found with those inputs. Please check and try again.");
+							_logger.Error("No games could be found with those inputs. Please check and try again.");
 							return null;
 						}
 

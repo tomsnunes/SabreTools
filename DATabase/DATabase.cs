@@ -372,7 +372,7 @@ or 'b' to go back to the previous menu:");
 			}
 			else
 			{
-				logger.Log("I'm sorry but " + filename + "doesn't exist!");
+				logger.Error("I'm sorry but " + filename + "doesn't exist!");
 			}
 			return;
 		}
@@ -510,7 +510,7 @@ Make a selection:
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							logger.Log("Error: No systems found! Please add a source and then try again.");
+							logger.Error("Error: No systems found! Please add a source and then try again.");
 							return;
 						}
 
@@ -535,7 +535,7 @@ Make a selection:
 									// If nothing is found, tell the user and exit
 									if (!ssldr.HasRows)
 									{
-										logger.Log("Error: No sources found! Please add a source and then try again.");
+										logger.Error("Error: No sources found! Please add a source and then try again.");
 										return;
 									}
 
@@ -563,7 +563,7 @@ Make a selection:
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							logger.Log("Error: No systems found! Please add a source and then try again.");
+							logger.Error("Error: No systems found! Please add a source and then try again.");
 							return;
 						}
 
@@ -781,7 +781,7 @@ Make a selection:
 			}
 			else
 			{
-				logger.Log("Source " + name + " could not be added!");
+				logger.Error("Source " + name + " could not be added!");
 			}
 		}
 
@@ -800,12 +800,12 @@ Make a selection:
 				}
 				else
 				{
-					logger.Log("Source with id '" + srcid + "' could not be removed.");
+					logger.Error("Source with id '" + srcid + "' could not be removed.");
                 }
 			}
 			else
 			{
-				logger.Log("Invalid input");
+				logger.Error("Invalid input");
 			}
 		}
 
@@ -822,7 +822,7 @@ Make a selection:
 			}
 			else
 			{
-				logger.Log("System " + manufacturer + " - " + system + " could not be added!");
+				logger.Error("System " + manufacturer + " - " + system + " could not be added!");
 			}
 		}
 
@@ -841,12 +841,12 @@ Make a selection:
 				}
 				else
 				{
-					logger.Log("System with id '" + sysid + "' could not be removed.");
+					logger.Error("System with id '" + sysid + "' could not be removed.");
                 }
 			}
 			else
 			{
-				logger.Log("Invalid input");
+				logger.Error("Invalid input");
 			}
 		}
 	}

@@ -146,7 +146,7 @@ namespace SabreTools
 			// If the type is still unmatched, the data can't be imported yet
 			else
 			{
-				_logger.Log("File " + filename + " cannot be imported at this time because it is not a known pattern.\nPlease try again with an unrenamed version.");
+				_logger.Error("File " + filename + " cannot be imported at this time because it is not a known pattern.\nPlease try again with an unrenamed version.");
 				return false;
 			}
 
@@ -162,7 +162,7 @@ namespace SabreTools
 				case DatType.MAME:
 					if (!Remapping.MAME.ContainsKey(fileinfo[1].Value))
 					{
-						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection mameInfo = Regex.Match(Remapping.MAME[fileinfo[1].Value], _remappedPattern).Groups;
@@ -175,7 +175,7 @@ namespace SabreTools
 				case DatType.NoIntro:
 					if (!Remapping.NoIntro.ContainsKey(fileinfo[1].Value))
 					{
-						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection nointroInfo = Regex.Match(Remapping.NoIntro[fileinfo[1].Value], _remappedPattern).Groups;
@@ -191,7 +191,7 @@ namespace SabreTools
 				case DatType.Redump:
 					if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
 					{
-						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection redumpInfo = Regex.Match(Remapping.Redump[fileinfo[1].Value], _remappedPattern).Groups;
@@ -212,7 +212,7 @@ namespace SabreTools
 
 						if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
 						{
-							_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+							_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 							return false;
 						}
 					}
@@ -228,7 +228,7 @@ namespace SabreTools
 				case DatType.TruRip:
 					if (!Remapping.TruRip.ContainsKey(fileinfo[1].Value))
 					{
-						_logger.Log("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection truripInfo = Regex.Match(Remapping.TruRip[fileinfo[1].Value], _remappedPattern).Groups;
@@ -264,7 +264,7 @@ namespace SabreTools
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							_logger.Log("Error: No suitable system for '" + filename + "' found! Please add the system and then try again.");
+							_logger.Error("Error: No suitable system for '" + filename + "' found! Please add the system and then try again.");
 							return false;
 						}
 
@@ -288,7 +288,7 @@ namespace SabreTools
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							_logger.Log("Error: No suitable source for '" + filename + "' found! Please add the source and then try again.");
+							_logger.Error("Error: No suitable source for '" + filename + "' found! Please add the source and then try again.");
 							return false;
 						}
 
@@ -562,14 +562,14 @@ INSERT INTO files (setid, name, type, lastupdated)
 									// If the insert of the checksums failed, that's bad
 									if (affected < 1)
 									{
-										_logger.Log("There was an error adding checksums for " + name + " to the database!");
+										_logger.Error("There was an error adding checksums for " + name + " to the database!");
 										return false;
 									}
 								}
 								// Otherwise, something happened which is bad
 								else
 								{
-									_logger.Log("There was an error adding " + name + " to the database!");
+									_logger.Error("There was an error adding " + name + " to the database!");
 									return false;
 								}
 							}
