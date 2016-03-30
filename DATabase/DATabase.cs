@@ -354,25 +354,25 @@ or 'b' to go back to the previous menu:");
 			// Check to see if the second argument is a file that exists
 			if (filename != "" && File.Exists(filename))
 			{
-				Console.WriteLine("Beginning import of " + filename);
+				logger.Log("Beginning import of " + filename);
 				Import imp = new Import(filename, _connectionString, logger);
 				imp.ImportData();
-				Console.WriteLine(filename + " imported!");
+				logger.Log(filename + " imported!");
 			}
 			// Check to see if the second argument is a directory that exists
 			else if (filename != "" && Directory.Exists(filename))
 			{
 				foreach (string file in Directory.GetFiles(filename, "*", SearchOption.TopDirectoryOnly))
 				{
-					Console.WriteLine("Beginning import of " + file);
+					logger.Log("Beginning import of " + file);
 					Import imp = new Import(file, _connectionString, logger);
 					imp.ImportData();
-					Console.WriteLine(file + " imported!");
+					logger.Log(file + " imported!");
 				}
 			}
 			else
 			{
-				Console.WriteLine("I'm sorry but " + filename + "doesn't exist!");
+				logger.Log("I'm sorry but " + filename + "doesn't exist!");
 			}
 			return;
 		}
