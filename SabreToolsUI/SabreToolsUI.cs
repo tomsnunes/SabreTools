@@ -74,24 +74,45 @@ namespace SabreTools
 			Process.Start("DATabase.exe", "-l -ga");
 		}
 
-		private void exploreButton_Click(object sender, EventArgs e)
+		private void fileButton_Click(object sender, EventArgs e)
 		{
 			OpenFileDialog ofd = new OpenFileDialog();
 
 			// Set the proper starting folder
 			if (importTextBox.Text != "")
 			{
-				ofd.InitialDirectory = Path.GetDirectoryName(importTextBox.Text);
+                ofd.InitialDirectory = Path.GetDirectoryName(importTextBox.Text);
 			}
 			else
 			{
-				ofd.InitialDirectory = Environment.CurrentDirectory;
+                ofd.InitialDirectory = Environment.CurrentDirectory;
 			}
 
-			// Set the new folder, if applicable
+			// Set the new file, if applicable
 			if (ofd.ShowDialog() == DialogResult.OK)
 			{
 				importTextBox.Text = ofd.FileName;
+			}
+		}
+
+		private void folderButton_Click(object sender, EventArgs e)
+		{
+			FolderBrowserDialog fbd = new FolderBrowserDialog();
+
+			// Set the proper starting folder
+			if (importTextBox.Text != "")
+			{
+				fbd.SelectedPath = Path.GetDirectoryName(importTextBox.Text);
+			}
+			else
+			{
+				fbd.SelectedPath = Environment.CurrentDirectory;
+			}
+
+			// Set the new folder, if applicable
+			if (fbd.ShowDialog() == DialogResult.OK)
+			{
+				importTextBox.Text = fbd.SelectedPath;
 			}
 		}
 	}
