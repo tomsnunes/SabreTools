@@ -124,7 +124,16 @@ ORDER BY sources.name COLLATE NOCASE";
 				sources += (sources == "" ? id : "," + id);
 			}
 
-			Process.Start("DATabase.exe", "-l -g" + (systems != "" ? " system=" + systems : "") + (sources != "" ? " source=" + sources : ""));
+			bool old = this.oldCheckBox.Checked;
+			bool norename = !this.renameCheckBox.Checked;
+
+			string args = "-l -g" +
+				(old ? " -old" : "") +
+				(norename ? " -nr" : "") +
+				(systems != "" ? " system=" + systems : "") +
+				(sources != "" ? " source=" + sources : "");
+
+			Process.Start("DATabase.exe", args);
 		}
 
 		private void button2_Click(object sender, EventArgs e)

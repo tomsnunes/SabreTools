@@ -38,12 +38,11 @@
 			this.systemsLabel = new System.Windows.Forms.Label();
 			this.systemsCheckedListBox = new System.Windows.Forms.CheckedListBox();
 			this.sourcesCheckedListBox = new System.Windows.Forms.CheckedListBox();
-			this.label4 = new System.Windows.Forms.Label();
-			this.label5 = new System.Windows.Forms.Label();
-			this.button1 = new System.Windows.Forms.Button();
-			this.button2 = new System.Windows.Forms.Button();
-			this.checkBox1 = new System.Windows.Forms.CheckBox();
-			this.checkBox2 = new System.Windows.Forms.CheckBox();
+			this.sourcesLabel = new System.Windows.Forms.Label();
+			this.generateButton = new System.Windows.Forms.Button();
+			this.generateAllButton = new System.Windows.Forms.Button();
+			this.oldCheckBox = new System.Windows.Forms.CheckBox();
+			this.renameCheckBox = new System.Windows.Forms.CheckBox();
 			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -119,91 +118,84 @@
 			// systemsCheckedListBox
 			// 
 			this.systemsCheckedListBox.FormattingEnabled = true;
+			this.systemsCheckedListBox.Items.AddRange(GetAllSystems());
 			this.systemsCheckedListBox.Location = new System.Drawing.Point(77, 65);
 			this.systemsCheckedListBox.Name = "systemsCheckedListBox";
 			this.systemsCheckedListBox.Size = new System.Drawing.Size(260, 34);
 			this.systemsCheckedListBox.TabIndex = 4;
 			// 
+			// sourcesLabel
+			// 
+			this.sourcesLabel.AutoSize = true;
+			this.sourcesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.sourcesLabel.Location = new System.Drawing.Point(353, 65);
+			this.sourcesLabel.Name = "sourcesLabel";
+			this.sourcesLabel.Size = new System.Drawing.Size(55, 15);
+			this.sourcesLabel.TabIndex = 6;
+			this.sourcesLabel.Text = "Sources:";
+			// 
 			// sourcesCheckedListBox
 			// 
 			this.sourcesCheckedListBox.FormattingEnabled = true;
+			this.sourcesCheckedListBox.Items.AddRange(GetAllSources());
 			this.sourcesCheckedListBox.Location = new System.Drawing.Point(415, 65);
 			this.sourcesCheckedListBox.Name = "sourcesCheckedListBox";
 			this.sourcesCheckedListBox.Size = new System.Drawing.Size(244, 34);
 			this.sourcesCheckedListBox.TabIndex = 7;
 			// 
-			// label4
+			// generateButton
 			// 
-			this.label4.AutoSize = true;
-			this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label4.Location = new System.Drawing.Point(353, 65);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(55, 15);
-			this.label4.TabIndex = 6;
-			this.label4.Text = "Sources:";
+			this.generateButton.Location = new System.Drawing.Point(18, 145);
+			this.generateButton.Name = "generateButton";
+			this.generateButton.Size = new System.Drawing.Size(75, 23);
+			this.generateButton.TabIndex = 8;
+			this.generateButton.Text = "Generate";
+			this.generateButton.UseVisualStyleBackColor = true;
+			this.generateButton.Click += new System.EventHandler(this.button1_Click);
 			// 
-			// label5
+			// generateAllButton
 			// 
-			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(363, 65);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(0, 13);
-			this.label5.TabIndex = 5;
+			this.generateAllButton.Location = new System.Drawing.Point(100, 145);
+			this.generateAllButton.Name = "generateAllButton";
+			this.generateAllButton.Size = new System.Drawing.Size(97, 23);
+			this.generateAllButton.TabIndex = 9;
+			this.generateAllButton.Text = "Generate All";
+			this.generateAllButton.UseVisualStyleBackColor = true;
+			this.generateAllButton.Click += new System.EventHandler(this.button2_Click);
 			// 
-			// button1
+			// oldCheckBox
 			// 
-			this.button1.Location = new System.Drawing.Point(18, 145);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(75, 23);
-			this.button1.TabIndex = 8;
-			this.button1.Text = "Generate";
-			this.button1.UseVisualStyleBackColor = true;
-			this.button1.Click += new System.EventHandler(this.button1_Click);
+			this.oldCheckBox.AutoSize = true;
+			this.oldCheckBox.Location = new System.Drawing.Point(18, 105);
+			this.oldCheckBox.Name = "oldCheckBox";
+			this.oldCheckBox.Size = new System.Drawing.Size(129, 17);
+			this.oldCheckBox.TabIndex = 10;
+			this.oldCheckBox.Text = "Use RomVault Format";
+			this.oldCheckBox.UseVisualStyleBackColor = true;
 			// 
-			// button2
+			// renameCheckBox
 			// 
-			this.button2.Location = new System.Drawing.Point(100, 145);
-			this.button2.Name = "button2";
-			this.button2.Size = new System.Drawing.Size(97, 23);
-			this.button2.TabIndex = 9;
-			this.button2.Text = "Generate All";
-			this.button2.UseVisualStyleBackColor = true;
-			this.button2.Click += new System.EventHandler(this.button2_Click);
-			// 
-			// checkBox1
-			// 
-			this.checkBox1.AutoSize = true;
-			this.checkBox1.Location = new System.Drawing.Point(18, 105);
-			this.checkBox1.Name = "checkBox1";
-			this.checkBox1.Size = new System.Drawing.Size(129, 17);
-			this.checkBox1.TabIndex = 10;
-			this.checkBox1.Text = "Use RomVault Format";
-			this.checkBox1.UseVisualStyleBackColor = true;
-			// 
-			// checkBox2
-			// 
-			this.checkBox2.AutoSize = true;
-			this.checkBox2.Checked = true;
-			this.checkBox2.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkBox2.Location = new System.Drawing.Point(154, 105);
-			this.checkBox2.Name = "checkBox2";
-			this.checkBox2.Size = new System.Drawing.Size(102, 17);
-			this.checkBox2.TabIndex = 11;
-			this.checkBox2.Text = "Rename Games";
-			this.checkBox2.UseVisualStyleBackColor = true;
+			this.renameCheckBox.AutoSize = true;
+			this.renameCheckBox.Checked = true;
+			this.renameCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.renameCheckBox.Location = new System.Drawing.Point(154, 105);
+			this.renameCheckBox.Name = "renameCheckBox";
+			this.renameCheckBox.Size = new System.Drawing.Size(102, 17);
+			this.renameCheckBox.TabIndex = 11;
+			this.renameCheckBox.Text = "Rename Games";
+			this.renameCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// SabreToolsUI
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(681, 477);
-			this.Controls.Add(this.checkBox2);
-			this.Controls.Add(this.checkBox1);
-			this.Controls.Add(this.button2);
-			this.Controls.Add(this.button1);
+			this.Controls.Add(this.renameCheckBox);
+			this.Controls.Add(this.oldCheckBox);
+			this.Controls.Add(this.generateAllButton);
+			this.Controls.Add(this.generateButton);
 			this.Controls.Add(this.sourcesCheckedListBox);
-			this.Controls.Add(this.label4);
-			this.Controls.Add(this.label5);
+			this.Controls.Add(this.sourcesLabel);
 			this.Controls.Add(this.systemsCheckedListBox);
 			this.Controls.Add(this.systemsLabel);
 			this.Controls.Add(this.generateDatLabel);
@@ -230,12 +222,11 @@
 		private System.Windows.Forms.Label systemsLabel;
 		private System.Windows.Forms.CheckedListBox systemsCheckedListBox;
 		private System.Windows.Forms.CheckedListBox sourcesCheckedListBox;
-		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.Label label5;
-		private System.Windows.Forms.Button button1;
-		private System.Windows.Forms.Button button2;
-		private System.Windows.Forms.CheckBox checkBox1;
-		private System.Windows.Forms.CheckBox checkBox2;
+		private System.Windows.Forms.Label sourcesLabel;
+		private System.Windows.Forms.Button generateButton;
+		private System.Windows.Forms.Button generateAllButton;
+		private System.Windows.Forms.CheckBox oldCheckBox;
+		private System.Windows.Forms.CheckBox renameCheckBox;
 	}
 }
 
