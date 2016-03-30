@@ -835,7 +835,7 @@ Make a selection:
 			int sysid = -1;
 			if (Int32.TryParse(systemid, out sysid))
 			{
-				if (DBTools.RemoveSource(sysid, _connectionString))
+				if (DBTools.RemoveSystem(sysid, _connectionString))
 				{
 					Console.WriteLine("System '" + sysid + "' removed!");
 				}
