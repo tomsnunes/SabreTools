@@ -257,7 +257,7 @@ namespace SabreTools
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							_logger.Log("Error: No suitable system found! Please add the system and then try again.");
+							_logger.Log("Error: No suitable system for '" + filename + "' found! Please add the system and then try again.");
 							return false;
 						}
 
@@ -281,7 +281,7 @@ namespace SabreTools
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							_logger.Log("Error: No suitable source found! Please add the source and then try again.");
+							_logger.Log("Error: No suitable source '" + filename + "' found! Please add the source and then try again.");
 							return false;
 						}
 

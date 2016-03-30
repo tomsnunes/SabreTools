@@ -837,16 +837,16 @@ Make a selection:
 			{
 				if (DBTools.RemoveSystem(sysid, _connectionString))
 				{
-					Console.WriteLine("System '" + sysid + "' removed!");
+					logger.Log("System '" + sysid + "' removed!");
 				}
 				else
 				{
-					Console.WriteLine("System with id '" + sysid + "' could not be removed.");
+					logger.Log("System with id '" + sysid + "' could not be removed.");
                 }
 			}
 			else
 			{
-				Console.WriteLine("Invalid input");
+				logger.Log("Invalid input");
 			}
 		}
 	}
