@@ -6,7 +6,7 @@ This project is a desktop port of some core features of Wizard of DATz Redux. Fo
 
 <h3>Features</h3>
 
-Currently, SabreTools consists of three programs: SabreTools UI, DATabase, and Deheader.
+Currently, SabreTools consists of three programs: SabreTools UI, DATabase, and Headerer.
 
 <b>SabreTools UI</b>
 <p/>
@@ -26,9 +26,9 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 </ul>
 This tool can both be used with command line parameters or with the built-in text menu system.
 
-<b>Deheader</b>
+<b>Headerer</b>
 <p/>
-A simple auxilary tool that detects and removes headers from the following systems:
+A simple auxilary tool that detects and removes headers and also restores headers for the following systems:
 <ul>
 	<li>Atari 7800</li>
 	<li>Atari Lynx</li>
@@ -36,7 +36,7 @@ A simple auxilary tool that detects and removes headers from the following syste
 	<li>Nintendo Entertainment System / Famicom</li>
 	<li>Super Nintendo Entertainment System</li>
 </ul>
-It can also save the removed header, in case you need to reconstruct the original file.
+The saved headers are currently stored in a database; one header per file. This restriction may be lifted in the future.
 
 <h3>Contributions</h3>
 
