@@ -6,7 +6,14 @@ This project is a desktop port of some core features of Wizard of DATz Redux. Fo
 
 <h3>Features</h3>
 
-Currently, SabreTools consists of two main programs: DATabase and Deheader.
+Currently, SabreTools consists of three programs: SabreTools UI, DATabase, and Deheader.
+
+<b>SabreTools UI</b>
+<p/>
+A bare-bones attempt at providing a true GUI experience for the SabreTools suite. Currently only provides the following functions:
+<ul>
+	<li>Importing and Generating DAT files in RomVault and XML formats</li>
+</ul>
 
 <b>DATabase</b>
 <p/>
