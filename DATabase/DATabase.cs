@@ -362,7 +362,7 @@ or 'b' to go back to the previous menu:");
 			// Check to see if the second argument is a directory that exists
 			else if (filename != "" && Directory.Exists(filename))
 			{
-				foreach (string file in Directory.GetFiles(filename, "*", SearchOption.TopDirectoryOnly))
+				foreach (string file in Directory.GetFiles(filename, "*", SearchOption.AllDirectories))
 				{
 					logger.Log("Beginning import of " + file);
 					Import imp = new Import(file, _connectionString, logger);
