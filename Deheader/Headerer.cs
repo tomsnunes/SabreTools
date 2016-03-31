@@ -13,7 +13,7 @@ namespace SabreTools
 	/// </summary>
 	class Headerer
 	{
-		private static string _version = "0.2.4.0";
+		private static string _version = "0.2.5.0";
 		private static string _dbName = "Headerer.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
 		private static Dictionary<string, int> types;
@@ -187,7 +187,7 @@ Options:
 				sha1.ComputeHash(File.ReadAllBytes(file + ".new"));
 				bool exists = false;
 
-				string query = @"SELECT * FROM data WHERE sha1='" + BitConverter.ToString(sha1.Hash) + "'";
+				string query = @"SELECT * FROM data WHERE sha1='" + BitConverter.ToString(sha1.Hash) + "' AND header='" + realhead + "'";
 				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 				{
 					dbc.Open();
@@ -220,7 +220,7 @@ Options:
 		}
 
 		/// <summary>
-		/// Detect and replace header to the given file
+		/// Detect and replace header(s) to the given file
 		/// </summary>
 		/// <param name="file">Name of the file to be parsed</param>
 		private static void ReplaceHeader(string file)
@@ -230,7 +230,7 @@ Options:
 			sha1.ComputeHash(File.ReadAllBytes(file));
 			string hash = BitConverter.ToString(sha1.Hash);
 
-			// Then try to pull the corresponding thing from the database
+			// Then try to pull the corresponding headers from the database
 			string header = "";
 
 			string query = @"SELECT header, type FROM data WHERE sha1='" + hash + "'";
@@ -243,32 +243,33 @@ Options:
 					{
 						if (sldr.HasRows)
 						{
-							sldr.Read();
-							Console.WriteLine("Found match with rom type " + sldr.GetString(1));
-							header = sldr.GetString(0);
+							int sub = 0;
+							while (sldr.Read())
+							{
+								Console.WriteLine("Found match with rom type " + sldr.GetString(1));
+								header = sldr.GetString(0);
+
+								Console.WriteLine("Creating reheadered file: " + file + ".new" + sub);
+								BinaryWriter bw = new BinaryWriter(File.OpenWrite(file + ".new" + sub));
+
+								// Source: http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
+								for (int i = 0; i < header.Length; i += 2)
+								{
+									bw.Write(Convert.ToByte(header.Substring(i, 2), 16));
+								}
+								bw.Write(File.ReadAllBytes(file));
+								bw.Close();
+								Console.WriteLine("Reheadered file created!");
+							}
+						}
+						else
+						{
+							Console.WriteLine("No matching header could be found!");
+							return;
 						}
 					}
 				}
 			}
-
-			// If the header isn't null, add it to the file. Otherwise tell the user
-			if (header == "")
-			{
-				Console.WriteLine("No matching header could be found!");
-				return;
-			}
-
-			Console.WriteLine("Creating reheadered file: " + file + ".new");
-			BinaryWriter bw = new BinaryWriter(File.OpenWrite(file + ".new"));
-
-			// Source: http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
-			for (int i = 0; i < header.Length; i += 2)
-			{
-				bw.Write(Convert.ToByte(header.Substring(i, 2), 16));
-			}
-			bw.Write(File.ReadAllBytes(file));
-			bw.Close();
-			Console.WriteLine("Reheadered file created!");
 		}
 
 		/// <summary>
@@ -292,9 +293,10 @@ Options:
 				// Make sure the database has the correct schema
 				string query = @"
 CREATE TABLE IF NOT EXISTS data (
-	'sha1'		TEXT PRIMARY KEY		NOT NULL,
-	'header'	TEXT					NOT NULL,
-	'type'		TEXT					NOT NULL
+	'sha1'		TEXT		NOT NULL,
+	'header'	TEXT		NOT NULL,
+	'type'		TEXT		NOT NULL,
+	PRIMARY KEY (sha1, header, type)
 )";
 				SQLiteCommand slc = new SQLiteCommand(query, dbc);
 				slc.ExecuteNonQuery();

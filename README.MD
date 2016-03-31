@@ -36,7 +36,7 @@ A simple auxilary tool that detects and removes headers and also restores header
 	<li>Nintendo Entertainment System / Famicom</li>
 	<li>Super Nintendo Entertainment System</li>
 </ul>
-The saved headers are currently stored in a database; one header per file. This restriction may be lifted in the future.
+The saved headers are currently stored in a database; multiple headers allowed per file.
 
 <h3>Contributions</h3>
 
