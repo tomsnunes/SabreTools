@@ -289,6 +289,7 @@ Options:
   -g, --generate	Start tool in generate mode
 			  system=sy,...		List of system IDs
 			  source=so,...		List of source IDs
+			  out=dir			Output directory
 			  -nr, --no-rename	Don't auto-rename games
 			  -old, --romvault	Produce a DAT in RV format
   -ga, --generate-all	Start tool in generate all mode
@@ -297,9 +298,6 @@ Options:
   -c, --convert		Convert a RV DAT to XML
 			  A filename or folder is required to run
   -l, --log		Enable logging of program output
-
-Filenames and directories can't start with '-', 'system=', or 'source='
-unless prefixed by 'input='
 ");
 
 			Console.Write("\nPress any key to continue...");
@@ -313,7 +311,10 @@ Database Options:
 			  url=ul		URL (source only)
   -r, --remove	Remove a system or source from the database
 			  system=sy		System ID
-			  source=so			Source ID");
+			  source=so			Source ID
+
+Filenames and directories can't start with '-', 'system=', or 'source='
+unless prefixed by 'input='");
 			Console.Write("\nPress any key to continue...");
 			Console.ReadKey();
 			return;
