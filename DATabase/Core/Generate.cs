@@ -272,6 +272,7 @@ namespace SabreTools
 		/// <summary>
 		/// Preprocess the rom data that is to be included in the outputted DAT
 		/// </summary>
+		/// <remarks>To make this even more accurate, files with a more recent "LastUpdated" should be considered the parent if all else is the same.</remarks>
 		/// <returns>A List of RomData objects containing all information about the files</returns>
 	    public List<RomData> ProcessRoms()
 		{
