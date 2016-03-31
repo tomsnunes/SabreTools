@@ -56,11 +56,11 @@ namespace SabreTools.Helper
 					XElement temp = new XElement(gc[1].Value);
 
 					// Loop over all attributes and add them if possible
-					for (int i = 1; i < gc.Count; i++)
+					for (int i = 2; i < gc.Count - 1; i++)
 					{
-						if (i + 2 < gc.Count)
+						if (i + 1 < gc.Count && gc[i].Value != "")
 						{
-							temp.SetAttributeValue(gc[i+1].Value, gc[i+2].Value);
+							temp.SetAttributeValue(gc[i].Value, gc[i+1].Value);
 							i++;
 						}
 					}
