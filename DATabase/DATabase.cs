@@ -472,7 +472,7 @@ Make a selection:
 
     1) " + (norename ? "Enable game renaming" : "Disable game renaming") + @"
     2) " + (old ? "Enable XML output" : "Enable RomVault output") + @"
-	3) Enter an output folder
+    3) Enter an output folder
     4) Generate all DAT files
     B) Go back to the previous menu
 ");

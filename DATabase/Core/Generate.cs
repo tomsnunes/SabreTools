@@ -50,9 +50,15 @@ namespace SabreTools
 			// Take care of special outfolder cases
 			_outdir = (outdir == "" ? outdir :
 				(outdir.Contains("/") && !outdir.EndsWith("/") ? outdir + "/" :
-					(outdir.Contains("\\") && !outdir.EndsWith("\\") ? outdir + "\\" : outdir)
+					(outdir.Contains("\\") && !outdir.EndsWith("\\") ? outdir + "\\" :
+						(!outdir.Contains("/") && !outdir.Contains("\\") ? outdir + "\\" : outdir)
+					)
 				)
 			);
+			if (!Directory.Exists(_outdir))
+			{
+				Directory.CreateDirectory(_outdir);
+			}
 
 			_headers = new Dictionary<int, string>();
 			_headers.Add(25, "a7800.xml");
@@ -74,7 +80,7 @@ namespace SabreTools
 			int id = 0;
 			if (_sources != "" && Int32.TryParse(_sources, out id) && id <= 14)
             {
-				_logger.Log("This source (" + id + ") is import-only so a DAT cannot be created. We apologize for the inconvenience.");
+				_logger.Warning("This source (" + id + ") is import-only so a DAT cannot be created. We apologize for the inconvenience.");
 				return false;
 			}
 
