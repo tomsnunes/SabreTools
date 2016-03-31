@@ -19,6 +19,7 @@ namespace SabreTools
 		// Private instance variables
 		private string _systems;
 		private string _sources;
+		private string _outdir;
 		private string _connectionString;
 		private bool _norename;
 		private bool _old;
@@ -32,11 +33,12 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="systems">Comma-separated list of systems to be included in the DAT (blank means all)</param>
 		/// <param name="sources">Comma-separated list of sources to be included in the DAT (blank means all)</param>
+		/// <param name="outdir">The output folder where the generated DAT will be put; blank means the current directory</param>
 		/// <param name="connectionString">Connection string for SQLite</param>
 		/// <param name="logger">Logger object for file or console output</param>
 		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
 		/// <param name="old">True if the output file should be in RomVault format (default false)</param>
-		public Generate(string systems, string sources, string connectionString, Logger logger, bool norename = false, bool old = false)
+		public Generate(string systems, string sources, string outdir, string connectionString, Logger logger, bool norename = false, bool old = false)
 		{
 			_systems = systems;
 			_sources = sources;
@@ -44,6 +46,13 @@ namespace SabreTools
 			_norename = norename;
 			_old = old;
 			_logger = logger;
+
+			// Take care of special outfolder cases
+			_outdir = (outdir == "" ? outdir :
+				(outdir.Contains("/") && !outdir.EndsWith("/") ? outdir + "/" :
+					(outdir.Contains("\\") && !outdir.EndsWith("\\") ? outdir + "\\" : outdir)
+				)
+			);
 
 			_headers = new Dictionary<int, string>();
 			_headers.Add(25, "a7800.xml");
@@ -168,11 +177,11 @@ namespace SabreTools
 			string datname = systemname + " (" + sourcename + " " + version + ")";
 
 			// Create and open an output file for writing (currently uses current time, change to "last updated time"
-			_logger.Log("Opening file for writing: " + datname + (_old ? ".dat" : ".xml"));
+			_logger.Log("Opening file for writing: " + _outdir + datname + (_old ? ".dat" : ".xml"));
 			
 			try
 			{
-				FileStream fs = File.Create(datname + (_old ? ".dat" : ".xml"));
+				FileStream fs = File.Create(_outdir + datname + (_old ? ".dat" : ".xml"));
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
 				// Temporarilly set _system if we're in MEGAMERGED mode to get the right header skip XML

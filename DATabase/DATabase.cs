@@ -53,7 +53,7 @@ namespace SabreTools
 			bool help = false, import = false, generate = false, convert = false,
 				listsys = false, listsrc = false, norename = false, old = false,
 				log = false, genall = false, add = false, rem = false, skip = false;
-			string systems = "", sources = "", input = "", manu = "", url = "";
+			string systems = "", sources = "", input = "", manu = "", url = "", outdir = "";
 			foreach (string arg in args)
 			{
 				// Main functions
@@ -76,6 +76,7 @@ namespace SabreTools
 				// User input strings
 				systems = (arg.StartsWith("system=") && systems == "" ? arg.Split('=')[1] : systems);
 				sources = (arg.StartsWith("source=") && sources == "" ? arg.Split('=')[1] : sources);
+				outdir = (arg.StartsWith("out=") && outdir == "" ? arg.Split('=')[1] : outdir);
 				manu = (arg.StartsWith("manu=") && manu == "" ? arg.Split('=')[1] : manu);
 				url = (arg.StartsWith("url=") && url == "" ? arg.Split('=')[1] : url);
 
@@ -84,6 +85,7 @@ namespace SabreTools
 				input = (!arg.StartsWith("-") && 
 					!arg.StartsWith("source=") &&
 					!arg.StartsWith("system=") &&
+					!arg.StartsWith("out=") &&
 					!arg.StartsWith("manu=") &&
 					!arg.StartsWith("url=") &&
 					!arg.StartsWith("input=") &&
@@ -118,13 +120,13 @@ namespace SabreTools
 			// Generate a DAT
 			else if (generate)
 			{
-				InitGenerate(systems, sources, norename, old);
+				InitGenerate(systems, sources, outdir, norename, old);
 			}
 
 			// Generate all DATs
 			else if (genall)
 			{
-				InitGenerateAll(norename, old);
+				InitGenerateAll(outdir, norename, old);
 			}
 
 			// List all available sources
@@ -382,7 +384,7 @@ or 'b' to go back to the previous menu:");
 		/// </summary>
 		private static void GenerateMenu()
 		{
-			string selection = "", systems = "", sources = "";
+			string selection = "", systems = "", sources = "", outdir = "";
 			bool norename = false, old = false;
 			while (selection.ToLowerInvariant() != "b")
 			{
@@ -396,7 +398,8 @@ Make a selection:
     2) " + (old ? "Enable XML output" : "Enable RomVault output") + @"
     3) Enter a list of systems to generate from
     4) Enter a list of sources to generate from
-    5) Generate the DAT file
+    5) Enter an output folder
+    6) Generate the DAT file
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -423,7 +426,12 @@ Make a selection:
 						break;
 					case "5":
 						Console.Clear();
-						InitGenerate(systems, sources, norename, old);
+						Console.Write("Please enter a folder name: ");
+						outdir = Console.ReadLine();
+						break;
+					case "6":
+						Console.Clear();
+						InitGenerate(systems, sources, outdir, norename, old);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
@@ -439,9 +447,9 @@ Make a selection:
 		/// <param name="sources">Comma-separated list of sources to be included in the DAT (blank means all)</param>
 		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
 		/// <param name="old">True if the output file should be in RomVault format (default false)</param>
-		private static void InitGenerate(string systems, string sources, bool norename, bool old)
+		private static void InitGenerate(string systems, string sources, string outdir, bool norename, bool old)
 		{
-			Generate gen = new Generate(systems, sources, _connectionString, logger, norename, old);
+			Generate gen = new Generate(systems, sources, outdir, _connectionString, logger, norename, old);
 			gen.Export();
 			return;
 		}
@@ -451,7 +459,7 @@ Make a selection:
 		/// </summary>
 		private static void GenerateAllMenu()
 		{
-			string selection = "";
+			string selection = "", outdir = "";
 			bool norename = false, old = false;
 			while (selection.ToLowerInvariant() != "b")
 			{
@@ -463,7 +471,8 @@ Make a selection:
 
     1) " + (norename ? "Enable game renaming" : "Disable game renaming") + @"
     2) " + (old ? "Enable XML output" : "Enable RomVault output") + @"
-    3) Generate all DAT files
+	3) Enter an output folder
+    4) Generate all DAT files
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -478,7 +487,12 @@ Make a selection:
 						break;
 					case "3":
 						Console.Clear();
-						InitGenerateAll(norename, old);
+						Console.Write("Please enter a folder name: ");
+						outdir = Console.ReadLine();
+						break;
+					case "4":
+						Console.Clear();
+						InitGenerateAll(outdir, norename, old);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
@@ -492,7 +506,7 @@ Make a selection:
 		/// </summary>
 		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
 		/// <param name="old">True if the output file should be in RomVault format (default false)</param>
-		private static void InitGenerateAll(bool norename, bool old)
+		private static void InitGenerateAll(string outdir, bool norename, bool old)
 		{
 			// Generate system-merged
 			string query = @"SELECT DISTINCT systems.id
@@ -516,7 +530,7 @@ Make a selection:
 
 						while (sldr.Read())
 						{
-							InitGenerate(sldr.GetInt32(0).ToString(), "", norename, old);
+							InitGenerate(sldr.GetInt32(0).ToString(), "", outdir, norename, old);
 
 							// Generate custom
 							string squery = @"SELECT DISTINCT sources.id
@@ -541,7 +555,7 @@ Make a selection:
 
 									while (ssldr.Read())
 									{
-										InitGenerate(sldr.GetInt32(0).ToString(), ssldr.GetInt32(0).ToString(), norename, old);
+										InitGenerate(sldr.GetInt32(0).ToString(), ssldr.GetInt32(0).ToString(), outdir, norename, old);
 									}
 								}
 							}
@@ -569,14 +583,14 @@ Make a selection:
 
 						while (sldr.Read())
 						{
-							InitGenerate("", sldr.GetInt32(0).ToString(), norename, old);
+							InitGenerate("", sldr.GetInt32(0).ToString(), outdir, norename, old);
 						}
 					}
 				}
 			}
 
 			// Generate MEGAMERGED
-			InitGenerate("", "", norename, old);
+			InitGenerate("", "", outdir, norename, old);
 			return;
 		}
 
