@@ -55,7 +55,7 @@ namespace SabreTools
 					)
 				)
 			);
-			if (!Directory.Exists(_outdir))
+			if (_outdir != "" && !Directory.Exists(_outdir))
 			{
 				Directory.CreateDirectory(_outdir);
 			}
