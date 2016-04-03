@@ -245,7 +245,7 @@
 	<mapping from="nascom_flop" to="Nascom - I, II" />
 	<mapping from="nascom_socket" to="Nascom - I, II" />
 	<mapping from="neocd" to="SNK - Neo Geo CD" />
-	<mapping from="neogeo" to="SNK - Neo-Geo" />
+	<mapping from="neogeo" to="SNK - Neo Geo" />
 	<mapping from="nes" to="Nintendo - Nintendo Entertainment System" />
 	<mapping from="nes_ade" to="Nintendo - Nintendo Entertainment System" />
 	<mapping from="nes_datach" to="Nintendo - Nintendo Entertainment System" />
