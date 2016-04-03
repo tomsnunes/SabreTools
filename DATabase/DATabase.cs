@@ -627,7 +627,7 @@ or 'b' to go back to the previous menu:
 				if (selection.ToLowerInvariant() != "b")
 				{
 					Console.Clear();
-					InitConvertXML(selection);
+					InitConvertRV(selection);
 					Console.Write("\nPress any key to continue...");
 					Console.ReadKey();
 				}
