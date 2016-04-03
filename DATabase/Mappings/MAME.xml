@@ -128,6 +128,7 @@
 	<mapping from="ec1841" to="MPO BT - EC 1841" />
 	<mapping from="einstein" to="Tatung - Einstein TC-01" />
 	<mapping from="electron_cart" to="Acorn - BBC, Electron" />
+	<mapping from="electron_cass" to="Acorn - BBC, Electron" />
 	<mapping from="ep64_cart" to="Enterprise - 64" />
 	<mapping from="ep64_cass" to="Enterprise - 64" />
 	<mapping from="ep64_flop" to="Enterprise - 64" />
@@ -135,6 +136,7 @@
 	<mapping from="exl100" to="Exelvision Exeltel, EXL100" />
 	<mapping from="famicom_cass" to="Nintendo - Famicom BASIC" />
 	<mapping from="famicom_flop" to="Nintendo - Famicom Disk System" />
+	<mapping from="fidel_scc" to="Fidelity - SCC" />
 	<mapping from="fm77av" to="Fujitsu - FM-77AV" />
 	<mapping from="fm7_cass" to="Fujitsu - FM-7" />
 	<mapping from="fm7_disk" to="Fujitsu - FM-7" />
@@ -143,7 +145,7 @@
 	<mapping from="galaxy" to="Galaksija  - Galaksija, Galaksija Plus" />
 	<mapping from="gamate" to="Bit Corp - Gamate" />
 	<mapping from="gameboy" to="Nintendo - Game Boy" />
-	<mapping from="gamecom" to="Tiger - Game.com" />
+	<mapping from="gamecom" to="Tiger Electronics - Game.com" />
 	<mapping from="gamegear" to="Sega - Game Gear" />
 	<mapping from="gameking" to="TimeTop - GameKing" />
 	<mapping from="gameking3" to="TimeTop - GameKing" />
@@ -184,6 +186,7 @@
 	<mapping from="jaguar" to="Atari - Jaguar" />
 	<mapping from="juicebox" to="Mattel - Juice Box" />
 	<mapping from="jupace_cass" to="Jupiter Cantab - Jupiter Ace" />
+	<mapping from="k28m2" to="Tiger Electronics - K28" />
 	<mapping from="kayproii" to="Kaypro - II" />
 	<mapping from="kc_cart" to="Robotron - KC85" />
 	<mapping from="kc_cass" to="Robotron - KC85" />
@@ -198,6 +201,7 @@
 	<mapping from="m20" to="Olivetti - M20" />
 	<mapping from="m5_cart" to="Sord - M5" />
 	<mapping from="m5_cass" to="Sord - M5" />
+	<mapping from="m5_flop" to="Sord - M5" />
 	<mapping from="mac_flop" to="Apple - Macintosh" />
 	<mapping from="mac_hdd" to="Apple - Macintosh" />
 	<mapping from="mbc200" to="Sanyo - MBC-200, MBC-1200" />
@@ -292,6 +296,8 @@
 	<mapping from="plus4_cass" to="Commodore - Plus-4" />
 	<mapping from="plus4_flop" to="Commodore - Plus-4" />
 	<mapping from="pmd85_cass" to="Tesla - PMD 85" />
+	<mapping from="pockchalv1" to="Benesse - Pocket Challenge V" />
+	<mapping from="pockchalv2" to="Benesse - Pocket Challenge V" />
 	<mapping from="pokemini" to="Nintendo - Pokemon Mini" />
 	<mapping from="pro128_cart" to="Olivetti - Prodest PC 128" />
 	<mapping from="pro128s_flop" to="Olivetti - Prodest PC 128" />

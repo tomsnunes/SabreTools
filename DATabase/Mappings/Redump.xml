@@ -24,8 +24,8 @@
 	<mapping from="NEC - PC-FX - PC-FXGA" to="NEC - PC FX, PC FXGA" />
 	<mapping from="Nintendo - GameCube - BIOS Images" to="Nintendo - GameCube" />
 	<mapping from="Nintendo - GameCube" to="Nintendo - GameCube" />
-	<mapping from="Nintendo - Wii" to="Nintendo - Wii" />
-	<mapping from="Nintendo - Wii U" to="Nintendo - Wii U" />
+	<mapping from="Nintendo - Wii" to="Nintendo - Nintendo Wii" />
+	<mapping from="Nintendo - Wii U" to="Nintendo - Nintendo Wii U" />
 	<mapping from="Palm" to="Hewlett-Packard - Palm" />
 	<mapping from="Panasonic - 3DO Interactive Multiplayer" to="Panasonic - 3DO Interactive Multiplayer" />
 	<mapping from="Philips - CD-i" to="Philips - CD-i" />
