@@ -36,6 +36,7 @@ Options:
 			types.Add("a7800", 128);
 			types.Add("fds", 16);
 			types.Add("lynx", 64);
+			types.Add("pce", 512);
 			types.Add("nes", 16);
 			types.Add("snes", 512);
 
@@ -146,6 +147,10 @@ Options:
 			else if (Regex.IsMatch(header, "^4C594E58") || Regex.IsMatch(header, "^425339"))
 			{
 				type = "lynx";
+			}
+			else if (Regex.IsMatch(header, "^4000000000000000AABB02"))
+			{
+				type = "pce";
 			}
 			else if (Regex.IsMatch(header, "^4E45531A"))
 			{
