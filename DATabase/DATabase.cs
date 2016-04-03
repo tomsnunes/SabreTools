@@ -228,7 +228,7 @@ Make a selection:
     4) Generate all DAT files
     5) Convert a DAT file from RV to XML
     6) Convert a DAT file from XML to RV
-	7) List all available sources
+    7) List all available sources
     8) List all available systems
     9) Add and Remove from database
     10) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
