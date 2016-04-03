@@ -406,7 +406,7 @@ namespace SabreTools
 										foreach (XmlNode data in part.ChildNodes)
 										{
 											// If we find a rom or disk, add it
-											if (data.NodeType == XmlNodeType.Element && (data.Name == "rom" || data.Name == "disk"))
+											if (data.NodeType == XmlNodeType.Element && (data.Name == "rom" || data.Name == "disk") && data.Attributes["name"] != null)
 											{
 												AddRom(
 													data.Name,
