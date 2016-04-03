@@ -248,9 +248,6 @@ namespace SabreTools.Helper
 				node = node.NextSibling;
 			}
 
-			Console.WriteLine(output);
-			Console.Read();
-
 			return output;
 		}
     }
