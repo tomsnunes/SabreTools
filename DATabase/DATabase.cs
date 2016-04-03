@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SQLite;
 using System.IO;
+using System.Xml;
 using System.Xml.Linq;
 
 using SabreTools.Helper;
@@ -50,7 +51,7 @@ namespace SabreTools
 			}
 
 			// Determine which switches are enabled (with values if necessary)
-			bool help = false, import = false, generate = false, convert = false,
+			bool help = false, import = false, generate = false, convertXml = false, convertRV = false,
 				listsys = false, listsrc = false, norename = false, old = false,
 				log = false, genall = false, add = false, rem = false, skip = false;
 			string systems = "", sources = "", input = "", manu = "", url = "", outdir = "";
@@ -61,7 +62,8 @@ namespace SabreTools
 				import = import || (arg == "-i" || arg == "--import");
 				generate = generate || (arg == "-g" || arg == "--generate");
 				genall = genall || (arg == "-ga" || arg == "--generate-all");
-				convert = convert || (arg == "-c" || arg == "--convert");
+				convertRV = convertRV || (arg == "-cr" || arg == "--convert-rv");
+				convertXml = convertXml || (arg == "-cx" || arg == "--convert-xml");
 				listsys = listsys || (arg == "-lsy" || arg == "--list-systems");
 				listsrc = listsrc || (arg == "-lso" || arg == "--list-sources");
 				add = add || (arg == "-a" || arg == "--add");
@@ -99,7 +101,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(import ^ generate ^ listsys ^ listsrc ^ genall ^ add ^ rem))
+			if (help || !(import ^ generate ^ listsys ^ listsrc ^ genall ^ add ^ rem ^ convertRV ^ convertXml))
 			{
 				Help();
 				logger.Close();
@@ -141,10 +143,16 @@ namespace SabreTools
 				ListSystems();
 			}
 
-			// Convert RV DAT to XML DAT
-			else if (convert)
+			// Convert XML DAT to RV DAT
+			else if (convertRV)
 			{
-				InitConvert(input);
+				InitConvertRV(input);
+			}
+
+			// Convert RV DAT to XML DAT
+			else if (convertXml)
+			{
+				InitConvertXML(input);
 			}
 
 			// Add a source or system
@@ -219,10 +227,11 @@ Make a selection:
     3) Generate a DAT file
     4) Generate all DAT files
     5) Convert a DAT file from RV to XML
-    6) List all available sources
-    7) List all available systems
-    8) Add and Remove from database
-    9) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
+    6) Convert a DAT file from XML to RV
+	7) List all available sources
+    8) List all available systems
+    9) Add and Remove from database
+    10) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
     X) Exit Program
 ");
 				Console.Write("Enter selection: ");
@@ -243,26 +252,29 @@ Make a selection:
 						GenerateAllMenu();
 						break;
 					case "5":
-						ConvertMenu();
+						ConvertXMLMenu();
 						break;
 					case "6":
+						ConvertRVMenu();
+						break;
+					case "7":
 						Console.Clear();
 						PrintHeader();
 						ListSources();
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
-					case "7":
+					case "8":
 						Console.Clear();
 						PrintHeader();
 						ListSystems();
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
-					case "8":
+					case "9":
 						AddRemoveMenu();
 						break;
-					case "9":
+					case "10":
 						logger.ToFile = !logger.ToFile;
 						break;
 				}
@@ -295,7 +307,8 @@ Options:
   -ga, --generate-all	Start tool in generate all mode
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
-  -c, --convert		Convert a RV DAT to XML
+  -cr, --convert-rv			Convert an XML DAT to RV
+  -cx, --convert-xml		Convert a RV DAT to XML
 			  A filename or folder is required to run
   -l, --log		Enable logging of program output
 ");
@@ -596,25 +609,25 @@ Make a selection:
 		}
 
 		/// <summary>
-		/// Show the text-based conversion menu
+		/// Show the text-based XML to RV conversion menu
 		/// </summary>
-		private static void ConvertMenu()
+		private static void ConvertRVMenu()
 		{
 			string selection = "";
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
 				PrintHeader();
-				Console.WriteLine(@"CONVERT MENU
+				Console.WriteLine(@"XML -> RV CONVERT MENU
 ===========================
-Enter the name of a DAT file to convert from RV to XML
+Enter the name of a DAT file to convert from XML to RV
 or 'b' to go back to the previous menu:
 ");
 				selection = Console.ReadLine();
 				if (selection.ToLowerInvariant() != "b")
 				{
 					Console.Clear();
-					InitConvert(selection);
+					InitConvertXML(selection);
 					Console.Write("\nPress any key to continue...");
 					Console.ReadKey();
 				}
@@ -623,10 +636,70 @@ or 'b' to go back to the previous menu:
 		}
 
 		/// <summary>
-		/// Wrap converting DAT file from RomValut to XML
+		/// Wrap converting DAT file from XML to RomVault
 		/// </summary>
 		/// <param name="filename"></param>
-		private static void InitConvert(string filename)
+		private static void InitConvertRV(string filename)
+		{
+			if (File.Exists(filename))
+			{
+				Console.WriteLine("Converting " + filename);
+				XmlDocument doc = new XmlDocument();
+				try
+				{
+					doc.LoadXml(File.ReadAllText(filename));
+					string conv = Converters.XMLToRomVault(doc);
+					FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(filename) + ".new.dat");
+					StreamWriter sw = new StreamWriter(fs);
+					sw.Write(conv);
+					sw.Close();
+					fs.Close();
+					Console.WriteLine("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.dat");
+				}
+				catch (XmlException ex)
+				{
+					logger.Warning("The file " + filename + " could not be parsed as an XML file.");
+				}
+			}
+			else
+			{
+				Console.WriteLine("I'm sorry but " + filename + "doesn't exist!");
+			}
+			return;
+		}
+
+		/// <summary>
+		/// Show the text-based RV to XML conversion menu
+		/// </summary>
+		private static void ConvertXMLMenu()
+		{
+			string selection = "";
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				PrintHeader();
+				Console.WriteLine(@"RV -> XML CONVERT MENU
+===========================
+Enter the name of a DAT file to convert from RV to XML
+or 'b' to go back to the previous menu:
+");
+				selection = Console.ReadLine();
+				if (selection.ToLowerInvariant() != "b")
+				{
+					Console.Clear();
+					InitConvertXML(selection);
+					Console.Write("\nPress any key to continue...");
+					Console.ReadKey();
+				}
+			}
+			return;
+		}
+
+		/// <summary>
+		/// Wrap converting DAT file from RomVault to XML
+		/// </summary>
+		/// <param name="filename"></param>
+		private static void InitConvertXML(string filename)
 		{
 			if (File.Exists(filename))
 			{

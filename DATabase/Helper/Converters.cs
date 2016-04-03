@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace SabreTools.Helper
@@ -138,5 +139,119 @@ namespace SabreTools.Helper
 
 			return elem;
 		}
-	}
+
+		/// <summary>
+		/// Convert an XML derived DAT to a RomVault style DAT
+		/// </summary>
+		/// <param name="root">XElement representing the file</param>
+		/// <returns>String representing the output RomVault DAT file</returns>
+		public static String XMLToRomVault(XmlDocument root)
+		{
+			string output = "";
+
+			// Experimental looping using only XML parsing
+			XmlNode node = root.FirstChild;
+			if (node != null && node.Name == "xml")
+			{
+				// Skip over everything that's not an element
+				while (node.NodeType != XmlNodeType.Element)
+				{
+					node = node.NextSibling;
+				}
+			}
+
+			// Once we find the main body, enter it
+			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
+			{
+				node = node.FirstChild;
+			}
+
+			// Read the header if it exists
+			if (node != null && node.Name == "header")
+			{
+				output += "clrmamepro (";
+
+				XmlNode child = node.FirstChild;
+				while (child != null)
+				{
+					output += "\n\t" + child.Name + " \"" + child.InnerText + "\"";
+					child = child.NextSibling;
+				}
+				output += "\n)";
+
+				// Skip over anything that's not an element
+				while (node.NodeType != XmlNodeType.Element)
+				{
+					node = node.NextSibling;
+				}
+			}
+
+			while (node != null)
+			{
+				if (node.NodeType == XmlNodeType.Element && (node.Name == "machine" || node.Name == "game" || node.Name == "software"))
+				{
+					// There are rare cases where a malformed XML will not have the required attributes. We can only skip them.
+					if (node.Attributes.Count == 0)
+					{
+						node = node.NextSibling;
+						continue;
+					}
+
+					output += "\ngame (\n\tname \"" + node.Attributes["name"].Value;
+
+					// Get the roms from the machine
+					if (node.HasChildNodes)
+					{
+						// If this node has children, traverse the children
+						foreach (XmlNode child in node.ChildNodes)
+						{
+							// If we find a rom or disk, add it
+							if (node.NodeType == XmlNodeType.Element && (child.Name == "rom" || child.Name == "disk"))
+							{
+								output += "\n\t" + child.Name + " ( name \"" + child.Attributes["name"].Value + "\"" + 
+									(child.Attributes["size"] != null ? " size " + Int32.Parse(child.Attributes["size"].Value) : "") +
+									(child.Attributes["crc"] != null ? " crc " + child.Attributes["crc"].Value.ToLowerInvariant().Trim() : "") +
+									(child.Attributes["md5"] != null ? " md5 " + child.Attributes["md5"].Value.ToLowerInvariant().Trim() : "") +
+									(child.Attributes["sha1"] != null ? " sha1 " + child.Attributes["sha1"].Value.ToLowerInvariant().Trim() : "") + " )";
+							}
+							// If we find the signs of a software list, traverse the children
+							else if (child.NodeType == XmlNodeType.Element && child.Name == "part" && child.HasChildNodes)
+							{
+								foreach (XmlNode part in child.ChildNodes)
+								{
+									// If we find a dataarea, traverse the children
+									if (part.NodeType == XmlNodeType.Element && part.Name == "dataarea")
+									{
+										foreach (XmlNode data in part.ChildNodes)
+										{
+											// If we find a rom or disk, add it
+											if (data.NodeType == XmlNodeType.Element && (data.Name == "rom" || data.Name == "disk") && data.Attributes["name"] != null)
+											{
+												output += "\n\t" + data.Name + " ( name \"" + data.Attributes["name"].Value +
+													(data.Attributes["size"] != null ? " size " + Int32.Parse(data.Attributes["size"].Value) : "") +
+													(data.Attributes["crc"] != null ? " crc " + data.Attributes["crc"].Value.ToLowerInvariant().Trim() : "") +
+													(data.Attributes["md5"] != null ? " md5 " + data.Attributes["md5"].Value.ToLowerInvariant().Trim() : "") +
+													(data.Attributes["sha1"] != null ? " sha1 " + data.Attributes["sha1"].Value.ToLowerInvariant().Trim() : "") + " )";
+											}
+										}
+									}
+								}
+							}
+							else
+							{
+								output += "\n\t" + child.Name + " \"" + child.InnerText + "\"";
+							}
+						}
+					}
+					output += "\n)";
+				}
+				node = node.NextSibling;
+			}
+
+			Console.WriteLine(output);
+			Console.Read();
+
+			return output;
+		}
+    }
 }
