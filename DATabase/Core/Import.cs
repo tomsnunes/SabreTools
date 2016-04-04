@@ -385,14 +385,14 @@ namespace SabreTools
 							if (node.NodeType == XmlNodeType.Element && (child.Name == "rom" || child.Name == "disk"))
 							{
 								// Take care of hex-sized files
-								int size = -1;
+								long size = -1;
 								if (child.Attributes["size"] != null && child.Attributes["size"].Value.Contains("0x"))
 								{
-									size = Convert.ToInt32(child.Attributes["size"].Value, 16);
+									size = Convert.ToInt64(child.Attributes["size"].Value, 16);
 								}
 								else if (child.Attributes["size"] != null)
 								{
-									size = Int32.Parse(child.Attributes["size"].Value);
+									size = Int64.Parse(child.Attributes["size"].Value);
                                 }
 
 								AddRom(
@@ -420,14 +420,14 @@ namespace SabreTools
 											if (data.NodeType == XmlNodeType.Element && (data.Name == "rom" || data.Name == "disk") && data.Attributes["name"] != null)
 											{
 												// Take care of hex-sized files
-												int size = -1;
+												long size = -1;
 												if (data.Attributes["size"] != null && data.Attributes["size"].Value.Contains("0x"))
 												{
-													size = Convert.ToInt32(data.Attributes["size"].Value, 16);
+													size = Convert.ToInt64(data.Attributes["size"].Value, 16);
 												}
 												else if (data.Attributes["size"] != null)
 												{
-													size = Int32.Parse(data.Attributes["size"].Value);
+													size = Int64.Parse(data.Attributes["size"].Value);
 												}
 
 												AddRom(
@@ -529,7 +529,7 @@ namespace SabreTools
 		/// <param name="md5">MD5 hash of the file</param>
 		/// <param name="sha1">SHA-1 hash of the file</param>
 		/// <returns>True if the file exists or could be added, false on error</returns>
-		private bool AddRom(string romtype, long gameid, string name, string date, int size, string crc, string md5, string sha1)
+		private bool AddRom(string romtype, long gameid, string name, string date, long size, string crc, string md5, string sha1)
 		{
 			// WOD origninally stripped out any subdirs from the imported files, we do the same
 			name = Path.GetFileName(name);
