@@ -32,9 +32,10 @@ A simple auxilary tool that detects and removes headers and also restores header
 <ul>
 	<li>Atari 7800</li>
 	<li>Atari Lynx</li>
+	<li>NEC PC-Engine / TurboGrafx 16</li>
 	<li>Nintendo Famicom Disk System</li>
 	<li>Nintendo Entertainment System / Famicom</li>
-	<li>Super Nintendo Entertainment System</li>
+	<li>Super Nintendo Entertainment System / Super Famicom</li>
 </ul>
 The saved headers are currently stored in a database; multiple headers allowed per file.
 
