@@ -47,6 +47,7 @@ namespace SabreTools
 		private static string _defaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
 		private static string _mamePattern = @"^(.*)\.xml$";
         private static string _nointroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
+		private static string _noIntroSpecialPattern = @"(.*? - .*?) \((\d{8}\)\.dat";
 		private static string _redumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
 		private static string _tosecPattern = @"^(.*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
 		private static string _tosecSpecialPattern = @"^(.*? - .*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
@@ -119,6 +120,12 @@ namespace SabreTools
 				type = DatType.MAME;
 			}
 			else if (Regex.IsMatch(filename, _nointroPattern))
+			{
+				fileinfo = Regex.Match(filename, _nointroPattern).Groups;
+				type = DatType.NoIntro;
+			}
+			// For N-Gage and Gizmondo only
+			else if (Regex.IsMatch(filename, _noIntroSpecialPattern))
 			{
 				fileinfo = Regex.Match(filename, _nointroPattern).Groups;
 				type = DatType.NoIntro;
