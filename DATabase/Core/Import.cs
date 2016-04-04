@@ -384,12 +384,23 @@ namespace SabreTools
 							// If we find a rom or disk, add it
 							if (node.NodeType == XmlNodeType.Element && (child.Name == "rom" || child.Name == "disk"))
 							{
+								// Take care of hex-sized files
+								int size = -1;
+								if (child.Attributes["size"] != null && child.Attributes["size"].Value.Contains("0x"))
+								{
+									size = Convert.ToInt32(child.Attributes["size"].Value, 16);
+								}
+								else if (child.Attributes["size"] != null)
+								{
+									size = Int32.Parse(child.Attributes["size"].Value);
+                                }
+
 								AddRom(
 									child.Name,
 									gameid,
 									child.Attributes["name"].Value,
 									date,
-									(child.Attributes["size"] != null ? Int32.Parse(child.Attributes["size"].Value) : -1),
+									size,
 									(child.Attributes["crc"] != null ? child.Attributes["crc"].Value.ToLowerInvariant().Trim() : ""),
 									(child.Attributes["md5"] != null ? child.Attributes["md5"].Value.ToLowerInvariant().Trim() : ""),
 									(child.Attributes["sha1"] != null ? child.Attributes["sha1"].Value.ToLowerInvariant().Trim() : "")
@@ -408,12 +419,23 @@ namespace SabreTools
 											// If we find a rom or disk, add it
 											if (data.NodeType == XmlNodeType.Element && (data.Name == "rom" || data.Name == "disk") && data.Attributes["name"] != null)
 											{
+												// Take care of hex-sized files
+												int size = -1;
+												if (data.Attributes["size"] != null && data.Attributes["size"].Value.Contains("0x"))
+												{
+													size = Convert.ToInt32(data.Attributes["size"].Value, 16);
+												}
+												else if (data.Attributes["size"] != null)
+												{
+													size = Int32.Parse(data.Attributes["size"].Value);
+												}
+
 												AddRom(
 													data.Name,
 													gameid,
 													data.Attributes["name"].Value,
 													date,
-													(data.Attributes["size"] != null ? Int32.Parse(data.Attributes["size"].Value) : -1),
+													size,
 													(data.Attributes["crc"] != null ? data.Attributes["crc"].Value.ToLowerInvariant().Trim() : ""),
 													(data.Attributes["md5"] != null ? data.Attributes["md5"].Value.ToLowerInvariant().Trim() : ""),
 													(data.Attributes["sha1"] != null ? data.Attributes["sha1"].Value.ToLowerInvariant().Trim() : "")
