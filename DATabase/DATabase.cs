@@ -307,9 +307,9 @@ Options:
   -ga, --generate-all	Start tool in generate all mode
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
-  -cr, --convert-rv			Convert an XML DAT to RV
-  -cx, --convert-xml		Convert a RV DAT to XML
-			  A filename or folder is required to run
+  -cr, --convert-rv	Convert an XML DAT to RV
+  -cx, --convert-xml	Convert a RV DAT to XML
+			  Both converters require a filename or folder
   -l, --log		Enable logging of program output
 ");
 
