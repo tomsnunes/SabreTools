@@ -51,6 +51,7 @@ namespace SabreTools
 		private static string _noIntroNumberedPattern = @"(.*? - .*?) \(.*?_CM\).dat";
 		private static string _noIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\)\.dat";
 		private static string _redumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
+		private static string _redumpBiosPattern = @"^(.*?) \(\d+\) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
 		private static string _tosecPattern = @"^(.*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
 		private static string _tosecSpecialPattern = @"^(.*? - .*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
 		private static string _truripPattern = @"^(.*?) - .* \(trurip_XML\)\.dat$";
@@ -213,8 +214,14 @@ namespace SabreTools
 				case DatType.Redump:
 					if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
 					{
-						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
-						return false;
+						// Handle special case mappings found only in TOSEC
+						fileinfo = Regex.Match(filename, _redumpBiosPattern).Groups;
+
+						if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
+						{
+							_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+							return false;
+						}
 					}
 					GroupCollection redumpInfo = Regex.Match(Remapping.Redump[fileinfo[1].Value], _remappedPattern).Groups;
 
