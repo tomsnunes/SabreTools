@@ -6,7 +6,7 @@ This project is a desktop port of some core features of Wizard of DATz Redux. Fo
 
 <h3>Features</h3>
 
-Currently, SabreTools consists of three programs: SabreTools UI, DATabase, and Headerer.
+Currently, SabreTools consists of 4 programs: SabreTools UI, DATabase, Headerer, and DatSplit.
 
 <b>SabreTools UI</b>
 <p/>
@@ -38,6 +38,10 @@ A simple auxilary tool that detects and removes headers and also restores header
 	<li>Super Nintendo Entertainment System / Super Famicom</li>
 </ul>
 The saved headers are currently stored in a database; multiple headers allowed per file.
+
+<b>DatSplit</b>
+<p/>
+This tool doesn't do everything possible for splitting DATs, most of those functions are taken care of by third-party tool <a href="http://www.logiqx.com/Tools/DatUtil/">DatUtil</a>. This tool only splits DATs based on extensions. This is useful for splitting DAT files similar to the NonGood set that can have more than one system per DAT.
 
 <h3>Contributions</h3>
 
