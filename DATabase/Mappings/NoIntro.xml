@@ -47,11 +47,11 @@
 	<mapping from="Nintendo - Nintendo 64DD" to="Nintendo - Nintendo 64DD" />
 	<mapping from="Nintendo - Nintendo DS" to="Nintendo - Nintendo DS" />
 	<mapping from="Nintendo - Nintendo DS Decrypted" to="Nintendo - Nintendo DS" />
-  <mapping from="Nintendo - Nintendo DS Encrypted" to="Nintendo - Nintendo DS" />
+	<mapping from="Nintendo - Nintendo DS Encrypted" to="Nintendo - Nintendo DS" />
 	<mapping from="Nintendo - Nintendo DS (Download Play) (BETA)" to="Nintendo - Nintendo DS" />
 	<mapping from="Nintendo - Nintendo DSi" to="Nintendo - Nintendo DSi" />
 	<mapping from="Nintendo - Nintendo DSi Decrypted" to="Nintendo - Nintendo DSi" />
-  <mapping from="Nintendo - Nintendo DSi Encrypted" to="Nintendo - Nintendo DSi" />
+	<mapping from="Nintendo - Nintendo DSi Encrypted" to="Nintendo - Nintendo DSi" />
 	<mapping from="Nintendo - Nintendo DSi (DLC)" to="Nintendo - Nintendo DSi" />
 	<mapping from="Nintendo - Nintendo Entertainment System" to="Nintendo - Nintendo Entertainment System" />
 	<mapping from="Nintendo - Nintendo Wii (DLC)" to="Nintendo - Nintendo Wii" />
