@@ -293,7 +293,7 @@ namespace SabreTools
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							_logger.Error("No suitable system for '" + filename + "' found! Please add the system and then try again.");
+							_logger.Error("No suitable system for '" + filename + "' (" + manufacturer + " " + system + ") found! Please add the system and then try again.");
 							return false;
 						}
 
