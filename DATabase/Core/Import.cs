@@ -51,7 +51,7 @@ namespace SabreTools
 		private static string _noIntroNumberedPattern = @"(.*? - .*?) \(.*?_CM\).dat";
 		private static string _noIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\)\.dat";
 		private static string _redumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
-		private static string _redumpBiosPattern = @"^(.*?) \(\d+\) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
+		private static string _redumpBiosPattern = @"^(.*?) \(\d+\) \((\d{4}-\d{2}-\d{2})\)\.dat$";
 		private static string _tosecPattern = @"^(.*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
 		private static string _tosecSpecialPattern = @"^(.*? - .*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
 		private static string _truripPattern = @"^(.*?) - .* \(trurip_XML\)\.dat$";
@@ -144,6 +144,12 @@ namespace SabreTools
 				fileinfo = Regex.Match(filename, _redumpPattern).Groups;
 				type = DatType.Redump;
 			}
+			// For special BIOSes only
+			else if (Regex.IsMatch(filename, _redumpBiosPattern))
+			{
+				fileinfo = Regex.Match(filename, _redumpBiosPattern).Groups;
+				type = DatType.Redump;
+			}
 			else if (Regex.IsMatch(filename, _tosecPattern))
 			{
 				fileinfo = Regex.Match(filename, _tosecPattern).Groups;
@@ -165,6 +171,8 @@ namespace SabreTools
 				_logger.Error("File " + filename + " cannot be imported at this time because it is not a known pattern.\nPlease try again with an unrenamed version.");
 				return false;
 			}
+
+			_logger.Log("Type detected: " + type.ToString());
 
 			// Check for and extract import information from the file name based on type
 			string manufacturer = "";
@@ -229,9 +237,18 @@ namespace SabreTools
 					system = redumpInfo[2].Value;
 					source = "Redump";
 					datestring = fileinfo[2].Value;
-					GroupCollection rdDateInfo = Regex.Match(datestring, _redumpDatePattern).Groups;
-					date = rdDateInfo[1].Value + "-" + rdDateInfo[2].Value + "-" + rdDateInfo[3].Value + " " +
-						rdDateInfo[4].Value + ":" + rdDateInfo[5].Value + ":" + rdDateInfo[6].Value;
+					if (Regex.IsMatch(datestring, _redumpDatePattern))
+					{
+						GroupCollection rdDateInfo = Regex.Match(datestring, _redumpDatePattern).Groups;
+						date = rdDateInfo[1].Value + "-" + rdDateInfo[2].Value + "-" + rdDateInfo[3].Value + " " +
+							rdDateInfo[4].Value + ":" + rdDateInfo[5].Value + ":" + rdDateInfo[6].Value;
+					}
+					else
+					{
+						GroupCollection rdDateInfo = Regex.Match(datestring, _tosecDatePattern).Groups;
+						date = rdDateInfo[1].Value + "-" + rdDateInfo[2].Value + "-" + rdDateInfo[3].Value + " 00:00:00";
+					}
+					
 					break;
 				case DatType.TOSEC:
 					if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
