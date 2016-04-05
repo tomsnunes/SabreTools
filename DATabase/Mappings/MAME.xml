@@ -43,7 +43,7 @@
 	<mapping from="apollo_ctape" to="Hewlett-Packard - Apollo" />
 	<mapping from="apple1" to="Apple - I" />
 	<mapping from="apple2" to="Apple - II" />
-	<mapping from="apple2gs" to="Apple  - II" />
+	<mapping from="apple2gs" to="Apple - II" />
 	<mapping from="apple3" to="Apple - III" />
 	<mapping from="aquarius" to="Mattel - Aquarius" />
 	<mapping from="arcadia" to="Emerson - Arcadia 2001" />
@@ -129,11 +129,11 @@
 	<mapping from="einstein" to="Tatung - Einstein TC-01" />
 	<mapping from="electron_cart" to="Acorn - BBC, Electron" />
 	<mapping from="electron_cass" to="Acorn - BBC, Electron" />
-	<mapping from="ep64_cart" to="Enterprise - 64" />
-	<mapping from="ep64_cass" to="Enterprise - 64" />
-	<mapping from="ep64_flop" to="Enterprise - 64" />
+	<mapping from="ep64_cart" to="Enterprise - 64, 128" />
+	<mapping from="ep64_cass" to="Enterprise - 64, 128" />
+	<mapping from="ep64_flop" to="Enterprise - 64, 128" />
 	<mapping from="epson_cpm" to="Epson - CPM" />
-	<mapping from="exl100" to="Exelvision Exeltel, EXL100" />
+	<mapping from="exl100" to="Exelvision - Exeltel, EXL100" />
 	<mapping from="famicom_cass" to="Nintendo - Famicom BASIC" />
 	<mapping from="famicom_flop" to="Nintendo - Famicom Disk System" />
 	<mapping from="fidel_scc" to="Fidelity - SCC" />
@@ -142,7 +142,7 @@
 	<mapping from="fm7_disk" to="Fujitsu - FM-7" />
 	<mapping from="fmtowns_cd" to="Fujitsu - FM Towns" />
 	<mapping from="g7400" to="Philips - Videopac+, Odyssey2" />
-	<mapping from="galaxy" to="Galaksija  - Galaksija, Galaksija Plus" />
+	<mapping from="galaxy" to="Galaksija - Galaksija, Galaksija Plus" />
 	<mapping from="gamate" to="Bit Corp - Gamate" />
 	<mapping from="gameboy" to="Nintendo - Game Boy" />
 	<mapping from="gamecom" to="Tiger Electronics - Game.com" />
@@ -196,7 +196,7 @@
 	<mapping from="leapster" to="LeapFrog - Leapster Learning Game System" />
 	<mapping from="lisa" to="Apple - Lisa" />
 	<mapping from="lisa2" to="Apple - Lisa 2" />
-	<mapping from="lviv" to="Lviv  - PC-01" />
+	<mapping from="lviv" to="Lviv - PC-01" />
 	<mapping from="lynx" to="Atari - Lynx" />
 	<mapping from="m20" to="Olivetti - M20" />
 	<mapping from="m5_cart" to="Sord - M5" />
@@ -239,7 +239,7 @@
 	<mapping from="mz2000_flop" to="Sharp - MZ-2000" />
 	<mapping from="mz2500" to="Sharp - MZ-2500" />
 	<mapping from="mz700_cass" to="Sharp - MZ-700" />
-	<mapping from="mz800_cass" to="Sharp - MZ-800, M-1500" />
+	<mapping from="mz800_cass" to="Sharp - MZ-800, MZ-1500" />
 	<mapping from="n64" to="Nintendo - Nintendo 64" />
 	<mapping from="n64dd" to="Nintendo - Nintendo 64DD" />
 	<mapping from="nascom_flop" to="Nascom - I, II" />
@@ -336,10 +336,10 @@
 	<mapping from="sgx" to="NEC - Super Grafx" />
 	<mapping from="smc777" to="Sony - SMC777" />
 	<mapping from="sms" to="Sega - Master System, Mark III" />
-	<mapping from="snes" to="Nintendo  - Super Nintendo Entertainment System" />
-	<mapping from="snes_bspack" to="Nintendo  - Super Nintendo Entertainment System" />
-	<mapping from="snes_strom" to="Nintendo  - Super Nintendo Entertainment System" />
-	<mapping from="snes_vkun" to="Nintendo  - Super Nintendo Entertainment System" />
+	<mapping from="snes" to="Nintendo - Super Nintendo Entertainment System" />
+	<mapping from="snes_bspack" to="Nintendo - Super Nintendo Entertainment System" />
+	<mapping from="snes_strom" to="Nintendo - Super Nintendo Entertainment System" />
+	<mapping from="snes_vkun" to="Nintendo - Super Nintendo Entertainment System" />
 	<mapping from="snotec" to="Bandai - Super Note Club" />
 	<mapping from="snread" to="Texas Instruments - Speak &amp; Read" />
 	<mapping from="snspell" to="Texas Instruments - Speak &amp; Spell" />
@@ -368,7 +368,7 @@
 	<mapping from="svi318_flop" to="Spectravideo - SVI-318, SVI-328" />
 	<mapping from="svision" to="Watara - Supervision" />
 	<mapping from="svmu" to="Sega - Visual Memory System" />
-	<mapping from="tandy200" to="Tandy Radio Shack - Model 200" />
+	<mapping from="tandy200" to="Tandy Radio Shack - TRS-80 Model 200" />
 	<mapping from="tandy2k" to="Tandy Radio Shack - 2000" />
 	<mapping from="tandy6k" to="Tandy Radio Shack - 6000" />
 	<mapping from="tdv2324" to="Tandberg - TDV 2324" />
@@ -396,7 +396,7 @@
 	<mapping from="vc4000" to="Interton - VC 4000" />
 	<mapping from="vector06_cart" to="Temirazov &amp; Sokolov - Vector-06C" />
 	<mapping from="vectrex" to="GCE - Vectrex" />
-	<mapping from="vg5k" to="Philips - VG-5000" />
+	<mapping from="vg5k" to="Philips - VG 5000" />
 	<mapping from="vic10" to="Commodore - VIC-10" />
 	<mapping from="vic1001_cart" to="Commodore - VIC-20" />
 	<mapping from="vic1001_cass" to="Commodore - VIC-20" />
