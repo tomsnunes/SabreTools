@@ -23,7 +23,7 @@ namespace SabreTools
 		private static string _defaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
 		private static string _mamePattern = @"^(.*)\.xml$";
 		private static string _noIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
-		private static string _noIntroNumberedPattern = @"(.*? - .*?) \(.*?_CM\).dat";
+		private static string _noIntroNumberedPattern = @"(.*? - .*?) \(\d.*?_CM\).dat";
 		private static string _noIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\)\.dat";
 		private static string _redumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
 		private static string _redumpBiosPattern = @"^(.*?) \(\d+\) \((\d{4}-\d{2}-\d{2})\)\.dat$";
