@@ -47,7 +47,7 @@ namespace SabreTools
 		// Regex File Name Patterns
 		private static string _defaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
 		private static string _mamePattern = @"^(.*)\.xml$";
-        private static string _nointroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
+        private static string _noIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
 		private static string _noIntroNumberedPattern = @"(.*? - .*?) \(.*?_CM\).dat";
 		private static string _noIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\)\.dat";
 		private static string _redumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
@@ -61,7 +61,8 @@ namespace SabreTools
 
 		// Regex Date Patterns
 		private static string _defaultDatePattern = @"(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})";
-		private static string _nointroDatePattern = @"(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})";
+		private static string _noIntroDatePattern = @"(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})";
+		private static string _noIntroSpecialDatePattern = @"(\d{4})(\d{2})(\d{2})";
 		private static string _redumpDatePattern = @"(\d{4})(\d{2})(\d{2}) (\d{2})-(\d{2})-(\d{2})";
 		private static string _tosecDatePattern = @"(\d{4})-(\d{2})-(\d{2})";
 
@@ -122,9 +123,9 @@ namespace SabreTools
 				fileinfo = Regex.Match(filename, _mamePattern).Groups;
 				type = DatType.MAME;
 			}
-			else if (Regex.IsMatch(filename, _nointroPattern))
+			else if (Regex.IsMatch(filename, _noIntroPattern))
 			{
-				fileinfo = Regex.Match(filename, _nointroPattern).Groups;
+				fileinfo = Regex.Match(filename, _noIntroPattern).Groups;
 				type = DatType.NoIntro;
 			}
 			// For numbered DATs only
@@ -136,7 +137,7 @@ namespace SabreTools
 			// For N-Gage and Gizmondo only
 			else if (Regex.IsMatch(filename, _noIntroSpecialPattern))
 			{
-				fileinfo = Regex.Match(filename, _nointroPattern).Groups;
+				fileinfo = Regex.Match(filename, _noIntroSpecialPattern).Groups;
 				type = DatType.NoIntro;
 			}
 			else if (Regex.IsMatch(filename, _redumpPattern))
@@ -211,13 +212,19 @@ namespace SabreTools
 					{
 						date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					}
-					else
+					else if (Regex.IsMatch(fileinfo[2].Value, _noIntroDatePattern))
 					{
 						datestring = fileinfo[2].Value;
-						GroupCollection niDateInfo = Regex.Match(datestring, _nointroDatePattern).Groups;
+						GroupCollection niDateInfo = Regex.Match(datestring, _noIntroDatePattern).Groups;
 						date = niDateInfo[1].Value + "-" + niDateInfo[2].Value + "-" + niDateInfo[3].Value + " " +
 							niDateInfo[4].Value + ":" + niDateInfo[5].Value + ":" + niDateInfo[6].Value;
 					}
+					else
+					{
+						datestring = fileinfo[2].Value;
+						GroupCollection niDateInfo = Regex.Match(datestring, _noIntroSpecialDatePattern).Groups;
+						date = niDateInfo[1].Value + "-" + niDateInfo[2].Value + "-" + niDateInfo[3].Value + " 00:00:00";
+                    }
 					break;
 				case DatType.Redump:
 					if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
