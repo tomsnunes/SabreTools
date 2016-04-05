@@ -4,14 +4,18 @@
 	<mapping from="3DO 3DO Interactive Multiplayer" to="Panasonic - 3DO Interactive Multiplayer" />
 	<mapping from="APF Imagination Machine" to="APF - M-1000" />
 	<mapping from="Acorn Archimedes" to="Acorn - Archimedes" />
-	<mapping from="Acorn BBC" to="Acorn BBC, Electron" />
-	<mapping from="Acorn Electron" to="Acorn BBC, Electron" />
+	<mapping from="Acorn BBC" to="Acorn - BBC, Electron" />
+  <mapping from="Acorn BBC Micro" to="Acorn - BBC, Electron" />
+  <mapping from="Acorn Electron" to="Acorn - BBC, Electron" />
 	<mapping from="Altos Computer Systems ACS-186, 586 &amp; 986" to="Altos Computer Systems - ACS-186, 586, 986" />
-	<mapping from="Altos Computer Systems Series 5" to="Altos Computer Systems - ACS Series 5" />
+  <mapping from="Altos Computer Systems ACS-8000" to="Altos Computer Systems - ACS-8000" />
+	<mapping from="Altos Computer Systems Series 5" to="Altos Computer Systems - Series 5" />
 	<mapping from="American Laser Games CD-ROM System" to="American Laser Games - CD-ROM System" />
 	<mapping from="Amstrad CPC" to="Amstrad - CPC" />
+  <mapping from="Amstrad GX4000" to="Amstrad - GX4000" />
 	<mapping from="Amstrad PCW" to="Amstrad - PCW" />
 	<mapping from="Apple 1" to="Apple - I" />
+  <mapping from="Apple I" to="Apple - I" />
 	<mapping from="Apple II" to="Apple - II" />
 	<mapping from="Apple IIGS" to="Apple - II" />
 	<mapping from="Apple III" to="Apple - III" />
@@ -97,6 +101,7 @@
 	<mapping from="Fuji Photo Film FUJIC" to="Fuji Photo Film - FUJIC" />
 	<mapping from="Fujitsu FM Towns" to="Fujitsu - FM Towns" />
 	<mapping from="Fujitsu FM-7" to="Fujitsu - FM-7" />
+  <mapping from="Funtech - Super Acan" to="Funtech - Super Acan" />
 	<mapping from="Funtech Super Acan" to="Funtech - Super Acan" />
 	<mapping from="GCE Vectrex" to="GCE - Vectrex" />
 	<mapping from="Galaksija Galaksija Plus" to="Galaksija - Galaksija, Galaksija Plus" />
@@ -135,7 +140,8 @@
 	<mapping from="Mattel HyperScan" to="Mattel - HyperScan" />
 	<mapping from="Mattel Intellivision" to="Mattel - Intellivision" />
 	<mapping from="Memorex Video Information System" to="Memorex - Video Information System" />
-	<mapping from="Memotech MTX" to="Memotech MTX512" />
+	<mapping from="Memotech MTX" to="Memotech - MTX512" />
+  <mapping from="Memotech MTX512" to="Memotech - MTX512" />
 	<mapping from="MicroBee" to="Applied Technology - MicroBee" />
 	<mapping from="Microkey Primo" to="Microkey - Primo" />
 	<mapping from="Miles Gordon Technology Sam Coupe" to="MGT - Sam Coupe" />
