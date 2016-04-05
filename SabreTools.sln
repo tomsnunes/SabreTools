@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Headerer", "Deheader\Header
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SabreToolsUI", "SabreToolsUI\SabreToolsUI.csproj", "{7DC54E53-4A46-4323-97E1-062EEFB7E4BC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatSplit", "DatSplit\DatSplit.csproj", "{9EB4738D-CAE7-420D-8A26-78A53CEA5E82}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{7DC54E53-4A46-4323-97E1-062EEFB7E4BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DC54E53-4A46-4323-97E1-062EEFB7E4BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DC54E53-4A46-4323-97E1-062EEFB7E4BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EB4738D-CAE7-420D-8A26-78A53CEA5E82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EB4738D-CAE7-420D-8A26-78A53CEA5E82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EB4738D-CAE7-420D-8A26-78A53CEA5E82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EB4738D-CAE7-420D-8A26-78A53CEA5E82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
