@@ -28,7 +28,8 @@ namespace SabreTools
 		private static string _redumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
 		private static string _redumpBiosPattern = @"^(.*?) \(\d+\) \((\d{4}-\d{2}-\d{2})\)\.dat$";
 		private static string _tosecPattern = @"^(.*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
-		private static string _tosecSpecialPattern = @"^(.*? - .*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
+		private static string _tosecSpecialPatternA = @"^(.*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
+		private static string _tosecSpecialPatternB = @"^(.*? - .*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
 		private static string _truripPattern = @"^(.*) - .* \(trurip_XML\)\.dat$";
 
 		// Regex Mapped Name Patterns
@@ -236,12 +237,17 @@ namespace SabreTools
 					if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
 					{
 						// Handle special case mappings found only in TOSEC
-						fileinfo = Regex.Match(filename, _tosecSpecialPattern).Groups;
+						fileinfo = Regex.Match(filename, _tosecSpecialPatternA).Groups;
 
 						if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
 						{
-							_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
-							return false;
+							fileinfo = Regex.Match(filename, _tosecSpecialPatternB).Groups;
+
+							if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
+							{
+								_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+								return false;
+							}
 						}
 					}
 					GroupCollection tosecInfo = Regex.Match(Remapping.TOSEC[fileinfo[1].Value], _remappedPattern).Groups;
