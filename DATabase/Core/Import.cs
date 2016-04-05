@@ -214,7 +214,7 @@ namespace SabreTools
 				case DatType.Redump:
 					if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
 					{
-						// Handle special case mappings found only in TOSEC
+						// Handle special case mappings found only in Redump
 						fileinfo = Regex.Match(filename, _redumpBiosPattern).Groups;
 
 						if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
