@@ -14,6 +14,7 @@ namespace DatSplit
 		private static string extA;
 		private static string extB;
 		private static string filename;
+		private static string _version = "0.3.0.0";
 
 		public static void Main(string[] args)
 		{

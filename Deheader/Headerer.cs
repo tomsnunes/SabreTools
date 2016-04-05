@@ -13,7 +13,7 @@ namespace SabreTools
 	/// </summary>
 	class Headerer
 	{
-		private static string _version = "0.2.8.0";
+		private static string _version = "0.3.0.0";
 		private static string _dbName = "Headerer.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
 		private static Dictionary<string, int> types;
