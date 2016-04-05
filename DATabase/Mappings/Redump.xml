@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
 <mappings>
-	<mapping from="Apple - Machintosh" to="Apple - Macintosh" />
+	<mapping from="Apple - Macintosh" to="Apple - Macintosh" />
 	<mapping from="Arcade - Namco - Sega - Nintendo - Triforce" to="Namco - Triforce" />
 	<mapping from="Arcade - Sega - Chihiro" to="Sega - Chihiro" />
 	<mapping from="Arcade - Sega - Lindbergh" to="Sega - Lindbergh" />
