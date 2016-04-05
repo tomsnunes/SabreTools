@@ -410,7 +410,7 @@ namespace SabreTools
 						foreach (XmlNode child in node.ChildNodes)
 						{
 							// If we find a rom or disk, add it
-							if (node.NodeType == XmlNodeType.Element && (child.Name == "rom" || child.Name == "disk"))
+							if (child.NodeType == XmlNodeType.Element && (child.Name == "rom" || child.Name == "disk"))
 							{
 								// Take care of hex-sized files
 								long size = -1;
