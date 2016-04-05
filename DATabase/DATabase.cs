@@ -554,7 +554,7 @@ Make a selection:
 		JOIN sources
 			ON games.source=sources.id
 		WHERE systems.id=" + sldr.GetInt32(0).ToString() + @"
-        ORDER BY sources.name";
+		ORDER BY sources.name";
 
 							using (SQLiteCommand sslc = new SQLiteCommand(squery, dbc))
 							{
@@ -889,7 +889,7 @@ Make a selection:
 				else
 				{
 					logger.Error("Source with id '" + srcid + "' could not be removed.");
-                }
+				}
 			}
 			else
 			{
@@ -930,7 +930,7 @@ Make a selection:
 				else
 				{
 					logger.Error("System with id '" + sysid + "' could not be removed.");
-                }
+				}
 			}
 			else
 			{

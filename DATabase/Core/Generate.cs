@@ -79,7 +79,7 @@ namespace SabreTools
 			// Check to see if the source is an import-only. If so, tell the user and exit
 			int id = 0;
 			if (_sources != "" && Int32.TryParse(_sources, out id) && id <= 14)
-            {
+			{
 				_logger.Warning("This source (" + id + ") is import-only so a DAT cannot be created. We apologize for the inconvenience.");
 				return false;
 			}
@@ -272,7 +272,7 @@ namespace SabreTools
 
 				sw.Write((_old ? ")" : "\t</machine>\n</datafile>"));
 				_logger.Log("File written!");
-                sw.Close();
+				sw.Close();
 				fs.Close();
 			}
 			catch (Exception ex)
@@ -289,7 +289,7 @@ namespace SabreTools
 		/// </summary>
 		/// <remarks>To make this even more accurate, files with a more recent "LastUpdated" should be considered the parent if all else is the same.</remarks>
 		/// <returns>A List of RomData objects containing all information about the files</returns>
-	    public List<RomData> ProcessRoms()
+		public List<RomData> ProcessRoms()
 		{
 			List<RomData> roms = new List<RomData>();
 

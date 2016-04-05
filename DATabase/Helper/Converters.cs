@@ -131,7 +131,7 @@ namespace SabreTools.Helper
 
 				// If we find an end bracket that's not associated with anything else, the block is done
 				else if (Regex.IsMatch(line, _endPattern) && block)
-			    {
+				{
 					block = false;
 					elem = elem.Parent;
 				}
@@ -250,5 +250,5 @@ namespace SabreTools.Helper
 
 			return output;
 		}
-    }
+	}
 }

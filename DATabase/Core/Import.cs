@@ -47,7 +47,7 @@ namespace SabreTools
 		// Regex File Name Patterns
 		private static string _defaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
 		private static string _mamePattern = @"^(.*)\.xml$";
-        private static string _noIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
+		private static string _noIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
 		private static string _noIntroNumberedPattern = @"(.*? - .*?) \(.*?_CM\).dat";
 		private static string _noIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\)\.dat";
 		private static string _redumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
@@ -224,7 +224,7 @@ namespace SabreTools
 						datestring = fileinfo[2].Value;
 						GroupCollection niDateInfo = Regex.Match(datestring, _noIntroSpecialDatePattern).Groups;
 						date = niDateInfo[1].Value + "-" + niDateInfo[2].Value + "-" + niDateInfo[3].Value + " 00:00:00";
-                    }
+					}
 					break;
 				case DatType.Redump:
 					if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
@@ -373,7 +373,7 @@ namespace SabreTools
 				{
 					node = node.NextSibling;
 				}
-            }
+			}
 
 			// Once we find the main body, enter it
 			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
@@ -406,15 +406,15 @@ namespace SabreTools
 					if (node.Name == "software")
 					{
 						tempname = node.SelectSingleNode("description").InnerText;
-                    }
+					}
 					else
 					{
 						// There are rare cases where a malformed XML will not have the required attributes. We can only skip them.
 						if (node.Attributes.Count == 0)
 						{
 							_logger.Error(@"A node with malformed XML has been found!
-    For RV DATs, please make sure that all names and descriptions are quoted.
-    For XML DATs, make sure that the DAT has all required information.");
+	For RV DATs, please make sure that all names and descriptions are quoted.
+	For XML DATs, make sure that the DAT has all required information.");
 							node = node.NextSibling;
 							continue;
 						}
@@ -446,7 +446,7 @@ namespace SabreTools
 								else if (child.Attributes["size"] != null)
 								{
 									size = Int64.Parse(child.Attributes["size"].Value);
-                                }
+								}
 
 								AddRom(
 									child.Name,
@@ -457,7 +457,7 @@ namespace SabreTools
 									(child.Attributes["crc"] != null ? child.Attributes["crc"].Value.ToLowerInvariant().Trim() : ""),
 									(child.Attributes["md5"] != null ? child.Attributes["md5"].Value.ToLowerInvariant().Trim() : ""),
 									(child.Attributes["sha1"] != null ? child.Attributes["sha1"].Value.ToLowerInvariant().Trim() : "")
-                                );
+								);
 							}
 							// If we find the signs of a software list, traverse the children
 							else if (child.NodeType == XmlNodeType.Element && child.Name == "part" && child.HasChildNodes)
@@ -605,10 +605,10 @@ SELECT files.id FROM files
 	WHERE files.name='" + name.Replace("'", "''") + @"'
 		AND files.type='" + romtype + @"' 
 		AND files.setid=" + gameid + " " + 
-        " AND checksums.size=" + size +
-        " AND checksums.crc='" + crc + "'" +
-        " AND checksums.md5='" + md5 + "'" +
-        " AND checksums.sha1='" + sha1 + "'";
+		" AND checksums.size=" + size +
+		" AND checksums.crc='" + crc + "'" +
+		" AND checksums.md5='" + md5 + "'" +
+		" AND checksums.sha1='" + sha1 + "'";
 			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 			{
 				dbc.Open();

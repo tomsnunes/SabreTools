@@ -33,7 +33,7 @@ namespace SabreTools.Helper
 			{
 				RemappingHelper(remapping);
 			}
-        }
+		}
 
 		/// <summary>
 		/// Create a remapping from XML

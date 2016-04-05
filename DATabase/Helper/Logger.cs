@@ -85,7 +85,7 @@ namespace SabreTools.Helper
 			}
 
 			try
-            {
+			{
 				_log.WriteLine("Logging ended " + DateTime.Now);
 				_log.Close();
 			}
