@@ -54,7 +54,7 @@ namespace SabreTools
 		private static string _redumpBiosPattern = @"^(.*?) \(\d+\) \((\d{4}-\d{2}-\d{2})\)\.dat$";
 		private static string _tosecPattern = @"^(.*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
 		private static string _tosecSpecialPattern = @"^(.*? - .*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
-		private static string _truripPattern = @"^(.*?) - .* \(trurip_XML\)\.dat$";
+		private static string _truripPattern = @"^(.*) - .* \(trurip_XML\)\.dat$";
 
 		// Regex Mapped Name Patterns
 		private static string _remappedPattern = @"^(.*) - (.*)$";
