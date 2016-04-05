@@ -17,13 +17,13 @@
 	<mapping from="Bandai WonderSwan Color (SwanCrystal)" to="Bandai - WonderSwan Color" />
 	<mapping from="Bandai WonderSwan" to="Bandai - WonderSwan" />
 	<mapping from="Capcom CP SYSTEM III" to="Capcom - CPS III" />
-  <mapping from="Capcom CP SYSTEM III (CPS3)" to="Capcom - CPS III" />
+	<mapping from="Capcom CP SYSTEM III (CPS3)" to="Capcom - CPS III" />
 	<mapping from="Commodore Amiga CD" to="Commodore - Amiga" />
 	<mapping from="Commodore Amiga CD32" to="Commodore - Amiga" />
 	<mapping from="Commodore Amiga CDTV" to="Commodore - Amiga" />
 	<mapping from="Fairchild Channel F (Video Entertainment System)" to="Fairchild - Channel F" />
 	<mapping from="Fujitsu FM Towns (Marty)" to="Fujitsu - FM Towns" />
-  <mapping from="IBM Compatible IBM PC compatible" to="IBM - PC Compatibles" />
+	<mapping from="IBM Compatible IBM PC compatible" to="IBM - PC Compatibles" />
 	<mapping from="IBM PC Compatible IBM PC compatible" to="IBM - PC Compatibles" />
 	<mapping from="Incredible Technologies IT Eagle" to="Incredible Technologies - Eagle" />
 	<mapping from="Incredible Technologies IT PC" to="Incredible Technologies - PC" />
