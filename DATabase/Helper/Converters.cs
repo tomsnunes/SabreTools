@@ -9,7 +9,7 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// Provide DAT conversion functionality
 	/// </summary>
-	class Converters
+	public class Converters
 	{
 		// Regex matching patterns
 		private static string _headerPattern = @"(^.*?) \($";
