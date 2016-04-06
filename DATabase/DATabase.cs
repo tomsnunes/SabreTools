@@ -39,7 +39,7 @@ namespace SabreTools
 
 			Console.Clear();
 			Console.SetBufferSize(Console.BufferWidth, 999);
-			Console.Title = "DATabase " + _version;
+			Console.Title = "DATabase " + Build.Version;
 
 			// If there's no arguments, show the menu
 			if (args.Length == 0)
