@@ -27,8 +27,8 @@ namespace DatSplit
 
 			// Set needed strings
 			filename = args[0];
-			extA = args[1];
-			extB = args[2];
+			extA = (args[1].StartsWith(".") ? args[1] : "." + args[1]);
+			extB = (args[2].StartsWith(".") ? args[2] : "." + args[2]);
 
 			// Take the filename, and load it as an XML document
 			XmlDocument doc = new XmlDocument();
@@ -52,9 +52,15 @@ namespace DatSplit
 				}
 			}
 
-			XmlDocument tempDoc = new XmlDocument();
-			XmlNode outA = tempDoc.CreateNode(XmlNodeType.Element, node.Name, "");
-			XmlNode outB = tempDoc.CreateNode(XmlNodeType.Element, node.Name, "");
+			XmlDocument outDocA = new XmlDocument();
+			outDocA.AppendChild(outDocA.CreateXmlDeclaration("1.0", Encoding.UTF8.WebName, null));
+			outDocA.AppendChild(outDocA.CreateDocumentType("datafile", "-//Logiqx//DTD ROM Management Datafile//EN", "http://www.logiqx.com/Dats/datafile.dtd", null));
+			XmlNode outA = outDocA.CreateNode(XmlNodeType.Element, node.Name, "");
+
+			XmlDocument outDocB = new XmlDocument();
+			outDocB.AppendChild(outDocB.CreateXmlDeclaration("1.0", Encoding.UTF8.WebName, null));
+			outDocB.AppendChild(outDocB.CreateDocumentType("datafile", "-//Logiqx//DTD ROM Management Datafile//EN", "http://www.logiqx.com/Dats/datafile.dtd", null));
+			XmlNode outB = outDocB.CreateNode(XmlNodeType.Element, node.Name, "");
 
 			// Once we find the main body, enter it
 			if (node != null && node.Name == "datafile")
@@ -96,29 +102,29 @@ namespace DatSplit
 									if (!inA)
 									{
 										//XmlNode temp = tempDoc.CreateNode(XmlNodeType.Element, node.Name, "");
-										XmlNode temp = tempDoc.ImportNode(node, false);
+										XmlNode temp = outDocA.ImportNode(node, false);
 										outA.AppendChild(temp);
 										outA = outA.LastChild;
 										inA = true;
 									}
-									outA.AppendChild(tempDoc.ImportNode(child, true));
+									outA.AppendChild(outDocA.ImportNode(child, true));
 								}
 								else if (child.Attributes["name"].Value.EndsWith(extB))
 								{
 									if (!inB)
 									{
 										//XmlNode temp = tempDoc.CreateNode(XmlNodeType.Element, node.Name, "");
-										XmlNode temp = tempDoc.ImportNode(node, false);
+										XmlNode temp = outDocB.ImportNode(node, false);
 										outB.AppendChild(temp);
 										outB = outB.LastChild;
 										inB = true;
 									}
-									outB.AppendChild(tempDoc.ImportNode(child, true));
+									outB.AppendChild(outDocB.ImportNode(child, true));
 								}
 								else
 								{
-									outA.AppendChild(tempDoc.ImportNode(child, true));
-									outB.AppendChild(tempDoc.ImportNode(child, true));
+									outA.AppendChild(outDocA.ImportNode(child, true));
+									outB.AppendChild(outDocB.ImportNode(child, true));
 								}
 							}
 						}
@@ -136,25 +142,22 @@ namespace DatSplit
 				}
 				else
 				{
-					XmlNode tempNode = tempDoc.ImportNode(node, true);
+					XmlNode tempNode = outDocA.ImportNode(node, true);
 					outA.AppendChild(tempNode);
-					tempNode = tempDoc.ImportNode(node, true);
+					tempNode = outDocB.ImportNode(node, true);
 					outB.AppendChild(tempNode);
 				}
 				node = node.NextSibling;
 			}
 
-			XmlDocument outDocA = new XmlDocument();
-			outDocA.AppendChild(outDocA.CreateDocumentType("datafile", "-//Logiqx//DTD ROM Management Datafile//EN", "http://www.logiqx.com/Dats/datafile.dtd", null));
+			// Append the built nodes to the documents
 			outDocA.AppendChild(outDocA.ImportNode(outA, true));
 			string outPathA = Path.GetFileNameWithoutExtension(filename) + extA + Path.GetExtension(filename);
-			File.WriteAllText(outPathA, Beautify(outDocA));
+			File.WriteAllText(outPathA, Beautify(outDocA), Encoding.UTF8);
 
-			XmlDocument outDocB = new XmlDocument();
-			outDocB.AppendChild(outDocB.CreateDocumentType("datafile", "-//Logiqx//DTD ROM Management Datafile//EN", "http://www.logiqx.com/Dats/datafile.dtd", null));
 			outDocB.AppendChild(outDocB.ImportNode(outB, true));
 			string outPathB = Path.GetFileNameWithoutExtension(filename) + extB + Path.GetExtension(filename);
-			File.WriteAllText(outPathB, Beautify(outDocB));
+			File.WriteAllText(outPathB, Beautify(outDocB), Encoding.UTF8);
 		}
 
 		public static void Help()
@@ -163,21 +166,24 @@ namespace DatSplit
 		}
 
 		// http://stackoverflow.com/questions/203528/what-is-the-simplest-way-to-get-indented-xml-with-line-breaks-from-xmldocument
+		// http://www.timvw.be/2007/01/08/generating-utf-8-with-systemxmlxmlwriter/
 		static public string Beautify(XmlDocument doc)
 		{
-			StringBuilder sb = new StringBuilder();
+			MemoryStream ms = new MemoryStream();
 			XmlWriterSettings settings = new XmlWriterSettings
 			{
+				Encoding = new UTF8Encoding(false),
 				Indent = true,
 				IndentChars = "\t",
 				NewLineChars = "\r\n",
 				NewLineHandling = NewLineHandling.Replace
 			};
-			using (XmlWriter writer = XmlWriter.Create(sb, settings))
+			
+			using (XmlWriter writer = XmlWriter.Create(ms, settings))
 			{
 				doc.Save(writer);
 			}
-			return sb.ToString();
+			return Encoding.UTF8.GetString(ms.ToArray());
 		}
 	}
 }
