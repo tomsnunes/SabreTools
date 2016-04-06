@@ -120,7 +120,7 @@ namespace SabreTools
 
 		private static void Help()
 		{
-
+			Console.WriteLine("SingleGame.exe <filename>");
 		}
 	}
 }
