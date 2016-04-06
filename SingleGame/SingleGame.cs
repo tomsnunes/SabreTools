@@ -17,6 +17,8 @@ namespace SabreTools
 
 		public static void Main(string[] args)
 		{
+			Console.Title = "SingleGame " + Build.Version;
+
 			if (args.Length != 1)
 			{
 				Help();

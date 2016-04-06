@@ -32,6 +32,8 @@ Options:
 		/// <param name="args">String array representing command line parameters</param>
 		static void Main(string[] args)
 		{
+			Console.Title = "Headerer " + Build.Version;
+
 			// Type mapped to header size (in decimal bytes)
 			types = new Dictionary<string, int>();
 			types.Add("a7800", 128);

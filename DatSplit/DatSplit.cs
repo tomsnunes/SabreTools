@@ -17,6 +17,8 @@ namespace DatSplit
 
 		public static void Main(string[] args)
 		{
+			Console.Title = "DatSplit " + Build.Version;
+
 			// If we don't have arguments, show help
 			if (args.Length == 0 && args.Length != 3)
 			{
