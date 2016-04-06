@@ -47,6 +47,7 @@
 	<mapping from="Sega Dreamcast" to="Sega - Dreamcast" />
 	<mapping from="Sega Lindbergh" to="Sega - Lindbergh" />
 	<mapping from="Sega Mega-CD &amp; Sega CD" to="Sega - Mega-CD, Sega CD" />
+	<mapping from="Sega Mega-CD &amp; Sega CD - Games" to="Sega - 32X CD" />
 	<mapping from="Sega NAOMI 2" to="Sega - Naomi, Naomi 2, Atomiswave" />
 	<mapping from="Sega NAOMI" to="Sega - Naomi, Naomi 2, Atomiswave" />
 	<mapping from="Sega RingWide" to="Sega - RingWide" />
