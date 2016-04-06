@@ -18,13 +18,6 @@ namespace SabreTools
 		private static string _dbName = "Headerer.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
 		private static Dictionary<string, int> types;
-		private static string help = @"Deheader - Remove headers from roms
------------------------------------------
-Usage: Deheader [option] [filename|dirname]
-
-Options:
-  -e			Detect and remove mode
-  -r			Restore header to file based on SHA-1";
 
 		/// <summary>
 		/// Start deheader operation with supplied parameters
@@ -48,7 +41,7 @@ Options:
 
 			if (args.Length == 0 || args.Length > 2)
 			{
-				Console.WriteLine(help);
+				Build.Help();
 				return;
 			}
 
@@ -95,7 +88,7 @@ Options:
 				// Else, show that help text
 				else
 				{
-					Console.WriteLine(help);
+					Build.Help();
 				}
 			}
 			else
@@ -119,7 +112,7 @@ Options:
 				// Else, show that help text
 				else
 				{
-					Console.WriteLine(help);
+					Build.Help();
 				}
 			}
 		}

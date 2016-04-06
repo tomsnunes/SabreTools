@@ -20,7 +20,7 @@ namespace DatSplit
 			// If we don't have arguments, show help
 			if (args.Length == 0 && args.Length != 3)
 			{
-				Help();
+				Build.Help();
 				return;
 			}
 
@@ -157,11 +157,6 @@ namespace DatSplit
 			outDocB.AppendChild(outDocB.ImportNode(outB, true));
 			string outPathB = Path.GetFileNameWithoutExtension(_filename) + _extB + Path.GetExtension(_filename);
 			File.WriteAllText(outPathB, Style.Beautify(outDocB), Encoding.UTF8);
-		}
-
-		public static void Help()
-		{
-			Console.WriteLine("DatSplit.exe <filename> <ext> <ext>");
 		}
 	}
 }

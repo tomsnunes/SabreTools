@@ -18,7 +18,7 @@ namespace SabreTools
 
 			if (args.Length == 0)
 			{
-				Help();
+				Build.Help();
 				return;
 			}
 
@@ -151,14 +151,6 @@ namespace SabreTools
 			tempDoc.AppendChild(outNode);
 			string outPath = Path.GetFileNameWithoutExtension(_filename) + ".new" + Path.GetExtension(_filename);
 			File.WriteAllText(outPath, Style.Beautify(tempDoc));
-		}
-
-		private static void Help()
-		{
-			Console.WriteLine(@"SingleGame.exe <filename> [-r=rootdir|-n]
-    -r=rootdir		Set the directory name for path size
-    -n			Disable single-game mode
-");
 		}
 	}
 }

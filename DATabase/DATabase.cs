@@ -102,7 +102,7 @@ namespace SabreTools
 			// If more than one switch is enabled or help is set, show the help screen
 			if (help || !(import ^ generate ^ listsys ^ listsrc ^ genall ^ add ^ rem ^ convertRV ^ convertXml))
 			{
-				Help();
+				Build.Help();
 				logger.Close();
 				return;
 			}
@@ -167,7 +167,7 @@ namespace SabreTools
 				}
 				else
 				{
-					Help();
+					Build.Help();
 				}
 			} 
 			
@@ -184,7 +184,7 @@ namespace SabreTools
 				}
 				else
 				{
-					Help();
+					Build.Help();
 				}
 			}
 
@@ -239,7 +239,7 @@ Make a selection:
 				switch (selection)
 				{
 					case "1":
-						Help();
+						Build.Help();
 						break;
 					case "2":
 						ImportMenu();
@@ -280,56 +280,6 @@ Make a selection:
 			}
 			Console.Clear();
 			Console.WriteLine("Thank you for using DATabase!");
-		}
-
-		/// <summary>
-		/// Show the help dialog
-		/// </summary>
-		private static void Help()
-		{
-			Console.Clear();
-			Console.Write(@"
-DATabase - Import and Generate DAT files
------------------------------------------
-Usage: DATabase [option] [filename|dirname|<system=sy,...> <source=so,...>]
-
-Options:
-  -h, -?, --help	Show this help
-  -i, --import		Start tool in import mode
-			  A filename or folder is required to run
-  -g, --generate	Start tool in generate mode
-			  system=sy,...		List of system IDs
-			  source=so,...		List of source IDs
-			  out=dir			Output directory
-			  -nr, --no-rename	Don't auto-rename games
-			  -old, --romvault	Produce a DAT in RV format
-  -ga, --generate-all	Start tool in generate all mode
-  -lso, --list-sources	List all sources (id <= name)
-  -lsy, --list-systems	List all systems (id <= name)
-  -cr, --convert-rv	Convert an XML DAT to RV
-  -cx, --convert-xml	Convert a RV DAT to XML
-			  Both converters require a filename or folder
-  -l, --log		Enable logging of program output
-");
-
-			Console.Write("\nPress any key to continue...");
-			Console.ReadKey();
-			Console.Write(@"
-Database Options:
-  -a, --add		Add a new system or source to the database
-			  manu=mn		Manufacturer name (system only)
-			  system=sy		System name (system only)
-			  source=sr		Source name (source only)
-			  url=ul		URL (source only)
-  -r, --remove	Remove a system or source from the database
-			  system=sy		System ID
-			  source=so			Source ID
-
-Filenames and directories can't start with '-', 'system=', or 'source='
-unless prefixed by 'input='");
-			Console.Write("\nPress any key to continue...");
-			Console.ReadKey();
-			return;
 		}
 
 		/// <summary>
