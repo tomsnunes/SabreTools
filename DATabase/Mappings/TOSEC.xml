@@ -5,17 +5,17 @@
 	<mapping from="APF Imagination Machine" to="APF - M-1000" />
 	<mapping from="Acorn Archimedes" to="Acorn - Archimedes" />
 	<mapping from="Acorn BBC" to="Acorn - BBC, Electron" />
-  <mapping from="Acorn BBC Micro" to="Acorn - BBC, Electron" />
-  <mapping from="Acorn Electron" to="Acorn - BBC, Electron" />
+	<mapping from="Acorn BBC Micro" to="Acorn - BBC, Electron" />
+	<mapping from="Acorn Electron" to="Acorn - BBC, Electron" />
 	<mapping from="Altos Computer Systems ACS-186, 586 &amp; 986" to="Altos Computer Systems - ACS-186, 586, 986" />
-  <mapping from="Altos Computer Systems ACS-8000" to="Altos Computer Systems - ACS-8000" />
+	<mapping from="Altos Computer Systems ACS-8000" to="Altos Computer Systems - ACS-8000" />
 	<mapping from="Altos Computer Systems Series 5" to="Altos Computer Systems - Series 5" />
 	<mapping from="American Laser Games CD-ROM System" to="American Laser Games - CD-ROM System" />
 	<mapping from="Amstrad CPC" to="Amstrad - CPC" />
-  <mapping from="Amstrad GX4000" to="Amstrad - GX4000" />
+	<mapping from="Amstrad GX4000" to="Amstrad - GX4000" />
 	<mapping from="Amstrad PCW" to="Amstrad - PCW" />
 	<mapping from="Apple 1" to="Apple - I" />
-  <mapping from="Apple I" to="Apple - I" />
+	<mapping from="Apple I" to="Apple - I" />
 	<mapping from="Apple II" to="Apple - II" />
 	<mapping from="Apple IIGS" to="Apple - II" />
 	<mapping from="Apple III" to="Apple - III" />
@@ -30,7 +30,7 @@
 	<mapping from="Atari Jaguar" to="Atari - Jaguar" />
 	<mapping from="Atari Lynx" to="Atari - Lynx" />
 	<mapping from="Atari ST" to="Atari - ST" />
-  <mapping from="Bally Midway Astrocade" to="Bally Professional - Arcade, Astrocade" />
+	<mapping from="Bally Midway Astrocade" to="Bally Professional - Arcade, Astrocade" />
 	<mapping from="Bally Professional Arcade &amp; Astrocade" to="Bally Professional - Arcade, Astrocade" />
 	<mapping from="Bandai Pippin @World &amp; Pippin Atmark" to="Bandai - Pippin" />
 	<mapping from="Bandai Pippin Atmark" to="Bandai - Pippin" />
@@ -39,7 +39,7 @@
 	<mapping from="Bandai WonderSwan" to="Bandai - WonderSwan" />
 	<mapping from="Bondwell 12" to="Bondwell - 12" />
 	<mapping from="Bondwell 2" to="Bondwell - 2" />
-  <mapping from="Bondwell Model 2" to="Bondwell - 2" />
+	<mapping from="Bondwell Model 2" to="Bondwell - 2" />
 	<mapping from="CBS ColecoVision ADAM" to="Coleco - ColecoVision, ColecoVision ADAM" />
 	<mapping from="CBS ColecoVision" to="Coleco - ColecoVision, ColecoVision ADAM" />
 	<mapping from="Cambridge University EDSAC" to="University of Cambridge - EDSAC" />
@@ -61,7 +61,7 @@
 	<mapping from="Commodore C65" to="Commodore - 65" />
 	<mapping from="Commodore MAX Machine &amp; VIC10" to="Commodore - VIC-10" />
 	<mapping from="Commodore PET" to="Commodore - PET" />
-  <mapping from="Commodore VIC10" to="Commodore - VIC-10" />
+	<mapping from="Commodore VIC10" to="Commodore - VIC-10" />
 	<mapping from="Commodore VIC20" to="Commodore - VIC-20" />
 	<mapping from="Creatronic Mega Duck &amp; Cougar Boy" to="Creatronic - Mega Duck, Cougar Boy" />
 	<mapping from="Cybiko Cybiko" to="Cybiko - Cybiko" />
@@ -104,7 +104,7 @@
 	<mapping from="Fuji Photo Film FUJIC" to="Fuji Photo Film - FUJIC" />
 	<mapping from="Fujitsu FM Towns" to="Fujitsu - FM Towns" />
 	<mapping from="Fujitsu FM-7" to="Fujitsu - FM-7" />
-  <mapping from="Funtech - Super Acan" to="Funtech - Super Acan" />
+	<mapping from="Funtech - Super Acan" to="Funtech - Super Acan" />
 	<mapping from="Funtech Super Acan" to="Funtech - Super Acan" />
 	<mapping from="GCE Vectrex" to="GCE - Vectrex" />
 	<mapping from="Galaksija Galaksija Plus" to="Galaksija - Galaksija, Galaksija Plus" />
@@ -144,7 +144,7 @@
 	<mapping from="Mattel Intellivision" to="Mattel - Intellivision" />
 	<mapping from="Memorex Video Information System" to="Memorex - Video Information System" />
 	<mapping from="Memotech MTX" to="Memotech - MTX512" />
-  <mapping from="Memotech MTX512" to="Memotech - MTX512" />
+	<mapping from="Memotech MTX512" to="Memotech - MTX512" />
 	<mapping from="MicroBee" to="Applied Technology - MicroBee" />
 	<mapping from="Microkey Primo" to="Microkey - Primo" />
 	<mapping from="Miles Gordon Technology Sam Coupe" to="MGT - Sam Coupe" />
@@ -186,7 +186,7 @@
 	<mapping from="Philips CD-i" to="Philips - CD-i" />
 	<mapping from="Philips G7000" to="Philips - Videopac+, Odyssey2" />
 	<mapping from="Philips P2000" to="Philips - P2000" />
-  <mapping from="Philips P2000T" to="Philips - P2000" />
+	<mapping from="Philips P2000T" to="Philips - P2000" />
 	<mapping from="Philips VG 5000" to="Philips - VG 5000" />
 	<mapping from="Philips Videopac G7000" to="Philips - Videopac+, Odyssey2" />
 	<mapping from="Philips Videopac+" to="Philips - Videopac+, Odyssey2" />
@@ -227,7 +227,7 @@
 	<mapping from="Sega Mega-CD and Sega CD" to="Sega - Mega-CD, Sega CD" />
 	<mapping from="Sega NAOMI 2" to="Sega - Naomi, Naomi 2, Atomiswave" />
 	<mapping from="Sega NAOMI" to="Sega - Naomi, Naomi 2, Atomiswave" />
-  <mapping from="Sega NAOMI GD-ROM" to="Sega - Naomi, Naomi 2, Atomiswave" />
+	<mapping from="Sega NAOMI GD-ROM" to="Sega - Naomi, Naomi 2, Atomiswave" />
 	<mapping from="Sega Pico" to="Sega - PICO" />
 	<mapping from="Sega Saturn" to="Sega - Saturn" />
 	<mapping from="Sega Super Control Station" to="Sega - SG-1000, SC-3000, SF-7000, Othello Multivision" />
