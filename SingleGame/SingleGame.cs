@@ -92,8 +92,14 @@ namespace SabreTools
 								XmlElement tempNode = (XmlElement)tempDoc.ImportNode(child, true);
 
 								// Windows max name length is 260. Taking into account the game name of "!", we can use 259 characters
-								tempNode.SetAttribute("name", "(" + node.Attributes["name"].Value + ")" + child.Attributes["name"].Value);
-								tempNode.Attributes["name"].Value = (tempNode.Attributes["name"].Value.Length > 259 ? tempNode.Attributes["name"].Value.Substring(0, 259) : tempNode.Attributes["name"].Value);
+								string tempname = "(" + node.Attributes["name"].Value + ")" + child.Attributes["name"].Value;
+								if (tempname.Length > 259)
+								{
+									string ext = Path.GetExtension(tempname);
+									tempname = tempname.Substring(0, 259 - ext.Length);
+									tempname += ext;
+								}
+								tempNode.SetAttribute("name", tempname);
 								outNode.AppendChild(tempNode);
 							}
 						}
