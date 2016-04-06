@@ -6,7 +6,7 @@ This project is a desktop port of some core features of Wizard of DATz Redux. Fo
 
 <h3>Features</h3>
 
-Currently, SabreTools consists of 4 programs: SabreTools UI, DATabase, Headerer, and DatSplit.
+Currently, SabreTools consists of the following programs: SabreTools UI, DATabase, Headerer, DatSplit, and SingleGame.
 
 <b>SabreTools UI</b>
 <p/>
@@ -41,7 +41,16 @@ The saved headers are currently stored in a database; multiple headers allowed p
 
 <b>DatSplit</b>
 <p/>
-This tool doesn't do everything possible for splitting DATs, most of those functions are taken care of by third-party tool <a href="http://www.logiqx.com/Tools/DatUtil/">DatUtil</a>. This tool only splits DATs based on extensions. This is useful for splitting DAT files similar to the NonGood set that can have more than one system per DAT.
+This tool doesn't do everything possible for splitting DATs, most of those functions are taken care of by third-party tool <a href="http://www.logiqx.com/Tools/DatUtil/">DatUtil</a>.
+<ul>
+	<li>Split a DAT file using two different file extensions</li>
+	<li>Works with RomVault and Logiqx XML DATs only because of current limitations</li>
+</ul>
+This is useful for splitting DAT files similar to the NonGood set that can have more than one system per DAT.
+
+<b>SingleGame</b>
+<p/>
+Hightly experimental tool for merging all games in a single DAT (RomVault or Loqiqx XML only) for use with a server environment. Requested by Kludge.
 
 <h3>Contributions</h3>
 
