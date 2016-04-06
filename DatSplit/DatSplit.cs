@@ -14,7 +14,6 @@ namespace DatSplit
 		private static string extA;
 		private static string extB;
 		private static string filename;
-		private static string _version = "0.3.0.0";
 
 		public static void Main(string[] args)
 		{
@@ -36,7 +35,7 @@ namespace DatSplit
 			{
 				doc.LoadXml(File.ReadAllText(filename));
 			}
-			catch (XmlException ex)
+			catch (XmlException)
 			{
 				doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(filename)).ToString());
 			}

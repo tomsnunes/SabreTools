@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SabreTools
 {
-	class Helper
+	class UIHelper
 	{
 		private static string _dbName = "DATabase.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";

@@ -340,7 +340,7 @@ namespace SabreTools
 			{
 				doc.LoadXml(File.ReadAllText(_filepath));
 			}
-			catch (XmlException ex)
+			catch (XmlException)
 			{
 				doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(_filepath)).ToString());
 			}

@@ -8,7 +8,7 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// Contains all remappings of known import classes
 	/// </summary>
-	class Remapping
+	public class Remapping
 	{
 		// Remapping classes represented by dictionaries
 		public static Dictionary<string, string> MAME = new Dictionary<string, string>();

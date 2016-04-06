@@ -16,10 +16,9 @@ namespace SabreTools
 		private static Logger logger;
 		private static string _dbName = "DATabase.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
-		private static string _version = "0.3.0.0";
 		private static string _header =
 @"+-----------------------------------------------------------------------------+
-|                             DATabase " + _version + @"                                |
+|                             DATabase " + Build.Version + @"                                |
 |                                                                             |
 |                 Programming: Matt Nadareski (darksabre76)                   |
 |                            Testing: @tractivo                               |
@@ -656,9 +655,9 @@ or 'b' to go back to the previous menu:
 					fs.Close();
 					Console.WriteLine("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.dat");
 				}
-				catch (XmlException ex)
+				catch (XmlException)
 				{
-					logger.Warning("The file " + filename + " could not be parsed as an XML file.");
+					logger.Warning("The file " + filename + " could not be parsed as an XML file");
 				}
 			}
 			else
