@@ -48,6 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Batches\SingleGameDir.bat" />
+    <None Include="Batches\SingleGameDir_NoRename.bat" />
+    <None Include="Batches\SingleGameDir_WithRoot.bat" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SabreHelper\SabreHelper.csproj">
