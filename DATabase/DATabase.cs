@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SQLite;
 using System.IO;
+using System.IO.Compression;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -471,6 +472,9 @@ Make a selection:
 		/// <param name="old">True if the output file should be in RomVault format (default false)</param>
 		private static void InitGenerateAll(string outdir, bool norename, bool old)
 		{
+			string actualdir = outdir + "/";
+			outdir = outdir + "/temp/";
+
 			// Generate system-merged
 			string query = @"SELECT DISTINCT systems.id
 		FROM systems
@@ -554,6 +558,24 @@ Make a selection:
 
 			// Generate MEGAMERGED
 			InitGenerate("", "", outdir, norename, old);
+
+			// Zip up all of the files that were generated
+			ZipArchive zip = ZipFile.Open(actualdir + "dats-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".zip", ZipArchiveMode.Create);
+			foreach (String filename in Directory.EnumerateFiles(outdir))
+			{
+				if (filename.EndsWith(".xml") || filename.EndsWith(".dat"))
+				{
+					string internalFolder = (filename.Contains("ALL (merged") ? "" :
+						filename.Contains("merged") ? "merged-system/" :
+							filename.Contains("ALL") ? "merged-source/" : "custom/");
+					zip.CreateEntryFromFile(filename, internalFolder + filename);
+				}
+			}
+			zip.Dispose();
+
+			// Remove all of the DATs from the folder
+			Directory.Delete(outdir, true);
+
 			return;
 		}
 
@@ -612,7 +634,7 @@ or 'b' to go back to the previous menu:
 			}
 			else
 			{
-				Console.WriteLine("I'm sorry but " + filename + "doesn't exist!");
+				Console.WriteLine("I'm sorry but " + filename + " doesn't exist!");
 			}
 			return;
 		}
