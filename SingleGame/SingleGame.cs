@@ -8,7 +8,7 @@ namespace SabreTools
 {
 	public class SingleGame
 	{
-		private static string filename;
+		private static string _filename;
 
 		public static void Main(string[] args)
 		{
@@ -20,17 +20,17 @@ namespace SabreTools
 				return;
 			}
 
-			filename = args[0];
+			_filename = args[0];
 
 			// Take the filename, and load it as an XML document
 			XmlDocument doc = new XmlDocument();
 			try
 			{
-				doc.LoadXml(File.ReadAllText(filename));
+				doc.LoadXml(File.ReadAllText(_filename));
 			}
 			catch (XmlException)
 			{
-				doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(filename)).ToString());
+				doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(_filename)).ToString());
 			}
 
 			// We all start the same
@@ -109,7 +109,7 @@ namespace SabreTools
 
 			tempDoc.AppendChild(tempDoc.CreateDocumentType("datafile", "-//Logiqx//DTD ROM Management Datafile//EN", "http://www.logiqx.com/Dats/datafile.dtd", null));
 			tempDoc.AppendChild(outNode);
-			string outPath = Path.GetFileNameWithoutExtension(filename) + ".new" + Path.GetExtension(filename);
+			string outPath = Path.GetFileNameWithoutExtension(_filename) + ".new" + Path.GetExtension(_filename);
 			File.WriteAllText(outPath, Style.Beautify(tempDoc));
 		}
 

@@ -9,9 +9,9 @@ namespace DatSplit
 {
 	class DatSplit
 	{
-		private static string extA;
-		private static string extB;
-		private static string filename;
+		private static string _extA;
+		private static string _extB;
+		private static string _filename;
 
 		public static void Main(string[] args)
 		{
@@ -25,19 +25,19 @@ namespace DatSplit
 			}
 
 			// Set needed strings
-			filename = args[0];
-			extA = (args[1].StartsWith(".") ? args[1] : "." + args[1]);
-			extB = (args[2].StartsWith(".") ? args[2] : "." + args[2]);
+			_filename = args[0];
+			_extA = (args[1].StartsWith(".") ? args[1] : "." + args[1]);
+			_extB = (args[2].StartsWith(".") ? args[2] : "." + args[2]);
 
 			// Take the filename, and load it as an XML document
 			XmlDocument doc = new XmlDocument();
 			try
 			{
-				doc.LoadXml(File.ReadAllText(filename));
+				doc.LoadXml(File.ReadAllText(_filename));
 			}
 			catch (XmlException)
 			{
-				doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(filename)).ToString());
+				doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(_filename)).ToString());
 			}
 
 			// We all start the same
@@ -96,7 +96,7 @@ namespace DatSplit
 									size = Int64.Parse(child.Attributes["size"].Value);
 								}
 
-								if (child.Attributes["name"].Value.EndsWith(extA))
+								if (child.Attributes["name"].Value.EndsWith(_extA))
 								{
 									if (!inA)
 									{
@@ -108,7 +108,7 @@ namespace DatSplit
 									}
 									outA.AppendChild(outDocA.ImportNode(child, true));
 								}
-								else if (child.Attributes["name"].Value.EndsWith(extB))
+								else if (child.Attributes["name"].Value.EndsWith(_extB))
 								{
 									if (!inB)
 									{
@@ -151,11 +151,11 @@ namespace DatSplit
 
 			// Append the built nodes to the documents
 			outDocA.AppendChild(outDocA.ImportNode(outA, true));
-			string outPathA = Path.GetFileNameWithoutExtension(filename) + extA + Path.GetExtension(filename);
+			string outPathA = Path.GetFileNameWithoutExtension(_filename) + _extA + Path.GetExtension(_filename);
 			File.WriteAllText(outPathA, Style.Beautify(outDocA), Encoding.UTF8);
 
 			outDocB.AppendChild(outDocB.ImportNode(outB, true));
-			string outPathB = Path.GetFileNameWithoutExtension(filename) + extB + Path.GetExtension(filename);
+			string outPathB = Path.GetFileNameWithoutExtension(_filename) + _extB + Path.GetExtension(_filename);
 			File.WriteAllText(outPathB, Style.Beautify(outDocB), Encoding.UTF8);
 		}
 
