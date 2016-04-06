@@ -24,12 +24,13 @@
 	<mapping from="Applied Technology MicroBee" to="Applied Technology - MicroBee" />
 	<mapping from="Atari 2600 &amp; VCS" to="Atari - 2600" />
 	<mapping from="Atari 5200" to="Atari - 5200" />
-	<mapping from="Atari 7800" to="Atari - 7200" />
+	<mapping from="Atari 7800" to="Atari - 7800" />
 	<mapping from="Atari 8bit" to="Atari - 8bit" />
 	<mapping from="Atari Jaguar CD" to="Atari - Jaguar CD" />
 	<mapping from="Atari Jaguar" to="Atari - Jaguar" />
 	<mapping from="Atari Lynx" to="Atari - Lynx" />
 	<mapping from="Atari ST" to="Atari - ST" />
+  <mapping from="Bally Midway Astrocade" to="Bally Professional - Arcade, Astrocade" />
 	<mapping from="Bally Professional Arcade &amp; Astrocade" to="Bally Professional - Arcade, Astrocade" />
 	<mapping from="Bandai Pippin @World &amp; Pippin Atmark" to="Bandai - Pippin" />
 	<mapping from="Bandai Pippin Atmark" to="Bandai - Pippin" />
@@ -38,6 +39,7 @@
 	<mapping from="Bandai WonderSwan" to="Bandai - WonderSwan" />
 	<mapping from="Bondwell 12" to="Bondwell - 12" />
 	<mapping from="Bondwell 2" to="Bondwell - 2" />
+  <mapping from="Bondwell Model 2" to="Bondwell - 2" />
 	<mapping from="CBS ColecoVision ADAM" to="Coleco - ColecoVision, ColecoVision ADAM" />
 	<mapping from="CBS ColecoVision" to="Coleco - ColecoVision, ColecoVision ADAM" />
 	<mapping from="Cambridge University EDSAC" to="University of Cambridge - EDSAC" />
@@ -59,6 +61,7 @@
 	<mapping from="Commodore C65" to="Commodore - 65" />
 	<mapping from="Commodore MAX Machine &amp; VIC10" to="Commodore - VIC-10" />
 	<mapping from="Commodore PET" to="Commodore - PET" />
+  <mapping from="Commodore VIC10" to="Commodore - VIC-10" />
 	<mapping from="Commodore VIC20" to="Commodore - VIC-20" />
 	<mapping from="Creatronic Mega Duck &amp; Cougar Boy" to="Creatronic - Mega Duck, Cougar Boy" />
 	<mapping from="Cybiko Cybiko" to="Cybiko - Cybiko" />
@@ -183,6 +186,7 @@
 	<mapping from="Philips CD-i" to="Philips - CD-i" />
 	<mapping from="Philips G7000" to="Philips - Videopac+, Odyssey2" />
 	<mapping from="Philips P2000" to="Philips - P2000" />
+  <mapping from="Philips P2000T" to="Philips - P2000" />
 	<mapping from="Philips VG 5000" to="Philips - VG 5000" />
 	<mapping from="Philips Videopac G7000" to="Philips - Videopac+, Odyssey2" />
 	<mapping from="Philips Videopac+" to="Philips - Videopac+, Odyssey2" />
@@ -223,6 +227,7 @@
 	<mapping from="Sega Mega-CD and Sega CD" to="Sega - Mega-CD, Sega CD" />
 	<mapping from="Sega NAOMI 2" to="Sega - Naomi, Naomi 2, Atomiswave" />
 	<mapping from="Sega NAOMI" to="Sega - Naomi, Naomi 2, Atomiswave" />
+  <mapping from="Sega NAOMI GD-ROM" to="Sega - Naomi, Naomi 2, Atomiswave" />
 	<mapping from="Sega Pico" to="Sega - PICO" />
 	<mapping from="Sega Saturn" to="Sega - Saturn" />
 	<mapping from="Sega Super Control Station" to="Sega - SG-1000, SC-3000, SF-7000, Othello Multivision" />
