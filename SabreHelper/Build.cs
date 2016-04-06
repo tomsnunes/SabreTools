@@ -4,7 +4,7 @@
 	{
 		public static string Version
 		{
-			get { return "0.3.0.0"; }
+			get { return "0.4.0.0"; }
 		}
 	}
 }
