@@ -6,6 +6,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
+using SabreTools.Helper;
+
 namespace SabreTools
 {
 	/// <summary>
@@ -40,7 +42,7 @@ Options:
 			types.Add("snes", 512);
 
 			// Ensure that the header database is set up
-			EnsureDatabase(_dbName, _connectionString);
+			DBTools.EnsureDatabase(_dbName, _connectionString);
 
 			if (args.Length == 0 || args.Length > 2)
 			{
@@ -273,46 +275,6 @@ Options:
 						}
 					}
 				}
-			}
-		}
-
-		/// <summary>
-		/// Ensure that the databse exists and has the proper schema
-		/// </summary>
-		/// <param name="db">Name of the databse</param>
-		/// <param name="connectionString">Connection string for SQLite</param>
-		public static void EnsureDatabase(string db, string connectionString)
-		{
-			// Make sure the file exists
-			if (!File.Exists(db))
-			{
-				SQLiteConnection.CreateFile(db);
-			}
-
-			// Connect to the file
-			SQLiteConnection dbc = new SQLiteConnection(connectionString);
-			dbc.Open();
-			try
-			{
-				// Make sure the database has the correct schema
-				string query = @"
-CREATE TABLE IF NOT EXISTS data (
-	'sha1'		TEXT		NOT NULL,
-	'header'	TEXT		NOT NULL,
-	'type'		TEXT		NOT NULL,
-	PRIMARY KEY (sha1, header, type)
-)";
-				SQLiteCommand slc = new SQLiteCommand(query, dbc);
-				slc.ExecuteNonQuery();
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex);
-			}
-			finally
-			{
-				// Close and return the database connection
-				dbc.Close();
 			}
 		}
 	}

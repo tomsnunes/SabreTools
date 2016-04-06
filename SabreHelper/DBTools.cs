@@ -22,13 +22,19 @@ namespace SabreTools.Helper
 				SQLiteConnection.CreateFile(db);
 			}
 
+			//Get "type" from the filename
+			string type = Path.GetFileNameWithoutExtension(db);
+
 			// Connect to the file
 			SQLiteConnection dbc = new SQLiteConnection(connectionString);
 			dbc.Open();
+
+			// Make sure the database has the correct schema
 			try
 			{
-				// Make sure the database has the correct schema
-				string query = @"
+				if (type == "DATabase")
+				{
+					string query = @"
 CREATE TABLE IF NOT EXISTS checksums (
 	'file'	INTEGER		NOT NULL,
 	'size'	INTEGER		NOT NULL	DEFAULT -1,
@@ -37,10 +43,10 @@ CREATE TABLE IF NOT EXISTS checksums (
 	'sha1'	TEXT		NOT NULL,
 	PRIMARY KEY (file, size, crc, md5, sha1)
 )";
-				SQLiteCommand slc = new SQLiteCommand(query, dbc);
-				slc.ExecuteNonQuery();
+					SQLiteCommand slc = new SQLiteCommand(query, dbc);
+					slc.ExecuteNonQuery();
 
-				query = @"
+					query = @"
 CREATE TABLE IF NOT EXISTS files (
 	'id'			INTEGER	PRIMARY KEY	NOT NULL,
 	'setid'			INTEGER				NOT NULL,
@@ -48,10 +54,10 @@ CREATE TABLE IF NOT EXISTS files (
 	'type'			TEXT				NOT NULL	DEFAULT 'rom',
 	'lastupdated'	TEXT				NOT NULL
 )";
-				slc = new SQLiteCommand(query, dbc);
-				slc.ExecuteNonQuery();
+					slc = new SQLiteCommand(query, dbc);
+					slc.ExecuteNonQuery();
 
-				query = @"
+					query = @"
 CREATE TABLE IF NOT EXISTS games (
 	'id'		INTEGER PRIMARY KEY	NOT NULL,
 	'system'	INTEGER				NOT NULL,
@@ -59,34 +65,47 @@ CREATE TABLE IF NOT EXISTS games (
 	'parent'	INTEGER				NOT NULL	DEFAULT '0',
 	'source'	INTEGER				NOT NULL	DEFAULT '0'
 )";
-				slc = new SQLiteCommand(query, dbc);
-				slc.ExecuteNonQuery();
+					slc = new SQLiteCommand(query, dbc);
+					slc.ExecuteNonQuery();
 
-				query = @"
+					query = @"
 CREATE TABLE IF NOT EXISTS parent (
 	'id'	INTEGER PRIMARY KEY	NOT NULL,
 	'name'	TEXT				NOT NULL
 )";
-				slc = new SQLiteCommand(query, dbc);
-				slc.ExecuteNonQuery();
+					slc = new SQLiteCommand(query, dbc);
+					slc.ExecuteNonQuery();
 
-				query = @"
+					query = @"
 CREATE TABLE IF NOT EXISTS sources (
 	'id'	INTEGER PRIMARY KEY	NOT NULL,
 	'name'	TEXT				NOT NULL	UNIQUE,
 	'url'	TEXT				NOT NULL
 )";
-				slc = new SQLiteCommand(query, dbc);
-				slc.ExecuteNonQuery();
+					slc = new SQLiteCommand(query, dbc);
+					slc.ExecuteNonQuery();
 
-				query = @"
+					query = @"
 CREATE TABLE IF NOT EXISTS systems (
 	'id'			INTEGER PRIMARY KEY	NOT NULL,
 	'manufacturer'	TEXT				NOT NULL,
 	'system'		TEXT				NOT NULL
 )";
-				slc = new SQLiteCommand(query, dbc);
-				slc.ExecuteNonQuery();
+					slc = new SQLiteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+				}
+				else if (type == "Headerer")
+				{
+					string query = @"
+CREATE TABLE IF NOT EXISTS data (
+	'sha1'		TEXT		NOT NULL,
+	'header'	TEXT		NOT NULL,
+	'type'		TEXT		NOT NULL,
+	PRIMARY KEY (sha1, header, type)
+)";
+					SQLiteCommand slc = new SQLiteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+				}
 			}
 			catch (Exception ex)
 			{
