@@ -1,4 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace SabreTools.Helper
 {
@@ -134,6 +137,27 @@ namespace SabreTools.Helper
 			}
 
 			return input;
+		}
+
+		// http://stackoverflow.com/questions/203528/what-is-the-simplest-way-to-get-indented-xml-with-line-breaks-from-xmldocument
+		// http://www.timvw.be/2007/01/08/generating-utf-8-with-systemxmlxmlwriter/
+		public static string Beautify(XmlDocument doc)
+		{
+			MemoryStream ms = new MemoryStream();
+			XmlWriterSettings settings = new XmlWriterSettings
+			{
+				Encoding = new UTF8Encoding(false),
+				Indent = true,
+				IndentChars = "\t",
+				NewLineChars = "\r\n",
+				NewLineHandling = NewLineHandling.Replace
+			};
+
+			using (XmlWriter writer = XmlWriter.Create(ms, settings))
+			{
+				doc.Save(writer);
+			}
+			return Encoding.UTF8.GetString(ms.ToArray());
 		}
 	}
 }

@@ -154,37 +154,16 @@ namespace DatSplit
 			// Append the built nodes to the documents
 			outDocA.AppendChild(outDocA.ImportNode(outA, true));
 			string outPathA = Path.GetFileNameWithoutExtension(filename) + extA + Path.GetExtension(filename);
-			File.WriteAllText(outPathA, Beautify(outDocA), Encoding.UTF8);
+			File.WriteAllText(outPathA, Style.Beautify(outDocA), Encoding.UTF8);
 
 			outDocB.AppendChild(outDocB.ImportNode(outB, true));
 			string outPathB = Path.GetFileNameWithoutExtension(filename) + extB + Path.GetExtension(filename);
-			File.WriteAllText(outPathB, Beautify(outDocB), Encoding.UTF8);
+			File.WriteAllText(outPathB, Style.Beautify(outDocB), Encoding.UTF8);
 		}
 
 		public static void Help()
 		{
 			Console.WriteLine("DatSplit.exe <filename> <ext> <ext>");
-		}
-
-		// http://stackoverflow.com/questions/203528/what-is-the-simplest-way-to-get-indented-xml-with-line-breaks-from-xmldocument
-		// http://www.timvw.be/2007/01/08/generating-utf-8-with-systemxmlxmlwriter/
-		static public string Beautify(XmlDocument doc)
-		{
-			MemoryStream ms = new MemoryStream();
-			XmlWriterSettings settings = new XmlWriterSettings
-			{
-				Encoding = new UTF8Encoding(false),
-				Indent = true,
-				IndentChars = "\t",
-				NewLineChars = "\r\n",
-				NewLineHandling = NewLineHandling.Replace
-			};
-			
-			using (XmlWriter writer = XmlWriter.Create(ms, settings))
-			{
-				doc.Save(writer);
-			}
-			return Encoding.UTF8.GetString(ms.ToArray());
 		}
 	}
 }
