@@ -24,6 +24,7 @@ namespace SabreTools
 		private static string _noIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
 		private static string _noIntroNumberedPattern = @"(.*? - .*?) \(\d.*?_CM\).dat";
 		private static string _noIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\)\.dat";
+		private static string _nonGoodPattern = @"(NonGood.*?)( .*)?.dat";
 		private static string _redumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
 		private static string _redumpBiosPattern = @"^(.*?) \(\d+\) \((\d{4}-\d{2}-\d{2})\)\.dat$";
 		private static string _tosecPattern = @"^(.*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
@@ -53,6 +54,7 @@ namespace SabreTools
 			Redump,
 			TOSEC,
 			TruRip,
+			NonGood,
 		}
 
 		// Public instance variables
@@ -114,6 +116,11 @@ namespace SabreTools
 			{
 				fileinfo = Regex.Match(filename, _noIntroSpecialPattern).Groups;
 				type = DatType.NoIntro;
+			}
+			else if (Regex.IsMatch(filename, _nonGoodPattern))
+			{
+				fileinfo = Regex.Match(filename, _nonGoodPattern).Groups;
+				type = DatType.NonGood;
 			}
 			else if (Regex.IsMatch(filename, _redumpPattern))
 			{
@@ -200,6 +207,19 @@ namespace SabreTools
 						GroupCollection niDateInfo = Regex.Match(datestring, _noIntroSpecialDatePattern).Groups;
 						date = niDateInfo[1].Value + "-" + niDateInfo[2].Value + "-" + niDateInfo[3].Value + " 00:00:00";
 					}
+					break;
+				case DatType.NonGood:
+					if (!Remapping.NonGood.ContainsKey(fileinfo[1].Value))
+					{
+						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						return false;
+					}
+					GroupCollection nonGoodInfo = Regex.Match(Remapping.NonGood[fileinfo[1].Value], _remappedPattern).Groups;
+
+					manufacturer = nonGoodInfo[1].Value;
+					system = nonGoodInfo[2].Value;
+					source = "NonGood";
+					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					break;
 				case DatType.Redump:
 					if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))

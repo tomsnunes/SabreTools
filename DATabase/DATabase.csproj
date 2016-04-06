@@ -82,6 +82,7 @@
     <Content Include="Mappings\NoIntro.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Mappings\NonGood.xml" />
     <Content Include="Mappings\Redump.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
