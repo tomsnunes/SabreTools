@@ -8,19 +8,32 @@ namespace SabreTools
 {
 	public class SingleGame
 	{
-		private static string _filename;
+		private static string _filename = "";
+		private static string _path = "";
+		private static bool _rename = true;
 
 		public static void Main(string[] args)
 		{
 			Console.Title = "SingleGame " + Build.Version;
 
-			if (args.Length != 1)
+			if (args.Length == 0)
 			{
 				Help();
 				return;
 			}
 
 			_filename = args[0];
+
+			if (args.Length > 1)
+			{
+				for (int i = 1; i < args.Length; i++)
+				{
+					_path = (args[i].StartsWith("-r") ? args[i].Split('=')[1] : _path);
+					_rename = (args[i] == "-n" ? false : _rename);
+				}
+			}
+
+			_path = (_path == "" ? Environment.CurrentDirectory : _path);
 
 			// Take the filename, and load it as an XML document
 			XmlDocument doc = new XmlDocument();
@@ -58,7 +71,7 @@ namespace SabreTools
 			while (node != null)
 			{
 				// If we're at a game node, add the parent node but not all the internals
-				if (node.NodeType == XmlNodeType.Element && (node.Name == "machine" || node.Name == "game"))
+				if (_rename && node.NodeType == XmlNodeType.Element && (node.Name == "machine" || node.Name == "game"))
 				{
 					if (!inGame)
 					{
@@ -91,12 +104,14 @@ namespace SabreTools
 
 								XmlElement tempNode = (XmlElement)tempDoc.ImportNode(child, true);
 
-								// Windows max name length is 260. Taking into account the game name of "!", we can use 259 characters
-								string tempname = "(" + node.Attributes["name"].Value + ")" + child.Attributes["name"].Value;
-								if (tempname.Length > 259)
+								// Windows max name length is 260
+								string tempname = child.Attributes["name"].Value;
+								int usableLength = 259 - _path.Length;
+
+								if (tempname.Length > usableLength)
 								{
 									string ext = Path.GetExtension(tempname);
-									tempname = tempname.Substring(0, 259 - ext.Length);
+									tempname = tempname.Substring(0, usableLength - ext.Length);
 									tempname += ext;
 								}
 								tempNode.SetAttribute("name", tempname);
@@ -108,9 +123,28 @@ namespace SabreTools
 				else
 				{
 					XmlNode tempNode = tempDoc.ImportNode(node, true);
+
+					if (tempNode.Name == "header")
+					{
+						if (tempNode.SelectSingleNode("clrmamepro") == null)
+						{
+							XmlElement tempChild = tempDoc.CreateElement("clrmamepro");
+							tempChild.SetAttribute("forcepacking", "unzip");
+							tempNode.AppendChild(tempChild);
+						}
+						else
+						{
+							(tempNode.SelectSingleNode("clrmamepro") as XmlElement).SetAttribute("forcepacking", "unzip");
+						}
+					}
+
 					outNode.AppendChild(tempNode);
 				}
 				node = node.NextSibling;
+			}
+			if (inGame)
+			{
+				outNode = outNode.ParentNode;
 			}
 
 			tempDoc.AppendChild(tempDoc.CreateDocumentType("datafile", "-//Logiqx//DTD ROM Management Datafile//EN", "http://www.logiqx.com/Dats/datafile.dtd", null));
@@ -121,7 +155,10 @@ namespace SabreTools
 
 		private static void Help()
 		{
-			Console.WriteLine("SingleGame.exe <filename>");
+			Console.WriteLine(@"SingleGame.exe <filename> [-r=rootdir|-n]
+    -r=rootdir		Set the directory name for path size
+    -n			Disable single-game mode
+");
 		}
 	}
 }
