@@ -31,6 +31,7 @@ namespace SabreTools
 		private static string _tosecSpecialPatternA = @"^(.*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
 		private static string _tosecSpecialPatternB = @"^(.*? - .*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
 		private static string _truripPattern = @"^(.*) - .* \(trurip_XML\)\.dat$";
+		private static string _zandroPattern = @"^SMW-.*.xml";
 
 		// Regex Mapped Name Patterns
 		private static string _remappedPattern = @"^(.*) - (.*)$";
@@ -142,6 +143,12 @@ namespace SabreTools
 			{
 				fileinfo = Regex.Match(filename, _truripPattern).Groups;
 				type = DatType.TruRip;
+			}
+			else if (Regex.IsMatch(filename, _zandroPattern))
+			{
+				filename = "Nintendo - Super Nintendo Entertainment System (Zandro " + File.GetLastWriteTime(_filepath).ToString("yyyyMMddHHmmss") + ").dat";
+				fileinfo = Regex.Match(filename, _defaultPattern).Groups;
+				type = DatType.Custom;
 			}
 			else if (Regex.IsMatch(filename, _defaultPattern))
 			{
