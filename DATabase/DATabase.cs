@@ -569,7 +569,7 @@ Make a selection:
 					string internalFolder = (filename.Contains("ALL (merged") ? "" :
 						filename.Contains("merged") ? "merged-system/" :
 							filename.Contains("ALL") ? "merged-source/" : "custom/");
-					zip.CreateEntryFromFile(filename, internalFolder + Path.GetFileName(filename));
+					zip.CreateEntryFromFile(filename, internalFolder + Path.GetFileName(filename), CompressionLevel.Optimal);
 				}
 			}
 			zip.Dispose();
