@@ -560,6 +560,7 @@ Make a selection:
 			InitGenerate("", "", outdir, norename, old);
 
 			// Zip up all of the files that were generated
+			logger.Log("Creating zip archive");
 			ZipArchive zip = ZipFile.Open(actualdir + "dats-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".zip", ZipArchiveMode.Create);
 			foreach (String filename in Directory.EnumerateFiles(outdir))
 			{
@@ -572,6 +573,7 @@ Make a selection:
 				}
 			}
 			zip.Dispose();
+			logger.Log("Zip archive created!");
 
 			// Remove all of the DATs from the folder
 			Directory.Delete(outdir, true);
