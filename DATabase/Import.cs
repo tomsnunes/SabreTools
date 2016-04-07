@@ -98,10 +98,10 @@ namespace SabreTools
 			GroupCollection fileinfo;
 			DatType type = DatType.none;
 
-			if (Regex.IsMatch(filename, _mamePattern))
+			if (Regex.IsMatch(filename, _nonGoodPattern))
 			{
-				fileinfo = Regex.Match(filename, _mamePattern).Groups;
-				type = DatType.MAME;
+				fileinfo = Regex.Match(filename, _nonGoodPattern).Groups;
+				type = DatType.NonGood;
 			}
 			else if (Regex.IsMatch(filename, _maybeIntroPattern))
 			{
@@ -124,11 +124,6 @@ namespace SabreTools
 			{
 				fileinfo = Regex.Match(filename, _noIntroSpecialPattern).Groups;
 				type = DatType.NoIntro;
-			}
-			else if (Regex.IsMatch(filename, _nonGoodPattern))
-			{
-				fileinfo = Regex.Match(filename, _nonGoodPattern).Groups;
-				type = DatType.NonGood;
 			}
 			else if (Regex.IsMatch(filename, _redumpPattern))
 			{
@@ -161,6 +156,11 @@ namespace SabreTools
 			{
 				fileinfo = Regex.Match(filename, _defaultPattern).Groups;
 				type = DatType.Custom;
+			}
+			else if (Regex.IsMatch(filename, _mamePattern))
+			{
+				fileinfo = Regex.Match(filename, _mamePattern).Groups;
+				type = DatType.MAME;
 			}
 			// If the type is still unmatched, the data can't be imported yet
 			else
