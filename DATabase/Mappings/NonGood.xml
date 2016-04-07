@@ -11,6 +11,8 @@
 	<!-- <mapping from="NonGoodGBX" to="Nintendo - Game Boy Color" /> -->
 	<mapping from="NonGoodGB" to="Nintendo - Game Boy" />
 	<mapping from="NonGoodGBC" to="Nintendo - Game Boy Color" />
+	<mapping from="NonGoodGBX.gb" to="Nintendo - Game Boy" />
+	<mapping from="NonGoodGBX.gbc" to="Nintendo - Game Boy Color" />
 	<mapping from="NonGoodGCom" to="Tiger Electronics - Game.com" />
 	<mapping from="NonGoodGen" to="Sega - Mega Drive, Genesis" />
 	<mapping from="NonGoodGG" to="Sega - Game Gear" />
@@ -28,6 +30,8 @@
 	<!-- <mapping from="NonGoodNGPX" to="SNK - Neo Geo Pocket Color" /> -->
 	<mapping from="NonGoodNGP" to="SNK - Neo Geo Pocket" />
 	<mapping from="NonGoodNGPC" to="SNK - Neo Geo Pocket Color" />
+	<mapping from="NonGoodNGPX.ngp" to="SNK - Neo Geo Pocket" />
+	<mapping from="NonGoodNGPX.ngc" to="SNK - Neo Geo Pocket Color" />
 	<mapping from="NonGoodOric" to="Tangerine - Oric-1, Oric Atmos" />
 	<mapping from="NonGoodPCE" to="NEC - PC Engine, TurboGrafx 16" />
 	<mapping from="NonGoodPico" to="Sega - PICO" />
@@ -40,4 +44,6 @@
 	<!-- <mapping from="NonGoodWSX" to="Bandai - WonderSwan Color" /> -->
 	<mapping from="NonGoodWS" to="Bandai - WonderSwan" />
 	<mapping from="NonGoodWSC" to="Bandai - WonderSwan Color" />
+	<mapping from="NonGoodWSX.ws" to="Bandai - WonderSwan" />
+	<mapping from="NonGoodWSX.wsc" to="Bandai - WonderSwan Color" />
 </mappings>
