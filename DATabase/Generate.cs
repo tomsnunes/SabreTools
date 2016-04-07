@@ -179,6 +179,7 @@ namespace SabreTools
 
 			// Create a name for the file based on the retrieved information
 			string version = DateTime.Now.ToString("yyyyMMddHHmmss");
+			string intname = systemname + " (" + sourcename + ")";
 			string datname = systemname + " (" + sourcename + " " + version + ")";
 
 			// Create and open an output file for writing (currently uses current time, change to "last updated time"
@@ -196,7 +197,7 @@ namespace SabreTools
 				}
 
 				string header_old = "clrmamepro (\n" +
-					"\tname \"" + HttpUtility.HtmlEncode(datname) + "\"\n" +
+					"\tname \"" + HttpUtility.HtmlEncode(intname) + "\"\n" +
 					"\tdescription \"" + HttpUtility.HtmlEncode(datname) + "\"\n" +
 					"\tversion \"" + version + "\"\n" +
 					(_systems != "" && _systems.Split(',').Length == 1 && _headers.ContainsKey(Int32.Parse(_systems)) ? " header \"" + _headers[Int32.Parse(_systems)] + "\"\n" : "") +
@@ -208,7 +209,7 @@ namespace SabreTools
 					"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
 					"\t<datafile>\n" +
 					"\t\t<header>\n" +
-					"\t\t\t<name>" + HttpUtility.HtmlEncode(datname) + "</name>\n" +
+					"\t\t\t<name>" + HttpUtility.HtmlEncode(intname) + "</name>\n" +
 					"\t\t\t<description>" + HttpUtility.HtmlEncode(datname) + "</description>\n" +
 					"\t\t\t<category>The Wizard of DATz</category>\n" +
 					"\t\t\t<version>" + version + "</version>\n" +
