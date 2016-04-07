@@ -472,8 +472,8 @@ Make a selection:
 		/// <param name="old">True if the output file should be in RomVault format (default false)</param>
 		private static void InitGenerateAll(string outdir, bool norename, bool old)
 		{
-			string actualdir = outdir + "/";
-			outdir = outdir + "/temp/";
+			string actualdir = (outdir == "" ? Environment.CurrentDirectory + "/" : outdir + "/");
+			outdir = actualdir + "/temp/";
 
 			// Generate system-merged
 			string query = @"SELECT DISTINCT systems.id
@@ -568,7 +568,7 @@ Make a selection:
 					string internalFolder = (filename.Contains("ALL (merged") ? "" :
 						filename.Contains("merged") ? "merged-system/" :
 							filename.Contains("ALL") ? "merged-source/" : "custom/");
-					zip.CreateEntryFromFile(filename, internalFolder + filename);
+					zip.CreateEntryFromFile(filename, internalFolder + Path.GetFileName(filename));
 				}
 			}
 			zip.Dispose();
