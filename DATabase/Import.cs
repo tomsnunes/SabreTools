@@ -21,6 +21,7 @@ namespace SabreTools
 		// Regex File Name Patterns
 		private static string _defaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
 		private static string _mamePattern = @"^(.*)\.xml$";
+		private static string _maybeIntroPattern = @"(.*?) \[T-En\].*\((\d{8})\)\.dat$";
 		private static string _noIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
 		private static string _noIntroNumberedPattern = @"(.*? - .*?) \(\d.*?_CM\).dat";
 		private static string _noIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\)\.dat";
@@ -56,6 +57,7 @@ namespace SabreTools
 			TOSEC,
 			TruRip,
 			NonGood,
+			MaybeIntro,
 		}
 
 		// Public instance variables
@@ -100,6 +102,11 @@ namespace SabreTools
 			{
 				fileinfo = Regex.Match(filename, _mamePattern).Groups;
 				type = DatType.MAME;
+			}
+			else if (Regex.IsMatch(filename, _maybeIntroPattern))
+			{
+				fileinfo = Regex.Match(filename, _maybeIntroPattern).Groups;
+				type = DatType.MaybeIntro;
 			}
 			else if (Regex.IsMatch(filename, _noIntroPattern))
 			{
@@ -185,6 +192,21 @@ namespace SabreTools
 					system = mameInfo[2].Value;
 					source = "MAME";
 					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
+					break;
+				case DatType.MaybeIntro:
+					if (!Remapping.MaybeIntro.ContainsKey(fileinfo[1].Value))
+					{
+						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						return false;
+					}
+					GroupCollection maybeIntroInfo = Regex.Match(Remapping.MaybeIntro[fileinfo[1].Value], _remappedPattern).Groups;
+
+					manufacturer = maybeIntroInfo[1].Value;
+					system = maybeIntroInfo[2].Value;
+					source = "Maybe-Intro";
+					datestring = fileinfo[2].Value;
+					GroupCollection miDateInfo = Regex.Match(datestring, _noIntroSpecialDatePattern).Groups;
+					date = miDateInfo[1].Value + "-" + miDateInfo[2].Value + "-" + miDateInfo[3].Value + " 00:00:00";
 					break;
 				case DatType.NoIntro:
 					if (!Remapping.NoIntro.ContainsKey(fileinfo[1].Value))

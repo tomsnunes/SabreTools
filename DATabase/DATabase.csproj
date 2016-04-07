@@ -84,6 +84,9 @@
     <Content Include="Mappings\MAME.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Mappings\MaybeIntro.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Mappings\NoIntro.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

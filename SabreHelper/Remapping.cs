@@ -12,6 +12,7 @@ namespace SabreTools.Helper
 	{
 		// Remapping classes represented by dictionaries
 		public static Dictionary<string, string> MAME = new Dictionary<string, string>();
+		public static Dictionary<string, string> MaybeIntro = new Dictionary<string, string>();
 		public static Dictionary<string, string> NoIntro = new Dictionary<string, string>();
 		public static Dictionary<string, string> NonGood = new Dictionary<string, string>();
 		public static Dictionary<string, string> Redump = new Dictionary<string, string>();
@@ -26,7 +27,7 @@ namespace SabreTools.Helper
 			// Create array of dictionary names
 			string[] remappings =
 			{
-				"MAME", "NoIntro", "NonGood", "Redump", "TOSEC", "TruRip",
+				"MAME", "MaybeIntro", "NoIntro", "NonGood", "Redump", "TOSEC", "TruRip",
 			};
 
 			// Loop through and add all remappings
@@ -75,6 +76,9 @@ namespace SabreTools.Helper
 				{
 					case "MAME":
 						MAME.Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
+						break;
+					case "MaybeIntro":
+						MaybeIntro.Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
 						break;
 					case "NoIntro":
 						NoIntro.Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
