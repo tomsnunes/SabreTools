@@ -15,6 +15,7 @@
 	<mapping from="NonGoodGen" to="Sega - Mega Drive, Genesis" />
 	<mapping from="NonGoodGG" to="Sega - Game Gear" />
 	<mapping from="NonGoodINTV" to="Mattel - Intellivision" />
+  <mapping from="NonGoodJag" to="Atari - Jaguar" /> 
 	<mapping from="NonGoodJAG" to="Atari - Jaguar" />
 	<mapping from="NonGoodLynx" to="Atari - Lynx" />
 	<mapping from="NonGoodMini" to="Nintendo - Pokemon Mini" />
@@ -23,6 +24,7 @@
 	<mapping from="NonGoodN64" to="Nintendo - Nintendo 64" />
 	<mapping from="NonGoodNDS" to="Nintendo - Nintendo DS" />
 	<mapping from="NonGoodNES" to="Nintendo - Nintendo Entertainment System" />
+  <mapping from="NonGoodNES CHINESE" to="Nintendo - Nintendo Entertainment System" />   
 	<!-- <mapping from="NonGoodNGPX" to="SNK - Neo Geo Pocket Color" /> -->
 	<mapping from="NonGoodNGP" to="SNK - Neo Geo Pocket" />
 	<mapping from="NonGoodNGPC" to="SNK - Neo Geo Pocket Color" />
