@@ -25,9 +25,9 @@ namespace SabreTools
 		private static string _noIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
 		private static string _noIntroNumberedPattern = @"(.*? - .*?) \(\d.*?_CM\).dat";
 		private static string _noIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\)\.dat";
-        private static string _nonGoodPattern = @"^(NonGood.*?)( .*?)?.xml";
-        private static string _nonGoodSpecialPattern = @"^(NonGood.*?)( .*)?.dat";
-        private static string _redumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
+		private static string _nonGoodPattern = @"^(NonGood.*?)( .*?)?.xml";
+		private static string _nonGoodSpecialPattern = @"^(NonGood.*?)( .*)?.dat";
+		private static string _redumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
 		private static string _redumpBiosPattern = @"^(.*?) \(\d+\) \((\d{4}-\d{2}-\d{2})\)\.dat$";
 		private static string _tosecPattern = @"^(.*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
 		private static string _tosecSpecialPatternA = @"^(.*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
@@ -104,12 +104,12 @@ namespace SabreTools
 				fileinfo = Regex.Match(filename, _nonGoodPattern).Groups;
 				type = DatType.NonGood;
 			}
-            else if (Regex.IsMatch(filename, _nonGoodSpecialPattern))
-            {
-                fileinfo = Regex.Match(filename, _nonGoodSpecialPattern).Groups;
-                type = DatType.NonGood;
-            }
-            else if (Regex.IsMatch(filename, _maybeIntroPattern))
+			else if (Regex.IsMatch(filename, _nonGoodSpecialPattern))
+			{
+				fileinfo = Regex.Match(filename, _nonGoodSpecialPattern).Groups;
+				type = DatType.NonGood;
+			}
+			else if (Regex.IsMatch(filename, _maybeIntroPattern))
 			{
 				fileinfo = Regex.Match(filename, _maybeIntroPattern).Groups;
 				type = DatType.MaybeIntro;
