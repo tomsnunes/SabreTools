@@ -566,7 +566,7 @@ Make a selection:
 			{
 				if (filename.EndsWith(".xml") || filename.EndsWith(".dat"))
 				{
-					string internalFolder = (filename.Contains("ALL (merged") ? "" :
+					string internalFolder = (filename.Contains("ALL (Merged") ? "" :
 						filename.Contains("Merged") ? "merged-system/" :
 							filename.Contains("ALL") ? "merged-source/" : "custom/");
 					zip.CreateEntryFromFile(filename, internalFolder + Path.GetFileName(filename), CompressionLevel.Optimal);
