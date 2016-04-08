@@ -26,7 +26,7 @@ namespace DatSplit
 
 			// Set needed strings
 			_filename = args[0];
-			_extA = (args[1].StartsWith(".") ? args[1] : "." + args[1]).ToUpperInvariant(); ;
+			_extA = (args[1].StartsWith(".") ? args[1] : "." + args[1]).ToUpperInvariant();
 			_extB = (args[2].StartsWith(".") ? args[2] : "." + args[2]).ToUpperInvariant();
 
 			// Take the filename, and load it as an XML document
