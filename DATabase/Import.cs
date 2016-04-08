@@ -20,6 +20,7 @@ namespace SabreTools
 
 		// Regex File Name Patterns
 		private static string _defaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
+		private static string _defaultSpecialPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.xml$";
 		private static string _mamePattern = @"^(.*)\.xml$";
 		private static string _maybeIntroPattern = @"(.*?) \[T-En\].*\((\d{8})\)\.dat$";
 		private static string _noIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
@@ -161,6 +162,11 @@ namespace SabreTools
 			else if (Regex.IsMatch(filename, _defaultPattern))
 			{
 				fileinfo = Regex.Match(filename, _defaultPattern).Groups;
+				type = DatType.Custom;
+			}
+			else if (Regex.IsMatch(filename, _defaultSpecialPattern))
+			{
+				fileinfo = Regex.Match(filename, _defaultSpecialPattern).Groups;
 				type = DatType.Custom;
 			}
 			else if (Regex.IsMatch(filename, _mamePattern))
