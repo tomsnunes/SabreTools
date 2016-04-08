@@ -62,4 +62,4 @@
 	<mapping from="NonGoodWSX.WS" to="Bandai - WonderSwan" />
 	<mapping from="NonGoodWSX.wsc" to="Bandai - WonderSwan Color" />
 	<mapping from="NonGoodWSX.WSC" to="Bandai - WonderSwan Color" />
-</mappings>
+	</mappings>
