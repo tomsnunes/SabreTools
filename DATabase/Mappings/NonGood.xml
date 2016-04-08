@@ -10,9 +10,13 @@
 	<mapping from="NonGoodGBAv4" to="Nintendo - Game Boy Advance" />
 	<!-- <mapping from="NonGoodGBX" to="Nintendo - Game Boy Color" /> -->
 	<mapping from="NonGoodGB" to="Nintendo - Game Boy" />
+  <mapping from="NonGoodgb" to="Nintendo - Game Boy" />
 	<mapping from="NonGoodGBC" to="Nintendo - Game Boy Color" />
+  <mapping from="NonGoodgbc" to="Nintendo - Game Boy Color" />
 	<mapping from="NonGoodGBX.gb" to="Nintendo - Game Boy" />
+  <mapping from="NonGoodGBX.GB" to="Nintendo - Game Boy" />
 	<mapping from="NonGoodGBX.gbc" to="Nintendo - Game Boy Color" />
+  <mapping from="NonGoodGBX.GBC" to="Nintendo - Game Boy Color" />
 	<mapping from="NonGoodGCom" to="Tiger Electronics - Game.com" />
 	<mapping from="NonGoodGen" to="Sega - Mega Drive, Genesis" />
 	<mapping from="NonGoodGG" to="Sega - Game Gear" />
@@ -29,9 +33,17 @@
 	<mapping from="NonGoodNES CHINESE" to="Nintendo - Nintendo Entertainment System" />   
 	<!-- <mapping from="NonGoodNGPX" to="SNK - Neo Geo Pocket Color" /> -->
 	<mapping from="NonGoodNGP" to="SNK - Neo Geo Pocket" />
+  <mapping from="NonGoodngp" to="SNK - Neo Geo Pocket" />
 	<mapping from="NonGoodNGPC" to="SNK - Neo Geo Pocket Color" />
-	<mapping from="NonGoodNGPX.ngp" to="SNK - Neo Geo Pocket" />
+  <mapping from="NonGoodngpc" to="SNK - Neo Geo Pocket Color" />
+  <mapping from="NonGoodNGC" to="SNK - Neo Geo Pocket Color" />
+  <mapping from="NonGoodngc" to="SNK - Neo Geo Pocket Color" />
+  <mapping from="NonGoodNGPX.NGP" to="SNK - Neo Geo Pocket" />
+  <mapping from="NonGoodNGPX.ngp" to="SNK - Neo Geo Pocket" />
+  <mapping from="NonGoodNGPX.NGC" to="SNK - Neo Geo Pocket Color" />
 	<mapping from="NonGoodNGPX.ngc" to="SNK - Neo Geo Pocket Color" />
+  <mapping from="NonGoodNGPX.NGPC" to="SNK - Neo Geo Pocket Color" />
+  <mapping from="NonGoodNGPX.ngpc" to="SNK - Neo Geo Pocket Color" />
 	<mapping from="NonGoodOric" to="Tangerine - Oric-1, Oric Atmos" />
 	<mapping from="NonGoodPCE" to="NEC - PC Engine, TurboGrafx 16" />
 	<mapping from="NonGoodPico" to="Sega - PICO" />
@@ -43,7 +55,11 @@
 	<mapping from="NonGoodVPac" to="Philips - Videopac+, Odyssey2" />
 	<!-- <mapping from="NonGoodWSX" to="Bandai - WonderSwan Color" /> -->
 	<mapping from="NonGoodWS" to="Bandai - WonderSwan" />
+  <mapping from="NonGoodws" to="Bandai - WonderSwan" />
 	<mapping from="NonGoodWSC" to="Bandai - WonderSwan Color" />
+  <mapping from="NonGoodwsc" to="Bandai - WonderSwan Color" />
 	<mapping from="NonGoodWSX.ws" to="Bandai - WonderSwan" />
+  <mapping from="NonGoodWSX.WS" to="Bandai - WonderSwan" />
 	<mapping from="NonGoodWSX.wsc" to="Bandai - WonderSwan Color" />
+  <mapping from="NonGoodWSX.WSC" to="Bandai - WonderSwan Color" />
 </mappings>
