@@ -26,8 +26,8 @@ namespace DatSplit
 
 			// Set needed strings
 			_filename = args[0];
-			_extA = (args[1].StartsWith(".") ? args[1] : "." + args[1]);
-			_extB = (args[2].StartsWith(".") ? args[2] : "." + args[2]);
+			_extA = (args[1].StartsWith(".") ? args[1] : "." + args[1]).ToUpperInvariant(); ;
+			_extB = (args[2].StartsWith(".") ? args[2] : "." + args[2]).ToUpperInvariant();
 
 			// Take the filename, and load it as an XML document
 			XmlDocument doc = new XmlDocument();
@@ -96,7 +96,7 @@ namespace DatSplit
 									size = Int64.Parse(child.Attributes["size"].Value);
 								}
 
-								if (child.Attributes["name"].Value.EndsWith(_extA))
+								if (child.Attributes["name"].Value.ToUpperInvariant().EndsWith(_extA))
 								{
 									if (!inA)
 									{
@@ -108,7 +108,7 @@ namespace DatSplit
 									}
 									outA.AppendChild(outDocA.ImportNode(child, true));
 								}
-								else if (child.Attributes["name"].Value.EndsWith(_extB))
+								else if (child.Attributes["name"].Value.ToUpperInvariant().EndsWith(_extB))
 								{
 									if (!inB)
 									{
