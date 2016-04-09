@@ -17,7 +17,21 @@ namespace SabreTools
 	{
 		private static string _dbName = "Headerer.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
-		private static Dictionary<string, int> types;
+
+		/// <summary>
+		/// Possible detected header type
+		/// </summary>
+		private enum HeaderType
+		{
+			None = 0,
+			A7800,
+			FDS,
+			Lynx,
+			//N64,
+			NES,
+			PCE,
+			SNES,
+		}
 
 		/// <summary>
 		/// Start deheader operation with supplied parameters
@@ -26,15 +40,6 @@ namespace SabreTools
 		static void Main(string[] args)
 		{
 			Console.Title = "Headerer " + Build.Version;
-
-			// Type mapped to header size (in decimal bytes)
-			types = new Dictionary<string, int>();
-			types.Add("a7800", 128);
-			types.Add("fds", 16);
-			types.Add("lynx", 64);
-			types.Add("pce", 512);
-			types.Add("nes", 16);
-			types.Add("snes", 512);
 
 			// Ensure that the header database is set up
 			DBTools.EnsureDatabase(_dbName, _connectionString);
@@ -131,38 +136,64 @@ namespace SabreTools
 			string header = BitConverter.ToString(hbin).Replace("-", string.Empty);
 
 			// Determine the type of the file from the header, if possible
-			string type = "";
-			if (Regex.IsMatch(header, "^.{2}415441524937383030") || Regex.IsMatch(header, "^.{200}41435455414C20434152542044415441205354415254532048455245"))
+			HeaderType type = HeaderType.None;
+			int headerSize = 0;
+
+			// Loop over the header types and see if there's a match
+			foreach (HeaderType test in Enum.GetValues(typeof(HeaderType)))
 			{
-				type = "a7800";
-			}
-			else if (Regex.IsMatch(header, "^4644531A0[1-4]0000000000000000000000"))
-			{
-				type = "fds";
-			}
-			else if (Regex.IsMatch(header, "^4C594E58") || Regex.IsMatch(header, "^425339"))
-			{
-				type = "lynx";
-			}
-			else if (Regex.IsMatch(header, "^4000000000000000AABB02"))
-			{
-				type = "pce";
-			}
-			else if (Regex.IsMatch(header, "^4E45531A"))
-			{
-				type = "nes";
-			}
-			else if (Regex.IsMatch(header, "^.{16}0000000000000000") || Regex.IsMatch(header, "^.{16}AABB040000000000") || Regex.IsMatch(header, "^.{16}535550455255464F")) // fig, smc, ufo
-			{
-				type = "snes";
+				Dictionary<string, int> tempDict = new Dictionary<string, int>();
+				switch (test)
+				{
+					case HeaderType.A7800:
+						tempDict = Remapping.A7800;
+						break;
+					case HeaderType.FDS:
+						tempDict = Remapping.FDS;
+						break;
+					case HeaderType.Lynx:
+						tempDict = Remapping.Lynx;
+						break;
+					case HeaderType.PCE:
+						tempDict = Remapping.PCE;
+						break;
+					/*
+					case HeaderType.N64:
+						tempDict = Remapping.N64;
+						break;
+					*/
+					case HeaderType.NES:
+						tempDict = Remapping.NES;
+						break;
+					case HeaderType.SNES:
+						tempDict = Remapping.SNES;
+						break;
+				}
+
+				// Loop over the dictionary and see if there are matches
+				foreach (KeyValuePair<string, int> entry in tempDict)
+				{
+					if (Regex.IsMatch(header, entry.Key))
+					{
+						type = test;
+						headerSize = entry.Value;
+						break;
+					}
+				}
+
+				// If we found something, break out
+				if (type != HeaderType.None)
+				{
+					break;
+				}
 			}
 
-			Console.WriteLine("File has header: " + (type != ""));
+			Console.WriteLine("File has header: " + (type != HeaderType.None));
 
-			if (type != "")
+			if (type != HeaderType.None)
 			{
 				Console.WriteLine("Deteched header type: " + type);
-				int hs = types[type];
+				int hs = headerSize;
 
 				// Save header as string in the database
 				string realhead = "";
@@ -206,7 +237,7 @@ namespace SabreTools
 					query = @"INSERT INTO data (sha1, header, type) VALUES ('" +
 					BitConverter.ToString(sha1.Hash) + "', " +
 					"'" + realhead + "', " +
-					"'" + type + "')";
+					"'" + type.ToString() + "')";
 					using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 					{
 						dbc.Open();

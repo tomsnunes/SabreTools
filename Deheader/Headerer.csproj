@@ -89,6 +89,7 @@
     <Content Include="Skippers\lynx.xml" />
     <Content Include="Skippers\n64.xml" />
     <Content Include="Skippers\nes.xml" />
+    <Content Include="Skippers\pce.xml" />
     <Content Include="Skippers\snes.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
