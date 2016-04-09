@@ -17,6 +17,7 @@ namespace SabreTools
 	{
 		private static string _dbName = "Headerer.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
+		private static Logger logger;
 
 		/// <summary>
 		/// Possible detected header type
@@ -39,10 +40,13 @@ namespace SabreTools
 		/// <param name="args">String array representing command line parameters</param>
 		static void Main(string[] args)
 		{
-			Console.Title = "Headerer " + Build.Version;
-
-			// Ensure that the header database is set up
+			// Perform initial setup and verification
+			logger = new Logger(false, "database.log");
+			logger.Start();
 			DBTools.EnsureDatabase(_dbName, _connectionString);
+			Remapping.CreateHeaderSkips();
+
+			Console.Title = "Headerer " + Build.Version;
 
 			if (args.Length == 0 || args.Length > 2)
 			{
