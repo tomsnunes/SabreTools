@@ -51,6 +51,7 @@ namespace SabreTools
 			if (args.Length == 0 || args.Length > 2)
 			{
 				Build.Help();
+				logger.Close();
 				return;
 			}
 
@@ -124,6 +125,7 @@ namespace SabreTools
 					Build.Help();
 				}
 			}
+			logger.Close();
 		}
 
 		/// <summary>
@@ -192,11 +194,11 @@ namespace SabreTools
 				}
 			}
 
-			Console.WriteLine("File has header: " + (type != HeaderType.None));
+			logger.Log("File has header: " + (type != HeaderType.None));
 
 			if (type != HeaderType.None)
 			{
-				Console.WriteLine("Deteched header type: " + type);
+				logger.Log("Deteched header type: " + type);
 				int hs = headerSize;
 
 				// Save header as string in the database
@@ -210,13 +212,13 @@ namespace SabreTools
 				hbin = hbin.Skip(hs).ToArray();
 
 				// Write out the new file
-				Console.WriteLine("Creating unheadered file: " + file + ".new");
+				logger.Log("Creating unheadered file: " + file + ".new");
 				BinaryWriter bw = new BinaryWriter(File.OpenWrite(file + ".new"));
 				FileInfo fi = new FileInfo(file);
 				bw.Write(hbin);
 				bw.Write(br.ReadBytes((int)fi.Length - hs));
 				bw.Close();
-				Console.WriteLine("Unheadered file created!");
+				logger.Log("Unheadered file created!");
 
 				// Now add the information to the database if it's not already there
 				SHA1 sha1 = SHA1.Create();
@@ -247,7 +249,7 @@ namespace SabreTools
 						dbc.Open();
 						using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
 						{
-							Console.WriteLine("Result of inserting header: " + slc.ExecuteNonQuery());
+							logger.Log("Result of inserting header: " + slc.ExecuteNonQuery());
 						}
 					}
 				}
@@ -282,10 +284,10 @@ namespace SabreTools
 							int sub = 0;
 							while (sldr.Read())
 							{
-								Console.WriteLine("Found match with rom type " + sldr.GetString(1));
+								logger.Log("Found match with rom type " + sldr.GetString(1));
 								header = sldr.GetString(0);
 
-								Console.WriteLine("Creating reheadered file: " + file + ".new" + sub);
+								logger.Log("Creating reheadered file: " + file + ".new" + sub);
 								BinaryWriter bw = new BinaryWriter(File.OpenWrite(file + ".new" + sub));
 
 								// Source: http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
@@ -295,12 +297,12 @@ namespace SabreTools
 								}
 								bw.Write(File.ReadAllBytes(file));
 								bw.Close();
-								Console.WriteLine("Reheadered file created!");
+								logger.Log("Reheadered file created!");
 							}
 						}
 						else
 						{
-							Console.WriteLine("No matching header could be found!");
+							logger.Warning("No matching header could be found!");
 							return;
 						}
 					}
