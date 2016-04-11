@@ -40,7 +40,7 @@ namespace SabreTools
 			List<Tuple<string, string, long, string>> roms = new List<Tuple<string, string, long, string>>();
 
 			// This is where the main loop would go
-			foreach (string item in Directory.EnumerateFileSystemEntries(_basePath))
+			foreach (string item in Directory.GetFiles(_basePath, "*", SearchOption.AllDirectories))
 			{
 				// Create the temporary output directory
 				Directory.CreateDirectory(_tempDir);
@@ -63,17 +63,35 @@ namespace SabreTools
 						string tempHash = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
 						fs.Close();
 
-						roms.Add(new Tuple<string, string, long, string>(Path.GetFileNameWithoutExtension(item), entry.Remove(0, _tempDir.Length), (new FileInfo(entry)).Length, tempHash));
+						roms.Add(new Tuple<string, string, long, string>(
+							Path.GetFileNameWithoutExtension(item),
+							entry.Remove(0, _tempDir.Length),
+							(new FileInfo(entry)).Length,
+							tempHash));
 					}
 				}
 				// Otherwise, just get the info on the file itself
-				else
+				else if (!Directory.Exists(item))
 				{
-					FileStream fs = File.OpenRead(item);
+					FileStream fs;
+					try
+					{
+						fs = File.OpenRead(item);
+					}
+					catch (IOException)
+					{
+						continue;
+					}
 					string tempHash = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
 					fs.Close();
 
-					roms.Add(new Tuple<string, string, long, string>("Default", item.Remove(0, _basePath.Length), (new FileInfo(item)).Length, tempHash));
+					string actualpath = Path.GetDirectoryName(item.Remove(0, _basePath.Length)).Replace('/', '\\').Split('\\')[0];
+
+					roms.Add(new Tuple<string, string, long, string>(
+						(actualpath == "" ? "Default" : actualpath),
+						item.Remove(0, _basePath.Length).Remove(0, actualpath.Length + (actualpath != "" ? 1 : 0)),
+						(new FileInfo(item)).Length,
+						tempHash));
 				}
 
 				// Delete the temp directory
