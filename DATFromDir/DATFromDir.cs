@@ -68,6 +68,8 @@ namespace SabreTools
 							entry.Remove(0, _tempDir.Length),
 							(new FileInfo(entry)).Length,
 							tempHash));
+
+						Console.WriteLine("File parsed: " + entry.Remove(0, _tempDir.Length));
 					}
 				}
 				// Otherwise, just get the info on the file itself
@@ -92,6 +94,8 @@ namespace SabreTools
 						item.Remove(0, _basePath.Length).Remove(0, actualpath.Length + (actualpath != "" ? 1 : 0)),
 						(new FileInfo(item)).Length,
 						tempHash));
+
+					Console.WriteLine("File parsed: " + item.Remove(0, _basePath.Length));
 				}
 
 				// Delete the temp directory
@@ -126,21 +130,16 @@ namespace SabreTools
 				Console.WriteLine(rom.Item1 + "\t" + rom.Item2 + "\t" + rom.Item3 + "\t" + rom.Item4);
 			}
 
+			//TODO: So, this below section is a pretty much one for one copy of code that is written in generate
+			//		this means that in the future, "writing to DAT" will be abstracted out to the DLL so that any
+			//		properly formatted data can be passed in and it will get written as necessary. That would open
+			//		the possibiliites for different ways to generate a DAT from multiple things
+
 			// Now write it all out as a DAT
 			try
 			{
 				FileStream fs = File.Create("dirdat.xml");
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-
-				/*
-				string header_old = "clrmamepro (\n" +
-					"\tname \"dirdat\"\n" +
-					"\tdescription \"dirdat\"\n" +
-					"\tversion \"\"\n" +
-					"\tcomment \"\"\n" +
-					"\tauthor \"DATFromDir\"\n" +
-					")\n";
-				*/
 
 				string header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 					"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
