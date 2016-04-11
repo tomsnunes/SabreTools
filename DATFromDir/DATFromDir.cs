@@ -95,7 +95,10 @@ namespace SabreTools
 				}
 
 				// Delete the temp directory
-				Directory.Delete(_tempDir, true);
+				if (Directory.Exists(_tempDir))
+				{
+					Directory.Delete(_tempDir, true);
+				}
 			}
 
 			// Order the roms by name of parent, then name of rom
