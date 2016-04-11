@@ -123,13 +123,6 @@ namespace SabreTools
 				return String.Compare(A.Item1, B.Item1);
 			});
 
-			// Write out all of the file information
-			Console.WriteLine("Parent\t\tRom\t\tSize\t\tSHA-1");
-			foreach (Tuple<string, string, long, string> rom in roms)
-			{
-				Console.WriteLine(rom.Item1 + "\t" + rom.Item2 + "\t" + rom.Item3 + "\t" + rom.Item4);
-			}
-
 			//TODO: So, this below section is a pretty much one for one copy of code that is written in generate
 			//		this means that in the future, "writing to DAT" will be abstracted out to the DLL so that any
 			//		properly formatted data can be passed in and it will get written as necessary. That would open
