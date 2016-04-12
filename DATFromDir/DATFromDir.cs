@@ -158,7 +158,7 @@ namespace SabreTools
 				}
 				else
 				{
-					foreach (string item in Directory.GetFiles(_basePath, "*", SearchOption.AllDirectories))
+					foreach (string item in Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories))
 					{
 						ProcessFile(item);
 					}
@@ -324,7 +324,7 @@ Options:
 			// If the file was an archive and was extracted successfully, check it
 			if (!encounteredErrors)
 			{
-				foreach (string entry in Directory.GetFiles(_tempDir, "*", SearchOption.AllDirectories))
+				foreach (string entry in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
 				{
 					string fileCRC = String.Empty;
 					string fileMD5 = String.Empty;
