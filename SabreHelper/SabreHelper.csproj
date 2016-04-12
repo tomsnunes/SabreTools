@@ -66,9 +66,11 @@
     <Compile Include="Converters.cs" />
     <Compile Include="CRC32.cs" />
     <Compile Include="DBTools.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Remapping.cs" />
+    <Compile Include="Structs.cs" />
     <Compile Include="Style.cs" />
     <Compile Include="Build.cs" />
   </ItemGroup>

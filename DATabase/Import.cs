@@ -46,22 +46,6 @@ namespace SabreTools
 		private static string _redumpDatePattern = @"(\d{4})(\d{2})(\d{2}) (\d{2})-(\d{2})-(\d{2})";
 		private static string _tosecDatePattern = @"(\d{4})-(\d{2})-(\d{2})";
 
-		/// <summary>
-		/// Possible DAT import classes
-		/// </summary>
-		private enum DatType
-		{
-			none = 0,
-			Custom,
-			MAME,
-			NoIntro,
-			Redump,
-			TOSEC,
-			TruRip,
-			NonGood,
-			MaybeIntro,
-		}
-
 		// Public instance variables
 		public string FilePath
 		{

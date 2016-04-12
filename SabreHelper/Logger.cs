@@ -13,13 +13,6 @@ namespace SabreTools.Helper
 		private string _filename;
 		private StreamWriter _log;
 
-		public enum LogLevel
-		{
-			VERBOSE = 0,
-			WARNING,
-			ERROR,
-		}
-
 		// Public wrappers
 		public bool ToFile
 		{

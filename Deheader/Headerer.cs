@@ -20,21 +20,6 @@ namespace SabreTools
 		private static Logger logger;
 
 		/// <summary>
-		/// Possible detected header type
-		/// </summary>
-		private enum HeaderType
-		{
-			None = 0,
-			A7800,
-			FDS,
-			Lynx,
-			//N64,
-			NES,
-			PCE,
-			SNES,
-		}
-
-		/// <summary>
 		/// Start deheader operation with supplied parameters
 		/// </summary>
 		/// <param name="args">String array representing command line parameters</param>
