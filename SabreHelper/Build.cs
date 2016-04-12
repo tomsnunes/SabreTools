@@ -15,15 +15,22 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Returns true if running in a Mono environment
+		/// </summary>
+		public static bool MonoEnvironment
+		{
+			get { return (Type.GetType("Mono.Runtime") != null);  }
+		}
+
+		/// <summary>
 		/// The path to the root of the 7z binaries and DLLs
 		/// </summary>
 		public static string SevenZipPath
 		{
 			get
 			{
-				bool isMono = (Type.GetType("Mono.Runtime") != null);
 				char delim = (Environment.CurrentDirectory.Contains("\\") ? '\\' : '/');
-				return Environment.CurrentDirectory + delim + (!isMono && Environment.Is64BitOperatingSystem ? "x64" : "x86") + delim;
+				return Environment.CurrentDirectory + delim + (!MonoEnvironment && Environment.Is64BitOperatingSystem ? "x64" : "x86") + delim;
 			}
 		}
 
