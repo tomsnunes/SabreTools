@@ -6,7 +6,7 @@ This project is a desktop port of some core features of Wizard of DATz Redux. Fo
 
 <h3>Features</h3>
 
-Currently, SabreTools consists of the following programs: SabreTools UI, DATabase, Headerer, DatSplit, and SingleGame.
+Currently, SabreTools consists of the following programs:
 
 <b>SabreTools UI</b>
 <p/>
@@ -51,6 +51,17 @@ This is useful for splitting DAT files similar to the NonGood set that can have 
 <b>SingleGame</b>
 <p/>
 Hightly experimental tool for merging all games in a single DAT (RomVault or Loqiqx XML only) for use with a server environment. Requested by Kludge.
+
+<b>DATFromDir</b>
+<p/>
+This a versitile Directory to DAT file creator developed to reduce the overhead of creating custom DAT files.
+<ul>
+	<li>Create a DIR from a file, a folder, or a set of either</li>
+	<li>Set most of the DAT header values</li>
+	<li>Enable DAT to be created with forcepacking="unzip"</li>
+	<li>Treat archives like directories (default) or files</li>
+	<li>Output to XML DAT</li>
+</ul>
 
 <h3>Contributions</h3>
 
