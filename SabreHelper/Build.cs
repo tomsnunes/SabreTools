@@ -23,14 +23,21 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// The path delimiter for the current environment
+		/// </summary>
+		public static char PathDelim
+		{
+			get { return (Environment.CurrentDirectory.Contains("\\") ? '\\' : '/'); }
+		}
+
+		/// <summary>
 		/// The path to the root of the 7z binaries and DLLs
 		/// </summary>
 		public static string SevenZipPath
 		{
 			get
 			{
-				char delim = (Environment.CurrentDirectory.Contains("\\") ? '\\' : '/');
-				return Environment.CurrentDirectory + delim + (!MonoEnvironment && Environment.Is64BitOperatingSystem ? "x64" : "x86") + delim;
+				return Environment.CurrentDirectory + PathDelim + (!MonoEnvironment && Environment.Is64BitOperatingSystem ? "x64" : "x86") + PathDelim;
 			}
 		}
 
