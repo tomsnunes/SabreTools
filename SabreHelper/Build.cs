@@ -90,6 +90,24 @@ Options:
     -n			Disable single-game mode
 ");
 					break;
+				case "DATFromDir":
+					Console.WriteLine(@"DATFromDir - Create a DAT file from a directory
+-----------------------------------------
+Usage: DATFromDir [options] [filename|dirname] <filename|dirname> ...
+
+Options:
+  -h, -?, --help	Show this help dialog
+  -m, --noMD5		Don't include MD5 in output
+  -s, --noSHA1		Don't include SHA1 in output
+  -u, --unzip		Force unzipping in created DAT
+  -f, --files		Treat archives as files
+  -o, --old		Output DAT in RV format instead of XML
+  -n=, --name=		Set the name of the DAT
+  -d=, --desc=		Set the description of the DAT
+  -c=, --cat=		Set the category of the DAT
+  -v=, --version=	Set the version of the DAT
+  -a=, --author=	Set the author of the DAT");
+					break;
 				default:
 					Console.Write("This is the default help output");
 					break;
