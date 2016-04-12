@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 
+//using SabreTools.Helper;
 using DamienG.Security.Cryptography;
 
 namespace SabreTools
@@ -51,6 +52,8 @@ namespace SabreTools
 			Console.Clear();
 			Console.Title = "DATFromDir " + "0.6.0.0";
 			//Console.Title = "DATFromDir " + Build.Version;
+			//Logger logger = new Logger(false, "datfromdir.log");
+			//logger.Start();
 
 			// First things first, take care of all of the arguments that this could have
 			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false;
@@ -65,6 +68,7 @@ namespace SabreTools
 					case "--help":
 						Help();
 						//Build.Help();
+						//logger.Close();
 						return;
 					case "-m":
 					case "--noMD5":
@@ -120,6 +124,7 @@ namespace SabreTools
 			{
 				Help();
 				//Build.Help();
+				//logger.Close();
 				return;
 			}
 
@@ -262,13 +267,16 @@ namespace SabreTools
 
 				sw.Write((_old ? ")" : "\t</machine>\n</datafile>"));
 				Console.Write("File written!");
+				//logger.Log("File + _desc + ".xml written!");
 				sw.Close();
 				fs.Close();
 			}
 			catch (Exception ex)
 			{
 				Console.Write(ex.ToString());
+				//logger.Error(ex.ToString());
 			}
+			//logger.Close();
 		}
 
 		/// <summary>
@@ -367,6 +375,7 @@ Options:
 					});
 
 					Console.WriteLine("File parsed: " + entry.Remove(0, _tempDir.Length));
+					//logger.Log("File parsed: " + entry.Remove(0, _tempDir.Length));
 				}
 			}
 			// Otherwise, just get the info on the file itself
@@ -421,6 +430,7 @@ Options:
 					});
 
 					Console.WriteLine("File parsed: " + item.Remove(0, _basePath.Length));
+					//logger.Log("File parsed: " + item.Remove(0, _basePath.Length));
 				}
 				catch (IOException) { }
 			}
