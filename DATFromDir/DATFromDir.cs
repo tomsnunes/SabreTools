@@ -50,6 +50,7 @@ namespace SabreTools
 		public static void Main(string[] args)
 		{
 			Console.Clear();
+			Console.Title = "DATFromDir " + "0.6.0.0";
 			//Console.Title = "DATFromDir " + Build.Version;
 
 			// First things first, take care of all of the arguments that this could have
@@ -64,6 +65,7 @@ namespace SabreTools
 					case "-?":
 					case "--help":
 						Help();
+						// Build.Help();
 						return;
 					case "-m":
 					case "--noMD5":
@@ -118,6 +120,7 @@ namespace SabreTools
 			if (inputs.Count == 0)
 			{
 				Help();
+				// Build.Help();
 				return;
 			}
 			
