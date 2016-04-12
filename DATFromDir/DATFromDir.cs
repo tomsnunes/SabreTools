@@ -396,6 +396,12 @@ Options:
 					actualroot = (actualroot == "" ? "Default" : actualroot);
 					string actualitem = (item == _basePath ? item : item.Remove(0, _basePath.Length).Remove(0, (actualroot != "Default" ? actualroot.Length + 1 : 0)));
 
+					// Drag and drop is funny
+					if (actualitem == Path.GetFullPath(actualitem))
+					{
+						actualitem = Path.GetFileName(actualitem);
+					}
+
 					_roms.Add(new RomData
 					{
 						Game = actualroot,
