@@ -12,14 +12,16 @@ using DamienG.Security.Cryptography;
 
 namespace SabreTools
 {
-	// TODO: Add the following flags:
-		// Remove MD5
-		// Remove SHA1
-		// Set forceunpacking
-		// Zips as files
-		// Old style DATs
-		// Set all of the fields in the DAT header
-		// Auto set Name and Description from current folder
+	/*
+	TODO: Add the following flags:
+		Remove MD5
+		Remove SHA1
+		Set forceunpacking
+		Zips as files
+		Old style DATs
+		Set all of the fields in the DAT header
+		Auto set Name and Description from current folder
+	*/
 
 	class DATFromDir
 	{
