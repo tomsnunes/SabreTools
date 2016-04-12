@@ -12,12 +12,22 @@ using DamienG.Security.Cryptography;
 
 namespace SabreTools
 {
+	// TODO: Add the following flags:
+	//	Remove MD5
+	//	Remove SHA1
+	//	Set forceunpacking
+	//	Zips as files
+	//	Old style DATs
+	//	Set all of the fields in the DAT header
+
 	class DATFromDir
 	{
 		private static string _7zPath;
 		private static string _basePath;
 		private static string _tempDir;
 		private static string _baseExtract;
+		private static ProcessStartInfo _psi;
+		private static List<Tuple<string, string, long, string, string, string>> _roms;
 
 		static void Main(string[] args)
 		{
@@ -30,8 +40,9 @@ namespace SabreTools
 			_baseExtract = "x -o\"" + _tempDir + "\"";
 
 			// Set the basic Process information for 7za
-			ProcessStartInfo psi = new ProcessStartInfo
+			_psi = new ProcessStartInfo
 			{
+				Arguments = "",
 				FileName = _7zPath + "7za.exe",
 				RedirectStandardError = true,
 				RedirectStandardOutput = true,
@@ -39,226 +50,23 @@ namespace SabreTools
 			};
 
 			// Get an output array going that has the right mappings (parent, name, size, hash)
-			List<Tuple<string, string, long, string, string, string>> roms = new List<Tuple<string, string, long, string, string, string>>();
+			_roms = new List<Tuple<string, string, long, string, string, string>>();
 
 			// This is where the main loop would go
 			if (File.Exists(_basePath))
 			{
-				// Create the temporary output directory
-				Directory.CreateDirectory(_tempDir);
-
-				psi.Arguments = _baseExtract + " " + _basePath;
-				Process zip = Process.Start(psi);
-				zip.WaitForExit();
-
-				bool encounteredErrors = zip.StandardError.ReadToEnd().Contains("ERROR");
-
-				// Get a list of files including size and hashes
-				Crc32 crc = new Crc32();
-				MD5 md5 = MD5.Create();
-				SHA1 sha1 = SHA1.Create();
-
-				// If the file was an archive and was extracted successfully, check it
-				if (!encounteredErrors)
-				{
-					foreach (string entry in Directory.GetFiles(_tempDir, "*", SearchOption.AllDirectories))
-					{
-						string fileCRC = String.Empty;
-						string fileMD5 = String.Empty;
-						string fileSHA1 = String.Empty;
-
-						try
-						{
-							using (FileStream fs = File.Open(entry, FileMode.Open))
-							{
-								foreach (byte b in crc.ComputeHash(fs))
-								{
-									fileCRC += b.ToString("x2").ToLower();
-								}
-							}
-							using (FileStream fs = File.Open(entry, FileMode.Open))
-							{
-								fileMD5 = BitConverter.ToString(md5.ComputeHash(fs)).Replace("-", "");
-							}
-							using (FileStream fs = File.Open(entry, FileMode.Open))
-							{
-								fileSHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
-							}
-						}
-						catch (IOException)
-						{
-							continue;
-						}
-
-						roms.Add(new Tuple<string, string, long, string, string, string>(
-							Path.GetFileNameWithoutExtension(_basePath),
-							entry.Remove(0, _tempDir.Length),
-							(new FileInfo(entry)).Length,
-							fileCRC,
-							fileMD5,
-							fileSHA1));
-
-						Console.WriteLine("File parsed: " + entry.Remove(0, _tempDir.Length));
-					}
-				}
-				// Otherwise, just get the info on the file itself
-				else if (!Directory.Exists(_basePath) && File.Exists(_basePath))
-				{
-					string fileCRC = String.Empty;
-					string fileMD5 = String.Empty;
-					string fileSHA1 = String.Empty;
-
-					try
-					{
-						using (FileStream fs = File.Open(_basePath, FileMode.Open))
-						{
-							foreach (byte b in crc.ComputeHash(fs))
-							{
-								fileCRC += b.ToString("x2").ToLower();
-							}
-						}
-						using (FileStream fs = File.Open(_basePath, FileMode.Open))
-						{
-							fileMD5 = BitConverter.ToString(md5.ComputeHash(fs)).Replace("-", "");
-						}
-						using (FileStream fs = File.Open(_basePath, FileMode.Open))
-						{
-							fileSHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
-						}
-
-						roms.Add(new Tuple<string, string, long, string, string, string>(
-							"Default",
-							_basePath,
-							(new FileInfo(_basePath)).Length,
-							fileCRC,
-							fileMD5,
-							fileSHA1));
-
-						Console.WriteLine("File parsed: " + _basePath.Remove(0, _basePath.Length));
-					}
-					catch (IOException) { }
-				}
-
-				// Delete the temp directory
-				if (Directory.Exists(_tempDir))
-				{
-					Directory.Delete(_tempDir, true);
-				}
+				ProcessFile(_basePath);
 			}
 			else
 			{
 				foreach (string item in Directory.GetFiles(_basePath, "*", SearchOption.AllDirectories))
 				{
-					// Create the temporary output directory
-					Directory.CreateDirectory(_tempDir);
-
-					psi.Arguments = _baseExtract + " " + item;
-					Process zip = Process.Start(psi);
-					zip.WaitForExit();
-
-					bool encounteredErrors = zip.StandardError.ReadToEnd().Contains("ERROR");
-
-					// Get a list of files including size and hashes
-					Crc32 crc = new Crc32();
-					MD5 md5 = MD5.Create();
-					SHA1 sha1 = SHA1.Create();
-
-					// If the file was an archive and was extracted successfully, check it
-					if (!encounteredErrors)
-					{
-						foreach (string entry in Directory.GetFiles(_tempDir, "*", SearchOption.AllDirectories))
-						{
-							string fileCRC = String.Empty;
-							string fileMD5 = String.Empty;
-							string fileSHA1 = String.Empty;
-
-							try
-							{
-								using (FileStream fs = File.Open(entry, FileMode.Open))
-								{
-									foreach (byte b in crc.ComputeHash(fs))
-									{
-										fileCRC += b.ToString("x2").ToLower();
-									}
-								}
-								using (FileStream fs = File.Open(entry, FileMode.Open))
-								{
-									fileMD5 = BitConverter.ToString(md5.ComputeHash(fs)).Replace("-", "");
-								}
-								using (FileStream fs = File.Open(entry, FileMode.Open))
-								{
-									fileSHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
-								}
-							}
-							catch (IOException)
-							{
-								continue;
-							}
-
-							roms.Add(new Tuple<string, string, long, string, string, string>(
-								Path.GetFileNameWithoutExtension(item),
-								entry.Remove(0, _tempDir.Length),
-								(new FileInfo(entry)).Length,
-								fileCRC,
-								fileMD5,
-								fileSHA1));
-
-							Console.WriteLine("File parsed: " + entry.Remove(0, _tempDir.Length));
-						}
-					}
-					// Otherwise, just get the info on the file itself
-					else if (!Directory.Exists(item) && File.Exists(item))
-					{
-						string fileCRC = String.Empty;
-						string fileMD5 = String.Empty;
-						string fileSHA1 = String.Empty;
-
-						try
-						{
-							using (FileStream fs = File.Open(item, FileMode.Open))
-							{
-								foreach (byte b in crc.ComputeHash(fs))
-								{
-									fileCRC += b.ToString("x2").ToLower();
-								}
-							}
-							using (FileStream fs = File.Open(item, FileMode.Open))
-							{
-								fileMD5 = BitConverter.ToString(md5.ComputeHash(fs)).Replace("-", "");
-							}
-							using (FileStream fs = File.Open(item, FileMode.Open))
-							{
-								fileSHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
-							}
-						}
-						catch (IOException)
-						{
-							continue;
-						}
-
-						string actualpath = Path.GetDirectoryName(item.Remove(0, _basePath.Length)).Replace('/', '\\').Split('\\')[0];
-
-						roms.Add(new Tuple<string, string, long, string, string, string>(
-							(actualpath == "" ? "Default" : actualpath),
-							item.Remove(0, _basePath.Length).Remove(0, actualpath.Length + (actualpath != "" ? 1 : 0)),
-							(new FileInfo(item)).Length,
-							fileCRC,
-							fileMD5,
-							fileSHA1));
-
-						Console.WriteLine("File parsed: " + item.Remove(0, _basePath.Length));
-					}
-
-					// Delete the temp directory
-					if (Directory.Exists(_tempDir))
-					{
-						Directory.Delete(_tempDir, true);
-					}
+					ProcessFile(item);
 				}
 			}
 
 			// Order the roms by name of parent, then name of rom
-			roms.Sort(delegate (Tuple<string, string, long, string, string, string> A, Tuple<string, string, long, string, string, string> B)
+			_roms.Sort(delegate (Tuple<string, string, long, string, string, string> A, Tuple<string, string, long, string, string, string> B)
 			{
 				if (A.Item1 == B.Item1)
 				{
@@ -300,7 +108,7 @@ namespace SabreTools
 
 				// Write out each of the machines and roms
 				string lastgame = "";
-				foreach (Tuple<string, string, long, string, string, string> rom in roms)
+				foreach (Tuple<string, string, long, string, string, string> rom in _roms)
 				{
 					string state = "";
 					if (lastgame != "" && lastgame != rom.Item1)
@@ -334,6 +142,114 @@ namespace SabreTools
 			catch (Exception ex)
 			{
 				Console.Write(ex.ToString());
+			}
+		}
+
+		private static void ProcessFile (string item)
+		{
+			// Create the temporary output directory
+			Directory.CreateDirectory(_tempDir);
+
+			_psi.Arguments = _baseExtract + " " + item;
+			Process zip = Process.Start(_psi);
+			zip.WaitForExit();
+
+			bool encounteredErrors = zip.StandardError.ReadToEnd().Contains("ERROR");
+
+			// Get a list of files including size and hashes
+			Crc32 crc = new Crc32();
+			MD5 md5 = MD5.Create();
+			SHA1 sha1 = SHA1.Create();
+
+			// If the file was an archive and was extracted successfully, check it
+			if (!encounteredErrors)
+			{
+				foreach (string entry in Directory.GetFiles(_tempDir, "*", SearchOption.AllDirectories))
+				{
+					string fileCRC = String.Empty;
+					string fileMD5 = String.Empty;
+					string fileSHA1 = String.Empty;
+
+					try
+					{
+						using (FileStream fs = File.Open(entry, FileMode.Open))
+						{
+							foreach (byte b in crc.ComputeHash(fs))
+							{
+								fileCRC += b.ToString("x2").ToLower();
+							}
+						}
+						using (FileStream fs = File.Open(entry, FileMode.Open))
+						{
+							fileMD5 = BitConverter.ToString(md5.ComputeHash(fs)).Replace("-", "");
+						}
+						using (FileStream fs = File.Open(entry, FileMode.Open))
+						{
+							fileSHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
+						}
+					}
+					catch (IOException)
+					{
+						continue;
+					}
+
+					_roms.Add(new Tuple<string, string, long, string, string, string>(
+						Path.GetFileNameWithoutExtension(item),
+						entry.Remove(0, _tempDir.Length),
+						(new FileInfo(entry)).Length,
+						fileCRC,
+						fileMD5,
+						fileSHA1));
+
+					Console.WriteLine("File parsed: " + entry.Remove(0, _tempDir.Length));
+				}
+			}
+			// Otherwise, just get the info on the file itself
+			else if (!Directory.Exists(item) && File.Exists(item))
+			{
+				string fileCRC = String.Empty;
+				string fileMD5 = String.Empty;
+				string fileSHA1 = String.Empty;
+
+				try
+				{
+					using (FileStream fs = File.Open(item, FileMode.Open))
+					{
+						foreach (byte b in crc.ComputeHash(fs))
+						{
+							fileCRC += b.ToString("x2").ToLower();
+						}
+					}
+					using (FileStream fs = File.Open(item, FileMode.Open))
+					{
+						fileMD5 = BitConverter.ToString(md5.ComputeHash(fs)).Replace("-", "");
+					}
+					using (FileStream fs = File.Open(item, FileMode.Open))
+					{
+						fileSHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
+					}
+
+					string actualroot = (item == _basePath ? "Default" : Path.GetDirectoryName(item.Remove(0, _basePath.Length)).Split('\\')[0]);
+					actualroot = (actualroot == "" ? "Default" : actualroot);
+					string actualitem = (item == _basePath ? item : item.Remove(0, _basePath.Length).Remove(0, (actualroot != "Default" ? actualroot.Length + 1 : 0)));
+
+					_roms.Add(new Tuple<string, string, long, string, string, string>(
+						actualroot,
+						actualitem,
+						(new FileInfo(item)).Length,
+						fileCRC,
+						fileMD5,
+						fileSHA1));
+
+					Console.WriteLine("File parsed: " + item.Remove(0, _basePath.Length));
+				}
+				catch (IOException) { }
+			}
+
+			// Delete the temp directory
+			if (Directory.Exists(_tempDir))
+			{
+				Directory.Delete(_tempDir, true);
 			}
 		}
 	}
