@@ -22,7 +22,6 @@ namespace SabreTools
 		private static string _tempDir;
 
 		// Extraction and listing related variables
-		private static char _delim;
 		private static string _baseExtract;
 		private static ProcessStartInfo _psi;
 		private static List<RomData> _roms;
@@ -65,7 +64,7 @@ namespace SabreTools
 					case "-?":
 					case "--help":
 						Help();
-						// Build.Help();
+						//Build.Help();
 						return;
 					case "-m":
 					case "--noMD5":
@@ -120,27 +119,18 @@ namespace SabreTools
 			if (inputs.Count == 0)
 			{
 				Help();
-				// Build.Help();
+				//Build.Help();
 				return;
-			}
-			
-			// Determine the deliminator that is to be used
-			if (Environment.CurrentDirectory.Contains("\\"))
-			{
-				_delim = '\\';
-			}
-			else
-			{
-				_delim = '/';
 			}
 
 			// Set 7za required variables
 			_isMono = (Type.GetType("Mono.Runtime") != null);
-			_7zPath = Environment.CurrentDirectory + _delim + "7z" + (Environment.Is64BitOperatingSystem && !_isMono ? _delim + "x64" : "") + _delim;
+			_7zPath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "7z" + (Environment.Is64BitOperatingSystem && !_isMono ? Path.DirectorySeparatorChar + "x64" : "") + Path.DirectorySeparatorChar;
 			_psi = new ProcessStartInfo
 			{
 				Arguments = "",
 				FileName = (_isMono ? "mono" : _7zPath + "7za.exe"),
+				//FileName = (Build.MonoEnvironment ? "mono" : SevenZipPath + "7za.exe"),
 				RedirectStandardError = true,
 				RedirectStandardOutput = true,
 				UseShellExecute = false,
@@ -153,9 +143,10 @@ namespace SabreTools
 			foreach (string path in inputs)
 			{
 				// Set local paths and vars
-				_tempDir = Environment.CurrentDirectory + _delim + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + _delim;
-				_basePath = (args.Length == 0 ? Environment.CurrentDirectory + _delim : (File.Exists(path) ? path : path + _delim));
+				_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
+				_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar);
 				_baseExtract = (_isMono ? _7zPath + "7za.exe " : "") + "x -o\"" + _tempDir + "\"";
+				//_baseExtract = (Build.MonoEnvironment ? SevenZipPath + "7za.exe " : "") + "x -o\"" + _tempDir + "\"";
 
 				// This is where the main loop would go
 				if (File.Exists(_basePath))
@@ -191,9 +182,9 @@ namespace SabreTools
 			//		the possibiliites for different ways to generate a DAT from multiple things
 
 			// Double check to see what it needs to be named
-			string[] splitPath = _basePath.Split(_delim);
-			_name = (_name == "" ? (inputs.Count > 1 ? Environment.CurrentDirectory.Split(_delim).Last() :
-				(_basePath.EndsWith(_delim.ToString()) ? splitPath[splitPath.Length - 2] : splitPath.Last())) : _name);
+			string[] splitPath = _basePath.Split(Path.DirectorySeparatorChar);
+			_name = (_name == "" ? (inputs.Count > 1 ? Environment.CurrentDirectory.Split(Path.DirectorySeparatorChar).Last() :
+				(_basePath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? splitPath[splitPath.Length - 2] : splitPath.Last())) : _name);
 			_desc = (_desc == "" ? _name + " (" + _date + ")" : _desc);
 
 			// Now write it all out as a DAT
@@ -409,7 +400,7 @@ Options:
 						}
 					}
 
-					string actualroot = (item == _basePath ? "Default" : Path.GetDirectoryName(item.Remove(0, _basePath.Length)).Split(_delim)[0]);
+					string actualroot = (item == _basePath ? "Default" : Path.GetDirectoryName(item.Remove(0, _basePath.Length)).Split(Path.DirectorySeparatorChar)[0]);
 					actualroot = (actualroot == "" ? "Default" : actualroot);
 					string actualitem = (item == _basePath ? item : item.Remove(0, _basePath.Length).Remove(0, (actualroot != "Default" ? actualroot.Length + 1 : 0)));
 

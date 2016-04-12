@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 
 namespace SabreTools.Helper
@@ -19,15 +20,7 @@ namespace SabreTools.Helper
 		/// </summary>
 		public static bool MonoEnvironment
 		{
-			get { return (Type.GetType("Mono.Runtime") != null);  }
-		}
-
-		/// <summary>
-		/// The path delimiter for the current environment
-		/// </summary>
-		public static char PathDelim
-		{
-			get { return (Environment.CurrentDirectory.Contains("\\") ? '\\' : '/'); }
+			get { return (Type.GetType("Mono.Runtime") != null); }
 		}
 
 		/// <summary>
@@ -37,7 +30,7 @@ namespace SabreTools.Helper
 		{
 			get
 			{
-				return Environment.CurrentDirectory + PathDelim + (!MonoEnvironment && Environment.Is64BitOperatingSystem ? "x64" : "x86") + PathDelim;
+				return Environment.CurrentDirectory + Path.DirectorySeparatorChar + (!MonoEnvironment && Environment.Is64BitOperatingSystem ? "x64" : "x86") + Path.DirectorySeparatorChar;
 			}
 		}
 
