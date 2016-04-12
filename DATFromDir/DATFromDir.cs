@@ -180,12 +180,21 @@ namespace SabreTools
 				FileStream fs = File.Create(_desc + ".xml");
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
+				string header_old = "clrmamepro (\n" +
+					"\tname \"" + _name + "\"\n" +
+					"\tdescription \"" + _desc + "\"\n" +
+					"\tversion \"" + _version + "\"\n" +
+					"\tcomment \"\"\n" +
+					"\tauthor \"Darksabre76\"\n" +
+					(_forceunzip ? "\tforcezipping no\n" : "") + 
+					")\n";
+
 				string header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 					"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
 					"\t<datafile>\n" +
 					"\t\t<header>\n" +
-					"\t\t\t<name>" + _name + "</name>\n" +
-					"\t\t\t<description>" + _desc + "</description>\n" +
+					"\t\t\t<name>" + HttpUtility.HtmlEncode(_name) + "</name>\n" +
+					"\t\t\t<description>" + HttpUtility.HtmlEncode(_desc) + "</description>\n" +
 					"\t\t\t<category>SabreTools Dir2DAT</category>\n" +
 					"\t\t\t<version>" + _version + "</version>\n" +
 					"\t\t\t<date>" + _version + "</date>\n" +
@@ -194,7 +203,7 @@ namespace SabreTools
 					"\t\t</header>\n";
 
 				// Write the header out
-				sw.Write(header);
+				sw.Write((_old ? header_old : header));
 
 				// Write out each of the machines and roms
 				string lastgame = "";
@@ -203,28 +212,42 @@ namespace SabreTools
 					string state = "";
 					if (lastgame != "" && lastgame != rom.Item1)
 					{
-						state += "\t</machine>\n";
+						state += (_old ? ")\n" : "\t</machine>\n");
 					}
 
 					if (lastgame != rom.Item1)
 					{
-						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Item1) + "\">\n" +
-							"\t\t<description>" + HttpUtility.HtmlEncode(rom.Item1) + "</description>\n";
+						state += (_old ? "game (\n\tname \"" + rom.Item1 + "\"\n" +
+							"\tdescription \"" + rom.Item1 + "\"\n" :
+							"\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Item1) + "\">\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode(rom.Item1) + "</description>\n");
 					}
 
-					state += "\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Item2) + "\"" +
-						(rom.Item3 != -1 ? " size=\"" + rom.Item3 + "\"" : "") +
-						(rom.Item4 != "" ? " crc=\"" + rom.Item4.ToLowerInvariant() + "\"" : "") +
-						(rom.Item5 != "" ? " md5=\"" + rom.Item5.ToLowerInvariant() + "\"" : "") +
-						(rom.Item6 != "" ? " sha1=\"" + rom.Item6.ToLowerInvariant() + "\"" : "") +
-						" />\n";
+					if (_old)
+					{
+						state += "\trom ( name \"" + rom.Item2 + "\"" +
+							(rom.Item3 != 0 ? " size " + rom.Item3 : "") +
+							(rom.Item4 != "" ? " crc " + rom.Item4.ToLowerInvariant() : "") +
+							(rom.Item5 != "" ? " md5 " + rom.Item5.ToLowerInvariant() : "") +
+							(rom.Item6 != "" ? " sha1 " + rom.Item6.ToLowerInvariant() : "") +
+							" )\n";
+					}
+					else
+					{
+						state += "\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Item2) + "\"" +
+							(rom.Item3 != -1 ? " size=\"" + rom.Item3 + "\"" : "") +
+							(rom.Item4 != "" ? " crc=\"" + rom.Item4.ToLowerInvariant() + "\"" : "") +
+							(rom.Item5 != "" ? " md5=\"" + rom.Item5.ToLowerInvariant() + "\"" : "") +
+							(rom.Item6 != "" ? " sha1=\"" + rom.Item6.ToLowerInvariant() + "\"" : "") +
+							" />\n";
+					}
 
 					lastgame = rom.Item1;
 
 					sw.Write(state);
 				}
 
-				sw.Write("\t</machine>\n</datafile>");
+				sw.Write((_old ? ")" : "\t</machine>\n</datafile>"));
 				Console.Write("File written!");
 				sw.Close();
 				fs.Close();
