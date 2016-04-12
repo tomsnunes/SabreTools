@@ -63,6 +63,11 @@ This a versitile Directory to DAT file creator developed to reduce the overhead 
 	<li>Output to XML DAT</li>
 </ul>
 
+<h3>External Code</h3>
+<p/>
+The preceeding programs use, in part or in whole, code, libraries, and/or applications from the <a href="www.7-zip.org">7-zip project</a>. 7-zip is licenced under the GNU LGPL.<br/>
+All other external code is marked as such within the source and correctly attributed to the site and/or person(s) that originally wrote the code.
+
 <h3>Contributions</h3>
 
 Any feature suggestions or code contributions are accepted. Please take the time to look over the existing code to see proper coding and documentation patterns.
