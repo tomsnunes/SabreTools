@@ -26,6 +26,7 @@ namespace SabreTools
 		private static string _baseExtract;
 		private static ProcessStartInfo _psi;
 		private static List<RomData> _roms;
+		private static bool _isMono;
 
 		// User specified variables
 		private static bool _noMD5;
@@ -49,6 +50,7 @@ namespace SabreTools
 		public static void Main(string[] args)
 		{
 			Console.Clear();
+			//Console.Title = "DATFromDir " + Build.Version;
 
 			// First things first, take care of all of the arguments that this could have
 			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false;
@@ -130,11 +132,12 @@ namespace SabreTools
 			}
 
 			// Set 7za required variables
+			_isMono = (Type.GetType("Mono.Runtime") != null);
 			_7zPath = Environment.CurrentDirectory + _delim + "7z" + (Environment.Is64BitOperatingSystem ? _delim + "x64" : "") + _delim;
 			_psi = new ProcessStartInfo
 			{
 				Arguments = "",
-				FileName = _7zPath + "7za.exe",
+				FileName = _7zPath + (_isMono ? "mono" : "7za.exe"),
 				RedirectStandardError = true,
 				RedirectStandardOutput = true,
 				UseShellExecute = false,
@@ -149,7 +152,7 @@ namespace SabreTools
 				// Set local paths and vars
 				_tempDir = Environment.CurrentDirectory + _delim + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + _delim;
 				_basePath = (args.Length == 0 ? Environment.CurrentDirectory + _delim : (File.Exists(path) ? path : path + _delim));
-				_baseExtract = "x -o\"" + _tempDir + "\"";
+				_baseExtract = (_isMono ? "7za.exe " : "") + "x -o\"" + _tempDir + "\"";
 
 				// This is where the main loop would go
 				if (File.Exists(_basePath))
@@ -188,7 +191,7 @@ namespace SabreTools
 			string[] splitPath = _basePath.Split(_delim);
 			_name = (_name == "" ? (inputs.Count > 1 ? Environment.CurrentDirectory.Split(_delim).Last() :
 				(_basePath.EndsWith(_delim.ToString()) ? splitPath[splitPath.Length - 2] : splitPath.Last())) : _name);
-			_desc = (_desc == "" ? _name + " (" + _version + ")" : _desc);
+			_desc = (_desc == "" ? _name + " (" + _date + ")" : _desc);
 
 			// Now write it all out as a DAT
 			try
