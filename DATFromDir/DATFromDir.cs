@@ -12,11 +12,10 @@ using DamienG.Security.Cryptography;
 
 namespace SabreTools
 {
-	/*
-		Auto set Name and Description from current folder
-	*/
-
-	class DATFromDir
+	/// <summary>
+	/// Create a DAT file from a specified file, directory, or set thereof
+	/// </summary>
+	public class DATFromDir
 	{
 		// Path-related variables
 		private static string _7zPath;
@@ -42,7 +41,11 @@ namespace SabreTools
 		// Other required variables
 		private static string _version = DateTime.Now.ToString("yyyyMMddHHmmss");
 
-		static void Main(string[] args)
+		/// <summary>
+		/// Start help or use supplied parameters
+		/// </summary>
+		/// <param name="args">String array representing command line parameters</param>
+		public static void Main(string[] args)
 		{
 			Console.Clear();
 
@@ -258,6 +261,9 @@ namespace SabreTools
 			}
 		}
 
+		/// <summary>
+		/// Show text-based help
+		/// </summary>
 		private static void Help()
 		{
 			Console.WriteLine(@"DATFromDir - Create a DAT file from a directory
@@ -276,6 +282,10 @@ Options:
   -c=, --cat=		Set the category of the DAT");
 		}
 
+		/// <summary>
+		/// Check a given file for hashes, based on current settings
+		/// </summary>
+		/// <param name="item">Filename of the item to be checked</param>
 		private static void ProcessFile (string item)
 		{
 			// Create the temporary output directory
