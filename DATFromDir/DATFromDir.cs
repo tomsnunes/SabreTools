@@ -141,8 +141,6 @@ namespace SabreTools
 				_tempDir = Environment.CurrentDirectory + _delim + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + _delim;
 				_basePath = (args.Length == 0 ? Environment.CurrentDirectory + _delim : (File.Exists(args[0]) ? args[0] : args[0] + _delim));
 				_baseExtract = "x -o\"" + _tempDir + "\"";
-				_name = (_name == "" ? _basePath.Split(_delim).Last() : _name);
-				_desc = (_desc == "" ? _name + " (" + _version + ")" : _desc);
 
 				// This is where the main loop would go
 				if (File.Exists(_basePath))
@@ -176,6 +174,12 @@ namespace SabreTools
 			//		this means that in the future, "writing to DAT" will be abstracted out to the DLL so that any
 			//		properly formatted data can be passed in and it will get written as necessary. That would open
 			//		the possibiliites for different ways to generate a DAT from multiple things
+
+			// Double check to see what it needs to be named
+			string[] splitPath = _basePath.Split(_delim);
+			_name = (_name == "" ? (inputs.Count > 1 ? Environment.CurrentDirectory.Split(_delim).Last() :
+				(_basePath.EndsWith(_delim.ToString()) ? splitPath[splitPath.Length - 2] : splitPath.Last())) : _name);
+			_desc = (_desc == "" ? _name + " (" + _version + ")" : _desc);
 
 			// Now write it all out as a DAT
 			try
