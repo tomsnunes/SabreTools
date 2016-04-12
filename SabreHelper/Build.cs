@@ -6,9 +6,25 @@ namespace SabreTools.Helper
 {
 	public class Build
 	{
+		/// <summary>
+		/// The current toolset version to be used by all child applications
+		/// </summary>
 		public static string Version
 		{
 			get { return "0.6.0.0"; }
+		}
+
+		/// <summary>
+		/// The path to the root of the 7z binaries and DLLs
+		/// </summary>
+		public static string SevenZipPath
+		{
+			get
+			{
+				bool isMono = (Type.GetType("Mono.Runtime") != null);
+				char delim = (Environment.CurrentDirectory.Contains("\\") ? '\\' : '/');
+				return Environment.CurrentDirectory + delim + (!isMono && Environment.Is64BitOperatingSystem ? "x64" : "x86") + delim;
+			}
 		}
 
 		/// <summary>
