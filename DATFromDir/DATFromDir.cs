@@ -133,7 +133,7 @@ namespace SabreTools
 
 			// Set 7za required variables
 			_isMono = (Type.GetType("Mono.Runtime") != null);
-			_7zPath = Environment.CurrentDirectory + _delim + "7z" + (Environment.Is64BitOperatingSystem ? _delim + "x64" : "") + _delim;
+			_7zPath = Environment.CurrentDirectory + _delim + "7z" + (Environment.Is64BitOperatingSystem && !_isMono ? _delim + "x64" : "") + _delim;
 			_psi = new ProcessStartInfo
 			{
 				Arguments = "",
