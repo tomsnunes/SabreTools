@@ -36,9 +36,11 @@ namespace SabreTools
 		private static string _name;
 		private static string _desc;
 		private static string _cat;
+		private static string _version;
+		private static string _author;
 
 		// Other required variables
-		private static string _version = DateTime.Now.ToString("yyyyMMddHHmmss");
+		private static string _date = DateTime.Now.ToString("yyyy-MM-dd");
 
 		/// <summary>
 		/// Start help or use supplied parameters
@@ -50,7 +52,7 @@ namespace SabreTools
 
 			// First things first, take care of all of the arguments that this could have
 			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false;
-			_name = ""; _desc = ""; _cat = "SabreTools Dir2DAT";
+			_name = ""; _desc = ""; _cat = ""; _version = ""; _author = "";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
 			{
@@ -93,6 +95,14 @@ namespace SabreTools
 						else if (arg.StartsWith("-c=") || arg.StartsWith("--cat="))
 						{
 							_cat = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-a=") || arg.StartsWith("--author="))
+						{
+							_author = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-v=") || arg.StartsWith("--version="))
+						{
+							_version = arg.Split('=')[1];
 						}
 						else
 						{
@@ -191,7 +201,7 @@ namespace SabreTools
 					"\tdescription \"" + _desc + "\"\n" +
 					"\tversion \"" + _version + "\"\n" +
 					"\tcomment \"\"\n" +
-					"\tauthor \"Darksabre76\"\n" +
+					"\tauthor \"" + _author + "\"\n" +
 					(_forceunzip ? "\tforcezipping no\n" : "") + 
 					")\n";
 
@@ -201,11 +211,11 @@ namespace SabreTools
 					"\t\t<header>\n" +
 					"\t\t\t<name>" + HttpUtility.HtmlEncode(_name) + "</name>\n" +
 					"\t\t\t<description>" + HttpUtility.HtmlEncode(_desc) + "</description>\n" +
-					"\t\t\t<category>SabreTools Dir2DAT</category>\n" +
-					"\t\t\t<version>" + _version + "</version>\n" +
-					"\t\t\t<date>" + _version + "</date>\n" +
-					"\t\t\t<author>Darksabre76</author>\n" +
-					"\t\t\t<clrmamepro " + (_forceunzip ? "forcepacking=\"unzip\" " : "") + " />\n" +
+					"\t\t\t<category>" + HttpUtility.HtmlEncode(_cat) + "</category>\n" +
+					"\t\t\t<version>" + HttpUtility.HtmlEncode(_version) + "</version>\n" +
+					"\t\t\t<date>" + _date + "</date>\n" +
+					"\t\t\t<author>" + HttpUtility.HtmlEncode(_author) + "</author>\n" +
+					(_forceunzip ? "\t\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
 					"\t\t</header>\n";
 
 				// Write the header out
@@ -282,7 +292,9 @@ Options:
   -o, --old		Output DAT in RV format instead of XML
   -n=, --name=		Set the name of the DAT
   -d=, --desc=		Set the description of the DAT
-  -c=, --cat=		Set the category of the DAT");
+  -c=, --cat=		Set the category of the DAT
+  -v=, --version=	Set the version of the DAT
+  -a=, --author=	Set the author of the DAT");
 		}
 
 		/// <summary>
