@@ -13,12 +13,13 @@ using DamienG.Security.Cryptography;
 namespace SabreTools
 {
 	// TODO: Add the following flags:
-	//	Remove MD5
-	//	Remove SHA1
-	//	Set forceunpacking
-	//	Zips as files
-	//	Old style DATs
-	//	Set all of the fields in the DAT header
+		// Remove MD5
+		// Remove SHA1
+		// Set forceunpacking
+		// Zips as files
+		// Old style DATs
+		// Set all of the fields in the DAT header
+		// Auto set Name and Description from current folder
 
 	class DATFromDir
 	{
@@ -96,10 +97,10 @@ namespace SabreTools
 					"\t\t<header>\n" +
 					"\t\t\t<name>dirdat</name>\n" +
 					"\t\t\t<description>dirdat</description>\n" +
-					"\t\t\t<category>DATFromDir</category>\n" +
+					"\t\t\t<category>SabreTools Dir2DAT</category>\n" +
 					"\t\t\t<version></version>\n" +
 					"\t\t\t<date></date>\n" +
-					"\t\t\t<author>DATFromDir</author>\n" +
+					"\t\t\t<author>Darksabre76</author>\n" +
 					"\t\t\t<clrmamepro />\n" +
 					"\t\t</header>\n";
 
