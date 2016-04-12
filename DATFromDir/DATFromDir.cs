@@ -21,23 +21,102 @@ namespace SabreTools
 		Old style DATs
 		Set all of the fields in the DAT header
 		Auto set Name and Description from current folder
+		Version and date from current date
 	*/
 
 	class DATFromDir
 	{
+		// Path-related variables
 		private static string _7zPath;
 		private static string _basePath;
 		private static string _tempDir;
+
+		// Extraction and listing related variables
+		private static char _delim;
 		private static string _baseExtract;
 		private static ProcessStartInfo _psi;
 		private static List<Tuple<string, string, long, string, string, string>> _roms;
 
+		// User specified variables
+		private static bool _remMD5;
+		private static bool _remSHA1;
+		private static bool _forceunzip;
+		private static bool _allfiles;
+		private static bool _old;
+		private static string _name;
+		private static string _desc;
+		private static string _cat;
+
+		// Other required variables
+		private static string _version = DateTime.Now.ToString("yyyyMMddHHmmss");
+
 		static void Main(string[] args)
 		{
-			// Set local paths
-			_7zPath = Environment.CurrentDirectory.Replace('/', '\\') + "\\7z" + (Environment.Is64BitOperatingSystem ? "\\x64" : "") + "\\";
-			_tempDir = Environment.CurrentDirectory.Replace('/', '\\') + "\\temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + "\\";
-			_basePath = (args.Length == 0 ? Environment.CurrentDirectory + "\\" : (File.Exists(args[0]) ? args[0] : args[0] + "\\").Replace('/', '\\'));
+			// First things first, take care of all of the arguments that this could have
+			_remMD5 = false; _remSHA1 = false; _forceunzip = false; _allfiles = false; _old = false;
+			_name = ""; _desc = ""; _cat = "SabreTools Dir2DAT";
+			List<string> inputs = new List<string>();
+			foreach (string arg in args)
+			{
+				switch (arg)
+				{
+					case "-m":
+					case "--noMD5":
+						_remMD5 = true;
+						break;
+					case "-s":
+					case "--noSHA1":
+						_remSHA1 = true;
+						break;
+					case "-u":
+					case "--unzip":
+						_forceunzip = true;
+						break;
+					case "-f":
+					case "--files":
+						_allfiles = true;
+						break;
+					case "-o":
+					case "--old":
+						_old = true;
+						break;
+					default:
+						if (arg.StartsWith("-n=") || arg.StartsWith("--name="))
+						{
+							_name = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-d=") || arg.StartsWith("--desc="))
+						{
+							_desc = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-c=") || arg.StartsWith("--cat="))
+						{
+							_cat = arg.Split('=')[1];
+						}
+						else
+						{
+							inputs.Add(arg);
+						}
+						break;
+				}
+			}
+			
+			// Determine the deliminator that is to be used
+			if (Environment.CurrentDirectory.Contains("\\"))
+			{
+				_delim = '\\';
+			}
+			else
+			{
+				_delim = '/';
+			}
+
+			// Set local paths and vars
+			_7zPath = Environment.CurrentDirectory + _delim + "7z" + (Environment.Is64BitOperatingSystem ? _delim + "x64" : "") + _delim;
+			_tempDir = Environment.CurrentDirectory + _delim + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + _delim;
+			_basePath = (args.Length == 0 ? Environment.CurrentDirectory + _delim : (File.Exists(args[0]) ? args[0] : args[0] + _delim));
+			_name = (_name == "" ? _basePath.Split(_delim).Last() : _name);
+			_desc = (_desc == "" ? _name + " (" + _version + ")" : _desc);
 
 			// Set base arguments to be used
 			_baseExtract = "x -o\"" + _tempDir + "\"";
@@ -90,20 +169,20 @@ namespace SabreTools
 			// Now write it all out as a DAT
 			try
 			{
-				FileStream fs = File.Create("dirdat.xml");
+				FileStream fs = File.Create(_desc + ".xml");
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
 				string header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 					"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
 					"\t<datafile>\n" +
 					"\t\t<header>\n" +
-					"\t\t\t<name>dirdat</name>\n" +
-					"\t\t\t<description>dirdat</description>\n" +
+					"\t\t\t<name>" + _name + "</name>\n" +
+					"\t\t\t<description>" + _desc + "</description>\n" +
 					"\t\t\t<category>SabreTools Dir2DAT</category>\n" +
-					"\t\t\t<version></version>\n" +
-					"\t\t\t<date></date>\n" +
+					"\t\t\t<version>" + _version + "</version>\n" +
+					"\t\t\t<date>" + _version + "</date>\n" +
 					"\t\t\t<author>Darksabre76</author>\n" +
-					"\t\t\t<clrmamepro />\n" +
+					"\t\t\t<clrmamepro " + (_forceunzip ? "forcepacking=\"unzip\" " : "") + " />\n" +
 					"\t\t</header>\n";
 
 				// Write the header out
@@ -232,7 +311,7 @@ namespace SabreTools
 						fileSHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
 					}
 
-					string actualroot = (item == _basePath ? "Default" : Path.GetDirectoryName(item.Remove(0, _basePath.Length)).Split('\\')[0]);
+					string actualroot = (item == _basePath ? "Default" : Path.GetDirectoryName(item.Remove(0, _basePath.Length)).Split(_delim)[0]);
 					actualroot = (actualroot == "" ? "Default" : actualroot);
 					string actualitem = (item == _basePath ? item : item.Remove(0, _basePath.Length).Remove(0, (actualroot != "Default" ? actualroot.Length + 1 : 0)));
 
