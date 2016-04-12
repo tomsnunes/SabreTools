@@ -312,7 +312,7 @@ Options:
 			bool encounteredErrors = true;
 			if (!_allfiles)
 			{
-				_psi.Arguments = _baseExtract + " " + item;
+				_psi.Arguments = _baseExtract + " \"" + item + "\"";
 				Process zip = Process.Start(_psi);
 				zip.WaitForExit();
 
