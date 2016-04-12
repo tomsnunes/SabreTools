@@ -26,7 +26,7 @@ namespace SabreTools
 		private static char _delim;
 		private static string _baseExtract;
 		private static ProcessStartInfo _psi;
-		private static List<Tuple<string, string, long, string, string, string>> _roms;
+		private static List<RomData> _roms;
 
 		// User specified variables
 		private static bool _noMD5;
@@ -132,7 +132,7 @@ namespace SabreTools
 			};
 
 			// Create an output array for all found items (parent, name, size, crc, md5, sha1)
-			_roms = new List<Tuple<string, string, long, string, string, string>>();
+			_roms = new List<RomData>();
 
 			// Loop over each of the found paths, if any
 			foreach (string path in inputs)
@@ -159,17 +159,17 @@ namespace SabreTools
 			}
 
 			// Order the roms by name of parent, then name of rom
-			_roms.Sort(delegate (Tuple<string, string, long, string, string, string> A, Tuple<string, string, long, string, string, string> B)
+			_roms.Sort(delegate (RomData A, RomData B)
 			{
-				if (A.Item1 == B.Item1)
+				if (A.Game == B.Game)
 				{
-					if (A.Item2 == B.Item2)
+					if (A.Name == B.Name)
 					{
-						return (int)(A.Item3 - B.Item3);
+						return (int)(A.Size - B.Size);
 					}
-					return String.Compare(A.Item2, B.Item2);
+					return String.Compare(A.Name, B.Name);
 				}
-				return String.Compare(A.Item1, B.Item1);
+				return String.Compare(A.Game, B.Game);
 			});
 
 			//TODO: So, this below section is a pretty much one for one copy of code that is written in generate
@@ -210,42 +210,42 @@ namespace SabreTools
 
 				// Write out each of the machines and roms
 				string lastgame = "";
-				foreach (Tuple<string, string, long, string, string, string> rom in _roms)
+				foreach (RomData rom in _roms)
 				{
 					string state = "";
-					if (lastgame != "" && lastgame != rom.Item1)
+					if (lastgame != "" && lastgame != rom.Game)
 					{
 						state += (_old ? ")\n" : "\t</machine>\n");
 					}
 
-					if (lastgame != rom.Item1)
+					if (lastgame != rom.Game)
 					{
-						state += (_old ? "game (\n\tname \"" + rom.Item1 + "\"\n" +
-							"\tdescription \"" + rom.Item1 + "\"\n" :
-							"\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Item1) + "\">\n" +
-							"\t\t<description>" + HttpUtility.HtmlEncode(rom.Item1) + "</description>\n");
+						state += (_old ? "game (\n\tname \"" + rom.Game + "\"\n" +
+							"\tdescription \"" + rom.Game + "\"\n" :
+							"\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode(rom.Game) + "</description>\n");
 					}
 
 					if (_old)
 					{
-						state += "\trom ( name \"" + rom.Item2 + "\"" +
-							(rom.Item3 != 0 ? " size " + rom.Item3 : "") +
-							(rom.Item4 != "" ? " crc " + rom.Item4.ToLowerInvariant() : "") +
-							(rom.Item5 != "" ? " md5 " + rom.Item5.ToLowerInvariant() : "") +
-							(rom.Item6 != "" ? " sha1 " + rom.Item6.ToLowerInvariant() : "") +
+						state += "\trom ( name \"" + rom.Name + "\"" +
+							(rom.Size != 0 ? " size " + rom.Size : "") +
+							(rom.CRC != "" ? " crc " + rom.CRC.ToLowerInvariant() : "") +
+							(rom.MD5 != "" ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
+							(rom.SHA1 != "" ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
 							" )\n";
 					}
 					else
 					{
-						state += "\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Item2) + "\"" +
-							(rom.Item3 != -1 ? " size=\"" + rom.Item3 + "\"" : "") +
-							(rom.Item4 != "" ? " crc=\"" + rom.Item4.ToLowerInvariant() + "\"" : "") +
-							(rom.Item5 != "" ? " md5=\"" + rom.Item5.ToLowerInvariant() + "\"" : "") +
-							(rom.Item6 != "" ? " sha1=\"" + rom.Item6.ToLowerInvariant() + "\"" : "") +
+						state += "\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
+							(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
+							(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
+							(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
+							(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
 							" />\n";
 					}
 
-					lastgame = rom.Item1;
+					lastgame = rom.Game;
 
 					sw.Write(state);
 				}
@@ -344,13 +344,15 @@ Options:
 						continue;
 					}
 
-					_roms.Add(new Tuple<string, string, long, string, string, string>(
-						Path.GetFileNameWithoutExtension(item),
-						entry.Remove(0, _tempDir.Length),
-						(new FileInfo(entry)).Length,
-						fileCRC,
-						fileMD5,
-						fileSHA1));
+					_roms.Add(new RomData
+					{
+						Game = Path.GetFileNameWithoutExtension(item),
+						Name = entry.Remove(0, _tempDir.Length),
+						Size = (new FileInfo(entry)).Length,
+						CRC = fileCRC,
+						MD5 = fileMD5,
+						SHA1 = fileSHA1,
+					});
 
 					Console.WriteLine("File parsed: " + entry.Remove(0, _tempDir.Length));
 				}
@@ -390,13 +392,15 @@ Options:
 					actualroot = (actualroot == "" ? "Default" : actualroot);
 					string actualitem = (item == _basePath ? item : item.Remove(0, _basePath.Length).Remove(0, (actualroot != "Default" ? actualroot.Length + 1 : 0)));
 
-					_roms.Add(new Tuple<string, string, long, string, string, string>(
-						actualroot,
-						actualitem,
-						(new FileInfo(item)).Length,
-						fileCRC,
-						fileMD5,
-						fileSHA1));
+					_roms.Add(new RomData
+					{
+						Game = actualroot,
+						Name = actualitem,
+						Size = (new FileInfo(item)).Length,
+						CRC = fileCRC,
+						MD5 = fileMD5,
+						SHA1 = fileSHA1,
+					});
 
 					Console.WriteLine("File parsed: " + item.Remove(0, _basePath.Length));
 				}
@@ -408,6 +412,26 @@ Options:
 			{
 				Directory.Delete(_tempDir, true);
 			}
+		}
+
+		/// <summary>
+		/// Intermediate struct for holding and processing rom data
+		/// </summary>
+		public struct RomData
+		{
+			public string Manufacturer;
+			public string System;
+			public int SystemID;
+			public string Source;
+			public string URL;
+			public int SourceID;
+			public string Game;
+			public string Name;
+			public string Type;
+			public long Size;
+			public string CRC;
+			public string MD5;
+			public string SHA1;
 		}
 	}
 }
