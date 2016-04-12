@@ -137,7 +137,7 @@ namespace SabreTools
 			_psi = new ProcessStartInfo
 			{
 				Arguments = "",
-				FileName = _7zPath + (_isMono ? "mono" : "7za.exe"),
+				FileName = (_isMono ? "mono" : _7zPath + "7za.exe"),
 				RedirectStandardError = true,
 				RedirectStandardOutput = true,
 				UseShellExecute = false,
@@ -152,7 +152,7 @@ namespace SabreTools
 				// Set local paths and vars
 				_tempDir = Environment.CurrentDirectory + _delim + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + _delim;
 				_basePath = (args.Length == 0 ? Environment.CurrentDirectory + _delim : (File.Exists(path) ? path : path + _delim));
-				_baseExtract = (_isMono ? "7za.exe " : "") + "x -o\"" + _tempDir + "\"";
+				_baseExtract = (_isMono ? _7zPath + "7za.exe " : "") + "x -o\"" + _tempDir + "\"";
 
 				// This is where the main loop would go
 				if (File.Exists(_basePath))
