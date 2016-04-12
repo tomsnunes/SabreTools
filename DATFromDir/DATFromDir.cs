@@ -139,7 +139,7 @@ namespace SabreTools
 			{
 				// Set local paths and vars
 				_tempDir = Environment.CurrentDirectory + _delim + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + _delim;
-				_basePath = (args.Length == 0 ? Environment.CurrentDirectory + _delim : (File.Exists(args[0]) ? args[0] : args[0] + _delim));
+				_basePath = (args.Length == 0 ? Environment.CurrentDirectory + _delim : (File.Exists(path) ? path : path + _delim));
 				_baseExtract = "x -o\"" + _tempDir + "\"";
 
 				// This is where the main loop would go
