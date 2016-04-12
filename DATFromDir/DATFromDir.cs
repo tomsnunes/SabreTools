@@ -13,15 +13,7 @@ using DamienG.Security.Cryptography;
 namespace SabreTools
 {
 	/*
-	TODO: Add the following flags:
-		Remove MD5
-		Remove SHA1
-		Set forceunpacking
-		Zips as files
-		Old style DATs
-		Set all of the fields in the DAT header
 		Auto set Name and Description from current folder
-		Version and date from current date
 	*/
 
 	class DATFromDir
@@ -38,8 +30,8 @@ namespace SabreTools
 		private static List<Tuple<string, string, long, string, string, string>> _roms;
 
 		// User specified variables
-		private static bool _remMD5;
-		private static bool _remSHA1;
+		private static bool _noMD5;
+		private static bool _noSHA1;
 		private static bool _forceunzip;
 		private static bool _allfiles;
 		private static bool _old;
@@ -52,21 +44,28 @@ namespace SabreTools
 
 		static void Main(string[] args)
 		{
+			Console.Clear();
+
 			// First things first, take care of all of the arguments that this could have
-			_remMD5 = false; _remSHA1 = false; _forceunzip = false; _allfiles = false; _old = false;
+			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false;
 			_name = ""; _desc = ""; _cat = "SabreTools Dir2DAT";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
 			{
 				switch (arg)
 				{
+					case "-h":
+					case "-?":
+					case "--help":
+						Help();
+						return;
 					case "-m":
 					case "--noMD5":
-						_remMD5 = true;
+						_noMD5 = true;
 						break;
 					case "-s":
 					case "--noSHA1":
-						_remSHA1 = true;
+						_noSHA1 = true;
 						break;
 					case "-u":
 					case "--unzip":
@@ -100,6 +99,13 @@ namespace SabreTools
 						break;
 				}
 			}
+
+			// If there's no inputs, show the help
+			if (inputs.Count == 0)
+			{
+				Help();
+				return;
+			}
 			
 			// Determine the deliminator that is to be used
 			if (Environment.CurrentDirectory.Contains("\\"))
@@ -111,17 +117,8 @@ namespace SabreTools
 				_delim = '/';
 			}
 
-			// Set local paths and vars
+			// Set 7za required variables
 			_7zPath = Environment.CurrentDirectory + _delim + "7z" + (Environment.Is64BitOperatingSystem ? _delim + "x64" : "") + _delim;
-			_tempDir = Environment.CurrentDirectory + _delim + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + _delim;
-			_basePath = (args.Length == 0 ? Environment.CurrentDirectory + _delim : (File.Exists(args[0]) ? args[0] : args[0] + _delim));
-			_name = (_name == "" ? _basePath.Split(_delim).Last() : _name);
-			_desc = (_desc == "" ? _name + " (" + _version + ")" : _desc);
-
-			// Set base arguments to be used
-			_baseExtract = "x -o\"" + _tempDir + "\"";
-
-			// Set the basic Process information for 7za
 			_psi = new ProcessStartInfo
 			{
 				Arguments = "",
@@ -131,19 +128,30 @@ namespace SabreTools
 				UseShellExecute = false,
 			};
 
-			// Get an output array going that has the right mappings (parent, name, size, hash)
+			// Create an output array for all found items (parent, name, size, crc, md5, sha1)
 			_roms = new List<Tuple<string, string, long, string, string, string>>();
 
-			// This is where the main loop would go
-			if (File.Exists(_basePath))
+			// Loop over each of the found paths, if any
+			foreach (string path in inputs)
 			{
-				ProcessFile(_basePath);
-			}
-			else
-			{
-				foreach (string item in Directory.GetFiles(_basePath, "*", SearchOption.AllDirectories))
+				// Set local paths and vars
+				_tempDir = Environment.CurrentDirectory + _delim + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + _delim;
+				_basePath = (args.Length == 0 ? Environment.CurrentDirectory + _delim : (File.Exists(args[0]) ? args[0] : args[0] + _delim));
+				_baseExtract = "x -o\"" + _tempDir + "\"";
+				_name = (_name == "" ? _basePath.Split(_delim).Last() : _name);
+				_desc = (_desc == "" ? _name + " (" + _version + ")" : _desc);
+
+				// This is where the main loop would go
+				if (File.Exists(_basePath))
 				{
-					ProcessFile(item);
+					ProcessFile(_basePath);
+				}
+				else
+				{
+					foreach (string item in Directory.GetFiles(_basePath, "*", SearchOption.AllDirectories))
+					{
+						ProcessFile(item);
+					}
 				}
 			}
 
@@ -227,16 +235,38 @@ namespace SabreTools
 			}
 		}
 
+		private static void Help()
+		{
+			Console.WriteLine(@"DATFromDir - Create a DAT file from a directory
+-----------------------------------------
+Usage: DATFromDir [options] [filename|dirname] <filename|dirname> ...
+
+Options:
+  -h, -?, --help	Show this help dialog
+  -m, --noMD5		Don't include MD5 in output
+  -s, --noSHA1		Don't include SHA1 in output
+  -u, --unzip		Force unzipping in created DAT
+  -f, --files		Treat archives as files
+  -o, --old		Output DAT in RV format instead of XML
+  -n=, --name=		Set the name of the DAT
+  -d=, --desc=		Set the description of the DAT
+  -c=, --cat=		Set the category of the DAT");
+		}
+
 		private static void ProcessFile (string item)
 		{
 			// Create the temporary output directory
 			Directory.CreateDirectory(_tempDir);
 
-			_psi.Arguments = _baseExtract + " " + item;
-			Process zip = Process.Start(_psi);
-			zip.WaitForExit();
+			bool encounteredErrors = true;
+			if (!_allfiles)
+			{
+				_psi.Arguments = _baseExtract + " " + item;
+				Process zip = Process.Start(_psi);
+				zip.WaitForExit();
 
-			bool encounteredErrors = zip.StandardError.ReadToEnd().Contains("ERROR");
+				encounteredErrors = zip.StandardError.ReadToEnd().Contains("ERROR");
+			}
 
 			// Get a list of files including size and hashes
 			Crc32 crc = new Crc32();
@@ -261,13 +291,19 @@ namespace SabreTools
 								fileCRC += b.ToString("x2").ToLower();
 							}
 						}
-						using (FileStream fs = File.Open(entry, FileMode.Open))
+						if (!_noMD5)
 						{
-							fileMD5 = BitConverter.ToString(md5.ComputeHash(fs)).Replace("-", "");
+							using (FileStream fs = File.Open(entry, FileMode.Open))
+							{
+								fileMD5 = BitConverter.ToString(md5.ComputeHash(fs)).Replace("-", "");
+							}
 						}
-						using (FileStream fs = File.Open(entry, FileMode.Open))
+						if (!_noSHA1)
 						{
-							fileSHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
+							using (FileStream fs = File.Open(entry, FileMode.Open))
+							{
+								fileSHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
+							}
 						}
 					}
 					catch (IOException)
@@ -302,13 +338,19 @@ namespace SabreTools
 							fileCRC += b.ToString("x2").ToLower();
 						}
 					}
-					using (FileStream fs = File.Open(item, FileMode.Open))
+					if (!_noMD5)
 					{
-						fileMD5 = BitConverter.ToString(md5.ComputeHash(fs)).Replace("-", "");
+						using (FileStream fs = File.Open(item, FileMode.Open))
+						{
+							fileMD5 = BitConverter.ToString(md5.ComputeHash(fs)).Replace("-", "");
+						}
 					}
-					using (FileStream fs = File.Open(item, FileMode.Open))
+					if (!_noSHA1)
 					{
-						fileSHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
+						using (FileStream fs = File.Open(item, FileMode.Open))
+						{
+							fileSHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
+						}
 					}
 
 					string actualroot = (item == _basePath ? "Default" : Path.GetDirectoryName(item.Remove(0, _basePath.Length)).Split(_delim)[0]);
