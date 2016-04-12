@@ -348,7 +348,7 @@ JOIN checksums
 								Game = sldr.GetString(6),
 								Name = sldr.GetString(7),
 								Type = sldr.GetString(8),
-								Size = sldr.GetInt32(9),
+								Size = sldr.GetInt64(9),
 								CRC = sldr.GetString(10),
 								MD5 = sldr.GetString(11),
 								SHA1 = sldr.GetString(12),
@@ -481,7 +481,7 @@ JOIN checksums
 		public string Game;
 		public string Name;
 		public string Type;
-		public int Size;
+		public long Size;
 		public string CRC;
 		public string MD5;
 		public string SHA1;
