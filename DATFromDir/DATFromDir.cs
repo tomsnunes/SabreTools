@@ -56,7 +56,7 @@ namespace SabreTools
 
 			// First things first, take care of all of the arguments that this could have
 			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false;
-			_name = ""; _desc = ""; _cat = ""; _version = ""; _author = "";
+			_name = ""; _desc = ""; _cat = ""; _version = ""; _author = ""; _basePath = "";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
 			{
@@ -165,6 +165,14 @@ namespace SabreTools
 				{
 					_logger.Error(path + " is not a valid input!");
 				}
+			}
+
+			// If we found nothing (error state), show the help and exit
+			if (_roms.Count == 0)
+			{
+				Console.WriteLine();
+				Build.Help();
+				return;
 			}
 
 			// Order the roms by name of parent, then name of rom
