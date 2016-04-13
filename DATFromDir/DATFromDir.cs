@@ -142,7 +142,6 @@ namespace SabreTools
 				// This is where the main loop would go
 				if (File.Exists(_basePath))
 				{
-					_logger.Log("File found: " + _basePath);
 					ProcessFile(_basePath);
 				}
 				else
@@ -282,6 +281,7 @@ namespace SabreTools
 					IArchive archive = ArchiveFactory.Open(item);
 					IReader reader = archive.ExtractAllEntries();
 					reader.WriteAllToDirectory(_tempDir, ExtractOptions.ExtractFullPath);
+					encounteredErrors = false;
 				}
 				catch (InvalidOperationException)
 				{
@@ -290,6 +290,7 @@ namespace SabreTools
 				catch (Exception ex)
 				{
 					_logger.Error(ex.ToString());
+					encounteredErrors = true;
 				}
 			}
 
