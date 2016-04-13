@@ -40,7 +40,7 @@ namespace SabreTools
 
 		// Other required variables
 		private static string _date = DateTime.Now.ToString("yyyy-MM-dd");
-		private static Logger logger;
+		private static Logger _logger;
 
 		/// <summary>
 		/// Start help or use supplied parameters
@@ -50,8 +50,8 @@ namespace SabreTools
 		{
 			Console.Clear();
 			Console.Title = "DATFromDir " + Build.Version;
-			logger = new Logger(false, "datfromdir.log");
-			logger.Start();
+			_logger = new Logger(false, "datfromdir.log");
+			_logger.Start();
 
 			// First things first, take care of all of the arguments that this could have
 			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false;
@@ -65,7 +65,7 @@ namespace SabreTools
 					case "-?":
 					case "--help":
 						Build.Help();
-						logger.Close();
+						_logger.Close();
 						return;
 					case "-m":
 					case "--noMD5":
@@ -120,7 +120,7 @@ namespace SabreTools
 			if (inputs.Count == 0)
 			{
 				Build.Help();
-				logger.Close();
+				_logger.Close();
 				return;
 			}
 
@@ -137,12 +137,12 @@ namespace SabreTools
 				// This is where the main loop would go
 				if (File.Exists(_basePath))
 				{
-					logger.Log("File found: " + _basePath);
+					_logger.Log("File found: " + _basePath);
 					ProcessFile(_basePath);
 				}
 				else
 				{
-					logger.Log("Folder found: " + _basePath);
+					_logger.Log("Folder found: " + _basePath);
 					foreach (string item in Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories))
 					{
 						ProcessFile(item);
@@ -249,15 +249,15 @@ namespace SabreTools
 				}
 
 				sw.Write((_old ? ")" : "\t</machine>\n</datafile>"));
-				logger.Log("File written!" + Environment.NewLine);
+				_logger.Log("File written!" + Environment.NewLine);
 				sw.Close();
 				fs.Close();
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				_logger.Error(ex.ToString());
 			}
-			logger.Close();
+			_logger.Close();
 		}
 
 		/// <summary>
@@ -282,6 +282,10 @@ namespace SabreTools
 				{
 					encounteredErrors = true;
 				}
+				catch (Exception ex)
+				{
+					_logger.Error(ex.ToString());
+				}
 			}
 
 			// Get a list of files including size and hashes
@@ -292,10 +296,10 @@ namespace SabreTools
 			// If the file was an archive and was extracted successfully, check it
 			if (!encounteredErrors)
 			{
-				logger.Log(Path.GetFileName(item) + " treated like an archive");
+				_logger.Log(Path.GetFileName(item) + " treated like an archive");
 				foreach (string entry in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
 				{
-					logger.Log("\tFound file: " + entry);
+					_logger.Log("\tFound file: " + entry);
 					string fileCRC = String.Empty;
 					string fileMD5 = String.Empty;
 					string fileSHA1 = String.Empty;
@@ -339,13 +343,13 @@ namespace SabreTools
 						SHA1 = fileSHA1,
 					});
 
-					logger.Log("File added" + Environment.NewLine);
+					_logger.Log("File added" + Environment.NewLine);
 				}
 			}
 			// Otherwise, just get the info on the file itself
 			else if (!Directory.Exists(item) && File.Exists(item))
 			{
-				logger.Log(Path.GetFileName(item) + " treated like a file");
+				_logger.Log(Path.GetFileName(item) + " treated like a file");
 
 				string fileCRC = String.Empty;
 				string fileMD5 = String.Empty;
@@ -395,7 +399,7 @@ namespace SabreTools
 						SHA1 = fileSHA1,
 					});
 
-					logger.Log("File added" + Environment.NewLine);
+					_logger.Log("File added" + Environment.NewLine);
 				}
 				catch (IOException) { }
 			}
