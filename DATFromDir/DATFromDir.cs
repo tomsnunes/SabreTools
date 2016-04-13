@@ -137,6 +137,13 @@ namespace SabreTools
 			{
 				// Set local paths and vars
 				_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
+
+				if (!File.Exists(path) && !Directory.Exists(path))
+				{
+					_logger.Error(path + " is not a valid input!");
+					continue;
+				}
+				
 				_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar);
 				_basePath = Path.GetFullPath(_basePath);
 
@@ -153,6 +160,7 @@ namespace SabreTools
 						ProcessFile(item);
 					}
 				}
+				// If this somehow skips past the original sensors
 				else
 				{
 					_logger.Error(path + " is not a valid input!");
