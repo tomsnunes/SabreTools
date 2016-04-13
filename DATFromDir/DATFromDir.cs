@@ -294,6 +294,7 @@ namespace SabreTools
 				try
 				{
 					IArchive archive = ArchiveFactory.Open(item);
+					_logger.Log("Found archive of type: " + archive.Type);
 					IReader reader = archive.ExtractAllEntries();
 					reader.WriteAllToDirectory(_tempDir, ExtractOptions.ExtractFullPath);
 					encounteredErrors = false;
