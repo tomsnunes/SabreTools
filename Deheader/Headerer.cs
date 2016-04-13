@@ -164,13 +164,16 @@ namespace SabreTools
 				// Loop over the dictionary and see if there are matches
 				foreach (KeyValuePair<string, int> entry in tempDict)
 				{
+					logger.Log("Attempting pattern '" + entry.Key + "' on header '" + header + "'");
 					if (Regex.IsMatch(header, entry.Key))
 					{
+						logger.Log("Pattern match!");
 						type = test;
 						headerSize = entry.Value;
 						break;
 					}
 				}
+				Console.Read();
 
 				// If we found something, break out
 				if (type != HeaderType.None)

@@ -179,7 +179,7 @@ namespace SabreTools.Helper
 					foreach (XmlNode child in node.SelectNodes("data"))
 					{
 						// Add an offset to the match if one exists
-						string header = (child.Attributes["offset"] != null && child.Attributes["offset"].Value != "0" ? "^.{" + Convert.ToInt32(child.Attributes["offset"].Value, 16) + "}" : "^");
+						string header = (child.Attributes["offset"] != null && child.Attributes["offset"].Value != "0" ? "^.{" + (Convert.ToInt32(child.Attributes["offset"].Value, 16) * 2) + "}" : "^");
 						header += child.Attributes["value"].Value;
 
 						// Now add the header and value to the appropriate skipper dictionary

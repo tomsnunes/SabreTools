@@ -7,11 +7,9 @@
   <version>1.0</version>
   
   <!-- fig header -->
-  <!--
   <rule start_offset="200">
     <data offset="16" value="0000000000000000"/>
   </rule>
-  -->
   
   <!-- smc header -->
   <rule start_offset="200">
