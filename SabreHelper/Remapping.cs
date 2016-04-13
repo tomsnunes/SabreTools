@@ -129,7 +129,7 @@ namespace SabreTools.Helper
 			// Create array of dictionary names
 			string[] skippers =
 			{
-				"a780", "fds", "lynx", /* "n64", */ "nes", "pce", "snes",
+				"a7800", "fds", "lynx", /* "n64", */ "nes", "pce", "snes",
 			};
 
 			// Loop through and add all remappings
