@@ -145,13 +145,17 @@ namespace SabreTools
 				{
 					ProcessFile(_basePath);
 				}
-				else
+				else if (Directory.Exists(_basePath))
 				{
 					_logger.Log("Folder found: " + _basePath);
 					foreach (string item in Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories))
 					{
 						ProcessFile(item);
 					}
+				}
+				else
+				{
+					_logger.Error(path + " is not a valid input!");
 				}
 			}
 
