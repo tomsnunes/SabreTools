@@ -29,6 +29,7 @@ namespace SabreTools
 		// User specified variables
 		private static bool _noMD5;
 		private static bool _noSHA1;
+		private static bool _noDate;
 		private static bool _forceunzip;
 		private static bool _allfiles;
 		private static bool _old;
@@ -74,6 +75,10 @@ namespace SabreTools
 					case "-s":
 					case "--noSHA1":
 						_noSHA1 = true;
+						break;
+					case "-b":
+					case "--bare":
+						_noDate = true;
 						break;
 					case "-u":
 					case "--unzip":
@@ -173,7 +178,7 @@ namespace SabreTools
 			string[] splitPath = _basePath.Split(Path.DirectorySeparatorChar);
 			_name = (_name == "" ? (inputs.Count > 1 ? Environment.CurrentDirectory.Split(Path.DirectorySeparatorChar).Last() :
 				(_basePath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? splitPath[splitPath.Length - 2] : splitPath.Last())) : _name);
-			_desc = (_desc == "" ? _name + " (" + _date + ")" : _desc);
+			_desc = (_desc == "" ? _name + (_noDate ? "" : " (" + _date + ")") : _desc);
 
 			// Now write it all out as a DAT
 			try

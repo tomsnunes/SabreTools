@@ -111,6 +111,7 @@ Options:
   -h, -?, --help	Show this help dialog
   -m, --noMD5		Don't include MD5 in output
   -s, --noSHA1		Don't include SHA1 in output
+  -b, --bare		Don't include date in file name
   -u, --unzip		Force unzipping in created DAT
   -f, --files		Treat archives as files
   -o, --old		Output DAT in RV format instead of XML
