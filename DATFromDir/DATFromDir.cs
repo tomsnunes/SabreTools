@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 
-//using SabreTools.Helper;
+using SabreTools.Helper;
 using DamienG.Security.Cryptography;
 using SharpCompress.Archive;
 using SharpCompress.Common;
@@ -26,7 +25,6 @@ namespace SabreTools
 
 		// Extraction and listing related variables
 		private static List<RomData> _roms;
-		private static bool _isMono;
 
 		// User specified variables
 		private static bool _noMD5;
@@ -42,6 +40,7 @@ namespace SabreTools
 
 		// Other required variables
 		private static string _date = DateTime.Now.ToString("yyyy-MM-dd");
+		private static Logger logger;
 
 		/// <summary>
 		/// Start help or use supplied parameters
@@ -50,10 +49,9 @@ namespace SabreTools
 		public static void Main(string[] args)
 		{
 			Console.Clear();
-			Console.Title = "DATFromDir " + "0.6.0.0";
-			//Console.Title = "DATFromDir " + Build.Version;
-			//Logger logger = new Logger(false, "datfromdir.log");
-			//logger.Start();
+			Console.Title = "DATFromDir " + Build.Version;
+			logger = new Logger(false, "datfromdir.log");
+			logger.Start();
 
 			// First things first, take care of all of the arguments that this could have
 			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false;
@@ -66,9 +64,8 @@ namespace SabreTools
 					case "-h":
 					case "-?":
 					case "--help":
-						Help();
-						//Build.Help();
-						//logger.Close();
+						Build.Help();
+						logger.Close();
 						return;
 					case "-m":
 					case "--noMD5":
@@ -122,14 +119,10 @@ namespace SabreTools
 			// If there's no inputs, show the help
 			if (inputs.Count == 0)
 			{
-				Help();
-				//Build.Help();
-				//logger.Close();
+				Build.Help();
+				logger.Close();
 				return;
 			}
-
-			// Set 7za required variables
-			_isMono = (Type.GetType("Mono.Runtime") != null);
 
 			// Create an output array for all found items
 			_roms = new List<RomData>();
@@ -144,12 +137,12 @@ namespace SabreTools
 				// This is where the main loop would go
 				if (File.Exists(_basePath))
 				{
-					Console.WriteLine("File found: " + _basePath);
+					logger.Log("File found: " + _basePath);
 					ProcessFile(_basePath);
 				}
 				else
 				{
-					Console.WriteLine("Folder found: " + _basePath);
+					logger.Log("Folder found: " + _basePath);
 					foreach (string item in Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories))
 					{
 						ProcessFile(item);
@@ -256,40 +249,15 @@ namespace SabreTools
 				}
 
 				sw.Write((_old ? ")" : "\t</machine>\n</datafile>"));
-				Console.Write("File written!" + Environment.NewLine);
-				//logger.Log("File + _desc + ".xml written!");
+				logger.Log("File written!" + Environment.NewLine);
 				sw.Close();
 				fs.Close();
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.ToString());
-				//logger.Error(ex.ToString());
+				logger.Error(ex.ToString());
 			}
-			//logger.Close();
-		}
-
-		/// <summary>
-		/// Show text-based help
-		/// </summary>
-		private static void Help()
-		{
-			Console.WriteLine(@"DATFromDir - Create a DAT file from a directory
------------------------------------------
-Usage: DATFromDir [options] [filename|dirname] <filename|dirname> ...
-
-Options:
-  -h, -?, --help	Show this help dialog
-  -m, --noMD5		Don't include MD5 in output
-  -s, --noSHA1		Don't include SHA1 in output
-  -u, --unzip		Force unzipping in created DAT
-  -f, --files		Treat archives as files
-  -o, --old		Output DAT in RV format instead of XML
-  -n=, --name=		Set the name of the DAT
-  -d=, --desc=		Set the description of the DAT
-  -c=, --cat=		Set the category of the DAT
-  -v=, --version=	Set the version of the DAT
-  -a=, --author=	Set the author of the DAT");
+			logger.Close();
 		}
 
 		/// <summary>
@@ -324,10 +292,10 @@ Options:
 			// If the file was an archive and was extracted successfully, check it
 			if (!encounteredErrors)
 			{
-				Console.WriteLine(Path.GetFileName(item) + " treated like an archive");
+				logger.Log(Path.GetFileName(item) + " treated like an archive");
 				foreach (string entry in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
 				{
-					Console.WriteLine("\tFound file: " + entry);
+					logger.Log("\tFound file: " + entry);
 					string fileCRC = String.Empty;
 					string fileMD5 = String.Empty;
 					string fileSHA1 = String.Empty;
@@ -371,14 +339,13 @@ Options:
 						SHA1 = fileSHA1,
 					});
 
-					Console.WriteLine("File added" + Environment.NewLine);
-					//logger.Log("File parsed: " + entry.Remove(0, _tempDir.Length));
+					logger.Log("File added" + Environment.NewLine);
 				}
 			}
 			// Otherwise, just get the info on the file itself
 			else if (!Directory.Exists(item) && File.Exists(item))
 			{
-				Console.WriteLine(Path.GetFileName(item) + " treated like a file");
+				logger.Log(Path.GetFileName(item) + " treated like a file");
 
 				string fileCRC = String.Empty;
 				string fileMD5 = String.Empty;
@@ -428,8 +395,7 @@ Options:
 						SHA1 = fileSHA1,
 					});
 
-					Console.WriteLine("File added" + Environment.NewLine);
-					//logger.Log("File parsed: " + item.Remove(0, _basePath.Length));
+					logger.Log("File added" + Environment.NewLine);
 				}
 				catch (IOException) { }
 			}
@@ -439,26 +405,6 @@ Options:
 			{
 				di.Delete(true);
 			}
-		}
-
-		/// <summary>
-		/// Intermediate struct for holding and processing rom data
-		/// </summary>
-		public struct RomData
-		{
-			public string Manufacturer;
-			public string System;
-			public int SystemID;
-			public string Source;
-			public string URL;
-			public int SourceID;
-			public string Game;
-			public string Name;
-			public string Type;
-			public long Size;
-			public string CRC;
-			public string MD5;
-			public string SHA1;
 		}
 	}
 }
