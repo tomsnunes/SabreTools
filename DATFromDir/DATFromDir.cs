@@ -177,6 +177,7 @@ namespace SabreTools
 			string[] splitPath = _basePath.Split(Path.DirectorySeparatorChar);
 			_name = (_name == "" ? (inputs.Count > 1 ? Environment.CurrentDirectory.Split(Path.DirectorySeparatorChar).Last() :
 				(_basePath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? splitPath[splitPath.Length - 2] : splitPath.Last())) : _name);
+			_name = (_name == "" ? "Default " : _name);
 			_desc = (_desc == "" ? _name + (_noDate ? "" : " (" + _date + ")") : _desc);
 
 			// Now write it all out as a DAT
