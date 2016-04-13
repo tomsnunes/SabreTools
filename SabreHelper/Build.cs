@@ -24,17 +24,6 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// The path to the root of the 7z binaries and DLLs
-		/// </summary>
-		public static string SevenZipPath
-		{
-			get
-			{
-				return Environment.CurrentDirectory + Path.DirectorySeparatorChar + (Environment.Is64BitOperatingSystem ? "x64" : "x86") + Path.DirectorySeparatorChar;
-			}
-		}
-
-		/// <summary>
 		/// Show the help dialog for a given class
 		/// </summary>
 		public static void Help()
