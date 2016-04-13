@@ -129,6 +129,18 @@ namespace SabreTools
 				return;
 			}
 
+			// If any of the inputs are not valid, show the help
+			foreach (string input in inputs)
+			{
+				if (!File.Exists(input) && !Directory.Exists(input))
+				{
+					_logger.Error(input + " is not a valid input!");
+					Console.WriteLine();
+					Build.Help();
+					return;
+				}
+			}
+
 			// Create an output array for all found items
 			_roms = new List<RomData>();
 
@@ -137,12 +149,6 @@ namespace SabreTools
 			{
 				// Set local paths and vars
 				_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
-
-				if (!File.Exists(path) && !Directory.Exists(path))
-				{
-					_logger.Error(path + " is not a valid input!");
-					continue;
-				}
 				
 				_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar);
 				_basePath = Path.GetFullPath(_basePath);
