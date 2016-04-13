@@ -28,6 +28,9 @@ namespace SabreTools.Helper
 		public static Dictionary<string, int> PCE = new Dictionary<string, int>();
 		public static Dictionary<string, int> SNES = new Dictionary<string, int>();
 
+		// Available archive formats
+		public static List<string> ArchiveFormats = new List<string>();
+
 		/// <summary>
 		/// Create all remappings to be used by the program
 		/// </summary>
@@ -225,6 +228,13 @@ namespace SabreTools.Helper
 					node = node.NextSibling;
 				}
 			}
+		}
+
+		public static void CreateArchiveFormats()
+		{
+			ArchiveFormats.Add("7z");
+			ArchiveFormats.Add("zip");
+			ArchiveFormats.Add("rar");
 		}
 	}
 }
