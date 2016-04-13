@@ -54,8 +54,6 @@ namespace SabreTools
 			_logger = new Logger(false, "datfromdir.log");
 			_logger.Start();
 
-			Remapping.CreateArchiveFormats();
-
 			// First things first, take care of all of the arguments that this could have
 			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false;
 			_name = ""; _desc = ""; _cat = ""; _version = ""; _author = "";
@@ -291,15 +289,20 @@ namespace SabreTools
 			DirectoryInfo di = Directory.CreateDirectory(_tempDir);
 
 			bool encounteredErrors = true;
-			if (!_allfiles && Remapping.ArchiveFormats.Contains(Path.GetExtension(item).ToLowerInvariant()))
+			if (!_allfiles)
 			{
 				try
 				{
 					IArchive archive = ArchiveFactory.Open(item);
-					_logger.Log("Found archive of type: " + archive.Type);
-					IReader reader = archive.ExtractAllEntries();
-					reader.WriteAllToDirectory(_tempDir, ExtractOptions.ExtractFullPath);
-					encounteredErrors = false;
+					ArchiveType at = archive.Type;
+					_logger.Log("Found archive of type: " + at);
+
+					if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
+					{
+						IReader reader = archive.ExtractAllEntries();
+						reader.WriteAllToDirectory(_tempDir, ExtractOptions.ExtractFullPath);
+						encounteredErrors = false;
+					}
 				}
 				catch (InvalidOperationException)
 				{
