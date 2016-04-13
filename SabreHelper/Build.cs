@@ -30,7 +30,7 @@ namespace SabreTools.Helper
 		{
 			get
 			{
-				return Environment.CurrentDirectory + Path.DirectorySeparatorChar + (!MonoEnvironment && Environment.Is64BitOperatingSystem ? "x64" : "x86") + Path.DirectorySeparatorChar;
+				return Environment.CurrentDirectory + Path.DirectorySeparatorChar + (Environment.Is64BitOperatingSystem ? "x64" : "x86") + Path.DirectorySeparatorChar;
 			}
 		}
 

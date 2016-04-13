@@ -130,11 +130,11 @@ namespace SabreTools
 
 			// Set 7za required variables
 			_isMono = (Type.GetType("Mono.Runtime") != null);
-			_7zPath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "7z" + (Environment.Is64BitOperatingSystem && !_isMono ? Path.DirectorySeparatorChar + "x64" : "") + Path.DirectorySeparatorChar;
+			_7zPath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "7z" + (Environment.Is64BitOperatingSystem ? Path.DirectorySeparatorChar + "x64" : "") + Path.DirectorySeparatorChar;
 			_psi = new ProcessStartInfo
 			{
 				Arguments = "",
-				FileName = (_isMono ? "mono" : _7zPath + "7za.exe"),
+				FileName = (_isMono ? "7za" : _7zPath + "7za.exe"),
 				//FileName = (Build.MonoEnvironment ? "mono" : SevenZipPath + "7za.exe"),
 				RedirectStandardError = true,
 				RedirectStandardOutput = true,
@@ -150,7 +150,7 @@ namespace SabreTools
 				// Set local paths and vars
 				_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
 				_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar);
-				_baseExtract = (_isMono ? _7zPath + "7za.exe " : "") + "x -o\"" + _tempDir + "\"";
+				_baseExtract = "x -o\"" + _tempDir + "\"";
 				//_baseExtract = (Build.MonoEnvironment ? SevenZipPath + "7za.exe " : "") + "x -o\"" + _tempDir + "\"";
 
 				// This is where the main loop would go
