@@ -171,7 +171,6 @@ namespace SabreTools
 						break;
 					}
 				}
-				Console.Read();
 
 				// If we found something, break out
 				if (type != HeaderType.None)
