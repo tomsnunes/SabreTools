@@ -141,7 +141,7 @@ namespace SabreTools
 				UseShellExecute = false,
 			};
 
-			// Create an output array for all found items (parent, name, size, crc, md5, sha1)
+			// Create an output array for all found items
 			_roms = new List<RomData>();
 
 			// Loop over each of the found paths, if any
