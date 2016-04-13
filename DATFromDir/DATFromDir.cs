@@ -21,13 +21,10 @@ namespace SabreTools
 	public class DATFromDir
 	{
 		// Path-related variables
-		private static string _7zPath;
 		private static string _basePath;
 		private static string _tempDir;
 
 		// Extraction and listing related variables
-		private static string _baseExtract;
-		private static ProcessStartInfo _psi;
 		private static List<RomData> _roms;
 		private static bool _isMono;
 
