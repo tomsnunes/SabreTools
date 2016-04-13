@@ -268,14 +268,14 @@ namespace SabreTools
 				}
 
 				sw.Write((_old ? ")" : "\t</machine>\n</datafile>"));
-				Console.Write("File written!");
+				Console.Write("File written!" + Environment.NewLine);
 				//logger.Log("File + _desc + ".xml written!");
 				sw.Close();
 				fs.Close();
 			}
 			catch (Exception ex)
 			{
-				Console.Write(ex.ToString());
+				Console.WriteLine(ex.ToString());
 				//logger.Error(ex.ToString());
 			}
 			//logger.Close();
@@ -320,7 +320,13 @@ Options:
 				Process zip = Process.Start(_psi);
 				zip.WaitForExit();
 
-				encounteredErrors = zip.StandardError.ReadToEnd().Contains("ERROR");
+				string stdout = zip.StandardOutput.ReadToEnd();
+				string stderr = zip.StandardError.ReadToEnd();
+
+				Console.WriteLine("7z stdout: " + stdout + Environment.NewLine);
+				Console.WriteLine("7z stderr: " + stderr + Environment.NewLine);
+
+				encounteredErrors = stderr.Contains("ERROR");
 			}
 
 			// Get a list of files including size and hashes
@@ -378,7 +384,7 @@ Options:
 						SHA1 = fileSHA1,
 					});
 
-					Console.WriteLine("File added");
+					Console.WriteLine("File added" + Environment.NewLine);
 					//logger.Log("File parsed: " + entry.Remove(0, _tempDir.Length));
 				}
 			}
@@ -435,7 +441,7 @@ Options:
 						SHA1 = fileSHA1,
 					});
 
-					Console.WriteLine("File added");
+					Console.WriteLine("File added" + Environment.NewLine);
 					//logger.Log("File parsed: " + item.Remove(0, _basePath.Length));
 				}
 				catch (IOException) { }
