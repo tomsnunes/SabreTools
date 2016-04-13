@@ -9,6 +9,9 @@ using System.Web;
 
 //using SabreTools.Helper;
 using DamienG.Security.Cryptography;
+using SharpCompress.Archive;
+using SharpCompress.Common;
+using SharpCompress.Reader;
 
 namespace SabreTools
 {
@@ -130,16 +133,6 @@ namespace SabreTools
 
 			// Set 7za required variables
 			_isMono = (Type.GetType("Mono.Runtime") != null);
-			_7zPath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "7z" + (Environment.Is64BitOperatingSystem ? Path.DirectorySeparatorChar + "x64" : "") + Path.DirectorySeparatorChar;
-			_psi = new ProcessStartInfo
-			{
-				Arguments = "",
-				FileName = (_isMono ? "7za" : _7zPath + "7za.exe"),
-				//FileName = (Build.MonoEnvironment ? "mono" : SevenZipPath + "7za.exe"),
-				RedirectStandardError = true,
-				RedirectStandardOutput = true,
-				UseShellExecute = false,
-			};
 
 			// Create an output array for all found items
 			_roms = new List<RomData>();
@@ -149,9 +142,7 @@ namespace SabreTools
 			{
 				// Set local paths and vars
 				_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
-				_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar);
-				_baseExtract = "x -o\"" + _tempDir + "\"";
-				//_baseExtract = (Build.MonoEnvironment ? SevenZipPath + "7za.exe " : "") + "x -o\"" + _tempDir + "\"";
+				_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar); 
 
 				// This is where the main loop would go
 				if (File.Exists(_basePath))
@@ -316,17 +307,16 @@ Options:
 			bool encounteredErrors = true;
 			if (!_allfiles)
 			{
-				_psi.Arguments = _baseExtract + " \"" + item + "\"";
-				Process zip = Process.Start(_psi);
-				zip.WaitForExit();
-
-				string stdout = zip.StandardOutput.ReadToEnd();
-				string stderr = zip.StandardError.ReadToEnd();
-
-				Console.WriteLine("7z stdout: " + stdout + Environment.NewLine);
-				Console.WriteLine("7z stderr: " + stderr + Environment.NewLine);
-
-				encounteredErrors = stderr.Contains("ERROR");
+				try
+				{
+					IArchive archive = ArchiveFactory.Open(item);
+					IReader reader = archive.ExtractAllEntries();
+					reader.WriteAllToDirectory(_tempDir, ExtractOptions.ExtractFullPath);
+				}
+				catch (InvalidOperationException)
+				{
+					encounteredErrors = true;
+				}
 			}
 
 			// Get a list of files including size and hashes
