@@ -156,10 +156,12 @@ namespace SabreTools
 				// This is where the main loop would go
 				if (File.Exists(_basePath))
 				{
+					Console.WriteLine("File found: " + _basePath);
 					ProcessFile(_basePath);
 				}
 				else
 				{
+					Console.WriteLine("Folder found: " + _basePath);
 					foreach (string item in Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories))
 					{
 						ProcessFile(item);
@@ -309,7 +311,7 @@ Options:
 		private static void ProcessFile (string item)
 		{
 			// Create the temporary output directory
-			Directory.CreateDirectory(_tempDir);
+			DirectoryInfo di = Directory.CreateDirectory(_tempDir);
 
 			bool encounteredErrors = true;
 			if (!_allfiles)
@@ -329,8 +331,10 @@ Options:
 			// If the file was an archive and was extracted successfully, check it
 			if (!encounteredErrors)
 			{
+				Console.WriteLine(Path.GetFileName(item) + " treated like an archive");
 				foreach (string entry in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
 				{
+					Console.WriteLine("\tFound file: " + entry);
 					string fileCRC = String.Empty;
 					string fileMD5 = String.Empty;
 					string fileSHA1 = String.Empty;
@@ -374,13 +378,15 @@ Options:
 						SHA1 = fileSHA1,
 					});
 
-					Console.WriteLine("File parsed: " + entry.Remove(0, _tempDir.Length));
+					Console.WriteLine("File added");
 					//logger.Log("File parsed: " + entry.Remove(0, _tempDir.Length));
 				}
 			}
 			// Otherwise, just get the info on the file itself
 			else if (!Directory.Exists(item) && File.Exists(item))
 			{
+				Console.WriteLine(Path.GetFileName(item) + " treated like a file");
+
 				string fileCRC = String.Empty;
 				string fileMD5 = String.Empty;
 				string fileSHA1 = String.Empty;
@@ -429,7 +435,7 @@ Options:
 						SHA1 = fileSHA1,
 					});
 
-					Console.WriteLine("File parsed: " + item.Remove(0, _basePath.Length));
+					Console.WriteLine("File added");
 					//logger.Log("File parsed: " + item.Remove(0, _basePath.Length));
 				}
 				catch (IOException) { }
@@ -438,7 +444,7 @@ Options:
 			// Delete the temp directory
 			if (Directory.Exists(_tempDir))
 			{
-				Directory.Delete(_tempDir, true);
+				di.Delete(true);
 			}
 		}
 
