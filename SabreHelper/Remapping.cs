@@ -165,11 +165,7 @@ namespace SabreTools.Helper
 			}
 
 			// Get the first rule node
-			node = node.FirstChild;
-			while (node.NodeType != XmlNodeType.Element && node.Name != "rule")
-			{
-				node = node.NextSibling;
-			}
+			node = node.SelectSingleNode("rule");
 
 			// Now read in the rules
 			while (node != null && node.Name == "rule")
