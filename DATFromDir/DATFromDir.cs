@@ -137,7 +137,8 @@ namespace SabreTools
 			{
 				// Set local paths and vars
 				_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
-				_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar); 
+				_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar);
+				_basePath = Path.GetFullPath(_basePath);
 
 				// This is where the main loop would go
 				if (File.Exists(_basePath))
@@ -405,8 +406,8 @@ namespace SabreTools
 					}
 
 					string actualroot = (item == _basePath ? item.Split(Path.DirectorySeparatorChar).Last() : item.Remove(0, _basePath.Length).Split(Path.DirectorySeparatorChar)[0]);
-					actualroot = (actualroot == "" ? _basePath : actualroot);
-					string actualitem = (item == _basePath ? item : item.Remove(0, _basePath.Length).Remove(0, (actualroot != "Default" ? actualroot.Length : 0)));
+					actualroot = (actualroot == "" ? _basePath.Split(Path.DirectorySeparatorChar).Last() : actualroot);
+					string actualitem = (item == _basePath ? item : item.Remove(0, _basePath.Length + 1)); //.Remove(0, actualroot.Length)
 
 					// Drag and drop is funny
 					if (actualitem == Path.GetFullPath(actualitem))
