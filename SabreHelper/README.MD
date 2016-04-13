@@ -18,7 +18,7 @@ A bare-bones attempt at providing a true GUI experience for the SabreTools suite
 <b>DATabase</b>
 <p/>
 The main tool of the SabreTools suite. Performs the majority of the core features of the parent project, including the following:
-<ul>
+<ul>C:\Users\Matt\GitHub\DATabase\SabreHelper\README.MD
 	<li>Importing and Generating DAT files in RomVault and XML formats</li>
 	<li>Converting DATs from RomVault to XML format</li>
 	<li>Add and remove sources and systems from the database</li>
@@ -60,7 +60,7 @@ This a versitile Directory to DAT file creator developed to reduce the overhead 
 	<li>Set most of the DAT header values</li>
 	<li>Enable DAT to be created with forcepacking="unzip"</li>
 	<li>Treat archives like directories (default) or files</li>
-	<li>Output to XML DAT</li>
+	<li>Output to XML and RV DATs</li>
 </ul>
 
 <h3>Licensing</h3>
