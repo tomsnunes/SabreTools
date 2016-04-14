@@ -200,7 +200,7 @@ namespace SabreTools
 					"\tname \"" + HttpUtility.HtmlEncode(intname) + "\"\n" +
 					"\tdescription \"" + HttpUtility.HtmlEncode(datname) + "\"\n" +
 					"\tversion \"" + version + "\"\n" +
-					(_systems != "" && _systems.Split(',').Length == 1 && _headers.ContainsKey(Int32.Parse(_systems)) ? " header \"" + _headers[Int32.Parse(_systems)] + "\"\n" : "") +
+					//(_systems != "" && _systems.Split(',').Length == 1 && _headers.ContainsKey(Int32.Parse(_systems)) ? " header \"" + _headers[Int32.Parse(_systems)] + "\"\n" : "") +
 					"\tcomment \"\"\n" +
 					"\tauthor \"The Wizard of DATz\"\n" +
 					")\n";
@@ -216,7 +216,7 @@ namespace SabreTools
 					"\t\t\t<date>" + version + "</date>\n" +
 					"\t\t\t<author>The Wizard of DATz</author>\n" +
 					"\t\t\t<clrmamepro" + 
-					(_systems != "" && _systems.Split(',').Length == 1 && _headers.ContainsKey(Int32.Parse(_systems)) ? " header=\"" + _headers[Int32.Parse(_systems)] + "\"\n" : "") + "/>\n" +
+					//(_systems != "" && _systems.Split(',').Length == 1 && _headers.ContainsKey(Int32.Parse(_systems)) ? " header=\"" + _headers[Int32.Parse(_systems)] + "\"\n" : "") + "/>\n" +
 					"\t\t</header>\n";
 
 				// Unset _system again if we're in MEGAMERGED mode
