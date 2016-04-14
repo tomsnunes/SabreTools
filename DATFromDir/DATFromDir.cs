@@ -33,6 +33,7 @@ namespace SabreTools
 		private static bool _forceunzip;
 		private static bool _allfiles;
 		private static bool _old;
+		private static bool _log;
 		private static string _name;
 		private static string _desc;
 		private static string _cat;
@@ -51,11 +52,9 @@ namespace SabreTools
 		{
 			Console.Clear();
 			Console.Title = "DATFromDir " + Build.Version;
-			_logger = new Logger(false, "datfromdir.log");
-			_logger.Start();
 
 			// First things first, take care of all of the arguments that this could have
-			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false;
+			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false; _log = false; ;
 			_name = ""; _desc = ""; _cat = ""; _version = ""; _author = ""; _basePath = "";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
@@ -92,6 +91,10 @@ namespace SabreTools
 					case "--old":
 						_old = true;
 						break;
+					case "-l":
+					case "--log":
+						_log = true;
+						break;
 					default:
 						if (arg.StartsWith("-n=") || arg.StartsWith("--name="))
 						{
@@ -120,6 +123,9 @@ namespace SabreTools
 						break;
 				}
 			}
+
+			_logger = new Logger(_log, "datfromdir.log");
+			_logger.Start();
 
 			// If there's no inputs, show the help
 			if (inputs.Count == 0)

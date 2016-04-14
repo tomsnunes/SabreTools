@@ -119,7 +119,8 @@ Options:
   -d=, --desc=		Set the description of the DAT
   -c=, --cat=		Set the category of the DAT
   -v=, --version=	Set the version of the DAT
-  -a=, --author=	Set the author of the DAT");
+  -a=, --author=	Set the author of the DAT
+  -l, --log		Enable log to file");
 					break;
 				default:
 					Console.Write("This is the default help output");
