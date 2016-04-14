@@ -26,7 +26,7 @@ namespace SabreTools
 		// Extraction and listing related variables
 		private static List<RomData> _roms;
 
-		// User specified variables
+		// User specified flags
 		private static bool _noMD5;
 		private static bool _noSHA1;
 		private static bool _noDate;
@@ -34,6 +34,8 @@ namespace SabreTools
 		private static bool _allfiles;
 		private static bool _old;
 		private static bool _log;
+
+		// User specified strings
 		private static string _name;
 		private static string _desc;
 		private static string _cat;
