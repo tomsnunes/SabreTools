@@ -316,7 +316,7 @@ JOIN checksums
 	(_systems != "" && _sources != "" ? " AND" : "") +
 	(_systems != "" ? " systems.id in (" + _systems + ")" : "") +
 "\nORDER BY " +
-	(merged ? "checksums.size, checksums.crc, systems.id, sources.id, files.lastupdated DEC, checksums.md5, checksums.sha1"
+	(merged ? "checksums.size, checksums.crc, systems.id, sources.id, files.lastupdated DESC, checksums.md5, checksums.sha1"
 			: "systems.id, sources.id, games.name, files.name");
 
 			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
