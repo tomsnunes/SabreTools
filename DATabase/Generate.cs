@@ -300,8 +300,9 @@ namespace SabreTools
 			string query = @"
 SELECT DISTINCT systems.manufacturer AS manufacturer, systems.system AS system, systems.id AS systemid,
 	sources.name AS source, sources.url AS url, sources.id AS sourceid,
-	games.name AS game, files.name AS name, files.type AS type, files.lastupdated AS lastupdated,
-	checksums.size AS size, checksums.crc AS crc, checksums.md5 AS md5, checksums.sha1 AS sha1
+	games.name AS game, files.name AS name, files.type AS type,
+	checksums.size AS size, checksums.crc AS crc, checksums.md5 AS md5, checksums.sha1 AS sha1,
+	files.lastupdated AS lastupdated
 FROM systems
 JOIN games
 	ON systems.id=games.system
