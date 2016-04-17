@@ -215,7 +215,7 @@ namespace SabreTools
 					"\t\t\t<version>" + version + "</version>\n" +
 					"\t\t\t<date>" + version + "</date>\n" +
 					"\t\t\t<author>The Wizard of DATz</author>\n" +
-					"\t\t\t<clrmamepro" + 
+					//"\t\t\t<clrmamepro" + 
 					//(_systems != "" && _systems.Split(',').Length == 1 && _headers.ContainsKey(Int32.Parse(_systems)) ? " header=\"" + _headers[Int32.Parse(_systems)] + "\"\n" : "") + "/>\n" +
 					"\t\t</header>\n";
 
