@@ -287,7 +287,6 @@ namespace SabreTools
 		/// <summary>
 		/// Preprocess the rom data that is to be included in the outputted DAT
 		/// </summary>
-		/// <remarks>To make this even more accurate, files with a more recent "LastUpdated" should be considered the parent if all else is the same.</remarks>
 		/// <returns>A List of RomData objects containing all information about the files</returns>
 		public List<RomData> ProcessRoms()
 		{
@@ -301,8 +300,8 @@ namespace SabreTools
 			string query = @"
 SELECT DISTINCT systems.manufacturer AS manufacturer, systems.system AS system, systems.id AS systemid,
 	sources.name AS source, sources.url AS url, sources.id AS sourceid,
-	games.name AS game, files.name AS name, files.type AS type, checksums.size AS size, checksums.crc AS crc,
-	checksums.md5 AS md5, checksums.sha1 AS sha1
+	games.name AS game, files.name AS name, files.type AS type, files.lastupdated AS lastupdated,
+	checksums.size AS size, checksums.crc AS crc, checksums.md5 AS md5, checksums.sha1 AS sha1
 FROM systems
 JOIN games
 	ON systems.id=games.system
@@ -317,7 +316,7 @@ JOIN checksums
 	(_systems != "" && _sources != "" ? " AND" : "") +
 	(_systems != "" ? " systems.id in (" + _systems + ")" : "") +
 "\nORDER BY " +
-	(merged ? "checksums.size, checksums.crc, systems.id, sources.id, checksums.md5, checksums.sha1"
+	(merged ? "checksums.size, checksums.crc, systems.id, sources.id, files.lastupdated, checksums.md5, checksums.sha1"
 			: "systems.id, sources.id, games.name, files.name");
 
 			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
