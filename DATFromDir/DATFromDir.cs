@@ -238,7 +238,6 @@ namespace SabreTools
 				if (inputs.Count > 1)
 				{
 					_name = Environment.CurrentDirectory.Split(Path.DirectorySeparatorChar).Last();
-					Console.WriteLine(_name);
 				}
 				else
 				{
@@ -361,6 +360,7 @@ namespace SabreTools
 						reader.WriteAllToDirectory(_tempDir, ExtractOptions.ExtractFullPath);
 						encounteredErrors = false;
 					}
+					archive.Dispose();
 				}
 				catch (InvalidOperationException)
 				{
@@ -479,6 +479,8 @@ namespace SabreTools
 						actualitem = Path.GetFileName(actualitem);
 					}
 
+					_logger.Log("Actual item added: " + actualitem);
+
 					_roms.Add(new RomData
 					{
 						Game = actualroot,
@@ -491,7 +493,10 @@ namespace SabreTools
 
 					_logger.Log("File added" + Environment.NewLine);
 				}
-				catch (IOException) { }
+				catch (IOException ex)
+				{
+					_logger.Error(ex.ToString());
+				}
 			}
 
 			// Delete the temp directory
