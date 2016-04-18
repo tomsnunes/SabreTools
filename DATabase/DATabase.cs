@@ -21,9 +21,6 @@ namespace SabreTools
 		private static string _header =
 @"+-----------------------------------------------------------------------------+
 |                             DATabase " + Build.Version + @"                                |
-|                                                                             |
-|                 Programming: Matt Nadareski (darksabre76)                   |
-|                            Testing: @tractivo                               |
 +-----------------------------------------------------------------------------+
 ";
 
@@ -241,6 +238,7 @@ Make a selection:
     8) List all available systems
     9) Add and Remove from database
     10) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
+    11) Show credits
     X) Exit Program
 ");
 				Console.Write("Enter selection: ");
@@ -285,6 +283,12 @@ Make a selection:
 						break;
 					case "10":
 						logger.ToFile = !logger.ToFile;
+						break;
+					case "11":
+						Console.Clear();
+						Build.Credits();
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
 						break;
 				}
 			}
