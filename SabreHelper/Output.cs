@@ -10,7 +10,7 @@ namespace SabreTools.Helper
 	{
 		public static bool WriteToDat(string name, string description, string version, string date, string category, string author, bool forceunzip, bool old, string outDir, List<RomData> roms, Logger logger)
 		{
-			// Create and open an output file for writing (currently uses current time, change to "last updated time"
+			// Create and open an output file for writing (currently uses current time, change to "last updated time")
 			logger.Log("Opening file for writing: " + outDir + description + (old ? ".dat" : ".xml"));
 
 			try
