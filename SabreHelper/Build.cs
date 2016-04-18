@@ -128,5 +128,17 @@ Options:
 					break;
 			}
 		}
+
+		public static void Credits()
+		{
+			Console.WriteLine(@"
+-----------------------------------------
+Credits
+-----------------------------------------
+Programmer / Project Lead: Matt Nadareski (darksabre76)
+Additional code: emuLOAD, @tractivo
+Testing: emuLOAD, @tractivo, Kludge, Obiwantje
+Based on work by: The Wizard of DATz");
+		}
 	}
 }
