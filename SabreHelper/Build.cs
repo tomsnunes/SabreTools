@@ -120,7 +120,8 @@ Options:
   -c=, --cat=		Set the category of the DAT
   -v=, --version=	Set the version of the DAT
   -a=, --author=	Set the author of the DAT
-  -l, --log		Enable log to file");
+  -l, --log		Enable log to file
+  -sd, --superdat	Enable SuperDAT creation");
 					break;
 				default:
 					Console.Write("This is the default help output");

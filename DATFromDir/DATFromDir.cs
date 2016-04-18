@@ -17,6 +17,7 @@ namespace SabreTools
 	/// <summary>
 	/// Create a DAT file from a specified file, directory, or set thereof
 	/// </summary>
+	/// <remarks>Add SuperDAT functionality</remarks>
 	public class DATFromDir
 	{
 		// Path-related variables
@@ -34,6 +35,7 @@ namespace SabreTools
 		private static bool _allfiles;
 		private static bool _old;
 		private static bool _log;
+		private static bool _superDat;
 
 		// User specified strings
 		private static string _name;
@@ -56,7 +58,7 @@ namespace SabreTools
 			Console.Title = "DATFromDir " + Build.Version;
 
 			// First things first, take care of all of the arguments that this could have
-			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false; _log = false; ;
+			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false; _log = false; _superDat = false;
 			_name = ""; _desc = ""; _cat = ""; _version = ""; _author = ""; _basePath = "";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
@@ -96,6 +98,10 @@ namespace SabreTools
 					case "-l":
 					case "--log":
 						_log = true;
+						break;
+					case "-sd":
+					case "--superdat":
+						_superDat = true;
 						break;
 					default:
 						if (arg.StartsWith("-n=") || arg.StartsWith("--name="))
@@ -152,32 +158,50 @@ namespace SabreTools
 			// Create an output array for all found items
 			_roms = new List<RomData>();
 
-			// Loop over each of the found paths, if any
-			foreach (string path in inputs)
-			{
-				// Set local paths and vars
-				_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
-				
-				_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar);
-				_basePath = Path.GetFullPath(_basePath);
+			/*
+			For clarity, here is the process for SuperDAT:
+			1) Check to see if the input is a directory
+			2) If it is, loop through and get ONLY the directories
+			3) Treat each subdirectory like a base path
+			4) Process each subdirectory like a normal one
+			5) Prefix any added game names with the parent directory name
+			6) Process like normal
+			*/
 
-				// This is where the main loop would go
-				if (File.Exists(_basePath))
+			// If we're in SuperDAT mode, we have to treat it separately
+			if (_superDat)
+			{
+
+			}
+			else
+			{
+				// Loop over each of the found paths, if any
+				foreach (string path in inputs)
 				{
-					ProcessFile(_basePath);
-				}
-				else if (Directory.Exists(_basePath))
-				{
-					_logger.Log("Folder found: " + _basePath);
-					foreach (string item in Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories))
+					// Set local paths and vars
+					_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
+
+					_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar);
+					_basePath = Path.GetFullPath(_basePath);
+
+					// This is where the main loop would go
+					if (File.Exists(_basePath))
 					{
-						ProcessFile(item);
+						ProcessFile(_basePath);
 					}
-				}
-				// If this somehow skips past the original sensors
-				else
-				{
-					_logger.Error(path + " is not a valid input!");
+					else if (Directory.Exists(_basePath))
+					{
+						_logger.Log("Folder found: " + _basePath);
+						foreach (string item in Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories))
+						{
+							ProcessFile(item);
+						}
+					}
+					// If this somehow skips past the original sensors
+					else
+					{
+						_logger.Error(path + " is not a valid input!");
+					}
 				}
 			}
 
