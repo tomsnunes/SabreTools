@@ -25,6 +25,12 @@ namespace SabreTools.Helper
 		/// <returns></returns>
 		public static bool WriteToDat(string name, string description, string version, string date, string category, string author, bool forceunzip, bool old, string outDir, List<RomData> roms, Logger logger)
 		{
+			// Double check the outdir for the end delim
+			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				outDir += Path.DirectorySeparatorChar;
+			}
+
 			// (currently uses current time, change to "last updated time")
 			logger.Log("Opening file for writing: " + outDir + description + (old ? ".dat" : ".xml"));
 
