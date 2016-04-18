@@ -8,9 +8,24 @@ namespace SabreTools.Helper
 {
 	public class Output
 	{
+		/// <summary>
+		/// Create and open an output file for writing
+		/// </summary>
+		/// <param name="name">Internal name of the DAT</param>
+		/// <param name="description">Description and external name of the DAT</param>
+		/// <param name="version">Version or iteration of the DAT</param>
+		/// <param name="date">Usually the DAT creation date</param>
+		/// <param name="category">Category of the DAT</param>
+		/// <param name="author">DAT author</param>
+		/// <param name="forceunzip">Force all sets to be unzipped</param>
+		/// <param name="old">Set output mode to old-style DAT</param>
+		/// <param name="outDir">Set the output directory</param>
+		/// <param name="roms">List of RomData objects representing the games to be written out</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns></returns>
 		public static bool WriteToDat(string name, string description, string version, string date, string category, string author, bool forceunzip, bool old, string outDir, List<RomData> roms, Logger logger)
 		{
-			// Create and open an output file for writing (currently uses current time, change to "last updated time")
+			// (currently uses current time, change to "last updated time")
 			logger.Log("Opening file for writing: " + outDir + description + (old ? ".dat" : ".xml"));
 
 			try
