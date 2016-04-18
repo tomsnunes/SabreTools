@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.IO.Compression;
@@ -41,6 +42,14 @@ namespace SabreTools
 			Console.Clear();
 			Console.SetBufferSize(Console.BufferWidth, 999);
 			Console.Title = "DATabase " + Build.Version;
+
+			// Credits take precidence over all
+			if ((new List<string>(args)).Contains("--credits"))
+			{
+				Build.Credits();
+				logger.Close();
+				return;
+			}
 
 			// If there's no arguments, show the menu
 			if (args.Length == 0)

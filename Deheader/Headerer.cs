@@ -33,6 +33,13 @@ namespace SabreTools
 
 			Console.Title = "Headerer " + Build.Version;
 
+			// Credits take precidence over all
+			if ((new List<string>(args)).Contains("--credits"))
+			{
+				Build.Credits();
+				return;
+			}
+
 			if (args.Length == 0 || args.Length > 2)
 			{
 				Build.Help();

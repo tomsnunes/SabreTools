@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -16,6 +17,13 @@ namespace DatSplit
 		public static void Main(string[] args)
 		{
 			Console.Title = "DatSplit " + Build.Version;
+
+			// Credits take precidence over all
+			if ((new List<string>(args)).Contains("--credits"))
+			{
+				Build.Credits();
+				return;
+			}
 
 			// If we don't have arguments, show help
 			if (args.Length == 0 && args.Length != 3)

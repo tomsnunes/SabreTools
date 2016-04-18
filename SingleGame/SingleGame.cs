@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 
@@ -15,6 +16,13 @@ namespace SabreTools
 		public static void Main(string[] args)
 		{
 			Console.Title = "SingleGame " + Build.Version;
+
+			// Credits take precidence over all
+			if ((new List<string>(args)).Contains("--credits"))
+			{
+				Build.Credits();
+				return;
+			}
 
 			if (args.Length == 0)
 			{

@@ -57,8 +57,16 @@ namespace SabreTools
 			Console.Clear();
 			Console.Title = "DATFromDir " + Build.Version;
 
+			// Credits take precidence over all
+			if ((new List<string>(args)).Contains("--credits"))
+			{
+				Build.Credits();
+				return;
+			}
+
 			// First things first, take care of all of the arguments that this could have
 			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false; _log = false; _superDat = false;
+			bool credits = false;
 			_name = ""; _desc = ""; _cat = ""; _version = ""; _author = ""; _basePath = "";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
@@ -102,6 +110,9 @@ namespace SabreTools
 					case "-sd":
 					case "--superdat":
 						_superDat = true;
+						break;
+					case "--credits":
+						credits = true;
 						break;
 					default:
 						if (arg.StartsWith("-n=") || arg.StartsWith("--name="))
