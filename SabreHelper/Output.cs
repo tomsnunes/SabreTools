@@ -22,7 +22,7 @@ namespace SabreTools.Helper
 		/// <param name="outDir">Set the output directory</param>
 		/// <param name="roms">List of RomData objects representing the games to be written out</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
-		/// <returns></returns>
+		/// <returns>Tru if the DAT was written correctly, false otherwise</returns>
 		public static bool WriteToDat(string name, string description, string version, string date, string category, string author, bool forceunzip, bool old, string outDir, List<RomData> roms, Logger logger)
 		{
 			// Double check the outdir for the end delim
