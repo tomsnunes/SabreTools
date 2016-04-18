@@ -86,7 +86,7 @@ namespace SabreTools.Helper
 				}
 
 				sw.Write((old ? ")" : "\t</machine>\n</datafile>"));
-				logger.Log("File written!");
+				logger.Log("File written!" + Environment.NewLine);
 				sw.Close();
 				fs.Close();
 			}

@@ -227,11 +227,6 @@ namespace SabreTools
 				return String.Compare(A.Game, B.Game);
 			});
 
-			//TODO: So, this below section is a pretty much one for one copy of code that is written in generate
-			//		this means that in the future, "writing to DAT" will be abstracted out to the DLL so that any
-			//		properly formatted data can be passed in and it will get written as necessary. That would open
-			//		the possibiliites for different ways to generate a DAT from multiple things
-
 			// Double check to see what it needs to be named
 			if (_name == "")
 			{
@@ -252,87 +247,8 @@ namespace SabreTools
 			_desc = (_desc == "" ? _name + (_noDate ? "" : " (" + _date + ")") : _desc);
 
 			// Now write it all out as a DAT
-			try
-			{
-				FileStream fs = File.Create(_desc + ".xml");
-				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-
-				string header_old = "clrmamepro (\n" +
-					"\tname \"" + _name + "\"\n" +
-					"\tdescription \"" + _desc + "\"\n" +
-					"\tversion \"" + _version + "\"\n" +
-					"\tcomment \"\"\n" +
-					"\tauthor \"" + _author + "\"\n" +
-					(_forceunzip ? "\tforcezipping no\n" : "") + 
-					")\n";
-
-				string header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-					"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
-					"\t<datafile>\n" +
-					"\t\t<header>\n" +
-					"\t\t\t<name>" + HttpUtility.HtmlEncode(_name) + "</name>\n" +
-					"\t\t\t<description>" + HttpUtility.HtmlEncode(_desc) + "</description>\n" +
-					"\t\t\t<category>" + HttpUtility.HtmlEncode(_cat) + "</category>\n" +
-					"\t\t\t<version>" + HttpUtility.HtmlEncode(_version) + "</version>\n" +
-					"\t\t\t<date>" + _date + "</date>\n" +
-					"\t\t\t<author>" + HttpUtility.HtmlEncode(_author) + "</author>\n" +
-					(_forceunzip ? "\t\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
-					"\t\t</header>\n";
-
-				// Write the header out
-				sw.Write((_old ? header_old : header));
-
-				// Write out each of the machines and roms
-				string lastgame = "";
-				foreach (RomData rom in _roms)
-				{
-					string state = "";
-					if (lastgame != "" && lastgame != rom.Game)
-					{
-						state += (_old ? ")\n" : "\t</machine>\n");
-					}
-
-					if (lastgame != rom.Game)
-					{
-						state += (_old ? "game (\n\tname \"" + rom.Game + "\"\n" +
-							"\tdescription \"" + rom.Game + "\"\n" :
-							"\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
-							"\t\t<description>" + HttpUtility.HtmlEncode(rom.Game) + "</description>\n");
-					}
-
-					if (_old)
-					{
-						state += "\trom ( name \"" + rom.Name + "\"" +
-							(rom.Size != 0 ? " size " + rom.Size : "") +
-							(rom.CRC != "" ? " crc " + rom.CRC.ToLowerInvariant() : "") +
-							(rom.MD5 != "" ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
-							(rom.SHA1 != "" ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
-							" )\n";
-					}
-					else
-					{
-						state += "\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
-							(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
-							(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
-							(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
-							(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
-							" />\n";
-					}
-
-					lastgame = rom.Game;
-
-					sw.Write(state);
-				}
-
-				sw.Write((_old ? ")" : "\t</machine>\n</datafile>"));
-				_logger.Log("File written!" + Environment.NewLine);
-				sw.Close();
-				fs.Close();
-			}
-			catch (Exception ex)
-			{
-				_logger.Error(ex.ToString());
-			}
+			Output.WriteToDat(_name, _desc, _version, _date, _cat, _author, _forceunzip, _old, Environment.CurrentDirectory, _roms, _logger);
+			
 			_logger.Close();
 		}
 
@@ -420,6 +336,7 @@ namespace SabreTools
 
 					_roms.Add(new RomData
 					{
+						Type = "rom",
 						Game = Path.GetFileNameWithoutExtension(item),
 						Name = entry.Remove(0, _tempDir.Length),
 						Size = (new FileInfo(entry)).Length,
@@ -483,6 +400,7 @@ namespace SabreTools
 
 					_roms.Add(new RomData
 					{
+						Type = "rom",
 						Game = actualroot,
 						Name = actualitem,
 						Size = (new FileInfo(item)).Length,
