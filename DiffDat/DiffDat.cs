@@ -34,7 +34,7 @@ namespace SabreTools
 			Build.Start("DiffDat");
 
 			List<String> inputs = new List<String>();
-			bool tofile = false, help = false;
+			bool tofile = false, help = false, merge = false; ;
 			foreach (string arg in args)
 			{
 				switch (arg)
@@ -47,6 +47,10 @@ namespace SabreTools
 					case "-l":
 					case "--log":
 						tofile = true;
+						break;
+					case "-m":
+					case "--merge":
+						merge = true;
 						break;
 					default:
 						// Add actual files to the list of inputs
@@ -84,6 +88,13 @@ namespace SabreTools
 				List<RomData> B = RomManipulation.Parse(input, 0, 0, logger);
 				A = RomManipulation.Diff(A, B);
 			}
+
+			// If we want a merged list, send it for merging before outputting
+			if (merge)
+			{
+				A = RomManipulation.Merge(A);
+			}
+
 			Output.WriteToDat("diffdat", "diffdat", "", "", "DiffDat", "SabreTools", false, !RomManipulation.IsXmlDat(inputs[0]), "", A, logger);
 		}
 	}

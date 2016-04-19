@@ -163,7 +163,8 @@ Usage: DiffDat [options] [filename] [filename] ...
 
 Options:
   -h, -?, --help	Show this help dialog
-  -l, --log		Enable log to file");
+  -l, --log		Enable log to file
+  -m, --merge	Enable merging in the created DAT");
 					break;
 				default:
 					Console.Write("This is the default help output");
