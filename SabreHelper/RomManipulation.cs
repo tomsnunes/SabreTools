@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -8,6 +9,25 @@ namespace SabreTools.Helper
 {
 	public class RomManipulation
 	{
+		/// <summary>
+		/// Return if the file is XML or not
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <returns>True if the file is XML, false otherwise</returns>
+		public static bool IsXmlDat(string filename)
+		{
+			XmlDocument doc = new XmlDocument();
+			try
+			{
+				doc.LoadXml(File.ReadAllText(filename));
+			}
+			catch (XmlException)
+			{
+				return false;
+			}
+			return true;
+		}
+
 		/// <summary>
 		/// Parse a DAT and return all found games and roms within
 		/// </summary>
@@ -304,18 +324,16 @@ namespace SabreTools.Helper
 			});
 		}
 
-		public static bool IsXmlDat(string filename)
+		/// <summary>
+		/// Get differences between two lists of RomData objects
+		/// </summary>
+		/// <param name="A">First RomData list</param>
+		/// <param name="B">Second RomData list</param>
+		/// <returns>Any rom that's not in both lists</returns>
+		/// <remarks>Adapted from http://stackoverflow.com/questions/5620266/the-opposite-of-intersect</remarks>
+		public static List<RomData> Diff(List<RomData> A, List<RomData> B)
 		{
-			XmlDocument doc = new XmlDocument();
-			try
-			{
-				doc.LoadXml(File.ReadAllText(filename));
-			}
-			catch (XmlException)
-			{
-				return false;
-			}
-			return true;
+			return A.Except(B).Union(B.Except(A)).ToList();
 		}
 	}
 }
