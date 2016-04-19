@@ -79,9 +79,7 @@ namespace SabreTools.Helper
 						// There are rare cases where a malformed XML will not have the required attributes. We can only skip them.
 						if (node.Attributes.Count == 0)
 						{
-							logger.Error(@"A node with malformed XML has been found!
-	For RV DATs, please make sure that all names and descriptions are quoted.
-	For XML DATs, make sure that the DAT has all required information.");
+							logger.Error("No attributes were found");
 							node = node.NextSibling;
 							continue;
 						}
