@@ -78,6 +78,10 @@ CURRENTLY UNCODED - A program to merge an arbitrary number of DATs into a single
 <b>DiffDat</b>
 <p/>
 A program to create a DAT based on the differences between two or more input DATs.
+<ul>
+	<li>Read in from commandline, drag-and-drop, a directory, or any combination</li>
+	<li>Output type automatically determined by the first input file</li>
+</ul>
 
 <h3>Licensing</h3>
 <p/>
