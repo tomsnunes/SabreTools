@@ -126,7 +126,7 @@ Options:
 				case "SingleGame":
 					Console.WriteLine(@"SingleGame - Process DATs for use in server environments
 -----------------------------------------
-Usage: SingleGame.exe <file|folder> [-r=rootdir|-n]
+Usage: SingleGame.exe [option] [filename|dirname]
 
 Options:
     -r=rootdir		Set the directory name for path size

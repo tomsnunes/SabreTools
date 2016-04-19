@@ -38,32 +38,31 @@ namespace SabreTools
 			// Output the title
 			Build.Start("SingleGame");
 
-			_filename = args[0];
-
 			bool tofile = false;
-			if (args.Length > 1)
+			foreach (string arg in args)
 			{
-				for (int i = 1; i < args.Length; i++)
+				switch (arg)
 				{
-					switch (args[i])
-					{
-						case "-n":
-							_rename = false;
-							break;
-						case "-z":
-							_forceunpack = false;
-							break;
-						case "-l":
-						case "--log":
-							tofile = true;
-							break;
-						default:
-							if (args[i].StartsWith("-r"))
-							{
-								_path = args[i].Split('=')[1];
-							}
-							break;
-					}
+					case "-n":
+						_rename = false;
+						break;
+					case "-z":
+						_forceunpack = false;
+						break;
+					case "-l":
+					case "--log":
+						tofile = true;
+						break;
+					default:
+						if (arg.StartsWith("-r"))
+						{
+							_path = arg.Split('=')[1];
+						}
+						else
+						{
+							_filename = arg;
+						}
+						break;
 				}
 			}
 
