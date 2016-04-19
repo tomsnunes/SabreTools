@@ -42,8 +42,18 @@ namespace SabreTools
 			{
 				for (int i = 1; i < args.Length; i++)
 				{
-					_path = (args[i].StartsWith("-r") ? args[i].Split('=')[1] : _path);
-					_rename = (args[i] == "-n" ? false : _rename);
+					switch (args[i])
+					{
+						case "-n":
+							_rename = false;
+							break;
+						default:
+							if (args[i].StartsWith("-r"))
+							{
+								_path = args[i].Split('=')[1];
+							}
+							break;
+					}
 				}
 			}
 
