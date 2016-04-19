@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 
 using SabreTools.Helper;
 
@@ -25,7 +22,6 @@ namespace SabreTools
 		private bool _old;
 
 		// Private required variables
-		private Dictionary<int, string> _headers;
 		private Logger _logger;
 
 		/// <summary>
@@ -48,26 +44,13 @@ namespace SabreTools
 			_logger = logger;
 
 			// Take care of special outfolder cases
-			_outdir = (outdir == "" ? outdir :
-				(outdir.Contains("/") && !outdir.EndsWith("/") ? outdir + "/" :
-					(outdir.Contains("\\") && !outdir.EndsWith("\\") ? outdir + "\\" :
-						(!outdir.Contains("/") && !outdir.Contains("\\") ? outdir + "\\" : outdir)
-					)
-				)
+			_outdir = (outdir == "" ? Environment.CurrentDirectory + Path.DirectorySeparatorChar :
+				(!outdir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? outdir + Path.DirectorySeparatorChar : outdir)
 			);
 			if (_outdir != "" && !Directory.Exists(_outdir))
 			{
 				Directory.CreateDirectory(_outdir);
 			}
-
-			_headers = new Dictionary<int, string>();
-			_headers.Add(25, "a7800.xml");
-			_headers.Add(228, "fds.xml");
-			_headers.Add(31, "lynx.xml");
-			_headers.Add(0, "mega.xml");    // Merged version of all other headers
-			_headers.Add(234, "n64.xml");
-			_headers.Add(238, "nes.xml");
-			_headers.Add(241, "snes.xml");  // Self-created to deal with various headers
 		}
 
 		/// <summary>
@@ -255,52 +238,12 @@ JOIN checksums
 								SHA1 = sldr.GetString(12),
 							};
 
-							if (merged)
+							// Rename the game associated if it's still valid and we allow renames
+							if (merged && !_norename)
 							{
-								// If it's the first rom in the list, don't touch it
-								if (roms.Count != 0)
-								{
-									// Check if the rom is a duplicate
-									RomData last = roms[roms.Count - 1];
-
-									bool shouldcont = false;
-									if (temp.Type == "rom" && last.Type == "rom")
-									{
-										shouldcont = ((temp.Size != -1 && temp.Size == last.Size) && (
-												(temp.CRC != "" && last.CRC != "" && temp.CRC == last.CRC) ||
-												(temp.MD5 != "" && last.MD5 != "" && temp.MD5 == last.MD5) ||
-												(temp.SHA1 != "" && last.SHA1 != "" && temp.SHA1 == last.SHA1)
-												)
-											);
-									}
-									else if (temp.Type == "disk" && last.Type == "disk")
-									{
-										shouldcont = ((temp.MD5 != "" && last.MD5 != "" && temp.MD5 == last.MD5) ||
-												(temp.SHA1 != "" && last.SHA1 != "" && temp.SHA1 == last.SHA1)
-											);
-									}
-
-									// If it's a duplicate, skip adding it to the output but add any missing information
-									if (shouldcont)
-									{
-										last.CRC = (last.CRC == "" && temp.CRC != "" ? temp.CRC : last.CRC);
-										last.MD5 = (last.MD5 == "" && temp.MD5 != "" ? temp.MD5 : last.MD5);
-										last.SHA1 = (last.SHA1 == "" && temp.SHA1 != "" ? temp.SHA1 : last.SHA1);
-
-										roms.RemoveAt(roms.Count - 1);
-										roms.Insert(roms.Count, last);
-
-										continue;
-									}
-								}
-
-								// Rename the game associated if it's still valid and we allow renames
-								if (!_norename)
-								{
-									temp.Game = temp.Game +
-										(sysmerged ? " [" + temp.Manufacturer + " - " + temp.System + "]" : "") +
-										(srcmerged ? " [" + temp.Source + "]" : "");
-								}
+								temp.Game = temp.Game +
+									(sysmerged ? " [" + temp.Manufacturer + " - " + temp.System + "]" : "") +
+									(srcmerged ? " [" + temp.Source + "]" : "");
 							}
 
 							roms.Add(temp);
@@ -309,25 +252,11 @@ JOIN checksums
 				}
 			}
 
-			// If we're in a merged mode, resort by the correct parameters
+			// If we're in a merged mode, merge and then resort by the correct parameters
 			if (merged)
 			{
-				roms.Sort(delegate (RomData x, RomData y)
-				{
-					if (x.SystemID == y.SystemID)
-					{
-						if (x.SourceID == y.SourceID)
-						{
-							if (x.Game == y.Game)
-							{
-								return String.Compare(x.Name, y.Name);
-							}
-							return String.Compare(x.Game, y.Game);
-						}
-						return (_norename ? String.Compare(x.Game, y.Game) : x.SourceID - y.SourceID);
-					}
-					return (_norename ? String.Compare(x.Game, y.Game) : x.SystemID - y.SystemID);
-				});
+				roms = Sort.Merge(roms, true);
+				Sort.RomSort(roms, _norename);
 			}
 
 			// Now check rename within games
