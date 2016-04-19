@@ -292,5 +292,19 @@ namespace SabreTools.Helper
 				return (norename ? String.Compare(x.Game, y.Game) : x.SystemID - y.SystemID);
 			});
 		}
+
+		public static bool IsXmlDat(string filename)
+		{
+			XmlDocument doc = new XmlDocument();
+			try
+			{
+				doc.LoadXml(File.ReadAllText(filename));
+			}
+			catch (XmlException)
+			{
+				return false;
+			}
+			return true;
+		}
 	}
 }

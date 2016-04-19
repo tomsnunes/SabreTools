@@ -133,7 +133,7 @@ namespace SabreTools
 
 			// Now write the file out accordingly
 			Output.WriteToDat(Path.GetFileNameWithoutExtension(filename),
-				Path.GetFileNameWithoutExtension(filename), "", "", "", "", _forceunpack, Path.GetExtension(filename) == ".dat", Path.GetDirectoryName(filename), outroms, logger);
+				Path.GetFileNameWithoutExtension(filename), "", "", "", "", _forceunpack, !RomManipulation.IsXmlDat(filename), Path.GetDirectoryName(filename), outroms, logger);
 		}
 	}
 }

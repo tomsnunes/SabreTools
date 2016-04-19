@@ -68,9 +68,9 @@ namespace DatSplit
 
 			// Then write out both files
 			Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename) + "." + _extA, Path.GetFileNameWithoutExtension(_filename) + "." + _extA,
-				"", "", "", "", false, Path.GetExtension(_filename) == ".dat", "", romsA, logger);
+				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), "", romsA, logger);
 			Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename) + "." + _extB, Path.GetFileNameWithoutExtension(_filename) + "." + _extB,
-				"", "", "", "", false, Path.GetExtension(_filename) == ".dat", "", romsB, logger);
+				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), "", romsB, logger);
 
 			logger.Close();
 		}
