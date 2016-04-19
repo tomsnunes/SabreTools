@@ -54,7 +54,7 @@ namespace SabreTools.Helper
 					"\t\t<header>\n" +
 					"\t\t\t<name>" + HttpUtility.HtmlEncode(name) + "</name>\n" +
 					"\t\t\t<description>" + HttpUtility.HtmlEncode(description) + "</description>\n" +
-					"\t\t\t<category>" + HttpUtility.HtmlEncode(category) + "/category>\n" +
+					"\t\t\t<category>" + HttpUtility.HtmlEncode(category) + "</category>\n" +
 					"\t\t\t<version>" + HttpUtility.HtmlEncode(version) + "</version>\n" +
 					"\t\t\t<date>" + HttpUtility.HtmlEncode(date) + "</date>\n" +
 					"\t\t\t<author>" + HttpUtility.HtmlEncode(author) + "</author>\n" +
