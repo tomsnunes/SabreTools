@@ -71,6 +71,7 @@ Experimental tool for trimming all files in DAT (or folder of DATs) so that they
 <p/>
 A program to create a DAT based on the differences between two or more input DATs.
 <ul>
+	<li>Intended for use with DATs in the same "family", e.g. a DAT and a fixdat generated from it or two different fixdats</li>
 	<li>Read in from commandline, drag-and-drop, a directory, or any combination</li>
 	<li>Output type automatically determined by the first input file</li>
 </ul>
