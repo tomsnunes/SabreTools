@@ -119,5 +119,51 @@ namespace SabreTools.Helper
 
 			return true;
 		}
+
+		/// <summary>
+		/// Output a list of roms as a text file with an arbitrary prefix and postfix
+		/// </summary>
+		/// <param name="textfile">Name of the output file</param>
+		/// <param name="roms">List of RomData objects representing the roms to be output</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="useGame">True if only games are written to text file (default), false for files only</param>
+		/// <param name="prefix">Arbitrary string to prefix each line</param>
+		/// <param name="postfix">Arbitrary string to postfix each line</param>
+		/// <returns>True if the file was written, false otherwise</returns>
+		public static bool WriteToText(string textfile, List<RomData> roms, Logger logger, bool useGame = true, string prefix = "", string postfix = "")
+		{
+			logger.Log("Opening file for writing: " + textfile);
+
+			try
+			{
+				FileStream fs = File.Create(textfile);
+				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
+
+				string lastgame = "";
+				foreach (RomData rom in roms)
+				{
+					if (useGame && rom.Game != lastgame)
+					{
+						sw.WriteLine(prefix + rom.Game + postfix);
+						lastgame = rom.Game;
+					}
+					else if (!useGame)
+					{
+						sw.WriteLine(prefix + rom.Name + postfix);
+					}
+				}
+
+				logger.Log("File written!" + Environment.NewLine);
+				sw.Close();
+				fs.Close();
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+				return false;
+			}
+
+			return true;
+		}
 	}
 }
