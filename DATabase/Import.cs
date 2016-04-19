@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -377,156 +378,24 @@ namespace SabreTools
 				}
 			}
 
-			// Attempt to load the current file as XML
-			bool superdat = false;
-			XmlDocument doc = new XmlDocument();
-			try
-			{
-				doc.LoadXml(File.ReadAllText(_filepath));
-			}
-			catch (XmlException)
-			{
-				doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(_filepath)).ToString());
-			}
+			// Get all roms that are found in the DAT to see what needs to be added
+			List<RomData> roms = RomManipulation.Parse(_filepath, sysid, srcid, _logger);
 
-			// Experimental looping using only XML parsing
-			XmlNode node = doc.FirstChild;
-			if (node != null && node.Name == "xml")
+			// Sort and loop over all roms, checking for adds
+			RomManipulation.Sort(roms, true);
+			string lastgame = "";
+			long gameid = -1;
+			foreach (RomData rom in roms)
 			{
-				// Skip over everything that's not an element
-				while (node.NodeType != XmlNodeType.Element)
+				// If we have a new game, check for a new ID
+				if (rom.Game != lastgame)
 				{
-					node = node.NextSibling;
-				}
-			}
-
-			// Once we find the main body, enter it
-			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
-			{
-				node = node.FirstChild;
-			}
-
-			// Skip the header if it exists
-			if (node != null && node.Name == "header")
-			{
-				// Check for SuperDAT mode
-				if (node.SelectSingleNode("name").InnerText.Contains(" - SuperDAT"))
-				{
-					superdat = true;
+					gameid = AddGame(sysid, rom.Game, srcid);
+					lastgame = rom.Game;
 				}
 
-				// Skip over anything that's not an element
-				while (node.NodeType != XmlNodeType.Element)
-				{
-					node = node.NextSibling;
-				}
-			}
-
-			while (node != null)
-			{
-				if (node.NodeType == XmlNodeType.Element && (node.Name == "machine" || node.Name == "game" || node.Name == "software"))
-				{
-					long gameid = -1;
-					string tempname = "";
-					if (node.Name == "software")
-					{
-						tempname = node.SelectSingleNode("description").InnerText;
-					}
-					else
-					{
-						// There are rare cases where a malformed XML will not have the required attributes. We can only skip them.
-						if (node.Attributes.Count == 0)
-						{
-							_logger.Error(@"A node with malformed XML has been found!
-	For RV DATs, please make sure that all names and descriptions are quoted.
-	For XML DATs, make sure that the DAT has all required information.");
-							node = node.NextSibling;
-							continue;
-						}
-						tempname = node.Attributes["name"].Value;
-					}
-
-					if (superdat)
-					{
-						tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
-					}
-
-					gameid = AddGame(sysid, tempname, srcid);
-					
-					// Get the roms from the machine
-					if (node.HasChildNodes)
-					{
-						// If this node has children, traverse the children
-						foreach (XmlNode child in node.ChildNodes)
-						{
-							// If we find a rom or disk, add it
-							if (child.NodeType == XmlNodeType.Element && (child.Name == "rom" || child.Name == "disk"))
-							{
-								// Take care of hex-sized files
-								long size = -1;
-								if (child.Attributes["size"] != null && child.Attributes["size"].Value.Contains("0x"))
-								{
-									size = Convert.ToInt64(child.Attributes["size"].Value, 16);
-								}
-								else if (child.Attributes["size"] != null)
-								{
-									size = Int64.Parse(child.Attributes["size"].Value);
-								}
-
-								AddRom(
-									child.Name,
-									gameid,
-									child.Attributes["name"].Value,
-									date,
-									size,
-									(child.Attributes["crc"] != null ? child.Attributes["crc"].Value.ToLowerInvariant().Trim() : ""),
-									(child.Attributes["md5"] != null ? child.Attributes["md5"].Value.ToLowerInvariant().Trim() : ""),
-									(child.Attributes["sha1"] != null ? child.Attributes["sha1"].Value.ToLowerInvariant().Trim() : "")
-								);
-							}
-							// If we find the signs of a software list, traverse the children
-							else if (child.NodeType == XmlNodeType.Element && child.Name == "part" && child.HasChildNodes)
-							{
-								foreach (XmlNode part in child.ChildNodes)
-								{
-									// If we find a dataarea, traverse the children
-									if (part.NodeType == XmlNodeType.Element && part.Name == "dataarea")
-									{
-										foreach (XmlNode data in part.ChildNodes)
-										{
-											// If we find a rom or disk, add it
-											if (data.NodeType == XmlNodeType.Element && (data.Name == "rom" || data.Name == "disk") && data.Attributes["name"] != null)
-											{
-												// Take care of hex-sized files
-												long size = -1;
-												if (data.Attributes["size"] != null && data.Attributes["size"].Value.Contains("0x"))
-												{
-													size = Convert.ToInt64(data.Attributes["size"].Value, 16);
-												}
-												else if (data.Attributes["size"] != null)
-												{
-													size = Int64.Parse(data.Attributes["size"].Value);
-												}
-
-												AddRom(
-													data.Name,
-													gameid,
-													data.Attributes["name"].Value,
-													date,
-													size,
-													(data.Attributes["crc"] != null ? data.Attributes["crc"].Value.ToLowerInvariant().Trim() : ""),
-													(data.Attributes["md5"] != null ? data.Attributes["md5"].Value.ToLowerInvariant().Trim() : ""),
-													(data.Attributes["sha1"] != null ? data.Attributes["sha1"].Value.ToLowerInvariant().Trim() : "")
-												);
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				node = node.NextSibling;
+				// Try to add the rom with the game information
+				AddRom(rom, gameid, date);
 			}
 
 			return true;
@@ -598,28 +467,23 @@ namespace SabreTools
 		/// <summary>
 		/// Add a file to the database if it doesn't already exist
 		/// </summary>
-		/// <param name="romtype">File type (either "rom" or "disk")</param>
+		/// <param name="rom">RomData object representing the rom</param>
 		/// <param name="gameid">ID of the parent game to be mapped to</param>
-		/// <param name="name">File name</param>
 		/// <param name="date">Last updated date</param>
-		/// <param name="size">File size in bytes</param>
-		/// <param name="crc">CRC32 hash of the file</param>
-		/// <param name="md5">MD5 hash of the file</param>
-		/// <param name="sha1">SHA-1 hash of the file</param>
 		/// <returns>True if the file exists or could be added, false on error</returns>
-		private bool AddRom(string romtype, long gameid, string name, string date, long size, string crc, string md5, string sha1)
+		private bool AddRom(RomData rom, long gameid, string date)
 		{
 			// WOD origninally stripped out any subdirs from the imported files, we do the same
-			name = Path.GetFileName(name);
+			rom.Name = Path.GetFileName(rom.Name);
 
 			// Run the name through the filters to make sure that it's correct
-			name = Style.NormalizeChars(name);
-			name = Style.RussianToLatin(name);
-			name = Regex.Replace(name, @"(.*) \.(.*)", "$1.$2");
+			rom.Name = Style.NormalizeChars(rom.Name);
+			rom.Name = Style.RussianToLatin(rom.Name);
+			rom.Name = Regex.Replace(rom.Name, @"(.*) \.(.*)", "$1.$2");
 
-			if (romtype != "rom" && romtype != "disk")
+			if (rom.Type != "rom" && rom.Type != "disk")
 			{
-				romtype = "rom";
+				rom.Type = "rom";
 			}
 
 			// Check to see if this exact file is in the database already
@@ -627,13 +491,13 @@ namespace SabreTools
 SELECT files.id FROM files
 	JOIN checksums
 	ON files.id=checksums.file
-	WHERE files.name='" + name.Replace("'", "''") + @"'
-		AND files.type='" + romtype + @"' 
+	WHERE files.name='" + rom.Name.Replace("'", "''") + @"'
+		AND files.type='" + rom.Type + @"' 
 		AND files.setid=" + gameid + " " + 
-		" AND checksums.size=" + size +
-		" AND checksums.crc='" + crc + "'" +
-		" AND checksums.md5='" + md5 + "'" +
-		" AND checksums.sha1='" + sha1 + "'";
+		" AND checksums.size=" + rom.Size +
+		" AND checksums.crc='" + rom.CRC + "'" +
+		" AND checksums.md5='" + rom.MD5 + "'" +
+		" AND checksums.sha1='" + rom.SHA1 + "'";
 			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
 			{
 				dbc.Open();
@@ -646,7 +510,7 @@ SELECT files.id FROM files
 						{
 							query = @"
 INSERT INTO files (setid, name, type, lastupdated)
-	VALUES (" + gameid + ", '" + name.Replace("'", "''") + "', '" + romtype + "', '" + date + "')";
+	VALUES (" + gameid + ", '" + rom.Name.Replace("'", "''") + "', '" + rom.Type + "', '" + date + "')";
 							using (SQLiteCommand slc2 = new SQLiteCommand(query, dbc))
 							{
 								int affected = slc2.ExecuteNonQuery();
@@ -662,7 +526,7 @@ INSERT INTO files (setid, name, type, lastupdated)
 									}
 
 									query = @"INSERT INTO checksums (file, size, crc, md5, sha1) VALUES (" +
-										romid + ", " + size + ", '" + crc + "'" + ", '" + md5 + "'" + ", '" + sha1 + "')";
+										romid + ", " + rom.Size + ", '" + rom.CRC + "'" + ", '" + rom.MD5 + "'" + ", '" + rom.SHA1 + "')";
 									using (SQLiteCommand slc3 = new SQLiteCommand(query, dbc))
 									{
 										affected = slc3.ExecuteNonQuery();
@@ -671,14 +535,14 @@ INSERT INTO files (setid, name, type, lastupdated)
 									// If the insert of the checksums failed, that's bad
 									if (affected < 1)
 									{
-										_logger.Error("There was an error adding checksums for " + name + " to the database!");
+										_logger.Error("There was an error adding checksums for " + rom.Name + " to the database!");
 										return false;
 									}
 								}
 								// Otherwise, something happened which is bad
 								else
 								{
-									_logger.Error("There was an error adding " + name + " to the database!");
+									_logger.Error("There was an error adding " + rom.Name + " to the database!");
 									return false;
 								}
 							}

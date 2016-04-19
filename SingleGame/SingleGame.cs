@@ -30,6 +30,9 @@ namespace SabreTools
 				return;
 			}
 
+			Logger logger = new Logger(false, "singlegame.log");
+			logger.Start();
+
 			// Output the title
 			Build.Start("SingleGame");
 
@@ -46,122 +49,37 @@ namespace SabreTools
 
 			_path = (_path == "" ? Environment.CurrentDirectory : _path);
 
-			// Take the filename, and load it as an XML document
-			XmlDocument doc = new XmlDocument();
-			try
-			{
-				doc.LoadXml(File.ReadAllText(_filename));
-			}
-			catch (XmlException)
-			{
-				doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(_filename)).ToString());
-			}
+			// Import the existing DAT
+			List<RomData> roms = RomManipulation.Parse(_filename, 0, 0, logger);
 
-			// We all start the same
-			XmlNode node = doc.FirstChild;
-			if (node != null && node.Name == "xml")
+			// If we are in single game mode, rename all games
+			if (_rename)
 			{
-				// Skip over everything that's not an element
-				while (node.NodeType != XmlNodeType.Element)
+				roms.ForEach(delegate (RomData x)
 				{
-					node = node.NextSibling;
-				}
+					x.Game = "!";
+				});
 			}
 
-			XmlDocument tempDoc = new XmlDocument();
-			XmlNode outNode = tempDoc.CreateNode(XmlNodeType.Element, node.Name, "");
-
-			// Once we find the main body, enter it
-			if (node != null && node.Name == "datafile")
+			// Trim all file names according to the path that's set
+			roms.ForEach(delegate (RomData x)
 			{
-				node = node.FirstChild;
-			}
+				// Windows max name length is 260
+				int usableLength = 259 - _path.Length;
 
-			// Now here's where it differs from import
-			bool inGame = false;
-			while (node != null)
-			{
-				// If we're at a game node, add the parent node but not all the internals
-				if (_rename && node.NodeType == XmlNodeType.Element && (node.Name == "machine" || node.Name == "game"))
+				if (x.Name.Length > usableLength)
 				{
-					if (!inGame)
-					{
-						XmlElement tempNode = tempDoc.CreateElement(node.Name);
-						tempNode.SetAttribute("name", "!");
-						outNode.AppendChild(tempNode);
-						outNode = outNode.LastChild;
-						inGame = true;
-					}
-
-					// Get the roms from the machine
-					if (node.HasChildNodes)
-					{
-						// If this node has children, traverse the children
-						foreach (XmlNode child in node.ChildNodes)
-						{
-							// If we find a rom or disk, add it
-							if (child.NodeType == XmlNodeType.Element && (child.Name == "rom" || child.Name == "disk"))
-							{
-								// Take care of hex-sized files
-								long size = -1;
-								if (child.Attributes["size"] != null && child.Attributes["size"].Value.Contains("0x"))
-								{
-									size = Convert.ToInt64(child.Attributes["size"].Value, 16);
-								}
-								else if (child.Attributes["size"] != null)
-								{
-									size = Int64.Parse(child.Attributes["size"].Value);
-								}
-
-								XmlElement tempNode = (XmlElement)tempDoc.ImportNode(child, true);
-
-								// Windows max name length is 260
-								string tempname = child.Attributes["name"].Value;
-								int usableLength = 259 - _path.Length;
-
-								if (tempname.Length > usableLength)
-								{
-									string ext = Path.GetExtension(tempname);
-									tempname = tempname.Substring(0, usableLength - ext.Length);
-									tempname += ext;
-								}
-								tempNode.SetAttribute("name", tempname);
-								outNode.AppendChild(tempNode);
-							}
-						}
-					}
+					string ext = Path.GetExtension(x.Name);
+					x.Name = x.Name.Substring(0, usableLength - ext.Length);
+					x.Name += ext;
 				}
-				else
-				{
-					XmlNode tempNode = tempDoc.ImportNode(node, true);
+			});
 
-					if (tempNode.Name == "header")
-					{
-						if (tempNode.SelectSingleNode("clrmamepro") == null)
-						{
-							XmlElement tempChild = tempDoc.CreateElement("clrmamepro");
-							tempChild.SetAttribute("forcepacking", "unzip");
-							tempNode.AppendChild(tempChild);
-						}
-						else
-						{
-							(tempNode.SelectSingleNode("clrmamepro") as XmlElement).SetAttribute("forcepacking", "unzip");
-						}
-					}
+			// Now write the file out accordingly
+			Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename),
+				Path.GetFileNameWithoutExtension(_filename), "", "", "", "", false, Path.GetExtension(_filename) == ".dat", "", roms, logger);
 
-					outNode.AppendChild(tempNode);
-				}
-				node = node.NextSibling;
-			}
-			if (inGame)
-			{
-				outNode = outNode.ParentNode;
-			}
-
-			tempDoc.AppendChild(tempDoc.CreateDocumentType("datafile", "-//Logiqx//DTD ROM Management Datafile//EN", "http://www.logiqx.com/Dats/datafile.dtd", null));
-			tempDoc.AppendChild(outNode);
-			string outPath = Path.GetFileNameWithoutExtension(_filename) + ".new" + Path.GetExtension(_filename);
-			File.WriteAllText(outPath, Style.Beautify(tempDoc));
+			logger.Close();
 		}
 	}
 }
