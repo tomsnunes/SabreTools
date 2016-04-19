@@ -60,41 +60,101 @@ namespace SabreTools
 			string systems = "", sources = "", input = "", manu = "", url = "", outdir = "";
 			foreach (string arg in args)
 			{
-				// Main functions
-				help = help || (arg == "-h" || arg == "-?" || arg == "--help");
-				import = import || (arg == "-i" || arg == "--import");
-				generate = generate || (arg == "-g" || arg == "--generate");
-				genall = genall || (arg == "-ga" || arg == "--generate-all");
-				convertRV = convertRV || (arg == "-cr" || arg == "--convert-rv");
-				convertXml = convertXml || (arg == "-cx" || arg == "--convert-xml");
-				listsys = listsys || (arg == "-lsy" || arg == "--list-systems");
-				listsrc = listsrc || (arg == "-lso" || arg == "--list-sources");
-				add = add || (arg == "-a" || arg == "--add");
-				rem = rem || (arg == "-r" || arg == "--remove");
+				switch (arg)
+				{
+					// Main functions
+					case "-h":
+					case "-?":
+					case "--help":
+						help = true;
+						break;
+					case "-i":
+					case "--import":
+						import = true;
+						break;
+					case "-g":
+					case "--generate":
+						generate = true;
+						break;
+					case "-ga":
+					case "--generate-all":
+						genall = true;
+						break;
+					case "-cr":
+					case "--convert-rv":
+						convertRV = true;
+						break;
+					case "-cx":
+					case "--convert-xml":
+						convertXml = true;
+						break;
+					case "-lsy":
+					case "--list-systems":
+						listsys = true;
+						break;
+					case "-lso":
+					case "--list-sources":
+						listsrc = true;
+						break;
+					case "-a":
+					case "--add":
+						add = true;
+						break;
+					case "-r":
+					case "--remove":
+						rem = true;
+						break;
 
-				// Switches
-				log = log || (arg == "-l" || arg == "--log");
-				old = old || (arg == "-old" || arg == "--romvault");
-				norename = norename || (arg == "-nr" || arg == "--no-rename");
-				skip = skip || (arg == "--skip");
-				
-				// User input strings
-				systems = (arg.StartsWith("system=") && systems == "" ? arg.Split('=')[1] : systems);
-				sources = (arg.StartsWith("source=") && sources == "" ? arg.Split('=')[1] : sources);
-				outdir = (arg.StartsWith("out=") && outdir == "" ? arg.Split('=')[1] : outdir);
-				manu = (arg.StartsWith("manu=") && manu == "" ? arg.Split('=')[1] : manu);
-				url = (arg.StartsWith("url=") && url == "" ? arg.Split('=')[1] : url);
+					// Switches
+					case "-l":
+					case "--log":
+						log = true;
+						break;
+					case "-old":
+					case "--romvault":
+						old = true;
+						break;
+					case "-nr":
+					case "--no-rename":
+						norename = true;
+						break;
+					case "--skip":
+						skip = true;
+						break;
+					default:
+						// User input strings
+						if (arg.StartsWith("system=") && systems == "")
+						{
+							systems = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("source=") && sources == "")
+						{
+							sources = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("out=") && outdir == "")
+						{
+							outdir = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("manu=") && manu == "")
+						{
+							manu = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("url=") && url == "")
+						{
+							url = arg.Split('=')[1];
+						}
 
-				// Take care of the two distinct input name possibilites; prioritize the input tag
-				input = (arg.StartsWith("input=") && input == "" ? arg.Split('=')[1] : input);
-				input = (!arg.StartsWith("-") && 
-					!arg.StartsWith("source=") &&
-					!arg.StartsWith("system=") &&
-					!arg.StartsWith("out=") &&
-					!arg.StartsWith("manu=") &&
-					!arg.StartsWith("url=") &&
-					!arg.StartsWith("input=") &&
-					input == "" ? arg : input);
+						// Take care of the two distinct input name possibilites; prioritize the input tag
+						else if (arg.StartsWith("input=") && input == "")
+						{
+							input = arg.Split('=')[1];
+						}
+						else if (input == "")
+						{
+							input = arg;
+						}
+						break;
+				}
 			}
 
 			// If skip is set, it's being called from the UI so we just exit
