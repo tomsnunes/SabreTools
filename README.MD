@@ -48,10 +48,6 @@ This tool doesn't do everything possible for splitting DATs, most of those funct
 </ul>
 This is useful for splitting DAT files similar to the NonGood set that can have more than one system per DAT.
 
-<b>SingleGame</b>
-<p/>
-Hightly experimental tool for merging all games in a single DAT (RomVault or Loqiqx XML only) for use with a server environment. Requested by Kludge.
-
 <b>DATFromDir</b>
 <p/>
 This a versitile Directory to DAT file creator developed to reduce the overhead of creating custom DAT files.
@@ -60,8 +56,28 @@ This a versitile Directory to DAT file creator developed to reduce the overhead 
 	<li>Set most of the DAT header values</li>
 	<li>Enable DAT to be created with forcepacking="unzip"</li>
 	<li>Treat archives like directories (default) or files</li>
-	<li>Output to XML DAT</li>
+	<li>Output to both supported DAT formats</li>
 </ul>
+
+<h3>Power User Tools</h3>
+
+This section is for tools that have been requested for a highly specific purpose and are not generally going to be used by regular users.
+
+<b>SingleGame</b>
+<p/>
+Hightly experimental tool for merging all games in a single DAT (RomVault or Loqiqx XML only) for use with a server environment. Requested by Kludge.
+
+<b>DatToMiss</b>
+<p/>
+CURRENTLY UNCODED - A program to convert a DAT to a miss file either for the games or the roms with the option to add a generic preface or postface to all of the outputted lines.
+
+<b>MergeDAT</b>
+<p/>
+CURRENTLY UNCODED - A program to merge an arbitrary number of DATs into a single file and optionally dedupe the resulting set of roms.
+
+<b>DiffDat</b>
+<p/>
+CURRENTLY UNCODED - A program to create a DAT based on the differences between two input DATs. Optionally, if the output file exists, the information is appended. (This latter functionality may be wrapped into MergeDAT.)
 
 <h3>Licensing</h3>
 <p/>
