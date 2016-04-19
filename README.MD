@@ -65,7 +65,7 @@ This section is for tools that have been requested for a highly specific purpose
 
 <b>SingleGame</b>
 <p/>
-Hightly experimental tool for merging all games in a single DAT (RomVault or Loqiqx XML only) for use with a server environment. Requested by Kludge.
+Experimental tool for trimming all files in DAT (or folder of DATs) so that they fall within the path size limits of NTFS. By default, it also merges all games into a single, minimally-named game for uncompressed sets.
 
 <b>DatToMiss</b>
 <p/>
