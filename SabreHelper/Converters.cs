@@ -30,6 +30,12 @@ namespace SabreTools.Helper
 			{
 				string line = filecontents[k];
 
+				// Comments in RV DATs start with a #
+				if (line.StartsWith("#"))
+				{
+					continue;
+				}
+
 				// If the line is the header or a game
 				if (Regex.IsMatch(line, _headerPattern))
 				{
