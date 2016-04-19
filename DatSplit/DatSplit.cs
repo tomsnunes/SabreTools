@@ -16,7 +16,7 @@ namespace DatSplit
 
 		public static void Main(string[] args)
 		{
-			Console.Title = "DatSplit " + Build.Version;
+			Console.Clear();
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
@@ -31,6 +31,9 @@ namespace DatSplit
 				Build.Help();
 				return;
 			}
+
+			// Output the title
+			Build.Start("DatSplit");
 
 			// Set needed strings
 			_filename = args[0];

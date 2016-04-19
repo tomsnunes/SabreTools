@@ -35,10 +35,7 @@ namespace SabreTools
 			logger.Start();
 			DBTools.EnsureDatabase(_dbName, _connectionString);
 			Remapping.CreateRemappings();
-
 			Console.Clear();
-			Console.SetBufferSize(Console.BufferWidth, 999);
-			Console.Title = "DATabase " + Build.Version;
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
@@ -200,20 +197,6 @@ namespace SabreTools
 		}
 
 		/// <summary>
-		/// Print the program header
-		/// </summary>
-		private static void PrintHeader()
-		{
-			ConsoleColor formertext = Console.ForegroundColor;
-			ConsoleColor formerback = Console.BackgroundColor;
-			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.BackgroundColor = ConsoleColor.Blue;
-			Console.WriteLine(_header);
-			Console.ForegroundColor = formertext;
-			Console.BackgroundColor = formerback;
-		}
-
-		/// <summary>
 		/// Show the text-based main menu
 		/// </summary>
 		private static void ShowMainMenu()
@@ -223,7 +206,7 @@ namespace SabreTools
 			while (selection.ToLowerInvariant() != "x")
 			{
 				Console.Clear();
-				PrintHeader();
+				Build.Start("DATabase");
 				Console.WriteLine(@"MAIN MENU
 ===========================
 Make a selection:
@@ -266,14 +249,14 @@ Make a selection:
 						break;
 					case "7":
 						Console.Clear();
-						PrintHeader();
+						Build.Start("DATabase");
 						ListSources();
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
 					case "8":
 						Console.Clear();
-						PrintHeader();
+						Build.Start("DATabase");
 						ListSystems();
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
@@ -305,7 +288,7 @@ Make a selection:
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
-				PrintHeader();
+				Build.Start("DATabase");
 				Console.WriteLine( @"IMPORT MENU
 ===========================
 Enter the name of a DAT file or folder containing DAT files
@@ -366,7 +349,7 @@ or 'b' to go back to the previous menu:");
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
-				PrintHeader();
+				Build.Start("DATabase");
 				Console.WriteLine(@"GENERATE MENU
 ===========================
 Make a selection:
@@ -441,7 +424,7 @@ Make a selection:
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
-				PrintHeader();
+				Build.Start("DATabase");
 				Console.WriteLine(@"GENERATE ALL MENU
 ===========================
 Make a selection:
@@ -603,7 +586,7 @@ Make a selection:
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
-				PrintHeader();
+				Build.Start("DATabase");
 				Console.WriteLine(@"XML -> RV CONVERT MENU
 ===========================
 Enter the name of a DAT file to convert from XML to RV
@@ -663,7 +646,7 @@ or 'b' to go back to the previous menu:
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
-				PrintHeader();
+				Build.Start("DATabase");
 				Console.WriteLine(@"RV -> XML CONVERT MENU
 ===========================
 Enter the name of a DAT file to convert from RV to XML
@@ -786,7 +769,7 @@ ORDER BY systems.manufacturer, systems.system";
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
-				PrintHeader();
+				Build.Start("DATabase");
 				Console.WriteLine(@"ADD AND REMOVE MENU
 ===========================
 Make a selection:

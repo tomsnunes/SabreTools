@@ -15,7 +15,7 @@ namespace SabreTools
 
 		public static void Main(string[] args)
 		{
-			Console.Title = "SingleGame " + Build.Version;
+			Console.Clear();
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
@@ -29,6 +29,9 @@ namespace SabreTools
 				Build.Help();
 				return;
 			}
+
+			// Output the title
+			Build.Start("SingleGame");
 
 			_filename = args[0];
 

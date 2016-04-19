@@ -55,7 +55,6 @@ namespace SabreTools
 		public static void Main(string[] args)
 		{
 			Console.Clear();
-			Console.Title = "DATFromDir " + Build.Version;
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
@@ -149,6 +148,9 @@ namespace SabreTools
 				_logger.Close();
 				return;
 			}
+
+			// Output the title
+			Build.Start("DATFromDir");
 
 			// If any of the inputs are not valid, show the help
 			foreach (string input in inputs)

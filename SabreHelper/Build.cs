@@ -24,6 +24,37 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Readies the console and outputs the header
+		/// </summary>
+		/// <param name="name">The name to be displayed as the program</param>
+		/// <remarks>Adapted from http://stackoverflow.com/questions/8200661/how-to-align-string-in-fixed-length-string</remarks>
+		public static void Start(string name)
+		{
+			// Dynamically create the header string
+			string border = "+-----------------------------------------------------------------------------+";
+			string mid = name + " " + Build.Version;
+			mid = "|" + mid.PadLeft(((77 - mid.Length) / 2) + mid.Length).PadRight(77) + "|";
+
+			// Set the console to ready state
+			Console.SetBufferSize(Console.BufferWidth, 999);
+			Console.Title = name + " " + Build.Version;
+			ConsoleColor formertext = Console.ForegroundColor;
+			ConsoleColor formerback = Console.BackgroundColor;
+			Console.ForegroundColor = ConsoleColor.Yellow;
+			Console.BackgroundColor = ConsoleColor.Blue;
+
+			// Output the header
+			Console.WriteLine(border);
+			Console.WriteLine(mid);
+			Console.WriteLine(border);
+			Console.WriteLine();
+
+			// Return the console to the original text and background colors
+			Console.ForegroundColor = formertext;
+			Console.BackgroundColor = formerback;
+		}
+
+		/// <summary>
 		/// Show the help dialog for a given class
 		/// </summary>
 		public static void Help()

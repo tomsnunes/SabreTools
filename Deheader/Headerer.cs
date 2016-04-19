@@ -26,12 +26,11 @@ namespace SabreTools
 		static void Main(string[] args)
 		{
 			// Perform initial setup and verification
+			Console.Clear();
 			logger = new Logger(false, "database.log");
 			logger.Start();
 			DBTools.EnsureDatabase(_dbName, _connectionString);
 			Remapping.CreateHeaderSkips();
-
-			Console.Title = "Headerer " + Build.Version;
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
@@ -46,6 +45,9 @@ namespace SabreTools
 				logger.Close();
 				return;
 			}
+
+			// Output the title
+			Build.Start("Headerer");
 
 			// Get the filename (or foldername)
 			string file = "";
