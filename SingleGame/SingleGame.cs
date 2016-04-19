@@ -40,6 +40,7 @@ namespace SabreTools
 
 			_filename = args[0];
 
+			bool tofile = false;
 			if (args.Length > 1)
 			{
 				for (int i = 1; i < args.Length; i++)
@@ -52,6 +53,10 @@ namespace SabreTools
 						case "-z":
 							_forceunpack = false;
 							break;
+						case "-l":
+						case "--log":
+							tofile = true;
+							break;
 						default:
 							if (args[i].StartsWith("-r"))
 							{
@@ -61,6 +66,9 @@ namespace SabreTools
 					}
 				}
 			}
+
+			// Set the possibly new value for logger
+			logger.ToFile = tofile;
 
 			_path = (_path == "" ? Environment.CurrentDirectory : _path);
 
