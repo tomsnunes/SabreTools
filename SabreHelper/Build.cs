@@ -156,6 +156,15 @@ Options:
   -l, --log		Enable log to file
   -sd, --superdat	Enable SuperDAT creation");
 					break;
+				case "DiffDat":
+					Console.WriteLine(@"DiffDat - Get the difference between two or more DAT files
+-----------------------------------------
+Usage: DiffDat [options] [filename] [filename] ...
+
+Options:
+  -h, -?, --help	Show this help dialog
+  -l, --log		Enable log to file");
+					break;
 				default:
 					Console.Write("This is the default help output");
 					break;

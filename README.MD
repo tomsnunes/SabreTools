@@ -77,7 +77,7 @@ CURRENTLY UNCODED - A program to merge an arbitrary number of DATs into a single
 
 <b>DiffDat</b>
 <p/>
-CURRENTLY UNCODED - A program to create a DAT based on the differences between two input DATs. Optionally, if the output file exists, the information is appended. (This latter functionality may be wrapped into MergeDAT.)
+A program to create a DAT based on the differences between two or more input DATs.
 
 <h3>Licensing</h3>
 <p/>

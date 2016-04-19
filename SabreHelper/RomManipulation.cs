@@ -333,7 +333,10 @@ namespace SabreTools.Helper
 		/// <remarks>Adapted from http://stackoverflow.com/questions/5620266/the-opposite-of-intersect</remarks>
 		public static List<RomData> Diff(List<RomData> A, List<RomData> B)
 		{
-			return A.Except(B).Union(B.Except(A)).ToList();
+			List<String> AString = Output.RomDataToString(A);
+			List<String> BString = Output.RomDataToString(B);
+			List<String> CString = AString.Except(BString).Union(BString.Except(AString)).ToList();
+			return Output.StringToRomData(CString);
 		}
 	}
 }

@@ -171,5 +171,70 @@ namespace SabreTools.Helper
 
 			return true;
 		}
+
+		/// <summary>
+		/// Convert a List of RomData objects to a List of tab-deliminated strings
+		/// </summary>
+		/// <param name="roms">List of RomData objects representing the roms to be parsed</param>
+		/// <returns>List of Strings representing the roms</returns>
+		public static List<String> RomDataToString(List<RomData> roms)
+		{
+			List<String> outlist = new List<String>();
+			foreach (RomData rom in roms)
+			{
+				outlist.Add(rom.Manufacturer + "\t" +
+					rom.System + "\t" +
+					rom.SystemID + "\t" +
+					rom.Source + "\t" +
+					rom.URL + "\t" +
+					rom.SourceID + "\t" +
+					rom.Game + "\t" +
+					rom.Name + "\t" +
+					rom.Type + "\t" +
+					rom.Size + "\t" +
+					rom.CRC + "\t" +
+					rom.MD5 + "\t" +
+					rom.SHA1);
+			}
+			return outlist;
+		}
+
+		/// <summary>
+		/// Convert a List of tab-deliminated strings objects to a List of RomData objects
+		/// </summary>
+		/// <param name="roms">List of Strings representing the roms to be parsed</param>
+		/// <returns>List of RomData objects representing the roms</returns>
+		public static List<RomData> StringToRomData(List<String> roms)
+		{
+			List<RomData> outlist = new List<RomData>();
+			foreach (String rom in roms)
+			{
+				string[] temp = rom.Split('\t');
+				try
+				{
+					outlist.Add(new RomData
+					{
+						Manufacturer = temp[0],
+						System = temp[1],
+						SystemID = Int32.Parse(temp[2]),
+						Source = temp[3],
+						URL = temp[4],
+						SourceID = Int32.Parse(temp[5]),
+						Game = temp[6],
+						Name = temp[7],
+						Type = temp[8],
+						Size = Int64.Parse(temp[9]),
+						CRC = temp[10],
+						MD5 = temp[11],
+						SHA1 = temp[12],
+					});
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine(ex.ToString());
+				}
+			}
+			return outlist;
+		}
 	}
 }
