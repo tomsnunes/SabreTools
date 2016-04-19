@@ -37,7 +37,7 @@ namespace SabreTools.Helper
 
 			// Set the console to ready state
 			Console.SetBufferSize(Console.BufferWidth, 999);
-			Console.Title = name + " " + Build.Version;
+			Console.Title = "SabreTools-" + name + " " + Build.Version;
 			ConsoleColor formertext = Console.ForegroundColor;
 			ConsoleColor formerback = Console.BackgroundColor;
 			Console.ForegroundColor = ConsoleColor.Yellow;
