@@ -255,8 +255,8 @@ JOIN checksums
 			// If we're in a merged mode, merge and then resort by the correct parameters
 			if (merged)
 			{
-				roms = Sort.Merge(roms, true);
-				Sort.RomSort(roms, _norename);
+				roms = Sorting.RomMerge(roms, true);
+				Sorting.RomSort(roms, _norename);
 			}
 
 			// Now check rename within games

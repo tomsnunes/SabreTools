@@ -3,9 +3,15 @@ using System.Collections.Generic;
 
 namespace SabreTools.Helper
 {
-	public class Sort
+	public class Sorting
 	{
-		public static List<RomData> Merge(List<RomData> inroms, bool presorted = false)
+		/// <summary>
+		/// Merge an arbitrary set of ROMs based on the supplied information
+		/// </summary>
+		/// <param name="inroms">List of RomData objects representing the roms to be merged</param>
+		/// <param name="presorted">True if the list should be considered pre-sorted (default false)</param>
+		/// <returns>A List of RomData objects representing the merged roms</returns>
+		public static List<RomData> RomMerge(List<RomData> inroms, bool presorted = false)
 		{
 			List<RomData> outroms = new List<RomData>();
 
