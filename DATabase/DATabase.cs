@@ -274,7 +274,7 @@ Make a selection:
     6) Convert a DAT file from XML to RV
     7) List all available sources
     8) List all available systems
-    9) Add and Remove from database
+    9) Add and remove systems and sources
     10) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
     11) Show credits
     X) Exit Program
@@ -368,6 +368,9 @@ or 'b' to go back to the previous menu:");
 		{
 			Console.Clear();
 
+			// Drag and drop means quotes; we don't want quotes
+			filename = filename.Replace("\"", "");
+
 			// Check to see if the second argument is a file that exists
 			if (filename != "" && File.Exists(filename))
 			{
@@ -389,7 +392,7 @@ or 'b' to go back to the previous menu:");
 			}
 			else
 			{
-				logger.Error("I'm sorry but " + filename + "doesn't exist!");
+				logger.Error("I'm sorry but " + filename + " doesn't exist!");
 			}
 			return;
 		}

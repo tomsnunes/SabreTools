@@ -83,11 +83,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Default\DATabase.sqlite">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="DATabase.sqlite">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Default\Headerer.sqlite">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Headerer.sqlite">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="LICENSE">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
