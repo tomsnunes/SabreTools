@@ -67,16 +67,28 @@ namespace SabreTools
 			// Drag and drop means quotes; we don't want quotes
 			_filename = _filename.Replace("\"", "");
 
+			// We also want the full path of the file, just in case
+			_filename = Path.GetFullPath(_filename);
+
 			// If it's a single file, handle it as such
 			if (!Directory.Exists(_filename) && File.Exists(_filename))
 			{
+				logger.Log("File found: " + _filename);
 				ProcessDAT(_filename, _path, _rename);
 			}
 			// If it's a directory, loop through the files and see if any are DATs
 			else if (Directory.Exists(_filename))
 			{
-				foreach (string file in Directory.EnumerateFiles(_filename))
+				// Make sure the path ends with the proper character
+				if (!_filename.EndsWith(Path.DirectorySeparatorChar.ToString()))
 				{
+					_filename += Path.DirectorySeparatorChar;
+				}
+
+				logger.Log("Directory found: " + _filename);
+				foreach (string file in Directory.EnumerateFiles(_filename, "*", SearchOption.AllDirectories))
+				{
+					logger.Log("File found: " + file);
 					ProcessDAT(file, _path, _rename);
 				}
 			}
@@ -92,7 +104,7 @@ namespace SabreTools
 		/// <param name="rename">True if roms are to be renamed</param>
 		private static void ProcessDAT(string filename, string path, bool rename)
 		{
-			List<RomData> roms = RomManipulation.Parse(_filename, 0, 0, logger);
+			List<RomData> roms = RomManipulation.Parse(filename, 0, 0, logger);
 
 			// Trim all file names according to the path that's set
 			List<RomData> outroms = new List<RomData>();
@@ -120,8 +132,8 @@ namespace SabreTools
 			}
 
 			// Now write the file out accordingly
-			Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename),
-				Path.GetFileNameWithoutExtension(_filename), "", "", "", "", _forceunpack, Path.GetExtension(filename) == ".dat", "", outroms, logger);
+			Output.WriteToDat(Path.GetFileNameWithoutExtension(filename),
+				Path.GetFileNameWithoutExtension(filename), "", "", "", "", _forceunpack, Path.GetExtension(filename) == ".dat", Path.GetDirectoryName(filename), outroms, logger);
 		}
 	}
 }
