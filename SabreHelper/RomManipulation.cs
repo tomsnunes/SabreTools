@@ -28,7 +28,15 @@ namespace SabreTools.Helper
 			}
 			catch (XmlException)
 			{
-				doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(filename)).ToString());
+				try
+				{
+					doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(filename)).ToString());
+				}
+				catch (Exception ex)
+				{
+					logger.Error(ex.ToString());
+					return roms;
+				}
 			}
 
 			// Experimental looping using only XML parsing
