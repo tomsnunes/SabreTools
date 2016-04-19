@@ -31,7 +31,7 @@ namespace SabreTools.Helper
 				string line = filecontents[k];
 
 				// Comments in RV DATs start with a #
-				if (line.StartsWith("#"))
+				if (line.Trim().StartsWith("#"))
 				{
 					continue;
 				}
@@ -67,8 +67,13 @@ namespace SabreTools.Helper
 					string attrib = "", val = "";
 					for (int i = 2; i < gc.Length; i++)
 					{
+						//If the item is empty, we automatically skip it because it's a fluke
+						if (gc[i].Trim() == String.Empty)
+						{
+							continue;
+						}
 						// Even number of quotes, not in a quote, not in attribute
-						if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib == "")
+						else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib == "")
 						{
 							attrib = gc[i].Replace("\"", "");
 						}
