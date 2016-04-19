@@ -38,6 +38,11 @@ namespace SabreTools.Helper
 					return roms;
 				}
 			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+				return roms;
+			}
 
 			// Experimental looping using only XML parsing
 			XmlNode node = doc.FirstChild;
