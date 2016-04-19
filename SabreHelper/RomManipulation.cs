@@ -253,6 +253,14 @@ namespace SabreTools.Helper
 
 						continue;
 					}
+					else
+					{
+						outroms.Add(rom);
+					}
+				}
+				else
+				{
+					outroms.Add(rom);
 				}
 			}
 
