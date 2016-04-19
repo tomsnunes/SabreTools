@@ -104,7 +104,7 @@ namespace SabreTools.Helper
 							(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
 							(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
 							(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
-							" />\n";
+							"/>\n";
 					}
 
 					lastgame = rom.Game;
