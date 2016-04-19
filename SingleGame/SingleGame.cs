@@ -113,17 +113,6 @@ namespace SabreTools
 		{
 			List<RomData> roms = RomManipulation.Parse(filename, 0, 0, logger);
 
-			// Remove the original file and inform the user
-			try
-			{
-				File.Delete(filename);
-				logger.Log("Original file \"" + filename + "\" deleted");
-			}
-			catch (Exception ex)
-			{
-				logger.Error(ex.ToString());
-			}
-
 			// Trim all file names according to the path that's set
 			List<RomData> outroms = new List<RomData>();
 			while (roms.Count != 0)
@@ -152,6 +141,20 @@ namespace SabreTools
 			// Now write the file out accordingly
 			Output.WriteToDat(Path.GetFileNameWithoutExtension(filename),
 				Path.GetFileNameWithoutExtension(filename), "", "", "", "", _forceunpack, !RomManipulation.IsXmlDat(filename), Path.GetDirectoryName(filename), outroms, logger);
+
+			// Remove the original file if different and inform the user
+			if (Path.GetExtension(filename) != (RomManipulation.IsXmlDat(filename) ? ".xml" : ".dat"))
+			{
+				try
+				{
+					File.Delete(filename);
+					logger.Log("Original file \"" + filename + "\" deleted");
+				}
+				catch (Exception ex)
+				{
+					logger.Error(ex.ToString());
+				}
+			}
 		}
 	}
 }
