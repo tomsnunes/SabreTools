@@ -25,6 +25,12 @@ namespace SabreTools.Helper
 		/// <returns>Tru if the DAT was written correctly, false otherwise</returns>
 		public static bool WriteToDat(string name, string description, string version, string date, string category, string author, bool forceunzip, bool old, string outDir, List<RomData> roms, Logger logger)
 		{
+			// If it's empty, use the current folder
+			if (outDir.Trim() == "")
+			{
+				outDir = Environment.CurrentDirectory;
+			}
+
 			// Double check the outdir for the end delim
 			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
 			{

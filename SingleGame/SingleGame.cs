@@ -12,6 +12,8 @@ namespace SabreTools
 		private static string _filename = "";
 		private static string _path = "";
 		private static bool _rename = true;
+		private static bool _forceunpack = true;
+		private static Logger logger;
 
 		public static void Main(string[] args)
 		{
@@ -30,7 +32,7 @@ namespace SabreTools
 				return;
 			}
 
-			Logger logger = new Logger(false, "singlegame.log");
+			logger = new Logger(false, "singlegame.log");
 			logger.Start();
 
 			// Output the title
@@ -47,6 +49,9 @@ namespace SabreTools
 						case "-n":
 							_rename = false;
 							break;
+						case "-z":
+							_forceunpack = false;
+							break;
 						default:
 							if (args[i].StartsWith("-r"))
 							{
@@ -59,37 +64,64 @@ namespace SabreTools
 
 			_path = (_path == "" ? Environment.CurrentDirectory : _path);
 
-			// Import the existing DAT
-			List<RomData> roms = RomManipulation.Parse(_filename, 0, 0, logger);
+			// Drag and drop means quotes; we don't want quotes
+			_filename = _filename.Replace("\"", "");
 
-			// If we are in single game mode, rename all games
-			if (_rename)
+			// If it's a single file, handle it as such
+			if (!Directory.Exists(_filename) && File.Exists(_filename))
 			{
-				roms.ForEach(delegate (RomData x)
+				ProcessDAT(_filename, _path, _rename);
+			}
+			// If it's a directory, loop through the files and see if any are DATs
+			else if (Directory.Exists(_filename))
+			{
+				foreach (string file in Directory.EnumerateFiles(_filename))
 				{
-					x.Game = "!";
-				});
+					ProcessDAT(file, _path, _rename);
+				}
 			}
 
+			logger.Close();
+		}
+
+		/// <summary>
+		/// Import the existing DAT(s)
+		/// </summary>
+		/// <param name="filename">Name of the file to be processed</param>
+		/// <param name="path">The base path to be used for comparison</param>
+		/// <param name="rename">True if roms are to be renamed</param>
+		private static void ProcessDAT(string filename, string path, bool rename)
+		{
+			List<RomData> roms = RomManipulation.Parse(_filename, 0, 0, logger);
+
 			// Trim all file names according to the path that's set
-			roms.ForEach(delegate (RomData x)
+			List<RomData> outroms = new List<RomData>();
+			while (roms.Count != 0)
 			{
+				RomData rom = roms[0];
+				roms.RemoveAt(0);
+
+				// If we are in single game mode, rename all games
+				if (rename)
+				{
+					rom.Game = "!";
+				}
+
 				// Windows max name length is 260
 				int usableLength = 259 - _path.Length;
-
-				if (x.Name.Length > usableLength)
+				if (rom.Name.Length > usableLength)
 				{
-					string ext = Path.GetExtension(x.Name);
-					x.Name = x.Name.Substring(0, usableLength - ext.Length);
-					x.Name += ext;
+					string ext = Path.GetExtension(rom.Name);
+					rom.Name = rom.Name.Substring(0, usableLength - ext.Length);
+					rom.Name += ext;
 				}
-			});
+
+				outroms.Add(rom);
+			}
 
 			// Now write the file out accordingly
 			Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename),
-				Path.GetFileNameWithoutExtension(_filename), "", "", "", "", false, Path.GetExtension(_filename) == ".dat", "", roms, logger);
-
-			logger.Close();
+				Path.GetFileNameWithoutExtension(_filename), "", "", "", "", _forceunpack, Path.GetExtension(filename) == ".dat", "", outroms, logger);
 		}
 	}
 }

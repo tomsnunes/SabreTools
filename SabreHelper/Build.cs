@@ -126,11 +126,12 @@ Options:
 				case "SingleGame":
 					Console.WriteLine(@"SingleGame - Process DATs for use in server environments
 -----------------------------------------
-Usage: SingleGame.exe <filename> [-r=rootdir|-n]
+Usage: SingleGame.exe <file|folder> [-r=rootdir|-n]
 
 Options:
     -r=rootdir		Set the directory name for path size
     -n			Disable single-game mode
+    -z			Disable forceunzipping
 ");
 					break;
 				case "DATFromDir":
