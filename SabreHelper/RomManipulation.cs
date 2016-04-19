@@ -248,8 +248,8 @@ namespace SabreTools.Helper
 						last.MD5 = (last.MD5 == "" && rom.MD5 != "" ? rom.MD5 : last.MD5);
 						last.SHA1 = (last.SHA1 == "" && rom.SHA1 != "" ? rom.SHA1 : last.SHA1);
 
-						outroms.RemoveAt(inroms.Count - 1);
-						outroms.Insert(inroms.Count, last);
+						outroms.RemoveAt(outroms.Count - 1);
+						outroms.Insert(outroms.Count, last);
 
 						continue;
 					}
