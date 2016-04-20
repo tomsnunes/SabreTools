@@ -316,6 +316,13 @@ namespace SabreTools
 			}
 
 			// Split a DAT by extension
+			else if (extsplit)
+			{
+				foreach (string input in inputs)
+				{
+					InitExtSplit(input, exta, extb, outdir);
+				}
+			}
 
 			logger.Close();
 			return;
@@ -950,10 +957,10 @@ Make a selection:
 		/// <summary>
 		/// Wrap splitting a DAT by 2 extensions
 		/// </summary>
-		/// <param name="input">Input file or folder to be converted</param>
-		/// <param name="exta">Root directory to base path lengths on</param>
-		/// <param name="rename">True is games should not be renamed</param>
-		/// <param name="force">True if forcepacking="unzip" should be included</param>
+		/// <param name="input">Input file or folder to be split</param>
+		/// <param name="exta">First extension to split on</param>
+		/// <param name="extb">Second extension to split on</param>
+		/// <param name="outdir">Output directory for the split files</param>
 		private static void InitExtSplit(string input, string exta, string extb, string outdir)
 		{
 			// Strip any quotations from the names
@@ -966,7 +973,7 @@ Make a selection:
 			{
 				if (exta == "" || extb == "")
 				{
-					logger.Warning("Two extension are needed to split a DAT!");
+					logger.Warning("Two extensions are needed to split a DAT!");
 					return;
 				}
 				ExtSplit es = new ExtSplit(input, exta, extb, outdir, logger);

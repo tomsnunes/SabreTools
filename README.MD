@@ -22,6 +22,7 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 	<li>Importing and Generating DAT files in RomVault and XML formats</li>
 	<li>Converting DATs from RomVault to XML format</li>
 	<li>Trim DAT entries and optionally merge into a single game (formerly <i>SingleGame</i>; requested by Kludge)</li>
+	<li>Split a DAT using two different file extensions within the DAT (formerly <i>DatSplit</i>)</li>
 	<li>Add and remove sources and systems from the database</li>
 	<li>Retrieve a list of all sources and systems that are available</li>
 </ul>

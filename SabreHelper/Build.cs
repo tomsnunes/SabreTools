@@ -85,11 +85,12 @@ Options:
   -es, --ext-split		Split a DAT by two file extensions
 	exta=			First extension to split by
 	extb=			Second extension to split by
+	out=			Output directory
   -g, --generate	Start tool in generate mode
   -ga, --generate-all	Start tool in generate all mode
 	system=			Comma-separated list of system IDs
 	source=			Comma-separated list of source IDs
-	out=			Output directoryComma-separated list
+	out=			Output directory
 	-nr, --no-rename	Don't auto-rename games
 	-old, --romvault	Produce a DAT in RV format
   -i, --import		Start tool in import mode
