@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml;
 
 using SabreTools.Helper;
 
 namespace SabreTools
 {
-	public class SingleGame
+	public class TrimMerge
 	{
 		// Instance variables
 		private static string _filename = "";
@@ -24,7 +23,7 @@ namespace SabreTools
 		/// <param name="rename">True if games should be renamed into a uniform string, false otherwise</param>
 		/// <param name="forceunpack">True if forcepacking="unzip" should be set on the output, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public SingleGame(string filename, string path, bool rename, bool forceunpack, Logger logger)
+		public TrimMerge(string filename, string path, bool rename, bool forceunpack, Logger logger)
 		{
 			_filename = filename;
 			_path = path;

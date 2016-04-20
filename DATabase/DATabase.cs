@@ -63,7 +63,7 @@ namespace SabreTools
 				norename = false,
 				old = false,
 				rem = false,
-				single = false,
+				trim = false,
 				skip = false;
 			string manu = "",
 				outdir = "",
@@ -135,12 +135,12 @@ namespace SabreTools
 					case "--remove":
 						rem = true;
 						break;
-					case "-sg":
-					case "--single-game":
-						single = true;
-						break;
 					case "--skip":
 						skip = true;
+						break;
+					case "-tm":
+					case "--trim-merge":
+						trim = true;
 						break;
 					default:
 						if (arg.StartsWith("input="))
@@ -186,7 +186,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(add ^ convertRV ^ convertXml ^ generate ^ genall ^ import ^ listsrc ^ listsys ^ rem ^ single))
+			if (help || !(add ^ convertRV ^ convertXml ^ generate ^ genall ^ import ^ listsrc ^ listsys ^ rem ^ trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -194,7 +194,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (convertRV || convertXml || import || single))
+			if (inputs.Count == 0 && (convertRV || convertXml || import || trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -292,11 +292,11 @@ namespace SabreTools
 			}
 
 			// Consolodate and trim DAT
-			else if (single)
+			else if (trim)
 			{
 				foreach (string input in inputs)
 				{
-					InitSingleGame(input, root, !norename, !disableForce);
+					InitTrimMerge(input, root, !norename, !disableForce);
 				}
 			}
 
@@ -677,7 +677,7 @@ Make a selection:
 						ConvertXMLMenu();
 						break;
 					case "3":
-						SingleGameMenu();
+						TrimMergeMenu();
 						break;
 				}
 			}
@@ -797,9 +797,9 @@ or 'b' to go back to the previous menu:
 		}
 
 		/// <summary>
-		/// Show the text-based SingleGame menu
+		/// Show the text-based TrimMerge menu
 		/// </summary>
-		private static void SingleGameMenu()
+		private static void TrimMergeMenu()
 		{
 			string selection = "", input = "", root = "";
 			bool forceunzip = true, rename = true;
@@ -807,7 +807,7 @@ or 'b' to go back to the previous menu:
 			{
 				Console.Clear();
 				Build.Start("DATabase");
-				Console.WriteLine(@"SINGLE GAME MENU
+				Console.WriteLine(@"DAT TRIM MENU
 ===========================
 Make a selection:
 
@@ -815,7 +815,7 @@ Make a selection:
     2) Root folder for reference" + (root != "" ? ":\n\t" + root : "") + @"
     3) " + (forceunzip ? "Remove 'forcepacking=\"unzip\"' from output" : "Add 'forcepacking=\"unzip\"' to output") + @"
     4) " + (rename ? "Disable game renaming" : "Enable game renaming") + @"
-    5) Process the DAT
+    5) Process the file or folder
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -840,7 +840,7 @@ Make a selection:
 						break;
 					case "5":
 						Console.Clear();
-						InitSingleGame(input, root, rename, forceunzip);
+						InitTrimMerge(input, root, rename, forceunzip);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
@@ -855,14 +855,14 @@ Make a selection:
 		/// <param name="root">Root directory to base path lengths on</param>
 		/// <param name="rename">True is games should not be renamed</param>
 		/// <param name="force">True if forcepacking="unzip" should be included</param>
-		private static void InitSingleGame(string input, string root, bool rename, bool force)
+		private static void InitTrimMerge(string input, string root, bool rename, bool force)
 		{
 			// Strip any quotations from the name
 			input = input.Replace("\"", "");
 
 			if (input != "" && File.Exists(input) || Directory.Exists(input))
 			{
-				SingleGame sg = new SingleGame(input, root, rename, force, logger);
+				TrimMerge sg = new TrimMerge(input, root, rename, force, logger);
 				sg.Process();
 				return;
 			}

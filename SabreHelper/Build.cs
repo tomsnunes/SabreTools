@@ -97,12 +97,12 @@ Options:
   -r, --remove	Remove a system or source from the database
 	system=		System ID
 	source=		Source ID
-  -sg, --single-game	Consolidate DAT into a single game and trim entries
+  -tm, --trim-merge	Consolidate DAT into a single game and trim entries
 	-rd=, --root-dir=	Set the directory name for path size
 	-nr, --no-rename	Disable single-game mode
 	-df, --disable-force	Disable forceunzipping
 
-Filenames and directories can't start with '-', 'system=', or 'source='
+Filenames and directories can't start with a reserved string
 unless prefixed by 'input='
 ");
 					Console.Write("\nPress any key to continue...");
