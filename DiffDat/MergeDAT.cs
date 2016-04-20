@@ -34,7 +34,7 @@ namespace SabreTools
 			Build.Start("DiffDat");
 
 			List<String> inputs = new List<String>();
-			bool tofile = false, help = false, merge = false; ;
+			bool tofile = false, help = false, merge = false, diff = false;
 			foreach (string arg in args)
 			{
 				switch (arg)
@@ -47,6 +47,10 @@ namespace SabreTools
 					case "-l":
 					case "--log":
 						tofile = true;
+						break;
+					case "-d":
+					case "--diff":
+						diff = true;
 						break;
 					case "-m":
 					case "--merge":
@@ -80,13 +84,20 @@ namespace SabreTools
 				return;
 			}
 
-			// Otherwise, read in the files, diff them, and write the result to the file type that the first one is
+			// Otherwise, read in the files, process them and write the result to the file type that the first one is
 			List<RomData> A = new List<RomData>();
 			foreach (string input in inputs)
 			{
 				logger.Log("Adding DAT: " + input);
 				List<RomData> B = RomManipulation.Parse(input, 0, 0, logger);
-				A = RomManipulation.Diff(A, B);
+				if (diff)
+				{
+					A = RomManipulation.Diff(A, B);
+				}
+				else
+				{
+					A.AddRange(B);
+				}
 			}
 
 			// If we want a merged list, send it for merging before outputting
