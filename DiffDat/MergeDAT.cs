@@ -6,7 +6,7 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
-	public class DiffDat
+	public class MergeDAT
 	{
 		private static Logger logger;
 

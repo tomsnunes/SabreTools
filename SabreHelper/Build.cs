@@ -156,14 +156,15 @@ Options:
   -l, --log		Enable log to file
   -sd, --superdat	Enable SuperDAT creation");
 					break;
-				case "DiffDat":
-					Console.WriteLine(@"DiffDat - Get the difference between two or more DAT files
+				case "MergeDAT":
+					Console.WriteLine(@"MergeDAT - Merge or diff two or more files
 -----------------------------------------
 Usage: DiffDat [options] [filename] [filename] ...
 
 Options:
   -h, -?, --help	Show this help dialog
   -l, --log		Enable log to file
+  -d, --diff		Enable diff creation
   -m, --merge	Enable merging in the created DAT");
 					break;
 				case "DatToMiss":

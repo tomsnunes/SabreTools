@@ -67,23 +67,20 @@ This section is for tools that have been requested for a highly specific purpose
 <p/>
 Experimental tool for trimming all files in DAT (or folder of DATs) so that they fall within the path size limits of NTFS. By default, it also merges all games into a single, minimally-named game for uncompressed sets.
 
-<b>DiffDat</b>
+<b>MergeDAT</b>
 <p/>
-A program to create a DAT based on the differences between two or more input DATs.
+A program to merge (or diff) an arbitrary number of DATs
 <ul>
 	<li>Read in from commandline, drag-and-drop, a directory, or any combination</li>
 	<li>Roms are compared with all information available, so duplicates can exist in the output</li>
 	<li>Output type automatically determined by the first input file</li>
-	<li>Merge the output DAT so no partial duplicates are included</li>
+	<li>Optionally create a DiffDat of the inputted files instead of a straight merge</li>
+	<li>Optionally merge the output DAT so no partial duplicates are included</li>
 </ul>
 
 <b>DatToMiss</b>
 <p/>
 A program to convert a DAT to a miss file either for the games or the roms with the option to add a generic preface and postface to all of the outputted lines.
-
-<b>MergeDAT</b>
-<p/>
-CURRENTLY UNCODED - A program to merge an arbitrary number of DATs into a single file and optionally dedupe the resulting set of roms.
 
 <h3>Licensing</h3>
 <p/>
