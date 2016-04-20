@@ -647,7 +647,7 @@ Make a selection:
 		/// </summary>
 		/// <remarks>
 		/// At an unspecified future date, this will also include the following currently-separate programs:
-		/// - DatSplit
+		/// - DatSplit*
 		/// - MergeDAT
 		/// - DATFromDir
 		/// - DatToMiss
@@ -665,7 +665,7 @@ Make a selection:
 
     1) Convert XML DAT to RV
     2) Convert RV DAT to XML
-    3) Trim all entries in DAT and optionally merge into a single game
+    3) Trim all entries in DAT and merge into a single game
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
