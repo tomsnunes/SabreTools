@@ -72,6 +72,7 @@ Experimental tool for trimming all files in DAT (or folder of DATs) so that they
 A program to create a DAT based on the differences between two or more input DATs.
 <ul>
 	<li>Read in from commandline, drag-and-drop, a directory, or any combination</li>
+	<li>Roms are compared with all information available, so duplicates can exist in the output</li>
 	<li>Output type automatically determined by the first input file</li>
 	<li>Merge the output DAT so no partial duplicates are included</li>
 </ul>
