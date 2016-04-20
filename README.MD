@@ -21,6 +21,7 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 <ul>
 	<li>Importing and Generating DAT files in RomVault and XML formats</li>
 	<li>Converting DATs from RomVault to XML format</li>
+	<li>Trim DAT entries and optionally merge into a single game (formerly <i>SingleGame</i>; requested by Kludge)</li>
 	<li>Add and remove sources and systems from the database</li>
 	<li>Retrieve a list of all sources and systems that are available</li>
 </ul>
@@ -62,10 +63,6 @@ This a versitile Directory to DAT file creator developed to reduce the overhead 
 <h3>Power User Tools</h3>
 
 This section is for tools that have been requested for a highly specific purpose and are not generally going to be used by regular users. All of them have a possibility of being included in the main DATabase program eventually.
-
-<b>SingleGame</b>
-<p/>
-Experimental tool for trimming all files in DAT (or folder of DATs) so that they fall within the path size limits of NTFS. By default, it also merges all games into a single, minimally-named game for uncompressed sets.
 
 <b>MergeDAT</b>
 <p/>

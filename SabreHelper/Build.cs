@@ -122,18 +122,6 @@ Options:
   -e			Detect and remove mode
   -r			Restore header to file based on SHA-1");
 					break;
-				case "SingleGame":
-					Console.WriteLine(@"SingleGame - Process DATs for use in server environments
------------------------------------------
-Usage: SingleGame.exe [option] [filename|dirname]
-
-Options:
-    -rd=, --root-dir=		Set the directory name for path size
-    -l, --log			Enable logging to file
-    -nr, --no-rename		Disable single-game mode
-    -df, --disable-force	Disable forceunzipping
-");
-					break;
 				case "DATFromDir":
 					Console.WriteLine(@"DATFromDir - Create a DAT file from a directory
 -----------------------------------------
