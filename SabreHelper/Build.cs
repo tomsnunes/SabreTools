@@ -66,7 +66,6 @@ namespace SabreTools.Helper
 			switch (className)
 			{
 				case "DATabase":
-					Console.Clear();
 					Console.Write(@"
 DATabase - Import and Generate DAT files
 -----------------------------------------

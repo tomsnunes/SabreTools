@@ -336,6 +336,7 @@ Make a selection:
 				switch (selection)
 				{
 					case "1":
+						Console.Clear();
 						Build.Help();
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
