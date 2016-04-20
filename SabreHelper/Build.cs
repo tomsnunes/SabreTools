@@ -89,6 +89,7 @@ Options:
 	url=			URL (source only)
   -cm, --convert-miss
 	-r, --roms		Output roms to miss instead of sets
+	-dp, --dat-prefix	Add dat name as a prefix to each item
 	-pre=, --prefix=	Set prefix to be printed in front of all lines
 	-post=, --postfix=	Set postfix to be printed behind all lines
 	-q, --quotes		Put double-quotes around each item

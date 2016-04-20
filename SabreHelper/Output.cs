@@ -139,9 +139,10 @@ namespace SabreTools.Helper
 		/// <param name="quotes">True if quotes should be put around the item, false otherwise (default)</param>
 		/// <param name="addext">Arbitrary extension added to the end of each item</param>
 		/// <param name="repext">Arbitrary extension to replace all extensions in the item</param>
+		/// <param name="datname">The internal name of the DAT to prefix</param>
 		/// <returns>True if the file was written, false otherwise</returns>
 		public static bool WriteToText(string textfile, string outdir, List<RomData> roms, Logger logger, bool useGame = true, string prefix = "",
-			string postfix = "", string addext = "", string repext = "", bool quotes = false)
+			string postfix = "", string addext = "", string repext = "", bool quotes = false, string datname = "")
 		{
 			// Normalize the output directory
 			if (outdir == "")
@@ -151,6 +152,12 @@ namespace SabreTools.Helper
 			if (!outdir.EndsWith(Path.DirectorySeparatorChar.ToString()))
 			{
 				outdir += Path.DirectorySeparatorChar;
+			}
+
+			// Get the DAT name, if applicable
+			if (datname != "" && !datname.EndsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				datname = datname + Path.DirectorySeparatorChar;
 			}
 
 			// Make the output directory if it doesn't exist
@@ -175,7 +182,7 @@ namespace SabreTools.Helper
 				{
 					string pre = prefix + (quotes ? "\"" : "");
 					string post = (quotes ? "\"" : "") + postfix;
-					string name = (useGame ? rom.Game : rom.Name);
+					string name = datname + (useGame ? rom.Game : rom.Name);
 					if (repext != "")
 					{
 						string dir = Path.GetDirectoryName(name);

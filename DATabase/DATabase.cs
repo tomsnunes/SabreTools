@@ -54,6 +54,7 @@ namespace SabreTools
 				convertMiss = false,
 				convertRV = false,
 				convertXml = false,
+				datname = false,
 				disableForce = false,
 				extsplit = false,
 				generate = false,
@@ -112,6 +113,10 @@ namespace SabreTools
 					case "-df":
 					case "--disable-force":
 						disableForce = true;
+						break;
+					case "-dp":
+					case "--dat-prefix":
+						datname = true;
 						break;
 					case "-es":
 					case "--ext-split":
@@ -294,7 +299,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext);
+					InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, datname);
 				}
 			}
 
@@ -880,7 +885,7 @@ or 'b' to go back to the previous menu:
 		private static void ConvertMissMenu()
 		{
 			string selection = "", input = "", prefix = "", postfix = "", addext = "", repext = "";
-			bool usegame = true, quotes = false;
+			bool usegame = true, quotes = false, datname = false;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
@@ -896,7 +901,8 @@ Make a selection:
     5) " + (quotes ? "Don't add quotes around each item" : "Add quotes around each item") + @"
     6) Replace all extensions with another" + (repext != "" ? ":\t" + repext : "") + @"
     7) Add extensions to each item" + (addext != "" ? ":\n\t" + addext : "") + @"
-    8) Begin conversion
+    8) " + (datname ? "Don't add dat name before every item" : "Add dat name before every item") + @"
+    9) Begin conversion
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -935,8 +941,11 @@ Make a selection:
 						postfix = Console.ReadLine();
 						break;
 					case "8":
+						datname = !datname;
+						break;
+					case "9":
 						Console.Clear();
-						InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext);
+						InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, datname);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
@@ -954,7 +963,8 @@ Make a selection:
 		/// <param name="quotes">Add quotes to each item</param>
 		/// <param name="repext">Replace all extensions with another</param>
 		/// <param name="addext">Add an extension to all items</param>
-		private static void InitConvertMiss(string input, bool usegame, string prefix, string postfix, bool quotes, string repext, string addext)
+		/// <param name="datname">Add the dat name as a directory prefix</param>
+		private static void InitConvertMiss(string input, bool usegame, string prefix, string postfix, bool quotes, string repext, string addext, bool datname)
 		{
 			// Strip any quotations from the name
 			input = input.Replace("\"", "");
@@ -967,9 +977,16 @@ Make a selection:
 				// Get the output name
 				string name = Path.GetFileNameWithoutExtension(input) + "-miss.txt";
 
+				// Get the DAT name string
+				string datstring = "";
+				if (datname)
+				{
+					datstring = RomManipulation.GetDatName(input, logger);
+				}
+
 				// Read in the roms from the DAT and then write them to the file
 				logger.Log("Converting " + input);
-				Output.WriteToText(name, Path.GetDirectoryName(input), RomManipulation.Parse(input, 0, 0, logger), logger, usegame, prefix, postfix, addext, repext, quotes);
+				Output.WriteToText(name, Path.GetDirectoryName(input), RomManipulation.Parse(input, 0, 0, logger), logger, usegame, prefix, postfix, addext, repext, quotes, datstring);
 				logger.Log(input + " converted to: " + name);
 				return;
 			}

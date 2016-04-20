@@ -29,6 +29,65 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Get the name of the DAT for external use
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		/// <returns>The internal name of the DAT on success, empty string otherwise</returns>
+		public static string GetDatName(string filename, Logger logger)
+		{
+			string name = "";
+
+			XmlDocument doc = new XmlDocument();
+			try
+			{
+				doc.LoadXml(File.ReadAllText(filename));
+			}
+			catch (XmlException)
+			{
+				try
+				{
+					doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(filename)).ToString());
+				}
+				catch (Exception ex)
+				{
+					logger.Error(ex.ToString());
+					return name;
+				}
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+				return name;
+			}
+
+			// Experimental looping using only XML parsing
+			XmlNode node = doc.FirstChild;
+			if (node != null && node.Name == "xml")
+			{
+				// Skip over everything that's not an element
+				while (node.NodeType != XmlNodeType.Element)
+				{
+					node = node.NextSibling;
+				}
+			}
+
+			// Once we find the main body, enter it
+			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
+			{
+				node = node.FirstChild;
+			}
+
+			// Get the name from the header
+			if (node != null && node.Name == "header")
+			{
+				name = node.SelectSingleNode("name").InnerText;
+			}
+
+			return name;
+		}
+
+		/// <summary>
 		/// Parse a DAT and return all found games and roms within
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
