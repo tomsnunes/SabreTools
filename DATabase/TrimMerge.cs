@@ -16,7 +16,7 @@ namespace SabreTools
 		private static Logger _logger;
 
 		/// <summary>
-		/// Create a new SingleGame object
+		/// Create a new TrimMerge object
 		/// </summary>
 		/// <param name="filename">Name of the file or folder to be processed</param>
 		/// <param name="path">Root path to use for trimming</param>
