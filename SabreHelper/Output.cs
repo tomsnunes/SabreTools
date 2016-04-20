@@ -160,8 +160,8 @@ namespace SabreTools.Helper
 			}
 
 			// Normalize the extensions
-			addext = (addext.StartsWith(".") ? addext : "." + addext);
-			repext = (repext.StartsWith(".") ? repext : "." + repext);
+			addext = (addext == "" || addext.StartsWith(".") ? addext : "." + addext);
+			repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
 
 			logger.Log("Opening file for writing: " + outdir + textfile);
 
