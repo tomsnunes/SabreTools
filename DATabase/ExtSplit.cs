@@ -6,7 +6,7 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
-	public class DatSplit
+	public class ExtSplit
 	{
 		// Instance variables
 		private string _extA;
@@ -22,7 +22,7 @@ namespace SabreTools
 		/// <param name="extA">First extension to split on</param>
 		/// <param name="extB">Second extension to split on</param>
 		/// <param name="logger">Logger object for console and file writing</param>
-		public DatSplit(string filename, string extA, string extB, string outdir, Logger logger)
+		public ExtSplit(string filename, string extA, string extB, string outdir, Logger logger)
 		{
 			_filename = filename.Replace("\"", "");
 			_extA = (extA.StartsWith(".") ? extA : "." + extA).ToUpperInvariant();
@@ -82,9 +82,9 @@ namespace SabreTools
 
 			// Then write out both files
 			bool success = Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename) + "." + _extA, Path.GetFileNameWithoutExtension(_filename) + "." + _extA,
-				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), "", romsA, _logger);
+				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), _outdir, romsA, _logger);
 			success &= Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename) + "." + _extB, Path.GetFileNameWithoutExtension(_filename) + "." + _extB,
-				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), "", romsB, _logger);
+				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), _outdir, romsB, _logger);
 
 			return success;
 		}

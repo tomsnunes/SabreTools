@@ -315,6 +315,8 @@ namespace SabreTools
 				}
 			}
 
+			// Split a DAT by extension
+
 			logger.Close();
 			return;
 		}
@@ -740,7 +742,7 @@ or 'b' to go back to the previous menu:
 		{
 			if (File.Exists(filename))
 			{
-				Console.WriteLine("Converting " + filename);
+				logger.Log("Converting " + filename);
 				XmlDocument doc = new XmlDocument();
 				try
 				{
@@ -751,7 +753,7 @@ or 'b' to go back to the previous menu:
 					sw.Write(conv);
 					sw.Close();
 					fs.Close();
-					Console.WriteLine("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.dat");
+					logger.Log("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.dat");
 				}
 				catch (XmlException)
 				{
@@ -760,7 +762,7 @@ or 'b' to go back to the previous menu:
 			}
 			else
 			{
-				Console.WriteLine("I'm sorry but " + filename + " doesn't exist!");
+				logger.Error("I'm sorry but " + filename + " doesn't exist!");
 			}
 			return;
 		}
@@ -800,7 +802,7 @@ or 'b' to go back to the previous menu:
 		{
 			if (File.Exists(filename))
 			{
-				Console.WriteLine("Converting " + filename);
+				logger.Log("Converting " + filename);
 				XElement conv = Converters.RomVaultToXML(File.ReadAllLines(filename));
 				FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(filename) + ".new.xml");
 				StreamWriter sw = new StreamWriter(fs);
@@ -809,11 +811,11 @@ or 'b' to go back to the previous menu:
 				sw.Write(conv);
 				sw.Close();
 				fs.Close();
-				Console.WriteLine("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.xml");
+				logger.Log("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.xml");
 			}
 			else
 			{
-				Console.WriteLine("I'm sorry but " + filename + "doesn't exist!");
+				logger.Error("I'm sorry but " + filename + "doesn't exist!");
 			}
 			return;
 		}
@@ -937,7 +939,7 @@ Make a selection:
 						break;
 					case "5":
 						Console.Clear();
-						InitTrimMerge(input, root, rename, forceunzip);
+						InitExtSplit(input, exta, extb, outdir);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
@@ -946,22 +948,34 @@ Make a selection:
 		}
 
 		/// <summary>
-		/// Wrap trimming and merging a single DAT
+		/// Wrap splitting a DAT by 2 extensions
 		/// </summary>
 		/// <param name="input">Input file or folder to be converted</param>
-		/// <param name="root">Root directory to base path lengths on</param>
+		/// <param name="exta">Root directory to base path lengths on</param>
 		/// <param name="rename">True is games should not be renamed</param>
 		/// <param name="force">True if forcepacking="unzip" should be included</param>
-		private static void InitTrimMerge(string input, string root, bool rename, bool force)
+		private static void InitExtSplit(string input, string exta, string extb, string outdir)
 		{
-			// Strip any quotations from the name
+			// Strip any quotations from the names
 			input = input.Replace("\"", "");
+			exta = exta.Replace("\"", "");
+			extb = extb.Replace("\"", "");
+			outdir = outdir.Replace("\"", "");
 
-			if (input != "" && (File.Exists(input) || Directory.Exists(input)))
+			if (input != "" && File.Exists(input))
 			{
-				TrimMerge sg = new TrimMerge(input, root, rename, force, logger);
-				sg.Process();
+				if (exta == "" || extb == "")
+				{
+					logger.Warning("Two extension are needed to split a DAT!");
+					return;
+				}
+				ExtSplit es = new ExtSplit(input, exta, extb, outdir, logger);
+				es.Split();
 				return;
+			}
+			else
+			{
+				logger.Log("I'm sorry but " + input + "doesn't exist!");
 			}
 		}
 
