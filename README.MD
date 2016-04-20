@@ -79,7 +79,7 @@ A program to create a DAT based on the differences between two or more input DAT
 
 <b>DatToMiss</b>
 <p/>
-CURRENTLY UNCODED - A program to convert a DAT to a miss file either for the games or the roms with the option to add a generic preface or postface to all of the outputted lines.
+A program to convert a DAT to a miss file either for the games or the roms with the option to add a generic preface and postface to all of the outputted lines.
 
 <b>MergeDAT</b>
 <p/>

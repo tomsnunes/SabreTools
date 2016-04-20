@@ -166,6 +166,18 @@ Options:
   -l, --log		Enable log to file
   -m, --merge	Enable merging in the created DAT");
 					break;
+				case "DatToMiss":
+					Console.WriteLine(@"DatToMiss - Generate a miss file from a DAT
+-----------------------------------------
+Usage: DatToMiss [options] [filename]
+
+Options:
+  -h, -?, --help	Show this help dialog
+  -l, --log		Enable log to file
+  -r, --roms		Output roms to miss instead of sets
+  -pre=, --prefix=	Set prefix to be printed in front of all lines
+  -post=, --postfix=	Set postfix to be printed behind all lines");
+					break;
 				default:
 					Console.Write("This is the default help output");
 					break;

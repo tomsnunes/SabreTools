@@ -80,11 +80,11 @@ namespace SabreTools
 				return;
 			}
 
-			// Otherwise, read in the two files, diff them, and write the result to the file type that the first one is
+			// Otherwise, read in the files, diff them, and write the result to the file type that the first one is
 			List<RomData> A = new List<RomData>();
 			foreach (string input in inputs)
 			{
-				logger.Log("Merging in DAT: " + input);
+				logger.Log("Adding DAT: " + input);
 				List<RomData> B = RomManipulation.Parse(input, 0, 0, logger);
 				A = RomManipulation.Diff(A, B);
 			}
