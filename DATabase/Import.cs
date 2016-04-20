@@ -47,12 +47,6 @@ namespace SabreTools
 		private static string _redumpDatePattern = @"(\d{4})(\d{2})(\d{2}) (\d{2})-(\d{2})-(\d{2})";
 		private static string _tosecDatePattern = @"(\d{4})-(\d{2})-(\d{2})";
 
-		// Public instance variables
-		public string FilePath
-		{
-			get { return _filepath; }
-		}
-
 		/// <summary>
 		/// Initialize an Import object with the given information
 		/// </summary>
@@ -61,6 +55,9 @@ namespace SabreTools
 		/// <param name="logger">Logger object for file or console output</param>
 		public Import(string filepath, string connectionString, Logger logger)
 		{
+			// Take care of quotes
+			filepath = filepath.Replace("\"", "");
+
 			if (File.Exists(filepath))
 			{
 				_filepath = filepath;
