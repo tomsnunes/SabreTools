@@ -8,11 +8,28 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
-	class DatSplit
+	public class DatSplit
 	{
+		// Instance variables
 		private static string _extA;
 		private static string _extB;
 		private static string _filename;
+		private static Logger _logger;
+
+		/// <summary>
+		/// Create a new DatSplit object
+		/// </summary>
+		/// <param name="filename">Filename of the DAT to split</param>
+		/// <param name="extA">First extension to split on</param>
+		/// <param name="extB">Second extension to split on</param>
+		/// <param name="logger">Logger object for console and file writing</param>
+		public DatSplit(string filename, string extA, string extB, Logger logger)
+		{
+			_filename = filename.Replace("\"", "");
+			_extA = (extA.StartsWith(".") ? extA : "." + extA).ToUpperInvariant();
+			_extB = (extB.StartsWith(".") ? extB : "." + extB).ToUpperInvariant();
+			_logger = logger;
+		}
 
 		public static void Main(string[] args)
 		{
@@ -42,6 +59,16 @@ namespace SabreTools
 			_filename = args[0];
 			_extA = (args[1].StartsWith(".") ? args[1] : "." + args[1]).ToUpperInvariant();
 			_extB = (args[2].StartsWith(".") ? args[2] : "." + args[2]).ToUpperInvariant();
+
+			// Split the DAT
+			DatSplit ds = new DatSplit(_filename, _extA, _extB, logger);
+			ds.Split();
+
+			logger.Close();
+		}
+
+		public void Split()
+		{
 			List<RomData> romsA = new List<RomData>();
 			List<RomData> romsB = new List<RomData>();
 
@@ -68,11 +95,9 @@ namespace SabreTools
 
 			// Then write out both files
 			Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename) + "." + _extA, Path.GetFileNameWithoutExtension(_filename) + "." + _extA,
-				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), "", romsA, logger);
+				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), "", romsA, _logger);
 			Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename) + "." + _extB, Path.GetFileNameWithoutExtension(_filename) + "." + _extB,
-				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), "", romsB, logger);
-
-			logger.Close();
+				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), "", romsB, _logger);
 		}
 	}
 }
