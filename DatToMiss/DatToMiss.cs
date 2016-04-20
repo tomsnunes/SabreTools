@@ -65,17 +65,24 @@ namespace SabreTools
 						{
 							postfix = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("-ae=") || arg.StartsWith("-add-ext="))
+						else if (arg.StartsWith("-ae=") || arg.StartsWith("--add-ext="))
 						{
 							addext = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("-re=") || arg.StartsWith("-rep-ext="))
+						else if (arg.StartsWith("-re=") || arg.StartsWith("--rep-ext="))
 						{
 							repext = arg.Split('=')[1];
 						}
 						else if (input == "" && File.Exists(arg.Replace("\"", "")))
 						{
 							input = arg.Replace("\"", "");
+						}
+						else
+						{
+							logger.Warning("Incorrect param or extra input found: " + arg + Environment.NewLine);
+							Build.Help();
+							logger.Close();
+							return;
 						}
 						break;
 				}
