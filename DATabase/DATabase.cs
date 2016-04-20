@@ -49,10 +49,11 @@ namespace SabreTools
 			}
 
 			// Set all default values
-			bool help = false, 
+			bool help = false,
 				add = false,
 				convertRV = false,
 				convertXml = false,
+				disableForce = false,
 				generate = false,
 				genall = false,
 				import = false,
@@ -62,11 +63,13 @@ namespace SabreTools
 				norename = false,
 				old = false,
 				rem = false,
+				single = false,
 				skip = false;
 			string manu = "",
 				outdir = "",
 				sources = "",
 				systems = "",
+				root = "",
 				url = "";
 			List<string> inputs = new List<string>();
 
@@ -91,6 +94,10 @@ namespace SabreTools
 					case "-cx":
 					case "--convert-xml":
 						convertXml = true;
+						break;
+					case "-df":
+					case "--disable-force":
+						disableForce = false;
 						break;
 					case "-g":
 					case "--generate":
@@ -128,6 +135,10 @@ namespace SabreTools
 					case "--remove":
 						rem = true;
 						break;
+					case "-sg":
+					case "--single-game":
+						single = true;
+						break;
 					case "--skip":
 						skip = true;
 						break;
@@ -152,6 +163,10 @@ namespace SabreTools
 						{
 							systems = arg.Split('=')[1];
 						}
+						else if(arg.StartsWith("-rd=") || arg.StartsWith("--root-dir="))
+						{
+							root = arg.Split('=')[1];
+						}
 						else if (arg.StartsWith("url=") && url == "")
 						{
 							url = arg.Split('=')[1];
@@ -171,7 +186,15 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(import ^ generate ^ listsys ^ listsrc ^ genall ^ add ^ rem ^ convertRV ^ convertXml))
+			if (help || !(add ^ convertRV ^ convertXml ^ generate ^ genall ^ import ^ listsrc ^ listsys ^ rem ^ single))
+			{
+				Build.Help();
+				logger.Close();
+				return;
+			}
+
+			// If a switch that requires a filename is set and no file is, show the help screen
+			if (inputs.Count == 0 && (convertRV || convertXml || import || single))
 			{
 				Build.Help();
 				logger.Close();
@@ -265,6 +288,15 @@ namespace SabreTools
 				else
 				{
 					Build.Help();
+				}
+			}
+
+			// Consolodate and trim DAT
+			else if (single)
+			{
+				foreach (string input in inputs)
+				{
+					InitSingleGame(input, root, norename, disableForce);
 				}
 			}
 
@@ -632,6 +664,7 @@ Make a selection:
 
     1) Convert XML DAT to RV
     2) Convert RV DAT to XML
+    3) Merge all entries into a single game and trim
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -643,6 +676,9 @@ Make a selection:
 						break;
 					case "2":
 						ConvertXMLMenu();
+						break;
+					case "3":
+						SingleGameMenu();
 						break;
 				}
 			}
@@ -759,6 +795,28 @@ or 'b' to go back to the previous menu:
 				Console.WriteLine("I'm sorry but " + filename + "doesn't exist!");
 			}
 			return;
+		}
+
+		private static void SingleGameMenu()
+		{
+
+		}
+
+		/// <summary>
+		/// Wrap converting a DAT to single-game mode
+		/// </summary>
+		/// <param name="input">Input file or folder to be converted</param>
+		/// <param name="root">Root directory to base path lengths on</param>
+		/// <param name="norename">True is games should not be renamed</param>
+		/// <param name="disableForce">True if forcepacking="unzip" should be omitted</param>
+		private static void InitSingleGame(string input, string root, bool norename, bool disableForce)
+		{
+			if (File.Exists(input) || Directory.Exists(input))
+			{
+				SingleGame sg = new SingleGame(input, root, norename, disableForce);
+				sg.Process();
+				return;
+			}
 		}
 
 		/// <summary>

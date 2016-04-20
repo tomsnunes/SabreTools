@@ -32,29 +32,25 @@ namespace SabreTools
 				return;
 			}
 
-			logger = new Logger(false, "singlegame.log");
-			logger.Start();
-
-			// Output the title
-			Build.Start("SingleGame");
-
-			bool tofile = false;
+			bool log = false;
 			foreach (string arg in args)
 			{
 				switch (arg)
 				{
-					case "-n":
+					case "-nr":
+					case "--no-rename":
 						_rename = false;
 						break;
-					case "-z":
+					case "-df":
+					case "--disable-force":
 						_forceunpack = false;
 						break;
 					case "-l":
 					case "--log":
-						tofile = true;
+						log = true;
 						break;
 					default:
-						if (arg.StartsWith("-rd="))
+						if (arg.StartsWith("-rd=") || arg.StartsWith("--root-dir="))
 						{
 							_path = arg.Split('=')[1];
 						}
@@ -66,8 +62,21 @@ namespace SabreTools
 				}
 			}
 
+			// If the filename is blank, show the help and exit
+			if (_filename == "")
+			{
+				Build.Help();
+				return;
+			}
+
+			logger = new Logger(false, "singlegame.log");
+			logger.Start();
+
+			// Output the title
+			Build.Start("SingleGame");
+
 			// Set the possibly new value for logger
-			logger.ToFile = tofile;
+			logger.ToFile = log;
 
 			_path = (_path == "" ? Environment.CurrentDirectory : _path);
 
