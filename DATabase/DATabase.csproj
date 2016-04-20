@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatSplit.cs" />
     <Compile Include="Generate.cs" />
     <Compile Include="Import.cs" />
     <Compile Include="DATabase.cs" />
