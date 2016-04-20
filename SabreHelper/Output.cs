@@ -130,19 +130,36 @@ namespace SabreTools.Helper
 		/// Output a list of roms as a text file with an arbitrary prefix and postfix
 		/// </summary>
 		/// <param name="textfile">Name of the output file</param>
+		/// <param name="outdir">Output directory for the miss file</param>
 		/// <param name="roms">List of RomData objects representing the roms to be output</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="useGame">True if only games are written to text file (default), false for files only</param>
 		/// <param name="prefix">Arbitrary string to prefix each line</param>
 		/// <param name="postfix">Arbitrary string to postfix each line</param>
 		/// <returns>True if the file was written, false otherwise</returns>
-		public static bool WriteToText(string textfile, List<RomData> roms, Logger logger, bool useGame = true, string prefix = "", string postfix = "")
+		public static bool WriteToText(string textfile, string outdir, List<RomData> roms, Logger logger, bool useGame = true, string prefix = "", string postfix = "")
 		{
-			logger.Log("Opening file for writing: " + textfile);
+			// Normalize the output directory
+			if (outdir == "")
+			{
+				outdir = Environment.CurrentDirectory;
+			}
+			if (!outdir.EndsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				outdir += Path.DirectorySeparatorChar;
+			}
+
+			// Make the output directory if it doesn't exist
+			if (!Directory.Exists(outdir))
+			{
+				Directory.CreateDirectory(outdir);
+			}
+
+			logger.Log("Opening file for writing: " + outdir + textfile);
 
 			try
 			{
-				FileStream fs = File.Create(textfile);
+				FileStream fs = File.Create(outdir + textfile);
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
 				string lastgame = "";
