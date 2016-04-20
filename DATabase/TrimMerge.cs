@@ -25,7 +25,7 @@ namespace SabreTools
 		/// <param name="logger">Logger object for console and file output</param>
 		public TrimMerge(string filename, string path, bool rename, bool forceunpack, Logger logger)
 		{
-			_filename = filename;
+			_filename = filename.Replace("\"", "");
 			_path = path;
 			_rename = rename;
 			_forceunpack = forceunpack;
