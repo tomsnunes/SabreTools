@@ -34,7 +34,7 @@ namespace SabreTools
 			Build.Start("DatToMiss");
 
 			string prefix = "", postfix = "", input = "";
-			bool tofile = false, help = false, usegame = true;
+			bool tofile = false, help = false, usegame = true, quotes = false;
 			foreach (string arg in args)
 			{
 				switch (arg)
@@ -51,6 +51,10 @@ namespace SabreTools
 					case "-r":
 					case "--roms":
 						usegame = false;
+						break;
+					case "-q":
+					case "--quotes":
+						quotes = true;
 						break;
 					default:
 						if ((arg.StartsWith("-pre=") || arg.StartsWith("--prefix=")) && prefix == "")
@@ -89,7 +93,7 @@ namespace SabreTools
 			name += Path.GetFileNameWithoutExtension(input) + "-miss.txt";
 
 			// Read in the roms from the DAT and then write them to the file
-			Output.WriteToText(name, Path.GetDirectoryName(input), RomManipulation.Parse(input, 0, 0, logger), logger, usegame, prefix, postfix);
+			Output.WriteToText(name, Path.GetDirectoryName(input), RomManipulation.Parse(input, 0, 0, logger), logger, usegame, prefix, postfix, quotes);
 		}
 	}
 }

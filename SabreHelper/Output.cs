@@ -136,8 +136,9 @@ namespace SabreTools.Helper
 		/// <param name="useGame">True if only games are written to text file (default), false for files only</param>
 		/// <param name="prefix">Arbitrary string to prefix each line</param>
 		/// <param name="postfix">Arbitrary string to postfix each line</param>
+		/// <param name="quotes">True if quotes should be put around the item, false otherwise (default)</param>
 		/// <returns>True if the file was written, false otherwise</returns>
-		public static bool WriteToText(string textfile, string outdir, List<RomData> roms, Logger logger, bool useGame = true, string prefix = "", string postfix = "")
+		public static bool WriteToText(string textfile, string outdir, List<RomData> roms, Logger logger, bool useGame = true, string prefix = "", string postfix = "", bool quotes = false)
 		{
 			// Normalize the output directory
 			if (outdir == "")
@@ -167,12 +168,12 @@ namespace SabreTools.Helper
 				{
 					if (useGame && rom.Game != lastgame)
 					{
-						sw.WriteLine(prefix + rom.Game + postfix);
+						sw.WriteLine(prefix + (quotes ? "\"" : "") + rom.Game + (quotes ? "\"" : "") + postfix);
 						lastgame = rom.Game;
 					}
 					else if (!useGame)
 					{
-						sw.WriteLine(prefix + rom.Name + postfix);
+						sw.WriteLine(prefix + (quotes ? "\"" : "") + rom.Name + (quotes ? "\"" : "")+ postfix);
 					}
 				}
 
