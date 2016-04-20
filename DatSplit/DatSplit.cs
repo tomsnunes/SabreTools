@@ -6,7 +6,7 @@ using System.Xml;
 
 using SabreTools.Helper;
 
-namespace DatSplit
+namespace SabreTools
 {
 	class DatSplit
 	{
