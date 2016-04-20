@@ -7,8 +7,8 @@
     <ProjectGuid>{785A4E9E-0DC1-4FAD-AA3A-57B5B122CD8E}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DiffDat</RootNamespace>
-    <AssemblyName>DiffDat</AssemblyName>
+    <RootNamespace>SabreTools</RootNamespace>
+    <AssemblyName>MergeDAT</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
