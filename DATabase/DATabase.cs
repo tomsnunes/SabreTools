@@ -48,32 +48,41 @@ namespace SabreTools
 				return;
 			}
 
+			// Set all default values
+			bool help = false, 
+				add = false,
+				convertRV = false,
+				convertXml = false,
+				generate = false,
+				genall = false,
+				import = false,
+				log = false,
+				listsrc = false,
+				listsys = false,
+				norename = false,
+				old = false,
+				rem = false,
+				skip = false;
+			string manu = "",
+				outdir = "",
+				sources = "",
+				systems = "",
+				url = "";
+			List<string> inputs = new List<string>();
+
 			// Determine which switches are enabled (with values if necessary)
-			bool help = false, import = false, generate = false, convertXml = false, convertRV = false,
-				listsys = false, listsrc = false, norename = false, old = false,
-				log = false, genall = false, add = false, rem = false, skip = false;
-			string systems = "", sources = "", input = "", manu = "", url = "", outdir = "";
 			foreach (string arg in args)
 			{
 				switch (arg)
 				{
-					// Main functions
-					case "-h":
 					case "-?":
+					case "-h":
 					case "--help":
 						help = true;
 						break;
-					case "-i":
-					case "--import":
-						import = true;
-						break;
-					case "-g":
-					case "--generate":
-						generate = true;
-						break;
-					case "-ga":
-					case "--generate-all":
-						genall = true;
+					case "-a":
+					case "--add":
+						add = true;
 						break;
 					case "-cr":
 					case "--convert-rv":
@@ -83,70 +92,73 @@ namespace SabreTools
 					case "--convert-xml":
 						convertXml = true;
 						break;
-					case "-lsy":
-					case "--list-systems":
-						listsys = true;
+					case "-g":
+					case "--generate":
+						generate = true;
+						break;
+					case "-ga":
+					case "--generate-all":
+						genall = true;
+						break;
+					case "-i":
+					case "--import":
+						import = true;
+						break;
+					case "-l":
+					case "--log":
+						log = true;
 						break;
 					case "-lso":
 					case "--list-sources":
 						listsrc = true;
 						break;
-					case "-a":
-					case "--add":
-						add = true;
-						break;
-					case "-r":
-					case "--remove":
-						rem = true;
-						break;
-
-					// Switches
-					case "-l":
-					case "--log":
-						log = true;
-						break;
-					case "-old":
-					case "--romvault":
-						old = true;
+					case "-lsy":
+					case "--list-systems":
+						listsys = true;
 						break;
 					case "-nr":
 					case "--no-rename":
 						norename = true;
 						break;
+					case "-old":
+					case "--romvault":
+						old = true;
+						break;
+					case "-r":
+					case "--remove":
+						rem = true;
+						break;
 					case "--skip":
 						skip = true;
 						break;
 					default:
-						// User input strings
-						if (arg.StartsWith("system=") && systems == "")
+						if (arg.StartsWith("input="))
 						{
-							systems = arg.Split('=')[1];
-						}
-						else if (arg.StartsWith("source=") && sources == "")
-						{
-							sources = arg.Split('=')[1];
-						}
-						else if (arg.StartsWith("out=") && outdir == "")
-						{
-							outdir = arg.Split('=')[1];
+							inputs.Add(arg.Split('=')[1]);
 						}
 						else if (arg.StartsWith("manu=") && manu == "")
 						{
 							manu = arg.Split('=')[1];
 						}
+						else if (arg.StartsWith("out=") && outdir == "")
+						{
+							outdir = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("source=") && sources == "")
+						{
+							sources = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("system=") && systems == "")
+						{
+							systems = arg.Split('=')[1];
+						}
 						else if (arg.StartsWith("url=") && url == "")
 						{
 							url = arg.Split('=')[1];
 						}
-
-						// Take care of the two distinct input name possibilites; prioritize the input tag
-						else if (arg.StartsWith("input=") && input == "")
+						else
 						{
-							input = arg.Split('=')[1];
-						}
-						else if (input == "")
-						{
-							input = arg;
+							inputs.Add(arg);
 						}
 						break;
 				}
@@ -174,7 +186,10 @@ namespace SabreTools
 			// Import a file or folder
 			if (import)
 			{
-				InitImport(input);
+				foreach (string input in inputs)
+				{
+					InitImport(input);
+				}
 			}
 
 			// Generate a DAT
@@ -204,13 +219,19 @@ namespace SabreTools
 			// Convert XML DAT to RV DAT
 			else if (convertRV)
 			{
-				InitConvertRV(input);
+				foreach (string input in inputs)
+				{
+					InitConvertRV(input);
+				}
 			}
 
 			// Convert RV DAT to XML DAT
 			else if (convertXml)
 			{
-				InitConvertXML(input);
+				foreach (string input in inputs)
+				{
+					InitConvertXML(input);
+				}
 			}
 
 			// Add a source or system

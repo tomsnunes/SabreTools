@@ -124,7 +124,7 @@ Options:
 Usage: SingleGame.exe [option] [filename|dirname]
 
 Options:
-    -r=rootdir		Set the directory name for path size
+    -rd=		Set the directory name for path size
     -l, --log		Enable logging to file
     -n			Disable single-game mode
     -z			Disable forceunzipping

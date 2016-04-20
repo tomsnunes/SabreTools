@@ -54,7 +54,7 @@ namespace SabreTools
 						tofile = true;
 						break;
 					default:
-						if (arg.StartsWith("-r"))
+						if (arg.StartsWith("-rd="))
 						{
 							_path = arg.Split('=')[1];
 						}
