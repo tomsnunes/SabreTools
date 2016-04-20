@@ -10,6 +10,12 @@ namespace SabreTools
 	{
 		private static Logger logger;
 
+		/// <summary>
+		/// Entry point for MergeDat program
+		/// </summary>
+		/// <param name="args">String array representing command line parameters</param>
+		/// TODO: @tractivo -for the A and B and AB output you could let this be determined by comparing the hashes.
+		/// 	when a hash is present in both dats then this entry goes to AB, if its only in A then it stay in A if in B then in B.
 		public static void Main(string[] args)
 		{
 			Console.Clear();
