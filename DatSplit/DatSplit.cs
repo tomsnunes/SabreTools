@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Xml;
 
 using SabreTools.Helper;
 
@@ -73,7 +71,7 @@ namespace SabreTools
 			List<RomData> romsB = new List<RomData>();
 
 			// Load the current DAT to be processed
-			List<RomData> roms = RomManipulation.Parse(_filename, 0, 0, logger);
+			List<RomData> roms = RomManipulation.Parse(_filename, 0, 0, _logger);
 
 			// Now separate the roms accordingly
 			foreach (RomData rom in roms)
