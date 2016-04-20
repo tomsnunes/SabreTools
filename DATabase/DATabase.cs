@@ -54,6 +54,7 @@ namespace SabreTools
 				convertRV = false,
 				convertXml = false,
 				disableForce = false,
+				extsplit = false,
 				generate = false,
 				genall = false,
 				import = false,
@@ -65,7 +66,9 @@ namespace SabreTools
 				rem = false,
 				trim = false,
 				skip = false;
-			string manu = "",
+			string exta = "",
+				extb = "",
+				manu = "",
 				outdir = "",
 				sources = "",
 				systems = "",
@@ -97,7 +100,11 @@ namespace SabreTools
 						break;
 					case "-df":
 					case "--disable-force":
-						disableForce = false;
+						disableForce = true;
+						break;
+					case "-es":
+					case "--ext-split":
+						extsplit = true;
 						break;
 					case "-g":
 					case "--generate":
@@ -143,7 +150,15 @@ namespace SabreTools
 						trim = true;
 						break;
 					default:
-						if (arg.StartsWith("input="))
+						if (arg.StartsWith("exta="))
+						{
+							exta = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("extb"))
+						{
+							extb = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("input="))
 						{
 							inputs.Add(arg.Split('=')[1]);
 						}
@@ -186,7 +201,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(add ^ convertRV ^ convertXml ^ generate ^ genall ^ import ^ listsrc ^ listsys ^ rem ^ trim))
+			if (help || !(add ^ convertRV ^ convertXml ^ extsplit ^ generate ^ genall ^ import ^ listsrc ^ listsys ^ rem ^ trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -194,7 +209,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (convertRV || convertXml || import || trim))
+			if (inputs.Count == 0 && (convertRV || convertXml || extsplit || import || trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -667,6 +682,7 @@ Make a selection:
     1) Convert XML DAT to RV
     2) Convert RV DAT to XML
     3) Trim all entries in DAT and merge into a single game
+    4) Split DAT using 2 extensions
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -681,6 +697,9 @@ Make a selection:
 						break;
 					case "3":
 						TrimMergeMenu();
+						break;
+					case "4":
+						ExtSplitMenu();
 						break;
 				}
 			}
@@ -840,6 +859,81 @@ Make a selection:
 						break;
 					case "4":
 						rename = !rename;
+						break;
+					case "5":
+						Console.Clear();
+						InitTrimMerge(input, root, rename, forceunzip);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Wrap trimming and merging a single DAT
+		/// </summary>
+		/// <param name="input">Input file or folder to be converted</param>
+		/// <param name="root">Root directory to base path lengths on</param>
+		/// <param name="rename">True is games should not be renamed</param>
+		/// <param name="force">True if forcepacking="unzip" should be included</param>
+		private static void InitTrimMerge(string input, string root, bool rename, bool force)
+		{
+			// Strip any quotations from the name
+			input = input.Replace("\"", "");
+
+			if (input != "" && (File.Exists(input) || Directory.Exists(input)))
+			{
+				TrimMerge sg = new TrimMerge(input, root, rename, force, logger);
+				sg.Process();
+				return;
+			}
+		}
+
+		/// <summary>
+		/// Show the text-based ExtSplit menu
+		/// </summary>
+		private static void ExtSplitMenu()
+		{
+			string selection = "", input = "", exta = "", extb = "", outdir = "";
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"EXTENSION SPLIT MENU
+===========================
+Make a selection:
+
+    1) File to split" + (input != "" ? ":\n\t" + input : "") + @"
+    2) First file extension" + (exta != "" ? ":\t" + exta : "") + @"
+    3) Second file extension" + (extb != "" ? ":\t" + extb : "") + @"
+    4) Output directory" + (outdir != "" ? ":\n\t" + outdir : "") + @"
+    5) Split the file
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						Console.Clear();
+						Console.Write("Please enter the file name: ");
+						input = Console.ReadLine();
+						break;
+					case "2":
+						Console.Clear();
+						Console.Write("Please enter the first extension: ");
+						exta = Console.ReadLine();
+						break;
+					case "3":
+						Console.Clear();
+						Console.Write("Please enter the second extension: ");
+						extb = Console.ReadLine();
+						break;
+					case "4":
+						Console.Clear();
+						Console.Write("Please enter the output directory: ");
+						exta = Console.ReadLine();
 						break;
 					case "5":
 						Console.Clear();

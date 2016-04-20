@@ -82,6 +82,9 @@ Options:
 	out=			Output directory
   -cx, --convert-xml	Convert a RV DAT to XML
 	out=			Output directory
+  -es, --ext-split		Split a DAT by two file extensions
+	exta=			First extension to split by
+	extb=			Second extension to split by
   -g, --generate	Start tool in generate mode
   -ga, --generate-all	Start tool in generate all mode
 	system=			Comma-separated list of system IDs
@@ -104,11 +107,6 @@ Options:
 Filenames and directories can't start with a reserved string
 unless prefixed by 'input='
 ");
-					break;
-				case "DatSplit":
-					Console.WriteLine(@"DatSplit - Split DAT files by file extension
------------------------------------------
-Usage: DatSplit.exe <filename> <ext> <ext>");
 					break;
 				case "Headerer":
 					Console.WriteLine(@"Headerer - Remove and restore rom headers

@@ -9,9 +9,10 @@ namespace SabreTools
 	public class DatSplit
 	{
 		// Instance variables
-		private static string _extA;
-		private static string _extB;
-		private static string _filename;
+		private string _extA;
+		private string _extB;
+		private string _filename;
+		private string _outdir;
 		private static Logger _logger;
 
 		/// <summary>
@@ -21,48 +22,13 @@ namespace SabreTools
 		/// <param name="extA">First extension to split on</param>
 		/// <param name="extB">Second extension to split on</param>
 		/// <param name="logger">Logger object for console and file writing</param>
-		public DatSplit(string filename, string extA, string extB, Logger logger)
+		public DatSplit(string filename, string extA, string extB, string outdir, Logger logger)
 		{
 			_filename = filename.Replace("\"", "");
 			_extA = (extA.StartsWith(".") ? extA : "." + extA).ToUpperInvariant();
 			_extB = (extB.StartsWith(".") ? extB : "." + extB).ToUpperInvariant();
+			_outdir = outdir.Replace("\"", "");
 			_logger = logger;
-		}
-
-		public static void Main(string[] args)
-		{
-			Console.Clear();
-
-			// Credits take precidence over all
-			if ((new List<string>(args)).Contains("--credits"))
-			{
-				Build.Credits();
-				return;
-			}
-
-			// If we don't have arguments, show help
-			if (args.Length == 0 && args.Length != 3)
-			{
-				Build.Help();
-				return;
-			}
-
-			Logger logger = new Logger(false, "datsplit.log");
-			logger.Start();
-
-			// Output the title
-			Build.Start("DatSplit");
-
-			// Set needed variables
-			_filename = args[0];
-			_extA = (args[1].StartsWith(".") ? args[1] : "." + args[1]).ToUpperInvariant();
-			_extB = (args[2].StartsWith(".") ? args[2] : "." + args[2]).ToUpperInvariant();
-
-			// Split the DAT
-			DatSplit ds = new DatSplit(_filename, _extA, _extB, logger);
-			ds.Split();
-
-			logger.Close();
 		}
 
 		/// <summary>
@@ -76,6 +42,12 @@ namespace SabreTools
 			{
 				_logger.Error("File '" + _filename + "' doesn't exist");
 				return false;
+			}
+
+			// If the output directory doesn't exist, create it
+			if (!Directory.Exists(_outdir))
+			{
+				Directory.CreateDirectory(_outdir);
 			}
 
 			List<RomData> romsA = new List<RomData>();
