@@ -672,7 +672,6 @@ Make a selection:
 		/// </summary>
 		/// <remarks>
 		/// At an unspecified future date, this will also include the following currently-separate programs:
-		/// - DatSplit*
 		/// - MergeDAT
 		/// - DATFromDir
 		/// - DatToMiss
