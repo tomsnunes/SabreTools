@@ -35,14 +35,19 @@ namespace SabreTools
 		/// <summary>
 		/// Trim and process the given DAT or folder of DATs
 		/// </summary>
-		public void Process()
+		/// <returns>True if the DAT could be updated, false otherwise</returns>
+		public bool Process()
 		{
+			// If file doesn't exist, error and return
+			if (!File.Exists(_filename))
+			{
+				_logger.Error("File '" + _filename + "' doesn't exist");
+				return false;
+			}
+
 			_path = (_path == "" ? Environment.CurrentDirectory : _path);
 
-			// Drag and drop means quotes; we don't want quotes
-			_filename = _filename.Replace("\"", "");
-
-			// We also want the full path of the file, just in case
+			// We want the full path of the file, just in case
 			_filename = Path.GetFullPath(_filename);
 
 			// If it's a single file, handle it as such
@@ -68,7 +73,7 @@ namespace SabreTools
 				}
 			}
 
-			_logger.Close();
+			return true;
 		}
 
 		/// <summary>

@@ -68,13 +68,27 @@ namespace SabreTools
 		/// <summary>
 		/// Split a DAT based on filtering by 2 extensions
 		/// </summary>
-		public void Split()
+		/// <returns>True if DAT was split, false otherwise</returns>
+		public bool Split()
 		{
+			// If file doesn't exist, error and return
+			if (!File.Exists(_filename))
+			{
+				_logger.Error("File '" + _filename + "' doesn't exist");
+				return false;
+			}
+
 			List<RomData> romsA = new List<RomData>();
 			List<RomData> romsB = new List<RomData>();
 
 			// Load the current DAT to be processed
 			List<RomData> roms = RomManipulation.Parse(_filename, 0, 0, _logger);
+
+			// If roms is empty, return false
+			if (roms.Count == 0)
+			{
+				return false;
+			}
 
 			// Now separate the roms accordingly
 			foreach (RomData rom in roms)
@@ -95,10 +109,12 @@ namespace SabreTools
 			}
 
 			// Then write out both files
-			Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename) + "." + _extA, Path.GetFileNameWithoutExtension(_filename) + "." + _extA,
+			bool success = Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename) + "." + _extA, Path.GetFileNameWithoutExtension(_filename) + "." + _extA,
 				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), "", romsA, _logger);
-			Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename) + "." + _extB, Path.GetFileNameWithoutExtension(_filename) + "." + _extB,
+			success &= Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename) + "." + _extB, Path.GetFileNameWithoutExtension(_filename) + "." + _extB,
 				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), "", romsB, _logger);
+
+			return success;
 		}
 	}
 }
