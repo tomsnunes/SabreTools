@@ -863,7 +863,7 @@ Make a selection:
 			// Strip any quotations from the name
 			input = input.Replace("\"", "");
 
-			if (input != "" && File.Exists(input) || Directory.Exists(input))
+			if (input != "" && (File.Exists(input) || Directory.Exists(input)))
 			{
 				TrimMerge sg = new TrimMerge(input, root, rename, force, logger);
 				sg.Process();
