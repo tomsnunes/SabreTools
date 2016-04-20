@@ -973,6 +973,10 @@ Make a selection:
 				logger.Log(input + " converted to: " + name);
 				return;
 			}
+			else
+			{
+				logger.Error("I'm sorry but " + input + "doesn't exist!");
+			}
 		}
 
 		/// <summary>
