@@ -112,7 +112,14 @@ namespace SabreTools
 				A = RomManipulation.Merge(A);
 			}
 
-			Output.WriteToDat("diffdat", "diffdat", "", "", "DiffDat", "SabreTools", false, !RomManipulation.IsXmlDat(inputs[0]), "", A, logger);
+			if (diff)
+			{
+				Output.WriteToDat("diffdat" + (merge ? "-merged" : ""), "diffdat" + (merge ? "-merged" : ""), "", "", "DiffDat", "SabreTools", false, !RomManipulation.IsXmlDat(inputs[0]), "", A, logger);
+			}
+			else
+			{
+				Output.WriteToDat("combinedat" + (merge ? "-merged" : ""), "combinedat" + (merge ? "-merged" : ""), "", "", "", "SabreTools", false, !RomManipulation.IsXmlDat(inputs[0]), "", A, logger);
+			}
 		}
 	}
 }
