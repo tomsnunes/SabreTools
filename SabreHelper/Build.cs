@@ -70,23 +70,23 @@ namespace SabreTools.Helper
 					Console.Write(@"
 DATabase - Import and Generate DAT files
 -----------------------------------------
-Usage: DATabase [option] <input=>[filename|dirname] <input=><filename|dirname> ...
+Usage: DATabase [option] [filename|dirname] ...
 
 Options:
   -?, -h, --help	Show this help
   -a, --add		Add a new system or source to the database
-	manu=		Manufacturer name (system only)
-	system=		System name (system only)
-	source=		Source name (source only)
-	url=		URL (source only)
+	manu=			Manufacturer name (system only)
+	system=			System name (system only)
+	source=			Source name (source only)
+	url=			URL (source only)
   -cr, --convert-rv	Convert an XML DAT to RV
 	out=			Output directory
   -cx, --convert-xml	Convert a RV DAT to XML
 	out=			Output directory
   -g, --generate	Start tool in generate mode
   -ga, --generate-all	Start tool in generate all mode
-	system=		Comma-separated list of system IDs
-	source=		Comma-separated list of source IDs
+	system=			Comma-separated list of system IDs
+	source=			Comma-separated list of source IDs
 	out=			Output directoryComma-separated list
 	-nr, --no-rename	Don't auto-rename games
 	-old, --romvault	Produce a DAT in RV format
@@ -95,8 +95,8 @@ Options:
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
   -r, --remove	Remove a system or source from the database
-	system=		System ID
-	source=		Source ID
+	system=			System ID
+	source=			Source ID
   -tm, --trim-merge	Consolidate DAT into a single game and trim entries
 	-rd=, --root-dir=	Set the directory name for path size
 	-nr, --no-rename	Disable single-game mode
@@ -105,8 +105,6 @@ Options:
 Filenames and directories can't start with a reserved string
 unless prefixed by 'input='
 ");
-					Console.Write("\nPress any key to continue...");
-					Console.ReadKey();
 					break;
 				case "DatSplit":
 					Console.WriteLine(@"DatSplit - Split DAT files by file extension

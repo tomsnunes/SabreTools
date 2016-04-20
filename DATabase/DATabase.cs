@@ -337,6 +337,8 @@ Make a selection:
 				{
 					case "1":
 						Build.Help();
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
 						break;
 					case "2":
 						ImportMenu();
