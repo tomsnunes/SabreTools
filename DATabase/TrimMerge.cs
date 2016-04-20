@@ -39,9 +39,9 @@ namespace SabreTools
 		public bool Process()
 		{
 			// If file doesn't exist, error and return
-			if (!File.Exists(_filename))
+			if (!File.Exists(_filename) && !Directory.Exists(_filename))
 			{
-				_logger.Error("File '" + _filename + "' doesn't exist");
+				_logger.Error("File or folder '" + _filename + "' doesn't exist");
 				return false;
 			}
 
