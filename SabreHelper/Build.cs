@@ -169,7 +169,8 @@ Options:
   -l, --log		Enable log to file
   -r, --roms		Output roms to miss instead of sets
   -pre=, --prefix=	Set prefix to be printed in front of all lines
-  -post=, --postfix=	Set postfix to be printed behind all lines");
+  -post=, --postfix=	Set postfix to be printed behind all lines
+  -q, --quotes		Put double-quotes around each outputted item (not prefix/postfix)");
 					break;
 				default:
 					Console.Write("This is the default help output");
