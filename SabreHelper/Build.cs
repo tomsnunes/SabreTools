@@ -157,7 +157,7 @@ Options:
   -h, -?, --help	Show this help dialog
   -l, --log		Enable log to file
   -di, --diff		Switch to diffdat mode
-  -dd, --dedup	Enable deduping in the created DAT");
+  -dd, --dedup		Enable deduping in the created DAT");
 					break;
 				case "DatToMiss":
 					Console.WriteLine(@"DatToMiss - Generate a miss file from a DAT
