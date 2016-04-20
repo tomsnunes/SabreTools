@@ -61,7 +61,7 @@ This a versitile Directory to DAT file creator developed to reduce the overhead 
 
 <h3>Power User Tools</h3>
 
-This section is for tools that have been requested for a highly specific purpose and are not generally going to be used by regular users.
+This section is for tools that have been requested for a highly specific purpose and are not generally going to be used by regular users. All of them have a possibility of being included in the main DATabase program eventually.
 
 <b>SingleGame</b>
 <p/>
