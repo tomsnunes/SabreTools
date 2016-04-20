@@ -55,18 +55,7 @@ namespace SabreTools
 		/// <param name="logger">Logger object for file or console output</param>
 		public Import(string filepath, string connectionString, Logger logger)
 		{
-			// Take care of quotes
-			filepath = filepath.Replace("\"", "");
-
-			if (File.Exists(filepath))
-			{
-				_filepath = filepath;
-			}
-			else
-			{
-				throw new IOException("File " + filepath + " does not exist!");
-			}
-
+			_filepath = filepath.Replace("\"", "");
 			_connectionString = connectionString;
 			_logger = logger;
 		}
@@ -77,6 +66,13 @@ namespace SabreTools
 		/// <returns>True if the data was imported, false otherwise</returns>
 		public bool ImportData ()
 		{
+			// If file doesn't exist, error and return
+			if (!File.Exists(_filepath))
+			{
+				_logger.Error("File '" + _filepath + "' doesn't exist");
+				return false;
+			}
+
 			// Determine which dattype we have
 			string filename = Path.GetFileName(_filepath);
 			GroupCollection fileinfo;
