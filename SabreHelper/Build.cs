@@ -149,15 +149,15 @@ Options:
   -sd, --superdat	Enable SuperDAT creation");
 					break;
 				case "MergeDAT":
-					Console.WriteLine(@"MergeDAT - Merge or diff two or more files
+					Console.WriteLine(@"MergeDAT - Merge two or more DATs
 -----------------------------------------
-Usage: DiffDat [options] [filename] [filename] ...
+Usage: MergeDAT [options] [filename] ...
 
 Options:
   -h, -?, --help	Show this help dialog
   -l, --log		Enable log to file
-  -d, --diff		Enable diff creation
-  -m, --merge	Enable merging in the created DAT");
+  -d, --diff		Switch to diffdat mode
+  -m, --merge	Enable deduping in the created DAT");
 					break;
 				case "DatToMiss":
 					Console.WriteLine(@"DatToMiss - Generate a miss file from a DAT
