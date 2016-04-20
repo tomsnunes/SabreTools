@@ -54,12 +54,12 @@ namespace SabreTools
 					case "--log":
 						tofile = true;
 						break;
-					case "-d":
+					case "-di":
 					case "--diff":
 						diff = true;
 						break;
-					case "-m":
-					case "--merge":
+					case "-dd":
+					case "--dedup":
 						merge = true;
 						break;
 					default:

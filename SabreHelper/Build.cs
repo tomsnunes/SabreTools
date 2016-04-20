@@ -156,8 +156,8 @@ Usage: MergeDAT [options] [filename] ...
 Options:
   -h, -?, --help	Show this help dialog
   -l, --log		Enable log to file
-  -d, --diff		Switch to diffdat mode
-  -m, --merge	Enable deduping in the created DAT");
+  -di, --diff		Switch to diffdat mode
+  -dd, --dedup	Enable deduping in the created DAT");
 					break;
 				case "DatToMiss":
 					Console.WriteLine(@"DatToMiss - Generate a miss file from a DAT
