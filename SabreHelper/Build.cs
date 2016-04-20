@@ -36,12 +36,18 @@ namespace SabreTools.Helper
 			mid = "|" + mid.PadLeft(((77 - mid.Length) / 2) + mid.Length).PadRight(77) + "|";
 
 			// Set the console to ready state
-			Console.SetBufferSize(Console.BufferWidth, 999);
+			ConsoleColor formertext = ConsoleColor.White;
+			ConsoleColor formerback = ConsoleColor.Black;
+			if (!MonoEnvironment)
+			{
+				Console.SetBufferSize(Console.BufferWidth, 999);
+				formertext = Console.ForegroundColor;
+				formerback = Console.BackgroundColor;
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.BackgroundColor = ConsoleColor.Blue;
+			}
+
 			Console.Title = "SabreTools-" + name + " " + Build.Version;
-			ConsoleColor formertext = Console.ForegroundColor;
-			ConsoleColor formerback = Console.BackgroundColor;
-			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.BackgroundColor = ConsoleColor.Blue;
 
 			// Output the header
 			Console.WriteLine(border);
@@ -50,8 +56,11 @@ namespace SabreTools.Helper
 			Console.WriteLine();
 
 			// Return the console to the original text and background colors
-			Console.ForegroundColor = formertext;
-			Console.BackgroundColor = formerback;
+			if (!MonoEnvironment)
+			{
+				Console.ForegroundColor = formertext;
+				Console.BackgroundColor = formerback;
+			}
 		}
 
 		/// <summary>
