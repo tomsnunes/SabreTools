@@ -268,15 +268,13 @@ Make a selection:
 
     1) Show command line usage
     2) Import a DAT file or folder
-    3) Generate a DAT file
-    4) Generate all DAT files
-    5) Convert a DAT file from RV to XML
-    6) Convert a DAT file from XML to RV
-    7) List all available sources
-    8) List all available systems
-    9) Add and remove systems and sources
-    10) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
-    11) Show credits
+    3) Generate DAT files
+    4) DAT file tools
+    5) List all available sources
+    6) List all available systems
+    7) Add and remove systems and sources
+    8) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
+    9) Show credits
     X) Exit Program
 ");
 				Console.Write("Enter selection: ");
@@ -294,35 +292,29 @@ Make a selection:
 						GenerateMenu();
 						break;
 					case "4":
-						GenerateAllMenu();
+						DatToolsMenu();
 						break;
 					case "5":
-						ConvertXMLMenu();
-						break;
-					case "6":
-						ConvertRVMenu();
-						break;
-					case "7":
 						Console.Clear();
 						Build.Start("DATabase");
 						ListSources();
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
-					case "8":
+					case "6":
 						Console.Clear();
 						Build.Start("DATabase");
 						ListSystems();
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
-					case "9":
+					case "7":
 						AddRemoveMenu();
 						break;
-					case "10":
+					case "8":
 						logger.ToFile = !logger.ToFile;
 						break;
-					case "11":
+					case "9":
 						Console.Clear();
 						Build.Credits();
 						Console.Write("\nPress any key to continue...");
@@ -414,10 +406,11 @@ Make a selection:
 
     1) " + (norename ? "Enable game renaming" : "Disable game renaming") + @"
     2) " + (old ? "Enable XML output" : "Enable RomVault output") + @"
-    3) Enter a list of systems to generate from
-    4) Enter a list of sources to generate from
-    5) Enter an output folder
+    3) List of systems to generate from" + (systems != "" ? ": " + systems : "") + @"
+    4) List of sources to generate from" + (sources != "" ? ": " + sources : "") + @"
+    5) Enter an output folder" + (outdir != "" ? ":\n\t" + outdir : "") + @"
     6) Generate the DAT file
+    7) Generate all available DAT files
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -453,6 +446,12 @@ Make a selection:
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
+					case "7":
+						Console.Clear();
+						InitGenerateAll(outdir, norename, old);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
 				}
 			}
 			return;
@@ -469,53 +468,6 @@ Make a selection:
 		{
 			Generate gen = new Generate(systems, sources, outdir, _connectionString, logger, norename, old);
 			gen.Export();
-			return;
-		}
-
-		/// <summary>
-		/// Show the text-based generate all menu
-		/// </summary>
-		private static void GenerateAllMenu()
-		{
-			string selection = "", outdir = "";
-			bool norename = false, old = false;
-			while (selection.ToLowerInvariant() != "b")
-			{
-				Console.Clear();
-				Build.Start("DATabase");
-				Console.WriteLine(@"GENERATE ALL MENU
-===========================
-Make a selection:
-
-    1) " + (norename ? "Enable game renaming" : "Disable game renaming") + @"
-    2) " + (old ? "Enable XML output" : "Enable RomVault output") + @"
-    3) Enter an output folder
-    4) Generate all DAT files
-    B) Go back to the previous menu
-");
-				Console.Write("Enter selection: ");
-				selection = Console.ReadLine();
-				switch (selection)
-				{
-					case "1":
-						norename = !norename;
-						break;
-					case "2":
-						old = !old;
-						break;
-					case "3":
-						Console.Clear();
-						Console.Write("Please enter a folder name: ");
-						outdir = Console.ReadLine();
-						break;
-					case "4":
-						Console.Clear();
-						InitGenerateAll(outdir, norename, old);
-						Console.Write("\nPress any key to continue...");
-						Console.ReadKey();
-						break;
-				}
-			}
 			return;
 		}
 
@@ -633,6 +585,46 @@ Make a selection:
 			Directory.Delete(outdir, true);
 
 			return;
+		}
+
+		/// <summary>
+		/// Show the text-based DAT tools menu
+		/// </summary>
+		/// <remarks>
+		/// At an unspecified future date, this will also include the following currently-separate programs:
+		/// - DatSplit
+		/// - SingleGame
+		/// - MergeDAT
+		/// - DATFromDir
+		/// - DatToMiss
+		/// </remarks>
+		private static void DatToolsMenu()
+		{
+			string selection = "";
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"DAT TOOLS MENU
+===========================
+Make a selection:
+
+    1) Convert XML DAT to RV
+    2) Convert RV DAT to XML
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						ConvertRVMenu();
+						break;
+					case "2":
+						ConvertXMLMenu();
+						break;
+				}
+			}
 		}
 
 		/// <summary>
