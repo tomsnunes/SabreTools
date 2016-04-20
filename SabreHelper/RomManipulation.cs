@@ -29,15 +29,13 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Get the name of the DAT for external use
+		/// Get the XmlDocument associated with a file, if possible
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		/// <returns>The internal name of the DAT on success, empty string otherwise</returns>
-		public static string GetDatName(string filename, Logger logger)
+		/// <returns>The XmlDocument representing the (possibly converted) file, null otherwise</returns>
+		public static XmlDocument GetXmlDocument(string filename, Logger logger)
 		{
-			string name = "";
-
 			XmlDocument doc = new XmlDocument();
 			try
 			{
@@ -52,12 +50,32 @@ namespace SabreTools.Helper
 				catch (Exception ex)
 				{
 					logger.Error(ex.ToString());
-					return name;
+					return null;
 				}
 			}
 			catch (Exception ex)
 			{
 				logger.Error(ex.ToString());
+				return null;
+			}
+
+			return doc;
+		}
+
+		/// <summary>
+		/// Get the name of the DAT for external use
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		/// <returns>The internal name of the DAT on success, empty string otherwise</returns>
+		public static string GetDatName(string filename, Logger logger)
+		{
+			string name = "";
+			XmlDocument doc = GetXmlDocument(filename, logger);
+
+			// If the returned document is null, return the blank string
+			if (doc == null)
+			{
 				return name;
 			}
 
@@ -100,26 +118,11 @@ namespace SabreTools.Helper
 			List<RomData> roms = new List<RomData>();
 
 			bool superdat = false;
-			XmlDocument doc = new XmlDocument();
-			try
+			XmlDocument doc = GetXmlDocument(filename, logger);
+
+			// If the returned document is null, return the empty list
+			if (doc == null)
 			{
-				doc.LoadXml(File.ReadAllText(filename));
-			}
-			catch (XmlException)
-			{
-				try
-				{
-					doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(filename)).ToString());
-				}
-				catch (Exception ex)
-				{
-					logger.Error(ex.ToString());
-					return roms;
-				}
-			}
-			catch (Exception ex)
-			{
-				logger.Error(ex.ToString());
 				return roms;
 			}
 
