@@ -92,13 +92,11 @@ namespace SabreTools
 				return;
 			}
 
+			// Get the full input name
+			input = Path.GetFullPath(input);
+
 			// Get the output name
-			string name = Path.GetDirectoryName(input);
-			if (!name.EndsWith(Path.DirectorySeparatorChar.ToString()))
-			{
-				name += Path.DirectorySeparatorChar;
-			}
-			name += Path.GetFileNameWithoutExtension(input) + "-miss.txt";
+			string name = Path.GetFileNameWithoutExtension(input) + "-miss.txt";
 
 			// Read in the roms from the DAT and then write them to the file
 			Output.WriteToText(name, Path.GetDirectoryName(input), RomManipulation.Parse(input, 0, 0, logger), logger, usegame, prefix, postfix, addext, repext, quotes);
