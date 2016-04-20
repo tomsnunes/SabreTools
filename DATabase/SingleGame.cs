@@ -9,75 +9,35 @@ namespace SabreTools
 {
 	public class SingleGame
 	{
+		// Instance variables
 		private static string _filename = "";
 		private static string _path = "";
-		private static bool _rename = true;
-		private static bool _forceunpack = true;
-		private static Logger logger;
+		private static bool _rename;
+		private static bool _forceunpack;
+		private static Logger _logger;
 
-		public static void Main(string[] args)
+		/// <summary>
+		/// Create a new SingleGame object
+		/// </summary>
+		/// <param name="filename">Name of the file or folder to be processed</param>
+		/// <param name="path">Root path to use for trimming</param>
+		/// <param name="rename">True if games should be renamed into a uniform string, false otherwise</param>
+		/// <param name="forceunpack">True if forcepacking="unzip" should be set on the output, false otherwise</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		public SingleGame(string filename, string path, bool rename, bool forceunpack, Logger logger)
 		{
-			Console.Clear();
+			_filename = filename;
+			_path = path;
+			_rename = rename;
+			_forceunpack = forceunpack;
+			_logger = logger;
+		}
 
-			// Credits take precidence over all
-			if ((new List<string>(args)).Contains("--credits"))
-			{
-				Build.Credits();
-				return;
-			}
-
-			if (args.Length == 0)
-			{
-				Build.Help();
-				return;
-			}
-
-			bool log = false;
-			foreach (string arg in args)
-			{
-				switch (arg)
-				{
-					case "-nr":
-					case "--no-rename":
-						_rename = false;
-						break;
-					case "-df":
-					case "--disable-force":
-						_forceunpack = false;
-						break;
-					case "-l":
-					case "--log":
-						log = true;
-						break;
-					default:
-						if (arg.StartsWith("-rd=") || arg.StartsWith("--root-dir="))
-						{
-							_path = arg.Split('=')[1];
-						}
-						else
-						{
-							_filename = arg;
-						}
-						break;
-				}
-			}
-
-			// If the filename is blank, show the help and exit
-			if (_filename == "")
-			{
-				Build.Help();
-				return;
-			}
-
-			logger = new Logger(false, "singlegame.log");
-			logger.Start();
-
-			// Output the title
-			Build.Start("SingleGame");
-
-			// Set the possibly new value for logger
-			logger.ToFile = log;
-
+		/// <summary>
+		/// Trim and process the given DAT or folder of DATs
+		/// </summary>
+		public void Process()
+		{
 			_path = (_path == "" ? Environment.CurrentDirectory : _path);
 
 			// Drag and drop means quotes; we don't want quotes
@@ -89,7 +49,7 @@ namespace SabreTools
 			// If it's a single file, handle it as such
 			if (!Directory.Exists(_filename) && File.Exists(_filename))
 			{
-				logger.Log("File found: " + _filename);
+				_logger.Log("File found: " + _filename);
 				ProcessDAT(_filename, _path, _rename);
 			}
 			// If it's a directory, loop through the files and see if any are DATs
@@ -101,15 +61,15 @@ namespace SabreTools
 					_filename += Path.DirectorySeparatorChar;
 				}
 
-				logger.Log("Directory found: " + _filename);
+				_logger.Log("Directory found: " + _filename);
 				foreach (string file in Directory.EnumerateFiles(_filename, "*", SearchOption.AllDirectories))
 				{
-					logger.Log("File found: " + file);
+					_logger.Log("File found: " + file);
 					ProcessDAT(file, _path, _rename);
 				}
 			}
 
-			logger.Close();
+			_logger.Close();
 		}
 
 		/// <summary>
@@ -120,7 +80,7 @@ namespace SabreTools
 		/// <param name="rename">True if roms are to be renamed</param>
 		private static void ProcessDAT(string filename, string path, bool rename)
 		{
-			List<RomData> roms = RomManipulation.Parse(filename, 0, 0, logger);
+			List<RomData> roms = RomManipulation.Parse(filename, 0, 0, _logger);
 
 			// Trim all file names according to the path that's set
 			List<RomData> outroms = new List<RomData>();
@@ -149,7 +109,7 @@ namespace SabreTools
 
 			// Now write the file out accordingly
 			Output.WriteToDat(Path.GetFileNameWithoutExtension(filename),
-				Path.GetFileNameWithoutExtension(filename), "", "", "", "", _forceunpack, !RomManipulation.IsXmlDat(filename), Path.GetDirectoryName(filename), outroms, logger);
+				Path.GetFileNameWithoutExtension(filename), "", "", "", "", _forceunpack, !RomManipulation.IsXmlDat(filename), Path.GetDirectoryName(filename), outroms, _logger);
 
 			// Remove the original file if different and inform the user
 			if (Path.GetExtension(filename) != (RomManipulation.IsXmlDat(filename) ? ".xml" : ".dat"))
@@ -157,11 +117,11 @@ namespace SabreTools
 				try
 				{
 					File.Delete(filename);
-					logger.Log("Original file \"" + filename + "\" deleted");
+					_logger.Log("Original file \"" + filename + "\" deleted");
 				}
 				catch (Exception ex)
 				{
-					logger.Error(ex.ToString());
+					_logger.Error(ex.ToString());
 				}
 			}
 		}

@@ -296,7 +296,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitSingleGame(input, root, norename, disableForce);
+					InitSingleGame(input, root, !norename, !disableForce);
 				}
 			}
 
@@ -646,7 +646,6 @@ Make a selection:
 		/// <remarks>
 		/// At an unspecified future date, this will also include the following currently-separate programs:
 		/// - DatSplit
-		/// - SingleGame
 		/// - MergeDAT
 		/// - DATFromDir
 		/// - DatToMiss
@@ -664,7 +663,7 @@ Make a selection:
 
     1) Convert XML DAT to RV
     2) Convert RV DAT to XML
-    3) Merge all entries into a single game and trim
+    3) Trim all entries in DAT and optionally merge into a single game
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -797,23 +796,73 @@ or 'b' to go back to the previous menu:
 			return;
 		}
 
+		/// <summary>
+		/// Show the text-based SingleGame menu
+		/// </summary>
 		private static void SingleGameMenu()
 		{
+			string selection = "", input = "", root = "";
+			bool forceunzip = true, rename = true;
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"SINGLE GAME MENU
+===========================
+Make a selection:
 
+    1) File or folder to process" + (input != "" ? ":\n\t" + input : "") + @"
+    2) Root folder for reference" + (root != "" ? ":\n\t" + root : "") + @"
+    3) " + (forceunzip ? "Remove 'forcepacking=\"unzip\"' from output" : "Add 'forcepacking=\"unzip\"' to output") + @"
+    4) " + (rename ? "Disable game renaming" : "Enable game renaming") + @"
+    5) Process the DAT
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						Console.Clear();
+						Console.Write("Please enter the file or folder name: ");
+						input = Console.ReadLine();
+						break;
+					case "2":
+						Console.Clear();
+						Console.Write("Please enter the root folder name: ");
+						root = Console.ReadLine();
+						break;
+					case "3":
+						forceunzip = !forceunzip;
+						break;
+					case "4":
+						rename = !rename;
+						break;
+					case "5":
+						Console.Clear();
+						InitSingleGame(input, root, rename, forceunzip);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+				}
+			}
 		}
 
 		/// <summary>
-		/// Wrap converting a DAT to single-game mode
+		/// Wrap trimming and merging a single DAT
 		/// </summary>
 		/// <param name="input">Input file or folder to be converted</param>
 		/// <param name="root">Root directory to base path lengths on</param>
-		/// <param name="norename">True is games should not be renamed</param>
-		/// <param name="disableForce">True if forcepacking="unzip" should be omitted</param>
-		private static void InitSingleGame(string input, string root, bool norename, bool disableForce)
+		/// <param name="rename">True is games should not be renamed</param>
+		/// <param name="force">True if forcepacking="unzip" should be included</param>
+		private static void InitSingleGame(string input, string root, bool rename, bool force)
 		{
-			if (File.Exists(input) || Directory.Exists(input))
+			// Strip any quotations from the name
+			input = input.Replace("\"", "");
+
+			if (input != "" && File.Exists(input) || Directory.Exists(input))
 			{
-				SingleGame sg = new SingleGame(input, root, norename, disableForce);
+				SingleGame sg = new SingleGame(input, root, rename, force, logger);
 				sg.Process();
 				return;
 			}
