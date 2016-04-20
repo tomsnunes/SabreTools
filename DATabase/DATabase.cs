@@ -51,6 +51,7 @@ namespace SabreTools
 			// Set all default values
 			bool help = false,
 				add = false,
+				convertMiss = false,
 				convertRV = false,
 				convertXml = false,
 				disableForce = false,
@@ -63,13 +64,19 @@ namespace SabreTools
 				listsys = false,
 				norename = false,
 				old = false,
+				quotes = false,
 				rem = false,
 				trim = false,
-				skip = false;
-			string exta = "",
+				skip = false,
+				usegame = true;
+			string addext = "",
+				exta = "",
 				extb = "",
 				manu = "",
 				outdir = "",
+				postfix = "",
+				prefix = "",
+				repext = "",
 				sources = "",
 				systems = "",
 				root = "",
@@ -89,6 +96,10 @@ namespace SabreTools
 					case "-a":
 					case "--add":
 						add = true;
+						break;
+					case "-cm":
+					case "--convert-miss":
+						convertMiss = true;
 						break;
 					case "-cr":
 					case "--convert-rv":
@@ -138,7 +149,15 @@ namespace SabreTools
 					case "--romvault":
 						old = true;
 						break;
+					case "-q":
+					case "--quotes":
+						quotes = true;
+						break;
 					case "-r":
+					case "--roms":
+						usegame = false;
+						break;
+					case "-rm":
 					case "--remove":
 						rem = true;
 						break;
@@ -150,7 +169,11 @@ namespace SabreTools
 						trim = true;
 						break;
 					default:
-						if (arg.StartsWith("exta="))
+						if (arg.StartsWith("-ae=") || arg.StartsWith("--add-ext="))
+						{
+							addext = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("exta="))
 						{
 							exta = arg.Split('=')[1];
 						}
@@ -170,6 +193,14 @@ namespace SabreTools
 						{
 							outdir = arg.Split('=')[1];
 						}
+						else if (arg.StartsWith("-post=") || arg.StartsWith("--postfix="))
+						{
+							postfix = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-pre=") || arg.StartsWith("--prefix="))
+						{
+							prefix = arg.Split('=')[1];
+						}
 						else if (arg.StartsWith("source=") && sources == "")
 						{
 							sources = arg.Split('=')[1];
@@ -178,9 +209,13 @@ namespace SabreTools
 						{
 							systems = arg.Split('=')[1];
 						}
-						else if(arg.StartsWith("-rd=") || arg.StartsWith("--root-dir="))
+						else if (arg.StartsWith("-rd=") || arg.StartsWith("--root-dir="))
 						{
 							root = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-re=") || arg.StartsWith("--rep-ext="))
+						{
+							repext = arg.Split('=')[1];
 						}
 						else if (arg.StartsWith("url=") && url == "")
 						{
@@ -201,7 +236,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(add ^ convertRV ^ convertXml ^ extsplit ^ generate ^ genall ^ import ^ listsrc ^ listsys ^ rem ^ trim))
+			if (help || !(add ^ convertMiss ^ convertRV ^ convertXml ^ extsplit ^ generate ^ genall ^ import ^ listsrc ^ listsys ^ rem ^ trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -209,7 +244,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (convertRV || convertXml || extsplit || import || trim))
+			if (inputs.Count == 0 && (convertMiss || convertRV || convertXml || extsplit || import || trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -252,6 +287,15 @@ namespace SabreTools
 			else if (listsys)
 			{
 				ListSystems();
+			}
+
+			// Convert DAT to missfile
+			else if (convertMiss)
+			{
+				foreach (string input in inputs)
+				{
+					InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext);
+				}
 			}
 
 			// Convert XML DAT to RV DAT
@@ -689,8 +733,9 @@ Make a selection:
 
     1) Convert XML DAT to RV
     2) Convert RV DAT to XML
-    3) Trim all entries in DAT and merge into a single game
-    4) Split DAT using 2 extensions
+    3) Convert DAT to missfile
+    4) Trim all entries in DAT and merge into a single game
+    5) Split DAT using 2 extensions
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -704,9 +749,12 @@ Make a selection:
 						ConvertXMLMenu();
 						break;
 					case "3":
-						TrimMergeMenu();
+						ConvertMissMenu();
 						break;
 					case "4":
+						TrimMergeMenu();
+						break;
+					case "5":
 						ExtSplitMenu();
 						break;
 				}
@@ -824,6 +872,107 @@ or 'b' to go back to the previous menu:
 				logger.Error("I'm sorry but " + filename + "doesn't exist!");
 			}
 			return;
+		}
+
+		/// <summary>
+		/// Show the text-based DAT to missfile conversion menu
+		/// </summary>
+		private static void ConvertMissMenu()
+		{
+			string selection = "", input = "", prefix = "", postfix = "", addext = "", repext = "";
+			bool usegame = true, quotes = false;
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"DAT -> MISS CONVERT MENU
+===========================
+Make a selection:
+
+    1) File to convert" + (input != "" ? ":\n\t" + input : "") + @"
+    2) " + (usegame ? "Output roms instead of games" : "Output games instead of roms") + @"
+    3) Prefix to add to each line" + (prefix != "" ? ":\n\t" + prefix : "") + @"
+    4) Postfix to add to each line" + (postfix != "" ? ":\n\t" + postfix : "") + @"
+    5) " + (quotes ? "Don't add quotes around each item" : "Add quotes around each item") + @"
+    6) Replace all extensions with another" + (repext != "" ? ":\t" + repext : "") + @"
+    7) Add extensions to each item" + (addext != "" ? ":\n\t" + addext : "") + @"
+    8) Begin conversion
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						Console.Clear();
+						Console.Write("Please enter the file name: ");
+						input = Console.ReadLine();
+						break;
+					case "2":
+						usegame = !usegame;
+						break;
+					case "3":
+						Console.Clear();
+						Console.Write("Please enter the prefix: ");
+						prefix = Console.ReadLine();
+						break;
+					case "4":
+						Console.Clear();
+						Console.Write("Please enter the postfix: ");
+						postfix = Console.ReadLine();
+						break;
+					case "5":
+						quotes = !quotes;
+						break;
+					case "6":
+						Console.Clear();
+						Console.Write("Please enter the replacement extension: ");
+						postfix = Console.ReadLine();
+						break;
+					case "7":
+						Console.Clear();
+						Console.Write("Please enter the additional extension: ");
+						postfix = Console.ReadLine();
+						break;
+					case "8":
+						Console.Clear();
+						InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Wrap converting a DAT to missfile
+		/// </summary>
+		/// <param name="input">File to be converted</param>
+		/// <param name="usegame">True if games are to be used in output, false if roms are</param>
+		/// <param name="prefix">Generic prefix to be added to each line</param>
+		/// <param name="postfix">Generic postfix to be added to each line</param>
+		/// <param name="quotes">Add quotes to each item</param>
+		/// <param name="repext">Replace all extensions with another</param>
+		/// <param name="addext">Add an extension to all items</param>
+		private static void InitConvertMiss(string input, bool usegame, string prefix, string postfix, bool quotes, string repext, string addext)
+		{
+			// Strip any quotations from the name
+			input = input.Replace("\"", "");
+
+			if (input != "" && File.Exists(input))
+			{
+				// Get the full input name
+				input = Path.GetFullPath(input);
+
+				// Get the output name
+				string name = Path.GetFileNameWithoutExtension(input) + "-miss.txt";
+
+				// Read in the roms from the DAT and then write them to the file
+				logger.Log("Converting " + input);
+				Output.WriteToText(name, Path.GetDirectoryName(input), RomManipulation.Parse(input, 0, 0, logger), logger, usegame, prefix, postfix, addext, repext, quotes);
+				logger.Log(input + " converted to: " + name);
+				return;
+			}
 		}
 
 		/// <summary>

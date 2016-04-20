@@ -20,7 +20,7 @@ A bare-bones attempt at providing a true GUI experience for the SabreTools suite
 The main tool of the SabreTools suite. Performs the majority of the core features of the parent project, including the following:
 <ul>
 	<li>Importing and Generating DAT files in RomVault and XML formats</li>
-	<li>Converting DATs from RomVault to XML format</li>
+	<li>Converting DATs from RomVault to XML format, vice versa, and to missfile (last part formerly <i>DatToMiss</i>; requested by Obiwantje)</li>
 	<li>Trim DAT entries and optionally merge into a single game (formerly <i>SingleGame</i>; requested by Kludge)</li>
 	<li>Split a DAT using two different file extensions within the DAT (formerly <i>DatSplit</i>)</li>
 	<li>Add and remove sources and systems from the database</li>
@@ -75,10 +75,6 @@ A program to merge (or diff) an arbitrary number of DATs
 	<li>Optionally create a DiffDat of the inputted files instead of a straight merge</li>
 	<li>Optionally merge the output DAT so no partial duplicates are included</li>
 </ul>
-
-<b>DatToMiss</b>
-<p/>
-A program to convert a DAT to a miss file either for the games or the roms with the option to add a generic preface and postface to all of the outputted lines.
 
 <h3>Licensing</h3>
 <p/>

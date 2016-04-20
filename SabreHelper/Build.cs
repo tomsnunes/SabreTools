@@ -87,6 +87,13 @@ Options:
 	system=			System name (system only)
 	source=			Source name (source only)
 	url=			URL (source only)
+  -cm, --convert-miss
+	-r, --roms		Output roms to miss instead of sets
+	-pre=, --prefix=	Set prefix to be printed in front of all lines
+	-post=, --postfix=	Set postfix to be printed behind all lines
+	-q, --quotes		Put double-quotes around each item
+	-ae=, --add-ext=	Add an extension to each item
+	-re=, --rep-ext=	Replace all extensions with specified
   -cr, --convert-rv	Convert an XML DAT to RV
 	out=			Output directory
   -cx, --convert-xml	Convert a RV DAT to XML
@@ -106,7 +113,7 @@ Options:
   -l, --log		Enable logging of program output
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
-  -r, --remove	Remove a system or source from the database
+  -rm, --remove	Remove a system or source from the database
 	system=			System ID
 	source=			Source ID
   -tm, --trim-merge	Consolidate DAT into a single game and trim entries
@@ -158,21 +165,6 @@ Options:
   -l, --log		Enable log to file
   -di, --diff		Switch to diffdat mode
   -dd, --dedup		Enable deduping in the created DAT");
-					break;
-				case "DatToMiss":
-					Console.WriteLine(@"DatToMiss - Generate a miss file from a DAT
------------------------------------------
-Usage: DatToMiss [options] [filename]
-
-Options:
-  -h, -?, --help	Show this help dialog
-  -l, --log		Enable log to file
-  -r, --roms		Output roms to miss instead of sets
-  -pre=, --prefix=	Set prefix to be printed in front of all lines
-  -post=, --postfix=	Set postfix to be printed behind all lines
-  -q, --quotes		Put double-quotes around each outputted item (not prefix/postfix)
-  -ae=, --add-ext=	Add an extension to each outputted item
-  -re=, --rep-ext=	Replace all extensions with specified");
 					break;
 				default:
 					Console.Write("This is the default help output");
