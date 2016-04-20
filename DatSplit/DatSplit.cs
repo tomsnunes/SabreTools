@@ -65,6 +65,9 @@ namespace SabreTools
 			logger.Close();
 		}
 
+		/// <summary>
+		/// Split a DAT based on filtering by 2 extensions
+		/// </summary>
 		public void Split()
 		{
 			List<RomData> romsA = new List<RomData>();
