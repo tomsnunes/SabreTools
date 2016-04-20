@@ -137,6 +137,8 @@ namespace SabreTools.Helper
 		/// <param name="prefix">Arbitrary string to prefix each line</param>
 		/// <param name="postfix">Arbitrary string to postfix each line</param>
 		/// <param name="quotes">True if quotes should be put around the item, false otherwise (default)</param>
+		/// <param name="addext">Arbitrary extension added to the end of each item</param>
+		/// <param name="repext">Arbitrary extension to replace all extensions in the item</param>
 		/// <returns>True if the file was written, false otherwise</returns>
 		public static bool WriteToText(string textfile, string outdir, List<RomData> roms, Logger logger, bool useGame = true, string prefix = "",
 			string postfix = "", string addext = "", string repext = "", bool quotes = false)
@@ -157,6 +159,10 @@ namespace SabreTools.Helper
 				Directory.CreateDirectory(outdir);
 			}
 
+			// Normalize the extensions
+			addext = (addext.StartsWith(".") ? addext : "." + addext);
+			repext = (repext.StartsWith(".") ? repext : "." + repext);
+
 			logger.Log("Opening file for writing: " + outdir + textfile);
 
 			try
@@ -174,6 +180,7 @@ namespace SabreTools.Helper
 					{
 						string dir = Path.GetDirectoryName(name);
 						dir = (dir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? dir : dir + Path.DirectorySeparatorChar);
+						dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
 						name = dir + Path.GetFileNameWithoutExtension(name) + repext;
 					}
 					if (addext != "")
@@ -183,12 +190,12 @@ namespace SabreTools.Helper
 
 					if (useGame && rom.Game != lastgame)
 					{
-						sw.WriteLine(prefix + (quotes ? "\"" : "") + rom.Game + (quotes ? "\"" : "") + postfix);
+						sw.WriteLine(pre + name + post);
 						lastgame = rom.Game;
 					}
 					else if (!useGame)
 					{
-						sw.WriteLine(prefix + (quotes ? "\"" : "") + rom.Name + (quotes ? "\"" : "")+ postfix);
+						sw.WriteLine(pre + name + post);
 					}
 				}
 
