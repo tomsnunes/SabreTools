@@ -33,7 +33,7 @@ namespace SabreTools
 			// Output the title
 			Build.Start("DatToMiss");
 
-			string prefix = "", postfix = "", input = "";
+			string prefix = "", postfix = "", input = "", addext = "", repext = "";
 			bool tofile = false, help = false, usegame = true, quotes = false;
 			foreach (string arg in args)
 			{
@@ -57,13 +57,21 @@ namespace SabreTools
 						quotes = true;
 						break;
 					default:
-						if ((arg.StartsWith("-pre=") || arg.StartsWith("--prefix=")) && prefix == "")
+						if (arg.StartsWith("-pre=") || arg.StartsWith("--prefix="))
 						{
 							prefix = arg.Split('=')[1];
 						}
-						else if ((arg.StartsWith("-post=") || arg.StartsWith("--postfix=")) && postfix == "")
+						else if (arg.StartsWith("-post=") || arg.StartsWith("--postfix="))
 						{
 							postfix = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-ae=") || arg.StartsWith("-add-ext="))
+						{
+							addext = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-re=") || arg.StartsWith("-rep-ext="))
+						{
+							repext = arg.Split('=')[1];
 						}
 						else if (input == "" && File.Exists(arg.Replace("\"", "")))
 						{
@@ -93,7 +101,7 @@ namespace SabreTools
 			name += Path.GetFileNameWithoutExtension(input) + "-miss.txt";
 
 			// Read in the roms from the DAT and then write them to the file
-			Output.WriteToText(name, Path.GetDirectoryName(input), RomManipulation.Parse(input, 0, 0, logger), logger, usegame, prefix, postfix, quotes);
+			Output.WriteToText(name, Path.GetDirectoryName(input), RomManipulation.Parse(input, 0, 0, logger), logger, usegame, prefix, postfix, addext, repext, quotes);
 		}
 	}
 }

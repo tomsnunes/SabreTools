@@ -170,7 +170,9 @@ Options:
   -r, --roms		Output roms to miss instead of sets
   -pre=, --prefix=	Set prefix to be printed in front of all lines
   -post=, --postfix=	Set postfix to be printed behind all lines
-  -q, --quotes		Put double-quotes around each outputted item (not prefix/postfix)");
+  -q, --quotes		Put double-quotes around each outputted item (not prefix/postfix)
+  -ae=, --add-ext=	Add an extension to each outputted item
+  -re=, --rep-ext=	Replace all extensions with specified");
 					break;
 				default:
 					Console.Write("This is the default help output");

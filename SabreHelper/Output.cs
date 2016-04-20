@@ -138,7 +138,8 @@ namespace SabreTools.Helper
 		/// <param name="postfix">Arbitrary string to postfix each line</param>
 		/// <param name="quotes">True if quotes should be put around the item, false otherwise (default)</param>
 		/// <returns>True if the file was written, false otherwise</returns>
-		public static bool WriteToText(string textfile, string outdir, List<RomData> roms, Logger logger, bool useGame = true, string prefix = "", string postfix = "", bool quotes = false)
+		public static bool WriteToText(string textfile, string outdir, List<RomData> roms, Logger logger, bool useGame = true, string prefix = "",
+			string postfix = "", string addext = "", string repext = "", bool quotes = false)
 		{
 			// Normalize the output directory
 			if (outdir == "")
@@ -166,6 +167,20 @@ namespace SabreTools.Helper
 				string lastgame = "";
 				foreach (RomData rom in roms)
 				{
+					string pre = prefix + (quotes ? "\"" : "");
+					string post = (quotes ? "\"" : "") + postfix;
+					string name = (useGame ? rom.Game : rom.Name);
+					if (repext != "")
+					{
+						string dir = Path.GetDirectoryName(name);
+						dir = (dir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? dir : dir + Path.DirectorySeparatorChar);
+						name = dir + Path.GetFileNameWithoutExtension(name) + repext;
+					}
+					if (addext != "")
+					{
+						name += addext;
+					}
+
 					if (useGame && rom.Game != lastgame)
 					{
 						sw.WriteLine(prefix + (quotes ? "\"" : "") + rom.Game + (quotes ? "\"" : "") + postfix);
