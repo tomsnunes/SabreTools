@@ -92,6 +92,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Mappings\Good.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Mappings\MAME.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

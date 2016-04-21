@@ -22,6 +22,8 @@ namespace SabreTools
 		// Regex File Name Patterns
 		private static string _defaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
 		private static string _defaultSpecialPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.xml$";
+		private static string _goodPattern = @"^(Good.*?)_.*\.dat";
+		private static string _goodXmlPattern = @"^(Good.*?)_.*\.xml";
 		private static string _mamePattern = @"^(.*)\.xml$";
 		private static string _maybeIntroPattern = @"(.*?) \[T-En\].*\((\d{8})\)\.dat$";
 		private static string _noIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
@@ -87,6 +89,16 @@ namespace SabreTools
 			{
 				fileinfo = Regex.Match(filename, _nonGoodSpecialPattern).Groups;
 				type = DatType.NonGood;
+			}
+			else if (Regex.IsMatch(filename, _goodPattern))
+			{
+				fileinfo = Regex.Match(filename, _goodPattern).Groups;
+				type = DatType.Good;
+			}
+			else if (Regex.IsMatch(filename, _goodXmlPattern))
+			{
+				fileinfo = Regex.Match(filename, _goodXmlPattern).Groups;
+				type = DatType.Good;
 			}
 			else if (Regex.IsMatch(filename, _maybeIntroPattern))
 			{
@@ -170,6 +182,19 @@ namespace SabreTools
 
 			switch (type)
 			{
+				case DatType.Good:
+					if (!Remapping.Good.ContainsKey(fileinfo[1].Value))
+					{
+						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						return false;
+					}
+					GroupCollection goodInfo = Regex.Match(Remapping.Good[fileinfo[1].Value], _remappedPattern).Groups;
+
+					manufacturer = goodInfo[1].Value;
+					system = goodInfo[2].Value;
+					source = "Good";
+					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
+					break;
 				case DatType.MAME:
 					if (!Remapping.MAME.ContainsKey(fileinfo[1].Value))
 					{

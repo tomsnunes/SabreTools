@@ -20,6 +20,7 @@ namespace SabreTools.Helper
 		TruRip,
 		NonGood,
 		MaybeIntro,
+		Good,
 	}
 
 	/// <summary>
