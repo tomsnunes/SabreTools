@@ -526,39 +526,18 @@ SELECT files.id FROM files
 						// If the file doesn't exist, add it
 						if (!sldr.HasRows)
 						{
-							query = @"
+							query = @"BEGIN;
 INSERT INTO files (setid, name, type, lastupdated)
-	VALUES (" + gameid + ", '" + rom.Name.Replace("'", "''") + "', '" + rom.Type + "', '" + date + "')";
+	VALUES (" + gameid + ", '" + rom.Name.Replace("'", "''") + "', '" + rom.Type + "', '" + date + @"');
+INSERT INTO checksums (file, size, crc, md5, sha1)
+	VALUES ((SELECT last_insert_rowid()), " + rom.Size + ", '" + rom.CRC + "'" + ", '" + rom.MD5 + "'" + ", '" + rom.SHA1 + @"');
+COMMIT;";
 							using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
 							{
 								int affected = slc2.ExecuteNonQuery();
 
-								// If the insert was successful, add the checksums for the file
-								if (affected >= 1)
-								{
-									query = "SELECT last_insert_rowid()";
-									long romid = -1;
-									using (SqliteCommand slc3 = new SqliteCommand(query, dbc))
-									{
-										romid = (long)slc3.ExecuteScalar();
-									}
-
-									query = @"INSERT INTO checksums (file, size, crc, md5, sha1) VALUES (" +
-										romid + ", " + rom.Size + ", '" + rom.CRC + "'" + ", '" + rom.MD5 + "'" + ", '" + rom.SHA1 + "')";
-									using (SqliteCommand slc3 = new SqliteCommand(query, dbc))
-									{
-										affected = slc3.ExecuteNonQuery();
-									}
-
-									// If the insert of the checksums failed, that's bad
-									if (affected < 1)
-									{
-										_logger.Error("There was an error adding checksums for " + rom.Name + " to the database!");
-										return false;
-									}
-								}
-								// Otherwise, something happened which is bad
-								else
+								// If the insert was unsuccessful, something bad happened
+								if (affected < 1)
 								{
 									_logger.Error("There was an error adding " + rom.Name + " to the database!");
 									return false;
