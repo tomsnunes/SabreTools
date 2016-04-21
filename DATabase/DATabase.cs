@@ -865,7 +865,7 @@ Make a selection:
 ===========================
 Make a selection:
 
-    1) Add a file or folder to process" + (input != "" ? ":\n\t" + input : "") + @"
+    1) Add a file or folder to process
     2) Internal DAT name" + (name != "" ? ":\t" + name : "") + @"
     3) External DAT name/description" + (desc != "" ? ":\t" + desc : "") + @"
     4) Category" + (cat != "" ? ":\t" + cat : "") + @"
@@ -886,7 +886,7 @@ Make a selection:
 					case "1":
 						Console.Clear();
 						Console.Write("Please enter a file or folder name: ");
-						input += ";" + Console.ReadLine();
+						input += (input == "" ? "" : ";") + Console.ReadLine();
 						break;
 					case "2":
 						Console.Clear();
