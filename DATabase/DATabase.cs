@@ -640,7 +640,8 @@ Make a selection:
     2) Convert CMP DAT to XML
     3) Convert DAT to missfile
     4) Trim all entries in DAT and merge into a single game
-    5) Split DAT using 2 extensions
+    5) Merge, diff, and/or dedup 2 or more DAT files
+    6) Split DAT using 2 extensions
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -660,6 +661,9 @@ Make a selection:
 						TrimMergeMenu();
 						break;
 					case "5":
+						MergeDiffMenu();
+						break;
+					case "6":
 						ExtSplitMenu();
 						break;
 				}
@@ -839,6 +843,95 @@ Make a selection:
 					case "5":
 						Console.Clear();
 						InitTrimMerge(input, root, rename, forceunpack);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Show the text-based MergeDiff menu
+		/// </summary>
+		private static void MergeDiffMenu()
+		{
+			string selection = "", input = "", name = "", desc = "", cat = "", version = "", author = "";
+			bool dedup = false, diff = false, noDate = false, forceunpack = false, old = false;
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"DAT TRIM MENU
+===========================
+Make a selection:
+
+    1) Add a file or folder to process" + (input != "" ? ":\n\t" + input : "") + @"
+    2) Internal DAT name" + (name != "" ? ":\t" + name : "") + @"
+    3) External DAT name/description" + (desc != "" ? ":\t" + desc : "") + @"
+    4) Category" + (cat != "" ? ":\t" + cat : "") + @"
+    5) Version" + (version != "" ? ":\t" + version : "") + @"
+    6) Author" + (author != "" ? ":\t" + author : "") + @"
+    7) " + (dedup ? "Don't dedup files in output" : "Dedup files in output") + @"
+    8) " + (diff ? "Only merge the input files" : "Diff the input files") + @"
+    9) " + (noDate ? "Don't append the date to the name" : "Append the date to the name") + @"
+    10) " + (forceunpack ? "Remove 'forcepacking=\"unzip\"' from output" : "Add 'forcepacking=\"unzip\"' to output") + @"
+    11) " + (old ? "Enable XML output" : "Enable ClrMamePro output") + @"
+    12) Merge the DATs
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						Console.Clear();
+						Console.Write("Please enter a file or folder name: ");
+						input += ";" + Console.ReadLine();
+						break;
+					case "2":
+						Console.Clear();
+						Console.Write("Please enter a name: ");
+						name = Console.ReadLine();
+						break;
+					case "3":
+						Console.Clear();
+						Console.Write("Please enter a description: ");
+						desc = Console.ReadLine();
+						break;
+					case "4":
+						Console.Clear();
+						Console.Write("Please enter a category: ");
+						cat = Console.ReadLine();
+						break;
+					case "5":
+						Console.Clear();
+						Console.Write("Please enter a version: ");
+						version = Console.ReadLine();
+						break;
+					case "6":
+						Console.Clear();
+						Console.Write("Please enter an author: ");
+						author = Console.ReadLine();
+						break;
+					case "7":
+						dedup = !dedup;
+						break;
+					case "8":
+						diff = !diff;
+						break;
+					case "9":
+						noDate = !noDate;
+						break;
+					case "10":
+						forceunpack = !forceunpack;
+						break;
+					case "11":
+						old = !old;
+						break;
+					case "12":
+						Console.Clear();
+						List<string> inputs = new List<string>(input.Split(';'));
+						InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, noDate, forceunpack, old);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
@@ -1287,7 +1380,6 @@ Make a selection:
 		/// <summary>
 		/// Wrap merging, diffing, and deduping 2 or mor DATs
 		/// </summary>
-		/// <param name="inputs">List of files and directories to be merged</param>
 		/// <param name="inputs">A List of Strings representing the DATs or DAT folders to be merged</param>
 		/// <param name="name">Internal name of the DAT</param>
 		/// <param name="desc">Description and external name of the DAT</param>
