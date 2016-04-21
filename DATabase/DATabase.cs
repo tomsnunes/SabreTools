@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using Mono.Data.Sqlite;
 using System.IO;
 using System.IO.Compression;
 using System.Xml;
@@ -616,12 +616,12 @@ Make a selection:
 		JOIN games
 			ON systems.id=games.system
 		ORDER BY systems.manufacturer, systems.system";
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
@@ -644,9 +644,9 @@ Make a selection:
 		WHERE systems.id=" + sldr.GetInt32(0).ToString() + @"
 		ORDER BY sources.name";
 
-							using (SQLiteCommand sslc = new SQLiteCommand(squery, dbc))
+							using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
 							{
-								using (SQLiteDataReader ssldr = sslc.ExecuteReader())
+								using (SqliteDataReader ssldr = sslc.ExecuteReader())
 								{
 									// If nothing is found, tell the user and exit
 									if (!ssldr.HasRows)
@@ -672,9 +672,9 @@ Make a selection:
 			ON sources.id=games.source
 		ORDER BY sources.name";
 
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
@@ -1165,12 +1165,12 @@ Make a selection:
 SELECT DISTINCT sources.id, sources.name
 FROM sources " + (!all ? "JOIN games on sources.id=games.source" : "") + @"
 ORDER BY sources.name COLLATE NOCASE";
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
@@ -1200,12 +1200,12 @@ ORDER BY sources.name COLLATE NOCASE";
 SELECT DISTINCT systems.id, systems.manufacturer, systems.system
 FROM systems " + (!all ? "JOIN games ON systems.id=games.system" : "") + @"
 ORDER BY systems.manufacturer, systems.system";
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)

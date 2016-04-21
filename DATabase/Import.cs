@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using Mono.Data.Sqlite;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -326,12 +326,12 @@ namespace SabreTools
 			// Check to make sure that the manufacturer and system are valid according to the database
 			int sysid = -1;
 			string query = "SELECT id FROM systems WHERE manufacturer='" + manufacturer + "' AND system='" + system +"'";
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
@@ -350,12 +350,12 @@ namespace SabreTools
 			// Check to make sure that the source is valid according to the database
 			int srcid = -1;
 			query = "SELECT id FROM sources WHERE name='" + source + "'";
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
@@ -420,12 +420,12 @@ namespace SabreTools
 				" AND name='" + machinename.Replace("'", "''") + "'" +
 				" AND source=" + srcid;
 
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If nothing is found, add the game and get the insert ID
 						if (!sldr.HasRows)
@@ -433,13 +433,13 @@ namespace SabreTools
 							query = "INSERT INTO games (system, name, source)" +
 								" VALUES (" + sysid + ", '" + machinename.Replace("'", "''") + "', " + srcid + ")";
 
-							using (SQLiteCommand slc2 = new SQLiteCommand(query, dbc))
+							using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
 							{
 								slc2.ExecuteNonQuery();
 							}
 
 							query = "SELECT last_insert_rowid()";
-							using (SQLiteCommand slc2 = new SQLiteCommand(query, dbc))
+							using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
 							{
 								gameid = (long)slc2.ExecuteScalar();
 							}
@@ -491,12 +491,12 @@ SELECT files.id FROM files
 		" AND checksums.crc='" + rom.CRC + "'" +
 		" AND checksums.md5='" + rom.MD5 + "'" +
 		" AND checksums.sha1='" + rom.SHA1 + "'";
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If the file doesn't exist, add it
 						if (!sldr.HasRows)
@@ -504,7 +504,7 @@ SELECT files.id FROM files
 							query = @"
 INSERT INTO files (setid, name, type, lastupdated)
 	VALUES (" + gameid + ", '" + rom.Name.Replace("'", "''") + "', '" + rom.Type + "', '" + date + "')";
-							using (SQLiteCommand slc2 = new SQLiteCommand(query, dbc))
+							using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
 							{
 								int affected = slc2.ExecuteNonQuery();
 
@@ -513,14 +513,14 @@ INSERT INTO files (setid, name, type, lastupdated)
 								{
 									query = "SELECT last_insert_rowid()";
 									long romid = -1;
-									using (SQLiteCommand slc3 = new SQLiteCommand(query, dbc))
+									using (SqliteCommand slc3 = new SqliteCommand(query, dbc))
 									{
 										romid = (long)slc3.ExecuteScalar();
 									}
 
 									query = @"INSERT INTO checksums (file, size, crc, md5, sha1) VALUES (" +
 										romid + ", " + rom.Size + ", '" + rom.CRC + "'" + ", '" + rom.MD5 + "'" + ", '" + rom.SHA1 + "')";
-									using (SQLiteCommand slc3 = new SQLiteCommand(query, dbc))
+									using (SqliteCommand slc3 = new SqliteCommand(query, dbc))
 									{
 										affected = slc3.ExecuteNonQuery();
 									}

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Data.SQLite;
+using Mono.Data.Sqlite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,12 +23,12 @@ namespace SabreTools
 SELECT DISTINCT systems.id, systems.manufacturer, systems.system
 FROM systems JOIN games ON systems.id=games.system
 ORDER BY systems.manufacturer, systems.system";
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If nothing is found, tell the user and exit
 						if (sldr.HasRows)
@@ -55,12 +55,12 @@ ORDER BY systems.manufacturer, systems.system";
 SELECT DISTINCT sources.id, sources.name
 FROM sources JOIN games on sources.id=games.source
 ORDER BY sources.name COLLATE NOCASE";
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If nothing is found, tell the user and exit
 						if (sldr.HasRows)

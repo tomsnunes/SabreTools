@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data.SQLite;
+using Mono.Data.Sqlite;
 using System.IO;
 
 namespace SabreTools.Helper
@@ -19,14 +19,14 @@ namespace SabreTools.Helper
 			// Make sure the file exists
 			if (!File.Exists(db))
 			{
-				SQLiteConnection.CreateFile(db);
+				SqliteConnection.CreateFile(db);
 			}
 
 			//Get "type" from the filename
 			string type = Path.GetFileNameWithoutExtension(db);
 
 			// Connect to the file
-			SQLiteConnection dbc = new SQLiteConnection(connectionString);
+			SqliteConnection dbc = new SqliteConnection(connectionString);
 			dbc.Open();
 
 			// Make sure the database has the correct schema
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS checksums (
 	'sha1'	TEXT		NOT NULL,
 	PRIMARY KEY (file, size, crc, md5, sha1)
 )";
-					SQLiteCommand slc = new SQLiteCommand(query, dbc);
+					SqliteCommand slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 
 					query = @"
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS files (
 	'type'			TEXT				NOT NULL	DEFAULT 'rom',
 	'lastupdated'	TEXT				NOT NULL
 )";
-					slc = new SQLiteCommand(query, dbc);
+					slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 
 					query = @"
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS games (
 	'parent'	INTEGER				NOT NULL	DEFAULT '0',
 	'source'	INTEGER				NOT NULL	DEFAULT '0'
 )";
-					slc = new SQLiteCommand(query, dbc);
+					slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 
 					query = @"
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS parent (
 	'id'	INTEGER PRIMARY KEY	NOT NULL,
 	'name'	TEXT				NOT NULL
 )";
-					slc = new SQLiteCommand(query, dbc);
+					slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 
 					query = @"
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS sources (
 	'name'	TEXT				NOT NULL	UNIQUE,
 	'url'	TEXT				NOT NULL
 )";
-					slc = new SQLiteCommand(query, dbc);
+					slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 
 					query = @"
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS systems (
 	'manufacturer'	TEXT				NOT NULL,
 	'system'		TEXT				NOT NULL
 )";
-					slc = new SQLiteCommand(query, dbc);
+					slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 				}
 				else if (type == "Headerer")
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS data (
 	'type'		TEXT		NOT NULL,
 	PRIMARY KEY (sha1, header, type)
 )";
-					SQLiteCommand slc = new SQLiteCommand(query, dbc);
+					SqliteCommand slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 				}
 			}
@@ -128,18 +128,18 @@ CREATE TABLE IF NOT EXISTS data (
 		public static bool AddSource(string name, string url, string connectionString)
 		{
 			string query = "SELECT id, name, url FROM sources WHERE name='" + name + "'";
-			using (SQLiteConnection dbc = new SQLiteConnection(connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If nothing is found, add the source
 						if (!sldr.HasRows)
 						{
 							string squery = "INSERT INTO sources (name, url) VALUES ('" + name + "', '" + url + "')";
-							using (SQLiteCommand sslc = new SQLiteCommand(squery, dbc))
+							using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
 							{
 								return sslc.ExecuteNonQuery() >= 1;
 							}
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS data (
 							if (url != sldr.GetString(2))
 							{
 								string squery = "UPDATE sources SET url='" + url + "' WHERE id=" + sldr.GetInt32(0);
-								using (SQLiteCommand sslc = new SQLiteCommand(squery, dbc))
+								using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
 								{
 									return sslc.ExecuteNonQuery() >= 1;
 								}
@@ -173,10 +173,10 @@ CREATE TABLE IF NOT EXISTS data (
 		public static bool RemoveSource(int id, string connectionString)
 		{
 			string query = "DELETE FROM sources WHERE id=" + id;
-			using (SQLiteConnection dbc = new SQLiteConnection(connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
 					return slc.ExecuteNonQuery() >= 1;
 				}
@@ -193,18 +193,18 @@ CREATE TABLE IF NOT EXISTS data (
 		public static bool AddSystem(string manufacturer, string system, string connectionString)
 		{
 			string query = "SELECT id, manufacturer, system FROM systems WHERE manufacturer='" + manufacturer + "' AND system='" + system + "'";
-			using (SQLiteConnection dbc = new SQLiteConnection(connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If nothing is found, add the system
 						if (!sldr.HasRows)
 						{
 							string squery = "INSERT INTO systems (manufacturer, system) VALUES ('" + manufacturer + "', '" + system + "')";
-							using (SQLiteCommand sslc = new SQLiteCommand(squery, dbc))
+							using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
 							{
 								return sslc.ExecuteNonQuery() >= 1;
 							}
@@ -224,10 +224,10 @@ CREATE TABLE IF NOT EXISTS data (
 		public static bool RemoveSystem(int id, string connectionString)
 		{
 			string query = "DELETE FROM systems WHERE id=" + id;
-			using (SQLiteConnection dbc = new SQLiteConnection(connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
 					return slc.ExecuteNonQuery() >= 1;
 				}

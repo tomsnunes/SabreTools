@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using Mono.Data.Sqlite;
 using System.IO;
 using System.Text.RegularExpressions;
 
@@ -72,12 +72,12 @@ namespace SabreTools
 			if (_systems != "")
 			{
 				string query = "SELECT manufacturer, system FROM systems WHERE id in (" + _systems + ")";
-				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+				using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 				{
 					dbc.Open();
-					using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+					using (SqliteCommand slc = new SqliteCommand(query, dbc))
 					{
-						using (SQLiteDataReader sldr = slc.ExecuteReader())
+						using (SqliteDataReader sldr = slc.ExecuteReader())
 						{
 							// If there are no games for this combination, return nothing
 							if (!sldr.HasRows)
@@ -115,12 +115,12 @@ namespace SabreTools
 			{
 				string query = "SELECT name FROM sources WHERE id in (" + _sources + ")";
 
-				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+				using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 				{
 					dbc.Open();
-					using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+					using (SqliteCommand slc = new SqliteCommand(query, dbc))
 					{
-						using (SQLiteDataReader sldr = slc.ExecuteReader())
+						using (SqliteDataReader sldr = slc.ExecuteReader())
 						{
 							// If there are no games for this combination, return nothing
 							if (!sldr.HasRows)
@@ -204,12 +204,12 @@ JOIN checksums
 	(merged ? "checksums.size, checksums.crc, systems.id, sources.id, files.lastupdated DESC, checksums.md5, checksums.sha1"
 			: "systems.id, sources.id, games.name, files.name");
 
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						// If there are no games for this combination, return nothing
 						if (!sldr.HasRows)

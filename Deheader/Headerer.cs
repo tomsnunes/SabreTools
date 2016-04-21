@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using Mono.Data.Sqlite;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -220,12 +220,12 @@ namespace SabreTools
 				bool exists = false;
 
 				string query = @"SELECT * FROM data WHERE sha1='" + BitConverter.ToString(sha1.Hash) + "' AND header='" + realhead + "'";
-				using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+				using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 				{
 					dbc.Open();
-					using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+					using (SqliteCommand slc = new SqliteCommand(query, dbc))
 					{
-						using (SQLiteDataReader sldr = slc.ExecuteReader())
+						using (SqliteDataReader sldr = slc.ExecuteReader())
 						{
 							exists = sldr.HasRows;
 						}
@@ -238,10 +238,10 @@ namespace SabreTools
 					BitConverter.ToString(sha1.Hash) + "', " +
 					"'" + realhead + "', " +
 					"'" + type.ToString() + "')";
-					using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+					using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 					{
 						dbc.Open();
-						using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+						using (SqliteCommand slc = new SqliteCommand(query, dbc))
 						{
 							logger.Log("Result of inserting header: " + slc.ExecuteNonQuery());
 						}
@@ -266,12 +266,12 @@ namespace SabreTools
 			string header = "";
 
 			string query = @"SELECT header, type FROM data WHERE sha1='" + hash + "'";
-			using (SQLiteConnection dbc = new SQLiteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
-				using (SQLiteCommand slc = new SQLiteCommand(query, dbc))
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					using (SQLiteDataReader sldr = slc.ExecuteReader())
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						if (sldr.HasRows)
 						{
