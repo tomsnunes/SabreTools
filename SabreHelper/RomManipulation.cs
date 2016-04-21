@@ -45,7 +45,7 @@ namespace SabreTools.Helper
 			{
 				try
 				{
-					doc.LoadXml(Converters.RomVaultToXML(File.ReadAllLines(filename)).ToString());
+					doc.LoadXml(Converters.ClrMameProToXML(File.ReadAllLines(filename)).ToString());
 				}
 				catch (Exception ex)
 				{

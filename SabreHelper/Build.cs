@@ -87,6 +87,8 @@ Options:
 	system=			System name (system only)
 	source=			Source name (source only)
 	url=			URL (source only)
+  -cc, --convert-cmp	Convert an XML DAT to CMP
+	out=			Output directory
   -cm, --convert-miss
 	-r, --roms		Output roms to miss instead of sets
 	-gp, --game-prefix	Add game name as a prefix to each item
@@ -95,21 +97,22 @@ Options:
 	-q, --quotes		Put double-quotes around each item
 	-ae=, --add-ext=	Add an extension to each item
 	-re=, --rep-ext=	Replace all extensions with specified
-  -cr, --convert-rv	Convert an XML DAT to RV
-	out=			Output directory
-  -cx, --convert-xml	Convert a RV DAT to XML
+  -cx, --convert-xml	Convert a CMP DAT to XML
 	out=			Output directory
   -es, --ext-split		Split a DAT by two file extensions
 	exta=			First extension to split by
 	extb=			Second extension to split by
 	out=			Output directory
   -g, --generate	Start tool in generate mode
-  -ga, --generate-all	Start tool in generate all mode
 	system=			Comma-separated list of system IDs
 	source=			Comma-separated list of source IDs
 	out=			Output directory
 	-nr, --no-rename	Don't auto-rename games
-	-old, --romvault	Produce a DAT in RV format
+	-o, --old		Output DAT in CMP format instead of XML
+  -ga, --generate-all	Start tool in generate all mode
+	out=			Output directory
+	-nr, --no-rename	Don't auto-rename games
+	-o, --old		Output DAT in CMP format instead of XML
   -i, --import		Start tool in import mode
   -l, --log		Enable logging of program output
   -lso, --list-sources	List all sources (id <= name)
@@ -147,7 +150,7 @@ Options:
   -b, --bare		Don't include date in file name
   -u, --unzip		Force unzipping in created DAT
   -f, --files		Treat archives as files
-  -o, --old		Output DAT in RV format instead of XML
+  -o, --old		Output DAT in CMP format instead of XML
   -n=, --name=		Set the name of the DAT
   -d=, --desc=		Set the description of the DAT
   -c=, --cat=		Set the category of the DAT
@@ -168,7 +171,7 @@ Options:
   -dd, --dedup		Enable deduping in the created DAT
   -b, --bare		Don't include date in file name
   -u, --unzip		Force unzipping in created DAT
-  -o, --old		Output DAT in RV format instead of XML
+  -o, --old		Output DAT in CMP format instead of XML
   -n=, --name=		Set the name of the DAT
   -d=, --desc=		Set the description of the DAT
   -c=, --cat=		Set the category of the DAT

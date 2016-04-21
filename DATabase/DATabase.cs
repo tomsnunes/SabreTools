@@ -52,7 +52,7 @@ namespace SabreTools
 			bool help = false,
 				add = false,
 				convertMiss = false,
-				convertRV = false,
+				convertCMP = false,
 				convertXml = false,
 				gamename = false,
 				disableForce = false,
@@ -98,13 +98,13 @@ namespace SabreTools
 					case "--add":
 						add = true;
 						break;
+					case "-cc":
+					case "--convert-cmp":
+						convertCMP = true;
+						break;
 					case "-cm":
 					case "--convert-miss":
 						convertMiss = true;
-						break;
-					case "-cr":
-					case "--convert-rv":
-						convertRV = true;
 						break;
 					case "-cx":
 					case "--convert-xml":
@@ -150,8 +150,8 @@ namespace SabreTools
 					case "--no-rename":
 						norename = true;
 						break;
-					case "-old":
-					case "--romvault":
+					case "-o":
+					case "--old":
 						old = true;
 						break;
 					case "-q":
@@ -249,7 +249,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(add ^ convertMiss ^ convertRV ^ convertXml ^ extsplit ^ generate ^ genall ^ import ^ listsrc ^ listsys ^ rem ^ trim))
+			if (help || !(add ^ convertMiss ^ convertCMP ^ convertXml ^ extsplit ^ generate ^ genall ^ import ^ listsrc ^ listsys ^ rem ^ trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -257,7 +257,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (convertMiss || convertRV || convertXml || extsplit || import || trim))
+			if (inputs.Count == 0 && (convertMiss || convertCMP || convertXml || extsplit || import || trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -311,16 +311,16 @@ namespace SabreTools
 				}
 			}
 
-			// Convert XML DAT to RV DAT
-			else if (convertRV)
+			// Convert XML DAT to CMP DAT
+			else if (convertCMP)
 			{
 				foreach (string input in inputs)
 				{
-					InitConvertRV(input);
+					InitConvertCMP(input);
 				}
 			}
 
-			// Convert RV DAT to XML DAT
+			// Convert CMP DAT to XML DAT
 			else if (convertXml)
 			{
 				foreach (string input in inputs)
@@ -542,7 +542,7 @@ or 'b' to go back to the previous menu:");
 Make a selection:
 
     1) " + (norename ? "Enable game renaming" : "Disable game renaming") + @"
-    2) " + (old ? "Enable XML output" : "Enable RomVault output") + @"
+    2) " + (old ? "Enable XML output" : "Enable ClrMamePro output") + @"
     3) List of systems to generate from" + (systems != "" ? ": " + systems : "") + @"
     4) List of sources to generate from" + (sources != "" ? ": " + sources : "") + @"
     5) Enter an output folder" + (outdir != "" ? ":\n\t" + outdir : "") + @"
@@ -600,7 +600,7 @@ Make a selection:
 		/// <param name="systems">Comma-separated list of systems to be included in the DAT (blank means all)</param>
 		/// <param name="sources">Comma-separated list of sources to be included in the DAT (blank means all)</param>
 		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
-		/// <param name="old">True if the output file should be in RomVault format (default false)</param>
+		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
 		private static void InitGenerate(string systems, string sources, string outdir, bool norename, bool old)
 		{
 			Generate gen = new Generate(systems, sources, outdir, _connectionString, logger, norename, old);
@@ -612,7 +612,7 @@ Make a selection:
 		/// Wrap generating all standard DATs from the database
 		/// </summary>
 		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
-		/// <param name="old">True if the output file should be in RomVault format (default false)</param>
+		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
 		private static void InitGenerateAll(string outdir, bool norename, bool old)
 		{
 			string actualdir = (outdir == "" ? Environment.CurrentDirectory + "/" : outdir + "/");
@@ -744,8 +744,8 @@ Make a selection:
 ===========================
 Make a selection:
 
-    1) Convert XML DAT to RV
-    2) Convert RV DAT to XML
+    1) Convert XML DAT to CMP
+    2) Convert CMP DAT to XML
     3) Convert DAT to missfile
     4) Trim all entries in DAT and merge into a single game
     5) Split DAT using 2 extensions
@@ -756,7 +756,7 @@ Make a selection:
 				switch (selection)
 				{
 					case "1":
-						ConvertRVMenu();
+						ConvertCMPMenu();
 						break;
 					case "2":
 						ConvertXMLMenu();
@@ -775,25 +775,25 @@ Make a selection:
 		}
 
 		/// <summary>
-		/// Show the text-based XML to RV conversion menu
+		/// Show the text-based XML to CMP conversion menu
 		/// </summary>
-		private static void ConvertRVMenu()
+		private static void ConvertCMPMenu()
 		{
 			string selection = "";
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
 				Build.Start("DATabase");
-				Console.WriteLine(@"XML -> RV CONVERT MENU
+				Console.WriteLine(@"XML -> CMP CONVERT MENU
 ===========================
-Enter the name of a DAT file to convert from XML to RV
+Enter the name of a DAT file to convert from XML to CMP
 or 'b' to go back to the previous menu:
 ");
 				selection = Console.ReadLine();
 				if (selection.ToLowerInvariant() != "b")
 				{
 					Console.Clear();
-					InitConvertRV(selection);
+					InitConvertCMP(selection);
 					Console.Write("\nPress any key to continue...");
 					Console.ReadKey();
 				}
@@ -802,10 +802,10 @@ or 'b' to go back to the previous menu:
 		}
 
 		/// <summary>
-		/// Wrap converting DAT file from XML to RomVault
+		/// Wrap converting DAT file from XML to ClrMamePro
 		/// </summary>
 		/// <param name="filename"></param>
-		private static void InitConvertRV(string filename)
+		private static void InitConvertCMP(string filename)
 		{
 			if (File.Exists(filename))
 			{
@@ -814,7 +814,7 @@ or 'b' to go back to the previous menu:
 				try
 				{
 					doc.LoadXml(File.ReadAllText(filename));
-					string conv = Converters.XMLToRomVault(doc);
+					string conv = Converters.XMLToClrMamePro(doc);
 					FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(filename) + ".new.dat");
 					StreamWriter sw = new StreamWriter(fs);
 					sw.Write(conv);
@@ -835,7 +835,7 @@ or 'b' to go back to the previous menu:
 		}
 
 		/// <summary>
-		/// Show the text-based RV to XML conversion menu
+		/// Show the text-based CMP to XML conversion menu
 		/// </summary>
 		private static void ConvertXMLMenu()
 		{
@@ -844,9 +844,9 @@ or 'b' to go back to the previous menu:
 			{
 				Console.Clear();
 				Build.Start("DATabase");
-				Console.WriteLine(@"RV -> XML CONVERT MENU
+				Console.WriteLine(@"CMP -> XML CONVERT MENU
 ===========================
-Enter the name of a DAT file to convert from RV to XML
+Enter the name of a DAT file to convert from CMP to XML
 or 'b' to go back to the previous menu:
 ");
 				selection = Console.ReadLine();
@@ -862,7 +862,7 @@ or 'b' to go back to the previous menu:
 		}
 
 		/// <summary>
-		/// Wrap converting DAT file from RomVault to XML
+		/// Wrap converting DAT file from ClrMamePro to XML
 		/// </summary>
 		/// <param name="filename"></param>
 		private static void InitConvertXML(string filename)
@@ -870,7 +870,7 @@ or 'b' to go back to the previous menu:
 			if (File.Exists(filename))
 			{
 				logger.Log("Converting " + filename);
-				XElement conv = Converters.RomVaultToXML(File.ReadAllLines(filename));
+				XElement conv = Converters.ClrMameProToXML(File.ReadAllLines(filename));
 				FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(filename) + ".new.xml");
 				StreamWriter sw = new StreamWriter(fs);
 				sw.Write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +

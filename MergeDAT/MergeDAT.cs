@@ -9,7 +9,6 @@ namespace SabreTools
 	public class MergeDAT
 	{
 		// Listing related variables
-		private List<RomData> _roms;
 		private List<String> _inputs;
 
 		// User specified flags

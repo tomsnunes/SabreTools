@@ -175,7 +175,7 @@
 			this.oldCheckBox.Name = "oldCheckBox";
 			this.oldCheckBox.Size = new System.Drawing.Size(129, 17);
 			this.oldCheckBox.TabIndex = 10;
-			this.oldCheckBox.Text = "Use RomVault Format";
+			this.oldCheckBox.Text = "Use ClrMamePro Format";
 			this.oldCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// renameCheckBox

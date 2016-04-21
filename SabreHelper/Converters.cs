@@ -17,11 +17,11 @@ namespace SabreTools.Helper
 		private static string _endPattern = @"^\s*\)\s*$";
 
 		/// <summary>
-		/// Convert a RomVault style DAT to an XML derived DAT
+		/// Convert a ClrMamePro style DAT to an XML derived DAT
 		/// </summary>
 		/// <param name="filecontents">Array of strings representing the input file</param>
 		/// <returns>XElement representing the output XML DAT file</returns>
-		public static XElement RomVaultToXML (string[] filecontents)
+		public static XElement ClrMameProToXML (string[] filecontents)
 		{
 			XElement elem = new XElement("datafile");
 
@@ -30,7 +30,7 @@ namespace SabreTools.Helper
 			{
 				string line = filecontents[k];
 
-				// Comments in RV DATs start with a #
+				// Comments in CMP DATs start with a #
 				if (line.Trim().StartsWith("#"))
 				{
 					continue;
@@ -152,11 +152,11 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Convert an XML derived DAT to a RomVault style DAT
+		/// Convert an XML derived DAT to a ClrMamePro style DAT
 		/// </summary>
 		/// <param name="root">XElement representing the file</param>
-		/// <returns>String representing the output RomVault DAT file</returns>
-		public static String XMLToRomVault(XmlDocument root)
+		/// <returns>String representing the output ClrMamePro DAT file</returns>
+		public static String XMLToClrMamePro(XmlDocument root)
 		{
 			string output = "";
 

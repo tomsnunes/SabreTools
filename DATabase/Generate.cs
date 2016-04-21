@@ -33,7 +33,7 @@ namespace SabreTools
 		/// <param name="connectionString">Connection string for SQLite</param>
 		/// <param name="logger">Logger object for file or console output</param>
 		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
-		/// <param name="old">True if the output file should be in RomVault format (default false)</param>
+		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
 		public Generate(string systems, string sources, string outdir, string connectionString, Logger logger, bool norename = false, bool old = false)
 		{
 			_systems = systems;
