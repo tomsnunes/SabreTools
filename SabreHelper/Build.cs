@@ -89,7 +89,7 @@ Options:
 	url=			URL (source only)
   -cc, --convert-cmp	Convert an XML DAT to CMP
 	out=			Output directory
-  -cm, --convert-miss
+  -cm, --convert-miss	Convert from DAT to miss
 	-r, --roms		Output roms to miss instead of sets
 	-gp, --game-prefix	Add game name as a prefix to each item
 	-pre=, --prefix=	Set prefix to be printed in front of all lines
@@ -116,7 +116,7 @@ Options:
   -i, --import		Start tool in import mode
   -l, --log		Enable logging of program output
   -lso, --list-sources	List all sources (id <= name)
-  -lsy, --list-systems	List all systems (id <= name)\
+  -lsy, --list-systems	List all systems (id <= name)
   -m, --merge		Merge two or more DATs
 	-di, --diff		Switch to diffdat mode
 	-dd, --dedup		Enable deduping in the created DAT
@@ -126,8 +126,8 @@ Options:
 	-n=, --name=		Set the name of the DAT
 	-d=, --desc=		Set the description of the DAT
 	-c=, --cat=		Set the category of the DAT
-	-v=, --version=	Set the version of the DAT
-	-au=, --author=	Set the author of the DAT
+	-v=, --version=		Set the version of the DAT
+	-au=, --author=		Set the author of the DAT
   -rm, --remove	Remove a system or source from the database
 	system=			System ID
 	source=			Source ID
