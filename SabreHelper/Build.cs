@@ -162,7 +162,7 @@ Options:
 				case "MergeDAT":
 					Console.WriteLine(@"MergeDAT - Merge two or more DATs
 -----------------------------------------
-Usage: MergeDAT [options] [filename] ...
+Usage: MergeDAT [options] [filename|dirname] <filename|dirname> ...
 
 Options:
   -h, -?, --help	Show this help dialog

@@ -86,7 +86,7 @@ namespace SabreTools
 			logger.Start();
 
 			// Output the title
-			Build.Start("DiffDat");
+			Build.Start("MergeDAT");
 
 			List<String> inputs = new List<String>();
 			bool help = false, dedup = false, diff = false, forceunpack = false, old = false, log = false, noDate = false;

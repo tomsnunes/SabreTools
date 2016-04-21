@@ -203,7 +203,7 @@ namespace SabreTools.Helper
 								}
 								else if (child.Attributes["size"] != null)
 								{
-									size = Int64.Parse(child.Attributes["size"].Value);
+									Int64.TryParse(child.Attributes["size"].Value, out size);
 								}
 
 								roms.Add(new RomData
@@ -240,7 +240,7 @@ namespace SabreTools.Helper
 												}
 												else if (data.Attributes["size"] != null)
 												{
-													size = Int64.Parse(data.Attributes["size"].Value);
+													Int64.TryParse(data.Attributes["size"].Value, out size);
 												}
 
 												roms.Add(new RomData
