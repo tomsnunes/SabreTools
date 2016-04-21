@@ -811,7 +811,7 @@ Make a selection:
 Make a selection:
 
     1) File or folder to process" + (input != "" ? ":\n\t" + input : "") + @"
-    2) Root folder for reference" + (root != "" ? ":\n\t" + root : "") + @"
+    2) Set the root directory for trimming calculation" + (root != "" ? ":\n\t" + root : "") + @"
     3) " + (forceunpack ? "Remove 'forcepacking=\"unzip\"' from output" : "Add 'forcepacking=\"unzip\"' to output") + @"
     4) " + (rename ? "Keep all game names" : "Rename all games to '!'") + @"
     5) Process the file or folder

@@ -45,8 +45,6 @@ namespace SabreTools
 				return false;
 			}
 
-			_path = (_path == "" ? Environment.CurrentDirectory : _path);
-
 			// We want the full path of the file, just in case
 			_filename = Path.GetFullPath(_filename);
 

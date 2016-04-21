@@ -132,7 +132,7 @@ Options:
 	system=			System ID
 	source=			Source ID
   -tm, --trim-merge	Consolidate DAT into a single game and trim entries
-	-rd=, --root-dir=	Set the directory name for path size
+	-rd=, --root-dir=	Set the root directory for trimming calculation
 	-nr, --no-rename	Keep game names instead of using '!'
 	-df, --disable-force	Disable forceunzipping
 
