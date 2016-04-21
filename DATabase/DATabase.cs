@@ -1346,38 +1346,6 @@ Make a selection:
 		}
 
 		/// <summary>
-		/// Wrap splitting a DAT by 2 extensions
-		/// </summary>
-		/// <param name="input">Input file or folder to be split</param>
-		/// <param name="exta">First extension to split on</param>
-		/// <param name="extb">Second extension to split on</param>
-		/// <param name="outdir">Output directory for the split files</param>
-		private static void InitExtSplit(string input, string exta, string extb, string outdir)
-		{
-			// Strip any quotations from the names
-			input = input.Replace("\"", "");
-			exta = exta.Replace("\"", "");
-			extb = extb.Replace("\"", "");
-			outdir = outdir.Replace("\"", "");
-
-			if (input != "" && File.Exists(input))
-			{
-				if (exta == "" || extb == "")
-				{
-					logger.Warning("Two extensions are needed to split a DAT!");
-					return;
-				}
-				ExtSplit es = new ExtSplit(input, exta, extb, outdir, logger);
-				es.Split();
-				return;
-			}
-			else
-			{
-				logger.Log("I'm sorry but " + input + "doesn't exist!");
-			}
-		}
-
-		/// <summary>
 		/// Wrap merging, diffing, and deduping 2 or mor DATs
 		/// </summary>
 		/// <param name="inputs">A List of Strings representing the DATs or DAT folders to be merged</param>
@@ -1412,6 +1380,38 @@ Make a selection:
 
 			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, noDate, forceunpack, old, logger);
 			md.Process();
+		}
+
+		/// <summary>
+		/// Wrap splitting a DAT by 2 extensions
+		/// </summary>
+		/// <param name="input">Input file or folder to be split</param>
+		/// <param name="exta">First extension to split on</param>
+		/// <param name="extb">Second extension to split on</param>
+		/// <param name="outdir">Output directory for the split files</param>
+		private static void InitExtSplit(string input, string exta, string extb, string outdir)
+		{
+			// Strip any quotations from the names
+			input = input.Replace("\"", "");
+			exta = exta.Replace("\"", "");
+			extb = extb.Replace("\"", "");
+			outdir = outdir.Replace("\"", "");
+
+			if (input != "" && File.Exists(input))
+			{
+				if (exta == "" || extb == "")
+				{
+					logger.Warning("Two extensions are needed to split a DAT!");
+					return;
+				}
+				ExtSplit es = new ExtSplit(input, exta, extb, outdir, logger);
+				es.Split();
+				return;
+			}
+			else
+			{
+				logger.Log("I'm sorry but " + input + "doesn't exist!");
+			}
 		}
 
 		/// <summary>
