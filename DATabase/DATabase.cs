@@ -933,12 +933,12 @@ Make a selection:
 					case "6":
 						Console.Clear();
 						Console.Write("Please enter the replacement extension: ");
-						postfix = Console.ReadLine();
+						repext = Console.ReadLine();
 						break;
 					case "7":
 						Console.Clear();
 						Console.Write("Please enter the additional extension: ");
-						postfix = Console.ReadLine();
+						addext = Console.ReadLine();
 						break;
 					case "8":
 						datname = !datname;
