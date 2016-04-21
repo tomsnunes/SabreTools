@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text;
-using System.Web;
 
 using SabreTools.Helper;
 using DamienG.Security.Cryptography;
@@ -21,32 +19,69 @@ namespace SabreTools
 	public class DATFromDir
 	{
 		// Path-related variables
-		private static string _basePath;
-		private static string _tempDir;
+		private string _basePath;
+		private string _tempDir;
 
 		// Extraction and listing related variables
-		private static List<RomData> _roms;
+		private List<RomData> _roms;
+		private List<String> _inputs;
 
 		// User specified flags
-		private static bool _noMD5;
-		private static bool _noSHA1;
-		private static bool _noDate;
-		private static bool _forceunzip;
-		private static bool _allfiles;
-		private static bool _old;
-		private static bool _log;
-		private static bool _superDat;
+		private bool _noMD5;
+		private bool _noSHA1;
+		private bool _noDate;
+		private bool _forceunzip;
+		private bool _archivesAsFiles;
+		private bool _old;
+		private bool _log;
+		private bool _superDat;
 
 		// User specified strings
-		private static string _name;
-		private static string _desc;
-		private static string _cat;
-		private static string _version;
-		private static string _author;
+		private string _name;
+		private string _desc;
+		private string _cat;
+		private string _version;
+		private string _author;
 
 		// Other required variables
-		private static string _date = DateTime.Now.ToString("yyyy-MM-dd");
-		private static Logger _logger;
+		private string _date = DateTime.Now.ToString("yyyy-MM-dd");
+		private Logger _logger;
+
+		/// <summary>
+		/// Create a new DATFromDir object
+		/// </summary>
+		/// <param name="inputs">A List of Strings representing the files and folders to be DATted</param>
+		/// <param name="name">Internal name of the DAT</param>
+		/// <param name="desc">Description and external name of the DAT</param>
+		/// <param name="cat">Category for the DAT</param>
+		/// <param name="version">Version of the DAT</param>
+		/// <param name="author">Author of the DAT</param>
+		/// <param name="noMD5">True if MD5 hashes should be skipped over, false otherwise</param>
+		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
+		/// <param name="noDate">True if the date should be omitted from the DAT, false otherwise</param>
+		/// <param name="forceunzip">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
+		/// <param name="archivesAsFiles">True if all archives should be treated like files, false otherwise</param>
+		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
+		/// <param name="superDat">True if SuperDAT mode is enabled, false otherwise</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		public DATFromDir(List<String> inputs, string name, string desc, string cat, string version, string author,
+			bool noMD5, bool noSHA1, bool noDate, bool forceunzip, bool archivesAsFiles, bool old, bool superDat, Logger logger)
+		{
+			_inputs = inputs;
+			_name = name;
+			_desc = desc;
+			_cat = cat;
+			_version = version;
+			_author = author;
+			_noMD5 = noMD5;
+			_noSHA1 = noSHA1;
+			_noDate = noDate;
+			_forceunzip = forceunzip;
+			_archivesAsFiles = archivesAsFiles;
+			_old = old;
+			_superDat = superDat;
+			_logger = logger;
+		}
 
 		/// <summary>
 		/// Start help or use supplied parameters
@@ -63,9 +98,12 @@ namespace SabreTools
 				return;
 			}
 
+			Logger logger = new Logger(false, "datfromdir.log");
+			logger.Start();
+
 			// First things first, take care of all of the arguments that this could have
-			_noMD5 = false; _noSHA1 = false; _forceunzip = false; _allfiles = false; _old = false; _log = false; _superDat = false;
-			_name = ""; _desc = ""; _cat = ""; _version = ""; _author = ""; _basePath = "";
+			bool noMD5 = false, noSHA1 = false, forceunzip = false, allfiles = false, old = false, log = false, superDat = false, noDate = false;
+			string name = "", desc = "", cat = "", version = "", author = "", basePath = "";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
 			{
@@ -75,60 +113,60 @@ namespace SabreTools
 					case "-?":
 					case "--help":
 						Build.Help();
-						_logger.Close();
+						logger.Close();
 						return;
 					case "-m":
 					case "--noMD5":
-						_noMD5 = true;
+						noMD5 = true;
 						break;
 					case "-s":
 					case "--noSHA1":
-						_noSHA1 = true;
+						noSHA1 = true;
 						break;
 					case "-b":
 					case "--bare":
-						_noDate = true;
+						noDate = true;
 						break;
 					case "-u":
 					case "--unzip":
-						_forceunzip = true;
+						forceunzip = true;
 						break;
 					case "-f":
 					case "--files":
-						_allfiles = true;
+						allfiles = true;
 						break;
 					case "-o":
 					case "--old":
-						_old = true;
+						old = true;
 						break;
 					case "-l":
 					case "--log":
-						_log = true;
+						log = true;
 						break;
 					case "-sd":
 					case "--superdat":
-						_superDat = true;
+						superDat = true;
 						break;
 					default:
 						if (arg.StartsWith("-n=") || arg.StartsWith("--name="))
 						{
-							_name = arg.Split('=')[1];
+							name = arg.Split('=')[1];
 						}
 						else if (arg.StartsWith("-d=") || arg.StartsWith("--desc="))
 						{
-							_desc = arg.Split('=')[1];
+							desc = arg.Split('=')[1];
 						}
 						else if (arg.StartsWith("-c=") || arg.StartsWith("--cat="))
 						{
-							_cat = arg.Split('=')[1];
+							cat = arg.Split('=')[1];
 						}
 						else if (arg.StartsWith("-a=") || arg.StartsWith("--author="))
 						{
-							_author = arg.Split('=')[1];
+							author = arg.Split('=')[1];
 						}
 						else if (arg.StartsWith("-v=") || arg.StartsWith("--version="))
 						{
-							_version = arg.Split('=')[1];
+							version = arg.Split('=')[1];
 						}
 						else
 						{
@@ -138,16 +176,16 @@ namespace SabreTools
 				}
 			}
 
-			_logger = new Logger(_log, "datfromdir.log");
-			_logger.Start();
-
 			// If there's no inputs, show the help
 			if (inputs.Count == 0)
 			{
 				Build.Help();
-				_logger.Close();
+				logger.Close();
 				return;
 			}
+
+			// Set the new state for Logger
+			logger.ToFile = log;
 
 			// Output the title
 			Build.Start("DATFromDir");
@@ -157,13 +195,33 @@ namespace SabreTools
 			{
 				if (!File.Exists(input) && !Directory.Exists(input))
 				{
-					_logger.Error(input + " is not a valid input!");
+					logger.Error(input + " is not a valid input!");
 					Console.WriteLine();
 					Build.Help();
 					return;
 				}
 			}
 
+			// Create a new DATFromDir object and process the inputs
+			DATFromDir dfd = new DATFromDir(inputs, name, desc, cat, version, author, noMD5, noSHA1, noDate, forceunzip, allfiles, old, superDat, logger);
+			bool success = dfd.Start();
+
+			// If we failed, show the help
+			if (!success)
+			{
+				Console.WriteLine();
+				Build.Help();
+			}
+			
+			logger.Close();
+		}
+
+		/// <summary>
+		/// Process the file, folder, or list of some combination into a DAT file
+		/// </summary>
+		/// <returns>True if the DAT could be created, false otherwise</returns>
+		public bool Start()
+		{
 			// Create an output array for all found items
 			_roms = new List<RomData>();
 
@@ -180,12 +238,13 @@ namespace SabreTools
 			// If we're in SuperDAT mode, we have to treat it separately
 			if (_superDat)
 			{
-
+				_logger.Error("SuperDAT functionality not implemented yet!");
+				return false;
 			}
 			else
 			{
 				// Loop over each of the found paths, if any
-				foreach (string path in inputs)
+				foreach (string path in _inputs)
 				{
 					// Set local paths and vars
 					_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
@@ -214,12 +273,10 @@ namespace SabreTools
 				}
 			}
 
-			// If we found nothing (error state), show the help and exit
+			// If we found nothing (error state), exit
 			if (_roms.Count == 0)
 			{
-				Console.WriteLine();
-				Build.Help();
-				return;
+				return false;
 			}
 
 			// Order the roms by name of parent, then name of rom
@@ -239,7 +296,7 @@ namespace SabreTools
 			// Double check to see what it needs to be named
 			if (_name == "")
 			{
-				if (inputs.Count > 1)
+				if (_inputs.Count > 1)
 				{
 					_name = Environment.CurrentDirectory.Split(Path.DirectorySeparatorChar).Last();
 				}
@@ -257,21 +314,21 @@ namespace SabreTools
 
 			// Now write it all out as a DAT
 			Output.WriteToDat(_name, _desc, _version, _date, _cat, _author, _forceunzip, _old, Environment.CurrentDirectory, _roms, _logger);
-			
-			_logger.Close();
+
+			return true;
 		}
 
 		/// <summary>
 		/// Check a given file for hashes, based on current settings
 		/// </summary>
 		/// <param name="item">Filename of the item to be checked</param>
-		private static void ProcessFile (string item)
+		private void ProcessFile (string item)
 		{
 			// Create the temporary output directory
 			DirectoryInfo di = Directory.CreateDirectory(_tempDir);
 
 			bool encounteredErrors = true;
-			if (!_allfiles)
+			if (!_archivesAsFiles)
 			{
 				try
 				{
