@@ -72,6 +72,12 @@ namespace SabreTools.Helper
 				node = node.NextSibling;
 			}
 
+			// If the node is empty, just return so it doesn't crash
+			if (!node.HasChildNodes)
+			{
+				return;
+			}
+
 			// Get the first mapping node
 			node = node.FirstChild;
 			while (node.NodeType != XmlNodeType.Element && node.Name != "mapping")
