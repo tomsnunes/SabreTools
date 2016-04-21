@@ -14,6 +14,13 @@ namespace SabreTools
 		private List<String> _inputs;
 		private Logger _logger;
 
+		/// <summary>
+		/// Create a new MergeDAT object
+		/// </summary>
+		/// <param name="inputs">A List of Strings representing the DATs or DAT folders to be merged</param>
+		/// <param name="diff">True if a DiffDat of all inputs is wanted, false otherwise</param>
+		/// <param name="dedup">True if the outputted file should remove duplicates, false otherwise</param>
+		/// <param name="logger">Logger object for console and file output</param>
 		public MergeDAT(List<String> inputs, bool diff, bool dedup, Logger logger)
 		{
 			_inputs = inputs;
