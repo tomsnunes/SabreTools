@@ -68,7 +68,6 @@ namespace SabreTools
 				listsrc = false,
 				listsys = false,
 				merge = false,
-				noDate = false,
 				norename = false,
 				old = false,
 				quotes = false,
@@ -111,7 +110,7 @@ namespace SabreTools
 						break;
 					case "-b":
 					case "--bare":
-						noDate = true;
+						bare = true;
 						break;
 					case "-cc":
 					case "--convert-cmp":
@@ -435,7 +434,7 @@ namespace SabreTools
 			// Merge, diff, and dedupe at least 2 DATs
 			else if (merge)
 			{
-				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, noDate, forceunpack, old);
+				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old);
 			}
 
 			logger.Close();
@@ -854,7 +853,7 @@ Make a selection:
 		private static void MergeDiffMenu()
 		{
 			string selection = "", input = "", name = "", desc = "", cat = "", version = "", author = "";
-			bool dedup = false, diff = false, noDate = false, forceunpack = false, old = false;
+			bool dedup = false, diff = false, bare = false, forceunpack = false, old = false;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
@@ -871,7 +870,7 @@ Make a selection:
     6) Author" + (author != "" ? ":\t" + author : "") + @"
     7) " + (dedup ? "Don't dedup files in output" : "Dedup files in output") + @"
     8) " + (diff ? "Only merge the input files" : "Diff the input files") + @"
-    9) " + (noDate ? "Don't append the date to the name" : "Append the date to the name") + @"
+    9) " + (bare ? "Don't append the date to the name" : "Append the date to the name") + @"
     10) " + (forceunpack ? "Remove 'forcepacking=\"unzip\"' from output" : "Add 'forcepacking=\"unzip\"' to output") + @"
     11) " + (old ? "Enable XML output" : "Enable ClrMamePro output") + @"
     12) Merge the DATs
@@ -918,7 +917,7 @@ Make a selection:
 						diff = !diff;
 						break;
 					case "9":
-						noDate = !noDate;
+						bare = !bare;
 						break;
 					case "10":
 						forceunpack = !forceunpack;
@@ -929,7 +928,7 @@ Make a selection:
 					case "12":
 						Console.Clear();
 						List<string> inputs = new List<string>(input.Split(';'));
-						InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, noDate, forceunpack, old);
+						InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
@@ -1354,10 +1353,10 @@ Make a selection:
 		/// <param name="author">Author of the DAT</param>
 		/// <param name="diff">True if a DiffDat of all inputs is wanted, false otherwise</param>
 		/// <param name="dedup">True if the outputted file should remove duplicates, false otherwise</param>
-		/// <param name="noDate">True if the date should be omitted from the DAT, false otherwise</param>
+		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="forceunpack">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
 		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
-		private static void InitMergeDiff(List<string> inputs, string name, string desc, string cat, string version, string author, bool diff, bool dedup, bool noDate, bool forceunpack, bool old)
+		private static void InitMergeDiff(List<string> inputs, string name, string desc, string cat, string version, string author, bool diff, bool dedup, bool bare, bool forceunpack, bool old)
 		{
 			// Make sure there are no folders in inputs
 			List<string> newInputs = new List<string>();
@@ -1376,7 +1375,7 @@ Make a selection:
 				}
 			}
 
-			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, noDate, forceunpack, old, logger);
+			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, logger);
 			md.Process();
 		}
 

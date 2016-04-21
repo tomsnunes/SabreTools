@@ -13,7 +13,7 @@ namespace SabreTools
 		// User specified flags
 		private bool _diff;
 		private bool _dedup;
-		private bool _noDate;
+		private bool _bare;
 		private bool _forceunpack;
 		private bool _old;
 
@@ -39,12 +39,12 @@ namespace SabreTools
 		/// <param name="author">Author of the DAT</param>
 		/// <param name="diff">True if a DiffDat of all inputs is wanted, false otherwise</param>
 		/// <param name="dedup">True if the outputted file should remove duplicates, false otherwise</param>
-		/// <param name="noDate">True if the date should be omitted from the DAT, false otherwise</param>
+		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="forceunpack">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
 		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		public MergeDiff(List<String> inputs, string name, string desc, string cat, string version, string author,
-			bool diff, bool dedup, bool noDate, bool forceunpack, bool old, Logger logger)
+			bool diff, bool dedup, bool bare, bool forceunpack, bool old, Logger logger)
 		{
 			_inputs = inputs;
 			_name = name;
@@ -54,7 +54,7 @@ namespace SabreTools
 			_author = author;
 			_diff = diff;
 			_dedup = dedup;
-			_noDate = noDate;
+			_bare = bare;
 			_forceunpack = forceunpack;
 			_old = old;
 			_logger = logger;
@@ -106,7 +106,7 @@ namespace SabreTools
 			if (_desc == "")
 			{
 				_desc = (_diff ? "diffdat" : "mergedat") + (_dedup ? "-merged" : "");
-				if (!_noDate)
+				if (!_bare)
 				{
 					_desc += " (" + _date + ")";
 				}
