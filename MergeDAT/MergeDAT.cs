@@ -8,24 +8,47 @@ namespace SabreTools
 {
 	public class MergeDAT
 	{
-		// Instance variables
+		// Listing related variables
+		private List<RomData> _roms;
+		private List<String> _inputs;
+
+		// User specified flags
 		private bool _diff;
 		private bool _dedup;
-		private List<String> _inputs;
+		private bool _noDate;
+		private bool _forceunpack;
+		private bool _old;
+
+		// User specified strings
+		private string _name;
+		private string _desc;
+		private string _cat;
+		private string _version;
+		private string _author;
+
+		// Other required variables
+		private string _date = DateTime.Now.ToString("yyyy-MM-dd");
 		private Logger _logger;
 
-		/// <summary>
-		/// Create a new MergeDAT object
-		/// </summary>
 		/// <param name="inputs">A List of Strings representing the DATs or DAT folders to be merged</param>
 		/// <param name="diff">True if a DiffDat of all inputs is wanted, false otherwise</param>
 		/// <param name="dedup">True if the outputted file should remove duplicates, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public MergeDAT(List<String> inputs, bool diff, bool dedup, Logger logger)
+
+		public MergeDAT(List<String> inputs, string name, string desc, string cat, string version, string author,
+			bool diff, bool dedup, bool noDate, bool forceunpack, bool old, Logger logger)
 		{
 			_inputs = inputs;
+			_name = name;
+			_desc = desc;
+			_cat = cat;
+			_version = version;
+			_author = author;
 			_diff = diff;
 			_dedup = dedup;
+			_noDate = noDate;
+			_forceunpack = forceunpack;
+			_old = old;
 			_logger = logger;
 		}
 
@@ -57,7 +80,8 @@ namespace SabreTools
 			Build.Start("DiffDat");
 
 			List<String> inputs = new List<String>();
-			bool tofile = false, help = false, dedup = false, diff = false;
+			bool help = false, dedup = false, diff = false, forceunpack = false, old = false, log = false, noDate = false;
+			string name = "", desc = "", cat = "", version = "", author = "";
 			foreach (string arg in args)
 			{
 				switch (arg)
@@ -65,12 +89,9 @@ namespace SabreTools
 					case "-h":
 					case "-?":
 					case "--help":
-						help = true;
-						break;
-					case "-l":
-					case "--log":
-						tofile = true;
-						break;
+						Build.Help();
+						logger.Close();
+						return;
 					case "-di":
 					case "--diff":
 						diff = true;
@@ -79,9 +100,45 @@ namespace SabreTools
 					case "--dedup":
 						dedup = true;
 						break;
+					case "-b":
+					case "--bare":
+						noDate = true;
+						break;
+					case "-u":
+					case "--unzip":
+						forceunpack = true;
+						break;
+					case "-o":
+					case "--old":
+						old = true;
+						break;
+					case "-l":
+					case "--log":
+						log = true;
+						break;
 					default:
+						if (arg.StartsWith("-n=") || arg.StartsWith("--name="))
+						{
+							name = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-d=") || arg.StartsWith("--desc="))
+						{
+							desc = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-c=") || arg.StartsWith("--cat="))
+						{
+							cat = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-a=") || arg.StartsWith("--author="))
+						{
+							author = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-v=") || arg.StartsWith("--version="))
+						{
+							version = arg.Split('=')[1];
+						}
 						// Add actual files to the list of inputs
-						if (File.Exists(arg.Replace("\"", "")))
+						else if (File.Exists(arg.Replace("\"", "")))
 						{
 							inputs.Add(Path.GetFullPath(arg.Replace("\"", "")));
 						}
@@ -97,7 +154,7 @@ namespace SabreTools
 			}
 
 			// Set the possibly new value for logger
-			logger.ToFile = tofile;
+			logger.ToFile = log;
 
 			// Show help if explicitly asked for it or if not enough files are supplied
 			if (help || inputs.Count < 2)
@@ -108,7 +165,7 @@ namespace SabreTools
 			}
 
 			// Otherwise, read in the files, process them and write the result to the file type that the first one is
-			MergeDAT md = new MergeDAT(inputs, diff, dedup, logger);
+			MergeDAT md = new MergeDAT(inputs, name, desc, cat, version, author, diff, dedup, noDate, forceunpack, old, logger);
 			md.MergeDiff();
 		}
 
@@ -150,14 +207,30 @@ namespace SabreTools
 				A = RomManipulation.Merge(A);
 			}
 
-			if (_diff)
+			// Get the names that will be used
+			if (_name == "")
 			{
-				Output.WriteToDat("diffdat" + (_dedup ? "-merged" : ""), "diffdat" + (_dedup ? "-merged" : ""), "", "", "DiffDat", "SabreTools", false, !RomManipulation.IsXmlDat(_inputs[0]), "", A, _logger);
+				_name = (_diff ? "diffdat" : "mergedat") + (_dedup ? "-merged" : "");
 			}
-			else
+			if (_desc == "")
 			{
-				Output.WriteToDat("combinedat" + (_dedup ? "-merged" : ""), "combinedat" + (_dedup ? "-merged" : ""), "", "", "", "SabreTools", false, !RomManipulation.IsXmlDat(_inputs[0]), "", A, _logger);
+				_desc = (_diff ? "diffdat" : "mergedat") + (_dedup ? "-merged" : "");
+				if (!_noDate)
+				{
+					_desc += " (" + _date + ")";
+				}
 			}
+			if (_cat == "" && _diff)
+			{
+				_cat = "DiffDAT";
+			}
+			if (_author == "")
+			{
+				_author = "SabreTools";
+			}
+
+			// Now write the file out
+			Output.WriteToDat(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, "", A, _logger);
 
 			return true;
 		}

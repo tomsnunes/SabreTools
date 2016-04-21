@@ -89,7 +89,7 @@ Options:
 	url=			URL (source only)
   -cm, --convert-miss
 	-r, --roms		Output roms to miss instead of sets
-		-gp, --game-prefix	Add game name as a prefix to each item
+	-gp, --game-prefix	Add game name as a prefix to each item
 	-pre=, --prefix=	Set prefix to be printed in front of all lines
 	-post=, --postfix=	Set postfix to be printed behind all lines
 	-q, --quotes		Put double-quotes around each item
@@ -165,7 +165,15 @@ Options:
   -h, -?, --help	Show this help dialog
   -l, --log		Enable log to file
   -di, --diff		Switch to diffdat mode
-  -dd, --dedup		Enable deduping in the created DAT");
+  -dd, --dedup		Enable deduping in the created DAT
+  -b, --bare		Don't include date in file name
+  -u, --unzip		Force unzipping in created DAT
+  -o, --old		Output DAT in RV format instead of XML
+  -n=, --name=		Set the name of the DAT
+  -d=, --desc=		Set the description of the DAT
+  -c=, --cat=		Set the category of the DAT
+  -v=, --version=	Set the version of the DAT
+  -a=, --author=	Set the author of the DAT");
 					break;
 				default:
 					Console.Write("This is the default help output");

@@ -30,10 +30,9 @@ namespace SabreTools
 		private bool _noMD5;
 		private bool _noSHA1;
 		private bool _noDate;
-		private bool _forceunzip;
+		private bool _forceunpack;
 		private bool _archivesAsFiles;
 		private bool _old;
-		private bool _log;
 		private bool _superDat;
 
 		// User specified strings
@@ -59,13 +58,13 @@ namespace SabreTools
 		/// <param name="noMD5">True if MD5 hashes should be skipped over, false otherwise</param>
 		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
 		/// <param name="noDate">True if the date should be omitted from the DAT, false otherwise</param>
-		/// <param name="forceunzip">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
+		/// <param name="forceunpack">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
 		/// <param name="archivesAsFiles">True if all archives should be treated like files, false otherwise</param>
 		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
 		/// <param name="superDat">True if SuperDAT mode is enabled, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		public DATFromDir(List<String> inputs, string name, string desc, string cat, string version, string author,
-			bool noMD5, bool noSHA1, bool noDate, bool forceunzip, bool archivesAsFiles, bool old, bool superDat, Logger logger)
+			bool noMD5, bool noSHA1, bool noDate, bool forceunpack, bool archivesAsFiles, bool old, bool superDat, Logger logger)
 		{
 			_inputs = inputs;
 			_name = name;
@@ -76,7 +75,7 @@ namespace SabreTools
 			_noMD5 = noMD5;
 			_noSHA1 = noSHA1;
 			_noDate = noDate;
-			_forceunzip = forceunzip;
+			_forceunpack = forceunpack;
 			_archivesAsFiles = archivesAsFiles;
 			_old = old;
 			_superDat = superDat;
@@ -102,8 +101,8 @@ namespace SabreTools
 			logger.Start();
 
 			// First things first, take care of all of the arguments that this could have
-			bool noMD5 = false, noSHA1 = false, forceunzip = false, allfiles = false, old = false, log = false, superDat = false, noDate = false;
-			string name = "", desc = "", cat = "", version = "", author = "", basePath = "";
+			bool noMD5 = false, noSHA1 = false, forceunpack = false, archivesAsFiles = false, old = false, log = false, superDat = false, noDate = false;
+			string name = "", desc = "", cat = "", version = "", author = "";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
 			{
@@ -129,11 +128,11 @@ namespace SabreTools
 						break;
 					case "-u":
 					case "--unzip":
-						forceunzip = true;
+						forceunpack = true;
 						break;
 					case "-f":
 					case "--files":
-						allfiles = true;
+						archivesAsFiles = true;
 						break;
 					case "-o":
 					case "--old":
@@ -203,7 +202,7 @@ namespace SabreTools
 			}
 
 			// Create a new DATFromDir object and process the inputs
-			DATFromDir dfd = new DATFromDir(inputs, name, desc, cat, version, author, noMD5, noSHA1, noDate, forceunzip, allfiles, old, superDat, logger);
+			DATFromDir dfd = new DATFromDir(inputs, name, desc, cat, version, author, noMD5, noSHA1, noDate, forceunpack, archivesAsFiles, old, superDat, logger);
 			bool success = dfd.Start();
 
 			// If we failed, show the help
@@ -313,7 +312,7 @@ namespace SabreTools
 			_desc = (_desc == "" ? _name + (_noDate ? "" : " (" + _date + ")") : _desc);
 
 			// Now write it all out as a DAT
-			Output.WriteToDat(_name, _desc, _version, _date, _cat, _author, _forceunzip, _old, Environment.CurrentDirectory, _roms, _logger);
+			Output.WriteToDat(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, Environment.CurrentDirectory, _roms, _logger);
 
 			return true;
 		}

@@ -17,13 +17,13 @@ namespace SabreTools.Helper
 		/// <param name="date">Usually the DAT creation date</param>
 		/// <param name="category">Category of the DAT</param>
 		/// <param name="author">DAT author</param>
-		/// <param name="forceunzip">Force all sets to be unzipped</param>
+		/// <param name="forceunpack">Force all sets to be unzipped</param>
 		/// <param name="old">Set output mode to old-style DAT</param>
 		/// <param name="outDir">Set the output directory</param>
 		/// <param name="roms">List of RomData objects representing the games to be written out</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>Tru if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToDat(string name, string description, string version, string date, string category, string author, bool forceunzip, bool old, string outDir, List<RomData> roms, Logger logger)
+		public static bool WriteToDat(string name, string description, string version, string date, string category, string author, bool forceunpack, bool old, string outDir, List<RomData> roms, Logger logger)
 		{
 			// If it's empty, use the current folder
 			if (outDir.Trim() == "")
@@ -51,7 +51,7 @@ namespace SabreTools.Helper
 					"\tversion \"" + HttpUtility.HtmlEncode(version) + "\"\n" +
 					"\tcomment \"\"\n" +
 					"\tauthor \"" + HttpUtility.HtmlEncode(author) + "\"\n" +
-					(forceunzip ? "\tforcezipping no\n" : "") +
+					(forceunpack ? "\tforcezipping no\n" : "") +
 					")\n";
 
 				string header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -64,7 +64,7 @@ namespace SabreTools.Helper
 					"\t\t\t<version>" + HttpUtility.HtmlEncode(version) + "</version>\n" +
 					"\t\t\t<date>" + HttpUtility.HtmlEncode(date) + "</date>\n" +
 					"\t\t\t<author>" + HttpUtility.HtmlEncode(author) + "</author>\n" +
-					(forceunzip ? "\t\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
+					(forceunpack ? "\t\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
 					"\t\t</header>\n";
 
 				// Write the header out

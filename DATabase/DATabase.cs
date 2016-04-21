@@ -226,9 +226,17 @@ namespace SabreTools
 						{
 							url = arg.Split('=')[1];
 						}
-						else
+						else if (File.Exists(arg) || Directory.Exists(arg))
 						{
 							inputs.Add(arg);
+						}
+						else
+						{
+							logger.Warning("Invalid input detected: " + arg);
+							Console.WriteLine();
+							Build.Help();
+							logger.Close();
+							return;
 						}
 						break;
 				}
@@ -995,7 +1003,7 @@ Make a selection:
 		private static void TrimMergeMenu()
 		{
 			string selection = "", input = "", root = "";
-			bool forceunzip = true, rename = true;
+			bool forceunpack = true, rename = true;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
@@ -1006,7 +1014,7 @@ Make a selection:
 
     1) File or folder to process" + (input != "" ? ":\n\t" + input : "") + @"
     2) Root folder for reference" + (root != "" ? ":\n\t" + root : "") + @"
-    3) " + (forceunzip ? "Remove 'forcepacking=\"unzip\"' from output" : "Add 'forcepacking=\"unzip\"' to output") + @"
+    3) " + (forceunpack ? "Remove 'forcepacking=\"unzip\"' from output" : "Add 'forcepacking=\"unzip\"' to output") + @"
     4) " + (rename ? "Disable game renaming" : "Enable game renaming") + @"
     5) Process the file or folder
     B) Go back to the previous menu
@@ -1026,14 +1034,14 @@ Make a selection:
 						root = Console.ReadLine();
 						break;
 					case "3":
-						forceunzip = !forceunzip;
+						forceunpack = !forceunpack;
 						break;
 					case "4":
 						rename = !rename;
 						break;
 					case "5":
 						Console.Clear();
-						InitTrimMerge(input, root, rename, forceunzip);
+						InitTrimMerge(input, root, rename, forceunpack);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
