@@ -112,8 +112,8 @@ namespace SabreTools
 			}
 
 			// Now write the file out accordingly
-			Output.WriteToDat(Path.GetFileNameWithoutExtension(filename),
-				Path.GetFileNameWithoutExtension(filename), "", "", "", "", _forceunpack, !RomManipulation.IsXmlDat(filename), Path.GetDirectoryName(filename), outroms, _logger);
+			Output.WriteToDat(RomManipulation.GetDatName(filename, _logger), RomManipulation.GetDatDescription(filename, _logger),
+				"", "", "", "", _forceunpack, !RomManipulation.IsXmlDat(filename), Path.GetDirectoryName(filename), outroms, _logger);
 
 			// Remove the original file if different and inform the user
 			if (Path.GetExtension(filename) != (RomManipulation.IsXmlDat(filename) ? ".xml" : ".dat"))

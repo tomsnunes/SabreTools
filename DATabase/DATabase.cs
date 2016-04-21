@@ -621,9 +621,7 @@ Make a selection:
 		/// </summary>
 		/// <remarks>
 		/// At an unspecified future date, this will also include the following currently-separate programs:
-		/// - MergeDAT
 		/// - DATFromDir
-		/// - DatToMiss
 		/// </remarks>
 		private static void DatToolsMenu()
 		{

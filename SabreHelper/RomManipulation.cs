@@ -99,10 +99,61 @@ namespace SabreTools.Helper
 			// Get the name from the header
 			if (node != null && node.Name == "header")
 			{
-				name = node.SelectSingleNode("name").InnerText;
+				XmlNode temp = node.SelectSingleNode("name");
+				if (temp != null)
+				{
+					name = temp.InnerText;
+				}
 			}
 
 			return name;
+		}
+
+		/// <summary>
+		/// Get the description of the DAT for external use
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		/// <returns>The internal name of the DAT on success, empty string otherwise</returns>
+		public static string GetDatDescription(string filename, Logger logger)
+		{
+			string desc = "";
+			XmlDocument doc = GetXmlDocument(filename, logger);
+
+			// If the returned document is null, return the blank string
+			if (doc == null)
+			{
+				return desc;
+			}
+
+			// Experimental looping using only XML parsing
+			XmlNode node = doc.FirstChild;
+			if (node != null && node.Name == "xml")
+			{
+				// Skip over everything that's not an element
+				while (node.NodeType != XmlNodeType.Element)
+				{
+					node = node.NextSibling;
+				}
+			}
+
+			// Once we find the main body, enter it
+			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
+			{
+				node = node.FirstChild;
+			}
+
+			// Get the name from the header
+			if (node != null && node.Name == "header")
+			{
+				XmlNode temp = node.SelectSingleNode("description");
+				if (temp != null)
+				{
+					desc = temp.InnerText;
+				}
+			}
+
+			return desc;
 		}
 
 		/// <summary>

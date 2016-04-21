@@ -128,7 +128,7 @@ Options:
 	-c=, --cat=		Set the category of the DAT
 	-v=, --version=		Set the version of the DAT
 	-au=, --author=		Set the author of the DAT
-  -rm, --remove	Remove a system or source from the database
+  -rm, --remove		Remove a system or source from the database
 	system=			System ID
 	source=			Source ID
   -tm, --trim-merge	Consolidate DAT into a single game and trim entries
