@@ -29,11 +29,21 @@ namespace SabreTools
 		private string _date = DateTime.Now.ToString("yyyy-MM-dd");
 		private Logger _logger;
 
+		/// <summary>
+		/// Create a new MergeDAT object
+		/// </summary>
 		/// <param name="inputs">A List of Strings representing the DATs or DAT folders to be merged</param>
+		/// <param name="name">Internal name of the DAT</param>
+		/// <param name="desc">Description and external name of the DAT</param>
+		/// <param name="cat">Category for the DAT</param>
+		/// <param name="version">Version of the DAT</param>
+		/// <param name="author">Author of the DAT</param>
 		/// <param name="diff">True if a DiffDat of all inputs is wanted, false otherwise</param>
 		/// <param name="dedup">True if the outputted file should remove duplicates, false otherwise</param>
+		/// <param name="noDate">True if the date should be omitted from the DAT, false otherwise</param>
+		/// <param name="forceunpack">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
+		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
-
 		public MergeDAT(List<String> inputs, string name, string desc, string cat, string version, string author,
 			bool diff, bool dedup, bool noDate, bool forceunpack, bool old, Logger logger)
 		{
