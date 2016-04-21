@@ -116,7 +116,7 @@ namespace SabreTools
 				"", "", "", "", _forceunpack, !RomManipulation.IsXmlDat(filename), Path.GetDirectoryName(filename), outroms, _logger);
 
 			// Remove the original file if different and inform the user
-			if (Path.GetExtension(filename) != (RomManipulation.IsXmlDat(filename) ? ".xml" : ".dat"))
+			if (filename != RomManipulation.GetDatDescription(filename, _logger) + (RomManipulation.IsXmlDat(filename) ? ".xml" : ".dat"))
 			{
 				try
 				{
