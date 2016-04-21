@@ -167,7 +167,7 @@ namespace SabreTools
 			// If the type is still unmatched, the data can't be imported yet
 			else
 			{
-				_logger.Error("File " + filename + " cannot be imported at this time because it is not a known pattern.\nPlease try again with an unrenamed version.");
+				_logger.Warning("File " + filename + " cannot be imported at this time because it is not a known pattern.\nPlease try again with an unrenamed version.");
 				return false;
 			}
 
@@ -185,7 +185,7 @@ namespace SabreTools
 				case DatType.Good:
 					if (!Remapping.Good.ContainsKey(fileinfo[1].Value))
 					{
-						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection goodInfo = Regex.Match(Remapping.Good[fileinfo[1].Value], _remappedPattern).Groups;
@@ -198,7 +198,7 @@ namespace SabreTools
 				case DatType.MAME:
 					if (!Remapping.MAME.ContainsKey(fileinfo[1].Value))
 					{
-						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection mameInfo = Regex.Match(Remapping.MAME[fileinfo[1].Value], _remappedPattern).Groups;
@@ -211,7 +211,7 @@ namespace SabreTools
 				case DatType.MaybeIntro:
 					if (!Remapping.MaybeIntro.ContainsKey(fileinfo[1].Value))
 					{
-						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection maybeIntroInfo = Regex.Match(Remapping.MaybeIntro[fileinfo[1].Value], _remappedPattern).Groups;
@@ -226,7 +226,7 @@ namespace SabreTools
 				case DatType.NoIntro:
 					if (!Remapping.NoIntro.ContainsKey(fileinfo[1].Value))
 					{
-						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection nointroInfo = Regex.Match(Remapping.NoIntro[fileinfo[1].Value], _remappedPattern).Groups;
@@ -255,7 +255,7 @@ namespace SabreTools
 				case DatType.NonGood:
 					if (!Remapping.NonGood.ContainsKey(fileinfo[1].Value))
 					{
-						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection nonGoodInfo = Regex.Match(Remapping.NonGood[fileinfo[1].Value], _remappedPattern).Groups;
@@ -273,7 +273,7 @@ namespace SabreTools
 
 						if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
 						{
-							_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+							_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 							return false;
 						}
 					}
@@ -308,7 +308,7 @@ namespace SabreTools
 
 							if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
 							{
-								_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+								_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 								return false;
 							}
 						}
@@ -325,7 +325,7 @@ namespace SabreTools
 				case DatType.TruRip:
 					if (!Remapping.TruRip.ContainsKey(fileinfo[1].Value))
 					{
-						_logger.Error("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
+						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
 					GroupCollection truripInfo = Regex.Match(Remapping.TruRip[fileinfo[1].Value], _remappedPattern).Groups;
