@@ -133,7 +133,7 @@ Options:
 	source=			Source ID
   -tm, --trim-merge	Consolidate DAT into a single game and trim entries
 	-rd=, --root-dir=	Set the directory name for path size
-	-nr, --no-rename	Disable single-game mode
+	-nr, --no-rename	Keep game names instead of using '!'
 	-df, --disable-force	Disable forceunzipping
 
 Filenames and directories can't start with a reserved string
