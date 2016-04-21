@@ -12,15 +12,15 @@ Currently, SabreTools consists of the following programs:
 <p/>
 A bare-bones attempt at providing a true GUI experience for the SabreTools suite. Currently only provides the following functions:
 <ul>
-	<li>Importing and Generating DAT files in RomVault and XML formats</li>
+	<li>Importing and Generating DAT files in ClrMamePro and XML formats</li>
 </ul>
 
 <b>DATabase</b>
 <p/>
 The main tool of the SabreTools suite. Performs the majority of the core features of the parent project, including the following:
 <ul>
-	<li>Importing and Generating DAT files in RomVault and XML formats</li>
-	<li>Converting DATs from RomVault to XML format, vice versa, and to missfile (last part formerly <i>DatToMiss</i>; requested by Obiwantje)</li>
+	<li>Importing and Generating DAT files in ClrMamePro and XML formats</li>
+	<li>Converting DATs from ClrMamePro to XML format, vice versa, and to missfile (last part formerly <i>DatToMiss</i>; requested by Obiwantje)</li>
 	<li>Trim DAT entries and optionally merge into a single game (formerly <i>SingleGame</i>; requested by Kludge)</li>
 	<li>Split a DAT using two different file extensions within the DAT (formerly <i>DatSplit</i>)</li>
 	<li>Merge, diff, and dedupe an arbitrary number of DAT files, as long as it's two or more (formerly <i>MergeDAT</i>; requested by Obiwantje and Kludge)
@@ -55,7 +55,7 @@ The saved headers are currently stored in a database; multiple headers allowed p
 This tool doesn't do everything possible for splitting DATs, most of those functions are taken care of by third-party tool <a href="http://www.logiqx.com/Tools/DatUtil/">DatUtil</a>.
 <ul>
 	<li>Split a DAT file using two different file extensions</li>
-	<li>Works with RomVault and Logiqx XML DATs only because of current limitations</li>
+	<li>Works with ClrMamePro and Logiqx XML DATs only because of current limitations</li>
 </ul>
 This is useful for splitting DAT files similar to the NonGood set that can have more than one system per DAT.
 
