@@ -5,7 +5,7 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
-	public class MergeDAT
+	public class MergeDiff
 	{
 		// Listing related variables
 		private List<String> _inputs;
@@ -43,7 +43,7 @@ namespace SabreTools
 		/// <param name="forceunpack">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
 		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public MergeDAT(List<String> inputs, string name, string desc, string cat, string version, string author,
+		public MergeDiff(List<String> inputs, string name, string desc, string cat, string version, string author,
 			bool diff, bool dedup, bool noDate, bool forceunpack, bool old, Logger logger)
 		{
 			_inputs = inputs;
@@ -68,7 +68,7 @@ namespace SabreTools
 		/// TODO: @tractivo -for the A and B and AB output you could let this be determined by comparing the hashes.
 		/// 	when a hash is present in both dats then this entry goes to AB, if its only in A then it stay in A if in B then in B.
 		/// </remarks>
-		public bool MergeDiff()
+		public bool Process()
 		{
 			// Check if there are enough inputs
 			if (_inputs.Count < 0)

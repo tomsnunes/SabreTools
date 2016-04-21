@@ -1404,14 +1404,14 @@ Make a selection:
 						newInputs.Add(Path.GetFullPath(file));
 					}
 				}
-				else
+				else if (File.Exists(input.Replace("\"", "")))
 				{
-					newInputs.Add(input.Replace("\"", ""));
+					newInputs.Add(Path.GetFullPath(input.Replace("\"", "")));
 				}
 			}
 
-			MergeDAT md = new MergeDAT(newInputs, name, desc, cat, version, author, diff, dedup, noDate, forceunpack, old, logger);
-			md.MergeDiff();
+			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, noDate, forceunpack, old, logger);
+			md.Process();
 		}
 
 		/// <summary>
