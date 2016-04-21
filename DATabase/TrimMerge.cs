@@ -112,11 +112,12 @@ namespace SabreTools
 			}
 
 			// Now write the file out accordingly
-			Output.WriteToDat(RomManipulation.GetDatName(filename, _logger), RomManipulation.GetDatDescription(filename, _logger),
-				"", "", "", "", _forceunpack, !RomManipulation.IsXmlDat(filename), Path.GetDirectoryName(filename), outroms, _logger);
+			string datName = RomManipulation.GetDatName(filename, _logger);
+			string datDescription = RomManipulation.GetDatDescription(filename, _logger);
+			Output.WriteToDat(datName, datDescription, "", "", "", "", _forceunpack, !RomManipulation.IsXmlDat(filename), Path.GetDirectoryName(filename), outroms, _logger);
 
 			// Remove the original file if different and inform the user
-			if (filename != RomManipulation.GetDatDescription(filename, _logger) + (RomManipulation.IsXmlDat(filename) ? ".xml" : ".dat"))
+			if (filename != datDescription + (RomManipulation.IsXmlDat(filename) ? ".xml" : ".dat"))
 			{
 				try
 				{
