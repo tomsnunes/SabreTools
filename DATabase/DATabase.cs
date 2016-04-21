@@ -1079,8 +1079,8 @@ Make a selection:
 			{
 				logger.Log("Beginning import of " + filename);
 				Import imp = new Import(filename, _connectionString, logger);
-				imp.ImportData();
-				logger.Log(filename + " imported!");
+				bool success = imp.ImportData();
+				logger.Log(filename + (success ? "" : " not") + " imported!");
 			}
 			// Check to see if the second argument is a directory that exists
 			else if (filename != "" && Directory.Exists(filename))
@@ -1089,8 +1089,8 @@ Make a selection:
 				{
 					logger.Log("Beginning import of " + file);
 					Import imp = new Import(file, _connectionString, logger);
-					imp.ImportData();
-					logger.Log(file + " imported!");
+					bool success = imp.ImportData();
+					logger.Log(file + (success ? "" : " not") + " imported!");
 				}
 			}
 			else
