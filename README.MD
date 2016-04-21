@@ -23,6 +23,15 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 	<li>Converting DATs from RomVault to XML format, vice versa, and to missfile (last part formerly <i>DatToMiss</i>; requested by Obiwantje)</li>
 	<li>Trim DAT entries and optionally merge into a single game (formerly <i>SingleGame</i>; requested by Kludge)</li>
 	<li>Split a DAT using two different file extensions within the DAT (formerly <i>DatSplit</i>)</li>
+	<li>Merge, diff, and dedupe an arbitrary number of DAT files, as long as it's two or more (formerly <i>MergeDAT</i>; requested by Obiwantje and Kludge)
+		<ul>
+			<li>Read in from commandline, drag-and-drop, a directory, or any combination</li>
+			<li>Roms are compared with all information available, so duplicates can exist in the output</li>
+			<li>Output type automatically determined by the first input file</li>
+			<li>Optionally create a DiffDat of the inputted files instead of a straight merge</li>
+			<li>Optionally merge the output DAT so no partial duplicates are included</li>
+		</ul>
+	</li>
 	<li>Add and remove sources and systems from the database</li>
 	<li>Retrieve a list of all sources and systems that are available</li>
 </ul>
@@ -65,16 +74,7 @@ This a versitile Directory to DAT file creator developed to reduce the overhead 
 
 This section is for tools that have been requested for a highly specific purpose and are not generally going to be used by regular users. All of them have a possibility of being included in the main DATabase program eventually.
 
-<b>MergeDAT</b>
-<p/>
-A program to merge (or diff) an arbitrary number of DATs
-<ul>
-	<li>Read in from commandline, drag-and-drop, a directory, or any combination</li>
-	<li>Roms are compared with all information available, so duplicates can exist in the output</li>
-	<li>Output type automatically determined by the first input file</li>
-	<li>Optionally create a DiffDat of the inputted files instead of a straight merge</li>
-	<li>Optionally merge the output DAT so no partial duplicates are included</li>
-</ul>
+<b>There are no tools that are for power users at this time.</b>
 
 <h3>Licensing</h3>
 <p/>
