@@ -9,11 +9,11 @@ namespace SabreTools
 	public class TrimMerge
 	{
 		// Instance variables
-		private static string _filename = "";
-		private static string _path = "";
-		private static bool _rename;
-		private static bool _forceunpack;
-		private static Logger _logger;
+		private string _filename = "";
+		private string _path = "";
+		private bool _rename;
+		private bool _forceunpack;
+		private Logger _logger;
 
 		/// <summary>
 		/// Create a new TrimMerge object
@@ -82,7 +82,7 @@ namespace SabreTools
 		/// <param name="filename">Name of the file to be processed</param>
 		/// <param name="path">The base path to be used for comparison</param>
 		/// <param name="rename">True if roms are to be renamed</param>
-		private static void ProcessDAT(string filename, string path, bool rename)
+		private void ProcessDAT(string filename, string path, bool rename)
 		{
 			List<RomData> roms = RomManipulation.Parse(filename, 0, 0, _logger);
 
