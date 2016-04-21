@@ -100,7 +100,7 @@ namespace SabreTools
 				}
 
 				// Windows max name length is 260
-				int usableLength = 259 - _path.Length;
+				int usableLength = 260 - rom.Game.Length - _path.Length;
 				if (rom.Name.Length > usableLength)
 				{
 					string ext = Path.GetExtension(rom.Name);
