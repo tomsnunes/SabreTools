@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
 using SabreTools.Helper;
 
@@ -62,123 +61,6 @@ namespace SabreTools
 		}
 
 		/// <summary>
-		/// Entry point for MergeDat program
-		/// </summary>
-		/// <param name="args">String array representing command line parameters</param>
-		public static void Main(string[] args)
-		{
-			Console.Clear();
-
-			// Credits take precidence over all
-			if ((new List<string>(args)).Contains("--credits"))
-			{
-				Build.Credits();
-				return;
-			}
-
-			if (args.Length == 0)
-			{
-				Build.Help();
-				return;
-			}
-
-			Logger logger = new Logger(false, "diffdat.log");
-			logger.Start();
-
-			// Output the title
-			Build.Start("MergeDAT");
-
-			List<String> inputs = new List<String>();
-			bool help = false, dedup = false, diff = false, forceunpack = false, old = false, log = false, noDate = false;
-			string name = "", desc = "", cat = "", version = "", author = "";
-			foreach (string arg in args)
-			{
-				switch (arg)
-				{
-					case "-h":
-					case "-?":
-					case "--help":
-						Build.Help();
-						logger.Close();
-						return;
-					case "-di":
-					case "--diff":
-						diff = true;
-						break;
-					case "-dd":
-					case "--dedup":
-						dedup = true;
-						break;
-					case "-b":
-					case "--bare":
-						noDate = true;
-						break;
-					case "-u":
-					case "--unzip":
-						forceunpack = true;
-						break;
-					case "-o":
-					case "--old":
-						old = true;
-						break;
-					case "-l":
-					case "--log":
-						log = true;
-						break;
-					default:
-						if (arg.StartsWith("-n=") || arg.StartsWith("--name="))
-						{
-							name = arg.Split('=')[1];
-						}
-						else if (arg.StartsWith("-d=") || arg.StartsWith("--desc="))
-						{
-							desc = arg.Split('=')[1];
-						}
-						else if (arg.StartsWith("-c=") || arg.StartsWith("--cat="))
-						{
-							cat = arg.Split('=')[1];
-						}
-						else if (arg.StartsWith("-a=") || arg.StartsWith("--author="))
-						{
-							author = arg.Split('=')[1];
-						}
-						else if (arg.StartsWith("-v=") || arg.StartsWith("--version="))
-						{
-							version = arg.Split('=')[1];
-						}
-						// Add actual files to the list of inputs
-						else if (File.Exists(arg.Replace("\"", "")))
-						{
-							inputs.Add(Path.GetFullPath(arg.Replace("\"", "")));
-						}
-						else if (Directory.Exists(arg.Replace("\"", "")))
-						{
-							foreach (string file in Directory.EnumerateFiles(arg, "*", SearchOption.AllDirectories))
-							{
-								inputs.Add(Path.GetFullPath(file));
-							}
-						}
-						break;
-				}
-			}
-
-			// Set the possibly new value for logger
-			logger.ToFile = log;
-
-			// Show help if explicitly asked for it or if not enough files are supplied
-			if (help || inputs.Count < 2)
-			{
-				Build.Help();
-				logger.Close();
-				return;
-			}
-
-			// Otherwise, read in the files, process them and write the result to the file type that the first one is
-			MergeDAT md = new MergeDAT(inputs, name, desc, cat, version, author, diff, dedup, noDate, forceunpack, old, logger);
-			md.MergeDiff();
-		}
-
-		/// <summary>
 		/// Combine DATs, optionally diffing and deduping them
 		/// </summary>
 		/// <returns>True if the DATs merged correctly, false otherwise</returns>
@@ -188,10 +70,10 @@ namespace SabreTools
 		/// </remarks>
 		public bool MergeDiff()
 		{
-			// Check if there are any inputs
-			if (_inputs.Count == 0)
+			// Check if there are enough inputs
+			if (_inputs.Count < 0)
 			{
-				_logger.Warning("No inputs were found!");
+				_logger.Warning("At least inputs are required!");
 				return false;
 			}
 

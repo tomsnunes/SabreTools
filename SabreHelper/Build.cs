@@ -116,7 +116,18 @@ Options:
   -i, --import		Start tool in import mode
   -l, --log		Enable logging of program output
   -lso, --list-sources	List all sources (id <= name)
-  -lsy, --list-systems	List all systems (id <= name)
+  -lsy, --list-systems	List all systems (id <= name)\
+  -m, --merge		Merge two or more DATs
+	-di, --diff		Switch to diffdat mode
+	-dd, --dedup		Enable deduping in the created DAT
+	-b, --bare		Don't include date in file name
+	-u, --unzip		Force unzipping in created DAT
+	-o, --old		Output DAT in CMP format instead of XML
+	-n=, --name=		Set the name of the DAT
+	-d=, --desc=		Set the description of the DAT
+	-c=, --cat=		Set the category of the DAT
+	-v=, --version=	Set the version of the DAT
+	-au=, --author=	Set the author of the DAT
   -rm, --remove	Remove a system or source from the database
 	system=			System ID
 	source=			Source ID
@@ -155,28 +166,9 @@ Options:
   -d=, --desc=		Set the description of the DAT
   -c=, --cat=		Set the category of the DAT
   -v=, --version=	Set the version of the DAT
-  -a=, --author=	Set the author of the DAT
+  -au=, --author=	Set the author of the DAT
   -l, --log		Enable log to file
   -sd, --superdat	Enable SuperDAT creation");
-					break;
-				case "MergeDAT":
-					Console.WriteLine(@"MergeDAT - Merge two or more DATs
------------------------------------------
-Usage: MergeDAT [options] [filename|dirname] <filename|dirname> ...
-
-Options:
-  -h, -?, --help	Show this help dialog
-  -l, --log		Enable log to file
-  -di, --diff		Switch to diffdat mode
-  -dd, --dedup		Enable deduping in the created DAT
-  -b, --bare		Don't include date in file name
-  -u, --unzip		Force unzipping in created DAT
-  -o, --old		Output DAT in CMP format instead of XML
-  -n=, --name=		Set the name of the DAT
-  -d=, --desc=		Set the description of the DAT
-  -c=, --cat=		Set the category of the DAT
-  -v=, --version=	Set the version of the DAT
-  -a=, --author=	Set the author of the DAT");
 					break;
 				default:
 					Console.Write("This is the default help output");

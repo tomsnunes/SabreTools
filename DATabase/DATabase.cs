@@ -51,18 +51,24 @@ namespace SabreTools
 			// Set all default values
 			bool help = false,
 				add = false,
+				bare = false,
 				convertMiss = false,
 				convertCMP = false,
 				convertXml = false,
+				dedup = false,
+				diff = false,
 				gamename = false,
 				disableForce = false,
 				extsplit = false,
+				forceunpack = false,
 				generate = false,
 				genall = false,
 				import = false,
 				log = false,
 				listsrc = false,
 				listsys = false,
+				merge = false,
+				noDate = false,
 				norename = false,
 				old = false,
 				quotes = false,
@@ -71,8 +77,12 @@ namespace SabreTools
 				skip = false,
 				usegame = true;
 			string addext = "",
+				author = "",
+				cat = "",
+				desc = "",
 				exta = "",
 				extb = "",
+				name = "",
 				manu = "",
 				outdir = "",
 				postfix = "",
@@ -81,7 +91,8 @@ namespace SabreTools
 				sources = "",
 				systems = "",
 				root = "",
-				url = "";
+				url = "",
+				version = "";
 			List<string> inputs = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
@@ -98,6 +109,10 @@ namespace SabreTools
 					case "--add":
 						add = true;
 						break;
+					case "-b":
+					case "--bare":
+						noDate = true;
+						break;
 					case "-cc":
 					case "--convert-cmp":
 						convertCMP = true;
@@ -110,9 +125,17 @@ namespace SabreTools
 					case "--convert-xml":
 						convertXml = true;
 						break;
+					case "-dd":
+					case "--dedup":
+						dedup = true;
+						break;
 					case "-df":
 					case "--disable-force":
 						disableForce = true;
+						break;
+					case "-di":
+					case "--diff":
+						diff = true;
 						break;
 					case "-es":
 					case "--ext-split":
@@ -146,6 +169,10 @@ namespace SabreTools
 					case "--list-systems":
 						listsys = true;
 						break;
+					case "-m":
+					case "--merge":
+						merge = true;
+						break;
 					case "-nr":
 					case "--no-rename":
 						norename = true;
@@ -173,10 +200,26 @@ namespace SabreTools
 					case "--trim-merge":
 						trim = true;
 						break;
+					case "-u":
+					case "--unzip":
+						forceunpack = true;
+						break;
 					default:
 						if (arg.StartsWith("-ae=") || arg.StartsWith("--add-ext="))
 						{
 							addext = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-au=") || arg.StartsWith("--author="))
+						{
+							author = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-c=") || arg.StartsWith("--cat="))
+						{
+							cat = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-d=") || arg.StartsWith("--desc="))
+						{
+							desc = arg.Split('=')[1];
 						}
 						else if (arg.StartsWith("exta="))
 						{
@@ -193,6 +236,10 @@ namespace SabreTools
 						else if (arg.StartsWith("manu=") && manu == "")
 						{
 							manu = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-n=") || arg.StartsWith("--name="))
+						{
+							name = arg.Split('=')[1];
 						}
 						else if (arg.StartsWith("out=") && outdir == "")
 						{
@@ -226,6 +273,10 @@ namespace SabreTools
 						{
 							url = arg.Split('=')[1];
 						}
+						else if (arg.StartsWith("-v=") || arg.StartsWith("--version="))
+						{
+							version = arg.Split('=')[1];
+						}
 						else if (File.Exists(arg) || Directory.Exists(arg))
 						{
 							inputs.Add(arg);
@@ -249,7 +300,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(add ^ convertMiss ^ convertCMP ^ convertXml ^ extsplit ^ generate ^ genall ^ import ^ listsrc ^ listsys ^ rem ^ trim))
+			if (help || !(add ^ convertMiss ^ convertCMP ^ convertXml ^ extsplit ^ generate ^ genall ^ import ^ listsrc ^ listsys ^ merge ^ rem ^ trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -257,7 +308,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (convertMiss || convertCMP || convertXml || extsplit || import || trim))
+			if (inputs.Count == 0 && (convertMiss || convertCMP || convertXml || extsplit || import || merge || trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -381,9 +432,17 @@ namespace SabreTools
 				}
 			}
 
+			// Merge, diff, and dedupe at least 2 DATs
+			else if (merge)
+			{
+				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, noDate, forceunpack, old);
+			}
+
 			logger.Close();
 			return;
 		}
+
+		#region Menus
 
 		/// <summary>
 		/// Show the text-based main menu
@@ -473,7 +532,7 @@ Make a selection:
 			{
 				Console.Clear();
 				Build.Start("DATabase");
-				Console.WriteLine( @"IMPORT MENU
+				Console.WriteLine(@"IMPORT MENU
 ===========================
 Enter the name of a DAT file or folder containing DAT files
 or 'b' to go back to the previous menu:");
@@ -485,43 +544,6 @@ or 'b' to go back to the previous menu:");
 					Console.Write("\nPress any key to continue...");
 					Console.ReadKey();
 				}
-			}
-			return;
-		}
-
-		/// <summary>
-		/// Wrap importing a file or folder into the database
-		/// </summary>
-		/// <param name="filename">File or folder to be imported</param>
-		private static void InitImport(string filename)
-		{
-			Console.Clear();
-
-			// Drag and drop means quotes; we don't want quotes
-			filename = filename.Replace("\"", "");
-
-			// Check to see if the second argument is a file that exists
-			if (filename != "" && File.Exists(filename))
-			{
-				logger.Log("Beginning import of " + filename);
-				Import imp = new Import(filename, _connectionString, logger);
-				imp.ImportData();
-				logger.Log(filename + " imported!");
-			}
-			// Check to see if the second argument is a directory that exists
-			else if (filename != "" && Directory.Exists(filename))
-			{
-				foreach (string file in Directory.GetFiles(filename, "*", SearchOption.AllDirectories))
-				{
-					logger.Log("Beginning import of " + file);
-					Import imp = new Import(file, _connectionString, logger);
-					imp.ImportData();
-					logger.Log(file + " imported!");
-				}
-			}
-			else
-			{
-				logger.Error("I'm sorry but " + filename + " doesn't exist!");
 			}
 			return;
 		}
@@ -590,6 +612,397 @@ Make a selection:
 						Console.ReadKey();
 						break;
 				}
+			}
+			return;
+		}
+
+		/// <summary>
+		/// Show the text-based DAT tools menu
+		/// </summary>
+		/// <remarks>
+		/// At an unspecified future date, this will also include the following currently-separate programs:
+		/// - MergeDAT
+		/// - DATFromDir
+		/// - DatToMiss
+		/// </remarks>
+		private static void DatToolsMenu()
+		{
+			string selection = "";
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"DAT TOOLS MENU
+===========================
+Make a selection:
+
+    1) Convert XML DAT to CMP
+    2) Convert CMP DAT to XML
+    3) Convert DAT to missfile
+    4) Trim all entries in DAT and merge into a single game
+    5) Split DAT using 2 extensions
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						ConvertCMPMenu();
+						break;
+					case "2":
+						ConvertXMLMenu();
+						break;
+					case "3":
+						ConvertMissMenu();
+						break;
+					case "4":
+						TrimMergeMenu();
+						break;
+					case "5":
+						ExtSplitMenu();
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Show the text-based XML to CMP conversion menu
+		/// </summary>
+		private static void ConvertCMPMenu()
+		{
+			string selection = "";
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"XML -> CMP CONVERT MENU
+===========================
+Enter the name of a DAT file to convert from XML to CMP
+or 'b' to go back to the previous menu:
+");
+				selection = Console.ReadLine();
+				if (selection.ToLowerInvariant() != "b")
+				{
+					Console.Clear();
+					InitConvertCMP(selection);
+					Console.Write("\nPress any key to continue...");
+					Console.ReadKey();
+				}
+			}
+			return;
+		}
+
+		/// <summary>
+		/// Show the text-based CMP to XML conversion menu
+		/// </summary>
+		private static void ConvertXMLMenu()
+		{
+			string selection = "";
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"CMP -> XML CONVERT MENU
+===========================
+Enter the name of a DAT file to convert from CMP to XML
+or 'b' to go back to the previous menu:
+");
+				selection = Console.ReadLine();
+				if (selection.ToLowerInvariant() != "b")
+				{
+					Console.Clear();
+					InitConvertXML(selection);
+					Console.Write("\nPress any key to continue...");
+					Console.ReadKey();
+				}
+			}
+			return;
+		}
+
+		/// <summary>
+		/// Show the text-based DAT to missfile conversion menu
+		/// </summary>
+		private static void ConvertMissMenu()
+		{
+			string selection = "", input = "", prefix = "", postfix = "", addext = "", repext = "";
+			bool usegame = true, quotes = false, gamename = false;
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"DAT -> MISS CONVERT MENU
+===========================
+Make a selection:
+
+    1) File to convert" + (input != "" ? ":\n\t" + input : "") + @"
+    2) " + (usegame ? "Output roms instead of games" : "Output games instead of roms") + @"
+    3) Prefix to add to each line" + (prefix != "" ? ":\n\t" + prefix : "") + @"
+    4) Postfix to add to each line" + (postfix != "" ? ":\n\t" + postfix : "") + @"
+    5) " + (quotes ? "Don't add quotes around each item" : "Add quotes around each item") + @"
+    6) Replace all extensions with another" + (repext != "" ? ":\t" + repext : "") + @"
+    7) Add extensions to each item" + (addext != "" ? ":\n\t" + addext : "") + @"
+" + (!usegame ? "    8) " + (gamename ? "Don't add game name before every item" : "Add game name before every item") + "\n" : "") +
+@"    9) Begin conversion
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						Console.Clear();
+						Console.Write("Please enter the file name: ");
+						input = Console.ReadLine();
+						break;
+					case "2":
+						usegame = !usegame;
+						break;
+					case "3":
+						Console.Clear();
+						Console.Write("Please enter the prefix: ");
+						prefix = Console.ReadLine();
+						break;
+					case "4":
+						Console.Clear();
+						Console.Write("Please enter the postfix: ");
+						postfix = Console.ReadLine();
+						break;
+					case "5":
+						quotes = !quotes;
+						break;
+					case "6":
+						Console.Clear();
+						Console.Write("Please enter the replacement extension: ");
+						repext = Console.ReadLine();
+						break;
+					case "7":
+						Console.Clear();
+						Console.Write("Please enter the additional extension: ");
+						addext = Console.ReadLine();
+						break;
+					case "8":
+						gamename = !gamename;
+						break;
+					case "9":
+						Console.Clear();
+						InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Show the text-based TrimMerge menu
+		/// </summary>
+		private static void TrimMergeMenu()
+		{
+			string selection = "", input = "", root = "";
+			bool forceunpack = true, rename = true;
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"DAT TRIM MENU
+===========================
+Make a selection:
+
+    1) File or folder to process" + (input != "" ? ":\n\t" + input : "") + @"
+    2) Root folder for reference" + (root != "" ? ":\n\t" + root : "") + @"
+    3) " + (forceunpack ? "Remove 'forcepacking=\"unzip\"' from output" : "Add 'forcepacking=\"unzip\"' to output") + @"
+    4) " + (rename ? "Disable game renaming" : "Enable game renaming") + @"
+    5) Process the file or folder
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						Console.Clear();
+						Console.Write("Please enter the file or folder name: ");
+						input = Console.ReadLine();
+						break;
+					case "2":
+						Console.Clear();
+						Console.Write("Please enter the root folder name: ");
+						root = Console.ReadLine();
+						break;
+					case "3":
+						forceunpack = !forceunpack;
+						break;
+					case "4":
+						rename = !rename;
+						break;
+					case "5":
+						Console.Clear();
+						InitTrimMerge(input, root, rename, forceunpack);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Show the text-based ExtSplit menu
+		/// </summary>
+		private static void ExtSplitMenu()
+		{
+			string selection = "", input = "", exta = "", extb = "", outdir = "";
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"EXTENSION SPLIT MENU
+===========================
+Make a selection:
+
+    1) File to split" + (input != "" ? ":\n\t" + input : "") + @"
+    2) First file extension" + (exta != "" ? ":\t" + exta : "") + @"
+    3) Second file extension" + (extb != "" ? ":\t" + extb : "") + @"
+    4) Output directory" + (outdir != "" ? ":\n\t" + outdir : "") + @"
+    5) Split the file
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						Console.Clear();
+						Console.Write("Please enter the file name: ");
+						input = Console.ReadLine();
+						break;
+					case "2":
+						Console.Clear();
+						Console.Write("Please enter the first extension: ");
+						exta = Console.ReadLine();
+						break;
+					case "3":
+						Console.Clear();
+						Console.Write("Please enter the second extension: ");
+						extb = Console.ReadLine();
+						break;
+					case "4":
+						Console.Clear();
+						Console.Write("Please enter the output directory: ");
+						exta = Console.ReadLine();
+						break;
+					case "5":
+						Console.Clear();
+						InitExtSplit(input, exta, extb, outdir);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Show the text-based add and remove menu
+		/// </summary>
+		private static void AddRemoveMenu()
+		{
+			string selection = "", manufacturer = "", system = "", name = "", url = "";
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"ADD AND REMOVE MENU
+===========================
+Make a selection:
+
+    1) Add a source
+    2) Remove a source
+    3) Add a system
+    4) Remove a system
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						Console.Clear();
+						Console.Write("Please enter the source name: ");
+						name = Console.ReadLine();
+						Console.Write("\nPlease enter the source URL: ");
+						url = Console.ReadLine();
+						InitAddSource(name, url);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+					case "2":
+						Console.Clear();
+						ListSources(true);
+						Console.Write("Please enter the source: ");
+						InitRemoveSource(Console.ReadLine());
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+					case "3":
+						Console.Clear();
+						Console.Write("Please enter the manufacturer: ");
+						manufacturer = Console.ReadLine();
+						Console.Write("\nPlease enter the system: ");
+						system = Console.ReadLine();
+						InitAddSystem(manufacturer, system);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+					case "4":
+						Console.Clear();
+						ListSystems(true);
+						Console.Write("Please enter the system: ");
+						InitRemoveSystem(Console.ReadLine());
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
+				}
+			}
+			return;
+		}
+
+		#endregion
+
+		#region Init Methods
+
+		/// <summary>
+		/// Wrap importing a file or folder into the database
+		/// </summary>
+		/// <param name="filename">File or folder to be imported</param>
+		private static void InitImport(string filename)
+		{
+			Console.Clear();
+
+			// Drag and drop means quotes; we don't want quotes
+			filename = filename.Replace("\"", "");
+
+			// Check to see if the second argument is a file that exists
+			if (filename != "" && File.Exists(filename))
+			{
+				logger.Log("Beginning import of " + filename);
+				Import imp = new Import(filename, _connectionString, logger);
+				imp.ImportData();
+				logger.Log(filename + " imported!");
+			}
+			// Check to see if the second argument is a directory that exists
+			else if (filename != "" && Directory.Exists(filename))
+			{
+				foreach (string file in Directory.GetFiles(filename, "*", SearchOption.AllDirectories))
+				{
+					logger.Log("Beginning import of " + file);
+					Import imp = new Import(file, _connectionString, logger);
+					imp.ImportData();
+					logger.Log(file + " imported!");
+				}
+			}
+			else
+			{
+				logger.Error("I'm sorry but " + filename + " doesn't exist!");
 			}
 			return;
 		}
@@ -725,83 +1138,6 @@ Make a selection:
 		}
 
 		/// <summary>
-		/// Show the text-based DAT tools menu
-		/// </summary>
-		/// <remarks>
-		/// At an unspecified future date, this will also include the following currently-separate programs:
-		/// - MergeDAT
-		/// - DATFromDir
-		/// - DatToMiss
-		/// </remarks>
-		private static void DatToolsMenu()
-		{
-			string selection = "";
-			while (selection.ToLowerInvariant() != "b")
-			{
-				Console.Clear();
-				Build.Start("DATabase");
-				Console.WriteLine(@"DAT TOOLS MENU
-===========================
-Make a selection:
-
-    1) Convert XML DAT to CMP
-    2) Convert CMP DAT to XML
-    3) Convert DAT to missfile
-    4) Trim all entries in DAT and merge into a single game
-    5) Split DAT using 2 extensions
-    B) Go back to the previous menu
-");
-				Console.Write("Enter selection: ");
-				selection = Console.ReadLine();
-				switch (selection)
-				{
-					case "1":
-						ConvertCMPMenu();
-						break;
-					case "2":
-						ConvertXMLMenu();
-						break;
-					case "3":
-						ConvertMissMenu();
-						break;
-					case "4":
-						TrimMergeMenu();
-						break;
-					case "5":
-						ExtSplitMenu();
-						break;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Show the text-based XML to CMP conversion menu
-		/// </summary>
-		private static void ConvertCMPMenu()
-		{
-			string selection = "";
-			while (selection.ToLowerInvariant() != "b")
-			{
-				Console.Clear();
-				Build.Start("DATabase");
-				Console.WriteLine(@"XML -> CMP CONVERT MENU
-===========================
-Enter the name of a DAT file to convert from XML to CMP
-or 'b' to go back to the previous menu:
-");
-				selection = Console.ReadLine();
-				if (selection.ToLowerInvariant() != "b")
-				{
-					Console.Clear();
-					InitConvertCMP(selection);
-					Console.Write("\nPress any key to continue...");
-					Console.ReadKey();
-				}
-			}
-			return;
-		}
-
-		/// <summary>
 		/// Wrap converting DAT file from XML to ClrMamePro
 		/// </summary>
 		/// <param name="filename"></param>
@@ -835,33 +1171,6 @@ or 'b' to go back to the previous menu:
 		}
 
 		/// <summary>
-		/// Show the text-based CMP to XML conversion menu
-		/// </summary>
-		private static void ConvertXMLMenu()
-		{
-			string selection = "";
-			while (selection.ToLowerInvariant() != "b")
-			{
-				Console.Clear();
-				Build.Start("DATabase");
-				Console.WriteLine(@"CMP -> XML CONVERT MENU
-===========================
-Enter the name of a DAT file to convert from CMP to XML
-or 'b' to go back to the previous menu:
-");
-				selection = Console.ReadLine();
-				if (selection.ToLowerInvariant() != "b")
-				{
-					Console.Clear();
-					InitConvertXML(selection);
-					Console.Write("\nPress any key to continue...");
-					Console.ReadKey();
-				}
-			}
-			return;
-		}
-
-		/// <summary>
 		/// Wrap converting DAT file from ClrMamePro to XML
 		/// </summary>
 		/// <param name="filename"></param>
@@ -885,80 +1194,6 @@ or 'b' to go back to the previous menu:
 				logger.Error("I'm sorry but " + filename + "doesn't exist!");
 			}
 			return;
-		}
-
-		/// <summary>
-		/// Show the text-based DAT to missfile conversion menu
-		/// </summary>
-		private static void ConvertMissMenu()
-		{
-			string selection = "", input = "", prefix = "", postfix = "", addext = "", repext = "";
-			bool usegame = true, quotes = false, gamename = false;
-			while (selection.ToLowerInvariant() != "b")
-			{
-				Console.Clear();
-				Build.Start("DATabase");
-				Console.WriteLine(@"DAT -> MISS CONVERT MENU
-===========================
-Make a selection:
-
-    1) File to convert" + (input != "" ? ":\n\t" + input : "") + @"
-    2) " + (usegame ? "Output roms instead of games" : "Output games instead of roms") + @"
-    3) Prefix to add to each line" + (prefix != "" ? ":\n\t" + prefix : "") + @"
-    4) Postfix to add to each line" + (postfix != "" ? ":\n\t" + postfix : "") + @"
-    5) " + (quotes ? "Don't add quotes around each item" : "Add quotes around each item") + @"
-    6) Replace all extensions with another" + (repext != "" ? ":\t" + repext : "") + @"
-    7) Add extensions to each item" + (addext != "" ? ":\n\t" + addext : "") + @"
-" + (!usegame ? "    8) " + (gamename ? "Don't add game name before every item" : "Add game name before every item") + "\n" : "") +
-@"    9) Begin conversion
-    B) Go back to the previous menu
-");
-				Console.Write("Enter selection: ");
-				selection = Console.ReadLine();
-				switch (selection)
-				{
-					case "1":
-						Console.Clear();
-						Console.Write("Please enter the file name: ");
-						input = Console.ReadLine();
-						break;
-					case "2":
-						usegame = !usegame;
-						break;
-					case "3":
-						Console.Clear();
-						Console.Write("Please enter the prefix: ");
-						prefix = Console.ReadLine();
-						break;
-					case "4":
-						Console.Clear();
-						Console.Write("Please enter the postfix: ");
-						postfix = Console.ReadLine();
-						break;
-					case "5":
-						quotes = !quotes;
-						break;
-					case "6":
-						Console.Clear();
-						Console.Write("Please enter the replacement extension: ");
-						repext = Console.ReadLine();
-						break;
-					case "7":
-						Console.Clear();
-						Console.Write("Please enter the additional extension: ");
-						addext = Console.ReadLine();
-						break;
-					case "8":
-						gamename = !gamename;
-						break;
-					case "9":
-						Console.Clear();
-						InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename);
-						Console.Write("\nPress any key to continue...");
-						Console.ReadKey();
-						break;
-				}
-			}
 		}
 
 		/// <summary>
@@ -998,58 +1233,6 @@ Make a selection:
 		}
 
 		/// <summary>
-		/// Show the text-based TrimMerge menu
-		/// </summary>
-		private static void TrimMergeMenu()
-		{
-			string selection = "", input = "", root = "";
-			bool forceunpack = true, rename = true;
-			while (selection.ToLowerInvariant() != "b")
-			{
-				Console.Clear();
-				Build.Start("DATabase");
-				Console.WriteLine(@"DAT TRIM MENU
-===========================
-Make a selection:
-
-    1) File or folder to process" + (input != "" ? ":\n\t" + input : "") + @"
-    2) Root folder for reference" + (root != "" ? ":\n\t" + root : "") + @"
-    3) " + (forceunpack ? "Remove 'forcepacking=\"unzip\"' from output" : "Add 'forcepacking=\"unzip\"' to output") + @"
-    4) " + (rename ? "Disable game renaming" : "Enable game renaming") + @"
-    5) Process the file or folder
-    B) Go back to the previous menu
-");
-				Console.Write("Enter selection: ");
-				selection = Console.ReadLine();
-				switch (selection)
-				{
-					case "1":
-						Console.Clear();
-						Console.Write("Please enter the file or folder name: ");
-						input = Console.ReadLine();
-						break;
-					case "2":
-						Console.Clear();
-						Console.Write("Please enter the root folder name: ");
-						root = Console.ReadLine();
-						break;
-					case "3":
-						forceunpack = !forceunpack;
-						break;
-					case "4":
-						rename = !rename;
-						break;
-					case "5":
-						Console.Clear();
-						InitTrimMerge(input, root, rename, forceunpack);
-						Console.Write("\nPress any key to continue...");
-						Console.ReadKey();
-						break;
-				}
-			}
-		}
-
-		/// <summary>
 		/// Wrap trimming and merging a single DAT
 		/// </summary>
 		/// <param name="input">Input file or folder to be converted</param>
@@ -1066,61 +1249,6 @@ Make a selection:
 				TrimMerge sg = new TrimMerge(input, root, rename, force, logger);
 				sg.Process();
 				return;
-			}
-		}
-
-		/// <summary>
-		/// Show the text-based ExtSplit menu
-		/// </summary>
-		private static void ExtSplitMenu()
-		{
-			string selection = "", input = "", exta = "", extb = "", outdir = "";
-			while (selection.ToLowerInvariant() != "b")
-			{
-				Console.Clear();
-				Build.Start("DATabase");
-				Console.WriteLine(@"EXTENSION SPLIT MENU
-===========================
-Make a selection:
-
-    1) File to split" + (input != "" ? ":\n\t" + input : "") + @"
-    2) First file extension" + (exta != "" ? ":\t" + exta : "") + @"
-    3) Second file extension" + (extb != "" ? ":\t" + extb : "") + @"
-    4) Output directory" + (outdir != "" ? ":\n\t" + outdir : "") + @"
-    5) Split the file
-    B) Go back to the previous menu
-");
-				Console.Write("Enter selection: ");
-				selection = Console.ReadLine();
-				switch (selection)
-				{
-					case "1":
-						Console.Clear();
-						Console.Write("Please enter the file name: ");
-						input = Console.ReadLine();
-						break;
-					case "2":
-						Console.Clear();
-						Console.Write("Please enter the first extension: ");
-						exta = Console.ReadLine();
-						break;
-					case "3":
-						Console.Clear();
-						Console.Write("Please enter the second extension: ");
-						extb = Console.ReadLine();
-						break;
-					case "4":
-						Console.Clear();
-						Console.Write("Please enter the output directory: ");
-						exta = Console.ReadLine();
-						break;
-					case "5":
-						Console.Clear();
-						InitExtSplit(input, exta, extb, outdir);
-						Console.Write("\nPress any key to continue...");
-						Console.ReadKey();
-						break;
-				}
 			}
 		}
 
@@ -1157,138 +1285,41 @@ Make a selection:
 		}
 
 		/// <summary>
-		/// List sources in the database
+		/// Wrap merging, diffing, and deduping 2 or mor DATs
 		/// </summary>
-		/// <param name="all">True to list all sources regardless if there is a game associated or not</param>
-		private static void ListSources(bool all = false)
+		/// <param name="inputs">List of files and directories to be merged</param>
+		/// <param name="inputs">A List of Strings representing the DATs or DAT folders to be merged</param>
+		/// <param name="name">Internal name of the DAT</param>
+		/// <param name="desc">Description and external name of the DAT</param>
+		/// <param name="cat">Category for the DAT</param>
+		/// <param name="version">Version of the DAT</param>
+		/// <param name="author">Author of the DAT</param>
+		/// <param name="diff">True if a DiffDat of all inputs is wanted, false otherwise</param>
+		/// <param name="dedup">True if the outputted file should remove duplicates, false otherwise</param>
+		/// <param name="noDate">True if the date should be omitted from the DAT, false otherwise</param>
+		/// <param name="forceunpack">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
+		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
+		private static void InitMergeDiff(List<string> inputs, string name, string desc, string cat, string version, string author, bool diff, bool dedup, bool noDate, bool forceunpack, bool old)
 		{
-			string query = @"
-SELECT DISTINCT sources.id, sources.name
-FROM sources " + (!all ? "JOIN games on sources.id=games.source" : "") + @"
-ORDER BY sources.name COLLATE NOCASE";
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			// Make sure there are no folders in inputs
+			List<string> newInputs = new List<string>();
+			foreach (string input in inputs)
 			{
-				dbc.Open();
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
+				if (Directory.Exists(input.Replace("\"", "")))
 				{
-					using (SqliteDataReader sldr = slc.ExecuteReader())
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						// If nothing is found, tell the user and exit
-						if (!sldr.HasRows)
-						{
-							logger.Warning("No sources found! Please add a source and then try again.");
-							return;
-						}
-
-						Console.WriteLine("Available Sources (id <= name):\n");
-						while (sldr.Read())
-						{
-							Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1));
-						}
+						newInputs.Add(Path.GetFullPath(file));
 					}
 				}
-			}
-			return;
-		}
-
-		/// <summary>
-		/// List systems in the database
-		/// </summary>
-		/// <param name="all">True to list all systems regardless if there is a game associated or not</param>
-		private static void ListSystems(bool all = false)
-		{
-			string query = @"
-SELECT DISTINCT systems.id, systems.manufacturer, systems.system
-FROM systems " + (!all ? "JOIN games ON systems.id=games.system" : "") + @"
-ORDER BY systems.manufacturer, systems.system";
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
-			{
-				dbc.Open();
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
+				else
 				{
-					using (SqliteDataReader sldr = slc.ExecuteReader())
-					{
-						// If nothing is found, tell the user and exit
-						if (!sldr.HasRows)
-						{
-							logger.Warning("No systems found! Please add a system and then try again.");
-							return;
-						}
-
-						Console.WriteLine("Available Systems (id <= name):\n");
-						while (sldr.Read())
-						{
-							Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1) + " - " + sldr.GetString(2));
-						}
-					}
+					newInputs.Add(input.Replace("\"", ""));
 				}
 			}
-			return;
-		}
 
-		/// <summary>
-		/// Show the text-based add and remove menu
-		/// </summary>
-		private static void AddRemoveMenu()
-		{
-			string selection = "", manufacturer = "", system = "", name = "", url = "";
-			while (selection.ToLowerInvariant() != "b")
-			{
-				Console.Clear();
-				Build.Start("DATabase");
-				Console.WriteLine(@"ADD AND REMOVE MENU
-===========================
-Make a selection:
-
-    1) Add a source
-    2) Remove a source
-    3) Add a system
-    4) Remove a system
-    B) Go back to the previous menu
-");
-				Console.Write("Enter selection: ");
-				selection = Console.ReadLine();
-				switch (selection)
-				{
-					case "1":
-						Console.Clear();
-						Console.Write("Please enter the source name: ");
-						name = Console.ReadLine();
-						Console.Write("\nPlease enter the source URL: ");
-						url = Console.ReadLine();
-						InitAddSource(name, url);
-						Console.Write("\nPress any key to continue...");
-						Console.ReadKey();
-						break;
-					case "2":
-						Console.Clear();
-						ListSources(true);
-						Console.Write("Please enter the source: ");
-						InitRemoveSource(Console.ReadLine());
-						Console.Write("\nPress any key to continue...");
-						Console.ReadKey();
-						break;
-					case "3":
-						Console.Clear();
-						Console.Write("Please enter the manufacturer: ");
-						manufacturer = Console.ReadLine();
-						Console.Write("\nPlease enter the system: ");
-						system = Console.ReadLine();
-						InitAddSystem(manufacturer, system);
-						Console.Write("\nPress any key to continue...");
-						Console.ReadKey();
-						break;
-					case "4":
-						Console.Clear();
-						ListSystems(true);
-						Console.Write("Please enter the system: ");
-						InitRemoveSystem(Console.ReadLine());
-						Console.Write("\nPress any key to continue...");
-						Console.ReadKey();
-						break;
-				}
-			}
-			return;
+			MergeDAT md = new MergeDAT(newInputs, name, desc, cat, version, author, diff, dedup, noDate, forceunpack, old, logger);
+			md.MergeDiff();
 		}
 
 		/// <summary>
@@ -1372,5 +1403,81 @@ Make a selection:
 				logger.Error("Invalid input");
 			}
 		}
+
+		#endregion
+
+		#region Listing Methods
+
+		/// <summary>
+		/// List sources in the database
+		/// </summary>
+		/// <param name="all">True to list all sources regardless if there is a game associated or not</param>
+		private static void ListSources(bool all = false)
+		{
+			string query = @"
+SELECT DISTINCT sources.id, sources.name
+FROM sources " + (!all ? "JOIN games on sources.id=games.source" : "") + @"
+ORDER BY sources.name COLLATE NOCASE";
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			{
+				dbc.Open();
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
+				{
+					using (SqliteDataReader sldr = slc.ExecuteReader())
+					{
+						// If nothing is found, tell the user and exit
+						if (!sldr.HasRows)
+						{
+							logger.Warning("No sources found! Please add a source and then try again.");
+							return;
+						}
+
+						Console.WriteLine("Available Sources (id <= name):\n");
+						while (sldr.Read())
+						{
+							Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1));
+						}
+					}
+				}
+			}
+			return;
+		}
+
+		/// <summary>
+		/// List systems in the database
+		/// </summary>
+		/// <param name="all">True to list all systems regardless if there is a game associated or not</param>
+		private static void ListSystems(bool all = false)
+		{
+			string query = @"
+SELECT DISTINCT systems.id, systems.manufacturer, systems.system
+FROM systems " + (!all ? "JOIN games ON systems.id=games.system" : "") + @"
+ORDER BY systems.manufacturer, systems.system";
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			{
+				dbc.Open();
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
+				{
+					using (SqliteDataReader sldr = slc.ExecuteReader())
+					{
+						// If nothing is found, tell the user and exit
+						if (!sldr.HasRows)
+						{
+							logger.Warning("No systems found! Please add a system and then try again.");
+							return;
+						}
+
+						Console.WriteLine("Available Systems (id <= name):\n");
+						while (sldr.Read())
+						{
+							Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1) + " - " + sldr.GetString(2));
+						}
+					}
+				}
+			}
+			return;
+		}
+
+		#endregion
 	}
 }

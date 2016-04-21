@@ -159,7 +159,7 @@ namespace SabreTools
 						{
 							cat = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("-a=") || arg.StartsWith("--author="))
+						else if (arg.StartsWith("-au=") || arg.StartsWith("--author="))
 						{
 							author = arg.Split('=')[1];
 						}
