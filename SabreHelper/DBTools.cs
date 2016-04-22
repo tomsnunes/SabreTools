@@ -106,6 +106,65 @@ CREATE TABLE IF NOT EXISTS data (
 					SqliteCommand slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 				}
+				else if (type == "SabreTools")
+				{
+					string query = @"
+CREATE TABLE IF NOT EXISTS hash (
+	'id'	INTEGER	PRIMARY KEY	NOT NULL,
+	'size'	INTEGER				NOT NULL	DEFAULT -1,
+	'crc'	TEXT				NOT NULL,
+	'md5'	TEXT				NOT NULL,
+	'sha1'	TEXT				NOT NULL
+)";
+					SqliteCommand slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS hashdata (
+	'hashid'	INTEGER		NOT NULL,
+	'key'		TEXT		NOT NULL,
+	'value'		TEXT,
+	PRIMARY KEY (hashid, key, value)
+)";
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS source (
+	'id'	INTEGER PRIMARY KEY	NOT NULL,
+	'name'	TEXT				NOT NULL	UNIQUE,
+	'url'	TEXT				NOT NULL
+)";
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS system (
+	'id'			INTEGER PRIMARY KEY	NOT NULL,
+	'manufacturer'	TEXT				NOT NULL,
+	'name'		TEXT				NOT NULL
+)";
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS gamesystem (
+	'game'		TEXT		NOT NULL,
+	'systemid'	INTEGER		NOT NULL,
+	PRIMARY KEY (game, systemid)
+)";
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS gamesource (
+	'game'		TEXT		NOT NULL,
+	'sourceid'	INTEGER		NOT NULL,
+	PRIMARY KEY (game, sourceid)
+)";
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+				}
 			}
 			catch (Exception ex)
 			{

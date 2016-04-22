@@ -429,6 +429,7 @@ namespace SabreTools
 		/// <param name="sysid">System ID for the game to be added with</param>
 		/// <param name="machinename">Name of the game to be added</param>
 		/// <param name="srcid">Source ID for the game to be added with</param>
+		/// <param name="dbc">SQLite database connection to use</param>
 		/// <returns>Game ID of the inserted (or found) game, -1 on error</returns>
 		private long AddGame(int sysid, string machinename, int srcid, SqliteConnection dbc)
 		{
@@ -488,6 +489,7 @@ namespace SabreTools
 		/// <param name="rom">RomData object representing the rom</param>
 		/// <param name="gameid">ID of the parent game to be mapped to</param>
 		/// <param name="date">Last updated date</param>
+		/// <param name="dbc">SQLite database connection to use</param>
 		/// <returns>True if the file exists or could be added, false on error</returns>
 		private bool AddRom(RomData rom, long gameid, string date, SqliteConnection dbc)
 		{
@@ -542,6 +544,98 @@ COMMIT;";
 							}
 						}
 					}
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Add a hash to the database if it doesn't exist already
+		/// </summary>
+		/// <param name="rom">RomData object representing the rom</param>
+		/// <param name="sysid">System ID for the game to be added with</param>
+		/// <param name="srcid">Source ID for the game to be added with</param>
+		/// <param name="date">Last updated date</param>
+		/// <param name="dbc">SQLite database connection to use</param>
+		/// <returns>True if the hash exists or could be added, false on error</returns>
+		/// <remarks>This is currently unused. It is a test method for the new SabreTools DB schema</remarks>
+		private bool AddHash(RomData rom, int sysid, int srcid, string date, SqliteConnection dbc)
+		{
+			// Process the game name
+
+			// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
+			string stripPattern = @"(([[(].*[\)\]] )?([^([]+))";
+			Regex stripRegex = new Regex(stripPattern);
+			Match stripMatch = stripRegex.Match(rom.Game);
+			rom.Game = stripMatch.Groups[1].Value;
+
+			// Run the name through the filters to make sure that it's correct
+			rom.Game = Style.NormalizeChars(rom.Game);
+			rom.Game = Style.RussianToLatin(rom.Game);
+			rom.Game = Style.SearchPattern(rom.Game);
+			rom.Game = rom.Game.Trim();
+
+			// Process the rom name
+
+			// WOD origninally stripped out any subdirs from the imported files, we do the same
+			rom.Name = Path.GetFileName(rom.Name);
+
+			// Run the name through the filters to make sure that it's correct
+			rom.Name = Style.NormalizeChars(rom.Name);
+			rom.Name = Style.RussianToLatin(rom.Name);
+			rom.Name = Regex.Replace(rom.Name, @"(.*) \.(.*)", "$1.$2");
+
+			// Retrieve or insert the hash
+			long hashid = -1;
+			string query = "SELECT id FROM hash WHERE size=" + rom.Size + " AND crc='" + rom.CRC + "' AND md5='" + rom.MD5 + "' AND sha1='" + rom.SHA1 + "'";
+			using (SqliteCommand slc = new SqliteCommand(query, dbc))
+			{
+				using (SqliteDataReader sldr = slc.ExecuteReader())
+				{
+					// If nothing is found, add the hash and get the insert ID
+					if (!sldr.HasRows)
+					{
+						query = "INSERT INTO hash (size, crc, md5, sha1)" +
+							" VALUES (" + rom.Size + ", '" + rom.CRC + "', '" + rom.MD5 + "', '" + rom.SHA1 + "')";
+
+						using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
+						{
+							slc2.ExecuteNonQuery();
+						}
+
+						query = "SELECT last_insert_rowid()";
+						using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
+						{
+							hashid = (long)slc2.ExecuteScalar();
+						}
+					}
+					// Otherwise, retrieve the ID
+					else
+					{
+						sldr.Read();
+						hashid = sldr.GetInt64(0);
+					}
+				}
+			}
+
+			// Ignore or insert the file and game
+			query = @"BEGIN;
+INSERT OR IGNORE INTO hashdata (hashid, key, value) VALUES " +
+	"(" + hashid + ", 'name', '" + rom.Name + "'), " +
+	"(" + hashid + ", 'game', '" + rom.Game + "'), " +
+	"(" + hashid + ", 'lastupdated', '" + date + @"');
+INSERT OR IGNORE INTO gamesystem (game, systemid) VALUES ('" + rom.Game + "', " + sysid + @");
+INSERT OR IGNORE INTO gamesource (game, sourceid) VALUES ('" + rom.Game + "', " + srcid + @");
+COMMIT;";
+
+			using (SqliteCommand slc = new SqliteCommand(query, dbc))
+			{
+				int ret = slc.ExecuteNonQuery();
+				if ((SQLiteErrorCode)ret != SQLiteErrorCode.Done && (SQLiteErrorCode)ret != SQLiteErrorCode.Ok)
+				{
+					_logger.Error("A SQLite error has occurred: " + ((SQLiteErrorCode)ret).ToString());
+					return false;
 				}
 			}
 
