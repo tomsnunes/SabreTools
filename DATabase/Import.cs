@@ -351,6 +351,7 @@ namespace SabreTools
 			// Check to make sure that the manufacturer and system are valid according to the database
 			int sysid = -1;
 			string query = "SELECT id FROM systems WHERE manufacturer='" + manufacturer + "' AND system='" + system +"'";
+			//string query = "SELECT id FROM system WHERE manufacturer='" + manufacturer + "' AND name='" + system + "'";
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
@@ -375,6 +376,7 @@ namespace SabreTools
 			// Check to make sure that the source is valid according to the database
 			int srcid = -1;
 			query = "SELECT id FROM sources WHERE name='" + source + "'";
+			//query = "SELECT id FROM source WHERE name='" + source + "'";
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
@@ -627,17 +629,17 @@ COMMIT;";
 			// Ignore or insert the file and game
 			query = @"BEGIN;
 INSERT OR IGNORE INTO hashdata (hashid, key, value) VALUES " +
-	"(" + hashid + ", 'name', '" + rom.Name + "'), " +
-	"(" + hashid + ", 'game', '" + rom.Game + "'), " +
+	"(" + hashid + ", 'name', '" + rom.Name.Replace("'", "''") + "'), " +
+	"(" + hashid + ", 'game', '" + rom.Game.Replace("'", "''") + "'), " +
 	"(" + hashid + ", 'lastupdated', '" + date + @"');
-INSERT OR IGNORE INTO gamesystem (game, systemid) VALUES ('" + rom.Game + "', " + sysid + @");
-INSERT OR IGNORE INTO gamesource (game, sourceid) VALUES ('" + rom.Game + "', " + srcid + @");
+INSERT OR IGNORE INTO gamesystem (game, systemid) VALUES ('" + rom.Game.Replace("'", "''") + "', " + sysid + @");
+INSERT OR IGNORE INTO gamesource (game, sourceid) VALUES ('" + rom.Game.Replace("'", "''") + "', " + srcid + @");
 COMMIT;";
 
 			using (SqliteCommand slc = new SqliteCommand(query, dbc))
 			{
 				int ret = slc.ExecuteNonQuery();
-				if ((SQLiteErrorCode)ret != SQLiteErrorCode.Done && (SQLiteErrorCode)ret != SQLiteErrorCode.Ok)
+				if ((SQLiteErrorCode)ret == SQLiteErrorCode.Error)
 				{
 					_logger.Error("A SQLite error has occurred: " + ((SQLiteErrorCode)ret).ToString());
 					return false;
