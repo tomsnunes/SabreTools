@@ -268,16 +268,18 @@ JOIN checksums
 			// This block would replace the whole block above between BEGIN COMMENT and END COMMENT
 			string query = @"
 SELECT hash.id AS id, hash.size AS size, hash.crc AS crc, hash.md5 AS md5, hash.sha1 AS sha1,
-	hashdata.key AS key, hashdata.value AS value,
+	a.key AS key, a.value AS value,
 	source.id, source.name, source.url,
 	system.id, system.manufacturer, system.name
 FROM hash
-JOIN hashdata
-	ON hash.id=hashdata.hashid
+JOIN hashdata a
+	ON hash.id=a.hashid
+JOIN hashdata b
+	ON a.hashid=b.hashid
 JOIN gamesystem
-	ON hash.value=gamesystem.game
+	ON b.value=gamesystem.game
 JOIN gamesource
-	ON hash.value=gamesource.game
+	ON b.value=gamesource.game
 JOIN system
 	ON gamesystem.systemid=system.id
 JOIN source
@@ -303,30 +305,29 @@ JOIN source
 						}
 
 						// Retrieve and process the roms for merging
-						string lastid = "";
-						string name = "";
-						string game = "";
-						string type = "";
+						int systemid = -1, sourceid = -1;
+						long lastid = -1, size = -1;
+						string name = "", game = "", type = "", manufacturer = "", system = "", source = "", url = "", crc = "", md5 = "", sha1 = "";
 						while (sldr.Read())
 						{
 							// If the hash is different than the last
-							if (lastid != "" && sldr.GetString(0) != lastid)
+							if (lastid != -1 && sldr.GetInt64(0) != lastid)
 							{
 								RomData temp = new RomData
 								{
-									Manufacturer = sldr.GetString(11),
-									System = sldr.GetString(12),
-									SystemID = sldr.GetInt32(10),
-									Source = sldr.GetString(8),
-									URL = sldr.GetString(9),
-									SourceID = sldr.GetInt32(7),
+									Manufacturer = manufacturer,
+									System = system,
+									SystemID = systemid,
+									Source = source,
+									URL = url,
+									SourceID = sourceid,
 									Game = game,
 									Name = name,
 									Type = type,
-									Size = sldr.GetInt64(1),
-									CRC = sldr.GetString(2),
-									MD5 = sldr.GetString(3),
-									SHA1 = sldr.GetString(4),
+									Size = size,
+									CRC = crc,
+									MD5 = md5,
+									SHA1 = sha1,
 								};
 
 								// Rename the game associated if it's still valid and we allow renames
@@ -344,22 +345,33 @@ JOIN source
 								name = "";
 								type = "";
 							}
-							// Otherwise, try to get the values
-							else
+							
+							// Get all of the current ROM information
+							manufacturer = sldr.GetString(11);
+							system = sldr.GetString(12);
+							systemid = sldr.GetInt32(10);
+							source = sldr.GetString(8);
+							url = sldr.GetString(9);
+							sourceid = sldr.GetInt32(7);
+							size = sldr.GetInt64(1);
+							crc = sldr.GetString(2);
+							md5 = sldr.GetString(3);
+							sha1 = sldr.GetString(4);
+
+							switch (sldr.GetString(5))
 							{
-								switch (sldr.GetString(5))
-								{
-									case "name":
-										name = sldr.GetString(6);
-										break;
-									case "game":
-										game = sldr.GetString(6);
-										break;
-									case "type":
-										type = sldr.GetString(6);
-										break;
-								}
+								case "game":
+									game = sldr.GetString(6);
+									break;
+								case "name":
+									name = sldr.GetString(6);
+									break;
+								case "type":
+									type = sldr.GetString(6);
+									break;
 							}
+
+							lastid = sldr.GetInt64(0);
 						}
 					}
 				}

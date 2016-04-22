@@ -1119,15 +1119,13 @@ Make a selection:
 		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
 		private static void InitGenerateAll(string outdir, bool norename, bool old)
 		{
-			string actualdir = (outdir == "" ? Environment.CurrentDirectory + "/" : outdir + "/");
-			outdir = actualdir + "/temp/";
+			string actualdir = (outdir == "" ? Environment.CurrentDirectory + Path.DirectorySeparatorChar :
+				(!outdir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? outdir + Path.DirectorySeparatorChar : outdir));
+			outdir = actualdir + "temp" + Path.DirectorySeparatorChar;
 
 			// Generate system-merged
-			string query = @"SELECT DISTINCT systems.id
-		FROM systems
-		JOIN games
-			ON systems.id=games.system
-		ORDER BY systems.manufacturer, systems.system";
+			string query = "SELECT DISTINCT systems.id FROM systems JOIN games ON systems.id=games.system ORDER BY systems.manufacturer, systems.system";
+			//string query = "SELECT DISTINCT system.id FROM system JOIN gamesystem ON system.id=gamesystem.systemid ORDER BY system.manufacturer, system.name";
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
@@ -1155,6 +1153,18 @@ Make a selection:
 			ON games.source=sources.id
 		WHERE systems.id=" + sldr.GetInt32(0).ToString() + @"
 		ORDER BY sources.name";
+							/*
+							string squery = @"SELECT DISTINCT source.id
+		FROM system
+		JOIN gamesystem
+			ON system.id=gamesystem.systemid
+		JOIN gamesource
+			ON gamesystem.game=gamesource.game
+		JOIN source
+			ON gamesource.sourceid=source.id
+		WHERE system.id=" + sldr.GetInt32(0).ToString() + @"
+		ORDER BY source.name";
+							*/
 
 							using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
 							{
@@ -1178,11 +1188,8 @@ Make a selection:
 				}
 
 				// Generate source-merged
-				query = @"SELECT DISTINCT sources.id, sources.name
-		FROM sources
-		JOIN games
-			ON sources.id=games.source
-		ORDER BY sources.name";
+				query = "SELECT DISTINCT sources.id, sources.name FROM sources JOIN games ON sources.id=games.source ORDER BY sources.name";
+				//query = "SELECT DISTINCT source.id, source.name FROM source JOIN gamesource ON source.id=gamesource.sourceid ORDER BY source.name";
 
 				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
