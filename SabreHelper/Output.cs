@@ -48,8 +48,9 @@ namespace SabreTools.Helper
 				string header_old = "clrmamepro (\n" +
 					"\tname \"" + HttpUtility.HtmlEncode(name) + "\"\n" +
 					"\tdescription \"" + HttpUtility.HtmlEncode(description) + "\"\n" +
+					"\tcategory \"" + HttpUtility.HtmlEncode(category) + "\"\n" +
 					"\tversion \"" + HttpUtility.HtmlEncode(version) + "\"\n" +
-					"\tcomment \"\"\n" +
+					"\tdate \"" + HttpUtility.HtmlEncode(date) + "\"\n" +
 					"\tauthor \"" + HttpUtility.HtmlEncode(author) + "\"\n" +
 					(forceunpack ? "\tforcezipping no\n" : "") +
 					")\n";
