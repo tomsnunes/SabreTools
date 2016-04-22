@@ -143,6 +143,9 @@ namespace SabreTools
 				A = RomManipulation.Merge(A);
 			}
 
+			// Sort the file by names for ease
+			RomManipulation.Sort(A, false);
+
 			// Now write the file out
 			Output.WriteToDat(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, "", A, _logger);
 
