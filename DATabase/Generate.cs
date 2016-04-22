@@ -72,6 +72,8 @@ namespace SabreTools
 			if (_systems != "")
 			{
 				string query = "SELECT manufacturer, system FROM systems WHERE id in (" + _systems + ")";
+				//string query = "SELECT manufacturer, name FROM system WHERE id in (" + _systems + ")";
+
 				using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 				{
 					dbc.Open();
@@ -114,6 +116,7 @@ namespace SabreTools
 			if (_sources != "")
 			{
 				string query = "SELECT name FROM sources WHERE id in (" + _sources + ")";
+				//string query = "SELECT name FROM source WHERE id in (" + _sources + ")";
 
 				using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 				{

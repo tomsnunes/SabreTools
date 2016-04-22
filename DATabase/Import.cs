@@ -631,6 +631,7 @@ COMMIT;";
 INSERT OR IGNORE INTO hashdata (hashid, key, value) VALUES " +
 	"(" + hashid + ", 'name', '" + rom.Name.Replace("'", "''") + "'), " +
 	"(" + hashid + ", 'game', '" + rom.Game.Replace("'", "''") + "'), " +
+	"(" + hashid + ", 'type', '" + rom.Type + "'), " +
 	"(" + hashid + ", 'lastupdated', '" + date + @"');
 INSERT OR IGNORE INTO gamesystem (game, systemid) VALUES ('" + rom.Game.Replace("'", "''") + "', " + sysid + @");
 INSERT OR IGNORE INTO gamesource (game, sourceid) VALUES ('" + rom.Game.Replace("'", "''") + "', " + srcid + @");
