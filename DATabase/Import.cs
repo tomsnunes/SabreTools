@@ -511,7 +511,7 @@ SELECT files.id FROM files
 	ON files.id=checksums.file
 	WHERE files.name='" + rom.Name.Replace("'", "''") + @"'
 		AND files.type='" + rom.Type + @"' 
-		AND files.setid=" + gameid + " " + 
+		AND files.setid=" + gameid +
 		" AND checksums.size=" + rom.Size +
 		" AND checksums.crc='" + rom.CRC + "'" +
 		" AND checksums.md5='" + rom.MD5 + "'" +
