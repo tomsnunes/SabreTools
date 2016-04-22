@@ -403,17 +403,21 @@ namespace SabreTools
 			RomManipulation.Sort(roms, true);
 			string lastgame = "";
 			long gameid = -1;
-			foreach (RomData rom in roms)
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
-				// If we have a new game, check for a new ID
-				if (rom.Game != lastgame)
+				dbc.Open();
+				foreach (RomData rom in roms)
 				{
-					gameid = AddGame(sysid, rom.Game, srcid);
-					lastgame = rom.Game;
-				}
+					// If we have a new game, check for a new ID
+					if (rom.Game != lastgame)
+					{
+						gameid = AddGame(sysid, rom.Game, srcid, dbc);
+						lastgame = rom.Game;
+					}
 
-				// Try to add the rom with the game information
-				AddRom(rom, gameid, date);
+					// Try to add the rom with the game information
+					AddRom(rom, gameid, date, dbc);
+				}
 			}
 
 			return true;
@@ -426,7 +430,7 @@ namespace SabreTools
 		/// <param name="machinename">Name of the game to be added</param>
 		/// <param name="srcid">Source ID for the game to be added with</param>
 		/// <returns>Game ID of the inserted (or found) game, -1 on error</returns>
-		private long AddGame(int sysid, string machinename, int srcid)
+		private long AddGame(int sysid, string machinename, int srcid, SqliteConnection dbc)
 		{
 			// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
 			string stripPattern = @"(([[(].*[\)\]] )?([^([]+))";
@@ -445,36 +449,32 @@ namespace SabreTools
 				" AND name='" + machinename.Replace("'", "''") + "'" +
 				" AND source=" + srcid;
 
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			using (SqliteCommand slc = new SqliteCommand(query, dbc))
 			{
-				dbc.Open();
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
+				using (SqliteDataReader sldr = slc.ExecuteReader())
 				{
-					using (SqliteDataReader sldr = slc.ExecuteReader())
+					// If nothing is found, add the game and get the insert ID
+					if (!sldr.HasRows)
 					{
-						// If nothing is found, add the game and get the insert ID
-						if (!sldr.HasRows)
-						{
-							query = "INSERT INTO games (system, name, source)" +
-								" VALUES (" + sysid + ", '" + machinename.Replace("'", "''") + "', " + srcid + ")";
+						query = "INSERT INTO games (system, name, source)" +
+							" VALUES (" + sysid + ", '" + machinename.Replace("'", "''") + "', " + srcid + ")";
 
-							using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
-							{
-								slc2.ExecuteNonQuery();
-							}
-
-							query = "SELECT last_insert_rowid()";
-							using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
-							{
-								gameid = (long)slc2.ExecuteScalar();
-							}
-						}
-						// Otherwise, retrieve the ID
-						else
+						using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
 						{
-							sldr.Read();
-							gameid = sldr.GetInt64(0);
+							slc2.ExecuteNonQuery();
 						}
+
+						query = "SELECT last_insert_rowid()";
+						using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
+						{
+							gameid = (long)slc2.ExecuteScalar();
+						}
+					}
+					// Otherwise, retrieve the ID
+					else
+					{
+						sldr.Read();
+						gameid = sldr.GetInt64(0);
 					}
 				}
 			}
@@ -489,7 +489,7 @@ namespace SabreTools
 		/// <param name="gameid">ID of the parent game to be mapped to</param>
 		/// <param name="date">Last updated date</param>
 		/// <returns>True if the file exists or could be added, false on error</returns>
-		private bool AddRom(RomData rom, long gameid, string date)
+		private bool AddRom(RomData rom, long gameid, string date, SqliteConnection dbc)
 		{
 			// WOD origninally stripped out any subdirs from the imported files, we do the same
 			rom.Name = Path.GetFileName(rom.Name);
@@ -516,32 +516,29 @@ SELECT files.id FROM files
 		" AND checksums.crc='" + rom.CRC + "'" +
 		" AND checksums.md5='" + rom.MD5 + "'" +
 		" AND checksums.sha1='" + rom.SHA1 + "'";
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
-			{
-				dbc.Open();
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
-				{
-					using (SqliteDataReader sldr = slc.ExecuteReader())
-					{
-						// If the file doesn't exist, add it with its checksums
-						if (!sldr.HasRows)
-						{
-							query = @"BEGIN;
-INSERT INTO files (setid, name, type, lastupdated)
-	VALUES (" + gameid + ", '" + rom.Name.Replace("'", "''") + "', '" + rom.Type + "', '" + date + @"');
-INSERT INTO checksums (file, size, crc, md5, sha1)
-	VALUES ((SELECT last_insert_rowid()), " + rom.Size + ", '" + rom.CRC + "'" + ", '" + rom.MD5 + "'" + ", '" + rom.SHA1 + @"');
-COMMIT;";
-							using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
-							{
-								int affected = slc2.ExecuteNonQuery();
 
-								// If the insert was unsuccessful, something bad happened
-								if (affected < 1)
-								{
-									_logger.Error("There was an error adding " + rom.Name + " to the database!");
-									return false;
-								}
+			using (SqliteCommand slc = new SqliteCommand(query, dbc))
+			{
+				using (SqliteDataReader sldr = slc.ExecuteReader())
+				{
+					// If the file doesn't exist, add it with its checksums
+					if (!sldr.HasRows)
+					{
+						query = @"BEGIN;
+INSERT INTO files (setid, name, type, lastupdated)
+VALUES (" + gameid + ", '" + rom.Name.Replace("'", "''") + "', '" + rom.Type + "', '" + date + @"');
+INSERT INTO checksums (file, size, crc, md5, sha1)
+VALUES ((SELECT last_insert_rowid()), " + rom.Size + ", '" + rom.CRC + "'" + ", '" + rom.MD5 + "'" + ", '" + rom.SHA1 + @"');
+COMMIT;";
+						using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
+						{
+							int affected = slc2.ExecuteNonQuery();
+
+							// If the insert was unsuccessful, something bad happened
+							if (affected < 1)
+							{
+								_logger.Error("There was an error adding " + rom.Name + " to the database!");
+								return false;
 							}
 						}
 					}
