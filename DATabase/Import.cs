@@ -523,7 +523,7 @@ SELECT files.id FROM files
 				{
 					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
-						// If the file doesn't exist, add it
+						// If the file doesn't exist, add it with its checksums
 						if (!sldr.HasRows)
 						{
 							query = @"BEGIN;
