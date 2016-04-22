@@ -262,6 +262,117 @@ JOIN checksums
 				RomManipulation.Sort(roms, _norename);
 			}
 
+			/*
+			// This block would replace the whole block above from 'string query' on to 'if (merged)'
+			string query = @"
+SELECT hash.id AS id, hash.size AS size, hash.crc AS crc, hash.md5 AS md5, hash.sha1 AS sha1,
+	hashdata.key AS key, hashdata.value AS value,
+	source.id, source.name, source.url,
+	system.id, system.manufacturer, system.name
+FROM hash
+JOIN hashdata
+	ON hash.id=hashdata.hashid
+JOIN gamesystem
+	ON hash.value=gamesystem.game
+JOIN gamesource
+	ON hash.value=gamesource.game
+JOIN system
+	ON gamesystem.systemid=system.id
+JOIN source
+	ON gamesource.sourceid=source.id" + 
+(_systems != "" || _sources != "" ? "\nWHERE" : "") +
+	(_sources != "" ? " source.id in (" + _sources + ")" : "") +
+	(_systems != "" && _sources != "" ? " AND" : "") +
+	(_systems != "" ? " system.id in (" + _systems + ")" : "") +
+"\nORDER BY hash.id";
+
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			{
+				dbc.Open();
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
+				{
+					using (SqliteDataReader sldr = slc.ExecuteReader())
+					{
+						// If there are no games for this combination, return nothing
+						if (!sldr.HasRows)
+						{
+							_logger.Error("No games could be found with those inputs. Please check and try again.");
+							return null;
+						}
+
+						// Retrieve and process the roms for merging
+						string lastid = "";
+						string name = "";
+						string game = "";
+						string type = "";
+						while (sldr.Read())
+						{
+							// If the hash is different than the last
+							if (lastid != "" && sldr.GetString(0) != lastid)
+							{
+								RomData temp = new RomData
+								{
+									Manufacturer = sldr.GetString(11),
+									System = sldr.GetString(12),
+									SystemID = sldr.GetInt32(10),
+									Source = sldr.GetString(8),
+									URL = sldr.GetString(9),
+									SourceID = sldr.GetInt32(7),
+									Game = game,
+									Name = name,
+									Type = type,
+									Size = sldr.GetInt64(1),
+									CRC = sldr.GetString(2),
+									MD5 = sldr.GetString(3),
+									SHA1 = sldr.GetString(4),
+								};
+
+								// Rename the game associated if it's still valid and we allow renames
+								if (merged && !_norename)
+								{
+									temp.Game = temp.Game +
+										(sysmerged ? " [" + temp.Manufacturer + " - " + temp.System + "]" : "") +
+										(srcmerged ? " [" + temp.Source + "]" : "");
+								}
+
+								roms.Add(temp);
+
+								// Reset the variables
+								game = "";
+								name = "";
+								type = "";
+							}
+							// Otherwise, try to get the values
+							else
+							{
+								switch (sldr.GetString(5))
+								{
+									case "name":
+										name = sldr.GetString(6);
+										break;
+									case "game":
+										game = sldr.GetString(6);
+										break;
+									case "type":
+										type = sldr.GetString(6);
+										break;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// If we're in a merged mode, merge
+			if (merged)
+			{
+				roms = RomManipulation.Merge(roms);
+			}
+
+			// Now sort the roms by the correct parameters
+			RomManipulation.Sort(roms, _norename);
+			*/
+
 			// Now check rename within games
 			string lastname = "", lastgame = "";
 			for (int i = 0; i < roms.Count; i++)
