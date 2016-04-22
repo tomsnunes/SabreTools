@@ -17,6 +17,7 @@ namespace SabreTools
 	{
 		private static Logger logger;
 		private static string _dbName = "DATabase.sqlite";
+		//private static string _dbName = "SabreTools.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
 
 		/// <summary>

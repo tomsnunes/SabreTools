@@ -417,6 +417,11 @@ namespace SabreTools
 
 					// Try to add the rom with the game information
 					AddRom(rom, gameid, date, dbc);
+
+					/*
+					// Try to add the romdata
+					AddHash(rom, sysid, srcid, date, dbc);
+					*/
 				}
 			}
 
