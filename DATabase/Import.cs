@@ -410,6 +410,7 @@ namespace SabreTools
 				dbc.Open();
 				foreach (RomData rom in roms)
 				{
+					// BEGIN COMMENT
 					// If we have a new game, check for a new ID
 					if (rom.Game != lastgame)
 					{
@@ -419,6 +420,7 @@ namespace SabreTools
 
 					// Try to add the rom with the game information
 					AddRom(rom, gameid, date, dbc);
+					// END COMMENT
 
 					/*
 					// Try to add the romdata

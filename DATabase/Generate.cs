@@ -184,6 +184,7 @@ namespace SabreTools
 			bool srcmerged = (_sources == "" || _sources.Split(',').Length > 1);
 			bool merged = sysmerged || srcmerged;
 
+			// BEGIN COMMENT
 			string query = @"
 SELECT DISTINCT systems.manufacturer AS manufacturer, systems.system AS system, systems.id AS systemid,
 	sources.name AS source, sources.url AS url, sources.id AS sourceid,
@@ -261,9 +262,10 @@ JOIN checksums
 				roms = RomManipulation.Merge(roms, true);
 				RomManipulation.Sort(roms, _norename);
 			}
+			// END COMMENT
 
 			/*
-			// This block would replace the whole block above from 'string query' on to 'if (merged)'
+			// This block would replace the whole block above between BEGIN COMMENT and END COMMENT
 			string query = @"
 SELECT hash.id AS id, hash.size AS size, hash.crc AS crc, hash.md5 AS md5, hash.sha1 AS sha1,
 	hashdata.key AS key, hashdata.value AS value,
