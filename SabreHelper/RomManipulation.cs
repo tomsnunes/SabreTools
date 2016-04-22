@@ -37,15 +37,20 @@ namespace SabreTools.Helper
 		public static XmlDocument GetXmlDocument(string filename, Logger logger)
 		{
 			XmlDocument doc = new XmlDocument();
+			string alltext = "";
+			string[] alllines;
 			try
 			{
-				doc.LoadXml(File.ReadAllText(filename));
+				alltext = File.ReadAllText(filename);
+				doc.LoadXml(alltext);
 			}
 			catch (XmlException)
 			{
 				try
 				{
-					doc.LoadXml(Converters.ClrMameProToXML(File.ReadAllLines(filename)).ToString());
+					alllines = File.ReadAllLines(filename);
+					alltext = Converters.ClrMameProToXML(alllines).ToString();
+					doc.LoadXml(alltext);
 				}
 				catch (Exception ex)
 				{
