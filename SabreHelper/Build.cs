@@ -12,7 +12,7 @@ namespace SabreTools.Helper
 		/// </summary>
 		public static string Version
 		{
-			get { return "0.6.0.0"; }
+			get { return "0.6.5.0"; }
 		}
 
 		/// <summary>
