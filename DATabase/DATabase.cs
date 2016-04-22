@@ -864,7 +864,7 @@ Make a selection:
 			{
 				Console.Clear();
 				Build.Start("DATabase");
-				Console.WriteLine(@"DAT TRIM MENU
+				Console.WriteLine(@"MERGE AND DIFF MENU
 ===========================
 Make a selection:
 
