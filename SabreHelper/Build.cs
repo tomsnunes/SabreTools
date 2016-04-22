@@ -185,6 +185,7 @@ Credits
 Programmer / Lead:	Matt Nadareski (darksabre76)
 Additional code:	emuLOAD, @tractivo
 Testing:		emuLOAD, @tractivo, Kludge, Obiwantje
+Suggestions:	edc, AcidX
 Based on work by:	The Wizard of DATz");
 		}
 	}
