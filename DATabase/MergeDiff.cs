@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 using SabreTools.Helper;
 
@@ -11,6 +12,7 @@ namespace SabreTools
 		private List<String> _inputs;
 
 		// User specified flags
+		private bool _ad;
 		private bool _diff;
 		private bool _dedup;
 		private bool _bare;
@@ -37,6 +39,7 @@ namespace SabreTools
 		/// <param name="cat">Category for the DAT</param>
 		/// <param name="version">Version of the DAT</param>
 		/// <param name="author">Author of the DAT</param>
+		/// <param name="ad">True if all diff variants should be outputted, false otherwise</param>
 		/// <param name="diff">True if a DiffDat of all inputs is wanted, false otherwise</param>
 		/// <param name="dedup">True if the outputted file should remove duplicates, false otherwise</param>
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
@@ -44,7 +47,7 @@ namespace SabreTools
 		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		public MergeDiff(List<String> inputs, string name, string desc, string cat, string version, string author,
-			bool diff, bool dedup, bool bare, bool forceunpack, bool old, Logger logger)
+			bool ad, bool diff, bool dedup, bool bare, bool forceunpack, bool old, Logger logger)
 		{
 			_inputs = inputs;
 			_name = name;
@@ -52,6 +55,7 @@ namespace SabreTools
 			_cat = cat;
 			_version = version;
 			_author = author;
+			_ad = ad;
 			_diff = diff;
 			_dedup = dedup;
 			_bare = bare;
@@ -78,6 +82,8 @@ namespace SabreTools
 			}
 
 			List<RomData> A = new List<RomData>();
+			List<RomData> X = new List<RomData>();
+
 			foreach (string input in _inputs)
 			{
 				_logger.Log("Adding DAT: " + input);
@@ -89,6 +95,56 @@ namespace SabreTools
 				else
 				{
 					A.AddRange(B);
+				}
+
+				// If we're in all-diff mode, get a master merged DAT to compare against
+				if (_ad)
+				{
+					X.AddRange(B);
+				}
+			}
+
+			// If we're in all diff mode, diff against every DAT and output accordingly
+			if (_ad)
+			{
+				foreach (string input in _inputs)
+				{
+					List<RomData> B = RomManipulation.Parse(input, 0, 0, _logger);
+					List<RomData> C = RomManipulation.DiffOnlyInA(B, X);
+					List<RomData> D = RomManipulation.DiffInAB(B, X);
+
+					if (_dedup)
+					{
+						C = RomManipulation.Merge(C);
+						D = RomManipulation.Merge(D);
+					}
+
+					if (_name == "")
+					{
+						_name = (_diff ? "diffdat" : "mergedat") + (_dedup ? "-merged" : "");
+					}
+					if (_desc == "")
+					{
+						_desc = (_diff ? "diffdat" : "mergedat") + (_dedup ? "-merged" : "");
+						if (!_bare)
+						{
+							_desc += " (" + _date + ")";
+						}
+					}
+					if (_cat == "" && _diff)
+					{
+						_cat = "DiffDAT";
+					}
+					if (_author == "")
+					{
+						_author = "SabreTools";
+					}
+
+					string realname = Path.GetFileNameWithoutExtension(input);
+
+					// Now write the files out
+					Output.WriteToDat(_name + "-" + realname + "-inall", _desc + "-" + realname + "-inall", _version, _date, _cat, _author, _forceunpack, _old, "", C, _logger);
+					Output.WriteToDat(_name + "-" + realname + "-only", _desc + "-" + realname + "-only", _version, _date, _cat, _author, _forceunpack, _old, "", D, _logger);
 				}
 			}
 

@@ -451,5 +451,35 @@ namespace SabreTools.Helper
 			List<String> CString = AString.Except(BString).Union(BString.Except(AString)).ToList();
 			return Output.StringToRomData(CString);
 		}
+
+		/// <summary>
+		/// Get all RomData objects that are in A but not in B
+		/// </summary>
+		/// <param name="A">First RomData list</param>
+		/// <param name="B">Second RomData list</param>
+		/// <returns>Any rom that's only in the first list</returns>
+		/// <remarks>Adapted from http://stackoverflow.com/questions/5620266/the-opposite-of-intersect</remarks>
+		public static List<RomData> DiffOnlyInA(List<RomData> A, List<RomData> B)
+		{
+			List<String> AString = Output.RomDataToString(A);
+			List<String> BString = Output.RomDataToString(B);
+			List<String> CString = AString.Except(BString).ToList();
+			return Output.StringToRomData(CString);
+		}
+
+		/// <summary>
+		/// Get all RomData objects that are in A and B
+		/// </summary>
+		/// <param name="A">First RomData list</param>
+		/// <param name="B">Second RomData list</param>
+		/// <returns>Any rom that's in both lists</returns>
+		/// <remarks>Adapted from http://stackoverflow.com/questions/5620266/the-opposite-of-intersect</remarks>
+		public static List<RomData> DiffInAB(List<RomData> A, List<RomData> B)
+		{
+			List<String> AString = Output.RomDataToString(A);
+			List<String> BString = Output.RomDataToString(B);
+			List<String> CString = AString.Union(BString).Except(AString.Except(BString).Union(BString.Except(AString))).ToList();
+			return Output.StringToRomData(CString);
+		}
 	}
 }
