@@ -106,7 +106,7 @@ namespace SabreTools.Helper
 			{
 				try
 				{
-					_log.WriteLine(loglevel.ToString() + " " + output);
+					_log.WriteLine(loglevel.ToString() + " - " + DateTime.Now  + " - " + output);
 				}
 				catch
 				{
