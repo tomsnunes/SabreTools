@@ -53,6 +53,10 @@ namespace SabreTools.Helper
 					return null;
 				}
 			}
+			catch (IOException)
+			{
+				logger.Error("File '" + filename + "' could not be open or read");
+			}
 			catch (Exception ex)
 			{
 				logger.Error(ex.ToString());
