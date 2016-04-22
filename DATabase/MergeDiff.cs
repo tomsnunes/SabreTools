@@ -81,29 +81,7 @@ namespace SabreTools
 				return false;
 			}
 
-			List<RomData> A = new List<RomData>();
-
-			foreach (string input in _inputs)
-			{
-				_logger.Log("Adding DAT: " + input);
-				List<RomData> B = RomManipulation.Parse(input, 0, 0, _logger);
-				if (_diff)
-				{
-					A = RomManipulation.Diff(A, B);
-				}
-				else
-				{
-					A.AddRange(B);
-				}
-			}
-
-			// If we want a merged list, send it for merging before outputting
-			if (_dedup)
-			{
-				A = RomManipulation.Merge(A);
-			}
-
-			// Get the names that will be used
+			// Get the values that will be used
 			if (_name == "")
 			{
 				_name = (_diff ? "diffdat" : "mergedat") + (_dedup ? "-merged" : "");
@@ -123,6 +101,46 @@ namespace SabreTools
 			if (_author == "")
 			{
 				_author = "SabreTools";
+			}
+
+			List<RomData> A = new List<RomData>();
+
+			foreach (string input in _inputs)
+			{
+				_logger.Log("Adding DAT: " + input);
+				List<RomData> B = RomManipulation.Parse(input, 0, 0, _logger);
+				if (_diff)
+				{
+					A = RomManipulation.Diff(A, B);
+				}
+				else
+				{
+					A.AddRange(B);
+				}
+			}
+
+			// If we're in Alldiff mode, we can only use the first 2 inputs
+			if (_ad)
+			{
+				List<RomData> AB1 = RomManipulation.Parse(_inputs[0], 0, 0, _logger);
+				List<RomData> AB2 = RomManipulation.Parse(_inputs[1], 0, 0, _logger);
+
+				List<RomData> OnlyA = RomManipulation.DiffOnlyInA(AB1, AB2);
+				List<RomData> OnlyB = RomManipulation.DiffOnlyInA(AB2, AB1);
+				List<RomData> BothAB = RomManipulation.DiffInAB(AB1, AB2);
+
+				string input0 = Path.GetFileNameWithoutExtension(_inputs[0]);
+				string input1 = Path.GetFileNameWithoutExtension(_inputs[1]);
+
+				Output.WriteToDat(_name + "-" + input0 + "-only", _desc + "-" + input0 + "-only", _version, _date, _cat, _author, _forceunpack, _old, "", OnlyA, _logger);
+				Output.WriteToDat(_name + "-" + input1 + "-only", _desc + "-" + input1 + "-only", _version, _date, _cat, _author, _forceunpack, _old, "", OnlyB, _logger);
+				Output.WriteToDat(_name + "-inboth", _desc + "-inboth", _version, _date, _cat, _author, _forceunpack, _old, "", BothAB, _logger);
+			}
+
+			// If we want a merged list, send it for merging before outputting
+			if (_dedup)
+			{
+				A = RomManipulation.Merge(A);
 			}
 
 			// Now write the file out

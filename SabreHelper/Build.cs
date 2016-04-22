@@ -118,7 +118,7 @@ Options:
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
   -m, --merge		Merge two or more DATs
-	-ad, --all-diff	Enable output of all diff variants
+	-ad, --all-diff	Enable output of all diff variants (2 DATs only)
 	-di, --diff		Switch to diffdat mode
 	-dd, --dedup		Enable deduping in the created DAT
 	-b, --bare		Don't include date in file name

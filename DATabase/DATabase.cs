@@ -874,7 +874,7 @@ Make a selection:
     4) Category" + (cat != "" ? ":\t" + cat : "") + @"
     5) Version" + (version != "" ? ":\t" + version : "") + @"
     6) Author" + (author != "" ? ":\t" + author : "") + @"
-    7) " + (ad ? "Only output normal diff" : "Output all diff variants") + @"
+    7) " + (ad ? "Only output normal diff" : "Output all diff variants (2 files only)") + @"
     8) " + (dedup ? "Don't dedup files in output" : "Dedup files in output") + @"
     9) " + (diff ? "Only merge the input files" : "Diff the input files") + @"
     10) " + (bare ? "Don't append the date to the name" : "Append the date to the name") + @"
