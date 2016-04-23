@@ -75,9 +75,9 @@ namespace SabreTools
 		public bool Process()
 		{
 			// Check if there are enough inputs
-			if (_inputs.Count < 0)
+			if (_inputs.Count < 2)
 			{
-				_logger.Warning("At least inputs are required!");
+				_logger.Warning("At least 2 inputs are required!");
 				return false;
 			}
 

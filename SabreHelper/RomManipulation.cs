@@ -36,21 +36,25 @@ namespace SabreTools.Helper
 		/// <returns>The XmlDocument representing the (possibly converted) file, null otherwise</returns>
 		public static XmlDocument GetXmlDocument(string filename, Logger logger)
 		{
+			logger.Log("Attempting to read file: " + filename);
+
+			// Check if file exists
+			if (!File.Exists(filename))
+			{
+				logger.Warning("File '" + filename + "' could not read from!");
+				return null;
+			}
+
 			XmlDocument doc = new XmlDocument();
-			string alltext = "";
-			string[] alllines;
 			try
 			{
-				alltext = File.ReadAllText(filename);
-				doc.LoadXml(alltext);
+				doc.LoadXml(File.ReadAllText(filename));
 			}
 			catch (XmlException)
 			{
 				try
 				{
-					alllines = File.ReadAllLines(filename);
-					alltext = Converters.ClrMameProToXML(alllines).ToString();
-					doc.LoadXml(alltext);
+					doc.LoadXml(Converters.ClrMameProToXML(File.ReadAllLines(filename)).ToString());
 				}
 				catch (Exception ex)
 				{
