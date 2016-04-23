@@ -19,7 +19,7 @@ namespace SabreTools.Helper
 			XmlDocument doc = new XmlDocument();
 			try
 			{
-				doc.LoadXml(File.ReadAllText(filename));
+				doc.LoadXml(filename);
 			}
 			catch (XmlException)
 			{
@@ -48,7 +48,7 @@ namespace SabreTools.Helper
 			XmlDocument doc = new XmlDocument();
 			try
 			{
-				doc.LoadXml(File.ReadAllText(filename));
+				doc.Load(filename);
 			}
 			catch (XmlException)
 			{
@@ -65,6 +65,10 @@ namespace SabreTools.Helper
 			catch (IOException)
 			{
 				logger.Error("File '" + filename + "' could not be open or read");
+			}
+			catch (OutOfMemoryException)
+			{
+				logger.Error("File '" + filename + "' is too large to be processed!");
 			}
 			catch (Exception ex)
 			{
