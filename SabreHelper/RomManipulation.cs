@@ -116,6 +116,7 @@ namespace SabreTools.Helper
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		/// <returns>The internal name of the DAT on success, empty string otherwise</returns>
+		/// <remarks>Needs to be upgraded to XmlTextReader</remarks>
 		public static string GetDatName(string filename, Logger logger)
 		{
 			string name = "";
@@ -163,6 +164,7 @@ namespace SabreTools.Helper
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		/// <returns>The internal name of the DAT on success, empty string otherwise</returns>
+		/// <remarks>Needs to be upgraded to XmlTextReader</remarks>
 		public static string GetDatDescription(string filename, Logger logger)
 		{
 			string desc = "";
