@@ -13,19 +13,20 @@ namespace SabreTools.Helper
 		/// Return if the file is XML or not
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
-		/// <returns>True if the file is XML, false otherwise</returns>
+		/// <returns>public static bool IsXmlDat(string filename)
 		public static bool IsXmlDat(string filename)
 		{
-			XmlDocument doc = new XmlDocument();
 			try
 			{
-				doc.LoadXml(filename);
+				StreamReader sr = new StreamReader(File.OpenRead(filename));
+				string first = sr.ReadLine();
+				sr.Close();
+				return first.Contains("<") && first.Contains(">");
 			}
-			catch (XmlException)
+			catch (Exception)
 			{
 				return false;
 			}
-			return true;
 		}
 
 		/// <summary>
