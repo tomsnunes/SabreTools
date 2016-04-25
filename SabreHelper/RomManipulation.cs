@@ -81,6 +81,36 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Get the XmlTextReader associated with a file, if possible
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		/// <returns>The XmlTextReader representing the (possibly converted) file, null otherwise</returns>
+		public static XmlTextReader GetXmlTextReader(string filename, Logger logger)
+		{
+			logger.Log("Attempting to read file: " + filename);
+
+			// Check if file exists
+			if (!File.Exists(filename))
+			{
+				logger.Warning("File '" + filename + "' could not read from!");
+				return null;
+			}
+
+			if (IsXmlDat(filename))
+			{
+				logger.Log("XML DAT detected");
+				return new XmlTextReader(filename);
+			}
+			else
+			{
+				logger.Log("Non-XML DAT detected");
+				StringReader sr = new StringReader(Converters.ClrMameProToXML(File.ReadAllLines(filename)).ToString());
+				return new XmlTextReader(sr);
+			}
+		}
+
+		/// <summary>
 		/// Get the name of the DAT for external use
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
