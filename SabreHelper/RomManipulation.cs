@@ -371,6 +371,206 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Parse a DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>List of RomData objects representing the found data</returns>
+		public static List<RomData> Parse2(string filename, int sysid, int srcid, Logger logger)
+		{
+			List<RomData> roms = new List<RomData>();
+			XmlTextReader xtr = GetXmlTextReader(filename, logger);
+			xtr.WhitespaceHandling = WhitespaceHandling.None;
+			bool superdat = false;
+			string parent = "";
+			if (xtr != null)
+			{
+				xtr.MoveToContent();
+				while (true)
+				{
+					// If we're at the end element, break
+					if (xtr.NodeType == XmlNodeType.EndElement && xtr.Name == parent)
+					{
+						break;
+					}
+
+					// We only want elements
+					if (xtr.NodeType != XmlNodeType.Element && xtr.NodeType != XmlNodeType.Text)
+					{
+						xtr.Read();
+						continue;
+					}
+
+					Console.WriteLine(xtr.Name + " " + xtr.NodeType);
+
+					if (xtr.Name == "datafile" || xtr.Name == "softwarelist")
+					{
+						parent = xtr.Name;
+						xtr.Read();
+					}
+					else if (xtr.Name == "header")
+					{
+						xtr.ReadToDescendant("name");
+						superdat = (xtr.ReadElementContentAsString() != null ? xtr.ReadElementContentAsString().Contains(" - SuperDAT") : false);
+					}
+					else if (xtr.Name == "machine" || xtr.Name == "game" || xtr.Name == "software")
+					{
+						string temptype = xtr.Name;
+						string tempname = "";
+						if (temptype == "software")
+						{
+							xtr.ReadToDescendant("description");
+							tempname = xtr.ReadElementContentAsString();
+						}
+						else
+						{
+							// There are rare cases where a malformed XML will not have the required attributes. We can only skip them.
+							if (xtr.AttributeCount == 0)
+							{
+								logger.Error("No attributes were found");
+								xtr.ReadToNextSibling(xtr.Name);
+								continue;
+							}
+							tempname = xtr.GetAttribute("name");
+						}
+
+						if (superdat)
+						{
+							tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
+						}
+
+						// Get the roms from the machine
+						if (xtr.ReadInnerXml() != null && xtr.ReadInnerXml() != "")
+						{
+							while (!(xtr.Name == temptype && xtr.NodeType == XmlNodeType.EndElement))
+							{
+								// If we find a rom or disk, add it
+								if (xtr.Name == "rom" || xtr.Name == "disk")
+								{
+									// Take care of hex-sized files
+									long size = -1;
+									if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
+									{
+										size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
+									}
+									else if (xtr.GetAttribute("size") != null)
+									{
+										Int64.TryParse(xtr.GetAttribute("size"), out size);
+									}
+
+									roms.Add(new RomData
+									{
+										Game = tempname,
+										Name = xtr.GetAttribute("name"),
+										Type = xtr.Name,
+										SystemID = sysid,
+										SourceID = srcid,
+										Size = size,
+										CRC = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : ""),
+										MD5 = (xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : ""),
+										SHA1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : ""),
+									});
+
+									xtr.Read();
+
+									// If we hit end of file, break
+									if (xtr.EOF)
+									{
+										break;
+									}
+								}
+								// If we find the signs of a software list, traverse the children
+								else if (xtr.NodeType == XmlNodeType.Element && xtr.Name == "part" && xtr.ReadInnerXml() != null && xtr.ReadInnerXml() != "")
+								{
+									while (!(xtr.Name == "part" && xtr.NodeType == XmlNodeType.EndElement))
+									{
+										// If we find a dataarea, traverse the children
+										if (xtr.NodeType == XmlNodeType.Element && xtr.Name == "dataarea")
+										{
+											while (!(xtr.Name == "dataarea" && xtr.NodeType == XmlNodeType.EndElement))
+											{
+												// If we find a rom or disk, add it
+												if ((xtr.Name == "rom" || xtr.Name == "disk") && xtr.GetAttribute("name") != null)
+												{
+													// Take care of hex-sized files
+													long size = -1;
+													if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
+													{
+														size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
+													}
+													else if (xtr.GetAttribute("size") != null)
+													{
+														Int64.TryParse(xtr.GetAttribute("size"), out size);
+													}
+
+													roms.Add(new RomData
+													{
+														Game = tempname,
+														Name = xtr.GetAttribute("name"),
+														Type = xtr.Name,
+														SystemID = sysid,
+														SourceID = srcid,
+														Size = size,
+														CRC = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : ""),
+														MD5 = (xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : ""),
+														SHA1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : ""),
+													});
+												}
+
+												xtr.Read();
+
+												// If we hit end of file, break
+												if (xtr.EOF)
+												{
+													break;
+												}
+											}
+										}
+
+										xtr.Read();
+
+										// If we hit end of file, break
+										if (xtr.EOF)
+										{
+											break;
+										}
+									}
+								}
+								else
+								{
+									xtr.Read();
+								}
+							}
+						}
+						xtr.ReadToNextSibling(temptype);
+					}
+					else
+					{
+						xtr.Read();
+					}
+
+					// If we hit end of file, break
+					if (xtr.EOF)
+					{
+						break;
+					}
+					// If we're at the end element, break
+					if (xtr.NodeType == XmlNodeType.EndElement && xtr.Name == parent)
+					{
+						break;
+					}
+				}
+			}
+
+			logger.Log("Outputting roms");
+
+			return roms;
+		}
+	}
+
+		/// <summary>
 		/// Merge an arbitrary set of ROMs based on the supplied information
 		/// </summary>
 		/// <param name="inroms">List of RomData objects representing the roms to be merged</param>
