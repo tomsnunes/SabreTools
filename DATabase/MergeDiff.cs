@@ -75,9 +75,9 @@ namespace SabreTools
 		public bool Process()
 		{
 			// Check if there are enough inputs
-			if (_inputs.Count < 2)
+			if ((!_ad && _inputs.Count < 1) || (_ad && _inputs.Count < 2))
 			{
-				_logger.Warning("At least 2 inputs are required!");
+				_logger.Warning("At least " + (_ad ? "2" : "1") + " input(s) are required!");
 				return false;
 			}
 
@@ -144,7 +144,7 @@ namespace SabreTools
 			}
 
 			// Sort the file by names for ease
-			RomManipulation.Sort(A, false);
+			RomManipulation.Sort(A, true);
 
 			// Now write the file out
 			Output.WriteToDat(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, "", A, _logger);

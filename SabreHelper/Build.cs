@@ -117,7 +117,7 @@ Options:
   -l, --log		Enable logging of program output
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
-  -m, --merge		Merge two or more DATs
+  -m, --merge		Merge one or more DATs
 	-ad, --all-diff	Enable output of all diff variants (2 DATs only)
 	-di, --diff		Switch to diffdat mode
 	-dd, --dedup		Enable deduping in the created DAT
