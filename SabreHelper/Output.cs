@@ -246,6 +246,24 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Convert a List of RomData objects' hash information to a List of tab-deliminated strings
+		/// </summary>
+		/// <param name="roms">List of RomData objects representing the roms to be parsed</param>
+		/// <returns>List of Strings representing the rom hashes</returns>
+		public static List<String> HashDataToString(List<RomData> roms)
+		{
+			List<String> outlist = new List<String>();
+			foreach (RomData rom in roms)
+			{
+				outlist.Add(rom.Size + "\t" +
+					rom.CRC + "\t" +
+					rom.MD5 + "\t" +
+					rom.SHA1);
+			}
+			return outlist;
+		}
+
+		/// <summary>
 		/// Convert a List of tab-deliminated strings objects to a List of RomData objects
 		/// </summary>
 		/// <param name="roms">List of Strings representing the roms to be parsed</param>
