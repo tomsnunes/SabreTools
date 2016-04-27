@@ -113,6 +113,7 @@ namespace SabreTools
 				_logger.Log("Adding DAT: " + input);
 				RomManipulation.Parse2(input, 0, 0, _dedup, dbc, _logger);
 
+				/*
 				List<RomData> B = RomManipulation.Parse(input, 0, 0, _logger);
 				if (_diff)
 				{
@@ -122,6 +123,7 @@ namespace SabreTools
 				{
 					A.AddRange(B);
 				}
+				*/
 			}
 
 			// Until I find a way to output the roms from the db, here's just a count of the items in it
@@ -129,7 +131,8 @@ namespace SabreTools
 			{
 				_logger.Log("Total number of lines in database: " + slc.ExecuteScalar());
 			}
-			Output.WriteToDat2(_name + "-db", _desc + "-db", _version, _date, _cat, _author, _forceunpack, _old, "", dbc, _logger);
+			Output.WriteToDat2(_name + "-db", _desc + "-db", _version, _date, _cat, _author, _forceunpack, _old, _diff, "", dbc, _logger);
+
 			dbc.Close();
 
 			// If we're in Alldiff mode, we can only use the first 2 inputs
@@ -150,6 +153,7 @@ namespace SabreTools
 				Output.WriteToDat(_name + "-inboth", _desc + "-inboth", _version, _date, _cat, _author, _forceunpack, _old, "", BothAB, _logger);
 			}
 
+			/*
 			// If we want a merged list, send it for merging before outputting
 			if (_dedup)
 			{
@@ -161,6 +165,7 @@ namespace SabreTools
 
 			// Now write the file out
 			Output.WriteToDat(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, "", A, _logger);
+			*/
 
 			return true;
 		}

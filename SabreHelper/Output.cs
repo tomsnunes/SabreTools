@@ -139,11 +139,13 @@ namespace SabreTools.Helper
 		/// <param name="author">DAT author</param>
 		/// <param name="forceunpack">Force all sets to be unzipped</param>
 		/// <param name="old">Set output mode to old-style DAT</param>
+		/// <param name="diff">Only output files that don't have dupes</param>
 		/// <param name="outDir">Set the output directory</param>
 		/// <param name="dbc">Database connection representing the roms to be written</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>Tru if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToDat2(string name, string description, string version, string date, string category, string author, bool forceunpack, bool old, string outDir, SqliteConnection dbc, Logger logger)
+		public static bool WriteToDat2(string name, string description, string version, string date, string category,
+			string author, bool forceunpack, bool old, bool diff, string outDir, SqliteConnection dbc, Logger logger)
 		{
 			// If it's empty, use the current folder
 			if (outDir.Trim() == "")
@@ -193,7 +195,8 @@ namespace SabreTools.Helper
 
 				// Write out each of the machines and roms
 				string lastgame = "";
-				using (SqliteDataReader sldr = (new SqliteCommand("SELECT * FROM roms ORDER BY game, name", dbc).ExecuteReader()))
+				string query = "SELECT * FROM roms" + (diff ? " WHERE dupe='false'" : "") + " ORDER BY game, name";
+				using (SqliteDataReader sldr = (new SqliteCommand(query, dbc).ExecuteReader()))
 				{
 					while (sldr.Read())
 					{
