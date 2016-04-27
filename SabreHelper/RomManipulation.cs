@@ -451,51 +451,75 @@ namespace SabreTools.Helper
 											Int64.TryParse(xtr.GetAttribute("size"), out size);
 										}
 
-										// If the rom doesn't exist, add it to the database
-										string query = @"SELECT sha1 FROM roms WHERE size=" + size +
-(xtr.GetAttribute("crc") != null ? " AND crc='" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : "") +
-(xtr.GetAttribute("md5") != null ? " AND md5='" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : "") +
-(xtr.GetAttribute("sha1") != null ? " AND sha1='" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : "") +
-(merge ? "" : " AND game='" + tempname.Replace("'", "''") + "' AND name='" + xtr.GetAttribute("name").Replace("'", "''") + "' AND sysid=" + sysid + " AND srcid=" + srcid);
-
-										using (SqliteCommand slc = new SqliteCommand(query, dbc))
+										// If we're in merged mode, check before adding
+										if (merge)
 										{
-											using (SqliteDataReader sldr = slc.ExecuteReader())
+											// If the rom doesn't exist, add it to the database
+											string query = @"SELECT sha1 FROM roms WHERE size=" + size +
+	(xtr.GetAttribute("crc") != null ? " AND crc='" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : "") +
+	(xtr.GetAttribute("md5") != null ? " AND md5='" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : "") +
+	(xtr.GetAttribute("sha1") != null ? " AND sha1='" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : "") +
+	(merge ? "" : " AND game='" + tempname.Replace("'", "''") + "' AND name='" + xtr.GetAttribute("name").Replace("'", "''") + "' AND sysid=" + sysid + " AND srcid=" + srcid);
+
+											using (SqliteCommand slc = new SqliteCommand(query, dbc))
 											{
-												// If there's no returns, then add the file
-												if (!sldr.HasRows)
+												using (SqliteDataReader sldr = slc.ExecuteReader())
 												{
-													query = @"INSERT INTO roms 
+													// If there's no returns, then add the file
+													if (!sldr.HasRows)
+													{
+														query = @"INSERT INTO roms 
 (game, name, type, sysid, srcid, size, crc, md5, sha1)
 VALUES ('" + tempname.Replace("'", "''") + "', '" +
-		xtr.GetAttribute("name").Replace("'", "''") + "', '" +
-		xtr.Name + "', " +
-		sysid + ", " +
-		srcid + ", " +
-		size +
-		(xtr.GetAttribute("crc") != null ? ", '" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : ", ''") +
-		(xtr.GetAttribute("md5") != null ? ", '" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : ", ''") +
-		(xtr.GetAttribute("sha1") != null ? ", '" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : ", ''") +
-	")";
-													using (SqliteCommand sslc = new SqliteCommand(query, dbc))
-													{
-														sslc.ExecuteNonQuery();
+			xtr.GetAttribute("name").Replace("'", "''") + "', '" +
+			xtr.Name + "', " +
+			sysid + ", " +
+			srcid + ", " +
+			size +
+			(xtr.GetAttribute("crc") != null ? ", '" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : ", ''") +
+			(xtr.GetAttribute("md5") != null ? ", '" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : ", ''") +
+			(xtr.GetAttribute("sha1") != null ? ", '" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : ", ''") +
+		")";
+														using (SqliteCommand sslc = new SqliteCommand(query, dbc))
+														{
+															sslc.ExecuteNonQuery();
+														}
 													}
-												}
-												// Otherwise, set the dupe flag to true
-												else
-												{
-													query = @"UPDATE roms SET dupe='true' WHERE size=" + size +
-(xtr.GetAttribute("crc") != null ? " AND crc='" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : "") +
-(xtr.GetAttribute("md5") != null ? " AND md5='" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : "") +
-(xtr.GetAttribute("sha1") != null ? " AND sha1='" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : "") +
-(merge ? "" : " AND game='" + tempname.Replace("'", "''") + "' AND name='" + xtr.GetAttribute("name").Replace("'", "''") + "' AND sysid=" + sysid + " AND srcid=" + srcid);
+													// Otherwise, set the dupe flag to true
+													else
+													{
+														query = @"UPDATE roms SET dupe='true' WHERE size=" + size +
+	(xtr.GetAttribute("crc") != null ? " AND crc='" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : "") +
+	(xtr.GetAttribute("md5") != null ? " AND md5='" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : "") +
+	(xtr.GetAttribute("sha1") != null ? " AND sha1='" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : "") +
+	(merge ? "" : " AND game='" + tempname.Replace("'", "''") + "' AND name='" + xtr.GetAttribute("name").Replace("'", "''") + "' AND sysid=" + sysid + " AND srcid=" + srcid);
 
-													using (SqliteCommand sslc = new SqliteCommand(query, dbc))
-													{
-														sslc.ExecuteNonQuery();
+														using (SqliteCommand sslc = new SqliteCommand(query, dbc))
+														{
+															sslc.ExecuteNonQuery();
+														}
 													}
 												}
+											}
+										}
+										// If we're not in merged mode, just add it
+										else
+										{
+											string query = @"INSERT INTO roms 
+(game, name, type, sysid, srcid, size, crc, md5, sha1)
+VALUES ('" + tempname.Replace("'", "''") + "', '" +
+			xtr.GetAttribute("name").Replace("'", "''") + "', '" +
+			xtr.Name + "', " +
+			sysid + ", " +
+			srcid + ", " +
+			size +
+			(xtr.GetAttribute("crc") != null ? ", '" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : ", ''") +
+			(xtr.GetAttribute("md5") != null ? ", '" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : ", ''") +
+			(xtr.GetAttribute("sha1") != null ? ", '" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : ", ''") +
+		")";
+											using (SqliteCommand sslc = new SqliteCommand(query, dbc))
+											{
+												sslc.ExecuteNonQuery();
 											}
 										}
 	
