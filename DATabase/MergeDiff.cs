@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mono.Data.Sqlite;
 using System.IO;
 
 using SabreTools.Helper;
@@ -105,9 +106,13 @@ namespace SabreTools
 
 			List<RomData> A = new List<RomData>();
 
+			SqliteConnection dbc = DBTools.InMemoryDb();
+
 			foreach (string input in _inputs)
 			{
 				_logger.Log("Adding DAT: " + input);
+				RomManipulation.Parse2(input, 0, 0, _dedup, dbc, _logger);
+
 				List<RomData> B = RomManipulation.Parse(input, 0, 0, _logger);
 				if (_diff)
 				{
@@ -118,6 +123,13 @@ namespace SabreTools
 					A.AddRange(B);
 				}
 			}
+
+			// Until I find a way to output the roms from the db, here's just a count of the items in it
+			using (SqliteCommand slc = new SqliteCommand("SELECT count(*) FROM roms", dbc))
+			{
+				_logger.Log("Total number of lines in database: " + slc.ExecuteScalar());
+			}
+			dbc.Close();
 
 			// If we're in Alldiff mode, we can only use the first 2 inputs
 			if (_ad)

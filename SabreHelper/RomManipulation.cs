@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mono.Data.Sqlite;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -345,6 +346,185 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Parse a DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="merge">True if files should be matched by hash alone, false otherwise</param>
+		/// <param name="dbc">Database connection for adding found ROMs</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>True if no errors occur, false otherwise</returns>
+		public static bool Parse2(string filename, int sysid, int srcid, bool merge, SqliteConnection dbc, Logger logger)
+		{
+			XmlTextReader xtr = GetXmlTextReader(filename, logger);
+			xtr.WhitespaceHandling = WhitespaceHandling.None;
+			bool superdat = false, shouldbreak = false;
+			string parent = "";
+
+			// If the reader is null, return false
+			if (xtr == null)
+			{
+				return false;
+			}
+
+			xtr.MoveToContent();
+			while (xtr.NodeType != XmlNodeType.None)
+			{
+				// We only want elements
+				if (xtr.NodeType != XmlNodeType.Element)
+				{
+					xtr.Read();
+					continue;
+				}
+
+				switch (xtr.Name)
+				{
+					case "datafile":
+					case "softwarelist":
+						parent = xtr.Name;
+						xtr.Read();
+						break;
+					case "header":
+						xtr.ReadToDescendant("name");
+						superdat = (xtr.ReadElementContentAsString() != null ? xtr.ReadElementContentAsString().Contains(" - SuperDAT") : false);
+						while (xtr.Name != "header")
+						{
+							xtr.Read();
+						}
+						xtr.Read();
+						break;
+					case "machine":
+					case "game":
+					case "software":
+						string temptype = xtr.Name;
+						string tempname = "";
+
+						// We want to process the entire subtree of the game
+						XmlReader subreader = xtr.ReadSubtree();
+
+						if (subreader != null)
+						{
+							if (temptype == "software" && subreader.ReadToFollowing("description"))
+							{
+								tempname = subreader.ReadElementContentAsString();
+							}
+							else
+							{
+								// There are rare cases where a malformed XML will not have the required attributes. We can only skip them.
+								if (xtr.AttributeCount == 0)
+								{
+									logger.Error("No attributes were found");
+									xtr.ReadToNextSibling(xtr.Name);
+									continue;
+								}
+								tempname = xtr.GetAttribute("name");
+							}
+
+							if (superdat)
+							{
+								tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
+							}
+
+							while (subreader.Read())
+							{
+								// We only want elements
+								if (subreader.NodeType != XmlNodeType.Element)
+								{
+									continue;
+								}
+
+								// Get the roms from the machine
+								switch (subreader.Name)
+								{
+									case "rom":
+									case "disk":
+										// Take care of hex-sized files
+										long size = -1;
+										if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
+										{
+											size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
+										}
+										else if (xtr.GetAttribute("size") != null)
+										{
+											Int64.TryParse(xtr.GetAttribute("size"), out size);
+										}
+
+										// If the rom doesn't exist, add it to the database
+										string query = @"SELECT sha1 FROM roms WHERE size=" + size +
+(xtr.GetAttribute("crc") != null ? " AND crc='" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : "") +
+(xtr.GetAttribute("md5") != null ? " AND md5='" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : "") +
+(xtr.GetAttribute("sha1") != null ? " AND sha1='" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : "") +
+(merge ? "" : " AND game='" + tempname.Replace("'", "''") + "' AND name='" + xtr.GetAttribute("name").Replace("'", "''") + "' AND sysid=" + sysid + " AND srcid=" + srcid);
+
+										using (SqliteCommand slc = new SqliteCommand(query, dbc))
+										{
+											using (SqliteDataReader sldr = slc.ExecuteReader())
+											{
+												// If there's no returns, then add the file
+												if (!sldr.HasRows)
+												{
+													query = @"INSERT INTO roms 
+(game, name, type, sysid, srcid, size, crc, md5, sha1)
+VALUES ('" + tempname.Replace("'", "''") + "', '" +
+		xtr.GetAttribute("name").Replace("'", "''") + "', '" +
+		xtr.Name + "', " +
+		sysid + ", " +
+		srcid + ", " +
+		size +
+		(xtr.GetAttribute("crc") != null ? ", '" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : ", ''") +
+		(xtr.GetAttribute("md5") != null ? ", '" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : ", ''") +
+		(xtr.GetAttribute("sha1") != null ? ", '" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : ", ''") +
+	")";
+													using (SqliteCommand sslc = new SqliteCommand(query, dbc))
+													{
+														sslc.ExecuteNonQuery();
+													}
+												}
+												// Otherwise, set the dupe flag to true
+												else
+												{
+													query = @"UPDATE roms SET dupe='true' WHERE size=" + size +
+(xtr.GetAttribute("crc") != null ? " AND crc='" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : "") +
+(xtr.GetAttribute("md5") != null ? " AND md5='" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : "") +
+(xtr.GetAttribute("sha1") != null ? " AND sha1='" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : "") +
+(merge ? "" : " AND game='" + tempname.Replace("'", "''") + "' AND name='" + xtr.GetAttribute("name").Replace("'", "''") + "' AND sysid=" + sysid + " AND srcid=" + srcid);
+
+													using (SqliteCommand sslc = new SqliteCommand(query, dbc))
+													{
+														sslc.ExecuteNonQuery();
+													}
+												}
+											}
+										}
+	
+										break;
+								}
+							}
+						}
+
+						// Read to next game
+						if (!xtr.ReadToNextSibling(temptype))
+						{
+							shouldbreak = true;
+						}
+						break;
+					default:
+						xtr.Read();
+						break;
+				}
+
+				// If we hit an endpoint, break out of the loop early
+				if (shouldbreak)
+				{
+					break;
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Merge an arbitrary set of ROMs based on the supplied information
 		/// </summary>
 		/// <param name="inroms">List of RomData objects representing the roms to be merged</param>
@@ -435,6 +615,7 @@ namespace SabreTools.Helper
 			// Then return the result
 			return outroms;
 		}
+
 
 		/// <summary>
 		/// Sort a list of RomData objects by SystemID, SourceID, Game, and Name (in order)

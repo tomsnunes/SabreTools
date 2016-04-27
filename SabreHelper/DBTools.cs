@@ -178,6 +178,35 @@ CREATE TABLE IF NOT EXISTS gamesource (
 		}
 
 		/// <summary>
+		/// Create an in-memory database table for import and merging
+		/// </summary>
+		/// <returns>An active database connection</returns>
+		public static SqliteConnection InMemoryDb()
+		{
+			SqliteConnection dbc = new SqliteConnection("Data Source=:memory:;Version = 3;");
+			dbc.Open();
+
+			string query = @"
+CREATE TABLE IF NOT EXISTS roms (
+	'id'	INTEGER	PRIMARY KEY	NOT NULL,
+	'game'	TEXT				NOT NULL,
+	'name'	TEXT				NOT NULL,
+	'type'	TEXT				NOT NULL	DEFAULT 'rom',
+	'sysid'	INTEGER				NOT NULL,
+	'srcid'	INTEGER				NOT NULL,
+	'size'	INTEGER				NOT NULL	DEFAULT -1,
+	'crc'	TEXT				NOT NULL,
+	'md5'	TEXT				NOT NULL,
+	'sha1'	TEXT				NOT NULL,
+	'dupe'	TEXT				NOT NULL	DEFAULT 'false'
+)";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			slc.ExecuteNonQuery();
+
+			return dbc;
+		}
+
+		/// <summary>
 		/// Add a new source to the database if it doesn't already exist
 		/// </summary>
 		/// <param name="name">Source name</param>
