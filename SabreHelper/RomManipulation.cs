@@ -468,7 +468,7 @@ namespace SabreTools.Helper
 													if (!sldr.HasRows)
 													{
 														query = @"INSERT INTO roms 
-(game, name, type, sysid, srcid, size, crc, md5, sha1)
+(game, name, type, sysid, srcid, size, crc, md5, sha1, dupe)
 VALUES ('" + tempname.Replace("'", "''") + "', '" +
 			xtr.GetAttribute("name").Replace("'", "''") + "', '" +
 			xtr.Name + "', " +
@@ -478,6 +478,7 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 			(xtr.GetAttribute("crc") != null ? ", '" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : ", ''") +
 			(xtr.GetAttribute("md5") != null ? ", '" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : ", ''") +
 			(xtr.GetAttribute("sha1") != null ? ", '" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : ", ''") +
+			", '" + filename + "'" +
 		")";
 														using (SqliteCommand sslc = new SqliteCommand(query, dbc))
 														{

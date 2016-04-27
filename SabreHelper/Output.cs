@@ -24,7 +24,8 @@ namespace SabreTools.Helper
 		/// <param name="roms">List of RomData objects representing the games to be written out</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>Tru if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToDat(string name, string description, string version, string date, string category, string author, bool forceunpack, bool old, string outDir, List<RomData> roms, Logger logger)
+		public static bool WriteToDat(string name, string description, string version, string date, string category, string author,
+			bool forceunpack, bool old, string outDir, List<RomData> roms, Logger logger)
 		{
 			// If it's empty, use the current folder
 			if (outDir.Trim() == "")
@@ -140,12 +141,13 @@ namespace SabreTools.Helper
 		/// <param name="forceunpack">Force all sets to be unzipped</param>
 		/// <param name="old">Set output mode to old-style DAT</param>
 		/// <param name="diff">Only output files that don't have dupes</param>
+		/// <param name="ab">Enable output of files just in each DAT and also just duped. Best if combined with diff=true.</param>
 		/// <param name="outDir">Set the output directory</param>
 		/// <param name="dbc">Database connection representing the roms to be written</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>Tru if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToDat2(string name, string description, string version, string date, string category,
-			string author, bool forceunpack, bool old, bool diff, string outDir, SqliteConnection dbc, Logger logger)
+		public static bool WriteToDat2(string name, string description, string version, string date, string category, string author,
+			bool forceunpack, bool old, bool diff, bool ab, string outDir, SqliteConnection dbc, Logger logger)
 		{
 			// If it's empty, use the current folder
 			if (outDir.Trim() == "")
@@ -159,95 +161,132 @@ namespace SabreTools.Helper
 				outDir += Path.DirectorySeparatorChar;
 			}
 
-			// (currently uses current time, change to "last updated time")
-			logger.Log("Opening file for writing: " + outDir + description + (old ? ".dat" : ".xml"));
-
-			try
+			// Get all query strings to use
+			List<string> inputs = new List<string>();
+			inputs.Add("");
+			if (diff)
 			{
-				FileStream fs = File.Create(outDir + description + (old ? ".dat" : ".xml"));
-				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-
-				string header_old = "clrmamepro (\n" +
-					"\tname \"" + HttpUtility.HtmlEncode(name) + "\"\n" +
-					"\tdescription \"" + HttpUtility.HtmlEncode(description) + "\"\n" +
-					"\tcategory \"" + HttpUtility.HtmlEncode(category) + "\"\n" +
-					"\tversion \"" + HttpUtility.HtmlEncode(version) + "\"\n" +
-					"\tdate \"" + HttpUtility.HtmlEncode(date) + "\"\n" +
-					"\tauthor \"" + HttpUtility.HtmlEncode(author) + "\"\n" +
-					(forceunpack ? "\tforcezipping no\n" : "") +
-					")\n";
-
-				string header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-					"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
-					"\t<datafile>\n" +
-					"\t\t<header>\n" +
-					"\t\t\t<name>" + HttpUtility.HtmlEncode(name) + "</name>\n" +
-					"\t\t\t<description>" + HttpUtility.HtmlEncode(description) + "</description>\n" +
-					"\t\t\t<category>" + HttpUtility.HtmlEncode(category) + "</category>\n" +
-					"\t\t\t<version>" + HttpUtility.HtmlEncode(version) + "</version>\n" +
-					"\t\t\t<date>" + HttpUtility.HtmlEncode(date) + "</date>\n" +
-					"\t\t\t<author>" + HttpUtility.HtmlEncode(author) + "</author>\n" +
-					(forceunpack ? "\t\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
-					"\t\t</header>\n";
-
-				// Write the header out
-				sw.Write((old ? header_old : header));
-
-				// Write out each of the machines and roms
-				string lastgame = "";
-				string query = "SELECT * FROM roms" + (diff ? " WHERE dupe='false'" : "") + " ORDER BY game, name";
-				using (SqliteDataReader sldr = (new SqliteCommand(query, dbc).ExecuteReader()))
+				inputs.Add("WHERE dupe<>'true'");
+			}
+			if (ab)
+			{
+				using (SqliteDataReader sldr = (new SqliteCommand("SELECT DISTINCT dupe FROM roms", dbc).ExecuteReader()))
 				{
-					while (sldr.Read())
+					if (sldr.HasRows)
 					{
-						string state = "";
-						if (lastgame != "" && lastgame != sldr.GetString(1))
+						while (sldr.Read())
 						{
-							state += (old ? ")\n" : "\t</machine>\n");
+							inputs.Add("WHERE dupe='" + inputs + "'");
 						}
-
-						if (lastgame != sldr.GetString(1))
-						{
-							state += (old ? "game (\n\tname \"" + sldr.GetString(1) + "\"\n" +
-								"\tdescription \"" + sldr.GetString(1) + "\"\n" :
-								"\t<machine name=\"" + HttpUtility.HtmlEncode(sldr.GetString(1)) + "\">\n" +
-								"\t\t<description>" + HttpUtility.HtmlEncode(sldr.GetString(1)) + "</description>\n");
-						}
-
-						if (old)
-						{
-							state += "\t" + sldr.GetString(3) + " ( name \"" + sldr.GetString(2) + "\"" +
-								(sldr.GetInt64(6) != 0 ? " size " + sldr.GetInt64(6) : "") +
-								(sldr.GetString(7) != "" ? " crc " + sldr.GetString(7).ToLowerInvariant() : "") +
-								(sldr.GetString(8) != "" ? " md5 " + sldr.GetString(8).ToLowerInvariant() : "") +
-								(sldr.GetString(9) != "" ? " sha1 " + sldr.GetString(9).ToLowerInvariant() : "") +
-								" )\n";
-						}
-						else
-						{
-							state += "\t\t<" + sldr.GetString(3) + " name=\"" + HttpUtility.HtmlEncode(sldr.GetString(2)) + "\"" +
-								(sldr.GetInt64(6) != -1 ? " size=\"" + sldr.GetInt64(6) + "\"" : "") +
-								(sldr.GetString(7) != "" ? " crc=\"" + sldr.GetString(7).ToLowerInvariant() + "\"" : "") +
-								(sldr.GetString(8) != "" ? " md5=\"" + sldr.GetString(8).ToLowerInvariant() + "\"" : "") +
-								(sldr.GetString(9) != "" ? " sha1=\"" + sldr.GetString(9).ToLowerInvariant() + "\"" : "") +
-								"/>\n";
-						}
-
-						lastgame = sldr.GetString(1);
-
-						sw.Write(state);
 					}
 				}
-
-				sw.Write((old ? ")" : "\t</machine>\n</datafile>"));
-				logger.Log("File written!" + Environment.NewLine);
-				sw.Close();
-				fs.Close();
 			}
-			catch (Exception ex)
+
+			int i = 0;
+			foreach (string input in inputs)
 			{
-				logger.Error(ex.ToString());
-				return false;
+				string tempname = name;
+				string tempdesc = description;
+
+				// If we have special outputs, append the right things
+				if (i != 0)
+				{
+					tempname += " (" + i + ")";
+					tempdesc += " (" + i + ")";
+				}
+
+				// (currently uses current time, change to "last updated time")
+				logger.Log("Opening file for writing: " + outDir + tempdesc + (old ? ".dat" : ".xml"));
+
+				try
+				{
+					FileStream fs = File.Create(outDir + tempdesc + (old ? ".dat" : ".xml"));
+					StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
+
+					string header_old = "clrmamepro (\n" +
+						"\tname \"" + HttpUtility.HtmlEncode(tempname) + "\"\n" +
+						"\tdescription \"" + HttpUtility.HtmlEncode(tempdesc) + "\"\n" +
+						"\tcategory \"" + HttpUtility.HtmlEncode(category) + "\"\n" +
+						"\tversion \"" + HttpUtility.HtmlEncode(version) + "\"\n" +
+						"\tdate \"" + HttpUtility.HtmlEncode(date) + "\"\n" +
+						"\tauthor \"" + HttpUtility.HtmlEncode(author) + "\"\n" +
+						(forceunpack ? "\tforcezipping no\n" : "") +
+						")\n";
+
+					string header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+						"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
+						"\t<datafile>\n" +
+						"\t\t<header>\n" +
+						"\t\t\t<name>" + HttpUtility.HtmlEncode(tempname) + "</name>\n" +
+						"\t\t\t<description>" + HttpUtility.HtmlEncode(tempdesc) + "</description>\n" +
+						"\t\t\t<category>" + HttpUtility.HtmlEncode(category) + "</category>\n" +
+						"\t\t\t<version>" + HttpUtility.HtmlEncode(version) + "</version>\n" +
+						"\t\t\t<date>" + HttpUtility.HtmlEncode(date) + "</date>\n" +
+						"\t\t\t<author>" + HttpUtility.HtmlEncode(author) + "</author>\n" +
+						(forceunpack ? "\t\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
+						"\t\t</header>\n";
+
+					// Write the header out
+					sw.Write((old ? header_old : header));
+
+					// Write out each of the machines and roms
+					string lastgame = "";
+					string query = "SELECT * FROM roms " + input + " ORDER BY game, name";
+					using (SqliteDataReader sldr = (new SqliteCommand(query, dbc).ExecuteReader()))
+					{
+						while (sldr.Read())
+						{
+							string state = "";
+							if (lastgame != "" && lastgame != sldr.GetString(1))
+							{
+								state += (old ? ")\n" : "\t</machine>\n");
+							}
+
+							if (lastgame != sldr.GetString(1))
+							{
+								state += (old ? "game (\n\tname \"" + sldr.GetString(1) + "\"\n" +
+									"\tdescription \"" + sldr.GetString(1) + "\"\n" :
+									"\t<machine name=\"" + HttpUtility.HtmlEncode(sldr.GetString(1)) + "\">\n" +
+									"\t\t<description>" + HttpUtility.HtmlEncode(sldr.GetString(1)) + "</description>\n");
+							}
+
+							if (old)
+							{
+								state += "\t" + sldr.GetString(3) + " ( name \"" + sldr.GetString(2) + "\"" +
+									(sldr.GetInt64(6) != 0 ? " size " + sldr.GetInt64(6) : "") +
+									(sldr.GetString(7) != "" ? " crc " + sldr.GetString(7).ToLowerInvariant() : "") +
+									(sldr.GetString(8) != "" ? " md5 " + sldr.GetString(8).ToLowerInvariant() : "") +
+									(sldr.GetString(9) != "" ? " sha1 " + sldr.GetString(9).ToLowerInvariant() : "") +
+									" )\n";
+							}
+							else
+							{
+								state += "\t\t<" + sldr.GetString(3) + " name=\"" + HttpUtility.HtmlEncode(sldr.GetString(2)) + "\"" +
+									(sldr.GetInt64(6) != -1 ? " size=\"" + sldr.GetInt64(6) + "\"" : "") +
+									(sldr.GetString(7) != "" ? " crc=\"" + sldr.GetString(7).ToLowerInvariant() + "\"" : "") +
+									(sldr.GetString(8) != "" ? " md5=\"" + sldr.GetString(8).ToLowerInvariant() + "\"" : "") +
+									(sldr.GetString(9) != "" ? " sha1=\"" + sldr.GetString(9).ToLowerInvariant() + "\"" : "") +
+									"/>\n";
+							}
+
+							lastgame = sldr.GetString(1);
+
+							sw.Write(state);
+						}
+					}
+
+					sw.Write((old ? ")" : "\t</machine>\n</datafile>"));
+					logger.Log("File written!" + Environment.NewLine);
+					sw.Close();
+					fs.Close();
+				}
+				catch (Exception ex)
+				{
+					logger.Error(ex.ToString());
+					return false;
+				}
+
+				i++;
 			}
 
 			return true;

@@ -131,10 +131,11 @@ namespace SabreTools
 			{
 				_logger.Log("Total number of lines in database: " + slc.ExecuteScalar());
 			}
-			Output.WriteToDat2(_name + "-db", _desc + "-db", _version, _date, _cat, _author, _forceunpack, _old, _diff, "", dbc, _logger);
+			Output.WriteToDat2(_name + "-db", _desc + "-db", _version, _date, _cat, _author, _forceunpack, _old, _diff, _ad, "", dbc, _logger);
 
 			dbc.Close();
 
+			/*
 			// If we're in Alldiff mode, we can only use the first 2 inputs
 			if (_ad)
 			{
@@ -152,6 +153,7 @@ namespace SabreTools
 				Output.WriteToDat(_name + "-" + input1 + "-only", _desc + "-" + input1 + "-only", _version, _date, _cat, _author, _forceunpack, _old, "", OnlyB, _logger);
 				Output.WriteToDat(_name + "-inboth", _desc + "-inboth", _version, _date, _cat, _author, _forceunpack, _old, "", BothAB, _logger);
 			}
+			*/
 
 			/*
 			// If we want a merged list, send it for merging before outputting
