@@ -129,6 +129,7 @@ namespace SabreTools
 			{
 				_logger.Log("Total number of lines in database: " + slc.ExecuteScalar());
 			}
+			Output.WriteToDat2(_name + "-db", _desc + "-db", _version, _date, _cat, _author, _forceunpack, _old, "", dbc, _logger);
 			dbc.Close();
 
 			// If we're in Alldiff mode, we can only use the first 2 inputs

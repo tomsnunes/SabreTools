@@ -355,6 +355,7 @@ namespace SabreTools.Helper
 		/// <param name="dbc">Database connection for adding found ROMs</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>True if no errors occur, false otherwise</returns>
+		/// <remarks>This doesn't have the same output as Parse + Merge OR even just Parse. Duplicates don't seem to be added either way, why?</remarks>
 		public static bool Parse2(string filename, int sysid, int srcid, bool merge, SqliteConnection dbc, Logger logger)
 		{
 			XmlTextReader xtr = GetXmlTextReader(filename, logger);
