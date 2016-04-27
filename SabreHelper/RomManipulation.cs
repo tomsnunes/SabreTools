@@ -455,11 +455,10 @@ namespace SabreTools.Helper
 										if (merge)
 										{
 											// If the rom doesn't exist, add it to the database
-											string query = @"SELECT sha1 FROM roms WHERE size=" + size +
-	(xtr.GetAttribute("crc") != null ? " AND crc='" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : "") +
-	(xtr.GetAttribute("md5") != null ? " AND md5='" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : "") +
-	(xtr.GetAttribute("sha1") != null ? " AND sha1='" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : "") +
-	(merge ? "" : " AND game='" + tempname.Replace("'", "''") + "' AND name='" + xtr.GetAttribute("name").Replace("'", "''") + "' AND sysid=" + sysid + " AND srcid=" + srcid);
+											string query = @"SELECT id FROM roms WHERE size=" + size +
+	(xtr.GetAttribute("crc") != null ? " AND (crc='" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "' OR crc='')" : "") +
+	(xtr.GetAttribute("md5") != null ? " AND (md5='" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "' OR md5='')" : "") +
+	(xtr.GetAttribute("sha1") != null ? " AND (sha1='" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "' OR sha1='')" : "");
 
 											using (SqliteCommand slc = new SqliteCommand(query, dbc))
 											{
@@ -491,8 +490,7 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 														query = @"UPDATE roms SET dupe='true' WHERE size=" + size +
 	(xtr.GetAttribute("crc") != null ? " AND crc='" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : "") +
 	(xtr.GetAttribute("md5") != null ? " AND md5='" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : "") +
-	(xtr.GetAttribute("sha1") != null ? " AND sha1='" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : "") +
-	(merge ? "" : " AND game='" + tempname.Replace("'", "''") + "' AND name='" + xtr.GetAttribute("name").Replace("'", "''") + "' AND sysid=" + sysid + " AND srcid=" + srcid);
+	(xtr.GetAttribute("sha1") != null ? " AND sha1='" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : "");
 
 														using (SqliteCommand sslc = new SqliteCommand(query, dbc))
 														{
