@@ -559,7 +559,7 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 		/// <param name="dict">The dictionary to add found roms to</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>Dictionary with "crc-sha1-size" key and List of RomData objects value representing the found data</returns>
-		public static bool ParseDict(string filename, int sysid, int srcid, Dictionary<string, List<RomData>> dict, Logger logger)
+		public static Dictionary<string, List<RomData>> ParseDict(string filename, int sysid, int srcid, Dictionary<string, List<RomData>> dict, Logger logger)
 		{
 			XmlTextReader xtr = GetXmlTextReader(filename, logger);
 			xtr.WhitespaceHandling = WhitespaceHandling.None;
@@ -701,7 +701,7 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 				}
 			}
 
-			return true;
+			return dict;
 		}
 
 		/// <summary>

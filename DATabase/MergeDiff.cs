@@ -100,6 +100,7 @@ namespace SabreTools
 				_author = "SabreTools";
 			}
 
+			/*
 			// Create the database of ROMs from the input DATs
 			SqliteConnection dbc = DBTools.InMemoryDb();
 			foreach (string input in _inputs)
@@ -111,30 +112,72 @@ namespace SabreTools
 			// Output all DATs specified by user inputs
 			Output.WriteToDatFromDb(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, _diff, _ad, "", dbc, _logger);
 			dbc.Close();
+			*/
 
 			// Create a dictionary of all ROMs from the input DATs
 			Dictionary<string, List<RomData>> dict = new Dictionary<string, List<RomData>>();
 			foreach (string input in _inputs)
 			{
 				_logger.Log("Adding DAT: " + input);
-				RomManipulation.ParseDict(input, 0, 0, dict, _logger);
+				dict = RomManipulation.ParseDict(input, 0, 0, dict, _logger);
 			}
 			
 			// Modify the Dictionary if necessary and output the results
-			if (_diff)
+			if (_diff || _ad)
 			{
 				// Get all entries that have only one item in their list
+				Dictionary<string, List<RomData>> diffed = new Dictionary<string, List<RomData>>();
+				foreach (string key in dict.Keys)
+				{
+					if (dict[key].Count == 1)
+					{
+						diffed.Add(key, dict[key]);
+					}
+				}
+
+				// Output the difflist only if we're in diff mode and not AB
+				if (_diff)
+				{
+					Output.WriteToDatFromDict(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", diffed, _logger);
+				}
+
+				// For the AB mode, get all required dictionaries and output with a new name
+				if (_ad)
+				{
+					// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
+					string post = "";
+					foreach (string filename in _inputs)
+					{
+						Dictionary<string, List<RomData>> sysDict = new Dictionary<string, List<RomData>>();
+						foreach (string key in diffed.Keys)
+						{
+							if (diffed[key][0].System == filename)
+							{
+								sysDict.Add(key, diffed[key]);
+							}
+						}
+
+						post = " (" + Path.GetFileNameWithoutExtension(filename) + ")";
+						Output.WriteToDatFromDict(_name + post, _desc + post, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", sysDict, _logger);
+					}
+
+					// Then loop through all that have a count > 1 for the AB merged DAT
+					Dictionary<string, List<RomData>> duplicates = new Dictionary<string, List<RomData>>();
+					post = " (dupes)";
+					foreach (string key in dict.Keys)
+					{
+						if (dict[key].Count > 1)
+						{
+							duplicates.Add(key, diffed[key]);
+						}
+					}
+					Output.WriteToDatFromDict(_name + post, _desc + post, _version, _date, _cat, _author, _forceunpack, _old, true, "", duplicates, _logger);
+				}
 			}
+			// Output all entries with user-defined merge
 			else
 			{
-				// Output all entries with user-defined merge
-			}
-
-			// For the AB mode, get all required dictionaries and output with a new name
-			if (_ad)
-			{
-				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
-				// Then loop through all that have a count > 1 for the AB merged DAT
+				Output.WriteToDatFromDict(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", dict, _logger);
 			}
 
 			return true;
