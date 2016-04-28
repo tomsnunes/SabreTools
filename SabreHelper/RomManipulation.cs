@@ -483,7 +483,7 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 		")";
 														using (SqliteCommand sslc = new SqliteCommand(query, dbc))
 														{
-															sslc.ExecuteNonQuery();
+															sslc.ExecuteNonQueryAsync();
 														}
 													}
 													// Otherwise, set the dupe flag to true
@@ -496,7 +496,7 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 
 														using (SqliteCommand sslc = new SqliteCommand(query, dbc))
 														{
-															sslc.ExecuteNonQuery();
+															sslc.ExecuteNonQueryAsync();
 														}
 													}
 												}
@@ -520,7 +520,7 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 		")";
 											using (SqliteCommand sslc = new SqliteCommand(query, dbc))
 											{
-												sslc.ExecuteNonQuery();
+												sslc.ExecuteNonQueryAsync();
 											}
 										}
 	
@@ -548,6 +548,160 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Parse a DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>Dictionary with "crc-sha1-size" key and List of RomData objects value representing the found data</returns>
+		public static Dictionary<string, List<RomData>> ParseDict(string filename, int sysid, int srcid, Logger logger)
+		{
+			Dictionary<string, List<RomData>> roms = new Dictionary<string, List<RomData>>();
+			XmlTextReader xtr = GetXmlTextReader(filename, logger);
+			xtr.WhitespaceHandling = WhitespaceHandling.None;
+			bool superdat = false, shouldbreak = false;
+			string parent = "";
+			if (xtr != null)
+			{
+				xtr.MoveToContent();
+				while (xtr.NodeType != XmlNodeType.None)
+				{
+					// We only want elements
+					if (xtr.NodeType != XmlNodeType.Element)
+					{
+						xtr.Read();
+						continue;
+					}
+
+					switch (xtr.Name)
+					{
+						case "datafile":
+						case "softwarelist":
+							parent = xtr.Name;
+							xtr.Read();
+							break;
+						case "header":
+							xtr.ReadToDescendant("name");
+							superdat = (xtr.ReadElementContentAsString() != null ? xtr.ReadElementContentAsString().Contains(" - SuperDAT") : false);
+							while (xtr.Name != "header")
+							{
+								xtr.Read();
+							}
+							xtr.Read();
+							break;
+						case "machine":
+						case "game":
+						case "software":
+							string temptype = xtr.Name;
+							string tempname = "";
+
+							// We want to process the entire subtree of the game
+							XmlReader subreader = xtr.ReadSubtree();
+
+							if (subreader != null)
+							{
+								if (temptype == "software" && subreader.ReadToFollowing("description"))
+								{
+									tempname = subreader.ReadElementContentAsString();
+								}
+								else
+								{
+									// There are rare cases where a malformed XML will not have the required attributes. We can only skip them.
+									if (xtr.AttributeCount == 0)
+									{
+										logger.Error("No attributes were found");
+										xtr.ReadToNextSibling(xtr.Name);
+										continue;
+									}
+									tempname = xtr.GetAttribute("name");
+								}
+
+								if (superdat)
+								{
+									tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
+								}
+
+								while (subreader.Read())
+								{
+									// We only want elements
+									if (subreader.NodeType != XmlNodeType.Element)
+									{
+										continue;
+									}
+
+									// Get the roms from the machine
+									switch (subreader.Name)
+									{
+										case "rom":
+										case "disk":
+											// Take care of hex-sized files
+											long size = -1;
+											if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
+											{
+												size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
+											}
+											else if (xtr.GetAttribute("size") != null)
+											{
+												Int64.TryParse(xtr.GetAttribute("size"), out size);
+											}
+
+											// Get the new values to add
+											string key = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "") +
+												(xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : "") +
+												size;
+											RomData value = new RomData
+											{
+												Game = tempname,
+												Name = xtr.GetAttribute("name"),
+												Type = xtr.Name,
+												SystemID = sysid,
+												SourceID = srcid,
+												Size = size,
+												CRC = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : ""),
+												MD5 = (xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : ""),
+												SHA1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : ""),
+												System = filename,
+											};
+
+											if (roms.ContainsKey(key))
+											{
+												roms[key].Add(value);
+											}
+											else
+											{
+												List<RomData> newvalue = new List<RomData>();
+												newvalue.Add(value);
+												roms.Add(key, newvalue);
+											}
+											break;
+									}
+								}
+							}
+
+							// Read to next game
+							if (!xtr.ReadToNextSibling(temptype))
+							{
+								shouldbreak = true;
+							}
+							break;
+						default:
+							xtr.Read();
+							break;
+					}
+
+					// If we hit an endpoint, break out of the loop early
+					if (shouldbreak)
+					{
+						break;
+					}
+				}
+			}
+
+			return roms;
 		}
 
 		/// <summary>
