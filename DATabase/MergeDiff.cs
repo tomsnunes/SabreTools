@@ -69,10 +69,6 @@ namespace SabreTools
 		/// Combine DATs, optionally diffing and deduping them
 		/// </summary>
 		/// <returns>True if the DATs merged correctly, false otherwise</returns>
-		/// <remarks>
-		/// TODO: @tractivo -for the A and B and AB output you could let this be determined by comparing the hashes.
-		/// 	when a hash is present in both dats then this entry goes to AB, if its only in A then it stay in A if in B then in B.
-		/// </remarks>
 		public bool Process()
 		{
 			// Check if there are enough inputs
@@ -104,70 +100,17 @@ namespace SabreTools
 				_author = "SabreTools";
 			}
 
-			List<RomData> A = new List<RomData>();
-
+			// Create the database of ROMs from the input DATs
 			SqliteConnection dbc = DBTools.InMemoryDb();
-
 			foreach (string input in _inputs)
 			{
 				_logger.Log("Adding DAT: " + input);
 				RomManipulation.Parse2(input, 0, 0, _dedup, dbc, _logger);
-
-				/*
-				List<RomData> B = RomManipulation.Parse(input, 0, 0, _logger);
-				if (_diff)
-				{
-					A = RomManipulation.Diff(A, B);
-				}
-				else
-				{
-					A.AddRange(B);
-				}
-				*/
 			}
 
-			// Until I find a way to output the roms from the db, here's just a count of the items in it
-			using (SqliteCommand slc = new SqliteCommand("SELECT count(*) FROM roms", dbc))
-			{
-				_logger.Log("Total number of lines in database: " + slc.ExecuteScalar());
-			}
-			Output.WriteToDatFromDb(_name + "-db", _desc + "-db", _version, _date, _cat, _author, _forceunpack, _old, _diff, _ad, "", dbc, _logger);
-
+			// Output all DATs specified by user inputs
+			Output.WriteToDatFromDb(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, _diff, _ad, "", dbc, _logger);
 			dbc.Close();
-
-			/*
-			// If we're in Alldiff mode, we can only use the first 2 inputs
-			if (_ad)
-			{
-				List<RomData> AB1 = RomManipulation.Parse(_inputs[0], 0, 0, _logger);
-				List<RomData> AB2 = RomManipulation.Parse(_inputs[1], 0, 0, _logger);
-
-				List<RomData> OnlyA = RomManipulation.DiffOnlyInA(AB1, AB2);
-				List<RomData> OnlyB = RomManipulation.DiffOnlyInA(AB2, AB1);
-				List<RomData> BothAB = RomManipulation.DiffInAB(AB1, AB2);
-
-				string input0 = Path.GetFileNameWithoutExtension(_inputs[0]);
-				string input1 = Path.GetFileNameWithoutExtension(_inputs[1]);
-
-				Output.WriteToDat(_name + "-" + input0 + "-only", _desc + "-" + input0 + "-only", _version, _date, _cat, _author, _forceunpack, _old, "", OnlyA, _logger);
-				Output.WriteToDat(_name + "-" + input1 + "-only", _desc + "-" + input1 + "-only", _version, _date, _cat, _author, _forceunpack, _old, "", OnlyB, _logger);
-				Output.WriteToDat(_name + "-inboth", _desc + "-inboth", _version, _date, _cat, _author, _forceunpack, _old, "", BothAB, _logger);
-			}
-			*/
-
-			/*
-			// If we want a merged list, send it for merging before outputting
-			if (_dedup)
-			{
-				A = RomManipulation.Merge(A);
-			}
-
-			// Sort the file by names for ease
-			RomManipulation.Sort(A, true);
-
-			// Now write the file out
-			Output.WriteToDat(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, "", A, _logger);
-			*/
 
 			return true;
 		}
