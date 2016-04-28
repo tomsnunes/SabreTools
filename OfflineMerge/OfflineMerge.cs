@@ -85,6 +85,7 @@ namespace SabreTools
 					default:
 						if (File.Exists(arg.Replace("\"", "")))
 						{
+							logger.Log("File found: " + arg);
 							if (currentAllMerged == "")
 							{
 								currentAllMerged = arg.Replace("\"", "");
@@ -104,19 +105,20 @@ namespace SabreTools
 						}
 						else if (Directory.Exists(arg.Replace("\"", "")))
 						{
+							logger.Log("Directory found: " + arg);
 							foreach (string file in Directory.GetFiles(arg.Replace("\"", ""), "*", SearchOption.AllDirectories))
 							{
 								if (currentAllMerged == "")
 								{
-									currentAllMerged = arg.Replace("\"", "");
+									currentAllMerged = file.Replace("\"", "");
 								}
 								else if (currentMissingMerged == "")
 								{
-									currentMissingMerged = arg.Replace("\"", "");
+									currentMissingMerged = file.Replace("\"", "");
 								}
 								else if (currentNewMerged == "")
 								{
-									currentNewMerged = arg.Replace("\"", "");
+									currentNewMerged = file.Replace("\"", "");
 								}
 								else
 								{
@@ -134,19 +136,19 @@ namespace SabreTools
 						}
 						break;
 				}
-
-				// If help is set or any of the inputs are empty, show help
-				if (help || currentAllMerged == "" || currentMissingMerged == "" || currentNewMerged == "")
-				{
-					Build.Help();
-					logger.Close();
-					return;
-				}
-
-				// Otherwise, run the program
-				OfflineMerge om = new OfflineMerge(currentAllMerged, currentMissingMerged, currentNewMerged, fake, logger);
-				om.Process();
 			}
+
+			// If help is set or any of the inputs are empty, show help
+			if (help || currentAllMerged == "" || currentMissingMerged == "" || currentNewMerged == "")
+			{
+				Build.Help();
+				logger.Close();
+				return;
+			}
+
+			// Otherwise, run the program
+			OfflineMerge om = new OfflineMerge(currentAllMerged, currentMissingMerged, currentNewMerged, fake, logger);
+			om.Process();
 		}
 
 		/// <summary>
@@ -258,7 +260,8 @@ namespace SabreTools
 			// If we are supposed to replace everything in the output with default values, do so
 			if (_fake)
 			{
-				foreach (string key in netNew.Keys)
+				List<string> keys = netNew.Keys.ToList();
+				foreach (string key in keys)
 				{
 					List<RomData> temp = new List<RomData>();
 					List<RomData> roms = netNew[key];
@@ -271,10 +274,10 @@ namespace SabreTools
 						rom.SHA1 = sha1zero;
 						temp.Add(rom);
 					}
-					netNew.Remove(key);
-					netNew.Add(key, temp);
+					netNew[key] = temp;
 				}
-				foreach (string key in unneeded.Keys)
+				keys = unneeded.Keys.ToList();
+				foreach (string key in keys)
 				{
 					List<RomData> temp = new List<RomData>();
 					List<RomData> roms = unneeded[key];
@@ -287,10 +290,10 @@ namespace SabreTools
 						rom.SHA1 = sha1zero;
 						temp.Add(rom);
 					}
-					unneeded.Remove(key);
-					unneeded.Add(key, temp);
+					unneeded[key] = temp;
 				}
-				foreach (string key in newMissing.Keys)
+				keys = newMissing.Keys.ToList();
+				foreach (string key in keys)
 				{
 					List<RomData> temp = new List<RomData>();
 					List<RomData> roms = newMissing[key];
@@ -303,8 +306,7 @@ namespace SabreTools
 						rom.SHA1 = sha1zero;
 						temp.Add(rom);
 					}
-					newMissing.Remove(key);
-					newMissing.Add(key, temp);
+					newMissing[key] = temp;
 				}
 			}
 
