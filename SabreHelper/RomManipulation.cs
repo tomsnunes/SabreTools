@@ -449,8 +449,9 @@ namespace SabreTools.Helper
 											}
 
 											// Get the new values to add
-											string key = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "") +
-												(xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : "") +
+											string key = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "") + "-" +
+												(xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : "") + "-" +
+												(xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : "") + "-" +
 												size;
 											RomData value = new RomData
 											{
