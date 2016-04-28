@@ -130,7 +130,7 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Create and open an output file for writing
+		/// Create and open an output file for writing direct from a database
 		/// </summary>
 		/// <param name="name">Internal name of the DAT</param>
 		/// <param name="description">Description and external name of the DAT</param>
@@ -146,7 +146,7 @@ namespace SabreTools.Helper
 		/// <param name="dbc">Database connection representing the roms to be written</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>Tru if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToDat2(string name, string description, string version, string date, string category, string author,
+		public static bool WriteToDatFromDb(string name, string description, string version, string date, string category, string author,
 			bool forceunpack, bool old, bool diff, bool ab, string outDir, SqliteConnection dbc, Logger logger)
 		{
 			// If it's empty, use the current folder
@@ -166,7 +166,7 @@ namespace SabreTools.Helper
 			inputs.Add("");
 			if (diff)
 			{
-				inputs.Add("WHERE dupe<>'true'");
+				inputs.Add("<>");
 			}
 			if (ab)
 			{
@@ -176,23 +176,42 @@ namespace SabreTools.Helper
 					{
 						while (sldr.Read())
 						{
-							inputs.Add("WHERE dupe='" + inputs + "'");
+							inputs.Add(sldr.GetString(0));
 						}
 					}
 				}
 			}
 
-			int i = 0;
-			foreach (string input in inputs)
+			for (int i = 0; i < inputs.Count; i++)
 			{
+				// Set strings to be used internally
+				string input = inputs[i];
+				string where = "";
 				string tempname = name;
 				string tempdesc = description;
+
+				// Get the right value from the input
+				if (input == "<>")
+				{
+					where = "WHERE dupe<>'true'";
+					input = "diff";
+				}
+				else if (input == "true")
+				{
+					where = "WHERE dupe='true'";
+					input = "diff";
+				}
+				else if (input != "")
+				{
+					where = "WHERE dupe='" + input + "'";
+					input = Path.GetFileNameWithoutExtension(input);
+				}
 
 				// If we have special outputs, append the right things
 				if (i != 0)
 				{
-					tempname += " (" + i + ")";
-					tempdesc += " (" + i + ")";
+					tempname += " (" + input + ")";
+					tempdesc += " (" + input + ")";
 				}
 
 				// (currently uses current time, change to "last updated time")
@@ -231,7 +250,7 @@ namespace SabreTools.Helper
 
 					// Write out each of the machines and roms
 					string lastgame = "";
-					string query = "SELECT * FROM roms " + input + " ORDER BY game, name";
+					string query = "SELECT * FROM roms " + where + " ORDER BY game, name";
 					using (SqliteDataReader sldr = (new SqliteCommand(query, dbc).ExecuteReader()))
 					{
 						while (sldr.Read())
@@ -285,8 +304,6 @@ namespace SabreTools.Helper
 					logger.Error(ex.ToString());
 					return false;
 				}
-
-				i++;
 			}
 
 			return true;

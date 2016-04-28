@@ -131,7 +131,7 @@ namespace SabreTools
 			{
 				_logger.Log("Total number of lines in database: " + slc.ExecuteScalar());
 			}
-			Output.WriteToDat2(_name + "-db", _desc + "-db", _version, _date, _cat, _author, _forceunpack, _old, _diff, _ad, "", dbc, _logger);
+			Output.WriteToDatFromDb(_name + "-db", _desc + "-db", _version, _date, _cat, _author, _forceunpack, _old, _diff, _ad, "", dbc, _logger);
 
 			dbc.Close();
 
