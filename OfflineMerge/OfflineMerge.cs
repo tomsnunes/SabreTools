@@ -56,7 +56,6 @@ namespace SabreTools
 		/// <remarks>
 		/// Need to implement:
 		/// - DAT hash and size replacement (_fake == true)
-		/// - File output
 		/// </remarks>
 		public bool Process()
 		{
@@ -147,15 +146,20 @@ namespace SabreTools
 			}
 			foreach (string key in netNew.Keys)
 			{
-				if (midMissing.ContainsKey(key))
+				if (newMissing.ContainsKey(key))
 				{
-					midMissing[key].AddRange(netNew[key]);
+					newMissing[key].AddRange(netNew[key]);
 				}
 				else
 				{
-					midMissing.Add(key, netNew[key]);
+					newMissing.Add(key, netNew[key]);
 				}
 			}
+
+			// Finally, output all of the files
+			Output.WriteToDatFromDict("netnew-merged", "netnew-merged", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", netNew, _logger);
+			Output.WriteToDatFromDict("unneeded-merged", "unneeded-merged", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", unneeded, _logger);
+			Output.WriteToDatFromDict("newmissing-merged", "newmissing-merged", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", newMissing, _logger);
 
 			return true;
 		}
