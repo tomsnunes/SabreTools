@@ -102,6 +102,28 @@ namespace SabreTools
 								logger.Warning("Only 3 input files are required; ignoring " + arg);
 							}
 						}
+						else if (Directory.Exists(arg.Replace("\"", "")))
+						{
+							foreach (string file in Directory.GetFiles(arg.Replace("\"", ""), "*", SearchOption.AllDirectories))
+							{
+								if (currentAllMerged == "")
+								{
+									currentAllMerged = arg.Replace("\"", "");
+								}
+								else if (currentMissingMerged == "")
+								{
+									currentMissingMerged = arg.Replace("\"", "");
+								}
+								else if (currentNewMerged == "")
+								{
+									currentNewMerged = arg.Replace("\"", "");
+								}
+								else
+								{
+									logger.Warning("Only 3 input files are required; ignoring " + arg);
+								}
+							}
+						}
 						else
 						{
 							logger.Warning("Invalid input detected: " + arg);
