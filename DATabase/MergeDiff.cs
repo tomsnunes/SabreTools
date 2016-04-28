@@ -171,7 +171,7 @@ namespace SabreTools
 							duplicates.Add(key, diffed[key]);
 						}
 					}
-					Output.WriteToDatFromDict(_name + post, _desc + post, _version, _date, _cat, _author, _forceunpack, _old, true, "", duplicates, _logger);
+					Output.WriteToDatFromDict(_name + post, _desc + post, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", duplicates, _logger);
 				}
 			}
 			// Output all entries with user-defined merge
