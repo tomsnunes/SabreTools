@@ -87,15 +87,15 @@ namespace SabreTools
 						{
 							if (currentAllMerged == "")
 							{
-								currentAllMerged = arg;
+								currentAllMerged = arg.Replace("\"", "");
 							}
 							else if (currentMissingMerged == "")
 							{
-								currentMissingMerged = arg;
+								currentMissingMerged = arg.Replace("\"", "");
 							}
 							else if (currentNewMerged == "")
 							{
-								currentNewMerged = arg;
+								currentNewMerged = arg.Replace("\"", "");
 							}
 							else
 							{
