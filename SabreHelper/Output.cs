@@ -320,14 +320,13 @@ namespace SabreTools.Helper
 		/// <param name="author">DAT author</param>
 		/// <param name="forceunpack">Force all sets to be unzipped</param>
 		/// <param name="old">Set output mode to old-style DAT</param>
-		/// <param name="diff">Only output files that don't have dupes</param>
-		/// <param name="ab">Enable output of files just in each DAT and also just duped. Best if combined with diff=true.</param>
+		/// <param name="merge">Enable output in merged mode (one game per hash)</param>
 		/// <param name="outDir">Set the output directory</param>
 		/// <param name="dict">Dictionary containing all the roms to be written</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>Tru if the DAT was written correctly, false otherwise</returns>
 		public static bool WriteToDatFromDict(string name, string description, string version, string date, string category, string author,
-			bool forceunpack, bool old, bool diff, bool ab, string outDir, Dictionary<string, List<RomData>> dict, Logger logger)
+			bool forceunpack, bool old, bool merge, string outDir, Dictionary<string, List<RomData>> dict, Logger logger)
 		{
 			// If it's empty, use the current folder
 			if (outDir.Trim() == "")
@@ -415,8 +414,13 @@ namespace SabreTools.Helper
 						}
 
 						lastgame = value.Game;
-
 						sw.Write(state);
+
+						// If we're in merged mode, only write the first file in each list
+						if (merge)
+						{
+							break;
+						}
 					}
 				}
 

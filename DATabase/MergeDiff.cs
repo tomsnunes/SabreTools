@@ -113,7 +113,29 @@ namespace SabreTools
 			dbc.Close();
 
 			// Create a dictionary of all ROMs from the input DATs
+			Dictionary<string, List<RomData>> dict = new Dictionary<string, List<RomData>>();
+			foreach (string input in _inputs)
+			{
+				_logger.Log("Adding DAT: " + input);
+				RomManipulation.ParseDict(input, 0, 0, dict, _logger);
+			}
 			
+			// Modify the Dictionary if necessary and output the results
+			if (_diff)
+			{
+				// Get all entries that have only one item in their list
+			}
+			else
+			{
+				// Output all entries with user-defined merge
+			}
+
+			// For the AB mode, get all required dictionaries and output with a new name
+			if (_ad)
+			{
+				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
+				// Then loop through all that have a count > 1 for the AB merged DAT
+			}
 
 			return true;
 		}

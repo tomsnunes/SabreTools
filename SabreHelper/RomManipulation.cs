@@ -556,11 +556,11 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="dict">The dictionary to add found roms to</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>Dictionary with "crc-sha1-size" key and List of RomData objects value representing the found data</returns>
-		public static Dictionary<string, List<RomData>> ParseDict(string filename, int sysid, int srcid, Logger logger)
+		public static bool ParseDict(string filename, int sysid, int srcid, Dictionary<string, List<RomData>> dict, Logger logger)
 		{
-			Dictionary<string, List<RomData>> roms = new Dictionary<string, List<RomData>>();
 			XmlTextReader xtr = GetXmlTextReader(filename, logger);
 			xtr.WhitespaceHandling = WhitespaceHandling.None;
 			bool superdat = false, shouldbreak = false;
@@ -667,15 +667,15 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 												System = filename,
 											};
 
-											if (roms.ContainsKey(key))
+											if (dict.ContainsKey(key))
 											{
-												roms[key].Add(value);
+												dict[key].Add(value);
 											}
 											else
 											{
 												List<RomData> newvalue = new List<RomData>();
 												newvalue.Add(value);
-												roms.Add(key, newvalue);
+												dict.Add(key, newvalue);
 											}
 											break;
 									}
@@ -701,7 +701,7 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 				}
 			}
 
-			return roms;
+			return true;
 		}
 
 		/// <summary>
