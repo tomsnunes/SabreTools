@@ -71,13 +71,68 @@ namespace SabreTools
 
 		/// <summary>
 		/// Process the supplied inputs and create the three required outputs:
-		/// (a) Net-New - (currentWithReplaced)-(currentAllMerged)
+		/// (a) Net New - (currentWithReplaced)-(currentAllMerged)
 		/// (b) New Missing - (a)+(currentAllMissing)
 		/// (c) Unneeded - (currentAllMerged)-(currentWithReplaced)
 		/// </summary>
 		/// <returns>True if the files were created properly, false otherwise</returns>
 		public bool Process()
 		{
+			// First get the combination Dictionary of currentWithReplaced and currentAllMerged
+			Dictionary<string, List<RomData>> completeDats = new Dictionary<string, List<RomData>>();
+			completeDats = RomManipulation.ParseDict(_currentAllMerged, 0, 0, completeDats, _logger);
+			completeDats = RomManipulation.ParseDict(_currentWithReplaced, 0, 0, completeDats, _logger);
+
+			// Now get Net New output dictionary
+			Dictionary<string, List<RomData>> netNew = new Dictionary<string, List<RomData>>();
+			foreach (string key in completeDats.Keys)
+			{
+				if (completeDats[key].Count == 1)
+				{
+					if (completeDats[key][0].System == _currentWithReplaced)
+					{
+						if (netNew.ContainsKey(key))
+						{
+							netNew[key].Add(completeDats[key][0]);
+						}
+						else
+						{
+							List<RomData> temp = new List<RomData>();
+							temp.Add(completeDats[key][0]);
+							netNew.Add(key, temp);
+						}
+
+					}
+				}
+			}
+
+			// Now create the New Missing dictionary
+			Dictionary<string, List<RomData>> newMissing = new Dictionary<string, List<RomData>>(netNew);
+			newMissing = RomManipulation.ParseDict(_currentAllMissing, 0, 0, newMissing, _logger);
+
+			// Now create the Unneeded dictionary
+			Dictionary<string, List<RomData>> unneeded = new Dictionary<string, List<RomData>>();
+			foreach (string key in completeDats.Keys)
+			{
+				if (completeDats[key].Count == 1)
+				{
+					if (completeDats[key][0].System == _currentAllMerged)
+					{
+						if (netNew.ContainsKey(key))
+						{
+							netNew[key].Add(completeDats[key][0]);
+						}
+						else
+						{
+							List<RomData> temp = new List<RomData>();
+							temp.Add(completeDats[key][0]);
+							netNew.Add(key, temp);
+						}
+
+					}
+				}
+			}
+
 			return true;
 		}
 	}
