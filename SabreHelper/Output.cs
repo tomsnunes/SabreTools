@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Mono.Data.Sqlite;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Web;
 
@@ -161,6 +162,30 @@ namespace SabreTools.Helper
 				outDir += Path.DirectorySeparatorChar;
 			}
 
+			// Get all values in the dictionary and write out
+			List<RomData> sortable = new List<RomData>();
+			List<string> keys = dict.Keys.ToList();
+			foreach (string key in keys)
+			{
+				if (merge)
+				{
+					sortable.Add(dict[key][0]);
+					dict.Remove(key);
+				}
+				else
+				{
+					sortable.AddRange(dict[key]);
+					dict.Remove(key);
+				}
+			}
+
+			// Sort the new list
+			RomManipulation.Sort(sortable, true);
+
+			// Now write out to file
+			return WriteToDat(name, description, version, date, category, author, forceunpack, old, outDir, sortable, logger);
+
+			/*
 			// (currently uses current time, change to "last updated time")
 			logger.Log("Opening file for writing: " + outDir + description + (old ? ".dat" : ".xml"));
 
@@ -257,6 +282,7 @@ namespace SabreTools.Helper
 			}
 
 			return true;
+			*/
 		}
 
 		/// <summary>
