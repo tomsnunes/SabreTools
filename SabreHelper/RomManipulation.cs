@@ -455,26 +455,6 @@ namespace SabreTools.Helper
 										// If we're in merged mode, check before adding
 										if (merge)
 										{
-											/*
-											string query = @"INSERT OR UPDATE INTO roms 
-(game, name, type, sysid, srcid, size, crc, md5, sha1, dupe)
-VALUES ('" + tempname.Replace("'", "''") + "', '" +
-			xtr.GetAttribute("name").Replace("'", "''") + "', '" +
-			xtr.Name + "', " +
-			sysid + ", " +
-			srcid + ", " +
-			size +
-			(xtr.GetAttribute("crc") != null ? ", '" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : ", ''") +
-			(xtr.GetAttribute("md5") != null ? ", '" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : ", ''") +
-			(xtr.GetAttribute("sha1") != null ? ", '" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : ", ''") +
-			", '" + filename + "'" +
-		")";
-											using (SqliteCommand slc = new SqliteCommand(query, dbc))
-											{
-												slc.ExecuteNonQuery();
-											}
-											*/
-
 											// If the rom doesn't exist, add it to the database
 											string query = @"SELECT id FROM roms WHERE size=" + size +
 	(xtr.GetAttribute("crc") != null ? " AND (crc='" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "' OR crc='')" : "") +
@@ -526,7 +506,7 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 										else
 										{
 											string query = @"INSERT INTO roms 
-(game, name, type, sysid, srcid, size, crc, md5, sha1)
+(game, name, type, sysid, srcid, size, crc, md5, sha1, filename)
 VALUES ('" + tempname.Replace("'", "''") + "', '" +
 			xtr.GetAttribute("name").Replace("'", "''") + "', '" +
 			xtr.Name + "', " +
@@ -536,6 +516,7 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 			(xtr.GetAttribute("crc") != null ? ", '" + xtr.GetAttribute("crc").ToLowerInvariant().Trim() + "'" : ", ''") +
 			(xtr.GetAttribute("md5") != null ? ", '" + xtr.GetAttribute("md5").ToLowerInvariant().Trim() + "'" : ", ''") +
 			(xtr.GetAttribute("sha1") != null ? ", '" + xtr.GetAttribute("sha1").ToLowerInvariant().Trim() + "'" : ", ''") +
+			", '" + filename + "'" +
 		")";
 											using (SqliteCommand sslc = new SqliteCommand(query, dbc))
 											{
