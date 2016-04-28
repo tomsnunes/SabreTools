@@ -506,7 +506,7 @@ VALUES ('" + tempname.Replace("'", "''") + "', '" +
 										else
 										{
 											string query = @"INSERT INTO roms 
-(game, name, type, sysid, srcid, size, crc, md5, sha1, filename)
+(game, name, type, sysid, srcid, size, crc, md5, sha1, dupe)
 VALUES ('" + tempname.Replace("'", "''") + "', '" +
 			xtr.GetAttribute("name").Replace("'", "''") + "', '" +
 			xtr.Name + "', " +
