@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Mono.Data.Sqlite;
 using System.IO;
 
 using SabreTools.Helper;
@@ -99,20 +98,6 @@ namespace SabreTools
 			{
 				_author = "SabreTools";
 			}
-
-			/*
-			// Create the database of ROMs from the input DATs
-			SqliteConnection dbc = DBTools.InMemoryDb();
-			foreach (string input in _inputs)
-			{
-				_logger.Log("Adding DAT: " + input);
-				RomManipulation.ParseDb(input, 0, 0, _dedup, dbc, _logger);
-			}
-
-			// Output all DATs specified by user inputs
-			Output.WriteToDatFromDb(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, _diff, _ad, "", dbc, _logger);
-			dbc.Close();
-			*/
 
 			// Create a dictionary of all ROMs from the input DATs
 			Dictionary<string, List<RomData>> dict = new Dictionary<string, List<RomData>>();
