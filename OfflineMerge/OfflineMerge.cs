@@ -9,12 +9,6 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
-	/*
-	0-byte Values:
-		CRC - 00000000
-		MD5 - d41d8cd98f00b204e9800998ecf8427e
-		SHA-1 - da39a3ee5e6b4b0d3255bfef95601890afd80709
-	*/
 	public class OfflineMerge
 	{
 		// Instance variables
@@ -23,6 +17,12 @@ namespace SabreTools
 		private string _currentNewMerged;
 		private bool _fake;
 		private Logger _logger;
+
+		// Static required variables
+		private static long sizezero = 0;
+		private static string crczero = "00000000";
+		private static string md5zero = "d41d8cd98f00b204e9800998ecf8427e";
+		private static string sha1zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
 		/// <summary>
 		/// Instantiate an OfflineMerge object
@@ -53,6 +53,11 @@ namespace SabreTools
 		/// (c) New Missing - (a)+(currentMissingMerged-(b))
 		/// </summary>
 		/// <returns>True if the files were created properly, false otherwise</returns>
+		/// <remarks>
+		/// Need to implement:
+		/// - DAT hash and size replacement (_fake == true)
+		/// - File output
+		/// </remarks>
 		public bool Process()
 		{
 			// First get the combination Dictionary of currentWithReplaced and currentAllMerged
