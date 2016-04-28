@@ -237,7 +237,7 @@ namespace SabreTools
 						}
 						else if (arg.StartsWith("input="))
 						{
-							inputs.Add(arg.Split('=')[1]);
+							inputs.Add(arg.Split('=')[1].Replace("\"", ""));
 						}
 						else if (arg.StartsWith("manu=") && manu == "")
 						{
@@ -283,7 +283,7 @@ namespace SabreTools
 						{
 							version = arg.Split('=')[1];
 						}
-						else if (File.Exists(arg) || Directory.Exists(arg))
+						else if (File.Exists(arg.Replace("\"", "")) || Directory.Exists(arg.Replace("\"", "")))
 						{
 							inputs.Add(arg);
 						}
@@ -1382,7 +1382,7 @@ Make a selection:
 			{
 				if (Directory.Exists(input.Replace("\"", "")))
 				{
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					foreach (string file in Directory.EnumerateFiles(input.Replace("\"", ""), "*", SearchOption.AllDirectories))
 					{
 						newInputs.Add(Path.GetFullPath(file));
 					}
