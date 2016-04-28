@@ -44,6 +44,7 @@ namespace SabreTools
 			// If there's no arguments, show the menu
 			if (args.Length == 0)
 			{
+				logger.ToFile = true;
 				ShowMainMenu();
 				logger.Close();
 				return;
