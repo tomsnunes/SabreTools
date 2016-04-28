@@ -53,10 +53,6 @@ namespace SabreTools
 		/// (c) New Missing - (a)+(currentMissingMerged-(b))
 		/// </summary>
 		/// <returns>True if the files were created properly, false otherwise</returns>
-		/// <remarks>
-		/// Need to implement:
-		/// - DAT hash and size replacement (_fake == true)
-		/// </remarks>
 		public bool Process()
 		{
 			// First get the combination Dictionary of currentWithReplaced and currentAllMerged
@@ -153,6 +149,59 @@ namespace SabreTools
 				else
 				{
 					newMissing.Add(key, netNew[key]);
+				}
+			}
+
+			// If we are supposed to replace everything in the output with default values, do so
+			if (_fake)
+			{
+				foreach (string key in netNew.Keys)
+				{
+					List<RomData> temp = new List<RomData>();
+					List<RomData> roms = netNew[key];
+					for (int i = 0; i < roms.Count; i++)
+					{
+						RomData rom = roms[i];
+						rom.Size = sizezero;
+						rom.CRC = crczero;
+						rom.MD5 = md5zero;
+						rom.SHA1 = sha1zero;
+						temp.Add(rom);
+					}
+					netNew.Remove(key);
+					netNew.Add(key, temp);
+				}
+				foreach (string key in unneeded.Keys)
+				{
+					List<RomData> temp = new List<RomData>();
+					List<RomData> roms = unneeded[key];
+					for (int i = 0; i < roms.Count; i++)
+					{
+						RomData rom = roms[i];
+						rom.Size = sizezero;
+						rom.CRC = crczero;
+						rom.MD5 = md5zero;
+						rom.SHA1 = sha1zero;
+						temp.Add(rom);
+					}
+					unneeded.Remove(key);
+					unneeded.Add(key, temp);
+				}
+				foreach (string key in newMissing.Keys)
+				{
+					List<RomData> temp = new List<RomData>();
+					List<RomData> roms = newMissing[key];
+					for (int i = 0; i < roms.Count; i++)
+					{
+						RomData rom = roms[i];
+						rom.Size = sizezero;
+						rom.CRC = crczero;
+						rom.MD5 = md5zero;
+						rom.SHA1 = sha1zero;
+						temp.Add(rom);
+					}
+					newMissing.Remove(key);
+					newMissing.Add(key, temp);
 				}
 			}
 
