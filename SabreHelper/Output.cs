@@ -144,7 +144,8 @@ namespace SabreTools.Helper
 		/// <param name="outDir">Set the output directory</param>
 		/// <param name="dict">Dictionary containing all the roms to be written</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
-		/// <returns>Tru if the DAT was written correctly, false otherwise</returns>
+		/// <returns>True if the DAT was written correctly, false otherwise</returns>
+		/// <remarks>This does not currently do the proper sorting because everything is sorted by key. It needs to have some pre-processing in order to output correctly</remarks>
 		public static bool WriteToDatFromDict(string name, string description, string version, string date, string category, string author,
 			bool forceunpack, bool old, bool merge, string outDir, Dictionary<string, List<RomData>> dict, Logger logger)
 		{
