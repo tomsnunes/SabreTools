@@ -168,7 +168,7 @@ namespace SabreTools
 					{
 						if (dict[key].Count > 1)
 						{
-							duplicates.Add(key, diffed[key]);
+							duplicates.Add(key, dict[key]);
 						}
 					}
 					Output.WriteToDatFromDict(_name + post, _desc + post, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", duplicates, _logger);
