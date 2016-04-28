@@ -11,6 +11,7 @@ namespace SabreTools.Helper
 		// Private instance variables
 		private bool _tofile;
 		private string _filename;
+		private DateTime _start;
 		private StreamWriter _log;
 
 		// Public wrappers
@@ -57,6 +58,7 @@ namespace SabreTools.Helper
 			{
 				_log = new StreamWriter(File.Open(_filename, FileMode.OpenOrCreate | FileMode.Append));
 				_log.WriteLine("Logging started " + DateTime.Now);
+				_start = DateTime.Now;
 			}
 			catch
 			{
@@ -79,7 +81,10 @@ namespace SabreTools.Helper
 
 			try
 			{
+				TimeSpan elapsed = DateTime.Now - _start;
 				_log.WriteLine("Logging ended " + DateTime.Now);
+				_log.WriteLine("Total runtime: " + elapsed.TotalMinutes);
+				Console.WriteLine("Total runtime: " + elapsed);
 				_log.Close();
 			}
 			catch
