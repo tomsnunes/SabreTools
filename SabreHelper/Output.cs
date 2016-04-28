@@ -310,6 +310,131 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Create and open an output file for writing direct from a database
+		/// </summary>
+		/// <param name="name">Internal name of the DAT</param>
+		/// <param name="description">Description and external name of the DAT</param>
+		/// <param name="version">Version or iteration of the DAT</param>
+		/// <param name="date">Usually the DAT creation date</param>
+		/// <param name="category">Category of the DAT</param>
+		/// <param name="author">DAT author</param>
+		/// <param name="forceunpack">Force all sets to be unzipped</param>
+		/// <param name="old">Set output mode to old-style DAT</param>
+		/// <param name="diff">Only output files that don't have dupes</param>
+		/// <param name="ab">Enable output of files just in each DAT and also just duped. Best if combined with diff=true.</param>
+		/// <param name="outDir">Set the output directory</param>
+		/// <param name="dict">Dictionary containing all the roms to be written</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>Tru if the DAT was written correctly, false otherwise</returns>
+		public static bool WriteToDatFromDict(string name, string description, string version, string date, string category, string author,
+			bool forceunpack, bool old, bool diff, bool ab, string outDir, Dictionary<string, List<RomData>> dict, Logger logger)
+		{
+			// If it's empty, use the current folder
+			if (outDir.Trim() == "")
+			{
+				outDir = Environment.CurrentDirectory;
+			}
+
+			// Double check the outdir for the end delim
+			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				outDir += Path.DirectorySeparatorChar;
+			}
+
+			// (currently uses current time, change to "last updated time")
+			logger.Log("Opening file for writing: " + outDir + description + (old ? ".dat" : ".xml"));
+
+			try
+			{
+				FileStream fs = File.Create(outDir + description + (old ? ".dat" : ".xml"));
+				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
+
+				string header_old = "clrmamepro (\n" +
+					"\tname \"" + HttpUtility.HtmlEncode(name) + "\"\n" +
+					"\tdescription \"" + HttpUtility.HtmlEncode(description) + "\"\n" +
+					"\tcategory \"" + HttpUtility.HtmlEncode(category) + "\"\n" +
+					"\tversion \"" + HttpUtility.HtmlEncode(version) + "\"\n" +
+					"\tdate \"" + HttpUtility.HtmlEncode(date) + "\"\n" +
+					"\tauthor \"" + HttpUtility.HtmlEncode(author) + "\"\n" +
+					(forceunpack ? "\tforcezipping no\n" : "") +
+					")\n";
+
+				string header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+					"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
+					"\t<datafile>\n" +
+					"\t\t<header>\n" +
+					"\t\t\t<name>" + HttpUtility.HtmlEncode(name) + "</name>\n" +
+					"\t\t\t<description>" + HttpUtility.HtmlEncode(description) + "</description>\n" +
+					"\t\t\t<category>" + HttpUtility.HtmlEncode(category) + "</category>\n" +
+					"\t\t\t<version>" + HttpUtility.HtmlEncode(version) + "</version>\n" +
+					"\t\t\t<date>" + HttpUtility.HtmlEncode(date) + "</date>\n" +
+					"\t\t\t<author>" + HttpUtility.HtmlEncode(author) + "</author>\n" +
+					(forceunpack ? "\t\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
+					"\t\t</header>\n";
+
+				// Write the header out
+				sw.Write((old ? header_old : header));
+
+				// Write out each of the machines and roms
+				string lastgame = "";
+				foreach (string key in dict.Keys)
+				{
+					foreach (RomData value in dict[key])
+					{
+						string state = "";
+						if (lastgame != "" && lastgame != value.Game)
+						{
+							state += (old ? ")\n" : "\t</machine>\n");
+						}
+
+						if (lastgame != value.Game)
+						{
+							state += (old ? "game (\n\tname \"" + value.Game + "\"\n" +
+								"\tdescription \"" + value.Game + "\"\n" :
+								"\t<machine name=\"" + HttpUtility.HtmlEncode(value.Game) + "\">\n" +
+								"\t\t<description>" + HttpUtility.HtmlEncode(value.Game) + "</description>\n");
+						}
+
+						if (old)
+						{
+							state += "\t" + value.Type + " ( name \"" + value.Name + "\"" +
+								(value.Size != 0 ? " size " + value.Size : "") +
+								(value.CRC != "" ? " crc " + value.CRC.ToLowerInvariant() : "") +
+								(value.MD5 != "" ? " md5 " + value.MD5.ToLowerInvariant() : "") +
+								(value.SHA1 != "" ? " sha1 " + value.SHA1.ToLowerInvariant() : "") +
+								" )\n";
+						}
+						else
+						{
+							state += "\t\t<" + value.Type + " name=\"" + HttpUtility.HtmlEncode(value.Name) + "\"" +
+								(value.Size != -1 ? " size=\"" + value.Size + "\"" : "") +
+								(value.CRC != "" ? " crc=\"" + value.CRC.ToLowerInvariant() + "\"" : "") +
+								(value.MD5 != "" ? " md5=\"" + value.MD5.ToLowerInvariant() + "\"" : "") +
+								(value.SHA1 != "" ? " sha1=\"" + value.SHA1.ToLowerInvariant() + "\"" : "") +
+								"/>\n";
+						}
+
+						lastgame = value.Game;
+
+						sw.Write(state);
+					}
+				}
+
+				sw.Write((old ? ")" : "\t</machine>\n</datafile>"));
+				logger.Log("File written!" + Environment.NewLine);
+				sw.Close();
+				fs.Close();
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Output a list of roms as a text file with an arbitrary prefix and postfix
 		/// </summary>
 		/// <param name="textfile">Name of the output file</param>

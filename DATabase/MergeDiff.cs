@@ -112,6 +112,9 @@ namespace SabreTools
 			Output.WriteToDatFromDb(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, _diff, _ad, "", dbc, _logger);
 			dbc.Close();
 
+			// Create a dictionary of all ROMs from the input DATs
+			
+
 			return true;
 		}
 	}
