@@ -178,7 +178,12 @@ Usage: OfflineMerge [options] [Complete] [Missing] [NewComplete]
 
 Options:
   -h, -?, --help	Show this help dialog
-  -f, --fake		Replace all hashes and sizes by the default");
+  -f, --fake		Replace all hashes and sizes by the default
+
+This program will output the following DATs:
+  (a) Net New - (NewComplete)-(Complete)
+  (b) Unneeded - (Complete)-(NewComplete)
+  (c) New Missing - (Net New)+(Missing-(Unneeded))");
 					break;
 				default:
 					Console.Write("This is the default help output");
