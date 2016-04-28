@@ -43,7 +43,88 @@ namespace SabreTools
 
 		public static void Main(string[] args)
 		{
-			// Read in inputs and start the processing
+			// Perform initial setup and verification
+			Logger logger = new Logger(false, "database.log");
+			logger.Start();
+			Console.Clear();
+
+			// Credits take precidence over all
+			if ((new List<string>(args)).Contains("--credits"))
+			{
+				Build.Credits();
+				logger.Close();
+				return;
+			}
+
+			// If there's no arguments, show the help
+			if (args.Length == 0)
+			{
+				Build.Help();
+				logger.Close();
+				return;
+			}
+
+			// Set all default values
+			bool help = false, fake = false;
+			string currentAllMerged = "", currentMissingMerged = "", currentNewMerged = "";
+
+			// Determine which switches are enabled (with values if necessary)
+			foreach (string arg in args)
+			{
+				switch (arg)
+				{
+					case "-?":
+					case "-h":
+					case "--help":
+						help = true;
+						break;
+					case "-f":
+					case "--fake":
+						fake = true;
+						break;
+					default:
+						if (File.Exists(arg.Replace("\"", "")))
+						{
+							if (currentAllMerged == "")
+							{
+								currentAllMerged = arg;
+							}
+							else if (currentMissingMerged == "")
+							{
+								currentMissingMerged = arg;
+							}
+							else if (currentNewMerged == "")
+							{
+								currentNewMerged = arg;
+							}
+							else
+							{
+								logger.Warning("Only 3 input files are required; ignoring " + arg);
+							}
+						}
+						else
+						{
+							logger.Warning("Invalid input detected: " + arg);
+							Console.WriteLine();
+							Build.Help();
+							logger.Close();
+							return;
+						}
+						break;
+				}
+
+				// If help is set or any of the inputs are empty, show help
+				if (help || currentAllMerged == "" || currentMissingMerged == "" || currentNewMerged == "")
+				{
+					Build.Help();
+					logger.Close();
+					return;
+				}
+
+				// Otherwise, run the program
+				OfflineMerge om = new OfflineMerge(currentAllMerged, currentMissingMerged, currentNewMerged, fake, logger);
+				om.Process();
+			}
 		}
 
 		/// <summary>

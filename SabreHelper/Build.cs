@@ -171,6 +171,15 @@ Options:
   -l, --log		Enable log to file
   -sd, --superdat	Enable SuperDAT creation");
 					break;
+				case "OfflineMerge":
+					Console.WriteLine(@"OfflineMerge - Update DATS for offline arrays
+-----------------------------------------
+Usage: OfflineMerge [options] [Complete] [Missing] [NewComplete]
+
+Options:
+  -h, -?, --help	Show this help dialog
+  -f, --fake		Replace all hashes and sizes by the default");
+					break;
 				default:
 					Console.Write("This is the default help output");
 					break;
