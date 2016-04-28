@@ -81,11 +81,11 @@ namespace SabreTools
 			// Get the values that will be used
 			if (_name == "")
 			{
-				_name = (_diff ? "diffdat" : "mergedat") + (_dedup ? "-merged" : "");
+				_name = (_diff ? "diffdat" : "mergedat") + (_dedup ? "-deduped" : "");
 			}
 			if (_desc == "")
 			{
-				_desc = (_diff ? "diffdat" : "mergedat") + (_dedup ? "-merged" : "");
+				_desc = (_diff ? "diffdat" : "mergedat") + (_dedup ? "-deduped" : "");
 				if (!_bare)
 				{
 					_desc += " (" + _date + ")";
