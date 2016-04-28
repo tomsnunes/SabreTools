@@ -74,7 +74,15 @@ This a versitile Directory to DAT file creator developed to reduce the overhead 
 
 This section is for tools that have been requested for a highly specific purpose and are not generally going to be used by regular users. All of them have a possibility of being included in the main DATabase program eventually.
 
-<b>There are no tools that are for power users at this time.</b>
+<!-- <b>There are no tools that are for power users at this time.</b> -->
+
+<b>OfflineMerge</b>
+<p/>
+This tool is meant to help users who want to keep their hard drives offline and still be up to date on what they have in their collection and what they need.
+<ul>
+	<li>Take a current merged DAT, a current missing DAT, and a new merged DAT and get all new files, files to remove, and a new missing DAT</li>
+	<li>Set all hash values to 0-byte equivalents for rom managers</li>
+</ul>
 
 <h3>Licensing</h3>
 <p/>
