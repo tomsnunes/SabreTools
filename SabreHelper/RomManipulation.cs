@@ -101,13 +101,19 @@ namespace SabreTools.Helper
 			if (IsXmlDat(filename))
 			{
 				logger.Log("XML DAT detected");
-				return new XmlTextReader(filename);
+				XmlTextReader xtr = new XmlTextReader(filename);
+				xtr.WhitespaceHandling = WhitespaceHandling.None;
+				xtr.DtdProcessing = DtdProcessing.Ignore;
+				return xtr;
 			}
 			else
 			{
 				logger.Log("Non-XML DAT detected");
 				StringReader sr = new StringReader(Converters.ClrMameProToXML(File.ReadAllLines(filename)).ToString());
-				return new XmlTextReader(sr);
+				XmlTextReader xtr = new XmlTextReader(sr);
+				xtr.WhitespaceHandling = WhitespaceHandling.None;
+				xtr.DtdProcessing = DtdProcessing.Ignore;
+				return xtr;
 			}
 		}
 
@@ -219,7 +225,6 @@ namespace SabreTools.Helper
 		{
 			List<RomData> roms = new List<RomData>();
 			XmlTextReader xtr = GetXmlTextReader(filename, logger);
-			xtr.WhitespaceHandling = WhitespaceHandling.None;
 			bool superdat = false, shouldbreak = false;
 			string parent = "";
 			if (xtr != null)
@@ -357,7 +362,6 @@ namespace SabreTools.Helper
 		public static Dictionary<string, List<RomData>> ParseDict(string filename, int sysid, int srcid, Dictionary<string, List<RomData>> dict, Logger logger)
 		{
 			XmlTextReader xtr = GetXmlTextReader(filename, logger);
-			xtr.WhitespaceHandling = WhitespaceHandling.None;
 			bool superdat = false, shouldbreak = false;
 			string parent = "";
 			if (xtr != null)
