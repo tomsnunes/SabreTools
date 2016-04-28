@@ -10,15 +10,6 @@ using SabreTools.Helper;
 namespace SabreTools
 {
 	/*
-	"Special Merge" by Obiwantje
-	------------------------
-	Inputs:
-		(1) All - Current all merged
-		(2) Missing - Current all missing
-		(3) Add - Current to add
-		(4) All-New - Current with replaced DATs (some add/remove)
-		(5) [Flag] Set all roms to have 0-byte values; if set, prepend "Offline" to DAT name/desc
-
 	0-byte Values:
 		CRC - 00000000
 		MD5 - d41d8cd98f00b204e9800998ecf8427e
