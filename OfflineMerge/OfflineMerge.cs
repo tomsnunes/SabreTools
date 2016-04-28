@@ -28,38 +28,24 @@ namespace SabreTools
 	{
 		// Instance variables
 		private string _currentAllMerged;
-		private string _currentAllMissing;
-		private List<String> _toAdd;
-		private string _currentWithReplaced;
+		private string _currentMissingMerged;
+		private string _currentNewMerged;
 		private bool _fake;
 		private Logger _logger;
 
 		/// <summary>
 		/// Instantiate an OfflineMerge object
 		/// </summary>
-		/// <param name="currentAllMerged">Old-current DAT with merged values</param>
-		/// <param name="currentAllMissing">Old-current missing DAT with merged values</param>
-		/// <param name="toAdd">List of new files to merge in</param>
-		/// <param name="currentWithReplaced">New-current DAT with merged values</param>
+		/// <param name="currentAllMerged">Old-current DAT with merged and deduped values</param>
+		/// <param name="currentMissingMerged">Old-current missing DAT with merged and deduped values</param>
+		/// <param name="currentNewMerged">New-current DAT with merged and deduped values</param>
 		/// <param name="fake">True if all values should be replaced with default 0-byte values, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public OfflineMerge (string currentAllMerged, string currentAllMissing, string toAdd, string currentWithReplaced, bool fake, Logger logger)
+		public OfflineMerge (string currentAllMerged, string currentMissingMerged, string currentNewMerged, bool fake, Logger logger)
 		{
 			_currentAllMerged = currentAllMerged.Replace("\"", "");
-			_currentAllMissing = currentAllMissing.Replace("\"", "");
-			_toAdd = new List<String>();
-			if (File.Exists(toAdd.Replace("\"", "")))
-			{
-				_toAdd.Add(toAdd.Replace("\"", ""));
-			}
-			else if (Directory.Exists(toAdd.Replace("\"", "")))
-			{
-				foreach (string file in Directory.EnumerateFiles(toAdd, "*", SearchOption.AllDirectories))
-				{
-					_toAdd.Add(file);
-				}
-			}
-			_currentWithReplaced = currentWithReplaced;
+			_currentMissingMerged = currentMissingMerged.Replace("\"", "");
+			_currentNewMerged = currentNewMerged;
 			_fake = fake;
 			_logger = logger;
 		}
@@ -71,9 +57,9 @@ namespace SabreTools
 
 		/// <summary>
 		/// Process the supplied inputs and create the three required outputs:
-		/// (a) Net New - (currentWithReplaced)-(currentAllMerged)
-		/// (b) New Missing - (a)+(currentAllMissing)
-		/// (c) Unneeded - (currentAllMerged)-(currentWithReplaced)
+		/// (a) Net New - (currentNewMerged)-(currentAllMerged)
+		/// (b) Unneeded - (currentAllMerged)-(currentNewMerged)
+		/// (c) New Missing - (a)+(currentMissingMerged-(b))
 		/// </summary>
 		/// <returns>True if the files were created properly, false otherwise</returns>
 		public bool Process()
@@ -81,7 +67,7 @@ namespace SabreTools
 			// First get the combination Dictionary of currentWithReplaced and currentAllMerged
 			Dictionary<string, List<RomData>> completeDats = new Dictionary<string, List<RomData>>();
 			completeDats = RomManipulation.ParseDict(_currentAllMerged, 0, 0, completeDats, _logger);
-			completeDats = RomManipulation.ParseDict(_currentWithReplaced, 0, 0, completeDats, _logger);
+			completeDats = RomManipulation.ParseDict(_currentNewMerged, 0, 0, completeDats, _logger);
 
 			// Now get Net New output dictionary
 			Dictionary<string, List<RomData>> netNew = new Dictionary<string, List<RomData>>();
@@ -89,7 +75,7 @@ namespace SabreTools
 			{
 				if (completeDats[key].Count == 1)
 				{
-					if (completeDats[key][0].System == _currentWithReplaced)
+					if (completeDats[key][0].System == _currentNewMerged)
 					{
 						if (netNew.ContainsKey(key))
 						{
@@ -105,10 +91,6 @@ namespace SabreTools
 					}
 				}
 			}
-
-			// Now create the New Missing dictionary
-			Dictionary<string, List<RomData>> newMissing = new Dictionary<string, List<RomData>>(netNew);
-			newMissing = RomManipulation.ParseDict(_currentAllMissing, 0, 0, newMissing, _logger);
 
 			// Now create the Unneeded dictionary
 			Dictionary<string, List<RomData>> unneeded = new Dictionary<string, List<RomData>>();
@@ -130,6 +112,52 @@ namespace SabreTools
 						}
 
 					}
+				}
+			}
+
+			// Now create the New Missing dictionary
+			Dictionary<string, List<RomData>> midMissing = new Dictionary<string, List<RomData>>();
+			midMissing = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midMissing, _logger);
+			foreach (string key in unneeded.Keys)
+			{
+				if (midMissing.ContainsKey(key))
+				{
+					midMissing[key].AddRange(unneeded[key]);
+				}
+				else
+				{
+					midMissing.Add(key, unneeded[key]);
+				}
+			}
+			Dictionary<string, List<RomData>> newMissing = new Dictionary<string, List<RomData>>();
+			foreach (string key in midMissing.Keys)
+			{
+				if (midMissing[key].Count == 1)
+				{
+					if (midMissing[key][0].System == _currentMissingMerged)
+					{
+						if (newMissing.ContainsKey(key))
+						{
+							newMissing[key].Add(midMissing[key][0]);
+						}
+						else
+						{
+							List<RomData> temp = new List<RomData>();
+							temp.Add(midMissing[key][0]);
+							newMissing.Add(key, temp);
+						}
+					}
+				}
+			}
+			foreach (string key in netNew.Keys)
+			{
+				if (midMissing.ContainsKey(key))
+				{
+					midMissing[key].AddRange(netNew[key]);
+				}
+				else
+				{
+					midMissing.Add(key, netNew[key]);
 				}
 			}
 
