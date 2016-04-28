@@ -105,7 +105,7 @@ namespace SabreTools
 			foreach (string input in _inputs)
 			{
 				_logger.Log("Adding DAT: " + input);
-				RomManipulation.Parse2(input, 0, 0, _dedup, dbc, _logger);
+				RomManipulation.ParseDb(input, 0, 0, _dedup, dbc, _logger);
 			}
 
 			// Output all DATs specified by user inputs
