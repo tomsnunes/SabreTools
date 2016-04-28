@@ -610,12 +610,16 @@ Make a selection:
 						InitGenerate(systems, sources, outdir, norename, old);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
+						systems = ""; sources = ""; outdir = "";
+						norename = false; old = false;
 						break;
 					case "7":
 						Console.Clear();
 						InitGenerateAll(outdir, norename, old);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
+						systems = ""; sources = ""; outdir = "";
+						norename = false; old = false;
 						break;
 				}
 			}
@@ -797,6 +801,8 @@ Make a selection:
 						InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
+						input = ""; prefix = ""; postfix = ""; addext = ""; repext = "";
+						usegame = true; quotes = false; gamename = false;
 						break;
 				}
 			}
@@ -849,6 +855,8 @@ Make a selection:
 						InitTrimMerge(input, root, rename, forceunpack);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
+						selection = ""; input = ""; root = "";
+						forceunpack = true; rename = true;
 						break;
 				}
 			}
@@ -942,6 +950,8 @@ Make a selection:
 						InitMergeDiff(inputs, name, desc, cat, version, author, ad, diff, dedup, bare, forceunpack, old);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
+						selection = ""; input = ""; name = ""; desc = ""; cat = ""; version = ""; author = "";
+						ad = false; dedup = false; diff = false; bare = false; forceunpack = false; old = false;
 						break;
 				}
 			}
@@ -997,6 +1007,7 @@ Make a selection:
 						InitExtSplit(input, exta, extb, outdir);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
+						input = ""; exta = ""; extb = ""; outdir = "";
 						break;
 				}
 			}
@@ -1035,6 +1046,7 @@ Make a selection:
 						InitAddSource(name, url);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
+						manufacturer = ""; system = ""; name = ""; url = "";
 						break;
 					case "2":
 						Console.Clear();
@@ -1043,6 +1055,7 @@ Make a selection:
 						InitRemoveSource(Console.ReadLine());
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
+						manufacturer = ""; system = ""; name = ""; url = "";
 						break;
 					case "3":
 						Console.Clear();
@@ -1053,6 +1066,7 @@ Make a selection:
 						InitAddSystem(manufacturer, system);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
+						manufacturer = ""; system = ""; name = ""; url = "";
 						break;
 					case "4":
 						Console.Clear();
@@ -1061,6 +1075,7 @@ Make a selection:
 						InitRemoveSystem(Console.ReadLine());
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
+						manufacturer = ""; system = ""; name = ""; url = "";
 						break;
 				}
 			}
