@@ -604,7 +604,8 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="roms">List of RomData objects representing the roms to be sorted</param>
 		/// <param name="norename">True if files are not renamed, false otherwise</param>
-		public static void Sort(List<RomData> roms, bool norename)
+		/// <returns>True if it sorted correctly, false otherwise</returns>
+		public static bool Sort(List<RomData> roms, bool norename)
 		{
 			roms.Sort(delegate (RomData x, RomData y)
 			{
@@ -622,6 +623,7 @@ namespace SabreTools.Helper
 				}
 				return (norename ? String.Compare(x.Game, y.Game) : x.SystemID - y.SystemID);
 			});
+			return true;
 		}
 
 		/// <summary>

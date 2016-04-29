@@ -151,20 +151,22 @@ namespace SabreTools.Helper
 		{
 			// Get all values in the dictionary and write out
 			List<RomData> sortable = new List<RomData>();
-			List<string> keys = dict.Keys.ToList();
-			foreach (string key in keys)
+			long count = 0;
+			foreach (List<RomData> roms in dict.Values)
 			{
 				if (merge)
 				{
-					sortable.Add(dict[key][0]);
-					dict.Remove(key);
+					sortable.Add(roms[0]);
+					count++;
 				}
 				else
 				{
-					sortable.AddRange(dict[key]);
-					dict.Remove(key);
+					sortable.AddRange(roms);
+					count += roms.Count;
 				}
 			}
+
+			logger.Log("The total number of items added for output is " + count);
 
 			// Sort the new list
 			RomManipulation.Sort(sortable, true);
