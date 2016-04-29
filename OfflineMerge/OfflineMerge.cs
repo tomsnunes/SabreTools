@@ -160,12 +160,14 @@ namespace SabreTools
 		/// <returns>True if the files were created properly, false otherwise</returns>
 		public bool Process()
 		{
-			// First get the combination Dictionary of currentWithReplaced and currentAllMerged
+			// First get the combination Dictionary of currentAllMerged and currentNewMerged
+			_logger.Log("Adding Current and New Merged DATs to the dictionary");
 			Dictionary<string, List<RomData>> completeDats = new Dictionary<string, List<RomData>>();
 			completeDats = RomManipulation.ParseDict(_currentAllMerged, 0, 0, completeDats, _logger);
 			completeDats = RomManipulation.ParseDict(_currentNewMerged, 0, 0, completeDats, _logger);
 
 			// Now get Net New output dictionary
+			_logger.Log("Creating and populating Net New dictionary");
 			Dictionary<string, List<RomData>> netNew = new Dictionary<string, List<RomData>>();
 			foreach (string key in completeDats.Keys)
 			{
@@ -189,6 +191,7 @@ namespace SabreTools
 			}
 
 			// Now create the Unneeded dictionary
+			_logger.Log("Creating and populating Uneeded dictionary");
 			Dictionary<string, List<RomData>> unneeded = new Dictionary<string, List<RomData>>();
 			foreach (string key in completeDats.Keys)
 			{
@@ -212,6 +215,7 @@ namespace SabreTools
 			}
 
 			// Now create the New Missing dictionary
+			_logger.Log("Creating and populating New Missing dictionary");
 			Dictionary<string, List<RomData>> midMissing = new Dictionary<string, List<RomData>>();
 			midMissing = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midMissing, _logger);
 			foreach (string key in unneeded.Keys)
@@ -260,6 +264,7 @@ namespace SabreTools
 			// If we are supposed to replace everything in the output with default values, do so
 			if (_fake)
 			{
+				_logger.Log("Replacing all hashes in Net New with 0-byte values");
 				List<string> keys = netNew.Keys.ToList();
 				foreach (string key in keys)
 				{
@@ -276,6 +281,8 @@ namespace SabreTools
 					}
 					netNew[key] = temp;
 				}
+
+				_logger.Log("Replacing all hashes in Unneeded with 0-byte values");
 				keys = unneeded.Keys.ToList();
 				foreach (string key in keys)
 				{
@@ -292,6 +299,8 @@ namespace SabreTools
 					}
 					unneeded[key] = temp;
 				}
+
+				_logger.Log("Replacing all hashes in New Missing with 0-byte values");
 				keys = newMissing.Keys.ToList();
 				foreach (string key in keys)
 				{
@@ -311,9 +320,9 @@ namespace SabreTools
 			}
 
 			// Finally, output all of the files
-			Output.WriteToDatFromDict("netnew-merged", "netnew-merged", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", netNew, _logger);
-			Output.WriteToDatFromDict("unneeded-merged", "unneeded-merged", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", unneeded, _logger);
-			Output.WriteToDatFromDict("newmissing-merged", "newmissing-merged", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", newMissing, _logger);
+			Output.WriteToDatFromDict("Net New", "Net New", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", netNew, _logger);
+			Output.WriteToDatFromDict("Unneeded", "Unneeded", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", unneeded, _logger);
+			Output.WriteToDatFromDict("New Missing", "New Missing", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", newMissing, _logger);
 
 			return true;
 		}
