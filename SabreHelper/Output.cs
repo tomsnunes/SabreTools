@@ -60,16 +60,16 @@ namespace SabreTools.Helper
 
 				string header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 					"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
-					"\t<datafile>\n" +
-					"\t\t<header>\n" +
-					"\t\t\t<name>" + HttpUtility.HtmlEncode(name) + "</name>\n" +
-					"\t\t\t<description>" + HttpUtility.HtmlEncode(description) + "</description>\n" +
-					"\t\t\t<category>" + HttpUtility.HtmlEncode(category) + "</category>\n" +
-					"\t\t\t<version>" + HttpUtility.HtmlEncode(version) + "</version>\n" +
-					"\t\t\t<date>" + HttpUtility.HtmlEncode(date) + "</date>\n" +
-					"\t\t\t<author>" + HttpUtility.HtmlEncode(author) + "</author>\n" +
-					(forceunpack ? "\t\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
-					"\t\t</header>\n";
+					"<datafile>\n" +
+					"\t<header>\n" +
+					"\t\t<name>" + HttpUtility.HtmlEncode(name) + "</name>\n" +
+					"\t\t<description>" + HttpUtility.HtmlEncode(description) + "</description>\n" +
+					"\t\t<category>" + HttpUtility.HtmlEncode(category) + "</category>\n" +
+					"\t\t<version>" + HttpUtility.HtmlEncode(version) + "</version>\n" +
+					"\t\t<date>" + HttpUtility.HtmlEncode(date) + "</date>\n" +
+					"\t\t<author>" + HttpUtility.HtmlEncode(author) + "</author>\n" +
+					(forceunpack ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
+					"\t</header>\n";
 
 				// Write the header out
 				sw.Write((old ? header_old : header));
