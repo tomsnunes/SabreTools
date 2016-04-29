@@ -131,7 +131,7 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Create and open an output file for writing direct from a database
+		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
 		/// <param name="name">Internal name of the DAT</param>
 		/// <param name="description">Description and external name of the DAT</param>
@@ -146,7 +146,6 @@ namespace SabreTools.Helper
 		/// <param name="dict">Dictionary containing all the roms to be written</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		/// <remarks>This does not currently do the proper sorting because everything is sorted by key. It needs to have some pre-processing in order to output correctly</remarks>
 		public static bool WriteToDatFromDict(string name, string description, string version, string date, string category, string author,
 			bool forceunpack, bool old, bool merge, string outDir, Dictionary<string, List<RomData>> dict, Logger logger)
 		{
