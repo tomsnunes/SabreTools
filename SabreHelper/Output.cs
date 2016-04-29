@@ -150,18 +150,6 @@ namespace SabreTools.Helper
 		public static bool WriteToDatFromDict(string name, string description, string version, string date, string category, string author,
 			bool forceunpack, bool old, bool merge, string outDir, Dictionary<string, List<RomData>> dict, Logger logger)
 		{
-			// If it's empty, use the current folder
-			if (outDir.Trim() == "")
-			{
-				outDir = Environment.CurrentDirectory;
-			}
-
-			// Double check the outdir for the end delim
-			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
-			{
-				outDir += Path.DirectorySeparatorChar;
-			}
-
 			// Get all values in the dictionary and write out
 			List<RomData> sortable = new List<RomData>();
 			List<string> keys = dict.Keys.ToList();
