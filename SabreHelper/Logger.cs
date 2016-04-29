@@ -49,6 +49,7 @@ namespace SabreTools.Helper
 		/// <returns>True if the logging was started correctly, false otherwise</returns>
 		public bool Start()
 		{
+			_start = DateTime.Now;
 			if (!_tofile)
 			{
 				return true;
@@ -58,7 +59,6 @@ namespace SabreTools.Helper
 			{
 				_log = new StreamWriter(File.Open(_filename, FileMode.OpenOrCreate | FileMode.Append));
 				_log.WriteLine("Logging started " + DateTime.Now);
-				_start = DateTime.Now;
 			}
 			catch
 			{
@@ -74,18 +74,20 @@ namespace SabreTools.Helper
 		/// <returns>True if the logging was ended correctly, false otherwise</returns>
 		public bool Close()
 		{
-			TimeSpan elapsed = DateTime.Now - _start;
+
+			TimeSpan span = DateTime.Now.Subtract(_start);
+			string total = span.ToString(@"hh\:mm\:ss\.fffff");
 			if (!_tofile)
 			{
-				Console.WriteLine("Total runtime: " + elapsed);
+				Console.WriteLine("Total runtime: " + total);
 				return true;
 			}
 
 			try
 			{
 				_log.WriteLine("Logging ended " + DateTime.Now);
-				_log.WriteLine("Total runtime: " + elapsed.TotalMinutes);
-				Console.WriteLine("Total runtime: " + elapsed);
+				_log.WriteLine("Total runtime: " + total);
+				Console.WriteLine("Total runtime: " + total);
 				_log.Close();
 			}
 			catch
