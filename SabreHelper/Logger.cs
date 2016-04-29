@@ -74,14 +74,15 @@ namespace SabreTools.Helper
 		/// <returns>True if the logging was ended correctly, false otherwise</returns>
 		public bool Close()
 		{
+			TimeSpan elapsed = DateTime.Now - _start;
 			if (!_tofile)
 			{
+				Console.WriteLine("Total runtime: " + elapsed);
 				return true;
 			}
 
 			try
 			{
-				TimeSpan elapsed = DateTime.Now - _start;
 				_log.WriteLine("Logging ended " + DateTime.Now);
 				_log.WriteLine("Total runtime: " + elapsed.TotalMinutes);
 				Console.WriteLine("Total runtime: " + elapsed);

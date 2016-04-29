@@ -248,7 +248,8 @@ namespace SabreTools.Helper
 							break;
 						case "header":
 							xtr.ReadToDescendant("name");
-							superdat = (xtr.ReadElementContentAsString() != null ? xtr.ReadElementContentAsString().Contains(" - SuperDAT") : false);
+							string content = xtr.ReadElementContentAsString();
+							superdat = (content != null ? content.Contains(" - SuperDAT") : false);
 							while (xtr.Name != "header")
 							{
 								xtr.Read();
@@ -385,7 +386,8 @@ namespace SabreTools.Helper
 							break;
 						case "header":
 							xtr.ReadToDescendant("name");
-							superdat = (xtr.ReadElementContentAsString() != null ? xtr.ReadElementContentAsString().Contains(" - SuperDAT") : false);
+							string content = xtr.ReadElementContentAsString();
+							superdat = (content != null ? content.Contains(" - SuperDAT") : false);
 							while (xtr.Name != "header")
 							{
 								xtr.Read();
