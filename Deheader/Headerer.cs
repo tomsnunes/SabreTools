@@ -165,8 +165,14 @@ namespace SabreTools
 					case HeaderType.NES:
 						tempDict = Remapping.NES;
 						break;
+					case HeaderType.PSID:
+						tempDict = Remapping.PSID;
+						break;
 					case HeaderType.SNES:
 						tempDict = Remapping.SNES;
+						break;
+					case HeaderType.SPC:
+						tempDict = Remapping.SPC;
 						break;
 				}
 
