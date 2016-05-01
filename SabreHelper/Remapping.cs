@@ -27,7 +27,10 @@ namespace SabreTools.Helper
 		//public static Dictionary<string, int> N64 = new Dictionary<string, int>();
 		public static Dictionary<string, int> NES = new Dictionary<string, int>();
 		public static Dictionary<string, int> PCE = new Dictionary<string, int>();
+		public static Dictionary<string, int> PSID = new Dictionary<string, int>();
 		public static Dictionary<string, int> SNES = new Dictionary<string, int>();
+		public static Dictionary<string, int> SPC = new Dictionary<string, int>();
+
 
 		/// <summary>
 		/// Create all remappings to be used by the program
@@ -139,7 +142,7 @@ namespace SabreTools.Helper
 			// Create array of dictionary names
 			string[] skippers =
 			{
-				"a7800", "fds", "lynx", /* "n64", */ "nes", "pce", "snes",
+				"a7800", "fds", "lynx", /* "n64", */ "nes", "pce", "psid", "snes", "spc",
 			};
 
 			// Loop through and add all remappings
@@ -215,8 +218,14 @@ namespace SabreTools.Helper
 							case "pce":
 								PCE.Add(header, size);
 								break;
+							case "psid":
+								PSID.Add(header, size);
+								break;
 							case "snes":
 								SNES.Add(header, size);
+								break;
+							case "spc":
+								SPC.Add(header, size);
 								break;
 						}
 					}

@@ -35,7 +35,9 @@ namespace SabreTools.Helper
 		//N64,
 		NES,
 		PCE,
+		PSID,
 		SNES,
+		SPC,
 	}
 
 	/// <summary>
