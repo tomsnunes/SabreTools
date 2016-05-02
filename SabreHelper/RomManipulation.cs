@@ -312,6 +312,14 @@ namespace SabreTools.Helper
 												Int64.TryParse(xtr.GetAttribute("size"), out size);
 											}
 
+											// Take care of hex-prefixed hashes
+											string crc = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "");
+											crc = (crc.StartsWith("0x") ? crc.Remove(0, 2) : crc);
+											string md5 = (xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : "");
+											md5 = (md5.StartsWith("0x") ? md5.Remove(0, 2) : md5);
+											string sha1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : "");
+											sha1 = (sha1.StartsWith("0x") ? sha1.Remove(0, 2) : sha1);
+
 											roms.Add(new RomData
 											{
 												Game = tempname,
@@ -320,9 +328,9 @@ namespace SabreTools.Helper
 												SystemID = sysid,
 												SourceID = srcid,
 												Size = size,
-												CRC = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : ""),
-												MD5 = (xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : ""),
-												SHA1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : ""),
+												CRC = crc,
+												MD5 = md5,
+												SHA1 = sha1,
 											});
 											break;
 									}
