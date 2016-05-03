@@ -166,7 +166,7 @@ namespace SabreTools
 			completeDats = RomManipulation.ParseDict(_currentAllMerged, 0, 0, completeDats, _logger);
 			completeDats = RomManipulation.ParseDict(_currentNewMerged, 0, 0, completeDats, _logger);
 
-			// Now get Net New output dictionary
+			// Now get Net New output dictionary [(currentNewMerged)-(currentAllMerged)]
 			_logger.Log("Creating and populating Net New dictionary");
 			Dictionary<string, List<RomData>> netNew = new Dictionary<string, List<RomData>>();
 			foreach (string key in completeDats.Keys)
@@ -185,12 +185,11 @@ namespace SabreTools
 							temp.Add(completeDats[key][0]);
 							netNew.Add(key, temp);
 						}
-
 					}
 				}
 			}
 
-			// Now create the Unneeded dictionary
+			// Now create the Unneeded dictionary [(currentAllMerged)-(currentNewMerged)]
 			_logger.Log("Creating and populating Uneeded dictionary");
 			Dictionary<string, List<RomData>> unneeded = new Dictionary<string, List<RomData>>();
 			foreach (string key in completeDats.Keys)
@@ -199,22 +198,21 @@ namespace SabreTools
 				{
 					if (completeDats[key][0].System == _currentAllMerged)
 					{
-						if (netNew.ContainsKey(key))
+						if (unneeded.ContainsKey(key))
 						{
-							netNew[key].Add(completeDats[key][0]);
+							unneeded[key].Add(completeDats[key][0]);
 						}
 						else
 						{
 							List<RomData> temp = new List<RomData>();
 							temp.Add(completeDats[key][0]);
-							netNew.Add(key, temp);
+							unneeded.Add(key, temp);
 						}
-
 					}
 				}
 			}
 
-			// Now create the New Missing dictionary
+			// Now create the New Missing dictionary [(Net New)+(currentMissingMerged-(Unneeded))]
 			_logger.Log("Creating and populating New Missing dictionary");
 			Dictionary<string, List<RomData>> midMissing = new Dictionary<string, List<RomData>>();
 			midMissing = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midMissing, _logger);
