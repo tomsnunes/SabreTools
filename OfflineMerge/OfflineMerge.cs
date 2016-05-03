@@ -156,6 +156,7 @@ namespace SabreTools
 		/// (a) Net New - (currentNewMerged)-(currentAllMerged)
 		/// (b) Unneeded - (currentAllMerged)-(currentNewMerged)
 		/// (c) New Missing - (a)+(currentMissingMerged-(b))
+		/// (d) Have - (currentNewMerged)-(c)
 		/// </summary>
 		/// <returns>True if the files were created properly, false otherwise</returns>
 		public bool Process()
@@ -259,6 +260,66 @@ namespace SabreTools
 				}
 			}
 
+			// Now create the Have dictionary [(currentNewMerged)-(c)]
+			_logger.Log("Creating and populating Have dictionary");
+			Dictionary<string, List<RomData>> midHave = new Dictionary<string, List<RomData>>();
+			foreach (string key in newMissing.Keys)
+			{
+				if (midHave.ContainsKey(key))
+				{
+					midHave[key].AddRange(newMissing[key]);
+				}
+				else
+				{
+					midHave.Add(key, newMissing[key]);
+				}
+			}
+			foreach (string key in completeDats.Keys)
+			{
+				if (midHave.ContainsKey(key))
+				{
+					foreach (RomData rom in completeDats[key])
+					{
+						if (rom.System == _currentNewMerged)
+						{
+							midHave[key].Add(rom);
+						}
+					}
+				}
+				else
+				{
+					List<RomData> roms = new List<RomData>();
+					foreach (RomData rom in completeDats[key])
+					{
+						if (rom.System == _currentNewMerged)
+						{
+							roms.Add(rom);
+						}
+					}
+					midHave.Add(key, roms);
+				}
+			}
+			Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
+			foreach (string key in midHave.Keys)
+			{
+				if (midHave[key].Count == 1)
+				{
+					if (midHave[key][0].System == _currentNewMerged)
+					{
+						if (have.ContainsKey(key))
+						{
+							have[key].Add(midHave[key][0]);
+						}
+						else
+						{
+							List<RomData> temp = new List<RomData>();
+							temp.Add(midHave[key][0]);
+							have.Add(key, temp);
+						}
+					}
+				}
+			}
+
 			// If we are supposed to replace everything in the output with default values, do so
 			if (_fake)
 			{
@@ -315,12 +376,31 @@ namespace SabreTools
 					}
 					newMissing[key] = temp;
 				}
+
+				_logger.Log("Replacing all hashes in Have with 0-byte values");
+				keys = have.Keys.ToList();
+				foreach (string key in keys)
+				{
+					List<RomData> temp = new List<RomData>();
+					List<RomData> roms = have[key];
+					for (int i = 0; i < roms.Count; i++)
+					{
+						RomData rom = roms[i];
+						rom.Size = sizezero;
+						rom.CRC = crczero;
+						rom.MD5 = md5zero;
+						rom.SHA1 = sha1zero;
+						temp.Add(rom);
+					}
+					have[key] = temp;
+				}
 			}
 
 			// Finally, output all of the files
 			Output.WriteToDatFromDict("Net New", "Net New", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", netNew, _logger);
 			Output.WriteToDatFromDict("Unneeded", "Unneeded", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", unneeded, _logger);
 			Output.WriteToDatFromDict("New Missing", "New Missing", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", newMissing, _logger);
+			Output.WriteToDatFromDict("Have", "Have", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", have, _logger);
 
 			return true;
 		}

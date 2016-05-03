@@ -118,7 +118,7 @@ Options:
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
   -m, --merge		Merge one or more DATs
-	-ad, --all-diff	Enable output of all diff variants (2 DATs only)
+	-ad, --all-diff	Enable output of all diff variants
 	-di, --diff		Switch to diffdat mode
 	-dd, --dedup		Enable deduping in the created DAT
 	-b, --bare		Don't include date in file name
@@ -183,7 +183,8 @@ Options:
 This program will output the following DATs:
   (a) Net New - (NewComplete)-(Complete)
   (b) Unneeded - (Complete)-(NewComplete)
-  (c) New Missing - (Net New)+(Missing-(Unneeded))");
+  (c) New Missing - (Net New)+(Missing-(Unneeded))
+  (d) Have - (NewComplete)-(New Missing)");
 					break;
 				default:
 					Console.Write("This is the default help output");
