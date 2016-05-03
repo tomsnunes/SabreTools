@@ -13,7 +13,7 @@ namespace SabreTools.Helper
 	{
 		// Regex matching patterns
 		private static string _headerPattern = @"(^.*?) \($";
-		private static string _itemPattern = @"^\s+(\S*?) (.*)";
+		private static string _itemPattern = @"^\s*(\S*?) (.*)";
 		private static string _endPattern = @"^\s*\)\s*$";
 
 		/// <summary>
@@ -124,7 +124,7 @@ namespace SabreTools.Helper
 
 					elem.Add(new XElement(temp));
 				}
-				// If the line is anything but a rom or disk  and we're in a block
+				// If the line is anything but a rom or disk and we're in a block
 				else if (Regex.IsMatch(line, _itemPattern) && block)
 				{
 					GroupCollection gc = Regex.Match(line, _itemPattern).Groups;
