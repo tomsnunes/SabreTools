@@ -174,17 +174,23 @@ Options:
 				case "OfflineMerge":
 					Console.WriteLine(@"OfflineMerge - Update DATS for offline arrays
 -----------------------------------------
-Usage: OfflineMerge [options] [Complete] [Missing] [NewComplete]
+Usage: OfflineMerge [options] [inputs]
 
 Options:
   -h, -?, --help	Show this help dialog
   -f, --fake		Replace all hashes and sizes by the default
 
+Inputs:
+  com=			Complete current DAT
+  fix=			Complete current Missing
+  new=			New Complete DAT
+
 This program will output the following DATs:
   (a) Net New - (NewComplete)-(Complete)
   (b) Unneeded - (Complete)-(NewComplete)
   (c) New Missing - (Net New)+(Missing-(Unneeded))
-  (d) Have - (NewComplete)-(New Missing)");
+  (d) Have - (NewComplete)-(New Missing)
+        OR (Complete or NewComplete)-(Missing) if one is missing");
 					break;
 				default:
 					Console.Write("This is the default help output");

@@ -36,7 +36,7 @@ namespace SabreTools
 		{
 			_currentAllMerged = currentAllMerged.Replace("\"", "");
 			_currentMissingMerged = currentMissingMerged.Replace("\"", "");
-			_currentNewMerged = currentNewMerged;
+			_currentNewMerged = currentNewMerged.Replace("\"", "");
 			_fake = fake;
 			_logger = logger;
 		}
@@ -83,48 +83,18 @@ namespace SabreTools
 						fake = true;
 						break;
 					default:
-						if (File.Exists(arg.Replace("\"", "")))
+						string temparg = arg.Replace("\"", "");
+						if (temparg.StartsWith("com="))
 						{
-							logger.Log("File found: " + arg);
-							if (currentAllMerged == "")
-							{
-								currentAllMerged = arg.Replace("\"", "");
-							}
-							else if (currentMissingMerged == "")
-							{
-								currentMissingMerged = arg.Replace("\"", "");
-							}
-							else if (currentNewMerged == "")
-							{
-								currentNewMerged = arg.Replace("\"", "");
-							}
-							else
-							{
-								logger.Warning("Only 3 input files are required; ignoring " + arg);
-							}
+							currentAllMerged = temparg.Split('=')[1];
 						}
-						else if (Directory.Exists(arg.Replace("\"", "")))
+						else if (temparg.StartsWith("fix="))
 						{
-							logger.Log("Directory found: " + arg);
-							foreach (string file in Directory.GetFiles(arg.Replace("\"", ""), "*", SearchOption.AllDirectories))
-							{
-								if (currentAllMerged == "")
-								{
-									currentAllMerged = file.Replace("\"", "");
-								}
-								else if (currentMissingMerged == "")
-								{
-									currentMissingMerged = file.Replace("\"", "");
-								}
-								else if (currentNewMerged == "")
-								{
-									currentNewMerged = file.Replace("\"", "");
-								}
-								else
-								{
-									logger.Warning("Only 3 input files are required; ignoring " + arg);
-								}
-							}
+							currentMissingMerged = temparg.Split('=')[1];
+						}
+						else if (temparg.StartsWith("new="))
+						{
+							currentNewMerged = temparg.Split('=')[1];
 						}
 						else
 						{
@@ -138,8 +108,8 @@ namespace SabreTools
 				}
 			}
 
-			// If help is set or any of the inputs are empty, show help
-			if (help || currentAllMerged == "" || currentMissingMerged == "" || currentNewMerged == "")
+			// If help is set or all of the inputs are empty, show help
+			if (help || (currentAllMerged == "" && currentMissingMerged == "" && currentNewMerged == ""))
 			{
 				Build.Help();
 				logger.Close();
@@ -148,265 +118,401 @@ namespace SabreTools
 
 			// Otherwise, run the program
 			OfflineMerge om = new OfflineMerge(currentAllMerged, currentMissingMerged, currentNewMerged, fake, logger);
-			om.Process();
+			bool success = om.Process();
+			if (!success)
+			{
+				logger.Warning("At least one complete DAT and the fixdat is needed to run!");
+			}
 		}
 
 		/// <summary>
-		/// Process the supplied inputs and create the three required outputs:
-		/// (a) Net New - (currentNewMerged)-(currentAllMerged)
-		/// (b) Unneeded - (currentAllMerged)-(currentNewMerged)
-		/// (c) New Missing - (a)+(currentMissingMerged-(b))
-		/// (d) Have - (currentNewMerged)-(c)
+		/// Process the supplied inputs and create the four outputs
 		/// </summary>
 		/// <returns>True if the files were created properly, false otherwise</returns>
 		public bool Process()
 		{
-			// First get the combination Dictionary of currentAllMerged and currentNewMerged
-			_logger.Log("Adding Current and New Merged DATs to the dictionary");
-			Dictionary<string, List<RomData>> completeDats = new Dictionary<string, List<RomData>>();
-			completeDats = RomManipulation.ParseDict(_currentAllMerged, 0, 0, completeDats, _logger);
-			completeDats = RomManipulation.ParseDict(_currentNewMerged, 0, 0, completeDats, _logger);
-
-			// Now get Net New output dictionary [(currentNewMerged)-(currentAllMerged)]
-			_logger.Log("Creating and populating Net New dictionary");
-			Dictionary<string, List<RomData>> netNew = new Dictionary<string, List<RomData>>();
-			foreach (string key in completeDats.Keys)
+			// Check all of the files for validity and break if one doesn't exist
+			if (_currentAllMerged != "" && !File.Exists(_currentAllMerged))
 			{
-				List<RomData> templist = RomManipulation.Merge(completeDats[key]);
-				foreach (RomData rom in templist)
+				return false;
+			}
+			if (_currentMissingMerged != "" && !File.Exists(_currentMissingMerged))
+			{
+				return false;
+			}
+			if (_currentNewMerged != "" && !File.Exists(_currentNewMerged))
+			{
+				return false;
+			}
+
+			Console.WriteLine(_currentAllMerged + " " + _currentMissingMerged + " " + _currentNewMerged);
+
+			// If we have all three DATs, then generate everything
+			if (_currentAllMerged != "" && _currentMissingMerged != "" && _currentNewMerged != "")
+			{
+				// First get the combination Dictionary of currentAllMerged and currentNewMerged
+				_logger.Log("Adding Current and New Merged DATs to the dictionary");
+				Dictionary<string, List<RomData>> completeDats = new Dictionary<string, List<RomData>>();
+				completeDats = RomManipulation.ParseDict(_currentAllMerged, 0, 0, completeDats, _logger);
+				completeDats = RomManipulation.ParseDict(_currentNewMerged, 0, 0, completeDats, _logger);
+
+				// Now get Net New output dictionary [(currentNewMerged)-(currentAllMerged)]
+				_logger.Log("Creating and populating Net New dictionary");
+				Dictionary<string, List<RomData>> netNew = new Dictionary<string, List<RomData>>();
+				foreach (string key in completeDats.Keys)
 				{
-					if (!rom.Dupe && rom.System == _currentNewMerged)
+					List<RomData> templist = RomManipulation.Merge(completeDats[key]);
+					foreach (RomData rom in templist)
 					{
-						if (netNew.ContainsKey(key))
+						if (!rom.Dupe && rom.System == _currentNewMerged)
 						{
-							netNew[key].Add(rom);
+							if (netNew.ContainsKey(key))
+							{
+								netNew[key].Add(rom);
+							}
+							else
+							{
+								List<RomData> temp = new List<RomData>();
+								temp.Add(rom);
+								netNew.Add(key, temp);
+							}
 						}
-						else
+					}
+				}
+
+				// Now create the Unneeded dictionary [(currentAllMerged)-(currentNewMerged)]
+				_logger.Log("Creating and populating Uneeded dictionary");
+				Dictionary<string, List<RomData>> unneeded = new Dictionary<string, List<RomData>>();
+				foreach (string key in completeDats.Keys)
+				{
+					List<RomData> templist = RomManipulation.Merge(completeDats[key]);
+					foreach (RomData rom in templist)
+					{
+						if (!rom.Dupe && rom.System == _currentAllMerged)
 						{
-							List<RomData> temp = new List<RomData>();
+							if (unneeded.ContainsKey(key))
+							{
+								unneeded[key].Add(rom);
+							}
+							else
+							{
+								List<RomData> temp = new List<RomData>();
+								temp.Add(rom);
+								unneeded.Add(key, temp);
+							}
+						}
+					}
+				}
+
+				// Now create the New Missing dictionary [(Net New)+(currentMissingMerged-(Unneeded))]
+				_logger.Log("Creating and populating New Missing dictionary");
+				Dictionary<string, List<RomData>> midMissing = new Dictionary<string, List<RomData>>();
+				midMissing = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midMissing, _logger);
+				foreach (string key in unneeded.Keys)
+				{
+					if (midMissing.ContainsKey(key))
+					{
+						midMissing[key].AddRange(unneeded[key]);
+					}
+					else
+					{
+						midMissing.Add(key, unneeded[key]);
+					}
+				}
+				Dictionary<string, List<RomData>> newMissing = new Dictionary<string, List<RomData>>();
+				foreach (string key in midMissing.Keys)
+				{
+					List<RomData> templist = RomManipulation.Merge(midMissing[key]);
+					foreach (RomData rom in templist)
+					{
+						if (!rom.Dupe && rom.System == _currentMissingMerged)
+						{
+							if (newMissing.ContainsKey(key))
+							{
+								newMissing[key].Add(rom);
+							}
+							else
+							{
+								List<RomData> temp = new List<RomData>();
+								temp.Add(rom);
+								newMissing.Add(key, temp);
+							}
+						}
+					}
+				}
+				foreach (string key in netNew.Keys)
+				{
+					if (newMissing.ContainsKey(key))
+					{
+						newMissing[key].AddRange(netNew[key]);
+					}
+					else
+					{
+						newMissing.Add(key, netNew[key]);
+					}
+				}
+
+				// Now create the Have dictionary [(currentNewMerged)-(c)]
+				_logger.Log("Creating and populating Have dictionary");
+				Dictionary<string, List<RomData>> midHave = new Dictionary<string, List<RomData>>();
+				foreach (string key in newMissing.Keys)
+				{
+					if (midHave.ContainsKey(key))
+					{
+						midHave[key].AddRange(newMissing[key]);
+					}
+					else
+					{
+						midHave.Add(key, newMissing[key]);
+					}
+				}
+				foreach (string key in completeDats.Keys)
+				{
+					if (midHave.ContainsKey(key))
+					{
+						foreach (RomData rom in completeDats[key])
+						{
+							if (rom.System == _currentNewMerged)
+							{
+								midHave[key].Add(rom);
+							}
+						}
+					}
+					else
+					{
+						List<RomData> roms = new List<RomData>();
+						foreach (RomData rom in completeDats[key])
+						{
+							if (rom.System == _currentNewMerged)
+							{
+								roms.Add(rom);
+							}
+						}
+						midHave.Add(key, roms);
+					}
+				}
+				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
+				foreach (string key in midHave.Keys)
+				{
+					List<RomData> templist = RomManipulation.Merge(midHave[key]);
+					foreach (RomData rom in templist)
+					{
+						if (!rom.Dupe && rom.System == _currentNewMerged)
+						{
+							if (have.ContainsKey(key))
+							{
+								have[key].Add(rom);
+							}
+							else
+							{
+								List<RomData> temp = new List<RomData>();
+								temp.Add(rom);
+								have.Add(key, temp);
+							}
+						}
+					}
+				}
+
+				// If we are supposed to replace everything in the output with default values, do so
+				if (_fake)
+				{
+					_logger.Log("Replacing all hashes in Net New with 0-byte values");
+					List<string> keys = netNew.Keys.ToList();
+					foreach (string key in keys)
+					{
+						List<RomData> temp = new List<RomData>();
+						List<RomData> roms = netNew[key];
+						for (int i = 0; i < roms.Count; i++)
+						{
+							RomData rom = roms[i];
+							rom.Size = sizezero;
+							rom.CRC = crczero;
+							rom.MD5 = md5zero;
+							rom.SHA1 = sha1zero;
 							temp.Add(rom);
-							netNew.Add(key, temp);
 						}
+						netNew[key] = temp;
 					}
-				}
-			}
 
-			// Now create the Unneeded dictionary [(currentAllMerged)-(currentNewMerged)]
-			_logger.Log("Creating and populating Uneeded dictionary");
-			Dictionary<string, List<RomData>> unneeded = new Dictionary<string, List<RomData>>();
-			foreach (string key in completeDats.Keys)
-			{
-				List<RomData> templist = RomManipulation.Merge(completeDats[key]);
-				foreach (RomData rom in templist)
-				{
-					if (!rom.Dupe && rom.System == _currentAllMerged)
+					_logger.Log("Replacing all hashes in Unneeded with 0-byte values");
+					keys = unneeded.Keys.ToList();
+					foreach (string key in keys)
 					{
-						if (unneeded.ContainsKey(key))
+						List<RomData> temp = new List<RomData>();
+						List<RomData> roms = unneeded[key];
+						for (int i = 0; i < roms.Count; i++)
 						{
-							unneeded[key].Add(rom);
-						}
-						else
-						{
-							List<RomData> temp = new List<RomData>();
+							RomData rom = roms[i];
+							rom.Size = sizezero;
+							rom.CRC = crczero;
+							rom.MD5 = md5zero;
+							rom.SHA1 = sha1zero;
 							temp.Add(rom);
-							unneeded.Add(key, temp);
 						}
+						unneeded[key] = temp;
 					}
-				}
-			}
 
-			// Now create the New Missing dictionary [(Net New)+(currentMissingMerged-(Unneeded))]
-			_logger.Log("Creating and populating New Missing dictionary");
-			Dictionary<string, List<RomData>> midMissing = new Dictionary<string, List<RomData>>();
-			midMissing = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midMissing, _logger);
-			foreach (string key in unneeded.Keys)
-			{
-				if (midMissing.ContainsKey(key))
-				{
-					midMissing[key].AddRange(unneeded[key]);
-				}
-				else
-				{
-					midMissing.Add(key, unneeded[key]);
-				}
-			}
-			Dictionary<string, List<RomData>> newMissing = new Dictionary<string, List<RomData>>();
-			foreach (string key in midMissing.Keys)
-			{
-				List<RomData> templist = RomManipulation.Merge(midMissing[key]);
-				foreach (RomData rom in templist)
-				{
-					if (!rom.Dupe && rom.System == _currentMissingMerged)
+					_logger.Log("Replacing all hashes in New Missing with 0-byte values");
+					keys = newMissing.Keys.ToList();
+					foreach (string key in keys)
 					{
-						if (newMissing.ContainsKey(key))
+						List<RomData> temp = new List<RomData>();
+						List<RomData> roms = newMissing[key];
+						for (int i = 0; i < roms.Count; i++)
 						{
-							newMissing[key].Add(rom);
-						}
-						else
-						{
-							List<RomData> temp = new List<RomData>();
+							RomData rom = roms[i];
+							rom.Size = sizezero;
+							rom.CRC = crczero;
+							rom.MD5 = md5zero;
+							rom.SHA1 = sha1zero;
 							temp.Add(rom);
-							newMissing.Add(key, temp);
 						}
+						newMissing[key] = temp;
 					}
-				}
-			}
-			foreach (string key in netNew.Keys)
-			{
-				if (newMissing.ContainsKey(key))
-				{
-					newMissing[key].AddRange(netNew[key]);
-				}
-				else
-				{
-					newMissing.Add(key, netNew[key]);
-				}
-			}
 
-			// Now create the Have dictionary [(currentNewMerged)-(c)]
-			_logger.Log("Creating and populating Have dictionary");
-			Dictionary<string, List<RomData>> midHave = new Dictionary<string, List<RomData>>();
-			foreach (string key in newMissing.Keys)
-			{
-				if (midHave.ContainsKey(key))
-				{
-					midHave[key].AddRange(newMissing[key]);
-				}
-				else
-				{
-					midHave.Add(key, newMissing[key]);
-				}
-			}
-			foreach (string key in completeDats.Keys)
-			{
-				if (midHave.ContainsKey(key))
-				{
-					foreach (RomData rom in completeDats[key])
+					_logger.Log("Replacing all hashes in Have with 0-byte values");
+					keys = have.Keys.ToList();
+					foreach (string key in keys)
 					{
-						if (rom.System == _currentNewMerged)
+						List<RomData> temp = new List<RomData>();
+						List<RomData> roms = have[key];
+						for (int i = 0; i < roms.Count; i++)
 						{
-							midHave[key].Add(rom);
-						}
-					}
-				}
-				else
-				{
-					List<RomData> roms = new List<RomData>();
-					foreach (RomData rom in completeDats[key])
-					{
-						if (rom.System == _currentNewMerged)
-						{
-							roms.Add(rom);
-						}
-					}
-					midHave.Add(key, roms);
-				}
-			}
-			Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
-			foreach (string key in midHave.Keys)
-			{
-				List<RomData> templist = RomManipulation.Merge(midHave[key]);
-				foreach (RomData rom in templist)
-				{
-					if (!rom.Dupe && rom.System == _currentNewMerged)
-					{
-						if (have.ContainsKey(key))
-						{
-							have[key].Add(rom);
-						}
-						else
-						{
-							List<RomData> temp = new List<RomData>();
+							RomData rom = roms[i];
+							rom.Size = sizezero;
+							rom.CRC = crczero;
+							rom.MD5 = md5zero;
+							rom.SHA1 = sha1zero;
 							temp.Add(rom);
-							have.Add(key, temp);
+						}
+						have[key] = temp;
+					}
+				}
+
+				// Finally, output all of the files
+				Output.WriteToDatFromDict("Net New", "Net New", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", netNew, _logger);
+				Output.WriteToDatFromDict("Unneeded", "Unneeded", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", unneeded, _logger);
+				Output.WriteToDatFromDict("New Missing", "New Missing", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", newMissing, _logger);
+				Output.WriteToDatFromDict("Have", "Have", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", have, _logger);
+
+				return true;
+			}
+
+			// If we only have the old merged and missing, only generate Have
+			else if (_currentAllMerged != "" && _currentMissingMerged != "")
+			{
+				// Now create the Have dictionary [(currentAllMerged)-(currentMissingMerged)]
+				_logger.Log("Creating and populating Have dictionary");
+				Dictionary<string, List<RomData>> midHave = new Dictionary<string, List<RomData>>();
+				midHave = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midHave, _logger);
+				midHave = RomManipulation.ParseDict(_currentAllMerged, 0, 0, midHave, _logger);
+				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
+				foreach (string key in midHave.Keys)
+				{
+					List<RomData> templist = RomManipulation.Merge(midHave[key]);
+					foreach (RomData rom in templist)
+					{
+						if (!rom.Dupe && rom.System == _currentAllMerged)
+						{
+							if (have.ContainsKey(key))
+							{
+								have[key].Add(rom);
+							}
+							else
+							{
+								List<RomData> temp = new List<RomData>();
+								temp.Add(rom);
+								have.Add(key, temp);
+							}
 						}
 					}
 				}
+
+				// If we are supposed to replace everything in the output with default values, do so
+				if (_fake)
+				{
+					_logger.Log("Replacing all hashes in Have with 0-byte values");
+					List<string> keys = have.Keys.ToList();
+					foreach (string key in keys)
+					{
+						List<RomData> temp = new List<RomData>();
+						List<RomData> roms = have[key];
+						for (int i = 0; i < roms.Count; i++)
+						{
+							RomData rom = roms[i];
+							rom.Size = sizezero;
+							rom.CRC = crczero;
+							rom.MD5 = md5zero;
+							rom.SHA1 = sha1zero;
+							temp.Add(rom);
+						}
+						have[key] = temp;
+					}
+				}
+
+				Output.WriteToDatFromDict("Have", "Have", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", have, _logger);
+
+				return true;
 			}
 
-			// If we are supposed to replace everything in the output with default values, do so
-			if (_fake)
+			// If we only have the new merged and missing, only generate Have
+			else if (_currentNewMerged != "" && _currentMissingMerged != "")
 			{
-				_logger.Log("Replacing all hashes in Net New with 0-byte values");
-				List<string> keys = netNew.Keys.ToList();
-				foreach (string key in keys)
+				// Now create the Have dictionary [(currentNewMerged)-(currentMissingMerged)]
+				_logger.Log("Creating and populating Have dictionary");
+				Dictionary<string, List<RomData>> midHave = new Dictionary<string, List<RomData>>();
+				midHave = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midHave, _logger);
+				midHave = RomManipulation.ParseDict(_currentNewMerged, 0, 0, midHave, _logger);
+				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
+				foreach (string key in midHave.Keys)
 				{
-					List<RomData> temp = new List<RomData>();
-					List<RomData> roms = netNew[key];
-					for (int i = 0; i < roms.Count; i++)
+					List<RomData> templist = RomManipulation.Merge(midHave[key]);
+					foreach (RomData rom in templist)
 					{
-						RomData rom = roms[i];
-						rom.Size = sizezero;
-						rom.CRC = crczero;
-						rom.MD5 = md5zero;
-						rom.SHA1 = sha1zero;
-						temp.Add(rom);
+						if (!rom.Dupe && rom.System == _currentNewMerged)
+						{
+							if (have.ContainsKey(key))
+							{
+								have[key].Add(rom);
+							}
+							else
+							{
+								List<RomData> temp = new List<RomData>();
+								temp.Add(rom);
+								have.Add(key, temp);
+							}
+						}
 					}
-					netNew[key] = temp;
 				}
 
-				_logger.Log("Replacing all hashes in Unneeded with 0-byte values");
-				keys = unneeded.Keys.ToList();
-				foreach (string key in keys)
+				// If we are supposed to replace everything in the output with default values, do so
+				if (_fake)
 				{
-					List<RomData> temp = new List<RomData>();
-					List<RomData> roms = unneeded[key];
-					for (int i = 0; i < roms.Count; i++)
+					_logger.Log("Replacing all hashes in Have with 0-byte values");
+					List<string> keys = have.Keys.ToList();
+					foreach (string key in keys)
 					{
-						RomData rom = roms[i];
-						rom.Size = sizezero;
-						rom.CRC = crczero;
-						rom.MD5 = md5zero;
-						rom.SHA1 = sha1zero;
-						temp.Add(rom);
+						List<RomData> temp = new List<RomData>();
+						List<RomData> roms = have[key];
+						for (int i = 0; i < roms.Count; i++)
+						{
+							RomData rom = roms[i];
+							rom.Size = sizezero;
+							rom.CRC = crczero;
+							rom.MD5 = md5zero;
+							rom.SHA1 = sha1zero;
+							temp.Add(rom);
+						}
+						have[key] = temp;
 					}
-					unneeded[key] = temp;
 				}
 
-				_logger.Log("Replacing all hashes in New Missing with 0-byte values");
-				keys = newMissing.Keys.ToList();
-				foreach (string key in keys)
-				{
-					List<RomData> temp = new List<RomData>();
-					List<RomData> roms = newMissing[key];
-					for (int i = 0; i < roms.Count; i++)
-					{
-						RomData rom = roms[i];
-						rom.Size = sizezero;
-						rom.CRC = crczero;
-						rom.MD5 = md5zero;
-						rom.SHA1 = sha1zero;
-						temp.Add(rom);
-					}
-					newMissing[key] = temp;
-				}
+				Output.WriteToDatFromDict("Have", "Have", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", have, _logger);
 
-				_logger.Log("Replacing all hashes in Have with 0-byte values");
-				keys = have.Keys.ToList();
-				foreach (string key in keys)
-				{
-					List<RomData> temp = new List<RomData>();
-					List<RomData> roms = have[key];
-					for (int i = 0; i < roms.Count; i++)
-					{
-						RomData rom = roms[i];
-						rom.Size = sizezero;
-						rom.CRC = crczero;
-						rom.MD5 = md5zero;
-						rom.SHA1 = sha1zero;
-						temp.Add(rom);
-					}
-					have[key] = temp;
-				}
+				return true;
 			}
 
-			// Finally, output all of the files
-			Output.WriteToDatFromDict("Net New", "Net New", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", netNew, _logger);
-			Output.WriteToDatFromDict("Unneeded", "Unneeded", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", unneeded, _logger);
-			Output.WriteToDatFromDict("New Missing", "New Missing", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", newMissing, _logger);
-			Output.WriteToDatFromDict("Have", "Have", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", have, _logger);
-
-			return true;
+			return false;
 		}
 	}
 }
