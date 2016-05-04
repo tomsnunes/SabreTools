@@ -467,7 +467,7 @@ namespace SabreTools.Helper
 											sha1 = (sha1.StartsWith("0x") ? sha1.Remove(0, 2) : sha1);
 
 											// Get the new values to add
-											string key = crc + "-" + md5 + "-" + sha1 + "-" + size;
+											string key = crc + "-" + size;
 											RomData value = new RomData
 											{
 												Game = tempname,
@@ -590,6 +590,7 @@ namespace SabreTools.Helper
 						last.CRC = (last.CRC == "" && rom.CRC != "" ? rom.CRC : last.CRC);
 						last.MD5 = (last.MD5 == "" && rom.MD5 != "" ? rom.MD5 : last.MD5);
 						last.SHA1 = (last.SHA1 == "" && rom.SHA1 != "" ? rom.SHA1 : last.SHA1);
+						last.Dupe = true;
 
 						outroms.RemoveAt(outroms.Count - 1);
 						outroms.Insert(outroms.Count, last);
@@ -610,7 +611,6 @@ namespace SabreTools.Helper
 			// Then return the result
 			return outroms;
 		}
-
 
 		/// <summary>
 		/// Sort a list of RomData objects by SystemID, SourceID, Game, and Name (in order)

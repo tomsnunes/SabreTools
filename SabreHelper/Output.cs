@@ -154,7 +154,13 @@ namespace SabreTools.Helper
 			long count = 0;
 			foreach (List<RomData> roms in dict.Values)
 			{
-				foreach (RomData rom in roms)
+				List<RomData> newroms = roms;
+				if (merge)
+				{
+					newroms = RomManipulation.Merge(newroms);
+				}
+
+				foreach (RomData rom in newroms)
 				{
 					count++;
 					string key = rom.SystemID + "-" + rom.SourceID + "-" + rom.Game + "-" + rom.Name;
@@ -167,11 +173,6 @@ namespace SabreTools.Helper
 						List<RomData> temp = new List<RomData>();
 						temp.Add(rom);
 						sortable.Add(key, temp);
-					}
-
-					if (merge)
-					{
-						break;
 					}
 				}
 			}

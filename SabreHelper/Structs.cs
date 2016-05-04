@@ -18,5 +18,6 @@
 		public string CRC;
 		public string MD5;
 		public string SHA1;
+		public bool Dupe;
 	}
 }

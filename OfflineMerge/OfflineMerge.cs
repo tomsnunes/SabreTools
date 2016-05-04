@@ -172,18 +172,19 @@ namespace SabreTools
 			Dictionary<string, List<RomData>> netNew = new Dictionary<string, List<RomData>>();
 			foreach (string key in completeDats.Keys)
 			{
-				if (completeDats[key].Count == 1)
+				List<RomData> templist = RomManipulation.Merge(completeDats[key]);
+				foreach (RomData rom in templist)
 				{
-					if (completeDats[key][0].System == _currentNewMerged)
+					if (!rom.Dupe && rom.System == _currentNewMerged)
 					{
 						if (netNew.ContainsKey(key))
 						{
-							netNew[key].Add(completeDats[key][0]);
+							netNew[key].Add(rom);
 						}
 						else
 						{
 							List<RomData> temp = new List<RomData>();
-							temp.Add(completeDats[key][0]);
+							temp.Add(rom);
 							netNew.Add(key, temp);
 						}
 					}
@@ -195,18 +196,19 @@ namespace SabreTools
 			Dictionary<string, List<RomData>> unneeded = new Dictionary<string, List<RomData>>();
 			foreach (string key in completeDats.Keys)
 			{
-				if (completeDats[key].Count == 1)
+				List<RomData> templist = RomManipulation.Merge(completeDats[key]);
+				foreach (RomData rom in templist)
 				{
-					if (completeDats[key][0].System == _currentAllMerged)
+					if (!rom.Dupe && rom.System == _currentAllMerged)
 					{
 						if (unneeded.ContainsKey(key))
 						{
-							unneeded[key].Add(completeDats[key][0]);
+							unneeded[key].Add(rom);
 						}
 						else
 						{
 							List<RomData> temp = new List<RomData>();
-							temp.Add(completeDats[key][0]);
+							temp.Add(rom);
 							unneeded.Add(key, temp);
 						}
 					}
@@ -231,18 +233,19 @@ namespace SabreTools
 			Dictionary<string, List<RomData>> newMissing = new Dictionary<string, List<RomData>>();
 			foreach (string key in midMissing.Keys)
 			{
-				if (midMissing[key].Count == 1)
+				List<RomData> templist = RomManipulation.Merge(midMissing[key]);
+				foreach (RomData rom in templist)
 				{
-					if (midMissing[key][0].System == _currentMissingMerged)
+					if (!rom.Dupe && rom.System == _currentMissingMerged)
 					{
 						if (newMissing.ContainsKey(key))
 						{
-							newMissing[key].Add(midMissing[key][0]);
+							newMissing[key].Add(rom);
 						}
 						else
 						{
 							List<RomData> temp = new List<RomData>();
-							temp.Add(midMissing[key][0]);
+							temp.Add(rom);
 							newMissing.Add(key, temp);
 						}
 					}
@@ -302,18 +305,19 @@ namespace SabreTools
 			Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
 			foreach (string key in midHave.Keys)
 			{
-				if (midHave[key].Count == 1)
+				List<RomData> templist = RomManipulation.Merge(midHave[key]);
+				foreach (RomData rom in templist)
 				{
-					if (midHave[key][0].System == _currentNewMerged)
+					if (!rom.Dupe && rom.System == _currentNewMerged)
 					{
 						if (have.ContainsKey(key))
 						{
-							have[key].Add(midHave[key][0]);
+							have[key].Add(rom);
 						}
 						else
 						{
 							List<RomData> temp = new List<RomData>();
-							temp.Add(midHave[key][0]);
+							temp.Add(rom);
 							have.Add(key, temp);
 						}
 					}
