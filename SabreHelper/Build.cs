@@ -83,12 +83,12 @@ Usage: DATabase [option] [filename|dirname] ...
 Options:
   -?, -h, --help	Show this help
   -a, --add		Add a new system or source to the database
-	manu=			Manufacturer name (system only)
-	system=			System name (system only)
-	source=			Source name (source only)
-	url=			URL (source only)
+	-manu=			Manufacturer name (system only)
+	-system=			System name (system only)
+	-source=			Source name (source only)
+	-url=			URL (source only)
   -cc, --convert-cmp	Convert an XML DAT to CMP
-	out=			Output directory
+	-out=			Output directory
   -cm, --convert-miss	Convert from DAT to miss
 	-r, --roms		Output roms to miss instead of sets
 	-gp, --game-prefix	Add game name as a prefix to each item
@@ -98,19 +98,19 @@ Options:
 	-ae=, --add-ext=	Add an extension to each item
 	-re=, --rep-ext=	Replace all extensions with specified
   -cx, --convert-xml	Convert a CMP DAT to XML
-	out=			Output directory
+	-out=			Output directory
   -es, --ext-split		Split a DAT by two file extensions
-	exta=			First extension to split by
-	extb=			Second extension to split by
-	out=			Output directory
+	-exta=			First extension to split by
+	-extb=			Second extension to split by
+	-out=			Output directory
   -g, --generate	Start tool in generate mode
-	system=			Comma-separated list of system IDs
-	source=			Comma-separated list of source IDs
-	out=			Output directory
+	-system=			Comma-separated list of system IDs
+	-source=			Comma-separated list of source IDs
+	-out=			Output directory
 	-nr, --no-rename	Don't auto-rename games
 	-o, --old		Output DAT in CMP format instead of XML
   -ga, --generate-all	Start tool in generate all mode
-	out=			Output directory
+	-out=			Output directory
 	-nr, --no-rename	Don't auto-rename games
 	-o, --old		Output DAT in CMP format instead of XML
   -i, --import		Start tool in import mode
@@ -130,8 +130,8 @@ Options:
 	-v=, --version=		Set the version of the DAT
 	-au=, --author=		Set the author of the DAT
   -rm, --remove		Remove a system or source from the database
-	system=			System ID
-	source=			Source ID
+	-system=		System ID
+	-source=		Source ID
   -tm, --trim-merge	Consolidate DAT into a single game and trim entries
 	-rd=, --root-dir=	Set the root directory for trimming calculation
 	-nr, --no-rename	Keep game names instead of using '!'
@@ -181,9 +181,9 @@ Options:
   -f, --fake		Replace all hashes and sizes by the default
 
 Inputs:
-  com=			Complete current DAT
-  fix=			Complete current Missing
-  new=			New Complete DAT
+  -com=			Complete current DAT
+  -fix=			Complete current Missing
+  -new=			New Complete DAT
 
 This program will output the following DATs:
   (a) Net New - (NewComplete)-(Complete)

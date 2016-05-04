@@ -227,19 +227,19 @@ namespace SabreTools
 						{
 							desc = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("exta="))
+						else if (arg.StartsWith("-exta="))
 						{
 							exta = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("extb"))
+						else if (arg.StartsWith("-extb="))
 						{
 							extb = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("input="))
+						else if (arg.StartsWith("-input="))
 						{
 							inputs.Add(arg.Split('=')[1].Replace("\"", ""));
 						}
-						else if (arg.StartsWith("manu=") && manu == "")
+						else if (arg.StartsWith("-manu=") && manu == "")
 						{
 							manu = arg.Split('=')[1];
 						}
@@ -247,7 +247,7 @@ namespace SabreTools
 						{
 							name = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("out=") && outdir == "")
+						else if (arg.StartsWith("-out=") && outdir == "")
 						{
 							outdir = arg.Split('=')[1];
 						}
@@ -259,11 +259,11 @@ namespace SabreTools
 						{
 							prefix = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("source=") && sources == "")
+						else if (arg.StartsWith("-source=") && sources == "")
 						{
 							sources = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("system=") && systems == "")
+						else if (arg.StartsWith("-system=") && systems == "")
 						{
 							systems = arg.Split('=')[1];
 						}
@@ -275,7 +275,7 @@ namespace SabreTools
 						{
 							repext = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("url=") && url == "")
+						else if (arg.StartsWith("-url=") && url == "")
 						{
 							url = arg.Split('=')[1];
 						}

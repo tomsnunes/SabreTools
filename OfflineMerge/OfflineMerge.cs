@@ -84,15 +84,15 @@ namespace SabreTools
 						break;
 					default:
 						string temparg = arg.Replace("\"", "");
-						if (temparg.StartsWith("com="))
+						if (temparg.StartsWith("-com="))
 						{
 							currentAllMerged = temparg.Split('=')[1];
 						}
-						else if (temparg.StartsWith("fix="))
+						else if (temparg.StartsWith("-fix="))
 						{
 							currentMissingMerged = temparg.Split('=')[1];
 						}
-						else if (temparg.StartsWith("new="))
+						else if (temparg.StartsWith("-new="))
 						{
 							currentNewMerged = temparg.Split('=')[1];
 						}
