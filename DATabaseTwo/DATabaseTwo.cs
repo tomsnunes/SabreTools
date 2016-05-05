@@ -350,8 +350,8 @@ Make a selection:
 					return;
 				}
 
-				path += Path.DirectorySeparatorChar + system;
-				name = system;
+				path += Path.DirectorySeparatorChar + system.Trim();
+				name = system.Trim();
 			}
 			else
 			{
