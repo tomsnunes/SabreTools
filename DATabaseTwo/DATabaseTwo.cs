@@ -35,11 +35,7 @@ namespace SabreTools
 	/// as System (merged Date) as is customary. The files will
 	/// always be written out to "Output" or "Created".
 	/// 
-	/// The below code still has to sanitize the rom names and
-	/// game names according to the WoD standard as seen in
-	/// Import.cs.
-	/// 
-	/// The database will be set up as follows:
+	/// The database is be set up as follows:
 	/// dats
 	///		id
 	///		sha1
