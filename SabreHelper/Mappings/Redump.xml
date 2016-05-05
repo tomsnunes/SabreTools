@@ -18,7 +18,7 @@
 	<mapping from="Microsoft - Xbox" to="Microsoft - Xbox" />
 	<mapping from="Microsoft - Xbox 360" to="Microsoft - Xbox 360" />
 	<mapping from="Microsoft - Xbox One" to="Microsoft - Xbox One" />
-	<mapping from="NEC - PC Engine CD - TurboGrafx-CD" to="NEC - PC Engine CD, TurboGrafx 16 CD" />
+	<mapping from="NEC - PC Engine CD - TurboGrafx-CD" to="NEC - PC Engine, TurboGrafx 16" />
 	<mapping from="NEC - PC-88 series" to="NEC - PC-8801" />
 	<mapping from="NEC - PC-98 series" to="NEC - PC-9801" />
 	<mapping from="NEC - PC-FX - PC-FXGA" to="NEC - PC FX, PC FXGA" />

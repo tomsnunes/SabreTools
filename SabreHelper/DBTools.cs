@@ -165,6 +165,46 @@ CREATE TABLE IF NOT EXISTS gamesource (
 					slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 				}
+				else if (type == "dats")
+				{
+					string query = @"
+CREATE TABLE IF NOT EXISTS dats (
+	'id'	INTEGER	PRIMARY KEY	NOT NULL,
+	'size'	INTEGER				NOT NULL	DEFAULT -1,
+	'sha1'	TEXT				NOT NULL,
+	'name'	TEXT				NOT NULL
+)";
+					SqliteCommand slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS datsdata (
+	'id'	INTEGER		NOT NULL,
+	'key'		TEXT		NOT NULL,
+	'value'		TEXT,
+	PRIMARY KEY (id, key, value)
+)";
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS source (
+	'id'	INTEGER PRIMARY KEY	NOT NULL,
+	'name'	TEXT				NOT NULL	UNIQUE,
+	'url'	TEXT				NOT NULL
+)";
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS system (
+	'id'			INTEGER PRIMARY KEY	NOT NULL,
+	'manufacturer'	TEXT				NOT NULL,
+	'name'		TEXT				NOT NULL
+)";
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+				}
 			}
 			catch (Exception ex)
 			{

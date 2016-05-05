@@ -6,8 +6,8 @@
 	<mapping from="Atari - Jaguar" to="Atari - Jaguar" />
 	<mapping from="Atari - Lynx" to="Atari - Lynx" />
 	<mapping from="Atari - ST" to="Atari - ST" />
-	<mapping from="Bandai - WonderSwan" to="Bandai - WonderSwan" />
-	<mapping from="Bandai - WonderSwan Color" to="Bandai - WonderSwan Color" />
+	<mapping from="Bandai - WonderSwan" to="Bandai - WonderSwan, WonderSwan Color" />
+	<mapping from="Bandai - WonderSwan Color" to="Bandai - WonderSwan, WonderSwan Color" />
 	<mapping from="Casio - Loopy" to="Casio - Loopy" />
 	<mapping from="Casio - PV-1000" to="Casio - PV-1000" />
 	<mapping from="Coleco - ColecoVision" to="Coleco - ColecoVision, ColecoVision ADAM" />
@@ -35,14 +35,14 @@
 	<mapping from="NEC - PC Engine - TurboGrafx 16" to="NEC - PC Engine, TurboGrafx 16" />
 	<mapping from="NEC - Super Grafx" to="NEC - Super Grafx" />
 	<mapping from="Nintendo - Famicom Disk System" to="Nintendo - Famicom Disk System" />
-	<mapping from="Nintendo - Game Boy" to="Nintendo - Game Boy" />
+	<mapping from="Nintendo - Game Boy" to="Nintendo - Game Boy, Game Boy Color" />
 	<mapping from="Nintendo - Game Boy Advance" to="Nintendo - Game Boy Advance" />
 	<mapping from="Nintendo - Game Boy Advance (e-Cards)" to="Nintendo - Game Boy Advance" />
-	<mapping from="Nintendo - Game Boy Color" to="Nintendo - Game Boy Color" />
-	<mapping from="Nintendo - New Nintendo 3DS" to="Nintendo - Nintendo 3DS" />
-	<mapping from="Nintendo - New Nintendo 3DS (DLC)" to="Nintendo - Nintendo 3DS" />
-	<mapping from="Nintendo - Nintendo 3DS" to="Nintendo - Nintendo 3DS" />
-	<mapping from="Nintendo - Nintendo 3DS (DLC)" to="Nintendo - Nintendo 3DS" />
+	<mapping from="Nintendo - Game Boy Color" to="Nintendo - Game Boy, Game Boy Color" />
+	<mapping from="Nintendo - New Nintendo 3DS" to="Nintendo - Nintendo 3DS, New Nintendo 3DS" />
+	<mapping from="Nintendo - New Nintendo 3DS (DLC)" to="Nintendo - Nintendo 3DS, New Nintendo 3DS" />
+	<mapping from="Nintendo - Nintendo 3DS" to="Nintendo - Nintendo 3DS, New Nintendo 3DS" />
+	<mapping from="Nintendo - Nintendo 3DS (DLC)" to="Nintendo - Nintendo 3DS, New Nintendo 3DS" />
 	<mapping from="Nintendo - Nintendo 64" to="Nintendo - Nintendo 64" />
 	<mapping from="Nintendo - Nintendo 64DD" to="Nintendo - Nintendo 64DD" />
 	<mapping from="Nintendo - Nintendo DS" to="Nintendo - Nintendo DS" />
@@ -79,8 +79,8 @@
 	<mapping from="Sony - PlayStation Portable (PSX2PSP)" to="Sony - PlayStation Portable" />
 	<mapping from="Sony - PlayStation Portable (UMD Music)" to="Sony - PlayStation Portable" />
 	<mapping from="Sony - PlayStation Portable (UMD Video)" to="Sony - PlayStation Portable" />
-	<mapping from="SNK - Neo Geo Pocket" to="SNK - Neo Geo Pocket" />
-	<mapping from="SNK - Neo Geo Pocket Color" to="SNK - Neo Geo Pocket Color" />
+	<mapping from="SNK - Neo Geo Pocket" to="SNK - Neo Geo Pocket, Neo Geo Pocket Color" />
+	<mapping from="SNK - Neo Geo Pocket Color" to="SNK - Neo Geo Pocket, Neo Geo Pocket Color" />
 	<mapping from="Tiger - Game.com" to="Tiger Electronics - Game.com" />
 	<mapping from="Tiger - Gizmondo" to="Tiger Telematics - Gizmondo" />
 	<mapping from="VTech - CreatiVision" to="VTech - CreatiVision" />

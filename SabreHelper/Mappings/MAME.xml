@@ -144,14 +144,14 @@
 	<mapping from="g7400" to="Philips - Videopac+, Odyssey2" />
 	<mapping from="galaxy" to="Galaksija - Galaksija, Galaksija Plus" />
 	<mapping from="gamate" to="Bit Corp - Gamate" />
-	<mapping from="gameboy" to="Nintendo - Game Boy" />
+	<mapping from="gameboy" to="Nintendo - Game Boy, Game Boy Color" />
 	<mapping from="gamecom" to="Tiger Electronics - Game.com" />
 	<mapping from="gamegear" to="Sega - Game Gear" />
 	<mapping from="gameking" to="TimeTop - GameKing" />
 	<mapping from="gameking3" to="TimeTop - GameKing" />
 	<mapping from="gamepock" to="Epoch - Game Pocket Computer" />
 	<mapping from="gba" to="Nintendo - Game Boy Advance" />
-	<mapping from="gbcolor" to="Nintendo - Game Boy Color" />
+	<mapping from="gbcolor" to="Nintendo - Game Boy, Game Boy Color" />
 	<mapping from="genius" to="VTech - Genius" />
 	<mapping from="gimix" to="Gimix - 6809" />
 	<mapping from="gjmovie" to="VTech - Genius" />
@@ -244,7 +244,7 @@
 	<mapping from="n64dd" to="Nintendo - Nintendo 64DD" />
 	<mapping from="nascom_flop" to="Nascom - I, II" />
 	<mapping from="nascom_socket" to="Nascom - I, II" />
-	<mapping from="neocd" to="SNK - Neo Geo CD" />
+	<mapping from="neocd" to="SNK - Neo Geo" />
 	<mapping from="neogeo" to="SNK - Neo Geo" />
 	<mapping from="nes" to="Nintendo - Nintendo Entertainment System" />
 	<mapping from="nes_ade" to="Nintendo - Nintendo Entertainment System" />
@@ -252,8 +252,8 @@
 	<mapping from="nes_kstudio" to="Nintendo - Nintendo Entertainment System" />
 	<mapping from="nes_ntbrom" to="Nintendo - Nintendo Entertainment System" />
 	<mapping from="next" to="NeXT - NeXT" />
-	<mapping from="ngp" to="SNK - Neo Geo Pocket" />
-	<mapping from="ngpc" to="SNK - Neo Geo Pocket Color" />
+	<mapping from="ngp" to="SNK - Neo Geo Pocket, Neo Geo Pocket Color" />
+	<mapping from="ngpc" to="SNK - Neo Geo Pocket, Neo Geo Pocket Color" />
 	<mapping from="nimbus" to="RM - Nimbus PC" />
 	<mapping from="odyssey2" to="Philips - Videopac+, Odyssey2" />
 	<mapping from="ondra" to="Tesla - Ondra, Ondra ViLi" />
@@ -278,7 +278,7 @@
 	<mapping from="pc88va" to="NEC - PC-88VA" />
 	<mapping from="pc98" to="NEC - PC-9801" />
 	<mapping from="pce" to="NEC - PC Engine, TurboGrafx 16" />
-	<mapping from="pcecd" to="NEC - PC Engine CD, TurboGrafx 16 CD" />
+	<mapping from="pcecd" to="NEC - PC Engine, TurboGrafx 16" />
 	<mapping from="pcw" to="Amstrad - PCW" />
 	<mapping from="pcw16" to="Amstrad - PCW" />
 	<mapping from="pecom_cass" to="Elektronska Industrija Nis - PECOM 32, 64" />
@@ -414,8 +414,8 @@
 	<mapping from="wangpc" to="Wang - PC" />
 	<mapping from="wicat" to="Millennium Systems - Wicat" />
 	<mapping from="wmbullet" to="WaveMate - Bullet" />
-	<mapping from="wscolor" to="Bandai - WonderSwan Color" />
-	<mapping from="wswan" to="Bandai - WonderSwan" />
+	<mapping from="wscolor" to="Bandai - WonderSwan, WonderSwan Color" />
+	<mapping from="wswan" to="Bandai - WonderSwan, WonderSwan Color" />
 	<mapping from="x07_card" to="Canon - X-07" />
 	<mapping from="x07_cass" to="Canon - X-07" />
 	<mapping from="x1_cass" to="Sharp - X1" />

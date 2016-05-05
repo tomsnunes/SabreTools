@@ -8,9 +8,9 @@
 	<mapping from="NonGoodCol" to="Coleco - ColecoVision, ColecoVision ADAM" />
 	<mapping from="NonGoodCPC" to="Amstrad - CPC" />
 	<mapping from="NonGoodGBAv4" to="Nintendo - Game Boy Advance" />
-	<!-- <mapping from="NonGoodGBX" to="Nintendo - Game Boy Color" /> -->
-	<mapping from="NonGoodGBX.GB" to="Nintendo - Game Boy" />
-	<mapping from="NonGoodGBX.GBC" to="Nintendo - Game Boy Color" />
+	<mapping from="NonGoodGBX" to="Nintendo - Game Boy, Game Boy Color" />
+	<mapping from="NonGoodGBX.GB" to="Nintendo - Game Boy, Game Boy Color" />
+	<mapping from="NonGoodGBX.GBC" to="Nintendo - Game Boy, Game Boy Color" />
 	<mapping from="NonGoodGCom" to="Tiger Electronics - Game.com" />
 	<mapping from="NonGoodGen" to="Sega - Mega Drive, Genesis" />
 	<mapping from="NonGoodGG" to="Sega - Game Gear" />
@@ -25,9 +25,9 @@
 	<mapping from="NonGoodNDS" to="Nintendo - Nintendo DS" />
 	<mapping from="NonGoodNES" to="Nintendo - Nintendo Entertainment System" />
 	<mapping from="NonGoodNES CHINESE" to="Nintendo - Nintendo Entertainment System" />   
-	<!-- <mapping from="NonGoodNGPX" to="SNK - Neo Geo Pocket Color" /> -->
-	<mapping from="NonGoodNGPX.NGP" to="SNK - Neo Geo Pocket" />
-	<mapping from="NonGoodNGPX.NGC" to="SNK - Neo Geo Pocket Color" />
+	<mapping from="NonGoodNGPX" to="SNK - Neo Geo Pocket, Neo Geo Pocket Color" />
+	<mapping from="NonGoodNGPX.NGP" to="SNK - Neo Geo Pocket, Neo Geo Pocket Color" />
+	<mapping from="NonGoodNGPX.NGC" to="SNK - Neo Geo Pocket, Neo Geo Pocket Color" />
 	<mapping from="NonGoodOric" to="Tangerine - Oric-1, Oric Atmos" />
 	<mapping from="NonGoodPCE" to="NEC - PC Engine, TurboGrafx 16" />
 	<mapping from="NonGoodPico" to="Sega - PICO" />
@@ -37,7 +37,7 @@
 	<mapping from="NonGoodVboy" to="Nintendo - Virtual Boy" />
 	<mapping from="NonGoodVect" to="GCE - Vectrex" />
 	<mapping from="NonGoodVPac" to="Philips - Videopac+, Odyssey2" />
-	<!-- <mapping from="NonGoodWSX" to="Bandai - WonderSwan Color" /> -->
-	<mapping from="NonGoodWSX.WS" to="Bandai - WonderSwan" />
-	<mapping from="NonGoodWSX.WSC" to="Bandai - WonderSwan Color" />
+	<mapping from="NonGoodWSX" to="Bandai - WonderSwan, WonderSwan Color" />
+	<mapping from="NonGoodWSX.WS" to="Bandai - WonderSwan, WonderSwan Color" />
+	<mapping from="NonGoodWSX.WSC" to="Bandai - WonderSwan, WonderSwan Color" />
 </mappings>

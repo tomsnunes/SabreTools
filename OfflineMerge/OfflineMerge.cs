@@ -145,8 +145,6 @@ namespace SabreTools
 				return false;
 			}
 
-			Console.WriteLine(_currentAllMerged + " " + _currentMissingMerged + " " + _currentNewMerged);
-
 			// If we have all three DATs, then generate everything
 			if (_currentAllMerged != "" && _currentMissingMerged != "" && _currentNewMerged != "")
 			{

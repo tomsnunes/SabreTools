@@ -26,7 +26,7 @@
 	<mapping from="Atari 5200" to="Atari - 5200" />
 	<mapping from="Atari 7800" to="Atari - 7800" />
 	<mapping from="Atari 8bit" to="Atari - 8bit" />
-	<mapping from="Atari Jaguar CD" to="Atari - Jaguar CD" />
+	<mapping from="Atari Jaguar CD" to="Atari - Jaguar" />
 	<mapping from="Atari Jaguar" to="Atari - Jaguar" />
 	<mapping from="Atari Lynx" to="Atari - Lynx" />
 	<mapping from="Atari ST" to="Atari - ST" />
@@ -35,8 +35,8 @@
 	<mapping from="Bandai Pippin @World &amp; Pippin Atmark" to="Bandai - Pippin" />
 	<mapping from="Bandai Pippin Atmark" to="Bandai - Pippin" />
 	<mapping from="Bandai Playdia" to="Bandai - Playdia" />
-	<mapping from="Bandai WonderSwan Color" to="Bandai - WonderSwan Color" />
-	<mapping from="Bandai WonderSwan" to="Bandai - WonderSwan" />
+	<mapping from="Bandai WonderSwan Color" to="Bandai - WonderSwan, WonderSwan Color" />
+	<mapping from="Bandai WonderSwan" to="Bandai - WonderSwan, WonderSwan Color" />
 	<mapping from="Bondwell 12" to="Bondwell - 12" />
 	<mapping from="Bondwell 2" to="Bondwell - 2" />
 	<mapping from="Bondwell Model 2" to="Bondwell - 2" />
@@ -158,7 +158,7 @@
 	<mapping from="NEC PC-9801" to="NEC - PC-9801" />
 	<mapping from="NEC PC-9821" to="NEC - PC-9801" />
 	<mapping from="NEC PC-Engine &amp; TurboGrafx-16" to="NEC - PC Engine, TurboGrafx 16" />
-	<mapping from="NEC PC-Engine CD &amp; TurboGrafx-16 CD" to="NEC - PC Engine CD, TurboGrafx 16 CD" />
+	<mapping from="NEC PC-Engine CD &amp; TurboGrafx-16 CD" to="NEC - PC Engine, TurboGrafx 16" />
 	<mapping from="NEC PC-FX" to="NEC - PC FX, PC FXGA" />
 	<mapping from="NEC PC-FXGA" to="NEC - PC FX, PC FXGA" />
 	<mapping from="NEC PC6001" to="NEC - PC-6001" />
@@ -169,8 +169,8 @@
 	<mapping from="Nintendo Famicom &amp; Entertainment System" to="Nintendo - Nintendo Entertainment System" />
 	<mapping from="Nintendo Famicom Disk System" to="Nintendo - Famicom Disk System" />
 	<mapping from="Nintendo Game Boy Advance" to="Nintendo - Game Boy Advance" />
-	<mapping from="Nintendo Game Boy Color" to="Nintendo - Game Boy Color" />
-	<mapping from="Nintendo Game Boy" to="Nintendo - Game Boy" />
+	<mapping from="Nintendo Game Boy Color" to="Nintendo - Game Boy, Game Boy Color" />
+	<mapping from="Nintendo Game Boy" to="Nintendo - Game Boy, Game Boy Color" />
 	<mapping from="Nintendo GameCube" to="Nintendo - GameCube" />
 	<mapping from="Nintendo N64" to="Nintendo - Nintendo 64" />
 	<mapping from="Nintendo Pokemon Mini" to="Nintendo - Pokemon Mini" />
@@ -212,9 +212,9 @@
 	<mapping from="Robotron Z9001" to="Robotron - KC85" />
 	<mapping from="SABA Videoplay" to="Fairchild - Channel F" />
 	<mapping from="SNK Hyper Neo-Geo 64" to="SNK - Hyper Neo Geo 64" />
-	<mapping from="SNK Neo-Geo CD" to="SNK - Neo Geo CD" />
-	<mapping from="SNK Neo-Geo Pocket Color" to="SNK - Neo Geo Pocket Color" />
-	<mapping from="SNK Neo-Geo Pocket" to="SNK - Neo Geo Pocket" />
+	<mapping from="SNK Neo-Geo CD" to="SNK - Neo Geo" />
+	<mapping from="SNK Neo-Geo Pocket Color" to="SNK - Neo Geo Pocket, Neo Geo Pocket Color" />
+	<mapping from="SNK Neo-Geo Pocket" to="SNK - Neo Geo Pocket, Neo Geo Pocket Color" />
 	<mapping from="Sega 32X" to="Sega - 32X" />
 	<mapping from="Sega Computer 3000" to="Sega - SG-1000, SC-3000, SF-7000, Othello Multivision" />
 	<mapping from="Sega Dreamcast" to="Sega - Dreamcast" />

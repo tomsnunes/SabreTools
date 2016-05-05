@@ -192,6 +192,19 @@ This program will output the following DATs:
   (d) Have - (NewComplete)-(New Missing)
         OR (Complete or NewComplete)-(Missing) if one is missing");
 					break;
+				case "DATabaseTwo":
+					Console.WriteLine(@"DATabaseTwo - Catalog and merge DATs by system
+-----------------------------------------
+Usage: DATabaseTwo [options]
+
+Options:
+  -h, -?, --help	Show this help dialog
+  -ga, --generate-all	Start tool in generate all mode
+  -lsy, --list-systems	List all systems (id <= name)
+  -o, --old		Output DAT in CMP format instead of XML
+  -sys=, --system=	System ID to generate from
+");
+					break;
 				default:
 					Console.Write("This is the default help output");
 					break;
@@ -207,7 +220,7 @@ Credits
 Programmer / Lead:	Matt Nadareski (darksabre76)
 Additional code:	emuLOAD, @tractivo
 Testing:		emuLOAD, @tractivo, Kludge, Obiwantje
-Suggestions:	edc, AcidX
+Suggestions:		edc, AcidX
 Based on work by:	The Wizard of DATz");
 		}
 	}
