@@ -435,6 +435,12 @@ Make a selection:
 				{
 					RomData rom = newroms[i];
 
+					// In the case that the RomData is incomplete, skip it
+					if (rom.Name == null || rom.Game == null)
+					{
+						continue;
+					}
+
 					// WOD origninally stripped out any subdirs from the imported files, we do the same
 					rom.Name = Path.GetFileName(rom.Name);
 
