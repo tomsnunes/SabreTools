@@ -10,6 +10,12 @@ namespace SabreTools.Helper
 {
 	public class RomManipulation
 	{
+		// 0-byte file constants
+		private static long sizezero = 0;
+		private static string crczero = "00000000";
+		private static string md5zero = "d41d8cd98f00b204e9800998ecf8427e";
+		private static string sha1zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+
 		/// <summary>
 		/// Return if the file is XML or not
 		/// </summary>
@@ -450,6 +456,7 @@ namespace SabreTools.Helper
 											// If the rom is nodump, skip it
 											if (xtr.GetAttribute("flags") == "nodump" || xtr.GetAttribute("status") == "nodump")
 											{
+												logger.Log("Nodump detected");
 												break;
 											}
 
@@ -474,6 +481,21 @@ namespace SabreTools.Helper
 											string sha1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : "");
 											sha1 = (sha1.StartsWith("0x") ? sha1.Remove(0, 2) : sha1);
 											sha1 = (sha1 == "-" ? "" : sha1);
+
+											// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
+											if (subreader.Name == "rom" && size == 0 && (crc == crczero || md5 == md5zero || sha1 == sha1zero))
+											{
+												size = 0;
+												crc = crczero;
+												md5 = md5zero;
+												sha1 = sha1zero;
+											}
+											// If the file has no size and it's not the above case, skip and log
+											else if (subreader.Name == "rom" && size == 0)
+											{
+												logger.Warning("Potentially incomplete entry found for " + xtr.GetAttribute("name"));
+												break;
+											}
 
 											// Only add the rom if there's useful information in it
 											if (!(crc == "" && md5 == "" && sha1 == ""))
