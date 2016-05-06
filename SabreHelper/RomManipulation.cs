@@ -11,10 +11,10 @@ namespace SabreTools.Helper
 	public class RomManipulation
 	{
 		// 0-byte file constants
-		private static long sizezero = 0;
-		private static string crczero = "00000000";
-		private static string md5zero = "d41d8cd98f00b204e9800998ecf8427e";
-		private static string sha1zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+		public static long SizeZero = 0;
+		public static string CRCZero = "00000000";
+		public static string MD5Zero = "d41d8cd98f00b204e9800998ecf8427e";
+		public static string SHA1Zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
 		/// <summary>
 		/// Return if the file is XML or not
@@ -483,15 +483,15 @@ namespace SabreTools.Helper
 											sha1 = (sha1 == "-" ? "" : sha1);
 
 											// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
-											if (subreader.Name == "rom" && size == 0 && (crc == crczero || md5 == md5zero || sha1 == sha1zero))
+											if (subreader.Name == "rom" && (size == 0 || size == -1) && (crc == CRCZero || md5 == MD5Zero || sha1 == SHA1Zero))
 											{
-												size = 0;
-												crc = crczero;
-												md5 = md5zero;
-												sha1 = sha1zero;
+												size = SizeZero;
+												crc = CRCZero;
+												md5 = MD5Zero;
+												sha1 = SHA1Zero;
 											}
 											// If the file has no size and it's not the above case, skip and log
-											else if (subreader.Name == "rom" && size == 0)
+											else if (subreader.Name == "rom" && (size == 0 || size == -1))
 											{
 												logger.Warning("Potentially incomplete entry found for " + xtr.GetAttribute("name"));
 												break;
@@ -605,7 +605,7 @@ namespace SabreTools.Helper
 					bool shouldcont = false;
 					if (rom.Type == "rom" && last.Type == "rom")
 					{
-						shouldcont = ((rom.Size != -1 && rom.Size == last.Size) && (
+						shouldcont = ((rom.Size == last.Size) && (
 								(rom.CRC != "" && last.CRC != "" && rom.CRC == last.CRC) ||
 								(rom.MD5 != "" && last.MD5 != "" && rom.MD5 == last.MD5) ||
 								(rom.SHA1 != "" && last.SHA1 != "" && rom.SHA1 == last.SHA1)

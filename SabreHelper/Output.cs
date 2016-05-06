@@ -95,7 +95,11 @@ namespace SabreTools.Helper
 					if (old)
 					{
 						state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
-							(rom.Size != -1 ? " size " + rom.Size : "") +
+							(rom.Size != -1 &&
+								rom.Size != 0 &&
+								rom.CRC != RomManipulation.CRCZero &&
+								rom.MD5 != RomManipulation.MD5Zero &&
+								rom.SHA1 != RomManipulation.SHA1Zero ? " size " + rom.Size : "") +
 							(rom.CRC != "" ? " crc " + rom.CRC.ToLowerInvariant() : "") +
 							(rom.MD5 != "" ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
 							(rom.SHA1 != "" ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
@@ -104,7 +108,11 @@ namespace SabreTools.Helper
 					else
 					{
 						state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
-							(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
+							(rom.Size != -1 &&
+								rom.Size != 0 &&
+								rom.CRC != RomManipulation.CRCZero &&
+								rom.MD5 != RomManipulation.MD5Zero &&
+								rom.SHA1 != RomManipulation.SHA1Zero ? " size=\"" + rom.Size + "\"" : "") +
 							(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
 							(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
 							(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
