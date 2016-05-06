@@ -447,6 +447,12 @@ namespace SabreTools.Helper
 									{
 										case "rom":
 										case "disk":
+											// If the rom is nodump, skip it
+											if (xtr.GetAttribute("flags") == "nodump" || xtr.GetAttribute("status") == "nodump")
+											{
+												break;
+											}
+
 											// Take care of hex-sized files
 											long size = -1;
 											if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
@@ -469,31 +475,35 @@ namespace SabreTools.Helper
 											sha1 = (sha1.StartsWith("0x") ? sha1.Remove(0, 2) : sha1);
 											sha1 = (sha1 == "-" ? "" : sha1);
 
-											// Get the new values to add
-											string key = crc + "-" + size;
-											RomData value = new RomData
+											// Only add the rom if there's useful information in it
+											if (!(crc == "" && md5 == "" && sha1 == ""))
 											{
-												Game = tempname,
-												Name = xtr.GetAttribute("name"),
-												Type = xtr.Name,
-												SystemID = sysid,
-												SourceID = srcid,
-												Size = size,
-												CRC = crc,
-												MD5 = md5,
-												SHA1 = sha1,
-												System = filename,
-											};
+												// Get the new values to add
+												string key = crc + "-" + size;
+												RomData value = new RomData
+												{
+													Game = tempname,
+													Name = xtr.GetAttribute("name"),
+													Type = xtr.Name,
+													SystemID = sysid,
+													SourceID = srcid,
+													Size = size,
+													CRC = crc,
+													MD5 = md5,
+													SHA1 = sha1,
+													System = filename,
+												};
 
-											if (dict.ContainsKey(key))
-											{
-												dict[key].Add(value);
-											}
-											else
-											{
-												List<RomData> newvalue = new List<RomData>();
-												newvalue.Add(value);
-												dict.Add(key, newvalue);
+												if (dict.ContainsKey(key))
+												{
+													dict[key].Add(value);
+												}
+												else
+												{
+													List<RomData> newvalue = new List<RomData>();
+													newvalue.Add(value);
+													dict.Add(key, newvalue);
+												}
 											}
 											break;
 									}
