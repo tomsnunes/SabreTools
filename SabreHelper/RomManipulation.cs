@@ -458,13 +458,16 @@ namespace SabreTools.Helper
 												Int64.TryParse(xtr.GetAttribute("size"), out size);
 											}
 
-											// Take care of hex-prefixed hashes
+											// Sanitize the hashes from null, hex sizes, and "true blank" strings
 											string crc = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "");
 											crc = (crc.StartsWith("0x") ? crc.Remove(0, 2) : crc);
+											crc = (crc == "-" ? "" : crc);
 											string md5 = (xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : "");
 											md5 = (md5.StartsWith("0x") ? md5.Remove(0, 2) : md5);
+											md5 = (md5 == "-" ? "" : md5);
 											string sha1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : "");
 											sha1 = (sha1.StartsWith("0x") ? sha1.Remove(0, 2) : sha1);
+											sha1 = (sha1 == "-" ? "" : sha1);
 
 											// Get the new values to add
 											string key = crc + "-" + size;
