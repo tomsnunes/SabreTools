@@ -124,12 +124,6 @@ COMMIT;";
 									// Add the hash to the temporary Dictionary
 									hashes.Add(hash, hashid);
 
-									// If we don't care about source, stop here
-									if (_ignore)
-									{
-										continue;
-									}
-
 									// Now try to determine the source for the file based on the name
 									string source = GetSourceFromFileName(Path.GetFileName(file));
 									int sourceid = 0;
@@ -147,66 +141,70 @@ COMMIT;";
 										}
 									}
 
-									// If the source is blank, ask the user to supply one
-									while (source == "" && sourceid == 0)
+									// Only if we're not ignoring new sources should be ask the user for input
+									if (!_ignore)
 									{
-										Console.Clear();
-										Build.Start("DATabaseTwo");
-
-										Console.WriteLine("Sources:");
-										foreach (KeyValuePair<string, int> pair in sources)
+										// If the source is blank, ask the user to supply one
+										while (source == "" && sourceid == 0)
 										{
-											Console.WriteLine("    " + pair.Value + " - " + pair.Key);
+											Console.Clear();
+											Build.Start("DATabaseTwo");
+
+											Console.WriteLine("Sources:");
+											foreach (KeyValuePair<string, int> pair in sources)
+											{
+												Console.WriteLine("    " + pair.Value + " - " + pair.Key);
+											}
+											Console.WriteLine("\nFor file name: " + Path.GetFileName(file));
+											Console.Write("Select a source above or enter a new one: ");
+											source = Console.ReadLine();
+
+											Int32.TryParse(source, out sourceid);
+
+											// If the value could be parsed, reset the source string
+											if (sourceid != 0)
+											{
+												source = "";
+											}
+
+											// If the source ID is set check to see if it's valid
+											if (sourceid != 0 && !sources.ContainsValue(sourceid))
+											{
+												Console.WriteLine("Invalid selection: " + sourceid);
+												Console.ReadLine();
+												sourceid = 0;
+											}
 										}
-										Console.WriteLine("\nFor file name: " + Path.GetFileName(file));
-										Console.Write("Select a source above or enter a new one: ");
-										source = Console.ReadLine();
 
-										Int32.TryParse(source, out sourceid);
-
-										// If the value could be parsed, reset the source string
-										if (sourceid != 0)
+										// If the source isn't in, add it and get the insert id
+										if (source != "" && sourceid == 0 && !sources.ContainsKey(source))
 										{
-											source = "";
-										}
-
-										// If the source ID is set check to see if it's valid
-										if (sourceid != 0 && !sources.ContainsValue(sourceid))
-										{
-											Console.WriteLine("Invalid selection: " + sourceid);
-											Console.ReadLine();
-											sourceid = 0;
-										}
-									}
-
-									// If the source isn't in, add it and get the insert id
-									if (source != "" && sourceid == 0 && !sources.ContainsKey(source))
-									{
-										string tquery = @"BEGIN;
+											string tquery = @"BEGIN;
 INSERT INTO source (name, url)
 VALUES ('" + source + @"', '');
 SELECT last_insert_rowid();
 COMMIT;";
-										using (SqliteCommand sslc = new SqliteCommand(tquery, dbc))
-										{
-											using (SqliteDataReader ssldr = sslc.ExecuteReader())
+											using (SqliteCommand sslc = new SqliteCommand(tquery, dbc))
 											{
-												if (ssldr.Read())
+												using (SqliteDataReader ssldr = sslc.ExecuteReader())
 												{
-													sourceid = ssldr.GetInt32(0);
+													if (ssldr.Read())
+													{
+														sourceid = ssldr.GetInt32(0);
+													}
 												}
 											}
-										}
 
-										// Add the new source to the temporary Dictionary
-										sources.Add(source, sourceid);
+											// Add the new source to the temporary Dictionary
+											sources.Add(source, sourceid);
+										}
+										// Otherwise, get the ID
+										else if (source != "" && sourceid == 0 && sources.ContainsKey(source))
+										{
+											sourceid = sources[source];
+										}
+										// Otherwise, we should already have an ID
 									}
-									// Otherwise, get the ID
-									else if (source != "" && sourceid == 0 && sources.ContainsKey(source))
-									{
-										sourceid = sources[source];
-									}
-									// Otherwise, we should already have an ID
 
 									// Add the source and system link to the database
 									string uquery = @"INSERT OR IGNORE INTO datsdata (id, key, value)
