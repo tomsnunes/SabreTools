@@ -172,7 +172,7 @@ namespace SabreTools.Helper
 				foreach (RomData rom in newroms)
 				{
 					count++;
-					string key = (norename ? "" : rom.SystemID + "-" + rom.SourceID + "-") + rom.Game.ToLowerInvariant();
+					string key = (norename ? "" : rom.SystemID.ToString().PadLeft(10, '0') + "-" + rom.SourceID.ToString().PadLeft(10, '0') + "-") + rom.Game.ToLowerInvariant();
 					if (sortable.ContainsKey(key))
 					{
 						sortable[key].Add(rom);
