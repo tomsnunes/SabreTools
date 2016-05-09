@@ -53,8 +53,32 @@ namespace SabreTools
 			_logger = new Logger(true, "database2.log");
 			_logger.Start();
 
+			Remapping.CreateRemappings();
+			Build.Start("DATabaseTwo");
+
+			// Perform initial database and folder setup
+			if (!Directory.Exists(_datroot))
+			{
+				Directory.CreateDirectory(_datroot);
+			}
+			if (!Directory.Exists(_outroot))
+			{
+				Directory.CreateDirectory(_outroot);
+			}
+			DBTools.EnsureDatabase(_dbName, _connectionString);
+
+			// If there's no arguments, show the menu
+			if (args.Length == 0)
+			{
+				_logger.ToFile = true;
+				ShowMainMenu();
+				_logger.Close();
+				return;
+			}
+
 			// Set all default values
 			bool help = false,
+				gen = false,
 				genall = false,
 				ignore = false,
 				listsys = false,
@@ -71,6 +95,10 @@ namespace SabreTools
 					case "-h":
 					case "--help":
 						help = true;
+						break;
+					case "-g":
+					case "--generate":
+						gen = true;
 						break;
 					case "-ga":
 					case "--generate-all":
@@ -117,18 +145,6 @@ namespace SabreTools
 				return;
 			}
 
-			// Call initial setup because everything after here requires it
-			Import(ignore);
-
-			// If there's no arguments, show the menu
-			if (args.Length == 0)
-			{
-				_logger.ToFile = true;
-				ShowMainMenu();
-				_logger.Close();
-				return;
-			}
-
 			// If we want a list of systems
 			if (listsys)
 			{
@@ -138,12 +154,14 @@ namespace SabreTools
 			// If we want to generate all DATs
 			else if (genall)
 			{
+				Import(ignore);
 				InitGenerateAll(norename, old);
 			}
 
 			// If we want to generate a DAT
-			else
+			else if (gen)
 			{
+				Import(ignore);
 				InitGenerate(system, norename, old);
 			}
 
@@ -168,10 +186,11 @@ namespace SabreTools
 Make a selection:
 
     1) Show command line usage
-    2) Generate System DATs
-    3) List all available systems
-    4) " + (_logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
-    5) Show credits
+    2) Check for new or changed DATs
+    3) Generate System DATs
+    4) List all available systems
+    5) " + (_logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
+    6) Show credits
     X) Exit Program
 ");
 				Console.Write("Enter selection: ");
@@ -186,19 +205,22 @@ Make a selection:
 						Console.ReadKey();
 						break;
 					case "2":
-						GenerateMenu();
+						ImportMenu();
 						break;
 					case "3":
+						GenerateMenu();
+						break;
+					case "4":
 						Console.Clear();
 						Build.Start("DATabaseTwo");
 						ListSystems();
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						break;
-					case "4":
+					case "5":
 						_logger.ToFile = !_logger.ToFile;
 						break;
-					case "5":
+					case "6":
 						Console.Clear();
 						Build.Credits();
 						Console.Write("\nPress any key to continue...");
@@ -206,6 +228,44 @@ Make a selection:
 						break;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Show the text-based import menu
+		/// </summary>
+		private static void ImportMenu()
+		{
+			string selection = "";
+			bool ignore = false;
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabaseTwo");
+				Console.WriteLine(@"IMPORT MENU
+===========================
+Make a selection:
+
+    1) " + (ignore ? "Enable new source prompt" : "Disable new source prompt") + @"
+    2) Begin import process
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						ignore = !ignore;
+						break;
+					case "2":
+						Console.Clear();
+						Import(ignore);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						ignore = false;
+						break;
+				}
+			}
+			return;
 		}
 
 		/// <summary>
@@ -218,7 +278,7 @@ Make a selection:
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
-				Build.Start("DATabase");
+				Build.Start("DATabaseTwo");
 				Console.WriteLine(@"GENERATE MENU
 ===========================
 Make a selection:
@@ -515,28 +575,12 @@ ORDER BY system.manufacturer, system.name";
 		#region Helper Methods
 
 		/// <summary>
-		/// Perform initial setup for the program
+		/// Perform initial or incremental import of DATs in the root folder
 		/// </summary>
 		/// <param name="ignore">False if each DAT that has no defined source asks for user input (default), true otherwise</param>
 		private static void Import(bool ignore = false)
 		{
-			Remapping.CreateRemappings();
-			Build.Start("DATabaseTwo");
-
-			_logger.Log("Beginning setup...");
-
-			// Perform initial database and folder setup
-			if (!Directory.Exists(_datroot))
-			{
-				Directory.CreateDirectory(_datroot);
-			}
-			if (!Directory.Exists(_outroot))
-			{
-				Directory.CreateDirectory(_outroot);
-			}
-
-			DBTools.EnsureDatabase(_dbName, _connectionString);
-
+			_logger.Log("Beginning import/update process");
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
@@ -706,7 +750,7 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				}
 			}
 
-			_logger.Log("Setup complete!");
+			_logger.Log("Import/update process complete!");
 		}
 
 		/// <summary>
