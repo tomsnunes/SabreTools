@@ -238,7 +238,7 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 		/// <returns>The name of the source if determined, blank otherwise</returns>
 		private string GetSourceFromFileName(string filename)
 		{
-			string source = "";
+			string source = "Default";
 
 			// Determine which dattype we have
 			GroupCollection fileinfo;
