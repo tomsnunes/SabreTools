@@ -455,7 +455,7 @@ Make a selection:
 					rom.Game = Style.NormalizeChars(rom.Game);
 					rom.Game = Style.RussianToLatin(rom.Game);
 					rom.Game = Style.SearchPattern(rom.Game);
-					rom.Game = rom.Game.Replace("\n", "").Replace("\r", "");
+					rom.Game = rom.Game.TrimEnd().TrimStart();
 
 					if (!norename)
 					{
@@ -467,7 +467,7 @@ Make a selection:
 			}
 
 			// Then write out the file
-			Output.WriteToDatFromDict(name, description, "", date, "SabreTools", "SabreTools", false, old, true, _outroot, roms, _logger);
+			Output.WriteToDatFromDict(name, description, "", date, "SabreTools", "SabreTools", false, old, true, _outroot, roms, _logger, norename);
 		}
 
 		/// <summary>

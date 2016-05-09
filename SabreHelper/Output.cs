@@ -153,9 +153,10 @@ namespace SabreTools.Helper
 		/// <param name="outDir">Set the output directory</param>
 		/// <param name="dict">Dictionary containing all the roms to be written</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
 		public static bool WriteToDatFromDict(string name, string description, string version, string date, string category, string author,
-			bool forceunpack, bool old, bool merge, string outDir, Dictionary<string, List<RomData>> dict, Logger logger)
+			bool forceunpack, bool old, bool merge, string outDir, Dictionary<string, List<RomData>> dict, Logger logger, bool norename = true)
 		{
 			// Get all values in the dictionary and write out
 			SortedDictionary<string, List<RomData>> sortable = new SortedDictionary<string, List<RomData>>();
@@ -171,7 +172,7 @@ namespace SabreTools.Helper
 				foreach (RomData rom in newroms)
 				{
 					count++;
-					string key = rom.SystemID + "-" + rom.SourceID + "-" + rom.Game + "-" + rom.Name;
+					string key = (norename ? "" : rom.SystemID + "-" + rom.SourceID + "-" ) + rom.Game + "-" + rom.Name;
 					if (sortable.ContainsKey(key))
 					{
 						sortable[key].Add(rom);
