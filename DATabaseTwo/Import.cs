@@ -51,7 +51,7 @@ namespace SabreTools
 		/// Perform initial or incremental import of DATs in the root folder
 		/// </summary>
 		/// <param name="ignore">False if each DAT that has no defined source asks for user input (default), true otherwise</param>
-		public bool ImportData(bool ignore = false)
+		public bool ImportData()
 		{
 			_logger.Log("Beginning import/update process");
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
@@ -120,7 +120,7 @@ COMMIT;";
 									hashes.Add(hash, hashid);
 
 									// If we don't care about source, stop here
-									if (ignore)
+									if (_ignore)
 									{
 										continue;
 									}
