@@ -420,6 +420,13 @@ Make a selection:
 				roms = RomManipulation.ParseDict(file, 0, tempSrcId, roms, _logger);
 			}
 
+			// If the dictionary is empty for any reason, tell the user and exit
+			if (roms.Keys.Count == 0 || roms.Count == 0)
+			{
+				_logger.Log("No roms found for system ID " + systemid);
+				return;
+			}
+
 			// Now process all of the roms
 			_logger.Log("Cleaning rom data");
 			List<string> keys = roms.Keys.ToList();
