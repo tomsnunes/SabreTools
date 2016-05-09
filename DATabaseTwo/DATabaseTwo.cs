@@ -455,6 +455,12 @@ Make a selection:
 						continue;
 					}
 
+					// If a game has source "0" it's Default. Make this Int32.MaxValue for sorting purposes
+					if (rom.SourceID == 0)
+					{
+						rom.SourceID = Int32.MaxValue;
+					}
+
 					// WOD origninally stripped out any subdirs from the imported files, we do the same
 					rom.Name = Path.GetFileName(rom.Name);
 
