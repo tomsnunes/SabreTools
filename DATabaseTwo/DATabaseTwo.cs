@@ -10,49 +10,6 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
-	/// <summary>
-	/// This is meant to be a replacement for Import and Generate
-	/// that currently reside in DATabase. Import is no longer
-	/// going to be a function. Rather, on run, a subfolder called
-	/// "DATS" is going to be created in the folder the program
-	/// is run from. Inside, it will create a folder for every
-	/// System that is in the database at the time. It then audits
-	/// the files it finds inside of each folder. If the file
-	/// already exists in the database (by SHA-1 hash) then it
-	/// is not added. Otherwise, it is added with the System ID
-	/// of the folder it is in. Along the way, it also checks to
-	/// see what source each file belongs to for reference. If
-	/// the source cannot be automatically determined, then the user
-	/// is prompted to either pick from the list or enter a new
-	/// source for the DAT. New sources are added to the end
-	/// of the database.
-	/// 
-	/// Once the intial setup is done, the user can choose
-	/// a system to generate a merged DAT for, generate all
-	/// DATs, or create a merged DAT from all sources. This will
-	/// use the dictionary-based merging that DATabase has been
-	/// using for MergeDiff. The files will all be written out
-	/// as System (merged Date) as is customary. The files will
-	/// always be written out to "Output" or "Created".
-	/// 
-	/// The database is be set up as follows:
-	/// dats
-	///		id
-	///		sha1
-	///		name
-	/// datsdata
-	///		id
-	///		key
-	///		value
-	/// system
-	///		id
-	///		manufacturer
-	///		name
-	/// source
-	///		id
-	///		name
-	///		url
-	/// </summary>
 	public class DATabaseTwo
 	{
 		// Private required variables
