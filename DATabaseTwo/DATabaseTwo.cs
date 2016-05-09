@@ -455,7 +455,7 @@ Make a selection:
 					rom.Game = Style.NormalizeChars(rom.Game);
 					rom.Game = Style.RussianToLatin(rom.Game);
 					rom.Game = Style.SearchPattern(rom.Game);
-					rom.Game = rom.Game.Trim();
+					rom.Game = rom.Game.Replace("\n", "").Replace("\r", "");
 
 					if (!norename)
 					{
