@@ -129,6 +129,7 @@ COMMIT;";
 									int sourceid = 0;
 
 									Dictionary<string, int> sources = new Dictionary<string, int>();
+									sources.Add("Default", 0);
 									query = "SELECT name, id FROM source";
 									using (SqliteCommand sslc = new SqliteCommand(query, dbc))
 									{
