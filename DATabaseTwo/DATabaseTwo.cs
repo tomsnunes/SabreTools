@@ -53,21 +53,10 @@ namespace SabreTools
 			_logger = new Logger(true, "database2.log");
 			_logger.Start();
 
-			// Call initial setup
-			Setup();
-
-			// If there's no arguments, show the menu
-			if (args.Length == 0)
-			{
-				_logger.ToFile = true;
-				ShowMainMenu();
-				_logger.Close();
-				return;
-			}
-
 			// Set all default values
 			bool help = false,
 				genall = false,
+				ignore = false,
 				listsys = false,
 				norename = false,
 				old = false;
@@ -86,6 +75,10 @@ namespace SabreTools
 					case "-ga":
 					case "--generate-all":
 						genall = true;
+						break;
+					case "-i":
+					case "--ignore":
+						ignore = true;
 						break;
 					case "-lsy":
 					case "--list-systems":
@@ -120,6 +113,18 @@ namespace SabreTools
 			if (help || (system == "" && !listsys))
 			{
 				Build.Help();
+				_logger.Close();
+				return;
+			}
+
+			// Call initial setup because everything after here requires it
+			Import(ignore);
+
+			// If there's no arguments, show the menu
+			if (args.Length == 0)
+			{
+				_logger.ToFile = true;
+				ShowMainMenu();
 				_logger.Close();
 				return;
 			}
@@ -512,7 +517,8 @@ ORDER BY system.manufacturer, system.name";
 		/// <summary>
 		/// Perform initial setup for the program
 		/// </summary>
-		private static void Setup()
+		/// <param name="ignore">False if each DAT that has no defined source asks for user input (default), true otherwise</param>
+		private static void Import(bool ignore = false)
 		{
 			Remapping.CreateRemappings();
 			Build.Start("DATabaseTwo");
@@ -556,7 +562,7 @@ ORDER BY system.manufacturer, system.name";
 					{
 						while (sldr.Read())
 						{
-							int id = sldr.GetInt32(0);
+							int systemid = sldr.GetInt32(0);
 							string system = _datroot + Path.DirectorySeparatorChar + sldr.GetString(1) + " - " + sldr.GetString(2);
 							system = system.Trim();
 
@@ -600,6 +606,12 @@ COMMIT;";
 
 									// Add the hash to the temporary Dictionary
 									hashes.Add(hash, hashid);
+
+									// If we don't care about source, stop here
+									if (ignore)
+									{
+										continue;
+									}
 
 									// Now try to determine the source for the file based on the name
 									string source = GetSourceFromFileName(Path.GetFileName(file));
@@ -679,8 +691,10 @@ COMMIT;";
 									}
 									// Otherwise, we should already have an ID
 
-									// Add the source link to the database
-									string uquery = "INSERT OR IGNORE INTO datsdata (id, key, value) VALUES (" + hashid + ", 'source', '" + sourceid + "')";
+									// Add the source and system link to the database
+									string uquery = @"INSERT OR IGNORE INTO datsdata (id, key, value)
+VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
+(" + hashid + ", 'system', '" + systemid + "')";
 									using (SqliteCommand uslc = new SqliteCommand(uquery, dbc))
 									{
 										uslc.ExecuteNonQuery();

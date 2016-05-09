@@ -200,6 +200,7 @@ Usage: DATabaseTwo [options]
 Options:
   -h, -?, --help	Show this help dialog
   -ga, --generate-all	Start tool in generate all mode
+  -i, --ignore		Don't prompt for new sources
   -lsy, --list-systems	List all systems (id <= name)
   -o, --old		Output DAT in CMP format instead of XML
   -sys=, --system=	System ID to generate from
