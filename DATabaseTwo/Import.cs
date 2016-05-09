@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using Mono.Data.Sqlite;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 using SabreTools.Helper;
 
