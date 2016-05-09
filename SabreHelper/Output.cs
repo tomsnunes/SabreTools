@@ -247,7 +247,7 @@ namespace SabreTools.Helper
 							state += (old ? ")\n" : "\t</machine>\n");
 						}
 
-						if (lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+						if (lastgame == null || lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
 							state += (old ? "game (\n\tname \"" + rom.Game + "\"\n" +
 								"\tdescription \"" + rom.Game + "\"\n" :
