@@ -205,6 +205,10 @@ COMMIT;";
 										}
 										// Otherwise, we should already have an ID
 									}
+									else
+									{
+										sourceid = sources[source];
+									}
 
 									// Add the source and system link to the database
 									string uquery = @"INSERT OR IGNORE INTO datsdata (id, key, value)
