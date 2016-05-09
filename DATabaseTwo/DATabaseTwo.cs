@@ -53,19 +53,8 @@ namespace SabreTools
 			_logger = new Logger(true, "database2.log");
 			_logger.Start();
 
-			Remapping.CreateRemappings();
-			Build.Start("DATabaseTwo");
-
-			// Perform initial database and folder setup
-			if (!Directory.Exists(_datroot))
-			{
-				Directory.CreateDirectory(_datroot);
-			}
-			if (!Directory.Exists(_outroot))
-			{
-				Directory.CreateDirectory(_outroot);
-			}
-			DBTools.EnsureDatabase(_dbName, _connectionString);
+			// Perform initial setup
+			Setup();
 
 			// If there's no arguments, show the menu
 			if (args.Length == 0)
@@ -575,6 +564,50 @@ ORDER BY system.manufacturer, system.name";
 		#region Helper Methods
 
 		/// <summary>
+		/// Perform initial setup for the program
+		/// </summary>
+		private static void Setup()
+		{
+			Remapping.CreateRemappings();
+			Build.Start("DATabaseTwo");
+
+			// Perform initial database and folder setup
+			if (!Directory.Exists(_datroot))
+			{
+				Directory.CreateDirectory(_datroot);
+			}
+			if (!Directory.Exists(_outroot))
+			{
+				Directory.CreateDirectory(_outroot);
+			}
+			DBTools.EnsureDatabase(_dbName, _connectionString);
+
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			{
+				dbc.Open();
+
+				string query = "SELECT * FROM system";
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
+				{
+					using (SqliteDataReader sldr = slc.ExecuteReader())
+					{
+						while (sldr.Read())
+						{
+							int systemid = sldr.GetInt32(0);
+							string system = _datroot + Path.DirectorySeparatorChar + sldr.GetString(1) + " - " + sldr.GetString(2);
+							system = system.Trim();
+
+							if (!Directory.Exists(system))
+							{
+								Directory.CreateDirectory(system);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		/// <summary>
 		/// Perform initial or incremental import of DATs in the root folder
 		/// </summary>
 		/// <param name="ignore">False if each DAT that has no defined source asks for user input (default), true otherwise</param>
@@ -611,11 +644,6 @@ ORDER BY system.manufacturer, system.name";
 							system = system.Trim();
 
 							_logger.Log("System: " + system.Remove(0, 5));
-
-							if (!Directory.Exists(system))
-							{
-								Directory.CreateDirectory(system);
-							}
 
 							// Audit all DATs in the folder
 							foreach (string file in Directory.GetFiles(system, "*", SearchOption.AllDirectories))
