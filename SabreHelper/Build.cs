@@ -202,6 +202,7 @@ Options:
   -ga, --generate-all	Start tool in generate all mode
   -i, --ignore		Don't prompt for new sources
   -lsy, --list-systems	List all systems (id <= name)
+  -nr, --no-rename	Don't auto-rename games by source/system
   -o, --old		Output DAT in CMP format instead of XML
   -sys=, --system=	System ID to generate from
 ");
