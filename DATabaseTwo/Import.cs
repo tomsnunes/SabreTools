@@ -37,6 +37,13 @@ namespace SabreTools
 		private static string _truripPattern = @"^(.*) - .* \(trurip_XML\)\.dat$";
 		private static string _zandroPattern = @"^SMW-.*.xml";
 
+		/// <summary>
+		/// Initialize an Import object with the given information
+		/// </summary>
+		/// <param name="datroot">Root directory where all DAT files are held</param>
+		/// <param name="connectionString">Connection string for SQLite</param>
+		/// <param name="logger">Logger object for file or console output</param>
+		/// <param name="ignore">False if each DAT that has no defined source asks for user input (default), true otherwise</param>
 		public Import(string datroot, string connectionString, Logger logger, bool ignore = false)
 		{
 			_datroot = datroot;
@@ -48,7 +55,7 @@ namespace SabreTools
 		/// <summary>
 		/// Perform initial or incremental import of DATs in the root folder
 		/// </summary>
-		/// <param name="ignore">False if each DAT that has no defined source asks for user input (default), true otherwise</param>
+		/// <returns>True if the data could be inserted or updated correctly, false otherwise</returns>
 		public bool ImportData()
 		{
 			_logger.Log("Beginning import/update process");
