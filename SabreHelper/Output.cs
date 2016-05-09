@@ -172,7 +172,7 @@ namespace SabreTools.Helper
 				foreach (RomData rom in newroms)
 				{
 					count++;
-					string key = (norename ? "" : rom.SystemID + "-" + rom.SourceID + "-") + rom.Game; // + "-" + rom.Name;
+					string key = (norename ? "" : rom.SystemID + "-" + rom.SourceID + "-") + rom.Game.ToLowerInvariant();
 					if (sortable.ContainsKey(key))
 					{
 						sortable[key].Add(rom);
@@ -242,12 +242,12 @@ namespace SabreTools.Helper
 					foreach (RomData rom in roms)
 					{
 						string state = "";
-						if (lastgame != null && lastgame != rom.Game)
+						if (lastgame != null && lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
 							state += (old ? ")\n" : "\t</machine>\n");
 						}
 
-						if (lastgame != rom.Game)
+						if (lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
 							state += (old ? "game (\n\tname \"" + rom.Game + "\"\n" +
 								"\tdescription \"" + rom.Game + "\"\n" :
