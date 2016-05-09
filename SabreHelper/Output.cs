@@ -236,13 +236,13 @@ namespace SabreTools.Helper
 				sw.Write((old ? header_old : header));
 
 				// Write out each of the machines and roms
-				string lastgame = "";
+				string lastgame = null;
 				foreach (List<RomData> roms in sortable.Values)
 				{
 					foreach (RomData rom in roms)
 					{
 						string state = "";
-						if (lastgame != "" && lastgame != rom.Game)
+						if (lastgame != null && lastgame != rom.Game)
 						{
 							state += (old ? ")\n" : "\t</machine>\n");
 						}
