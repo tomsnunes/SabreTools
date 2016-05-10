@@ -14,6 +14,9 @@ namespace SabreTools.Helper
 		private DateTime _start;
 		private StreamWriter _log;
 
+		// Private required variables
+		private string _basepath = "Logs" + Path.DirectorySeparatorChar;
+
 		// Public wrappers
 		public bool ToFile
 		{
@@ -41,6 +44,11 @@ namespace SabreTools.Helper
 		{
 			_tofile = tofile;
 			_filename = filename;
+
+			if (!Directory.Exists(_basepath))
+			{
+				Directory.CreateDirectory(_basepath);
+			}
 		}
 
 		/// <summary>
@@ -57,7 +65,7 @@ namespace SabreTools.Helper
 
 			try
 			{
-				_log = new StreamWriter(File.Open(_filename, FileMode.OpenOrCreate | FileMode.Append));
+				_log = new StreamWriter(File.Open(_basepath + _filename, FileMode.OpenOrCreate | FileMode.Append));
 				_log.WriteLine("Logging started " + DateTime.Now);
 			}
 			catch
