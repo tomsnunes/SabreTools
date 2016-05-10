@@ -154,8 +154,7 @@ Make a selection:
     2) Check for new or changed DATs
     3) Generate System DATs
     4) List all available systems
-    5) " + (_logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
-    6) Show credits
+    5) Show credits
     X) Exit Program
 ");
 				Console.Write("Enter selection: ");
@@ -183,9 +182,6 @@ Make a selection:
 						Console.ReadKey();
 						break;
 					case "5":
-						_logger.ToFile = !_logger.ToFile;
-						break;
-					case "6":
 						Console.Clear();
 						Build.Credits();
 						Console.Write("\nPress any key to continue...");

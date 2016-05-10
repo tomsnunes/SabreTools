@@ -463,8 +463,7 @@ Make a selection:
     5) List all available sources
     6) List all available systems
     7) Add and remove systems and sources
-    8) " + (logger.ToFile ? "Disable Logging" : "Enable Logging") + @"
-    9) Show credits
+    8) Show credits
     X) Exit Program
 ");
 				Console.Write("Enter selection: ");
@@ -505,9 +504,6 @@ Make a selection:
 						AddRemoveMenu();
 						break;
 					case "8":
-						logger.ToFile = !logger.ToFile;
-						break;
-					case "9":
 						Console.Clear();
 						Build.Credits();
 						Console.Write("\nPress any key to continue...");
