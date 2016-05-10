@@ -100,7 +100,7 @@ namespace SabreTools
 			name += " (merged)";
 
 			// For good measure, get all sources
-			Dictionary<int, string> sources = new Dictionary<int, string>();C:\Users\Matt\GitHub\DATabase\DATabaseTwo\Generate.cs
+			Dictionary<int, string> sources = new Dictionary<int, string>();
 			sources.Add(0, "Default");
 
 			string squery = "SELECT id, name FROM source";
