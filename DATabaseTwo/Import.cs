@@ -128,7 +128,7 @@ COMMIT;";
 									string source = GetSourceFromFileName(Path.GetFileName(file));
 									int sourceid = 0;
 
-									Dictionary<string, int> sources = new Dictionary<string, int>();
+									SortedDictionary<string, int> sources = new SortedDictionary<string, int>();
 									sources.Add("default", 0);
 									query = "SELECT name, id FROM source";
 									using (SqliteCommand sslc = new SqliteCommand(query, dbc))
@@ -208,13 +208,27 @@ COMMIT;";
 										// Otherwise, get the ID
 										else if (source != "" && sourceid == 0 && sources.ContainsKey(source))
 										{
-											sourceid = sources[source.ToLowerInvariant()];
+											try
+											{
+												sourceid = sources[source.ToLowerInvariant()];
+											}
+											catch
+											{
+												sourceid = 0;
+											}
 										}
 										// Otherwise, we should already have an ID
 									}
 									else
 									{
-										sourceid = sources[source.ToLowerInvariant()];
+										try
+										{
+											sourceid = sources[source.ToLowerInvariant()];
+										}
+										catch
+										{
+											sourceid = 0;
+										}
 									}
 
 									// Add the source and system link to the database
