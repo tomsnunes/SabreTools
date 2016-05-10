@@ -129,7 +129,7 @@ COMMIT;";
 									int sourceid = 0;
 
 									Dictionary<string, int> sources = new Dictionary<string, int>();
-									sources.Add("Default", 0);
+									sources.Add("default", 0);
 									query = "SELECT name, id FROM source";
 									using (SqliteCommand sslc = new SqliteCommand(query, dbc))
 									{
@@ -137,7 +137,7 @@ COMMIT;";
 										{
 											while (ssldr.Read())
 											{
-												sources.Add(ssldr.GetString(0), ssldr.GetInt32(1));
+												sources.Add(ssldr.GetString(0).ToLowerInvariant(), ssldr.GetInt32(1));
 											}
 										}
 									}
@@ -202,13 +202,13 @@ COMMIT;";
 										// Otherwise, get the ID
 										else if (source != "" && sourceid == 0 && sources.ContainsKey(source))
 										{
-											sourceid = sources[source];
+											sourceid = sources[source.ToLowerInvariant()];
 										}
 										// Otherwise, we should already have an ID
 									}
 									else
 									{
-										sourceid = sources[source];
+										sourceid = sources[source.ToLowerInvariant()];
 									}
 
 									// Add the source and system link to the database
