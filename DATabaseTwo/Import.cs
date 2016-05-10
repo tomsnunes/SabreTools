@@ -206,7 +206,7 @@ COMMIT;";
 											sources.Add(source.ToLowerInvariant(), sourceid);
 										}
 										// Otherwise, get the ID
-										else if (source != "" && sourceid == 0 && sources.ContainsKey(source))
+										else if (source != "" && sourceid == 0 && sources.ContainsKey(source.ToLowerInvariant()))
 										{
 											try
 											{
