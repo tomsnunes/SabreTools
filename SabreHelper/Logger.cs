@@ -67,6 +67,7 @@ namespace SabreTools.Helper
 			{
 				_log = new StreamWriter(File.Open(_basepath + _filename, FileMode.OpenOrCreate | FileMode.Append));
 				_log.WriteLine("Logging started " + DateTime.Now);
+				_log.Flush();
 			}
 			catch
 			{
