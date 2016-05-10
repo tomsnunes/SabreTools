@@ -203,7 +203,7 @@ COMMIT;";
 											}
 
 											// Add the new source to the temporary Dictionary
-											sources.Add(source, sourceid);
+											sources.Add(source.ToLowerInvariant(), sourceid);
 										}
 										// Otherwise, get the ID
 										else if (source != "" && sourceid == 0 && sources.ContainsKey(source))
