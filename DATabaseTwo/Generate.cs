@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Mono.Data.Sqlite;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 using SabreTools.Helper;
 
@@ -126,18 +126,18 @@ namespace SabreTools
 			{
 				dbc.Open();
 
-				string tquery = "SELECT DISTINCT dats.name, datsdata.value FROM dats JOIN datsdata ON dats.id=datsdata.id WHERE key='source'";
+				string tquery = "SELECT DISTINCT dats.sha1, datsdata.value FROM dats JOIN datsdata ON dats.id=datsdata.id WHERE key='source'";
 				using (SqliteCommand slc = new SqliteCommand(tquery, dbc))
 				{
 					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						while (sldr.Read())
 						{
-							string tempname = sldr.GetString(0);
+							string tempsha1 = sldr.GetString(0);
 							string tempval = sldr.GetString(1);
-							if (!sourcemap.ContainsKey(tempname))
+							if (!sourcemap.ContainsKey(tempsha1))
 							{
-								sourcemap.Add(tempname, tempval);
+								sourcemap.Add(tempsha1, tempval);
 							}
 						}
 					}
@@ -145,13 +145,20 @@ namespace SabreTools
 			}
 
 			// Now read in all of the files
+			SHA1 sha1 = SHA1.Create();
 			Dictionary<string, List<RomData>> roms = new Dictionary<string, List<RomData>>();
 			foreach (string file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
 			{
-				int tempSrcId = 0;
-				if (sourcemap.ContainsKey(file))
+				string hash = "";
+				using (FileStream fs = File.Open(file, FileMode.Open))
 				{
-					Int32.TryParse(sourcemap[file], out tempSrcId);
+					hash = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
+				}
+
+				int tempSrcId = 0;
+				if (sourcemap.ContainsKey(hash))
+				{
+					Int32.TryParse(sourcemap[hash], out tempSrcId);
 				}
 				roms = RomManipulation.ParseDict(file, 0, tempSrcId, roms, _logger);
 			}
