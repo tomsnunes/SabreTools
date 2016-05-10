@@ -178,7 +178,7 @@ COMMIT;";
 										}
 
 										// If the source isn't in, add it and get the insert id
-										if (source != "" && sourceid == 0 && !sources.ContainsKey(source))
+										if (source != "" && sourceid == 0 && !sources.ContainsKey(source.ToLowerInvariant()))
 										{
 											string tquery = @"BEGIN;
 INSERT INTO source (name, url)
