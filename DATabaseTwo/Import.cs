@@ -145,6 +145,12 @@ COMMIT;";
 									// Only if we're not ignoring new sources should be ask the user for input
 									if (!_ignore)
 									{
+										// We want to reset "Default" at this point, just in case
+										if (source.ToLowerInvariant() == "default")
+										{
+											source = "";
+										}
+
 										// If the source is blank, ask the user to supply one
 										while (source == "" && sourceid == 0)
 										{
