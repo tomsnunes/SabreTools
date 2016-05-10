@@ -118,7 +118,7 @@ Options:
   -lsy, --list-systems	List all systems (id <= name)
   -m, --merge		Merge one or more DATs
 	-ad, --all-diff	Enable output of all diff variants
-	-di, --diff		Switch to diffdat mode
+	-di, --diff		Switch to diffdat mode (merge flag not required)
 	-dd, --dedup		Enable deduping in the created DAT
 	-b, --bare		Don't include date in file name
 	-u, --unzip		Force unzipping in created DAT

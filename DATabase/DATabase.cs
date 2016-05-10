@@ -430,7 +430,7 @@ namespace SabreTools
 			}
 
 			// Merge, diff, and dedupe at least 2 DATs
-			else if (merge)
+			else if (merge || diff)
 			{
 				InitMergeDiff(inputs, name, desc, cat, version, author, ad, diff, dedup, bare, forceunpack, old);
 			}
