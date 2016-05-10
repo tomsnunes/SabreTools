@@ -58,7 +58,7 @@ namespace SabreTools
 		/// <returns>True if the data could be inserted or updated correctly, false otherwise</returns>
 		public bool ImportData()
 		{
-			_logger.Log("Beginning import/update process");
+			_logger.User("Beginning import/update process");
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
@@ -88,7 +88,7 @@ namespace SabreTools
 							string system = _datroot + Path.DirectorySeparatorChar + sldr.GetString(1) + " - " + sldr.GetString(2);
 							system = system.Trim();
 
-							_logger.Log("System: " + system.Remove(0, 5));
+							_logger.User("System: " + system.Remove(0, 5));
 
 							// Audit all DATs in the folder
 							foreach (string file in Directory.GetFiles(system, "*", SearchOption.AllDirectories))
@@ -246,7 +246,7 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				}
 			}
 
-			_logger.Log("Import/update process complete!");
+			_logger.User("Import/update process complete!");
 
 			return true;
 		}

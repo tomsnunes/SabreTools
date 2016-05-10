@@ -45,7 +45,7 @@ namespace SabreTools
 				}
 			}
 
-			logger.Log("The total file size is: " + GetBytesReadable(size));
+			logger.User("The total file size is: " + GetBytesReadable(size));
 			logger.Close();
 		}
 

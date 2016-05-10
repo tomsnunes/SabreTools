@@ -97,11 +97,11 @@ namespace SabreTools
 				return;
 			}
 
-			Logger logger = new Logger(false, "datfromdir.log");
+			Logger logger = new Logger(true, "datfromdir.log");
 			logger.Start();
 
 			// First things first, take care of all of the arguments that this could have
-			bool noMD5 = false, noSHA1 = false, forceunpack = false, archivesAsFiles = false, old = false, log = false, superDat = false, bare = false;
+			bool noMD5 = false, noSHA1 = false, forceunpack = false, archivesAsFiles = false, old = false, superDat = false, bare = false;
 			string name = "", desc = "", cat = "", version = "", author = "";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
@@ -137,10 +137,6 @@ namespace SabreTools
 					case "-o":
 					case "--old":
 						old = true;
-						break;
-					case "-l":
-					case "--log":
-						log = true;
 						break;
 					case "-sd":
 					case "--superdat":
@@ -182,9 +178,6 @@ namespace SabreTools
 				logger.Close();
 				return;
 			}
-
-			// Set the new state for Logger
-			logger.ToFile = log;
 
 			// Output the title
 			Build.Start("DATFromDir");
@@ -365,7 +358,7 @@ namespace SabreTools
 				_logger.Log(Path.GetFileName(item) + " treated like an archive");
 				foreach (string entry in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
 				{
-					_logger.Log("\tFound file: " + entry);
+					_logger.Log("Found file: " + entry);
 					string fileCRC = String.Empty;
 					string fileMD5 = String.Empty;
 					string fileSHA1 = String.Empty;
@@ -410,7 +403,7 @@ namespace SabreTools
 						SHA1 = fileSHA1,
 					});
 
-					_logger.Log("File added" + Environment.NewLine);
+					_logger.User("File added: " + entry + Environment.NewLine);
 				}
 			}
 			// Otherwise, just get the info on the file itself
@@ -474,7 +467,7 @@ namespace SabreTools
 						SHA1 = fileSHA1,
 					});
 
-					_logger.Log("File added" + Environment.NewLine);
+					_logger.User("File added: " + actualitem + Environment.NewLine);
 				}
 				catch (IOException ex)
 				{

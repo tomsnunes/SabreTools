@@ -27,7 +27,7 @@ namespace SabreTools
 		public static void Main(string[] args)
 		{
 			// Perform initial setup and verification
-			logger = new Logger(false, "database.log");
+			logger = new Logger(true, "database.log");
 			logger.Start();
 			DBTools.EnsureDatabase(_dbName, _connectionString);
 			Remapping.CreateRemappings();
@@ -44,7 +44,6 @@ namespace SabreTools
 			// If there's no arguments, show the menu
 			if (args.Length == 0)
 			{
-				logger.ToFile = true;
 				ShowMainMenu();
 				logger.Close();
 				return;
@@ -67,7 +66,6 @@ namespace SabreTools
 				generate = false,
 				genall = false,
 				import = false,
-				log = false,
 				listsrc = false,
 				listsys = false,
 				merge = false,
@@ -162,10 +160,6 @@ namespace SabreTools
 					case "-i":
 					case "--import":
 						import = true;
-						break;
-					case "-l":
-					case "--log":
-						log = true;
 						break;
 					case "-lso":
 					case "--list-sources":
@@ -320,9 +314,6 @@ namespace SabreTools
 				logger.Close();
 				return;
 			}
-
-			// Update the logger with the new value
-			logger.ToFile = log;
 
 			// Now take care of each mode in succesion
 
@@ -738,7 +729,7 @@ or 'b' to go back to the previous menu:
 		private static void ConvertMissMenu()
 		{
 			string selection = "", input = "", prefix = "", postfix = "", addext = "", repext = "";
-			bool usegame = true, quotes = false, gamename = false;
+			bool usegame = true, quotes = false, gamename = false, romba = false;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
@@ -749,13 +740,14 @@ Make a selection:
 
     1) File to convert" + (input != "" ? ":\n\t" + input : "") + @"
     2) " + (usegame ? "Output roms instead of games" : "Output games instead of roms") + @"
-    3) Prefix to add to each line" + (prefix != "" ? ":\n\t" + prefix : "") + @"
-    4) Postfix to add to each line" + (postfix != "" ? ":\n\t" + postfix : "") + @"
-    5) " + (quotes ? "Don't add quotes around each item" : "Add quotes around each item") + @"
-    6) Replace all extensions with another" + (repext != "" ? ":\t" + repext : "") + @"
-    7) Add extensions to each item" + (addext != "" ? ":\n\t" + addext : "") + @"
-" + (!usegame ? "    8) " + (gamename ? "Don't add game name before every item" : "Add game name before every item") + "\n" : "") +
-@"    9) Begin conversion
+    3) " + (romba ? "Disable Romba-style output naming" : "Enable Romba-style output naming (overrides previous)") + @"
+    4) Prefix to add to each line" + (prefix != "" ? ":\n\t" + prefix : "") + @"
+    5) Postfix to add to each line" + (postfix != "" ? ":\n\t" + postfix : "") + @"
+    6) " + (quotes ? "Don't add quotes around each item" : "Add quotes around each item") + @"
+    7) Replace all extensions with another" + (repext != "" ? ":\t" + repext : "") + @"
+    8) Add extensions to each item" + (addext != "" ? ":\n\t" + addext : "") + @"
+" + (!usegame ? "    9) " + (gamename ? "Don't add game name before every item" : "Add game name before every item") + "\n" : "") +
+@"    10) Begin conversion
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -771,32 +763,35 @@ Make a selection:
 						usegame = !usegame;
 						break;
 					case "3":
+						romba = !romba;
+						break;
+					case "4":
 						Console.Clear();
 						Console.Write("Please enter the prefix: ");
 						prefix = Console.ReadLine();
 						break;
-					case "4":
+					case "5":
 						Console.Clear();
 						Console.Write("Please enter the postfix: ");
 						postfix = Console.ReadLine();
 						break;
-					case "5":
+					case "6":
 						quotes = !quotes;
 						break;
-					case "6":
+					case "7":
 						Console.Clear();
 						Console.Write("Please enter the replacement extension: ");
 						repext = Console.ReadLine();
 						break;
-					case "7":
+					case "8":
 						Console.Clear();
 						Console.Write("Please enter the additional extension: ");
 						addext = Console.ReadLine();
 						break;
-					case "8":
+					case "9":
 						gamename = !gamename;
 						break;
-					case "9":
+					case "10":
 						Console.Clear();
 						InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename);
 						Console.Write("\nPress any key to continue...");
@@ -1100,20 +1095,20 @@ Make a selection:
 			// Check to see if the second argument is a file that exists
 			if (filename != "" && File.Exists(filename))
 			{
-				logger.Log("Beginning import of " + filename);
+				logger.User("Beginning import of " + filename);
 				Import imp = new Import(filename, _connectionString, logger);
 				bool success = imp.ImportData();
-				logger.Log(filename + (success ? "" : " not") + " imported!");
+				logger.User(filename + (success ? "" : " not") + " imported!");
 			}
 			// Check to see if the second argument is a directory that exists
 			else if (filename != "" && Directory.Exists(filename))
 			{
 				foreach (string file in Directory.GetFiles(filename, "*", SearchOption.AllDirectories))
 				{
-					logger.Log("Beginning import of " + file);
+					logger.User("Beginning import of " + file);
 					Import imp = new Import(file, _connectionString, logger);
 					bool success = imp.ImportData();
-					logger.Log(file + (success ? "" : " not") + " imported!");
+					logger.User(file + (success ? "" : " not") + " imported!");
 				}
 			}
 			else
@@ -1239,7 +1234,7 @@ Make a selection:
 			InitGenerate("", "", outdir, norename, old);
 
 			// Zip up all of the files that were generated
-			logger.Log("Creating zip archive");
+			logger.User("Creating zip archive");
 			ZipArchive zip = ZipFile.Open(actualdir + "dats-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".zip", ZipArchiveMode.Create);
 			foreach (String filename in Directory.EnumerateFiles(outdir))
 			{
@@ -1252,7 +1247,7 @@ Make a selection:
 				}
 			}
 			zip.Dispose();
-			logger.Log("Zip archive created!");
+			logger.User("Zip archive created!");
 
 			// Remove all of the DATs from the folder
 			Directory.Delete(outdir, true);
@@ -1268,7 +1263,7 @@ Make a selection:
 		{
 			if (File.Exists(filename))
 			{
-				logger.Log("Converting " + filename);
+				logger.User("Converting " + filename);
 				XmlDocument doc = new XmlDocument();
 				try
 				{
@@ -1279,7 +1274,7 @@ Make a selection:
 					sw.Write(conv);
 					sw.Close();
 					fs.Close();
-					logger.Log("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.dat");
+					logger.User("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.dat");
 				}
 				catch (XmlException)
 				{
@@ -1301,7 +1296,7 @@ Make a selection:
 		{
 			if (File.Exists(filename))
 			{
-				logger.Log("Converting " + filename);
+				logger.User("Converting " + filename);
 				XElement conv = Converters.ClrMameProToXML(File.ReadAllLines(filename));
 				FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(filename) + ".new.xml");
 				StreamWriter sw = new StreamWriter(fs);
@@ -1310,7 +1305,7 @@ Make a selection:
 				sw.Write(conv);
 				sw.Close();
 				fs.Close();
-				logger.Log("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.xml");
+				logger.User("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.xml");
 			}
 			else
 			{
@@ -1344,9 +1339,9 @@ Make a selection:
 				string name = Path.GetFileNameWithoutExtension(input) + "-miss.txt";
 
 				// Read in the roms from the DAT and then write them to the file
-				logger.Log("Converting " + input);
+				logger.User("Converting " + input);
 				Output.WriteToText(name, Path.GetDirectoryName(input), RomManipulation.Parse(input, 0, 0, logger), logger, usegame, prefix, postfix, addext, repext, quotes, gamename);
-				logger.Log(input + " converted to: " + name);
+				logger.User(input + " converted to: " + name);
 				return;
 			}
 			else

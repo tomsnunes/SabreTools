@@ -106,8 +106,11 @@ namespace SabreTools.Helper
 		/// <returns>True if the output could be written, false otherwise</returns>
 		public bool Log(string output, LogLevel loglevel = LogLevel.VERBOSE)
 		{
-			// Everything writes to console
-			Console.WriteLine(loglevel.ToString() + " " + output);
+			// USER and ERROR writes to console
+			if (loglevel == LogLevel.USER || loglevel == LogLevel.ERROR)
+			{
+				Console.WriteLine((loglevel == LogLevel.ERROR ? loglevel.ToString() + " " : "") + output);
+			}
 
 			// If we're writing to file, use the existing stream
 			if (_tofile)
@@ -125,6 +128,11 @@ namespace SabreTools.Helper
 			}
 
 			return true;
+		}
+
+		public bool User(string output)
+		{
+			return Log(output, LogLevel.USER);
 		}
 
 		/// <summary>

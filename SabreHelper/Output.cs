@@ -41,7 +41,7 @@ namespace SabreTools.Helper
 			}
 
 			// (currently uses current time, change to "last updated time")
-			logger.Log("Opening file for writing: " + outDir + description + (old ? ".dat" : ".xml"));
+			logger.User("Opening file for writing: " + outDir + description + (old ? ".dat" : ".xml"));
 
 			try
 			{
@@ -125,7 +125,7 @@ namespace SabreTools.Helper
 				}
 
 				sw.Write((old ? ")" : "\t</machine>\n</datafile>"));
-				logger.Log("File written!" + Environment.NewLine);
+				logger.User("File written!" + Environment.NewLine);
 				sw.Close();
 				fs.Close();
 			}
@@ -202,7 +202,7 @@ namespace SabreTools.Helper
 			}
 
 			// (currently uses current time, change to "last updated time")
-			logger.Log("Opening file for writing: " + outDir + description + (old ? ".dat" : ".xml"));
+			logger.User("Opening file for writing: " + outDir + description + (old ? ".dat" : ".xml"));
 
 			try
 			{
@@ -281,7 +281,7 @@ namespace SabreTools.Helper
 				}
 
 				sw.Write((old ? ")" : "\t</machine>\n</datafile>"));
-				logger.Log("File written!" + Environment.NewLine);
+				logger.User("File written!" + Environment.NewLine);
 				sw.Close();
 				fs.Close();
 			}
@@ -332,7 +332,7 @@ namespace SabreTools.Helper
 			addext = (addext == "" || addext.StartsWith(".") ? addext : "." + addext);
 			repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
 
-			logger.Log("Opening file for writing: " + outdir + textfile);
+			logger.User("Opening file for writing: " + outdir + textfile);
 
 			try
 			{
@@ -372,7 +372,7 @@ namespace SabreTools.Helper
 					}
 				}
 
-				logger.Log("File written!" + Environment.NewLine);
+				logger.User("File written!" + Environment.NewLine);
 				sw.Close();
 				fs.Close();
 			}

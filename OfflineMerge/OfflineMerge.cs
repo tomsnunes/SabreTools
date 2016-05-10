@@ -38,7 +38,7 @@ namespace SabreTools
 		public static void Main(string[] args)
 		{
 			// Perform initial setup and verification
-			Logger logger = new Logger(false, "database.log");
+			Logger logger = new Logger(true, "offlinemerge.log");
 			logger.Start();
 			Console.Clear();
 
@@ -143,13 +143,13 @@ namespace SabreTools
 			if (_currentAllMerged != "" && _currentMissingMerged != "" && _currentNewMerged != "")
 			{
 				// First get the combination Dictionary of currentAllMerged and currentNewMerged
-				_logger.Log("Adding Current and New Merged DATs to the dictionary");
+				_logger.User("Adding Current and New Merged DATs to the dictionary");
 				Dictionary<string, List<RomData>> completeDats = new Dictionary<string, List<RomData>>();
 				completeDats = RomManipulation.ParseDict(_currentAllMerged, 0, 0, completeDats, _logger);
 				completeDats = RomManipulation.ParseDict(_currentNewMerged, 0, 0, completeDats, _logger);
 
 				// Now get Net New output dictionary [(currentNewMerged)-(currentAllMerged)]
-				_logger.Log("Creating and populating Net New dictionary");
+				_logger.User("Creating and populating Net New dictionary");
 				Dictionary<string, List<RomData>> netNew = new Dictionary<string, List<RomData>>();
 				foreach (string key in completeDats.Keys)
 				{
@@ -173,7 +173,7 @@ namespace SabreTools
 				}
 
 				// Now create the Unneeded dictionary [(currentAllMerged)-(currentNewMerged)]
-				_logger.Log("Creating and populating Uneeded dictionary");
+				_logger.User("Creating and populating Uneeded dictionary");
 				Dictionary<string, List<RomData>> unneeded = new Dictionary<string, List<RomData>>();
 				foreach (string key in completeDats.Keys)
 				{
@@ -197,7 +197,7 @@ namespace SabreTools
 				}
 
 				// Now create the New Missing dictionary [(Net New)+(currentMissingMerged-(Unneeded))]
-				_logger.Log("Creating and populating New Missing dictionary");
+				_logger.User("Creating and populating New Missing dictionary");
 				Dictionary<string, List<RomData>> midMissing = new Dictionary<string, List<RomData>>();
 				midMissing = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midMissing, _logger);
 				foreach (string key in unneeded.Keys)
@@ -245,7 +245,7 @@ namespace SabreTools
 				}
 
 				// Now create the Have dictionary [(currentNewMerged)-(c)]
-				_logger.Log("Creating and populating Have dictionary");
+				_logger.User("Creating and populating Have dictionary");
 				Dictionary<string, List<RomData>> midHave = new Dictionary<string, List<RomData>>();
 				foreach (string key in newMissing.Keys)
 				{
@@ -308,7 +308,7 @@ namespace SabreTools
 				// If we are supposed to replace everything in the output with default values, do so
 				if (_fake)
 				{
-					_logger.Log("Replacing all hashes in Net New with 0-byte values");
+					_logger.User("Replacing all hashes in Net New with 0-byte values");
 					List<string> keys = netNew.Keys.ToList();
 					foreach (string key in keys)
 					{
@@ -326,7 +326,7 @@ namespace SabreTools
 						netNew[key] = temp;
 					}
 
-					_logger.Log("Replacing all hashes in Unneeded with 0-byte values");
+					_logger.User("Replacing all hashes in Unneeded with 0-byte values");
 					keys = unneeded.Keys.ToList();
 					foreach (string key in keys)
 					{
@@ -344,7 +344,7 @@ namespace SabreTools
 						unneeded[key] = temp;
 					}
 
-					_logger.Log("Replacing all hashes in New Missing with 0-byte values");
+					_logger.User("Replacing all hashes in New Missing with 0-byte values");
 					keys = newMissing.Keys.ToList();
 					foreach (string key in keys)
 					{
@@ -362,7 +362,7 @@ namespace SabreTools
 						newMissing[key] = temp;
 					}
 
-					_logger.Log("Replacing all hashes in Have with 0-byte values");
+					_logger.User("Replacing all hashes in Have with 0-byte values");
 					keys = have.Keys.ToList();
 					foreach (string key in keys)
 					{
@@ -394,7 +394,7 @@ namespace SabreTools
 			else if (_currentAllMerged != "" && _currentMissingMerged != "")
 			{
 				// Now create the Have dictionary [(currentAllMerged)-(currentMissingMerged)]
-				_logger.Log("Creating and populating Have dictionary");
+				_logger.User("Creating and populating Have dictionary");
 				Dictionary<string, List<RomData>> midHave = new Dictionary<string, List<RomData>>();
 				midHave = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midHave, _logger);
 				midHave = RomManipulation.ParseDict(_currentAllMerged, 0, 0, midHave, _logger);
@@ -423,7 +423,7 @@ namespace SabreTools
 				// If we are supposed to replace everything in the output with default values, do so
 				if (_fake)
 				{
-					_logger.Log("Replacing all hashes in Have with 0-byte values");
+					_logger.User("Replacing all hashes in Have with 0-byte values");
 					List<string> keys = have.Keys.ToList();
 					foreach (string key in keys)
 					{
@@ -451,7 +451,7 @@ namespace SabreTools
 			else if (_currentNewMerged != "" && _currentMissingMerged != "")
 			{
 				// Now create the Have dictionary [(currentNewMerged)-(currentMissingMerged)]
-				_logger.Log("Creating and populating Have dictionary");
+				_logger.User("Creating and populating Have dictionary");
 				Dictionary<string, List<RomData>> midHave = new Dictionary<string, List<RomData>>();
 				midHave = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midHave, _logger);
 				midHave = RomManipulation.ParseDict(_currentNewMerged, 0, 0, midHave, _logger);
@@ -480,7 +480,7 @@ namespace SabreTools
 				// If we are supposed to replace everything in the output with default values, do so
 				if (_fake)
 				{
-					_logger.Log("Replacing all hashes in Have with 0-byte values");
+					_logger.User("Replacing all hashes in Have with 0-byte values");
 					List<string> keys = have.Keys.ToList();
 					foreach (string key in keys)
 					{

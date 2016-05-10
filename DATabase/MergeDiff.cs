@@ -103,7 +103,7 @@ namespace SabreTools
 			Dictionary<string, List<RomData>> dict = new Dictionary<string, List<RomData>>();
 			foreach (string input in _inputs)
 			{
-				_logger.Log("Adding DAT: " + input);
+				_logger.User("Adding DAT: " + input);
 				dict = RomManipulation.ParseDict(input, 0, 0, dict, _logger);
 			}
 			

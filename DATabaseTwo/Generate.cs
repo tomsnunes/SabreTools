@@ -100,7 +100,7 @@ namespace SabreTools
 			name += " (merged)";
 
 			// For good measure, get all sources
-			Dictionary<int, string> sources = new Dictionary<int, string>();
+			Dictionary<int, string> sources = new Dictionary<int, string>();C:\Users\Matt\GitHub\DATabase\DATabaseTwo\Generate.cs
 			sources.Add(0, "Default");
 
 			string squery = "SELECT id, name FROM source";
@@ -171,7 +171,7 @@ namespace SabreTools
 			}
 
 			// Now process all of the roms
-			_logger.Log("Cleaning rom data");
+			_logger.User("Cleaning rom data");
 			List<string> keys = roms.Keys.ToList();
 			foreach (string key in keys)
 			{

@@ -27,7 +27,7 @@ namespace SabreTools
 		{
 			// Perform initial setup and verification
 			Console.Clear();
-			logger = new Logger(false, "database.log");
+			logger = new Logger(true, "headerer.log");
 			logger.Start();
 			DBTools.EnsureDatabase(_dbName, _connectionString);
 			Remapping.CreateHeaderSkips();
@@ -194,7 +194,7 @@ namespace SabreTools
 				}
 			}
 
-			logger.Log("File has header: " + (type != HeaderType.None));
+			logger.User("File has header: " + (type != HeaderType.None));
 
 			if (type != HeaderType.None)
 			{
@@ -212,13 +212,13 @@ namespace SabreTools
 				hbin = hbin.Skip(hs).ToArray();
 
 				// Write out the new file
-				logger.Log("Creating unheadered file: " + file + ".new");
+				logger.User("Creating unheadered file: " + file + ".new");
 				BinaryWriter bw = new BinaryWriter(File.OpenWrite(file + ".new"));
 				FileInfo fi = new FileInfo(file);
 				bw.Write(hbin);
 				bw.Write(br.ReadBytes((int)fi.Length - hs));
 				bw.Close();
-				logger.Log("Unheadered file created!");
+				logger.User("Unheadered file created!");
 
 				// Now add the information to the database if it's not already there
 				SHA1 sha1 = SHA1.Create();
@@ -287,7 +287,7 @@ namespace SabreTools
 								logger.Log("Found match with rom type " + sldr.GetString(1));
 								header = sldr.GetString(0);
 
-								logger.Log("Creating reheadered file: " + file + ".new" + sub);
+								logger.User("Creating reheadered file: " + file + ".new" + sub);
 								BinaryWriter bw = new BinaryWriter(File.OpenWrite(file + ".new" + sub));
 
 								// Source: http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
@@ -297,7 +297,7 @@ namespace SabreTools
 								}
 								bw.Write(File.ReadAllBytes(file));
 								bw.Close();
-								logger.Log("Reheadered file created!");
+								logger.User("Reheadered file created!");
 							}
 						}
 						else

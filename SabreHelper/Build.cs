@@ -114,7 +114,6 @@ Options:
 	-nr, --no-rename	Don't auto-rename games
 	-o, --old		Output DAT in CMP format instead of XML
   -i, --import		Start tool in import mode
-  -l, --log		Enable logging of program output
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
   -m, --merge		Merge one or more DATs
@@ -168,7 +167,6 @@ Options:
   -c=, --cat=		Set the category of the DAT
   -v=, --version=	Set the version of the DAT
   -au=, --author=	Set the author of the DAT
-  -l, --log		Enable log to file
   -sd, --superdat	Enable SuperDAT creation");
 					break;
 				case "OfflineMerge":

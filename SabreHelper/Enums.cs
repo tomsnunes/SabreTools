@@ -46,6 +46,7 @@ namespace SabreTools.Helper
 	public enum LogLevel
 	{
 		VERBOSE = 0,
+		USER,
 		WARNING,
 		ERROR,
 	}
