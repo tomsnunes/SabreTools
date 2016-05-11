@@ -504,7 +504,8 @@ namespace SabreTools.Helper
 											if (!(crc == "" && md5 == "" && sha1 == ""))
 											{
 												// Get the new values to add
-												string key = crc + "-" + size;
+												string key = size + "-" + crc;
+
 												RomData value = new RomData
 												{
 													Game = tempname,
@@ -576,19 +577,40 @@ namespace SabreTools.Helper
 					{
 						if (x.CRC == y.CRC)
 						{
-							if (x.SystemID == y.SystemID)
+							// If the CRC is blank, use MD5 before SystemID
+							if (x.CRC == "")
 							{
-								if (x.SourceID == y.SourceID)
+								if (x.MD5 == y.MD5)
 								{
-									if (x.MD5 == y.MD5)
+									if (x.SystemID == y.SystemID)
 									{
-										return String.Compare(x.SHA1, y.SHA1);
+										if (x.SourceID == y.SourceID)
+										{
+											return String.Compare(x.SHA1, y.SHA1);
+										}
+										return x.SourceID - y.SourceID;
 									}
-									return String.Compare(x.MD5, y.MD5);
+									return x.SystemID - y.SystemID;
 								}
-								return x.SourceID - y.SourceID;
+								return String.Compare(x.MD5, y.MD5);
 							}
-							return x.SystemID - y.SystemID;
+							else
+							{
+								if (x.SystemID == y.SystemID)
+								{
+									if (x.SourceID == y.SourceID)
+									{
+										if (x.MD5 == y.MD5)
+										{
+											return String.Compare(x.SHA1, y.SHA1);
+										}
+										return String.Compare(x.MD5, y.MD5);
+									}
+									return x.SourceID - y.SourceID;
+								}
+								return x.SystemID - y.SystemID;
+							}
+							
 						}
 						return String.Compare(x.CRC, y.CRC);
 					}
