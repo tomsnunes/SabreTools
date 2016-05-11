@@ -141,8 +141,7 @@ namespace SabreTools
 				// For the AB mode-style diffs, get all required dictionaries and output with a new name
 				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
 				string post = "";
-				int j = 0;
-				foreach (string filename in _inputs)
+				for (int j = 0; j < _inputs.Count; j++)
 				{
 					Dictionary<string, List<RomData>> sysDict = new Dictionary<string, List<RomData>>();
 					foreach (string key in diffed.Keys)
@@ -165,10 +164,8 @@ namespace SabreTools
 						}
 					}
 
-					post = " (" + Path.GetFileNameWithoutExtension(filename) + ")";
+					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j]) + ")";
 					Output.WriteToDatFromDict(_name + post, _desc + post, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", sysDict, _logger);
-
-					j++;
 				}
 
 				// Get all entries that have External dupes
