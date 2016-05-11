@@ -119,7 +119,7 @@ namespace SabreTools
 
 					foreach (RomData rom in temp)
 					{
-						if ((_dedup && rom.Dupe != DupeType.ExternalHash) || (!_dedup && rom.Dupe != DupeType.ExternalAll))
+						if (rom.Dupe != DupeType.ExternalHash && rom.Dupe != DupeType.ExternalAll)
 						{
 							if (diffed.ContainsKey(key))
 							{
@@ -178,7 +178,7 @@ namespace SabreTools
 
 					foreach (RomData rom in temp)
 					{
-						if ((_dedup && rom.Dupe == DupeType.ExternalHash) || (!_dedup && rom.Dupe == DupeType.ExternalAll))
+						if (rom.Dupe == DupeType.ExternalHash || rom.Dupe == DupeType.ExternalAll)
 						{
 							if (duplicates.ContainsKey(key))
 							{
