@@ -119,7 +119,7 @@ namespace SabreTools
 
 					foreach (RomData rom in temp)
 					{
-						if (rom.Dupe != DupeType.ExternalHash && rom.Dupe != DupeType.ExternalAll)
+						if (rom.Dupe < DupeType.ExternalHash)
 						{
 							if (diffed.ContainsKey(key))
 							{
@@ -178,7 +178,7 @@ namespace SabreTools
 
 					foreach (RomData rom in temp)
 					{
-						if (rom.Dupe == DupeType.ExternalHash || rom.Dupe == DupeType.ExternalAll)
+						if (rom.Dupe >= DupeType.ExternalHash)
 						{
 							if (duplicates.ContainsKey(key))
 							{

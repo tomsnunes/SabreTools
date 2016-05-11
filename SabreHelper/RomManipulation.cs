@@ -629,8 +629,8 @@ namespace SabreTools.Helper
 						last.MD5 = (last.MD5 == "" && rom.MD5 != "" ? rom.MD5 : last.MD5);
 						last.SHA1 = (last.SHA1 == "" && rom.SHA1 != "" ? rom.SHA1 : last.SHA1);
 
-						// If the duplicate is in the same system and dupe is not already set to External
-						if ((last.SystemID == rom.SystemID || last.SourceID == rom.SourceID) && last.Dupe != DupeType.ExternalHash)
+						// If the duplicate is in the same system and dupe is not already set to External*
+						if ((last.SystemID == rom.SystemID || last.SourceID == rom.SourceID) && last.Dupe < DupeType.ExternalHash)
 						{
 							if (last.Game == rom.Game && last.Name == rom.Name)
 							{
