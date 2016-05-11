@@ -156,7 +156,7 @@ namespace SabreTools
 					List<RomData> templist = RomManipulation.Merge(completeDats[key]);
 					foreach (RomData rom in templist)
 					{
-						if (!rom.Dupe && rom.System == _currentNewMerged)
+						if (rom.Dupe == DupeType.None && rom.System == _currentNewMerged)
 						{
 							if (netNew.ContainsKey(key))
 							{
@@ -180,7 +180,7 @@ namespace SabreTools
 					List<RomData> templist = RomManipulation.Merge(completeDats[key]);
 					foreach (RomData rom in templist)
 					{
-						if (!rom.Dupe && rom.System == _currentAllMerged)
+						if (rom.Dupe == DupeType.None && rom.System == _currentAllMerged)
 						{
 							if (unneeded.ContainsKey(key))
 							{
@@ -217,7 +217,7 @@ namespace SabreTools
 					List<RomData> templist = RomManipulation.Merge(midMissing[key]);
 					foreach (RomData rom in templist)
 					{
-						if (!rom.Dupe && rom.System == _currentMissingMerged)
+						if (rom.Dupe == DupeType.None && rom.System == _currentMissingMerged)
 						{
 							if (newMissing.ContainsKey(key))
 							{
@@ -289,7 +289,7 @@ namespace SabreTools
 					List<RomData> templist = RomManipulation.Merge(midHave[key]);
 					foreach (RomData rom in templist)
 					{
-						if (!rom.Dupe && rom.System == _currentNewMerged)
+						if (rom.Dupe == DupeType.None && rom.System == _currentNewMerged)
 						{
 							if (have.ContainsKey(key))
 							{
@@ -404,7 +404,7 @@ namespace SabreTools
 					List<RomData> templist = RomManipulation.Merge(midHave[key]);
 					foreach (RomData rom in templist)
 					{
-						if (!rom.Dupe && rom.System == _currentAllMerged)
+						if (rom.Dupe == DupeType.None && rom.System == _currentAllMerged)
 						{
 							if (have.ContainsKey(key))
 							{
@@ -461,7 +461,7 @@ namespace SabreTools
 					List<RomData> templist = RomManipulation.Merge(midHave[key]);
 					foreach (RomData rom in templist)
 					{
-						if (!rom.Dupe && rom.System == _currentNewMerged)
+						if (rom.Dupe == DupeType.None && rom.System == _currentNewMerged)
 						{
 							if (have.ContainsKey(key))
 							{
