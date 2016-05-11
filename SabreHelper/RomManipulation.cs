@@ -475,12 +475,15 @@ namespace SabreTools.Helper
 											string crc = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "");
 											crc = (crc.StartsWith("0x") ? crc.Remove(0, 2) : crc);
 											crc = (crc == "-" ? "" : crc);
+											crc = (crc == "" ? "" : crc.PadLeft(8, '0'));
 											string md5 = (xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : "");
 											md5 = (md5.StartsWith("0x") ? md5.Remove(0, 2) : md5);
 											md5 = (md5 == "-" ? "" : md5);
+											md5 = (md5 == "" ? "" : md5.PadLeft(32, '0'));
 											string sha1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : "");
 											sha1 = (sha1.StartsWith("0x") ? sha1.Remove(0, 2) : sha1);
 											sha1 = (sha1 == "-" ? "" : sha1);
+											sha1 = (sha1 == "" ? "" : sha1.PadLeft(40, '0'));
 
 											// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 											if (subreader.Name == "rom" && (size == 0 || size == -1) && (crc == CRCZero || md5 == MD5Zero || sha1 == SHA1Zero))
