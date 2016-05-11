@@ -58,8 +58,8 @@ namespace SabreTools.Helper
 	{
 		None = 0,
 		InternalHash,
-		ExternalHash,
 		InternalAll,
+		ExternalHash,
 		ExternalAll,
 	}
 }
