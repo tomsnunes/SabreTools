@@ -78,11 +78,11 @@ namespace SabreTools
 			// Get the values that will be used
 			if (_name == "")
 			{
-				_name = (_diff ? "diffdat" : "mergedat") + (_dedup ? "-deduped" : "");
+				_name = (_diff ? "DiffDAT" : "") + (_dedup ? "-deduped" : "");
 			}
 			if (_desc == "")
 			{
-				_desc = (_diff ? "diffdat" : "mergedat") + (_dedup ? "-deduped" : "");
+				_desc = (_diff ? "DiffDAT" : "MergeDAT") + (_dedup ? " - deduped" : "");
 				if (!_bare)
 				{
 					_desc += " (" + _date + ")";
@@ -110,6 +110,8 @@ namespace SabreTools
 			// Modify the Dictionary if necessary and output the results
 			if (_diff)
 			{
+				string post = "";
+
 				// Get all entries that don't have External dupes
 				Dictionary<string, List<RomData>> diffed = new Dictionary<string, List<RomData>>();
 				foreach (string key in dict.Keys)
@@ -135,12 +137,13 @@ namespace SabreTools
 					}
 				}
 
+				post = " (No Duplicates)";
+
 				// Output the difflist (a-b)+(b-a) diff
-				Output.WriteToDatFromDict(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", diffed, _logger);
+				Output.WriteToDatFromDict(_name + post, _desc + post, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", diffed, _logger);
 
 				// For the AB mode-style diffs, get all required dictionaries and output with a new name
 				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
-				string post = "";
 				for (int j = 0; j < _inputs.Count; j++)
 				{
 					Dictionary<string, List<RomData>> sysDict = new Dictionary<string, List<RomData>>();
@@ -164,13 +167,13 @@ namespace SabreTools
 						}
 					}
 
-					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j]) + ")";
+					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j]) + " Only)";
 					Output.WriteToDatFromDict(_name + post, _desc + post, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", sysDict, _logger);
 				}
 
 				// Get all entries that have External dupes
 				Dictionary<string, List<RomData>> duplicates = new Dictionary<string, List<RomData>>();
-				post = " (dupes)";
+				post = " (Duplicates)";
 				foreach (string key in dict.Keys)
 				{
 					List<RomData> temp = dict[key];
