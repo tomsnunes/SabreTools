@@ -100,23 +100,40 @@ namespace SabreTools
 			}
 
 			// Create a dictionary of all ROMs from the input DATs
+			int i = 0;
 			Dictionary<string, List<RomData>> dict = new Dictionary<string, List<RomData>>();
 			foreach (string input in _inputs)
 			{
 				_logger.User("Adding DAT: " + input);
-				dict = RomManipulation.ParseDict(input, 0, 0, dict, _logger);
+				dict = RomManipulation.ParseDict(input, i, 0, dict, _logger);
+				i++;
 			}
 			
 			// Modify the Dictionary if necessary and output the results
 			if (_diff || _ad)
 			{
-				// Get all entries that have only one item in their list
+				// Get all entries that don't have External dupes
 				Dictionary<string, List<RomData>> diffed = new Dictionary<string, List<RomData>>();
 				foreach (string key in dict.Keys)
 				{
-					if (dict[key].Count == 1)
+					List<RomData> temp = dict[key];
+					temp = RomManipulation.Merge(temp);
+
+					foreach (RomData rom in temp)
 					{
-						diffed.Add(key, dict[key]);
+						if ((_dedup && rom.Dupe != DupeType.InternalHash) || (!_dedup && rom.Dupe != DupeType.InternalAll))
+						{
+							if (diffed.ContainsKey(key))
+							{
+								diffed[key].Add(rom);
+							}
+							else
+							{
+								List<RomData> tl = new List<RomData>();
+								tl.Add(rom);
+								diffed.Add(key, tl);
+							}
+						}
 					}
 				}
 

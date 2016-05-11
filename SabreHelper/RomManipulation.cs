@@ -628,7 +628,30 @@ namespace SabreTools.Helper
 						last.CRC = (last.CRC == "" && rom.CRC != "" ? rom.CRC : last.CRC);
 						last.MD5 = (last.MD5 == "" && rom.MD5 != "" ? rom.MD5 : last.MD5);
 						last.SHA1 = (last.SHA1 == "" && rom.SHA1 != "" ? rom.SHA1 : last.SHA1);
-						last.Dupe = true;
+
+						// If the duplicate is in the same system and dupe is not already set to External
+						if ((last.SystemID == rom.SystemID || last.SourceID == rom.SourceID) && last.Dupe != DupeType.ExternalHash)
+						{
+							if (last.Game == rom.Game && last.Name == rom.Name)
+							{
+								last.Dupe = DupeType.InternalAll;
+							}
+							else
+							{
+								last.Dupe = DupeType.InternalHash;
+							}
+						}
+						else
+						{
+							if (last.Game == rom.Game && last.Name == rom.Name)
+							{
+								last.Dupe = DupeType.ExternalAll;
+							}
+							else
+							{
+								last.Dupe = DupeType.ExternalHash;
+							}
+						}
 
 						outroms.RemoveAt(outroms.Count - 1);
 						outroms.Insert(outroms.Count, last);

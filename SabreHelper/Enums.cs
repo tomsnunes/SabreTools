@@ -50,4 +50,16 @@ namespace SabreTools.Helper
 		WARNING,
 		ERROR,
 	}
+
+	/// <summary>
+	/// Determines which type of duplicate a file is
+	/// </summary>
+	public enum DupeType
+	{
+		None = 0,
+		InternalHash,
+		ExternalHash,
+		InternalAll,
+		ExternalAll,
+	}
 }
