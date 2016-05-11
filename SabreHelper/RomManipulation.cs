@@ -629,19 +629,8 @@ namespace SabreTools.Helper
 						last.MD5 = (last.MD5 == "" && rom.MD5 != "" ? rom.MD5 : last.MD5);
 						last.SHA1 = (last.SHA1 == "" && rom.SHA1 != "" ? rom.SHA1 : last.SHA1);
 
-						// If the duplicate is in the same system and dupe is not already set to External*
-						if ((last.SystemID == rom.SystemID || last.SourceID == rom.SourceID) && last.Dupe < DupeType.ExternalHash)
-						{
-							if (last.Game == rom.Game && last.Name == rom.Name)
-							{
-								last.Dupe = DupeType.InternalAll;
-							}
-							else
-							{
-								last.Dupe = DupeType.InternalHash;
-							}
-						}
-						else
+						// If the duplicate is external already or should be, set it
+						if (last.Dupe >= DupeType.ExternalHash || last.SystemID != rom.SystemID || last.SourceID != rom.SourceID)
 						{
 							if (last.Game == rom.Game && last.Name == rom.Name)
 							{
@@ -650,6 +639,19 @@ namespace SabreTools.Helper
 							else
 							{
 								last.Dupe = DupeType.ExternalHash;
+							}
+						}
+
+						// Otherwise, it's considered an internal dupe
+						else
+						{
+							if (last.Game == rom.Game && last.Name == rom.Name)
+							{
+								last.Dupe = DupeType.InternalAll;
+							}
+							else
+							{
+								last.Dupe = DupeType.InternalHash;
 							}
 						}
 
