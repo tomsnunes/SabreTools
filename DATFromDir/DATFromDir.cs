@@ -252,10 +252,27 @@ namespace SabreTools
 					else if (Directory.Exists(_basePath))
 					{
 						_logger.Log("Folder found: " + _basePath);
-						foreach (string item in Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories))
+
+						// Process the files in the base folder first
+						foreach (string item in Directory.EnumerateFiles(_basePath, "*", SearchOption.TopDirectoryOnly))
 						{
 							ProcessFile(item);
 						}
+
+						// Then process each of the subfolders themselves
+						string basePathBackup = _basePath;
+						foreach (string item in Directory.EnumerateDirectories(_basePath))
+						{
+							_basePath = (File.Exists(item) ? item : item + Path.DirectorySeparatorChar);
+							_basePath = Path.GetFullPath(_basePath);
+
+							foreach (string subitem in Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories))
+							{
+								ProcessFile(subitem);
+							}
+						}
+						_basePath = basePathBackup;
+
 					}
 					// If this somehow skips past the original sensors
 					else
