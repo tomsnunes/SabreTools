@@ -44,6 +44,12 @@ namespace SabreTools
 				return false;
 			}
 
+			// If it's empty, use the current folder
+			if (_outdir.Trim() == "")
+			{
+				_outdir = Environment.CurrentDirectory;
+			}
+
 			// If the output directory doesn't exist, create it
 			if (!Directory.Exists(_outdir))
 			{
