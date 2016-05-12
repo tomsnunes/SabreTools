@@ -582,15 +582,31 @@ namespace SabreTools.Helper
 							{
 								if (x.MD5 == y.MD5)
 								{
-									if (x.SystemID == y.SystemID)
+									// If the MD5 is blank, use SHA1 before SystemID
+									if (x.MD5 == "")
 									{
-										if (x.SourceID == y.SourceID)
+										if (x.SHA1 == y.SHA1)
 										{
-											return String.Compare(x.SHA1, y.SHA1);
+											if (x.SystemID == y.SystemID)
+											{
+												return x.SourceID - y.SourceID;
+											}
+											return x.SystemID - y.SystemID;
 										}
-										return x.SourceID - y.SourceID;
+										return String.Compare(x.SHA1, y.SHA1);
 									}
-									return x.SystemID - y.SystemID;
+									else
+									{
+										if (x.SystemID == y.SystemID)
+										{
+											if (x.SourceID == y.SourceID)
+											{
+												return String.Compare(x.SHA1, y.SHA1);
+											}
+											return x.SourceID - y.SourceID;
+										}
+										return x.SystemID - y.SystemID;
+									}
 								}
 								return String.Compare(x.MD5, y.MD5);
 							}
