@@ -575,17 +575,17 @@ namespace SabreTools.Helper
 				{
 					if (x.Size == y.Size)
 					{
-						if (x.SHA1 == y.SHA1)
+						if (x.CRC == y.CRC)
 						{
-							// If the SHA1 is blank, use MD5 before SystemID
-							if (x.SHA1 == "")
+							// If the CRC is blank, use MD5 before SystemID
+							if (x.CRC == "")
 							{
 								if (x.MD5 == y.MD5)
 								{
-									// If the MD5 is blank, use CRC before SystemID
+									// If the MD5 is blank, use SHA1 before SystemID
 									if (x.MD5 == "")
 									{
-										if (x.CRC == y.CRC)
+										if (x.SHA1 == y.SHA1)
 										{
 											if (x.SystemID == y.SystemID)
 											{
@@ -593,7 +593,7 @@ namespace SabreTools.Helper
 											}
 											return x.SystemID - y.SystemID;
 										}
-										return String.Compare(x.CRC, y.CRC);
+										return String.Compare(x.SHA1, y.SHA1);
 									}
 									else
 									{
@@ -601,7 +601,7 @@ namespace SabreTools.Helper
 										{
 											if (x.SourceID == y.SourceID)
 											{
-												return String.Compare(x.CRC, y.CRC);
+												return String.Compare(x.SHA1, y.SHA1);
 											}
 											return x.SourceID - y.SourceID;
 										}
@@ -618,7 +618,7 @@ namespace SabreTools.Helper
 									{
 										if (x.MD5 == y.MD5)
 										{
-											return String.Compare(x.CRC, y.CRC);
+											return String.Compare(x.SHA1, y.SHA1);
 										}
 										return String.Compare(x.MD5, y.MD5);
 									}
@@ -626,8 +626,9 @@ namespace SabreTools.Helper
 								}
 								return x.SystemID - y.SystemID;
 							}
+
 						}
-						return String.Compare(x.SHA1, y.SHA1);
+						return String.Compare(x.CRC, y.CRC);
 					}
 					return (int)(x.Size - y.Size);
 				});
