@@ -195,16 +195,17 @@ namespace SabreTools
 					rom.Name = Style.RussianToLatin(rom.Name);
 					rom.Name = Regex.Replace(rom.Name, @"(.*) \.(.*)", "$1.$2");
 
+					// Run the name through the filters to make sure that it's correct
+					rom.Game = Style.NormalizeChars(rom.Game);
+					rom.Game = Style.RussianToLatin(rom.Game);
+					rom.Game = Style.SearchPattern(rom.Game);
+
 					// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
 					string stripPattern = @"(([[(].*[\)\]] )?([^([]+))";
 					Regex stripRegex = new Regex(stripPattern);
 					Match stripMatch = stripRegex.Match(rom.Game);
 					rom.Game = stripMatch.Groups[1].Value;
 
-					// Run the name through the filters to make sure that it's correct
-					rom.Game = Style.NormalizeChars(rom.Game);
-					rom.Game = Style.RussianToLatin(rom.Game);
-					rom.Game = Style.SearchPattern(rom.Game);
 					rom.Game = rom.Game.TrimEnd().TrimStart();
 
 					if (!_norename)
