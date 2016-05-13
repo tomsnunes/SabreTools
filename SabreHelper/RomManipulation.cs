@@ -568,6 +568,7 @@ namespace SabreTools.Helper
 		{
 			List<RomData> outroms = new List<RomData>();
 
+			/*
 			// First sort the roms by size, crc, sysid, srcid, md5, and sha1 (in order), if not sorted already
 			if (!presorted)
 			{
@@ -627,6 +628,36 @@ namespace SabreTools.Helper
 								return x.SystemID - y.SystemID;
 							}
 
+						}
+						return String.Compare(x.CRC, y.CRC);
+					}
+					return (int)(x.Size - y.Size);
+				});
+			}
+			*/
+
+			// First sort the roms by size, crc, md5, sha1, sysid, srcid (in order), if not sorted already
+			if (!presorted)
+			{
+				inroms.Sort(delegate (RomData x, RomData y)
+				{
+					if (x.Size == y.Size)
+					{
+						if (x.CRC == y.CRC)
+						{
+							if (x.MD5 == y.MD5)
+							{
+								if (x.SHA1 == y.SHA1)
+								{
+									if (x.SystemID == y.SystemID)
+									{
+										return x.SourceID - y.SourceID;
+									}
+									return x.SystemID - y.SystemID;
+								}
+								return String.Compare(x.SHA1, y.SHA1);
+							}
+							return String.Compare(x.MD5, y.MD5);
 						}
 						return String.Compare(x.CRC, y.CRC);
 					}
