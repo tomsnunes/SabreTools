@@ -568,30 +568,30 @@ namespace SabreTools.Helper
 		{
 			List<RomData> outroms = new List<RomData>();
 
-			// First sort the roms by sha1, md5, crc, size, sysid, srcid (in order) if not sorted already
+			// First sort the roms by sha1, sysid, srcid, md5, crc, size (in order) if not sorted already
 			if (!presorted)
 			{
 				inroms.Sort(delegate (RomData x, RomData y)
 				{
 					if (x.SHA1 == y.SHA1)
 					{
-						if (x.MD5 == y.MD5)
+						if (x.SystemID == y.SystemID)
 						{
-							if (x.CRC == y.CRC)
+							if (x.SourceID == y.SourceID)
 							{
-								if (x.Size == y.Size)
+								if (x.MD5 == y.MD5)
 								{
-									if (x.SystemID == y.SystemID)
+									if (x.CRC == y.CRC)
 									{
-										return x.SourceID - y.SourceID;
+										return (int)(x.Size - y.Size);
 									}
-									return x.SystemID - y.SystemID;
+									return String.Compare(x.CRC, y.CRC);
 								}
-								return (int)(x.Size - y.Size);
+								return String.Compare(x.MD5, y.MD5);
 							}
-							return String.Compare(x.CRC, y.CRC);
+							return x.SourceID - y.SourceID;
 						}
-						return String.Compare(x.MD5, y.MD5);
+						return x.SystemID - y.SystemID;
 					}
 					return String.Compare(x.SHA1, y.SHA1);
 				});
