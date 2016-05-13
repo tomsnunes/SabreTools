@@ -346,6 +346,7 @@ Make a selection:
 				// Loop through the inputs
 				foreach (string system in systems)
 				{
+					_logger.User("Generating DAT for system id " + system);
 					InitGenerate(system, norename, old);
 				}
 			}
