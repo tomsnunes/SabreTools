@@ -647,14 +647,6 @@ namespace SabreTools.Helper
 						{
 							if (x.MD5 == y.MD5)
 							{
-								if (x.SHA1 == y.SHA1)
-								{
-									if (x.SystemID == y.SystemID)
-									{
-										return x.SourceID - y.SourceID;
-									}
-									return x.SystemID - y.SystemID;
-								}
 								return String.Compare(x.SHA1, y.SHA1);
 							}
 							return String.Compare(x.MD5, y.MD5);
@@ -696,6 +688,24 @@ namespace SabreTools.Helper
 						last.CRC = (last.CRC == "" && rom.CRC != "" ? rom.CRC : last.CRC);
 						last.MD5 = (last.MD5 == "" && rom.MD5 != "" ? rom.MD5 : last.MD5);
 						last.SHA1 = (last.SHA1 == "" && rom.SHA1 != "" ? rom.SHA1 : last.SHA1);
+
+						// If the current system has a lower ID than the previous, set the system accordingly
+						if (last.SystemID < rom.SystemID)
+						{
+							last.SystemID = rom.SystemID;
+							last.System = rom.System;
+							last.Game = rom.Game;
+							last.Name = rom.Name;
+						}
+
+						// If the current source has a lower ID than the previous, set the source accordingly
+						if (last.SourceID < rom.SourceID)
+						{
+							last.SourceID = rom.SourceID;
+							last.Source = rom.Source;
+							last.Game = rom.Game;
+							last.Name = rom.Name;
+						}
 
 						// If the duplicate is external already or should be, set it
 						if (last.Dupe >= DupeType.ExternalHash || last.SystemID != rom.SystemID || last.SourceID != rom.SourceID)
