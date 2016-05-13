@@ -690,7 +690,7 @@ namespace SabreTools.Helper
 						last.SHA1 = (last.SHA1 == "" && rom.SHA1 != "" ? rom.SHA1 : last.SHA1);
 
 						// If the current system has a lower ID than the previous, set the system accordingly
-						if (last.SystemID < rom.SystemID)
+						if (rom.SystemID < last.SystemID)
 						{
 							last.SystemID = rom.SystemID;
 							last.System = rom.System;
@@ -699,7 +699,7 @@ namespace SabreTools.Helper
 						}
 
 						// If the current source has a lower ID than the previous, set the source accordingly
-						if (last.SourceID < rom.SourceID)
+						if (rom.SourceID < last.SourceID)
 						{
 							last.SourceID = rom.SourceID;
 							last.Source = rom.Source;
