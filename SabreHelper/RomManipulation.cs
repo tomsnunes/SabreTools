@@ -568,69 +568,32 @@ namespace SabreTools.Helper
 		{
 			List<RomData> outroms = new List<RomData>();
 
-			// First sort the roms by size, crc, sysid, srcid, md5, and sha1 (in order), if not sorted already
+			// First sort the roms by sha1, md5, crc, size, sysid, srcid (in order) if not sorted already
 			if (!presorted)
 			{
 				inroms.Sort(delegate (RomData x, RomData y)
 				{
-					if (x.Size == y.Size)
+					if (x.SHA1 == y.SHA1)
 					{
-						if (x.CRC == y.CRC)
+						if (x.MD5 == y.MD5)
 						{
-							// If the CRC is blank, use MD5 before SystemID
-							if (x.CRC == "")
+							if (x.CRC == y.CRC)
 							{
-								if (x.MD5 == y.MD5)
+								if (x.Size == y.Size)
 								{
-									// If the MD5 is blank, use SHA1 before SystemID
-									if (x.MD5 == "")
+									if (x.SystemID == y.SystemID)
 									{
-										if (x.SHA1 == y.SHA1)
-										{
-											if (x.SystemID == y.SystemID)
-											{
-												return x.SourceID - y.SourceID;
-											}
-											return x.SystemID - y.SystemID;
-										}
-										return String.Compare(x.SHA1, y.SHA1);
+										return x.SourceID - y.SourceID;
 									}
-									else
-									{
-										if (x.SystemID == y.SystemID)
-										{
-											if (x.SourceID == y.SourceID)
-											{
-												return String.Compare(x.SHA1, y.SHA1);
-											}
-											return x.SourceID - y.SourceID;
-										}
-										return x.SystemID - y.SystemID;
-									}
+									return x.SystemID - y.SystemID;
 								}
-								return String.Compare(x.MD5, y.MD5);
+								return (int)(x.Size - y.Size);
 							}
-							else
-							{
-								if (x.SystemID == y.SystemID)
-								{
-									if (x.SourceID == y.SourceID)
-									{
-										if (x.MD5 == y.MD5)
-										{
-											return String.Compare(x.SHA1, y.SHA1);
-										}
-										return String.Compare(x.MD5, y.MD5);
-									}
-									return x.SourceID - y.SourceID;
-								}
-								return x.SystemID - y.SystemID;
-							}
-							
+							return String.Compare(x.CRC, y.CRC);
 						}
-						return String.Compare(x.CRC, y.CRC);
+						return String.Compare(x.MD5, y.MD5);
 					}
-					return (int)(x.Size - y.Size);
+					return String.Compare(x.SHA1, y.SHA1);
 				});
 			}
 
@@ -646,18 +609,17 @@ namespace SabreTools.Helper
 					bool shouldcont = false;
 					if (rom.Type == "rom" && last.Type == "rom")
 					{
-						shouldcont = ((rom.Size == last.Size) && (
-								(rom.CRC != "" && last.CRC != "" && rom.CRC == last.CRC) ||
-								(rom.MD5 != "" && last.MD5 != "" && rom.MD5 == last.MD5) ||
-								(rom.SHA1 != "" && last.SHA1 != "" && rom.SHA1 == last.SHA1)
-								)
-							);
+						shouldcont = ((rom.Size == last.Size) &&
+							((rom.CRC == "" || last.CRC == "") || rom.CRC == last.CRC) &&
+							((rom.MD5 == "" || last.MD5 == "") || rom.MD5 == last.MD5) &&
+							((rom.SHA1 == "" || last.SHA1 == "") || rom.SHA1 == last.SHA1)
+						);
 					}
 					else if (rom.Type == "disk" && last.Type == "disk")
 					{
-						shouldcont = ((rom.MD5 != "" && last.MD5 != "" && rom.MD5 == last.MD5) ||
-								(rom.SHA1 != "" && last.SHA1 != "" && rom.SHA1 == last.SHA1)
-							);
+						shouldcont = (((rom.MD5 == "" || last.MD5 == "") || rom.MD5 == last.MD5) &&
+							((rom.SHA1 == "" || last.SHA1 == "") || rom.SHA1 == last.SHA1)
+						);
 					}
 
 					// If it's a duplicate, skip adding it to the output but add any missing information
