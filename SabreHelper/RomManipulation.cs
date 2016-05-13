@@ -568,32 +568,69 @@ namespace SabreTools.Helper
 		{
 			List<RomData> outroms = new List<RomData>();
 
-			// First sort the roms by sha1, sysid, srcid, md5, crc, size (in order) if not sorted already
+			// First sort the roms by size, crc, sysid, srcid, md5, and sha1 (in order), if not sorted already
 			if (!presorted)
 			{
 				inroms.Sort(delegate (RomData x, RomData y)
 				{
-					if (x.SHA1 == y.SHA1)
+					if (x.Size == y.Size)
 					{
-						if (x.SystemID == y.SystemID)
+						if (x.CRC == y.CRC)
 						{
-							if (x.SourceID == y.SourceID)
+							// If the CRC is blank, use MD5 before SystemID
+							if (x.CRC == "")
 							{
 								if (x.MD5 == y.MD5)
 								{
-									if (x.CRC == y.CRC)
+									// If the MD5 is blank, use SHA1 before SystemID
+									if (x.MD5 == "")
 									{
-										return (int)(x.Size - y.Size);
+										if (x.SHA1 == y.SHA1)
+										{
+											if (x.SystemID == y.SystemID)
+											{
+												return x.SourceID - y.SourceID;
+											}
+											return x.SystemID - y.SystemID;
+										}
+										return String.Compare(x.SHA1, y.SHA1);
 									}
-									return String.Compare(x.CRC, y.CRC);
+									else
+									{
+										if (x.SystemID == y.SystemID)
+										{
+											if (x.SourceID == y.SourceID)
+											{
+												return String.Compare(x.SHA1, y.SHA1);
+											}
+											return x.SourceID - y.SourceID;
+										}
+										return x.SystemID - y.SystemID;
+									}
 								}
 								return String.Compare(x.MD5, y.MD5);
 							}
-							return x.SourceID - y.SourceID;
+							else
+							{
+								if (x.SystemID == y.SystemID)
+								{
+									if (x.SourceID == y.SourceID)
+									{
+										if (x.MD5 == y.MD5)
+										{
+											return String.Compare(x.SHA1, y.SHA1);
+										}
+										return String.Compare(x.MD5, y.MD5);
+									}
+									return x.SourceID - y.SourceID;
+								}
+								return x.SystemID - y.SystemID;
+							}
+
 						}
-						return x.SystemID - y.SystemID;
+						return String.Compare(x.CRC, y.CRC);
 					}
-					return String.Compare(x.SHA1, y.SHA1);
+					return (int)(x.Size - y.Size);
 				});
 			}
 
