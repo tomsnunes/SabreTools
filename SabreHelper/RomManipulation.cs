@@ -449,8 +449,23 @@ namespace SabreTools.Helper
 									}
 
 									// Get the roms from the machine
+									long dataAreaSize = -1;
 									switch (subreader.Name)
 									{
+										case "dataarea":
+											if (xtr.GetAttribute("size") == null)
+											{
+												dataAreaSize = -1;
+											}
+											else if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
+											{
+												dataAreaSize = Convert.ToInt64(xtr.GetAttribute("size"), 16);
+											}
+											else if (xtr.GetAttribute("size") != null)
+											{
+												Int64.TryParse(xtr.GetAttribute("size"), out dataAreaSize);
+											}
+											break;
 										case "rom":
 										case "disk":
 											// If the rom is nodump, skip it
@@ -460,15 +475,24 @@ namespace SabreTools.Helper
 												break;
 											}
 
-											// Take care of hex-sized files
+											// If the size was in the dataarea, use that instead
 											long size = -1;
-											if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
+											if (dataAreaSize != -1)
 											{
-												size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
+												size = dataAreaSize;
+												dataAreaSize = -1;
 											}
-											else if (xtr.GetAttribute("size") != null)
+											else
 											{
-												Int64.TryParse(xtr.GetAttribute("size"), out size);
+												// Take care of hex-sized files
+												if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
+												{
+													size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
+												}
+												else if (xtr.GetAttribute("size") != null)
+												{
+													Int64.TryParse(xtr.GetAttribute("size"), out size);
+												}
 											}
 
 											// Sanitize the hashes from null, hex sizes, and "true blank" strings
