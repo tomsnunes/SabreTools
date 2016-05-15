@@ -150,7 +150,6 @@ namespace SabreTools.Helper
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
 		/// <remarks>
 		/// The following features have been requested for file output:
-		/// - Have the ability to add a comment field
 		/// - Have the ability to strip special (non-ASCII) characters from rom information
 		/// - Add a flag for ignoring roms with blank sizes
 		/// </remarks>
