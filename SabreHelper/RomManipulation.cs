@@ -440,6 +440,7 @@ namespace SabreTools.Helper
 									tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
 								}
 
+								string lastkey = "";
 								while (subreader.Read())
 								{
 									// We only want elements
@@ -471,24 +472,16 @@ namespace SabreTools.Helper
 												Int64.TryParse(xtr.GetAttribute("size"), out size);
 											}
 
-											/*
-											// Take care of hex-sized offsets
-											long offset = -1;
-											if (xtr.GetAttribute("offset") != null && xtr.GetAttribute("offset").Contains("0x"))
+											// If the rom is continue or ignore, add the size to the previous rom
+											if (xtr.GetAttribute("loadflag") == "continue" || xtr.GetAttribute("loadflag") == "ignore")
 											{
-												offset = Convert.ToInt64(xtr.GetAttribute("offset"), 16);
+												int index = dict[lastkey].Count() - 1;
+												RomData lastrom = dict[lastkey][index];
+												lastrom.Size += size;
+												dict[lastkey].RemoveAt(index);
+												dict[lastkey].Add(lastrom);
+												continue;
 											}
-											else if (xtr.GetAttribute("offset") != null)
-											{
-												Int64.TryParse(xtr.GetAttribute("offset"), out offset);
-											}
-											
-											// Add offset if possible
-											if (offset > 0)
-											{
-												size += offset;
-											}
-											*/
 
 											// Sanitize the hashes from null, hex sizes, and "true blank" strings
 											string crc = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "");
@@ -524,6 +517,7 @@ namespace SabreTools.Helper
 											{
 												// Get the new values to add
 												string key = size + "-" + crc;
+												lastkey = key;
 
 												RomData value = new RomData
 												{
