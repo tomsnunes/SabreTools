@@ -8,6 +8,10 @@ namespace SabreTools.Helper
 {
 	/// <summary>
 	/// Provide DAT conversion functionality
+	/// 
+	/// The following features have been requested:
+	/// - Implement converting from/to DOSCenter format
+	/// - Implement converting from/to RomCenter format
 	/// </summary>
 	public class Converters
 	{

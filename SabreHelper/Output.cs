@@ -155,6 +155,12 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
+		/// <remarks>
+		/// The following features have been requested for file output:
+		/// - Have the ability to add a comment field
+		/// - Have the ability to strip special (non-ASCII) characters from rom information
+		/// - Add a flag for ignoring roms with blank sizes
+		/// </remarks>
 		public static bool WriteToDatFromDict(string name, string description, string version, string date, string category, string author,
 			bool forceunpack, bool old, bool merge, string outDir, Dictionary<string, List<RomData>> dict, Logger logger, bool norename = true)
 		{
@@ -309,6 +315,12 @@ namespace SabreTools.Helper
 		/// <param name="repext">Arbitrary extension to replace all extensions in the item</param>
 		/// <param name="gamename">True if the game name is appended (only when !usegame), false otherwise</param>
 		/// <returns>True if the file was written, false otherwise</returns>
+		/// <remarks>
+		/// The following features have been requested for this method:
+		/// - Have switch for automatically outputting to Romba format:
+		///		e.g. /aa/bb/cc/dd/aabbccddef770b06131a878b46d4302ac28dd126.gz
+		///		Anything without a SHA-1 has to be skipped
+		/// </remarks>
 		public static bool WriteToText(string textfile, string outdir, List<RomData> roms, Logger logger, bool useGame = true, string prefix = "",
 			string postfix = "", string addext = "", string repext = "", bool quotes = false, bool gamename = false)
 		{
