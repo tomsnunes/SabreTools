@@ -13,9 +13,12 @@ namespace SabreTools
 	/// - Custom DATs based on a system and a source
 	/// - Multi-source and multi-system DATs
 	/// 
-	/// The following features need to be implemented in DATabaseTwo for further stability
+	/// The following features need to (want to) be implemented in DATabaseTwo for further stability
 	/// - Import updating file locations and names when SHA-1 hashes are matched
 	/// - True duplicate DATs being removed from the import folder (SHA-1 matches)
+	/// - Generate All only generating DATs that have been recently updated
+	///		+ This requires implementing a "last updated" data point for all DATs and tracking for "last generate" somewhere
+	/// - Impelement a ToSort folder for DATs that will place DATs in the correct subfolder on Import
 	/// </summary>
 	public class DATabaseTwo
 	{
