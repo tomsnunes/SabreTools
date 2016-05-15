@@ -62,4 +62,35 @@ namespace SabreTools.Helper
 		ExternalHash,
 		ExternalAll,
 	}
+
+	public enum ForceMerging
+	{
+		None = 0,
+		Split,
+		Full,
+	}
+
+	public enum ForceNodump
+	{
+		None = 0,
+		Obsolete,
+		Required,
+		Ignore,
+	}
+
+	public enum ForcePacking
+	{
+		None = 0,
+		Zip,
+		Unzip,
+	}
+
+	public enum OutputFormat
+	{
+		Xml = 0,
+		ClrMamePro,
+		RomCenter,
+		DOSCenter,
+		MissFile,
+	}
 }

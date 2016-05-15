@@ -141,14 +141,7 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="name">Internal name of the DAT</param>
-		/// <param name="description">Description and external name of the DAT</param>
-		/// <param name="version">Version or iteration of the DAT</param>
-		/// <param name="date">Usually the DAT creation date</param>
-		/// <param name="category">Category of the DAT</param>
-		/// <param name="author">DAT author</param>
-		/// <param name="forceunpack">Force all sets to be unzipped</param>
-		/// <param name="old">Set output mode to old-style DAT</param>
+		/// <param name="datdata">All information for creating the datfile header</param>
 		/// <param name="merge">Enable output in merged mode (one game per hash)</param>
 		/// <param name="outDir">Set the output directory</param>
 		/// <param name="dict">Dictionary containing all the roms to be written</param>
@@ -161,8 +154,7 @@ namespace SabreTools.Helper
 		/// - Have the ability to strip special (non-ASCII) characters from rom information
 		/// - Add a flag for ignoring roms with blank sizes
 		/// </remarks>
-		public static bool WriteToDatFromDict(string name, string description, string version, string date, string category, string author,
-			bool forceunpack, bool old, bool merge, string outDir, Dictionary<string, List<RomData>> dict, Logger logger, bool norename = true)
+		public static bool WriteToDatFromDict(DatData datdata, bool merge, string outDir, Dictionary<string, List<RomData>> dict, Logger logger, bool norename = true)
 		{
 			// Get all values in the dictionary and write out
 			SortedDictionary<string, List<RomData>> sortable = new SortedDictionary<string, List<RomData>>();
@@ -208,38 +200,38 @@ namespace SabreTools.Helper
 			}
 
 			// (currently uses current time, change to "last updated time")
-			logger.User("Opening file for writing: " + outDir + description + (old ? ".dat" : ".xml"));
+			logger.User("Opening file for writing: " + outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.ClrMamePro ? ".dat" : ".xml"));
 
 			try
 			{
-				FileStream fs = File.Create(outDir + description + (old ? ".dat" : ".xml"));
+				FileStream fs = File.Create(outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.ClrMamePro ? ".dat" : ".xml"));
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
 				string header_old = "clrmamepro (\n" +
-					"\tname \"" + HttpUtility.HtmlEncode(name) + "\"\n" +
-					"\tdescription \"" + HttpUtility.HtmlEncode(description) + "\"\n" +
-					"\tcategory \"" + HttpUtility.HtmlEncode(category) + "\"\n" +
-					"\tversion \"" + HttpUtility.HtmlEncode(version) + "\"\n" +
-					"\tdate \"" + HttpUtility.HtmlEncode(date) + "\"\n" +
-					"\tauthor \"" + HttpUtility.HtmlEncode(author) + "\"\n" +
-					(forceunpack ? "\tforcezipping no\n" : "") +
+					"\tname \"" + HttpUtility.HtmlEncode(datdata.Name) + "\"\n" +
+					"\tdescription \"" + HttpUtility.HtmlEncode(datdata.Description) + "\"\n" +
+					"\tcategory \"" + HttpUtility.HtmlEncode(datdata.Category) + "\"\n" +
+					"\tversion \"" + HttpUtility.HtmlEncode(datdata.Version) + "\"\n" +
+					"\tdate \"" + HttpUtility.HtmlEncode(datdata.Date) + "\"\n" +
+					"\tauthor \"" + HttpUtility.HtmlEncode(datdata.Author) + "\"\n" +
+					(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
 					")\n";
 
 				string header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 					"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
 					"<datafile>\n" +
 					"\t<header>\n" +
-					"\t\t<name>" + HttpUtility.HtmlEncode(name) + "</name>\n" +
-					"\t\t<description>" + HttpUtility.HtmlEncode(description) + "</description>\n" +
-					"\t\t<category>" + HttpUtility.HtmlEncode(category) + "</category>\n" +
-					"\t\t<version>" + HttpUtility.HtmlEncode(version) + "</version>\n" +
-					"\t\t<date>" + HttpUtility.HtmlEncode(date) + "</date>\n" +
-					"\t\t<author>" + HttpUtility.HtmlEncode(author) + "</author>\n" +
-					(forceunpack ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
+					"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
+					"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
+					"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
+					"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
+					"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
+					"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
+					(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
 					"\t</header>\n";
 
 				// Write the header out
-				sw.Write((old ? header_old : header));
+				sw.Write((datdata.OutputFormat == OutputFormat.ClrMamePro ? header_old : header));
 
 				// Write out each of the machines and roms
 				string lastgame = null;
@@ -250,18 +242,18 @@ namespace SabreTools.Helper
 						string state = "";
 						if (lastgame != null && lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
-							state += (old ? ")\n" : "\t</machine>\n");
+							state += (datdata.OutputFormat == OutputFormat.ClrMamePro ? ")\n" : "\t</machine>\n");
 						}
 
 						if (lastgame == null || lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
-							state += (old ? "game (\n\tname \"" + rom.Game + "\"\n" +
+							state += (datdata.OutputFormat == OutputFormat.ClrMamePro ? "game (\n\tname \"" + rom.Game + "\"\n" +
 								"\tdescription \"" + rom.Game + "\"\n" :
 								"\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
 								"\t\t<description>" + HttpUtility.HtmlEncode(rom.Game) + "</description>\n");
 						}
 
-						if (old)
+						if (datdata.OutputFormat == OutputFormat.ClrMamePro)
 						{
 							state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
 								(rom.Size != 0 ? " size " + rom.Size : "") +
@@ -286,7 +278,7 @@ namespace SabreTools.Helper
 					}
 				}
 
-				sw.Write((old ? ")" : "\t</machine>\n</datafile>"));
+				sw.Write((datdata.OutputFormat == OutputFormat.ClrMamePro ? ")" : "\t</machine>\n</datafile>"));
 				logger.User("File written!" + Environment.NewLine);
 				sw.Close();
 				fs.Close();

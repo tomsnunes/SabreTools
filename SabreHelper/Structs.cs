@@ -20,4 +20,26 @@
 		public string SHA1;
 		public DupeType Dupe;
 	}
+
+	/// <summary>
+	/// Intermediate struct for holding DAT information
+	/// </summary>
+	public struct DatData
+	{
+		public string Name;
+		public string Description;
+		public string Category;
+		public string Version;
+		public string Date;
+		public string Author;
+		public string Email;
+		public string Homepage;
+		public string Url;
+		public string Comment;
+		public string Header;
+		public ForceMerging ForceMerging;
+		public ForceNodump ForceNodump;
+		public ForcePacking ForcePacking;
+		public OutputFormat OutputFormat;
+	}
 }

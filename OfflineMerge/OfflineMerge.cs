@@ -382,10 +382,55 @@ namespace SabreTools
 				}
 
 				// Finally, output all of the files
-				Output.WriteToDatFromDict("Net New", "Net New", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", netNew, _logger);
-				Output.WriteToDatFromDict("Unneeded", "Unneeded", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", unneeded, _logger);
-				Output.WriteToDatFromDict("New Missing", "New Missing", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", newMissing, _logger);
-				Output.WriteToDatFromDict("Have", "Have", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", have, _logger);
+				DatData netNewData = new DatData
+				{
+					Name = "Net New",
+					Description = "Net New",
+					Version = "",
+					Date = DateTime.Now.ToString("yyyy-MM-dd"),
+					Category = "",
+					Author = "SabreTools",
+					ForcePacking = ForcePacking.None,
+					OutputFormat = OutputFormat.Xml,
+				};
+				DatData unneededData = new DatData
+				{
+					Name = "Unneeded",
+					Description = "Unneeded",
+					Version = "",
+					Date = DateTime.Now.ToString("yyyy-MM-dd"),
+					Category = "",
+					Author = "SabreTools",
+					ForcePacking = ForcePacking.None,
+					OutputFormat = OutputFormat.Xml,
+				};
+				DatData newMissingData = new DatData
+				{
+					Name = "New Missing",
+					Description = "New Missing",
+					Version = "",
+					Date = DateTime.Now.ToString("yyyy-MM-dd"),
+					Category = "",
+					Author = "SabreTools",
+					ForcePacking = ForcePacking.None,
+					OutputFormat = OutputFormat.Xml,
+				};
+				DatData haveData = new DatData
+				{
+					Name = "Have",
+					Description = "Have",
+					Version = "",
+					Date = DateTime.Now.ToString("yyyy-MM-dd"),
+					Category = "",
+					Author = "SabreTools",
+					ForcePacking = ForcePacking.None,
+					OutputFormat = OutputFormat.Xml,
+				};
+
+				Output.WriteToDatFromDict(netNewData, true, "", netNew, _logger);
+				Output.WriteToDatFromDict(unneededData, true, "", unneeded, _logger);
+				Output.WriteToDatFromDict(newMissingData, true, "", newMissing, _logger);
+				Output.WriteToDatFromDict(haveData, true, "", have, _logger);
 
 				return true;
 			}
@@ -442,7 +487,18 @@ namespace SabreTools
 					}
 				}
 
-				Output.WriteToDatFromDict("Have", "Have", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", have, _logger);
+				DatData haveData = new DatData
+				{
+					Name = "Have",
+					Description = "Have",
+					Version = "",
+					Date = DateTime.Now.ToString("yyyy-MM-dd"),
+					Category = "",
+					Author = "SabreTools",
+					ForcePacking = ForcePacking.None,
+					OutputFormat = OutputFormat.Xml,
+				};
+				Output.WriteToDatFromDict(haveData, true, "", have, _logger);
 
 				return true;
 			}
@@ -499,7 +555,18 @@ namespace SabreTools
 					}
 				}
 
-				Output.WriteToDatFromDict("Have", "Have", "", DateTime.Now.ToString("yyyy-MM-dd"), "", "SabreTools", false, false, true, "", have, _logger);
+				DatData haveData = new DatData
+				{
+					Name = "Have",
+					Description = "Have",
+					Version = "",
+					Date = DateTime.Now.ToString("yyyy-MM-dd"),
+					Category = "",
+					Author = "SabreTools",
+					ForcePacking = ForcePacking.None,
+					OutputFormat = OutputFormat.Xml,
+				};
+				Output.WriteToDatFromDict(haveData, true, "", have, _logger);
 
 				return true;
 			}

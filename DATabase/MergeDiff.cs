@@ -140,7 +140,18 @@ namespace SabreTools
 				post = " (No Duplicates)";
 
 				// Output the difflist (a-b)+(b-a) diff
-				Output.WriteToDatFromDict(_name + post, _desc + post, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", diffed, _logger);
+				DatData outerDiffData = new DatData
+				{
+					Name = _name + post,
+					Description = _desc + post,
+					Version = _version,
+					Date = _date,
+					Category = _cat,
+					Author = _author,
+					ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+					OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				};
+				Output.WriteToDatFromDict(outerDiffData, _dedup, "", diffed, _logger);
 
 				// For the AB mode-style diffs, get all required dictionaries and output with a new name
 				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
@@ -168,7 +179,19 @@ namespace SabreTools
 					}
 
 					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j]) + " Only)";
-					Output.WriteToDatFromDict(_name + post, _desc + post, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", sysDict, _logger);
+
+					DatData diffData = new DatData
+					{
+						Name = _name + post,
+						Description = _desc + post,
+						Version = _version,
+						Date = _date,
+						Category = _cat,
+						Author = _author,
+						ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+						OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+					};
+					Output.WriteToDatFromDict(diffData, _dedup, "", sysDict, _logger);
 				}
 
 				// Get all entries that have External dupes
@@ -196,12 +219,35 @@ namespace SabreTools
 						}
 					}
 				}
-				Output.WriteToDatFromDict(_name + post, _desc + post, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", duplicates, _logger);
+
+				DatData dupeData = new DatData
+				{
+					Name = _name + post,
+					Description = _desc + post,
+					Version = _version,
+					Date = _date,
+					Category = _cat,
+					Author = _author,
+					ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+					OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				};
+				Output.WriteToDatFromDict(dupeData, _dedup, "", duplicates, _logger);
 			}
 			// Output all entries with user-defined merge
 			else
 			{
-				Output.WriteToDatFromDict(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, _dedup, "", dict, _logger);
+				DatData userData = new DatData
+				{
+					Name = _name,
+					Description = _desc,
+					Version = _version,
+					Date = _date,
+					Category = _cat,
+					Author = _author,
+					ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+					OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				};
+				Output.WriteToDatFromDict(userData, _dedup, "", dict, _logger);
 			}
 
 			return true;

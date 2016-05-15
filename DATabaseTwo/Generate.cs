@@ -225,7 +225,18 @@ namespace SabreTools
 			}
 
 			// Then write out the file
-			Output.WriteToDatFromDict(name, description, "", date, "SabreTools", "SabreTools", false, _old, true, _outroot, roms, _logger, _norename);
+			DatData datdata = new DatData
+			{
+				Name = name,
+				Description = description,
+				Version = "",
+				Date = date,
+				Category = "SabreTools",
+				Author = "SabreTools",
+				ForcePacking = ForcePacking.None,
+				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+			};
+			Output.WriteToDatFromDict(datdata, true, _outroot, roms, _logger, _norename);
 
 			return true;
 		}
