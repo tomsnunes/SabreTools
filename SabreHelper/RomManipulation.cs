@@ -471,6 +471,7 @@ namespace SabreTools.Helper
 												Int64.TryParse(xtr.GetAttribute("size"), out size);
 											}
 
+											/*
 											// Take care of hex-sized offsets
 											long offset = -1;
 											if (xtr.GetAttribute("offset") != null && xtr.GetAttribute("offset").Contains("0x"))
@@ -487,6 +488,7 @@ namespace SabreTools.Helper
 											{
 												size += offset;
 											}
+											*/
 
 											// Sanitize the hashes from null, hex sizes, and "true blank" strings
 											string crc = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "");
