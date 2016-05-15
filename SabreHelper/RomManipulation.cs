@@ -440,7 +440,7 @@ namespace SabreTools.Helper
 									tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
 								}
 
-								string lastkey = "";
+								string key = "";
 								while (subreader.Read())
 								{
 									// We only want elements
@@ -475,11 +475,11 @@ namespace SabreTools.Helper
 											// If the rom is continue or ignore, add the size to the previous rom
 											if (xtr.GetAttribute("loadflag") == "continue" || xtr.GetAttribute("loadflag") == "ignore")
 											{
-												int index = dict[lastkey].Count() - 1;
-												RomData lastrom = dict[lastkey][index];
+												int index = dict[key].Count() - 1;
+												RomData lastrom = dict[key][index];
 												lastrom.Size += size;
-												dict[lastkey].RemoveAt(index);
-												dict[lastkey].Add(lastrom);
+												dict[key].RemoveAt(index);
+												dict[key].Add(lastrom);
 												continue;
 											}
 
@@ -516,8 +516,7 @@ namespace SabreTools.Helper
 											if (!(crc == "" && md5 == "" && sha1 == ""))
 											{
 												// Get the new values to add
-												string key = size + "-" + crc;
-												lastkey = key;
+												key = size + "-" + crc;
 
 												RomData value = new RomData
 												{
