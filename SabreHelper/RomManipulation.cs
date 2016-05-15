@@ -456,7 +456,7 @@ namespace SabreTools.Helper
 											// If the rom is nodump, skip it
 											if (xtr.GetAttribute("flags") == "nodump" || xtr.GetAttribute("status") == "nodump")
 											{
-												logger.Log("Nodump detected");
+												logger.Log("Nodump detected; skipping...");
 												break;
 											}
 
