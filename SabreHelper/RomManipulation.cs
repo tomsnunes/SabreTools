@@ -449,23 +449,8 @@ namespace SabreTools.Helper
 									}
 
 									// Get the roms from the machine
-									long dataAreaSize = -1;
 									switch (subreader.Name)
 									{
-										case "dataarea":
-											if (xtr.GetAttribute("size") == null)
-											{
-												dataAreaSize = -1;
-											}
-											else if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
-											{
-												dataAreaSize = Convert.ToInt64(xtr.GetAttribute("size"), 16);
-											}
-											else if (xtr.GetAttribute("size") != null)
-											{
-												Int64.TryParse(xtr.GetAttribute("size"), out dataAreaSize);
-											}
-											break;
 										case "rom":
 										case "disk":
 											// If the rom is nodump, skip it
@@ -475,24 +460,32 @@ namespace SabreTools.Helper
 												break;
 											}
 
-											// If the size was in the dataarea, use that instead
+											// Take care of hex-sized files
 											long size = -1;
-											if (dataAreaSize != -1)
+											if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
 											{
-												size = dataAreaSize;
-												dataAreaSize = -1;
+												size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
 											}
-											else
+											else if (xtr.GetAttribute("size") != null)
 											{
-												// Take care of hex-sized files
-												if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
-												{
-													size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
-												}
-												else if (xtr.GetAttribute("size") != null)
-												{
-													Int64.TryParse(xtr.GetAttribute("size"), out size);
-												}
+												Int64.TryParse(xtr.GetAttribute("size"), out size);
+											}
+
+											// Take care of hex-sized offsets
+											long offset = -1;
+											if (xtr.GetAttribute("offset") != null && xtr.GetAttribute("offset").Contains("0x"))
+											{
+												offset = Convert.ToInt64(xtr.GetAttribute("offset"), 16);
+											}
+											else if (xtr.GetAttribute("offset") != null)
+											{
+												Int64.TryParse(xtr.GetAttribute("offset"), out offset);
+											}
+											
+											// Add offset if possible
+											if (offset > 0)
+											{
+												size += offset;
 											}
 
 											// Sanitize the hashes from null, hex sizes, and "true blank" strings
