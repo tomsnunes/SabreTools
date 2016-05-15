@@ -214,6 +214,7 @@ namespace SabreTools.Helper
 					"\tversion \"" + HttpUtility.HtmlEncode(datdata.Version) + "\"\n" +
 					"\tdate \"" + HttpUtility.HtmlEncode(datdata.Date) + "\"\n" +
 					"\tauthor \"" + HttpUtility.HtmlEncode(datdata.Author) + "\"\n" +
+					"\tcomment \"" + HttpUtility.HtmlEncode(datdata.Comment) + "\"\n" +
 					(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
 					")\n";
 
@@ -227,6 +228,7 @@ namespace SabreTools.Helper
 					"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
 					"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
 					"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
+					"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
 					(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
 					"\t</header>\n";
 
