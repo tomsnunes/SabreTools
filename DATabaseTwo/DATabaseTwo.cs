@@ -7,6 +7,16 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
+	/// <summary>
+	/// The following features are missing from DATabaseTwo with respect to the original DATabase:
+	/// - Source merging
+	/// - Custom DATs based on a system and a source
+	/// - Multi-source and multi-system DATs
+	/// 
+	/// The following features need to be implemented in DATabaseTwo for further stability
+	/// - Import updating file locations and names when SHA-1 hashes are matched
+	/// - True duplicate DATs being removed from the import folder (SHA-1 matches)
+	/// </summary>
 	public class DATabaseTwo
 	{
 		// Private required variables
