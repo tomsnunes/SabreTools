@@ -63,6 +63,9 @@ namespace SabreTools.Helper
 		ExternalAll,
 	}
 
+	/// <summary>
+	/// Determines forcemerging tag for DAT output
+	/// </summary>
 	public enum ForceMerging
 	{
 		None = 0,
@@ -70,6 +73,9 @@ namespace SabreTools.Helper
 		Full,
 	}
 
+	/// <summary>
+	/// Determines forcenodump tag for DAT output
+	/// </summary>
 	public enum ForceNodump
 	{
 		None = 0,
@@ -78,6 +84,9 @@ namespace SabreTools.Helper
 		Ignore,
 	}
 
+	/// <summary>
+	/// Determines forcepacking tag for DAT output
+	/// </summary>
 	public enum ForcePacking
 	{
 		None = 0,
@@ -85,6 +94,9 @@ namespace SabreTools.Helper
 		Unzip,
 	}
 
+	/// <summary>
+	/// Determines the DAT output format
+	/// </summary>
 	public enum OutputFormat
 	{
 		Xml = 0,
