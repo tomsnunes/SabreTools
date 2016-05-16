@@ -199,11 +199,11 @@ namespace SabreTools.Helper
 			}
 
 			// (currently uses current time, change to "last updated time")
-			logger.User("Opening file for writing: " + outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.ClrMamePro ? ".dat" : ".xml"));
+			logger.User("Opening file for writing: " + outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"));
 
 			try
 			{
-				FileStream fs = File.Create(outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.ClrMamePro ? ".dat" : ".xml"));
+				FileStream fs = File.Create(outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"));
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
 				string header_old = "clrmamepro (\n" +
@@ -263,7 +263,7 @@ namespace SabreTools.Helper
 								(rom.SHA1 != "" ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
 								" )\n";
 						}
-						else
+						else if (datdata.OutputFormat == OutputFormat.Xml)
 						{
 							state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
 								(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
