@@ -7,7 +7,7 @@ using System.Xml.Linq;
 namespace SabreTools.Helper
 {
 	/// <summary>
-	/// Provide DAT conversion functionality
+	/// Provide DAT to XML conversion functionality
 	/// 
 	/// The following features have been requested:
 	/// - Implement converting from DOSCenter format
