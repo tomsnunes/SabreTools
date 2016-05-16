@@ -144,9 +144,23 @@ namespace SabreTools
 				}
 			}
 
+			// Create the output DatData object
+			DatData datdata = new DatData
+			{
+				Name = name,
+				Description = description,
+				Version = "",
+				Date = date,
+				Category = "SabreTools",
+				Author = "SabreTools",
+				ForcePacking = ForcePacking.None,
+				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				MergeRoms = true,
+				Roms = new Dictionary<string, List<RomData>>(),
+			};
+
 			// Now read in all of the files
 			SHA1 sha1 = SHA1.Create();
-			Dictionary<string, List<RomData>> roms = new Dictionary<string, List<RomData>>();
 			foreach (string file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
 			{
 				string hash = "";
@@ -160,11 +174,11 @@ namespace SabreTools
 				{
 					Int32.TryParse(sourcemap[hash], out tempSrcId);
 				}
-				roms = RomManipulation.ParseDict(file, 0, tempSrcId, roms, _logger);
+				datdata = RomManipulation.ParseDict(file, 0, tempSrcId, datdata, _logger);
 			}
 
 			// If the dictionary is empty for any reason, tell the user and exit
-			if (roms.Keys.Count == 0 || roms.Count == 0)
+			if (datdata.Roms.Keys.Count == 0 || datdata.Roms.Count == 0)
 			{
 				_logger.Log("No roms found for system ID " + _systemid);
 				return false;
@@ -172,11 +186,11 @@ namespace SabreTools
 
 			// Now process all of the roms
 			_logger.User("Cleaning rom data");
-			List<string> keys = roms.Keys.ToList();
+			List<string> keys = datdata.Roms.Keys.ToList();
 			foreach (string key in keys)
 			{
 				List<RomData> temp = new List<RomData>();
-				List<RomData> newroms = roms[key];
+				List<RomData> newroms = datdata.Roms[key];
 				for (int i = 0; i < newroms.Count; i++)
 				{
 					RomData rom = newroms[i];
@@ -221,22 +235,11 @@ namespace SabreTools
 
 					temp.Add(rom);
 				}
-				roms[key] = temp;
+				datdata.Roms[key] = temp;
 			}
 
 			// Then write out the file
-			DatData datdata = new DatData
-			{
-				Name = name,
-				Description = description,
-				Version = "",
-				Date = date,
-				Category = "SabreTools",
-				Author = "SabreTools",
-				ForcePacking = ForcePacking.None,
-				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-			};
-			Output.WriteToDatFromDict(datdata, true, _outroot, roms, _logger, _norename);
+			Output.WriteToDatFromDict(datdata, _outroot, _logger, _norename);
 
 			return true;
 		}

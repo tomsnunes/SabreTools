@@ -392,6 +392,8 @@ namespace SabreTools
 					Author = "SabreTools",
 					ForcePacking = ForcePacking.None,
 					OutputFormat = OutputFormat.Xml,
+					MergeRoms = true,
+					Roms = netNew,
 				};
 				DatData unneededData = new DatData
 				{
@@ -403,6 +405,8 @@ namespace SabreTools
 					Author = "SabreTools",
 					ForcePacking = ForcePacking.None,
 					OutputFormat = OutputFormat.Xml,
+					MergeRoms = true,
+					Roms = unneeded,
 				};
 				DatData newMissingData = new DatData
 				{
@@ -414,6 +418,8 @@ namespace SabreTools
 					Author = "SabreTools",
 					ForcePacking = ForcePacking.None,
 					OutputFormat = OutputFormat.Xml,
+					MergeRoms = true,
+					Roms = newMissing,
 				};
 				DatData haveData = new DatData
 				{
@@ -425,12 +431,14 @@ namespace SabreTools
 					Author = "SabreTools",
 					ForcePacking = ForcePacking.None,
 					OutputFormat = OutputFormat.Xml,
+					MergeRoms = true,
+					Roms = have,
 				};
 
-				Output.WriteToDatFromDict(netNewData, true, "", netNew, _logger);
-				Output.WriteToDatFromDict(unneededData, true, "", unneeded, _logger);
-				Output.WriteToDatFromDict(newMissingData, true, "", newMissing, _logger);
-				Output.WriteToDatFromDict(haveData, true, "", have, _logger);
+				Output.WriteToDatFromDict(netNewData, "", _logger);
+				Output.WriteToDatFromDict(unneededData, "", _logger);
+				Output.WriteToDatFromDict(newMissingData, "", _logger);
+				Output.WriteToDatFromDict(haveData, "", _logger);
 
 				return true;
 			}
@@ -497,8 +505,10 @@ namespace SabreTools
 					Author = "SabreTools",
 					ForcePacking = ForcePacking.None,
 					OutputFormat = OutputFormat.Xml,
+					MergeRoms = true,
+					Roms = have,
 				};
-				Output.WriteToDatFromDict(haveData, true, "", have, _logger);
+				Output.WriteToDatFromDict(haveData, "", _logger);
 
 				return true;
 			}
@@ -565,8 +575,10 @@ namespace SabreTools
 					Author = "SabreTools",
 					ForcePacking = ForcePacking.None,
 					OutputFormat = OutputFormat.Xml,
+					MergeRoms = true,
+					Roms = have,
 				};
-				Output.WriteToDatFromDict(haveData, true, "", have, _logger);
+				Output.WriteToDatFromDict(haveData, "", _logger);
 
 				return true;
 			}

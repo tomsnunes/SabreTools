@@ -142,9 +142,7 @@ namespace SabreTools.Helper
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
 		/// <param name="datdata">All information for creating the datfile header</param>
-		/// <param name="merge">Enable output in merged mode (one game per hash)</param>
 		/// <param name="outDir">Set the output directory</param>
-		/// <param name="dict">Dictionary containing all the roms to be written</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
@@ -153,15 +151,15 @@ namespace SabreTools.Helper
 		/// - Have the ability to strip special (non-ASCII) characters from rom information
 		/// - Add a flag for ignoring roms with blank sizes
 		/// </remarks>
-		public static bool WriteToDatFromDict(DatData datdata, bool merge, string outDir, Dictionary<string, List<RomData>> dict, Logger logger, bool norename = true)
+		public static bool WriteToDatFromDict(DatData datdata, string outDir, Logger logger, bool norename = true)
 		{
 			// Get all values in the dictionary and write out
 			SortedDictionary<string, List<RomData>> sortable = new SortedDictionary<string, List<RomData>>();
 			long count = 0;
-			foreach (List<RomData> roms in dict.Values)
+			foreach (List<RomData> roms in datdata.Roms.Values)
 			{
 				List<RomData> newroms = roms;
-				if (merge)
+				if (datdata.MergeRoms)
 				{
 					newroms = RomManipulation.Merge(newroms);
 				}

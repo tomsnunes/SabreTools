@@ -99,11 +99,23 @@ namespace SabreTools
 
 			// Create a dictionary of all ROMs from the input DATs
 			int i = 0;
-			Dictionary<string, List<RomData>> dict = new Dictionary<string, List<RomData>>();
+			DatData userData = new DatData
+			{
+				Name = _name,
+				Description = _desc,
+				Version = _version,
+				Date = _date,
+				Category = _cat,
+				Author = _author,
+				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				MergeRoms = _dedup,
+				Roms = new Dictionary<string, List<RomData>>(),
+			};
 			foreach (string input in _inputs)
 			{
 				_logger.User("Adding DAT: " + input);
-				dict = RomManipulation.ParseDict(input, i, 0, dict, _logger);
+				userData = RomManipulation.ParseDict(input, i, 0, userData, _logger);
 				i++;
 			}
 			
@@ -113,33 +125,6 @@ namespace SabreTools
 				string post = "";
 
 				// Get all entries that don't have External dupes
-				Dictionary<string, List<RomData>> diffed = new Dictionary<string, List<RomData>>();
-				foreach (string key in dict.Keys)
-				{
-					List<RomData> temp = dict[key];
-					temp = RomManipulation.Merge(temp);
-
-					foreach (RomData rom in temp)
-					{
-						if (rom.Dupe < DupeType.ExternalHash)
-						{
-							if (diffed.ContainsKey(key))
-							{
-								diffed[key].Add(rom);
-							}
-							else
-							{
-								List<RomData> tl = new List<RomData>();
-								tl.Add(rom);
-								diffed.Add(key, tl);
-							}
-						}
-					}
-				}
-
-				post = " (No Duplicates)";
-
-				// Output the difflist (a-b)+(b-a) diff
 				DatData outerDiffData = new DatData
 				{
 					Name = _name + post,
@@ -150,36 +135,41 @@ namespace SabreTools
 					Author = _author,
 					ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 					OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+					MergeRoms = _dedup,
+					Roms = new Dictionary<string, List<RomData>>(),
 				};
-				Output.WriteToDatFromDict(outerDiffData, _dedup, "", diffed, _logger);
+				foreach (string key in userData.Roms.Keys)
+				{
+					List<RomData> temp = userData.Roms[key];
+					temp = RomManipulation.Merge(temp);
+
+					foreach (RomData rom in temp)
+					{
+						if (rom.Dupe < DupeType.ExternalHash)
+						{
+							if (outerDiffData.Roms.ContainsKey(key))
+							{
+								outerDiffData.Roms[key].Add(rom);
+							}
+							else
+							{
+								List<RomData> tl = new List<RomData>();
+								tl.Add(rom);
+								outerDiffData.Roms.Add(key, tl);
+							}
+						}
+					}
+				}
+
+				post = " (No Duplicates)";
+
+				// Output the difflist (a-b)+(b-a) diff
+				Output.WriteToDatFromDict(outerDiffData, "", _logger);
 
 				// For the AB mode-style diffs, get all required dictionaries and output with a new name
 				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
 				for (int j = 0; j < _inputs.Count; j++)
 				{
-					Dictionary<string, List<RomData>> sysDict = new Dictionary<string, List<RomData>>();
-					foreach (string key in diffed.Keys)
-					{
-						foreach (RomData rom in diffed[key])
-						{
-							if (rom.SystemID == j)
-							{
-								if (sysDict.ContainsKey(key))
-								{
-									sysDict[key].Add(rom);
-								}
-								else
-								{
-									List<RomData> tl = new List<RomData>();
-									tl.Add(rom);
-									sysDict.Add(key, tl);
-								}
-							}
-						}
-					}
-
-					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j]) + " Only)";
-
 					DatData diffData = new DatData
 					{
 						Name = _name + post,
@@ -190,36 +180,35 @@ namespace SabreTools
 						Author = _author,
 						ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 						OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+						MergeRoms = _dedup,
+						Roms = new Dictionary<string, List<RomData>>(),
 					};
-					Output.WriteToDatFromDict(diffData, _dedup, "", sysDict, _logger);
-				}
 
-				// Get all entries that have External dupes
-				Dictionary<string, List<RomData>> duplicates = new Dictionary<string, List<RomData>>();
-				post = " (Duplicates)";
-				foreach (string key in dict.Keys)
-				{
-					List<RomData> temp = dict[key];
-					temp = RomManipulation.Merge(temp);
-
-					foreach (RomData rom in temp)
+					foreach (string key in outerDiffData.Roms.Keys)
 					{
-						if (rom.Dupe >= DupeType.ExternalHash)
+						foreach (RomData rom in outerDiffData.Roms[key])
 						{
-							if (duplicates.ContainsKey(key))
+							if (rom.SystemID == j)
 							{
-								duplicates[key].Add(rom);
-							}
-							else
-							{
-								List<RomData> tl = new List<RomData>();
-								tl.Add(rom);
-								duplicates.Add(key, tl);
+								if (diffData.Roms.ContainsKey(key))
+								{
+									diffData.Roms[key].Add(rom);
+								}
+								else
+								{
+									List<RomData> tl = new List<RomData>();
+									tl.Add(rom);
+									diffData.Roms.Add(key, tl);
+								}
 							}
 						}
 					}
+
+					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j]) + " Only)";
+					Output.WriteToDatFromDict(diffData, "", _logger);
 				}
 
+				// Get all entries that have External dupes
 				DatData dupeData = new DatData
 				{
 					Name = _name + post,
@@ -230,24 +219,39 @@ namespace SabreTools
 					Author = _author,
 					ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 					OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+					MergeRoms = _dedup,
+					Roms = new Dictionary<string, List<RomData>>(),
 				};
-				Output.WriteToDatFromDict(dupeData, _dedup, "", duplicates, _logger);
+				post = " (Duplicates)";
+				foreach (string key in userData.Roms.Keys)
+				{
+					List<RomData> temp = userData.Roms[key];
+					temp = RomManipulation.Merge(temp);
+
+					foreach (RomData rom in temp)
+					{
+						if (rom.Dupe >= DupeType.ExternalHash)
+						{
+							if (dupeData.Roms.ContainsKey(key))
+							{
+								dupeData.Roms[key].Add(rom);
+							}
+							else
+							{
+								List<RomData> tl = new List<RomData>();
+								tl.Add(rom);
+								dupeData.Roms.Add(key, tl);
+							}
+						}
+					}
+				}
+
+				Output.WriteToDatFromDict(dupeData, "", _logger);
 			}
 			// Output all entries with user-defined merge
 			else
 			{
-				DatData userData = new DatData
-				{
-					Name = _name,
-					Description = _desc,
-					Version = _version,
-					Date = _date,
-					Category = _cat,
-					Author = _author,
-					ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-					OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-				};
-				Output.WriteToDatFromDict(userData, _dedup, "", dict, _logger);
+				Output.WriteToDatFromDict(userData, "", _logger);
 			}
 
 			return true;

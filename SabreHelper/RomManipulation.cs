@@ -371,6 +371,22 @@ namespace SabreTools.Helper
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="datdata">The DatData object representing found roms to this point</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>DatData object representing the read-in data</returns>
+		public static DatData ParseDict(string filename, int sysid, int srcid, DatData datdata, Logger logger)
+		{
+			Dictionary<string, List<RomData>> roms = ParseDict(filename, sysid, srcid, datdata.Roms, logger);
+			datdata.Roms = roms;
+			return datdata;
+		}
+
+		/// <summary>
+		/// Parse a DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="dict">The dictionary to add found roms to</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>Dictionary with "size-crc" key and List of RomData objects value representing the found data</returns>
