@@ -206,33 +206,54 @@ namespace SabreTools.Helper
 				FileStream fs = File.Create(outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"));
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
-				string header_old = "clrmamepro (\n" +
-					"\tname \"" + HttpUtility.HtmlEncode(datdata.Name) + "\"\n" +
-					"\tdescription \"" + HttpUtility.HtmlEncode(datdata.Description) + "\"\n" +
-					"\tcategory \"" + HttpUtility.HtmlEncode(datdata.Category) + "\"\n" +
-					"\tversion \"" + HttpUtility.HtmlEncode(datdata.Version) + "\"\n" +
-					"\tdate \"" + HttpUtility.HtmlEncode(datdata.Date) + "\"\n" +
-					"\tauthor \"" + HttpUtility.HtmlEncode(datdata.Author) + "\"\n" +
-					"\tcomment \"" + HttpUtility.HtmlEncode(datdata.Comment) + "\"\n" +
-					(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
-					")\n";
-
-				string header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-					"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
-					"<datafile>\n" +
-					"\t<header>\n" +
-					"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
-					"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
-					"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
-					"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
-					"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
-					"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
-					"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
-					(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
-					"\t</header>\n";
+				string header = "";
+				switch (datdata.OutputFormat)
+				{
+					case OutputFormat.ClrMamePro:
+						header = "clrmamepro (\n" +
+							"\tname \"" + HttpUtility.HtmlEncode(datdata.Name) + "\"\n" +
+							"\tdescription \"" + HttpUtility.HtmlEncode(datdata.Description) + "\"\n" +
+							"\tcategory \"" + HttpUtility.HtmlEncode(datdata.Category) + "\"\n" +
+							"\tversion \"" + HttpUtility.HtmlEncode(datdata.Version) + "\"\n" +
+							"\tdate \"" + HttpUtility.HtmlEncode(datdata.Date) + "\"\n" +
+							"\tauthor \"" + HttpUtility.HtmlEncode(datdata.Author) + "\"\n" +
+							"\tcomment \"" + HttpUtility.HtmlEncode(datdata.Comment) + "\"\n" +
+							(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
+							")\n";
+						break;
+					case OutputFormat.RomCenter:
+						header = "[CREDITS]\n" +
+							"author=" + HttpUtility.HtmlEncode(datdata.Author) + "\n" +
+							"version=" + HttpUtility.HtmlEncode(datdata.Version) + "\n" +
+							"comment=" + HttpUtility.HtmlEncode(datdata.Comment) + "\n" +
+							"[DAT]\n" +
+							"version=2.50\n" +
+							"split=" + (datdata.ForceMerging == ForceMerging.Split ? "1" : "0") + "\n" +
+							"merge=" + (datdata.ForceMerging == ForceMerging.Full ? "1" : "0") + "\n" +
+							"[EMULATOR]\n" +
+							"refname=" + HttpUtility.HtmlEncode(datdata.Name) + "\n" +
+							"version=" + HttpUtility.HtmlEncode(datdata.Description) + "\n" +
+							"[GAMES]\n";
+						break;
+					case OutputFormat.Xml:
+						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
+							"<datafile>\n" +
+							"\t<header>\n" +
+							"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
+							"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
+							"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
+							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
+							"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
+							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
+							(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
+							"\t</header>\n";
+						break;
+				}
 
 				// Write the header out
-				sw.Write((datdata.OutputFormat == OutputFormat.ClrMamePro ? header_old : header));
+				sw.Write(header);
 
 				// Write out each of the machines and roms
 				string lastgame = null;
@@ -243,34 +264,58 @@ namespace SabreTools.Helper
 						string state = "";
 						if (lastgame != null && lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
-							state += (datdata.OutputFormat == OutputFormat.ClrMamePro ? ")\n" : "\t</machine>\n");
+							switch (datdata.OutputFormat)
+							{
+								case OutputFormat.ClrMamePro:
+									state += ")\n";
+									break;
+								case OutputFormat.Xml:
+									state += "\t </ machine >\n";
+									break;
+							}
 						}
 
 						if (lastgame == null || lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
-							state += (datdata.OutputFormat == OutputFormat.ClrMamePro ? "game (\n\tname \"" + rom.Game + "\"\n" +
-								"\tdescription \"" + rom.Game + "\"\n" :
-								"\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
-								"\t\t<description>" + HttpUtility.HtmlEncode(rom.Game) + "</description>\n");
+							switch (datdata.OutputFormat)
+							{
+								case OutputFormat.ClrMamePro:
+									state += "game (\n\tname \"" + rom.Game + "\"\n" +
+										"\tdescription \"" + rom.Game + "\"\n";
+									break;
+								case OutputFormat.Xml:
+									state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
+										"\t\t<description>" + HttpUtility.HtmlEncode(rom.Game) + "</description>\n";
+									break;
+							}
 						}
 
-						if (datdata.OutputFormat == OutputFormat.ClrMamePro)
+						// Now output the rom data
+						switch (datdata.OutputFormat)
 						{
-							state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
-								(rom.Size != 0 ? " size " + rom.Size : "") +
-								(rom.CRC != "" ? " crc " + rom.CRC.ToLowerInvariant() : "") +
-								(rom.MD5 != "" ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
-								(rom.SHA1 != "" ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
-								" )\n";
-						}
-						else if (datdata.OutputFormat == OutputFormat.Xml)
-						{
-							state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
-								(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
-								(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
-								(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
-								(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
-								"/>\n";
+							case OutputFormat.ClrMamePro:
+								state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
+									(rom.Size != 0 ? " size " + rom.Size : "") +
+									(rom.CRC != "" ? " crc " + rom.CRC.ToLowerInvariant() : "") +
+									(rom.MD5 != "" ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
+									(rom.SHA1 != "" ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
+									" )\n";
+								break;
+							case OutputFormat.RomCenter:
+								state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Game) +
+									"¬" + HttpUtility.HtmlEncode(rom.Game) +
+									"¬" + HttpUtility.HtmlEncode(rom.Name) +
+									"¬" + rom.CRC.ToLowerInvariant() +
+									"¬" + (rom.Size != -1 ? rom.Size.ToString() : "") + "¬¬¬";
+								break;
+							case OutputFormat.Xml:
+								state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
+									(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
+									(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
+									(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
+									(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
+									"/>\n";
+								break;
 						}
 
 						lastgame = rom.Game;
@@ -279,7 +324,18 @@ namespace SabreTools.Helper
 					}
 				}
 
-				sw.Write((datdata.OutputFormat == OutputFormat.ClrMamePro ? ")" : "\t</machine>\n</datafile>"));
+				string footer = "";
+				switch (datdata.OutputFormat)
+				{
+					case OutputFormat.ClrMamePro:
+						footer = ")";
+						break;
+					case OutputFormat.Xml:
+						footer = "\t</machine>\n</datafile>";
+						break;
+				}
+
+				sw.Write(footer);
 				logger.User("File written!" + Environment.NewLine);
 				sw.Close();
 				fs.Close();
