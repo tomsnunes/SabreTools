@@ -376,22 +376,6 @@ namespace SabreTools.Helper
 		/// <returns>DatData object representing the read-in data</returns>
 		public static DatData ParseDict(string filename, int sysid, int srcid, DatData datdata, Logger logger)
 		{
-			Dictionary<string, List<RomData>> roms = ParseDict(filename, sysid, srcid, datdata.Roms, logger);
-			datdata.Roms = roms;
-			return datdata;
-		}
-
-		/// <summary>
-		/// Parse a DAT and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="dict">The dictionary to add found roms to</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
-		/// <returns>Dictionary with "size-crc" key and List of RomData objects value representing the found data</returns>
-		public static Dictionary<string, List<RomData>> ParseDict(string filename, int sysid, int srcid, Dictionary<string, List<RomData>> dict, Logger logger)
-		{
 			XmlTextReader xtr = GetXmlTextReader(filename, logger);
 			bool superdat = false, shouldbreak = false;
 			string parent = "";
@@ -415,14 +399,104 @@ namespace SabreTools.Helper
 							xtr.Read();
 							break;
 						case "header":
-							xtr.ReadToDescendant("name");
-							string content = xtr.ReadElementContentAsString();
-							superdat = (content != null ? content.Contains(" - SuperDAT") : false);
-							while (xtr.Name != "header")
+							// We want to process the entire subtree of the header
+							XmlReader headreader = xtr.ReadSubtree();
+
+							if (headreader != null)
 							{
-								xtr.Read();
+								while (headreader.Read())
+								{
+									// We only want elements
+										if (headreader.NodeType != XmlNodeType.Element)
+									{
+										continue;
+									}
+
+									// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
+									switch (xtr.Name)
+									{
+										case "name":
+											string readname = headreader.ReadElementContentAsString();
+											datdata.Name = (datdata.Name == "" ? readname : "");
+											superdat = superdat || readname.Contains(" - SuperDAT");
+											break;
+										case "description":
+											datdata.Description = (datdata.Description == "" ? headreader.ReadElementContentAsString() : datdata.Description);
+											break;
+										case "category":
+											datdata.Category = (datdata.Category == "" ? headreader.ReadElementContentAsString() : datdata.Category);
+											break;
+										case "version":
+											datdata.Version = (datdata.Version == "" ? headreader.ReadElementContentAsString() : datdata.Version);
+											break;
+										case "date":
+											datdata.Date = (datdata.Date == "" ? headreader.ReadElementContentAsString() : datdata.Date);
+											break;
+										case "author":
+											datdata.Author = (datdata.Author == "" ? headreader.ReadElementContentAsString() : datdata.Author);
+											break;
+										case "email":
+											datdata.Email = (datdata.Email == "" ? headreader.ReadElementContentAsString() : datdata.Email);
+											break;
+										case "homepage":
+											datdata.Homepage = (datdata.Homepage == "" ? headreader.ReadElementContentAsString() : datdata.Homepage);
+											break;
+										case "url":
+											datdata.Url = (datdata.Url == "" ? headreader.ReadElementContentAsString() : datdata.Url);
+											break;
+										case "comment":
+											datdata.Comment = (datdata.Comment == "" ? headreader.ReadElementContentAsString() : datdata.Comment);
+											break;
+										case "clrmamepro":
+											if (headreader.GetAttribute("forcemerging") != null)
+											{
+												switch (headreader.GetAttribute("forcemerging"))
+												{
+													case "split":
+														datdata.ForceMerging = ForceMerging.Split;
+														break;
+													case "none":
+														datdata.ForceMerging = ForceMerging.None;
+														break;
+													case "full":
+														datdata.ForceMerging = ForceMerging.Full;
+														break;
+												}
+											}
+											if (headreader.GetAttribute("forcenodump") != null)
+											{
+												switch (headreader.GetAttribute("forcenodump"))
+												{
+													case "obsolete":
+														datdata.ForceNodump = ForceNodump.Obsolete;
+														break;
+													case "required":
+														datdata.ForceNodump = ForceNodump.Required;
+														break;
+													case "ignore":
+														datdata.ForceNodump = ForceNodump.Ignore;
+														break;
+												}
+											}
+											if (headreader.GetAttribute("forcepacking") != null)
+											{
+												switch (headreader.GetAttribute("forcepacking"))
+												{
+													case "zip":
+														datdata.ForcePacking = ForcePacking.Zip;
+														break;
+													case "unzip":
+														datdata.ForcePacking = ForcePacking.Unzip;
+														break;
+												}
+											}
+											break;
+									}
+								}
 							}
-							xtr.Read();
+
+							// Skip the header node now that we've processed it
+							xtr.Skip();
 							break;
 						case "machine":
 						case "game":
@@ -491,11 +565,11 @@ namespace SabreTools.Helper
 											// If the rom is continue or ignore, add the size to the previous rom
 											if (xtr.GetAttribute("loadflag") == "continue" || xtr.GetAttribute("loadflag") == "ignore")
 											{
-												int index = dict[key].Count() - 1;
-												RomData lastrom = dict[key][index];
+												int index = datdata.Roms[key].Count() - 1;
+												RomData lastrom = datdata.Roms[key][index];
 												lastrom.Size += size;
-												dict[key].RemoveAt(index);
-												dict[key].Add(lastrom);
+												datdata.Roms[key].RemoveAt(index);
+												datdata.Roms[key].Add(lastrom);
 												continue;
 											}
 
@@ -548,15 +622,15 @@ namespace SabreTools.Helper
 													System = filename,
 												};
 
-												if (dict.ContainsKey(key))
+												if (datdata.Roms.ContainsKey(key))
 												{
-													dict[key].Add(value);
+													datdata.Roms[key].Add(value);
 												}
 												else
 												{
 													List<RomData> newvalue = new List<RomData>();
 													newvalue.Add(value);
-													dict.Add(key, newvalue);
+													datdata.Roms.Add(key, newvalue);
 												}
 											}
 											break;
@@ -583,7 +657,7 @@ namespace SabreTools.Helper
 				}
 			}
 
-			return dict;
+			return datdata;
 		}
 
 		/// <summary>
