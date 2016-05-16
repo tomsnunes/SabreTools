@@ -10,14 +10,7 @@ namespace SabreTools.Helper
 	/// Provide DAT conversion functionality
 	/// 
 	/// The following features have been requested:
-	/// - Implement converting from/to DOSCenter format
-	/// - Implement converting to RomCenter format
-	/// 
-	/// Internal notes:
-	/// - Can the XMLToDATFORMAT functions be replaced by Output.WriteToDatFromDict?
-	/// - ParseDict should then return a DatData with the current DAT information as well as the parsed roms
-	/// - This in turn would make converting a lot easier since all we have to do is know how to read from every
-	///		DAT type and write in every DAT type without needing a middle ground
+	/// - Implement converting from DOSCenter format
 	/// </summary>
 	public class Converters
 	{
@@ -315,129 +308,6 @@ namespace SabreTools.Helper
 			}
 
 			return elem;
-		}
-
-		/// <summary>
-		/// Convert an XML derived DAT to a ClrMamePro style DAT
-		/// </summary>
-		/// <param name="root">XElement representing the file</param>
-		/// <returns>String representing the output ClrMamePro DAT file</returns>
-		public static String XMLToClrMamePro(XmlDocument root)
-		{
-			string output = "";
-
-			// Experimental looping using only XML parsing
-			XmlNode node = root.FirstChild;
-			if (node != null && node.Name == "xml")
-			{
-				// Skip over everything that's not an element
-				while (node.NodeType != XmlNodeType.Element)
-				{
-					node = node.NextSibling;
-				}
-			}
-
-			// Once we find the main body, enter it
-			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
-			{
-				node = node.FirstChild;
-			}
-
-			// Read the header if it exists
-			if (node != null && node.Name == "header")
-			{
-				output += "clrmamepro (";
-
-				XmlNode child = node.FirstChild;
-				while (child != null)
-				{
-					output += "\n\t" + child.Name + " \"" + child.InnerText + "\"";
-					child = child.NextSibling;
-				}
-				output += "\n)";
-
-				// Skip over anything that's not an element
-				while (node.NodeType != XmlNodeType.Element)
-				{
-					node = node.NextSibling;
-				}
-			}
-
-			while (node != null)
-			{
-				if (node.NodeType == XmlNodeType.Element && (node.Name == "machine" || node.Name == "game" || node.Name == "software"))
-				{
-					// There are rare cases where a malformed XML will not have the required attributes. We can only skip them.
-					if (node.Attributes.Count == 0)
-					{
-						node = node.NextSibling;
-						continue;
-					}
-
-					output += "\ngame (\n\tname \"" + node.Attributes["name"].Value;
-
-					// Get the roms from the machine
-					if (node.HasChildNodes)
-					{
-						// If this node has children, traverse the children
-						foreach (XmlNode child in node.ChildNodes)
-						{
-							// If we find a rom or disk, add it
-							if (node.NodeType == XmlNodeType.Element && (child.Name == "rom" || child.Name == "disk"))
-							{
-								output += "\n\t" + child.Name + " ( name \"" + child.Attributes["name"].Value + "\"" +
-									(child.Attributes["size"] != null ? " size " + Int32.Parse(child.Attributes["size"].Value) : "") +
-									(child.Attributes["crc"] != null ? " crc " + child.Attributes["crc"].Value.ToLowerInvariant().Trim() : "") +
-									(child.Attributes["md5"] != null ? " md5 " + child.Attributes["md5"].Value.ToLowerInvariant().Trim() : "") +
-									(child.Attributes["sha1"] != null ? " sha1 " + child.Attributes["sha1"].Value.ToLowerInvariant().Trim() : "") + " )";
-							}
-							// If we find the signs of a software list, traverse the children
-							else if (child.NodeType == XmlNodeType.Element && child.Name == "part" && child.HasChildNodes)
-							{
-								foreach (XmlNode part in child.ChildNodes)
-								{
-									// If we find a dataarea, traverse the children
-									if (part.NodeType == XmlNodeType.Element && part.Name == "dataarea")
-									{
-										foreach (XmlNode data in part.ChildNodes)
-										{
-											// If we find a rom or disk, add it
-											if (data.NodeType == XmlNodeType.Element && (data.Name == "rom" || data.Name == "disk") && data.Attributes["name"] != null)
-											{
-												output += "\n\t" + data.Name + " ( name \"" + data.Attributes["name"].Value +
-													(data.Attributes["size"] != null ? " size " + Int32.Parse(data.Attributes["size"].Value) : "") +
-													(data.Attributes["crc"] != null ? " crc " + data.Attributes["crc"].Value.ToLowerInvariant().Trim() : "") +
-													(data.Attributes["md5"] != null ? " md5 " + data.Attributes["md5"].Value.ToLowerInvariant().Trim() : "") +
-													(data.Attributes["sha1"] != null ? " sha1 " + data.Attributes["sha1"].Value.ToLowerInvariant().Trim() : "") + " )";
-											}
-										}
-									}
-								}
-							}
-							else
-							{
-								output += "\n\t" + child.Name + " \"" + child.InnerText + "\"";
-							}
-						}
-					}
-					output += "\n)";
-				}
-				node = node.NextSibling;
-			}
-
-			return output;
-		}
-
-		/// <summary>
-		/// Convert an XML derived DAT to a RomCenter style DAT
-		/// </summary>
-		/// <param name="root">XElement representing the file</param>
-		/// <returns>String representing the output RomCenter DAT file</returns>
-		public static String XMLToRomCenter(XmlDocument root)
-		{
-			string output = "";
-
-			return output;
 		}
 	}
 }

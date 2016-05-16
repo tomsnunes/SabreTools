@@ -1251,22 +1251,29 @@ Make a selection:
 			if (File.Exists(filename))
 			{
 				logger.User("Converting " + filename);
-				XmlDocument doc = new XmlDocument();
-				try
+				DatData datdata = new DatData
 				{
-					doc.LoadXml(File.ReadAllText(filename));
-					string conv = Converters.XMLToClrMamePro(doc);
-					FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(filename) + ".new.dat");
-					StreamWriter sw = new StreamWriter(fs);
-					sw.Write(conv);
-					sw.Close();
-					fs.Close();
-					logger.User("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.dat");
-				}
-				catch (XmlException)
-				{
-					logger.Warning("The file " + filename + " could not be parsed as an XML file");
-				}
+					Name = "",
+					Description = "",
+					Category = "",
+					Version = "",
+					Date = "",
+					Author = "",
+					Email = "",
+					Homepage = "",
+					Url = "",
+					Comment = "",
+					OutputFormat = OutputFormat.ClrMamePro,
+					Roms = new Dictionary<string, List<RomData>>(),
+					MergeRoms = false,
+				};
+
+				datdata = RomManipulation.ParseDict(filename, 0, 0, datdata, logger);
+
+				logger.User("datdata.Description: " + datdata.Description);
+
+				datdata.Description += ".new";
+				Output.WriteToDatFromDict(datdata, Path.GetDirectoryName(filename), logger);
 			}
 			else
 			{
@@ -1284,19 +1291,33 @@ Make a selection:
 			if (File.Exists(filename))
 			{
 				logger.User("Converting " + filename);
-				XElement conv = Converters.ClrMameProToXML(File.ReadAllLines(filename));
-				FileStream fs = File.OpenWrite(Path.GetFileNameWithoutExtension(filename) + ".new.xml");
-				StreamWriter sw = new StreamWriter(fs);
-				sw.Write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-					"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n");
-				sw.Write(conv);
-				sw.Close();
-				fs.Close();
-				logger.User("Converted file: " + Path.GetFileNameWithoutExtension(filename) + ".new.xml");
+				DatData datdata = new DatData
+				{
+					Name = "",
+					Description = "",
+					Category = "",
+					Version = "",
+					Date = "",
+					Author = "",
+					Email = "",
+					Homepage = "",
+					Url = "",
+					Comment = "",
+					OutputFormat = OutputFormat.Xml,
+					Roms = new Dictionary<string, List<RomData>>(),
+					MergeRoms = false,
+				};
+
+				datdata = RomManipulation.ParseDict(filename, 0, 0, datdata, logger);
+
+				logger.User("datdata.Description: " + datdata.Description);
+
+				datdata.Description += ".new";
+				Output.WriteToDatFromDict(datdata, Path.GetDirectoryName(filename), logger);
 			}
 			else
 			{
-				logger.Error("I'm sorry but " + filename + "doesn't exist!");
+				logger.Error("I'm sorry but " + filename + " doesn't exist!");
 			}
 			return;
 		}

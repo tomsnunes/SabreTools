@@ -404,48 +404,59 @@ namespace SabreTools.Helper
 
 							if (headreader != null)
 							{
-								while (headreader.Read())
+								while (!headreader.EOF)
 								{
 									// We only want elements
-										if (headreader.NodeType != XmlNodeType.Element)
+									if (headreader.NodeType != XmlNodeType.Element || headreader.Name == "header")
 									{
+										headreader.Read();
 										continue;
 									}
 
 									// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
-									switch (xtr.Name)
+									string content = "";
+									switch (headreader.Name)
 									{
 										case "name":
-											string readname = headreader.ReadElementContentAsString();
+											string readname = headreader.ReadElementContentAsString(); ;
 											datdata.Name = (datdata.Name == "" ? readname : "");
 											superdat = superdat || readname.Contains(" - SuperDAT");
 											break;
 										case "description":
-											datdata.Description = (datdata.Description == "" ? headreader.ReadElementContentAsString() : datdata.Description);
+											content = headreader.ReadElementContentAsString();
+											datdata.Description = (datdata.Description == "" ? content : datdata.Description);
 											break;
 										case "category":
-											datdata.Category = (datdata.Category == "" ? headreader.ReadElementContentAsString() : datdata.Category);
+											content = headreader.ReadElementContentAsString();
+											datdata.Category = (datdata.Category == "" ? content : datdata.Category);
 											break;
 										case "version":
-											datdata.Version = (datdata.Version == "" ? headreader.ReadElementContentAsString() : datdata.Version);
+											content = headreader.ReadElementContentAsString();
+											datdata.Version = (datdata.Version == "" ? content : datdata.Version);
 											break;
 										case "date":
-											datdata.Date = (datdata.Date == "" ? headreader.ReadElementContentAsString() : datdata.Date);
+											content = headreader.ReadElementContentAsString();
+											datdata.Date = (datdata.Date == "" ? content : datdata.Date);
 											break;
 										case "author":
-											datdata.Author = (datdata.Author == "" ? headreader.ReadElementContentAsString() : datdata.Author);
+											content = headreader.ReadElementContentAsString();
+											datdata.Author = (datdata.Author == "" ? content : datdata.Author);
 											break;
 										case "email":
-											datdata.Email = (datdata.Email == "" ? headreader.ReadElementContentAsString() : datdata.Email);
+											content = headreader.ReadElementContentAsString();
+											datdata.Email = (datdata.Email == "" ? content : datdata.Email);
 											break;
 										case "homepage":
-											datdata.Homepage = (datdata.Homepage == "" ? headreader.ReadElementContentAsString() : datdata.Homepage);
+											content = headreader.ReadElementContentAsString();
+											datdata.Homepage = (datdata.Homepage == "" ? content : datdata.Homepage);
 											break;
 										case "url":
-											datdata.Url = (datdata.Url == "" ? headreader.ReadElementContentAsString() : datdata.Url);
+											content = headreader.ReadElementContentAsString();
+											datdata.Url = (datdata.Url == "" ? content : datdata.Url);
 											break;
 										case "comment":
-											datdata.Comment = (datdata.Comment == "" ? headreader.ReadElementContentAsString() : datdata.Comment);
+											content = headreader.ReadElementContentAsString();
+											datdata.Comment = (datdata.Comment == "" ? content : datdata.Comment);
 											break;
 										case "clrmamepro":
 											if (headreader.GetAttribute("forcemerging") != null)
@@ -490,6 +501,7 @@ namespace SabreTools.Helper
 														break;
 												}
 											}
+											headreader.Read();
 											break;
 									}
 								}

@@ -87,7 +87,7 @@ Options:
 	-system=			System name (system only)
 	-source=			Source name (source only)
 	-url=			URL (source only)
-  -cc, --convert-cmp	Convert an XML DAT to CMP
+  -cc, --convert-cmp	Convert any DAT to CMP
 	-out=			Output directory
   -cm, --convert-miss	Convert from DAT to miss
 	-r, --roms		Output roms to miss instead of sets
@@ -97,7 +97,7 @@ Options:
 	-q, --quotes		Put double-quotes around each item
 	-ae=, --add-ext=	Add an extension to each item
 	-re=, --rep-ext=	Replace all extensions with specified
-  -cx, --convert-xml	Convert a CMP DAT to XML
+  -cx, --convert-xml	Convert any DAT to XML
 	-out=			Output directory
   -es, --ext-split		Split a DAT by two file extensions
 	-exta=			First extension to split by

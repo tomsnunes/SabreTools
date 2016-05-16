@@ -268,7 +268,7 @@ namespace SabreTools.Helper
 									state += ")\n";
 									break;
 								case OutputFormat.Xml:
-									state += "\t </ machine >\n";
+									state += "\t</machine>\n";
 									break;
 							}
 						}
