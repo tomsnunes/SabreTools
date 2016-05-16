@@ -1,4 +1,6 @@
-﻿namespace SabreTools.Helper
+﻿using System.Collections.Generic;
+
+namespace SabreTools.Helper
 {
 	/// <summary>
 	/// Intermediate struct for holding and processing rom data
@@ -41,5 +43,7 @@
 		public ForceNodump ForceNodump;
 		public ForcePacking ForcePacking;
 		public OutputFormat OutputFormat;
+		public bool MergeRoms;
+		public Dictionary<string, List<RomData>> Roms;
 	}
 }

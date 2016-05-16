@@ -12,6 +12,12 @@ namespace SabreTools.Helper
 	/// The following features have been requested:
 	/// - Implement converting from/to DOSCenter format
 	/// - Implement converting to RomCenter format
+	/// 
+	/// Internal notes:
+	/// - Can the XMLToDATFORMAT functions be replaced by Output.WriteToDatFromDict?
+	/// - ParseDict should then return a DatData with the current DAT information as well as the parsed roms
+	/// - This in turn would make converting a lot easier since all we have to do is know how to read from every
+	///		DAT type and write in every DAT type without needing a middle ground
 	/// </summary>
 	public class Converters
 	{
