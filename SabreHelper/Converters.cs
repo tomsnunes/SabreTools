@@ -268,23 +268,23 @@ namespace SabreTools.Helper
 					{
 						/*
 						The rominfo order is as follows:
-						0 - parent name
-						1 - parent description
-						2 - game name
-						3 - game description
-						4 - rom name
-						5 - rom crc
-						6 - rom size
-						7 - romof name
-						8 - merge name
+						1 - parent name
+						2 - parent description
+						3 - game name
+						4 - game description
+						5 - rom name
+						6 - rom crc
+						7 - rom size
+						8 - romof name
+						9 - merge name
 						*/
 						string[] rominfo = line.Split('¬');
 						RomData rom = new RomData
 						{
-							Game = rominfo[2],
-							Name = rominfo[4],
-							CRC = rominfo[5],
-							Size = Int64.Parse(rominfo[6]),
+							Game = rominfo[3],
+							Name = rominfo[5],
+							CRC = rominfo[6],
+							Size = Int64.Parse(rominfo[7]),
 						};
 
 						if (lastgame != rom.Game)
@@ -307,7 +307,7 @@ namespace SabreTools.Helper
 				}
 			}
 
-			return elem;
+			return elem.Parent;
 		}
 	}
 }
