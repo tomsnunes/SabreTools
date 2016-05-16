@@ -11,7 +11,7 @@ namespace SabreTools.Helper
 	/// 
 	/// The following features have been requested:
 	/// - Implement converting from/to DOSCenter format
-	/// - Implement converting from/to RomCenter format
+	/// - Implement converting to RomCenter format
 	/// </summary>
 	public class Converters
 	{
@@ -25,7 +25,7 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="filecontents">Array of strings representing the input file</param>
 		/// <returns>XElement representing the output XML DAT file</returns>
-		public static XElement ClrMameProToXML (string[] filecontents)
+		public static XElement ClrMameProToXML(string[] filecontents)
 		{
 			XElement elem = new XElement("datafile");
 
@@ -55,7 +55,7 @@ namespace SabreTools.Helper
 						elem.Add(new XElement(gc[1].Value));
 						elem = elem.Elements(gc[1].Value).Last();
 					}
-					
+
 					block = true;
 				}
 
@@ -379,7 +379,7 @@ namespace SabreTools.Helper
 							// If we find a rom or disk, add it
 							if (node.NodeType == XmlNodeType.Element && (child.Name == "rom" || child.Name == "disk"))
 							{
-								output += "\n\t" + child.Name + " ( name \"" + child.Attributes["name"].Value + "\"" + 
+								output += "\n\t" + child.Name + " ( name \"" + child.Attributes["name"].Value + "\"" +
 									(child.Attributes["size"] != null ? " size " + Int32.Parse(child.Attributes["size"].Value) : "") +
 									(child.Attributes["crc"] != null ? " crc " + child.Attributes["crc"].Value.ToLowerInvariant().Trim() : "") +
 									(child.Attributes["md5"] != null ? " md5 " + child.Attributes["md5"].Value.ToLowerInvariant().Trim() : "") +
@@ -418,6 +418,18 @@ namespace SabreTools.Helper
 				}
 				node = node.NextSibling;
 			}
+
+			return output;
+		}
+
+		/// <summary>
+		/// Convert an XML derived DAT to a RomCenter style DAT
+		/// </summary>
+		/// <param name="root">XElement representing the file</param>
+		/// <returns>String representing the output RomCenter DAT file</returns>
+		public static String XMLToRomCenter(XmlDocument root)
+		{
+			string output = "";
 
 			return output;
 		}
