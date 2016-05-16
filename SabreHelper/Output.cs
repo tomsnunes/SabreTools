@@ -304,7 +304,7 @@ namespace SabreTools.Helper
 									"¬" + HttpUtility.HtmlEncode(rom.Game) +
 									"¬" + HttpUtility.HtmlEncode(rom.Name) +
 									"¬" + rom.CRC.ToLowerInvariant() +
-									"¬" + (rom.Size != -1 ? rom.Size.ToString() : "") + "¬¬¬";
+									"¬" + (rom.Size != -1 ? rom.Size.ToString() : "") + "¬¬¬\n";
 								break;
 							case OutputFormat.Xml:
 								state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +

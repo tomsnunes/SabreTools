@@ -97,6 +97,8 @@ Options:
 	-q, --quotes		Put double-quotes around each item
 	-ae=, --add-ext=	Add an extension to each item
 	-re=, --rep-ext=	Replace all extensions with specified
+  -cr, --convert-rc	Convert any DAT to RomCenter
+	-out=			Output directory
   -cx, --convert-xml	Convert any DAT to XML
 	-out=			Output directory
   -es, --ext-split		Split a DAT by two file extensions

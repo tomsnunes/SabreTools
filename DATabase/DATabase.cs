@@ -55,6 +55,7 @@ namespace SabreTools
 				bare = false,
 				convertMiss = false,
 				convertCMP = false,
+				convertRC = false,
 				convertXml = false,
 				dedup = false,
 				diff = false,
@@ -119,6 +120,10 @@ namespace SabreTools
 					case "-cm":
 					case "--convert-miss":
 						convertMiss = true;
+						break;
+					case "-cr":
+					case "--convert-rc":
+						convertRC = true;
 						break;
 					case "-cx":
 					case "--convert-xml":
@@ -295,7 +300,8 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(add ^ convertMiss ^ convertCMP ^ convertXml ^ extsplit ^ generate ^ genall ^ import ^ listsrc ^ listsys ^ (merge || diff) ^ rem ^ trim))
+			if (help || !(add ^ convertMiss ^ convertCMP ^ convertRC ^ convertXml ^ extsplit ^ generate ^ genall ^
+				import ^ listsrc ^ listsys ^ (merge || diff) ^ rem ^ trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -303,7 +309,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (convertMiss || convertCMP || convertXml || extsplit || import || (merge || diff) || trim))
+			if (inputs.Count == 0 && (convertMiss || convertCMP || convertRC || convertXml || extsplit || import || (merge || diff) || trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -354,7 +360,7 @@ namespace SabreTools
 				}
 			}
 
-			// Convert XML DAT to CMP DAT
+			// Convert any DAT to CMP DAT
 			else if (convertCMP)
 			{
 				foreach (string input in inputs)
@@ -363,7 +369,16 @@ namespace SabreTools
 				}
 			}
 
-			// Convert CMP DAT to XML DAT
+			// Convert any DAT to RC DAT
+			else if (convertRC)
+			{
+				foreach (string input in inputs)
+				{
+					InitConvertRC(input);
+				}
+			}
+
+			// Convert any DAT to XML DAT
 			else if (convertXml)
 			{
 				foreach (string input in inputs)
@@ -626,12 +641,13 @@ Make a selection:
 ===========================
 Make a selection:
 
-    1) Convert XML DAT to CMP
-    2) Convert CMP DAT to XML
-    3) Convert DAT to missfile
-    4) Trim all entries in DAT and merge into a single game
-    5) Merge, diff, and/or dedup 2 or more DAT files
-    6) Split DAT using 2 extensions
+    1) Convert DAT to ClrMamePro
+    2) Convert DAT to RomCenter
+    3) Convert DAT to XML
+    4) Convert DAT to missfile
+    5) Trim all entries in DAT and merge into a single game
+    6) Merge, diff, and/or dedup 2 or more DAT files
+    7) Split DAT using 2 extensions
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -642,18 +658,21 @@ Make a selection:
 						ConvertCMPMenu();
 						break;
 					case "2":
-						ConvertXMLMenu();
+						ConvertRCMenu();
 						break;
 					case "3":
-						ConvertMissMenu();
+						ConvertXMLMenu();
 						break;
 					case "4":
-						TrimMergeMenu();
+						ConvertMissMenu();
 						break;
 					case "5":
-						MergeDiffMenu();
+						TrimMergeMenu();
 						break;
 					case "6":
+						MergeDiffMenu();
+						break;
+					case "7":
 						ExtSplitMenu();
 						break;
 				}
@@ -661,7 +680,7 @@ Make a selection:
 		}
 
 		/// <summary>
-		/// Show the text-based XML to CMP conversion menu
+		/// Show the text-based any to CMP conversion menu
 		/// </summary>
 		private static void ConvertCMPMenu()
 		{
@@ -670,9 +689,9 @@ Make a selection:
 			{
 				Console.Clear();
 				Build.Start("DATabase");
-				Console.WriteLine(@"XML -> CMP CONVERT MENU
+				Console.WriteLine(@"ANY -> CMP CONVERT MENU
 ===========================
-Enter the name of a DAT file to convert from XML to CMP
+Enter the name of a DAT file to convert to CMP
 or 'b' to go back to the previous menu:
 ");
 				selection = Console.ReadLine();
@@ -680,6 +699,33 @@ or 'b' to go back to the previous menu:
 				{
 					Console.Clear();
 					InitConvertCMP(selection);
+					Console.Write("\nPress any key to continue...");
+					Console.ReadKey();
+				}
+			}
+			return;
+		}
+
+		/// <summary>
+		/// Show the text-based any to RomCenter conversion menu
+		/// </summary>
+		private static void ConvertRCMenu()
+		{
+			string selection = "";
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"ANY -> RC CONVERT MENU
+===========================
+Enter the name of a DAT file to convert to RomCenter
+or 'b' to go back to the previous menu:
+");
+				selection = Console.ReadLine();
+				if (selection.ToLowerInvariant() != "b")
+				{
+					Console.Clear();
+					InitConvertRC(selection);
 					Console.Write("\nPress any key to continue...");
 					Console.ReadKey();
 				}
@@ -697,9 +743,9 @@ or 'b' to go back to the previous menu:
 			{
 				Console.Clear();
 				Build.Start("DATabase");
-				Console.WriteLine(@"CMP -> XML CONVERT MENU
+				Console.WriteLine(@"ANY -> XML CONVERT MENU
 ===========================
-Enter the name of a DAT file to convert from CMP to XML
+Enter the name of a DAT file to convert to XML
 or 'b' to go back to the previous menu:
 ");
 				selection = Console.ReadLine();
@@ -1243,7 +1289,7 @@ Make a selection:
 		}
 
 		/// <summary>
-		/// Wrap converting DAT file from XML to ClrMamePro
+		/// Wrap converting DAT file from any format to ClrMamePro
 		/// </summary>
 		/// <param name="filename"></param>
 		private static void InitConvertCMP(string filename)
@@ -1283,7 +1329,47 @@ Make a selection:
 		}
 
 		/// <summary>
-		/// Wrap converting DAT file from ClrMamePro to XML
+		/// Wrap converting DAT file from any format to RomCenter
+		/// </summary>
+		/// <param name="filename"></param>
+		private static void InitConvertRC(string filename)
+		{
+			if (File.Exists(filename))
+			{
+				logger.User("Converting " + filename);
+				DatData datdata = new DatData
+				{
+					Name = "",
+					Description = "",
+					Category = "",
+					Version = "",
+					Date = "",
+					Author = "",
+					Email = "",
+					Homepage = "",
+					Url = "",
+					Comment = "",
+					OutputFormat = OutputFormat.RomCenter,
+					Roms = new Dictionary<string, List<RomData>>(),
+					MergeRoms = false,
+				};
+
+				datdata = RomManipulation.ParseDict(filename, 0, 0, datdata, logger);
+
+				logger.User("datdata.Description: " + datdata.Description);
+
+				datdata.Description += ".new";
+				Output.WriteToDatFromDict(datdata, Path.GetDirectoryName(filename), logger);
+			}
+			else
+			{
+				logger.Error("I'm sorry but " + filename + " doesn't exist!");
+			}
+			return;
+		}
+
+		/// <summary>
+		/// Wrap converting DAT file from any format to XML
 		/// </summary>
 		/// <param name="filename"></param>
 		private static void InitConvertXML(string filename)

@@ -20,7 +20,7 @@ namespace SabreTools.Helper
 		/// Return if the file is XML or not
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
-		/// <returns>public static bool IsXmlDat(string filename)
+		/// <returns>True if the DAT is probably XML, false otherwise</returns>
 		public static bool IsXmlDat(string filename)
 		{
 			try
@@ -29,6 +29,26 @@ namespace SabreTools.Helper
 				string first = sr.ReadLine();
 				sr.Close();
 				return first.Contains("<") && first.Contains(">");
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Return if the file is RomCenter or not
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <returns>True if the DAT is probably XML, false otherwise</returns>
+		public static bool IsRCDat(string filename)
+		{
+			try
+			{
+				StreamReader sr = new StreamReader(File.OpenRead(filename));
+				string first = sr.ReadLine();
+				sr.Close();
+				return first.Contains("[") && first.Contains("]");
 			}
 			catch (Exception)
 			{
@@ -112,9 +132,18 @@ namespace SabreTools.Helper
 				xtr.DtdProcessing = DtdProcessing.Ignore;
 				return xtr;
 			}
+			else if (IsRCDat(filename))
+			{
+				logger.Log("RomCenter DAT detected");
+				StringReader sr = new StringReader(Converters.RomCenterToXML(File.ReadAllLines(filename)).ToString());
+				XmlTextReader xtr = new XmlTextReader(sr);
+				xtr.WhitespaceHandling = WhitespaceHandling.None;
+				xtr.DtdProcessing = DtdProcessing.Ignore;
+				return xtr;
+			}
 			else
 			{
-				logger.Log("Non-XML DAT detected");
+				logger.Log("ClrMamePro DAT detected");
 				StringReader sr = new StringReader(Converters.ClrMameProToXML(File.ReadAllLines(filename)).ToString());
 				XmlTextReader xtr = new XmlTextReader(sr);
 				xtr.WhitespaceHandling = WhitespaceHandling.None;
