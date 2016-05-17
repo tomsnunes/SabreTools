@@ -399,33 +399,66 @@ namespace SabreTools
 			}
 
 			// Get all roms that are found in the DAT to see what needs to be added
-			List<RomData> roms = RomManipulation.Parse(_filepath, sysid, srcid, _logger);
-
-			// Sort and loop over all roms, checking for adds
-			RomManipulation.Sort(roms, true);
-			string lastgame = "";
-			long gameid = -1;
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			DatData datdata = new DatData
 			{
-				dbc.Open();
-				foreach (RomData rom in roms)
+				Roms = new Dictionary<string, List<RomData>>(),
+			};
+			datdata = RomManipulation.Parse(_filepath, sysid, srcid, datdata, _logger);
+
+			// Sort inputted roms into games
+			SortedDictionary<string, List<RomData>> sortable = new SortedDictionary<string, List<RomData>>();
+			long count = 0;
+			foreach (List<RomData> roms in datdata.Roms.Values)
+			{
+				List<RomData> newroms = roms;
+				if (datdata.MergeRoms)
 				{
-					// BEGIN COMMENT
-					// If we have a new game, check for a new ID
-					if (rom.Game != lastgame)
+					newroms = RomManipulation.Merge(newroms);
+				}
+
+				foreach (RomData rom in newroms)
+				{
+					count++;
+					string key = rom.SystemID.ToString().PadLeft(10, '0') + "-" + rom.SourceID.ToString().PadLeft(10, '0') + "-" + rom.Game.ToLowerInvariant();
+					if (sortable.ContainsKey(key))
 					{
-						gameid = AddGame(sysid, rom.Game, srcid, dbc);
-						lastgame = rom.Game;
+						sortable[key].Add(rom);
 					}
+					else
+					{
+						List<RomData> temp = new List<RomData>();
+						temp.Add(rom);
+						sortable.Add(key, temp);
+					}
+				}
+			}
 
-					// Try to add the rom with the game information
-					AddRom(rom, gameid, date, dbc);
-					// END COMMENT
+			// Loop over all roms, checking for adds
+			foreach (string key in sortable.Keys)
+			{
+				List<RomData> roms = sortable[key];
+				RomManipulation.Sort(roms, true);
 
-					/*
-					// Try to add the romdata
-					AddHash(rom, sysid, srcid, date, dbc);
-					*/
+				long gameid = -1;
+				using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+				{
+					dbc.Open();
+
+					// For each game, check for a new ID
+					gameid = AddGame(sysid, roms[0].Game, srcid, dbc);
+
+					foreach (RomData rom in roms)
+					{
+						// BEGIN COMMENT
+						// Try to add the rom with the game information
+						AddRom(rom, gameid, date, dbc);
+						// END COMMENT
+
+						/*
+						// Try to add the romdata
+						AddHash(rom, sysid, srcid, date, dbc);
+						*/
+					}
 				}
 			}
 

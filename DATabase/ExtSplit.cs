@@ -73,7 +73,7 @@ namespace SabreTools
 			};
 
 			// Load the current DAT to be processed
-			datdata = RomManipulation.ParseDict(_filename, 0, 0, datdata, _logger);
+			datdata = RomManipulation.Parse(_filename, 0, 0, datdata, _logger);
 
 			// Set all of the appropriate outputs for each of the subsets
 			OutputFormat outputFormat = RomManipulation.GetOutputFormat(_filename);
@@ -172,8 +172,8 @@ namespace SabreTools
 			}
 
 			// Then write out both files
-			bool success = Output.WriteToDatFromDict(datdataA, _outdir, _logger);
-			success &= Output.WriteToDatFromDict(datdataB, _outdir, _logger);
+			bool success = Output.WriteDatfile(datdataA, _outdir, _logger);
+			success &= Output.WriteDatfile(datdataB, _outdir, _logger);
 
 			return success;
 		}

@@ -38,7 +38,7 @@ namespace SabreTools
 				{
 					Roms = new Dictionary<string, List<RomData>>(),
 				};
-				datdata = RomManipulation.ParseDict(filename, 0, 0, datdata, logger);
+				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger);
 				foreach (List<RomData> romlist in datdata.Roms.Values)
 				{
 					foreach (RomData rom in romlist)

@@ -155,10 +155,10 @@ namespace SabreTools
 			}
 
 			// Retrieve the list of processed roms
-			List<RomData> roms = ProcessRoms();
+			Dictionary<string, List<RomData>> dict = ProcessRoms();
 
 			// If the output is null, nothing was found so return false
-			if (roms == null)
+			if (dict.Count == 0)
 			{
 				return false;
 			}
@@ -168,16 +168,29 @@ namespace SabreTools
 			string intname = systemname + " (" + sourcename + ")";
 			string datname = systemname + " (" + sourcename + " " + version + ")";
 
-			return Output.WriteToDat(intname, datname, version, version, "The Wizard of DATz", "The Wizard of DATz", false, _old, _outdir, roms, _logger);
+			DatData datdata = new DatData
+			{
+				Name = intname,
+				Description = datname,
+				Version = version,
+				Date = version,
+				Category = "The Wizard of DATz",
+				Author = "The Wizard of DATz",
+				ForcePacking = ForcePacking.None,
+				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				Roms = dict,
+			};
+
+			return Output.WriteDatfile(datdata, _outdir, _logger);
 		}
 
 		/// <summary>
 		/// Preprocess the rom data that is to be included in the outputted DAT
 		/// </summary>
 		/// <returns>A List of RomData objects containing all information about the files</returns>
-		public List<RomData> ProcessRoms()
+		public Dictionary<string, List<RomData>> ProcessRoms()
 		{
-			List<RomData> roms = new List<RomData>();
+			Dictionary<string, List<RomData>> roms = new Dictionary<string, List<RomData>>();
 
 			// Check if we have listed sources or systems
 			bool sysmerged = (_systems == "" || _systems.Split(',').Length > 1);
@@ -250,7 +263,17 @@ JOIN checksums
 									(srcmerged ? " [" + temp.Source + "]" : "");
 							}
 
-							roms.Add(temp);
+							string key = temp.Size + "-" + temp.CRC;
+							if (roms.ContainsKey(key))
+							{
+								roms[key].Add(temp);
+							}
+							else
+							{
+								List<RomData> templist = new List<RomData>();
+								templist.Add(temp);
+								roms.Add(key, templist);
+							}
 						}
 					}
 				}
@@ -259,8 +282,10 @@ JOIN checksums
 			// If we're in a merged mode, merge and then resort by the correct parameters
 			if (merged)
 			{
-				roms = RomManipulation.Merge(roms, true);
-				RomManipulation.Sort(roms, _norename);
+				foreach (string key in roms.Keys)
+				{
+					roms[key] = RomManipulation.Merge(roms[key]);
+				}
 			}
 			// END COMMENT
 
@@ -338,7 +363,17 @@ JOIN source
 										(srcmerged ? " [" + temp.Source + "]" : "");
 								}
 
-								roms.Add(temp);
+								string key = temp.Size + "-" + temp.CRC;
+								if (roms.ContainsKey(key))
+								{
+									roms[key].Add(temp);
+								}
+								else
+								{
+									List<RomData> templist = new List<RomData>();
+									templist.Add(temp);
+									roms.Add(key, templist);
+								}
 
 								// Reset the variables
 								game = "";
@@ -380,12 +415,15 @@ JOIN source
 			// If we're in a merged mode, merge
 			if (merged)
 			{
-				roms = RomManipulation.Merge(roms);
+				foreach (string key in roms.Keys)
+				{
+					roms[key] = RomManipulation.Merge(roms[key]);
+				}
 			}
-
-			// Now sort the roms by the correct parameters
-			RomManipulation.Sort(roms, _norename);
 			*/
+
+			/*
+			// THIS CODE SHOULD BE PUT IN WriteToDatFromDict
 
 			// Now check rename within games
 			string lastname = "", lastgame = "";
@@ -420,6 +458,7 @@ JOIN source
 				// Assign back just in case
 				roms[i] = rom;
 			}
+			*/
 
 			return roms;
 		}

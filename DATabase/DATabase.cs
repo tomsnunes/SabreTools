@@ -1314,12 +1314,12 @@ Make a selection:
 					MergeRoms = false,
 				};
 
-				datdata = RomManipulation.ParseDict(filename, 0, 0, datdata, logger);
+				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger);
 
 				logger.User("datdata.Description: " + datdata.Description);
 
 				datdata.Description += ".new";
-				Output.WriteToDatFromDict(datdata, Path.GetDirectoryName(filename), logger);
+				Output.WriteDatfile(datdata, Path.GetDirectoryName(filename), logger);
 			}
 			else
 			{
@@ -1354,12 +1354,12 @@ Make a selection:
 					MergeRoms = false,
 				};
 
-				datdata = RomManipulation.ParseDict(filename, 0, 0, datdata, logger);
+				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger);
 
 				logger.User("datdata.Description: " + datdata.Description);
 
 				datdata.Description += ".new";
-				Output.WriteToDatFromDict(datdata, Path.GetDirectoryName(filename), logger);
+				Output.WriteDatfile(datdata, Path.GetDirectoryName(filename), logger);
 			}
 			else
 			{
@@ -1394,12 +1394,12 @@ Make a selection:
 					MergeRoms = false,
 				};
 
-				datdata = RomManipulation.ParseDict(filename, 0, 0, datdata, logger);
+				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger);
 
 				logger.User("datdata.Description: " + datdata.Description);
 
 				datdata.Description += ".new";
-				Output.WriteToDatFromDict(datdata, Path.GetDirectoryName(filename), logger);
+				Output.WriteDatfile(datdata, Path.GetDirectoryName(filename), logger);
 			}
 			else
 			{
@@ -1430,11 +1430,42 @@ Make a selection:
 				input = Path.GetFullPath(input);
 
 				// Get the output name
-				string name = Path.GetFileNameWithoutExtension(input) + "-miss.txt";
+				string name = Path.GetFileNameWithoutExtension(input) + "-miss";
 
 				// Read in the roms from the DAT and then write them to the file
 				logger.User("Converting " + input);
-				Output.WriteToText(name, Path.GetDirectoryName(input), RomManipulation.Parse(input, 0, 0, logger), logger, usegame, prefix, postfix, addext, repext, quotes, gamename);
+				DatData datdata = new DatData
+				{
+					Name = "",
+					Description = "",
+					Category = "",
+					Version = "",
+					Date = "",
+					Author = "",
+					Email = "",
+					Homepage = "",
+					Url = "",
+					Comment = "",
+					Roms = new Dictionary<string, List<RomData>>(),
+					OutputFormat = OutputFormat.MissFile,
+
+					UseGame = usegame,
+					Prefix = prefix,
+					Postfix = postfix,
+					AddExt = addext,
+					RepExt = repext,
+					Quotes = quotes,
+					GameName = gamename,
+				};
+				datdata = RomManipulation.Parse(input, 0, 0, datdata, logger);
+				datdata.Name += "-miss";
+				datdata.Description += "-miss";
+
+				// Normalize the extensions
+				addext = (addext == "" || addext.StartsWith(".") ? addext : "." + addext);
+				repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
+
+				Output.WriteDatfile(datdata, Path.GetDirectoryName(input), logger);
 				logger.User(input + " converted to: " + name);
 				return;
 			}

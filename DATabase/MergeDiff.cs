@@ -115,7 +115,7 @@ namespace SabreTools
 			foreach (string input in _inputs)
 			{
 				_logger.User("Adding DAT: " + input);
-				userData = RomManipulation.ParseDict(input, i, 0, userData, _logger);
+				userData = RomManipulation.Parse(input, i, 0, userData, _logger);
 				i++;
 			}
 			
@@ -164,7 +164,7 @@ namespace SabreTools
 				post = " (No Duplicates)";
 
 				// Output the difflist (a-b)+(b-a) diff
-				Output.WriteToDatFromDict(outerDiffData, "", _logger);
+				Output.WriteDatfile(outerDiffData, "", _logger);
 
 				// For the AB mode-style diffs, get all required dictionaries and output with a new name
 				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
@@ -205,7 +205,7 @@ namespace SabreTools
 					}
 
 					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j]) + " Only)";
-					Output.WriteToDatFromDict(diffData, "", _logger);
+					Output.WriteDatfile(diffData, "", _logger);
 				}
 
 				// Get all entries that have External dupes
@@ -246,12 +246,12 @@ namespace SabreTools
 					}
 				}
 
-				Output.WriteToDatFromDict(dupeData, "", _logger);
+				Output.WriteDatfile(dupeData, "", _logger);
 			}
 			// Output all entries with user-defined merge
 			else
 			{
-				Output.WriteToDatFromDict(userData, "", _logger);
+				Output.WriteDatfile(userData, "", _logger);
 			}
 
 			return true;

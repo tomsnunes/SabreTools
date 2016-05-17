@@ -98,7 +98,7 @@ namespace SabreTools
 				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 				OutputFormat = RomManipulation.GetOutputFormat(filename),
 			};
-			datdata = RomManipulation.ParseDict(filename, 0, 0, datdata, _logger);
+			datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger);
 
 			// Trim all file names according to the path that's set
 			foreach (string key in datdata.Roms.Keys)
@@ -130,7 +130,7 @@ namespace SabreTools
 			}
 
 			// Now write the file out accordingly
-			Output.WriteToDatFromDict(datdata, Path.GetDirectoryName(filename), _logger);
+			Output.WriteDatfile(datdata, Path.GetDirectoryName(filename), _logger);
 
 			// Remove the original file if different and inform the user
 			if (filename != datdata.Description + (RomManipulation.GetOutputFormat(filename) == OutputFormat.Xml ? ".xml" : ".dat"))

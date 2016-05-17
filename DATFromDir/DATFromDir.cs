@@ -23,7 +23,7 @@ namespace SabreTools
 		private string _tempDir;
 
 		// Extraction and listing related variables
-		private List<RomData> _roms;
+		private Dictionary<string, List<RomData>> _dict;
 		private List<String> _inputs;
 
 		// User specified flags
@@ -214,8 +214,8 @@ namespace SabreTools
 		/// <returns>True if the DAT could be created, false otherwise</returns>
 		public bool Start()
 		{
-			// Create an output array for all found items
-			_roms = new List<RomData>();
+			// Create an output dictionary for all found items
+			_dict = new Dictionary<string, List<RomData>>();
 
 			/*
 			For clarity, here is the process for SuperDAT:
@@ -283,24 +283,10 @@ namespace SabreTools
 			}
 
 			// If we found nothing (error state), exit
-			if (_roms.Count == 0)
+			if (_dict.Count == 0)
 			{
 				return false;
 			}
-
-			// Order the roms by name of parent, then name of rom
-			_roms.Sort(delegate (RomData A, RomData B)
-			{
-				if (A.Game == B.Game)
-				{
-					if (A.Name == B.Name)
-					{
-						return (int)(A.Size - B.Size);
-					}
-					return String.Compare(A.Name, B.Name);
-				}
-				return String.Compare(A.Game, B.Game);
-			});
 
 			// Double check to see what it needs to be named
 			if (_name == "")
@@ -321,8 +307,21 @@ namespace SabreTools
 			_name = (_name == "" ? "Default" : _name);
 			_desc = (_desc == "" ? _name + (_bare ? "" : " (" + _date + ")") : _desc);
 
+			DatData datdata = new DatData
+			{
+				Name = _name,
+				Description = _desc,
+				Version = _version,
+				Date = _date,
+				Category = _cat,
+				Author = _author,
+				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				Roms = _dict,
+			};
+
 			// Now write it all out as a DAT
-			Output.WriteToDat(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, Environment.CurrentDirectory, _roms, _logger);
+			Output.WriteDatfile(datdata, Environment.CurrentDirectory, _logger);
 
 			return true;
 		}
@@ -331,7 +330,7 @@ namespace SabreTools
 		/// Check a given file for hashes, based on current settings
 		/// </summary>
 		/// <param name="item">Filename of the item to be checked</param>
-		private void ProcessFile (string item)
+		private void ProcessFile(string item)
 		{
 			// Create the temporary output directory
 			DirectoryInfo di = Directory.CreateDirectory(_tempDir);
@@ -409,7 +408,7 @@ namespace SabreTools
 						continue;
 					}
 
-					_roms.Add(new RomData
+					RomData rom = new RomData
 					{
 						Type = "rom",
 						Game = Path.GetFileNameWithoutExtension(item),
@@ -418,7 +417,19 @@ namespace SabreTools
 						CRC = fileCRC,
 						MD5 = fileMD5,
 						SHA1 = fileSHA1,
-					});
+					};
+
+					string key = rom.Size + "-" + rom.CRC;
+					if (_dict.ContainsKey(key))
+					{
+						_dict[key].Add(rom);
+					}
+					else
+					{
+						List<RomData> temp = new List<RomData>();
+						temp.Add(rom);
+						_dict.Add(key, temp);
+					}
 
 					_logger.User("File added: " + entry + Environment.NewLine);
 				}
@@ -473,7 +484,7 @@ namespace SabreTools
 
 					_logger.Log("Actual item added: " + actualitem);
 
-					_roms.Add(new RomData
+					RomData rom = new RomData
 					{
 						Type = "rom",
 						Game = actualroot,
@@ -482,7 +493,19 @@ namespace SabreTools
 						CRC = fileCRC,
 						MD5 = fileMD5,
 						SHA1 = fileSHA1,
-					});
+					};
+
+					string key = rom.Size + "-" + rom.CRC;
+					if (_dict.ContainsKey(key))
+					{
+						_dict[key].Add(rom);
+					}
+					else
+					{
+						List<RomData> temp = new List<RomData>();
+						temp.Add(rom);
+						_dict.Add(key, temp);
+					}
 
 					_logger.User("File added: " + actualitem + Environment.NewLine);
 				}

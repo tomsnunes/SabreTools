@@ -148,8 +148,8 @@ namespace SabreTools
 				{
 					Roms = new Dictionary<string, List<RomData>>(),
 				};
-				completeDats = RomManipulation.ParseDict(_currentAllMerged, 0, 0, completeDats, _logger);
-				completeDats = RomManipulation.ParseDict(_currentNewMerged, 0, 0, completeDats, _logger);
+				completeDats = RomManipulation.Parse(_currentAllMerged, 0, 0, completeDats, _logger);
+				completeDats = RomManipulation.Parse(_currentNewMerged, 0, 0, completeDats, _logger);
 
 				// Now get Net New output dictionary [(currentNewMerged)-(currentAllMerged)]
 				_logger.User("Creating and populating Net New dictionary");
@@ -205,7 +205,7 @@ namespace SabreTools
 				{
 					Roms = new Dictionary<string, List<RomData>>(),
 				};
-				midMissing = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midMissing, _logger);
+				midMissing = RomManipulation.Parse(_currentMissingMerged, 0, 0, midMissing, _logger);
 				foreach (string key in unneeded.Keys)
 				{
 					if (midMissing.Roms.ContainsKey(key))
@@ -441,10 +441,10 @@ namespace SabreTools
 					Roms = have,
 				};
 
-				Output.WriteToDatFromDict(netNewData, "", _logger);
-				Output.WriteToDatFromDict(unneededData, "", _logger);
-				Output.WriteToDatFromDict(newMissingData, "", _logger);
-				Output.WriteToDatFromDict(haveData, "", _logger);
+				Output.WriteDatfile(netNewData, "", _logger);
+				Output.WriteDatfile(unneededData, "", _logger);
+				Output.WriteDatfile(newMissingData, "", _logger);
+				Output.WriteDatfile(haveData, "", _logger);
 
 				return true;
 			}
@@ -458,8 +458,8 @@ namespace SabreTools
 				{
 					Roms = new Dictionary<string, List<RomData>>(),
 				};
-				midHave = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midHave, _logger);
-				midHave = RomManipulation.ParseDict(_currentAllMerged, 0, 0, midHave, _logger);
+				midHave = RomManipulation.Parse(_currentMissingMerged, 0, 0, midHave, _logger);
+				midHave = RomManipulation.Parse(_currentAllMerged, 0, 0, midHave, _logger);
 				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
 				foreach (string key in midHave.Roms.Keys)
 				{
@@ -517,7 +517,7 @@ namespace SabreTools
 					MergeRoms = true,
 					Roms = have,
 				};
-				Output.WriteToDatFromDict(haveData, "", _logger);
+				Output.WriteDatfile(haveData, "", _logger);
 
 				return true;
 			}
@@ -531,8 +531,8 @@ namespace SabreTools
 				{
 					Roms = new Dictionary<string, List<RomData>>(),
 				};
-				midHave = RomManipulation.ParseDict(_currentMissingMerged, 0, 0, midHave, _logger);
-				midHave = RomManipulation.ParseDict(_currentNewMerged, 0, 0, midHave, _logger);
+				midHave = RomManipulation.Parse(_currentMissingMerged, 0, 0, midHave, _logger);
+				midHave = RomManipulation.Parse(_currentNewMerged, 0, 0, midHave, _logger);
 				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
 				foreach (string key in midHave.Roms.Keys)
 				{
@@ -590,7 +590,7 @@ namespace SabreTools
 					MergeRoms = true,
 					Roms = have,
 				};
-				Output.WriteToDatFromDict(haveData, "", _logger);
+				Output.WriteDatfile(haveData, "", _logger);
 
 				return true;
 			}

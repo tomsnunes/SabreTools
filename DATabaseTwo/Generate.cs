@@ -174,7 +174,7 @@ namespace SabreTools
 				{
 					Int32.TryParse(sourcemap[hash], out tempSrcId);
 				}
-				datdata = RomManipulation.ParseDict(file, 0, tempSrcId, datdata, _logger);
+				datdata = RomManipulation.Parse(file, 0, tempSrcId, datdata, _logger);
 			}
 
 			// If the dictionary is empty for any reason, tell the user and exit
@@ -239,7 +239,7 @@ namespace SabreTools
 			}
 
 			// Then write out the file
-			Output.WriteToDatFromDict(datdata, _outroot, _logger, _norename);
+			Output.WriteDatfile(datdata, _outroot, _logger, _norename);
 
 			return true;
 		}

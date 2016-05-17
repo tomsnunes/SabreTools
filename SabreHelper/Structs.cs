@@ -28,6 +28,7 @@ namespace SabreTools.Helper
 	/// </summary>
 	public struct DatData
 	{
+		// Data common to most DAT types
 		public string Name;
 		public string Description;
 		public string Category;
@@ -45,5 +46,15 @@ namespace SabreTools.Helper
 		public OutputFormat OutputFormat;
 		public bool MergeRoms;
 		public Dictionary<string, List<RomData>> Roms;
+
+		// Data specific to the Miss DAT type
+		public bool UseGame;
+		public string Prefix;
+		public string Postfix;
+		public bool Quotes;
+		public string RepExt;
+		public string AddExt;
+		public bool GameName;
+		public bool Romba;
 	}
 }
