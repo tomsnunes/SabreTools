@@ -78,7 +78,7 @@ namespace SabreTools
 			// Get the values that will be used
 			if (_name == "")
 			{
-				_name = (_diff ? "DiffDAT" : "") + (_dedup ? "-deduped" : "");
+				_name = (_diff ? "DiffDAT" : "MergeDAT") + (_dedup ? "-deduped" : "");
 			}
 			if (_desc == "")
 			{
