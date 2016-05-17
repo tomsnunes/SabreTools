@@ -82,40 +82,58 @@ namespace SabreTools
 		/// <param name="rename">True if roms are to be renamed</param>
 		private void ProcessDAT(string filename, string path, bool rename)
 		{
-			List<RomData> roms = RomManipulation.Parse(filename, 0, 0, _logger);
+			DatData datdata = new DatData
+			{
+				Name = "",
+				Description = "",
+				Category = "",
+				Version = "",
+				Date = "",
+				Author = "",
+				Email = "",
+				Homepage = "",
+				Url = "",
+				Comment = "",
+				Roms = new Dictionary<string, List<RomData>>(),
+				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				OutputFormat = RomManipulation.GetOutputFormat(filename),
+			};
+			datdata = RomManipulation.ParseDict(filename, 0, 0, datdata, _logger);
 
 			// Trim all file names according to the path that's set
-			List<RomData> outroms = new List<RomData>();
-			while (roms.Count != 0)
+			foreach (string key in datdata.Roms.Keys)
 			{
-				RomData rom = roms[0];
-				roms.RemoveAt(0);
+				List<RomData> outroms = new List<RomData>();
 
-				// If we are in single game mode, rename all games
-				if (rename)
+				foreach (RomData actrom in datdata.Roms[key])
 				{
-					rom.Game = "!";
-				}
+					RomData rom = actrom;
 
-				// Windows max name length is 260
-				int usableLength = 260 - rom.Game.Length - _path.Length;
-				if (rom.Name.Length > usableLength)
-				{
-					string ext = Path.GetExtension(rom.Name);
-					rom.Name = rom.Name.Substring(0, usableLength - ext.Length);
-					rom.Name += ext;
-				}
+					// If we are in single game mode, rename all games
+					if (rename)
+					{
+						rom.Game = "!";
+					}
 
-				outroms.Add(rom);
+					// Windows max name length is 260
+					int usableLength = 260 - rom.Game.Length - _path.Length;
+					if (rom.Name.Length > usableLength)
+					{
+						string ext = Path.GetExtension(rom.Name);
+						rom.Name = rom.Name.Substring(0, usableLength - ext.Length);
+						rom.Name += ext;
+					}
+
+					outroms.Add(rom);
+				}
+				datdata.Roms[key] = outroms;
 			}
 
 			// Now write the file out accordingly
-			string datName = RomManipulation.GetDatName(filename, _logger);
-			string datDescription = RomManipulation.GetDatDescription(filename, _logger);
-			Output.WriteToDat(datName, datDescription, "", "", "", "", _forceunpack, !RomManipulation.IsXmlDat(filename), Path.GetDirectoryName(filename), outroms, _logger);
+			Output.WriteToDatFromDict(datdata, Path.GetDirectoryName(filename), _logger);
 
 			// Remove the original file if different and inform the user
-			if (filename != datDescription + (RomManipulation.IsXmlDat(filename) ? ".xml" : ".dat"))
+			if (filename != datdata.Description + (RomManipulation.GetOutputFormat(filename) == OutputFormat.Xml ? ".xml" : ".dat"))
 			{
 				try
 				{

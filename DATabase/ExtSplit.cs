@@ -56,41 +56,124 @@ namespace SabreTools
 				Directory.CreateDirectory(_outdir);
 			}
 
-			List<RomData> romsA = new List<RomData>();
-			List<RomData> romsB = new List<RomData>();
+			// Create the initial DatData object
+			DatData datdata = new DatData
+			{
+				Name = "",
+				Description = "",
+				Category = "",
+				Version = "",
+				Date = "",
+				Author = "",
+				Email = "",
+				Homepage = "",
+				Url = "",
+				Comment = "",
+				Roms = new Dictionary<string, List<RomData>>(),
+			};
 
 			// Load the current DAT to be processed
-			List<RomData> roms = RomManipulation.Parse(_filename, 0, 0, _logger);
+			datdata = RomManipulation.ParseDict(_filename, 0, 0, datdata, _logger);
+
+			// Set all of the appropriate outputs for each of the subsets
+			OutputFormat outputFormat = RomManipulation.GetOutputFormat(_filename);
+			DatData datdataA = new DatData
+			{
+				Name = datdata.Name + "." + _extA,
+				Description = datdata.Description + "." + _extA,
+				Category = datdata.Category,
+				Version = datdata.Version,
+				Date = datdata.Date,
+				Author = datdata.Author,
+				Email = datdata.Email,
+				Homepage = datdata.Homepage,
+				Url = datdata.Url,
+				Comment = datdata.Comment,
+				Roms = new Dictionary<string, List<RomData>>(),
+				OutputFormat = outputFormat,
+			};
+			DatData datdataB = new DatData
+			{
+				Name = datdata.Name + "." + _extB,
+				Description = datdata.Description + "." + _extB,
+				Category = datdata.Category,
+				Version = datdata.Version,
+				Date = datdata.Date,
+				Author = datdata.Author,
+				Email = datdata.Email,
+				Homepage = datdata.Homepage,
+				Url = datdata.Url,
+				Comment = datdata.Comment,
+				Roms = new Dictionary<string, List<RomData>>(),
+				OutputFormat = outputFormat,
+			};
 
 			// If roms is empty, return false
-			if (roms.Count == 0)
+			if (datdata.Roms.Count == 0)
 			{
 				return false;
 			}
 
 			// Now separate the roms accordingly
-			foreach (RomData rom in roms)
+			foreach (string key in datdata.Roms.Keys)
 			{
-				if (rom.Name.ToUpperInvariant().EndsWith(_extA))
+				foreach (RomData rom in datdata.Roms[key])
 				{
-					romsA.Add(rom);
-				}
-				else if (rom.Name.ToUpperInvariant().EndsWith(_extB))
-				{
-					romsB.Add(rom);
-				}
-				else
-				{
-					romsA.Add(rom);
-					romsB.Add(rom);
+					if (rom.Name.ToUpperInvariant().EndsWith(_extA))
+					{
+						if (datdataA.Roms.ContainsKey(key))
+						{
+							datdataA.Roms[key].Add(rom);
+						}
+						else
+						{
+							List<RomData> temp = new List<RomData>();
+							temp.Add(rom);
+							datdataA.Roms.Add(key, temp);
+						}
+					}
+					else if (rom.Name.ToUpperInvariant().EndsWith(_extB))
+					{
+						if (datdataB.Roms.ContainsKey(key))
+						{
+							datdataB.Roms[key].Add(rom);
+						}
+						else
+						{
+							List<RomData> temp = new List<RomData>();
+							temp.Add(rom);
+							datdataB.Roms.Add(key, temp);
+						}
+					}
+					else
+					{
+						if (datdataA.Roms.ContainsKey(key))
+						{
+							datdataA.Roms[key].Add(rom);
+						}
+						else
+						{
+							List<RomData> temp = new List<RomData>();
+							temp.Add(rom);
+							datdataA.Roms.Add(key, temp);
+						}
+						if (datdataB.Roms.ContainsKey(key))
+						{
+							datdataB.Roms[key].Add(rom);
+						}
+						else
+						{
+							List<RomData> temp = new List<RomData>();
+							temp.Add(rom);
+							datdataB.Roms.Add(key, temp);
+						}
+					}
 				}
 			}
 
 			// Then write out both files
-			bool success = Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename) + "." + _extA, Path.GetFileNameWithoutExtension(_filename) + "." + _extA,
-				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), _outdir, romsA, _logger);
-			success &= Output.WriteToDat(Path.GetFileNameWithoutExtension(_filename) + "." + _extB, Path.GetFileNameWithoutExtension(_filename) + "." + _extB,
-				"", "", "", "", false, !RomManipulation.IsXmlDat(_filename), _outdir, romsB, _logger);
+			bool success = Output.WriteToDatFromDict(datdataA, _outdir, _logger);
+			success &= Output.WriteToDatFromDict(datdataB, _outdir, _logger);
 
 			return success;
 		}

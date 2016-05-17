@@ -17,94 +17,34 @@ namespace SabreTools.Helper
 		public static string SHA1Zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
 		/// <summary>
-		/// Return if the file is XML or not
+		/// Get what type of DAT the input file is
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
-		/// <returns>True if the DAT is probably XML, false otherwise</returns>
-		public static bool IsXmlDat(string filename)
+		/// <returns>The OutputFormat corresponding to the DAT</returns>
+		public static OutputFormat GetOutputFormat(string filename)
 		{
 			try
 			{
 				StreamReader sr = new StreamReader(File.OpenRead(filename));
 				string first = sr.ReadLine();
 				sr.Close();
-				return first.Contains("<") && first.Contains(">");
+				if (first.Contains("<") && first.Contains(">"))
+				{
+					return OutputFormat.Xml;
+				}
+				else if (first.Contains("[") && first.Contains("]"))
+				{
+					return OutputFormat.RomCenter;
+				}
+				else
+				{
+					return OutputFormat.ClrMamePro;
+				}
 			}
 			catch (Exception)
 			{
-				return false;
+				return OutputFormat.ClrMamePro;
 			}
-		}
-
-		/// <summary>
-		/// Return if the file is RomCenter or not
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <returns>True if the DAT is probably RomCenter, false otherwise</returns>
-		public static bool IsRCDat(string filename)
-		{
-			try
-			{
-				StreamReader sr = new StreamReader(File.OpenRead(filename));
-				string first = sr.ReadLine();
-				sr.Close();
-				return first.Contains("[") && first.Contains("]");
-			}
-			catch (Exception)
-			{
-				return false;
-			}
-		}
-
-		/// <summary>
-		/// Get the XmlDocument associated with a file, if possible
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="logger">Logger object for console and file output</param>
-		/// <returns>The XmlDocument representing the (possibly converted) file, null otherwise</returns>
-		public static XmlDocument GetXmlDocument(string filename, Logger logger)
-		{
-			logger.Log("Attempting to read file: " + filename);
-
-			// Check if file exists
-			if (!File.Exists(filename))
-			{
-				logger.Warning("File '" + filename + "' could not read from!");
-				return null;
-			}
-
-			XmlDocument doc = new XmlDocument();
-			try
-			{
-				doc.Load(filename);
-			}
-			catch (XmlException)
-			{
-				try
-				{
-					doc.LoadXml(Converters.ClrMameProToXML(File.ReadAllLines(filename)).ToString());
-				}
-				catch (Exception ex)
-				{
-					logger.Error(ex.ToString());
-					return null;
-				}
-			}
-			catch (IOException)
-			{
-				logger.Error("File '" + filename + "' could not be open or read");
-			}
-			catch (OutOfMemoryException)
-			{
-				logger.Error("File '" + filename + "' is too large to be processed!");
-			}
-			catch (Exception ex)
-			{
-				logger.Error(ex.ToString());
-				return null;
-			}
-
-			return doc;
 		}
 
 		/// <summary>
@@ -124,128 +64,29 @@ namespace SabreTools.Helper
 				return null;
 			}
 
-			if (IsXmlDat(filename))
+			XmlTextReader xtr;
+			StringReader sr;
+			switch (GetOutputFormat(filename))
 			{
-				logger.Log("XML DAT detected");
-				XmlTextReader xtr = new XmlTextReader(filename);
-				xtr.WhitespaceHandling = WhitespaceHandling.None;
-				xtr.DtdProcessing = DtdProcessing.Ignore;
-				return xtr;
-			}
-			else if (IsRCDat(filename))
-			{
-				logger.Log("RomCenter DAT detected");
-				StringReader sr = new StringReader(Converters.RomCenterToXML(File.ReadAllLines(filename)).ToString());
-				XmlTextReader xtr = new XmlTextReader(sr);
-				xtr.WhitespaceHandling = WhitespaceHandling.None;
-				xtr.DtdProcessing = DtdProcessing.Ignore;
-				return xtr;
-			}
-			else
-			{
-				logger.Log("ClrMamePro DAT detected");
-				StringReader sr = new StringReader(Converters.ClrMameProToXML(File.ReadAllLines(filename)).ToString());
-				XmlTextReader xtr = new XmlTextReader(sr);
-				xtr.WhitespaceHandling = WhitespaceHandling.None;
-				xtr.DtdProcessing = DtdProcessing.Ignore;
-				return xtr;
-			}
-		}
-
-		/// <summary>
-		/// Get the name of the DAT for external use
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="logger">Logger object for console and file output</param>
-		/// <returns>The internal name of the DAT on success, empty string otherwise</returns>
-		/// <remarks>Needs to be upgraded to XmlTextReader</remarks>
-		public static string GetDatName(string filename, Logger logger)
-		{
-			string name = "";
-			XmlDocument doc = GetXmlDocument(filename, logger);
-
-			// If the returned document is null, return the blank string
-			if (doc == null)
-			{
-				return name;
+				case OutputFormat.Xml:
+					logger.Log("XML DAT detected");
+					xtr = new XmlTextReader(filename);
+					break;
+				case OutputFormat.RomCenter:
+					logger.Log("RomCenter DAT detected");
+					sr = new StringReader(Converters.RomCenterToXML(File.ReadAllLines(filename)).ToString());
+					xtr = new XmlTextReader(sr);
+					break;
+				default:
+					logger.Log("ClrMamePro DAT detected");
+					sr = new StringReader(Converters.ClrMameProToXML(File.ReadAllLines(filename)).ToString());
+					xtr = new XmlTextReader(sr);
+					break;
 			}
 
-			// Experimental looping using only XML parsing
-			XmlNode node = doc.FirstChild;
-			if (node != null && node.Name == "xml")
-			{
-				// Skip over everything that's not an element
-				while (node.NodeType != XmlNodeType.Element)
-				{
-					node = node.NextSibling;
-				}
-			}
-
-			// Once we find the main body, enter it
-			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
-			{
-				node = node.FirstChild;
-			}
-
-			// Get the name from the header
-			if (node != null && node.Name == "header")
-			{
-				XmlNode temp = node.SelectSingleNode("name");
-				if (temp != null)
-				{
-					name = temp.InnerText;
-				}
-			}
-
-			return name;
-		}
-
-		/// <summary>
-		/// Get the description of the DAT for external use
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="logger">Logger object for console and file output</param>
-		/// <returns>The internal name of the DAT on success, empty string otherwise</returns>
-		/// <remarks>Needs to be upgraded to XmlTextReader</remarks>
-		public static string GetDatDescription(string filename, Logger logger)
-		{
-			string desc = "";
-			XmlDocument doc = GetXmlDocument(filename, logger);
-
-			// If the returned document is null, return the blank string
-			if (doc == null)
-			{
-				return desc;
-			}
-
-			// Experimental looping using only XML parsing
-			XmlNode node = doc.FirstChild;
-			if (node != null && node.Name == "xml")
-			{
-				// Skip over everything that's not an element
-				while (node.NodeType != XmlNodeType.Element)
-				{
-					node = node.NextSibling;
-				}
-			}
-
-			// Once we find the main body, enter it
-			if (node != null && (node.Name == "datafile" || node.Name == "softwarelist"))
-			{
-				node = node.FirstChild;
-			}
-
-			// Get the name from the header
-			if (node != null && node.Name == "header")
-			{
-				XmlNode temp = node.SelectSingleNode("description");
-				if (temp != null)
-				{
-					desc = temp.InnerText;
-				}
-			}
-
-			return desc;
+			xtr.WhitespaceHandling = WhitespaceHandling.None;
+			xtr.DtdProcessing = DtdProcessing.Ignore;
+			return xtr;
 		}
 
 		/// <summary>
