@@ -53,7 +53,7 @@ namespace SabreTools.Helper
 				}
 			}
 
-			logger.Log("A total of " + count + " file hashes will be written out to file");
+			logger.User("A total of " + count + " file hashes will be written out to file");
 
 			// Now write out to file
 			// If it's empty, use the current folder
