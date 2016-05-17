@@ -40,7 +40,7 @@ namespace SabreTools.Helper
 		/// Return if the file is RomCenter or not
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
-		/// <returns>True if the DAT is probably XML, false otherwise</returns>
+		/// <returns>True if the DAT is probably RomCenter, false otherwise</returns>
 		public static bool IsRCDat(string filename)
 		{
 			try
