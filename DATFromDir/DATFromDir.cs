@@ -217,68 +217,49 @@ namespace SabreTools
 			// Create an output dictionary for all found items
 			_dict = new Dictionary<string, List<RomData>>();
 
-			/*
-			For clarity, here is the process for SuperDAT:
-			1) Check to see if the input is a directory
-			2) If it is, loop through and get ONLY the directories
-			3) Treat each subdirectory like a base path
-			4) Process each subdirectory like a normal one
-			5) Prefix any added game names with the parent directory name
-			6) Process like normal
-			*/
+			// Loop over each of the found paths, if any
+			foreach (string path in _inputs)
+			{
+				// Set local paths and vars
+				_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
 
-			// If we're in SuperDAT mode, we have to treat it separately
-			if (_superDat)
-			{
-				_logger.Error("SuperDAT functionality not implemented yet!");
-				return false;
-			}
-			else
-			{
-				// Loop over each of the found paths, if any
-				foreach (string path in _inputs)
+				_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar);
+				_basePath = Path.GetFullPath(_basePath);
+
+				// This is where the main loop would go
+				if (File.Exists(_basePath))
 				{
-					// Set local paths and vars
-					_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
+					ProcessFile(_basePath);
+				}
+				else if (Directory.Exists(_basePath))
+				{
+					_logger.Log("Folder found: " + _basePath);
 
-					_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar);
-					_basePath = Path.GetFullPath(_basePath);
-
-					// This is where the main loop would go
-					if (File.Exists(_basePath))
+					// Process the files in the base folder first
+					foreach (string item in Directory.EnumerateFiles(_basePath, "*", SearchOption.TopDirectoryOnly))
 					{
-						ProcessFile(_basePath);
+						ProcessFile(item);
 					}
-					else if (Directory.Exists(_basePath))
-					{
-						_logger.Log("Folder found: " + _basePath);
 
-						// Process the files in the base folder first
-						foreach (string item in Directory.EnumerateFiles(_basePath, "*", SearchOption.TopDirectoryOnly))
+					// Then process each of the subfolders themselves
+					string basePathBackup = _basePath;
+					foreach (string item in Directory.EnumerateDirectories(_basePath))
+					{
+						_basePath = (File.Exists(item) ? item : item + Path.DirectorySeparatorChar);
+						_basePath = Path.GetFullPath(_basePath);
+
+						foreach (string subitem in Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories))
 						{
-							ProcessFile(item);
+							ProcessFile(subitem);
 						}
-
-						// Then process each of the subfolders themselves
-						string basePathBackup = _basePath;
-						foreach (string item in Directory.EnumerateDirectories(_basePath))
-						{
-							_basePath = (File.Exists(item) ? item : item + Path.DirectorySeparatorChar);
-							_basePath = Path.GetFullPath(_basePath);
-
-							foreach (string subitem in Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories))
-							{
-								ProcessFile(subitem);
-							}
-						}
-						_basePath = basePathBackup;
-
 					}
-					// If this somehow skips past the original sensors
-					else
-					{
-						_logger.Error(path + " is not a valid input!");
-					}
+					_basePath = basePathBackup;
+
+				}
+				// If this somehow skips past the original sensors
+				else
+				{
+					_logger.Error(path + " is not a valid input!");
 				}
 			}
 
@@ -305,6 +286,26 @@ namespace SabreTools
 				}
 			}
 			_name = (_name == "" ? "Default" : _name);
+
+			// If we're in a superdat, append the folder name to all game names
+			if (_superDat)
+			{
+				List<string> keys = _dict.Keys.ToList();
+				foreach (string key in keys)
+				{
+					List<RomData> newroms = new List<RomData>();
+					foreach (RomData rom in _dict[key])
+					{
+						RomData newrom = rom;
+						newrom.Game = _name + Path.DirectorySeparatorChar + newrom.Game;
+						newroms.Add(newrom);
+					}
+					_dict[key] = newroms;
+				}
+
+				_name = _name += " - SuperDAT";
+			}
+
 			_desc = (_desc == "" ? _name + (_bare ? "" : " (" + _date + ")") : _desc);
 
 			DatData datdata = new DatData
