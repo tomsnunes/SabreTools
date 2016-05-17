@@ -187,7 +187,7 @@ namespace SabreTools.Helper
 									if (rom.SHA1 != "")
 									{
 										string name = "/" + rom.SHA1.Substring(0, 2) + "/" + rom.SHA1.Substring(2, 2) + "/" + rom.SHA1.Substring(4, 2) + "/" +
-											rom.SHA1.Substring(6, 2) + "/" + rom.SHA1 + ".gz";
+											rom.SHA1.Substring(6, 2) + "/" + rom.SHA1 + ".gz\n";
 										state += pre + name + post;
 									}
 								}
