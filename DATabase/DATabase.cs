@@ -1530,12 +1530,26 @@ Make a selection:
 				{
 					foreach (string file in Directory.EnumerateFiles(input.Replace("\"", ""), "*", SearchOption.AllDirectories))
 					{
-						newInputs.Add(Path.GetFullPath(file));
+						try
+						{
+							newInputs.Add(Path.GetFullPath(file));
+						}
+						catch (PathTooLongException)
+						{
+							logger.Warning("The path for " + file + " was too long");
+						}
 					}
 				}
 				else if (File.Exists(input.Replace("\"", "")))
 				{
-					newInputs.Add(Path.GetFullPath(input.Replace("\"", "")));
+					try
+					{
+						newInputs.Add(Path.GetFullPath(input.Replace("\"", "")));
+					}
+					catch (PathTooLongException)
+					{
+						logger.Warning("The path for " + input.Replace("\"", "") + " was too long");
+					}
 				}
 			}
 
