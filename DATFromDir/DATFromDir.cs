@@ -221,8 +221,6 @@ namespace SabreTools
 			foreach (string path in _inputs)
 			{
 				// Set local paths and vars
-				_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
-
 				_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar);
 				_basePath = Path.GetFullPath(_basePath);
 
@@ -245,9 +243,13 @@ namespace SabreTools
 					string basePathBackup = _basePath;
 					foreach (string item in Directory.EnumerateDirectories(_basePath))
 					{
-						_basePath = (File.Exists(item) ? item : item + Path.DirectorySeparatorChar);
-						_basePath = Path.GetFullPath(_basePath);
-
+						// If we're not in SuperDAT mode, then reset the base path
+						if (!_superDat)
+						{
+							_basePath = (File.Exists(item) ? item : item + Path.DirectorySeparatorChar);
+							_basePath = Path.GetFullPath(_basePath);
+						}
+						
 						foreach (string subitem in Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories))
 						{
 							ProcessFile(subitem);
@@ -334,9 +336,9 @@ namespace SabreTools
 		/// <param name="item">Filename of the item to be checked</param>
 		private void ProcessFile(string item)
 		{
-			// Create the temporary output directory
-			DirectoryInfo di = Directory.CreateDirectory(_tempDir);
+			Console.WriteLine("basepath: " + _basePath);
 
+			// Create the temporary output directory
 			bool encounteredErrors = true;
 			if (!_archivesAsFiles)
 			{
@@ -348,6 +350,8 @@ namespace SabreTools
 
 					if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
 					{
+						_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
+						DirectoryInfo di = Directory.CreateDirectory(_tempDir);
 						IReader reader = archive.ExtractAllEntries();
 						reader.WriteAllToDirectory(_tempDir, ExtractOptions.ExtractFullPath);
 						encounteredErrors = false;
@@ -435,6 +439,12 @@ namespace SabreTools
 
 					_logger.User("File added: " + entry + Environment.NewLine);
 				}
+
+				// Delete the temp directory
+				if (Directory.Exists(_tempDir))
+				{
+					Directory.Delete(_tempDir, true);
+				}
 			}
 			// Otherwise, just get the info on the file itself
 			else if (!Directory.Exists(item) && File.Exists(item))
@@ -515,12 +525,6 @@ namespace SabreTools
 				{
 					_logger.Error(ex.ToString());
 				}
-			}
-
-			// Delete the temp directory
-			if (Directory.Exists(_tempDir))
-			{
-				di.Delete(true);
 			}
 		}
 	}

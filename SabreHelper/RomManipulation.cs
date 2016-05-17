@@ -142,9 +142,9 @@ namespace SabreTools.Helper
 									switch (headreader.Name)
 									{
 										case "name":
-											string readname = headreader.ReadElementContentAsString(); ;
-											datdata.Name = (datdata.Name == "" ? readname : "");
-											superdat = superdat || readname.Contains(" - SuperDAT");
+											content = headreader.ReadElementContentAsString(); ;
+											datdata.Name = (datdata.Name == "" ? content : datdata.Name);
+											superdat = superdat || content.Contains(" - SuperDAT");
 											break;
 										case "description":
 											content = headreader.ReadElementContentAsString();
@@ -181,6 +181,11 @@ namespace SabreTools.Helper
 										case "comment":
 											content = headreader.ReadElementContentAsString();
 											datdata.Comment = (datdata.Comment == "" ? content : datdata.Comment);
+											break;
+										case "type":
+											content = headreader.ReadElementContentAsString();
+											datdata.Type = (datdata.Type == "" ? content : datdata.Type);
+											superdat = superdat || content.Contains("SuperDAT");
 											break;
 										case "clrmamepro":
 											if (headreader.GetAttribute("forcemerging") != null)
