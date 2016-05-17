@@ -437,83 +437,96 @@ namespace SabreTools.Helper
 				if (outroms.Count != 0)
 				{
 					// Check if the rom is a duplicate
-					RomData last = outroms[outroms.Count - 1];
-
-					bool shouldcont = false;
-					if (rom.Type == "rom" && last.Type == "rom")
+					bool dupefound = false;
+					RomData savedrom = new RomData();
+					int pos = -1;
+					for (int i = 0; i < outroms.Count; i++)
 					{
-						shouldcont = ((rom.Size == last.Size) &&
-							((rom.CRC == "" || last.CRC == "") || rom.CRC == last.CRC) &&
-							((rom.MD5 == "" || last.MD5 == "") || rom.MD5 == last.MD5) &&
-							((rom.SHA1 == "" || last.SHA1 == "") || rom.SHA1 == last.SHA1)
-						);
-					}
-					else if (rom.Type == "disk" && last.Type == "disk")
-					{
-						shouldcont = (((rom.MD5 == "" || last.MD5 == "") || rom.MD5 == last.MD5) &&
-							((rom.SHA1 == "" || last.SHA1 == "") || rom.SHA1 == last.SHA1)
-						);
-					}
+						RomData lastrom = outroms[i];
 
-					// If it's a duplicate, skip adding it to the output but add any missing information
-					if (shouldcont)
-					{
-						last.CRC = (last.CRC == "" && rom.CRC != "" ? rom.CRC : last.CRC);
-						last.MD5 = (last.MD5 == "" && rom.MD5 != "" ? rom.MD5 : last.MD5);
-						last.SHA1 = (last.SHA1 == "" && rom.SHA1 != "" ? rom.SHA1 : last.SHA1);
-
-						// If the duplicate is external already or should be, set it
-						if (last.Dupe >= DupeType.ExternalHash || last.SystemID != rom.SystemID || last.SourceID != rom.SourceID)
+						if (rom.Type == "rom" && lastrom.Type == "rom")
 						{
-							if (last.Game == rom.Game && last.Name == rom.Name)
+							dupefound = ((rom.Size == lastrom.Size) &&
+								((rom.CRC == "" || lastrom.CRC == "") || rom.CRC == lastrom.CRC) &&
+								((rom.MD5 == "" || lastrom.MD5 == "") || rom.MD5 == lastrom.MD5) &&
+								((rom.SHA1 == "" || lastrom.SHA1 == "") || rom.SHA1 == lastrom.SHA1)
+							);
+						}
+						else if (rom.Type == "disk" && lastrom.Type == "disk")
+						{
+							dupefound = (((rom.MD5 == "" || lastrom.MD5 == "") || rom.MD5 == lastrom.MD5) &&
+								((rom.SHA1 == "" || lastrom.SHA1 == "") || rom.SHA1 == lastrom.SHA1)
+							);
+						}
+
+						// If it's a duplicate, skip adding it to the output but add any missing information
+						if (dupefound)
+						{
+							savedrom = lastrom;
+							pos = i;
+
+							savedrom.CRC = (savedrom.CRC == "" && rom.CRC != "" ? rom.CRC : savedrom.CRC);
+							savedrom.MD5 = (savedrom.MD5 == "" && rom.MD5 != "" ? rom.MD5 : savedrom.MD5);
+							savedrom.SHA1 = (savedrom.SHA1 == "" && rom.SHA1 != "" ? rom.SHA1 : savedrom.SHA1);
+
+							// If the duplicate is external already or should be, set it
+							if (savedrom.Dupe >= DupeType.ExternalHash || savedrom.SystemID != rom.SystemID || savedrom.SourceID != rom.SourceID)
 							{
-								last.Dupe = DupeType.ExternalAll;
+								if (savedrom.Game == rom.Game && savedrom.Name == rom.Name)
+								{
+									savedrom.Dupe = DupeType.ExternalAll;
+								}
+								else
+								{
+									savedrom.Dupe = DupeType.ExternalHash;
+								}
 							}
+
+							// Otherwise, it's considered an internal dupe
 							else
 							{
-								last.Dupe = DupeType.ExternalHash;
+								if (savedrom.Game == rom.Game && savedrom.Name == rom.Name)
+								{
+									savedrom.Dupe = DupeType.InternalAll;
+								}
+								else
+								{
+									savedrom.Dupe = DupeType.InternalHash;
+								}
 							}
-						}
 
-						// Otherwise, it's considered an internal dupe
-						else
-						{
-							if (last.Game == rom.Game && last.Name == rom.Name)
+							// If the current system has a lower ID than the previous, set the system accordingly
+							if (rom.SystemID < savedrom.SystemID)
 							{
-								last.Dupe = DupeType.InternalAll;
+								savedrom.SystemID = rom.SystemID;
+								savedrom.System = rom.System;
+								savedrom.Game = rom.Game;
+								savedrom.Name = rom.Name;
 							}
-							else
+
+							// If the current source has a lower ID than the previous, set the source accordingly
+							if (rom.SourceID < savedrom.SourceID)
 							{
-								last.Dupe = DupeType.InternalHash;
+								savedrom.SourceID = rom.SourceID;
+								savedrom.Source = rom.Source;
+								savedrom.Game = rom.Game;
+								savedrom.Name = rom.Name;
 							}
+
+							break;
 						}
-
-						// If the current system has a lower ID than the previous, set the system accordingly
-						if (rom.SystemID < last.SystemID)
-						{
-							last.SystemID = rom.SystemID;
-							last.System = rom.System;
-							last.Game = rom.Game;
-							last.Name = rom.Name;
-						}
-
-						// If the current source has a lower ID than the previous, set the source accordingly
-						if (rom.SourceID < last.SourceID)
-						{
-							last.SourceID = rom.SourceID;
-							last.Source = rom.Source;
-							last.Game = rom.Game;
-							last.Name = rom.Name;
-						}
-
-						outroms.RemoveAt(outroms.Count - 1);
-						outroms.Insert(outroms.Count, last);
-
-						continue;
 					}
-					else
+
+					// If no duplicate is found, add it to the list
+					if (!dupefound)
 					{
 						outroms.Add(rom);
+					}
+					// Otherwise, if a new rom information is found, add that
+					else
+					{
+						outroms.RemoveAt(pos);
+						outroms.Insert(pos, savedrom);
 					}
 				}
 				else
