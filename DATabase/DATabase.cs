@@ -73,6 +73,7 @@ namespace SabreTools
 				old = false,
 				quotes = false,
 				rem = false,
+				romba = false,
 				trim = false,
 				skip = false,
 				usegame = true;
@@ -192,6 +193,10 @@ namespace SabreTools
 					case "-rm":
 					case "--remove":
 						rem = true;
+						break;
+					case "-ro":
+					case "--romba":
+						romba = true;
 						break;
 					case "--skip":
 						skip = true;
@@ -356,7 +361,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename);
+					InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename, romba);
 				}
 			}
 
@@ -784,7 +789,8 @@ Make a selection:
     7) Replace all extensions with another" + (repext != "" ? ":\t" + repext : "") + @"
     8) Add extensions to each item" + (addext != "" ? ":\n\t" + addext : "") + @"
 " + (!usegame ? "    9) " + (gamename ? "Don't add game name before every item" : "Add game name before every item") + "\n" : "") +
-@"    10) Begin conversion
+@"    10) " + (romba ? "Don't output items in Romba format" : "Output items in Romba format") + @"
+    11) Begin conversion
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -829,8 +835,11 @@ Make a selection:
 						gamename = !gamename;
 						break;
 					case "10":
+						romba = !romba;
+						break;
+					case "11":
 						Console.Clear();
-						InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename);
+						InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename, romba);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; prefix = ""; postfix = ""; addext = ""; repext = "";
@@ -1419,7 +1428,8 @@ Make a selection:
 		/// <param name="repext">Replace all extensions with another</param>
 		/// <param name="addext">Add an extension to all items</param>
 		/// <param name="gamename">Add the dat name as a directory prefix</param>
-		private static void InitConvertMiss(string input, bool usegame, string prefix, string postfix, bool quotes, string repext, string addext, bool gamename)
+		/// <param name="romba">Output files in romba format</param>
+		private static void InitConvertMiss(string input, bool usegame, string prefix, string postfix, bool quotes, string repext, string addext, bool gamename, bool romba)
 		{
 			// Strip any quotations from the name
 			input = input.Replace("\"", "");
@@ -1456,6 +1466,7 @@ Make a selection:
 					RepExt = repext,
 					Quotes = quotes,
 					GameName = gamename,
+					Romba = romba,
 				};
 				datdata = RomManipulation.Parse(input, 0, 0, datdata, logger);
 				datdata.Name += "-miss";

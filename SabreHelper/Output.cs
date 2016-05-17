@@ -179,31 +179,47 @@ namespace SabreTools.Helper
 							case OutputFormat.MissFile:
 								string pre = datdata.Prefix + (datdata.Quotes ? "\"" : "");
 								string post = (datdata.Quotes ? "\"" : "") + datdata.Postfix;
-								string name = (datdata.UseGame ? rom.Game : rom.Name);
-								if (datdata.RepExt != "")
-								{
-									string dir = Path.GetDirectoryName(name);
-									dir = (dir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? dir : dir + Path.DirectorySeparatorChar);
-									dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
-									name = dir + Path.GetFileNameWithoutExtension(name) + datdata.RepExt;
-								}
-								if (datdata.AddExt != "")
-								{
-									name += datdata.AddExt;
-								}
-								if (!datdata.UseGame && datdata.GameName)
-								{
-									name = (rom.Game.EndsWith(Path.DirectorySeparatorChar.ToString()) ? rom.Game : rom.Game + Path.DirectorySeparatorChar) + name;
-								}
 
-								if (datdata.UseGame && rom.Game != lastgame)
+								// If we're in Romba mode, the state is consistent
+								if (datdata.Romba)
 								{
-									state += pre + name + post + "\n";
-									lastgame = rom.Game;
+									// We can only write out if there's a SHA-1
+									if (rom.SHA1 != "")
+									{
+										string name = "/" + rom.SHA1.Substring(0, 2) + "/" + rom.SHA1.Substring(2, 2) + "/" + rom.SHA1.Substring(4, 2) + "/" +
+											rom.SHA1.Substring(6, 2) + "/" + rom.SHA1 + ".gz";
+										state += pre + name + post;
+									}
 								}
-								else if (!datdata.UseGame)
+								// Otherwise, use any flags
+								else
 								{
-									state += pre + name + post + "\n";
+									string name = (datdata.UseGame ? rom.Game : rom.Name);
+									if (datdata.RepExt != "")
+									{
+										string dir = Path.GetDirectoryName(name);
+										dir = (dir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? dir : dir + Path.DirectorySeparatorChar);
+										dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
+										name = dir + Path.GetFileNameWithoutExtension(name) + datdata.RepExt;
+									}
+									if (datdata.AddExt != "")
+									{
+										name += datdata.AddExt;
+									}
+									if (!datdata.UseGame && datdata.GameName)
+									{
+										name = (rom.Game.EndsWith(Path.DirectorySeparatorChar.ToString()) ? rom.Game : rom.Game + Path.DirectorySeparatorChar) + name;
+									}
+
+									if (datdata.UseGame && rom.Game != lastgame)
+									{
+										state += pre + name + post + "\n";
+										lastgame = rom.Game;
+									}
+									else if (!datdata.UseGame)
+									{
+										state += pre + name + post + "\n";
+									}
 								}
 								break;
 							case OutputFormat.RomCenter:
