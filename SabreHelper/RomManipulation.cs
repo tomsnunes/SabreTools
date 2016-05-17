@@ -462,24 +462,6 @@ namespace SabreTools.Helper
 						last.MD5 = (last.MD5 == "" && rom.MD5 != "" ? rom.MD5 : last.MD5);
 						last.SHA1 = (last.SHA1 == "" && rom.SHA1 != "" ? rom.SHA1 : last.SHA1);
 
-						// If the current system has a lower ID than the previous, set the system accordingly
-						if (rom.SystemID < last.SystemID)
-						{
-							last.SystemID = rom.SystemID;
-							last.System = rom.System;
-							last.Game = rom.Game;
-							last.Name = rom.Name;
-						}
-
-						// If the current source has a lower ID than the previous, set the source accordingly
-						if (rom.SourceID < last.SourceID)
-						{
-							last.SourceID = rom.SourceID;
-							last.Source = rom.Source;
-							last.Game = rom.Game;
-							last.Name = rom.Name;
-						}
-
 						// If the duplicate is external already or should be, set it
 						if (last.Dupe >= DupeType.ExternalHash || last.SystemID != rom.SystemID || last.SourceID != rom.SourceID)
 						{
@@ -504,6 +486,24 @@ namespace SabreTools.Helper
 							{
 								last.Dupe = DupeType.InternalHash;
 							}
+						}
+
+						// If the current system has a lower ID than the previous, set the system accordingly
+						if (rom.SystemID < last.SystemID)
+						{
+							last.SystemID = rom.SystemID;
+							last.System = rom.System;
+							last.Game = rom.Game;
+							last.Name = rom.Name;
+						}
+
+						// If the current source has a lower ID than the previous, set the source accordingly
+						if (rom.SourceID < last.SourceID)
+						{
+							last.SourceID = rom.SourceID;
+							last.Source = rom.Source;
+							last.Game = rom.Game;
+							last.Name = rom.Name;
 						}
 
 						outroms.RemoveAt(outroms.Count - 1);

@@ -122,7 +122,7 @@ namespace SabreTools
 			// Modify the Dictionary if necessary and output the results
 			if (_diff)
 			{
-				string post = "";
+				string post = " (No Duplicates)";
 
 				// Get all entries that don't have External dupes
 				DatData outerDiffData = new DatData
@@ -161,8 +161,6 @@ namespace SabreTools
 					}
 				}
 
-				post = " (No Duplicates)";
-
 				// Output the difflist (a-b)+(b-a) diff
 				Output.WriteDatfile(outerDiffData, "", _logger);
 
@@ -170,6 +168,7 @@ namespace SabreTools
 				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
 				for (int j = 0; j < _inputs.Count; j++)
 				{
+					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j]) + " Only)";
 					DatData diffData = new DatData
 					{
 						Name = _name + post,
@@ -204,11 +203,11 @@ namespace SabreTools
 						}
 					}
 
-					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j]) + " Only)";
 					Output.WriteDatfile(diffData, "", _logger);
 				}
 
 				// Get all entries that have External dupes
+				post = " (Duplicates)";
 				DatData dupeData = new DatData
 				{
 					Name = _name + post,
@@ -222,7 +221,6 @@ namespace SabreTools
 					MergeRoms = _dedup,
 					Roms = new Dictionary<string, List<RomData>>(),
 				};
-				post = " (Duplicates)";
 				foreach (string key in userData.Roms.Keys)
 				{
 					List<RomData> temp = userData.Roms[key];
