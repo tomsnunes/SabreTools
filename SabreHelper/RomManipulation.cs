@@ -227,6 +227,9 @@ namespace SabreTools.Helper
 											}
 											headreader.Read();
 											break;
+										default:
+											headreader.Read();
+											break;
 									}
 								}
 							}
