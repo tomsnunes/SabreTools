@@ -57,10 +57,10 @@ namespace SabreTools.Helper
 	public enum DupeType
 	{
 		None = 0,
-		InternalHash,
-		InternalAll,
-		ExternalHash,
-		ExternalAll,
+		InternalHash = 1,
+		InternalAll = 2,
+		ExternalHash = 3,
+		ExternalAll = 4,
 	}
 
 	/// <summary>
