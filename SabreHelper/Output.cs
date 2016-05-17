@@ -22,11 +22,6 @@ namespace SabreTools.Helper
 		/// The following features have been requested for file output:
 		/// - Have the ability to strip special (non-ASCII) characters from rom information
 		/// - Add a flag for ignoring roms with blank sizes
-		/// - For OutputFormat.MissFile:
-		///		+ Have switch for automatically outputting to Romba format:
-		///			e.g. /aa/bb/cc/dd/aabbccddef770b06131a878b46d4302ac28dd126.gz
-		///			Anything without a SHA-1 has to be skipped
-		/// </remarks>
 		/// </remarks>
 		public static bool WriteDatfile(DatData datdata, string outDir, Logger logger, bool norename = true)
 		{
