@@ -125,8 +125,8 @@ Options:
 	-b, --bare		Don't include date in file name
 	-u, --unzip		Force unzipping in created DAT
 	-o, --old		Output DAT in CMP format instead of XML
-	-n=, --name=		Set the name of the DAT
-	-d=, --desc=		Set the description of the DAT
+	-n=, --name=		Set the internal name of the DAT
+	-d=, --desc=		Set the filename and description of the DAT
 	-c=, --cat=		Set the category of the DAT
 	-v=, --version=		Set the version of the DAT
 	-au=, --author=		Set the author of the DAT
@@ -164,8 +164,8 @@ Options:
   -u, --unzip		Force unzipping in created DAT
   -f, --files		Treat archives as files
   -o, --old		Output DAT in CMP format instead of XML
-  -n=, --name=		Set the name of the DAT
-  -d=, --desc=		Set the description of the DAT
+  -n=, --name=		Set the internal name of the DAT
+  -d=, --desc=		Set the filename and description of the DAT
   -c=, --cat=		Set the category of the DAT
   -v=, --version=	Set the version of the DAT
   -au=, --author=	Set the author of the DAT
