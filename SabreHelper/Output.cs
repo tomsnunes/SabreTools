@@ -117,6 +117,7 @@ namespace SabreTools.Helper
 							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
 							"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
 							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
+							(datdata.Type != null && datdata.Type != "" ? "\t\t<type>" + datdata.Type + "</type>\n" : "") +
 							(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
 							"\t</header>\n";
 						break;

@@ -316,6 +316,7 @@ namespace SabreTools
 				Date = _date,
 				Category = _cat,
 				Author = _author,
+				Type = (_superDat ? "SuperDAT" : ""),
 				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 				Roms = _dict,

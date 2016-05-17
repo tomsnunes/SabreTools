@@ -40,6 +40,7 @@ namespace SabreTools.Helper
 		public string Url;
 		public string Comment;
 		public string Header;
+		public string Type; // Generally only used for SuperDAT
 		public ForceMerging ForceMerging;
 		public ForceNodump ForceNodump;
 		public ForcePacking ForcePacking;
