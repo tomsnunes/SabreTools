@@ -375,7 +375,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvertCMP(input);
+					InitConvert(input, OutputFormat.ClrMamePro);
 				}
 			}
 
@@ -384,7 +384,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvertRC(input);
+					InitConvert(input, OutputFormat.RomCenter);
 				}
 			}
 
@@ -393,7 +393,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvertXML(input);
+					InitConvert(input, OutputFormat.Xml);
 				}
 			}
 
@@ -708,7 +708,7 @@ or 'b' to go back to the previous menu:
 				if (selection.ToLowerInvariant() != "b")
 				{
 					Console.Clear();
-					InitConvertCMP(selection);
+					InitConvert(selection, OutputFormat.ClrMamePro);
 					Console.Write("\nPress any key to continue...");
 					Console.ReadKey();
 				}
@@ -735,7 +735,7 @@ or 'b' to go back to the previous menu:
 				if (selection.ToLowerInvariant() != "b")
 				{
 					Console.Clear();
-					InitConvertRC(selection);
+					InitConvert(selection, OutputFormat.RomCenter);
 					Console.Write("\nPress any key to continue...");
 					Console.ReadKey();
 				}
@@ -762,7 +762,7 @@ or 'b' to go back to the previous menu:
 				if (selection.ToLowerInvariant() != "b")
 				{
 					Console.Clear();
-					InitConvertXML(selection);
+					InitConvert(selection, OutputFormat.Xml);
 					Console.Write("\nPress any key to continue...");
 					Console.ReadKey();
 				}
@@ -1307,11 +1307,13 @@ Make a selection:
 		}
 
 		/// <summary>
-		/// Wrap converting DAT file from any format to ClrMamePro
+		/// Wrap converting DAT file from any format to any format
 		/// </summary>
 		/// <param name="filename"></param>
-		private static void InitConvertCMP(string filename)
+		/// <param name="outputFormat"></param>
+		private static void InitConvert(string filename, OutputFormat outputFormat)
 		{
+			filename = filename.Replace("\"", "");
 			if (File.Exists(filename))
 			{
 				logger.User("Converting " + filename);
@@ -1327,97 +1329,63 @@ Make a selection:
 					Homepage = "",
 					Url = "",
 					Comment = "",
-					OutputFormat = OutputFormat.ClrMamePro,
+					OutputFormat = outputFormat,
 					Roms = new Dictionary<string, List<RomData>>(),
 					MergeRoms = false,
 				};
-
 				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger);
 
-				logger.User("datdata.Description: " + datdata.Description);
-
-				datdata.Description += ".new";
-				Output.WriteDatfile(datdata, Path.GetDirectoryName(filename), logger);
-			}
-			else
-			{
-				logger.Error("I'm sorry but " + filename + " doesn't exist!");
-			}
-			return;
-		}
-
-		/// <summary>
-		/// Wrap converting DAT file from any format to RomCenter
-		/// </summary>
-		/// <param name="filename"></param>
-		private static void InitConvertRC(string filename)
-		{
-			if (File.Exists(filename))
-			{
-				logger.User("Converting " + filename);
-				DatData datdata = new DatData
+				// Sometimes the description doesn't match the filename, change this
+				if (datdata.Description != Path.GetFileNameWithoutExtension(filename))
 				{
-					Name = "",
-					Description = "",
-					Category = "",
-					Version = "",
-					Date = "",
-					Author = "",
-					Email = "",
-					Homepage = "",
-					Url = "",
-					Comment = "",
-					OutputFormat = OutputFormat.RomCenter,
-					Roms = new Dictionary<string, List<RomData>>(),
-					MergeRoms = false,
-				};
+					datdata.Description = Path.GetFileNameWithoutExtension(filename);
+				}
 
-				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger);
-
-				logger.User("datdata.Description: " + datdata.Description);
-
-				datdata.Description += ".new";
-				Output.WriteDatfile(datdata, Path.GetDirectoryName(filename), logger);
-			}
-			else
-			{
-				logger.Error("I'm sorry but " + filename + " doesn't exist!");
-			}
-			return;
-		}
-
-		/// <summary>
-		/// Wrap converting DAT file from any format to XML
-		/// </summary>
-		/// <param name="filename"></param>
-		private static void InitConvertXML(string filename)
-		{
-			if (File.Exists(filename))
-			{
-				logger.User("Converting " + filename);
-				DatData datdata = new DatData
+				// If the extension matches, append ".new" to the filename
+				if (Path.GetExtension(filename) == (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"))
 				{
-					Name = "",
-					Description = "",
-					Category = "",
-					Version = "",
-					Date = "",
-					Author = "",
-					Email = "",
-					Homepage = "",
-					Url = "",
-					Comment = "",
-					OutputFormat = OutputFormat.Xml,
-					Roms = new Dictionary<string, List<RomData>>(),
-					MergeRoms = false,
-				};
+					datdata.Description += ".new";
+				}
 
-				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger);
-
-				logger.User("datdata.Description: " + datdata.Description);
-
-				datdata.Description += ".new";
 				Output.WriteDatfile(datdata, Path.GetDirectoryName(filename), logger);
+			}
+			else if (Directory.Exists(filename))
+			{
+				foreach (string file in Directory.EnumerateFiles(filename, "*", SearchOption.AllDirectories))
+				{
+					logger.User("Converting " + file);
+					DatData datdata = new DatData
+					{
+						Name = "",
+						Description = "",
+						Category = "",
+						Version = "",
+						Date = "",
+						Author = "",
+						Email = "",
+						Homepage = "",
+						Url = "",
+						Comment = "",
+						OutputFormat = outputFormat,
+						Roms = new Dictionary<string, List<RomData>>(),
+						MergeRoms = false,
+					};
+					datdata = RomManipulation.Parse(file, 0, 0, datdata, logger);
+
+					// Sometimes the description doesn't match the filename, change this
+					if (datdata.Description != Path.GetFileNameWithoutExtension(file))
+					{
+						datdata.Description = Path.GetFileNameWithoutExtension(file);
+					}
+
+					// If the extension matches, append ".new" to the filename
+					if (Path.GetExtension(file) == (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"))
+					{
+						datdata.Description += ".new";
+					}
+
+					Output.WriteDatfile(datdata, Path.GetDirectoryName(file), logger);
+				}
 			}
 			else
 			{
