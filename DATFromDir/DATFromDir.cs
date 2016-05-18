@@ -407,17 +407,25 @@ namespace SabreTools
 						continue;
 					}
 
-					string actualroot = (item == _basePath ? item.Split(Path.DirectorySeparatorChar).Last() : item.Remove(0, _basePath.Length).Split(Path.DirectorySeparatorChar)[0]);
-					actualroot = (actualroot == "" ? _basePath.Split(Path.DirectorySeparatorChar).Last() : actualroot);
-					actualroot += Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(item);
-					string actualitem = entry.Remove(0, _tempDir.Length);
+					string actualroot = "";
+					string actualitem = "";
+
+					actualitem = entry.Remove(0, _tempDir.Length);
 
 					// If we're in SuperDAT mode, make sure the added item is by itself
 					if (_superDat)
 					{
-						actualroot += Path.DirectorySeparatorChar + Path.GetDirectoryName(actualitem);
+						actualroot = (item == _basePath ? item.Split(Path.DirectorySeparatorChar).Last() : item.Remove(0, _basePath.Length).Split(Path.DirectorySeparatorChar)[0]);
+						actualroot = (actualroot == "" ? _basePath.Split(Path.DirectorySeparatorChar).Last() : actualroot);
+						actualroot += Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(item) + Path.DirectorySeparatorChar + Path.GetDirectoryName(actualitem);
 						actualroot = actualroot.TrimEnd(Path.DirectorySeparatorChar);
 						actualitem = Path.GetFileName(actualitem);
+					}
+					// Otherwise, set the correct root and such
+					else
+					{
+						actualroot = Path.GetFileNameWithoutExtension(item);
+						actualroot = actualroot.TrimEnd(Path.DirectorySeparatorChar);
 					}
 
 					RomData rom = new RomData
