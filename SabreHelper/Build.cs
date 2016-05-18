@@ -125,6 +125,7 @@ Options:
 	-b, --bare		Don't include date in file name
 	-u, --unzip		Force unzipping in created DAT
 	-o, --old		Output DAT in CMP format instead of XML
+	-sd, --superdat		Enable SuperDAT creation
 	-n=, --name=		Set the internal name of the DAT
 	-d=, --desc=		Set the filename and description of the DAT
 	-c=, --cat=		Set the category of the DAT

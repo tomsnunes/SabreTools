@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using SabreTools.Helper;
 
@@ -17,6 +18,7 @@ namespace SabreTools
 		private bool _bare;
 		private bool _forceunpack;
 		private bool _old;
+		private bool _superdat;
 
 		// User specified strings
 		private string _name;
@@ -44,9 +46,10 @@ namespace SabreTools
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="forceunpack">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
 		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
+		/// <param name="superdat">True if DATs should be parsed into SuperDAT format, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		public MergeDiff(List<String> inputs, string name, string desc, string cat, string version, string author,
-			bool diff, bool dedup, bool bare, bool forceunpack, bool old, Logger logger)
+			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, Logger logger)
 		{
 			_inputs = inputs;
 			_name = name;
@@ -59,6 +62,7 @@ namespace SabreTools
 			_bare = bare;
 			_forceunpack = forceunpack;
 			_old = old;
+			_superdat = superdat;
 			_logger = logger;
 		}
 
@@ -111,11 +115,12 @@ namespace SabreTools
 				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 				MergeRoms = _dedup,
 				Roms = new Dictionary<string, List<RomData>>(),
+				Type = (_superdat ? "SuperDAT" : ""),
 			};
 			foreach (string input in _inputs)
 			{
-				_logger.User("Adding DAT: " + input);
-				userData = RomManipulation.Parse(input, i, 0, userData, _logger);
+				_logger.User("Adding DAT: " + input.Split('¬')[0]);
+				userData = RomManipulation.Parse(input.Split('¬')[0], i, 0, userData, _logger);
 				i++;
 			}
 			
@@ -168,7 +173,7 @@ namespace SabreTools
 				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
 				for (int j = 0; j < _inputs.Count; j++)
 				{
-					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j]) + " Only)";
+					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
 					DatData diffData = new DatData
 					{
 						Name = _name + post,
@@ -249,6 +254,30 @@ namespace SabreTools
 			// Output all entries with user-defined merge
 			else
 			{
+				// If we're in SuperDAT mode, prefix all games with their respective DATs
+				if (_superdat)
+				{
+					List<string> keys = userData.Roms.Keys.ToList();
+					foreach (string key in keys)
+					{
+						List<RomData> newroms = new List<RomData>();
+						foreach (RomData rom in userData.Roms[key])
+						{
+							RomData newrom = rom;
+							string filename = _inputs[newrom.SystemID].Split('¬')[0];
+							string rootpath = _inputs[newrom.SystemID].Split('¬')[1];
+
+							rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
+							filename = filename.Remove(0, rootpath.Length);
+							newrom.Game = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar.ToString() + 
+								Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar + newrom.Game;
+							newroms.Add(newrom);
+							Console.WriteLine(newrom.Game);
+						}
+						userData.Roms[key] = newroms;
+					}
+				}
+
 				Output.WriteDatfile(userData, "", _logger);
 			}
 

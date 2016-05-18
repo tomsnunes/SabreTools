@@ -74,6 +74,7 @@ namespace SabreTools
 				quotes = false,
 				rem = false,
 				romba = false,
+				superdat = false,
 				trim = false,
 				skip = false,
 				usegame = true;
@@ -197,6 +198,10 @@ namespace SabreTools
 					case "-ro":
 					case "--romba":
 						romba = true;
+						break;
+					case "-sd":
+					case "--superdat":
+						superdat = true;
 						break;
 					case "--skip":
 						skip = true;
@@ -447,7 +452,7 @@ namespace SabreTools
 			// Merge, diff, and dedupe at least 2 DATs
 			else if (merge || diff)
 			{
-				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old);
+				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat);
 			}
 
 			logger.Close();
@@ -909,7 +914,7 @@ Make a selection:
 		private static void MergeDiffMenu()
 		{
 			string selection = "", input = "", name = "", desc = "", cat = "", version = "", author = "";
-			bool dedup = false, diff = false, bare = false, forceunpack = false, old = false;
+			bool dedup = false, diff = false, bare = false, forceunpack = false, old = false, superdat = false;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
@@ -929,7 +934,8 @@ Make a selection:
     9) " + (bare ? "Don't append the date to the name" : "Append the date to the name") + @"
     10) " + (forceunpack ? "Remove 'forcepacking=\"unzip\"' from output" : "Add 'forcepacking=\"unzip\"' to output") + @"
     11) " + (old ? "Enable XML output" : "Enable ClrMamePro output") + @"
-    12) Merge the DATs
+    12) " + (superdat ? "Disable SuperDAT output" : "Enable SuperDAT output") + @"
+    13) Merge the DATs
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -982,9 +988,12 @@ Make a selection:
 						old = !old;
 						break;
 					case "12":
+						superdat = !superdat;
+						break;
+					case "13":
 						Console.Clear();
 						List<string> inputs = new List<string>(input.Split(';'));
-						InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old);
+						InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						selection = ""; input = ""; name = ""; desc = ""; cat = ""; version = ""; author = "";
@@ -1520,7 +1529,9 @@ Make a selection:
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="forceunpack">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
 		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
-		private static void InitMergeDiff(List<string> inputs, string name, string desc, string cat, string version, string author, bool diff, bool dedup, bool bare, bool forceunpack, bool old)
+		/// <param name="superdat">True if DATs should be merged in SuperDAT style, false otherwise</param>
+		private static void InitMergeDiff(List<string> inputs, string name, string desc, string cat, string version, string author,
+			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat)
 		{
 			// Make sure there are no folders in inputs
 			List<string> newInputs = new List<string>();
@@ -1532,7 +1543,7 @@ Make a selection:
 					{
 						try
 						{
-							newInputs.Add(Path.GetFullPath(file));
+							newInputs.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(input.Replace("\"", "")));
 						}
 						catch (PathTooLongException)
 						{
@@ -1544,7 +1555,7 @@ Make a selection:
 				{
 					try
 					{
-						newInputs.Add(Path.GetFullPath(input.Replace("\"", "")));
+						newInputs.Add(Path.GetFullPath(input.Replace("\"", "") + "¬"));
 					}
 					catch (PathTooLongException)
 					{
@@ -1553,7 +1564,7 @@ Make a selection:
 				}
 			}
 
-			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, logger);
+			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, logger);
 			md.Process();
 		}
 
