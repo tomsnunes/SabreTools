@@ -420,9 +420,6 @@ namespace SabreTools
 						actualitem = Path.GetFileName(actualitem);
 					}
 
-					Console.WriteLine("actualroot: " + actualroot);
-					Console.WriteLine("actualitem: " + actualitem);
-
 					RomData rom = new RomData
 					{
 						Type = "rom",
