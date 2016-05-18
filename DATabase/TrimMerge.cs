@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using SabreTools.Helper;
 
@@ -101,32 +102,32 @@ namespace SabreTools
 			datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger);
 
 			// Trim all file names according to the path that's set
-			foreach (string key in datdata.Roms.Keys)
+			List<string> keys = datdata.Roms.Keys.ToList();
+			foreach (string key in keys)
 			{
-				List<RomData> outroms = new List<RomData>();
-
-				foreach (RomData actrom in datdata.Roms[key])
+				List<RomData> newroms = new List<RomData>();
+				foreach (RomData rom in datdata.Roms[key])
 				{
-					RomData rom = actrom;
+					RomData newrom = rom;
 
 					// If we are in single game mode, rename all games
 					if (rename)
 					{
-						rom.Game = "!";
+						newrom.Game = "!";
 					}
 
 					// Windows max name length is 260
-					int usableLength = 260 - rom.Game.Length - _path.Length;
-					if (rom.Name.Length > usableLength)
+					int usableLength = 260 - newrom.Game.Length - _path.Length;
+					if (newrom.Name.Length > usableLength)
 					{
-						string ext = Path.GetExtension(rom.Name);
-						rom.Name = rom.Name.Substring(0, usableLength - ext.Length);
-						rom.Name += ext;
+						string ext = Path.GetExtension(newrom.Name);
+						newrom.Name = newrom.Name.Substring(0, usableLength - ext.Length);
+						newrom.Name += ext;
 					}
 
-					outroms.Add(rom);
+					newroms.Add(newrom);
 				}
-				datdata.Roms[key] = outroms;
+				datdata.Roms[key] = newroms;
 			}
 
 			// Now write the file out accordingly
