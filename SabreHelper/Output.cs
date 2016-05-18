@@ -173,6 +173,7 @@ namespace SabreTools.Helper
 									(rom.CRC != "" ? " crc " + rom.CRC.ToLowerInvariant() : "") +
 									(rom.MD5 != "" ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
 									(rom.SHA1 != "" ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
+									(rom.Nodump ? " flags nodump" : "") +
 									" )\n";
 								break;
 							case OutputFormat.MissFile:
@@ -234,6 +235,7 @@ namespace SabreTools.Helper
 									(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
 									(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
 									(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
+									(rom.Nodump ? " status=\"nodump\"" : "") +
 									"/>\n";
 								break;
 						}

@@ -288,12 +288,13 @@ namespace SabreTools.Helper
 									{
 										case "rom":
 										case "disk":
-											// If the rom is nodump, skip it
+											// If the rom is nodump, flag it
+											bool nodump = false;
 											if (xtr.GetAttribute("flags") == "nodump" || xtr.GetAttribute("status") == "nodump")
 											{
 												logger.Log("Nodump detected: " +
-													(xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND") + "; skipping...");
-												break;
+													(xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
+												nodump = true;
 											}
 
 											// Take care of hex-sized files
@@ -343,12 +344,12 @@ namespace SabreTools.Helper
 											// If the file has no size and it's not the above case, skip and log
 											else if (subreader.Name == "rom" && (size == 0 || size == -1))
 											{
-												logger.Warning("Potentially incomplete entry found for \"" + xtr.GetAttribute("name") + "\"");
-												break;
+												logger.Error("Incomplete entry for \"" + xtr.GetAttribute("name") + "\" will be output as nodump");
+												nodump = true;
 											}
 
 											// Only add the rom if there's useful information in it
-											if (!(crc == "" && md5 == "" && sha1 == ""))
+											if (!(crc == "" && md5 == "" && sha1 == "") || nodump)
 											{
 												// Get the new values to add
 												key = size + "-" + crc;
@@ -365,6 +366,7 @@ namespace SabreTools.Helper
 													MD5 = md5,
 													SHA1 = sha1,
 													System = filename,
+													Nodump = nodump,
 												};
 
 												if (datdata.Roms.ContainsKey(key))

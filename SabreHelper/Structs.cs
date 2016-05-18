@@ -21,6 +21,7 @@ namespace SabreTools.Helper
 		public string MD5;
 		public string SHA1;
 		public DupeType Dupe;
+		public bool Nodump;
 	}
 
 	/// <summary>
