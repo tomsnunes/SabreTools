@@ -1309,7 +1309,7 @@ Make a selection:
 
 			if (File.Exists(filename))
 			{
-				logger.User("Converting " + filename);
+				logger.User("Converting \"" + Path.GetFileName(filename) + "\"");
 				DatData datdata = new DatData
 				{
 					Name = "",
@@ -1348,7 +1348,7 @@ Make a selection:
 
 				foreach (string file in Directory.EnumerateFiles(filename, "*", SearchOption.AllDirectories))
 				{
-					logger.User("Converting " + file);
+					logger.User("Converting \"" + Path.GetFullPath(file).Remove(0, filename.Length + 1) + "\"");
 					DatData datdata = new DatData
 					{
 						Name = "",

@@ -55,7 +55,7 @@ namespace SabreTools.Helper
 		/// <returns>The XmlTextReader representing the (possibly converted) file, null otherwise</returns>
 		public static XmlTextReader GetXmlTextReader(string filename, Logger logger)
 		{
-			logger.Log("Attempting to read file: " + filename);
+			logger.Log("Attempting to read file: \"" + filename + "\"");
 
 			// Check if file exists
 			if (!File.Exists(filename))
@@ -291,7 +291,8 @@ namespace SabreTools.Helper
 											// If the rom is nodump, skip it
 											if (xtr.GetAttribute("flags") == "nodump" || xtr.GetAttribute("status") == "nodump")
 											{
-												logger.Log("Nodump detected; skipping...");
+												logger.Log("Nodump detected: " +
+													(xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND") + "; skipping...");
 												break;
 											}
 
@@ -342,7 +343,7 @@ namespace SabreTools.Helper
 											// If the file has no size and it's not the above case, skip and log
 											else if (subreader.Name == "rom" && (size == 0 || size == -1))
 											{
-												logger.Warning("Potentially incomplete entry found for " + xtr.GetAttribute("name"));
+												logger.Warning("Potentially incomplete entry found for \"" + xtr.GetAttribute("name") + "\"");
 												break;
 											}
 

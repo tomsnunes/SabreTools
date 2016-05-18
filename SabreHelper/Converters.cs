@@ -75,6 +75,11 @@ namespace SabreTools.Helper
 						{
 							continue;
 						}
+						// Special case for nodump...
+						else if (gc[i] == "nodump" && attrib != "status" && attrib != "flags")
+						{
+							temp.SetAttributeValue("status", "nodump");
+						}
 						// Even number of quotes, not in a quote, not in attribute
 						else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib == "")
 						{
