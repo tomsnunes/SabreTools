@@ -256,7 +256,7 @@ namespace SabreTools.Helper
 				}
 
 				sw.Write(footer);
-				logger.User("File written!" + Environment.NewLine);
+				logger.Log("File written!" + Environment.NewLine);
 				sw.Close();
 				fs.Close();
 			}

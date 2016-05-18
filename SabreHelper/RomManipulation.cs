@@ -332,7 +332,7 @@ namespace SabreTools.Helper
 											sha1 = (sha1 == "" ? "" : sha1.PadLeft(40, '0'));
 
 											// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
-											if (subreader.Name == "rom" && (size == 0 || size == -1) && (crc == CRCZero || md5 == MD5Zero || sha1 == SHA1Zero))
+											if (subreader.Name == "rom" && (size == 0 || size == -1) && ((crc == CRCZero || crc == "") || md5 == MD5Zero || sha1 == SHA1Zero))
 											{
 												size = SizeZero;
 												crc = CRCZero;

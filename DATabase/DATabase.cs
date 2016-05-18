@@ -1303,9 +1303,8 @@ Make a selection:
 			outdir = outdir.Replace("\"", "");
 			if (outdir != "")
 			{
-				outdir = Path.GetFullPath(outdir);
+				outdir = Path.GetFullPath(outdir) + Path.DirectorySeparatorChar;
 			}
-			Console.WriteLine(outdir);
 			filename = filename.Replace("\"", "");
 
 			if (File.Exists(filename))
@@ -1380,7 +1379,7 @@ Make a selection:
 						datdata.Description += ".new";
 					}
 
-					Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(file) : outdir + Path.DirectorySeparatorChar + Path.GetDirectoryName(file).Remove(0, filename.Length)), logger);
+					Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(file) : outdir + Path.GetDirectoryName(file).Remove(0, filename.Length + 1)), logger);
 				}
 			}
 			else
