@@ -243,8 +243,11 @@ namespace SabreTools
 					string basePathBackup = _basePath;
 					foreach (string item in Directory.EnumerateDirectories(_basePath))
 					{
-						_basePath = (File.Exists(item) ? item : item + Path.DirectorySeparatorChar);
-						_basePath = Path.GetFullPath(_basePath);
+						if (!_superDat)
+						{
+							_basePath = (File.Exists(item) ? item : item + Path.DirectorySeparatorChar);
+							_basePath = Path.GetFullPath(_basePath);
+						}
 						
 						foreach (string subitem in Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories))
 						{
@@ -294,7 +297,8 @@ namespace SabreTools
 					foreach (RomData rom in _dict[key])
 					{
 						RomData newrom = rom;
-						newrom.Game = _name + Path.DirectorySeparatorChar + newrom.Game;
+						newrom.Game = _name + (newrom.Game != "" &&
+							!newrom.Game.StartsWith(Path.DirectorySeparatorChar.ToString()) ? Path.DirectorySeparatorChar.ToString() : "") + newrom.Game;
 						newroms.Add(newrom);
 					}
 					_dict[key] = newroms;
@@ -415,7 +419,7 @@ namespace SabreTools
 					// If we're in SuperDAT mode, make sure the added item is by itself
 					if (_superDat)
 					{
-						actualroot = (item == _basePath ? item.Split(Path.DirectorySeparatorChar).Last() : item.Remove(0, _basePath.Length).Split(Path.DirectorySeparatorChar)[0]);
+						actualroot = Path.GetDirectoryName(item.Remove(0, _basePath.Length));
 						actualroot = (actualroot == "" ? _basePath.Split(Path.DirectorySeparatorChar).Last() : actualroot);
 						actualroot += Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(item) + Path.DirectorySeparatorChar + Path.GetDirectoryName(actualitem);
 						actualroot = actualroot.TrimEnd(Path.DirectorySeparatorChar);
@@ -431,8 +435,8 @@ namespace SabreTools
 					RomData rom = new RomData
 					{
 						Type = "rom",
-						Game = actualroot, //Path.GetFileNameWithoutExtension(item),
-						Name = actualitem, // entry.Remove(0, _tempDir.Length),
+						Game = actualroot,
+						Name = actualitem,
 						Size = (new FileInfo(entry)).Length,
 						CRC = fileCRC,
 						MD5 = fileMD5,
@@ -499,13 +503,13 @@ namespace SabreTools
 					}
 
 					string actualroot = (item == _basePath ? item.Split(Path.DirectorySeparatorChar).Last() : item.Remove(0, _basePath.Length).Split(Path.DirectorySeparatorChar)[0]);
-					actualroot = (actualroot == "" ? _basePath.Split(Path.DirectorySeparatorChar).Last() : actualroot);
+					actualroot = (actualroot == "" && !_superDat ? _basePath.Split(Path.DirectorySeparatorChar).Last() : actualroot);
 					string actualitem = (item == _basePath ? item : item.Remove(0, _basePath.Length + 1));
 
 					// If we're in SuperDAT mode, make sure the added item is by itself
 					if (_superDat)
 					{
-						actualroot += Path.DirectorySeparatorChar + Path.GetDirectoryName(actualitem);
+						actualroot += (actualroot != "" ? Path.DirectorySeparatorChar.ToString() : "") + Path.GetDirectoryName(actualitem);
 						actualroot = actualroot.TrimEnd(Path.DirectorySeparatorChar);
 						actualitem = Path.GetFileName(actualitem);
 					}
