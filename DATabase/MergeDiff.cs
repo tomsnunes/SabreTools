@@ -272,7 +272,6 @@ namespace SabreTools
 							newrom.Game = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar.ToString() + 
 								Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar + newrom.Game;
 							newroms.Add(newrom);
-							Console.WriteLine(newrom.Game);
 						}
 						userData.Roms[key] = newroms;
 					}
