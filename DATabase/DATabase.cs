@@ -375,7 +375,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvert(input, OutputFormat.ClrMamePro);
+					InitConvert(input, OutputFormat.ClrMamePro, outdir);
 				}
 			}
 
@@ -384,7 +384,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvert(input, OutputFormat.RomCenter);
+					InitConvert(input, OutputFormat.RomCenter, outdir);
 				}
 			}
 
@@ -393,7 +393,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvert(input, OutputFormat.Xml);
+					InitConvert(input, OutputFormat.Xml, outdir);
 				}
 			}
 
@@ -651,13 +651,11 @@ Make a selection:
 ===========================
 Make a selection:
 
-    1) Convert DAT to ClrMamePro
-    2) Convert DAT to RomCenter
-    3) Convert DAT to XML
-    4) Convert DAT to missfile
-    5) Trim all entries in DAT and merge into a single game
-    6) Merge, diff, and/or dedup 2 or more DAT files
-    7) Split DAT using 2 extensions
+    1) Convert or clean DAT or folder of DATs
+    3) Convert DAT to missfile
+    4) Trim all entries in DAT and merge into a single game
+    5) Merge, diff, and/or dedup 2 or more DAT files
+    6) Split DAT using 2 extensions
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -665,24 +663,18 @@ Make a selection:
 				switch (selection)
 				{
 					case "1":
-						ConvertCMPMenu();
+						ConvertMenu();
 						break;
 					case "2":
-						ConvertRCMenu();
-						break;
-					case "3":
-						ConvertXMLMenu();
-						break;
-					case "4":
 						ConvertMissMenu();
 						break;
-					case "5":
+					case "3":
 						TrimMergeMenu();
 						break;
-					case "6":
+					case "4":
 						MergeDiffMenu();
 						break;
-					case "7":
+					case "5":
 						ExtSplitMenu();
 						break;
 				}
@@ -690,84 +682,78 @@ Make a selection:
 		}
 
 		/// <summary>
-		/// Show the text-based any to CMP conversion menu
+		/// Show the text-based any to any conversion menu
 		/// </summary>
-		private static void ConvertCMPMenu()
+		private static void ConvertMenu()
 		{
-			string selection = "";
+			string selection = "", input = "", outdir = "";
+			OutputFormat outputFormat = OutputFormat.Xml;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
 				Build.Start("DATabase");
-				Console.WriteLine(@"ANY -> CMP CONVERT MENU
+				Console.WriteLine(@"DAT CONVERSION MENU
 ===========================
-Enter the name of a DAT file to convert to CMP
-or 'b' to go back to the previous menu:
-");
-				selection = Console.ReadLine();
-				if (selection.ToLowerInvariant() != "b")
-				{
-					Console.Clear();
-					InitConvert(selection, OutputFormat.ClrMamePro);
-					Console.Write("\nPress any key to continue...");
-					Console.ReadKey();
-				}
-			}
-			return;
-		}
+Make a selection:
 
-		/// <summary>
-		/// Show the text-based any to RomCenter conversion menu
-		/// </summary>
-		private static void ConvertRCMenu()
-		{
-			string selection = "";
-			while (selection.ToLowerInvariant() != "b")
-			{
-				Console.Clear();
-				Build.Start("DATabase");
-				Console.WriteLine(@"ANY -> RC CONVERT MENU
-===========================
-Enter the name of a DAT file to convert to RomCenter
-or 'b' to go back to the previous menu:
+    1) File or folder to convert" + (input == "" ? "" : ":\n" + input) + @"
+    2) New output folder" + (outdir == "" ? " (blank means source directory)" : ":\n" + outdir) + @"
+    3) Current output type: " + (outputFormat.ToString()) + @"
+    4) Process file or folder
+    B) Go back to the previous menu
 ");
+				Console.Write("Enter selection: ");
 				selection = Console.ReadLine();
-				if (selection.ToLowerInvariant() != "b")
+				switch (selection)
 				{
-					Console.Clear();
-					InitConvert(selection, OutputFormat.RomCenter);
-					Console.Write("\nPress any key to continue...");
-					Console.ReadKey();
-				}
-			}
-			return;
-		}
+					case "1":
+						Console.Clear();
+						Console.Write("Please enter a file or folder name: ");
+						input = Console.ReadLine();
+						break;
+					case "2":
+						Console.Clear();
+						Console.Write("Please enter a folder name: ");
+						input = Console.ReadLine();
+						break;
+					case "3":
+						string subsel = "";
+						while (subsel == "")
+						{
+							Console.Clear();
+							Console.WriteLine(@"Possible output formats:
+    1) Xml
+    2) ClrMamePro
+    3) RomCenter
+");
+							Console.Write("Please enter your selection: ");
+							subsel = Console.ReadLine();
 
-		/// <summary>
-		/// Show the text-based CMP to XML conversion menu
-		/// </summary>
-		private static void ConvertXMLMenu()
-		{
-			string selection = "";
-			while (selection.ToLowerInvariant() != "b")
-			{
-				Console.Clear();
-				Build.Start("DATabase");
-				Console.WriteLine(@"ANY -> XML CONVERT MENU
-===========================
-Enter the name of a DAT file to convert to XML
-or 'b' to go back to the previous menu:
-");
-				selection = Console.ReadLine();
-				if (selection.ToLowerInvariant() != "b")
-				{
-					Console.Clear();
-					InitConvert(selection, OutputFormat.Xml);
-					Console.Write("\nPress any key to continue...");
-					Console.ReadKey();
+							switch (subsel)
+							{
+								case "1":
+									outputFormat = OutputFormat.Xml;
+									break;
+								case "2":
+									outputFormat = OutputFormat.ClrMamePro;
+									break;
+								case "3":
+									outputFormat = OutputFormat.RomCenter;
+									break;
+								default:
+									subsel = "";
+									break;
+							}
+						}
+						break;
+					case "4":
+						Console.Clear();
+						InitConvert(input, outputFormat, outdir);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						break;
 				}
 			}
-			return;
 		}
 
 		/// <summary>
@@ -1311,9 +1297,17 @@ Make a selection:
 		/// </summary>
 		/// <param name="filename"></param>
 		/// <param name="outputFormat"></param>
-		private static void InitConvert(string filename, OutputFormat outputFormat)
+		private static void InitConvert(string filename, OutputFormat outputFormat, string outdir = "")
 		{
+			// Clean the input strings
+			outdir = outdir.Replace("\"", "");
+			if (outdir != "")
+			{
+				outdir = Path.GetFullPath(outdir);
+			}
+			Console.WriteLine(outdir);
 			filename = filename.Replace("\"", "");
+
 			if (File.Exists(filename))
 			{
 				logger.User("Converting " + filename);
@@ -1342,15 +1336,17 @@ Make a selection:
 				}
 
 				// If the extension matches, append ".new" to the filename
-				if (Path.GetExtension(filename) == (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"))
+				if (outdir == "" && Path.GetExtension(filename) == (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"))
 				{
 					datdata.Description += ".new";
 				}
 
-				Output.WriteDatfile(datdata, Path.GetDirectoryName(filename), logger);
+				Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(filename) : outdir), logger);
 			}
 			else if (Directory.Exists(filename))
 			{
+				filename = Path.GetFullPath(filename);
+
 				foreach (string file in Directory.EnumerateFiles(filename, "*", SearchOption.AllDirectories))
 				{
 					logger.User("Converting " + file);
@@ -1379,12 +1375,12 @@ Make a selection:
 					}
 
 					// If the extension matches, append ".new" to the filename
-					if (Path.GetExtension(file) == (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"))
+					if (outdir == "" && Path.GetExtension(file) == (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"))
 					{
 						datdata.Description += ".new";
 					}
 
-					Output.WriteDatfile(datdata, Path.GetDirectoryName(file), logger);
+					Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(file) : outdir + Path.DirectorySeparatorChar + Path.GetDirectoryName(file).Remove(0, filename.Length)), logger);
 				}
 			}
 			else

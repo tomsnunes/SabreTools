@@ -68,6 +68,9 @@ namespace SabreTools.Helper
 				outDir += Path.DirectorySeparatorChar;
 			}
 
+			// Create the output directory if it doesn't already exist
+			Directory.CreateDirectory(outDir);
+
 			// (currently uses current time, change to "last updated time")
 			logger.User("Opening file for writing: " + outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"));
 
