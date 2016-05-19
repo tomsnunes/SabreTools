@@ -156,6 +156,7 @@ namespace SabreTools.Helper
 							if (keep)
 							{
 								datdata.Type = (String.IsNullOrEmpty(datdata.Type) ? "SuperDAT" : datdata.Type);
+								superdat = true;
 							}
 						}
 					}
@@ -407,12 +408,15 @@ namespace SabreTools.Helper
 
 								if (superdat && !keep)
 								{
-									tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
+									string tempout = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
+									if (tempout != "")
+									{
+										tempname = tempout;
+									}
 								}
 								// Get the name of the game from the parent
 								else if (superdat && keep && parent.Count > 0)
 								{
-
 									tempname = String.Join("\\", parent) + "\\" + tempname;
 								}
 
@@ -683,7 +687,11 @@ namespace SabreTools.Helper
 							// If we have a SuperDAT and we aren't keeping names
 							if (superdat && !keep)
 							{
-								tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
+								string tempout = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
+								if (tempout != "")
+								{
+									tempname = tempout;
+								}
 							}
 
 							// Only add the rom if there's useful information in it
