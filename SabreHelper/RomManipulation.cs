@@ -114,9 +114,13 @@ namespace SabreTools.Helper
 				while (xtr.NodeType != XmlNodeType.None)
 				{
 					// If we have an end folder element, remove one item from the parent, if possible
-					if (xtr.NodeType == XmlNodeType.EndElement && xtr.Name == "directory" && parent.Count > 0)
+					if (xtr.NodeType == XmlNodeType.EndElement && (xtr.Name == "directory" || xtr.Name == "dir") && parent.Count > 0)
 					{
 						parent.RemoveAt(parent.Count - 1);
+						if (keep)
+						{
+							datdata.Type = (String.IsNullOrEmpty(datdata.Type) ? "SuperDAT" : datdata.Type);
+						}
 					}
 
 					// We only want elements
@@ -371,6 +375,12 @@ namespace SabreTools.Helper
 								{
 									tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
 								}
+								// Get the name of the game from the parent
+								else if (superdat && keep && parent.Count > 0)
+								{
+									
+									tempname = String.Join("\\", parent) + "\\" + tempname;
+								}
 
 								while (subreader.Read())
 								{
@@ -494,6 +504,7 @@ namespace SabreTools.Helper
 								shouldbreak = true;
 							}
 							break;
+						case "dir":
 						case "directory":
 							// Set SuperDAT flag for all SabreDAT inputs, regardless of depth
 							superdat = true;
