@@ -351,6 +351,12 @@ namespace SabreTools.Helper
 											// Only add the rom if there's useful information in it
 											if (!(crc == "" && md5 == "" && sha1 == "") || nodump)
 											{
+												// If we got to this point and it's a disk, log it because some tools don't like disks
+												if (xtr.Name == "disk")
+												{
+													logger.Log("Disk found: \"" + xtr.GetAttribute("name") + "\"");
+												}
+
 												// Get the new values to add
 												key = size + "-" + crc;
 
