@@ -728,7 +728,7 @@ Make a selection:
 					case "2":
 						Console.Clear();
 						Console.Write("Please enter a folder name: ");
-						input = Console.ReadLine();
+						outdir = Console.ReadLine();
 						break;
 					case "3":
 						string subsel = "";
