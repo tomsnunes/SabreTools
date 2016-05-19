@@ -123,7 +123,7 @@ namespace SabreTools
 			foreach (string input in _inputs)
 			{
 				_logger.User("Adding DAT: " + input.Split('¬')[0]);
-				userData = RomManipulation.Parse(input.Split('¬')[0], i, 0, userData, _logger);
+				userData = RomManipulation.Parse(input.Split('¬')[0], i, 0, userData, _logger, _superdat);
 				i++;
 			}
 
