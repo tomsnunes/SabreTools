@@ -315,8 +315,8 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(add ^ convertMiss ^ convertCMP ^ convertRC ^ convertSD ^ convertXml ^ extsplit ^ generate ^ genall ^
-				import ^ listsrc ^ listsys ^ (merge || diff) ^ rem ^ trim))
+			if (help || !(add ^ (convertMiss || romba) ^ convertCMP ^ convertRC ^ convertSD ^ convertXml ^ extsplit ^ generate ^ 
+				genall ^ import ^ listsrc ^ listsys ^ (merge || diff) ^ rem ^ trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -324,7 +324,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (convertMiss || convertCMP || convertRC || convertSD || convertXml || extsplit || import || (merge || diff) || trim))
+			if (inputs.Count == 0 && ((convertMiss || romba) || convertCMP || convertRC || convertSD || convertXml || extsplit || import || (merge || diff) || trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -367,7 +367,7 @@ namespace SabreTools
 			}
 
 			// Convert DAT to missfile
-			else if (convertMiss)
+			else if (convertMiss || romba)
 			{
 				foreach (string input in inputs)
 				{
