@@ -345,7 +345,7 @@ namespace SabreTools.Helper
 											// If the file has no size and it's not the above case, skip and log
 											else if (subreader.Name == "rom" && (size == 0 || size == -1))
 											{
-												logger.Error("Incomplete entry for \"" + xtr.GetAttribute("name") + "\" will be output as nodump");
+												logger.Warning("Incomplete entry for \"" + xtr.GetAttribute("name") + "\" will be output as nodump");
 												nodump = true;
 											}
 
