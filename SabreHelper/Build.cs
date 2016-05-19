@@ -123,6 +123,7 @@ Options:
   -lsy, --list-systems	List all systems (id <= name)
   -m, --merge		Merge one or more DATs
 	-di, --diff		Output all diffdats (merge flag not required)
+		-c, --cascade		Enable cascaded diffing
 	-dd, --dedup		Enable deduping in the created DAT
 	-b, --bare		Don't include date in file name
 	-u, --unzip		Force unzipping in created DAT

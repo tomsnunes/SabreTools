@@ -19,6 +19,7 @@ namespace SabreTools
 		private bool _forceunpack;
 		private bool _old;
 		private bool _superdat;
+		private bool _cascade;
 
 		// User specified strings
 		private string _name;
@@ -47,9 +48,10 @@ namespace SabreTools
 		/// <param name="forceunpack">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
 		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
 		/// <param name="superdat">True if DATs should be parsed into SuperDAT format, false otherwise</param>
+		/// <param name="cascade">True if the outputted diffs should be cascaded, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		public MergeDiff(List<String> inputs, string name, string desc, string cat, string version, string author,
-			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, Logger logger)
+			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, Logger logger)
 		{
 			_inputs = inputs;
 			_name = name;
@@ -63,6 +65,7 @@ namespace SabreTools
 			_forceunpack = forceunpack;
 			_old = old;
 			_superdat = superdat;
+			_cascade = cascade;
 			_logger = logger;
 		}
 
@@ -123,11 +126,12 @@ namespace SabreTools
 				userData = RomManipulation.Parse(input.Split('¬')[0], i, 0, userData, _logger);
 				i++;
 			}
-			
+
 			// Modify the Dictionary if necessary and output the results
-			if (_diff)
+			string post = "";
+			if (_diff && !_cascade)
 			{
-				string post = " (No Duplicates)";
+				post = " (No Duplicates)";
 
 				// Get all entries that don't have External dupes
 				DatData outerDiffData = new DatData
@@ -250,6 +254,59 @@ namespace SabreTools
 				}
 
 				Output.WriteDatfile(dupeData, "", _logger);
+			}
+			// If we're in cascade and diff, output only cascaded diffs
+			else if (_diff && _cascade)
+			{
+				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
+				for (int j = 0; j < _inputs.Count; j++)
+				{
+					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
+					DatData diffData = new DatData
+					{
+						Name = _name + post,
+						Description = _desc + post,
+						Version = _version,
+						Date = _date,
+						Category = _cat,
+						Author = _author,
+						ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+						OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+						MergeRoms = _dedup,
+						Roms = new Dictionary<string, List<RomData>>(),
+					};
+
+					List<string> keys = userData.Roms.Keys.ToList();
+					foreach (string key in keys)
+					{
+						List<RomData> oldroms = RomManipulation.Merge(userData.Roms[key]);
+						List<RomData> newroms = new List<RomData>();
+
+						foreach (RomData rom in oldroms)
+						{
+							if (rom.SystemID == j)
+							{
+								if (diffData.Roms.ContainsKey(key))
+								{
+									diffData.Roms[key].Add(rom);
+								}
+								else
+								{
+									List<RomData> tl = new List<RomData>();
+									tl.Add(rom);
+									diffData.Roms.Add(key, tl);
+								}
+							}
+							else
+							{
+								newroms.Add(rom);
+							}
+						}
+						userData.Roms[key] = newroms;
+					}
+
+					Output.WriteDatfile(diffData, "", _logger);
+				}
 			}
 			// Output all entries with user-defined merge
 			else

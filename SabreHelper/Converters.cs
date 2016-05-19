@@ -28,7 +28,7 @@ namespace SabreTools.Helper
 		{
 			XElement elem = new XElement("datafile");
 
-			bool block = false, romfound = false;
+			bool block = false;
 			for (int k = 0; k < filecontents.Length; k++)
 			{
 				string line = filecontents[k];
@@ -61,7 +61,6 @@ namespace SabreTools.Helper
 				// If the line is a rom or disk and we're in a block
 				else if ((line.Trim().StartsWith("rom (") || line.Trim().StartsWith("disk (")) && block)
 				{
-					romfound = true;
 					string[] gc = line.Trim().Split(' ');
 
 					XElement temp = new XElement(gc[0]);
@@ -152,7 +151,6 @@ namespace SabreTools.Helper
 				// If we find an end bracket that's not associated with anything else, the block is done
 				else if (Regex.IsMatch(line, _endPatternCMP) && block)
 				{
-					romfound = false;
 					block = false;
 					elem = elem.Parent;
 				}
