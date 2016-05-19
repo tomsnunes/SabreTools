@@ -104,5 +104,6 @@ namespace SabreTools.Helper
 		RomCenter,
 		DOSCenter,
 		MissFile,
+		SabreDat,
 	}
 }

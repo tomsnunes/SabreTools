@@ -72,11 +72,12 @@ namespace SabreTools.Helper
 			Directory.CreateDirectory(outDir);
 
 			// (currently uses current time, change to "last updated time")
-			logger.User("Opening file for writing: " + outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"));
+			string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
+			logger.User("Opening file for writing: " + outDir + datdata.Description + extension);
 
 			try
 			{
-				FileStream fs = File.Create(outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"));
+				FileStream fs = File.Create(outDir + datdata.Description + extension);
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
 				string header = "";
@@ -108,6 +109,26 @@ namespace SabreTools.Helper
 							"version=" + HttpUtility.HtmlEncode(datdata.Description) + "\n" +
 							"[GAMES]\n";
 						break;
+					case OutputFormat.SabreDat:
+						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
+							"<datafile>\n" +
+							"\t<header>\n" +
+							"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
+							"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
+							"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
+							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
+							"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
+							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
+							(datdata.Type != null && datdata.Type != "" && datdata.ForcePacking != ForcePacking.Unzip ?
+								"\t\t<flags>\n" +
+								(datdata.Type != null && datdata.Type != "" ? "\t\t\t<flag name=\"type\" value=\"" + datdata.Type + "\"/>\n" : "") +
+								(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : "") +
+								"\t\t</flags>\n" : "") +
+							"\t</header>\n" +
+							"\t<data>\n";
+						break;
 					case OutputFormat.Xml:
 						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
@@ -130,12 +151,17 @@ namespace SabreTools.Helper
 				sw.Write(header);
 
 				// Write out each of the machines and roms
+				int depth = 2, last = -1;
 				string lastgame = null;
+				List<string> splitpath = new List<string>();
 				foreach (List<RomData> roms in sortable.Values)
 				{
 					foreach (RomData rom in roms)
 					{
 						string state = "";
+						List<string> newsplit = rom.Game.Split('\\').ToList();
+
+						// If we have a different game and we're not at the start of the list, output the end of last item
 						if (lastgame != null && lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
 							switch (datdata.OutputFormat)
@@ -143,12 +169,43 @@ namespace SabreTools.Helper
 								case OutputFormat.ClrMamePro:
 									state += ")\n";
 									break;
+								case OutputFormat.SabreDat:
+									if (splitpath != null)
+									{
+										for (int i = 0; i < newsplit.Count && i < splitpath.Count; i++)
+										{
+											// Always keep track of the last seen item
+											last = i;
+
+											// If we find a difference, break
+											if (newsplit[i] != splitpath[i])
+											{
+												break;
+											}
+										}
+
+										// Now that we have the last known position, take down all open folders
+										for (int i = depth - 1; i > last + 1; i--)
+										{
+											// Print out the number of tabs and the end folder
+											for (int j = 0; j < i; j++)
+											{
+												state += "\t";
+											}
+											state += "</folder>\n";
+										}
+
+										// Reset the current depth
+										depth = 2 + last;
+									}
+									break;
 								case OutputFormat.Xml:
 									state += "\t</machine>\n";
 									break;
 							}
 						}
 
+						// If we have a new game, output the beginning of the new item
 						if (lastgame == null || lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
 							switch (datdata.OutputFormat)
@@ -156,6 +213,18 @@ namespace SabreTools.Helper
 								case OutputFormat.ClrMamePro:
 									state += "game (\n\tname \"" + rom.Game + "\"\n" +
 										"\tdescription \"" + rom.Game + "\"\n";
+									break;
+								case OutputFormat.SabreDat:
+									for (int i = (last == -1 ? 0 : last); i < newsplit.Count; i++)
+									{
+										for (int j = 0; j < depth - last + i - (lastgame == null ? 1 : 0); j++)
+										{
+											state += "\t";
+										}
+										state += "<folder name=\"" + HttpUtility.HtmlEncode(newsplit[i]) + "\" description=\"" +
+										HttpUtility.HtmlEncode(newsplit[i]) + "\">\n";
+									}
+									depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
 									break;
 								case OutputFormat.Xml:
 									state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
@@ -229,6 +298,19 @@ namespace SabreTools.Helper
 									"¬" + rom.CRC.ToLowerInvariant() +
 									"¬" + (rom.Size != -1 ? rom.Size.ToString() : "") + "¬¬¬\n";
 								break;
+							case OutputFormat.SabreDat:
+								for (int i = 0; i < depth; i++)
+								{
+									state += "\t";
+								}
+								state += "<file type=\"" + rom.Type + "\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
+									(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
+									(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
+									(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
+									(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
+									(rom.Nodump ? " status=\"nodump\"" : "") +
+									"/>\n";
+								break;
 							case OutputFormat.Xml:
 								state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
 									(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
@@ -240,6 +322,7 @@ namespace SabreTools.Helper
 								break;
 						}
 
+						splitpath = newsplit;
 						lastgame = rom.Game;
 
 						sw.Write(state);
@@ -251,6 +334,18 @@ namespace SabreTools.Helper
 				{
 					case OutputFormat.ClrMamePro:
 						footer = ")";
+						break;
+					case OutputFormat.SabreDat:
+						for (int i = depth; i >= 2; i--)
+						{
+							// Print out the number of tabs and the end folder
+							for (int j = 0; j < i; j++)
+							{
+								footer += "\t";
+							}
+							footer += "</folder>\n";
+						}
+						footer += "\t</data>\n</datafile>";
 						break;
 					case OutputFormat.Xml:
 						footer = "\t</machine>\n</datafile>";

@@ -98,7 +98,7 @@ namespace SabreTools.Helper
 		/// <param name="datdata">The DatData object representing found roms to this point</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static DatData Parse(string filename, int sysid, int srcid, DatData datdata, Logger logger)
+		public static DatData Parse(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false)
 		{
 			XmlTextReader xtr = GetXmlTextReader(filename, logger);
 			bool superdat = false, shouldbreak = false;
@@ -270,7 +270,7 @@ namespace SabreTools.Helper
 									tempname = xtr.GetAttribute("name");
 								}
 
-								if (superdat)
+								if (superdat && !keep)
 								{
 									tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
 								}

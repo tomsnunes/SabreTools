@@ -56,6 +56,7 @@ namespace SabreTools
 				convertMiss = false,
 				convertCMP = false,
 				convertRC = false,
+				convertSD = false,
 				convertXml = false,
 				dedup = false,
 				diff = false,
@@ -126,6 +127,10 @@ namespace SabreTools
 					case "-cr":
 					case "--convert-rc":
 						convertRC = true;
+						break;
+					case "-cs":
+					case "--convert-sd":
+						convertSD = true;
 						break;
 					case "-cx":
 					case "--convert-xml":
@@ -310,7 +315,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(add ^ convertMiss ^ convertCMP ^ convertRC ^ convertXml ^ extsplit ^ generate ^ genall ^
+			if (help || !(add ^ convertMiss ^ convertCMP ^ convertRC ^ convertSD ^ convertXml ^ extsplit ^ generate ^ genall ^
 				import ^ listsrc ^ listsys ^ (merge || diff) ^ rem ^ trim))
 			{
 				Build.Help();
@@ -319,7 +324,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (convertMiss || convertCMP || convertRC || convertXml || extsplit || import || (merge || diff) || trim))
+			if (inputs.Count == 0 && (convertMiss || convertCMP || convertRC || convertSD || convertXml || extsplit || import || (merge || diff) || trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -385,6 +390,15 @@ namespace SabreTools
 				foreach (string input in inputs)
 				{
 					InitConvert(input, OutputFormat.RomCenter, outdir);
+				}
+			}
+
+			// Convert any DAT to SabreDAT
+			else if (convertSD)
+			{
+				foreach (string input in inputs)
+				{
+					InitConvert(input, OutputFormat.SabreDat, outdir);
 				}
 			}
 
@@ -652,10 +666,10 @@ Make a selection:
 Make a selection:
 
     1) Convert or clean DAT or folder of DATs
-    3) Convert DAT to missfile
-    4) Trim all entries in DAT and merge into a single game
-    5) Merge, diff, and/or dedup 2 or more DAT files
-    6) Split DAT using 2 extensions
+    2) Convert DAT to missfile
+    3) Trim all entries in DAT and merge into a single game
+    4) Merge, diff, and/or dedup 2 or more DAT files
+    5) Split DAT using 2 extensions
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -725,6 +739,7 @@ Make a selection:
     1) Xml
     2) ClrMamePro
     3) RomCenter
+    4) SabreDAT
 ");
 							Console.Write("Please enter your selection: ");
 							subsel = Console.ReadLine();
@@ -740,6 +755,9 @@ Make a selection:
 								case "3":
 									outputFormat = OutputFormat.RomCenter;
 									break;
+								case "4":
+									outputFormat = OutputFormat.SabreDat;
+									break;
 								default:
 									subsel = "";
 									break;
@@ -751,6 +769,8 @@ Make a selection:
 						InitConvert(input, outputFormat, outdir);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
+						input = ""; outdir = "";
+						outputFormat = OutputFormat.Xml;
 						break;
 				}
 			}
@@ -1326,7 +1346,7 @@ Make a selection:
 					Roms = new Dictionary<string, List<RomData>>(),
 					MergeRoms = false,
 				};
-				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger);
+				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger, true);
 
 				// Sometimes the description doesn't match the filename, change this
 				if (datdata.Description != Path.GetFileNameWithoutExtension(filename))
@@ -1335,7 +1355,8 @@ Make a selection:
 				}
 
 				// If the extension matches, append ".new" to the filename
-				if (outdir == "" && Path.GetExtension(filename) == (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"))
+				string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
+				if (outdir == "" && Path.GetExtension(filename) == extension)
 				{
 					datdata.Description += ".new";
 				}
@@ -1365,7 +1386,7 @@ Make a selection:
 						Roms = new Dictionary<string, List<RomData>>(),
 						MergeRoms = false,
 					};
-					datdata = RomManipulation.Parse(file, 0, 0, datdata, logger);
+					datdata = RomManipulation.Parse(file, 0, 0, datdata, logger, true);
 
 					// Sometimes the description doesn't match the filename, change this
 					if (datdata.Description != Path.GetFileNameWithoutExtension(file))
@@ -1374,7 +1395,8 @@ Make a selection:
 					}
 
 					// If the extension matches, append ".new" to the filename
-					if (outdir == "" && Path.GetExtension(file) == (datdata.OutputFormat == OutputFormat.Xml ? ".xml" : ".dat"))
+					string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
+					if (outdir == "" && Path.GetExtension(file) == extension)
 					{
 						datdata.Description += ".new";
 					}
