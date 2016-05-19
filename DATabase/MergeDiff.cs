@@ -114,11 +114,11 @@ namespace SabreTools
 				Date = _date,
 				Category = _cat,
 				Author = _author,
-				Type = (_superdat ? "SuperDAT" : ""),
 				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 				MergeRoms = _dedup,
 				Roms = new Dictionary<string, List<RomData>>(),
+				Type = (_superdat ? "SuperDAT" : ""),
 			};
 			foreach (string input in _inputs)
 			{
@@ -142,7 +142,6 @@ namespace SabreTools
 					Date = _date,
 					Category = _cat,
 					Author = _author,
-					Type = (_superdat ? "SuperDAT" : ""),
 					ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 					OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 					MergeRoms = _dedup,
@@ -187,7 +186,6 @@ namespace SabreTools
 						Date = _date,
 						Category = _cat,
 						Author = _author,
-						Type = (_superdat ? "SuperDAT" : ""),
 						ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 						OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 						MergeRoms = _dedup,
@@ -227,7 +225,6 @@ namespace SabreTools
 					Date = _date,
 					Category = _cat,
 					Author = _author,
-					Type = (_superdat ? "SuperDAT" : ""),
 					ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 					OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 					MergeRoms = _dedup,
@@ -273,7 +270,6 @@ namespace SabreTools
 						Date = _date,
 						Category = _cat,
 						Author = _author,
-						Type = (_superdat ? "SuperDAT" : ""),
 						ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 						OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 						MergeRoms = _dedup,
@@ -286,7 +282,7 @@ namespace SabreTools
 						List<RomData> oldroms = RomManipulation.Merge(userData.Roms[key]);
 						List<RomData> newroms = new List<RomData>();
 
-						foreach (RomData rom in userData.Roms[key])
+						foreach (RomData rom in oldroms)
 						{
 							if (rom.SystemID == j)
 							{
