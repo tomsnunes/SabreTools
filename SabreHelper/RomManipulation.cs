@@ -102,7 +102,7 @@ namespace SabreTools.Helper
 		{
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
-			bool superdat = false, shouldbreak = false, nodump = false, empty = true;
+			bool superdat = false, nodump = false, empty = true;
 			string key = "", crc = "", md5 = "", sha1 = "";
 			long size = -1;
 			List<string> parent = new List<string>();
@@ -111,10 +111,8 @@ namespace SabreTools.Helper
 			if (xtr != null)
 			{
 				xtr.MoveToContent();
-				while (!xtr.EOF) //xtr.NodeType != XmlNodeType.None
+				while (!xtr.EOF)
 				{
-					Console.WriteLine(xtr.Name + " " + xtr.NodeType);
-
 					// If we're ending a folder or game, take care of possibly empty games and removing from the parent
 					if (xtr.NodeType == XmlNodeType.EndElement && (xtr.Name == "directory" || xtr.Name == "dir"))
 					{
@@ -570,14 +568,6 @@ namespace SabreTools.Helper
 								empty = true;
 							}
 							xtr.Skip();
-
-							/*
-							// Read to next game, folder, or dir
-							if (!xtr.ReadToFollowing(temptype))
-							{
-								shouldbreak = true;
-							}
-							*/
 							break;
 						case "dir":
 						case "directory":
@@ -739,12 +729,6 @@ namespace SabreTools.Helper
 						default:
 							xtr.Read();
 							break;
-					}
-
-					// If we hit an endpoint, break out of the loop early
-					if (shouldbreak)
-					{
-						break;
 					}
 				}
 			}
