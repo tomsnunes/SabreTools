@@ -111,8 +111,10 @@ namespace SabreTools.Helper
 			if (xtr != null)
 			{
 				xtr.MoveToContent();
-				while (xtr.NodeType != XmlNodeType.None)
+				while (!xtr.EOF) //xtr.NodeType != XmlNodeType.None
 				{
+					Console.WriteLine(xtr.Name + " " + xtr.NodeType);
+
 					// If we're ending a folder or game, take care of possibly empty games and removing from the parent
 					if (xtr.NodeType == XmlNodeType.EndElement && (xtr.Name == "directory" || xtr.Name == "dir"))
 					{
@@ -143,7 +145,11 @@ namespace SabreTools.Helper
 						}
 
 						// Regardless, end the current folder
-						empty = true;
+						if (parent.Count == 0)
+						{
+							Console.WriteLine("Empty parent: " + String.Join("\\", parent));
+							empty = true;
+						}
 
 						// If we have an end folder element, remove one item from the parent, if possible
 						if (parent.Count > 0)
@@ -156,15 +162,11 @@ namespace SabreTools.Helper
 						}
 					}
 
-
 					// We only want elements
 					if (xtr.NodeType != XmlNodeType.Element)
 					{
-						if (xtr.Read())
-						{
-							continue;
-						}
-						break;
+						xtr.Read();
+						continue;
 					}
 
 					switch (xtr.Name)
@@ -412,7 +414,7 @@ namespace SabreTools.Helper
 								// Get the name of the game from the parent
 								else if (superdat && keep && parent.Count > 0)
 								{
-									
+
 									tempname = String.Join("\\", parent) + "\\" + tempname;
 								}
 
@@ -563,13 +565,19 @@ namespace SabreTools.Helper
 							}
 
 							// Regardless, end the current folder
-							empty = true;
+							if (parent.Count == 0)
+							{
+								empty = true;
+							}
+							xtr.Skip();
 
-							// Read to next game
-							if (!xtr.ReadToNextSibling(temptype))
+							/*
+							// Read to next game, folder, or dir
+							if (!xtr.ReadToFollowing(temptype))
 							{
 								shouldbreak = true;
 							}
+							*/
 							break;
 						case "dir":
 						case "directory":
@@ -585,6 +593,7 @@ namespace SabreTools.Helper
 							{
 								parent.Add(foldername);
 							}
+
 							xtr.Read();
 							break;
 						case "file":
