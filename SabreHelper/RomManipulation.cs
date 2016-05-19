@@ -100,31 +100,40 @@ namespace SabreTools.Helper
 		/// <returns>DatData object representing the read-in data</returns>
 		public static DatData Parse(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false)
 		{
+			// Prepare all internal variables
+			XmlReader subreader, headreader, flagreader;
+			bool superdat = false, shouldbreak = false, nodump = false;
+			string key = "", crc = "", md5 = "", sha1 = "";
+			long size = -1;
+			List<string> parent = new List<string>();
+
 			XmlTextReader xtr = GetXmlTextReader(filename, logger);
-			bool superdat = false, shouldbreak = false;
-			string parent = "";
 			if (xtr != null)
 			{
 				xtr.MoveToContent();
 				while (xtr.NodeType != XmlNodeType.None)
 				{
+					// If we have an end folder element, remove one item from the parent, if possible
+					if (xtr.NodeType == XmlNodeType.EndElement && xtr.Name == "directory" && parent.Count > 0)
+					{
+						parent.RemoveAt(parent.Count - 1);
+					}
+
 					// We only want elements
 					if (xtr.NodeType != XmlNodeType.Element)
 					{
-						xtr.Read();
-						continue;
+						if (xtr.Read())
+						{
+							continue;
+						}
+						break;
 					}
 
 					switch (xtr.Name)
 					{
-						case "datafile":
-						case "softwarelist":
-							parent = xtr.Name;
-							xtr.Read();
-							break;
 						case "header":
 							// We want to process the entire subtree of the header
-							XmlReader headreader = xtr.ReadSubtree();
+							headreader = xtr.ReadSubtree();
 
 							if (headreader != null)
 							{
@@ -143,48 +152,60 @@ namespace SabreTools.Helper
 									{
 										case "name":
 											content = headreader.ReadElementContentAsString(); ;
-											datdata.Name = (datdata.Name == "" ? content : datdata.Name);
+											datdata.Name = (String.IsNullOrEmpty(datdata.Name) ? content : datdata.Name);
 											superdat = superdat || content.Contains(" - SuperDAT");
+											if (keep)
+											{
+												datdata.Type = (String.IsNullOrEmpty(datdata.Type) ? "SuperDAT" : datdata.Type);
+											}
 											break;
 										case "description":
 											content = headreader.ReadElementContentAsString();
-											datdata.Description = (datdata.Description == "" ? content : datdata.Description);
+											datdata.Description = (String.IsNullOrEmpty(datdata.Description) ? content : datdata.Description);
 											break;
 										case "category":
 											content = headreader.ReadElementContentAsString();
-											datdata.Category = (datdata.Category == "" ? content : datdata.Category);
+											datdata.Category = (String.IsNullOrEmpty(datdata.Category) ? content : datdata.Category);
 											break;
 										case "version":
 											content = headreader.ReadElementContentAsString();
-											datdata.Version = (datdata.Version == "" ? content : datdata.Version);
+											datdata.Version = (String.IsNullOrEmpty(datdata.Version) ? content : datdata.Version);
 											break;
 										case "date":
 											content = headreader.ReadElementContentAsString();
-											datdata.Date = (datdata.Date == "" ? content : datdata.Date);
+											datdata.Date = (String.IsNullOrEmpty(datdata.Date) ? content : datdata.Date);
 											break;
 										case "author":
 											content = headreader.ReadElementContentAsString();
-											datdata.Author = (datdata.Author == "" ? content : datdata.Author);
+											datdata.Author = (String.IsNullOrEmpty(datdata.Author) ? content : datdata.Author);
+
+											// Special cases for SabreDAT
+											datdata.Email = (String.IsNullOrEmpty(datdata.Email) && !String.IsNullOrEmpty(headreader.GetAttribute("email")) ?
+												headreader.GetAttribute("email") : datdata.Email);
+											datdata.Homepage = (String.IsNullOrEmpty(datdata.Homepage) && !String.IsNullOrEmpty(headreader.GetAttribute("homepage")) ?
+												headreader.GetAttribute("homepage") : datdata.Email);
+											datdata.Url = (String.IsNullOrEmpty(datdata.Url) && !String.IsNullOrEmpty(headreader.GetAttribute("url")) ?
+												headreader.GetAttribute("url") : datdata.Email);
 											break;
 										case "email":
 											content = headreader.ReadElementContentAsString();
-											datdata.Email = (datdata.Email == "" ? content : datdata.Email);
+											datdata.Email = (String.IsNullOrEmpty(datdata.Email) ? content : datdata.Email);
 											break;
 										case "homepage":
 											content = headreader.ReadElementContentAsString();
-											datdata.Homepage = (datdata.Homepage == "" ? content : datdata.Homepage);
+											datdata.Homepage = (String.IsNullOrEmpty(datdata.Homepage) ? content : datdata.Homepage);
 											break;
 										case "url":
 											content = headreader.ReadElementContentAsString();
-											datdata.Url = (datdata.Url == "" ? content : datdata.Url);
+											datdata.Url = (String.IsNullOrEmpty(datdata.Url) ? content : datdata.Url);
 											break;
 										case "comment":
 											content = headreader.ReadElementContentAsString();
-											datdata.Comment = (datdata.Comment == "" ? content : datdata.Comment);
+											datdata.Comment = (String.IsNullOrEmpty(datdata.Comment) ? content : datdata.Comment);
 											break;
 										case "type":
 											content = headreader.ReadElementContentAsString();
-											datdata.Type = (datdata.Type == "" ? content : datdata.Type);
+											datdata.Type = (String.IsNullOrEmpty(datdata.Type) ? content : datdata.Type);
 											superdat = superdat || content.Contains("SuperDAT");
 											break;
 										case "clrmamepro":
@@ -232,6 +253,82 @@ namespace SabreTools.Helper
 											}
 											headreader.Read();
 											break;
+										case "flags":
+											flagreader = xtr.ReadSubtree();
+											if (flagreader != null)
+											{
+												while (!flagreader.EOF)
+												{
+													// We only want elements
+													if (flagreader.NodeType != XmlNodeType.Element || flagreader.Name == "flags")
+													{
+														flagreader.Read();
+														continue;
+													}
+
+													switch (flagreader.Name)
+													{
+														case "flag":
+															if (flagreader.GetAttribute("name") != null && flagreader.GetAttribute("value") != null)
+															{
+																content = flagreader.GetAttribute("value");
+																switch (flagreader.GetAttribute("name"))
+																{
+																	case "type":
+																		datdata.Type = (datdata.Type == "" ? content : datdata.Type);
+																		superdat = superdat || content.Contains("SuperDAT");
+																		break;
+																	case "forcemerging":
+																		switch (content)
+																		{
+																			case "split":
+																				datdata.ForceMerging = ForceMerging.Split;
+																				break;
+																			case "none":
+																				datdata.ForceMerging = ForceMerging.None;
+																				break;
+																			case "full":
+																				datdata.ForceMerging = ForceMerging.Full;
+																				break;
+																		}
+																		break;
+																	case "forcenodump":
+																		switch (content)
+																		{
+																			case "obsolete":
+																				datdata.ForceNodump = ForceNodump.Obsolete;
+																				break;
+																			case "required":
+																				datdata.ForceNodump = ForceNodump.Required;
+																				break;
+																			case "ignore":
+																				datdata.ForceNodump = ForceNodump.Ignore;
+																				break;
+																		}
+																		break;
+																	case "forcepacking":
+																		switch (content)
+																		{
+																			case "zip":
+																				datdata.ForcePacking = ForcePacking.Zip;
+																				break;
+																			case "unzip":
+																				datdata.ForcePacking = ForcePacking.Unzip;
+																				break;
+																		}
+																		break;
+																}
+															}
+															flagreader.Read();
+															break;
+														default:
+															flagreader.Read();
+															break;
+													}
+												}
+											}
+											headreader.Skip();
+											break;
 										default:
 											headreader.Read();
 											break;
@@ -249,7 +346,7 @@ namespace SabreTools.Helper
 							string tempname = "";
 
 							// We want to process the entire subtree of the game
-							XmlReader subreader = xtr.ReadSubtree();
+							subreader = xtr.ReadSubtree();
 
 							if (subreader != null)
 							{
@@ -275,7 +372,6 @@ namespace SabreTools.Helper
 									tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
 								}
 
-								string key = "";
 								while (subreader.Read())
 								{
 									// We only want elements
@@ -290,7 +386,7 @@ namespace SabreTools.Helper
 										case "rom":
 										case "disk":
 											// If the rom is nodump, flag it
-											bool nodump = false;
+											nodump = false;
 											if (xtr.GetAttribute("flags") == "nodump" || xtr.GetAttribute("status") == "nodump")
 											{
 												logger.Log("Nodump detected: " +
@@ -299,7 +395,7 @@ namespace SabreTools.Helper
 											}
 
 											// Take care of hex-sized files
-											long size = -1;
+											size = -1;
 											if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
 											{
 												size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
@@ -321,15 +417,15 @@ namespace SabreTools.Helper
 											}
 
 											// Sanitize the hashes from null, hex sizes, and "true blank" strings
-											string crc = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "");
+											crc = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "");
 											crc = (crc.StartsWith("0x") ? crc.Remove(0, 2) : crc);
 											crc = (crc == "-" ? "" : crc);
 											crc = (crc == "" ? "" : crc.PadLeft(8, '0'));
-											string md5 = (xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : "");
+											md5 = (xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : "");
 											md5 = (md5.StartsWith("0x") ? md5.Remove(0, 2) : md5);
 											md5 = (md5 == "-" ? "" : md5);
 											md5 = (md5 == "" ? "" : md5.PadLeft(32, '0'));
-											string sha1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : "");
+											sha1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : "");
 											sha1 = (sha1.StartsWith("0x") ? sha1.Remove(0, 2) : sha1);
 											sha1 = (sha1 == "-" ? "" : sha1);
 											sha1 = (sha1 == "" ? "" : sha1.PadLeft(40, '0'));
@@ -353,9 +449,9 @@ namespace SabreTools.Helper
 											if (!(crc == "" && md5 == "" && sha1 == "") || nodump)
 											{
 												// If we got to this point and it's a disk, log it because some tools don't like disks
-												if (xtr.Name == "disk")
+												if (subreader.Name == "disk")
 												{
-													logger.Log("Disk found: \"" + xtr.GetAttribute("name") + "\"");
+													logger.Log("Disk found: \"" + subreader.GetAttribute("name") + "\"");
 												}
 
 												// Get the new values to add
@@ -397,6 +493,159 @@ namespace SabreTools.Helper
 							{
 								shouldbreak = true;
 							}
+							break;
+						case "directory":
+							// Set SuperDAT flag for all SabreDAT inputs, regardless of depth
+							superdat = true;
+							if (keep)
+							{
+								datdata.Type = (datdata.Type == "" ? "SuperDAT" : datdata.Type);
+							}
+
+							string foldername = (xtr.GetAttribute("name") == null ? "" : xtr.GetAttribute("name"));
+							if (foldername != "")
+							{
+								parent.Add(foldername);
+							}
+							xtr.Read();
+							break;
+						case "file":
+							// If the rom is nodump, flag it
+							nodump = false;
+							flagreader = xtr.ReadSubtree();
+							if (flagreader != null)
+							{
+								while (!flagreader.EOF)
+								{
+									// We only want elements
+									if (flagreader.NodeType != XmlNodeType.Element || flagreader.Name == "flags")
+									{
+										flagreader.Read();
+										continue;
+									}
+
+									switch (flagreader.Name)
+									{
+										case "flag":
+										case "status":
+											if (flagreader.GetAttribute("name") != null && flagreader.GetAttribute("value") != null)
+											{
+												string content = flagreader.GetAttribute("value");
+												switch (flagreader.GetAttribute("name"))
+												{
+													case "nodump":
+														logger.Log("Nodump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
+															"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
+														nodump = true;
+														break;
+												}
+											}
+											break;
+									}
+
+									flagreader.Read();
+								}
+							}
+
+							// Take care of hex-sized files
+							size = -1;
+							if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
+							{
+								size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
+							}
+							else if (xtr.GetAttribute("size") != null)
+							{
+								Int64.TryParse(xtr.GetAttribute("size"), out size);
+							}
+
+							// If the rom is continue or ignore, add the size to the previous rom
+							if (xtr.GetAttribute("loadflag") == "continue" || xtr.GetAttribute("loadflag") == "ignore")
+							{
+								int index = datdata.Roms[key].Count() - 1;
+								RomData lastrom = datdata.Roms[key][index];
+								lastrom.Size += size;
+								datdata.Roms[key].RemoveAt(index);
+								datdata.Roms[key].Add(lastrom);
+								continue;
+							}
+
+							// Sanitize the hashes from null, hex sizes, and "true blank" strings
+							crc = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "");
+							crc = (crc.StartsWith("0x") ? crc.Remove(0, 2) : crc);
+							crc = (crc == "-" ? "" : crc);
+							crc = (crc == "" ? "" : crc.PadLeft(8, '0'));
+							md5 = (xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : "");
+							md5 = (md5.StartsWith("0x") ? md5.Remove(0, 2) : md5);
+							md5 = (md5 == "-" ? "" : md5);
+							md5 = (md5 == "" ? "" : md5.PadLeft(32, '0'));
+							sha1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : "");
+							sha1 = (sha1.StartsWith("0x") ? sha1.Remove(0, 2) : sha1);
+							sha1 = (sha1 == "-" ? "" : sha1);
+							sha1 = (sha1 == "" ? "" : sha1.PadLeft(40, '0'));
+
+							// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
+							if (xtr.GetAttribute("type") == "rom" && (size == 0 || size == -1) && ((crc == CRCZero || crc == "") || md5 == MD5Zero || sha1 == SHA1Zero))
+							{
+								size = SizeZero;
+								crc = CRCZero;
+								md5 = MD5Zero;
+								sha1 = SHA1Zero;
+							}
+							// If the file has no size and it's not the above case, skip and log
+							else if (xtr.GetAttribute("type") == "rom" && (size == 0 || size == -1))
+							{
+								logger.Warning("Incomplete entry for \"" + xtr.GetAttribute("name") + "\" will be output as nodump");
+								nodump = true;
+							}
+
+							// Get the name of the game from the parent
+							tempname = String.Join("\\", parent);
+
+							// If we have a SuperDAT and we aren't keeping names
+							if (superdat && !keep)
+							{
+								tempname = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
+							}
+
+							// Only add the rom if there's useful information in it
+							if (!(crc == "" && md5 == "" && sha1 == "") || nodump)
+							{
+								// If we got to this point and it's a disk, log it because some tools don't like disks
+								if (xtr.GetAttribute("type") == "disk")
+								{
+									logger.Log("Disk found: \"" + xtr.GetAttribute("name") + "\"");
+								}
+
+								// Get the new values to add
+								key = size + "-" + crc;
+
+								RomData value = new RomData
+								{
+									Game = tempname,
+									Name = xtr.GetAttribute("name"),
+									Type = xtr.GetAttribute("type"),
+									SystemID = sysid,
+									SourceID = srcid,
+									Size = size,
+									CRC = crc,
+									MD5 = md5,
+									SHA1 = sha1,
+									System = filename,
+									Nodump = nodump,
+								};
+
+								if (datdata.Roms.ContainsKey(key))
+								{
+									datdata.Roms[key].Add(value);
+								}
+								else
+								{
+									List<RomData> newvalue = new List<RomData>();
+									newvalue.Add(value);
+									datdata.Roms.Add(key, newvalue);
+								}
+							}
+							xtr.Read();
 							break;
 						default:
 							xtr.Read();

@@ -59,16 +59,6 @@ namespace SabreTools
 			// Create the initial DatData object
 			DatData datdata = new DatData
 			{
-				Name = "",
-				Description = "",
-				Category = "",
-				Version = "",
-				Date = "",
-				Author = "",
-				Email = "",
-				Homepage = "",
-				Url = "",
-				Comment = "",
 				Roms = new Dictionary<string, List<RomData>>(),
 			};
 

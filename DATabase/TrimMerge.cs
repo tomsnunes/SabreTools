@@ -85,16 +85,6 @@ namespace SabreTools
 		{
 			DatData datdata = new DatData
 			{
-				Name = "",
-				Description = "",
-				Category = "",
-				Version = "",
-				Date = "",
-				Author = "",
-				Email = "",
-				Homepage = "",
-				Url = "",
-				Comment = "",
 				Roms = new Dictionary<string, List<RomData>>(),
 				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 				OutputFormat = RomManipulation.GetOutputFormat(filename),

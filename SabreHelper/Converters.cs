@@ -20,7 +20,7 @@ namespace SabreTools.Helper
 		private static string _endPatternCMP = @"^\s*\)\s*$";
 
 		/// <summary>
-		/// Convert a ClrMamePro style DAT to an XML derived DAT
+		/// Convert a ClrMamePro style DAT to an Logiqx XML derived DAT
 		/// </summary>
 		/// <param name="filecontents">Array of strings representing the input file</param>
 		/// <returns>XElement representing the output XML DAT file</returns>
@@ -160,7 +160,7 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Convert a RomCenter style DAT to an XML derived DAT
+		/// Convert a RomCenter style DAT to an Logiqx XML derived DAT
 		/// </summary>
 		/// <param name="filecontents">Array of strings representing the input file</param>
 		/// <returns>XElement representing the output XML DAT file</returns>

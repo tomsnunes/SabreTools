@@ -1332,16 +1332,6 @@ Make a selection:
 				logger.User("Converting \"" + Path.GetFileName(filename) + "\"");
 				DatData datdata = new DatData
 				{
-					Name = "",
-					Description = "",
-					Category = "",
-					Version = "",
-					Date = "",
-					Author = "",
-					Email = "",
-					Homepage = "",
-					Url = "",
-					Comment = "",
 					OutputFormat = outputFormat,
 					Roms = new Dictionary<string, List<RomData>>(),
 					MergeRoms = false,
@@ -1372,16 +1362,6 @@ Make a selection:
 					logger.User("Converting \"" + Path.GetFullPath(file).Remove(0, filename.Length + 1) + "\"");
 					DatData datdata = new DatData
 					{
-						Name = "",
-						Description = "",
-						Category = "",
-						Version = "",
-						Date = "",
-						Author = "",
-						Email = "",
-						Homepage = "",
-						Url = "",
-						Comment = "",
 						OutputFormat = outputFormat,
 						Roms = new Dictionary<string, List<RomData>>(),
 						MergeRoms = false,
@@ -1440,16 +1420,6 @@ Make a selection:
 				logger.User("Converting " + input);
 				DatData datdata = new DatData
 				{
-					Name = "",
-					Description = "",
-					Category = "",
-					Version = "",
-					Date = "",
-					Author = "",
-					Email = "",
-					Homepage = "",
-					Url = "",
-					Comment = "",
 					Roms = new Dictionary<string, List<RomData>>(),
 					OutputFormat = OutputFormat.MissFile,
 

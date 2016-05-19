@@ -192,7 +192,7 @@ namespace SabreTools.Helper
 											{
 												state += "\t";
 											}
-											state += "</folder>\n";
+											state += "</directory>\n";
 										}
 
 										// Reset the current depth
@@ -221,7 +221,7 @@ namespace SabreTools.Helper
 										{
 											state += "\t";
 										}
-										state += "<folder name=\"" + HttpUtility.HtmlEncode(newsplit[i]) + "\" description=\"" +
+										state += "<directory name=\"" + HttpUtility.HtmlEncode(newsplit[i]) + "\" description=\"" +
 										HttpUtility.HtmlEncode(newsplit[i]) + "\">\n";
 									}
 									depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
@@ -336,14 +336,14 @@ namespace SabreTools.Helper
 						footer = ")";
 						break;
 					case OutputFormat.SabreDat:
-						for (int i = depth; i >= 2; i--)
+						for (int i = depth - 1; i >= 2; i--)
 						{
 							// Print out the number of tabs and the end folder
 							for (int j = 0; j < i; j++)
 							{
 								footer += "\t";
 							}
-							footer += "</folder>\n";
+							footer += "</directory>\n";
 						}
 						footer += "\t</data>\n</datafile>";
 						break;
