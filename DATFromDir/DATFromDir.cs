@@ -248,10 +248,67 @@ namespace SabreTools
 							_basePath = (File.Exists(item) ? item : item + Path.DirectorySeparatorChar);
 							_basePath = Path.GetFullPath(_basePath);
 						}
-						
+
+						bool items = false;
 						foreach (string subitem in Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories))
 						{
+							items = true;
 							ProcessFile(subitem);
+						}
+
+						// If there were no subitems, add a "blank" game to to the set
+						if (!items)
+						{
+							RomData rom = new RomData
+							{
+								Name = "null",
+								Game = item.Remove(0, basePathBackup.Length),
+								Size = -1,
+								CRC = "null",
+								MD5 = "null",
+								SHA1 = "null",
+							};
+
+							string key = rom.Size + "-" + rom.CRC;
+							if (_dict.ContainsKey(key))
+							{
+								_dict[key].Add(rom);
+							}
+							else
+							{
+								List<RomData> temp = new List<RomData>();
+								temp.Add(rom);
+								_dict.Add(key, temp);
+							}
+						}
+
+						// Now scour subdirectories for empties and add those as well
+						foreach (string subdir in Directory.EnumerateDirectories(item, "*", SearchOption.AllDirectories))
+						{
+							if (Directory.EnumerateFiles(subdir, "*", SearchOption.AllDirectories).Count() == 0)
+							{
+								RomData rom = new RomData
+								{
+									Name = "null",
+									Game = subdir.Remove(0, basePathBackup.Length),
+									Size = -1,
+									CRC = "null",
+									MD5 = "null",
+									SHA1 = "null",
+								};
+
+								string key = rom.Size + "-" + rom.CRC;
+								if (_dict.ContainsKey(key))
+								{
+									_dict[key].Add(rom);
+								}
+								else
+								{
+									List<RomData> temp = new List<RomData>();
+									temp.Add(rom);
+									_dict.Add(key, temp);
+								}
+							}
 						}
 					}
 					_basePath = basePathBackup;

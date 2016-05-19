@@ -102,7 +102,7 @@ namespace SabreTools.Helper
 		{
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
-			bool superdat = false, shouldbreak = false, nodump = false;
+			bool superdat = false, shouldbreak = false, nodump = false, empty = true;
 			string key = "", crc = "", md5 = "", sha1 = "";
 			long size = -1;
 			List<string> parent = new List<string>();
@@ -113,15 +113,49 @@ namespace SabreTools.Helper
 				xtr.MoveToContent();
 				while (xtr.NodeType != XmlNodeType.None)
 				{
-					// If we have an end folder element, remove one item from the parent, if possible
-					if (xtr.NodeType == XmlNodeType.EndElement && (xtr.Name == "directory" || xtr.Name == "dir") && parent.Count > 0)
+					// If we're ending a folder or game, take care of possibly empty games and removing from the parent
+					if (xtr.NodeType == XmlNodeType.EndElement && (xtr.Name == "directory" || xtr.Name == "dir"))
 					{
-						parent.RemoveAt(parent.Count - 1);
-						if (keep)
+						// If we didn't find any items in the folder, make sure to add the blank rom
+						if (empty)
 						{
-							datdata.Type = (String.IsNullOrEmpty(datdata.Type) ? "SuperDAT" : datdata.Type);
+							RomData rom = new RomData
+							{
+								Name = "null",
+								Game = String.Join("\\", parent),
+								Size = -1,
+								CRC = "null",
+								MD5 = "null",
+								SHA1 = "null",
+							};
+
+							key = rom.Size + "-" + rom.CRC;
+							if (datdata.Roms.ContainsKey(key))
+							{
+								datdata.Roms[key].Add(rom);
+							}
+							else
+							{
+								List<RomData> temp = new List<RomData>();
+								temp.Add(rom);
+								datdata.Roms.Add(key, temp);
+							}
+						}
+
+						// Regardless, end the current folder
+						empty = true;
+
+						// If we have an end folder element, remove one item from the parent, if possible
+						if (parent.Count > 0)
+						{
+							parent.RemoveAt(parent.Count - 1);
+							if (keep)
+							{
+								datdata.Type = (String.IsNullOrEmpty(datdata.Type) ? "SuperDAT" : datdata.Type);
+							}
 						}
 					}
+
 
 					// We only want elements
 					if (xtr.NodeType != XmlNodeType.Element)
@@ -395,6 +429,8 @@ namespace SabreTools.Helper
 									{
 										case "rom":
 										case "disk":
+											empty = false;
+
 											// If the rom is nodump, flag it
 											nodump = false;
 											if (xtr.GetAttribute("flags") == "nodump" || xtr.GetAttribute("status") == "nodump")
@@ -498,6 +534,37 @@ namespace SabreTools.Helper
 								}
 							}
 
+							// If we didn't find any items in the folder, make sure to add the blank rom
+							if (empty)
+							{
+								tempname = (parent.Count > 0 ? String.Join("\\", parent) + Path.DirectorySeparatorChar : "") + tempname;
+
+								RomData rom = new RomData
+								{
+									Name = "null",
+									Game = tempname,
+									Size = -1,
+									CRC = "null",
+									MD5 = "null",
+									SHA1 = "null",
+								};
+
+								key = rom.Size + "-" + rom.CRC;
+								if (datdata.Roms.ContainsKey(key))
+								{
+									datdata.Roms[key].Add(rom);
+								}
+								else
+								{
+									List<RomData> temp = new List<RomData>();
+									temp.Add(rom);
+									datdata.Roms.Add(key, temp);
+								}
+							}
+
+							// Regardless, end the current folder
+							empty = true;
+
 							// Read to next game
 							if (!xtr.ReadToNextSibling(temptype))
 							{
@@ -521,6 +588,8 @@ namespace SabreTools.Helper
 							xtr.Read();
 							break;
 						case "file":
+							empty = false;
+
 							// If the rom is nodump, flag it
 							nodump = false;
 							flagreader = xtr.ReadSubtree();

@@ -233,93 +233,101 @@ namespace SabreTools.Helper
 							}
 						}
 
-						// Now output the rom data
-						switch (datdata.OutputFormat)
+						// If we have a "null" game (created by DATFromDir or something similar), skip trying to add a rom
+						if (rom.Name == "null" && rom.Size == -1 && rom.CRC == "null" && rom.MD5 == "null" && rom.SHA1 == "null")
 						{
-							case OutputFormat.ClrMamePro:
-								state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
-									(rom.Size != 0 ? " size " + rom.Size : "") +
-									(rom.CRC != "" ? " crc " + rom.CRC.ToLowerInvariant() : "") +
-									(rom.MD5 != "" ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
-									(rom.SHA1 != "" ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
-									(rom.Nodump ? " flags nodump" : "") +
-									" )\n";
-								break;
-							case OutputFormat.MissFile:
-								string pre = datdata.Prefix + (datdata.Quotes ? "\"" : "");
-								string post = (datdata.Quotes ? "\"" : "") + datdata.Postfix;
+							logger.Log("Empty folder found: " + rom.Game);
+						}
+						// Otherwise, output the rom data
+						else
+						{
+							switch (datdata.OutputFormat)
+							{
+								case OutputFormat.ClrMamePro:
+									state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
+										(rom.Size != 0 ? " size " + rom.Size : "") +
+										(rom.CRC != "" ? " crc " + rom.CRC.ToLowerInvariant() : "") +
+										(rom.MD5 != "" ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
+										(rom.SHA1 != "" ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
+										(rom.Nodump ? " flags nodump" : "") +
+										" )\n";
+									break;
+								case OutputFormat.MissFile:
+									string pre = datdata.Prefix + (datdata.Quotes ? "\"" : "");
+									string post = (datdata.Quotes ? "\"" : "") + datdata.Postfix;
 
-								// If we're in Romba mode, the state is consistent
-								if (datdata.Romba)
-								{
-									// We can only write out if there's a SHA-1
-									if (rom.SHA1 != "")
+									// If we're in Romba mode, the state is consistent
+									if (datdata.Romba)
 									{
-										string name = "/" + rom.SHA1.Substring(0, 2) + "/" + rom.SHA1.Substring(2, 2) + "/" + rom.SHA1.Substring(4, 2) + "/" +
-											rom.SHA1.Substring(6, 2) + "/" + rom.SHA1 + ".gz\n";
-										state += pre + name + post;
+										// We can only write out if there's a SHA-1
+										if (rom.SHA1 != "")
+										{
+											string name = "/" + rom.SHA1.Substring(0, 2) + "/" + rom.SHA1.Substring(2, 2) + "/" + rom.SHA1.Substring(4, 2) + "/" +
+												rom.SHA1.Substring(6, 2) + "/" + rom.SHA1 + ".gz\n";
+											state += pre + name + post;
+										}
 									}
-								}
-								// Otherwise, use any flags
-								else
-								{
-									string name = (datdata.UseGame ? rom.Game : rom.Name);
-									if (datdata.RepExt != "")
+									// Otherwise, use any flags
+									else
 									{
-										string dir = Path.GetDirectoryName(name);
-										dir = (dir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? dir : dir + Path.DirectorySeparatorChar);
-										dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
-										name = dir + Path.GetFileNameWithoutExtension(name) + datdata.RepExt;
-									}
-									if (datdata.AddExt != "")
-									{
-										name += datdata.AddExt;
-									}
-									if (!datdata.UseGame && datdata.GameName)
-									{
-										name = (rom.Game.EndsWith(Path.DirectorySeparatorChar.ToString()) ? rom.Game : rom.Game + Path.DirectorySeparatorChar) + name;
-									}
+										string name = (datdata.UseGame ? rom.Game : rom.Name);
+										if (datdata.RepExt != "")
+										{
+											string dir = Path.GetDirectoryName(name);
+											dir = (dir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? dir : dir + Path.DirectorySeparatorChar);
+											dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
+											name = dir + Path.GetFileNameWithoutExtension(name) + datdata.RepExt;
+										}
+										if (datdata.AddExt != "")
+										{
+											name += datdata.AddExt;
+										}
+										if (!datdata.UseGame && datdata.GameName)
+										{
+											name = (rom.Game.EndsWith(Path.DirectorySeparatorChar.ToString()) ? rom.Game : rom.Game + Path.DirectorySeparatorChar) + name;
+										}
 
-									if (datdata.UseGame && rom.Game != lastgame)
-									{
-										state += pre + name + post + "\n";
-										lastgame = rom.Game;
+										if (datdata.UseGame && rom.Game != lastgame)
+										{
+											state += pre + name + post + "\n";
+											lastgame = rom.Game;
+										}
+										else if (!datdata.UseGame)
+										{
+											state += pre + name + post + "\n";
+										}
 									}
-									else if (!datdata.UseGame)
+									break;
+								case OutputFormat.RomCenter:
+									state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Game) +
+										"¬" + HttpUtility.HtmlEncode(rom.Game) +
+										"¬" + HttpUtility.HtmlEncode(rom.Name) +
+										"¬" + rom.CRC.ToLowerInvariant() +
+										"¬" + (rom.Size != -1 ? rom.Size.ToString() : "") + "¬¬¬\n";
+									break;
+								case OutputFormat.SabreDat:
+									for (int i = 0; i < depth; i++)
 									{
-										state += pre + name + post + "\n";
+										state += "\t";
 									}
-								}
-								break;
-							case OutputFormat.RomCenter:
-								state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Game) +
-									"¬" + HttpUtility.HtmlEncode(rom.Game) +
-									"¬" + HttpUtility.HtmlEncode(rom.Name) +
-									"¬" + rom.CRC.ToLowerInvariant() +
-									"¬" + (rom.Size != -1 ? rom.Size.ToString() : "") + "¬¬¬\n";
-								break;
-							case OutputFormat.SabreDat:
-								for (int i = 0; i < depth; i++)
-								{
-									state += "\t";
-								}
-								state += "<file type=\"" + rom.Type + "\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
-									(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
-									(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
-									(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
-									(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
-									(rom.Nodump ? " status=\"nodump\"" : "") +
-									"/>\n";
-								break;
-							case OutputFormat.Xml:
-								state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
-									(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
-									(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
-									(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
-									(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
-									(rom.Nodump ? " status=\"nodump\"" : "") +
-									"/>\n";
-								break;
+									state += "<file type=\"" + rom.Type + "\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
+										(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
+										(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
+										(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
+										(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
+										(rom.Nodump ? " status=\"nodump\"" : "") +
+										"/>\n";
+									break;
+								case OutputFormat.Xml:
+									state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
+										(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
+										(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
+										(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
+										(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
+										(rom.Nodump ? " status=\"nodump\"" : "") +
+										"/>\n";
+									break;
+							}
 						}
 
 						splitpath = newsplit;
