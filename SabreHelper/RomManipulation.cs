@@ -121,6 +121,7 @@ namespace SabreTools.Helper
 						{
 							RomData rom = new RomData
 							{
+								Type = "rom",
 								Name = "null",
 								Game = String.Join("\\", parent),
 								Size = -1,
