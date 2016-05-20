@@ -13,16 +13,19 @@ namespace SabreTools
 	{
 		// Internal variables
 		List<string> _inputs;
+		string _outdir;
 		Logger _logger;
 
 		/// <summary>
 		/// Create a HashSplit object
 		/// </summary>
 		/// <param name="filename">The name of the file to be split</param>
+		/// <param name="outdir">Optional output directory, defaults to DAT directory</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public HashSplit(List<string> inputs, Logger logger)
+		public HashSplit(List<string> inputs, string outdir, Logger logger)
 		{
 			_inputs = inputs;
+			_outdir = (outdir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? outdir : outdir + Path.DirectorySeparatorChar).Replace("\"", "");
 			_logger = logger;
 		}
 
@@ -45,6 +48,7 @@ namespace SabreTools
 			logger.Start();
 
 			// First things first, take care of all of the arguments that this could have
+			string outdir = "";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
 			{
@@ -57,7 +61,14 @@ namespace SabreTools
 						logger.Close();
 						return;
 					default:
-						inputs.Add(arg);
+						if (arg.StartsWith("out="))
+						{
+							outdir = arg.Split('=')[1];
+						}
+						else
+						{
+							inputs.Add(arg);
+						}
 						break;
 				}
 			}
@@ -86,7 +97,7 @@ namespace SabreTools
 			}
 
 			// If so, run the program
-			HashSplit hs = new HashSplit(inputs, logger);
+			HashSplit hs = new HashSplit(inputs, outdir, logger);
 			hs.Split();
 		}
 
@@ -110,13 +121,13 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					finalreturn &= SplitHelper(input);
+					finalreturn &= SplitHelper(input, Path.GetDirectoryName(input));
 				}
 				if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						finalreturn &= SplitHelper(Path.GetFullPath(file));
+						finalreturn &= SplitHelper(Path.GetFullPath(file), (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar));
 					}
 				}
 			}
@@ -124,7 +135,7 @@ namespace SabreTools
 			return finalreturn;
 		}
 
-		private bool SplitHelper(string filename)
+		private bool SplitHelper(string filename, string basepath)
 		{
 			// Get the file data to be split
 			OutputFormat outputFormat = RomManipulation.GetOutputFormat(filename);
@@ -252,11 +263,20 @@ namespace SabreTools
 				}
 			}
 
-			bool success = true;
+			// Get the output directory
+			string outdir = "";
+			if (_outdir != "")
+			{
+				outdir = _outdir + Path.GetDirectoryName(filename).Remove(0, filename.Length);
+			}
+			else
+			{
+				outdir = Path.GetDirectoryName(filename);
+			}
 
-			// Now, output all of the files to the original location
+			// Now, output all of the files to the output directory
 			_logger.User("DAT information created, outputting new files");
-			string outdir = Path.GetDirectoryName(filename);
+			bool success = true;
 			success &= Output.WriteDatfile(sha1, outdir, _logger);
 			success &= Output.WriteDatfile(md5, outdir, _logger);
 			success &= Output.WriteDatfile(crc, outdir, _logger);
