@@ -392,7 +392,7 @@ namespace SabreTools.Helper
 								if (temptype == "software" && subreader.ReadToFollowing("description"))
 								{
 									tempname = subreader.ReadElementContentAsString();
-									tempname = tempname.Replace('/', '_');
+									tempname = tempname.Replace('/', '_').Replace("\"", "''");
 								}
 								else
 								{
