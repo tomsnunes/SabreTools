@@ -554,6 +554,7 @@ namespace SabreTools.Helper
 
 								RomData rom = new RomData
 								{
+									Type = "rom",
 									Name = "null",
 									Game = tempname,
 									Size = -1,
