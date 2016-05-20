@@ -103,7 +103,7 @@ namespace SabreTools.Helper
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
 			bool superdat = false, nodump = false, empty = true;
-			string key = "", crc = "", md5 = "", sha1 = "";
+			string key = "", crc = "", md5 = "", sha1 = "", date = "";
 			long size = -1;
 			List<string> parent = new List<string>();
 
@@ -400,7 +400,7 @@ namespace SabreTools.Helper
 									if (xtr.AttributeCount == 0)
 									{
 										logger.Error("No attributes were found");
-										xtr.ReadToNextSibling(xtr.Name);
+										subreader.Skip();
 										continue;
 									}
 									tempname = xtr.GetAttribute("name");
@@ -437,26 +437,33 @@ namespace SabreTools.Helper
 
 											// If the rom is nodump, flag it
 											nodump = false;
-											if (xtr.GetAttribute("flags") == "nodump" || xtr.GetAttribute("status") == "nodump")
+											if (subreader.GetAttribute("flags") == "nodump" || subreader.GetAttribute("status") == "nodump")
 											{
 												logger.Log("Nodump detected: " +
-													(xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
+													(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 												nodump = true;
+											}
+
+											// If the rom has a Date attached, read it in and then sanitize it
+											date = "";
+											if (subreader.GetAttribute("date") != null)
+											{
+												date = DateTime.Parse(subreader.GetAttribute("date")).ToString();
 											}
 
 											// Take care of hex-sized files
 											size = -1;
-											if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
+											if (subreader.GetAttribute("size") != null && subreader.GetAttribute("size").Contains("0x"))
 											{
-												size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
+												size = Convert.ToInt64(subreader.GetAttribute("size"), 16);
 											}
-											else if (xtr.GetAttribute("size") != null)
+											else if (subreader.GetAttribute("size") != null)
 											{
-												Int64.TryParse(xtr.GetAttribute("size"), out size);
+												Int64.TryParse(subreader.GetAttribute("size"), out size);
 											}
 
 											// If the rom is continue or ignore, add the size to the previous rom
-											if (xtr.GetAttribute("loadflag") == "continue" || xtr.GetAttribute("loadflag") == "ignore")
+											if (subreader.GetAttribute("loadflag") == "continue" || subreader.GetAttribute("loadflag") == "ignore")
 											{
 												int index = datdata.Roms[key].Count() - 1;
 												RomData lastrom = datdata.Roms[key][index];
@@ -467,15 +474,15 @@ namespace SabreTools.Helper
 											}
 
 											// Sanitize the hashes from null, hex sizes, and "true blank" strings
-											crc = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "");
+											crc = (subreader.GetAttribute("crc") != null ? subreader.GetAttribute("crc").ToLowerInvariant().Trim() : "");
 											crc = (crc.StartsWith("0x") ? crc.Remove(0, 2) : crc);
 											crc = (crc == "-" ? "" : crc);
 											crc = (crc == "" ? "" : crc.PadLeft(8, '0'));
-											md5 = (xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : "");
+											md5 = (subreader.GetAttribute("md5") != null ? subreader.GetAttribute("md5").ToLowerInvariant().Trim() : "");
 											md5 = (md5.StartsWith("0x") ? md5.Remove(0, 2) : md5);
 											md5 = (md5 == "-" ? "" : md5);
 											md5 = (md5 == "" ? "" : md5.PadLeft(32, '0'));
-											sha1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : "");
+											sha1 = (subreader.GetAttribute("sha1") != null ? subreader.GetAttribute("sha1").ToLowerInvariant().Trim() : "");
 											sha1 = (sha1.StartsWith("0x") ? sha1.Remove(0, 2) : sha1);
 											sha1 = (sha1 == "-" ? "" : sha1);
 											sha1 = (sha1 == "" ? "" : sha1.PadLeft(40, '0'));
@@ -491,7 +498,7 @@ namespace SabreTools.Helper
 											// If the file has no size and it's not the above case, skip and log
 											else if (subreader.Name == "rom" && (size == 0 || size == -1))
 											{
-												logger.Warning("Incomplete entry for \"" + xtr.GetAttribute("name") + "\" will be output as nodump");
+												logger.Warning("Incomplete entry for \"" + subreader.GetAttribute("name") + "\" will be output as nodump");
 												nodump = true;
 											}
 
@@ -520,6 +527,7 @@ namespace SabreTools.Helper
 													SHA1 = sha1,
 													System = filename,
 													Nodump = nodump,
+													Date = date,
 												};
 
 												if (datdata.Roms.ContainsKey(key))
@@ -630,6 +638,13 @@ namespace SabreTools.Helper
 								}
 							}
 
+							// If the rom has a Date attached, read it in and then sanitize it
+							date = "";
+							if (xtr.GetAttribute("date") != null)
+							{
+								date = DateTime.Parse(xtr.GetAttribute("date")).ToString();
+							}
+
 							// Take care of hex-sized files
 							size = -1;
 							if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
@@ -719,6 +734,7 @@ namespace SabreTools.Helper
 									SHA1 = sha1,
 									System = filename,
 									Nodump = nodump,
+									Date = date,
 								};
 
 								if (datdata.Roms.ContainsKey(key))

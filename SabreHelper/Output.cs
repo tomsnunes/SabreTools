@@ -275,6 +275,7 @@ namespace SabreTools.Helper
 									(rom.CRC != "" ? " crc " + rom.CRC.ToLowerInvariant() : "") +
 									(rom.MD5 != "" ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
 									(rom.SHA1 != "" ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
+									(rom.Date != "" ? " date \"" + rom.Date + "\"" : "") +
 									(rom.Nodump ? " flags nodump" : "") +
 									" )\n";
 								break;
@@ -332,17 +333,20 @@ namespace SabreTools.Helper
 									"¬" + (rom.Size != -1 ? rom.Size.ToString() : "") + "¬¬¬\n";
 								break;
 							case OutputFormat.SabreDat:
+								string prefix = "";
 								for (int i = 0; i < depth; i++)
 								{
-									state += "\t";
+									prefix += "\t";
 								}
+
+								state += prefix;
 								state += "<file type=\"" + rom.Type + "\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
 									(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
 									(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
 									(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
 									(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
-									(rom.Nodump ? " status=\"nodump\"" : "") +
-									"/>\n";
+									(rom.Date != "" ? " date=\"" + rom.Date + "\"" : "") +
+									(rom.Nodump ? prefix + "/>\n\t<flags>\n" + prefix + "\t\t<flag name=\"status\" value=\"nodump\"/>\n" + prefix + "\t</flags>\n" + prefix + "</file>" : "/>\n");
 								break;
 							case OutputFormat.Xml:
 								state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
@@ -350,6 +354,7 @@ namespace SabreTools.Helper
 									(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
 									(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
 									(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
+									(rom.Date != "" ? " date=\"" + rom.Date + "\"" : "") +
 									(rom.Nodump ? " status=\"nodump\"" : "") +
 									"/>\n";
 								break;
