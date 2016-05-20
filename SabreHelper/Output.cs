@@ -346,7 +346,10 @@ namespace SabreTools.Helper
 									(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
 									(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
 									(rom.Date != "" ? " date=\"" + rom.Date + "\"" : "") +
-									(rom.Nodump ? prefix + "/>\n\t<flags>\n" + prefix + "\t\t<flag name=\"status\" value=\"nodump\"/>\n" + prefix + "\t</flags>\n" + prefix + "</file>" : "/>\n");
+									(rom.Nodump ? prefix + "/>\n" + prefix + "\t<flags>\n" +
+										prefix + "\t\t<flag name=\"status\" value=\"nodump\"/>\n" +
+										prefix + "\t</flags>\n" +
+										prefix + "</file>" : "/>\n");
 								break;
 							case OutputFormat.Xml:
 								state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
