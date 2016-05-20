@@ -12,7 +12,7 @@ namespace SabreTools
 	public class HashSplit
 	{
 		// Internal variables
-		string _filename;
+		List<string> _inputs;
 		Logger _logger;
 
 		/// <summary>
@@ -20,9 +20,9 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="filename">The name of the file to be split</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public HashSplit(string filename, Logger logger)
+		public HashSplit(List<string> inputs, Logger logger)
 		{
-			_filename = filename;
+			_inputs = inputs;
 			_logger = logger;
 		}
 
@@ -45,7 +45,7 @@ namespace SabreTools
 			logger.Start();
 
 			// First things first, take care of all of the arguments that this could have
-			string filename = "";
+			List<string> inputs = new List<string>();
 			foreach (string arg in args)
 			{
 				switch (arg)
@@ -57,13 +57,13 @@ namespace SabreTools
 						logger.Close();
 						return;
 					default:
-						filename = arg;
+						inputs.Add(arg);
 						break;
 				}
 			}
 
 			// If there's no inputs, show the help
-			if (filename == "")
+			if (inputs.Count() == 0)
 			{
 				Build.Help();
 				logger.Close();
@@ -74,18 +74,19 @@ namespace SabreTools
 			Build.Start("HashSplit");
 
 			// Verify the input file
-			filename = filename.Replace("\"", "");
-			if (!File.Exists(filename))
+			foreach (string input in inputs)
 			{
-				logger.Error(filename + " is not a valid file!");
-				Console.WriteLine();
-				Build.Help();
-				return;
+				if (!File.Exists(input.Replace("\"", "")) && !Directory.Exists(input.Replace("\"", "")))
+				{
+					logger.Error(input + " is not a valid file!");
+					Console.WriteLine();
+					Build.Help();
+					return;
+				}
 			}
 
 			// If so, run the program
-			filename = Path.GetFullPath(filename);
-			HashSplit hs = new HashSplit(filename, logger);
+			HashSplit hs = new HashSplit(inputs, logger);
 			hs.Split();
 		}
 
@@ -95,15 +96,46 @@ namespace SabreTools
 		/// <returns>True if the DATs were output, false otherwise</returns>
 		public bool Split()
 		{
+			// First, clean the original filenames
+			List<string> newinputs = new List<string>();
+			foreach (string input in _inputs)
+			{
+				newinputs.Add(Path.GetFullPath(input.Replace("\"", "")));
+			}
+			_inputs = newinputs;
+
+			// Now, process each file and folder in the input
+			bool finalreturn = true;
+			foreach (string input in _inputs)
+			{
+				if (File.Exists(input))
+				{
+					finalreturn &= SplitHelper(input);
+				}
+				if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						finalreturn &= SplitHelper(Path.GetFullPath(file));
+					}
+				}
+			}
+
+			return finalreturn;
+		}
+
+		private bool SplitHelper(string filename)
+		{
 			// Get the file data to be split
-			OutputFormat outputFormat = RomManipulation.GetOutputFormat(_filename);
+			OutputFormat outputFormat = RomManipulation.GetOutputFormat(filename);
 			DatData datdata = new DatData
 			{
 				Roms = new Dictionary<string, List<RomData>>(),
 			};
-			datdata = RomManipulation.Parse(_filename, 0, 0, datdata, _logger, true);
+			datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger, true);
 
 			// Create each of the respective output DATs
+			_logger.User("Creating and populating new DATs");
 			DatData sha1 = new DatData
 			{
 				Name = datdata.Name + " (SHA-1)",
@@ -223,7 +255,8 @@ namespace SabreTools
 			bool success = true;
 
 			// Now, output all of the files to the original location
-			string outdir = Path.GetDirectoryName(_filename);
+			_logger.User("DAT information created, outputting new files");
+			string outdir = Path.GetDirectoryName(filename);
 			success &= Output.WriteDatfile(sha1, outdir, _logger);
 			success &= Output.WriteDatfile(md5, outdir, _logger);
 			success &= Output.WriteDatfile(crc, outdir, _logger);
