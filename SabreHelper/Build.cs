@@ -212,6 +212,15 @@ Options:
   -sys=, --system=	System ID to generate from
 ");
 					break;
+				case "HashSplit":
+					Console.WriteLine(@"HashSplit - Split a DAT by best-available hashes
+-----------------------------------------
+Usage: DATabaseTwo [options] filename
+
+Options:
+  -h, -?, --help	Show this help dialog
+");
+					break;
 				default:
 					Console.Write("This is the default help output");
 					break;
