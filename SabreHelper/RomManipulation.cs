@@ -15,6 +15,9 @@ namespace SabreTools.Helper
 		public static string CRCZero = "00000000";
 		public static string MD5Zero = "d41d8cd98f00b204e9800998ecf8427e";
 		public static string SHA1Zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+		/////public static string NormalizeChars;
+		/////public static string RussianToLatin;
+		/////public static string SearchPattern;
 
 		/// <summary>
 		/// Get what type of DAT the input file is
@@ -515,6 +518,12 @@ namespace SabreTools.Helper
 												logger.Warning("Incomplete entry for \"" + subreader.GetAttribute("name") + "\" will be output as nodump");
 												nodump = true;
 											}
+											
+											///Run the name through the filters to make sure that it's correct
+											/////tempname = Style.NormalizeChars(tempname);
+											/////tempname = Style.RussianToLatin(tempname);
+											/////tempname = Style.SearchPattern(tempname);
+											
 											///WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
 											////tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
 											////tempname = tempname.TrimStart().TrimEnd();
