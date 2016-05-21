@@ -280,9 +280,18 @@ namespace SabreTools
 			// Now, output all of the files to the output directory
 			_logger.User("DAT information created, outputting new files");
 			bool success = true;
-			success &= Output.WriteDatfile(sha1, outdir, _logger);
-			success &= Output.WriteDatfile(md5, outdir, _logger);
-			success &= Output.WriteDatfile(crc, outdir, _logger);
+			if (sha1.Roms.Count > 0)
+			{
+				success &= Output.WriteDatfile(sha1, outdir, _logger);
+			}
+			if (md5.Roms.Count > 0)
+			{
+				success &= Output.WriteDatfile(md5, outdir, _logger);
+			}
+			if (crc.Roms.Count > 0)
+			{
+				success &= Output.WriteDatfile(crc, outdir, _logger);
+			}
 
 			return success;
 		}
