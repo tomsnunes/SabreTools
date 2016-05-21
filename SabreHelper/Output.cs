@@ -272,10 +272,10 @@ namespace SabreTools.Helper
 							case OutputFormat.ClrMamePro:
 								state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
 									(rom.Size != 0 ? " size " + rom.Size : "") +
-									(rom.CRC != "" ? " crc " + rom.CRC.ToLowerInvariant() : "") +
-									(rom.MD5 != "" ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
-									(rom.SHA1 != "" ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
-									(rom.Date != "" ? " date \"" + rom.Date + "\"" : "") +
+									(!String.IsNullOrEmpty(rom.CRC) ? " crc " + rom.CRC.ToLowerInvariant() : "") +
+									(!String.IsNullOrEmpty(rom.MD5) ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
+									(!String.IsNullOrEmpty(rom.SHA1) ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
+									(!String.IsNullOrEmpty(rom.Date) ? " date \"" + rom.Date + "\"" : "") +
 									(rom.Nodump ? " flags nodump" : "") +
 									" )\n";
 								break;
@@ -342,10 +342,10 @@ namespace SabreTools.Helper
 								state += prefix;
 								state += "<file type=\"" + rom.Type + "\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
 									(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
-									(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
-									(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
-									(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
-									(rom.Date != "" ? " date=\"" + rom.Date + "\"" : "") +
+									(!String.IsNullOrEmpty(rom.CRC) ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
+									(!String.IsNullOrEmpty(rom.MD5) ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
+									(!String.IsNullOrEmpty(rom.SHA1) ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
+									(!String.IsNullOrEmpty(rom.Date) ? " date=\"" + rom.Date + "\"" : "") +
 									(rom.Nodump ? prefix + "/>\n" + prefix + "\t<flags>\n" +
 										prefix + "\t\t<flag name=\"status\" value=\"nodump\"/>\n" +
 										prefix + "\t</flags>\n" +
@@ -355,10 +355,10 @@ namespace SabreTools.Helper
 							case OutputFormat.Xml:
 								state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
 									(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
-									(rom.CRC != "" ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
-									(rom.MD5 != "" ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
-									(rom.SHA1 != "" ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
-									(rom.Date != "" ? " date=\"" + rom.Date + "\"" : "") +
+									(!String.IsNullOrEmpty(rom.CRC) ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
+									(!String.IsNullOrEmpty(rom.MD5) ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
+									(!String.IsNullOrEmpty(rom.SHA1) ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
+									(!String.IsNullOrEmpty(rom.Date) ? " date=\"" + rom.Date + "\"" : "") +
 									(rom.Nodump ? " status=\"nodump\"" : "") +
 									"/>\n";
 								break;
