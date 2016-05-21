@@ -137,6 +137,9 @@ namespace SabreTools
 
 		private bool SplitHelper(string filename, string basepath)
 		{
+			// Sanitize the basepath to be more predictable
+			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
+
 			// Get the file data to be split
 			OutputFormat outputFormat = RomManipulation.GetOutputFormat(filename);
 			DatData datdata = new DatData
@@ -267,7 +270,7 @@ namespace SabreTools
 			string outdir = "";
 			if (_outdir != "")
 			{
-				outdir = _outdir + Path.GetDirectoryName(filename).Remove(0, basepath.Length);
+				outdir = _outdir + Path.GetDirectoryName(filename).Remove(0, basepath.Length - 1);
 			}
 			else
 			{
