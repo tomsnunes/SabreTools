@@ -61,7 +61,7 @@ namespace SabreTools
 						logger.Close();
 						return;
 					default:
-						if (arg.StartsWith("out="))
+						if (arg.StartsWith("-out="))
 						{
 							outdir = arg.Split('=')[1];
 						}
