@@ -127,9 +127,9 @@ namespace SabreTools.Helper
 							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
 							"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
 							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
-							(datdata.Type != null && datdata.Type != "" && datdata.ForcePacking != ForcePacking.Unzip ?
+							(!String.IsNullOrEmpty(datdata.Type) && datdata.ForcePacking != ForcePacking.Unzip ?
 								"\t\t<flags>\n" +
-								(datdata.Type != null && datdata.Type != "" ? "\t\t\t<flag name=\"type\" value=\"" + datdata.Type + "\"/>\n" : "") +
+								(!String.IsNullOrEmpty(datdata.Type) ? "\t\t\t<flag name=\"type\" value=\"" + datdata.Type + "\"/>\n" : "") +
 								(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : "") +
 								"\t\t</flags>\n" : "") +
 							"\t</header>\n" +
@@ -147,7 +147,7 @@ namespace SabreTools.Helper
 							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
 							"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
 							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
-							(datdata.Type != null && datdata.Type != "" ? "\t\t<type>" + datdata.Type + "</type>\n" : "") +
+							(!String.IsNullOrEmpty(datdata.Type) ? "\t\t<type>" + datdata.Type + "</type>\n" : "") +
 							(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
 							"\t</header>\n";
 						break;

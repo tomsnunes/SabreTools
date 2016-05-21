@@ -15,7 +15,6 @@ namespace SabreTools
 	/// <summary>
 	/// Create a DAT file from a specified file, directory, or set thereof
 	/// </summary>
-	/// <remarks>Add SuperDAT functionality</remarks>
 	public class DATFromDir
 	{
 		// Path-related variables

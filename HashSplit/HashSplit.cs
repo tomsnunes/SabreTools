@@ -144,6 +144,7 @@ namespace SabreTools
 			OutputFormat outputFormat = RomManipulation.GetOutputFormat(filename);
 			DatData datdata = new DatData
 			{
+				Description = Path.GetFileNameWithoutExtension(filename),
 				Roms = new Dictionary<string, List<RomData>>(),
 			};
 			datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger, true);

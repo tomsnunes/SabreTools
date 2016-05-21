@@ -144,17 +144,18 @@ namespace SabreTools.Helper
 						}
 
 						// Regardless, end the current folder
-						if (parent.Count == 0)
+						int parentcount = parent.Count;
+						if (parentcount == 0)
 						{
 							Console.WriteLine("Empty parent: " + String.Join("\\", parent));
 							empty = true;
 						}
 
 						// If we have an end folder element, remove one item from the parent, if possible
-						if (parent.Count > 0)
+						if (parentcount > 0)
 						{
 							parent.RemoveAt(parent.Count - 1);
-							if (keep)
+							if (keep && parentcount > 1)
 							{
 								datdata.Type = (String.IsNullOrEmpty(datdata.Type) ? "SuperDAT" : datdata.Type);
 								superdat = true;
@@ -194,7 +195,7 @@ namespace SabreTools.Helper
 											content = headreader.ReadElementContentAsString(); ;
 											datdata.Name = (String.IsNullOrEmpty(datdata.Name) ? content : datdata.Name);
 											superdat = superdat || content.Contains(" - SuperDAT");
-											if (keep)
+											if (keep && superdat)
 											{
 												datdata.Type = (String.IsNullOrEmpty(datdata.Type) ? "SuperDAT" : datdata.Type);
 											}
