@@ -267,7 +267,7 @@ namespace SabreTools
 			string outdir = "";
 			if (_outdir != "")
 			{
-				outdir = _outdir + Path.GetDirectoryName(filename).Remove(0, filename.Length);
+				outdir = _outdir + Path.GetDirectoryName(filename).Remove(0, basepath.Length);
 			}
 			else
 			{
