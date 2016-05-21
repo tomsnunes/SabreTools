@@ -271,7 +271,7 @@ namespace SabreTools.Helper
 						{
 							case OutputFormat.ClrMamePro:
 								state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
-									(rom.Size != 0 ? " size " + rom.Size : "") +
+									(rom.Size != -1 ? " size " + rom.Size : "") +
 									(!String.IsNullOrEmpty(rom.CRC) ? " crc " + rom.CRC.ToLowerInvariant() : "") +
 									(!String.IsNullOrEmpty(rom.MD5) ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
 									(!String.IsNullOrEmpty(rom.SHA1) ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
