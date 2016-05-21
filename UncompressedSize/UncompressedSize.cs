@@ -34,10 +34,7 @@ namespace SabreTools
 			long size = 0;
 			foreach (string filename in inputs)
 			{
-				DatData datdata = new DatData
-				{
-					Roms = new Dictionary<string, List<RomData>>(),
-				};
+				DatData datdata = new DatData();
 				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger);
 				foreach (List<RomData> romlist in datdata.Roms.Values)
 				{

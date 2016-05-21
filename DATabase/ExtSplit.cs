@@ -56,13 +56,8 @@ namespace SabreTools
 				Directory.CreateDirectory(_outdir);
 			}
 
-			// Create the initial DatData object
-			DatData datdata = new DatData
-			{
-				Roms = new Dictionary<string, List<RomData>>(),
-			};
-
 			// Load the current DAT to be processed
+			DatData datdata = new DatData();
 			datdata = RomManipulation.Parse(_filename, 0, 0, datdata, _logger);
 
 			// Set all of the appropriate outputs for each of the subsets

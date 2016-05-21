@@ -1342,7 +1342,6 @@ Make a selection:
 				DatData datdata = new DatData
 				{
 					OutputFormat = outputFormat,
-					Roms = new Dictionary<string, List<RomData>>(),
 					MergeRoms = false,
 				};
 				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger, true);
@@ -1372,7 +1371,6 @@ Make a selection:
 					DatData datdata = new DatData
 					{
 						OutputFormat = outputFormat,
-						Roms = new Dictionary<string, List<RomData>>(),
 						MergeRoms = false,
 					};
 					datdata = RomManipulation.Parse(file, 0, 0, datdata, logger, true);
@@ -1429,7 +1427,6 @@ Make a selection:
 				logger.User("Converting " + input);
 				DatData datdata = new DatData
 				{
-					Roms = new Dictionary<string, List<RomData>>(),
 					OutputFormat = OutputFormat.MissFile,
 
 					UseGame = usegame,

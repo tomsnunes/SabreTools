@@ -117,7 +117,6 @@ namespace SabreTools
 				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 				MergeRoms = _dedup,
-				Roms = new Dictionary<string, List<RomData>>(),
 				Type = (_superdat ? "SuperDAT" : ""),
 			};
 			foreach (string input in _inputs)
@@ -145,7 +144,6 @@ namespace SabreTools
 					ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 					OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 					MergeRoms = _dedup,
-					Roms = new Dictionary<string, List<RomData>>(),
 				};
 				foreach (string key in userData.Roms.Keys)
 				{
@@ -189,7 +187,6 @@ namespace SabreTools
 						ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 						OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 						MergeRoms = _dedup,
-						Roms = new Dictionary<string, List<RomData>>(),
 					};
 
 					foreach (string key in outerDiffData.Roms.Keys)
@@ -228,7 +225,6 @@ namespace SabreTools
 					ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 					OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 					MergeRoms = _dedup,
-					Roms = new Dictionary<string, List<RomData>>(),
 				};
 				foreach (string key in userData.Roms.Keys)
 				{
@@ -273,7 +269,6 @@ namespace SabreTools
 						ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 						OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 						MergeRoms = _dedup,
-						Roms = new Dictionary<string, List<RomData>>(),
 					};
 
 					List<string> keys = userData.Roms.Keys.ToList();

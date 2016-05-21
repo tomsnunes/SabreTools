@@ -144,10 +144,7 @@ namespace SabreTools
 			{
 				// First get the combination Dictionary of currentAllMerged and currentNewMerged
 				_logger.User("Adding Current and New Merged DATs to the dictionary");
-				DatData completeDats = new DatData
-				{
-					Roms = new Dictionary<string, List<RomData>>(),
-				};
+				DatData completeDats = new DatData();
 				completeDats = RomManipulation.Parse(_currentAllMerged, 0, 0, completeDats, _logger);
 				completeDats = RomManipulation.Parse(_currentNewMerged, 0, 0, completeDats, _logger);
 
@@ -201,10 +198,7 @@ namespace SabreTools
 
 				// Now create the New Missing dictionary [(Net New)+(currentMissingMerged-(Unneeded))]
 				_logger.User("Creating and populating New Missing dictionary");
-				DatData midMissing = new DatData
-				{
-					Roms = new Dictionary<string, List<RomData>>(),
-				};
+				DatData midMissing = new DatData();
 				midMissing = RomManipulation.Parse(_currentMissingMerged, 0, 0, midMissing, _logger);
 				foreach (string key in unneeded.Keys)
 				{
@@ -454,10 +448,7 @@ namespace SabreTools
 			{
 				// Now create the Have dictionary [(currentAllMerged)-(currentMissingMerged)]
 				_logger.User("Creating and populating Have dictionary");
-				DatData midHave = new DatData
-				{
-					Roms = new Dictionary<string, List<RomData>>(),
-				};
+				DatData midHave = new DatData();
 				midHave = RomManipulation.Parse(_currentMissingMerged, 0, 0, midHave, _logger);
 				midHave = RomManipulation.Parse(_currentAllMerged, 0, 0, midHave, _logger);
 				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
@@ -527,10 +518,7 @@ namespace SabreTools
 			{
 				// Now create the Have dictionary [(currentNewMerged)-(currentMissingMerged)]
 				_logger.User("Creating and populating Have dictionary");
-				DatData midHave = new DatData
-				{
-					Roms = new Dictionary<string, List<RomData>>(),
-				};
+				DatData midHave = new DatData();
 				midHave = RomManipulation.Parse(_currentMissingMerged, 0, 0, midHave, _logger);
 				midHave = RomManipulation.Parse(_currentNewMerged, 0, 0, midHave, _logger);
 				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();

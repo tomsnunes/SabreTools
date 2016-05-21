@@ -399,10 +399,7 @@ namespace SabreTools
 			}
 
 			// Get all roms that are found in the DAT to see what needs to be added
-			DatData datdata = new DatData
-			{
-				Roms = new Dictionary<string, List<RomData>>(),
-			};
+			DatData datdata = new DatData();
 			datdata = RomManipulation.Parse(_filepath, sysid, srcid, datdata, _logger);
 
 			// Sort inputted roms into games

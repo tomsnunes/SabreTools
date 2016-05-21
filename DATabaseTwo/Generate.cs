@@ -156,7 +156,6 @@ namespace SabreTools
 				ForcePacking = ForcePacking.None,
 				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 				MergeRoms = true,
-				Roms = new Dictionary<string, List<RomData>>(),
 			};
 
 			// Now read in all of the files

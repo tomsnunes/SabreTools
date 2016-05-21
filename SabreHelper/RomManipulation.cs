@@ -100,6 +100,12 @@ namespace SabreTools.Helper
 		/// <returns>DatData object representing the read-in data</returns>
 		public static DatData Parse(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false)
 		{
+			// Make sure there's a dictionary to read to
+			if (datdata.Roms == null)
+			{
+				datdata.Roms = new Dictionary<string, List<RomData>>();
+			}
+
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
 			bool superdat = false, nodump = false, empty = true;

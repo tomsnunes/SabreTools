@@ -145,12 +145,32 @@ namespace SabreTools
 			DatData datdata = new DatData
 			{
 				Description = Path.GetFileNameWithoutExtension(filename),
-				Roms = new Dictionary<string, List<RomData>>(),
 			};
 			datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger, true);
 
 			// Create each of the respective output DATs
 			_logger.User("Creating and populating new DATs");
+			DatData nodump = new DatData
+			{
+				Name = datdata.Name + " (Nodump)",
+				Description = datdata.Description + " (Nodump)",
+				Category = datdata.Category,
+				Version = datdata.Version,
+				Date = datdata.Date,
+				Author = datdata.Author,
+				Email = datdata.Email,
+				Homepage = datdata.Homepage,
+				Url = datdata.Url,
+				Comment = datdata.Comment,
+				Header = datdata.Header,
+				Type = datdata.Type,
+				ForceMerging = datdata.ForceMerging,
+				ForceNodump = datdata.ForceNodump,
+				ForcePacking = datdata.ForcePacking,
+				OutputFormat = outputFormat,
+				MergeRoms = datdata.MergeRoms,
+				Roms = new Dictionary<string, List<RomData>>(),
+			};
 			DatData sha1 = new DatData
 			{
 				Name = datdata.Name + " (SHA-1)",
@@ -195,8 +215,8 @@ namespace SabreTools
 			};
 			DatData crc = new DatData
 			{
-				Name = datdata.Name + " (CRC and None)",
-				Description = datdata.Description + " (CRC and None)",
+				Name = datdata.Name + " (CRC)",
+				Description = datdata.Description + " (CRC)",
 				Category = datdata.Category,
 				Version = datdata.Version,
 				Date = datdata.Date,
@@ -222,8 +242,22 @@ namespace SabreTools
 				List<RomData> roms = datdata.Roms[key];
 				foreach (RomData rom in roms)
 				{
+					// If the file is a nodump
+					if (rom.Nodump)
+					{
+						if (nodump.Roms.ContainsKey(key))
+						{
+							nodump.Roms[key].Add(rom);
+						}
+						else
+						{
+							List<RomData> temp = new List<RomData>();
+							temp.Add(rom);
+							nodump.Roms.Add(key, temp);
+						}
+					}
 					// If the file has a SHA-1
-					if (rom.SHA1 != null && rom.SHA1 != "")
+					else if (rom.SHA1 != null && rom.SHA1 != "")
 					{
 						if (sha1.Roms.ContainsKey(key))
 						{
@@ -281,6 +315,10 @@ namespace SabreTools
 			// Now, output all of the files to the output directory
 			_logger.User("DAT information created, outputting new files");
 			bool success = true;
+			if (nodump.Roms.Count > 0)
+			{
+				success &= Output.WriteDatfile(nodump, outdir, _logger);
+			}
 			if (sha1.Roms.Count > 0)
 			{
 				success &= Output.WriteDatfile(sha1, outdir, _logger);
