@@ -21,63 +21,35 @@ namespace SabreTools
 		private string _basePath;
 		private string _tempDir;
 
-		// Extraction and listing related variables
-		private Dictionary<string, List<RomData>> _dict;
+		// User specified inputs
 		private List<String> _inputs;
-
-		// User specified flags
+		private DatData _datdata;
 		private bool _noMD5;
 		private bool _noSHA1;
 		private bool _bare;
-		private bool _forceunpack;
 		private bool _archivesAsFiles;
-		private bool _old;
-		private bool _superDat;
-
-		// User specified strings
-		private string _name;
-		private string _desc;
-		private string _cat;
-		private string _version;
-		private string _author;
 
 		// Other required variables
-		private string _date = DateTime.Now.ToString("yyyy-MM-dd");
 		private Logger _logger;
 
 		/// <summary>
 		/// Create a new DATFromDir object
 		/// </summary>
 		/// <param name="inputs">A List of Strings representing the files and folders to be DATted</param>
-		/// <param name="name">Internal name of the DAT</param>
-		/// <param name="desc">Description and external name of the DAT</param>
-		/// <param name="cat">Category for the DAT</param>
-		/// <param name="version">Version of the DAT</param>
-		/// <param name="author">Author of the DAT</param>
+		/// <param name="datdata">DatData object representing the requested output DAT</param>
 		/// <param name="noMD5">True if MD5 hashes should be skipped over, false otherwise</param>
 		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
-		/// <param name="forceunpack">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
-		/// <param name="archivesAsFiles">True if all archives should be treated like files, false otherwise</param>
-		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
-		/// <param name="superDat">True if SuperDAT mode is enabled, false otherwise</param>
+		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public DATFromDir(List<String> inputs, string name, string desc, string cat, string version, string author,
-			bool noMD5, bool noSHA1, bool bare, bool forceunpack, bool archivesAsFiles, bool old, bool superDat, Logger logger)
+		public DATFromDir(List<String> inputs, DatData datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, Logger logger)
 		{
 			_inputs = inputs;
-			_name = name;
-			_desc = desc;
-			_cat = cat;
-			_version = version;
-			_author = author;
+			_datdata = datdata;
 			_noMD5 = noMD5;
 			_noSHA1 = noSHA1;
 			_bare = bare;
-			_forceunpack = forceunpack;
 			_archivesAsFiles = archivesAsFiles;
-			_old = old;
-			_superDat = superDat;
 			_logger = logger;
 		}
 
@@ -100,7 +72,7 @@ namespace SabreTools
 			logger.Start();
 
 			// First things first, take care of all of the arguments that this could have
-			bool noMD5 = false, noSHA1 = false, forceunpack = false, archivesAsFiles = false, old = false, superDat = false, bare = false;
+			bool noMD5 = false, noSHA1 = false, forceunpack = false, archivesAsFiles = false, old = false, superDat = false, bare = false, romba = false;
 			string name = "", desc = "", cat = "", version = "", author = "";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
@@ -136,6 +108,10 @@ namespace SabreTools
 					case "-o":
 					case "--old":
 						old = true;
+						break;
+					case "-ro":
+					case "--romba":
+						romba = true;
 						break;
 					case "-sd":
 					case "--superdat":
@@ -194,7 +170,21 @@ namespace SabreTools
 			}
 
 			// Create a new DATFromDir object and process the inputs
-			DATFromDir dfd = new DATFromDir(inputs, name, desc, cat, version, author, noMD5, noSHA1, bare, forceunpack, archivesAsFiles, old, superDat, logger);
+			DatData datdata = new DatData
+			{
+				Name = name,
+				Description = desc,
+				Category = cat,
+				Version = version,
+				Date = DateTime.Now.ToString("yyyy-MM-dd"),
+				Author = author,
+				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				Romba = romba,
+				Type = (superDat ? "SuperDAT" : ""),
+				Roms = new Dictionary<string, List<RomData>>(),
+			};
+			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, logger);
 			bool success = dfd.Start();
 
 			// If we failed, show the help
@@ -214,7 +204,7 @@ namespace SabreTools
 		public bool Start()
 		{
 			// Create an output dictionary for all found items
-			_dict = new Dictionary<string, List<RomData>>();
+			_datdata.Roms = new Dictionary<string, List<RomData>>();
 
 			// Loop over each of the found paths, if any
 			foreach (string path in _inputs)
@@ -242,7 +232,7 @@ namespace SabreTools
 					string basePathBackup = _basePath;
 					foreach (string item in Directory.EnumerateDirectories(_basePath))
 					{
-						if (!_superDat)
+						if (_datdata.Type != "SuperDAT")
 						{
 							_basePath = (File.Exists(item) ? item : item + Path.DirectorySeparatorChar);
 							_basePath = Path.GetFullPath(_basePath);
@@ -269,15 +259,15 @@ namespace SabreTools
 							};
 
 							string key = rom.Size + "-" + rom.CRC;
-							if (_dict.ContainsKey(key))
+							if (_datdata.Roms.ContainsKey(key))
 							{
-								_dict[key].Add(rom);
+								_datdata.Roms[key].Add(rom);
 							}
 							else
 							{
 								List<RomData> temp = new List<RomData>();
 								temp.Add(rom);
-								_dict.Add(key, temp);
+								_datdata.Roms.Add(key, temp);
 							}
 						}
 
@@ -297,15 +287,15 @@ namespace SabreTools
 								};
 
 								string key = rom.Size + "-" + rom.CRC;
-								if (_dict.ContainsKey(key))
+								if (_datdata.Roms.ContainsKey(key))
 								{
-									_dict[key].Add(rom);
+									_datdata.Roms[key].Add(rom);
 								}
 								else
 								{
 									List<RomData> temp = new List<RomData>();
 									temp.Add(rom);
-									_dict.Add(key, temp);
+									_datdata.Roms.Add(key, temp);
 								}
 							}
 						}
@@ -320,17 +310,17 @@ namespace SabreTools
 			}
 
 			// If we found nothing (error state), exit
-			if (_dict.Count == 0)
+			if (_datdata.Roms.Count == 0)
 			{
 				return false;
 			}
 
 			// Double check to see what it needs to be named
-			if (_name == "")
+			if (_datdata.Name == "")
 			{
 				if (_inputs.Count > 1)
 				{
-					_name = Environment.CurrentDirectory.Split(Path.DirectorySeparatorChar).Last();
+					_datdata.Name = Environment.CurrentDirectory.Split(Path.DirectorySeparatorChar).Last();
 				}
 				else
 				{
@@ -338,49 +328,35 @@ namespace SabreTools
 					{
 						_basePath = _basePath.Substring(0, _basePath.Length - 1);
 					}
-					_name = _basePath.Split(Path.DirectorySeparatorChar).Last();
+					_datdata.Name = _basePath.Split(Path.DirectorySeparatorChar).Last();
 				}
 			}
-			_name = (_name == "" ? "Default" : _name);
+			_datdata.Name = (_datdata.Name == "" ? "Default" : _datdata.Name);
 
 			// If we're in a superdat, append the folder name to all game names
-			if (_superDat)
+			if (_datdata.Type == "SuperDAT")
 			{
-				List<string> keys = _dict.Keys.ToList();
+				List<string> keys = _datdata.Roms.Keys.ToList();
 				foreach (string key in keys)
 				{
 					List<RomData> newroms = new List<RomData>();
-					foreach (RomData rom in _dict[key])
+					foreach (RomData rom in _datdata.Roms[key])
 					{
 						RomData newrom = rom;
-						newrom.Game = _name + (newrom.Game != "" &&
+						newrom.Game = _datdata.Name + (newrom.Game != "" &&
 							!newrom.Game.StartsWith(Path.DirectorySeparatorChar.ToString()) ? Path.DirectorySeparatorChar.ToString() : "") + newrom.Game;
 						newroms.Add(newrom);
 					}
-					_dict[key] = newroms;
+					_datdata.Roms[key] = newroms;
 				}
 
-				_name = _name += " - SuperDAT";
+				_datdata.Name = _datdata.Name += " - SuperDAT";
 			}
 
-			_desc = (_desc == "" ? _name + (_bare ? "" : " (" + _date + ")") : _desc);
-
-			DatData datdata = new DatData
-			{
-				Name = _name,
-				Description = _desc,
-				Version = _version,
-				Date = _date,
-				Category = _cat,
-				Author = _author,
-				Type = (_superDat ? "SuperDAT" : ""),
-				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-				Roms = _dict,
-			};
+			_datdata.Description = (_datdata.Description == "" ? _datdata.Name + (_bare ? "" : " (" + _datdata.Date + ")") : _datdata.Description);
 
 			// Now write it all out as a DAT
-			Output.WriteDatfile(datdata, Environment.CurrentDirectory, _logger);
+			Output.WriteDatfile(_datdata, Environment.CurrentDirectory, _logger);
 
 			return true;
 		}
@@ -401,7 +377,7 @@ namespace SabreTools
 					ArchiveType at = archive.Type;
 					_logger.Log("Found archive of type: " + at);
 
-					if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
+					if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar || (at == ArchiveType.GZip && _datdata.Romba))
 					{
 						_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
 						DirectoryInfo di = Directory.CreateDirectory(_tempDir);
@@ -473,7 +449,7 @@ namespace SabreTools
 					actualitem = entry.Remove(0, _tempDir.Length);
 
 					// If we're in SuperDAT mode, make sure the added item is by itself
-					if (_superDat)
+					if (_datdata.Type == "SuperDAT")
 					{
 						actualroot = Path.GetDirectoryName(item.Remove(0, _basePath.Length));
 						actualroot = (actualroot == "" ? _basePath.Split(Path.DirectorySeparatorChar).Last() : actualroot);
@@ -500,15 +476,15 @@ namespace SabreTools
 					};
 
 					string key = rom.Size + "-" + rom.CRC;
-					if (_dict.ContainsKey(key))
+					if (_datdata.Roms.ContainsKey(key))
 					{
-						_dict[key].Add(rom);
+						_datdata.Roms[key].Add(rom);
 					}
 					else
 					{
 						List<RomData> temp = new List<RomData>();
 						temp.Add(rom);
-						_dict.Add(key, temp);
+						_datdata.Roms.Add(key, temp);
 					}
 
 					_logger.User("File added: " + entry + Environment.NewLine);
@@ -559,11 +535,11 @@ namespace SabreTools
 					}
 
 					string actualroot = (item == _basePath ? item.Split(Path.DirectorySeparatorChar).Last() : item.Remove(0, _basePath.Length).Split(Path.DirectorySeparatorChar)[0]);
-					actualroot = (actualroot == "" && !_superDat ? _basePath.Split(Path.DirectorySeparatorChar).Last() : actualroot);
+					actualroot = (actualroot == "" && _datdata.Type != "SuperDAT" ? _basePath.Split(Path.DirectorySeparatorChar).Last() : actualroot);
 					string actualitem = (item == _basePath ? item : item.Remove(0, _basePath.Length + 1));
 
 					// If we're in SuperDAT mode, make sure the added item is by itself
-					if (_superDat)
+					if (_datdata.Type == "SuperDAT")
 					{
 						actualroot += (actualroot != "" ? Path.DirectorySeparatorChar.ToString() : "") + Path.GetDirectoryName(actualitem);
 						actualroot = actualroot.TrimEnd(Path.DirectorySeparatorChar);
@@ -590,15 +566,15 @@ namespace SabreTools
 					};
 
 					string key = rom.Size + "-" + rom.CRC;
-					if (_dict.ContainsKey(key))
+					if (_datdata.Roms.ContainsKey(key))
 					{
-						_dict[key].Add(rom);
+						_datdata.Roms[key].Add(rom);
 					}
 					else
 					{
 						List<RomData> temp = new List<RomData>();
 						temp.Add(rom);
-						_dict.Add(key, temp);
+						_datdata.Roms.Add(key, temp);
 					}
 
 					_logger.User("File added: " + actualitem + Environment.NewLine);

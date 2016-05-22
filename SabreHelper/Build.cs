@@ -118,6 +118,8 @@ Options:
 	-out=			Output directory
 	-nr, --no-rename	Don't auto-rename games
 	-o, --old		Output DAT in CMP format instead of XML
+  -hs, --hash-split		Split a DAT or folder by best-available hashes
+	-out=			Output directory
   -i, --import		Start tool in import mode
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
@@ -168,6 +170,7 @@ Options:
   -u, --unzip		Force unzipping in created DAT
   -f, --files		Treat archives as files
   -o, --old		Output DAT in CMP format instead of XML
+  -ro, --romba		Allow reading of GZIP files for Romba
   -n=, --name=		Set the internal name of the DAT
   -d=, --desc=		Set the filename and description of the DAT
   -c=, --cat=		Set the category of the DAT
@@ -210,16 +213,6 @@ Options:
   -nr, --no-rename	Don't auto-rename games by source/system
   -o, --old		Output DAT in CMP format instead of XML
   -sys=, --system=	System ID to generate from
-");
-					break;
-				case "HashSplit":
-					Console.WriteLine(@"HashSplit - Split a DAT by best-available hashes
------------------------------------------
-Usage: HashSplit [options] [filename|dirname] <filename|dirname> ...
-
-Options:
-  -h, -?, --help	Show this help dialog
-  -out=			Output directory
 ");
 					break;
 				default:

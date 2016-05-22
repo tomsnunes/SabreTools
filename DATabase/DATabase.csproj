@@ -106,6 +106,7 @@
   <ItemGroup>
     <Compile Include="ExtSplit.cs" />
     <Compile Include="Generate.cs" />
+    <Compile Include="HashSplit.cs" />
     <Compile Include="Import.cs" />
     <Compile Include="DATabase.cs" />
     <Compile Include="MergeDiff.cs" />

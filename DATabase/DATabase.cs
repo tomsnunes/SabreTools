@@ -67,6 +67,7 @@ namespace SabreTools
 				forceunpack = false,
 				generate = false,
 				genall = false,
+				hashsplit = false,
 				import = false,
 				listsrc = false,
 				listsys = false,
@@ -168,6 +169,10 @@ namespace SabreTools
 					case "-gp":
 					case "--game-prefix":
 						gamename = true;
+						break;
+					case "-hs":
+					case "--hash-split":
+						hashsplit = true;
 						break;
 					case "-i":
 					case "--import":
@@ -321,7 +326,7 @@ namespace SabreTools
 
 			// If more than one switch is enabled or help is set, show the help screen
 			if (help || !(add ^ (convertMiss || romba) ^ convertCMP ^ convertRC ^ convertSD ^ convertXml ^ extsplit ^ generate ^ 
-				genall ^ import ^ listsrc ^ listsys ^ (merge || diff) ^ rem ^ trim))
+				genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^ rem ^ trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -329,7 +334,8 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && ((convertMiss || romba) || convertCMP || convertRC || convertSD || convertXml || extsplit || import || (merge || diff) || trim))
+			if (inputs.Count == 0 && ((convertMiss || romba) || convertCMP || convertRC || convertSD
+				|| convertXml || extsplit || hashsplit || import || (merge || diff) || trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -472,6 +478,12 @@ namespace SabreTools
 			else if (merge || diff)
 			{
 				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade);
+			}
+
+			// Split a DAT by available hashes
+			else if (hashsplit)
+			{
+				InitHashSplit(inputs, outdir);
 			}
 
 			logger.Close();
@@ -675,6 +687,7 @@ Make a selection:
     3) Trim all entries in DAT and merge into a single game
     4) Merge, diff, and/or dedup 2 or more DAT files
     5) Split DAT using 2 extensions
+    6) Split DATs by best available hash values
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -695,6 +708,9 @@ Make a selection:
 						break;
 					case "5":
 						ExtSplitMenu();
+						break;
+					case "6":
+						HashSplitMenu();
 						break;
 				}
 			}
@@ -1061,7 +1077,7 @@ Make a selection:
 					case "4":
 						Console.Clear();
 						Console.Write("Please enter the output directory: ");
-						exta = Console.ReadLine();
+						outdir = Console.ReadLine();
 						break;
 					case "5":
 						Console.Clear();
@@ -1069,6 +1085,52 @@ Make a selection:
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; exta = ""; extb = ""; outdir = "";
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Show the text-based HashSplit menu
+		/// </summary>
+		private static void HashSplitMenu()
+		{
+			string selection = "", input = "", outdir = "";
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"HASH SPLIT MENU
+===========================
+Make a selection:
+
+    1) File or folder to split" + (input != "" ? ":\n\t" + input : "") + @"
+    2) Output directory" + (outdir != "" ? ":\n\t" + outdir : "") + @"
+    3) Split the file
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						Console.Clear();
+						Console.Write("Please enter the file or folder name: ");
+						input = Console.ReadLine();
+						break;
+					case "2":
+						Console.Clear();
+						Console.Write("Please enter the output directory: ");
+						outdir = Console.ReadLine();
+						break;
+					case "3":
+						Console.Clear();
+						List<string> inputs = new List<string>();
+						inputs.Add(input);
+						InitHashSplit(inputs, outdir);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						input = ""; outdir = "";
 						break;
 				}
 			}
@@ -1560,6 +1622,33 @@ Make a selection:
 			{
 				logger.Log("I'm sorry but " + input + "doesn't exist!");
 			}
+		}
+
+		/// <summary>
+		/// Wrap splitting a DAT by best available hashes
+		/// </summary>
+		/// <param name="inputs">List of inputs to be used</param>
+		/// <param name="outdir">Output directory for the split files</param>
+		private static void InitHashSplit(List<string> inputs, string outdir)
+		{
+			// Strip any quotations from the names
+			outdir = outdir.Replace("\"", "");
+
+			// Verify the input files
+			foreach (string input in inputs)
+			{
+				if (!File.Exists(input.Replace("\"", "")) && !Directory.Exists(input.Replace("\"", "")))
+				{
+					logger.Error(input + " is not a valid file or folder!");
+					Console.WriteLine();
+					Build.Help();
+					return;
+				}
+			}
+
+			// If so, run the program
+			HashSplit hs = new HashSplit(inputs, outdir, logger);
+			hs.Split();
 		}
 
 		/// <summary>
