@@ -15,9 +15,6 @@ namespace SabreTools.Helper
 		public static string CRCZero = "00000000";
 		public static string MD5Zero = "d41d8cd98f00b204e9800998ecf8427e";
 		public static string SHA1Zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
-		/////public static string NormalizeChars;
-		/////public static string RussianToLatin;
-		/////public static string SearchPattern;
 
 		/// <summary>
 		/// Get what type of DAT the input file is
@@ -130,9 +127,11 @@ namespace SabreTools.Helper
 						{
 							string tempgame = String.Join("\\", parent);
 
-							///WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
-							////tempgame = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempgame).Groups[1].Value;
-							////tempgame = tempgame.TrimStart().TrimEnd();
+							/*
+							// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
+							tempgame = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempgame).Groups[1].Value;
+							tempgame = tempgame.TrimStart().TrimEnd();
+							*/
 
 							RomData rom = new RomData
 							{
@@ -519,14 +518,16 @@ namespace SabreTools.Helper
 												nodump = true;
 											}
 											
+											/*
 											///Run the name through the filters to make sure that it's correct
-											/////tempname = Style.NormalizeChars(tempname);
-											/////tempname = Style.RussianToLatin(tempname);
-											/////tempname = Style.SearchPattern(tempname);
+											tempname = Style.NormalizeChars(tempname);
+											tempname = Style.RussianToLatin(tempname);
+											tempname = Style.SearchPattern(tempname);
 											
-											///WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
-											////tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
-											////tempname = tempname.TrimStart().TrimEnd();
+											// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
+											tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
+											tempname = tempname.TrimStart().TrimEnd();
+											*/
 
 											// Only add the rom if there's useful information in it
 											if (!(crc == "" && md5 == "" && sha1 == "") || nodump)
@@ -577,9 +578,11 @@ namespace SabreTools.Helper
 							{
 								tempname = (parent.Count > 0 ? String.Join("\\", parent) + Path.DirectorySeparatorChar : "") + tempname;
 
-								///WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
-								////tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
-								////tempname = tempname.TrimEnd().TrimStart();
+								/*
+								// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
+								tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
+								tempname = tempname.TrimEnd().TrimStart();
+								*/
 
 								RomData rom = new RomData
 								{
@@ -740,9 +743,11 @@ namespace SabreTools.Helper
 								}
 							}
 
-							///WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
-							////tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
-							////tempname = tempname.TrimEnd().TrimStart();
+							/*
+							// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
+							tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
+							tempname = tempname.TrimEnd().TrimStart();
+							*/
 
 							// Only add the rom if there's useful information in it
 							if (!(crc == "" && md5 == "" && sha1 == "") || nodump)
