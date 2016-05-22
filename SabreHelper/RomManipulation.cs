@@ -15,6 +15,9 @@ namespace SabreTools.Helper
 		public static string CRCZero = "00000000";
 		public static string MD5Zero = "d41d8cd98f00b204e9800998ecf8427e";
 		public static string SHA1Zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+		/////public static string NormalizeChars;
+		/////public static string RussianToLatin;
+		/////public static string SearchPattern;
 
 		/// <summary>
 		/// Get what type of DAT the input file is
@@ -125,11 +128,17 @@ namespace SabreTools.Helper
 						// If we didn't find any items in the folder, make sure to add the blank rom
 						if (empty)
 						{
+							string tempgame = String.Join("\\", parent);
+
+							///WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
+							////tempgame = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempgame).Groups[1].Value;
+							////tempgame = tempgame.TrimStart().TrimEnd();
+
 							RomData rom = new RomData
 							{
 								Type = "rom",
 								Name = "null",
-								Game = String.Join("\\", parent),
+								Game = tempgame,
 								Size = -1,
 								CRC = "null",
 								MD5 = "null",
@@ -509,6 +518,15 @@ namespace SabreTools.Helper
 												logger.Warning("Incomplete entry for \"" + subreader.GetAttribute("name") + "\" will be output as nodump");
 												nodump = true;
 											}
+											
+											///Run the name through the filters to make sure that it's correct
+											/////tempname = Style.NormalizeChars(tempname);
+											/////tempname = Style.RussianToLatin(tempname);
+											/////tempname = Style.SearchPattern(tempname);
+											
+											///WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
+											////tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
+											////tempname = tempname.TrimStart().TrimEnd();
 
 											// Only add the rom if there's useful information in it
 											if (!(crc == "" && md5 == "" && sha1 == "") || nodump)
@@ -558,6 +576,10 @@ namespace SabreTools.Helper
 							if (empty)
 							{
 								tempname = (parent.Count > 0 ? String.Join("\\", parent) + Path.DirectorySeparatorChar : "") + tempname;
+
+								///WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
+								////tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
+								////tempname = tempname.TrimEnd().TrimStart();
 
 								RomData rom = new RomData
 								{
@@ -717,6 +739,10 @@ namespace SabreTools.Helper
 									tempname = tempout;
 								}
 							}
+
+							///WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
+							////tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
+							////tempname = tempname.TrimEnd().TrimStart();
 
 							// Only add the rom if there's useful information in it
 							if (!(crc == "" && md5 == "" && sha1 == "") || nodump)
