@@ -8,14 +8,6 @@ namespace SabreTools.Helper
 	public class Build
 	{
 		/// <summary>
-		/// The current toolset version to be used by all child applications
-		/// </summary>
-		public static string Version
-		{
-			get { return "0.7.5.0"; }
-		}
-
-		/// <summary>
 		/// Returns true if running in a Mono environment
 		/// </summary>
 		public static bool MonoEnvironment
@@ -32,7 +24,7 @@ namespace SabreTools.Helper
 		{
 			// Dynamically create the header string
 			string border = "+-----------------------------------------------------------------------------+";
-			string mid = name + " " + Build.Version;
+			string mid = name + " " + Constants.Version;
 			mid = "|" + mid.PadLeft(((77 - mid.Length) / 2) + mid.Length).PadRight(77) + "|";
 
 			// Set the console to ready state
@@ -47,7 +39,7 @@ namespace SabreTools.Helper
 				Console.BackgroundColor = ConsoleColor.Blue;
 			}
 
-			Console.Title = "SabreTools-" + name + " " + Build.Version;
+			Console.Title = "SabreTools-" + name + " " + Constants.Version;
 
 			// Output the header
 			Console.WriteLine(border);

@@ -10,12 +10,6 @@ namespace SabreTools.Helper
 {
 	public class RomManipulation
 	{
-		// 0-byte file constants
-		public static long SizeZero = 0;
-		public static string CRCZero = "00000000";
-		public static string MD5Zero = "d41d8cd98f00b204e9800998ecf8427e";
-		public static string SHA1Zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
-
 		/// <summary>
 		/// Get what type of DAT the input file is
 		/// </summary>
@@ -504,12 +498,13 @@ namespace SabreTools.Helper
 											sha1 = (sha1 == "" ? "" : sha1.PadLeft(40, '0'));
 
 											// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
-											if (subreader.Name == "rom" && (size == 0 || size == -1) && ((crc == CRCZero || crc == "") || md5 == MD5Zero || sha1 == SHA1Zero))
+											if (subreader.Name == "rom" && (size == 0 || size == -1) &&
+												((crc == Constants.CRCZero || crc == "") || md5 == Constants.MD5Zero || sha1 == Constants.SHA1Zero))
 											{
-												size = SizeZero;
-												crc = CRCZero;
-												md5 = MD5Zero;
-												sha1 = SHA1Zero;
+												size = Constants.SizeZero;
+												crc = Constants.CRCZero;
+												md5 = Constants.MD5Zero;
+												sha1 = Constants.SHA1Zero;
 											}
 											// If the file has no size and it's not the above case, skip and log
 											else if (subreader.Name == "rom" && (size == 0 || size == -1))
@@ -716,12 +711,12 @@ namespace SabreTools.Helper
 							sha1 = (sha1 == "" ? "" : sha1.PadLeft(40, '0'));
 
 							// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
-							if (xtr.GetAttribute("type") == "rom" && (size == 0 || size == -1) && ((crc == CRCZero || crc == "") || md5 == MD5Zero || sha1 == SHA1Zero))
+							if (xtr.GetAttribute("type") == "rom" && (size == 0 || size == -1) && ((crc == Constants.CRCZero || crc == "") || md5 == Constants.MD5Zero || sha1 == Constants.SHA1Zero))
 							{
-								size = SizeZero;
-								crc = CRCZero;
-								md5 = MD5Zero;
-								sha1 = SHA1Zero;
+								size = Constants.SizeZero;
+								crc = Constants.CRCZero;
+								md5 = Constants.MD5Zero;
+								sha1 = Constants.SHA1Zero;
 							}
 							// If the file has no size and it's not the above case, skip and log
 							else if (xtr.GetAttribute("type") == "rom" && (size == 0 || size == -1))

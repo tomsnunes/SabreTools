@@ -10,12 +10,6 @@ namespace SabreTools.Helper
 {
 	public class Output
 	{
-		// 0-byte file constants
-		public static long SizeZero = 0;
-		public static string CRCZero = "00000000";
-		public static string MD5Zero = "d41d8cd98f00b204e9800998ecf8427e";
-		public static string SHA1Zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
-
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
@@ -250,10 +244,10 @@ namespace SabreTools.Helper
 							if (datdata.OutputFormat != OutputFormat.SabreDat && datdata.OutputFormat != OutputFormat.MissFile)
 							{
 								rom.Name = "-";
-								rom.Size = SizeZero;
-								rom.CRC = CRCZero;
-								rom.MD5 = MD5Zero;
-								rom.SHA1 = SHA1Zero;
+								rom.Size = Constants.SizeZero;
+								rom.CRC = Constants.CRCZero;
+								rom.MD5 = Constants.MD5Zero;
+								rom.SHA1 = Constants.SHA1Zero;
 							}
 
 							// Otherwise, set the new path and such, write out, and continue

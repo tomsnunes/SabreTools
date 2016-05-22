@@ -14,11 +14,6 @@ namespace SabreTools.Helper
 	/// </summary>
 	public class Converters
 	{
-		// Regex matching patterns
-		private static string _headerPatternCMP = @"(^.*?) \($";
-		private static string _itemPatternCMP = @"^\s*(\S*?) (.*)";
-		private static string _endPatternCMP = @"^\s*\)\s*$";
-
 		/// <summary>
 		/// Convert a ClrMamePro style DAT to an Logiqx XML derived DAT
 		/// </summary>
@@ -40,9 +35,9 @@ namespace SabreTools.Helper
 				}
 
 				// If the line is the header or a game
-				if (Regex.IsMatch(line, _headerPatternCMP))
+				if (Regex.IsMatch(line, Constants.HeaderPatternCMP))
 				{
-					GroupCollection gc = Regex.Match(line, _headerPatternCMP).Groups;
+					GroupCollection gc = Regex.Match(line, Constants.HeaderPatternCMP).Groups;
 
 					if (gc[1].Value == "clrmamepro" || gc[1].Value == "romvault")
 					{
@@ -133,9 +128,9 @@ namespace SabreTools.Helper
 					elem.Add(new XElement(temp));
 				}
 				// If the line is anything but a rom or disk and we're in a block
-				else if (Regex.IsMatch(line, _itemPatternCMP) && block)
+				else if (Regex.IsMatch(line, Constants.ItemPatternCMP) && block)
 				{
-					GroupCollection gc = Regex.Match(line, _itemPatternCMP).Groups;
+					GroupCollection gc = Regex.Match(line, Constants.ItemPatternCMP).Groups;
 
 					if (gc[1].Value == "name" && elem.Name != "header")
 					{
@@ -149,7 +144,7 @@ namespace SabreTools.Helper
 				}
 
 				// If we find an end bracket that's not associated with anything else, the block is done
-				else if (Regex.IsMatch(line, _endPatternCMP) && block)
+				else if (Regex.IsMatch(line, Constants.EndPatternCMP) && block)
 				{
 					block = false;
 					elem = elem.Parent;

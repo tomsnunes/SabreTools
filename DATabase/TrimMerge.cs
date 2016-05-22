@@ -10,8 +10,8 @@ namespace SabreTools
 	public class TrimMerge
 	{
 		// Instance variables
-		private string _filename = "";
-		private string _path = "";
+		private string _filename;
+		private string _path;
 		private bool _rename;
 		private bool _forceunpack;
 		private Logger _logger;

@@ -17,26 +17,6 @@ namespace SabreTools
 		private Logger _logger;
 		private bool _ignore;
 
-		// Regex File Name Patterns
-		private static string _defaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
-		private static string _defaultSpecialPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.xml$";
-		private static string _goodPattern = @"^(Good.*?)_.*\.dat";
-		private static string _goodXmlPattern = @"^(Good.*?)_.*\.xml";
-		private static string _mamePattern = @"^(.*)\.xml$";
-		private static string _maybeIntroPattern = @"(.*?) \[T-En\].*\((\d{8})\)\.dat$";
-		private static string _noIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
-		private static string _noIntroNumberedPattern = @"(.*? - .*?) \(\d.*?_CM\).dat";
-		private static string _noIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\)\.dat";
-		private static string _nonGoodPattern = @"^(NonGood.*?)( .*?)?.xml";
-		private static string _nonGoodSpecialPattern = @"^(NonGood.*?)( .*)?.dat";
-		private static string _redumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
-		private static string _redumpBiosPattern = @"^(.*?) \(\d+\) \((\d{4}-\d{2}-\d{2})\)\.dat$";
-		private static string _tosecPattern = @"^(.*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
-		private static string _tosecSpecialPatternA = @"^(.*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
-		private static string _tosecSpecialPatternB = @"^(.*? - .*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
-		private static string _truripPattern = @"^(.*) - .* \(trurip_XML\)\.dat$";
-		private static string _zandroPattern = @"^SMW-.*.xml";
-
 		/// <summary>
 		/// Initialize an Import object with the given information
 		/// </summary>
@@ -108,7 +88,7 @@ namespace SabreTools
 									string squery = @"BEGIN;
 INSERT INTO dats (size, sha1, name)
 VALUES (" + (new FileInfo(file)).Length + ", '" + hash + "', '" + file.Replace("'", "''") + @"');
-SELECT last_insert_rowid();
+SELECT last_insertConstants.Rowid();
 COMMIT;";
 									using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
 									{
@@ -189,7 +169,7 @@ COMMIT;";
 											string tquery = @"BEGIN;
 INSERT INTO source (name, url)
 VALUES ('" + source + @"', '');
-SELECT last_insert_rowid();
+SELECT last_insertConstants.Rowid();
 COMMIT;";
 											using (SqliteCommand sslc = new SqliteCommand(tquery, dbc))
 											{
@@ -263,9 +243,9 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 			// Determine which dattype we have
 			GroupCollection fileinfo;
 
-			if (Regex.IsMatch(filename, _nonGoodPattern))
+			if (Regex.IsMatch(filename, Constants.NonGoodPattern))
 			{
-				fileinfo = Regex.Match(filename, _nonGoodPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.NonGoodPattern).Groups;
 				if (!Remapping.NonGood.ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as NonGood but could not be mapped.");
@@ -273,9 +253,9 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				}
 				source = "NonGood";
 			}
-			else if (Regex.IsMatch(filename, _nonGoodSpecialPattern))
+			else if (Regex.IsMatch(filename, Constants.NonGoodSpecialPattern))
 			{
-				fileinfo = Regex.Match(filename, _nonGoodSpecialPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.NonGoodSpecialPattern).Groups;
 				if (!Remapping.NonGood.ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as NonGood but could not be mapped.");
@@ -283,9 +263,9 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				}
 				source = "NonGood";
 			}
-			else if (Regex.IsMatch(filename, _goodPattern))
+			else if (Regex.IsMatch(filename, Constants.GoodPattern))
 			{
-				fileinfo = Regex.Match(filename, _goodPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.GoodPattern).Groups;
 				if (!Remapping.Good.ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as Good but could not be mapped.");
@@ -293,13 +273,13 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				}
 				source = "Good";
 			}
-			else if (Regex.IsMatch(filename, _goodXmlPattern))
+			else if (Regex.IsMatch(filename, Constants.GoodXmlPattern))
 			{
-				fileinfo = Regex.Match(filename, _goodXmlPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.GoodXmlPattern).Groups;
 			}
-			else if (Regex.IsMatch(filename, _maybeIntroPattern))
+			else if (Regex.IsMatch(filename, Constants.MaybeIntroPattern))
 			{
-				fileinfo = Regex.Match(filename, _maybeIntroPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.MaybeIntroPattern).Groups;
 				if (!Remapping.MaybeIntro.ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as Maybe-Intro but could not be mapped.");
@@ -307,9 +287,9 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				}
 				source = "Maybe-Intro";
 			}
-			else if (Regex.IsMatch(filename, _noIntroPattern))
+			else if (Regex.IsMatch(filename, Constants.NoIntroPattern))
 			{
-				fileinfo = Regex.Match(filename, _noIntroPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.NoIntroPattern).Groups;
 				if (!Remapping.NoIntro.ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as No-Intro but could not be mapped.");
@@ -318,9 +298,9 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				source = "no-Intro";
 			}
 			// For numbered DATs only
-			else if (Regex.IsMatch(filename, _noIntroNumberedPattern))
+			else if (Regex.IsMatch(filename, Constants.NoIntroNumberedPattern))
 			{
-				fileinfo = Regex.Match(filename, _noIntroNumberedPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.NoIntroNumberedPattern).Groups;
 				if (!Remapping.NoIntro.ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as No-Intro but could not be mapped.");
@@ -329,9 +309,9 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				source = "no-Intro";
 			}
 			// For N-Gage and Gizmondo only
-			else if (Regex.IsMatch(filename, _noIntroSpecialPattern))
+			else if (Regex.IsMatch(filename, Constants.NoIntroSpecialPattern))
 			{
-				fileinfo = Regex.Match(filename, _noIntroSpecialPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.NoIntroSpecialPattern).Groups;
 				if (!Remapping.NoIntro.ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as No-Intro but could not be mapped.");
@@ -339,9 +319,9 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				}
 				source = "no-Intro";
 			}
-			else if (Regex.IsMatch(filename, _redumpPattern))
+			else if (Regex.IsMatch(filename, Constants.RedumpPattern))
 			{
-				fileinfo = Regex.Match(filename, _redumpPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.RedumpPattern).Groups;
 				if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as Redump but could not be mapped.");
@@ -350,9 +330,9 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				source = "Redump";
 			}
 			// For special BIOSes only
-			else if (Regex.IsMatch(filename, _redumpBiosPattern))
+			else if (Regex.IsMatch(filename, Constants.RedumpBiosPattern))
 			{
-				fileinfo = Regex.Match(filename, _redumpBiosPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.RedumpBiosPattern).Groups;
 				if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as Redump but could not be mapped.");
@@ -360,17 +340,17 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				}
 				source = "Redump";
 			}
-			else if (Regex.IsMatch(filename, _tosecPattern))
+			else if (Regex.IsMatch(filename, Constants.TosecPattern))
 			{
-				fileinfo = Regex.Match(filename, _tosecPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.TosecPattern).Groups;
 				if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
 				{
 					// Handle special case mappings found only in TOSEC
-					fileinfo = Regex.Match(filename, _tosecSpecialPatternA).Groups;
+					fileinfo = Regex.Match(filename, Constants.TosecSpecialPatternA).Groups;
 
 					if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
 					{
-						fileinfo = Regex.Match(filename, _tosecSpecialPatternB).Groups;
+						fileinfo = Regex.Match(filename, Constants.TosecSpecialPatternB).Groups;
 
 						if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
 						{
@@ -381,9 +361,9 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				}
 				source = "TOSEC";
 			}
-			else if (Regex.IsMatch(filename, _truripPattern))
+			else if (Regex.IsMatch(filename, Constants.TruripPattern))
 			{
-				fileinfo = Regex.Match(filename, _truripPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.TruripPattern).Groups;
 				if (!Remapping.TruRip.ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as TruRip but could not be mapped.");
@@ -391,23 +371,23 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 				}
 				source = "trurip";
 			}
-			else if (Regex.IsMatch(filename, _zandroPattern))
+			else if (Regex.IsMatch(filename, Constants.ZandroPattern))
 			{
 				source = "Zandro";
 			}
-			else if (Regex.IsMatch(filename, _defaultPattern))
+			else if (Regex.IsMatch(filename, Constants.DefaultPattern))
 			{
-				fileinfo = Regex.Match(filename, _defaultPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.DefaultPattern).Groups;
 				source = fileinfo[3].Value;
 			}
-			else if (Regex.IsMatch(filename, _defaultSpecialPattern))
+			else if (Regex.IsMatch(filename, Constants.DefaultSpecialPattern))
 			{
-				fileinfo = Regex.Match(filename, _defaultSpecialPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.DefaultSpecialPattern).Groups;
 				source = fileinfo[3].Value;
 			}
-			else if (Regex.IsMatch(filename, _mamePattern))
+			else if (Regex.IsMatch(filename, Constants.MamePattern))
 			{
-				fileinfo = Regex.Match(filename, _mamePattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.MamePattern).Groups;
 				if (!Remapping.MAME.ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as MAME but could not be mapped.");

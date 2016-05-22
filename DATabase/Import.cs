@@ -19,36 +19,6 @@ namespace SabreTools
 		private string _connectionString;
 		private Logger _logger;
 
-		// Regex File Name Patterns
-		private static string _defaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
-		private static string _defaultSpecialPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.xml$";
-		private static string _goodPattern = @"^(Good.*?)_.*\.dat";
-		private static string _goodXmlPattern = @"^(Good.*?)_.*\.xml";
-		private static string _mamePattern = @"^(.*)\.xml$";
-		private static string _maybeIntroPattern = @"(.*?) \[T-En\].*\((\d{8})\)\.dat$";
-		private static string _noIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
-		private static string _noIntroNumberedPattern = @"(.*? - .*?) \(\d.*?_CM\).dat";
-		private static string _noIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\)\.dat";
-		private static string _nonGoodPattern = @"^(NonGood.*?)( .*?)?.xml";
-		private static string _nonGoodSpecialPattern = @"^(NonGood.*?)( .*)?.dat";
-		private static string _redumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
-		private static string _redumpBiosPattern = @"^(.*?) \(\d+\) \((\d{4}-\d{2}-\d{2})\)\.dat$";
-		private static string _tosecPattern = @"^(.*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
-		private static string _tosecSpecialPatternA = @"^(.*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
-		private static string _tosecSpecialPatternB = @"^(.*? - .*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
-		private static string _truripPattern = @"^(.*) - .* \(trurip_XML\)\.dat$";
-		private static string _zandroPattern = @"^SMW-.*.xml";
-
-		// Regex Mapped Name Patterns
-		private static string _remappedPattern = @"^(.*) - (.*)$";
-
-		// Regex Date Patterns
-		private static string _defaultDatePattern = @"(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})";
-		private static string _noIntroDatePattern = @"(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})";
-		private static string _noIntroSpecialDatePattern = @"(\d{4})(\d{2})(\d{2})";
-		private static string _redumpDatePattern = @"(\d{4})(\d{2})(\d{2}) (\d{2})-(\d{2})-(\d{2})";
-		private static string _tosecDatePattern = @"(\d{4})-(\d{2})-(\d{2})";
-
 		/// <summary>
 		/// Initialize an Import object with the given information
 		/// </summary>
@@ -80,88 +50,88 @@ namespace SabreTools
 			GroupCollection fileinfo;
 			DatType type = DatType.none;
 
-			if (Regex.IsMatch(filename, _nonGoodPattern))
+			if (Regex.IsMatch(filename, Constants.NonGoodPattern))
 			{
-				fileinfo = Regex.Match(filename, _nonGoodPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.NonGoodPattern).Groups;
 				type = DatType.NonGood;
 			}
-			else if (Regex.IsMatch(filename, _nonGoodSpecialPattern))
+			else if (Regex.IsMatch(filename, Constants.NonGoodSpecialPattern))
 			{
-				fileinfo = Regex.Match(filename, _nonGoodSpecialPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.NonGoodSpecialPattern).Groups;
 				type = DatType.NonGood;
 			}
-			else if (Regex.IsMatch(filename, _goodPattern))
+			else if (Regex.IsMatch(filename, Constants.GoodPattern))
 			{
-				fileinfo = Regex.Match(filename, _goodPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.GoodPattern).Groups;
 				type = DatType.Good;
 			}
-			else if (Regex.IsMatch(filename, _goodXmlPattern))
+			else if (Regex.IsMatch(filename, Constants.GoodXmlPattern))
 			{
-				fileinfo = Regex.Match(filename, _goodXmlPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.GoodXmlPattern).Groups;
 				type = DatType.Good;
 			}
-			else if (Regex.IsMatch(filename, _maybeIntroPattern))
+			else if (Regex.IsMatch(filename, Constants.MaybeIntroPattern))
 			{
-				fileinfo = Regex.Match(filename, _maybeIntroPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.MaybeIntroPattern).Groups;
 				type = DatType.MaybeIntro;
 			}
-			else if (Regex.IsMatch(filename, _noIntroPattern))
+			else if (Regex.IsMatch(filename, Constants.NoIntroPattern))
 			{
-				fileinfo = Regex.Match(filename, _noIntroPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.NoIntroPattern).Groups;
 				type = DatType.NoIntro;
 			}
 			// For numbered DATs only
-			else if (Regex.IsMatch(filename, _noIntroNumberedPattern))
+			else if (Regex.IsMatch(filename, Constants.NoIntroNumberedPattern))
 			{
-				fileinfo = Regex.Match(filename, _noIntroNumberedPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.NoIntroNumberedPattern).Groups;
 				type = DatType.NoIntro;
 			}
 			// For N-Gage and Gizmondo only
-			else if (Regex.IsMatch(filename, _noIntroSpecialPattern))
+			else if (Regex.IsMatch(filename, Constants.NoIntroSpecialPattern))
 			{
-				fileinfo = Regex.Match(filename, _noIntroSpecialPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.NoIntroSpecialPattern).Groups;
 				type = DatType.NoIntro;
 			}
-			else if (Regex.IsMatch(filename, _redumpPattern))
+			else if (Regex.IsMatch(filename, Constants.RedumpPattern))
 			{
-				fileinfo = Regex.Match(filename, _redumpPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.RedumpPattern).Groups;
 				type = DatType.Redump;
 			}
 			// For special BIOSes only
-			else if (Regex.IsMatch(filename, _redumpBiosPattern))
+			else if (Regex.IsMatch(filename, Constants.RedumpBiosPattern))
 			{
-				fileinfo = Regex.Match(filename, _redumpBiosPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.RedumpBiosPattern).Groups;
 				type = DatType.Redump;
 			}
-			else if (Regex.IsMatch(filename, _tosecPattern))
+			else if (Regex.IsMatch(filename, Constants.TosecPattern))
 			{
-				fileinfo = Regex.Match(filename, _tosecPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.TosecPattern).Groups;
 				type = DatType.TOSEC;
 			}
-			else if (Regex.IsMatch(filename, _truripPattern))
+			else if (Regex.IsMatch(filename, Constants.TruripPattern))
 			{
-				fileinfo = Regex.Match(filename, _truripPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.TruripPattern).Groups;
 				type = DatType.TruRip;
 			}
-			else if (Regex.IsMatch(filename, _zandroPattern))
+			else if (Regex.IsMatch(filename, Constants.ZandroPattern))
 			{
 				filename = "Nintendo - Super Nintendo Entertainment System (Zandro " + File.GetLastWriteTime(_filepath).ToString("yyyyMMddHHmmss") + ").dat";
-				fileinfo = Regex.Match(filename, _defaultPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.DefaultPattern).Groups;
 				type = DatType.Custom;
 			}
-			else if (Regex.IsMatch(filename, _defaultPattern))
+			else if (Regex.IsMatch(filename, Constants.DefaultPattern))
 			{
-				fileinfo = Regex.Match(filename, _defaultPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.DefaultPattern).Groups;
 				type = DatType.Custom;
 			}
-			else if (Regex.IsMatch(filename, _defaultSpecialPattern))
+			else if (Regex.IsMatch(filename, Constants.DefaultSpecialPattern))
 			{
-				fileinfo = Regex.Match(filename, _defaultSpecialPattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.DefaultSpecialPattern).Groups;
 				type = DatType.Custom;
 			}
-			else if (Regex.IsMatch(filename, _mamePattern))
+			else if (Regex.IsMatch(filename, Constants.MamePattern))
 			{
-				fileinfo = Regex.Match(filename, _mamePattern).Groups;
+				fileinfo = Regex.Match(filename, Constants.MamePattern).Groups;
 				type = DatType.MAME;
 			}
 			// If the type is still unmatched, the data can't be imported yet
@@ -188,7 +158,7 @@ namespace SabreTools
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection goodInfo = Regex.Match(Remapping.Good[fileinfo[1].Value], _remappedPattern).Groups;
+					GroupCollection goodInfo = Regex.Match(Remapping.Good[fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = goodInfo[1].Value;
 					system = goodInfo[2].Value;
@@ -201,7 +171,7 @@ namespace SabreTools
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection mameInfo = Regex.Match(Remapping.MAME[fileinfo[1].Value], _remappedPattern).Groups;
+					GroupCollection mameInfo = Regex.Match(Remapping.MAME[fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = mameInfo[1].Value;
 					system = mameInfo[2].Value;
@@ -214,13 +184,13 @@ namespace SabreTools
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection maybeIntroInfo = Regex.Match(Remapping.MaybeIntro[fileinfo[1].Value], _remappedPattern).Groups;
+					GroupCollection maybeIntroInfo = Regex.Match(Remapping.MaybeIntro[fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = maybeIntroInfo[1].Value;
 					system = maybeIntroInfo[2].Value;
 					source = "Maybe-Intro";
 					datestring = fileinfo[2].Value;
-					GroupCollection miDateInfo = Regex.Match(datestring, _noIntroSpecialDatePattern).Groups;
+					GroupCollection miDateInfo = Regex.Match(datestring, Constants.NoIntroSpecialDatePattern).Groups;
 					date = miDateInfo[1].Value + "-" + miDateInfo[2].Value + "-" + miDateInfo[3].Value + " 00:00:00";
 					break;
 				case DatType.NoIntro:
@@ -229,7 +199,7 @@ namespace SabreTools
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection nointroInfo = Regex.Match(Remapping.NoIntro[fileinfo[1].Value], _remappedPattern).Groups;
+					GroupCollection nointroInfo = Regex.Match(Remapping.NoIntro[fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = nointroInfo[1].Value;
 					system = nointroInfo[2].Value;
@@ -238,17 +208,17 @@ namespace SabreTools
 					{
 						date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					}
-					else if (Regex.IsMatch(fileinfo[2].Value, _noIntroDatePattern))
+					else if (Regex.IsMatch(fileinfo[2].Value, Constants.NoIntroDatePattern))
 					{
 						datestring = fileinfo[2].Value;
-						GroupCollection niDateInfo = Regex.Match(datestring, _noIntroDatePattern).Groups;
+						GroupCollection niDateInfo = Regex.Match(datestring, Constants.NoIntroDatePattern).Groups;
 						date = niDateInfo[1].Value + "-" + niDateInfo[2].Value + "-" + niDateInfo[3].Value + " " +
 							niDateInfo[4].Value + ":" + niDateInfo[5].Value + ":" + niDateInfo[6].Value;
 					}
 					else
 					{
 						datestring = fileinfo[2].Value;
-						GroupCollection niDateInfo = Regex.Match(datestring, _noIntroSpecialDatePattern).Groups;
+						GroupCollection niDateInfo = Regex.Match(datestring, Constants.NoIntroSpecialDatePattern).Groups;
 						date = niDateInfo[1].Value + "-" + niDateInfo[2].Value + "-" + niDateInfo[3].Value + " 00:00:00";
 					}
 					break;
@@ -258,7 +228,7 @@ namespace SabreTools
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection nonGoodInfo = Regex.Match(Remapping.NonGood[fileinfo[1].Value], _remappedPattern).Groups;
+					GroupCollection nonGoodInfo = Regex.Match(Remapping.NonGood[fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = nonGoodInfo[1].Value;
 					system = nonGoodInfo[2].Value;
@@ -269,7 +239,7 @@ namespace SabreTools
 					if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
 					{
 						// Handle special case mappings found only in Redump
-						fileinfo = Regex.Match(filename, _redumpBiosPattern).Groups;
+						fileinfo = Regex.Match(filename, Constants.RedumpBiosPattern).Groups;
 
 						if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
 						{
@@ -277,21 +247,21 @@ namespace SabreTools
 							return false;
 						}
 					}
-					GroupCollection redumpInfo = Regex.Match(Remapping.Redump[fileinfo[1].Value], _remappedPattern).Groups;
+					GroupCollection redumpInfo = Regex.Match(Remapping.Redump[fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = redumpInfo[1].Value;
 					system = redumpInfo[2].Value;
 					source = "Redump";
 					datestring = fileinfo[2].Value;
-					if (Regex.IsMatch(datestring, _redumpDatePattern))
+					if (Regex.IsMatch(datestring, Constants.RedumpDatePattern))
 					{
-						GroupCollection rdDateInfo = Regex.Match(datestring, _redumpDatePattern).Groups;
+						GroupCollection rdDateInfo = Regex.Match(datestring, Constants.RedumpDatePattern).Groups;
 						date = rdDateInfo[1].Value + "-" + rdDateInfo[2].Value + "-" + rdDateInfo[3].Value + " " +
 							rdDateInfo[4].Value + ":" + rdDateInfo[5].Value + ":" + rdDateInfo[6].Value;
 					}
 					else
 					{
-						GroupCollection rdDateInfo = Regex.Match(datestring, _tosecDatePattern).Groups;
+						GroupCollection rdDateInfo = Regex.Match(datestring, Constants.TosecDatePattern).Groups;
 						date = rdDateInfo[1].Value + "-" + rdDateInfo[2].Value + "-" + rdDateInfo[3].Value + " 00:00:00";
 					}
 					
@@ -300,11 +270,11 @@ namespace SabreTools
 					if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
 					{
 						// Handle special case mappings found only in TOSEC
-						fileinfo = Regex.Match(filename, _tosecSpecialPatternA).Groups;
+						fileinfo = Regex.Match(filename, Constants.TosecSpecialPatternA).Groups;
 
 						if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
 						{
-							fileinfo = Regex.Match(filename, _tosecSpecialPatternB).Groups;
+							fileinfo = Regex.Match(filename, Constants.TosecSpecialPatternB).Groups;
 
 							if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
 							{
@@ -313,13 +283,13 @@ namespace SabreTools
 							}
 						}
 					}
-					GroupCollection tosecInfo = Regex.Match(Remapping.TOSEC[fileinfo[1].Value], _remappedPattern).Groups;
+					GroupCollection tosecInfo = Regex.Match(Remapping.TOSEC[fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = tosecInfo[1].Value;
 					system = tosecInfo[2].Value;
 					source = "TOSEC";
 					datestring = fileinfo[2].Value;
-					GroupCollection toDateInfo = Regex.Match(datestring, _tosecDatePattern).Groups;
+					GroupCollection toDateInfo = Regex.Match(datestring, Constants.TosecDatePattern).Groups;
 					date = toDateInfo[1].Value + "-" + toDateInfo[2].Value + "-" + toDateInfo[3].Value + " 00:00:00";
 					break;
 				case DatType.TruRip:
@@ -328,7 +298,7 @@ namespace SabreTools
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection truripInfo = Regex.Match(Remapping.TruRip[fileinfo[1].Value], _remappedPattern).Groups;
+					GroupCollection truripInfo = Regex.Match(Remapping.TruRip[fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = truripInfo[1].Value;
 					system = truripInfo[2].Value;
@@ -342,7 +312,7 @@ namespace SabreTools
 					source = fileinfo[3].Value;
 					datestring = fileinfo[4].Value;
 
-					GroupCollection cDateInfo = Regex.Match(datestring, _defaultDatePattern).Groups;
+					GroupCollection cDateInfo = Regex.Match(datestring, Constants.DefaultDatePattern).Groups;
 					date = cDateInfo[1].Value + "-" + cDateInfo[2].Value + "-" + cDateInfo[3].Value + " " +
 						cDateInfo[4].Value + ":" + cDateInfo[5].Value + ":" + cDateInfo[6].Value;
 					break;
@@ -504,7 +474,7 @@ namespace SabreTools
 							slc2.ExecuteNonQuery();
 						}
 
-						query = "SELECT last_insert_rowid()";
+						query = "SELECT last_insertConstants.Rowid()";
 						using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
 						{
 							gameid = (long)slc2.ExecuteScalar();
@@ -569,7 +539,7 @@ SELECT files.id FROM files
 INSERT INTO files (setid, name, type, lastupdated)
 VALUES (" + gameid + ", '" + rom.Name.Replace("'", "''") + "', '" + rom.Type + "', '" + date + @"');
 INSERT INTO checksums (file, size, crc, md5, sha1)
-VALUES ((SELECT last_insert_rowid()), " + rom.Size + ", '" + rom.CRC + "'" + ", '" + rom.MD5 + "'" + ", '" + rom.SHA1 + @"');
+VALUES ((SELECT last_insertConstants.Rowid()), " + rom.Size + ", '" + rom.CRC + "'" + ", '" + rom.MD5 + "'" + ", '" + rom.SHA1 + @"');
 COMMIT;";
 						using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
 						{
@@ -643,7 +613,7 @@ COMMIT;";
 							slc2.ExecuteNonQuery();
 						}
 
-						query = "SELECT last_insert_rowid()";
+						query = "SELECT last_insertConstants.Rowid()";
 						using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
 						{
 							hashid = (long)slc2.ExecuteScalar();
