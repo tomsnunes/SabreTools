@@ -84,75 +84,8 @@ namespace SabreTools.Helper
 				FileStream fs = File.Create(outfile);
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
-				string header = "";
-				switch (datdata.OutputFormat)
-				{
-					case OutputFormat.ClrMamePro:
-						header = "clrmamepro (\n" +
-							"\tname \"" + HttpUtility.HtmlEncode(datdata.Name) + "\"\n" +
-							"\tdescription \"" + HttpUtility.HtmlEncode(datdata.Description) + "\"\n" +
-							"\tcategory \"" + HttpUtility.HtmlEncode(datdata.Category) + "\"\n" +
-							"\tversion \"" + HttpUtility.HtmlEncode(datdata.Version) + "\"\n" +
-							"\tdate \"" + HttpUtility.HtmlEncode(datdata.Date) + "\"\n" +
-							"\tauthor \"" + HttpUtility.HtmlEncode(datdata.Author) + "\"\n" +
-							"\tcomment \"" + HttpUtility.HtmlEncode(datdata.Comment) + "\"\n" +
-							(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
-							")\n";
-						break;
-					case OutputFormat.RomCenter:
-						header = "[CREDITS]\n" +
-							"author=" + HttpUtility.HtmlEncode(datdata.Author) + "\n" +
-							"version=" + HttpUtility.HtmlEncode(datdata.Version) + "\n" +
-							"comment=" + HttpUtility.HtmlEncode(datdata.Comment) + "\n" +
-							"[DAT]\n" +
-							"version=2.50\n" +
-							"split=" + (datdata.ForceMerging == ForceMerging.Split ? "1" : "0") + "\n" +
-							"merge=" + (datdata.ForceMerging == ForceMerging.Full ? "1" : "0") + "\n" +
-							"[EMULATOR]\n" +
-							"refname=" + HttpUtility.HtmlEncode(datdata.Name) + "\n" +
-							"version=" + HttpUtility.HtmlEncode(datdata.Description) + "\n" +
-							"[GAMES]\n";
-						break;
-					case OutputFormat.SabreDat:
-						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
-							"<datafile>\n" +
-							"\t<header>\n" +
-							"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
-							"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
-							"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
-							"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
-							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
-							"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
-							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
-							(!String.IsNullOrEmpty(datdata.Type) && datdata.ForcePacking != ForcePacking.Unzip ?
-								"\t\t<flags>\n" +
-								(!String.IsNullOrEmpty(datdata.Type) ? "\t\t\t<flag name=\"type\" value=\"" + datdata.Type + "\"/>\n" : "") +
-								(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : "") +
-								"\t\t</flags>\n" : "") +
-							"\t</header>\n" +
-							"\t<data>\n";
-						break;
-					case OutputFormat.Xml:
-						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
-							"<datafile>\n" +
-							"\t<header>\n" +
-							"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
-							"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
-							"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
-							"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
-							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
-							"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
-							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
-							(!String.IsNullOrEmpty(datdata.Type) ? "\t\t<type>" + datdata.Type + "</type>\n" : "") +
-							(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
-							"\t</header>\n";
-						break;
-				}
-
-				// Write the header out
-				sw.Write(header);
+				// Write out the header
+				WriteHeader(sw, datdata);
 
 				// Write out each of the machines and roms
 				int depth = 2, last = -1;
@@ -406,6 +339,81 @@ namespace SabreTools.Helper
 				logger.Error(ex.ToString());
 				return false;
 			}
+
+			return true;
+		}
+
+		public static bool WriteHeader(StreamWriter sw, DatData datdata)
+		{
+			string header = "";
+			switch (datdata.OutputFormat)
+			{
+				case OutputFormat.ClrMamePro:
+					header = "clrmamepro (\n" +
+						"\tname \"" + HttpUtility.HtmlEncode(datdata.Name) + "\"\n" +
+						"\tdescription \"" + HttpUtility.HtmlEncode(datdata.Description) + "\"\n" +
+						"\tcategory \"" + HttpUtility.HtmlEncode(datdata.Category) + "\"\n" +
+						"\tversion \"" + HttpUtility.HtmlEncode(datdata.Version) + "\"\n" +
+						"\tdate \"" + HttpUtility.HtmlEncode(datdata.Date) + "\"\n" +
+						"\tauthor \"" + HttpUtility.HtmlEncode(datdata.Author) + "\"\n" +
+						"\tcomment \"" + HttpUtility.HtmlEncode(datdata.Comment) + "\"\n" +
+						(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
+						")\n";
+					break;
+				case OutputFormat.RomCenter:
+					header = "[CREDITS]\n" +
+						"author=" + HttpUtility.HtmlEncode(datdata.Author) + "\n" +
+						"version=" + HttpUtility.HtmlEncode(datdata.Version) + "\n" +
+						"comment=" + HttpUtility.HtmlEncode(datdata.Comment) + "\n" +
+						"[DAT]\n" +
+						"version=2.50\n" +
+						"split=" + (datdata.ForceMerging == ForceMerging.Split ? "1" : "0") + "\n" +
+						"merge=" + (datdata.ForceMerging == ForceMerging.Full ? "1" : "0") + "\n" +
+						"[EMULATOR]\n" +
+						"refname=" + HttpUtility.HtmlEncode(datdata.Name) + "\n" +
+						"version=" + HttpUtility.HtmlEncode(datdata.Description) + "\n" +
+						"[GAMES]\n";
+					break;
+				case OutputFormat.SabreDat:
+					header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+						"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
+						"<datafile>\n" +
+						"\t<header>\n" +
+						"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
+						"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
+						"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
+						"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
+						"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
+						"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
+						"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
+						(!String.IsNullOrEmpty(datdata.Type) && datdata.ForcePacking != ForcePacking.Unzip ?
+							"\t\t<flags>\n" +
+							(!String.IsNullOrEmpty(datdata.Type) ? "\t\t\t<flag name=\"type\" value=\"" + datdata.Type + "\"/>\n" : "") +
+							(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : "") +
+							"\t\t</flags>\n" : "") +
+						"\t</header>\n" +
+						"\t<data>\n";
+					break;
+				case OutputFormat.Xml:
+					header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+						"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
+						"<datafile>\n" +
+						"\t<header>\n" +
+						"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
+						"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
+						"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
+						"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
+						"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
+						"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
+						"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
+						(!String.IsNullOrEmpty(datdata.Type) ? "\t\t<type>" + datdata.Type + "</type>\n" : "") +
+						(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
+						"\t</header>\n";
+					break;
+			}
+
+			// Write the header out
+			sw.Write(header);
 
 			return true;
 		}
