@@ -155,7 +155,7 @@ namespace SabreTools.Helper
 						int parentcount = parent.Count;
 						if (parentcount == 0)
 						{
-							Console.WriteLine("Empty parent: " + String.Join("\\", parent));
+							logger.Log("Empty parent: " + String.Join("\\", parent));
 							empty = true;
 						}
 
@@ -397,12 +397,17 @@ namespace SabreTools.Helper
 							// We want to process the entire subtree of the game
 							subreader = xtr.ReadSubtree();
 
+							// Safeguard for interesting case of "software" without anything except roms
+							bool software = false;
+
+							// If we have a subtree, add what is possible
 							if (subreader != null)
 							{
 								if (temptype == "software" && subreader.ReadToFollowing("description"))
 								{
 									tempname = subreader.ReadElementContentAsString();
 									tempname = tempname.Replace('/', '_').Replace("\"", "''");
+									software = true;
 								}
 								else
 								{
@@ -410,7 +415,7 @@ namespace SabreTools.Helper
 									if (xtr.AttributeCount == 0)
 									{
 										logger.Error("No attributes were found");
-										subreader.Skip();
+										xtr.Skip();
 										continue;
 									}
 									tempname = xtr.GetAttribute("name");
@@ -430,8 +435,10 @@ namespace SabreTools.Helper
 									tempname = String.Join("\\", parent) + "\\" + tempname;
 								}
 
-								while (subreader.Read())
+								while (software || subreader.Read())
 								{
+									software = false;
+
 									// We only want elements
 									if (subreader.NodeType != XmlNodeType.Element)
 									{
@@ -512,7 +519,7 @@ namespace SabreTools.Helper
 												logger.Warning("Incomplete entry for \"" + subreader.GetAttribute("name") + "\" will be output as nodump");
 												nodump = true;
 											}
-											
+
 											/*
 											///Run the name through the filters to make sure that it's correct
 											tempname = Style.NormalizeChars(tempname);
@@ -539,8 +546,8 @@ namespace SabreTools.Helper
 												RomData value = new RomData
 												{
 													Game = tempname,
-													Name = xtr.GetAttribute("name"),
-													Type = xtr.Name,
+													Name = subreader.GetAttribute("name"),
+													Type = subreader.Name,
 													SystemID = sysid,
 													SourceID = srcid,
 													Size = size,
@@ -562,6 +569,11 @@ namespace SabreTools.Helper
 													newvalue.Add(value);
 													datdata.Roms.Add(key, newvalue);
 												}
+											}
+											// Otherwise, log that it wasn't added
+											else
+											{
+												logger.Log("Rom was not added: '" + xtr.GetAttribute("name") + "'");
 											}
 											break;
 									}
@@ -829,6 +841,13 @@ namespace SabreTools.Helper
 			// Then, deduplicate them by checking to see if data matches
 			foreach (RomData rom in inroms)
 			{
+				// If it's a nodump, add and skip
+				if (rom.Nodump)
+				{
+					outroms.Add(rom);
+					continue;
+				}
+
 				// If it's the first rom in the list, don't touch it
 				if (outroms.Count != 0)
 				{
@@ -839,6 +858,12 @@ namespace SabreTools.Helper
 					for (int i = 0; i < outroms.Count; i++)
 					{
 						RomData lastrom = outroms[i];
+
+						// If last is a nodump, skip it
+						if (lastrom.Nodump)
+						{
+							continue;
+						}
 
 						if (rom.Type == "rom" && lastrom.Type == "rom")
 						{
