@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 using SabreTools.Helper;
 using DamienG.Security.Cryptography;
@@ -208,6 +209,7 @@ namespace SabreTools
 		/// Process the file, folder, or list of some combination into a DAT file
 		/// </summary>
 		/// <returns>True if the DAT could be created, false otherwise</returns>
+		/// <remarks>Try to get the hashing multithreaded (either on a per-hash or per-file level)</remarks>
 		public bool Start()
 		{
 			// Create an output dictionary for all found items
@@ -377,10 +379,10 @@ namespace SabreTools
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
 			{
-				string datum = Path.GetFileNameWithoutExtension(item);
+				string datum = Path.GetFileNameWithoutExtension(item).ToLowerInvariant();
 
 				// Check if the name is the right length
-				if (datum.Length != 40)
+				if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}"))
 				{
 					_logger.Warning("Non SHA-1 filename found, skipping: '" + datum + "'");
 					return;

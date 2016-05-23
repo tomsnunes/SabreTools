@@ -277,6 +277,10 @@ namespace SabreTools.Helper
 								string pre = datdata.Prefix + (datdata.Quotes ? "\"" : "");
 								string post = (datdata.Quotes ? "\"" : "") + datdata.Postfix;
 
+								// Check for special strings in prefix and postfix
+								pre = pre.Replace("%crc%", rom.CRC).Replace("%md5%", rom.MD5).Replace("%sha1%", rom.SHA1).Replace("%size%", rom.Size.ToString());
+								post = post.Replace("%crc%", rom.CRC).Replace("%md5%", rom.MD5).Replace("%sha1%", rom.SHA1).Replace("%size%", rom.Size.ToString());
+
 								// If we're in Romba mode, the state is consistent
 								if (datdata.Romba)
 								{
