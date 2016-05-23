@@ -103,7 +103,7 @@ namespace SabreTools.Helper
 						// If we have a different game and we're not at the start of the list, output the end of last item
 						if (lastgame != null && lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
-							depth = WriteEndGame(sw, rom, splitpath, newsplit, lastgame, datdata, depth, last, logger);
+							depth = WriteEndGame(sw, rom, splitpath, newsplit, lastgame, datdata, depth, out last, logger);
 						}
 
 						// If we have a new game, output the beginning of the new item
@@ -132,7 +132,6 @@ namespace SabreTools.Helper
 							{
 								splitpath = newsplit;
 								lastgame = rom.Game;
-								sw.Write(state);
 								continue;
 							}
 						}
@@ -317,11 +316,14 @@ namespace SabreTools.Helper
 		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>The new depth of the tag</returns>
-		public static int WriteEndGame(StreamWriter sw, RomData rom, List<string> splitpath, List<string> newsplit, string lastgame, DatData datdata, int depth, int last, Logger logger)
+		public static int WriteEndGame(StreamWriter sw, RomData rom, List<string> splitpath, List<string> newsplit, string lastgame, DatData datdata, int depth, out int last, Logger logger)
 		{
+			last = 0;
+
 			try
 			{
 				string state = "";
+
 				switch (datdata.OutputFormat)
 				{
 					case OutputFormat.ClrMamePro:
