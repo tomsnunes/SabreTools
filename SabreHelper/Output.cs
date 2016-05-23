@@ -71,11 +71,8 @@ namespace SabreTools.Helper
 			// Create the output directory if it doesn't already exist
 			Directory.CreateDirectory(outDir);
 
-			// Get the outfile and clean the path
-			string outfile = outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
-			outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
-				outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
-				outfile);
+			// Get the outfile name
+			string outfile = Style.CreateOutfileName(outDir, datdata);
 
 			logger.User("Opening file for writing: " + outfile);
 
