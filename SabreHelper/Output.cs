@@ -103,51 +103,13 @@ namespace SabreTools.Helper
 						// If we have a different game and we're not at the start of the list, output the end of last item
 						if (lastgame != null && lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
-							switch (datdata.OutputFormat)
-							{
-								case OutputFormat.ClrMamePro:
-									state += ")\n";
-									break;
-								case OutputFormat.SabreDat:
-									if (splitpath != null)
-									{
-										for (int i = 0; i < newsplit.Count && i < splitpath.Count; i++)
-										{
-											// Always keep track of the last seen item
-											last = i;
-
-											// If we find a difference, break
-											if (newsplit[i] != splitpath[i])
-											{
-												break;
-											}
-										}
-
-										// Now that we have the last known position, take down all open folders
-										for (int i = depth - 1; i > last + 1; i--)
-										{
-											// Print out the number of tabs and the end folder
-											for (int j = 0; j < i; j++)
-											{
-												state += "\t";
-											}
-											state += "</directory>\n";
-										}
-
-										// Reset the current depth
-										depth = 2 + last;
-									}
-									break;
-								case OutputFormat.Xml:
-									state += "\t</machine>\n";
-									break;
-							}
+							depth = WriteEndGame(sw, rom, splitpath, newsplit, lastgame, datdata, depth, last, logger);
 						}
 
 						// If we have a new game, output the beginning of the new item
 						if (lastgame == null || lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
-							WriteStartGame(sw, rom, newsplit, lastgame, datdata, depth, last, logger);
+							depth = WriteStartGame(sw, rom, newsplit, lastgame, datdata, depth, last, logger);
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
@@ -328,6 +290,75 @@ namespace SabreTools.Helper
 					case OutputFormat.Xml:
 						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
 							"\t\t<description>" + HttpUtility.HtmlEncode(rom.Game) + "</description>\n";
+						break;
+				}
+
+				sw.Write(state);
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+				return depth;
+			}
+
+			return depth;
+		}
+
+		/// <summary>
+		/// Write out Game start using the supplied StreamWriter
+		/// </summary>
+		/// <param name="sw">StreamWriter to output to</param>
+		/// <param name="rom">RomData object to be output</param>
+		/// <param name="splitpath">Split path representing last kwown parent game (SabreDAT only)</param>
+		/// <param name="newsplit">Split path representing the parent game (SabreDAT only)</param>
+		/// <param name="lastgame">The name of the last game to be output</param>
+		/// <param name="datdata">DatData object representing DAT information</param>
+		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
+		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>The new depth of the tag</returns>
+		public static int WriteEndGame(StreamWriter sw, RomData rom, List<string> splitpath, List<string> newsplit, string lastgame, DatData datdata, int depth, int last, Logger logger)
+		{
+			try
+			{
+				string state = "";
+				switch (datdata.OutputFormat)
+				{
+					case OutputFormat.ClrMamePro:
+						state += ")\n";
+						break;
+					case OutputFormat.SabreDat:
+						if (splitpath != null)
+						{
+							for (int i = 0; i < newsplit.Count && i < splitpath.Count; i++)
+							{
+								// Always keep track of the last seen item
+								last = i;
+
+								// If we find a difference, break
+								if (newsplit[i] != splitpath[i])
+								{
+									break;
+								}
+							}
+
+							// Now that we have the last known position, take down all open folders
+							for (int i = depth - 1; i > last + 1; i--)
+							{
+								// Print out the number of tabs and the end folder
+								for (int j = 0; j < i; j++)
+								{
+									state += "\t";
+								}
+								state += "</directory>\n";
+							}
+
+							// Reset the current depth
+							depth = 2 + last;
+						}
+						break;
+					case OutputFormat.Xml:
+						state += "\t</machine>\n";
 						break;
 				}
 
