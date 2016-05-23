@@ -393,7 +393,7 @@ namespace SabreTools
 					Type = "rom",
 					Game = datum,
 					Name = datum,
-					Size = 1,
+					Size = (new FileInfo(item)).Length,
 					SHA1 = Path.GetFileNameWithoutExtension(item),
 				};
 
