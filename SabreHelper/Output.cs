@@ -71,13 +71,17 @@ namespace SabreTools.Helper
 			// Create the output directory if it doesn't already exist
 			Directory.CreateDirectory(outDir);
 
-			// (currently uses current time, change to "last updated time")
-			string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
-			logger.User("Opening file for writing: " + outDir + datdata.Description + extension);
+			// Get the outfile and clean the path
+			string outfile = outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
+			outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
+				outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
+				outfile);
+
+			logger.User("Opening file for writing: " + outfile);
 
 			try
 			{
-				FileStream fs = File.Create(outDir + datdata.Description + extension);
+				FileStream fs = File.Create(outfile);
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
 				string header = "";
