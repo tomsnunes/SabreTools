@@ -162,7 +162,8 @@ Options:
   -u, --unzip		Force unzipping in created DAT
   -f, --files		Treat archives as files
   -o, --old		Output DAT in CMP format instead of XML
-  -ro, --romba		Allow reading of GZIP files for Romba
+  -gz, --gz-files	Allow reading of GZIP files as archives
+  -ro, --romba		Read files from a Romba input
   -n=, --name=		Set the internal name of the DAT
   -d=, --desc=		Set the filename and description of the DAT
   -c=, --cat=		Set the category of the DAT

@@ -28,6 +28,7 @@ namespace SabreTools
 		private bool _noSHA1;
 		private bool _bare;
 		private bool _archivesAsFiles;
+		private bool _enableGzip;
 
 		// Other required variables
 		private Logger _logger;
@@ -41,8 +42,9 @@ namespace SabreTools
 		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
+		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>>
 		/// <param name="logger">Logger object for console and file output</param>
-		public DATFromDir(List<String> inputs, DatData datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, Logger logger)
+		public DATFromDir(List<String> inputs, DatData datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, Logger logger)
 		{
 			_inputs = inputs;
 			_datdata = datdata;
@@ -50,6 +52,7 @@ namespace SabreTools
 			_noSHA1 = noSHA1;
 			_bare = bare;
 			_archivesAsFiles = archivesAsFiles;
+			_enableGzip = enableGzip;
 			_logger = logger;
 		}
 
@@ -72,7 +75,7 @@ namespace SabreTools
 			logger.Start();
 
 			// First things first, take care of all of the arguments that this could have
-			bool noMD5 = false, noSHA1 = false, forceunpack = false, archivesAsFiles = false, old = false, superDat = false, bare = false, romba = false;
+			bool noMD5 = false, noSHA1 = false, forceunpack = false, archivesAsFiles = false, old = false, superDat = false, bare = false, romba = false, enableGzip = false;
 			string name = "", desc = "", cat = "", version = "", author = "";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
@@ -85,25 +88,21 @@ namespace SabreTools
 						Build.Help();
 						logger.Close();
 						return;
-					case "-m":
-					case "--noMD5":
-						noMD5 = true;
-						break;
-					case "-s":
-					case "--noSHA1":
-						noSHA1 = true;
-						break;
 					case "-b":
 					case "--bare":
 						bare = true;
 						break;
-					case "-u":
-					case "--unzip":
-						forceunpack = true;
-						break;
 					case "-f":
 					case "--files":
 						archivesAsFiles = true;
+						break;
+					case "-gz":
+					case "--gz-files":
+						enableGzip = true;
+						break;
+					case "-m":
+					case "--noMD5":
+						noMD5 = true;
 						break;
 					case "-o":
 					case "--old":
@@ -113,9 +112,17 @@ namespace SabreTools
 					case "--romba":
 						romba = true;
 						break;
+					case "-s":
+					case "--noSHA1":
+						noSHA1 = true;
+						break;
 					case "-sd":
 					case "--superdat":
 						superDat = true;
+						break;
+					case "-u":
+					case "--unzip":
+						forceunpack = true;
 						break;
 					default:
 						if (arg.StartsWith("-n=") || arg.StartsWith("--name="))
@@ -184,7 +191,7 @@ namespace SabreTools
 				Type = (superDat ? "SuperDAT" : ""),
 				Roms = new Dictionary<string, List<RomData>>(),
 			};
-			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, logger);
+			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, logger);
 			bool success = dfd.Start();
 
 			// If we failed, show the help
@@ -367,6 +374,36 @@ namespace SabreTools
 		/// <param name="item">Filename of the item to be checked</param>
 		private void ProcessFile(string item)
 		{
+			// Special case for if we are in Romba mode (all names are SHA-1 hashes)
+			if (_datdata.Romba)
+			{
+				string datum = Path.GetFileNameWithoutExtension(item);
+
+				RomData rom = new RomData
+				{
+					Type = "rom",
+					Game = datum,
+					Name = datum,
+					Size = 1,
+					SHA1 = Path.GetFileNameWithoutExtension(item),
+				};
+
+				string key = datum;
+				if (_datdata.Roms.ContainsKey(key))
+				{
+					_datdata.Roms[key].Add(rom);
+				}
+				else
+				{
+					List<RomData> temp = new List<RomData>();
+					temp.Add(rom);
+					_datdata.Roms.Add(key, temp);
+				}
+
+				_logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
+				return;
+			}
+
 			// Create the temporary output directory
 			bool encounteredErrors = true;
 			if (!_archivesAsFiles)
@@ -377,7 +414,7 @@ namespace SabreTools
 					ArchiveType at = archive.Type;
 					_logger.Log("Found archive of type: " + at);
 
-					if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar || (at == ArchiveType.GZip && _datdata.Romba))
+					if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar || (at == ArchiveType.GZip && _enableGzip))
 					{
 						_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
 						DirectoryInfo di = Directory.CreateDirectory(_tempDir);
