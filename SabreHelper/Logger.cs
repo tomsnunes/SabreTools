@@ -6,6 +6,13 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// Log either to file or to the console
 	/// </summary>
+	/// <remarks>
+	/// Things to do:
+	/// - Create log files by date
+	/// - Clean up log files if there are more than x number per program
+	/// - Allow for "triggerable" logging done on an interval (async)
+	/// - Log filtering?
+	/// </remarks>
 	public class Logger
 	{
 		// Private instance variables
@@ -139,6 +146,11 @@ namespace SabreTools.Helper
 			return true;
 		}
 
+		/// <summary>
+		/// Write the given string as a user message to the log output
+		/// </summary>
+		/// <param name="output">String to be written log</param>
+		/// <returns>True if the output could be written, false otherwise</returns>
 		public bool User(string output)
 		{
 			return Log(output, LogLevel.USER);
