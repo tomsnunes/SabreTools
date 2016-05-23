@@ -374,10 +374,17 @@ namespace SabreTools
 		/// <param name="item">Filename of the item to be checked</param>
 		private void ProcessFile(string item)
 		{
-			// Special case for if we are in Romba mode (all names are SHA-1 hashes)
+			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
 			{
 				string datum = Path.GetFileNameWithoutExtension(item);
+
+				// Check if the name is the right length
+				if (datum.Length != 40)
+				{
+					_logger.Warning("Non SHA-1 filename found, skipping: '" + datum + "'");
+					return;
+				}
 
 				RomData rom = new RomData
 				{
