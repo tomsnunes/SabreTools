@@ -25,35 +25,8 @@ namespace SabreTools.Helper
 		/// </remarks>
 		public static bool WriteDatfile(DatData datdata, string outDir, Logger logger, bool norename = true)
 		{
-			// Get all values in the dictionary and write out
-			SortedDictionary<string, List<RomData>> sortable = new SortedDictionary<string, List<RomData>>();
-			long count = 0;
-			foreach (List<RomData> roms in datdata.Roms.Values)
-			{
-				List<RomData> newroms = roms;
-				if (datdata.MergeRoms)
-				{
-					newroms = RomManipulation.Merge(newroms);
-				}
-
-				foreach (RomData rom in newroms)
-				{
-					count++;
-					string key = (norename ? "" : rom.SystemID.ToString().PadLeft(10, '0') + "-" + rom.SourceID.ToString().PadLeft(10, '0') + "-") + rom.Game.ToLowerInvariant();
-					if (sortable.ContainsKey(key))
-					{
-						sortable[key].Add(rom);
-					}
-					else
-					{
-						List<RomData> temp = new List<RomData>();
-						temp.Add(rom);
-						sortable.Add(key, temp);
-					}
-				}
-			}
-
-			logger.User("A total of " + count + " file hashes will be written out to file");
+			// Bucket roms by game name and optionally dedupe
+			SortedDictionary<string, List<RomData>> sortable = RomManipulation.BucketByGame(datdata.Roms, datdata.MergeRoms, norename, logger);
 
 			// Now write out to file
 			// If it's empty, use the current folder

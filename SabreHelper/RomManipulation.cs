@@ -986,5 +986,46 @@ namespace SabreTools.Helper
 			});
 			return true;
 		}
+
+		/// <summary>
+		/// Take an arbitrarily bucketed Dictionary and return one sorted by Game
+		/// </summary>
+		/// <param name="dict">Input unsorted dictionary</param>
+		/// <param name="mergeRoms">True if roms should be deduped, false otherwise</param>
+		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>SortedDictionary bucketed by game name</returns>
+		public static SortedDictionary<string, List<RomData>> BucketByGame(Dictionary<string, List<RomData>> dict, bool mergeroms, bool norename, Logger logger)
+		{
+			SortedDictionary<string, List<RomData>> sortable = new SortedDictionary<string, List<RomData>>();
+			long count = 0;
+			foreach (List<RomData> roms in dict.Values)
+			{
+				List<RomData> newroms = roms;
+				if (mergeroms)
+				{
+					newroms = RomManipulation.Merge(newroms);
+				}
+
+				foreach (RomData rom in newroms)
+				{
+					count++;
+					string key = (norename ? "" : rom.SystemID.ToString().PadLeft(10, '0') + "-" + rom.SourceID.ToString().PadLeft(10, '0') + "-") + rom.Game.ToLowerInvariant();
+					if (sortable.ContainsKey(key))
+					{
+						sortable[key].Add(rom);
+					}
+					else
+					{
+						List<RomData> temp = new List<RomData>();
+						temp.Add(rom);
+						sortable.Add(key, temp);
+					}
+				}
+			}
+
+			logger.User("A total of " + count + " file hashes will be written out to file");
+			return sortable;
+		}
 	}
 }
