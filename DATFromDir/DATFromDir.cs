@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
@@ -409,7 +410,7 @@ namespace SabreTools
 					_datdata.Roms.Add(key, temp);
 				}
 
-				_logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
+				_logger.Log("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 				return;
 			}
 
@@ -417,13 +418,14 @@ namespace SabreTools
 			bool encounteredErrors = true;
 			if (!_archivesAsFiles)
 			{
+				IArchive archive = null;
 				try
 				{
-					IArchive archive = ArchiveFactory.Open(item);
+					archive = ArchiveFactory.Open(item);
 					ArchiveType at = archive.Type;
 					_logger.Log("Found archive of type: " + at);
 
-					if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar || (at == ArchiveType.GZip && _enableGzip))
+					if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
 					{
 						_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
 						DirectoryInfo di = Directory.CreateDirectory(_tempDir);
@@ -431,16 +433,36 @@ namespace SabreTools
 						reader.WriteAllToDirectory(_tempDir, ExtractOptions.ExtractFullPath);
 						encounteredErrors = false;
 					}
+					else if (at == ArchiveType.GZip && _enableGzip)
+					{
+						archive.Dispose();
+						_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
+						DirectoryInfo di = Directory.CreateDirectory(_tempDir);
+
+						using (FileStream itemstream = File.OpenRead(item))
+						{
+							using (FileStream outstream = File.Create(_tempDir + Path.GetFileNameWithoutExtension(item)))
+							{
+								using (GZipStream gz = new GZipStream(itemstream, CompressionMode.Decompress))
+								{
+									gz.CopyTo(outstream);
+								}
+							}
+						}
+						encounteredErrors = false;
+					}
 					archive.Dispose();
 				}
 				catch (InvalidOperationException)
 				{
 					encounteredErrors = true;
+					archive.Dispose();
 				}
 				catch (Exception ex)
 				{
 					_logger.Error(ex.ToString());
 					encounteredErrors = true;
+					archive.Dispose();
 				}
 			}
 
