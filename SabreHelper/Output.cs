@@ -85,7 +85,7 @@ namespace SabreTools.Helper
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
 				// Write out the header
-				WriteHeader(sw, datdata);
+				WriteHeader(sw, datdata, logger);
 
 				// Write out each of the machines and roms
 				int depth = 2, last = -1;
@@ -198,111 +198,11 @@ namespace SabreTools.Helper
 						}
 
 						// Now, output the rom data
-						switch (datdata.OutputFormat)
-						{
-							case OutputFormat.ClrMamePro:
-								state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
-									(rom.Size != -1 ? " size " + rom.Size : "") +
-									(!String.IsNullOrEmpty(rom.CRC) ? " crc " + rom.CRC.ToLowerInvariant() : "") +
-									(!String.IsNullOrEmpty(rom.MD5) ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
-									(!String.IsNullOrEmpty(rom.SHA1) ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
-									(!String.IsNullOrEmpty(rom.Date) ? " date \"" + rom.Date + "\"" : "") +
-									(rom.Nodump ? " flags nodump" : "") +
-									" )\n";
-								break;
-							case OutputFormat.MissFile:
-								string pre = datdata.Prefix + (datdata.Quotes ? "\"" : "");
-								string post = (datdata.Quotes ? "\"" : "") + datdata.Postfix;
+						WriteRomData(sw, rom, lastgame, datdata, depth, logger);
 
-								// Check for special strings in prefix and postfix
-								pre = pre.Replace("%crc%", rom.CRC).Replace("%md5%", rom.MD5).Replace("%sha1%", rom.SHA1).Replace("%size%", rom.Size.ToString());
-								post = post.Replace("%crc%", rom.CRC).Replace("%md5%", rom.MD5).Replace("%sha1%", rom.SHA1).Replace("%size%", rom.Size.ToString());
-
-								// If we're in Romba mode, the state is consistent
-								if (datdata.Romba)
-								{
-									// We can only write out if there's a SHA-1
-									if (rom.SHA1 != "")
-									{
-										string name = "/" + rom.SHA1.Substring(0, 2) + "/" + rom.SHA1.Substring(2, 2) + "/" + rom.SHA1.Substring(4, 2) + "/" +
-											rom.SHA1.Substring(6, 2) + "/" + rom.SHA1 + ".gz\n";
-										state += pre + name + post;
-									}
-								}
-								// Otherwise, use any flags
-								else
-								{
-									string name = (datdata.UseGame ? rom.Game : rom.Name);
-									if (datdata.RepExt != "")
-									{
-										string dir = Path.GetDirectoryName(name);
-										dir = (dir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? dir : dir + Path.DirectorySeparatorChar);
-										dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
-										name = dir + Path.GetFileNameWithoutExtension(name) + datdata.RepExt;
-									}
-									if (datdata.AddExt != "")
-									{
-										name += datdata.AddExt;
-									}
-									if (!datdata.UseGame && datdata.GameName)
-									{
-										name = (rom.Game.EndsWith(Path.DirectorySeparatorChar.ToString()) ? rom.Game : rom.Game + Path.DirectorySeparatorChar) + name;
-									}
-
-									if (datdata.UseGame && rom.Game != lastgame)
-									{
-										state += pre + name + post + "\n";
-										lastgame = rom.Game;
-									}
-									else if (!datdata.UseGame)
-									{
-										state += pre + name + post + "\n";
-									}
-								}
-								break;
-							case OutputFormat.RomCenter:
-								state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Game) +
-									"¬" + HttpUtility.HtmlEncode(rom.Game) +
-									"¬" + HttpUtility.HtmlEncode(rom.Name) +
-									"¬" + rom.CRC.ToLowerInvariant() +
-									"¬" + (rom.Size != -1 ? rom.Size.ToString() : "") + "¬¬¬\n";
-								break;
-							case OutputFormat.SabreDat:
-								string prefix = "";
-								for (int i = 0; i < depth; i++)
-								{
-									prefix += "\t";
-								}
-
-								state += prefix;
-								state += "<file type=\"" + rom.Type + "\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
-									(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
-									(!String.IsNullOrEmpty(rom.CRC) ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
-									(!String.IsNullOrEmpty(rom.MD5) ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
-									(!String.IsNullOrEmpty(rom.SHA1) ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
-									(!String.IsNullOrEmpty(rom.Date) ? " date=\"" + rom.Date + "\"" : "") +
-									(rom.Nodump ? prefix + "/>\n" + prefix + "\t<flags>\n" +
-										prefix + "\t\t<flag name=\"status\" value=\"nodump\"/>\n" +
-										prefix + "\t</flags>\n" +
-										prefix + "</file>\n" :
-									"/>\n");
-								break;
-							case OutputFormat.Xml:
-								state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
-									(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
-									(!String.IsNullOrEmpty(rom.CRC) ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
-									(!String.IsNullOrEmpty(rom.MD5) ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
-									(!String.IsNullOrEmpty(rom.SHA1) ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
-									(!String.IsNullOrEmpty(rom.Date) ? " date=\"" + rom.Date + "\"" : "") +
-									(rom.Nodump ? " status=\"nodump\"" : "") +
-									"/>\n";
-								break;
-						}
-
+						// Set the new data to compare against
 						splitpath = newsplit;
 						lastgame = rom.Game;
-
-						sw.Write(state);
 					}
 				}
 
@@ -343,77 +243,202 @@ namespace SabreTools.Helper
 			return true;
 		}
 
-		public static bool WriteHeader(StreamWriter sw, DatData datdata)
+		public static bool WriteHeader(StreamWriter sw, DatData datdata, Logger logger)
 		{
-			string header = "";
-			switch (datdata.OutputFormat)
+			try
 			{
-				case OutputFormat.ClrMamePro:
-					header = "clrmamepro (\n" +
-						"\tname \"" + HttpUtility.HtmlEncode(datdata.Name) + "\"\n" +
-						"\tdescription \"" + HttpUtility.HtmlEncode(datdata.Description) + "\"\n" +
-						"\tcategory \"" + HttpUtility.HtmlEncode(datdata.Category) + "\"\n" +
-						"\tversion \"" + HttpUtility.HtmlEncode(datdata.Version) + "\"\n" +
-						"\tdate \"" + HttpUtility.HtmlEncode(datdata.Date) + "\"\n" +
-						"\tauthor \"" + HttpUtility.HtmlEncode(datdata.Author) + "\"\n" +
-						"\tcomment \"" + HttpUtility.HtmlEncode(datdata.Comment) + "\"\n" +
-						(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
-						")\n";
-					break;
-				case OutputFormat.RomCenter:
-					header = "[CREDITS]\n" +
-						"author=" + HttpUtility.HtmlEncode(datdata.Author) + "\n" +
-						"version=" + HttpUtility.HtmlEncode(datdata.Version) + "\n" +
-						"comment=" + HttpUtility.HtmlEncode(datdata.Comment) + "\n" +
-						"[DAT]\n" +
-						"version=2.50\n" +
-						"split=" + (datdata.ForceMerging == ForceMerging.Split ? "1" : "0") + "\n" +
-						"merge=" + (datdata.ForceMerging == ForceMerging.Full ? "1" : "0") + "\n" +
-						"[EMULATOR]\n" +
-						"refname=" + HttpUtility.HtmlEncode(datdata.Name) + "\n" +
-						"version=" + HttpUtility.HtmlEncode(datdata.Description) + "\n" +
-						"[GAMES]\n";
-					break;
-				case OutputFormat.SabreDat:
-					header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-						"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
-						"<datafile>\n" +
-						"\t<header>\n" +
-						"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
-						"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
-						"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
-						"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
-						"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
-						"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
-						"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
-						(!String.IsNullOrEmpty(datdata.Type) && datdata.ForcePacking != ForcePacking.Unzip ?
-							"\t\t<flags>\n" +
-							(!String.IsNullOrEmpty(datdata.Type) ? "\t\t\t<flag name=\"type\" value=\"" + datdata.Type + "\"/>\n" : "") +
-							(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : "") +
-							"\t\t</flags>\n" : "") +
-						"\t</header>\n" +
-						"\t<data>\n";
-					break;
-				case OutputFormat.Xml:
-					header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-						"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
-						"<datafile>\n" +
-						"\t<header>\n" +
-						"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
-						"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
-						"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
-						"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
-						"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
-						"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
-						"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
-						(!String.IsNullOrEmpty(datdata.Type) ? "\t\t<type>" + datdata.Type + "</type>\n" : "") +
-						(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
-						"\t</header>\n";
-					break;
+				string header = "";
+				switch (datdata.OutputFormat)
+				{
+					case OutputFormat.ClrMamePro:
+						header = "clrmamepro (\n" +
+							"\tname \"" + HttpUtility.HtmlEncode(datdata.Name) + "\"\n" +
+							"\tdescription \"" + HttpUtility.HtmlEncode(datdata.Description) + "\"\n" +
+							"\tcategory \"" + HttpUtility.HtmlEncode(datdata.Category) + "\"\n" +
+							"\tversion \"" + HttpUtility.HtmlEncode(datdata.Version) + "\"\n" +
+							"\tdate \"" + HttpUtility.HtmlEncode(datdata.Date) + "\"\n" +
+							"\tauthor \"" + HttpUtility.HtmlEncode(datdata.Author) + "\"\n" +
+							"\tcomment \"" + HttpUtility.HtmlEncode(datdata.Comment) + "\"\n" +
+							(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
+							")\n";
+						break;
+					case OutputFormat.RomCenter:
+						header = "[CREDITS]\n" +
+							"author=" + HttpUtility.HtmlEncode(datdata.Author) + "\n" +
+							"version=" + HttpUtility.HtmlEncode(datdata.Version) + "\n" +
+							"comment=" + HttpUtility.HtmlEncode(datdata.Comment) + "\n" +
+							"[DAT]\n" +
+							"version=2.50\n" +
+							"split=" + (datdata.ForceMerging == ForceMerging.Split ? "1" : "0") + "\n" +
+							"merge=" + (datdata.ForceMerging == ForceMerging.Full ? "1" : "0") + "\n" +
+							"[EMULATOR]\n" +
+							"refname=" + HttpUtility.HtmlEncode(datdata.Name) + "\n" +
+							"version=" + HttpUtility.HtmlEncode(datdata.Description) + "\n" +
+							"[GAMES]\n";
+						break;
+					case OutputFormat.SabreDat:
+						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
+							"<datafile>\n" +
+							"\t<header>\n" +
+							"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
+							"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
+							"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
+							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
+							"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
+							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
+							(!String.IsNullOrEmpty(datdata.Type) && datdata.ForcePacking != ForcePacking.Unzip ?
+								"\t\t<flags>\n" +
+								(!String.IsNullOrEmpty(datdata.Type) ? "\t\t\t<flag name=\"type\" value=\"" + datdata.Type + "\"/>\n" : "") +
+								(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : "") +
+								"\t\t</flags>\n" : "") +
+							"\t</header>\n" +
+							"\t<data>\n";
+						break;
+					case OutputFormat.Xml:
+						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
+							"<datafile>\n" +
+							"\t<header>\n" +
+							"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
+							"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
+							"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
+							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
+							"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
+							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
+							(!String.IsNullOrEmpty(datdata.Type) ? "\t\t<type>" + datdata.Type + "</type>\n" : "") +
+							(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
+							"\t</header>\n";
+						break;
+				}
+
+				// Write the header out
+				sw.Write(header);
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+				return false;
 			}
 
-			// Write the header out
-			sw.Write(header);
+			return true;
+		}
+
+		public static bool WriteRomData(StreamWriter sw, RomData rom, string lastgame, DatData datdata, int depth, Logger logger)
+		{
+			try
+			{
+				string state = "";
+				switch (datdata.OutputFormat)
+				{
+					case OutputFormat.ClrMamePro:
+						state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
+							(rom.Size != -1 ? " size " + rom.Size : "") +
+							(!String.IsNullOrEmpty(rom.CRC) ? " crc " + rom.CRC.ToLowerInvariant() : "") +
+							(!String.IsNullOrEmpty(rom.MD5) ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
+							(!String.IsNullOrEmpty(rom.SHA1) ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
+							(!String.IsNullOrEmpty(rom.Date) ? " date \"" + rom.Date + "\"" : "") +
+							(rom.Nodump ? " flags nodump" : "") +
+							" )\n";
+						break;
+					case OutputFormat.MissFile:
+						string pre = datdata.Prefix + (datdata.Quotes ? "\"" : "");
+						string post = (datdata.Quotes ? "\"" : "") + datdata.Postfix;
+
+						// Check for special strings in prefix and postfix
+						pre = pre.Replace("%crc%", rom.CRC).Replace("%md5%", rom.MD5).Replace("%sha1%", rom.SHA1).Replace("%size%", rom.Size.ToString());
+						post = post.Replace("%crc%", rom.CRC).Replace("%md5%", rom.MD5).Replace("%sha1%", rom.SHA1).Replace("%size%", rom.Size.ToString());
+
+						// If we're in Romba mode, the state is consistent
+						if (datdata.Romba)
+						{
+							// We can only write out if there's a SHA-1
+							if (rom.SHA1 != "")
+							{
+								string name = "/" + rom.SHA1.Substring(0, 2) + "/" + rom.SHA1.Substring(2, 2) + "/" + rom.SHA1.Substring(4, 2) + "/" +
+									rom.SHA1.Substring(6, 2) + "/" + rom.SHA1 + ".gz\n";
+								state += pre + name + post;
+							}
+						}
+						// Otherwise, use any flags
+						else
+						{
+							string name = (datdata.UseGame ? rom.Game : rom.Name);
+							if (datdata.RepExt != "")
+							{
+								string dir = Path.GetDirectoryName(name);
+								dir = (dir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? dir : dir + Path.DirectorySeparatorChar);
+								dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
+								name = dir + Path.GetFileNameWithoutExtension(name) + datdata.RepExt;
+							}
+							if (datdata.AddExt != "")
+							{
+								name += datdata.AddExt;
+							}
+							if (!datdata.UseGame && datdata.GameName)
+							{
+								name = (rom.Game.EndsWith(Path.DirectorySeparatorChar.ToString()) ? rom.Game : rom.Game + Path.DirectorySeparatorChar) + name;
+							}
+
+							if (datdata.UseGame && rom.Game != lastgame)
+							{
+								state += pre + name + post + "\n";
+								lastgame = rom.Game;
+							}
+							else if (!datdata.UseGame)
+							{
+								state += pre + name + post + "\n";
+							}
+						}
+						break;
+					case OutputFormat.RomCenter:
+						state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Game) +
+							"¬" + HttpUtility.HtmlEncode(rom.Game) +
+							"¬" + HttpUtility.HtmlEncode(rom.Name) +
+							"¬" + rom.CRC.ToLowerInvariant() +
+							"¬" + (rom.Size != -1 ? rom.Size.ToString() : "") + "¬¬¬\n";
+						break;
+					case OutputFormat.SabreDat:
+						string prefix = "";
+						for (int i = 0; i < depth; i++)
+						{
+							prefix += "\t";
+						}
+
+						state += prefix;
+						state += "<file type=\"" + rom.Type + "\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
+							(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.CRC) ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.MD5) ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.SHA1) ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.Date) ? " date=\"" + rom.Date + "\"" : "") +
+							(rom.Nodump ? prefix + "/>\n" + prefix + "\t<flags>\n" +
+								prefix + "\t\t<flag name=\"status\" value=\"nodump\"/>\n" +
+								prefix + "\t</flags>\n" +
+								prefix + "</file>\n" :
+							"/>\n");
+						break;
+					case OutputFormat.Xml:
+						state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
+							(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.CRC) ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.MD5) ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.SHA1) ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.Date) ? " date=\"" + rom.Date + "\"" : "") +
+							(rom.Nodump ? " status=\"nodump\"" : "") +
+							"/>\n";
+						break;
+				}
+
+				sw.Write(state);
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+				return false;
+			}
 
 			return true;
 		}
