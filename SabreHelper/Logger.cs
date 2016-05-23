@@ -11,7 +11,7 @@ namespace SabreTools.Helper
 	/// - Create log files by date
 	/// - Clean up log files if there are more than x number per program
 	/// - Allow for "triggerable" logging done on an interval (async)
-	/// - Log filtering?
+	/// - Log filtering? (#if debug?)
 	/// </remarks>
 	public class Logger
 	{

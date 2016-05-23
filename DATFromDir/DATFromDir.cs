@@ -456,13 +456,19 @@ namespace SabreTools
 				catch (InvalidOperationException)
 				{
 					encounteredErrors = true;
-					archive.Dispose();
+					if (archive != null)
+					{
+						archive.Dispose();
+					}
 				}
 				catch (Exception ex)
 				{
 					_logger.Error(ex.ToString());
 					encounteredErrors = true;
-					archive.Dispose();
+					if (archive != null)
+					{
+						archive.Dispose();
+					}
 				}
 			}
 
