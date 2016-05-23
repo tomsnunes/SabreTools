@@ -147,29 +147,7 @@ namespace SabreTools.Helper
 						// If we have a new game, output the beginning of the new item
 						if (lastgame == null || lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 						{
-							switch (datdata.OutputFormat)
-							{
-								case OutputFormat.ClrMamePro:
-									state += "game (\n\tname \"" + rom.Game + "\"\n" +
-										"\tdescription \"" + rom.Game + "\"\n";
-									break;
-								case OutputFormat.SabreDat:
-									for (int i = (last == -1 ? 0 : last); i < newsplit.Count; i++)
-									{
-										for (int j = 0; j < depth - last + i - (lastgame == null ? 1 : 0); j++)
-										{
-											state += "\t";
-										}
-										state += "<directory name=\"" + HttpUtility.HtmlEncode(newsplit[i]) + "\" description=\"" +
-										HttpUtility.HtmlEncode(newsplit[i]) + "\">\n";
-									}
-									depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
-									break;
-								case OutputFormat.Xml:
-									state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
-										"\t\t<description>" + HttpUtility.HtmlEncode(rom.Game) + "</description>\n";
-									break;
-							}
+							WriteStartGame(sw, rom, newsplit, lastgame, datdata, depth, last, logger);
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
@@ -206,30 +184,9 @@ namespace SabreTools.Helper
 					}
 				}
 
-				string footer = "";
-				switch (datdata.OutputFormat)
-				{
-					case OutputFormat.ClrMamePro:
-						footer = ")";
-						break;
-					case OutputFormat.SabreDat:
-						for (int i = depth - 1; i >= 2; i--)
-						{
-							// Print out the number of tabs and the end folder
-							for (int j = 0; j < i; j++)
-							{
-								footer += "\t";
-							}
-							footer += "</directory>\n";
-						}
-						footer += "\t</data>\n</datafile>";
-						break;
-					case OutputFormat.Xml:
-						footer = "\t</machine>\n</datafile>";
-						break;
-				}
-
-				sw.Write(footer);
+				// Write the file footer out
+				WriteFooter(sw, datdata, depth, logger);
+				
 				logger.Log("File written!" + Environment.NewLine);
 				sw.Close();
 				fs.Close();
@@ -243,6 +200,13 @@ namespace SabreTools.Helper
 			return true;
 		}
 
+		/// <summary>
+		/// Write out DAT header using the supplied StreamWriter
+		/// </summary>
+		/// <param name="sw">StreamWriter to output to</param>
+		/// <param name="datdata">DatData object representing DAT information</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the data was written, false on error</returns>
 		public static bool WriteHeader(StreamWriter sw, DatData datdata, Logger logger)
 		{
 			try
@@ -326,6 +290,68 @@ namespace SabreTools.Helper
 			return true;
 		}
 
+		/// <summary>
+		/// Write out Game start using the supplied StreamWriter
+		/// </summary>
+		/// <param name="sw">StreamWriter to output to</param>
+		/// <param name="rom">RomData object to be output</param>
+		/// <param name="newsplit">Split path representing the parent game (SabreDAT only)</param>
+		/// <param name="lastgame">The name of the last game to be output</param>
+		/// <param name="datdata">DatData object representing DAT information</param>
+		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
+		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>The new depth of the tag</returns>
+		public static int WriteStartGame(StreamWriter sw, RomData rom, List<string> newsplit, string lastgame, DatData datdata, int depth, int last, Logger logger)
+		{
+			try
+			{
+				string state = "";
+				switch (datdata.OutputFormat)
+				{
+					case OutputFormat.ClrMamePro:
+						state += "game (\n\tname \"" + rom.Game + "\"\n" +
+							"\tdescription \"" + rom.Game + "\"\n";
+						break;
+					case OutputFormat.SabreDat:
+						for (int i = (last == -1 ? 0 : last); i < newsplit.Count; i++)
+						{
+							for (int j = 0; j < depth - last + i - (lastgame == null ? 1 : 0); j++)
+							{
+								state += "\t";
+							}
+							state += "<directory name=\"" + HttpUtility.HtmlEncode(newsplit[i]) + "\" description=\"" +
+							HttpUtility.HtmlEncode(newsplit[i]) + "\">\n";
+						}
+						depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
+						break;
+					case OutputFormat.Xml:
+						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode(rom.Game) + "</description>\n";
+						break;
+				}
+
+				sw.Write(state);
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+				return depth;
+			}
+
+			return depth;
+		}
+
+		/// <summary>
+		/// Write out RomData using the supplied StreamWriter
+		/// </summary>
+		/// <param name="sw">StreamWriter to output to</param>
+		/// <param name="rom">RomData object to be output</param>
+		/// <param name="lastgame">The name of the last game to be output</param>
+		/// <param name="datdata">DatData object representing DAT information</param>
+		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the data was written, false on error</returns>
 		public static bool WriteRomData(StreamWriter sw, RomData rom, string lastgame, DatData datdata, int depth, Logger logger)
 		{
 			try
@@ -433,6 +459,53 @@ namespace SabreTools.Helper
 				}
 
 				sw.Write(state);
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Write out DAT footer using the supplied StreamWriter
+		/// </summary>
+		/// <param name="sw">StreamWriter to output to</param>
+		/// <param name="datdata">DatData object representing DAT information</param>
+		/// 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the data was written, false on error</returns>
+		public static bool WriteFooter(StreamWriter sw, DatData datdata, int depth, Logger logger)
+		{
+			try
+			{
+				string footer = "";
+				switch (datdata.OutputFormat)
+				{
+					case OutputFormat.ClrMamePro:
+						footer = ")";
+						break;
+					case OutputFormat.SabreDat:
+						for (int i = depth - 1; i >= 2; i--)
+						{
+							// Print out the number of tabs and the end folder
+							for (int j = 0; j < i; j++)
+							{
+								footer += "\t";
+							}
+							footer += "</directory>\n";
+						}
+						footer += "\t</data>\n</datafile>";
+						break;
+					case OutputFormat.Xml:
+						footer = "\t</machine>\n</datafile>";
+						break;
+				}
+
+				// Write the footer out
+				sw.Write(footer);
 			}
 			catch (Exception ex)
 			{
