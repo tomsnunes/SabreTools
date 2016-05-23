@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -141,10 +142,18 @@ namespace SabreTools.Helper
 
 		public static string CreateOutfileName(string outDir, DatData datdata)
 		{
+			// Double check the outdir for the end delim
+			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				outDir += Path.DirectorySeparatorChar;
+			}
+
 			string outfile = outDir + datdata.Description + (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
 			outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
 				outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
 				outfile);
+
+			Console.WriteLine(outfile);
 
 			return outfile;
 		}

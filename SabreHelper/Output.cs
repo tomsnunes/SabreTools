@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Mono.Data.Sqlite;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -35,12 +34,6 @@ namespace SabreTools.Helper
 				outDir = Environment.CurrentDirectory;
 			}
 
-			// Double check the outdir for the end delim
-			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
-			{
-				outDir += Path.DirectorySeparatorChar;
-			}
-
 			// Create the output directory if it doesn't already exist
 			Directory.CreateDirectory(outDir);
 
@@ -66,8 +59,6 @@ namespace SabreTools.Helper
 					for (int index = 0; index < roms.Count; index++)
 					{
 						RomData rom = roms[index];
-
-						string state = "";
 						List<string> newsplit = rom.Game.Split('\\').ToList();
 
 						// If we have a different game and we're not at the start of the list, output the end of last item

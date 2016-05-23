@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 
 using SabreTools.Helper;
@@ -213,10 +214,37 @@ namespace SabreTools
 		/// <remarks>Try to get the hashing multithreaded (either on a per-hash or per-file level)</remarks>
 		public bool Start()
 		{
-			// Create an output dictionary for all found items
-			_datdata.Roms = new Dictionary<string, List<RomData>>();
+			// Double check to see what it needs to be named
+			_basePath = (_inputs.Count > 0 ? (File.Exists(_inputs[0]) ? _inputs[0] : _inputs[0] + Path.DirectorySeparatorChar) : "");
+			_basePath = (_basePath != "" ? Path.GetFullPath(_basePath) : "");
+			if (_datdata.Name == "")
+			{
+				if (_inputs.Count > 1)
+				{
+					_datdata.Name = Environment.CurrentDirectory.Split(Path.DirectorySeparatorChar).Last();
+				}
+				else
+				{
+					if (_basePath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+					{
+						_basePath = _basePath.Substring(0, _basePath.Length - 1);
+					}
+					_datdata.Name = _basePath.Split(Path.DirectorySeparatorChar).Last();
+				}
+			}
+			_datdata.Name = (_datdata.Name == "" ? "Default" : _datdata.Name);
+			_datdata.Description = (_datdata.Description == "" ? _datdata.Name + (_bare ? "" : " (" + _datdata.Date + ")") : _datdata.Description);
+
+			// Create and open the output file for writing
+			FileStream fs = File.Create(Style.CreateOutfileName(Environment.CurrentDirectory, _datdata));
+			StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
+			sw.AutoFlush = true;
+
+			// Write out the initial file header
+			Output.WriteHeader(sw, _datdata, _logger);
 
 			// Loop over each of the found paths, if any
+			string lastparent = null;
 			foreach (string path in _inputs)
 			{
 				// Set local paths and vars
@@ -226,7 +254,7 @@ namespace SabreTools
 				// This is where the main loop would go
 				if (File.Exists(_basePath))
 				{
-					ProcessFile(_basePath);
+					lastparent = ProcessFile(_basePath, sw);
 				}
 				else if (Directory.Exists(_basePath))
 				{
@@ -235,7 +263,7 @@ namespace SabreTools
 					// Process the files in the base folder first
 					foreach (string item in Directory.EnumerateFiles(_basePath, "*", SearchOption.TopDirectoryOnly))
 					{
-						ProcessFile(item);
+						lastparent = ProcessFile(item, sw, lastparent);
 					}
 
 					// Then process each of the subfolders themselves
@@ -252,16 +280,21 @@ namespace SabreTools
 						foreach (string subitem in Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories))
 						{
 							items = true;
-							ProcessFile(subitem);
+							lastparent = ProcessFile(subitem, sw, item);
 						}
 
 						// If there were no subitems, add a "blank" game to to the set
 						if (!items)
 						{
+							string actualroot = item.Remove(0, basePathBackup.Length);
 							RomData rom = new RomData
 							{
 								Name = "null",
-								Game = item.Remove(0, basePathBackup.Length),
+								Game = (_datdata.Type == "SuperDAT" ?
+									_datdata.Name + (actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
+										Path.DirectorySeparatorChar.ToString() :
+										"") + actualroot :
+									actualroot),
 								Size = -1,
 								CRC = "null",
 								MD5 = "null",
@@ -286,10 +319,15 @@ namespace SabreTools
 						{
 							if (Directory.EnumerateFiles(subdir, "*", SearchOption.AllDirectories).Count() == 0)
 							{
+								string actualroot = subdir.Remove(0, basePathBackup.Length);
 								RomData rom = new RomData
 								{
 									Name = "null",
-									Game = subdir.Remove(0, basePathBackup.Length),
+									Game = (_datdata.Type == "SuperDAT" ?
+										_datdata.Name + (actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
+											Path.DirectorySeparatorChar.ToString() :
+											"") + actualroot :
+										actualroot),
 									Size = -1,
 									CRC = "null",
 									MD5 = "null",
@@ -319,54 +357,50 @@ namespace SabreTools
 				}
 			}
 
-			// If we found nothing (error state), exit
-			if (_datdata.Roms.Count == 0)
+			// Now output any empties to the stream
+			foreach (List<RomData> roms in _datdata.Roms.Values)
 			{
-				return false;
-			}
+				for (int i = 0; i < roms.Count; i++)
+				{
+					RomData rom = roms[i];
 
-			// Double check to see what it needs to be named
-			if (_datdata.Name == "")
-			{
-				if (_inputs.Count > 1)
-				{
-					_datdata.Name = Environment.CurrentDirectory.Split(Path.DirectorySeparatorChar).Last();
-				}
-				else
-				{
-					if (_basePath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+					// If we're in a mode that doesn't allow for actual empty folders, add the blank info
+					if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
 					{
-						_basePath = _basePath.Substring(0, _basePath.Length - 1);
+						rom.Type = "rom";
+						rom.Name = "-";
+						rom.Size = Constants.SizeZero;
+						rom.CRC = Constants.CRCZero;
+						rom.MD5 = Constants.MD5Zero;
+						rom.SHA1 = Constants.SHA1Zero;
 					}
-					_datdata.Name = _basePath.Split(Path.DirectorySeparatorChar).Last();
-				}
-			}
-			_datdata.Name = (_datdata.Name == "" ? "Default" : _datdata.Name);
 
-			// If we're in a superdat, append the folder name to all game names
-			if (_datdata.Type == "SuperDAT")
-			{
-				List<string> keys = _datdata.Roms.Keys.ToList();
-				foreach (string key in keys)
-				{
-					List<RomData> newroms = new List<RomData>();
-					foreach (RomData rom in _datdata.Roms[key])
+					// If we have a different game and we're not at the start of the list, output the end of last item
+					int last = 0;
+					if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 					{
-						RomData newrom = rom;
-						newrom.Game = _datdata.Name + (newrom.Game != "" &&
-							!newrom.Game.StartsWith(Path.DirectorySeparatorChar.ToString()) ? Path.DirectorySeparatorChar.ToString() : "") + newrom.Game;
-						newroms.Add(newrom);
+						Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
 					}
-					_datdata.Roms[key] = newroms;
-				}
 
-				_datdata.Name = _datdata.Name += " - SuperDAT";
+					// If we have a new game, output the beginning of the new item
+					if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+					{
+						Output.WriteStartGame(sw, rom, new List<string>(), lastparent, _datdata, 0, last, _logger);
+					}
+
+					// Write out the rom data
+					if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
+					{
+						Output.WriteRomData(sw, rom, lastparent, _datdata, 0, _logger);
+					}
+					
+					lastparent = rom.Game;
+				}
 			}
 
-			_datdata.Description = (_datdata.Description == "" ? _datdata.Name + (_bare ? "" : " (" + _datdata.Date + ")") : _datdata.Description);
-
-			// Now write it all out as a DAT
-			Output.WriteDatfile(_datdata, Environment.CurrentDirectory, _logger);
+			// Now write the final piece and close the output stream
+			Output.WriteFooter(sw, _datdata, 0, _logger);
+			sw.Close();
 
 			return true;
 		}
@@ -375,7 +409,8 @@ namespace SabreTools
 		/// Check a given file for hashes, based on current settings
 		/// </summary>
 		/// <param name="item">Filename of the item to be checked</param>
-		private void ProcessFile(string item)
+		/// <param name="sw">StreamWriter representing the output file</param>
+		private string ProcessFile(string item, StreamWriter sw, string lastparent = "")
 		{
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
@@ -386,7 +421,7 @@ namespace SabreTools
 				if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}"))
 				{
 					_logger.Warning("Non SHA-1 filename found, skipping: '" + datum + "'");
-					return;
+					return "";
 				}
 
 				RomData rom = new RomData
@@ -398,20 +433,13 @@ namespace SabreTools
 					SHA1 = Path.GetFileNameWithoutExtension(item),
 				};
 
-				string key = datum;
-				if (_datdata.Roms.ContainsKey(key))
-				{
-					_datdata.Roms[key].Add(rom);
-				}
-				else
-				{
-					List<RomData> temp = new List<RomData>();
-					temp.Add(rom);
-					_datdata.Roms.Add(key, temp);
-				}
+				int last = 0;
+				Output.WriteStartGame(sw, rom, new List<string>(), "", _datdata, 0, 0, _logger);
+				Output.WriteRomData(sw, rom, "", _datdata, 0, _logger);
+				Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), "", _datdata, 0, out last, _logger);
 
 				_logger.Log("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
-				return;
+				return "";
 			}
 
 			// Create the temporary output directory
@@ -480,6 +508,9 @@ namespace SabreTools
 			// If the file was an archive and was extracted successfully, check it
 			if (!encounteredErrors)
 			{
+				string lastgame = null;
+				int last = 0;
+
 				_logger.Log(Path.GetFileName(item) + " treated like an archive");
 				foreach (string entry in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
 				{
@@ -541,7 +572,11 @@ namespace SabreTools
 					RomData rom = new RomData
 					{
 						Type = "rom",
-						Game = actualroot,
+						Game = (_datdata.Type == "SuperDAT" ?
+							_datdata.Name + (actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
+								Path.DirectorySeparatorChar.ToString() :
+								"") + actualroot :
+							actualroot),
 						Name = actualitem,
 						Size = (new FileInfo(entry)).Length,
 						CRC = fileCRC,
@@ -549,19 +584,28 @@ namespace SabreTools
 						SHA1 = fileSHA1,
 					};
 
-					string key = rom.Size + "-" + rom.CRC;
-					if (_datdata.Roms.ContainsKey(key))
+					// If we have a different game and we're not at the start of the list, output the end of last item
+					if (lastgame != null && lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 					{
-						_datdata.Roms[key].Add(rom);
+						Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastgame, _datdata, 0, out last, _logger);
 					}
-					else
+					// If we have a different game and we're not at the start of the list, output the end of the last item
+					else if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 					{
-						List<RomData> temp = new List<RomData>();
-						temp.Add(rom);
-						_datdata.Roms.Add(key, temp);
+						Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
 					}
 
+					// If we have a new game, output the beginning of the new item
+					if (lastgame == null || lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+					{
+						Output.WriteStartGame(sw, rom, new List<string>(), lastgame, _datdata, 0, last, _logger);
+					}
+
+					// Write out the rom data
+					Output.WriteRomData(sw, rom, lastgame, _datdata, 0, _logger);
 					_logger.User("File added: " + entry + Environment.NewLine);
+
+					lastgame = rom.Game;
 				}
 
 				// Delete the temp directory
@@ -631,7 +675,11 @@ namespace SabreTools
 					RomData rom = new RomData
 					{
 						Type = "rom",
-						Game = actualroot,
+						Game = (_datdata.Type == "SuperDAT" ?
+							_datdata.Name + (actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
+								Path.DirectorySeparatorChar.ToString() :
+								"") + actualroot :
+							actualroot),
 						Name = actualitem,
 						Size = (new FileInfo(item)).Length,
 						CRC = fileCRC,
@@ -639,25 +687,32 @@ namespace SabreTools
 						SHA1 = fileSHA1,
 					};
 
-					string key = rom.Size + "-" + rom.CRC;
-					if (_datdata.Roms.ContainsKey(key))
+					// If we have a different game and we're not at the start of the list, output the end of last item
+					int last = 0;
+					if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 					{
-						_datdata.Roms[key].Add(rom);
-					}
-					else
-					{
-						List<RomData> temp = new List<RomData>();
-						temp.Add(rom);
-						_datdata.Roms.Add(key, temp);
+						Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
 					}
 
+					// If we have a new game, output the beginning of the new item
+					if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+					{
+						Output.WriteStartGame(sw, rom, new List<string>(), lastparent, _datdata, 0, last, _logger);
+					}
+
+					// Write out the rom data
+					Output.WriteRomData(sw, rom, lastparent, _datdata, 0, _logger);
 					_logger.User("File added: " + actualitem + Environment.NewLine);
+
+					return rom.Game;
 				}
 				catch (IOException ex)
 				{
 					_logger.Error(ex.ToString());
+					return null;
 				}
 			}
+			return "";
 		}
 	}
 }
