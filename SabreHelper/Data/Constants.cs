@@ -5,7 +5,7 @@
 		/// <summary>
 		/// The current toolset version to be used by all child applications
 		/// </summary>
-		public static string Version = "0.7.5.0";
+		public static string Version = "0.8.0.0";
 
 		// 0-byte file constants
 		public static long SizeZero = 0;
