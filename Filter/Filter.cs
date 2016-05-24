@@ -243,6 +243,16 @@ namespace SabreTools
 				List<RomData> roms = datdata.Roms[key];
 				foreach (RomData rom in roms)
 				{
+					// Filter on nodump status
+					if (_nodump == true && !rom.Nodump)
+					{
+						continue;
+					}
+					if (_nodump == false && rom.Nodump)
+					{
+						continue;
+					}
+
 					// Filter on game name
 					if (_gamename != "")
 					{
