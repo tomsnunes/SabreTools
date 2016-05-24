@@ -140,6 +140,12 @@ namespace SabreTools.Helper
 			return input;
 		}
 
+		/// <summary>
+		/// Generate a proper outfile name based on a DAT and output directory
+		/// </summary>
+		/// <param name="outDir">Output directory</param>
+		/// <param name="datdata">DAT information</param>
+		/// <returns>String representing the proper name</returns>
 		public static string CreateOutfileName(string outDir, DatData datdata)
 		{
 			// Double check the outdir for the end delim
