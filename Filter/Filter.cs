@@ -9,18 +9,11 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
-	/*
-	Create new tool: Filter, with the following filters available
-		Game name, Rom name, CRC, MD5, SHA-1 use asterisks as follows(case insensitive):
-			-crc=*00 (means ends with "00")
-			-crc=00* (means starts with "00")
-			-crc=*00* (means contains "00")
-			-crc=00 (means is "00")
-	*/
 	public class Filter
 	{
 		// Private instance variables
 		private string _filename;
+		private string _outdir;
 		private string _gamename;
 		private string _romname;
 		private string _romtype;
@@ -37,6 +30,7 @@ namespace SabreTools
 		/// Create a Filter object
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="outdir">Output directory to write the file to</param>
 		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
 		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
 		/// <param name="romtype">Type of the rom to match</param>
@@ -48,9 +42,11 @@ namespace SabreTools
 		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
 		/// <param name="logger">Logging object for file and console output</param>
-		public Filter(string filename, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
+		public Filter(string filename, string outdir, string gamename, string romname, string romtype,
+			long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
 		{
 			_filename = filename;
+			_outdir = (outdir == "" ? Path.GetDirectoryName(_filename) : outdir);
 			_gamename = gamename;
 			_romname = romname;
 			_romtype = romtype;
@@ -84,7 +80,7 @@ namespace SabreTools
 
 			// First things first, take care of all of the arguments that this could have
 			bool? nodump = null;
-			string gamename = "", romname = "", romtype = "", crc = "", md5 = "", sha1= "";
+			string outdir = "", gamename = "", romname = "", romtype = "", crc = "", md5 = "", sha1= "";
 			long sgt = -1, slt = -1, seq = -1;
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
@@ -130,6 +126,10 @@ namespace SabreTools
 						}
 
 						// String inputs
+						else if (arg.StartsWith("-out=") || arg.StartsWith("--out="))
+						{
+							outdir = arg.Split('=')[1];
+						}
 						else if (arg.StartsWith("-crc=") || arg.StartsWith("--crc="))
 						{
 							crc = arg.Split('=')[1];
@@ -194,7 +194,7 @@ namespace SabreTools
 
 				if (File.Exists(newinput))
 				{
-					filter = new Filter(newinput, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
+					filter = new Filter(newinput, outdir, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
 					success &= filter.Process();
 				}
 
@@ -202,7 +202,12 @@ namespace SabreTools
 				{
 					foreach (string file in Directory.EnumerateFiles(newinput, "*", SearchOption.AllDirectories))
 					{
-						filter = new Filter(file, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
+						string nestedoutdir = "";
+						if (outdir != "")
+						{
+							nestedoutdir = outdir + Path.GetDirectoryName(file).Remove(0, newinput.Length);
+						}
+						filter = new Filter(file, nestedoutdir, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
 						success &= filter.Process();
 					}
 				}
@@ -369,7 +374,7 @@ namespace SabreTools
 			datdata.Roms = dict;
 
 			// Now write the file out and return
-			return Output.WriteDatfile(datdata, Path.GetDirectoryName(_filename), _logger);
+			return Output.WriteDatfile(datdata, _outdir, _logger);
 		}
 	}
 }

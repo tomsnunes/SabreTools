@@ -215,6 +215,7 @@ Usage: Filter [options] [inputs]
 
 Options:
   -h, -?, --help	Show this help dialog
+  -out=, --out=		Output directory
   -gn=, --game-name=	Game name to be filtered on
   -rn=, --rom-name=	Rom name to be filtered on
   -rt=, --rom-type=	Rom type to be filtered on
