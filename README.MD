@@ -20,9 +20,10 @@ A bare-bones attempt at providing a true GUI experience for the SabreTools suite
 The main tool of the SabreTools suite. Performs the majority of the core features of the parent project, including the following:
 <ul>
 	<li>Importing and Generating DAT files in ClrMamePro and XML formats</li>
-	<li>Converting DATs from ClrMamePro to XML format, vice versa, and to missfile (last part formerly <i>DatToMiss</i>; requested by Obiwantje)</li>
+	<li>Converting DATs from any format to ClrMamePro, Logiqx XML, SabreDAT XML, and to missfile (last part formerly <i>DatToMiss</i>; requested by Obiwantje)</li>
 	<li>Trim DAT entries and optionally merge into a single game (formerly <i>SingleGame</i>; requested by Kludge)</li>
 	<li>Split a DAT using two different file extensions within the DAT (formerly <i>DatSplit</i>)</li>
+	<li>Split a DAT or folder of DATs by best available hash or nodump (formerly <i>HashSplit</i>, requested by Obiwantje)</li>
 	<li>Merge, diff, and dedupe an arbitrary number of DAT files, as long as it's two or more (formerly <i>MergeDAT</i>; requested by Obiwantje and Kludge)
 		<ul>
 			<li>Read in from commandline, drag-and-drop, a directory, or any combination</li>
@@ -37,6 +38,10 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 </ul>
 This tool can both be used with command line parameters or with the built-in text menu system.
 
+<b>DATabaseTwo</b>
+<p/>
+An in-progress replacement for the Import and Generate functions of <i>DATabase</i>. This is the recommended version to use for mass DAT management but it is still lacking some advanced features found only in the <i>DATabase</i> version.
+
 <b>Headerer</b>
 <p/>
 A simple auxilary tool that detects and removes headers and also restores headers for the following systems:
@@ -49,15 +54,6 @@ A simple auxilary tool that detects and removes headers and also restores header
 	<li>Super Nintendo Entertainment System / Super Famicom</li>
 </ul>
 The saved headers are currently stored in a database; multiple headers allowed per file.
-
-<b>DatSplit</b>
-<p/>
-This tool doesn't do everything possible for splitting DATs, most of those functions are taken care of by third-party tool <a href="http://www.logiqx.com/Tools/DatUtil/">DatUtil</a>.
-<ul>
-	<li>Split a DAT file using two different file extensions</li>
-	<li>Works with ClrMamePro and Logiqx XML DATs only because of current limitations</li>
-</ul>
-This is useful for splitting DAT files similar to the NonGood set that can have more than one system per DAT.
 
 <b>DATFromDir</b>
 <p/>
@@ -83,6 +79,10 @@ This tool is meant to help users who want to keep their hard drives offline and 
 	<li>Take a current merged DAT, a current missing DAT, and a new merged DAT and get all new files, files to remove, and a new missing DAT</li>
 	<li>Set all hash values to 0-byte equivalents for rom managers</li>
 </ul>
+
+<b>UncompressedSize</b>
+<p/>
+This tool allows a user to determine the entire uncompressed filesize (including human-readable output such as KB, MB, etc.) of a DAT or folder of DATs. This is very useful for those fortunate enough to have the space to keep their files uncompressed and also provdes a good baseline for maximum space a set will take up.
 
 <h3>Licensing</h3>
 <p/>
