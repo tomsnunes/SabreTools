@@ -31,6 +31,7 @@ namespace SabreTools.Helper
 	public struct DatData
 	{
 		// Data common to most DAT types
+		public string FileName;
 		public string Name;
 		public string Description;
 		public string Category;
