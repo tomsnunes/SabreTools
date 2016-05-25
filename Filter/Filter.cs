@@ -379,6 +379,7 @@ namespace SabreTools
 			}
 
 			// Get the correct output values
+			datdata.FileName = Path.GetFileNameWithoutExtension(datdata.FileName) + " (Filtered)" + Path.GetExtension(datdata.FileName);
 			datdata.Name += " (Filtered)";
 			datdata.Description += " (Filtered)";
 			datdata.Roms = dict;

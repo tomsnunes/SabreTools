@@ -94,6 +94,12 @@ namespace SabreTools.Helper
 		/// <returns>DatData object representing the read-in data</returns>
 		public static DatData Parse(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false)
 		{
+			// If the output filename isn't set already, get the internal filename
+			if (String.IsNullOrEmpty(datdata.FileName))
+			{
+				datdata.FileName = Path.GetFileNameWithoutExtension(filename);
+			}
+
 			// Make sure there's a dictionary to read to
 			if (datdata.Roms == null)
 			{

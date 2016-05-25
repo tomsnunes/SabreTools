@@ -64,6 +64,7 @@ namespace SabreTools
 			OutputFormat outputFormat = RomManipulation.GetOutputFormat(_filename);
 			DatData datdataA = new DatData
 			{
+				FileName = datdata.FileName + "." + _extA,
 				Name = datdata.Name + "." + _extA,
 				Description = datdata.Description + "." + _extA,
 				Category = datdata.Category,
@@ -79,6 +80,7 @@ namespace SabreTools
 			};
 			DatData datdataB = new DatData
 			{
+				FileName = datdata.FileName + "." + _extB,
 				Name = datdata.Name + "." + _extB,
 				Description = datdata.Description + "." + _extB,
 				Category = datdata.Category,

@@ -70,16 +70,14 @@ namespace SabreTools
 
 			// Get the file data to be split
 			OutputFormat outputFormat = RomManipulation.GetOutputFormat(filename);
-			DatData datdata = new DatData
-			{
-				Description = Path.GetFileNameWithoutExtension(filename),
-			};
+			DatData datdata = new DatData();
 			datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger, true);
 
 			// Create each of the respective output DATs
 			_logger.User("Creating and populating new DATs");
 			DatData nodump = new DatData
 			{
+				FileName = datdata.FileName + " (Nodump)",
 				Name = datdata.Name + " (Nodump)",
 				Description = datdata.Description + " (Nodump)",
 				Category = datdata.Category,
@@ -101,6 +99,7 @@ namespace SabreTools
 			};
 			DatData sha1 = new DatData
 			{
+				FileName = datdata.FileName + " (SHA-1)",
 				Name = datdata.Name + " (SHA-1)",
 				Description = datdata.Description + " (SHA-1)",
 				Category = datdata.Category,
@@ -122,6 +121,7 @@ namespace SabreTools
 			};
 			DatData md5 = new DatData
 			{
+				FileName = datdata.FileName + " (MD5)",
 				Name = datdata.Name + " (MD5)",
 				Description = datdata.Description + " (MD5)",
 				Category = datdata.Category,
@@ -143,6 +143,7 @@ namespace SabreTools
 			};
 			DatData crc = new DatData
 			{
+				FileName = datdata.FileName + " (CRC)",
 				Name = datdata.Name + " (CRC)",
 				Description = datdata.Description + " (CRC)",
 				Category = datdata.Category,

@@ -1501,6 +1501,7 @@ Make a selection:
 					Romba = romba,
 				};
 				datdata = RomManipulation.Parse(input, 0, 0, datdata, logger);
+				datdata.FileName += "-miss";
 				datdata.Name += "-miss";
 				datdata.Description += "-miss";
 

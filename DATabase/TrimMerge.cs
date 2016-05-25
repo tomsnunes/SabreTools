@@ -123,7 +123,7 @@ namespace SabreTools
 			Output.WriteDatfile(datdata, Path.GetDirectoryName(filename), _logger);
 
 			// Remove the original file if different and inform the user
-			if (filename != datdata.Description + (RomManipulation.GetOutputFormat(filename) == OutputFormat.Xml ? ".xml" : ".dat"))
+			if (filename != Style.CreateOutfileName(" ", datdata).Remove(0, 1))
 			{
 				try
 				{
