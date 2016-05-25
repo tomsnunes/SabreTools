@@ -414,6 +414,12 @@ namespace SabreTools
 				}
 			}
 
+			// If we had roms but not blanks, create an artifical rom for the purposes of outputting
+			if (lastparent != null && _datdata.Roms.Count == 0)
+			{
+				_datdata.Roms.Add("temp", new List<RomData>());
+			}
+
 			// Now write the final piece and close the output stream
 			Output.WriteFooter(sw, _datdata, 0, _logger);
 			sw.Close();
