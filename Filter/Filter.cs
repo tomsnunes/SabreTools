@@ -383,8 +383,14 @@ namespace SabreTools
 			datdata.Description += " (Filtered)";
 			datdata.Roms = dict;
 
-			// Now write the file out and return
-			return Output.WriteDatfile(datdata, _outdir, _logger);
+			// Now write the file out if anything is there and return
+			if (datdata.Roms.Count > 0)
+			{
+				return Output.WriteDatfile(datdata, _outdir, _logger);
+			}
+
+			// Otherwise, we return true because we did all we could
+			return true;
 		}
 	}
 }
