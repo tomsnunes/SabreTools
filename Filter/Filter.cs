@@ -273,15 +273,15 @@ namespace SabreTools
 					// Filter on rom name
 					if (_romname != "")
 					{
-						if (!(_romname.StartsWith("*") && _romname.EndsWith("*") && rom.Game.Contains(_romname.Replace("*", ""))))
+						if (!(_romname.StartsWith("*") && _romname.EndsWith("*") && rom.Name.Contains(_romname.Replace("*", ""))))
 						{
 							continue;
 						}
-						else if (!(_romname.StartsWith("*") && rom.Game.EndsWith(_romname.Replace("*", ""))))
+						else if (!(_romname.StartsWith("*") && rom.Name.EndsWith(_romname.Replace("*", ""))))
 						{
 							continue;
 						}
-						else if (!(_romname.EndsWith("*") && rom.Game.StartsWith(_romname.Replace("*", ""))))
+						else if (!(_romname.EndsWith("*") && rom.Name.StartsWith(_romname.Replace("*", ""))))
 						{
 							continue;
 						}
@@ -313,15 +313,15 @@ namespace SabreTools
 					// Filter on crc
 					if (_crc != "")
 					{
-						if (!(_crc.StartsWith("*") && _crc.EndsWith("*") && rom.Game.Contains(_crc.Replace("*", ""))))
+						if (!(_crc.StartsWith("*") && _crc.EndsWith("*") && rom.CRC.Contains(_crc.Replace("*", ""))))
 						{
 							continue;
 						}
-						else if (!(_crc.StartsWith("*") && rom.Game.EndsWith(_crc.Replace("*", ""))))
+						else if (!(_crc.StartsWith("*") && rom.CRC.EndsWith(_crc.Replace("*", ""))))
 						{
 							continue;
 						}
-						else if (!(_crc.EndsWith("*") && rom.Game.StartsWith(_crc.Replace("*", ""))))
+						else if (!(_crc.EndsWith("*") && rom.CRC.StartsWith(_crc.Replace("*", ""))))
 						{
 							continue;
 						}
@@ -330,15 +330,15 @@ namespace SabreTools
 					// Filter on md5
 					if (_md5 != "")
 					{
-						if (!(_md5.StartsWith("*") && _md5.EndsWith("*") && rom.Game.Contains(_md5.Replace("*", ""))))
+						if (!(_md5.StartsWith("*") && _md5.EndsWith("*") && rom.MD5.Contains(_md5.Replace("*", ""))))
 						{
 							continue;
 						}
-						else if (!(_md5.StartsWith("*") && rom.Game.EndsWith(_md5.Replace("*", ""))))
+						else if (!(_md5.StartsWith("*") && rom.MD5.EndsWith(_md5.Replace("*", ""))))
 						{
 							continue;
 						}
-						else if (!(_md5.EndsWith("*") && rom.Game.StartsWith(_md5.Replace("*", ""))))
+						else if (!(_md5.EndsWith("*") && rom.MD5.StartsWith(_md5.Replace("*", ""))))
 						{
 							continue;
 						}
@@ -347,15 +347,15 @@ namespace SabreTools
 					// Filter on sha1
 					if (_sha1 != "")
 					{
-						if (!(_sha1.StartsWith("*") && _sha1.EndsWith("*") && rom.Game.Contains(_sha1.Replace("*", ""))))
+						if (!(_sha1.StartsWith("*") && _sha1.EndsWith("*") && rom.SHA1.Contains(_sha1.Replace("*", ""))))
 						{
 							continue;
 						}
-						else if (!(_sha1.StartsWith("*") && rom.Game.EndsWith(_sha1.Replace("*", ""))))
+						else if (!(_sha1.StartsWith("*") && rom.SHA1.EndsWith(_sha1.Replace("*", ""))))
 						{
 							continue;
 						}
-						else if (!(_sha1.EndsWith("*") && rom.Game.StartsWith(_sha1.Replace("*", ""))))
+						else if (!(_sha1.EndsWith("*") && rom.SHA1.StartsWith(_sha1.Replace("*", ""))))
 						{
 							continue;
 						}
