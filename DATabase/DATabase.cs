@@ -1444,7 +1444,7 @@ Make a selection:
 						datdata.FileName += ".new";
 					}
 
-					Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(file) : outdir + Path.GetDirectoryName(file).Remove(0, filename.Length)), logger);
+					Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(file) : outdir + Path.GetDirectoryName(file).Remove(0, filename.Length - 1)), logger);
 				}
 			}
 			else
