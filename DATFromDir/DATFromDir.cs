@@ -524,7 +524,6 @@ namespace SabreTools
 			// If the file was an archive and was extracted successfully, check it
 			if (!encounteredErrors)
 			{
-				string lastgame = null;
 				int last = 0;
 
 				_logger.Log(Path.GetFileName(item) + " treated like an archive");
@@ -601,9 +600,9 @@ namespace SabreTools
 					};
 
 					// If we have a different game and we're not at the start of the list, output the end of last item
-					if (lastgame != null && lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+					if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 					{
-						Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastgame, _datdata, 0, out last, _logger);
+						Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
 					}
 					// If we have a different game and we're not at the start of the list, output the end of the last item
 					else if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
@@ -612,16 +611,16 @@ namespace SabreTools
 					}
 
 					// If we have a new game, output the beginning of the new item
-					if (lastgame == null || lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+					if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
 					{
-						Output.WriteStartGame(sw, rom, new List<string>(), lastgame, _datdata, 0, last, _logger);
+						Output.WriteStartGame(sw, rom, new List<string>(), lastparent, _datdata, 0, last, _logger);
 					}
 
 					// Write out the rom data
-					Output.WriteRomData(sw, rom, lastgame, _datdata, 0, _logger);
+					Output.WriteRomData(sw, rom, lastparent, _datdata, 0, _logger);
 					_logger.User("File added: " + entry + Environment.NewLine);
 
-					lastgame = rom.Game;
+					lastparent = rom.Game;
 				}
 
 				// Delete the temp directory
@@ -728,7 +727,7 @@ namespace SabreTools
 					return null;
 				}
 			}
-			return "";
+			return lastparent;
 		}
 	}
 }
