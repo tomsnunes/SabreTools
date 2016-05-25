@@ -254,7 +254,7 @@ namespace SabreTools
 				// This is where the main loop would go
 				if (File.Exists(_basePath))
 				{
-					lastparent = ProcessFile(_basePath, sw);
+					lastparent = ProcessFile(_basePath, sw, lastparent);
 				}
 				else if (Directory.Exists(_basePath))
 				{
@@ -280,7 +280,7 @@ namespace SabreTools
 						foreach (string subitem in Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories))
 						{
 							items = true;
-							lastparent = ProcessFile(subitem, sw, item);
+							lastparent = ProcessFile(subitem, sw, lastparent);
 						}
 
 						// If there were no subitems, add a "blank" game to to the set
