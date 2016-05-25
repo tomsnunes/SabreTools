@@ -1425,11 +1425,11 @@ Make a selection:
 			}
 			else if (Directory.Exists(filename))
 			{
-				filename = Path.GetFullPath(filename);
+				filename = Path.GetFullPath(filename) + Path.DirectorySeparatorChar;
 
 				foreach (string file in Directory.EnumerateFiles(filename, "*", SearchOption.AllDirectories))
 				{
-					logger.User("Converting \"" + Path.GetFullPath(file).Remove(0, filename.Length + 1) + "\"");
+					logger.User("Converting \"" + Path.GetFullPath(file).Remove(0, filename.Length) + "\"");
 					DatData datdata = new DatData
 					{
 						OutputFormat = outputFormat,
@@ -1444,7 +1444,7 @@ Make a selection:
 						datdata.FileName += ".new";
 					}
 
-					Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(file) : outdir + Path.GetDirectoryName(file).Remove(0, filename.Length + 1)), logger);
+					Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(file) : outdir + Path.GetDirectoryName(file).Remove(0, filename.Length)), logger);
 				}
 			}
 			else
