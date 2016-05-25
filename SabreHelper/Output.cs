@@ -476,26 +476,43 @@ namespace SabreTools.Helper
 			try
 			{
 				string footer = "";
-				switch (datdata.OutputFormat)
+
+				// If we have roms, output the full footer
+				if (datdata.Roms.Count > 0)
 				{
-					case OutputFormat.ClrMamePro:
-						footer = ")";
-						break;
-					case OutputFormat.SabreDat:
-						for (int i = depth - 1; i >= 2; i--)
-						{
-							// Print out the number of tabs and the end folder
-							for (int j = 0; j < i; j++)
+					switch (datdata.OutputFormat)
+					{
+						case OutputFormat.ClrMamePro:
+							footer = ")";
+							break;
+						case OutputFormat.SabreDat:
+							for (int i = depth - 1; i >= 2; i--)
 							{
-								footer += "\t";
+								// Print out the number of tabs and the end folder
+								for (int j = 0; j < i; j++)
+								{
+									footer += "\t";
+								}
+								footer += "</directory>\n";
 							}
-							footer += "</directory>\n";
-						}
-						footer += "\t</data>\n</datafile>";
-						break;
-					case OutputFormat.Xml:
-						footer = "\t</machine>\n</datafile>";
-						break;
+							footer += "\t</data>\n</datafile>";
+							break;
+						case OutputFormat.Xml:
+							footer = "\t</machine>\n</datafile>";
+							break;
+					}
+				}
+				
+				// Otherwise, output the abbreviated form
+				else
+				{
+					switch (datdata.OutputFormat)
+					{
+						case OutputFormat.SabreDat:
+						case OutputFormat.Xml:
+							footer = "</datafile>";
+							break;
+					}
 				}
 
 				// Write the footer out
