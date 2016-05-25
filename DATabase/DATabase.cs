@@ -1441,7 +1441,7 @@ Make a selection:
 					string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
 					if (outdir == "" && Path.GetExtension(file) == extension)
 					{
-						datdata.Description += ".new";
+						datdata.FileName += ".new";
 					}
 
 					Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(file) : outdir + Path.GetDirectoryName(file).Remove(0, filename.Length + 1)), logger);
