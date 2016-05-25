@@ -426,7 +426,9 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="item">Filename of the item to be checked</param>
 		/// <param name="sw">StreamWriter representing the output file</param>
-		private string ProcessFile(string item, StreamWriter sw, string lastparent = "")
+		/// <param name="lastparent">Name of the last parent rom to make sure that everything is grouped as well as possible</param>
+		/// <returns>New parent to be used</returns>
+		private string ProcessFile(string item, StreamWriter sw, string lastparent)
 		{
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
