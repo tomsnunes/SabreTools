@@ -217,7 +217,21 @@ namespace SabreTools
 			// Double check to see what it needs to be named
 			_basePath = (_inputs.Count > 0 ? (File.Exists(_inputs[0]) ? _inputs[0] : _inputs[0] + Path.DirectorySeparatorChar) : "");
 			_basePath = (_basePath != "" ? Path.GetFullPath(_basePath) : "");
-			if (String.IsNullOrEmpty(_datdata.Name))
+
+			// If the description is defined but not the name, set the name from the description
+			if (String.IsNullOrEmpty(_datdata.Name) && !String.IsNullOrEmpty(_datdata.Description))
+			{
+				_datdata.Name = _datdata.Description;
+			}
+			
+			// If the name is defined but not the description, set the description from the name
+			else if (!String.IsNullOrEmpty(_datdata.Name) && String.IsNullOrEmpty(_datdata.Description))
+			{
+				_datdata.Description = _datdata.Name + (_bare ? "" : " (" + _datdata.Date + ")");
+			}
+
+			// If neither the name or description are defined, set them from the automatic values
+			else if (String.IsNullOrEmpty(_datdata.Name) && String.IsNullOrEmpty(_datdata.Description))
 			{
 				if (_inputs.Count > 1)
 				{
@@ -231,9 +245,11 @@ namespace SabreTools
 					}
 					_datdata.Name = _basePath.Split(Path.DirectorySeparatorChar).Last();
 				}
+			
+				// If the name is still somehow empty, populate it with defaults
+				_datdata.Name = (String.IsNullOrEmpty(_datdata.Name) ? "Default" : _datdata.Name);
+				_datdata.Description = _datdata.Name + (_bare ? "" : " (" + _datdata.Date + ")");
 			}
-			_datdata.Name = (String.IsNullOrEmpty(_datdata.Name) ? "Default" : _datdata.Name);
-			_datdata.Description = (String.IsNullOrEmpty(_datdata.Description) ? _datdata.Name + (_bare ? "" : " (" + _datdata.Date + ")") : _datdata.Description);
 
 			// Create and open the output file for writing
 			FileStream fs = File.Create(Style.CreateOutfileName(Environment.CurrentDirectory, _datdata));
