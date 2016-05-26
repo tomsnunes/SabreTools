@@ -147,6 +147,7 @@ namespace SabreTools
 			// Create the output DatData object
 			DatData datdata = new DatData
 			{
+				FileName = description,
 				Name = name,
 				Description = description,
 				Version = "",
