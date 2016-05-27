@@ -8,7 +8,6 @@ namespace SabreTools
 	/// <summary>
 	/// Get statistics on one or more DAT files
 	/// </summary>
-	/// <remarks>Finish making this a proper object then port to DATabase (-st, --stats)</remarks>
 	public class Stats
 	{
 		// Private instance variables
