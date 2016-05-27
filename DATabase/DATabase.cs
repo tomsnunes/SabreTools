@@ -323,7 +323,7 @@ namespace SabreTools
 						}
 						else
 						{
-							logger.Warning("Invalid input detected: " + arg);
+							logger.Error("Invalid input detected: " + arg);
 							Console.WriteLine();
 							Build.Help();
 							logger.Close();
@@ -343,6 +343,7 @@ namespace SabreTools
 			if (help || !(add ^ (convertMiss || romba) ^ convertCMP ^ convertRC ^ convertSD ^ convertXml ^ extsplit ^ generate ^ 
 				genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^ rem ^ stats ^ trim))
 			{
+				logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
 				logger.Close();
 				return;
@@ -352,6 +353,7 @@ namespace SabreTools
 			if (inputs.Count == 0 && ((convertMiss || romba) || convertCMP || convertRC || convertSD
 				|| convertXml || extsplit || hashsplit || import || (merge || diff) || stats || trim))
 			{
+				logger.Error("This feature requires at least one input");
 				Build.Help();
 				logger.Close();
 				return;

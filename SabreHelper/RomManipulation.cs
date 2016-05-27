@@ -202,6 +202,7 @@ namespace SabreTools.Helper
 							{
 								datdata.Description = (String.IsNullOrEmpty(datdata.Description) ? xtr.GetAttribute("description") : datdata.Description);
 							}
+							xtr.Read();
 							break;
 						case "header":
 							// We want to process the entire subtree of the header
