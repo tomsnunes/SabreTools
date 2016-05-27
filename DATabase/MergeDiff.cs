@@ -108,6 +108,7 @@ namespace SabreTools
 			int i = 0;
 			DatData userData = new DatData
 			{
+				FileName = _desc,
 				Name = _name,
 				Description = _desc,
 				Version = _version,
@@ -136,6 +137,7 @@ namespace SabreTools
 				// Get all entries that don't have External dupes
 				DatData outerDiffData = new DatData
 				{
+					FileName = _desc + post,
 					Name = _name + post,
 					Description = _desc + post,
 					Version = _version,
@@ -180,6 +182,7 @@ namespace SabreTools
 					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
 					DatData diffData = new DatData
 					{
+						FileName = _desc + post,
 						Name = _name + post,
 						Description = _desc + post,
 						Version = _version,
@@ -219,6 +222,7 @@ namespace SabreTools
 				post = " (Duplicates)";
 				DatData dupeData = new DatData
 				{
+					FileName = _desc + post,
 					Name = _name + post,
 					Description = _desc + post,
 					Version = _version,
@@ -264,6 +268,7 @@ namespace SabreTools
 					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
 					DatData diffData = new DatData
 					{
+						FileName = _desc + post,
 						Name = _name + post,
 						Description = _desc + post,
 						Version = _version,
