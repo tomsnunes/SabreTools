@@ -126,8 +126,8 @@ namespace SabreTools
 				userData = RomManipulation.Parse(input.Split('¬')[0], i, 0, userData, _logger);
 				i++;
 
-				// If we are in inplace mode, save the DAT data
-				if (_inplace)
+				// If we are in inplace mode or redirecting output, save the DAT data
+				if (_inplace || !String.IsNullOrEmpty(_outdir))
 				{
 					datHeaders.Add(new DatData
 					{
@@ -370,7 +370,7 @@ namespace SabreTools
 
 					// If we have an output directory set, replace the path
 					string path = "";
-					if (_inplace || !String.IsNullOrEmpty(_outdir))
+					if (_inplace)
 					{
 						path = Path.GetDirectoryName(_inputs[j].Split('¬')[0]);
 					}
