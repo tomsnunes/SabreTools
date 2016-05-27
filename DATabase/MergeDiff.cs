@@ -370,7 +370,7 @@ namespace SabreTools
 
 					// If we have an output directory set, replace the path
 					string path = "";
-					if (_inplace)
+					if (_inplace || !String.IsNullOrEmpty(_outdir))
 					{
 						path = Path.GetDirectoryName(_inputs[j].Split('¬')[0]);
 					}
