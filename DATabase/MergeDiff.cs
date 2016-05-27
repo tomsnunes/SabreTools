@@ -199,9 +199,12 @@ namespace SabreTools
 					{
 						if (rom.Dupe < DupeType.ExternalHash)
 						{
+							RomData newrom = rom;
+							newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.SystemID].Split('¬')[0]) + ")";
+
 							if (outerDiffData.Roms.ContainsKey(key))
 							{
-								outerDiffData.Roms[key].Add(rom);
+								outerDiffData.Roms[key].Add(newrom);
 							}
 							else
 							{
@@ -284,9 +287,12 @@ namespace SabreTools
 					{
 						if (rom.Dupe >= DupeType.ExternalHash)
 						{
+							RomData newrom = rom;
+							newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.SystemID].Split('¬')[0]) + ")";
+
 							if (dupeData.Roms.ContainsKey(key))
 							{
-								dupeData.Roms[key].Add(rom);
+								dupeData.Roms[key].Add(newrom);
 							}
 							else
 							{
@@ -370,7 +376,7 @@ namespace SabreTools
 					}
 					else if (!String.IsNullOrEmpty(_outdir))
 					{
-						path = _outdir + (_inputs[j].Split('¬')[0].Remove(0, _inputs[j].Split('¬')[1].Length));
+						path = _outdir + (Path.GetDirectoryName(_inputs[j].Split('¬')[0]).Remove(0, _inputs[j].Split('¬')[1].Length));
 					}
 
 					Output.WriteDatfile(diffData, path, _logger);
