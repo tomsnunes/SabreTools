@@ -140,6 +140,7 @@ namespace SabreTools
 			}
 
 			// Output total DAT stats
+			if (!_single) { _logger.User(""); }
 			_logger.User(@"For ALL DATs found
 --------------------------------------------------
     Uncompressed size:       " + Style.GetBytesReadable(totalSize) + @"
