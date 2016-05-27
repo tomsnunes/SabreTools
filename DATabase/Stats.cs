@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
 using SabreTools.Helper;
 
@@ -10,7 +9,7 @@ namespace SabreTools
 	/// Get statistics on one or more DAT files
 	/// </summary>
 	/// <remarks>Finish making this a proper object then port to DATabase (-st, --stats)</remarks>
-	public class UncompressedSize
+	public class Stats
 	{
 		// Private instance variables
 		private List<String> _inputs;
@@ -23,7 +22,7 @@ namespace SabreTools
 		/// <param name="inputs">List of files and folders to parse</param>
 		/// <param name="single">True if single DAT stats are output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public UncompressedSize(List<String> inputs, bool single, Logger logger)
+		public Stats(List<String> inputs, bool single, Logger logger)
 		{
 			_inputs = inputs;
 			_single = single;
@@ -114,6 +113,10 @@ namespace SabreTools
     Roms with SHA-1:         " + singleSHA1 + @"
     Roms with Nodump status: " + singleNodump + @"
 ");
+				}
+				else
+				{
+					_logger.User("Adding stats for file '" + filename + "'");
 				}
 
 				// Add single DAT stats to totals

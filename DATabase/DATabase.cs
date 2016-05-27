@@ -78,6 +78,8 @@ namespace SabreTools
 				quotes = false,
 				rem = false,
 				romba = false,
+				single = false,
+				stats = false,
 				superdat = false,
 				trim = false,
 				skip = false,
@@ -223,6 +225,14 @@ namespace SabreTools
 					case "--superdat":
 						superdat = true;
 						break;
+					case "-si":
+					case "--single":
+						single = true;
+						break;
+					case "-st":
+					case "--stats":
+						stats = true;
+						break;
 					case "--skip":
 						skip = true;
 						break;
@@ -331,7 +341,7 @@ namespace SabreTools
 
 			// If more than one switch is enabled or help is set, show the help screen
 			if (help || !(add ^ (convertMiss || romba) ^ convertCMP ^ convertRC ^ convertSD ^ convertXml ^ extsplit ^ generate ^ 
-				genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^ rem ^ trim))
+				genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^ rem ^ stats ^ trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -340,7 +350,7 @@ namespace SabreTools
 
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (inputs.Count == 0 && ((convertMiss || romba) || convertCMP || convertRC || convertSD
-				|| convertXml || extsplit || hashsplit || import || (merge || diff) || trim))
+				|| convertXml || extsplit || hashsplit || import || (merge || diff) || stats || trim))
 			{
 				Build.Help();
 				logger.Close();
@@ -489,6 +499,12 @@ namespace SabreTools
 			else if (hashsplit)
 			{
 				InitHashSplit(inputs, outdir);
+			}
+
+			// Get statistics on input files
+			else if (stats)
+			{
+				InitStats(inputs, single);
 			}
 
 			logger.Close();
@@ -1729,7 +1745,7 @@ Make a selection:
 				}
 			}
 
-			Stats stats = new Stats(inputs, single, logger);
+			Stats stats = new Stats(newinputs, single, logger);
 			stats.Process();
 		}
 
