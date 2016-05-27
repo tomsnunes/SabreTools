@@ -20,6 +20,7 @@ namespace SabreTools
 		private bool _old;
 		private bool _superdat;
 		private bool _cascade;
+		private bool _inplace;
 
 		// User specified strings
 		private string _name;
@@ -49,9 +50,10 @@ namespace SabreTools
 		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
 		/// <param name="superdat">True if DATs should be parsed into SuperDAT format, false otherwise</param>
 		/// <param name="cascade">True if the outputted diffs should be cascaded, false otherwise</param>
+		/// <param name="inplace">True if cascaded diffs overwrite the source files, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		public MergeDiff(List<String> inputs, string name, string desc, string cat, string version, string author,
-			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, Logger logger)
+			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, bool inplace, Logger logger)
 		{
 			_inputs = inputs;
 			_name = name;
@@ -66,6 +68,7 @@ namespace SabreTools
 			_old = old;
 			_superdat = superdat;
 			_cascade = cascade;
+			_inplace = inplace;
 			_logger = logger;
 		}
 
