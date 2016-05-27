@@ -138,28 +138,28 @@ namespace SabreTools.Helper
 				{
 					case OutputFormat.ClrMamePro:
 						header = "clrmamepro (\n" +
-							"\tname \"" + HttpUtility.HtmlEncode(datdata.Name) + "\"\n" +
-							"\tdescription \"" + HttpUtility.HtmlEncode(datdata.Description) + "\"\n" +
-							"\tcategory \"" + HttpUtility.HtmlEncode(datdata.Category) + "\"\n" +
-							"\tversion \"" + HttpUtility.HtmlEncode(datdata.Version) + "\"\n" +
-							"\tdate \"" + HttpUtility.HtmlEncode(datdata.Date) + "\"\n" +
-							"\tauthor \"" + HttpUtility.HtmlEncode(datdata.Author) + "\"\n" +
-							"\tcomment \"" + HttpUtility.HtmlEncode(datdata.Comment) + "\"\n" +
+							"\tname \"" + datdata.Name + "\"\n" +
+							"\tdescription \"" + datdata.Description + "\"\n" +
+							"\tcategory \"" + datdata.Category + "\"\n" +
+							"\tversion \"" + datdata.Version + "\"\n" +
+							"\tdate \"" + datdata.Date + "\"\n" +
+							"\tauthor \"" + datdata.Author + "\"\n" +
+							"\tcomment \"" + datdata.Comment + "\"\n" +
 							(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
 							")\n";
 						break;
 					case OutputFormat.RomCenter:
 						header = "[CREDITS]\n" +
-							"author=" + HttpUtility.HtmlEncode(datdata.Author) + "\n" +
-							"version=" + HttpUtility.HtmlEncode(datdata.Version) + "\n" +
-							"comment=" + HttpUtility.HtmlEncode(datdata.Comment) + "\n" +
+							"author=" + datdata.Author + "\n" +
+							"version=" + datdata.Version + "\n" +
+							"comment=" + datdata.Comment + "\n" +
 							"[DAT]\n" +
 							"version=2.50\n" +
 							"split=" + (datdata.ForceMerging == ForceMerging.Split ? "1" : "0") + "\n" +
 							"merge=" + (datdata.ForceMerging == ForceMerging.Full ? "1" : "0") + "\n" +
 							"[EMULATOR]\n" +
-							"refname=" + HttpUtility.HtmlEncode(datdata.Name) + "\n" +
-							"version=" + HttpUtility.HtmlEncode(datdata.Description) + "\n" +
+							"refname=" + datdata.Name + "\n" +
+							"version=" + datdata.Description + "\n" +
 							"[GAMES]\n";
 						break;
 					case OutputFormat.SabreDat:

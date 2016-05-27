@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Mono.Data.Sqlite;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -37,7 +36,7 @@ namespace SabreTools.Helper
 			}
 			catch (Exception)
 			{
-				return OutputFormat.ClrMamePro;
+				return OutputFormat.None;
 			}
 		}
 
@@ -60,24 +59,7 @@ namespace SabreTools.Helper
 
 			XmlTextReader xtr;
 			StringReader sr;
-			switch (GetOutputFormat(filename))
-			{
-				case OutputFormat.Xml:
-					logger.Log("XML DAT detected");
-					xtr = new XmlTextReader(filename);
-					break;
-				case OutputFormat.RomCenter:
-					logger.Log("RomCenter DAT detected");
-					sr = new StringReader(Converters.RomCenterToXML(File.ReadAllLines(filename)).ToString());
-					xtr = new XmlTextReader(sr);
-					break;
-				default:
-					logger.Log("ClrMamePro DAT detected");
-					sr = new StringReader(Converters.ClrMameProToXML(File.ReadAllLines(filename)).ToString());
-					xtr = new XmlTextReader(sr);
-					break;
-			}
-
+			xtr = new XmlTextReader(filename);
 			xtr.WhitespaceHandling = WhitespaceHandling.None;
 			xtr.DtdProcessing = DtdProcessing.Ignore;
 			return xtr;
@@ -112,6 +94,442 @@ namespace SabreTools.Helper
 				datdata.Roms = new Dictionary<string, List<RomData>>();
 			}
 
+			// Now parse the correct type of DAT
+			switch (GetOutputFormat(filename))
+			{
+				case OutputFormat.ClrMamePro:
+					return ParseCMP(filename, sysid, srcid, datdata, logger, keep);
+				case OutputFormat.RomCenter:
+					return ParseRC(filename, sysid, srcid, datdata, logger, keep);
+				case OutputFormat.SabreDat:
+				case OutputFormat.Xml:
+					return ParseXML(filename, sysid, srcid, datdata, logger, keep);
+				default:
+					return datdata;
+			}
+		}
+
+		/// <summary>
+		/// Parse a ClrMamePro DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="datdata">The DatData object representing found roms to this point</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>DatData object representing the read-in data</returns>
+		public static DatData ParseCMP(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false)
+		{
+			// Read the input file, if possible
+			logger.Log("Attempting to read file: \"" + filename + "\"");
+
+			// Check if file exists
+			if (!File.Exists(filename))
+			{
+				logger.Warning("File '" + filename + "' could not read from!");
+				return datdata;
+			}
+
+			// If it does, open a file reader
+			StreamReader sr = new StreamReader(File.OpenRead(filename));
+
+			bool block = false, superdat = false;
+			string blockname = "", gamename = "";
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				// Comments in CMP DATs start with a #
+				if (line.Trim().StartsWith("#"))
+				{
+					continue;
+				}
+
+				// If the line is the header or a game
+				if (Regex.IsMatch(line, Constants.HeaderPatternCMP))
+				{
+					GroupCollection gc = Regex.Match(line, Constants.HeaderPatternCMP).Groups;
+
+					if (gc[1].Value == "clrmamepro" || gc[1].Value == "romvault")
+					{
+						blockname = "header";
+					}
+
+					block = true;
+				}
+
+				// If the line is a rom or disk and we're in a block
+				else if ((line.Trim().StartsWith("rom (") || line.Trim().StartsWith("disk (")) && block)
+				{
+					RomData rom = new RomData
+					{
+						Game = gamename,
+						Type = (line.Trim().StartsWith("disk (") ? "disk" : "rom"),
+						SystemID = sysid,
+						SourceID = srcid,
+					};
+
+					string[] gc = line.Trim().Split(' ');
+
+					// Loop over all attributes and add them if possible
+					bool quote = false;
+					string attrib = "", val = "";
+					for (int i = 2; i < gc.Length; i++)
+					{
+						//If the item is empty, we automatically skip it because it's a fluke
+						if (gc[i].Trim() == String.Empty)
+						{
+							continue;
+						}
+						// Special case for nodump...
+						else if (gc[i] == "nodump" && attrib != "status" && attrib != "flags")
+						{
+							rom.Nodump = true;
+						}
+						// Even number of quotes, not in a quote, not in attribute
+						else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib == "")
+						{
+							attrib = gc[i].Replace("\"", "");
+						}
+						// Even number of quotes, not in a quote, in attribute
+						else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib != "")
+						{
+							switch (attrib.ToLowerInvariant())
+							{
+								case "name":
+									rom.Name = gc[i].Replace("\"", "");
+									break;
+								case "size":
+									Int64.TryParse(gc[i].Replace("\"", ""), out rom.Size);
+									break;
+								case "crc":
+									rom.CRC = gc[i].Replace("\"", "");
+									break;
+								case "md5":
+									rom.MD5 = gc[i].Replace("\"", "");
+									break;
+								case "sha1":
+									rom.SHA1 = gc[i].Replace("\"", "");
+									break;
+							}
+
+							attrib = "";
+						}
+						// Even number of quotes, in a quote, not in attribute
+						else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && quote && attrib == "")
+						{
+							// Attributes can't have quoted names
+						}
+						// Even number of quotes, in a quote, in attribute
+						else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && quote && attrib != "")
+						{
+							val += " " + gc[i];
+						}
+						// Odd number of quotes, not in a quote, not in attribute
+						else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && !quote && attrib == "")
+						{
+							// Attributes can't have quoted names
+						}
+						// Odd number of quotes, not in a quote, in attribute
+						else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && !quote && attrib != "")
+						{
+							val = gc[i].Replace("\"", "");
+							quote = true;
+						}
+						// Odd number of quotes, in a quote, not in attribute
+						else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && quote && attrib == "")
+						{
+							quote = false;
+						}
+						// Odd number of quotes, in a quote, in attribute
+						else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && quote && attrib != "")
+						{
+							val += " " + gc[i].Replace("\"", "");
+							switch (attrib.ToLowerInvariant())
+							{
+								case "name":
+									rom.Name = val;
+									break;
+								case "size":
+									Int64.TryParse(val, out rom.Size);
+									break;
+								case "crc":
+									rom.CRC = val;
+									break;
+								case "md5":
+									rom.MD5 = val;
+									break;
+								case "sha1":
+									rom.SHA1 = val;
+									break;
+							}
+
+							quote = false;
+							attrib = "";
+							val = "";
+						}
+					}
+
+					// Now add the rom to the dictionary
+					string key = rom.CRC + "-" + rom.Size;
+					if (datdata.Roms.ContainsKey(key))
+					{
+						datdata.Roms[key].Add(rom);
+					}
+					else
+					{
+						List<RomData> templist = new List<RomData>();
+						templist.Add(rom);
+						datdata.Roms.Add(key, templist);
+					}
+				}
+				// If the line is anything but a rom or disk and we're in a block
+				else if (Regex.IsMatch(line, Constants.ItemPatternCMP) && block)
+				{
+					GroupCollection gc = Regex.Match(line, Constants.ItemPatternCMP).Groups;
+
+					if (gc[1].Value == "name" && blockname != "header")
+					{
+						gamename = gc[2].Value.Replace("\"", "");
+					}
+					else
+					{
+						string itemval = gc[2].Value.Replace("\"", "");
+						switch (gc[1].Value)
+						{
+							case "name":
+								datdata.Name = (String.IsNullOrEmpty(datdata.Name) ? itemval : datdata.Name);
+								superdat = superdat || itemval.Contains(" - SuperDAT");
+								if (keep && superdat)
+								{
+									datdata.Type = (String.IsNullOrEmpty(datdata.Type) ? "SuperDAT" : datdata.Type);
+								}
+								break;
+							case "description":
+								datdata.Description = (String.IsNullOrEmpty(datdata.Description) ? itemval : datdata.Description);
+								break;
+							case "category":
+								datdata.Category = (String.IsNullOrEmpty(datdata.Category) ? itemval : datdata.Category);
+								break;
+							case "version":
+								datdata.Version = (String.IsNullOrEmpty(datdata.Version) ? itemval : datdata.Version);
+								break;
+							case "date":
+								datdata.Date = (String.IsNullOrEmpty(datdata.Date) ? itemval : datdata.Date);
+								break;
+							case "author":
+								datdata.Author = (String.IsNullOrEmpty(datdata.Author) ? itemval : datdata.Author);
+								break;
+							case "email":
+								datdata.Email = (String.IsNullOrEmpty(datdata.Email) ? itemval : datdata.Email);
+								break;
+							case "homepage":
+								datdata.Homepage = (String.IsNullOrEmpty(datdata.Homepage) ? itemval : datdata.Homepage);
+								break;
+							case "url":
+								datdata.Url = (String.IsNullOrEmpty(datdata.Url) ? itemval : datdata.Url);
+								break;
+							case "comment":
+								datdata.Comment = (String.IsNullOrEmpty(datdata.Comment) ? itemval : datdata.Comment);
+								break;
+							case "type":
+								datdata.Type = (String.IsNullOrEmpty(datdata.Type) ? itemval : datdata.Type);
+								superdat = superdat || itemval.Contains("SuperDAT");
+								break;
+							case "forcemerging":
+								switch (itemval)
+								{
+									case "none":
+										datdata.ForceMerging = ForceMerging.None;
+										break;
+									case "split":
+										datdata.ForceMerging = ForceMerging.Split;
+										break;
+									case "full":
+										datdata.ForceMerging = ForceMerging.Full;
+										break;
+								}
+								break;
+							case "forcezipping":
+								datdata.ForcePacking = (itemval == "yes" ? ForcePacking.Zip : ForcePacking.Unzip);
+								break;
+						}
+					}
+				}
+
+				// If we find an end bracket that's not associated with anything else, the block is done
+				else if (Regex.IsMatch(line, Constants.EndPatternCMP) && block)
+				{
+					block = false;
+					blockname = "";
+					gamename = "";
+				}
+			}
+
+			return datdata;
+		}
+
+		/// <summary>
+		/// Parse a RomCenter DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="datdata">The DatData object representing found roms to this point</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>DatData object representing the read-in data</returns>
+		public static DatData ParseRC(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false)
+		{
+			// Read the input file, if possible
+			logger.Log("Attempting to read file: \"" + filename + "\"");
+
+			// Check if file exists
+			if (!File.Exists(filename))
+			{
+				logger.Warning("File '" + filename + "' could not read from!");
+				return datdata;
+			}
+
+			// If it does, open a file reader
+			StreamReader sr = new StreamReader(File.OpenRead(filename));
+
+			string blocktype = "";
+			string lastgame = null;
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				// If the line is the start of the credits section
+				if (line.ToLowerInvariant().Contains("[credits]"))
+				{
+					blocktype = "credits";
+				}
+				// If the line is the start of the dat section
+				else if (line.ToLowerInvariant().Contains("[dat]"))
+				{
+					blocktype = "dat";
+				}
+				// If the line is the start of the emulator section
+				else if (line.ToLowerInvariant().Contains("[emulator]"))
+				{
+					blocktype = "emulator";
+				}
+				// If the line is the start of the game section
+				else if (line.ToLowerInvariant().Contains("[games]"))
+				{
+					blocktype = "games";
+				}
+				// Otherwise, it's not a section and it's data, so get out all data
+				else
+				{
+					// If we have an author
+					if (line.StartsWith("author="))
+					{
+						datdata.Author = (String.IsNullOrEmpty(datdata.Author) ? line.Split('=')[1] : datdata.Author);
+					}
+					// If we have one of the three version tags
+					else if (line.StartsWith("version="))
+					{
+						switch (blocktype)
+						{
+							case "credits":
+								datdata.Version = (String.IsNullOrEmpty(datdata.Version) ? line.Split('=')[1] : datdata.Version);
+								break;
+							case "emulator":
+								datdata.Description = (String.IsNullOrEmpty(datdata.Description) ? line.Split('=')[1] : datdata.Description);
+								break;
+						}
+					}
+					// If we have a comment
+					else if (line.StartsWith("comment="))
+					{
+						datdata.Comment = (String.IsNullOrEmpty(datdata.Comment) ? line.Split('=')[1] : datdata.Comment);
+					}
+					// If we have the split flag
+					else if (line.StartsWith("split="))
+					{
+						int split = 0;
+						if (Int32.TryParse(line.Split('=')[1], out split))
+						{
+							if (split == 1)
+							{
+								datdata.ForceMerging = ForceMerging.Split;
+							}
+						}
+					}
+					// If we have the merge tag
+					else if (line.StartsWith("merge="))
+					{
+						int merge = 0;
+						if (Int32.TryParse(line.Split('=')[1], out merge))
+						{
+							if (merge == 1)
+							{
+								datdata.ForceMerging = ForceMerging.Full;
+							}
+						}
+					}
+					// If we have the refname tag
+					else if (line.StartsWith("refname="))
+					{
+						datdata.Name = (String.IsNullOrEmpty(datdata.Name) ? line.Split('=')[1] : datdata.Name);
+					}
+					// If we have a rom
+					else if (line.StartsWith("¬"))
+					{
+						/*
+						The rominfo order is as follows:
+						1 - parent name
+						2 - parent description
+						3 - game name
+						4 - game description
+						5 - rom name
+						6 - rom crc
+						7 - rom size
+						8 - romof name
+						9 - merge name
+						*/
+						string[] rominfo = line.Split('¬');
+						RomData rom = new RomData
+						{
+							Game = rominfo[3],
+							Name = rominfo[5],
+							CRC = rominfo[6],
+							Size = Int64.Parse(rominfo[7]),
+							SystemID = sysid,
+							SourceID = srcid,
+						};
+
+						// Add the new rom
+						string key = rom.CRC + "-" + rom.Size;
+						if (datdata.Roms.ContainsKey(key))
+						{
+							datdata.Roms[key].Add(rom);
+						}
+						else
+						{
+							List<RomData> templist = new List<RomData>();
+							templist.Add(rom);
+							datdata.Roms.Add(key, templist);
+						}
+					}
+				}
+			}
+
+			return datdata;
+		}
+
+		/// <summary>
+		/// Parse an XML DAT (Logiqx, SabreDAT, or SL) and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="datdata">The DatData object representing found roms to this point</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>DatData object representing the read-in data</returns>
+		public static DatData ParseXML(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false)
+		{
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
 			bool superdat = false, nodump = false, empty = true;

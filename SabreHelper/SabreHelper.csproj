@@ -91,7 +91,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Constants.cs" />
-    <Compile Include="Converters.cs" />
     <Compile Include="CRC32.cs" />
     <Compile Include="DBTools.cs" />
     <Compile Include="Data\Enums.cs" />
