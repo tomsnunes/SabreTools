@@ -622,6 +622,15 @@ namespace SabreTools.Helper
 							}
 							xtr.Read();
 							break;
+						// Handle M1 DATs since they're 99% the same as a SL DAT
+						case "m1":
+							datdata.Name = (String.IsNullOrEmpty(datdata.Name) ? "M1" : datdata.Name);
+							datdata.Description = (String.IsNullOrEmpty(datdata.Description) ? "M1" : datdata.Description);
+							if (xtr.GetAttribute("version") != null)
+							{
+								datdata.Version = (String.IsNullOrEmpty(datdata.Version) ? xtr.GetAttribute("version") : datdata.Version);
+							}
+							break;
 						case "header":
 							// We want to process the entire subtree of the header
 							headreader = xtr.ReadSubtree();
