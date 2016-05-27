@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 using SabreTools.Helper;
@@ -9,6 +10,7 @@ namespace SabreTools
 	{
 		public static void Main(string[] args)
 		{
+			Console.Clear();
 			Build.Start("UncompressedSize");
 
 			List<string> inputs = new List<string>();
@@ -31,76 +33,118 @@ namespace SabreTools
 			Logger logger = new Logger(true, "uncompressedsize.log");
 			logger.Start();
 
-			long size = 0;
+			// Init all single-dat variables
+			long singleSize = 0;
+			long singleGame = 0;
+			long singleRom = 0;
+			long singleDisk = 0;
+			long singleCRC = 0;
+			long singleMD5 = 0;
+			long singleSHA1 = 0;
+			long singleNodump = 0;
+
+			// Init all total variables
+			long totalSize = 0;
+			long totalGame = 0;
+			long totalRom = 0;
+			long totalDisk = 0;
+			long totalCRC = 0;
+			long totalMD5 = 0;
+			long totalSHA1 = 0;
+			long totalNodump = 0;
+
+
 			foreach (string filename in inputs)
 			{
+				List<String> games = new List<String>();
+
 				DatData datdata = new DatData();
 				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger);
 				foreach (List<RomData> romlist in datdata.Roms.Values)
 				{
 					foreach (RomData rom in romlist)
 					{
-						size += rom.Size;
+						singleSize += rom.Size;
+						if (!games.Contains(rom.Game))
+						{
+							singleGame++;
+							games.Add(rom.Game);
+						}
+						if (rom.Type == "rom")
+						{
+							singleRom++;
+						}
+						if (rom.Type == "disk")
+						{
+							singleDisk++;
+						}
+						if (!String.IsNullOrEmpty(rom.CRC))
+						{
+							singleCRC++;
+						}
+						if (!String.IsNullOrEmpty(rom.MD5))
+						{
+							singleMD5++;
+						}
+						if (!String.IsNullOrEmpty(rom.SHA1))
+						{
+							singleSHA1++;
+						}
+						if (rom.Nodump)
+						{
+							singleNodump++;
+						}
 					}
 				}
+
+				// Output single DAT stats
+				logger.User(@"For file '" + filename + @"':
+--------------------------------------------------
+    Uncompressed size:       " + Style.GetBytesReadable(singleSize) + @"
+    Games found:             " + singleGame + @"
+    Roms found:              " + singleRom + @"
+    Disks found:             " + singleDisk + @"
+    Roms with CRC:           " + singleCRC + @"
+    Roms with MD5:           " + singleMD5 + @"
+    Roms with SHA-1:         " + singleSHA1 + @"
+    Roms with Nodump status: " + singleNodump + @"
+");
+
+				// Add single DAT stats to totals
+				totalSize += singleSize;
+				totalGame += singleGame;
+				totalRom += singleRom;
+				totalDisk += singleDisk;
+				totalCRC += singleCRC;
+				totalMD5 += singleMD5;
+				totalSHA1 += singleSHA1;
+				totalNodump += singleNodump;
+
+				// Reset single DAT stats
+				singleSize = 0;
+				singleGame = 0;
+				singleRom = 0;
+				singleDisk = 0;
+				singleCRC = 0;
+				singleMD5 = 0;
+				singleSHA1 = 0;
+				singleNodump = 0;
 			}
 
-			logger.User("The total file size is: " + GetBytesReadable(size));
+			// Output total DAT stats
+			logger.User(@"For ALL DATs found
+--------------------------------------------------
+    Uncompressed size:       " + Style.GetBytesReadable(totalSize) + @"
+    Games found:             " + totalGame + @"
+    Roms found:              " + totalRom + @"
+    Disks found:             " + totalDisk + @"
+    Roms with CRC:           " + totalCRC + @"
+    Roms with MD5:           " + totalMD5 + @"
+    Roms with SHA-1:         " + totalSHA1 + @"
+    Roms with Nodump status: " + totalNodump + @"
+
+For all individual stats, check the log folder for a complete list");
 			logger.Close();
-		}
-
-		/// <summary>
-		///  Returns the human-readable file size for an arbitrary, 64-bit file size 
-		/// The default format is "0.### XB", e.g. "4.2 KB" or "1.434 GB"
-		/// </summary>
-		/// <param name="input"></param>
-		/// <returns>Human-readable file size</returns>
-		/// <link>http://www.somacon.com/p576.php</link>
-		public static string GetBytesReadable(long input)
-		{
-			// Get absolute value
-			long absolute_i = (input < 0 ? -input : input);
-			// Determine the suffix and readable value
-			string suffix;
-			double readable;
-			if (absolute_i >= 0x1000000000000000) // Exabyte
-			{
-				suffix = "EB";
-				readable = (input >> 50);
-			}
-			else if (absolute_i >= 0x4000000000000) // Petabyte
-			{
-				suffix = "PB";
-				readable = (input >> 40);
-			}
-			else if (absolute_i >= 0x10000000000) // Terabyte
-			{
-				suffix = "TB";
-				readable = (input >> 30);
-			}
-			else if (absolute_i >= 0x40000000) // Gigabyte
-			{
-				suffix = "GB";
-				readable = (input >> 20);
-			}
-			else if (absolute_i >= 0x100000) // Megabyte
-			{
-				suffix = "MB";
-				readable = (input >> 10);
-			}
-			else if (absolute_i >= 0x400) // Kilobyte
-			{
-				suffix = "KB";
-				readable = input;
-			}
-			else
-			{
-				return input.ToString("0 B"); // Byte
-			}
-			// Divide by 1024 to get fractional value
-			readable = (readable / 1024);
-			// Return formatted number with suffix
-			return readable.ToString("0.### ") + suffix;
 		}
 	}
 }
