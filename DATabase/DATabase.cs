@@ -693,6 +693,7 @@ Make a selection:
     4) Merge, diff, and/or dedup 2 or more DAT files
     5) Split DAT using 2 extensions
     6) Split DATs by best available hash values
+    7) Get statistics on a DAT or folder of DATs
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -716,6 +717,9 @@ Make a selection:
 						break;
 					case "6":
 						HashSplitMenu();
+						break;
+					case "7":
+						StatsMenu();
 						break;
 				}
 			}
@@ -1139,6 +1143,52 @@ Make a selection:
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; outdir = "";
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Show the text-based Stats menu
+		/// </summary>
+		private static void StatsMenu()
+		{
+			string selection = "", input = "";
+			bool single = false;
+			while (selection.ToLowerInvariant() != "b")
+			{
+				Console.Clear();
+				Build.Start("DATabase");
+				Console.WriteLine(@"STATISTICS MENU
+===========================
+Make a selection:
+
+    1) File or folder to get stats on" + (input != "" ? ":\n\t" + input : "") + @"
+    2) " + (single ? "Don't show individual DAT statistics" : "Show individual DAT statistics") + @"
+    3) Get stats on the file(s)
+    B) Go back to the previous menu
+");
+				Console.Write("Enter selection: ");
+				selection = Console.ReadLine();
+				switch (selection)
+				{
+					case "1":
+						Console.Clear();
+						Console.Write("Please enter the file or folder name: ");
+						input = Console.ReadLine();
+						break;
+					case "2":
+						single = !single;
+						break;
+					case "3":
+						Console.Clear();
+						List<string> inputs = new List<string>();
+						inputs.Add(input);
+						InitStats(inputs, single);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						input = "";
+						single = false;
 						break;
 				}
 			}
@@ -1653,6 +1703,34 @@ Make a selection:
 			// If so, run the program
 			HashSplit hs = new HashSplit(inputs, outdir, logger);
 			hs.Split();
+		}
+
+		/// <summary>
+		/// Wrap getting statistics on a DAT or folder of DATs
+		/// </summary>
+		/// <param name="inputs">List of inputs to be used</param>
+		/// <param name="single">True to show individual DAT statistics, false otherwise</param>
+		private static void InitStats(List<string> inputs, bool single)
+		{
+			List<string> newinputs = new List<string>();
+
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input.Replace("\"", "")))
+				{
+					newinputs.Add(input.Replace("\"", ""));
+				}
+				if (Directory.Exists(input.Replace("\"", "")))
+				{
+					foreach (string file in Directory.GetFiles(input.Replace("\"", ""), "*", SearchOption.AllDirectories))
+					{
+						newinputs.Add(file.Replace("\"", ""));
+					}
+				}
+			}
+
+			Stats stats = new Stats(inputs, single, logger);
+			stats.Process();
 		}
 
 		/// <summary>

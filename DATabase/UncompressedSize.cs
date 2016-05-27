@@ -6,33 +6,36 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
+	/// <summary>
+	/// Get statistics on one or more DAT files
+	/// </summary>
+	/// <remarks>Finish making this a proper object then port to DATabase (-st, --stats)</remarks>
 	public class UncompressedSize
 	{
-		public static void Main(string[] args)
+		// Private instance variables
+		private List<String> _inputs;
+		private bool _single;
+		private Logger _logger;
+
+		/// <summary>
+		/// Create a new UncompressedSize object
+		/// </summary>
+		/// <param name="inputs">List of files and folders to parse</param>
+		/// <param name="single">True if single DAT stats are output, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		public UncompressedSize(List<String> inputs, bool single, Logger logger)
 		{
-			Console.Clear();
-			Build.Start("UncompressedSize");
+			_inputs = inputs;
+			_single = single;
+			_logger = logger;
+		}
 
-			List<string> inputs = new List<string>();
-
-			foreach (string arg in args)
-			{
-				if (File.Exists(arg.Replace("\"", "")))
-				{
-					inputs.Add(arg.Replace("\"", ""));
-				}
-				if (Directory.Exists(arg.Replace("\"", "")))
-				{
-					foreach (string file in Directory.GetFiles(arg.Replace("\"", ""), "*", SearchOption.AllDirectories))
-					{
-						inputs.Add(file.Replace("\"", ""));
-					}
-				}
-			}
-
-			Logger logger = new Logger(true, "uncompressedsize.log");
-			logger.Start();
-
+		/// <summary>
+		/// Output all requested statistics
+		/// </summary>
+		/// <returns>True if output succeeded, false otherwise</returns>
+		public bool Process()
+		{
 			// Init all single-dat variables
 			long singleSize = 0;
 			long singleGame = 0;
@@ -53,13 +56,13 @@ namespace SabreTools
 			long totalSHA1 = 0;
 			long totalNodump = 0;
 
-
-			foreach (string filename in inputs)
+			/// Now process each of the input files
+			foreach (string filename in _inputs)
 			{
 				List<String> games = new List<String>();
 
 				DatData datdata = new DatData();
-				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger);
+				datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger);
 				foreach (List<RomData> romlist in datdata.Roms.Values)
 				{
 					foreach (RomData rom in romlist)
@@ -97,8 +100,10 @@ namespace SabreTools
 					}
 				}
 
-				// Output single DAT stats
-				logger.User(@"For file '" + filename + @"':
+				// Output single DAT stats (if asked)
+				if (_single)
+				{
+					_logger.User(@"For file '" + filename + @"':
 --------------------------------------------------
     Uncompressed size:       " + Style.GetBytesReadable(singleSize) + @"
     Games found:             " + singleGame + @"
@@ -109,6 +114,7 @@ namespace SabreTools
     Roms with SHA-1:         " + singleSHA1 + @"
     Roms with Nodump status: " + singleNodump + @"
 ");
+				}
 
 				// Add single DAT stats to totals
 				totalSize += singleSize;
@@ -132,7 +138,7 @@ namespace SabreTools
 			}
 
 			// Output total DAT stats
-			logger.User(@"For ALL DATs found
+			_logger.User(@"For ALL DATs found
 --------------------------------------------------
     Uncompressed size:       " + Style.GetBytesReadable(totalSize) + @"
     Games found:             " + totalGame + @"
@@ -143,8 +149,9 @@ namespace SabreTools
     Roms with SHA-1:         " + totalSHA1 + @"
     Roms with Nodump status: " + totalNodump + @"
 
-For all individual stats, check the log folder for a complete list");
-			logger.Close();
+Please check the log folder if the stats scrolled offscreen");
+
+			return true;
 		}
 	}
 }

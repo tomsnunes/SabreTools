@@ -112,6 +112,7 @@
     <Compile Include="MergeDiff.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TrimMerge.cs" />
+    <Compile Include="UncompressedSize.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
