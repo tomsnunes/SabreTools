@@ -69,6 +69,7 @@ namespace SabreTools
 				genall = false,
 				hashsplit = false,
 				import = false,
+				inplace = false,
 				listsrc = false,
 				listsys = false,
 				merge = false,
@@ -177,6 +178,10 @@ namespace SabreTools
 					case "-i":
 					case "--import":
 						import = true;
+						break;
+					case "-ip":
+					case "--inplace":
+						inplace = true;
 						break;
 					case "-lso":
 					case "--list-sources":
@@ -477,7 +482,7 @@ namespace SabreTools
 			// Merge, diff, and dedupe at least 2 DATs
 			else if (merge || diff)
 			{
-				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade);
+				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace);
 			}
 
 			// Split a DAT by available hashes
@@ -941,7 +946,7 @@ Make a selection:
 		private static void MergeDiffMenu()
 		{
 			string selection = "", input = "", name = "", desc = "", cat = "", version = "", author = "";
-			bool dedup = false, diff = false, bare = false, forceunpack = false, old = false, superdat = false, cascade = false;
+			bool dedup = false, diff = false, bare = false, forceunpack = false, old = false, superdat = false, cascade = false, inplace = false;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
@@ -956,14 +961,14 @@ Make a selection:
     4) Category" + (cat != "" ? ":\t" + cat : "") + @"
     5) Version" + (version != "" ? ":\t" + version : "") + @"
     6) Author" + (author != "" ? ":\t" + author : "") + @"
-    7) " + (dedup ? "Don't dedup files in output" : "Dedup files in output") + @"
-    8) " + (diff ? "Only merge the input files" : "Diff the input files") + @"
+    7) " + (dedup ? "Don't dedup files in output" : "Dedup files in output") + @"    8) " + (diff ? "Only merge the input files" : "Diff the input files") + @"
     9) " + (bare ? "Don't append the date to the name" : "Append the date to the name") + @"
     10) " + (forceunpack ? "Remove 'forcepacking=\"unzip\"' from output" : "Add 'forcepacking=\"unzip\"' to output") + @"
     11) " + (old ? "Enable XML output" : "Enable ClrMamePro output") + @"
     12) " + (superdat ? "Disable SuperDAT output" : "Enable SuperDAT output") + @"
     13) " + (cascade ? "Disable cascaded diffing (only if diff enabled)" : "Enable cascaded diffing (only if diff enabled)") + @"
-    14) Merge the DATs
+    14) " + (inplace ? "Disable inplace diffing (only if cascade enabled)" : "Enable inplace diffing (only if cascade enabled)") + @"
+    15) Process the DAT(s)
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -1022,9 +1027,12 @@ Make a selection:
 						cascade = !cascade;
 						break;
 					case "14":
+						inplace = !inplace;
+						break;
+					case "15":
 						Console.Clear();
 						List<string> inputs = new List<string>(input.Split(';'));
-						InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade);
+						InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						selection = ""; input = ""; name = ""; desc = ""; cat = ""; version = ""; author = "";
@@ -1549,8 +1557,9 @@ Make a selection:
 		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
 		/// <param name="superdat">True if DATs should be merged in SuperDAT style, false otherwise</param>
 		/// <param name="cascade">True if the outputted diffs should be cascaded, false otherwise</param>
+		/// <param name="inplace">True if cascaded diffs overwrite the source files, false otherwise</param>
 		private static void InitMergeDiff(List<string> inputs, string name, string desc, string cat, string version, string author,
-			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade)
+			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, bool inplace)
 		{
 			// Make sure there are no folders in inputs
 			List<string> newInputs = new List<string>();
@@ -1583,7 +1592,7 @@ Make a selection:
 				}
 			}
 
-			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, false /*inplace */, logger);
+			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, logger);
 			md.Process();
 		}
 
