@@ -115,6 +115,7 @@ namespace SabreTools
 			DatData userData = new DatData
 			{
 				Roms = new Dictionary<string, List<RomData>>(),
+				MergeRoms = _dedup,
 			};
 			foreach (string input in _inputs)
 			{
