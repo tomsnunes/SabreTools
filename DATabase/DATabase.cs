@@ -1747,8 +1747,11 @@ Make a selection:
 				}
 			}
 
-			Stats stats = new Stats(newinputs, single, logger);
+			Logger statlog = new Logger(true, "stats.txt");
+			statlog.Start();
+			Stats stats = new Stats(newinputs, single, statlog);
 			stats.Process();
+			statlog.Close();
 		}
 
 		/// <summary>
