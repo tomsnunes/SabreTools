@@ -107,29 +107,63 @@ namespace SabreTools
 				_author = "SabreTools";
 			}
 
+			// For inplace use only
+			List<DatData> datHeaders = new List<DatData>();
+
 			// Create a dictionary of all ROMs from the input DATs
 			int i = 0;
 			DatData userData = new DatData
 			{
-				FileName = _desc,
-				Name = _name,
-				Description = _desc,
-				Version = _version,
-				Date = _date,
-				Category = _cat,
-				Author = _author,
-				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-				MergeRoms = _dedup,
 				Roms = new Dictionary<string, List<RomData>>(),
-				Type = (_superdat ? "SuperDAT" : ""),
 			};
 			foreach (string input in _inputs)
 			{
 				_logger.User("Adding DAT: " + input.Split('¬')[0]);
 				userData = RomManipulation.Parse(input.Split('¬')[0], i, 0, userData, _logger);
 				i++;
+
+				// If we are in inplace mode, save the DAT data
+				if (_inplace)
+				{
+					datHeaders.Add(new DatData
+					{
+						FileName = Path.GetFullPath(userData.FileName),
+						Name = userData.Name,
+						Description = userData.Description,
+						Version = userData.Version,
+						Date = userData.Date,
+						Category = userData.Category,
+						Author = userData.Author,
+						ForcePacking = userData.ForcePacking,
+						OutputFormat = userData.OutputFormat,
+						Type = userData.Type,
+					});
+
+					// Reset the header values so the next can be captured
+					userData.FileName = "";
+					userData.Name = "";
+					userData.Description = "";
+					userData.Version = "";
+					userData.Date = "";
+					userData.Category = "";
+					userData.Author = "";
+					userData.ForcePacking = ForcePacking.None;
+					userData.OutputFormat = OutputFormat.Xml;
+					userData.Type = "";
+				}
 			}
+
+			// Set the output values
+			userData.FileName = _desc;
+			userData.Name = _name;
+			userData.Description = _desc;
+			userData.Version = _version;
+			userData.Date = _date;
+			userData.Category = _cat;
+			userData.Author = _author;
+			userData.ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None);
+			userData.OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml);
+			userData.Type = (_superdat ? "SuperDAT" : "");
 
 			// Modify the Dictionary if necessary and output the results
 			string post = "";
@@ -269,20 +303,31 @@ namespace SabreTools
 				for (int j = 0; j < _inputs.Count; j++)
 				{
 					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
-					DatData diffData = new DatData
+					DatData diffData;
+					
+					// If we're in inplace mode, take the appropriate DatData object already stored
+					if (_inplace)
 					{
-						FileName = _desc + post,
-						Name = _name + post,
-						Description = _desc + post,
-						Version = _version,
-						Date = _date,
-						Category = _cat,
-						Author = _author,
-						ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-						OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-						MergeRoms = _dedup,
-						Roms = new Dictionary<string, List<RomData>>(),
-					};
+						diffData = datHeaders[j];
+					}
+					else
+					{
+						diffData = new DatData
+						{
+							FileName = _desc + post,
+							Name = _name + post,
+							Description = _desc + post,
+							Version = _version,
+							Date = _date,
+							Category = _cat,
+							Author = _author,
+							ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+							OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+							MergeRoms = _dedup,
+						};
+					}
+
+					diffData.Roms = new Dictionary<string, List<RomData>>();
 
 					List<string> keys = userData.Roms.Keys.ToList();
 					foreach (string key in keys)
@@ -313,7 +358,7 @@ namespace SabreTools
 						userData.Roms[key] = newroms;
 					}
 
-					Output.WriteDatfile(diffData, "", _logger);
+					Output.WriteDatfile(diffData, (_inplace ? _inputs[j].Split('¬')[1] : ""), _logger);
 				}
 			}
 			// Output all entries with user-defined merge

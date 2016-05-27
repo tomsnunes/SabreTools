@@ -1574,7 +1574,7 @@ Make a selection:
 				{
 					try
 					{
-						newInputs.Add(Path.GetFullPath(input.Replace("\"", "") + "¬"));
+						newInputs.Add(Path.GetFullPath(input.Replace("\"", "")) + "¬" + Path.GetFullPath(input.Replace("\"", "")));
 					}
 					catch (PathTooLongException)
 					{
