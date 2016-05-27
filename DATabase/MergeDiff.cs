@@ -127,7 +127,7 @@ namespace SabreTools
 				{
 					datHeaders.Add(new DatData
 					{
-						FileName = Path.GetFullPath(userData.FileName),
+						FileName = userData.FileName,
 						Name = userData.Name,
 						Description = userData.Description,
 						Version = userData.Version,
@@ -148,7 +148,7 @@ namespace SabreTools
 					userData.Category = "";
 					userData.Author = "";
 					userData.ForcePacking = ForcePacking.None;
-					userData.OutputFormat = OutputFormat.Xml;
+					userData.OutputFormat = OutputFormat.None;
 					userData.Type = "";
 				}
 			}

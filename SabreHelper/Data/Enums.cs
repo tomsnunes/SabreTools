@@ -99,7 +99,8 @@ namespace SabreTools.Helper
 	/// </summary>
 	public enum OutputFormat
 	{
-		Xml = 0,
+		None = 0,
+		Xml,
 		ClrMamePro,
 		RomCenter,
 		DOSCenter,

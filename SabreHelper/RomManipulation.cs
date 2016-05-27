@@ -100,6 +100,12 @@ namespace SabreTools.Helper
 				datdata.FileName = Path.GetFileNameWithoutExtension(filename);
 			}
 
+			// If the output type isn't set already, get the internal output type
+			if (datdata.OutputFormat == OutputFormat.None)
+			{
+				datdata.OutputFormat = GetOutputFormat(filename);
+			}
+
 			// Make sure there's a dictionary to read to
 			if (datdata.Roms == null)
 			{
