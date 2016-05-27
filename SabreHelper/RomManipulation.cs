@@ -192,6 +192,17 @@ namespace SabreTools.Helper
 
 					switch (xtr.Name)
 					{
+						// New software lists have this behavior
+						case "softwarelist":
+							if (xtr.GetAttribute("name") != null)
+							{
+								datdata.Name = (String.IsNullOrEmpty(datdata.Name) ? xtr.GetAttribute("name") : datdata.Name);
+							}
+							if (xtr.GetAttribute("description") != null)
+							{
+								datdata.Description = (String.IsNullOrEmpty(datdata.Description) ? xtr.GetAttribute("description") : datdata.Description);
+							}
+							break;
 						case "header":
 							// We want to process the entire subtree of the header
 							headreader = xtr.ReadSubtree();
