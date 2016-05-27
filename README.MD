@@ -33,6 +33,7 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 			<li>Optionally merge the output DAT so no partial duplicates are included</li>
 		</ul>
 	</li>
+	<li>Get various statistics on a DAT or folder of DATs including number of roms, disks, and even total size in a human readable format (formerly <i>UncompressedSize</i>; additions requested by Obiwantje)</li>
 	<li>Add and remove sources and systems from the database</li>
 	<li>Retrieve a list of all sources and systems that are available</li>
 </ul>
@@ -48,10 +49,12 @@ A simple auxilary tool that detects and removes headers and also restores header
 <ul>
 	<li>Atari 7800</li>
 	<li>Atari Lynx</li>
+	<li>Commodore 64 PSID music</li>
 	<li>NEC PC-Engine / TurboGrafx 16</li>
 	<li>Nintendo Famicom Disk System</li>
 	<li>Nintendo Entertainment System / Famicom</li>
 	<li>Super Nintendo Entertainment System / Super Famicom</li>
+	<li>Super Nintendo Entertainment System / Super Famicom SPC music</li>
 </ul>
 The saved headers are currently stored in a database; multiple headers allowed per file.
 
@@ -72,6 +75,10 @@ This section is for tools that have been requested for a highly specific purpose
 
 <!-- <b>There are no tools that are for power users at this time.</b> -->
 
+<b>Filter</b>
+<p/>
+This tool allows you to split a DAT or folder of DATs by the "best available" hash. The order of preference for hashes is as follows: Nodump status, SHA-1, MD5, CRC. This can show where gaps in file information lay and allow users to fix them without having to scan manually.
+
 <b>OfflineMerge</b>
 <p/>
 This tool is meant to help users who want to keep their hard drives offline and still be up to date on what they have in their collection and what they need.
@@ -79,10 +86,6 @@ This tool is meant to help users who want to keep their hard drives offline and 
 	<li>Take a current merged DAT, a current missing DAT, and a new merged DAT and get all new files, files to remove, and a new missing DAT</li>
 	<li>Set all hash values to 0-byte equivalents for rom managers</li>
 </ul>
-
-<b>UncompressedSize</b>
-<p/>
-This tool allows a user to determine the entire uncompressed filesize (including human-readable output such as KB, MB, etc.) of a DAT or folder of DATs. This is very useful for those fortunate enough to have the space to keep their files uncompressed and also provdes a good baseline for maximum space a set will take up.
 
 <h3>Licensing</h3>
 <p/>
