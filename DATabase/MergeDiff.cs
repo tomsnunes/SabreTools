@@ -316,7 +316,7 @@ namespace SabreTools
 					DatData diffData;
 					
 					// If we're in inplace mode, take the appropriate DatData object already stored
-					if (_inplace)
+					if (_inplace || !String.IsNullOrEmpty(_outdir))
 					{
 						diffData = datHeaders[j];
 					}
