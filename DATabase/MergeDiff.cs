@@ -28,6 +28,7 @@ namespace SabreTools
 		private string _cat;
 		private string _version;
 		private string _author;
+		private string _outdir;
 
 		// Other required variables
 		private string _date = DateTime.Now.ToString("yyyy-MM-dd");
@@ -51,9 +52,10 @@ namespace SabreTools
 		/// <param name="superdat">True if DATs should be parsed into SuperDAT format, false otherwise</param>
 		/// <param name="cascade">True if the outputted diffs should be cascaded, false otherwise</param>
 		/// <param name="inplace">True if cascaded diffs overwrite the source files, false otherwise</param>
+		/// <param name="outdir">New output directory for outputted DATs (blank means default)</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		public MergeDiff(List<String> inputs, string name, string desc, string cat, string version, string author,
-			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, bool inplace, Logger logger)
+			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, bool inplace, string outdir, Logger logger)
 		{
 			_inputs = inputs;
 			_name = name;
@@ -69,6 +71,7 @@ namespace SabreTools
 			_superdat = superdat;
 			_cascade = cascade;
 			_inplace = inplace;
+			_outdir = outdir.Replace("\"", "");
 			_logger = logger;
 		}
 
@@ -211,7 +214,7 @@ namespace SabreTools
 				}
 
 				// Output the difflist (a-b)+(b-a) diff
-				Output.WriteDatfile(outerDiffData, "", _logger);
+				Output.WriteDatfile(outerDiffData, _outdir, _logger);
 
 				// For the AB mode-style diffs, get all required dictionaries and output with a new name
 				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
@@ -253,7 +256,7 @@ namespace SabreTools
 						}
 					}
 
-					Output.WriteDatfile(diffData, "", _logger);
+					Output.WriteDatfile(diffData, _outdir, _logger);
 				}
 
 				// Get all entries that have External dupes
@@ -295,7 +298,7 @@ namespace SabreTools
 					}
 				}
 
-				Output.WriteDatfile(dupeData, "", _logger);
+				Output.WriteDatfile(dupeData, _outdir, _logger);
 			}
 			// If we're in cascade and diff, output only cascaded diffs
 			else if (_diff && _cascade)
@@ -359,7 +362,18 @@ namespace SabreTools
 						userData.Roms[key] = newroms;
 					}
 
-					Output.WriteDatfile(diffData, (_inplace ? _inputs[j].Split('¬')[1] : ""), _logger);
+					// If we have an output directory set, replace the path
+					string path = "";
+					if (_inplace)
+					{
+						path = Path.GetDirectoryName(_inputs[j].Split('¬')[0]);
+					}
+					else if (!String.IsNullOrEmpty(_outdir))
+					{
+						path = _outdir + (_inputs[j].Split('¬')[0].Remove(0, _inputs[j].Split('¬')[1].Length));
+					}
+
+					Output.WriteDatfile(diffData, path, _logger);
 				}
 			}
 			// Output all entries with user-defined merge
@@ -388,7 +402,7 @@ namespace SabreTools
 					}
 				}
 
-				Output.WriteDatfile(userData, "", _logger);
+				Output.WriteDatfile(userData, _outdir, _logger);
 			}
 
 			return true;

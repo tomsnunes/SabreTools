@@ -494,7 +494,7 @@ namespace SabreTools
 			// Merge, diff, and dedupe at least 2 DATs
 			else if (merge || diff)
 			{
-				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace);
+				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir);
 			}
 
 			// Split a DAT by available hashes
@@ -1627,7 +1627,7 @@ Make a selection:
 		/// <param name="cascade">True if the outputted diffs should be cascaded, false otherwise</param>
 		/// <param name="inplace">True if cascaded diffs overwrite the source files, false otherwise</param>
 		private static void InitMergeDiff(List<string> inputs, string name, string desc, string cat, string version, string author,
-			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, bool inplace)
+			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, bool inplace, string outdir = "")
 		{
 			// Make sure there are no folders in inputs
 			List<string> newInputs = new List<string>();
@@ -1639,7 +1639,7 @@ Make a selection:
 					{
 						try
 						{
-							newInputs.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(file.Replace("\"", "")));
+							newInputs.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(input.Replace("\"", "")));
 						}
 						catch (PathTooLongException)
 						{
@@ -1660,7 +1660,7 @@ Make a selection:
 				}
 			}
 
-			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, logger);
+			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir, logger);
 			md.Process();
 		}
 
