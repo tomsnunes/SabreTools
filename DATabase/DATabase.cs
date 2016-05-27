@@ -1639,7 +1639,7 @@ Make a selection:
 					{
 						try
 						{
-							newInputs.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(input.Replace("\"", "")));
+							newInputs.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(file.Replace("\"", "")));
 						}
 						catch (PathTooLongException)
 						{
