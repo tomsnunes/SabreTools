@@ -101,7 +101,7 @@
     <Compile Include="RomManipulation.cs" />
     <Compile Include="Data\Structs.cs" />
     <Compile Include="Style.cs" />
-    <Compile Include="Build.cs" />
+    <Compile Include="Data\Build.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DATabase.sqlite">
