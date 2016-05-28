@@ -11,12 +11,28 @@ namespace SabreTools
 	/// <summary>
 	/// Entry class for the DATabase application
 	/// </summary>
+	/// <remarks>
+	/// The following features are missing from DATabaseTwo with respect to the original DATabase:
+	/// - Source merging
+	/// - Custom DATs based on a system and a source
+	/// - Multi-source and multi-system DATs
+	/// 
+	/// The following features need to (want to) be implemented in DATabaseTwo for further stability
+	/// - Import updating file locations and names when SHA-1 hashes are matched
+	/// - True duplicate DATs being removed from the import folder (SHA-1 matches)
+	/// - Generate All only generating DATs that have been recently updated
+	///		+ This requires implementing a "last updated" data point for all DATs and tracking for "last generate" somewhere
+	/// - Impelement a ToSort folder for DATs that will place DATs in the correct subfolder on Import
+	/// </remarks>
 	public class DATabase
 	{
-		private static Logger logger;
-		private static string _dbName = "DATabase.sqlite";
-		//private static string _dbName = "SabreTools.sqlite";
+		// Private required variables
+		private static string _datroot = "DATS";
+		private static string _outroot = "Output";
+		private static string _dbName = "dats.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
+
+		private static Logger _logger;
 
 		/// <summary>
 		/// Start menu or use supplied parameters
@@ -25,8 +41,8 @@ namespace SabreTools
 		public static void Main(string[] args)
 		{
 			// Perform initial setup and verification
-			logger = new Logger(true, "database.log");
-			logger.Start();
+			_logger = new Logger(true, "database.log");
+			_logger.Start();
 			DBTools.EnsureDatabase(_dbName, _connectionString);
 			Remapping.CreateRemappings();
 			Console.Clear();
@@ -35,7 +51,7 @@ namespace SabreTools
 			if ((new List<string>(args)).Contains("--credits"))
 			{
 				Build.Credits();
-				logger.Close();
+				_logger.Close();
 				return;
 			}
 
@@ -43,7 +59,7 @@ namespace SabreTools
 			if (args.Length == 0)
 			{
 				ShowMainMenu();
-				logger.Close();
+				_logger.Close();
 				return;
 			}
 
@@ -66,6 +82,7 @@ namespace SabreTools
 				generate = false,
 				genall = false,
 				hashsplit = false,
+				ignore = false,
 				import = false,
 				inplace = false,
 				listsrc = false,
@@ -178,6 +195,10 @@ namespace SabreTools
 					case "-i":
 					case "--import":
 						import = true;
+						break;
+					case "-ig":
+					case "--ignore":
+						ignore = true;
 						break;
 					case "-ip":
 					case "--inplace":
@@ -321,10 +342,10 @@ namespace SabreTools
 						}
 						else
 						{
-							logger.Error("Invalid input detected: " + arg);
+							_logger.Error("Invalid input detected: " + arg);
 							Console.WriteLine();
 							Build.Help();
-							logger.Close();
+							_logger.Close();
 							return;
 						}
 						break;
@@ -341,9 +362,9 @@ namespace SabreTools
 			if (help || !(add ^ (convertMiss || romba) ^ convertCMP ^ convertRC ^ convertSD ^ convertXml ^ extsplit ^ generate ^ 
 				genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^ rem ^ stats ^ trim))
 			{
-				logger.Error("Only one feature switch is allowed at a time");
+				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
-				logger.Close();
+				_logger.Close();
 				return;
 			}
 
@@ -351,9 +372,9 @@ namespace SabreTools
 			if (inputs.Count == 0 && ((convertMiss || romba) || convertCMP || convertRC || convertSD
 				|| convertXml || extsplit || hashsplit || import || (merge || diff) || stats || trim))
 			{
-				logger.Error("This feature requires at least one input");
+				_logger.Error("This feature requires at least one input");
 				Build.Help();
-				logger.Close();
+				_logger.Close();
 				return;
 			}
 
@@ -362,22 +383,21 @@ namespace SabreTools
 			// Import a file or folder
 			if (import)
 			{
-				foreach (string input in inputs)
-				{
-					InitImport(input);
-				}
+				InitImport(ignore);
 			}
 
 			// Generate a DAT
 			else if (generate)
 			{
-				InitGenerate(systems, sources, outdir, norename, old);
+				InitImport(ignore);
+				InitGenerate(systems, norename, old);
 			}
 
 			// Generate all DATs
 			else if (genall)
 			{
-				InitGenerateAll(outdir, norename, old);
+				InitImport(ignore);
+				InitGenerateAll(norename, old);
 			}
 
 			// List all available sources
@@ -507,7 +527,7 @@ namespace SabreTools
 				InitStats(inputs, single);
 			}
 
-			logger.Close();
+			_logger.Close();
 			return;
 		}
 
@@ -529,8 +549,8 @@ namespace SabreTools
 Make a selection:
 
     1) Show command line usage
-    2) Import a DAT file or folder
-    3) Generate DAT files
+    2) Check for new or changed DATs
+    3) Generate System DATs
     4) DAT file tools
     5) List all available sources
     6) List all available systems
@@ -593,21 +613,33 @@ Make a selection:
 		private static void ImportMenu()
 		{
 			string selection = "";
+			bool ignore = false;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
-				Build.Start("DATabase");
+				Build.Start("DATabaseTwo");
 				Console.WriteLine(@"IMPORT MENU
 ===========================
-Enter the name of a DAT file or folder containing DAT files
-or 'b' to go back to the previous menu:");
+Make a selection:
+
+    1) " + (ignore ? "Enable new source prompt" : "Disable new source prompt") + @"
+    2) Begin import process
+    B) Go back to the previous menu
+");
 				Console.Write("Enter selection: ");
 				selection = Console.ReadLine();
-				if (selection.ToLowerInvariant() != "b")
+				switch (selection)
 				{
-					InitImport(selection);
-					Console.Write("\nPress any key to continue...");
-					Console.ReadKey();
+					case "1":
+						ignore = !ignore;
+						break;
+					case "2":
+						Console.Clear();
+						InitImport(ignore);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						ignore = false;
+						break;
 				}
 			}
 			return;
@@ -618,23 +650,21 @@ or 'b' to go back to the previous menu:");
 		/// </summary>
 		private static void GenerateMenu()
 		{
-			string selection = "", systems = "", sources = "", outdir = "";
+			string selection = "", system = "";
 			bool norename = false, old = false;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
-				Build.Start("DATabase");
+				Build.Start("DATabaseTwo");
 				Console.WriteLine(@"GENERATE MENU
 ===========================
 Make a selection:
 
     1) " + (norename ? "Enable game renaming" : "Disable game renaming") + @"
     2) " + (old ? "Enable XML output" : "Enable ClrMamePro output") + @"
-    3) List of systems to generate from" + (systems != "" ? ": " + systems : "") + @"
-    4) List of sources to generate from" + (sources != "" ? ": " + sources : "") + @"
-    5) Enter an output folder" + (outdir != "" ? ":\n\t" + outdir : "") + @"
-    6) Generate the DAT file
-    7) Generate all available DAT files
+    3) System ID to generate from" + (system != "" ? ": " + system : "") + @"
+    4) Generate the DAT file for the specified system
+    5) Generate all DAT files
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -650,34 +680,23 @@ Make a selection:
 					case "3":
 						Console.Clear();
 						ListSystems();
-						Console.Write("Please enter the systems separated by commas: ");
-						systems = Console.ReadLine();
+						Console.Write("Please enter the System ID: ");
+						system = Console.ReadLine();
 						break;
 					case "4":
 						Console.Clear();
-						ListSources();
-						Console.Write("Please enter the sources separated by commas: ");
-						sources = Console.ReadLine();
+						InitGenerate(system, norename, old);
+						Console.Write("\nPress any key to continue...");
+						Console.ReadKey();
+						system = "";
+						norename = false; old = false;
 						break;
 					case "5":
 						Console.Clear();
-						Console.Write("Please enter a folder name: ");
-						outdir = Console.ReadLine();
-						break;
-					case "6":
-						Console.Clear();
-						InitGenerate(systems, sources, outdir, norename, old);
+						InitGenerateAll(norename, old);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
-						systems = ""; sources = ""; outdir = "";
-						norename = false; old = false;
-						break;
-					case "7":
-						Console.Clear();
-						InitGenerateAll(outdir, norename, old);
-						Console.Write("\nPress any key to continue...");
-						Console.ReadKey();
-						systems = ""; sources = ""; outdir = "";
+						system = "";
 						norename = false; old = false;
 						break;
 				}
@@ -1267,7 +1286,7 @@ Make a selection:
 						break;
 					case "4":
 						Console.Clear();
-						ListSystems(true);
+						ListSystems();
 						Console.Write("Please enter the system: ");
 						InitRemoveSystem(Console.ReadLine());
 						Console.Write("\nPress any key to continue...");
@@ -1284,73 +1303,38 @@ Make a selection:
 		#region Init Methods
 
 		/// <summary>
-		/// Wrap importing a file or folder into the database
+		/// Wrap importing and updating DATs
 		/// </summary>
-		/// <param name="filename">File or folder to be imported</param>
-		private static void InitImport(string filename)
+		/// <param name="ignore"></param>
+		private static void InitImport(bool ignore)
 		{
-			Console.Clear();
-
-			// Drag and drop means quotes; we don't want quotes
-			filename = filename.Replace("\"", "");
-
-			// Check to see if the second argument is a file that exists
-			if (filename != "" && File.Exists(filename))
-			{
-				logger.User("Beginning import of " + filename);
-				IImport imp = new Import(filename, _connectionString, logger);
-				bool success = imp.ImportData();
-				logger.User(filename + (success ? "" : " not") + " imported!");
-			}
-			// Check to see if the second argument is a directory that exists
-			else if (filename != "" && Directory.Exists(filename))
-			{
-				foreach (string file in Directory.GetFiles(filename, "*", SearchOption.AllDirectories))
-				{
-					logger.User("Beginning import of " + file);
-					IImport imp = new Import(file, _connectionString, logger);
-					bool success = imp.ImportData();
-					logger.User(file + (success ? "" : " not") + " imported!");
-				}
-			}
-			else
-			{
-				logger.Error("I'm sorry but " + filename + " doesn't exist!");
-			}
-			return;
+			IImport imp = new ImportTwo(_datroot, _connectionString, _logger, ignore);
+			imp.ImportData();
 		}
 
 		/// <summary>
-		/// Wrap generating a DAT from the database
+		/// Wrap generating a DAT from the library
 		/// </summary>
-		/// <param name="systems">Comma-separated list of systems to be included in the DAT (blank means all)</param>
-		/// <param name="sources">Comma-separated list of sources to be included in the DAT (blank means all)</param>
+		/// <param name="system">System ID to be used in the DAT (blank means all)</param>
 		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
 		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
-		private static void InitGenerate(string systems, string sources, string outdir, bool norename, bool old)
+		private static void InitGenerate(string systemid, bool norename, bool old)
 		{
-			IGenerate gen = new Generate(systems, sources, outdir, _connectionString, logger, norename, old);
+			IGenerate gen = new GenerateTwo(systemid, "" /* sourceid */, _datroot, _outroot, _connectionString, _logger, norename, old);
 			gen.Export();
-			return;
 		}
 
 		/// <summary>
-		/// Wrap generating all standard DATs from the database
+		/// Wrap generating all standard DATs from the library
 		/// </summary>
-		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
-		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
-		private static void InitGenerateAll(string outdir, bool norename, bool old)
+		private static void InitGenerateAll(bool norename, bool old)
 		{
-			string actualdir = (outdir == "" ? Environment.CurrentDirectory + Path.DirectorySeparatorChar :
-				(!outdir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? outdir + Path.DirectorySeparatorChar : outdir));
-			outdir = actualdir + "temp" + Path.DirectorySeparatorChar;
-
-			// Generate system-merged
-			string query = "SELECT DISTINCT systems.id FROM systems JOIN games ON systems.id=games.system ORDER BY systems.manufacturer, systems.system";
-			//string query = "SELECT DISTINCT system.id FROM system JOIN gamesystem ON system.id=gamesystem.systemid ORDER BY system.manufacturer, system.name";
+			List<string> systems = new List<string>();
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
+
+				string query = "SELECT id FROM system";
 				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
 					using (SqliteDataReader sldr = slc.ExecuteReader())
@@ -1358,103 +1342,24 @@ Make a selection:
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							logger.Error("No systems found! Please add a source and then try again.");
+							_logger.Warning("No systems found! Please add a system and then try again.");
 							return;
 						}
 
 						while (sldr.Read())
 						{
-							InitGenerate(sldr.GetInt32(0).ToString(), "", outdir, norename, old);
-
-							// Generate custom
-							string squery = @"SELECT DISTINCT sources.id
-		FROM systems
-		JOIN games
-			ON systems.id=games.system
-		JOIN sources
-			ON games.source=sources.id
-		WHERE systems.id=" + sldr.GetInt32(0).ToString() + @"
-		ORDER BY sources.name";
-							/*
-							string squery = @"SELECT DISTINCT source.id
-		FROM system
-		JOIN gamesystem
-			ON system.id=gamesystem.systemid
-		JOIN gamesource
-			ON gamesystem.game=gamesource.game
-		JOIN source
-			ON gamesource.sourceid=source.id
-		WHERE system.id=" + sldr.GetInt32(0).ToString() + @"
-		ORDER BY source.name";
-							*/
-
-							using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
-							{
-								using (SqliteDataReader ssldr = sslc.ExecuteReader())
-								{
-									// If nothing is found, tell the user and exit
-									if (!ssldr.HasRows)
-									{
-										logger.Error("No sources found! Please add a source and then try again.");
-										return;
-									}
-
-									while (ssldr.Read())
-									{
-										InitGenerate(sldr.GetInt32(0).ToString(), ssldr.GetInt32(0).ToString(), outdir, norename, old);
-									}
-								}
-							}
+							systems.Add(sldr.GetInt32(0).ToString());
 						}
 					}
 				}
 
-				// Generate source-merged
-				query = "SELECT DISTINCT sources.id, sources.name FROM sources JOIN games ON sources.id=games.source ORDER BY sources.name";
-				//query = "SELECT DISTINCT source.id, source.name FROM source JOIN gamesource ON source.id=gamesource.sourceid ORDER BY source.name";
-
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
+				// Loop through the inputs
+				foreach (string system in systems)
 				{
-					using (SqliteDataReader sldr = slc.ExecuteReader())
-					{
-						// If nothing is found, tell the user and exit
-						if (!sldr.HasRows)
-						{
-							logger.Error("No sources found! Please add a source and then try again.");
-							return;
-						}
-
-						while (sldr.Read())
-						{
-							InitGenerate("", sldr.GetInt32(0).ToString(), outdir, norename, old);
-						}
-					}
+					_logger.User("Generating DAT for system id " + system);
+					InitGenerate(system, norename, old);
 				}
 			}
-
-			// Generate MEGAMERGED
-			InitGenerate("", "", outdir, norename, old);
-
-			// Zip up all of the files that were generated
-			logger.User("Creating zip archive");
-			ZipArchive zip = ZipFile.Open(actualdir + "dats-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".zip", ZipArchiveMode.Create);
-			foreach (String filename in Directory.EnumerateFiles(outdir))
-			{
-				if (filename.EndsWith(".xml") || filename.EndsWith(".dat"))
-				{
-					string internalFolder = (filename.Contains("ALL (Merged") ? "" :
-						filename.Contains("Merged") ? "merged-system/" :
-							filename.Contains("ALL") ? "merged-source/" : "custom/");
-					zip.CreateEntryFromFile(filename, internalFolder + Path.GetFileName(filename), CompressionLevel.Optimal);
-				}
-			}
-			zip.Dispose();
-			logger.User("Zip archive created!");
-
-			// Remove all of the DATs from the folder
-			Directory.Delete(outdir, true);
-
-			return;
 		}
 
 		/// <summary>
@@ -1474,13 +1379,13 @@ Make a selection:
 
 			if (File.Exists(filename))
 			{
-				logger.User("Converting \"" + Path.GetFileName(filename) + "\"");
+				_logger.User("Converting \"" + Path.GetFileName(filename) + "\"");
 				DatData datdata = new DatData
 				{
 					OutputFormat = outputFormat,
 					MergeRoms = false,
 				};
-				datdata = RomManipulation.Parse(filename, 0, 0, datdata, logger, true);
+				datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger, true);
 
 				// Sometimes the description doesn't match the filename, change this
 				if (datdata.Description != Path.GetFileNameWithoutExtension(filename))
@@ -1495,7 +1400,7 @@ Make a selection:
 					datdata.Description += ".new";
 				}
 
-				Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(filename) : outdir), logger);
+				Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(filename) : outdir), _logger);
 			}
 			else if (Directory.Exists(filename))
 			{
@@ -1503,13 +1408,13 @@ Make a selection:
 
 				foreach (string file in Directory.EnumerateFiles(filename, "*", SearchOption.AllDirectories))
 				{
-					logger.User("Converting \"" + Path.GetFullPath(file).Remove(0, filename.Length) + "\"");
+					_logger.User("Converting \"" + Path.GetFullPath(file).Remove(0, filename.Length) + "\"");
 					DatData datdata = new DatData
 					{
 						OutputFormat = outputFormat,
 						MergeRoms = false,
 					};
-					datdata = RomManipulation.Parse(file, 0, 0, datdata, logger, true);
+					datdata = RomManipulation.Parse(file, 0, 0, datdata, _logger, true);
 
 					// If the extension matches, append ".new" to the filename
 					string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
@@ -1518,12 +1423,12 @@ Make a selection:
 						datdata.FileName += ".new";
 					}
 
-					Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(file) : outdir + Path.GetDirectoryName(file).Remove(0, filename.Length - 1)), logger);
+					Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(file) : outdir + Path.GetDirectoryName(file).Remove(0, filename.Length - 1)), _logger);
 				}
 			}
 			else
 			{
-				logger.Error("I'm sorry but " + filename + " doesn't exist!");
+				_logger.Error("I'm sorry but " + filename + " doesn't exist!");
 			}
 			return;
 		}
@@ -1554,7 +1459,7 @@ Make a selection:
 				string name = Path.GetFileNameWithoutExtension(input) + "-miss";
 
 				// Read in the roms from the DAT and then write them to the file
-				logger.User("Converting " + input);
+				_logger.User("Converting " + input);
 				DatData datdata = new DatData
 				{
 					OutputFormat = OutputFormat.MissFile,
@@ -1568,7 +1473,7 @@ Make a selection:
 					GameName = gamename,
 					Romba = romba,
 				};
-				datdata = RomManipulation.Parse(input, 0, 0, datdata, logger);
+				datdata = RomManipulation.Parse(input, 0, 0, datdata, _logger);
 				datdata.FileName += "-miss";
 				datdata.Name += "-miss";
 				datdata.Description += "-miss";
@@ -1577,13 +1482,13 @@ Make a selection:
 				addext = (addext == "" || addext.StartsWith(".") ? addext : "." + addext);
 				repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
 
-				Output.WriteDatfile(datdata, Path.GetDirectoryName(input), logger);
-				logger.User(input + " converted to: " + name);
+				Output.WriteDatfile(datdata, Path.GetDirectoryName(input), _logger);
+				_logger.User(input + " converted to: " + name);
 				return;
 			}
 			else
 			{
-				logger.Error("I'm sorry but " + input + "doesn't exist!");
+				_logger.Error("I'm sorry but " + input + "doesn't exist!");
 			}
 		}
 
@@ -1601,7 +1506,7 @@ Make a selection:
 
 			if (input != "" && (File.Exists(input) || Directory.Exists(input)))
 			{
-				TrimMerge sg = new TrimMerge(input, root, rename, force, logger);
+				TrimMerge sg = new TrimMerge(input, root, rename, force, _logger);
 				sg.Process();
 				return;
 			}
@@ -1641,7 +1546,7 @@ Make a selection:
 						}
 						catch (PathTooLongException)
 						{
-							logger.Warning("The path for " + file + " was too long");
+							_logger.Warning("The path for " + file + " was too long");
 						}
 					}
 				}
@@ -1653,12 +1558,12 @@ Make a selection:
 					}
 					catch (PathTooLongException)
 					{
-						logger.Warning("The path for " + input.Replace("\"", "") + " was too long");
+						_logger.Warning("The path for " + input.Replace("\"", "") + " was too long");
 					}
 				}
 			}
 
-			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir, logger);
+			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir, _logger);
 			md.Process();
 		}
 
@@ -1681,16 +1586,16 @@ Make a selection:
 			{
 				if (exta == "" || extb == "")
 				{
-					logger.Warning("Two extensions are needed to split a DAT!");
+					_logger.Warning("Two extensions are needed to split a DAT!");
 					return;
 				}
-				ExtSplit es = new ExtSplit(input, exta, extb, outdir, logger);
+				ExtSplit es = new ExtSplit(input, exta, extb, outdir, _logger);
 				es.Split();
 				return;
 			}
 			else
 			{
-				logger.Log("I'm sorry but " + input + "doesn't exist!");
+				_logger.Log("I'm sorry but " + input + "doesn't exist!");
 			}
 		}
 
@@ -1709,7 +1614,7 @@ Make a selection:
 			{
 				if (!File.Exists(input.Replace("\"", "")) && !Directory.Exists(input.Replace("\"", "")))
 				{
-					logger.Error(input + " is not a valid file or folder!");
+					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
 					Build.Help();
 					return;
@@ -1717,7 +1622,7 @@ Make a selection:
 			}
 
 			// If so, run the program
-			HashSplit hs = new HashSplit(inputs, outdir, logger);
+			HashSplit hs = new HashSplit(inputs, outdir, _logger);
 			hs.Split();
 		}
 
@@ -1761,11 +1666,11 @@ Make a selection:
 		{
 			if (DBTools.AddSource(name, url, _connectionString))
 			{
-				logger.Log("Source " + name + " added!");
+				_logger.Log("Source " + name + " added!");
 			}
 			else
 			{
-				logger.Error("Source " + name + " could not be added!");
+				_logger.Error("Source " + name + " could not be added!");
 			}
 		}
 
@@ -1780,16 +1685,16 @@ Make a selection:
 			{
 				if (DBTools.RemoveSource(srcid, _connectionString))
 				{
-					logger.Log("Source '" + srcid + "' removed!");
+					_logger.Log("Source '" + srcid + "' removed!");
 				}
 				else
 				{
-					logger.Error("Source with id '" + srcid + "' could not be removed.");
+					_logger.Error("Source with id '" + srcid + "' could not be removed.");
 				}
 			}
 			else
 			{
-				logger.Error("Invalid input");
+				_logger.Error("Invalid input");
 			}
 		}
 
@@ -1802,11 +1707,11 @@ Make a selection:
 		{
 			if (DBTools.AddSystem(manufacturer, system, _connectionString))
 			{
-				logger.Log("System " + manufacturer + " - " + system + " added!");
+				_logger.Log("System " + manufacturer + " - " + system + " added!");
 			}
 			else
 			{
-				logger.Error("System " + manufacturer + " - " + system + " could not be added!");
+				_logger.Error("System " + manufacturer + " - " + system + " could not be added!");
 			}
 		}
 
@@ -1821,27 +1726,72 @@ Make a selection:
 			{
 				if (DBTools.RemoveSystem(sysid, _connectionString))
 				{
-					logger.Log("System '" + sysid + "' removed!");
+					_logger.Log("System '" + sysid + "' removed!");
 				}
 				else
 				{
-					logger.Error("System with id '" + sysid + "' could not be removed.");
+					_logger.Error("System with id '" + sysid + "' could not be removed.");
 				}
 			}
 			else
 			{
-				logger.Error("Invalid input");
+				_logger.Error("Invalid input");
 			}
 		}
 
 		#endregion
 
-		#region Listing Methods
+		#region Helper methods
+
+		/// <summary>
+		/// Perform initial setup for the program
+		/// </summary>
+		private static void Setup()
+		{
+			Remapping.CreateRemappings();
+			Build.Start("DATabaseTwo");
+
+			// Perform initial database and folder setup
+			if (!Directory.Exists(_datroot))
+			{
+				Directory.CreateDirectory(_datroot);
+			}
+			if (!Directory.Exists(_outroot))
+			{
+				Directory.CreateDirectory(_outroot);
+			}
+			DBTools.EnsureDatabase(_dbName, _connectionString);
+
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			{
+				dbc.Open();
+
+				string query = "SELECT * FROM system";
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
+				{
+					using (SqliteDataReader sldr = slc.ExecuteReader())
+					{
+						while (sldr.Read())
+						{
+							int systemid = sldr.GetInt32(0);
+							string system = _datroot + Path.DirectorySeparatorChar + sldr.GetString(1) + " - " + sldr.GetString(2);
+							system = system.Trim();
+
+							if (!Directory.Exists(system))
+							{
+								Directory.CreateDirectory(system);
+							}
+						}
+					}
+				}
+			}
+		}
 
 		/// <summary>
 		/// List sources in the database
 		/// </summary>
 		/// <param name="all">True to list all sources regardless if there is a game associated or not</param>
+		/// <remarks>This does not have an analogue in DATabaseTwo</remarks>
 		private static void ListSources(bool all = false)
 		{
 			string query = @"
@@ -1858,7 +1808,7 @@ ORDER BY sources.name COLLATE NOCASE";
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							logger.Warning("No sources found! Please add a source and then try again.");
+							_logger.Warning("No sources found! Please add a source and then try again.");
 							return;
 						}
 
@@ -1876,13 +1826,12 @@ ORDER BY sources.name COLLATE NOCASE";
 		/// <summary>
 		/// List systems in the database
 		/// </summary>
-		/// <param name="all">True to list all systems regardless if there is a game associated or not</param>
-		private static void ListSystems(bool all = false)
+		private static void ListSystems()
 		{
 			string query = @"
-SELECT DISTINCT systems.id, systems.manufacturer, systems.system
-FROM systems " + (!all ? "JOIN games ON systems.id=games.system" : "") + @"
-ORDER BY systems.manufacturer, systems.system";
+SELECT DISTINCT system.id, system.manufacturer, system.name
+FROM system
+ORDER BY system.manufacturer, system.name";
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
@@ -1893,7 +1842,7 @@ ORDER BY systems.manufacturer, systems.system";
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							logger.Warning("No systems found! Please add a system and then try again.");
+							_logger.Warning("No systems found! Please add a system and then try again.");
 							return;
 						}
 

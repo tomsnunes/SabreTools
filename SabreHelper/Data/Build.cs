@@ -99,18 +99,16 @@ Options:
 	-extb=			Second extension to split by
 	-out=			Output directory
   -g, --generate	Start tool in generate mode
-	-system=			Comma-separated list of system IDs
-	-source=			Comma-separated list of source IDs
-	-out=			Output directory
+	-system=			System ID to generate from
 	-nr, --no-rename	Don't auto-rename games
 	-o, --old		Output DAT in CMP format instead of XML
   -ga, --generate-all	Start tool in generate all mode
-	-out=			Output directory
 	-nr, --no-rename	Don't auto-rename games
 	-o, --old		Output DAT in CMP format instead of XML
   -hs, --hash-split		Split a DAT or folder by best-available hashes
 	-out=			Output directory
   -i, --import		Start tool in import mode
+	-ig, --ignore		Don't prompt for new sources
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
   -m, --merge		Merge one or more DATs
@@ -194,22 +192,6 @@ This program will output the following DATs:
   (c) New Missing - (Net New)+(Missing-(Unneeded))
   (d) Have - (NewComplete)-(New Missing)
         OR (Complete or NewComplete)-(Missing) if one is missing");
-					break;
-				case "DATabaseTwo":
-					Console.WriteLine(@"DATabaseTwo - Catalog and merge DATs by system
------------------------------------------
-Usage: DATabaseTwo [options]
-
-Options:
-  -h, -?, --help	Show this help dialog
-  -g, --generate	Start tool in generate mode
-  -ga, --generate-all	Start tool in generate all mode
-  -i, --ignore		Don't prompt for new sources
-  -lsy, --list-systems	List all systems (id <= name)
-  -nr, --no-rename	Don't auto-rename games by source/system
-  -o, --old		Output DAT in CMP format instead of XML
-  -sys=, --system=	System ID to generate from
-");
 					break;
 				case "Filter":
 					Console.WriteLine(@"Filter - Filter DATs by inputted criteria
