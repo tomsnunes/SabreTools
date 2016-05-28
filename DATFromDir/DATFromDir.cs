@@ -47,7 +47,8 @@ namespace SabreTools
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>>
 		/// <param name="logger">Logger object for console and file output</param>
-		public DATFromDir(List<String> inputs, DatData datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, Logger logger)
+		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
+		public DATFromDir(List<String> inputs, DatData datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, string tempDir, Logger logger)
 		{
 			_inputs = inputs;
 			_datdata = datdata;
@@ -56,6 +57,7 @@ namespace SabreTools
 			_bare = bare;
 			_archivesAsFiles = archivesAsFiles;
 			_enableGzip = enableGzip;
+			_tempDir = tempDir;
 			_logger = logger;
 		}
 
@@ -79,7 +81,7 @@ namespace SabreTools
 
 			// First things first, take care of all of the arguments that this could have
 			bool noMD5 = false, noSHA1 = false, forceunpack = false, archivesAsFiles = false, old = false, superDat = false, bare = false, romba = false, enableGzip = false;
-			string name = "", desc = "", cat = "", version = "", author = "";
+			string name = "", desc = "", cat = "", version = "", author = "", tempDir = "";
 			List<string> inputs = new List<string>();
 			foreach (string arg in args)
 			{
@@ -144,6 +146,10 @@ namespace SabreTools
 						{
 							author = arg.Split('=')[1];
 						}
+						else if (arg.StartsWith("-t=") || arg.StartsWith("--temp="))
+						{
+							tempDir = arg.Split('=')[1];
+						}
 						else if (arg.StartsWith("-v=") || arg.StartsWith("--version="))
 						{
 							version = arg.Split('=')[1];
@@ -194,7 +200,7 @@ namespace SabreTools
 				Type = (superDat ? "SuperDAT" : ""),
 				Roms = new Dictionary<string, List<RomData>>(),
 			};
-			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, logger);
+			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, logger);
 			bool success = dfd.Start();
 
 			// If we failed, show the help
@@ -436,6 +442,8 @@ namespace SabreTools
 		/// <returns>New parent to be used</returns>
 		private string ProcessFile(string item, StreamWriter sw, string lastparent)
 		{
+			string tempdir = "";
+
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
 			{
@@ -477,23 +485,32 @@ namespace SabreTools
 					ArchiveType at = archive.Type;
 					_logger.Log("Found archive of type: " + at);
 
+					// Define the temporary directory
+					tempdir = (String.IsNullOrEmpty(_tempDir) ? Environment.CurrentDirectory : _tempDir);
+					tempdir += (tempdir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? "" : Path.DirectorySeparatorChar.ToString());
+					tempdir += "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
+
 					if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
 					{
-						_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
-						DirectoryInfo di = Directory.CreateDirectory(_tempDir);
+						// Create the temp directory
+						DirectoryInfo di = Directory.CreateDirectory(tempdir);
+
+						// Extract all files to the temp directory
 						IReader reader = archive.ExtractAllEntries();
-						reader.WriteAllToDirectory(_tempDir, ExtractOptions.ExtractFullPath);
+						reader.WriteAllToDirectory(tempdir, ExtractOptions.ExtractFullPath);
 						encounteredErrors = false;
 					}
 					else if (at == ArchiveType.GZip && _enableGzip)
 					{
+						// Close the original archive handle
 						archive.Dispose();
-						_tempDir = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
-						DirectoryInfo di = Directory.CreateDirectory(_tempDir);
+
+						// Create the temp directory
+						DirectoryInfo di = Directory.CreateDirectory(tempdir);
 
 						using (FileStream itemstream = File.OpenRead(item))
 						{
-							using (FileStream outstream = File.Create(_tempDir + Path.GetFileNameWithoutExtension(item)))
+							using (FileStream outstream = File.Create(tempdir + Path.GetFileNameWithoutExtension(item)))
 							{
 								using (GZipStream gz = new GZipStream(itemstream, CompressionMode.Decompress))
 								{
@@ -535,12 +552,12 @@ namespace SabreTools
 				int last = 0;
 
 				_logger.Log(Path.GetFileName(item) + " treated like an archive");
-				foreach (string entry in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
+				foreach (string entry in Directory.EnumerateFiles(tempdir, "*", SearchOption.AllDirectories))
 				{
 					_logger.Log("Found file: " + entry);
-					string fileCRC = String.Empty;
-					string fileMD5 = String.Empty;
-					string fileSHA1 = String.Empty;
+					string fileCRC = string.Empty;
+					string fileMD5 = string.Empty;
+					string fileSHA1 = string.Empty;
 
 					try
 					{
@@ -574,7 +591,7 @@ namespace SabreTools
 					string actualroot = "";
 					string actualitem = "";
 
-					actualitem = entry.Remove(0, _tempDir.Length);
+					actualitem = entry.Remove(0, tempdir.Length);
 
 					// If we're in SuperDAT mode, make sure the added item is by itself
 					if (_datdata.Type == "SuperDAT")
@@ -632,9 +649,9 @@ namespace SabreTools
 				}
 
 				// Delete the temp directory
-				if (Directory.Exists(_tempDir))
+				if (Directory.Exists(tempdir))
 				{
-					Directory.Delete(_tempDir, true);
+					Directory.Delete(tempdir, true);
 				}
 			}
 			// Otherwise, just get the info on the file itself

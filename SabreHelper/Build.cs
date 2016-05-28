@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Reflection;
 
 namespace SabreTools.Helper
 {
@@ -173,7 +171,8 @@ Options:
   -c=, --cat=		Set the category of the DAT
   -v=, --version=	Set the version of the DAT
   -au=, --author=	Set the author of the DAT
-  -sd, --superdat	Enable SuperDAT creation");
+  -sd, --superdat	Enable SuperDAT creation
+  -t=, --temp=		Set the temporary directory to use");
 					break;
 				case "OfflineMerge":
 					Console.WriteLine(@"OfflineMerge - Update DATS for offline arrays
