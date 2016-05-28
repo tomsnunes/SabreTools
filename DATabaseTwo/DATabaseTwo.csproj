@@ -77,8 +77,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DATabaseTwo.cs" />
-    <Compile Include="Generate.cs" />
-    <Compile Include="Import.cs" />
+    <Compile Include="GenerateTwo.cs" />
+    <Compile Include="ImportTwo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

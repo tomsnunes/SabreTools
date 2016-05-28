@@ -11,7 +11,7 @@ namespace SabreTools
 	/// <summary>
 	/// Entry class for the DATabase application
 	/// </summary>
-	class DATabase
+	public class DATabase
 	{
 		private static Logger logger;
 		private static string _dbName = "DATabase.sqlite";
@@ -1298,7 +1298,7 @@ Make a selection:
 			if (filename != "" && File.Exists(filename))
 			{
 				logger.User("Beginning import of " + filename);
-				Import imp = new Import(filename, _connectionString, logger);
+				IImport imp = new Import(filename, _connectionString, logger);
 				bool success = imp.ImportData();
 				logger.User(filename + (success ? "" : " not") + " imported!");
 			}
@@ -1308,7 +1308,7 @@ Make a selection:
 				foreach (string file in Directory.GetFiles(filename, "*", SearchOption.AllDirectories))
 				{
 					logger.User("Beginning import of " + file);
-					Import imp = new Import(file, _connectionString, logger);
+					IImport imp = new Import(file, _connectionString, logger);
 					bool success = imp.ImportData();
 					logger.User(file + (success ? "" : " not") + " imported!");
 				}
@@ -1329,7 +1329,7 @@ Make a selection:
 		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
 		private static void InitGenerate(string systems, string sources, string outdir, bool norename, bool old)
 		{
-			Generate gen = new Generate(systems, sources, outdir, _connectionString, logger, norename, old);
+			IGenerate gen = new Generate(systems, sources, outdir, _connectionString, logger, norename, old);
 			gen.Export();
 			return;
 		}

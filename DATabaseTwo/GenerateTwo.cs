@@ -10,7 +10,7 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
-	public class Generate
+	public class GenerateTwo : IGenerate
 	{
 		// Private instance variables
 		private string _systemid;
@@ -35,7 +35,7 @@ namespace SabreTools
 		/// <param name="logger">Logger object for file or console output</param>
 		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
 		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
-		public Generate(string systemid, string sourceid, string datroot, string outroot, string connectionString, Logger logger, bool norename = false, bool old = false)
+		public GenerateTwo(string systemid, string sourceid, string datroot, string outroot, string connectionString, Logger logger, bool norename = false, bool old = false)
 		{
 			_systemid = systemid;
 			_sourceid = sourceid;

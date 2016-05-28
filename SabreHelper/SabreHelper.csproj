@@ -94,6 +94,8 @@
     <Compile Include="CRC32.cs" />
     <Compile Include="DBTools.cs" />
     <Compile Include="Data\Enums.cs" />
+    <Compile Include="Interfaces\IGenerate.cs" />
+    <Compile Include="Interfaces\IImport.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Output.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

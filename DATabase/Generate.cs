@@ -11,7 +11,7 @@ namespace SabreTools
 	/// <summary>
 	/// Generate a DAT from the data in the database
 	/// </summary>
-	class Generate
+	class Generate : IGenerate
 	{
 		// Private instance variables
 		private string _systems;

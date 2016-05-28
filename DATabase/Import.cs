@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mono.Data.Sqlite;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Xml;
 
 using SabreTools.Helper;
 
@@ -12,7 +10,7 @@ namespace SabreTools
 	/// <summary>
 	/// Import data into the database from existing DATs
 	/// </summary>
-	public class Import
+	public class Import : IImport
 	{
 		// Private instance variables
 		private string _filepath;

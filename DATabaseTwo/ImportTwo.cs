@@ -9,7 +9,7 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
-	public class Import
+	public class ImportTwo : IImport
 	{
 		// Private instance variables
 		private string _datroot;
@@ -24,7 +24,7 @@ namespace SabreTools
 		/// <param name="connectionString">Connection string for SQLite</param>
 		/// <param name="logger">Logger object for file or console output</param>
 		/// <param name="ignore">False if each DAT that has no defined source asks for user input (default), true otherwise</param>
-		public Import(string datroot, string connectionString, Logger logger, bool ignore = false)
+		public ImportTwo(string datroot, string connectionString, Logger logger, bool ignore = false)
 		{
 			_datroot = datroot;
 			_connectionString = connectionString;
