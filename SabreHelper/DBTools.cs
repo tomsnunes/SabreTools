@@ -32,69 +32,7 @@ namespace SabreTools.Helper
 			// Make sure the database has the correct schema
 			try
 			{
-				if (type == "DATabase")
-				{
-					string query = @"
-CREATE TABLE IF NOT EXISTS checksums (
-	'file'	INTEGER		NOT NULL,
-	'size'	INTEGER		NOT NULL	DEFAULT -1,
-	'crc'	TEXT		NOT NULL,
-	'md5'	TEXT		NOT NULL,
-	'sha1'	TEXT		NOT NULL,
-	PRIMARY KEY (file, size, crc, md5, sha1)
-)";
-					SqliteCommand slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-
-					query = @"
-CREATE TABLE IF NOT EXISTS files (
-	'id'			INTEGER	PRIMARY KEY	NOT NULL,
-	'setid'			INTEGER				NOT NULL,
-	'name'			TEXT				NOT NULL,
-	'type'			TEXT				NOT NULL	DEFAULT 'rom',
-	'lastupdated'	TEXT				NOT NULL
-)";
-					slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-
-					query = @"
-CREATE TABLE IF NOT EXISTS games (
-	'id'		INTEGER PRIMARY KEY	NOT NULL,
-	'system'	INTEGER				NOT NULL,
-	'name'		TEXT				NOT NULL,
-	'parent'	INTEGER				NOT NULL	DEFAULT '0',
-	'source'	INTEGER				NOT NULL	DEFAULT '0'
-)";
-					slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-
-					query = @"
-CREATE TABLE IF NOT EXISTS parent (
-	'id'	INTEGER PRIMARY KEY	NOT NULL,
-	'name'	TEXT				NOT NULL
-)";
-					slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-
-					query = @"
-CREATE TABLE IF NOT EXISTS sources (
-	'id'	INTEGER PRIMARY KEY	NOT NULL,
-	'name'	TEXT				NOT NULL	UNIQUE,
-	'url'	TEXT				NOT NULL
-)";
-					slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-
-					query = @"
-CREATE TABLE IF NOT EXISTS systems (
-	'id'			INTEGER PRIMARY KEY	NOT NULL,
-	'manufacturer'	TEXT				NOT NULL,
-	'system'		TEXT				NOT NULL
-)";
-					slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-				}
-				else if (type == "Headerer")
+				if (type == "Headerer")
 				{
 					string query = @"
 CREATE TABLE IF NOT EXISTS data (
@@ -104,65 +42,6 @@ CREATE TABLE IF NOT EXISTS data (
 	PRIMARY KEY (sha1, header, type)
 )";
 					SqliteCommand slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-				}
-				else if (type == "SabreTools")
-				{
-					string query = @"
-CREATE TABLE IF NOT EXISTS hash (
-	'id'	INTEGER	PRIMARY KEY	NOT NULL,
-	'size'	INTEGER				NOT NULL	DEFAULT -1,
-	'crc'	TEXT				NOT NULL,
-	'md5'	TEXT				NOT NULL,
-	'sha1'	TEXT				NOT NULL
-)";
-					SqliteCommand slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-
-					query = @"
-CREATE TABLE IF NOT EXISTS hashdata (
-	'hashid'	INTEGER		NOT NULL,
-	'key'		TEXT		NOT NULL,
-	'value'		TEXT,
-	PRIMARY KEY (hashid, key, value)
-)";
-					slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-
-					query = @"
-CREATE TABLE IF NOT EXISTS source (
-	'id'	INTEGER PRIMARY KEY	NOT NULL,
-	'name'	TEXT				NOT NULL	UNIQUE,
-	'url'	TEXT				NOT NULL
-)";
-					slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-
-					query = @"
-CREATE TABLE IF NOT EXISTS system (
-	'id'			INTEGER PRIMARY KEY	NOT NULL,
-	'manufacturer'	TEXT				NOT NULL,
-	'name'		TEXT				NOT NULL
-)";
-					slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-
-					query = @"
-CREATE TABLE IF NOT EXISTS gamesystem (
-	'game'		TEXT		NOT NULL,
-	'systemid'	INTEGER		NOT NULL,
-	PRIMARY KEY (game, systemid)
-)";
-					slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-
-					query = @"
-CREATE TABLE IF NOT EXISTS gamesource (
-	'game'		TEXT		NOT NULL,
-	'sourceid'	INTEGER		NOT NULL,
-	PRIMARY KEY (game, sourceid)
-)";
-					slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 				}
 				else if (type == "dats")
@@ -226,7 +105,7 @@ CREATE TABLE IF NOT EXISTS system (
 		/// <returns>True if the source existed or could be added, false otherwise</returns>
 		public static bool AddSource(string name, string url, string connectionString)
 		{
-			string query = "SELECT id, name, url FROM sources WHERE name='" + name + "'";
+			string query = "SELECT id, name, url FROM source WHERE name='" + name + "'";
 			using (SqliteConnection dbc = new SqliteConnection(connectionString))
 			{
 				dbc.Open();
@@ -237,7 +116,7 @@ CREATE TABLE IF NOT EXISTS system (
 						// If nothing is found, add the source
 						if (!sldr.HasRows)
 						{
-							string squery = "INSERT INTO sources (name, url) VALUES ('" + name + "', '" + url + "')";
+							string squery = "INSERT INTO source (name, url) VALUES ('" + name + "', '" + url + "')";
 							using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
 							{
 								return sslc.ExecuteNonQuery() >= 1;
@@ -249,7 +128,7 @@ CREATE TABLE IF NOT EXISTS system (
 							sldr.Read();
 							if (url != sldr.GetString(2))
 							{
-								string squery = "UPDATE sources SET url='" + url + "' WHERE id=" + sldr.GetInt32(0);
+								string squery = "UPDATE source SET url='" + url + "' WHERE id=" + sldr.GetInt32(0);
 								using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
 								{
 									return sslc.ExecuteNonQuery() >= 1;
@@ -271,7 +150,7 @@ CREATE TABLE IF NOT EXISTS system (
 		/// <returns>True if the source was removed, false otherwise</returns>
 		public static bool RemoveSource(int id, string connectionString)
 		{
-			string query = "DELETE FROM sources WHERE id=" + id;
+			string query = "DELETE FROM source WHERE id=" + id;
 			using (SqliteConnection dbc = new SqliteConnection(connectionString))
 			{
 				dbc.Open();
@@ -291,7 +170,7 @@ CREATE TABLE IF NOT EXISTS system (
 		/// <returns>True if the system existed or could be added, false otherwise</returns>
 		public static bool AddSystem(string manufacturer, string system, string connectionString)
 		{
-			string query = "SELECT id, manufacturer, system FROM systems WHERE manufacturer='" + manufacturer + "' AND system='" + system + "'";
+			string query = "SELECT id, manufacturer, name FROM system WHERE manufacturer='" + manufacturer + "' AND system='" + system + "'";
 			using (SqliteConnection dbc = new SqliteConnection(connectionString))
 			{
 				dbc.Open();
@@ -302,7 +181,7 @@ CREATE TABLE IF NOT EXISTS system (
 						// If nothing is found, add the system
 						if (!sldr.HasRows)
 						{
-							string squery = "INSERT INTO systems (manufacturer, system) VALUES ('" + manufacturer + "', '" + system + "')";
+							string squery = "INSERT INTO name (manufacturer, system) VALUES ('" + manufacturer + "', '" + system + "')";
 							using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
 							{
 								return sslc.ExecuteNonQuery() >= 1;
@@ -322,7 +201,7 @@ CREATE TABLE IF NOT EXISTS system (
 		/// <returns>True if the system was removed, false otherwise</returns>
 		public static bool RemoveSystem(int id, string connectionString)
 		{
-			string query = "DELETE FROM systems WHERE id=" + id;
+			string query = "DELETE FROM system WHERE id=" + id;
 			using (SqliteConnection dbc = new SqliteConnection(connectionString))
 			{
 				dbc.Open();
