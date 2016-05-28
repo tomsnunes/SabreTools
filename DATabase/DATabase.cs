@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using Mono.Data.Sqlite;
 using System.IO;
 using System.IO.Compression;
-using System.Xml;
-using System.Xml.Linq;
 
 using SabreTools.Helper;
 
