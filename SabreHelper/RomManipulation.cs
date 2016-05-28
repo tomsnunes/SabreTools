@@ -14,6 +14,7 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <returns>The OutputFormat corresponding to the DAT</returns>
+		/// <remarks>There is currently no differentiation between XML and SabreDAT here</remarks>
 		public static OutputFormat GetOutputFormat(string filename)
 		{
 			try
