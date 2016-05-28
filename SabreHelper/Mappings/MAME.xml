@@ -223,6 +223,11 @@
 	<mapping from="misterx" to="Yeno - MisterX" />
 	<mapping from="mm1_flop" to="Nokia - MikroMikko 1" />
 	<mapping from="mo5_cart" to="Thomson - 8bit" />
+	<mapping from="mo5_cass" to="Thomson - 8bit" />
+	<mapping from="mo5_flop" to="Thomson - 8bit" />
+	<mapping from="mo5_qd" to="Thomson - 8bit" />
+	<mapping from="mo6_cass" to="Thomson - 8bit" />
+	<mapping from="mo6_flop" to="Thomson - 8bit" />
 	<mapping from="mpu1000" to="Acetronic - MPU-1000" />
 	<mapping from="mpz80" to="Morrow - MPZ80" />
 	<mapping from="msx1_cart" to="Microsoft - MSX, MSX 2" />
@@ -278,6 +283,7 @@
 	<mapping from="pc88va" to="NEC - PC-88VA" />
 	<mapping from="pc98" to="NEC - PC-9801" />
 	<mapping from="pce" to="NEC - PC Engine, TurboGrafx 16" />
+	<mapping from="pce_tourvision" to="NEC - PC Engine, TurboGrafx 16" />
 	<mapping from="pcecd" to="NEC - PC Engine, TurboGrafx 16" />
 	<mapping from="pcw" to="Amstrad - PCW" />
 	<mapping from="pcw16" to="Amstrad - PCW" />
@@ -298,8 +304,11 @@
 	<mapping from="pmd85_cass" to="Tesla - PMD 85" />
 	<mapping from="pockchalv1" to="Benesse - Pocket Challenge V" />
 	<mapping from="pockchalv2" to="Benesse - Pocket Challenge V" />
+	<mapping from="pockchalw" to="Benesse - Pocket Challenge V" />
 	<mapping from="pokemini" to="Nintendo - Pokemon Mini" />
 	<mapping from="pro128_cart" to="Olivetti - Prodest PC 128" />
+	<mapping from="pro128_cass" to="Olivetti - Prodest PC 128" />
+	<mapping from="pro128_flop" to="Olivetti - Prodest PC 128" />
 	<mapping from="pro128s_flop" to="Olivetti - Prodest PC 128" />
 	<mapping from="prof180" to="Conitec - PROF-180" />
 	<mapping from="prof80" to="Conitec - PROF-80" />
@@ -325,6 +334,7 @@
 	<mapping from="samcoupe_cass" to="MGT - Sam Coupe" />
 	<mapping from="samcoupe_flop" to="MGT - Sam Coupe" />
 	<mapping from="sat_cart" to="Sega - Saturn" />
+	<mapping from="sat_vccart" to="Sega - Saturn" />
 	<mapping from="saturn" to="Sega - Saturn" />
 	<mapping from="sawatte" to="Sega - PICO" />
 	<mapping from="sc3000_cart" to="Sega - SG-1000, SC-3000, SF-7000, Othello Multivision" />
@@ -350,6 +360,7 @@
 	<mapping from="sorcerer_cass" to="Exidy - Sorcerer" />
 	<mapping from="sorcerer_flop" to="Exidy - Sorcerer" />
 	<mapping from="spc1000_cass" to="Samsung - SPC-1000" />
+	<mapping from="spc1500_cass" to="Samsung - SPC-1500" />
 	<mapping from="special_cass" to="Specialist - Specialist" />
 	<mapping from="special_flop" to="Specialist - Specialist" />
 	<mapping from="specpls3_flop" to="Sinclair - ZX Spectrum" />
@@ -360,6 +371,7 @@
 	<mapping from="studio2" to="RCA - Studio II" />
 	<mapping from="stv" to="Sega - Titan Video" />
 	<mapping from="super6" to="ADC - Super Six" />
+	<mapping from="super80_cass" to="Dick Smith Electronics - Super-80" />
 	<mapping from="superpet_flop" to="Commodore - SuperPET, MMF 9000" />
 	<mapping from="supracan" to="Funtech - Super Acan" />
 	<mapping from="sv8000" to="Bandai - Super Vision 8000" />
@@ -379,8 +391,14 @@
 	<mapping from="tiki100" to="Tiki Data - Kontiki-100, Tiki-100" />
 	<mapping from="timex_dock" to="Timex - TS-2068" />
 	<mapping from="tntell" to="Texas Instruments - Touch &amp; Tell" />
+	<mapping from="to_flop" to="Thomson - 8bit" />
 	<mapping from="to770_cart" to="Thomson - 8bit" />
+	<mapping from="to770a_cart" to="Thomson - 8bit" />
 	<mapping from="to7_cart" to="Thomson - 8bit" />
+	<mapping from="to7_cass" to="Thomson - 8bit" />
+	<mapping from="to7_qd" to="Thomson - 8bit" />
+	<mapping from="to8_cass" to="Thomson - 8bit" />
+	<mapping from="to8_qd" to="Thomson - 8bit" />
 	<mapping from="trs80m2" to="Tandy Radio Shack - TRS-80 Model II" />
 	<mapping from="trsm100" to="Tandy Radio Shack - TRS-80 Model 100" />
 	<mapping from="tutor" to="Tomy - Tutor, Pyuuta" />
