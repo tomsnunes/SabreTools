@@ -127,7 +127,7 @@ namespace SabreTools
 			foreach (string input in _inputs)
 			{
 				_logger.User("Adding DAT: " + input.Split('¬')[0]);
-				userData = RomManipulation.Parse(input.Split('¬')[0], i, 0, userData, _logger, clean:_clean);
+				userData = RomManipulation.Parse(input.Split('¬')[0], i, 0, userData, _logger, true, _clean);
 				i++;
 
 				// If we are in inplace mode or redirecting output, save the DAT data
