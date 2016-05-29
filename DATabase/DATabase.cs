@@ -1274,7 +1274,7 @@ Make a selection:
 						break;
 					case "2":
 						Console.Clear();
-						ListSources(true);
+						ListSources();
 						Console.Write("Please enter the source: ");
 						InitRemoveSource(Console.ReadLine());
 						Console.Write("\nPress any key to continue...");
@@ -1801,14 +1801,13 @@ Make a selection:
 		/// <summary>
 		/// List sources in the database
 		/// </summary>
-		/// <param name="all">True to list all sources regardless if there is a game associated or not</param>
 		/// <remarks>This does not have an analogue in DATabaseTwo</remarks>
-		private static void ListSources(bool all = false)
+		private static void ListSources()
 		{
 			string query = @"
-SELECT DISTINCT sources.id, sources.name
-FROM sources " + (!all ? "JOIN games on sources.id=games.source" : "") + @"
-ORDER BY sources.name COLLATE NOCASE";
+SELECT DISTINCT source.id, source.name, source.url
+FROM source
+ORDER BY source.name";
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
@@ -1819,14 +1818,14 @@ ORDER BY sources.name COLLATE NOCASE";
 						// If nothing is found, tell the user and exit
 						if (!sldr.HasRows)
 						{
-							_logger.Warning("No sources found! Please add a source and then try again.");
+							_logger.Warning("No sources found! Please add a system and then try again.");
 							return;
 						}
 
 						Console.WriteLine("Available Sources (id <= name):\n");
 						while (sldr.Read())
 						{
-							Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1));
+							Console.WriteLine(sldr.GetInt32(0) + "\t<=\t" + sldr.GetString(1) + (!String.IsNullOrEmpty(sldr.GetString(2)) ? " (" + sldr.GetString(2) + ")" : ""));
 						}
 					}
 				}
