@@ -193,7 +193,7 @@ namespace SabreTools
 				foreach (string key in userData.Roms.Keys)
 				{
 					List<RomData> temp = userData.Roms[key];
-					temp = RomManipulation.Merge(temp);
+					temp = RomManipulation.Merge(temp, _logger);
 
 					foreach (RomData rom in temp)
 					{
@@ -281,7 +281,7 @@ namespace SabreTools
 				foreach (string key in userData.Roms.Keys)
 				{
 					List<RomData> temp = userData.Roms[key];
-					temp = RomManipulation.Merge(temp);
+					temp = RomManipulation.Merge(temp, _logger);
 
 					foreach (RomData rom in temp)
 					{
@@ -342,7 +342,7 @@ namespace SabreTools
 					List<string> keys = userData.Roms.Keys.ToList();
 					foreach (string key in keys)
 					{
-						List<RomData> oldroms = RomManipulation.Merge(userData.Roms[key]);
+						List<RomData> oldroms = RomManipulation.Merge(userData.Roms[key], _logger);
 						List<RomData> newroms = new List<RomData>();
 
 						foreach (RomData rom in oldroms)

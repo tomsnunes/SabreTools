@@ -59,7 +59,6 @@ namespace SabreTools.Helper
 			}
 
 			XmlTextReader xtr;
-			StringReader sr;
 			xtr = new XmlTextReader(filename);
 			xtr.WhitespaceHandling = WhitespaceHandling.None;
 			xtr.DtdProcessing = DtdProcessing.Ignore;
@@ -395,7 +394,6 @@ namespace SabreTools.Helper
 			StreamReader sr = new StreamReader(File.OpenRead(filename));
 
 			string blocktype = "";
-			string lastgame = null;
 			while (!sr.EndOfStream)
 			{
 				string line = sr.ReadLine();
@@ -1263,32 +1261,29 @@ namespace SabreTools.Helper
 		/// Merge an arbitrary set of ROMs based on the supplied information
 		/// </summary>
 		/// <param name="inroms">List of RomData objects representing the roms to be merged</param>
-		/// <param name="presorted">True if the list should be considered pre-sorted (default false)</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>A List of RomData objects representing the merged roms</returns>
-		public static List<RomData> Merge(List<RomData> inroms, bool presorted = false)
+		public static List<RomData> Merge(List<RomData> inroms, Logger logger)
 		{
 			List<RomData> outroms = new List<RomData>();
 
-			// First sort the roms by size, crc, md5, sha1 (in order), if not sorted already
-			if (!presorted)
+			// First sort the roms by size, crc, md5, sha1 (in order)
+			inroms.Sort(delegate (RomData x, RomData y)
 			{
-				inroms.Sort(delegate (RomData x, RomData y)
+				if (x.Size == y.Size)
 				{
-					if (x.Size == y.Size)
+					if (x.CRC == y.CRC)
 					{
-						if (x.CRC == y.CRC)
+						if (x.MD5 == y.MD5)
 						{
-							if (x.MD5 == y.MD5)
-							{
-								return String.Compare(x.SHA1, y.SHA1);
-							}
-							return String.Compare(x.MD5, y.MD5);
+							return String.Compare(x.SHA1, y.SHA1);
 						}
-						return String.Compare(x.CRC, y.CRC);
+						return String.Compare(x.MD5, y.MD5);
 					}
-					return (int)(x.Size - y.Size);
-				});
-			}
+					return String.Compare(x.CRC, y.CRC);
+				}
+				return (int)(x.Size - y.Size);
+			});
 
 			// Then, deduplicate them by checking to see if data matches
 			foreach (RomData rom in inroms)
@@ -1335,6 +1330,8 @@ namespace SabreTools.Helper
 						// If it's a duplicate, skip adding it to the output but add any missing information
 						if (dupefound)
 						{
+							logger.Log("Rom information of found duplicate: " + rom.Game + "\t" + rom.Name + "\t" + rom.Size + "\t" + rom.CRC + "\t" + rom.MD5 + "\t" + rom.SHA1);
+
 							savedrom = lastrom;
 							pos = i;
 
@@ -1456,7 +1453,7 @@ namespace SabreTools.Helper
 				List<RomData> newroms = roms;
 				if (mergeroms)
 				{
-					newroms = RomManipulation.Merge(newroms);
+					newroms = RomManipulation.Merge(newroms, logger);
 				}
 
 				foreach (RomData rom in newroms)

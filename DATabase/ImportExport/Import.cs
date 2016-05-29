@@ -378,7 +378,7 @@ namespace SabreTools
 				List<RomData> newroms = roms;
 				if (datdata.MergeRoms)
 				{
-					newroms = RomManipulation.Merge(newroms);
+					newroms = RomManipulation.Merge(newroms, _logger);
 				}
 
 				foreach (RomData rom in newroms)
