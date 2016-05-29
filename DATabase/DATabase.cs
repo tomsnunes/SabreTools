@@ -67,6 +67,7 @@ namespace SabreTools
 				add = false,
 				bare = false,
 				cascade = false,
+				clean = false,
 				convertMiss = false,
 				convertCMP = false,
 				convertRC = false,
@@ -143,6 +144,10 @@ namespace SabreTools
 					case "-cc":
 					case "--convert-cmp":
 						convertCMP = true;
+						break;
+					case "-clean":
+					case "--clean":
+						clean = true;
 						break;
 					case "-cm":
 					case "--convert-miss":
@@ -430,7 +435,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvert(input, OutputFormat.ClrMamePro, outdir);
+					InitConvert(input, OutputFormat.ClrMamePro, outdir, clean);
 				}
 			}
 
@@ -439,7 +444,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvert(input, OutputFormat.RomCenter, outdir);
+					InitConvert(input, OutputFormat.RomCenter, outdir, clean);
 				}
 			}
 
@@ -448,7 +453,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvert(input, OutputFormat.SabreDat, outdir);
+					InitConvert(input, OutputFormat.SabreDat, outdir, clean);
 				}
 			}
 
@@ -1375,7 +1380,7 @@ Make a selection:
 		/// </summary>
 		/// <param name="filename"></param>
 		/// <param name="outputFormat"></param>
-		private static void InitConvert(string filename, OutputFormat outputFormat, string outdir = "")
+		private static void InitConvert(string filename, OutputFormat outputFormat, string outdir = "", bool clean = false)
 		{
 			// Clean the input strings
 			outdir = outdir.Replace("\"", "");
@@ -1393,7 +1398,7 @@ Make a selection:
 					OutputFormat = outputFormat,
 					MergeRoms = false,
 				};
-				datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger, true);
+				datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger, true, clean);
 
 				// Sometimes the description doesn't match the filename, change this
 				if (datdata.Description != Path.GetFileNameWithoutExtension(filename))
@@ -1422,7 +1427,7 @@ Make a selection:
 						OutputFormat = outputFormat,
 						MergeRoms = false,
 					};
-					datdata = RomManipulation.Parse(file, 0, 0, datdata, _logger, true);
+					datdata = RomManipulation.Parse(file, 0, 0, datdata, _logger, true, clean);
 
 					// If the extension matches, append ".new" to the filename
 					string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");

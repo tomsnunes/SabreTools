@@ -78,6 +78,7 @@ Options:
 	-source=			Source name (source only)
 	-url=			URL (source only)
   -cc, --convert-cmp	Convert any DAT to CMP
+	-clean			Clean game names according to WoD standards
 	-out=			Output directory
   -cm, --convert-miss	Convert from DAT to miss
 	-r, --roms		Output roms to miss instead of sets
@@ -90,10 +91,13 @@ Options:
 	-ro, --romba		Output roms in Romba format (requires SHA-1)
 	-tsv, --tsv		Output roms in Tab-Separated Value format
   -cs, --convert-sd	Convert any DAT to SabreDAT
+	-clean			Clean game names according to WoD standards
 	-out=			Output directory
   -cr, --convert-rc	Convert any DAT to RomCenter
+	-clean			Clean game names according to WoD standards
 	-out=			Output directory
   -cx, --convert-xml	Convert any DAT to XML
+	-clean			Clean game names according to WoD standards
 	-out=			Output directory
   -es, --ext-split		Split a DAT by two file extensions
 	-exta=			First extension to split by
