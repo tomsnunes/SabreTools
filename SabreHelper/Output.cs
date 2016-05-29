@@ -108,7 +108,7 @@ namespace SabreTools.Helper
 
 				// Write the file footer out
 				WriteFooter(sw, datdata, depth, logger);
-				
+
 				logger.Log("File written!" + Environment.NewLine);
 				sw.Close();
 				fs.Close();
@@ -147,6 +147,13 @@ namespace SabreTools.Helper
 							"\tcomment \"" + datdata.Comment + "\"\n" +
 							(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
 							")\n";
+						break;
+					case OutputFormat.MissFile:
+						if (datdata.TSV)
+						{
+							header = "File Name\tInternal Name\tDescription\tGame Name\tGame Description\tType\t" +
+								"Rom Name\tDisk Name\tSize\tCRC\tMD5\tSHA1\tNodump\n";
+						}
 						break;
 					case OutputFormat.RomCenter:
 						header = "[CREDITS]\n" +
@@ -364,8 +371,8 @@ namespace SabreTools.Helper
 							" )\n";
 						break;
 					case OutputFormat.MissFile:
-						string pre = datdata.Prefix + (datdata.Quotes ? "\"" : "");
-						string post = (datdata.Quotes ? "\"" : "") + datdata.Postfix;
+						string pre = datdata.Prefix + (datdata.Quotes || datdata.TSV ? "\"" : "");
+						string post = (datdata.Quotes || datdata.TSV ? "\"" : "") + datdata.Postfix;
 
 						// Check for special strings in prefix and postfix
 						pre = pre.Replace("%crc%", rom.CRC).Replace("%md5%", rom.MD5).Replace("%sha1%", rom.SHA1).Replace("%size%", rom.Size.ToString());
@@ -378,9 +385,17 @@ namespace SabreTools.Helper
 							if (rom.SHA1 != "")
 							{
 								string name = "/" + rom.SHA1.Substring(0, 2) + "/" + rom.SHA1.Substring(2, 2) + "/" + rom.SHA1.Substring(4, 2) + "/" +
-									rom.SHA1.Substring(6, 2) + "/" + rom.SHA1 + ".gz\n";
-								state += pre + name + post;
+									rom.SHA1.Substring(6, 2) + "/" + rom.SHA1 + ".gz";
+								state += pre + name + post + "\n";
 							}
+						}
+						// If we're in TSV mode, similarly the state is consistent
+						else if (datdata.TSV)
+						{
+							string inline = datdata.FileName + "\t" + datdata.Name + "\t" + datdata.Description + "\t" + rom.Game + "\t" + rom.Game + "\t" +
+								rom.Type + "\t" + (rom.Type == "rom" ? rom.Name : "") + "\t" + (rom.Type == "disk" ? rom.Name : "") + "\t" + rom.Size + "\t" +
+								rom.CRC + "\t" + rom.MD5 + "\t" + rom.SHA1 + "\t" + (rom.Nodump ? "Nodump" : "");
+							state += pre + inline + post + "\n";
 						}
 						// Otherwise, use any flags
 						else

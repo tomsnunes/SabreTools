@@ -96,6 +96,7 @@ namespace SabreTools
 				stats = false,
 				superdat = false,
 				trim = false,
+				tsv = false,
 				skip = false,
 				usegame = true;
 			string addext = "",
@@ -258,6 +259,10 @@ namespace SabreTools
 					case "--trim-merge":
 						trim = true;
 						break;
+					case "-tsv":
+					case " --tsv":
+						tsv = true;
+						break;
 					case "-u":
 					case "--unzip":
 						forceunpack = true;
@@ -416,7 +421,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename, romba);
+					InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename, romba, tsv);
 				}
 			}
 
@@ -846,7 +851,7 @@ Make a selection:
 		private static void ConvertMissMenu()
 		{
 			string selection = "", input = "", prefix = "", postfix = "", addext = "", repext = "";
-			bool usegame = true, quotes = false, gamename = false, romba = false;
+			bool usegame = true, quotes = false, gamename = false, romba = false, tsv = false;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
@@ -865,7 +870,8 @@ Make a selection:
     8) Add extensions to each item" + (addext != "" ? ":\n\t" + addext : "") + @"
 " + (!usegame ? "    9) " + (gamename ? "Don't add game name before every item" : "Add game name before every item") + "\n" : "") +
 @"    10) " + (romba ? "Don't output items in Romba format" : "Output items in Romba format") + @"
-    11) Begin conversion
+    12) " + (tsv ? "Don't output items in TSV format" : "Output items in TSV format") + @"
+    12) Begin conversion
     B) Go back to the previous menu
 ");
 				Console.Write("Enter selection: ");
@@ -913,8 +919,11 @@ Make a selection:
 						romba = !romba;
 						break;
 					case "11":
+						tsv = !tsv;
+						break;
+					case "12":
 						Console.Clear();
-						InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename, romba);
+						InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename, romba, tsv);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; prefix = ""; postfix = ""; addext = ""; repext = "";
@@ -1444,7 +1453,9 @@ Make a selection:
 		/// <param name="addext">Add an extension to all items</param>
 		/// <param name="gamename">Add the dat name as a directory prefix</param>
 		/// <param name="romba">Output files in romba format</param>
-		private static void InitConvertMiss(string input, bool usegame, string prefix, string postfix, bool quotes, string repext, string addext, bool gamename, bool romba)
+		/// <param name="tsv">Output files in TSV format</param>
+		private static void InitConvertMiss(string input, bool usegame, string prefix, string postfix, bool quotes,
+			string repext, string addext, bool gamename, bool romba, bool tsv)
 		{
 			// Strip any quotations from the name
 			input = input.Replace("\"", "");
@@ -1471,6 +1482,7 @@ Make a selection:
 					Quotes = quotes,
 					GameName = gamename,
 					Romba = romba,
+					TSV = tsv,
 				};
 				datdata = RomManipulation.Parse(input, 0, 0, datdata, _logger);
 				datdata.FileName += "-miss";

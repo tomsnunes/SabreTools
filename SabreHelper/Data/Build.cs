@@ -88,6 +88,7 @@ Options:
 	-ae=, --add-ext=	Add an extension to each item
 	-re=, --rep-ext=	Replace all extensions with specified
 	-ro, --romba		Output roms in Romba format (requires SHA-1)
+	-tsv, --tsv		Output roms in Tab-Separated Value format
   -cs, --convert-sd	Convert any DAT to SabreDAT
 	-out=			Output directory
   -cr, --convert-rc	Convert any DAT to RomCenter

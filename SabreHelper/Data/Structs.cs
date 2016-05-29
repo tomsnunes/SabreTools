@@ -60,5 +60,6 @@ namespace SabreTools.Helper
 		public string AddExt;
 		public bool GameName;
 		public bool Romba;
+		public bool TSV; // tab-deliminated output
 	}
 }
