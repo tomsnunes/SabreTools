@@ -172,6 +172,7 @@ namespace SabreTools.Helper
 						gamename = Style.NormalizeChars(gamename);
 						gamename = Style.RussianToLatin(gamename);
 						gamename = Style.SearchPattern(gamename);
+						gamename = gamename.TrimStart().TrimEnd();
 					}
 
 					RomData rom = new RomData
@@ -511,6 +512,7 @@ namespace SabreTools.Helper
 							rominfo[3] = Style.NormalizeChars(rominfo[3]);
 							rominfo[3] = Style.RussianToLatin(rominfo[3]);
 							rominfo[3] = Style.SearchPattern(rominfo[3]);
+							rominfo[3] = rominfo[3].TrimStart().TrimEnd();
 						}
 
 						RomData rom = new RomData
