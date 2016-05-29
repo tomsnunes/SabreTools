@@ -138,7 +138,6 @@ VALUES (" + (new FileInfo(file)).Length + ", '" + hash + "', '" + file.Replace("
 								slc.ExecuteNonQuery();
 							}
 
-							//query = "SELECT last_insertConstants.Rowid()";
 							query = "SELECT last_insert_rowid()";
 							using (SqliteCommand slc = new SqliteCommand(query, dbc))
 							{
@@ -157,8 +156,8 @@ VALUES (" + (new FileInfo(file)).Length + ", '" + hash + "', '" + file.Replace("
 							// Try to get the source ID from the name
 							int sourceid = (sources.ContainsKey(possiblesource.ToLowerInvariant()) ? sources[possiblesource] : 0);
 
-							// If we have the "default" ID and we're not ignoring new sources, prompt for a source input
-							if (!_ignore)
+							// If we have a "default" ID and we're not ignoring new sources, prompt for a source input
+							if (!_ignore && sourceid <= 1)
 							{
 								// We want to reset "Default" at this point, just in case
 								if (possiblesource.ToLowerInvariant() == "default")
