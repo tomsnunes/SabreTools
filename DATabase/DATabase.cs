@@ -1583,7 +1583,7 @@ Make a selection:
 				}
 			}
 
-			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir, clean _logger);
+			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir, clean, _logger);
 			md.Process();
 		}
 
