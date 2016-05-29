@@ -1228,8 +1228,8 @@ namespace SabreTools.Helper
 							// Get the name of the game from the parent
 							tempname = String.Join("\\", parent);
 
-							// If we have a SuperDAT and we aren't keeping names
-							if (superdat && !keep)
+							// If we aren't keeping names, trim out the path
+							if (!keep || !superdat)
 							{
 								string tempout = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
 								if (tempout != "")
