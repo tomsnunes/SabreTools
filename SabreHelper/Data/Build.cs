@@ -124,6 +124,7 @@ Options:
 	-b, --bare		Don't include date in file name
 	-u, --unzip		Force unzipping in created DAT
 	-o, --old		Output DAT in CMP format instead of XML
+	-clean			Clean game names according to WoD standards
 	-out=			Output directory (overridden by --inplace)
 	-sd, --superdat		Enable SuperDAT creation
 	-n=, --name=		Set the internal name of the DAT

@@ -521,7 +521,7 @@ namespace SabreTools
 			// Merge, diff, and dedupe at least 2 DATs
 			else if (merge || diff)
 			{
-				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir);
+				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir, clean);
 			}
 
 			// Split a DAT by available hashes
@@ -1380,6 +1380,8 @@ Make a selection:
 		/// </summary>
 		/// <param name="filename"></param>
 		/// <param name="outputFormat"></param>
+		/// <param name="outdir">Optional param for output directory</param>
+		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		private static void InitConvert(string filename, OutputFormat outputFormat, string outdir = "", bool clean = false)
 		{
 			// Clean the input strings
@@ -1545,8 +1547,10 @@ Make a selection:
 		/// <param name="superdat">True if DATs should be merged in SuperDAT style, false otherwise</param>
 		/// <param name="cascade">True if the outputted diffs should be cascaded, false otherwise</param>
 		/// <param name="inplace">True if cascaded diffs overwrite the source files, false otherwise</param>
+		/// <param name="outdir">Output directory for the files (blank is default)</param>
+		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		private static void InitMergeDiff(List<string> inputs, string name, string desc, string cat, string version, string author,
-			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, bool inplace, string outdir = "")
+			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, bool inplace, string outdir = "", bool clean = false)
 		{
 			// Make sure there are no folders in inputs
 			List<string> newInputs = new List<string>();
@@ -1579,7 +1583,7 @@ Make a selection:
 				}
 			}
 
-			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir, _logger);
+			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir, clean _logger);
 			md.Process();
 		}
 

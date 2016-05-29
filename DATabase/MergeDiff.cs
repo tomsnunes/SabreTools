@@ -21,6 +21,7 @@ namespace SabreTools
 		private bool _superdat;
 		private bool _cascade;
 		private bool _inplace;
+		private bool _clean;
 
 		// User specified strings
 		private string _name;
@@ -53,9 +54,11 @@ namespace SabreTools
 		/// <param name="cascade">True if the outputted diffs should be cascaded, false otherwise</param>
 		/// <param name="inplace">True if cascaded diffs overwrite the source files, false otherwise</param>
 		/// <param name="outdir">New output directory for outputted DATs (blank means default)</param>
+		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		public MergeDiff(List<String> inputs, string name, string desc, string cat, string version, string author,
-			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, bool inplace, string outdir, Logger logger)
+			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, bool inplace,
+			string outdir, bool clean, Logger logger)
 		{
 			_inputs = inputs;
 			_name = name;
@@ -72,6 +75,7 @@ namespace SabreTools
 			_cascade = cascade;
 			_inplace = inplace;
 			_outdir = outdir.Replace("\"", "");
+			_clean = clean;
 			_logger = logger;
 		}
 
@@ -123,7 +127,7 @@ namespace SabreTools
 			foreach (string input in _inputs)
 			{
 				_logger.User("Adding DAT: " + input.Split('¬')[0]);
-				userData = RomManipulation.Parse(input.Split('¬')[0], i, 0, userData, _logger);
+				userData = RomManipulation.Parse(input.Split('¬')[0], i, 0, userData, _logger, clean:_clean);
 				i++;
 
 				// If we are in inplace mode or redirecting output, save the DAT data
