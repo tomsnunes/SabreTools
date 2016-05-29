@@ -20,16 +20,16 @@
 		public static string GoodXmlPattern = @"^(Good.*?)_.*\.xml";
 		public static string MamePattern = @"^(.*)\.xml$";
 		public static string MaybeIntroPattern = @"(.*?) \[T-En\].*\((\d{8})\)\.dat$";
-		public static string NoIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\)\.dat$";
-		public static string NoIntroNumberedPattern = @"(.*? - .*?) \(\d.*?_CM\).dat";
-		public static string NoIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\)\.dat";
+		public static string NoIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\).*\.dat$";
+		public static string NoIntroNumberedPattern = @"(.*? - .*?) \(\d.*?_CM\).*.dat";
+		public static string NoIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\).*\.dat";
 		public static string NonGoodPattern = @"^(NonGood.*?)( .*?)?.xml";
 		public static string NonGoodSpecialPattern = @"^(NonGood.*?)( .*)?.dat";
 		public static string RedumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
 		public static string RedumpBiosPattern = @"^(.*?) \(\d+\) \((\d{4}-\d{2}-\d{2})\)\.dat$";
-		public static string TosecPattern = @"^(.*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
-		public static string TosecSpecialPatternA = @"^(.*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
-		public static string TosecSpecialPatternB = @"^(.*? - .*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\)\.dat$";
+		public static string TosecPattern = @"^(.*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\).*\.dat$";
+		public static string TosecSpecialPatternA = @"^(.*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\).*\.dat$";
+		public static string TosecSpecialPatternB = @"^(.*? - .*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\).*\.dat$";
 		public static string TruripPattern = @"^(.*) - .* \(trurip_XML\)\.dat$";
 		public static string ZandroPattern = @"^SMW-.*.xml";
 

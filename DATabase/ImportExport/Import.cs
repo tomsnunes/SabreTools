@@ -34,7 +34,7 @@ namespace SabreTools
 		/// Import the data from file into the database
 		/// </summary>
 		/// <returns>True if the data was imported, false otherwise</returns>
-		public bool ImportData()
+		public bool UpdateDatabase()
 		{
 			// If file doesn't exist, error and return
 			if (!File.Exists(_filepath))

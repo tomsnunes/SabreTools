@@ -43,9 +43,8 @@ namespace SabreTools
 			// Perform initial setup and verification
 			_logger = new Logger(true, "database.log");
 			_logger.Start();
-			DBTools.EnsureDatabase(_dbName, _connectionString);
-			Remapping.CreateRemappings();
 			Console.Clear();
+			Setup();
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
@@ -370,7 +369,7 @@ namespace SabreTools
 
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (inputs.Count == 0 && ((convertMiss || romba) || convertCMP || convertRC || convertSD
-				|| convertXml || extsplit || hashsplit || import || (merge || diff) || stats || trim))
+				|| convertXml || extsplit || hashsplit || (merge || diff) || stats || trim))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -1309,7 +1308,7 @@ Make a selection:
 		private static void InitImport(bool ignore)
 		{
 			IImport imp = new ImportTwo(_datroot, _connectionString, _logger, ignore);
-			imp.ImportData();
+			imp.UpdateDatabase();
 		}
 
 		/// <summary>
@@ -1749,7 +1748,7 @@ Make a selection:
 		private static void Setup()
 		{
 			Remapping.CreateRemappings();
-			Build.Start("DATabaseTwo");
+			Build.Start("DATabase");
 
 			// Perform initial database and folder setup
 			if (!Directory.Exists(_datroot))

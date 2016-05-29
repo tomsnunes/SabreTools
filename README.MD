@@ -19,7 +19,7 @@ A bare-bones attempt at providing a true GUI experience for the SabreTools suite
 <p/>
 The main tool of the SabreTools suite. Performs the majority of the core features of the parent project, including the following:
 <ul>
-	<li>Importing and Generating DAT files in ClrMamePro and XML formats</li>
+	<li>Importing and Generating DAT files in ClrMamePro and XML formats (current version formerly <i>DATabaseTwo</i>)</li>
 	<li>Converting DATs from any format to ClrMamePro, Logiqx XML, SabreDAT XML, and to missfile (last part formerly <i>DatToMiss</i>; requested by Obiwantje)</li>
 	<li>Trim DAT entries and optionally merge into a single game (formerly <i>SingleGame</i>; requested by Kludge)</li>
 	<li>Split a DAT using two different file extensions within the DAT (formerly <i>DatSplit</i>)</li>
@@ -38,10 +38,6 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 	<li>Retrieve a list of all sources and systems that are available</li>
 </ul>
 This tool can both be used with command line parameters or with the built-in text menu system.
-
-<b>DATabaseTwo</b>
-<p/>
-An in-progress replacement for the Import and Generate functions of <i>DATabase</i>. This is the recommended version to use for mass DAT management but it is still lacking some advanced features found only in the <i>DATabase</i> version.
 
 <b>Headerer</b>
 <p/>

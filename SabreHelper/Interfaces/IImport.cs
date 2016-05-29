@@ -2,6 +2,6 @@
 {
 	public interface IImport
 	{
-		bool ImportData();
+		bool UpdateDatabase();
 	}
 }

@@ -218,5 +218,22 @@ namespace SabreTools.Helper
 			// Return formatted number with suffix
 			return readable.ToString("0.### ") + suffix;
 		}
+
+		/// <summary>
+		/// Converts a string to sentence case.
+		/// </summary>
+		/// <param name="input">The string to convert.</param>
+		/// <returns>A string representing a sentence case string</returns>
+		/// <remarks>http://stackoverflow.com/questions/3141426/net-method-to-convert-a-string-to-sentence-case</remarks>
+		public static string SentenceCase(string input)
+		{
+			if (input.Length < 1)
+			{
+				return input;
+			}
+
+			string sentence = input.ToLower();
+			return sentence[0].ToString().ToUpper() + sentence.Substring(1);
+		}
 	}
 }

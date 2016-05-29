@@ -36,199 +36,248 @@ namespace SabreTools
 		/// Perform initial or incremental import of DATs in the root folder
 		/// </summary>
 		/// <returns>True if the data could be inserted or updated correctly, false otherwise</returns>
-		public bool ImportData()
+		public bool UpdateDatabase()
 		{
 			_logger.User("Beginning import/update process");
+
+			Dictionary<Tuple<long, string, string>, int> missing = ImportData();
+			bool success = RemoveData(missing);
+
+			_logger.User("Import/update process complete!");
+
+			return success;
+		}
+
+		/// <summary>
+		/// Import data into the database and return all files not found in the list
+		/// </summary>
+		/// <returns>List of files that were not found in the audit</returns>
+		private Dictionary<Tuple<long, string, string>, int> ImportData()
+		{
+			// Create the empty dictionary for file filtering and output
+			Dictionary<Tuple<long, string, string>, int> dbfiles = new Dictionary<Tuple<long, string, string>, int>();
+
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
+				_logger.User("Populating reference objects");
 
-				Dictionary<string, int> hashes = new Dictionary<string, int>();
-				string query = "SELECT sha1, id FROM dats";
+				// Populate the list of files in the database with Tuples (size, sha1, name)
+				string query = "SELECT id, size, sha1, name FROM dats";
 				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
 					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						while (sldr.Read())
 						{
-							hashes.Add(sldr.GetString(0), sldr.GetInt32(1));
+							dbfiles.Add(Tuple.Create(sldr.GetInt64(1), sldr.GetString(2), sldr.GetString(3)), sldr.GetInt32(0));
 						}
 					}
 				}
 
-				SHA1 sha1 = SHA1.Create();
-				query = "SELECT * FROM system";
+				// Populate the list of systems
+				Dictionary<string, int> systems = new Dictionary<string, int>();
+				query = "SELECT id, manufacturer, name FROM system";
 				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
 					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
 						while (sldr.Read())
 						{
-							int systemid = sldr.GetInt32(0);
-							string system = _datroot + Path.DirectorySeparatorChar + sldr.GetString(1) + " - " + sldr.GetString(2);
-							system = system.Trim();
+							systems.Add(sldr.GetString(1) + " - " + sldr.GetString(2), sldr.GetInt32(0));
+						}
+					}
+				}
 
-							_logger.User("System: " + system.Remove(0, 5));
+				// Populate the list of sources (initial)
+				SortedDictionary<string, int> sources = new SortedDictionary<string, int>();
+				sources.Add("default", 0);
+				query = "SELECT name, id FROM source";
+				using (SqliteCommand sslc = new SqliteCommand(query, dbc))
+				{
+					using (SqliteDataReader ssldr = sslc.ExecuteReader())
+					{
+						while (ssldr.Read())
+						{
+							sources.Add(ssldr.GetString(0).ToLowerInvariant(), ssldr.GetInt32(1));
+						}
+					}
+				}
 
-							// Audit all DATs in the folder
-							foreach (string file in Directory.GetFiles(system, "*", SearchOption.AllDirectories))
+				// Interate through each system and check files
+				SHA1 sha1 = SHA1.Create();
+				foreach (KeyValuePair<string, int> kv in systems)
+				{
+					_logger.User("Processing DATs for system: '" + kv.Key + "'");
+
+					// Set the folder to iterate through based on the DAT root
+					string folder = _datroot + Path.DirectorySeparatorChar + kv.Key.Trim();
+
+					// Audit all files in the folder
+					foreach (string file in Directory.EnumerateFiles(folder, "*", SearchOption.AllDirectories))
+					{
+						// First get the file information for comparison
+						long size = (new FileInfo(file)).Length;
+						string hash = "";
+						using (FileStream fs = File.Open(file, FileMode.Open))
+						{
+							hash = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
+						}
+
+						// If it's not in the list of known files, add it
+						if (!dbfiles.ContainsKey(Tuple.Create(size, hash, file)))
+						{
+							// First add the information to the database as is and return the new insert ID
+							_logger.Log("Adding file information for " + Path.GetFileName(file));
+
+							int hashid = -1;
+							query = @"INSERT INTO dats (size, sha1, name)
+VALUES (" + (new FileInfo(file)).Length + ", '" + hash + "', '" + file.Replace("'", "''") + @"')";
+							using (SqliteCommand slc = new SqliteCommand(query, dbc))
 							{
-								string hash = "";
-								using (FileStream fs = File.Open(file, FileMode.Open))
+								slc.ExecuteNonQuery();
+							}
+
+							//query = "SELECT last_insertConstants.Rowid()";
+							query = "SELECT last_insert_rowid()";
+							using (SqliteCommand slc = new SqliteCommand(query, dbc))
+							{
+								using (SqliteDataReader sldr = slc.ExecuteReader())
 								{
-									hash = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
-								}
-
-								// If the hash isn't in add it and all required information
-								int hashid = -1;
-								if (!hashes.ContainsKey(hash))
-								{
-									_logger.Log("Adding file information for " + Path.GetFileName(file));
-
-									string squery = @"BEGIN;
-INSERT INTO dats (size, sha1, name)
-VALUES (" + (new FileInfo(file)).Length + ", '" + hash + "', '" + file.Replace("'", "''") + @"');
-SELECT last_insertConstants.Rowid();
-COMMIT;";
-									using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
+									if (sldr.Read())
 									{
-										using (SqliteDataReader ssldr = sslc.ExecuteReader())
-										{
-											if (ssldr.Read())
-											{
-												hashid = ssldr.GetInt32(0);
-											}
-										}
-									}
-
-									// Add the hash to the temporary Dictionary
-									hashes.Add(hash, hashid);
-
-									// Now try to determine the source for the file based on the name
-									string source = GetSourceFromFileName(Path.GetFileName(file));
-									int sourceid = 0;
-
-									SortedDictionary<string, int> sources = new SortedDictionary<string, int>();
-									sources.Add("default", 0);
-									query = "SELECT name, id FROM source";
-									using (SqliteCommand sslc = new SqliteCommand(query, dbc))
-									{
-										using (SqliteDataReader ssldr = sslc.ExecuteReader())
-										{
-											while (ssldr.Read())
-											{
-												sources.Add(ssldr.GetString(0).ToLowerInvariant(), ssldr.GetInt32(1));
-											}
-										}
-									}
-
-									// Only if we're not ignoring new sources should be ask the user for input
-									if (!_ignore)
-									{
-										// We want to reset "Default" at this point, just in case
-										if (source.ToLowerInvariant() == "default")
-										{
-											source = "";
-										}
-
-										// If the source is blank, ask the user to supply one
-										while (source == "" && sourceid == 0)
-										{
-											Console.Clear();
-											Build.Start("DATabaseTwo");
-
-											Console.WriteLine("Sources:");
-											foreach (KeyValuePair<string, int> pair in sources)
-											{
-												Console.WriteLine("    " + pair.Value + " - " + pair.Key);
-											}
-											Console.WriteLine("\nFor file name: " + Path.GetFileName(file));
-											Console.Write("Select a source above or enter a new one: ");
-											source = Console.ReadLine();
-
-											Int32.TryParse(source, out sourceid);
-
-											// If the value could be parsed, reset the source string
-											if (sourceid != 0)
-											{
-												source = "";
-											}
-
-											// If the source ID is set check to see if it's valid
-											if (sourceid != 0 && !sources.ContainsValue(sourceid))
-											{
-												Console.WriteLine("Invalid selection: " + sourceid);
-												Console.ReadLine();
-												sourceid = 0;
-											}
-										}
-
-										// If the source isn't in, add it and get the insert id
-										if (source != "" && sourceid == 0 && !sources.ContainsKey(source.ToLowerInvariant()))
-										{
-											string tquery = @"BEGIN;
-INSERT INTO source (name, url)
-VALUES ('" + source + @"', '');
-SELECT last_insertConstants.Rowid();
-COMMIT;";
-											using (SqliteCommand sslc = new SqliteCommand(tquery, dbc))
-											{
-												using (SqliteDataReader ssldr = sslc.ExecuteReader())
-												{
-													if (ssldr.Read())
-													{
-														sourceid = ssldr.GetInt32(0);
-													}
-												}
-											}
-
-											// Add the new source to the temporary Dictionary
-											sources.Add(source.ToLowerInvariant(), sourceid);
-										}
-										// Otherwise, get the ID
-										else if (source != "" && sourceid == 0 && sources.ContainsKey(source.ToLowerInvariant()))
-										{
-											try
-											{
-												sourceid = sources[source.ToLowerInvariant()];
-											}
-											catch
-											{
-												sourceid = 0;
-											}
-										}
-										// Otherwise, we should already have an ID
-									}
-									else
-									{
-										try
-										{
-											sourceid = sources[source.ToLowerInvariant()];
-										}
-										catch
-										{
-											sourceid = 0;
-										}
-									}
-
-									// Add the source and system link to the database
-									string uquery = @"INSERT OR IGNORE INTO datsdata (id, key, value)
-VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
-(" + hashid + ", 'system', '" + systemid + "')";
-									using (SqliteCommand uslc = new SqliteCommand(uquery, dbc))
-									{
-										uslc.ExecuteNonQuery();
+										hashid = sldr.GetInt32(0);
 									}
 								}
 							}
+
+							// Next we try to figure out the source ID from the name
+							string possiblesource = GetSourceFromFileName(Path.GetFileName(file));
+
+							// Try to get the source ID from the name
+							int sourceid = (sources.ContainsKey(possiblesource.ToLowerInvariant()) ? sources[possiblesource] : 0);
+
+							// If we have the "default" ID and we're not ignoring new sources, prompt for a source input
+							if (!_ignore)
+							{
+								// We want to reset "Default" at this point, just in case
+								if (possiblesource.ToLowerInvariant() == "default")
+								{
+									possiblesource = "";
+								}
+
+								// If the source is blank, ask the user to supply one
+								while (possiblesource == "" && sourceid == 0)
+								{
+									Console.Clear();
+									Build.Start("DATabaseTwo");
+
+									Console.WriteLine("Sources:");
+									foreach (KeyValuePair<string, int> pair in sources)
+									{
+										Console.WriteLine("    " + pair.Value + " - " + Style.SentenceCase(pair.Key));
+									}
+									Console.WriteLine("\nFor file name: " + Path.GetFileName(file));
+									Console.Write("Select a source above or enter a new one: ");
+									possiblesource = Console.ReadLine();
+
+									Int32.TryParse(possiblesource, out sourceid);
+
+									// If the value could be parsed, reset the source string
+									if (sourceid != 0)
+									{
+										possiblesource = "";
+									}
+
+									// If the source ID is set check to see if it's valid
+									if (sourceid != 0 && !sources.ContainsValue(sourceid))
+									{
+										Console.WriteLine("Invalid selection: " + sourceid);
+										Console.ReadLine();
+										sourceid = 0;
+									}
+								}
+
+								// If we have a non-empty possible source and it's in the database, get the id
+								if (possiblesource != "" && sources.ContainsKey(possiblesource.ToLowerInvariant()))
+								{
+									sourceid = sources[possiblesource.ToLowerInvariant()];
+								}
+
+								// If we have a non-empty possible source and it's not in the database, insert and get the id
+								else if (possiblesource != "" && !sources.ContainsKey(possiblesource.ToLowerInvariant()))
+								{
+									query = @"BEGIN;
+INSERT INTO source (name, url)
+VALUES ('" + possiblesource + @"', '');
+SELECT last_insertConstants.Rowid();
+COMMIT;";
+									using (SqliteCommand slc = new SqliteCommand(query, dbc))
+									{
+										using (SqliteDataReader sldr = slc.ExecuteReader())
+										{
+											if (sldr.Read())
+											{
+												sourceid = sldr.GetInt32(0);
+											}
+										}
+									}
+
+									// Add the new source to the current dictionary
+									sources.Add(possiblesource.ToLowerInvariant(), sourceid);
+								}
+							}
+
+							// Now that we have a source ID, we can add the mappings for system and source to the database
+							query = @"INSERT OR IGNORE INTO datsdata (id, key, value)
+VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
+(" + hashid + ", 'system', '" + kv.Value + "')";
+							using (SqliteCommand slc = new SqliteCommand(query, dbc))
+							{
+								slc.ExecuteNonQuery();
+							}
+						}
+
+						// Otherwise, remove it from the list of found items
+						else
+						{
+							dbfiles.Remove(Tuple.Create(size, hash, file));
 						}
 					}
 				}
 			}
 
-			_logger.User("Import/update process complete!");
+			return dbfiles;
+		}
 
-			return true;
+		/// <summary>
+		/// Remove all data associated with various files
+		/// </summary>
+		/// <param name="missing">List of file identifiers to remove from the database</param>
+		/// <returns>True if everything went well, false otherwise</returns>
+		private bool RemoveData(Dictionary<Tuple<long, string, string>, int> missing)
+		{
+			bool success = true;
+
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			{
+				dbc.Open();
+
+				// Get a comma-separated list of IDs from the input files
+				string idlist = String.Join(",", missing.Values);
+
+				// Now remove all of the files from the database
+				string query = @"BEGIN;
+DELETE FROM datsdata WHERE id IN (" + idlist + @");
+DELETE FROM dats WHERE id IN (" + idlist + @");
+COMMIT;";
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
+				{
+					slc.ExecuteNonQuery();
+				}
+			}
+
+			return success;
 		}
 
 		/// <summary>
@@ -276,6 +325,12 @@ VALUES (" + hashid + ", 'source', '" + sourceid + @"'),
 			else if (Regex.IsMatch(filename, Constants.GoodXmlPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.GoodXmlPattern).Groups;
+				if (!Remapping.Good.ContainsKey(fileinfo[1].Value))
+				{
+					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as Good but could not be mapped.");
+					return source;
+				}
+				source = "Good";
 			}
 			else if (Regex.IsMatch(filename, Constants.MaybeIntroPattern))
 			{

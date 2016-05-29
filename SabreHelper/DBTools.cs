@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS system (
 								{
 									return sslc.ExecuteNonQuery() >= 1;
 								}
-							}							
+							}
 						}
 					}
 				}

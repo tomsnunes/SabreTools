@@ -38,6 +38,7 @@
 	<mapping from="Nintendo - Game Boy" to="Nintendo - Game Boy, Game Boy Color" />
 	<mapping from="Nintendo - Game Boy Advance" to="Nintendo - Game Boy Advance" />
 	<mapping from="Nintendo - Game Boy Advance (e-Cards)" to="Nintendo - Game Boy Advance" />
+	<mapping from="Nintendo - Game Boy Advance MultiBoots" to="Nintendo - Game Boy Advance" />
 	<mapping from="Nintendo - Game Boy Color" to="Nintendo - Game Boy, Game Boy Color" />
 	<mapping from="Nintendo - New Nintendo 3DS" to="Nintendo - Nintendo 3DS, New Nintendo 3DS" />
 	<mapping from="Nintendo - New Nintendo 3DS (DLC)" to="Nintendo - Nintendo 3DS, New Nintendo 3DS" />
