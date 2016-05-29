@@ -100,9 +100,9 @@ namespace SabreTools.Helper
 			switch (GetOutputFormat(filename))
 			{
 				case OutputFormat.ClrMamePro:
-					return ParseCMP(filename, sysid, srcid, datdata, logger, keep);
+					return ParseCMP(filename, sysid, srcid, datdata, logger, keep, clean);
 				case OutputFormat.RomCenter:
-					return ParseRC(filename, sysid, srcid, datdata, logger);
+					return ParseRC(filename, sysid, srcid, datdata, logger, clean);
 				case OutputFormat.SabreDat:
 				case OutputFormat.Xml:
 					return ParseXML(filename, sysid, srcid, datdata, logger, keep, clean);
@@ -120,8 +120,9 @@ namespace SabreTools.Helper
 		/// <param name="datdata">The DatData object representing found roms to this point</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static DatData ParseCMP(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false)
+		public static DatData ParseCMP(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep, bool clean)
 		{
 			// Read the input file, if possible
 			logger.Log("Attempting to read file: \"" + filename + "\"");
@@ -164,6 +165,15 @@ namespace SabreTools.Helper
 				// If the line is a rom or disk and we're in a block
 				else if ((line.Trim().StartsWith("rom (") || line.Trim().StartsWith("disk (")) && block)
 				{
+					// If we're in cleaning mode, sanitize the game name
+					if (clean)
+					{
+						///Run the name through the filters to make sure that it's correct
+						gamename = Style.NormalizeChars(gamename);
+						gamename = Style.RussianToLatin(gamename);
+						gamename = Style.SearchPattern(gamename);
+					}
+
 					RomData rom = new RomData
 					{
 						Game = gamename,
@@ -380,8 +390,9 @@ namespace SabreTools.Helper
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="datdata">The DatData object representing found roms to this point</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static DatData ParseRC(string filename, int sysid, int srcid, DatData datdata, Logger logger)
+		public static DatData ParseRC(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool clean)
 		{
 			// Read the input file, if possible
 			logger.Log("Attempting to read file: \"" + filename + "\"");
@@ -492,6 +503,16 @@ namespace SabreTools.Helper
 						9 - merge name
 						*/
 						string[] rominfo = line.Split('¬');
+
+						// If we're in cleaning mode, sanitize the game name
+						if (clean)
+						{
+							///Run the name through the filters to make sure that it's correct
+							rominfo[3] = Style.NormalizeChars(rominfo[3]);
+							rominfo[3] = Style.RussianToLatin(rominfo[3]);
+							rominfo[3] = Style.SearchPattern(rominfo[3]);
+						}
+
 						RomData rom = new RomData
 						{
 							Game = rominfo[3],
@@ -532,7 +553,7 @@ namespace SabreTools.Helper
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static DatData ParseXML(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false, bool clean = false)
+		public static DatData ParseXML(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep, bool clean)
 		{
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
