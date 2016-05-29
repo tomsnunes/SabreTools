@@ -73,8 +73,10 @@ namespace SabreTools.Helper
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="datdata">The DatData object representing found roms to this point</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static DatData Parse(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false)
+		public static DatData Parse(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false, bool clean = false)
 		{
 			// If the output filename isn't set already, get the internal filename
 			if (String.IsNullOrEmpty(datdata.FileName))
@@ -100,10 +102,10 @@ namespace SabreTools.Helper
 				case OutputFormat.ClrMamePro:
 					return ParseCMP(filename, sysid, srcid, datdata, logger, keep);
 				case OutputFormat.RomCenter:
-					return ParseRC(filename, sysid, srcid, datdata, logger, keep);
+					return ParseRC(filename, sysid, srcid, datdata, logger);
 				case OutputFormat.SabreDat:
 				case OutputFormat.Xml:
-					return ParseXML(filename, sysid, srcid, datdata, logger, keep);
+					return ParseXML(filename, sysid, srcid, datdata, logger, keep, clean);
 				default:
 					return datdata;
 			}
@@ -117,6 +119,7 @@ namespace SabreTools.Helper
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="datdata">The DatData object representing found roms to this point</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
 		public static DatData ParseCMP(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false)
 		{
@@ -378,7 +381,7 @@ namespace SabreTools.Helper
 		/// <param name="datdata">The DatData object representing found roms to this point</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static DatData ParseRC(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false)
+		public static DatData ParseRC(string filename, int sysid, int srcid, DatData datdata, Logger logger)
 		{
 			// Read the input file, if possible
 			logger.Log("Attempting to read file: \"" + filename + "\"");
@@ -526,8 +529,10 @@ namespace SabreTools.Helper
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="datdata">The DatData object representing found roms to this point</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static DatData ParseXML(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false)
+		public static DatData ParseXML(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false, bool clean = false)
 		{
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
@@ -550,11 +555,14 @@ namespace SabreTools.Helper
 						{
 							string tempgame = String.Join("\\", parent);
 
-							/*
-							// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
-							tempgame = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempgame).Groups[1].Value;
-							tempgame = tempgame.TrimStart().TrimEnd();
-							*/
+							// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same if in clean mode
+							if (clean)
+							{
+								string[] splitgame = tempgame.Split(Path.DirectorySeparatorChar);
+								splitgame[splitgame.Length - 1] = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(splitgame[splitgame.Length - 1]).Groups[1].Value;
+								tempgame = String.Join(Path.DirectorySeparatorChar.ToString(), splitgame);
+								tempgame = tempgame.TrimStart().TrimEnd();
+							}
 
 							RomData rom = new RomData
 							{
@@ -970,16 +978,22 @@ namespace SabreTools.Helper
 												nodump = true;
 											}
 
-											/*
-											///Run the name through the filters to make sure that it's correct
-											tempname = Style.NormalizeChars(tempname);
-											tempname = Style.RussianToLatin(tempname);
-											tempname = Style.SearchPattern(tempname);
-											
-											// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
-											tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
-											tempname = tempname.TrimStart().TrimEnd();
-											*/
+											// If we're in clean mode, sanitize the game name
+											if (clean)
+											{
+												string[] splitgame = tempname.Split(Path.DirectorySeparatorChar);
+												string intname = splitgame[splitgame.Length - 1];
+
+												///Run the name through the filters to make sure that it's correct
+												intname = Style.NormalizeChars(intname);
+												intname = Style.RussianToLatin(intname);
+												intname = Style.SearchPattern(intname);
+
+												// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same if in clean mode
+												splitgame[splitgame.Length - 1] = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(intname).Groups[1].Value;
+												tempname = String.Join(Path.DirectorySeparatorChar.ToString(), splitgame);
+												tempname = tempname.TrimStart().TrimEnd();
+											}
 
 											// Only add the rom if there's useful information in it
 											if (!(crc == "" && md5 == "" && sha1 == "") || nodump)
@@ -1035,11 +1049,14 @@ namespace SabreTools.Helper
 							{
 								tempname = (parent.Count > 0 ? String.Join("\\", parent) + Path.DirectorySeparatorChar : "") + tempname;
 
-								/*
-								// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
-								tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
-								tempname = tempname.TrimEnd().TrimStart();
-								*/
+								// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same if in clean mode
+								if (clean)
+								{
+									string[] splitgame = tempname.Split(Path.DirectorySeparatorChar);
+									splitgame[splitgame.Length - 1] = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(splitgame[splitgame.Length - 1]).Groups[1].Value;
+									tempname = String.Join(Path.DirectorySeparatorChar.ToString(), splitgame);
+									tempname = tempname.TrimStart().TrimEnd();
+								}
 
 								RomData rom = new RomData
 								{
@@ -1200,11 +1217,14 @@ namespace SabreTools.Helper
 								}
 							}
 
-							/*
-							// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
-							tempname = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(tempname).Groups[1].Value;
-							tempname = tempname.TrimEnd().TrimStart();
-							*/
+							// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same if in clean mode
+							if (clean)
+							{
+								string[] splitgame = tempname.Split(Path.DirectorySeparatorChar);
+								splitgame[splitgame.Length - 1] = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(splitgame[splitgame.Length - 1]).Groups[1].Value;
+								tempname = String.Join(Path.DirectorySeparatorChar.ToString(), splitgame);
+								tempname = tempname.TrimStart().TrimEnd();
+							}
 
 							// Only add the rom if there's useful information in it
 							if (!(crc == "" && md5 == "" && sha1 == "") || nodump)
