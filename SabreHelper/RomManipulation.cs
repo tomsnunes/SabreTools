@@ -277,6 +277,12 @@ namespace SabreTools.Helper
 						}
 					}
 
+					// If we have a disk, make sure that the value for size is -1
+					if (rom.Type == "disk")
+					{
+						rom.Size = -1;
+					}
+
 					// Now add the rom to the dictionary
 					string key = rom.Size + "-" + rom.CRC;
 					if (datdata.Roms.ContainsKey(key))
