@@ -210,13 +210,13 @@ namespace SabreTools.Helper
 									Int64.TryParse(gc[i].Replace("\"", ""), out rom.Size);
 									break;
 								case "crc":
-									rom.CRC = gc[i].Replace("\"", "");
+									rom.CRC = gc[i].Replace("\"", "").ToLowerInvariant();
 									break;
 								case "md5":
-									rom.MD5 = gc[i].Replace("\"", "");
+									rom.MD5 = gc[i].Replace("\"", "").ToLowerInvariant();
 									break;
 								case "sha1":
-									rom.SHA1 = gc[i].Replace("\"", "");
+									rom.SHA1 = gc[i].Replace("\"", "").ToLowerInvariant();
 									break;
 							}
 
@@ -261,13 +261,13 @@ namespace SabreTools.Helper
 									Int64.TryParse(val, out rom.Size);
 									break;
 								case "crc":
-									rom.CRC = val;
+									rom.CRC = val.ToLowerInvariant();
 									break;
 								case "md5":
-									rom.MD5 = val;
+									rom.MD5 = val.ToLowerInvariant();
 									break;
 								case "sha1":
-									rom.SHA1 = val;
+									rom.SHA1 = val.ToLowerInvariant();
 									break;
 							}
 
@@ -279,6 +279,7 @@ namespace SabreTools.Helper
 
 					// Now add the rom to the dictionary
 					string key = rom.Size + "-" + rom.CRC;
+					Console.WriteLine(key);
 					if (datdata.Roms.ContainsKey(key))
 					{
 						datdata.Roms[key].Add(rom);
@@ -505,7 +506,7 @@ namespace SabreTools.Helper
 						{
 							Game = rominfo[3],
 							Name = rominfo[5],
-							CRC = rominfo[6],
+							CRC = rominfo[6].ToLowerInvariant(),
 							Size = Int64.Parse(rominfo[7]),
 							SystemID = sysid,
 							SourceID = srcid,
