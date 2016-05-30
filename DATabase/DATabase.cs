@@ -1402,17 +1402,11 @@ Make a selection:
 				};
 				datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger, true, clean);
 
-				// Sometimes the description doesn't match the filename, change this
-				if (datdata.Description != Path.GetFileNameWithoutExtension(filename))
-				{
-					datdata.Description = Path.GetFileNameWithoutExtension(filename);
-				}
-
 				// If the extension matches, append ".new" to the filename
 				string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
 				if (outdir == "" && Path.GetExtension(filename) == extension)
 				{
-					datdata.Description += ".new";
+					datdata.FileName += ".new";
 				}
 
 				Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(filename) : outdir), _logger);
