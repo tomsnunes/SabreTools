@@ -235,6 +235,12 @@ namespace SabreTools.Helper
 		{
 			try
 			{
+				// No game should start with a path separator
+				if (rom.Game.StartsWith(Path.DirectorySeparatorChar.ToString()))
+				{
+					rom.Game = rom.Game.Substring(1);
+				}
+
 				string state = "";
 				switch (datdata.OutputFormat)
 				{
