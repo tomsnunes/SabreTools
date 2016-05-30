@@ -462,7 +462,7 @@ namespace SabreTools
 			{
 				foreach (string input in inputs)
 				{
-					InitConvert(input, OutputFormat.Xml, outdir);
+					InitConvert(input, OutputFormat.Xml, outdir, clean);
 				}
 			}
 
@@ -840,7 +840,7 @@ Make a selection:
 						break;
 					case "4":
 						Console.Clear();
-						InitConvert(input, outputFormat, outdir);
+						InitConvert(input, outputFormat, outdir, false);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; outdir = "";
@@ -1382,7 +1382,7 @@ Make a selection:
 		/// <param name="outputFormat"></param>
 		/// <param name="outdir">Optional param for output directory</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
-		private static void InitConvert(string filename, OutputFormat outputFormat, string outdir = "", bool clean = false)
+		private static void InitConvert(string filename, OutputFormat outputFormat, string outdir, bool clean)
 		{
 			// Clean the input strings
 			outdir = outdir.Replace("\"", "");
