@@ -279,7 +279,6 @@ namespace SabreTools.Helper
 
 					// Now add the rom to the dictionary
 					string key = rom.Size + "-" + rom.CRC;
-					Console.WriteLine(key);
 					if (datdata.Roms.ContainsKey(key))
 					{
 						datdata.Roms[key].Add(rom);
