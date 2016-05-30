@@ -166,10 +166,7 @@ namespace SabreTools.Helper
 				else if ((line.Trim().StartsWith("rom (") || line.Trim().StartsWith("disk (")) && block)
 				{
 					// If we're in cleaning mode, sanitize the game name
-					if (clean)
-					{
-						gamename = CleanGameName(gamename);
-					}
+					gamename = (clean ? CleanGameName(gamename) : gamename);
 
 					RomData rom = new RomData
 					{
@@ -502,10 +499,7 @@ namespace SabreTools.Helper
 						string[] rominfo = line.Split('¬');
 
 						// If we're in cleaning mode, sanitize the game name
-						if (clean)
-						{
-							rominfo[3] = CleanGameName(rominfo[3]);
-						}
+						rominfo[3] = (clean ? CleanGameName(rominfo[3]) : rominfo[3]);
 
 						RomData rom = new RomData
 						{
@@ -571,10 +565,7 @@ namespace SabreTools.Helper
 							string tempgame = String.Join("\\", parent);
 
 							// If we're in cleaning mode, sanitize the game name
-							if (clean)
-							{
-								tempgame = CleanGameName(tempgame.Split(Path.DirectorySeparatorChar));
-							}
+							tempgame = (clean ? CleanGameName(tempgame) : tempgame);
 
 							RomData rom = new RomData
 							{
@@ -1051,10 +1042,7 @@ namespace SabreTools.Helper
 								tempname = (parent.Count > 0 ? String.Join("\\", parent) + Path.DirectorySeparatorChar : "") + tempname;
 
 								// If we're in cleaning mode, sanitize the game name
-								if (clean)
-								{
-									tempname = CleanGameName(tempname.Split(Path.DirectorySeparatorChar));
-								}
+								tempname = (clean ? CleanGameName(tempname.Split(Path.DirectorySeparatorChar)) : tempname);
 
 								RomData rom = new RomData
 								{
@@ -1216,10 +1204,7 @@ namespace SabreTools.Helper
 							}
 
 							// If we're in cleaning mode, sanitize the game name
-							if (clean)
-							{
-								tempname = CleanGameName(tempname.Split(Path.DirectorySeparatorChar));
-							}
+							tempname = (clean ? CleanGameName(tempname) : tempname);
 
 							// Only add the rom if there's useful information in it
 							if (!(crc == "" && md5 == "" && sha1 == "") || nodump)
