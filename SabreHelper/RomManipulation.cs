@@ -168,14 +168,7 @@ namespace SabreTools.Helper
 					// If we're in cleaning mode, sanitize the game name
 					if (clean)
 					{
-						///Run the name through the filters to make sure that it's correct
-						gamename = Style.NormalizeChars(gamename);
-						gamename = Style.RussianToLatin(gamename);
-						gamename = Style.SearchPattern(gamename);
-						gamename = gamename.TrimStart().TrimEnd();
-
-						gamename = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(gamename).Groups[1].Value;
-						gamename = gamename.TrimStart().TrimEnd();
+						gamename = CleanGameName(gamename);
 					}
 
 					RomData rom = new RomData
@@ -511,13 +504,7 @@ namespace SabreTools.Helper
 						// If we're in cleaning mode, sanitize the game name
 						if (clean)
 						{
-							///Run the name through the filters to make sure that it's correct
-							rominfo[3] = Style.NormalizeChars(rominfo[3]);
-							rominfo[3] = Style.RussianToLatin(rominfo[3]);
-							rominfo[3] = Style.SearchPattern(rominfo[3]);
-
-							rominfo[3] = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(rominfo[3]).Groups[1].Value;
-							rominfo[3] = rominfo[3].TrimStart().TrimEnd();
+							rominfo[3] = CleanGameName(rominfo[3]);
 						}
 
 						RomData rom = new RomData
@@ -583,13 +570,10 @@ namespace SabreTools.Helper
 						{
 							string tempgame = String.Join("\\", parent);
 
-							// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same if in clean mode
+							// If we're in cleaning mode, sanitize the game name
 							if (clean)
 							{
-								string[] splitgame = tempgame.Split(Path.DirectorySeparatorChar);
-								splitgame[splitgame.Length - 1] = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(splitgame[splitgame.Length - 1]).Groups[1].Value;
-								tempgame = String.Join(Path.DirectorySeparatorChar.ToString(), splitgame);
-								tempgame = tempgame.TrimStart().TrimEnd();
+								tempgame = CleanGameName(tempgame.Split(Path.DirectorySeparatorChar));
 							}
 
 							RomData rom = new RomData
@@ -1009,18 +993,7 @@ namespace SabreTools.Helper
 											// If we're in clean mode, sanitize the game name
 											if (clean)
 											{
-												string[] splitgame = tempname.Split(Path.DirectorySeparatorChar);
-												string intname = splitgame[splitgame.Length - 1];
-
-												///Run the name through the filters to make sure that it's correct
-												intname = Style.NormalizeChars(intname);
-												intname = Style.RussianToLatin(intname);
-												intname = Style.SearchPattern(intname);
-
-												// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same if in clean mode
-												splitgame[splitgame.Length - 1] = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(intname).Groups[1].Value;
-												tempname = String.Join(Path.DirectorySeparatorChar.ToString(), splitgame);
-												tempname = tempname.TrimStart().TrimEnd();
+												tempname = CleanGameName(tempname.Split(Path.DirectorySeparatorChar));
 											}
 
 											// Only add the rom if there's useful information in it
@@ -1077,13 +1050,10 @@ namespace SabreTools.Helper
 							{
 								tempname = (parent.Count > 0 ? String.Join("\\", parent) + Path.DirectorySeparatorChar : "") + tempname;
 
-								// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same if in clean mode
+								// If we're in cleaning mode, sanitize the game name
 								if (clean)
 								{
-									string[] splitgame = tempname.Split(Path.DirectorySeparatorChar);
-									splitgame[splitgame.Length - 1] = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(splitgame[splitgame.Length - 1]).Groups[1].Value;
-									tempname = String.Join(Path.DirectorySeparatorChar.ToString(), splitgame);
-									tempname = tempname.TrimStart().TrimEnd();
+									tempname = CleanGameName(tempname.Split(Path.DirectorySeparatorChar));
 								}
 
 								RomData rom = new RomData
@@ -1245,13 +1215,10 @@ namespace SabreTools.Helper
 								}
 							}
 
-							// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same if in clean mode
+							// If we're in cleaning mode, sanitize the game name
 							if (clean)
 							{
-								string[] splitgame = tempname.Split(Path.DirectorySeparatorChar);
-								splitgame[splitgame.Length - 1] = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(splitgame[splitgame.Length - 1]).Groups[1].Value;
-								tempname = String.Join(Path.DirectorySeparatorChar.ToString(), splitgame);
-								tempname = tempname.TrimStart().TrimEnd();
+								tempname = CleanGameName(tempname.Split(Path.DirectorySeparatorChar));
 							}
 
 							// Only add the rom if there's useful information in it
@@ -1523,6 +1490,36 @@ namespace SabreTools.Helper
 
 			logger.User("A total of " + count + " file hashes will be written out to file");
 			return sortable;
+		}
+
+		/// <summary>
+		/// Clean a game (or rom) name to the WoD standard
+		/// </summary>
+		/// <param name="game">Name of the game to be cleaned</param>
+		/// <returns>The cleaned name</returns>
+		public static string CleanGameName(string game)
+		{
+			///Run the name through the filters to make sure that it's correct
+			game = Style.NormalizeChars(game);
+			game = Style.RussianToLatin(game);
+			game = Style.SearchPattern(game);
+
+			game = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(game).Groups[1].Value;
+			game = game.TrimStart().TrimEnd();
+			return game;
+		}
+
+		/// <summary>
+		/// Clean a game (or rom) name to the WoD standard
+		/// </summary>
+		/// <param name="game">Array representing the path to be cleaned</param>
+		/// <returns>The cleaned name</returns>
+		public static string CleanGameName(string[] game)
+		{
+			game[game.Length - 1] = CleanGameName(game[game.Length - 1]);
+			string outgame = String.Join(Path.DirectorySeparatorChar.ToString(), game);
+			outgame = outgame.TrimStart().TrimEnd();
+			return outgame;
 		}
 	}
 }
