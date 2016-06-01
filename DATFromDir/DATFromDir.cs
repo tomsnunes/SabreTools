@@ -379,51 +379,54 @@ namespace SabreTools
 				}
 			}
 
-			// Now output any empties to the stream
-			foreach (List<RomData> roms in _datdata.Roms.Values)
+			// Now output any empties to the stream (if not in Romba mode)
+			if (!_datdata.Romba)
 			{
-				for (int i = 0; i < roms.Count; i++)
+				foreach (List<RomData> roms in _datdata.Roms.Values)
 				{
-					RomData rom = roms[i];
-
-					// If we're in a mode that doesn't allow for actual empty folders, add the blank info
-					if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
+					for (int i = 0; i < roms.Count; i++)
 					{
-						rom.Type = "rom";
-						rom.Name = "-";
-						rom.Size = Constants.SizeZero;
-						rom.CRC = Constants.CRCZero;
-						rom.MD5 = Constants.MD5Zero;
-						rom.SHA1 = Constants.SHA1Zero;
-					}
+						RomData rom = roms[i];
 
-					// If we have a different game and we're not at the start of the list, output the end of last item
-					int last = 0;
-					if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
-					{
-						Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
-					}
+						// If we're in a mode that doesn't allow for actual empty folders, add the blank info
+						if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
+						{
+							rom.Type = "rom";
+							rom.Name = "-";
+							rom.Size = Constants.SizeZero;
+							rom.CRC = Constants.CRCZero;
+							rom.MD5 = Constants.MD5Zero;
+							rom.SHA1 = Constants.SHA1Zero;
+						}
 
-					// If we have a new game, output the beginning of the new item
-					if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
-					{
-						Output.WriteStartGame(sw, rom, new List<string>(), lastparent, _datdata, 0, last, _logger);
-					}
+						// If we have a different game and we're not at the start of the list, output the end of last item
+						int last = 0;
+						if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+						{
+							Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
+						}
 
-					// Write out the rom data
-					if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
-					{
-						Output.WriteRomData(sw, rom, lastparent, _datdata, 0, _logger);
+						// If we have a new game, output the beginning of the new item
+						if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+						{
+							Output.WriteStartGame(sw, rom, new List<string>(), lastparent, _datdata, 0, last, _logger);
+						}
+
+						// Write out the rom data
+						if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
+						{
+							Output.WriteRomData(sw, rom, lastparent, _datdata, 0, _logger);
+						}
+
+						lastparent = rom.Game;
 					}
-					
-					lastparent = rom.Game;
 				}
-			}
 
-			// If we had roms but not blanks (and not in Romba mode), create an artifical rom for the purposes of outputting
-			if (lastparent != null && _datdata.Roms.Count == 0 && !_datdata.Romba)
-			{
-				_datdata.Roms.Add("temp", new List<RomData>());
+				// If we had roms but not blanks (and not in Romba mode), create an artifical rom for the purposes of outputting
+				if (lastparent != null && _datdata.Roms.Count == 0)
+				{
+					_datdata.Roms.Add("temp", new List<RomData>());
+				}
 			}
 
 			// Now write the final piece and close the output stream
