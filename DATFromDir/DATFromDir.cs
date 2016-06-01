@@ -504,7 +504,7 @@ namespace SabreTools
 					{
 						extractedsize += (4 * Constants.GibiByte);
 					}
-					_logger.Log("Final file size: " + extractedsize + "\nExtracted CRC: " + gzcrc +
+					_logger.Log("Filename: '" + Path.GetFullPath(item) + "'\nFinal file size: " + extractedsize + "\nExtracted CRC: " + gzcrc +
 						"\nExtracted MD5: " + gzmd5 + "\nSHA-1: " + Path.GetFileNameWithoutExtension(item));
 				}
 
