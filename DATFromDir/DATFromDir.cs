@@ -491,8 +491,8 @@ namespace SabreTools
 				string gzsize = BitConverter.ToString(footer.Reverse().ToArray()).Replace("-", string.Empty);
 				long extractedsize = Convert.ToInt64(gzsize, 16);
 
-				// Only try to add if the file size is greater than 1 GiB
-				if (filesize >= (Constants.GibiByte))
+				// Only try to add if the file size is greater than 750 MiB
+				if (filesize >= (750 * Constants.MibiByte))
 				{
 					// ISIZE is mod 4GiB, so we add that if the ISIZE is smaller than the filesize and header
 					bool shouldfollowup = false;
