@@ -522,7 +522,7 @@ namespace SabreTools
 				Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), "", _datdata, 0, out last, _logger);
 
 				_logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
-				return "";
+				return rom.Game;
 			}
 
 			// Create the temporary output directory
