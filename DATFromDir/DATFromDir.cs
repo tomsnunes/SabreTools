@@ -504,8 +504,8 @@ namespace SabreTools
 					{
 						extractedsize += (4 * Constants.GibiByte);
 					}
-					_logger.Log("Filename: '" + Path.GetFullPath(item) + "'\nFinal file size: " + extractedsize + "\nExtracted CRC: " + gzcrc +
-						"\nExtracted MD5: " + gzmd5 + "\nSHA-1: " + Path.GetFileNameWithoutExtension(item));
+					_logger.Log("Filename: '" + Path.GetFullPath(item) + "'\nFinal file size: " + extractedsize + ", " + Style.GetBytesReadable(extractedsize) +
+						"\nExtracted CRC: " + gzcrc + "\nExtracted MD5: " + gzmd5 + "\nSHA-1: " + Path.GetFileNameWithoutExtension(item));
 				}
 
 				RomData rom = new RomData
