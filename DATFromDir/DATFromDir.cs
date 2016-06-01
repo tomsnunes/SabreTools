@@ -492,9 +492,9 @@ namespace SabreTools
 				long extractedsize = Convert.ToInt64(gzsize, 16);
 
 				// Only try to add if the file size is greater than 2.5 GiB
-				if (filesize >= (2.5 * 1024 * 1024 * 1024))
+				if (filesize >= (2.5 * Constants.GibiByte))
 				{
-					// ISIZE is mod 2^32, so we add that if the ISIZE is smaller than the filesize and header
+					// ISIZE is mod 4GiB, so we add that if the ISIZE is smaller than the filesize and header
 					if (extractedsize < (filesize - neededHeaderSize))
 					{
 						_logger.Log("Filename: '" + Path.GetFullPath(item) + "'\nExtracted file size: " +
@@ -502,7 +502,7 @@ namespace SabreTools
 					}
 					while (extractedsize < (filesize - neededHeaderSize))
 					{
-						extractedsize += (long)Math.Pow(2, 32);
+						extractedsize += (4 * Constants.GibiByte);
 					}
 					_logger.Log("Final file size: " + extractedsize + "\nExtracted CRC: " + gzcrc +
 						"\nExtracted MD5: " + gzmd5 + "\nSHA-1: " + Path.GetFileNameWithoutExtension(item));

@@ -1,4 +1,6 @@
-﻿namespace SabreTools.Helper
+﻿using System;
+
+namespace SabreTools.Helper
 {
 	public class Constants
 	{
@@ -47,5 +49,19 @@
 		public static string HeaderPatternCMP = @"(^.*?) \($";
 		public static string ItemPatternCMP = @"^\s*(\S*?) (.*)";
 		public static string EndPatternCMP = @"^\s*\)\s*$";
+
+		// Byte (1024-based) size comparisons
+		public static long KibiByte = 1024;
+		public static long MibiByte = (long)Math.Pow(KibiByte, 2);
+		public static long GibiByte = (long)Math.Pow(KibiByte, 3);
+		public static long TibiByte = (long)Math.Pow(KibiByte, 4);
+		public static long PibiByte = (long)Math.Pow(KibiByte, 5);
+
+		// Byte (1000-based) size comparisons
+		public static long KiloByte = 1000;
+		public static long MegaByte = (long)Math.Pow(KiloByte, 2);
+		public static long GigaByte = (long)Math.Pow(KiloByte, 2);
+		public static long TeraByte = (long)Math.Pow(KiloByte, 2);
+		public static long PetaByte = (long)Math.Pow(KiloByte, 2);
 	}
 }
