@@ -508,7 +508,7 @@ namespace SabreTools
 					}
 					if (shouldfollowup)
 					{
-						_logger.Log("mancalc - Filename: '" + Path.GetFullPath(item) + "'\nFinal file size: " + extractedsize + ", " + Style.GetBytesReadable(extractedsize) +
+						_logger.Log("Filename: '" + Path.GetFullPath(item) + "'\nFinal file size: " + extractedsize + ", " + Style.GetBytesReadable(extractedsize) +
 						"\nExtracted CRC: " + gzcrc + "\nExtracted MD5: " + gzmd5 + "\nSHA-1: " + Path.GetFileNameWithoutExtension(item));
 					}
 				}
