@@ -34,16 +34,6 @@ namespace SabreTools
 		/// <returns>True if output succeeded, false otherwise</returns>
 		public bool Process()
 		{
-			// Init all single-dat variables
-			long singleSize = 0;
-			long singleGame = 0;
-			long singleRom = 0;
-			long singleDisk = 0;
-			long singleCRC = 0;
-			long singleMD5 = 0;
-			long singleSHA1 = 0;
-			long singleNodump = 0;
-
 			// Init all total variables
 			long totalSize = 0;
 			long totalGame = 0;
@@ -59,85 +49,39 @@ namespace SabreTools
 			{
 				_logger.User("Beginning stat collection for '" + filename + "'");
 				List<String> games = new List<String>();
-
 				DatData datdata = new DatData();
 				datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger);
-				foreach (List<RomData> romlist in datdata.Roms.Values)
-				{
-					foreach (RomData rom in romlist)
-					{
-						singleSize += rom.Size;
-						if (!games.Contains(rom.Game))
-						{
-							singleGame++;
-							games.Add(rom.Game);
-						}
-						if (rom.Type == "rom")
-						{
-							singleRom++;
-						}
-						if (rom.Type == "disk")
-						{
-							singleDisk++;
-						}
-						if (!String.IsNullOrEmpty(rom.CRC))
-						{
-							singleCRC++;
-						}
-						if (!String.IsNullOrEmpty(rom.MD5))
-						{
-							singleMD5++;
-						}
-						if (!String.IsNullOrEmpty(rom.SHA1))
-						{
-							singleSHA1++;
-						}
-						if (rom.Nodump)
-						{
-							singleNodump++;
-						}
-					}
-				}
+				SortedDictionary<string, List<RomData>> newroms = RomManipulation.BucketByGame(datdata.Roms, false, true, _logger);
 
 				// Output single DAT stats (if asked)
 				if (_single)
 				{
-					_logger.User(@"For file '" + filename + @"':
+					_logger.User(@"\nFor file '" + filename + @"':
 --------------------------------------------------
-    Uncompressed size:       " + Style.GetBytesReadable(singleSize) + @"
-    Games found:             " + singleGame + @"
-    Roms found:              " + singleRom + @"
-    Disks found:             " + singleDisk + @"
-    Roms with CRC:           " + singleCRC + @"
-    Roms with MD5:           " + singleMD5 + @"
-    Roms with SHA-1:         " + singleSHA1 + @"
-    Roms with Nodump status: " + singleNodump + @"
+    Uncompressed size:       " + Style.GetBytesReadable(datdata.TotalSize) + @"
+    Games found:             " + newroms.Count + @"
+    Roms found:              " + datdata.RomCount + @"
+    Disks found:             " + datdata.DiskCount + @"
+    Roms with CRC:           " + datdata.CRCCount + @"
+    Roms with MD5:           " + datdata.MD5Count + @"
+    Roms with SHA-1:         " + datdata.SHA1Count + @"
+    Roms with Nodump status: " + datdata.NodumpCount + @"
 ");
 				}
 				else
 				{
-					_logger.User("Adding stats for file '" + filename + "'");
+					_logger.User("\nAdding stats for file '" + filename + "'");
 				}
 
 				// Add single DAT stats to totals
-				totalSize += singleSize;
-				totalGame += singleGame;
-				totalRom += singleRom;
-				totalDisk += singleDisk;
-				totalCRC += singleCRC;
-				totalMD5 += singleMD5;
-				totalSHA1 += singleSHA1;
-				totalNodump += singleNodump;
-
-				// Reset single DAT stats
-				singleSize = 0;
-				singleGame = 0;
-				singleRom = 0;
-				singleDisk = 0;
-				singleCRC = 0;
-				singleMD5 = 0;
-				singleSHA1 = 0;
-				singleNodump = 0;
+				totalSize += datdata.TotalSize;
+				totalGame += newroms.Count;
+				totalRom += datdata.RomCount;
+				totalDisk += datdata.DiskCount;
+				totalCRC += datdata.CRCCount;
+				totalMD5 += datdata.MD5Count;
+				totalSHA1 += datdata.SHA1Count;
+				totalNodump += datdata.SHA1Count;
 			}
 
 			// Output total DAT stats

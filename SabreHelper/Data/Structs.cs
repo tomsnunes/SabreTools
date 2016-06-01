@@ -61,5 +61,14 @@ namespace SabreTools.Helper
 		public bool GameName;
 		public bool Romba;
 		public bool TSV; // tab-deliminated output
+
+		// Statistical data related to the DAT
+		public long RomCount;
+		public long DiskCount;
+		public long TotalSize;
+		public long CRCCount;
+		public long MD5Count;
+		public long SHA1Count;
+		public long NodumpCount;
 	}
 }

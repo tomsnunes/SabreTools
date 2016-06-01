@@ -420,8 +420,8 @@ namespace SabreTools
 				}
 			}
 
-			// If we had roms but not blanks, create an artifical rom for the purposes of outputting
-			if (lastparent != null && _datdata.Roms.Count == 0)
+			// If we had roms but not blanks (and not in Romba mode), create an artifical rom for the purposes of outputting
+			if (lastparent != null && _datdata.Roms.Count == 0 && !_datdata.Romba)
 			{
 				_datdata.Roms.Add("temp", new List<RomData>());
 			}
@@ -442,26 +442,77 @@ namespace SabreTools
 		/// <returns>New parent to be used</returns>
 		private string ProcessFile(string item, StreamWriter sw, string lastparent)
 		{
-			string tempdir = "";
+			// Define the temporary directory
+			string tempdir = (String.IsNullOrEmpty(_tempDir) ? Environment.CurrentDirectory : _tempDir);
+			tempdir += (tempdir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? "" : Path.DirectorySeparatorChar.ToString());
+			tempdir += "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
 
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
 			{
-				string datum = Path.GetFileNameWithoutExtension(item).ToLowerInvariant();
+				int neededHeaderSize = 32;
+				string datum = Path.GetFileName(item).ToLowerInvariant();
+				long filesize = new FileInfo(item).Length;
 
 				// Check if the name is the right length
-				if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}"))
+				if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}\.gz"))
 				{
 					_logger.Warning("Non SHA-1 filename found, skipping: '" + datum + "'");
 					return "";
 				}
 
+				// Check if the file is at least the minimum length
+				if (filesize < neededHeaderSize)
+				{
+					_logger.Warning("Possibly corrupt file '" + item + "' with size " + Style.GetBytesReadable(filesize));
+					return "";
+				}
+
+				// Get the Romba-specific header data
+				byte[] header;
+				byte[] footer;
+				using (FileStream itemstream = File.OpenRead(item))
+				{
+					using (BinaryReader br = new BinaryReader(itemstream))
+					{
+						header = br.ReadBytes(neededHeaderSize);
+						br.BaseStream.Seek(-4, SeekOrigin.End);
+						footer = br.ReadBytes(4);
+					}
+				}
+
+				// Now convert the data and get the right positions
+				string headerstring = BitConverter.ToString(header).Replace("-", string.Empty);
+				string gzmd5 = headerstring.Substring(24, 32);
+				string gzcrc = headerstring.Substring(56, 8);
+				string gzsize = BitConverter.ToString(footer.Reverse().ToArray()).Replace("-", string.Empty);
+				long extractedsize = Convert.ToInt64(gzsize, 16);
+
+				// Only try to add if the file size is greater than 2.5 GiB
+				if (filesize >= (2.5 * 1024 * 1024 * 1024))
+				{
+					// ISIZE is mod 2^32, so we add that if the ISIZE is smaller than the filesize and header
+					if (extractedsize < (filesize - neededHeaderSize))
+					{
+						_logger.Log("Filename: '" + Path.GetFullPath(item) + "'\nExtracted file size: " +
+							extractedsize + ", " + Style.GetBytesReadable(extractedsize) + "\nArchive file size: " + filesize + ", " + Style.GetBytesReadable(filesize));
+					}
+					while (extractedsize < (filesize - neededHeaderSize))
+					{
+						extractedsize += (long)Math.Pow(2, 32);
+					}
+					_logger.Log("Final file size: " + extractedsize + "\nExtracted CRC: " + gzcrc +
+						"\nExtracted MD5: " + gzmd5 + "\nSHA-1: " + Path.GetFileNameWithoutExtension(item));
+				}
+
 				RomData rom = new RomData
 				{
 					Type = "rom",
-					Game = datum,
-					Name = datum,
-					Size = (new FileInfo(item)).Length,
+					Game = Path.GetFileNameWithoutExtension(item),
+					Name = Path.GetFileNameWithoutExtension(item),
+					Size = extractedsize,
+					CRC = gzcrc,
+					MD5 = gzmd5,
 					SHA1 = Path.GetFileNameWithoutExtension(item),
 				};
 
@@ -470,7 +521,7 @@ namespace SabreTools
 				Output.WriteRomData(sw, rom, "", _datdata, 0, _logger);
 				Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), "", _datdata, 0, out last, _logger);
 
-				_logger.Log("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
+				_logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 				return "";
 			}
 
@@ -484,11 +535,6 @@ namespace SabreTools
 					archive = ArchiveFactory.Open(item);
 					ArchiveType at = archive.Type;
 					_logger.Log("Found archive of type: " + at);
-
-					// Define the temporary directory
-					tempdir = (String.IsNullOrEmpty(_tempDir) ? Environment.CurrentDirectory : _tempDir);
-					tempdir += (tempdir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? "" : Path.DirectorySeparatorChar.ToString());
-					tempdir += "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
 
 					if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
 					{

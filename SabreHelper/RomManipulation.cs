@@ -295,6 +295,15 @@ namespace SabreTools.Helper
 						templist.Add(rom);
 						datdata.Roms.Add(key, templist);
 					}
+
+					// Add statistical data
+					datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
+					datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+					datdata.TotalSize += rom.Size;
+					datdata.CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
+					datdata.MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
+					datdata.SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
+					datdata.NodumpCount += (rom.Nodump ? 1 : 0);
 				}
 				// If the line is anything but a rom or disk and we're in a block
 				else if (Regex.IsMatch(line, Constants.ItemPatternCMP) && block)
@@ -529,6 +538,15 @@ namespace SabreTools.Helper
 							templist.Add(rom);
 							datdata.Roms.Add(key, templist);
 						}
+
+						// Add statistical data
+						datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
+						datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+						datdata.TotalSize += rom.Size;
+						datdata.CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
+						datdata.MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
+						datdata.SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
+						datdata.NodumpCount += (rom.Nodump ? 1 : 0);
 					}
 				}
 			}
@@ -595,6 +613,15 @@ namespace SabreTools.Helper
 								temp.Add(rom);
 								datdata.Roms.Add(key, temp);
 							}
+
+							// Add statistical data
+							datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
+							datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+							datdata.TotalSize += rom.Size;
+							datdata.CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
+							datdata.MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
+							datdata.SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
+							datdata.NodumpCount += (rom.Nodump ? 1 : 0);
 						}
 
 						// Regardless, end the current folder
@@ -1005,7 +1032,7 @@ namespace SabreTools.Helper
 												// Get the new values to add
 												key = size + "-" + crc;
 
-												RomData value = new RomData
+												RomData rom = new RomData
 												{
 													Game = tempname,
 													Name = subreader.GetAttribute("name"),
@@ -1023,14 +1050,23 @@ namespace SabreTools.Helper
 
 												if (datdata.Roms.ContainsKey(key))
 												{
-													datdata.Roms[key].Add(value);
+													datdata.Roms[key].Add(rom);
 												}
 												else
 												{
 													List<RomData> newvalue = new List<RomData>();
-													newvalue.Add(value);
+													newvalue.Add(rom);
 													datdata.Roms.Add(key, newvalue);
 												}
+
+												// Add statistical data
+												datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
+												datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+												datdata.TotalSize += rom.Size;
+												datdata.CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
+												datdata.MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
+												datdata.SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
+												datdata.NodumpCount += (rom.Nodump ? 1 : 0);
 											}
 											// Otherwise, log that it wasn't added
 											else
@@ -1072,6 +1108,15 @@ namespace SabreTools.Helper
 									temp.Add(rom);
 									datdata.Roms.Add(key, temp);
 								}
+
+								// Add statistical data
+								datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
+								datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+								datdata.TotalSize += rom.Size;
+								datdata.CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
+								datdata.MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
+								datdata.SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
+								datdata.NodumpCount += (rom.Nodump ? 1 : 0);
 							}
 
 							// Regardless, end the current folder
@@ -1224,7 +1269,7 @@ namespace SabreTools.Helper
 								// Get the new values to add
 								key = size + "-" + crc;
 
-								RomData value = new RomData
+								RomData rom = new RomData
 								{
 									Game = tempname,
 									Name = xtr.GetAttribute("name"),
@@ -1242,14 +1287,23 @@ namespace SabreTools.Helper
 
 								if (datdata.Roms.ContainsKey(key))
 								{
-									datdata.Roms[key].Add(value);
+									datdata.Roms[key].Add(rom);
 								}
 								else
 								{
 									List<RomData> newvalue = new List<RomData>();
-									newvalue.Add(value);
+									newvalue.Add(rom);
 									datdata.Roms.Add(key, newvalue);
 								}
+
+								// Add statistical data
+								datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
+								datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+								datdata.TotalSize += rom.Size;
+								datdata.CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
+								datdata.MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
+								datdata.SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
+								datdata.NodumpCount += (rom.Nodump ? 1 : 0);
 							}
 							xtr.Read();
 							break;
@@ -1331,6 +1385,12 @@ namespace SabreTools.Helper
 							dupefound = (((rom.MD5 == "" || lastrom.MD5 == "") || rom.MD5 == lastrom.MD5) &&
 								((rom.SHA1 == "" || lastrom.SHA1 == "") || rom.SHA1 == lastrom.SHA1)
 							);
+						}
+
+						// Special logging to remove later
+						if (rom.SHA1 == lastrom.SHA1 && rom.Size != lastrom.Size)
+						{
+							logger.User("Rom SHA-1: " + lastrom.SHA1 + "\nRom Size: " + lastrom.Size + "\nNew Rom size: " + rom.Size);
 						}
 
 						// If it's a duplicate, skip adding it to the output but add any missing information
