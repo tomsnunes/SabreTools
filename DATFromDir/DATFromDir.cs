@@ -495,6 +495,7 @@ namespace SabreTools
 				if (filesize >= (Constants.GibiByte))
 				{
 					// ISIZE is mod 4GiB, so we add that if the ISIZE is smaller than the filesize and header
+					bool shouldfollowup = false;
 					if (extractedsize < (filesize - neededHeaderSize))
 					{
 						_logger.Log("Filename: '" + Path.GetFullPath(item) + "'\nExtracted file size: " +
@@ -503,9 +504,13 @@ namespace SabreTools
 					while (extractedsize < (filesize - neededHeaderSize))
 					{
 						extractedsize += (4 * Constants.GibiByte);
+						shouldfollowup = true;
 					}
-					_logger.Log("Filename: '" + Path.GetFullPath(item) + "'\nFinal file size: " + extractedsize + ", " + Style.GetBytesReadable(extractedsize) +
+					if (shouldfollowup)
+					{
+						_logger.Log("Filename: '" + Path.GetFullPath(item) + "'\nFinal file size: " + extractedsize + ", " + Style.GetBytesReadable(extractedsize) +
 						"\nExtracted CRC: " + gzcrc + "\nExtracted MD5: " + gzmd5 + "\nSHA-1: " + Path.GetFileNameWithoutExtension(item));
+					}
 				}
 
 				RomData rom = new RomData
