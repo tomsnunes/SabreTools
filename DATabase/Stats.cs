@@ -81,7 +81,7 @@ namespace SabreTools
 				totalCRC += datdata.CRCCount;
 				totalMD5 += datdata.MD5Count;
 				totalSHA1 += datdata.SHA1Count;
-				totalNodump += datdata.SHA1Count;
+				totalNodump += datdata.NodumpCount;
 			}
 
 			// Output total DAT stats
