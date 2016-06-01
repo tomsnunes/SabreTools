@@ -57,6 +57,7 @@ namespace SabreTools
 			/// Now process each of the input files
 			foreach (string filename in _inputs)
 			{
+				_logger.User("Beginning stat collection for '" + filename + "'");
 				List<String> games = new List<String>();
 
 				DatData datdata = new DatData();
