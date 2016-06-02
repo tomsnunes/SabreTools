@@ -1387,16 +1387,6 @@ namespace SabreTools.Helper
 							);
 						}
 
-						// Special logging to remove later
-						if (rom.SHA1 == lastrom.SHA1 && rom.Size != lastrom.Size)
-						{
-							logger.User("Hash duplicate found:\nRom SHA-1: " + lastrom.SHA1 + "\nRom Size: " + lastrom.Size + "\nNew Rom size: " + rom.Size);
-						}
-						if (rom.MD5 == lastrom.MD5 && rom.Size != lastrom.Size)
-						{
-							logger.User("Hash duplicate found:\nRom MD5: " + lastrom.MD5 + "\nRom Size: " + lastrom.Size + "\nNew Rom size: " + rom.Size);
-						}
-
 						// If it's a duplicate, skip adding it to the output but add any missing information
 						if (dupefound)
 						{
