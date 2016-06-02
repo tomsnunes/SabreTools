@@ -1390,13 +1390,18 @@ namespace SabreTools.Helper
 						// Special logging to remove later
 						if (rom.SHA1 == lastrom.SHA1 && rom.Size != lastrom.Size)
 						{
-							logger.User("Rom SHA-1: " + lastrom.SHA1 + "\nRom Size: " + lastrom.Size + "\nNew Rom size: " + rom.Size);
+							logger.User("Hash duplicate found:\nRom SHA-1: " + lastrom.SHA1 + "\nRom Size: " + lastrom.Size + "\nNew Rom size: " + rom.Size);
+						}
+						if (rom.MD5 == lastrom.MD5 && rom.Size != lastrom.Size)
+						{
+							logger.User("Hash duplicate found:\nRom MD5: " + lastrom.MD5 + "\nRom Size: " + lastrom.Size + "\nNew Rom size: " + rom.Size);
 						}
 
 						// If it's a duplicate, skip adding it to the output but add any missing information
 						if (dupefound)
 						{
-							logger.Log("Rom information of found duplicate: " + rom.Game + "\t" + rom.Name + "\t" + rom.Size + "\t" + rom.CRC + "\t" + rom.MD5 + "\t" + rom.SHA1);
+							logger.Log("Rom information of found duplicate:\n\tGame: " + rom.Game + "\n\tRom Name:" + rom.Name +
+								"\n\tSize: " + rom.Size + "\n\tCRC:" + rom.CRC + "\n\tMD5:" + rom.MD5 + "\n\tSHA-1:" + rom.SHA1);
 
 							savedrom = lastrom;
 							pos = i;

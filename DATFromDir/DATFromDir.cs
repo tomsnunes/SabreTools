@@ -453,7 +453,6 @@ namespace SabreTools
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
 			{
-				int neededHeaderSize = 32;
 				string datum = Path.GetFileName(item).ToLowerInvariant();
 				long filesize = new FileInfo(item).Length;
 
@@ -465,7 +464,7 @@ namespace SabreTools
 				}
 
 				// Check if the file is at least the minimum length
-				if (filesize < neededHeaderSize)
+				if (filesize < 32 /* bytes */)
 				{
 					_logger.Warning("Possibly corrupt file '" + item + "' with size " + Style.GetBytesReadable(filesize));
 					return "";
@@ -478,7 +477,7 @@ namespace SabreTools
 				{
 					using (BinaryReader br = new BinaryReader(itemstream))
 					{
-						header = br.ReadBytes(neededHeaderSize);
+						header = br.ReadBytes(32);
 						br.BaseStream.Seek(-4, SeekOrigin.End);
 						footer = br.ReadBytes(4);
 					}
@@ -494,14 +493,14 @@ namespace SabreTools
 				// Only try to add if the file size is greater than 750 MiB
 				if (filesize >= (750 * Constants.MibiByte))
 				{
-					// ISIZE is mod 4GiB, so we add that if the ISIZE is smaller than the filesize and header
+					// ISIZE is mod 4GiB, so we add that if the ISIZE is smaller than the filesize and greater than 1% different
 					bool shouldfollowup = false;
-					if (extractedsize < (filesize - neededHeaderSize))
+					if (extractedsize < filesize && (100 * extractedsize / filesize) < 99 /* percent */)
 					{
 						_logger.Log("mancalc - Filename: '" + Path.GetFullPath(item) + "'\nExtracted file size: " +
 							extractedsize + ", " + Style.GetBytesReadable(extractedsize) + "\nArchive file size: " + filesize + ", " + Style.GetBytesReadable(filesize));
 					}
-					while (extractedsize < (filesize - neededHeaderSize))
+					while (extractedsize < filesize && (100 * extractedsize / filesize) < 99 /* percent */)
 					{
 						extractedsize += (4 * Constants.GibiByte);
 						shouldfollowup = true;

@@ -1562,17 +1562,25 @@ Make a selection:
 						{
 							_logger.Warning("The path for " + file + " was too long");
 						}
+						catch (Exception ex)
+						{
+							_logger.Error(ex.ToString());
+						}
 					}
 				}
 				else if (File.Exists(input.Replace("\"", "")))
 				{
 					try
 					{
-						newInputs.Add(Path.GetFullPath(input.Replace("\"", "")) + "¬" + Path.GetFullPath(Path.GetDirectoryName(input.Replace("\"", ""))));
+						newInputs.Add(Path.GetFullPath(input.Replace("\"", "")) + "¬" + Path.GetDirectoryName(Path.GetFullPath(input.Replace("\"", ""))));
 					}
 					catch (PathTooLongException)
 					{
 						_logger.Warning("The path for " + input.Replace("\"", "") + " was too long");
+					}
+					catch (Exception ex)
+					{
+						_logger.Error(ex.ToString());
 					}
 				}
 			}
