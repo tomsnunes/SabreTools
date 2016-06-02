@@ -1387,6 +1387,15 @@ namespace SabreTools.Helper
 							);
 						}
 
+						// DEBUG
+						if ((rom.Size == lastrom.Size) &&
+								((String.IsNullOrEmpty(rom.CRC) || String.IsNullOrEmpty(lastrom.CRC)) || rom.CRC == lastrom.CRC) &&
+								((String.IsNullOrEmpty(rom.MD5) || String.IsNullOrEmpty(lastrom.MD5)) || rom.MD5 != lastrom.MD5) &&
+								((String.IsNullOrEmpty(rom.SHA1) || String.IsNullOrEmpty(lastrom.SHA1)) || rom.SHA1 == lastrom.SHA1))
+						{
+							logger.User("md5diff - MD5 source: " + lastrom.MD5 + ", MD5 new: " + rom.MD5);
+						}
+
 						// If it's a duplicate, skip adding it to the output but add any missing information
 						if (dupefound)
 						{
@@ -1397,8 +1406,8 @@ namespace SabreTools.Helper
 							pos = i;
 
 							savedrom.CRC = (String.IsNullOrEmpty(savedrom.CRC) && !String.IsNullOrEmpty(rom.CRC) ? rom.CRC : savedrom.CRC);
-							savedrom.MD5 = (String.IsNullOrEmpty(savedrom.MD5) && !String.IsNullOrEmpty(rom.CRC) ? rom.MD5 : savedrom.MD5);
-							savedrom.SHA1 = (String.IsNullOrEmpty(savedrom.MD5) && !String.IsNullOrEmpty(rom.CRC) ? rom.SHA1 : savedrom.SHA1);
+							savedrom.MD5 = (String.IsNullOrEmpty(savedrom.MD5) && !String.IsNullOrEmpty(rom.MD5) ? rom.MD5 : savedrom.MD5);
+							savedrom.SHA1 = (String.IsNullOrEmpty(savedrom.SHA1) && !String.IsNullOrEmpty(rom.SHA1) ? rom.SHA1 : savedrom.SHA1);
 
 							// If the duplicate is external already or should be, set it
 							if (savedrom.Dupe >= DupeType.ExternalHash || savedrom.SystemID != rom.SystemID || savedrom.SourceID != rom.SourceID)
