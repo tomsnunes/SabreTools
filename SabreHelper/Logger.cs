@@ -8,7 +8,6 @@ namespace SabreTools.Helper
 	/// </summary>
 	/// <remarks>
 	/// Things to do:
-	/// - Create log files by date
 	/// - Clean up log files if there are more than x number per program
 	/// - Allow for "triggerable" logging done on an interval (async)
 	/// - Log filtering? (#if debug?)
@@ -46,11 +45,11 @@ namespace SabreTools.Helper
 		/// Initialize a Logger object with the given information
 		/// </summary>
 		/// <param name="tofile">True if file should be written to instead of console</param>
-		/// <param name="filename">Optional filename representing log location</param>
-		public Logger(bool tofile, string filename = "")
+		/// <param name="filename">Filename representing log location</param>
+		public Logger(bool tofile, string filename)
 		{
 			_tofile = tofile;
-			_filename = filename;
+			_filename = Path.GetFileNameWithoutExtension(filename) + " (" + DateTime.Now.ToString("yyyy-MM-dd HHmmss") + ")" + Path.GetExtension(filename);
 
 			if (!Directory.Exists(_basepath))
 			{
