@@ -818,7 +818,7 @@ namespace SabreTools.Helper
 																switch (flagreader.GetAttribute("name"))
 																{
 																	case "type":
-																		datdata.Type = (datdata.Type == "" ? content : datdata.Type);
+																		datdata.Type = (String.IsNullOrEmpty(datdata.Type) ? content : datdata.Type);
 																		superdat = superdat || content.Contains("SuperDAT");
 																		break;
 																	case "forcemerging":
@@ -1375,15 +1375,15 @@ namespace SabreTools.Helper
 						if (rom.Type == "rom" && lastrom.Type == "rom")
 						{
 							dupefound = ((rom.Size == lastrom.Size) &&
-								((rom.CRC == "" || lastrom.CRC == "") || rom.CRC == lastrom.CRC) &&
-								((rom.MD5 == "" || lastrom.MD5 == "") || rom.MD5 == lastrom.MD5) &&
-								((rom.SHA1 == "" || lastrom.SHA1 == "") || rom.SHA1 == lastrom.SHA1)
+								((String.IsNullOrEmpty(rom.CRC) || String.IsNullOrEmpty(lastrom.CRC)) || rom.CRC == lastrom.CRC) &&
+								((String.IsNullOrEmpty(rom.MD5) || String.IsNullOrEmpty(lastrom.MD5)) || rom.MD5 == lastrom.MD5) &&
+								((String.IsNullOrEmpty(rom.SHA1) || String.IsNullOrEmpty(lastrom.SHA1)) || rom.SHA1 == lastrom.SHA1)
 							);
 						}
 						else if (rom.Type == "disk" && lastrom.Type == "disk")
 						{
-							dupefound = (((rom.MD5 == "" || lastrom.MD5 == "") || rom.MD5 == lastrom.MD5) &&
-								((rom.SHA1 == "" || lastrom.SHA1 == "") || rom.SHA1 == lastrom.SHA1)
+							dupefound = (((String.IsNullOrEmpty(rom.MD5) || String.IsNullOrEmpty(lastrom.MD5)) || rom.MD5 == lastrom.MD5) &&
+								((String.IsNullOrEmpty(rom.SHA1) || String.IsNullOrEmpty(lastrom.SHA1)) || rom.SHA1 == lastrom.SHA1)
 							);
 						}
 
@@ -1396,9 +1396,9 @@ namespace SabreTools.Helper
 							savedrom = lastrom;
 							pos = i;
 
-							savedrom.CRC = (savedrom.CRC == "" && rom.CRC != "" ? rom.CRC : savedrom.CRC);
-							savedrom.MD5 = (savedrom.MD5 == "" && rom.MD5 != "" ? rom.MD5 : savedrom.MD5);
-							savedrom.SHA1 = (savedrom.SHA1 == "" && rom.SHA1 != "" ? rom.SHA1 : savedrom.SHA1);
+							savedrom.CRC = (String.IsNullOrEmpty(savedrom.CRC) && !String.IsNullOrEmpty(rom.CRC) ? rom.CRC : savedrom.CRC);
+							savedrom.MD5 = (String.IsNullOrEmpty(savedrom.MD5) && !String.IsNullOrEmpty(rom.CRC) ? rom.MD5 : savedrom.MD5);
+							savedrom.SHA1 = (String.IsNullOrEmpty(savedrom.MD5) && !String.IsNullOrEmpty(rom.CRC) ? rom.SHA1 : savedrom.SHA1);
 
 							// If the duplicate is external already or should be, set it
 							if (savedrom.Dupe >= DupeType.ExternalHash || savedrom.SystemID != rom.SystemID || savedrom.SourceID != rom.SourceID)
@@ -1514,7 +1514,7 @@ namespace SabreTools.Helper
 				List<RomData> newroms = roms;
 				if (mergeroms)
 				{
-					newroms = RomManipulation.Merge(newroms, logger);
+					newroms = Merge(newroms, logger);
 				}
 
 				foreach (RomData rom in newroms)
