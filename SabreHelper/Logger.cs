@@ -8,7 +8,6 @@ namespace SabreTools.Helper
 	/// </summary>
 	/// <remarks>
 	/// Things to do:
-	/// - Clean up log files if there are more than x number per program
 	/// - Allow for "triggerable" logging done on an interval (async)
 	/// - Log filtering? (#if debug?)
 	/// </remarks>
