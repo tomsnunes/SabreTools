@@ -154,8 +154,25 @@ namespace SabreTools.Helper
 				outDir += Path.DirectorySeparatorChar;
 			}
 
+			// Get the extension from the output type
+			string extension = "";
+			switch(datdata.OutputFormat)
+			{
+				case OutputFormat.ClrMamePro:
+				case OutputFormat.DOSCenter:
+				case OutputFormat.RomCenter:
+					extension = ".dat";
+					break;
+				case OutputFormat.MissFile:
+					extension = ".txt";
+					break;
+				case OutputFormat.SabreDat:
+				case OutputFormat.Xml:
+					extension = ".xml";
+					break;
+			}
 			string filename = (String.IsNullOrEmpty(datdata.FileName) ? datdata.Description : datdata.FileName);
-			string outfile = outDir + filename + (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
+			string outfile = outDir + filename + extension;
 			outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
 				outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
 				outfile);
