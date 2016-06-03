@@ -1389,18 +1389,21 @@ namespace SabreTools.Helper
 
 						// DEBUG
 						if ((rom.Size == lastrom.Size) &&
-								((String.IsNullOrEmpty(rom.CRC) || String.IsNullOrEmpty(lastrom.CRC)) || rom.CRC == lastrom.CRC) &&
-								((String.IsNullOrEmpty(rom.MD5) || String.IsNullOrEmpty(lastrom.MD5)) || rom.MD5 != lastrom.MD5) &&
-								((String.IsNullOrEmpty(rom.SHA1) || String.IsNullOrEmpty(lastrom.SHA1)) || rom.SHA1 == lastrom.SHA1))
+								(!String.IsNullOrEmpty(rom.CRC) && !String.IsNullOrEmpty(lastrom.CRC) && rom.CRC == lastrom.CRC) &&
+								(!String.IsNullOrEmpty(rom.MD5) && !String.IsNullOrEmpty(lastrom.MD5) && rom.MD5 != lastrom.MD5) &&
+								(!String.IsNullOrEmpty(rom.SHA1) && !String.IsNullOrEmpty(lastrom.SHA1) && rom.SHA1 == lastrom.SHA1))
 						{
-							logger.User("md5diff - MD5 source: " + lastrom.MD5 + ", MD5 new: " + rom.MD5);
+							logger.User("md5diff - MD5 source: " + lastrom.MD5 + " MD5 new: " + rom.MD5);
 						}
 
 						// If it's a duplicate, skip adding it to the output but add any missing information
 						if (dupefound)
 						{
+							/*
+							// DEBUG
 							logger.Log("Rom information of found duplicate:\n\tGame: " + rom.Game + "\n\tRom Name:" + rom.Name +
 								"\n\tSize: " + rom.Size + "\n\tCRC:" + rom.CRC + "\n\tMD5:" + rom.MD5 + "\n\tSHA-1:" + rom.SHA1);
+							*/
 
 							savedrom = lastrom;
 							pos = i;
