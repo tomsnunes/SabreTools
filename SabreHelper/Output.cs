@@ -390,7 +390,7 @@ namespace SabreTools.Helper
 							// We can only write out if there's a SHA-1
 							if (rom.SHA1 != "")
 							{
-								string name = "/" + rom.SHA1.Substring(0, 2) + "/" + rom.SHA1.Substring(2, 2) + "/" + rom.SHA1.Substring(4, 2) + "/" +
+								string name = rom.SHA1.Substring(0, 2) + "/" + rom.SHA1.Substring(2, 2) + "/" + rom.SHA1.Substring(4, 2) + "/" +
 									rom.SHA1.Substring(6, 2) + "/" + rom.SHA1 + ".gz";
 								state += pre + name + post + "\n";
 							}
@@ -499,7 +499,7 @@ namespace SabreTools.Helper
 				string footer = "";
 
 				// If we have roms, output the full footer
-				if (datdata.Roms.Count > 0)
+				if (datdata.Roms != null && datdata.Roms.Count > 0)
 				{
 					switch (datdata.OutputFormat)
 					{
