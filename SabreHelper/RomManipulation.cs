@@ -207,6 +207,7 @@ namespace SabreTools.Helper
 									rom.Name = gc[i].Replace("\"", "");
 									break;
 								case "size":
+
 									Int64.TryParse(gc[i].Replace("\"", ""), out rom.Size);
 									break;
 								case "crc":

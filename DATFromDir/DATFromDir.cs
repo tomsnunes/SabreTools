@@ -305,43 +305,13 @@ namespace SabreTools
 							lastparent = ProcessFile(subitem, sw, lastparent);
 						}
 
-						// If there were no subitems, add a "blank" game to to the set
-						if (!items)
+						// In romba mode we ignore empty folders completely
+						if (!_datdata.Romba)
 						{
-							string actualroot = item.Remove(0, basePathBackup.Length);
-							RomData rom = new RomData
+							// If there were no subitems, add a "blank" game to to the set (if not in Romba mode)
+							if (!items)
 							{
-								Name = "null",
-								Game = (_datdata.Type == "SuperDAT" ?
-									_datdata.Name + (actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
-										Path.DirectorySeparatorChar.ToString() :
-										"") + actualroot :
-									actualroot),
-								Size = -1,
-								CRC = "null",
-								MD5 = "null",
-								SHA1 = "null",
-							};
-
-							string key = rom.Size + "-" + rom.CRC;
-							if (_datdata.Roms.ContainsKey(key))
-							{
-								_datdata.Roms[key].Add(rom);
-							}
-							else
-							{
-								List<RomData> temp = new List<RomData>();
-								temp.Add(rom);
-								_datdata.Roms.Add(key, temp);
-							}
-						}
-
-						// Now scour subdirectories for empties and add those as well
-						foreach (string subdir in Directory.EnumerateDirectories(item, "*", SearchOption.AllDirectories))
-						{
-							if (Directory.EnumerateFiles(subdir, "*", SearchOption.AllDirectories).Count() == 0)
-							{
-								string actualroot = subdir.Remove(0, basePathBackup.Length);
+								string actualroot = item.Remove(0, basePathBackup.Length);
 								RomData rom = new RomData
 								{
 									Name = "null",
@@ -366,6 +336,40 @@ namespace SabreTools
 									List<RomData> temp = new List<RomData>();
 									temp.Add(rom);
 									_datdata.Roms.Add(key, temp);
+								}
+							}
+
+							// Now scour subdirectories for empties and add those as well (if not in Romba mode)
+							foreach (string subdir in Directory.EnumerateDirectories(item, "*", SearchOption.AllDirectories))
+							{
+								if (Directory.EnumerateFiles(subdir, "*", SearchOption.AllDirectories).Count() == 0)
+								{
+									string actualroot = subdir.Remove(0, basePathBackup.Length);
+									RomData rom = new RomData
+									{
+										Name = "null",
+										Game = (_datdata.Type == "SuperDAT" ?
+											_datdata.Name + (actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
+												Path.DirectorySeparatorChar.ToString() :
+												"") + actualroot :
+											actualroot),
+										Size = -1,
+										CRC = "null",
+										MD5 = "null",
+										SHA1 = "null",
+									};
+
+									string key = rom.Size + "-" + rom.CRC;
+									if (_datdata.Roms.ContainsKey(key))
+									{
+										_datdata.Roms[key].Add(rom);
+									}
+									else
+									{
+										List<RomData> temp = new List<RomData>();
+										temp.Add(rom);
+										_datdata.Roms.Add(key, temp);
+									}
 								}
 							}
 						}
