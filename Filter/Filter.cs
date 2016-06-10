@@ -25,40 +25,6 @@ namespace SabreTools
 		private Logger _logger;
 
 		/// <summary>
-		/// Create a Filter object
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="outdir">Output directory to write the file to</param>
-		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="romtype">Type of the rom to match</param>
-		/// <param name="sgt">Find roms greater than or equal to this size</param>
-		/// <param name="slt">Find roms less than or equal to this size</param>
-		/// <param name="seq">Find roms equal to this size</param>
-		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
-		/// <param name="logger">Logging object for file and console output</param>
-		public Filter(string filename, string outdir, string gamename, string romname, string romtype,
-			long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
-		{
-			_filename = filename;
-			_outdir = (outdir == "" ? Path.GetDirectoryName(_filename) : outdir);
-			_gamename = gamename;
-			_romname = romname;
-			_romtype = romtype;
-			_sgt = sgt;
-			_slt = slt;
-			_seq = seq;
-			_crc = crc;
-			_md5 = md5;
-			_sha1 = sha1;
-			_nodump = nodump;
-			_logger = logger;
-		}
-
-		/// <summary>
 		/// Start help or use supplied parameters
 		/// </summary>
 		/// <param name="args">String array representing command line parameters</param>
@@ -246,6 +212,40 @@ namespace SabreTools
 				Console.WriteLine();
 				Build.Help();
 			}
+		}
+
+		/// <summary>
+		/// Create a Filter object
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="outdir">Output directory to write the file to</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// <param name="logger">Logging object for file and console output</param>
+		public Filter(string filename, string outdir, string gamename, string romname, string romtype,
+			long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
+		{
+			_filename = filename;
+			_outdir = (outdir == "" ? Path.GetDirectoryName(_filename) : outdir);
+			_gamename = gamename;
+			_romname = romname;
+			_romtype = romtype;
+			_sgt = sgt;
+			_slt = slt;
+			_seq = seq;
+			_crc = crc;
+			_md5 = md5;
+			_sha1 = sha1;
+			_nodump = nodump;
+			_logger = logger;
 		}
 
 		/// <summary>
