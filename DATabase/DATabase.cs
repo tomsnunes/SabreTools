@@ -62,7 +62,14 @@ namespace SabreTools
 			// If there's no arguments, show the menu
 			if (args.Length == 0)
 			{
-				ShowMainMenu();
+				if (!Console.IsOutputRedirected)
+				{
+					ShowMainMenu();
+				}
+				else
+				{
+					Build.Help();
+				}
 				_logger.Close();
 				return;
 			}
