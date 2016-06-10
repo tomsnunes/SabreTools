@@ -383,7 +383,11 @@ namespace SabreTools
 						path = _outdir + (Path.GetDirectoryName(_inputs[j].Split('¬')[0]).Remove(0, _inputs[j].Split('¬')[1].Length));
 					}
 
-					Output.WriteDatfile(diffData, path, _logger);
+					// If we have anything but the first DAT, output (the first DAT is always complete)
+					if (j > 0)
+					{
+						Output.WriteDatfile(diffData, path, _logger);
+					}
 				}
 			}
 			// Output all entries with user-defined merge
