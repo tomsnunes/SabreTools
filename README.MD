@@ -35,6 +35,7 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 		</ul>
 	</li>
 	<li>Get various statistics on a DAT or folder of DATs including number of roms, disks, and even total size in a human readable format (formerly <i>UncompressedSize</i>; additions requested by Obiwantje)</li>
+	<li>Filter a DAT by any criteria that the user chooses including wildcard searches (formerly <i>Filter</i>, requested by Obiwantje and others)</li>
 	<li>Add and remove sources and systems from the database</li>
 	<li>Retrieve a list of all sources and systems that are available</li>
 </ul>
@@ -71,10 +72,6 @@ This a versitile Directory to DAT file creator developed to reduce the overhead 
 This section is for tools that have been requested for a highly specific purpose and are not generally going to be used by regular users. All of them have a possibility of being included in the main DATabase program eventually.
 
 <!-- <b>There are no tools that are for power users at this time.</b> -->
-
-<b>Filter</b>
-<p/>
-This tool allows you to split a DAT or folder of DATs by the "best available" hash. The order of preference for hashes is as follows: Nodump status, SHA-1, MD5, CRC. This can show where gaps in file information lay and allow users to fix them without having to scan manually.
 
 <b>OfflineMerge</b>
 <p/>
