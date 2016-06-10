@@ -102,6 +102,7 @@
     <Compile Include="Remapping.cs" />
     <Compile Include="RomManipulation.cs" />
     <Compile Include="Data\Structs.cs" />
+    <Compile Include="Stats.cs" />
     <Compile Include="Style.cs" />
     <Compile Include="Data\Build.cs" />
   </ItemGroup>

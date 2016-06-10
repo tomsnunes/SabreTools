@@ -24,6 +24,9 @@ namespace SabreTools.Helper
 		/// </remarks>
 		public static bool WriteDatfile(DatData datdata, string outDir, Logger logger, bool norename = true)
 		{
+			// Output initial statistics, for kicks
+			Stats.OutputStats(datdata, logger);
+
 			// Bucket roms by game name and optionally dedupe
 			SortedDictionary<string, List<RomData>> sortable = RomManipulation.BucketByGame(datdata.Roms, datdata.MergeRoms, norename, logger);
 

@@ -57,16 +57,8 @@ namespace SabreTools
 				if (_single)
 				{
 					_logger.User(@"\nFor file '" + filename + @"':
---------------------------------------------------
-    Uncompressed size:       " + Style.GetBytesReadable(datdata.TotalSize) + @"
-    Games found:             " + newroms.Count + @"
-    Roms found:              " + datdata.RomCount + @"
-    Disks found:             " + datdata.DiskCount + @"
-    Roms with CRC:           " + datdata.CRCCount + @"
-    Roms with MD5:           " + datdata.MD5Count + @"
-    Roms with SHA-1:         " + datdata.SHA1Count + @"
-    Roms with Nodump status: " + datdata.NodumpCount + @"
-");
+--------------------------------------------------");
+					OutputStats(datdata, _logger);
 				}
 				else
 				{
@@ -86,20 +78,42 @@ namespace SabreTools
 
 			// Output total DAT stats
 			if (!_single) { _logger.User(""); }
+			DatData totaldata = new DatData
+			{
+				TotalSize = totalSize,
+				RomCount = totalRom,
+				DiskCount = totalDisk,
+				CRCCount = totalCRC,
+				MD5Count = totalMD5,
+				SHA1Count = totalSHA1,
+				NodumpCount = totalNodump,
+			};
 			_logger.User(@"For ALL DATs found
---------------------------------------------------
-    Uncompressed size:       " + Style.GetBytesReadable(totalSize) + @"
-    Games found:             " + totalGame + @"
-    Roms found:              " + totalRom + @"
-    Disks found:             " + totalDisk + @"
-    Roms with CRC:           " + totalCRC + @"
-    Roms with MD5:           " + totalMD5 + @"
-    Roms with SHA-1:         " + totalSHA1 + @"
-    Roms with Nodump status: " + totalNodump + @"
-
+--------------------------------------------------");
+			OutputStats(totaldata, _logger);
+			_logger.User(@"
 Please check the log folder if the stats scrolled offscreen");
 
 			return true;
+		}
+
+		/// <summary>
+		/// Output the stats in a human-readable format
+		/// </summary>
+		/// <param name="datdata">DatData object to read stats from</param>
+		/// <param name="logger">Logger object for file and console writing</param>
+		public static void OutputStats(DatData datdata, Logger logger)
+		{
+			SortedDictionary<string, List<RomData>> newroms = RomManipulation.BucketByGame(datdata.Roms, false, true, logger);
+			logger.User(@"    Uncompressed size:       " + Style.GetBytesReadable(datdata.TotalSize) + @"
+    Games found:             " + newroms.Count + @"
+    Roms found:              " + datdata.RomCount + @"
+    Disks found:             " + datdata.DiskCount + @"
+    Roms with CRC:           " + datdata.CRCCount + @"
+    Roms with MD5:           " + datdata.MD5Count + @"
+    Roms with SHA-1:         " + datdata.SHA1Count + @"
+    Roms with Nodump status: " + datdata.NodumpCount + @"
+");)
 		}
 	}
 }

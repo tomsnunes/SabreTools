@@ -116,7 +116,6 @@
     <Compile Include="Partials\DATabase_Menus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TrimMerge.cs" />
-    <Compile Include="Stats.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
