@@ -285,17 +285,29 @@ namespace SabreTools.Helper
 						rom.CRC = (rom.CRC == "-" ? "" : rom.CRC);
 						rom.CRC = (rom.CRC == "" ? "" : rom.CRC.PadLeft(8, '0'));
 					}
+					else
+					{
+						rom.CRC = "";
+					}
 					if (rom.MD5 != null)
 					{
 						rom.MD5 = (rom.MD5.StartsWith("0x") ? rom.MD5.Remove(0, 2) : rom.MD5);
 						rom.MD5 = (rom.MD5 == "-" ? "" : rom.MD5);
 						rom.MD5 = (rom.MD5 == "" ? "" : rom.MD5.PadLeft(32, '0'));
 					}
+					else
+					{
+						rom.MD5 = "";
+					}
 					if (rom.SHA1 != null)
 					{
 						rom.SHA1 = (rom.SHA1.StartsWith("0x") ? rom.SHA1.Remove(0, 2) : rom.SHA1);
 						rom.SHA1 = (rom.SHA1 == "-" ? "" : rom.SHA1);
 						rom.SHA1 = (rom.SHA1 == "" ? "" : rom.SHA1.PadLeft(40, '0'));
+					}
+					else
+					{
+						rom.SHA1 = "";
 					}
 
 					// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
@@ -569,17 +581,29 @@ namespace SabreTools.Helper
 							rom.CRC = (rom.CRC == "-" ? "" : rom.CRC);
 							rom.CRC = (rom.CRC == "" ? "" : rom.CRC.PadLeft(8, '0'));
 						}
+						else
+						{
+							rom.CRC = "";
+						}
 						if (rom.MD5 != null)
 						{
 							rom.MD5 = (rom.MD5.StartsWith("0x") ? rom.MD5.Remove(0, 2) : rom.MD5);
 							rom.MD5 = (rom.MD5 == "-" ? "" : rom.MD5);
 							rom.MD5 = (rom.MD5 == "" ? "" : rom.MD5.PadLeft(32, '0'));
 						}
+						else
+						{
+							rom.MD5 = "";
+						}
 						if (rom.SHA1 != null)
 						{
 							rom.SHA1 = (rom.SHA1.StartsWith("0x") ? rom.SHA1.Remove(0, 2) : rom.SHA1);
 							rom.SHA1 = (rom.SHA1 == "-" ? "" : rom.SHA1);
 							rom.SHA1 = (rom.SHA1 == "" ? "" : rom.SHA1.PadLeft(40, '0'));
+						}
+						else
+						{
+							rom.SHA1 = "";
 						}
 
 						// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
