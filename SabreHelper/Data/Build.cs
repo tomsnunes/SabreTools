@@ -85,6 +85,19 @@ Options:
 	-exta=			First extension to split by
 	-extb=			Second extension to split by
 	-out=			Output directory
+  -f, --filter		Filter DATs by inputted criteria
+	-out=, --out=		Output directory
+	-gn=, --game-name=	Game name to be filtered on
+	-rn=, --rom-name=	Rom name to be filtered on
+	-rt=, --rom-type=	Rom type to be filtered on
+	-sgt=, --greater=	Size greater than or equal to
+	-slt=, --less=	Size less than or equal to
+	-seq=, --equal=	Size equal to
+	-crc=, --crc=		CRC to be filtered on
+	-md5=, --md5=		MD5 to be filtered on
+	-sha1=, --sha1=	SHA-1 to be filtered on
+	-nd, --nodump		Only match nodump roms
+	-nnd, --not-nodump	Exclude all nodump roms
   -g, --generate	Start tool in generate mode
 	-system=			System ID to generate from
 	-nr, --no-rename	Don't auto-rename games
@@ -172,7 +185,14 @@ Options:
 
 Filenames and directories can't start with a reserved string
 unless prefixed by 'input='
-");
+
+For Filter options:
+Game name, Rom name, CRC, MD5, SHA-1 can do partial matches
+using asterisks as follows (case insensitive):
+    *00 means ends with '00'
+    00* means starts with '00'
+    *00* means contains '00'
+    00 means exactly equals '00'");
 					break;
 				case "Headerer":
 					Console.WriteLine(@"Headerer - Remove and restore rom headers
@@ -226,33 +246,6 @@ This program will output the following DATs:
   (c) New Missing - (Net New)+(Missing-(Unneeded))
   (d) Have - (NewComplete)-(New Missing)
         OR (Complete or NewComplete)-(Missing) if one is missing");
-					break;
-				case "Filter":
-					Console.WriteLine(@"Filter - Filter DATs by inputted criteria
------------------------------------------
-Usage: Filter [options] [inputs]
-
-Options:
-  -h, -?, --help	Show this help dialog
-  -out=, --out=		Output directory
-  -gn=, --game-name=	Game name to be filtered on
-  -rn=, --rom-name=	Rom name to be filtered on
-  -rt=, --rom-type=	Rom type to be filtered on
-  -sgt=, --greater=	Size greater than or equal to
-  -slt=, --less=	Size less than or equal to
-  -seq=, --equal=	Size equal to
-  -crc=, --crc=		CRC to be filtered on
-  -md5=, --md5=		MD5 to be filtered on
-  -sha1=, --sha1=	SHA-1 to be filtered on
-  -nd, --nodump		Only match nodump roms
-  -nnd, --not-nodump	Exclude all nodump roms
-
-Game name, Rom name, CRC, MD5, SHA-1 can do partial matches
-using asterisks as follows (case insensitive):
-    *00 means ends with '00'
-    00* means starts with '00'
-    *00* means contains '00'
-    00 means exactly equals '00'");
 					break;
 				default:
 					Console.Write("This is the default help output");
