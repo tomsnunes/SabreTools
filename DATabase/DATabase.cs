@@ -85,11 +85,12 @@ namespace SabreTools
 				bare = false,
 				cascade = false,
 				clean = false,
+				datprefix = false,
 				dedup = false,
 				diff = false,
-				gamename = false,
 				disableForce = false,
 				extsplit = false,
+				filter = false,
 				forceunpack = false,
 				generate = false,
 				genall = false,
@@ -118,10 +119,15 @@ namespace SabreTools
 				skip = false,
 				update = false,
 				usegame = true;
+			bool? nodump = null;
+			long sgt = -1,
+				slt = -1,
+				seq = -1;
 			string addext = "",
 				author = "",
 				category = "",
 				comment = "",
+				crc = "",
 				date = "",
 				description = "",
 				email = "",
@@ -131,14 +137,19 @@ namespace SabreTools
 				forcemerge = "",
 				forcend = "",
 				forcepack = "",
+				gamename = "",
 				header = "",
 				homepage = "",
 				name = "",
 				manu = "",
+				md5 = "",
 				outdir = "",
 				postfix = "",
 				prefix = "",
 				repext = "",
+				romname = "",
+				romtype = "",
+				sha1 = "",
 				sources = "",
 				systems = "",
 				root = "",
@@ -208,6 +219,10 @@ namespace SabreTools
 					case "--ext-split":
 						extsplit = true;
 						break;
+					case "-f":
+					case "--filter":
+						filter = true;
+						break;
 					case "-g":
 					case "--generate":
 						generate = true;
@@ -218,7 +233,7 @@ namespace SabreTools
 						break;
 					case "-gp":
 					case "--game-prefix":
-						gamename = true;
+						datprefix = true;
 						break;
 					case "-hs":
 					case "--hash-split":
@@ -247,6 +262,14 @@ namespace SabreTools
 					case "-m":
 					case "--merge":
 						merge = true;
+						break;
+					case "-nd":
+					case "--nodump":
+						nodump = true;
+						break;
+					case "-nnd":
+					case "--not-nodump":
+						nodump = false;
 						break;
 					case "-nr":
 					case "--no-rename":
@@ -340,6 +363,10 @@ namespace SabreTools
 						{
 							comment = arg.Split('=')[1];
 						}
+						else if (arg.StartsWith("-crc=") || arg.StartsWith("--crc="))
+						{
+							crc = arg.Split('=')[1];
+						}
 						else if (arg.StartsWith("-da=") || arg.StartsWith("--date="))
 						{
 							date = arg.Split('=')[1];
@@ -376,6 +403,10 @@ namespace SabreTools
 						{
 							forcepack = arg.Split('=')[1];
 						}
+						else if (arg.StartsWith("-gn=") || arg.StartsWith("--game-name="))
+						{
+							gamename = arg.Split('=')[1];
+						}
 						else if (arg.StartsWith("-h=") || arg.StartsWith("--header="))
 						{
 							header = arg.Split('=')[1];
@@ -392,6 +423,10 @@ namespace SabreTools
 						{
 							manu = arg.Split('=')[1];
 						}
+						else if (arg.StartsWith("-md5=") || arg.StartsWith("--md5="))
+						{
+							md5 = arg.Split('=')[1];
+						}
 						else if (arg.StartsWith("-n=") || arg.StartsWith("--name="))
 						{
 							name = arg.Split('=')[1];
@@ -407,6 +442,39 @@ namespace SabreTools
 						else if (arg.StartsWith("-pre=") || arg.StartsWith("--prefix="))
 						{
 							prefix = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-rn=") || arg.StartsWith("--rom-name="))
+						{
+							romname = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-rt=") || arg.StartsWith("--rom-type="))
+						{
+							romtype = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-seq=") || arg.StartsWith("--equal="))
+						{
+							if (!Int64.TryParse(arg.Split('=')[1], out seq))
+							{
+								seq = -1;
+							}
+						}
+						else if (arg.StartsWith("-sgt=") || arg.StartsWith("--greater="))
+						{
+							if (!Int64.TryParse(arg.Split('=')[1], out sgt))
+							{
+								sgt = -1;
+							}
+						}
+						else if (arg.StartsWith("-sha1=") || arg.StartsWith("--sha1="))
+						{
+							sha1 = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-slt=") || arg.StartsWith("--less="))
+						{
+							if (!Int64.TryParse(arg.Split('=')[1], out slt))
+							{
+								slt = -1;
+							}
 						}
 						else if (arg.StartsWith("-source=") && sources == "")
 						{
@@ -467,7 +535,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(add ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^
+			if (!(add ^ extsplit ^ filter ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^
 				(update || outputCMP || outputRC || outputSD || outputXML || outputMiss || romba) ^ rem ^ stats ^ trim))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
@@ -478,7 +546,7 @@ namespace SabreTools
 
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (inputs.Count == 0 && (update || (outputMiss || romba) || outputCMP || outputRC || outputSD
-				|| outputXML || extsplit || hashsplit || (merge || diff) || stats || trim))
+				|| outputXML || filter || extsplit || hashsplit || (merge || diff) || stats || trim))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -527,7 +595,7 @@ namespace SabreTools
 				{
 					InitUpdate(input, filename, name, description, category, version, date, author, email, homepage, url, comment, header,
 						superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,
-						postfix, quotes, repext, addext, gamename, romba, tsv, outdir, clean);
+						postfix, quotes, repext, addext, datprefix, romba, tsv, outdir, clean);
 				}
 			}
 
@@ -599,6 +667,12 @@ namespace SabreTools
 			else if (stats)
 			{
 				InitStats(inputs, single);
+			}
+
+			// Filter input files
+			else if (filter)
+			{
+				InitFilter(inputs, outdir, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
 			}
 
 			// If nothing is set, show the help

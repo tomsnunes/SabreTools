@@ -102,7 +102,7 @@ namespace SabreTools
 		/// <param name="quotes">Add quotes to each item</param>
 		/// <param name="repext">Replace all extensions with another</param>
 		/// <param name="addext">Add an extension to all items</param>
-		/// <param name="gamename">Add the dat name as a directory prefix</param>
+		/// <param name="datprefix">Add the dat name as a directory prefix</param>
 		/// <param name="romba">Output files in romba format</param>
 		/// <param name="tsv">Output files in TSV format</param>
 		/// <param name="outdir">Optional param for output directory</param>
@@ -135,7 +135,7 @@ namespace SabreTools
 			bool quotes,
 			string repext,
 			string addext,
-			bool gamename,
+			bool datprefix,
 			bool romba,
 			bool tsv,
 			string outdir,
@@ -221,7 +221,7 @@ namespace SabreTools
 				Quotes = quotes,
 				RepExt = repext,
 				AddExt = addext,
-				GameName = gamename,
+				GameName = datprefix,
 				Romba = romba,
 				TSV = tsv,
 			};
@@ -489,6 +489,61 @@ namespace SabreTools
 			Stats stats = new Stats(newinputs, single, statlog);
 			stats.Process();
 			statlog.Close();
+		}
+
+		/// <summary>
+		/// Wrap filtering a DAT or set of DATs
+		/// </summary>
+		/// <param name="inputs">List of inputs to be procesed</param>
+		/// <param name="outdir">Output directory for new files (optional)</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// <param name="logger">Logging object for file and console output</param>
+		private static void InitFilter(List<string> inputs, string outdir, string gamename, string romname, string romtype, long sgt,
+			long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
+		{
+			// Create new Filter objects for each input
+			Filter filter;
+			bool success = true;
+			foreach (string input in inputs)
+			{
+				string newinput = Path.GetFullPath(input.Replace("\"", ""));
+
+				if (File.Exists(newinput))
+				{
+					filter = new Filter(newinput, outdir, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
+					success &= filter.Process();
+				}
+
+				if (Directory.Exists(newinput))
+				{
+					foreach (string file in Directory.EnumerateFiles(newinput, "*", SearchOption.AllDirectories))
+					{
+						string nestedoutdir = "";
+						if (outdir != "")
+						{
+							nestedoutdir = outdir + Path.GetDirectoryName(file).Remove(0, newinput.Length);
+						}
+						filter = new Filter(file, nestedoutdir, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
+						success &= filter.Process();
+					}
+				}
+			}
+
+			// If we failed, show the help
+			if (!success)
+			{
+				Console.WriteLine();
+				Build.Help();
+			}
 		}
 
 		/// <summary>

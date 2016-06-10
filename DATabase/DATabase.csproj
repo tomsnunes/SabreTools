@@ -105,6 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExtSplit.cs" />
+    <Compile Include="Filter.cs" />
     <Compile Include="ImportExport\Generate.cs" />
     <Compile Include="ImportExport\GenerateTwo.cs" />
     <Compile Include="HashSplit.cs" />
