@@ -59,9 +59,11 @@ namespace SabreTools
 				return;
 			}
 
-			// If there's no arguments, show the menu
+			// If there's no arguments, show help
 			if (args.Length == 0)
 			{
+				/*
+				// If there are no arguments, show the menu
 				if (!Console.IsOutputRedirected)
 				{
 					ShowMainMenu();
@@ -70,6 +72,9 @@ namespace SabreTools
 				{
 					Build.Help();
 				}
+				*/
+
+				Build.Help();
 				_logger.Close();
 				return;
 			}

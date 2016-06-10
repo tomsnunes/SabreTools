@@ -38,7 +38,7 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 	<li>Add and remove sources and systems from the database</li>
 	<li>Retrieve a list of all sources and systems that are available</li>
 </ul>
-This tool can both be used with command line parameters or with the built-in text menu system.
+This tool has a comprehensive list of command line parameters that can be used to do the above and much more.
 
 <b>Headerer</b>
 <p/>
