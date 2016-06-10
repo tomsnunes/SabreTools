@@ -278,6 +278,32 @@ namespace SabreTools.Helper
 						}
 					}
 
+					// Sanitize the hashes from null, hex sizes, and "true blank" strings
+					rom.CRC = (rom.CRC.StartsWith("0x") ? rom.CRC.Remove(0, 2) : rom.CRC);
+					rom.CRC = (rom.CRC == "-" ? "" : rom.CRC);
+					rom.CRC = (rom.CRC == "" ? "" : rom.CRC.PadLeft(8, '0'));
+					rom.MD5 = (rom.MD5.StartsWith("0x") ? rom.MD5.Remove(0, 2) : rom.MD5);
+					rom.MD5 = (rom.MD5 == "-" ? "" : rom.MD5);
+					rom.MD5 = (rom.MD5 == "" ? "" : rom.MD5.PadLeft(32, '0'));
+					rom.SHA1 = (rom.SHA1.StartsWith("0x") ? rom.SHA1.Remove(0, 2) : rom.SHA1);
+					rom.SHA1 = (rom.SHA1 == "-" ? "" : rom.SHA1);
+					rom.SHA1 = (rom.SHA1 == "" ? "" : rom.SHA1.PadLeft(40, '0'));
+
+					// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
+					if (rom.Type == "rom" && (rom.Size == 0 || rom.Size == -1) && ((rom.CRC == Constants.CRCZero || rom.CRC == "") || rom.MD5 == Constants.MD5Zero || rom.SHA1 == Constants.SHA1Zero))
+					{
+						rom.Size = Constants.SizeZero;
+						rom.CRC = Constants.CRCZero;
+						rom.MD5 = Constants.MD5Zero;
+						rom.SHA1 = Constants.SHA1Zero;
+					}
+					// If the file has no size and it's not the above case, skip and log
+					else if (rom.Type == "rom" && (rom.Size == 0 || rom.Size == -1))
+					{
+						logger.Warning("Incomplete entry for \"" + rom.Name + "\" will be output as nodump");
+						rom.Nodump = true;
+					}
+
 					// If we have a disk, make sure that the value for size is -1
 					if (rom.Type == "disk")
 					{
@@ -526,6 +552,38 @@ namespace SabreTools.Helper
 							SystemID = sysid,
 							SourceID = srcid,
 						};
+
+						// Sanitize the hashes from null, hex sizes, and "true blank" strings
+						rom.CRC = (rom.CRC.StartsWith("0x") ? rom.CRC.Remove(0, 2) : rom.CRC);
+						rom.CRC = (rom.CRC == "-" ? "" : rom.CRC);
+						rom.CRC = (rom.CRC == "" ? "" : rom.CRC.PadLeft(8, '0'));
+						rom.MD5 = (rom.MD5.StartsWith("0x") ? rom.MD5.Remove(0, 2) : rom.MD5);
+						rom.MD5 = (rom.MD5 == "-" ? "" : rom.MD5);
+						rom.MD5 = (rom.MD5 == "" ? "" : rom.MD5.PadLeft(32, '0'));
+						rom.SHA1 = (rom.SHA1.StartsWith("0x") ? rom.SHA1.Remove(0, 2) : rom.SHA1);
+						rom.SHA1 = (rom.SHA1 == "-" ? "" : rom.SHA1);
+						rom.SHA1 = (rom.SHA1 == "" ? "" : rom.SHA1.PadLeft(40, '0'));
+
+						// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
+						if (rom.Type == "rom" && (rom.Size == 0 || rom.Size == -1) && ((rom.CRC == Constants.CRCZero || rom.CRC == "") || rom.MD5 == Constants.MD5Zero || rom.SHA1 == Constants.SHA1Zero))
+						{
+							rom.Size = Constants.SizeZero;
+							rom.CRC = Constants.CRCZero;
+							rom.MD5 = Constants.MD5Zero;
+							rom.SHA1 = Constants.SHA1Zero;
+						}
+						// If the file has no size and it's not the above case, skip and log
+						else if (rom.Type == "rom" && (rom.Size == 0 || rom.Size == -1))
+						{
+							logger.Warning("Incomplete entry for \"" + rom.Name + "\" will be output as nodump");
+							rom.Nodump = true;
+						}
+
+						// If we have a disk, make sure that the value for size is -1
+						if (rom.Type == "disk")
+						{
+							rom.Size = -1;
+						}
 
 						// Add the new rom
 						string key = rom.Size + "-" + rom.CRC;
