@@ -9,8 +9,8 @@ namespace SabreTools
 	public class ExtSplit
 	{
 		// Instance variables
-		private string _extA;
-		private string _extB;
+		private List<string> _extA;
+		private List<string> _extB;
 		private string _filename;
 		private string _outdir;
 		private static Logger _logger;
@@ -19,14 +19,22 @@ namespace SabreTools
 		/// Create a new DatSplit object
 		/// </summary>
 		/// <param name="filename">Filename of the DAT to split</param>
-		/// <param name="extA">First extension to split on</param>
-		/// <param name="extB">Second extension to split on</param>
+		/// <param name="extA">List of extensions to split on (first DAT)</param>
+		/// <param name="extB">List of extensions to split on (second DAT)</param>
 		/// <param name="logger">Logger object for console and file writing</param>
-		public ExtSplit(string filename, string extA, string extB, string outdir, Logger logger)
+		public ExtSplit(string filename, List<string> extA, List<string> extB, string outdir, Logger logger)
 		{
 			_filename = filename.Replace("\"", "");
-			_extA = (extA.StartsWith(".") ? extA : "." + extA).ToUpperInvariant();
-			_extB = (extB.StartsWith(".") ? extB : "." + extB).ToUpperInvariant();
+			_extA = new List<string>();
+			foreach (string s in extA)
+			{
+				_extA.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
+			}
+			_extB = new List<string>();
+			foreach (string s in extB)
+			{
+				_extB.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
+			}
 			_outdir = outdir.Replace("\"", "");
 			_logger = logger;
 		}
@@ -106,7 +114,7 @@ namespace SabreTools
 			{
 				foreach (RomData rom in datdata.Roms[key])
 				{
-					if (rom.Name.ToUpperInvariant().EndsWith(_extA))
+					if (rom.Name.ToUpperInvariant().EndsWith(_extA[0]))
 					{
 						if (datdataA.Roms.ContainsKey(key))
 						{
@@ -119,7 +127,7 @@ namespace SabreTools
 							datdataA.Roms.Add(key, temp);
 						}
 					}
-					else if (rom.Name.ToUpperInvariant().EndsWith(_extB))
+					else if (rom.Name.ToUpperInvariant().EndsWith(_extB[0]))
 					{
 						if (datdataB.Roms.ContainsKey(key))
 						{

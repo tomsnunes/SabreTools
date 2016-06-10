@@ -416,6 +416,11 @@ namespace SabreTools
 			extb = extb.Replace("\"", "");
 			outdir = outdir.Replace("\"", "");
 
+			List<string> extaList = new List<string>();
+			extaList.Add(exta);
+			List<string> extbList = new List<string>();
+			extbList.Add(extb);
+
 			if (input != "" && File.Exists(input))
 			{
 				if (exta == "" || extb == "")
@@ -423,7 +428,7 @@ namespace SabreTools
 					_logger.Warning("Two extensions are needed to split a DAT!");
 					return;
 				}
-				ExtSplit es = new ExtSplit(input, exta, extb, outdir, _logger);
+				ExtSplit es = new ExtSplit(input, extaList, extbList, outdir, _logger);
 				es.Split();
 				return;
 			}
