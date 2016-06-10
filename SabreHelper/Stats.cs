@@ -102,8 +102,36 @@ Please check the log folder if the stats scrolled offscreen");
 		/// </summary>
 		/// <param name="datdata">DatData object to read stats from</param>
 		/// <param name="logger">Logger object for file and console writing</param>
-		public static void OutputStats(DatData datdata, Logger logger)
+		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
+		public static void OutputStats(DatData datdata, Logger logger, bool recalculate = false)
 		{
+			if (recalculate)
+			{
+				// Wipe out any stats already there
+				datdata.RomCount = 0;
+				datdata.DiskCount = 0;
+				datdata.TotalSize = 0;
+				datdata.CRCCount = 0;
+				datdata.MD5Count = 0;
+				datdata.SHA1Count = 0;
+				datdata.NodumpCount = 0;
+
+				// Loop through and add
+				foreach (List<RomData> roms in datdata.Roms.Values)
+				{
+					foreach (RomData rom in roms)
+					{
+						datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
+						datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+						datdata.TotalSize += rom.Size;
+						datdata.CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
+						datdata.MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
+						datdata.SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
+						datdata.NodumpCount += (rom.Nodump ? 1 : 0);
+					}
+				}
+			}
+
 			SortedDictionary<string, List<RomData>> newroms = RomManipulation.BucketByGame(datdata.Roms, false, true, logger);
 			logger.User(@"    Uncompressed size:       " + Style.GetBytesReadable(datdata.TotalSize) + @"
     Games found:             " + newroms.Count + @"

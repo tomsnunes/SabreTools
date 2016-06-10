@@ -16,17 +16,21 @@ namespace SabreTools.Helper
 		/// <param name="outDir">Set the output directory</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
+		/// <param name="stats">True if DAT statistics should be output on write, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
 		/// <remarks>
 		/// The following features have been requested for file output:
 		/// - Have the ability to strip special (non-ASCII) characters from rom information
 		/// - Add a flag for ignoring roms with blank sizes
 		/// </remarks>
-		public static bool WriteDatfile(DatData datdata, string outDir, Logger logger, bool norename = true)
+		public static bool WriteDatfile(DatData datdata, string outDir, Logger logger, bool norename = true, bool stats = false)
 		{
 			// Output initial statistics, for kicks
-			Stats.OutputStats(datdata, logger);
-
+			if (stats)
+			{
+				Stats.OutputStats(datdata, logger, (datdata.RomCount + datdata.DiskCount == 0));
+			}
+			
 			// Bucket roms by game name and optionally dedupe
 			SortedDictionary<string, List<RomData>> sortable = RomManipulation.BucketByGame(datdata.Roms, datdata.MergeRoms, norename, logger);
 
