@@ -113,6 +113,7 @@
     <Compile Include="DATabase.cs" />
     <Compile Include="ImportExport\ImportTwo.cs" />
     <Compile Include="MergeDiff.cs" />
+    <Compile Include="Partials\DATabase_Helpers.cs" />
     <Compile Include="Partials\DATabase_Inits.cs" />
     <Compile Include="Partials\DATabase_Menus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
