@@ -426,8 +426,16 @@ namespace SabreTools
 				return;
 			}
 
-			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(add ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^
+			// If help is set, show the help screen
+			if (help)
+			{
+				Build.Help();
+				_logger.Close();
+				return;
+			}
+
+			// If more than one switch is enabled, show the help screen
+			if (!(add ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^
 				(update || outputCMP || outputRC || outputSD || outputXML || outputMiss || romba) ^ rem ^ stats ^ trim))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
