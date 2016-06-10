@@ -166,20 +166,13 @@ Options:
 	-sd=, --superdat	Set SuperDAT type
 	-fm=, --forcemerge=	Set force merging
 		Supported values are:
-		- None
-		- Split
-		- Full
+			None, Split, Full
 	-fn=, --forcend=	Set force nodump
 		Supported values are:
-		- None
-		- Obsolete
-		- Required
-		- Ignore
+			None, Obsolete, Required, Ignore
 	-fp=, --forcepack=	Set force packing
 		Supported values are:
-		- None
-		- Zip
-		- Unzip
+			None, Zip, Unzip
 	-clean			Clean game names according to WoD standards
 	-out=			Output directory
 
