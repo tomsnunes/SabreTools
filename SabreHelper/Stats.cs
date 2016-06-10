@@ -113,7 +113,7 @@ Please check the log folder if the stats scrolled offscreen");
     Roms with MD5:           " + datdata.MD5Count + @"
     Roms with SHA-1:         " + datdata.SHA1Count + @"
     Roms with Nodump status: " + datdata.NodumpCount + @"
-");)
+");
 		}
 	}
 }
