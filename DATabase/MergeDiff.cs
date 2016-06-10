@@ -114,12 +114,40 @@ namespace SabreTools
 				_author = "SabreTools";
 			}
 
-			// For inplace use only
+			// Create a dictionary of all ROMs from the input DATs
+			DatData userData;
+			List<DatData> datHeaders = PopulateUserData(out userData);
+
+			// Modify the Dictionary if necessary and output the results
+			if (_diff && !_cascade)
+			{
+				DiffNoCascade(userData, datHeaders);
+			}
+			// If we're in cascade and diff, output only cascaded diffs
+			else if (_diff && _cascade)
+			{
+				DiffCascade(userData, datHeaders);
+			}
+			// Output all entries with user-defined merge
+			else
+			{
+				MergeNoDiff(userData, datHeaders);
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Populate the user DatData object from the input files
+		/// </summary>
+		/// <param name="userData">Output user DatData object to output</param>
+		/// <returns>List of DatData objects representing headers</returns>
+		private List<DatData> PopulateUserData(out DatData userData)
+		{
 			List<DatData> datHeaders = new List<DatData>();
 
-			// Create a dictionary of all ROMs from the input DATs
 			int i = 0;
-			DatData userData = new DatData
+			userData = new DatData
 			{
 				Roms = new Dictionary<string, List<RomData>>(),
 				MergeRoms = _dedup,
@@ -173,14 +201,68 @@ namespace SabreTools
 			userData.OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml);
 			userData.Type = (_superdat ? "SuperDAT" : "");
 
-			// Modify the Dictionary if necessary and output the results
-			string post = "";
-			if (_diff && !_cascade)
-			{
-				post = " (No Duplicates)";
+			return datHeaders;
+		}
 
-				// Get all entries that don't have External dupes
-				DatData outerDiffData = new DatData
+		/// <summary>
+		/// Output non-cascading diffs
+		/// </summary>
+		/// <param name="userData">Main DatData to draw information from</param>
+		/// <param name="datHeaders">Dat headers used optionally</param>
+		private void DiffNoCascade(DatData userData, List<DatData> datHeaders)
+		{
+			string post = " (No Duplicates)";
+
+			// Get all entries that don't have External dupes
+			DatData outerDiffData = new DatData
+			{
+				FileName = _desc + post,
+				Name = _name + post,
+				Description = _desc + post,
+				Version = _version,
+				Date = _date,
+				Category = _cat,
+				Author = _author,
+				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				MergeRoms = _dedup,
+				Roms = new Dictionary<string, List<RomData>>(),
+			};
+			foreach (string key in userData.Roms.Keys)
+			{
+				List<RomData> temp = userData.Roms[key];
+				temp = RomManipulation.Merge(temp, _logger);
+
+				foreach (RomData rom in temp)
+				{
+					if (rom.Dupe < DupeType.ExternalHash)
+					{
+						RomData newrom = rom;
+						newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.SystemID].Split('¬')[0]) + ")";
+
+						if (outerDiffData.Roms.ContainsKey(key))
+						{
+							outerDiffData.Roms[key].Add(newrom);
+						}
+						else
+						{
+							List<RomData> tl = new List<RomData>();
+							tl.Add(rom);
+							outerDiffData.Roms.Add(key, tl);
+						}
+					}
+				}
+			}
+
+			// Output the difflist (a-b)+(b-a) diff
+			Output.WriteDatfile(outerDiffData, _outdir, _logger);
+
+			// For the AB mode-style diffs, get all required dictionaries and output with a new name
+			// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
+			for (int j = 0; j < _inputs.Count; j++)
+			{
+				post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
+				DatData diffData = new DatData
 				{
 					FileName = _desc + post,
 					Name = _name + post,
@@ -194,41 +276,98 @@ namespace SabreTools
 					MergeRoms = _dedup,
 					Roms = new Dictionary<string, List<RomData>>(),
 				};
-				foreach (string key in userData.Roms.Keys)
+
+				foreach (string key in outerDiffData.Roms.Keys)
 				{
-					List<RomData> temp = userData.Roms[key];
-					temp = RomManipulation.Merge(temp, _logger);
-
-					foreach (RomData rom in temp)
+					foreach (RomData rom in outerDiffData.Roms[key])
 					{
-						if (rom.Dupe < DupeType.ExternalHash)
+						if (rom.SystemID == j)
 						{
-							RomData newrom = rom;
-							newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.SystemID].Split('¬')[0]) + ")";
-
-							if (outerDiffData.Roms.ContainsKey(key))
+							if (diffData.Roms.ContainsKey(key))
 							{
-								outerDiffData.Roms[key].Add(newrom);
+								diffData.Roms[key].Add(rom);
 							}
 							else
 							{
 								List<RomData> tl = new List<RomData>();
 								tl.Add(rom);
-								outerDiffData.Roms.Add(key, tl);
+								diffData.Roms.Add(key, tl);
 							}
 						}
 					}
 				}
 
-				// Output the difflist (a-b)+(b-a) diff
-				Output.WriteDatfile(outerDiffData, _outdir, _logger);
+				Output.WriteDatfile(diffData, _outdir, _logger);
+			}
 
-				// For the AB mode-style diffs, get all required dictionaries and output with a new name
-				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
-				for (int j = 0; j < _inputs.Count; j++)
+			// Get all entries that have External dupes
+			post = " (Duplicates)";
+			DatData dupeData = new DatData
+			{
+				FileName = _desc + post,
+				Name = _name + post,
+				Description = _desc + post,
+				Version = _version,
+				Date = _date,
+				Category = _cat,
+				Author = _author,
+				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				MergeRoms = _dedup,
+				Roms = new Dictionary<string, List<RomData>>(),
+			};
+			foreach (string key in userData.Roms.Keys)
+			{
+				List<RomData> temp = userData.Roms[key];
+				temp = RomManipulation.Merge(temp, _logger);
+
+				foreach (RomData rom in temp)
 				{
-					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
-					DatData diffData = new DatData
+					if (rom.Dupe >= DupeType.ExternalHash)
+					{
+						RomData newrom = rom;
+						newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.SystemID].Split('¬')[0]) + ")";
+
+						if (dupeData.Roms.ContainsKey(key))
+						{
+							dupeData.Roms[key].Add(newrom);
+						}
+						else
+						{
+							List<RomData> tl = new List<RomData>();
+							tl.Add(rom);
+							dupeData.Roms.Add(key, tl);
+						}
+					}
+				}
+			}
+
+			Output.WriteDatfile(dupeData, _outdir, _logger);
+		}
+
+		/// <summary>
+		/// Output cascading diffs
+		/// </summary>
+		/// <param name="userData">Main DatData to draw information from</param>
+		/// <param name="datHeaders">Dat headers used optionally</param>
+		private void DiffCascade(DatData userData, List<DatData> datHeaders)
+		{
+			string post = "";
+
+			// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
+			for (int j = 0; j < _inputs.Count; j++)
+			{
+				post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
+				DatData diffData;
+
+				// If we're in inplace mode, take the appropriate DatData object already stored
+				if (_inplace || !String.IsNullOrEmpty(_outdir))
+				{
+					diffData = datHeaders[j];
+				}
+				else
+				{
+					diffData = new DatData
 					{
 						FileName = _desc + post,
 						Name = _name + post,
@@ -240,186 +379,90 @@ namespace SabreTools
 						ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 						OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 						MergeRoms = _dedup,
-						Roms = new Dictionary<string, List<RomData>>(),
 					};
-
-					foreach (string key in outerDiffData.Roms.Keys)
-					{
-						foreach (RomData rom in outerDiffData.Roms[key])
-						{
-							if (rom.SystemID == j)
-							{
-								if (diffData.Roms.ContainsKey(key))
-								{
-									diffData.Roms[key].Add(rom);
-								}
-								else
-								{
-									List<RomData> tl = new List<RomData>();
-									tl.Add(rom);
-									diffData.Roms.Add(key, tl);
-								}
-							}
-						}
-					}
-
-					Output.WriteDatfile(diffData, _outdir, _logger);
 				}
 
-				// Get all entries that have External dupes
-				post = " (Duplicates)";
-				DatData dupeData = new DatData
-				{
-					FileName = _desc + post,
-					Name = _name + post,
-					Description = _desc + post,
-					Version = _version,
-					Date = _date,
-					Category = _cat,
-					Author = _author,
-					ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-					OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-					MergeRoms = _dedup,
-					Roms = new Dictionary<string, List<RomData>>(),
-				};
-				foreach (string key in userData.Roms.Keys)
-				{
-					List<RomData> temp = userData.Roms[key];
-					temp = RomManipulation.Merge(temp, _logger);
+				diffData.Roms = new Dictionary<string, List<RomData>>();
 
-					foreach (RomData rom in temp)
+				List<string> keys = userData.Roms.Keys.ToList();
+				foreach (string key in keys)
+				{
+					List<RomData> oldroms = RomManipulation.Merge(userData.Roms[key], _logger);
+					List<RomData> newroms = new List<RomData>();
+
+					foreach (RomData rom in oldroms)
 					{
-						if (rom.Dupe >= DupeType.ExternalHash)
+						if (rom.SystemID == j)
 						{
-							RomData newrom = rom;
-							newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.SystemID].Split('¬')[0]) + ")";
-
-							if (dupeData.Roms.ContainsKey(key))
+							if (diffData.Roms.ContainsKey(key))
 							{
-								dupeData.Roms[key].Add(newrom);
+								diffData.Roms[key].Add(rom);
 							}
 							else
 							{
 								List<RomData> tl = new List<RomData>();
 								tl.Add(rom);
-								dupeData.Roms.Add(key, tl);
+								diffData.Roms.Add(key, tl);
 							}
 						}
+						else
+						{
+							newroms.Add(rom);
+						}
 					}
+					userData.Roms[key] = newroms;
 				}
 
-				Output.WriteDatfile(dupeData, _outdir, _logger);
-			}
-			// If we're in cascade and diff, output only cascaded diffs
-			else if (_diff && _cascade)
-			{
-				// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
-				for (int j = 0; j < _inputs.Count; j++)
+				// If we have an output directory set, replace the path
+				string path = "";
+				if (_inplace)
 				{
-					post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
-					DatData diffData;
-					
-					// If we're in inplace mode, take the appropriate DatData object already stored
-					if (_inplace || !String.IsNullOrEmpty(_outdir))
-					{
-						diffData = datHeaders[j];
-					}
-					else
-					{
-						diffData = new DatData
-						{
-							FileName = _desc + post,
-							Name = _name + post,
-							Description = _desc + post,
-							Version = _version,
-							Date = _date,
-							Category = _cat,
-							Author = _author,
-							ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-							OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-							MergeRoms = _dedup,
-						};
-					}
-
-					diffData.Roms = new Dictionary<string, List<RomData>>();
-
-					List<string> keys = userData.Roms.Keys.ToList();
-					foreach (string key in keys)
-					{
-						List<RomData> oldroms = RomManipulation.Merge(userData.Roms[key], _logger);
-						List<RomData> newroms = new List<RomData>();
-
-						foreach (RomData rom in oldroms)
-						{
-							if (rom.SystemID == j)
-							{
-								if (diffData.Roms.ContainsKey(key))
-								{
-									diffData.Roms[key].Add(rom);
-								}
-								else
-								{
-									List<RomData> tl = new List<RomData>();
-									tl.Add(rom);
-									diffData.Roms.Add(key, tl);
-								}
-							}
-							else
-							{
-								newroms.Add(rom);
-							}
-						}
-						userData.Roms[key] = newroms;
-					}
-
-					// If we have an output directory set, replace the path
-					string path = "";
-					if (_inplace)
-					{
-						path = Path.GetDirectoryName(_inputs[j].Split('¬')[0]);
-					}
-					else if (!String.IsNullOrEmpty(_outdir))
-					{
-						path = _outdir + (Path.GetDirectoryName(_inputs[j].Split('¬')[0]).Remove(0, _inputs[j].Split('¬')[1].Length));
-					}
-
-					// If we have anything but the first DAT, output (the first DAT is always complete)
-					if (j > 0)
-					{
-						Output.WriteDatfile(diffData, path, _logger);
-					}
+					path = Path.GetDirectoryName(_inputs[j].Split('¬')[0]);
 				}
-			}
-			// Output all entries with user-defined merge
-			else
-			{
-				// If we're in SuperDAT mode, prefix all games with their respective DATs
-				if (_superdat)
+				else if (!String.IsNullOrEmpty(_outdir))
 				{
-					List<string> keys = userData.Roms.Keys.ToList();
-					foreach (string key in keys)
-					{
-						List<RomData> newroms = new List<RomData>();
-						foreach (RomData rom in userData.Roms[key])
-						{
-							RomData newrom = rom;
-							string filename = _inputs[newrom.SystemID].Split('¬')[0];
-							string rootpath = _inputs[newrom.SystemID].Split('¬')[1];
-
-							rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
-							filename = filename.Remove(0, rootpath.Length);
-							newrom.Game = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar.ToString() + 
-								Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar + newrom.Game;
-							newroms.Add(newrom);
-						}
-						userData.Roms[key] = newroms;
-					}
+					path = _outdir + (Path.GetDirectoryName(_inputs[j].Split('¬')[0]).Remove(0, _inputs[j].Split('¬')[1].Length));
 				}
 
-				Output.WriteDatfile(userData, _outdir, _logger);
+				// If we have anything but the first DAT, output (the first DAT is always complete)
+				if (j > 0)
+				{
+					Output.WriteDatfile(diffData, path, _logger);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Output user defined merge
+		/// </summary>
+		/// <param name="userData">Main DatData to draw information from</param>
+		/// <param name="datHeaders">Dat headers used optionally</param>
+		private void MergeNoDiff(DatData userData, List<DatData> datHeaders)
+		{
+			// If we're in SuperDAT mode, prefix all games with their respective DATs
+			if (_superdat)
+			{
+				List<string> keys = userData.Roms.Keys.ToList();
+				foreach (string key in keys)
+				{
+					List<RomData> newroms = new List<RomData>();
+					foreach (RomData rom in userData.Roms[key])
+					{
+						RomData newrom = rom;
+						string filename = _inputs[newrom.SystemID].Split('¬')[0];
+						string rootpath = _inputs[newrom.SystemID].Split('¬')[1];
+
+						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
+						filename = filename.Remove(0, rootpath.Length);
+						newrom.Game = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar.ToString() +
+							Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar + newrom.Game;
+						newroms.Add(newrom);
+					}
+					userData.Roms[key] = newroms;
+				}
 			}
 
-			return true;
+			Output.WriteDatfile(userData, _outdir, _logger);
 		}
 	}
 }
