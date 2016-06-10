@@ -67,7 +67,11 @@ namespace SabreTools
 		/// <param name="args">String array representing command line parameters</param>
 		public static void Main(string[] args)
 		{
-			Console.Clear();
+			// If output is being redirected, don't allow clear screens
+			if (!Console.IsOutputRedirected)
+			{
+				Console.Clear();
+			}
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))

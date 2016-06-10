@@ -43,7 +43,12 @@ namespace SabreTools
 			// Perform initial setup and verification
 			_logger = new Logger(true, "database.log");
 			_logger.Start();
-			Console.Clear();
+
+			// If output is being redirected, don't allow clear screens
+			if (!Console.IsOutputRedirected)
+			{
+				Console.Clear();
+			}
 			Setup();
 
 			// Credits take precidence over all
@@ -535,6 +540,9 @@ namespace SabreTools
 			{
 				InitStats(inputs, single);
 			}
+
+			// If nothing is set, show the help
+			Build.Help();
 
 			_logger.Close();
 			return;

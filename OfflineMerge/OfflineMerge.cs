@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using SabreTools.Helper;
 
@@ -40,7 +38,12 @@ namespace SabreTools
 			// Perform initial setup and verification
 			Logger logger = new Logger(true, "offlinemerge.log");
 			logger.Start();
-			Console.Clear();
+
+			// If output is being redirected, don't allow clear screens
+			if (!Console.IsOutputRedirected)
+			{
+				Console.Clear();
+			}
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))

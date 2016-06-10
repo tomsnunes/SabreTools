@@ -25,8 +25,13 @@ namespace SabreTools
 		/// <param name="args">String array representing command line parameters</param>
 		static void Main(string[] args)
 		{
+			// If output is being redirected, don't allow clear screens
+			if (!Console.IsOutputRedirected)
+			{
+				Console.Clear();
+			}
+
 			// Perform initial setup and verification
-			Console.Clear();
 			logger = new Logger(true, "headerer.log");
 			logger.Start();
 			DBTools.EnsureDatabase(_dbName, _connectionString);
