@@ -91,11 +91,11 @@ Options:
 	-rn=, --rom-name=	Rom name to be filtered on
 	-rt=, --rom-type=	Rom type to be filtered on
 	-sgt=, --greater=	Size greater than or equal to
-	-slt=, --less=	Size less than or equal to
-	-seq=, --equal=	Size equal to
+	-slt=, --less=		Size less than or equal to
+	-seq=, --equal=		Size equal to
 	-crc=, --crc=		CRC to be filtered on
 	-md5=, --md5=		MD5 to be filtered on
-	-sha1=, --sha1=	SHA-1 to be filtered on
+	-sha1=, --sha1=		SHA-1 to be filtered on
 	-nd, --nodump		Only match nodump roms
 	-nnd, --not-nodump	Exclude all nodump roms
   -g, --generate	Start tool in generate mode
@@ -139,15 +139,15 @@ Options:
   -ud, --update		Update a DAT file
 	-oc, --output-cmp	Output in CMP format
 	-om, --output-miss	Output in Missfile format
-	  -r, --roms		Output roms to miss instead of sets
+	  -r, --roms			Output roms to miss instead of sets
 	  -gp, --game-prefix	Add game name as a prefix to each item
-	  -pre=, --prefix=	Set prefix to be printed in front of all lines
-	  -post=, --postfix=	Set postfix to be printed behind all lines
-	  -q, --quotes		Put double-quotes around each item
-	  -ae=, --add-ext=	Add an extension to each item
-	  -re=, --rep-ext=	Replace all extensions with specified
-	  -ro, --romba		Output roms in Romba format (requires SHA-1)
-	  -tsv, --tsv		Output roms in Tab-Separated Value format
+	  -pre=, --prefix=		Set prefix for all lines
+	  -post=, --postfix=	Set postfix for all lines
+	  -q, --quotes			Put double-quotes around each item
+	  -ae=, --add-ext=		Add an extension to each item
+	  -re=, --rep-ext=		Replace all extensions with specified
+	  -ro, --romba			Output in Romba format (requires SHA-1)
+	  -tsv, --tsv			Output in Tab-Separated Value format
 	-or, --output-rc	Output in RomCenter format
 	-os, --output-sd	Output in SabreDAT format
 	-ox, --output-xml	Output in Logiqx XML format
@@ -186,9 +186,8 @@ Options:
 Filenames and directories can't start with a reserved string
 unless prefixed by 'input='
 
-For Filter options:
-Game name, Rom name, CRC, MD5, SHA-1 can do partial matches
-using asterisks as follows (case insensitive):
+In filter mode, Game name, Rom name, CRC, MD5, SHA-1 can
+do partial matches using asterisks as follows (case insensitive):
     *00 means ends with '00'
     00* means starts with '00'
     *00* means contains '00'
