@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SabreTools.Helper
 {
@@ -28,7 +29,7 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// Intermediate struct for holding DAT information
 	/// </summary>
-	public struct DatData
+	public struct DatData : ICloneable
 	{
 		// Data common to most DAT types
 		public string FileName;
@@ -70,5 +71,47 @@ namespace SabreTools.Helper
 		public long MD5Count;
 		public long SHA1Count;
 		public long NodumpCount;
+
+		public object Clone()
+		{
+			return new DatData
+			{
+				FileName = this.FileName,
+				Name = this.Name,
+				Description = this.Description,
+				Category = this.Category,
+				Version = this.Version,
+				Date = this.Date,
+				Author = this.Author,
+				Email = this.Email,
+				Homepage = this.Homepage,
+				Url = this.Url,
+				Comment = this.Comment,
+				Header = this.Header,
+				Type = this.Type,
+				ForceMerging = this.ForceMerging,
+				ForceNodump = this.ForceNodump,
+				ForcePacking = this.ForcePacking,
+				OutputFormat = this.OutputFormat,
+				MergeRoms = this.MergeRoms,
+				Roms = this.Roms,
+				UseGame = this.UseGame,
+				Prefix = this.Prefix,
+				Postfix = this.Postfix,
+				Quotes = this.Quotes,
+				RepExt = this.RepExt,
+				AddExt = this.AddExt,
+				GameName = this.GameName,
+				Romba = this.Romba,
+				TSV = this.TSV,
+				RomCount = this.RomCount,
+				DiskCount = this.DiskCount,
+				TotalSize = this.TotalSize,
+				CRCCount = this.CRCCount,
+				MD5Count = this.MD5Count,
+				SHA1Count = this.SHA1Count,
+				NodumpCount = this.NodumpCount,
+			};
+		}
 	}
 }

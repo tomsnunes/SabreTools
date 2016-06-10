@@ -24,7 +24,7 @@ namespace SabreTools
 	///		+ This requires implementing a "last updated" data point for all DATs and tracking for "last generate" somewhere
 	/// - Impelement a ToSort folder for DATs that will place DATs in the correct subfolder on Import
 	/// </remarks>
-	public class DATabase
+	public partial class DATabase
 	{
 		// Private required variables
 		private static string _datroot = "DATS";
@@ -73,11 +73,6 @@ namespace SabreTools
 				bare = false,
 				cascade = false,
 				clean = false,
-				convertMiss = false,
-				convertCMP = false,
-				convertRC = false,
-				convertSD = false,
-				convertXml = false,
 				dedup = false,
 				diff = false,
 				gamename = false,
@@ -95,6 +90,11 @@ namespace SabreTools
 				merge = false,
 				norename = false,
 				old = false,
+				outputCMP = false,
+				outputMiss = false,
+				outputRC = false,
+				outputSD = false,
+				outputXML = false,
 				quotes = false,
 				rem = false,
 				romba = false,
@@ -104,13 +104,23 @@ namespace SabreTools
 				trim = false,
 				tsv = false,
 				skip = false,
+				update = false,
 				usegame = true;
 			string addext = "",
 				author = "",
-				cat = "",
-				desc = "",
+				category = "",
+				comment = "",
+				date = "",
+				description = "",
+				email = "",
 				exta = "",
 				extb = "",
+				filename = "",
+				forcemerge = "",
+				forcend = "",
+				forcepack = "",
+				header = "",
+				homepage = "",
 				name = "",
 				manu = "",
 				outdir = "",
@@ -146,29 +156,9 @@ namespace SabreTools
 					case "--cascade":
 						cascade = true;
 						break;
-					case "-cc":
-					case "--convert-cmp":
-						convertCMP = true;
-						break;
 					case "-clean":
 					case "--clean":
 						clean = true;
-						break;
-					case "-cm":
-					case "--convert-miss":
-						convertMiss = true;
-						break;
-					case "-cr":
-					case "--convert-rc":
-						convertRC = true;
-						break;
-					case "-cs":
-					case "--convert-sd":
-						convertSD = true;
-						break;
-					case "-cx":
-					case "--convert-xml":
-						convertXml = true;
 						break;
 					case "-dd":
 					case "--dedup":
@@ -234,6 +224,26 @@ namespace SabreTools
 					case "--old":
 						old = true;
 						break;
+					case "-oc":
+					case "--output-cmp":
+						outputCMP = true;
+						break;
+					case "-om":
+					case "--output-miss":
+						outputMiss = true;
+						break;
+					case "-or":
+					case "--output-rc":
+						outputRC = true;
+						break;
+					case "-os":
+					case "--output-sd":
+						outputSD = true;
+						break;
+					case "-ox":
+					case "--output-xml":
+						outputXML = true;
+						break;
 					case "-q":
 					case "--quotes":
 						quotes = true;
@@ -277,6 +287,10 @@ namespace SabreTools
 					case "--unzip":
 						forceunpack = true;
 						break;
+					case "-ud":
+					case "--update":
+						update = true;
+						break;
 					default:
 						if (arg.StartsWith("-ae=") || arg.StartsWith("--add-ext="))
 						{
@@ -286,13 +300,25 @@ namespace SabreTools
 						{
 							author = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("-c=") || arg.StartsWith("--cat="))
+						else if (arg.StartsWith("-ca=") || arg.StartsWith("--category="))
 						{
-							cat = arg.Split('=')[1];
+							category = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("-d=") || arg.StartsWith("--desc="))
+						else if (arg.StartsWith("-co=") || arg.StartsWith("--comment="))
 						{
-							desc = arg.Split('=')[1];
+							comment = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-da=") || arg.StartsWith("--date="))
+						{
+							date = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-de=") || arg.StartsWith("--desc="))
+						{
+							description = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-em=") || arg.StartsWith("--email="))
+						{
+							email = arg.Split('=')[1];
 						}
 						else if (arg.StartsWith("-exta="))
 						{
@@ -301,6 +327,30 @@ namespace SabreTools
 						else if (arg.StartsWith("-extb="))
 						{
 							extb = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-f=") || arg.StartsWith("--filename="))
+						{
+							filename = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-fm=") || arg.StartsWith("--forcemerge="))
+						{
+							forcemerge = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-fn=") || arg.StartsWith("--forcend="))
+						{
+							forcend = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-fp=") || arg.StartsWith("--forcepack="))
+						{
+							forcepack = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-h=") || arg.StartsWith("--header="))
+						{
+							header = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-hp=") || arg.StartsWith("--homepage="))
+						{
+							homepage = arg.Split('=')[1];
 						}
 						else if (arg.StartsWith("-input="))
 						{
@@ -342,6 +392,10 @@ namespace SabreTools
 						{
 							repext = arg.Split('=')[1];
 						}
+						else if (arg.StartsWith("-u=") || arg.StartsWith("--url="))
+						{
+							url = arg.Split('=')[1];
+						}
 						else if (arg.StartsWith("-url=") && url == "")
 						{
 							url = arg.Split('=')[1];
@@ -373,8 +427,8 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled or help is set, show the help screen
-			if (help || !(add ^ (convertMiss || romba) ^ convertCMP ^ convertRC ^ convertSD ^ convertXml ^ extsplit ^ generate ^ 
-				genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^ rem ^ stats ^ trim))
+			if (help || !(add ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^
+				(update || outputCMP || outputRC || outputSD || outputXML || outputMiss || romba) ^ rem ^ stats ^ trim))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -383,8 +437,8 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && ((convertMiss || romba) || convertCMP || convertRC || convertSD
-				|| convertXml || extsplit || hashsplit || (merge || diff) || stats || trim))
+			if (inputs.Count == 0 && (update || (outputMiss || romba) || outputCMP || outputRC || outputSD
+				|| outputXML || extsplit || hashsplit || (merge || diff) || stats || trim))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -426,48 +480,14 @@ namespace SabreTools
 				ListSystems();
 			}
 
-			// Convert DAT to missfile
-			else if (convertMiss || romba)
+			// Convert or update a DAT or folder of DATs
+			else if (update || outputCMP || outputMiss || outputRC || outputSD || outputXML || romba)
 			{
 				foreach (string input in inputs)
 				{
-					InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename, romba, tsv);
-				}
-			}
-
-			// Convert any DAT to CMP DAT
-			else if (convertCMP)
-			{
-				foreach (string input in inputs)
-				{
-					InitConvert(input, OutputFormat.ClrMamePro, outdir, clean);
-				}
-			}
-
-			// Convert any DAT to RC DAT
-			else if (convertRC)
-			{
-				foreach (string input in inputs)
-				{
-					InitConvert(input, OutputFormat.RomCenter, outdir, clean);
-				}
-			}
-
-			// Convert any DAT to SabreDAT
-			else if (convertSD)
-			{
-				foreach (string input in inputs)
-				{
-					InitConvert(input, OutputFormat.SabreDat, outdir, clean);
-				}
-			}
-
-			// Convert any DAT to XML DAT
-			else if (convertXml)
-			{
-				foreach (string input in inputs)
-				{
-					InitConvert(input, OutputFormat.Xml, outdir, clean);
+					InitUpdate(input, filename, name, description, category, version, date, author, email, homepage, url, comment, header,
+						superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,
+						postfix, quotes, repext, addext, gamename, romba, tsv, outdir, clean);
 				}
 			}
 
@@ -526,7 +546,7 @@ namespace SabreTools
 			// Merge, diff, and dedupe at least 2 DATs
 			else if (merge || diff)
 			{
-				InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir, clean);
+				InitMergeDiff(inputs, name, description, category, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir, clean);
 			}
 
 			// Split a DAT by available hashes
@@ -542,7 +562,10 @@ namespace SabreTools
 			}
 
 			// If nothing is set, show the help
-			Build.Help();
+			else
+			{
+				Build.Help();
+			}
 
 			_logger.Close();
 			return;
@@ -1331,185 +1354,6 @@ Make a selection:
 		{
 			IImport imp = new ImportTwo(_datroot, _connectionString, _logger, ignore);
 			imp.UpdateDatabase();
-		}
-
-		/// <summary>
-		/// Wrap generating a DAT from the library
-		/// </summary>
-		/// <param name="system">System ID to be used in the DAT (blank means all)</param>
-		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
-		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
-		private static void InitGenerate(string systemid, bool norename, bool old)
-		{
-			IGenerate gen = new GenerateTwo(systemid, "" /* sourceid */, _datroot, _outroot, _connectionString, _logger, norename, old);
-			gen.Export();
-		}
-
-		/// <summary>
-		/// Wrap generating all standard DATs from the library
-		/// </summary>
-		private static void InitGenerateAll(bool norename, bool old)
-		{
-			List<string> systems = new List<string>();
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
-			{
-				dbc.Open();
-
-				string query = "SELECT id FROM system";
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
-				{
-					using (SqliteDataReader sldr = slc.ExecuteReader())
-					{
-						// If nothing is found, tell the user and exit
-						if (!sldr.HasRows)
-						{
-							_logger.Warning("No systems found! Please add a system and then try again.");
-							return;
-						}
-
-						while (sldr.Read())
-						{
-							systems.Add(sldr.GetInt32(0).ToString());
-						}
-					}
-				}
-
-				// Loop through the inputs
-				foreach (string system in systems)
-				{
-					_logger.User("Generating DAT for system id " + system);
-					InitGenerate(system, norename, old);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Wrap converting DAT file from any format to any format
-		/// </summary>
-		/// <param name="filename"></param>
-		/// <param name="outputFormat"></param>
-		/// <param name="outdir">Optional param for output directory</param>
-		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
-		private static void InitConvert(string filename, OutputFormat outputFormat, string outdir, bool clean)
-		{
-			// Clean the input strings
-			outdir = outdir.Replace("\"", "");
-			if (outdir != "")
-			{
-				outdir = Path.GetFullPath(outdir) + Path.DirectorySeparatorChar;
-			}
-			filename = filename.Replace("\"", "");
-
-			if (File.Exists(filename))
-			{
-				_logger.User("Converting \"" + Path.GetFileName(filename) + "\"");
-				DatData datdata = new DatData
-				{
-					OutputFormat = outputFormat,
-					MergeRoms = false,
-				};
-				datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger, true, clean);
-
-				// If the extension matches, append ".new" to the filename
-				string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
-				if (outdir == "" && Path.GetExtension(filename) == extension)
-				{
-					datdata.FileName += ".new";
-				}
-
-				Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(filename) : outdir), _logger);
-			}
-			else if (Directory.Exists(filename))
-			{
-				filename = Path.GetFullPath(filename) + Path.DirectorySeparatorChar;
-
-				foreach (string file in Directory.EnumerateFiles(filename, "*", SearchOption.AllDirectories))
-				{
-					_logger.User("Converting \"" + Path.GetFullPath(file).Remove(0, filename.Length) + "\"");
-					DatData datdata = new DatData
-					{
-						OutputFormat = outputFormat,
-						MergeRoms = false,
-					};
-					datdata = RomManipulation.Parse(file, 0, 0, datdata, _logger, true, clean);
-
-					// If the extension matches, append ".new" to the filename
-					string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
-					if (outdir == "" && Path.GetExtension(file) == extension)
-					{
-						datdata.FileName += ".new";
-					}
-
-					Output.WriteDatfile(datdata, (outdir == "" ? Path.GetDirectoryName(file) : outdir + Path.GetDirectoryName(file).Remove(0, filename.Length - 1)), _logger);
-				}
-			}
-			else
-			{
-				_logger.Error("I'm sorry but " + filename + " doesn't exist!");
-			}
-			return;
-		}
-
-		/// <summary>
-		/// Wrap converting a DAT to missfile
-		/// </summary>
-		/// <param name="input">File to be converted</param>
-		/// <param name="usegame">True if games are to be used in output, false if roms are</param>
-		/// <param name="prefix">Generic prefix to be added to each line</param>
-		/// <param name="postfix">Generic postfix to be added to each line</param>
-		/// <param name="quotes">Add quotes to each item</param>
-		/// <param name="repext">Replace all extensions with another</param>
-		/// <param name="addext">Add an extension to all items</param>
-		/// <param name="gamename">Add the dat name as a directory prefix</param>
-		/// <param name="romba">Output files in romba format</param>
-		/// <param name="tsv">Output files in TSV format</param>
-		private static void InitConvertMiss(string input, bool usegame, string prefix, string postfix, bool quotes,
-			string repext, string addext, bool gamename, bool romba, bool tsv)
-		{
-			// Strip any quotations from the name
-			input = input.Replace("\"", "");
-
-			if (input != "" && File.Exists(input))
-			{
-				// Get the full input name
-				input = Path.GetFullPath(input);
-
-				// Get the output name
-				string name = Path.GetFileNameWithoutExtension(input) + "-miss";
-
-				// Read in the roms from the DAT and then write them to the file
-				_logger.User("Converting " + input);
-				DatData datdata = new DatData
-				{
-					OutputFormat = OutputFormat.MissFile,
-
-					UseGame = usegame,
-					Prefix = prefix,
-					Postfix = postfix,
-					AddExt = addext,
-					RepExt = repext,
-					Quotes = quotes,
-					GameName = gamename,
-					Romba = romba,
-					TSV = tsv,
-				};
-				datdata = RomManipulation.Parse(input, 0, 0, datdata, _logger);
-				datdata.FileName += "-miss";
-				datdata.Name += "-miss";
-				datdata.Description += "-miss";
-
-				// Normalize the extensions
-				addext = (addext == "" || addext.StartsWith(".") ? addext : "." + addext);
-				repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
-
-				Output.WriteDatfile(datdata, Path.GetDirectoryName(input), _logger);
-				_logger.User(input + " converted to: " + name);
-				return;
-			}
-			else
-			{
-				_logger.Error("I'm sorry but " + input + "doesn't exist!");
-			}
 		}
 
 		/// <summary>

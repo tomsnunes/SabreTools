@@ -25,31 +25,35 @@ namespace SabreTools.Helper
 			string mid = name + " " + Constants.Version;
 			mid = "|" + mid.PadLeft(((77 - mid.Length) / 2) + mid.Length).PadRight(77) + "|";
 
-			// Set the console to ready state
-			ConsoleColor formertext = ConsoleColor.White;
-			ConsoleColor formerback = ConsoleColor.Black;
-			if (!MonoEnvironment)
+			// If we're outputting to console, do fancy things
+			if (!Console.IsOutputRedirected)
 			{
-				Console.SetBufferSize(Console.BufferWidth, 999);
-				formertext = Console.ForegroundColor;
-				formerback = Console.BackgroundColor;
-				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.BackgroundColor = ConsoleColor.Blue;
-			}
+				// Set the console to ready state
+				ConsoleColor formertext = ConsoleColor.White;
+				ConsoleColor formerback = ConsoleColor.Black;
+				if (!MonoEnvironment)
+				{
+					Console.SetBufferSize(Console.BufferWidth, 999);
+					formertext = Console.ForegroundColor;
+					formerback = Console.BackgroundColor;
+					Console.ForegroundColor = ConsoleColor.Yellow;
+					Console.BackgroundColor = ConsoleColor.Blue;
+				}
 
-			Console.Title = "SabreTools-" + name + " " + Constants.Version;
+				Console.Title = "SabreTools-" + name + " " + Constants.Version;
 
-			// Output the header
-			Console.WriteLine(border);
-			Console.WriteLine(mid);
-			Console.WriteLine(border);
-			Console.WriteLine();
+				// Output the header
+				Console.WriteLine(border);
+				Console.WriteLine(mid);
+				Console.WriteLine(border);
+				Console.WriteLine();
 
-			// Return the console to the original text and background colors
-			if (!MonoEnvironment)
-			{
-				Console.ForegroundColor = formertext;
-				Console.BackgroundColor = formerback;
+				// Return the console to the original text and background colors
+				if (!MonoEnvironment)
+				{
+					Console.ForegroundColor = formertext;
+					Console.BackgroundColor = formerback;
+				}
 			}
 		}
 
@@ -77,28 +81,6 @@ Options:
 	-system=			System name (system only)
 	-source=			Source name (source only)
 	-url=			URL (source only)
-  -cc, --convert-cmp	Convert any DAT to CMP
-	-clean			Clean game names according to WoD standards
-	-out=			Output directory
-  -cm, --convert-miss	Convert from DAT to miss
-	-r, --roms		Output roms to miss instead of sets
-	-gp, --game-prefix	Add game name as a prefix to each item
-	-pre=, --prefix=	Set prefix to be printed in front of all lines
-	-post=, --postfix=	Set postfix to be printed behind all lines
-	-q, --quotes		Put double-quotes around each item
-	-ae=, --add-ext=	Add an extension to each item
-	-re=, --rep-ext=	Replace all extensions with specified
-	-ro, --romba		Output roms in Romba format (requires SHA-1)
-	-tsv, --tsv		Output roms in Tab-Separated Value format
-  -cs, --convert-sd	Convert any DAT to SabreDAT
-	-clean			Clean game names according to WoD standards
-	-out=			Output directory
-  -cr, --convert-rc	Convert any DAT to RomCenter
-	-clean			Clean game names according to WoD standards
-	-out=			Output directory
-  -cx, --convert-xml	Convert any DAT to XML
-	-clean			Clean game names according to WoD standards
-	-out=			Output directory
   -es, --ext-split		Split a DAT by two file extensions
 	-exta=			First extension to split by
 	-extb=			Second extension to split by
@@ -128,8 +110,8 @@ Options:
 	-out=			Output directory (overridden by --inplace)
 	-sd, --superdat		Enable SuperDAT creation
 	-n=, --name=		Set the internal name of the DAT
-	-d=, --desc=		Set the filename and description of the DAT
-	-c=, --cat=		Set the category of the DAT
+	-de=, --desc=		Set the filename and description of the DAT
+	-ca=, --category=	Set the category of the DAT
 	-v=, --version=		Set the version of the DAT
 	-au=, --author=		Set the author of the DAT
   -rm, --remove		Remove a system or source from the database
@@ -141,6 +123,52 @@ Options:
 	-rd=, --root-dir=	Set the root directory for trimming calculation
 	-nr, --no-rename	Keep game names instead of using '!'
 	-df, --disable-force	Disable forceunzipping
+  -ud, --update		Update a DAT file
+	-oc, --output-cmp	Output in CMP format
+	-om, --output-miss	Output in Missfile format
+	  -r, --roms		Output roms to miss instead of sets
+	  -gp, --game-prefix	Add game name as a prefix to each item
+	  -pre=, --prefix=	Set prefix to be printed in front of all lines
+	  -post=, --postfix=	Set postfix to be printed behind all lines
+	  -q, --quotes		Put double-quotes around each item
+	  -ae=, --add-ext=	Add an extension to each item
+	  -re=, --rep-ext=	Replace all extensions with specified
+	  -ro, --romba		Output roms in Romba format (requires SHA-1)
+	  -tsv, --tsv		Output roms in Tab-Separated Value format
+	-or, --output-rc	Output in RomCenter format
+	-os, --output-sd	Output in SabreDAT format
+	-ox, --output-xml	Output in Logiqx XML format
+	-f=, --filename=	Set a new filename
+	-n=, --name=		Set a new internal name
+	-de=, --desc=		Set a new description
+	-ca=, --category=	Set a new category
+	-v=, --version=		Set a new version
+	-da=, --date=		Set a new date
+	-au=, --author=		Set a new author
+	-em=, --email=		Set a new email
+	-hp=, --homepage=	Set a new homepage
+	-u=, --url=		Set a new URL
+	-co=, --comment=	Set a new comment
+	-h=, --header=		Set a new header skipper
+	-sd=, --superdat	Set SuperDAT type
+	-fm=, --forcemerge=	Set force merging
+		Supported values are:
+		- None
+		- Split
+		- Full
+	-fn=, --forcend=	Set force nodump
+		Supported values are:
+		- None
+		- Obsolete
+		- Required
+		- Ignore
+	-fp=, --forcepack=	Set force packing
+		Supported values are:
+		- None
+		- Zip
+		- Unzip
+	-clean			Clean game names according to WoD standards
+	-out=			Output directory
 
 Filenames and directories can't start with a reserved string
 unless prefixed by 'input='
