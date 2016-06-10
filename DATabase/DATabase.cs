@@ -163,6 +163,26 @@ namespace SabreTools
 					case "--cascade":
 						cascade = true;
 						break;
+					case "-cc":
+					case "--convert-cmp":
+						outputCMP = true;
+						break;
+					case "-cm":
+					case "--convert-miss":
+						outputMiss = true;
+						break;
+					case "-cr":
+					case "--convert-rc":
+						outputRC = true;
+						break;
+					case "-cs":
+					case "--convert-sd":
+						outputSD = true;
+						break;
+					case "-cx":
+					case "--convert-xml":
+						outputXML = true;
+						break;
 					case "-clean":
 					case "--clean":
 						clean = true;
