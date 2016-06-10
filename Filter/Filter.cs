@@ -187,6 +187,31 @@ namespace SabreTools
 				}
 			}
 
+			// Run the filter
+			InitFilter(inputs, outdir, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
+
+			logger.Close();
+		}
+
+		/// <summary>
+		/// Wrap filtering a DAT or set of DATs
+		/// </summary>
+		/// <param name="inputs">List of inputs to be procesed</param>
+		/// <param name="outdir">Output directory for new files (optional)</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// <param name="logger">Logging object for file and console output</param>
+		private static void InitFilter(List<string> inputs, string outdir, string gamename, string romname, string romtype, long sgt,
+			long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
+		{
 			// Create new Filter objects for each input
 			Filter filter;
 			bool success = true;
@@ -221,8 +246,6 @@ namespace SabreTools
 				Console.WriteLine();
 				Build.Help();
 			}
-
-			logger.Close();
 		}
 
 		/// <summary>
