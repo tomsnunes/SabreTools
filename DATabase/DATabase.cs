@@ -672,7 +672,7 @@ namespace SabreTools
 			// Filter input files
 			else if (filter)
 			{
-				InitFilter(inputs, outdir, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
+				InitFilter(inputs, outdir, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 
 			// If nothing is set, show the help
