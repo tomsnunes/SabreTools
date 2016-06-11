@@ -174,6 +174,7 @@ Options:
 		Supported values are:
 			None, Zip, Unzip
 	-clean			Clean game names according to WoD standards
+	-dd, --dedup		Enable deduping in the created DAT
 	-out=			Output directory
 
 Filenames and directories can't start with a reserved string

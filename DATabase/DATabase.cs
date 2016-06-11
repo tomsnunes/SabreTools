@@ -593,7 +593,7 @@ namespace SabreTools
 				{
 					InitUpdate(input, filename, name, description, category, version, date, author, email, homepage, url, comment, header,
 						superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,
-						postfix, quotes, repext, addext, datprefix, romba, tsv, outdir, clean);
+						postfix, quotes, repext, addext, datprefix, romba, tsv, outdir, clean, dedup);
 				}
 			}
 

@@ -108,6 +108,7 @@ namespace SabreTools
 		/// <param name="tsv">Output files in TSV format</param>
 		/// <param name="outdir">Optional param for output directory</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
+		/// <param name="dedup">True to dedupe the roms in the DAT, false otherwise (default)</param>
 		private static void InitUpdate(string input,
 			string filename,
 			string name,
@@ -140,7 +141,8 @@ namespace SabreTools
 			bool romba,
 			bool tsv,
 			string outdir,
-			bool clean)
+			bool clean,
+			bool dedup)
 		{
 			// Set the special flags
 			ForceMerging fm = ForceMerging.None;
@@ -214,7 +216,7 @@ namespace SabreTools
 				ForceMerging = fm,
 				ForceNodump = fn,
 				ForcePacking = fp,
-				MergeRoms = false,
+				MergeRoms = dedup,
 
 				UseGame = usegame,
 				Prefix = prefix,
