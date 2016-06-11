@@ -178,7 +178,7 @@ Options:
 Filenames and directories can't start with a reserved string
 unless prefixed by 'input='
 
-In filter mode, Game name, Rom name, CRC, MD5, SHA-1 can
+Filter parameters game name, rom name, CRC, MD5, SHA-1 can
 do partial matches using asterisks as follows (case insensitive):
     *00 means ends with '00'
     00* means starts with '00'
