@@ -85,19 +85,6 @@ Options:
 	-exta=			First set of extensions (comma-separated)
 	-extb=			Second set of extensions (comma-separated)
 	-out=			Output directory
-  -f, --filter		Filter DATs by inputted criteria
-	-out=, --out=		Output directory
-	-gn=, --game-name=	Game name to be filtered on
-	-rn=, --rom-name=	Rom name to be filtered on
-	-rt=, --rom-type=	Rom type to be filtered on
-	-sgt=, --greater=	Size greater than or equal to
-	-slt=, --less=		Size less than or equal to
-	-seq=, --equal=		Size equal to
-	-crc=, --crc=		CRC to be filtered on
-	-md5=, --md5=		MD5 to be filtered on
-	-sha1=, --sha1=		SHA-1 to be filtered on
-	-nd, --nodump		Only match nodump roms
-	-nnd, --not-nodump	Exclude all nodump roms
   -g, --generate	Start tool in generate mode
 	-system=			System ID to generate from
 	-nr, --no-rename	Don't auto-rename games
@@ -175,6 +162,17 @@ Options:
 			None, Zip, Unzip
 	-clean			Clean game names according to WoD standards
 	-dd, --dedup		Enable deduping in the created DAT
+	-gn=, --game-name=	Filter by game name
+	-rn=, --rom-name=	Filter by rom name
+	-rt=, --rom-type=	Filter by rom type
+	-sgt=, --greater=	Filter by size >=
+	-slt=, --less=		Filter by size <=
+	-seq=, --equal=		Filter by size ==
+	-crc=, --crc=		Filter by CRC hash
+	-md5=, --md5=		Filter by MD5 hash
+	-sha1=, --sha1=		Filter by SHA-1 hash
+	-nd, --nodump		Include only match nodump roms
+	-nnd, --not-nodump	Exclude all nodump roms
 	-out=			Output directory
 
 Filenames and directories can't start with a reserved string
