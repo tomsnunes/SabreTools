@@ -104,11 +104,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExtSplit.cs" />
+    <Compile Include="Split.cs" />
     <Compile Include="Filter.cs" />
     <Compile Include="ImportExport\Generate.cs" />
     <Compile Include="ImportExport\GenerateTwo.cs" />
-    <Compile Include="HashSplit.cs" />
     <Compile Include="ImportExport\Import.cs" />
     <Compile Include="DATabase.cs" />
     <Compile Include="ImportExport\ImportTwo.cs" />

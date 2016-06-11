@@ -643,10 +643,7 @@ namespace SabreTools
 			// Split a DAT by extension
 			else if (extsplit)
 			{
-				foreach (string input in inputs)
-				{
-					InitExtSplit(input, exta, extb, outdir);
-				}
+				InitExtSplit(inputs, exta, extb, outdir);
 			}
 
 			// Merge, diff, and dedupe at least 2 DATs

@@ -405,14 +405,25 @@ namespace SabreTools
 		/// <summary>
 		/// Wrap splitting a DAT by 2 extensions
 		/// </summary>
-		/// <param name="input">Input file or folder to be split</param>
+		/// <param name="inputs">Input files or folders to be split</param>
 		/// <param name="exta">First extension to split on</param>
 		/// <param name="extb">Second extension to split on</param>
 		/// <param name="outdir">Output directory for the split files</param>
-		private static void InitExtSplit(string input, string exta, string extb, string outdir)
+		private static void InitExtSplit(List<string> inputs, string exta, string extb, string outdir)
 		{
+			// Verify the input files
+			foreach (string input in inputs)
+			{
+				if (!File.Exists(input.Replace("\"", "")) && !Directory.Exists(input.Replace("\"", "")))
+				{
+					_logger.Error(input + " is not a valid file or folder!");
+					Console.WriteLine();
+					Build.Help();
+					return;
+				}
+			}
+
 			// Strip any quotations from the names
-			input = input.Replace("\"", "");
 			exta = exta.Replace("\"", "");
 			extb = extb.Replace("\"", "");
 			outdir = outdir.Replace("\"", "");
@@ -421,21 +432,9 @@ namespace SabreTools
 			List<string> extaList = exta.Split(',').ToList();
 			List<string> extbList = extb.Split(',').ToList();
 
-			if (input != "" && File.Exists(input))
-			{
-				if (exta == "" || extb == "")
-				{
-					_logger.Warning("Two extensions are needed to split a DAT!");
-					return;
-				}
-				ExtSplit es = new ExtSplit(input, extaList, extbList, outdir, _logger);
-				es.Split();
-				return;
-			}
-			else
-			{
-				_logger.Log("I'm sorry but " + input + "doesn't exist!");
-			}
+			Split es = new Split(inputs, extaList, extbList, outdir, _logger);
+			es.Process();
+			return;
 		}
 
 		/// <summary>
@@ -461,8 +460,8 @@ namespace SabreTools
 			}
 
 			// If so, run the program
-			HashSplit hs = new HashSplit(inputs, outdir, _logger);
-			hs.Split();
+			Split hs = new Split(inputs, outdir, _logger);
+			hs.Process();
 		}
 
 		/// <summary>
