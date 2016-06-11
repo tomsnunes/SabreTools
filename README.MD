@@ -21,6 +21,7 @@ This tool is not recommended for any usage.
 The main tool of the SabreTools suite. Performs the majority of the core features of the parent project, including the following:
 <ul>
 	<li>Importing and Generating DAT files in ClrMamePro and XML formats (current version formerly <i>DATabaseTwo</i>)</li>
+	<li>Create a DAT from a file, a folder, or a set of either(formerly <i>DATFromDir</i>)</li>
 	<li>Converting DATs from any format to ClrMamePro, Logiqx XML, SabreDAT XML, and to missfile (last part formerly <i>DatToMiss</i>; requested by Obiwantje)</li>
 	<li>Trim DAT entries and optionally merge into a single game (formerly <i>SingleGame</i>; requested by Kludge)</li>
 	<li>Split a DAT using two different file extensions within the DAT (formerly <i>DatSplit</i>)</li>
@@ -55,17 +56,6 @@ A simple auxilary tool that detects and removes headers and also restores header
 	<li>Super Nintendo Entertainment System / Super Famicom SPC music</li>
 </ul>
 The saved headers are currently stored in a database; multiple headers allowed per file.
-
-<b>DATFromDir</b>
-<p/>
-This a versitile Directory to DAT file creator developed to reduce the overhead of creating custom DAT files.
-<ul>
-	<li>Create a DIR from a file, a folder, or a set of either</li>
-	<li>Set most of the DAT header values</li>
-	<li>Enable DAT to be created with forcepacking="unzip"</li>
-	<li>Treat archives like directories (default) or files</li>
-	<li>Output to both supported DAT formats</li>
-</ul>
 
 <h3>Power User Tools</h3>
 
