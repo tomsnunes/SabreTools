@@ -90,8 +90,9 @@ Options:
 	-o, --old		Output DAT in CMP format instead of XML
 	-gz, --gz-files	Allow reading of GZIP files as archives
 	-ro, --romba		Read files from a Romba input
+	-f=, --filename=	Set the external name of the DAT
 	-n=, --name=		Set the internal name of the DAT
-	-d=, --desc=		Set the filename and description of the DAT
+	-d=, --desc=		Set the description of the DAT
 	-c=, --cat=		Set the category of the DAT
 	-v=, --version=	Set the version of the DAT
 	-au=, --author=	Set the author of the DAT
