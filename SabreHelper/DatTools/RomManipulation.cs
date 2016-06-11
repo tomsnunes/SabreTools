@@ -1687,5 +1687,242 @@ namespace SabreTools.Helper
 			outgame = outgame.TrimStart().TrimEnd();
 			return outgame;
 		}
+
+		/// <summary>
+		/// Convert, update, and filter a DAT file
+		/// </summary>
+		/// <param name="inputFileName">Name of the input file or folder</param>
+		/// <param name="datdata">User specified inputs contained in a DatData object</param>
+		/// <param name="outputDirectory">Optional param for output directory</param>
+		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		public static void Update(string inputFileName, DatData datdata, string outputDirectory, bool clean, string gamename, string romname,
+			string romtype, long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
+		{
+			// Clean the input strings
+			outputDirectory = outputDirectory.Replace("\"", "");
+			if (outputDirectory != "")
+			{
+				outputDirectory = Path.GetFullPath(outputDirectory) + Path.DirectorySeparatorChar;
+			}
+			inputFileName = inputFileName.Replace("\"", "");
+
+			if (File.Exists(inputFileName))
+			{
+				logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
+				datdata = RomManipulation.Parse(inputFileName, 0, 0, datdata, logger, true, clean);
+				datdata = Filter(datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
+
+				// If the extension matches, append ".new" to the filename
+				string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
+				if (outputDirectory == "" && Path.GetExtension(inputFileName) == extension)
+				{
+					datdata.FileName += ".new";
+				}
+
+				Output.WriteDatfile(datdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger);
+			}
+			else if (Directory.Exists(inputFileName))
+			{
+				inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
+
+				foreach (string file in Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories))
+				{
+					logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
+					DatData innerDatdata = (DatData)datdata.Clone();
+					innerDatdata.Roms = null;
+					innerDatdata = RomManipulation.Parse(file, 0, 0, innerDatdata, logger, true, clean);
+					innerDatdata = Filter(innerDatdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
+
+					// If the extension matches, append ".new" to the filename
+					string extension = (innerDatdata.OutputFormat == OutputFormat.Xml || innerDatdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
+					if (outputDirectory == "" && Path.GetExtension(file) == extension)
+					{
+						innerDatdata.FileName += ".new";
+					}
+
+					Output.WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger);
+				}
+			}
+			else
+			{
+				logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
+			}
+			return;
+		}
+
+		/// <summary>
+		/// Filter an input DAT file
+		/// </summary>
+		/// <param name="datdata">User specified inputs contained in a DatData object</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		/// <returns>Returns filtered DatData object</returns>
+		public static DatData Filter(DatData datdata, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
+		{
+			// Now loop through and create a new Rom dictionary using filtered values
+			Dictionary<string, List<RomData>> dict = new Dictionary<string, List<RomData>>();
+			List<string> keys = datdata.Roms.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<RomData> roms = datdata.Roms[key];
+				foreach (RomData rom in roms)
+				{
+					// Filter on nodump status
+					if (nodump == true && !rom.Nodump)
+					{
+						continue;
+					}
+					if (nodump == false && rom.Nodump)
+					{
+						continue;
+					}
+
+					// Filter on game name
+					if (gamename != "")
+					{
+						if (gamename.StartsWith("*") && gamename.EndsWith("*") && !rom.Game.ToLowerInvariant().Contains(gamename.ToLowerInvariant().Replace("*", "")))
+						{
+							continue;
+						}
+						else if (gamename.StartsWith("*") && !rom.Game.EndsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							continue;
+						}
+						else if (gamename.EndsWith("*") && !rom.Game.StartsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							continue;
+						}
+					}
+
+					// Filter on rom name
+					if (romname != "")
+					{
+						if (romname.StartsWith("*") && romname.EndsWith("*") && !rom.Name.ToLowerInvariant().Contains(romname.ToLowerInvariant().Replace("*", "")))
+						{
+							continue;
+						}
+						else if (romname.StartsWith("*") && !rom.Name.EndsWith(romname.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							continue;
+						}
+						else if (romname.EndsWith("*") && !rom.Name.StartsWith(romname.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							continue;
+						}
+					}
+
+					// Filter on rom type
+					if (romtype != "" && rom.Type.ToLowerInvariant() != romtype.ToLowerInvariant())
+					{
+						continue;
+					}
+
+					// Filter on rom size
+					if (seq != -1 && rom.Size != seq)
+					{
+						continue;
+					}
+					else
+					{
+						if (sgt != -1 && rom.Size < sgt)
+						{
+							continue;
+						}
+						if (slt != -1 && rom.Size > slt)
+						{
+							continue;
+						}
+					}
+
+					// Filter on crc
+					if (crc != "")
+					{
+						if (crc.StartsWith("*") && crc.EndsWith("*") && !rom.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", "")))
+						{
+							continue;
+						}
+						else if (crc.StartsWith("*") && !rom.CRC.EndsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							continue;
+						}
+						else if (crc.EndsWith("*") && !rom.CRC.StartsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							continue;
+						}
+					}
+
+					// Filter on md5
+					if (md5 != "")
+					{
+						if (md5.StartsWith("*") && md5.EndsWith("*") && !rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
+						{
+							continue;
+						}
+						else if (md5.StartsWith("*") && !rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							continue;
+						}
+						else if (md5.EndsWith("*") && !rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							continue;
+						}
+					}
+
+					// Filter on sha1
+					if (sha1 != "")
+					{
+						if (sha1.StartsWith("*") && sha1.EndsWith("*") && !rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
+						{
+							continue;
+						}
+						else if (sha1.StartsWith("*") && !rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							continue;
+						}
+						else if (sha1.EndsWith("*") && !rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							continue;
+						}
+					}
+
+					// If it made it this far, add the rom to the output dictionary
+					if (dict.ContainsKey(key))
+					{
+						dict[key].Add(rom);
+					}
+					else
+					{
+						List<RomData> temp = new List<RomData>();
+						temp.Add(rom);
+						dict.Add(key, temp);
+					}
+				}
+
+				// Now clean up by removing the old list
+				datdata.Roms[key] = null;
+			}
+
+			return datdata;
+		}
 	}
 }

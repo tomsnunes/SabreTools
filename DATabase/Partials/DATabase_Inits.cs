@@ -106,10 +106,21 @@ namespace SabreTools
 		/// <param name="datprefix">Add the dat name as a directory prefix</param>
 		/// <param name="romba">Output files in romba format</param>
 		/// <param name="tsv">Output files in TSV format</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
 		/// <param name="outdir">Optional param for output directory</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="dedup">True to dedupe the roms in the DAT, false otherwise (default)</param>
 		private static void InitUpdate(string input,
+			/* Normal DAT header info */
 			string filename,
 			string name,
 			string description,
@@ -131,6 +142,8 @@ namespace SabreTools
 			bool outputRC,
 			bool outputSD,
 			bool outputXML,
+
+			/* Missfile-specific DAT info */
 			bool usegame,
 			string prefix,
 			string postfix,
@@ -140,6 +153,20 @@ namespace SabreTools
 			bool datprefix,
 			bool romba,
 			bool tsv,
+
+			/* Filtering info */
+			string gamename,
+			string romname,
+			string romtype,
+			long sgt,
+			long slt,
+			long seq,
+			string crc,
+			string md5,
+			string sha1,
+			bool? nodump,
+
+			/* Output DAT info */
 			string outdir,
 			bool clean,
 			bool dedup)
@@ -232,91 +259,32 @@ namespace SabreTools
 			if (outputCMP)
 			{
 				userInputDat.OutputFormat = OutputFormat.ClrMamePro;
-				InitUpdate(input, userInputDat, outdir, clean);
+				RomManipulation.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (outputMiss || romba)
 			{
 				userInputDat.OutputFormat = OutputFormat.MissFile;
-				InitUpdate(input, userInputDat, outdir, clean);
+				RomManipulation.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (outputRC)
 			{
 				userInputDat.OutputFormat = OutputFormat.RomCenter;
-				InitUpdate(input, userInputDat, outdir, clean);
+				RomManipulation.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (outputSD)
 			{
 				userInputDat.OutputFormat = OutputFormat.SabreDat;
-				InitUpdate(input, userInputDat, outdir, clean);
+				RomManipulation.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (outputXML)
 			{
 				userInputDat.OutputFormat = OutputFormat.Xml;
-				InitUpdate(input, userInputDat, outdir, clean);
+				RomManipulation.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (!outputCMP && !(outputMiss || romba) && !outputRC && !outputSD && !outputXML)
 			{
-				InitUpdate(input, userInputDat, outdir, clean);
+				RomManipulation.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
-		}
-
-		/// <summary>
-		/// Wrap converting and updating DAT file from any format to any format
-		/// </summary>
-		/// <param name="inputFileName">Name of the input file or folder</param>
-		/// <param name="datdata">User specified inputs contained in a DatData object</param>
-		/// <param name="outputDirectory">Optional param for output directory</param>
-		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
-		private static void InitUpdate(string inputFileName, DatData datdata, string outputDirectory, bool clean = false)
-		{
-			// Clean the input strings
-			outputDirectory = outputDirectory.Replace("\"", "");
-			if (outputDirectory != "")
-			{
-				outputDirectory = Path.GetFullPath(outputDirectory) + Path.DirectorySeparatorChar;
-			}
-			inputFileName = inputFileName.Replace("\"", "");
-
-			if (File.Exists(inputFileName))
-			{
-				_logger.User("Converting \"" + Path.GetFileName(inputFileName) + "\"");
-				datdata = RomManipulation.Parse(inputFileName, 0, 0, datdata, _logger, true, clean);
-
-				// If the extension matches, append ".new" to the filename
-				string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
-				if (outputDirectory == "" && Path.GetExtension(inputFileName) == extension)
-				{
-					datdata.FileName += ".new";
-				}
-
-				Output.WriteDatfile(datdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), _logger);
-			}
-			else if (Directory.Exists(inputFileName))
-			{
-				inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
-
-				foreach (string file in Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories))
-				{
-					_logger.User("Converting \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
-					DatData innerDatdata = (DatData)datdata.Clone();
-					innerDatdata.Roms = null;
-					innerDatdata = RomManipulation.Parse(file, 0, 0, innerDatdata, _logger, true, clean);
-
-					// If the extension matches, append ".new" to the filename
-					string extension = (innerDatdata.OutputFormat == OutputFormat.Xml || innerDatdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
-					if (outputDirectory == "" && Path.GetExtension(file) == extension)
-					{
-						innerDatdata.FileName += ".new";
-					}
-
-					Output.WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), _logger);
-				}
-			}
-			else
-			{
-				_logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
-			}
-			return;
 		}
 
 		/// <summary>
@@ -495,61 +463,6 @@ namespace SabreTools
 			Stats stats = new Stats(newinputs, single, statlog);
 			stats.Process();
 			statlog.Close();
-		}
-
-		/// <summary>
-		/// Wrap filtering a DAT or set of DATs
-		/// </summary>
-		/// <param name="inputs">List of inputs to be procesed</param>
-		/// <param name="outdir">Output directory for new files (optional)</param>
-		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="romtype">Type of the rom to match</param>
-		/// <param name="sgt">Find roms greater than or equal to this size</param>
-		/// <param name="slt">Find roms less than or equal to this size</param>
-		/// <param name="seq">Find roms equal to this size</param>
-		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
-		/// <param name="logger">Logging object for file and console output</param>
-		private static void InitFilter(List<string> inputs, string outdir, string gamename, string romname, string romtype, long sgt,
-			long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
-		{
-			// Create new Filter objects for each input
-			Filter filter;
-			bool success = true;
-			foreach (string input in inputs)
-			{
-				string newinput = Path.GetFullPath(input.Replace("\"", ""));
-
-				if (File.Exists(newinput))
-				{
-					filter = new Filter(newinput, outdir, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
-					success &= filter.Process();
-				}
-
-				if (Directory.Exists(newinput))
-				{
-					foreach (string file in Directory.EnumerateFiles(newinput, "*", SearchOption.AllDirectories))
-					{
-						string nestedoutdir = "";
-						if (outdir != "")
-						{
-							nestedoutdir = outdir + Path.GetDirectoryName(file).Remove(0, newinput.Length);
-						}
-						filter = new Filter(file, nestedoutdir, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
-						success &= filter.Process();
-					}
-				}
-			}
-
-			// If we failed, show the help
-			if (!success)
-			{
-				Console.WriteLine();
-				Build.Help();
-			}
 		}
 
 		/// <summary>

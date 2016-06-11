@@ -586,14 +586,15 @@ namespace SabreTools
 				ListSystems();
 			}
 
-			// Convert or update a DAT or folder of DATs
-			else if (update || outputCMP || outputMiss || outputRC || outputSD || outputXML || romba)
+			// Convert, update, and filter a DAT or folder of DATs
+			else if (update || outputCMP || outputMiss || outputRC || outputSD || outputXML || romba || filter)
 			{
 				foreach (string input in inputs)
 				{
 					InitUpdate(input, filename, name, description, category, version, date, author, email, homepage, url, comment, header,
 						superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,
-						postfix, quotes, repext, addext, datprefix, romba, tsv, outdir, clean, dedup);
+						postfix, quotes, repext, addext, datprefix, romba, tsv, gamename, romname, romtype, sgt, slt, seq, crc, md5,
+						sha1, nodump, outdir, clean, dedup);
 				}
 			}
 
@@ -662,12 +663,6 @@ namespace SabreTools
 			else if (stats)
 			{
 				InitStats(inputs, single);
-			}
-
-			// Filter input files
-			else if (filter)
-			{
-				InitFilter(inputs, outdir, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 
 			// If nothing is set, show the help
