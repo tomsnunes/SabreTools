@@ -19,7 +19,7 @@ namespace SabreTools.Helper
 		{
 			try
 			{
-				StreamReader sr = new StreamReader(File.OpenRead(filename));
+				StreamReader sr = File.OpenText(filename);
 				string first = sr.ReadLine();
 				sr.Close();
 				if (first.Contains("<") && first.Contains(">"))
@@ -1426,6 +1426,13 @@ namespace SabreTools.Helper
 		/// <returns>A List of RomData objects representing the merged roms</returns>
 		public static List<RomData> Merge(List<RomData> inroms, Logger logger)
 		{
+			// Check for null or blank roms first
+			if (inroms == null || inroms.Count == 0)
+			{
+				return new List<RomData>();
+			}
+
+			// Create output list
 			List<RomData> outroms = new List<RomData>();
 
 			// First sort the roms by size, crc, md5, sha1 (in order)
