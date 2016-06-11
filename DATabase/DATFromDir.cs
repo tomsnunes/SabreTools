@@ -109,7 +109,7 @@ namespace SabreTools
 					case "--gz-files":
 						enableGzip = true;
 						break;
-					case "-m":
+					case "-nm":
 					case "--noMD5":
 						noMD5 = true;
 						break;

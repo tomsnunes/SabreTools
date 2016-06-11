@@ -82,6 +82,10 @@
       <HintPath>..\packages\Mono.Data.Sqlite.Portable.1.0.3.5\lib\net4\Mono.Data.Sqlite.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SharpCompress, Version=0.11.6.0, Culture=neutral, PublicKeyToken=beaf6f427e128133, processorArchitecture=MSIL">
+      <HintPath>..\packages\sharpcompress.0.11.6\lib\net40\SharpCompress.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -104,6 +108,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DATFromDir.cs" />
     <Compile Include="Split.cs" />
     <Compile Include="ImportExport\Generate.cs" />
     <Compile Include="ImportExport\GenerateTwo.cs" />

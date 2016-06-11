@@ -80,15 +80,17 @@ namespace SabreTools
 			// Set all default values
 			bool help = false,
 				add = false,
+				archivesAsFiles = false,
 				bare = false,
 				cascade = false,
 				clean = false,
+				datfromdir = false,
 				datprefix = false,
 				dedup = false,
 				diff = false,
 				disableForce = false,
+				enableGzip = false,
 				extsplit = false,
-				filter = false,
 				forceunpack = false,
 				generate = false,
 				genall = false,
@@ -99,7 +101,9 @@ namespace SabreTools
 				listsrc = false,
 				listsys = false,
 				merge = false,
+				noMD5 = false,
 				norename = false,
+				noSHA1 = false,
 				old = false,
 				outputCMP = false,
 				outputMiss = false,
@@ -151,6 +155,7 @@ namespace SabreTools
 				sources = "",
 				systems = "",
 				root = "",
+				tempdir = "",
 				url = "",
 				version = "";
 			List<string> inputs = new List<string>();
@@ -201,6 +206,10 @@ namespace SabreTools
 					case "--clean":
 						clean = true;
 						break;
+					case "-d":
+					case "--dfd":
+						datfromdir = true;
+						break;
 					case "-dd":
 					case "--dedup":
 						dedup = true;
@@ -218,8 +227,8 @@ namespace SabreTools
 						extsplit = true;
 						break;
 					case "-f":
-					case "--filter":
-						filter = true;
+					case "--files":
+						archivesAsFiles = true;
 						break;
 					case "-g":
 					case "--generate":
@@ -232,6 +241,10 @@ namespace SabreTools
 					case "-gp":
 					case "--game-prefix":
 						datprefix = true;
+						break;
+					case "-gz":
+					case "--gz-files":
+						enableGzip = true;
 						break;
 					case "-hs":
 					case "--hash-split":
@@ -265,6 +278,10 @@ namespace SabreTools
 					case "--nodump":
 						nodump = true;
 						break;
+					case "-nm":
+					case "--noMD5":
+						noMD5 = true;
+						break;
 					case "-nnd":
 					case "--not-nodump":
 						nodump = false;
@@ -272,6 +289,10 @@ namespace SabreTools
 					case "-nr":
 					case "--no-rename":
 						norename = true;
+						break;
+					case "-ns":
+					case "--noSHA1":
+						noSHA1 = true;
 						break;
 					case "-o":
 					case "--old":
@@ -441,6 +462,14 @@ namespace SabreTools
 						{
 							prefix = arg.Split('=')[1];
 						}
+						else if (arg.StartsWith("-rd=") || arg.StartsWith("--root-dir="))
+						{
+							root = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-re=") || arg.StartsWith("--rep-ext="))
+						{
+							repext = arg.Split('=')[1];
+						}
 						else if (arg.StartsWith("-rn=") || arg.StartsWith("--rom-name="))
 						{
 							romname = arg.Split('=')[1];
@@ -482,13 +511,9 @@ namespace SabreTools
 						{
 							systems = arg.Split('=')[1];
 						}
-						else if (arg.StartsWith("-rd=") || arg.StartsWith("--root-dir="))
+						else if (arg.StartsWith("-t=") || arg.StartsWith("--temp="))
 						{
-							root = arg.Split('=')[1];
-						}
-						else if (arg.StartsWith("-re=") || arg.StartsWith("--rep-ext="))
-						{
-							repext = arg.Split('=')[1];
+							tempdir = arg.Split('=')[1];
 						}
 						else if (arg.StartsWith("-u=") || arg.StartsWith("--url="))
 						{
@@ -533,7 +558,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(add ^ extsplit ^ filter ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^
+			if (!(add ^ datfromdir ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^
 				(update || outputCMP || outputRC || outputSD || outputXML || outputMiss || romba) ^ rem ^ stats ^ trim))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
@@ -544,7 +569,7 @@ namespace SabreTools
 
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (inputs.Count == 0 && (update || (outputMiss || romba) || outputCMP || outputRC || outputSD
-				|| outputXML || filter || extsplit || hashsplit || (merge || diff) || stats || trim))
+				|| outputXML || extsplit || hashsplit || datfromdir || (merge || diff) || stats || trim))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -587,7 +612,7 @@ namespace SabreTools
 			}
 
 			// Convert, update, and filter a DAT or folder of DATs
-			else if (update || outputCMP || outputMiss || outputRC || outputSD || outputXML || romba || filter)
+			else if (update || outputCMP || outputMiss || outputRC || outputSD || outputXML || romba)
 			{
 				foreach (string input in inputs)
 				{
@@ -663,6 +688,12 @@ namespace SabreTools
 			else if (stats)
 			{
 				InitStats(inputs, single);
+			}
+
+			// Create a DAT from a directory or set of directories
+			else if (datfromdir)
+			{
+				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, old, romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir);
 			}
 
 			// If nothing is set, show the help
