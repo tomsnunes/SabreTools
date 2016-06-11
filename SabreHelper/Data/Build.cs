@@ -81,6 +81,22 @@ Options:
 	-system=			System name (system only)
 	-source=			Source name (source only)
 	-url=			URL (source only)
+  -d, --dfd		Enable Dir2DAT mode
+	-nm, --noMD5		Don't include MD5 in output
+	-ns, --noSHA1		Don't include SHA1 in output
+	-b, --bare		Don't include date in file name
+	-u, --unzip		Force unzipping in created DAT
+	-f, --files		Treat archives as files
+	-o, --old		Output DAT in CMP format instead of XML
+	-gz, --gz-files	Allow reading of GZIP files as archives
+	-ro, --romba		Read files from a Romba input
+	-n=, --name=		Set the internal name of the DAT
+	-d=, --desc=		Set the filename and description of the DAT
+	-c=, --cat=		Set the category of the DAT
+	-v=, --version=	Set the version of the DAT
+	-au=, --author=	Set the author of the DAT
+	-sd, --superdat	Enable SuperDAT creation
+	-t=, --temp=		Set the temporary directory to use
   -es, --ext-split		Split a DAT by two file extensions
 	-exta=			First set of extensions (comma-separated)
 	-extb=			Second set of extensions (comma-separated)
@@ -193,29 +209,6 @@ Usage: Headerer [option] [filename|dirname]
 Options:
   -e			Detect and remove mode
   -r			Restore header to file based on SHA-1");
-					break;
-				case "DATFromDir":
-					Console.WriteLine(@"DATFromDir - Create a DAT file from a directory
------------------------------------------
-Usage: DATFromDir [options] [filename|dirname] <filename|dirname> ...
-
-Options:
-  -h, -?, --help	Show this help dialog
-  -nm, --noMD5		Don't include MD5 in output
-  -ns, --noSHA1		Don't include SHA1 in output
-  -b, --bare		Don't include date in file name
-  -u, --unzip		Force unzipping in created DAT
-  -f, --files		Treat archives as files
-  -o, --old		Output DAT in CMP format instead of XML
-  -gz, --gz-files	Allow reading of GZIP files as archives
-  -ro, --romba		Read files from a Romba input
-  -n=, --name=		Set the internal name of the DAT
-  -d=, --desc=		Set the filename and description of the DAT
-  -c=, --cat=		Set the category of the DAT
-  -v=, --version=	Set the version of the DAT
-  -au=, --author=	Set the author of the DAT
-  -sd, --superdat	Enable SuperDAT creation
-  -t=, --temp=		Set the temporary directory to use");
 					break;
 				case "OfflineMerge":
 					Console.WriteLine(@"OfflineMerge - Update DATS for offline arrays
