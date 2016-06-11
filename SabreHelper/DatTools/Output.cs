@@ -151,6 +151,9 @@ namespace SabreTools.Helper
 							"\tversion \"" + datdata.Version + "\"\n" +
 							"\tdate \"" + datdata.Date + "\"\n" +
 							"\tauthor \"" + datdata.Author + "\"\n" +
+							"\temail \"" + datdata.Email + "\"\n" +
+							"\thomepage \"" + datdata.Homepage + "\"\n" +
+							"\turl \"" + datdata.Url + "\"\n" +
 							"\tcomment \"" + datdata.Comment + "\"\n" +
 							(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
 							")\n";
@@ -207,6 +210,9 @@ namespace SabreTools.Helper
 							"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
 							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
 							"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
+							"\t\t<email>" + HttpUtility.HtmlEncode(datdata.Email) + "</email>\n" +
+							"\t\t<homepage>" + HttpUtility.HtmlEncode(datdata.Homepage) + "</homepage>\n" +
+							"\t\t<url>" + HttpUtility.HtmlEncode(datdata.Url) + "</url>\n" +
 							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
 							(!String.IsNullOrEmpty(datdata.Type) ? "\t\t<type>" + datdata.Type + "</type>\n" : "") +
 							(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
