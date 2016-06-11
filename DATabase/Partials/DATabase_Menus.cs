@@ -608,7 +608,9 @@ Make a selection:
 						break;
 					case "5":
 						Console.Clear();
-						InitExtSplit(input, exta, extb, outdir);
+						List<string> inputs = new List<string>();
+						inputs.Add(input);
+						InitExtSplit(inputs, exta, extb, outdir);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; exta = ""; extb = ""; outdir = "";
