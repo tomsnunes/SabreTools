@@ -155,7 +155,7 @@ namespace SabreTools
 			foreach (string input in _inputs)
 			{
 				_logger.User("Adding DAT: " + input.Split('¬')[0]);
-				userData = RomManipulation.Parse(input.Split('¬')[0], i, 0, userData, _logger, true, _clean);
+				userData = DatTools.Parse(input.Split('¬')[0], i, 0, userData, _logger, true, _clean);
 				i++;
 
 				// If we are in inplace mode or redirecting output, save the DAT data
@@ -231,7 +231,7 @@ namespace SabreTools
 			foreach (string key in userData.Roms.Keys)
 			{
 				List<RomData> temp = userData.Roms[key];
-				temp = RomManipulation.Merge(temp, _logger);
+				temp = DatTools.Merge(temp, _logger);
 
 				foreach (RomData rom in temp)
 				{
@@ -319,7 +319,7 @@ namespace SabreTools
 			foreach (string key in userData.Roms.Keys)
 			{
 				List<RomData> temp = userData.Roms[key];
-				temp = RomManipulation.Merge(temp, _logger);
+				temp = DatTools.Merge(temp, _logger);
 
 				foreach (RomData rom in temp)
 				{
@@ -387,7 +387,7 @@ namespace SabreTools
 				List<string> keys = userData.Roms.Keys.ToList();
 				foreach (string key in keys)
 				{
-					List<RomData> oldroms = RomManipulation.Merge(userData.Roms[key], _logger);
+					List<RomData> oldroms = DatTools.Merge(userData.Roms[key], _logger);
 					List<RomData> newroms = new List<RomData>();
 
 					foreach (RomData rom in oldroms)

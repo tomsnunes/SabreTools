@@ -138,9 +138,9 @@ namespace SabreTools
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
 			// Get the file data to be split
-			OutputFormat outputFormat = RomManipulation.GetOutputFormat(filename);
+			OutputFormat outputFormat = DatTools.GetOutputFormat(filename);
 			DatData datdata = new DatData();
-			datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger, true);
+			datdata = DatTools.Parse(filename, 0, 0, datdata, _logger, true);
 
 			// Create each of the respective output DATs
 			_logger.User("Creating and populating new DATs");
@@ -343,10 +343,10 @@ namespace SabreTools
 		{
 			// Load the current DAT to be processed
 			DatData datdata = new DatData();
-			datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger);
+			datdata = DatTools.Parse(filename, 0, 0, datdata, _logger);
 
 			// Set all of the appropriate outputs for each of the subsets
-			OutputFormat outputFormat = RomManipulation.GetOutputFormat(filename);
+			OutputFormat outputFormat = DatTools.GetOutputFormat(filename);
 			DatData datdataA = new DatData
 			{
 				FileName = datdata.FileName + " (" + String.Join(",", _extA) + ")",

@@ -368,7 +368,7 @@ namespace SabreTools
 
 			// Get all roms that are found in the DAT to see what needs to be added
 			DatData datdata = new DatData();
-			datdata = RomManipulation.Parse(_filepath, sysid, srcid, datdata, _logger);
+			datdata = DatTools.Parse(_filepath, sysid, srcid, datdata, _logger);
 
 			// Sort inputted roms into games
 			SortedDictionary<string, List<RomData>> sortable = new SortedDictionary<string, List<RomData>>();
@@ -378,7 +378,7 @@ namespace SabreTools
 				List<RomData> newroms = roms;
 				if (datdata.MergeRoms)
 				{
-					newroms = RomManipulation.Merge(newroms, _logger);
+					newroms = DatTools.Merge(newroms, _logger);
 				}
 
 				foreach (RomData rom in newroms)
@@ -402,7 +402,7 @@ namespace SabreTools
 			foreach (string key in sortable.Keys)
 			{
 				List<RomData> roms = sortable[key];
-				RomManipulation.Sort(roms, true);
+				DatTools.Sort(roms, true);
 
 				long gameid = -1;
 				using (SqliteConnection dbc = new SqliteConnection(_connectionString))

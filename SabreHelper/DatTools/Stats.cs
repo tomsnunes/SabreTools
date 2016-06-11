@@ -50,8 +50,8 @@ namespace SabreTools
 				_logger.User("Beginning stat collection for '" + filename + "'");
 				List<String> games = new List<String>();
 				DatData datdata = new DatData();
-				datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger);
-				SortedDictionary<string, List<RomData>> newroms = RomManipulation.BucketByGame(datdata.Roms, false, true, _logger);
+				datdata = DatTools.Parse(filename, 0, 0, datdata, _logger);
+				SortedDictionary<string, List<RomData>> newroms = DatTools.BucketByGame(datdata.Roms, false, true, _logger);
 
 				// Output single DAT stats (if asked)
 				if (_single)
@@ -132,7 +132,7 @@ Please check the log folder if the stats scrolled offscreen");
 				}
 			}
 
-			SortedDictionary<string, List<RomData>> newroms = RomManipulation.BucketByGame(datdata.Roms, false, true, logger);
+			SortedDictionary<string, List<RomData>> newroms = DatTools.BucketByGame(datdata.Roms, false, true, logger);
 			logger.User(@"    Uncompressed size:       " + Style.GetBytesReadable(datdata.TotalSize) + @"
     Games found:             " + newroms.Count + @"
     Roms found:              " + datdata.RomCount + @"

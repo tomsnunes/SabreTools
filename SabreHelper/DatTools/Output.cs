@@ -32,7 +32,7 @@ namespace SabreTools.Helper
 			}
 			
 			// Bucket roms by game name and optionally dedupe
-			SortedDictionary<string, List<RomData>> sortable = RomManipulation.BucketByGame(datdata.Roms, datdata.MergeRoms, norename, logger);
+			SortedDictionary<string, List<RomData>> sortable = DatTools.BucketByGame(datdata.Roms, datdata.MergeRoms, norename, logger);
 
 			// Now write out to file
 			// If it's empty, use the current folder

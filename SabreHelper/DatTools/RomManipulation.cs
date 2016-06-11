@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace SabreTools.Helper
 {
-	public class RomManipulation
+	public class DatTools
 	{
 		/// <summary>
 		/// Get what type of DAT the input file is
@@ -1720,7 +1720,7 @@ namespace SabreTools.Helper
 			if (File.Exists(inputFileName))
 			{
 				logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-				datdata = RomManipulation.Parse(inputFileName, 0, 0, datdata, logger, true, clean);
+				datdata = DatTools.Parse(inputFileName, 0, 0, datdata, logger, true, clean);
 				datdata = Filter(datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
 
 				// If the extension matches, append ".new" to the filename
@@ -1741,7 +1741,7 @@ namespace SabreTools.Helper
 					logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 					DatData innerDatdata = (DatData)datdata.Clone();
 					innerDatdata.Roms = null;
-					innerDatdata = RomManipulation.Parse(file, 0, 0, innerDatdata, logger, true, clean);
+					innerDatdata = DatTools.Parse(file, 0, 0, innerDatdata, logger, true, clean);
 					innerDatdata = Filter(innerDatdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
 
 					// If the extension matches, append ".new" to the filename

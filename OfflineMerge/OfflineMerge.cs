@@ -148,15 +148,15 @@ namespace SabreTools
 				// First get the combination Dictionary of currentAllMerged and currentNewMerged
 				_logger.User("Adding Current and New Merged DATs to the dictionary");
 				DatData completeDats = new DatData();
-				completeDats = RomManipulation.Parse(_currentAllMerged, 0, 0, completeDats, _logger);
-				completeDats = RomManipulation.Parse(_currentNewMerged, 0, 0, completeDats, _logger);
+				completeDats = DatTools.Parse(_currentAllMerged, 0, 0, completeDats, _logger);
+				completeDats = DatTools.Parse(_currentNewMerged, 0, 0, completeDats, _logger);
 
 				// Now get Net New output dictionary [(currentNewMerged)-(currentAllMerged)]
 				_logger.User("Creating and populating Net New dictionary");
 				Dictionary<string, List<RomData>> netNew = new Dictionary<string, List<RomData>>();
 				foreach (string key in completeDats.Roms.Keys)
 				{
-					List<RomData> templist = RomManipulation.Merge(completeDats.Roms[key], _logger);
+					List<RomData> templist = DatTools.Merge(completeDats.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.System == _currentNewMerged)
@@ -180,7 +180,7 @@ namespace SabreTools
 				Dictionary<string, List<RomData>> unneeded = new Dictionary<string, List<RomData>>();
 				foreach (string key in completeDats.Roms.Keys)
 				{
-					List<RomData> templist = RomManipulation.Merge(completeDats.Roms[key], _logger);
+					List<RomData> templist = DatTools.Merge(completeDats.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.System == _currentAllMerged)
@@ -202,7 +202,7 @@ namespace SabreTools
 				// Now create the New Missing dictionary [(Net New)+(currentMissingMerged-(Unneeded))]
 				_logger.User("Creating and populating New Missing dictionary");
 				DatData midMissing = new DatData();
-				midMissing = RomManipulation.Parse(_currentMissingMerged, 0, 0, midMissing, _logger);
+				midMissing = DatTools.Parse(_currentMissingMerged, 0, 0, midMissing, _logger);
 				foreach (string key in unneeded.Keys)
 				{
 					if (midMissing.Roms.ContainsKey(key))
@@ -217,7 +217,7 @@ namespace SabreTools
 				Dictionary<string, List<RomData>> newMissing = new Dictionary<string, List<RomData>>();
 				foreach (string key in midMissing.Roms.Keys)
 				{
-					List<RomData> templist = RomManipulation.Merge(midMissing.Roms[key], _logger);
+					List<RomData> templist = DatTools.Merge(midMissing.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.System == _currentMissingMerged)
@@ -289,7 +289,7 @@ namespace SabreTools
 				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
 				foreach (string key in midHave.Keys)
 				{
-					List<RomData> templist = RomManipulation.Merge(midHave[key], _logger);
+					List<RomData> templist = DatTools.Merge(midHave[key], _logger);
 					foreach (RomData rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.System == _currentNewMerged)
@@ -452,12 +452,12 @@ namespace SabreTools
 				// Now create the Have dictionary [(currentAllMerged)-(currentMissingMerged)]
 				_logger.User("Creating and populating Have dictionary");
 				DatData midHave = new DatData();
-				midHave = RomManipulation.Parse(_currentMissingMerged, 0, 0, midHave, _logger);
-				midHave = RomManipulation.Parse(_currentAllMerged, 0, 0, midHave, _logger);
+				midHave = DatTools.Parse(_currentMissingMerged, 0, 0, midHave, _logger);
+				midHave = DatTools.Parse(_currentAllMerged, 0, 0, midHave, _logger);
 				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
 				foreach (string key in midHave.Roms.Keys)
 				{
-					List<RomData> templist = RomManipulation.Merge(midHave.Roms[key], _logger);
+					List<RomData> templist = DatTools.Merge(midHave.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.System == _currentAllMerged)
@@ -522,12 +522,12 @@ namespace SabreTools
 				// Now create the Have dictionary [(currentNewMerged)-(currentMissingMerged)]
 				_logger.User("Creating and populating Have dictionary");
 				DatData midHave = new DatData();
-				midHave = RomManipulation.Parse(_currentMissingMerged, 0, 0, midHave, _logger);
-				midHave = RomManipulation.Parse(_currentNewMerged, 0, 0, midHave, _logger);
+				midHave = DatTools.Parse(_currentMissingMerged, 0, 0, midHave, _logger);
+				midHave = DatTools.Parse(_currentNewMerged, 0, 0, midHave, _logger);
 				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
 				foreach (string key in midHave.Roms.Keys)
 				{
-					List<RomData> templist = RomManipulation.Merge(midHave.Roms[key], _logger);
+					List<RomData> templist = DatTools.Merge(midHave.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.System == _currentNewMerged)

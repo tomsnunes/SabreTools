@@ -259,31 +259,31 @@ namespace SabreTools
 			if (outputCMP)
 			{
 				userInputDat.OutputFormat = OutputFormat.ClrMamePro;
-				RomManipulation.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+				DatTools.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (outputMiss || romba)
 			{
 				userInputDat.OutputFormat = OutputFormat.MissFile;
-				RomManipulation.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+				DatTools.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (outputRC)
 			{
 				userInputDat.OutputFormat = OutputFormat.RomCenter;
-				RomManipulation.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+				DatTools.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (outputSD)
 			{
 				userInputDat.OutputFormat = OutputFormat.SabreDat;
-				RomManipulation.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+				DatTools.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (outputXML)
 			{
 				userInputDat.OutputFormat = OutputFormat.Xml;
-				RomManipulation.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+				DatTools.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (!outputCMP && !(outputMiss || romba) && !outputRC && !outputSD && !outputXML)
 			{
-				RomManipulation.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+				DatTools.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 		}
 
@@ -576,7 +576,7 @@ namespace SabreTools
 					OutputFormat = outputFormat,
 					MergeRoms = false,
 				};
-				datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger, true, clean);
+				datdata = DatTools.Parse(filename, 0, 0, datdata, _logger, true, clean);
 
 				// If the extension matches, append ".new" to the filename
 				string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
@@ -599,7 +599,7 @@ namespace SabreTools
 						OutputFormat = outputFormat,
 						MergeRoms = false,
 					};
-					datdata = RomManipulation.Parse(file, 0, 0, datdata, _logger, true, clean);
+					datdata = DatTools.Parse(file, 0, 0, datdata, _logger, true, clean);
 
 					// If the extension matches, append ".new" to the filename
 					string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
@@ -661,7 +661,7 @@ namespace SabreTools
 					Romba = romba,
 					TSV = tsv,
 				};
-				datdata = RomManipulation.Parse(input, 0, 0, datdata, _logger);
+				datdata = DatTools.Parse(input, 0, 0, datdata, _logger);
 				datdata.FileName += "-miss";
 				datdata.Name += "-miss";
 				datdata.Description += "-miss";

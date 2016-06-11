@@ -86,9 +86,9 @@ namespace SabreTools
 			DatData datdata = new DatData
 			{
 				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = RomManipulation.GetOutputFormat(filename),
+				OutputFormat = DatTools.GetOutputFormat(filename),
 			};
-			datdata = RomManipulation.Parse(filename, 0, 0, datdata, _logger);
+			datdata = DatTools.Parse(filename, 0, 0, datdata, _logger);
 
 			// Trim all file names according to the path that's set
 			List<string> keys = datdata.Roms.Keys.ToList();
