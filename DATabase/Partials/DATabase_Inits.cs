@@ -76,6 +76,7 @@ namespace SabreTools
 		/// Wrap converting and updating DAT file from any format to any format
 		/// </summary>
 		/// <param name="input">Input filename</param>
+		/// /* Normal DAT header info */
 		/// <param name="filename">New filename</param>
 		/// <param name="name">New name</param>
 		/// <param name="description">New description</param>
@@ -97,6 +98,7 @@ namespace SabreTools
 		/// <param name="outputRC">True to output to RomCenter format</param>
 		/// <param name="outputSD">True to output to SabreDAT format</param>
 		/// <param name="outputXML">True to output to Logiqx XML format</param>
+		/// /* Missfile-specific DAT info */
 		/// <param name="usegame">True if games are to be used in output, false if roms are</param>
 		/// <param name="prefix">Generic prefix to be added to each line</param>
 		/// <param name="postfix">Generic postfix to be added to each line</param>
@@ -106,6 +108,7 @@ namespace SabreTools
 		/// <param name="datprefix">Add the dat name as a directory prefix</param>
 		/// <param name="romba">Output files in romba format</param>
 		/// <param name="tsv">Output files in TSV format</param>
+		/// /* Filtering info */
 		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
 		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
 		/// <param name="romtype">Type of the rom to match</param>
@@ -116,6 +119,7 @@ namespace SabreTools
 		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// /* Output DAT info */
 		/// <param name="outdir">Optional param for output directory</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="dedup">True to dedupe the roms in the DAT, false otherwise (default)</param>
