@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Mono.Data.Sqlite;
 
 using SabreTools.Helper;
@@ -416,10 +417,9 @@ namespace SabreTools
 			extb = extb.Replace("\"", "");
 			outdir = outdir.Replace("\"", "");
 
-			List<string> extaList = new List<string>();
-			extaList.Add(exta);
-			List<string> extbList = new List<string>();
-			extbList.Add(extb);
+			// Convert comma-separated strings to list
+			List<string> extaList = exta.Split(',').ToList();
+			List<string> extbList = extb.Split(',').ToList();
 
 			if (input != "" && File.Exists(input))
 			{

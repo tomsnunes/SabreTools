@@ -72,9 +72,9 @@ namespace SabreTools
 			OutputFormat outputFormat = RomManipulation.GetOutputFormat(_filename);
 			DatData datdataA = new DatData
 			{
-				FileName = datdata.FileName + "." + _extA,
-				Name = datdata.Name + "." + _extA,
-				Description = datdata.Description + "." + _extA,
+				FileName = datdata.FileName + " (" + String.Join(",", _extA) + ")",
+				Name = datdata.Name + " (" + String.Join(",", _extA) + ")",
+				Description = datdata.Description + " (" + String.Join(",", _extA) + ")",
 				Category = datdata.Category,
 				Version = datdata.Version,
 				Date = datdata.Date,
@@ -88,9 +88,9 @@ namespace SabreTools
 			};
 			DatData datdataB = new DatData
 			{
-				FileName = datdata.FileName + "." + _extB,
-				Name = datdata.Name + "." + _extB,
-				Description = datdata.Description + "." + _extB,
+				FileName = datdata.FileName + " (" + String.Join(",", _extB) + ")",
+				Name = datdata.Name + " (" + String.Join(",", _extB) + ")",
+				Description = datdata.Description + " (" + String.Join(",", _extB) + ")",
 				Category = datdata.Category,
 				Version = datdata.Version,
 				Date = datdata.Date,
@@ -114,7 +114,7 @@ namespace SabreTools
 			{
 				foreach (RomData rom in datdata.Roms[key])
 				{
-					if (rom.Name.ToUpperInvariant().EndsWith(_extA[0]))
+					if (_extA.Contains(Path.GetExtension(rom.Name.ToUpperInvariant())))
 					{
 						if (datdataA.Roms.ContainsKey(key))
 						{
@@ -127,7 +127,7 @@ namespace SabreTools
 							datdataA.Roms.Add(key, temp);
 						}
 					}
-					else if (rom.Name.ToUpperInvariant().EndsWith(_extB[0]))
+					else if (_extB.Contains(Path.GetExtension(rom.Name.ToUpperInvariant())))
 					{
 						if (datdataB.Roms.ContainsKey(key))
 						{

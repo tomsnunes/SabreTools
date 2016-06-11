@@ -82,8 +82,8 @@ Options:
 	-source=			Source name (source only)
 	-url=			URL (source only)
   -es, --ext-split		Split a DAT by two file extensions
-	-exta=			First extension to split by
-	-extb=			Second extension to split by
+	-exta=			First set of extensions (comma-separated)
+	-extb=			Second set of extensions (comma-separated)
 	-out=			Output directory
   -f, --filter		Filter DATs by inputted criteria
 	-out=, --out=		Output directory
