@@ -307,7 +307,10 @@ Make a selection:
 						break;
 					case "4":
 						Console.Clear();
-						InitConvert(input, outputFormat, outdir, false);
+						InitUpdate(input, "", "", "", "", "", "", "", "", "", "", "", "", false, "", "", "",
+							(outputFormat == OutputFormat.ClrMamePro), (outputFormat == OutputFormat.MissFile), (outputFormat == OutputFormat.RomCenter),
+							(outputFormat == OutputFormat.SabreDat), (outputFormat == OutputFormat.Xml), false, "", "", false, "", "", false, false, false,
+							"", "", "", -1, -1, -1, "", "", "", null, outdir, false, false);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; outdir = "";
@@ -395,7 +398,9 @@ Make a selection:
 						break;
 					case "12":
 						Console.Clear();
-						InitConvertMiss(input, usegame, prefix, postfix, quotes, repext, addext, gamename, romba, tsv);
+						InitUpdate(input, "", "", "", "", "", "", "", "", "", "", "", "", false, "", "", "",
+							false, true, false, false, false, usegame, prefix, postfix, quotes, repext, addext,
+							gamename, romba, tsv, "", "", "", -1, -1, -1, "", "", "", null, "", false, false);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; prefix = ""; postfix = ""; addext = ""; repext = "";
