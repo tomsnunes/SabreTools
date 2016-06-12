@@ -1710,17 +1710,17 @@ namespace SabreTools.Helper
 			string romtype, long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
 		{
 			// Clean the input strings
-			outputDirectory = outputDirectory.Replace("\"", "");
-			if (outputDirectory != "")
-			{
-				outputDirectory = Path.GetFullPath(outputDirectory) + Path.DirectorySeparatorChar;
-			}
 			inputFileName = inputFileName.Replace("\"", "");
+			if (inputFileName != "")
+			{
+				inputFileName = Path.GetFullPath(inputFileName);
+			}
+			outputDirectory = outputDirectory.Replace("\"", "");
 
 			if (File.Exists(inputFileName))
 			{
 				logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-				datdata = DatTools.Parse(inputFileName, 0, 0, datdata, logger, true, clean);
+				datdata = Parse(inputFileName, 0, 0, datdata, logger, true, clean);
 				datdata = Filter(datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
 
 				// If the extension matches, append ".new" to the filename
@@ -1741,7 +1741,7 @@ namespace SabreTools.Helper
 					logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 					DatData innerDatdata = (DatData)datdata.Clone();
 					innerDatdata.Roms = null;
-					innerDatdata = DatTools.Parse(file, 0, 0, innerDatdata, logger, true, clean);
+					innerDatdata = Parse(file, 0, 0, innerDatdata, logger, true, clean);
 					innerDatdata = Filter(innerDatdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
 
 					// If the extension matches, append ".new" to the filename
@@ -1921,6 +1921,9 @@ namespace SabreTools.Helper
 				// Now clean up by removing the old list
 				datdata.Roms[key] = null;
 			}
+
+			// Resassign the new dictionary to the DatData object
+			datdata.Roms = dict;
 
 			return datdata;
 		}

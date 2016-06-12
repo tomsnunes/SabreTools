@@ -100,7 +100,7 @@
     <Compile Include="DatTools\Output.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Remapping.cs" />
-    <Compile Include="DatTools\RomManipulation.cs" />
+    <Compile Include="DatTools\DatTools.cs" />
     <Compile Include="Data\Structs.cs" />
     <Compile Include="DatTools\Stats.cs" />
     <Compile Include="DatTools\Style.cs" />
