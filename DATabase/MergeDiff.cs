@@ -390,26 +390,30 @@ namespace SabreTools
 					List<RomData> oldroms = DatTools.Merge(userData.Roms[key], _logger);
 					List<RomData> newroms = new List<RomData>();
 
-					foreach (RomData rom in oldroms)
+					if (oldroms != null && oldroms.Count > 0)
 					{
-						if (rom.SystemID == j)
+						foreach (RomData rom in oldroms)
 						{
-							if (diffData.Roms.ContainsKey(key))
+							if (rom.SystemID == j)
 							{
-								diffData.Roms[key].Add(rom);
+								if (diffData.Roms.ContainsKey(key))
+								{
+									diffData.Roms[key].Add(rom);
+								}
+								else
+								{
+									List<RomData> tl = new List<RomData>();
+									tl.Add(rom);
+									diffData.Roms.Add(key, tl);
+								}
 							}
 							else
 							{
-								List<RomData> tl = new List<RomData>();
-								tl.Add(rom);
-								diffData.Roms.Add(key, tl);
+								newroms.Add(rom);
 							}
 						}
-						else
-						{
-							newroms.Add(rom);
-						}
 					}
+					
 					userData.Roms[key] = newroms;
 				}
 
