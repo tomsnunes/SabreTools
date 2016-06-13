@@ -1621,14 +1621,23 @@ namespace SabreTools.Helper
 		/// Take an arbitrarily bucketed Dictionary and return one sorted by Game
 		/// </summary>
 		/// <param name="dict">Input unsorted dictionary</param>
-		/// <param name="mergeRoms">True if roms should be deduped, false otherwise</param>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
 		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
 		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
 		/// <returns>SortedDictionary bucketed by game name</returns>
-		public static SortedDictionary<string, List<RomData>> BucketByGame(Dictionary<string, List<RomData>> dict, bool mergeroms, bool norename, Logger logger)
+		public static SortedDictionary<string, List<RomData>> BucketByGame(Dictionary<string, List<RomData>> dict, bool mergeroms, bool norename, Logger logger, bool output = true)
 		{
 			SortedDictionary<string, List<RomData>> sortable = new SortedDictionary<string, List<RomData>>();
 			long count = 0;
+
+			// If we have a null dict or an empty one, output a new dictionary
+			if (dict == null || dict.Count == 0)
+			{
+				return sortable;
+			}
+			
+			// Process each all of the roms
 			foreach (List<RomData> roms in dict.Values)
 			{
 				List<RomData> newroms = roms;
@@ -1654,7 +1663,12 @@ namespace SabreTools.Helper
 				}
 			}
 
-			logger.User("A total of " + count + " file hashes will be written out to file");
+			// Output the count if told to
+			if (output)
+			{
+				logger.User("A total of " + count + " file hashes will be written out to file");
+			}
+			
 			return sortable;
 		}
 

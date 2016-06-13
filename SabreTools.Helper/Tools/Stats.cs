@@ -51,7 +51,7 @@ namespace SabreTools
 				List<String> games = new List<String>();
 				DatData datdata = new DatData();
 				datdata = DatTools.Parse(filename, 0, 0, datdata, _logger);
-				SortedDictionary<string, List<RomData>> newroms = DatTools.BucketByGame(datdata.Roms, false, true, _logger);
+				SortedDictionary<string, List<RomData>> newroms = DatTools.BucketByGame(datdata.Roms, false, true, _logger, false);
 
 				// Output single DAT stats (if asked)
 				if (_single)
@@ -62,7 +62,7 @@ namespace SabreTools
 				}
 				else
 				{
-					_logger.User("\nAdding stats for file '" + filename + "'");
+					_logger.User("Adding stats for file '" + filename + "'\n");
 				}
 
 				// Add single DAT stats to totals

@@ -510,7 +510,6 @@ namespace SabreTools
 		/// <param name="currentMissingMerged">Old-current missing DAT with merged and deduped values</param>
 		/// <param name="currentNewMerged">New-current DAT with merged and deduped values</param>
 		/// <param name="fake">True if all values should be replaced with default 0-byte values, false otherwise</param>
-		/// <param name="logger"></param>
 		private static void InitOfflineMerge(string currentAllMerged, string currentMissingMerged, string currentNewMerged, bool fake)
 		{
 			// Sanitize the inputs
