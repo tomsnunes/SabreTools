@@ -109,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DATFromDir.cs" />
+    <Compile Include="OfflineMerge.cs" />
     <Compile Include="Split.cs" />
     <Compile Include="ImportExport\Generate.cs" />
     <Compile Include="ImportExport\GenerateTwo.cs" />

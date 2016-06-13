@@ -91,6 +91,7 @@ namespace SabreTools
 				disableForce = false,
 				enableGzip = false,
 				extsplit = false,
+				fake = false,
 				forceunpack = false,
 				generate = false,
 				genall = false,
@@ -104,6 +105,7 @@ namespace SabreTools
 				noMD5 = false,
 				norename = false,
 				noSHA1 = false,
+				offlineMerge = false,
 				old = false,
 				outputCMP = false,
 				outputMiss = false,
@@ -130,6 +132,9 @@ namespace SabreTools
 				category = "",
 				comment = "",
 				crc = "",
+				currentAllMerged = "",
+				currentMissingMerged = "",
+				currentNewMerged = "",
 				date = "",
 				description = "",
 				email = "",
@@ -230,6 +235,10 @@ namespace SabreTools
 					case "--files":
 						archivesAsFiles = true;
 						break;
+					case "-fk":
+					case "--fake":
+						fake = true;
+						break;
 					case "-g":
 					case "--generate":
 						generate = true;
@@ -301,6 +310,10 @@ namespace SabreTools
 					case "-oc":
 					case "--output-cmp":
 						outputCMP = true;
+						break;
+					case "-ol":
+					case "--offmerge":
+						offlineMerge = true;
 						break;
 					case "-om":
 					case "--output-miss":
@@ -382,6 +395,10 @@ namespace SabreTools
 						{
 							comment = arg.Split('=')[1];
 						}
+						else if (arg.StartsWith("-com=") || arg.StartsWith("--com="))
+						{
+							currentAllMerged = arg.Split('=')[1];
+						}
 						else if (arg.StartsWith("-crc=") || arg.StartsWith("--crc="))
 						{
 							crc = arg.Split('=')[1];
@@ -409,6 +426,10 @@ namespace SabreTools
 						else if (arg.StartsWith("-f=") || arg.StartsWith("--filename="))
 						{
 							filename = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-fix=") || arg.StartsWith("--fix="))
+						{
+							currentMissingMerged = arg.Split('=')[1];
 						}
 						else if (arg.StartsWith("-fm=") || arg.StartsWith("--forcemerge="))
 						{
@@ -449,6 +470,10 @@ namespace SabreTools
 						else if (arg.StartsWith("-n=") || arg.StartsWith("--name="))
 						{
 							name = arg.Split('=')[1];
+						}
+						else if (arg.StartsWith("-new=") || arg.StartsWith("--new="))
+						{
+							currentNewMerged = arg.Split('=')[1];
 						}
 						else if (arg.StartsWith("-out=") && outdir == "")
 						{
@@ -558,8 +583,9 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(add ^ datfromdir ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^ (merge || diff) ^
-				(update || outputCMP || outputRC || outputSD || outputXML || outputMiss || romba) ^ rem ^ stats ^ trim))
+			if (!(add ^ datfromdir ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^
+				(merge || diff) ^ (update || outputCMP || outputRC || outputSD || outputXML || outputMiss || romba) ^
+				offlineMerge ^ rem ^ stats ^ trim))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -694,6 +720,22 @@ namespace SabreTools
 			else if (datfromdir)
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, old, romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir);
+			}
+
+			// If we want to run Offline merging mode
+			else if (offlineMerge)
+			{
+				if (!(currentAllMerged == "" && currentMissingMerged == "" && currentNewMerged == ""))
+				{
+					InitOfflineMerge(currentAllMerged, currentMissingMerged, currentNewMerged, fake);
+				}
+				else
+				{
+					_logger.User("All inputs were empty! At least one input is required...");
+					Build.Help();
+					_logger.Close();
+					return;
+				}
 			}
 
 			// If nothing is set, show the help

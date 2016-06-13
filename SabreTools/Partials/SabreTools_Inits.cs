@@ -504,6 +504,29 @@ namespace SabreTools
 		}
 
 		/// <summary>
+		/// Wrap creating an Offline merged DAT set
+		/// </summary>
+		/// <param name="currentAllMerged">Old-current DAT with merged and deduped values</param>
+		/// <param name="currentMissingMerged">Old-current missing DAT with merged and deduped values</param>
+		/// <param name="currentNewMerged">New-current DAT with merged and deduped values</param>
+		/// <param name="fake">True if all values should be replaced with default 0-byte values, false otherwise</param>
+		/// <param name="logger"></param>
+		private static void InitOfflineMerge(string currentAllMerged, string currentMissingMerged, string currentNewMerged, bool fake)
+		{
+			// Sanitize the inputs
+			currentAllMerged = currentAllMerged.Replace("\"", "");
+			currentMissingMerged = currentMissingMerged.Replace("\"", "");
+			currentNewMerged = currentNewMerged.Replace("\"", "");
+
+			OfflineMerge om = new OfflineMerge(currentAllMerged, currentMissingMerged, currentNewMerged, fake, _logger);
+			bool success = om.Process();
+			if (!success)
+			{
+				_logger.Warning("At least one complete DAT and the fixdat is needed to run!");
+			}
+		}
+
+		/// <summary>
 		/// Wrap getting statistics on a DAT or folder of DATs
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>

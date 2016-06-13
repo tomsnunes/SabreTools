@@ -68,18 +68,18 @@ namespace SabreTools.Helper
 
 			switch (className)
 			{
-				case "DATabase":
+				case "SabreTools":
 					Console.Write(@"
-DATabase - Import and Generate DAT files
+SabreTools - Import, generate, manipulate DAT files
 -----------------------------------------
-Usage: DATabase [option] [filename|dirname] ...
+Usage: SabreTools [option] [filename|dirname] ...
 
 Options:
   -?, -h, --help	Show this help
   -a, --add		Add a new system or source to the database
 	-manu=			Manufacturer name (system only)
-	-system=			System name (system only)
-	-source=			Source name (source only)
+	-system=		System name (system only)
+	-source=		Source name (source only)
 	-url=			URL (source only)
   -d, --dfd		Enable Dir2DAT mode
 	-nm, --noMD5		Don't include MD5 in output
@@ -88,22 +88,22 @@ Options:
 	-u, --unzip		Force unzipping in created DAT
 	-f, --files		Treat archives as files
 	-o, --old		Output DAT in CMP format instead of XML
-	-gz, --gz-files	Allow reading of GZIP files as archives
+	-gz, --gz-files		Allow reading of GZIP files as archives
 	-ro, --romba		Read files from a Romba input
 	-f=, --filename=	Set the external name of the DAT
 	-n=, --name=		Set the internal name of the DAT
 	-d=, --desc=		Set the description of the DAT
 	-c=, --cat=		Set the category of the DAT
-	-v=, --version=	Set the version of the DAT
-	-au=, --author=	Set the author of the DAT
-	-sd, --superdat	Enable SuperDAT creation
+	-v=, --version=		Set the version of the DAT
+	-au=, --author=		Set the author of the DAT
+	-sd, --superdat		Enable SuperDAT creation
 	-t=, --temp=		Set the temporary directory to use
-  -es, --ext-split		Split a DAT by two file extensions
+  -es, --ext-split	Split a DAT by two file extensions
 	-exta=			First set of extensions (comma-separated)
 	-extb=			Second set of extensions (comma-separated)
 	-out=			Output directory
   -g, --generate	Start tool in generate mode
-	-system=			System ID to generate from
+	-system=		System ID to generate from
 	-nr, --no-rename	Don't auto-rename games
 	-o, --old		Output DAT in CMP format instead of XML
   -ga, --generate-all	Start tool in generate all mode
@@ -118,7 +118,7 @@ Options:
   -m, --merge		Merge one or more DATs
 	-di, --diff		Output all diffdats (merge flag not required)
 		-c, --cascade		Enable cascaded diffing
-			-ip, --inplace		Enable inplace, cascaded diffing
+			-ip, --inplace		Enable inplace, cascaded diff
 	-dd, --dedup		Enable deduping in the created DAT
 	-b, --bare		Don't include date in file name
 	-u, --unzip		Force unzipping in created DAT
@@ -131,6 +131,11 @@ Options:
 	-ca=, --category=	Set the category of the DAT
 	-v=, --version=		Set the version of the DAT
 	-au=, --author=		Set the author of the DAT
+  -ol, --offmerge	Update DATS for offline arrays (see notes)
+	-com=			Complete current DAT
+	-fix=			Complete current Missing
+	-new=			New Complete DAT
+	-fk, --fake		Replace all hashes and sizes by the default
   -rm, --remove		Remove a system or source from the database
 	-system=		System ID
 	-source=		Source ID
@@ -144,9 +149,9 @@ Options:
 	-oc, --output-cmp	Output in CMP format
 	-om, --output-miss	Output in Missfile format
 	  -r, --roms			Output roms to miss instead of sets
-	  -gp, --game-prefix	Add game name as a prefix to each item
+	  -gp, --game-prefix		Add game name as a prefix
 	  -pre=, --prefix=		Set prefix for all lines
-	  -post=, --postfix=	Set postfix for all lines
+	  -post=, --postfix=		Set postfix for all lines
 	  -q, --quotes			Put double-quotes around each item
 	  -ae=, --add-ext=		Add an extension to each item
 	  -re=, --rep-ext=		Replace all extensions with specified
@@ -170,13 +175,13 @@ Options:
 	-sd=, --superdat	Set SuperDAT type
 	-fm=, --forcemerge=	Set force merging
 		Supported values are:
-			None, Split, Full
+		  None, Split, Full
 	-fn=, --forcend=	Set force nodump
 		Supported values are:
-			None, Obsolete, Required, Ignore
+		  None, Obsolete, Required, Ignore
 	-fp=, --forcepack=	Set force packing
 		Supported values are:
-			None, Zip, Unzip
+		  None, Zip, Unzip
 	-clean			Clean game names according to WoD standards
 	-dd, --dedup		Enable deduping in the created DAT
 	-gn=, --game-name=	Filter by game name
@@ -200,7 +205,16 @@ do partial matches using asterisks as follows (case insensitive):
     *00 means ends with '00'
     00* means starts with '00'
     *00* means contains '00'
-    00 means exactly equals '00'");
+    00 means exactly equals '00'
+
+Offline merge mode notes:
+  This program will output the following DATs:
+    (a) Net New - (NewComplete)-(Complete)
+    (b) Unneeded - (Complete)-(NewComplete)
+    (c) New Missing - (Net New)+(Missing-(Unneeded))
+    (d) Have - (NewComplete)-(New Missing)
+      OR (Complete or NewComplete)-(Missing) if one is missing
+");
 					break;
 				case "Headerer":
 					Console.WriteLine(@"Headerer - Remove and restore rom headers
@@ -210,27 +224,6 @@ Usage: Headerer [option] [filename|dirname]
 Options:
   -e			Detect and remove mode
   -r			Restore header to file based on SHA-1");
-					break;
-				case "OfflineMerge":
-					Console.WriteLine(@"OfflineMerge - Update DATS for offline arrays
------------------------------------------
-Usage: OfflineMerge [options] [inputs]
-
-Options:
-  -h, -?, --help	Show this help dialog
-  -f, --fake		Replace all hashes and sizes by the default
-
-Inputs:
-  -com=			Complete current DAT
-  -fix=			Complete current Missing
-  -new=			New Complete DAT
-
-This program will output the following DATs:
-  (a) Net New - (NewComplete)-(Complete)
-  (b) Unneeded - (Complete)-(NewComplete)
-  (c) New Missing - (Net New)+(Missing-(Unneeded))
-  (d) Have - (NewComplete)-(New Missing)
-        OR (Complete or NewComplete)-(Missing) if one is missing");
 					break;
 				default:
 					Console.Write("This is the default help output");
