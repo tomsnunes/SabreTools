@@ -7,7 +7,7 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// The current toolset version to be used by all child applications
 		/// </summary>
-		public static string Version = "v0.8.3";
+		public static string Version = "v0.8.9";
 
 		// 0-byte file constants
 		public static long SizeZero = 0;
