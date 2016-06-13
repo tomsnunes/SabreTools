@@ -37,6 +37,7 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 	</li>
 	<li>Get various statistics on a DAT or folder of DATs including number of roms, disks, and even total size in a human readable format (formerly <i>UncompressedSize</i>; additions requested by Obiwantje)</li>
 	<li>Filter a DAT by any criteria that the user chooses including wildcard searches (formerly <i>Filter</i>, requested by Obiwantje and others)</li>
+	<li>Take a current merged DAT, a current missing DAT, and a new merged DAT and get all new files, files to remove, and a new missing DAT. Optionally set all hash values to 0-byte equivalents for rom managers (formerly <i>OfflineMerge</i>, requested by Obiwantje)</li>
 	<li>Add and remove sources and systems from the database</li>
 	<li>Retrieve a list of all sources and systems that are available</li>
 </ul>
@@ -61,15 +62,7 @@ The saved headers are currently stored in a database; multiple headers allowed p
 
 This section is for tools that have been requested for a highly specific purpose and are not generally going to be used by regular users. All of them have a possibility of being included in the main DATabase program eventually.
 
-<!-- <b>There are no tools that are for power users at this time.</b> -->
-
-<b>OfflineMerge</b>
-<p/>
-This tool is meant to help users who want to keep their hard drives offline and still be up to date on what they have in their collection and what they need.
-<ul>
-	<li>Take a current merged DAT, a current missing DAT, and a new merged DAT and get all new files, files to remove, and a new missing DAT</li>
-	<li>Set all hash values to 0-byte equivalents for rom managers</li>
-</ul>
+<b>There are no standalone tools that are for power users at this time.</b>
 
 <h3>Licensing</h3>
 <p/>
