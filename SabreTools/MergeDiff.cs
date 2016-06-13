@@ -211,9 +211,11 @@ namespace SabreTools
 		/// <param name="datHeaders">Dat headers used optionally</param>
 		private void DiffNoCascade(DatData userData, List<DatData> datHeaders)
 		{
-			string post = " (No Duplicates)";
+			DateTime start = DateTime.Now;
+			_logger.User("Initializing all output DATs");
 
-			// Get all entries that don't have External dupes
+			// Don't have External dupes
+			string post = " (No Duplicates)";
 			DatData outerDiffData = new DatData
 			{
 				FileName = _desc + post,
@@ -228,37 +230,27 @@ namespace SabreTools
 				MergeRoms = _dedup,
 				Roms = new Dictionary<string, List<RomData>>(),
 			};
-			foreach (string key in userData.Roms.Keys)
+			// Have External dupes
+			post = " (Duplicates)";
+			DatData dupeData = new DatData
 			{
-				List<RomData> temp = userData.Roms[key];
-				temp = DatTools.Merge(temp, _logger);
+				FileName = _desc + post,
+				Name = _name + post,
+				Description = _desc + post,
+				Version = _version,
+				Date = _date,
+				Category = _cat,
+				Author = _author,
+				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				MergeRoms = _dedup,
+				Roms = new Dictionary<string, List<RomData>>(),
+			};
 
-				foreach (RomData rom in temp)
-				{
-					if (rom.Dupe < DupeType.ExternalHash)
-					{
-						RomData newrom = rom;
-						newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.SystemID].Split('¬')[0]) + ")";
+			// Create a list of DatData objects representing individual output files
+			List<DatData> outDats = new List<DatData>();
 
-						if (outerDiffData.Roms.ContainsKey(key))
-						{
-							outerDiffData.Roms[key].Add(newrom);
-						}
-						else
-						{
-							List<RomData> tl = new List<RomData>();
-							tl.Add(rom);
-							outerDiffData.Roms.Add(key, tl);
-						}
-					}
-				}
-			}
-
-			// Output the difflist (a-b)+(b-a) diff
-			Output.WriteDatfile(outerDiffData, _outdir, _logger);
-
-			// For the AB mode-style diffs, get all required dictionaries and output with a new name
-			// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
+			// Loop through each of the inputs and get or create a new DatData object
 			for (int j = 0; j < _inputs.Count; j++)
 			{
 				post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
@@ -276,73 +268,98 @@ namespace SabreTools
 					MergeRoms = _dedup,
 					Roms = new Dictionary<string, List<RomData>>(),
 				};
+				outDats.Add(diffData);
+			}
+			_logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-				foreach (string key in outerDiffData.Roms.Keys)
+			// Now, loop through the dictionary and populate the correct DATs
+			start = DateTime.Now;
+			_logger.User("Populating all output DATs");
+			List<string> keys = userData.Roms.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<RomData> roms = DatTools.Merge(userData.Roms[key], _logger);
+
+				if (roms != null && roms.Count > 0)
 				{
-					foreach (RomData rom in outerDiffData.Roms[key])
+					foreach (RomData rom in roms)
 					{
-						if (rom.SystemID == j)
+						// No duplicates
+						if (rom.Dupe < DupeType.ExternalHash)
 						{
-							if (diffData.Roms.ContainsKey(key))
+							// Individual DATs that are output
+							if (outDats[rom.SystemID].Roms.ContainsKey(key))
 							{
-								diffData.Roms[key].Add(rom);
+								outDats[rom.SystemID].Roms[key].Add(rom);
 							}
 							else
 							{
 								List<RomData> tl = new List<RomData>();
 								tl.Add(rom);
-								diffData.Roms.Add(key, tl);
+								outDats[rom.SystemID].Roms.Add(key, tl);
+							}
+
+							// Merged no-duplicates DAT
+							RomData newrom = rom;
+							newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.SystemID].Split('¬')[0]) + ")";
+
+							if (outerDiffData.Roms.ContainsKey(key))
+							{
+								outerDiffData.Roms[key].Add(newrom);
+							}
+							else
+							{
+								List<RomData> tl = new List<RomData>();
+								tl.Add(rom);
+								outerDiffData.Roms.Add(key, tl);
+							}
+						}
+
+						// Duplicates only
+						if (rom.Dupe >= DupeType.ExternalHash)
+						{
+							RomData newrom = rom;
+							newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.SystemID].Split('¬')[0]) + ")";
+
+							if (dupeData.Roms.ContainsKey(key))
+							{
+								dupeData.Roms[key].Add(newrom);
+							}
+							else
+							{
+								List<RomData> tl = new List<RomData>();
+								tl.Add(rom);
+								dupeData.Roms.Add(key, tl);
 							}
 						}
 					}
 				}
-
-				Output.WriteDatfile(diffData, _outdir, _logger);
 			}
+			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			// Get all entries that have External dupes
-			post = " (Duplicates)";
-			DatData dupeData = new DatData
-			{
-				FileName = _desc + post,
-				Name = _name + post,
-				Description = _desc + post,
-				Version = _version,
-				Date = _date,
-				Category = _cat,
-				Author = _author,
-				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-				MergeRoms = _dedup,
-				Roms = new Dictionary<string, List<RomData>>(),
-			};
-			foreach (string key in userData.Roms.Keys)
-			{
-				List<RomData> temp = userData.Roms[key];
-				temp = DatTools.Merge(temp, _logger);
+			// Finally, loop through and output each of the DATs
+			start = DateTime.Now;
+			_logger.User("Outputting all created DATs");
 
-				foreach (RomData rom in temp)
+			// Output the difflist (a-b)+(b-a) diff
+			Output.WriteDatfile(outerDiffData, _outdir, _logger);
+
+			// Output the (ab) diff
+			Output.WriteDatfile(dupeData, _outdir, _logger);
+
+			// Output the individual (a-b) DATs
+			for (int j = 0; j < _inputs.Count; j++)
+			{
+				// If we have an output directory set, replace the path
+				string path = _outdir + (Path.GetDirectoryName(_inputs[j].Split('¬')[0]).Remove(0, _inputs[j].Split('¬')[1].Length));
+
+				// If we have more than 0 roms, output
+				if (outDats[j].Roms.Count > 0)
 				{
-					if (rom.Dupe >= DupeType.ExternalHash)
-					{
-						RomData newrom = rom;
-						newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.SystemID].Split('¬')[0]) + ")";
-
-						if (dupeData.Roms.ContainsKey(key))
-						{
-							dupeData.Roms[key].Add(newrom);
-						}
-						else
-						{
-							List<RomData> tl = new List<RomData>();
-							tl.Add(rom);
-							dupeData.Roms.Add(key, tl);
-						}
-					}
+					Output.WriteDatfile(outDats[j], path, _logger);
 				}
 			}
-
-			Output.WriteDatfile(dupeData, _outdir, _logger);
+			_logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
 
 		/// <summary>
@@ -354,7 +371,12 @@ namespace SabreTools
 		{
 			string post = "";
 
-			// Loop through _inputs first and filter from all diffed roms to find the ones that have the same "System"
+			// Create a list of DatData objects representing output files
+			List<DatData> outDats = new List<DatData>();
+
+			// Loop through each of the inputs and get or create a new DatData object
+			DateTime start = DateTime.Now;
+			_logger.User("Initializing all output DATs");
 			for (int j = 0; j < _inputs.Count; j++)
 			{
 				post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
@@ -383,40 +405,42 @@ namespace SabreTools
 				}
 
 				diffData.Roms = new Dictionary<string, List<RomData>>();
+				outDats.Add(diffData);
+			}
+			_logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-				List<string> keys = userData.Roms.Keys.ToList();
-				foreach (string key in keys)
+			// Now, loop through the dictionary and populate the correct DATs
+			start = DateTime.Now;
+			_logger.User("Populating all output DATs");
+			List<string> keys = userData.Roms.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<RomData> roms = DatTools.Merge(userData.Roms[key], _logger);
+
+				if (roms != null && roms.Count > 0)
 				{
-					List<RomData> oldroms = DatTools.Merge(userData.Roms[key], _logger);
-					List<RomData> newroms = new List<RomData>();
-
-					if (oldroms != null && oldroms.Count > 0)
+					foreach (RomData rom in roms)
 					{
-						foreach (RomData rom in oldroms)
+						if (outDats[rom.SystemID].Roms.ContainsKey(key))
 						{
-							if (rom.SystemID == j)
-							{
-								if (diffData.Roms.ContainsKey(key))
-								{
-									diffData.Roms[key].Add(rom);
-								}
-								else
-								{
-									List<RomData> tl = new List<RomData>();
-									tl.Add(rom);
-									diffData.Roms.Add(key, tl);
-								}
-							}
-							else
-							{
-								newroms.Add(rom);
-							}
+							outDats[rom.SystemID].Roms[key].Add(rom);
+						}
+						else
+						{
+							List<RomData> tl = new List<RomData>();
+							tl.Add(rom);
+							outDats[rom.SystemID].Roms.Add(key, tl);
 						}
 					}
-					
-					userData.Roms[key] = newroms;
 				}
+			}
+			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
+			// Finally, loop through and output each of the DATs
+			start = DateTime.Now;
+			_logger.User("Outputting all created DATs");
+			for (int j = 1; j < _inputs.Count; j++)
+			{
 				// If we have an output directory set, replace the path
 				string path = "";
 				if (_inplace)
@@ -428,12 +452,13 @@ namespace SabreTools
 					path = _outdir + (Path.GetDirectoryName(_inputs[j].Split('¬')[0]).Remove(0, _inputs[j].Split('¬')[1].Length));
 				}
 
-				// If we have anything but the first DAT, output (the first DAT is always complete)
-				if (j > 0)
+				// If we have more than 0 roms, output
+				if (outDats[j].Roms.Count > 0)
 				{
-					Output.WriteDatfile(diffData, path, _logger);
+					Output.WriteDatfile(outDats[j], path, _logger);
 				}
 			}
+			_logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
 
 		/// <summary>
