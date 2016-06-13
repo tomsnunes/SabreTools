@@ -554,7 +554,7 @@ namespace SabreTools
 						{
 							version = temparg.Split('=')[1];
 						}
-						else if (File.Exists(temparg.Replace("\"", "")) || Directory.Exists(temparg.Replace("\"", "")))
+						else if (File.Exists(temparg) || Directory.Exists(temparg))
 						{
 							inputs.Add(arg);
 						}

@@ -26,9 +26,9 @@ namespace SabreTools
 		/// <param name="logger">Logger object for console and file output</param>
 		public OfflineMerge (string currentAllMerged, string currentMissingMerged, string currentNewMerged, bool fake, Logger logger)
 		{
-			_currentAllMerged = currentAllMerged.Replace("\"", "");
-			_currentMissingMerged = currentMissingMerged.Replace("\"", "");
-			_currentNewMerged = currentNewMerged.Replace("\"", "");
+			_currentAllMerged = currentAllMerged;
+			_currentMissingMerged = currentMissingMerged;
+			_currentNewMerged = currentNewMerged;
 			_fake = fake;
 			_logger = logger;
 		}

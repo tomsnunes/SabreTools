@@ -365,9 +365,6 @@ namespace SabreTools
 		/// <param name="force">True if forcepacking="unzip" should be included</param>
 		private static void InitTrimMerge(string input, string root, bool rename, bool force)
 		{
-			// Strip any quotations from the name
-			input = input.Replace("\"", "");
-
 			if (input != "" && (File.Exists(input) || Directory.Exists(input)))
 			{
 				TrimMerge sg = new TrimMerge(input, root, rename, force, _logger);
@@ -402,13 +399,13 @@ namespace SabreTools
 			List<string> newInputs = new List<string>();
 			foreach (string input in inputs)
 			{
-				if (Directory.Exists(input.Replace("\"", "")))
+				if (Directory.Exists(input))
 				{
-					foreach (string file in Directory.EnumerateFiles(input.Replace("\"", ""), "*", SearchOption.AllDirectories))
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						try
 						{
-							newInputs.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(input.Replace("\"", "")));
+							newInputs.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(input));
 						}
 						catch (PathTooLongException)
 						{
@@ -420,15 +417,15 @@ namespace SabreTools
 						}
 					}
 				}
-				else if (File.Exists(input.Replace("\"", "")))
+				else if (File.Exists(input))
 				{
 					try
 					{
-						newInputs.Add(Path.GetFullPath(input.Replace("\"", "")) + "¬" + Path.GetDirectoryName(Path.GetFullPath(input.Replace("\"", ""))));
+						newInputs.Add(Path.GetFullPath(input) + "¬" + Path.GetDirectoryName(Path.GetFullPath(input)));
 					}
 					catch (PathTooLongException)
 					{
-						_logger.Warning("The path for " + input.Replace("\"", "") + " was too long");
+						_logger.Warning("The path for " + input + " was too long");
 					}
 					catch (Exception ex)
 					{
@@ -453,7 +450,7 @@ namespace SabreTools
 			// Verify the input files
 			foreach (string input in inputs)
 			{
-				if (!File.Exists(input.Replace("\"", "")) && !Directory.Exists(input.Replace("\"", "")))
+				if (!File.Exists(input) && !Directory.Exists(input))
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
@@ -461,11 +458,6 @@ namespace SabreTools
 					return;
 				}
 			}
-
-			// Strip any quotations from the names
-			exta = exta.Replace("\"", "");
-			extb = extb.Replace("\"", "");
-			outdir = outdir.Replace("\"", "");
 
 			// Convert comma-separated strings to list
 			List<string> extaList = exta.Split(',').ToList();
@@ -483,13 +475,10 @@ namespace SabreTools
 		/// <param name="outdir">Output directory for the split files</param>
 		private static void InitHashSplit(List<string> inputs, string outdir)
 		{
-			// Strip any quotations from the names
-			outdir = outdir.Replace("\"", "");
-
 			// Verify the input files
 			foreach (string input in inputs)
 			{
-				if (!File.Exists(input.Replace("\"", "")) && !Directory.Exists(input.Replace("\"", "")))
+				if (!File.Exists(input) && !Directory.Exists(input))
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
@@ -512,11 +501,6 @@ namespace SabreTools
 		/// <param name="fake">True if all values should be replaced with default 0-byte values, false otherwise</param>
 		private static void InitOfflineMerge(string currentAllMerged, string currentMissingMerged, string currentNewMerged, bool fake)
 		{
-			// Sanitize the inputs
-			currentAllMerged = currentAllMerged.Replace("\"", "");
-			currentMissingMerged = currentMissingMerged.Replace("\"", "");
-			currentNewMerged = currentNewMerged.Replace("\"", "");
-
 			OfflineMerge om = new OfflineMerge(currentAllMerged, currentMissingMerged, currentNewMerged, fake, _logger);
 			bool success = om.Process();
 			if (!success)
@@ -536,15 +520,15 @@ namespace SabreTools
 
 			foreach (string input in inputs)
 			{
-				if (File.Exists(input.Replace("\"", "")))
+				if (File.Exists(input))
 				{
-					newinputs.Add(input.Replace("\"", ""));
+					newinputs.Add(input);
 				}
-				if (Directory.Exists(input.Replace("\"", "")))
+				if (Directory.Exists(input))
 				{
-					foreach (string file in Directory.GetFiles(input.Replace("\"", ""), "*", SearchOption.AllDirectories))
+					foreach (string file in Directory.GetFiles(input, "*", SearchOption.AllDirectories))
 					{
-						newinputs.Add(file.Replace("\"", ""));
+						newinputs.Add(file);
 					}
 				}
 			}

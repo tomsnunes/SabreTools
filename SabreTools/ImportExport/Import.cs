@@ -25,7 +25,7 @@ namespace SabreTools
 		/// <param name="logger">Logger object for file or console output</param>
 		public Import(string filepath, string connectionString, Logger logger)
 		{
-			_filepath = filepath.Replace("\"", "");
+			_filepath = filepath;
 			_connectionString = connectionString;
 			_logger = logger;
 		}

@@ -74,7 +74,7 @@ namespace SabreTools
 			_superdat = superdat;
 			_cascade = cascade;
 			_inplace = inplace;
-			_outdir = outdir.Replace("\"", "");
+			_outdir = outdir;
 			_clean = clean;
 			_logger = logger;
 		}

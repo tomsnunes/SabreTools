@@ -1733,13 +1733,11 @@ namespace SabreTools.Helper
 		public static void Update(string inputFileName, DatData datdata, string outputDirectory, bool clean, string gamename, string romname,
 			string romtype, long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
 		{
-			// Clean the input strings
-			inputFileName = inputFileName.Replace("\"", "");
+			// Clean the input string
 			if (inputFileName != "")
 			{
 				inputFileName = Path.GetFullPath(inputFileName);
 			}
-			outputDirectory = outputDirectory.Replace("\"", "");
 
 			if (File.Exists(inputFileName))
 			{

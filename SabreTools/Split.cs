@@ -27,11 +27,7 @@ namespace SabreTools
 		public Split(List<string> inputs, List<string> extA, List<string> extB, string outdir, Logger logger)
 		{
 			_hash = false;
-			_inputs = new List<string>();
-			foreach (string s in inputs)
-			{
-				_inputs.Add(s.Replace("\"", ""));
-			}
+			_inputs = inputs;
 			_extA = new List<string>();
 			foreach (string s in extA)
 			{
@@ -42,7 +38,7 @@ namespace SabreTools
 			{
 				_extB.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
 			}
-			_outdir = outdir.Replace("\"", "");
+			_outdir = outdir;
 			_logger = logger;
 		}
 
@@ -54,14 +50,10 @@ namespace SabreTools
 		public Split(List<string> inputs, string outdir, Logger logger)
 		{
 			_hash = true;
-			_inputs = new List<string>();
-			foreach (string s in inputs)
-			{
-				_inputs.Add(s.Replace("\"", ""));
-			}
+			_inputs = inputs;
 			_extA = new List<string>();
 			_extB = new List<string>();
-			_outdir = outdir.Replace("\"", "");
+			_outdir = outdir;
 			_logger = logger;
 		}
 
