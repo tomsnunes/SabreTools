@@ -22,6 +22,7 @@ namespace SabreTools.Helper
 				StreamReader sr = File.OpenText(filename);
 				string first = sr.ReadLine();
 				sr.Close();
+				sr.Dispose();
 				if (first.Contains("<") && first.Contains(">"))
 				{
 					return OutputFormat.Xml;
@@ -436,6 +437,9 @@ namespace SabreTools.Helper
 				}
 			}
 
+			sr.Close();
+			sr.Dispose();
+
 			return datdata;
 		}
 
@@ -651,6 +655,9 @@ namespace SabreTools.Helper
 					}
 				}
 			}
+
+			sr.Close();
+			sr.Dispose();
 
 			return datdata;
 		}
@@ -1413,6 +1420,9 @@ namespace SabreTools.Helper
 							break;
 					}
 				}
+
+				xtr.Close();
+				xtr.Dispose();
 			}
 
 			return datdata;
