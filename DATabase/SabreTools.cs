@@ -22,7 +22,7 @@ namespace SabreTools
 	///		+ This requires implementing a "last updated" data point for all DATs and tracking for "last generate" somewhere
 	/// - Impelement a ToSort folder for DATs that will place DATs in the correct subfolder on Import
 	/// </remarks>
-	public partial class DATabase
+	public partial class SabreTools
 	{
 		// Private required variables
 		private static string _datroot = "DATS";

@@ -8,7 +8,7 @@ using SabreTools.Helper;
 
 namespace SabreTools
 {
-	public partial class DATabase
+	public partial class SabreTools
 	{
 		#region Init Methods
 

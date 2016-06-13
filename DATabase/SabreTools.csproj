@@ -7,8 +7,8 @@
     <ProjectGuid>{3B615702-1866-4D7B-8AF1-7B43FD0CC1D0}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DATabase</RootNamespace>
-    <AssemblyName>DATabase</AssemblyName>
+    <RootNamespace>SabreTools</RootNamespace>
+    <AssemblyName>SabreTools</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -113,12 +113,12 @@
     <Compile Include="ImportExport\Generate.cs" />
     <Compile Include="ImportExport\GenerateTwo.cs" />
     <Compile Include="ImportExport\Import.cs" />
-    <Compile Include="DATabase.cs" />
+    <Compile Include="SabreTools.cs" />
     <Compile Include="ImportExport\ImportTwo.cs" />
     <Compile Include="MergeDiff.cs" />
-    <Compile Include="Partials\DATabase_Helpers.cs" />
-    <Compile Include="Partials\DATabase_Inits.cs" />
-    <Compile Include="Partials\DATabase_Menus.cs" />
+    <Compile Include="Partials\SabreTools_Helpers.cs" />
+    <Compile Include="Partials\SabreTools_Inits.cs" />
+    <Compile Include="Partials\SabreTools_Menus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TrimMerge.cs" />
   </ItemGroup>
