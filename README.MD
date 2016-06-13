@@ -2,12 +2,13 @@
 
 <h3>Introduction</h3>
 
-This project started as a desktop port of some core features of Wizard of DATz Redux. For more information about the parent project, see <a href="https://github.com/mnadareski/wizzardRedux">here</a>.
+This project started as a desktop port of some core features of Wizard of DATz Redux, but it has since grown into a fully-featured DAT management tool. Below is a brief description of the features available in the suite. For more information about each feature, see the help text in each of the programs. For more information about the parent project, see <a href="https://github.com/mnadareski/wizzardRedux">here</a>.
 
 <h3>Features</h3>
 
-Currently, SabreTools consists of the following programs:
+Currently, the SabreTools suite consists of the following programs:
 
+<!--
 <b>SabreTools UI</b>
 <p/>
 A bare-bones attempt at providing a true GUI experience for the SabreTools suite. Currently only provides the following functions:
@@ -15,6 +16,7 @@ A bare-bones attempt at providing a true GUI experience for the SabreTools suite
 	<li>Importing and Generating DAT files in ClrMamePro and XML formats</li>
 </ul>
 This tool is not recommended for any usage.
+-->
 
 <b>SabreTools</b> (formerly <i>DATabase</i>)
 <p/>
