@@ -556,7 +556,7 @@ namespace SabreTools
 						}
 						else if (File.Exists(temparg) || Directory.Exists(temparg))
 						{
-							inputs.Add(arg);
+							inputs.Add(temparg);
 						}
 						else
 						{
