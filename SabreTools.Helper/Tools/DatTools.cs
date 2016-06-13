@@ -1490,20 +1490,8 @@ namespace SabreTools.Helper
 							continue;
 						}
 
-						if (rom.Type == "rom" && lastrom.Type == "rom")
-						{
-							dupefound = ((rom.Size == lastrom.Size) &&
-								((String.IsNullOrEmpty(rom.CRC) || String.IsNullOrEmpty(lastrom.CRC)) || rom.CRC == lastrom.CRC) &&
-								((String.IsNullOrEmpty(rom.MD5) || String.IsNullOrEmpty(lastrom.MD5)) || rom.MD5 == lastrom.MD5) &&
-								((String.IsNullOrEmpty(rom.SHA1) || String.IsNullOrEmpty(lastrom.SHA1)) || rom.SHA1 == lastrom.SHA1)
-							);
-						}
-						else if (rom.Type == "disk" && lastrom.Type == "disk")
-						{
-							dupefound = (((String.IsNullOrEmpty(rom.MD5) || String.IsNullOrEmpty(lastrom.MD5)) || rom.MD5 == lastrom.MD5) &&
-								((String.IsNullOrEmpty(rom.SHA1) || String.IsNullOrEmpty(lastrom.SHA1)) || rom.SHA1 == lastrom.SHA1)
-							);
-						}
+						// Get the duplicate status
+						dupefound = RomDuplicate(rom, lastrom);
 
 						// If it's a duplicate, skip adding it to the output but add any missing information
 						if (dupefound)
@@ -1583,6 +1571,34 @@ namespace SabreTools.Helper
 
 			// Then return the result
 			return outroms;
+		}
+
+		/// <summary>
+		/// Determine if a file is a duplicate using partial matching logic
+		/// </summary>
+		/// <param name="rom">Rom to check for duplicate status</param>
+		/// <param name="lastrom">Rom to use as a baseline</param>
+		/// <returns>True if the roms are duplicates, false otherwise</returns>
+		public static bool RomDuplicate(RomData rom, RomData lastrom)
+		{
+			bool dupefound = false;
+
+			if (rom.Type == "rom" && lastrom.Type == "rom")
+			{
+				dupefound = ((rom.Size == lastrom.Size) &&
+					((String.IsNullOrEmpty(rom.CRC) || String.IsNullOrEmpty(lastrom.CRC)) || rom.CRC == lastrom.CRC) &&
+					((String.IsNullOrEmpty(rom.MD5) || String.IsNullOrEmpty(lastrom.MD5)) || rom.MD5 == lastrom.MD5) &&
+					((String.IsNullOrEmpty(rom.SHA1) || String.IsNullOrEmpty(lastrom.SHA1)) || rom.SHA1 == lastrom.SHA1)
+				);
+			}
+			else if (rom.Type == "disk" && lastrom.Type == "disk")
+			{
+				dupefound = (((String.IsNullOrEmpty(rom.MD5) || String.IsNullOrEmpty(lastrom.MD5)) || rom.MD5 == lastrom.MD5) &&
+					((String.IsNullOrEmpty(rom.SHA1) || String.IsNullOrEmpty(lastrom.SHA1)) || rom.SHA1 == lastrom.SHA1)
+				);
+			}
+
+			return dupefound;
 		}
 
 		/// <summary>
