@@ -92,7 +92,7 @@
   <ItemGroup>
     <Compile Include="Data\Constants.cs" />
     <Compile Include="Tools\CRC32.cs" />
-    <Compile Include="DatabaseTools.cs" />
+    <Compile Include="Tools\Database.cs" />
     <Compile Include="Data\Enums.cs" />
     <Compile Include="Interfaces\IGenerate.cs" />
     <Compile Include="Interfaces\IImport.cs" />
