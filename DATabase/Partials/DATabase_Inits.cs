@@ -541,7 +541,7 @@ namespace SabreTools
 		/// <param name="url">Source URL(s)</param>
 		private static void InitAddSource(string name, string url)
 		{
-			if (DBTools.AddSource(name, url, _connectionString))
+			if (DatabaseTools.AddSource(name, url, _connectionString))
 			{
 				_logger.Log("Source " + name + " added!");
 			}
@@ -560,7 +560,7 @@ namespace SabreTools
 			int srcid = -1;
 			if (Int32.TryParse(sourceid, out srcid))
 			{
-				if (DBTools.RemoveSource(srcid, _connectionString))
+				if (DatabaseTools.RemoveSource(srcid, _connectionString))
 				{
 					_logger.Log("Source '" + srcid + "' removed!");
 				}
@@ -582,7 +582,7 @@ namespace SabreTools
 		/// <param name="system">System name</param>
 		private static void InitAddSystem(string manufacturer, string system)
 		{
-			if (DBTools.AddSystem(manufacturer, system, _connectionString))
+			if (DatabaseTools.AddSystem(manufacturer, system, _connectionString))
 			{
 				_logger.Log("System " + manufacturer + " - " + system + " added!");
 			}
@@ -601,7 +601,7 @@ namespace SabreTools
 			int sysid = -1;
 			if (Int32.TryParse(systemid, out sysid))
 			{
-				if (DBTools.RemoveSystem(sysid, _connectionString))
+				if (DatabaseTools.RemoveSystem(sysid, _connectionString))
 				{
 					_logger.Log("System '" + sysid + "' removed!");
 				}

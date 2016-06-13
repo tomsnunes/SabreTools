@@ -34,7 +34,7 @@ namespace SabreTools
 			// Perform initial setup and verification
 			logger = new Logger(true, "headerer.log");
 			logger.Start();
-			DBTools.EnsureDatabase(_dbName, _connectionString);
+			DatabaseTools.EnsureDatabase(_dbName, _connectionString);
 			Remapping.CreateHeaderSkips();
 
 			// Credits take precidence over all
