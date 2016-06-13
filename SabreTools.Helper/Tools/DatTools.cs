@@ -1574,6 +1574,37 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// List all duplicates found in a DAT based on a rom
+		/// </summary>
+		/// <param name="lastrom">Rom to use as a base</param>
+		/// <param name="datdata">DAT to match against</param>
+		/// <returns>List of matched RomData objects</returns>
+		public static List<RomData> ListDuplicates(RomData lastrom, DatData datdata)
+		{
+			List<RomData> output = new List<RomData>();
+
+			// Check for an empty rom list first
+			if (datdata.Roms == null || datdata.Roms.Count == 0)
+			{
+				return output;
+			}
+
+			// Try to find duplicates
+			foreach (List<RomData> roms in datdata.Roms.Values)
+			{
+				foreach (RomData rom in roms)
+				{
+					if (RomDuplicate(rom, lastrom))
+					{
+						output.Add(rom);
+					}
+				}
+			}
+
+			return output;
+		}
+
+		/// <summary>
 		/// Determine if a file is a duplicate using partial matching logic
 		/// </summary>
 		/// <param name="rom">Rom to check for duplicate status</param>
