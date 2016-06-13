@@ -90,7 +90,7 @@ namespace SabreTools
 			};
 			_logger.User(@"For ALL DATs found
 --------------------------------------------------");
-			OutputStats(totaldata, _logger);
+			OutputStats(totaldata, _logger, game:totalGame);
 			_logger.User(@"
 Please check the log folder if the stats scrolled offscreen");
 
@@ -103,7 +103,8 @@ Please check the log folder if the stats scrolled offscreen");
 		/// <param name="datdata">DatData object to read stats from</param>
 		/// <param name="logger">Logger object for file and console writing</param>
 		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
-		public static void OutputStats(DatData datdata, Logger logger, bool recalculate = false)
+		/// <param name="game">Number of games to use, -1 means recalculate games (default)</param>
+		public static void OutputStats(DatData datdata, Logger logger, bool recalculate = false, long game = -1)
 		{
 			if (recalculate)
 			{
@@ -134,7 +135,7 @@ Please check the log folder if the stats scrolled offscreen");
 
 			SortedDictionary<string, List<RomData>> newroms = DatTools.BucketByGame(datdata.Roms, false, true, logger);
 			logger.User(@"    Uncompressed size:       " + Style.GetBytesReadable(datdata.TotalSize) + @"
-    Games found:             " + newroms.Count + @"
+    Games found:             " + (game == -1 ? newroms.Count : game) + @"
     Roms found:              " + datdata.RomCount + @"
     Disks found:             " + datdata.DiskCount + @"
     Roms with CRC:           " + datdata.CRCCount + @"
