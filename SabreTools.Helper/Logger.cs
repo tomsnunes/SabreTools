@@ -85,28 +85,42 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// End logging by closing output file (if necessary)
 		/// </summary>
+		/// <param name="suppress">True if all ending output is to be suppressed, false otherwise (default)</param>
 		/// <returns>True if the logging was ended correctly, false otherwise</returns>
-		public bool Close()
+		public bool Close(bool suppress = false)
 		{
+			if (!suppress)
+			{
+				TimeSpan span = DateTime.Now.Subtract(_start);
+				string total = span.ToString(@"hh\:mm\:ss\.fffff");
+				if (!_tofile)
+				{
+					Console.WriteLine("Total runtime: " + total);
+					return true;
+				}
 
-			TimeSpan span = DateTime.Now.Subtract(_start);
-			string total = span.ToString(@"hh\:mm\:ss\.fffff");
-			if (!_tofile)
-			{
-				Console.WriteLine("Total runtime: " + total);
-				return true;
+				try
+				{
+					_log.WriteLine("Logging ended " + DateTime.Now);
+					_log.WriteLine("Total runtime: " + total);
+					Console.WriteLine("Total runtime: " + total);
+					_log.Close();
+				}
+				catch
+				{
+					return false;
+				}
 			}
-
-			try
+			else
 			{
-				_log.WriteLine("Logging ended " + DateTime.Now);
-				_log.WriteLine("Total runtime: " + total);
-				Console.WriteLine("Total runtime: " + total);
-				_log.Close();
-			}
-			catch
-			{
-				return false;
+				try
+				{
+					_log.Close();
+				}
+				catch
+				{
+					return false;
+				}
 			}
 
 			return true;

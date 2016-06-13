@@ -553,7 +553,7 @@ namespace SabreTools
 			statlog.Start();
 			Stats stats = new Stats(newinputs, single, statlog);
 			stats.Process();
-			statlog.Close();
+			statlog.Close(true);
 		}
 
 		/// <summary>
