@@ -16,7 +16,7 @@ A bare-bones attempt at providing a true GUI experience for the SabreTools suite
 </ul>
 This tool is not recommended for any usage.
 
-<b>DATabase</b>
+<b>SabreTools</b> (formerly <i>DATabase</i>)
 <p/>
 The main tool of the SabreTools suite. Performs the majority of the core features of the parent project, including the following:
 <ul>
