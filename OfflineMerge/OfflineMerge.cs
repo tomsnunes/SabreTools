@@ -62,7 +62,7 @@ namespace SabreTools
 			}
 
 			// Set all default values
-			bool help = false, fake = false;
+			bool help = false, fake = false, offlineMerge = true;
 			string currentAllMerged = "", currentMissingMerged = "", currentNewMerged = "";
 
 			// Determine which switches are enabled (with values if necessary)
@@ -105,8 +105,8 @@ namespace SabreTools
 				}
 			}
 
-			// If help is set or all of the inputs are empty, show help
-			if (help || (currentAllMerged == "" && currentMissingMerged == "" && currentNewMerged == ""))
+			// If help is set, show help
+			if (help)
 			{
 				Build.Help();
 				logger.Close();
@@ -114,6 +114,24 @@ namespace SabreTools
 			}
 
 			// Otherwise, run the program
+			if (offlineMerge)
+			{
+				if (!(currentAllMerged == "" && currentMissingMerged == "" && currentNewMerged == ""))
+				{
+					InitOfflineMerge(currentAllMerged, currentMissingMerged, currentNewMerged, fake, logger);
+				}
+				else
+				{
+					logger.User("All inputs were empty! At least one input is required...");
+					Build.Help();
+					logger.Close();
+					return;
+				}
+			}
+		}
+
+		private static void InitOfflineMerge(string currentAllMerged, string currentMissingMerged, string currentNewMerged, bool fake, Logger logger)
+		{
 			OfflineMerge om = new OfflineMerge(currentAllMerged, currentMissingMerged, currentNewMerged, fake, logger);
 			bool success = om.Process();
 			if (!success)
