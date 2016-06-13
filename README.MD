@@ -23,7 +23,7 @@ This tool is not recommended for any usage.
 The main tool of the SabreTools suite. Performs the majority of the core features of the parent project, including the following:
 <ul>
 	<li>Importing and Generating DAT files in ClrMamePro and XML formats (current version formerly <i>DATabaseTwo</i>)</li>
-	<li>Create a DAT from a file, a folder, or a set of either(formerly <i>DATFromDir</i>)</li>
+	<li>Create a DAT from a file, a folder, or a set of either (formerly <i>DATFromDir</i>)</li>
 	<li>Converting DATs from any format to ClrMamePro, Logiqx XML, SabreDAT XML, and to missfile (last part formerly <i>DatToMiss</i>; requested by Obiwantje)</li>
 	<li>Trim DAT entries and optionally merge into a single game (formerly <i>SingleGame</i>; requested by Kludge)</li>
 	<li>Split a DAT using two different file extensions within the DAT (formerly <i>DatSplit</i>)</li>
