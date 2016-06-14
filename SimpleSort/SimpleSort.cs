@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
 
 using SabreTools.Helper;
-using DamienG.Security.Cryptography;
 using SharpCompress.Common;
 
 namespace SabreTools
@@ -299,7 +297,7 @@ namespace SabreTools
 			_logger.User("Beginning processing of '" + input + "'");
 
 			// Get the hash of the file first
-			RomData rom = GetSingleFileInfo(input);
+			RomData rom = DatTools.GetSingleFileInfo(input);
 
 			// If we have a blank RomData, it's an error
 			if (rom.Name == null)
@@ -335,53 +333,6 @@ namespace SabreTools
 			}
 
 			return success;
-		}
-
-		/// <summary>
-		/// Retrieve file information for a single file
-		/// </summary>
-		/// <param name="input">Filename to get information from</param>
-		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static RomData GetSingleFileInfo(string input)
-		{
-			RomData rom = new RomData
-			{
-				Name = Path.GetFileName(input),
-				Type = "rom",
-				Size = (new FileInfo(input)).Length,
-				CRC = string.Empty,
-				MD5 = string.Empty,
-				SHA1 = string.Empty,
-			};
-
-			try
-			{
-				Crc32 crc = new Crc32();
-				MD5 md5 = MD5.Create();
-				SHA1 sha1 = SHA1.Create();
-
-				using (FileStream fs = File.Open(input, FileMode.Open))
-				{
-					foreach (byte b in crc.ComputeHash(fs))
-					{
-						rom.CRC += b.ToString("x2").ToLowerInvariant();
-					}
-				}
-				using (FileStream fs = File.Open(input, FileMode.Open))
-				{
-					rom.MD5 = BitConverter.ToString(md5.ComputeHash(fs)).Replace("-", "").ToLowerInvariant();
-				}
-				using (FileStream fs = File.Open(input, FileMode.Open))
-				{
-					rom.SHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "").ToLowerInvariant();
-				}
-			}
-			catch (IOException)
-			{
-				return new RomData();
-			}
-
-			return rom;
 		}
 	}
 }

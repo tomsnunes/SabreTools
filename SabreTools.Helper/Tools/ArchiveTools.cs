@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 using SharpCompress.Archive;
 using SharpCompress.Common;
@@ -150,6 +152,86 @@ namespace SabreTools.Helper
 			}
 
 			return !encounteredErrors;
+		}
+
+		/// <summary>
+		/// Retrieve file information for a single torrent GZ file
+		/// </summary>
+		/// <param name="input">Filename to get information from</param>
+		/// <returns>Populated RomData object if success, empty one on error</returns>
+		public static RomData GetTorrentGZFileInfo(string input, Logger logger)
+		{
+			string datum = Path.GetFileName(input).ToLowerInvariant();
+			long filesize = new FileInfo(input).Length;
+
+			// Check if the name is the right length
+			if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}\.gz"))
+			{
+				logger.Warning("Non SHA-1 filename found, skipping: '" + datum + "'");
+				return new RomData();
+			}
+
+			// Check if the file is at least the minimum length
+			if (filesize < 32 /* bytes */)
+			{
+				logger.Warning("Possibly corrupt file '" + input + "' with size " + Style.GetBytesReadable(filesize));
+				return new RomData();
+			}
+
+			// Get the Romba-specific header data
+			byte[] header;
+			byte[] footer;
+			using (FileStream itemstream = File.OpenRead(input))
+			{
+				using (BinaryReader br = new BinaryReader(itemstream))
+				{
+					header = br.ReadBytes(32);
+					br.BaseStream.Seek(-4, SeekOrigin.End);
+					footer = br.ReadBytes(4);
+				}
+			}
+
+			// Now convert the data and get the right positions
+			string headerstring = BitConverter.ToString(header).Replace("-", string.Empty);
+			string gzmd5 = headerstring.Substring(24, 32);
+			string gzcrc = headerstring.Substring(56, 8);
+			string gzsize = BitConverter.ToString(footer.Reverse().ToArray()).Replace("-", string.Empty);
+			long extractedsize = Convert.ToInt64(gzsize, 16);
+
+			// Only try to add if the file size is greater than 750 MiB
+			if (filesize >= (750 * Constants.MibiByte))
+			{
+				// ISIZE is mod 4GiB, so we add that if the ISIZE is smaller than the filesize and greater than 1% different
+				bool shouldfollowup = false;
+				if (extractedsize < filesize && (100 * extractedsize / filesize) < 99 /* percent */)
+				{
+					logger.Log("mancalc - Filename: '" + Path.GetFullPath(input) + "'\nExtracted file size: " +
+						extractedsize + ", " + Style.GetBytesReadable(extractedsize) + "\nArchive file size: " + filesize + ", " + Style.GetBytesReadable(filesize));
+				}
+				while (extractedsize < filesize && (100 * extractedsize / filesize) < 99 /* percent */)
+				{
+					extractedsize += (4 * Constants.GibiByte);
+					shouldfollowup = true;
+				}
+				if (shouldfollowup)
+				{
+					logger.Log("Filename: '" + Path.GetFullPath(input) + "'\nFinal file size: " + extractedsize + ", " + Style.GetBytesReadable(extractedsize) +
+					"\nExtracted CRC: " + gzcrc + "\nExtracted MD5: " + gzmd5 + "\nSHA-1: " + Path.GetFileNameWithoutExtension(input));
+				}
+			}
+
+			RomData rom = new RomData
+			{
+				Type = "rom",
+				Game = Path.GetFileNameWithoutExtension(input),
+				Name = Path.GetFileNameWithoutExtension(input),
+				Size = extractedsize,
+				CRC = gzcrc,
+				MD5 = gzmd5,
+				SHA1 = Path.GetFileNameWithoutExtension(input),
+			};
+
+			return rom;
 		}
 	}
 }
