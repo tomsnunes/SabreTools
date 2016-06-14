@@ -22,7 +22,7 @@ namespace SabreTools
 		/// Start deheader operation with supplied parameters
 		/// </summary>
 		/// <param name="args">String array representing command line parameters</param>
-		static void Main(string[] args)
+		public static void Main(string[] args)
 		{
 			// If output is being redirected, don't allow clear screens
 			if (!Console.IsOutputRedirected)
@@ -132,111 +132,77 @@ namespace SabreTools
 		/// <param name="file">Name of the file to be parsed</param>
 		private static void DetectRemoveHeader(string file)
 		{
-			// Open the file in read mode
-			BinaryReader br = new BinaryReader(File.OpenRead(file));
+			// First get the HeaderType, if any
+			int headerSize = -1;
+			HeaderType type = RomTools.GetFileHeaderType(file, out headerSize, logger);
 
-			// Extract the first 1024 bytes of the file
-			byte[] hbin = br.ReadBytes(1024);
-			string header = BitConverter.ToString(hbin).Replace("-", string.Empty);
-
-			// Determine the type of the file from the header, if possible
-			HeaderType type = HeaderType.None;
-			int headerSize = 0;
-
-			// Loop over the header types and see if there's a match
-			foreach (HeaderType test in Enum.GetValues(typeof(HeaderType)))
-			{
-				Dictionary<string, int> tempDict = new Dictionary<string, int>();
-
-				// Try populating the dictionary from the master list
-				try
-				{
-					tempDict = Remapping.HeaderMaps[test.ToString()];
-				}
-				catch
-				{
-					logger.Warning("The mapping for '" + test.ToString() + "' cannot be found!");
-				}
-
-				// Loop over the dictionary and see if there are matches
-				foreach (KeyValuePair<string, int> entry in tempDict)
-				{
-					if (Regex.IsMatch(header, entry.Key))
-					{
-						type = test;
-						headerSize = entry.Value;
-						break;
-					}
-				}
-
-				// If we found something, break out
-				if (type != HeaderType.None)
-				{
-					break;
-				}
-			}
-
+			// If we have a valid HeaderType, remove the correct byte count
 			logger.User("File has header: " + (type != HeaderType.None));
-
 			if (type != HeaderType.None)
 			{
 				logger.Log("Deteched header type: " + type);
-				int hs = headerSize;
 
-				// Save header as string in the database
-				string realhead = "";
-				for (int i = 0; i < hs; i++)
+				// Now take care of the header and new output file
+				string hstr = string.Empty;
+				using (BinaryReader br = new BinaryReader(File.OpenRead(file)))
 				{
-					realhead += BitConverter.ToString(new byte[] { hbin[i] });
+					// Extract the header as a string for the database
+					byte[] hbin = br.ReadBytes(headerSize);
+					for (int i = 0; i < headerSize; i++)
+					{
+						hstr += BitConverter.ToString(new byte[] { hbin[i] });
+					}
 				}
 
-				// Get the bytes that aren't from the header from the extracted bit so they can be written before the rest of the file
-				hbin = hbin.Skip(hs).ToArray();
-
-				// Write out the new file
+				// Write out the remaining bytes to new file
 				logger.User("Creating unheadered file: " + file + ".new");
-				BinaryWriter bw = new BinaryWriter(File.OpenWrite(file + ".new"));
-				FileInfo fi = new FileInfo(file);
-				bw.Write(hbin);
-				bw.Write(br.ReadBytes((int)fi.Length - hs));
-				bw.Close();
+				Output.RemoveBytesFromFile(file, file + ".new", headerSize, 0);
 				logger.User("Unheadered file created!");
 
 				// Now add the information to the database if it's not already there
-				SHA1 sha1 = SHA1.Create();
-				sha1.ComputeHash(File.ReadAllBytes(file + ".new"));
-				bool exists = false;
+				RomData rom = RomTools.GetSingleFileInfo(file + ".new");
+				AddHeaderToDatabase(hstr, rom.SHA1, type);
+			}
+		}
 
-				string query = @"SELECT * FROM data WHERE sha1='" + BitConverter.ToString(sha1.Hash) + "' AND header='" + realhead + "'";
+		/// <summary>
+		/// Add a header to the database
+		/// </summary>
+		/// <param name="header">String representing the header bytes</param>
+		/// <param name="SHA1">SHA-1 of the deheadered file</param>
+		/// <param name="type">HeaderType representing the detected header</param>
+		private static void AddHeaderToDatabase(string header, string SHA1, HeaderType type)
+		{
+			bool exists = false;
+
+			string query = @"SELECT * FROM data WHERE sha1='" + SHA1 + "' AND header='" + header + "'";
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			{
+				dbc.Open();
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
+				{
+					using (SqliteDataReader sldr = slc.ExecuteReader())
+					{
+						exists = sldr.HasRows;
+					}
+				}
+			}
+
+			if (!exists)
+			{
+				query = @"INSERT INTO data (sha1, header, type) VALUES ('" +
+				SHA1 + "', " +
+				"'" + header + "', " +
+				"'" + type.ToString() + "')";
 				using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 				{
 					dbc.Open();
 					using (SqliteCommand slc = new SqliteCommand(query, dbc))
 					{
-						using (SqliteDataReader sldr = slc.ExecuteReader())
-						{
-							exists = sldr.HasRows;
-						}
-					}
-				}
-
-				if (!exists)
-				{
-					query = @"INSERT INTO data (sha1, header, type) VALUES ('" +
-					BitConverter.ToString(sha1.Hash) + "', " +
-					"'" + realhead + "', " +
-					"'" + type.ToString() + "')";
-					using (SqliteConnection dbc = new SqliteConnection(_connectionString))
-					{
-						dbc.Open();
-						using (SqliteCommand slc = new SqliteCommand(query, dbc))
-						{
-							logger.Log("Result of inserting header: " + slc.ExecuteNonQuery());
-						}
+						logger.Log("Result of inserting header: " + slc.ExecuteNonQuery());
 					}
 				}
 			}
-			br.Close();
 		}
 
 		/// <summary>
@@ -246,14 +212,12 @@ namespace SabreTools
 		private static void ReplaceHeader(string file)
 		{
 			// First, get the SHA-1 hash of the file
-			SHA1 sha1 = SHA1.Create();
-			sha1.ComputeHash(File.ReadAllBytes(file));
-			string hash = BitConverter.ToString(sha1.Hash);
+			RomData rom = RomTools.GetSingleFileInfo(file);
 
 			// Then try to pull the corresponding headers from the database
 			string header = "";
 
-			string query = @"SELECT header, type FROM data WHERE sha1='" + hash + "'";
+			string query = @"SELECT header, type FROM data WHERE sha1='" + rom.SHA1 + "'";
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();
@@ -270,15 +234,7 @@ namespace SabreTools
 								header = sldr.GetString(0);
 
 								logger.User("Creating reheadered file: " + file + ".new" + sub);
-								BinaryWriter bw = new BinaryWriter(File.OpenWrite(file + ".new" + sub));
-
-								// Source: http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
-								for (int i = 0; i < header.Length; i += 2)
-								{
-									bw.Write(Convert.ToByte(header.Substring(i, 2), 16));
-								}
-								bw.Write(File.ReadAllBytes(file));
-								bw.Close();
+								Output.AppendBytesToFile(file, file + ".new" + sub, header, string.Empty);
 								logger.User("Reheadered file created!");
 							}
 						}
