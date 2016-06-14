@@ -23,15 +23,15 @@
 	public enum HeaderType
 	{
 		None = 0,
-		A7800,
-		FDS,
-		Lynx,
-		//N64,
-		NES,
-		PCE,
-		PSID,
-		SNES,
-		SPC,
+		a7800,
+		fds,
+		lynx,
+		//n64,
+		nes,
+		pce,
+		psid,
+		snes,
+		spc,
 	}
 
 	/// <summary>
