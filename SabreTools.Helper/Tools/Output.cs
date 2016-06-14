@@ -560,5 +560,29 @@ namespace SabreTools.Helper
 
 			return true;
 		}
+
+		/// <summary>
+		/// Cleans out the temporary directory
+		/// </summary>
+		/// <param name="dirname">Name of the directory to clean out</param>
+		public static void CleanDirectory(string dirname)
+		{
+			foreach (string file in Directory.EnumerateFiles(dirname, "*", SearchOption.TopDirectoryOnly))
+			{
+				try
+				{
+					File.Delete(file);
+				}
+				catch { }
+			}
+			foreach (string dir in Directory.EnumerateDirectories(dirname, "*", SearchOption.TopDirectoryOnly))
+			{
+				try
+				{
+					Directory.Delete(dir, true);
+				}
+				catch { }
+			}
+		}
 	}
 }

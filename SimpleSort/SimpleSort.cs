@@ -123,6 +123,14 @@ namespace SabreTools
 						else if (temparg.StartsWith("-dat=") || temparg.StartsWith("--dat="))
 						{
 							datfile = temparg.Split('=')[1];
+							if (!File.Exists(datfile))
+							{
+								logger.Error("DAT must be a valid file: " + datfile);
+								Console.WriteLine();
+								Build.Help();
+								logger.Close();
+								return;
+							}
 						}
 						else if (temparg.StartsWith("-gz=") || temparg.StartsWith("--gz="))
 						{
@@ -257,7 +265,7 @@ namespace SabreTools
 				{
 					_logger.Log("File found: '" + input + "'");
 					success &= ProcessFile(input);
-					CleanTempDirectory();
+					Output.CleanDirectory(_tempdir);
 				}
 				else if (Directory.Exists(input))
 				{
@@ -266,7 +274,7 @@ namespace SabreTools
 					{
 						_logger.Log("File found: '" + file + "'");
 						success &= ProcessFile(file);
-						CleanTempDirectory();
+						Output.CleanDirectory(_tempdir);
 					}
 				}
 				else
@@ -296,12 +304,57 @@ namespace SabreTools
 			_logger.User("Beginning processing of '" + input + "'");
 
 			// Get the hash of the file first
+			RomData rom = GetSingleFileInfo(input);
+
+			// If we have a blank RomData, it's an error
+			if (rom.Name == null)
+			{
+				return false;
+			}
+
+			// Try to find the matches to the file that was found
+			List<RomData> foundroms = DatTools.GetDuplicates(rom, _datdata);
+			_logger.User("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
+			foreach (RomData found in foundroms)
+			{
+				WriteFix(input, _outdir, ArchiveType.Zip, found);
+			}
+
+			// Now, if the file is a supported archive type, also run on all files within
+			bool encounteredErrors = !ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
+
+			// Remove the current file if we are in recursion so it's not picked up in the next step
+			if (recurse)
+			{
+				File.Delete(input);
+			}
+
+			// If no errors were encountered, we loop through the temp directory
+			if (!encounteredErrors)
+			{
+				_logger.User("Archive found! Successfully extracted");
+				foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
+				{
+					success &= ProcessFile(file, true);
+				}
+			}
+
+			return success;
+		}
+
+		/// <summary>
+		/// Retrieve file information for a single file
+		/// </summary>
+		/// <param name="input">Filename to get information from</param>
+		/// <returns>Populated RomData object if success, empty one on error</returns>
+		public static RomData GetSingleFileInfo(string input)
+		{
 			RomData rom = new RomData
 			{
 				Name = Path.GetFileName(input),
 				Type = "rom",
 				Size = (new FileInfo(input)).Length,
-				CRC= string.Empty,
+				CRC = string.Empty,
 				MD5 = string.Empty,
 				SHA1 = string.Empty,
 			};
@@ -330,73 +383,113 @@ namespace SabreTools
 			}
 			catch (IOException)
 			{
-				return false;
+				return new RomData();
 			}
 
-			// Try to find the matches to the file that was found
-			List<RomData> foundroms = DatTools.GetDuplicates(rom, _datdata);
-			_logger.User("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
-			foreach (RomData found in foundroms)
+			return rom;
+		}
+
+		/// <summary>
+		/// Copy a file either to an output archive or to an output folder
+		/// </summary>
+		/// <param name="input">Input filename to be moved</param>
+		/// <param name="output">Output directory to build to</param>
+		/// <param name="archiveType">Type of archive to attempt to write to</param>
+		/// <param name="rom">RomData representing the new information</param>
+		public static void WriteFix(string input, string output, ArchiveType archiveType, RomData rom)
+		{
+			string archiveFileName = output + Path.DirectorySeparatorChar + rom.Game + ".zip";
+			string singleFileName = output + Path.DirectorySeparatorChar + rom.Game + Path.DirectorySeparatorChar + rom.Name;
+
+			IWriter outarchive = null;
+			FileStream fs = null;
+			try
 			{
-				IWriter outarchive = null;
-				FileStream fs = null;
-				try
+				fs = File.OpenWrite(archiveFileName);
+				outarchive = WriterFactory.Open(fs, ArchiveType.Zip, CompressionType.Deflate);
+				outarchive.Write(rom.Name, input);
+			}
+			catch
+			{
+				if (!File.Exists(singleFileName))
 				{
-					fs = File.OpenWrite(_outdir + Path.DirectorySeparatorChar + found.Game + ".zip");
-					outarchive = WriterFactory.Open(fs, ArchiveType.Zip, CompressionType.Deflate);
-					outarchive.Write(found.Name, input);
-				}
-				catch
-				{
-					if (!File.Exists(_outdir + Path.DirectorySeparatorChar + found.Game + Path.DirectorySeparatorChar + rom.Name))
-					{
-						File.Copy(input, _outdir + Path.DirectorySeparatorChar + found.Game + Path.DirectorySeparatorChar + rom.Name);
-					}
-				}
-				finally
-				{
-					outarchive?.Dispose();
-					fs?.Close();
-					fs?.Dispose();
+					File.Copy(input, singleFileName);
 				}
 			}
+			finally
+			{
+				outarchive?.Dispose();
+				fs?.Close();
+				fs?.Dispose();
+			}
+		}
 
-			// Now, if the file is a supported archive type, also run on all files within
+		/// <summary>
+		/// Attempt to extract a file as an archive
+		/// </summary>
+		/// <param name="input">Name of the file to be extracted</param>
+		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
+		/// <param name="gz">Integer representing the archive handling level for GZip</param>
+		/// <param name="rar">Integer representing the archive handling level for RAR</param>
+		/// <param name="zip">Integer representing the archive handling level for Zip</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the extraction was a success, false otherwise</returns>
+		public static bool ExtractArchive(string input, string tempdir, int sevenzip,
+			int gz, int rar, int zip, Logger logger)
+		{
+			return ExtractArchive(input, tempdir, (ArchiveScanLevel)sevenzip, (ArchiveScanLevel)gz, (ArchiveScanLevel)rar, (ArchiveScanLevel)zip, logger);
+		}
+
+		/// <summary>
+		/// Attempt to extract a file as an archive
+		/// </summary>
+		/// <param name="input">Name of the file to be extracted</param>
+		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="sevenzip">Archive handling level for 7z</param>
+		/// <param name="gz">Archive handling level for GZip</param>
+		/// <param name="rar">Archive handling level for RAR</param>
+		/// <param name="zip">Archive handling level for Zip</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the extraction was a success, false otherwise</returns>
+		public static bool ExtractArchive(string input, string tempdir, ArchiveScanLevel sevenzip,
+			ArchiveScanLevel gz, ArchiveScanLevel rar, ArchiveScanLevel zip, Logger logger)
+		{
 			bool encounteredErrors = true;
 			IArchive archive = null;
 			try
 			{
 				archive = ArchiveFactory.Open(input);
 				ArchiveType at = archive.Type;
-				_logger.Log("Found archive of type: " + at);
+				logger.Log("Found archive of type: " + at);
 
-				if ((at == ArchiveType.Zip && _zip != ArchiveScanLevel.External) ||
-					(at == ArchiveType.SevenZip && _7z != ArchiveScanLevel.External) ||
-					(at == ArchiveType.Rar && _rar != ArchiveScanLevel.External))
+				if ((at == ArchiveType.Zip && zip != ArchiveScanLevel.External) ||
+					(at == ArchiveType.SevenZip && sevenzip != ArchiveScanLevel.External) ||
+					(at == ArchiveType.Rar && rar != ArchiveScanLevel.External))
 				{
 					// Create the temp directory
-					DirectoryInfo di = Directory.CreateDirectory(_tempdir);
+					DirectoryInfo di = Directory.CreateDirectory(tempdir);
 
 					// Extract all files to the temp directory
 					IReader reader = archive.ExtractAllEntries();
-					reader.WriteAllToDirectory(_tempdir, ExtractOptions.ExtractFullPath);
+					reader.WriteAllToDirectory(tempdir, ExtractOptions.ExtractFullPath);
 					encounteredErrors = false;
 				}
-				else if (at == ArchiveType.GZip && _gz != ArchiveScanLevel.External)
+				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
 				{
 					// Close the original archive handle
 					archive.Dispose();
 
 					// Create the temp directory
-					DirectoryInfo di = Directory.CreateDirectory(_tempdir);
+					DirectoryInfo di = Directory.CreateDirectory(tempdir);
 
 					using (FileStream itemstream = File.OpenRead(input))
 					{
-						using (FileStream outstream = File.Create(_tempdir + Path.GetFileNameWithoutExtension(input)))
+						using (FileStream outstream = File.Create(tempdir + Path.GetFileNameWithoutExtension(input)))
 						{
-							using (GZipStream gz = new GZipStream(itemstream, CompressionMode.Decompress))
+							using (GZipStream gzstream = new GZipStream(itemstream, CompressionMode.Decompress))
 							{
-								gz.CopyTo(outstream);
+								gzstream.CopyTo(outstream);
 							}
 						}
 					}
@@ -414,7 +507,7 @@ namespace SabreTools
 			}
 			catch (Exception ex)
 			{
-				_logger.Error(ex.ToString());
+				logger.Error(ex.ToString());
 				encounteredErrors = true;
 				if (archive != null)
 				{
@@ -422,46 +515,7 @@ namespace SabreTools
 				}
 			}
 
-			// Remove the current file if we are in recursion so it's not picked up in the next step
-			if (recurse)
-			{
-				File.Delete(input);
-			}
-
-			// If no errors were encountered, we loop through the temp directory
-			if (!encounteredErrors)
-			{
-				_logger.User("Archive found! Successfully extracted");
-				foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
-				{
-					success &= ProcessFile(file, true);
-				}
-			}
-
-			return success;
-		}
-
-		/// <summary>
-		/// Cleans out the temporary directory
-		/// </summary>
-		private void CleanTempDirectory()
-		{
-			foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.TopDirectoryOnly))
-			{
-				try
-				{
-					File.Delete(file);
-				}
-				catch { }
-			}
-			foreach (string dir in Directory.EnumerateDirectories(_tempdir, "*", SearchOption.TopDirectoryOnly))
-			{
-				try
-				{
-					Directory.Delete(dir, true);
-				}
-				catch { }
-			}
+			return !encounteredErrors;
 		}
 	}
 }
