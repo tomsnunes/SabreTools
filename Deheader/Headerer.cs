@@ -148,37 +148,15 @@ namespace SabreTools
 			foreach (HeaderType test in Enum.GetValues(typeof(HeaderType)))
 			{
 				Dictionary<string, int> tempDict = new Dictionary<string, int>();
-				switch (test)
+
+				// Try populating the dictionary from the master list
+				try
 				{
-					case HeaderType.A7800:
-						tempDict = Remapping.A7800;
-						break;
-					case HeaderType.FDS:
-						tempDict = Remapping.FDS;
-						break;
-					case HeaderType.Lynx:
-						tempDict = Remapping.Lynx;
-						break;
-					case HeaderType.PCE:
-						tempDict = Remapping.PCE;
-						break;
-					/*
-					case HeaderType.N64:
-						tempDict = Remapping.N64;
-						break;
-					*/
-					case HeaderType.NES:
-						tempDict = Remapping.NES;
-						break;
-					case HeaderType.PSID:
-						tempDict = Remapping.PSID;
-						break;
-					case HeaderType.SNES:
-						tempDict = Remapping.SNES;
-						break;
-					case HeaderType.SPC:
-						tempDict = Remapping.SPC;
-						break;
+					tempDict = Remapping.HeaderMaps[test.ToString()];
+				}
+				catch
+				{
+					logger.Warning("The mapping for '" + test.ToString() + "' cannot be found!");
 				}
 
 				// Loop over the dictionary and see if there are matches

@@ -151,12 +151,12 @@ namespace SabreTools
 			switch (type)
 			{
 				case DatType.Good:
-					if (!Remapping.Good.ContainsKey(fileinfo[1].Value))
+					if (!Remapping.DatMaps["Good"].ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection goodInfo = Regex.Match(Remapping.Good[fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection goodInfo = Regex.Match(Remapping.DatMaps["Good"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = goodInfo[1].Value;
 					system = goodInfo[2].Value;
@@ -164,12 +164,12 @@ namespace SabreTools
 					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					break;
 				case DatType.MAME:
-					if (!Remapping.MAME.ContainsKey(fileinfo[1].Value))
+					if (!Remapping.DatMaps["MAME"].ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection mameInfo = Regex.Match(Remapping.MAME[fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection mameInfo = Regex.Match(Remapping.DatMaps["MAME"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = mameInfo[1].Value;
 					system = mameInfo[2].Value;
@@ -177,12 +177,12 @@ namespace SabreTools
 					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					break;
 				case DatType.MaybeIntro:
-					if (!Remapping.MaybeIntro.ContainsKey(fileinfo[1].Value))
+					if (!Remapping.DatMaps["MaybeIntro"].ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection maybeIntroInfo = Regex.Match(Remapping.MaybeIntro[fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection maybeIntroInfo = Regex.Match(Remapping.DatMaps["MaybeIntro"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = maybeIntroInfo[1].Value;
 					system = maybeIntroInfo[2].Value;
@@ -192,12 +192,12 @@ namespace SabreTools
 					date = miDateInfo[1].Value + "-" + miDateInfo[2].Value + "-" + miDateInfo[3].Value + " 00:00:00";
 					break;
 				case DatType.NoIntro:
-					if (!Remapping.NoIntro.ContainsKey(fileinfo[1].Value))
+					if (!Remapping.DatMaps["NoIntro"].ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection nointroInfo = Regex.Match(Remapping.NoIntro[fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection nointroInfo = Regex.Match(Remapping.DatMaps["NoIntro"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = nointroInfo[1].Value;
 					system = nointroInfo[2].Value;
@@ -221,12 +221,12 @@ namespace SabreTools
 					}
 					break;
 				case DatType.NonGood:
-					if (!Remapping.NonGood.ContainsKey(fileinfo[1].Value))
+					if (!Remapping.DatMaps["NonGood"].ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection nonGoodInfo = Regex.Match(Remapping.NonGood[fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection nonGoodInfo = Regex.Match(Remapping.DatMaps["NonGood"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = nonGoodInfo[1].Value;
 					system = nonGoodInfo[2].Value;
@@ -234,18 +234,18 @@ namespace SabreTools
 					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					break;
 				case DatType.Redump:
-					if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
+					if (!Remapping.DatMaps["Redump"].ContainsKey(fileinfo[1].Value))
 					{
 						// Handle special case mappings found only in Redump
 						fileinfo = Regex.Match(filename, Constants.RedumpBiosPattern).Groups;
 
-						if (!Remapping.Redump.ContainsKey(fileinfo[1].Value))
+						if (!Remapping.DatMaps["Redump"].ContainsKey(fileinfo[1].Value))
 						{
 							_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 							return false;
 						}
 					}
-					GroupCollection redumpInfo = Regex.Match(Remapping.Redump[fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection redumpInfo = Regex.Match(Remapping.DatMaps["Redump"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = redumpInfo[1].Value;
 					system = redumpInfo[2].Value;
@@ -265,23 +265,23 @@ namespace SabreTools
 					
 					break;
 				case DatType.TOSEC:
-					if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
+					if (!Remapping.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
 					{
 						// Handle special case mappings found only in TOSEC
 						fileinfo = Regex.Match(filename, Constants.TosecSpecialPatternA).Groups;
 
-						if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
+						if (!Remapping.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
 						{
 							fileinfo = Regex.Match(filename, Constants.TosecSpecialPatternB).Groups;
 
-							if (!Remapping.TOSEC.ContainsKey(fileinfo[1].Value))
+							if (!Remapping.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
 							{
 								_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 								return false;
 							}
 						}
 					}
-					GroupCollection tosecInfo = Regex.Match(Remapping.TOSEC[fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection tosecInfo = Regex.Match(Remapping.DatMaps["TOSEC"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = tosecInfo[1].Value;
 					system = tosecInfo[2].Value;
@@ -291,12 +291,12 @@ namespace SabreTools
 					date = toDateInfo[1].Value + "-" + toDateInfo[2].Value + "-" + toDateInfo[3].Value + " 00:00:00";
 					break;
 				case DatType.TruRip:
-					if (!Remapping.TruRip.ContainsKey(fileinfo[1].Value))
+					if (!Remapping.DatMaps["TruRip"].ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection truripInfo = Regex.Match(Remapping.TruRip[fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection truripInfo = Regex.Match(Remapping.DatMaps["TruRip"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = truripInfo[1].Value;
 					system = truripInfo[2].Value;

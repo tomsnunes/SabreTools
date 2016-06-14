@@ -10,27 +10,11 @@ namespace SabreTools.Helper
 	/// </summary>
 	public class Remapping
 	{
-		// Remapping classes represented by dictionaries (from, to)
-		public static Dictionary<string, string> Good = new Dictionary<string, string>();
-		public static Dictionary<string, string> MAME = new Dictionary<string, string>();
-		public static Dictionary<string, string> MaybeIntro = new Dictionary<string, string>();
-		public static Dictionary<string, string> NoIntro = new Dictionary<string, string>();
-		public static Dictionary<string, string> NonGood = new Dictionary<string, string>();
-		public static Dictionary<string, string> Redump = new Dictionary<string, string>();
-		public static Dictionary<string, string> TOSEC = new Dictionary<string, string>();
-		public static Dictionary<string, string> TruRip = new Dictionary<string, string>();
+		// Remapping classes represented by a dictionary of dictionaries (name, (from, to))
+		public static Dictionary<string, Dictionary<string, string>> DatMaps = new Dictionary<string, Dictionary<string, string>>();
 
-		// Header skip classes represented by dictionaries (header, size)
-		public static Dictionary<string, int> A7800 = new Dictionary<string, int>();
-		public static Dictionary<string, int> FDS = new Dictionary<string, int>();
-		public static Dictionary<string, int> Lynx = new Dictionary<string, int>();
-		//public static Dictionary<string, int> N64 = new Dictionary<string, int>();
-		public static Dictionary<string, int> NES = new Dictionary<string, int>();
-		public static Dictionary<string, int> PCE = new Dictionary<string, int>();
-		public static Dictionary<string, int> PSID = new Dictionary<string, int>();
-		public static Dictionary<string, int> SNES = new Dictionary<string, int>();
-		public static Dictionary<string, int> SPC = new Dictionary<string, int>();
-
+		// Header skip classes represented by a dictionary of dictionaries (name, (header, size))
+		public static Dictionary<string, Dictionary<string, int>> HeaderMaps = new Dictionary<string, Dictionary<string, int>>();
 
 		/// <summary>
 		/// Create all remappings to be used by the program
@@ -46,6 +30,7 @@ namespace SabreTools.Helper
 			// Loop through and add all remappings
 			foreach (string remapping in remappings)
 			{
+				DatMaps.Add(remapping, new Dictionary<string, string>());
 				RemappingHelper(remapping);
 			}
 		}
@@ -91,33 +76,7 @@ namespace SabreTools.Helper
 			// Now read in the mappings
 			while (node != null && node.Name == "mapping")
 			{
-				switch (mapping)
-				{
-					case "Good":
-						Good.Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
-						break;
-					case "MAME":
-						MAME.Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
-						break;
-					case "MaybeIntro":
-						MaybeIntro.Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
-						break;
-					case "NoIntro":
-						NoIntro.Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
-						break;
-					case "NonGood":
-						NonGood.Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
-						break;
-					case "Redump":
-						Redump.Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
-						break;
-					case "TOSEC":
-						TOSEC.Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
-						break;
-					case "TruRip":
-						TruRip.Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
-						break;
-				}
+				DatMaps[mapping].Add(node.Attributes["from"].Value, node.Attributes["to"].Value);
 
 				// Get the next node and skip over anything that's not an element
 				node = node.NextSibling;
@@ -148,6 +107,7 @@ namespace SabreTools.Helper
 			// Loop through and add all remappings
 			foreach (string skipper in skippers)
 			{
+				HeaderMaps.Add(skipper, new Dictionary<string, int>());
 				SkipperHelper(skipper);
 			}
 		}
@@ -196,38 +156,7 @@ namespace SabreTools.Helper
 						header += child.Attributes["value"].Value;
 
 						// Now add the header and value to the appropriate skipper dictionary
-						switch (skipper)
-						{
-							case "a7800":
-								A7800.Add(header, size);
-								break;
-							case "fds":
-								FDS.Add(header, size);
-								break;
-							case "lynx":
-								Lynx.Add(header, size);
-								break;
-							/*
-							case "n64":
-								N64.Add(header, size);
-								break;
-							*/
-							case "nes":
-								NES.Add(header, size);
-								break;
-							case "pce":
-								PCE.Add(header, size);
-								break;
-							case "psid":
-								PSID.Add(header, size);
-								break;
-							case "snes":
-								SNES.Add(header, size);
-								break;
-							case "spc":
-								SPC.Add(header, size);
-								break;
-						}
+						HeaderMaps[skipper].Add(header, size);
 					}
 				}
 
