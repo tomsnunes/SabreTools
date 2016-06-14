@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using SabreTools.Helper;
-
-namespace SabreTools
+namespace SabreTools.Helper
 {
 	/// <summary>
 	/// Get statistics on one or more DAT files

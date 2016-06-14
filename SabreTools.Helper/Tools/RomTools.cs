@@ -1,9 +1,8 @@
-﻿using System;
+﻿using DamienG.Security.Cryptography;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-
-using DamienG.Security.Cryptography;
 
 namespace SabreTools.Helper
 {

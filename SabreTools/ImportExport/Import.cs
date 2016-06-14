@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using Mono.Data.Sqlite;
+﻿using Mono.Data.Sqlite;
+using SabreTools.Helper;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-
-using SabreTools.Helper;
 
 namespace SabreTools
 {

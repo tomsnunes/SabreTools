@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Mono.Data.Sqlite;
+using SabreTools.Helper;
+using System;
 using System.Collections.Generic;
-using Mono.Data.Sqlite;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-
-using SabreTools.Helper;
 
 namespace SabreTools
 {

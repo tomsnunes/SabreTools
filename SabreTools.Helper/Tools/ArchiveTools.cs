@@ -1,13 +1,12 @@
-﻿using System;
+﻿using SharpCompress.Archive;
+using SharpCompress.Common;
+using SharpCompress.Reader;
+using SharpCompress.Writer;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
-
-using SharpCompress.Archive;
-using SharpCompress.Common;
-using SharpCompress.Reader;
-using SharpCompress.Writer;
 
 namespace SabreTools.Helper
 {

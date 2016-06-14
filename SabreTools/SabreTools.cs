@@ -1,8 +1,7 @@
-﻿using System;
+﻿using SabreTools.Helper;
+using System;
 using System.Collections.Generic;
 using System.IO;
-
-using SabreTools.Helper;
 
 namespace SabreTools
 {

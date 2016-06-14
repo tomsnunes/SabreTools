@@ -1,8 +1,7 @@
-﻿using System;
-using System.IO;
-using Mono.Data.Sqlite;
-
+﻿using Mono.Data.Sqlite;
 using SabreTools.Helper;
+using System;
+using System.IO;
 
 namespace SabreTools
 {

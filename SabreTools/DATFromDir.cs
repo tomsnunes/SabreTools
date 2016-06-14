@@ -1,17 +1,9 @@
-﻿using System;
+﻿using SabreTools.Helper;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using System.IO.Compression;
-using System.Security.Cryptography;
+using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-
-using SabreTools.Helper;
-using DamienG.Security.Cryptography;
-using SharpCompress.Archive;
-using SharpCompress.Common;
-using SharpCompress.Reader;
 
 namespace SabreTools
 {
