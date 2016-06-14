@@ -1,4 +1,5 @@
 ﻿using SabreTools.Helper;
+using SharpCompress.Archive;
 using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
@@ -249,6 +250,16 @@ namespace SabreTools
 				_outdir = Path.GetFullPath(_outdir);
 			}
 
+			// Then create or clean the temp directory
+			if (!Directory.Exists(_tempdir))
+			{
+				Directory.CreateDirectory(_tempdir);
+			}
+			else
+			{
+				Output.CleanDirectory(_tempdir);
+			}
+
 			// Then, loop through and check each of the inputs
 			_logger.User("Starting to loop through inputs");
 			foreach (string input in _inputs)
@@ -275,6 +286,20 @@ namespace SabreTools
 				}
 			}
 
+			// Now process the output directory and write all to zipfiles
+			foreach (string dir in Directory.EnumerateDirectories(_outdir, "*", SearchOption.TopDirectoryOnly))
+			{
+				ArchiveTools.WriteFolderToArchive(dir, _outdir, ArchiveType.Zip);
+				try
+				{
+					Directory.Delete(dir, true);
+				}
+				catch (Exception ex)
+				{
+					_logger.Error(ex.ToString());
+				}
+			}
+
 			// Now one final delete of the temp directory
 			Directory.Delete(_tempdir, true);
 
@@ -295,21 +320,93 @@ namespace SabreTools
 			input = Path.GetFullPath(input);
 			_logger.User("Beginning processing of '" + input + "'");
 
-			// Get the hash of the file first
-			RomData rom = RomTools.GetSingleFileInfo(input);
-
-			// If we have a blank RomData, it's an error
-			if (rom.Name == null)
+			// If we have an archive, scan it if necessary
+			bool shouldscan = true;
+			try
 			{
-				return false;
+				IArchive temp = ArchiveFactory.Open(input);
+				switch (temp.Type)
+				{
+					case ArchiveType.GZip:
+						shouldscan = (_gz != ArchiveScanLevel.Internal);
+						break;
+					case ArchiveType.Rar:
+						shouldscan = (_rar != ArchiveScanLevel.Internal);
+						break;
+					case ArchiveType.SevenZip:
+						shouldscan = (_7z != ArchiveScanLevel.Internal);
+						break;
+					case ArchiveType.Zip:
+						shouldscan = (_zip != ArchiveScanLevel.Internal);
+						break;
+				}
+			}
+			catch
+			{
+				shouldscan = true;
 			}
 
-			// Try to find the matches to the file that was found
-			List<RomData> foundroms = RomTools.GetDuplicates(rom, _datdata);
-			_logger.User("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
-			foreach (RomData found in foundroms)
+			// Hash and match the external files
+			if (shouldscan)
 			{
-				ArchiveTools.WriteArchiveOrFile(input, _outdir, ArchiveType.Zip, found);
+				RomData rom = RomTools.GetSingleFileInfo(input);
+
+				// If we have a blank RomData, it's an error
+				if (rom.Name == null)
+				{
+					return false;
+				}
+
+				// Try to find the matches to the file that was found
+				List<RomData> foundroms = RomTools.GetDuplicates(rom, _datdata);
+				_logger.User("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
+				foreach (RomData found in foundroms)
+				{
+					_logger.Log("Matched name: " + found.Name);
+					string singleFileName = _outdir + Path.DirectorySeparatorChar + found.Game + Path.DirectorySeparatorChar + found.Name;
+					Output.CopyFileToNewLocation(input, singleFileName);
+				}
+
+				// Now get the headerless file if it exists
+				int hs = 0;
+				RomTools.GetFileHeaderType(input, out hs, _logger);
+				if (hs > 0)
+				{
+					string newinput = input + ".new";
+					_logger.Log("Creating unheadered file: '" + newinput + "'");
+					Output.RemoveBytesFromFile(input, newinput, hs, 0);
+					RomData drom = RomTools.GetSingleFileInfo(newinput);
+
+					// If we have a blank RomData, it's an error
+					if (drom.Name == null)
+					{
+						return false;
+					}
+
+					// Try to find the matches to the file that was found
+					List<RomData> founddroms = RomTools.GetDuplicates(drom, _datdata);
+					_logger.User("File '" + newinput + "' had " + founddroms.Count + " matches in the DAT!");
+					foreach (RomData found in founddroms)
+					{
+						_logger.Log("Matched name: " + found.Name);
+
+						// First output the headerless rom
+						string singleFileName = _outdir + Path.DirectorySeparatorChar + found.Game + Path.DirectorySeparatorChar + found.Name;
+						Output.CopyFileToNewLocation(newinput, singleFileName);
+
+						// Then output the headered rom (renamed)
+						RomData newfound = found;
+						newfound.Name = Path.GetFileNameWithoutExtension(newfound.Name) + " (" + rom.CRC + ")" + Path.GetExtension(newfound.Name);
+
+						_logger.Log("Matched name: " + newfound.Name);
+
+						singleFileName = _outdir + Path.DirectorySeparatorChar + newfound.Game + Path.DirectorySeparatorChar + newfound.Name;
+						Output.CopyFileToNewLocation(input, singleFileName);
+					}
+
+					// Now remove this temporary file
+					File.Delete(newinput);
+				}
 			}
 
 			// Now, if the file is a supported archive type, also run on all files within

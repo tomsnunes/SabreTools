@@ -608,7 +608,7 @@ namespace SabreTools.Helper
 				long adjustedLength = br.BaseStream.Length - bytesToRemoveFromTail;
 
 				// Seek to the correct position
-				br.BaseStream.Seek(bytesToRemoveFromHead, SeekOrigin.Begin);
+				br.BaseStream.Seek((bytesToRemoveFromHead < 0 ? 0 : bytesToRemoveFromHead), SeekOrigin.Begin);
 
 				// Now read the file in chunks and write out
 				byte[] buffer = new byte[bufferSize];
@@ -695,5 +695,22 @@ namespace SabreTools.Helper
 				}
 			}
 		}
-	}
+
+		/// <summary>
+		/// Copy a file to a new location, creating directories as needed
+		/// </summary>
+		/// <param name="input">Input filename</param>
+		/// <param name="output">Output filename</param>
+		public static void CopyFileToNewLocation(string input, string output)
+		{
+			if (File.Exists(input) && !File.Exists(output))
+			{
+				if (!Directory.Exists(Path.GetDirectoryName(output)))
+				{
+					Directory.CreateDirectory(Path.GetDirectoryName(output));
+				}
+				File.Copy(input, output);
+			}
+		}
+		}
 }

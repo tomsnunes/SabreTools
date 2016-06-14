@@ -16,6 +16,7 @@ namespace SabreTools.Helper
 		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise</param>
 		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
+		/// <remarks>Add read-offset for hash info</remarks>
 		public static RomData GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false)
 		{
 			RomData rom = new RomData

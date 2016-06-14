@@ -19,31 +19,67 @@ namespace SabreTools.Helper
 		/// <param name="output">Output directory to build to</param>
 		/// <param name="archiveType">Type of archive to attempt to write to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		public static void WriteArchiveOrFile(string input, string output, ArchiveType archiveType, RomData rom)
+		public static void WriteFileToArchive(string input, string output, ArchiveType archiveType, RomData rom)
 		{
 			string archiveFileName = output + Path.DirectorySeparatorChar + rom.Game + ".zip";
 			string singleFileName = output + Path.DirectorySeparatorChar + rom.Game + Path.DirectorySeparatorChar + rom.Name;
 
-			IWriter outarchive = null;
-			FileStream fs = null;
+			IWritableArchive outarchive = null;
 			try
 			{
-				fs = File.OpenWrite(archiveFileName);
-				outarchive = WriterFactory.Open(fs, ArchiveType.Zip, CompressionType.Deflate);
-				outarchive.Write(rom.Name, input);
-			}
-			catch
-			{
-				if (!File.Exists(singleFileName))
+				if (!File.Exists(archiveFileName))
 				{
-					File.Copy(input, singleFileName);
+					outarchive = ArchiveFactory.Create(archiveType) as IWritableArchive;
 				}
+				else
+				{
+					outarchive = ArchiveFactory.Open(archiveFileName, Options.LookForHeader) as IWritableArchive;
+				}
+				outarchive.AddEntry(rom.Name, input);
+				outarchive.SaveTo(archiveFileName, new CompressionInfo { Type = CompressionType.Deflate });
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
 			}
 			finally
 			{
 				outarchive?.Dispose();
-				fs?.Close();
-				fs?.Dispose();
+			}
+		}
+
+		/// <summary>
+		/// Copy a file either to an output archive or to an output folder
+		/// </summary>
+		/// <param name="input">Input filename to be moved</param>
+		/// <param name="output">Output directory to build to</param>
+		/// <param name="archiveType">Type of archive to attempt to write to</param>
+		/// <param name="rom">RomData representing the new information</param>
+		public static void WriteFolderToArchive(string input, string output, ArchiveType archiveType)
+		{
+			string archiveFileName = output + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(input) + ".zip";
+
+			IWritableArchive outarchive = null;
+			try
+			{
+				if (!File.Exists(archiveFileName))
+				{
+					outarchive = ArchiveFactory.Create(archiveType) as IWritableArchive;
+				}
+				else
+				{
+					outarchive = ArchiveFactory.Open(archiveFileName, Options.LookForHeader) as IWritableArchive;
+				}
+				outarchive.AddAllFromDirectory(input, "*", SearchOption.AllDirectories);
+				outarchive.SaveTo(archiveFileName, new CompressionInfo { Type = CompressionType.Deflate });
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+			}
+			finally
+			{
+				outarchive?.Dispose();
 			}
 		}
 
