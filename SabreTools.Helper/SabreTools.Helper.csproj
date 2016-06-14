@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Constants.cs" />
+    <Compile Include="Tools\ArchiveTools.cs" />
     <Compile Include="Tools\CRC32.cs" />
     <Compile Include="Tools\Database.cs" />
     <Compile Include="Data\Enums.cs" />
