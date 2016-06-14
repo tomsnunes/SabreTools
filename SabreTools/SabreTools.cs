@@ -477,7 +477,7 @@ namespace SabreTools
 						{
 							currentNewMerged = temparg.Split('=')[1];
 						}
-						else if (temparg.StartsWith("-out=") && outdir == "")
+						else if (temparg.StartsWith("-out=") || temparg.StartsWith("--out="))
 						{
 							outdir = temparg.Split('=')[1];
 						}

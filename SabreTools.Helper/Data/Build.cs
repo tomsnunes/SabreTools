@@ -225,6 +225,27 @@ Options:
   -e			Detect and remove mode
   -r			Restore header to file based on SHA-1");
 					break;
+				case "SimpleSort":
+					Console.WriteLine(@"SimpleSort - Basic rebuild using a DAT
+-----------------------------------------
+Usage: SimpleSort [options] [filename|dirname] ...
+
+Options:
+  -?, -h, --help	Show this help
+  -dat=			Input DAT to rebuild against (REQUIRED)
+  -out=			Output directory
+  -t=, --temp=		Set the temporary directory to use
+  -7z={0}		Set scanning level for 7z archives
+  -gz={2}		Set scanning level for GZip archives
+  -rar={2}		Set scanning level for RAR archives
+  -zip={0}		Set scanning level for ZIP archives
+
+SimpleSort scanning levels:
+  0	Hash archive and contents
+  1	Only hash contents
+  2	Only hash archive
+");
+					break;
 				default:
 					Console.Write("This is the default help output");
 					break;

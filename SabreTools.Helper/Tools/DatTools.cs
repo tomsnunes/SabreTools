@@ -1484,14 +1484,8 @@ namespace SabreTools.Helper
 					{
 						RomData lastrom = outroms[i];
 
-						// If last is a nodump, skip it
-						if (lastrom.Nodump)
-						{
-							continue;
-						}
-
 						// Get the duplicate status
-						dupefound = RomDuplicate(rom, lastrom);
+						dupefound = IsDuplicate(rom, lastrom);
 
 						// If it's a duplicate, skip adding it to the output but add any missing information
 						if (dupefound)
@@ -1579,7 +1573,7 @@ namespace SabreTools.Helper
 		/// <param name="lastrom">Rom to use as a base</param>
 		/// <param name="datdata">DAT to match against</param>
 		/// <returns>List of matched RomData objects</returns>
-		public static List<RomData> ListDuplicates(RomData lastrom, DatData datdata)
+		public static List<RomData> GetDuplicates(RomData lastrom, DatData datdata)
 		{
 			List<RomData> output = new List<RomData>();
 
@@ -1594,7 +1588,7 @@ namespace SabreTools.Helper
 			{
 				foreach (RomData rom in roms)
 				{
-					if (RomDuplicate(rom, lastrom))
+					if (IsDuplicate(rom, lastrom))
 					{
 						output.Add(rom);
 					}
@@ -1610,9 +1604,15 @@ namespace SabreTools.Helper
 		/// <param name="rom">Rom to check for duplicate status</param>
 		/// <param name="lastrom">Rom to use as a baseline</param>
 		/// <returns>True if the roms are duplicates, false otherwise</returns>
-		public static bool RomDuplicate(RomData rom, RomData lastrom)
+		public static bool IsDuplicate(RomData rom, RomData lastrom)
 		{
 			bool dupefound = false;
+
+			// If either is a nodump, it's never a match
+			if (rom.Nodump || lastrom.Nodump)
+			{
+				return dupefound;
+			}
 
 			if (rom.Type == "rom" && lastrom.Type == "rom")
 			{

@@ -107,4 +107,14 @@ namespace SabreTools.Helper
 		MissFile,
 		SabreDat,
 	}
+
+	/// <summary>
+	/// Determines the level to scan archives at
+	/// </summary>
+	public enum ArchiveScanLevel
+	{
+		Both = 0,
+		Internal,
+		External,
+	}
 }
