@@ -1990,8 +1990,10 @@ namespace SabreTools.Helper
 		/// Retrieve file information for a single file
 		/// </summary>
 		/// <param name="input">Filename to get information from</param>
+		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise</param>
+		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static RomData GetSingleFileInfo(string input)
+		public static RomData GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false)
 		{
 			RomData rom = new RomData
 			{
@@ -2005,24 +2007,39 @@ namespace SabreTools.Helper
 
 			try
 			{
-				Crc32 crc = new Crc32();
-				MD5 md5 = MD5.Create();
-				SHA1 sha1 = SHA1.Create();
-
-				using (FileStream fs = File.Open(input, FileMode.Open))
+				using (Crc32 crc = new Crc32())
+				using (MD5 md5 = MD5.Create())
+				using (SHA1 sha1 = SHA1.Create())
+				using (FileStream fs = File.OpenRead(input))
 				{
-					foreach (byte b in crc.ComputeHash(fs))
+					byte[] buffer = new byte[1024];
+					int read;
+					while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
 					{
-						rom.CRC += b.ToString("x2").ToLowerInvariant();
+						crc.TransformBlock(buffer, 0, read, buffer, 0);
+						if (!noMD5)
+						{
+							md5.TransformBlock(buffer, 0, read, buffer, 0);
+						}
+						if (!noSHA1)
+						{
+							sha1.TransformBlock(buffer, 0, read, buffer, 0);
+						}
 					}
-				}
-				using (FileStream fs = File.Open(input, FileMode.Open))
-				{
-					rom.MD5 = BitConverter.ToString(md5.ComputeHash(fs)).Replace("-", "").ToLowerInvariant();
-				}
-				using (FileStream fs = File.Open(input, FileMode.Open))
-				{
-					rom.SHA1 = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "").ToLowerInvariant();
+
+					crc.TransformFinalBlock(buffer, 0, 0);
+					rom.CRC = BitConverter.ToString(crc.Hash).Replace("-", "").ToLowerInvariant();
+
+					if (!noMD5)
+					{
+						md5.TransformFinalBlock(buffer, 0, 0);
+						rom.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
+					}
+					if (!noSHA1)
+					{
+						sha1.TransformFinalBlock(buffer, 0, 0);
+						rom.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
+					}
 				}
 			}
 			catch (IOException)
