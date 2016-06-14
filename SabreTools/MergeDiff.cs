@@ -278,7 +278,7 @@ namespace SabreTools
 			List<string> keys = userData.Roms.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<RomData> roms = DatTools.Merge(userData.Roms[key], _logger);
+				List<RomData> roms = RomTools.Merge(userData.Roms[key], _logger);
 
 				if (roms != null && roms.Count > 0)
 				{
@@ -415,7 +415,7 @@ namespace SabreTools
 			List<string> keys = userData.Roms.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<RomData> roms = DatTools.Merge(userData.Roms[key], _logger);
+				List<RomData> roms = RomTools.Merge(userData.Roms[key], _logger);
 
 				if (roms != null && roms.Count > 0)
 				{

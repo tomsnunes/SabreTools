@@ -378,7 +378,7 @@ namespace SabreTools
 				List<RomData> newroms = roms;
 				if (datdata.MergeRoms)
 				{
-					newroms = DatTools.Merge(newroms, _logger);
+					newroms = RomTools.Merge(newroms, _logger);
 				}
 
 				foreach (RomData rom in newroms)
@@ -402,7 +402,7 @@ namespace SabreTools
 			foreach (string key in sortable.Keys)
 			{
 				List<RomData> roms = sortable[key];
-				DatTools.Sort(roms, true);
+				RomTools.Sort(roms, true);
 
 				long gameid = -1;
 				using (SqliteConnection dbc = new SqliteConnection(_connectionString))

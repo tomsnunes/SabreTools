@@ -183,6 +183,36 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Clean a game (or rom) name to the WoD standard
+		/// </summary>
+		/// <param name="game">Name of the game to be cleaned</param>
+		/// <returns>The cleaned name</returns>
+		public static string CleanGameName(string game)
+		{
+			///Run the name through the filters to make sure that it's correct
+			game = Style.NormalizeChars(game);
+			game = Style.RussianToLatin(game);
+			game = Style.SearchPattern(game);
+
+			game = new Regex(@"(([[(].*[\)\]] )?([^([]+))").Match(game).Groups[1].Value;
+			game = game.TrimStart().TrimEnd();
+			return game;
+		}
+
+		/// <summary>
+		/// Clean a game (or rom) name to the WoD standard
+		/// </summary>
+		/// <param name="game">Array representing the path to be cleaned</param>
+		/// <returns>The cleaned name</returns>
+		public static string CleanGameName(string[] game)
+		{
+			game[game.Length - 1] = CleanGameName(game[game.Length - 1]);
+			string outgame = String.Join(Path.DirectorySeparatorChar.ToString(), game);
+			outgame = outgame.TrimStart().TrimEnd();
+			return outgame;
+		}
+
+		/// <summary>
 		///  Returns the human-readable file size for an arbitrary, 64-bit file size 
 		/// The default format is "0.### XB", e.g. "4.2 KB" or "1.434 GB"
 		/// </summary>

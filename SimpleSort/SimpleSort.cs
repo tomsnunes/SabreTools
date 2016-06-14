@@ -297,7 +297,7 @@ namespace SabreTools
 			_logger.User("Beginning processing of '" + input + "'");
 
 			// Get the hash of the file first
-			RomData rom = DatTools.GetSingleFileInfo(input);
+			RomData rom = RomTools.GetSingleFileInfo(input);
 
 			// If we have a blank RomData, it's an error
 			if (rom.Name == null)
@@ -306,7 +306,7 @@ namespace SabreTools
 			}
 
 			// Try to find the matches to the file that was found
-			List<RomData> foundroms = DatTools.GetDuplicates(rom, _datdata);
+			List<RomData> foundroms = RomTools.GetDuplicates(rom, _datdata);
 			_logger.User("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
 			foreach (RomData found in foundroms)
 			{

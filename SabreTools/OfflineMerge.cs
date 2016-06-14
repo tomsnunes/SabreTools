@@ -67,7 +67,7 @@ namespace SabreTools
 				Dictionary<string, List<RomData>> netNew = new Dictionary<string, List<RomData>>();
 				foreach (string key in completeDats.Roms.Keys)
 				{
-					List<RomData> templist = DatTools.Merge(completeDats.Roms[key], _logger);
+					List<RomData> templist = RomTools.Merge(completeDats.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.System == _currentNewMerged)
@@ -91,7 +91,7 @@ namespace SabreTools
 				Dictionary<string, List<RomData>> unneeded = new Dictionary<string, List<RomData>>();
 				foreach (string key in completeDats.Roms.Keys)
 				{
-					List<RomData> templist = DatTools.Merge(completeDats.Roms[key], _logger);
+					List<RomData> templist = RomTools.Merge(completeDats.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.System == _currentAllMerged)
@@ -128,7 +128,7 @@ namespace SabreTools
 				Dictionary<string, List<RomData>> newMissing = new Dictionary<string, List<RomData>>();
 				foreach (string key in midMissing.Roms.Keys)
 				{
-					List<RomData> templist = DatTools.Merge(midMissing.Roms[key], _logger);
+					List<RomData> templist = RomTools.Merge(midMissing.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.System == _currentMissingMerged)
@@ -200,7 +200,7 @@ namespace SabreTools
 				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
 				foreach (string key in midHave.Keys)
 				{
-					List<RomData> templist = DatTools.Merge(midHave[key], _logger);
+					List<RomData> templist = RomTools.Merge(midHave[key], _logger);
 					foreach (RomData rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.System == _currentNewMerged)
@@ -368,7 +368,7 @@ namespace SabreTools
 				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
 				foreach (string key in midHave.Roms.Keys)
 				{
-					List<RomData> templist = DatTools.Merge(midHave.Roms[key], _logger);
+					List<RomData> templist = RomTools.Merge(midHave.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.System == _currentAllMerged)
@@ -438,7 +438,7 @@ namespace SabreTools
 				Dictionary<string, List<RomData>> have = new Dictionary<string, List<RomData>>();
 				foreach (string key in midHave.Roms.Keys)
 				{
-					List<RomData> templist = DatTools.Merge(midHave.Roms[key], _logger);
+					List<RomData> templist = RomTools.Merge(midHave.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.System == _currentNewMerged)

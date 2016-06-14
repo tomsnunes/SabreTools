@@ -284,7 +284,7 @@ JOIN checksums
 			{
 				foreach (string key in roms.Keys)
 				{
-					roms[key] = DatTools.Merge(roms[key], _logger);
+					roms[key] = RomTools.Merge(roms[key], _logger);
 				}
 			}
 			// END COMMENT
