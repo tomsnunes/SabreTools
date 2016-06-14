@@ -429,6 +429,18 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="input">Name of the file to be extracted</param>
 		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the extraction was a success, false otherwise</returns>
+		public static bool ExtractArchive(string input, string tempdir, Logger logger)
+		{
+			return ExtractArchive(input, tempdir, ArchiveScanLevel.Both, ArchiveScanLevel.External, ArchiveScanLevel.External, ArchiveScanLevel.Both, logger);
+		}
+
+		/// <summary>
+		/// Attempt to extract a file as an archive
+		/// </summary>
+		/// <param name="input">Name of the file to be extracted</param>
+		/// <param name="tempdir">Temporary directory for archive extraction</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
