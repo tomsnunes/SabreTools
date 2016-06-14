@@ -7,7 +7,7 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// All general database operations
 	/// </summary>
-	public class Database
+	public class DBTools
 	{
 		/// <summary>
 		/// Ensure that the databse exists and has the proper schema
