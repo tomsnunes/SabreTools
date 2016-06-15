@@ -183,7 +183,8 @@ namespace SabreTools.Helper
 		/// <param name="tempdir">Temporary directory for archive extraction</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>Name of the extracted file, null on error</returns>
-		public static string ExtractSingleItemFromArchive(string input, string entryname, string tempdir, Logger logger)
+		public static string ExtractSingleItemFromArchive(string input, string entryname,
+			string tempdir, Logger logger)
 		{
 			string outfile = null;
 
@@ -239,7 +240,8 @@ namespace SabreTools.Helper
 		/// <param name="outentryname">Output entry name</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the copy was a success, false otherwise</returns>
-		public static bool CopyFileBetweenArchives(string inputarc, string outputarc, string inentryname, string outentryname, Logger logger)
+		public static bool CopyFileBetweenArchives(string inputarc, string outputarc,
+			string inentryname, string outentryname, Logger logger)
 		{
 			bool success = false;
 
