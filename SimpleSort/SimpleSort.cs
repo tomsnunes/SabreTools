@@ -400,29 +400,66 @@ namespace SabreTools
 				}
 			}
 
-			// Now, if the file is a supported archive type, also run on all files within
-			bool encounteredErrors = !ArchiveTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
-
-			// Remove the current file if we are in recursion so it's not picked up in the next step
-			if (recurse)
+			/// TODO: Implement flag for external scanning only
+			bool externalScan = false;
+			if (externalScan)
 			{
-				try
+				List<RomData> internalRomData = ArchiveTools.GetArchiveFileInfo(input, _logger);
+
+				// If the list is populated, then the file was a filled archive
+				if (internalRomData.Count >= 0)
 				{
-					File.Delete(input);
-				}
-				catch (Exception ex)
-				{
-					_logger.Error(ex.ToString());
+					foreach (RomData rom in internalRomData)
+					{
+						// Try to find the matches to the file that was found
+						List<RomData> foundroms = RomTools.GetDuplicates(rom, _datdata);
+						_logger.User("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
+						foreach (RomData found in foundroms)
+						{
+							_logger.Log("Matched name: " + found.Name);
+							string newinput = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
+							if (newinput != null && File.Exists(newinput))
+							{
+								ArchiveTools.WriteToArchive(newinput, _outdir, found);
+								try
+								{
+									File.Delete(newinput);
+								}
+								catch (Exception ex)
+								{
+									_logger.Error(ex.ToString());
+								}
+							}
+						}
+					}
 				}
 			}
-
-			// If no errors were encountered, we loop through the temp directory
-			if (!encounteredErrors)
+			else
 			{
-				_logger.User("Archive found! Successfully extracted");
-				foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
+				// Now, if the file is a supported archive type, also run on all files within
+				bool encounteredErrors = !ArchiveTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
+
+				// Remove the current file if we are in recursion so it's not picked up in the next step
+				if (recurse)
 				{
-					success &= ProcessFile(file, true);
+					try
+					{
+						File.Delete(input);
+					}
+					catch (Exception ex)
+					{
+						_logger.Error(ex.ToString());
+					}
+				}
+
+				// If no errors were encountered, we loop through the temp directory
+				if (!encounteredErrors)
+				{
+					_logger.User("Archive found! Successfully extracted");
+					foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
+					{
+						success &= ProcessFile(file, true);
+					}
 				}
 			}
 
