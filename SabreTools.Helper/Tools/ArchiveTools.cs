@@ -41,6 +41,7 @@ namespace SabreTools.Helper
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex);
+				outarchive?.SaveTo(archiveFileName, new CompressionInfo { Type = CompressionType.Deflate });
 			}
 			finally
 			{
@@ -76,6 +77,7 @@ namespace SabreTools.Helper
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex);
+				outarchive?.SaveTo(archiveFileName, new CompressionInfo { Type = CompressionType.Deflate });
 			}
 			finally
 			{
