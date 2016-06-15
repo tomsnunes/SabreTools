@@ -248,7 +248,7 @@ namespace SabreTools.Helper
 			ArchiveType? oat = (File.Exists(outputarc) ? GetCurrentArchiveType(outputarc, logger) : ArchiveType.Zip);
 
 			// If we got back null (or the output is not a Zipfile), then it's not an archive, so we we return
-			if (iat == null || (oat == null || oat != ArchiveType.Zip))
+			if (iat == null || (oat == null || oat != ArchiveType.Zip) || inputarc == outputarc)
 			{
 				return success;
 			}
