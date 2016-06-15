@@ -1,6 +1,8 @@
-﻿using SharpCompress.Common;
+﻿using SharpCompress.Archive;
+using SharpCompress.Common;
 using SharpCompress.Reader;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -171,6 +173,59 @@ namespace SabreTools.Helper
 			}
 
 			return !encounteredErrors;
+		}
+
+		/// <summary>
+		/// Generate a list of RomData objects from the header values in an archive
+		/// </summary>
+		/// <param name="input">Input file to get data from</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>List of RomData objects representing the found data</returns>
+		public static List<RomData> GetArchiveFileInfo(string input, Logger logger)
+		{
+			List<RomData> roms = new List<RomData>();
+			string gamename = Path.GetFileNameWithoutExtension(input);
+
+			// First get the archive type
+			ArchiveType? at = GetCurrentArchiveType(input, logger);
+
+			// If we got back null, then it's not an archive, so we we return
+			if (at == null)
+			{
+				return roms;
+			}
+
+			IReader reader = null;
+			try
+			{
+				reader = ReaderFactory.Open(File.OpenRead(input));
+				logger.Log("Found archive of type: " + at);
+
+				if (at != ArchiveType.Tar)
+				{
+					IArchiveEntry entry;
+					while ((entry = reader.Entry as IArchiveEntry) != null)
+					{
+						roms.Add(new RomData
+						{
+							Name = entry.Key,
+							Game = gamename,
+							Size = entry.Size,
+							CRC = entry.Crc.ToString("X"),
+						});
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+			}
+			finally
+			{
+				reader?.Dispose();
+			}
+
+			return roms;
 		}
 
 		/// <summary>
