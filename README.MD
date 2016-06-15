@@ -60,6 +60,15 @@ A simple auxilary tool that detects and removes headers and also restores header
 </ul>
 The saved headers are currently stored in a database; multiple headers allowed per file.
 
+<b>SimpleSort</b>
+<p/>
+A simple rebuild-from-DAT tool that allows users to sort from the commandline.
+<ul>
+	<li>Rebuild from multiple sources</li>
+	<li>Single DAT and output directory support</li>
+	<li>Header skipper support</li>
+</ul>
+
 <h3>Power User Tools</h3>
 
 This section is for tools that have been requested for a highly specific purpose and are not generally going to be used by regular users. All of them have a possibility of being included in the main DATabase program eventually.
