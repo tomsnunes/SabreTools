@@ -401,13 +401,15 @@ namespace SabreTools
 			}
 
 			/// TODO: Implement flag for external scanning only
-			bool externalScan = false;
+			bool externalScan = true;
 			if (externalScan)
 			{
+				_logger.Log("Beginning quick scan of contents from '" + input + "'");
 				List<RomData> internalRomData = ArchiveTools.GetArchiveFileInfo(input, _logger);
+				_logger.Log(internalRomData.Count + " entries found in '" + input + "'");
 
 				// If the list is populated, then the file was a filled archive
-				if (internalRomData.Count >= 0)
+				if (internalRomData.Count > 0)
 				{
 					foreach (RomData rom in internalRomData)
 					{

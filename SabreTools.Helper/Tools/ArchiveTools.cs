@@ -200,20 +200,19 @@ namespace SabreTools.Helper
 			try
 			{
 				reader = ReaderFactory.Open(File.OpenRead(input));
-				logger.Log("Found archive of type: " + at);
 
 				if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
 				{
 					// Create the temp directory
 					Directory.CreateDirectory(tempdir);
 
-					IArchiveEntry entry;
-					while ((entry = reader.Entry as IArchiveEntry) != null)
+					while (reader.MoveToNextEntry())
 					{
-						if (entry.Key.Contains(entryname))
+						logger.Log("Current entry name: '" + reader.Entry.Key + "'");
+						if (reader.Entry != null && reader.Entry.Key.Contains(entryname))
 						{
-							entry.WriteToDirectory(tempdir);
-							outfile = tempdir + Path.DirectorySeparatorChar + entry.Key;
+							reader.WriteEntryToFile(tempdir + Path.DirectorySeparatorChar + reader.Entry.Key);
+							outfile = tempdir + Path.DirectorySeparatorChar + reader.Entry.Key;
 						}
 					}
 				}
@@ -259,16 +258,21 @@ namespace SabreTools.Helper
 
 				if (at != ArchiveType.Tar)
 				{
-					IArchiveEntry entry;
-					while ((entry = reader.Entry as IArchiveEntry) != null)
+					while (reader.MoveToNextEntry())
 					{
-						roms.Add(new RomData
+						if (reader.Entry != null && !reader.Entry.IsDirectory)
 						{
-							Name = entry.Key,
-							Game = gamename,
-							Size = entry.Size,
-							CRC = entry.Crc.ToString("X"),
-						});
+							logger.Log("Entry found: '" + reader.Entry.Key + "': " + reader.Entry.Size + ", " + reader.Entry.Crc.ToString("X").ToLowerInvariant());
+
+							roms.Add(new RomData
+							{
+								Type = "rom",
+								Name = reader.Entry.Key,
+								Game = gamename,
+								Size = reader.Entry.Size,
+								CRC = reader.Entry.Crc.ToString("X").ToLowerInvariant(),
+							});
+						}
 					}
 				}
 			}
