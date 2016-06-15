@@ -105,11 +105,11 @@ namespace SabreTools.Helper
 			ArchiveScanLevel gz, ArchiveScanLevel rar, ArchiveScanLevel zip, Logger logger)
 		{
 			bool encounteredErrors = true;
-			IArchive archive = null;
+			IReader reader = null;
 			try
 			{
-				archive = ArchiveFactory.Open(input);
-				ArchiveType at = archive.Type;
+				reader = ReaderFactory.Open(File.OpenRead(input));
+				ArchiveType at = reader.ArchiveType;
 				logger.Log("Found archive of type: " + at);
 
 				if ((at == ArchiveType.Zip && zip != ArchiveScanLevel.External) ||
@@ -117,22 +117,19 @@ namespace SabreTools.Helper
 					(at == ArchiveType.Rar && rar != ArchiveScanLevel.External))
 				{
 					// Create the temp directory
-					DirectoryInfo di = Directory.CreateDirectory(tempdir);
+					Directory.CreateDirectory(tempdir);
 
 					// Extract all files to the temp directory
-					using (IReader reader = archive.ExtractAllEntries())
-					{
-						reader.WriteAllToDirectory(tempdir, ExtractOptions.ExtractFullPath);
-						encounteredErrors = false;
-					}
+					reader.WriteAllToDirectory(tempdir, ExtractOptions.ExtractFullPath);
+					encounteredErrors = false;
 				}
 				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
 				{
 					// Close the original archive handle
-					archive.Dispose();
+					reader.Dispose();
 
 					// Create the temp directory
-					DirectoryInfo di = Directory.CreateDirectory(tempdir);
+					Directory.CreateDirectory(tempdir);
 
 					using (FileStream itemstream = File.OpenRead(input))
 					{
@@ -147,6 +144,10 @@ namespace SabreTools.Helper
 					encounteredErrors = false;
 				}
 			}
+			catch (EndOfStreamException)
+			{
+				// Catch this but don't count it as an error because SharpCompress is unsafe
+			}
 			catch (InvalidOperationException)
 			{
 				encounteredErrors = true;
@@ -158,7 +159,7 @@ namespace SabreTools.Helper
 			}
 			finally
 			{
-				archive?.Dispose();
+				reader?.Dispose();
 			}
 
 			return !encounteredErrors;
