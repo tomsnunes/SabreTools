@@ -231,6 +231,79 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Attempt to copy a file between archives
+		/// </summary>
+		/// <param name="inputarc">Source archive name</param>
+		/// <param name="outputarc">Destination archive name</param>
+		/// <param name="inentryname">Input entry name</param>
+		/// <param name="outentryname">Output entry name</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the copy was a success, false otherwise</returns>
+		public static bool CopyFileBetweenArchives(string inputarc, string outputarc, string inentryname, string outentryname, Logger logger)
+		{
+			bool success = false;
+
+			// First get the archive types
+			ArchiveType? iat = GetCurrentArchiveType(inputarc, logger);
+			ArchiveType? oat = (File.Exists(outputarc) ? GetCurrentArchiveType(outputarc, logger) : ArchiveType.Zip);
+
+			// If we got back null (or the output is not a Zipfile), then it's not an archive, so we we return
+			if (iat == null || (oat == null || oat != ArchiveType.Zip))
+			{
+				return success;
+			}
+
+			IReader reader = null;
+			ZipArchive outarchive = null;
+			try
+			{
+				reader = ReaderFactory.Open(File.OpenRead(inputarc));
+
+				if (iat == ArchiveType.Zip || iat == ArchiveType.SevenZip || iat == ArchiveType.Rar)
+				{
+					while (reader.MoveToNextEntry())
+					{
+						logger.Log("Current entry name: '" + reader.Entry.Key + "'");
+						if (reader.Entry != null && reader.Entry.Key.Contains(inentryname))
+						{
+							if (!File.Exists(outputarc))
+							{
+								outarchive = ZipFile.Open(outputarc, ZipArchiveMode.Create);
+							}
+							else
+							{
+								outarchive = ZipFile.Open(outputarc, ZipArchiveMode.Update);
+							}
+
+							if (outarchive.Mode == ZipArchiveMode.Create || outarchive.GetEntry(outentryname) == null)
+							{
+								IArchiveEntry iae = outarchive.CreateEntry(outentryname, CompressionLevel.Optimal) as IArchiveEntry;
+								using (Stream iaestream = iae.OpenEntryStream())
+								using (Stream readerstream = (reader.Entry as IArchiveEntry).OpenEntryStream())
+								{
+									readerstream.CopyTo(iaestream);
+								}
+							}
+							success = true;
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+				success = false;
+			}
+			finally
+			{
+				reader?.Dispose();
+				outarchive?.Dispose();
+			}
+
+			return success;
+		}
+
+		/// <summary>
 		/// Generate a list of RomData objects from the header values in an archive
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
