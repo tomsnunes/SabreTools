@@ -182,10 +182,10 @@ namespace SabreTools.Helper
 		/// <param name="entryname">Name of the entry to be extracted</param>
 		/// <param name="tempdir">Temporary directory for archive extraction</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public static bool ExtractSingleItemFromArchive(string input, string entryname, string tempdir, Logger logger)
+		/// <returns>Name of the extracted file, null on error</returns>
+		public static string ExtractSingleItemFromArchive(string input, string entryname, string tempdir, Logger logger)
 		{
-			bool encounteredErrors = true;
+			string outfile = null;
 
 			// First get the archive type
 			ArchiveType? at = GetCurrentArchiveType(input, logger);
@@ -193,7 +193,7 @@ namespace SabreTools.Helper
 			// If we got back null, then it's not an archive, so we we return
 			if (at == null)
 			{
-				return encounteredErrors;
+				return outfile;
 			}
 
 			IReader reader = null;
@@ -210,33 +210,25 @@ namespace SabreTools.Helper
 					IArchiveEntry entry;
 					while ((entry = reader.Entry as IArchiveEntry) != null)
 					{
-						if (entry.Key == entryname)
+						if (entry.Key.Contains(entryname))
 						{
 							entry.WriteToDirectory(tempdir);
+							outfile = tempdir + Path.DirectorySeparatorChar + entry.Key;
 						}
 					}
-					encounteredErrors = false;
 				}
-			}
-			catch (EndOfStreamException)
-			{
-				// Catch this but don't count it as an error because SharpCompress is unsafe
-			}
-			catch (InvalidOperationException)
-			{
-				encounteredErrors = true;
 			}
 			catch (Exception ex)
 			{
 				logger.Error(ex.ToString());
-				encounteredErrors = true;
+				outfile = null;
 			}
 			finally
 			{
 				reader?.Dispose();
 			}
 
-			return !encounteredErrors;
+			return outfile;
 		}
 
 		/// <summary>
