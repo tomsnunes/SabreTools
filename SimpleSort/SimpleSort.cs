@@ -446,6 +446,25 @@ namespace SabreTools
 			}
 			else
 			{
+				// If the file isn't an archive, skip out sooner
+				if (ArchiveTools.GetCurrentArchiveType(input, _logger) == null)
+				{
+					// Remove the current file if we are in recursion so it's not picked up in the next step
+					if (recurse)
+					{
+						try
+						{
+							File.Delete(input);
+						}
+						catch (Exception ex)
+						{
+							_logger.Error(ex.ToString());
+						}
+					}
+
+					return success;
+				}
+
 				// Now, if the file is a supported archive type, also run on all files within
 				bool encounteredErrors = !ArchiveTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
 
