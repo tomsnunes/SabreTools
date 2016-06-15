@@ -176,6 +176,70 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Attempt to extract a file from an archive
+		/// </summary>
+		/// <param name="input">Name of the archive to be extracted</param>
+		/// <param name="entryname">Name of the entry to be extracted</param>
+		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the extraction was a success, false otherwise</returns>
+		public static bool ExtractSingleItemFromArchive(string input, string entryname, string tempdir, Logger logger)
+		{
+			bool encounteredErrors = true;
+
+			// First get the archive type
+			ArchiveType? at = GetCurrentArchiveType(input, logger);
+
+			// If we got back null, then it's not an archive, so we we return
+			if (at == null)
+			{
+				return encounteredErrors;
+			}
+
+			IReader reader = null;
+			try
+			{
+				reader = ReaderFactory.Open(File.OpenRead(input));
+				logger.Log("Found archive of type: " + at);
+
+				if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
+				{
+					// Create the temp directory
+					Directory.CreateDirectory(tempdir);
+
+					IArchiveEntry entry;
+					while ((entry = reader.Entry as IArchiveEntry) != null)
+					{
+						if (entry.Key == entryname)
+						{
+							entry.WriteToDirectory(tempdir);
+						}
+					}
+					encounteredErrors = false;
+				}
+			}
+			catch (EndOfStreamException)
+			{
+				// Catch this but don't count it as an error because SharpCompress is unsafe
+			}
+			catch (InvalidOperationException)
+			{
+				encounteredErrors = true;
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+				encounteredErrors = true;
+			}
+			finally
+			{
+				reader?.Dispose();
+			}
+
+			return !encounteredErrors;
+		}
+
+		/// <summary>
 		/// Generate a list of RomData objects from the header values in an archive
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
