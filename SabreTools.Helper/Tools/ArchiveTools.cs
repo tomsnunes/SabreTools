@@ -1,5 +1,4 @@
-﻿using SharpCompress.Archive;
-using SharpCompress.Common;
+﻿using SharpCompress.Common;
 using SharpCompress.Reader;
 using System;
 using System.IO;
@@ -105,11 +104,20 @@ namespace SabreTools.Helper
 			ArchiveScanLevel gz, ArchiveScanLevel rar, ArchiveScanLevel zip, Logger logger)
 		{
 			bool encounteredErrors = true;
+
+			// First get the archive type
+			ArchiveType? at = GetCurrentArchiveType(input, logger);
+
+			// If we got back null, then it's not an archive, so we we return
+			if (at == null)
+			{
+				return encounteredErrors;
+			}
+
 			IReader reader = null;
 			try
 			{
 				reader = ReaderFactory.Open(File.OpenRead(input));
-				ArchiveType at = reader.ArchiveType;
 				logger.Log("Found archive of type: " + at);
 
 				if ((at == ArchiveType.Zip && zip != ArchiveScanLevel.External) ||
@@ -169,6 +177,7 @@ namespace SabreTools.Helper
 		/// Retrieve file information for a single torrent GZ file
 		/// </summary>
 		/// <param name="input">Filename to get information from</param>
+		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
 		public static RomData GetTorrentGZFileInfo(string input, Logger logger)
 		{
@@ -243,6 +252,34 @@ namespace SabreTools.Helper
 			};
 
 			return rom;
+		}
+
+		/// <summary>
+		/// Returns the archive type of an input file
+		/// </summary>
+		/// <param name="input">Input file to check</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>ArchiveType of inputted file (null on error)</returns>
+		public static ArchiveType? GetCurrentArchiveType(string input, Logger logger)
+		{
+			ArchiveType? outtype = null;
+
+			IReader reader = null;
+			try
+			{
+				reader = ReaderFactory.Open(File.OpenRead(input));
+				outtype = reader.ArchiveType;
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+			}
+			finally
+			{
+				reader?.Dispose();
+			}
+
+			return outtype;
 		}
 	}
 }
