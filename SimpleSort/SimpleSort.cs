@@ -405,7 +405,14 @@ namespace SabreTools
 					}
 
 					// Now remove this temporary file
-					File.Delete(newinput);
+					try
+					{
+						File.Delete(newinput);
+					}
+					catch
+					{
+						// Don't log file deletion errors
+					}
 				}
 			}
 
@@ -437,7 +444,7 @@ namespace SabreTools
 								}
 								catch (Exception ex)
 								{
-									_logger.Error(ex.ToString());
+									// Don't log file deletion errors
 								}
 							}
 						}
@@ -458,7 +465,7 @@ namespace SabreTools
 						}
 						catch (Exception ex)
 						{
-							_logger.Error(ex.ToString());
+							// Don't log file deletion errors
 						}
 					}
 
@@ -477,7 +484,7 @@ namespace SabreTools
 					}
 					catch (Exception ex)
 					{
-						_logger.Error(ex.ToString());
+						// Don't log file deletion errors
 					}
 				}
 
