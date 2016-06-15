@@ -286,22 +286,18 @@ namespace SabreTools
 				}
 			}
 
-			// Now process the output directory and write all to zipfiles
-			foreach (string dir in Directory.EnumerateDirectories(_outdir, "*", SearchOption.TopDirectoryOnly))
+			// Now one final delete of the temp directory
+			while (Directory.Exists(_tempdir))
 			{
-				ArchiveTools.WriteFolderToArchive(dir, _outdir, ArchiveType.Zip);
 				try
 				{
-					Directory.Delete(dir, true);
+					Directory.Delete(_tempdir, true);
 				}
-				catch (Exception ex)
+				catch
 				{
-					_logger.Error(ex.ToString());
+					continue;
 				}
 			}
-
-			// Now one final delete of the temp directory
-			Directory.Delete(_tempdir, true);
 
 			return success;
 		}
@@ -363,8 +359,7 @@ namespace SabreTools
 				foreach (RomData found in foundroms)
 				{
 					_logger.Log("Matched name: " + found.Name);
-					string singleFileName = _outdir + Path.DirectorySeparatorChar + found.Game + Path.DirectorySeparatorChar + found.Name;
-					Output.CopyFileToNewLocation(input, singleFileName);
+					ArchiveTools.WriteToArchive(input, _outdir, found);
 				}
 
 				// Now get the headerless file if it exists
@@ -388,20 +383,16 @@ namespace SabreTools
 					_logger.User("File '" + newinput + "' had " + founddroms.Count + " matches in the DAT!");
 					foreach (RomData found in founddroms)
 					{
-						_logger.Log("Matched name: " + found.Name);
-
 						// First output the headerless rom
-						string singleFileName = _outdir + Path.DirectorySeparatorChar + found.Game + Path.DirectorySeparatorChar + found.Name;
-						Output.CopyFileToNewLocation(newinput, singleFileName);
+						_logger.Log("Matched name: " + found.Name);
+						ArchiveTools.WriteToArchive(newinput, _outdir, found);
 
 						// Then output the headered rom (renamed)
 						RomData newfound = found;
 						newfound.Name = Path.GetFileNameWithoutExtension(newfound.Name) + " (" + rom.CRC + ")" + Path.GetExtension(newfound.Name);
 
 						_logger.Log("Matched name: " + newfound.Name);
-
-						singleFileName = _outdir + Path.DirectorySeparatorChar + newfound.Game + Path.DirectorySeparatorChar + newfound.Name;
-						Output.CopyFileToNewLocation(input, singleFileName);
+						ArchiveTools.WriteToArchive(input, _outdir, newfound);
 					}
 
 					// Now remove this temporary file
@@ -415,7 +406,14 @@ namespace SabreTools
 			// Remove the current file if we are in recursion so it's not picked up in the next step
 			if (recurse)
 			{
-				File.Delete(input);
+				try
+				{
+					File.Delete(input);
+				}
+				catch (Exception ex)
+				{
+					_logger.Error(ex.ToString());
+				}
 			}
 
 			// If no errors were encountered, we loop through the temp directory

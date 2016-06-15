@@ -1,7 +1,6 @@
 ﻿using SharpCompress.Archive;
 using SharpCompress.Common;
 using SharpCompress.Reader;
-using SharpCompress.Writer;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -17,67 +16,44 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="input">Input filename to be moved</param>
 		/// <param name="output">Output directory to build to</param>
-		/// <param name="archiveType">Type of archive to attempt to write to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		public static void WriteFileToArchive(string input, string output, ArchiveType archiveType, RomData rom)
+		public static void WriteToArchive(string input, string output, RomData rom)
 		{
 			string archiveFileName = output + Path.DirectorySeparatorChar + rom.Game + ".zip";
-			string singleFileName = output + Path.DirectorySeparatorChar + rom.Game + Path.DirectorySeparatorChar + rom.Name;
 
-			IWritableArchive outarchive = null;
+			ZipArchive outarchive = null;
 			try
 			{
 				if (!File.Exists(archiveFileName))
 				{
-					outarchive = ArchiveFactory.Create(archiveType) as IWritableArchive;
+					outarchive = ZipFile.Open(archiveFileName, ZipArchiveMode.Create);
 				}
 				else
 				{
-					outarchive = ArchiveFactory.Open(archiveFileName, Options.LookForHeader) as IWritableArchive;
+					outarchive = ZipFile.Open(archiveFileName, ZipArchiveMode.Update);
 				}
-				outarchive.AddEntry(rom.Name, input);
-				outarchive.SaveTo(archiveFileName, new CompressionInfo { Type = CompressionType.Deflate });
+
+				if (File.Exists(input))
+				{
+					if (outarchive.Mode == ZipArchiveMode.Create || outarchive.GetEntry(rom.Name) == null)
+					{
+						outarchive.CreateEntryFromFile(input, rom.Name, CompressionLevel.Optimal);
+					}
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						if (outarchive.Mode == ZipArchiveMode.Create || outarchive.GetEntry(file) == null)
+						{
+							outarchive.CreateEntryFromFile(file, file, CompressionLevel.Optimal);
+						}
+					}
+				}
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex);
-				outarchive?.SaveTo(archiveFileName, new CompressionInfo { Type = CompressionType.Deflate });
-			}
-			finally
-			{
-				outarchive?.Dispose();
-			}
-		}
-
-		/// <summary>
-		/// Copy a file either to an output archive or to an output folder
-		/// </summary>
-		/// <param name="input">Input filename to be moved</param>
-		/// <param name="output">Output directory to build to</param>
-		/// <param name="archiveType">Type of archive to attempt to write to</param>
-		/// <param name="rom">RomData representing the new information</param>
-		public static void WriteFolderToArchive(string input, string output, ArchiveType archiveType)
-		{
-			string archiveFileName = output + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(input) + ".zip";
-
-			IWritableArchive outarchive = null;
-			try
-			{
-				if (!File.Exists(archiveFileName))
-				{
-					outarchive = ArchiveFactory.Create(archiveType) as IWritableArchive;
-				}
-				else
-				{
-					outarchive = ArchiveFactory.Open(archiveFileName, Options.LookForHeader) as IWritableArchive;
-				}
-				outarchive.AddAllFromDirectory(input, "*", SearchOption.AllDirectories);
-				outarchive.SaveTo(archiveFileName, new CompressionInfo { Type = CompressionType.Deflate });
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex);
-				outarchive?.SaveTo(archiveFileName, new CompressionInfo { Type = CompressionType.Deflate });
 			}
 			finally
 			{
@@ -144,9 +120,11 @@ namespace SabreTools.Helper
 					DirectoryInfo di = Directory.CreateDirectory(tempdir);
 
 					// Extract all files to the temp directory
-					IReader reader = archive.ExtractAllEntries();
-					reader.WriteAllToDirectory(tempdir, ExtractOptions.ExtractFullPath);
-					encounteredErrors = false;
+					using (IReader reader = archive.ExtractAllEntries())
+					{
+						reader.WriteAllToDirectory(tempdir, ExtractOptions.ExtractFullPath);
+						encounteredErrors = false;
+					}
 				}
 				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
 				{
@@ -168,24 +146,19 @@ namespace SabreTools.Helper
 					}
 					encounteredErrors = false;
 				}
-				archive.Dispose();
 			}
 			catch (InvalidOperationException)
 			{
 				encounteredErrors = true;
-				if (archive != null)
-				{
-					archive.Dispose();
-				}
 			}
 			catch (Exception ex)
 			{
 				logger.Error(ex.ToString());
 				encounteredErrors = true;
-				if (archive != null)
-				{
-					archive.Dispose();
-				}
+			}
+			finally
+			{
+				archive?.Dispose();
 			}
 
 			return !encounteredErrors;
