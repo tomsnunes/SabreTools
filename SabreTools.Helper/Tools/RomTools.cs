@@ -17,7 +17,7 @@ namespace SabreTools.Helper
 		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
 		/// <remarks>Add read-offset for hash info</remarks>
-		public static RomData GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false)
+		public static RomData GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false, long offset = 0)
 		{
 			RomData rom = new RomData
 			{
@@ -36,6 +36,12 @@ namespace SabreTools.Helper
 				using (SHA1 sha1 = SHA1.Create())
 				using (FileStream fs = File.OpenRead(input))
 				{
+					// Seek to the starting position, if one is set
+					if (offset > 0)
+					{
+						fs.Seek(offset, SeekOrigin.Begin);
+					}
+
 					byte[] buffer = new byte[1024];
 					int read;
 					while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
