@@ -14,6 +14,7 @@ namespace SabreTools
 		private List<string> _inputs;
 		private string _outdir;
 		private string _tempdir;
+		private bool _externalScan;
 		private ArchiveScanLevel _7z;
 		private ArchiveScanLevel _gz;
 		private ArchiveScanLevel _rar;
@@ -27,18 +28,20 @@ namespace SabreTools
 		/// <param name="inputs">List of input files/folders to check</param>
 		/// <param name="outdir">Output directory to use to build to</param>
 		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="externalScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public SimpleSort(DatData datdata, List<string> inputs, string outdir, string tempdir,
-			int sevenzip, int gz, int rar, int zip, Logger logger)
+			bool externalScan, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			_datdata = datdata;
 			_inputs = inputs;
 			_outdir = (outdir == "" ? "Rebuild" : outdir);
 			_tempdir = (tempdir == "" ? "__TEMP__" : tempdir);
+			_externalScan = externalScan;
 			_7z = (ArchiveScanLevel)(sevenzip < 0 || sevenzip > 2 ? 0 : sevenzip);
 			_gz = (ArchiveScanLevel)(gz < 0 || gz > 2 ? 0 : gz);
 			_rar = (ArchiveScanLevel)(rar < 0 || rar > 2 ? 0 : rar);
@@ -83,6 +86,7 @@ namespace SabreTools
 
 			// Set all default values
 			bool help = false,
+				externalScan = false,
 				simpleSort = true;
 			int sevenzip = 0,
 				gz = 2,
@@ -102,6 +106,10 @@ namespace SabreTools
 					case "-h":
 					case "--help":
 						help = true;
+						break;
+					case "-qs":
+					case "--quick":
+						externalScan = true;
 						break;
 					default:
 						string temparg = arg.Replace("\"", "").Replace("file://", "");
@@ -192,7 +200,7 @@ namespace SabreTools
 			{
 				if (datfile != "")
 				{
-					InitSimpleSort(datfile, inputs, outdir, tempdir, sevenzip, gz, rar, zip, logger);
+					InitSimpleSort(datfile, inputs, outdir, tempdir, externalScan, sevenzip, gz, rar, zip, logger);
 				}
 				else
 				{
@@ -220,18 +228,19 @@ namespace SabreTools
 		/// <param name="inputs">List of input files/folders to check</param>
 		/// <param name="outdir">Output directory to use to build to</param>
 		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="externalScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		private static void InitSimpleSort(string datfile, List<string> inputs, string outdir, string tempdir, 
-			int sevenzip, int gz, int rar, int zip, Logger logger)
+			bool externalScan, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			DatData datdata = new DatData();
 			datdata = DatTools.Parse(datfile, 0, 0, datdata, logger);
 
-			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, sevenzip, gz, rar, zip, logger);
+			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, externalScan, sevenzip, gz, rar, zip, logger);
 			ss.Process();
 		}
 
@@ -400,9 +409,8 @@ namespace SabreTools
 				}
 			}
 
-			/// TODO: Implement flag for external scanning only
-			bool externalScan = true;
-			if (externalScan)
+			// If external scanning is enabled, use that method instead
+			if (_externalScan)
 			{
 				_logger.Log("Beginning quick scan of contents from '" + input + "'");
 				List<RomData> internalRomData = ArchiveTools.GetArchiveFileInfo(input, _logger);
