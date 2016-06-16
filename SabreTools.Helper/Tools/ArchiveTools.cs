@@ -460,9 +460,9 @@ namespace SabreTools.Helper
 				reader = ReaderFactory.Open(File.OpenRead(input));
 				outtype = reader.ArchiveType;
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				logger.Error(ex.ToString());
+				// Don't log archive open errors
 			}
 			finally
 			{
