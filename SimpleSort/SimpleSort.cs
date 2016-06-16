@@ -581,6 +581,21 @@ namespace SabreTools
 					We have to check if it's an exact duplicate or a hash-duplicate
 					Which is better: traversing the "should have" list or the "do have" list?
 					*/
+					List<RomData> fromDat = sortedByGame[Path.GetFileNameWithoutExtension(archive)];
+					List<RomData> toRemove = new List<RomData>();
+					foreach (RomData rom in roms)
+					{
+						// If it's not in at all or needs renaming, mark for removal
+						if (!fromDat.Contains(rom))
+						{
+							toRemove.Add(rom);
+						}
+						// Otherwise, we leave it be
+						else
+						{
+							
+						}
+					}
 				}
 			}
 
