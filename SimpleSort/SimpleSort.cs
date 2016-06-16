@@ -92,10 +92,10 @@ namespace SabreTools
 				gz = 2,
 				rar = 2,
 				zip = 0;
-			string datfile = "",
-				outdir = "",
+			string outdir = "",
 				tempdir = "";
 			List<string> inputs = new List<string>();
+			List<string> datfiles = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
 			foreach (string arg in args)
@@ -123,7 +123,7 @@ namespace SabreTools
 						}
 						else if (temparg.StartsWith("-dat=") || temparg.StartsWith("--dat="))
 						{
-							datfile = temparg.Split('=')[1];
+							string datfile = temparg.Split('=')[1];
 							if (!File.Exists(datfile))
 							{
 								logger.Error("DAT must be a valid file: " + datfile);
@@ -132,6 +132,7 @@ namespace SabreTools
 								logger.Close();
 								return;
 							}
+							datfiles.Add(datfile);
 						}
 						else if (temparg.StartsWith("-gz=") || temparg.StartsWith("--gz="))
 						{
@@ -198,9 +199,9 @@ namespace SabreTools
 			// If we are doing a simple sort
 			if (simpleSort)
 			{
-				if (datfile != "")
+				if (datfiles.Count > 0)
 				{
-					InitSimpleSort(datfile, inputs, outdir, tempdir, externalScan, sevenzip, gz, rar, zip, logger);
+					InitSimpleSort(datfiles, inputs, outdir, tempdir, externalScan, sevenzip, gz, rar, zip, logger);
 				}
 				else
 				{
@@ -224,7 +225,7 @@ namespace SabreTools
 		/// <summary>
 		/// Wrap sorting files using an input DAT
 		/// </summary>
-		/// <param name="datfile">Name of the DAT to compare against</param>
+		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">List of input files/folders to check</param>
 		/// <param name="outdir">Output directory to use to build to</param>
 		/// <param name="tempdir">Temporary directory for archive extraction</param>
@@ -234,21 +235,25 @@ namespace SabreTools
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private static void InitSimpleSort(string datfile, List<string> inputs, string outdir, string tempdir, 
+		private static void InitSimpleSort(List<string> datfiles, List<string> inputs, string outdir, string tempdir, 
 			bool externalScan, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
+			// Add all of the input DATs into one huge internal DAT
 			DatData datdata = new DatData();
-			datdata = DatTools.Parse(datfile, 0, 0, datdata, logger);
+			foreach (string datfile in datfiles)
+			{
+				datdata = DatTools.Parse(datfile, 0, 0, datdata, logger);
+			}
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, externalScan, sevenzip, gz, rar, zip, logger);
-			ss.Process();
+			ss.RebuildFromFolder();
 		}
 
 		/// <summary>
 		/// Process the DAT and find all matches in input files and folders
 		/// </summary>
 		/// <returns></returns>
-		public bool Process()
+		public bool RebuildFromFolder()
 		{
 			bool success = true;
 
