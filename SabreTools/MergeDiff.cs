@@ -438,7 +438,7 @@ namespace SabreTools
 			// Finally, loop through and output each of the DATs
 			start = DateTime.Now;
 			_logger.User("Outputting all created DATs");
-			for (int j = 1; j < _inputs.Count; j++)
+			for (int j = 0; j < _inputs.Count; j++)
 			{
 				// If we have an output directory set, replace the path
 				string path = "";
