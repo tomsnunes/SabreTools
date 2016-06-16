@@ -246,14 +246,14 @@ namespace SabreTools
 			}
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, externalScan, sevenzip, gz, rar, zip, logger);
-			ss.RebuildFromFolder();
+			ss.RebuildToFolder();
 		}
 
 		/// <summary>
 		/// Process the DAT and find all matches in input files and folders
 		/// </summary>
-		/// <returns></returns>
-		public bool RebuildFromFolder()
+		/// <returns>True if rebuilding was a success, false otherwise</returns>
+		public bool RebuildToFolder()
 		{
 			bool success = true;
 
@@ -281,7 +281,7 @@ namespace SabreTools
 				if (File.Exists(input))
 				{
 					_logger.Log("File found: '" + input + "'");
-					success &= ProcessFile(input);
+					success &= RebuildToFolderHelper(input);
 					Output.CleanDirectory(_tempdir);
 				}
 				else if (Directory.Exists(input))
@@ -290,7 +290,7 @@ namespace SabreTools
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						_logger.Log("File found: '" + file + "'");
-						success &= ProcessFile(file);
+						success &= RebuildToFolderHelper(file);
 						Output.CleanDirectory(_tempdir);
 					}
 				}
@@ -322,7 +322,7 @@ namespace SabreTools
 		/// <param name="input">The name of the input file</param>
 		/// <param name="recurse">True if this is in a recurse step and the file should be deleted, false otherwise (default)</param>
 		/// <returns>True if it was processed properly, false otherwise</returns>
-		private bool ProcessFile(string input, bool recurse = false)
+		private bool RebuildToFolderHelper(string input, bool recurse = false)
 		{
 			bool success = true;
 
@@ -447,7 +447,7 @@ namespace SabreTools
 								{
 									File.Delete(newinput);
 								}
-								catch (Exception ex)
+								catch (Exception)
 								{
 									// Don't log file deletion errors
 								}
@@ -468,7 +468,7 @@ namespace SabreTools
 						{
 							File.Delete(input);
 						}
-						catch (Exception ex)
+						catch (Exception)
 						{
 							// Don't log file deletion errors
 						}
@@ -487,7 +487,7 @@ namespace SabreTools
 					{
 						File.Delete(input);
 					}
-					catch (Exception ex)
+					catch (Exception)
 					{
 						// Don't log file deletion errors
 					}
@@ -499,8 +499,88 @@ namespace SabreTools
 					_logger.User("Archive found! Successfully extracted");
 					foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
 					{
-						success &= ProcessFile(file, true);
+						success &= RebuildToFolderHelper(file, true);
 					}
+				}
+			}
+
+			return success;
+		}
+
+		/// <summary>
+		/// Clean an individual folder based on the DAT
+		/// </summary>
+		/// <returns>True if the cleaning succeeded, false otherwise</returns>
+		public bool InplaceRebuild()
+		{
+			bool success = true;
+
+			/*
+			The process of rebuilding inplace is as follows:
+			0) Resort the input roms by Game since that's more important in this case
+			1) Scan the current folder according to the level specified (no recursion)
+				a - If file is a match in all aspects, set correct flag and pass
+					+ If the file has a header, skip?
+				b - If file is a match in hash but not name, rename, set correct flag and pass
+				c - If file is not a match, extract it to the output folder and remove from archive, set incorrect flag
+			2) For all files that have been removed, check to see if they could be rebuilt to another location
+				a - This behaves similarly (and indeed could call) "RebuildToFolder"
+				b - If a file is a match and rebuilt, remove it from the output folder
+			*/
+
+			// Sort the input set(s) by game
+			SortedDictionary<string, List<RomData>> sortedByGame = DatTools.BucketByGame(_datdata.Roms, false, true, _logger);
+
+			// Assuming archived sets, move all toplevel folders to temp
+			foreach (string directory in Directory.EnumerateDirectories(_outdir, "*", SearchOption.TopDirectoryOnly))
+			{
+				Directory.Move(directory, _tempdir + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(directory));
+			}
+
+			// Now process the inputs (assumed that it's archived sets as of right now
+			foreach (string archive in Directory.EnumerateFiles(_outdir, "*", SearchOption.AllDirectories))
+			{
+				// If the name of the archive is not in the set exactly, move it to temp
+				if (!sortedByGame.ContainsKey(Path.GetFileNameWithoutExtension(archive)))
+				{
+					File.Move(archive, _tempdir + Path.DirectorySeparatorChar + archive);
+				}
+				// Otherwise, we check if it's an archive. If it's not, move it to temp
+				else if (ArchiveTools.GetCurrentArchiveType(Path.GetFullPath(archive), _logger) == null)
+				{
+					File.Move(Path.GetFullPath(archive), _tempdir + Path.DirectorySeparatorChar + archive);
+				}
+				// Finally, if it's an archive and exists properly, we check the insides
+				else
+				{
+					List<RomData> roms = new List<RomData>();
+
+					// If we are in quickscan, get the list of roms that way
+					if (_externalScan)
+					{
+						roms = ArchiveTools.GetArchiveFileInfo(Path.GetFullPath(archive), _logger);
+					}
+					// Otherwise, extract it and get info one by one
+					else
+					{
+						string temparcdir = _tempdir + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(archive);
+						ArchiveTools.ExtractArchive(Path.GetFullPath(archive), temparcdir, _logger);
+						foreach (string tempfile in Directory.EnumerateFiles(temparcdir, "*", SearchOption.AllDirectories))
+						{
+							roms.Add(RomTools.GetSingleFileInfo(Path.GetFullPath(tempfile)));
+						}
+
+						// Clear the temporary archive directory
+						Output.CleanDirectory(temparcdir);
+					}
+
+					// Here, we traverse the newly created list and see if any of the files are in the list corresponding to the game
+					/*
+					Now, how do we do this WITHOUT traversing the list a billion times?
+					Does "contains" work in this situation?
+					We have to check if it's an exact duplicate or a hash-duplicate
+					Which is better: traversing the "should have" list or the "do have" list?
+					*/
 				}
 			}
 
