@@ -511,6 +511,7 @@ namespace SabreTools
 		/// Clean an individual folder based on the DAT
 		/// </summary>
 		/// <returns>True if the cleaning succeeded, false otherwise</returns>
+		/// <remarks>This method is incomplete, it need to be finished before it can be used</remarks>
 		public bool InplaceRebuild()
 		{
 			bool success = true;
