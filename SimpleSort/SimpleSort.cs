@@ -45,7 +45,7 @@ namespace SabreTools
 			_7z = (ArchiveScanLevel)(sevenzip < 0 || sevenzip > 2 ? 0 : sevenzip);
 			_gz = (ArchiveScanLevel)(gz < 0 || gz > 2 ? 0 : gz);
 			_rar = (ArchiveScanLevel)(rar < 0 || rar > 2 ? 0 : rar);
-			_zip = (ArchiveScanLevel)(zip < 0 || zip > 0 ? 0 : zip);
+			_zip = (ArchiveScanLevel)(zip < 0 || zip > 2 ? 0 : zip);
 			_logger = logger;
 		}
 
