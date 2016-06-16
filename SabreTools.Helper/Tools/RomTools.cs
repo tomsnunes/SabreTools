@@ -187,7 +187,7 @@ namespace SabreTools.Helper
 				if (outroms.Count != 0)
 				{
 					// Check if the rom is a duplicate
-					bool dupefound = false;
+					DupeType dupetype = DupeType.None;
 					RomData savedrom = new RomData();
 					int pos = -1;
 					for (int i = 0; i < outroms.Count; i++)
@@ -195,10 +195,10 @@ namespace SabreTools.Helper
 						RomData lastrom = outroms[i];
 
 						// Get the duplicate status
-						dupefound = IsDuplicate(rom, lastrom);
+						dupetype = GetDuplicateStatus(rom, lastrom);
 
 						// If it's a duplicate, skip adding it to the output but add any missing information
-						if (dupefound)
+						if (dupetype != DupeType.None)
 						{
 							savedrom = lastrom;
 							pos = i;
@@ -206,32 +206,7 @@ namespace SabreTools.Helper
 							savedrom.CRC = (String.IsNullOrEmpty(savedrom.CRC) && !String.IsNullOrEmpty(rom.CRC) ? rom.CRC : savedrom.CRC);
 							savedrom.MD5 = (String.IsNullOrEmpty(savedrom.MD5) && !String.IsNullOrEmpty(rom.MD5) ? rom.MD5 : savedrom.MD5);
 							savedrom.SHA1 = (String.IsNullOrEmpty(savedrom.SHA1) && !String.IsNullOrEmpty(rom.SHA1) ? rom.SHA1 : savedrom.SHA1);
-
-							// If the duplicate is external already or should be, set it
-							if (savedrom.Dupe >= DupeType.ExternalHash || savedrom.SystemID != rom.SystemID || savedrom.SourceID != rom.SourceID)
-							{
-								if (savedrom.Game == rom.Game && savedrom.Name == rom.Name)
-								{
-									savedrom.Dupe = DupeType.ExternalAll;
-								}
-								else
-								{
-									savedrom.Dupe = DupeType.ExternalHash;
-								}
-							}
-
-							// Otherwise, it's considered an internal dupe
-							else
-							{
-								if (savedrom.Game == rom.Game && savedrom.Name == rom.Name)
-								{
-									savedrom.Dupe = DupeType.InternalAll;
-								}
-								else
-								{
-									savedrom.Dupe = DupeType.InternalHash;
-								}
-							}
+							savedrom.Dupe = dupetype;
 
 							// If the current system has a lower ID than the previous, set the system accordingly
 							if (rom.SystemID < savedrom.SystemID)
@@ -256,7 +231,7 @@ namespace SabreTools.Helper
 					}
 
 					// If no duplicate is found, add it to the list
-					if (!dupefound)
+					if (dupetype == DupeType.None)
 					{
 						outroms.Add(rom);
 					}
@@ -340,6 +315,51 @@ namespace SabreTools.Helper
 			}
 
 			return dupefound;
+		}
+
+		/// <summary>
+		/// Return the duplicate status of two roms
+		/// </summary>
+		/// <param name="rom">Current rom to check</param>
+		/// <param name="lastrom">Last rom to check against</param>
+		/// <returns>The DupeType corresponding to the relationship between the two</returns>
+		public static DupeType GetDuplicateStatus(RomData rom, RomData lastrom)
+		{
+			DupeType output = DupeType.None;
+
+			// If we don't have a duplicate at all, return none
+			if (!IsDuplicate(rom, lastrom))
+			{
+				return output;
+			}
+
+			// If the duplicate is external already or should be, set it
+			if (lastrom.Dupe >= DupeType.ExternalHash || lastrom.SystemID != rom.SystemID || lastrom.SourceID != rom.SourceID)
+			{
+				if (lastrom.Game == rom.Game && lastrom.Name == rom.Name)
+				{
+					output = DupeType.ExternalAll;
+				}
+				else
+				{
+					output = DupeType.ExternalHash;
+				}
+			}
+
+			// Otherwise, it's considered an internal dupe
+			else
+			{
+				if (lastrom.Game == rom.Game && lastrom.Name == rom.Name)
+				{
+					output = DupeType.InternalAll;
+				}
+				else
+				{
+					output = DupeType.InternalHash;
+				}
+			}
+
+			return output;
 		}
 
 		/// <summary>
