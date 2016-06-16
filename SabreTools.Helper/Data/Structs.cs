@@ -6,7 +6,7 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// Intermediate struct for holding and processing rom data
 	/// </summary>
-	public struct RomData : IComparable
+	public struct RomData : IComparable, IEquatable<RomData>
 	{
 		public string Manufacturer;
 		public string System;
@@ -31,28 +31,27 @@ namespace SabreTools.Helper
 			{
 				RomData comp = (RomData)obj;
 
-				if (this.SystemID == comp.SystemID)
+				if (this.Game == comp.Game)
 				{
-					if (this.SourceID == comp.SourceID)
+					if (this.Name == comp.Name)
 					{
-						if (this.Game == comp.Game)
-						{
-							if (this.Name == comp.Name)
-							{
-								return (RomTools.IsDuplicate(this, comp) ? 0 : 1);
-							}
-							return String.Compare(this.Name, comp.Name);
-						}
-						return String.Compare(this.Game, comp.Game);
+						return (RomTools.IsDuplicate(this, comp) ? 0 : 1);
 					}
-					return this.SourceID - comp.SourceID;
+					return String.Compare(this.Name, comp.Name);
 				}
-				return this.SystemID - comp.SystemID;
+				return String.Compare(this.Game, comp.Game);
 			}
 			catch
 			{
 				return 1;
 			}
+		}
+
+		public bool Equals(RomData other)
+		{
+			return (this.Game == other.Game &&
+				this.Name == other.Name &&
+				RomTools.IsDuplicate(this, other));
 		}
 	}
 
