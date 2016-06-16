@@ -30,16 +30,24 @@ namespace SabreTools.Helper
 			try
 			{
 				RomData comp = (RomData)obj;
-				if (this.Game == comp.Game &&
-					this.Name == comp.Name &&
-					RomTools.IsDuplicate(this, comp))
+
+				if (this.SystemID == comp.SystemID)
 				{
-					return 0;
+					if (this.SourceID == comp.SourceID)
+					{
+						if (this.Game == comp.Game)
+						{
+							if (this.Name == comp.Name)
+							{
+								return (RomTools.IsDuplicate(this, comp) ? 0 : 1);
+							}
+							return String.Compare(this.Name, comp.Name);
+						}
+						return String.Compare(this.Game, comp.Game);
+					}
+					return this.SourceID - comp.SourceID;
 				}
-				else
-				{
-					return 1;
-				}
+				return this.SystemID - comp.SystemID;
 			}
 			catch
 			{
