@@ -155,25 +155,7 @@ namespace SabreTools.Helper
 			// Create output list
 			List<RomData> outroms = new List<RomData>();
 
-			// First sort the roms by size, crc, md5, sha1 (in order)
-			inroms.Sort(delegate (RomData x, RomData y)
-			{
-				if (x.Size == y.Size)
-				{
-					if (x.CRC == y.CRC)
-					{
-						if (x.MD5 == y.MD5)
-						{
-							return String.Compare(x.SHA1, y.SHA1);
-						}
-						return String.Compare(x.MD5, y.MD5);
-					}
-					return String.Compare(x.CRC, y.CRC);
-				}
-				return (int)(x.Size - y.Size);
-			});
-
-			// Then, deduplicate them by checking to see if data matches
+			// Then deduplicate them by checking to see if data matches previous saved roms
 			foreach (RomData rom in inroms)
 			{
 				// If it's a nodump, add and skip
