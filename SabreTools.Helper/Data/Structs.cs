@@ -149,4 +149,29 @@ namespace SabreTools.Helper
 			};
 		}
 	}
+
+	/// <summary>
+	/// Intermediate struct for holding header skipper rule information
+	/// </summary>
+	public struct SkipperRule
+	{
+		long? StartOffset; // null is EOF
+		long? EndOffset; // null if EOF
+		HeaderSkipOperation Operation;
+		List<SkipperTest> Tests;
+	}
+
+	/// <summary>
+	/// Intermediate struct for holding header test information
+	/// </summary>
+	public struct SkipperTest
+	{
+		HeaderSkipTest Type;
+		long? Offset; // null is EOF
+		byte[] Value;
+		bool Result;
+		byte[] Mask;
+		long? Size; // null is PO2, "power of 2" filesize
+		HeaderSkipTestFileOperator Operator;
+	}
 }
