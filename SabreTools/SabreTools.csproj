@@ -103,9 +103,7 @@
     <Compile Include="DATFromDir.cs" />
     <Compile Include="OfflineMerge.cs" />
     <Compile Include="Split.cs" />
-    <Compile Include="ImportExport\Generate.cs" />
     <Compile Include="ImportExport\GenerateTwo.cs" />
-    <Compile Include="ImportExport\Import.cs" />
     <Compile Include="SabreTools.cs" />
     <Compile Include="ImportExport\ImportTwo.cs" />
     <Compile Include="MergeDiff.cs" />
