@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 
 namespace SabreTools.Helper
 {
@@ -19,6 +18,12 @@ namespace SabreTools.Helper
 		/// <remarks>Add read-offset for hash info</remarks>
 		public static Rom GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false, long offset = 0)
 		{
+			// Add safeguard if file doesn't exist
+			if (!File.Exists(input))
+			{
+				return new Rom();
+			}
+
 			Rom rom = new Rom
 			{
 				Name = Path.GetFileName(input),
