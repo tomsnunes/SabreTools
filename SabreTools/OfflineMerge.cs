@@ -69,7 +69,7 @@ namespace SabreTools
 					List<RomData> templist = RomTools.Merge(completeDats.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
-						if (rom.Dupe == DupeType.None && rom.SystemData.Name == _currentNewMerged)
+						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentNewMerged)
 						{
 							if (netNew.ContainsKey(key))
 							{
@@ -93,7 +93,7 @@ namespace SabreTools
 					List<RomData> templist = RomTools.Merge(completeDats.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
-						if (rom.Dupe == DupeType.None && rom.SystemData.Name == _currentAllMerged)
+						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentAllMerged)
 						{
 							if (unneeded.ContainsKey(key))
 							{
@@ -130,7 +130,7 @@ namespace SabreTools
 					List<RomData> templist = RomTools.Merge(midMissing.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
-						if (rom.Dupe == DupeType.None && rom.SystemData.Name == _currentMissingMerged)
+						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentMissingMerged)
 						{
 							if (newMissing.ContainsKey(key))
 							{
@@ -177,7 +177,7 @@ namespace SabreTools
 					{
 						foreach (RomData rom in completeDats.Roms[key])
 						{
-							if (rom.SystemData.Name == _currentNewMerged)
+							if (rom.Metadata.System == _currentNewMerged)
 							{
 								midHave[key].Add(rom);
 							}
@@ -188,7 +188,7 @@ namespace SabreTools
 						List<RomData> roms = new List<RomData>();
 						foreach (RomData rom in completeDats.Roms[key])
 						{
-							if (rom.SystemData.Name == _currentNewMerged)
+							if (rom.Metadata.System == _currentNewMerged)
 							{
 								roms.Add(rom);
 							}
@@ -202,7 +202,7 @@ namespace SabreTools
 					List<RomData> templist = RomTools.Merge(midHave[key], _logger);
 					foreach (RomData rom in templist)
 					{
-						if (rom.Dupe == DupeType.None && rom.SystemData.Name == _currentNewMerged)
+						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentNewMerged)
 						{
 							if (have.ContainsKey(key))
 							{
@@ -370,7 +370,7 @@ namespace SabreTools
 					List<RomData> templist = RomTools.Merge(midHave.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
-						if (rom.Dupe == DupeType.None && rom.SystemData.Name == _currentAllMerged)
+						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentAllMerged)
 						{
 							if (have.ContainsKey(key))
 							{
@@ -440,7 +440,7 @@ namespace SabreTools
 					List<RomData> templist = RomTools.Merge(midHave.Roms[key], _logger);
 					foreach (RomData rom in templist)
 					{
-						if (rom.Dupe == DupeType.None && rom.SystemData.Name == _currentNewMerged)
+						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentNewMerged)
 						{
 							if (have.ContainsKey(key))
 							{

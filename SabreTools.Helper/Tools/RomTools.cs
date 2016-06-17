@@ -209,17 +209,19 @@ namespace SabreTools.Helper
 							savedrom.Dupe = dupetype;
 
 							// If the current system has a lower ID than the previous, set the system accordingly
-							if (rom.SystemData.ID < savedrom.SystemData.ID)
+							if (rom.Metadata.SystemID < savedrom.Metadata.SystemID)
 							{
-								savedrom.SystemData = rom.SystemData;
+								savedrom.Metadata.SystemID = rom.Metadata.SystemID;
+								savedrom.Metadata.System = rom.Metadata.System;
 								savedrom.Game = rom.Game;
 								savedrom.Name = rom.Name;
 							}
 
 							// If the current source has a lower ID than the previous, set the source accordingly
-							if (rom.SourceData.ID < savedrom.SourceData.ID)
+							if (rom.Metadata.SourceID < savedrom.Metadata.SourceID)
 							{
-								savedrom.SourceData = rom.SourceData;
+								savedrom.Metadata.SourceID = rom.Metadata.SourceID;
+								savedrom.Metadata.Source = rom.Metadata.Source;
 								savedrom.Game = rom.Game;
 								savedrom.Name = rom.Name;
 							}
@@ -332,7 +334,7 @@ namespace SabreTools.Helper
 			}
 
 			// If the duplicate is external already or should be, set it
-			if (lastrom.Dupe >= DupeType.ExternalHash || lastrom.SystemData.ID != rom.SystemData.ID || lastrom.SourceData.ID != rom.SourceData.ID)
+			if (lastrom.Dupe >= DupeType.ExternalHash || lastrom.Metadata.SystemID != rom.Metadata.SystemID || lastrom.Metadata.SourceID != rom.Metadata.SourceID)
 			{
 				if (lastrom.Game == rom.Game && lastrom.Name == rom.Name)
 				{
@@ -370,9 +372,9 @@ namespace SabreTools.Helper
 		{
 			roms.Sort(delegate (RomData x, RomData y)
 			{
-				if (x.SystemData.ID == y.SystemData.ID)
+				if (x.Metadata.SystemID == y.Metadata.SystemID)
 				{
-					if (x.SourceData.ID == y.SourceData.ID)
+					if (x.Metadata.SourceID == y.Metadata.SourceID)
 					{
 						if (x.Game == y.Game)
 						{
@@ -380,9 +382,9 @@ namespace SabreTools.Helper
 						}
 						return String.Compare(x.Game, y.Game);
 					}
-					return (norename ? String.Compare(x.Game, y.Game) : x.SourceData.ID - y.SourceData.ID);
+					return (norename ? String.Compare(x.Game, y.Game) : x.Metadata.SourceID - y.Metadata.SourceID);
 				}
-				return (norename ? String.Compare(x.Game, y.Game) : x.SystemData.ID - y.SystemData.ID);
+				return (norename ? String.Compare(x.Game, y.Game) : x.Metadata.SystemID - y.Metadata.SystemID);
 			});
 			return true;
 		}

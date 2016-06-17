@@ -223,13 +223,13 @@ namespace SabreTools
 
 					if (!_norename)
 					{
-						rom.Game += " [" + sources[rom.SourceData.ID] + "]";
+						rom.Game += " [" + sources[rom.Metadata.SourceID] + "]";
 					}
 
 					// If a game has source "0" it's Default. Make this Int32.MaxValue for sorting purposes
-					if (rom.SourceData.ID == 0)
+					if (rom.Metadata.SourceID == 0)
 					{
-						rom.SourceData.ID = Int32.MaxValue;
+						rom.Metadata.SourceID = Int32.MaxValue;
 					}
 
 					temp.Add(rom);

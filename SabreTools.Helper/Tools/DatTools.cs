@@ -173,8 +173,7 @@ namespace SabreTools.Helper
 					{
 						Game = gamename,
 						Type = (line.Trim().StartsWith("disk (") ? "disk" : "rom"),
-						SystemData = new SystemData { ID = sysid },
-						SourceData = new SourceData { ID = srcid },
+						Metadata = new SourceMetadata { SystemID = sysid, SourceID = srcid },
 					};
 
 					string[] gc = line.Trim().Split(' ');
@@ -577,8 +576,7 @@ namespace SabreTools.Helper
 							Name = rominfo[5],
 							CRC = rominfo[6].ToLowerInvariant(),
 							Size = Int64.Parse(rominfo[7]),
-							SystemData = new SystemData { ID = sysid },
-							SourceData = new SourceData { ID = srcid },
+							Metadata = new SourceMetadata { SystemID = sysid, SourceID = srcid },
 						};
 
 						// Sanitize the hashes from null, hex sizes, and "true blank" strings
@@ -1158,8 +1156,7 @@ namespace SabreTools.Helper
 													SHA1 = sha1,
 													Nodump = nodump,
 													Date = date,
-													SystemData = new SystemData { ID = sysid, Name = filename },
-													SourceData = new SourceData { ID = srcid },
+													Metadata = new SourceMetadata { SystemID = sysid, System = filename, SourceID = srcid },
 												};
 
 												if (datdata.Roms.ContainsKey(key))
@@ -1394,8 +1391,7 @@ namespace SabreTools.Helper
 									SHA1 = sha1,
 									Nodump = nodump,
 									Date = date,
-									SystemData = new SystemData { ID = sysid, Name = filename },
-									SourceData = new SourceData { ID = srcid },
+									Metadata = new SourceMetadata { SystemID = sysid, System = filename, SourceID = srcid },
 								};
 
 								if (datdata.Roms.ContainsKey(key))
@@ -1465,7 +1461,7 @@ namespace SabreTools.Helper
 				foreach (RomData rom in newroms)
 				{
 					count++;
-					string key = (norename ? "" : rom.SystemData.ID.ToString().PadLeft(10, '0') + "-" + rom.SourceData.ID.ToString().PadLeft(10, '0') + "-") + rom.Game.ToLowerInvariant();
+					string key = (norename ? "" : rom.Metadata.SystemID.ToString().PadLeft(10, '0') + "-" + rom.Metadata.SourceID.ToString().PadLeft(10, '0') + "-") + rom.Game.ToLowerInvariant();
 					if (sortable.ContainsKey(key))
 					{
 						sortable[key].Add(rom);

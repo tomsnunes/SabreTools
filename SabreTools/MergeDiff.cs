@@ -287,20 +287,20 @@ namespace SabreTools
 						if (rom.Dupe < DupeType.ExternalHash)
 						{
 							// Individual DATs that are output
-							if (outDats[rom.SystemData.ID].Roms.ContainsKey(key))
+							if (outDats[rom.Metadata.SystemID].Roms.ContainsKey(key))
 							{
-								outDats[rom.SystemData.ID].Roms[key].Add(rom);
+								outDats[rom.Metadata.SystemID].Roms[key].Add(rom);
 							}
 							else
 							{
 								List<RomData> tl = new List<RomData>();
 								tl.Add(rom);
-								outDats[rom.SystemData.ID].Roms.Add(key, tl);
+								outDats[rom.Metadata.SystemID].Roms.Add(key, tl);
 							}
 
 							// Merged no-duplicates DAT
 							RomData newrom = rom;
-							newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.SystemData.ID].Split('¬')[0]) + ")";
+							newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
 
 							if (outerDiffData.Roms.ContainsKey(key))
 							{
@@ -318,7 +318,7 @@ namespace SabreTools
 						if (rom.Dupe >= DupeType.ExternalHash)
 						{
 							RomData newrom = rom;
-							newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.SystemData.ID].Split('¬')[0]) + ")";
+							newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
 
 							if (dupeData.Roms.ContainsKey(key))
 							{
@@ -420,15 +420,15 @@ namespace SabreTools
 				{
 					foreach (RomData rom in roms)
 					{
-						if (outDats[rom.SystemData.ID].Roms.ContainsKey(key))
+						if (outDats[rom.Metadata.SystemID].Roms.ContainsKey(key))
 						{
-							outDats[rom.SystemData.ID].Roms[key].Add(rom);
+							outDats[rom.Metadata.SystemID].Roms[key].Add(rom);
 						}
 						else
 						{
 							List<RomData> tl = new List<RomData>();
 							tl.Add(rom);
-							outDats[rom.SystemData.ID].Roms.Add(key, tl);
+							outDats[rom.Metadata.SystemID].Roms.Add(key, tl);
 						}
 					}
 				}
@@ -477,8 +477,8 @@ namespace SabreTools
 					foreach (RomData rom in userData.Roms[key])
 					{
 						RomData newrom = rom;
-						string filename = _inputs[newrom.SystemData.ID].Split('¬')[0];
-						string rootpath = _inputs[newrom.SystemData.ID].Split('¬')[1];
+						string filename = _inputs[newrom.Metadata.SystemID].Split('¬')[0];
+						string rootpath = _inputs[newrom.Metadata.SystemID].Split('¬')[1];
 
 						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
 						filename = filename.Remove(0, rootpath.Length);
