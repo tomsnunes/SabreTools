@@ -130,7 +130,7 @@ namespace SabreTools.Helper
 					Directory.CreateDirectory(tempdir);
 
 					// Extract all files to the temp directory
-					reader.WriteAllToDirectory(tempdir, ExtractOptions.ExtractFullPath);
+					reader.WriteAllToDirectory(tempdir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
 					encounteredErrors = false;
 				}
 				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
@@ -213,7 +213,7 @@ namespace SabreTools.Helper
 						if (reader.Entry != null && reader.Entry.Key.Contains(entryname))
 						{
 							outfile = Path.Combine(tempdir, reader.Entry.Key);
-							reader.WriteEntryToFile(outfile);
+							reader.WriteEntryToFile(outfile, ExtractOptions.Overwrite);
 						}
 					}
 				}
