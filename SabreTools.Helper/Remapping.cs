@@ -143,6 +143,10 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Populate the entire list of header Skippers
 		/// </summary>
+		/// <remarks>
+		/// http://mamedev.emulab.it/clrmamepro/docs/xmlheaders.txt
+		/// http://www.emulab.it/forum/index.php?topic=127.0
+		/// </remarks>
 		private static void PopulateSkippers()
 		{
 			if (_list == null)
