@@ -81,64 +81,6 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Get the header type for the input file
-		/// </summary>
-		/// <param name="input">Input file to parse for header</param>
-		/// <param name="hs">Passed back size of the header</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>The detected HeaderType</returns>
-		public static HeaderType GetFileHeaderType(string input, out int hs, Logger logger)
-		{
-			// Open the file in read mode
-			BinaryReader br = new BinaryReader(File.OpenRead(input));
-
-			// Extract the first 1024 bytes of the file
-			byte[] hbin = br.ReadBytes(1024);
-			string header = BitConverter.ToString(hbin).Replace("-", string.Empty);
-			br.Dispose();
-
-			// Determine the type of the file from the header, if possible
-			HeaderType type = HeaderType.None;
-
-			// Loop over the header types and see if there's a match
-			hs = -1;
-			foreach (HeaderType test in Enum.GetValues(typeof(HeaderType)))
-			{
-				Dictionary<string, int> tempDict = new Dictionary<string, int>();
-
-				// Try populating the dictionary from the master list
-				try
-				{
-					tempDict = Remapping.HeaderMaps[test.ToString()];
-				}
-				catch
-				{
-					logger.Warning("The mapping for '" + test.ToString() + "' cannot be found!");
-					continue;
-				}
-
-				// Loop over the dictionary and see if there are matches
-				foreach (KeyValuePair<string, int> entry in tempDict)
-				{
-					if (Regex.IsMatch(header, entry.Key))
-					{
-						type = test;
-						hs = entry.Value;
-						break;
-					}
-				}
-
-				// If we found something, break out
-				if (type != HeaderType.None)
-				{
-					break;
-				}
-			}
-
-			return type;
-		}
-
-		/// <summary>
 		/// Merge an arbitrary set of ROMs based on the supplied information
 		/// </summary>
 		/// <param name="inroms">List of RomData objects representing the roms to be merged</param>

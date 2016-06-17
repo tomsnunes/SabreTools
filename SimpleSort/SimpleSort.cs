@@ -377,7 +377,7 @@ namespace SabreTools
 
 				// Now get the headerless file if it exists
 				int hs = 0;
-				RomTools.GetFileHeaderType(input, out hs, _logger);
+				Skippers.GetFileHeaderType(input, out hs, _logger);
 				if (hs > 0)
 				{
 					string newinput = input + ".new";

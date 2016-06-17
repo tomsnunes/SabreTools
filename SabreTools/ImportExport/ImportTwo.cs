@@ -293,7 +293,7 @@ COMMIT;";
 			if (Regex.IsMatch(filename, Constants.NonGoodPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.NonGoodPattern).Groups;
-				if (!Remapping.DatMaps["NonGood"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["NonGood"].ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as NonGood but could not be mapped.");
 					return source;
@@ -303,7 +303,7 @@ COMMIT;";
 			else if (Regex.IsMatch(filename, Constants.NonGoodSpecialPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.NonGoodSpecialPattern).Groups;
-				if (!Remapping.DatMaps["NonGood"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["NonGood"].ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as NonGood but could not be mapped.");
 					return source;
@@ -313,7 +313,7 @@ COMMIT;";
 			else if (Regex.IsMatch(filename, Constants.GoodPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.GoodPattern).Groups;
-				if (!Remapping.DatMaps["Good"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["Good"].ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as Good but could not be mapped.");
 					return source;
@@ -323,7 +323,7 @@ COMMIT;";
 			else if (Regex.IsMatch(filename, Constants.GoodXmlPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.GoodXmlPattern).Groups;
-				if (!Remapping.DatMaps["Good"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["Good"].ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as Good but could not be mapped.");
 					return source;
@@ -333,7 +333,7 @@ COMMIT;";
 			else if (Regex.IsMatch(filename, Constants.MaybeIntroPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.MaybeIntroPattern).Groups;
-				if (!Remapping.DatMaps["MaybeIntro"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["MaybeIntro"].ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as Maybe-Intro but could not be mapped.");
 					return source;
@@ -343,7 +343,7 @@ COMMIT;";
 			else if (Regex.IsMatch(filename, Constants.NoIntroPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.NoIntroPattern).Groups;
-				if (!Remapping.DatMaps["NoIntro"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["NoIntro"].ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as No-Intro but could not be mapped.");
 					return source;
@@ -354,7 +354,7 @@ COMMIT;";
 			else if (Regex.IsMatch(filename, Constants.NoIntroNumberedPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.NoIntroNumberedPattern).Groups;
-				if (!Remapping.DatMaps["NoIntro"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["NoIntro"].ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as No-Intro but could not be mapped.");
 					return source;
@@ -365,7 +365,7 @@ COMMIT;";
 			else if (Regex.IsMatch(filename, Constants.NoIntroSpecialPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.NoIntroSpecialPattern).Groups;
-				if (!Remapping.DatMaps["NoIntro"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["NoIntro"].ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as No-Intro but could not be mapped.");
 					return source;
@@ -375,7 +375,7 @@ COMMIT;";
 			else if (Regex.IsMatch(filename, Constants.RedumpPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.RedumpPattern).Groups;
-				if (!Remapping.DatMaps["Redump"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["Redump"].ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as Redump but could not be mapped.");
 					return source;
@@ -386,7 +386,7 @@ COMMIT;";
 			else if (Regex.IsMatch(filename, Constants.RedumpBiosPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.RedumpBiosPattern).Groups;
-				if (!Remapping.DatMaps["Redump"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["Redump"].ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as Redump but could not be mapped.");
 					return source;
@@ -396,16 +396,16 @@ COMMIT;";
 			else if (Regex.IsMatch(filename, Constants.TosecPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.TosecPattern).Groups;
-				if (!Remapping.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
 				{
 					// Handle special case mappings found only in TOSEC
 					fileinfo = Regex.Match(filename, Constants.TosecSpecialPatternA).Groups;
 
-					if (!Remapping.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
+					if (!Mappings.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
 					{
 						fileinfo = Regex.Match(filename, Constants.TosecSpecialPatternB).Groups;
 
-						if (!Remapping.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
+						if (!Mappings.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
 						{
 							_logger.Warning("The filename " + fileinfo[1].Value + " was matched as TOSEC but could not be mapped.");
 							return source;
@@ -417,7 +417,7 @@ COMMIT;";
 			else if (Regex.IsMatch(filename, Constants.TruripPattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.TruripPattern).Groups;
-				if (!Remapping.DatMaps["TruRip"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["TruRip"].ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as TruRip but could not be mapped.");
 					return source;
@@ -441,7 +441,7 @@ COMMIT;";
 			else if (Regex.IsMatch(filename, Constants.MamePattern))
 			{
 				fileinfo = Regex.Match(filename, Constants.MamePattern).Groups;
-				if (!Remapping.DatMaps["MAME"].ContainsKey(fileinfo[1].Value))
+				if (!Mappings.DatMaps["MAME"].ContainsKey(fileinfo[1].Value))
 				{
 					_logger.Warning("The filename " + fileinfo[1].Value + " was matched as MAME but could not be mapped.");
 					return source;

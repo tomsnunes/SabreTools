@@ -121,6 +121,7 @@
 		Bitswap,
 		Byteswap,
 		Wordswap,
+		WordByteswap,
 	}
 
 	/// <summary>

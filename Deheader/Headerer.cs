@@ -130,7 +130,7 @@ namespace SabreTools
 		{
 			// First get the HeaderType, if any
 			int headerSize = -1;
-			HeaderType type = RomTools.GetFileHeaderType(file, out headerSize, logger);
+			HeaderType type = Skippers.GetFileHeaderType(file, out headerSize, logger);
 
 			// If we have a valid HeaderType, remove the correct byte count
 			logger.User("File has header: " + (type != HeaderType.None));
