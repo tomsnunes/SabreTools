@@ -423,9 +423,8 @@ namespace SabreTools.Helper
 							if (datdata.RepExt != "")
 							{
 								string dir = Path.GetDirectoryName(name);
-								dir = (dir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? dir : dir + Path.DirectorySeparatorChar);
 								dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
-								name = dir + Path.GetFileNameWithoutExtension(name) + datdata.RepExt;
+								name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + datdata.RepExt);
 							}
 							if (datdata.AddExt != "")
 							{
@@ -433,7 +432,7 @@ namespace SabreTools.Helper
 							}
 							if (!datdata.UseGame && datdata.GameName)
 							{
-								name = (rom.Game.EndsWith(Path.DirectorySeparatorChar.ToString()) ? rom.Game : rom.Game + Path.DirectorySeparatorChar) + name;
+								name = Path.Combine(rom.Game, name);
 							}
 
 							if (datdata.UseGame && rom.Game != lastgame)

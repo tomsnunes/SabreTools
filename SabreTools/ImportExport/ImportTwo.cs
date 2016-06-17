@@ -110,7 +110,7 @@ namespace SabreTools
 					_logger.User("Processing DATs for system: '" + kv.Key + "'");
 
 					// Set the folder to iterate through based on the DAT root
-					string folder = _datroot + Path.DirectorySeparatorChar + kv.Key.Trim();
+					string folder = Path.Combine(_datroot, kv.Key.Trim());
 
 					// Audit all files in the folder
 					foreach (string file in Directory.EnumerateFiles(folder, "*", SearchOption.AllDirectories))

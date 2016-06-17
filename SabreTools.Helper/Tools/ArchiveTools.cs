@@ -20,7 +20,7 @@ namespace SabreTools.Helper
 		/// <param name="rom">RomData representing the new information</param>
 		public static void WriteToArchive(string input, string output, Rom rom)
 		{
-			string archiveFileName = output + Path.DirectorySeparatorChar + rom.Game + ".zip";
+			string archiveFileName = Path.Combine(output, rom.Game + ".zip");
 
 			ZipArchive outarchive = null;
 			try
@@ -212,8 +212,8 @@ namespace SabreTools.Helper
 						logger.Log("Current entry name: '" + reader.Entry.Key + "'");
 						if (reader.Entry != null && reader.Entry.Key.Contains(entryname))
 						{
-							reader.WriteEntryToFile(tempdir + Path.DirectorySeparatorChar + reader.Entry.Key);
-							outfile = tempdir + Path.DirectorySeparatorChar + reader.Entry.Key;
+							outfile = Path.Combine(tempdir, reader.Entry.Key);
+							reader.WriteEntryToFile(outfile);
 						}
 					}
 				}

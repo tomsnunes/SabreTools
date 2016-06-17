@@ -85,8 +85,8 @@ namespace SabreTools
 					return false;
 				}
 
-				path += Path.DirectorySeparatorChar + system.Trim();
 				name = system.Trim();
+				path = Path.Combine(path, name);
 			}
 			else
 			{

@@ -31,7 +31,6 @@ namespace SabreTools
 			logger = new Logger(true, "headerer.log");
 			logger.Start();
 			DBTools.EnsureDatabase(_dbName, _connectionString);
-			Remapping.CreateHeaderSkips();
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))

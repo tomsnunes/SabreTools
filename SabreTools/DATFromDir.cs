@@ -332,8 +332,9 @@ namespace SabreTools
 				foreach (string entry in Directory.EnumerateFiles(tempdir, "*", SearchOption.AllDirectories))
 				{
 					lastparent = ProcessFile(Path.GetFullPath(entry), sw, Path.GetFullPath(tempdir),
-						(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) +
-						Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(item), _datdata, lastparent);
+						Path.Combine((Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) +
+							Path.GetFileNameWithoutExtension(item)
+						), _datdata, lastparent);
 				}
 
 				// Clear the temp directory

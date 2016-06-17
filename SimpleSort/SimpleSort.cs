@@ -64,7 +64,6 @@ namespace SabreTools
 			// Perform initial setup and verification
 			Logger logger = new Logger(true, "simplesort.log");
 			logger.Start();
-			Remapping.CreateHeaderSkips();
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
@@ -535,7 +534,7 @@ namespace SabreTools
 			// Assuming archived sets, move all toplevel folders to temp
 			foreach (string directory in Directory.EnumerateDirectories(_outdir, "*", SearchOption.TopDirectoryOnly))
 			{
-				Directory.Move(directory, _tempdir + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(directory));
+				Directory.Move(directory, Path.Combine(_tempdir, Path.GetFileNameWithoutExtension(directory)));
 			}
 
 			// Now process the inputs (assumed that it's archived sets as of right now
@@ -544,12 +543,12 @@ namespace SabreTools
 				// If the name of the archive is not in the set exactly, move it to temp
 				if (!sortedByGame.ContainsKey(Path.GetFileNameWithoutExtension(archive)))
 				{
-					File.Move(archive, _tempdir + Path.DirectorySeparatorChar + archive);
+					File.Move(archive, Path.Combine(_tempdir, archive));
 				}
 				// Otherwise, we check if it's an archive. If it's not, move it to temp
 				else if (ArchiveTools.GetCurrentArchiveType(Path.GetFullPath(archive), _logger) == null)
 				{
-					File.Move(Path.GetFullPath(archive), _tempdir + Path.DirectorySeparatorChar + archive);
+					File.Move(Path.GetFullPath(archive), Path.Combine(_tempdir, archive));
 				}
 				// Finally, if it's an archive and exists properly, we check the insides
 				else
@@ -564,7 +563,7 @@ namespace SabreTools
 					// Otherwise, extract it and get info one by one
 					else
 					{
-						string temparcdir = _tempdir + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(archive);
+						string temparcdir = Path.Combine(_tempdir, Path.GetFileNameWithoutExtension(archive));
 						ArchiveTools.ExtractArchive(Path.GetFullPath(archive), temparcdir, _logger);
 						foreach (string tempfile in Directory.EnumerateFiles(temparcdir, "*", SearchOption.AllDirectories))
 						{

@@ -14,7 +14,6 @@ namespace SabreTools
 		/// </summary>
 		private static void Setup()
 		{
-			Remapping.CreateRemappings();
 			Build.Start("DATabase");
 
 			// Perform initial database and folder setup
@@ -40,7 +39,7 @@ namespace SabreTools
 						while (sldr.Read())
 						{
 							int systemid = sldr.GetInt32(0);
-							string system = _datroot + Path.DirectorySeparatorChar + sldr.GetString(1) + " - " + sldr.GetString(2);
+							string system = Path.Combine(_datroot, sldr.GetString(1) + " - " + sldr.GetString(2));
 							system = system.Trim();
 
 							if (!Directory.Exists(system))
