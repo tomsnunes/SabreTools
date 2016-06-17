@@ -8,11 +8,7 @@ namespace SabreTools.Helper
 	/// </summary>
 	public struct RomData : IComparable, IEquatable<RomData>
 	{
-		public string Manufacturer;
-		public string System;
 		public int SystemID;
-		public string Source;
-		public string URL;
 		public int SourceID;
 		public string Game;
 		public string Name;
