@@ -865,7 +865,7 @@ namespace SabreTools.Helper
 										case "clrmamepro":
 											if (headreader.GetAttribute("header") != null)
 											{
-												datdata.Header = (String.IsNullOrEmpty(datdata.Header) ? headreader.GetAttribute("header") : datdata.header);
+												datdata.Header = (String.IsNullOrEmpty(datdata.Header) ? headreader.GetAttribute("header") : datdata.Header);
 											}
 											if (headreader.GetAttribute("forcemerging") != null)
 											{
