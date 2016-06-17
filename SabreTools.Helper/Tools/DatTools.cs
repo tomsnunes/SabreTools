@@ -173,8 +173,8 @@ namespace SabreTools.Helper
 					{
 						Game = gamename,
 						Type = (line.Trim().StartsWith("disk (") ? "disk" : "rom"),
-						SystemID = sysid,
-						SourceID = srcid,
+						SystemData = new SystemData { ID = sysid },
+						SourceData = new SourceData { ID = srcid },
 					};
 
 					string[] gc = line.Trim().Split(' ');
@@ -577,8 +577,8 @@ namespace SabreTools.Helper
 							Name = rominfo[5],
 							CRC = rominfo[6].ToLowerInvariant(),
 							Size = Int64.Parse(rominfo[7]),
-							SystemID = sysid,
-							SourceID = srcid,
+							SystemData = new SystemData { ID = sysid },
+							SourceData = new SourceData { ID = srcid },
 						};
 
 						// Sanitize the hashes from null, hex sizes, and "true blank" strings
@@ -1152,15 +1152,14 @@ namespace SabreTools.Helper
 													Game = tempname,
 													Name = subreader.GetAttribute("name"),
 													Type = subreader.Name,
-													SystemID = sysid,
-													SourceID = srcid,
 													Size = size,
 													CRC = crc,
 													MD5 = md5,
 													SHA1 = sha1,
-													System = filename,
 													Nodump = nodump,
 													Date = date,
+													SystemData = new SystemData { ID = sysid, Name = filename },
+													SourceData = new SourceData { ID = srcid },
 												};
 
 												if (datdata.Roms.ContainsKey(key))
@@ -1389,15 +1388,14 @@ namespace SabreTools.Helper
 									Game = tempname,
 									Name = xtr.GetAttribute("name"),
 									Type = xtr.GetAttribute("type"),
-									SystemID = sysid,
-									SourceID = srcid,
 									Size = size,
 									CRC = crc,
 									MD5 = md5,
 									SHA1 = sha1,
-									System = filename,
 									Nodump = nodump,
 									Date = date,
+									SystemData = new SystemData { ID = sysid, Name = filename },
+									SourceData = new SourceData { ID = srcid },
 								};
 
 								if (datdata.Roms.ContainsKey(key))
@@ -1467,7 +1465,7 @@ namespace SabreTools.Helper
 				foreach (RomData rom in newroms)
 				{
 					count++;
-					string key = (norename ? "" : rom.SystemID.ToString().PadLeft(10, '0') + "-" + rom.SourceID.ToString().PadLeft(10, '0') + "-") + rom.Game.ToLowerInvariant();
+					string key = (norename ? "" : rom.SystemData.ID.ToString().PadLeft(10, '0') + "-" + rom.SourceData.ID.ToString().PadLeft(10, '0') + "-") + rom.Game.ToLowerInvariant();
 					if (sortable.ContainsKey(key))
 					{
 						sortable[key].Add(rom);

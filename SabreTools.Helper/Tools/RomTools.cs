@@ -209,19 +209,17 @@ namespace SabreTools.Helper
 							savedrom.Dupe = dupetype;
 
 							// If the current system has a lower ID than the previous, set the system accordingly
-							if (rom.SystemID < savedrom.SystemID)
+							if (rom.SystemData.ID < savedrom.SystemData.ID)
 							{
-								savedrom.SystemID = rom.SystemID;
-								savedrom.System = rom.System;
+								savedrom.SystemData = rom.SystemData;
 								savedrom.Game = rom.Game;
 								savedrom.Name = rom.Name;
 							}
 
 							// If the current source has a lower ID than the previous, set the source accordingly
-							if (rom.SourceID < savedrom.SourceID)
+							if (rom.SourceData.ID < savedrom.SourceData.ID)
 							{
-								savedrom.SourceID = rom.SourceID;
-								savedrom.Source = rom.Source;
+								savedrom.SourceData = rom.SourceData;
 								savedrom.Game = rom.Game;
 								savedrom.Name = rom.Name;
 							}
@@ -334,7 +332,7 @@ namespace SabreTools.Helper
 			}
 
 			// If the duplicate is external already or should be, set it
-			if (lastrom.Dupe >= DupeType.ExternalHash || lastrom.SystemID != rom.SystemID || lastrom.SourceID != rom.SourceID)
+			if (lastrom.Dupe >= DupeType.ExternalHash || lastrom.SystemData.ID != rom.SystemData.ID || lastrom.SourceData.ID != rom.SourceData.ID)
 			{
 				if (lastrom.Game == rom.Game && lastrom.Name == rom.Name)
 				{
@@ -372,9 +370,9 @@ namespace SabreTools.Helper
 		{
 			roms.Sort(delegate (RomData x, RomData y)
 			{
-				if (x.SystemID == y.SystemID)
+				if (x.SystemData.ID == y.SystemData.ID)
 				{
-					if (x.SourceID == y.SourceID)
+					if (x.SourceData.ID == y.SourceData.ID)
 					{
 						if (x.Game == y.Game)
 						{
@@ -382,9 +380,9 @@ namespace SabreTools.Helper
 						}
 						return String.Compare(x.Game, y.Game);
 					}
-					return (norename ? String.Compare(x.Game, y.Game) : x.SourceID - y.SourceID);
+					return (norename ? String.Compare(x.Game, y.Game) : x.SourceData.ID - y.SourceData.ID);
 				}
-				return (norename ? String.Compare(x.Game, y.Game) : x.SystemID - y.SystemID);
+				return (norename ? String.Compare(x.Game, y.Game) : x.SystemData.ID - y.SystemData.ID);
 			});
 			return true;
 		}

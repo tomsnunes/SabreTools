@@ -18,10 +18,8 @@ namespace SabreTools.Helper
 		public DupeType Dupe;
 		public bool Nodump;
 		public string Date;
-		public string System;
-		public int SystemID;
-		public string Source;
-		public int SourceID;
+		public SystemData SystemData;
+		public SourceData SourceData;
 
 		public int CompareTo(object obj)
 		{
@@ -51,6 +49,25 @@ namespace SabreTools.Helper
 				this.Name == other.Name &&
 				RomTools.IsDuplicate(this, other));
 		}
+	}
+
+	/// <summary>
+	/// Intermediate struct for holding System information
+	/// </summary>
+	public struct SystemData
+	{
+		public int ID;
+		public string Name;
+	}
+
+	/// <summary>
+	/// Intermediate struct for holding Source information
+	/// </summary>
+	public struct SourceData
+	{
+		public int ID;
+		public string Name;
+		public string URL;
 	}
 
 	/// <summary>
