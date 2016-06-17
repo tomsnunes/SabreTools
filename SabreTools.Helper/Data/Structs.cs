@@ -8,8 +8,6 @@ namespace SabreTools.Helper
 	/// </summary>
 	public struct RomData : IComparable, IEquatable<RomData>
 	{
-		public int SystemID;
-		public int SourceID;
 		public string Game;
 		public string Name;
 		public string Type;
@@ -20,6 +18,10 @@ namespace SabreTools.Helper
 		public DupeType Dupe;
 		public bool Nodump;
 		public string Date;
+		public string System;
+		public int SystemID;
+		public string Source;
+		public int SourceID;
 
 		public int CompareTo(object obj)
 		{
