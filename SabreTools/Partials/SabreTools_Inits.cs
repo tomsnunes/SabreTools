@@ -228,7 +228,7 @@ namespace SabreTools
 			repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
 
 			// Populate the DatData object
-			DatData userInputDat = new DatData
+			Dat userInputDat = new Dat
 			{
 				FileName = filename,
 				Name = name,
@@ -329,7 +329,7 @@ namespace SabreTools
 			string tempDir)
 		{
 			// Create a new DATFromDir object and process the inputs
-			DatData datdata = new DatData
+			Dat datdata = new Dat
 			{
 				FileName = description,
 				Name = name,
@@ -342,7 +342,7 @@ namespace SabreTools
 				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
-				Roms = new Dictionary<string, List<RomData>>(),
+				Roms = new Dictionary<string, List<Rom>>(),
 			};
 			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
 			bool success = dfd.Start();

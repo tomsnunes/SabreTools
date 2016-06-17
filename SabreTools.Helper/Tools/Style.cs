@@ -144,7 +144,7 @@ namespace SabreTools.Helper
 		/// <param name="outDir">Output directory</param>
 		/// <param name="datdata">DAT information</param>
 		/// <returns>String representing the proper name</returns>
-		public static string CreateOutfileName(string outDir, DatData datdata)
+		public static string CreateOutfileName(string outDir, Dat datdata)
 		{
 			// Double check the outdir for the end delim
 			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))

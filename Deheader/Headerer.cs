@@ -157,7 +157,7 @@ namespace SabreTools
 				logger.User("Unheadered file created!");
 
 				// Now add the information to the database if it's not already there
-				RomData rom = RomTools.GetSingleFileInfo(file + ".new");
+				Rom rom = RomTools.GetSingleFileInfo(file + ".new");
 				AddHeaderToDatabase(hstr, rom.SHA1, type);
 			}
 		}
@@ -209,7 +209,7 @@ namespace SabreTools
 		private static void ReplaceHeader(string file)
 		{
 			// First, get the SHA-1 hash of the file
-			RomData rom = RomTools.GetSingleFileInfo(file);
+			Rom rom = RomTools.GetSingleFileInfo(file);
 
 			// Then try to pull the corresponding headers from the database
 			string header = "";

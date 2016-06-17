@@ -144,7 +144,7 @@ namespace SabreTools
 			}
 
 			// Create the output DatData object
-			DatData datdata = new DatData
+			Dat datdata = new Dat
 			{
 				FileName = description,
 				Name = name,
@@ -188,11 +188,11 @@ namespace SabreTools
 			List<string> keys = datdata.Roms.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<RomData> temp = new List<RomData>();
-				List<RomData> newroms = datdata.Roms[key];
+				List<Rom> temp = new List<Rom>();
+				List<Rom> newroms = datdata.Roms[key];
 				for (int i = 0; i < newroms.Count; i++)
 				{
-					RomData rom = newroms[i];
+					Rom rom = newroms[i];
 
 					// In the case that the RomData is incomplete, skip it
 					if (rom.Name == null || rom.Game == null)

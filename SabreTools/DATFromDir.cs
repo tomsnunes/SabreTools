@@ -18,7 +18,7 @@ namespace SabreTools
 
 		// User specified inputs
 		private List<String> _inputs;
-		private DatData _datdata;
+		private Dat _datdata;
 		private bool _noMD5;
 		private bool _noSHA1;
 		private bool _bare;
@@ -40,7 +40,7 @@ namespace SabreTools
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>>
 		/// <param name="logger">Logger object for console and file output</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
-		public DATFromDir(List<String> inputs, DatData datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, string tempDir, Logger logger)
+		public DATFromDir(List<String> inputs, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, string tempDir, Logger logger)
 		{
 			_inputs = inputs;
 			_datdata = datdata;
@@ -152,7 +152,7 @@ namespace SabreTools
 							if (!items)
 							{
 								string actualroot = item.Remove(0, basePathBackup.Length);
-								RomData rom = new RomData
+								Rom rom = new Rom
 								{
 									Name = "null",
 									Game = (_datdata.Type == "SuperDAT" ?
@@ -173,7 +173,7 @@ namespace SabreTools
 								}
 								else
 								{
-									List<RomData> temp = new List<RomData>();
+									List<Rom> temp = new List<Rom>();
 									temp.Add(rom);
 									_datdata.Roms.Add(key, temp);
 								}
@@ -185,7 +185,7 @@ namespace SabreTools
 								if (Directory.EnumerateFiles(subdir, "*", SearchOption.AllDirectories).Count() == 0)
 								{
 									string actualroot = subdir.Remove(0, basePathBackup.Length);
-									RomData rom = new RomData
+									Rom rom = new Rom
 									{
 										Name = "null",
 										Game = (_datdata.Type == "SuperDAT" ?
@@ -206,7 +206,7 @@ namespace SabreTools
 									}
 									else
 									{
-										List<RomData> temp = new List<RomData>();
+										List<Rom> temp = new List<Rom>();
 										temp.Add(rom);
 										_datdata.Roms.Add(key, temp);
 									}
@@ -226,11 +226,11 @@ namespace SabreTools
 			// Now output any empties to the stream (if not in Romba mode)
 			if (!_datdata.Romba)
 			{
-				foreach (List<RomData> roms in _datdata.Roms.Values)
+				foreach (List<Rom> roms in _datdata.Roms.Values)
 				{
 					for (int i = 0; i < roms.Count; i++)
 					{
-						RomData rom = roms[i];
+						Rom rom = roms[i];
 
 						// If we're in a mode that doesn't allow for actual empty folders, add the blank info
 						if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
@@ -269,7 +269,7 @@ namespace SabreTools
 				// If we had roms but not blanks (and not in Romba mode), create an artifical rom for the purposes of outputting
 				if (lastparent != null && _datdata.Roms.Count == 0)
 				{
-					_datdata.Roms.Add("temp", new List<RomData>());
+					_datdata.Roms.Add("temp", new List<Rom>());
 				}
 			}
 
@@ -297,7 +297,7 @@ namespace SabreTools
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
 			{
-				RomData rom = ArchiveTools.GetTorrentGZFileInfo(item, _logger);
+				Rom rom = ArchiveTools.GetTorrentGZFileInfo(item, _logger);
 
 				// If the rom is valid, write it out
 				if (rom.Name != null)
@@ -360,10 +360,10 @@ namespace SabreTools
 		/// <param name="datdata">DatData object with output information</param>
 		/// <param name="lastparent">Last known parent game name</param>
 		/// <returns>New last known parent game name</returns>
-		private string ProcessFile(string item, StreamWriter sw, string basepath, string parent, DatData datdata, string lastparent)
+		private string ProcessFile(string item, StreamWriter sw, string basepath, string parent, Dat datdata, string lastparent)
 		{
 			_logger.Log(Path.GetFileName(item) + " treated like a file");
-			RomData rom = RomTools.GetSingleFileInfo(item, _noMD5, _noSHA1);
+			Rom rom = RomTools.GetSingleFileInfo(item, _noMD5, _noSHA1);
 
 			try
 			{

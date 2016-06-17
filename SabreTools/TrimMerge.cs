@@ -82,7 +82,7 @@ namespace SabreTools
 		/// <param name="rename">True if roms are to be renamed</param>
 		private void ProcessDAT(string filename, string path, bool rename)
 		{
-			DatData datdata = new DatData
+			Dat datdata = new Dat
 			{
 				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
 				OutputFormat = DatTools.GetOutputFormat(filename),
@@ -93,10 +93,10 @@ namespace SabreTools
 			List<string> keys = datdata.Roms.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<RomData> newroms = new List<RomData>();
-				foreach (RomData rom in datdata.Roms[key])
+				List<Rom> newroms = new List<Rom>();
+				foreach (Rom rom in datdata.Roms[key])
 				{
-					RomData newrom = rom;
+					Rom newrom = rom;
 
 					// If we are in single game mode, rename all games
 					if (rename)

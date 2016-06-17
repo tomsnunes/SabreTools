@@ -1,4 +1,7 @@
 /.vs
+/CommandVault/obj
+/CommandVault/obj/Debug
+/CommandVault/obj/Release
 /Deheader/obj
 /Deheader/obj/Debug
 /Deheader/obj/Release

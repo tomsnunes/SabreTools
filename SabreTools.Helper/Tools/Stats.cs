@@ -47,9 +47,9 @@ namespace SabreTools.Helper
 			{
 				_logger.User("Beginning stat collection for '" + filename + "'");
 				List<String> games = new List<String>();
-				DatData datdata = new DatData();
+				Dat datdata = new Dat();
 				datdata = DatTools.Parse(filename, 0, 0, datdata, _logger);
-				SortedDictionary<string, List<RomData>> newroms = DatTools.BucketByGame(datdata.Roms, false, true, _logger, false);
+				SortedDictionary<string, List<Rom>> newroms = DatTools.BucketByGame(datdata.Roms, false, true, _logger, false);
 
 				// Output single DAT stats (if asked)
 				if (_single)
@@ -76,7 +76,7 @@ namespace SabreTools.Helper
 
 			// Output total DAT stats
 			if (!_single) { _logger.User(""); }
-			DatData totaldata = new DatData
+			Dat totaldata = new Dat
 			{
 				TotalSize = totalSize,
 				RomCount = totalRom,
@@ -102,7 +102,7 @@ Please check the log folder if the stats scrolled offscreen");
 		/// <param name="logger">Logger object for file and console writing</param>
 		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
 		/// <param name="game">Number of games to use, -1 means recalculate games (default)</param>
-		public static void OutputStats(DatData datdata, Logger logger, bool recalculate = false, long game = -1)
+		public static void OutputStats(Dat datdata, Logger logger, bool recalculate = false, long game = -1)
 		{
 			if (recalculate)
 			{
@@ -116,9 +116,9 @@ Please check the log folder if the stats scrolled offscreen");
 				datdata.NodumpCount = 0;
 
 				// Loop through and add
-				foreach (List<RomData> roms in datdata.Roms.Values)
+				foreach (List<Rom> roms in datdata.Roms.Values)
 				{
-					foreach (RomData rom in roms)
+					foreach (Rom rom in roms)
 					{
 						datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
 						datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
@@ -131,7 +131,7 @@ Please check the log folder if the stats scrolled offscreen");
 				}
 			}
 
-			SortedDictionary<string, List<RomData>> newroms = DatTools.BucketByGame(datdata.Roms, false, true, logger);
+			SortedDictionary<string, List<Rom>> newroms = DatTools.BucketByGame(datdata.Roms, false, true, logger);
 			logger.User(@"    Uncompressed size:       " + Style.GetBytesReadable(datdata.TotalSize) + @"
     Games found:             " + (game == -1 ? newroms.Count : game) + @"
     Roms found:              " + datdata.RomCount + @"

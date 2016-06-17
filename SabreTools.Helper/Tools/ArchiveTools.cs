@@ -18,7 +18,7 @@ namespace SabreTools.Helper
 		/// <param name="input">Input filename to be moved</param>
 		/// <param name="output">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		public static void WriteToArchive(string input, string output, RomData rom)
+		public static void WriteToArchive(string input, string output, Rom rom)
 		{
 			string archiveFileName = output + Path.DirectorySeparatorChar + rom.Game + ".zip";
 
@@ -311,9 +311,9 @@ namespace SabreTools.Helper
 		/// <param name="input">Input file to get data from</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>List of RomData objects representing the found data</returns>
-		public static List<RomData> GetArchiveFileInfo(string input, Logger logger)
+		public static List<Rom> GetArchiveFileInfo(string input, Logger logger)
 		{
-			List<RomData> roms = new List<RomData>();
+			List<Rom> roms = new List<Rom>();
 			string gamename = Path.GetFileNameWithoutExtension(input);
 
 			// First get the archive type
@@ -339,7 +339,7 @@ namespace SabreTools.Helper
 						{
 							logger.Log("Entry found: '" + reader.Entry.Key + "': " + reader.Entry.Size + ", " + reader.Entry.Crc.ToString("X").ToLowerInvariant());
 
-							roms.Add(new RomData
+							roms.Add(new Rom
 							{
 								Type = "rom",
 								Name = reader.Entry.Key,
@@ -369,7 +369,7 @@ namespace SabreTools.Helper
 		/// <param name="input">Filename to get information from</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static RomData GetTorrentGZFileInfo(string input, Logger logger)
+		public static Rom GetTorrentGZFileInfo(string input, Logger logger)
 		{
 			string datum = Path.GetFileName(input).ToLowerInvariant();
 			long filesize = new FileInfo(input).Length;
@@ -378,14 +378,14 @@ namespace SabreTools.Helper
 			if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}\.gz"))
 			{
 				logger.Warning("Non SHA-1 filename found, skipping: '" + datum + "'");
-				return new RomData();
+				return new Rom();
 			}
 
 			// Check if the file is at least the minimum length
 			if (filesize < 32 /* bytes */)
 			{
 				logger.Warning("Possibly corrupt file '" + input + "' with size " + Style.GetBytesReadable(filesize));
-				return new RomData();
+				return new Rom();
 			}
 
 			// Get the Romba-specific header data
@@ -430,7 +430,7 @@ namespace SabreTools.Helper
 				}
 			}
 
-			RomData rom = new RomData
+			Rom rom = new Rom
 			{
 				Type = "rom",
 				Game = Path.GetFileNameWithoutExtension(input),

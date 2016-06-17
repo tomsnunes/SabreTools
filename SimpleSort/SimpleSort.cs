@@ -10,7 +10,7 @@ namespace SabreTools
 	public class SimpleSort
 	{
 		// Private instance variables
-		private DatData _datdata;
+		private Dat _datdata;
 		private List<string> _inputs;
 		private string _outdir;
 		private string _tempdir;
@@ -34,7 +34,7 @@ namespace SabreTools
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public SimpleSort(DatData datdata, List<string> inputs, string outdir, string tempdir,
+		public SimpleSort(Dat datdata, List<string> inputs, string outdir, string tempdir,
 			bool externalScan, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			_datdata = datdata;
@@ -239,7 +239,7 @@ namespace SabreTools
 			bool externalScan, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
-			DatData datdata = new DatData();
+			Dat datdata = new Dat();
 			foreach (string datfile in datfiles)
 			{
 				datdata = DatTools.Parse(datfile, 0, 0, datdata, logger);
@@ -359,7 +359,7 @@ namespace SabreTools
 			// Hash and match the external files
 			if (shouldscan)
 			{
-				RomData rom = RomTools.GetSingleFileInfo(input);
+				Rom rom = RomTools.GetSingleFileInfo(input);
 
 				// If we have a blank RomData, it's an error
 				if (rom.Name == null)
@@ -368,9 +368,9 @@ namespace SabreTools
 				}
 
 				// Try to find the matches to the file that was found
-				List<RomData> foundroms = RomTools.GetDuplicates(rom, _datdata);
+				List<Rom> foundroms = RomTools.GetDuplicates(rom, _datdata);
 				_logger.User("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
-				foreach (RomData found in foundroms)
+				foreach (Rom found in foundroms)
 				{
 					_logger.Log("Matched name: " + found.Name);
 					ArchiveTools.WriteToArchive(input, _outdir, found);
@@ -384,7 +384,7 @@ namespace SabreTools
 					string newinput = input + ".new";
 					_logger.Log("Creating unheadered file: '" + newinput + "'");
 					Output.RemoveBytesFromFile(input, newinput, hs, 0);
-					RomData drom = RomTools.GetSingleFileInfo(newinput);
+					Rom drom = RomTools.GetSingleFileInfo(newinput);
 
 					// If we have a blank RomData, it's an error
 					if (drom.Name == null)
@@ -393,16 +393,16 @@ namespace SabreTools
 					}
 
 					// Try to find the matches to the file that was found
-					List<RomData> founddroms = RomTools.GetDuplicates(drom, _datdata);
+					List<Rom> founddroms = RomTools.GetDuplicates(drom, _datdata);
 					_logger.User("File '" + newinput + "' had " + founddroms.Count + " matches in the DAT!");
-					foreach (RomData found in founddroms)
+					foreach (Rom found in founddroms)
 					{
 						// First output the headerless rom
 						_logger.Log("Matched name: " + found.Name);
 						ArchiveTools.WriteToArchive(newinput, _outdir, found);
 
 						// Then output the headered rom (renamed)
-						RomData newfound = found;
+						Rom newfound = found;
 						newfound.Name = Path.GetFileNameWithoutExtension(newfound.Name) + " (" + rom.CRC + ")" + Path.GetExtension(newfound.Name);
 
 						_logger.Log("Matched name: " + newfound.Name);
@@ -425,18 +425,18 @@ namespace SabreTools
 			if (_externalScan)
 			{
 				_logger.Log("Beginning quick scan of contents from '" + input + "'");
-				List<RomData> internalRomData = ArchiveTools.GetArchiveFileInfo(input, _logger);
+				List<Rom> internalRomData = ArchiveTools.GetArchiveFileInfo(input, _logger);
 				_logger.Log(internalRomData.Count + " entries found in '" + input + "'");
 
 				// If the list is populated, then the file was a filled archive
 				if (internalRomData.Count > 0)
 				{
-					foreach (RomData rom in internalRomData)
+					foreach (Rom rom in internalRomData)
 					{
 						// Try to find the matches to the file that was found
-						List<RomData> foundroms = RomTools.GetDuplicates(rom, _datdata);
+						List<Rom> foundroms = RomTools.GetDuplicates(rom, _datdata);
 						_logger.User("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
-						foreach (RomData found in foundroms)
+						foreach (Rom found in foundroms)
 						{
 							_logger.Log("Matched name: " + found.Name);
 							string newinput = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
@@ -530,7 +530,7 @@ namespace SabreTools
 			*/
 
 			// Sort the input set(s) by game
-			SortedDictionary<string, List<RomData>> sortedByGame = DatTools.BucketByGame(_datdata.Roms, false, true, _logger);
+			SortedDictionary<string, List<Rom>> sortedByGame = DatTools.BucketByGame(_datdata.Roms, false, true, _logger);
 
 			// Assuming archived sets, move all toplevel folders to temp
 			foreach (string directory in Directory.EnumerateDirectories(_outdir, "*", SearchOption.TopDirectoryOnly))
@@ -554,7 +554,7 @@ namespace SabreTools
 				// Finally, if it's an archive and exists properly, we check the insides
 				else
 				{
-					List<RomData> roms = new List<RomData>();
+					List<Rom> roms = new List<Rom>();
 
 					// If we are in quickscan, get the list of roms that way
 					if (_externalScan)
@@ -582,9 +582,9 @@ namespace SabreTools
 					We have to check if it's an exact duplicate or a hash-duplicate
 					Which is better: traversing the "should have" list or the "do have" list?
 					*/
-					List<RomData> fromDat = sortedByGame[Path.GetFileNameWithoutExtension(archive)];
-					List<RomData> toRemove = new List<RomData>();
-					foreach (RomData rom in roms)
+					List<Rom> fromDat = sortedByGame[Path.GetFileNameWithoutExtension(archive)];
+					List<Rom> toRemove = new List<Rom>();
+					foreach (Rom rom in roms)
 					{
 						// If it's not in at all or needs renaming, mark for removal
 						if (!fromDat.Contains(rom))

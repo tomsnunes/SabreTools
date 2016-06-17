@@ -23,7 +23,7 @@ namespace SabreTools.Helper
 		/// - Have the ability to strip special (non-ASCII) characters from rom information
 		/// - Add a flag for ignoring roms with blank sizes
 		/// </remarks>
-		public static bool WriteDatfile(DatData datdata, string outDir, Logger logger, bool norename = true, bool stats = false)
+		public static bool WriteDatfile(Dat datdata, string outDir, Logger logger, bool norename = true, bool stats = false)
 		{
 			// Output initial statistics, for kicks
 			if (stats)
@@ -32,7 +32,7 @@ namespace SabreTools.Helper
 			}
 			
 			// Bucket roms by game name and optionally dedupe
-			SortedDictionary<string, List<RomData>> sortable = DatTools.BucketByGame(datdata.Roms, datdata.MergeRoms, norename, logger);
+			SortedDictionary<string, List<Rom>> sortable = DatTools.BucketByGame(datdata.Roms, datdata.MergeRoms, norename, logger);
 
 			// Now write out to file
 			// If it's empty, use the current folder
@@ -61,11 +61,11 @@ namespace SabreTools.Helper
 				int depth = 2, last = -1;
 				string lastgame = null;
 				List<string> splitpath = new List<string>();
-				foreach (List<RomData> roms in sortable.Values)
+				foreach (List<Rom> roms in sortable.Values)
 				{
 					for (int index = 0; index < roms.Count; index++)
 					{
-						RomData rom = roms[index];
+						Rom rom = roms[index];
 						List<string> newsplit = rom.Game.Split('\\').ToList();
 
 						// If we have a different game and we're not at the start of the list, output the end of last item
@@ -136,7 +136,7 @@ namespace SabreTools.Helper
 		/// <param name="datdata">DatData object representing DAT information</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		public static bool WriteHeader(StreamWriter sw, DatData datdata, Logger logger)
+		public static bool WriteHeader(StreamWriter sw, Dat datdata, Logger logger)
 		{
 			try
 			{
@@ -244,7 +244,7 @@ namespace SabreTools.Helper
 		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>The new depth of the tag</returns>
-		public static int WriteStartGame(StreamWriter sw, RomData rom, List<string> newsplit, string lastgame, DatData datdata, int depth, int last, Logger logger)
+		public static int WriteStartGame(StreamWriter sw, Rom rom, List<string> newsplit, string lastgame, Dat datdata, int depth, int last, Logger logger)
 		{
 			try
 			{
@@ -303,7 +303,7 @@ namespace SabreTools.Helper
 		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>The new depth of the tag</returns>
-		public static int WriteEndGame(StreamWriter sw, RomData rom, List<string> splitpath, List<string> newsplit, string lastgame, DatData datdata, int depth, out int last, Logger logger)
+		public static int WriteEndGame(StreamWriter sw, Rom rom, List<string> splitpath, List<string> newsplit, string lastgame, Dat datdata, int depth, out int last, Logger logger)
 		{
 			last = 0;
 
@@ -372,7 +372,7 @@ namespace SabreTools.Helper
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		public static bool WriteRomData(StreamWriter sw, RomData rom, string lastgame, DatData datdata, int depth, Logger logger)
+		public static bool WriteRomData(StreamWriter sw, Rom rom, string lastgame, Dat datdata, int depth, Logger logger)
 		{
 			try
 			{
@@ -505,7 +505,7 @@ namespace SabreTools.Helper
 		/// 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		public static bool WriteFooter(StreamWriter sw, DatData datdata, int depth, Logger logger)
+		public static bool WriteFooter(StreamWriter sw, Dat datdata, int depth, Logger logger)
 		{
 			try
 			{

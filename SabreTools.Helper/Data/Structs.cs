@@ -6,7 +6,7 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// Intermediate struct for holding and processing rom data
 	/// </summary>
-	public struct RomData : IComparable, IEquatable<RomData>
+	public struct Rom : IComparable, IEquatable<Rom>
 	{
 		public string Game;
 		public string Name;
@@ -24,7 +24,7 @@ namespace SabreTools.Helper
 		{
 			try
 			{
-				RomData comp = (RomData)obj;
+				Rom comp = (Rom)obj;
 
 				if (this.Game == comp.Game)
 				{
@@ -42,7 +42,7 @@ namespace SabreTools.Helper
 			}
 		}
 
-		public bool Equals(RomData other)
+		public bool Equals(Rom other)
 		{
 			return (this.Game == other.Game &&
 				this.Name == other.Name &&
@@ -64,7 +64,7 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// Intermediate struct for holding DAT information
 	/// </summary>
-	public struct DatData : ICloneable
+	public struct Dat : ICloneable
 	{
 		// Data common to most DAT types
 		public string FileName;
@@ -85,7 +85,7 @@ namespace SabreTools.Helper
 		public ForcePacking ForcePacking;
 		public OutputFormat OutputFormat;
 		public bool MergeRoms;
-		public Dictionary<string, List<RomData>> Roms;
+		public Dictionary<string, List<Rom>> Roms;
 
 		// Data specific to the Miss DAT type
 		public bool UseGame;
@@ -109,7 +109,7 @@ namespace SabreTools.Helper
 
 		public object Clone()
 		{
-			return new DatData
+			return new Dat
 			{
 				FileName = this.FileName,
 				Name = this.Name,

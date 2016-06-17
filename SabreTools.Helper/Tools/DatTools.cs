@@ -77,7 +77,7 @@ namespace SabreTools.Helper
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static DatData Parse(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep = false, bool clean = false)
+		public static Dat Parse(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep = false, bool clean = false)
 		{
 			// If the output filename isn't set already, get the internal filename
 			if (String.IsNullOrEmpty(datdata.FileName))
@@ -94,7 +94,7 @@ namespace SabreTools.Helper
 			// Make sure there's a dictionary to read to
 			if (datdata.Roms == null)
 			{
-				datdata.Roms = new Dictionary<string, List<RomData>>();
+				datdata.Roms = new Dictionary<string, List<Rom>>();
 			}
 
 			// Now parse the correct type of DAT
@@ -123,7 +123,7 @@ namespace SabreTools.Helper
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static DatData ParseCMP(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep, bool clean)
+		public static Dat ParseCMP(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep, bool clean)
 		{
 			// Read the input file, if possible
 			logger.Log("Attempting to read file: \"" + filename + "\"");
@@ -169,7 +169,7 @@ namespace SabreTools.Helper
 					// If we're in cleaning mode, sanitize the game name
 					gamename = (clean ? Style.CleanGameName(gamename) : gamename);
 
-					RomData rom = new RomData
+					Rom rom = new Rom
 					{
 						Game = gamename,
 						Type = (line.Trim().StartsWith("disk (") ? "disk" : "rom"),
@@ -339,7 +339,7 @@ namespace SabreTools.Helper
 					}
 					else
 					{
-						List<RomData> templist = new List<RomData>();
+						List<Rom> templist = new List<Rom>();
 						templist.Add(rom);
 						datdata.Roms.Add(key, templist);
 					}
@@ -455,7 +455,7 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static DatData ParseRC(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool clean)
+		public static Dat ParseRC(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool clean)
 		{
 			// Read the input file, if possible
 			logger.Log("Attempting to read file: \"" + filename + "\"");
@@ -570,7 +570,7 @@ namespace SabreTools.Helper
 						// If we're in cleaning mode, sanitize the game name
 						rominfo[3] = (clean ? Style.CleanGameName(rominfo[3]) : rominfo[3]);
 
-						RomData rom = new RomData
+						Rom rom = new Rom
 						{
 							Game = rominfo[3],
 							Name = rominfo[5],
@@ -640,7 +640,7 @@ namespace SabreTools.Helper
 						}
 						else
 						{
-							List<RomData> templist = new List<RomData>();
+							List<Rom> templist = new List<Rom>();
 							templist.Add(rom);
 							datdata.Roms.Add(key, templist);
 						}
@@ -674,7 +674,7 @@ namespace SabreTools.Helper
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static DatData ParseXML(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep, bool clean)
+		public static Dat ParseXML(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep, bool clean)
 		{
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
@@ -700,7 +700,7 @@ namespace SabreTools.Helper
 							// If we're in cleaning mode, sanitize the game name
 							tempgame = (clean ? Style.CleanGameName(tempgame) : tempgame);
 
-							RomData rom = new RomData
+							Rom rom = new Rom
 							{
 								Type = "rom",
 								Name = "null",
@@ -718,7 +718,7 @@ namespace SabreTools.Helper
 							}
 							else
 							{
-								List<RomData> temp = new List<RomData>();
+								List<Rom> temp = new List<Rom>();
 								temp.Add(rom);
 								datdata.Roms.Add(key, temp);
 							}
@@ -1090,7 +1090,7 @@ namespace SabreTools.Helper
 											if (subreader.GetAttribute("loadflag") == "continue" || subreader.GetAttribute("loadflag") == "ignore")
 											{
 												int index = datdata.Roms[key].Count() - 1;
-												RomData lastrom = datdata.Roms[key][index];
+												Rom lastrom = datdata.Roms[key][index];
 												lastrom.Size += size;
 												datdata.Roms[key].RemoveAt(index);
 												datdata.Roms[key].Add(lastrom);
@@ -1145,7 +1145,7 @@ namespace SabreTools.Helper
 												// Get the new values to add
 												key = size + "-" + crc;
 
-												RomData rom = new RomData
+												Rom rom = new Rom
 												{
 													Game = tempname,
 													Name = subreader.GetAttribute("name"),
@@ -1165,7 +1165,7 @@ namespace SabreTools.Helper
 												}
 												else
 												{
-													List<RomData> newvalue = new List<RomData>();
+													List<Rom> newvalue = new List<Rom>();
 													newvalue.Add(rom);
 													datdata.Roms.Add(key, newvalue);
 												}
@@ -1197,7 +1197,7 @@ namespace SabreTools.Helper
 								// If we're in cleaning mode, sanitize the game name
 								tempname = (clean ? Style.CleanGameName(tempname.Split(Path.DirectorySeparatorChar)) : tempname);
 
-								RomData rom = new RomData
+								Rom rom = new Rom
 								{
 									Type = "rom",
 									Name = "null",
@@ -1215,7 +1215,7 @@ namespace SabreTools.Helper
 								}
 								else
 								{
-									List<RomData> temp = new List<RomData>();
+									List<Rom> temp = new List<Rom>();
 									temp.Add(rom);
 									datdata.Roms.Add(key, temp);
 								}
@@ -1316,7 +1316,7 @@ namespace SabreTools.Helper
 							if (xtr.GetAttribute("loadflag") == "continue" || xtr.GetAttribute("loadflag") == "ignore")
 							{
 								int index = datdata.Roms[key].Count() - 1;
-								RomData lastrom = datdata.Roms[key][index];
+								Rom lastrom = datdata.Roms[key][index];
 								lastrom.Size += size;
 								datdata.Roms[key].RemoveAt(index);
 								datdata.Roms[key].Add(lastrom);
@@ -1380,7 +1380,7 @@ namespace SabreTools.Helper
 								// Get the new values to add
 								key = size + "-" + crc;
 
-								RomData rom = new RomData
+								Rom rom = new Rom
 								{
 									Game = tempname,
 									Name = xtr.GetAttribute("name"),
@@ -1400,7 +1400,7 @@ namespace SabreTools.Helper
 								}
 								else
 								{
-									List<RomData> newvalue = new List<RomData>();
+									List<Rom> newvalue = new List<Rom>();
 									newvalue.Add(rom);
 									datdata.Roms.Add(key, newvalue);
 								}
@@ -1438,9 +1438,9 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
 		/// <returns>SortedDictionary bucketed by game name</returns>
-		public static SortedDictionary<string, List<RomData>> BucketByGame(List<RomData> list, bool mergeroms, bool norename, Logger logger, bool output = true)
+		public static SortedDictionary<string, List<Rom>> BucketByGame(List<Rom> list, bool mergeroms, bool norename, Logger logger, bool output = true)
 		{
-			Dictionary<string, List<RomData>> dict = new Dictionary<string, List<RomData>>();
+			Dictionary<string, List<Rom>> dict = new Dictionary<string, List<Rom>>();
 			dict.Add("key", list);
 			return BucketByGame(dict, mergeroms, norename, logger, output);
 		}
@@ -1454,9 +1454,9 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
 		/// <returns>SortedDictionary bucketed by game name</returns>
-		public static SortedDictionary<string, List<RomData>> BucketByGame(IDictionary<string, List<RomData>> dict, bool mergeroms, bool norename, Logger logger, bool output = true)
+		public static SortedDictionary<string, List<Rom>> BucketByGame(IDictionary<string, List<Rom>> dict, bool mergeroms, bool norename, Logger logger, bool output = true)
 		{
-			SortedDictionary<string, List<RomData>> sortable = new SortedDictionary<string, List<RomData>>();
+			SortedDictionary<string, List<Rom>> sortable = new SortedDictionary<string, List<Rom>>();
 			long count = 0;
 
 			// If we have a null dict or an empty one, output a new dictionary
@@ -1466,15 +1466,15 @@ namespace SabreTools.Helper
 			}
 			
 			// Process each all of the roms
-			foreach (List<RomData> roms in dict.Values)
+			foreach (List<Rom> roms in dict.Values)
 			{
-				List<RomData> newroms = roms;
+				List<Rom> newroms = roms;
 				if (mergeroms)
 				{
 					newroms = RomTools.Merge(newroms, logger);
 				}
 
-				foreach (RomData rom in newroms)
+				foreach (Rom rom in newroms)
 				{
 					count++;
 					string key = (norename ? "" : rom.Metadata.SystemID.ToString().PadLeft(10, '0') + "-" + rom.Metadata.SourceID.ToString().PadLeft(10, '0') + "-") + rom.Game.ToLowerInvariant();
@@ -1484,7 +1484,7 @@ namespace SabreTools.Helper
 					}
 					else
 					{
-						List<RomData> temp = new List<RomData>();
+						List<Rom> temp = new List<Rom>();
 						temp.Add(rom);
 						sortable.Add(key, temp);
 					}
@@ -1509,9 +1509,9 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
 		/// <returns>SortedDictionary bucketed by size and hash</returns>
-		public static SortedDictionary<string, List<RomData>> BucketByHashSize(List<RomData> list, bool mergeroms, bool norename, Logger logger, bool output = true)
+		public static SortedDictionary<string, List<Rom>> BucketByHashSize(List<Rom> list, bool mergeroms, bool norename, Logger logger, bool output = true)
 		{
-			Dictionary<string, List<RomData>> dict = new Dictionary<string, List<RomData>>();
+			Dictionary<string, List<Rom>> dict = new Dictionary<string, List<Rom>>();
 			dict.Add("key", list);
 			return BucketByHashSize(dict, mergeroms, norename, logger, output);
 		}
@@ -1525,9 +1525,9 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
 		/// <returns>SortedDictionary bucketed by size and hash</returns>
-		public static SortedDictionary<string, List<RomData>> BucketByHashSize(IDictionary<string, List<RomData>> dict, bool mergeroms, bool norename, Logger logger, bool output = true)
+		public static SortedDictionary<string, List<Rom>> BucketByHashSize(IDictionary<string, List<Rom>> dict, bool mergeroms, bool norename, Logger logger, bool output = true)
 		{
-			SortedDictionary<string, List<RomData>> sortable = new SortedDictionary<string, List<RomData>>();
+			SortedDictionary<string, List<Rom>> sortable = new SortedDictionary<string, List<Rom>>();
 			long count = 0;
 
 			// If we have a null dict or an empty one, output a new dictionary
@@ -1537,15 +1537,15 @@ namespace SabreTools.Helper
 			}
 
 			// Process each all of the roms
-			foreach (List<RomData> roms in dict.Values)
+			foreach (List<Rom> roms in dict.Values)
 			{
-				List<RomData> newroms = roms;
+				List<Rom> newroms = roms;
 				if (mergeroms)
 				{
 					newroms = RomTools.Merge(newroms, logger);
 				}
 
-				foreach (RomData rom in newroms)
+				foreach (Rom rom in newroms)
 				{
 					count++;
 					string key = rom.Size + "-" + rom.CRC; ;
@@ -1555,7 +1555,7 @@ namespace SabreTools.Helper
 					}
 					else
 					{
-						List<RomData> temp = new List<RomData>();
+						List<Rom> temp = new List<Rom>();
 						temp.Add(rom);
 						sortable.Add(key, temp);
 					}
@@ -1589,7 +1589,7 @@ namespace SabreTools.Helper
 		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void Update(string inputFileName, DatData datdata, string outputDirectory, bool clean, string gamename, string romname,
+		public static void Update(string inputFileName, Dat datdata, string outputDirectory, bool clean, string gamename, string romname,
 			string romtype, long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
 		{
 			// Clean the input string
@@ -1620,7 +1620,7 @@ namespace SabreTools.Helper
 				foreach (string file in Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories))
 				{
 					logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
-					DatData innerDatdata = (DatData)datdata.Clone();
+					Dat innerDatdata = (Dat)datdata.Clone();
 					innerDatdata.Roms = null;
 					innerDatdata = Parse(file, 0, 0, innerDatdata, logger, true, clean);
 					innerDatdata = Filter(innerDatdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
@@ -1658,16 +1658,16 @@ namespace SabreTools.Helper
 		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		/// <returns>Returns filtered DatData object</returns>
-		public static DatData Filter(DatData datdata, string gamename, string romname, string romtype, long sgt,
+		public static Dat Filter(Dat datdata, string gamename, string romname, string romtype, long sgt,
 			long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
 		{
 			// Now loop through and create a new Rom dictionary using filtered values
-			Dictionary<string, List<RomData>> dict = new Dictionary<string, List<RomData>>();
+			Dictionary<string, List<Rom>> dict = new Dictionary<string, List<Rom>>();
 			List<string> keys = datdata.Roms.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<RomData> roms = datdata.Roms[key];
-				foreach (RomData rom in roms)
+				List<Rom> roms = datdata.Roms[key];
+				foreach (Rom rom in roms)
 				{
 					// Filter on nodump status
 					if (nodump == true && !rom.Nodump)
@@ -1794,7 +1794,7 @@ namespace SabreTools.Helper
 					}
 					else
 					{
-						List<RomData> temp = new List<RomData>();
+						List<Rom> temp = new List<Rom>();
 						temp.Add(rom);
 						dict.Add(key, temp);
 					}
