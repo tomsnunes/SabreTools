@@ -164,7 +164,7 @@ namespace SabreTools.Helper
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				// Don't log file open errors
 				encounteredErrors = true;
 			}
 			finally
