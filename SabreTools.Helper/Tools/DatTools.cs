@@ -403,6 +403,9 @@ namespace SabreTools.Helper
 							case "comment":
 								datdata.Comment = (String.IsNullOrEmpty(datdata.Comment) ? itemval : datdata.Comment);
 								break;
+							case "header":
+								datdata.Header = (String.IsNullOrEmpty(datdata.Header) ? itemval : datdata.Header);
+								break;
 							case "type":
 								datdata.Type = (String.IsNullOrEmpty(datdata.Type) ? itemval : datdata.Type);
 								superdat = superdat || itemval.Contains("SuperDAT");
@@ -860,6 +863,10 @@ namespace SabreTools.Helper
 											superdat = superdat || content.Contains("SuperDAT");
 											break;
 										case "clrmamepro":
+											if (headreader.GetAttribute("header") != null)
+											{
+												datdata.Header = (String.IsNullOrEmpty(datdata.Header) ? headreader.GetAttribute("header") : datdata.header);
+											}
 											if (headreader.GetAttribute("forcemerging") != null)
 											{
 												switch (headreader.GetAttribute("forcemerging"))
