@@ -10,7 +10,7 @@ namespace SabreTools.Helper
 	public class Skippers
 	{
 		// Local paths
-		private const string _skippersPath = "Skippers";
+		public const string Path = "Skippers";
 
 		// Header skippers represented by a list of skipper objects
 		private static List<Skipper> _list;
@@ -56,9 +56,9 @@ namespace SabreTools.Helper
 				_list = new List<Skipper>();
 			}
 
-			foreach (string skipperFile in Directory.EnumerateFiles(_skippersPath, "*", SearchOption.AllDirectories))
+			foreach (string skipperFile in Directory.EnumerateFiles(Path, "*", SearchOption.AllDirectories))
 			{
-				_list.Add(PopulateSkippersHelper(Path.GetFullPath(skipperFile)));
+				_list.Add(PopulateSkippersHelper(System.IO.Path.GetFullPath(skipperFile)));
 			}
 		}
 
@@ -69,7 +69,10 @@ namespace SabreTools.Helper
 		/// <returns>The Skipper object associated with the file</returns>
 		private static Skipper PopulateSkippersHelper(string filename)
 		{
-			Skipper skipper = new Skipper();
+			Skipper skipper = new Skipper
+			{
+				Rules = new List<SkipperRule>(),
+			};
 
 			if (!File.Exists(filename))
 			{
@@ -98,6 +101,7 @@ namespace SabreTools.Helper
 				{
 					case "detector":
 						valid = true;
+						xtr.Read();
 						break;
 					case "name":
 						skipper.Name = xtr.ReadElementContentAsString();
@@ -127,9 +131,7 @@ namespace SabreTools.Helper
 							}
 							else
 							{
-								long temp = 0;
-								Int64.TryParse(offset, out temp);
-								rule.StartOffset = temp;
+								rule.StartOffset = Convert.ToInt64(offset, 16);
 							}
 						}
 						if (xtr.GetAttribute("end_offset") != null)
@@ -141,9 +143,7 @@ namespace SabreTools.Helper
 							}
 							else
 							{
-								long temp = 0;
-								Int64.TryParse(offset, out temp);
-								rule.EndOffset = temp;
+								rule.EndOffset = Convert.ToInt64(offset, 16);
 							}
 						}
 						if (xtr.GetAttribute("operation") != null)
@@ -217,9 +217,7 @@ namespace SabreTools.Helper
 									}
 									else
 									{
-										long temp = 0;
-										Int64.TryParse(offset, out temp);
-										test.Offset = temp;
+										test.Offset = Convert.ToInt64(offset, 16);
 									}
 								}
 								if (subreader.GetAttribute("value") != null)
@@ -269,9 +267,7 @@ namespace SabreTools.Helper
 									}
 									else
 									{
-										long temp = 0;
-										Int64.TryParse(size, out temp);
-										test.Size = temp;
+										test.Size = Convert.ToInt64(size, 16);
 									}
 								}
 								if (subreader.GetAttribute("operator") != null)
@@ -330,160 +326,149 @@ namespace SabreTools.Helper
 			}
 
 			// Loop through and find a Skipper that has the right name
-			Skipper matchedSkipper = new Skipper();
+			logger.User("Beginning search for matching header skip rules");
 			foreach (Skipper skipper in List)
 			{
-				if (!String.IsNullOrEmpty(skipper.Name) && skippername.ToLowerInvariant() == skipper.Name.ToLowerInvariant())
+				if (String.IsNullOrEmpty(skippername) || (!String.IsNullOrEmpty(skipper.Name) && skippername.ToLowerInvariant() == skipper.Name.ToLowerInvariant()))
 				{
-					matchedSkipper = skipper;
-					break;
-				}
-			}
-
-			// If we have a blank skipper, return a blank skipper rule
-			if (String.IsNullOrEmpty(matchedSkipper.Name) || matchedSkipper.Rules == null)
-			{
-				logger.Warning("No header skipper by the name of '" + skippername + "' can be found");
-				return skipperRule;
-			}
-
-			// Otherwise, loop through the rules until one is found that works
-			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
-			{
-				logger.User("Beginning search for matching header skip rules");
-				foreach (SkipperRule rule in matchedSkipper.Rules)
-				{
-					// Always reset the stream back to the original place
-					br.BaseStream.Seek(0, SeekOrigin.Begin);
-
-					// For each rule, make sure it passes each test
-					bool success = true;
-					foreach (SkipperTest test in rule.Tests)
+					// Loop through the rules until one is found that works
+					using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
 					{
-						bool result = true;
-						switch (test.Type)
+						foreach (SkipperRule rule in skipper.Rules)
 						{
-							case HeaderSkipTest.Data:
-								// First seek to the correct position
-								if (test.Offset == null)
-								{
-									br.BaseStream.Seek(0, SeekOrigin.End);
-								}
-								else if (test.Offset > 0 && test.Offset <= br.BaseStream.Length)
-								{
-									br.BaseStream.Seek((long)test.Offset, SeekOrigin.Begin);
-								}
-								else if (test.Offset < 0 && Math.Abs((long)test.Offset) <= br.BaseStream.Length)
-								{
-									br.BaseStream.Seek((long)test.Offset, SeekOrigin.End);
-								}
+							// Always reset the stream back to the original place
+							br.BaseStream.Seek(0, SeekOrigin.Begin);
 
-								// Then read and compare bytewise
-								result = true;
-								for (int i = 0; i < test.Value.Length; i++)
+							// For each rule, make sure it passes each test
+							bool success = true;
+							foreach (SkipperTest test in rule.Tests)
+							{
+								bool result = true;
+								switch (test.Type)
 								{
-									try
-									{
-										if (br.ReadByte() != test.Value[i])
+									case HeaderSkipTest.Data:
+										// First seek to the correct position
+										if (test.Offset == null)
 										{
-											result = false;
-											break;
+											br.BaseStream.Seek(0, SeekOrigin.End);
 										}
-									}
-									catch
-									{
-										result = false;
+										else if (test.Offset > 0 && test.Offset <= br.BaseStream.Length)
+										{
+											br.BaseStream.Seek((long)test.Offset, SeekOrigin.Begin);
+										}
+										else if (test.Offset < 0 && Math.Abs((long)test.Offset) <= br.BaseStream.Length)
+										{
+											br.BaseStream.Seek((long)test.Offset, SeekOrigin.End);
+										}
+
+										// Then read and compare bytewise
+										result = true;
+										for (int i = 0; i < test.Value.Length; i++)
+										{
+											try
+											{
+												if (br.ReadByte() != test.Value[i])
+												{
+													result = false;
+													break;
+												}
+											}
+											catch
+											{
+												result = false;
+												break;
+											}
+										}
+
+										// Return if the expected and actual results match
+										success &= (result == test.Result);
 										break;
-									}
-								}
+									case HeaderSkipTest.Or:
+									case HeaderSkipTest.Xor:
+									case HeaderSkipTest.And:
+										// First seek to the correct position
+										if (test.Offset == null)
+										{
+											br.BaseStream.Seek(0, SeekOrigin.End);
+										}
+										else if (test.Offset > 0 && test.Offset <= br.BaseStream.Length)
+										{
+											br.BaseStream.Seek((long)test.Offset, SeekOrigin.Begin);
+										}
+										else if (test.Offset < 0 && Math.Abs((long)test.Offset) <= br.BaseStream.Length)
+										{
+											br.BaseStream.Seek((long)test.Offset, SeekOrigin.End);
+										}
 
-								// Return if the expected and actual results match
-								success &= (result == test.Result);
-								break;
-							case HeaderSkipTest.Or:
-							case HeaderSkipTest.Xor:
-							case HeaderSkipTest.And:
-								// First seek to the correct position
-								if (test.Offset == null)
-								{
-									br.BaseStream.Seek(0, SeekOrigin.End);
-								}
-								else if (test.Offset > 0 && test.Offset <= br.BaseStream.Length)
-								{
-									br.BaseStream.Seek((long)test.Offset, SeekOrigin.Begin);
-								}
-								else if (test.Offset < 0 && Math.Abs((long)test.Offset) <= br.BaseStream.Length)
-								{
-									br.BaseStream.Seek((long)test.Offset, SeekOrigin.End);
-								}
+										result = true;
+										try
+										{
+											// Then apply the mask if it exists
+											byte[] read = br.ReadBytes(test.Mask.Length);
+											byte[] masked = new byte[test.Mask.Length];
+											for (int i = 0; i < read.Length; i++)
+											{
+												masked[i] = (byte)(test.Type == HeaderSkipTest.And ? read[i] & test.Mask[i] :
+													(test.Type == HeaderSkipTest.Or ? read[i] | test.Mask[i] : read[i] ^ test.Mask[i])
+												);
+											}
 
-								result = true;
-								try
-								{
-									// Then apply the mask if it exists
-									byte[] read = br.ReadBytes(test.Mask.Length);
-									byte[] masked = new byte[test.Mask.Length];
-									for (int i = 0; i < read.Length; i++)
-									{
-										masked[i] = (byte)(test.Type == HeaderSkipTest.And ? read[i] & test.Mask[i] :
-											(test.Type == HeaderSkipTest.Or ? read[i] | test.Mask[i] : read[i] ^ test.Mask[i])
-										);
-									}
-
-									// Finally, compare it against the value
-									for (int i = 0; i < test.Value.Length; i++)
-									{
-										if (masked[i] != test.Value[i])
+											// Finally, compare it against the value
+											for (int i = 0; i < test.Value.Length; i++)
+											{
+												if (masked[i] != test.Value[i])
+												{
+													result = false;
+													break;
+												}
+											}
+										}
+										catch
 										{
 											result = false;
-											break;
 										}
-									}
-								}
-								catch
-								{
-									result = false;
-								}
 
-								// Return if the expected and actual results match
-								success &= (result == test.Result);
+										// Return if the expected and actual results match
+										success &= (result == test.Result);
+										break;
+									case HeaderSkipTest.File:
+										// First get the file size from stream
+										long size = br.BaseStream.Length;
+
+										// If we have a null size, check that the size is a power of 2
+										result = true;
+										if (test.Size == null)
+										{
+											// http://stackoverflow.com/questions/600293/how-to-check-if-a-number-is-a-power-of-2
+											result = (((ulong)size & ((ulong)size - 1)) == 0);
+										}
+										else if (test.Operator == HeaderSkipTestFileOperator.Less)
+										{
+											result = (size < test.Size);
+										}
+										else if (test.Operator == HeaderSkipTestFileOperator.Greater)
+										{
+											result = (size > test.Size);
+										}
+										else if (test.Operator == HeaderSkipTestFileOperator.Equal)
+										{
+											result = (size == test.Size);
+										}
+
+										// Return if the expected and actual results match
+										success &= (result == test.Result);
+										break;
+								}
+							}
+
+							// If we still have a success, then return this rule
+							if (success)
+							{
+								logger.User("Matching rule found!");
+								skipperRule = rule;
 								break;
-							case HeaderSkipTest.File:
-								// First get the file size from stream
-								long size = br.BaseStream.Length;
-
-								// If we have a null size, check that the size is a power of 2
-								result = true;
-								if (test.Size == null)
-								{
-									// http://stackoverflow.com/questions/600293/how-to-check-if-a-number-is-a-power-of-2
-									result = (((ulong)size & ((ulong)size - 1)) == 0);
-								}
-								else if (test.Operator == HeaderSkipTestFileOperator.Less)
-								{
-									result = (size < test.Size);
-								}
-								else if (test.Operator == HeaderSkipTestFileOperator.Greater)
-								{
-									result = (size > test.Size);
-								}
-								else if (test.Operator == HeaderSkipTestFileOperator.Equal)
-								{
-									result = (size == test.Size);
-								}
-
-								// Return if the expected and actual results match
-								success &= (result == test.Result);
-								break;
+							}
 						}
-					}
-
-					// If we still have a success, then return this rule
-					if (success)
-					{
-						logger.User("Matching rule found!");
-						skipperRule = rule;
-						break;
 					}
 				}
 			}
@@ -507,6 +492,8 @@ namespace SabreTools.Helper
 		/// <returns></returns>
 		public static bool TransformFile(string input, string output, SkipperRule rule, Logger logger)
 		{
+			bool success = true;
+
 			// If the input file doesn't exist, fail
 			if (!File.Exists(input))
 			{
@@ -515,9 +502,9 @@ namespace SabreTools.Helper
 			}
 
 			// Create the output directory if it doesn't already
-			if (!Directory.Exists(Path.GetDirectoryName(output)))
+			if (!Directory.Exists(System.IO.Path.GetDirectoryName(output)))
 			{
-				Directory.CreateDirectory(Path.GetDirectoryName(output));
+				Directory.CreateDirectory(System.IO.Path.GetDirectoryName(output));
 			}
 
 			// If the sizes are wrong for the values, fail
@@ -533,17 +520,18 @@ namespace SabreTools.Helper
 			// Now read the proper part of the file and apply the rule
 			try
 			{
+				logger.User("Applying found rule to file '" + input + "'");
 				using (BinaryWriter bw = new BinaryWriter(File.OpenWrite(output)))
 				using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
 				{
 					// Seek to the beginning offset
 					if (rule.StartOffset == null)
 					{
-						return false;
+						success = false;
 					}
 					else if (Math.Abs((long)rule.StartOffset) > br.BaseStream.Length)
 					{
-						return false;
+						success = false;
 					}
 					else if (rule.StartOffset > 0)
 					{
@@ -555,65 +543,69 @@ namespace SabreTools.Helper
 					}
 
 					// Then read and apply the operation as you go
-					byte[] buffer = new byte[4];
-					int pos = 0;
-					while (br.BaseStream.Position <= (rule.EndOffset != null ? rule.EndOffset : br.BaseStream.Length)
-						&& br.BaseStream.Position <= br.BaseStream.Length)
+					if (success)
 					{
-						uint b = br.ReadUInt32();
-						switch (rule.Operation)
+						byte[] buffer = new byte[4];
+						int pos = 0;
+						while (br.BaseStream.Position < (rule.EndOffset != null ? rule.EndOffset : br.BaseStream.Length)
+							&& br.BaseStream.Position < br.BaseStream.Length)
 						{
-							case HeaderSkipOperation.Bitswap:
-								// http://stackoverflow.com/questions/3587826/is-there-a-built-in-function-to-reverse-bit-order
-								uint r = b;
-								int s = 7;
-								for (b >>= 1; b != 0; b >>= 1)
-								{
-									r <<= 1;
-									r |= (byte)(b & 1);
-									s--;
-								}
-								r <<= s;
-								buffer[pos] = (byte)r;
-								break;
-							case HeaderSkipOperation.Byteswap:
-								if (pos % 2 == 1)
-								{
-									buffer[pos - 1] = (byte)b;
-								}
-								if (pos % 2 == 0)
-								{
-									buffer[pos + 1] = (byte)b;
-								}
-								break;
-							case HeaderSkipOperation.Wordswap:
-								buffer[3 - pos] = (byte)b;
-								break;
-							case HeaderSkipOperation.WordByteswap:
-								buffer[(pos + 2) % 4] = (byte)b;
-								break;
-							case HeaderSkipOperation.None:
-							default:
-								buffer[pos] = (byte)b;
-								break;
+							byte b = br.ReadByte();
+							switch (rule.Operation)
+							{
+								case HeaderSkipOperation.Bitswap:
+									// http://stackoverflow.com/questions/3587826/is-there-a-built-in-function-to-reverse-bit-order
+									uint r = b;
+									int s = 7;
+									for (b >>= 1; b != 0; b >>= 1)
+									{
+										r <<= 1;
+										r |= (byte)(b & 1);
+										s--;
+									}
+									r <<= s;
+									buffer[pos] = (byte)r;
+									break;
+								case HeaderSkipOperation.Byteswap:
+									if (pos % 2 == 1)
+									{
+										buffer[pos - 1] = b;
+									}
+									if (pos % 2 == 0)
+									{
+										buffer[pos + 1] = b;
+									}
+									break;
+								case HeaderSkipOperation.Wordswap:
+									buffer[3 - pos] = b;
+									break;
+								case HeaderSkipOperation.WordByteswap:
+									buffer[(pos + 2) % 4] = b;
+									break;
+								case HeaderSkipOperation.None:
+								default:
+									buffer[pos] = b;
+									break;
+							}
+
+							// Set the buffer position to default write to
+							pos = (pos + 1) % 4;
+
+							// If we filled a buffer, flush to the stream
+							if (pos == 0)
+							{
+								bw.Write(buffer);
+								bw.Flush();
+								buffer = new byte[4];
+							}
 						}
-
-						// Set the buffer position to default write to
-						pos = (pos + 1) % 4;
-
-						// If we filled a buffer, flush to the stream
-						if (pos == 0)
+						// If there's anything more in the buffer, write only the left bits
+						for (int i = 0; i < pos; i++)
 						{
-							bw.Write(buffer);
-							buffer = new byte[4];
+							bw.Write(buffer[i]);
 						}
 					}
-
-					// If there's anything more in the buffer, write only the left bits
-					for (int i = 0; i < pos; i++)
-					{
-						bw.Write(buffer[i]);
-					}
+					
 				}
 			}
 			catch (Exception ex)
@@ -622,7 +614,20 @@ namespace SabreTools.Helper
 				return false;
 			}
 
-			return true;
+			// If the output file has size 0, delete it
+			if (new FileInfo(output).Length == 0)
+			{
+				try
+				{
+					File.Delete(output);
+				}
+				catch
+				{
+					// Don't log this file deletion error
+				}
+			}
+
+			return success;
 		}
 
 		#endregion
@@ -658,7 +663,7 @@ namespace SabreTools.Helper
 			XmlDocument doc = new XmlDocument();
 			try
 			{
-				doc.LoadXml(File.ReadAllText(Path.Combine(_skippersPath, skipper + ".xml")));
+				doc.LoadXml(File.ReadAllText(System.IO.Path.Combine(Path, skipper + ".xml")));
 			}
 			catch (XmlException ex)
 			{
@@ -744,7 +749,6 @@ namespace SabreTools.Helper
 				}
 				catch
 				{
-					logger.Warning("The mapping for '" + test.ToString() + "' cannot be found!");
 					continue;
 				}
 

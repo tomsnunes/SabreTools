@@ -375,14 +375,15 @@ namespace SabreTools
 					ArchiveTools.WriteToArchive(input, _outdir, found);
 				}
 
-				// Now get the headerless file if it exists
-				int hs = 0;
-				Skippers.GetFileHeaderType(input, out hs, _logger);
-				if (hs > 0)
+				// Now get the transformed file if it exists
+				SkipperRule rule = Skippers.MatchesSkipper(input, "", _logger);
+
+				// If we have have a non-empty rule, apply it
+				if (rule.Tests != null && rule.Tests.Count != 0)
 				{
+					// Otherwise, apply the rule ot the file
 					string newinput = input + ".new";
-					_logger.Log("Creating unheadered file: '" + newinput + "'");
-					Output.RemoveBytesFromFile(input, newinput, hs, 0);
+					Skippers.TransformFile(input, input + ".new", rule, _logger);
 					Rom drom = RomTools.GetSingleFileInfo(newinput);
 
 					// If we have a blank RomData, it's an error

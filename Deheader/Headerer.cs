@@ -76,7 +76,7 @@ namespace SabreTools
 				// If it's a single file, just check it
 				if (File.Exists(file))
 				{
-					DetectRemoveHeader(file);
+					DetectSkipperAndTransform(file);
 				}
 				// If it's a directory, recursively check all
 				else if (Directory.Exists(file))
@@ -85,7 +85,7 @@ namespace SabreTools
 					{
 						if (sub != ".." && sub != ".")
 						{
-							DetectRemoveHeader(sub);
+							DetectSkipperAndTransform(sub);
 						}
 					}
 				}
@@ -123,12 +123,15 @@ namespace SabreTools
 		}
 
 		/// <summary>
-		/// Detect and remove header from the given file
+		/// Detect header skipper compliance and create an output file
 		/// </summary>
 		/// <param name="file">Name of the file to be parsed</param>
-		private static void DetectRemoveHeader(string file)
+		/// <returns>True if the output file was created, false otherwise</returns>
+		private static bool DetectSkipperAndTransform(string file)
 		{
-			// First get the HeaderType, if any
+			logger.User("\nGetting skipper information for '" + file + "'");
+
+			// Then, if the file was headered, store it to the database
 			int headerSize = -1;
 			HeaderType type = Skippers.GetFileHeaderType(file, out headerSize, logger);
 
@@ -150,15 +153,30 @@ namespace SabreTools
 					}
 				}
 
-				// Write out the remaining bytes to new file
-				logger.User("Creating unheadered file: " + file + ".new");
-				Output.RemoveBytesFromFile(file, file + ".new", headerSize, 0);
-				logger.User("Unheadered file created!");
+				// Then find an apply the exact rule to the file
+				SkipperRule rule = Skippers.MatchesSkipper(file, "", logger);
+
+				// If we have an empty rule, return false
+				if (rule.Tests == null || rule.Tests.Count == 0)
+				{
+					return false;
+				}
+
+				// Otherwise, apply the rule ot the file
+				Skippers.TransformFile(file, file + ".new", rule, logger);
+
+				// If the output file doesn't exist, return false
+				if (!File.Exists(file + ".new"))
+				{
+					return false;
+				}
 
 				// Now add the information to the database if it's not already there
 				Rom rom = RomTools.GetSingleFileInfo(file + ".new");
 				AddHeaderToDatabase(hstr, rom.SHA1, type);
 			}
+
+			return true;
 		}
 
 		/// <summary>
