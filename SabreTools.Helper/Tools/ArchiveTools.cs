@@ -162,7 +162,7 @@ namespace SabreTools.Helper
 			{
 				encounteredErrors = true;
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				// Don't log file open errors
 				encounteredErrors = true;
