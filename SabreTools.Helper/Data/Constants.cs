@@ -63,5 +63,16 @@ namespace SabreTools.Helper
 		public static long GigaByte = (long)Math.Pow(KiloByte, 2);
 		public static long TeraByte = (long)Math.Pow(KiloByte, 2);
 		public static long PetaByte = (long)Math.Pow(KiloByte, 2);
+
+		// Magic numbers as strings
+		public static string SevenZipSig = "377ABCAF271C";
+		public static string GzSig = "1F8B";
+		public static string RarSig = "526172211A0700";
+		public static string RarFiveSig = "526172211A070100";
+		public static string TarSig = "7573746172202000";
+		public static string TarZeroSig = "7573746172003030";
+		public static string ZipSig = "504B0304";
+		public static string ZipSigEmpty = "504B0506";
+		public static string ZipSigSpanned = "504B0708";
 	}
 }

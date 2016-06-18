@@ -454,19 +454,48 @@ namespace SabreTools.Helper
 		{
 			ArchiveType? outtype = null;
 
-			IReader reader = null;
+			// Read the first bytes of the file and get the magic numbe
 			try
 			{
-				reader = ReaderFactory.Open(File.OpenRead(input));
-				outtype = reader.ArchiveType;
+				byte[] magic = new byte[8];
+				using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+				{
+					magic = br.ReadBytes(8);
+				}
+
+				// Convert it to an uppercase string
+				string mstr = string.Empty;
+				for (int i = 0; i < magic.Length; i++)
+				{
+					mstr += BitConverter.ToString(new byte[] { magic[i] });
+				}
+				mstr = mstr.ToUpperInvariant();
+
+				// Now try to match it to a known signature
+				if (mstr.StartsWith(Constants.SevenZipSig))
+				{
+					outtype = ArchiveType.SevenZip;
+				}
+				else if (mstr.StartsWith(Constants.GzSig))
+				{
+					outtype = ArchiveType.GZip;
+				}
+				else if (mstr.StartsWith(Constants.RarSig) || mstr.StartsWith(Constants.RarFiveSig))
+				{
+					outtype = ArchiveType.Rar;
+				}
+				else if (mstr.StartsWith(Constants.TarSig) || mstr.StartsWith(Constants.TarZeroSig))
+				{
+					outtype = ArchiveType.Tar;
+				}
+				else if (mstr.StartsWith(Constants.ZipSig) || mstr.StartsWith(Constants.ZipSigEmpty) || mstr.StartsWith(Constants.ZipSigSpanned))
+				{
+					outtype = ArchiveType.Zip;
+				}
 			}
 			catch (Exception)
 			{
-				// Don't log archive open errors
-			}
-			finally
-			{
-				reader?.Dispose();
+				// Don't log file open errors
 			}
 
 			return outtype;

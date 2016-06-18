@@ -1,5 +1,4 @@
 ﻿using SabreTools.Helper;
-using SharpCompress.Archive;
 using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ namespace SabreTools
 		private List<string> _inputs;
 		private string _outdir;
 		private string _tempdir;
-		private bool _externalScan;
+		private bool _quickScan;
 		private ArchiveScanLevel _7z;
 		private ArchiveScanLevel _gz;
 		private ArchiveScanLevel _rar;
@@ -28,20 +27,20 @@ namespace SabreTools
 		/// <param name="inputs">List of input files/folders to check</param>
 		/// <param name="outdir">Output directory to use to build to</param>
 		/// <param name="tempdir">Temporary directory for archive extraction</param>
-		/// <param name="externalScan">True to enable external scanning of archives, false otherwise</param>
+		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public SimpleSort(Dat datdata, List<string> inputs, string outdir, string tempdir,
-			bool externalScan, int sevenzip, int gz, int rar, int zip, Logger logger)
+			bool quickScan, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			_datdata = datdata;
 			_inputs = inputs;
 			_outdir = (outdir == "" ? "Rebuild" : outdir);
 			_tempdir = (tempdir == "" ? "__TEMP__" : tempdir);
-			_externalScan = externalScan;
+			_quickScan = quickScan;
 			_7z = (ArchiveScanLevel)(sevenzip < 0 || sevenzip > 2 ? 0 : sevenzip);
 			_gz = (ArchiveScanLevel)(gz < 0 || gz > 2 ? 0 : gz);
 			_rar = (ArchiveScanLevel)(rar < 0 || rar > 2 ? 0 : rar);
@@ -85,7 +84,7 @@ namespace SabreTools
 
 			// Set all default values
 			bool help = false,
-				externalScan = false,
+				quickScan = false,
 				simpleSort = true;
 			int sevenzip = 0,
 				gz = 2,
@@ -108,7 +107,7 @@ namespace SabreTools
 						break;
 					case "-qs":
 					case "--quick":
-						externalScan = true;
+						quickScan = true;
 						break;
 					default:
 						string temparg = arg.Replace("\"", "").Replace("file://", "");
@@ -200,7 +199,7 @@ namespace SabreTools
 			{
 				if (datfiles.Count > 0)
 				{
-					InitSimpleSort(datfiles, inputs, outdir, tempdir, externalScan, sevenzip, gz, rar, zip, logger);
+					InitSimpleSort(datfiles, inputs, outdir, tempdir, quickScan, sevenzip, gz, rar, zip, logger);
 				}
 				else
 				{
@@ -228,14 +227,14 @@ namespace SabreTools
 		/// <param name="inputs">List of input files/folders to check</param>
 		/// <param name="outdir">Output directory to use to build to</param>
 		/// <param name="tempdir">Temporary directory for archive extraction</param>
-		/// <param name="externalScan">True to enable external scanning of archives, false otherwise</param>
+		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		private static void InitSimpleSort(List<string> datfiles, List<string> inputs, string outdir, string tempdir, 
-			bool externalScan, int sevenzip, int gz, int rar, int zip, Logger logger)
+			bool quickScan, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
 			Dat datdata = new Dat();
@@ -244,7 +243,7 @@ namespace SabreTools
 				datdata = DatTools.Parse(datfile, 0, 0, datdata, logger);
 			}
 
-			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, externalScan, sevenzip, gz, rar, zip, logger);
+			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, sevenzip, gz, rar, zip, logger);
 			ss.RebuildToFolder();
 		}
 
@@ -329,34 +328,37 @@ namespace SabreTools
 			input = Path.GetFullPath(input);
 			_logger.User("Beginning processing of '" + input + "'");
 
-			// If we have an archive, scan it if necessary
-			bool shouldscan = true;
-			try
+			// Get if the file should be scanned internally and externally
+			bool shouldExternalScan = true;
+			bool shouldInternalScan = true;
+
+			ArchiveType? archiveType = ArchiveTools.GetCurrentArchiveType(input, _logger);
+			switch (archiveType)
 			{
-				IArchive temp = ArchiveFactory.Open(input);
-				switch (temp.Type)
-				{
-					case ArchiveType.GZip:
-						shouldscan = (_gz != ArchiveScanLevel.Internal);
-						break;
-					case ArchiveType.Rar:
-						shouldscan = (_rar != ArchiveScanLevel.Internal);
-						break;
-					case ArchiveType.SevenZip:
-						shouldscan = (_7z != ArchiveScanLevel.Internal);
-						break;
-					case ArchiveType.Zip:
-						shouldscan = (_zip != ArchiveScanLevel.Internal);
-						break;
-				}
-			}
-			catch
-			{
-				shouldscan = true;
+				case null:
+					shouldExternalScan = true;
+					shouldInternalScan = false;
+					break;
+				case ArchiveType.GZip:
+					shouldExternalScan = (_gz != ArchiveScanLevel.Internal);
+					shouldInternalScan = (_gz != ArchiveScanLevel.External);
+					break;
+				case ArchiveType.Rar:
+					shouldExternalScan = (_rar != ArchiveScanLevel.Internal);
+					shouldInternalScan = (_rar != ArchiveScanLevel.External);
+					break;
+				case ArchiveType.SevenZip:
+					shouldExternalScan = (_7z != ArchiveScanLevel.Internal);
+					shouldInternalScan = (_7z != ArchiveScanLevel.External);
+					break;
+				case ArchiveType.Zip:
+					shouldExternalScan = (_zip != ArchiveScanLevel.Internal);
+					shouldInternalScan = (_zip != ArchiveScanLevel.External);
+					break;
 			}
 
 			// Hash and match the external files
-			if (shouldscan)
+			if (shouldExternalScan)
 			{
 				Rom rom = RomTools.GetSingleFileInfo(input);
 
@@ -421,46 +423,49 @@ namespace SabreTools
 				}
 			}
 
-			// If external scanning is enabled, use that method instead
-			if (_externalScan)
+			// If we should scan the file as an archive
+			if (shouldInternalScan)
 			{
-				_logger.Log("Beginning quick scan of contents from '" + input + "'");
-				List<Rom> internalRomData = ArchiveTools.GetArchiveFileInfo(input, _logger);
-				_logger.Log(internalRomData.Count + " entries found in '" + input + "'");
-
-				// If the list is populated, then the file was a filled archive
-				if (internalRomData.Count > 0)
+				// If external scanning is enabled, use that method instead
+				if (_quickScan)
 				{
-					foreach (Rom rom in internalRomData)
+					_logger.Log("Beginning quick scan of contents from '" + input + "'");
+					List<Rom> internalRomData = ArchiveTools.GetArchiveFileInfo(input, _logger);
+					_logger.Log(internalRomData.Count + " entries found in '" + input + "'");
+
+					// If the list is populated, then the file was a filled archive
+					if (internalRomData.Count > 0)
 					{
-						// Try to find the matches to the file that was found
-						List<Rom> foundroms = RomTools.GetDuplicates(rom, _datdata);
-						_logger.User("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
-						foreach (Rom found in foundroms)
+						foreach (Rom rom in internalRomData)
 						{
-							_logger.Log("Matched name: " + found.Name);
-							string newinput = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
-							if (newinput != null && File.Exists(newinput))
+							// Try to find the matches to the file that was found
+							List<Rom> foundroms = RomTools.GetDuplicates(rom, _datdata);
+							_logger.User("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
+							foreach (Rom found in foundroms)
 							{
-								ArchiveTools.WriteToArchive(newinput, _outdir, found);
-								try
+								_logger.Log("Matched name: " + found.Name);
+								string newinput = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
+								if (newinput != null && File.Exists(newinput))
 								{
-									File.Delete(newinput);
-								}
-								catch (Exception)
-								{
-									// Don't log file deletion errors
+									ArchiveTools.WriteToArchive(newinput, _outdir, found);
+									try
+									{
+										File.Delete(newinput);
+									}
+									catch (Exception)
+									{
+										// Don't log file deletion errors
+									}
 								}
 							}
 						}
 					}
 				}
-			}
-			else
-			{
-				// If the file isn't an archive, skip out sooner
-				if (ArchiveTools.GetCurrentArchiveType(input, _logger) == null)
+				else
 				{
+					// Now, if the file is a supported archive type, also run on all files within
+					bool encounteredErrors = !ArchiveTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
+
 					// Remove the current file if we are in recursion so it's not picked up in the next step
 					if (recurse)
 					{
@@ -474,32 +479,14 @@ namespace SabreTools
 						}
 					}
 
-					return success;
-				}
-
-				// Now, if the file is a supported archive type, also run on all files within
-				bool encounteredErrors = !ArchiveTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
-
-				// Remove the current file if we are in recursion so it's not picked up in the next step
-				if (recurse)
-				{
-					try
+					// If no errors were encountered, we loop through the temp directory
+					if (!encounteredErrors)
 					{
-						File.Delete(input);
-					}
-					catch (Exception)
-					{
-						// Don't log file deletion errors
-					}
-				}
-
-				// If no errors were encountered, we loop through the temp directory
-				if (!encounteredErrors)
-				{
-					_logger.User("Archive found! Successfully extracted");
-					foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
-					{
-						success &= RebuildToFolderHelper(file, true);
+						_logger.User("Archive found! Successfully extracted");
+						foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
+						{
+							success &= RebuildToFolderHelper(file, true);
+						}
 					}
 				}
 			}
@@ -557,7 +544,7 @@ namespace SabreTools
 					List<Rom> roms = new List<Rom>();
 
 					// If we are in quickscan, get the list of roms that way
-					if (_externalScan)
+					if (_quickScan)
 					{
 						roms = ArchiveTools.GetArchiveFileInfo(Path.GetFullPath(archive), _logger);
 					}
