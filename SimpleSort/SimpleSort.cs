@@ -447,6 +447,7 @@ namespace SabreTools
 								string newinput = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
 								if (newinput != null && File.Exists(newinput))
 								{
+									_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
 									ArchiveTools.WriteToArchive(newinput, _outdir, found);
 									try
 									{
