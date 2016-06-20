@@ -1532,10 +1532,27 @@ namespace SabreTools.Helper
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || diff)
 			{
+				// Create a new list of inputs that are only files
+				List<string> newInputFileNames = new List<string>();
+				foreach (string input in inputFileNames)
+				{
+					if (File.Exists(input))
+					{
+						newInputFileNames.Add(Path.GetFullPath(input));
+					}
+					else if (Directory.Exists(input))
+					{
+						foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+						{
+							newInputFileNames.Add(Path.GetFullPath(file));
+						}
+					}
+				}
+
 				// Create a dictionary of all ROMs from the input DATs
 				datdata.FileName = datdata.Description;
 				Dat userData;
-				List<Dat> datHeaders = PopulateUserData(inputFileNames, inplace, clean, outputDirectory, datdata, out userData, logger);
+				List<Dat> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, outputDirectory, datdata, out userData, logger);
 
 				// If we want to filter, apply it to the userData now
 				userData = Filter(userData, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
@@ -1543,17 +1560,17 @@ namespace SabreTools.Helper
 				// Modify the Dictionary if necessary and output the results
 				if (diff && !cascade)
 				{
-					DiffNoCascade(outputDirectory, userData, inputFileNames, logger);
+					DiffNoCascade(outputDirectory, userData, newInputFileNames, logger);
 				}
 				// If we're in cascade and diff, output only cascaded diffs
 				else if (diff && cascade)
 				{
-					DiffCascade(outputDirectory, inplace, userData, inputFileNames, datHeaders, logger);
+					DiffCascade(outputDirectory, inplace, userData, newInputFileNames, datHeaders, logger);
 				}
 				// Output all entries with user-defined merge
 				else
 				{
-					MergeNoDiff(outputDirectory, userData, inputFileNames, datHeaders, logger);
+					MergeNoDiff(outputDirectory, userData, newInputFileNames, datHeaders, logger);
 				}
 			}
 			// Otherwise, loop through all of the inputs individually
