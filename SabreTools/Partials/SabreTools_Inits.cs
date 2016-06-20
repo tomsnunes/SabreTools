@@ -343,6 +343,10 @@ namespace SabreTools
 			}
 			if (!outputCMP && !outputMiss && !outputRC && !outputSD && !outputXML)
 			{
+				if (merge || diff)
+				{
+					userInputDat.OutputFormat = OutputFormat.Xml;
+				}
 				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean,
 					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
