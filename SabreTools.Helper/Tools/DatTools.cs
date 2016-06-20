@@ -1521,10 +1521,13 @@ namespace SabreTools.Helper
 		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		public static void Update(List<string> inputFileNames, Dat datdata, string outputDirectory, bool merge, bool diff, bool cascade, bool inplace,
 			bool bare, bool clean, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc, string md5,
-			string sha1, bool? nodump, Logger logger)
+			string sha1, bool? nodump, bool trim, bool single, string root, Logger logger)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || diff)
@@ -1535,7 +1538,13 @@ namespace SabreTools.Helper
 				List<Dat> datHeaders = PopulateUserData(inputFileNames, inplace, clean, outputDirectory, datdata, out userData, logger);
 
 				// If we want to filter, apply it to the userData now
-				userData = Filter(userData, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
+				userData = Filter(userData, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
+
+				// If we're trimming, apply it to the userData now
+				if (trim)
+				{
+
+				}
 
 				// Modify the Dictionary if necessary and output the results
 				if (diff && !cascade)
@@ -1570,7 +1579,7 @@ namespace SabreTools.Helper
 					{
 						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
 						datdata = Parse(inputFileName, 0, 0, datdata, logger, true, clean);
-						datdata = Filter(datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
+						datdata = Filter(datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
 
 						// If the extension matches, append ".new" to the filename
 						string extension = (datdata.OutputFormat == OutputFormat.Xml || datdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
@@ -1591,7 +1600,7 @@ namespace SabreTools.Helper
 							Dat innerDatdata = (Dat)datdata.Clone();
 							innerDatdata.Roms = null;
 							innerDatdata = Parse(file, 0, 0, innerDatdata, logger, true, clean);
-							innerDatdata = Filter(innerDatdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
+							innerDatdata = Filter(innerDatdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
 
 							// If the extension matches, append ".new" to the filename
 							string extension = (innerDatdata.OutputFormat == OutputFormat.Xml || innerDatdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
@@ -1672,10 +1681,13 @@ namespace SabreTools.Helper
 		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		/// <returns>Returns filtered DatData object</returns>
 		public static Dat Filter(Dat datdata, string gamename, string romname, string romtype, long sgt,
-			long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
+			long slt, long seq, string crc, string md5, string sha1, bool? nodump, bool trim, bool single, string root, Logger logger)
 		{
 			// Now loop through and create a new Rom dictionary using filtered values
 			Dictionary<string, List<Rom>> dict = new Dictionary<string, List<Rom>>();
@@ -1683,8 +1695,10 @@ namespace SabreTools.Helper
 			foreach (string key in keys)
 			{
 				List<Rom> roms = datdata.Roms[key];
-				foreach (Rom rom in roms)
+				for (int i = 0; i < roms.Count; i++)
 				{
+					Rom rom = roms[i];
+
 					// Filter on nodump status
 					if (nodump == true && !rom.Nodump)
 					{
@@ -1800,6 +1814,25 @@ namespace SabreTools.Helper
 						else if (sha1.EndsWith("*") && !rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 						{
 							continue;
+						}
+					}
+
+					// If we are in single game mode, rename all games
+					if (single)
+					{
+						rom.Game = "!";
+					}
+
+					// If we are in NTFS trim mode, trim the game name
+					if (trim)
+					{
+						// Windows max name length is 260
+						int usableLength = 260 - rom.Game.Length - root.Length;
+						if (rom.Name.Length > usableLength)
+						{
+							string ext = Path.GetExtension(rom.Name);
+							rom.Name = rom.Name.Substring(0, usableLength - ext.Length);
+							rom.Name += ext;
 						}
 					}
 

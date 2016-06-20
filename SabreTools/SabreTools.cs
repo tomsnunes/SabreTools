@@ -361,8 +361,7 @@ namespace SabreTools
 					case "--skip":
 						skip = true;
 						break;
-					case "-tm":
-					case "--trim-merge":
+					case "-trim":
 						trim = true;
 						break;
 					case "-tsv":
@@ -585,8 +584,8 @@ namespace SabreTools
 
 			// If more than one switch is enabled, show the help screen
 			if (!(add ^ datfromdir ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^
-				(merge || diff) ^ (update || outputCMP || outputRC || outputSD || outputXML || outputMiss) ^
-				offlineMerge ^ rem ^ stats ^ trim))
+				(merge || diff || update || outputCMP || outputRC || outputSD || outputXML || outputMiss || trim) ^
+				offlineMerge ^ rem ^ stats))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -644,7 +643,7 @@ namespace SabreTools
 				InitUpdate(inputs, filename, name, description, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,
 					postfix, quotes, repext, addext, datprefix, romba, tsv, merge, diff, cascade, inplace, bare, gamename, romname,
-					romtype, sgt, slt, seq, crc, md5, sha1, nodump, outdir, clean, dedup);
+					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, dedup);
 			}
 
 			// Add a source or system
@@ -678,15 +677,6 @@ namespace SabreTools
 				else
 				{
 					Build.Help();
-				}
-			}
-
-			// Consolodate and trim DAT
-			else if (trim)
-			{
-				foreach (string input in inputs)
-				{
-					InitTrimMerge(input, root, !norename, !disableForce);
 				}
 			}
 

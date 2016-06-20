@@ -124,6 +124,10 @@ namespace SabreTools
 		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// /* Trimming info */
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// /* Output DAT info */
 		/// <param name="outdir">Optional param for output directory</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
@@ -181,6 +185,11 @@ namespace SabreTools
 			string md5,
 			string sha1,
 			bool? nodump,
+
+			/* Trimming info */
+			bool trim,
+			bool single,
+			string root,
 
 			/* Output DAT info */
 			string outdir,
@@ -302,36 +311,36 @@ namespace SabreTools
 			{
 				userInputDat.OutputFormat = OutputFormat.ClrMamePro;
 				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
 			if (outputMiss)
 			{
 				userInputDat.OutputFormat = OutputFormat.MissFile;
 				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
 			if (outputRC)
 			{
 				userInputDat.OutputFormat = OutputFormat.RomCenter;
 				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
 			if (outputSD)
 			{
 				userInputDat.OutputFormat = OutputFormat.SabreDat;
 				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
 			if (outputXML)
 			{
 				userInputDat.OutputFormat = OutputFormat.Xml;
 				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean, 
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
 			if (!outputCMP && !outputMiss && !outputRC && !outputSD && !outputXML)
 			{
 				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
 		}
 
@@ -397,23 +406,6 @@ namespace SabreTools
 			{
 				Console.WriteLine();
 				Build.Help();
-			}
-		}
-
-		/// <summary>
-		/// Wrap trimming and merging a single DAT
-		/// </summary>
-		/// <param name="input">Input file or folder to be converted</param>
-		/// <param name="root">Root directory to base path lengths on</param>
-		/// <param name="rename">True is games should not be renamed</param>
-		/// <param name="force">True if forcepacking="unzip" should be included</param>
-		private static void InitTrimMerge(string input, string root, bool rename, bool force)
-		{
-			if (input != "" && (File.Exists(input) || Directory.Exists(input)))
-			{
-				TrimMerge sg = new TrimMerge(input, root, rename, force, _logger);
-				sg.Process();
-				return;
 			}
 		}
 

@@ -125,10 +125,6 @@ Options:
 	-source=		Source ID
   -st, --stats		Get statistics on all input DATs
 	-si, --single		Show individual statistics
-  -tm, --trim-merge	Consolidate DAT into a single game and trim entries
-	-rd=, --root-dir=	Set the root directory for trimming calculation
-	-nr, --no-rename	Keep game names instead of using '!'
-	-df, --disable-force	Disable forceunzipping
   -ud, --update		Update a DAT file
 	-oc, --output-cmp	Output in CMP format
 	-om, --output-miss	Output in Missfile format
@@ -167,6 +163,9 @@ Options:
 		Supported values are:
 		  None, Zip, Unzip
 	-clean			Clean game names according to WoD standards
+	-trim			Trim file names to fit NTFS length
+		-rd=, --root-dir=	Set the root directory for calc
+	-si, --single		All game names replaced by '!'
 	-dd, --dedup		Enable deduping in the created DAT
 	-m, --merge		Merge the input DATs
 		-b, --bare		Don't include date in automatic name

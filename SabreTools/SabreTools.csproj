@@ -110,7 +110,6 @@
     <Compile Include="Partials\SabreTools_Inits.cs" />
     <Compile Include="Partials\SabreTools_Menus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TrimMerge.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
