@@ -638,16 +638,13 @@ namespace SabreTools
 				ListSystems();
 			}
 
-			// Convert, update, and filter a DAT or folder of DATs
-			else if (update || outputCMP || outputMiss || outputRC || outputSD || outputXML)
+			// Convert, update, merge, diff, and filter a DAT or folder of DATs
+			else if (update || outputCMP || outputMiss || outputRC || outputSD || outputXML || merge || diff)
 			{
-				foreach (string input in inputs)
-				{
-					InitUpdate(input, filename, name, description, category, version, date, author, email, homepage, url, comment, header,
-						superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,
-						postfix, quotes, repext, addext, datprefix, romba, tsv, gamename, romname, romtype, sgt, slt, seq, crc, md5,
-						sha1, nodump, outdir, clean, dedup);
-				}
+				InitUpdate(inputs, filename, name, description, category, version, date, author, email, homepage, url, comment, header,
+					superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,
+					postfix, quotes, repext, addext, datprefix, romba, tsv, merge, diff, cascade, inplace, bare, gamename, romname,
+					romtype, sgt, slt, seq, crc, md5, sha1, nodump, outdir, clean, dedup);
 			}
 
 			// Add a source or system
@@ -697,12 +694,6 @@ namespace SabreTools
 			else if (extsplit)
 			{
 				InitExtSplit(inputs, exta, extb, outdir);
-			}
-
-			// Merge, diff, and dedupe at least 2 DATs
-			else if (merge || diff)
-			{
-				InitMergeDiff(inputs, name, description, category, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir, clean);
 			}
 
 			// Split a DAT by available hashes

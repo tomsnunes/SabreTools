@@ -74,7 +74,7 @@ namespace SabreTools
 		/// <summary>
 		/// Wrap converting and updating DAT file from any format to any format
 		/// </summary>
-		/// <param name="input">Input filename</param>
+		/// <param name="input">List of input filenames</param>
 		/// /* Normal DAT header info */
 		/// <param name="filename">New filename</param>
 		/// <param name="name">New name</param>
@@ -107,6 +107,12 @@ namespace SabreTools
 		/// <param name="datprefix">Add the dat name as a directory prefix</param>
 		/// <param name="romba">Output files in romba format</param>
 		/// <param name="tsv">Output files in TSV format</param>
+		/// /* Merging and Diffing info */
+		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
+		/// <param name="diff">True if the input files should be diffed with each other, false otherwise</param>
+		/// <param name="cascade">True if the diffed files should be cascade diffed, false otherwise</param>
+		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
+		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// /* Filtering info */
 		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
 		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
@@ -122,7 +128,7 @@ namespace SabreTools
 		/// <param name="outdir">Optional param for output directory</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="dedup">True to dedupe the roms in the DAT, false otherwise (default)</param>
-		private static void InitUpdate(string input,
+		private static void InitUpdate(List<string> inputs,
 			/* Normal DAT header info */
 			string filename,
 			string name,
@@ -156,6 +162,13 @@ namespace SabreTools
 			bool datprefix,
 			bool romba,
 			bool tsv,
+
+			/* Merging and Diffing info */
+			bool merge,
+			bool diff,
+			bool cascade,
+			bool inplace,
+			bool bare,
 
 			/* Filtering info */
 			string gamename,
@@ -227,6 +240,32 @@ namespace SabreTools
 			addext = (addext == "" || addext.StartsWith(".") ? addext : "." + addext);
 			repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
 
+			// If we're in merge or diff mode and the names aren't set, set defaults
+			if (merge || diff)
+			{
+				// Get the values that will be used
+				if (name == "")
+				{
+					name = (diff ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup ? "-deduped" : "");
+				}
+				if (description == "")
+				{
+					description = (diff ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup ? " - deduped" : "");
+					if (!bare)
+					{
+						description += " (" + date + ")";
+					}
+				}
+				if (category == "" && diff)
+				{
+					category = "DiffDAT";
+				}
+				if (author == "")
+				{
+					author = "SabreTools";
+				}
+			}
+
 			// Populate the DatData object
 			Dat userInputDat = new Dat
 			{
@@ -262,31 +301,37 @@ namespace SabreTools
 			if (outputCMP)
 			{
 				userInputDat.OutputFormat = OutputFormat.ClrMamePro;
-				DatTools.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
-			if (outputMiss || romba)
+			if (outputMiss)
 			{
 				userInputDat.OutputFormat = OutputFormat.MissFile;
-				DatTools.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (outputRC)
 			{
 				userInputDat.OutputFormat = OutputFormat.RomCenter;
-				DatTools.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (outputSD)
 			{
 				userInputDat.OutputFormat = OutputFormat.SabreDat;
-				DatTools.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 			if (outputXML)
 			{
 				userInputDat.OutputFormat = OutputFormat.Xml;
-				DatTools.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean, 
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
-			if (!outputCMP && !(outputMiss || romba) && !outputRC && !outputSD && !outputXML)
+			if (!outputCMP && !outputMiss && !outputRC && !outputSD && !outputXML)
 			{
-				DatTools.Update(input, userInputDat, outdir, clean, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
+				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, _logger);
 			}
 		}
 
@@ -370,71 +415,6 @@ namespace SabreTools
 				sg.Process();
 				return;
 			}
-		}
-
-		/// <summary>
-		/// Wrap merging, diffing, and deduping 2 or mor DATs
-		/// </summary>
-		/// <param name="inputs">A List of Strings representing the DATs or DAT folders to be merged</param>
-		/// <param name="name">Internal name of the DAT</param>
-		/// <param name="desc">Description and external name of the DAT</param>
-		/// <param name="cat">Category for the DAT</param>
-		/// <param name="version">Version of the DAT</param>
-		/// <param name="author">Author of the DAT</param>
-		/// <param name="diff">True if a DiffDat of all inputs is wanted, false otherwise</param>
-		/// <param name="dedup">True if the outputted file should remove duplicates, false otherwise</param>
-		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
-		/// <param name="forceunpack">True if the forcepacking="unzip" tag is to be added, false otherwise</param>
-		/// <param name="old">True if a old-style DAT should be output, false otherwise</param>
-		/// <param name="superdat">True if DATs should be merged in SuperDAT style, false otherwise</param>
-		/// <param name="cascade">True if the outputted diffs should be cascaded, false otherwise</param>
-		/// <param name="inplace">True if cascaded diffs overwrite the source files, false otherwise</param>
-		/// <param name="outdir">Output directory for the files (blank is default)</param>
-		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
-		private static void InitMergeDiff(List<string> inputs, string name, string desc, string cat, string version, string author,
-			bool diff, bool dedup, bool bare, bool forceunpack, bool old, bool superdat, bool cascade, bool inplace, string outdir = "", bool clean = false)
-		{
-			// Make sure there are no folders in inputs
-			List<string> newInputs = new List<string>();
-			foreach (string input in inputs)
-			{
-				if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-					{
-						try
-						{
-							newInputs.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(input));
-						}
-						catch (PathTooLongException)
-						{
-							_logger.Warning("The path for " + file + " was too long");
-						}
-						catch (Exception ex)
-						{
-							_logger.Error(ex.ToString());
-						}
-					}
-				}
-				else if (File.Exists(input))
-				{
-					try
-					{
-						newInputs.Add(Path.GetFullPath(input) + "¬" + Path.GetDirectoryName(Path.GetFullPath(input)));
-					}
-					catch (PathTooLongException)
-					{
-						_logger.Warning("The path for " + input + " was too long");
-					}
-					catch (Exception ex)
-					{
-						_logger.Error(ex.ToString());
-					}
-				}
-			}
-
-			MergeDiff md = new MergeDiff(newInputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace, outdir, clean, _logger);
-			md.Process();
 		}
 
 		/// <summary>
