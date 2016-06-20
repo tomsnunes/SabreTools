@@ -253,6 +253,10 @@ namespace SabreTools
 			if (merge || diff)
 			{
 				// Get the values that will be used
+				if (date == "")
+				{
+					date = DateTime.Now.ToString("yyyy-MM-dd");
+				}
 				if (name == "")
 				{
 					name = (diff ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup ? "-deduped" : "");

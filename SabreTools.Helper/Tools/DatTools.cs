@@ -1540,12 +1540,6 @@ namespace SabreTools.Helper
 				// If we want to filter, apply it to the userData now
 				userData = Filter(userData, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
 
-				// If we're trimming, apply it to the userData now
-				if (trim)
-				{
-
-				}
-
 				// Modify the Dictionary if necessary and output the results
 				if (diff && !cascade)
 				{
@@ -1871,7 +1865,10 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Output non-cascading diffs
 		/// </summary>
+		/// <param name="outdir">Output directory to write the DATs to</param>
 		/// <param name="userData">Main DatData to draw information from</param>
+		/// <param name="inputs">List of inputs to write out from</param>
+		/// <param name="logger">Logging object for console and file output</param>
 		public static void DiffNoCascade(string outdir, Dat userData, List<string> inputs, Logger logger)
 		{
 			DateTime start = DateTime.Now;
@@ -1999,8 +1996,12 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Output cascading diffs
 		/// </summary>
+		/// <param name="outdir">Output directory to write the DATs to</param>
+		/// <param name="inplace">True if cascaded diffs are outputted in-place, false otherwise</param>
 		/// <param name="userData">Main DatData to draw information from</param>
+		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
+		/// <param name="logger">Logging object for console and file output</param>
 		public static void DiffCascade(string outdir, bool inplace, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
 		{
 			string post = "";
@@ -2087,8 +2088,11 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Output user defined merge
 		/// </summary>
+		/// <param name="outdir">Output directory to write the DATs to</param>
+		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
+		/// <param name="logger">Logging object for console and file output</param>
 		public static void MergeNoDiff(string outdir, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
 		{
 			// If we're in SuperDAT mode, prefix all games with their respective DATs
@@ -2113,7 +2117,11 @@ namespace SabreTools.Helper
 				}
 			}
 
-			Output.WriteDatfile(userData, outdir, logger);
+			// Output a DAT only if there are roms
+			if (userData.Roms.Count != 0)
+			{
+				Output.WriteDatfile(userData, outdir, logger);
+			}
 		}
 	}
 }
