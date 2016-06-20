@@ -120,17 +120,17 @@ namespace SabreTools
 			// Modify the Dictionary if necessary and output the results
 			if (_diff && !_cascade)
 			{
-				DiffNoCascade(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, _dedup, _outdir, userData, _inputs, datHeaders, _logger);
+				DiffNoCascade(_outdir, userData, _inputs, _logger);
 			}
 			// If we're in cascade and diff, output only cascaded diffs
 			else if (_diff && _cascade)
 			{
-				DiffCascade(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, _dedup, _outdir, _inplace, userData, _inputs, datHeaders, _logger);
+				DiffCascade(_outdir, _inplace, userData, _inputs, datHeaders, _logger);
 			}
 			// Output all entries with user-defined merge
 			else
 			{
-				MergeNoDiff(_superdat, _outdir, userData, _inputs, datHeaders, _logger);
+				MergeNoDiff(_outdir, userData, _inputs, datHeaders, _logger);
 			}
 
 			return true;
@@ -160,19 +160,7 @@ namespace SabreTools
 				// If we are in inplace mode or redirecting output, save the DAT data
 				if (_inplace || !String.IsNullOrEmpty(_outdir))
 				{
-					datHeaders.Add(new Dat
-					{
-						FileName = userData.FileName,
-						Name = userData.Name,
-						Description = userData.Description,
-						Version = userData.Version,
-						Date = userData.Date,
-						Category = userData.Category,
-						Author = userData.Author,
-						ForcePacking = userData.ForcePacking,
-						OutputFormat = userData.OutputFormat,
-						Type = userData.Type,
-					});
+					datHeaders.Add((Dat)userData.CloneHeader());
 
 					// Reset the header values so the next can be captured
 					userData.FileName = "";
@@ -207,45 +195,24 @@ namespace SabreTools
 		/// Output non-cascading diffs
 		/// </summary>
 		/// <param name="userData">Main DatData to draw information from</param>
-		/// <param name="datHeaders">Dat headers used optionally</param>
-		public void DiffNoCascade(string name, string desc, string version, string date, string cat, string author, bool forceunpack,
-			bool old, bool dedup, string outdir, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
+		public void DiffNoCascade(string outdir, Dat userData, List<string> inputs, Logger logger)
 		{
 			DateTime start = DateTime.Now;
 			logger.User("Initializing all output DATs");
 
 			// Don't have External dupes
 			string post = " (No Duplicates)";
-			Dat outerDiffData = new Dat
-			{
-				FileName = desc + post,
-				Name = name + post,
-				Description = desc + post,
-				Version = version,
-				Date = date,
-				Category = cat,
-				Author = author,
-				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-				MergeRoms = dedup,
-				Roms = new Dictionary<string, List<Rom>>(),
-			};
+			Dat outerDiffData = (Dat)userData.CloneHeader();
+			outerDiffData.FileName += post;
+			outerDiffData.Name += post;
+			outerDiffData.Description += post;
+
 			// Have External dupes
 			post = " (Duplicates)";
-			Dat dupeData = new Dat
-			{
-				FileName = desc + post,
-				Name = name + post,
-				Description = desc + post,
-				Version = version,
-				Date = date,
-				Category = cat,
-				Author = author,
-				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-				MergeRoms = dedup,
-				Roms = new Dictionary<string, List<Rom>>(),
-			};
+			Dat dupeData = (Dat)userData.CloneHeader();
+			dupeData.FileName += post;
+			dupeData.Name += post;
+			dupeData.Description += post;
 
 			// Create a list of DatData objects representing individual output files
 			List<Dat> outDats = new List<Dat>();
@@ -254,20 +221,10 @@ namespace SabreTools
 			for (int j = 0; j < inputs.Count; j++)
 			{
 				post = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
-				Dat diffData = new Dat
-				{
-					FileName = desc + post,
-					Name = name + post,
-					Description = desc + post,
-					Version = version,
-					Date = date,
-					Category = cat,
-					Author = author,
-					ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-					OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-					MergeRoms = dedup,
-					Roms = new Dictionary<string, List<Rom>>(),
-				};
+				Dat diffData = (Dat)userData.CloneHeader();
+				diffData.FileName += post;
+				diffData.Name += post;
+				diffData.Description += post;
 				outDats.Add(diffData);
 			}
 			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
@@ -367,8 +324,7 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
-		private void DiffCascade(string name, string desc, string version, string date, string cat, string author, bool forceunpack,
-			bool old, bool dedup, string outdir, bool inplace, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
+		private void DiffCascade(string outdir, bool inplace, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
 		{
 			string post = "";
 
@@ -390,22 +346,11 @@ namespace SabreTools
 				}
 				else
 				{
-					diffData = new Dat
-					{
-						FileName = desc + post,
-						Name = name + post,
-						Description = desc + post,
-						Version = version,
-						Date = date,
-						Category = cat,
-						Author = author,
-						ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-						OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-						MergeRoms = dedup,
-					};
+					diffData = (Dat)userData.CloneHeader();
+					diffData.FileName += post;
+					diffData.Name += post;
+					diffData.Description += post;
 				}
-
-				diffData.Roms = new Dictionary<string, List<Rom>>();
 				outDats.Add(diffData);
 			}
 			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
@@ -467,10 +412,10 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
-		private void MergeNoDiff(bool superdat, string outdir, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
+		private void MergeNoDiff(string outdir, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
 		{
 			// If we're in SuperDAT mode, prefix all games with their respective DATs
-			if (superdat)
+			if (userData.Type == "SuperDAT")
 			{
 				List<string> keys = userData.Roms.Keys.ToList();
 				foreach (string key in keys)
