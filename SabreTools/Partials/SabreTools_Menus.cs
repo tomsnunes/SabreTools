@@ -306,10 +306,12 @@ Make a selection:
 						break;
 					case "4":
 						Console.Clear();
-						InitUpdate(input, "", "", "", "", "", "", "", "", "", "", "", "", false, "", "", "",
+						List<string> temp = new List<string>();
+						temp.Add(input);
+						InitUpdate(temp, "", "", "", "", "", "", "", "", "", "", "", "", false, "", "", "",
 							(outputFormat == OutputFormat.ClrMamePro), (outputFormat == OutputFormat.MissFile), (outputFormat == OutputFormat.RomCenter),
 							(outputFormat == OutputFormat.SabreDat), (outputFormat == OutputFormat.Xml), false, "", "", false, "", "", false, false, false,
-							"", "", "", -1, -1, -1, "", "", "", null, outdir, false, false);
+							false, false, false, false, false, "", "", "", -1, -1, -1, "", "", "", null, outdir, false, false);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; outdir = "";
@@ -397,9 +399,12 @@ Make a selection:
 						break;
 					case "12":
 						Console.Clear();
-						InitUpdate(input, "", "", "", "", "", "", "", "", "", "", "", "", false, "", "", "",
+						List<string> temp = new List<string>();
+						temp.Add(input);
+						InitUpdate(temp, "", "", "", "", "", "", "", "", "", "", "", "", false, "", "", "",
 							false, true, false, false, false, usegame, prefix, postfix, quotes, repext, addext,
-							gamename, romba, tsv, "", "", "", -1, -1, -1, "", "", "", null, "", false, false);
+							gamename, romba, tsv, false, false, false, false, false, "", "", "", -1, -1, -1,
+							"", "", "", null, "", false, false);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; prefix = ""; postfix = ""; addext = ""; repext = "";
@@ -555,7 +560,7 @@ Make a selection:
 					case "15":
 						Console.Clear();
 						List<string> inputs = new List<string>(input.Split(';'));
-						InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace);
+						//InitMergeDiff(inputs, name, desc, cat, version, author, diff, dedup, bare, forceunpack, old, superdat, cascade, inplace);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						selection = ""; input = ""; name = ""; desc = ""; cat = ""; version = ""; author = "";
