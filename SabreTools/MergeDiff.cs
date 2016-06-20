@@ -120,17 +120,17 @@ namespace SabreTools
 			// Modify the Dictionary if necessary and output the results
 			if (_diff && !_cascade)
 			{
-				DiffNoCascade(userData, datHeaders);
+				DiffNoCascade(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, _dedup, _outdir, userData, _inputs, datHeaders, _logger);
 			}
 			// If we're in cascade and diff, output only cascaded diffs
 			else if (_diff && _cascade)
 			{
-				DiffCascade(userData, datHeaders);
+				DiffCascade(_name, _desc, _version, _date, _cat, _author, _forceunpack, _old, _dedup, _outdir, _inplace, userData, _inputs, datHeaders, _logger);
 			}
 			// Output all entries with user-defined merge
 			else
 			{
-				MergeNoDiff(userData, datHeaders);
+				MergeNoDiff(_superdat, _outdir, userData, _inputs, datHeaders, _logger);
 			}
 
 			return true;
@@ -208,41 +208,42 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
-		private void DiffNoCascade(Dat userData, List<Dat> datHeaders)
+		public void DiffNoCascade(string name, string desc, string version, string date, string cat, string author, bool forceunpack,
+			bool old, bool dedup, string outdir, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
 		{
 			DateTime start = DateTime.Now;
-			_logger.User("Initializing all output DATs");
+			logger.User("Initializing all output DATs");
 
 			// Don't have External dupes
 			string post = " (No Duplicates)";
 			Dat outerDiffData = new Dat
 			{
-				FileName = _desc + post,
-				Name = _name + post,
-				Description = _desc + post,
-				Version = _version,
-				Date = _date,
-				Category = _cat,
-				Author = _author,
-				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-				MergeRoms = _dedup,
+				FileName = desc + post,
+				Name = name + post,
+				Description = desc + post,
+				Version = version,
+				Date = date,
+				Category = cat,
+				Author = author,
+				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				MergeRoms = dedup,
 				Roms = new Dictionary<string, List<Rom>>(),
 			};
 			// Have External dupes
 			post = " (Duplicates)";
 			Dat dupeData = new Dat
 			{
-				FileName = _desc + post,
-				Name = _name + post,
-				Description = _desc + post,
-				Version = _version,
-				Date = _date,
-				Category = _cat,
-				Author = _author,
-				ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-				MergeRoms = _dedup,
+				FileName = desc + post,
+				Name = name + post,
+				Description = desc + post,
+				Version = version,
+				Date = date,
+				Category = cat,
+				Author = author,
+				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				MergeRoms = dedup,
 				Roms = new Dictionary<string, List<Rom>>(),
 			};
 
@@ -250,34 +251,34 @@ namespace SabreTools
 			List<Dat> outDats = new List<Dat>();
 
 			// Loop through each of the inputs and get or create a new DatData object
-			for (int j = 0; j < _inputs.Count; j++)
+			for (int j = 0; j < inputs.Count; j++)
 			{
-				post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
+				post = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
 				Dat diffData = new Dat
 				{
-					FileName = _desc + post,
-					Name = _name + post,
-					Description = _desc + post,
-					Version = _version,
-					Date = _date,
-					Category = _cat,
-					Author = _author,
-					ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-					OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-					MergeRoms = _dedup,
+					FileName = desc + post,
+					Name = name + post,
+					Description = desc + post,
+					Version = version,
+					Date = date,
+					Category = cat,
+					Author = author,
+					ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+					OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+					MergeRoms = dedup,
 					Roms = new Dictionary<string, List<Rom>>(),
 				};
 				outDats.Add(diffData);
 			}
-			_logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
-			_logger.User("Populating all output DATs");
+			logger.User("Populating all output DATs");
 			List<string> keys = userData.Roms.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<Rom> roms = RomTools.Merge(userData.Roms[key], _logger);
+				List<Rom> roms = RomTools.Merge(userData.Roms[key], logger);
 
 				if (roms != null && roms.Count > 0)
 				{
@@ -300,7 +301,7 @@ namespace SabreTools
 
 							// Merged no-duplicates DAT
 							Rom newrom = rom;
-							newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
+							newrom.Game += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
 
 							if (outerDiffData.Roms.ContainsKey(key))
 							{
@@ -318,7 +319,7 @@ namespace SabreTools
 						if (rom.Dupe >= DupeType.ExternalHash)
 						{
 							Rom newrom = rom;
-							newrom.Game += " (" + Path.GetFileNameWithoutExtension(_inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
+							newrom.Game += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
 
 							if (dupeData.Roms.ContainsKey(key))
 							{
@@ -334,31 +335,31 @@ namespace SabreTools
 					}
 				}
 			}
-			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Finally, loop through and output each of the DATs
 			start = DateTime.Now;
-			_logger.User("Outputting all created DATs");
+			logger.User("Outputting all created DATs");
 
 			// Output the difflist (a-b)+(b-a) diff
-			Output.WriteDatfile(outerDiffData, _outdir, _logger);
+			Output.WriteDatfile(outerDiffData, outdir, logger);
 
 			// Output the (ab) diff
-			Output.WriteDatfile(dupeData, _outdir, _logger);
+			Output.WriteDatfile(dupeData, outdir, logger);
 
 			// Output the individual (a-b) DATs
-			for (int j = 0; j < _inputs.Count; j++)
+			for (int j = 0; j < inputs.Count; j++)
 			{
 				// If we have an output directory set, replace the path
-				string path = _outdir + (Path.GetDirectoryName(_inputs[j].Split('¬')[0]).Remove(0, _inputs[j].Split('¬')[1].Length));
+				string path = outdir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
 
 				// If we have more than 0 roms, output
 				if (outDats[j].Roms.Count > 0)
 				{
-					Output.WriteDatfile(outDats[j], path, _logger);
+					Output.WriteDatfile(outDats[j], path, logger);
 				}
 			}
-			_logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
 
 		/// <summary>
@@ -366,7 +367,8 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
-		private void DiffCascade(Dat userData, List<Dat> datHeaders)
+		private void DiffCascade(string name, string desc, string version, string date, string cat, string author, bool forceunpack,
+			bool old, bool dedup, string outdir, bool inplace, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
 		{
 			string post = "";
 
@@ -375,14 +377,14 @@ namespace SabreTools
 
 			// Loop through each of the inputs and get or create a new DatData object
 			DateTime start = DateTime.Now;
-			_logger.User("Initializing all output DATs");
-			for (int j = 0; j < _inputs.Count; j++)
+			logger.User("Initializing all output DATs");
+			for (int j = 0; j < inputs.Count; j++)
 			{
-				post = " (" + Path.GetFileNameWithoutExtension(_inputs[j].Split('¬')[0]) + " Only)";
+				post = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
 				Dat diffData;
 
 				// If we're in inplace mode, take the appropriate DatData object already stored
-				if (_inplace || !String.IsNullOrEmpty(_outdir))
+				if (inplace || !String.IsNullOrEmpty(outdir))
 				{
 					diffData = datHeaders[j];
 				}
@@ -390,31 +392,31 @@ namespace SabreTools
 				{
 					diffData = new Dat
 					{
-						FileName = _desc + post,
-						Name = _name + post,
-						Description = _desc + post,
-						Version = _version,
-						Date = _date,
-						Category = _cat,
-						Author = _author,
-						ForcePacking = (_forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-						OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-						MergeRoms = _dedup,
+						FileName = desc + post,
+						Name = name + post,
+						Description = desc + post,
+						Version = version,
+						Date = date,
+						Category = cat,
+						Author = author,
+						ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+						OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+						MergeRoms = dedup,
 					};
 				}
 
 				diffData.Roms = new Dictionary<string, List<Rom>>();
 				outDats.Add(diffData);
 			}
-			_logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
-			_logger.User("Populating all output DATs");
+			logger.User("Populating all output DATs");
 			List<string> keys = userData.Roms.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<Rom> roms = RomTools.Merge(userData.Roms[key], _logger);
+				List<Rom> roms = RomTools.Merge(userData.Roms[key], logger);
 
 				if (roms != null && roms.Count > 0)
 				{
@@ -433,31 +435,31 @@ namespace SabreTools
 					}
 				}
 			}
-			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Finally, loop through and output each of the DATs
 			start = DateTime.Now;
-			_logger.User("Outputting all created DATs");
-			for (int j = 0; j < _inputs.Count; j++)
+			logger.User("Outputting all created DATs");
+			for (int j = 0; j < inputs.Count; j++)
 			{
 				// If we have an output directory set, replace the path
 				string path = "";
-				if (_inplace)
+				if (inplace)
 				{
-					path = Path.GetDirectoryName(_inputs[j].Split('¬')[0]);
+					path = Path.GetDirectoryName(inputs[j].Split('¬')[0]);
 				}
-				else if (!String.IsNullOrEmpty(_outdir))
+				else if (!String.IsNullOrEmpty(outdir))
 				{
-					path = _outdir + (Path.GetDirectoryName(_inputs[j].Split('¬')[0]).Remove(0, _inputs[j].Split('¬')[1].Length));
+					path = outdir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
 				}
 
 				// If we have more than 0 roms, output
 				if (outDats[j].Roms.Count > 0)
 				{
-					Output.WriteDatfile(outDats[j], path, _logger);
+					Output.WriteDatfile(outDats[j], path, logger);
 				}
 			}
-			_logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
 
 		/// <summary>
@@ -465,10 +467,10 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
-		private void MergeNoDiff(Dat userData, List<Dat> datHeaders)
+		private void MergeNoDiff(bool superdat, string outdir, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
 		{
 			// If we're in SuperDAT mode, prefix all games with their respective DATs
-			if (_superdat)
+			if (superdat)
 			{
 				List<string> keys = userData.Roms.Keys.ToList();
 				foreach (string key in keys)
@@ -477,8 +479,8 @@ namespace SabreTools
 					foreach (Rom rom in userData.Roms[key])
 					{
 						Rom newrom = rom;
-						string filename = _inputs[newrom.Metadata.SystemID].Split('¬')[0];
-						string rootpath = _inputs[newrom.Metadata.SystemID].Split('¬')[1];
+						string filename = inputs[newrom.Metadata.SystemID].Split('¬')[0];
+						string rootpath = inputs[newrom.Metadata.SystemID].Split('¬')[1];
 
 						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
 						filename = filename.Remove(0, rootpath.Length);
@@ -489,7 +491,7 @@ namespace SabreTools
 				}
 			}
 
-			Output.WriteDatfile(userData, _outdir, _logger);
+			Output.WriteDatfile(userData, outdir, logger);
 		}
 	}
 }
