@@ -639,7 +639,7 @@ namespace SabreTools
 			}
 
 			// Convert, update, and filter a DAT or folder of DATs
-			else if (update || outputCMP || outputMiss || outputRC || outputSD || outputXML || romba)
+			else if (update || outputCMP || outputMiss || outputRC || outputSD || outputXML)
 			{
 				foreach (string input in inputs)
 				{
