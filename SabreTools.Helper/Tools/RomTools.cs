@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace SabreTools.Helper
 {
@@ -316,6 +317,29 @@ namespace SabreTools.Helper
 				return (norename ? String.Compare(x.Game, y.Game) : x.Metadata.SystemID - y.Metadata.SystemID);
 			});
 			return true;
+		}
+
+		/// <summary>
+		/// Clean a hash string and pad to the correct size
+		/// </summary>
+		/// <param name="hash">Hash string to sanitize</param>
+		/// <param name="padding">Amount of characters to pad to</param>
+		/// <returns>Cleaned string</returns>
+		public static string CleanHashData(string hash, int padding)
+		{
+			// First get the hash to the correct length
+			hash = (String.IsNullOrEmpty(hash) ? "" : hash.Trim());
+			hash = (hash.StartsWith("0x") ? hash.Remove(0, 2) : hash);
+			hash = (hash == "-" ? "" : hash);
+			hash = (String.IsNullOrEmpty(hash) ? "" : hash.PadLeft(padding, '0'));
+
+			// Then make sure that it has the correct characters
+			if (!Regex.IsMatch(hash.ToLowerInvariant(), "[0-9a-f]{" + padding + "}"))
+			{
+				hash = "";
+			}
+
+			return hash;
 		}
 	}
 }

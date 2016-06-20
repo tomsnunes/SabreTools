@@ -15,6 +15,11 @@ namespace SabreTools.Helper
 		public static string MD5Zero = "d41d8cd98f00b204e9800998ecf8427e";
 		public static string SHA1Zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
+		// Hash string length constants
+		public static int CRCLength = 8;
+		public static int MD5Length = 32;
+		public static int SHA1Length = 40;
+
 		// Regex File Name Patterns
 		public static string DefaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
 		public static string DefaultSpecialPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.xml$";

@@ -279,36 +279,9 @@ namespace SabreTools.Helper
 					}
 
 					// Sanitize the hashes from null, hex sizes, and "true blank" strings
-					if (rom.CRC != null)
-					{
-						rom.CRC = (rom.CRC.StartsWith("0x") ? rom.CRC.Remove(0, 2) : rom.CRC);
-						rom.CRC = (rom.CRC == "-" ? "" : rom.CRC);
-						rom.CRC = (rom.CRC == "" ? "" : rom.CRC.PadLeft(8, '0'));
-					}
-					else
-					{
-						rom.CRC = "";
-					}
-					if (rom.MD5 != null)
-					{
-						rom.MD5 = (rom.MD5.StartsWith("0x") ? rom.MD5.Remove(0, 2) : rom.MD5);
-						rom.MD5 = (rom.MD5 == "-" ? "" : rom.MD5);
-						rom.MD5 = (rom.MD5 == "" ? "" : rom.MD5.PadLeft(32, '0'));
-					}
-					else
-					{
-						rom.MD5 = "";
-					}
-					if (rom.SHA1 != null)
-					{
-						rom.SHA1 = (rom.SHA1.StartsWith("0x") ? rom.SHA1.Remove(0, 2) : rom.SHA1);
-						rom.SHA1 = (rom.SHA1 == "-" ? "" : rom.SHA1);
-						rom.SHA1 = (rom.SHA1 == "" ? "" : rom.SHA1.PadLeft(40, '0'));
-					}
-					else
-					{
-						rom.SHA1 = "";
-					}
+					rom.CRC = RomTools.CleanHashData(rom.CRC, Constants.CRCLength);
+					rom.MD5 = RomTools.CleanHashData(rom.MD5, Constants.MD5Length);
+					rom.SHA1 = RomTools.CleanHashData(rom.SHA1, Constants.SHA1Length);
 
 					// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 					if (rom.Type == "rom" && (rom.Size == 0 || rom.Size == -1) && ((rom.CRC == Constants.CRCZero || rom.CRC == "") || rom.MD5 == Constants.MD5Zero || rom.SHA1 == Constants.SHA1Zero))
@@ -580,36 +553,9 @@ namespace SabreTools.Helper
 						};
 
 						// Sanitize the hashes from null, hex sizes, and "true blank" strings
-						if (rom.CRC != null)
-						{
-							rom.CRC = (rom.CRC.StartsWith("0x") ? rom.CRC.Remove(0, 2) : rom.CRC);
-							rom.CRC = (rom.CRC == "-" ? "" : rom.CRC);
-							rom.CRC = (rom.CRC == "" ? "" : rom.CRC.PadLeft(8, '0'));
-						}
-						else
-						{
-							rom.CRC = "";
-						}
-						if (rom.MD5 != null)
-						{
-							rom.MD5 = (rom.MD5.StartsWith("0x") ? rom.MD5.Remove(0, 2) : rom.MD5);
-							rom.MD5 = (rom.MD5 == "-" ? "" : rom.MD5);
-							rom.MD5 = (rom.MD5 == "" ? "" : rom.MD5.PadLeft(32, '0'));
-						}
-						else
-						{
-							rom.MD5 = "";
-						}
-						if (rom.SHA1 != null)
-						{
-							rom.SHA1 = (rom.SHA1.StartsWith("0x") ? rom.SHA1.Remove(0, 2) : rom.SHA1);
-							rom.SHA1 = (rom.SHA1 == "-" ? "" : rom.SHA1);
-							rom.SHA1 = (rom.SHA1 == "" ? "" : rom.SHA1.PadLeft(40, '0'));
-						}
-						else
-						{
-							rom.SHA1 = "";
-						}
+						rom.CRC = RomTools.CleanHashData(rom.CRC, Constants.CRCLength);
+						rom.MD5 = RomTools.CleanHashData(rom.MD5, Constants.MD5Length);
+						rom.SHA1 = RomTools.CleanHashData(rom.SHA1, Constants.SHA1Length);
 
 						// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 						if (rom.Type == "rom" && (rom.Size == 0 || rom.Size == -1) && ((rom.CRC == Constants.CRCZero || rom.CRC == "") || rom.MD5 == Constants.MD5Zero || rom.SHA1 == Constants.SHA1Zero))
@@ -1098,18 +1044,9 @@ namespace SabreTools.Helper
 											}
 
 											// Sanitize the hashes from null, hex sizes, and "true blank" strings
-											crc = (subreader.GetAttribute("crc") != null ? subreader.GetAttribute("crc").ToLowerInvariant().Trim() : "");
-											crc = (crc.StartsWith("0x") ? crc.Remove(0, 2) : crc);
-											crc = (crc == "-" ? "" : crc);
-											crc = (crc == "" ? "" : crc.PadLeft(8, '0'));
-											md5 = (subreader.GetAttribute("md5") != null ? subreader.GetAttribute("md5").ToLowerInvariant().Trim() : "");
-											md5 = (md5.StartsWith("0x") ? md5.Remove(0, 2) : md5);
-											md5 = (md5 == "-" ? "" : md5);
-											md5 = (md5 == "" ? "" : md5.PadLeft(32, '0'));
-											sha1 = (subreader.GetAttribute("sha1") != null ? subreader.GetAttribute("sha1").ToLowerInvariant().Trim() : "");
-											sha1 = (sha1.StartsWith("0x") ? sha1.Remove(0, 2) : sha1);
-											sha1 = (sha1 == "-" ? "" : sha1);
-											sha1 = (sha1 == "" ? "" : sha1.PadLeft(40, '0'));
+											crc = RomTools.CleanHashData(subreader.GetAttribute("crc"), Constants.CRCLength);
+											md5 = RomTools.CleanHashData(subreader.GetAttribute("md5"), Constants.MD5Length);
+											sha1 = RomTools.CleanHashData(subreader.GetAttribute("sha1"), Constants.SHA1Length);
 
 											// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 											if (subreader.Name == "rom" && (size == 0 || size == -1) &&
@@ -1324,18 +1261,9 @@ namespace SabreTools.Helper
 							}
 
 							// Sanitize the hashes from null, hex sizes, and "true blank" strings
-							crc = (xtr.GetAttribute("crc") != null ? xtr.GetAttribute("crc").ToLowerInvariant().Trim() : "");
-							crc = (crc.StartsWith("0x") ? crc.Remove(0, 2) : crc);
-							crc = (crc == "-" ? "" : crc);
-							crc = (crc == "" ? "" : crc.PadLeft(8, '0'));
-							md5 = (xtr.GetAttribute("md5") != null ? xtr.GetAttribute("md5").ToLowerInvariant().Trim() : "");
-							md5 = (md5.StartsWith("0x") ? md5.Remove(0, 2) : md5);
-							md5 = (md5 == "-" ? "" : md5);
-							md5 = (md5 == "" ? "" : md5.PadLeft(32, '0'));
-							sha1 = (xtr.GetAttribute("sha1") != null ? xtr.GetAttribute("sha1").ToLowerInvariant().Trim() : "");
-							sha1 = (sha1.StartsWith("0x") ? sha1.Remove(0, 2) : sha1);
-							sha1 = (sha1 == "-" ? "" : sha1);
-							sha1 = (sha1 == "" ? "" : sha1.PadLeft(40, '0'));
+							crc = RomTools.CleanHashData(xtr.GetAttribute("crc"), Constants.CRCLength);
+							md5 = RomTools.CleanHashData(xtr.GetAttribute("md5"), Constants.MD5Length);
+							sha1 = RomTools.CleanHashData(xtr.GetAttribute("sha1"), Constants.SHA1Length);
 
 							// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 							if (xtr.GetAttribute("type") == "rom" && (size == 0 || size == -1) && ((crc == Constants.CRCZero || crc == "") || md5 == Constants.MD5Zero || sha1 == Constants.SHA1Zero))
