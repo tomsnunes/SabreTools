@@ -1606,6 +1606,9 @@ namespace SabreTools.Helper
 				Dat userData;
 				List<Dat> datHeaders = PopulateUserData(inputFileNames, inplace, clean, outputDirectory, datdata, out userData, logger);
 
+				// If we want to filter, apply it to the userData now
+				userData = Filter(userData, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, logger);
+
 				// Modify the Dictionary if necessary and output the results
 				if (diff && !cascade)
 				{

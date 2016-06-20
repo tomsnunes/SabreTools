@@ -115,22 +115,6 @@ Options:
 	-ig, --ignore		Don't prompt for new sources
   -lso, --list-sources	List all sources (id <= name)
   -lsy, --list-systems	List all systems (id <= name)
-  -m, --merge		Merge one or more DATs
-	-di, --diff		Output all diffdats (merge flag not required)
-		-c, --cascade		Enable cascaded diffing
-			-ip, --inplace		Enable inplace, cascaded diff
-	-dd, --dedup		Enable deduping in the created DAT
-	-b, --bare		Don't include date in file name
-	-u, --unzip		Force unzipping in created DAT
-	-o, --old		Output DAT in CMP format instead of XML
-	-clean			Clean game names according to WoD standards
-	-out=			Output directory (overridden by --inplace)
-	-sd, --superdat		Enable SuperDAT creation
-	-n=, --name=		Set the internal name of the DAT
-	-de=, --desc=		Set the filename and description of the DAT
-	-ca=, --category=	Set the category of the DAT
-	-v=, --version=		Set the version of the DAT
-	-au=, --author=		Set the author of the DAT
   -ol, --offmerge	Update DATS for offline arrays (see notes)
 	-com=			Complete current DAT
 	-fix=			Complete current Missing
@@ -184,6 +168,12 @@ Options:
 		  None, Zip, Unzip
 	-clean			Clean game names according to WoD standards
 	-dd, --dedup		Enable deduping in the created DAT
+	-m, --merge		Merge the input DATs
+		-b, --bare		Don't include date in automatic name
+	-di, --diff		Create diffdats from inputs
+		-b, --bare		Don't include date in automatic name
+		-c, --cascade		Enable cascaded diffing
+			-ip, --inplace		Enable inplace, cascaded diff
 	-gn=, --game-name=	Filter by game name
 	-rn=, --rom-name=	Filter by rom name
 	-rt=, --rom-type=	Filter by rom type
@@ -195,7 +185,7 @@ Options:
 	-sha1=, --sha1=		Filter by SHA-1 hash
 	-nd, --nodump		Include only match nodump roms
 	-nnd, --not-nodump	Exclude all nodump roms
-	-out=			Output directory
+	-out=			Output directory (overridden by --inplace)
 
 Filenames and directories can't start with a reserved string
 unless prefixed by 'input='
