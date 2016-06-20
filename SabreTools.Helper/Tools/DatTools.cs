@@ -1659,7 +1659,7 @@ namespace SabreTools.Helper
 			foreach (string input in inputs)
 			{
 				logger.User("Adding DAT: " + input.Split('¬')[0]);
-				userData = DatTools.Parse(input.Split('¬')[0], i, 0, userData, logger, true, clean);
+				userData = Parse(input.Split('¬')[0], i, 0, userData, logger, true, clean);
 				i++;
 
 				// If we are in inplace mode or redirecting output, save the DAT data
@@ -1668,21 +1668,16 @@ namespace SabreTools.Helper
 					datHeaders.Add((Dat)userData.CloneHeader());
 
 					// Reset the header values so the next can be captured
-					userData.FileName = "";
-					userData.Name = "";
-					userData.Description = "";
-					userData.Version = "";
-					userData.Date = "";
-					userData.Category = "";
-					userData.Author = "";
-					userData.ForcePacking = ForcePacking.None;
-					userData.OutputFormat = OutputFormat.None;
-					userData.Type = "";
+					Dictionary<string, List<Rom>> temp = userData.Roms;
+					userData = new Dat();
+					userData.Roms = temp;
 				}
 			}
 
 			// Set the output values
+			Dictionary<string, List<Rom>> roms = userData.Roms;
 			userData = (Dat)inputDat.CloneHeader();
+			userData.Roms = roms;
 
 			return datHeaders;
 		}

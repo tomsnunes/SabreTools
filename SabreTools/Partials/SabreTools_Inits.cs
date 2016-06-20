@@ -277,15 +277,6 @@ namespace SabreTools
 				{
 					author = "SabreTools";
 				}
-
-				if (outdir == "")
-				{
-					outdir = Environment.CurrentDirectory;
-				}
-				else if (!Directory.Exists(outdir))
-				{
-					Directory.CreateDirectory(outdir);
-				}
 			}
 
 			// Populate the DatData object
