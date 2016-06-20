@@ -148,6 +148,41 @@ namespace SabreTools.Helper
 				NodumpCount = this.NodumpCount,
 			};
 		}
+
+		public object CloneHeader()
+		{
+			return new Dat
+			{
+				FileName = this.FileName,
+				Name = this.Name,
+				Description = this.Description,
+				Category = this.Category,
+				Version = this.Version,
+				Date = this.Date,
+				Author = this.Author,
+				Email = this.Email,
+				Homepage = this.Homepage,
+				Url = this.Url,
+				Comment = this.Comment,
+				Header = this.Header,
+				Type = this.Type,
+				ForceMerging = this.ForceMerging,
+				ForceNodump = this.ForceNodump,
+				ForcePacking = this.ForcePacking,
+				OutputFormat = this.OutputFormat,
+				MergeRoms = this.MergeRoms,
+				Roms = new Dictionary<string, List<Rom>>(),
+				UseGame = this.UseGame,
+				Prefix = this.Prefix,
+				Postfix = this.Postfix,
+				Quotes = this.Quotes,
+				RepExt = this.RepExt,
+				AddExt = this.AddExt,
+				GameName = this.GameName,
+				Romba = this.Romba,
+				TSV = this.TSV,
+			};
+		}
 	}
 
 	/// <summary>
