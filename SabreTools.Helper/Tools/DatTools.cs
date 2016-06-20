@@ -1588,7 +1588,11 @@ namespace SabreTools.Helper
 							datdata.FileName += ".new";
 						}
 
-						Output.WriteDatfile(datdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger);
+						// If we have roms, output them
+						if (datdata.Roms.Count != 0)
+						{
+							Output.WriteDatfile(datdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger);
+						}
 					}
 					else if (Directory.Exists(inputFileName))
 					{
@@ -1609,7 +1613,12 @@ namespace SabreTools.Helper
 								innerDatdata.FileName += ".new";
 							}
 
-							Output.WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger);
+
+							// If we have roms, output them
+							if (innerDatdata.Roms.Count != 0)
+							{
+								Output.WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger);
+							}
 						}
 					}
 					else
