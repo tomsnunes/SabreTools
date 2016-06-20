@@ -308,10 +308,12 @@ Make a selection:
 						Console.Clear();
 						List<string> temp = new List<string>();
 						temp.Add(input);
+						/*
 						InitUpdate(temp, "", "", "", "", "", "", "", "", "", "", "", "", false, "", "", "",
 							(outputFormat == OutputFormat.ClrMamePro), (outputFormat == OutputFormat.MissFile), (outputFormat == OutputFormat.RomCenter),
 							(outputFormat == OutputFormat.SabreDat), (outputFormat == OutputFormat.Xml), false, "", "", false, "", "", false, false, false,
 							false, false, false, false, false, "", "", "", -1, -1, -1, "", "", "", null, outdir, false, false);
+						*/
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; outdir = "";
@@ -401,10 +403,12 @@ Make a selection:
 						Console.Clear();
 						List<string> temp = new List<string>();
 						temp.Add(input);
+						/*
 						InitUpdate(temp, "", "", "", "", "", "", "", "", "", "", "", "", false, "", "", "",
 							false, true, false, false, false, usegame, prefix, postfix, quotes, repext, addext,
 							gamename, romba, tsv, false, false, false, false, false, "", "", "", -1, -1, -1,
 							"", "", "", null, "", false, false);
+						*/
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; prefix = ""; postfix = ""; addext = ""; repext = "";
@@ -458,7 +462,7 @@ Make a selection:
 						break;
 					case "5":
 						Console.Clear();
-						InitTrimMerge(input, root, rename, forceunpack);
+						//InitTrimMerge(input, root, rename, forceunpack);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						selection = ""; input = ""; root = "";

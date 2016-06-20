@@ -87,7 +87,6 @@ namespace SabreTools
 				datprefix = false,
 				dedup = false,
 				diff = false,
-				disableForce = false,
 				enableGzip = false,
 				extsplit = false,
 				fake = false,
@@ -217,10 +216,6 @@ namespace SabreTools
 					case "-dd":
 					case "--dedup":
 						dedup = true;
-						break;
-					case "-df":
-					case "--disable-force":
-						disableForce = true;
 						break;
 					case "-di":
 					case "--diff":
