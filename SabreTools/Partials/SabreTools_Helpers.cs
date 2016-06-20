@@ -39,8 +39,7 @@ namespace SabreTools
 						while (sldr.Read())
 						{
 							int systemid = sldr.GetInt32(0);
-							string system = Path.Combine(_datroot, sldr.GetString(1) + " - " + sldr.GetString(2));
-							system = system.Trim();
+							string system = Path.Combine(_datroot, sldr.GetString(1).Trim() + " - " + sldr.GetString(2).Trim());
 
 							if (!Directory.Exists(system))
 							{
