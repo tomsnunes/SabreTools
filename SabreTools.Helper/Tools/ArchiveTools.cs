@@ -212,7 +212,7 @@ namespace SabreTools.Helper
 						logger.Log("Current entry name: '" + reader.Entry.Key + "'");
 						if (reader.Entry != null && reader.Entry.Key.Contains(entryname))
 						{
-							outfile = Path.Combine(tempdir, reader.Entry.Key);
+							outfile = Path.GetFullPath(Path.Combine(tempdir, reader.Entry.Key));
 							if (!Directory.Exists(Path.GetDirectoryName(outfile)))
 							{
 								Directory.CreateDirectory(Path.GetDirectoryName(outfile));
