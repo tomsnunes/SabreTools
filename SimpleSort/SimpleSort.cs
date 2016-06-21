@@ -449,24 +449,6 @@ namespace SabreTools
 								_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
 								string archiveFileName = Path.Combine(_outdir, found.Game + ".zip");
 								ArchiveTools.CopyFileBetweenArchives(input, archiveFileName, rom.Name, found.Name, _logger);
-
-								/*
-								// Extract file into temp and then rebuild
-								string newinput = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
-								if (newinput != null && File.Exists(newinput))
-								{
-									_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
-									ArchiveTools.WriteToArchive(newinput, _outdir, found);
-									try
-									{
-										File.Delete(newinput);
-									}
-									catch (Exception)
-									{
-										// Don't log file deletion errors
-									}
-								}
-								*/
 							}
 						}
 					}
@@ -576,7 +558,6 @@ namespace SabreTools
 					/*
 					Now, how do we do this WITHOUT traversing the list a billion times?
 					Does "contains" work in this situation?
-					We have to check if it's an exact duplicate or a hash-duplicate
 					Which is better: traversing the "should have" list or the "do have" list?
 					*/
 					List<Rom> fromDat = sortedByGame[Path.GetFileNameWithoutExtension(archive)];
