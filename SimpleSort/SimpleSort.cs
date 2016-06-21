@@ -14,7 +14,7 @@ namespace SabreTools
 		private string _outdir;
 		private string _tempdir;
 		private bool _quickScan;
-		private bool _toFolder = false;
+		private bool _toFolder;
 		private ArchiveScanLevel _7z;
 		private ArchiveScanLevel _gz;
 		private ArchiveScanLevel _rar;
@@ -29,19 +29,21 @@ namespace SabreTools
 		/// <param name="outdir">Output directory to use to build to</param>
 		/// <param name="tempdir">Temporary directory for archive extraction</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
+		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public SimpleSort(Dat datdata, List<string> inputs, string outdir, string tempdir,
-			bool quickScan, int sevenzip, int gz, int rar, int zip, Logger logger)
+			bool quickScan, bool toFolder, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			_datdata = datdata;
 			_inputs = inputs;
 			_outdir = (outdir == "" ? "Rebuild" : outdir);
 			_tempdir = (tempdir == "" ? "__TEMP__" : tempdir);
 			_quickScan = quickScan;
+			_toFolder = toFolder;
 			_7z = (ArchiveScanLevel)(sevenzip < 0 || sevenzip > 2 ? 0 : sevenzip);
 			_gz = (ArchiveScanLevel)(gz < 0 || gz > 2 ? 0 : gz);
 			_rar = (ArchiveScanLevel)(rar < 0 || rar > 2 ? 0 : rar);
@@ -86,7 +88,8 @@ namespace SabreTools
 			// Set all default values
 			bool help = false,
 				quickScan = false,
-				simpleSort = true;
+				simpleSort = true,
+				toFolder = false;
 			int sevenzip = 0,
 				gz = 2,
 				rar = 2,
@@ -105,6 +108,10 @@ namespace SabreTools
 					case "-h":
 					case "--help":
 						help = true;
+						break;
+					case "-do":
+					case "--directory":
+						toFolder = true;
 						break;
 					case "-qs":
 					case "--quick":
@@ -200,7 +207,7 @@ namespace SabreTools
 			{
 				if (datfiles.Count > 0)
 				{
-					InitSimpleSort(datfiles, inputs, outdir, tempdir, quickScan, sevenzip, gz, rar, zip, logger);
+					InitSimpleSort(datfiles, inputs, outdir, tempdir, quickScan, toFolder, sevenzip, gz, rar, zip, logger);
 				}
 				else
 				{
@@ -230,12 +237,13 @@ namespace SabreTools
 		/// <param name="tempdir">Temporary directory for archive extraction</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
+		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		private static void InitSimpleSort(List<string> datfiles, List<string> inputs, string outdir, string tempdir, 
-			bool quickScan, int sevenzip, int gz, int rar, int zip, Logger logger)
+			bool quickScan, bool toFolder, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
 			Dat datdata = new Dat();
@@ -244,15 +252,15 @@ namespace SabreTools
 				datdata = DatTools.Parse(datfile, 0, 0, datdata, logger);
 			}
 
-			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, sevenzip, gz, rar, zip, logger);
-			ss.RebuildToFolder();
+			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, toFolder, sevenzip, gz, rar, zip, logger);
+			ss.RebuildToOutput();
 		}
 
 		/// <summary>
 		/// Process the DAT and find all matches in input files and folders
 		/// </summary>
 		/// <returns>True if rebuilding was a success, false otherwise</returns>
-		public bool RebuildToFolder()
+		public bool RebuildToOutput()
 		{
 			bool success = true;
 
@@ -280,7 +288,7 @@ namespace SabreTools
 				if (File.Exists(input))
 				{
 					_logger.Log("File found: '" + input + "'");
-					success &= RebuildToFolderHelper(input);
+					success &= RebuildToOutputHelper(input);
 					Output.CleanDirectory(_tempdir);
 				}
 				else if (Directory.Exists(input))
@@ -289,7 +297,7 @@ namespace SabreTools
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						_logger.Log("File found: '" + file + "'");
-						success &= RebuildToFolderHelper(file);
+						success &= RebuildToOutputHelper(file);
 						Output.CleanDirectory(_tempdir);
 					}
 				}
@@ -321,7 +329,7 @@ namespace SabreTools
 		/// <param name="input">The name of the input file</param>
 		/// <param name="recurse">True if this is in a recurse step and the file should be deleted, false otherwise (default)</param>
 		/// <returns>True if it was processed properly, false otherwise</returns>
-		private bool RebuildToFolderHelper(string input, bool recurse = false)
+		private bool RebuildToOutputHelper(string input, bool recurse = false)
 		{
 			bool success = true;
 
@@ -558,7 +566,7 @@ namespace SabreTools
 						_logger.User("Archive found! Successfully extracted");
 						foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
 						{
-							success &= RebuildToFolderHelper(file, true);
+							success &= RebuildToOutputHelper(file, true);
 						}
 					}
 				}
