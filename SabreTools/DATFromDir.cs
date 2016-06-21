@@ -1,4 +1,5 @@
 ﻿using SabreTools.Helper;
+using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -316,8 +317,44 @@ namespace SabreTools
 				return rom.Game;
 			}
 
-			// Attempt to extract the files to the temporary directory
-			bool encounteredErrors = !ArchiveTools.ExtractArchive(item,
+			// If both deep hash flags are set, do a quickscan
+			if (_noMD5 && _noSHA1)
+			{
+				ArchiveType? type = ArchiveTools.GetCurrentArchiveType(item, _logger);
+
+				// If we have an archive, scan it
+				if (type != null)
+				{
+					List<Rom> extracted = ArchiveTools.GetArchiveFileInfo(item, _logger);
+					foreach (Rom rom in extracted)
+					{
+						int last = 0;
+						if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+						{
+							Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
+						}
+
+						// If we have a new game, output the beginning of the new item
+						if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+						{
+							Output.WriteStartGame(sw, rom, new List<string>(), lastparent, _datdata, 0, last, _logger);
+						}
+
+						// Write out the rom data
+						Output.WriteRomData(sw, rom, lastparent, _datdata, 0, _logger);
+						_logger.User("File added: " + rom.Name + Environment.NewLine);
+					}
+				}
+				// Otherwise, just get the info on the file itself
+				else if (!Directory.Exists(item) && File.Exists(item))
+				{
+					lastparent = ProcessFile(item, sw, _basePath, "", _datdata, lastparent);
+				}
+			}
+			// Otherwise, ttempt to extract the files to the temporary directory
+			else
+			{
+				bool encounteredErrors = !ArchiveTools.ExtractArchive(item,
 				tempdir,
 				(_archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
 				(!_archivesAsFiles && _enableGzip ? ArchiveScanLevel.Internal : ArchiveScanLevel.External),
@@ -325,29 +362,31 @@ namespace SabreTools
 				(_archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
 				_logger);
 
-			// If the file was an archive and was extracted successfully, check it
-			if (!encounteredErrors)
-			{
-				_logger.Log(Path.GetFileName(item) + " treated like an archive");
-				foreach (string entry in Directory.EnumerateFiles(tempdir, "*", SearchOption.AllDirectories))
+				// If the file was an archive and was extracted successfully, check it
+				if (!encounteredErrors)
 				{
-					lastparent = ProcessFile(Path.GetFullPath(entry), sw, Path.GetFullPath(tempdir),
-						Path.Combine((Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) +
-							Path.GetFileNameWithoutExtension(item)
-						), _datdata, lastparent);
-				}
+					_logger.Log(Path.GetFileName(item) + " treated like an archive");
+					foreach (string entry in Directory.EnumerateFiles(tempdir, "*", SearchOption.AllDirectories))
+					{
+						lastparent = ProcessFile(Path.GetFullPath(entry), sw, Path.GetFullPath(tempdir),
+							Path.Combine((Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) +
+								Path.GetFileNameWithoutExtension(item)
+							), _datdata, lastparent);
+					}
 
-				// Clear the temp directory
-				if (Directory.Exists(tempdir))
+					// Clear the temp directory
+					if (Directory.Exists(tempdir))
+					{
+						Output.CleanDirectory(tempdir);
+					}
+				}
+				// Otherwise, just get the info on the file itself
+				else if (!Directory.Exists(item) && File.Exists(item))
 				{
-					Output.CleanDirectory(tempdir);
+					lastparent = ProcessFile(item, sw, _basePath, "", _datdata, lastparent);
 				}
 			}
-			// Otherwise, just get the info on the file itself
-			else if (!Directory.Exists(item) && File.Exists(item))
-			{
-				lastparent = ProcessFile(item, sw, _basePath, "", _datdata, lastparent);
-			}
+
 			return lastparent;
 		}
 
