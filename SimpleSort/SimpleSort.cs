@@ -14,6 +14,7 @@ namespace SabreTools
 		private string _outdir;
 		private string _tempdir;
 		private bool _quickScan;
+		private bool _toFolder = false;
 		private ArchiveScanLevel _7z;
 		private ArchiveScanLevel _gz;
 		private ArchiveScanLevel _rar;
@@ -374,7 +375,27 @@ namespace SabreTools
 				foreach (Rom found in foundroms)
 				{
 					_logger.Log("Matched name: " + found.Name);
-					ArchiveTools.WriteToArchive(input, _outdir, found);
+
+					if (_toFolder)
+					{
+						// Copy file to output directory
+						string gamedir = Path.Combine(_outdir, found.Game);
+						if (!Directory.Exists(gamedir))
+						{
+							Directory.CreateDirectory(gamedir);
+						}
+
+						_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+						try
+						{
+							File.Copy(input, Path.Combine(gamedir, Path.GetFileName(found.Name)));
+						}
+						catch { }
+					}
+					else
+					{
+						ArchiveTools.WriteToArchive(input, _outdir, found);
+					}
 				}
 
 				// Now get the transformed file if it exists
@@ -385,7 +406,7 @@ namespace SabreTools
 				{
 					// Otherwise, apply the rule ot the file
 					string newinput = input + ".new";
-					Skippers.TransformFile(input, input + ".new", rule, _logger);
+					Skippers.TransformFile(input, newinput, rule, _logger);
 					Rom drom = RomTools.GetSingleFileInfo(newinput);
 
 					// If we have a blank RomData, it's an error
@@ -401,14 +422,53 @@ namespace SabreTools
 					{
 						// First output the headerless rom
 						_logger.Log("Matched name: " + found.Name);
-						ArchiveTools.WriteToArchive(newinput, _outdir, found);
+
+						if (_toFolder)
+						{
+							// Copy file to output directory
+							string gamedir = Path.Combine(_outdir, found.Game);
+							if (!Directory.Exists(gamedir))
+							{
+								Directory.CreateDirectory(gamedir);
+							}
+
+							_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+							try
+							{
+								File.Copy(newinput, Path.Combine(gamedir, Path.GetFileName(found.Name)));
+							}
+							catch { }
+						}
+						else
+						{
+							ArchiveTools.WriteToArchive(newinput, _outdir, found);
+						}
 
 						// Then output the headered rom (renamed)
 						Rom newfound = found;
 						newfound.Name = Path.GetFileNameWithoutExtension(newfound.Name) + " (" + rom.CRC + ")" + Path.GetExtension(newfound.Name);
 
-						_logger.Log("Matched name: " + newfound.Name);
-						ArchiveTools.WriteToArchive(input, _outdir, newfound);
+						if (_toFolder)
+						{
+							// Copy file to output directory
+							string gamedir = Path.Combine(_outdir, found.Game);
+							if (!Directory.Exists(gamedir))
+							{
+								Directory.CreateDirectory(gamedir);
+							}
+
+							_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + newfound.Name + "'");
+							try
+							{
+								File.Copy(input, Path.Combine(gamedir, Path.GetFileName(newfound.Name)));
+							}
+							catch { }
+						}
+						else
+						{
+							_logger.Log("Matched name: " + newfound.Name);
+							ArchiveTools.WriteToArchive(input, _outdir, newfound);
+						}
 					}
 
 					// Now remove this temporary file
@@ -443,12 +503,33 @@ namespace SabreTools
 							_logger.User("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
 							foreach (Rom found in foundroms)
 							{
-								_logger.Log("Matched name: " + found.Name);
+								if (_toFolder)
+								{
+									// Copy file to output directory
+									_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+									string outfile = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
+									if (File.Exists(outfile))
+									{
+										string gamedir = Path.Combine(_outdir, found.Game);
+										if (!Directory.Exists(gamedir))
+										{
+											Directory.CreateDirectory(gamedir);
+										}
 
-								// Copy file between archives
-								_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
-								string archiveFileName = Path.Combine(_outdir, found.Game + ".zip");
-								ArchiveTools.CopyFileBetweenArchives(input, archiveFileName, rom.Name, found.Name, _logger);
+										try
+										{
+											File.Move(outfile, Path.Combine(gamedir, Path.GetFileName(found.Name)));
+										}
+										catch { }
+									}
+								}
+								else
+								{
+									// Copy file between archives
+									_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+									string archiveFileName = Path.Combine(_outdir, found.Game + ".zip");
+									ArchiveTools.CopyFileBetweenArchives(input, archiveFileName, rom.Name, found.Name, _logger);
+								}
 							}
 						}
 					}
