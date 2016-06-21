@@ -292,7 +292,7 @@ namespace SabreTools
 			// Define the temporary directory
 			string tempdir = (String.IsNullOrEmpty(_tempDir) ? Environment.CurrentDirectory : _tempDir);
 			tempdir += (tempdir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? "" : Path.DirectorySeparatorChar.ToString());
-			tempdir += "temp" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.DirectorySeparatorChar;
+			tempdir += "__temp__" + Path.DirectorySeparatorChar;
 
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
@@ -340,7 +340,7 @@ namespace SabreTools
 				// Clear the temp directory
 				if (Directory.Exists(tempdir))
 				{
-					Directory.Delete(tempdir, true);
+					Output.CleanDirectory(tempdir);
 				}
 			}
 			// Otherwise, just get the info on the file itself
