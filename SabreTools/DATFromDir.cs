@@ -328,21 +328,10 @@ namespace SabreTools
 					List<Rom> extracted = ArchiveTools.GetArchiveFileInfo(item, _logger);
 					foreach (Rom rom in extracted)
 					{
-						int last = 0;
-						if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
-						{
-							Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
-						}
-
-						// If we have a new game, output the beginning of the new item
-						if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
-						{
-							Output.WriteStartGame(sw, rom, new List<string>(), lastparent, _datdata, 0, last, _logger);
-						}
-
-						// Write out the rom data
-						Output.WriteRomData(sw, rom, lastparent, _datdata, 0, _logger);
-						_logger.User("File added: " + rom.Name + Environment.NewLine);
+						lastparent = ProcessFileHelper(item, rom, sw, _basePath,
+							Path.Combine((Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) +
+								Path.GetFileNameWithoutExtension(item)
+							), _datdata, lastparent);
 					}
 				}
 				// Otherwise, just get the info on the file itself
@@ -351,7 +340,7 @@ namespace SabreTools
 					lastparent = ProcessFile(item, sw, _basePath, "", _datdata, lastparent);
 				}
 			}
-			// Otherwise, ttempt to extract the files to the temporary directory
+			// Otherwise, attempt to extract the files to the temporary directory
 			else
 			{
 				bool encounteredErrors = !ArchiveTools.ExtractArchive(item,
@@ -405,6 +394,22 @@ namespace SabreTools
 			_logger.Log(Path.GetFileName(item) + " treated like a file");
 			Rom rom = RomTools.GetSingleFileInfo(item, _noMD5, _noSHA1);
 
+			return ProcessFileHelper(item, rom, sw, basepath, parent, datdata, lastparent);
+		}
+
+		/// <summary>
+		/// Process a single file as a file (with found Rom data)
+		/// </summary>
+		/// <param name="item">File to be added</param>
+		/// <param name="rom">Rom data to be used to write to file</param>
+		/// <param name="sw">StreamWriter representing the output file</param>
+		/// <param name="basepath">Path the represents the parent directory</param>
+		/// <param name="parent">Parent game to be used</param>
+		/// <param name="datdata">DatData object with output information</param>
+		/// <param name="lastparent">Last known parent game name</param>
+		/// <returns>New last known parent game name</returns>
+		private string ProcessFileHelper(string item, Rom rom, StreamWriter sw, string basepath, string parent, Dat datdata, string lastparent)
+		{
 			try
 			{
 				if (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()))
