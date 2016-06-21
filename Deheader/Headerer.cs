@@ -242,16 +242,17 @@ namespace SabreTools
 				}
 
 				// Otherwise, apply the rule ot the file
-				Skippers.TransformFile(file, file + ".new", rule, _logger);
+				string newfile = file + ".new";
+				Skippers.TransformFile(file, newfile, rule, _logger);
 
 				// If the output file doesn't exist, return false
-				if (!File.Exists(file + ".new"))
+				if (!File.Exists(newfile))
 				{
 					return false;
 				}
 
 				// Now add the information to the database if it's not already there
-				Rom rom = RomTools.GetSingleFileInfo(file + ".new");
+				Rom rom = RomTools.GetSingleFileInfo(newfile);
 				AddHeaderToDatabase(hstr, rom.SHA1, type);
 			}
 
