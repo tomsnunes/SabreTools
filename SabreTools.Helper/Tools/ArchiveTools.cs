@@ -283,11 +283,11 @@ namespace SabreTools.Helper
 
 							if (outarchive.Mode == ZipArchiveMode.Create || outarchive.GetEntry(outentryname) == null)
 							{
-								IArchiveEntry iae = outarchive.CreateEntry(outentryname, CompressionLevel.Optimal) as IArchiveEntry;
-								using (Stream iaestream = iae.OpenEntryStream())
-								using (Stream readerstream = (reader.Entry as IArchiveEntry).OpenEntryStream())
+								ZipArchiveEntry iae = outarchive.CreateEntry(outentryname, CompressionLevel.Optimal) as ZipArchiveEntry;
+
+								using (Stream iaestream = iae.Open())
 								{
-									readerstream.CopyTo(iaestream);
+									reader.WriteEntryTo(iaestream);
 								}
 							}
 							success = true;

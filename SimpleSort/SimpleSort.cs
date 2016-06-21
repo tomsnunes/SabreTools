@@ -444,6 +444,14 @@ namespace SabreTools
 							foreach (Rom found in foundroms)
 							{
 								_logger.Log("Matched name: " + found.Name);
+
+								// Copy file between archives
+								_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+								string archiveFileName = Path.Combine(_outdir, found.Game + ".zip");
+								ArchiveTools.CopyFileBetweenArchives(input, archiveFileName, rom.Name, found.Name, _logger);
+
+								/*
+								// Extract file into temp and then rebuild
 								string newinput = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
 								if (newinput != null && File.Exists(newinput))
 								{
@@ -458,6 +466,7 @@ namespace SabreTools
 										// Don't log file deletion errors
 									}
 								}
+								*/
 							}
 						}
 					}
