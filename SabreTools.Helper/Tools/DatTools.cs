@@ -1532,19 +1532,41 @@ namespace SabreTools.Helper
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || diff)
 			{
-				// Create a new list of inputs that are only files
+				// Make sure there are no folders in inputs
 				List<string> newInputFileNames = new List<string>();
 				foreach (string input in inputFileNames)
 				{
-					if (File.Exists(input))
-					{
-						newInputFileNames.Add(Path.GetFullPath(input));
-					}
-					else if (Directory.Exists(input))
+					if (Directory.Exists(input))
 					{
 						foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 						{
-							newInputFileNames.Add(Path.GetFullPath(file));
+							try
+							{
+								newInputFileNames.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(input));
+							}
+							catch (PathTooLongException)
+							{
+								logger.Warning("The path for " + file + " was too long");
+							}
+							catch (Exception ex)
+							{
+								logger.Error(ex.ToString());
+							}
+						}
+					}
+					else if (File.Exists(input))
+					{
+						try
+						{
+							newInputFileNames.Add(Path.GetFullPath(input) + "¬" + Path.GetDirectoryName(Path.GetFullPath(input)));
+						}
+						catch (PathTooLongException)
+						{
+							logger.Warning("The path for " + input + " was too long");
+						}
+						catch (Exception ex)
+						{
+							logger.Error(ex.ToString());
 						}
 					}
 				}
