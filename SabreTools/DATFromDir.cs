@@ -317,7 +317,7 @@ namespace SabreTools
 				return rom.Game;
 			}
 
-			// If both deep hash flags are set, do a quickscan
+			// If both deep hash skip flags are set, do a quickscan
 			if (_noMD5 && _noSHA1)
 			{
 				ArchiveType? type = ArchiveTools.GetCurrentArchiveType(item, _logger);
