@@ -508,9 +508,6 @@ namespace SabreTools
 				b - If a file is a match and rebuilt, remove it from the output folder
 			*/
 
-			// Sort the input set(s) by game
-			SortedDictionary<string, List<Rom>> sortedByGame = DatTools.BucketByGame(_datdata.Roms, false, true, _logger);
-
 			// Assuming archived sets, move all toplevel folders to temp
 			foreach (string directory in Directory.EnumerateDirectories(_outdir, "*", SearchOption.TopDirectoryOnly))
 			{
@@ -518,65 +515,105 @@ namespace SabreTools
 			}
 
 			// Now process the inputs (assumed that it's archived sets as of right now
+			Dictionary<string, List<Rom>> scanned = new Dictionary<string, List<Rom>>();
 			foreach (string archive in Directory.EnumerateFiles(_outdir, "*", SearchOption.AllDirectories))
 			{
-				// If the name of the archive is not in the set exactly, move it to temp
-				if (!sortedByGame.ContainsKey(Path.GetFileNameWithoutExtension(archive)))
+				// If we are in quickscan, get the list of roms that way
+				List<Rom> roms = new List<Rom>();
+				if (_quickScan)
 				{
-					File.Move(archive, Path.Combine(_tempdir, archive));
+					roms = ArchiveTools.GetArchiveFileInfo(Path.GetFullPath(archive), _logger);
 				}
-				// Otherwise, we check if it's an archive. If it's not, move it to temp
-				else if (ArchiveTools.GetCurrentArchiveType(Path.GetFullPath(archive), _logger) == null)
-				{
-					File.Move(Path.GetFullPath(archive), Path.Combine(_tempdir, archive));
-				}
-				// Finally, if it's an archive and exists properly, we check the insides
+				// Otherwise, extract it and get info one by one
 				else
 				{
-					List<Rom> roms = new List<Rom>();
-
-					// If we are in quickscan, get the list of roms that way
-					if (_quickScan)
+					string temparcdir = Path.Combine(_tempdir, Path.GetFileNameWithoutExtension(archive));
+					ArchiveTools.ExtractArchive(Path.GetFullPath(archive), temparcdir, _logger);
+					foreach (string tempfile in Directory.EnumerateFiles(temparcdir, "*", SearchOption.AllDirectories))
 					{
-						roms = ArchiveTools.GetArchiveFileInfo(Path.GetFullPath(archive), _logger);
+						roms.Add(RomTools.GetSingleFileInfo(Path.GetFullPath(tempfile)));
 					}
-					// Otherwise, extract it and get info one by one
+
+					// Clear the temporary archive directory
+					Output.CleanDirectory(temparcdir);
+				}
+
+				// Then add each of the found files to the new dictionary
+				foreach (Rom rom in roms)
+				{
+					string key = rom.Size + "-" + rom.CRC;
+					if (scanned.ContainsKey(key))
+					{
+						scanned[key].Add(rom);
+					}
 					else
 					{
-						string temparcdir = Path.Combine(_tempdir, Path.GetFileNameWithoutExtension(archive));
-						ArchiveTools.ExtractArchive(Path.GetFullPath(archive), temparcdir, _logger);
-						foreach (string tempfile in Directory.EnumerateFiles(temparcdir, "*", SearchOption.AllDirectories))
-						{
-							roms.Add(RomTools.GetSingleFileInfo(Path.GetFullPath(tempfile)));
-						}
-
-						// Clear the temporary archive directory
-						Output.CleanDirectory(temparcdir);
+						List<Rom> templist = new List<Rom>();
+						templist.Add(rom);
+						scanned.Add(key, templist);
 					}
+				}
+			}
 
-					// Here, we traverse the newly created list and see if any of the files are in the list corresponding to the game
-					/*
-					Now, how do we do this WITHOUT traversing the list a billion times?
-					Does "contains" work in this situation?
-					Which is better: traversing the "should have" list or the "do have" list?
-					*/
-					List<Rom> fromDat = sortedByGame[Path.GetFileNameWithoutExtension(archive)];
-					List<Rom> toRemove = new List<Rom>();
-					foreach (Rom rom in roms)
+			// If nothing was found, we that it was successful
+			if (scanned.Count == 0)
+			{
+				return success;
+			}
+
+			// Now that we have all of the from DAT and from folder roms, we try to match them, removing the perfect matches
+			Dictionary<string, List<Rom>> remove = new Dictionary<string, List<Rom>>();
+			foreach (string key in scanned.Keys)
+			{
+				// If the key doesn't even exist in the DAT, then mark the entire key for removal
+				if (!_datdata.Roms.ContainsKey(key))
+				{
+					if (remove.ContainsKey(key))
 					{
-						// If it's not in at all or needs renaming, mark for removal
-						if (!fromDat.Contains(rom))
+						remove[key].AddRange(scanned[key]);
+					}
+					else
+					{
+						remove.Add(key, scanned[key]);
+					}
+				}
+				// Otherwise check each of the values individually
+				else
+				{
+					List<Rom> romsList = _datdata.Roms[key];
+					List<Rom> scannedList = scanned[key];
+					foreach (Rom rom in scannedList)
+					{
+						if (!romsList.Contains(rom))
 						{
-							toRemove.Add(rom);
-						}
-						// Otherwise, we leave it be
-						else
-						{
-							
+							if (remove.ContainsKey(key))
+							{
+								remove[key].Add(rom);
+							}
+							else
+							{
+								List<Rom> templist = new List<Rom>();
+								templist.Add(rom);
+								remove.Add(key, templist);
+							}
 						}
 					}
 				}
 			}
+
+			// At this point, we have the complete list of files from the DAT, a complete
+			// list of files that were scanned from the archives, and a complete list of
+			// the files to be removed because they aren't matches. I think at this point,
+			// we need to see if any of the files in "removed" can be rebuilt to something
+			// that is missing. But we don't have a list of missings, so how do we get this
+			// set of roms? Missing would be (_datdata.Roms - matches) I think. So if we
+			// get this additional set, we then run it against the "removed" set and rebuild
+			// as we go based on what we can do. Here is where we need some smarts. If the
+			// game to rebuild from and to are the same, we want to copy within. You
+			// should create a new helper function that "renames" an entry within the same
+			// archive to help this along. Everything else rebuilding should be copied from
+			// archive to archive. Once remove has been traversed, we will extract and remove
+			// all of the files that have been found and put them in the temporary folder.
 
 			return success;
 		}
