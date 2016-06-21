@@ -2144,7 +2144,9 @@ namespace SabreTools.Helper
 
 						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
 						filename = filename.Remove(0, rootpath.Length);
-						newrom.Game = Path.Combine(Path.GetDirectoryName(filename), Path.GetFileNameWithoutExtension(filename), newrom.Game);
+						newrom.Game = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
+							+ Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar
+							+ newrom.Game;
 						newroms.Add(newrom);
 					}
 					userData.Roms[key] = newroms;
