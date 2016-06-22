@@ -326,7 +326,7 @@ namespace SabreTools.Helper
 			}
 
 			// Loop through and find a Skipper that has the right name
-			logger.User("Beginning search for matching header skip rules");
+			logger.Log("Beginning search for matching header skip rules");
 			foreach (Skipper skipper in List)
 			{
 				if (String.IsNullOrEmpty(skippername) || (!String.IsNullOrEmpty(skipper.Name) && skippername.ToLowerInvariant() == skipper.Name.ToLowerInvariant()))
