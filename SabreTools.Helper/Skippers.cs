@@ -476,7 +476,7 @@ namespace SabreTools.Helper
 			// If we have a blank rule, inform the user
 			if (skipperRule.Tests == null)
 			{
-				logger.User("No matching rule found!");
+				logger.Log("No matching rule found!");
 			}
 
 			return skipperRule;
