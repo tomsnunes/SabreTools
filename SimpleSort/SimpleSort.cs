@@ -402,7 +402,7 @@ namespace SabreTools
 					}
 					else
 					{
-						ArchiveTools.WriteToArchive(input, _outdir, found);
+						ArchiveTools.WriteToManagedArchive(input, _outdir, found);
 					}
 				}
 
@@ -449,7 +449,7 @@ namespace SabreTools
 						}
 						else
 						{
-							ArchiveTools.WriteToArchive(newinput, _outdir, found);
+							ArchiveTools.WriteToManagedArchive(newinput, _outdir, found);
 						}
 
 						// Then output the headered rom (renamed)
@@ -475,7 +475,7 @@ namespace SabreTools
 						else
 						{
 							_logger.Log("Matched name: " + newfound.Name);
-							ArchiveTools.WriteToArchive(input, _outdir, newfound);
+							ArchiveTools.WriteToManagedArchive(input, _outdir, newfound);
 						}
 					}
 
@@ -535,8 +535,26 @@ namespace SabreTools
 								{
 									// Copy file between archives
 									_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
-									string archiveFileName = Path.Combine(_outdir, found.Game + ".zip");
-									ArchiveTools.CopyFileBetweenArchives(input, archiveFileName, rom.Name, found.Name, _logger);
+
+									if (Build.MonoEnvironment)
+									{
+										string outfile = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
+										if (File.Exists(outfile))
+										{
+											ArchiveTools.WriteToManagedArchive(outfile, _outdir, found);
+
+											try
+											{
+												File.Delete(outfile);
+											}
+											catch { }
+										}
+									}
+									else
+									{
+										string archiveFileName = Path.Combine(_outdir, found.Game + ".zip");
+										ArchiveTools.CopyFileBetweenManagedArchives(input, archiveFileName, rom.Name, found.Name, _logger);
+									}
 								}
 							}
 						}

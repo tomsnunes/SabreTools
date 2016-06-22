@@ -1,5 +1,10 @@
-﻿using SharpCompress.Common;
+﻿using SharpCompress.Archive;
+using SharpCompress.Archive.Zip;
+using SharpCompress.Common;
 using SharpCompress.Reader;
+using SharpCompress.Reader.Zip;
+using SharpCompress.Writer;
+using SharpCompress.Writer.Zip;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +17,7 @@ namespace SabreTools.Helper
 	public class ArchiveTools
 	{
 		/// <summary>
-		/// Copy a file either to an output archive or to an output folder
+		/// Copy a file to an output archive
 		/// </summary>
 		/// <param name="input">Input filename to be moved</param>
 		/// <param name="output">Output directory to build to</param>
@@ -21,7 +26,7 @@ namespace SabreTools.Helper
 		{
 			string archiveFileName = Path.Combine(output, rom.Game + ".zip");
 
-			ZipArchive outarchive = null;
+			System.IO.Compression.ZipArchive outarchive = null;
 			try
 			{
 				if (!File.Exists(archiveFileName))
@@ -58,6 +63,55 @@ namespace SabreTools.Helper
 			finally
 			{
 				outarchive?.Dispose();
+			}
+		}
+
+		/// <summary>
+		/// Copy a file to an output archive using SharpCompress
+		/// </summary>
+		/// <param name="input">Input filename to be moved</param>
+		/// <param name="output">Output directory to build to</param>
+		/// <param name="rom">RomData representing the new information</param>
+		public static void WriteToManagedArchive(string input, string output, Rom rom)
+		{
+			string archiveFileName = Path.Combine(output, rom.Game + ".zip");
+
+			// Delete an empty file first
+			if (File.Exists(archiveFileName) && new FileInfo(archiveFileName).Length == 0)
+			{
+				File.Delete(archiveFileName);
+			}
+
+			// Get if the file should be written out
+			bool newfile = File.Exists(archiveFileName) && new FileInfo(archiveFileName).Length != 0;
+
+			using (SharpCompress.Archive.Zip.ZipArchive archive = (newfile
+				? ArchiveFactory.Open(archiveFileName, Options.LookForHeader) as SharpCompress.Archive.Zip.ZipArchive
+				: ArchiveFactory.Create(ArchiveType.Zip) as SharpCompress.Archive.Zip.ZipArchive))
+			{
+				try
+				{
+					if (File.Exists(input))
+					{
+						archive.AddEntry(rom.Name, input);
+					}
+					else if (Directory.Exists(input))
+					{
+						archive.AddAllFromDirectory(input, "*", SearchOption.AllDirectories);
+					}
+
+					archive.SaveTo(archiveFileName + ".tmp", CompressionType.Deflate);
+				}
+				catch (Exception ex)
+				{
+					// Don't log archive write errors
+				}
+			}
+
+			if (File.Exists(archiveFileName + ".tmp"))
+			{
+				File.Delete(archiveFileName);
+				File.Move(archiveFileName + ".tmp", archiveFileName);
 			}
 		}
 
@@ -259,7 +313,7 @@ namespace SabreTools.Helper
 			}
 
 			IReader reader = null;
-			ZipArchive outarchive = null;
+			System.IO.Compression.ZipArchive outarchive = null;
 			try
 			{
 				reader = ReaderFactory.Open(File.OpenRead(inputArchive));
@@ -282,7 +336,7 @@ namespace SabreTools.Helper
 
 							if (outarchive.Mode == ZipArchiveMode.Create || outarchive.GetEntry(destEntryName) == null)
 							{
-								ZipArchiveEntry iae = outarchive.CreateEntry(destEntryName, CompressionLevel.Optimal) as ZipArchiveEntry;
+								System.IO.Compression.ZipArchiveEntry iae = outarchive.CreateEntry(destEntryName, CompressionLevel.Optimal) as System.IO.Compression.ZipArchiveEntry;
 
 								using (Stream iaestream = iae.Open())
 								{
@@ -303,6 +357,83 @@ namespace SabreTools.Helper
 			{
 				reader?.Dispose();
 				outarchive?.Dispose();
+			}
+
+			return success;
+		}
+
+		/// <summary>
+		/// Attempt to copy a file between archives using SharpCompress
+		/// </summary>
+		/// <param name="inputArchive">Source archive name</param>
+		/// <param name="outputArchive">Destination archive name</param>
+		/// <param name="sourceEntryName">Input entry name</param>
+		/// <param name="destEntryName">Output entry name</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the copy was a success, false otherwise</returns>
+		public static bool CopyFileBetweenManagedArchives(string inputArchive, string outputArchive,
+			string sourceEntryName, string destEntryName, Logger logger)
+		{
+			bool success = false;
+
+			// First get the archive types
+			ArchiveType? iat = GetCurrentArchiveType(inputArchive, logger);
+			ArchiveType? oat = (File.Exists(outputArchive) ? GetCurrentArchiveType(outputArchive, logger) : ArchiveType.Zip);
+
+			// If we got back null (or the output is not a Zipfile), then it's not an archive, so we we return
+			if (iat == null || (oat == null || oat != ArchiveType.Zip) || inputArchive == outputArchive)
+			{
+				return success;
+			}
+
+			try
+			{
+				using (IReader reader = ReaderFactory.Open(File.OpenRead(inputArchive)))
+				{
+					if (iat == ArchiveType.Zip || iat == ArchiveType.SevenZip || iat == ArchiveType.Rar)
+					{
+						while (reader.MoveToNextEntry())
+						{
+							logger.Log("Current entry name: '" + reader.Entry.Key + "'");
+							if (reader.Entry != null && reader.Entry.Key.Contains(sourceEntryName))
+							{
+								// Get if the file should be written out
+								bool newfile = File.Exists(outputArchive) && new FileInfo(outputArchive).Length != 0;
+
+								using (SharpCompress.Archive.Zip.ZipArchive archive = (newfile
+									? ArchiveFactory.Open(outputArchive, Options.LookForHeader) as SharpCompress.Archive.Zip.ZipArchive
+									: ArchiveFactory.Create(ArchiveType.Zip) as SharpCompress.Archive.Zip.ZipArchive))
+								{
+									try
+									{
+										Stream tempstream = new MemoryStream();
+										reader.WriteEntryTo(tempstream);
+										archive.AddEntry(destEntryName, tempstream);
+
+										archive.SaveTo(outputArchive + ".tmp", CompressionType.Deflate);
+									}
+									catch (Exception ex)
+									{
+										// Don't log archive write errors
+									}
+								}
+
+								if (File.Exists(outputArchive + ".tmp"))
+								{
+									File.Delete(outputArchive);
+									File.Move(outputArchive + ".tmp", outputArchive);
+								}
+
+								success = true;
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+				success = false;
 			}
 
 			return success;
