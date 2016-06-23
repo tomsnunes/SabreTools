@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
@@ -187,8 +188,9 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="lastrom">Rom to use as a base</param>
 		/// <param name="datdata">DAT to match against</param>
+		/// <param name="remove">True to remove matched roms from the input, false otherwise (default)</param>
 		/// <returns>List of matched RomData objects</returns>
-		public static List<Rom> GetDuplicates(Rom lastrom, Dat datdata)
+		public static List<Rom> GetDuplicates(Rom lastrom, Dat datdata, bool remove = false)
 		{
 			List<Rom> output = new List<Rom>();
 
@@ -199,14 +201,27 @@ namespace SabreTools.Helper
 			}
 
 			// Try to find duplicates
-			foreach (List<Rom> roms in datdata.Roms.Values)
+			List<string> keys = datdata.Roms.Keys.ToList();
+			foreach (string key in keys)
 			{
+				List<Rom> roms = datdata.Roms[key];
+				List<Rom> left = new List<Rom>();
 				foreach (Rom rom in roms)
 				{
 					if (IsDuplicate(rom, lastrom))
 					{
 						output.Add(rom);
 					}
+					else
+					{
+						left.Add(rom);
+					}
+				}
+
+				// If we're in removal mode, replace the list with the new one
+				if (remove)
+				{
+					datdata.Roms[key] = left;
 				}
 			}
 
