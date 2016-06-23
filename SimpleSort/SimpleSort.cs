@@ -320,6 +320,9 @@ namespace SabreTools
 				}
 			}
 
+			// Now output the stats for the DAT (remaining)
+			Stats.OutputStats(_datdata, _logger, true);
+
 			return success;
 		}
 
@@ -378,7 +381,7 @@ namespace SabreTools
 				}
 
 				// Try to find the matches to the file that was found
-				List<Rom> foundroms = RomTools.GetDuplicates(rom, _datdata);
+				List<Rom> foundroms = RomTools.GetDuplicates(rom, _datdata, true);
 				_logger.Log("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
 				foreach (Rom found in foundroms)
 				{
@@ -424,7 +427,7 @@ namespace SabreTools
 					}
 
 					// Try to find the matches to the file that was found
-					List<Rom> founddroms = RomTools.GetDuplicates(drom, _datdata);
+					List<Rom> founddroms = RomTools.GetDuplicates(drom, _datdata, true);
 					_logger.Log("File '" + newinput + "' had " + founddroms.Count + " matches in the DAT!");
 					foreach (Rom found in founddroms)
 					{
@@ -507,7 +510,7 @@ namespace SabreTools
 						foreach (Rom rom in internalRomData)
 						{
 							// Try to find the matches to the file that was found
-							List<Rom> foundroms = RomTools.GetDuplicates(rom, _datdata);
+							List<Rom> foundroms = RomTools.GetDuplicates(rom, _datdata, true);
 							_logger.Log("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
 							foreach (Rom found in foundroms)
 							{
