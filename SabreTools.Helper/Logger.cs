@@ -159,6 +159,34 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Write the given exact string to the log output
+		/// </summary>
+		/// <param name="output">String to be written log</param>
+		/// <param name="loglevel">Severity of the information being logged</param>
+		/// <returns>True if the output could be written, false otherwise</returns>
+		public bool LogExact(string output)
+		{
+			Console.Write(output);
+
+			// If we're writing to file, use the existing stream
+			if (_tofile)
+			{
+				try
+				{
+					_log.Write(DateTime.Now + " - " + output);
+					_log.Flush();
+				}
+				catch
+				{
+					Console.WriteLine("Could not write to log file!");
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Write the given string as a user message to the log output
 		/// </summary>
 		/// <param name="output">String to be written log</param>
