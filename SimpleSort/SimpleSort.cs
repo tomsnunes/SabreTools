@@ -379,7 +379,7 @@ namespace SabreTools
 
 				// Try to find the matches to the file that was found
 				List<Rom> foundroms = RomTools.GetDuplicates(rom, _datdata);
-				_logger.User("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
+				_logger.Log("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
 				foreach (Rom found in foundroms)
 				{
 					_logger.Log("Matched name: " + found.Name);
@@ -425,7 +425,7 @@ namespace SabreTools
 
 					// Try to find the matches to the file that was found
 					List<Rom> founddroms = RomTools.GetDuplicates(drom, _datdata);
-					_logger.User("File '" + newinput + "' had " + founddroms.Count + " matches in the DAT!");
+					_logger.Log("File '" + newinput + "' had " + founddroms.Count + " matches in the DAT!");
 					foreach (Rom found in founddroms)
 					{
 						// First output the headerless rom
@@ -508,7 +508,7 @@ namespace SabreTools
 						{
 							// Try to find the matches to the file that was found
 							List<Rom> foundroms = RomTools.GetDuplicates(rom, _datdata);
-							_logger.User("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
+							_logger.Log("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
 							foreach (Rom found in foundroms)
 							{
 								if (_toFolder)
