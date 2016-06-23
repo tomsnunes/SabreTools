@@ -321,6 +321,7 @@ namespace SabreTools
 			}
 
 			// Now output the stats for the DAT (remaining)
+			_logger.User("Stats of the remaining ROMs:");
 			Stats.OutputStats(_datdata, _logger, true);
 
 			return success;
