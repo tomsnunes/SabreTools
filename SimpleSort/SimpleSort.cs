@@ -281,15 +281,14 @@ namespace SabreTools
 				Output.CleanDirectory(_tempdir);
 			}
 
-			// Then, loop through and check each of the inputs
-			_logger.User("Starting to loop through inputs");
+			// Create a list of just files from inputs
+			List<string> files = new List<string>();
 			foreach (string input in _inputs)
 			{
 				if (File.Exists(input))
 				{
 					_logger.Log("File found: '" + input + "'");
-					success &= RebuildToOutputHelper(input);
-					Output.CleanDirectory(_tempdir);
+					files.Add(Path.GetFullPath(input));
 				}
 				else if (Directory.Exists(input))
 				{
@@ -297,14 +296,21 @@ namespace SabreTools
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						_logger.Log("File found: '" + file + "'");
-						success &= RebuildToOutputHelper(file);
-						Output.CleanDirectory(_tempdir);
+						files.Add(Path.GetFullPath(file));
 					}
 				}
 				else
 				{
 					_logger.Error("'" + input + "' is not a file or directory!");
 				}
+			}
+
+			// Then, loop through and check each of the inputs
+			_logger.User("Starting to loop through inputs\n");
+			for (int i = 0; i < files.Count; i++)
+			{
+				success &= RebuildToOutputHelper(files[i], i, files.Count);
+				Output.CleanDirectory(_tempdir);
 			}
 
 			// Now one final delete of the temp directory
@@ -330,16 +336,18 @@ namespace SabreTools
 		/// <summary>
 		/// Process an individual file against the DAT
 		/// </summary>
-		/// <param name="input">The name of the input file</param>
+		/// <param name="input">Name of the input file</param>
+		/// <param name="index">Index of the current file</param>
+		/// <param name="total">Total number of files</param>
 		/// <param name="recurse">True if this is in a recurse step and the file should be deleted, false otherwise (default)</param>
 		/// <returns>True if it was processed properly, false otherwise</returns>
-		private bool RebuildToOutputHelper(string input, bool recurse = false)
+		private bool RebuildToOutputHelper(string input, int index, int total, bool recurse = false)
 		{
 			bool success = true;
 
 			// Get the full path of the input for movement purposes
-			input = Path.GetFullPath(input);
-			_logger.User("Beginning processing of '" + input + "'");
+			string statement = "\r" + (100 * index / total) + "% - Processing '" + input + "'";
+			_logger.LogExact(statement.PadRight(79, ' '));
 
 			// Get if the file should be scanned internally and externally
 			bool shouldExternalScan = true;
@@ -397,7 +405,7 @@ namespace SabreTools
 							Directory.CreateDirectory(gamedir);
 						}
 
-						_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+						_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
 						try
 						{
 							File.Copy(input, Path.Combine(gamedir, Path.GetFileName(found.Name)));
@@ -444,7 +452,7 @@ namespace SabreTools
 								Directory.CreateDirectory(gamedir);
 							}
 
-							_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+							_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
 							try
 							{
 								File.Copy(newinput, Path.Combine(gamedir, Path.GetFileName(found.Name)));
@@ -469,7 +477,7 @@ namespace SabreTools
 								Directory.CreateDirectory(gamedir);
 							}
 
-							_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + newfound.Name + "'");
+							_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + newfound.Name + "'");
 							try
 							{
 								File.Copy(input, Path.Combine(gamedir, Path.GetFileName(newfound.Name)));
@@ -518,7 +526,7 @@ namespace SabreTools
 								if (_toFolder)
 								{
 									// Copy file to output directory
-									_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+									_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
 									string outfile = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
 									if (File.Exists(outfile))
 									{
@@ -538,7 +546,7 @@ namespace SabreTools
 								else
 								{
 									// Copy file between archives
-									_logger.User("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+									_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
 
 									if (Build.MonoEnvironment)
 									{
@@ -585,10 +593,10 @@ namespace SabreTools
 					// If no errors were encountered, we loop through the temp directory
 					if (!encounteredErrors)
 					{
-						_logger.User("Archive found! Successfully extracted");
+						_logger.Log("Archive found! Successfully extracted");
 						foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
 						{
-							success &= RebuildToOutputHelper(file, true);
+							success &= RebuildToOutputHelper(file, index, total, true);
 						}
 					}
 				}
