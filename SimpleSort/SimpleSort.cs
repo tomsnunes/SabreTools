@@ -306,7 +306,7 @@ namespace SabreTools
 			}
 
 			// Then, loop through and check each of the inputs
-			_logger.User("Starting to loop through inputs\n");
+			_logger.User("Processing files:\n");
 			for (int i = 0; i < files.Count; i++)
 			{
 				success &= RebuildToOutputHelper(files[i], i, files.Count);
@@ -327,7 +327,8 @@ namespace SabreTools
 			}
 
 			// Now output the stats for the DAT (remaining)
-			_logger.User("\nStats of the remaining ROMs:");
+			Console.SetCursorPosition(0, Console.CursorTop - 2);
+			_logger.User("Stats of the unmatched ROMs:".PadRight(79, ' '));
 			Stats.OutputStats(_datdata, _logger, true);
 
 			return success;
@@ -346,7 +347,7 @@ namespace SabreTools
 			bool success = true;
 
 			// Get the full path of the input for movement purposes
-			string statement = "\r" + (100 * index / total) + "% - Processing '" + input + "'";
+			string statement = "\r" + (100 * index / total) + "% - " + input;
 			_logger.LogExact(statement.PadRight(79, ' '));
 
 			// Get if the file should be scanned internally and externally
