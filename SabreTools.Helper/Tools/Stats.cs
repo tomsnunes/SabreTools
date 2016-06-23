@@ -131,7 +131,7 @@ Please check the log folder if the stats scrolled offscreen");
 				}
 			}
 
-			SortedDictionary<string, List<Rom>> newroms = DatTools.BucketByGame(datdata.Roms, false, true, logger);
+			SortedDictionary<string, List<Rom>> newroms = DatTools.BucketByGame(datdata.Roms, false, true, logger, false);
 			logger.User(@"    Uncompressed size:       " + Style.GetBytesReadable(datdata.TotalSize) + @"
     Games found:             " + (game == -1 ? newroms.Count : game) + @"
     Roms found:              " + datdata.RomCount + @"
