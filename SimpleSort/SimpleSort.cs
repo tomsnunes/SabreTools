@@ -21,6 +21,10 @@ namespace SabreTools
 		private ArchiveScanLevel _zip;
 		private Logger _logger;
 
+		// Other private variables
+		private int _cursorTop;
+		private int _cursorLeft;
+
 		/// <summary>
 		/// Create a new SimpleSort object
 		/// </summary>
@@ -307,6 +311,7 @@ namespace SabreTools
 
 			// Then, loop through and check each of the inputs
 			_logger.User("Processing files:\n");
+			_cursorTop = Console.CursorTop;
 			for (int i = 0; i < files.Count; i++)
 			{
 				success &= RebuildToOutputHelper(files[i], i, files.Count);
@@ -347,8 +352,9 @@ namespace SabreTools
 			bool success = true;
 
 			// Get the full path of the input for movement purposes
-			string statement = "\r" + (100 * index / total) + "% - " + Path.GetFileName(input);
-			_logger.LogExact(statement.PadRight(79, ' '));
+			string percentage = Math.Round((100 * ((double)index / total)), 2, MidpointRounding.AwayFromZero).ToString();
+			string statement = percentage + "% - " + input;
+			_logger.Log(statement, _cursorTop, 0);
 
 			// Get if the file should be scanned internally and externally
 			bool shouldExternalScan = true;

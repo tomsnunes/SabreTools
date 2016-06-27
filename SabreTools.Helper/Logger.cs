@@ -137,7 +137,9 @@ namespace SabreTools.Helper
 			// USER and ERROR writes to console
 			if (loglevel == LogLevel.USER || loglevel == LogLevel.ERROR)
 			{
-				Console.WriteLine((loglevel == LogLevel.ERROR ? loglevel.ToString() + " " : "") + output);
+				int padlength = (int)(Math.Ceiling((double)output.Length / 80) * 80) - 1;
+				string tempoutput = output.PadRight(padlength, ' ');
+				Console.WriteLine((loglevel == LogLevel.ERROR ? loglevel.ToString() + " " : "") + tempoutput);
 			}
 
 			// If we're writing to file, use the existing stream
@@ -162,11 +164,22 @@ namespace SabreTools.Helper
 		/// Write the given exact string to the log output
 		/// </summary>
 		/// <param name="output">String to be written log</param>
-		/// <param name="loglevel">Severity of the information being logged</param>
+		/// <param name="line">Line number to write out to</param>
+		/// <param name="column">Column number to write out to</param>
 		/// <returns>True if the output could be written, false otherwise</returns>
-		public bool LogExact(string output)
+		public bool Log(string output, int line, int column)
 		{
-			Console.Write(output);
+			// Set the cursor position (if not being redirected)
+			if (!Console.IsOutputRedirected)
+			{
+				Console.CursorTop = line;
+				Console.CursorLeft = column;
+			}
+
+			// Write out to the console
+			int padlength = (int)(Math.Ceiling((double)output.Length / 80) * 80) - 1;
+			string tempoutput = output.PadRight(padlength, ' ');
+			Console.Write(tempoutput);
 
 			// If we're writing to file, use the existing stream
 			if (_tofile)
