@@ -1476,7 +1476,7 @@ namespace SabreTools.Helper
 				foreach (Rom rom in newroms)
 				{
 					count++;
-					string key = rom.Size + "-" + rom.CRC; ;
+					string key = rom.Size + "-" + rom.CRC;
 					if (sortable.ContainsKey(key))
 					{
 						sortable[key].Add(rom);

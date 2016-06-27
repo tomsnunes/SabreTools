@@ -24,6 +24,7 @@ namespace SabreTools
 		// Other private variables
 		private int _cursorTop;
 		private int _cursorLeft;
+		private Dat _matched;
 
 		/// <summary>
 		/// Create a new SimpleSort object
@@ -53,6 +54,13 @@ namespace SabreTools
 			_rar = (ArchiveScanLevel)(rar < 0 || rar > 2 ? 0 : rar);
 			_zip = (ArchiveScanLevel)(zip < 0 || zip > 2 ? 0 : zip);
 			_logger = logger;
+
+			_cursorTop = Console.CursorTop;
+			_cursorLeft = Console.CursorLeft;
+			_matched = new Dat
+			{
+				Roms = new Dictionary<string, List<Rom>>(),
+			};
 		}
 
 		/// <summary>
@@ -333,8 +341,8 @@ namespace SabreTools
 
 			// Now output the stats for the DAT (remaining)
 			Console.SetCursorPosition(0, Console.CursorTop - 2);
-			_logger.User("Stats of the unmatched ROMs:".PadRight(79, ' '));
-			Stats.OutputStats(_datdata, _logger, true);
+			_logger.User("Stats of the matched ROMs:".PadRight(79, ' '));
+			Stats.OutputStats(_matched, _logger, true);
 
 			return success;
 		}
@@ -354,6 +362,7 @@ namespace SabreTools
 			// Get the full path of the input for movement purposes
 			string percentage = Math.Round((100 * ((double)index / total)), 2, MidpointRounding.AwayFromZero).ToString();
 			string statement = percentage + "% - " + input;
+			_logger.ClearBeneath(_cursorTop + 1);
 			_logger.Log(statement, _cursorTop, 0);
 
 			// Get if the file should be scanned internally and externally
@@ -403,6 +412,19 @@ namespace SabreTools
 				{
 					_logger.Log("Matched name: " + found.Name);
 
+					// Add rom to the matched list
+					string key = found.Size + "-" + found.CRC;
+					if(_matched.Roms.ContainsKey(key))
+					{
+						_matched.Roms[key].Add(found);
+					}
+					else
+					{
+						List<Rom> temp = new List<Rom>();
+						temp.Add(found);
+						_matched.Roms.Add(key, temp);
+					}
+
 					if (_toFolder)
 					{
 						// Copy file to output directory
@@ -447,6 +469,19 @@ namespace SabreTools
 					_logger.Log("File '" + newinput + "' had " + founddroms.Count + " matches in the DAT!");
 					foreach (Rom found in founddroms)
 					{
+						// Add rom to the matched list
+						string key = found.Size + "-" + found.CRC;
+						if (_matched.Roms.ContainsKey(key))
+						{
+							_matched.Roms[key].Add(found);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(found);
+							_matched.Roms.Add(key, temp);
+						}
+
 						// First output the headerless rom
 						_logger.Log("Matched name: " + found.Name);
 
@@ -474,6 +509,19 @@ namespace SabreTools
 						// Then output the headered rom (renamed)
 						Rom newfound = found;
 						newfound.Name = Path.GetFileNameWithoutExtension(newfound.Name) + " (" + rom.CRC + ")" + Path.GetExtension(newfound.Name);
+
+						// Add rom to the matched list
+						key = newfound.Size + "-" + newfound.CRC;
+						if (_matched.Roms.ContainsKey(key))
+						{
+							_matched.Roms[key].Add(newfound);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(newfound);
+							_matched.Roms.Add(key, temp);
+						}
 
 						if (_toFolder)
 						{
@@ -530,6 +578,19 @@ namespace SabreTools
 							_logger.Log("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
 							foreach (Rom found in foundroms)
 							{
+								// Add rom to the matched list
+								string key = found.Size + "-" + found.CRC;
+								if (_matched.Roms.ContainsKey(key))
+								{
+									_matched.Roms[key].Add(found);
+								}
+								else
+								{
+									List<Rom> temp = new List<Rom>();
+									temp.Add(found);
+									_matched.Roms.Add(key, temp);
+								}
+
 								if (_toFolder)
 								{
 									// Copy file to output directory

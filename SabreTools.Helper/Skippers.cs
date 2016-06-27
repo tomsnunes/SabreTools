@@ -464,7 +464,7 @@ namespace SabreTools.Helper
 							// If we still have a success, then return this rule
 							if (success)
 							{
-								logger.User("Matching rule found!");
+								logger.User(" Matching rule found!");
 								skipperRule = rule;
 								break;
 							}

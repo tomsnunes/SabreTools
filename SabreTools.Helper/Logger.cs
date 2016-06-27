@@ -137,7 +137,8 @@ namespace SabreTools.Helper
 			// USER and ERROR writes to console
 			if (loglevel == LogLevel.USER || loglevel == LogLevel.ERROR)
 			{
-				int padlength = (int)(Math.Ceiling((double)output.Length / 80) * 80) - 1;
+				int padlength = (int)(Math.Ceiling((double)output.Length / 80) * 80);
+				padlength = (padlength > 0 ? padlength: 0);
 				string tempoutput = output.PadRight(padlength, ' ');
 				Console.WriteLine((loglevel == LogLevel.ERROR ? loglevel.ToString() + " " : "") + tempoutput);
 			}
@@ -178,6 +179,7 @@ namespace SabreTools.Helper
 
 			// Write out to the console
 			int padlength = (int)(Math.Ceiling((double)output.Length / 80) * 80) - 1;
+			padlength = (padlength > 0 ? padlength : 0);
 			string tempoutput = output.PadRight(padlength, ' ');
 			Console.Write(tempoutput);
 
@@ -227,6 +229,23 @@ namespace SabreTools.Helper
 		public bool Error(string output)
 		{
 			return Log(output, LogLevel.ERROR);
+		}
+
+		/// <summary>
+		/// Clear lines beneath the given line in the console
+		/// </summary>
+		/// <param name="line">Line number to clear beneath</param>
+		/// <returns>True</returns>
+		public bool ClearBeneath(int line)
+		{
+			if (!Console.IsOutputRedirected)
+			{
+				for (int i = line; i < Console.WindowHeight; i++)
+				{
+					Log(" ", i, 0);
+				}
+			}
+			return true;
 		}
 	}
 }
