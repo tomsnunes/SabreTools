@@ -347,7 +347,7 @@ namespace SabreTools
 			bool success = true;
 
 			// Get the full path of the input for movement purposes
-			string statement = "\r" + (100 * index / total) + "% - " + input;
+			string statement = "\r" + (100 * index / total) + "% - " + Path.GetFileName(input);
 			_logger.LogExact(statement.PadRight(79, ' '));
 
 			// Get if the file should be scanned internally and externally
