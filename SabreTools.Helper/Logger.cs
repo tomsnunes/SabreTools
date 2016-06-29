@@ -137,10 +137,7 @@ namespace SabreTools.Helper
 			// USER and ERROR writes to console
 			if (loglevel == LogLevel.USER || loglevel == LogLevel.ERROR)
 			{
-				int padlength = (int)(Math.Ceiling((double)output.Length / 80) * 80);
-				padlength = (padlength > 0 ? padlength: 0);
-				string tempoutput = output.PadRight(padlength, ' ');
-				Console.WriteLine((loglevel == LogLevel.ERROR ? loglevel.ToString() + " " : "") + tempoutput);
+				Console.WriteLine((loglevel == LogLevel.ERROR ? loglevel.ToString() + " " : "") + output);
 			}
 
 			// If we're writing to file, use the existing stream
@@ -178,10 +175,7 @@ namespace SabreTools.Helper
 			}
 
 			// Write out to the console
-			int padlength = (int)(Math.Ceiling((double)output.Length / 80) * 80) - 1;
-			padlength = (padlength > 0 ? padlength : 0);
-			string tempoutput = output.PadRight(padlength, ' ');
-			Console.Write(tempoutput);
+			Console.Write(output);
 
 			// If we're writing to file, use the existing stream
 			if (_tofile)
