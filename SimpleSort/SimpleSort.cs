@@ -339,9 +339,10 @@ namespace SabreTools
 				}
 			}
 
-			// Now output the stats for the DAT (remaining)
-			Console.SetCursorPosition(0, Console.CursorTop - 2);
-			_logger.User("Stats of the matched ROMs:".PadRight(79, ' '));
+			// Now output the stats for the built files
+			_logger.ClearBeneath(Constants.HeaderHeight);
+			Console.SetCursorPosition(0, Constants.HeaderHeight + 1);
+			_logger.User("Stats of the matched ROMs:");
 			Stats.OutputStats(_matched, _logger, true);
 
 			return success;

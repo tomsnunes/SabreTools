@@ -132,23 +132,15 @@ Please check the log folder if the stats scrolled offscreen");
 			}
 
 			SortedDictionary<string, List<Rom>> newroms = DatTools.BucketByGame(datdata.Roms, false, true, logger, false);
-			string line = "    Uncompressed size:       " + Style.GetBytesReadable(datdata.TotalSize);
-			logger.Log(line, Console.CursorTop, 0);
-			line = "    Games found:             " + (game == -1 ? newroms.Count : game);
-			logger.Log(line, Console.CursorTop + 1, 0);
-			line = "    Roms found:              " + datdata.RomCount;
-			logger.Log(line, Console.CursorTop + 1, 0);
-			line = "    Disks found:             " + datdata.DiskCount;
-			logger.Log(line, Console.CursorTop + 1, 0);
-			line = "    Roms with CRC:           " + datdata.CRCCount;
-			logger.Log(line, Console.CursorTop + 1, 0);
-			line = "    Roms with MD5:           " + datdata.MD5Count;
-			logger.Log(line, Console.CursorTop + 1, 0);
-			line = "    Roms with SHA-1:         " + datdata.SHA1Count;
-			logger.Log(line, Console.CursorTop + 1, 0);
-			line = "    Roms with Nodump status: " + datdata.NodumpCount;
-			logger.Log(line, Console.CursorTop + 1, 0);
-			logger.User("");
+			logger.User("    Uncompressed size:       " + Style.GetBytesReadable(datdata.TotalSize) + @"
+    Games found:             " + (game == -1 ? newroms.Count : game) + @"
+    Roms found:              " + datdata.RomCount + @"
+    Disks found:             " + datdata.DiskCount + @"
+    Roms with CRC:           " + datdata.CRCCount + @"
+    Roms with MD5:           " + datdata.MD5Count + @"
+    Roms with SHA-1:         " + datdata.SHA1Count + @"
+    Roms with Nodump status: " + datdata.NodumpCount + @"
+");
 		}
 	}
 }
