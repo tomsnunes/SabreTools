@@ -360,7 +360,7 @@ namespace SabreTools
 			bool success = true;
 
 			// Get the full path of the input for movement purposes
-			string percentage = Math.Round((100 * ((double)index / total)), 2, MidpointRounding.AwayFromZero).ToString();
+			string percentage = (index == 0 ? "0.00" : Math.Round((100 * ((double)index / total)), 2, MidpointRounding.AwayFromZero).ToString());
 			string statement = percentage + "% - " + input;
 			_logger.ClearBeneath(_cursorTop + 1);
 			_logger.Log(statement, _cursorTop, 0);

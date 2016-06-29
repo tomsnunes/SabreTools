@@ -242,7 +242,10 @@ namespace SabreTools.Helper
 			{
 				for (int i = line; i < Console.WindowHeight; i++)
 				{
-					Log(" ", i, 0);
+					// http://stackoverflow.com/questions/8946808/can-console-clear-be-used-to-only-clear-a-line-instead-of-whole-console
+					Console.SetCursorPosition(0, Console.CursorTop);
+					Console.Write(new string(' ', Console.WindowWidth));
+					Console.SetCursorPosition(0, i);
 				}
 			}
 			return true;
