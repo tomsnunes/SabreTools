@@ -102,7 +102,7 @@ namespace SabreTools.Helper
 
 					archive.SaveTo(archiveFileName + ".tmp", CompressionType.Deflate);
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					// Don't log archive write errors
 				}
@@ -412,7 +412,7 @@ namespace SabreTools.Helper
 
 										archive.SaveTo(outputArchive + ".tmp", CompressionType.Deflate);
 									}
-									catch (Exception ex)
+									catch (Exception)
 									{
 										// Don't log archive write errors
 									}
@@ -542,8 +542,8 @@ namespace SabreTools.Helper
 			string gzsize = BitConverter.ToString(footer.Reverse().ToArray()).Replace("-", string.Empty);
 			long extractedsize = Convert.ToInt64(gzsize, 16);
 
-			// Only try to add if the file size is greater than 750 MiB
-			if (filesize >= (750 * Constants.MibiByte))
+			// Only try to add if the file size is greater than 600 MiB
+			if (filesize >= (600 * Constants.MibiByte))
 			{
 				// ISIZE is mod 4GiB, so we add that if the ISIZE is smaller than the filesize and greater than 1% different
 				bool shouldfollowup = false;

@@ -126,7 +126,7 @@ namespace SabreTools.Helper
 						Rom lastrom = outroms[i];
 
 						// Get the duplicate status
-						dupetype = GetDuplicateStatus(rom, lastrom);
+						dupetype = GetDuplicateStatus(rom, lastrom, logger);
 
 						// If it's a duplicate, skip adding it to the output but add any missing information
 						if (dupetype != DupeType.None)
@@ -188,9 +188,10 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="lastrom">Rom to use as a base</param>
 		/// <param name="datdata">DAT to match against</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="remove">True to remove matched roms from the input, false otherwise (default)</param>
 		/// <returns>List of matched RomData objects</returns>
-		public static List<Rom> GetDuplicates(Rom lastrom, Dat datdata, bool remove = false)
+		public static List<Rom> GetDuplicates(Rom lastrom, Dat datdata, Logger logger, bool remove = false)
 		{
 			List<Rom> output = new List<Rom>();
 
@@ -208,7 +209,7 @@ namespace SabreTools.Helper
 				List<Rom> left = new List<Rom>();
 				foreach (Rom rom in roms)
 				{
-					if (IsDuplicate(rom, lastrom))
+					if (IsDuplicate(rom, lastrom, logger))
 					{
 						output.Add(rom);
 					}
@@ -233,8 +234,9 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="rom">Rom to check for duplicate status</param>
 		/// <param name="lastrom">Rom to use as a baseline</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>True if the roms are duplicates, false otherwise</returns>
-		public static bool IsDuplicate(Rom rom, Rom lastrom)
+		public static bool IsDuplicate(Rom rom, Rom lastrom, Logger logger)
 		{
 			bool dupefound = false;
 
@@ -259,6 +261,12 @@ namespace SabreTools.Helper
 				);
 			}
 
+			// More wonderful SHA-1 logging that has to be done
+			if (rom.SHA1 == lastrom.SHA1 && rom.Size != lastrom.Size)
+			{
+				logger.User("SHA-1 mismatch - Hash: " + rom.SHA1);
+			}
+
 			return dupefound;
 		}
 
@@ -267,13 +275,14 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="rom">Current rom to check</param>
 		/// <param name="lastrom">Last rom to check against</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>The DupeType corresponding to the relationship between the two</returns>
-		public static DupeType GetDuplicateStatus(Rom rom, Rom lastrom)
+		public static DupeType GetDuplicateStatus(Rom rom, Rom lastrom, Logger logger)
 		{
 			DupeType output = DupeType.None;
 
 			// If we don't have a duplicate at all, return none
-			if (!IsDuplicate(rom, lastrom))
+			if (!IsDuplicate(rom, lastrom, logger))
 			{
 				return output;
 			}

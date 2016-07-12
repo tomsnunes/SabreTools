@@ -22,6 +22,11 @@ namespace SabreTools.Helper
 
 		public int CompareTo(object obj)
 		{
+			Logger temp = new Logger(false, "");
+			temp.Start();
+
+			int ret = 0;
+
 			try
 			{
 				Rom comp = (Rom)obj;
@@ -30,23 +35,31 @@ namespace SabreTools.Helper
 				{
 					if (this.Name == comp.Name)
 					{
-						return (RomTools.IsDuplicate(this, comp) ? 0 : 1);
+						ret = (RomTools.IsDuplicate(this, comp, temp) ? 0 : 1);
 					}
-					return String.Compare(this.Name, comp.Name);
+					ret = String.Compare(this.Name, comp.Name);
 				}
-				return String.Compare(this.Game, comp.Game);
+				ret = String.Compare(this.Game, comp.Game);
 			}
 			catch
 			{
-				return 1;
+				ret = 1;
 			}
+
+			temp.Close();
+			return ret;
 		}
 
 		public bool Equals(Rom other)
 		{
+			Logger temp = new Logger(false, "");
+			temp.Start();
+			bool isdupe = RomTools.IsDuplicate(this, other, temp);
+			temp.Close();
+
 			return (this.Game == other.Game &&
 				this.Name == other.Name &&
-				RomTools.IsDuplicate(this, other));
+				isdupe);
 		}
 	}
 
