@@ -1395,27 +1395,27 @@ namespace SabreTools.Helper
 			}
 			
 			// Process each all of the roms
-			foreach (List<Rom> roms in dict.Values)
+			foreach (string key in dict.Keys)
 			{
-				List<Rom> newroms = roms;
+				List<Rom> roms = dict[key];
 				if (mergeroms)
 				{
-					newroms = RomTools.Merge(newroms, logger);
+					roms = RomTools.Merge(roms, logger);
 				}
 
-				foreach (Rom rom in newroms)
+				foreach (Rom rom in roms)
 				{
 					count++;
-					string key = (norename ? "" : rom.Metadata.SystemID.ToString().PadLeft(10, '0') + "-" + rom.Metadata.SourceID.ToString().PadLeft(10, '0') + "-") + rom.Game.ToLowerInvariant();
-					if (sortable.ContainsKey(key))
+					string newkey = (norename ? "" : rom.Metadata.SystemID.ToString().PadLeft(10, '0') + "-" + rom.Metadata.SourceID.ToString().PadLeft(10, '0') + "-") + rom.Game.ToLowerInvariant();
+					if (sortable.ContainsKey(newkey))
 					{
-						sortable[key].Add(rom);
+						sortable[newkey].Add(rom);
 					}
 					else
 					{
 						List<Rom> temp = new List<Rom>();
 						temp.Add(rom);
-						sortable.Add(key, temp);
+						sortable.Add(newkey, temp);
 					}
 				}
 			}

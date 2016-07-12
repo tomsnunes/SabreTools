@@ -356,9 +356,10 @@ namespace SabreTools.Helper
 			hash = (hash.StartsWith("0x") ? hash.Remove(0, 2) : hash);
 			hash = (hash == "-" ? "" : hash);
 			hash = (String.IsNullOrEmpty(hash) ? "" : hash.PadLeft(padding, '0'));
+			hash = hash.ToLowerInvariant();
 
 			// Then make sure that it has the correct characters
-			if (!Regex.IsMatch(hash.ToLowerInvariant(), "[0-9a-f]{" + padding + "}"))
+			if (!Regex.IsMatch(hash, "[0-9a-f]{" + padding + "}"))
 			{
 				hash = "";
 			}
