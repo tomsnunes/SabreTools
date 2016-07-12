@@ -77,7 +77,7 @@ namespace SabreTools.Helper
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static Dat Parse(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep = false, bool clean = false, bool sl = false)
+		public static Dat Parse(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep = false, bool clean = false, bool softlist = false)
 		{
 			// If the output filename isn't set already, get the internal filename
 			if (String.IsNullOrEmpty(datdata.FileName))
@@ -106,7 +106,7 @@ namespace SabreTools.Helper
 					return ParseRC(filename, sysid, srcid, datdata, logger, clean);
 				case OutputFormat.SabreDat:
 				case OutputFormat.Xml:
-					return ParseXML(filename, sysid, srcid, datdata, logger, keep, clean, sl);
+					return ParseXML(filename, sysid, srcid, datdata, logger, keep, clean, softlist);
 				default:
 					return datdata;
 			}
@@ -619,9 +619,9 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="sl">True if SL XML names should be kept, false otherwise (default)</param>
+		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static Dat ParseXML(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep, bool clean, bool sl)
+		public static Dat ParseXML(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep, bool clean, bool softlist)
 		{
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
@@ -957,7 +957,7 @@ namespace SabreTools.Helper
 							// If we have a subtree, add what is possible
 							if (subreader != null)
 							{
-								if (!sl && temptype == "software" && subreader.ReadToFollowing("description"))
+								if (!softlist && temptype == "software" && subreader.ReadToFollowing("description"))
 								{
 									tempname = subreader.ReadElementContentAsString();
 									tempname = tempname.Replace('/', '_').Replace("\"", "''");
@@ -1512,6 +1512,7 @@ namespace SabreTools.Helper
 		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
+		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
 		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
 		/// <param name="romtype">Type of the rom to match</param>
@@ -1527,7 +1528,7 @@ namespace SabreTools.Helper
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		public static void Update(List<string> inputFileNames, Dat datdata, string outputDirectory, bool merge, bool diff, bool cascade, bool inplace,
-			bool bare, bool clean, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc, string md5,
+			bool bare, bool clean, bool softlist, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc, string md5,
 			string sha1, bool? nodump, bool trim, bool single, string root, Logger logger)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
@@ -1575,7 +1576,7 @@ namespace SabreTools.Helper
 				// Create a dictionary of all ROMs from the input DATs
 				datdata.FileName = datdata.Description;
 				Dat userData;
-				List<Dat> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, outputDirectory, datdata, out userData, logger);
+				List<Dat> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, softlist, outputDirectory, datdata, out userData, logger);
 
 				// If we want to filter, apply it to the userData now
 				userData = Filter(userData, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
@@ -1612,7 +1613,7 @@ namespace SabreTools.Helper
 					if (File.Exists(inputFileName))
 					{
 						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-						datdata = Parse(inputFileName, 0, 0, datdata, logger, true, clean);
+						datdata = Parse(inputFileName, 0, 0, datdata, logger, true, clean, softlist);
 						datdata = Filter(datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
 
 						// If the extension matches, append ".new" to the filename
@@ -1669,7 +1670,7 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="userData">Output user DatData object to output</param>
 		/// <returns>List of DatData objects representing headers</returns>
-		private static List<Dat> PopulateUserData(List<string> inputs, bool inplace, bool clean, string outdir, Dat inputDat, out Dat userData, Logger logger)
+		private static List<Dat> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool softlist, string outdir, Dat inputDat, out Dat userData, Logger logger)
 		{
 			List<Dat> datHeaders = new List<Dat>();
 
@@ -1682,7 +1683,7 @@ namespace SabreTools.Helper
 			foreach (string input in inputs)
 			{
 				logger.User("Adding DAT: " + input.Split('¬')[0]);
-				userData = Parse(input.Split('¬')[0], i, 0, userData, logger, true, clean);
+				userData = Parse(input.Split('¬')[0], i, 0, userData, logger, true, clean, softlist);
 				i++;
 
 				// If we are in inplace mode or redirecting output, save the DAT data

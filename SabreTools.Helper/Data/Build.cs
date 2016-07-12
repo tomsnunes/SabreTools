@@ -163,7 +163,7 @@ Options:
 		Supported values are:
 		  None, Zip, Unzip
 	-clean			Clean game names according to WoD standards
-	-sl			Use Software List name instead of description
+	-sl, --softlist	Use Software List name instead of description
 	-trim			Trim file names to fit NTFS length
 		-rd=, --root-dir=	Set the root directory for calc
 	-si, --single		All game names replaced by '!'

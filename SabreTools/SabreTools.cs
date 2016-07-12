@@ -114,6 +114,7 @@ namespace SabreTools
 				rem = false,
 				romba = false,
 				single = false,
+				softlist = false,
 				stats = false,
 				superdat = false,
 				trim = false,
@@ -348,6 +349,10 @@ namespace SabreTools
 					case "-si":
 					case "--single":
 						single = true;
+						break;
+					case "-sl":
+					case "--softlist":
+						softlist = true;
 						break;
 					case "-st":
 					case "--stats":
@@ -638,7 +643,7 @@ namespace SabreTools
 				InitUpdate(inputs, filename, name, description, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,
 					postfix, quotes, repext, addext, datprefix, romba, tsv, merge, diff, cascade, inplace, bare, gamename, romname,
-					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, dedup);
+					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, softlist, dedup);
 			}
 
 			// Add a source or system
