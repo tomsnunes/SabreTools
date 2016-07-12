@@ -77,7 +77,7 @@ namespace SabreTools.Helper
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static Dat Parse(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep = false, bool clean = false)
+		public static Dat Parse(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep = false, bool clean = false, bool sl = false)
 		{
 			// If the output filename isn't set already, get the internal filename
 			if (String.IsNullOrEmpty(datdata.FileName))
@@ -106,7 +106,7 @@ namespace SabreTools.Helper
 					return ParseRC(filename, sysid, srcid, datdata, logger, clean);
 				case OutputFormat.SabreDat:
 				case OutputFormat.Xml:
-					return ParseXML(filename, sysid, srcid, datdata, logger, keep, clean);
+					return ParseXML(filename, sysid, srcid, datdata, logger, keep, clean, sl);
 				default:
 					return datdata;
 			}
@@ -619,8 +619,9 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="sl">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static Dat ParseXML(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep, bool clean)
+		public static Dat ParseXML(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep, bool clean, bool sl)
 		{
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
@@ -956,7 +957,7 @@ namespace SabreTools.Helper
 							// If we have a subtree, add what is possible
 							if (subreader != null)
 							{
-								if (temptype == "software" && subreader.ReadToFollowing("description"))
+								if (!sl && temptype == "software" && subreader.ReadToFollowing("description"))
 								{
 									tempname = subreader.ReadElementContentAsString();
 									tempname = tempname.Replace('/', '_').Replace("\"", "''");
