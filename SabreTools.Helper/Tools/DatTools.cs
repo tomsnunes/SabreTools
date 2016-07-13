@@ -207,7 +207,6 @@ namespace SabreTools.Helper
 									rom.Name = gc[i].Replace("\"", "");
 									break;
 								case "size":
-
 									Int64.TryParse(gc[i].Replace("\"", ""), out rom.Size);
 									break;
 								case "crc":
@@ -218,6 +217,12 @@ namespace SabreTools.Helper
 									break;
 								case "sha1":
 									rom.SHA1 = gc[i].Replace("\"", "").ToLowerInvariant();
+									break;
+								case "flags":
+									if (gc[i].Replace("\"", "").ToLowerInvariant() == "nodump")
+									{
+										rom.Nodump = true;
+									}
 									break;
 							}
 
@@ -269,6 +274,12 @@ namespace SabreTools.Helper
 									break;
 								case "sha1":
 									rom.SHA1 = val.ToLowerInvariant();
+									break;
+								case "flags":
+									if (val.ToLowerInvariant() == "nodump")
+									{
+										rom.Nodump = true;
+									}
 									break;
 							}
 
