@@ -80,16 +80,10 @@ namespace SabreTools.Helper
 		public static Dat Parse(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep = false, bool clean = false, bool softlist = false)
 		{
 			// If the output filename isn't set already, get the internal filename
-			if (String.IsNullOrEmpty(datdata.FileName))
-			{
-				datdata.FileName = Path.GetFileNameWithoutExtension(filename);
-			}
+			datdata.FileName = (String.IsNullOrEmpty(datdata.FileName) ? Path.GetFileNameWithoutExtension(filename) : datdata.FileName);
 
 			// If the output type isn't set already, get the internal output type
-			if (datdata.OutputFormat == OutputFormat.None)
-			{
-				datdata.OutputFormat = GetOutputFormat(filename);
-			}
+			datdata.OutputFormat = (datdata.OutputFormat == OutputFormat.None ? GetOutputFormat(filename) : datdata.OutputFormat);
 
 			// Make sure there's a dictionary to read to
 			if (datdata.Roms == null)

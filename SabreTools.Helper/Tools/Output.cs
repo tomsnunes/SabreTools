@@ -147,7 +147,6 @@ namespace SabreTools.Helper
 						header = "clrmamepro (\n" +
 							"\tname \"" + datdata.Name + "\"\n" +
 							"\tdescription \"" + datdata.Description + "\"\n" +
-							"\trootdir \"" + datdata.RootDir + "\"\n" +
 							"\tcategory \"" + datdata.Category + "\"\n" +
 							"\tversion \"" + datdata.Version + "\"\n" +
 							"\tdate \"" + datdata.Date + "\"\n" +
