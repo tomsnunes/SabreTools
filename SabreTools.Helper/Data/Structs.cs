@@ -83,6 +83,7 @@ namespace SabreTools.Helper
 		public string FileName;
 		public string Name;
 		public string Description;
+		public string RootDir;
 		public string Category;
 		public string Version;
 		public string Date;

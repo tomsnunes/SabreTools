@@ -143,6 +143,7 @@ Options:
 	-f=, --filename=	Set a new filename
 	-n=, --name=		Set a new internal name
 	-de=, --desc=		Set a new description
+	-r=, --root=		Set a new rootdir
 	-ca=, --category=	Set a new category
 	-v=, --version=		Set a new version
 	-da=, --date=		Set a new date

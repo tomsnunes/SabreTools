@@ -155,10 +155,11 @@ namespace SabreTools
 				repext = "",
 				romname = "",
 				romtype = "",
+				root = "",
+				rootdir = "",
 				sha1 = "",
 				sources = "",
 				systems = "",
-				root = "",
 				tempdir = "",
 				url = "",
 				version = "";
@@ -487,6 +488,10 @@ namespace SabreTools
 						{
 							prefix = temparg.Split('=')[1];
 						}
+						else if (temparg.StartsWith("-r=") || temparg.StartsWith("--root="))
+						{
+							rootdir = temparg.Split('=')[1];
+						}
 						else if (temparg.StartsWith("-rd=") || temparg.StartsWith("--root-dir="))
 						{
 							root = temparg.Split('=')[1];
@@ -640,7 +645,7 @@ namespace SabreTools
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
 			else if (update || outputCMP || outputMiss || outputRC || outputSD || outputXML || merge || diff)
 			{
-				InitUpdate(inputs, filename, name, description, category, version, date, author, email, homepage, url, comment, header,
+				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,
 					postfix, quotes, repext, addext, datprefix, romba, tsv, merge, diff, cascade, inplace, bare, gamename, romname,
 					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, softlist, dedup);

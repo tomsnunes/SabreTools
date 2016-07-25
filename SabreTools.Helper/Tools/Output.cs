@@ -147,6 +147,7 @@ namespace SabreTools.Helper
 						header = "clrmamepro (\n" +
 							"\tname \"" + datdata.Name + "\"\n" +
 							"\tdescription \"" + datdata.Description + "\"\n" +
+							"\trootdir \"" + datdata.RootDir + "\"\n" +
 							"\tcategory \"" + datdata.Category + "\"\n" +
 							"\tversion \"" + datdata.Version + "\"\n" +
 							"\tdate \"" + datdata.Date + "\"\n" +
@@ -186,6 +187,7 @@ namespace SabreTools.Helper
 							"\t<header>\n" +
 							"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
 							"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
+							"\t\t<rootdir>" + HttpUtility.HtmlEncode(datdata.RootDir) + "</rootdir>\n" +
 							"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
 							"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
 							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +

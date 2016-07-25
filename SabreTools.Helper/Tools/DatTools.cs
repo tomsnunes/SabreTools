@@ -362,6 +362,9 @@ namespace SabreTools.Helper
 							case "description":
 								datdata.Description = (String.IsNullOrEmpty(datdata.Description) ? itemval : datdata.Description);
 								break;
+							case "rootdir":
+								datdata.RootDir = (String.IsNullOrEmpty(datdata.RootDir) ? itemval : datdata.RootDir);
+								break;
 							case "category":
 								datdata.Category = (String.IsNullOrEmpty(datdata.Category) ? itemval : datdata.Category);
 								break;
@@ -772,6 +775,10 @@ namespace SabreTools.Helper
 										case "description":
 											content = headreader.ReadElementContentAsString();
 											datdata.Description = (String.IsNullOrEmpty(datdata.Description) ? content : datdata.Description);
+											break;
+										case "rootdir":
+											content = headreader.ReadElementContentAsString();
+											datdata.RootDir = (String.IsNullOrEmpty(datdata.RootDir) ? content : datdata.RootDir);
 											break;
 										case "category":
 											content = headreader.ReadElementContentAsString();

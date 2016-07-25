@@ -79,6 +79,7 @@ namespace SabreTools
 		/// <param name="filename">New filename</param>
 		/// <param name="name">New name</param>
 		/// <param name="description">New description</param>
+		/// <param name="rootdir">New rootdir</param>
 		/// <param name="category">New category</param>
 		/// <param name="version">New version</param>
 		/// <param name="date">New date</param>
@@ -138,6 +139,7 @@ namespace SabreTools
 			string filename,
 			string name,
 			string description,
+			string rootdir,
 			string category,
 			string version,
 			string date,
@@ -287,6 +289,7 @@ namespace SabreTools
 				FileName = filename,
 				Name = name,
 				Description = description,
+				RootDir = rootdir,
 				Category = category,
 				Version = version,
 				Date = date,
