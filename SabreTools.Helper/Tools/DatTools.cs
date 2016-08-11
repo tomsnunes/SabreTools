@@ -1522,6 +1522,7 @@ namespace SabreTools.Helper
 		/// <param name="diff">True if the input files should be diffed with each other, false otherwise</param>
 		/// <param name="cascade">True if the diffed files should be cascade diffed, false otherwise</param>
 		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
+		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
@@ -1540,8 +1541,8 @@ namespace SabreTools.Helper
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		public static void Update(List<string> inputFileNames, Dat datdata, string outputDirectory, bool merge, bool diff, bool cascade, bool inplace,
-			bool bare, bool clean, bool softlist, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc, string md5,
-			string sha1, bool? nodump, bool trim, bool single, string root, Logger logger)
+			bool skip, bool bare, bool clean, bool softlist, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
+			string md5, string sha1, bool? nodump, bool trim, bool single, string root, Logger logger)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || diff)
@@ -1601,7 +1602,7 @@ namespace SabreTools.Helper
 				// If we're in cascade and diff, output only cascaded diffs
 				else if (diff && cascade)
 				{
-					DiffCascade(outputDirectory, inplace, userData, newInputFileNames, datHeaders, logger);
+					DiffCascade(outputDirectory, inplace, userData, newInputFileNames, datHeaders, skip, logger);
 				}
 				// Output all entries with user-defined merge
 				else
@@ -2049,8 +2050,9 @@ namespace SabreTools.Helper
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
+		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void DiffCascade(string outdir, bool inplace, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
+		public static void DiffCascade(string outdir, bool inplace, Dat userData, List<string> inputs, List<Dat> datHeaders, bool skip, Logger logger)
 		{
 			string post = "";
 
@@ -2085,6 +2087,7 @@ namespace SabreTools.Helper
 			start = DateTime.Now;
 			logger.User("Populating all output DATs");
 			List<string> keys = userData.Roms.Keys.ToList();
+
 			foreach (string key in keys)
 			{
 				List<Rom> roms = RomTools.Merge(userData.Roms[key], logger);
@@ -2111,7 +2114,7 @@ namespace SabreTools.Helper
 			// Finally, loop through and output each of the DATs
 			start = DateTime.Now;
 			logger.User("Outputting all created DATs");
-			for (int j = 0; j < inputs.Count; j++)
+			for (int j = (skip ? 1 : 0); j < inputs.Count; j++)
 			{
 				// If we have an output directory set, replace the path
 				string path = "";

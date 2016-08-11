@@ -347,6 +347,10 @@ namespace SabreTools
 					case "--superdat":
 						superdat = true;
 						break;
+					case "-sf":
+					case "--skip":
+						skip = true;
+						break;
 					case "-si":
 					case "--single":
 						single = true;
@@ -358,9 +362,6 @@ namespace SabreTools
 					case "-st":
 					case "--stats":
 						stats = true;
-						break;
-					case "--skip":
-						skip = true;
 						break;
 					case "-trim":
 						trim = true;
@@ -573,12 +574,6 @@ namespace SabreTools
 				}
 			}
 
-			// If skip is set, it's being called from the UI so we just exit
-			if (skip)
-			{
-				return;
-			}
-
 			// If help is set, show the help screen
 			if (help)
 			{
@@ -647,7 +642,7 @@ namespace SabreTools
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,
-					postfix, quotes, repext, addext, datprefix, romba, tsv, merge, diff, cascade, inplace, bare, gamename, romname,
+					postfix, quotes, repext, addext, datprefix, romba, tsv, merge, diff, cascade, inplace, skip, bare, gamename, romname,
 					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, softlist, dedup);
 			}
 

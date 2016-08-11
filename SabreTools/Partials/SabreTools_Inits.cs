@@ -113,6 +113,7 @@ namespace SabreTools
 		/// <param name="diff">True if the input files should be diffed with each other, false otherwise</param>
 		/// <param name="cascade">True if the diffed files should be cascade diffed, false otherwise</param>
 		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
+		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// /* Filtering info */
 		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
@@ -175,6 +176,7 @@ namespace SabreTools
 			bool diff,
 			bool cascade,
 			bool inplace,
+			bool skip,
 			bool bare,
 
 			/* Filtering info */
@@ -319,31 +321,31 @@ namespace SabreTools
 			if (outputCMP)
 			{
 				userInputDat.OutputFormat = OutputFormat.ClrMamePro;
-				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean, softlist,
+				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
 					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
 			if (outputMiss)
 			{
 				userInputDat.OutputFormat = OutputFormat.MissFile;
-				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean, softlist,
+				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
 					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
 			if (outputRC)
 			{
 				userInputDat.OutputFormat = OutputFormat.RomCenter;
-				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean, softlist,
+				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
 					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
 			if (outputSD)
 			{
 				userInputDat.OutputFormat = OutputFormat.SabreDat;
-				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean, softlist,
+				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
 					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
 			if (outputXML)
 			{
 				userInputDat.OutputFormat = OutputFormat.Xml;
-				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean, softlist,
+				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
 					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
 			if (!outputCMP && !outputMiss && !outputRC && !outputSD && !outputXML)
@@ -352,7 +354,7 @@ namespace SabreTools
 				{
 					userInputDat.OutputFormat = OutputFormat.Xml;
 				}
-				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, bare, clean, softlist,
+				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
 					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
 		}
