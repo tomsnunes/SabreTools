@@ -81,7 +81,6 @@ namespace SabreTools
 				add = false,
 				archivesAsFiles = false,
 				bare = false,
-				cascade = false,
 				clean = false,
 				datfromdir = false,
 				datprefix = false,
@@ -122,7 +121,8 @@ namespace SabreTools
 				skip = false,
 				update = false,
 				usegame = true;
-			bool? nodump = null;
+			bool? cascade = null,
+				nodump = null;
 			long sgt = -1,
 				slt = -1,
 				seq = -1;
@@ -334,6 +334,10 @@ namespace SabreTools
 					case "-r":
 					case "--roms":
 						usegame = false;
+						break;
+					case "-rc":
+					case "--rev-cascade":
+						cascade = false;
 						break;
 					case "-rm":
 					case "--remove":

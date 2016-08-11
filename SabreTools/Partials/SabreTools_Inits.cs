@@ -111,7 +111,7 @@ namespace SabreTools
 		/// /* Merging and Diffing info */
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
 		/// <param name="diff">True if the input files should be diffed with each other, false otherwise</param>
-		/// <param name="cascade">True if the diffed files should be cascade diffed, false otherwise</param>
+		/// <param name="cascade">True if the diffed files should be cascade diffed, false if diffed files should be reverse cascaded, null otherwise</param>
 		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
@@ -174,7 +174,7 @@ namespace SabreTools
 			/* Merging and Diffing info */
 			bool merge,
 			bool diff,
-			bool cascade,
+			bool? cascade,
 			bool inplace,
 			bool skip,
 			bool bare,

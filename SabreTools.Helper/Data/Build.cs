@@ -176,6 +176,9 @@ Options:
 		-c, --cascade		Enable cascaded diffing
 			-ip, --inplace		Enable inplace, cascaded diff
 			-sf, --skip		Skip output of first DAT
+		-rc, --rev-cascade	Enable reverse cascaded diffing
+			-ip, --inplace		Enable inplace, cascaded diff
+			-sf, --skip		Skip output of first DAT
 	-gn=, --game-name=	Filter by game name
 	-rn=, --rom-name=	Filter by rom name
 	-rt=, --rom-type=	Filter by rom type
