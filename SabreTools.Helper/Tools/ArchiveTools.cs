@@ -516,20 +516,22 @@ namespace SabreTools.Helper
 			}
 
 			// Check if the file is at least the minimum length
-			if (filesize < 32 /* bytes */)
+			if (filesize < 36 /* bytes */)
 			{
 				logger.Warning("Possibly corrupt file '" + input + "' with size " + Style.GetBytesReadable(filesize));
 				return new Rom();
 			}
 
 			// Get the Romba-specific header data
-			byte[] header;
-			byte[] footer;
+			byte[] header; // MD5 and CRC
+			byte[] headersz; // MSB of long-size
+			byte[] footer; // Internal CRC and isize
 			using (FileStream itemstream = File.OpenRead(input))
 			{
 				using (BinaryReader br = new BinaryReader(itemstream))
 				{
 					header = br.ReadBytes(32);
+					headersz = br.ReadBytes(4);
 					br.BaseStream.Seek(-4, SeekOrigin.End);
 					footer = br.ReadBytes(4);
 				}
@@ -539,30 +541,8 @@ namespace SabreTools.Helper
 			string headerstring = BitConverter.ToString(header).Replace("-", string.Empty);
 			string gzmd5 = headerstring.Substring(24, 32);
 			string gzcrc = headerstring.Substring(56, 8);
-			string gzsize = BitConverter.ToString(footer.Reverse().ToArray()).Replace("-", string.Empty);
+			string gzsize = BitConverter.ToString(headersz.Reverse().ToArray()).Replace("-", string.Empty) + BitConverter.ToString(footer.Reverse().ToArray()).Replace("-", string.Empty);
 			long extractedsize = Convert.ToInt64(gzsize, 16);
-
-			// Only try to add if the file size is greater than 600 MiB
-			if (filesize >= (600 * Constants.MibiByte))
-			{
-				// ISIZE is mod 4GiB, so we add that if the ISIZE is smaller than the filesize and greater than 1% different
-				bool shouldfollowup = false;
-				if (extractedsize < filesize && (100 * extractedsize / filesize) < 99 /* percent */)
-				{
-					logger.Log("mancalc - Filename: '" + Path.GetFullPath(input) + "'\nExtracted file size: " +
-						extractedsize + ", " + Style.GetBytesReadable(extractedsize) + "\nArchive file size: " + filesize + ", " + Style.GetBytesReadable(filesize));
-				}
-				while (extractedsize < filesize && (100 * extractedsize / filesize) < 99 /* percent */)
-				{
-					extractedsize += (4 * Constants.GibiByte);
-					shouldfollowup = true;
-				}
-				if (shouldfollowup)
-				{
-					logger.Log("Filename: '" + Path.GetFullPath(input) + "'\nFinal file size: " + extractedsize + ", " + Style.GetBytesReadable(extractedsize) +
-					"\nExtracted CRC: " + gzcrc + "\nExtracted MD5: " + gzmd5 + "\nSHA-1: " + Path.GetFileNameWithoutExtension(input));
-				}
-			}
 
 			Rom rom = new Rom
 			{
