@@ -507,7 +507,7 @@ namespace SabreTools.Helper
 		{
 			string datum = Path.GetFileName(input).ToLowerInvariant();
 			long filesize = new FileInfo(input).Length;
-
+ 
 			// Check if the name is the right length
 			if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}\.gz"))
 			{
@@ -516,32 +516,31 @@ namespace SabreTools.Helper
 			}
 
 			// Check if the file is at least the minimum length
-			if (filesize < 36 /* bytes */)
+			if (filesize < 40 /* bytes */)
 			{
 				logger.Warning("Possibly corrupt file '" + input + "' with size " + Style.GetBytesReadable(filesize));
 				return new Rom();
 			}
 
 			// Get the Romba-specific header data
-			byte[] header; // MD5 and CRC
-			byte[] headersz; // MSB of long-size
-			byte[] footer; // Internal CRC and isize
+			byte[] headermd5; // MD5
+			byte[] headercrc; // CRC
+			byte[] headersz; // Int64 size
 			using (FileStream itemstream = File.OpenRead(input))
 			{
 				using (BinaryReader br = new BinaryReader(itemstream))
 				{
-					header = br.ReadBytes(32);
-					headersz = br.ReadBytes(4);
-					br.BaseStream.Seek(-4, SeekOrigin.End);
-					footer = br.ReadBytes(4);
+					br.BaseStream.Seek(12, SeekOrigin.Begin);
+					headermd5 = br.ReadBytes(16);
+					headercrc = br.ReadBytes(4);
+					headersz = br.ReadBytes(8);
 				}
 			}
 
-			// Now convert the data and get the right positions
-			string headerstring = BitConverter.ToString(header).Replace("-", string.Empty);
-			string gzmd5 = headerstring.Substring(24, 32);
-			string gzcrc = headerstring.Substring(56, 8);
-			string gzsize = BitConverter.ToString(headersz.Reverse().ToArray()).Replace("-", string.Empty) + BitConverter.ToString(footer.Reverse().ToArray()).Replace("-", string.Empty);
+			// Now convert the data and get the right position
+			string gzmd5 = BitConverter.ToString(headermd5).Replace("-", string.Empty);
+			string gzcrc = BitConverter.ToString(headercrc).Replace("-", string.Empty);
+			string gzsize = BitConverter.ToString(headersz.Reverse().ToArray()).Replace("-", string.Empty);
 			long extractedsize = Convert.ToInt64(gzsize, 16);
 
 			Rom rom = new Rom
