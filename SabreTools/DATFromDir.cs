@@ -295,12 +295,6 @@ namespace SabreTools
 			tempdir += (tempdir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? "" : Path.DirectorySeparatorChar.ToString());
 			tempdir += "__temp__" + Path.DirectorySeparatorChar;
 
-			// Create the temporary directory
-			if (!Directory.Exists(tempdir))
-			{
-				Directory.CreateDirectory(tempdir);
-			}
-
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
 			{
@@ -349,7 +343,7 @@ namespace SabreTools
 			// Otherwise, attempt to extract the files to the temporary directory
 			else
 			{
-				bool encounteredErrors = !ArchiveTools.ExtractArchive(item,
+				bool encounteredErrors = ArchiveTools.ExtractArchive(item,
 				tempdir,
 				(_archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
 				(!_archivesAsFiles && _enableGzip ? ArchiveScanLevel.Internal : ArchiveScanLevel.External),

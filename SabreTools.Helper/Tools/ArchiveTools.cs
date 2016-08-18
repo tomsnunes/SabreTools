@@ -225,7 +225,7 @@ namespace SabreTools.Helper
 				reader?.Dispose();
 			}
 
-			return !encounteredErrors;
+			return encounteredErrors;
 		}
 
 		/// <summary>
