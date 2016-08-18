@@ -157,7 +157,7 @@ namespace SabreTools
 								{
 									Name = "null",
 									Game = (_datdata.Type == "SuperDAT" ?
-										_datdata.Name + (actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
+										(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
 											Path.DirectorySeparatorChar.ToString() :
 											"") + actualroot :
 										actualroot),
@@ -190,7 +190,7 @@ namespace SabreTools
 									{
 										Name = "null",
 										Game = (_datdata.Type == "SuperDAT" ?
-											_datdata.Name + (actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
+											(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
 												Path.DirectorySeparatorChar.ToString() :
 												"") + actualroot :
 											actualroot),
@@ -448,7 +448,7 @@ namespace SabreTools
 
 				// Update rom information
 				rom.Game = (datdata.Type == "SuperDAT" ?
-						datdata.Name + (actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
+						(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
 							Path.DirectorySeparatorChar.ToString() :
 							"") + actualroot :
 						actualroot);
