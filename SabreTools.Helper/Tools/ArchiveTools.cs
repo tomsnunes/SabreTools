@@ -187,6 +187,23 @@ namespace SabreTools.Helper
 					sza.WriteToDirectory(tempdir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
 					encounteredErrors = false;
 				}
+				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
+				{
+					// Create the temp directory
+					Directory.CreateDirectory(tempdir);
+
+					using (FileStream itemstream = File.OpenRead(input))
+					{
+						using (FileStream outstream = File.Create(tempdir + Path.GetFileNameWithoutExtension(input)))
+						{
+							using (GZipStream gzstream = new GZipStream(itemstream, CompressionMode.Decompress))
+							{
+								gzstream.CopyTo(outstream);
+							}
+						}
+					}
+					encounteredErrors = false;
+				}
 				else
 				{
 					reader = ReaderFactory.Open(File.OpenRead(input));
@@ -200,26 +217,6 @@ namespace SabreTools.Helper
 
 						// Extract all files to the temp directory
 						reader.WriteAllToDirectory(tempdir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
-						encounteredErrors = false;
-					}
-					else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
-					{
-						// Close the original archive handle
-						reader.Dispose();
-
-						// Create the temp directory
-						Directory.CreateDirectory(tempdir);
-
-						using (FileStream itemstream = File.OpenRead(input))
-						{
-							using (FileStream outstream = File.Create(tempdir + Path.GetFileNameWithoutExtension(input)))
-							{
-								using (GZipStream gzstream = new GZipStream(itemstream, CompressionMode.Decompress))
-								{
-									gzstream.CopyTo(outstream);
-								}
-							}
-						}
 						encounteredErrors = false;
 					}
 				}
