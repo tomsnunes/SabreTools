@@ -189,6 +189,8 @@ namespace SabreTools.Helper
 				}
 				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
 				{
+					logger.Log("Found archive of type: " + at);
+
 					// Create the temp directory
 					Directory.CreateDirectory(tempdir);
 
