@@ -400,7 +400,7 @@ namespace SabreTools
 			// Create a new DATFromDir object and process the inputs
 			Dat datdata = new Dat
 			{
-				FileName = description,
+				FileName = filename,
 				Name = name,
 				Description = description,
 				Category = category,
