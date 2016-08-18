@@ -231,6 +231,7 @@ Options:
   -out=			Output directory
   -t=, --temp=		Set the temporary directory to use
   -qs, --quick		Enable quick scanning of archives
+  -v, --verify		Enable verification of output directory
   -do, --directory	Output files as uncompressed
   -7z={0}		Set scanning level for 7z archives
   -gz={2}		Set scanning level for GZip archives

@@ -15,6 +15,7 @@ namespace SabreTools
 		private string _tempdir;
 		private bool _quickScan;
 		private bool _toFolder;
+		private bool _verify;
 		private ArchiveScanLevel _7z;
 		private ArchiveScanLevel _gz;
 		private ArchiveScanLevel _rar;
@@ -35,13 +36,14 @@ namespace SabreTools
 		/// <param name="tempdir">Temporary directory for archive extraction</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
+		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public SimpleSort(Dat datdata, List<string> inputs, string outdir, string tempdir,
-			bool quickScan, bool toFolder, int sevenzip, int gz, int rar, int zip, Logger logger)
+			bool quickScan, bool toFolder, bool verify, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			_datdata = datdata;
 			_inputs = inputs;
@@ -49,6 +51,7 @@ namespace SabreTools
 			_tempdir = (tempdir == "" ? "__TEMP__" : tempdir);
 			_quickScan = quickScan;
 			_toFolder = toFolder;
+			_verify = verify;
 			_7z = (ArchiveScanLevel)(sevenzip < 0 || sevenzip > 2 ? 0 : sevenzip);
 			_gz = (ArchiveScanLevel)(gz < 0 || gz > 2 ? 0 : gz);
 			_rar = (ArchiveScanLevel)(rar < 0 || rar > 2 ? 0 : rar);
@@ -101,7 +104,8 @@ namespace SabreTools
 			bool help = false,
 				quickScan = false,
 				simpleSort = true,
-				toFolder = false;
+				toFolder = false,
+				verify = false;
 			int sevenzip = 0,
 				gz = 2,
 				rar = 2,
@@ -128,6 +132,10 @@ namespace SabreTools
 					case "-qs":
 					case "--quick":
 						quickScan = true;
+						break;
+					case "-v":
+					case "--verify":
+						verify = true;
 						break;
 					default:
 						string temparg = arg.Replace("\"", "").Replace("file://", "");
@@ -206,7 +214,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (simpleSort))
+			if (inputs.Count == 0 && (simpleSort && !verify))
 			{
 				logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -219,7 +227,7 @@ namespace SabreTools
 			{
 				if (datfiles.Count > 0)
 				{
-					InitSimpleSort(datfiles, inputs, outdir, tempdir, quickScan, toFolder, sevenzip, gz, rar, zip, logger);
+					InitSimpleSort(datfiles, inputs, outdir, tempdir, quickScan, toFolder, verify, sevenzip, gz, rar, zip, logger);
 				}
 				else
 				{
@@ -250,12 +258,13 @@ namespace SabreTools
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
+		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		private static void InitSimpleSort(List<string> datfiles, List<string> inputs, string outdir, string tempdir, 
-			bool quickScan, bool toFolder, int sevenzip, int gz, int rar, int zip, Logger logger)
+			bool quickScan, bool toFolder, bool verify, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
 			Dat datdata = new Dat();
@@ -264,7 +273,7 @@ namespace SabreTools
 				datdata = DatTools.Parse(datfile, 0, 0, datdata, logger);
 			}
 
-			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, toFolder, sevenzip, gz, rar, zip, logger);
+			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, toFolder, verify, sevenzip, gz, rar, zip, logger);
 			ss.RebuildToOutput();
 		}
 
@@ -293,57 +302,73 @@ namespace SabreTools
 				Output.CleanDirectory(_tempdir);
 			}
 
-			// Create a list of just files from inputs
-			List<string> files = new List<string>();
-			foreach (string input in _inputs)
+			// If we're in verification mode, only check the output directory
+			if (_verify)
 			{
-				if (File.Exists(input))
+				// Create a list of files from the output directory
+				List<string> files = new List<string>();
+				foreach (string file in Directory.EnumerateFiles(_outdir, "*", SearchOption.AllDirectories))
 				{
-					_logger.Log("File found: '" + input + "'");
-					files.Add(Path.GetFullPath(input));
+					_logger.Log("File found: '" + file + "'");
+					files.Add(Path.GetFullPath(file));
 				}
-				else if (Directory.Exists(input))
+			}
+
+			// Otherwise, run the rebuilder
+			else
+			{
+				// Create a list of just files from inputs
+				List<string> files = new List<string>();
+				foreach (string input in _inputs)
 				{
-					_logger.Log("Directory found: '" + input + "'");
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					if (File.Exists(input))
 					{
-						_logger.Log("File found: '" + file + "'");
-						files.Add(Path.GetFullPath(file));
+						_logger.Log("File found: '" + input + "'");
+						files.Add(Path.GetFullPath(input));
+					}
+					else if (Directory.Exists(input))
+					{
+						_logger.Log("Directory found: '" + input + "'");
+						foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+						{
+							_logger.Log("File found: '" + file + "'");
+							files.Add(Path.GetFullPath(file));
+						}
+					}
+					else
+					{
+						_logger.Error("'" + input + "' is not a file or directory!");
 					}
 				}
-				else
-				{
-					_logger.Error("'" + input + "' is not a file or directory!");
-				}
-			}
 
-			// Then, loop through and check each of the inputs
-			_logger.User("Processing files:\n");
-			_cursorTop = Console.CursorTop;
-			for (int i = 0; i < files.Count; i++)
-			{
-				success &= RebuildToOutputHelper(files[i], i, files.Count);
-				Output.CleanDirectory(_tempdir);
-			}
-
-			// Now one final delete of the temp directory
-			while (Directory.Exists(_tempdir))
-			{
-				try
+				// Then, loop through and check each of the inputs
+				_logger.User("Processing files:\n");
+				_cursorTop = Console.CursorTop;
+				for (int i = 0; i < files.Count; i++)
 				{
-					Directory.Delete(_tempdir, true);
+					success &= RebuildToOutputHelper(files[i], i, files.Count);
+					Output.CleanDirectory(_tempdir);
 				}
-				catch
-				{
-					continue;
-				}
-			}
 
-			// Now output the stats for the built files
-			_logger.ClearBeneath(Constants.HeaderHeight);
-			Console.SetCursorPosition(0, Constants.HeaderHeight + 1);
-			_logger.User("Stats of the matched ROMs:");
-			Stats.OutputStats(_matched, _logger, true);
+				// Now one final delete of the temp directory
+				while (Directory.Exists(_tempdir))
+				{
+					try
+					{
+						Directory.Delete(_tempdir, true);
+					}
+					catch
+					{
+						continue;
+					}
+				}
+
+				// Now output the stats for the built files
+				_logger.ClearBeneath(Constants.HeaderHeight);
+				Console.SetCursorPosition(0, Constants.HeaderHeight + 1);
+				_logger.User("Stats of the matched ROMs:");
+				Stats.OutputStats(_matched, _logger, true);
+			}
 
 			return success;
 		}
