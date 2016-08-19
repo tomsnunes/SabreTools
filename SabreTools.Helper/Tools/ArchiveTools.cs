@@ -586,12 +586,14 @@ namespace SabreTools.Helper
 
 			// First line of defense is going to be the extension, for better or worse
 			string ext = Path.GetExtension(input).ToLowerInvariant();
-			if (ext != "7z" && ext != "gz" && ext != "rar" && ext != "tar" && ext != "zip" && ext != "z")
+			if (ext != "7z" && ext != "gz" && ext != "lzma" && ext != "rar"
+				&& ext != "rev" && ext != "r00" && ext != "r01" && ext != "tar"
+				&& ext != "tgz" && ext != "tlz" && ext != "zip" && ext != "zipx")
 			{
 				return outtype;
 			}
 
-			// Read the first bytes of the file and get the magic numbe
+			// Read the first bytes of the file and get the magic number
 			try
 			{
 				byte[] magic = new byte[8];
