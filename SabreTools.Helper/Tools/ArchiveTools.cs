@@ -584,6 +584,13 @@ namespace SabreTools.Helper
 		{
 			ArchiveType? outtype = null;
 
+			// First line of defense is going to be the extension, for better or worse
+			string ext = Path.GetExtension(input).ToLowerInvariant();
+			if (ext != "7z" && ext != "gz" && ext != "rar" && ext != "tar" && ext != "zip" && ext != "z")
+			{
+				return outtype;
+			}
+
 			// Read the first bytes of the file and get the magic numbe
 			try
 			{
