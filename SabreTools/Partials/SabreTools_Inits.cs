@@ -324,7 +324,7 @@ namespace SabreTools
 				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
 					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
-			if (outputMiss)
+			if (outputMiss || tsv != null)
 			{
 				userInputDat.OutputFormat = OutputFormat.MissFile;
 				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
@@ -348,7 +348,7 @@ namespace SabreTools
 				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
 					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
 			}
-			if (!outputCMP && !outputMiss && !outputRC && !outputSD && !outputXML)
+			if (!outputCMP && !(outputMiss || tsv != null) && !outputRC && !outputSD && !outputXML)
 			{
 				if (merge || diff)
 				{
