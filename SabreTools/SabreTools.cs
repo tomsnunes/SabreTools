@@ -371,7 +371,7 @@ namespace SabreTools
 						trim = true;
 						break;
 					case "-tsv":
-					case " --tsv":
+					case "--tsv":
 						tsv = true;
 						break;
 					case "-u":
