@@ -110,7 +110,7 @@ namespace SabreTools.Helper
 		public string AddExt;
 		public bool GameName;
 		public bool Romba;
-		public bool TSV; // tab-deliminated output
+		public bool? TSV; // true for tab-deliminated output, false for comma-deliminated output
 
 		// Statistical data related to the DAT
 		public long RomCount;

@@ -137,6 +137,7 @@ Options:
 	  -re=, --rep-ext=		Replace all extensions with specified
 	  -ro, --romba			Output in Romba format (requires SHA-1)
 	  -tsv, --tsv			Output in Tab-Separated Value format
+	  -csv, --csv			Output in Comma-Separated Value format
 	-or, --output-rc	Output in RomCenter format
 	-os, --output-sd	Output in SabreDAT format
 	-ox, --output-xml	Output in Logiqx XML format

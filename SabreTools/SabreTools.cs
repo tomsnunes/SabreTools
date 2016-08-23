@@ -117,12 +117,12 @@ namespace SabreTools
 				stats = false,
 				superdat = false,
 				trim = false,
-				tsv = false,
 				skip = false,
 				update = false,
 				usegame = true;
 			bool? cascade = null,
-				nodump = null;
+				nodump = null,
+				tsv = null;
 			long sgt = -1,
 				slt = -1,
 				seq = -1;
@@ -202,6 +202,10 @@ namespace SabreTools
 					case "-cs":
 					case "--convert-sd":
 						outputSD = true;
+						break;
+					case "-csv":
+					case "--csv":
+						tsv = false;
 						break;
 					case "-cx":
 					case "--convert-xml":
@@ -588,7 +592,7 @@ namespace SabreTools
 
 			// If more than one switch is enabled, show the help screen
 			if (!(add ^ datfromdir ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^
-				(merge || diff || update || outputCMP || outputRC || outputSD || outputXML || outputMiss || tsv || trim) ^
+				(merge || diff || update || outputCMP || outputRC || outputSD || outputXML || outputMiss || tsv != null|| trim) ^
 				offlineMerge ^ rem ^ stats))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
@@ -598,7 +602,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (update || (outputMiss || tsv) || outputCMP || outputRC || outputSD
+			if (inputs.Count == 0 && (update || (outputMiss || tsv != null) || outputCMP || outputRC || outputSD
 				|| outputXML || extsplit || hashsplit || datfromdir || (merge || diff) || stats || trim))
 			{
 				_logger.Error("This feature requires at least one input");
@@ -642,7 +646,7 @@ namespace SabreTools
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
-			else if (update || outputCMP || outputMiss || tsv || outputRC || outputSD || outputXML || merge || diff)
+			else if (update || outputCMP || outputMiss || tsv != null || outputRC || outputSD || outputXML || merge || diff)
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,

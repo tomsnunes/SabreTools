@@ -107,7 +107,7 @@ namespace SabreTools
 		/// <param name="addext">Add an extension to all items</param>
 		/// <param name="datprefix">Add the dat name as a directory prefix</param>
 		/// <param name="romba">Output files in romba format</param>
-		/// <param name="tsv">Output files in TSV format</param>
+		/// <param name="tsv">True to output files in TSV format, false to output files in CSV format, null otherwise</param>
 		/// /* Merging and Diffing info */
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
 		/// <param name="diff">True if the input files should be diffed with each other, false otherwise</param>
@@ -169,7 +169,7 @@ namespace SabreTools
 			string addext,
 			bool datprefix,
 			bool romba,
-			bool tsv,
+			bool? tsv,
 
 			/* Merging and Diffing info */
 			bool merge,
