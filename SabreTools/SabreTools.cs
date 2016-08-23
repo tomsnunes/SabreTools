@@ -519,17 +519,11 @@ namespace SabreTools
 						}
 						else if (temparg.StartsWith("-seq=") || temparg.StartsWith("--equal="))
 						{
-							if (!Int64.TryParse(temparg.Split('=')[1], out seq))
-							{
-								seq = -1;
-							}
+							seq = GetSizeFromString(temparg.Split('=')[1]);
 						}
 						else if (temparg.StartsWith("-sgt=") || temparg.StartsWith("--greater="))
 						{
-							if (!Int64.TryParse(temparg.Split('=')[1], out sgt))
-							{
-								sgt = -1;
-							}
+							sgt = GetSizeFromString(temparg.Split('=')[1]);
 						}
 						else if (temparg.StartsWith("-sha1=") || temparg.StartsWith("--sha1="))
 						{
@@ -537,10 +531,7 @@ namespace SabreTools
 						}
 						else if (temparg.StartsWith("-slt=") || temparg.StartsWith("--less="))
 						{
-							if (!Int64.TryParse(temparg.Split('=')[1], out slt))
-							{
-								slt = -1;
-							}
+							slt = GetSizeFromString(temparg.Split('=')[1]);
 						}
 						else if (temparg.StartsWith("-source=") && sources == "")
 						{
