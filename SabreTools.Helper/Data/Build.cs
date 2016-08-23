@@ -203,6 +203,9 @@ do partial matches using asterisks as follows (case insensitive):
     *00* means contains '00'
     00 means exactly equals '00'
 
+Filter parameters for size can use postfixes for inputs:
+    e.g. 8kb => 8000 or 8kib => 8192
+
 Offline merge mode notes:
   This program will output the following DATs:
     (a) Net New - (NewComplete)-(Complete)
