@@ -1,12 +1,7 @@
 ﻿using SharpCompress.Archive;
-using SharpCompress.Archive.Zip;
 using SharpCompress.Archive.SevenZip;
 using SharpCompress.Common;
-using SharpCompress.Common.SevenZip;
 using SharpCompress.Reader;
-using SharpCompress.Reader.Zip;
-using SharpCompress.Writer;
-using SharpCompress.Writer.Zip;
 using System;
 using System.Collections.Generic;
 using System.IO;
