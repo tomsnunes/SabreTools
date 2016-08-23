@@ -161,13 +161,13 @@ namespace SabreTools.Helper
 					case OutputFormat.MissFile:
 						if (datdata.TSV == true)
 						{
-							header = "File Name\tInternal Name\tDescription\tGame Name\tGame Description\tType\t" +
-								"Rom Name\tDisk Name\tSize\tCRC\tMD5\tSHA1\tNodump\n";
+							header = "\"File Name\"\t\"Internal Name\"\t\"Description\"\t\"Game Name\"\t\"Game Description\"\t\"Type\"\t\"" +
+								"Rom Name\"\t\"Disk Name\"\t\"Size\"\t\"CRC\"\t\"MD5\"\t\"SHA1\"\t\"Nodump\"\n";
 						}
 						else if (datdata.TSV == false)
 						{
 							header = "\"File Name\",\"Internal Name\",\"Description\",\"Game Name\",\"Game Description\",\"Type\",\"" +
-								"Rom Name\",\"Disk Name\",\"Size\",\"CRC\",\"MD5\",\"SHA1\",\"Nodump\n";
+								"Rom Name\",\"Disk Name\",\"Size\",\"CRC\",\"MD5\",\"SHA1\",\"Nodump\"\n";
 						}
 						break;
 					case OutputFormat.RomCenter:
@@ -418,9 +418,9 @@ namespace SabreTools.Helper
 						// If we're in TSV mode, similarly the state is consistent
 						else if (datdata.TSV == true)
 						{
-							string inline = datdata.FileName + "\t" + datdata.Name + "\t" + datdata.Description + "\t" + rom.Game + "\t" + rom.Game + "\t" +
-								rom.Type + "\t" + (rom.Type == "rom" ? rom.Name : "") + "\t" + (rom.Type == "disk" ? rom.Name : "") + "\t" + rom.Size + "\t" +
-								rom.CRC + "\t" + rom.MD5 + "\t" + rom.SHA1 + "\t" + (rom.Nodump ? "Nodump" : "");
+							string inline = "\"" + datdata.FileName + "\"\t\"" + datdata.Name + "\"\t\"" + datdata.Description + "\"\t\"" + rom.Game + "\"\t\"" + rom.Game + "\"\t\"" +
+								rom.Type + "\"\t\"" + (rom.Type == "rom" ? rom.Name : "") + "\"\t\"" + (rom.Type == "disk" ? rom.Name : "") + "\"\t\"" + rom.Size + "\"\t\"" +
+								rom.CRC + "\"\t\"" + rom.MD5 + "\"\t\"" + rom.SHA1 + "\"\t" + (rom.Nodump ? "\"Nodump\"" : "\"\"");
 							state += pre + inline + post + "\n";
 						}
 						// If we're in CSV mode, similarly the state is consistent
