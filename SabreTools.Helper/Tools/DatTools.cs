@@ -77,10 +77,10 @@ namespace SabreTools.Helper
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
-		public static Dat Parse(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep = false, bool clean = false, bool softlist = false)
+		public static Dat Parse(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep = false, bool clean = false, bool softlist = false, bool keepext = false)
 		{
 			// If the output filename isn't set already, get the internal filename
-			datdata.FileName = (String.IsNullOrEmpty(datdata.FileName) ? Path.GetFileNameWithoutExtension(filename) : datdata.FileName);
+			datdata.FileName = (String.IsNullOrEmpty(datdata.FileName) ? (keepext ? Path.GetFileName(filename) : Path.GetFileNameWithoutExtension(filename)) : datdata.FileName);
 
 			// If the output type isn't set already, get the internal output type
 			datdata.OutputFormat = (datdata.OutputFormat == OutputFormat.None ? GetOutputFormat(filename) : datdata.OutputFormat);
@@ -1632,7 +1632,7 @@ namespace SabreTools.Helper
 					if (File.Exists(inputFileName))
 					{
 						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-						datdata = Parse(inputFileName, 0, 0, datdata, logger, true, clean, softlist);
+						datdata = Parse(inputFileName, 0, 0, datdata, logger, true, clean, softlist, keepext:(datdata.TSV != null));
 						datdata = Filter(datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
 
 						// If the extension matches, append ".new" to the filename
@@ -1657,7 +1657,7 @@ namespace SabreTools.Helper
 							logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 							Dat innerDatdata = (Dat)datdata.Clone();
 							innerDatdata.Roms = null;
-							innerDatdata = Parse(file, 0, 0, innerDatdata, logger, true, clean);
+							innerDatdata = Parse(file, 0, 0, innerDatdata, logger, true, clean, keepext:(datdata.TSV != null));
 							innerDatdata = Filter(innerDatdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
 
 							// If the extension matches, append ".new" to the filename
