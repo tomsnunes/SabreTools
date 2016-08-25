@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using SabreTools.Helper;
+using SharpCompress.Common;
 
 namespace SabreTools
 {
@@ -18,8 +19,6 @@ namespace SabreTools
 		private ArchiveScanLevel _rar;
 		private ArchiveScanLevel _zip;
 		private Logger _logger;
-
-		// We still need access permissions for each of the archive files as well, kind of like DATFromDir
 
 		/// <summary>
 		/// Create a new TGZTest object
@@ -229,7 +228,7 @@ namespace SabreTools
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						newinputs.Add(Path.GetFullPath(input));
+						newinputs.Add(Path.GetFullPath(file));
 					}
 				}
 			}
@@ -248,10 +247,46 @@ namespace SabreTools
 			{
 				_logger.User("Processing file " + input);
 
+				// Get if the file should be scanned internally and externally
+				bool shouldExternalProcess = true;
+				bool shouldInternalProcess = true;
+
+				ArchiveType? archiveType = ArchiveTools.GetCurrentArchiveType(input, _logger);
+				switch (archiveType)
+				{
+					case null:
+						shouldExternalProcess = true;
+						shouldInternalProcess = false;
+						break;
+					case ArchiveType.GZip:
+						shouldExternalProcess = (_gz != ArchiveScanLevel.Internal);
+						shouldInternalProcess = (_gz != ArchiveScanLevel.External);
+						break;
+					case ArchiveType.Rar:
+						shouldExternalProcess = (_rar != ArchiveScanLevel.Internal);
+						shouldInternalProcess = (_rar != ArchiveScanLevel.External);
+						break;
+					case ArchiveType.SevenZip:
+						shouldExternalProcess = (_7z != ArchiveScanLevel.Internal);
+						shouldInternalProcess = (_7z != ArchiveScanLevel.External);
+						break;
+					case ArchiveType.Zip:
+						shouldExternalProcess = (_zip != ArchiveScanLevel.Internal);
+						shouldInternalProcess = (_zip != ArchiveScanLevel.External);
+						break;
+				}
+
 				// Do an external scan of the file, if necessary
-				ArchiveTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
+				if (shouldExternalProcess)
+				{
+					ArchiveTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
+				}
 
 				// Process the file as an archive, if necessary
+				if (shouldInternalProcess)
+				{
+					// DO THINGS
+				}
 
 				// Delete the soruce file if we're supposed to
 				if (_delete)
@@ -265,6 +300,19 @@ namespace SabreTools
 					{
 						_logger.Error(ex.ToString());
 					}
+				}
+			}
+
+			// Now one final delete of the temp directory
+			while (Directory.Exists(_tempdir))
+			{
+				try
+				{
+					Directory.Delete(_tempdir, true);
+				}
+				catch
+				{
+					continue;
 				}
 			}
 
