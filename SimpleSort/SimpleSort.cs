@@ -16,6 +16,8 @@ namespace SabreTools
 		private bool _quickScan;
 		private bool _toFolder;
 		private bool _verify;
+		private bool _tgz;
+		private bool _romba;
 		private ArchiveScanLevel _7z;
 		private ArchiveScanLevel _gz;
 		private ArchiveScanLevel _rar;
@@ -37,13 +39,16 @@ namespace SabreTools
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
+		/// <param name="tgz">True if files should be output in TorrentGZ format, false for standard zip</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public SimpleSort(Dat datdata, List<string> inputs, string outdir, string tempdir,
-			bool quickScan, bool toFolder, bool verify, int sevenzip, int gz, int rar, int zip, Logger logger)
+			bool quickScan, bool toFolder, bool verify, bool tgz, bool romba, int sevenzip,
+			int gz, int rar, int zip, Logger logger)
 		{
 			_datdata = datdata;
 			_inputs = inputs;
@@ -52,6 +57,8 @@ namespace SabreTools
 			_quickScan = quickScan;
 			_toFolder = toFolder;
 			_verify = verify;
+			_tgz = tgz;
+			_romba = romba;
 			_7z = (ArchiveScanLevel)(sevenzip < 0 || sevenzip > 2 ? 0 : sevenzip);
 			_gz = (ArchiveScanLevel)(gz < 0 || gz > 2 ? 0 : gz);
 			_rar = (ArchiveScanLevel)(rar < 0 || rar > 2 ? 0 : rar);
@@ -103,7 +110,9 @@ namespace SabreTools
 			// Set all default values
 			bool help = false,
 				quickScan = false,
+				romba = false,
 				simpleSort = true,
+				tgz = false,
 				toFolder = false,
 				verify = false;
 			int sevenzip = 0,
@@ -132,6 +141,14 @@ namespace SabreTools
 					case "-qs":
 					case "--quick":
 						quickScan = true;
+						break;
+					case "-r":
+					case "--romba":
+						romba = true;
+						break;
+					case "-tgz":
+					case "--tgz":
+						tgz = true;
 						break;
 					case "-v":
 					case "--verify":
@@ -227,7 +244,7 @@ namespace SabreTools
 			{
 				if (datfiles.Count > 0)
 				{
-					InitSimpleSort(datfiles, inputs, outdir, tempdir, quickScan, toFolder, verify, sevenzip, gz, rar, zip, logger);
+					InitSimpleSort(datfiles, inputs, outdir, tempdir, quickScan, toFolder, verify, tgz, romba, sevenzip, gz, rar, zip, logger);
 				}
 				else
 				{
@@ -259,12 +276,14 @@ namespace SabreTools
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
+		/// <param name="tgz">True if files should be output in TorrentGZ format, false for standard zip</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		private static void InitSimpleSort(List<string> datfiles, List<string> inputs, string outdir, string tempdir, 
-			bool quickScan, bool toFolder, bool verify, int sevenzip, int gz, int rar, int zip, Logger logger)
+			bool quickScan, bool toFolder, bool verify, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
 			Dat datdata = new Dat();
@@ -273,7 +292,7 @@ namespace SabreTools
 				datdata = DatTools.Parse(datfile, 99, 99, datdata, logger);
 			}
 
-			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, toFolder, verify, sevenzip, gz, rar, zip, logger);
+			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, toFolder, verify, tgz, romba, sevenzip, gz, rar, zip, logger);
 			ss.StartProcessing();
 		}
 
@@ -531,7 +550,7 @@ namespace SabreTools
 							Directory.CreateDirectory(gamedir);
 						}
 
-						_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+						_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_tgz ? found.SHA1 : found.Name) + "'");
 						try
 						{
 							File.Copy(input, Path.Combine(gamedir, Path.GetFileName(found.Name)));
@@ -540,7 +559,14 @@ namespace SabreTools
 					}
 					else
 					{
-						ArchiveTools.WriteToManagedArchive(input, _outdir, found);
+						if (_tgz)
+						{
+							ArchiveTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
+						}
+						else
+						{
+							ArchiveTools.WriteToManagedArchive(input, _outdir, found);
+						}
 					}
 				}
 
@@ -591,7 +617,7 @@ namespace SabreTools
 								Directory.CreateDirectory(gamedir);
 							}
 
-							_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+							_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_tgz ? found.SHA1 : found.Name) + "'");
 							try
 							{
 								File.Copy(newinput, Path.Combine(gamedir, Path.GetFileName(found.Name)));
@@ -600,7 +626,14 @@ namespace SabreTools
 						}
 						else
 						{
-							ArchiveTools.WriteToManagedArchive(newinput, _outdir, found);
+							if (_tgz)
+							{
+								ArchiveTools.WriteTorrentGZ(newinput, _outdir, _romba, _logger);
+							}
+							else
+							{
+								ArchiveTools.WriteToManagedArchive(newinput, _outdir, found);
+							}
 						}
 
 						// Then output the headered rom (renamed)
@@ -639,7 +672,14 @@ namespace SabreTools
 						else
 						{
 							_logger.Log("Matched name: " + newfound.Name);
-							ArchiveTools.WriteToManagedArchive(input, _outdir, newfound);
+							if (_tgz)
+							{
+								ArchiveTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
+							}
+							else
+							{
+								ArchiveTools.WriteToManagedArchive(input, _outdir, newfound);
+							}
 						}
 					}
 
@@ -711,14 +751,21 @@ namespace SabreTools
 								else
 								{
 									// Copy file between archives
-									_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+									_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_tgz ? found.SHA1 : found.Name) + "'");
 
-									if (Build.MonoEnvironment)
+									if (Build.MonoEnvironment || _tgz)
 									{
 										string outfile = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
 										if (File.Exists(outfile))
 										{
-											ArchiveTools.WriteToManagedArchive(outfile, _outdir, found);
+											if (_tgz)
+											{
+												ArchiveTools.WriteTorrentGZ(outfile, _outdir, _romba, _logger);
+											}
+											else
+											{
+												ArchiveTools.WriteToManagedArchive(outfile, _outdir, found);
+											}
 
 											try
 											{
@@ -740,7 +787,7 @@ namespace SabreTools
 				else
 				{
 					// Now, if the file is a supported archive type, also run on all files within
-					bool encounteredErrors = !ArchiveTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
+					bool encounteredErrors = ArchiveTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
 
 					// Remove the current file if we are in recursion so it's not picked up in the next step
 					if (recurse)
