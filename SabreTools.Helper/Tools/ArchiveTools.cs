@@ -596,9 +596,10 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="input">File to write from</param>
 		/// <param name="outdir">Directory to write archive to</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the write was a success, false otherwise</returns>
-		public static bool WriteTorrentGZ(string input, string outdir, Logger logger)
+		public static bool WriteTorrentGZ(string input, string outdir, bool romba, Logger logger)
 		{
 			// Check that the input file exists
 			if (!File.Exists(input))
@@ -666,6 +667,19 @@ namespace SabreTools.Helper
 					bw.BaseStream.Seek(0, SeekOrigin.Begin);
 					sw.BaseStream.CopyTo(bw.BaseStream);
 				}
+			}
+
+			// If we're in romba mode, create the subfolder and move the file
+			if (romba)
+			{
+				string subfolder = Path.Combine(rom.SHA1.Substring(0, 2), rom.SHA1.Substring(2, 2), rom.SHA1.Substring(4, 2), rom.SHA1.Substring(6, 2));
+				outdir = Path.Combine(outdir, subfolder);
+				if (!Directory.Exists(outdir))
+				{
+					Directory.CreateDirectory(outdir);
+				}
+
+				File.Move(input, Path.Combine(outdir, input));
 			}
 
 			return true;

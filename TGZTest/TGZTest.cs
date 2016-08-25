@@ -11,6 +11,7 @@ namespace SabreTools
 		private List<string> _inputs;
 		private string _outdir;
 		private bool _delete;
+		private bool _romba;
 		private Logger _logger;
 
 		/// <summary>
@@ -19,12 +20,14 @@ namespace SabreTools
 		/// <param name="inputs">List of all inputted files and folders</param>
 		/// <param name="outdir">Output directory (empty for default directory)</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public TGZTest(List<string> inputs, string outdir, bool delete, Logger logger)
+		public TGZTest(List<string> inputs, string outdir, bool delete, bool romba, Logger logger)
 		{
 			_inputs = inputs;
 			_outdir = (String.IsNullOrEmpty(outdir) ? "tgz" : outdir);
 			_delete = delete;
+			_romba = romba;
 			_logger = logger;
 		}
 
@@ -65,6 +68,7 @@ namespace SabreTools
 			// Set all default values
 			bool help = false,
 				delete = false,
+				romba = false,
 				tgz = true;
 			string outdir = "";
 			List<string> inputs = new List<string>();
@@ -84,6 +88,10 @@ namespace SabreTools
 					case "-d":
 					case "--delete":
 						delete = true;
+						break;
+					case "-r":
+					case "--romba":
+						romba = true;
 						break;
 					default:
 						if (temparg.StartsWith("-out=") || temparg.StartsWith("--out="))
@@ -126,7 +134,7 @@ namespace SabreTools
 			// If we are doing a simple sort
 			if (tgz)
 			{
-				InitTGZTest(inputs, outdir, delete, logger);
+				InitTGZTest(inputs, outdir, delete, romba, logger);
 			}
 
 			// If nothing is set, show the help
@@ -145,8 +153,9 @@ namespace SabreTools
 		/// <param name="inputs">List of all inputted files and folders</param>
 		/// <param name="outdir">Output directory (empty for default directory)</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public static bool InitTGZTest(List<string> inputs, string outdir, bool delete, Logger logger)
+		public static bool InitTGZTest(List<string> inputs, string outdir, bool delete, bool romba, Logger logger)
 		{
 			// Get all individual files from the inputs
 			List<string> newinputs = new List<string>();
@@ -165,7 +174,7 @@ namespace SabreTools
 				}
 			}
 
-			TGZTest tgztest = new TGZTest(newinputs, outdir, delete, logger);
+			TGZTest tgztest = new TGZTest(newinputs, outdir, delete, romba, logger);
 			return tgztest.Process();
 		}
 
@@ -177,7 +186,7 @@ namespace SabreTools
 		{
 			foreach (string input in _inputs)
 			{
-				ArchiveTools.WriteTorrentGZ(input, _outdir, _logger);
+				ArchiveTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
 				if (_delete)
 				{
 					try
