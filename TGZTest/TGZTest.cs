@@ -38,6 +38,7 @@ namespace SabreTools
 		{
 			_inputs = inputs;
 			_outdir = (String.IsNullOrEmpty(outdir) ? "tgz" : outdir);
+			_tempdir = (String.IsNullOrEmpty(tempdir) ? "__temp__" : tempdir);
 			_delete = delete;
 			_romba = romba;
 			_7z = (ArchiveScanLevel)(sevenzip < 0 || sevenzip > 2 ? 0 : sevenzip);
