@@ -191,7 +191,7 @@ namespace SabreTools.Helper
 
 					using (FileStream itemstream = File.OpenRead(input))
 					{
-						using (FileStream outstream = File.Create(tempdir + Path.GetFileNameWithoutExtension(input)))
+						using (FileStream outstream = File.Create(Path.Combine(tempdir, Path.GetFileNameWithoutExtension(input))))
 						{
 							using (GZipStream gzstream = new GZipStream(itemstream, CompressionMode.Decompress))
 							{
