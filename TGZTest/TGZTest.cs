@@ -14,6 +14,8 @@ namespace SabreTools
 		private bool _romba;
 		private Logger _logger;
 
+		// We still need access permissions for each of the archive files as well, kind of like DATFromDir
+
 		/// <summary>
 		/// Create a new TGZTest object
 		/// </summary>
@@ -186,11 +188,13 @@ namespace SabreTools
 		{
 			foreach (string input in _inputs)
 			{
+				_logger.User("Processing file " + input);
 				ArchiveTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
 				if (_delete)
 				{
 					try
 					{
+						_logger.User("Attempting to delete " + input);
 						File.Delete(input);
 					}
 					catch (Exception ex)

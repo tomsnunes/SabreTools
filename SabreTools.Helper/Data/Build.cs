@@ -248,6 +248,17 @@ SimpleSort scanning levels:
   2	Only hash archive
 ");
 					break;
+				case "TGZTest":
+					Console.WriteLine(@"TGZTest - Test TorrentGZ output
+-----------------------------------------
+Usage: TGZTest [options] [filename|dirname] ...
+
+Options:
+  -?, -h, --help	Show this help
+  -out=			Output directory
+  -d, --delete	Delete input files
+  -r, --romba	Enable Romba depot dir output");
+                    break;
 				default:
 					Console.Write("This is the default help output");
 					break;
