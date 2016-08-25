@@ -87,10 +87,10 @@ namespace SabreTools
 				delete = false,
 				romba = false,
 				tgz = true;
-			int sevenzip = 0,
+			int sevenzip = 1,
 				gz = 2,
 				rar = 2,
-				zip = 0;
+				zip = 1;
 			string outdir = "",
 				tempdir = "";
 			List<string> inputs = new List<string>();

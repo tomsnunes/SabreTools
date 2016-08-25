@@ -242,7 +242,7 @@ Options:
   -rar={2}		Set scanning level for RAR archives
   -zip={0}		Set scanning level for ZIP archives
 
-SimpleSort scanning levels:
+Archive scanning levels:
   0	Hash archive and contents
   1	Only hash contents
   2	Only hash archive
@@ -259,10 +259,15 @@ Options:
   -t=, --temp=		Set the temporary directory to use
   -d, --delete	Delete input files
   -r, --romba	Enable Romba depot dir output
-  -7z={0}		Set scanning level for 7z archives
+  -7z={1}		Set scanning level for 7z archives
   -gz={2}		Set scanning level for GZip archives
   -rar={2}		Set scanning level for RAR archives
-  -zip={0}		Set scanning level for ZIP archives");
+  -zip={1}		Set scanning level for ZIP archives
+
+Archive scanning levels:
+  0	Hash archive and contents
+  1	Only hash contents
+  2	Only hash archive");
                     break;
 				default:
 					Console.Write("This is the default help output");

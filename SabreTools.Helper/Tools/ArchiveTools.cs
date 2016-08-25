@@ -621,7 +621,14 @@ namespace SabreTools.Helper
 
 			// Rename the input file based on the SHA-1
 			string tempname = Path.Combine(Path.GetDirectoryName(input), rom.SHA1);
-			File.Move(input, tempname);
+			try
+			{
+				File.Move(input, tempname);
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+			}
 
 			// If it doesn't exist, create the output file and then write
 			string outfile = Path.Combine(outdir, rom.SHA1 + ".gz");
@@ -632,7 +639,14 @@ namespace SabreTools.Helper
 			}
 
 			// Name the original input file correctly again
-			File.Move(tempname, input);
+			try
+			{
+				File.Move(tempname, input);
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex.ToString());
+			}
 
 			// Now that it's renamed, inject the header info
 			using (BinaryWriter sw = new BinaryWriter(new MemoryStream()))
