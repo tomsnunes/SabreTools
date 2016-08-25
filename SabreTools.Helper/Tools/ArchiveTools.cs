@@ -9,6 +9,11 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+using SharpCompress.Archive.GZip;
+using SharpCompress.Common.GZip;
+using SharpCompress.Reader.GZip;
+using SharpCompress.Writer.GZip;
+
 namespace SabreTools.Helper
 {
 	public class ArchiveTools
@@ -599,6 +604,7 @@ namespace SabreTools.Helper
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the write was a success, false otherwise</returns>
+		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
 		public static bool WriteTorrentGZ(string input, string outdir, bool romba, Logger logger)
 		{
 			// Check that the input file exists
@@ -627,7 +633,7 @@ namespace SabreTools.Helper
 				inputstream.CopyTo(output);
 			}
 
-			// Now that it's renamed, inject the header info
+			// Now that it's ready, inject the header info
 			using (BinaryWriter sw = new BinaryWriter(new MemoryStream()))
 			{
 				using (BinaryReader br = new BinaryReader(File.OpenRead(outfile)))
