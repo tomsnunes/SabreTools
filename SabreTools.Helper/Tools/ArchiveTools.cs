@@ -627,7 +627,8 @@ namespace SabreTools.Helper
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				logger.Warning(ex.ToString());
+				return false;
 			}
 
 			// If it doesn't exist, create the output file and then write
@@ -638,14 +639,14 @@ namespace SabreTools.Helper
 				inputstream.CopyTo(output);
 			}
 
-			// Name the original input file correctly again
+			// Name the original input file correctly again, if possible
 			try
 			{
 				File.Move(tempname, input);
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				logger.Warning(ex.ToString());
 			}
 
 			// Now that it's renamed, inject the header info
@@ -699,7 +700,7 @@ namespace SabreTools.Helper
 				}
 				catch (Exception ex)
 				{
-					logger.Error(ex.ToString());
+					logger.Warning(ex.ToString());
 					File.Delete(outfile);
 				}
 			}
