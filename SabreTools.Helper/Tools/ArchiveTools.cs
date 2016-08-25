@@ -9,11 +9,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using SharpCompress.Archive.GZip;
-using SharpCompress.Common.GZip;
-using SharpCompress.Reader.GZip;
-using SharpCompress.Writer.GZip;
-
 namespace SabreTools.Helper
 {
 	public class ArchiveTools
@@ -474,6 +469,19 @@ namespace SabreTools.Helper
 			if (at == null)
 			{
 				return roms;
+			}
+
+			// If we got back GZip, try to get TGZ info first
+			else if (at == ArchiveType.GZip)
+			{
+				Rom possibleTgz = GetTorrentGZFileInfo(input, logger);
+
+				// If it was, then add it to the outputs and continue
+				if (possibleTgz.Name != null)
+				{
+					roms.Add(possibleTgz);
+					return roms;
+				}
 			}
 
 			IReader reader = null;
