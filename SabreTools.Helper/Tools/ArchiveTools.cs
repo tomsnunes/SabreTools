@@ -679,7 +679,15 @@ namespace SabreTools.Helper
 					Directory.CreateDirectory(outdir);
 				}
 
-				File.Move(outfile, Path.Combine(outdir, Path.GetFileName(outfile)));
+				try
+				{
+					File.Move(outfile, Path.Combine(outdir, Path.GetFileName(outfile)));
+				}
+				catch (Exception ex)
+				{
+					logger.Error(ex.ToString());
+					File.Delete(outfile);
+				}
 			}
 
 			return true;
