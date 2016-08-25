@@ -243,6 +243,24 @@ namespace SabreTools
 		/// <returns>True if processing was a success, false otherwise</returns>
 		public bool Process()
 		{
+			// First, check that the output directory exists
+			if (!Directory.Exists(_outdir))
+			{
+				Directory.CreateDirectory(_outdir);
+				_outdir = Path.GetFullPath(_outdir);
+			}
+
+			// Then create or clean the temp directory
+			if (!Directory.Exists(_tempdir))
+			{
+				Directory.CreateDirectory(_tempdir);
+			}
+			else
+			{
+				Output.CleanDirectory(_tempdir);
+			}
+
+			// Now process all of the inputs
 			foreach (string input in _inputs)
 			{
 				_logger.User("Processing file " + input);
@@ -285,7 +303,18 @@ namespace SabreTools
 				// Process the file as an archive, if necessary
 				if (shouldInternalProcess)
 				{
-					// DO THINGS
+					// Now, if the file is a supported archive type, also run on all files within
+					bool encounteredErrors = !ArchiveTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
+
+					// If no errors were encountered, we loop through the temp directory
+					if (!encounteredErrors)
+					{
+						_logger.Log("Archive found! Successfully extracted");
+						foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
+						{
+							ArchiveTools.WriteTorrentGZ(file, _outdir, _romba, _logger);
+						}
+					}
 				}
 
 				// Delete the soruce file if we're supposed to
