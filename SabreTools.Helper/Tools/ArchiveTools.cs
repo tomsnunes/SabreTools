@@ -596,20 +596,14 @@ namespace SabreTools.Helper
 			// Now get the Rom info for the file so we have hashes and size
 			Rom rom = RomTools.GetSingleFileInfo(input);
 
-			// Now, check to make sure the output file doesn't already exist
-			string outfile = Path.Combine(outdir, rom.SHA1 + ".gz");
-			if (File.Exists(outfile))
-			{
-				return true;
-			}
-
 			// Rename the input file based on the SHA-1
 			string tempname = Path.Combine(Path.GetDirectoryName(input), rom.SHA1);
 			File.Move(input, tempname);
 
 			// If it doesn't exist, create the output file and then write
+			string outfile = Path.Combine(outdir, rom.SHA1 + ".gz");
 			using (FileStream inputstream = new FileStream(tempname, FileMode.Open))
-			using (GZipStream output = new GZipStream(File.OpenWrite(outfile), CompressionMode.Compress))
+			using (GZipStream output = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress))
 			{
 				inputstream.CopyTo(output);
 			}
@@ -618,31 +612,38 @@ namespace SabreTools.Helper
 			File.Move(tempname, input);
 
 			// Now that it's renamed, inject the header info
-			using (BinaryReader br = new BinaryReader(File.Open(outfile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
-			using (BinaryWriter bw = new BinaryWriter(File.Open(outfile, FileMode.Open, FileAccess.Write, FileShare.ReadWrite)))
-			using (StreamWriter sw = new StreamWriter(new MemoryStream()))
+			using (BinaryWriter sw = new BinaryWriter(new MemoryStream()))
 			{
-				// Copy the first part of the file to the memory stream
-				sw.Write(br.ReadBytes(3)); //0x1F (ID1), 0x8B (ID2), 0x08 (Compression method - Deflate)
-
-				// Now write TGZ info
-				byte[] data = new byte[] { 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1c, 0x0 } // Flags with FEXTRA set (1), MTIME (4), XFLAG (1), OS (1), FEXTRA-LEN (2, Mirrored)
-								.Concat(StringToByteArray(rom.MD5)) // MD5
-								.Concat(StringToByteArray(rom.CRC)) // CRC
-								.Concat(BitConverter.GetBytes(rom.Size).Reverse().ToArray()) // Long size (Mirrored)
-							.ToArray();
-				sw.Write(data);
-
-				// Finally, copy the rest of the data from the original file
-				br.BaseStream.Seek(10, SeekOrigin.Begin);
-				while (br.BaseStream.Position < br.BaseStream.Length)
+				using (BinaryReader br = new BinaryReader(File.OpenRead(outfile)))
 				{
-					sw.Write(br.ReadByte());
+					// Copy the first part of the file to the memory stream
+					sw.Write(br.ReadBytes(3)); //0x1F (ID1), 0x8B (ID2), 0x08 (Compression method - Deflate)
+
+					// Now write TGZ info
+					byte[] data = new byte[] { 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1c, 0x0 } // Flags with FEXTRA set (1), MTIME (4), XFLAG (1), OS (1), FEXTRA-LEN (2, Mirrored)
+									.Concat(StringToByteArray(rom.MD5)) // MD5
+									.Concat(StringToByteArray(rom.CRC)) // CRC
+									.Concat(BitConverter.GetBytes(rom.Size).Reverse().ToArray()) // Long size (Mirrored)
+								.ToArray();
+					sw.Write(data);
+
+					// Finally, copy the rest of the data from the original file
+					br.BaseStream.Seek(10, SeekOrigin.Begin);
+					int i = 10;
+					while (br.BaseStream.Position < br.BaseStream.Length)
+					{
+						sw.Write(br.ReadByte());
+						i++;
+					}
 				}
 
-				// Now write the new file over the original
-				sw.BaseStream.Seek(0, SeekOrigin.Begin);
-				sw.BaseStream.CopyTo(bw.BaseStream);
+				using (BinaryWriter bw = new BinaryWriter(File.Open(outfile, FileMode.Create)))
+				{
+					// Now write the new file over the original
+					sw.BaseStream.Seek(0, SeekOrigin.Begin);
+					bw.BaseStream.Seek(0, SeekOrigin.Begin);
+					sw.BaseStream.CopyTo(bw.BaseStream);
+				}
 			}
 
 			return true;
