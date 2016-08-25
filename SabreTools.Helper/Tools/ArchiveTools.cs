@@ -509,8 +509,8 @@ namespace SabreTools.Helper
 			return roms;
 		}
 
-		/*
-		(Torrent)GZ Header Format (https://tools.ietf.org/html/rfc1952)
+		/* (Torrent)GZ Header Format
+			(https://tools.ietf.org/html/rfc1952)
 			00			Identification 1 (0x1F)
 			01			Identification 2 (0x8B)
 			02			Compression Method (0-7 reserved, 8 deflate; 0x08)
