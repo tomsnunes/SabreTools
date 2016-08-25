@@ -322,7 +322,7 @@ namespace SabreTools
 					}
 				}
 
-				// Delete the soruce file if we're supposed to
+				// Delete the source file if we're supposed to
 				if (_delete)
 				{
 					try
@@ -348,6 +348,26 @@ namespace SabreTools
 				catch
 				{
 					continue;
+				}
+			}
+
+			// If we're in romba mode and the size file doesn't exist, create it
+			if (_romba && !File.Exists(Path.Combine(_outdir, ".romba_size")))
+			{
+				// Get the size of all of the files in the output folder
+				long size = 0;
+				foreach (string file in Directory.EnumerateFiles(_outdir, "*", SearchOption.AllDirectories))
+				{
+					FileInfo tempinfo = new FileInfo(file);
+					size += tempinfo.Length;
+				}
+
+				// Write out the value to each of the romba depot files
+				using (StreamWriter tw = new StreamWriter(File.Open(Path.Combine(_outdir, ".romba_size"), FileMode.Create, FileAccess.Write)))
+				using (StreamWriter twb = new StreamWriter(File.Open(Path.Combine(_outdir, ".romba_size.backup"), FileMode.Create, FileAccess.Write)))
+				{
+					tw.Write(size);
+					twb.Write(size);
 				}
 			}
 
