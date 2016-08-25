@@ -256,8 +256,13 @@ Usage: TGZTest [options] [filename|dirname] ...
 Options:
   -?, -h, --help	Show this help
   -out=			Output directory
+  -t=, --temp=		Set the temporary directory to use
   -d, --delete	Delete input files
-  -r, --romba	Enable Romba depot dir output");
+  -r, --romba	Enable Romba depot dir output
+  -7z={0}		Set scanning level for 7z archives
+  -gz={2}		Set scanning level for GZip archives
+  -rar={2}		Set scanning level for RAR archives
+  -zip={0}		Set scanning level for ZIP archives");
                     break;
 				default:
 					Console.Write("This is the default help output");
