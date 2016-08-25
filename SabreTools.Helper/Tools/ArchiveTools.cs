@@ -619,34 +619,12 @@ namespace SabreTools.Helper
 			// Now get the Rom info for the file so we have hashes and size
 			Rom rom = RomTools.GetSingleFileInfo(input);
 
-			// Rename the input file based on the SHA-1
-			string tempname = Path.Combine(Path.GetDirectoryName(input), rom.SHA1);
-			try
-			{
-				File.Move(input, tempname);
-			}
-			catch (Exception ex)
-			{
-				logger.Warning(ex.ToString());
-				return false;
-			}
-
 			// If it doesn't exist, create the output file and then write
 			string outfile = Path.Combine(outdir, rom.SHA1 + ".gz");
-			using (FileStream inputstream = new FileStream(tempname, FileMode.Open))
+			using (FileStream inputstream = new FileStream(input, FileMode.Open))
 			using (GZipStream output = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress))
 			{
 				inputstream.CopyTo(output);
-			}
-
-			// Name the original input file correctly again, if possible
-			try
-			{
-				File.Move(tempname, input);
-			}
-			catch (Exception ex)
-			{
-				logger.Warning(ex.ToString());
 			}
 
 			// Now that it's renamed, inject the header info
