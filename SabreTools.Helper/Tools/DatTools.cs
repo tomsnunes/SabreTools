@@ -1418,7 +1418,7 @@ namespace SabreTools.Helper
 				foreach (Rom rom in roms)
 				{
 					count++;
-					string newkey = (norename ? "" : rom.Metadata.SystemID.ToString().PadLeft(10, '0') + "-" + rom.Metadata.SourceID.ToString().PadLeft(10, '0') + "-") + rom.Game.ToLowerInvariant();
+					string newkey = (norename ? "" : rom.Metadata.SystemID.ToString().PadLeft(10, '0') + "-" + rom.Metadata.SourceID.ToString().PadLeft(10, '0') + "-") + (String.IsNullOrEmpty(rom.Game) ? "" : rom.Game.ToLowerInvariant());
 					if (sortable.ContainsKey(newkey))
 					{
 						sortable[newkey].Add(rom);

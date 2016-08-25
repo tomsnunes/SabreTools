@@ -79,6 +79,10 @@
       <Project>{225a1afd-0890-44e8-b779-7502665c23a5}</Project>
       <Name>SabreTools.Helper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SabreTools\SabreTools.csproj">
+      <Project>{3b615702-1866-4d7b-8af1-7b43fd0cc1d0}</Project>
+      <Name>SabreTools</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -270,21 +270,19 @@ namespace SabreTools
 			Dat datdata = new Dat();
 			foreach (string datfile in datfiles)
 			{
-				datdata = DatTools.Parse(datfile, 0, 0, datdata, logger);
+				datdata = DatTools.Parse(datfile, 99, 99, datdata, logger);
 			}
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, toFolder, verify, sevenzip, gz, rar, zip, logger);
-			ss.RebuildToOutput();
+			ss.StartProcessing();
 		}
 
 		/// <summary>
-		/// Process the DAT and find all matches in input files and folders
+		/// Pick the appropriate action based on the inputs
 		/// </summary>
-		/// <returns>True if rebuilding was a success, false otherwise</returns>
-		public bool RebuildToOutput()
+		/// <returns>True if success, false otherwise</returns>
+		public bool StartProcessing()
 		{
-			bool success = true;
-
 			// First, check that the output directory exists
 			if (!Directory.Exists(_outdir))
 			{
@@ -302,79 +300,152 @@ namespace SabreTools
 				Output.CleanDirectory(_tempdir);
 			}
 
-			// If we're in verification mode, only check the output directory
 			if (_verify)
 			{
-				// Create a list of files from the output directory
-				List<string> files = new List<string>();
-				foreach (string file in Directory.EnumerateFiles(_outdir, "*", SearchOption.AllDirectories))
+				return VerifyDirectory();
+			}
+			else
+			{
+				return RebuildToOutput();
+			}
+		}
+
+		/// <summary>
+		/// Process the DAT and verify the output directory
+		/// </summary>
+		/// <returns>True if verification was a success, false otherwise</returns>
+		public bool VerifyDirectory()
+		{
+			bool success = true;
+
+			// Enumerate all files from the output directory
+			List<string> files = new List<string>();
+			foreach (string file in Directory.EnumerateFiles(_outdir, "*", SearchOption.AllDirectories))
+			{
+				_logger.Log("File found: '" + file + "'");
+				files.Add(Path.GetFullPath(file));
+			}
+
+			/*
+			We want the cross section of what's the folder and what's in the DAT. Right now, it just has what's in the DAT that's not in the folder
+			*/
+
+			// Then, loop through and check each of the inputs
+			_logger.User("Processing files:\n");
+			DATFromDir dfd = new DATFromDir(files, _datdata, false, false, false, false, true, "", _logger, true);
+			dfd.Start();
+
+			// Setup the fixdat
+			_matched = (Dat)_datdata.CloneHeader();
+			_matched.Roms = new Dictionary<string, List<Rom>>();
+			_matched.FileName = "fixDat_" + _matched.FileName;
+			_matched.Name = "fixDat_" + _matched.Name;
+			_matched.Description = "fixDat_" + _matched.Description;
+			_matched.OutputFormat = OutputFormat.Xml;
+
+			// Now that all files are parsed, get only files found in directory
+			bool found = false;
+			foreach (List<Rom> roms in _datdata.Roms.Values)
+			{
+				List<Rom> newroms = RomTools.Merge(roms, _logger);
+				foreach (Rom rom in newroms)
 				{
-					_logger.Log("File found: '" + file + "'");
-					files.Add(Path.GetFullPath(file));
+					if (rom.Metadata.SourceID == 99)
+					{
+						found = true;
+						string key = rom.Size + "-" + rom.CRC;
+						if (_matched.Roms.ContainsKey(key))
+						{
+							_matched.Roms[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							_matched.Roms.Add(key, temp);
+						}
+					}
 				}
 			}
 
-			// Otherwise, run the rebuilder
+			// Now output the fixdat to the main folder
+			if (found)
+			{
+				Output.WriteDatfile(_matched, "", _logger, stats: true);
+			}
 			else
 			{
-				// Create a list of just files from inputs
-				List<string> files = new List<string>();
-				foreach (string input in _inputs)
-				{
-					if (File.Exists(input))
-					{
-						_logger.Log("File found: '" + input + "'");
-						files.Add(Path.GetFullPath(input));
-					}
-					else if (Directory.Exists(input))
-					{
-						_logger.Log("Directory found: '" + input + "'");
-						foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-						{
-							_logger.Log("File found: '" + file + "'");
-							files.Add(Path.GetFullPath(file));
-						}
-					}
-					else
-					{
-						_logger.Error("'" + input + "' is not a file or directory!");
-					}
-				}
-
-				// Then, loop through and check each of the inputs
-				_logger.User("Processing files:\n");
-				_cursorTop = Console.CursorTop;
-				for (int i = 0; i < files.Count; i++)
-				{
-					success &= RebuildToOutputHelper(files[i], i, files.Count);
-					Output.CleanDirectory(_tempdir);
-				}
-
-				// Now one final delete of the temp directory
-				while (Directory.Exists(_tempdir))
-				{
-					try
-					{
-						Directory.Delete(_tempdir, true);
-					}
-					catch
-					{
-						continue;
-					}
-				}
-
-				// Now output the stats for the built files
-				_logger.ClearBeneath(Constants.HeaderHeight);
-				Console.SetCursorPosition(0, Constants.HeaderHeight + 1);
-				_logger.User("Stats of the matched ROMs:");
-				Stats.OutputStats(_matched, _logger, true);
+				_logger.User("No fixDat needed");
 			}
 
 			return success;
 		}
 
 		/// <summary>
-		/// Process an individual file against the DAT
+		/// Process the DAT and find all matches in input files and folders
+		/// </summary>
+		/// <returns>True if rebuilding was a success, false otherwise</returns>
+		public bool RebuildToOutput()
+		{
+			bool success = true;
+
+			// Create a list of just files from inputs
+			List<string> files = new List<string>();
+			foreach (string input in _inputs)
+			{
+				if (File.Exists(input))
+				{
+					_logger.Log("File found: '" + input + "'");
+					files.Add(Path.GetFullPath(input));
+				}
+				else if (Directory.Exists(input))
+				{
+					_logger.Log("Directory found: '" + input + "'");
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						_logger.Log("File found: '" + file + "'");
+						files.Add(Path.GetFullPath(file));
+					}
+				}
+				else
+				{
+					_logger.Error("'" + input + "' is not a file or directory!");
+				}
+			}
+
+			// Then, loop through and check each of the inputs
+			_logger.User("Processing files:\n");
+			_cursorTop = Console.CursorTop;
+			for (int i = 0; i < files.Count; i++)
+			{
+				success &= RebuildToOutputHelper(files[i], i, files.Count);
+				Output.CleanDirectory(_tempdir);
+			}
+
+			// Now one final delete of the temp directory
+			while (Directory.Exists(_tempdir))
+			{
+				try
+				{
+					Directory.Delete(_tempdir, true);
+				}
+				catch
+				{
+					continue;
+				}
+			}
+
+			// Now output the stats for the built files
+			_logger.ClearBeneath(Constants.HeaderHeight);
+			Console.SetCursorPosition(0, Constants.HeaderHeight + 1);
+			_logger.User("Stats of the matched ROMs:");
+			Stats.OutputStats(_matched, _logger, true);
+
+			return success;
+		}
+
+		/// <summary>
+		/// Process an individual file against the DAT for rebuilding
 		/// </summary>
 		/// <param name="input">Name of the input file</param>
 		/// <param name="index">Index of the current file</param>

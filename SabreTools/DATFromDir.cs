@@ -25,9 +25,16 @@ namespace SabreTools
 		private bool _bare;
 		private bool _archivesAsFiles;
 		private bool _enableGzip;
+		private bool _nowrite;
 
 		// Other required variables
 		private Logger _logger;
+
+		// Public variables
+		public Dat DatData
+		{
+			get { return _datdata; }
+		}
 
 		/// <summary>
 		/// Create a new DATFromDir object
@@ -38,10 +45,11 @@ namespace SabreTools
 		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
-		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>>
-		/// <param name="logger">Logger object for console and file output</param>
+		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
-		public DATFromDir(List<String> inputs, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, string tempDir, Logger logger)
+		/// <param name="nowrite">True if the file should not be written out, false otherwise (default)</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		public DATFromDir(List<String> inputs, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, string tempDir, Logger logger, bool nowrite = false)
 		{
 			_inputs = inputs;
 			_datdata = datdata;
@@ -52,6 +60,7 @@ namespace SabreTools
 			_enableGzip = enableGzip;
 			_tempDir = tempDir;
 			_logger = logger;
+			_nowrite = nowrite;
 		}
 
 		/// <summary>
@@ -98,10 +107,18 @@ namespace SabreTools
 				_datdata.Description = _datdata.Name + (_bare ? "" : " (" + _datdata.Date + ")");
 			}
 
-			// Create and open the output file for writing
-			FileStream fs = File.Create(Style.CreateOutfileName(Environment.CurrentDirectory, _datdata));
-			StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-			sw.AutoFlush = true;
+			StreamWriter sw;
+			if (_nowrite)
+			{
+				sw = new StreamWriter(new MemoryStream());
+			}
+			else
+			{
+				// Create and open the output file for writing
+				FileStream fs = File.Create(Style.CreateOutfileName(Environment.CurrentDirectory, _datdata));
+				sw = new StreamWriter(fs, Encoding.UTF8);
+				sw.AutoFlush = true;
+			}
 
 			// Write out the initial file header
 			Output.WriteHeader(sw, _datdata, _logger);
@@ -227,8 +244,10 @@ namespace SabreTools
 			// Now output any empties to the stream (if not in Romba mode)
 			if (!_datdata.Romba)
 			{
-				foreach (List<Rom> roms in _datdata.Roms.Values)
+				List<string> keys = _datdata.Roms.Keys.ToList();
+				foreach (string key in keys)
 				{
+					List<Rom> roms = _datdata.Roms[key];
 					for (int i = 0; i < roms.Count; i++)
 					{
 						Rom rom = roms[i];
@@ -244,23 +263,40 @@ namespace SabreTools
 							rom.SHA1 = Constants.SHA1Zero;
 						}
 
-						// If we have a different game and we're not at the start of the list, output the end of last item
-						int last = 0;
-						if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+						if (_nowrite)
 						{
-							Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
+							string inkey = rom.Size + "-" + rom.CRC;
+							if (_datdata.Roms.ContainsKey(inkey))
+							{
+								_datdata.Roms[inkey].Add(rom);
+							}
+							else
+							{
+								List<Rom> temp = new List<Rom>();
+								temp.Add(rom);
+								_datdata.Roms.Add(inkey, temp);
+							}
 						}
-
-						// If we have a new game, output the beginning of the new item
-						if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+						else
 						{
-							Output.WriteStartGame(sw, rom, new List<string>(), lastparent, _datdata, 0, last, _logger);
-						}
+							// If we have a different game and we're not at the start of the list, output the end of last item
+							int last = 0;
+							if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+							{
+								Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
+							}
 
-						// Write out the rom data
-						if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
-						{
-							Output.WriteRomData(sw, rom, lastparent, _datdata, 0, _logger);
+							// If we have a new game, output the beginning of the new item
+							if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+							{
+								Output.WriteStartGame(sw, rom, new List<string>(), lastparent, _datdata, 0, last, _logger);
+							}
+
+							// Write out the rom data
+							if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
+							{
+								Output.WriteRomData(sw, rom, lastparent, _datdata, 0, _logger);
+							}
 						}
 
 						lastparent = rom.Game;
@@ -304,9 +340,27 @@ namespace SabreTools
 				if (rom.Name != null)
 				{
 					int last = 0;
-					Output.WriteStartGame(sw, rom, new List<string>(), "", _datdata, 0, 0, _logger);
-					Output.WriteRomData(sw, rom, "", _datdata, 0, _logger);
-					Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), "", _datdata, 0, out last, _logger);
+
+					if (_nowrite)
+					{
+						string key = rom.Size + "-" + rom.CRC;
+						if (_datdata.Roms.ContainsKey(key))
+						{
+							_datdata.Roms[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							_datdata.Roms.Add(key, temp);
+						}
+					}
+					else
+					{
+						Output.WriteStartGame(sw, rom, new List<string>(), "", _datdata, 0, 0, _logger);
+						Output.WriteRomData(sw, rom, "", _datdata, 0, _logger);
+						Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), "", _datdata, 0, out last, _logger);
+					}
 				}
 				else
 				{
@@ -357,10 +411,14 @@ namespace SabreTools
 					_logger.Log(Path.GetFileName(item) + " treated like an archive");
 					foreach (string entry in Directory.EnumerateFiles(tempdir, "*", SearchOption.AllDirectories))
 					{
+						string tempbasepath = (Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar);
 						lastparent = ProcessFile(Path.GetFullPath(entry), sw, Path.GetFullPath(tempdir),
-							Path.Combine((Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) +
-								Path.GetFileNameWithoutExtension(item)
-							), _datdata, lastparent);
+							(String.IsNullOrEmpty(tempbasepath)
+								? ""
+								: (tempbasepath.Length < _basePath.Length
+									? tempbasepath
+									: tempbasepath.Remove(0, _basePath.Length))) +
+							Path.GetFileNameWithoutExtension(item), _datdata, lastparent);
 					}
 
 					// Clear the temp directory
@@ -455,21 +513,38 @@ namespace SabreTools
 				rom.Game = rom.Game.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
 				rom.Name = actualitem;
 
-				// If we have a different game and we're not at the start of the list, output the end of last item
-				int last = 0;
-				if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+				if (_nowrite)
 				{
-					Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, datdata, 0, out last, _logger);
+					string key = rom.Size + "-" + rom.CRC;
+					if (_datdata.Roms.ContainsKey(key))
+					{
+						_datdata.Roms[key].Add(rom);
+					}
+					else
+					{
+						List<Rom> temp = new List<Rom>();
+						temp.Add(rom);
+						_datdata.Roms.Add(key, temp);
+					}
 				}
-
-				// If we have a new game, output the beginning of the new item
-				if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+				else
 				{
-					Output.WriteStartGame(sw, rom, new List<string>(), lastparent, datdata, 0, last, _logger);
-				}
+					// If we have a different game and we're not at the start of the list, output the end of last item
+					int last = 0;
+					if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+					{
+						Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, datdata, 0, out last, _logger);
+					}
 
-				// Write out the rom data
-				Output.WriteRomData(sw, rom, lastparent, datdata, 0, _logger);
+					// If we have a new game, output the beginning of the new item
+					if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+					{
+						Output.WriteStartGame(sw, rom, new List<string>(), lastparent, datdata, 0, last, _logger);
+					}
+
+					// Write out the rom data
+					Output.WriteRomData(sw, rom, lastparent, datdata, 0, _logger);
+				}
 				_logger.User("File added: " + actualitem + Environment.NewLine);
 
 				return rom.Game;
