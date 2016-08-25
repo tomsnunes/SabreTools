@@ -244,6 +244,8 @@ namespace SabreTools
 		/// <returns>True if processing was a success, false otherwise</returns>
 		public bool Process()
 		{
+			bool success = true;
+
 			// First, check that the output directory exists
 			if (!Directory.Exists(_outdir))
 			{
@@ -299,7 +301,7 @@ namespace SabreTools
 				if (shouldExternalProcess)
 				{
 					_logger.User("Processing file " + input);
-					ArchiveTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
+					success &= ArchiveTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
 				}
 
 				// Process the file as an archive, if necessary
@@ -315,7 +317,7 @@ namespace SabreTools
 						foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
 						{
 							_logger.User("Processing extracted file " + file);
-							ArchiveTools.WriteTorrentGZ(file, _outdir, _romba, _logger);
+							success &= ArchiveTools.WriteTorrentGZ(file, _outdir, _romba, _logger);
 						}
 					}
 				}
@@ -331,6 +333,7 @@ namespace SabreTools
 					catch (Exception ex)
 					{
 						_logger.Error(ex.ToString());
+						success &= false;
 					}
 				}
 			}
@@ -348,7 +351,7 @@ namespace SabreTools
 				}
 			}
 
-			return true;
+			return success;
 		}
 	}
 }
