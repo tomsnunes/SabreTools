@@ -1603,7 +1603,7 @@ namespace SabreTools.Helper
 				// Modify the Dictionary if necessary and output the results
 				if (diff != 0 && cascade == null)
 				{
-					DiffNoCascade(outputDirectory, userData, newInputFileNames, logger);
+					DiffNoCascade(diff, outputDirectory, userData, newInputFileNames, logger);
 				}
 				// If we're in cascade and diff, output only cascaded diffs
 				else if (diff != 0 && cascade != null)
@@ -1924,41 +1924,56 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Output non-cascading diffs
 		/// </summary>
+		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
 		/// <param name="outdir">Output directory to write the DATs to</param>
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void DiffNoCascade(string outdir, Dat userData, List<string> inputs, Logger logger)
+		public static void DiffNoCascade(DiffMode diff, string outdir, Dat userData, List<string> inputs, Logger logger)
 		{
 			DateTime start = DateTime.Now;
 			logger.User("Initializing all output DATs");
 
+			// Default vars for use
+			string post = "";
+			Dat outerDiffData = new Dat();
+			Dat dupeData = new Dat();
+
 			// Don't have External dupes
-			string post = " (No Duplicates)";
-			Dat outerDiffData = (Dat)userData.CloneHeader();
-			outerDiffData.FileName += post;
-			outerDiffData.Name += post;
-			outerDiffData.Description += post;
+			if ((diff & DiffMode.NoDupes) != 0)
+			{
+				post = " (No Duplicates)";
+				outerDiffData = (Dat)userData.CloneHeader();
+				outerDiffData.FileName += post;
+				outerDiffData.Name += post;
+				outerDiffData.Description += post;
+			}
 
 			// Have External dupes
-			post = " (Duplicates)";
-			Dat dupeData = (Dat)userData.CloneHeader();
-			dupeData.FileName += post;
-			dupeData.Name += post;
-			dupeData.Description += post;
+			if ((diff & DiffMode.Dupes) != 0)
+			{
+				post = " (Duplicates)";
+				dupeData = (Dat)userData.CloneHeader();
+				dupeData.FileName += post;
+				dupeData.Name += post;
+				dupeData.Description += post;
+			}
 
 			// Create a list of DatData objects representing individual output files
 			List<Dat> outDats = new List<Dat>();
 
 			// Loop through each of the inputs and get or create a new DatData object
-			for (int j = 0; j < inputs.Count; j++)
+			if ((diff & DiffMode.Individuals) != 0)
 			{
-				post = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
-				Dat diffData = (Dat)userData.CloneHeader();
-				diffData.FileName += post;
-				diffData.Name += post;
-				diffData.Description += post;
-				outDats.Add(diffData);
+				for (int j = 0; j < inputs.Count; j++)
+				{
+					post = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
+					Dat diffData = (Dat)userData.CloneHeader();
+					diffData.FileName += post;
+					diffData.Name += post;
+					diffData.Description += post;
+					outDats.Add(diffData);
+				}
 			}
 			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -1975,51 +1990,63 @@ namespace SabreTools.Helper
 					foreach (Rom rom in roms)
 					{
 						// No duplicates
-						if (rom.Dupe < DupeType.ExternalHash)
+						if ((diff & DiffMode.NoDupes) != 0 || (diff & DiffMode.Individuals) != 0)
 						{
-							// Individual DATs that are output
-							if (outDats[rom.Metadata.SystemID].Roms.ContainsKey(key))
+							if (rom.Dupe < DupeType.ExternalHash)
 							{
-								outDats[rom.Metadata.SystemID].Roms[key].Add(rom);
-							}
-							else
-							{
-								List<Rom> tl = new List<Rom>();
-								tl.Add(rom);
-								outDats[rom.Metadata.SystemID].Roms.Add(key, tl);
-							}
+								// Individual DATs that are output
+								if ((diff & DiffMode.Individuals) != 0)
+								{
+									if (outDats[rom.Metadata.SystemID].Roms.ContainsKey(key))
+									{
+										outDats[rom.Metadata.SystemID].Roms[key].Add(rom);
+									}
+									else
+									{
+										List<Rom> tl = new List<Rom>();
+										tl.Add(rom);
+										outDats[rom.Metadata.SystemID].Roms.Add(key, tl);
+									}
+								}
 
-							// Merged no-duplicates DAT
-							Rom newrom = rom;
-							newrom.Game += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
+								// Merged no-duplicates DAT
+								if ((diff & DiffMode.NoDupes) != 0)
+								{
+									Rom newrom = rom;
+									newrom.Game += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
 
-							if (outerDiffData.Roms.ContainsKey(key))
-							{
-								outerDiffData.Roms[key].Add(newrom);
-							}
-							else
-							{
-								List<Rom> tl = new List<Rom>();
-								tl.Add(rom);
-								outerDiffData.Roms.Add(key, tl);
+									if (outerDiffData.Roms.ContainsKey(key))
+									{
+										outerDiffData.Roms[key].Add(newrom);
+									}
+									else
+									{
+										List<Rom> tl = new List<Rom>();
+										tl.Add(rom);
+										outerDiffData.Roms.Add(key, tl);
+									}
+								}
 							}
 						}
 
 						// Duplicates only
-						if (rom.Dupe >= DupeType.ExternalHash)
+						if ((diff & DiffMode.Dupes) != 0)
 						{
-							Rom newrom = rom;
-							newrom.Game += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
+							if (rom.Dupe >= DupeType.ExternalHash)
+							{
+								Rom newrom = rom;
+								newrom.Game += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
 
-							if (dupeData.Roms.ContainsKey(key))
-							{
-								dupeData.Roms[key].Add(newrom);
-							}
-							else
-							{
-								List<Rom> tl = new List<Rom>();
-								tl.Add(rom);
-								dupeData.Roms.Add(key, tl);
+								if (dupeData.Roms.ContainsKey(key))
+								{
+									dupeData.Roms[key].Add(newrom);
+								}
+								else
+								{
+									List<Rom> tl = new List<Rom>();
+									tl.Add(rom);
+									dupeData.Roms.Add(key, tl);
+								}
 							}
 						}
 					}
