@@ -2066,21 +2066,30 @@ namespace SabreTools.Helper
 			logger.User("Outputting all created DATs");
 
 			// Output the difflist (a-b)+(b-a) diff
-			Output.WriteDatfile(outerDiffData, outdir, logger);
+			if ((diff & DiffMode.NoDupes) != 0)
+			{
+				Output.WriteDatfile(outerDiffData, outdir, logger);
+			}
 
 			// Output the (ab) diff
-			Output.WriteDatfile(dupeData, outdir, logger);
+			if ((diff & DiffMode.Dupes) != 0)
+			{
+				Output.WriteDatfile(dupeData, outdir, logger);
+			}
 
 			// Output the individual (a-b) DATs
-			for (int j = 0; j < inputs.Count; j++)
+			if ((diff & DiffMode.Individuals) != 0)
 			{
-				// If we have an output directory set, replace the path
-				string path = outdir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
-
-				// If we have more than 0 roms, output
-				if (outDats[j].Roms.Count > 0)
+				for (int j = 0; j < inputs.Count; j++)
 				{
-					Output.WriteDatfile(outDats[j], path, logger);
+					// If we have an output directory set, replace the path
+					string path = outdir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
+
+					// If we have more than 0 roms, output
+					if (outDats[j].Roms.Count > 0)
+					{
+						Output.WriteDatfile(outDats[j], path, logger);
+					}
 				}
 			}
 			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
