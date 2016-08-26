@@ -85,7 +85,6 @@ namespace SabreTools
 				datfromdir = false,
 				datprefix = false,
 				dedup = false,
-				diff = false,
 				enableGzip = false,
 				extsplit = false,
 				fake = false,
@@ -123,6 +122,7 @@ namespace SabreTools
 			bool? cascade = null,
 				nodump = null,
 				tsv = null;
+			DiffMode diff = 0x0;
 			long sgt = -1,
 				slt = -1,
 				seq = -1;
@@ -225,7 +225,19 @@ namespace SabreTools
 						break;
 					case "-di":
 					case "--diff":
-						diff = true;
+						diff |= DiffMode.All;
+						break;
+					case "-did":
+					case "--diff-du":
+						diff |= DiffMode.Dupes;
+						break;
+					case "-dii":
+					case "--diff-in":
+						diff |= DiffMode.Individuals;
+						break;
+					case "-din":
+					case "--diff-nd":
+						diff |= DiffMode.NoDupes;
 						break;
 					case "-es":
 					case "--ext-split":
@@ -583,7 +595,7 @@ namespace SabreTools
 
 			// If more than one switch is enabled, show the help screen
 			if (!(add ^ datfromdir ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^
-				(merge || diff || update || outputCMP || outputRC || outputSD || outputXML || outputMiss || tsv != null|| trim) ^
+				(merge || diff != 0 || update || outputCMP || outputRC || outputSD || outputXML || outputMiss || tsv != null|| trim) ^
 				offlineMerge ^ rem ^ stats))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
@@ -594,7 +606,7 @@ namespace SabreTools
 
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (inputs.Count == 0 && (update || (outputMiss || tsv != null) || outputCMP || outputRC || outputSD
-				|| outputXML || extsplit || hashsplit || datfromdir || (merge || diff) || stats || trim))
+				|| outputXML || extsplit || hashsplit || datfromdir || (merge || diff != 0) || stats || trim))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -637,7 +649,7 @@ namespace SabreTools
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
-			else if (update || outputCMP || outputMiss || tsv != null || outputRC || outputSD || outputXML || merge || diff)
+			else if (update || outputCMP || outputMiss || tsv != null || outputRC || outputSD || outputXML || merge || diff != 0)
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,

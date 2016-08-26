@@ -1519,7 +1519,7 @@ namespace SabreTools.Helper
 		/// <param name="datdata">User specified inputs contained in a DatData object</param>
 		/// <param name="outputDirectory">Optional param for output directory</param>
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
-		/// <param name="diff">True if the input files should be diffed with each other, false otherwise</param>
+		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
 		/// <param name="cascade">True if the diffed files should be cascade diffed, false if diffed files should be reverse cascaded, null otherwise</param>
 		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
@@ -1540,12 +1540,12 @@ namespace SabreTools.Helper
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void Update(List<string> inputFileNames, Dat datdata, string outputDirectory, bool merge, bool diff, bool? cascade, bool inplace,
+		public static void Update(List<string> inputFileNames, Dat datdata, string outputDirectory, bool merge, DiffMode diff, bool? cascade, bool inplace,
 			bool skip, bool bare, bool clean, bool softlist, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
 			string md5, string sha1, bool? nodump, bool trim, bool single, string root, Logger logger)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
-			if (merge || diff)
+			if (merge || diff != 0)
 			{
 				// Make sure there are no folders in inputs
 				List<string> newInputFileNames = new List<string>();
@@ -1601,12 +1601,12 @@ namespace SabreTools.Helper
 				userData = Filter(userData, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
 
 				// Modify the Dictionary if necessary and output the results
-				if (diff && cascade == null)
+				if (diff != 0 && cascade == null)
 				{
 					DiffNoCascade(outputDirectory, userData, newInputFileNames, logger);
 				}
 				// If we're in cascade and diff, output only cascaded diffs
-				else if (diff && cascade != null)
+				else if (diff != 0 && cascade != null)
 				{
 					DiffCascade(outputDirectory, inplace, userData, newInputFileNames, datHeaders, skip, logger);
 				}

@@ -110,7 +110,7 @@ namespace SabreTools
 		/// <param name="tsv">True to output files in TSV format, false to output files in CSV format, null otherwise</param>
 		/// /* Merging and Diffing info */
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
-		/// <param name="diff">True if the input files should be diffed with each other, false otherwise</param>
+		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
 		/// <param name="cascade">True if the diffed files should be cascade diffed, false if diffed files should be reverse cascaded, null otherwise</param>
 		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
@@ -173,7 +173,7 @@ namespace SabreTools
 
 			/* Merging and Diffing info */
 			bool merge,
-			bool diff,
+			DiffMode diff,
 			bool? cascade,
 			bool inplace,
 			bool skip,
@@ -256,7 +256,7 @@ namespace SabreTools
 			repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
 
 			// If we're in merge or diff mode and the names aren't set, set defaults
-			if (merge || diff)
+			if (merge || diff != 0)
 			{
 				// Get the values that will be used
 				if (date == "")
@@ -265,17 +265,17 @@ namespace SabreTools
 				}
 				if (name == "")
 				{
-					name = (diff ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup ? "-deduped" : "");
+					name = (diff != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup ? "-deduped" : "");
 				}
 				if (description == "")
 				{
-					description = (diff ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup ? " - deduped" : "");
+					description = (diff != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup ? " - deduped" : "");
 					if (!bare)
 					{
 						description += " (" + date + ")";
 					}
 				}
-				if (category == "" && diff)
+				if (category == "" && diff != 0)
 				{
 					category = "DiffDAT";
 				}
@@ -350,7 +350,7 @@ namespace SabreTools
 			}
 			if (!outputCMP && !(outputMiss || tsv != null) && !outputRC && !outputSD && !outputXML)
 			{
-				if (merge || diff)
+				if (merge || diff != 0)
 				{
 					userInputDat.OutputFormat = OutputFormat.Xml;
 				}
