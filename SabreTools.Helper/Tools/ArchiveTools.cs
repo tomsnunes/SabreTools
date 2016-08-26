@@ -286,6 +286,23 @@ namespace SabreTools.Helper
 						}
 					}
 				}
+				else if (at == ArchiveType.GZip)
+				{
+					// Dispose the original reader
+					reader.Dispose();
+
+					using(FileStream itemstream = File.OpenRead(input))
+					{
+						using (FileStream outstream = File.Create(Path.Combine(tempdir, Path.GetFileNameWithoutExtension(input))))
+						{
+							using (GZipStream gzstream = new GZipStream(itemstream, CompressionMode.Decompress))
+							{
+								gzstream.CopyTo(outstream);
+								outfile = Path.GetFullPath(Path.Combine(tempdir, Path.GetFileNameWithoutExtension(input)));
+							}
+						}
+					}
+				}
 			}
 			catch (Exception ex)
 			{
@@ -487,8 +504,25 @@ namespace SabreTools.Helper
 			IReader reader = null;
 			try
 			{
-				reader = ReaderFactory.Open(File.OpenRead(input));
 				logger.Log("Found archive of type: " + at);
+				long size = 0;
+				string crc = "";
+
+				// If we have a gzip file, get the crc directly
+				if (at == ArchiveType.GZip)
+				{
+					// Get the CRC and size from the file
+					using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+					{
+						br.BaseStream.Seek(-8, SeekOrigin.End);
+						byte[] headercrc = br.ReadBytes(4);
+						crc = BitConverter.ToString(headercrc.Reverse().ToArray()).Replace("-", string.Empty).ToLowerInvariant();
+						byte[] headersize = br.ReadBytes(4);
+						size = BitConverter.ToInt32(headersize.Reverse().ToArray(), 0);
+					}
+				}
+
+				reader = ReaderFactory.Open(File.OpenRead(input));
 
 				if (at != ArchiveType.Tar)
 				{
@@ -496,15 +530,17 @@ namespace SabreTools.Helper
 					{
 						if (reader.Entry != null && !reader.Entry.IsDirectory)
 						{
-							logger.Log("Entry found: '" + reader.Entry.Key + "': " + reader.Entry.Size + ", " + reader.Entry.Crc.ToString("X").ToLowerInvariant());
+							logger.Log("Entry found: '" + reader.Entry.Key + "': "
+								+ (size == 0 ? reader.Entry.Size : size) + ", "
+								+ (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc));
 
 							roms.Add(new Rom
 							{
 								Type = "rom",
 								Name = reader.Entry.Key,
 								Game = gamename,
-								Size = reader.Entry.Size,
-								CRC = reader.Entry.Crc.ToString("X").ToLowerInvariant(),
+								Size = (size == 0 ? reader.Entry.Size : size),
+								CRC = (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc),
 							});
 						}
 					}
@@ -570,35 +606,44 @@ namespace SabreTools.Helper
 			}
 
 			// Get the Romba-specific header data
+			byte[] header; // Get preamble header for checking
+			byte[] headercheck = new byte[] { 0x1f, 0x8b, 0x8, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1c, 0x0 };
 			byte[] headermd5; // MD5
 			byte[] headercrc; // CRC
 			byte[] headersz; // Int64 size
-			using (FileStream itemstream = File.OpenRead(input))
+			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
 			{
-				using (BinaryReader br = new BinaryReader(itemstream))
-				{
-					br.BaseStream.Seek(12, SeekOrigin.Begin);
-					headermd5 = br.ReadBytes(16);
-					headercrc = br.ReadBytes(4);
-					headersz = br.ReadBytes(8);
-				}
+				header = br.ReadBytes(12);
+				headermd5 = br.ReadBytes(16);
+				headercrc = br.ReadBytes(4);
+				headersz = br.ReadBytes(8);
+			}
+
+			// If the header is not correct, return a blank rom
+			bool correct = true;
+			for (int i = 0; i < header.Length; i++)
+			{
+				correct &= (header[i] == headercheck[i]);
+			}
+			if (!correct)
+			{
+				return new Rom();
 			}
 
 			// Now convert the data and get the right position
 			string gzmd5 = BitConverter.ToString(headermd5).Replace("-", string.Empty);
 			string gzcrc = BitConverter.ToString(headercrc).Replace("-", string.Empty);
-			string gzsize = BitConverter.ToString(headersz.Reverse().ToArray()).Replace("-", string.Empty);
-			long extractedsize = Convert.ToInt64(gzsize, 16);
+			long extractedsize = (long)BitConverter.ToUInt64(headersz.Reverse().ToArray(), 0);
 
 			Rom rom = new Rom
 			{
 				Type = "rom",
-				Game = Path.GetFileNameWithoutExtension(input),
-				Name = Path.GetFileNameWithoutExtension(input),
+				Game = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
+				Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 				Size = extractedsize,
-				CRC = gzcrc,
-				MD5 = gzmd5,
-				SHA1 = Path.GetFileNameWithoutExtension(input),
+				CRC = gzcrc.ToLowerInvariant(),
+				MD5 = gzmd5.ToLowerInvariant(),
+				SHA1 = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 			};
 
 			return rom;
