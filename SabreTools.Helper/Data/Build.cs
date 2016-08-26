@@ -172,7 +172,7 @@ Options:
 	-dd, --dedup		Enable deduping in the created DAT
 	-m, --merge		Merge the input DATs
 		-b, --bare		Don't include date in automatic name
-	-di, --diff		Create diffdats from inputs
+	-di, --diff		Create diffdats from inputs (all outputs)
 		-b, --bare		Don't include date in automatic name
 		-c, --cascade		Enable cascaded diffing
 			-ip, --inplace		Enable inplace, cascaded diff
@@ -180,6 +180,15 @@ Options:
 		-rc, --rev-cascade	Enable reverse cascaded diffing
 			-ip, --inplace		Enable inplace, cascaded diff
 			-sf, --skip		Skip output of first DAT
+	-did, --diff-du	Create diffdat containing just duplicates
+		[Can be used with other -diX flags]
+		-b, --bare		Don't include date in automatic name
+	-dii, --diff-in	Create diffdats for individual DATs
+		[Can be used with other -diX flags]
+		-b, --bare		Don't include date in automatic name
+	-din, --diff-nd	Create diffdat containing no duplicates
+		[Can be used with other -diX flags]
+		-b, --bare		Don't include date in automatic name
 	-gn=, --game-name=	Filter by game name
 	-rn=, --rom-name=	Filter by rom name
 	-rt=, --rom-type=	Filter by rom type
