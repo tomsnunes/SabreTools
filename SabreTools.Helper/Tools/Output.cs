@@ -44,6 +44,40 @@ namespace SabreTools.Helper
 			// Create the output directory if it doesn't already exist
 			Directory.CreateDirectory(outDir);
 
+			// Make sure that the three essential fields are filled in
+			if (String.IsNullOrEmpty(datdata.FileName) && String.IsNullOrEmpty(datdata.Name) && String.IsNullOrEmpty(datdata.Description))
+			{
+				datdata.FileName = datdata.Name = datdata.Description = "Default";
+			}
+			else if (String.IsNullOrEmpty(datdata.FileName) && String.IsNullOrEmpty(datdata.Name) && !String.IsNullOrEmpty(datdata.Description))
+			{
+				datdata.FileName = datdata.Name = datdata.Description;
+			}
+			else if (String.IsNullOrEmpty(datdata.FileName) && !String.IsNullOrEmpty(datdata.Name) && String.IsNullOrEmpty(datdata.Description))
+			{
+				datdata.FileName = datdata.Description = datdata.Name;
+			}
+			else if (String.IsNullOrEmpty(datdata.FileName) && !String.IsNullOrEmpty(datdata.Name) && !String.IsNullOrEmpty(datdata.Description))
+			{
+				datdata.FileName = datdata.Description;
+			}
+			else if (!String.IsNullOrEmpty(datdata.FileName) && String.IsNullOrEmpty(datdata.Name) && String.IsNullOrEmpty(datdata.Description))
+			{
+				datdata.Name = datdata.Description = datdata.FileName;
+			}
+			else if (!String.IsNullOrEmpty(datdata.FileName) && String.IsNullOrEmpty(datdata.Name) && !String.IsNullOrEmpty(datdata.Description))
+			{
+				datdata.Name = datdata.Description;
+			}
+			else if (!String.IsNullOrEmpty(datdata.FileName) && !String.IsNullOrEmpty(datdata.Name) && String.IsNullOrEmpty(datdata.Description))
+			{
+				datdata.Description = datdata.Name;
+			}
+			else if (!String.IsNullOrEmpty(datdata.FileName) && !String.IsNullOrEmpty(datdata.Name) && !String.IsNullOrEmpty(datdata.Description))
+			{
+				// Nothing is needed
+			}
+
 			// Get the outfile name
 			string outfile = Style.CreateOutfileName(outDir, datdata);
 
