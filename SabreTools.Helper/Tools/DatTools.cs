@@ -1692,6 +1692,8 @@ namespace SabreTools.Helper
 		private static List<Dat> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool softlist, string outdir, Dat inputDat, out Dat userData, Logger logger)
 		{
 			List<Dat> datHeaders = new List<Dat>();
+			DateTime start = DateTime.Now;
+			logger.User("Populating internal DAT");
 
 			int i = 0;
 			userData = new Dat
@@ -1721,6 +1723,8 @@ namespace SabreTools.Helper
 			Dictionary<string, List<Rom>> roms = userData.Roms;
 			userData = (Dat)inputDat.CloneHeader();
 			userData.Roms = roms;
+
+			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			return datHeaders;
 		}
