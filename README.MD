@@ -67,13 +67,24 @@ A simple rebuild-from-DAT tool that allows users to sort from the commandline.
 	<li>Rebuild from multiple sources</li>
 	<li>Single DAT and output directory support</li>
 	<li>Header skipper support</li>
+	<li>Verify a folder against a DAT (create a fixDat)</li>
+	<li>Rebuild to TGZ archives</li>
+	<li>Rebuild to Romba depot</li>
 </ul>
 
 <h3>Power User Tools</h3>
 
 This section is for tools that have been requested for a highly specific purpose and are not generally going to be used by regular users. All of them have a possibility of being included in the main DATabase program eventually.
 
-<b>There are no standalone tools that are for power users at this time.</b>
+<!-- <b>There are no standalone tools that are for power users at this time.</b> -->
+
+<b>TGZTest</b>
+<p/>
+A simple tool to convert a folder to TGZ, optionally to a specific folder.
+<ul>
+	<li>Optionally delete source files (if possible)</li>
+	<li>Create a Romba depot from an input folder</li>
+</ul>
 
 <h3>Licensing</h3>
 <p/>
