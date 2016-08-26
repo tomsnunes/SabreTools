@@ -79,6 +79,13 @@ namespace SabreTools.Helper
 		/// <returns>DatData object representing the read-in data</returns>
 		public static Dat Parse(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep = false, bool clean = false, bool softlist = false, bool keepext = false)
 		{
+			// Check the file extension first as a safeguard
+			string ext = Path.GetExtension(filename).ToLowerInvariant();
+			if (ext != ".txt" && ext != ".dat" && ext != ".xml")
+			{
+				return datdata;
+			}
+
 			// If the output filename isn't set already, get the internal filename
 			datdata.FileName = (String.IsNullOrEmpty(datdata.FileName) ? (keepext ? Path.GetFileName(filename) : Path.GetFileNameWithoutExtension(filename)) : datdata.FileName);
 
