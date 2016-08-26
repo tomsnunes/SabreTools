@@ -1,4 +1,6 @@
-﻿namespace SabreTools.Helper
+﻿using System;
+
+namespace SabreTools.Helper
 {
 	/// <summary>
 	/// Possible DAT import classes
@@ -144,5 +146,17 @@
 		Equal = 0,
 		Less,
 		Greater,
+	}
+
+	/// <summary>
+	/// Determines which diffs should be created
+	/// </summary>
+	[Flags]
+	public enum DiffMode
+	{
+		Dupes = 0x01,
+		NoDupes = 0x02,
+		Individuals = 0x04,
+		All = Dupes | NoDupes | Individuals,
 	}
 }
