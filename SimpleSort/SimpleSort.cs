@@ -215,6 +215,8 @@ namespace SabreTools
 							logger.Error("Invalid input detected: " + arg);
 							Console.WriteLine();
 							Build.Help();
+							Console.WriteLine();
+							logger.Error("Invalid input detected: " + arg);
 							logger.Close();
 							return;
 						}
