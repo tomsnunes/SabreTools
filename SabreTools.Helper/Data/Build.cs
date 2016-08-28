@@ -69,10 +69,9 @@ namespace SabreTools.Helper
 			switch (className)
 			{
 				case "SabreTools":
-					Console.Write(@"
-SabreTools - Import, generate, manipulate DAT files
+					Console.Write(Resources.Resources.SabreTools_Name + " - " + Resources.Resources.SabreTools_Desc + @"
 -----------------------------------------
-Usage: SabreTools [option] [filename|dirname] ...
+" + Resources.Resources.Usage + ": " + Resources.Resources.SabreTools_Name + @" [option] [filename|dirname] ...
 
 Options:
   -?, -h, --help	Show this help
@@ -225,18 +224,18 @@ Offline merge mode notes:
 ");
 					break;
 				case "Headerer":
-					Console.WriteLine(@"Headerer - Remove and restore rom headers
+					Console.WriteLine(Resources.Resources.Headerer_Name + " - " + Resources.Resources.Headerer_Desc + @"
 -----------------------------------------
-Usage: Headerer [option] [filename|dirname]
+" + Resources.Resources.Usage + ": " + Resources.Resources.Headerer_Name + @" [option] [filename|dirname]
 
 Options:
   -e			Detect and remove mode
   -r			Restore header to file based on SHA-1");
 					break;
 				case "SimpleSort":
-					Console.WriteLine(@"SimpleSort - Basic rebuild using a DAT
+					Console.WriteLine(Resources.Resources.SimpleSort_Name + " - " + Resources.Resources.SimpleSort_Desc + @"
 -----------------------------------------
-Usage: SimpleSort [options] [filename|dirname] ...
+" + Resources.Resources.Usage + ": " + Resources.Resources.SimpleSort_Name + @" [options] [filename|dirname] ...
 
 Options:
   -?, -h, --help	Show this help
@@ -260,9 +259,9 @@ Archive scanning levels:
 ");
 					break;
 				case "TGZTest":
-					Console.WriteLine(@"TGZTest - Test TorrentGZ output
+					Console.WriteLine(Resources.Resources.TGZTest_Name + " - " + Resources.Resources.TGZTest_Desc + @"
 -----------------------------------------
-Usage: TGZTest [options] [filename|dirname] ...
+" + Resources.Resources.Usage + ": " + Resources.Resources.TGZTest_Name + @" [options] [filename|dirname] ...
 
 Options:
   -?, -h, --help	Show this help
@@ -281,7 +280,7 @@ Archive scanning levels:
   2	Only hash archive");
                     break;
 				default:
-					Console.Write("This is the default help output");
+					Console.Write(Resources.Resources.Default_Desc);
 					break;
 			}
 		}
