@@ -32,7 +32,7 @@ namespace SabreTools.Helper
 			}
 			
 			// Bucket roms by game name and optionally dedupe
-			SortedDictionary<string, List<Rom>> sortable = DatTools.BucketByGame(datdata.Roms, datdata.MergeRoms, norename, logger);
+			SortedDictionary<string, List<File>> sortable = DatTools.BucketByGame(datdata.Roms, datdata.MergeRoms, norename, logger);
 
 			// Now write out to file
 			// If it's empty, use the current folder
@@ -85,7 +85,7 @@ namespace SabreTools.Helper
 
 			try
 			{
-				FileStream fs = File.Create(outfile);
+				FileStream fs = System.IO.File.Create(outfile);
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
 				// Write out the header
@@ -95,11 +95,11 @@ namespace SabreTools.Helper
 				int depth = 2, last = -1;
 				string lastgame = null;
 				List<string> splitpath = new List<string>();
-				foreach (List<Rom> roms in sortable.Values)
+				foreach (List<File> roms in sortable.Values)
 				{
 					for (int index = 0; index < roms.Count; index++)
 					{
-						Rom rom = roms[index];
+						File rom = roms[index];
 						List<string> newsplit = rom.Machine.Name.Split('\\').ToList();
 
 						// If we have a different game and we're not at the start of the list, output the end of last item
@@ -285,7 +285,7 @@ namespace SabreTools.Helper
 		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>The new depth of the tag</returns>
-		public static int WriteStartGame(StreamWriter sw, Rom rom, List<string> newsplit, string lastgame, Dat datdata, int depth, int last, Logger logger)
+		public static int WriteStartGame(StreamWriter sw, File rom, List<string> newsplit, string lastgame, Dat datdata, int depth, int last, Logger logger)
 		{
 			try
 			{
@@ -344,7 +344,7 @@ namespace SabreTools.Helper
 		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>The new depth of the tag</returns>
-		public static int WriteEndGame(StreamWriter sw, Rom rom, List<string> splitpath, List<string> newsplit, string lastgame, Dat datdata, int depth, out int last, Logger logger)
+		public static int WriteEndGame(StreamWriter sw, File rom, List<string> splitpath, List<string> newsplit, string lastgame, Dat datdata, int depth, out int last, Logger logger)
 		{
 			last = 0;
 
@@ -413,7 +413,7 @@ namespace SabreTools.Helper
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		public static bool WriteRomData(StreamWriter sw, Rom rom, string lastgame, Dat datdata, int depth, Logger logger)
+		public static bool WriteRomData(StreamWriter sw, File rom, string lastgame, Dat datdata, int depth, Logger logger)
 		{
 			try
 			{
@@ -619,7 +619,7 @@ namespace SabreTools.Helper
 			{
 				try
 				{
-					File.Delete(file);
+					System.IO.File.Delete(file);
 				}
 				catch { }
 			}
@@ -643,14 +643,14 @@ namespace SabreTools.Helper
 		public static void RemoveBytesFromFile(string input, string output, long bytesToRemoveFromHead, long bytesToRemoveFromTail)
 		{
 			// If any of the inputs are invalid, skip
-			if (!File.Exists(input) || new FileInfo(input).Length <= (bytesToRemoveFromHead + bytesToRemoveFromTail))
+			if (!System.IO.File.Exists(input) || new FileInfo(input).Length <= (bytesToRemoveFromHead + bytesToRemoveFromTail))
 			{
 				return;
 			}
 
 			// Read the input file and write to the fail
-			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
-			using (BinaryWriter bw = new BinaryWriter(File.OpenWrite(output)))
+			using (BinaryReader br = new BinaryReader(System.IO.File.OpenRead(input)))
+			using (BinaryWriter bw = new BinaryWriter(System.IO.File.OpenWrite(output)))
 			{
 				int bufferSize = 1024;
 				long adjustedLength = br.BaseStream.Length - bytesToRemoveFromTail;
@@ -708,13 +708,13 @@ namespace SabreTools.Helper
 		public static void AppendBytesToFile(string input, string output, byte[] bytesToAddToHead, byte[] bytesToAddToTail)
 		{
 			// If any of the inputs are invalid, skip
-			if (!File.Exists(input))
+			if (!System.IO.File.Exists(input))
 			{
 				return;
 			}
 
-			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
-			using (BinaryWriter bw = new BinaryWriter(File.OpenWrite(output)))
+			using (BinaryReader br = new BinaryReader(System.IO.File.OpenRead(input)))
+			using (BinaryWriter bw = new BinaryWriter(System.IO.File.OpenWrite(output)))
 			{
 				if (bytesToAddToHead.Count() > 0)
 				{
@@ -751,13 +751,13 @@ namespace SabreTools.Helper
 		/// <param name="output">Output filename</param>
 		public static void CopyFileToNewLocation(string input, string output)
 		{
-			if (File.Exists(input) && !File.Exists(output))
+			if (System.IO.File.Exists(input) && !System.IO.File.Exists(output))
 			{
 				if (!Directory.Exists(Path.GetDirectoryName(output)))
 				{
 					Directory.CreateDirectory(Path.GetDirectoryName(output));
 				}
-				File.Copy(input, output);
+				System.IO.File.Copy(input, output);
 			}
 		}
 		}

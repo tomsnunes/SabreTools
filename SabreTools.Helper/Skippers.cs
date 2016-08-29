@@ -74,7 +74,7 @@ namespace SabreTools.Helper
 				Rules = new List<SkipperRule>(),
 			};
 
-			if (!File.Exists(filename))
+			if (!System.IO.File.Exists(filename))
 			{
 				return skipper;
 			}
@@ -319,7 +319,7 @@ namespace SabreTools.Helper
 			SkipperRule skipperRule = new SkipperRule();
 
 			// If the file doesn't exist, return a blank skipper rule
-			if (!File.Exists(input))
+			if (!System.IO.File.Exists(input))
 			{
 				logger.Error("The file '" + input + "' does not exist so it cannot be tested");
 				return skipperRule;
@@ -332,7 +332,7 @@ namespace SabreTools.Helper
 				if (String.IsNullOrEmpty(skippername) || (!String.IsNullOrEmpty(skipper.Name) && skippername.ToLowerInvariant() == skipper.Name.ToLowerInvariant()))
 				{
 					// Loop through the rules until one is found that works
-					using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+					using (BinaryReader br = new BinaryReader(System.IO.File.OpenRead(input)))
 					{
 						foreach (SkipperRule rule in skipper.Rules)
 						{
@@ -495,7 +495,7 @@ namespace SabreTools.Helper
 			bool success = true;
 
 			// If the input file doesn't exist, fail
-			if (!File.Exists(input))
+			if (!System.IO.File.Exists(input))
 			{
 				logger.Error("I'm sorry but '" + input + "' doesn't exist!");
 				return false;
@@ -521,8 +521,8 @@ namespace SabreTools.Helper
 			try
 			{
 				logger.User("Applying found rule to file '" + input + "'");
-				using (BinaryWriter bw = new BinaryWriter(File.OpenWrite(output)))
-				using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+				using (BinaryWriter bw = new BinaryWriter(System.IO.File.OpenWrite(output)))
+				using (BinaryReader br = new BinaryReader(System.IO.File.OpenRead(input)))
 				{
 					// Seek to the beginning offset
 					if (rule.StartOffset == null)
@@ -619,7 +619,7 @@ namespace SabreTools.Helper
 			{
 				try
 				{
-					File.Delete(output);
+					System.IO.File.Delete(output);
 				}
 				catch
 				{
@@ -663,7 +663,7 @@ namespace SabreTools.Helper
 			XmlDocument doc = new XmlDocument();
 			try
 			{
-				doc.LoadXml(File.ReadAllText(System.IO.Path.Combine(Path, skipper + ".xml")));
+				doc.LoadXml(System.IO.File.ReadAllText(System.IO.Path.Combine(Path, skipper + ".xml")));
 			}
 			catch (XmlException ex)
 			{
@@ -726,7 +726,7 @@ namespace SabreTools.Helper
 		public static HeaderType GetFileHeaderType(string input, out int hs, Logger logger)
 		{
 			// Open the file in read mode
-			BinaryReader br = new BinaryReader(File.OpenRead(input));
+			BinaryReader br = new BinaryReader(System.IO.File.OpenRead(input));
 
 			// Extract the first 1024 bytes of the file
 			byte[] hbin = br.ReadBytes(1024);

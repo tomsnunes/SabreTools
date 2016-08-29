@@ -19,14 +19,14 @@ namespace SabreTools.Helper
 		/// <param name="input">Input filename to be moved</param>
 		/// <param name="output">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		public static void WriteToArchive(string input, string output, Rom rom)
+		public static void WriteToArchive(string input, string output, File rom)
 		{
 			string archiveFileName = Path.Combine(output, rom.Machine + ".zip");
 
 			System.IO.Compression.ZipArchive outarchive = null;
 			try
 			{
-				if (!File.Exists(archiveFileName))
+				if (!System.IO.File.Exists(archiveFileName))
 				{
 					outarchive = ZipFile.Open(archiveFileName, ZipArchiveMode.Create);
 				}
@@ -35,7 +35,7 @@ namespace SabreTools.Helper
 					outarchive = ZipFile.Open(archiveFileName, ZipArchiveMode.Update);
 				}
 
-				if (File.Exists(input))
+				if (System.IO.File.Exists(input))
 				{
 					if (outarchive.Mode == ZipArchiveMode.Create || outarchive.GetEntry(rom.Name) == null)
 					{
@@ -69,18 +69,18 @@ namespace SabreTools.Helper
 		/// <param name="input">Input filename to be moved</param>
 		/// <param name="output">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		public static void WriteToManagedArchive(string input, string output, Rom rom)
+		public static void WriteToManagedArchive(string input, string output, File rom)
 		{
 			string archiveFileName = Path.Combine(output, rom.Machine + ".zip");
 
 			// Delete an empty file first
-			if (File.Exists(archiveFileName) && new FileInfo(archiveFileName).Length == 0)
+			if (System.IO.File.Exists(archiveFileName) && new FileInfo(archiveFileName).Length == 0)
 			{
-				File.Delete(archiveFileName);
+				System.IO.File.Delete(archiveFileName);
 			}
 
 			// Get if the file should be written out
-			bool newfile = File.Exists(archiveFileName) && new FileInfo(archiveFileName).Length != 0;
+			bool newfile = System.IO.File.Exists(archiveFileName) && new FileInfo(archiveFileName).Length != 0;
 
 			using (SharpCompress.Archive.Zip.ZipArchive archive = (newfile
 				? ArchiveFactory.Open(archiveFileName, Options.LookForHeader) as SharpCompress.Archive.Zip.ZipArchive
@@ -88,7 +88,7 @@ namespace SabreTools.Helper
 			{
 				try
 				{
-					if (File.Exists(input))
+					if (System.IO.File.Exists(input))
 					{
 						archive.AddEntry(rom.Name, input);
 					}
@@ -105,10 +105,10 @@ namespace SabreTools.Helper
 				}
 			}
 
-			if (File.Exists(archiveFileName + ".tmp"))
+			if (System.IO.File.Exists(archiveFileName + ".tmp"))
 			{
-				File.Delete(archiveFileName);
-				File.Move(archiveFileName + ".tmp", archiveFileName);
+				System.IO.File.Delete(archiveFileName);
+				System.IO.File.Move(archiveFileName + ".tmp", archiveFileName);
 			}
 		}
 
@@ -172,7 +172,7 @@ namespace SabreTools.Helper
 			{
 				if (at == ArchiveType.SevenZip && sevenzip != ArchiveScanLevel.External)
 				{
-					sza = SevenZipArchive.Open(File.OpenRead(input));
+					sza = SevenZipArchive.Open(System.IO.File.OpenRead(input));
 					logger.Log("Found archive of type: " + at);
 
 					// Create the temp directory
@@ -189,9 +189,9 @@ namespace SabreTools.Helper
 					// Create the temp directory
 					Directory.CreateDirectory(tempdir);
 
-					using (FileStream itemstream = File.OpenRead(input))
+					using (FileStream itemstream = System.IO.File.OpenRead(input))
 					{
-						using (FileStream outstream = File.Create(Path.Combine(tempdir, Path.GetFileNameWithoutExtension(input))))
+						using (FileStream outstream = System.IO.File.Create(Path.Combine(tempdir, Path.GetFileNameWithoutExtension(input))))
 						{
 							using (GZipStream gzstream = new GZipStream(itemstream, CompressionMode.Decompress))
 							{
@@ -203,7 +203,7 @@ namespace SabreTools.Helper
 				}
 				else
 				{
-					reader = ReaderFactory.Open(File.OpenRead(input));
+					reader = ReaderFactory.Open(System.IO.File.OpenRead(input));
 					logger.Log("Found archive of type: " + at);
 
 					if ((at == ArchiveType.Zip && zip != ArchiveScanLevel.External) ||
@@ -265,7 +265,7 @@ namespace SabreTools.Helper
 			IReader reader = null;
 			try
 			{
-				reader = ReaderFactory.Open(File.OpenRead(input));
+				reader = ReaderFactory.Open(System.IO.File.OpenRead(input));
 
 				if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
 				{
@@ -291,9 +291,9 @@ namespace SabreTools.Helper
 					// Dispose the original reader
 					reader.Dispose();
 
-					using(FileStream itemstream = File.OpenRead(input))
+					using(FileStream itemstream = System.IO.File.OpenRead(input))
 					{
-						using (FileStream outstream = File.Create(Path.Combine(tempdir, Path.GetFileNameWithoutExtension(input))))
+						using (FileStream outstream = System.IO.File.Create(Path.Combine(tempdir, Path.GetFileNameWithoutExtension(input))))
 						{
 							using (GZipStream gzstream = new GZipStream(itemstream, CompressionMode.Decompress))
 							{
@@ -333,7 +333,7 @@ namespace SabreTools.Helper
 
 			// First get the archive types
 			ArchiveType? iat = GetCurrentArchiveType(inputArchive, logger);
-			ArchiveType? oat = (File.Exists(outputArchive) ? GetCurrentArchiveType(outputArchive, logger) : ArchiveType.Zip);
+			ArchiveType? oat = (System.IO.File.Exists(outputArchive) ? GetCurrentArchiveType(outputArchive, logger) : ArchiveType.Zip);
 
 			// If we got back null (or the output is not a Zipfile), then it's not an archive, so we we return
 			if (iat == null || (oat == null || oat != ArchiveType.Zip) || inputArchive == outputArchive)
@@ -345,7 +345,7 @@ namespace SabreTools.Helper
 			System.IO.Compression.ZipArchive outarchive = null;
 			try
 			{
-				reader = ReaderFactory.Open(File.OpenRead(inputArchive));
+				reader = ReaderFactory.Open(System.IO.File.OpenRead(inputArchive));
 
 				if (iat == ArchiveType.Zip || iat == ArchiveType.SevenZip || iat == ArchiveType.Rar)
 				{
@@ -354,7 +354,7 @@ namespace SabreTools.Helper
 						logger.Log("Current entry name: '" + reader.Entry.Key + "'");
 						if (reader.Entry != null && reader.Entry.Key.Contains(sourceEntryName))
 						{
-							if (!File.Exists(outputArchive))
+							if (!System.IO.File.Exists(outputArchive))
 							{
 								outarchive = ZipFile.Open(outputArchive, ZipArchiveMode.Create);
 							}
@@ -407,7 +407,7 @@ namespace SabreTools.Helper
 
 			// First get the archive types
 			ArchiveType? iat = GetCurrentArchiveType(inputArchive, logger);
-			ArchiveType? oat = (File.Exists(outputArchive) ? GetCurrentArchiveType(outputArchive, logger) : ArchiveType.Zip);
+			ArchiveType? oat = (System.IO.File.Exists(outputArchive) ? GetCurrentArchiveType(outputArchive, logger) : ArchiveType.Zip);
 
 			// If we got back null (or the output is not a Zipfile), then it's not an archive, so we we return
 			if (iat == null || (oat == null || oat != ArchiveType.Zip) || inputArchive == outputArchive)
@@ -417,7 +417,7 @@ namespace SabreTools.Helper
 
 			try
 			{
-				using (IReader reader = ReaderFactory.Open(File.OpenRead(inputArchive)))
+				using (IReader reader = ReaderFactory.Open(System.IO.File.OpenRead(inputArchive)))
 				{
 					if (iat == ArchiveType.Zip || iat == ArchiveType.SevenZip || iat == ArchiveType.Rar)
 					{
@@ -427,7 +427,7 @@ namespace SabreTools.Helper
 							if (reader.Entry != null && reader.Entry.Key.Contains(sourceEntryName))
 							{
 								// Get if the file should be written out
-								bool newfile = File.Exists(outputArchive) && new FileInfo(outputArchive).Length != 0;
+								bool newfile = System.IO.File.Exists(outputArchive) && new FileInfo(outputArchive).Length != 0;
 
 								using (SharpCompress.Archive.Zip.ZipArchive archive = (newfile
 									? ArchiveFactory.Open(outputArchive, Options.LookForHeader) as SharpCompress.Archive.Zip.ZipArchive
@@ -447,10 +447,10 @@ namespace SabreTools.Helper
 									}
 								}
 
-								if (File.Exists(outputArchive + ".tmp"))
+								if (System.IO.File.Exists(outputArchive + ".tmp"))
 								{
-									File.Delete(outputArchive);
-									File.Move(outputArchive + ".tmp", outputArchive);
+									System.IO.File.Delete(outputArchive);
+									System.IO.File.Move(outputArchive + ".tmp", outputArchive);
 								}
 
 								success = true;
@@ -474,9 +474,9 @@ namespace SabreTools.Helper
 		/// <param name="input">Input file to get data from</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>List of RomData objects representing the found data</returns>
-		public static List<Rom> GetArchiveFileInfo(string input, Logger logger)
+		public static List<File> GetArchiveFileInfo(string input, Logger logger)
 		{
-			List<Rom> roms = new List<Rom>();
+			List<File> roms = new List<File>();
 			string gamename = Path.GetFileNameWithoutExtension(input);
 
 			// First get the archive type
@@ -491,7 +491,7 @@ namespace SabreTools.Helper
 			// If we got back GZip, try to get TGZ info first
 			else if (at == ArchiveType.GZip)
 			{
-				Rom possibleTgz = GetTorrentGZFileInfo(input, logger);
+				File possibleTgz = GetTorrentGZFileInfo(input, logger);
 
 				// If it was, then add it to the outputs and continue
 				if (possibleTgz.Name != null)
@@ -512,7 +512,7 @@ namespace SabreTools.Helper
 				if (at == ArchiveType.GZip)
 				{
 					// Get the CRC and size from the file
-					using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+					using (BinaryReader br = new BinaryReader(System.IO.File.OpenRead(input)))
 					{
 						br.BaseStream.Seek(-8, SeekOrigin.End);
 						byte[] headercrc = br.ReadBytes(4);
@@ -522,7 +522,7 @@ namespace SabreTools.Helper
 					}
 				}
 
-				reader = ReaderFactory.Open(File.OpenRead(input));
+				reader = ReaderFactory.Open(System.IO.File.OpenRead(input));
 
 				if (at != ArchiveType.Tar)
 				{
@@ -534,7 +534,7 @@ namespace SabreTools.Helper
 								+ (size == 0 ? reader.Entry.Size : size) + ", "
 								+ (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc));
 
-							roms.Add(new Rom
+							roms.Add(new File
 							{
 								Type = ItemType.Rom,
 								Name = reader.Entry.Key,
@@ -570,7 +570,7 @@ namespace SabreTools.Helper
 		/// <param name="input">Filename to get information from</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static Rom GetTorrentGZFileInfo(string input, Logger logger)
+		public static File GetTorrentGZFileInfo(string input, Logger logger)
 		{
 			string datum = Path.GetFileName(input).ToLowerInvariant();
 			long filesize = new FileInfo(input).Length;
@@ -579,14 +579,14 @@ namespace SabreTools.Helper
 			if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}\.gz"))
 			{
 				logger.Warning("Non SHA-1 filename found, skipping: '" + datum + "'");
-				return new Rom();
+				return new File();
 			}
 
 			// Check if the file is at least the minimum length
 			if (filesize < 40 /* bytes */)
 			{
 				logger.Warning("Possibly corrupt file '" + input + "' with size " + Style.GetBytesReadable(filesize));
-				return new Rom();
+				return new File();
 			}
 
 			// Get the Romba-specific header data
@@ -594,7 +594,7 @@ namespace SabreTools.Helper
 			byte[] headermd5; // MD5
 			byte[] headercrc; // CRC
 			byte[] headersz; // Int64 size
-			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+			using (BinaryReader br = new BinaryReader(System.IO.File.OpenRead(input)))
 			{
 				header = br.ReadBytes(12);
 				headermd5 = br.ReadBytes(16);
@@ -610,7 +610,7 @@ namespace SabreTools.Helper
 			}
 			if (!correct)
 			{
-				return new Rom();
+				return new File();
 			}
 
 			// Now convert the data and get the right position
@@ -618,7 +618,7 @@ namespace SabreTools.Helper
 			string gzcrc = BitConverter.ToString(headercrc).Replace("-", string.Empty);
 			long extractedsize = (long)BitConverter.ToUInt64(headersz.Reverse().ToArray(), 0);
 
-			Rom rom = new Rom
+			File rom = new File
 			{
 				Type = ItemType.Rom,
 				Machine = new Machine
@@ -650,7 +650,7 @@ namespace SabreTools.Helper
 		public static bool WriteTorrentGZ(string input, string outdir, bool romba, Logger logger)
 		{
 			// Check that the input file exists
-			if (!File.Exists(input))
+			if (!System.IO.File.Exists(input))
 			{
 				logger.Warning("File " + input + " does not exist!");
 				return false;
@@ -665,12 +665,12 @@ namespace SabreTools.Helper
 			outdir = Path.GetFullPath(outdir);
 
 			// Now get the Rom info for the file so we have hashes and size
-			Rom rom = RomTools.GetSingleFileInfo(input);
+			File rom = RomTools.GetSingleFileInfo(input);
 
 			// If it doesn't exist, create the output file and then write
 			string outfile = Path.Combine(outdir, rom.HashData.SHA1 + ".gz");
 			using (FileStream inputstream = new FileStream(input, FileMode.Open))
-			using (GZipStream output = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress))
+			using (GZipStream output = new GZipStream(System.IO.File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress))
 			{
 				inputstream.CopyTo(output);
 			}
@@ -678,7 +678,7 @@ namespace SabreTools.Helper
 			// Now that it's ready, inject the header info
 			using (BinaryWriter sw = new BinaryWriter(new MemoryStream()))
 			{
-				using (BinaryReader br = new BinaryReader(File.OpenRead(outfile)))
+				using (BinaryReader br = new BinaryReader(System.IO.File.OpenRead(outfile)))
 				{
 					// Write standard header and TGZ info
 					byte[] data = Constants.TorrentGZHeader
@@ -698,7 +698,7 @@ namespace SabreTools.Helper
 					}
 				}
 
-				using (BinaryWriter bw = new BinaryWriter(File.Open(outfile, FileMode.Create)))
+				using (BinaryWriter bw = new BinaryWriter(System.IO.File.Open(outfile, FileMode.Create)))
 				{
 					// Now write the new file over the original
 					sw.BaseStream.Seek(0, SeekOrigin.Begin);
@@ -719,12 +719,12 @@ namespace SabreTools.Helper
 
 				try
 				{
-					File.Move(outfile, Path.Combine(outdir, Path.GetFileName(outfile)));
+					System.IO.File.Move(outfile, Path.Combine(outdir, Path.GetFileName(outfile)));
 				}
 				catch (Exception ex)
 				{
 					logger.Warning(ex.ToString());
-					File.Delete(outfile);
+					System.IO.File.Delete(outfile);
 				}
 			}
 
@@ -754,7 +754,7 @@ namespace SabreTools.Helper
 			try
 			{
 				byte[] magic = new byte[8];
-				using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+				using (BinaryReader br = new BinaryReader(System.IO.File.OpenRead(input)))
 				{
 					magic = br.ReadBytes(8);
 				}

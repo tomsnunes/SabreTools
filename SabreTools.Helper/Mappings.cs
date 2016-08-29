@@ -58,7 +58,7 @@ namespace SabreTools.Helper
 			XmlDocument doc = new XmlDocument();
 			try
 			{
-				doc.LoadXml(File.ReadAllText(Path.Combine(_remappersPath, mapping + ".xml")));
+				doc.LoadXml(System.IO.File.ReadAllText(Path.Combine(_remappersPath, mapping + ".xml")));
 			}
 			catch (XmlException ex)
 			{

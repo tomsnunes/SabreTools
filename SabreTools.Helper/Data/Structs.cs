@@ -44,7 +44,7 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// Intermediate struct for holding and processing rom data
 	/// </summary>
-	public struct Rom : IComparable, IEquatable<Rom>
+	public struct File : IComparable, IEquatable<File>
 	{
 		public Machine Machine;
 		public string Name;
@@ -64,7 +64,7 @@ namespace SabreTools.Helper
 
 			try
 			{
-				Rom comp = (Rom)obj;
+				File comp = (File)obj;
 
 				if (this.Machine.Name == comp.Machine.Name)
 				{
@@ -85,7 +85,7 @@ namespace SabreTools.Helper
 			return ret;
 		}
 
-		public bool Equals(Rom other)
+		public bool Equals(File other)
 		{
 			Logger temp = new Logger(false, "");
 			temp.Start();
@@ -153,7 +153,7 @@ namespace SabreTools.Helper
 		public ForcePacking ForcePacking;
 		public OutputFormat OutputFormat;
 		public bool MergeRoms;
-		public Dictionary<string, List<Rom>> Roms;
+		public Dictionary<string, List<File>> Roms;
 
 		// Data specific to the Miss DAT type
 		public bool UseGame;
@@ -241,7 +241,7 @@ namespace SabreTools.Helper
 				ForcePacking = this.ForcePacking,
 				OutputFormat = this.OutputFormat,
 				MergeRoms = this.MergeRoms,
-				Roms = new Dictionary<string, List<Rom>>(),
+				Roms = new Dictionary<string, List<File>>(),
 				UseGame = this.UseGame,
 				Prefix = this.Prefix,
 				Postfix = this.Postfix,
