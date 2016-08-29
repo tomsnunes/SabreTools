@@ -18,15 +18,15 @@ namespace SabreTools.Helper
 		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
 		/// <remarks>Add read-offset for hash info</remarks>
-		public static File GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false, long offset = 0)
+		public static Rom GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false, long offset = 0)
 		{
 			// Add safeguard if file doesn't exist
 			if (!System.IO.File.Exists(input))
 			{
-				return new File();
+				return new Rom();
 			}
 
-			File rom = new File
+			Rom rom = new Rom
 			{
 				Name = Path.GetFileName(input),
 				Type = ItemType.Rom,
@@ -84,7 +84,7 @@ namespace SabreTools.Helper
 			}
 			catch (IOException)
 			{
-				return new File();
+				return new Rom();
 			}
 
 			return rom;
@@ -96,19 +96,19 @@ namespace SabreTools.Helper
 		/// <param name="inroms">List of RomData objects representing the roms to be merged</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>A List of RomData objects representing the merged roms</returns>
-		public static List<File> Merge(List<File> inroms, Logger logger)
+		public static List<Rom> Merge(List<Rom> inroms, Logger logger)
 		{
 			// Check for null or blank roms first
 			if (inroms == null || inroms.Count == 0)
 			{
-				return new List<File>();
+				return new List<Rom>();
 			}
 
 			// Create output list
-			List<File> outroms = new List<File>();
+			List<Rom> outroms = new List<Rom>();
 
 			// Then deduplicate them by checking to see if data matches previous saved roms
-			foreach (File rom in inroms)
+			foreach (Rom rom in inroms)
 			{
 				// If it's a nodump, add and skip
 				if (rom.Nodump)
@@ -122,11 +122,11 @@ namespace SabreTools.Helper
 				{
 					// Check if the rom is a duplicate
 					DupeType dupetype = DupeType.None;
-					File savedrom = new File();
+					Rom savedrom = new Rom();
 					int pos = -1;
 					for (int i = 0; i < outroms.Count; i++)
 					{
-						File lastrom = outroms[i];
+						Rom lastrom = outroms[i];
 
 						// Get the duplicate status
 						dupetype = GetDuplicateStatus(rom, lastrom, logger);
@@ -194,9 +194,9 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="remove">True to remove matched roms from the input, false otherwise (default)</param>
 		/// <returns>List of matched RomData objects</returns>
-		public static List<File> GetDuplicates(File lastrom, Dat datdata, Logger logger, bool remove = false)
+		public static List<Rom> GetDuplicates(Rom lastrom, Dat datdata, Logger logger, bool remove = false)
 		{
-			List<File> output = new List<File>();
+			List<Rom> output = new List<Rom>();
 
 			// Check for an empty rom list first
 			if (datdata.Files == null || datdata.Files.Count == 0)
@@ -208,9 +208,9 @@ namespace SabreTools.Helper
 			List<string> keys = datdata.Files.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<File> roms = datdata.Files[key];
-				List<File> left = new List<File>();
-				foreach (File rom in roms)
+				List<Rom> roms = datdata.Files[key];
+				List<Rom> left = new List<Rom>();
+				foreach (Rom rom in roms)
 				{
 					if (IsDuplicate(rom, lastrom, logger))
 					{
@@ -239,7 +239,7 @@ namespace SabreTools.Helper
 		/// <param name="lastrom">Rom to use as a baseline</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>True if the roms are duplicates, false otherwise</returns>
-		public static bool IsDuplicate(File rom, File lastrom, Logger logger)
+		public static bool IsDuplicate(Rom rom, Rom lastrom, Logger logger)
 		{
 			bool dupefound = false;
 
@@ -274,7 +274,7 @@ namespace SabreTools.Helper
 		/// <param name="lastrom">Last rom to check against</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>The DupeType corresponding to the relationship between the two</returns>
-		public static DupeType GetDuplicateStatus(File rom, File lastrom, Logger logger)
+		public static DupeType GetDuplicateStatus(Rom rom, Rom lastrom, Logger logger)
 		{
 			DupeType output = DupeType.None;
 
@@ -319,9 +319,9 @@ namespace SabreTools.Helper
 		/// <param name="roms">List of RomData objects representing the roms to be sorted</param>
 		/// <param name="norename">True if files are not renamed, false otherwise</param>
 		/// <returns>True if it sorted correctly, false otherwise</returns>
-		public static bool Sort(List<File> roms, bool norename)
+		public static bool Sort(List<Rom> roms, bool norename)
 		{
-			roms.Sort(delegate (File x, File y)
+			roms.Sort(delegate (Rom x, Rom y)
 			{
 				if (x.Metadata.SystemID == y.Metadata.SystemID)
 				{

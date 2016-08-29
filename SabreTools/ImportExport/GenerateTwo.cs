@@ -188,11 +188,11 @@ namespace SabreTools
 			List<string> keys = datdata.Files.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<Helper.File> temp = new List<Helper.File>();
-				List<Helper.File> newroms = datdata.Files[key];
+				List<Helper.Rom> temp = new List<Helper.Rom>();
+				List<Helper.Rom> newroms = datdata.Files[key];
 				for (int i = 0; i < newroms.Count; i++)
 				{
-					Helper.File rom = newroms[i];
+					Helper.Rom rom = newroms[i];
 
 					// In the case that the RomData is incomplete, skip it
 					if (rom.Name == null || rom.Machine.Name == null)

@@ -49,7 +49,7 @@ namespace SabreTools.Helper
 				List<String> games = new List<String>();
 				Dat datdata = new Dat();
 				datdata = DatTools.Parse(filename, 0, 0, datdata, _logger);
-				SortedDictionary<string, List<File>> newroms = DatTools.BucketByGame(datdata.Files, false, true, _logger, false);
+				SortedDictionary<string, List<Rom>> newroms = DatTools.BucketByGame(datdata.Files, false, true, _logger, false);
 
 				// Output single DAT stats (if asked)
 				if (_single)
@@ -116,9 +116,9 @@ Please check the log folder if the stats scrolled offscreen");
 				datdata.NodumpCount = 0;
 
 				// Loop through and add
-				foreach (List<File> roms in datdata.Files.Values)
+				foreach (List<Rom> roms in datdata.Files.Values)
 				{
-					foreach (File rom in roms)
+					foreach (Rom rom in roms)
 					{
 						datdata.RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
 						datdata.DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
@@ -131,7 +131,7 @@ Please check the log folder if the stats scrolled offscreen");
 				}
 			}
 
-			SortedDictionary<string, List<File>> newroms = DatTools.BucketByGame(datdata.Files, false, true, logger, false);
+			SortedDictionary<string, List<Rom>> newroms = DatTools.BucketByGame(datdata.Files, false, true, logger, false);
 			if (datdata.TotalSize < 0)
 			{
 				datdata.TotalSize = Int64.MaxValue + datdata.TotalSize;

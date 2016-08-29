@@ -254,7 +254,7 @@ namespace SabreTools
 				}
 
 				// Now add the information to the database if it's not already there
-				Helper.File rom = RomTools.GetSingleFileInfo(newfile);
+				Helper.Rom rom = RomTools.GetSingleFileInfo(newfile);
 				AddHeaderToDatabase(hstr, rom.HashData.SHA1, type);
 			}
 
@@ -309,7 +309,7 @@ namespace SabreTools
 		public bool ReplaceHeader(string file)
 		{
 			// First, get the SHA-1 hash of the file
-			Helper.File rom = RomTools.GetSingleFileInfo(file);
+			Helper.Rom rom = RomTools.GetSingleFileInfo(file);
 
 			// Then try to pull the corresponding headers from the database
 			string header = "";

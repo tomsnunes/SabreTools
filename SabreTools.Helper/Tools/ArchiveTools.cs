@@ -19,7 +19,7 @@ namespace SabreTools.Helper
 		/// <param name="input">Input filename to be moved</param>
 		/// <param name="output">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		public static void WriteToArchive(string input, string output, File rom)
+		public static void WriteToArchive(string input, string output, Rom rom)
 		{
 			string archiveFileName = Path.Combine(output, rom.Machine + ".zip");
 
@@ -69,7 +69,7 @@ namespace SabreTools.Helper
 		/// <param name="input">Input filename to be moved</param>
 		/// <param name="output">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		public static void WriteToManagedArchive(string input, string output, File rom)
+		public static void WriteToManagedArchive(string input, string output, Rom rom)
 		{
 			string archiveFileName = Path.Combine(output, rom.Machine + ".zip");
 
@@ -474,9 +474,9 @@ namespace SabreTools.Helper
 		/// <param name="input">Input file to get data from</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>List of RomData objects representing the found data</returns>
-		public static List<File> GetArchiveFileInfo(string input, Logger logger)
+		public static List<Rom> GetArchiveFileInfo(string input, Logger logger)
 		{
-			List<File> roms = new List<File>();
+			List<Rom> roms = new List<Rom>();
 			string gamename = Path.GetFileNameWithoutExtension(input);
 
 			// First get the archive type
@@ -491,7 +491,7 @@ namespace SabreTools.Helper
 			// If we got back GZip, try to get TGZ info first
 			else if (at == ArchiveType.GZip)
 			{
-				File possibleTgz = GetTorrentGZFileInfo(input, logger);
+				Rom possibleTgz = GetTorrentGZFileInfo(input, logger);
 
 				// If it was, then add it to the outputs and continue
 				if (possibleTgz.Name != null)
@@ -534,7 +534,7 @@ namespace SabreTools.Helper
 								+ (size == 0 ? reader.Entry.Size : size) + ", "
 								+ (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc));
 
-							roms.Add(new File
+							roms.Add(new Rom
 							{
 								Type = ItemType.Rom,
 								Name = reader.Entry.Key,
@@ -570,7 +570,7 @@ namespace SabreTools.Helper
 		/// <param name="input">Filename to get information from</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static File GetTorrentGZFileInfo(string input, Logger logger)
+		public static Rom GetTorrentGZFileInfo(string input, Logger logger)
 		{
 			string datum = Path.GetFileName(input).ToLowerInvariant();
 			long filesize = new FileInfo(input).Length;
@@ -579,14 +579,14 @@ namespace SabreTools.Helper
 			if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}\.gz"))
 			{
 				logger.Warning("Non SHA-1 filename found, skipping: '" + datum + "'");
-				return new File();
+				return new Rom();
 			}
 
 			// Check if the file is at least the minimum length
 			if (filesize < 40 /* bytes */)
 			{
 				logger.Warning("Possibly corrupt file '" + input + "' with size " + Style.GetBytesReadable(filesize));
-				return new File();
+				return new Rom();
 			}
 
 			// Get the Romba-specific header data
@@ -610,7 +610,7 @@ namespace SabreTools.Helper
 			}
 			if (!correct)
 			{
-				return new File();
+				return new Rom();
 			}
 
 			// Now convert the data and get the right position
@@ -618,7 +618,7 @@ namespace SabreTools.Helper
 			string gzcrc = BitConverter.ToString(headercrc).Replace("-", string.Empty);
 			long extractedsize = (long)BitConverter.ToUInt64(headersz.Reverse().ToArray(), 0);
 
-			File rom = new File
+			Rom rom = new Rom
 			{
 				Type = ItemType.Rom,
 				Machine = new Machine
@@ -665,7 +665,7 @@ namespace SabreTools.Helper
 			outdir = Path.GetFullPath(outdir);
 
 			// Now get the Rom info for the file so we have hashes and size
-			File rom = RomTools.GetSingleFileInfo(input);
+			Rom rom = RomTools.GetSingleFileInfo(input);
 
 			// If it doesn't exist, create the output file and then write
 			string outfile = Path.Combine(outdir, rom.HashData.SHA1 + ".gz");

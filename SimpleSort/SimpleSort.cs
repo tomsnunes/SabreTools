@@ -69,7 +69,7 @@ namespace SabreTools
 			_cursorLeft = Console.CursorLeft;
 			_matched = new Dat
 			{
-				Files = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.Rom>>(),
 			};
 		}
 
@@ -358,7 +358,7 @@ namespace SabreTools
 
 			// Setup the fixdat
 			_matched = (Dat)_datdata.CloneHeader();
-			_matched.Files = new Dictionary<string, List<Helper.File>>();
+			_matched.Files = new Dictionary<string, List<Helper.Rom>>();
 			_matched.FileName = "fixDat_" + _matched.FileName;
 			_matched.Name = "fixDat_" + _matched.Name;
 			_matched.Description = "fixDat_" + _matched.Description;
@@ -366,10 +366,10 @@ namespace SabreTools
 
 			// Now that all files are parsed, get only files found in directory
 			bool found = false;
-			foreach (List<Helper.File> roms in _datdata.Files.Values)
+			foreach (List<Helper.Rom> roms in _datdata.Files.Values)
 			{
-				List<Helper.File> newroms = RomTools.Merge(roms, _logger);
-				foreach (Helper.File rom in newroms)
+				List<Helper.Rom> newroms = RomTools.Merge(roms, _logger);
+				foreach (Helper.Rom rom in newroms)
 				{
 					if (rom.Metadata.SourceID == 99)
 					{
@@ -381,7 +381,7 @@ namespace SabreTools
 						}
 						else
 						{
-							List<Helper.File> temp = new List<Helper.File>();
+							List<Helper.Rom> temp = new List<Helper.Rom>();
 							temp.Add(rom);
 							_matched.Files.Add(key, temp);
 						}
@@ -492,7 +492,7 @@ namespace SabreTools
 			// Hash and match the external files
 			if (shouldExternalScan)
 			{
-				Helper.File rom = RomTools.GetSingleFileInfo(input);
+				Helper.Rom rom = RomTools.GetSingleFileInfo(input);
 
 				// If we have a blank RomData, it's an error
 				if (rom.Name == null)
@@ -501,9 +501,9 @@ namespace SabreTools
 				}
 
 				// Try to find the matches to the file that was found
-				List<Helper.File> foundroms = RomTools.GetDuplicates(rom, _datdata, _logger, true);
+				List<Helper.Rom> foundroms = RomTools.GetDuplicates(rom, _datdata, _logger, true);
 				_logger.Log("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
-				foreach (Helper.File found in foundroms)
+				foreach (Helper.Rom found in foundroms)
 				{
 					_logger.Log("Matched name: " + found.Name);
 
@@ -515,7 +515,7 @@ namespace SabreTools
 					}
 					else
 					{
-						List<Helper.File> temp = new List<Helper.File>();
+						List<Helper.Rom> temp = new List<Helper.Rom>();
 						temp.Add(found);
 						_matched.Files.Add(key, temp);
 					}
@@ -558,7 +558,7 @@ namespace SabreTools
 					// Otherwise, apply the rule ot the file
 					string newinput = input + ".new";
 					Skippers.TransformFile(input, newinput, rule, _logger);
-					Helper.File drom = RomTools.GetSingleFileInfo(newinput);
+					Helper.Rom drom = RomTools.GetSingleFileInfo(newinput);
 
 					// If we have a blank RomData, it's an error
 					if (drom.Name == null)
@@ -567,9 +567,9 @@ namespace SabreTools
 					}
 
 					// Try to find the matches to the file that was found
-					List<Helper.File> founddroms = RomTools.GetDuplicates(drom, _datdata, _logger, true);
+					List<Helper.Rom> founddroms = RomTools.GetDuplicates(drom, _datdata, _logger, true);
 					_logger.Log("File '" + newinput + "' had " + founddroms.Count + " matches in the DAT!");
-					foreach (Helper.File found in founddroms)
+					foreach (Helper.Rom found in founddroms)
 					{
 						// Add rom to the matched list
 						string key = found.HashData.Size + "-" + found.HashData.CRC;
@@ -579,7 +579,7 @@ namespace SabreTools
 						}
 						else
 						{
-							List<Helper.File> temp = new List<Helper.File>();
+							List<Helper.Rom> temp = new List<Helper.Rom>();
 							temp.Add(found);
 							_matched.Files.Add(key, temp);
 						}
@@ -616,7 +616,7 @@ namespace SabreTools
 						}
 
 						// Then output the headered rom (renamed)
-						Helper.File newfound = found;
+						Helper.Rom newfound = found;
 						newfound.Name = Path.GetFileNameWithoutExtension(newfound.Name) + " (" + rom.HashData.CRC + ")" + Path.GetExtension(newfound.Name);
 
 						// Add rom to the matched list
@@ -627,7 +627,7 @@ namespace SabreTools
 						}
 						else
 						{
-							List<Helper.File> temp = new List<Helper.File>();
+							List<Helper.Rom> temp = new List<Helper.Rom>();
 							temp.Add(newfound);
 							_matched.Files.Add(key, temp);
 						}
@@ -681,18 +681,18 @@ namespace SabreTools
 				if (_quickScan)
 				{
 					_logger.Log("Beginning quick scan of contents from '" + input + "'");
-					List<Helper.File> internalRomData = ArchiveTools.GetArchiveFileInfo(input, _logger);
+					List<Helper.Rom> internalRomData = ArchiveTools.GetArchiveFileInfo(input, _logger);
 					_logger.Log(internalRomData.Count + " entries found in '" + input + "'");
 
 					// If the list is populated, then the file was a filled archive
 					if (internalRomData.Count > 0)
 					{
-						foreach (Helper.File rom in internalRomData)
+						foreach (Helper.Rom rom in internalRomData)
 						{
 							// Try to find the matches to the file that was found
-							List<Helper.File> foundroms = RomTools.GetDuplicates(rom, _datdata, _logger, true);
+							List<Helper.Rom> foundroms = RomTools.GetDuplicates(rom, _datdata, _logger, true);
 							_logger.Log("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
-							foreach (Helper.File found in foundroms)
+							foreach (Helper.Rom found in foundroms)
 							{
 								// Add rom to the matched list
 								string key = found.HashData.Size + "-" + found.HashData.CRC;
@@ -702,7 +702,7 @@ namespace SabreTools
 								}
 								else
 								{
-									List<Helper.File> temp = new List<Helper.File>();
+									List<Helper.Rom> temp = new List<Helper.Rom>();
 									temp.Add(found);
 									_matched.Files.Add(key, temp);
 								}
@@ -825,11 +825,11 @@ namespace SabreTools
 			}
 
 			// Now process the inputs (assumed that it's archived sets as of right now
-			Dictionary<string, List<Helper.File>> scanned = new Dictionary<string, List<Helper.File>>();
+			Dictionary<string, List<Helper.Rom>> scanned = new Dictionary<string, List<Helper.Rom>>();
 			foreach (string archive in Directory.EnumerateFiles(_outdir, "*", SearchOption.AllDirectories))
 			{
 				// If we are in quickscan, get the list of roms that way
-				List<Helper.File> roms = new List<Helper.File>();
+				List<Helper.Rom> roms = new List<Helper.Rom>();
 				if (_quickScan)
 				{
 					roms = ArchiveTools.GetArchiveFileInfo(Path.GetFullPath(archive), _logger);
@@ -849,7 +849,7 @@ namespace SabreTools
 				}
 
 				// Then add each of the found files to the new dictionary
-				foreach (Helper.File rom in roms)
+				foreach (Helper.Rom rom in roms)
 				{
 					string key = rom.HashData.Size + "-" + rom.HashData.CRC;
 					if (scanned.ContainsKey(key))
@@ -858,7 +858,7 @@ namespace SabreTools
 					}
 					else
 					{
-						List<Helper.File> templist = new List<Helper.File>();
+						List<Helper.Rom> templist = new List<Helper.Rom>();
 						templist.Add(rom);
 						scanned.Add(key, templist);
 					}
@@ -872,7 +872,7 @@ namespace SabreTools
 			}
 
 			// Now that we have all of the from DAT and from folder roms, we try to match them, removing the perfect matches
-			Dictionary<string, List<Helper.File>> remove = new Dictionary<string, List<Helper.File>>();
+			Dictionary<string, List<Helper.Rom>> remove = new Dictionary<string, List<Helper.Rom>>();
 			foreach (string key in scanned.Keys)
 			{
 				// If the key doesn't even exist in the DAT, then mark the entire key for removal
@@ -890,9 +890,9 @@ namespace SabreTools
 				// Otherwise check each of the values individually
 				else
 				{
-					List<Helper.File> romsList = _datdata.Files[key];
-					List<Helper.File> scannedList = scanned[key];
-					foreach (Helper.File rom in scannedList)
+					List<Helper.Rom> romsList = _datdata.Files[key];
+					List<Helper.Rom> scannedList = scanned[key];
+					foreach (Helper.Rom rom in scannedList)
 					{
 						if (!romsList.Contains(rom))
 						{
@@ -902,7 +902,7 @@ namespace SabreTools
 							}
 							else
 							{
-								List<Helper.File> templist = new List<Helper.File>();
+								List<Helper.Rom> templist = new List<Helper.Rom>();
 								templist.Add(rom);
 								remove.Add(key, templist);
 							}

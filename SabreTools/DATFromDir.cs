@@ -170,7 +170,7 @@ namespace SabreTools
 							if (!items)
 							{
 								string actualroot = item.Remove(0, basePathBackup.Length);
-								Helper.File rom = new Helper.File
+								Helper.Rom rom = new Helper.Rom
 								{
 									Name = "null",
 									Machine = new Machine
@@ -197,7 +197,7 @@ namespace SabreTools
 								}
 								else
 								{
-									List<Helper.File> temp = new List<Helper.File>();
+									List<Helper.Rom> temp = new List<Helper.Rom>();
 									temp.Add(rom);
 									_datdata.Files.Add(key, temp);
 								}
@@ -209,7 +209,7 @@ namespace SabreTools
 								if (Directory.EnumerateFiles(subdir, "*", SearchOption.AllDirectories).Count() == 0)
 								{
 									string actualroot = subdir.Remove(0, basePathBackup.Length);
-									Helper.File rom = new Helper.File
+									Helper.Rom rom = new Helper.Rom
 									{
 										Name = "null",
 										Machine = new Machine
@@ -236,7 +236,7 @@ namespace SabreTools
 									}
 									else
 									{
-										List<Helper.File> temp = new List<Helper.File>();
+										List<Helper.Rom> temp = new List<Helper.Rom>();
 										temp.Add(rom);
 										_datdata.Files.Add(key, temp);
 									}
@@ -259,10 +259,10 @@ namespace SabreTools
 				List<string> keys = _datdata.Files.Keys.ToList();
 				foreach (string key in keys)
 				{
-					List<Helper.File> roms = _datdata.Files[key];
+					List<Helper.Rom> roms = _datdata.Files[key];
 					for (int i = 0; i < roms.Count; i++)
 					{
-						Helper.File rom = roms[i];
+						Helper.Rom rom = roms[i];
 
 						// If we're in a mode that doesn't allow for actual empty folders, add the blank info
 						if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
@@ -284,7 +284,7 @@ namespace SabreTools
 							}
 							else
 							{
-								List<Helper.File> temp = new List<Helper.File>();
+								List<Helper.Rom> temp = new List<Helper.Rom>();
 								temp.Add(rom);
 								_datdata.Files.Add(inkey, temp);
 							}
@@ -318,7 +318,7 @@ namespace SabreTools
 				// If we had roms but not blanks (and not in Romba mode), create an artifical rom for the purposes of outputting
 				if (lastparent != null && _datdata.Files.Count == 0)
 				{
-					_datdata.Files.Add("temp", new List<Helper.File>());
+					_datdata.Files.Add("temp", new List<Helper.Rom>());
 				}
 			}
 
@@ -346,7 +346,7 @@ namespace SabreTools
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
 			{
-				Helper.File rom = ArchiveTools.GetTorrentGZFileInfo(item, _logger);
+				Helper.Rom rom = ArchiveTools.GetTorrentGZFileInfo(item, _logger);
 
 				// If the rom is valid, write it out
 				if (rom.Name != null)
@@ -362,7 +362,7 @@ namespace SabreTools
 						}
 						else
 						{
-							List<Helper.File> temp = new List<Helper.File>();
+							List<Helper.Rom> temp = new List<Helper.Rom>();
 							temp.Add(rom);
 							_datdata.Files.Add(key, temp);
 						}
@@ -391,8 +391,8 @@ namespace SabreTools
 				// If we have an archive, scan it
 				if (type != null)
 				{
-					List<Helper.File> extracted = ArchiveTools.GetArchiveFileInfo(item, _logger);
-					foreach (Helper.File rom in extracted)
+					List<Helper.Rom> extracted = ArchiveTools.GetArchiveFileInfo(item, _logger);
+					foreach (Helper.Rom rom in extracted)
 					{
 						lastparent = ProcessFileHelper(item, rom, sw, _basePath,
 							Path.Combine((Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) +
@@ -462,7 +462,7 @@ namespace SabreTools
 		private string ProcessFile(string item, StreamWriter sw, string basepath, string parent, Dat datdata, string lastparent)
 		{
 			_logger.Log(Path.GetFileName(item) + " treated like a file");
-			Helper.File rom = RomTools.GetSingleFileInfo(item, _noMD5, _noSHA1);
+			Helper.Rom rom = RomTools.GetSingleFileInfo(item, _noMD5, _noSHA1);
 
 			return ProcessFileHelper(item, rom, sw, basepath, parent, datdata, lastparent);
 		}
@@ -478,7 +478,7 @@ namespace SabreTools
 		/// <param name="datdata">DatData object with output information</param>
 		/// <param name="lastparent">Last known parent game name</param>
 		/// <returns>New last known parent game name</returns>
-		private string ProcessFileHelper(string item, Helper.File rom, StreamWriter sw, string basepath, string parent, Dat datdata, string lastparent)
+		private string ProcessFileHelper(string item, Helper.Rom rom, StreamWriter sw, string basepath, string parent, Dat datdata, string lastparent)
 		{
 			try
 			{
@@ -537,7 +537,7 @@ namespace SabreTools
 					}
 					else
 					{
-						List<Helper.File> temp = new List<Helper.File>();
+						List<Helper.Rom> temp = new List<Helper.Rom>();
 						temp.Add(rom);
 						_datdata.Files.Add(key, temp);
 					}

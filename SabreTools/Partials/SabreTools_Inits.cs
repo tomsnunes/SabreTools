@@ -411,7 +411,7 @@ namespace SabreTools
 				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
-				Files = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.Rom>>(),
 			};
 			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
 			bool success = dfd.Start();

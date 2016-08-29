@@ -155,7 +155,7 @@ namespace SabreTools
 				ForcePacking = datdata.ForcePacking,
 				OutputFormat = outputFormat,
 				MergeRoms = datdata.MergeRoms,
-				Files = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.Rom>>(),
 			};
 			Dat sha1 = new Dat
 			{
@@ -177,7 +177,7 @@ namespace SabreTools
 				ForcePacking = datdata.ForcePacking,
 				OutputFormat = outputFormat,
 				MergeRoms = datdata.MergeRoms,
-				Files = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.Rom>>(),
 			};
 			Dat md5 = new Dat
 			{
@@ -199,7 +199,7 @@ namespace SabreTools
 				ForcePacking = datdata.ForcePacking,
 				OutputFormat = outputFormat,
 				MergeRoms = datdata.MergeRoms,
-				Files = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.Rom>>(),
 			};
 			Dat crc = new Dat
 			{
@@ -221,15 +221,15 @@ namespace SabreTools
 				ForcePacking = datdata.ForcePacking,
 				OutputFormat = outputFormat,
 				MergeRoms = datdata.MergeRoms,
-				Files = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.Rom>>(),
 			};
 
 			// Now populate each of the DAT objects in turn
 			List<string> keys = datdata.Files.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<Helper.File> roms = datdata.Files[key];
-				foreach (Helper.File rom in roms)
+				List<Helper.Rom> roms = datdata.Files[key];
+				foreach (Helper.Rom rom in roms)
 				{
 					// If the file is a nodump
 					if (rom.Nodump)
@@ -240,7 +240,7 @@ namespace SabreTools
 						}
 						else
 						{
-							List<Helper.File> temp = new List<Helper.File>();
+							List<Helper.Rom> temp = new List<Helper.Rom>();
 							temp.Add(rom);
 							nodump.Files.Add(key, temp);
 						}
@@ -254,7 +254,7 @@ namespace SabreTools
 						}
 						else
 						{
-							List<Helper.File> temp = new List<Helper.File>();
+							List<Helper.Rom> temp = new List<Helper.Rom>();
 							temp.Add(rom);
 							sha1.Files.Add(key, temp);
 						}
@@ -268,7 +268,7 @@ namespace SabreTools
 						}
 						else
 						{
-							List<Helper.File> temp = new List<Helper.File>();
+							List<Helper.Rom> temp = new List<Helper.Rom>();
 							temp.Add(rom);
 							md5.Files.Add(key, temp);
 						}
@@ -282,7 +282,7 @@ namespace SabreTools
 						}
 						else
 						{
-							List<Helper.File> temp = new List<Helper.File>();
+							List<Helper.Rom> temp = new List<Helper.Rom>();
 							temp.Add(rom);
 							crc.Files.Add(key, temp);
 						}
@@ -351,7 +351,7 @@ namespace SabreTools
 				Homepage = datdata.Homepage,
 				Url = datdata.Url,
 				Comment = datdata.Comment,
-				Files = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.Rom>>(),
 				OutputFormat = outputFormat,
 			};
 			Dat datdataB = new Dat
@@ -367,7 +367,7 @@ namespace SabreTools
 				Homepage = datdata.Homepage,
 				Url = datdata.Url,
 				Comment = datdata.Comment,
-				Files = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.Rom>>(),
 				OutputFormat = outputFormat,
 			};
 
@@ -380,7 +380,7 @@ namespace SabreTools
 			// Now separate the roms accordingly
 			foreach (string key in datdata.Files.Keys)
 			{
-				foreach (Helper.File rom in datdata.Files[key])
+				foreach (Helper.Rom rom in datdata.Files[key])
 				{
 					if (_extA.Contains(Path.GetExtension(rom.Name.ToUpperInvariant())))
 					{
@@ -390,7 +390,7 @@ namespace SabreTools
 						}
 						else
 						{
-							List<Helper.File> temp = new List<Helper.File>();
+							List<Helper.Rom> temp = new List<Helper.Rom>();
 							temp.Add(rom);
 							datdataA.Files.Add(key, temp);
 						}
@@ -403,7 +403,7 @@ namespace SabreTools
 						}
 						else
 						{
-							List<Helper.File> temp = new List<Helper.File>();
+							List<Helper.Rom> temp = new List<Helper.Rom>();
 							temp.Add(rom);
 							datdataB.Files.Add(key, temp);
 						}
@@ -416,7 +416,7 @@ namespace SabreTools
 						}
 						else
 						{
-							List<Helper.File> temp = new List<Helper.File>();
+							List<Helper.Rom> temp = new List<Helper.Rom>();
 							temp.Add(rom);
 							datdataA.Files.Add(key, temp);
 						}
@@ -426,7 +426,7 @@ namespace SabreTools
 						}
 						else
 						{
-							List<Helper.File> temp = new List<Helper.File>();
+							List<Helper.Rom> temp = new List<Helper.Rom>();
 							temp.Add(rom);
 							datdataB.Files.Add(key, temp);
 						}
