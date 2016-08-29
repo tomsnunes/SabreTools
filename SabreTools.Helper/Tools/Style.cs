@@ -210,6 +210,8 @@ namespace SabreTools.Helper
 			return outgame;
 		}
 
+		#region Externally sourced methods
+
 		/// <summary>
 		///  Returns the human-readable file size for an arbitrary, 64-bit file size 
 		/// The default format is "0.### XB", e.g. "4.2 KB" or "1.434 GB"
@@ -280,5 +282,19 @@ namespace SabreTools.Helper
 			string sentence = input.ToLower();
 			return sentence[0].ToString().ToUpper() + sentence.Substring(1);
 		}
+
+		/// <summary>
+		/// http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
+		/// </summary>
+		public static byte[] StringToByteArray(String hex)
+		{
+			int NumberChars = hex.Length;
+			byte[] bytes = new byte[NumberChars / 2];
+			for (int i = 0; i < NumberChars; i += 2)
+				bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+			return bytes;
+		}
+
+		#endregion
 	}
 }

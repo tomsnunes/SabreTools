@@ -2441,13 +2441,13 @@ namespace SabreTools.Helper
 									Int64.TryParse(gc[i].Replace("\"", ""), out hashData.Size);
 									break;
 								case "crc":
-									hashData.CRC = ArchiveTools.StringToByteArray(gc[i].Replace("\"", ""));
+									hashData.CRC = Style.StringToByteArray(gc[i].Replace("\"", ""));
 									break;
 								case "md5":
-									hashData.MD5 = ArchiveTools.StringToByteArray(gc[i].Replace("\"", ""));
+									hashData.MD5 = Style.StringToByteArray(gc[i].Replace("\"", ""));
 									break;
 								case "sha1":
-									hashData.SHA1 = ArchiveTools.StringToByteArray(gc[i].Replace("\"", ""));
+									hashData.SHA1 = Style.StringToByteArray(gc[i].Replace("\"", ""));
 									break;
 								case "flags":
 									if (gc[i].Replace("\"", "").ToLowerInvariant() == "nodump")
@@ -2498,13 +2498,13 @@ namespace SabreTools.Helper
 									Int64.TryParse(val, out hashData.Size);
 									break;
 								case "crc":
-									hashData.CRC = ArchiveTools.StringToByteArray(val);
+									hashData.CRC = Style.StringToByteArray(val);
 									break;
 								case "md5":
-									hashData.MD5 = ArchiveTools.StringToByteArray(val);
+									hashData.MD5 = Style.StringToByteArray(val);
 									break;
 								case "sha1":
-									hashData.SHA1 = ArchiveTools.StringToByteArray(val);
+									hashData.SHA1 = Style.StringToByteArray(val);
 									break;
 								case "flags":
 									if (val.ToLowerInvariant() == "nodump")
@@ -2806,7 +2806,7 @@ namespace SabreTools.Helper
 						HashData hashData = new HashData
 						{
 							Size = Int64.Parse(rominfo[7]),
-							CRC = ArchiveTools.StringToByteArray(rominfo[6]),
+							CRC = Style.StringToByteArray(rominfo[6]),
 						};
 
 						// Sanitize the hashes from null, hex sizes, and "true blank" strings
@@ -3361,9 +3361,9 @@ namespace SabreTools.Helper
 												HashData hashData = new HashData
 												{
 													Size = size,
-													CRC = RomTools.CleanHashData(ArchiveTools.StringToByteArray(crc), Constants.CRCBytesLength),
-													MD5 = RomTools.CleanHashData(ArchiveTools.StringToByteArray(md5), Constants.MD5BytesLength),
-													SHA1 = RomTools.CleanHashData(ArchiveTools.StringToByteArray(sha1), Constants.SHA1BytesLength),
+													CRC = RomTools.CleanHashData(Style.StringToByteArray(crc), Constants.CRCBytesLength),
+													MD5 = RomTools.CleanHashData(Style.StringToByteArray(md5), Constants.MD5BytesLength),
+													SHA1 = RomTools.CleanHashData(Style.StringToByteArray(sha1), Constants.SHA1BytesLength),
 													Roms = new List<RomData>(),
 												};
 												hashData.Roms.Add(romData);
@@ -3587,9 +3587,9 @@ namespace SabreTools.Helper
 								HashData hashData = new HashData
 								{
 									Size = size,
-									CRC = RomTools.CleanHashData(ArchiveTools.StringToByteArray(crc), Constants.CRCBytesLength),
-									MD5 = RomTools.CleanHashData(ArchiveTools.StringToByteArray(md5), Constants.MD5BytesLength),
-									SHA1 = RomTools.CleanHashData(ArchiveTools.StringToByteArray(sha1), Constants.SHA1BytesLength),
+									CRC = RomTools.CleanHashData(Style.StringToByteArray(crc), Constants.CRCBytesLength),
+									MD5 = RomTools.CleanHashData(Style.StringToByteArray(md5), Constants.MD5BytesLength),
+									SHA1 = RomTools.CleanHashData(Style.StringToByteArray(sha1), Constants.SHA1BytesLength),
 									Roms = new List<RomData>(),
 								};
 								hashData.Roms.Add(romData);

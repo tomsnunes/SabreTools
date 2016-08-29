@@ -682,8 +682,8 @@ namespace SabreTools.Helper
 				{
 					// Write standard header and TGZ info
 					byte[] data = Constants.TorrentGZHeader
-									.Concat(StringToByteArray(rom.HashData.MD5)) // MD5
-									.Concat(StringToByteArray(rom.HashData.CRC)) // CRC
+									.Concat(Style.StringToByteArray(rom.HashData.MD5)) // MD5
+									.Concat(Style.StringToByteArray(rom.HashData.CRC)) // CRC
 									.Concat(BitConverter.GetBytes(rom.HashData.Size).Reverse().ToArray()) // Long size (Mirrored)
 								.ToArray();
 					sw.Write(data);
@@ -840,17 +840,7 @@ namespace SabreTools.Helper
 			}
 		}
 
-		/// <summary>
-		/// http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
-		/// </summary>
-		public static byte[] StringToByteArray(String hex)
-		{
-			int NumberChars = hex.Length;
-			byte[] bytes = new byte[NumberChars / 2];
-			for (int i = 0; i < NumberChars; i += 2)
-				bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
-			return bytes;
-		}
+		
 
 		#region Hash-to-Dat functions
 
