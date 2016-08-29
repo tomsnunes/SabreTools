@@ -28,9 +28,9 @@ namespace SabreTools.Helper
 	public struct HashData
 	{
 		public long Size;
-		public string CRC;
-		public string MD5;
-		public string SHA1;
+		public byte[] CRC;
+		public byte[] MD5;
+		public byte[] SHA1;
 		public List<RomData> Roms;
 	}
 
@@ -43,7 +43,8 @@ namespace SabreTools.Helper
 		public ItemType Type;
 		public bool Nodump;
 		public string Date;
-		public List<MachineData> Machines;
+		public DupeType DupeType;
+		public MachineData Machine;
 	}
 
 	/// <summary>
@@ -51,6 +52,7 @@ namespace SabreTools.Helper
 	/// </summary>
 	public struct MachineData
 	{
+		// Data specific to Machine/Game
 		public string Name;
 		public string Comment;
 		public string Description;
@@ -64,6 +66,12 @@ namespace SabreTools.Helper
 		public string Board;
 		public string RebuildTo;
 		public bool TorrentZipped;
+
+		// Data specific to the source of the Machine/Game
+		public int SystemID;
+		public string System;
+		public int SourceID;
+		public string Source;
 	}
 
 	/// <summary>
@@ -91,6 +99,7 @@ namespace SabreTools.Helper
 		public ForcePacking ForcePacking;
 		public OutputFormat OutputFormat;
 		public bool MergeRoms;
+		public List<HashData> Hashes;
 
 		// Data specific to the Miss DAT type
 		public bool UseGame;

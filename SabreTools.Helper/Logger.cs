@@ -70,7 +70,7 @@ namespace SabreTools.Helper
 
 			try
 			{
-				_log = new StreamWriter(System.IO.File.Open(_basepath + _filename, FileMode.OpenOrCreate | FileMode.Append));
+				_log = new StreamWriter(File.Open(_basepath + _filename, FileMode.OpenOrCreate | FileMode.Append));
 				_log.WriteLine("Logging started " + DateTime.Now);
 				_log.Flush();
 			}

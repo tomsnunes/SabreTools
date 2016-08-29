@@ -92,7 +92,7 @@ namespace SabreTools
 						flag = false;
 						break;
 					default:
-						if (System.IO.File.Exists(temparg) || Directory.Exists(temparg))
+						if (File.Exists(temparg) || Directory.Exists(temparg))
 						{
 							input = temparg;
 						}
@@ -164,7 +164,7 @@ namespace SabreTools
 			if (_flag)
 			{
 				// If it's a single file, just check it
-				if (System.IO.File.Exists(_input))
+				if (File.Exists(_input))
 				{
 					DetectSkipperAndTransform(_input);
 				}
@@ -183,7 +183,7 @@ namespace SabreTools
 			else
 			{
 				// If it's a single file, just check it
-				if (System.IO.File.Exists(_input))
+				if (File.Exists(_input))
 				{
 					ReplaceHeader(_input);
 				}
@@ -224,7 +224,7 @@ namespace SabreTools
 
 				// Now take care of the header and new output file
 				string hstr = string.Empty;
-				using (BinaryReader br = new BinaryReader(System.IO.File.OpenRead(file)))
+				using (BinaryReader br = new BinaryReader(File.OpenRead(file)))
 				{
 					// Extract the header as a string for the database
 					byte[] hbin = br.ReadBytes(headerSize);
@@ -248,13 +248,13 @@ namespace SabreTools
 				Skippers.TransformFile(file, newfile, rule, _logger);
 
 				// If the output file doesn't exist, return false
-				if (!System.IO.File.Exists(newfile))
+				if (!File.Exists(newfile))
 				{
 					return false;
 				}
 
 				// Now add the information to the database if it's not already there
-				Helper.Rom rom = RomTools.GetSingleFileInfo(newfile);
+				Rom rom = RomTools.GetSingleFileInfo(newfile);
 				AddHeaderToDatabase(hstr, rom.HashData.SHA1, type);
 			}
 
@@ -309,7 +309,7 @@ namespace SabreTools
 		public bool ReplaceHeader(string file)
 		{
 			// First, get the SHA-1 hash of the file
-			Helper.Rom rom = RomTools.GetSingleFileInfo(file);
+			Rom rom = RomTools.GetSingleFileInfo(file);
 
 			// Then try to pull the corresponding headers from the database
 			string header = "";

@@ -163,7 +163,7 @@ namespace SabreTools
 			foreach (string file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
 			{
 				string hash = "";
-				using (FileStream fs = System.IO.File.Open(file, FileMode.Open))
+				using (FileStream fs = File.Open(file, FileMode.Open))
 				{
 					hash = BitConverter.ToString(sha1.ComputeHash(fs)).Replace("-", "");
 				}
@@ -188,11 +188,11 @@ namespace SabreTools
 			List<string> keys = datdata.Files.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<Helper.Rom> temp = new List<Helper.Rom>();
-				List<Helper.Rom> newroms = datdata.Files[key];
+				List<Rom> temp = new List<Rom>();
+				List<Rom> newroms = datdata.Files[key];
 				for (int i = 0; i < newroms.Count; i++)
 				{
-					Helper.Rom rom = newroms[i];
+					Rom rom = newroms[i];
 
 					// In the case that the RomData is incomplete, skip it
 					if (rom.Name == null || rom.Machine.Name == null)

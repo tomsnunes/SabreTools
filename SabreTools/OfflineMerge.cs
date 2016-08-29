@@ -39,15 +39,15 @@ namespace SabreTools
 		public bool Process()
 		{
 			// Check all of the files for validity and break if one doesn't exist
-			if (_currentAllMerged != "" && !System.IO.File.Exists(_currentAllMerged))
+			if (_currentAllMerged != "" && !File.Exists(_currentAllMerged))
 			{
 				return false;
 			}
-			if (_currentMissingMerged != "" && !System.IO.File.Exists(_currentMissingMerged))
+			if (_currentMissingMerged != "" && !File.Exists(_currentMissingMerged))
 			{
 				return false;
 			}
-			if (_currentNewMerged != "" && !System.IO.File.Exists(_currentNewMerged))
+			if (_currentNewMerged != "" && !File.Exists(_currentNewMerged))
 			{
 				return false;
 			}
@@ -63,11 +63,11 @@ namespace SabreTools
 
 				// Now get Net New output dictionary [(currentNewMerged)-(currentAllMerged)]
 				_logger.User("Creating and populating Net New dictionary");
-				Dictionary<string, List<Helper.Rom>> netNew = new Dictionary<string, List<Helper.Rom>>();
+				Dictionary<string, List<Rom>> netNew = new Dictionary<string, List<Rom>>();
 				foreach (string key in completeDats.Files.Keys)
 				{
-					List<Helper.Rom> templist = RomTools.Merge(completeDats.Files[key], _logger);
-					foreach (Helper.Rom rom in templist)
+					List<Rom> templist = RomTools.Merge(completeDats.Files[key], _logger);
+					foreach (Rom rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentNewMerged)
 						{
@@ -77,7 +77,7 @@ namespace SabreTools
 							}
 							else
 							{
-								List<Helper.Rom> temp = new List<Helper.Rom>();
+								List<Rom> temp = new List<Rom>();
 								temp.Add(rom);
 								netNew.Add(key, temp);
 							}
@@ -87,11 +87,11 @@ namespace SabreTools
 
 				// Now create the Unneeded dictionary [(currentAllMerged)-(currentNewMerged)]
 				_logger.User("Creating and populating Uneeded dictionary");
-				Dictionary<string, List<Helper.Rom>> unneeded = new Dictionary<string, List<Helper.Rom>>();
+				Dictionary<string, List<Rom>> unneeded = new Dictionary<string, List<Rom>>();
 				foreach (string key in completeDats.Files.Keys)
 				{
-					List<Helper.Rom> templist = RomTools.Merge(completeDats.Files[key], _logger);
-					foreach (Helper.Rom rom in templist)
+					List<Rom> templist = RomTools.Merge(completeDats.Files[key], _logger);
+					foreach (Rom rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentAllMerged)
 						{
@@ -101,7 +101,7 @@ namespace SabreTools
 							}
 							else
 							{
-								List<Helper.Rom> temp = new List<Helper.Rom>();
+								List<Rom> temp = new List<Rom>();
 								temp.Add(rom);
 								unneeded.Add(key, temp);
 							}
@@ -124,11 +124,11 @@ namespace SabreTools
 						midMissing.Files.Add(key, unneeded[key]);
 					}
 				}
-				Dictionary<string, List<Helper.Rom>> newMissing = new Dictionary<string, List<Helper.Rom>>();
+				Dictionary<string, List<Rom>> newMissing = new Dictionary<string, List<Rom>>();
 				foreach (string key in midMissing.Files.Keys)
 				{
-					List<Helper.Rom> templist = RomTools.Merge(midMissing.Files[key], _logger);
-					foreach (Helper.Rom rom in templist)
+					List<Rom> templist = RomTools.Merge(midMissing.Files[key], _logger);
+					foreach (Rom rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentMissingMerged)
 						{
@@ -138,7 +138,7 @@ namespace SabreTools
 							}
 							else
 							{
-								List<Helper.Rom> temp = new List<Helper.Rom>();
+								List<Rom> temp = new List<Rom>();
 								temp.Add(rom);
 								newMissing.Add(key, temp);
 							}
@@ -159,7 +159,7 @@ namespace SabreTools
 
 				// Now create the Have dictionary [(currentNewMerged)-(c)]
 				_logger.User("Creating and populating Have dictionary");
-				Dictionary<string, List<Helper.Rom>> midHave = new Dictionary<string, List<Helper.Rom>>();
+				Dictionary<string, List<Rom>> midHave = new Dictionary<string, List<Rom>>();
 				foreach (string key in newMissing.Keys)
 				{
 					if (midHave.ContainsKey(key))
@@ -175,7 +175,7 @@ namespace SabreTools
 				{
 					if (midHave.ContainsKey(key))
 					{
-						foreach (Helper.Rom rom in completeDats.Files[key])
+						foreach (Rom rom in completeDats.Files[key])
 						{
 							if (rom.Metadata.System == _currentNewMerged)
 							{
@@ -185,8 +185,8 @@ namespace SabreTools
 					}
 					else
 					{
-						List<Helper.Rom> roms = new List<Helper.Rom>();
-						foreach (Helper.Rom rom in completeDats.Files[key])
+						List<Rom> roms = new List<Rom>();
+						foreach (Rom rom in completeDats.Files[key])
 						{
 							if (rom.Metadata.System == _currentNewMerged)
 							{
@@ -196,11 +196,11 @@ namespace SabreTools
 						midHave.Add(key, roms);
 					}
 				}
-				Dictionary<string, List<Helper.Rom>> have = new Dictionary<string, List<Helper.Rom>>();
+				Dictionary<string, List<Rom>> have = new Dictionary<string, List<Rom>>();
 				foreach (string key in midHave.Keys)
 				{
-					List<Helper.Rom> templist = RomTools.Merge(midHave[key], _logger);
-					foreach (Helper.Rom rom in templist)
+					List<Rom> templist = RomTools.Merge(midHave[key], _logger);
+					foreach (Rom rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentNewMerged)
 						{
@@ -210,7 +210,7 @@ namespace SabreTools
 							}
 							else
 							{
-								List<Helper.Rom> temp = new List<Helper.Rom>();
+								List<Rom> temp = new List<Rom>();
 								temp.Add(rom);
 								have.Add(key, temp);
 							}
@@ -225,11 +225,11 @@ namespace SabreTools
 					List<string> keys = netNew.Keys.ToList();
 					foreach (string key in keys)
 					{
-						List<Helper.Rom> temp = new List<Helper.Rom>();
-						List<Helper.Rom> roms = netNew[key];
+						List<Rom> temp = new List<Rom>();
+						List<Rom> roms = netNew[key];
 						for (int i = 0; i < roms.Count; i++)
 						{
-							Helper.Rom rom = roms[i];
+							Rom rom = roms[i];
 							rom.HashData.Size = Constants.SizeZero;
 							rom.HashData.CRC = Constants.CRCZero;
 							rom.HashData.MD5 = Constants.MD5Zero;
@@ -243,11 +243,11 @@ namespace SabreTools
 					keys = unneeded.Keys.ToList();
 					foreach (string key in keys)
 					{
-						List<Helper.Rom> temp = new List<Helper.Rom>();
-						List<Helper.Rom> roms = unneeded[key];
+						List<Rom> temp = new List<Rom>();
+						List<Rom> roms = unneeded[key];
 						for (int i = 0; i < roms.Count; i++)
 						{
-							Helper.Rom rom = roms[i];
+							Rom rom = roms[i];
 							rom.HashData.Size = Constants.SizeZero;
 							rom.HashData.CRC = Constants.CRCZero;
 							rom.HashData.MD5 = Constants.MD5Zero;
@@ -261,11 +261,11 @@ namespace SabreTools
 					keys = newMissing.Keys.ToList();
 					foreach (string key in keys)
 					{
-						List<Helper.Rom> temp = new List<Helper.Rom>();
-						List<Helper.Rom> roms = newMissing[key];
+						List<Rom> temp = new List<Rom>();
+						List<Rom> roms = newMissing[key];
 						for (int i = 0; i < roms.Count; i++)
 						{
-							Helper.Rom rom = roms[i];
+							Rom rom = roms[i];
 							rom.HashData.Size = Constants.SizeZero;
 							rom.HashData.CRC = Constants.CRCZero;
 							rom.HashData.MD5 = Constants.MD5Zero;
@@ -279,11 +279,11 @@ namespace SabreTools
 					keys = have.Keys.ToList();
 					foreach (string key in keys)
 					{
-						List<Helper.Rom> temp = new List<Helper.Rom>();
-						List<Helper.Rom> roms = have[key];
+						List<Rom> temp = new List<Rom>();
+						List<Rom> roms = have[key];
 						for (int i = 0; i < roms.Count; i++)
 						{
-							Helper.Rom rom = roms[i];
+							Rom rom = roms[i];
 							rom.HashData.Size = Constants.SizeZero;
 							rom.HashData.CRC = Constants.CRCZero;
 							rom.HashData.MD5 = Constants.MD5Zero;
@@ -364,11 +364,11 @@ namespace SabreTools
 				Dat midHave = new Dat();
 				midHave = DatTools.Parse(_currentMissingMerged, 0, 0, midHave, _logger);
 				midHave = DatTools.Parse(_currentAllMerged, 0, 0, midHave, _logger);
-				Dictionary<string, List<Helper.Rom>> have = new Dictionary<string, List<Helper.Rom>>();
+				Dictionary<string, List<Rom>> have = new Dictionary<string, List<Rom>>();
 				foreach (string key in midHave.Files.Keys)
 				{
-					List<Helper.Rom> templist = RomTools.Merge(midHave.Files[key], _logger);
-					foreach (Helper.Rom rom in templist)
+					List<Rom> templist = RomTools.Merge(midHave.Files[key], _logger);
+					foreach (Rom rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentAllMerged)
 						{
@@ -378,7 +378,7 @@ namespace SabreTools
 							}
 							else
 							{
-								List<Helper.Rom> temp = new List<Helper.Rom>();
+								List<Rom> temp = new List<Rom>();
 								temp.Add(rom);
 								have.Add(key, temp);
 							}
@@ -393,11 +393,11 @@ namespace SabreTools
 					List<string> keys = have.Keys.ToList();
 					foreach (string key in keys)
 					{
-						List<Helper.Rom> temp = new List<Helper.Rom>();
-						List<Helper.Rom> roms = have[key];
+						List<Rom> temp = new List<Rom>();
+						List<Rom> roms = have[key];
 						for (int i = 0; i < roms.Count; i++)
 						{
-							Helper.Rom rom = roms[i];
+							Rom rom = roms[i];
 							rom.HashData.Size = Constants.SizeZero;
 							rom.HashData.CRC = Constants.CRCZero;
 							rom.HashData.MD5 = Constants.MD5Zero;
@@ -434,11 +434,11 @@ namespace SabreTools
 				Dat midHave = new Dat();
 				midHave = DatTools.Parse(_currentMissingMerged, 0, 0, midHave, _logger);
 				midHave = DatTools.Parse(_currentNewMerged, 0, 0, midHave, _logger);
-				Dictionary<string, List<Helper.Rom>> have = new Dictionary<string, List<Helper.Rom>>();
+				Dictionary<string, List<Rom>> have = new Dictionary<string, List<Rom>>();
 				foreach (string key in midHave.Files.Keys)
 				{
-					List<Helper.Rom> templist = RomTools.Merge(midHave.Files[key], _logger);
-					foreach (Helper.Rom rom in templist)
+					List<Rom> templist = RomTools.Merge(midHave.Files[key], _logger);
+					foreach (Rom rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentNewMerged)
 						{
@@ -448,7 +448,7 @@ namespace SabreTools
 							}
 							else
 							{
-								List<Helper.Rom> temp = new List<Helper.Rom>();
+								List<Rom> temp = new List<Rom>();
 								temp.Add(rom);
 								have.Add(key, temp);
 							}
@@ -463,11 +463,11 @@ namespace SabreTools
 					List<string> keys = have.Keys.ToList();
 					foreach (string key in keys)
 					{
-						List<Helper.Rom> temp = new List<Helper.Rom>();
-						List<Helper.Rom> roms = have[key];
+						List<Rom> temp = new List<Rom>();
+						List<Rom> roms = have[key];
 						for (int i = 0; i < roms.Count; i++)
 						{
-							Helper.Rom rom = roms[i];
+							Rom rom = roms[i];
 							rom.HashData.Size = Constants.SizeZero;
 							rom.HashData.CRC = Constants.CRCZero;
 							rom.HashData.MD5 = Constants.MD5Zero;

@@ -21,7 +21,7 @@ namespace SabreTools.Helper
 		public static Rom GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false, long offset = 0)
 		{
 			// Add safeguard if file doesn't exist
-			if (!System.IO.File.Exists(input))
+			if (!File.Exists(input))
 			{
 				return new Rom();
 			}
@@ -44,7 +44,7 @@ namespace SabreTools.Helper
 				using (Crc32 crc = new Crc32())
 				using (MD5 md5 = MD5.Create())
 				using (SHA1 sha1 = SHA1.Create())
-				using (FileStream fs = System.IO.File.OpenRead(input))
+				using (FileStream fs = File.OpenRead(input))
 				{
 					// Seek to the starting position, if one is set
 					if (offset > 0)
@@ -179,6 +179,104 @@ namespace SabreTools.Helper
 				else
 				{
 					outroms.Add(rom);
+				}
+			}
+
+			// Then return the result
+			return outroms;
+		}
+
+		/// <summary>
+		/// Merge an arbitrary set of ROMs based on the supplied information
+		/// </summary>
+		/// <param name="inhashes">List of HashData objects representing the roms to be merged</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>A List of HashData objects representing the merged roms</returns>
+		public static List<HashData> Merge(List<HashData> inhashes, Logger logger)
+		{
+			// Create output list
+			List<HashData> outroms = new List<HashData>();
+
+			// Check for null or blank roms first
+			if (inhashes == null || inhashes.Count == 0)
+			{
+				return outroms;
+			}
+
+			// Then deduplicate them by checking to see if data matches previous saved roms
+			foreach (HashData hash in inhashes)
+			{
+				// If it's a nodump, add and skip
+				if (hash.Roms[0].Nodump)
+				{
+					outroms.Add(hash);
+					continue;
+				}
+
+				// If it's the first rom in the list, don't touch it
+				if (outroms.Count != 0)
+				{
+					// Check if the rom is a duplicate
+					DupeType dupetype = DupeType.None;
+					HashData savedHash = new HashData();
+					int pos = -1;
+					for (int i = 0; i < outroms.Count; i++)
+					{
+						HashData lastrom = outroms[i];
+						RomData savedRom = savedHash.Roms[0];
+						MachineData savedMachine = savedRom.Machine;
+
+						// Get the duplicate status
+						dupetype = GetDuplicateStatus(hash, lastrom, logger);
+
+						// If it's a duplicate, skip adding it to the output but add any missing information
+						if (dupetype != DupeType.None)
+						{
+							savedHash = lastrom;
+							pos = i;
+
+							savedHash.CRC = (savedHash.CRC == null && hash.CRC != null ? hash.CRC : savedHash.CRC);
+							savedHash.MD5 = (savedHash.MD5 == null && hash.MD5 != null ? hash.MD5 : savedHash.MD5);
+							savedHash.SHA1 = (savedHash.SHA1 == null && hash.SHA1 != null ? hash.SHA1 : savedHash.SHA1);
+							savedRom.DupeType = dupetype;
+
+							// If the current system has a lower ID than the previous, set the system accordingly
+							if (hash.Roms[0].Machine.SystemID < savedMachine.SystemID)
+							{
+								savedMachine.SystemID = hash.Roms[0].Machine.SystemID;
+								savedMachine.System = hash.Roms[0].Machine.System;
+								savedMachine.Name = hash.Roms[0].Machine.Name;
+								savedRom.Name = hash.Roms[0].Name;
+							}
+
+							// If the current source has a lower ID than the previous, set the source accordingly
+							if (hash.Roms[0].Machine.SourceID < savedMachine.SourceID)
+							{
+								savedMachine.SourceID = hash.Roms[0].Machine.SourceID;
+								savedMachine.Source = hash.Roms[0].Machine.Source;
+								savedMachine.Name = hash.Roms[0].Machine.Name;
+								savedRom.Name = hash.Roms[0].Name;
+							}
+
+							break;
+						}
+					}
+
+					// If no duplicate is found, add it to the list
+					if (dupetype == DupeType.None)
+					{
+						outroms.Add(hash);
+					}
+					// Otherwise, if a new rom information is found, add that
+					else
+					{
+						outroms.RemoveAt(pos);
+						outroms.Insert(pos, savedHash);
+					}
+				}
+				else
+				{
+					outroms.Add(hash);
 				}
 			}
 
@@ -347,6 +445,52 @@ namespace SabreTools.Helper
 			}
 
 			return hash;
+		}
+
+		/// <summary>
+		/// Clean a hash byte array and pad to the correct size
+		/// </summary>
+		/// <param name="hash">Hash byte array to sanitize</param>
+		/// <param name="padding">Amount of bytes to pad to</param>
+		/// <returns>Cleaned byte array</returns>
+		public static byte[] CleanHashData(byte[] hash, int padding)
+		{
+			// If we have a null hash or a <=0 padding, return the hash
+			if (hash == null || padding <= 0)
+			{
+				return hash;
+			}
+
+			// If we have a hash longer than the padding, trim and return
+			if (hash.Length > padding)
+			{
+				return hash.Take(padding).ToArray();
+			}
+
+			// If we have a hash of the correct length, return
+			if (hash.Length == padding)
+			{
+				return hash;
+			}
+
+			// Otherwise get the output byte array of the correct length
+			byte[] newhash = new byte[padding];
+
+			// Then write the proper number of empty bytes
+			int padNeeded = padding - hash.Length;
+			int index = 0;
+			for (index = 0; index < padNeeded; index++)
+			{
+				newhash[index] = 0x00;
+			}
+
+			// Now add the original hash
+			for (int i = 0; i < hash.Length; i++)
+			{
+				newhash[index + i] = hash[index];
+			}
+
+			return newhash;
 		}
 	}
 }

@@ -17,7 +17,7 @@ namespace SabreTools.Helper
 		public static void EnsureDatabase(string db, string connectionString)
 		{
 			// Make sure the file exists
-			if (!System.IO.File.Exists(db))
+			if (!File.Exists(db))
 			{
 				SqliteConnection.CreateFile(db);
 			}

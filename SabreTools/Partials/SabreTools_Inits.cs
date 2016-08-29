@@ -411,7 +411,7 @@ namespace SabreTools
 				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
-				Files = new Dictionary<string, List<Helper.Rom>>(),
+				Files = new Dictionary<string, List<Rom>>(),
 			};
 			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
 			bool success = dfd.Start();
@@ -436,7 +436,7 @@ namespace SabreTools
 			// Verify the input files
 			foreach (string input in inputs)
 			{
-				if (!System.IO.File.Exists(input) && !Directory.Exists(input))
+				if (!File.Exists(input) && !Directory.Exists(input))
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
@@ -464,7 +464,7 @@ namespace SabreTools
 			// Verify the input files
 			foreach (string input in inputs)
 			{
-				if (!System.IO.File.Exists(input) && !Directory.Exists(input))
+				if (!File.Exists(input) && !Directory.Exists(input))
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
@@ -506,7 +506,7 @@ namespace SabreTools
 
 			foreach (string input in inputs)
 			{
-				if (System.IO.File.Exists(input))
+				if (File.Exists(input))
 				{
 					newinputs.Add(input);
 				}

@@ -152,7 +152,7 @@ namespace SabreTools
 								zip = 0;
 							}
 						}
-						else if (System.IO.File.Exists(temparg) || Directory.Exists(temparg))
+						else if (File.Exists(temparg) || Directory.Exists(temparg))
 						{
 							inputs.Add(temparg);
 						}
@@ -223,7 +223,7 @@ namespace SabreTools
 			List<string> newinputs = new List<string>();
 			foreach (string input in inputs)
 			{
-				if (System.IO.File.Exists(input))
+				if (File.Exists(input))
 				{
 					newinputs.Add(Path.GetFullPath(input));
 				}
@@ -305,7 +305,7 @@ namespace SabreTools
 					try
 					{
 						_logger.User("Attempting to delete " + input);
-						System.IO.File.Delete(input);
+						File.Delete(input);
 					}
 					catch (Exception ex)
 					{
@@ -329,7 +329,7 @@ namespace SabreTools
 			}
 
 			// If we're in romba mode and the size file doesn't exist, create it
-			if (_romba && !System.IO.File.Exists(Path.Combine(_outdir, ".romba_size")))
+			if (_romba && !File.Exists(Path.Combine(_outdir, ".romba_size")))
 			{
 				// Get the size of all of the files in the output folder
 				long size = 0;
@@ -340,8 +340,8 @@ namespace SabreTools
 				}
 
 				// Write out the value to each of the romba depot files
-				using (StreamWriter tw = new StreamWriter(System.IO.File.Open(Path.Combine(_outdir, ".romba_size"), FileMode.Create, FileAccess.Write)))
-				using (StreamWriter twb = new StreamWriter(System.IO.File.Open(Path.Combine(_outdir, ".romba_size.backup"), FileMode.Create, FileAccess.Write)))
+				using (StreamWriter tw = new StreamWriter(File.Open(Path.Combine(_outdir, ".romba_size"), FileMode.Create, FileAccess.Write)))
+				using (StreamWriter twb = new StreamWriter(File.Open(Path.Combine(_outdir, ".romba_size.backup"), FileMode.Create, FileAccess.Write)))
 				{
 					tw.Write(size);
 					twb.Write(size);

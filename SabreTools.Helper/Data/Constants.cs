@@ -14,16 +14,22 @@ namespace SabreTools.Helper
 
 		public static long SizeZero = 0;
 		public static string CRCZero = "00000000";
+		public static byte[] CRCZeroBytes = new byte[] { 0x00, 0x00, 0x00, 0x00 };
 		public static string MD5Zero = "d41d8cd98f00b204e9800998ecf8427e";
+		public static byte[] MD5ZeroBytes = new byte[] { 0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04, 0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e };
 		public static string SHA1Zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+		public static byte[] SHA1ZeroBytes = new byte[] { 0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d, 0x32, 0x55, 0xbf, 0xef, 0x95, 0x60, 0x18, 0x90, 0xaf, 0xd8, 0x07, 0x09 };
 
 		#endregion
 
 		#region Hash string length constants
 
 		public static int CRCLength = 8;
+		public static int CRCBytesLength = 4;
 		public static int MD5Length = 32;
+		public static int MD5BytesLength = 16;
 		public static int SHA1Length = 40;
+		public static int SHA1BytesLength = 20;
 
 		#endregion
 

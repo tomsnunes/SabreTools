@@ -85,7 +85,7 @@ namespace SabreTools.Helper
 
 			try
 			{
-				FileStream fs = System.IO.File.Create(outfile);
+				FileStream fs = File.Create(outfile);
 				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
 
 				// Write out the header
@@ -619,7 +619,7 @@ namespace SabreTools.Helper
 			{
 				try
 				{
-					System.IO.File.Delete(file);
+					File.Delete(file);
 				}
 				catch { }
 			}
@@ -643,14 +643,14 @@ namespace SabreTools.Helper
 		public static void RemoveBytesFromFile(string input, string output, long bytesToRemoveFromHead, long bytesToRemoveFromTail)
 		{
 			// If any of the inputs are invalid, skip
-			if (!System.IO.File.Exists(input) || new FileInfo(input).Length <= (bytesToRemoveFromHead + bytesToRemoveFromTail))
+			if (!File.Exists(input) || new FileInfo(input).Length <= (bytesToRemoveFromHead + bytesToRemoveFromTail))
 			{
 				return;
 			}
 
 			// Read the input file and write to the fail
-			using (BinaryReader br = new BinaryReader(System.IO.File.OpenRead(input)))
-			using (BinaryWriter bw = new BinaryWriter(System.IO.File.OpenWrite(output)))
+			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+			using (BinaryWriter bw = new BinaryWriter(File.OpenWrite(output)))
 			{
 				int bufferSize = 1024;
 				long adjustedLength = br.BaseStream.Length - bytesToRemoveFromTail;
@@ -708,13 +708,13 @@ namespace SabreTools.Helper
 		public static void AppendBytesToFile(string input, string output, byte[] bytesToAddToHead, byte[] bytesToAddToTail)
 		{
 			// If any of the inputs are invalid, skip
-			if (!System.IO.File.Exists(input))
+			if (!File.Exists(input))
 			{
 				return;
 			}
 
-			using (BinaryReader br = new BinaryReader(System.IO.File.OpenRead(input)))
-			using (BinaryWriter bw = new BinaryWriter(System.IO.File.OpenWrite(output)))
+			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+			using (BinaryWriter bw = new BinaryWriter(File.OpenWrite(output)))
 			{
 				if (bytesToAddToHead.Count() > 0)
 				{
@@ -751,13 +751,13 @@ namespace SabreTools.Helper
 		/// <param name="output">Output filename</param>
 		public static void CopyFileToNewLocation(string input, string output)
 		{
-			if (System.IO.File.Exists(input) && !System.IO.File.Exists(output))
+			if (File.Exists(input) && !File.Exists(output))
 			{
 				if (!Directory.Exists(Path.GetDirectoryName(output)))
 				{
 					Directory.CreateDirectory(Path.GetDirectoryName(output));
 				}
-				System.IO.File.Copy(input, output);
+				File.Copy(input, output);
 			}
 		}
 		}
