@@ -21,9 +21,10 @@ namespace SabreTools.Helper
 		public static void Start(string name)
 		{
 			// Dynamically create the header string
-			string border = "+-----------------------------------------------------------------------------+";
+			int width = Console.WindowWidth - 3;
+			string border = "+" + new string('-', width) + "+";
 			string mid = name + " " + Constants.Version;
-			mid = "|" + mid.PadLeft(((77 - mid.Length) / 2) + mid.Length).PadRight(77) + "|";
+			mid = "|" + mid.PadLeft(((width - mid.Length) / 2) + mid.Length).PadRight(width) + "|";
 
 			// If we're outputting to console, do fancy things
 			if (!Console.IsOutputRedirected)
