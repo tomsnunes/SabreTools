@@ -1,4 +1,5 @@
-﻿using SharpCompress.Archive;
+﻿using DamienG.Security.Cryptography;
+using SharpCompress.Archive;
 using SharpCompress.Archive.SevenZip;
 using SharpCompress.Common;
 using SharpCompress.Reader;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace SabreTools.Helper
@@ -141,7 +143,7 @@ namespace SabreTools.Helper
 			outdir = Path.GetFullPath(outdir);
 
 			// Now get the Rom info for the file so we have hashes and size
-			Rom rom = RomTools.GetSingleFileInfo(input);
+			Rom rom = FileTools.GetSingleFileInfo(input);
 
 			// If it doesn't exist, create the output file and then write
 			string outfile = Path.Combine(outdir, rom.HashData.SHA1 + ".gz");
@@ -574,6 +576,86 @@ namespace SabreTools.Helper
 		#endregion
 
 		#region File Information Methods
+
+		/// <summary>
+		/// Retrieve file information for a single file
+		/// </summary>
+		/// <param name="input">Filename to get information from</param>
+		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise</param>
+		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise</param>
+		/// <returns>Populated RomData object if success, empty one on error</returns>
+		/// <remarks>Add read-offset for hash info</remarks>
+		public static Rom GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false, long offset = 0)
+		{
+			// Add safeguard if file doesn't exist
+			if (!File.Exists(input))
+			{
+				return new Rom();
+			}
+
+			Rom rom = new Rom
+			{
+				Name = Path.GetFileName(input),
+				Type = ItemType.Rom,
+				HashData = new Hash
+				{
+					Size = (new FileInfo(input)).Length,
+					CRC = string.Empty,
+					MD5 = string.Empty,
+					SHA1 = string.Empty,
+				}
+			};
+
+			try
+			{
+				using (Crc32 crc = new Crc32())
+				using (MD5 md5 = MD5.Create())
+				using (SHA1 sha1 = SHA1.Create())
+				using (FileStream fs = File.OpenRead(input))
+				{
+					// Seek to the starting position, if one is set
+					if (offset > 0)
+					{
+						fs.Seek(offset, SeekOrigin.Begin);
+					}
+
+					byte[] buffer = new byte[1024];
+					int read;
+					while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
+					{
+						crc.TransformBlock(buffer, 0, read, buffer, 0);
+						if (!noMD5)
+						{
+							md5.TransformBlock(buffer, 0, read, buffer, 0);
+						}
+						if (!noSHA1)
+						{
+							sha1.TransformBlock(buffer, 0, read, buffer, 0);
+						}
+					}
+
+					crc.TransformFinalBlock(buffer, 0, 0);
+					rom.HashData.CRC = BitConverter.ToString(crc.Hash).Replace("-", "").ToLowerInvariant();
+
+					if (!noMD5)
+					{
+						md5.TransformFinalBlock(buffer, 0, 0);
+						rom.HashData.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
+					}
+					if (!noSHA1)
+					{
+						sha1.TransformFinalBlock(buffer, 0, 0);
+						rom.HashData.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
+					}
+				}
+			}
+			catch (IOException)
+			{
+				return new Rom();
+			}
+
+			return rom;
+		}
 
 		/// <summary>
 		/// Generate a list of RomData objects from the header values in an archive

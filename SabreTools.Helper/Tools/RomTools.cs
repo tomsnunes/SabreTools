@@ -1,95 +1,12 @@
-﻿using DamienG.Security.Cryptography;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace SabreTools.Helper
 {
 	public class RomTools
 	{
-		/// <summary>
-		/// Retrieve file information for a single file
-		/// </summary>
-		/// <param name="input">Filename to get information from</param>
-		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise</param>
-		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise</param>
-		/// <returns>Populated RomData object if success, empty one on error</returns>
-		/// <remarks>Add read-offset for hash info</remarks>
-		public static Rom GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false, long offset = 0)
-		{
-			// Add safeguard if file doesn't exist
-			if (!File.Exists(input))
-			{
-				return new Rom();
-			}
-
-			Rom rom = new Rom
-			{
-				Name = Path.GetFileName(input),
-				Type = ItemType.Rom,
-				HashData = new Hash
-				{
-					Size = (new FileInfo(input)).Length,
-					CRC = string.Empty,
-					MD5 = string.Empty,
-					SHA1 = string.Empty,
-				}
-			};
-
-			try
-			{
-				using (Crc32 crc = new Crc32())
-				using (MD5 md5 = MD5.Create())
-				using (SHA1 sha1 = SHA1.Create())
-				using (FileStream fs = File.OpenRead(input))
-				{
-					// Seek to the starting position, if one is set
-					if (offset > 0)
-					{
-						fs.Seek(offset, SeekOrigin.Begin);
-					}
-
-					byte[] buffer = new byte[1024];
-					int read;
-					while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
-					{
-						crc.TransformBlock(buffer, 0, read, buffer, 0);
-						if (!noMD5)
-						{
-							md5.TransformBlock(buffer, 0, read, buffer, 0);
-						}
-						if (!noSHA1)
-						{
-							sha1.TransformBlock(buffer, 0, read, buffer, 0);
-						}
-					}
-
-					crc.TransformFinalBlock(buffer, 0, 0);
-					rom.HashData.CRC = BitConverter.ToString(crc.Hash).Replace("-", "").ToLowerInvariant();
-
-					if (!noMD5)
-					{
-						md5.TransformFinalBlock(buffer, 0, 0);
-						rom.HashData.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
-					}
-					if (!noSHA1)
-					{
-						sha1.TransformFinalBlock(buffer, 0, 0);
-						rom.HashData.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
-					}
-				}
-			}
-			catch (IOException)
-			{
-				return new Rom();
-			}
-
-			return rom;
-		}
-
 		/// <summary>
 		/// Merge an arbitrary set of ROMs based on the supplied information
 		/// </summary>
@@ -487,76 +404,6 @@ namespace SabreTools.Helper
 				return (norename ? String.Compare(x.Machine.Name, y.Machine.Name) : x.Metadata.SystemID - y.Metadata.SystemID);
 			});
 			return true;
-		}
-
-		/// <summary>
-		/// Clean a hash string and pad to the correct size
-		/// </summary>
-		/// <param name="hash">Hash string to sanitize</param>
-		/// <param name="padding">Amount of characters to pad to</param>
-		/// <returns>Cleaned string</returns>
-		public static string CleanHashData(string hash, int padding)
-		{
-			// First get the hash to the correct length
-			hash = (String.IsNullOrEmpty(hash) ? "" : hash.Trim());
-			hash = (hash.StartsWith("0x") ? hash.Remove(0, 2) : hash);
-			hash = (hash == "-" ? "" : hash);
-			hash = (String.IsNullOrEmpty(hash) ? "" : hash.PadLeft(padding, '0'));
-			hash = hash.ToLowerInvariant();
-
-			// Then make sure that it has the correct characters
-			if (!Regex.IsMatch(hash, "[0-9a-f]{" + padding + "}"))
-			{
-				hash = "";
-			}
-
-			return hash;
-		}
-
-		/// <summary>
-		/// Clean a hash byte array and pad to the correct size
-		/// </summary>
-		/// <param name="hash">Hash byte array to sanitize</param>
-		/// <param name="padding">Amount of bytes to pad to</param>
-		/// <returns>Cleaned byte array</returns>
-		public static byte[] CleanHashData(byte[] hash, int padding)
-		{
-			// If we have a null hash or a <=0 padding, return the hash
-			if (hash == null || padding <= 0)
-			{
-				return hash;
-			}
-
-			// If we have a hash longer than the padding, trim and return
-			if (hash.Length > padding)
-			{
-				return hash.Take(padding).ToArray();
-			}
-
-			// If we have a hash of the correct length, return
-			if (hash.Length == padding)
-			{
-				return hash;
-			}
-
-			// Otherwise get the output byte array of the correct length
-			byte[] newhash = new byte[padding];
-
-			// Then write the proper number of empty bytes
-			int padNeeded = padding - hash.Length;
-			int index = 0;
-			for (index = 0; index < padNeeded; index++)
-			{
-				newhash[index] = 0x00;
-			}
-
-			// Now add the original hash
-			for (int i = 0; i < hash.Length; i++)
-			{
-				newhash[index + i] = hash[index];
-			}
-
-			return newhash;
 		}
 	}
 }

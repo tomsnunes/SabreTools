@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace SabreTools.Helper
@@ -208,6 +209,76 @@ namespace SabreTools.Helper
 			string outgame = String.Join(Path.DirectorySeparatorChar.ToString(), game);
 			outgame = outgame.TrimStart().TrimEnd();
 			return outgame;
+		}
+
+		/// <summary>
+		/// Clean a hash string and pad to the correct size
+		/// </summary>
+		/// <param name="hash">Hash string to sanitize</param>
+		/// <param name="padding">Amount of characters to pad to</param>
+		/// <returns>Cleaned string</returns>
+		public static string CleanHashData(string hash, int padding)
+		{
+			// First get the hash to the correct length
+			hash = (String.IsNullOrEmpty(hash) ? "" : hash.Trim());
+			hash = (hash.StartsWith("0x") ? hash.Remove(0, 2) : hash);
+			hash = (hash == "-" ? "" : hash);
+			hash = (String.IsNullOrEmpty(hash) ? "" : hash.PadLeft(padding, '0'));
+			hash = hash.ToLowerInvariant();
+
+			// Then make sure that it has the correct characters
+			if (!Regex.IsMatch(hash, "[0-9a-f]{" + padding + "}"))
+			{
+				hash = "";
+			}
+
+			return hash;
+		}
+
+		/// <summary>
+		/// Clean a hash byte array and pad to the correct size
+		/// </summary>
+		/// <param name="hash">Hash byte array to sanitize</param>
+		/// <param name="padding">Amount of bytes to pad to</param>
+		/// <returns>Cleaned byte array</returns>
+		public static byte[] CleanHashData(byte[] hash, int padding)
+		{
+			// If we have a null hash or a <=0 padding, return the hash
+			if (hash == null || padding <= 0)
+			{
+				return hash;
+			}
+
+			// If we have a hash longer than the padding, trim and return
+			if (hash.Length > padding)
+			{
+				return hash.Take(padding).ToArray();
+			}
+
+			// If we have a hash of the correct length, return
+			if (hash.Length == padding)
+			{
+				return hash;
+			}
+
+			// Otherwise get the output byte array of the correct length
+			byte[] newhash = new byte[padding];
+
+			// Then write the proper number of empty bytes
+			int padNeeded = padding - hash.Length;
+			int index = 0;
+			for (index = 0; index < padNeeded; index++)
+			{
+				newhash[index] = 0x00;
+			}
+
+			// Now add the original hash
+			for (int i = 0; i < hash.Length; i++)
+			{
+				newhash[index + i] = hash[index];
+			}
+
+			return newhash;
 		}
 
 		#region Externally sourced methods

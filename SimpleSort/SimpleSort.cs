@@ -492,7 +492,7 @@ namespace SabreTools
 			// Hash and match the external files
 			if (shouldExternalScan)
 			{
-				Rom rom = RomTools.GetSingleFileInfo(input);
+				Rom rom = FileTools.GetSingleFileInfo(input);
 
 				// If we have a blank RomData, it's an error
 				if (rom.Name == null)
@@ -558,7 +558,7 @@ namespace SabreTools
 					// Otherwise, apply the rule ot the file
 					string newinput = input + ".new";
 					Skippers.TransformFile(input, newinput, rule, _logger);
-					Rom drom = RomTools.GetSingleFileInfo(newinput);
+					Rom drom = FileTools.GetSingleFileInfo(newinput);
 
 					// If we have a blank RomData, it's an error
 					if (drom.Name == null)
@@ -841,7 +841,7 @@ namespace SabreTools
 					FileTools.ExtractArchive(Path.GetFullPath(archive), temparcdir, _logger);
 					foreach (string tempfile in Directory.EnumerateFiles(temparcdir, "*", SearchOption.AllDirectories))
 					{
-						roms.Add(RomTools.GetSingleFileInfo(Path.GetFullPath(tempfile)));
+						roms.Add(FileTools.GetSingleFileInfo(Path.GetFullPath(tempfile)));
 					}
 
 					// Clear the temporary archive directory

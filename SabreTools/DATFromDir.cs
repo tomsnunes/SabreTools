@@ -462,7 +462,7 @@ namespace SabreTools
 		private string ProcessFile(string item, StreamWriter sw, string basepath, string parent, Dat datdata, string lastparent)
 		{
 			_logger.Log(Path.GetFileName(item) + " treated like a file");
-			Rom rom = RomTools.GetSingleFileInfo(item, _noMD5, _noSHA1);
+			Rom rom = FileTools.GetSingleFileInfo(item, _noMD5, _noSHA1);
 
 			return ProcessFileHelper(item, rom, sw, basepath, parent, datdata, lastparent);
 		}

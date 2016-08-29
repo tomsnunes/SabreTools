@@ -295,9 +295,9 @@ namespace SabreTools.Helper
 					}
 
 					// Sanitize the hashes from null, hex sizes, and "true blank" strings
-					rom.HashData.CRC = RomTools.CleanHashData(rom.HashData.CRC, Constants.CRCLength);
-					rom.HashData.MD5 = RomTools.CleanHashData(rom.HashData.MD5, Constants.MD5Length);
-					rom.HashData.SHA1 = RomTools.CleanHashData(rom.HashData.SHA1, Constants.SHA1Length);
+					rom.HashData.CRC = Style.CleanHashData(rom.HashData.CRC, Constants.CRCLength);
+					rom.HashData.MD5 = Style.CleanHashData(rom.HashData.MD5, Constants.MD5Length);
+					rom.HashData.SHA1 = Style.CleanHashData(rom.HashData.SHA1, Constants.SHA1Length);
 
 					// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 					if (rom.Type == ItemType.Rom && (rom.HashData.Size == 0 || rom.HashData.Size == -1) && ((rom.HashData.CRC == Constants.CRCZero || rom.HashData.CRC == "") || rom.HashData.MD5 == Constants.MD5Zero || rom.HashData.SHA1 == Constants.SHA1Zero))
@@ -583,9 +583,9 @@ namespace SabreTools.Helper
 						};
 
 						// Sanitize the hashes from null, hex sizes, and "true blank" strings
-						rom.HashData.CRC = RomTools.CleanHashData(rom.HashData.CRC, Constants.CRCLength);
-						rom.HashData.MD5 = RomTools.CleanHashData(rom.HashData.MD5, Constants.MD5Length);
-						rom.HashData.SHA1 = RomTools.CleanHashData(rom.HashData.SHA1, Constants.SHA1Length);
+						rom.HashData.CRC = Style.CleanHashData(rom.HashData.CRC, Constants.CRCLength);
+						rom.HashData.MD5 = Style.CleanHashData(rom.HashData.MD5, Constants.MD5Length);
+						rom.HashData.SHA1 = Style.CleanHashData(rom.HashData.SHA1, Constants.SHA1Length);
 
 						// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 						if (rom.Type == ItemType.Rom && (rom.HashData.Size == 0 || rom.HashData.Size == -1) && ((rom.HashData.CRC == Constants.CRCZero || rom.HashData.CRC == "") || rom.HashData.MD5 == Constants.MD5Zero || rom.HashData.SHA1 == Constants.SHA1Zero))
@@ -1089,9 +1089,9 @@ namespace SabreTools.Helper
 											}
 
 											// Sanitize the hashes from null, hex sizes, and "true blank" strings
-											crc = RomTools.CleanHashData(subreader.GetAttribute("crc"), Constants.CRCLength);
-											md5 = RomTools.CleanHashData(subreader.GetAttribute("md5"), Constants.MD5Length);
-											sha1 = RomTools.CleanHashData(subreader.GetAttribute("sha1"), Constants.SHA1Length);
+											crc = Style.CleanHashData(subreader.GetAttribute("crc"), Constants.CRCLength);
+											md5 = Style.CleanHashData(subreader.GetAttribute("md5"), Constants.MD5Length);
+											sha1 = Style.CleanHashData(subreader.GetAttribute("sha1"), Constants.SHA1Length);
 
 											// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 											if (subreader.Name == "rom" && (size == 0 || size == -1) &&
@@ -1320,9 +1320,9 @@ namespace SabreTools.Helper
 							}
 
 							// Sanitize the hashes from null, hex sizes, and "true blank" strings
-							crc = RomTools.CleanHashData(xtr.GetAttribute("crc"), Constants.CRCLength);
-							md5 = RomTools.CleanHashData(xtr.GetAttribute("md5"), Constants.MD5Length);
-							sha1 = RomTools.CleanHashData(xtr.GetAttribute("sha1"), Constants.SHA1Length);
+							crc = Style.CleanHashData(xtr.GetAttribute("crc"), Constants.CRCLength);
+							md5 = Style.CleanHashData(xtr.GetAttribute("md5"), Constants.MD5Length);
+							sha1 = Style.CleanHashData(xtr.GetAttribute("sha1"), Constants.SHA1Length);
 
 							// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 							if (xtr.GetAttribute("type") == "rom" && (size == 0 || size == -1) && ((crc == Constants.CRCZero || crc == "") || md5 == Constants.MD5Zero || sha1 == Constants.SHA1Zero))
@@ -2519,9 +2519,9 @@ namespace SabreTools.Helper
 					}
 
 					// Sanitize the hashes from null, hex sizes, and "true blank" strings
-					hashData.CRC = RomTools.CleanHashData(hashData.CRC, Constants.CRCBytesLength);
-					hashData.MD5 = RomTools.CleanHashData(hashData.MD5, Constants.MD5BytesLength);
-					hashData.SHA1 = RomTools.CleanHashData(hashData.SHA1, Constants.SHA1BytesLength);
+					hashData.CRC = Style.CleanHashData(hashData.CRC, Constants.CRCBytesLength);
+					hashData.MD5 = Style.CleanHashData(hashData.MD5, Constants.MD5BytesLength);
+					hashData.SHA1 = Style.CleanHashData(hashData.SHA1, Constants.SHA1BytesLength);
 
 					// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 					if (romData.Type == ItemType.Rom
@@ -2806,9 +2806,9 @@ namespace SabreTools.Helper
 						};
 
 						// Sanitize the hashes from null, hex sizes, and "true blank" strings
-						hashData.CRC = RomTools.CleanHashData(hashData.CRC, Constants.CRCBytesLength);
-						hashData.MD5 = RomTools.CleanHashData(hashData.MD5, Constants.MD5BytesLength);
-						hashData.SHA1 = RomTools.CleanHashData(hashData.SHA1, Constants.SHA1BytesLength);
+						hashData.CRC = Style.CleanHashData(hashData.CRC, Constants.CRCBytesLength);
+						hashData.MD5 = Style.CleanHashData(hashData.MD5, Constants.MD5BytesLength);
+						hashData.SHA1 = Style.CleanHashData(hashData.SHA1, Constants.SHA1BytesLength);
 
 						// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 						if (romData.Type == ItemType.Rom
@@ -3299,9 +3299,9 @@ namespace SabreTools.Helper
 											}
 
 											// Sanitize the hashes from null, hex sizes, and "true blank" strings
-											crc = RomTools.CleanHashData(subreader.GetAttribute("crc"), Constants.CRCLength);
-											md5 = RomTools.CleanHashData(subreader.GetAttribute("md5"), Constants.MD5Length);
-											sha1 = RomTools.CleanHashData(subreader.GetAttribute("sha1"), Constants.SHA1Length);
+											crc = Style.CleanHashData(subreader.GetAttribute("crc"), Constants.CRCLength);
+											md5 = Style.CleanHashData(subreader.GetAttribute("md5"), Constants.MD5Length);
+											sha1 = Style.CleanHashData(subreader.GetAttribute("sha1"), Constants.SHA1Length);
 
 											// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 											if (subreader.Name == "rom" && (size == 0 || size == -1) &&
@@ -3353,9 +3353,9 @@ namespace SabreTools.Helper
 												HashData hashData = new HashData
 												{
 													Size = size,
-													CRC = RomTools.CleanHashData(Style.StringToByteArray(crc), Constants.CRCBytesLength),
-													MD5 = RomTools.CleanHashData(Style.StringToByteArray(md5), Constants.MD5BytesLength),
-													SHA1 = RomTools.CleanHashData(Style.StringToByteArray(sha1), Constants.SHA1BytesLength),
+													CRC = Style.CleanHashData(Style.StringToByteArray(crc), Constants.CRCBytesLength),
+													MD5 = Style.CleanHashData(Style.StringToByteArray(md5), Constants.MD5BytesLength),
+													SHA1 = Style.CleanHashData(Style.StringToByteArray(sha1), Constants.SHA1BytesLength),
 													Roms = new List<RomData>(),
 												};
 												hashData.Roms.Add(romData);
@@ -3513,9 +3513,9 @@ namespace SabreTools.Helper
 							}
 
 							// Sanitize the hashes from null, hex sizes, and "true blank" strings
-							crc = RomTools.CleanHashData(xtr.GetAttribute("crc"), Constants.CRCLength);
-							md5 = RomTools.CleanHashData(xtr.GetAttribute("md5"), Constants.MD5Length);
-							sha1 = RomTools.CleanHashData(xtr.GetAttribute("sha1"), Constants.SHA1Length);
+							crc = Style.CleanHashData(xtr.GetAttribute("crc"), Constants.CRCLength);
+							md5 = Style.CleanHashData(xtr.GetAttribute("md5"), Constants.MD5Length);
+							sha1 = Style.CleanHashData(xtr.GetAttribute("sha1"), Constants.SHA1Length);
 
 							// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 							if (xtr.GetAttribute("type") == "rom" && (size == 0 || size == -1) && ((crc == Constants.CRCZero || crc == "") || md5 == Constants.MD5Zero || sha1 == Constants.SHA1Zero))
@@ -3575,9 +3575,9 @@ namespace SabreTools.Helper
 								HashData hashData = new HashData
 								{
 									Size = size,
-									CRC = RomTools.CleanHashData(Style.StringToByteArray(crc), Constants.CRCBytesLength),
-									MD5 = RomTools.CleanHashData(Style.StringToByteArray(md5), Constants.MD5BytesLength),
-									SHA1 = RomTools.CleanHashData(Style.StringToByteArray(sha1), Constants.SHA1BytesLength),
+									CRC = Style.CleanHashData(Style.StringToByteArray(crc), Constants.CRCBytesLength),
+									MD5 = Style.CleanHashData(Style.StringToByteArray(md5), Constants.MD5BytesLength),
+									SHA1 = Style.CleanHashData(Style.StringToByteArray(sha1), Constants.SHA1BytesLength),
 									Roms = new List<RomData>(),
 								};
 								hashData.Roms.Add(romData);
