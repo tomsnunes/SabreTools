@@ -29,7 +29,7 @@ namespace SabreTools.Helper
 			Rom rom = new Rom
 			{
 				Name = Path.GetFileName(input),
-				Type = "rom",
+				Type = ItemType.Rom,
 				HashData = new HashData
 				{
 					Size = (new FileInfo(input)).Length,
@@ -249,11 +249,11 @@ namespace SabreTools.Helper
 				return dupefound;
 			}
 
-			if (rom.Type == "rom" && lastrom.Type == "rom")
+			if (rom.Type == ItemType.Rom && lastrom.Type == ItemType.Rom)
 			{
 				dupefound = rom.HashData.Equals(lastrom.HashData, false);
 			}
-			else if (rom.Type == "disk" && lastrom.Type == "disk")
+			else if (rom.Type == ItemType.Disk && lastrom.Type == ItemType.Disk)
 			{
 				dupefound = rom.HashData.Equals(lastrom.HashData, true);
 			}

@@ -267,7 +267,7 @@ namespace SabreTools
 						// If we're in a mode that doesn't allow for actual empty folders, add the blank info
 						if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
 						{
-							rom.Type = "rom";
+							rom.Type = ItemType.Rom;
 							rom.Name = "-";
 							rom.HashData.Size = Constants.SizeZero;
 							rom.HashData.CRC = Constants.CRCZero;

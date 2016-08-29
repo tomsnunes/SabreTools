@@ -421,7 +421,7 @@ namespace SabreTools.Helper
 				switch (datdata.OutputFormat)
 				{
 					case OutputFormat.ClrMamePro:
-						state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
+						state += "\t" + rom.Type.ToString().ToLowerInvariant() + " ( name \"" + rom.Name + "\"" +
 							(rom.HashData.Size != -1 ? " size " + rom.HashData.Size : "") +
 							(!String.IsNullOrEmpty(rom.HashData.CRC) ? " crc " + rom.HashData.CRC.ToLowerInvariant() : "") +
 							(!String.IsNullOrEmpty(rom.HashData.MD5) ? " md5 " + rom.HashData.MD5.ToLowerInvariant() : "") +
@@ -453,7 +453,7 @@ namespace SabreTools.Helper
 						else if (datdata.TSV == true)
 						{
 							string inline = "\"" + datdata.FileName + "\"\t\"" + datdata.Name + "\"\t\"" + datdata.Description + "\"\t\"" + rom.Machine + "\"\t\"" + rom.Machine + "\"\t\"" +
-								rom.Type + "\"\t\"" + (rom.Type == "rom" ? rom.Name : "") + "\"\t\"" + (rom.Type == "disk" ? rom.Name : "") + "\"\t\"" + rom.HashData.Size + "\"\t\"" +
+								rom.Type.ToString().ToLowerInvariant() + "\"\t\"" + (rom.Type == ItemType.Rom ? rom.Name : "") + "\"\t\"" + (rom.Type == ItemType.Disk ? rom.Name : "") + "\"\t\"" + rom.HashData.Size + "\"\t\"" +
 								rom.HashData.CRC + "\"\t\"" + rom.HashData.MD5 + "\"\t\"" + rom.HashData.SHA1 + "\"\t" + (rom.Nodump ? "\"Nodump\"" : "\"\"");
 							state += pre + inline + post + "\n";
 						}
@@ -461,7 +461,7 @@ namespace SabreTools.Helper
 						else if (datdata.TSV == false)
 						{
 							string inline = "\"" + datdata.FileName + "\",\"" + datdata.Name + "\",\"" + datdata.Description + "\",\"" + rom.Machine + "\",\"" + rom.Machine + "\",\"" +
-								rom.Type + "\",\"" + (rom.Type == "rom" ? rom.Name : "") + "\",\"" + (rom.Type == "disk" ? rom.Name : "") + "\",\"" + rom.HashData.Size + "\",\"" +
+								rom.Type.ToString().ToLowerInvariant() + "\",\"" + (rom.Type == ItemType.Rom ? rom.Name : "") + "\",\"" + (rom.Type == ItemType.Disk ? rom.Name : "") + "\",\"" + rom.HashData.Size + "\",\"" +
 								rom.HashData.CRC + "\",\"" + rom.HashData.MD5 + "\",\"" + rom.HashData.SHA1 + "\"," + (rom.Nodump ? "\"Nodump\"" : "\"\"");
 							state += pre + inline + post + "\n";
 						}
@@ -510,7 +510,7 @@ namespace SabreTools.Helper
 						}
 
 						state += prefix;
-						state += "<file type=\"" + rom.Type + "\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
+						state += "<file type=\"" + rom.Type.ToString().ToLowerInvariant() + "\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
 							(rom.HashData.Size != -1 ? " size=\"" + rom.HashData.Size + "\"" : "") +
 							(!String.IsNullOrEmpty(rom.HashData.CRC) ? " crc=\"" + rom.HashData.CRC.ToLowerInvariant() + "\"" : "") +
 							(!String.IsNullOrEmpty(rom.HashData.MD5) ? " md5=\"" + rom.HashData.MD5.ToLowerInvariant() + "\"" : "") +
@@ -523,7 +523,7 @@ namespace SabreTools.Helper
 							"/>\n");
 						break;
 					case OutputFormat.Xml:
-						state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
+						state += "\t\t<" + rom.Type.ToString().ToLowerInvariant() + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
 							(rom.HashData.Size != -1 ? " size=\"" + rom.HashData.Size + "\"" : "") +
 							(!String.IsNullOrEmpty(rom.HashData.CRC) ? " crc=\"" + rom.HashData.CRC.ToLowerInvariant() + "\"" : "") +
 							(!String.IsNullOrEmpty(rom.HashData.MD5) ? " md5=\"" + rom.HashData.MD5.ToLowerInvariant() + "\"" : "") +

@@ -177,7 +177,7 @@ namespace SabreTools.Helper
 							Name = gamename,
 							Description = gamedesc,
 						},
-						Type = (line.Trim().StartsWith("disk (") ? "disk" : "rom"),
+						Type = (line.Trim().StartsWith("disk (") ? ItemType.Disk : ItemType.Rom),
 						Metadata = new SourceMetadata { SystemID = sysid, SourceID = srcid },
 					};
 
@@ -300,7 +300,7 @@ namespace SabreTools.Helper
 					rom.HashData.SHA1 = RomTools.CleanHashData(rom.HashData.SHA1, Constants.SHA1Length);
 
 					// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
-					if (rom.Type == "rom" && (rom.HashData.Size == 0 || rom.HashData.Size == -1) && ((rom.HashData.CRC == Constants.CRCZero || rom.HashData.CRC == "") || rom.HashData.MD5 == Constants.MD5Zero || rom.HashData.SHA1 == Constants.SHA1Zero))
+					if (rom.Type == ItemType.Rom && (rom.HashData.Size == 0 || rom.HashData.Size == -1) && ((rom.HashData.CRC == Constants.CRCZero || rom.HashData.CRC == "") || rom.HashData.MD5 == Constants.MD5Zero || rom.HashData.SHA1 == Constants.SHA1Zero))
 					{
 						rom.HashData.Size = Constants.SizeZero;
 						rom.HashData.CRC = Constants.CRCZero;
@@ -308,14 +308,14 @@ namespace SabreTools.Helper
 						rom.HashData.SHA1 = Constants.SHA1Zero;
 					}
 					// If the file has no size and it's not the above case, skip and log
-					else if (rom.Type == "rom" && (rom.HashData.Size == 0 || rom.HashData.Size == -1))
+					else if (rom.Type == ItemType.Rom && (rom.HashData.Size == 0 || rom.HashData.Size == -1))
 					{
 						logger.Warning("Incomplete entry for \"" + rom.Name + "\" will be output as nodump");
 						rom.Nodump = true;
 					}
 
 					// If we have a disk, make sure that the value for size is -1
-					if (rom.Type == "disk")
+					if (rom.Type == ItemType.Disk)
 					{
 						rom.HashData.Size = -1;
 					}
@@ -334,8 +334,8 @@ namespace SabreTools.Helper
 					}
 
 					// Add statistical data
-					datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
-					datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+					datdata.RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
+					datdata.DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
 					datdata.TotalSize += (rom.Nodump ? 0 : rom.HashData.Size);
 					datdata.CRCCount += (String.IsNullOrEmpty(rom.HashData.CRC) ? 0 : 1);
 					datdata.MD5Count += (String.IsNullOrEmpty(rom.HashData.MD5) ? 0 : 1);
@@ -588,7 +588,7 @@ namespace SabreTools.Helper
 						rom.HashData.SHA1 = RomTools.CleanHashData(rom.HashData.SHA1, Constants.SHA1Length);
 
 						// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
-						if (rom.Type == "rom" && (rom.HashData.Size == 0 || rom.HashData.Size == -1) && ((rom.HashData.CRC == Constants.CRCZero || rom.HashData.CRC == "") || rom.HashData.MD5 == Constants.MD5Zero || rom.HashData.SHA1 == Constants.SHA1Zero))
+						if (rom.Type == ItemType.Rom && (rom.HashData.Size == 0 || rom.HashData.Size == -1) && ((rom.HashData.CRC == Constants.CRCZero || rom.HashData.CRC == "") || rom.HashData.MD5 == Constants.MD5Zero || rom.HashData.SHA1 == Constants.SHA1Zero))
 						{
 							rom.HashData.Size = Constants.SizeZero;
 							rom.HashData.CRC = Constants.CRCZero;
@@ -596,14 +596,14 @@ namespace SabreTools.Helper
 							rom.HashData.SHA1 = Constants.SHA1Zero;
 						}
 						// If the file has no size and it's not the above case, skip and log
-						else if (rom.Type == "rom" && (rom.HashData.Size == 0 || rom.HashData.Size == -1))
+						else if (rom.Type == ItemType.Rom && (rom.HashData.Size == 0 || rom.HashData.Size == -1))
 						{
 							logger.Warning("Incomplete entry for \"" + rom.Name + "\" will be output as nodump");
 							rom.Nodump = true;
 						}
 
 						// If we have a disk, make sure that the value for size is -1
-						if (rom.Type == "disk")
+						if (rom.Type == ItemType.Disk)
 						{
 							rom.HashData.Size = -1;
 						}
@@ -622,8 +622,8 @@ namespace SabreTools.Helper
 						}
 
 						// Add statistical data
-						datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
-						datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+						datdata.RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
+						datdata.DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
 						datdata.TotalSize += (rom.Nodump ? 0 : rom.HashData.Size);
 						datdata.CRCCount += (String.IsNullOrEmpty(rom.HashData.CRC) ? 0 : 1);
 						datdata.MD5Count += (String.IsNullOrEmpty(rom.HashData.MD5) ? 0 : 1);
@@ -679,7 +679,7 @@ namespace SabreTools.Helper
 
 							Rom rom = new Rom
 							{
-								Type = "rom",
+								Type = ItemType.Rom,
 								Name = "null",
 								Machine = new Machine
 								{
@@ -708,8 +708,8 @@ namespace SabreTools.Helper
 							}
 
 							// Add statistical data
-							datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
-							datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+							datdata.RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
+							datdata.DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
 							datdata.TotalSize += (rom.Nodump ? 0 : rom.HashData.Size);
 							datdata.CRCCount += (String.IsNullOrEmpty(rom.HashData.CRC) ? 0 : 1);
 							datdata.MD5Count += (String.IsNullOrEmpty(rom.HashData.MD5) ? 0 : 1);
@@ -1135,7 +1135,7 @@ namespace SabreTools.Helper
 														Description = gamedesc,
 													},
 													Name = subreader.GetAttribute("name"),
-													Type = subreader.Name,
+													Type = (subreader.Name.ToLowerInvariant() == "disk" ? ItemType.Disk : ItemType.Rom),
 													HashData = new HashData
 													{
 														Size = size,
@@ -1160,8 +1160,8 @@ namespace SabreTools.Helper
 												}
 
 												// Add statistical data
-												datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
-												datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+												datdata.RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
+												datdata.DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
 												datdata.TotalSize += (rom.Nodump ? 0 : rom.HashData.Size);
 												datdata.CRCCount += (String.IsNullOrEmpty(rom.HashData.CRC) ? 0 : 1);
 												datdata.MD5Count += (String.IsNullOrEmpty(rom.HashData.MD5) ? 0 : 1);
@@ -1188,7 +1188,7 @@ namespace SabreTools.Helper
 
 								Rom rom = new Rom
 								{
-									Type = "rom",
+									Type = ItemType.Rom,
 									Name = "null",
 									Machine = new Machine
 									{
@@ -1217,8 +1217,8 @@ namespace SabreTools.Helper
 								}
 
 								// Add statistical data
-								datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
-								datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+								datdata.RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
+								datdata.DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
 								datdata.TotalSize += (rom.Nodump ? 0 : rom.HashData.Size);
 								datdata.CRCCount += (String.IsNullOrEmpty(rom.HashData.CRC) ? 0 : 1);
 								datdata.MD5Count += (String.IsNullOrEmpty(rom.HashData.MD5) ? 0 : 1);
@@ -1374,7 +1374,7 @@ namespace SabreTools.Helper
 										Name = tempname,
 									},
 									Name = xtr.GetAttribute("name"),
-									Type = xtr.GetAttribute("type"),
+									Type = (xtr.GetAttribute("type").ToLowerInvariant() == "disk" ? ItemType.Disk : ItemType.Rom),
 									HashData = new HashData
 									{
 										Size = size,
@@ -1399,8 +1399,8 @@ namespace SabreTools.Helper
 								}
 
 								// Add statistical data
-								datdata.RomCount += (rom.Type == "rom" ? 1 : 0);
-								datdata.DiskCount += (rom.Type == "disk" ? 1 : 0);
+								datdata.RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
+								datdata.DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
 								datdata.TotalSize += (rom.Nodump ? 0 : rom.HashData.Size);
 								datdata.CRCCount += (String.IsNullOrEmpty(rom.HashData.CRC) ? 0 : 1);
 								datdata.MD5Count += (String.IsNullOrEmpty(rom.HashData.MD5) ? 0 : 1);
@@ -1864,7 +1864,7 @@ namespace SabreTools.Helper
 					}
 
 					// Filter on rom type
-					if (romtype != "" && rom.Type.ToLowerInvariant() != romtype.ToLowerInvariant())
+					if (romtype != "" && rom.Type.ToString().ToLowerInvariant() != romtype.ToLowerInvariant())
 					{
 						continue;
 					}

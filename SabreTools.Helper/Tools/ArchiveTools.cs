@@ -536,7 +536,7 @@ namespace SabreTools.Helper
 
 							roms.Add(new Rom
 							{
-								Type = "rom",
+								Type = ItemType.Rom,
 								Name = reader.Entry.Key,
 								Machine = new Machine
 								{
@@ -620,7 +620,7 @@ namespace SabreTools.Helper
 
 			Rom rom = new Rom
 			{
-				Type = "rom",
+				Type = ItemType.Rom,
 				Machine = new Machine
 				{
 					Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),

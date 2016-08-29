@@ -60,6 +60,19 @@ namespace SabreTools.Helper
 	}
 
 	/// <summary>
+	/// Determine what type of file an item is
+	/// </summary>
+	public enum ItemType
+	{
+		Rom = 0,
+		Disk = 1,
+		Sample = 2,
+		Release = 3,
+		BiosSet = 4,
+		Archive = 5,
+	}
+
+	/// <summary>
 	/// Determines forcemerging tag for DAT output
 	/// </summary>
 	public enum ForceMerging

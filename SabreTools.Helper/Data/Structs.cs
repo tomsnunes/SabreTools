@@ -48,7 +48,7 @@ namespace SabreTools.Helper
 	{
 		public Machine Machine;
 		public string Name;
-		public string Type;
+		public ItemType Type;
 		public HashData HashData;
 		public DupeType Dupe;
 		public bool Nodump;
