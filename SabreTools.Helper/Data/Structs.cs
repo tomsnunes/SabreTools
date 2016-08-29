@@ -153,7 +153,7 @@ namespace SabreTools.Helper
 		public ForcePacking ForcePacking;
 		public OutputFormat OutputFormat;
 		public bool MergeRoms;
-		public Dictionary<string, List<File>> Roms;
+		public Dictionary<string, List<File>> Files;
 
 		// Data specific to the Miss DAT type
 		public bool UseGame;
@@ -198,7 +198,7 @@ namespace SabreTools.Helper
 				ForcePacking = this.ForcePacking,
 				OutputFormat = this.OutputFormat,
 				MergeRoms = this.MergeRoms,
-				Roms = this.Roms,
+				Files = this.Files,
 				UseGame = this.UseGame,
 				Prefix = this.Prefix,
 				Postfix = this.Postfix,
@@ -241,7 +241,7 @@ namespace SabreTools.Helper
 				ForcePacking = this.ForcePacking,
 				OutputFormat = this.OutputFormat,
 				MergeRoms = this.MergeRoms,
-				Roms = new Dictionary<string, List<File>>(),
+				Files = new Dictionary<string, List<File>>(),
 				UseGame = this.UseGame,
 				Prefix = this.Prefix,
 				Postfix = this.Postfix,

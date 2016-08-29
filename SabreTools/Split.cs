@@ -155,7 +155,7 @@ namespace SabreTools
 				ForcePacking = datdata.ForcePacking,
 				OutputFormat = outputFormat,
 				MergeRoms = datdata.MergeRoms,
-				Roms = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.File>>(),
 			};
 			Dat sha1 = new Dat
 			{
@@ -177,7 +177,7 @@ namespace SabreTools
 				ForcePacking = datdata.ForcePacking,
 				OutputFormat = outputFormat,
 				MergeRoms = datdata.MergeRoms,
-				Roms = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.File>>(),
 			};
 			Dat md5 = new Dat
 			{
@@ -199,7 +199,7 @@ namespace SabreTools
 				ForcePacking = datdata.ForcePacking,
 				OutputFormat = outputFormat,
 				MergeRoms = datdata.MergeRoms,
-				Roms = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.File>>(),
 			};
 			Dat crc = new Dat
 			{
@@ -221,70 +221,70 @@ namespace SabreTools
 				ForcePacking = datdata.ForcePacking,
 				OutputFormat = outputFormat,
 				MergeRoms = datdata.MergeRoms,
-				Roms = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.File>>(),
 			};
 
 			// Now populate each of the DAT objects in turn
-			List<string> keys = datdata.Roms.Keys.ToList();
+			List<string> keys = datdata.Files.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<Helper.File> roms = datdata.Roms[key];
+				List<Helper.File> roms = datdata.Files[key];
 				foreach (Helper.File rom in roms)
 				{
 					// If the file is a nodump
 					if (rom.Nodump)
 					{
-						if (nodump.Roms.ContainsKey(key))
+						if (nodump.Files.ContainsKey(key))
 						{
-							nodump.Roms[key].Add(rom);
+							nodump.Files[key].Add(rom);
 						}
 						else
 						{
 							List<Helper.File> temp = new List<Helper.File>();
 							temp.Add(rom);
-							nodump.Roms.Add(key, temp);
+							nodump.Files.Add(key, temp);
 						}
 					}
 					// If the file has a SHA-1
 					else if (rom.HashData.SHA1 != null && rom.HashData.SHA1 != "")
 					{
-						if (sha1.Roms.ContainsKey(key))
+						if (sha1.Files.ContainsKey(key))
 						{
-							sha1.Roms[key].Add(rom);
+							sha1.Files[key].Add(rom);
 						}
 						else
 						{
 							List<Helper.File> temp = new List<Helper.File>();
 							temp.Add(rom);
-							sha1.Roms.Add(key, temp);
+							sha1.Files.Add(key, temp);
 						}
 					}
 					// If the file has no SHA-1 but has an MD5
 					else if (rom.HashData.MD5 != null && rom.HashData.MD5 != "")
 					{
-						if (md5.Roms.ContainsKey(key))
+						if (md5.Files.ContainsKey(key))
 						{
-							md5.Roms[key].Add(rom);
+							md5.Files[key].Add(rom);
 						}
 						else
 						{
 							List<Helper.File> temp = new List<Helper.File>();
 							temp.Add(rom);
-							md5.Roms.Add(key, temp);
+							md5.Files.Add(key, temp);
 						}
 					}
 					// All other cases
 					else
 					{
-						if (crc.Roms.ContainsKey(key))
+						if (crc.Files.ContainsKey(key))
 						{
-							crc.Roms[key].Add(rom);
+							crc.Files[key].Add(rom);
 						}
 						else
 						{
 							List<Helper.File> temp = new List<Helper.File>();
 							temp.Add(rom);
-							crc.Roms.Add(key, temp);
+							crc.Files.Add(key, temp);
 						}
 					}
 				}
@@ -304,19 +304,19 @@ namespace SabreTools
 			// Now, output all of the files to the output directory
 			_logger.User("DAT information created, outputting new files");
 			bool success = true;
-			if (nodump.Roms.Count > 0)
+			if (nodump.Files.Count > 0)
 			{
 				success &= Output.WriteDatfile(nodump, outdir, _logger);
 			}
-			if (sha1.Roms.Count > 0)
+			if (sha1.Files.Count > 0)
 			{
 				success &= Output.WriteDatfile(sha1, outdir, _logger);
 			}
-			if (md5.Roms.Count > 0)
+			if (md5.Files.Count > 0)
 			{
 				success &= Output.WriteDatfile(md5, outdir, _logger);
 			}
-			if (crc.Roms.Count > 0)
+			if (crc.Files.Count > 0)
 			{
 				success &= Output.WriteDatfile(crc, outdir, _logger);
 			}
@@ -351,7 +351,7 @@ namespace SabreTools
 				Homepage = datdata.Homepage,
 				Url = datdata.Url,
 				Comment = datdata.Comment,
-				Roms = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.File>>(),
 				OutputFormat = outputFormat,
 			};
 			Dat datdataB = new Dat
@@ -367,68 +367,68 @@ namespace SabreTools
 				Homepage = datdata.Homepage,
 				Url = datdata.Url,
 				Comment = datdata.Comment,
-				Roms = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.File>>(),
 				OutputFormat = outputFormat,
 			};
 
 			// If roms is empty, return false
-			if (datdata.Roms.Count == 0)
+			if (datdata.Files.Count == 0)
 			{
 				return false;
 			}
 
 			// Now separate the roms accordingly
-			foreach (string key in datdata.Roms.Keys)
+			foreach (string key in datdata.Files.Keys)
 			{
-				foreach (Helper.File rom in datdata.Roms[key])
+				foreach (Helper.File rom in datdata.Files[key])
 				{
 					if (_extA.Contains(Path.GetExtension(rom.Name.ToUpperInvariant())))
 					{
-						if (datdataA.Roms.ContainsKey(key))
+						if (datdataA.Files.ContainsKey(key))
 						{
-							datdataA.Roms[key].Add(rom);
+							datdataA.Files[key].Add(rom);
 						}
 						else
 						{
 							List<Helper.File> temp = new List<Helper.File>();
 							temp.Add(rom);
-							datdataA.Roms.Add(key, temp);
+							datdataA.Files.Add(key, temp);
 						}
 					}
 					else if (_extB.Contains(Path.GetExtension(rom.Name.ToUpperInvariant())))
 					{
-						if (datdataB.Roms.ContainsKey(key))
+						if (datdataB.Files.ContainsKey(key))
 						{
-							datdataB.Roms[key].Add(rom);
+							datdataB.Files[key].Add(rom);
 						}
 						else
 						{
 							List<Helper.File> temp = new List<Helper.File>();
 							temp.Add(rom);
-							datdataB.Roms.Add(key, temp);
+							datdataB.Files.Add(key, temp);
 						}
 					}
 					else
 					{
-						if (datdataA.Roms.ContainsKey(key))
+						if (datdataA.Files.ContainsKey(key))
 						{
-							datdataA.Roms[key].Add(rom);
+							datdataA.Files[key].Add(rom);
 						}
 						else
 						{
 							List<Helper.File> temp = new List<Helper.File>();
 							temp.Add(rom);
-							datdataA.Roms.Add(key, temp);
+							datdataA.Files.Add(key, temp);
 						}
-						if (datdataB.Roms.ContainsKey(key))
+						if (datdataB.Files.ContainsKey(key))
 						{
-							datdataB.Roms[key].Add(rom);
+							datdataB.Files[key].Add(rom);
 						}
 						else
 						{
 							List<Helper.File> temp = new List<Helper.File>();
 							temp.Add(rom);
-							datdataB.Roms.Add(key, temp);
+							datdataB.Files.Add(key, temp);
 						}
 					}
 				}

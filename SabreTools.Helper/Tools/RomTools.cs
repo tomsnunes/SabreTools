@@ -199,16 +199,16 @@ namespace SabreTools.Helper
 			List<File> output = new List<File>();
 
 			// Check for an empty rom list first
-			if (datdata.Roms == null || datdata.Roms.Count == 0)
+			if (datdata.Files == null || datdata.Files.Count == 0)
 			{
 				return output;
 			}
 
 			// Try to find duplicates
-			List<string> keys = datdata.Roms.Keys.ToList();
+			List<string> keys = datdata.Files.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<File> roms = datdata.Roms[key];
+				List<File> roms = datdata.Files[key];
 				List<File> left = new List<File>();
 				foreach (File rom in roms)
 				{
@@ -225,7 +225,7 @@ namespace SabreTools.Helper
 				// If we're in removal mode, replace the list with the new one
 				if (remove)
 				{
-					datdata.Roms[key] = left;
+					datdata.Files[key] = left;
 				}
 			}
 

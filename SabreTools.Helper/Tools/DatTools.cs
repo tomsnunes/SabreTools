@@ -93,9 +93,9 @@ namespace SabreTools.Helper
 			datdata.OutputFormat = (datdata.OutputFormat == OutputFormat.None ? GetOutputFormat(filename) : datdata.OutputFormat);
 
 			// Make sure there's a dictionary to read to
-			if (datdata.Roms == null)
+			if (datdata.Files == null)
 			{
-				datdata.Roms = new Dictionary<string, List<File>>();
+				datdata.Files = new Dictionary<string, List<File>>();
 			}
 
 			// Now parse the correct type of DAT
@@ -322,15 +322,15 @@ namespace SabreTools.Helper
 
 					// Now add the rom to the dictionary
 					string key = rom.HashData.Size + "-" + rom.HashData.CRC;
-					if (datdata.Roms.ContainsKey(key))
+					if (datdata.Files.ContainsKey(key))
 					{
-						datdata.Roms[key].Add(rom);
+						datdata.Files[key].Add(rom);
 					}
 					else
 					{
 						List<File> templist = new List<File>();
 						templist.Add(rom);
-						datdata.Roms.Add(key, templist);
+						datdata.Files.Add(key, templist);
 					}
 
 					// Add statistical data
@@ -610,15 +610,15 @@ namespace SabreTools.Helper
 
 						// Add the new rom
 						string key = rom.HashData.Size + "-" + rom.HashData.CRC;
-						if (datdata.Roms.ContainsKey(key))
+						if (datdata.Files.ContainsKey(key))
 						{
-							datdata.Roms[key].Add(rom);
+							datdata.Files[key].Add(rom);
 						}
 						else
 						{
 							List<File> templist = new List<File>();
 							templist.Add(rom);
-							datdata.Roms.Add(key, templist);
+							datdata.Files.Add(key, templist);
 						}
 
 						// Add statistical data
@@ -696,15 +696,15 @@ namespace SabreTools.Helper
 							};
 
 							key = rom.HashData.Size + "-" + rom.HashData.CRC;
-							if (datdata.Roms.ContainsKey(key))
+							if (datdata.Files.ContainsKey(key))
 							{
-								datdata.Roms[key].Add(rom);
+								datdata.Files[key].Add(rom);
 							}
 							else
 							{
 								List<File> temp = new List<File>();
 								temp.Add(rom);
-								datdata.Roms.Add(key, temp);
+								datdata.Files.Add(key, temp);
 							}
 
 							// Add statistical data
@@ -1080,11 +1080,11 @@ namespace SabreTools.Helper
 											// If the rom is continue or ignore, add the size to the previous rom
 											if (subreader.GetAttribute("loadflag") == "continue" || subreader.GetAttribute("loadflag") == "ignore")
 											{
-												int index = datdata.Roms[key].Count() - 1;
-												File lastrom = datdata.Roms[key][index];
+												int index = datdata.Files[key].Count() - 1;
+												File lastrom = datdata.Files[key][index];
 												lastrom.HashData.Size += size;
-												datdata.Roms[key].RemoveAt(index);
-												datdata.Roms[key].Add(lastrom);
+												datdata.Files[key].RemoveAt(index);
+												datdata.Files[key].Add(lastrom);
 												continue;
 											}
 
@@ -1148,15 +1148,15 @@ namespace SabreTools.Helper
 													Metadata = new SourceMetadata { SystemID = sysid, System = filename, SourceID = srcid },
 												};
 
-												if (datdata.Roms.ContainsKey(key))
+												if (datdata.Files.ContainsKey(key))
 												{
-													datdata.Roms[key].Add(rom);
+													datdata.Files[key].Add(rom);
 												}
 												else
 												{
 													List<File> newvalue = new List<File>();
 													newvalue.Add(rom);
-													datdata.Roms.Add(key, newvalue);
+													datdata.Files.Add(key, newvalue);
 												}
 
 												// Add statistical data
@@ -1205,15 +1205,15 @@ namespace SabreTools.Helper
 								};
 
 								key = rom.HashData.Size + "-" + rom.HashData.CRC;
-								if (datdata.Roms.ContainsKey(key))
+								if (datdata.Files.ContainsKey(key))
 								{
-									datdata.Roms[key].Add(rom);
+									datdata.Files[key].Add(rom);
 								}
 								else
 								{
 									List<File> temp = new List<File>();
 									temp.Add(rom);
-									datdata.Roms.Add(key, temp);
+									datdata.Files.Add(key, temp);
 								}
 
 								// Add statistical data
@@ -1311,11 +1311,11 @@ namespace SabreTools.Helper
 							// If the rom is continue or ignore, add the size to the previous rom
 							if (xtr.GetAttribute("loadflag") == "continue" || xtr.GetAttribute("loadflag") == "ignore")
 							{
-								int index = datdata.Roms[key].Count() - 1;
-								File lastrom = datdata.Roms[key][index];
+								int index = datdata.Files[key].Count() - 1;
+								File lastrom = datdata.Files[key][index];
 								lastrom.HashData.Size += size;
-								datdata.Roms[key].RemoveAt(index);
-								datdata.Roms[key].Add(lastrom);
+								datdata.Files[key].RemoveAt(index);
+								datdata.Files[key].Add(lastrom);
 								continue;
 							}
 
@@ -1387,15 +1387,15 @@ namespace SabreTools.Helper
 									Metadata = new SourceMetadata { SystemID = sysid, System = filename, SourceID = srcid },
 								};
 
-								if (datdata.Roms.ContainsKey(key))
+								if (datdata.Files.ContainsKey(key))
 								{
-									datdata.Roms[key].Add(rom);
+									datdata.Files[key].Add(rom);
 								}
 								else
 								{
 									List<File> newvalue = new List<File>();
 									newvalue.Add(rom);
-									datdata.Roms.Add(key, newvalue);
+									datdata.Files.Add(key, newvalue);
 								}
 
 								// Add statistical data
@@ -1701,7 +1701,7 @@ namespace SabreTools.Helper
 						}
 
 						// If we have roms, output them
-						if (datdata.Roms.Count != 0)
+						if (datdata.Files.Count != 0)
 						{
 							Output.WriteDatfile(datdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger);
 						}
@@ -1714,7 +1714,7 @@ namespace SabreTools.Helper
 						{
 							logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 							Dat innerDatdata = (Dat)datdata.Clone();
-							innerDatdata.Roms = null;
+							innerDatdata.Files = null;
 							innerDatdata = Parse(file, 0, 0, innerDatdata, logger, true, clean, keepext:(datdata.TSV != null));
 							innerDatdata = Filter(innerDatdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
 
@@ -1727,7 +1727,7 @@ namespace SabreTools.Helper
 
 
 							// If we have roms, output them
-							if (innerDatdata.Roms.Count != 0)
+							if (innerDatdata.Files.Count != 0)
 							{
 								Output.WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger);
 							}
@@ -1756,7 +1756,7 @@ namespace SabreTools.Helper
 			int i = 0;
 			userData = new Dat
 			{
-				Roms = new Dictionary<string, List<File>>(),
+				Files = new Dictionary<string, List<File>>(),
 				MergeRoms = inputDat.MergeRoms,
 			};
 			foreach (string input in inputs)
@@ -1771,16 +1771,16 @@ namespace SabreTools.Helper
 					datHeaders.Add((Dat)userData.CloneHeader());
 
 					// Reset the header values so the next can be captured
-					Dictionary<string, List<File>> temp = userData.Roms;
+					Dictionary<string, List<File>> temp = userData.Files;
 					userData = new Dat();
-					userData.Roms = temp;
+					userData.Files = temp;
 				}
 			}
 
 			// Set the output values
-			Dictionary<string, List<File>> roms = userData.Roms;
+			Dictionary<string, List<File>> roms = userData.Files;
 			userData = (Dat)inputDat.CloneHeader();
-			userData.Roms = roms;
+			userData.Files = roms;
 
 			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -1811,10 +1811,10 @@ namespace SabreTools.Helper
 		{
 			// Now loop through and create a new Rom dictionary using filtered values
 			Dictionary<string, List<File>> dict = new Dictionary<string, List<File>>();
-			List<string> keys = datdata.Roms.Keys.ToList();
+			List<string> keys = datdata.Files.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<File> roms = datdata.Roms[key];
+				List<File> roms = datdata.Files[key];
 				for (int i = 0; i < roms.Count; i++)
 				{
 					File rom = roms[i];
@@ -1970,11 +1970,11 @@ namespace SabreTools.Helper
 				}
 
 				// Now clean up by removing the old list
-				datdata.Roms[key] = null;
+				datdata.Files[key] = null;
 			}
 
 			// Resassign the new dictionary to the DatData object
-			datdata.Roms = dict;
+			datdata.Files = dict;
 
 			return datdata;
 		}
@@ -2038,10 +2038,10 @@ namespace SabreTools.Helper
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
 			logger.User("Populating all output DATs");
-			List<string> keys = userData.Roms.Keys.ToList();
+			List<string> keys = userData.Files.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<File> roms = RomTools.Merge(userData.Roms[key], logger);
+				List<File> roms = RomTools.Merge(userData.Files[key], logger);
 
 				if (roms != null && roms.Count > 0)
 				{
@@ -2055,15 +2055,15 @@ namespace SabreTools.Helper
 								// Individual DATs that are output
 								if ((diff & DiffMode.Individuals) != 0)
 								{
-									if (outDats[rom.Metadata.SystemID].Roms.ContainsKey(key))
+									if (outDats[rom.Metadata.SystemID].Files.ContainsKey(key))
 									{
-										outDats[rom.Metadata.SystemID].Roms[key].Add(rom);
+										outDats[rom.Metadata.SystemID].Files[key].Add(rom);
 									}
 									else
 									{
 										List<File> tl = new List<File>();
 										tl.Add(rom);
-										outDats[rom.Metadata.SystemID].Roms.Add(key, tl);
+										outDats[rom.Metadata.SystemID].Files.Add(key, tl);
 									}
 								}
 
@@ -2073,15 +2073,15 @@ namespace SabreTools.Helper
 									File newrom = rom;
 									newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
 
-									if (outerDiffData.Roms.ContainsKey(key))
+									if (outerDiffData.Files.ContainsKey(key))
 									{
-										outerDiffData.Roms[key].Add(newrom);
+										outerDiffData.Files[key].Add(newrom);
 									}
 									else
 									{
 										List<File> tl = new List<File>();
 										tl.Add(rom);
-										outerDiffData.Roms.Add(key, tl);
+										outerDiffData.Files.Add(key, tl);
 									}
 								}
 							}
@@ -2095,15 +2095,15 @@ namespace SabreTools.Helper
 								File newrom = rom;
 								newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
 
-								if (dupeData.Roms.ContainsKey(key))
+								if (dupeData.Files.ContainsKey(key))
 								{
-									dupeData.Roms[key].Add(newrom);
+									dupeData.Files[key].Add(newrom);
 								}
 								else
 								{
 									List<File> tl = new List<File>();
 									tl.Add(rom);
-									dupeData.Roms.Add(key, tl);
+									dupeData.Files.Add(key, tl);
 								}
 							}
 						}
@@ -2137,7 +2137,7 @@ namespace SabreTools.Helper
 					string path = outdir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
 
 					// If we have more than 0 roms, output
-					if (outDats[j].Roms.Count > 0)
+					if (outDats[j].Files.Count > 0)
 					{
 						Output.WriteDatfile(outDats[j], path, logger);
 					}
@@ -2190,25 +2190,25 @@ namespace SabreTools.Helper
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
 			logger.User("Populating all output DATs");
-			List<string> keys = userData.Roms.Keys.ToList();
+			List<string> keys = userData.Files.Keys.ToList();
 
 			foreach (string key in keys)
 			{
-				List<File> roms = RomTools.Merge(userData.Roms[key], logger);
+				List<File> roms = RomTools.Merge(userData.Files[key], logger);
 
 				if (roms != null && roms.Count > 0)
 				{
 					foreach (File rom in roms)
 					{
-						if (outDats[rom.Metadata.SystemID].Roms.ContainsKey(key))
+						if (outDats[rom.Metadata.SystemID].Files.ContainsKey(key))
 						{
-							outDats[rom.Metadata.SystemID].Roms[key].Add(rom);
+							outDats[rom.Metadata.SystemID].Files[key].Add(rom);
 						}
 						else
 						{
 							List<File> tl = new List<File>();
 							tl.Add(rom);
-							outDats[rom.Metadata.SystemID].Roms.Add(key, tl);
+							outDats[rom.Metadata.SystemID].Files.Add(key, tl);
 						}
 					}
 				}
@@ -2232,7 +2232,7 @@ namespace SabreTools.Helper
 				}
 
 				// If we have more than 0 roms, output
-				if (outDats[j].Roms.Count > 0)
+				if (outDats[j].Files.Count > 0)
 				{
 					Output.WriteDatfile(outDats[j], path, logger);
 				}
@@ -2253,11 +2253,11 @@ namespace SabreTools.Helper
 			// If we're in SuperDAT mode, prefix all games with their respective DATs
 			if (userData.Type == "SuperDAT")
 			{
-				List<string> keys = userData.Roms.Keys.ToList();
+				List<string> keys = userData.Files.Keys.ToList();
 				foreach (string key in keys)
 				{
 					List<File> newroms = new List<File>();
-					foreach (File rom in userData.Roms[key])
+					foreach (File rom in userData.Files[key])
 					{
 						File newrom = rom;
 						string filename = inputs[newrom.Metadata.SystemID].Split('¬')[0];
@@ -2270,12 +2270,12 @@ namespace SabreTools.Helper
 							+ newrom.Machine.Name;
 						newroms.Add(newrom);
 					}
-					userData.Roms[key] = newroms;
+					userData.Files[key] = newroms;
 				}
 			}
 
 			// Output a DAT only if there are roms
-			if (userData.Roms.Count != 0)
+			if (userData.Files.Count != 0)
 			{
 				Output.WriteDatfile(userData, outdir, logger);
 			}

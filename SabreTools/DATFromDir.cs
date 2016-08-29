@@ -191,15 +191,15 @@ namespace SabreTools
 								};
 
 								string key = rom.HashData.Size + "-" + rom.HashData.CRC;
-								if (_datdata.Roms.ContainsKey(key))
+								if (_datdata.Files.ContainsKey(key))
 								{
-									_datdata.Roms[key].Add(rom);
+									_datdata.Files[key].Add(rom);
 								}
 								else
 								{
 									List<Helper.File> temp = new List<Helper.File>();
 									temp.Add(rom);
-									_datdata.Roms.Add(key, temp);
+									_datdata.Files.Add(key, temp);
 								}
 							}
 
@@ -230,15 +230,15 @@ namespace SabreTools
 									};
 
 									string key = rom.HashData.Size + "-" + rom.HashData.CRC;
-									if (_datdata.Roms.ContainsKey(key))
+									if (_datdata.Files.ContainsKey(key))
 									{
-										_datdata.Roms[key].Add(rom);
+										_datdata.Files[key].Add(rom);
 									}
 									else
 									{
 										List<Helper.File> temp = new List<Helper.File>();
 										temp.Add(rom);
-										_datdata.Roms.Add(key, temp);
+										_datdata.Files.Add(key, temp);
 									}
 								}
 							}
@@ -256,10 +256,10 @@ namespace SabreTools
 			// Now output any empties to the stream (if not in Romba mode)
 			if (!_datdata.Romba)
 			{
-				List<string> keys = _datdata.Roms.Keys.ToList();
+				List<string> keys = _datdata.Files.Keys.ToList();
 				foreach (string key in keys)
 				{
-					List<Helper.File> roms = _datdata.Roms[key];
+					List<Helper.File> roms = _datdata.Files[key];
 					for (int i = 0; i < roms.Count; i++)
 					{
 						Helper.File rom = roms[i];
@@ -278,15 +278,15 @@ namespace SabreTools
 						if (_nowrite)
 						{
 							string inkey = rom.HashData.Size + "-" + rom.HashData.CRC;
-							if (_datdata.Roms.ContainsKey(inkey))
+							if (_datdata.Files.ContainsKey(inkey))
 							{
-								_datdata.Roms[inkey].Add(rom);
+								_datdata.Files[inkey].Add(rom);
 							}
 							else
 							{
 								List<Helper.File> temp = new List<Helper.File>();
 								temp.Add(rom);
-								_datdata.Roms.Add(inkey, temp);
+								_datdata.Files.Add(inkey, temp);
 							}
 						}
 						else
@@ -316,9 +316,9 @@ namespace SabreTools
 				}
 
 				// If we had roms but not blanks (and not in Romba mode), create an artifical rom for the purposes of outputting
-				if (lastparent != null && _datdata.Roms.Count == 0)
+				if (lastparent != null && _datdata.Files.Count == 0)
 				{
-					_datdata.Roms.Add("temp", new List<Helper.File>());
+					_datdata.Files.Add("temp", new List<Helper.File>());
 				}
 			}
 
@@ -356,15 +356,15 @@ namespace SabreTools
 					if (_nowrite)
 					{
 						string key = rom.HashData.Size + "-" + rom.HashData.CRC;
-						if (_datdata.Roms.ContainsKey(key))
+						if (_datdata.Files.ContainsKey(key))
 						{
-							_datdata.Roms[key].Add(rom);
+							_datdata.Files[key].Add(rom);
 						}
 						else
 						{
 							List<Helper.File> temp = new List<Helper.File>();
 							temp.Add(rom);
-							_datdata.Roms.Add(key, temp);
+							_datdata.Files.Add(key, temp);
 						}
 					}
 					else
@@ -531,15 +531,15 @@ namespace SabreTools
 				if (_nowrite)
 				{
 					string key = rom.HashData.Size + "-" + rom.HashData.CRC;
-					if (_datdata.Roms.ContainsKey(key))
+					if (_datdata.Files.ContainsKey(key))
 					{
-						_datdata.Roms[key].Add(rom);
+						_datdata.Files[key].Add(rom);
 					}
 					else
 					{
 						List<Helper.File> temp = new List<Helper.File>();
 						temp.Add(rom);
-						_datdata.Roms.Add(key, temp);
+						_datdata.Files.Add(key, temp);
 					}
 				}
 				else

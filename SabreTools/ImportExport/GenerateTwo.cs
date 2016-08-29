@@ -177,7 +177,7 @@ namespace SabreTools
 			}
 
 			// If the dictionary is empty for any reason, tell the user and exit
-			if (datdata.Roms.Keys.Count == 0 || datdata.Roms.Count == 0)
+			if (datdata.Files.Keys.Count == 0 || datdata.Files.Count == 0)
 			{
 				_logger.Log("No roms found for system ID " + _systemid);
 				return false;
@@ -185,11 +185,11 @@ namespace SabreTools
 
 			// Now process all of the roms
 			_logger.User("Cleaning rom data");
-			List<string> keys = datdata.Roms.Keys.ToList();
+			List<string> keys = datdata.Files.Keys.ToList();
 			foreach (string key in keys)
 			{
 				List<Helper.File> temp = new List<Helper.File>();
-				List<Helper.File> newroms = datdata.Roms[key];
+				List<Helper.File> newroms = datdata.Files[key];
 				for (int i = 0; i < newroms.Count; i++)
 				{
 					Helper.File rom = newroms[i];
@@ -234,7 +234,7 @@ namespace SabreTools
 
 					temp.Add(rom);
 				}
-				datdata.Roms[key] = temp;
+				datdata.Files[key] = temp;
 			}
 
 			// Then write out the file

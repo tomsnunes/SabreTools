@@ -64,9 +64,9 @@ namespace SabreTools
 				// Now get Net New output dictionary [(currentNewMerged)-(currentAllMerged)]
 				_logger.User("Creating and populating Net New dictionary");
 				Dictionary<string, List<Helper.File>> netNew = new Dictionary<string, List<Helper.File>>();
-				foreach (string key in completeDats.Roms.Keys)
+				foreach (string key in completeDats.Files.Keys)
 				{
-					List<Helper.File> templist = RomTools.Merge(completeDats.Roms[key], _logger);
+					List<Helper.File> templist = RomTools.Merge(completeDats.Files[key], _logger);
 					foreach (Helper.File rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentNewMerged)
@@ -88,9 +88,9 @@ namespace SabreTools
 				// Now create the Unneeded dictionary [(currentAllMerged)-(currentNewMerged)]
 				_logger.User("Creating and populating Uneeded dictionary");
 				Dictionary<string, List<Helper.File>> unneeded = new Dictionary<string, List<Helper.File>>();
-				foreach (string key in completeDats.Roms.Keys)
+				foreach (string key in completeDats.Files.Keys)
 				{
-					List<Helper.File> templist = RomTools.Merge(completeDats.Roms[key], _logger);
+					List<Helper.File> templist = RomTools.Merge(completeDats.Files[key], _logger);
 					foreach (Helper.File rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentAllMerged)
@@ -115,19 +115,19 @@ namespace SabreTools
 				midMissing = DatTools.Parse(_currentMissingMerged, 0, 0, midMissing, _logger);
 				foreach (string key in unneeded.Keys)
 				{
-					if (midMissing.Roms.ContainsKey(key))
+					if (midMissing.Files.ContainsKey(key))
 					{
-						midMissing.Roms[key].AddRange(unneeded[key]);
+						midMissing.Files[key].AddRange(unneeded[key]);
 					}
 					else
 					{
-						midMissing.Roms.Add(key, unneeded[key]);
+						midMissing.Files.Add(key, unneeded[key]);
 					}
 				}
 				Dictionary<string, List<Helper.File>> newMissing = new Dictionary<string, List<Helper.File>>();
-				foreach (string key in midMissing.Roms.Keys)
+				foreach (string key in midMissing.Files.Keys)
 				{
-					List<Helper.File> templist = RomTools.Merge(midMissing.Roms[key], _logger);
+					List<Helper.File> templist = RomTools.Merge(midMissing.Files[key], _logger);
 					foreach (Helper.File rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentMissingMerged)
@@ -171,11 +171,11 @@ namespace SabreTools
 						midHave.Add(key, newMissing[key]);
 					}
 				}
-				foreach (string key in completeDats.Roms.Keys)
+				foreach (string key in completeDats.Files.Keys)
 				{
 					if (midHave.ContainsKey(key))
 					{
-						foreach (Helper.File rom in completeDats.Roms[key])
+						foreach (Helper.File rom in completeDats.Files[key])
 						{
 							if (rom.Metadata.System == _currentNewMerged)
 							{
@@ -186,7 +186,7 @@ namespace SabreTools
 					else
 					{
 						List<Helper.File> roms = new List<Helper.File>();
-						foreach (Helper.File rom in completeDats.Roms[key])
+						foreach (Helper.File rom in completeDats.Files[key])
 						{
 							if (rom.Metadata.System == _currentNewMerged)
 							{
@@ -306,7 +306,7 @@ namespace SabreTools
 					ForcePacking = ForcePacking.None,
 					OutputFormat = OutputFormat.Xml,
 					MergeRoms = true,
-					Roms = netNew,
+					Files = netNew,
 				};
 				Dat unneededData = new Dat
 				{
@@ -319,7 +319,7 @@ namespace SabreTools
 					ForcePacking = ForcePacking.None,
 					OutputFormat = OutputFormat.Xml,
 					MergeRoms = true,
-					Roms = unneeded,
+					Files = unneeded,
 				};
 				Dat newMissingData = new Dat
 				{
@@ -332,7 +332,7 @@ namespace SabreTools
 					ForcePacking = ForcePacking.None,
 					OutputFormat = OutputFormat.Xml,
 					MergeRoms = true,
-					Roms = newMissing,
+					Files = newMissing,
 				};
 				Dat haveData = new Dat
 				{
@@ -345,7 +345,7 @@ namespace SabreTools
 					ForcePacking = ForcePacking.None,
 					OutputFormat = OutputFormat.Xml,
 					MergeRoms = true,
-					Roms = have,
+					Files = have,
 				};
 
 				Output.WriteDatfile(netNewData, "", _logger);
@@ -365,9 +365,9 @@ namespace SabreTools
 				midHave = DatTools.Parse(_currentMissingMerged, 0, 0, midHave, _logger);
 				midHave = DatTools.Parse(_currentAllMerged, 0, 0, midHave, _logger);
 				Dictionary<string, List<Helper.File>> have = new Dictionary<string, List<Helper.File>>();
-				foreach (string key in midHave.Roms.Keys)
+				foreach (string key in midHave.Files.Keys)
 				{
-					List<Helper.File> templist = RomTools.Merge(midHave.Roms[key], _logger);
+					List<Helper.File> templist = RomTools.Merge(midHave.Files[key], _logger);
 					foreach (Helper.File rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentAllMerged)
@@ -419,7 +419,7 @@ namespace SabreTools
 					ForcePacking = ForcePacking.None,
 					OutputFormat = OutputFormat.Xml,
 					MergeRoms = true,
-					Roms = have,
+					Files = have,
 				};
 				Output.WriteDatfile(haveData, "", _logger);
 
@@ -435,9 +435,9 @@ namespace SabreTools
 				midHave = DatTools.Parse(_currentMissingMerged, 0, 0, midHave, _logger);
 				midHave = DatTools.Parse(_currentNewMerged, 0, 0, midHave, _logger);
 				Dictionary<string, List<Helper.File>> have = new Dictionary<string, List<Helper.File>>();
-				foreach (string key in midHave.Roms.Keys)
+				foreach (string key in midHave.Files.Keys)
 				{
-					List<Helper.File> templist = RomTools.Merge(midHave.Roms[key], _logger);
+					List<Helper.File> templist = RomTools.Merge(midHave.Files[key], _logger);
 					foreach (Helper.File rom in templist)
 					{
 						if (rom.Dupe == DupeType.None && rom.Metadata.System == _currentNewMerged)
@@ -489,7 +489,7 @@ namespace SabreTools
 					ForcePacking = ForcePacking.None,
 					OutputFormat = OutputFormat.Xml,
 					MergeRoms = true,
-					Roms = have,
+					Files = have,
 				};
 				Output.WriteDatfile(haveData, "", _logger);
 

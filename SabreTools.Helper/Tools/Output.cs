@@ -32,7 +32,7 @@ namespace SabreTools.Helper
 			}
 			
 			// Bucket roms by game name and optionally dedupe
-			SortedDictionary<string, List<File>> sortable = DatTools.BucketByGame(datdata.Roms, datdata.MergeRoms, norename, logger);
+			SortedDictionary<string, List<File>> sortable = DatTools.BucketByGame(datdata.Files, datdata.MergeRoms, norename, logger);
 
 			// Now write out to file
 			// If it's empty, use the current folder
@@ -560,7 +560,7 @@ namespace SabreTools.Helper
 				string footer = "";
 
 				// If we have roms, output the full footer
-				if (datdata.Roms != null && datdata.Roms.Count > 0)
+				if (datdata.Files != null && datdata.Files.Count > 0)
 				{
 					switch (datdata.OutputFormat)
 					{

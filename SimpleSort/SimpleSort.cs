@@ -69,7 +69,7 @@ namespace SabreTools
 			_cursorLeft = Console.CursorLeft;
 			_matched = new Dat
 			{
-				Roms = new Dictionary<string, List<Helper.File>>(),
+				Files = new Dictionary<string, List<Helper.File>>(),
 			};
 		}
 
@@ -358,7 +358,7 @@ namespace SabreTools
 
 			// Setup the fixdat
 			_matched = (Dat)_datdata.CloneHeader();
-			_matched.Roms = new Dictionary<string, List<Helper.File>>();
+			_matched.Files = new Dictionary<string, List<Helper.File>>();
 			_matched.FileName = "fixDat_" + _matched.FileName;
 			_matched.Name = "fixDat_" + _matched.Name;
 			_matched.Description = "fixDat_" + _matched.Description;
@@ -366,7 +366,7 @@ namespace SabreTools
 
 			// Now that all files are parsed, get only files found in directory
 			bool found = false;
-			foreach (List<Helper.File> roms in _datdata.Roms.Values)
+			foreach (List<Helper.File> roms in _datdata.Files.Values)
 			{
 				List<Helper.File> newroms = RomTools.Merge(roms, _logger);
 				foreach (Helper.File rom in newroms)
@@ -375,15 +375,15 @@ namespace SabreTools
 					{
 						found = true;
 						string key = rom.HashData.Size + "-" + rom.HashData.CRC;
-						if (_matched.Roms.ContainsKey(key))
+						if (_matched.Files.ContainsKey(key))
 						{
-							_matched.Roms[key].Add(rom);
+							_matched.Files[key].Add(rom);
 						}
 						else
 						{
 							List<Helper.File> temp = new List<Helper.File>();
 							temp.Add(rom);
-							_matched.Roms.Add(key, temp);
+							_matched.Files.Add(key, temp);
 						}
 					}
 				}
@@ -509,15 +509,15 @@ namespace SabreTools
 
 					// Add rom to the matched list
 					string key = found.HashData.Size + "-" + found.HashData.CRC;
-					if(_matched.Roms.ContainsKey(key))
+					if(_matched.Files.ContainsKey(key))
 					{
-						_matched.Roms[key].Add(found);
+						_matched.Files[key].Add(found);
 					}
 					else
 					{
 						List<Helper.File> temp = new List<Helper.File>();
 						temp.Add(found);
-						_matched.Roms.Add(key, temp);
+						_matched.Files.Add(key, temp);
 					}
 
 					if (_toFolder)
@@ -573,15 +573,15 @@ namespace SabreTools
 					{
 						// Add rom to the matched list
 						string key = found.HashData.Size + "-" + found.HashData.CRC;
-						if (_matched.Roms.ContainsKey(key))
+						if (_matched.Files.ContainsKey(key))
 						{
-							_matched.Roms[key].Add(found);
+							_matched.Files[key].Add(found);
 						}
 						else
 						{
 							List<Helper.File> temp = new List<Helper.File>();
 							temp.Add(found);
-							_matched.Roms.Add(key, temp);
+							_matched.Files.Add(key, temp);
 						}
 
 						// First output the headerless rom
@@ -621,15 +621,15 @@ namespace SabreTools
 
 						// Add rom to the matched list
 						key = newfound.HashData.Size + "-" + newfound.HashData.CRC;
-						if (_matched.Roms.ContainsKey(key))
+						if (_matched.Files.ContainsKey(key))
 						{
-							_matched.Roms[key].Add(newfound);
+							_matched.Files[key].Add(newfound);
 						}
 						else
 						{
 							List<Helper.File> temp = new List<Helper.File>();
 							temp.Add(newfound);
-							_matched.Roms.Add(key, temp);
+							_matched.Files.Add(key, temp);
 						}
 
 						if (_toFolder)
@@ -696,15 +696,15 @@ namespace SabreTools
 							{
 								// Add rom to the matched list
 								string key = found.HashData.Size + "-" + found.HashData.CRC;
-								if (_matched.Roms.ContainsKey(key))
+								if (_matched.Files.ContainsKey(key))
 								{
-									_matched.Roms[key].Add(found);
+									_matched.Files[key].Add(found);
 								}
 								else
 								{
 									List<Helper.File> temp = new List<Helper.File>();
 									temp.Add(found);
-									_matched.Roms.Add(key, temp);
+									_matched.Files.Add(key, temp);
 								}
 
 								if (_toFolder)
@@ -876,7 +876,7 @@ namespace SabreTools
 			foreach (string key in scanned.Keys)
 			{
 				// If the key doesn't even exist in the DAT, then mark the entire key for removal
-				if (!_datdata.Roms.ContainsKey(key))
+				if (!_datdata.Files.ContainsKey(key))
 				{
 					if (remove.ContainsKey(key))
 					{
@@ -890,7 +890,7 @@ namespace SabreTools
 				// Otherwise check each of the values individually
 				else
 				{
-					List<Helper.File> romsList = _datdata.Roms[key];
+					List<Helper.File> romsList = _datdata.Files[key];
 					List<Helper.File> scannedList = scanned[key];
 					foreach (Helper.File rom in scannedList)
 					{
