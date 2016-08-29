@@ -853,9 +853,9 @@ namespace SabreTools.Helper
 		/// <param name="output">Output directory to build to</param>
 		/// <param name="hash">RomData representing the new information</param>
 		/// <remarks>This uses the new system that is not implemented anywhere yet</remarks>
-		public static void WriteToArchive(string input, string output, RomData rom, int machineIndex)
+		public static void WriteToArchive(string input, string output, RomData rom)
 		{
-			string archiveFileName = Path.Combine(output, rom.Machines[machineIndex] + ".zip");
+			string archiveFileName = Path.Combine(output, rom.Machine + ".zip");
 
 			ZipArchive outarchive = null;
 			try
@@ -904,9 +904,9 @@ namespace SabreTools.Helper
 		/// <param name="output">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
 		/// <remarks>This uses the new system that is not implemented anywhere yet</remarks>
-		public static void WriteToManagedArchive(string input, string output, RomData rom, int machineIndex)
+		public static void WriteToManagedArchive(string input, string output, RomData rom)
 		{
-			string archiveFileName = Path.Combine(output, rom.Machines[machineIndex] + ".zip");
+			string archiveFileName = Path.Combine(output, rom.Machine + ".zip");
 
 			// Delete an empty file first
 			if (File.Exists(archiveFileName) && new FileInfo(archiveFileName).Length == 0)
@@ -1013,18 +1013,16 @@ namespace SabreTools.Helper
 								+ (size == 0 ? reader.Entry.Size : size) + ", "
 								+ (crc == null ? BitConverter.GetBytes(reader.Entry.Crc) : crc));
 
-							MachineData tempmachine = new MachineData
-							{
-								Name = gamename,
-								Description = gamename,
-							};
 							RomData temprom = new RomData
 							{
 								Type = ItemType.Rom,
 								Name = reader.Entry.Key,
-								Machines = new List<MachineData>(),
+								Machine = new MachineData
+								{
+									Name = gamename,
+									Description = gamename,
+								},
 							};
-							temprom.Machines.Add(tempmachine);
 							HashData temphash = new HashData
 							{
 								Size = (size == 0 ? reader.Entry.Size : size),
@@ -1105,24 +1103,22 @@ namespace SabreTools.Helper
 			// Now convert the size and get the right position
 			long extractedsize = (long)BitConverter.ToUInt64(headersz.Reverse().ToArray(), 0);
 
-			MachineData tempmachine = new MachineData
-			{
-				Name = sha1,
-				Description = sha1,
-			};
 			RomData temprom = new RomData
 			{
 				Type = ItemType.Rom,
 				Name = sha1,
-				Machines = new List<MachineData>(),
+				Machine = new MachineData
+				{
+					Name = sha1,
+					Description = sha1,
+				},
 			};
-			temprom.Machines.Add(tempmachine);
 			HashData temphash = new HashData
 			{
 				Size = extractedsize,
 				CRC = headercrc,
 				MD5 = headermd5,
-				SHA1 = StringToByteArray(sha1),
+				SHA1 = Style.StringToByteArray(sha1),
 				Roms = new List<RomData>(),
 			};
 			temphash.Roms.Add(temprom);

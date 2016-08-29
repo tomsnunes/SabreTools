@@ -25,13 +25,40 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// Intermediate struct for holding and processing Hash data (NEW SYSTEM)
 	/// </summary>
-	public struct HashData
+	public struct HashData : IEquatable<HashData>
 	{
 		public long Size;
 		public byte[] CRC;
 		public byte[] MD5;
 		public byte[] SHA1;
 		public List<RomData> Roms;
+
+		public bool Equals(HashData other)
+		{
+			return this.Equals(other, false);
+		}
+
+		public bool Equals(HashData other, bool IsDisk)
+		{
+			bool equals = false;
+
+			if (!IsDisk &&
+					((this.MD5 == null || other.MD5 == null) || this.MD5 == other.MD5) &&
+					((this.SHA1 == null || other.SHA1 == null) || this.SHA1 == other.SHA1))
+			{
+				equals = true;
+			}
+			else if (!IsDisk &&
+					(this.Size == other.Size) &&
+					((this.CRC == null || other.CRC != null) || this.CRC == other.CRC) &&
+					((this.MD5 == null || other.MD5 == null) || this.MD5 == other.MD5) &&
+					((this.SHA1 == null || other.SHA1 == null) || this.SHA1 == other.SHA1))
+			{
+				equals = true;
+			}
+
+			return equals;
+		}
 	}
 
 	/// <summary>

@@ -351,6 +351,26 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Determine if a file is a duplicate using partial matching logic
+		/// </summary>
+		/// <param name="hash">Hash to check for duplicate status</param>
+		/// <param name="lasthash">Hash to use as a baseline</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>True if the hashes are duplicates, false otherwise</returns>
+		public static bool IsDuplicate(HashData hash, HashData lasthash, Logger logger)
+		{
+			bool dupefound = hash.Equals(lasthash);
+
+			// More wonderful SHA-1 logging that has to be done
+			if (hash.SHA1 == lasthash.SHA1 && hash.Size != lasthash.Size)
+			{
+				logger.User("SHA-1 mismatch - Hash: " + hash.SHA1);
+			}
+
+			return dupefound;
+		}
+
+		/// <summary>
 		/// Return the duplicate status of two roms
 		/// </summary>
 		/// <param name="rom">Current rom to check</param>
@@ -384,6 +404,52 @@ namespace SabreTools.Helper
 			else
 			{
 				if (lastrom.Machine.Name == rom.Machine.Name && lastrom.Name == rom.Name)
+				{
+					output = DupeType.InternalAll;
+				}
+				else
+				{
+					output = DupeType.InternalHash;
+				}
+			}
+
+			return output;
+		}
+
+		/// <summary>
+		/// Return the duplicate status of two hashes
+		/// </summary>
+		/// <param name="hash">Current hash to check</param>
+		/// <param name="lasthash">Last hash to check against</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>The DupeType corresponding to the relationship between the two</returns>
+		public static DupeType GetDuplicateStatus(HashData hash, HashData lasthash, Logger logger)
+		{
+			DupeType output = DupeType.None;
+
+			// If we don't have a duplicate at all, return none
+			if (!IsDuplicate(hash, lasthash, logger))
+			{
+				return output;
+			}
+
+			// If the duplicate is external already or should be, set it
+			if (lasthash.Roms[0].DupeType >= DupeType.ExternalHash || lasthash.Roms[0].Machine.SystemID != hash.Roms[0].Machine.SystemID || lasthash.Roms[0].Machine.SourceID != hash.Roms[0].Machine.SourceID)
+			{
+				if (lasthash.Roms[0].Machine.Name == hash.Roms[0].Machine.Name && lasthash.Roms[0].Name == hash.Roms[0].Name)
+				{
+					output = DupeType.ExternalAll;
+				}
+				else
+				{
+					output = DupeType.ExternalHash;
+				}
+			}
+
+			// Otherwise, it's considered an internal dupe
+			else
+			{
+				if (lasthash.Roms[0].Machine.Name == hash.Roms[0].Machine.Name && lasthash.Roms[0].Name == hash.Roms[0].Name)
 				{
 					output = DupeType.InternalAll;
 				}

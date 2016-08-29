@@ -2389,19 +2389,17 @@ namespace SabreTools.Helper
 					// If we're in cleaning mode, sanitize the game name
 					gamename = (clean ? Style.CleanGameName(gamename) : gamename);
 
-					MachineData machineData = new MachineData
-					{
-						Name = gamename,
-						Description = gamedesc,
-						SystemID = sysid,
-						SourceID = srcid,
-					};
 					RomData romData = new RomData
 					{
 						Type = (line.Trim().StartsWith("disk (") ? ItemType.Disk : ItemType.Rom),
-						Machines = new List<MachineData>(),
+						Machine = new MachineData
+						{
+							Name = gamename,
+							Description = gamedesc,
+							SystemID = sysid,
+							SourceID = srcid,
+						},
 					};
-					romData.Machines.Add(machineData);
 					HashData hashData = new HashData
 					{
 						Roms = new List<RomData>(),
@@ -2788,21 +2786,19 @@ namespace SabreTools.Helper
 						// If we're in cleaning mode, sanitize the game name
 						rominfo[3] = (clean ? Style.CleanGameName(rominfo[3]) : rominfo[3]);
 
-						MachineData machineData = new MachineData
-						{
-							Name = rominfo[3],
-							Description = rominfo[4],
-							CloneOf = rominfo[1],
-							RomOf = rominfo[1],
-							SystemID = sysid,
-							SourceID = srcid,
-						};
 						RomData romData = new RomData
 						{
 							Name = rominfo[5],
-							Machines = new List<MachineData>(),
+							Machine = new MachineData
+							{
+								Name = rominfo[3],
+								Description = rominfo[4],
+								CloneOf = rominfo[1],
+								RomOf = rominfo[1],
+								SystemID = sysid,
+								SourceID = srcid,
+							},
 						};
-						romData.Machines.Add(machineData);
 						HashData hashData = new HashData
 						{
 							Size = Int64.Parse(rominfo[7]),
@@ -2900,18 +2896,16 @@ namespace SabreTools.Helper
 							// If we're in cleaning mode, sanitize the game name
 							tempgame = (clean ? Style.CleanGameName(tempgame) : tempgame);
 
-							MachineData machineData = new MachineData
-							{
-								Name = tempgame,
-								Description = tempgame,
-							};
 							RomData romData = new RomData
 							{
 								Type = ItemType.Rom,
 								Name = "null",
-								Machines = new List<MachineData>(),
+								Machine = new MachineData
+								{
+									Name = tempgame,
+									Description = tempgame,
+								},
 							};
-							romData.Machines.Add(machineData);
 							HashData hashData = new HashData
 							{
 								Size = -1,
@@ -3341,23 +3335,21 @@ namespace SabreTools.Helper
 												}
 
 												// Get the new values to add
-												MachineData machineData = new MachineData
-												{
-													Name = tempname,
-													Description = gamedesc,
-													SystemID = sysid,
-													System = filename,
-													SourceID = srcid,
-												};
 												RomData romData = new RomData
 												{
 													Name = subreader.GetAttribute("name"),
 													Type = (subreader.Name.ToLowerInvariant() == "disk" ? ItemType.Disk : ItemType.Rom),
 													Nodump = nodump,
 													Date = date,
-													Machines = new List<MachineData>(),
+													Machine = new MachineData
+													{
+														Name = tempname,
+														Description = gamedesc,
+														SystemID = sysid,
+														System = filename,
+														SourceID = srcid,
+													},
 												};
-												romData.Machines.Add(machineData);
 												HashData hashData = new HashData
 												{
 													Size = size,
@@ -3396,18 +3388,16 @@ namespace SabreTools.Helper
 								// If we're in cleaning mode, sanitize the game name
 								tempname = (clean ? Style.CleanGameName(tempname.Split(Path.DirectorySeparatorChar)) : tempname);
 
-								MachineData machineData = new MachineData
-								{
-									Name = tempname,
-									Description = tempname,
-								};
 								RomData romData = new RomData
 								{
 									Type = ItemType.Rom,
 									Name = "null",
-									Machines = new List<MachineData>(),
+									Machine = new MachineData
+									{
+										Name = tempname,
+										Description = tempname,
+									},
 								};
-								romData.Machines.Add(machineData);
 								HashData hashData = new HashData
 								{
 									Size = -1,
@@ -3568,22 +3558,20 @@ namespace SabreTools.Helper
 								}
 
 								// Get the new values to add
-								MachineData machineData = new MachineData
-								{
-									Name = tempname,
-									SystemID = sysid,
-									System = filename,
-									SourceID = srcid,
-								};
 								RomData romData = new RomData
 								{
 									Name = xtr.GetAttribute("name"),
 									Type = (xtr.GetAttribute("type").ToLowerInvariant() == "disk" ? ItemType.Disk : ItemType.Rom),
 									Nodump = nodump,
 									Date = date,
-									Machines = new List<MachineData>(),
+									Machine = new MachineData
+									{
+										Name = tempname,
+										SystemID = sysid,
+										System = filename,
+										SourceID = srcid,
+									},
 								};
-								romData.Machines.Add(machineData);
 								HashData hashData = new HashData
 								{
 									Size = size,
@@ -3682,7 +3670,7 @@ namespace SabreTools.Helper
 					}
 					else
 					{
-						List<Rom> temp = new List<Rom>();
+						List<HashData> temp = new List<HashData>();
 						temp.Add(hash);
 						sortable.Add(newkey, temp);
 					}
