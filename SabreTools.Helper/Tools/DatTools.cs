@@ -140,7 +140,7 @@ namespace SabreTools.Helper
 			StreamReader sr = new StreamReader(File.OpenRead(filename));
 
 			bool block = false, superdat = false;
-			string blockname = "", gamename = "";
+			string blockname = "", gamename = "", gamedesc = "";
 			while (!sr.EndOfStream)
 			{
 				string line = sr.ReadLine();
@@ -173,6 +173,7 @@ namespace SabreTools.Helper
 					Rom rom = new Rom
 					{
 						Game = gamename,
+						GameDescription = gamedesc,
 						Type = (line.Trim().StartsWith("disk (") ? "disk" : "rom"),
 						Metadata = new SourceMetadata { SystemID = sysid, SourceID = srcid },
 					};
@@ -346,6 +347,10 @@ namespace SabreTools.Helper
 					if (gc[1].Value == "name" && blockname != "header")
 					{
 						gamename = gc[2].Value.Replace("\"", "");
+					}
+					else if (gc[1].Value == "description" && blockname != "header")
+					{
+						gamedesc = gc[2].Value.Replace("\"", "");
 					}
 					else
 					{
@@ -561,6 +566,7 @@ namespace SabreTools.Helper
 						Rom rom = new Rom
 						{
 							Game = rominfo[3],
+							GameDescription = rominfo[4],
 							Name = rominfo[5],
 							CRC = rominfo[6].ToLowerInvariant(),
 							Size = Int64.Parse(rominfo[7]),
@@ -667,6 +673,7 @@ namespace SabreTools.Helper
 								Type = "rom",
 								Name = "null",
 								Game = tempgame,
+								GameDescription = tempgame,
 								Size = -1,
 								CRC = "null",
 								MD5 = "null",
@@ -965,7 +972,7 @@ namespace SabreTools.Helper
 						case "game":
 						case "software":
 							string temptype = xtr.Name;
-							string tempname = "";
+							string tempname = "", gamedesc = "";
 
 							// We want to process the entire subtree of the game
 							subreader = xtr.ReadSubtree();
@@ -1021,6 +1028,9 @@ namespace SabreTools.Helper
 									// Get the roms from the machine
 									switch (subreader.Name)
 									{
+										case "description":
+											gamedesc = subreader.ReadElementContentAsString();
+											break;
 										case "rom":
 										case "disk":
 											empty = false;
@@ -1105,6 +1115,7 @@ namespace SabreTools.Helper
 												Rom rom = new Rom
 												{
 													Game = tempname,
+													GameDescription = gamedesc,
 													Name = subreader.GetAttribute("name"),
 													Type = subreader.Name,
 													Size = size,
@@ -1159,6 +1170,7 @@ namespace SabreTools.Helper
 									Type = "rom",
 									Name = "null",
 									Game = tempname,
+									GameDescription = tempname,
 									Size = -1,
 									CRC = "null",
 									MD5 = "null",

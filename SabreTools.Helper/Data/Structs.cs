@@ -9,6 +9,7 @@ namespace SabreTools.Helper
 	public struct Rom : IComparable, IEquatable<Rom>
 	{
 		public string Game;
+		public string GameDescription;
 		public string Name;
 		public string Type;
 		public long Size;

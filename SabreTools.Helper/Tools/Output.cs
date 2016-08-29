@@ -300,7 +300,7 @@ namespace SabreTools.Helper
 				{
 					case OutputFormat.ClrMamePro:
 						state += "game (\n\tname \"" + rom.Game + "\"\n" +
-							"\tdescription \"" + rom.Game + "\"\n";
+							"\tdescription \"" + (String.IsNullOrEmpty(rom.GameDescription) ? rom.Game : rom.GameDescription) + "\"\n";
 						break;
 					case OutputFormat.SabreDat:
 						for (int i = (last == -1 ? 0 : last); i < newsplit.Count; i++)
@@ -316,7 +316,7 @@ namespace SabreTools.Helper
 						break;
 					case OutputFormat.Xml:
 						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
-							"\t\t<description>" + HttpUtility.HtmlEncode(rom.Game) + "</description>\n";
+							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.GameDescription) ? rom.Game : rom.GameDescription)) + "</description>\n";
 						break;
 				}
 
@@ -497,7 +497,7 @@ namespace SabreTools.Helper
 						break;
 					case OutputFormat.RomCenter:
 						state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Game) +
-							"¬" + HttpUtility.HtmlEncode(rom.Game) +
+							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.GameDescription) ? rom.Game : rom.GameDescription)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
 							"¬" + rom.CRC.ToLowerInvariant() +
 							"¬" + (rom.Size != -1 ? rom.Size.ToString() : "") + "¬¬¬\n";
