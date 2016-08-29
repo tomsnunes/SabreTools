@@ -241,22 +241,7 @@ namespace SabreTools.Helper
 		/// <returns>True if the roms are duplicates, false otherwise</returns>
 		public static bool IsDuplicate(Rom rom, Rom lastrom, Logger logger)
 		{
-			bool dupefound = false;
-
-			// If either is a nodump, it's never a match
-			if (rom.Nodump || lastrom.Nodump)
-			{
-				return dupefound;
-			}
-
-			if (rom.Type == ItemType.Rom && lastrom.Type == ItemType.Rom)
-			{
-				dupefound = rom.HashData.Equals(lastrom.HashData, false);
-			}
-			else if (rom.Type == ItemType.Disk && lastrom.Type == ItemType.Disk)
-			{
-				dupefound = rom.HashData.Equals(lastrom.HashData, true);
-			}
+			bool dupefound = rom.Equals(lastrom);
 
 			// More wonderful SHA-1 logging that has to be done
 			if (rom.HashData.SHA1 == lastrom.HashData.SHA1 && rom.HashData.Size != lastrom.HashData.Size)

@@ -87,14 +87,26 @@ namespace SabreTools.Helper
 
 		public bool Equals(Rom other)
 		{
-			Logger temp = new Logger(false, "");
-			temp.Start();
-			bool isdupe = RomTools.IsDuplicate(this, other, temp);
-			temp.Close();
+			bool dupefound = false;
 
-			return (this.Machine.Name == other.Machine.Name &&
+			// If either is a nodump, it's never a match
+			if (this.Nodump || other.Nodump)
+			{
+				return dupefound;
+			}
+
+			if (this.Type == ItemType.Rom && other.Type == ItemType.Rom)
+			{
+				dupefound = this.HashData.Equals(other.HashData, false);
+			}
+			else if (this.Type == ItemType.Disk && other.Type == ItemType.Disk)
+			{
+				dupefound = this.HashData.Equals(other.HashData, true);
+			}
+
+			return (this.Machine.Equals(other.Machine) &&
 				this.Name == other.Name &&
-				isdupe);
+				dupefound);
 		}
 	}
 
@@ -112,7 +124,7 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// Intermediate struct for holding and processing Rom/Machine data
 	/// </summary>
-	public struct Machine
+	public struct Machine : IEquatable<Machine>
 	{
 		public string Name;
 		public string Comment;
@@ -127,6 +139,16 @@ namespace SabreTools.Helper
 		public string Board;
 		public string RebuildTo;
 		public bool TorrentZipped;
+
+		public bool Equals(Machine other)
+		{
+			if (this.Name == other.Name)
+			{
+				return true;
+			}
+
+			return false;
+		}
 	}
 
 	/// <summary>
