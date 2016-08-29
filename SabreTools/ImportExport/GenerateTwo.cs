@@ -195,7 +195,7 @@ namespace SabreTools
 					Rom rom = newroms[i];
 
 					// In the case that the RomData is incomplete, skip it
-					if (rom.Name == null || rom.Game == null)
+					if (rom.Name == null || rom.Game.Name == null)
 					{
 						continue;
 					}
@@ -209,21 +209,21 @@ namespace SabreTools
 					rom.Name = Regex.Replace(rom.Name, @"(.*) \.(.*)", "$1.$2");
 
 					// Run the name through the filters to make sure that it's correct
-					rom.Game = Style.NormalizeChars(rom.Game);
-					rom.Game = Style.RussianToLatin(rom.Game);
-					rom.Game = Style.SearchPattern(rom.Game);
+					rom.Game.Name = Style.NormalizeChars(rom.Game.Name);
+					rom.Game.Name = Style.RussianToLatin(rom.Game.Name);
+					rom.Game.Name = Style.SearchPattern(rom.Game.Name);
 
 					// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
 					string stripPattern = @"(([[(].*[\)\]] )?([^([]+))";
 					Regex stripRegex = new Regex(stripPattern);
-					Match stripMatch = stripRegex.Match(rom.Game);
-					rom.Game = stripMatch.Groups[1].Value;
+					Match stripMatch = stripRegex.Match(rom.Game.Name);
+					rom.Game.Name = stripMatch.Groups[1].Value;
 
-					rom.Game = rom.Game.TrimEnd().TrimStart();
+					rom.Game.Name = rom.Game.Name.TrimEnd().TrimStart();
 
 					if (!_norename)
 					{
-						rom.Game += " [" + sources[rom.Metadata.SourceID] + "]";
+						rom.Game.Name += " [" + sources[rom.Metadata.SourceID] + "]";
 					}
 
 					// If a game has source "0" it's Default. Make this Int32.MaxValue for sorting purposes

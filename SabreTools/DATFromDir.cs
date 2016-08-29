@@ -173,11 +173,14 @@ namespace SabreTools
 								Rom rom = new Rom
 								{
 									Name = "null",
-									Game = (_datdata.Type == "SuperDAT" ?
-										(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
-											Path.DirectorySeparatorChar.ToString() :
-											"") + actualroot :
-										actualroot),
+									Game = new Machine
+									{
+										Name = (_datdata.Type == "SuperDAT" ?
+											(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
+												Path.DirectorySeparatorChar.ToString() :
+												"") + actualroot :
+											actualroot),
+									},
 									HashData = new HashData
 									{
 										Size = -1,
@@ -209,11 +212,14 @@ namespace SabreTools
 									Rom rom = new Rom
 									{
 										Name = "null",
-										Game = (_datdata.Type == "SuperDAT" ?
-											(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
-												Path.DirectorySeparatorChar.ToString() :
-												"") + actualroot :
-											actualroot),
+										Game = new Machine
+										{
+											Name = (_datdata.Type == "SuperDAT" ?
+												(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
+													Path.DirectorySeparatorChar.ToString() :
+													"") + actualroot :
+												actualroot),
+										},
 										HashData = new HashData
 										{
 											Size = -1,
@@ -287,13 +293,13 @@ namespace SabreTools
 						{
 							// If we have a different game and we're not at the start of the list, output the end of last item
 							int last = 0;
-							if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+							if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.Name.ToLowerInvariant())
 							{
 								Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
 							}
 
 							// If we have a new game, output the beginning of the new item
-							if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+							if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.Name.ToLowerInvariant())
 							{
 								Output.WriteStartGame(sw, rom, new List<string>(), lastparent, _datdata, 0, last, _logger);
 							}
@@ -305,7 +311,7 @@ namespace SabreTools
 							}
 						}
 
-						lastparent = rom.Game;
+						lastparent = rom.Game.Name;
 					}
 				}
 
@@ -374,7 +380,7 @@ namespace SabreTools
 				}
 
 				_logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
-				return rom.Game;
+				return rom.Game.Name;
 			}
 
 			// If both deep hash skip flags are set, do a quickscan
@@ -511,12 +517,15 @@ namespace SabreTools
 				_logger.Log("Actual item added: " + actualitem);
 
 				// Update rom information
-				rom.Game = (datdata.Type == "SuperDAT" ?
+				rom.Game = new Machine
+				{
+					Name = (datdata.Type == "SuperDAT" ?
 						(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
 							Path.DirectorySeparatorChar.ToString() :
 							"") + actualroot :
-						actualroot);
-				rom.Game = rom.Game.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
+						actualroot),
+				};
+				rom.Game.Name = rom.Game.Name.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
 				rom.Name = actualitem;
 
 				if (_nowrite)
@@ -537,13 +546,13 @@ namespace SabreTools
 				{
 					// If we have a different game and we're not at the start of the list, output the end of last item
 					int last = 0;
-					if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+					if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.Name.ToLowerInvariant())
 					{
 						Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, datdata, 0, out last, _logger);
 					}
 
 					// If we have a new game, output the beginning of the new item
-					if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+					if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.Name.ToLowerInvariant())
 					{
 						Output.WriteStartGame(sw, rom, new List<string>(), lastparent, datdata, 0, last, _logger);
 					}
@@ -553,7 +562,7 @@ namespace SabreTools
 				}
 				_logger.User("File added: " + actualitem + Environment.NewLine);
 
-				return rom.Game;
+				return rom.Game.Name;
 			}
 			catch (IOException ex)
 			{

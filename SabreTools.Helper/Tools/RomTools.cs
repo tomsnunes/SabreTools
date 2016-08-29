@@ -147,7 +147,7 @@ namespace SabreTools.Helper
 							{
 								savedrom.Metadata.SystemID = rom.Metadata.SystemID;
 								savedrom.Metadata.System = rom.Metadata.System;
-								savedrom.Game = rom.Game;
+								savedrom.Game.Name = rom.Game.Name;
 								savedrom.Name = rom.Name;
 							}
 
@@ -156,7 +156,7 @@ namespace SabreTools.Helper
 							{
 								savedrom.Metadata.SourceID = rom.Metadata.SourceID;
 								savedrom.Metadata.Source = rom.Metadata.Source;
-								savedrom.Game = rom.Game;
+								savedrom.Game.Name = rom.Game.Name;
 								savedrom.Name = rom.Name;
 							}
 
@@ -287,7 +287,7 @@ namespace SabreTools.Helper
 			// If the duplicate is external already or should be, set it
 			if (lastrom.Dupe >= DupeType.ExternalHash || lastrom.Metadata.SystemID != rom.Metadata.SystemID || lastrom.Metadata.SourceID != rom.Metadata.SourceID)
 			{
-				if (lastrom.Game == rom.Game && lastrom.Name == rom.Name)
+				if (lastrom.Game.Name == rom.Game.Name && lastrom.Name == rom.Name)
 				{
 					output = DupeType.ExternalAll;
 				}
@@ -300,7 +300,7 @@ namespace SabreTools.Helper
 			// Otherwise, it's considered an internal dupe
 			else
 			{
-				if (lastrom.Game == rom.Game && lastrom.Name == rom.Name)
+				if (lastrom.Game.Name == rom.Game.Name && lastrom.Name == rom.Name)
 				{
 					output = DupeType.InternalAll;
 				}
@@ -327,15 +327,15 @@ namespace SabreTools.Helper
 				{
 					if (x.Metadata.SourceID == y.Metadata.SourceID)
 					{
-						if (x.Game == y.Game)
+						if (x.Game.Name == y.Game.Name)
 						{
 							return String.Compare(x.Name, y.Name);
 						}
-						return String.Compare(x.Game, y.Game);
+						return String.Compare(x.Game.Name, y.Game.Name);
 					}
-					return (norename ? String.Compare(x.Game, y.Game) : x.Metadata.SourceID - y.Metadata.SourceID);
+					return (norename ? String.Compare(x.Game.Name, y.Game.Name) : x.Metadata.SourceID - y.Metadata.SourceID);
 				}
-				return (norename ? String.Compare(x.Game, y.Game) : x.Metadata.SystemID - y.Metadata.SystemID);
+				return (norename ? String.Compare(x.Game.Name, y.Game.Name) : x.Metadata.SystemID - y.Metadata.SystemID);
 			});
 			return true;
 		}

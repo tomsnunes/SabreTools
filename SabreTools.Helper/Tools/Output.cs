@@ -100,16 +100,16 @@ namespace SabreTools.Helper
 					for (int index = 0; index < roms.Count; index++)
 					{
 						Rom rom = roms[index];
-						List<string> newsplit = rom.Game.Split('\\').ToList();
+						List<string> newsplit = rom.Game.Name.Split('\\').ToList();
 
 						// If we have a different game and we're not at the start of the list, output the end of last item
-						if (lastgame != null && lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+						if (lastgame != null && lastgame.ToLowerInvariant() != rom.Game.Name.ToLowerInvariant())
 						{
 							depth = WriteEndGame(sw, rom, splitpath, newsplit, lastgame, datdata, depth, out last, logger);
 						}
 
 						// If we have a new game, output the beginning of the new item
-						if (lastgame == null || lastgame.ToLowerInvariant() != rom.Game.ToLowerInvariant())
+						if (lastgame == null || lastgame.ToLowerInvariant() != rom.Game.Name.ToLowerInvariant())
 						{
 							depth = WriteStartGame(sw, rom, newsplit, lastgame, datdata, depth, last, logger);
 						}
@@ -133,7 +133,7 @@ namespace SabreTools.Helper
 							else
 							{
 								splitpath = newsplit;
-								lastgame = rom.Game;
+								lastgame = rom.Game.Name;
 								continue;
 							}
 						}
@@ -143,7 +143,7 @@ namespace SabreTools.Helper
 
 						// Set the new data to compare against
 						splitpath = newsplit;
-						lastgame = rom.Game;
+						lastgame = rom.Game.Name;
 					}
 				}
 
@@ -290,9 +290,9 @@ namespace SabreTools.Helper
 			try
 			{
 				// No game should start with a path separator
-				if (rom.Game.StartsWith(Path.DirectorySeparatorChar.ToString()))
+				if (rom.Game.Name.StartsWith(Path.DirectorySeparatorChar.ToString()))
 				{
-					rom.Game = rom.Game.Substring(1);
+					rom.Game.Name = rom.Game.Name.Substring(1);
 				}
 
 				string state = "";
@@ -300,7 +300,7 @@ namespace SabreTools.Helper
 				{
 					case OutputFormat.ClrMamePro:
 						state += "game (\n\tname \"" + rom.Game + "\"\n" +
-							"\tdescription \"" + (String.IsNullOrEmpty(rom.GameDescription) ? rom.Game : rom.GameDescription) + "\"\n";
+							"\tdescription \"" + (String.IsNullOrEmpty(rom.Game.Description) ? rom.Game.Name : rom.Game.Description) + "\"\n";
 						break;
 					case OutputFormat.SabreDat:
 						for (int i = (last == -1 ? 0 : last); i < newsplit.Count; i++)
@@ -316,7 +316,7 @@ namespace SabreTools.Helper
 						break;
 					case OutputFormat.Xml:
 						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
-							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.GameDescription) ? rom.Game : rom.GameDescription)) + "</description>\n";
+							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Game.Description) ? rom.Game.Name : rom.Game.Description)) + "</description>\n";
 						break;
 				}
 
@@ -468,7 +468,7 @@ namespace SabreTools.Helper
 						// Otherwise, use any flags
 						else
 						{
-							string name = (datdata.UseGame ? rom.Game : rom.Name);
+							string name = (datdata.UseGame ? rom.Game.Name : rom.Name);
 							if (datdata.RepExt != "")
 							{
 								string dir = Path.GetDirectoryName(name);
@@ -481,13 +481,13 @@ namespace SabreTools.Helper
 							}
 							if (!datdata.UseGame && datdata.GameName)
 							{
-								name = Path.Combine(rom.Game, name);
+								name = Path.Combine(rom.Game.Name, name);
 							}
 
-							if (datdata.UseGame && rom.Game != lastgame)
+							if (datdata.UseGame && rom.Game.Name != lastgame)
 							{
 								state += pre + name + post + "\n";
-								lastgame = rom.Game;
+								lastgame = rom.Game.Name;
 							}
 							else if (!datdata.UseGame)
 							{
@@ -497,7 +497,7 @@ namespace SabreTools.Helper
 						break;
 					case OutputFormat.RomCenter:
 						state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Game) +
-							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.GameDescription) ? rom.Game : rom.GameDescription)) +
+							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Game.Description) ? rom.Game.Name : rom.Game.Description)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
 							"¬" + rom.HashData.CRC.ToLowerInvariant() +
 							"¬" + (rom.HashData.Size != -1 ? rom.HashData.Size.ToString() : "") + "¬¬¬\n";

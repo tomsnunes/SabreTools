@@ -538,7 +538,10 @@ namespace SabreTools.Helper
 							{
 								Type = "rom",
 								Name = reader.Entry.Key,
-								Game = gamename,
+								Game = new Machine
+								{
+									Name = gamename,
+								},
 								HashData = new HashData
 								{
 									Size = (size == 0 ? reader.Entry.Size : size),
@@ -618,7 +621,10 @@ namespace SabreTools.Helper
 			Rom rom = new Rom
 			{
 				Type = "rom",
-				Game = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
+				Game = new Machine
+				{
+					Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
+				},
 				Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 				HashData = new HashData
 				{

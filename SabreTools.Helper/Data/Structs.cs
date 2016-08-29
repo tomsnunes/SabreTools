@@ -46,8 +46,7 @@ namespace SabreTools.Helper
 	/// </summary>
 	public struct Rom : IComparable, IEquatable<Rom>
 	{
-		public string Game;
-		public string GameDescription;
+		public Machine Game;
 		public string Name;
 		public string Type;
 		public HashData HashData;
@@ -67,7 +66,7 @@ namespace SabreTools.Helper
 			{
 				Rom comp = (Rom)obj;
 
-				if (this.Game == comp.Game)
+				if (this.Game.Name == comp.Game.Name)
 				{
 					if (this.Name == comp.Name)
 					{
@@ -75,7 +74,7 @@ namespace SabreTools.Helper
 					}
 					ret = String.Compare(this.Name, comp.Name);
 				}
-				ret = String.Compare(this.Game, comp.Game);
+				ret = String.Compare(this.Game.Name, comp.Game.Name);
 			}
 			catch
 			{
@@ -93,7 +92,7 @@ namespace SabreTools.Helper
 			bool isdupe = RomTools.IsDuplicate(this, other, temp);
 			temp.Close();
 
-			return (this.Game == other.Game &&
+			return (this.Game.Name == other.Game.Name &&
 				this.Name == other.Name &&
 				isdupe);
 		}
@@ -108,6 +107,25 @@ namespace SabreTools.Helper
 		public string System;
 		public int SourceID;
 		public string Source;
+	}
+
+	/// <summary>
+	/// Intermediate struct for holding and processing Rom/Machine data
+	/// </summary>
+	public struct Machine
+	{
+		public string Name;
+		public string Comment;
+		public string Description;
+		public string Year;
+		public string Manufacturer;
+		public string RomOf;
+		public string CloneOf;
+		public string SampleOf;
+		public string SourceFile;
+		public bool IsBios;
+		public string Board;
+		public string RebuildTo;
 	}
 
 	/// <summary>

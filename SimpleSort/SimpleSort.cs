@@ -523,7 +523,7 @@ namespace SabreTools
 					if (_toFolder)
 					{
 						// Copy file to output directory
-						string gamedir = Path.Combine(_outdir, found.Game);
+						string gamedir = Path.Combine(_outdir, found.Game.Name);
 						if (!Directory.Exists(gamedir))
 						{
 							Directory.CreateDirectory(gamedir);
@@ -590,7 +590,7 @@ namespace SabreTools
 						if (_toFolder)
 						{
 							// Copy file to output directory
-							string gamedir = Path.Combine(_outdir, found.Game);
+							string gamedir = Path.Combine(_outdir, found.Game.Name);
 							if (!Directory.Exists(gamedir))
 							{
 								Directory.CreateDirectory(gamedir);
@@ -635,7 +635,7 @@ namespace SabreTools
 						if (_toFolder)
 						{
 							// Copy file to output directory
-							string gamedir = Path.Combine(_outdir, found.Game);
+							string gamedir = Path.Combine(_outdir, found.Game.Name);
 							if (!Directory.Exists(gamedir))
 							{
 								Directory.CreateDirectory(gamedir);
@@ -714,7 +714,7 @@ namespace SabreTools
 									string outfile = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
 									if (File.Exists(outfile))
 									{
-										string gamedir = Path.Combine(_outdir, found.Game);
+										string gamedir = Path.Combine(_outdir, found.Game.Name);
 										if (!Directory.Exists(gamedir))
 										{
 											Directory.CreateDirectory(gamedir);
