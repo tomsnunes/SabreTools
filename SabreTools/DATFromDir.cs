@@ -181,7 +181,7 @@ namespace SabreTools
 												"") + actualroot :
 											actualroot),
 									},
-									HashData = new HashData
+									HashData = new Hash
 									{
 										Size = -1,
 										CRC = "null",
@@ -220,7 +220,7 @@ namespace SabreTools
 													"") + actualroot :
 												actualroot),
 										},
-										HashData = new HashData
+										HashData = new Hash
 										{
 											Size = -1,
 											CRC = "null",

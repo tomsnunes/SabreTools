@@ -542,7 +542,7 @@ namespace SabreTools.Helper
 								{
 									Name = gamename,
 								},
-								HashData = new HashData
+								HashData = new Hash
 								{
 									Size = (size == 0 ? reader.Entry.Size : size),
 									CRC = (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc),
@@ -626,7 +626,7 @@ namespace SabreTools.Helper
 					Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 				},
 				Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
-				HashData = new HashData
+				HashData = new Hash
 				{
 					Size = extractedsize,
 					CRC = gzcrc.ToLowerInvariant(),

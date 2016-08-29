@@ -3,22 +3,136 @@ using System.Collections.Generic;
 
 namespace SabreTools.Helper
 {
+	#region Hash-to-Dat structs [Currently Unused]
+
+	/* Thought experiment
+
+		So, here's a connundrum: Should the internal structure of how DATs work (down to the hash level) mirror
+		how people see it (Dat to multiple games, game to multiple roms, rom to single hash) or
+		should it more closely mirror real life (Hash to multiple roms, rom to multiple games, game to single DAT)
+
+		If I use the "how people see it":
+			Things are pretty much how they are now with redundant data and the like
+			It makes sense to write things out to file, though. And life is easier when output is easier.
+			No code changes (big plus!)
+
+		If I use the "how it is":
+			Less data is likely to be mirrored
+			Refs to DAT files are possible so that there aren't duplicates
+			A lot of code will have to change...
+	*/
+
+	/// <summary>
+	/// Intermediate struct for holding and processing Hash data (NEW SYSTEM)
+	/// </summary>
+	public struct HashData
+	{
+		public long Size;
+		public string CRC;
+		public string MD5;
+		public string SHA1;
+		public List<RomData> Roms;
+	}
+
+	/// <summary>
+	/// Intermediate struct for holding and processing Rom data (NEW SYSTEM)
+	/// </summary>
+	public struct RomData
+	{
+		public string Name;
+		public ItemType Type;
+		public bool Nodump;
+		public string Date;
+		public List<MachineData> Machines;
+	}
+
+	/// <summary>
+	/// Intermediate struct for holding and processing Game/Machine data (NEW SYSTEM)
+	/// </summary>
+	public struct MachineData
+	{
+		public string Name;
+		public string Comment;
+		public string Description;
+		public string Year;
+		public string Manufacturer;
+		public string RomOf;
+		public string CloneOf;
+		public string SampleOf;
+		public string SourceFile;
+		public bool IsBios;
+		public string Board;
+		public string RebuildTo;
+		public bool TorrentZipped;
+	}
+
+	/// <summary>
+	/// Intermediate struct for holding and processing DAT data (NEW SYSTEM)
+	/// </summary>
+	public struct DatData
+	{
+		// Data common to most DAT types
+		public string FileName;
+		public string Name;
+		public string Description;
+		public string RootDir;
+		public string Category;
+		public string Version;
+		public string Date;
+		public string Author;
+		public string Email;
+		public string Homepage;
+		public string Url;
+		public string Comment;
+		public string Header;
+		public string Type; // Generally only used for SuperDAT
+		public ForceMerging ForceMerging;
+		public ForceNodump ForceNodump;
+		public ForcePacking ForcePacking;
+		public OutputFormat OutputFormat;
+		public bool MergeRoms;
+
+		// Data specific to the Miss DAT type
+		public bool UseGame;
+		public string Prefix;
+		public string Postfix;
+		public bool Quotes;
+		public string RepExt;
+		public string AddExt;
+		public bool GameName;
+		public bool Romba;
+		public bool? XSV; // true for tab-deliminated output, false for comma-deliminated output
+
+		// Statistical data related to the DAT
+		public long RomCount;
+		public long DiskCount;
+		public long TotalSize;
+		public long CRCCount;
+		public long MD5Count;
+		public long SHA1Count;
+		public long NodumpCount;
+	}
+
+	#endregion
+
+	#region Dat-to-Hash structs
+
 	/// <summary>
 	/// Intermediate struct for holding and processing hash data
 	/// </summary>
-	public struct HashData : IEquatable<HashData>
+	public struct Hash : IEquatable<Hash>
 	{
 		public long Size;
 		public string CRC;
 		public string MD5;
 		public string SHA1;
 
-		public bool Equals(HashData other)
+		public bool Equals(Hash other)
 		{
 			return this.Equals(other, false);
 		}
 
-		public bool Equals(HashData other, bool IsDisk)
+		public bool Equals(Hash other, bool IsDisk)
 		{
 			bool equals = false;
 
@@ -49,7 +163,7 @@ namespace SabreTools.Helper
 		public Machine Machine;
 		public string Name;
 		public ItemType Type;
-		public HashData HashData;
+		public Hash HashData;
 		public DupeType Dupe;
 		public bool Nodump;
 		public string Date;
@@ -57,9 +171,6 @@ namespace SabreTools.Helper
 
 		public int CompareTo(object obj)
 		{
-			Logger temp = new Logger(false, "");
-			temp.Start();
-
 			int ret = 0;
 
 			try
@@ -70,7 +181,7 @@ namespace SabreTools.Helper
 				{
 					if (this.Name == comp.Name)
 					{
-						ret = (RomTools.IsDuplicate(this, comp, temp) ? 0 : 1);
+						ret = (this.Equals(comp) ? 0 : 1);
 					}
 					ret = String.Compare(this.Name, comp.Name);
 				}
@@ -81,7 +192,6 @@ namespace SabreTools.Helper
 				ret = 1;
 			}
 
-			temp.Close();
 			return ret;
 		}
 
@@ -278,6 +388,10 @@ namespace SabreTools.Helper
 		}
 	}
 
+	#endregion
+
+	#region Skipper structs
+
 	/// <summary>
 	/// Intermediate struct for holding header skipper information
 	/// </summary>
@@ -313,4 +427,6 @@ namespace SabreTools.Helper
 		public long? Size; // null is PO2, "power of 2" filesize
 		public HeaderSkipTestFileOperator Operator;
 	}
+
+	#endregion
 }

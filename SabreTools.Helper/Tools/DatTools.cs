@@ -574,7 +574,7 @@ namespace SabreTools.Helper
 								Description = rominfo[4],
 							},
 							Name = rominfo[5],
-							HashData = new HashData
+							HashData = new Hash
 							{
 								CRC = rominfo[6].ToLowerInvariant(),
 								Size = Int64.Parse(rominfo[7]),
@@ -686,7 +686,7 @@ namespace SabreTools.Helper
 									Name = tempgame,
 									Description = tempgame,
 								},
-								HashData = new HashData
+								HashData = new Hash
 								{
 									Size = -1,
 									CRC = "null",
@@ -1136,7 +1136,7 @@ namespace SabreTools.Helper
 													},
 													Name = subreader.GetAttribute("name"),
 													Type = (subreader.Name.ToLowerInvariant() == "disk" ? ItemType.Disk : ItemType.Rom),
-													HashData = new HashData
+													HashData = new Hash
 													{
 														Size = size,
 														CRC = crc,
@@ -1195,7 +1195,7 @@ namespace SabreTools.Helper
 										Name = tempname,
 										Description = tempname,
 									},
-									HashData = new HashData
+									HashData = new Hash
 									{
 										Size = -1,
 										CRC = "null",
@@ -1375,7 +1375,7 @@ namespace SabreTools.Helper
 									},
 									Name = xtr.GetAttribute("name"),
 									Type = (xtr.GetAttribute("type").ToLowerInvariant() == "disk" ? ItemType.Disk : ItemType.Rom),
-									HashData = new HashData
+									HashData = new Hash
 									{
 										Size = size,
 										CRC = crc,

@@ -30,7 +30,7 @@ namespace SabreTools.Helper
 			{
 				Name = Path.GetFileName(input),
 				Type = ItemType.Rom,
-				HashData = new HashData
+				HashData = new Hash
 				{
 					Size = (new FileInfo(input)).Length,
 					CRC = string.Empty,
