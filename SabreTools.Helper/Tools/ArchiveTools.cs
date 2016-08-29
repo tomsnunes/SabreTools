@@ -13,6 +13,8 @@ namespace SabreTools.Helper
 {
 	public class ArchiveTools
 	{
+		#region Archive Writing
+
 		/// <summary>
 		/// Copy a file to an output archive
 		/// </summary>
@@ -111,6 +113,103 @@ namespace SabreTools.Helper
 				File.Move(archiveFileName + ".tmp", archiveFileName);
 			}
 		}
+
+		/// <summary>
+		/// Write an input file to a torrent GZ file
+		/// </summary>
+		/// <param name="input">File to write from</param>
+		/// <param name="outdir">Directory to write archive to</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the write was a success, false otherwise</returns>
+		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
+		public static bool WriteTorrentGZ(string input, string outdir, bool romba, Logger logger)
+		{
+			// Check that the input file exists
+			if (!File.Exists(input))
+			{
+				logger.Warning("File " + input + " does not exist!");
+				return false;
+			}
+			input = Path.GetFullPath(input);
+
+			// Make sure the output directory exists
+			if (!Directory.Exists(outdir))
+			{
+				Directory.CreateDirectory(outdir);
+			}
+			outdir = Path.GetFullPath(outdir);
+
+			// Now get the Rom info for the file so we have hashes and size
+			Rom rom = RomTools.GetSingleFileInfo(input);
+
+			// If it doesn't exist, create the output file and then write
+			string outfile = Path.Combine(outdir, rom.HashData.SHA1 + ".gz");
+			using (FileStream inputstream = new FileStream(input, FileMode.Open))
+			using (GZipStream output = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress))
+			{
+				inputstream.CopyTo(output);
+			}
+
+			// Now that it's ready, inject the header info
+			using (BinaryWriter sw = new BinaryWriter(new MemoryStream()))
+			{
+				using (BinaryReader br = new BinaryReader(File.OpenRead(outfile)))
+				{
+					// Write standard header and TGZ info
+					byte[] data = Constants.TorrentGZHeader
+									.Concat(Style.StringToByteArray(rom.HashData.MD5)) // MD5
+									.Concat(Style.StringToByteArray(rom.HashData.CRC)) // CRC
+									.Concat(BitConverter.GetBytes(rom.HashData.Size).Reverse().ToArray()) // Long size (Mirrored)
+								.ToArray();
+					sw.Write(data);
+
+					// Finally, copy the rest of the data from the original file
+					br.BaseStream.Seek(10, SeekOrigin.Begin);
+					int i = 10;
+					while (br.BaseStream.Position < br.BaseStream.Length)
+					{
+						sw.Write(br.ReadByte());
+						i++;
+					}
+				}
+
+				using (BinaryWriter bw = new BinaryWriter(File.Open(outfile, FileMode.Create)))
+				{
+					// Now write the new file over the original
+					sw.BaseStream.Seek(0, SeekOrigin.Begin);
+					bw.BaseStream.Seek(0, SeekOrigin.Begin);
+					sw.BaseStream.CopyTo(bw.BaseStream);
+				}
+			}
+
+			// If we're in romba mode, create the subfolder and move the file
+			if (romba)
+			{
+				string subfolder = Path.Combine(rom.HashData.SHA1.Substring(0, 2), rom.HashData.SHA1.Substring(2, 2), rom.HashData.SHA1.Substring(4, 2), rom.HashData.SHA1.Substring(6, 2));
+				outdir = Path.Combine(outdir, subfolder);
+				if (!Directory.Exists(outdir))
+				{
+					Directory.CreateDirectory(outdir);
+				}
+
+				try
+				{
+					File.Move(outfile, Path.Combine(outdir, Path.GetFileName(outfile)));
+				}
+				catch (Exception ex)
+				{
+					logger.Warning(ex.ToString());
+					File.Delete(outfile);
+				}
+			}
+
+			return true;
+		}
+
+		#endregion
+
+		#region Archive Extraction
 
 		/// <summary>
 		/// Attempt to extract a file as an archive
@@ -317,6 +416,10 @@ namespace SabreTools.Helper
 			return outfile;
 		}
 
+		#endregion
+
+		#region Archive-to-Archive Handling
+
 		/// <summary>
 		/// Attempt to copy a file between archives
 		/// </summary>
@@ -467,6 +570,10 @@ namespace SabreTools.Helper
 
 			return success;
 		}
+
+		#endregion
+
+		#region Archive Information Methods
 
 		/// <summary>
 		/// Generate a list of RomData objects from the header values in an archive
@@ -639,99 +746,6 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Write an input file to a torrent GZ file
-		/// </summary>
-		/// <param name="input">File to write from</param>
-		/// <param name="outdir">Directory to write archive to</param>
-		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>True if the write was a success, false otherwise</returns>
-		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
-		public static bool WriteTorrentGZ(string input, string outdir, bool romba, Logger logger)
-		{
-			// Check that the input file exists
-			if (!File.Exists(input))
-			{
-				logger.Warning("File " + input + " does not exist!");
-				return false;
-			}
-			input = Path.GetFullPath(input);
-
-			// Make sure the output directory exists
-			if (!Directory.Exists(outdir))
-			{
-				Directory.CreateDirectory(outdir);
-			}
-			outdir = Path.GetFullPath(outdir);
-
-			// Now get the Rom info for the file so we have hashes and size
-			Rom rom = RomTools.GetSingleFileInfo(input);
-
-			// If it doesn't exist, create the output file and then write
-			string outfile = Path.Combine(outdir, rom.HashData.SHA1 + ".gz");
-			using (FileStream inputstream = new FileStream(input, FileMode.Open))
-			using (GZipStream output = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress))
-			{
-				inputstream.CopyTo(output);
-			}
-
-			// Now that it's ready, inject the header info
-			using (BinaryWriter sw = new BinaryWriter(new MemoryStream()))
-			{
-				using (BinaryReader br = new BinaryReader(File.OpenRead(outfile)))
-				{
-					// Write standard header and TGZ info
-					byte[] data = Constants.TorrentGZHeader
-									.Concat(Style.StringToByteArray(rom.HashData.MD5)) // MD5
-									.Concat(Style.StringToByteArray(rom.HashData.CRC)) // CRC
-									.Concat(BitConverter.GetBytes(rom.HashData.Size).Reverse().ToArray()) // Long size (Mirrored)
-								.ToArray();
-					sw.Write(data);
-
-					// Finally, copy the rest of the data from the original file
-					br.BaseStream.Seek(10, SeekOrigin.Begin);
-					int i = 10;
-					while (br.BaseStream.Position < br.BaseStream.Length)
-					{
-						sw.Write(br.ReadByte());
-						i++;
-					}
-				}
-
-				using (BinaryWriter bw = new BinaryWriter(File.Open(outfile, FileMode.Create)))
-				{
-					// Now write the new file over the original
-					sw.BaseStream.Seek(0, SeekOrigin.Begin);
-					bw.BaseStream.Seek(0, SeekOrigin.Begin);
-					sw.BaseStream.CopyTo(bw.BaseStream);
-				}
-			}
-
-			// If we're in romba mode, create the subfolder and move the file
-			if (romba)
-			{
-				string subfolder = Path.Combine(rom.HashData.SHA1.Substring(0, 2), rom.HashData.SHA1.Substring(2, 2), rom.HashData.SHA1.Substring(4, 2), rom.HashData.SHA1.Substring(6, 2));
-				outdir = Path.Combine(outdir, subfolder);
-				if (!Directory.Exists(outdir))
-				{
-					Directory.CreateDirectory(outdir);
-				}
-
-				try
-				{
-					File.Move(outfile, Path.Combine(outdir, Path.GetFileName(outfile)));
-				}
-				catch (Exception ex)
-				{
-					logger.Warning(ex.ToString());
-					File.Delete(outfile);
-				}
-			}
-
-			return true;
-		}
-
-		/// <summary>
 		/// Returns the archive type of an input file
 		/// </summary>
 		/// <param name="input">Input file to check</param>
@@ -840,7 +854,7 @@ namespace SabreTools.Helper
 			}
 		}
 
-		
+		#endregion
 
 		#region Hash-to-Dat functions
 
