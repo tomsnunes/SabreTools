@@ -1690,7 +1690,7 @@ namespace SabreTools.Helper
 					if (System.IO.File.Exists(inputFileName))
 					{
 						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-						datdata = Parse(inputFileName, 0, 0, datdata, logger, true, clean, softlist, keepext:(datdata.TSV != null));
+						datdata = Parse(inputFileName, 0, 0, datdata, logger, true, clean, softlist, keepext:(datdata.XSV != null));
 						datdata = Filter(datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
 
 						// If the extension matches, append ".new" to the filename
@@ -1715,7 +1715,7 @@ namespace SabreTools.Helper
 							logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 							Dat innerDatdata = (Dat)datdata.Clone();
 							innerDatdata.Files = null;
-							innerDatdata = Parse(file, 0, 0, innerDatdata, logger, true, clean, keepext:(datdata.TSV != null));
+							innerDatdata = Parse(file, 0, 0, innerDatdata, logger, true, clean, keepext:(datdata.XSV != null));
 							innerDatdata = Filter(innerDatdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger);
 
 							// If the extension matches, append ".new" to the filename

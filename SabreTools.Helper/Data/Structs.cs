@@ -164,7 +164,7 @@ namespace SabreTools.Helper
 		public string AddExt;
 		public bool GameName;
 		public bool Romba;
-		public bool? TSV; // true for tab-deliminated output, false for comma-deliminated output
+		public bool? XSV; // true for tab-deliminated output, false for comma-deliminated output
 
 		// Statistical data related to the DAT
 		public long RomCount;
@@ -207,7 +207,7 @@ namespace SabreTools.Helper
 				AddExt = this.AddExt,
 				GameName = this.GameName,
 				Romba = this.Romba,
-				TSV = this.TSV,
+				XSV = this.XSV,
 				RomCount = this.RomCount,
 				DiskCount = this.DiskCount,
 				TotalSize = this.TotalSize,
@@ -250,7 +250,7 @@ namespace SabreTools.Helper
 				AddExt = this.AddExt,
 				GameName = this.GameName,
 				Romba = this.Romba,
-				TSV = this.TSV,
+				XSV = this.XSV,
 			};
 		}
 	}

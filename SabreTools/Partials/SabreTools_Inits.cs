@@ -315,7 +315,7 @@ namespace SabreTools
 				AddExt = addext,
 				GameName = datprefix,
 				Romba = romba,
-				TSV = tsv,
+				XSV = tsv,
 			};
 
 			if (outputCMP)
