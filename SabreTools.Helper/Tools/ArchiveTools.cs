@@ -21,7 +21,7 @@ namespace SabreTools.Helper
 		/// <param name="rom">RomData representing the new information</param>
 		public static void WriteToArchive(string input, string output, Rom rom)
 		{
-			string archiveFileName = Path.Combine(output, rom.Game + ".zip");
+			string archiveFileName = Path.Combine(output, rom.Machine + ".zip");
 
 			System.IO.Compression.ZipArchive outarchive = null;
 			try
@@ -71,7 +71,7 @@ namespace SabreTools.Helper
 		/// <param name="rom">RomData representing the new information</param>
 		public static void WriteToManagedArchive(string input, string output, Rom rom)
 		{
-			string archiveFileName = Path.Combine(output, rom.Game + ".zip");
+			string archiveFileName = Path.Combine(output, rom.Machine + ".zip");
 
 			// Delete an empty file first
 			if (File.Exists(archiveFileName) && new FileInfo(archiveFileName).Length == 0)
@@ -538,7 +538,7 @@ namespace SabreTools.Helper
 							{
 								Type = "rom",
 								Name = reader.Entry.Key,
-								Game = new Machine
+								Machine = new Machine
 								{
 									Name = gamename,
 								},
@@ -621,7 +621,7 @@ namespace SabreTools.Helper
 			Rom rom = new Rom
 			{
 				Type = "rom",
-				Game = new Machine
+				Machine = new Machine
 				{
 					Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 				},

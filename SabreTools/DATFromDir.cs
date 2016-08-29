@@ -173,7 +173,7 @@ namespace SabreTools
 								Rom rom = new Rom
 								{
 									Name = "null",
-									Game = new Machine
+									Machine = new Machine
 									{
 										Name = (_datdata.Type == "SuperDAT" ?
 											(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
@@ -212,7 +212,7 @@ namespace SabreTools
 									Rom rom = new Rom
 									{
 										Name = "null",
-										Game = new Machine
+										Machine = new Machine
 										{
 											Name = (_datdata.Type == "SuperDAT" ?
 												(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
@@ -293,13 +293,13 @@ namespace SabreTools
 						{
 							// If we have a different game and we're not at the start of the list, output the end of last item
 							int last = 0;
-							if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.Name.ToLowerInvariant())
+							if (lastparent != null && lastparent.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 							{
 								Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
 							}
 
 							// If we have a new game, output the beginning of the new item
-							if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.Name.ToLowerInvariant())
+							if (lastparent == null || lastparent.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 							{
 								Output.WriteStartGame(sw, rom, new List<string>(), lastparent, _datdata, 0, last, _logger);
 							}
@@ -311,7 +311,7 @@ namespace SabreTools
 							}
 						}
 
-						lastparent = rom.Game.Name;
+						lastparent = rom.Machine.Name;
 					}
 				}
 
@@ -380,7 +380,7 @@ namespace SabreTools
 				}
 
 				_logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
-				return rom.Game.Name;
+				return rom.Machine.Name;
 			}
 
 			// If both deep hash skip flags are set, do a quickscan
@@ -517,7 +517,7 @@ namespace SabreTools
 				_logger.Log("Actual item added: " + actualitem);
 
 				// Update rom information
-				rom.Game = new Machine
+				rom.Machine = new Machine
 				{
 					Name = (datdata.Type == "SuperDAT" ?
 						(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
@@ -525,7 +525,7 @@ namespace SabreTools
 							"") + actualroot :
 						actualroot),
 				};
-				rom.Game.Name = rom.Game.Name.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
+				rom.Machine.Name = rom.Machine.Name.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
 				rom.Name = actualitem;
 
 				if (_nowrite)
@@ -546,13 +546,13 @@ namespace SabreTools
 				{
 					// If we have a different game and we're not at the start of the list, output the end of last item
 					int last = 0;
-					if (lastparent != null && lastparent.ToLowerInvariant() != rom.Game.Name.ToLowerInvariant())
+					if (lastparent != null && lastparent.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 					{
 						Output.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, datdata, 0, out last, _logger);
 					}
 
 					// If we have a new game, output the beginning of the new item
-					if (lastparent == null || lastparent.ToLowerInvariant() != rom.Game.Name.ToLowerInvariant())
+					if (lastparent == null || lastparent.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 					{
 						Output.WriteStartGame(sw, rom, new List<string>(), lastparent, datdata, 0, last, _logger);
 					}
@@ -562,7 +562,7 @@ namespace SabreTools
 				}
 				_logger.User("File added: " + actualitem + Environment.NewLine);
 
-				return rom.Game.Name;
+				return rom.Machine.Name;
 			}
 			catch (IOException ex)
 			{

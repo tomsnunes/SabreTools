@@ -172,7 +172,7 @@ namespace SabreTools.Helper
 
 					Rom rom = new Rom
 					{
-						Game = new Machine
+						Machine = new Machine
 						{
 							Name = gamename,
 							Description = gamedesc,
@@ -568,7 +568,7 @@ namespace SabreTools.Helper
 
 						Rom rom = new Rom
 						{
-							Game = new Machine
+							Machine = new Machine
 							{
 								Name = rominfo[3],
 								Description = rominfo[4],
@@ -681,7 +681,7 @@ namespace SabreTools.Helper
 							{
 								Type = "rom",
 								Name = "null",
-								Game = new Machine
+								Machine = new Machine
 								{
 									Name = tempgame,
 									Description = tempgame,
@@ -1129,7 +1129,7 @@ namespace SabreTools.Helper
 
 												Rom rom = new Rom
 												{
-													Game = new Machine
+													Machine = new Machine
 													{
 														Name = tempname,
 														Description = gamedesc,
@@ -1190,7 +1190,7 @@ namespace SabreTools.Helper
 								{
 									Type = "rom",
 									Name = "null",
-									Game = new Machine
+									Machine = new Machine
 									{
 										Name = tempname,
 										Description = tempname,
@@ -1369,7 +1369,7 @@ namespace SabreTools.Helper
 
 								Rom rom = new Rom
 								{
-									Game = new Machine
+									Machine = new Machine
 									{
 										Name = tempname,
 									},
@@ -1474,9 +1474,9 @@ namespace SabreTools.Helper
 										: rom.Metadata.SystemID.ToString().PadLeft(10, '0')
 											+ "-"
 											+ rom.Metadata.SourceID.ToString().PadLeft(10, '0') + "-")
-											+ (String.IsNullOrEmpty(rom.Game.Name)
+											+ (String.IsNullOrEmpty(rom.Machine.Name)
 												? ""
-												: rom.Game.Name.ToLowerInvariant());
+												: rom.Machine.Name.ToLowerInvariant());
 					if (sortable.ContainsKey(newkey))
 					{
 						sortable[newkey].Add(rom);
@@ -1832,15 +1832,15 @@ namespace SabreTools.Helper
 					// Filter on game name
 					if (gamename != "")
 					{
-						if (gamename.StartsWith("*") && gamename.EndsWith("*") && !rom.Game.Name.ToLowerInvariant().Contains(gamename.ToLowerInvariant().Replace("*", "")))
+						if (gamename.StartsWith("*") && gamename.EndsWith("*") && !rom.Machine.Name.ToLowerInvariant().Contains(gamename.ToLowerInvariant().Replace("*", "")))
 						{
 							continue;
 						}
-						else if (gamename.StartsWith("*") && !rom.Game.Name.EndsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						else if (gamename.StartsWith("*") && !rom.Machine.Name.EndsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 						{
 							continue;
 						}
-						else if (gamename.EndsWith("*") && !rom.Game.Name.StartsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						else if (gamename.EndsWith("*") && !rom.Machine.Name.StartsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 						{
 							continue;
 						}
@@ -1940,14 +1940,14 @@ namespace SabreTools.Helper
 					// If we are in single game mode, rename all games
 					if (single)
 					{
-						rom.Game.Name = "!";
+						rom.Machine.Name = "!";
 					}
 
 					// If we are in NTFS trim mode, trim the game name
 					if (trim)
 					{
 						// Windows max name length is 260
-						int usableLength = 260 - rom.Game.Name.Length - root.Length;
+						int usableLength = 260 - rom.Machine.Name.Length - root.Length;
 						if (rom.Name.Length > usableLength)
 						{
 							string ext = Path.GetExtension(rom.Name);
@@ -2071,7 +2071,7 @@ namespace SabreTools.Helper
 								if ((diff & DiffMode.NoDupes) != 0)
 								{
 									Rom newrom = rom;
-									newrom.Game.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
+									newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
 
 									if (outerDiffData.Roms.ContainsKey(key))
 									{
@@ -2093,7 +2093,7 @@ namespace SabreTools.Helper
 							if (rom.Dupe >= DupeType.ExternalHash)
 							{
 								Rom newrom = rom;
-								newrom.Game.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
+								newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
 
 								if (dupeData.Roms.ContainsKey(key))
 								{
@@ -2265,9 +2265,9 @@ namespace SabreTools.Helper
 
 						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
 						filename = filename.Remove(0, rootpath.Length);
-						newrom.Game.Name = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
+						newrom.Machine.Name = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
 							+ Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar
-							+ newrom.Game.Name;
+							+ newrom.Machine.Name;
 						newroms.Add(newrom);
 					}
 					userData.Roms[key] = newroms;

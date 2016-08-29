@@ -100,16 +100,16 @@ namespace SabreTools.Helper
 					for (int index = 0; index < roms.Count; index++)
 					{
 						Rom rom = roms[index];
-						List<string> newsplit = rom.Game.Name.Split('\\').ToList();
+						List<string> newsplit = rom.Machine.Name.Split('\\').ToList();
 
 						// If we have a different game and we're not at the start of the list, output the end of last item
-						if (lastgame != null && lastgame.ToLowerInvariant() != rom.Game.Name.ToLowerInvariant())
+						if (lastgame != null && lastgame.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 						{
 							depth = WriteEndGame(sw, rom, splitpath, newsplit, lastgame, datdata, depth, out last, logger);
 						}
 
 						// If we have a new game, output the beginning of the new item
-						if (lastgame == null || lastgame.ToLowerInvariant() != rom.Game.Name.ToLowerInvariant())
+						if (lastgame == null || lastgame.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 						{
 							depth = WriteStartGame(sw, rom, newsplit, lastgame, datdata, depth, last, logger);
 						}
@@ -117,7 +117,7 @@ namespace SabreTools.Helper
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
 						if (rom.Name == "null" && rom.HashData.Size == -1 && rom.HashData.CRC == "null" && rom.HashData.MD5 == "null" && rom.HashData.SHA1 == "null")
 						{
-							logger.Log("Empty folder found: " + rom.Game);
+							logger.Log("Empty folder found: " + rom.Machine);
 
 							// If we're in a mode that doesn't allow for actual empty folders, add the blank info
 							if (datdata.OutputFormat != OutputFormat.SabreDat && datdata.OutputFormat != OutputFormat.MissFile)
@@ -133,7 +133,7 @@ namespace SabreTools.Helper
 							else
 							{
 								splitpath = newsplit;
-								lastgame = rom.Game.Name;
+								lastgame = rom.Machine.Name;
 								continue;
 							}
 						}
@@ -143,7 +143,7 @@ namespace SabreTools.Helper
 
 						// Set the new data to compare against
 						splitpath = newsplit;
-						lastgame = rom.Game.Name;
+						lastgame = rom.Machine.Name;
 					}
 				}
 
@@ -290,17 +290,17 @@ namespace SabreTools.Helper
 			try
 			{
 				// No game should start with a path separator
-				if (rom.Game.Name.StartsWith(Path.DirectorySeparatorChar.ToString()))
+				if (rom.Machine.Name.StartsWith(Path.DirectorySeparatorChar.ToString()))
 				{
-					rom.Game.Name = rom.Game.Name.Substring(1);
+					rom.Machine.Name = rom.Machine.Name.Substring(1);
 				}
 
 				string state = "";
 				switch (datdata.OutputFormat)
 				{
 					case OutputFormat.ClrMamePro:
-						state += "game (\n\tname \"" + rom.Game + "\"\n" +
-							"\tdescription \"" + (String.IsNullOrEmpty(rom.Game.Description) ? rom.Game.Name : rom.Game.Description) + "\"\n";
+						state += "game (\n\tname \"" + rom.Machine + "\"\n" +
+							"\tdescription \"" + (String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description) + "\"\n";
 						break;
 					case OutputFormat.SabreDat:
 						for (int i = (last == -1 ? 0 : last); i < newsplit.Count; i++)
@@ -315,8 +315,8 @@ namespace SabreTools.Helper
 						depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
 						break;
 					case OutputFormat.Xml:
-						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Game) + "\">\n" +
-							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Game.Description) ? rom.Game.Name : rom.Game.Description)) + "</description>\n";
+						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Machine) + "\">\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) + "</description>\n";
 						break;
 				}
 
@@ -452,7 +452,7 @@ namespace SabreTools.Helper
 						// If we're in TSV mode, similarly the state is consistent
 						else if (datdata.TSV == true)
 						{
-							string inline = "\"" + datdata.FileName + "\"\t\"" + datdata.Name + "\"\t\"" + datdata.Description + "\"\t\"" + rom.Game + "\"\t\"" + rom.Game + "\"\t\"" +
+							string inline = "\"" + datdata.FileName + "\"\t\"" + datdata.Name + "\"\t\"" + datdata.Description + "\"\t\"" + rom.Machine + "\"\t\"" + rom.Machine + "\"\t\"" +
 								rom.Type + "\"\t\"" + (rom.Type == "rom" ? rom.Name : "") + "\"\t\"" + (rom.Type == "disk" ? rom.Name : "") + "\"\t\"" + rom.HashData.Size + "\"\t\"" +
 								rom.HashData.CRC + "\"\t\"" + rom.HashData.MD5 + "\"\t\"" + rom.HashData.SHA1 + "\"\t" + (rom.Nodump ? "\"Nodump\"" : "\"\"");
 							state += pre + inline + post + "\n";
@@ -460,7 +460,7 @@ namespace SabreTools.Helper
 						// If we're in CSV mode, similarly the state is consistent
 						else if (datdata.TSV == false)
 						{
-							string inline = "\"" + datdata.FileName + "\",\"" + datdata.Name + "\",\"" + datdata.Description + "\",\"" + rom.Game + "\",\"" + rom.Game + "\",\"" +
+							string inline = "\"" + datdata.FileName + "\",\"" + datdata.Name + "\",\"" + datdata.Description + "\",\"" + rom.Machine + "\",\"" + rom.Machine + "\",\"" +
 								rom.Type + "\",\"" + (rom.Type == "rom" ? rom.Name : "") + "\",\"" + (rom.Type == "disk" ? rom.Name : "") + "\",\"" + rom.HashData.Size + "\",\"" +
 								rom.HashData.CRC + "\",\"" + rom.HashData.MD5 + "\",\"" + rom.HashData.SHA1 + "\"," + (rom.Nodump ? "\"Nodump\"" : "\"\"");
 							state += pre + inline + post + "\n";
@@ -468,7 +468,7 @@ namespace SabreTools.Helper
 						// Otherwise, use any flags
 						else
 						{
-							string name = (datdata.UseGame ? rom.Game.Name : rom.Name);
+							string name = (datdata.UseGame ? rom.Machine.Name : rom.Name);
 							if (datdata.RepExt != "")
 							{
 								string dir = Path.GetDirectoryName(name);
@@ -481,13 +481,13 @@ namespace SabreTools.Helper
 							}
 							if (!datdata.UseGame && datdata.GameName)
 							{
-								name = Path.Combine(rom.Game.Name, name);
+								name = Path.Combine(rom.Machine.Name, name);
 							}
 
-							if (datdata.UseGame && rom.Game.Name != lastgame)
+							if (datdata.UseGame && rom.Machine.Name != lastgame)
 							{
 								state += pre + name + post + "\n";
-								lastgame = rom.Game.Name;
+								lastgame = rom.Machine.Name;
 							}
 							else if (!datdata.UseGame)
 							{
@@ -496,8 +496,8 @@ namespace SabreTools.Helper
 						}
 						break;
 					case OutputFormat.RomCenter:
-						state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Game) +
-							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Game.Description) ? rom.Game.Name : rom.Game.Description)) +
+						state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Machine) +
+							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
 							"¬" + rom.HashData.CRC.ToLowerInvariant() +
 							"¬" + (rom.HashData.Size != -1 ? rom.HashData.Size.ToString() : "") + "¬¬¬\n";

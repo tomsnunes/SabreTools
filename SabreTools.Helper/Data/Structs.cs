@@ -46,7 +46,7 @@ namespace SabreTools.Helper
 	/// </summary>
 	public struct Rom : IComparable, IEquatable<Rom>
 	{
-		public Machine Game;
+		public Machine Machine;
 		public string Name;
 		public string Type;
 		public HashData HashData;
@@ -66,7 +66,7 @@ namespace SabreTools.Helper
 			{
 				Rom comp = (Rom)obj;
 
-				if (this.Game.Name == comp.Game.Name)
+				if (this.Machine.Name == comp.Machine.Name)
 				{
 					if (this.Name == comp.Name)
 					{
@@ -74,7 +74,7 @@ namespace SabreTools.Helper
 					}
 					ret = String.Compare(this.Name, comp.Name);
 				}
-				ret = String.Compare(this.Game.Name, comp.Game.Name);
+				ret = String.Compare(this.Machine.Name, comp.Machine.Name);
 			}
 			catch
 			{
@@ -92,7 +92,7 @@ namespace SabreTools.Helper
 			bool isdupe = RomTools.IsDuplicate(this, other, temp);
 			temp.Close();
 
-			return (this.Game.Name == other.Game.Name &&
+			return (this.Machine.Name == other.Machine.Name &&
 				this.Name == other.Name &&
 				isdupe);
 		}
