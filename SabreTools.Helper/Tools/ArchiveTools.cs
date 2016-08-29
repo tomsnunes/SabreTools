@@ -558,28 +558,6 @@ namespace SabreTools.Helper
 			return roms;
 		}
 
-		/* (Torrent)GZ Header Format
-			(https://tools.ietf.org/html/rfc1952)
-			00			Identification 1 (0x1F)
-			01			Identification 2 (0x8B)
-			02			Compression Method (0-7 reserved, 8 deflate; 0x08)
-			03			Flags (0 FTEXT, 1 FHCRC, 2 FEXTRA, 3 FNAME, 4 FCOMMENT, 5 reserved, 6 reserved, 7 reserved; 0x04)
-			04-07		Modification time (Unix format; 0x00, 0x00, 0x00, 0x00)
-			08			Extra Flags (2 maximum compression, 4 fastest algorithm; 0x00)
-			09			OS (See list on https://tools.ietf.org/html/rfc1952; 0x00)
-			0A-0B		[if FEXTRA set] Length of extra field (mirrored; 0x1C, 0x00)
-			0C-ww		[if FEXTRA set] Extra field
-				0C-1B	MD5 Hash
-				1C-1F	CRC hash
-				20-27	Int64 size (mirrored)
-			ww+1-xx		[if FNAME set] Original filename, 00 terminated
-			xx+1-yy		[if FCOMMENT set] File comment, 00 terminated
-			yy+1-yy+03	[if FHCRC set] CRC16
-			yy+04-zz	Compressed blocks
-			zz+1-zz+5	CRC32
-			zz+6-zz+10	Size (< 4GiB, mirrored)
-		*/
-
 		/// <summary>
 		/// Retrieve file information for a single torrent GZ file
 		/// </summary>
@@ -607,7 +585,6 @@ namespace SabreTools.Helper
 
 			// Get the Romba-specific header data
 			byte[] header; // Get preamble header for checking
-			byte[] headercheck = new byte[] { 0x1f, 0x8b, 0x8, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1c, 0x0 };
 			byte[] headermd5; // MD5
 			byte[] headercrc; // CRC
 			byte[] headersz; // Int64 size
@@ -623,7 +600,7 @@ namespace SabreTools.Helper
 			bool correct = true;
 			for (int i = 0; i < header.Length; i++)
 			{
-				correct &= (header[i] == headercheck[i]);
+				correct &= (header[i] == Constants.TorrentGZHeader[i]);
 			}
 			if (!correct)
 			{
@@ -691,11 +668,8 @@ namespace SabreTools.Helper
 			{
 				using (BinaryReader br = new BinaryReader(File.OpenRead(outfile)))
 				{
-					// Copy the first part of the file to the memory stream
-					sw.Write(br.ReadBytes(3)); //0x1F (ID1), 0x8B (ID2), 0x08 (Compression method - Deflate)
-
-					// Now write TGZ info
-					byte[] data = new byte[] { 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1c, 0x0 } // Flags with FEXTRA set (1), MTIME (4), XFLAG (1), OS (1), FEXTRA-LEN (2, Mirrored)
+					// Write standard header and TGZ info
+					byte[] data = Constants.TorrentGZHeader
 									.Concat(StringToByteArray(rom.MD5)) // MD5
 									.Concat(StringToByteArray(rom.CRC)) // CRC
 									.Concat(BitConverter.GetBytes(rom.Size).Reverse().ToArray()) // Long size (Mirrored)
