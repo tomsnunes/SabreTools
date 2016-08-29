@@ -255,7 +255,7 @@ namespace SabreTools
 
 				// Now add the information to the database if it's not already there
 				Rom rom = RomTools.GetSingleFileInfo(newfile);
-				AddHeaderToDatabase(hstr, rom.SHA1, type);
+				AddHeaderToDatabase(hstr, rom.HashData.SHA1, type);
 			}
 
 			return true;
@@ -314,7 +314,7 @@ namespace SabreTools
 			// Then try to pull the corresponding headers from the database
 			string header = "";
 
-			string query = @"SELECT header, type FROM data WHERE sha1='" + rom.SHA1 + "'";
+			string query = @"SELECT header, type FROM data WHERE sha1='" + rom.HashData.SHA1 + "'";
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
 				dbc.Open();

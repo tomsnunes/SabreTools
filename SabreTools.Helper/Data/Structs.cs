@@ -4,6 +4,29 @@ using System.Collections.Generic;
 namespace SabreTools.Helper
 {
 	/// <summary>
+	/// Intermediate struct for holding and processing hash data
+	/// </summary>
+	public struct HashData : IComparable, IEquatable<HashData>
+	{
+		public long Size;
+		public string CRC;
+		public string MD5;
+		public string SHA1;
+
+		// Needs implementation
+		public int CompareTo(object obj)
+		{
+			return 0;
+		}
+
+		// Needs implementation
+		public bool Equals(HashData other)
+		{
+			return true;
+		}
+	}
+
+	/// <summary>
 	/// Intermediate struct for holding and processing rom data
 	/// </summary>
 	public struct Rom : IComparable, IEquatable<Rom>
@@ -12,10 +35,7 @@ namespace SabreTools.Helper
 		public string GameDescription;
 		public string Name;
 		public string Type;
-		public long Size;
-		public string CRC;
-		public string MD5;
-		public string SHA1;
+		public HashData HashData;
 		public DupeType Dupe;
 		public bool Nodump;
 		public string Date;

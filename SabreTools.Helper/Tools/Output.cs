@@ -115,7 +115,7 @@ namespace SabreTools.Helper
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
-						if (rom.Name == "null" && rom.Size == -1 && rom.CRC == "null" && rom.MD5 == "null" && rom.SHA1 == "null")
+						if (rom.Name == "null" && rom.HashData.Size == -1 && rom.HashData.CRC == "null" && rom.HashData.MD5 == "null" && rom.HashData.SHA1 == "null")
 						{
 							logger.Log("Empty folder found: " + rom.Game);
 
@@ -123,10 +123,10 @@ namespace SabreTools.Helper
 							if (datdata.OutputFormat != OutputFormat.SabreDat && datdata.OutputFormat != OutputFormat.MissFile)
 							{
 								rom.Name = "-";
-								rom.Size = Constants.SizeZero;
-								rom.CRC = Constants.CRCZero;
-								rom.MD5 = Constants.MD5Zero;
-								rom.SHA1 = Constants.SHA1Zero;
+								rom.HashData.Size = Constants.SizeZero;
+								rom.HashData.CRC = Constants.CRCZero;
+								rom.HashData.MD5 = Constants.MD5Zero;
+								rom.HashData.SHA1 = Constants.SHA1Zero;
 							}
 
 							// Otherwise, set the new path and such, write out, and continue
@@ -422,10 +422,10 @@ namespace SabreTools.Helper
 				{
 					case OutputFormat.ClrMamePro:
 						state += "\t" + rom.Type + " ( name \"" + rom.Name + "\"" +
-							(rom.Size != -1 ? " size " + rom.Size : "") +
-							(!String.IsNullOrEmpty(rom.CRC) ? " crc " + rom.CRC.ToLowerInvariant() : "") +
-							(!String.IsNullOrEmpty(rom.MD5) ? " md5 " + rom.MD5.ToLowerInvariant() : "") +
-							(!String.IsNullOrEmpty(rom.SHA1) ? " sha1 " + rom.SHA1.ToLowerInvariant() : "") +
+							(rom.HashData.Size != -1 ? " size " + rom.HashData.Size : "") +
+							(!String.IsNullOrEmpty(rom.HashData.CRC) ? " crc " + rom.HashData.CRC.ToLowerInvariant() : "") +
+							(!String.IsNullOrEmpty(rom.HashData.MD5) ? " md5 " + rom.HashData.MD5.ToLowerInvariant() : "") +
+							(!String.IsNullOrEmpty(rom.HashData.SHA1) ? " sha1 " + rom.HashData.SHA1.ToLowerInvariant() : "") +
 							(!String.IsNullOrEmpty(rom.Date) ? " date \"" + rom.Date + "\"" : "") +
 							(rom.Nodump ? " flags nodump" : "") +
 							" )\n";
@@ -435,17 +435,17 @@ namespace SabreTools.Helper
 						string post = (datdata.Quotes ? "\"" : "") + datdata.Postfix;
 
 						// Check for special strings in prefix and postfix
-						pre = pre.Replace("%crc%", rom.CRC).Replace("%md5%", rom.MD5).Replace("%sha1%", rom.SHA1).Replace("%size%", rom.Size.ToString());
-						post = post.Replace("%crc%", rom.CRC).Replace("%md5%", rom.MD5).Replace("%sha1%", rom.SHA1).Replace("%size%", rom.Size.ToString());
+						pre = pre.Replace("%crc%", rom.HashData.CRC).Replace("%md5%", rom.HashData.MD5).Replace("%sha1%", rom.HashData.SHA1).Replace("%size%", rom.HashData.Size.ToString());
+						post = post.Replace("%crc%", rom.HashData.CRC).Replace("%md5%", rom.HashData.MD5).Replace("%sha1%", rom.HashData.SHA1).Replace("%size%", rom.HashData.Size.ToString());
 
 						// If we're in Romba mode, the state is consistent
 						if (datdata.Romba)
 						{
 							// We can only write out if there's a SHA-1
-							if (rom.SHA1 != "")
+							if (rom.HashData.SHA1 != "")
 							{
-								string name = rom.SHA1.Substring(0, 2) + "/" + rom.SHA1.Substring(2, 2) + "/" + rom.SHA1.Substring(4, 2) + "/" +
-									rom.SHA1.Substring(6, 2) + "/" + rom.SHA1 + ".gz";
+								string name = rom.HashData.SHA1.Substring(0, 2) + "/" + rom.HashData.SHA1.Substring(2, 2) + "/" + rom.HashData.SHA1.Substring(4, 2) + "/" +
+									rom.HashData.SHA1.Substring(6, 2) + "/" + rom.HashData.SHA1 + ".gz";
 								state += pre + name + post + "\n";
 							}
 						}
@@ -453,16 +453,16 @@ namespace SabreTools.Helper
 						else if (datdata.TSV == true)
 						{
 							string inline = "\"" + datdata.FileName + "\"\t\"" + datdata.Name + "\"\t\"" + datdata.Description + "\"\t\"" + rom.Game + "\"\t\"" + rom.Game + "\"\t\"" +
-								rom.Type + "\"\t\"" + (rom.Type == "rom" ? rom.Name : "") + "\"\t\"" + (rom.Type == "disk" ? rom.Name : "") + "\"\t\"" + rom.Size + "\"\t\"" +
-								rom.CRC + "\"\t\"" + rom.MD5 + "\"\t\"" + rom.SHA1 + "\"\t" + (rom.Nodump ? "\"Nodump\"" : "\"\"");
+								rom.Type + "\"\t\"" + (rom.Type == "rom" ? rom.Name : "") + "\"\t\"" + (rom.Type == "disk" ? rom.Name : "") + "\"\t\"" + rom.HashData.Size + "\"\t\"" +
+								rom.HashData.CRC + "\"\t\"" + rom.HashData.MD5 + "\"\t\"" + rom.HashData.SHA1 + "\"\t" + (rom.Nodump ? "\"Nodump\"" : "\"\"");
 							state += pre + inline + post + "\n";
 						}
 						// If we're in CSV mode, similarly the state is consistent
 						else if (datdata.TSV == false)
 						{
 							string inline = "\"" + datdata.FileName + "\",\"" + datdata.Name + "\",\"" + datdata.Description + "\",\"" + rom.Game + "\",\"" + rom.Game + "\",\"" +
-								rom.Type + "\",\"" + (rom.Type == "rom" ? rom.Name : "") + "\",\"" + (rom.Type == "disk" ? rom.Name : "") + "\",\"" + rom.Size + "\",\"" +
-								rom.CRC + "\",\"" + rom.MD5 + "\",\"" + rom.SHA1 + "\"," + (rom.Nodump ? "\"Nodump\"" : "\"\"");
+								rom.Type + "\",\"" + (rom.Type == "rom" ? rom.Name : "") + "\",\"" + (rom.Type == "disk" ? rom.Name : "") + "\",\"" + rom.HashData.Size + "\",\"" +
+								rom.HashData.CRC + "\",\"" + rom.HashData.MD5 + "\",\"" + rom.HashData.SHA1 + "\"," + (rom.Nodump ? "\"Nodump\"" : "\"\"");
 							state += pre + inline + post + "\n";
 						}
 						// Otherwise, use any flags
@@ -499,8 +499,8 @@ namespace SabreTools.Helper
 						state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Game) +
 							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.GameDescription) ? rom.Game : rom.GameDescription)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
-							"¬" + rom.CRC.ToLowerInvariant() +
-							"¬" + (rom.Size != -1 ? rom.Size.ToString() : "") + "¬¬¬\n";
+							"¬" + rom.HashData.CRC.ToLowerInvariant() +
+							"¬" + (rom.HashData.Size != -1 ? rom.HashData.Size.ToString() : "") + "¬¬¬\n";
 						break;
 					case OutputFormat.SabreDat:
 						string prefix = "";
@@ -511,10 +511,10 @@ namespace SabreTools.Helper
 
 						state += prefix;
 						state += "<file type=\"" + rom.Type + "\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
-							(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
-							(!String.IsNullOrEmpty(rom.CRC) ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
-							(!String.IsNullOrEmpty(rom.MD5) ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
-							(!String.IsNullOrEmpty(rom.SHA1) ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
+							(rom.HashData.Size != -1 ? " size=\"" + rom.HashData.Size + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.HashData.CRC) ? " crc=\"" + rom.HashData.CRC.ToLowerInvariant() + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.HashData.MD5) ? " md5=\"" + rom.HashData.MD5.ToLowerInvariant() + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.HashData.SHA1) ? " sha1=\"" + rom.HashData.SHA1.ToLowerInvariant() + "\"" : "") +
 							(!String.IsNullOrEmpty(rom.Date) ? " date=\"" + rom.Date + "\"" : "") +
 							(rom.Nodump ? prefix + "/>\n" + prefix + "\t<flags>\n" +
 								prefix + "\t\t<flag name=\"status\" value=\"nodump\"/>\n" +
@@ -524,10 +524,10 @@ namespace SabreTools.Helper
 						break;
 					case OutputFormat.Xml:
 						state += "\t\t<" + rom.Type + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
-							(rom.Size != -1 ? " size=\"" + rom.Size + "\"" : "") +
-							(!String.IsNullOrEmpty(rom.CRC) ? " crc=\"" + rom.CRC.ToLowerInvariant() + "\"" : "") +
-							(!String.IsNullOrEmpty(rom.MD5) ? " md5=\"" + rom.MD5.ToLowerInvariant() + "\"" : "") +
-							(!String.IsNullOrEmpty(rom.SHA1) ? " sha1=\"" + rom.SHA1.ToLowerInvariant() + "\"" : "") +
+							(rom.HashData.Size != -1 ? " size=\"" + rom.HashData.Size + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.HashData.CRC) ? " crc=\"" + rom.HashData.CRC.ToLowerInvariant() + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.HashData.MD5) ? " md5=\"" + rom.HashData.MD5.ToLowerInvariant() + "\"" : "") +
+							(!String.IsNullOrEmpty(rom.HashData.SHA1) ? " sha1=\"" + rom.HashData.SHA1.ToLowerInvariant() + "\"" : "") +
 							(!String.IsNullOrEmpty(rom.Date) ? " date=\"" + rom.Date + "\"" : "") +
 							(rom.Nodump ? " status=\"nodump\"" : "") +
 							"/>\n";

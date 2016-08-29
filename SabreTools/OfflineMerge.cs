@@ -230,10 +230,10 @@ namespace SabreTools
 						for (int i = 0; i < roms.Count; i++)
 						{
 							Rom rom = roms[i];
-							rom.Size = Constants.SizeZero;
-							rom.CRC = Constants.CRCZero;
-							rom.MD5 = Constants.MD5Zero;
-							rom.SHA1 = Constants.SHA1Zero;
+							rom.HashData.Size = Constants.SizeZero;
+							rom.HashData.CRC = Constants.CRCZero;
+							rom.HashData.MD5 = Constants.MD5Zero;
+							rom.HashData.SHA1 = Constants.SHA1Zero;
 							temp.Add(rom);
 						}
 						netNew[key] = temp;
@@ -248,10 +248,10 @@ namespace SabreTools
 						for (int i = 0; i < roms.Count; i++)
 						{
 							Rom rom = roms[i];
-							rom.Size = Constants.SizeZero;
-							rom.CRC = Constants.CRCZero;
-							rom.MD5 = Constants.MD5Zero;
-							rom.SHA1 = Constants.SHA1Zero;
+							rom.HashData.Size = Constants.SizeZero;
+							rom.HashData.CRC = Constants.CRCZero;
+							rom.HashData.MD5 = Constants.MD5Zero;
+							rom.HashData.SHA1 = Constants.SHA1Zero;
 							temp.Add(rom);
 						}
 						unneeded[key] = temp;
@@ -266,10 +266,10 @@ namespace SabreTools
 						for (int i = 0; i < roms.Count; i++)
 						{
 							Rom rom = roms[i];
-							rom.Size = Constants.SizeZero;
-							rom.CRC = Constants.CRCZero;
-							rom.MD5 = Constants.MD5Zero;
-							rom.SHA1 = Constants.SHA1Zero;
+							rom.HashData.Size = Constants.SizeZero;
+							rom.HashData.CRC = Constants.CRCZero;
+							rom.HashData.MD5 = Constants.MD5Zero;
+							rom.HashData.SHA1 = Constants.SHA1Zero;
 							temp.Add(rom);
 						}
 						newMissing[key] = temp;
@@ -284,10 +284,10 @@ namespace SabreTools
 						for (int i = 0; i < roms.Count; i++)
 						{
 							Rom rom = roms[i];
-							rom.Size = Constants.SizeZero;
-							rom.CRC = Constants.CRCZero;
-							rom.MD5 = Constants.MD5Zero;
-							rom.SHA1 = Constants.SHA1Zero;
+							rom.HashData.Size = Constants.SizeZero;
+							rom.HashData.CRC = Constants.CRCZero;
+							rom.HashData.MD5 = Constants.MD5Zero;
+							rom.HashData.SHA1 = Constants.SHA1Zero;
 							temp.Add(rom);
 						}
 						have[key] = temp;
@@ -398,10 +398,10 @@ namespace SabreTools
 						for (int i = 0; i < roms.Count; i++)
 						{
 							Rom rom = roms[i];
-							rom.Size = Constants.SizeZero;
-							rom.CRC = Constants.CRCZero;
-							rom.MD5 = Constants.MD5Zero;
-							rom.SHA1 = Constants.SHA1Zero;
+							rom.HashData.Size = Constants.SizeZero;
+							rom.HashData.CRC = Constants.CRCZero;
+							rom.HashData.MD5 = Constants.MD5Zero;
+							rom.HashData.SHA1 = Constants.SHA1Zero;
 							temp.Add(rom);
 						}
 						have[key] = temp;
@@ -468,10 +468,10 @@ namespace SabreTools
 						for (int i = 0; i < roms.Count; i++)
 						{
 							Rom rom = roms[i];
-							rom.Size = Constants.SizeZero;
-							rom.CRC = Constants.CRCZero;
-							rom.MD5 = Constants.MD5Zero;
-							rom.SHA1 = Constants.SHA1Zero;
+							rom.HashData.Size = Constants.SizeZero;
+							rom.HashData.CRC = Constants.CRCZero;
+							rom.HashData.MD5 = Constants.MD5Zero;
+							rom.HashData.SHA1 = Constants.SHA1Zero;
 							temp.Add(rom);
 						}
 						have[key] = temp;

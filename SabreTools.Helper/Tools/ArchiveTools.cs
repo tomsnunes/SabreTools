@@ -539,8 +539,11 @@ namespace SabreTools.Helper
 								Type = "rom",
 								Name = reader.Entry.Key,
 								Game = gamename,
-								Size = (size == 0 ? reader.Entry.Size : size),
-								CRC = (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc),
+								HashData = new HashData
+								{
+									Size = (size == 0 ? reader.Entry.Size : size),
+									CRC = (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc),
+								},
 							});
 						}
 					}
@@ -617,10 +620,13 @@ namespace SabreTools.Helper
 				Type = "rom",
 				Game = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 				Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
-				Size = extractedsize,
-				CRC = gzcrc.ToLowerInvariant(),
-				MD5 = gzmd5.ToLowerInvariant(),
-				SHA1 = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
+				HashData = new HashData
+				{
+					Size = extractedsize,
+					CRC = gzcrc.ToLowerInvariant(),
+					MD5 = gzmd5.ToLowerInvariant(),
+					SHA1 = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
+				},
 			};
 
 			return rom;
@@ -656,7 +662,7 @@ namespace SabreTools.Helper
 			Rom rom = RomTools.GetSingleFileInfo(input);
 
 			// If it doesn't exist, create the output file and then write
-			string outfile = Path.Combine(outdir, rom.SHA1 + ".gz");
+			string outfile = Path.Combine(outdir, rom.HashData.SHA1 + ".gz");
 			using (FileStream inputstream = new FileStream(input, FileMode.Open))
 			using (GZipStream output = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress))
 			{
@@ -670,9 +676,9 @@ namespace SabreTools.Helper
 				{
 					// Write standard header and TGZ info
 					byte[] data = Constants.TorrentGZHeader
-									.Concat(StringToByteArray(rom.MD5)) // MD5
-									.Concat(StringToByteArray(rom.CRC)) // CRC
-									.Concat(BitConverter.GetBytes(rom.Size).Reverse().ToArray()) // Long size (Mirrored)
+									.Concat(StringToByteArray(rom.HashData.MD5)) // MD5
+									.Concat(StringToByteArray(rom.HashData.CRC)) // CRC
+									.Concat(BitConverter.GetBytes(rom.HashData.Size).Reverse().ToArray()) // Long size (Mirrored)
 								.ToArray();
 					sw.Write(data);
 
@@ -698,7 +704,7 @@ namespace SabreTools.Helper
 			// If we're in romba mode, create the subfolder and move the file
 			if (romba)
 			{
-				string subfolder = Path.Combine(rom.SHA1.Substring(0, 2), rom.SHA1.Substring(2, 2), rom.SHA1.Substring(4, 2), rom.SHA1.Substring(6, 2));
+				string subfolder = Path.Combine(rom.HashData.SHA1.Substring(0, 2), rom.HashData.SHA1.Substring(2, 2), rom.HashData.SHA1.Substring(4, 2), rom.HashData.SHA1.Substring(6, 2));
 				outdir = Path.Combine(outdir, subfolder);
 				if (!Directory.Exists(outdir))
 				{

@@ -246,7 +246,7 @@ namespace SabreTools
 						}
 					}
 					// If the file has a SHA-1
-					else if (rom.SHA1 != null && rom.SHA1 != "")
+					else if (rom.HashData.SHA1 != null && rom.HashData.SHA1 != "")
 					{
 						if (sha1.Roms.ContainsKey(key))
 						{
@@ -260,7 +260,7 @@ namespace SabreTools
 						}
 					}
 					// If the file has no SHA-1 but has an MD5
-					else if (rom.MD5 != null && rom.MD5 != "")
+					else if (rom.HashData.MD5 != null && rom.HashData.MD5 != "")
 					{
 						if (md5.Roms.ContainsKey(key))
 						{

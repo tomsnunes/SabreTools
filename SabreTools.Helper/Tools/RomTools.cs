@@ -30,10 +30,13 @@ namespace SabreTools.Helper
 			{
 				Name = Path.GetFileName(input),
 				Type = "rom",
-				Size = (new FileInfo(input)).Length,
-				CRC = string.Empty,
-				MD5 = string.Empty,
-				SHA1 = string.Empty,
+				HashData = new HashData
+				{
+					Size = (new FileInfo(input)).Length,
+					CRC = string.Empty,
+					MD5 = string.Empty,
+					SHA1 = string.Empty,
+				}
 			};
 
 			try
@@ -65,17 +68,17 @@ namespace SabreTools.Helper
 					}
 
 					crc.TransformFinalBlock(buffer, 0, 0);
-					rom.CRC = BitConverter.ToString(crc.Hash).Replace("-", "").ToLowerInvariant();
+					rom.HashData.CRC = BitConverter.ToString(crc.Hash).Replace("-", "").ToLowerInvariant();
 
 					if (!noMD5)
 					{
 						md5.TransformFinalBlock(buffer, 0, 0);
-						rom.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
+						rom.HashData.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
 					}
 					if (!noSHA1)
 					{
 						sha1.TransformFinalBlock(buffer, 0, 0);
-						rom.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
+						rom.HashData.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
 					}
 				}
 			}
@@ -134,9 +137,9 @@ namespace SabreTools.Helper
 							savedrom = lastrom;
 							pos = i;
 
-							savedrom.CRC = (String.IsNullOrEmpty(savedrom.CRC) && !String.IsNullOrEmpty(rom.CRC) ? rom.CRC : savedrom.CRC);
-							savedrom.MD5 = (String.IsNullOrEmpty(savedrom.MD5) && !String.IsNullOrEmpty(rom.MD5) ? rom.MD5 : savedrom.MD5);
-							savedrom.SHA1 = (String.IsNullOrEmpty(savedrom.SHA1) && !String.IsNullOrEmpty(rom.SHA1) ? rom.SHA1 : savedrom.SHA1);
+							savedrom.HashData.CRC = (String.IsNullOrEmpty(savedrom.HashData.CRC) && !String.IsNullOrEmpty(rom.HashData.CRC) ? rom.HashData.CRC : savedrom.HashData.CRC);
+							savedrom.HashData.MD5 = (String.IsNullOrEmpty(savedrom.HashData.MD5) && !String.IsNullOrEmpty(rom.HashData.MD5) ? rom.HashData.MD5 : savedrom.HashData.MD5);
+							savedrom.HashData.SHA1 = (String.IsNullOrEmpty(savedrom.HashData.SHA1) && !String.IsNullOrEmpty(rom.HashData.SHA1) ? rom.HashData.SHA1 : savedrom.HashData.SHA1);
 							savedrom.Dupe = dupetype;
 
 							// If the current system has a lower ID than the previous, set the system accordingly
@@ -248,23 +251,23 @@ namespace SabreTools.Helper
 
 			if (rom.Type == "rom" && lastrom.Type == "rom")
 			{
-				dupefound = ((rom.Size == lastrom.Size) &&
-					((String.IsNullOrEmpty(rom.CRC) || String.IsNullOrEmpty(lastrom.CRC)) || rom.CRC == lastrom.CRC) &&
-					((String.IsNullOrEmpty(rom.MD5) || String.IsNullOrEmpty(lastrom.MD5)) || rom.MD5 == lastrom.MD5) &&
-					((String.IsNullOrEmpty(rom.SHA1) || String.IsNullOrEmpty(lastrom.SHA1)) || rom.SHA1 == lastrom.SHA1)
+				dupefound = ((rom.HashData.Size == lastrom.HashData.Size) &&
+					((String.IsNullOrEmpty(rom.HashData.CRC) || String.IsNullOrEmpty(lastrom.HashData.CRC)) || rom.HashData.CRC == lastrom.HashData.CRC) &&
+					((String.IsNullOrEmpty(rom.HashData.MD5) || String.IsNullOrEmpty(lastrom.HashData.MD5)) || rom.HashData.MD5 == lastrom.HashData.MD5) &&
+					((String.IsNullOrEmpty(rom.HashData.SHA1) || String.IsNullOrEmpty(lastrom.HashData.SHA1)) || rom.HashData.SHA1 == lastrom.HashData.SHA1)
 				);
 			}
 			else if (rom.Type == "disk" && lastrom.Type == "disk")
 			{
-				dupefound = (((String.IsNullOrEmpty(rom.MD5) || String.IsNullOrEmpty(lastrom.MD5)) || rom.MD5 == lastrom.MD5) &&
-					((String.IsNullOrEmpty(rom.SHA1) || String.IsNullOrEmpty(lastrom.SHA1)) || rom.SHA1 == lastrom.SHA1)
+				dupefound = (((String.IsNullOrEmpty(rom.HashData.MD5) || String.IsNullOrEmpty(lastrom.HashData.MD5)) || rom.HashData.MD5 == lastrom.HashData.MD5) &&
+					((String.IsNullOrEmpty(rom.HashData.SHA1) || String.IsNullOrEmpty(lastrom.HashData.SHA1)) || rom.HashData.SHA1 == lastrom.HashData.SHA1)
 				);
 			}
 
 			// More wonderful SHA-1 logging that has to be done
-			if (rom.SHA1 == lastrom.SHA1 && rom.Size != lastrom.Size)
+			if (rom.HashData.SHA1 == lastrom.HashData.SHA1 && rom.HashData.Size != lastrom.HashData.Size)
 			{
-				logger.User("SHA-1 mismatch - Hash: " + rom.SHA1);
+				logger.User("SHA-1 mismatch - Hash: " + rom.HashData.SHA1);
 			}
 
 			return dupefound;

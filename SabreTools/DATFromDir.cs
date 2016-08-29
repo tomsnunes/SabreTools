@@ -178,13 +178,16 @@ namespace SabreTools
 											Path.DirectorySeparatorChar.ToString() :
 											"") + actualroot :
 										actualroot),
-									Size = -1,
-									CRC = "null",
-									MD5 = "null",
-									SHA1 = "null",
+									HashData = new HashData
+									{
+										Size = -1,
+										CRC = "null",
+										MD5 = "null",
+										SHA1 = "null",
+									},
 								};
 
-								string key = rom.Size + "-" + rom.CRC;
+								string key = rom.HashData.Size + "-" + rom.HashData.CRC;
 								if (_datdata.Roms.ContainsKey(key))
 								{
 									_datdata.Roms[key].Add(rom);
@@ -211,13 +214,16 @@ namespace SabreTools
 												Path.DirectorySeparatorChar.ToString() :
 												"") + actualroot :
 											actualroot),
-										Size = -1,
-										CRC = "null",
-										MD5 = "null",
-										SHA1 = "null",
+										HashData = new HashData
+										{
+											Size = -1,
+											CRC = "null",
+											MD5 = "null",
+											SHA1 = "null",
+										},
 									};
 
-									string key = rom.Size + "-" + rom.CRC;
+									string key = rom.HashData.Size + "-" + rom.HashData.CRC;
 									if (_datdata.Roms.ContainsKey(key))
 									{
 										_datdata.Roms[key].Add(rom);
@@ -257,15 +263,15 @@ namespace SabreTools
 						{
 							rom.Type = "rom";
 							rom.Name = "-";
-							rom.Size = Constants.SizeZero;
-							rom.CRC = Constants.CRCZero;
-							rom.MD5 = Constants.MD5Zero;
-							rom.SHA1 = Constants.SHA1Zero;
+							rom.HashData.Size = Constants.SizeZero;
+							rom.HashData.CRC = Constants.CRCZero;
+							rom.HashData.MD5 = Constants.MD5Zero;
+							rom.HashData.SHA1 = Constants.SHA1Zero;
 						}
 
 						if (_nowrite)
 						{
-							string inkey = rom.Size + "-" + rom.CRC;
+							string inkey = rom.HashData.Size + "-" + rom.HashData.CRC;
 							if (_datdata.Roms.ContainsKey(inkey))
 							{
 								_datdata.Roms[inkey].Add(rom);
@@ -343,7 +349,7 @@ namespace SabreTools
 
 					if (_nowrite)
 					{
-						string key = rom.Size + "-" + rom.CRC;
+						string key = rom.HashData.Size + "-" + rom.HashData.CRC;
 						if (_datdata.Roms.ContainsKey(key))
 						{
 							_datdata.Roms[key].Add(rom);
@@ -515,7 +521,7 @@ namespace SabreTools
 
 				if (_nowrite)
 				{
-					string key = rom.Size + "-" + rom.CRC;
+					string key = rom.HashData.Size + "-" + rom.HashData.CRC;
 					if (_datdata.Roms.ContainsKey(key))
 					{
 						_datdata.Roms[key].Add(rom);
