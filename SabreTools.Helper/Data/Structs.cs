@@ -126,6 +126,7 @@ namespace SabreTools.Helper
 		public bool IsBios;
 		public string Board;
 		public string RebuildTo;
+		public bool TorrentZipped;
 	}
 
 	/// <summary>
