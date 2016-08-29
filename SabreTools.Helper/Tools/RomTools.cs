@@ -251,17 +251,11 @@ namespace SabreTools.Helper
 
 			if (rom.Type == "rom" && lastrom.Type == "rom")
 			{
-				dupefound = ((rom.HashData.Size == lastrom.HashData.Size) &&
-					((String.IsNullOrEmpty(rom.HashData.CRC) || String.IsNullOrEmpty(lastrom.HashData.CRC)) || rom.HashData.CRC == lastrom.HashData.CRC) &&
-					((String.IsNullOrEmpty(rom.HashData.MD5) || String.IsNullOrEmpty(lastrom.HashData.MD5)) || rom.HashData.MD5 == lastrom.HashData.MD5) &&
-					((String.IsNullOrEmpty(rom.HashData.SHA1) || String.IsNullOrEmpty(lastrom.HashData.SHA1)) || rom.HashData.SHA1 == lastrom.HashData.SHA1)
-				);
+				dupefound = rom.HashData.Equals(lastrom.HashData, false);
 			}
 			else if (rom.Type == "disk" && lastrom.Type == "disk")
 			{
-				dupefound = (((String.IsNullOrEmpty(rom.HashData.MD5) || String.IsNullOrEmpty(lastrom.HashData.MD5)) || rom.HashData.MD5 == lastrom.HashData.MD5) &&
-					((String.IsNullOrEmpty(rom.HashData.SHA1) || String.IsNullOrEmpty(lastrom.HashData.SHA1)) || rom.HashData.SHA1 == lastrom.HashData.SHA1)
-				);
+				dupefound = rom.HashData.Equals(lastrom.HashData, true);
 			}
 
 			// More wonderful SHA-1 logging that has to be done

@@ -6,23 +6,42 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// Intermediate struct for holding and processing hash data
 	/// </summary>
-	public struct HashData : IComparable, IEquatable<HashData>
+	public struct HashData : IEquatable<HashData>
 	{
 		public long Size;
 		public string CRC;
 		public string MD5;
 		public string SHA1;
 
-		// Needs implementation
-		public int CompareTo(object obj)
-		{
-			return 0;
-		}
-
-		// Needs implementation
 		public bool Equals(HashData other)
 		{
-			return true;
+			if ((this.Size == other.Size) &&
+					((String.IsNullOrEmpty(this.CRC) || String.IsNullOrEmpty(other.CRC)) || this.CRC == other.CRC) &&
+					((String.IsNullOrEmpty(this.MD5) || String.IsNullOrEmpty(other.MD5)) || this.MD5 == other.MD5) &&
+					((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(other.SHA1)) || this.SHA1 == other.SHA1))
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		public bool Equals(HashData other, bool IsDisk)
+		{
+			if (IsDisk)
+			{
+				HashData newthis = this;
+				newthis.Size = Constants.SizeZero;
+				newthis.CRC = Constants.CRCZero;
+
+				HashData newother = other;
+				newother.Size = Constants.SizeZero;
+				newother.CRC = Constants.CRCZero;
+
+				return newthis.Equals(newother);
+			}
+
+			return this.Equals(other);
 		}
 	}
 
