@@ -15,33 +15,29 @@ namespace SabreTools.Helper
 
 		public bool Equals(HashData other)
 		{
-			if ((this.Size == other.Size) &&
-					((String.IsNullOrEmpty(this.CRC) || String.IsNullOrEmpty(other.CRC)) || this.CRC == other.CRC) &&
-					((String.IsNullOrEmpty(this.MD5) || String.IsNullOrEmpty(other.MD5)) || this.MD5 == other.MD5) &&
-					((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(other.SHA1)) || this.SHA1 == other.SHA1))
-			{
-				return true;
-			}
-
-			return false;
+			return this.Equals(other, false);
 		}
 
 		public bool Equals(HashData other, bool IsDisk)
 		{
-			if (IsDisk)
+			bool equals = false;
+
+			if (!IsDisk &&
+					((String.IsNullOrEmpty(this.MD5) || String.IsNullOrEmpty(other.MD5)) || this.MD5 == other.MD5) &&
+					((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(other.SHA1)) || this.SHA1 == other.SHA1))
 			{
-				HashData newthis = this;
-				newthis.Size = Constants.SizeZero;
-				newthis.CRC = Constants.CRCZero;
-
-				HashData newother = other;
-				newother.Size = Constants.SizeZero;
-				newother.CRC = Constants.CRCZero;
-
-				return newthis.Equals(newother);
+				equals = true;
+			}
+			else if (!IsDisk &&
+					(this.Size == other.Size) &&
+					((String.IsNullOrEmpty(this.CRC) || String.IsNullOrEmpty(other.CRC)) || this.CRC == other.CRC) &&
+					((String.IsNullOrEmpty(this.MD5) || String.IsNullOrEmpty(other.MD5)) || this.MD5 == other.MD5) &&
+					((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(other.SHA1)) || this.SHA1 == other.SHA1))
+			{
+				equals = true;
 			}
 
-			return this.Equals(other);
+			return equals;
 		}
 	}
 
