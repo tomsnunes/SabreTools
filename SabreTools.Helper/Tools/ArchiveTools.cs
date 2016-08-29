@@ -786,6 +786,49 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Get if the current file should be scanned internally and externally
+		/// </summary>
+		/// <param name="input">Name of the input file to check</param>
+		/// <param name="sevenzip">User-defined scan level for 7z archives</param>
+		/// <param name="gzip">User-defined scan level for GZ archives</param>
+		/// <param name="rar">User-defined scan level for RAR archives</param>
+		/// <param name="zip">User-defined scan level for Zip archives</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="shouldExternalProcess">Output parameter determining if file should be processed externally</param>
+		/// <param name="shouldInternalProcess">Output parameter determining if file should be processed internally</param>
+		public static void GetInternalExternalProcess(string input, ArchiveScanLevel sevenzip, ArchiveScanLevel gzip,
+			ArchiveScanLevel rar, ArchiveScanLevel zip, Logger logger, out bool shouldExternalProcess, out bool shouldInternalProcess)
+		{
+			shouldExternalProcess = true;
+			shouldInternalProcess = true;
+
+			ArchiveType? archiveType = ArchiveTools.GetCurrentArchiveType(input, logger);
+			switch (archiveType)
+			{
+				case null:
+					shouldExternalProcess = true;
+					shouldInternalProcess = false;
+					break;
+				case ArchiveType.GZip:
+					shouldExternalProcess = (gzip != ArchiveScanLevel.Internal);
+					shouldInternalProcess = (gzip != ArchiveScanLevel.External);
+					break;
+				case ArchiveType.Rar:
+					shouldExternalProcess = (rar != ArchiveScanLevel.Internal);
+					shouldInternalProcess = (rar != ArchiveScanLevel.External);
+					break;
+				case ArchiveType.SevenZip:
+					shouldExternalProcess = (sevenzip != ArchiveScanLevel.Internal);
+					shouldInternalProcess = (sevenzip != ArchiveScanLevel.External);
+					break;
+				case ArchiveType.Zip:
+					shouldExternalProcess = (zip != ArchiveScanLevel.Internal);
+					shouldInternalProcess = (zip != ArchiveScanLevel.External);
+					break;
+			}
+		}
+
+		/// <summary>
 		/// http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
 		/// </summary>
 		public static byte[] StringToByteArray(String hex)

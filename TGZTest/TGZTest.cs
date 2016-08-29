@@ -271,33 +271,8 @@ namespace SabreTools
 				_logger.User("Examining file " + input);
 
 				// Get if the file should be scanned internally and externally
-				bool shouldExternalProcess = true;
-				bool shouldInternalProcess = true;
-
-				ArchiveType? archiveType = ArchiveTools.GetCurrentArchiveType(input, _logger);
-				switch (archiveType)
-				{
-					case null:
-						shouldExternalProcess = true;
-						shouldInternalProcess = false;
-						break;
-					case ArchiveType.GZip:
-						shouldExternalProcess = (_gz != ArchiveScanLevel.Internal);
-						shouldInternalProcess = (_gz != ArchiveScanLevel.External);
-						break;
-					case ArchiveType.Rar:
-						shouldExternalProcess = (_rar != ArchiveScanLevel.Internal);
-						shouldInternalProcess = (_rar != ArchiveScanLevel.External);
-						break;
-					case ArchiveType.SevenZip:
-						shouldExternalProcess = (_7z != ArchiveScanLevel.Internal);
-						shouldInternalProcess = (_7z != ArchiveScanLevel.External);
-						break;
-					case ArchiveType.Zip:
-						shouldExternalProcess = (_zip != ArchiveScanLevel.Internal);
-						shouldInternalProcess = (_zip != ArchiveScanLevel.External);
-						break;
-				}
+				bool shouldExternalProcess, shouldInternalProcess;
+				ArchiveTools.GetInternalExternalProcess(input, _7z, _gz, _rar, _zip, _logger, out shouldExternalProcess, out shouldInternalProcess);
 
 				// Do an external scan of the file, if necessary
 				if (shouldExternalProcess)

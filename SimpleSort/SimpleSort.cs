@@ -462,6 +462,8 @@ namespace SabreTools
 			_logger.User("Stats of the matched ROMs:");
 			Stats.OutputStats(_matched, _logger, true);
 
+			// Diff the matched with the input DAT(s) and output if flag is set
+
 			return success;
 		}
 
@@ -484,33 +486,8 @@ namespace SabreTools
 			_logger.Log(statement, _cursorTop, 0);
 
 			// Get if the file should be scanned internally and externally
-			bool shouldExternalScan = true;
-			bool shouldInternalScan = true;
-
-			ArchiveType? archiveType = ArchiveTools.GetCurrentArchiveType(input, _logger);
-			switch (archiveType)
-			{
-				case null:
-					shouldExternalScan = true;
-					shouldInternalScan = false;
-					break;
-				case ArchiveType.GZip:
-					shouldExternalScan = (_gz != ArchiveScanLevel.Internal);
-					shouldInternalScan = (_gz != ArchiveScanLevel.External);
-					break;
-				case ArchiveType.Rar:
-					shouldExternalScan = (_rar != ArchiveScanLevel.Internal);
-					shouldInternalScan = (_rar != ArchiveScanLevel.External);
-					break;
-				case ArchiveType.SevenZip:
-					shouldExternalScan = (_7z != ArchiveScanLevel.Internal);
-					shouldInternalScan = (_7z != ArchiveScanLevel.External);
-					break;
-				case ArchiveType.Zip:
-					shouldExternalScan = (_zip != ArchiveScanLevel.Internal);
-					shouldInternalScan = (_zip != ArchiveScanLevel.External);
-					break;
-			}
+			bool shouldExternalScan, shouldInternalScan;
+			ArchiveTools.GetInternalExternalProcess(input, _7z, _gz, _rar, _zip, _logger, out shouldExternalScan, out shouldInternalScan);
 
 			// Hash and match the external files
 			if (shouldExternalScan)
