@@ -106,7 +106,7 @@
       <DependentUpon>Resources.fr-FR.resx</DependentUpon>
     </Compile>
     <Compile Include="Skippers.cs" />
-    <Compile Include="Tools\ArchiveTools.cs" />
+    <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\CRC32.cs" />
     <Compile Include="Tools\DBTools.cs" />
     <Compile Include="Data\Enums.cs" />

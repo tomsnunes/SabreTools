@@ -272,20 +272,20 @@ namespace SabreTools
 
 				// Get if the file should be scanned internally and externally
 				bool shouldExternalProcess, shouldInternalProcess;
-				ArchiveTools.GetInternalExternalProcess(input, _7z, _gz, _rar, _zip, _logger, out shouldExternalProcess, out shouldInternalProcess);
+				FileTools.GetInternalExternalProcess(input, _7z, _gz, _rar, _zip, _logger, out shouldExternalProcess, out shouldInternalProcess);
 
 				// Do an external scan of the file, if necessary
 				if (shouldExternalProcess)
 				{
 					_logger.User("Processing file " + input);
-					success &= ArchiveTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
+					success &= FileTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
 				}
 
 				// Process the file as an archive, if necessary
 				if (shouldInternalProcess)
 				{
 					// Now, if the file is a supported archive type, also run on all files within
-					bool encounteredErrors = ArchiveTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
+					bool encounteredErrors = FileTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
 
 					// If no errors were encountered, we loop through the temp directory
 					if (!encounteredErrors)
@@ -294,7 +294,7 @@ namespace SabreTools
 						foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
 						{
 							_logger.User("Processing extracted file " + file);
-							success &= ArchiveTools.WriteTorrentGZ(file, _outdir, _romba, _logger);
+							success &= FileTools.WriteTorrentGZ(file, _outdir, _romba, _logger);
 						}
 					}
 				}

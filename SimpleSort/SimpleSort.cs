@@ -487,7 +487,7 @@ namespace SabreTools
 
 			// Get if the file should be scanned internally and externally
 			bool shouldExternalScan, shouldInternalScan;
-			ArchiveTools.GetInternalExternalProcess(input, _7z, _gz, _rar, _zip, _logger, out shouldExternalScan, out shouldInternalScan);
+			FileTools.GetInternalExternalProcess(input, _7z, _gz, _rar, _zip, _logger, out shouldExternalScan, out shouldInternalScan);
 
 			// Hash and match the external files
 			if (shouldExternalScan)
@@ -540,11 +540,11 @@ namespace SabreTools
 					{
 						if (_tgz)
 						{
-							ArchiveTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
+							FileTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
 						}
 						else
 						{
-							ArchiveTools.WriteToManagedArchive(input, _outdir, found);
+							FileTools.WriteToManagedArchive(input, _outdir, found);
 						}
 					}
 				}
@@ -607,11 +607,11 @@ namespace SabreTools
 						{
 							if (_tgz)
 							{
-								ArchiveTools.WriteTorrentGZ(newinput, _outdir, _romba, _logger);
+								FileTools.WriteTorrentGZ(newinput, _outdir, _romba, _logger);
 							}
 							else
 							{
-								ArchiveTools.WriteToManagedArchive(newinput, _outdir, found);
+								FileTools.WriteToManagedArchive(newinput, _outdir, found);
 							}
 						}
 
@@ -653,11 +653,11 @@ namespace SabreTools
 							_logger.Log("Matched name: " + newfound.Name);
 							if (_tgz)
 							{
-								ArchiveTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
+								FileTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
 							}
 							else
 							{
-								ArchiveTools.WriteToManagedArchive(input, _outdir, newfound);
+								FileTools.WriteToManagedArchive(input, _outdir, newfound);
 							}
 						}
 					}
@@ -681,7 +681,7 @@ namespace SabreTools
 				if (_quickScan)
 				{
 					_logger.Log("Beginning quick scan of contents from '" + input + "'");
-					List<Rom> internalRomData = ArchiveTools.GetArchiveFileInfo(input, _logger);
+					List<Rom> internalRomData = FileTools.GetArchiveFileInfo(input, _logger);
 					_logger.Log(internalRomData.Count + " entries found in '" + input + "'");
 
 					// If the list is populated, then the file was a filled archive
@@ -711,7 +711,7 @@ namespace SabreTools
 								{
 									// Copy file to output directory
 									_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
-									string outfile = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
+									string outfile = FileTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
 									if (File.Exists(outfile))
 									{
 										string gamedir = Path.Combine(_outdir, found.Machine.Name);
@@ -734,16 +734,16 @@ namespace SabreTools
 
 									if (Build.MonoEnvironment || _tgz)
 									{
-										string outfile = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
+										string outfile = FileTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
 										if (File.Exists(outfile))
 										{
 											if (_tgz)
 											{
-												ArchiveTools.WriteTorrentGZ(outfile, _outdir, _romba, _logger);
+												FileTools.WriteTorrentGZ(outfile, _outdir, _romba, _logger);
 											}
 											else
 											{
-												ArchiveTools.WriteToManagedArchive(outfile, _outdir, found);
+												FileTools.WriteToManagedArchive(outfile, _outdir, found);
 											}
 
 											try
@@ -756,7 +756,7 @@ namespace SabreTools
 									else
 									{
 										string archiveFileName = Path.Combine(_outdir, found.Machine + ".zip");
-										ArchiveTools.CopyFileBetweenManagedArchives(input, archiveFileName, rom.Name, found.Name, _logger);
+										FileTools.CopyFileBetweenManagedArchives(input, archiveFileName, rom.Name, found.Name, _logger);
 									}
 								}
 							}
@@ -766,7 +766,7 @@ namespace SabreTools
 				else
 				{
 					// Now, if the file is a supported archive type, also run on all files within
-					bool encounteredErrors = ArchiveTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
+					bool encounteredErrors = FileTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
 
 					// Remove the current file if we are in recursion so it's not picked up in the next step
 					if (recurse)
@@ -832,13 +832,13 @@ namespace SabreTools
 				List<Rom> roms = new List<Rom>();
 				if (_quickScan)
 				{
-					roms = ArchiveTools.GetArchiveFileInfo(Path.GetFullPath(archive), _logger);
+					roms = FileTools.GetArchiveFileInfo(Path.GetFullPath(archive), _logger);
 				}
 				// Otherwise, extract it and get info one by one
 				else
 				{
 					string temparcdir = Path.Combine(_tempdir, Path.GetFileNameWithoutExtension(archive));
-					ArchiveTools.ExtractArchive(Path.GetFullPath(archive), temparcdir, _logger);
+					FileTools.ExtractArchive(Path.GetFullPath(archive), temparcdir, _logger);
 					foreach (string tempfile in Directory.EnumerateFiles(temparcdir, "*", SearchOption.AllDirectories))
 					{
 						roms.Add(RomTools.GetSingleFileInfo(Path.GetFullPath(tempfile)));

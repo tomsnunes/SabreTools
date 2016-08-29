@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace SabreTools.Helper
 {
-	public class ArchiveTools
+	public class FileTools
 	{
 		#region Archive Writing
 
@@ -573,7 +573,7 @@ namespace SabreTools.Helper
 
 		#endregion
 
-		#region Archive Information Methods
+		#region File Information Methods
 
 		/// <summary>
 		/// Generate a list of RomData objects from the header values in an archive
@@ -828,7 +828,7 @@ namespace SabreTools.Helper
 			shouldExternalProcess = true;
 			shouldInternalProcess = true;
 
-			ArchiveType? archiveType = ArchiveTools.GetCurrentArchiveType(input, logger);
+			ArchiveType? archiveType = FileTools.GetCurrentArchiveType(input, logger);
 			switch (archiveType)
 			{
 				case null:

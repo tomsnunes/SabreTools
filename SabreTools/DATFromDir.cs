@@ -346,7 +346,7 @@ namespace SabreTools
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
 			{
-				Rom rom = ArchiveTools.GetTorrentGZFileInfo(item, _logger);
+				Rom rom = FileTools.GetTorrentGZFileInfo(item, _logger);
 
 				// If the rom is valid, write it out
 				if (rom.Name != null)
@@ -386,12 +386,12 @@ namespace SabreTools
 			// If both deep hash skip flags are set, do a quickscan
 			if (_noMD5 && _noSHA1)
 			{
-				ArchiveType? type = ArchiveTools.GetCurrentArchiveType(item, _logger);
+				ArchiveType? type = FileTools.GetCurrentArchiveType(item, _logger);
 
 				// If we have an archive, scan it
 				if (type != null)
 				{
-					List<Rom> extracted = ArchiveTools.GetArchiveFileInfo(item, _logger);
+					List<Rom> extracted = FileTools.GetArchiveFileInfo(item, _logger);
 					foreach (Rom rom in extracted)
 					{
 						lastparent = ProcessFileHelper(item, rom, sw, _basePath,
@@ -409,7 +409,7 @@ namespace SabreTools
 			// Otherwise, attempt to extract the files to the temporary directory
 			else
 			{
-				bool encounteredErrors = ArchiveTools.ExtractArchive(item,
+				bool encounteredErrors = FileTools.ExtractArchive(item,
 				tempdir,
 				(_archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
 				(!_archivesAsFiles && _enableGzip ? ArchiveScanLevel.Internal : ArchiveScanLevel.External),
