@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace SabreTools.Helper
 {
 	public class RomTools
 	{
+		#region Rom-based sorting and merging
+
 		/// <summary>
 		/// Merge an arbitrary set of ROMs based on the supplied information
 		/// </summary>
@@ -102,6 +103,149 @@ namespace SabreTools.Helper
 			// Then return the result
 			return outroms;
 		}
+
+		/// <summary>
+		/// List all duplicates found in a DAT based on a rom
+		/// </summary>
+		/// <param name="lastrom">Rom to use as a base</param>
+		/// <param name="datdata">DAT to match against</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="remove">True to remove matched roms from the input, false otherwise (default)</param>
+		/// <returns>List of matched RomData objects</returns>
+		public static List<Rom> GetDuplicates(Rom lastrom, Dat datdata, Logger logger, bool remove = false)
+		{
+			List<Rom> output = new List<Rom>();
+
+			// Check for an empty rom list first
+			if (datdata.Files == null || datdata.Files.Count == 0)
+			{
+				return output;
+			}
+
+			// Try to find duplicates
+			List<string> keys = datdata.Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<Rom> roms = datdata.Files[key];
+				List<Rom> left = new List<Rom>();
+				foreach (Rom rom in roms)
+				{
+					if (IsDuplicate(rom, lastrom, logger))
+					{
+						output.Add(rom);
+					}
+					else
+					{
+						left.Add(rom);
+					}
+				}
+
+				// If we're in removal mode, replace the list with the new one
+				if (remove)
+				{
+					datdata.Files[key] = left;
+				}
+			}
+
+			return output;
+		}
+
+		/// <summary>
+		/// Determine if a file is a duplicate using partial matching logic
+		/// </summary>
+		/// <param name="rom">Rom to check for duplicate status</param>
+		/// <param name="lastrom">Rom to use as a baseline</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>True if the roms are duplicates, false otherwise</returns>
+		public static bool IsDuplicate(Rom rom, Rom lastrom, Logger logger)
+		{
+			bool dupefound = rom.Equals(lastrom);
+
+			// More wonderful SHA-1 logging that has to be done
+			if (rom.HashData.SHA1 == lastrom.HashData.SHA1 && rom.HashData.Size != lastrom.HashData.Size)
+			{
+				logger.User("SHA-1 mismatch - Hash: " + rom.HashData.SHA1);
+			}
+
+			return dupefound;
+		}
+
+		/// <summary>
+		/// Return the duplicate status of two roms
+		/// </summary>
+		/// <param name="rom">Current rom to check</param>
+		/// <param name="lastrom">Last rom to check against</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>The DupeType corresponding to the relationship between the two</returns>
+		public static DupeType GetDuplicateStatus(Rom rom, Rom lastrom, Logger logger)
+		{
+			DupeType output = DupeType.None;
+
+			// If we don't have a duplicate at all, return none
+			if (!IsDuplicate(rom, lastrom, logger))
+			{
+				return output;
+			}
+
+			// If the duplicate is external already or should be, set it
+			if (lastrom.Dupe >= DupeType.ExternalHash || lastrom.Metadata.SystemID != rom.Metadata.SystemID || lastrom.Metadata.SourceID != rom.Metadata.SourceID)
+			{
+				if (lastrom.Machine.Name == rom.Machine.Name && lastrom.Name == rom.Name)
+				{
+					output = DupeType.ExternalAll;
+				}
+				else
+				{
+					output = DupeType.ExternalHash;
+				}
+			}
+
+			// Otherwise, it's considered an internal dupe
+			else
+			{
+				if (lastrom.Machine.Name == rom.Machine.Name && lastrom.Name == rom.Name)
+				{
+					output = DupeType.InternalAll;
+				}
+				else
+				{
+					output = DupeType.InternalHash;
+				}
+			}
+
+			return output;
+		}
+
+		/// <summary>
+		/// Sort a list of RomData objects by SystemID, SourceID, Game, and Name (in order)
+		/// </summary>
+		/// <param name="roms">List of RomData objects representing the roms to be sorted</param>
+		/// <param name="norename">True if files are not renamed, false otherwise</param>
+		/// <returns>True if it sorted correctly, false otherwise</returns>
+		public static bool Sort(List<Rom> roms, bool norename)
+		{
+			roms.Sort(delegate (Rom x, Rom y)
+			{
+				if (x.Metadata.SystemID == y.Metadata.SystemID)
+				{
+					if (x.Metadata.SourceID == y.Metadata.SourceID)
+					{
+						if (x.Machine.Name == y.Machine.Name)
+						{
+							return String.Compare(x.Name, y.Name);
+						}
+						return String.Compare(x.Machine.Name, y.Machine.Name);
+					}
+					return (norename ? String.Compare(x.Machine.Name, y.Machine.Name) : x.Metadata.SourceID - y.Metadata.SourceID);
+				}
+				return (norename ? String.Compare(x.Machine.Name, y.Machine.Name) : x.Metadata.SystemID - y.Metadata.SystemID);
+			});
+			return true;
+		}
+
+		#endregion
+
+		#region HashData-based sorting and merging
 
 		/// <summary>
 		/// Merge an arbitrary set of ROMs based on the supplied information
@@ -201,28 +345,29 @@ namespace SabreTools.Helper
 			return outroms;
 		}
 
+		/*
 		/// <summary>
 		/// List all duplicates found in a DAT based on a rom
 		/// </summary>
-		/// <param name="lastrom">Rom to use as a base</param>
+		/// <param name="lastrom">Hash to use as a base</param>
 		/// <param name="datdata">DAT to match against</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="remove">True to remove matched roms from the input, false otherwise (default)</param>
-		/// <returns>List of matched RomData objects</returns>
-		public static List<Rom> GetDuplicates(Rom lastrom, Dat datdata, Logger logger, bool remove = false)
+		/// <returns>List of matched HashData objects</returns>
+		public static List<HashData> GetDuplicates(HashData lastrom, DatData datdata, Logger logger, bool remove = false)
 		{
-			List<Rom> output = new List<Rom>();
+			List<HashData> output = new List<HashData>();
 
 			// Check for an empty rom list first
-			if (datdata.Files == null || datdata.Files.Count == 0)
+			if (datdata.Hashes == null || datdata.Hashes.Count == 0)
 			{
 				return output;
 			}
 
 			// Try to find duplicates
-			List<string> keys = datdata.Files.Keys.ToList();
-			foreach (string key in keys)
+			for (int i = 0; i < datdata.Hashes.Count; i++)
 			{
+
 				List<Rom> roms = datdata.Files[key];
 				List<Rom> left = new List<Rom>();
 				foreach (Rom rom in roms)
@@ -246,91 +391,26 @@ namespace SabreTools.Helper
 
 			return output;
 		}
-
-		/// <summary>
-		/// Determine if a file is a duplicate using partial matching logic
-		/// </summary>
-		/// <param name="rom">Rom to check for duplicate status</param>
-		/// <param name="lastrom">Rom to use as a baseline</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
-		/// <returns>True if the roms are duplicates, false otherwise</returns>
-		public static bool IsDuplicate(Rom rom, Rom lastrom, Logger logger)
-		{
-			bool dupefound = rom.Equals(lastrom);
-
-			// More wonderful SHA-1 logging that has to be done
-			if (rom.HashData.SHA1 == lastrom.HashData.SHA1 && rom.HashData.Size != lastrom.HashData.Size)
-			{
-				logger.User("SHA-1 mismatch - Hash: " + rom.HashData.SHA1);
-			}
-
-			return dupefound;
-		}
+		*/
 
 		/// <summary>
 		/// Determine if a file is a duplicate using partial matching logic
 		/// </summary>
 		/// <param name="hash">Hash to check for duplicate status</param>
-		/// <param name="lasthash">Hash to use as a baseline</param>
+		/// <param name="lastHash">Hash to use as a baseline</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>True if the hashes are duplicates, false otherwise</returns>
-		public static bool IsDuplicate(HashData hash, HashData lasthash, Logger logger)
+		public static bool IsDuplicate(HashData hash, int hashIndex, HashData lastHash, int lastHashIndex, Logger logger)
 		{
-			bool dupefound = hash.Equals(lasthash);
+			bool dupefound = hash.Equals(lastHash);
 
 			// More wonderful SHA-1 logging that has to be done
-			if (hash.SHA1 == lasthash.SHA1 && hash.Size != lasthash.Size)
+			if (hash.SHA1 == lastHash.SHA1 && hash.Size != lastHash.Size)
 			{
 				logger.User("SHA-1 mismatch - Hash: " + hash.SHA1);
 			}
 
 			return dupefound;
-		}
-
-		/// <summary>
-		/// Return the duplicate status of two roms
-		/// </summary>
-		/// <param name="rom">Current rom to check</param>
-		/// <param name="lastrom">Last rom to check against</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
-		/// <returns>The DupeType corresponding to the relationship between the two</returns>
-		public static DupeType GetDuplicateStatus(Rom rom, Rom lastrom, Logger logger)
-		{
-			DupeType output = DupeType.None;
-
-			// If we don't have a duplicate at all, return none
-			if (!IsDuplicate(rom, lastrom, logger))
-			{
-				return output;
-			}
-
-			// If the duplicate is external already or should be, set it
-			if (lastrom.Dupe >= DupeType.ExternalHash || lastrom.Metadata.SystemID != rom.Metadata.SystemID || lastrom.Metadata.SourceID != rom.Metadata.SourceID)
-			{
-				if (lastrom.Machine.Name == rom.Machine.Name && lastrom.Name == rom.Name)
-				{
-					output = DupeType.ExternalAll;
-				}
-				else
-				{
-					output = DupeType.ExternalHash;
-				}
-			}
-
-			// Otherwise, it's considered an internal dupe
-			else
-			{
-				if (lastrom.Machine.Name == rom.Machine.Name && lastrom.Name == rom.Name)
-				{
-					output = DupeType.InternalAll;
-				}
-				else
-				{
-					output = DupeType.InternalHash;
-				}
-			}
-
-			return output;
 		}
 
 		/// <summary>
@@ -344,11 +424,13 @@ namespace SabreTools.Helper
 		{
 			DupeType output = DupeType.None;
 
+			/*
 			// If we don't have a duplicate at all, return none
 			if (!IsDuplicate(hash, lasthash, logger))
 			{
 				return output;
 			}
+			*/
 
 			// If the duplicate is external already or should be, set it
 			if (lasthash.Roms[0].DupeType >= DupeType.ExternalHash || lasthash.Roms[0].Machine.SystemID != hash.Roms[0].Machine.SystemID || lasthash.Roms[0].Machine.SourceID != hash.Roms[0].Machine.SourceID)
@@ -379,31 +461,6 @@ namespace SabreTools.Helper
 			return output;
 		}
 
-		/// <summary>
-		/// Sort a list of RomData objects by SystemID, SourceID, Game, and Name (in order)
-		/// </summary>
-		/// <param name="roms">List of RomData objects representing the roms to be sorted</param>
-		/// <param name="norename">True if files are not renamed, false otherwise</param>
-		/// <returns>True if it sorted correctly, false otherwise</returns>
-		public static bool Sort(List<Rom> roms, bool norename)
-		{
-			roms.Sort(delegate (Rom x, Rom y)
-			{
-				if (x.Metadata.SystemID == y.Metadata.SystemID)
-				{
-					if (x.Metadata.SourceID == y.Metadata.SourceID)
-					{
-						if (x.Machine.Name == y.Machine.Name)
-						{
-							return String.Compare(x.Name, y.Name);
-						}
-						return String.Compare(x.Machine.Name, y.Machine.Name);
-					}
-					return (norename ? String.Compare(x.Machine.Name, y.Machine.Name) : x.Metadata.SourceID - y.Metadata.SourceID);
-				}
-				return (norename ? String.Compare(x.Machine.Name, y.Machine.Name) : x.Metadata.SystemID - y.Metadata.SystemID);
-			});
-			return true;
-		}
+		#endregion
 	}
 }
