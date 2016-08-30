@@ -75,7 +75,7 @@ namespace SabreTools.Helper
 		/// <param name="rom">RomData representing the new information</param>
 		public static void WriteToManagedArchive(string input, string output, Rom rom)
 		{
-			string archiveFileName = Path.Combine(output, rom.Machine + ".zip");
+			string archiveFileName = Path.Combine(output, rom.Machine.Name + ".zip");
 
 			// Delete an empty file first
 			if (File.Exists(archiveFileName) && new FileInfo(archiveFileName).Length == 0)
