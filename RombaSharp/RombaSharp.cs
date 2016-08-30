@@ -330,34 +330,6 @@ CREATE TABLE IF NOT EXISTS data (
 		/// </summary>
 		private void RefreshDatabase()
 		{
-			// Make sure the dats dir is set
-			if (String.IsNullOrEmpty(_dats))
-			{
-				_dats = "dats";
-			}
-
-			// Make sure the folder exists
-			if (!Directory.Exists(_dats))
-			{
-				Directory.CreateDirectory(_dats);
-			}
-
-			// Now parse the directory into an internal Dat then insert
-			foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
-			{
-				Dat datdata = new Dat();
-				datdata = DatTools.Parse(file, 0, 0, datdata, _logger);
-				Rom romdata = FileTools.GetSingleFileInfo(file);
-			}
-		}
-
-		/// <summary>
-		/// Process a datfile and insert it into the database
-		/// </summary>
-		/// <param name="datdata">Dat object representing the data to insert</param>
-		/// <param name="romdata">Rom object representing the Dat file itself</param>
-		private void InsertDatIntoDatabase(Dat datdata, Rom romdata)
-		{
 			// Make sure the db is set
 			if (String.IsNullOrEmpty(_db))
 			{
@@ -372,22 +344,30 @@ CREATE TABLE IF NOT EXISTS data (
 				InitializeDatabase();
 			}
 
-			// Open a connection to the database
-			using (SqliteConnection slc = new SqliteConnection(_connectionString))
+			// Make sure the dats dir is set
+			if (String.IsNullOrEmpty(_dats))
 			{
-				// For each key
-				foreach (string key in datdata.Files.Keys)
-				{
-					// For each Rom in the list
-					foreach (Rom file in datdata.Files[key])
-					{
-						// Try to find the hash in the set
+				_dats = "dats";
+			}
 
-						// If it exists, see if there's any missing information
+			// Make sure the folder exists
+			if (!Directory.Exists(_dats))
+			{
+				Directory.CreateDirectory(_dats);
+			}
 
-						// If it doesn't exist, insert it completely
-					}
-				}
+			// Now create a new structure to replace the database
+			List<Tuple<int, string, string>> keyvault = new List<Tuple<int, string, string>>();
+
+			// Now parse the directory into an internal Dat then insert
+			int i = 0;
+			foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
+			{
+				Dat datdata = new Dat();
+				datdata = DatTools.Parse(file, 0, 0, datdata, _logger);
+				Rom romdata = FileTools.GetSingleFileInfo(file);
+
+				// Loop through the entire deduped DAT and add to the structure
 			}
 		}
 	}
