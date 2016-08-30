@@ -5,6 +5,9 @@
 /Deheader/obj
 /Deheader/obj/Debug
 /Deheader/obj/Release
+/RombaSharp/obj
+/RombaSharp/obj/Debug
+/RombaSharp/obj/Release
 /SabreTools/obj
 /SabreTools/obj/Debug
 /SabreTools/obj/Release
@@ -18,3 +21,5 @@
 /SimpleSort/obj/Debug
 /SimpleSort/obj/Release
 /TGZConvert/obj
+/TGZConvert/obj/Debug
+/TGZConvert/obj/Release

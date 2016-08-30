@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSort", "SimpleSort\Si
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TGZConvert", "TGZConvert\TGZConvert.csproj", "{73FBE2C1-39FB-4FFC-93F4-FB4998492429}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RombaSharp", "RombaSharp\RombaSharp.csproj", "{4728D479-8CFB-43E9-8C63-4774C6D73200}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +70,14 @@ Global
 		{73FBE2C1-39FB-4FFC-93F4-FB4998492429}.Release|Any CPU.Build.0 = Release|Any CPU
 		{73FBE2C1-39FB-4FFC-93F4-FB4998492429}.Release|x64.ActiveCfg = Release|Any CPU
 		{73FBE2C1-39FB-4FFC-93F4-FB4998492429}.Release|x64.Build.0 = Release|Any CPU
+		{4728D479-8CFB-43E9-8C63-4774C6D73200}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4728D479-8CFB-43E9-8C63-4774C6D73200}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4728D479-8CFB-43E9-8C63-4774C6D73200}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4728D479-8CFB-43E9-8C63-4774C6D73200}.Debug|x64.Build.0 = Debug|Any CPU
+		{4728D479-8CFB-43E9-8C63-4774C6D73200}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4728D479-8CFB-43E9-8C63-4774C6D73200}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4728D479-8CFB-43E9-8C63-4774C6D73200}.Release|x64.ActiveCfg = Release|Any CPU
+		{4728D479-8CFB-43E9-8C63-4774C6D73200}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
