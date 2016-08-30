@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace SabreTools.Helper
@@ -66,223 +67,240 @@ namespace SabreTools.Helper
 			//http://stackoverflow.com/questions/14849367/how-to-determine-calling-method-and-class-name
 			StackTrace st = new StackTrace();
 			string className = st.GetFrame(1).GetMethod().ReflectedType.Name;
+			string barrier = "-----------------------------------------";
+			List<String> helptext = new List<string>();
 
+			// Set the help text
 			switch (className)
 			{
 				case "SabreTools":
-					Console.Write(Resources.Resources.SabreTools_Name + " - " + Resources.Resources.SabreTools_Desc + @"
------------------------------------------
-" + Resources.Resources.Usage + ": " + Resources.Resources.SabreTools_Name + @" [option] [filename|dirname] ...
-
-Options:
-  -?, -h, --help	Show this help
-  -a, --add		Add a new system or source to the database
-	-manu=			Manufacturer name (system only)
-	-system=		System name (system only)
-	-source=		Source name (source only)
-	-url=			URL (source only)
-  -d, --dfd		Enable Dir2DAT mode
-	-nm, --noMD5		Don't include MD5 in output
-	-ns, --noSHA1		Don't include SHA1 in output
-	-b, --bare		Don't include date in file name
-	-u, --unzip		Force unzipping in created DAT
-	-f, --files		Treat archives as files
-	-o, --old		Output DAT in CMP format instead of XML
-	-gz, --gz-files		Allow reading of GZIP files as archives
-	-ro, --romba		Read files from a Romba input
-	-f=, --filename=	Set the external name of the DAT
-	-n=, --name=		Set the internal name of the DAT
-	-de=, --desc=		Set the description of the DAT
-	-c=, --cat=		Set the category of the DAT
-	-v=, --version=		Set the version of the DAT
-	-au=, --author=		Set the author of the DAT
-	-sd, --superdat		Enable SuperDAT creation
-	-t=, --temp=		Set the temporary directory to use
-  -es, --ext-split	Split a DAT by two file extensions
-	-exta=			First set of extensions (comma-separated)
-	-extb=			Second set of extensions (comma-separated)
-	-out=			Output directory
-  -g, --generate	Start tool in generate mode
-	-system=		System ID to generate from
-	-nr, --no-rename	Don't auto-rename games
-	-o, --old		Output DAT in CMP format instead of XML
-  -ga, --generate-all	Start tool in generate all mode
-	-nr, --no-rename	Don't auto-rename games
-	-o, --old		Output DAT in CMP format instead of XML
-  -hs, --hash-split		Split a DAT or folder by best-available hashes
-	-out=			Output directory
-  -i, --import		Start tool in import mode
-	-ig, --ignore		Don't prompt for new sources
-  -lso, --list-sources	List all sources (id <= name)
-  -lsy, --list-systems	List all systems (id <= name)
-  -ol, --offmerge	Update DATS for offline arrays (see notes)
-	-com=			Complete current DAT
-	-fix=			Complete current Missing
-	-new=			New Complete DAT
-	-fk, --fake		Replace all hashes and sizes by the default
-  -rm, --remove		Remove a system or source from the database
-	-system=		System ID
-	-source=		Source ID
-  -st, --stats		Get statistics on all input DATs
-	-si, --single		Show individual statistics
-  -ud, --update		Update a DAT file
-	-oc, --output-cmp	Output in CMP format
-	-om, --output-miss	Output in Missfile format
-	  -r, --roms			Output roms to miss instead of sets
-	  -gp, --game-prefix		Add game name as a prefix
-	  -pre=, --prefix=		Set prefix for all lines
-	  -post=, --postfix=		Set postfix for all lines
-	  -q, --quotes			Put double-quotes around each item
-	  -ae=, --add-ext=		Add an extension to each item
-	  -re=, --rep-ext=		Replace all extensions with specified
-	  -ro, --romba			Output in Romba format (requires SHA-1)
-	  -tsv, --tsv			Output in Tab-Separated Value format
-	  -csv, --csv			Output in Comma-Separated Value format
-	-or, --output-rc	Output in RomCenter format
-	-os, --output-sd	Output in SabreDAT format
-	-ox, --output-xml	Output in Logiqx XML format
-	-f=, --filename=	Set a new filename
-	-n=, --name=		Set a new internal name
-	-de=, --desc=		Set a new description
-	-r=, --root=		Set a new rootdir
-	-ca=, --category=	Set a new category
-	-v=, --version=		Set a new version
-	-da=, --date=		Set a new date
-	-au=, --author=		Set a new author
-	-em=, --email=		Set a new email
-	-hp=, --homepage=	Set a new homepage
-	-u=, --url=		Set a new URL
-	-co=, --comment=	Set a new comment
-	-h=, --header=		Set a new header skipper
-	-sd=, --superdat	Set SuperDAT type
-	-fm=, --forcemerge=	Set force merging
-		Supported values are:
-		  None, Split, Full
-	-fn=, --forcend=	Set force nodump
-		Supported values are:
-		  None, Obsolete, Required, Ignore
-	-fp=, --forcepack=	Set force packing
-		Supported values are:
-		  None, Zip, Unzip
-	-clean			Clean game names according to WoD standards
-	-sl, --softlist	Use Software List name instead of description
-	-trim			Trim file names to fit NTFS length
-		-rd=, --root-dir=	Set the root directory for calc
-	-si, --single		All game names replaced by '!'
-	-dd, --dedup		Enable deduping in the created DAT
-	-m, --merge		Merge the input DATs
-		-b, --bare		Don't include date in automatic name
-	-di, --diff		Create diffdats from inputs (all outputs)
-		-b, --bare		Don't include date in automatic name
-		-c, --cascade		Enable cascaded diffing
-			-ip, --inplace		Enable inplace, cascaded diff
-			-sf, --skip		Skip output of first DAT
-		-rc, --rev-cascade	Enable reverse cascaded diffing
-			-ip, --inplace		Enable inplace, cascaded diff
-			-sf, --skip		Skip output of first DAT
-	-did, --diff-du	Create diffdat containing just duplicates
-		[Can be used with other -diX flags]
-		-b, --bare		Don't include date in automatic name
-	-dii, --diff-in	Create diffdats for individual DATs
-		[Can be used with other -diX flags]
-		-b, --bare		Don't include date in automatic name
-	-din, --diff-nd	Create diffdat containing no duplicates
-		[Can be used with other -diX flags]
-		-b, --bare		Don't include date in automatic name
-	-gn=, --game-name=	Filter by game name
-	-rn=, --rom-name=	Filter by rom name
-	-rt=, --rom-type=	Filter by rom type
-	-sgt=, --greater=	Filter by size >=
-	-slt=, --less=		Filter by size <=
-	-seq=, --equal=		Filter by size ==
-	-crc=, --crc=		Filter by CRC hash
-	-md5=, --md5=		Filter by MD5 hash
-	-sha1=, --sha1=		Filter by SHA-1 hash
-	-nd, --nodump		Include only match nodump roms
-	-nnd, --not-nodump	Exclude all nodump roms
-	-out=			Output directory (overridden by --inplace)
-
-Filenames and directories can't start with a reserved string
-unless prefixed by 'input='
-
-Filter parameters game name, rom name, CRC, MD5, SHA-1 can
-do partial matches using asterisks as follows (case insensitive):
-    *00 means ends with '00'
-    00* means starts with '00'
-    *00* means contains '00'
-    00 means exactly equals '00'
-
-Filter parameters for size can use postfixes for inputs:
-    e.g. 8kb => 8000 or 8kib => 8192
-
-Offline merge mode notes:
-  This program will output the following DATs:
-    (a) Net New - (NewComplete)-(Complete)
-    (b) Unneeded - (Complete)-(NewComplete)
-    (c) New Missing - (Net New)+(Missing-(Unneeded))
-    (d) Have - (NewComplete)-(New Missing)
-      OR (Complete or NewComplete)-(Missing) if one is missing
-");
+					helptext.Add(Resources.Resources.SabreTools_Name + " - " + Resources.Resources.SabreTools_Desc);
+					helptext.Add(barrier);
+					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.SabreTools_Name + " [option] [filename|dirname] ...");
+					helptext.Add("");
+					helptext.Add("Options:");
+					helptext.Add("  -?, -h, --help	Show this help");
+					helptext.Add("  -a, --add		Add a new system or source to the database");
+					helptext.Add("	-manu=			Manufacturer name (system only)");
+					helptext.Add("	-system=		System name (system only)");
+					helptext.Add("	-source=		Source name (source only)");
+					helptext.Add("	-url=			URL (source only)");
+					helptext.Add("  -d, --dfd		Enable Dir2DAT mode");
+					helptext.Add("	-nm, --noMD5		Don't include MD5 in output");
+					helptext.Add("	-ns, --noSHA1		Don't include SHA1 in output");
+					helptext.Add("	-b, --bare		Don't include date in file name");
+					helptext.Add("	-u, --unzip		Force unzipping in created DAT");
+					helptext.Add("	-f, --files		Treat archives as files");
+					helptext.Add("	-o, --old		Output DAT in CMP format instead of XML");
+					helptext.Add("	-gz, --gz-files		Allow reading of GZIP files as archives");
+					helptext.Add("	-ro, --romba		Read files from a Romba input");
+					helptext.Add("	-f=, --filename=	Set the external name of the DAT");
+					helptext.Add("	-n=, --name=		Set the internal name of the DAT");
+					helptext.Add("	-de=, --desc=		Set the description of the DAT");
+					helptext.Add("	-c=, --cat=		Set the category of the DAT");
+					helptext.Add("	-v=, --version=		Set the version of the DAT");
+					helptext.Add("	-au=, --author=		Set the author of the DAT");
+					helptext.Add("	-sd, --superdat		Enable SuperDAT creation");
+					helptext.Add("	-t=, --temp=		Set the temporary directory to use");
+					helptext.Add("  -es, --ext-split	Split a DAT by two file extensions");
+					helptext.Add("	-exta=			First set of extensions (comma-separated)");
+					helptext.Add("	-extb=			Second set of extensions (comma-separated)");
+					helptext.Add("	-out=			Output directory");
+					helptext.Add("  -g, --generate	Start tool in generate mode");
+					helptext.Add("	-system=		System ID to generate from");
+					helptext.Add("	-nr, --no-rename	Don't auto-rename games");
+					helptext.Add("	-o, --old		Output DAT in CMP format instead of XML");
+					helptext.Add("  -ga, --generate-all	Start tool in generate all mode");
+					helptext.Add("	-nr, --no-rename	Don't auto-rename games");
+					helptext.Add("	-o, --old		Output DAT in CMP format instead of XML");
+					helptext.Add("  -hs, --hash-split		Split a DAT or folder by best-available hashes");
+					helptext.Add("	-out=			Output directory");
+					helptext.Add("  -i, --import		Start tool in import mode");
+					helptext.Add("	-ig, --ignore		Don't prompt for new sources");
+					helptext.Add("  -lso, --list-sources	List all sources (id <= name)");
+					helptext.Add("  -lsy, --list-systems	List all systems (id <= name)");
+					helptext.Add("  -ol, --offmerge	Update DATS for offline arrays (see notes)");
+					helptext.Add("	-com=			Complete current DAT");
+					helptext.Add("	-fix=			Complete current Missing");
+					helptext.Add("	-new=			New Complete DAT");
+					helptext.Add("	-fk, --fake		Replace all hashes and sizes by the default");
+					helptext.Add("  -rm, --remove		Remove a system or source from the database");
+					helptext.Add("	-system=		System ID");
+					helptext.Add("	-source=		Source ID");
+					helptext.Add("  -st, --stats		Get statistics on all input DATs");
+					helptext.Add("	-si, --single		Show individual statistics");
+					helptext.Add("  -ud, --update		Update a DAT file");
+					helptext.Add("	-oc, --output-cmp	Output in CMP format");
+					helptext.Add("	-om, --output-miss	Output in Missfile format");
+					helptext.Add("	  -r, --roms			Output roms to miss instead of sets");
+					helptext.Add("	  -gp, --game-prefix		Add game name as a prefix");
+					helptext.Add("	  -pre=, --prefix=		Set prefix for all lines");
+					helptext.Add("	  -post=, --postfix=		Set postfix for all lines");
+					helptext.Add("	  -q, --quotes			Put double-quotes around each item");
+					helptext.Add("	  -ae=, --add-ext=		Add an extension to each item");
+					helptext.Add("	  -re=, --rep-ext=		Replace all extensions with specified");
+					helptext.Add("	  -ro, --romba			Output in Romba format (requires SHA-1)");
+					helptext.Add("	  -tsv, --tsv			Output in Tab-Separated Value format");
+					helptext.Add("	  -csv, --csv			Output in Comma-Separated Value format");
+					helptext.Add("	-or, --output-rc	Output in RomCenter format");
+					helptext.Add("	-os, --output-sd	Output in SabreDAT format");
+					helptext.Add("	-ox, --output-xml	Output in Logiqx XML format");
+					helptext.Add("	-f=, --filename=	Set a new filename");
+					helptext.Add("	-n=, --name=		Set a new internal name");
+					helptext.Add("	-de=, --desc=		Set a new description");
+					helptext.Add("	-r=, --root=		Set a new rootdir");
+					helptext.Add("	-ca=, --category=	Set a new category");
+					helptext.Add("	-v=, --version=		Set a new version");
+					helptext.Add("	-da=, --date=		Set a new date");
+					helptext.Add("	-au=, --author=		Set a new author");
+					helptext.Add("	-em=, --email=		Set a new email");
+					helptext.Add("	-hp=, --homepage=	Set a new homepage");
+					helptext.Add("	-u=, --url=		Set a new URL");
+					helptext.Add("	-co=, --comment=	Set a new comment");
+					helptext.Add("	-h=, --header=		Set a new header skipper");
+					helptext.Add("	-sd=, --superdat	Set SuperDAT type");
+					helptext.Add("	-fm=, --forcemerge=	Set force merging");
+					helptext.Add("		Supported values are:");
+					helptext.Add("		  None, Split, Full");
+					helptext.Add("	-fn=, --forcend=	Set force nodump");
+					helptext.Add("		Supported values are:");
+					helptext.Add("		  None, Obsolete, Required, Ignore");
+					helptext.Add("	-fp=, --forcepack=	Set force packing");
+					helptext.Add("		Supported values are:");
+					helptext.Add("		  None, Zip, Unzip");
+					helptext.Add("	-clean			Clean game names according to WoD standards");
+					helptext.Add("	-sl, --softlist	Use Software List name instead of description");
+					helptext.Add("	-trim			Trim file names to fit NTFS length");
+					helptext.Add("		-rd=, --root-dir=	Set the root directory for calc");
+					helptext.Add("	-si, --single		All game names replaced by '!'");
+					helptext.Add("	-dd, --dedup		Enable deduping in the created DAT");
+					helptext.Add("	-m, --merge		Merge the input DATs");
+					helptext.Add("		-b, --bare		Don't include date in automatic name");
+					helptext.Add("	-di, --diff		Create diffdats from inputs (all outputs)");
+					helptext.Add("		-b, --bare		Don't include date in automatic name");
+					helptext.Add("		-c, --cascade		Enable cascaded diffing");
+					helptext.Add("			-ip, --inplace		Enable inplace, cascaded diff");
+					helptext.Add("			-sf, --skip		Skip output of first DAT");
+					helptext.Add("		-rc, --rev-cascade	Enable reverse cascaded diffing");
+					helptext.Add("			-ip, --inplace		Enable inplace, cascaded diff");
+					helptext.Add("			-sf, --skip		Skip output of first DAT");
+					helptext.Add("	-did, --diff-du	Create diffdat containing just duplicates");
+					helptext.Add("		[Can be used with other -diX flags]");
+					helptext.Add("		-b, --bare		Don't include date in automatic name");
+					helptext.Add("	-dii, --diff-in	Create diffdats for individual DATs");
+					helptext.Add("		[Can be used with other -diX flags]");
+					helptext.Add("		-b, --bare		Don't include date in automatic name");
+					helptext.Add("	-din, --diff-nd	Create diffdat containing no duplicates");
+					helptext.Add("		[Can be used with other -diX flags]");
+					helptext.Add("		-b, --bare		Don't include date in automatic name");
+					helptext.Add("	-gn=, --game-name=	Filter by game name");
+					helptext.Add("	-rn=, --rom-name=	Filter by rom name");
+					helptext.Add("	-rt=, --rom-type=	Filter by rom type");
+					helptext.Add("	-sgt=, --greater=	Filter by size >=");
+					helptext.Add("	-slt=, --less=		Filter by size <=");
+					helptext.Add("	-seq=, --equal=		Filter by size ==");
+					helptext.Add("	-crc=, --crc=		Filter by CRC hash");
+					helptext.Add("	-md5=, --md5=		Filter by MD5 hash");
+					helptext.Add("	-sha1=, --sha1=		Filter by SHA-1 hash");
+					helptext.Add("	-nd, --nodump		Include only match nodump roms");
+					helptext.Add("	-nnd, --not-nodump	Exclude all nodump roms");
+					helptext.Add("	-out=			Output directory (overridden by --inplace)");
+					helptext.Add("");
+					helptext.Add("Filenames and directories can't start with a reserved string");
+					helptext.Add("unless prefixed by 'input='");
+					helptext.Add("");
+					helptext.Add("Filter parameters game name, rom name, CRC, MD5, SHA-1 can");
+					helptext.Add("do partial matches using asterisks as follows (case insensitive):");
+					helptext.Add("    *00 means ends with '00'");
+					helptext.Add("    00* means starts with '00'");
+					helptext.Add("    *00* means contains '00'");
+					helptext.Add("    00 means exactly equals '00'");
+					helptext.Add("");
+					helptext.Add("Filter parameters for size can use postfixes for inputs:");
+					helptext.Add("    e.g. 8kb => 8000 or 8kib => 8192");
+					helptext.Add("");
+					helptext.Add("Offline merge mode notes:");
+					helptext.Add("  This program will output the following DATs:");
+					helptext.Add("    (a) Net New - (NewComplete)-(Complete)");
+					helptext.Add("    (b) Unneeded - (Complete)-(NewComplete)");
+					helptext.Add("    (c) New Missing - (Net New)+(Missing-(Unneeded))");
+					helptext.Add("    (d) Have - (NewComplete)-(New Missing)");
+					helptext.Add("      OR(Complete or NewComplete) - (Missing) if one is missing");
 					break;
 				case "Headerer":
-					Console.WriteLine(Resources.Resources.Headerer_Name + " - " + Resources.Resources.Headerer_Desc + @"
------------------------------------------
-" + Resources.Resources.Usage + ": " + Resources.Resources.Headerer_Name + @" [option] [filename|dirname]
-
-Options:
-  -e			Detect and remove mode
-  -r			Restore header to file based on SHA-1");
+					helptext.Add(Resources.Resources.Headerer_Name + " - " + Resources.Resources.Headerer_Desc);
+					helptext.Add(barrier);
+					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.Headerer_Name + " [option] [filename|dirname]");
+					helptext.Add("");
+					helptext.Add("Options:");
+					helptext.Add("  -e			Detect and remove mode");
+					helptext.Add("  -r			Restore header to file based on SHA-1");
 					break;
 				case "SimpleSort":
-					Console.WriteLine(Resources.Resources.SimpleSort_Name + " - " + Resources.Resources.SimpleSort_Desc + @"
------------------------------------------
-" + Resources.Resources.Usage + ": " + Resources.Resources.SimpleSort_Name + @" [options] [filename|dirname] ...
-
-Options:
-  -?, -h, --help	Show this help
-  -dat=			Input DAT to rebuild against (REQUIRED)
-  -out=			Output directory
-  -t=, --temp=		Set the temporary directory to use
-  -qs, --quick		Enable quick scanning of archives
-  -v, --verify		Enable verification of output directory
-  -tgz, --tgz		Enable TorrentGZ output
-	-r, --romba			Enable Romba depot dir output
-  -do, --directory	Output files as uncompressed
-  -7z={0}		Set scanning level for 7z archives
-  -gz={2}		Set scanning level for GZip archives
-  -rar={2}		Set scanning level for RAR archives
-  -zip={0}		Set scanning level for ZIP archives
-
-Archive scanning levels:
-  0	Hash archive and contents
-  1	Only hash contents
-  2	Only hash archive
-");
+					helptext.Add(Resources.Resources.SimpleSort_Name + " - " + Resources.Resources.SimpleSort_Desc);
+					helptext.Add(barrier);
+					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.SimpleSort_Name + " [options] [filename|dirname] ...");
+					helptext.Add("");
+					helptext.Add("Options:");
+					helptext.Add("  -?, -h, --help	Show this help");
+					helptext.Add("  -dat=			Input DAT to rebuild against (REQUIRED)");
+					helptext.Add("  -out=			Output directory");
+					helptext.Add("  -t=, --temp=		Set the temporary directory to use");
+					helptext.Add("  -qs, --quick		Enable quick scanning of archives");
+					helptext.Add("  -v, --verify		Enable verification of output directory");
+					helptext.Add("  -tgz, --tgz		Enable TorrentGZ output");
+					helptext.Add("	-r, --romba			Enable Romba depot dir output");
+					helptext.Add("  -do, --directory	Output files as uncompressed");
+					helptext.Add("  -7z={0}		Set scanning level for 7z archives");
+					helptext.Add("  -gz={2}		Set scanning level for GZip archives");
+					helptext.Add("  -rar={2}		Set scanning level for RAR archives");
+					helptext.Add("  -zip={0}		Set scanning level for ZIP archives");
+					helptext.Add("");
+					helptext.Add("Archive scanning levels:");
+					helptext.Add("  0	Hash archive and contents");
+					helptext.Add("  1	Only hash contents");
+					helptext.Add("  2	Only hash archive");
 					break;
 				case "TGZTest":
-					Console.WriteLine(Resources.Resources.TGZTest_Name + " - " + Resources.Resources.TGZTest_Desc + @"
------------------------------------------
-" + Resources.Resources.Usage + ": " + Resources.Resources.TGZTest_Name + @" [options] [filename|dirname] ...
-
-Options:
-  -?, -h, --help	Show this help
-  -out=			Output directory
-  -t=, --temp=		Set the temporary directory to use
-  -d, --delete	Delete input files
-  -r, --romba	Enable Romba depot dir output
-  -7z={1}		Set scanning level for 7z archives
-  -gz={2}		Set scanning level for GZip archives
-  -rar={2}		Set scanning level for RAR archives
-  -zip={1}		Set scanning level for ZIP archives
-
-Archive scanning levels:
-  0	Hash archive and contents
-  1	Only hash contents
-  2	Only hash archive");
-                    break;
-				default:
-					Console.Write(Resources.Resources.Default_Desc);
+					helptext.Add(Resources.Resources.TGZTest_Name + " - " + Resources.Resources.TGZTest_Desc);
+					helptext.Add(barrier);
+					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.TGZTest_Name + " [options] [filename|dirname] ...");
+					helptext.Add("");
+					helptext.Add("Options:");
+					helptext.Add("  -?, -h, --help	Show this help");
+					helptext.Add("  -out=			Output directory");
+					helptext.Add("  -t=, --temp=		Set the temporary directory to use");
+					helptext.Add("  -d, --delete	Delete input files");
+					helptext.Add("  -r, --romba	Enable Romba depot dir output");
+					helptext.Add("  -7z={1}		Set scanning level for 7z archives");
+					helptext.Add("  -gz={2}		Set scanning level for GZip archives");
+					helptext.Add("  -rar={2}		Set scanning level for RAR archives");
+					helptext.Add("  -zip={1}		Set scanning level for ZIP archives");
+					helptext.Add("");
+					helptext.Add("Archive scanning levels:");
+					helptext.Add("  0	Hash archive and contents");
+					helptext.Add("  1	Only hash contents");
+					helptext.Add("  2	Only hash archive");
 					break;
+				default:
+					helptext.Add(Resources.Resources.Default_Desc);
+					break;
+			}
+
+			// Now output based on the size of the screen
+			int i = 0;
+			foreach (string help in helptext)
+			{
+				Console.WriteLine(help);
+				i++;
+
+				// If we're not being redirected and we reached the size of the screen, pause
+				if (!Console.IsOutputRedirected && i == Console.WindowHeight - 2)
+				{
+					i = 0;
+					Console.WriteLine("Press enter to continue...");
+					Console.ReadLine();
+				}
 			}
 		}
 
