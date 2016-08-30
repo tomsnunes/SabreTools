@@ -124,7 +124,7 @@ namespace SabreTools.Helper.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Test TorrentGZ output.
+        ///   Looks up a localized string similar to Convert files to TGZ output.
         /// </summary>
         public static string TGZTest_Desc {
             get {
@@ -133,7 +133,7 @@ namespace SabreTools.Helper.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to TGZTest.
+        ///   Looks up a localized string similar to TGZConvert.
         /// </summary>
         public static string TGZTest_Name {
             get {

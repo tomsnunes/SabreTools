@@ -139,10 +139,10 @@
     <value>SimpleSort</value>
   </data>
   <data name="TGZTest_Desc" xml:space="preserve">
-    <value>Test TorrentGZ output</value>
+    <value>Convert files to TGZ output</value>
   </data>
   <data name="TGZTest_Name" xml:space="preserve">
-    <value>TGZTest</value>
+    <value>TGZConvert</value>
   </data>
   <data name="Usage" xml:space="preserve">
     <value>Usage</value>

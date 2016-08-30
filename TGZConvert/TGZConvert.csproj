@@ -7,8 +7,8 @@
     <ProjectGuid>{73FBE2C1-39FB-4FFC-93F4-FB4998492429}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TGZTest</RootNamespace>
-    <AssemblyName>TGZTest</AssemblyName>
+    <RootNamespace>TGZConvert</RootNamespace>
+    <AssemblyName>TGZConvert</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -67,7 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TGZTest.cs" />
+    <Compile Include="TGZConvert.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

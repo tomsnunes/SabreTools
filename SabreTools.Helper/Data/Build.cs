@@ -262,7 +262,7 @@ namespace SabreTools.Helper
 					helptext.Add("  1	Only hash contents");
 					helptext.Add("  2	Only hash archive");
 					break;
-				case "TGZTest":
+				case "TGZConvert":
 					helptext.Add(Resources.Resources.TGZTest_Name + " - " + Resources.Resources.TGZTest_Desc);
 					helptext.Add(barrier);
 					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.TGZTest_Name + " [options] [filename|dirname] ...");

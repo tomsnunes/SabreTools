@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SabreTools.Helper", "SabreT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSort", "SimpleSort\SimpleSort.csproj", "{7668FFA4-19AF-4F5D-8463-C7EF5B080FA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TGZTest", "TGZTest\TGZTest.csproj", "{73FBE2C1-39FB-4FFC-93F4-FB4998492429}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TGZConvert", "TGZTest\TGZConvert.csproj", "{73FBE2C1-39FB-4FFC-93F4-FB4998492429}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
