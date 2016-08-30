@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using SabreTools.Helper;
-using SharpCompress.Common;
-
 namespace SabreTools
 {
 	public class TGZTest
