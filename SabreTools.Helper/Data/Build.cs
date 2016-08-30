@@ -276,6 +276,7 @@ namespace SabreTools.Helper
 					helptext.Add("  -gz={2}		Set scanning level for GZip archives");
 					helptext.Add("  -rar={2}		Set scanning level for RAR archives");
 					helptext.Add("  -zip={1}		Set scanning level for ZIP archives");
+					helptext.Add("  -ud, --update-dat	Output updated DAT");
 					helptext.Add("");
 					helptext.Add("Archive scanning levels:");
 					helptext.Add("  0	Hash archive and contents");

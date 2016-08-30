@@ -18,6 +18,7 @@ namespace SabreTools
 		private bool _verify;
 		private bool _tgz;
 		private bool _romba;
+		private bool _updateDat;
 		private ArchiveScanLevel _7z;
 		private ArchiveScanLevel _gz;
 		private ArchiveScanLevel _rar;
@@ -45,10 +46,11 @@ namespace SabreTools
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
+		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public SimpleSort(Dat datdata, List<string> inputs, string outdir, string tempdir,
 			bool quickScan, bool toFolder, bool verify, bool tgz, bool romba, int sevenzip,
-			int gz, int rar, int zip, Logger logger)
+			int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			_datdata = datdata;
 			_inputs = inputs;
@@ -63,6 +65,7 @@ namespace SabreTools
 			_gz = (ArchiveScanLevel)(gz < 0 || gz > 2 ? 0 : gz);
 			_rar = (ArchiveScanLevel)(rar < 0 || rar > 2 ? 0 : rar);
 			_zip = (ArchiveScanLevel)(zip < 0 || zip > 2 ? 0 : zip);
+			_updateDat = updateDat;
 			_logger = logger;
 
 			_cursorTop = Console.CursorTop;
@@ -114,6 +117,7 @@ namespace SabreTools
 				simpleSort = true,
 				tgz = false,
 				toFolder = false,
+				updateDat = false,
 				verify = false;
 			int sevenzip = 0,
 				gz = 2,
@@ -149,6 +153,10 @@ namespace SabreTools
 					case "-tgz":
 					case "--tgz":
 						tgz = true;
+						break;
+					case "-ud":
+					case "--updated-dat":
+						updateDat = true;
 						break;
 					case "-v":
 					case "--verify":
@@ -246,7 +254,7 @@ namespace SabreTools
 			{
 				if (datfiles.Count > 0)
 				{
-					InitSimpleSort(datfiles, inputs, outdir, tempdir, quickScan, toFolder, verify, tgz, romba, sevenzip, gz, rar, zip, logger);
+					InitSimpleSort(datfiles, inputs, outdir, tempdir, quickScan, toFolder, verify, tgz, romba, sevenzip, gz, rar, zip, updateDat, logger);
 				}
 				else
 				{
@@ -283,9 +291,10 @@ namespace SabreTools
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
+		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private static void InitSimpleSort(List<string> datfiles, List<string> inputs, string outdir, string tempdir, 
-			bool quickScan, bool toFolder, bool verify, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
+		private static void InitSimpleSort(List<string> datfiles, List<string> inputs, string outdir, string tempdir, bool quickScan,
+			bool toFolder, bool verify, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
 			Dat datdata = new Dat();
@@ -294,7 +303,7 @@ namespace SabreTools
 				datdata = DatTools.Parse(datfile, 99, 99, datdata, logger);
 			}
 
-			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, toFolder, verify, tgz, romba, sevenzip, gz, rar, zip, logger);
+			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, toFolder, verify, tgz, romba, sevenzip, gz, rar, zip, updateDat, logger);
 			ss.StartProcessing();
 		}
 
@@ -462,7 +471,14 @@ namespace SabreTools
 			_logger.User("Stats of the matched ROMs:");
 			Stats.OutputStats(_matched, _logger, true);
 
-			// Diff the matched with the input DAT(s) and output if flag is set
+			// Now output the fixdat based on the original input if asked
+			if (_updateDat)
+			{
+				_datdata.FileName = "fixDat_" + _datdata.FileName;
+				_datdata.Name = "fixDat_" + _datdata.Name;
+				_datdata.Description = "fixDat_" + _datdata.Description;
+				Output.WriteDatfile(_datdata, "", _logger);
+			}
 
 			return success;
 		}
