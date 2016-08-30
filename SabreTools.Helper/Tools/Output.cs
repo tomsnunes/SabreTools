@@ -299,7 +299,7 @@ namespace SabreTools.Helper
 				switch (datdata.OutputFormat)
 				{
 					case OutputFormat.ClrMamePro:
-						state += "game (\n\tname \"" + rom.Machine + "\"\n" +
+						state += "game (\n\tname \"" + rom.Machine.Name + "\"\n" +
 							"\tdescription \"" + (String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description) + "\"\n";
 						break;
 					case OutputFormat.SabreDat:
@@ -315,7 +315,7 @@ namespace SabreTools.Helper
 						depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
 						break;
 					case OutputFormat.Xml:
-						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Machine) + "\">\n" +
+						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Machine.Name) + "\">\n" +
 							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) + "</description>\n";
 						break;
 				}

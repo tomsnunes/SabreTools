@@ -477,6 +477,7 @@ namespace SabreTools
 				_datdata.FileName = "fixDat_" + _datdata.FileName;
 				_datdata.Name = "fixDat_" + _datdata.Name;
 				_datdata.Description = "fixDat_" + _datdata.Description;
+				_datdata.OutputFormat = OutputFormat.Xml;
 				Output.WriteDatfile(_datdata, "", _logger);
 			}
 
