@@ -172,7 +172,7 @@ namespace SabreTools.Helper
 		{
 			bool equals = false;
 
-			if (!IsDisk &&
+			if (IsDisk &&
 					((String.IsNullOrEmpty(this.MD5) || String.IsNullOrEmpty(other.MD5)) || this.MD5 == other.MD5) &&
 					((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(other.SHA1)) || this.SHA1 == other.SHA1))
 			{
@@ -250,9 +250,7 @@ namespace SabreTools.Helper
 				dupefound = this.HashData.Equals(other.HashData, true);
 			}
 
-			return (this.Machine.Equals(other.Machine) &&
-				this.Name == other.Name &&
-				dupefound);
+			return dupefound;
 		}
 	}
 

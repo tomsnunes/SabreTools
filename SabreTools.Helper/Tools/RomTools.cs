@@ -128,6 +128,7 @@ namespace SabreTools.Helper
 			{
 				List<Rom> roms = datdata.Files[key];
 				List<Rom> left = new List<Rom>();
+
 				foreach (Rom rom in roms)
 				{
 					if (IsDuplicate(rom, lastrom, logger))
