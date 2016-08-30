@@ -249,12 +249,13 @@ namespace SabreTools.Helper
 					helptext.Add("  -qs, --quick		Enable quick scanning of archives");
 					helptext.Add("  -v, --verify		Enable verification of output directory");
 					helptext.Add("  -tgz, --tgz		Enable TorrentGZ output");
-					helptext.Add("	-r, --romba			Enable Romba depot dir output");
+					helptext.Add("	-r, --romba		Enable Romba depot dir output");
 					helptext.Add("  -do, --directory	Output files as uncompressed");
 					helptext.Add("  -7z={0}		Set scanning level for 7z archives");
 					helptext.Add("  -gz={2}		Set scanning level for GZip archives");
 					helptext.Add("  -rar={2}		Set scanning level for RAR archives");
 					helptext.Add("  -zip={0}		Set scanning level for ZIP archives");
+					helptext.Add("  -ud, --update-dat	Output updated DAT");
 					helptext.Add("");
 					helptext.Add("Archive scanning levels:");
 					helptext.Add("  0	Hash archive and contents");
@@ -276,7 +277,6 @@ namespace SabreTools.Helper
 					helptext.Add("  -gz={2}		Set scanning level for GZip archives");
 					helptext.Add("  -rar={2}		Set scanning level for RAR archives");
 					helptext.Add("  -zip={1}		Set scanning level for ZIP archives");
-					helptext.Add("  -ud, --update-dat	Output updated DAT");
 					helptext.Add("");
 					helptext.Add("Archive scanning levels:");
 					helptext.Add("  0	Hash archive and contents");
