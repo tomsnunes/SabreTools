@@ -12,6 +12,8 @@ namespace SabreTools.Helper
 	/// </summary>
 	public class DatToolsHash
 	{
+		#region DAT Parsing
+
 		/// <summary>
 		/// Parse a DAT and return all found games and roms within
 		/// </summary>
@@ -1380,6 +1382,10 @@ namespace SabreTools.Helper
 			return datdata;
 		}
 
+		#endregion
+
+		#region Bucketing methods
+
 		/// <summary>
 		/// Take an arbitrarily ordered List and return a Dictionary sorted by Game
 		/// </summary>
@@ -1456,5 +1462,82 @@ namespace SabreTools.Helper
 
 			return sortable;
 		}
+
+		/// <summary>
+		/// Take an arbitrarily ordered List and return a Dictionary sorted by size and hash
+		/// </summary>
+		/// <param name="list">Input unsorted list</param>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		/// <returns>SortedDictionary bucketed by size and hash</returns>
+		public static SortedDictionary<string, List<HashData>> BucketByHashSize(List<HashData> list, bool mergeroms, bool norename, Logger logger, bool output = true)
+		{
+			Dictionary<string, List<HashData>> dict = new Dictionary<string, List<HashData>>();
+			dict.Add("key", list);
+			return BucketByHashSize(dict, mergeroms, norename, logger, output);
+		}
+
+		/// <summary>
+		/// Take an arbitrarily bucketed Dictionary and return one sorted by size and hash
+		/// </summary>
+		/// <param name="dict">Input unsorted dictionary</param>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		/// <returns>SortedDictionary bucketed by size and hash</returns>
+		public static SortedDictionary<string, List<HashData>> BucketByHashSize(IDictionary<string, List<HashData>> dict, bool mergeroms, bool norename, Logger logger, bool output = true)
+		{
+			SortedDictionary<string, List<HashData>> sortable = new SortedDictionary<string, List<HashData>>();
+			long count = 0;
+
+			// If we have a null dict or an empty one, output a new dictionary
+			if (dict == null || dict.Count == 0)
+			{
+				return sortable;
+			}
+
+			// Process each all of the roms
+			foreach (List<HashData> hashes in dict.Values)
+			{
+				List<HashData> newhashes = hashes;
+				if (mergeroms)
+				{
+					newhashes = RomTools.Merge(newhashes, logger);
+				}
+
+				foreach (HashData hash in newhashes)
+				{
+					count++;
+					string key = hash.Size + "-" + BitConverter.ToString(hash.CRC).Replace("-", string.Empty);
+					if (sortable.ContainsKey(key))
+					{
+						sortable[key].Add(hash);
+					}
+					else
+					{
+						List<HashData> temp = new List<HashData>();
+						temp.Add(hash);
+						sortable.Add(key, temp);
+					}
+				}
+			}
+
+			// Output the count if told to
+			if (output)
+			{
+				logger.User("A total of " + count + " file hashes will be written out to file");
+			}
+
+			return sortable;
+		}
+
+		#endregion
+
+		#region Converting and updating
+
+		#endregion
 	}
 }

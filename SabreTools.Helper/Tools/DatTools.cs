@@ -7,8 +7,13 @@ using System.Xml;
 
 namespace SabreTools.Helper
 {
+	/// <summary>
+	/// DAT manipulation tools that rely on Rom and related structs
+	/// </summary>
 	public class DatTools
 	{
+		#region DAT Parsing
+
 		/// <summary>
 		/// Get what type of DAT the input file is
 		/// </summary>
@@ -1422,6 +1427,10 @@ namespace SabreTools.Helper
 			return datdata;
 		}
 
+		#endregion
+
+		#region Bucketing methods
+
 		/// <summary>
 		/// Take an arbitrarily ordered List and return a Dictionary sorted by Game
 		/// </summary>
@@ -1569,6 +1578,10 @@ namespace SabreTools.Helper
 
 			return sortable;
 		}
+
+		#endregion
+
+		#region Converting and updating
 
 		/// <summary>
 		/// Convert, update, and filter a DAT file
@@ -2280,5 +2293,7 @@ namespace SabreTools.Helper
 				Output.WriteDatfile(userData, outdir, logger);
 			}
 		}
+
+		#endregion
 	}
 }
