@@ -328,6 +328,15 @@ CREATE TABLE IF NOT EXISTS data (
 		/// <summary>
 		/// Populate or refresh the database information
 		/// </summary>
+		/// <remarks>
+		/// Even though I already wrote a bunch of code here, I think this needs improvement
+		/// The process for figuring out what needs updating should be easy:
+		///		- Get a list of DAT hashes from the database
+		///		- Get a list of DAT hashes from the folder
+		///		- Figure out what DATs are new and which are no longer around
+		///		- Remove references in the keyvault to the no-longer-arounds
+		///		- Add only new DATs
+		/// </remarks>
 		private void RefreshDatabase()
 		{
 			// Make sure the db is set
@@ -357,18 +366,40 @@ CREATE TABLE IF NOT EXISTS data (
 			}
 
 			// Now create a new structure to replace the database
-			List<Tuple<int, string, string>> keyvault = new List<Tuple<int, string, string>>();
+			Dictionary<Hash, List<string>> keyvault = new Dictionary<Hash, List<string>>();
 
-			// Now parse the directory into an internal Dat then insert
-			int i = 0;
+			// Now parse the directory into an internal structure
+			int i = 0; // Dat number
 			foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
 			{
 				Dat datdata = new Dat();
-				datdata = DatTools.Parse(file, 0, 0, datdata, _logger);
+				datdata = DatTools.Parse(file, i, i, datdata, _logger);
 				Rom romdata = FileTools.GetSingleFileInfo(file);
 
-				// Loop through the entire deduped DAT and add to the structure
+				// Loop through the entire DAT and add to the structure
+				foreach (List<Rom> roms in datdata.Files.Values)
+				{
+					List<Rom> newroms = RomTools.Merge(roms, _logger);
+					foreach (Rom rom in roms)
+					{
+						if (keyvault.ContainsKey(rom.HashData))
+						{
+							keyvault[rom.HashData].Add(romdata.HashData.SHA1);
+						}
+						else
+						{
+							List<string> temp = new List<string>();
+							temp.Add(romdata.HashData.SHA1);
+							keyvault.Add(rom.HashData, temp);
+						}
+					}
+				}
+
+				// Increment the DAT number
+				i++;
 			}
+
+			// Now that we have the structure, we can create a new database
 		}
 	}
 }
