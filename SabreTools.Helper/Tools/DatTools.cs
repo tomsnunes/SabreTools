@@ -1664,7 +1664,6 @@ namespace SabreTools.Helper
 				}
 
 				// Create a dictionary of all ROMs from the input DATs
-				datdata.FileName = datdata.Description;
 				Dat userData;
 				List<Dat> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, softlist, outputDirectory, datdata, out userData, logger);
 

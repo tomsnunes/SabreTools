@@ -416,6 +416,11 @@ namespace SabreTools
 			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
 			bool success = dfd.Start();
 
+			/*
+			// For DFDParallel only
+			Output.WriteDatfile(dfd.DatData, "", _logger);
+			*/
+
 			// If we failed, show the help
 			if (!success)
 			{

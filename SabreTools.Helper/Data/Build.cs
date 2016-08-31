@@ -130,8 +130,8 @@ namespace SabreTools.Helper
 					helptext.Add("  -st, --stats		Get statistics on all input DATs");
 					helptext.Add("	-si, --single		Show individual statistics");
 					helptext.Add("  -ud, --update		Update a DAT file");
-					helptext.Add("	-oc, --output-cmp	Output in CMP format");
-					helptext.Add("	-om, --output-miss	Output in Missfile format");
+					helptext.Add("	-oc, --output-cmp	Output in CMP format (except cascade)");
+					helptext.Add("	-om, --output-miss	Output in Missfile format (except cascade)");
 					helptext.Add("	  -r, --roms			Output roms to miss instead of sets");
 					helptext.Add("	  -gp, --game-prefix		Add game name as a prefix");
 					helptext.Add("	  -pre=, --prefix=		Set prefix for all lines");
@@ -142,9 +142,9 @@ namespace SabreTools.Helper
 					helptext.Add("	  -ro, --romba			Output in Romba format (requires SHA-1)");
 					helptext.Add("	  -tsv, --tsv			Output in Tab-Separated Value format");
 					helptext.Add("	  -csv, --csv			Output in Comma-Separated Value format");
-					helptext.Add("	-or, --output-rc	Output in RomCenter format");
-					helptext.Add("	-os, --output-sd	Output in SabreDAT format");
-					helptext.Add("	-ox, --output-xml	Output in Logiqx XML format");
+					helptext.Add("	-or, --output-rc	Output in RomCenter format (except cascade)");
+					helptext.Add("	-os, --output-sd	Output in SabreDAT format (except cascade)");
+					helptext.Add("	-ox, --output-xml	Output in Logiqx XML format (except cascade)");
 					helptext.Add("	-f=, --filename=	Set a new filename");
 					helptext.Add("	-n=, --name=		Set a new internal name");
 					helptext.Add("	-de=, --desc=		Set a new description");
