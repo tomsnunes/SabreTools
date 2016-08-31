@@ -78,7 +78,7 @@ This section is for tools that have been requested for a highly specific purpose
 
 <!-- <b>There are no standalone tools that are for power users at this time.</b> -->
 
-<b>TGZTest</b>
+<b>TGZConvert</b>
 <p/>
 A simple tool to convert a folder to TGZ, optionally to a specific folder.
 <ul>
