@@ -1035,13 +1035,14 @@ namespace SabreTools.Helper
 									tempname = String.Join("\\", parent) + "\\" + tempname;
 								}
 
-								while (software || subreader.Read())
+								while (software || !subreader.EOF)
 								{
 									software = false;
 
 									// We only want elements
 									if (subreader.NodeType != XmlNodeType.Element)
 									{
+										subreader.Read();
 										continue;
 									}
 
@@ -1178,6 +1179,10 @@ namespace SabreTools.Helper
 											{
 												logger.Log("Rom was not added: '" + xtr.GetAttribute("name") + "'");
 											}
+											subreader.Read();
+											break;
+										default:
+											subreader.Read();
 											break;
 									}
 								}
