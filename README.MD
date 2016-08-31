@@ -78,6 +78,10 @@ This section is for tools that have been requested for a highly specific purpose
 
 <!-- <b>There are no standalone tools that are for power users at this time.</b> -->
 
+<b>RombaSharp</b>
+<p/>
+An in-progress tool that will try to act as a C# port of the Go-based Romba program. All features that are not already a part of SabreTools will be attempted to be added to this program. It is NOT ready for use yet.
+
 <b>TGZConvert</b>
 <p/>
 A simple tool to convert a folder to TGZ, optionally to a specific folder.
