@@ -1790,8 +1790,12 @@ namespace SabreTools.Helper
 
 					// Reset the header values so the next can be captured
 					Dictionary<string, List<Rom>> temp = userData.Files;
-					userData = new Dat();
-					userData.Files = temp;
+					userData = new Dat
+					{
+						OutputFormat = (inputDat.OutputFormat != OutputFormat.None ? inputDat.OutputFormat : OutputFormat.None),
+						Files = temp,
+						MergeRoms = inputDat.MergeRoms,
+					};
 				}
 			}
 
