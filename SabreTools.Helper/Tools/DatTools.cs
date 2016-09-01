@@ -1773,6 +1773,7 @@ namespace SabreTools.Helper
 			int i = 0;
 			userData = new Dat
 			{
+				OutputFormat = (inputDat.OutputFormat != OutputFormat.None ? inputDat.OutputFormat : OutputFormat.None),
 				Files = new Dictionary<string, List<Rom>>(),
 				MergeRoms = inputDat.MergeRoms,
 			};
