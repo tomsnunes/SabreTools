@@ -17,13 +17,13 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
 		/// <param name="stats">True if DAT statistics should be output on write, false otherwise (default)</param>
+		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
 		/// <remarks>
 		/// The following features have been requested for file output:
 		/// - Have the ability to strip special (non-ASCII) characters from rom information
-		/// - Add a flag for ignoring roms with blank sizes
 		/// </remarks>
-		public static bool WriteDatfile(Dat datdata, string outDir, Logger logger, bool norename = true, bool stats = false)
+		public static bool WriteDatfile(Dat datdata, string outDir, Logger logger, bool norename = true, bool stats = false, bool ignoreblanks = false)
 		{
 			// If the DAT has no output format, default to XML
 			if (datdata.OutputFormat == OutputFormat.None)
@@ -145,7 +145,7 @@ namespace SabreTools.Helper
 						}
 
 						// Now, output the rom data
-						WriteRomData(sw, rom, lastgame, datdata, depth, logger);
+						WriteRomData(sw, rom, lastgame, datdata, depth, logger, ignoreblanks);
 
 						// Set the new data to compare against
 						splitpath = newsplit;
@@ -418,9 +418,16 @@ namespace SabreTools.Helper
 		/// <param name="datdata">DatData object representing DAT information</param>
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		public static bool WriteRomData(StreamWriter sw, Rom rom, string lastgame, Dat datdata, int depth, Logger logger)
+		public static bool WriteRomData(StreamWriter sw, Rom rom, string lastgame, Dat datdata, int depth, Logger logger, bool ignoreblanks = false)
 		{
+			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
+			if (ignoreblanks && (rom.HashData.Size == 0 || rom.HashData.Size == -1))
+			{
+				return true;
+			}
+
 			try
 			{
 				string state = "";
