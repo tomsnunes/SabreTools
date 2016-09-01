@@ -25,6 +25,12 @@ namespace SabreTools.Helper
 		/// </remarks>
 		public static bool WriteDatfile(Dat datdata, string outDir, Logger logger, bool norename = true, bool stats = false)
 		{
+			// If the DAT has no output format, default to XML
+			if (datdata.OutputFormat == OutputFormat.None)
+			{
+				datdata.OutputFormat = OutputFormat.Xml;
+			}
+
 			// Output initial statistics, for kicks
 			if (stats)
 			{
