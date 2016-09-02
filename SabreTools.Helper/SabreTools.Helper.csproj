@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Constants.cs" />
+    <Compile Include="External\OptimizedCRC.cs" />
     <Compile Include="Resources\Resources.de-DE.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -108,7 +109,6 @@
     <Compile Include="Skippers.cs" />
     <Compile Include="Tools\DatToolsHash.cs" />
     <Compile Include="Tools\FileTools.cs" />
-    <Compile Include="Tools\CRC32.cs" />
     <Compile Include="Tools\DBTools.cs" />
     <Compile Include="Data\Enums.cs" />
     <Compile Include="Interfaces\IGenerate.cs" />

@@ -1,4 +1,4 @@
-﻿using DamienG.Security.Cryptography;
+﻿using CRC32;
 using SharpCompress.Archive;
 using SharpCompress.Archive.SevenZip;
 using SharpCompress.Common;
@@ -608,7 +608,7 @@ namespace SabreTools.Helper
 
 			try
 			{
-				using (Crc32 crc = new Crc32())
+				using (OptimizedCRC crc = new OptimizedCRC())
 				using (MD5 md5 = MD5.Create())
 				using (SHA1 sha1 = SHA1.Create())
 				using (FileStream fs = File.OpenRead(input))
@@ -623,7 +623,7 @@ namespace SabreTools.Helper
 					int read;
 					while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
 					{
-						crc.TransformBlock(buffer, 0, read, buffer, 0);
+						crc.Update(buffer, 0, read);
 						if (!noMD5)
 						{
 							md5.TransformBlock(buffer, 0, read, buffer, 0);
@@ -634,8 +634,8 @@ namespace SabreTools.Helper
 						}
 					}
 
-					crc.TransformFinalBlock(buffer, 0, 0);
-					rom.HashData.CRC = BitConverter.ToString(crc.Hash).Replace("-", "").ToLowerInvariant();
+					crc.Update(buffer, 0, 0);
+					rom.HashData.CRC = crc.Value.ToString("X8").ToLowerInvariant();
 
 					if (!noMD5)
 					{
