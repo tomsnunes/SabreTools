@@ -12,18 +12,19 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Ensure that the databse exists and has the proper schema
 		/// </summary>
+		/// <param name="type">Schema type to use</param>
 		/// <param name="db">Name of the databse</param>
 		/// <param name="connectionString">Connection string for SQLite</param>
-		public static void EnsureDatabase(string db, string connectionString)
+		public static void EnsureDatabase(string type, string db, string connectionString)
 		{
+			// Set the type to lowercase
+			type = type.ToLowerInvariant();
+
 			// Make sure the file exists
 			if (!File.Exists(db))
 			{
 				SqliteConnection.CreateFile(db);
 			}
-
-			//Get "type" from the filename
-			string type = Path.GetFileNameWithoutExtension(db);
 
 			// Connect to the file
 			SqliteConnection dbc = new SqliteConnection(connectionString);
@@ -32,7 +33,18 @@ namespace SabreTools.Helper
 			// Make sure the database has the correct schema
 			try
 			{
-				if (type == "Headerer")
+				if (type == "rombasharp")
+				{
+					string query = @"
+CREATE TABLE IF NOT EXISTS data (
+'id'	INTEGER		NOT NULL
+'key'	TEXT		NOT NULL
+'value'	TEXT		NOT NULL
+)";
+					SqliteCommand slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+				}
+				else if (type == "headerer")
 				{
 					string query = @"
 CREATE TABLE IF NOT EXISTS data (

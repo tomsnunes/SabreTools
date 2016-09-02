@@ -33,6 +33,7 @@ namespace SabreTools
 
 		// Other private variables
 		private string _config = "config.xml";
+		private string _dbSchema = "rombasharp";
 		private string _connectionString;
 		private Logger _logger;
 
@@ -45,7 +46,7 @@ namespace SabreTools
 			_logger = logger;
 
 			InitializeConfiguration();
-			InitializeDatabase();
+			DBTools.EnsureDatabase(_dbSchema, _db, _connectionString);
 		}
 
 		public static void Main(string[] args)
@@ -278,51 +279,6 @@ namespace SabreTools
 			_connectionString = connectionString;
 			_depots = depots;
 			_port = port;
-		}
-
-		/// <summary>
-		/// Initialize the Romba database
-		/// </summary>
-		private void InitializeDatabase()
-		{
-			// Make sure the db is set
-			if (String.IsNullOrEmpty(_db))
-			{
-				_db = "db.sqlite";
-				_connectionString = "Data Source=" + _db + ";Version = 3;";
-			}
-
-			// Make sure the file exists
-			if (!File.Exists(_db))
-			{
-				SqliteConnection.CreateFile(_db);
-			}
-
-			// Connect to the file
-			SqliteConnection dbc = new SqliteConnection(_connectionString);
-			dbc.Open();
-
-			// Initialize the database schema
-			try
-			{
-				string query = @"
-CREATE TABLE IF NOT EXISTS data (
-'id'	INTEGER		NOT NULL
-'key'	TEXT		NOT NULL
-'value'	TEXT		NOT NULL
-)";
-				SqliteCommand slc = new SqliteCommand(query, dbc);
-				slc.ExecuteNonQuery();
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex);
-			}
-			finally
-			{
-				// Close the database connection
-				dbc.Close();
-			}
 		}
 
 		/// <summary>

@@ -25,7 +25,7 @@ namespace SabreTools
 			{
 				Directory.CreateDirectory(_outroot);
 			}
-			DBTools.EnsureDatabase(_dbName, _connectionString);
+			DBTools.EnsureDatabase(_dbSchema, _dbName, _connectionString);
 
 			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{

@@ -17,6 +17,7 @@ namespace SabreTools
 		private Logger _logger;
 
 		// Private required variables
+		private static string _dbSchema = "Headerer";
 		private static string _dbName = "Headerer.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
 
@@ -48,7 +49,7 @@ namespace SabreTools
 			// Perform initial setup and verification
 			Logger logger = new Logger(true, "headerer.log");
 			logger.Start();
-			DBTools.EnsureDatabase(_dbName, _connectionString);
+			DBTools.EnsureDatabase(_dbSchema, _dbName, _connectionString);
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
