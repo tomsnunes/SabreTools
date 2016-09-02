@@ -34,36 +34,6 @@ namespace SabreTools
 			// Get the XML text reader for the configuration file, if possible
 			XmlTextReader xtr = DatTools.GetXmlTextReader(_config, _logger);
 
-			/* XML file structure
-
-			<romba>
-				<general>
-					<workers>4</workers>
-					<logdir>logs</logdir>
-					<tmpdir>tmp</tmpdir>
-					<webdir>web</web>
-					<baddir>bad</baddir>
-					<verbosity>1</verbosity>
-					<cores>4</cores>
-				</general>
-				<index>
-					<dats>dats</dats>
-					<db>db</db>
-				</index>
-				<depots>
-					<depot>
-						<root>depot</root>
-						<maxsize>40000</maxsize>
-						<online>true</online>
-					</depot>
-				</depots>
-				<server>
-					<port>4003</port>
-				</server>
-			</romba>
-
-			*/
-
 			// Now parse the XML file for settings
 			if (xtr != null)
 			{
