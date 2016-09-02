@@ -276,6 +276,17 @@ namespace SabreTools
 					File.CreateText(Path.Combine(key, ".romba_size"));
 					File.CreateText(Path.Combine(key, ".romba_size.backup"));
 				}
+				else
+				{
+					if (!File.Exists(Path.Combine(key, ".romba_size")))
+					{
+						File.CreateText(Path.Combine(key, ".romba_size"));
+					}
+					if (!File.Exists(Path.Combine(key, ".romba_size.backup")))
+					{
+						File.CreateText(Path.Combine(key, ".romba_size.backup"));
+					}
+				}
 			}
 			if (port < 0)
 			{
