@@ -114,16 +114,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.fr-FR.resx</DependentUpon>
     </Compile>
-    <Compile Include="Skippers.cs" />
+    <Compile Include="Skippers\Skippers.cs" />
     <Compile Include="Tools\DatToolsHash.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\DBTools.cs" />
     <Compile Include="Data\Enums.cs" />
     <Compile Include="Interfaces\IGenerate.cs" />
     <Compile Include="Interfaces\IImport.cs" />
-    <Compile Include="Logger.cs" />
+    <Compile Include="Objects\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Mappings.cs" />
+    <Compile Include="Mappings\Mappings.cs" />
     <Compile Include="Tools\DatTools.cs" />
     <Compile Include="Data\Structs.cs" />
     <Compile Include="Tools\FileToolsHash.cs" />
