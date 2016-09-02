@@ -423,11 +423,18 @@ namespace SabreTools
 						}
 					}
 				}
-			}
 
-			// At this point, we should have everything that needs to be added, added
-			// Now we have to remove any files associated with Dats that are no longer
-			// around.
+				// Now loop through and remove all references to old Dats
+				// TODO: Remove orphaned files as well
+				foreach (string dathash in databaseDats)
+				{
+					query = "DELETE FROM data WHERE key=\"dat\" AND value=\"" + dathash + "\"";
+					using (SqliteCommand slc = new SqliteCommand(query, dbc))
+					{
+						slc.ExecuteNonQuery();
+					}
+				}
+			}
 		}
 	}
 }
