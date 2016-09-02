@@ -150,12 +150,12 @@ namespace SabreTools
 			switch (type)
 			{
 				case DatType.Good:
-					if (!Remapping.DatMaps["Good"].ContainsKey(fileinfo[1].Value))
+					if (!Mappings.DatMaps["Good"].ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection goodInfo = Regex.Match(Remapping.DatMaps["Good"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection goodInfo = Regex.Match(Mappings.DatMaps["Good"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = goodInfo[1].Value;
 					system = goodInfo[2].Value;
@@ -163,12 +163,12 @@ namespace SabreTools
 					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					break;
 				case DatType.MAME:
-					if (!Remapping.DatMaps["MAME"].ContainsKey(fileinfo[1].Value))
+					if (!Mappings.DatMaps["MAME"].ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection mameInfo = Regex.Match(Remapping.DatMaps["MAME"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection mameInfo = Regex.Match(Mappings.DatMaps["MAME"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = mameInfo[1].Value;
 					system = mameInfo[2].Value;
@@ -176,12 +176,12 @@ namespace SabreTools
 					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					break;
 				case DatType.MaybeIntro:
-					if (!Remapping.DatMaps["MaybeIntro"].ContainsKey(fileinfo[1].Value))
+					if (!Mappings.DatMaps["MaybeIntro"].ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection maybeIntroInfo = Regex.Match(Remapping.DatMaps["MaybeIntro"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection maybeIntroInfo = Regex.Match(Mappings.DatMaps["MaybeIntro"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = maybeIntroInfo[1].Value;
 					system = maybeIntroInfo[2].Value;
@@ -191,12 +191,12 @@ namespace SabreTools
 					date = miDateInfo[1].Value + "-" + miDateInfo[2].Value + "-" + miDateInfo[3].Value + " 00:00:00";
 					break;
 				case DatType.NoIntro:
-					if (!Remapping.DatMaps["NoIntro"].ContainsKey(fileinfo[1].Value))
+					if (!Mappings.DatMaps["NoIntro"].ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection nointroInfo = Regex.Match(Remapping.DatMaps["NoIntro"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection nointroInfo = Regex.Match(Mappings.DatMaps["NoIntro"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = nointroInfo[1].Value;
 					system = nointroInfo[2].Value;
@@ -220,12 +220,12 @@ namespace SabreTools
 					}
 					break;
 				case DatType.NonGood:
-					if (!Remapping.DatMaps["NonGood"].ContainsKey(fileinfo[1].Value))
+					if (!Mappings.DatMaps["NonGood"].ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection nonGoodInfo = Regex.Match(Remapping.DatMaps["NonGood"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection nonGoodInfo = Regex.Match(Mappings.DatMaps["NonGood"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = nonGoodInfo[1].Value;
 					system = nonGoodInfo[2].Value;
@@ -233,18 +233,18 @@ namespace SabreTools
 					date = File.GetLastWriteTime(_filepath).ToString("yyyy-MM-dd HH:mm:ss");
 					break;
 				case DatType.Redump:
-					if (!Remapping.DatMaps["Redump"].ContainsKey(fileinfo[1].Value))
+					if (!Mappings.DatMaps["Redump"].ContainsKey(fileinfo[1].Value))
 					{
 						// Handle special case mappings found only in Redump
 						fileinfo = Regex.Match(filename, Constants.RedumpBiosPattern).Groups;
 
-						if (!Remapping.DatMaps["Redump"].ContainsKey(fileinfo[1].Value))
+						if (!Mappings.DatMaps["Redump"].ContainsKey(fileinfo[1].Value))
 						{
 							_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 							return false;
 						}
 					}
-					GroupCollection redumpInfo = Regex.Match(Remapping.DatMaps["Redump"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection redumpInfo = Regex.Match(Mappings.DatMaps["Redump"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = redumpInfo[1].Value;
 					system = redumpInfo[2].Value;
@@ -264,23 +264,23 @@ namespace SabreTools
 					
 					break;
 				case DatType.TOSEC:
-					if (!Remapping.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
+					if (!Mappings.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
 					{
 						// Handle special case mappings found only in TOSEC
 						fileinfo = Regex.Match(filename, Constants.TosecSpecialPatternA).Groups;
 
-						if (!Remapping.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
+						if (!Mappings.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
 						{
 							fileinfo = Regex.Match(filename, Constants.TosecSpecialPatternB).Groups;
 
-							if (!Remapping.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
+							if (!Mappings.DatMaps["TOSEC"].ContainsKey(fileinfo[1].Value))
 							{
 								_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 								return false;
 							}
 						}
 					}
-					GroupCollection tosecInfo = Regex.Match(Remapping.DatMaps["TOSEC"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection tosecInfo = Regex.Match(Mappings.DatMaps["TOSEC"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = tosecInfo[1].Value;
 					system = tosecInfo[2].Value;
@@ -290,12 +290,12 @@ namespace SabreTools
 					date = toDateInfo[1].Value + "-" + toDateInfo[2].Value + "-" + toDateInfo[3].Value + " 00:00:00";
 					break;
 				case DatType.TruRip:
-					if (!Remapping.DatMaps["TruRip"].ContainsKey(fileinfo[1].Value))
+					if (!Mappings.DatMaps["TruRip"].ContainsKey(fileinfo[1].Value))
 					{
 						_logger.Warning("The filename " + fileinfo[1].Value + " could not be mapped! Please check the mappings and try again");
 						return false;
 					}
-					GroupCollection truripInfo = Regex.Match(Remapping.DatMaps["TruRip"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
+					GroupCollection truripInfo = Regex.Match(Mappings.DatMaps["TruRip"][fileinfo[1].Value], Constants.RemappedPattern).Groups;
 
 					manufacturer = truripInfo[1].Value;
 					system = truripInfo[2].Value;
@@ -366,31 +366,31 @@ namespace SabreTools
 			}
 
 			// Get all roms that are found in the DAT to see what needs to be added
-			DatData datdata = new DatData();
+			Dat datdata = new Dat();
 			datdata = DatTools.Parse(_filepath, sysid, srcid, datdata, _logger);
 
 			// Sort inputted roms into games
-			SortedDictionary<string, List<RomData>> sortable = new SortedDictionary<string, List<RomData>>();
+			SortedDictionary<string, List<Rom>> sortable = new SortedDictionary<string, List<Rom>>();
 			long count = 0;
-			foreach (List<RomData> roms in datdata.Roms.Values)
+			foreach (List<Rom> roms in datdata.Files.Values)
 			{
-				List<RomData> newroms = roms;
+				List<Rom> newroms = roms;
 				if (datdata.MergeRoms)
 				{
 					newroms = RomTools.Merge(newroms, _logger);
 				}
 
-				foreach (RomData rom in newroms)
+				foreach (Rom rom in newroms)
 				{
 					count++;
-					string key = rom.SystemID.ToString().PadLeft(10, '0') + "-" + rom.SourceID.ToString().PadLeft(10, '0') + "-" + rom.Game.ToLowerInvariant();
+					string key = rom.Metadata.SystemID.ToString().PadLeft(10, '0') + "-" + rom.Metadata.SourceID.ToString().PadLeft(10, '0') + "-" + rom.Machine.Name.ToLowerInvariant();
 					if (sortable.ContainsKey(key))
 					{
 						sortable[key].Add(rom);
 					}
 					else
 					{
-						List<RomData> temp = new List<RomData>();
+						List<Rom> temp = new List<Rom>();
 						temp.Add(rom);
 						sortable.Add(key, temp);
 					}
@@ -400,7 +400,7 @@ namespace SabreTools
 			// Loop over all roms, checking for adds
 			foreach (string key in sortable.Keys)
 			{
-				List<RomData> roms = sortable[key];
+				List<Rom> roms = sortable[key];
 				RomTools.Sort(roms, true);
 
 				long gameid = -1;
@@ -409,9 +409,9 @@ namespace SabreTools
 					dbc.Open();
 
 					// For each game, check for a new ID
-					gameid = AddGame(sysid, roms[0].Game, srcid, dbc);
+					gameid = AddGame(sysid, roms[0].Machine.Name, srcid, dbc);
 
-					foreach (RomData rom in roms)
+					foreach (Rom rom in roms)
 					{
 						// BEGIN COMMENT
 						// Try to add the rom with the game information
@@ -492,12 +492,12 @@ namespace SabreTools
 		/// <summary>
 		/// Add a file to the database if it doesn't already exist
 		/// </summary>
-		/// <param name="rom">RomData object representing the rom</param>
+		/// <param name="rom">Rom object representing the rom</param>
 		/// <param name="gameid">ID of the parent game to be mapped to</param>
 		/// <param name="date">Last updated date</param>
 		/// <param name="dbc">SQLite database connection to use</param>
 		/// <returns>True if the file exists or could be added, false on error</returns>
-		private bool AddRom(RomData rom, long gameid, string date, SqliteConnection dbc)
+		private bool AddRom(Rom rom, long gameid, string date, SqliteConnection dbc)
 		{
 			// WOD origninally stripped out any subdirs from the imported files, we do the same
 			rom.Name = Path.GetFileName(rom.Name);
@@ -507,9 +507,9 @@ namespace SabreTools
 			rom.Name = Style.RussianToLatin(rom.Name);
 			rom.Name = Regex.Replace(rom.Name, @"(.*) \.(.*)", "$1.$2");
 
-			if (rom.Type != "rom" && rom.Type != "disk")
+			if (rom.Type != ItemType.Rom && rom.Type != ItemType.Disk)
 			{
-				rom.Type = "rom";
+				rom.Type = ItemType.Rom;
 			}
 
 			// Check to see if this exact file is in the database already
@@ -520,10 +520,10 @@ SELECT files.id FROM files
 	WHERE files.name='" + rom.Name.Replace("'", "''") + @"'
 		AND files.type='" + rom.Type + @"' 
 		AND files.setid=" + gameid +
-		" AND checksums.size=" + rom.Size +
-		" AND checksums.crc='" + rom.CRC + "'" +
-		" AND checksums.md5='" + rom.MD5 + "'" +
-		" AND checksums.sha1='" + rom.SHA1 + "'";
+		" AND checksums.size=" + rom.HashData.Size +
+		" AND checksums.crc='" + rom.HashData.CRC + "'" +
+		" AND checksums.md5='" + rom.HashData.MD5 + "'" +
+		" AND checksums.sha1='" + rom.HashData.SHA1 + "'";
 
 			using (SqliteCommand slc = new SqliteCommand(query, dbc))
 			{
@@ -536,7 +536,7 @@ SELECT files.id FROM files
 INSERT INTO files (setid, name, type, lastupdated)
 VALUES (" + gameid + ", '" + rom.Name.Replace("'", "''") + "', '" + rom.Type + "', '" + date + @"');
 INSERT INTO checksums (file, size, crc, md5, sha1)
-VALUES ((SELECT last_insertConstants.Rowid()), " + rom.Size + ", '" + rom.CRC + "'" + ", '" + rom.MD5 + "'" + ", '" + rom.SHA1 + @"');
+VALUES ((SELECT last_insertConstants.Rowid()), " + rom.HashData.Size + ", '" + rom.HashData.CRC + "'" + ", '" + rom.HashData.MD5 + "'" + ", '" + rom.HashData.SHA1 + @"');
 COMMIT;";
 						using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
 						{
@@ -559,28 +559,28 @@ COMMIT;";
 		/// <summary>
 		/// Add a hash to the database if it doesn't exist already
 		/// </summary>
-		/// <param name="rom">RomData object representing the rom</param>
+		/// <param name="rom">Rom object representing the rom</param>
 		/// <param name="sysid">System ID for the game to be added with</param>
 		/// <param name="srcid">Source ID for the game to be added with</param>
 		/// <param name="date">Last updated date</param>
 		/// <param name="dbc">SQLite database connection to use</param>
 		/// <returns>True if the hash exists or could be added, false on error</returns>
 		/// <remarks>This is currently unused. It is a test method for the new SabreTools DB schema</remarks>
-		private bool AddHash(RomData rom, int sysid, int srcid, string date, SqliteConnection dbc)
+		private bool AddHash(Rom rom, int sysid, int srcid, string date, SqliteConnection dbc)
 		{
 			// Process the game name
 
 			// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
 			string stripPattern = @"(([[(].*[\)\]] )?([^([]+))";
 			Regex stripRegex = new Regex(stripPattern);
-			Match stripMatch = stripRegex.Match(rom.Game);
-			rom.Game = stripMatch.Groups[1].Value;
+			Match stripMatch = stripRegex.Match(rom.Machine.Name);
+			rom.Machine.Name = stripMatch.Groups[1].Value;
 
 			// Run the name through the filters to make sure that it's correct
-			rom.Game = Style.NormalizeChars(rom.Game);
-			rom.Game = Style.RussianToLatin(rom.Game);
-			rom.Game = Style.SearchPattern(rom.Game);
-			rom.Game = rom.Game.Trim();
+			rom.Machine.Name = Style.NormalizeChars(rom.Machine.Name);
+			rom.Machine.Name = Style.RussianToLatin(rom.Machine.Name);
+			rom.Machine.Name = Style.SearchPattern(rom.Machine.Name);
+			rom.Machine.Name = rom.Machine.Name.Trim();
 
 			// Process the rom name
 
@@ -594,7 +594,7 @@ COMMIT;";
 
 			// Retrieve or insert the hash
 			long hashid = -1;
-			string query = "SELECT id FROM hash WHERE size=" + rom.Size + " AND crc='" + rom.CRC + "' AND md5='" + rom.MD5 + "' AND sha1='" + rom.SHA1 + "'";
+			string query = "SELECT id FROM hash WHERE size=" + rom.HashData.Size + " AND crc='" + rom.HashData.CRC + "' AND md5='" + rom.HashData.MD5 + "' AND sha1='" + rom.HashData.SHA1 + "'";
 			using (SqliteCommand slc = new SqliteCommand(query, dbc))
 			{
 				using (SqliteDataReader sldr = slc.ExecuteReader())
@@ -603,7 +603,7 @@ COMMIT;";
 					if (!sldr.HasRows)
 					{
 						query = "INSERT INTO hash (size, crc, md5, sha1)" +
-							" VALUES (" + rom.Size + ", '" + rom.CRC + "', '" + rom.MD5 + "', '" + rom.SHA1 + "')";
+							" VALUES (" + rom.HashData.Size + ", '" + rom.HashData.CRC + "', '" + rom.HashData.MD5 + "', '" + rom.HashData.SHA1 + "')";
 
 						using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
 						{
@@ -629,11 +629,11 @@ COMMIT;";
 			query = @"BEGIN;
 INSERT OR IGNORE INTO hashdata (hashid, key, value) VALUES " +
 	"(" + hashid + ", 'name', '" + rom.Name.Replace("'", "''") + "'), " +
-	"(" + hashid + ", 'game', '" + rom.Game.Replace("'", "''") + "'), " +
+	"(" + hashid + ", 'game', '" + rom.Machine.Name.Replace("'", "''") + "'), " +
 	"(" + hashid + ", 'type', '" + rom.Type + "'), " +
 	"(" + hashid + ", 'lastupdated', '" + date + @"');
-INSERT OR IGNORE INTO gamesystem (game, systemid) VALUES ('" + rom.Game.Replace("'", "''") + "', " + sysid + @");
-INSERT OR IGNORE INTO gamesource (game, sourceid) VALUES ('" + rom.Game.Replace("'", "''") + "', " + srcid + @");
+INSERT OR IGNORE INTO gamesystem (game, systemid) VALUES ('" + rom.Machine.Name.Replace("'", "''") + "', " + sysid + @");
+INSERT OR IGNORE INTO gamesource (game, sourceid) VALUES ('" + rom.Machine.Name.Replace("'", "''") + "', " + srcid + @");
 COMMIT;";
 
 			using (SqliteCommand slc = new SqliteCommand(query, dbc))

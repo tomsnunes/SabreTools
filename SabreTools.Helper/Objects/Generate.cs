@@ -153,7 +153,7 @@ namespace SabreTools
 			}
 
 			// Retrieve the list of processed roms
-			Dictionary<string, List<RomData>> dict = ProcessRoms();
+			Dictionary<string, List<Rom>> dict = ProcessRoms();
 
 			// If the output is null, nothing was found so return false
 			if (dict.Count == 0)
@@ -166,7 +166,7 @@ namespace SabreTools
 			string intname = systemname + " (" + sourcename + ")";
 			string datname = systemname + " (" + sourcename + " " + version + ")";
 
-			DatData datdata = new DatData
+			Dat datdata = new Dat
 			{
 				Name = intname,
 				Description = datname,
@@ -176,19 +176,19 @@ namespace SabreTools
 				Author = "The Wizard of DATz",
 				ForcePacking = ForcePacking.None,
 				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
-				Roms = dict,
+				Files = dict,
 			};
 
-			return Output.WriteDatfile(datdata, _outdir, _logger);
+			return DatTools.WriteDatfile(datdata, _outdir, _logger);
 		}
 
 		/// <summary>
 		/// Preprocess the rom data that is to be included in the outputted DAT
 		/// </summary>
-		/// <returns>A List of RomData objects containing all information about the files</returns>
-		public Dictionary<string, List<RomData>> ProcessRoms()
+		/// <returns>A List of Rom objects containing all information about the files</returns>
+		public Dictionary<string, List<Rom>> ProcessRoms()
 		{
-			Dictionary<string, List<RomData>> roms = new Dictionary<string, List<RomData>>();
+			Dictionary<string, List<Rom>> roms = new Dictionary<string, List<Rom>>();
 
 			// Check if we have listed sources or systems
 			bool sysmerged = (_systems == "" || _systems.Split(',').Length > 1);
@@ -236,39 +236,47 @@ JOIN checksums
 						// Retrieve and process the roms for merging
 						while (sldr.Read())
 						{
-							RomData temp = new RomData
+							Rom temp = new Rom
 							{
-								Manufacturer = sldr.GetString(0),
-								System = sldr.GetString(1),
-								SystemID = sldr.GetInt32(2),
-								Source = sldr.GetString(3),
-								URL = sldr.GetString(4),
-								SourceID = sldr.GetInt32(5),
-								Game = sldr.GetString(6),
 								Name = sldr.GetString(7),
-								Type = sldr.GetString(8),
-								Size = sldr.GetInt64(9),
-								CRC = sldr.GetString(10),
-								MD5 = sldr.GetString(11),
-								SHA1 = sldr.GetString(12),
+								Type = (sldr.GetString(8) == "disk" ? ItemType.Disk : ItemType.Rom),
+								Machine = new Machine
+								{
+									Name = sldr.GetString(6),
+									Manufacturer = sldr.GetString(0),
+								},
+								Metadata = new SourceMetadata
+								{
+									System = sldr.GetString(1),
+									SystemID = sldr.GetInt32(2),
+									Source = sldr.GetString(3),
+									SourceID = sldr.GetInt32(5),
+								},
+								HashData = new Hash
+								{
+									Size = sldr.GetInt64(9),
+									CRC = sldr.GetString(10),
+									MD5 = sldr.GetString(11),
+									SHA1 = sldr.GetString(12),
+								},
 							};
 
 							// Rename the game associated if it's still valid and we allow renames
 							if (merged && !_norename)
 							{
-								temp.Game = temp.Game +
-									(sysmerged ? " [" + temp.Manufacturer + " - " + temp.System + "]" : "") +
-									(srcmerged ? " [" + temp.Source + "]" : "");
+								temp.Machine.Name = temp.Machine.Name +
+									(sysmerged ? " [" + temp.Machine.Manufacturer + " - " + temp.Metadata.System + "]" : "") +
+									(srcmerged ? " [" + temp.Metadata.Source + "]" : "");
 							}
 
-							string key = temp.Size + "-" + temp.CRC;
+							string key = temp.HashData.Size + "-" + temp.HashData.CRC;
 							if (roms.ContainsKey(key))
 							{
 								roms[key].Add(temp);
 							}
 							else
 							{
-								List<RomData> templist = new List<RomData>();
+								List<Rom> templist = new List<Rom>();
 								templist.Add(temp);
 								roms.Add(key, templist);
 							}
@@ -336,7 +344,7 @@ JOIN source
 							// If the hash is different than the last
 							if (lastid != -1 && sldr.GetInt64(0) != lastid)
 							{
-								RomData temp = new RomData
+								Rom temp = new Rom
 								{
 									Manufacturer = manufacturer,
 									System = system,
@@ -356,7 +364,7 @@ JOIN source
 								// Rename the game associated if it's still valid and we allow renames
 								if (merged && !_norename)
 								{
-									temp.Game = temp.Game +
+									temp.Machine = temp.Machine +
 										(sysmerged ? " [" + temp.Manufacturer + " - " + temp.System + "]" : "") +
 										(srcmerged ? " [" + temp.Source + "]" : "");
 								}
@@ -368,7 +376,7 @@ JOIN source
 								}
 								else
 								{
-									List<RomData> templist = new List<RomData>();
+									List<Rom> templist = new List<Rom>();
 									templist.Add(temp);
 									roms.Add(key, templist);
 								}
@@ -427,7 +435,7 @@ JOIN source
 			string lastname = "", lastgame = "";
 			for (int i = 0; i < roms.Count; i++)
 			{
-				RomData rom = roms[i];
+				Rom rom = roms[i];
 
 				// Now relable any roms that have the same name inside of the same game
 				bool samename = false, samegame = false;
@@ -435,13 +443,13 @@ JOIN source
 				{
 					samename = (lastname == rom.Name);
 				}
-				if (rom.Game != "")
+				if (rom.Machine != "")
 				{
-					samegame = (lastgame == rom.Game);
+					samegame = (lastgame == rom.Machine);
 				}
 
 				lastname = rom.Name;
-				lastgame = rom.Game;
+				lastgame = rom.Machine;
 
 				// If the name and set are the same, rename it with whatever is different
 				if (samename && samegame)

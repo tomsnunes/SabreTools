@@ -100,13 +100,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DATFromDir.cs" />
-    <Compile Include="DATFromDirParallel.cs" />
-    <Compile Include="OfflineMerge.cs" />
-    <Compile Include="Split.cs" />
-    <Compile Include="ImportExport\GenerateTwo.cs" />
     <Compile Include="SabreTools.cs" />
-    <Compile Include="ImportExport\ImportTwo.cs" />
     <Compile Include="Partials\SabreTools_Helpers.cs" />
     <Compile Include="Partials\SabreTools_Inits.cs" />
     <Compile Include="Partials\SabreTools_Menus.cs" />

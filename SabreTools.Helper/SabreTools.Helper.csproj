@@ -86,6 +86,14 @@
   <ItemGroup>
     <Compile Include="Data\Constants.cs" />
     <Compile Include="External\OptimizedCRC.cs" />
+    <Compile Include="Objects\DATFromDir.cs" />
+    <Compile Include="Objects\DATFromDirParallel.cs" />
+    <Compile Include="Objects\Generate.cs" />
+    <Compile Include="Objects\GenerateTwo.cs" />
+    <Compile Include="Objects\Import.cs" />
+    <Compile Include="Objects\ImportTwo.cs" />
+    <Compile Include="Objects\OfflineMerge.cs" />
+    <Compile Include="Objects\Split.cs" />
     <Compile Include="Resources\Resources.de-DE.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -121,7 +129,7 @@
     <Compile Include="Tools\FileToolsHash.cs" />
     <Compile Include="Tools\RomTools.cs" />
     <Compile Include="Tools\RomToolsHash.cs" />
-    <Compile Include="Tools\Stats.cs" />
+    <Compile Include="Objects\Stats.cs" />
     <Compile Include="Tools\Style.cs" />
     <Compile Include="Data\Build.cs" />
   </ItemGroup>
@@ -164,6 +172,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Mono.Data.Sqlite.Portable.1.0.3.5\tools\Mono.Data.Sqlite.Portable.targets" Condition="Exists('..\packages\Mono.Data.Sqlite.Portable.1.0.3.5\tools\Mono.Data.Sqlite.Portable.targets')" />
   <Target Name="EnsureMonoDataSqlitePortableImported" BeforeTargets="BeforeBuild" Condition="'$(MonoDataSqlitePortableImported)' == ''">
