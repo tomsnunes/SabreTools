@@ -322,55 +322,105 @@ namespace SabreTools
 				{
 					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
-						string hash = sldr.GetString(0);
-						if (!databaseDats.Contains(hash))
+						if (sldr.HasRows)
 						{
-							databaseDats.Add(hash);
+							sldr.Read();
+							string hash = sldr.GetString(0);
+							if (!databaseDats.Contains(hash))
+							{
+								databaseDats.Add(hash);
+							}
 						}
 					}
 				}
-			}
 
-			// Now create a Dictionary of dats to parse from what's not in the database (SHA-1, Path)
-			Dictionary<string, string> toscan = new Dictionary<string, string>();
+				// Now create a Dictionary of dats to parse from what's not in the database (SHA-1, Path)
+				Dictionary<string, string> toscan = new Dictionary<string, string>();
 
-			// Loop through the datroot and add only needed files
-			foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
-			{
-				Rom dat = FileTools.GetSingleFileInfo(file);
-
-				// If the Dat isn't in the database and isn't already accounted for in the DatRoot, add it
-				if (!databaseDats.Contains(dat.HashData.SHA1) && !toscan.ContainsKey(dat.HashData.SHA1))
+				// Loop through the datroot and add only needed files
+				foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
 				{
-					toscan.Add(dat.HashData.SHA1, Path.GetFullPath(file));
-				}
-				
-				// If the Dat is in the database already, remove it to find stragglers
-				else if (databaseDats.Contains(dat.HashData.SHA1))
-				{
-					databaseDats.Remove(dat.HashData.SHA1);
-				}
-			}
+					Rom dat = FileTools.GetSingleFileInfo(file);
 
-			// Loop through the Dictionary and add all data
-			foreach (string key in toscan.Keys)
-			{
-				// Parse the Dat if possible
-				Dat tempdat = new Dat();
-				tempdat = DatTools.Parse(toscan[key], 0, 0, tempdat, _logger);
-
-				// If the Dat wasn't empty, add the information
-				if (tempdat.Files.Count != 0)
-				{
-					// Loop through the parsed entries
-					foreach (string romkey in tempdat.Files.Keys)
+					// If the Dat isn't in the database and isn't already accounted for in the DatRoot, add it
+					if (!databaseDats.Contains(dat.HashData.SHA1) && !toscan.ContainsKey(dat.HashData.SHA1))
 					{
-						// So, we have an issue. Finding each of the particular crc/md5/sha1 combinations
-						// that need to be added compared to what's already in the database is likely to
-						// be difficult with the current keyvault structure. Can we move to a non-kv since
-						// we're using a database that we are fully aware of anyway? Then we can definitely
-						// have a hash table and a dat table and a mapping between the two. Slower, but works
-						// more efficiently for my format. Get input?
+						toscan.Add(dat.HashData.SHA1, Path.GetFullPath(file));
+					}
+				
+					// If the Dat is in the database already, remove it to find stragglers
+					else if (databaseDats.Contains(dat.HashData.SHA1))
+					{
+						databaseDats.Remove(dat.HashData.SHA1);
+					}
+				}
+
+				// Loop through the Dictionary and add all data
+				foreach (string key in toscan.Keys)
+				{
+					// Parse the Dat if possible
+					Dat tempdat = new Dat();
+					tempdat = DatTools.Parse(toscan[key], 0, 0, tempdat, _logger);
+
+					// If the Dat wasn't empty, add the information
+					if (tempdat.Files.Count != 0)
+					{
+						// Loop through the parsed entries
+						foreach (string romkey in tempdat.Files.Keys)
+						{
+							foreach (Rom rom in tempdat.Files[romkey])
+							{
+								query = "SELECT id FROM data WHERE key=\"size\" AND value=\"" + rom.HashData.Size + "\" AND ("
+									+ "(key=\"crc\" AND (value=\"" + rom.HashData.CRC + "\" OR value=\"null\"))"
+									+ "AND (key=\"md5\" AND value=\"" + rom.HashData.MD5 + "\" OR value=\"null\"))"
+									+ "AND (key=\"sha1\" AND value=\"" + rom.HashData.SHA1 + "\" OR value=\"null\")))";
+								using (SqliteCommand slc = new SqliteCommand(query, dbc))
+								{
+									using (SqliteDataReader sldr = slc.ExecuteReader())
+									{
+										// If the hash exists in the database, add the dat hash for that id
+										if (sldr.HasRows)
+										{
+											sldr.Read();
+											string id = sldr.GetString(0);
+
+											string squery = "INSERT INTO data (id, key, value) VALUES (\"" + id + "\", \"dat\", \"" + key + "\")";
+											using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
+											{
+												sslc.ExecuteNonQuery();
+											}
+										}
+
+										// If it doesn't exist, add the hash and the dat hash for a new id
+										else
+										{
+											string squery = "INSERT INTO data (key, value) VALUES (\"size\", \"" + rom.HashData.Size + "\")";
+											using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
+											{
+												sslc.ExecuteNonQuery();
+											}
+
+											long id = -1;
+
+											squery = "SELECT last_insertConstants.Rowid()";
+											using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
+											{
+												id = (long)sslc.ExecuteScalar();
+											}
+
+											squery = "INSERT INTO data (id, key, value) VALUES (\"" + id + "\", \"crc\", \"" + rom.HashData.CRC + "\"),"
+												+ " (\"" + id + "\", \"md5\", \"" + rom.HashData.MD5 + "\"),"
+												+ " (\"" + id + "\", \"sha1\", \"" + rom.HashData.SHA1 + "\"),"
+												+ " (\"" + id + "\", \"dat\", \"" + key + "\")";
+											using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
+											{
+												sslc.ExecuteNonQuery();
+											}
+										}
+									}
+								}
+							}
+						}
 					}
 				}
 			}

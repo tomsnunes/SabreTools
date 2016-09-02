@@ -37,9 +37,10 @@ namespace SabreTools.Helper
 				{
 					string query = @"
 CREATE TABLE IF NOT EXISTS data (
-'id'	INTEGER		NOT NULL
-'key'	TEXT		NOT NULL
-'value'	TEXT		NOT NULL
+	'id'	INTEGER		NOT NULL
+	'key'	TEXT		NOT NULL
+	'value'	TEXT		NOT NULL
+	PRIMARY KEY (id, key, value)
 )";
 					SqliteCommand slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
