@@ -306,19 +306,19 @@ namespace SabreTools
 			bool success = true;
 			if (nodump.Files.Count > 0)
 			{
-				success &= Output.WriteDatfile(nodump, outdir, _logger);
+				success &= DatTools.WriteDatfile(nodump, outdir, _logger);
 			}
 			if (sha1.Files.Count > 0)
 			{
-				success &= Output.WriteDatfile(sha1, outdir, _logger);
+				success &= DatTools.WriteDatfile(sha1, outdir, _logger);
 			}
 			if (md5.Files.Count > 0)
 			{
-				success &= Output.WriteDatfile(md5, outdir, _logger);
+				success &= DatTools.WriteDatfile(md5, outdir, _logger);
 			}
 			if (crc.Files.Count > 0)
 			{
-				success &= Output.WriteDatfile(crc, outdir, _logger);
+				success &= DatTools.WriteDatfile(crc, outdir, _logger);
 			}
 
 			return success;
@@ -446,8 +446,8 @@ namespace SabreTools
 			}
 
 			// Then write out both files
-			bool success = Output.WriteDatfile(datdataA, outdir, _logger);
-			success &= Output.WriteDatfile(datdataB, outdir, _logger);
+			bool success = DatTools.WriteDatfile(datdataA, outdir, _logger);
+			success &= DatTools.WriteDatfile(datdataB, outdir, _logger);
 
 			return success;
 		}

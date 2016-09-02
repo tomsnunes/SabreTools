@@ -260,7 +260,7 @@ namespace SabreTools
 			}
 			else
 			{
-				Output.CleanDirectory(_tempdir);
+				FileTools.CleanDirectory(_tempdir);
 			}
 
 			// Now process all of the inputs

@@ -327,7 +327,7 @@ namespace SabreTools
 			}
 			else
 			{
-				Output.CleanDirectory(_tempdir);
+				FileTools.CleanDirectory(_tempdir);
 			}
 
 			if (_verify)
@@ -401,7 +401,7 @@ namespace SabreTools
 			// Now output the fixdat to the main folder
 			if (found)
 			{
-				Output.WriteDatfile(_matched, "", _logger, stats: true);
+				DatTools.WriteDatfile(_matched, "", _logger, stats: true);
 			}
 			else
 			{
@@ -449,7 +449,7 @@ namespace SabreTools
 			for (int i = 0; i < files.Count; i++)
 			{
 				success &= RebuildToOutputHelper(files[i], i, files.Count);
-				Output.CleanDirectory(_tempdir);
+				FileTools.CleanDirectory(_tempdir);
 			}
 
 			// Now one final delete of the temp directory
@@ -478,7 +478,7 @@ namespace SabreTools
 				_datdata.Name = "fixDat_" + _datdata.Name;
 				_datdata.Description = "fixDat_" + _datdata.Description;
 				_datdata.OutputFormat = OutputFormat.Xml;
-				Output.WriteDatfile(_datdata, "", _logger);
+				DatTools.WriteDatfile(_datdata, "", _logger);
 			}
 
 			return success;
@@ -862,7 +862,7 @@ namespace SabreTools
 					}
 
 					// Clear the temporary archive directory
-					Output.CleanDirectory(temparcdir);
+					FileTools.CleanDirectory(temparcdir);
 				}
 
 				// Then add each of the found files to the new dictionary

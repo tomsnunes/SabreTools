@@ -331,7 +331,7 @@ namespace SabreTools
 								header = sldr.GetString(0);
 
 								_logger.User("Creating reheadered file: " + file + ".new" + sub);
-								Output.AppendBytesToFile(file, file + ".new" + sub, header, string.Empty);
+								FileTools.AppendBytesToFile(file, file + ".new" + sub, header, string.Empty);
 								_logger.User("Reheadered file created!");
 							}
 						}

@@ -238,7 +238,7 @@ namespace SabreTools
 			}
 
 			// Then write out the file
-			Output.WriteDatfile(datdata, _outroot, _logger, _norename);
+			DatTools.WriteDatfile(datdata, _outroot, _logger, _norename);
 
 			return true;
 		}

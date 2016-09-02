@@ -414,7 +414,7 @@ namespace SabreTools
 
 			/*
 			// For DFDParallel only
-			Output.WriteDatfile(dfd.DatData, "", _logger);
+			DatTools.WriteDatfile(dfd.DatData, "", _logger);
 			*/
 
 			// If we failed, show the help

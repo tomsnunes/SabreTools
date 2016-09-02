@@ -114,7 +114,6 @@
     <Compile Include="Interfaces\IGenerate.cs" />
     <Compile Include="Interfaces\IImport.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="Tools\Output.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mappings.cs" />
     <Compile Include="Tools\DatTools.cs" />

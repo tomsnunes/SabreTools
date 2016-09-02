@@ -348,10 +348,10 @@ namespace SabreTools
 					Files = have,
 				};
 
-				Output.WriteDatfile(netNewData, "", _logger);
-				Output.WriteDatfile(unneededData, "", _logger);
-				Output.WriteDatfile(newMissingData, "", _logger);
-				Output.WriteDatfile(haveData, "", _logger);
+				DatTools.WriteDatfile(netNewData, "", _logger);
+				DatTools.WriteDatfile(unneededData, "", _logger);
+				DatTools.WriteDatfile(newMissingData, "", _logger);
+				DatTools.WriteDatfile(haveData, "", _logger);
 
 				return true;
 			}
@@ -421,7 +421,7 @@ namespace SabreTools
 					MergeRoms = true,
 					Files = have,
 				};
-				Output.WriteDatfile(haveData, "", _logger);
+				DatTools.WriteDatfile(haveData, "", _logger);
 
 				return true;
 			}
@@ -491,7 +491,7 @@ namespace SabreTools
 					MergeRoms = true,
 					Files = have,
 				};
-				Output.WriteDatfile(haveData, "", _logger);
+				DatTools.WriteDatfile(haveData, "", _logger);
 
 				return true;
 			}

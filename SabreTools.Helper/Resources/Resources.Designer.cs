@@ -61,7 +61,7 @@ namespace SabreTools.Helper.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is the default help output.
+        ///   Looks up a localized string similar to This is the default help DatTools.
         /// </summary>
         public static string Default_Desc {
             get {
@@ -124,7 +124,7 @@ namespace SabreTools.Helper.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Convert files to TGZ output.
+        ///   Looks up a localized string similar to Convert files to TGZ DatTools.
         /// </summary>
         public static string TGZTest_Desc {
             get {

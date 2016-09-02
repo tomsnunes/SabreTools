@@ -379,7 +379,7 @@ namespace SabreTools
 					// Clear the temp directory
 					if (Directory.Exists(tempdir))
 					{
-						Output.CleanDirectory(tempdir);
+						FileTools.CleanDirectory(tempdir);
 					}
 				}
 				// Otherwise, just get the info on the file itself

@@ -575,7 +575,7 @@ namespace SabreTools.Helper
 
 		#endregion
 
-		#region File Information Methods
+		#region File Information
 
 		/// <summary>
 		/// Retrieve file information for a single file
@@ -933,6 +933,162 @@ namespace SabreTools.Helper
 					shouldExternalProcess = (zip != ArchiveScanLevel.Internal);
 					shouldInternalProcess = (zip != ArchiveScanLevel.External);
 					break;
+			}
+		}
+
+		#endregion
+
+		#region File Manipulation
+
+		/// <summary>
+		/// Remove an arbitrary number of bytes from the inputted file
+		/// </summary>
+		/// <param name="input">File to be cropped</param>
+		/// <param name="output">Outputted file</param>
+		/// <param name="bytesToRemoveFromHead">Bytes to be removed from head of file</param>
+		/// <param name="bytesToRemoveFromTail">Bytes to be removed from tail of file</param>
+		public static void RemoveBytesFromFile(string input, string output, long bytesToRemoveFromHead, long bytesToRemoveFromTail)
+		{
+			// If any of the inputs are invalid, skip
+			if (!File.Exists(input) || new FileInfo(input).Length <= (bytesToRemoveFromHead + bytesToRemoveFromTail))
+			{
+				return;
+			}
+
+			// Read the input file and write to the fail
+			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+			using (BinaryWriter bw = new BinaryWriter(File.OpenWrite(output)))
+			{
+				int bufferSize = 1024;
+				long adjustedLength = br.BaseStream.Length - bytesToRemoveFromTail;
+
+				// Seek to the correct position
+				br.BaseStream.Seek((bytesToRemoveFromHead < 0 ? 0 : bytesToRemoveFromHead), SeekOrigin.Begin);
+
+				// Now read the file in chunks and write out
+				byte[] buffer = new byte[bufferSize];
+				while (br.BaseStream.Position <= (adjustedLength - bufferSize))
+				{
+					buffer = br.ReadBytes(bufferSize);
+					bw.Write(buffer);
+				}
+
+				// For the final chunk, if any, write out only that number of bytes
+				int length = (int)(adjustedLength - br.BaseStream.Position);
+				buffer = new byte[length];
+				buffer = br.ReadBytes(length);
+				bw.Write(buffer);
+			}
+		}
+
+		/// <summary>
+		/// Add an aribtrary number of bytes to the inputted file
+		/// </summary>
+		/// <param name="input">File to be appended to</param>
+		/// <param name="output">Outputted file</param>
+		/// <param name="bytesToAddToHead">String representing bytes to be added to head of file</param>
+		/// <param name="bytesToAddToTail">String representing bytes to be added to tail of file</param>
+		public static void AppendBytesToFile(string input, string output, string bytesToAddToHead, string bytesToAddToTail)
+		{
+			// Source: http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
+			byte[] bytesToAddToHeadArray = new byte[bytesToAddToHead.Length / 2];
+			for (int i = 0; i < bytesToAddToHead.Length; i += 2)
+			{
+				bytesToAddToHeadArray[i / 2] = Convert.ToByte(bytesToAddToHead.Substring(i, 2), 16);
+			}
+			byte[] bytesToAddToTailArray = new byte[bytesToAddToTail.Length / 2];
+			for (int i = 0; i < bytesToAddToTail.Length; i += 2)
+			{
+				bytesToAddToTailArray[i / 2] = Convert.ToByte(bytesToAddToTail.Substring(i, 2), 16);
+			}
+
+			AppendBytesToFile(input, output, bytesToAddToHeadArray, bytesToAddToTailArray);
+		}
+
+		/// <summary>
+		/// Add an aribtrary number of bytes to the inputted file
+		/// </summary>
+		/// <param name="input">File to be appended to</param>
+		/// <param name="output">Outputted file</param>
+		/// <param name="bytesToAddToHead">Bytes to be added to head of file</param>
+		/// <param name="bytesToAddToTail">Bytes to be added to tail of file</param>
+		public static void AppendBytesToFile(string input, string output, byte[] bytesToAddToHead, byte[] bytesToAddToTail)
+		{
+			// If any of the inputs are invalid, skip
+			if (!File.Exists(input))
+			{
+				return;
+			}
+
+			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+			using (BinaryWriter bw = new BinaryWriter(File.OpenWrite(output)))
+			{
+				if (bytesToAddToHead.Count() > 0)
+				{
+					bw.Write(bytesToAddToHead);
+				}
+
+				int bufferSize = 1024;
+
+				// Now read the file in chunks and write out
+				byte[] buffer = new byte[bufferSize];
+				while (br.BaseStream.Position <= (br.BaseStream.Length - bufferSize))
+				{
+					buffer = br.ReadBytes(bufferSize);
+					bw.Write(buffer);
+				}
+
+				// For the final chunk, if any, write out only that number of bytes
+				int length = (int)(br.BaseStream.Length - br.BaseStream.Position);
+				buffer = new byte[length];
+				buffer = br.ReadBytes(length);
+				bw.Write(buffer);
+
+				if (bytesToAddToTail.Count() > 0)
+				{
+					bw.Write(bytesToAddToTail);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Copy a file to a new location, creating directories as needed
+		/// </summary>
+		/// <param name="input">Input filename</param>
+		/// <param name="output">Output filename</param>
+		public static void CopyFileToNewLocation(string input, string output)
+		{
+			if (File.Exists(input) && !File.Exists(output))
+			{
+				if (!Directory.Exists(Path.GetDirectoryName(output)))
+				{
+					Directory.CreateDirectory(Path.GetDirectoryName(output));
+				}
+				File.Copy(input, output);
+			}
+		}
+
+		/// <summary>
+		/// Cleans out the temporary directory
+		/// </summary>
+		/// <param name="dirname">Name of the directory to clean out</param>
+		public static void CleanDirectory(string dirname)
+		{
+			foreach (string file in Directory.EnumerateFiles(dirname, "*", SearchOption.TopDirectoryOnly))
+			{
+				try
+				{
+					File.Delete(file);
+				}
+				catch { }
+			}
+			foreach (string dir in Directory.EnumerateDirectories(dirname, "*", SearchOption.TopDirectoryOnly))
+			{
+				try
+				{
+					Directory.Delete(dir, true);
+				}
+				catch { }
 			}
 		}
 
