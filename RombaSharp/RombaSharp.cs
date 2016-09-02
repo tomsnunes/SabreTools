@@ -277,19 +277,19 @@ namespace SabreTools
 			// Shows progress of the currently running command
 			else if (progress)
 			{
-				_logger.User("This feature is not yet implemented!");
+				_logger.User("This feature is not used in RombaSharp: progress");
 			}
 
 			// Moves DAT index entries for orphaned DATs
 			else if (purgeBackup)
 			{
-				InitPurgeBackup();
+				PurgeBackup();
 			}
 
 			// Deletes DAT index entries for orphaned DATs
 			else if (purgeDelete)
 			{
-				InitPurgeDelete();
+				PurgeDelete();
 			}
 
 			// Refreshes the DAT index from the files in the DAT master directory tree
@@ -301,7 +301,7 @@ namespace SabreTools
 			// Gracefully shuts down server
 			else if (shutdown)
 			{
-				_logger.User("This feature is not yet implemented!");
+				_logger.User("This feature is not used in RombaSharp: shutdown");
 			}
 
 			// If nothing is set, show the help

@@ -253,14 +253,47 @@ namespace SabreTools
 			_port = port;
 		}
 
+		/// <summary>
+		/// Display the statistics in the database
+		/// </summary>
+		/// <remarks>
+		/// This list of stats should include:
+		///		- Total uncompressed size of the files
+		///		- Total number of files
+		///		- Total number of files that exist
+		///		- Total number of files that don't exist
+		///		- Total number of files with CRC
+		///		- Total number of files with MD5
+		///		- Total number of files with SHA-1
+		///		- Total number of unique DAT hashes
+		/// </remarks>
 		private static void DisplayDBStats()
 		{
 			_logger.User("This feature is not yet implemented: dbstats");
 		}
 
+		/// <summary>
+		/// Display the current memory usage of the application
+		/// </summary>
 		private static void DisplayMemoryStats()
 		{
 			_logger.User("This feature is not yet implemented: memstats");
+		}
+
+		/// <summary>
+		/// Moves DAT index entries for orphaned DATs to backup folder
+		/// </summary>
+		private static void PurgeBackup()
+		{
+			_logger.User("This feature is not yet implemented: purge-backup");
+		}
+
+		/// <summary>
+		/// Deletes DAT index entries for orphaned DATs
+		/// </summary>
+		private static void PurgeDelete()
+		{
+			_logger.User("This feature is not yet implemented: purge-delete");
 		}
 
 		/// <summary>
