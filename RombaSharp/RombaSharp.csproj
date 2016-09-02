@@ -76,6 +76,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Partials\RombaSharp_Helpers.cs" />
+    <Compile Include="Partials\RombaSharp_Inits.cs" />
     <Compile Include="RombaSharp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
