@@ -88,7 +88,7 @@ namespace SabreTools.Helper.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to C#port of the Romba rom management tool.
+        ///   Looks up a localized string similar to C# port of the Romba rom management tool.
         /// </summary>
         public static string RombaSharp_Desc {
             get {

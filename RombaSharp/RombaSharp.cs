@@ -126,6 +126,10 @@ namespace SabreTools
 					case "miss":
 						miss = true;
 						break;
+					case "-only-needed":
+					case "--only-needed":
+						onlyNeeded = true;
+						break;
 					case "purge-backup":
 						purgeBackup = true;
 						break;
@@ -147,27 +151,6 @@ namespace SabreTools
 						if (temparg.StartsWith("-new=") || temparg.StartsWith("--new="))
 						{
 							newdat = temparg.Split('=')[1];
-						}
-						else if (temparg.StartsWith("-only-needed="))
-						{
-							string temp = temparg.Split('=')[1].ToLowerInvariant();
-							switch (temp)
-							{
-								case "true":
-									onlyNeeded = true;
-									break;
-								case "false":
-									onlyNeeded = false;
-									break;
-								default:
-									_logger.Error("Invalid value detected: " + temp);
-									Console.WriteLine();
-									Build.Help();
-									Console.WriteLine();
-									_logger.Error("Invalid value detected: " + temp);
-									_logger.Close();
-									return;
-							}
 						}
 						else if (temparg.StartsWith("-out=") || temparg.StartsWith("--out="))
 						{

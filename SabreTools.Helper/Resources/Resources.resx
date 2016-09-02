@@ -127,7 +127,7 @@
     <value>Headerer</value>
   </data>
   <data name="RombaSharp_Desc" xml:space="preserve">
-    <value>C#port of the Romba rom management tool</value>
+    <value>C# port of the Romba rom management tool</value>
   </data>
   <data name="RombaSharp_Name" xml:space="preserve">
     <value>RombaSharp</value>
