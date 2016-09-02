@@ -306,7 +306,7 @@ namespace SabreTools
 			if (!File.Exists(_db))
 			{
 				SqliteConnection.CreateFile(_db);
-				InitializeDatabase();
+				DBTools.EnsureDatabase(_dbSchema, _db, _connectionString);
 			}
 
 			// Make sure the dats dir is set
