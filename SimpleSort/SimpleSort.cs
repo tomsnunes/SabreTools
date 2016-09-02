@@ -1,5 +1,4 @@
 ﻿using SabreTools.Helper;
-using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
