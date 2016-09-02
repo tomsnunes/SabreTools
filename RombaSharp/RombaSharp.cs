@@ -284,15 +284,6 @@ namespace SabreTools
 		/// <summary>
 		/// Populate or refresh the database information
 		/// </summary>
-		/// <remarks>
-		/// Even though I already wrote a bunch of code here, I think this needs improvement
-		/// The process for figuring out what needs updating should be easy:
-		///		- Get a list of DAT hashes from the database
-		///		- Get a list of DAT hashes from the folder
-		///		- Figure out what DATs are new and which are no longer around
-		///		- Remove references in the keyvault to the no-longer-arounds
-		///		- Add only new DATs
-		/// </remarks>
 		private void RefreshDatabase()
 		{
 			// Make sure the db is set
@@ -320,41 +311,51 @@ namespace SabreTools
 				Directory.CreateDirectory(_dats);
 			}
 
-			// Now create a new structure to replace the database
-			Dictionary<Hash, List<string>> keyvault = new Dictionary<Hash, List<string>>();
+			// Create a List of dat hashes in the database
+			List<string> databaseDats = new List<string>();
 
-			// Now parse the directory into an internal structure
-			int i = 0; // Dat number
-			foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
+			// Populate the List from the database
+			string query = "SELECT UNIQUE value FROM data WHERE key=\"dat\"";
+			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
 			{
-				Dat datdata = new Dat();
-				datdata = DatTools.Parse(file, i, i, datdata, _logger);
-				Rom romdata = FileTools.GetSingleFileInfo(file);
-
-				// Loop through the entire DAT and add to the structure
-				foreach (List<Rom> roms in datdata.Files.Values)
+				using (SqliteCommand slc = new SqliteCommand(query, dbc))
 				{
-					List<Rom> newroms = RomTools.Merge(roms, _logger);
-					foreach (Rom rom in roms)
+					using (SqliteDataReader sldr = slc.ExecuteReader())
 					{
-						if (keyvault.ContainsKey(rom.HashData))
+						string hash = sldr.GetString(0);
+						if (!databaseDats.Contains(hash))
 						{
-							keyvault[rom.HashData].Add(romdata.HashData.SHA1);
-						}
-						else
-						{
-							List<string> temp = new List<string>();
-							temp.Add(romdata.HashData.SHA1);
-							keyvault.Add(rom.HashData, temp);
+							databaseDats.Add(hash);
 						}
 					}
 				}
-
-				// Increment the DAT number
-				i++;
 			}
 
-			// Now that we have the structure, we can create a new database
+			// Now create a Dictionary of dats to parse from what's not in the database
+			Dictionary<string, string> toscan = new Dictionary<string, string>();
+
+			// Loop through the datroot and add only needed files
+			foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
+			{
+				Rom dat = FileTools.GetSingleFileInfo(file);
+
+				// If the Dat isn't in the database and isn't already accounted for in the DatRoot, add it
+				if (!databaseDats.Contains(dat.HashData.SHA1) && !toscan.ContainsKey(dat.HashData.SHA1))
+				{
+					toscan.Add(dat.HashData.SHA1, Path.GetFullPath(file));
+				}
+				
+				// If the Dat is in the database already, remove it to find stragglers
+				else if (databaseDats.Contains(dat.HashData.SHA1))
+				{
+					databaseDats.Remove(dat.HashData.SHA1);
+				}
+			}
+
+			// At this point, we have a Dictionary of Dats that need to be added and a list of Dats that need to be removed
+			// I think for the sake of ease, adding the new Dats and then removing the old ones makes the most sense
+			// That way if any hashes are duplicates, they don't get readded. Removing is going to be a bit difficult because
+			// It means that "if there's no other dat associated with this hash" it's removed. That's hard
 		}
 	}
 }
