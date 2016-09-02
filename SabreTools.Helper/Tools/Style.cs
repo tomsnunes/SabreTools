@@ -10,6 +10,8 @@ namespace SabreTools.Helper
 	/// </summary>
 	public class Style
 	{
+		#region WoD-based String Cleaning
+
 		/// <summary>
 		/// Replace accented characters
 		/// </summary>
@@ -138,6 +140,10 @@ namespace SabreTools.Helper
 
 			return input;
 		}
+
+		#endregion
+
+		#region DAT Cleaning
 
 		/// <summary>
 		/// Generate a proper outfile name based on a DAT and output directory
@@ -280,6 +286,8 @@ namespace SabreTools.Helper
 
 			return newhash;
 		}
+
+		#endregion
 
 		#region Externally sourced methods
 
