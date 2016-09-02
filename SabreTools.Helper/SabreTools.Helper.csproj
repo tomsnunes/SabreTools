@@ -118,7 +118,9 @@
     <Compile Include="Mappings.cs" />
     <Compile Include="Tools\DatTools.cs" />
     <Compile Include="Data\Structs.cs" />
+    <Compile Include="Tools\FileToolsHash.cs" />
     <Compile Include="Tools\RomTools.cs" />
+    <Compile Include="Tools\RomToolsHash.cs" />
     <Compile Include="Tools\Stats.cs" />
     <Compile Include="Tools\Style.cs" />
     <Compile Include="Data\Build.cs" />

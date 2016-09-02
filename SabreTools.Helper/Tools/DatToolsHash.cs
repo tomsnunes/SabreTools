@@ -1428,7 +1428,7 @@ namespace SabreTools.Helper
 				List<HashData> hashes = dict[key];
 				if (mergeroms)
 				{
-					hashes = RomTools.Merge(hashes, logger);
+					hashes = RomToolsHash.Merge(hashes, logger);
 				}
 
 				foreach (HashData hash in hashes)
@@ -1505,7 +1505,7 @@ namespace SabreTools.Helper
 				List<HashData> newhashes = hashes;
 				if (mergeroms)
 				{
-					newhashes = RomTools.Merge(newhashes, logger);
+					newhashes = RomToolsHash.Merge(newhashes, logger);
 				}
 
 				foreach (HashData hash in newhashes)
