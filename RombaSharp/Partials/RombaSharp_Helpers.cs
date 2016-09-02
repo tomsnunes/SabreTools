@@ -208,7 +208,7 @@ namespace SabreTools
 				Directory.CreateDirectory(dats);
 			}
 			db = Path.GetFileNameWithoutExtension(db) + ".sqlite";
-			connectionString = "Data Source=" + _db + ";Version = 3;";
+			connectionString = "Data Source=" + db + ";Version = 3;";
 			foreach (string key in depots.Keys)
 			{
 				if (!Directory.Exists(key))
