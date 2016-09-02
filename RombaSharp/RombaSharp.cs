@@ -305,7 +305,6 @@ namespace SabreTools
 			// Make sure the file exists
 			if (!File.Exists(_db))
 			{
-				SqliteConnection.CreateFile(_db);
 				DBTools.EnsureDatabase(_dbSchema, _db, _connectionString);
 			}
 
