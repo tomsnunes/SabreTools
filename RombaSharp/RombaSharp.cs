@@ -51,6 +51,24 @@ namespace SabreTools
 
 		public static void Main(string[] args)
 		{
+			/* Commands to implement
+
+				archive			Adds ROM files from the specified directories to the ROM archive
+					-only-needed=false	only archive ROM files actually referenced by DAT files from the DAT index
+				build			For each specified DAT file it creates the torrentzip files
+				dbstats			Prints db stats
+				diffdat			Creates a DAT file with those entries that are in -new DAT
+				dir2dat			Creates a DAT file for the specified input directory and saves it to -out filename
+				fixdat			For each specified DAT file it creates a fix DAT
+				lookup			For each specified hash it looks up any available information
+				memstats		Prints memory stats
+				miss			For each specified DAT file it creates a miss file and a have file
+				progress		Shows progress of the currently running command
+				purge-backup	Moves DAT index entries for orphaned DATs
+				purge-delete	Deletes DAT index entries for orphaned DATs
+				refresh-dats	Refreshes the DAT index fro mthe files in the DAT master directory tree
+				shutdown		Gracefully shuts down server
+			*/
 		}
 
 		/// <summary>
@@ -411,7 +429,8 @@ namespace SabreTools
 											squery = "INSERT INTO data (id, key, value) VALUES (\"" + id + "\", \"crc\", \"" + rom.HashData.CRC + "\"),"
 												+ " (\"" + id + "\", \"md5\", \"" + rom.HashData.MD5 + "\"),"
 												+ " (\"" + id + "\", \"sha1\", \"" + rom.HashData.SHA1 + "\"),"
-												+ " (\"" + id + "\", \"dat\", \"" + key + "\")";
+												+ " (\"" + id + "\", \"dat\", \"" + key + "\"),"
+												+ " (\"" + id + "\", \"exists\", \"false\")";
 											using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
 											{
 												sslc.ExecuteNonQuery();
