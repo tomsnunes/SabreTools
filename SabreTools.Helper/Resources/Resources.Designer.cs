@@ -61,7 +61,7 @@ namespace SabreTools.Helper.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is the default help DatTools.
+        ///   Looks up a localized string similar to This is the default help output.
         /// </summary>
         public static string Default_Desc {
             get {
@@ -84,6 +84,24 @@ namespace SabreTools.Helper.Resources {
         public static string Headerer_Name {
             get {
                 return ResourceManager.GetString("Headerer_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to C#port of the Romba rom management tool.
+        /// </summary>
+        public static string RombaSharp_Desc {
+            get {
+                return ResourceManager.GetString("RombaSharp_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RombaSharp.
+        /// </summary>
+        public static string RombaSharp_Name {
+            get {
+                return ResourceManager.GetString("RombaSharp_Name", resourceCulture);
             }
         }
         
@@ -124,7 +142,7 @@ namespace SabreTools.Helper.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Convert files to TGZ DatTools.
+        ///   Looks up a localized string similar to Convert files to TGZ output.
         /// </summary>
         public static string TGZTest_Desc {
             get {

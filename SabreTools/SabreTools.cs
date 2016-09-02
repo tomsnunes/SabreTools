@@ -27,7 +27,7 @@ namespace SabreTools
 		private static string _datroot = "DATS";
 		private static string _outroot = "Output";
 		private static string _dbSchema = "dats";
-        private static string _dbName = "dats.sqlite";
+		private static string _dbName = "dats.sqlite";
 		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
 
 		private static Logger _logger;

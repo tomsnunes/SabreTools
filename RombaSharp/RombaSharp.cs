@@ -51,30 +51,283 @@ namespace SabreTools
 
 		public static void Main(string[] args)
 		{
-			/* Commands to implement
+			// Perform initial setup and verification
+			Logger logger = new Logger(true, "romba.log");
+			logger.Start();
 
-				archive			Adds ROM files from the specified directories to the ROM archive
-					-only-needed=false	only archive ROM files actually referenced by DAT files from the DAT index
-				build			For each specified DAT file it creates the torrentzip files
-				dbstats			Prints db stats
-				diffdat			Creates a DAT file with those entries that are in -new DAT
-				dir2dat			Creates a DAT file for the specified input directory and saves it to -out filename
-				fixdat			For each specified DAT file it creates a fix DAT
-				lookup			For each specified hash it looks up any available information
-				memstats		Prints memory stats
-				miss			For each specified DAT file it creates a miss file and a have file
-				progress		Shows progress of the currently running command
-				purge-backup	Moves DAT index entries for orphaned DATs
-				purge-delete	Deletes DAT index entries for orphaned DATs
-				refresh-dats	Refreshes the DAT index fro mthe files in the DAT master directory tree
-				shutdown		Gracefully shuts down server
-			*/
+			// If output is being redirected, don't allow clear screens
+			if (!Console.IsOutputRedirected)
+			{
+				Console.Clear();
+			}
+
+			// Credits take precidence over all
+			if ((new List<string>(args)).Contains("--credits"))
+			{
+				Build.Credits();
+				logger.Close();
+				return;
+			}
+
+			// If there's no arguments, show help
+			if (args.Length == 0)
+			{
+				Build.Help();
+				logger.Close();
+				return;
+			}
+
+			// Set all default values
+			bool help = false,
+				archive = false,
+				build = false,
+				dbstats = false,
+				diffdat = false,
+				dir2dat = false,
+				fixdat = false,
+				lookup = false,
+				memstats = false,
+				miss = false,
+				onlyNeeded = false,
+				progress = false,
+				purgeBackup = false,
+				purgeDelete = false,
+				refreshDats = false,
+				rombaSharp = true,
+				shutdown = false;
+			string newdat ="",
+				outdat = "";
+			List<string> inputs = new List<string>();
+
+			// Determine which switches are enabled (with values if necessary)
+			foreach (string arg in args)
+			{
+				switch (arg)
+				{
+					case "-?":
+					case "-h":
+					case "--help":
+						help = true;
+						break;
+					case "archive":
+						archive = true;
+						break;
+					case "build":
+						build = true;
+						break;
+					case "dbstats":
+						dbstats = true;
+						break;
+					case "diffdat":
+						diffdat = true;
+						break;
+					case "dir2dat":
+						dir2dat = true;
+						break;
+					case "fixdat":
+						fixdat = true;
+						break;
+					case "lookup":
+						lookup = true;
+						break;
+					case "memstats":
+						memstats = true;
+						break;
+					case "miss":
+						miss = true;
+						break;
+					case "purge-backup":
+						purgeBackup = true;
+						break;
+					case "purge-delete":
+						purgeDelete = true;
+						break;
+					case "progress":
+						progress = true;
+						break;
+					case "refresh-dats":
+						refreshDats = true;
+						break;
+					case "shutdown":
+						shutdown = true;
+						break;
+					default:
+						string temparg = arg.Replace("\"", "").Replace("file://", "");
+
+						if (temparg.StartsWith("-new=") || temparg.StartsWith("--new="))
+						{
+							newdat = temparg.Split('=')[1];
+						}
+						else if (temparg.StartsWith("-only-needed="))
+						{
+							string temp = temparg.Split('=')[1].ToLowerInvariant();
+							switch (temp)
+							{
+								case "true":
+									onlyNeeded = true;
+									break;
+								case "false":
+									onlyNeeded = false;
+									break;
+								default:
+									logger.Error("Invalid value detected: " + temp);
+									Console.WriteLine();
+									Build.Help();
+									Console.WriteLine();
+									logger.Error("Invalid value detected: " + temp);
+									logger.Close();
+									return;
+							}
+						}
+						else if (temparg.StartsWith("-out=") || temparg.StartsWith("--out="))
+						{
+							outdat = temparg.Split('=')[1];
+						}
+						else if (File.Exists(temparg) || Directory.Exists(temparg))
+						{
+							inputs.Add(temparg);
+						}
+						else
+						{
+							logger.Error("Invalid input detected: " + arg);
+							Console.WriteLine();
+							Build.Help();
+							Console.WriteLine();
+							logger.Error("Invalid input detected: " + arg);
+							logger.Close();
+							return;
+						}
+						break;
+				}
+			}
+
+			// If help is set, show the help screen
+			if (help)
+			{
+				Build.Help();
+				logger.Close();
+				return;
+			}
+
+			// If more than one switch is enabled, show the help screen
+			if (!(archive ^ build ^ dbstats ^ diffdat ^ dir2dat ^ fixdat ^ lookup ^ memstats ^ miss ^
+				progress ^ purgeBackup ^ purgeDelete ^ refreshDats ^ shutdown))
+			{
+				logger.Error("Only one feature switch is allowed at a time");
+				Build.Help();
+				logger.Close();
+				return;
+			}
+
+			// If a switch that requires a filename is set and no file is, show the help screen
+			if (inputs.Count == 0 && (archive || build || dir2dat || fixdat || lookup || miss))
+			{
+				logger.Error("This feature requires at least one input");
+				Build.Help();
+				logger.Close();
+				return;
+			}
+
+			// Now take care of each mode in succesion
+
+			// Adds ROM files from the specified directories to the ROM archive
+			if (archive)
+			{
+				logger.User("This feature is not yet implemented!");
+			}
+
+			// For each specified DAT file it creates the torrentzip files
+			else if (build)
+			{
+				logger.User("This feature is not yet implemented!");
+			}
+
+			// Prints db stats
+			else if (dbstats)
+			{
+				logger.User("This feature is not yet implemented!");
+			}
+
+			// Creates a DAT file with those entries that are in new DAT
+			else if (diffdat)
+			{
+				logger.User("This feature is not yet implemented!");
+			}
+
+			// Creates a DAT file for the specified input directory
+			else if (dir2dat)
+			{
+
+			}
+
+			// For each specified DAT file it creates a fix DAT
+			else if (fixdat)
+			{
+				logger.User("This feature is not yet implemented!");
+			}
+
+			// For each specified hash it looks up any available information
+			else if (lookup)
+			{
+				logger.User("This feature is not yet implemented!");
+			}
+
+			// Prints memory stats
+			else if (memstats)
+			{
+				logger.User("This feature is not yet implemented!");
+			}
+
+			// For each specified DAT file it creates a miss file and a have file
+			else if (miss)
+			{
+				logger.User("This feature is not yet implemented!");
+			}
+
+			// Shows progress of the currently running command
+			else if (progress)
+			{
+				logger.User("This feature is not yet implemented!");
+			}
+
+			// Moves DAT index entries for orphaned DATs
+			else if (purgeBackup)
+			{
+				logger.User("This feature is not yet implemented!");
+			}
+
+			// Deletes DAT index entries for orphaned DATs
+			else if (purgeDelete)
+			{
+				logger.User("This feature is not yet implemented!");
+			}
+
+			// Refreshes the DAT index from the files in the DAT master directory tree
+			else if (refreshDats)
+			{
+				RefreshDatabase();
+			}
+
+			// Gracefully shuts down server
+			else if (shutdown)
+			{
+				logger.User("This feature is not yet implemented!");
+			}
+
+			// If nothing is set, show the help
+			else
+			{
+				Build.Help();
+			}
+
+			logger.Close();
+			return;
 		}
 
 		/// <summary>
 		/// Initialize the Romba application from XML config
 		/// </summary>
-		private void InitializeConfiguration()
+		private static void InitializeConfiguration()
 		{
 			// Get default values if they're not written
 			int workers = 4,
@@ -316,7 +569,7 @@ namespace SabreTools
 		/// Populate or refresh the database information
 		/// </summary>
 		/// <remarks>Each hash has the following attributes: size, crc, md5, sha-1, dathash, existss</remarks>
-		private void RefreshDatabase()
+		private static void RefreshDatabase()
 		{
 			// Make sure the db is set
 			if (String.IsNullOrEmpty(_db))

@@ -73,6 +73,31 @@ namespace SabreTools.Helper
 			// Set the help text
 			switch (className)
 			{
+				case "RombaSharp":
+					helptext.Add(Resources.Resources.RombaSharp_Name + " - " + Resources.Resources.RombaSharp_Desc);
+					helptext.Add(barrier);
+					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.RombaSharp_Name + " [option] [filename|dirname] ...");
+					helptext.Add("");
+					helptext.Add("Options:");
+					helptext.Add("  -?, -h, --help	Show this help");
+					helptext.Add("  archive		Adds ROM files from the specified directories to the ROM archive");
+					helptext.Add("	-only-needed=(true|false)	only archive ROM files actually referenced by DAT files from the DAT index");
+					helptext.Add("  build		For each specified DAT file it creates the torrentzip files");
+					helptext.Add("  dbstats		Prints db stats");
+					helptext.Add("  diffdat		Creates a DAT file with those entries that are in a new DAT");
+					helptext.Add("	-new=			DAT to compare to");
+					helptext.Add("  dir2dat		Creates a DAT file for the specified input directory");
+					helptext.Add("	-out=			Filename to save out to");
+					helptext.Add("  fixdat		For each specified DAT file it creates a fix DAT");
+					helptext.Add("  lookup		For each specified hash it looks up any available information");
+					helptext.Add("  memstats	Prints memory stats");
+					helptext.Add("  miss		For each specified DAT file it creates a miss file and a have file");
+					helptext.Add("  progress	Shows progress of the currently running command");
+					helptext.Add("  purge-backup	Moves DAT index entries for orphaned DATs");
+					helptext.Add("  purge-delete	Deletes DAT index entries for orphaned DATs");
+					helptext.Add("  refresh-dats	Refreshes the DAT index from the files in the DAT master directory tree");
+					helptext.Add("  shutdown	Gracefully shuts down server");
+					break;
 				case "SabreTools":
 					helptext.Add(Resources.Resources.SabreTools_Name + " - " + Resources.Resources.SabreTools_Desc);
 					helptext.Add(barrier);
