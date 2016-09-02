@@ -1,8 +1,6 @@
-﻿using System;
+﻿using SabreTools.Helper;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace SabreTools
 {
@@ -44,7 +42,18 @@ namespace SabreTools
 		/// <param name="inputs"></param>
 		private static void InitDir2Dat(List<string> inputs)
 		{
-			_logger.User("This feature is not yet implemented: dir2dat");
+			// Create a simple Dat output
+			Dat datdata = new Dat()
+			{
+				FileName = Path.GetFileName(inputs[0]) + " Dir2Dat",
+				Name = Path.GetFileName(inputs[0]) + " Dir2Dat",
+				Description = Path.GetFileName(inputs[0]) + " Dir2Dat",
+				OutputFormat = OutputFormat.Xml,
+				Files = new Dictionary<string, List<Rom>>(),
+			};
+
+			DATFromDir dfd = new DATFromDir(inputs, datdata, false, false, true, false, true, "__temp__", _logger);
+			dfd.Start();
 		}
 
 		/// <summary>
