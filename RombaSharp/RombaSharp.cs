@@ -273,6 +273,8 @@ namespace SabreTools
 				if (!Directory.Exists(key))
 				{
 					Directory.CreateDirectory(key);
+					File.CreateText(Path.Combine(key, ".romba_size"));
+					File.CreateText(Path.Combine(key, ".romba_size.backup"));
 				}
 			}
 			if (port < 0)
@@ -302,6 +304,7 @@ namespace SabreTools
 		/// <summary>
 		/// Populate or refresh the database information
 		/// </summary>
+		/// <remarks>Each hash has the following attributes: size, crc, md5, sha-1, dathash, existss</remarks>
 		private void RefreshDatabase()
 		{
 			// Make sure the db is set
