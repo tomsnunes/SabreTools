@@ -311,7 +311,7 @@ namespace SabreTools
 				Directory.CreateDirectory(_dats);
 			}
 
-			// Create a List of dat hashes in the database
+			// Create a List of dat hashes in the database (SHA-1)
 			List<string> databaseDats = new List<string>();
 
 			// Populate the List from the database
@@ -331,7 +331,7 @@ namespace SabreTools
 				}
 			}
 
-			// Now create a Dictionary of dats to parse from what's not in the database
+			// Now create a Dictionary of dats to parse from what's not in the database (SHA-1, Path)
 			Dictionary<string, string> toscan = new Dictionary<string, string>();
 
 			// Loop through the datroot and add only needed files
@@ -352,10 +352,32 @@ namespace SabreTools
 				}
 			}
 
-			// At this point, we have a Dictionary of Dats that need to be added and a list of Dats that need to be removed
-			// I think for the sake of ease, adding the new Dats and then removing the old ones makes the most sense
-			// That way if any hashes are duplicates, they don't get readded. Removing is going to be a bit difficult because
-			// It means that "if there's no other dat associated with this hash" it's removed. That's hard
+			// Loop through the Dictionary and add all data
+			foreach (string key in toscan.Keys)
+			{
+				// Parse the Dat if possible
+				Dat tempdat = new Dat();
+				tempdat = DatTools.Parse(toscan[key], 0, 0, tempdat, _logger);
+
+				// If the Dat wasn't empty, add the information
+				if (tempdat.Files.Count != 0)
+				{
+					// Loop through the parsed entries
+					foreach (string romkey in tempdat.Files.Keys)
+					{
+						// So, we have an issue. Finding each of the particular crc/md5/sha1 combinations
+						// that need to be added compared to what's already in the database is likely to
+						// be difficult with the current keyvault structure. Can we move to a non-kv since
+						// we're using a database that we are fully aware of anyway? Then we can definitely
+						// have a hash table and a dat table and a mapping between the two. Slower, but works
+						// more efficiently for my format. Get input?
+					}
+				}
+			}
+
+			// At this point, we should have everything that needs to be added, added
+			// Now we have to remove any files associated with Dats that are no longer
+			// around.
 		}
 	}
 }
