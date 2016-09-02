@@ -2,8 +2,8 @@
 using SabreTools.Helper;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Xml;
 
 namespace SabreTools
@@ -277,7 +277,18 @@ namespace SabreTools
 		/// </summary>
 		private static void DisplayMemoryStats()
 		{
-			_logger.User("This feature is not yet implemented: memstats");
+			Process proc = Process.GetCurrentProcess();
+
+			_logger.User("Current Nonpaged Memory: " + Style.GetBytesReadable(proc.NonpagedSystemMemorySize64));
+			_logger.User("Current Paged Memory: " + Style.GetBytesReadable(proc.PagedMemorySize64));
+			_logger.User("Peak Paged Memory: " + Style.GetBytesReadable(proc.PeakPagedMemorySize64));
+			_logger.User("Peak Virtual Memory: " + Style.GetBytesReadable(proc.PeakVirtualMemorySize64));
+			_logger.User("Peak Working Memory: " + Style.GetBytesReadable(proc.PeakWorkingSet64));
+			_logger.User("Private Memory: " + Style.GetBytesReadable(proc.PrivateMemorySize64));
+			_logger.User("Virtual Memory: " + Style.GetBytesReadable(proc.VirtualMemorySize64));
+			_logger.User("Working Memory: " + Style.GetBytesReadable(proc.WorkingSet64));
+			_logger.User("Total Processor Time: " + proc.TotalProcessorTime);
+			_logger.User("User Processor Time: " + proc.UserProcessorTime);
 		}
 
 		/// <summary>
