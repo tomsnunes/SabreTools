@@ -19,7 +19,6 @@ namespace SabreTools
 		private string _tempDir;
 
 		// User specified inputs
-		private List<String> _inputs;
 		private Dat _datdata;
 		private bool _noMD5;
 		private bool _noSHA1;
@@ -39,7 +38,7 @@ namespace SabreTools
 		/// <summary>
 		/// Create a new DATFromDir object
 		/// </summary>
-		/// <param name="inputs">A List of Strings representing the files and folders to be DATted</param>
+		/// <param name="basePath">Base folder to be used in creating the DAT</param>
 		/// <param name="datdata">DatData object representing the requested output DAT</param>
 		/// <param name="noMD5">True if MD5 hashes should be skipped over, false otherwise</param>
 		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
@@ -49,10 +48,11 @@ namespace SabreTools
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
 		/// <param name="nowrite">True if the file should not be written out, false otherwise (default)</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public DATFromDirParallel(List<String> inputs, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, string tempDir, Logger logger)
+		public DATFromDirParallel(string basePath, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, string tempDir, Logger logger)
 		{
-			_inputs = inputs;
+			_basePath = basePath;
 			_datdata = datdata;
+			_datdata.Files.Add("null", new List<Rom>(10));
 			_noMD5 = noMD5;
 			_noSHA1 = noSHA1;
 			_bare = bare;
@@ -69,10 +69,6 @@ namespace SabreTools
 		/// <remarks>Try to get the hashing multithreaded (either on a per-hash or per-file level)</remarks>
 		public bool Start()
 		{
-			// Double check to see what it needs to be named
-			_basePath = (_inputs.Count > 0 ? (File.Exists(_inputs[0]) ? _inputs[0] : _inputs[0] + Path.DirectorySeparatorChar) : "");
-			_basePath = (_basePath != "" ? Path.GetFullPath(_basePath) : "");
-
 			// If the description is defined but not the name, set the name from the description
 			if (String.IsNullOrEmpty(_datdata.Name) && !String.IsNullOrEmpty(_datdata.Description))
 			{
@@ -88,198 +84,22 @@ namespace SabreTools
 			// If neither the name or description are defined, set them from the automatic values
 			else if (String.IsNullOrEmpty(_datdata.Name) && String.IsNullOrEmpty(_datdata.Description))
 			{
-				if (_inputs.Count > 1)
+				if (_basePath.EndsWith(Path.DirectorySeparatorChar.ToString()))
 				{
-					_datdata.Name = Environment.CurrentDirectory.Split(Path.DirectorySeparatorChar).Last();
+					_basePath = _basePath.Substring(0, _basePath.Length - 1);
 				}
-				else
-				{
-					if (_basePath.EndsWith(Path.DirectorySeparatorChar.ToString()))
-					{
-						_basePath = _basePath.Substring(0, _basePath.Length - 1);
-					}
-					_datdata.Name = _basePath.Split(Path.DirectorySeparatorChar).Last();
-				}
-
-				// If the name is still somehow empty, populate it with defaults
-				_datdata.Name = (String.IsNullOrEmpty(_datdata.Name) ? "Default" : _datdata.Name);
+				_datdata.Name = _basePath.Split(Path.DirectorySeparatorChar).Last();
 				_datdata.Description = _datdata.Name + (_bare ? "" : " (" + _datdata.Date + ")");
 			}
 
-			// Loop over each of the found paths, if any
-			string lastparent = null;
-			foreach (string path in _inputs)
+			// Loop over the inputs
+			_logger.Log("Folder found: " + _basePath);
+
+			// Process the files in all subfolders
+			Parallel.ForEach(Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories), item =>
 			{
-				// Set local paths and vars
-				_basePath = (File.Exists(path) ? path : path + Path.DirectorySeparatorChar);
-				_basePath = Path.GetFullPath(_basePath);
-
-				// This is where the main loop would go
-				if (File.Exists(_basePath))
-				{
-					lastparent = ProcessPossibleArchive(_basePath, lastparent);
-				}
-				else if (Directory.Exists(_basePath))
-				{
-					_logger.Log("Folder found: " + _basePath);
-
-					// Process the files in the base folder first
-					Parallel.ForEach(Directory.EnumerateFiles(_basePath, "*", SearchOption.TopDirectoryOnly), item =>
-					{
-						lastparent = ProcessPossibleArchive(item, lastparent);
-					});
-
-					// Then process each of the subfolders themselves
-					string basePathBackup = _basePath;
-					foreach (string item in Directory.EnumerateDirectories(_basePath))
-					{
-						if (_datdata.Type != "SuperDAT")
-						{
-							_basePath = (File.Exists(item) ? item : item + Path.DirectorySeparatorChar);
-							_basePath = Path.GetFullPath(_basePath);
-						}
-
-						bool items = false;
-						Parallel.ForEach(Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories), subitem =>
-						{
-							items = true;
-							lastparent = ProcessPossibleArchive(subitem, lastparent);
-						});
-
-						// In romba mode we ignore empty folders completely
-						if (!_datdata.Romba)
-						{
-							// If there were no subitems, add a "blank" game to to the set (if not in Romba mode)
-							if (!items)
-							{
-								string actualroot = item.Remove(0, basePathBackup.Length);
-								Rom rom = new Rom
-								{
-									Name = "null",
-									Machine = new Machine
-									{
-										Name = (_datdata.Type == "SuperDAT" ?
-											(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
-												Path.DirectorySeparatorChar.ToString() :
-												"") + actualroot :
-											actualroot),
-									},
-									HashData = new Hash
-									{
-										Size = -1,
-										CRC = "null",
-										MD5 = "null",
-										SHA1 = "null",
-									},
-								};
-
-								string key = rom.HashData.Size + "-" + rom.HashData.CRC;
-								if (_datdata.Files.ContainsKey(key))
-								{
-									_datdata.Files[key].Add(rom);
-								}
-								else
-								{
-									List<Rom> temp = new List<Rom>();
-									temp.Add(rom);
-									_datdata.Files.Add(key, temp);
-								}
-							}
-
-							// Now scour subdirectories for empties and add those as well (if not in Romba mode)
-							foreach (string subdir in Directory.EnumerateDirectories(item, "*", SearchOption.AllDirectories))
-							{
-								if (Directory.EnumerateFiles(subdir, "*", SearchOption.AllDirectories).Count() == 0)
-								{
-									string actualroot = subdir.Remove(0, basePathBackup.Length);
-									Rom rom = new Rom
-									{
-										Name = "null",
-										Machine = new Machine
-										{
-											Name = (_datdata.Type == "SuperDAT" ?
-												(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
-													Path.DirectorySeparatorChar.ToString() :
-													"") + actualroot :
-												actualroot),
-										},
-										HashData = new Hash
-										{
-											Size = -1,
-											CRC = "null",
-											MD5 = "null",
-											SHA1 = "null",
-										},
-									};
-
-									string key = rom.HashData.Size + "-" + rom.HashData.CRC;
-									if (_datdata.Files.ContainsKey(key))
-									{
-										_datdata.Files[key].Add(rom);
-									}
-									else
-									{
-										List<Rom> temp = new List<Rom>();
-										temp.Add(rom);
-										_datdata.Files.Add(key, temp);
-									}
-								}
-							}
-						}
-					}
-					_basePath = basePathBackup;
-				}
-				// If this somehow skips past the original sensors
-				else
-				{
-					_logger.Error(path + " is not a valid input!");
-				}
-			}
-
-			// Now output any empties to the stream (if not in Romba mode)
-			if (!_datdata.Romba)
-			{
-				List<string> keys = _datdata.Files.Keys.ToList();
-				foreach (string key in keys)
-				{
-					List<Rom> roms = _datdata.Files[key];
-					for (int i = 0; i < roms.Count; i++)
-					{
-						Rom rom = roms[i];
-
-						// If we're in a mode that doesn't allow for actual empty folders, add the blank info
-						if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
-						{
-							rom.Type = ItemType.Rom;
-							rom.Name = "-";
-							rom.HashData.Size = Constants.SizeZero;
-							rom.HashData.CRC = Constants.CRCZero;
-							rom.HashData.MD5 = Constants.MD5Zero;
-							rom.HashData.SHA1 = Constants.SHA1Zero;
-						}
-
-						string inkey = rom.HashData.Size + "-" + rom.HashData.CRC;
-						if (_datdata.Files.ContainsKey(inkey))
-						{
-							_datdata.Files[inkey].Add(rom);
-						}
-						else
-						{
-							List<Rom> temp = new List<Rom>();
-							temp.Add(rom);
-							_datdata.Files.Add(inkey, temp);
-						}
-
-						lastparent = rom.Machine.Name;
-					}
-				}
-
-				// If we had roms but not blanks (and not in Romba mode), create an artifical rom for the purposes of outputting
-				if (lastparent != null && _datdata.Files.Count == 0)
-				{
-					_datdata.Files.Add("temp", new List<Rom>());
-				}
-			}
+				ProcessPossibleArchive(item);
+			});
 
 			return true;
 		}
@@ -288,14 +108,12 @@ namespace SabreTools
 		/// Check a given file for hashes, based on current settings
 		/// </summary>
 		/// <param name="item">Filename of the item to be checked</param>
-		/// <param name="lastparent">Name of the last parent rom to make sure that everything is grouped as well as possible</param>
 		/// <returns>New parent to be used</returns>
-		private string ProcessPossibleArchive(string item, string lastparent)
+		private void ProcessPossibleArchive(string item)
 		{
 			// Define the temporary directory
 			string tempdir = (String.IsNullOrEmpty(_tempDir) ? Environment.CurrentDirectory : _tempDir);
-			tempdir += (tempdir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? "" : Path.DirectorySeparatorChar.ToString());
-			tempdir += "__temp__" + Path.DirectorySeparatorChar;
+			tempdir = Path.Combine(tempdir, "__temp__", Path.GetFileNameWithoutExtension(item)) + Path.DirectorySeparatorChar;
 
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
@@ -305,25 +123,15 @@ namespace SabreTools
 				// If the rom is valid, write it out
 				if (rom.Name != null)
 				{
-					string key = rom.HashData.Size + "-" + rom.HashData.CRC;
-					if (_datdata.Files.ContainsKey(key))
-					{
-						_datdata.Files[key].Add(rom);
-					}
-					else
-					{
-						List<Rom> temp = new List<Rom>();
-						temp.Add(rom);
-						_datdata.Files.Add(key, temp);
-					}
+					_datdata.Files["null"].Add(rom);
 				}
 				else
 				{
-					return string.Empty;
+					return;
 				}
 
 				_logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
-				return rom.Machine.Name;
+				return;
 			}
 
 			// If both deep hash skip flags are set, do a quickscan
@@ -337,16 +145,14 @@ namespace SabreTools
 					List<Rom> extracted = FileTools.GetArchiveFileInfo(item, _logger);
 					foreach (Rom rom in extracted)
 					{
-						lastparent = ProcessFileHelper(item, rom, _basePath,
-							Path.Combine((Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) +
-								Path.GetFileNameWithoutExtension(item)
-							), _datdata, lastparent);
+						ProcessFileHelper(item, rom, _basePath,
+							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length), _datdata);
 					}
 				}
 				// Otherwise, just get the info on the file itself
 				else if (!Directory.Exists(item) && File.Exists(item))
 				{
-					lastparent = ProcessFile(item, _basePath, "", _datdata, lastparent);
+					ProcessFile(item, _basePath, "", _datdata);
 				}
 			}
 			// Otherwise, attempt to extract the files to the temporary directory
@@ -367,13 +173,13 @@ namespace SabreTools
 					Parallel.ForEach(Directory.EnumerateFiles(tempdir, "*", SearchOption.AllDirectories), entry =>
 					{
 						string tempbasepath = (Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar);
-						lastparent = ProcessFile(Path.GetFullPath(entry), Path.GetFullPath(tempdir),
+						ProcessFile(Path.GetFullPath(entry), Path.GetFullPath(tempdir),
 							(String.IsNullOrEmpty(tempbasepath)
 								? ""
 								: (tempbasepath.Length < _basePath.Length
 									? tempbasepath
 									: tempbasepath.Remove(0, _basePath.Length))) +
-							Path.GetFileNameWithoutExtension(item), _datdata, lastparent);
+							Path.GetFileNameWithoutExtension(item), _datdata);
 					});
 
 					// Clear the temp directory
@@ -385,11 +191,11 @@ namespace SabreTools
 				// Otherwise, just get the info on the file itself
 				else if (!Directory.Exists(item) && File.Exists(item))
 				{
-					lastparent = ProcessFile(item, _basePath, "", _datdata, lastparent);
+					ProcessFile(item, _basePath, Path.Combine((Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) +
+								Path.GetFileNameWithoutExtension(item)
+							), _datdata);
 				}
 			}
-
-			return lastparent;
 		}
 
 		/// <summary>
@@ -399,14 +205,12 @@ namespace SabreTools
 		/// <param name="basepath">Path the represents the parent directory</param>
 		/// <param name="parent">Parent game to be used</param>
 		/// <param name="datdata">DatData object with output information</param>
-		/// <param name="lastparent">Last known parent game name</param>
-		/// <returns>New last known parent game name</returns>
-		private string ProcessFile(string item, string basepath, string parent, Dat datdata, string lastparent)
+		private void ProcessFile(string item, string basepath, string parent, Dat datdata)
 		{
 			_logger.Log(Path.GetFileName(item) + " treated like a file");
 			Rom rom = FileTools.GetSingleFileInfo(item, _noMD5, _noSHA1);
 
-			return ProcessFileHelper(item, rom, basepath, parent, datdata, lastparent);
+			ProcessFileHelper(item, rom, basepath, parent, datdata);
 		}
 
 		/// <summary>
@@ -417,9 +221,7 @@ namespace SabreTools
 		/// <param name="basepath">Path the represents the parent directory</param>
 		/// <param name="parent">Parent game to be used</param>
 		/// <param name="datdata">DatData object with output information</param>
-		/// <param name="lastparent">Last known parent game name</param>
-		/// <returns>New last known parent game name</returns>
-		private string ProcessFileHelper(string item, Rom rom, string basepath, string parent, Dat datdata, string lastparent)
+		private void ProcessFileHelper(string item, Rom rom, string basepath, string parent, Dat datdata)
 		{
 			try
 			{
@@ -469,25 +271,14 @@ namespace SabreTools
 				rom.Machine.Name = rom.Machine.Name.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
 				rom.Name = actualitem;
 
-				string key = rom.HashData.Size + "-" + rom.HashData.CRC;
-				if (_datdata.Files.ContainsKey(key))
-				{
-					_datdata.Files[key].Add(rom);
-				}
-				else
-				{
-					List<Rom> temp = new List<Rom>();
-					temp.Add(rom);
-					_datdata.Files.Add(key, temp);
-				}
-				_logger.User("File added: " + actualitem + Environment.NewLine);
+				_datdata.Files["null"].Add(rom);
 
-				return rom.Machine.Name;
+				_logger.User("File added: " + actualitem + Environment.NewLine);
 			}
 			catch (IOException ex)
 			{
 				_logger.Error(ex.ToString());
-				return null;
+				return;
 			}
 		}
 	}
