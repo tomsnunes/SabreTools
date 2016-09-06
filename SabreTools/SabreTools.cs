@@ -84,6 +84,7 @@ namespace SabreTools
 				bare = false,
 				clean = false,
 				datfromdir = false,
+				datfromdirparallel = false,
 				datprefix = false,
 				dedup = false,
 				enableGzip = false,
@@ -240,6 +241,11 @@ namespace SabreTools
 					case "-din":
 					case "--diff-nd":
 						diff |= DiffMode.NoDupes;
+						break;
+					case "-dp":
+					case "--d2dp":
+					case "--dfdp":
+						datfromdirparallel = true;
 						break;
 					case "-es":
 					case "--ext-split":
@@ -598,7 +604,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(add ^ datfromdir ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^
+			if (!(add ^ datfromdir ^ datfromdirparallel ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^
 				(merge || diff != 0 || update || outputCMP || outputRC || outputSD || outputXML || outputMiss || tsv != null|| trim) ^
 				offlineMerge ^ rem ^ stats))
 			{
@@ -610,7 +616,7 @@ namespace SabreTools
 
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (inputs.Count == 0 && (update || (outputMiss || tsv != null) || outputCMP || outputRC || outputSD
-				|| outputXML || extsplit || hashsplit || datfromdir || (merge || diff != 0) || stats || trim))
+				|| outputXML || extsplit || hashsplit || datfromdir || datfromdirparallel || (merge || diff != 0) || stats || trim))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -717,6 +723,12 @@ namespace SabreTools
 			else if (datfromdir)
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, old, romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir);
+			}
+
+			// Create a DAT from a directory or set of directories in parallel
+			else if (datfromdirparallel)
+			{
+				InitDatFromDirParallel(inputs, filename, name, description, category, version, author, forceunpack, old, romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir);
 			}
 
 			// If we want to run Offline merging mode
