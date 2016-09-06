@@ -409,13 +409,32 @@ namespace SabreTools
 				Type = (superdat ? "SuperDAT" : ""),
 				Files = new Dictionary<string, List<Rom>>(),
 			};
-			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
-			bool success = dfd.Start();
 
 			/*
-			// For DFDParallel only
-			DatTools.WriteDatfile(dfd.DatData, "", _logger);
+			// For each input directory, create a DAT
+			foreach (string path in inputs)
+			{
+				if (Directory.Exists(path))
+				{
+					string basePath = Path.GetFullPath(path);
+					DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
+					bool success = dfd.Start();
+
+					// For DFDParallel only
+					DatTools.WriteDatfile(dfd.DatData, "", _logger);
+
+					// If we failed, show the help
+					if (!success)
+					{
+						Console.WriteLine();
+						Build.Help();
+					}
+				}
+			}
 			*/
+
+			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
+			bool success = dfd.Start();
 
 			// If we failed, show the help
 			if (!success)

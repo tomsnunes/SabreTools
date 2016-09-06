@@ -217,6 +217,7 @@ namespace SabreTools
 						clean = true;
 						break;
 					case "-d":
+					case "--d2d":
 					case "--dfd":
 						datfromdir = true;
 						break;

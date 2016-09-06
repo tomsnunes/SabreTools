@@ -2505,14 +2505,14 @@ namespace SabreTools.Helper
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
-						if (rom.Name == "null" && rom.HashData.Size == -1 && rom.HashData.CRC == "null" && rom.HashData.MD5 == "null" && rom.HashData.SHA1 == "null")
+						if (rom.HashData.Size == -1 && rom.HashData.CRC == "null" && rom.HashData.MD5 == "null" && rom.HashData.SHA1 == "null")
 						{
-							logger.Log("Empty folder found: " + rom.Machine);
+							logger.Log("Empty folder found: " + rom.Machine.Name);
 
 							// If we're in a mode that doesn't allow for actual empty folders, add the blank info
 							if (datdata.OutputFormat != OutputFormat.SabreDat && datdata.OutputFormat != OutputFormat.MissFile)
 							{
-								rom.Name = "-";
+								rom.Name = (rom.Name == "null" ? "-" : rom.Name);
 								rom.HashData.Size = Constants.SizeZero;
 								rom.HashData.CRC = Constants.CRCZero;
 								rom.HashData.MD5 = Constants.MD5Zero;

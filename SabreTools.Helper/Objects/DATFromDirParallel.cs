@@ -25,6 +25,7 @@ namespace SabreTools
 		private bool _bare;
 		private bool _archivesAsFiles;
 		private bool _enableGzip;
+		private bool _addblanks;
 
 		// Other required variables
 		private Logger _logger;
@@ -50,7 +51,7 @@ namespace SabreTools
 		/// <param name="logger">Logger object for console and file output</param>
 		public DATFromDirParallel(string basePath, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, string tempDir, Logger logger)
 		{
-			_basePath = basePath;
+			_basePath = Path.GetFullPath(basePath);
 			_datdata = datdata;
 			_datdata.Files.Add("null", new List<Rom>(10));
 			_noMD5 = noMD5;
@@ -58,6 +59,7 @@ namespace SabreTools
 			_bare = bare;
 			_archivesAsFiles = archivesAsFiles;
 			_enableGzip = enableGzip;
+			_addblanks = true;
 			_tempDir = tempDir;
 			_logger = logger;
 		}
@@ -66,7 +68,6 @@ namespace SabreTools
 		/// Process the file, folder, or list of some combination into a DAT file
 		/// </summary>
 		/// <returns>True if the DAT could be created, false otherwise</returns>
-		/// <remarks>Try to get the hashing multithreaded (either on a per-hash or per-file level)</remarks>
 		public bool Start()
 		{
 			// If the description is defined but not the name, set the name from the description
@@ -84,15 +85,11 @@ namespace SabreTools
 			// If neither the name or description are defined, set them from the automatic values
 			else if (String.IsNullOrEmpty(_datdata.Name) && String.IsNullOrEmpty(_datdata.Description))
 			{
-				if (_basePath.EndsWith(Path.DirectorySeparatorChar.ToString()))
-				{
-					_basePath = _basePath.Substring(0, _basePath.Length - 1);
-				}
 				_datdata.Name = _basePath.Split(Path.DirectorySeparatorChar).Last();
 				_datdata.Description = _datdata.Name + (_bare ? "" : " (" + _datdata.Date + ")");
 			}
 
-			// Loop over the inputs
+			// Process the input folder
 			_logger.Log("Folder found: " + _basePath);
 
 			// Process the files in all subfolders
@@ -101,6 +98,75 @@ namespace SabreTools
 				ProcessPossibleArchive(item);
 			});
 
+			// Now find all folders that are empty, if we are supposed to
+			if (_addblanks)
+			{
+				Parallel.ForEach(Directory.EnumerateDirectories(_basePath, "*", SearchOption.AllDirectories), dir =>
+				{
+					if (Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).Count() == 0)
+					{
+						// Get the full path for the directory
+						string fulldir = Path.GetFullPath(dir);
+
+						// Set the temporary variables
+						string gamename = "";
+						string romname = "";
+
+						// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
+						if (_datdata.Type == "SuperDAT")
+						{
+							gamename = fulldir.Remove(0, _basePath.Length + 1);
+							romname = "-";
+						}
+
+						// Otherwise, we want just the top level folder as the game, and the file as everything else
+						else
+						{
+							gamename = fulldir.Remove(0, _basePath.Length + 1).Split(Path.DirectorySeparatorChar)[0];
+							romname = Path.Combine(fulldir.Remove(0, _basePath.Length + 1 + gamename.Length), "-");
+						}
+
+						// Sanitize the names
+						if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
+						{
+							gamename = gamename.Substring(1);
+						}
+						if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
+						{
+							gamename = gamename.Substring(0, gamename.Length - 1);
+						}
+						if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
+						{
+							romname = romname.Substring(1);
+						}
+						if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
+						{
+							romname = romname.Substring(0, romname.Length - 1);
+						}
+
+						_logger.Log("Adding blank empty folder: " + gamename);
+
+						Rom blankrom = new Rom
+						{
+							Name = romname,
+							Machine = new Machine
+							{
+								Name = gamename,
+							},
+							HashData = new Hash
+							{
+								Size = -1,
+								CRC = "null",
+								MD5 = "null",
+								SHA1 = "null",
+							},
+						};
+
+						_datdata.Files["null"].Add(blankrom);
+					}
+				});
+			}
+
 			return true;
 		}
 
@@ -108,12 +174,11 @@ namespace SabreTools
 		/// Check a given file for hashes, based on current settings
 		/// </summary>
 		/// <param name="item">Filename of the item to be checked</param>
-		/// <returns>New parent to be used</returns>
 		private void ProcessPossibleArchive(string item)
 		{
 			// Define the temporary directory
-			string tempdir = (String.IsNullOrEmpty(_tempDir) ? Environment.CurrentDirectory : _tempDir);
-			tempdir = Path.Combine(tempdir, "__temp__", Path.GetFileNameWithoutExtension(item)) + Path.DirectorySeparatorChar;
+			string tempSubDir = (String.IsNullOrEmpty(_tempDir) ? Environment.CurrentDirectory : _tempDir);
+			tempSubDir = Path.GetFullPath(Path.Combine(tempSubDir, "__temp__", Path.GetFileNameWithoutExtension(item))) + Path.DirectorySeparatorChar;
 
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
@@ -124,13 +189,14 @@ namespace SabreTools
 				if (rom.Name != null)
 				{
 					_datdata.Files["null"].Add(rom);
+					_logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 				}
 				else
 				{
+					_logger.User("File not added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 					return;
 				}
-
-				_logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
+				
 				return;
 			}
 
@@ -140,17 +206,17 @@ namespace SabreTools
 				ArchiveType? type = FileTools.GetCurrentArchiveType(item, _logger);
 
 				// If we have an archive, scan it
-				if (type != null)
+				if (type != null && !_archivesAsFiles)
 				{
 					List<Rom> extracted = FileTools.GetArchiveFileInfo(item, _logger);
 					foreach (Rom rom in extracted)
 					{
 						ProcessFileHelper(item, rom, _basePath,
-							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length), _datdata);
+							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) + Path.GetFileNameWithoutExtension(item), _datdata);
 					}
 				}
 				// Otherwise, just get the info on the file itself
-				else if (!Directory.Exists(item) && File.Exists(item))
+				else if (File.Exists(item))
 				{
 					ProcessFile(item, _basePath, "", _datdata);
 				}
@@ -159,41 +225,32 @@ namespace SabreTools
 			else
 			{
 				bool encounteredErrors = FileTools.ExtractArchive(item,
-				tempdir,
-				(_archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
-				(!_archivesAsFiles && _enableGzip ? ArchiveScanLevel.Internal : ArchiveScanLevel.External),
-				(_archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
-				(_archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
-				_logger);
+					tempSubDir,
+					(_archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
+					(!_archivesAsFiles && _enableGzip ? ArchiveScanLevel.Internal : ArchiveScanLevel.External),
+					(_archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
+					(_archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
+					_logger);
 
 				// If the file was an archive and was extracted successfully, check it
 				if (!encounteredErrors)
 				{
 					_logger.Log(Path.GetFileName(item) + " treated like an archive");
-					Parallel.ForEach(Directory.EnumerateFiles(tempdir, "*", SearchOption.AllDirectories), entry =>
+					Parallel.ForEach(Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories), entry =>
 					{
-						string tempbasepath = (Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar);
-						ProcessFile(Path.GetFullPath(entry), Path.GetFullPath(tempdir),
-							(String.IsNullOrEmpty(tempbasepath)
-								? ""
-								: (tempbasepath.Length < _basePath.Length
-									? tempbasepath
-									: tempbasepath.Remove(0, _basePath.Length))) +
-							Path.GetFileNameWithoutExtension(item), _datdata);
+						ProcessFile(entry, tempSubDir, Path.GetFileNameWithoutExtension(item), _datdata);
 					});
 
 					// Clear the temp directory
-					if (Directory.Exists(tempdir))
+					if (Directory.Exists(tempSubDir))
 					{
-						FileTools.CleanDirectory(tempdir);
+						FileTools.CleanDirectory(tempSubDir);
 					}
 				}
 				// Otherwise, just get the info on the file itself
-				else if (!Directory.Exists(item) && File.Exists(item))
+				else if (File.Exists(item))
 				{
-					ProcessFile(item, _basePath, Path.Combine((Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) +
-								Path.GetFileNameWithoutExtension(item)
-							), _datdata);
+					ProcessFile(item, _basePath, "", _datdata);
 				}
 			}
 		}
@@ -225,55 +282,85 @@ namespace SabreTools
 		{
 			try
 			{
-				if (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+				// If the basepath ends with a directory separator, remove it
+				if (!basepath.EndsWith(Path.DirectorySeparatorChar.ToString()))
 				{
-					basepath = basepath.Substring(0, basepath.Length - 1);
+					basepath += Path.DirectorySeparatorChar.ToString();
 				}
 
-				string actualroot = (item == basepath ? item.Split(Path.DirectorySeparatorChar).Last() : item.Remove(0, basepath.Length).Split(Path.DirectorySeparatorChar)[0]);
+				// Make sure we have the full item path
+				item = Path.GetFullPath(item);
+
+				// Get the data to be added as game and item names
+				string gamename = "";
+				string romname = "";
+
+				// If the parent is blank, then we have a non-archive file
 				if (parent == "")
 				{
-					actualroot = (actualroot == "" && datdata.Type != "SuperDAT" ? basepath.Split(Path.DirectorySeparatorChar).Last() : actualroot);
-				}
-				string actualitem = (item == basepath ? item : item.Remove(0, basepath.Length + 1));
+					// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
+					if (datdata.Type == "SuperDAT")
+					{
+						gamename = Path.GetDirectoryName(item.Remove(0, basepath.Length));
+						romname = Path.GetFileName(item);
+					}
 
-				// If we're in SuperDAT mode, make sure the added item is by itself
-				if (datdata.Type == "SuperDAT")
-				{
-					actualroot += (actualroot != "" ? Path.DirectorySeparatorChar.ToString() : "") +
-						(parent != "" ? parent + Path.DirectorySeparatorChar : "") +
-						Path.GetDirectoryName(actualitem);
-					actualroot = actualroot.TrimEnd(Path.DirectorySeparatorChar);
-					actualitem = Path.GetFileName(actualitem);
+					// Otherwise, we want just the top level folder as the game, and the file as everything else
+					else
+					{
+						gamename = item.Remove(0, basepath.Length).Split(Path.DirectorySeparatorChar)[0];
+						romname = item.Remove(0, (Path.Combine(basepath, gamename).Length));
+					}
 				}
-				else if (parent != "")
+				
+				// Otherwise, we assume that we have an archive
+				else
 				{
-					actualroot = parent.TrimEnd(Path.DirectorySeparatorChar);
+					// If we have a SuperDAT, we want the archive name as the game, and the file as everything else (?)
+					if (datdata.Type == "SuperDAT")
+					{
+						gamename = parent;
+						romname = item.Remove(0, basepath.Length);
+					}
+
+					// Otherwise, we want the archive name as the game, and the file as everything else
+					else
+					{
+						gamename = parent;
+						romname = item.Remove(0, basepath.Length);
+					}
 				}
 
-				// Drag and drop is funny
-				if (actualitem == Path.GetFullPath(actualitem))
+				// Sanitize the names
+				if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
 				{
-					actualitem = Path.GetFileName(actualitem);
+					gamename = gamename.Substring(1);
 				}
-
-				_logger.Log("Actual item added: " + actualitem);
+				if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
+				{
+					gamename = gamename.Substring(0, gamename.Length - 1);
+				}
+				if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
+				{
+					romname = romname.Substring(1);
+				}
+				if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
+				{
+					romname = romname.Substring(0, romname.Length - 1);
+				}
 
 				// Update rom information
 				rom.Machine = new Machine
 				{
-					Name = (datdata.Type == "SuperDAT" ?
-						(actualroot != "" && !actualroot.StartsWith(Path.DirectorySeparatorChar.ToString()) ?
-							Path.DirectorySeparatorChar.ToString() :
-							"") + actualroot :
-						actualroot),
+					Name = gamename,
+					Description = gamename,
 				};
-				rom.Machine.Name = rom.Machine.Name.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString());
-				rom.Name = actualitem;
+				rom.Name = romname;
 
-				_datdata.Files["null"].Add(rom);
+				// Add the file information to the DAT
+				datdata.Files["null"].Add(rom);
 
-				_logger.User("File added: " + actualitem + Environment.NewLine);
+				_logger.User("File added: " + romname + Environment.NewLine);
 			}
 			catch (IOException ex)
 			{
