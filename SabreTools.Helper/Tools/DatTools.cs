@@ -2089,7 +2089,7 @@ namespace SabreTools.Helper
 			}
 
 			// Filter on game name
-			if (gamename != "")
+			if (!String.IsNullOrEmpty(gamename))
 			{
 				if (gamename.StartsWith("*") && gamename.EndsWith("*"))
 				{
@@ -2115,7 +2115,7 @@ namespace SabreTools.Helper
 			}
 
 			// Filter on rom name
-			if (romname != "")
+			if (!String.IsNullOrEmpty(romname))
 			{
 				if (romname.StartsWith("*") && romname.EndsWith("*") && !romdata.Name.ToLowerInvariant().Contains(romname.ToLowerInvariant().Replace("*", "")))
 				{
@@ -2132,7 +2132,7 @@ namespace SabreTools.Helper
 			}
 
 			// Filter on rom type
-			if (romtype != "" && romdata.Type.ToString().ToLowerInvariant() != romtype.ToLowerInvariant())
+			if (!String.IsNullOrEmpty(romtype) && romdata.Type.ToString().ToLowerInvariant() != romtype.ToLowerInvariant())
 			{
 				return false;
 			}
@@ -2155,7 +2155,7 @@ namespace SabreTools.Helper
 			}
 
 			// Filter on crc
-			if (crc != "")
+			if (!String.IsNullOrEmpty(crc))
 			{
 				if (crc.StartsWith("*") && crc.EndsWith("*") && !romdata.HashData.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", "")))
 				{
@@ -2172,7 +2172,7 @@ namespace SabreTools.Helper
 			}
 
 			// Filter on md5
-			if (md5 != "")
+			if (!String.IsNullOrEmpty(md5))
 			{
 				if (md5.StartsWith("*") && md5.EndsWith("*") && !romdata.HashData.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
 				{
@@ -2189,7 +2189,7 @@ namespace SabreTools.Helper
 			}
 
 			// Filter on sha1
-			if (sha1 != "")
+			if (!String.IsNullOrEmpty(sha1))
 			{
 				if (sha1.StartsWith("*") && sha1.EndsWith("*") && !romdata.HashData.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
 				{
