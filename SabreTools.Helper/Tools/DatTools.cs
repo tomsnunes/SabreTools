@@ -24,6 +24,13 @@ namespace SabreTools.Helper
 		/// <remarks>There is currently no differentiation between XML and SabreDAT here</remarks>
 		public static OutputFormat GetOutputFormat(string filename)
 		{
+			// Limit the output formats based on extension
+			string ext = Path.GetExtension(filename).ToLowerInvariant();
+			if (ext != ".dat" && ext != ".xml")
+			{
+				return OutputFormat.None;
+			}
+
 			try
 			{
 				StreamReader sr = File.OpenText(filename);
@@ -1005,9 +1012,11 @@ namespace SabreTools.Helper
 							// If we have a subtree, add what is possible
 							if (subreader != null)
 							{
+								subreader.MoveToContent();
 								if (!softlist && temptype == "software" && subreader.ReadToFollowing("description"))
 								{
 									tempname = subreader.ReadElementContentAsString();
+									gamedesc = tempname;
 									tempname = tempname.Replace('/', '_').Replace("\"", "''");
 									software = true;
 								}
@@ -1093,6 +1102,7 @@ namespace SabreTools.Helper
 												lastrom.HashData.Size += size;
 												datdata.Files[key].RemoveAt(index);
 												datdata.Files[key].Add(lastrom);
+												subreader.Read();
 												continue;
 											}
 
