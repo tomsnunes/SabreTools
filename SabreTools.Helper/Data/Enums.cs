@@ -172,4 +172,16 @@ namespace SabreTools.Helper
 		Individuals = 0x04,
 		All = Dupes | NoDupes | Individuals,
 	}
+
+	/// <summary>
+	/// Determines which fields should be split on
+	/// </summary>
+	public enum SplitType
+	{
+		None = 0,
+		Extension = 1,
+		BestAvailableHash = 2,
+		Type = 3,
+		Size = 4,
+	}
 }
