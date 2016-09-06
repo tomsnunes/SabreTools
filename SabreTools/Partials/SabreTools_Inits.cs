@@ -410,7 +410,72 @@ namespace SabreTools
 				Files = new Dictionary<string, List<Rom>>(),
 			};
 
-			/*
+			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
+			bool success = dfd.Start();
+
+			// If we failed, show the help
+			if (!success)
+			{
+				Console.WriteLine();
+				Build.Help();
+			}
+		}
+
+		/// <summary>
+		/// Wrap creating a DAT file from files or a directory in parallel
+		/// </summary>
+		/// <param name="input">List of innput filenames</param>
+		/// <param name="filename">New filename</param>
+		/// <param name="name">New name</param>
+		/// <param name="description">New description</param>
+		/// <param name="category">New category</param>
+		/// <param name="version">New version</param>
+		/// <param name="author">New author</param>
+		/// <param name="forceunpack">True to set forcepacking="unzip" on the created file, false otherwise</param>
+		/// <param name="old">True to output in CMP format, false to output in Logiqx XML</param>
+		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
+		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
+		/// <param name="noMD5">True to disable getting MD5 hash, false otherwise</param>
+		/// <param name="noSHA1">True to disable getting SHA-1 hash, false otherwise</param>
+		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
+		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
+		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
+		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
+		private static void InitDatFromDirParallel(List<string> inputs,
+			string filename,
+			string name,
+			string description,
+			string category,
+			string version,
+			string author,
+			bool forceunpack,
+			bool old,
+			bool romba,
+			bool superdat,
+			bool noMD5,
+			bool noSHA1,
+			bool bare,
+			bool archivesAsFiles,
+			bool enableGzip,
+			string tempDir)
+		{
+			// Create a new DATFromDir object and process the inputs
+			Dat datdata = new Dat
+			{
+				FileName = filename,
+				Name = name,
+				Description = description,
+				Category = category,
+				Version = version,
+				Date = DateTime.Now.ToString("yyyy-MM-dd"),
+				Author = author,
+				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				Romba = romba,
+				Type = (superdat ? "SuperDAT" : ""),
+				Files = new Dictionary<string, List<Rom>>(),
+			};
+
 			// For each input directory, create a DAT
 			foreach (string path in inputs)
 			{
@@ -430,17 +495,6 @@ namespace SabreTools
 						Build.Help();
 					}
 				}
-			}
-			*/
-
-			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
-			bool success = dfd.Start();
-
-			// If we failed, show the help
-			if (!success)
-			{
-				Console.WriteLine();
-				Build.Help();
 			}
 		}
 
