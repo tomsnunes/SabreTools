@@ -129,7 +129,7 @@ namespace SabreTools
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
 			// Get the file data to be split
-			OutputFormat outputFormat = DatTools.GetOutputFormat(filename);
+			OutputFormat outputFormat = DatTools.GetOutputFormat(filename, _logger);
 			Dat datdata = new Dat();
 			datdata = DatTools.Parse(filename, 0, 0, datdata, _logger, true);
 
@@ -337,7 +337,7 @@ namespace SabreTools
 			datdata = DatTools.Parse(filename, 0, 0, datdata, _logger);
 
 			// Set all of the appropriate outputs for each of the subsets
-			OutputFormat outputFormat = DatTools.GetOutputFormat(filename);
+			OutputFormat outputFormat = DatTools.GetOutputFormat(filename, _logger);
 			Dat datdataA = new Dat
 			{
 				FileName = datdata.FileName + " (" + string.Join(",", _extA) + ")",

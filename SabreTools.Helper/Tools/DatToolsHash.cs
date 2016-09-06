@@ -10,6 +10,7 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// DAT manipulation tools that rely on HashData and related structs
 	/// </summary>
+	/// <remarks>THIS IS NOT IN SYNC WITH THE MAIN DATTOOLS CLASS, WILL NEED AN UPDATE BEFORE THAT IS POSSIBLE</remarks>
 	public class DatToolsHash
 	{
 		#region DAT Parsing
@@ -38,7 +39,7 @@ namespace SabreTools.Helper
 			datdata.FileName = (String.IsNullOrEmpty(datdata.FileName) ? (keepext ? Path.GetFileName(filename) : Path.GetFileNameWithoutExtension(filename)) : datdata.FileName);
 
 			// If the output type isn't set already, get the internal output type
-			datdata.OutputFormat = (datdata.OutputFormat == OutputFormat.None ? DatTools.GetOutputFormat(filename) : datdata.OutputFormat);
+			datdata.OutputFormat = (datdata.OutputFormat == OutputFormat.None ? DatTools.GetOutputFormat(filename, logger) : datdata.OutputFormat);
 
 			// Make sure there's a dictionary to read to
 			if (datdata.Hashes == null)
@@ -47,7 +48,7 @@ namespace SabreTools.Helper
 			}
 
 			// Now parse the correct type of DAT
-			switch (DatTools.GetOutputFormat(filename))
+			switch (DatTools.GetOutputFormat(filename, logger))
 			{
 				case OutputFormat.ClrMamePro:
 					return ParseCMP(filename, sysid, srcid, datdata, logger, keep, clean);
@@ -74,17 +75,7 @@ namespace SabreTools.Helper
 		/// <returns>DatData object representing the read-in data</returns>
 		public static DatData ParseCMP(string filename, int sysid, int srcid, DatData datdata, Logger logger, bool keep, bool clean)
 		{
-			// Read the input file, if possible
-			logger.Log("Attempting to read file: \"" + filename + "\"");
-
-			// Check if file exists
-			if (!File.Exists(filename))
-			{
-				logger.Warning("File '" + filename + "' could not read from!");
-				return datdata;
-			}
-
-			// If it does, open a file reader
+			// Open a file reader
 			StreamReader sr = new StreamReader(File.OpenRead(filename));
 
 			bool block = false, superdat = false;
