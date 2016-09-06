@@ -110,7 +110,7 @@ namespace SabreTools.Helper
 					helptext.Add("	-system=		System name (system only)");
 					helptext.Add("	-source=		Source name (source only)");
 					helptext.Add("	-url=			URL (source only)");
-					helptext.Add("  -d, --dfd		Create a DAT from an input directory");
+					helptext.Add("  -d, --dfd		Create a DAT from each input directory");
 					helptext.Add("	-nm, --noMD5		Don't include MD5 in output");
 					helptext.Add("	-ns, --noSHA1		Don't include SHA1 in output");
 					helptext.Add("	-b, --bare		Don't include date in file name");
