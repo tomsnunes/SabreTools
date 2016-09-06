@@ -2112,27 +2112,50 @@ namespace SabreTools.Helper
 						return false;
 					}
 				}
+				else
+				{
+					if (!String.Equals(romdata.Machine.Name, gamename, StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
 			}
 
 			// Filter on rom name
 			if (!String.IsNullOrEmpty(romname))
 			{
-				if (romname.StartsWith("*") && romname.EndsWith("*") && !romdata.Name.ToLowerInvariant().Contains(romname.ToLowerInvariant().Replace("*", "")))
+				if (romname.StartsWith("*") && romname.EndsWith("*"))
 				{
-					return false;
+					if (!romdata.Name.ToLowerInvariant().Contains(romname.ToLowerInvariant().Replace("*", "")))
+					{
+						return false;
+					}
 				}
-				else if (romname.StartsWith("*") && !romdata.Name.EndsWith(romname.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+				else if (romname.StartsWith("*"))
 				{
-					return false;
+					if (!romdata.Name.EndsWith(romname.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
 				}
-				else if (romname.EndsWith("*") && !romdata.Name.StartsWith(romname.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+				else if (romname.EndsWith("*"))
 				{
-					return false;
+					if (!romdata.Name.StartsWith(romname.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if (!String.Equals(romdata.Name, romname, StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
 				}
 			}
 
 			// Filter on rom type
-			if (!String.IsNullOrEmpty(romtype) && romdata.Type.ToString().ToLowerInvariant() != romtype.ToLowerInvariant())
+			if (!String.IsNullOrEmpty(romtype) && !String.Equals(romdata.Type.ToString(), romtype, , StringComparison.InvariantCultureIgnoreCase))
 			{
 				return false;
 			}
@@ -2157,51 +2180,99 @@ namespace SabreTools.Helper
 			// Filter on crc
 			if (!String.IsNullOrEmpty(crc))
 			{
-				if (crc.StartsWith("*") && crc.EndsWith("*") && !romdata.HashData.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", "")))
+				if (crc.StartsWith("*") && crc.EndsWith("*"))
 				{
-					return false;
+					if (!romdata.HashData.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", "")))
+					{
+						return false;
+					}
 				}
-				else if (crc.StartsWith("*") && !romdata.HashData.CRC.EndsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+				else if (crc.StartsWith("*"))
 				{
-					return false;
+					if (!romdata.HashData.CRC.EndsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
 				}
-				else if (crc.EndsWith("*") && !romdata.HashData.CRC.StartsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+				else if (crc.EndsWith("*"))
 				{
-					return false;
+					if (!romdata.HashData.CRC.StartsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if (!String.Equals(romdata.HashData.CRC, crc, StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
 				}
 			}
 
 			// Filter on md5
 			if (!String.IsNullOrEmpty(md5))
 			{
-				if (md5.StartsWith("*") && md5.EndsWith("*") && !romdata.HashData.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
+				if (md5.StartsWith("*") && md5.EndsWith("*"))
 				{
-					return false;
+					if (!romdata.HashData.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
+					{
+						return false;
+					}
 				}
-				else if (md5.StartsWith("*") && !romdata.HashData.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+				else if (md5.StartsWith("*"))
 				{
-					return false;
+					if (!romdata.HashData.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
 				}
-				else if (md5.EndsWith("*") && !romdata.HashData.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+				else if (md5.EndsWith("*"))
 				{
-					return false;
+					if (!romdata.HashData.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if (!String.Equals(romdata.HashData.MD5, md5, StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
 				}
 			}
 
 			// Filter on sha1
 			if (!String.IsNullOrEmpty(sha1))
 			{
-				if (sha1.StartsWith("*") && sha1.EndsWith("*") && !romdata.HashData.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
+				if (sha1.StartsWith("*") && sha1.EndsWith("*"))
 				{
-					return false;
+					if (!romdata.HashData.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
+					{
+						return false;
+					}
 				}
-				else if (sha1.StartsWith("*") && !romdata.HashData.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+				else if (sha1.StartsWith("*"))
 				{
-					return false;
+					if (!romdata.HashData.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
 				}
-				else if (sha1.EndsWith("*") && !romdata.HashData.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+				else if (sha1.EndsWith("*"))
 				{
-					return false;
+					if (!romdata.HashData.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if (!String.Equals(romdata.HashData.SHA1, sha1, StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
 				}
 			}
 
