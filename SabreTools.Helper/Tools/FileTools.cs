@@ -805,7 +805,7 @@ namespace SabreTools.Helper
 			// Now convert the data and get the right position
 			string gzmd5 = BitConverter.ToString(headermd5).Replace("-", string.Empty);
 			string gzcrc = BitConverter.ToString(headercrc).Replace("-", string.Empty);
-			long extractedsize = (long)BitConverter.ToUInt64(headersz.Reverse().ToArray(), 0);
+			long extractedsize = BitConverter.ToInt64(headersz, 0);
 
 			Rom rom = new Rom
 			{
