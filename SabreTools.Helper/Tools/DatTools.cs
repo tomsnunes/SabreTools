@@ -1963,7 +1963,7 @@ namespace SabreTools.Helper
 			}
 
 			// Filter on rom type
-			if (!String.IsNullOrEmpty(romtype) && !String.Equals(romdata.Type.ToString(), romtype, , StringComparison.InvariantCultureIgnoreCase))
+			if (!String.IsNullOrEmpty(romtype) && !String.Equals(romdata.Type.ToString(), romtype, StringComparison.InvariantCultureIgnoreCase))
 			{
 				return false;
 			}
