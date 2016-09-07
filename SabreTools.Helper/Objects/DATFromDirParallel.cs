@@ -167,6 +167,9 @@ namespace SabreTools
 				});
 			}
 
+			// Wait for 5 seconds, just to be sure that no handles are open still
+			Thread.Sleep(5000);
+
 			return true;
 		}
 
