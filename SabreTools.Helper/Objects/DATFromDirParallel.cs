@@ -26,7 +26,7 @@ namespace SabreTools
 		private bool _archivesAsFiles;
 		private bool _enableGzip;
 		private bool _addblanks;
-		private int _maxParallelism;
+		private int _maxDegreeOfParallelism;
 
 		// Other required variables
 		private Logger _logger;
@@ -48,14 +48,14 @@ namespace SabreTools
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
-		/// <param name="maxParallelism">Integer representing the maximum amount of parallelization to be used</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		public DATFromDirParallel(string basePath, Dat datdata, bool noMD5, bool noSHA1, bool bare,
-			bool archivesAsFiles, bool enableGzip, string tempDir, int maxParallelism, Logger logger)
+			bool archivesAsFiles, bool enableGzip, string tempDir, int maxDegreeOfParallelism, Logger logger)
 		{
 			_basePath = Path.GetFullPath(basePath);
 			_datdata = datdata;
-			_datdata.Files.Add("null", new List<Rom>(10));
+			_datdata.Files.Add("null", new List<Rom>());
 			_noMD5 = noMD5;
 			_noSHA1 = noSHA1;
 			_bare = bare;
@@ -63,11 +63,11 @@ namespace SabreTools
 			_enableGzip = enableGzip;
 			_addblanks = true;
 			_tempDir = tempDir;
-			_maxParallelism = maxParallelism;
+			_maxDegreeOfParallelism = maxDegreeOfParallelism;
 			_logger = logger;
 		}
 
-		/// <summary>
+		/// <suaxmary>
 		/// Process the file, folder, or list of some combination into a DAT file
 		/// </summary>
 		/// <returns>True if the DAT could be created, false otherwise</returns>
@@ -97,7 +97,7 @@ namespace SabreTools
 
 			// Process the files in all subfolders
 			Parallel.ForEach(Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories),
-				new ParallelOptions { MaxDegreeOfParallelism = _maxParallelism },
+				new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
 				item =>
 			{
 				ProcessPossibleArchive(item);
@@ -107,7 +107,7 @@ namespace SabreTools
 			if (!_datdata.Romba && _addblanks)
 			{
 				Parallel.ForEach(Directory.EnumerateDirectories(_basePath, "*", SearchOption.AllDirectories),
-					new ParallelOptions { MaxDegreeOfParallelism = _maxParallelism },
+					new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
 					dir =>
 				{
 					if (Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).Count() == 0)
@@ -174,8 +174,15 @@ namespace SabreTools
 				});
 			}
 
-			// Wait for 5 seconds, just to be sure that no handles are open still
-			Thread.Sleep(5000);
+			// Now that we're done, delete the temp folder
+			try
+			{
+				Directory.Delete(_tempDir, true);
+			}
+			catch
+			{
+				// Just absorb the error for now
+			}
 
 			return true;
 		}
@@ -247,7 +254,7 @@ namespace SabreTools
 				{
 					_logger.Log(Path.GetFileName(item) + " treated like an archive");
 					Parallel.ForEach(Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories),
-						new ParallelOptions { MaxDegreeOfParallelism = _maxParallelism },
+						new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
 						entry =>
 					{
 						ProcessFile(entry, tempSubDir, Path.GetFileNameWithoutExtension(item), _datdata);

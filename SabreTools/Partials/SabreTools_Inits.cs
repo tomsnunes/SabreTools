@@ -441,7 +441,7 @@ namespace SabreTools
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
-		/// <param name="maxParallelism">Integer representing the maximum amount of parallelization to be used</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitDatFromDirParallel(List<string> inputs,
 			string filename,
 			string name,
@@ -459,7 +459,7 @@ namespace SabreTools
 			bool archivesAsFiles,
 			bool enableGzip,
 			string tempDir,
-			int maxParallelism)
+			int maxDegreeOfParallelism)
 		{
 			// Create a new DATFromDir object and process the inputs
 			Dat datdata = new Dat
@@ -484,14 +484,17 @@ namespace SabreTools
 				if (Directory.Exists(path))
 				{
 					string basePath = Path.GetFullPath(path);
-					DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, maxParallelism, _logger);
+					DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, maxDegreeOfParallelism, _logger);
 					bool success = dfd.Start();
 
-					// For DFDParallel only
-					DatTools.WriteDatfile(dfd.DatData, "", _logger);
+					// If it was a success, write the DAT out
+					if (success)
+					{
+						DatTools.WriteDatfile(dfd.DatData, "", _logger);
+					}
 
-					// If we failed, show the help
-					if (!success)
+					// Otherwise, show the help
+					else
 					{
 						Console.WriteLine();
 						Build.Help();
@@ -524,7 +527,7 @@ namespace SabreTools
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatTools.SplitByExt(input, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), extaList, extbList, _logger);
+						DatTools.SplitByExt(file, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), extaList, extbList, _logger);
 					}
 				}
 				else
@@ -555,7 +558,7 @@ namespace SabreTools
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatTools.SplitByHash(input, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
+						DatTools.SplitByHash(file, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
 					}
 				}
 				else
@@ -586,7 +589,7 @@ namespace SabreTools
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatTools.SplitByType(input, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
+						DatTools.SplitByType(file, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
 					}
 				}
 				else
