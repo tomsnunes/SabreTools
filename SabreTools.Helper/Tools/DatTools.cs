@@ -3007,5 +3007,491 @@ namespace SabreTools.Helper
 		}
 
 		#endregion
+
+		#region DAT Splitting
+
+		/// <summary>
+		/// Split a DAT by input extensions
+		/// </summary>
+		/// <param name="filename">Name of the file to be split</param>
+		/// <param name="outdir">Name of the directory to write the DATs out to</param>
+		/// <param name="basepath">Parent path for replacement</param>
+		/// <param name="extA">List of extensions to split on (first DAT)</param>
+		/// <param name="extB">List of extensions to split on (second DAT)</param>
+		/// <param name="logger">Logger object for console and file writing</param>
+		/// <returns>True if split succeeded, false otherwise</returns>
+		public static bool SplitByExt(string filename, string outdir, string basepath, List<string> extA, List<string> extB, Logger logger)
+		{
+			// Make sure all of the extensions have a dot at the beginning
+			List<string> newExtA = new List<string>();
+			foreach (string s in extA)
+			{
+				newExtA.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
+			}
+			string newExtAString = string.Join(",", newExtA);
+
+			List<string> newExtB = new List<string>();
+			foreach (string s in extB)
+			{
+				newExtB.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
+			}
+			string newExtBString = string.Join(",", newExtB);
+
+			// Load the current DAT to be processed
+			Dat datdata = new Dat();
+			datdata = DatTools.Parse(filename, 0, 0, datdata, logger);
+
+			// Set all of the appropriate outputs for each of the subsets
+			OutputFormat outputFormat = DatTools.GetOutputFormat(filename, logger);
+			Dat datdataA = new Dat
+			{
+				FileName = datdata.FileName + " (" + newExtAString + ")",
+				Name = datdata.Name + " (" + newExtAString + ")",
+				Description = datdata.Description + " (" + newExtAString + ")",
+				Category = datdata.Category,
+				Version = datdata.Version,
+				Date = datdata.Date,
+				Author = datdata.Author,
+				Email = datdata.Email,
+				Homepage = datdata.Homepage,
+				Url = datdata.Url,
+				Comment = datdata.Comment,
+				Files = new Dictionary<string, List<Rom>>(),
+				OutputFormat = outputFormat,
+			};
+			Dat datdataB = new Dat
+			{
+				FileName = datdata.FileName + " (" + newExtBString + ")",
+				Name = datdata.Name + " (" + newExtBString + ")",
+				Description = datdata.Description + " (" + newExtBString + ")",
+				Category = datdata.Category,
+				Version = datdata.Version,
+				Date = datdata.Date,
+				Author = datdata.Author,
+				Email = datdata.Email,
+				Homepage = datdata.Homepage,
+				Url = datdata.Url,
+				Comment = datdata.Comment,
+				Files = new Dictionary<string, List<Rom>>(),
+				OutputFormat = outputFormat,
+			};
+
+			// If roms is empty, return false
+			if (datdata.Files.Count == 0)
+			{
+				return false;
+			}
+
+			// Now separate the roms accordingly
+			foreach (string key in datdata.Files.Keys)
+			{
+				foreach (Rom rom in datdata.Files[key])
+				{
+					if (newExtA.Contains(Path.GetExtension(rom.Name.ToUpperInvariant())))
+					{
+						if (datdataA.Files.ContainsKey(key))
+						{
+							datdataA.Files[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							datdataA.Files.Add(key, temp);
+						}
+					}
+					else if (newExtB.Contains(Path.GetExtension(rom.Name.ToUpperInvariant())))
+					{
+						if (datdataB.Files.ContainsKey(key))
+						{
+							datdataB.Files[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							datdataB.Files.Add(key, temp);
+						}
+					}
+					else
+					{
+						if (datdataA.Files.ContainsKey(key))
+						{
+							datdataA.Files[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							datdataA.Files.Add(key, temp);
+						}
+						if (datdataB.Files.ContainsKey(key))
+						{
+							datdataB.Files[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							datdataB.Files.Add(key, temp);
+						}
+					}
+				}
+			}
+
+			// Get the output directory
+			if (outdir != "")
+			{
+				outdir = outdir + Path.GetDirectoryName(filename).Remove(0, basepath.Length - 1);
+			}
+			else
+			{
+				outdir = Path.GetDirectoryName(filename);
+			}
+
+			// Then write out both files
+			bool success = DatTools.WriteDatfile(datdataA, outdir, logger);
+			success &= DatTools.WriteDatfile(datdataB, outdir, logger);
+
+			return success;
+		}
+
+		/// <summary>
+		/// Split a DAT by best available hashes
+		/// </summary>
+		/// <param name="filename">Name of the file to be split</param>
+		/// <param name="outdir">Name of the directory to write the DATs out to</param>
+		/// <param name="basepath">Parent path for replacement</param>
+		/// <param name="logger">Logger object for console and file writing</param>
+		/// <returns>True if split succeeded, false otherwise</returns>
+		public static bool SplitByHash(string filename, string outdir, string basepath, Logger logger)
+		{
+			// Sanitize the basepath to be more predictable
+			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
+
+			// Get the file data to be split
+			OutputFormat outputFormat = DatTools.GetOutputFormat(filename, logger);
+			Dat datdata = new Dat();
+			datdata = DatTools.Parse(filename, 0, 0, datdata, logger, true);
+
+			// Create each of the respective output DATs
+			logger.User("Creating and populating new DATs");
+			Dat nodump = new Dat
+			{
+				FileName = datdata.FileName + " (Nodump)",
+				Name = datdata.Name + " (Nodump)",
+				Description = datdata.Description + " (Nodump)",
+				Category = datdata.Category,
+				Version = datdata.Version,
+				Date = datdata.Date,
+				Author = datdata.Author,
+				Email = datdata.Email,
+				Homepage = datdata.Homepage,
+				Url = datdata.Url,
+				Comment = datdata.Comment,
+				Header = datdata.Header,
+				Type = datdata.Type,
+				ForceMerging = datdata.ForceMerging,
+				ForceNodump = datdata.ForceNodump,
+				ForcePacking = datdata.ForcePacking,
+				OutputFormat = outputFormat,
+				MergeRoms = datdata.MergeRoms,
+				Files = new Dictionary<string, List<Rom>>(),
+			};
+			Dat sha1 = new Dat
+			{
+				FileName = datdata.FileName + " (SHA-1)",
+				Name = datdata.Name + " (SHA-1)",
+				Description = datdata.Description + " (SHA-1)",
+				Category = datdata.Category,
+				Version = datdata.Version,
+				Date = datdata.Date,
+				Author = datdata.Author,
+				Email = datdata.Email,
+				Homepage = datdata.Homepage,
+				Url = datdata.Url,
+				Comment = datdata.Comment,
+				Header = datdata.Header,
+				Type = datdata.Type,
+				ForceMerging = datdata.ForceMerging,
+				ForceNodump = datdata.ForceNodump,
+				ForcePacking = datdata.ForcePacking,
+				OutputFormat = outputFormat,
+				MergeRoms = datdata.MergeRoms,
+				Files = new Dictionary<string, List<Rom>>(),
+			};
+			Dat md5 = new Dat
+			{
+				FileName = datdata.FileName + " (MD5)",
+				Name = datdata.Name + " (MD5)",
+				Description = datdata.Description + " (MD5)",
+				Category = datdata.Category,
+				Version = datdata.Version,
+				Date = datdata.Date,
+				Author = datdata.Author,
+				Email = datdata.Email,
+				Homepage = datdata.Homepage,
+				Url = datdata.Url,
+				Comment = datdata.Comment,
+				Header = datdata.Header,
+				Type = datdata.Type,
+				ForceMerging = datdata.ForceMerging,
+				ForceNodump = datdata.ForceNodump,
+				ForcePacking = datdata.ForcePacking,
+				OutputFormat = outputFormat,
+				MergeRoms = datdata.MergeRoms,
+				Files = new Dictionary<string, List<Rom>>(),
+			};
+			Dat crc = new Dat
+			{
+				FileName = datdata.FileName + " (CRC)",
+				Name = datdata.Name + " (CRC)",
+				Description = datdata.Description + " (CRC)",
+				Category = datdata.Category,
+				Version = datdata.Version,
+				Date = datdata.Date,
+				Author = datdata.Author,
+				Email = datdata.Email,
+				Homepage = datdata.Homepage,
+				Url = datdata.Url,
+				Comment = datdata.Comment,
+				Header = datdata.Header,
+				Type = datdata.Type,
+				ForceMerging = datdata.ForceMerging,
+				ForceNodump = datdata.ForceNodump,
+				ForcePacking = datdata.ForcePacking,
+				OutputFormat = outputFormat,
+				MergeRoms = datdata.MergeRoms,
+				Files = new Dictionary<string, List<Rom>>(),
+			};
+
+			// Now populate each of the DAT objects in turn
+			List<string> keys = datdata.Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<Rom> roms = datdata.Files[key];
+				foreach (Rom rom in roms)
+				{
+					// If the file is a nodump
+					if (rom.Nodump)
+					{
+						if (nodump.Files.ContainsKey(key))
+						{
+							nodump.Files[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							nodump.Files.Add(key, temp);
+						}
+					}
+					// If the file has a SHA-1
+					else if (rom.HashData.SHA1 != null && rom.HashData.SHA1 != "")
+					{
+						if (sha1.Files.ContainsKey(key))
+						{
+							sha1.Files[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							sha1.Files.Add(key, temp);
+						}
+					}
+					// If the file has no SHA-1 but has an MD5
+					else if (rom.HashData.MD5 != null && rom.HashData.MD5 != "")
+					{
+						if (md5.Files.ContainsKey(key))
+						{
+							md5.Files[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							md5.Files.Add(key, temp);
+						}
+					}
+					// All other cases
+					else
+					{
+						if (crc.Files.ContainsKey(key))
+						{
+							crc.Files[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							crc.Files.Add(key, temp);
+						}
+					}
+				}
+			}
+
+			// Get the output directory
+			if (outdir != "")
+			{
+				outdir = outdir + Path.GetDirectoryName(filename).Remove(0, basepath.Length - 1);
+			}
+			else
+			{
+				outdir = Path.GetDirectoryName(filename);
+			}
+
+			// Now, output all of the files to the output directory
+			logger.User("DAT information created, outputting new files");
+			bool success = true;
+			if (nodump.Files.Count > 0)
+			{
+				success &= DatTools.WriteDatfile(nodump, outdir, logger);
+			}
+			if (sha1.Files.Count > 0)
+			{
+				success &= DatTools.WriteDatfile(sha1, outdir, logger);
+			}
+			if (md5.Files.Count > 0)
+			{
+				success &= DatTools.WriteDatfile(md5, outdir, logger);
+			}
+			if (crc.Files.Count > 0)
+			{
+				success &= DatTools.WriteDatfile(crc, outdir, logger);
+			}
+
+			return success;
+		}
+
+		/// <summary>
+		/// Split a DAT by type of Rom
+		/// </summary>
+		/// <param name="filename">Name of the file to be split</param>
+		/// <param name="outdir">Name of the directory to write the DATs out to</param>
+		/// <param name="basepath">Parent path for replacement</param>
+		/// <param name="logger">Logger object for console and file writing</param>
+		/// <returns>True if split succeeded, false otherwise</returns>
+		public static bool SplitByType(string filename, string outdir, string basepath, Logger logger)
+		{
+			// Sanitize the basepath to be more predictable
+			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
+
+			// Get the file data to be split
+			OutputFormat outputFormat = DatTools.GetOutputFormat(filename, logger);
+			Dat datdata = new Dat();
+			datdata = DatTools.Parse(filename, 0, 0, datdata, logger, true);
+
+			// Create each of the respective output DATs
+			logger.User("Creating and populating new DATs");
+			Dat romdat = new Dat
+			{
+				FileName = datdata.FileName + " (Rom)",
+				Name = datdata.Name + " (Rom)",
+				Description = datdata.Description + " (Rom)",
+				Category = datdata.Category,
+				Version = datdata.Version,
+				Date = datdata.Date,
+				Author = datdata.Author,
+				Email = datdata.Email,
+				Homepage = datdata.Homepage,
+				Url = datdata.Url,
+				Comment = datdata.Comment,
+				Header = datdata.Header,
+				Type = datdata.Type,
+				ForceMerging = datdata.ForceMerging,
+				ForceNodump = datdata.ForceNodump,
+				ForcePacking = datdata.ForcePacking,
+				OutputFormat = outputFormat,
+				MergeRoms = datdata.MergeRoms,
+				Files = new Dictionary<string, List<Rom>>(),
+			};
+			Dat diskdat = new Dat
+			{
+				FileName = datdata.FileName + " (Disk)",
+				Name = datdata.Name + " (Disk)",
+				Description = datdata.Description + " (Disk)",
+				Category = datdata.Category,
+				Version = datdata.Version,
+				Date = datdata.Date,
+				Author = datdata.Author,
+				Email = datdata.Email,
+				Homepage = datdata.Homepage,
+				Url = datdata.Url,
+				Comment = datdata.Comment,
+				Header = datdata.Header,
+				Type = datdata.Type,
+				ForceMerging = datdata.ForceMerging,
+				ForceNodump = datdata.ForceNodump,
+				ForcePacking = datdata.ForcePacking,
+				OutputFormat = outputFormat,
+				MergeRoms = datdata.MergeRoms,
+				Files = new Dictionary<string, List<Rom>>(),
+			};
+
+			// Now populate each of the DAT objects in turn
+			List<string> keys = datdata.Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<Rom> roms = datdata.Files[key];
+				foreach (Rom rom in roms)
+				{
+					// If the file is a Rom
+					if (rom.Type == ItemType.Rom)
+					{
+						if (romdat.Files.ContainsKey(key))
+						{
+							romdat.Files[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							romdat.Files.Add(key, temp);
+						}
+					}
+					// If the file is a Disk
+					else if (rom.Type == ItemType.Disk)
+					{
+						if (diskdat.Files.ContainsKey(key))
+						{
+							diskdat.Files[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							diskdat.Files.Add(key, temp);
+						}
+					}
+				}
+			}
+
+			// Get the output directory
+			if (outdir != "")
+			{
+				outdir = outdir + Path.GetDirectoryName(filename).Remove(0, basepath.Length - 1);
+			}
+			else
+			{
+				outdir = Path.GetDirectoryName(filename);
+			}
+
+			// Now, output all of the files to the output directory
+			logger.User("DAT information created, outputting new files");
+			bool success = true;
+			if (romdat.Files.Count > 0)
+			{
+				success &= DatTools.WriteDatfile(romdat, outdir, logger);
+			}
+			if (diskdat.Files.Count > 0)
+			{
+				success &= DatTools.WriteDatfile(diskdat, outdir, logger);
+			}
+
+			return success;
+		}
+
+		#endregion
 	}
 }

@@ -171,6 +171,8 @@ namespace SabreTools.Helper
 					helptext.Add("	-source=		Source ID");
 					helptext.Add("  -st, --stats		Get statistics on all input DATs");
 					helptext.Add("	-si, --single		Show individual statistics");
+					helptext.Add("  -ts, --type-split		Split a DAT or folder by file types (rom/disk)");
+					helptext.Add("	-out=			Output directory");
 					helptext.Add("  -ud, --update		Update a DAT file");
 					helptext.Add("	-oc, --output-cmp	Output in CMP format");
 					helptext.Add("	-om, --output-miss	Output in Missfile format");

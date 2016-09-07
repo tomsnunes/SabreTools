@@ -93,7 +93,6 @@
     <Compile Include="Objects\Import.cs" />
     <Compile Include="Objects\ImportTwo.cs" />
     <Compile Include="Objects\OfflineMerge.cs" />
-    <Compile Include="Objects\Split.cs" />
     <Compile Include="Resources\Resources.de-DE.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

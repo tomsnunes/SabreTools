@@ -507,10 +507,25 @@ namespace SabreTools
 		/// <param name="outdir">Output directory for the split files</param>
 		private static void InitExtSplit(List<string> inputs, string exta, string extb, string outdir)
 		{
-			// Verify the input files
+			// Convert comma-separated strings to list
+			List<string> extaList = exta.Split(',').ToList();
+			List<string> extbList = extb.Split(',').ToList();
+
+			// Loop over the input files
 			foreach (string input in inputs)
 			{
-				if (!File.Exists(input) && !Directory.Exists(input))
+				if (File.Exists(input))
+				{
+					DatTools.SplitByExt(Path.GetFullPath(input), outdir, Path.GetDirectoryName(input), extaList, extbList, _logger);
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						DatTools.SplitByExt(input, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), extaList, extbList, _logger);
+					}
+				}
+				else
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
@@ -518,14 +533,6 @@ namespace SabreTools
 					return;
 				}
 			}
-
-			// Convert comma-separated strings to list
-			List<string> extaList = exta.Split(',').ToList();
-			List<string> extbList = extb.Split(',').ToList();
-
-			Split es = new Split(inputs, extaList, extbList, outdir, _logger);
-			es.Process();
-			return;
 		}
 
 		/// <summary>
@@ -535,10 +542,21 @@ namespace SabreTools
 		/// <param name="outdir">Output directory for the split files</param>
 		private static void InitHashSplit(List<string> inputs, string outdir)
 		{
-			// Verify the input files
+			// Loop over the input files
 			foreach (string input in inputs)
 			{
-				if (!File.Exists(input) && !Directory.Exists(input))
+				if (File.Exists(input))
+				{
+					DatTools.SplitByHash(Path.GetFullPath(input), outdir, Path.GetDirectoryName(input), _logger);
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						DatTools.SplitByHash(input, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
+					}
+				}
+				else
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
@@ -546,10 +564,37 @@ namespace SabreTools
 					return;
 				}
 			}
+		}
 
-			// If so, run the program
-			Split hs = new Split(inputs, outdir, _logger);
-			hs.Process();
+		/// <summary>
+		/// Wrap splitting a DAT by item type
+		/// </summary>
+		/// <param name="inputs">List of inputs to be used</param>
+		/// <param name="outdir">Output directory for the split files</param>
+		private static void InitTypeSplit(List<string> inputs, string outdir)
+		{
+			// Loop over the input files
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					DatTools.SplitByType(Path.GetFullPath(input), outdir, Path.GetDirectoryName(input), _logger);
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						DatTools.SplitByType(input, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
+					}
+				}
+				else
+				{
+					_logger.Error(input + " is not a valid file or folder!");
+					Console.WriteLine();
+					Build.Help();
+					return;
+				}
+			}
 		}
 
 		/// <summary>

@@ -118,6 +118,7 @@ namespace SabreTools
 				stats = false,
 				superdat = false,
 				trim = false,
+				typesplit = false,
 				skip = false,
 				update = false,
 				usegame = true;
@@ -394,6 +395,10 @@ namespace SabreTools
 					case "-trim":
 						trim = true;
 						break;
+					case "-ts":
+					case "--type-split":
+						typesplit = true;
+						break;
 					case "-tsv":
 					case "--tsv":
 						tsv = true;
@@ -606,7 +611,7 @@ namespace SabreTools
 			// If more than one switch is enabled, show the help screen
 			if (!(add ^ datfromdir ^ datfromdirparallel ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^
 				(merge || diff != 0 || update || outputCMP || outputRC || outputSD || outputXML || outputMiss || tsv != null|| trim) ^
-				offlineMerge ^ rem ^ stats))
+				offlineMerge ^ rem ^ stats ^ typesplit))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -616,7 +621,8 @@ namespace SabreTools
 
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (inputs.Count == 0 && (update || (outputMiss || tsv != null) || outputCMP || outputRC || outputSD
-				|| outputXML || extsplit || hashsplit || datfromdir || datfromdirparallel || (merge || diff != 0) || stats || trim))
+				|| outputXML || extsplit || hashsplit || datfromdir || datfromdirparallel || (merge || diff != 0)
+				|| stats || trim || typesplit))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -711,6 +717,12 @@ namespace SabreTools
 			else if (hashsplit)
 			{
 				InitHashSplit(inputs, outdir);
+			}
+
+			// Split a DAT by item type
+			else if (typesplit)
+			{
+				InitTypeSplit(inputs, outdir);
 			}
 
 			// Get statistics on input files
