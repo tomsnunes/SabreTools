@@ -2515,7 +2515,9 @@ namespace SabreTools.Helper
 			// Otherwise, loop through all of the inputs individually
 			else
 			{
-				Parallel.ForEach(inputFileNames, inputFileName =>
+				Parallel.ForEach(inputFileNames,
+					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+					inputFileName =>
 				{
 					// Clean the input string
 					if (inputFileName != "")
@@ -2548,7 +2550,9 @@ namespace SabreTools.Helper
 					{
 						inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
 
-						Parallel.ForEach(Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories), file =>
+						Parallel.ForEach(Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories),
+							new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+							file =>
 						{
 							logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 							Dat innerDatdata = (Dat)datdata.Clone();
