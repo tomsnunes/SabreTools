@@ -1516,7 +1516,7 @@ namespace SabreTools.Helper
 			{
 				return sortable;
 			}
-			
+
 			// Process each all of the roms
 			foreach (string key in dict.Keys)
 			{
@@ -2687,7 +2687,12 @@ namespace SabreTools.Helper
 				int depth = 2, last = -1;
 				string lastgame = null;
 				List<string> splitpath = new List<string>();
-				foreach (string key in sortable.Keys)
+
+				// Get a properly sorted set of keys
+				List<string> keys = sortable.Keys.ToList();
+				keys.Sort(Style.CompareNumeric);
+
+				foreach (string key in keys)
 				{
 					List<Rom> roms = sortable[key];
 
