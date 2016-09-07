@@ -2417,30 +2417,23 @@ namespace SabreTools.Helper
 				return false;
 			}
 
-			// If the DAT has no output format, default to XML
-			if (datdata.OutputFormat == OutputFormat.None)
-			{
-				datdata.OutputFormat = OutputFormat.Xml;
-			}
-
-			// Output initial statistics, for kicks
-			if (stats)
-			{
-				Stats.OutputStats(datdata, logger, (datdata.RomCount + datdata.DiskCount == 0));
-			}
-
-			// Bucket roms by game name and optionally dedupe
-			SortedDictionary<string, List<Rom>> sortable = DatTools.BucketByGame(datdata.Files, datdata.MergeRoms, norename, logger);
-
-			// Now write out to file
-			// If it's empty, use the current folder
+			// If output directory is empty, use the current folder
 			if (outDir.Trim() == "")
 			{
 				outDir = Environment.CurrentDirectory;
 			}
 
 			// Create the output directory if it doesn't already exist
-			Directory.CreateDirectory(outDir);
+			if (!Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir);
+			}
+
+			// If the DAT has no output format, default to XML
+			if (datdata.OutputFormat == OutputFormat.None)
+			{
+				datdata.OutputFormat = OutputFormat.Xml;
+			}
 
 			// Make sure that the three essential fields are filled in
 			if (String.IsNullOrEmpty(datdata.FileName) && String.IsNullOrEmpty(datdata.Name) && String.IsNullOrEmpty(datdata.Description))
@@ -2475,6 +2468,15 @@ namespace SabreTools.Helper
 			{
 				// Nothing is needed
 			}
+
+			// Output initial statistics, for kicks
+			if (stats)
+			{
+				Stats.OutputStats(datdata, logger, (datdata.RomCount + datdata.DiskCount == 0));
+			}
+
+			// Bucket roms by game name and optionally dedupe
+			SortedDictionary<string, List<Rom>> sortable = DatTools.BucketByGame(datdata.Files, datdata.MergeRoms, norename, logger);
 
 			// Get the outfile name
 			string outfile = Style.CreateOutfileName(outDir, datdata);
