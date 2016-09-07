@@ -233,9 +233,9 @@ namespace SabreTools.Helper
 					{
 						if (x.Machine.Name == y.Machine.Name)
 						{
-							return String.Compare(x.Name, y.Name);
+							return Style.CompareNumeric(x.Name, y.Name);
 						}
-						return String.Compare(x.Machine.Name, y.Machine.Name);
+						return Style.CompareNumeric(x.Machine.Name, y.Machine.Name);
 					}
 					return (norename ? String.Compare(x.Machine.Name, y.Machine.Name) : x.Metadata.SourceID - y.Metadata.SourceID);
 				}
