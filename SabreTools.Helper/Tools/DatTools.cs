@@ -1549,6 +1549,12 @@ namespace SabreTools.Helper
 				}
 			}
 
+			// Now go through and sort all of the lists
+			foreach (string key in sortable.Keys)
+			{
+				RomTools.Sort(sortable[key], norename);
+			}
+
 			// Output the count if told to
 			if (output)
 			{
@@ -1618,6 +1624,12 @@ namespace SabreTools.Helper
 						sortable.Add(key, temp);
 					}
 				}
+			}
+
+			// Now go through and sort all of the lists
+			foreach (string key in sortable.Keys)
+			{
+				RomTools.Sort(sortable[key], norename);
 			}
 
 			// Output the count if told to
