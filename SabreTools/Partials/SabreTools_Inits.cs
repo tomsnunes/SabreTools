@@ -475,7 +475,6 @@ namespace SabreTools
 				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
-				Files = new Dictionary<string, List<Rom>>(),
 			};
 
 			// For each input directory, create a DAT
@@ -485,6 +484,7 @@ namespace SabreTools
 				{
 					// Clone the base Dat for information
 					Dat datdata = (Dat)basedat.Clone();
+					datdata.Files = new Dictionary<string, List<Rom>>();
 
 					string basePath = Path.GetFullPath(path);
 					DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, maxDegreeOfParallelism, _logger);
