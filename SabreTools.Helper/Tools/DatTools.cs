@@ -2424,10 +2424,11 @@ namespace SabreTools.Helper
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		public static void UpdateParallel(List<string> inputFileNames, Dat datdata, string outputDirectory, bool merge, DiffMode diff, bool? cascade, bool inplace,
 			bool skip, bool bare, bool clean, bool softlist, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
-			string md5, string sha1, bool? nodump, bool trim, bool single, string root, Logger logger)
+			string md5, string sha1, bool? nodump, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || diff != 0)
