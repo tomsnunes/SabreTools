@@ -61,7 +61,7 @@ namespace SabreTools
 			_bare = bare;
 			_archivesAsFiles = archivesAsFiles;
 			_enableGzip = enableGzip;
-			_addblanks = true;
+			_addblanks = false; // This needs a proper flag later
 			_tempDir = tempDir;
 			_maxDegreeOfParallelism = maxDegreeOfParallelism;
 			_logger = logger;
