@@ -97,17 +97,17 @@ namespace SabreTools
 
 			// Process the files in all subfolders
 			Parallel.ForEach(Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories),
-				new ParallelOptions { MaxDegreeOfParallelism = 4 },
+				new ParallelOptions { MaxDegreeOfParallelism = _maxParallelism },
 				item =>
 			{
 				ProcessPossibleArchive(item);
 			});
 
 			// Now find all folders that are empty, if we are supposed to
-			if (_addblanks)
+			if (!_datdata.Romba && _addblanks)
 			{
 				Parallel.ForEach(Directory.EnumerateDirectories(_basePath, "*", SearchOption.AllDirectories),
-					new ParallelOptions { MaxDegreeOfParallelism = 4 },
+					new ParallelOptions { MaxDegreeOfParallelism = _maxParallelism },
 					dir =>
 				{
 					if (Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).Count() == 0)
@@ -247,7 +247,7 @@ namespace SabreTools
 				{
 					_logger.Log(Path.GetFileName(item) + " treated like an archive");
 					Parallel.ForEach(Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories),
-						new ParallelOptions { MaxDegreeOfParallelism = 4 },
+						new ParallelOptions { MaxDegreeOfParallelism = _maxParallelism },
 						entry =>
 					{
 						ProcessFile(entry, tempSubDir, Path.GetFileNameWithoutExtension(item), _datdata);
