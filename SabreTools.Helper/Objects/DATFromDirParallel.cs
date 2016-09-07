@@ -55,6 +55,7 @@ namespace SabreTools
 		{
 			_basePath = Path.GetFullPath(basePath);
 			_datdata = datdata;
+			_datdata.Files = new Dictionary<string, List<Rom>>();
 			_datdata.Files.Add("null", new List<Rom>());
 			_noMD5 = noMD5;
 			_noSHA1 = noSHA1;
@@ -205,7 +206,14 @@ namespace SabreTools
 				// If the rom is valid, write it out
 				if (rom.Name != null)
 				{
-					_datdata.Files["null"].Add(rom);
+					// Add the list if it doesn't exist already
+					string key = rom.HashData.Size + "-" + rom.HashData.CRC;
+					if (!_datdata.Files.ContainsKey(key))
+					{
+						_datdata.Files.Add(key, new List<Rom>());
+					}
+
+					_datdata.Files[key].Add(rom);
 					_logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 				}
 				else
@@ -299,6 +307,13 @@ namespace SabreTools
 		/// <param name="datdata">DatData object with output information</param>
 		private void ProcessFileHelper(string item, Rom rom, string basepath, string parent, Dat datdata)
 		{
+			// Add the list if it doesn't exist already
+			string key = rom.HashData.Size + "-" + rom.HashData.CRC;
+			if (!datdata.Files.ContainsKey(key))
+			{
+				datdata.Files.Add(key, new List<Rom>());
+			}
+
 			try
 			{
 				// If the basepath ends with a directory separator, remove it
@@ -377,7 +392,7 @@ namespace SabreTools
 				rom.Name = romname;
 
 				// Add the file information to the DAT
-				datdata.Files["null"].Add(rom);
+				datdata.Files[key].Add(rom);
 
 				_logger.User("File added: " + romname + Environment.NewLine);
 			}
