@@ -144,6 +144,7 @@ namespace SabreTools.Helper
 					helptext.Add("	-au=, --author=		Set the author of the DAT");
 					helptext.Add("	-sd, --superdat		Enable SuperDAT creation");
 					helptext.Add("	-t=, --temp=		Set the temporary directory to use");
+					helptext.Add("	-mt={-1}			Amount of threads to use (-1 unlimted)");
 					helptext.Add("  -es, --ext-split	Split a DAT by two file extensions");
 					helptext.Add("	-exta=			First set of extensions (comma-separated)");
 					helptext.Add("	-extb=			Second set of extensions (comma-separated)");

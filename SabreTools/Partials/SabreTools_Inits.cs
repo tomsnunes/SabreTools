@@ -424,7 +424,7 @@ namespace SabreTools
 		/// <summary>
 		/// Wrap creating a DAT file from files or a directory in parallel
 		/// </summary>
-		/// <param name="input">List of innput filenames</param>
+		/// <param name="inputs">List of input filenames</param>
 		/// <param name="filename">New filename</param>
 		/// <param name="name">New name</param>
 		/// <param name="description">New description</param>
@@ -441,6 +441,7 @@ namespace SabreTools
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
+		/// <param name="maxParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitDatFromDirParallel(List<string> inputs,
 			string filename,
 			string name,
@@ -457,7 +458,8 @@ namespace SabreTools
 			bool bare,
 			bool archivesAsFiles,
 			bool enableGzip,
-			string tempDir)
+			string tempDir,
+			int maxParallelism)
 		{
 			// Create a new DATFromDir object and process the inputs
 			Dat datdata = new Dat
@@ -482,7 +484,7 @@ namespace SabreTools
 				if (Directory.Exists(path))
 				{
 					string basePath = Path.GetFullPath(path);
-					DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
+					DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, maxParallelism, _logger);
 					bool success = dfd.Start();
 
 					// For DFDParallel only

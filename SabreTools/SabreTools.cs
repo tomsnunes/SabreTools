@@ -126,6 +126,7 @@ namespace SabreTools
 				nodump = null,
 				tsv = null;
 			DiffMode diff = 0x0;
+			int maxParallelism = -1;
 			long sgt = -1,
 				slt = -1,
 				seq = -1;
@@ -502,6 +503,10 @@ namespace SabreTools
 						{
 							md5 = temparg.Split('=')[1];
 						}
+						else if (temparg.StartsWith("-mt=") || temparg.StartsWith("--mt="))
+						{
+							Int32.TryParse(temparg.Split('=')[1], out maxParallelism);
+						}
 						else if (temparg.StartsWith("-n=") || temparg.StartsWith("--name="))
 						{
 							name = temparg.Split('=')[1];
@@ -740,7 +745,8 @@ namespace SabreTools
 			// Create a DAT from a directory or set of directories in parallel
 			else if (datfromdirparallel)
 			{
-				InitDatFromDirParallel(inputs, filename, name, description, category, version, author, forceunpack, old, romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir);
+				InitDatFromDirParallel(inputs, filename, name, description, category, version, author,
+					forceunpack, old, romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir, maxParallelism);
 			}
 
 			// If we want to run Offline merging mode

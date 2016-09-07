@@ -26,6 +26,7 @@ namespace SabreTools
 		private bool _archivesAsFiles;
 		private bool _enableGzip;
 		private bool _addblanks;
+		private int _maxParallelism;
 
 		// Other required variables
 		private Logger _logger;
@@ -47,9 +48,10 @@ namespace SabreTools
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
-		/// <param name="nowrite">True if the file should not be written out, false otherwise (default)</param>
+		/// <param name="maxParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public DATFromDirParallel(string basePath, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, string tempDir, Logger logger)
+		public DATFromDirParallel(string basePath, Dat datdata, bool noMD5, bool noSHA1, bool bare,
+			bool archivesAsFiles, bool enableGzip, string tempDir, int maxParallelism, Logger logger)
 		{
 			_basePath = Path.GetFullPath(basePath);
 			_datdata = datdata;
@@ -61,6 +63,7 @@ namespace SabreTools
 			_enableGzip = enableGzip;
 			_addblanks = true;
 			_tempDir = tempDir;
+			_maxParallelism = maxParallelism;
 			_logger = logger;
 		}
 
@@ -93,7 +96,9 @@ namespace SabreTools
 			_logger.Log("Folder found: " + _basePath);
 
 			// Process the files in all subfolders
-			Parallel.ForEach(Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories), item =>
+			Parallel.ForEach(Directory.EnumerateFiles(_basePath, "*", SearchOption.AllDirectories),
+				new ParallelOptions { MaxDegreeOfParallelism = 4 },
+				item =>
 			{
 				ProcessPossibleArchive(item);
 			});
@@ -101,7 +106,9 @@ namespace SabreTools
 			// Now find all folders that are empty, if we are supposed to
 			if (_addblanks)
 			{
-				Parallel.ForEach(Directory.EnumerateDirectories(_basePath, "*", SearchOption.AllDirectories), dir =>
+				Parallel.ForEach(Directory.EnumerateDirectories(_basePath, "*", SearchOption.AllDirectories),
+					new ParallelOptions { MaxDegreeOfParallelism = 4 },
+					dir =>
 				{
 					if (Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).Count() == 0)
 					{
@@ -239,7 +246,9 @@ namespace SabreTools
 				if (!encounteredErrors)
 				{
 					_logger.Log(Path.GetFileName(item) + " treated like an archive");
-					Parallel.ForEach(Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories), entry =>
+					Parallel.ForEach(Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories),
+						new ParallelOptions { MaxDegreeOfParallelism = 4 },
+						entry =>
 					{
 						ProcessFile(entry, tempSubDir, Path.GetFileNameWithoutExtension(item), _datdata);
 					});
