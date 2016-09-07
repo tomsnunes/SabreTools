@@ -462,7 +462,7 @@ namespace SabreTools
 			int maxDegreeOfParallelism)
 		{
 			// Create a new DATFromDir object and process the inputs
-			Dat datdata = new Dat
+			Dat basedat = new Dat
 			{
 				FileName = filename,
 				Name = name,
@@ -483,6 +483,9 @@ namespace SabreTools
 			{
 				if (Directory.Exists(path))
 				{
+					// Clone the base Dat for information
+					Dat datdata = (Dat)basedat.Clone();
+
 					string basePath = Path.GetFullPath(path);
 					DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, maxDegreeOfParallelism, _logger);
 					bool success = dfd.Start();
