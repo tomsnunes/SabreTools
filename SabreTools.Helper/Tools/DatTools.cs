@@ -3043,12 +3043,18 @@ namespace SabreTools.Helper
 			}
 			string newExtBString = string.Join(",", newExtB);
 
-			// Load the current DAT to be processed
+			// Get the file format
+			OutputFormat outputFormat = GetOutputFormat(filename, logger);
+			if (outputFormat == OutputFormat.None)
+			{
+				return true;
+			}
+
+			// Get the file data to be split
 			Dat datdata = new Dat();
-			datdata = DatTools.Parse(filename, 0, 0, datdata, logger);
+			datdata = Parse(filename, 0, 0, datdata, logger);
 
 			// Set all of the appropriate outputs for each of the subsets
-			OutputFormat outputFormat = DatTools.GetOutputFormat(filename, logger);
 			Dat datdataA = new Dat
 			{
 				FileName = datdata.FileName + " (" + newExtAString + ")",
@@ -3156,8 +3162,8 @@ namespace SabreTools.Helper
 			}
 
 			// Then write out both files
-			bool success = DatTools.WriteDatfile(datdataA, outdir, logger);
-			success &= DatTools.WriteDatfile(datdataB, outdir, logger);
+			bool success = WriteDatfile(datdataA, outdir, logger);
+			success &= WriteDatfile(datdataB, outdir, logger);
 
 			return success;
 		}
@@ -3175,10 +3181,16 @@ namespace SabreTools.Helper
 			// Sanitize the basepath to be more predictable
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
+			// Get the file format
+			OutputFormat outputFormat = GetOutputFormat(filename, logger);
+			if (outputFormat == OutputFormat.None)
+			{
+				return true;
+			}
+
 			// Get the file data to be split
-			OutputFormat outputFormat = DatTools.GetOutputFormat(filename, logger);
 			Dat datdata = new Dat();
-			datdata = DatTools.Parse(filename, 0, 0, datdata, logger, true);
+			datdata = Parse(filename, 0, 0, datdata, logger, true);
 
 			// Create each of the respective output DATs
 			logger.User("Creating and populating new DATs");
@@ -3352,19 +3364,19 @@ namespace SabreTools.Helper
 			bool success = true;
 			if (nodump.Files.Count > 0)
 			{
-				success &= DatTools.WriteDatfile(nodump, outdir, logger);
+				success &= WriteDatfile(nodump, outdir, logger);
 			}
 			if (sha1.Files.Count > 0)
 			{
-				success &= DatTools.WriteDatfile(sha1, outdir, logger);
+				success &= WriteDatfile(sha1, outdir, logger);
 			}
 			if (md5.Files.Count > 0)
 			{
-				success &= DatTools.WriteDatfile(md5, outdir, logger);
+				success &= WriteDatfile(md5, outdir, logger);
 			}
 			if (crc.Files.Count > 0)
 			{
-				success &= DatTools.WriteDatfile(crc, outdir, logger);
+				success &= WriteDatfile(crc, outdir, logger);
 			}
 
 			return success;
@@ -3383,18 +3395,24 @@ namespace SabreTools.Helper
 			// Sanitize the basepath to be more predictable
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
+			// Get the file format
+			OutputFormat outputFormat = GetOutputFormat(filename, logger);
+			if (outputFormat == OutputFormat.None)
+			{
+				return true;
+			}
+
 			// Get the file data to be split
-			OutputFormat outputFormat = DatTools.GetOutputFormat(filename, logger);
 			Dat datdata = new Dat();
-			datdata = DatTools.Parse(filename, 0, 0, datdata, logger, true);
+			datdata = Parse(filename, 0, 0, datdata, logger, true);
 
 			// Create each of the respective output DATs
 			logger.User("Creating and populating new DATs");
 			Dat romdat = new Dat
 			{
-				FileName = datdata.FileName + " (Rom)",
-				Name = datdata.Name + " (Rom)",
-				Description = datdata.Description + " (Rom)",
+				FileName = datdata.FileName + " (ROM)",
+				Name = datdata.Name + " (ROM)",
+				Description = datdata.Description + " (ROM)",
 				Category = datdata.Category,
 				Version = datdata.Version,
 				Date = datdata.Date,
@@ -3488,11 +3506,11 @@ namespace SabreTools.Helper
 			bool success = true;
 			if (romdat.Files.Count > 0)
 			{
-				success &= DatTools.WriteDatfile(romdat, outdir, logger);
+				success &= WriteDatfile(romdat, outdir, logger);
 			}
 			if (diskdat.Files.Count > 0)
 			{
-				success &= DatTools.WriteDatfile(diskdat, outdir, logger);
+				success &= WriteDatfile(diskdat, outdir, logger);
 			}
 
 			return success;
