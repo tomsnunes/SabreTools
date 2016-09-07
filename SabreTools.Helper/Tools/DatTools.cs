@@ -2409,6 +2409,12 @@ namespace SabreTools.Helper
 		/// </remarks>
 		public static bool WriteDatfile(Dat datdata, string outDir, Logger logger, bool norename = true, bool stats = false, bool ignoreblanks = false)
 		{
+			// If there's nothing there, abort
+			if (datdata.Files == null || datdata.Files.Count == 0)
+			{
+				return false;
+			}
+
 			// If the DAT has no output format, default to XML
 			if (datdata.OutputFormat == OutputFormat.None)
 			{
