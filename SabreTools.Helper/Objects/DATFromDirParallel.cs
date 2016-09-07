@@ -238,13 +238,13 @@ namespace SabreTools
 					foreach (Rom rom in extracted)
 					{
 						ProcessFileHelper(item, rom, _basePath,
-							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) + Path.GetFileNameWithoutExtension(item), _datdata);
+							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) + Path.GetFileNameWithoutExtension(item));
 					}
 				}
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(item))
 				{
-					ProcessFile(item, _basePath, "", _datdata);
+					ProcessFile(item, _basePath, "");
 				}
 			}
 			// Otherwise, attempt to extract the files to the temporary directory
@@ -266,7 +266,7 @@ namespace SabreTools
 						new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
 						entry =>
 					{
-						ProcessFile(entry, tempSubDir, Path.GetFileNameWithoutExtension(item), _datdata);
+						ProcessFile(entry, tempSubDir, Path.GetFileNameWithoutExtension(item));
 					});
 
 					// Clear the temp directory
@@ -278,7 +278,7 @@ namespace SabreTools
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(item))
 				{
-					ProcessFile(item, _basePath, "", _datdata);
+					ProcessFile(item, _basePath, "");
 				}
 			}
 		}
@@ -289,13 +289,12 @@ namespace SabreTools
 		/// <param name="item">File to be added</param>
 		/// <param name="basepath">Path the represents the parent directory</param>
 		/// <param name="parent">Parent game to be used</param>
-		/// <param name="datdata">DatData object with output information</param>
-		private void ProcessFile(string item, string basepath, string parent, Dat datdata)
+		private void ProcessFile(string item, string basepath, string parent)
 		{
 			_logger.Log(Path.GetFileName(item) + " treated like a file");
 			Rom rom = FileTools.GetSingleFileInfo(item, _noMD5, _noSHA1);
 
-			ProcessFileHelper(item, rom, basepath, parent, datdata);
+			ProcessFileHelper(item, rom, basepath, parent);
 		}
 
 		/// <summary>
@@ -305,14 +304,13 @@ namespace SabreTools
 		/// <param name="rom">Rom data to be used to write to file</param>
 		/// <param name="basepath">Path the represents the parent directory</param>
 		/// <param name="parent">Parent game to be used</param>
-		/// <param name="datdata">DatData object with output information</param>
-		private void ProcessFileHelper(string item, Rom rom, string basepath, string parent, Dat datdata)
+		private void ProcessFileHelper(string item, Rom rom, string basepath, string parent)
 		{
 			// Add the list if it doesn't exist already
 			string key = rom.HashData.Size + "-" + rom.HashData.CRC;
-			if (!datdata.Files.ContainsKey(key))
+			if (!_datdata.Files.ContainsKey(key))
 			{
-				datdata.Files.Add(key, new List<Rom>());
+				_datdata.Files.Add(key, new List<Rom>());
 			}
 
 			try
@@ -334,7 +332,7 @@ namespace SabreTools
 				if (parent == "")
 				{
 					// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
-					if (datdata.Type == "SuperDAT")
+					if (_datdata.Type == "SuperDAT")
 					{
 						gamename = Path.GetDirectoryName(item.Remove(0, basepath.Length));
 						romname = Path.GetFileName(item);
@@ -352,7 +350,7 @@ namespace SabreTools
 				else
 				{
 					// If we have a SuperDAT, we want the archive name as the game, and the file as everything else (?)
-					if (datdata.Type == "SuperDAT")
+					if (_datdata.Type == "SuperDAT")
 					{
 						gamename = parent;
 						romname = item.Remove(0, basepath.Length);
@@ -393,7 +391,7 @@ namespace SabreTools
 				rom.Name = romname;
 
 				// Add the file information to the DAT
-				datdata.Files[key].Add(rom);
+				_datdata.Files[key].Add(rom);
 
 				_logger.User("File added: " + romname + Environment.NewLine);
 			}
