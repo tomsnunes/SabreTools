@@ -1533,9 +1533,9 @@ namespace SabreTools.Helper
 										: rom.Metadata.SystemID.ToString().PadLeft(10, '0')
 											+ "-"
 											+ rom.Metadata.SourceID.ToString().PadLeft(10, '0') + "-")
-											+ (String.IsNullOrEmpty(rom.Machine.Name)
-												? ""
-												: rom.Machine.Name.ToLowerInvariant());
+									+ (String.IsNullOrEmpty(rom.Machine.Name)
+											? "Default"
+											: rom.Machine.Name.ToLowerInvariant());
 					if (sortable.ContainsKey(newkey))
 					{
 						sortable[newkey].Add(rom);
@@ -2687,8 +2687,10 @@ namespace SabreTools.Helper
 				int depth = 2, last = -1;
 				string lastgame = null;
 				List<string> splitpath = new List<string>();
-				foreach (List<Rom> roms in sortable.Values)
+				foreach (string key in sortable.Keys)
 				{
+					List<Rom> roms = sortable[key];
+
 					for (int index = 0; index < roms.Count; index++)
 					{
 						Rom rom = roms[index];
