@@ -3052,7 +3052,7 @@ namespace SabreTools.Helper
 
 			// Get the file data to be split
 			Dat datdata = new Dat();
-			datdata = Parse(filename, 0, 0, datdata, logger);
+			datdata = Parse(filename, 0, 0, datdata, logger, softlist:true);
 
 			// Set all of the appropriate outputs for each of the subsets
 			Dat datdataA = new Dat
@@ -3190,7 +3190,7 @@ namespace SabreTools.Helper
 
 			// Get the file data to be split
 			Dat datdata = new Dat();
-			datdata = Parse(filename, 0, 0, datdata, logger, true);
+			datdata = Parse(filename, 0, 0, datdata, logger, true, softlist:true);
 
 			// Create each of the respective output DATs
 			logger.User("Creating and populating new DATs");
@@ -3404,7 +3404,7 @@ namespace SabreTools.Helper
 
 			// Get the file data to be split
 			Dat datdata = new Dat();
-			datdata = Parse(filename, 0, 0, datdata, logger, true);
+			datdata = Parse(filename, 0, 0, datdata, logger, true, softlist:true);
 
 			// Create each of the respective output DATs
 			logger.User("Creating and populating new DATs");
