@@ -160,6 +160,7 @@ namespace SabreTools
 							Machine = new Machine
 							{
 								Name = gamename,
+								Description = gamename,
 							},
 							HashData = new Hash
 							{
