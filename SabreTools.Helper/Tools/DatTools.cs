@@ -2243,13 +2243,13 @@ namespace SabreTools.Helper
 			// Output the difflist (a-b)+(b-a) diff
 			if ((diff & DiffMode.NoDupes) != 0)
 			{
-				DatTools.WriteDatfile(outerDiffData, outdir, logger);
+				WriteDatfile(outerDiffData, outdir, logger);
 			}
 
 			// Output the (ab) diff
 			if ((diff & DiffMode.Dupes) != 0)
 			{
-				DatTools.WriteDatfile(dupeData, outdir, logger);
+				WriteDatfile(dupeData, outdir, logger);
 			}
 
 			// Output the individual (a-b) DATs
@@ -2263,7 +2263,7 @@ namespace SabreTools.Helper
 					// If we have more than 0 roms, output
 					if (outDats[j].Files.Count > 0)
 					{
-						DatTools.WriteDatfile(outDats[j], path, logger);
+						WriteDatfile(outDats[j], path, logger);
 					}
 				}
 			}
@@ -2358,7 +2358,7 @@ namespace SabreTools.Helper
 				// If we have more than 0 roms, output
 				if (outDats[j].Files.Count > 0)
 				{
-					DatTools.WriteDatfile(outDats[j], path, logger);
+					WriteDatfile(outDats[j], path, logger);
 				}
 			}
 			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
@@ -2401,7 +2401,7 @@ namespace SabreTools.Helper
 			// Output a DAT only if there are roms
 			if (userData.Files.Count != 0)
 			{
-				DatTools.WriteDatfile(userData, outdir, logger);
+				WriteDatfile(userData, outdir, logger);
 			}
 		}
 
@@ -2570,7 +2570,7 @@ namespace SabreTools.Helper
 							// If we have roms, output them
 							if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
 							{
-								DatTools.WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger);
+								WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger);
 							}
 						});
 					}
@@ -2668,7 +2668,7 @@ namespace SabreTools.Helper
 			}
 
 			// Bucket roms by game name and optionally dedupe
-			SortedDictionary<string, List<Rom>> sortable = DatTools.BucketByGame(datdata.Files, datdata.MergeRoms, norename, logger);
+			SortedDictionary<string, List<Rom>> sortable = BucketByGame(datdata.Files, datdata.MergeRoms, norename, logger);
 
 			// Get the outfile name
 			string outfile = Style.CreateOutfileName(outDir, datdata);
