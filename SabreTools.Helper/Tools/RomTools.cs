@@ -232,12 +232,13 @@ namespace SabreTools.Helper
 				{
 					if (x.Metadata.SourceID == y.Metadata.SourceID)
 					{
-						if (x.Machine.Name == y.Machine.Name)
+						if (x.Machine.Name.Equals(y.Machine.Name, StringComparison.InvariantCultureIgnoreCase))
 						{
-							if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
+							if (Path.GetDirectoryName(x.Name).Equals(Path.GetDirectoryName(y.Name), StringComparison.InvariantCultureIgnoreCase))
 							{
 								return Style.CompareNumeric(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
 							}
+							return Style.CompareNumeric(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
 						}
 						return Style.CompareNumeric(x.Machine.Name, y.Machine.Name);
 					}
