@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace SabreTools.Helper
@@ -233,7 +234,10 @@ namespace SabreTools.Helper
 					{
 						if (x.Machine.Name == y.Machine.Name)
 						{
-							return Style.CompareNumeric(x.Name, y.Name);
+							if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
+							{
+								return Style.CompareNumeric(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
+							}
 						}
 						return Style.CompareNumeric(x.Machine.Name, y.Machine.Name);
 					}
