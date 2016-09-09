@@ -115,6 +115,9 @@ namespace SabreTools.Helper
 		DOSCenter,
 		MissFile,
 		SabreDat,
+		RedumpMD5,
+		RedumpSHA1,
+		RedumpSFV,
 	}
 
 	/// <summary>

@@ -176,6 +176,15 @@ namespace SabreTools.Helper
 				case OutputFormat.Xml:
 					extension = ".xml";
 					break;
+				case OutputFormat.RedumpMD5:
+					extension = ".md5";
+					break;
+				case OutputFormat.RedumpSFV:
+					extension = ".sfv";
+					break;
+				case OutputFormat.RedumpSHA1:
+					extension = ".sha1";
+					break;
 			}
 			string filename = (String.IsNullOrEmpty(datdata.FileName) ? datdata.Description : datdata.FileName);
 			string outfile = outDir + filename + extension;

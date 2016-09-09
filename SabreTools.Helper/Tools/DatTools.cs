@@ -3188,6 +3188,15 @@ namespace SabreTools.Helper
 							}
 						}
 						break;
+					case OutputFormat.RedumpMD5:
+						state += rom.HashData.MD5 + " *" + rom.Name + "\n";
+						break;
+					case OutputFormat.RedumpSFV:
+						state += rom.Name + " " + rom.HashData.CRC + "\n";
+						break;
+					case OutputFormat.RedumpSHA1:
+						state += rom.HashData.SHA1 + " *" + rom.Name + "\n";
+						break;
 					case OutputFormat.RomCenter:
 						state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Machine) +
 							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) +
