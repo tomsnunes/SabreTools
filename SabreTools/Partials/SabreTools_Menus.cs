@@ -241,7 +241,7 @@ Make a selection:
 		private static void ConvertMenu()
 		{
 			string selection = "", input = "", outdir = "";
-			OutputFormatFlag outputFormatFlag = OutputFormatFlag.Xml;
+			OutputFormat outputFormat = OutputFormat.Xml;
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
@@ -252,7 +252,7 @@ Make a selection:
 
     1) File or folder to convert" + (input == "" ? "" : ":\n" + input) + @"
     2) New output folder" + (outdir == "" ? " (blank means source directory)" : ":\n" + outdir) + @"
-    3) Current output type: " + (outputFormatFlag.ToString()) + @"
+    3) Current output type: " + (outputFormat.ToString()) + @"
     4) Process file or folder
     B) Go back to the previous menu
 ");
@@ -287,16 +287,16 @@ Make a selection:
 							switch (subsel)
 							{
 								case "1":
-									outputFormatFlag = OutputFormatFlag.Xml;
+									outputFormat = OutputFormat.Xml;
 									break;
 								case "2":
-									outputFormatFlag = OutputFormatFlag.ClrMamePro;
+									outputFormat = OutputFormat.ClrMamePro;
 									break;
 								case "3":
-									outputFormatFlag = OutputFormatFlag.RomCenter;
+									outputFormat = OutputFormat.RomCenter;
 									break;
 								case "4":
-									outputFormatFlag = OutputFormatFlag.SabreDat;
+									outputFormat = OutputFormat.SabreDat;
 									break;
 								default:
 									subsel = "";
@@ -310,14 +310,14 @@ Make a selection:
 						temp.Add(input);
 						/*
 						InitUpdate(temp, "", "", "", "", "", "", "", "", "", "", "", "", false, "", "", "",
-							(outputFormatFlag == OutputFormatFlag.ClrMamePro), (outputFormatFlag == OutputFormatFlag.MissFile), (outputFormatFlag == OutputFormatFlag.RomCenter),
-							(outputFormatFlag == OutputFormatFlag.SabreDat), (outputFormatFlag == OutputFormatFlag.Xml), false, "", "", false, "", "", false, false, false,
+							(outputFormat == OutputFormat.ClrMamePro), (outputFormat == OutputFormat.MissFile), (outputFormat == OutputFormat.RomCenter),
+							(outputFormat == OutputFormat.SabreDat), (outputFormat == OutputFormat.Xml), false, "", "", false, "", "", false, false, false,
 							false, false, false, false, false, "", "", "", -1, -1, -1, "", "", "", null, outdir, false, false);
 						*/
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
 						input = ""; outdir = "";
-						outputFormatFlag = OutputFormatFlag.Xml;
+						outputFormat = OutputFormat.Xml;
 						break;
 				}
 			}

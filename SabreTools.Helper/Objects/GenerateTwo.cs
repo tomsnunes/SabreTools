@@ -154,7 +154,7 @@ namespace SabreTools
 				Category = "SabreTools",
 				Author = "SabreTools",
 				ForcePacking = ForcePacking.None,
-				OutputFormatFlag = (_old ? OutputFormatFlag.ClrMamePro : OutputFormatFlag.Xml),
+				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 				MergeRoms = true,
 			};
 

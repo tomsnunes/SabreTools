@@ -93,7 +93,7 @@ namespace SabreTools
 		/// <param name="forcemerge">None, Split, Full</param>
 		/// <param name="forcend">None, Obsolete, Required, Ignore</param>
 		/// <param name="forcepack">None, Zip, Unzip</param>
-		/// <param name="outputFormatFlag">Non-zero flag for output format, zero otherwise for default</param>
+		/// <param name="outputFormat">Non-zero flag for output format, zero otherwise for default</param>
 		/// /* Missfile-specific DAT info */
 		/// <param name="usegame">True if games are to be used in output, false if roms are</param>
 		/// <param name="prefix">Generic prefix to be added to each line</param>
@@ -152,7 +152,7 @@ namespace SabreTools
 			string forcemerge,
 			string forcend,
 			string forcepack,
-			OutputFormatFlag outputFormatFlag,
+			OutputFormat outputFormat,
 
 			/* Missfile-specific DAT info */
 			bool usegame,
@@ -303,7 +303,7 @@ namespace SabreTools
 				ForceNodump = fn,
 				ForcePacking = fp,
 				MergeRoms = dedup,
-				OutputFormatFlag = outputFormatFlag,
+				OutputFormat = outputFormat,
 
 				UseGame = usegame,
 				Prefix = prefix,
@@ -316,7 +316,7 @@ namespace SabreTools
 				XSV = tsv,
 			};
 
-			DatTools.UpdateParallel(inputs, userInputDat, outputFormatFlag, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
+			DatTools.UpdateParallel(inputs, userInputDat, outputFormat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
 				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
 		}
 
@@ -369,7 +369,7 @@ namespace SabreTools
 				Date = DateTime.Now.ToString("yyyy-MM-dd"),
 				Author = author,
 				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormatFlag = (old ? OutputFormatFlag.ClrMamePro : OutputFormatFlag.Xml),
+				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
 				Files = new Dictionary<string, List<Rom>>(),
@@ -437,7 +437,7 @@ namespace SabreTools
 				Date = DateTime.Now.ToString("yyyy-MM-dd"),
 				Author = author,
 				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormatFlag = (old ? OutputFormatFlag.ClrMamePro : OutputFormatFlag.Xml),
+				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
 			};

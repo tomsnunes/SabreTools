@@ -18,7 +18,7 @@ namespace SabreTools.Helper
 	/// Determines the DAT output format
 	/// </summary>
 	[Flags]
-	public enum OutputFormatFlag
+	public enum OutputFormat
 	{
 		Xml = 0x001,
 		ClrMamePro = 0x002,

@@ -39,7 +39,7 @@ namespace SabreTools.Helper
 			datdata.FileName = (String.IsNullOrEmpty(datdata.FileName) ? (keepext ? Path.GetFileName(filename) : Path.GetFileNameWithoutExtension(filename)) : datdata.FileName);
 
 			// If the output type isn't set already, get the internal output type
-			datdata.OutputFormatFlag = (datdata.OutputFormatFlag == 0 ? DatTools.GetOutputFormat(filename, logger) : datdata.OutputFormatFlag);
+			datdata.OutputFormat = (datdata.OutputFormat == 0 ? DatTools.GetOutputFormat(filename, logger) : datdata.OutputFormat);
 
 			// Make sure there's a dictionary to read to
 			if (datdata.Hashes == null)
@@ -50,12 +50,12 @@ namespace SabreTools.Helper
 			// Now parse the correct type of DAT
 			switch (DatTools.GetOutputFormat(filename, logger))
 			{
-				case OutputFormatFlag.ClrMamePro:
+				case OutputFormat.ClrMamePro:
 					return ParseCMP(filename, sysid, srcid, datdata, logger, keep, clean);
-				case OutputFormatFlag.RomCenter:
+				case OutputFormat.RomCenter:
 					return ParseRC(filename, sysid, srcid, datdata, logger, clean);
-				case OutputFormatFlag.SabreDat:
-				case OutputFormatFlag.Xml:
+				case OutputFormat.SabreDat:
+				case OutputFormat.Xml:
 					return ParseXML(filename, sysid, srcid, datdata, logger, keep, clean, softlist);
 				default:
 					return datdata;

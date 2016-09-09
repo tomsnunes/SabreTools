@@ -125,7 +125,7 @@ namespace SabreTools
 			long sgt = -1,
 				slt = -1,
 				seq = -1;
-			OutputFormatFlag outputFormatFlag = 0x0;
+			OutputFormat outputFormat = 0x0;
 			string addext = "",
 				author = "",
 				category = "",
@@ -189,19 +189,19 @@ namespace SabreTools
 						break;
 					case "-cc":
 					case "--convert-cmp":
-						outputFormatFlag |= OutputFormatFlag.ClrMamePro;
+						outputFormat |= OutputFormat.ClrMamePro;
 						break;
 					case "-cm":
 					case "--convert-miss":
-						outputFormatFlag |= OutputFormatFlag.MissFile;
+						outputFormat |= OutputFormat.MissFile;
 						break;
 					case "-cr":
 					case "--convert-rc":
-						outputFormatFlag |= OutputFormatFlag.RomCenter;
+						outputFormat |= OutputFormat.RomCenter;
 						break;
 					case "-cs":
 					case "--convert-sd":
-						outputFormatFlag |= OutputFormatFlag.SabreDat;
+						outputFormat |= OutputFormat.SabreDat;
 						break;
 					case "-csv":
 					case "--csv":
@@ -209,7 +209,7 @@ namespace SabreTools
 						break;
 					case "-cx":
 					case "--convert-xml":
-						outputFormatFlag |= OutputFormatFlag.Xml;
+						outputFormat |= OutputFormat.Xml;
 						break;
 					case "-clean":
 					case "--clean":
@@ -327,7 +327,7 @@ namespace SabreTools
 						break;
 					case "-oc":
 					case "--output-cmp":
-						outputFormatFlag |= OutputFormatFlag.ClrMamePro;
+						outputFormat |= OutputFormat.ClrMamePro;
 						break;
 					case "-ol":
 					case "--offmerge":
@@ -335,31 +335,31 @@ namespace SabreTools
 						break;
 					case "-om":
 					case "--output-miss":
-						outputFormatFlag |= OutputFormatFlag.MissFile;
+						outputFormat |= OutputFormat.MissFile;
 						break;
 					case "-omd5":
 					case "--output-md5":
-						outputFormatFlag |= OutputFormatFlag.RedumpMD5;
+						outputFormat |= OutputFormat.RedumpMD5;
 						break;
 					case "-or":
 					case "--output-rc":
-						outputFormatFlag |= OutputFormatFlag.RomCenter;
+						outputFormat |= OutputFormat.RomCenter;
 						break;
 					case "-os":
 					case "--output-sd":
-						outputFormatFlag |= OutputFormatFlag.SabreDat;
+						outputFormat |= OutputFormat.SabreDat;
 						break;
 					case "-osfv":
 					case "--output-sfv":
-						outputFormatFlag |= OutputFormatFlag.RedumpSFV;
+						outputFormat |= OutputFormat.RedumpSFV;
 						break;
 					case "-osha1":
 					case "--output-sha1":
-						outputFormatFlag |= OutputFormatFlag.RedumpSHA1;
+						outputFormat |= OutputFormat.RedumpSHA1;
 						break;
 					case "-ox":
 					case "--output-xml":
-						outputFormatFlag |= OutputFormatFlag.Xml;
+						outputFormat |= OutputFormat.Xml;
 						break;
 					case "-q":
 					case "--quotes":
@@ -623,7 +623,7 @@ namespace SabreTools
 
 			// If more than one switch is enabled, show the help screen
 			if (!(add ^ datfromdir ^ datfromdirparallel ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^
-				(merge || diffMode != 0 || update || outputFormatFlag != 0 || tsv != null|| trim) ^ offlineMerge ^ rem ^ stats ^ typesplit))
+				(merge || diffMode != 0 || update || outputFormat != 0 || tsv != null|| trim) ^ offlineMerge ^ rem ^ stats ^ typesplit))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -632,7 +632,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (update || outputFormatFlag != 0 || tsv != null || extsplit || hashsplit || datfromdir
+			if (inputs.Count == 0 && (update || outputFormat != 0 || tsv != null || extsplit || hashsplit || datfromdir
 				|| datfromdirparallel || (merge || diffMode != 0) || stats || trim || typesplit))
 			{
 				_logger.Error("This feature requires at least one input");
@@ -676,10 +676,10 @@ namespace SabreTools
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
-			else if (update || tsv != null || outputFormatFlag != 0 || merge || diffMode != 0)
+			else if (update || tsv != null || outputFormat != 0 || merge || diffMode != 0)
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
-					superdat, forcemerge, forcend, forcepack, outputFormatFlag, usegame, prefix,
+					superdat, forcemerge, forcend, forcepack, outputFormat, usegame, prefix,
 					postfix, quotes, repext, addext, datprefix, romba, tsv, merge, diffMode, cascade, inplace, skip, bare, gamename, romname,
 					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, softlist, dedup, maxParallelism);
 			}

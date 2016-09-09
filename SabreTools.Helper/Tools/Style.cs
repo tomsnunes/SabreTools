@@ -154,10 +154,10 @@ namespace SabreTools.Helper
 		/// <param name="datdata">DAT information</param>
 		/// <param name="overwrite">True if we ignore existing files (default), false otherwise</param>
 		/// <returns>Dictionary of output formats mapped to file names</returns>
-		public static Dictionary<OutputFormatFlag, string> CreateOutfileNames(string outDir, Dat datdata, bool overwrite = true)
+		public static Dictionary<OutputFormat, string> CreateOutfileNames(string outDir, Dat datdata, bool overwrite = true)
 		{
 			// Create the output dictionary
-			Dictionary<OutputFormatFlag, string> outfileNames = new Dictionary<OutputFormatFlag, string>();
+			Dictionary<OutputFormat, string> outfileNames = new Dictionary<OutputFormat, string>();
 
 			// Double check the outdir for the end delim
 			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
@@ -166,41 +166,41 @@ namespace SabreTools.Helper
 			}
 
 			// Get the extensions from the output type
-			if ((datdata.OutputFormatFlag & OutputFormatFlag.Xml) != 0)
+			if ((datdata.OutputFormat & OutputFormat.Xml) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.Xml, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
+				outfileNames.Add(OutputFormat.Xml, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
 			};
-			if ((datdata.OutputFormatFlag & OutputFormatFlag.ClrMamePro) != 0)
+			if ((datdata.OutputFormat & OutputFormat.ClrMamePro) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.ClrMamePro, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
+				outfileNames.Add(OutputFormat.ClrMamePro, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
 			};
-			if ((datdata.OutputFormatFlag & OutputFormatFlag.RomCenter) != 0)
+			if ((datdata.OutputFormat & OutputFormat.RomCenter) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.RomCenter, CreateOutfileNamesHelper(outDir, ".rc.dat", datdata, overwrite));
+				outfileNames.Add(OutputFormat.RomCenter, CreateOutfileNamesHelper(outDir, ".rc.dat", datdata, overwrite));
 			};
-			if ((datdata.OutputFormatFlag & OutputFormatFlag.DOSCenter) != 0)
+			if ((datdata.OutputFormat & OutputFormat.DOSCenter) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", datdata, overwrite));
+				outfileNames.Add(OutputFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", datdata, overwrite));
 			};
-			if ((datdata.OutputFormatFlag & OutputFormatFlag.MissFile) != 0)
+			if ((datdata.OutputFormat & OutputFormat.MissFile) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.MissFile, CreateOutfileNamesHelper(outDir, ".txt", datdata, overwrite));
+				outfileNames.Add(OutputFormat.MissFile, CreateOutfileNamesHelper(outDir, ".txt", datdata, overwrite));
 			};
-			if ((datdata.OutputFormatFlag & OutputFormatFlag.SabreDat) != 0)
+			if ((datdata.OutputFormat & OutputFormat.SabreDat) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.SabreDat, CreateOutfileNamesHelper(outDir, ".sd.xml", datdata, overwrite));
+				outfileNames.Add(OutputFormat.SabreDat, CreateOutfileNamesHelper(outDir, ".sd.xml", datdata, overwrite));
 			};
-			if ((datdata.OutputFormatFlag & OutputFormatFlag.RedumpMD5) != 0)
+			if ((datdata.OutputFormat & OutputFormat.RedumpMD5) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.RedumpMD5, CreateOutfileNamesHelper(outDir, ".md5", datdata, overwrite));
+				outfileNames.Add(OutputFormat.RedumpMD5, CreateOutfileNamesHelper(outDir, ".md5", datdata, overwrite));
 			};
-			if ((datdata.OutputFormatFlag & OutputFormatFlag.RedumpSHA1) != 0)
+			if ((datdata.OutputFormat & OutputFormat.RedumpSHA1) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.RedumpSHA1, CreateOutfileNamesHelper(outDir, ".sha1", datdata, overwrite));
+				outfileNames.Add(OutputFormat.RedumpSHA1, CreateOutfileNamesHelper(outDir, ".sha1", datdata, overwrite));
 			};
-			if ((datdata.OutputFormatFlag & OutputFormatFlag.RedumpSFV) != 0)
+			if ((datdata.OutputFormat & OutputFormat.RedumpSFV) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.RedumpSFV, CreateOutfileNamesHelper(outDir, ".sfv", datdata, overwrite));
+				outfileNames.Add(OutputFormat.RedumpSFV, CreateOutfileNamesHelper(outDir, ".sfv", datdata, overwrite));
 			};
 
 			return outfileNames;
