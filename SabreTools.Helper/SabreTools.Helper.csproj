@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Constants.cs" />
+    <Compile Include="Data\Flags.cs" />
     <Compile Include="External\OptimizedCRC.cs" />
     <Compile Include="Objects\DATFromDir.cs" />
     <Compile Include="Objects\DATFromDirParallel.cs" />

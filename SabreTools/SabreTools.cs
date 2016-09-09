@@ -105,11 +105,6 @@ namespace SabreTools
 				noSHA1 = false,
 				offlineMerge = false,
 				old = false,
-				outputCMP = false,
-				outputMiss = false,
-				outputRC = false,
-				outputSD = false,
-				outputXML = false,
 				quotes = false,
 				rem = false,
 				romba = false,
@@ -125,11 +120,12 @@ namespace SabreTools
 			bool? cascade = null,
 				nodump = null,
 				tsv = null;
-			DiffMode diff = 0x0;
+			DiffMode diffMode = 0x0;
 			int maxParallelism = -1;
 			long sgt = -1,
 				slt = -1,
 				seq = -1;
+			OutputFormatFlag outputFormatFlag = 0x0;
 			string addext = "",
 				author = "",
 				category = "",
@@ -193,19 +189,19 @@ namespace SabreTools
 						break;
 					case "-cc":
 					case "--convert-cmp":
-						outputCMP = true;
+						outputFormatFlag |= OutputFormatFlag.ClrMamePro;
 						break;
 					case "-cm":
 					case "--convert-miss":
-						outputMiss = true;
+						outputFormatFlag |= OutputFormatFlag.MissFile;
 						break;
 					case "-cr":
 					case "--convert-rc":
-						outputRC = true;
+						outputFormatFlag |= OutputFormatFlag.RomCenter;
 						break;
 					case "-cs":
 					case "--convert-sd":
-						outputSD = true;
+						outputFormatFlag |= OutputFormatFlag.SabreDat;
 						break;
 					case "-csv":
 					case "--csv":
@@ -213,7 +209,7 @@ namespace SabreTools
 						break;
 					case "-cx":
 					case "--convert-xml":
-						outputXML = true;
+						outputFormatFlag |= OutputFormatFlag.Xml;
 						break;
 					case "-clean":
 					case "--clean":
@@ -230,19 +226,19 @@ namespace SabreTools
 						break;
 					case "-di":
 					case "--diff":
-						diff |= DiffMode.All;
+						diffMode |= DiffMode.All;
 						break;
 					case "-did":
 					case "--diff-du":
-						diff |= DiffMode.Dupes;
+						diffMode |= DiffMode.Dupes;
 						break;
 					case "-dii":
 					case "--diff-in":
-						diff |= DiffMode.Individuals;
+						diffMode |= DiffMode.Individuals;
 						break;
 					case "-din":
 					case "--diff-nd":
-						diff |= DiffMode.NoDupes;
+						diffMode |= DiffMode.NoDupes;
 						break;
 					case "-dp":
 					case "--d2dp":
@@ -331,7 +327,7 @@ namespace SabreTools
 						break;
 					case "-oc":
 					case "--output-cmp":
-						outputCMP = true;
+						outputFormatFlag |= OutputFormatFlag.ClrMamePro;
 						break;
 					case "-ol":
 					case "--offmerge":
@@ -339,19 +335,31 @@ namespace SabreTools
 						break;
 					case "-om":
 					case "--output-miss":
-						outputMiss = true;
+						outputFormatFlag |= OutputFormatFlag.MissFile;
+						break;
+					case "-omd5":
+					case "--output-md5":
+						outputFormatFlag |= OutputFormatFlag.RedumpMD5;
 						break;
 					case "-or":
 					case "--output-rc":
-						outputRC = true;
+						outputFormatFlag |= OutputFormatFlag.RomCenter;
 						break;
 					case "-os":
 					case "--output-sd":
-						outputSD = true;
+						outputFormatFlag |= OutputFormatFlag.SabreDat;
+						break;
+					case "-osfv":
+					case "--output-sfv":
+						outputFormatFlag |= OutputFormatFlag.RedumpSFV;
+						break;
+					case "-osha1":
+					case "--output-sha1":
+						outputFormatFlag |= OutputFormatFlag.RedumpSHA1;
 						break;
 					case "-ox":
 					case "--output-xml":
-						outputXML = true;
+						outputFormatFlag |= OutputFormatFlag.Xml;
 						break;
 					case "-q":
 					case "--quotes":
@@ -615,8 +623,7 @@ namespace SabreTools
 
 			// If more than one switch is enabled, show the help screen
 			if (!(add ^ datfromdir ^ datfromdirparallel ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^
-				(merge || diff != 0 || update || outputCMP || outputRC || outputSD || outputXML || outputMiss || tsv != null|| trim) ^
-				offlineMerge ^ rem ^ stats ^ typesplit))
+				(merge || diffMode != 0 || update || outputFormatFlag != 0 || tsv != null|| trim) ^ offlineMerge ^ rem ^ stats ^ typesplit))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -625,9 +632,8 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (update || (outputMiss || tsv != null) || outputCMP || outputRC || outputSD
-				|| outputXML || extsplit || hashsplit || datfromdir || datfromdirparallel || (merge || diff != 0)
-				|| stats || trim || typesplit))
+			if (inputs.Count == 0 && (update || outputFormatFlag != 0 || tsv != null || extsplit || hashsplit || datfromdir
+				|| datfromdirparallel || (merge || diffMode != 0) || stats || trim || typesplit))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -670,11 +676,11 @@ namespace SabreTools
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
-			else if (update || outputCMP || outputMiss || tsv != null || outputRC || outputSD || outputXML || merge || diff != 0)
+			else if (update || tsv != null || outputFormatFlag != 0 || merge || diffMode != 0)
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
-					superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,
-					postfix, quotes, repext, addext, datprefix, romba, tsv, merge, diff, cascade, inplace, skip, bare, gamename, romname,
+					superdat, forcemerge, forcend, forcepack, outputFormatFlag, usegame, prefix,
+					postfix, quotes, repext, addext, datprefix, romba, tsv, merge, diffMode, cascade, inplace, skip, bare, gamename, romname,
 					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, softlist, dedup, maxParallelism);
 			}
 
