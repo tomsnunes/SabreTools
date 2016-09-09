@@ -244,7 +244,7 @@ namespace SabreTools
 					return false;
 				}
 
-				// Otherwise, apply the rule ot the file
+				// Otherwise, apply the rule to the file
 				string newfile = file + ".new";
 				Skippers.TransformFile(file, newfile, rule, _logger);
 

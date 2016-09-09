@@ -571,7 +571,7 @@ namespace SabreTools
 				// If we have have a non-empty rule, apply it
 				if (rule.Tests != null && rule.Tests.Count != 0)
 				{
-					// Otherwise, apply the rule ot the file
+					// Otherwise, apply the rule to the file
 					string newinput = input + ".new";
 					Skippers.TransformFile(input, newinput, rule, _logger);
 					Rom drom = FileTools.GetSingleFileInfo(newinput);

@@ -152,8 +152,9 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="outDir">Output directory</param>
 		/// <param name="datdata">DAT information</param>
+		/// <param name="overwrite">True if we ignore existing files (default), false otherwise</param>
 		/// <returns>Dictionary of output formats mapped to file names</returns>
-		public static Dictionary<OutputFormatFlag, string> CreateOutfileNames(string outDir, Dat datdata)
+		public static Dictionary<OutputFormatFlag, string> CreateOutfileNames(string outDir, Dat datdata, bool overwrite = true)
 		{
 			// Create the output dictionary
 			Dictionary<OutputFormatFlag, string> outfileNames = new Dictionary<OutputFormatFlag, string>();
@@ -167,39 +168,39 @@ namespace SabreTools.Helper
 			// Get the extensions from the output type
 			if ((datdata.OutputFormatFlag & OutputFormatFlag.Xml) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.Xml, CreateOutfileNamesHelper(outDir, ".xml", datdata));
+				outfileNames.Add(OutputFormatFlag.Xml, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
 			};
 			if ((datdata.OutputFormatFlag & OutputFormatFlag.ClrMamePro) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.ClrMamePro, CreateOutfileNamesHelper(outDir, ".dat", datdata));
+				outfileNames.Add(OutputFormatFlag.ClrMamePro, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
 			};
 			if ((datdata.OutputFormatFlag & OutputFormatFlag.RomCenter) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.RomCenter, CreateOutfileNamesHelper(outDir, ".rc.dat", datdata));
+				outfileNames.Add(OutputFormatFlag.RomCenter, CreateOutfileNamesHelper(outDir, ".rc.dat", datdata, overwrite));
 			};
 			if ((datdata.OutputFormatFlag & OutputFormatFlag.DOSCenter) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", datdata));
+				outfileNames.Add(OutputFormatFlag.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", datdata, overwrite));
 			};
 			if ((datdata.OutputFormatFlag & OutputFormatFlag.MissFile) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.MissFile, CreateOutfileNamesHelper(outDir, ".txt", datdata));
+				outfileNames.Add(OutputFormatFlag.MissFile, CreateOutfileNamesHelper(outDir, ".txt", datdata, overwrite));
 			};
 			if ((datdata.OutputFormatFlag & OutputFormatFlag.SabreDat) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.SabreDat, CreateOutfileNamesHelper(outDir, ".sd.xml", datdata));
+				outfileNames.Add(OutputFormatFlag.SabreDat, CreateOutfileNamesHelper(outDir, ".sd.xml", datdata, overwrite));
 			};
 			if ((datdata.OutputFormatFlag & OutputFormatFlag.RedumpMD5) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.RedumpMD5, CreateOutfileNamesHelper(outDir, ".md5", datdata));
+				outfileNames.Add(OutputFormatFlag.RedumpMD5, CreateOutfileNamesHelper(outDir, ".md5", datdata, overwrite));
 			};
 			if ((datdata.OutputFormatFlag & OutputFormatFlag.RedumpSHA1) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.RedumpSHA1, CreateOutfileNamesHelper(outDir, ".sha1", datdata));
+				outfileNames.Add(OutputFormatFlag.RedumpSHA1, CreateOutfileNamesHelper(outDir, ".sha1", datdata, overwrite));
 			};
 			if ((datdata.OutputFormatFlag & OutputFormatFlag.RedumpSFV) != 0)
 			{
-				outfileNames.Add(OutputFormatFlag.RedumpSFV, CreateOutfileNamesHelper(outDir, ".sfv", datdata));
+				outfileNames.Add(OutputFormatFlag.RedumpSFV, CreateOutfileNamesHelper(outDir, ".sfv", datdata, overwrite));
 			};
 
 			return outfileNames;
@@ -211,14 +212,27 @@ namespace SabreTools.Helper
 		/// <param name="outDir">Output directory</param>
 		/// <param name="extension">Extension to use for the file</param>
 		/// <param name="datdata">DAT information</param>
+		/// <param name="overwrite">True if we ignore existing files, false otherwise</param>
 		/// <returns>String containing the new filename</returns>
-		private static string CreateOutfileNamesHelper(string outDir, string extension, Dat datdata)
+		private static string CreateOutfileNamesHelper(string outDir, string extension, Dat datdata, bool overwrite)
 		{
 			string filename = (String.IsNullOrEmpty(datdata.FileName) ? datdata.Description : datdata.FileName);
 			string outfile = outDir + filename + extension;
 			outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
 				outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
 				outfile);
+			if (!overwrite)
+			{
+				int i = 1;
+				while (File.Exists(outfile))
+				{
+					outfile = outDir + filename + "_" + i + extension;
+					outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
+						outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
+						outfile);
+					i++;
+				}
+			}
 
 			return outfile;
 		}

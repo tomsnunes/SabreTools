@@ -1778,17 +1778,10 @@ namespace SabreTools.Helper
 							romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single,
 							root, logger, true, clean, softlist, keepext:(innerDatdata.XSV != null));
 
-						// If the extension matches, append ".new" to the filename
-						string extension = ((innerDatdata.OutputFormatFlag & OutputFormatFlag.Xml) != 0 || (innerDatdata.OutputFormatFlag & OutputFormatFlag.SabreDat) != 0 ? ".xml" : ".dat");
-						if (outputDirectory == "" && Path.GetExtension(inputFileName) == extension)
-						{
-							innerDatdata.FileName += ".new";
-						}
-
 						// If we have roms, output them
 						if (innerDatdata.Files.Count != 0)
 						{
-							WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger);
+							WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger, overwrite: (outputDirectory == ""));
 						}
 					}
 					else if (Directory.Exists(inputFileName))
@@ -1803,17 +1796,10 @@ namespace SabreTools.Helper
 							innerDatdata = Parse(file, 0, 0, innerDatdata, gamename, romname, romtype, sgt,
 								slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, true, clean, keepext:(datdata.XSV != null));
 
-							// If the extension matches, append ".new" to the filename
-							string extension = ((innerDatdata.OutputFormatFlag & OutputFormatFlag.Xml) != 0 || (innerDatdata.OutputFormatFlag & OutputFormatFlag.SabreDat) != 0 ? ".xml" : ".dat");
-							if (outputDirectory == "" && Path.GetExtension(file) == extension)
-							{
-								innerDatdata.FileName += ".new";
-							}
-
 							// If we have roms, output them
 							if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
 							{
-								WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger);
+								WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outputDirectory == ""));
 							}
 						}
 					}
@@ -2545,17 +2531,10 @@ namespace SabreTools.Helper
 							romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single,
 							root, logger, true, clean, softlist, keepext: (innerDatdata.XSV != null));
 
-						// If the extension matches, append ".new" to the filename
-						string extension = ((innerDatdata.OutputFormatFlag & OutputFormatFlag.Xml) != 0 || (innerDatdata.OutputFormatFlag & OutputFormatFlag.SabreDat) != 0 ? ".xml" : ".dat");
-						if (outputDirectory == "" && Path.GetExtension(inputFileName) == extension)
-						{
-							innerDatdata.FileName += ".new";
-						}
-
 						// If we have roms, output them
 						if (innerDatdata.Files.Count != 0)
 						{
-							WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger);
+							WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger, overwrite: (outputDirectory == ""));
 						}
 					}
 					else if (Directory.Exists(inputFileName))
@@ -2572,17 +2551,10 @@ namespace SabreTools.Helper
 							innerDatdata = Parse(file, 0, 0, innerDatdata, gamename, romname, romtype, sgt,
 								slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, true, clean, keepext: (datdata.XSV != null));
 
-							// If the extension matches, append ".new" to the filename
-							string extension = ((innerDatdata.OutputFormatFlag & OutputFormatFlag.Xml) != 0 || (innerDatdata.OutputFormatFlag & OutputFormatFlag.SabreDat) != 0 ? ".xml" : ".dat");
-							if (outputDirectory == "" && Path.GetExtension(file) == extension)
-							{
-								innerDatdata.FileName += ".new";
-							}
-
 							// If we have roms, output them
 							if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
 							{
-								WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger);
+								WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outputDirectory == ""));
 							}
 						});
 					}
@@ -2685,12 +2657,13 @@ namespace SabreTools.Helper
 		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
 		/// <param name="stats">True if DAT statistics should be output on write, false otherwise (default)</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
+		/// <param name="overwrite">True if files should be overwritten (default), false if they should be renamed instead</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
 		/// <remarks>
 		/// The following features have been requested for file output:
 		/// - Have the ability to strip special (non-ASCII) characters from rom information
 		/// </remarks>
-		public static bool WriteDatfile(Dat datdata, string outDir, Logger logger, bool norename = true, bool stats = false, bool ignoreblanks = false)
+		public static bool WriteDatfile(Dat datdata, string outDir, Logger logger, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
 		{
 			// If there's nothing there, abort
 			if (datdata.Files == null || datdata.Files.Count == 0)
@@ -2760,7 +2733,7 @@ namespace SabreTools.Helper
 			SortedDictionary<string, List<Rom>> sortable = BucketByGame(datdata.Files, datdata.MergeRoms, norename, logger);
 
 			// Get the outfile name
-			Dictionary<OutputFormatFlag, string> outfiles = Style.CreateOutfileNames(outDir, datdata);
+			Dictionary<OutputFormatFlag, string> outfiles = Style.CreateOutfileNames(outDir, datdata, overwrite);
 
 			try
 			{
