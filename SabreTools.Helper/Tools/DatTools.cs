@@ -2583,6 +2583,83 @@ namespace SabreTools.Helper
 			return;
 		}
 
+		/// <summary>
+		/// Populate the user DatData object from the input files
+		/// </summary>
+		/// <param name="userData">Output user DatData object to output</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		/// <returns>List of DatData objects representing headers</returns>
+		private static List<Dat> PopulateUserDataParallel(List<string> inputs, bool inplace, bool clean, bool softlist, string outdir,
+			Dat inputDat, out Dat userData, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
+			string md5, string sha1, bool? nodump, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
+		{
+			Dat[] datHeaders = new Dat[inputs.Count];
+			DateTime start = DateTime.Now;
+			logger.User("Processing individual DATs");
+
+			userData = new Dat
+			{
+				OutputFormat = (inputDat.OutputFormat != OutputFormat.None ? inputDat.OutputFormat : OutputFormat.None),
+				Files = new Dictionary<string, List<Rom>>(),
+				MergeRoms = inputDat.MergeRoms,
+			};
+
+			Parallel.For(0, inputs.Count, i =>
+			{
+				string input = inputs[i];
+				logger.User("Adding DAT: " + input.Split('¬')[0]);
+				datHeaders[i] = new Dat
+				{
+					OutputFormat = (inputDat.OutputFormat != OutputFormat.None ? inputDat.OutputFormat : OutputFormat.None),
+					Files = new Dictionary<string, List<Rom>>(),
+					MergeRoms = inputDat.MergeRoms,
+				};
+
+				datHeaders[i] = Parse(input.Split('¬')[0], i, 0, datHeaders[i], gamename, romname, romtype, sgt, slt, seq,
+					crc, md5, sha1, nodump, trim, single, root, logger, true, clean, softlist);
+			});
+
+			logger.User("Populating internal DAT");
+			for (int i = 0; i < inputs.Count; i++)
+			{
+				foreach (string key in datHeaders[i].Files.Keys)
+				{
+					if (userData.Files.ContainsKey(key))
+					{
+						userData.Files[key].AddRange(datHeaders[i].Files[key]);
+					}
+					else
+					{
+						userData.Files.Add(key, datHeaders[i].Files[key]);
+					}
+				}
+				datHeaders[i].Files = null;
+			}
+
+			// Set the output values
+			Dictionary<string, List<Rom>> roms = userData.Files;
+			userData = (Dat)inputDat.CloneHeader();
+			userData.Files = roms;
+
+			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			return datHeaders.ToList();
+		}
+
 		#endregion
 
 		#region DAT Writing
