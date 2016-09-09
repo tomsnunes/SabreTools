@@ -1161,12 +1161,6 @@ namespace SabreTools.Helper
 												subreader.Read();
 												continue;
 											}
-											// If the rom has another type of loadflag, skip it completely
-											else if (subreader.GetAttribute("loadflag") != null)
-											{
-												subreader.Read();
-												continue;
-											}
 
 											// If we're in clean mode, sanitize the game name
 											if (clean)
