@@ -1518,6 +1518,8 @@ namespace SabreTools.Helper
 		/// <returns>SortedDictionary bucketed by game name</returns>
 		public static SortedDictionary<string, List<Rom>> BucketByGame(IDictionary<string, List<Rom>> dict, bool mergeroms, bool norename, Logger logger, bool output = true)
 		{
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+
 			SortedDictionary<string, List<Rom>> sortable = new SortedDictionary<string, List<Rom>>();
 			long count = 0;
 
