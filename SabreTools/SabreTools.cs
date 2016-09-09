@@ -121,7 +121,7 @@ namespace SabreTools
 				nodump = null,
 				tsv = null;
 			DiffMode diffMode = 0x0;
-			int maxParallelism = -1;
+			int maxParallelism = 4;
 			long sgt = -1,
 				slt = -1,
 				seq = -1;
