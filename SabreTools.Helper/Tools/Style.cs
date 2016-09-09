@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -151,48 +152,73 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="outDir">Output directory</param>
 		/// <param name="datdata">DAT information</param>
-		/// <returns>String representing the proper name</returns>
-		public static string CreateOutfileName(string outDir, Dat datdata)
+		/// <returns>Dictionary of output formats mapped to file names</returns>
+		public static Dictionary<OutputFormatFlag, string> CreateOutfileNames(string outDir, Dat datdata)
 		{
+			// Create the output dictionary
+			Dictionary<OutputFormatFlag, string> outfileNames = new Dictionary<OutputFormatFlag, string>();
+
 			// Double check the outdir for the end delim
 			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
 			{
 				outDir += Path.DirectorySeparatorChar;
 			}
 
-			// Get the extension from the output type
-			string extension = "";
-			switch(datdata.OutputFormat)
+			// Get the extensions from the output type
+			if ((datdata.OutputFormatFlag & OutputFormatFlag.Xml) != 0)
 			{
-				case OutputFormat.ClrMamePro:
-				case OutputFormat.DOSCenter:
-				case OutputFormat.RomCenter:
-					extension = ".dat";
-					break;
-				case OutputFormat.MissFile:
-					extension = ".txt";
-					break;
-				case OutputFormat.SabreDat:
-				case OutputFormat.Xml:
-					extension = ".xml";
-					break;
-				case OutputFormat.RedumpMD5:
-					extension = ".md5";
-					break;
-				case OutputFormat.RedumpSFV:
-					extension = ".sfv";
-					break;
-				case OutputFormat.RedumpSHA1:
-					extension = ".sha1";
-					break;
-			}
+				outfileNames.Add(OutputFormatFlag.Xml, CreateOutfileNamesHelper(outDir, ".xml", datdata));
+			};
+			if ((datdata.OutputFormatFlag & OutputFormatFlag.ClrMamePro) != 0)
+			{
+				outfileNames.Add(OutputFormatFlag.ClrMamePro, CreateOutfileNamesHelper(outDir, ".dat", datdata));
+			};
+			if ((datdata.OutputFormatFlag & OutputFormatFlag.RomCenter) != 0)
+			{
+				outfileNames.Add(OutputFormatFlag.RomCenter, CreateOutfileNamesHelper(outDir, ".rc.dat", datdata));
+			};
+			if ((datdata.OutputFormatFlag & OutputFormatFlag.DOSCenter) != 0)
+			{
+				outfileNames.Add(OutputFormatFlag.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", datdata));
+			};
+			if ((datdata.OutputFormatFlag & OutputFormatFlag.MissFile) != 0)
+			{
+				outfileNames.Add(OutputFormatFlag.MissFile, CreateOutfileNamesHelper(outDir, ".txt", datdata));
+			};
+			if ((datdata.OutputFormatFlag & OutputFormatFlag.SabreDat) != 0)
+			{
+				outfileNames.Add(OutputFormatFlag.SabreDat, CreateOutfileNamesHelper(outDir, ".sd.xml", datdata));
+			};
+			if ((datdata.OutputFormatFlag & OutputFormatFlag.RedumpMD5) != 0)
+			{
+				outfileNames.Add(OutputFormatFlag.RedumpMD5, CreateOutfileNamesHelper(outDir, ".md5", datdata));
+			};
+			if ((datdata.OutputFormatFlag & OutputFormatFlag.RedumpSHA1) != 0)
+			{
+				outfileNames.Add(OutputFormatFlag.RedumpSHA1, CreateOutfileNamesHelper(outDir, ".sha1", datdata));
+			};
+			if ((datdata.OutputFormatFlag & OutputFormatFlag.RedumpSFV) != 0)
+			{
+				outfileNames.Add(OutputFormatFlag.RedumpSFV, CreateOutfileNamesHelper(outDir, ".sfv", datdata));
+			};
+
+			return outfileNames;
+		}
+
+		/// <summary>
+		/// Help generating the outfile name
+		/// </summary>
+		/// <param name="outDir">Output directory</param>
+		/// <param name="extension">Extension to use for the file</param>
+		/// <param name="datdata">DAT information</param>
+		/// <returns>String containing the new filename</returns>
+		private static string CreateOutfileNamesHelper(string outDir, string extension, Dat datdata)
+		{
 			string filename = (String.IsNullOrEmpty(datdata.FileName) ? datdata.Description : datdata.FileName);
 			string outfile = outDir + filename + extension;
 			outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
 				outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
 				outfile);
-
-			Console.WriteLine(outfile);
 
 			return outfile;
 		}

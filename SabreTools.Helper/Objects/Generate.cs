@@ -175,7 +175,7 @@ namespace SabreTools
 				Category = "The Wizard of DATz",
 				Author = "The Wizard of DATz",
 				ForcePacking = ForcePacking.None,
-				OutputFormat = (_old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				OutputFormatFlag = (_old ? OutputFormatFlag.ClrMamePro : OutputFormatFlag.Xml),
 				Files = dict,
 			};
 

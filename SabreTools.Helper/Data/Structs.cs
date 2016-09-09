@@ -124,7 +124,7 @@ namespace SabreTools.Helper
 		public ForceMerging ForceMerging;
 		public ForceNodump ForceNodump;
 		public ForcePacking ForcePacking;
-		public OutputFormat OutputFormat;
+		public OutputFormatFlag OutputFormatFlag;
 		public bool MergeRoms;
 		public List<HashData> Hashes;
 
@@ -318,7 +318,7 @@ namespace SabreTools.Helper
 		public ForceMerging ForceMerging;
 		public ForceNodump ForceNodump;
 		public ForcePacking ForcePacking;
-		public OutputFormat OutputFormat;
+		public OutputFormatFlag OutputFormatFlag;
 		public bool MergeRoms;
 		public Dictionary<string, List<Rom>> Files;
 
@@ -363,7 +363,7 @@ namespace SabreTools.Helper
 				ForceMerging = this.ForceMerging,
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
-				OutputFormat = this.OutputFormat,
+				OutputFormatFlag = this.OutputFormatFlag,
 				MergeRoms = this.MergeRoms,
 				Files = this.Files,
 				UseGame = this.UseGame,
@@ -406,7 +406,7 @@ namespace SabreTools.Helper
 				ForceMerging = this.ForceMerging,
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
-				OutputFormat = this.OutputFormat,
+				OutputFormatFlag = this.OutputFormatFlag,
 				MergeRoms = this.MergeRoms,
 				Files = new Dictionary<string, List<Rom>>(),
 				UseGame = this.UseGame,

@@ -304,7 +304,7 @@ namespace SabreTools
 					Category = "",
 					Author = "SabreTools",
 					ForcePacking = ForcePacking.None,
-					OutputFormat = OutputFormat.Xml,
+					OutputFormatFlag = OutputFormatFlag.Xml,
 					MergeRoms = true,
 					Files = netNew,
 				};
@@ -317,7 +317,7 @@ namespace SabreTools
 					Category = "",
 					Author = "SabreTools",
 					ForcePacking = ForcePacking.None,
-					OutputFormat = OutputFormat.Xml,
+					OutputFormatFlag = OutputFormatFlag.Xml,
 					MergeRoms = true,
 					Files = unneeded,
 				};
@@ -330,7 +330,7 @@ namespace SabreTools
 					Category = "",
 					Author = "SabreTools",
 					ForcePacking = ForcePacking.None,
-					OutputFormat = OutputFormat.Xml,
+					OutputFormatFlag = OutputFormatFlag.Xml,
 					MergeRoms = true,
 					Files = newMissing,
 				};
@@ -343,7 +343,7 @@ namespace SabreTools
 					Category = "",
 					Author = "SabreTools",
 					ForcePacking = ForcePacking.None,
-					OutputFormat = OutputFormat.Xml,
+					OutputFormatFlag = OutputFormatFlag.Xml,
 					MergeRoms = true,
 					Files = have,
 				};
@@ -417,7 +417,7 @@ namespace SabreTools
 					Category = "",
 					Author = "SabreTools",
 					ForcePacking = ForcePacking.None,
-					OutputFormat = OutputFormat.Xml,
+					OutputFormatFlag = OutputFormatFlag.Xml,
 					MergeRoms = true,
 					Files = have,
 				};
@@ -487,7 +487,7 @@ namespace SabreTools
 					Category = "",
 					Author = "SabreTools",
 					ForcePacking = ForcePacking.None,
-					OutputFormat = OutputFormat.Xml,
+					OutputFormatFlag = OutputFormatFlag.Xml,
 					MergeRoms = true,
 					Files = have,
 				};

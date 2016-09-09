@@ -102,23 +102,6 @@
 	}
 
 	/// <summary>
-	/// Determines the DAT output format
-	/// </summary>
-	public enum OutputFormat
-	{
-		None = 0,
-		Xml,
-		ClrMamePro,
-		RomCenter,
-		DOSCenter,
-		MissFile,
-		SabreDat,
-		RedumpMD5,
-		RedumpSHA1,
-		RedumpSFV,
-	}
-
-	/// <summary>
 	/// Determines the level to scan archives at
 	/// </summary>
 	public enum ArchiveScanLevel

@@ -93,7 +93,7 @@ namespace SabreTools
 		/// <param name="forcemerge">None, Split, Full</param>
 		/// <param name="forcend">None, Obsolete, Required, Ignore</param>
 		/// <param name="forcepack">None, Zip, Unzip</param>
-		/// <param name="outputFormatFlag">Non-zero flag for output format, zero otherwise</param>
+		/// <param name="outputFormatFlag">Non-zero flag for output format, zero otherwise for default</param>
 		/// /* Missfile-specific DAT info */
 		/// <param name="usegame">True if games are to be used in output, false if roms are</param>
 		/// <param name="prefix">Generic prefix to be added to each line</param>
@@ -303,6 +303,7 @@ namespace SabreTools
 				ForceNodump = fn,
 				ForcePacking = fp,
 				MergeRoms = dedup,
+				OutputFormatFlag = outputFormatFlag,
 
 				UseGame = usegame,
 				Prefix = prefix,
@@ -315,59 +316,8 @@ namespace SabreTools
 				XSV = tsv,
 			};
 
-			if ((outputFormatFlag & OutputFormatFlag.ClrMamePro) != 0)
-			{
-				userInputDat.OutputFormat = OutputFormat.ClrMamePro;
-				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
-			}
-			if ((outputFormatFlag & OutputFormatFlag.MissFile) != 0 || tsv != null)
-			{
-				userInputDat.OutputFormat = OutputFormat.MissFile;
-				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
-			}
-			if ((outputFormatFlag & OutputFormatFlag.RedumpMD5) != 0)
-			{
-				userInputDat.OutputFormat = OutputFormat.RedumpMD5;
-				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
-			}
-			if ((outputFormatFlag & OutputFormatFlag.RedumpSFV) != 0)
-			{
-				userInputDat.OutputFormat = OutputFormat.RedumpSFV;
-				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
-			}
-			if ((outputFormatFlag & OutputFormatFlag.RedumpSHA1) != 0)
-			{
-				userInputDat.OutputFormat = OutputFormat.RedumpSHA1;
-				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
-			}
-			if ((outputFormatFlag & OutputFormatFlag.RomCenter) != 0)
-			{
-				userInputDat.OutputFormat = OutputFormat.RomCenter;
-				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
-			}
-			if ((outputFormatFlag & OutputFormatFlag.SabreDat) != 0)
-			{
-				userInputDat.OutputFormat = OutputFormat.SabreDat;
-				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
-			}
-			if ((outputFormatFlag & OutputFormatFlag.Xml) != 0)
-			{
-				userInputDat.OutputFormat = OutputFormat.Xml;
-				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
-			}
-			if (outputFormatFlag == 0 && tsv == null)
-			{
-				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
-			}
+			DatTools.UpdateParallel(inputs, userInputDat, outputFormatFlag, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
+				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
 		}
 
 		/// <summary>
@@ -419,7 +369,7 @@ namespace SabreTools
 				Date = DateTime.Now.ToString("yyyy-MM-dd"),
 				Author = author,
 				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				OutputFormatFlag = (old ? OutputFormatFlag.ClrMamePro : OutputFormatFlag.Xml),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
 				Files = new Dictionary<string, List<Rom>>(),
@@ -487,7 +437,7 @@ namespace SabreTools
 				Date = DateTime.Now.ToString("yyyy-MM-dd"),
 				Author = author,
 				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				OutputFormatFlag = (old ? OutputFormatFlag.ClrMamePro : OutputFormatFlag.Xml),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
 			};

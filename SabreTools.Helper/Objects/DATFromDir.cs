@@ -115,13 +115,13 @@ namespace SabreTools
 			else
 			{
 				// Create and open the output file for writing
-				FileStream fs = File.Create(Style.CreateOutfileName(Environment.CurrentDirectory, _datdata));
+				FileStream fs = File.Create(Style.CreateOutfileNames(Environment.CurrentDirectory, _datdata)[_datdata.OutputFormatFlag]);
 				sw = new StreamWriter(fs, Encoding.UTF8);
 				sw.AutoFlush = true;
 			}
 
 			// Write out the initial file header
-			DatTools.WriteHeader(sw, _datdata, _logger);
+			DatTools.WriteHeader(sw, _datdata.OutputFormatFlag, _datdata, _logger);
 
 			// Loop over each of the found paths, if any
 			string lastparent = null;
@@ -265,7 +265,7 @@ namespace SabreTools
 						Rom rom = roms[i];
 
 						// If we're in a mode that doesn't allow for actual empty folders, add the blank info
-						if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
+						if ((_datdata.OutputFormatFlag & OutputFormatFlag.SabreDat) == 0 && (_datdata.OutputFormatFlag & OutputFormatFlag.MissFile) == 0)
 						{
 							rom.Type = ItemType.Rom;
 							rom.Name = "-";
@@ -295,19 +295,19 @@ namespace SabreTools
 							int last = 0;
 							if (lastparent != null && lastparent.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 							{
-								DatTools.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, _datdata, 0, out last, _logger);
+								DatTools.WriteEndGame(sw, _datdata.OutputFormatFlag, rom, new List<string>(), new List<string>(), lastparent, 0, out last, _logger);
 							}
 
 							// If we have a new game, output the beginning of the new item
 							if (lastparent == null || lastparent.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 							{
-								DatTools.WriteStartGame(sw, rom, new List<string>(), lastparent, _datdata, 0, last, _logger);
+								DatTools.WriteStartGame(sw, _datdata.OutputFormatFlag, rom, new List<string>(), lastparent, 0, last, _logger);
 							}
 
 							// Write out the rom data
-							if (_datdata.OutputFormat != OutputFormat.SabreDat && _datdata.OutputFormat != OutputFormat.MissFile)
+							if ((_datdata.OutputFormatFlag & OutputFormatFlag.SabreDat) == 0 && (_datdata.OutputFormatFlag & OutputFormatFlag.MissFile) == 0)
 							{
-								DatTools.WriteRomData(sw, rom, lastparent, _datdata, 0, _logger);
+								DatTools.WriteRomData(sw, _datdata.OutputFormatFlag, rom, lastparent, _datdata, 0, _logger);
 							}
 						}
 
@@ -323,7 +323,7 @@ namespace SabreTools
 			}
 
 			// Now write the final piece and close the output stream
-			DatTools.WriteFooter(sw, _datdata, 0, _logger);
+			DatTools.WriteFooter(sw, _datdata.OutputFormatFlag, _datdata, 0, _logger);
 			sw.Close();
 
 			return true;
@@ -369,9 +369,9 @@ namespace SabreTools
 					}
 					else
 					{
-						DatTools.WriteStartGame(sw, rom, new List<string>(), "", _datdata, 0, 0, _logger);
-						DatTools.WriteRomData(sw, rom, "", _datdata, 0, _logger);
-						DatTools.WriteEndGame(sw, rom, new List<string>(), new List<string>(), "", _datdata, 0, out last, _logger);
+						DatTools.WriteStartGame(sw, _datdata.OutputFormatFlag, rom, new List<string>(), "", 0, 0, _logger);
+						DatTools.WriteRomData(sw, _datdata.OutputFormatFlag, rom, "", _datdata, 0, _logger);
+						DatTools.WriteEndGame(sw, _datdata.OutputFormatFlag, rom, new List<string>(), new List<string>(), "", 0, out last, _logger);
 					}
 				}
 				else
@@ -548,17 +548,17 @@ namespace SabreTools
 					int last = 0;
 					if (lastparent != null && lastparent.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 					{
-						DatTools.WriteEndGame(sw, rom, new List<string>(), new List<string>(), lastparent, datdata, 0, out last, _logger);
+						DatTools.WriteEndGame(sw, datdata.OutputFormatFlag, rom, new List<string>(), new List<string>(), lastparent, 0, out last, _logger);
 					}
 
 					// If we have a new game, output the beginning of the new item
 					if (lastparent == null || lastparent.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 					{
-						DatTools.WriteStartGame(sw, rom, new List<string>(), lastparent, datdata, 0, last, _logger);
+						DatTools.WriteStartGame(sw, datdata.OutputFormatFlag, rom, new List<string>(), lastparent, 0, last, _logger);
 					}
 
 					// Write out the rom data
-					DatTools.WriteRomData(sw, rom, lastparent, datdata, 0, _logger);
+					DatTools.WriteRomData(sw, datdata.OutputFormatFlag, rom, lastparent, datdata, 0, _logger);
 				}
 				_logger.User("File added: " + actualitem + Environment.NewLine);
 

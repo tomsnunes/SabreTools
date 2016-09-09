@@ -370,7 +370,7 @@ namespace SabreTools
 			_matched.FileName = "fixDat_" + _matched.FileName;
 			_matched.Name = "fixDat_" + _matched.Name;
 			_matched.Description = "fixDat_" + _matched.Description;
-			_matched.OutputFormat = OutputFormat.Xml;
+			_matched.OutputFormatFlag = OutputFormatFlag.Xml;
 
 			// Now that all files are parsed, get only files found in directory
 			bool found = false;
@@ -476,7 +476,7 @@ namespace SabreTools
 				_datdata.FileName = "fixDat_" + _datdata.FileName;
 				_datdata.Name = "fixDat_" + _datdata.Name;
 				_datdata.Description = "fixDat_" + _datdata.Description;
-				_datdata.OutputFormat = OutputFormat.Xml;
+				_datdata.OutputFormatFlag = OutputFormatFlag.Xml;
 				DatTools.WriteDatfile(_datdata, "", _logger);
 			}
 

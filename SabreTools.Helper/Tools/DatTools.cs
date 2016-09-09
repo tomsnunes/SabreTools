@@ -21,15 +21,15 @@ namespace SabreTools.Helper
 		/// Get what type of DAT the input file is
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
-		/// <returns>The OutputFormat corresponding to the DAT</returns>
+		/// <returns>The OutputFormatFlagcorresponding to the DAT</returns>
 		/// <remarks>There is currently no differentiation between XML and SabreDAT here</remarks>
-		public static OutputFormat GetOutputFormat(string filename, Logger logger)
+		public static OutputFormatFlag GetOutputFormat(string filename, Logger logger)
 		{
 			// Limit the output formats based on extension
 			string ext = Path.GetExtension(filename).ToLowerInvariant();
 			if (ext != ".dat" && ext != ".xml")
 			{
-				return OutputFormat.None;
+				return 0;
 			}
 
 			// Read the input file, if possible
@@ -39,7 +39,7 @@ namespace SabreTools.Helper
 			if (!File.Exists(filename))
 			{
 				logger.Warning("File '" + filename + "' could not read from!");
-				return OutputFormat.None;
+				return 0;
 			}
 
 			try
@@ -50,20 +50,20 @@ namespace SabreTools.Helper
 				sr.Dispose();
 				if (first.Contains("<") && first.Contains(">"))
 				{
-					return OutputFormat.Xml;
+					return OutputFormatFlag.Xml;
 				}
 				else if (first.Contains("[") && first.Contains("]"))
 				{
-					return OutputFormat.RomCenter;
+					return OutputFormatFlag.RomCenter;
 				}
 				else
 				{
-					return OutputFormat.ClrMamePro;
+					return OutputFormatFlag.ClrMamePro;
 				}
 			}
 			catch (Exception)
 			{
-				return OutputFormat.None;
+				return 0;
 			}
 		}
 
@@ -175,7 +175,7 @@ namespace SabreTools.Helper
 			datdata.FileName = (String.IsNullOrEmpty(datdata.FileName) ? (keepext ? Path.GetFileName(filename) : Path.GetFileNameWithoutExtension(filename)) : datdata.FileName);
 
 			// If the output type isn't set already, get the internal output type
-			datdata.OutputFormat = (datdata.OutputFormat == OutputFormat.None ? GetOutputFormat(filename, logger) : datdata.OutputFormat);
+			datdata.OutputFormatFlag = (datdata.OutputFormatFlag == 0 ? GetOutputFormat(filename, logger) : datdata.OutputFormatFlag);
 
 			// Make sure there's a dictionary to read to
 			if (datdata.Files == null)
@@ -186,12 +186,12 @@ namespace SabreTools.Helper
 			// Now parse the correct type of DAT
 			switch (GetOutputFormat(filename, logger))
 			{
-				case OutputFormat.ClrMamePro:
+				case OutputFormatFlag.ClrMamePro:
 					return ParseCMP(filename, sysid, srcid, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, keep, clean);
-				case OutputFormat.RomCenter:
+				case OutputFormatFlag.RomCenter:
 					return ParseRC(filename, sysid, srcid, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, clean);
-				case OutputFormat.SabreDat:
-				case OutputFormat.Xml:
+				case OutputFormatFlag.SabreDat:
+				case OutputFormatFlag.Xml:
 					return ParseXML(filename, sysid, srcid, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, keep, clean, softlist);
 				default:
 					return datdata;
@@ -1779,7 +1779,7 @@ namespace SabreTools.Helper
 							root, logger, true, clean, softlist, keepext:(innerDatdata.XSV != null));
 
 						// If the extension matches, append ".new" to the filename
-						string extension = (innerDatdata.OutputFormat == OutputFormat.Xml || innerDatdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
+						string extension = ((innerDatdata.OutputFormatFlag & OutputFormatFlag.Xml) != 0 || (innerDatdata.OutputFormatFlag & OutputFormatFlag.SabreDat) != 0 ? ".xml" : ".dat");
 						if (outputDirectory == "" && Path.GetExtension(inputFileName) == extension)
 						{
 							innerDatdata.FileName += ".new";
@@ -1804,7 +1804,7 @@ namespace SabreTools.Helper
 								slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, true, clean, keepext:(datdata.XSV != null));
 
 							// If the extension matches, append ".new" to the filename
-							string extension = (innerDatdata.OutputFormat == OutputFormat.Xml || innerDatdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
+							string extension = ((innerDatdata.OutputFormatFlag & OutputFormatFlag.Xml) != 0 || (innerDatdata.OutputFormatFlag & OutputFormatFlag.SabreDat) != 0 ? ".xml" : ".dat");
 							if (outputDirectory == "" && Path.GetExtension(file) == extension)
 							{
 								innerDatdata.FileName += ".new";
@@ -1856,7 +1856,7 @@ namespace SabreTools.Helper
 			int i = 0;
 			userData = new Dat
 			{
-				OutputFormat = (inputDat.OutputFormat != OutputFormat.None ? inputDat.OutputFormat : OutputFormat.None),
+				OutputFormatFlag = (inputDat.OutputFormatFlag != 0 ? inputDat.OutputFormatFlag : 0),
 				Files = new Dictionary<string, List<Rom>>(),
 				MergeRoms = inputDat.MergeRoms,
 			};
@@ -1876,7 +1876,7 @@ namespace SabreTools.Helper
 					Dictionary<string, List<Rom>> temp = userData.Files;
 					userData = new Dat
 					{
-						OutputFormat = (inputDat.OutputFormat != OutputFormat.None ? inputDat.OutputFormat : OutputFormat.None),
+						OutputFormatFlag = (inputDat.OutputFormatFlag != 0 ? inputDat.OutputFormatFlag : 0),
 						Files = temp,
 						MergeRoms = inputDat.MergeRoms,
 					};
@@ -2424,6 +2424,7 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="inputFileNames">Names of the input files and/or folders</param>
 		/// <param name="datdata">User specified inputs contained in a DatData object</param>
+		/// <param name="outputFormatFlag">Non-zero flag for output format, zero otherwise for default</param>
 		/// <param name="outputDirectory">Optional param for output directory</param>
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
 		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
@@ -2448,9 +2449,10 @@ namespace SabreTools.Helper
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void UpdateParallel(List<string> inputFileNames, Dat datdata, string outputDirectory, bool merge, DiffMode diff, bool? cascade, bool inplace,
-			bool skip, bool bare, bool clean, bool softlist, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
-			string md5, string sha1, bool? nodump, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
+		public static void UpdateParallel(List<string> inputFileNames, Dat datdata, OutputFormatFlag outputFormatFlag, string outputDirectory, bool merge,
+			DiffMode diff, bool? cascade, bool inplace, bool skip, bool bare, bool clean, bool softlist, string gamename, string romname, string romtype,
+			long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, bool trim, bool single, string root, int maxDegreeOfParallelism,
+			Logger logger)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || diff != 0)
@@ -2544,7 +2546,7 @@ namespace SabreTools.Helper
 							root, logger, true, clean, softlist, keepext: (innerDatdata.XSV != null));
 
 						// If the extension matches, append ".new" to the filename
-						string extension = (innerDatdata.OutputFormat == OutputFormat.Xml || innerDatdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
+						string extension = ((innerDatdata.OutputFormatFlag & OutputFormatFlag.Xml) != 0 || (innerDatdata.OutputFormatFlag & OutputFormatFlag.SabreDat) != 0 ? ".xml" : ".dat");
 						if (outputDirectory == "" && Path.GetExtension(inputFileName) == extension)
 						{
 							innerDatdata.FileName += ".new";
@@ -2571,7 +2573,7 @@ namespace SabreTools.Helper
 								slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, true, clean, keepext: (datdata.XSV != null));
 
 							// If the extension matches, append ".new" to the filename
-							string extension = (innerDatdata.OutputFormat == OutputFormat.Xml || innerDatdata.OutputFormat == OutputFormat.SabreDat ? ".xml" : ".dat");
+							string extension = ((innerDatdata.OutputFormatFlag & OutputFormatFlag.Xml) != 0 || (innerDatdata.OutputFormatFlag & OutputFormatFlag.SabreDat) != 0 ? ".xml" : ".dat");
 							if (outputDirectory == "" && Path.GetExtension(file) == extension)
 							{
 								innerDatdata.FileName += ".new";
@@ -2623,7 +2625,7 @@ namespace SabreTools.Helper
 
 			userData = new Dat
 			{
-				OutputFormat = (inputDat.OutputFormat != OutputFormat.None ? inputDat.OutputFormat : OutputFormat.None),
+				OutputFormatFlag = (inputDat.OutputFormatFlag != 0 ? inputDat.OutputFormatFlag: 0),
 				Files = new Dictionary<string, List<Rom>>(),
 				MergeRoms = inputDat.MergeRoms,
 			};
@@ -2634,7 +2636,7 @@ namespace SabreTools.Helper
 				logger.User("Adding DAT: " + input.Split('¬')[0]);
 				datHeaders[i] = new Dat
 				{
-					OutputFormat = (inputDat.OutputFormat != OutputFormat.None ? inputDat.OutputFormat : OutputFormat.None),
+					OutputFormatFlag = (inputDat.OutputFormatFlag != 0 ? inputDat.OutputFormatFlag: 0),
 					Files = new Dictionary<string, List<Rom>>(),
 					MergeRoms = inputDat.MergeRoms,
 				};
@@ -2709,9 +2711,9 @@ namespace SabreTools.Helper
 			}
 
 			// If the DAT has no output format, default to XML
-			if (datdata.OutputFormat == OutputFormat.None)
+			if (datdata.OutputFormatFlag == 0)
 			{
-				datdata.OutputFormat = OutputFormat.Xml;
+				datdata.OutputFormatFlag = OutputFormatFlag.Xml;
 			}
 
 			// Make sure that the three essential fields are filled in
@@ -2758,87 +2760,91 @@ namespace SabreTools.Helper
 			SortedDictionary<string, List<Rom>> sortable = BucketByGame(datdata.Files, datdata.MergeRoms, norename, logger);
 
 			// Get the outfile name
-			string outfile = Style.CreateOutfileName(outDir, datdata);
-
-			logger.User("Opening file for writing: " + outfile);
+			Dictionary<OutputFormatFlag, string> outfiles = Style.CreateOutfileNames(outDir, datdata);
 
 			try
 			{
-				FileStream fs = File.Create(outfile);
-				StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
-
-				// Write out the header
-				WriteHeader(sw, datdata, logger);
-
-				// Write out each of the machines and roms
-				int depth = 2, last = -1;
-				string lastgame = null;
-				List<string> splitpath = new List<string>();
-
-				// Get a properly sorted set of keys
-				List<string> keys = sortable.Keys.ToList();
-				keys.Sort(Style.CompareNumeric);
-
-				foreach (string key in keys)
+				foreach (OutputFormatFlag outputFormatFlag in outfiles.Keys)
 				{
-					List<Rom> roms = sortable[key];
+					string outfile = outfiles[outputFormatFlag];
 
-					for (int index = 0; index < roms.Count; index++)
+					logger.User("Opening file for writing: " + outfile);
+					FileStream fs = File.Create(outfile);
+					StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
+
+					// Write out the header
+					WriteHeader(sw, outputFormatFlag, datdata, logger);
+
+					// Write out each of the machines and roms
+					int depth = 2, last = -1;
+					string lastgame = null;
+					List<string> splitpath = new List<string>();
+
+					// Get a properly sorted set of keys
+					List<string> keys = sortable.Keys.ToList();
+					keys.Sort(Style.CompareNumeric);
+
+					foreach (string key in keys)
 					{
-						Rom rom = roms[index];
-						List<string> newsplit = rom.Machine.Name.Split('\\').ToList();
+						List<Rom> roms = sortable[key];
 
-						// If we have a different game and we're not at the start of the list, output the end of last item
-						if (lastgame != null && lastgame.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
+						for (int index = 0; index < roms.Count; index++)
 						{
-							depth = WriteEndGame(sw, rom, splitpath, newsplit, lastgame, datdata, depth, out last, logger);
-						}
+							Rom rom = roms[index];
+							List<string> newsplit = rom.Machine.Name.Split('\\').ToList();
 
-						// If we have a new game, output the beginning of the new item
-						if (lastgame == null || lastgame.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
-						{
-							depth = WriteStartGame(sw, rom, newsplit, lastgame, datdata, depth, last, logger);
-						}
-
-						// If we have a "null" game (created by DATFromDir or something similar), log it to file
-						if (rom.HashData.Size == -1 && rom.HashData.CRC == "null" && rom.HashData.MD5 == "null" && rom.HashData.SHA1 == "null")
-						{
-							logger.Log("Empty folder found: " + rom.Machine.Name);
-
-							// If we're in a mode that doesn't allow for actual empty folders, add the blank info
-							if (datdata.OutputFormat != OutputFormat.SabreDat && datdata.OutputFormat != OutputFormat.MissFile)
+							// If we have a different game and we're not at the start of the list, output the end of last item
+							if (lastgame != null && lastgame.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 							{
-								rom.Name = (rom.Name == "null" ? "-" : rom.Name);
-								rom.HashData.Size = Constants.SizeZero;
-								rom.HashData.CRC = Constants.CRCZero;
-								rom.HashData.MD5 = Constants.MD5Zero;
-								rom.HashData.SHA1 = Constants.SHA1Zero;
+								depth = WriteEndGame(sw, outputFormatFlag, rom, splitpath, newsplit, lastgame, depth, out last, logger);
 							}
 
-							// Otherwise, set the new path and such, write out, and continue
-							else
+							// If we have a new game, output the beginning of the new item
+							if (lastgame == null || lastgame.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 							{
-								splitpath = newsplit;
-								lastgame = rom.Machine.Name;
-								continue;
+								depth = WriteStartGame(sw, outputFormatFlag, rom, newsplit, lastgame, depth, last, logger);
 							}
+
+							// If we have a "null" game (created by DATFromDir or something similar), log it to file
+							if (rom.HashData.Size == -1 && rom.HashData.CRC == "null" && rom.HashData.MD5 == "null" && rom.HashData.SHA1 == "null")
+							{
+								logger.Log("Empty folder found: " + rom.Machine.Name);
+
+								// If we're in a mode that doesn't allow for actual empty folders, add the blank info
+								if (outputFormatFlag != OutputFormatFlag.SabreDat && outputFormatFlag != OutputFormatFlag.MissFile)
+								{
+									rom.Name = (rom.Name == "null" ? "-" : rom.Name);
+									rom.HashData.Size = Constants.SizeZero;
+									rom.HashData.CRC = Constants.CRCZero;
+									rom.HashData.MD5 = Constants.MD5Zero;
+									rom.HashData.SHA1 = Constants.SHA1Zero;
+								}
+
+								// Otherwise, set the new path and such, write out, and continue
+								else
+								{
+									splitpath = newsplit;
+									lastgame = rom.Machine.Name;
+									continue;
+								}
+							}
+
+							// Now, output the rom data
+							WriteRomData(sw, outputFormatFlag, rom, lastgame, datdata, depth, logger, ignoreblanks);
+
+							// Set the new data to compare against
+							splitpath = newsplit;
+							lastgame = rom.Machine.Name;
 						}
-
-						// Now, output the rom data
-						WriteRomData(sw, rom, lastgame, datdata, depth, logger, ignoreblanks);
-
-						// Set the new data to compare against
-						splitpath = newsplit;
-						lastgame = rom.Machine.Name;
 					}
+
+					// Write the file footer out
+					WriteFooter(sw, outputFormatFlag, datdata, depth, logger);
+
+					logger.Log("File written!" + Environment.NewLine);
+					sw.Close();
+					fs.Close();
 				}
-
-				// Write the file footer out
-				WriteFooter(sw, datdata, depth, logger);
-
-				logger.Log("File written!" + Environment.NewLine);
-				sw.Close();
-				fs.Close();
 			}
 			catch (Exception ex)
 			{
@@ -2853,17 +2859,18 @@ namespace SabreTools.Helper
 		/// Write out DAT header using the supplied StreamWriter
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
+		/// <param name="outputFormatFlag">Output format to write to</param>
 		/// <param name="datdata">DatData object representing DAT information</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		public static bool WriteHeader(StreamWriter sw, Dat datdata, Logger logger)
+		public static bool WriteHeader(StreamWriter sw, OutputFormatFlag outputFormatFlag, Dat datdata, Logger logger)
 		{
 			try
 			{
 				string header = "";
-				switch (datdata.OutputFormat)
+				switch (outputFormatFlag)
 				{
-					case OutputFormat.ClrMamePro:
+					case OutputFormatFlag.ClrMamePro:
 						header = "clrmamepro (\n" +
 							"\tname \"" + datdata.Name + "\"\n" +
 							"\tdescription \"" + datdata.Description + "\"\n" +
@@ -2878,7 +2885,7 @@ namespace SabreTools.Helper
 							(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
 							")\n";
 						break;
-					case OutputFormat.MissFile:
+					case OutputFormatFlag.MissFile:
 						if (datdata.XSV == true)
 						{
 							header = "\"File Name\"\t\"Internal Name\"\t\"Description\"\t\"Game Name\"\t\"Game Description\"\t\"Type\"\t\"" +
@@ -2890,7 +2897,7 @@ namespace SabreTools.Helper
 								"Rom Name\",\"Disk Name\",\"Size\",\"CRC\",\"MD5\",\"SHA1\",\"Nodump\"\n";
 						}
 						break;
-					case OutputFormat.RomCenter:
+					case OutputFormatFlag.RomCenter:
 						header = "[CREDITS]\n" +
 							"author=" + datdata.Author + "\n" +
 							"version=" + datdata.Version + "\n" +
@@ -2904,7 +2911,7 @@ namespace SabreTools.Helper
 							"version=" + datdata.Description + "\n" +
 							"[GAMES]\n";
 						break;
-					case OutputFormat.SabreDat:
+					case OutputFormatFlag.SabreDat:
 						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
 							"<datafile>\n" +
@@ -2925,7 +2932,7 @@ namespace SabreTools.Helper
 							"\t</header>\n" +
 							"\t<data>\n";
 						break;
-					case OutputFormat.Xml:
+					case OutputFormatFlag.Xml:
 						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
 							"<datafile>\n" +
@@ -2963,15 +2970,15 @@ namespace SabreTools.Helper
 		/// Write out Game start using the supplied StreamWriter
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
+		/// <param name="outputFormatFlag">Output format to write to</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="newsplit">Split path representing the parent game (SabreDAT only)</param>
 		/// <param name="lastgame">The name of the last game to be output</param>
-		/// <param name="datdata">DatData object representing DAT information</param>
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>The new depth of the tag</returns>
-		public static int WriteStartGame(StreamWriter sw, Rom rom, List<string> newsplit, string lastgame, Dat datdata, int depth, int last, Logger logger)
+		public static int WriteStartGame(StreamWriter sw, OutputFormatFlag outputFormatFlag, Rom rom, List<string> newsplit, string lastgame, int depth, int last, Logger logger)
 		{
 			try
 			{
@@ -2982,13 +2989,13 @@ namespace SabreTools.Helper
 				}
 
 				string state = "";
-				switch (datdata.OutputFormat)
+				switch (outputFormatFlag)
 				{
-					case OutputFormat.ClrMamePro:
+					case OutputFormatFlag.ClrMamePro:
 						state += "game (\n\tname \"" + rom.Machine.Name + "\"\n" +
 							"\tdescription \"" + (String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description) + "\"\n";
 						break;
-					case OutputFormat.SabreDat:
+					case OutputFormatFlag.SabreDat:
 						for (int i = (last == -1 ? 0 : last); i < newsplit.Count; i++)
 						{
 							for (int j = 0; j < depth - last + i - (lastgame == null ? 1 : 0); j++)
@@ -3000,7 +3007,7 @@ namespace SabreTools.Helper
 						}
 						depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
 						break;
-					case OutputFormat.Xml:
+					case OutputFormatFlag.Xml:
 						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Machine.Name) + "\">\n" +
 							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) + "</description>\n";
 						break;
@@ -3021,16 +3028,16 @@ namespace SabreTools.Helper
 		/// Write out Game start using the supplied StreamWriter
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
+		/// <param name="outputFormatFlag">Output format to write to</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="splitpath">Split path representing last kwown parent game (SabreDAT only)</param>
 		/// <param name="newsplit">Split path representing the parent game (SabreDAT only)</param>
 		/// <param name="lastgame">The name of the last game to be output</param>
-		/// <param name="datdata">DatData object representing DAT information</param>
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>The new depth of the tag</returns>
-		public static int WriteEndGame(StreamWriter sw, Rom rom, List<string> splitpath, List<string> newsplit, string lastgame, Dat datdata, int depth, out int last, Logger logger)
+		public static int WriteEndGame(StreamWriter sw, OutputFormatFlag outputFormatFlag, Rom rom, List<string> splitpath, List<string> newsplit, string lastgame, int depth, out int last, Logger logger)
 		{
 			last = 0;
 
@@ -3038,12 +3045,12 @@ namespace SabreTools.Helper
 			{
 				string state = "";
 
-				switch (datdata.OutputFormat)
+				switch (outputFormatFlag)
 				{
-					case OutputFormat.ClrMamePro:
+					case OutputFormatFlag.ClrMamePro:
 						state += ")\n";
 						break;
-					case OutputFormat.SabreDat:
+					case OutputFormatFlag.SabreDat:
 						if (splitpath != null)
 						{
 							for (int i = 0; i < newsplit.Count && i < splitpath.Count; i++)
@@ -3073,7 +3080,7 @@ namespace SabreTools.Helper
 							depth = 2 + last;
 						}
 						break;
-					case OutputFormat.Xml:
+					case OutputFormatFlag.Xml:
 						state += "\t</machine>\n";
 						break;
 				}
@@ -3093,6 +3100,7 @@ namespace SabreTools.Helper
 		/// Write out RomData using the supplied StreamWriter
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
+		/// <param name="outputFormatFlag">Output format to write to</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="lastgame">The name of the last game to be output</param>
 		/// <param name="datdata">DatData object representing DAT information</param>
@@ -3100,7 +3108,7 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		public static bool WriteRomData(StreamWriter sw, Rom rom, string lastgame, Dat datdata, int depth, Logger logger, bool ignoreblanks = false)
+		public static bool WriteRomData(StreamWriter sw, OutputFormatFlag outputFormatFlag, Rom rom, string lastgame, Dat datdata, int depth, Logger logger, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks && (rom.HashData.Size == 0 || rom.HashData.Size == -1))
@@ -3111,9 +3119,9 @@ namespace SabreTools.Helper
 			try
 			{
 				string state = "";
-				switch (datdata.OutputFormat)
+				switch (outputFormatFlag)
 				{
-					case OutputFormat.ClrMamePro:
+					case OutputFormatFlag.ClrMamePro:
 						state += "\t" + rom.Type.ToString().ToLowerInvariant() + " ( name \"" + rom.Name + "\"" +
 							(rom.HashData.Size != -1 ? " size " + rom.HashData.Size : "") +
 							(!String.IsNullOrEmpty(rom.HashData.CRC) ? " crc " + rom.HashData.CRC.ToLowerInvariant() : "") +
@@ -3123,7 +3131,7 @@ namespace SabreTools.Helper
 							(rom.Nodump ? " flags nodump" : "") +
 							" )\n";
 						break;
-					case OutputFormat.MissFile:
+					case OutputFormatFlag.MissFile:
 						string pre = datdata.Prefix + (datdata.Quotes ? "\"" : "");
 						string post = (datdata.Quotes ? "\"" : "") + datdata.Postfix;
 
@@ -3188,23 +3196,23 @@ namespace SabreTools.Helper
 							}
 						}
 						break;
-					case OutputFormat.RedumpMD5:
+					case OutputFormatFlag.RedumpMD5:
 						state += rom.HashData.MD5 + " *" + rom.Name + "\n";
 						break;
-					case OutputFormat.RedumpSFV:
+					case OutputFormatFlag.RedumpSFV:
 						state += rom.Name + " " + rom.HashData.CRC + "\n";
 						break;
-					case OutputFormat.RedumpSHA1:
+					case OutputFormatFlag.RedumpSHA1:
 						state += rom.HashData.SHA1 + " *" + rom.Name + "\n";
 						break;
-					case OutputFormat.RomCenter:
+					case OutputFormatFlag.RomCenter:
 						state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Machine) +
 							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
 							"¬" + rom.HashData.CRC.ToLowerInvariant() +
 							"¬" + (rom.HashData.Size != -1 ? rom.HashData.Size.ToString() : "") + "¬¬¬\n";
 						break;
-					case OutputFormat.SabreDat:
+					case OutputFormatFlag.SabreDat:
 						string prefix = "";
 						for (int i = 0; i < depth; i++)
 						{
@@ -3224,7 +3232,7 @@ namespace SabreTools.Helper
 								prefix + "</file>\n" :
 							"/>\n");
 						break;
-					case OutputFormat.Xml:
+					case OutputFormatFlag.Xml:
 						state += "\t\t<" + rom.Type.ToString().ToLowerInvariant() + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
 							(rom.HashData.Size != -1 ? " size=\"" + rom.HashData.Size + "\"" : "") +
 							(!String.IsNullOrEmpty(rom.HashData.CRC) ? " crc=\"" + rom.HashData.CRC.ToLowerInvariant() + "\"" : "") +
@@ -3255,7 +3263,7 @@ namespace SabreTools.Helper
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		public static bool WriteFooter(StreamWriter sw, Dat datdata, int depth, Logger logger)
+		public static bool WriteFooter(StreamWriter sw, OutputFormatFlag outputFormatFlag, Dat datdata, int depth, Logger logger)
 		{
 			try
 			{
@@ -3264,12 +3272,12 @@ namespace SabreTools.Helper
 				// If we have roms, output the full footer
 				if (datdata.Files != null && datdata.Files.Count > 0)
 				{
-					switch (datdata.OutputFormat)
+					switch (outputFormatFlag)
 					{
-						case OutputFormat.ClrMamePro:
+						case OutputFormatFlag.ClrMamePro:
 							footer = ")";
 							break;
-						case OutputFormat.SabreDat:
+						case OutputFormatFlag.SabreDat:
 							for (int i = depth - 1; i >= 2; i--)
 							{
 								// Print out the number of tabs and the end folder
@@ -3281,7 +3289,7 @@ namespace SabreTools.Helper
 							}
 							footer += "\t</data>\n</datafile>";
 							break;
-						case OutputFormat.Xml:
+						case OutputFormatFlag.Xml:
 							footer = "\t</machine>\n</datafile>";
 							break;
 					}
@@ -3290,10 +3298,10 @@ namespace SabreTools.Helper
 				// Otherwise, output the abbreviated form
 				else
 				{
-					switch (datdata.OutputFormat)
+					switch (outputFormatFlag)
 					{
-						case OutputFormat.SabreDat:
-						case OutputFormat.Xml:
+						case OutputFormatFlag.SabreDat:
+						case OutputFormatFlag.Xml:
 							footer = "</datafile>";
 							break;
 					}
@@ -3343,8 +3351,8 @@ namespace SabreTools.Helper
 			string newExtBString = string.Join(",", newExtB);
 
 			// Get the file format
-			OutputFormat outputFormat = GetOutputFormat(filename, logger);
-			if (outputFormat == OutputFormat.None)
+			OutputFormatFlag outputFormatFlag = GetOutputFormat(filename, logger);
+			if (outputFormatFlag == 0)
 			{
 				return true;
 			}
@@ -3368,7 +3376,7 @@ namespace SabreTools.Helper
 				Url = datdata.Url,
 				Comment = datdata.Comment,
 				Files = new Dictionary<string, List<Rom>>(),
-				OutputFormat = outputFormat,
+				OutputFormatFlag = outputFormatFlag,
 			};
 			Dat datdataB = new Dat
 			{
@@ -3384,7 +3392,7 @@ namespace SabreTools.Helper
 				Url = datdata.Url,
 				Comment = datdata.Comment,
 				Files = new Dictionary<string, List<Rom>>(),
-				OutputFormat = outputFormat,
+				OutputFormatFlag = outputFormatFlag,
 			};
 
 			// If roms is empty, return false
@@ -3481,8 +3489,8 @@ namespace SabreTools.Helper
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
 			// Get the file format
-			OutputFormat outputFormat = GetOutputFormat(filename, logger);
-			if (outputFormat == OutputFormat.None)
+			OutputFormatFlag outputFormatFlag = GetOutputFormat(filename, logger);
+			if (outputFormatFlag == 0)
 			{
 				return true;
 			}
@@ -3511,7 +3519,7 @@ namespace SabreTools.Helper
 				ForceMerging = datdata.ForceMerging,
 				ForceNodump = datdata.ForceNodump,
 				ForcePacking = datdata.ForcePacking,
-				OutputFormat = outputFormat,
+				OutputFormatFlag = outputFormatFlag,
 				MergeRoms = datdata.MergeRoms,
 				Files = new Dictionary<string, List<Rom>>(),
 			};
@@ -3533,7 +3541,7 @@ namespace SabreTools.Helper
 				ForceMerging = datdata.ForceMerging,
 				ForceNodump = datdata.ForceNodump,
 				ForcePacking = datdata.ForcePacking,
-				OutputFormat = outputFormat,
+				OutputFormatFlag = outputFormatFlag,
 				MergeRoms = datdata.MergeRoms,
 				Files = new Dictionary<string, List<Rom>>(),
 			};
@@ -3555,7 +3563,7 @@ namespace SabreTools.Helper
 				ForceMerging = datdata.ForceMerging,
 				ForceNodump = datdata.ForceNodump,
 				ForcePacking = datdata.ForcePacking,
-				OutputFormat = outputFormat,
+				OutputFormatFlag = outputFormatFlag,
 				MergeRoms = datdata.MergeRoms,
 				Files = new Dictionary<string, List<Rom>>(),
 			};
@@ -3577,7 +3585,7 @@ namespace SabreTools.Helper
 				ForceMerging = datdata.ForceMerging,
 				ForceNodump = datdata.ForceNodump,
 				ForcePacking = datdata.ForcePacking,
-				OutputFormat = outputFormat,
+				OutputFormatFlag = outputFormatFlag,
 				MergeRoms = datdata.MergeRoms,
 				Files = new Dictionary<string, List<Rom>>(),
 			};
@@ -3695,8 +3703,8 @@ namespace SabreTools.Helper
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
 			// Get the file format
-			OutputFormat outputFormat = GetOutputFormat(filename, logger);
-			if (outputFormat == OutputFormat.None)
+			OutputFormatFlag outputFormatFlag = GetOutputFormat(filename, logger);
+			if (outputFormatFlag == 0)
 			{
 				return true;
 			}
@@ -3725,7 +3733,7 @@ namespace SabreTools.Helper
 				ForceMerging = datdata.ForceMerging,
 				ForceNodump = datdata.ForceNodump,
 				ForcePacking = datdata.ForcePacking,
-				OutputFormat = outputFormat,
+				OutputFormatFlag = outputFormatFlag,
 				MergeRoms = datdata.MergeRoms,
 				Files = new Dictionary<string, List<Rom>>(),
 			};
@@ -3747,7 +3755,7 @@ namespace SabreTools.Helper
 				ForceMerging = datdata.ForceMerging,
 				ForceNodump = datdata.ForceNodump,
 				ForcePacking = datdata.ForcePacking,
-				OutputFormat = outputFormat,
+				OutputFormatFlag = outputFormatFlag,
 				MergeRoms = datdata.MergeRoms,
 				Files = new Dictionary<string, List<Rom>>(),
 			};

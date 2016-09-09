@@ -62,7 +62,7 @@ namespace SabreTools
 				FileName = Path.GetFileName(inputs[0]) + " Dir2Dat",
 				Name = Path.GetFileName(inputs[0]) + " Dir2Dat",
 				Description = Path.GetFileName(inputs[0]) + " Dir2Dat",
-				OutputFormat = OutputFormat.Xml,
+				OutputFormatFlag = OutputFormatFlag.Xml,
 				Files = new Dictionary<string, List<Rom>>(),
 			};
 
