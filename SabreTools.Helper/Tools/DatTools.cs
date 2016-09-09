@@ -1396,6 +1396,13 @@ namespace SabreTools.Helper
 		{
 			key = "";
 
+			// If there's no name in the rom, we log and skip it
+			if (String.IsNullOrEmpty(rom.Name))
+			{
+				logger.Warning("Rom with no name found! Skipping...");
+				return datdata;
+			}
+
 			// If we're in cleaning mode, sanitize the game name
 			rom.Machine.Name = (clean ? Style.CleanGameName(rom.Machine.Name) : rom.Machine.Name);
 
