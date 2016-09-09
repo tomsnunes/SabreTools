@@ -80,6 +80,11 @@ namespace SabreTools
 
 			// Verify the filenames
 			Dictionary<string, string> foundDats = GetValidDats(inputs);
+
+			// Once we have each DAT, look up each associated hash based on the hash of the DATs.
+			// Then, for each rom, check to see if they exist in the folder. If they don't, add it
+			// to the fixDAT. Then output when the DAT is done, processing, moving on to the next...
+			// NOTE: This might share code with InitMiss
 		}
 
 		/// <summary>
@@ -89,6 +94,11 @@ namespace SabreTools
 		private static void InitLookup(List<string> inputs)
 		{
 			_logger.User("This feature is not yet implemented: lookup");
+
+			// First things first is that the inputs have to be lower-cased. Then, we have to check
+			// to see what sort of hashes we're dealing with. Like [0-9a-f]{8} for CRC. Might add
+			// these to the constants while I'm at it. Once we have the hashes separated, we check
+			// and add a simple bool for each that's found.
 		}
 
 		/// <summary>
@@ -101,6 +111,12 @@ namespace SabreTools
 
 			// Verify the filenames
 			Dictionary<string, string> foundDats = GetValidDats(inputs);
+
+			// Once we have each DAT, look up each associated hash based on the hash of the DATs.
+			// Then, for each rom, check to see if they exist in the folder. If they do, add it
+			// to the have DAT, else wise go to the miss DAT. Then output both when the DAT is done
+			// processing, moving on to the next...
+			// NOTE: This might share code with InitFixdat
 		}
 
 		#endregion
