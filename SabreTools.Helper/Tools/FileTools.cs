@@ -795,6 +795,11 @@ namespace SabreTools.Helper
 			bool correct = true;
 			for (int i = 0; i < header.Length; i++)
 			{
+				// This is a temp fix to ignore the modification time and OS until romba can be fixed
+				if (i == 4 || i == 5 || i == 6 || i == 7 || i == 9)
+				{
+					continue;
+				}
 				correct &= (header[i] == Constants.TorrentGZHeader[i]);
 			}
 			if (!correct)
