@@ -1452,26 +1452,29 @@ namespace SabreTools.Helper
 					rom.HashData.Size = -1;
 				}
 
-				key = rom.HashData.Size + "-" + rom.HashData.CRC;
-				if (datdata.Files.ContainsKey(key))
+				lock (datdata.Files)
 				{
-					datdata.Files[key].Add(rom);
-				}
-				else
-				{
-					List<Rom> newvalue = new List<Rom>();
-					newvalue.Add(rom);
-					datdata.Files.Add(key, newvalue);
-				}
+					key = rom.HashData.Size + "-" + rom.HashData.CRC;
+					if (datdata.Files.ContainsKey(key))
+					{
+						datdata.Files[key].Add(rom);
+					}
+					else
+					{
+						List<Rom> newvalue = new List<Rom>();
+						newvalue.Add(rom);
+						datdata.Files.Add(key, newvalue);
+					}
 
-				// Add statistical data
-				datdata.RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
-				datdata.DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
-				datdata.TotalSize += (rom.Nodump ? 0 : rom.HashData.Size);
-				datdata.CRCCount += (String.IsNullOrEmpty(rom.HashData.CRC) ? 0 : 1);
-				datdata.MD5Count += (String.IsNullOrEmpty(rom.HashData.MD5) ? 0 : 1);
-				datdata.SHA1Count += (String.IsNullOrEmpty(rom.HashData.SHA1) ? 0 : 1);
-				datdata.NodumpCount += (rom.Nodump ? 1 : 0);
+					// Add statistical data
+					datdata.RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
+					datdata.DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
+					datdata.TotalSize += (rom.Nodump ? 0 : rom.HashData.Size);
+					datdata.CRCCount += (String.IsNullOrEmpty(rom.HashData.CRC) ? 0 : 1);
+					datdata.MD5Count += (String.IsNullOrEmpty(rom.HashData.MD5) ? 0 : 1);
+					datdata.SHA1Count += (String.IsNullOrEmpty(rom.HashData.SHA1) ? 0 : 1);
+					datdata.NodumpCount += (rom.Nodump ? 1 : 0);
+				}
 			}
 
 			return datdata;
