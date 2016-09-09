@@ -542,9 +542,12 @@ namespace SabreTools.Helper
 									{
 										Stream tempstream = new MemoryStream();
 										reader.WriteEntryTo(tempstream);
-										archive.AddEntry(destEntryName, tempstream);
 
-										archive.SaveTo(outputArchive + ".tmp", CompressionType.Deflate);
+										if (!archive.Entries.Contains(reader.Entry))
+										{
+											archive.AddEntry(destEntryName, tempstream);
+											archive.SaveTo(outputArchive + ".tmp", CompressionType.Deflate);
+										}
 									}
 									catch (Exception)
 									{
