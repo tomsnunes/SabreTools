@@ -2127,6 +2127,7 @@ namespace SabreTools.Helper
 				outerDiffData.FileName += post;
 				outerDiffData.Name += post;
 				outerDiffData.Description += post;
+				outerDiffData.Files = new Dictionary<string, List<Rom>>();
 			}
 
 			// Have External dupes
@@ -2137,6 +2138,7 @@ namespace SabreTools.Helper
 				dupeData.FileName += post;
 				dupeData.Name += post;
 				dupeData.Description += post;
+				dupeData.Files = new Dictionary<string, List<Rom>>();
 			}
 
 			// Create a list of DatData objects representing individual output files
@@ -2152,6 +2154,7 @@ namespace SabreTools.Helper
 					diffData.FileName += post;
 					diffData.Name += post;
 					diffData.Description += post;
+					diffData.Files = new Dictionary<string, List<Rom>>();
 					outDats.Add(diffData);
 				}
 			}
