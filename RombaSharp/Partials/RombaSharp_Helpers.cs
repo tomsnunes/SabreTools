@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Xml;
 
 namespace SabreTools
@@ -433,6 +434,33 @@ namespace SabreTools
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Gets all valid DATs that match in the DAT root
+		/// </summary>
+		/// <param name="inputs">List of input strings to check for, presumably file names</param>
+		/// <returns>Dictionary of hash/full path for each of the valid DATs</returns>
+		private static Dictionary<string, string> GetValidDats(List<string> inputs)
+		{
+			// Get a dictionary of filenames that actually exist in the DATRoot, logging which ones are not
+			List<string> datRootDats = Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories).ToList().ConvertAll(i => i.ToLowerInvariant());
+			Dictionary<string, string> foundDats = new Dictionary<string, string>();
+			foreach (string input in inputs)
+			{
+				if (datRootDats.Contains(input.ToLowerInvariant()))
+				{
+					string fullpath = Path.GetFullPath(datRootDats[datRootDats.IndexOf(input.ToLowerInvariant())]);
+					string sha1 = FileTools.GetSingleFileInfo(fullpath).HashData.SHA1;
+					foundDats.Add(sha1, fullpath);
+				}
+				else
+				{
+					_logger.Warning("The file '" + input + "' could not be found in the DAT root");
+				}
+			}
+
+			return foundDats;
 		}
 
 		#endregion

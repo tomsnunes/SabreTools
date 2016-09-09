@@ -16,6 +16,11 @@ namespace SabreTools
 		private static void InitArchive(List<string> inputs, bool onlyNeeded)
 		{
 			_logger.User("This feature is not yet implemented: archive");
+
+			// This should use the same thing as something like in SimpleSort, as in scan the archive and scan the files inside equally
+			// Either during or after, we then check against the database to see if there's any matches. If there's no match and
+			// we say onlyNeeded, then don't add it. If there's no match and not onlyNeeded, add it with no DAT hash. If there's a match,
+			// and it doesn't say exists, add it and change the flag. If there's a match and says exists, skip it.
 		}
 
 		/// <summary>
@@ -25,6 +30,12 @@ namespace SabreTools
 		private static void InitBuild(List<string> inputs)
 		{
 			_logger.User("This feature is not yet implemented: build");
+
+			// Verify the filenames
+			Dictionary<string, string> foundDats = GetValidDats(inputs);
+
+			// Now that we have the dictionary, we can loop through and output to a new folder for each
+
 		}
 
 		/// <summary>
@@ -34,6 +45,9 @@ namespace SabreTools
 		private static void InitDiffDat(string newdat)
 		{
 			_logger.User("This feature is not yet implemented: diffdat");
+
+			// First, we want to read in the DAT. Then for each file listed in the DAT, we check if it's in there or not.
+			// If it is in there, we add it to an output DAT. If it's not, we skip. Then we output the DAT.
 		}
 
 		/// <summary>
@@ -63,6 +77,9 @@ namespace SabreTools
 		private static void InitFixdat(List<string> inputs)
 		{
 			_logger.User("This feature is not yet implemented: fixdat");
+
+			// Verify the filenames
+			Dictionary<string, string> foundDats = GetValidDats(inputs);
 		}
 
 		/// <summary>
@@ -81,6 +98,9 @@ namespace SabreTools
 		private static void InitMiss(List<string> inputs)
 		{
 			_logger.User("This feature is not yet implemented: miss");
+
+			// Verify the filenames
+			Dictionary<string, string> foundDats = GetValidDats(inputs);
 		}
 
 		#endregion
