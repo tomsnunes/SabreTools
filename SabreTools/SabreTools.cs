@@ -675,7 +675,7 @@ namespace SabreTools
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, outputCMP, outputMiss, outputRC, outputSD, outputXML, usegame, prefix,
 					postfix, quotes, repext, addext, datprefix, romba, tsv, merge, diff, cascade, inplace, skip, bare, gamename, romname,
-					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, softlist, dedup);
+					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, softlist, dedup, maxParallelism);
 			}
 
 			// Add a source or system

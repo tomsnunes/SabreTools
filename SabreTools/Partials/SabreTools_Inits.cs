@@ -135,6 +135,8 @@ namespace SabreTools
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="dedup">True to dedupe the roms in the DAT, false otherwise (default)</param>
+		/// /* Multithreading info */
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitUpdate(List<string> inputs,
 			/* Normal DAT header info */
 			string filename,
@@ -200,7 +202,10 @@ namespace SabreTools
 			string outdir,
 			bool clean,
 			bool softlist,
-			bool dedup)
+			bool dedup,
+			
+			/* Multithreading info */
+			int maxDegreeOfParallelism)
 		{
 			// Set the special flags
 			ForceMerging fm = ForceMerging.None;
@@ -321,37 +326,37 @@ namespace SabreTools
 			if (outputCMP)
 			{
 				userInputDat.OutputFormat = OutputFormat.ClrMamePro;
-				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
+				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
 			}
 			if (outputMiss || tsv != null)
 			{
 				userInputDat.OutputFormat = OutputFormat.MissFile;
-				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
+				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
 			}
 			if (outputRC)
 			{
 				userInputDat.OutputFormat = OutputFormat.RomCenter;
-				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
+				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
 			}
 			if (outputSD)
 			{
 				userInputDat.OutputFormat = OutputFormat.SabreDat;
-				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
+				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
 			}
 			if (outputXML)
 			{
 				userInputDat.OutputFormat = OutputFormat.Xml;
-				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
+				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
 			}
 			if (!outputCMP && !(outputMiss || tsv != null) && !outputRC && !outputSD && !outputXML)
 			{
-				DatTools.Update(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, _logger);
+				DatTools.UpdateParallel(inputs, userInputDat, outdir, merge, diff, cascade, inplace, skip, bare, clean, softlist,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
 			}
 		}
 
