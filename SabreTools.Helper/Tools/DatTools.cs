@@ -1781,7 +1781,7 @@ namespace SabreTools.Helper
 						// If we have roms, output them
 						if (innerDatdata.Files.Count != 0)
 						{
-							WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger, overwrite: (outputDirectory == ""));
+							WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger, overwrite: (outputDirectory != ""));
 						}
 					}
 					else if (Directory.Exists(inputFileName))
@@ -1799,7 +1799,7 @@ namespace SabreTools.Helper
 							// If we have roms, output them
 							if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
 							{
-								WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outputDirectory == ""));
+								WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outputDirectory != ""));
 							}
 						}
 					}
@@ -2534,7 +2534,7 @@ namespace SabreTools.Helper
 						// If we have roms, output them
 						if (innerDatdata.Files.Count != 0)
 						{
-							WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger, overwrite: (outputDirectory == ""));
+							WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger, overwrite: (outputDirectory != ""));
 						}
 					}
 					else if (Directory.Exists(inputFileName))
@@ -2554,7 +2554,7 @@ namespace SabreTools.Helper
 							// If we have roms, output them
 							if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
 							{
-								WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outputDirectory == ""));
+								WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outputDirectory != ""));
 							}
 						});
 					}
