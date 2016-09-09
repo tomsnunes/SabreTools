@@ -540,11 +540,10 @@ namespace SabreTools.Helper
 								{
 									try
 									{
-										Stream tempstream = new MemoryStream();
-										reader.WriteEntryTo(tempstream);
-
 										if (!archive.Entries.Contains(reader.Entry))
 										{
+											Stream tempstream = new MemoryStream();
+											reader.WriteEntryTo(tempstream);
 											archive.AddEntry(destEntryName, tempstream);
 											archive.SaveTo(outputArchive + ".tmp", CompressionType.Deflate);
 										}
