@@ -389,12 +389,16 @@ namespace SabreTools.Helper
 				while (sIndex < s.Length)
 				{
 					if (otherIndex >= other.Length)
+					{
 						return 1;
+					}
 
 					if (char.IsDigit(s[sIndex]))
 					{
 						if (!char.IsDigit(other[otherIndex]))
+						{
 							return -1;
+						}
 
 						// Compare the numbers
 						StringBuilder sBuilder = new StringBuilder(), otherBuilder = new StringBuilder();
@@ -411,33 +415,41 @@ namespace SabreTools.Helper
 
 						long sValue = 0L, otherValue = 0L;
 
-						try
+						if (!Int64.TryParse(sBuilder.ToString(), out sValue))
 						{
-							sValue = Convert.ToInt64(sBuilder.ToString());
+							sValue = Int64.MaxValue;
 						}
-						catch (OverflowException) { sValue = Int64.MaxValue; }
 
-						try
+						if (!Int64.TryParse(otherBuilder.ToString(), out otherValue))
 						{
-							otherValue = Convert.ToInt64(otherBuilder.ToString());
+							otherValue = Int64.MaxValue;
 						}
-						catch (OverflowException) { otherValue = Int64.MaxValue; }
 
 						if (sValue < otherValue)
+						{
 							return -1;
+						}
 						else if (sValue > otherValue)
+						{
 							return 1;
+						}
 					}
 					else if (char.IsDigit(other[otherIndex]))
+					{
 						return 1;
+					}
 					else
 					{
 						int difference = string.Compare(s[sIndex].ToString(), other[otherIndex].ToString(), StringComparison.InvariantCultureIgnoreCase);
 
 						if (difference > 0)
+						{
 							return 1;
+						}
 						else if (difference < 0)
+						{
 							return -1;
+						}
 
 						sIndex++;
 						otherIndex++;
@@ -445,7 +457,9 @@ namespace SabreTools.Helper
 				}
 
 				if (otherIndex < other.Length)
+				{
 					return -1;
+				}
 			}
 
 			return 0;
