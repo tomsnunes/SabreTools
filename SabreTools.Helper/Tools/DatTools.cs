@@ -1164,6 +1164,7 @@ namespace SabreTools.Helper
 											// If the rom has another type of loadflag, skip it completely
 											else if (subreader.GetAttribute("loadflag") != null)
 											{
+												subreader.Read();
 												continue;
 											}
 
