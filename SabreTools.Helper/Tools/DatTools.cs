@@ -2308,6 +2308,7 @@ namespace SabreTools.Helper
 					diffData.Name += post;
 					diffData.Description += post;
 				}
+				diffData.Files = new Dictionary<string, List<Rom>>();
 				outDats.Add(diffData);
 			}
 			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
