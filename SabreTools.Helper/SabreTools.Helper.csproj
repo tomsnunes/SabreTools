@@ -142,7 +142,7 @@
     </None>
     <None Include="packages.config" />
     <None Include="README.1ST">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
