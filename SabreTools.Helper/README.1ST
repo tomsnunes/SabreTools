@@ -375,9 +375,9 @@ Options:
 			DAT outputs. If this flag is enabled, a clrmamepro DAT will be created instead.
 		
 	-hd, --headerer 		Backup or restore copier headers from a variety of file types
-		Headerer is formerly a small program that is meant as an intermediary between header
-		skipper files (which, a bit apart from their name, do not just show how to skip
-		copier headers) and rom managers that do not use them.
+		Headerer is meant as an intermediary between header skipper files (which, a bit
+		apart from their name, do not just show how to skip copier headers) and rom managers
+		that do not use them.
 		
 		By default, this will detect, store, and remove copier headers from a file or folder
 		of files. The headers are backed up and collated by the hash of the unheadered file.
