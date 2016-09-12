@@ -279,16 +279,6 @@ namespace SabreTools.Helper
 					helptext.Add("Filter parameters for size can use postfixes for inputs:");
 					helptext.Add("    e.g. 8kb => 8000 or 8kib => 8192");
 					break;
-				case "Headerer":
-					helptext.Add(Resources.Resources.Headerer_Name + " - " + Resources.Resources.Headerer_Desc);
-					helptext.Add(barrier);
-					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.Headerer_Name + " [option] [filename|dirname]");
-					helptext.Add("");
-					helptext.Add("Options:");
-					helptext.Add("  -?, -h, --help	Show this help");
-					helptext.Add("  -e, --extract	Detect and remove mode");
-					helptext.Add("  -r, --restore	Restore header to file based on SHA-1");
-					break;
 				case "SimpleSort":
 					helptext.Add(Resources.Resources.SimpleSort_Name + " - " + Resources.Resources.SimpleSort_Desc);
 					helptext.Add(barrier);

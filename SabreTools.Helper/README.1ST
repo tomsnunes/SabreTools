@@ -7,11 +7,10 @@ Table of Contents
 -----------------
 1.0		Introduction and History
 2.0		Included Programs
-	2.1		Headerer
-	2.2		RombaSharp
-	2.3		SabreTools
-	2.4		SimpleSort
-	2.5		TGZConvert
+	2.1		RombaSharp
+	2.2		SabreTools
+	2.3		SimpleSort
+	2.4		TGZConvert
 3.0		Examples
 4.0		Contributors
 5.0		Licensing
@@ -75,42 +74,7 @@ Below are a list of the programs that are included in the current SabreTools
 release. Each of them have a brief description of the tool along with in-depth
 desciptions of all flags.
 
-** Section 2.1 - Headerer
-
-Headerer is a small program that is meant as an intermediary between header skipper
-files (which, a bit apart from their name, do not just show how to skip copier headers)
-and rom managers that do not use them.
-
-The following systems have headers that this program can work with:
-	- Atari 7800
-	- Atari Lynx
-	- Commodore PSID Music
-	- NEC PC-Engine / TurboGrafx 16
-	- Nintendo Famicom / Nintendo Entertainment System
-	- Nintendo Famicom Disk System
-	- Nintendo Super Famicom / Super Nintendo Entertainment System
-	- Nintendo Super Famicom / Super Nintendo Entertainment System SPC Music
-
-Usage:
-	Headerer.exe [options] [filename|dirname]
-
-Options:
-	-?, -h, --help		Show the built-in help text
-		Built-in to most of the programs is a basic help text
-		
-	-e, --extract		Enable detect and remove mode
-		This mode allows the user to detect, store, and remove copier headers from a file
-		or folder of files. The headers are backed up and collated by the hash of the un-
-		headered file. Files are then output without the detected copier header alongside
-		the originals with the suffix .new. No input files are altered in the process.
-		
-	-r, --restore		Restore headers to file(s)
-		This mode uses stored copier headers and reapplies them to files if they match the
-		included hash. More than one header can be applied to a file, so they will be out-
-		put to new files, suffixed with .newX, where X is a number. No input files are
-		altered in the process.
-
-** Section 2.2 - RombaSharp
+** Section 2.1 - RombaSharp
 
 RombaSharp is an ongoing "spiritual port" of the Romba tool (https://github.com/uwedeportivo/romba).
 The code is not based on the actual source, rather taking the features and using the code
@@ -142,7 +106,7 @@ Options:
 	refresh-dats		Refreshes the DAT index from the files in the DAT root
 	shutdown		Gracefully shuts down server [OBSOLETE]
 
-** Section 2.3 - SabreTools
+** Section 2.2 - SabreTools
 
 SabreTools is the main application of the SabreTools suite. It is mostly just a frontend
 to a lot of features that are available in the DLL and can be considered the reference
@@ -728,7 +692,7 @@ Options:
 			This sets an output folder to be used when the files are created. If a path
 			is not defined, the application directory is used instead.
 
-** Section 2.4 - SimpleSort
+** Section 2.3 - SimpleSort
 
 SimpleSort is a WIP program that is meant as a command-line tool to quickly rebuild and
 verify files based on a supplied DAT file. The eventual aim for this program is to have
@@ -802,7 +766,7 @@ Options:
 		Once the files that were able to rebuilt are taken care of, a DAT of the files
 		that could not be matched will be output to the program directory.
 
-** Section 2.5 - TGZConvert
+** Section 2.4 - TGZConvert
 
 TGZConvert is a small program that allows conversion of a folder or set of folders to
 TorrentGZ format. It is only useful in a small amount of situations at the present,

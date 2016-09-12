@@ -59,21 +59,6 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 </ul>
 This tool has a comprehensive list of command line parameters that can be used to do the above and much more.
 
-<b>Headerer</b>
-<p/>
-A simple auxilary tool that detects and removes headers and also restores headers for the following systems:
-<ul>
-	<li>Atari 7800</li>
-	<li>Atari Lynx</li>
-	<li>Commodore 64 PSID music</li>
-	<li>NEC PC-Engine / TurboGrafx 16</li>
-	<li>Nintendo Famicom Disk System</li>
-	<li>Nintendo Entertainment System / Famicom</li>
-	<li>Super Nintendo Entertainment System / Super Famicom</li>
-	<li>Super Nintendo Entertainment System / Super Famicom SPC music</li>
-</ul>
-The saved headers are currently stored in a database; multiple headers allowed per file.
-
 <b>SimpleSort</b>
 <p/>
 A simple rebuild-from-DAT tool that allows users to sort from the commandline.
