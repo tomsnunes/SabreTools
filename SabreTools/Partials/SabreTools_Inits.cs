@@ -331,7 +331,7 @@ namespace SabreTools
 		/// <param name="version">New version</param>
 		/// <param name="author">New author</param>
 		/// <param name="forceunpack">True to set forcepacking="unzip" on the created file, false otherwise</param>
-		/// <param name="old">True to output in CMP format, false to output in Logiqx XML</param>
+		/// <param name="outputFormat">OutputFormat to be used for outputting the DAT</param>
 		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
 		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
 		/// <param name="noMD5">True to disable getting MD5 hash, false otherwise</param>
@@ -348,7 +348,7 @@ namespace SabreTools
 			string version,
 			string author,
 			bool forceunpack,
-			bool old,
+			OutputFormat outputFormat,
 			bool romba,
 			bool superdat,
 			bool noMD5,
@@ -369,7 +369,7 @@ namespace SabreTools
 				Date = DateTime.Now.ToString("yyyy-MM-dd"),
 				Author = author,
 				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				OutputFormat = outputFormat,
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
 				Files = new Dictionary<string, List<Rom>>(),
@@ -397,7 +397,7 @@ namespace SabreTools
 		/// <param name="version">New version</param>
 		/// <param name="author">New author</param>
 		/// <param name="forceunpack">True to set forcepacking="unzip" on the created file, false otherwise</param>
-		/// <param name="old">True to output in CMP format, false to output in Logiqx XML</param>
+		/// <param name="outputFormat">OutputFormat to be used for outputting the DAT</param>
 		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
 		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
 		/// <param name="noMD5">True to disable getting MD5 hash, false otherwise</param>
@@ -415,7 +415,7 @@ namespace SabreTools
 			string version,
 			string author,
 			bool forceunpack,
-			bool old,
+			OutputFormat outputFormat,
 			bool romba,
 			bool superdat,
 			bool noMD5,
@@ -437,7 +437,7 @@ namespace SabreTools
 				Date = DateTime.Now.ToString("yyyy-MM-dd"),
 				Author = author,
 				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (old ? OutputFormat.ClrMamePro : OutputFormat.Xml),
+				OutputFormat = outputFormat,
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
 			};

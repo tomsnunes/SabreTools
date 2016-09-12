@@ -745,14 +745,15 @@ namespace SabreTools
 			// Create a DAT from a directory or set of directories
 			else if (datfromdir)
 			{
-				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, old, romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir);
+				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
+					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir);
 			}
 
 			// Create a DAT from a directory or set of directories in parallel
 			else if (datfromdirparallel)
 			{
-				InitDatFromDirParallel(inputs, filename, name, description, category, version, author,
-					forceunpack, old, romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir, maxParallelism);
+				InitDatFromDirParallel(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
+					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir, maxParallelism);
 			}
 
 			// If we want to run Offline merging mode

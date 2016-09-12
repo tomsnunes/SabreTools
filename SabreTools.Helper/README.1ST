@@ -112,7 +112,580 @@ RombaSharp placeholder text
 
 ** Section 2.3 - SabreTools
 
-SabreTools placeholder text
+SabreTools is the main application of the SabreTools suite. It is mostly just a frontend
+to a lot of features that are available in the DLL and can be considered the reference
+implementation. As such, it has a lot of possible flags and options that a user can select
+from.
+
+Included within this tool are a few former standalone executables:
+	- Convert/DATToMiss: Convert an arbitrary input DAT to a different format
+	- DATabase/DATabaseTwo: A managed DAT tool that allows for creating automatically merged
+		DATs based on one or more systems, sources, or a combination thereof
+	- DATFromDir: Create a DAT file from a folder or file, sometimes called dir2dat
+	- DatSplit: Split a DAT based on 2 different file extensions
+	- Filter: Filter a DAT based on various user-defined criteria, optionally using wildcards
+	- HashSplit: Split a DAT based on the best available hash (No-dump, SHA-1, MD5, CRC)
+	- OfflineMerge: Use merged DATs to create DATs used for managing offline arrays
+	- MergeDAT: Merge and optionally dedupe an arbitrary number of DAT files
+	- SingleGame: Trim game and rom names to fit NTFS length standards, optionally merging
+		all roms to a single game named "!" and forcing unpack
+	- UncompressedSize: Get statistics from one or more input DATs, including number of
+		roms, disks, files with available hash, and size
+
+Usage:
+	SabreTools.exe [options] [filename|dirname] ...
+	
+Options:
+	-?, -h, --help		Show the built-in help text
+		Built-in to most of the programs is a basic help text
+	
+	-a, --add			Add a new system or source to the database
+		Add a new system or source to the DAT database, including additional information.
+		
+		-manu=				Manufacturer name
+			Used only when adding a system to the database
+		
+		-system=			System name
+			Used only when adding a system to the database
+		
+		-source=			Source name
+			Used only when adding a source to the database
+		
+		-url=				Source URL
+			Used only when adding a source to the database
+	
+	-d, --dfd		Create a DAT from each input directory
+		Create a DAT file from an input directory or set of files. By default, this will
+		output a DAT named based on the input directory and the current date. It will also
+		treat all archives as possible games and add all three hashes for each file.
+		
+		-nm, --noMD5		Don't include MD5 in output
+			This allows the user to skip calculating the MD5 for each of the files which will
+			speed up the creation of the DAT.
+			
+		-ns, --noSHA1		Don't include SHA1 in output
+			This allows the user to skip calculating the SHA-1 for each of the files which will
+			speed up the creation of the DAT.
+			
+		-b, --bare			Don't include date in file name
+			Normally, the DAT will be created with the date in the file name. This flag removes
+			that but keeps the date tag intact.
+			
+		-u, --unzip			Force unzipping in created DAT
+			This sets the 'forcepacking="unzip"' flag in the outputted DAT. When used with a
+			file manager that allows for it, this will force the outputted files to be in
+			subdirectories instead of archives.
+			
+		-f, --files			Treat archives as files
+			Instead of trying to enumerate the files within archives, treat the archives as
+			files themselves. This is good for uncompressed sets that include archives that
+			should be read as-is.
+			
+		-oc, --output-cmp	Output in CMP format
+			Add outputting the created DAT to clrmamepro format
+			
+		-om, --output-miss	Output in Missfile format
+			Add outputting the created DAT to GoodTools miss format
+			
+		-omd5, --output-md5	Output in MD5 format
+			Add outputting the created DAT to MD5 format
+			
+		-or, --output-rc	Output in RomCenter format
+			Add outputting the created DAT to RomCenter format
+			
+		-os, --output-sd	Output in SabreDAT format
+			Add outputting the created DAT to SabreDAT XML format
+			
+		-osfv, --ouput-sfv	Output in SFV format
+			Add outputting the created DAT to SFV format
+			
+		-osha1, --output-sha1	Output in SHA-1 format
+			Add outputting the created DAT to SHA1 format
+			
+		-ox, --output-xml	Output in Logiqx XML format (default)
+			Add outputting the created DAT to Logiqx XML format
+		
+		-gz, --gz-files		Allow reading of GZIP files as archives
+			Since GZip files are not commonly used for file storage, this flag allows for
+			any GZip archives to have their contents hashed instead.
+			
+		-ro, --romba		Read files from a Romba input
+			Allow for reading of GZipped files as if they were from a Romba depot. This
+			implies that the files will be in the TorrentGZ format as well, including
+			naming convention.
+			
+		-f=, --filename=	Set the external name of the DAT
+			Set the base filename for the output DAT(s) [default is folder name plus date]
+			
+		-n=, --name=		Set the internal name of the DAT
+			Set the internal name for the output DAT(s) [default is folder name plus date]
+			
+		-de=, --desc=		Set the description of the DAT
+			Set the description for the output DAT(s) [default is the folder name]
+			
+		-c=, --cat=		Set the category of the DAT
+			Set the category for the output DAT(s) [default is blank]
+			
+		-v=, --version=		Set the version of the DAT
+			Set the version for the output DAT(s) [default is blank]
+			
+		-au=, --author=		Set the author of the DAT
+			Set the author for the output DAT(s) [default is blank]
+			
+		-sd, --superdat		Enable SuperDAT creation
+			Set the type flag to "SuperDAT" for the output DAT as well as preserving the
+			directory structure of the inputted folder, if applicable
+			
+		-t=, --temp=		Set the name of the temporary directory
+			Optionally, a temp folder can be supplied in the case the default temp directory
+			(inside the running folder) is not preferred. This is used for any operations
+			that require an archive to be extracted.
+				
+	-dp, --dfdp		Create a DAT from each input directory using parallel code
+		Create a DAT file from an input directory or set of files. By default, this will
+		output a DAT named based on the input directory and the current date. It will also
+		treat all archives as possible games and add all three hashes for each file.
+		
+		-nm, --noMD5		Don't include MD5 in output
+			This allows the user to skip calculating the MD5 for each of the files which will
+			speed up the creation of the DAT.
+			
+		-ns, --noSHA1		Don't include SHA1 in output
+			This allows the user to skip calculating the SHA-1 for each of the files which will
+			speed up the creation of the DAT.
+			
+		-b, --bare			Don't include date in file name
+			Normally, the DAT will be created with the date in the file name. This flag removes
+			that but keeps the date tag intact.
+			
+		-u, --unzip			Force unzipping in created DAT
+			This sets the 'forcepacking="unzip"' flag in the outputted DAT. When used with a
+			file manager that allows for it, this will force the outputted files to be in
+			subdirectories instead of archives.
+			
+		-f, --files			Treat archives as files
+			Instead of trying to enumerate the files within archives, treat the archives as
+			files themselves. This is good for uncompressed sets that include archives that
+			should be read as-is.
+			
+		-oc, --output-cmp	Output in CMP format
+			Add outputting the created DAT to clrmamepro format
+			
+		-om, --output-miss	Output in Missfile format
+			Add outputting the created DAT to GoodTools miss format
+			
+		-omd5, --output-md5	Output in MD5 format
+			Add outputting the created DAT to MD5 format
+			
+		-or, --output-rc	Output in RomCenter format
+			Add outputting the created DAT to RomCenter format
+			
+		-os, --output-sd	Output in SabreDAT format
+			Add outputting the created DAT to SabreDAT XML format
+			
+		-osfv, --ouput-sfv	Output in SFV format
+			Add outputting the created DAT to SFV format
+			
+		-osha1, --output-sha1	Output in SHA-1 format
+			Add outputting the created DAT to SHA1 format
+			
+		-ox, --output-xml	Output in Logiqx XML format (default)
+			Add outputting the created DAT to Logiqx XML format
+		
+		-gz, --gz-files		Allow reading of GZIP files as archives
+			Since GZip files are not commonly used for file storage, this flag allows for
+			any GZip archives to have their contents hashed instead.
+			
+		-ro, --romba		Read files from a Romba input
+			Allow for reading of GZipped files as if they were from a Romba depot. This
+			implies that the files will be in the TorrentGZ format as well, including
+			naming convention.
+			
+		-f=, --filename=	Set the external name of the DAT
+			Set the base filename for the output DAT(s) [default is folder name plus date]
+			
+		-n=, --name=		Set the internal name of the DAT
+			Set the internal name for the output DAT(s) [default is folder name plus date]
+			
+		-de=, --desc=		Set the description of the DAT
+			Set the description for the output DAT(s) [default is the folder name]
+			
+		-c=, --cat=		Set the category of the DAT
+			Set the category for the output DAT(s) [default is blank]
+			
+		-v=, --version=		Set the version of the DAT
+			Set the version for the output DAT(s) [default is blank]
+			
+		-au=, --author=		Set the author of the DAT
+			Set the author for the output DAT(s) [default is blank]
+			
+		-sd, --superdat		Enable SuperDAT creation
+			Set the type flag to "SuperDAT" for the output DAT as well as preserving the
+			directory structure of the inputted folder, if applicable
+			
+		-t=, --temp=		Set the name of the temporary directory
+			Optionally, a temp folder can be supplied in the case the default temp directory
+			(inside the running folder) is not preferred. This is used for any operations
+			that require an archive to be extracted.
+		
+		-mt={4}			Amount of threads to use
+			Optionally, set the number of threads to use for the multithreaded operations.
+			The default is 4 threads; -1 means unlimited threads created.
+			
+	-es, --ext-split	Split a DAT by two file extensions
+		For a DAT, or set of DATs, allow for splitting based on a list of input extensions.
+		This can allow for combined DAT files, such as those combining two separate systems,
+		to be split. Files with any extensions not listed in the input lists will be included
+		in both outputted DAT files.
+		
+		-exta=			First set of extensions (comma-separated)
+			Set the extensions to be used to populate the first DAT. If more than one
+			extension is defined, they must be separated by commas.
+			
+		-extb=			Second set of extensions (comma-separated)
+			Set the extensions to be used to populate the second DAT. If more than one
+			extension is defined, they must be separated by commas.
+			
+		-out=			Set the name of the output directory
+			This sets an output folder to be used when the files are created. If a path
+			is not defined, the application directory is used instead.
+			
+	-g, --generate		Start tool in generate mode
+		This starts the tool in DATabase generate mode. This will allow for creation of
+		managed DATs based on the inputted systems and sources as defined by other flags.
+		
+		-system=		System ID to generate from
+			Set the system ID to be used to create an output DAT
+			
+		-nr, --no-rename	Don't auto-rename games
+			By default, games are automatically renamed with the source (for system-derived
+			DATs), system (for source-derived DATs), or both (for the complete merged DAT).
+			This flag disables the automatic renaming and uses the game names as they are.
+			
+		-o, --old		Output DAT in CMP format instead of XML
+			As a holdover from only two output formats, this tool defaults to Logiqx XML
+			DAT outputs. If this flag is enabled, a clrmamepro DAT will be created instead.
+			
+	-ga, --generate-all	Start tool in generate all mode
+		This starts the tool in DATabase generate all mode. This will allow for creation of
+		managed DATs based on the entire DAT folder.
+			
+		-nr, --no-rename	Don't auto-rename games
+			By default, games are automatically renamed with the source (for system-derived
+			DATs), system (for source-derived DATs), or both (for the complete merged DAT).
+			This flag disables the automatic renaming and uses the game names as they are.
+			
+		-o, --old		Output DAT in CMP format instead of XML
+			As a holdover from only two output formats, this tool defaults to Logiqx XML
+			DAT outputs. If this flag is enabled, a clrmamepro DAT will be created instead.
+		
+	-hs, --hash-split		Split a DAT or folder by best-available hashes
+		For a DAT, or set of DATs, allow for splitting based on the best available hash for
+		each file within. The order of preference for the outputted DATs is as follows:
+			- Nodump
+			- SHA-1 available
+			- MD5 available
+			- CRC or worse available
+		
+		-out=			Set the name of the output directory
+			This sets an output folder to be used when the files are created. If a path
+			is not defined, the application directory is used instead.
+			
+	-i, --import		Start tool in import mode
+		This starts the tool in DATabase import mode. This will allow for hashing of new
+		DAT files in the dats folder. If a source for the DAT cannot be automatically
+		determined, the user will be promted to select a source or enter a new one.
+		
+		-ig, --ignore		Don't prompt for new sources
+			If a source cannot be determined, then use the "Default" source instead of
+			asking the user.
+			
+	-input=				Set an input string
+		This should only be used if one of the inputs starts with a flag or another already
+		defined input.
+			
+	-lso, --list-sources	List all sources (id <= name)
+		List all sources in the database, ordered by the internal ID and mapped to the name
+		
+	-lsy, --list-systems	List all systems (id <= name)
+		List all systems in the database, ordered by the internal ID and mapped to the name
+		
+	-ol, --offmerge		Update DATS for offline arrays
+		This is a power user tool for dealing with offline arrays, specifically creating
+		have and miss lists without having to reconnect drives.
+		
+		This option will output the following DATs based on the inputs as defined below:
+			(a) Net New = (New Complete)-(Current Complete)
+			(b) Unneeded - (Current Complete)-(New Complete)
+			(c) New Missing - (Net New)+(Current Missing-(Unneeded))
+			(d) Have - (New Complete)-(New Missing)
+				OR (Complete or NewComplete) - (Missing) if one is missing
+				
+		-com=			Complete current DAT
+			This is a merged and deduped DAT that includes all DATs that should be checked
+			
+		-fix=			Complete current Missing
+			This is a merged and deduped DAT that includes all fixdats representing missing
+			files
+			
+		-new=			New Complete DAT
+			This is a merged and deduped DAT that includes all current and updated DATs that
+			should be checked
+			
+		-fk, --fake		Replace all hashes and sizes by the default
+			For further offline management, this option will replace all hashes in the output
+			DATs to be their 0-byte equivalents. This allows for file managers to be used 
+			to still deal with the DATs without reconnecting the drives
+			
+	-rm, --remove		Remove a system or source from the database
+		Remove a system or source to the DAT database so it can no longer be used
+		
+		-system=		System ID"
+			Internal ID of the system to be removed
+			
+		-source=		Source ID
+			Internal ID of the source to be removed
+			
+	-st, --stats		Get statistics on all input DATs
+		This will output by default the combined statistics for all input DAT files. The stats
+		that are outputted are as follows:
+			- Total uncompressed size
+			- Number of games found
+			- Number of roms found
+			- Number of disks found
+			- Roms that include a CRC
+			- Roms that include a MD5
+			- Roms that include a SHA-1
+			- Roms with Nodump status
+			
+		-si, --single		Show individual statistics
+			Optionally, the statistics for each of the individual input DATs can be output
+			as well. This can be useful to show where the size or amount of files found
+			in the combined totals can be broken down from.
+			
+	-ts, --type-split		Split a DAT or folder by file types (rom/disk)
+		For a DAT, or set of DATs, allow for splitting based on the types of the files,
+		specifically if the type is a rom or a disk.
+		
+		-out=			Set the name of the output directory
+			This sets an output folder to be used when the files are created. If a path
+			is not defined, the application directory is used instead.
+
+	-ud, --update		Update a DAT file
+		This is the multitool part of the program, allowing for almost every manipulation
+		to a DAT, or set of DATs. This is also a combination of many different programs
+		that performed DAT manipulation that work better together.
+		
+		-oc, --output-cmp	Output in CMP format
+			Add outputting the created DAT to clrmamepro format
+			
+		-om, --output-miss	Output in Missfile format
+			Add outputting the created DAT to GoodTools miss format
+			
+			-r, --roms			Output roms to miss instead of sets
+				By default, the outputted file will include the name of the game, so this
+				flag allows for the name of the rom to be output instead.
+				
+			-gp, --game-prefix		Add game name as a prefix
+				Mainly used with the previous flag, this allows for the name of the game
+				to be used as a prefix to each file.
+			
+			-pre=, --prefix=		Set prefix for all lines
+				Set a generic prefix to be prepended to all outputted lines
+				
+			-post=, --postfix=		Set postfix for all lines
+				Set a generic postfix to be appended to all outputted lines
+			
+			-q, --quotes			Put double-quotes around each item
+				This quotes only the item and not the prefix and postfix
+			
+			-ae=, --add-ext=		Add an extension to each item
+				To each item, a postfixed extension is added
+			
+			-re=, --rep-ext=		Replace all extensions with specified
+				When an extension exists, replace it with the provided instead
+			
+			-ro, --romba			Output in Romba format (requires SHA-1)
+				Instead of outputting the game or rom name, output the SHA-1 of the files
+				instead. This requires the source DAT to have SHA-1 hashes.
+			
+			-tsv, --tsv			Output in Tab-Separated Value format
+				Output all rom information in standardized TSV format
+			
+			-csv, --csv			Output in Comma-Separated Value format
+				Output all rom information in standardized CSV format
+			
+		-omd5, --output-md5	Output in MD5 format
+			Add outputting the created DAT to MD5 format
+			
+		-or, --output-rc	Output in RomCenter format
+			Add outputting the created DAT to RomCenter format
+			
+		-os, --output-sd	Output in SabreDAT format
+			Add outputting the created DAT to SabreDAT XML format
+			
+		-osfv, --ouput-sfv	Output in SFV format
+			Add outputting the created DAT to SFV format
+			
+		-osha1, --output-sha1	Output in SHA-1 format
+			Add outputting the created DAT to SHA1 format
+			
+		-ox, --output-xml	Output in Logiqx XML format (default)
+			Add outputting the created DAT to Logiqx XML format
+			
+		-f=, --filename=	Set the external name of the DAT
+			Set the base filename for the output DAT(s)
+			
+		-n=, --name=		Set the internal name of the DAT
+			Set the internal name for the output DAT(s)
+			
+		-de=, --desc=		Set the description of the DAT
+			Set the description for the output DAT(s)
+		
+		-r=, --root=		Set a new rootdir
+			Set the rootdir (as used by SuperDAT mode) for the output DAT(s)
+			
+		-c=, --cat=		Set the category of the DAT
+			Set the category for the output DAT(s)
+			
+		-v=, --version=		Set the version of the DAT
+			Set the version for the output DAT(s)
+			
+		-da=, --date=		Set a new date
+			Set the date for the output DAT(s)
+			
+		-au=, --author=		Set the author of the DAT
+			Set the author for the output DAT(s)
+			
+		-em=, --email=		Set a new email
+			Set the email for the output DAT(s)
+			
+		-hp=, --homepage=	Set a new homepage
+			Set the homepage for the output DAT(s)
+			
+		-u=, --url=		Set a new URL
+			Set the URL for the output DAT(s)
+			
+		-co=, --comment=	Set a new comment
+			Set the comment for the output DAT(s)
+			
+		-h=, --header=		Set a new header skipper
+			Set the header skipper for the output DAT(s)
+			
+		-sd, --superdat		Enable SuperDAT creation
+			Set the type flag to "SuperDAT" for the output DAT
+
+		-fm=, --forcemerge=	Set force merging
+			Set the forcemerge tag to one of the supported values:
+				None, Split, Full
+				
+		-fn=, --forcend=	Set force nodump
+			Set the forcenodump tag to one of the supported values:
+				None, Obsolete, Required, Ignore
+				
+		-fp=, --forcepack=	Set force packing
+			Set the forcepacking flag to one of the supported values:
+				None, Zip, Unzip
+				
+		-clean			Clean game names according to WoD standards
+			Game names will be santitized to remove what the original WoD standards
+			deemed as unneeded information, such as parenthized or bracketed strings
+			
+		-sl, --softlist	Use Software List name instead of description
+			By default, software list DATs are treated as "incorrect", using the game
+			descriptions as the name instead, since they tend to be more descriptive.
+			Enabling this flag allows for the original name to be preserved and keeping
+			the description as just a description.
+			
+		-trim			Trim file names to fit NTFS length
+			In the cases where files will have too long a name, this allows for trimming
+			the name of the files to the NTFS maximum length at most
+			
+			-rd=, --root-dir=	Set the root directory for calculation
+				In the case that the files will not be stored from the root directory, 
+				a new root can be set for path length calculations
+				
+		-si, --single		All game names replaced by '!'
+			This is useful for keeping all roms in a DAT in the same archive or folder
+			
+		-dd, --dedup		Enable deduping in the created DAT
+			For all outputted DATs, allow for hash deduping. This makes sure that there
+			are effectively no duplicates in the output files.
+			
+		-m, --merge		Merge the input DATs
+			By default, all DATs are processed individually with the user-specified flags.
+			With this flag enabled, all of the input DATs are merged into a single output.
+			This is best used with the dedupe flag.
+			
+			-b, --bare			Don't include date in file name
+				Normally, the DAT will be created with the date in the file name. This flag
+				removes that instead of the default.
+				
+		-di, --diff		Create diffdats from inputs (all outputs)
+			By default, all DATs are processed individually with the user-specified flags.
+			With this flag enabled, input DATs are diffed against each other in one of the
+			following ways (flags below are used for specific diff files to be output instead
+			of all types at once):
+			
+				-did, --diff-du		Create diffdat containing just duplicates
+					All files that have duplicates outside of the original DAT are included
+				
+				-dii, --diff-in		Create diffdats for individual DATs
+					All files that have no duplicates outside of the original DATs are put
+					into DATs that are named after the source DAT
+				
+				-din, --diff-nd		Create diffdat containing no duplicates
+					All files that have no duplicates outside of the original DATs are included
+					
+			-b, --bare			Don't include date in file name
+				Normally, the DAT will be created with the date in the file name. This flag
+				removes that instead of the default.
+				
+			-c, --cascade		Enable cascaded diffing
+			-rc, --rev-cascade	Enable reverse cascaded diffing
+				Each of the above flags allow for a special type of diffing in which the first
+				(or last) DAT is considered a base, and for each additional input DAT, it only
+				leaves the files that are not in one of the previous DATs. This can allow for
+				the creation of rollback sets or even just reduce the amount of duplicates 
+				across multiple sets
+				
+				-ip, --inplace		Enable inplace, cascaded diff
+					This will overwrite the source files instead of writing them out to the
+					program folder by default (or the output folder if overridden)
+					
+				-sf, --skip		Skip output of first DAT
+					In times where the first DAT does not need to be written out a second time,
+					this will skip writing it. This can often speed up the output process.
+
+		-gn=, --game-name=	Filter by game name
+		-rn=, --rom-name=	Filter by rom name
+		-crc=, --crc=		Filter by CRC hash
+		-md5=, --md5=		Filter by MD5 hash
+		-sha1=, --sha1=		Filter by SHA-1 hash
+			For each of the flags above, the user can specify either an exact match or can use a
+			wildcard as defined below (case-insensitive):
+				*00 means ends with '00'
+				00* means starts with '00'
+				*00* means contains '00'
+				00 means exactly equals '00'
+		
+		-rt=, --rom-type=	Filter by rom type
+			This allows users to only include roms or disks to their liking
+		
+		-sgt=, --greater=	Filter by size >=
+		-slt=, --less=		Filter by size <=
+		-seq=, --equal=		Filter by size ==
+			For each of the flags above, the user can specify a standard integer or one of the
+			various standard postfixes for size:
+				e.g. 8kb => 8000 or 8kib => 8192
+			
+		-nd, --nodump		Include only match nodump roms
+		-nnd, --not-nodump	Exclude all nodump roms
+			These flags allow for filtering based on the nodump status in the source DAT(s)
+		
+		-out=			Set the name of the output directory
+			This sets an output folder to be used when the files are created. If a path
+			is not defined, the application directory is used instead.
 
 ** Section 2.4 - SimpleSort
 
