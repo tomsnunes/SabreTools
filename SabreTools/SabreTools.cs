@@ -26,9 +26,14 @@ namespace SabreTools
 		// Private required variables
 		private static string _datroot = "DATS";
 		private static string _outroot = "Output";
-		private static string _dbSchema = "dats";
-		private static string _dbName = "dats.sqlite";
-		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
+
+		// Database schema variables
+		private static string _databaseDbSchema = "dats";
+		private static string _databaseDbName = "dats.sqlite";
+		private static string _databaseConnectionString = "Data Source=" + _databaseDbName + ";Version = 3;";
+		private static string _headererDbSchema = "Headerer";
+		private static string _headererDbName = "Headerer.sqlite";
+		private static string _headererConnectionString = "Data Source=" + _headererDbName + ";Version = 3;";
 
 		private static Logger _logger;
 

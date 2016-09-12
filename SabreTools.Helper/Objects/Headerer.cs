@@ -1,7 +1,6 @@
 ﻿using Mono.Data.Sqlite;
 using SabreTools.Helper;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace SabreTools
@@ -17,9 +16,9 @@ namespace SabreTools
 		private Logger _logger;
 
 		// Private required variables
-		private static string _dbSchema = "Headerer";
-		private static string _dbName = "Headerer.sqlite";
-		private static string _connectionString = "Data Source=" + _dbName + ";Version = 3;";
+		private static string _headererDbSchema = "Headerer";
+		private static string _headererDbName = "Headerer.sqlite";
+		private static string _headererConnectionString = "Data Source=" + _headererDbName + ";Version = 3;";
 
 		/// <summary>
 		/// Create a new Headerer object
@@ -151,7 +150,7 @@ namespace SabreTools
 			bool exists = false;
 
 			string query = @"SELECT * FROM data WHERE sha1='" + SHA1 + "' AND header='" + header + "'";
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_headererConnectionString))
 			{
 				dbc.Open();
 				using (SqliteCommand slc = new SqliteCommand(query, dbc))
@@ -169,7 +168,7 @@ namespace SabreTools
 				SHA1 + "', " +
 				"'" + header + "', " +
 				"'" + type.ToString() + "')";
-				using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+				using (SqliteConnection dbc = new SqliteConnection(_headererConnectionString))
 				{
 					dbc.Open();
 					using (SqliteCommand slc = new SqliteCommand(query, dbc))
@@ -194,7 +193,7 @@ namespace SabreTools
 			string header = "";
 
 			string query = @"SELECT header, type FROM data WHERE sha1='" + rom.HashData.SHA1 + "'";
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_headererConnectionString))
 			{
 				dbc.Open();
 				using (SqliteCommand slc = new SqliteCommand(query, dbc))

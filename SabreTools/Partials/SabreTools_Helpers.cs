@@ -25,9 +25,9 @@ namespace SabreTools
 			{
 				Directory.CreateDirectory(_outroot);
 			}
-			DBTools.EnsureDatabase(_dbSchema, _dbName, _connectionString);
+			DBTools.EnsureDatabase(_databaseDbSchema, _databaseDbName, _databaseConnectionString);
 
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_databaseConnectionString))
 			{
 				dbc.Open();
 
@@ -49,6 +49,8 @@ namespace SabreTools
 					}
 				}
 			}
+
+			DBTools.EnsureDatabase(_headererDbSchema, _headererDbName, _headererConnectionString);
 		}
 
 		/// <summary>
@@ -61,7 +63,7 @@ namespace SabreTools
 SELECT DISTINCT source.id, source.name, source.url
 FROM source
 ORDER BY source.name";
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_databaseConnectionString))
 			{
 				dbc.Open();
 				using (SqliteCommand slc = new SqliteCommand(query, dbc))
@@ -95,7 +97,7 @@ ORDER BY source.name";
 SELECT DISTINCT system.id, system.manufacturer, system.name
 FROM system
 ORDER BY system.manufacturer, system.name";
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_databaseConnectionString))
 			{
 				dbc.Open();
 				using (SqliteCommand slc = new SqliteCommand(query, dbc))

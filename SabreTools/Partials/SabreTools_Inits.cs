@@ -17,7 +17,7 @@ namespace SabreTools
 		/// <param name="ignore"></param>
 		private static void InitImport(bool ignore)
 		{
-			IImport imp = new ImportTwo(_datroot, _connectionString, _logger, ignore);
+			IImport imp = new ImportTwo(_datroot, _databaseConnectionString, _logger, ignore);
 			imp.UpdateDatabase();
 		}
 
@@ -29,7 +29,7 @@ namespace SabreTools
 		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
 		private static void InitGenerate(string systemid, bool norename, bool old)
 		{
-			IGenerate gen = new GenerateTwo(systemid, "" /* sourceid */, _datroot, _outroot, _connectionString, _logger, norename, old);
+			IGenerate gen = new GenerateTwo(systemid, "" /* sourceid */, _datroot, _outroot, _databaseConnectionString, _logger, norename, old);
 			gen.Export();
 		}
 
@@ -39,7 +39,7 @@ namespace SabreTools
 		private static void InitGenerateAll(bool norename, bool old)
 		{
 			List<string> systems = new List<string>();
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			using (SqliteConnection dbc = new SqliteConnection(_databaseConnectionString))
 			{
 				dbc.Open();
 
@@ -611,7 +611,7 @@ namespace SabreTools
 		/// <param name="url">Source URL(s)</param>
 		private static void InitAddSource(string name, string url)
 		{
-			if (DBTools.AddSource(name, url, _connectionString))
+			if (DBTools.AddSource(name, url, _databaseConnectionString))
 			{
 				_logger.Log("Source " + name + " added!");
 			}
@@ -630,7 +630,7 @@ namespace SabreTools
 			int srcid = -1;
 			if (Int32.TryParse(sourceid, out srcid))
 			{
-				if (DBTools.RemoveSource(srcid, _connectionString))
+				if (DBTools.RemoveSource(srcid, _databaseConnectionString))
 				{
 					_logger.Log("Source '" + srcid + "' removed!");
 				}
@@ -652,7 +652,7 @@ namespace SabreTools
 		/// <param name="system">System name</param>
 		private static void InitAddSystem(string manufacturer, string system)
 		{
-			if (DBTools.AddSystem(manufacturer, system, _connectionString))
+			if (DBTools.AddSystem(manufacturer, system, _databaseConnectionString))
 			{
 				_logger.Log("System " + manufacturer + " - " + system + " added!");
 			}
@@ -671,7 +671,7 @@ namespace SabreTools
 			int sysid = -1;
 			if (Int32.TryParse(systemid, out sysid))
 			{
-				if (DBTools.RemoveSystem(sysid, _connectionString))
+				if (DBTools.RemoveSystem(sysid, _databaseConnectionString))
 				{
 					_logger.Log("System '" + sysid + "' removed!");
 				}
