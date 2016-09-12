@@ -1658,230 +1658,6 @@ namespace SabreTools.Helper
 		#region Converting and Updating
 
 		/// <summary>
-		/// Convert, update, and filter a DAT file
-		/// </summary>
-		/// <param name="inputFileNames">Names of the input files and/or folders</param>
-		/// <param name="datdata">User specified inputs contained in a DatData object</param>
-		/// <param name="outputDirectory">Optional param for output directory</param>
-		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
-		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
-		/// <param name="cascade">True if the diffed files should be cascade diffed, false if diffed files should be reverse cascaded, null otherwise</param>
-		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
-		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
-		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
-		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
-		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
-		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="romtype">Type of the rom to match</param>
-		/// <param name="sgt">Find roms greater than or equal to this size</param>
-		/// <param name="slt">Find roms less than or equal to this size</param>
-		/// <param name="seq">Find roms equal to this size</param>
-		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		public static void Update(List<string> inputFileNames, Dat datdata, string outputDirectory, bool merge, DiffMode diff, bool? cascade, bool inplace,
-			bool skip, bool bare, bool clean, bool softlist, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
-			string md5, string sha1, bool? nodump, bool trim, bool single, string root, Logger logger)
-		{
-			// If we're in merging or diffing mode, use the full list of inputs
-			if (merge || diff != 0)
-			{
-				// Make sure there are no folders in inputs
-				List<string> newInputFileNames = new List<string>();
-				foreach (string input in inputFileNames)
-				{
-					if (Directory.Exists(input))
-					{
-						foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-						{
-							try
-							{
-								newInputFileNames.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(input));
-							}
-							catch (PathTooLongException)
-							{
-								logger.Warning("The path for " + file + " was too long");
-							}
-							catch (Exception ex)
-							{
-								logger.Error(ex.ToString());
-							}
-						}
-					}
-					else if (File.Exists(input))
-					{
-						try
-						{
-							newInputFileNames.Add(Path.GetFullPath(input) + "¬" + Path.GetDirectoryName(Path.GetFullPath(input)));
-						}
-						catch (PathTooLongException)
-						{
-							logger.Warning("The path for " + input + " was too long");
-						}
-						catch (Exception ex)
-						{
-							logger.Error(ex.ToString());
-						}
-					}
-				}
-
-				// If we're in inverse cascade, reverse the list
-				if (cascade == false)
-				{
-					newInputFileNames.Reverse();
-				}
-
-				// Create a dictionary of all ROMs from the input DATs
-				Dat userData;
-				List<Dat> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, softlist,
-					outputDirectory, datdata, out userData, gamename, romname, romtype, sgt, slt, seq,
-					crc, md5, sha1, nodump, trim, single, root, logger);
-
-				// Modify the Dictionary if necessary and output the results
-				if (diff != 0 && cascade == null)
-				{
-					DiffNoCascade(diff, outputDirectory, userData, newInputFileNames, logger);
-				}
-				// If we're in cascade and diff, output only cascaded diffs
-				else if (diff != 0 && cascade != null)
-				{
-					DiffCascade(outputDirectory, inplace, userData, newInputFileNames, datHeaders, skip, logger);
-				}
-				// Output all entries with user-defined merge
-				else
-				{
-					MergeNoDiff(outputDirectory, userData, newInputFileNames, datHeaders, logger);
-				}
-			}
-			// Otherwise, loop through all of the inputs individually
-			else
-			{
-				for (int i = 0; i < inputFileNames.Count; i++)
-				{
-					string inputFileName = inputFileNames[i];
-
-					// Clean the input string
-					if (inputFileName != "")
-					{
-						inputFileName = Path.GetFullPath(inputFileName);
-					}
-
-					if (File.Exists(inputFileName))
-					{
-						Dat innerDatdata = (Dat)datdata.CloneHeader();
-						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-						innerDatdata = Parse(inputFileName, 0, 0, innerDatdata, gamename, romname,
-							romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single,
-							root, logger, true, clean, softlist, keepext:(innerDatdata.XSV != null));
-
-						// If we have roms, output them
-						if (innerDatdata.Files.Count != 0)
-						{
-							WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger, overwrite: (outputDirectory != ""));
-						}
-					}
-					else if (Directory.Exists(inputFileName))
-					{
-						inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
-
-						foreach (string file in Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories))
-						{
-							logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
-							Dat innerDatdata = (Dat)datdata.Clone();
-							innerDatdata.Files = null;
-							innerDatdata = Parse(file, 0, 0, innerDatdata, gamename, romname, romtype, sgt,
-								slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, true, clean, keepext:(datdata.XSV != null));
-
-							// If we have roms, output them
-							if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
-							{
-								WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outputDirectory != ""));
-							}
-						}
-					}
-					else
-					{
-						logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
-					}
-				}
-			}
-			return;
-		}
-
-		/// <summary>
-		/// Populate the user DatData object from the input files
-		/// </summary>
-		/// <param name="userData">Output user DatData object to output</param>
-		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="romtype">Type of the rom to match</param>
-		/// <param name="sgt">Find roms greater than or equal to this size</param>
-		/// <param name="slt">Find roms less than or equal to this size</param>
-		/// <param name="seq">Find roms equal to this size</param>
-		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		/// <returns>List of DatData objects representing headers</returns>
-		private static List<Dat> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool softlist, string outdir,
-			Dat inputDat, out Dat userData, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
-			string md5, string sha1, bool? nodump, bool trim, bool single, string root, Logger logger)
-		{
-			List<Dat> datHeaders = new List<Dat>();
-			DateTime start = DateTime.Now;
-			logger.User("Populating internal DAT");
-
-			int i = 0;
-			userData = new Dat
-			{
-				OutputFormat = (inputDat.OutputFormat != 0 ? inputDat.OutputFormat : 0),
-				Files = new Dictionary<string, List<Rom>>(),
-				MergeRoms = inputDat.MergeRoms,
-			};
-			foreach (string input in inputs)
-			{
-				logger.User("Adding DAT: " + input.Split('¬')[0]);
-				userData = Parse(input.Split('¬')[0], i, 0, userData, gamename, romname, romtype, sgt, slt, seq,
-					crc, md5, sha1, nodump, trim, single, root, logger, true, clean, softlist);
-				i++;
-
-				// If we are in inplace mode or redirecting output, save the DAT data
-				if (inplace || !String.IsNullOrEmpty(outdir))
-				{
-					datHeaders.Add((Dat)userData.CloneHeader());
-
-					// Reset the header values so the next can be captured
-					Dictionary<string, List<Rom>> temp = userData.Files;
-					userData = new Dat
-					{
-						OutputFormat = (inputDat.OutputFormat != 0 ? inputDat.OutputFormat : 0),
-						Files = temp,
-						MergeRoms = inputDat.MergeRoms,
-					};
-				}
-			}
-
-			// Set the output values
-			Dictionary<string, List<Rom>> roms = userData.Files;
-			userData = (Dat)inputDat.CloneHeader();
-			userData.Files = roms;
-
-			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			return datHeaders;
-		}
-
-		/// <summary>
 		/// Determine if a rom should be included based on filters
 		/// </summary>
 		/// <param name="romdata">User supplied Rom to check</param>
@@ -2441,7 +2217,7 @@ namespace SabreTools.Helper
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void UpdateParallel(List<string> inputFileNames, Dat datdata, OutputFormat outputFormat, string outputDirectory, bool merge,
+		public static void Update(List<string> inputFileNames, Dat datdata, OutputFormat outputFormat, string outputDirectory, bool merge,
 			DiffMode diff, bool? cascade, bool inplace, bool skip, bool bare, bool clean, bool softlist, string gamename, string romname, string romtype,
 			long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, bool trim, bool single, string root, int maxDegreeOfParallelism,
 			Logger logger)
@@ -2496,7 +2272,7 @@ namespace SabreTools.Helper
 
 				// Create a dictionary of all ROMs from the input DATs
 				Dat userData;
-				List<Dat> datHeaders = PopulateUserDataParallel(newInputFileNames, inplace, clean, softlist,
+				List<Dat> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, softlist,
 					outputDirectory, datdata, out userData, gamename, romname, romtype, sgt, slt, seq,
 					crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, logger);
 
@@ -2593,7 +2369,7 @@ namespace SabreTools.Helper
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		/// <returns>List of DatData objects representing headers</returns>
-		private static List<Dat> PopulateUserDataParallel(List<string> inputs, bool inplace, bool clean, bool softlist, string outdir,
+		private static List<Dat> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool softlist, string outdir,
 			Dat inputDat, out Dat userData, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
 			string md5, string sha1, bool? nodump, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
 		{

@@ -319,7 +319,7 @@ namespace SabreTools
 				XSV = tsv,
 			};
 
-			DatTools.UpdateParallel(inputs, userInputDat, outputFormat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
+			DatTools.Update(inputs, userInputDat, outputFormat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
 				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
 		}
 
