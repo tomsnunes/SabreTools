@@ -41,7 +41,6 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 	</li>
 	<li>Get various statistics on a DAT or folder of DATs including number of roms, disks, and even total size in a human readable format (formerly <i>UncompressedSize</i>; additions requested by Obiwantje)</li>
 	<li>Filter a DAT by any criteria that the user chooses including wildcard searches (formerly <i>Filter</i>, requested by Obiwantje and others)</li>
-	<li>Take a current merged DAT, a current missing DAT, and a new merged DAT and get all new files, files to remove, and a new missing DAT. Optionally set all hash values to 0-byte equivalents for rom managers (formerly <i>OfflineMerge</i>, requested by Obiwantje)</li>
 	<li>Add and remove sources and systems from the database</li>
 	<li>Retrieve a list of all sources and systems that are available</li>
 </ul>

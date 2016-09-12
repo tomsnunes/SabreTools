@@ -89,7 +89,6 @@ namespace SabreTools
 				dedup = false,
 				enableGzip = false,
 				extsplit = false,
-				fake = false,
 				forceunpack = false,
 				generate = false,
 				genall = false,
@@ -103,7 +102,6 @@ namespace SabreTools
 				noMD5 = false,
 				norename = false,
 				noSHA1 = false,
-				offlineMerge = false,
 				old = false,
 				quotes = false,
 				rem = false,
@@ -253,10 +251,6 @@ namespace SabreTools
 					case "--files":
 						archivesAsFiles = true;
 						break;
-					case "-fk":
-					case "--fake":
-						fake = true;
-						break;
 					case "-g":
 					case "--generate":
 						generate = true;
@@ -328,10 +322,6 @@ namespace SabreTools
 					case "-oc":
 					case "--output-cmp":
 						outputFormat |= OutputFormat.ClrMamePro;
-						break;
-					case "-ol":
-					case "--offmerge":
-						offlineMerge = true;
 						break;
 					case "-om":
 					case "--output-miss":
@@ -623,7 +613,7 @@ namespace SabreTools
 
 			// If more than one switch is enabled, show the help screen
 			if (!(add ^ datfromdir ^ datfromdirparallel ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^
-				(merge || diffMode != 0 || update || outputFormat != 0 || tsv != null|| trim) ^ offlineMerge ^ rem ^ stats ^ typesplit))
+				(merge || diffMode != 0 || update || outputFormat != 0 || tsv != null|| trim) ^ rem ^ stats ^ typesplit))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -754,22 +744,6 @@ namespace SabreTools
 			{
 				InitDatFromDirParallel(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
 					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir, maxParallelism);
-			}
-
-			// If we want to run Offline merging mode
-			else if (offlineMerge)
-			{
-				if (!(currentAllMerged == "" && currentMissingMerged == "" && currentNewMerged == ""))
-				{
-					InitOfflineMerge(currentAllMerged, currentMissingMerged, currentNewMerged, fake);
-				}
-				else
-				{
-					_logger.User("All inputs were empty! At least one input is required...");
-					Build.Help();
-					_logger.Close();
-					return;
-				}
 			}
 
 			// If nothing is set, show the help

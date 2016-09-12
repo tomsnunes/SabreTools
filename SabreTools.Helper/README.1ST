@@ -153,7 +153,6 @@ Included within this tool are a few former standalone executables:
 	- DatSplit: Split a DAT based on 2 different file extensions
 	- Filter: Filter a DAT based on various user-defined criteria, optionally using wildcards
 	- HashSplit: Split a DAT based on the best available hash (No-dump, SHA-1, MD5, CRC)
-	- OfflineMerge: Use merged DATs to create DATs used for managing offline arrays
 	- MergeDAT: Merge and optionally dedupe an arbitrary number of DAT files
 	- SingleGame: Trim game and rom names to fit NTFS length standards, optionally merging
 		all roms to a single game named "!" and forcing unpack
@@ -437,33 +436,6 @@ Options:
 		
 	-lsy, --list-systems	List all systems (id <= name)
 		List all systems in the database, ordered by the internal ID and mapped to the name
-		
-	-ol, --offmerge		Update DATS for offline arrays
-		This is a power user tool for dealing with offline arrays, specifically creating
-		have and miss lists without having to reconnect drives.
-		
-		This option will output the following DATs based on the inputs as defined below:
-			(a) Net New = (New Complete)-(Current Complete)
-			(b) Unneeded - (Current Complete)-(New Complete)
-			(c) New Missing - (Net New)+(Current Missing-(Unneeded))
-			(d) Have - (New Complete)-(New Missing)
-				OR (Complete or NewComplete) - (Missing) if one is missing
-				
-		-com=			Complete current DAT
-			This is a merged and deduped DAT that includes all DATs that should be checked
-			
-		-fix=			Complete current Missing
-			This is a merged and deduped DAT that includes all fixdats representing missing
-			files
-			
-		-new=			New Complete DAT
-			This is a merged and deduped DAT that includes all current and updated DATs that
-			should be checked
-			
-		-fk, --fake		Replace all hashes and sizes by the default
-			For further offline management, this option will replace all hashes in the output
-			DATs to be their 0-byte equivalents. This allows for file managers to be used 
-			to still deal with the DATs without reconnecting the drives
 			
 	-rm, --remove		Remove a system or source from the database
 		Remove a system or source to the DAT database so it can no longer be used
