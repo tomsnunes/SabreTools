@@ -6,7 +6,7 @@ This project started as a desktop port of some core features of Wizard of DATz R
 
 <h3>Features</h3>
 
-For the most complete set of information, see the <a href="https://raw.githubusercontent.com/mnadareski/wizzardDesktop/master/SabreTools.Helper/README.1ST">README.1ST</a> file in SabreTools.Helper OR in the latest release. Currently, the SabreTools suite consists of the following programs:
+For the most complete set of information, see the <a href="https://raw.githubusercontent.com/mnadareski/wizzardDesktop/master/SabreTools.Helper/README.1ST">README.1ST</a> file. Currently, the SabreTools suite consists of the following programs:
 
 <!--
 <b>SabreTools UI</b>
