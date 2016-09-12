@@ -95,6 +95,9 @@ Usage:
 	Headerer.exe [options] [filename|dirname]
 
 Options:
+	-?, -h, --help		Show the built-in help text
+		Built-in to most of the programs is a basic help text
+		
 	-e		Enable detect and remove mode
 		This mode allows the user to detect, store, and remove copier headers from a file
 		or folder of files. The headers are backed up and collated by the hash of the un-
