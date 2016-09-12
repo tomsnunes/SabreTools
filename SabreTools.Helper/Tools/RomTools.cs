@@ -226,27 +226,35 @@ namespace SabreTools.Helper
 		/// <returns>True if it sorted correctly, false otherwise</returns>
 		public static bool Sort(List<Rom> roms, bool norename)
 		{
-			roms.Sort(delegate (Rom x, Rom y)
+			try
 			{
-				if (x.Metadata.SystemID == y.Metadata.SystemID)
+				roms.Sort(delegate (Rom x, Rom y)
 				{
-					if (x.Metadata.SourceID == y.Metadata.SourceID)
+					if (x.Metadata.SystemID == y.Metadata.SystemID)
 					{
-						if (x.Machine.Name == y.Machine.Name)
+						if (x.Metadata.SourceID == y.Metadata.SourceID)
 						{
-							if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
+							if (x.Machine.Name == y.Machine.Name)
 							{
-								return Style.CompareNumeric(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
+								if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
+								{
+									return Style.CompareNumeric(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
+								}
+								return Style.CompareNumeric(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
 							}
-							return Style.CompareNumeric(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
+							return Style.CompareNumeric(x.Machine.Name, y.Machine.Name);
 						}
-						return Style.CompareNumeric(x.Machine.Name, y.Machine.Name);
+						return (norename ? String.Compare(x.Machine.Name, y.Machine.Name) : x.Metadata.SourceID - y.Metadata.SourceID);
 					}
-					return (norename ? String.Compare(x.Machine.Name, y.Machine.Name) : x.Metadata.SourceID - y.Metadata.SourceID);
-				}
-				return (norename ? String.Compare(x.Machine.Name, y.Machine.Name) : x.Metadata.SystemID - y.Metadata.SystemID);
-			});
-			return true;
+					return (norename ? String.Compare(x.Machine.Name, y.Machine.Name) : x.Metadata.SystemID - y.Metadata.SystemID);
+				});
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+				return false;
+			}
 		}
 
 		#endregion

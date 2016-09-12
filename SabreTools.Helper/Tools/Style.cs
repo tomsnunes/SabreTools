@@ -514,6 +514,17 @@ namespace SabreTools.Helper
 			return 0;
 		}
 
+		/// <summary>
+		/// http://stackoverflow.com/questions/146134/how-to-remove-illegal-characters-from-path-and-filenames
+		/// </summary>
+		public static string StripInvalidPathChars(string s)
+		{
+			string regexSearch = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
+			Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
+			s = r.Replace(s, "");
+			return s;
+		}
+
 		#endregion
 	}
 }
