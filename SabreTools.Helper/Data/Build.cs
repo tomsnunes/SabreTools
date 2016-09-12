@@ -356,8 +356,11 @@ namespace SabreTools.Helper
 					Console.ReadLine();
 				}
 			}
-			Console.WriteLine("Press enter to continue...");
-			Console.ReadLine();
+			if (!Console.IsOutputRedirected)
+			{
+				Console.WriteLine("Press enter to continue...");
+				Console.ReadLine();
+			}
 		}
 
 		public static void Credits()
@@ -371,8 +374,11 @@ Additional code:	emuLOAD, @tractivo
 Testing:		emuLOAD, @tractivo, Kludge, Obiwantje, edc
 Suggestions:		edc, AcidX, Amiga12, EliUmniCk
 Based on work by:	The Wizard of DATz");
-			Console.WriteLine("Press enter to continue...");
-			Console.ReadLine();
+			if (!Console.IsOutputRedirected)
+			{
+				Console.WriteLine("Press enter to continue...");
+				Console.ReadLine();
+			}
 		}
 	}
 }
