@@ -101,6 +101,7 @@ namespace SabreTools
 		/// <param name="quotes">Add quotes to each item</param>
 		/// <param name="repext">Replace all extensions with another</param>
 		/// <param name="addext">Add an extension to all items</param>
+		/// <param name="remext">Remove all extensions</param>
 		/// <param name="datprefix">Add the dat name as a directory prefix</param>
 		/// <param name="romba">Output files in romba format</param>
 		/// <param name="tsv">True to output files in TSV format, false to output files in CSV format, null otherwise</param>
@@ -161,6 +162,7 @@ namespace SabreTools
 			bool quotes,
 			string repext,
 			string addext,
+			bool remext,
 			bool datprefix,
 			bool romba,
 			bool? tsv,
@@ -311,6 +313,7 @@ namespace SabreTools
 				Quotes = quotes,
 				RepExt = repext,
 				AddExt = addext,
+				RemExt = remext,
 				GameName = datprefix,
 				Romba = romba,
 				XSV = tsv,

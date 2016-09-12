@@ -105,6 +105,7 @@ namespace SabreTools
 				old = false,
 				quotes = false,
 				rem = false,
+				remext = false,
 				romba = false,
 				single = false,
 				softlist = false,
@@ -366,6 +367,10 @@ namespace SabreTools
 					case "-rm":
 					case "--remove":
 						rem = true;
+						break;
+					case "-rme":
+					case "--rem-ext":
+						remext = true;
 						break;
 					case "-ro":
 					case "--romba":
@@ -670,7 +675,7 @@ namespace SabreTools
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, outputFormat, usegame, prefix,
-					postfix, quotes, repext, addext, datprefix, romba, tsv, merge, diffMode, cascade, inplace, skip, bare, gamename, romname,
+					postfix, quotes, repext, addext, remext, datprefix, romba, tsv, merge, diffMode, cascade, inplace, skip, bare, gamename, romname,
 					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, softlist, dedup, maxParallelism);
 			}
 

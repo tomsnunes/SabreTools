@@ -496,6 +496,14 @@ Options:
 				
 			-post=, --postfix=		Set postfix for all lines
 				Set a generic postfix to be appended to all outputted lines
+				
+				Both prefix and postfix can use one of the following special strings:
+					- %game% - Replaced with the Game/Machine name
+					- %name% - Replaced with the Rom name
+					- %crc% - Replaced with the CRC
+					- %md5% - Replaced with the MD5
+					- %sha1% - Replaced with the SHA-1
+					- %size% - Replaced with the size
 			
 			-q, --quotes			Put double-quotes around each item
 				This quotes only the item and not the prefix and postfix
@@ -505,6 +513,9 @@ Options:
 			
 			-re=, --rep-ext=		Replace all extensions with specified
 				When an extension exists, replace it with the provided instead
+				
+			-rme, --rem-ext			Remove all extensions from all items
+				For each item, the extension is removed
 			
 			-ro, --romba			Output in Romba format (requires SHA-1)
 				Instead of outputting the game or rom name, output the SHA-1 of the files

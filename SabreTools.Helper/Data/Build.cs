@@ -198,6 +198,7 @@ namespace SabreTools.Helper
 					helptext.Add("	  -q, --quotes			Put double-quotes around each item");
 					helptext.Add("	  -ae=, --add-ext=		Add an extension to each item");
 					helptext.Add("	  -re=, --rep-ext=		Replace all extensions with specified");
+					helptext.Add("	  -rme, --rem-ext		Remove all extensions from each item");
 					helptext.Add("	  -ro, --romba			Output in Romba format (requires SHA-1)");
 					helptext.Add("	  -tsv, --tsv			Output in Tab-Separated Value format");
 					helptext.Add("	  -csv, --csv			Output in Comma-Separated Value format");

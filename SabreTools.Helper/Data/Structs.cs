@@ -329,6 +329,7 @@ namespace SabreTools.Helper
 		public bool Quotes;
 		public string RepExt;
 		public string AddExt;
+		public bool RemExt;
 		public bool GameName;
 		public bool Romba;
 		public bool? XSV; // true for tab-deliminated output, false for comma-deliminated output

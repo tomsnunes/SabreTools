@@ -2496,9 +2496,9 @@ namespace SabreTools.Helper
 
 				// Create a dictionary of all ROMs from the input DATs
 				Dat userData;
-				List<Dat> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, softlist,
+				List<Dat> datHeaders = PopulateUserDataParallel(newInputFileNames, inplace, clean, softlist,
 					outputDirectory, datdata, out userData, gamename, romname, romtype, sgt, slt, seq,
-					crc, md5, sha1, nodump, trim, single, root, logger);
+					crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, logger);
 
 				// Modify the Dictionary if necessary and output the results
 				if (diff != 0 && cascade == null)
@@ -3129,8 +3129,20 @@ namespace SabreTools.Helper
 						string post = (datdata.Quotes ? "\"" : "") + datdata.Postfix;
 
 						// Check for special strings in prefix and postfix
-						pre = pre.Replace("%crc%", rom.HashData.CRC).Replace("%md5%", rom.HashData.MD5).Replace("%sha1%", rom.HashData.SHA1).Replace("%size%", rom.HashData.Size.ToString());
-						post = post.Replace("%crc%", rom.HashData.CRC).Replace("%md5%", rom.HashData.MD5).Replace("%sha1%", rom.HashData.SHA1).Replace("%size%", rom.HashData.Size.ToString());
+						pre = pre
+							.Replace("%game%", rom.Machine.Name)
+							.Replace("%name%", rom.Name)
+							.Replace("%crc%", rom.HashData.CRC)
+							.Replace("%md5%", rom.HashData.MD5)
+							.Replace("%sha1%", rom.HashData.SHA1)
+							.Replace("%size%", rom.HashData.Size.ToString());
+						post = post
+							.Replace("%game%", rom.Machine.Name)
+							.Replace("%name%", rom.Name)
+							.Replace("%crc%", rom.HashData.CRC)
+							.Replace("%md5%", rom.HashData.MD5)
+							.Replace("%sha1%", rom.HashData.SHA1)
+							.Replace("%size%", rom.HashData.Size.ToString());
 
 						// If we're in Romba mode, the state is consistent
 						if (datdata.Romba)
@@ -3163,8 +3175,13 @@ namespace SabreTools.Helper
 						else
 						{
 							string name = (datdata.UseGame ? rom.Machine.Name : rom.Name);
-							if (datdata.RepExt != "")
+							if (datdata.RepExt != "" || datdata.RemExt)
 							{
+								if (datdata.RemExt)
+								{
+									datdata.RepExt = "";
+								}
+
 								string dir = Path.GetDirectoryName(name);
 								dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
 								name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + datdata.RepExt);
