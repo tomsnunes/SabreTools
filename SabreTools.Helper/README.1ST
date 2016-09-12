@@ -98,13 +98,13 @@ Options:
 	-?, -h, --help		Show the built-in help text
 		Built-in to most of the programs is a basic help text
 		
-	-e		Enable detect and remove mode
+	-e, --extract		Enable detect and remove mode
 		This mode allows the user to detect, store, and remove copier headers from a file
 		or folder of files. The headers are backed up and collated by the hash of the un-
 		headered file. Files are then output without the detected copier header alongside
 		the originals with the suffix .new. No input files are altered in the process.
 		
-	-r		Restore headers to file(s)
+	-r, --restore		Restore headers to file(s)
 		This mode uses stored copier headers and reapplies them to files if they match the
 		included hash. More than one header can be applied to a file, so they will be out-
 		put to new files, suffixed with .newX, where X is a number. No input files are

@@ -89,7 +89,7 @@ namespace SabreTools
 						flag = true;
 						break;
 					case "-r":
-					case "--replace":
+					case "--restore":
 						flag = false;
 						break;
 					default:

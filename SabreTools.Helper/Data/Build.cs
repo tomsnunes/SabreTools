@@ -297,8 +297,8 @@ namespace SabreTools.Helper
 					helptext.Add("");
 					helptext.Add("Options:");
 					helptext.Add("  -?, -h, --help	Show this help");
-					helptext.Add("  -e				Detect and remove mode");
-					helptext.Add("  -r				Restore header to file based on SHA-1");
+					helptext.Add("  -e, --extract	Detect and remove mode");
+					helptext.Add("  -r, --restore	Restore header to file based on SHA-1");
 					break;
 				case "SimpleSort":
 					helptext.Add(Resources.Resources.SimpleSort_Name + " - " + Resources.Resources.SimpleSort_Desc);
