@@ -410,6 +410,32 @@ Options:
 			As a holdover from only two output formats, this tool defaults to Logiqx XML
 			DAT outputs. If this flag is enabled, a clrmamepro DAT will be created instead.
 		
+	-hd, --headerer 		Backup or restore copier headers from a variety of file types
+		Headerer is formerly a small program that is meant as an intermediary between header
+		skipper files (which, a bit apart from their name, do not just show how to skip
+		copier headers) and rom managers that do not use them.
+		
+		By default, this will detect, store, and remove copier headers from a file or folder
+		of files. The headers are backed up and collated by the hash of the unheadered file.
+		Files are then output without the detected copier header alongside the originals with
+		the suffix .new. No input files are altered in the process.
+
+		The following systems have headers that this program can work with:
+			- Atari 7800
+			- Atari Lynx
+			- Commodore PSID Music
+			- NEC PC-Engine / TurboGrafx 16
+			- Nintendo Famicom / Nintendo Entertainment System
+			- Nintendo Famicom Disk System
+			- Nintendo Super Famicom / Super Nintendo Entertainment System
+			- Nintendo Super Famicom / Super Nintendo Entertainment System SPC Music
+			
+		-re, --restore		Restore headers to file(s)
+			Instead of the default extraction, this flag enables use of stored copier headers
+			to reapply them to files if they match the included hash. More than one header can
+			be applied to a file, so they will be output to new files, suffixed with .newX,
+			where X is a number. No input files are altered in the process.
+		
 	-hs, --hash-split		Split a DAT or folder by best-available hashes
 		For a DAT, or set of DATs, allow for splitting based on the best available hash for
 		each file within. The order of preference for the outputted DATs is as follows:

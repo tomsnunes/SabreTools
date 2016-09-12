@@ -70,6 +70,7 @@ namespace SabreTools
 						extract = true;
 						break;
 					case "-r":
+					case "-re":
 					case "--restore":
 						extract = false;
 						break;

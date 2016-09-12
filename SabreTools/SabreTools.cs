@@ -93,11 +93,13 @@ namespace SabreTools
 				datprefix = false,
 				dedup = false,
 				enableGzip = false,
+				extract = true,
 				extsplit = false,
 				forceunpack = false,
 				generate = false,
 				genall = false,
 				hashsplit = false,
+				headerer = false,
 				ignore = false,
 				import = false,
 				inplace = false,
@@ -273,6 +275,10 @@ namespace SabreTools
 					case "--gz-files":
 						enableGzip = true;
 						break;
+					case "-hd":
+					case "--headerer":
+						headerer = true;
+						break;
 					case "-hs":
 					case "--hash-split":
 						hashsplit = true;
@@ -368,6 +374,10 @@ namespace SabreTools
 					case "-rc":
 					case "--rev-cascade":
 						cascade = false;
+						break;
+					case "-re":
+					case "--restore":
+						extract = false;
 						break;
 					case "-rm":
 					case "--remove":
@@ -622,8 +632,8 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(add ^ datfromdir ^ datfromdirparallel ^ extsplit ^ generate ^ genall ^ hashsplit ^ import ^ listsrc ^ listsys ^
-				(merge || diffMode != 0 || update || outputFormat != 0 || tsv != null|| trim) ^ rem ^ stats ^ typesplit))
+			if (!(add ^ datfromdir ^ datfromdirparallel ^ extsplit ^ generate ^ genall ^ hashsplit ^ headerer ^ import ^ listsrc ^
+				listsys ^ (merge || diffMode != 0 || update || outputFormat != 0 || tsv != null|| trim) ^ rem ^ stats ^ typesplit))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -632,8 +642,8 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (update || outputFormat != 0 || tsv != null || extsplit || hashsplit || datfromdir
-				|| datfromdirparallel || (merge || diffMode != 0) || stats || trim || typesplit))
+			if (inputs.Count == 0 && (datfromdir || datfromdirparallel || extsplit || hashsplit || headerer
+				|| (merge || diffMode != 0 || update || outputFormat != 0 || tsv != null) || stats || trim || typesplit))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -643,10 +653,48 @@ namespace SabreTools
 
 			// Now take care of each mode in succesion
 
-			// Import a file or folder
-			if (import)
+			// Add a source or system
+			if (add)
+			{
+				if (manu != "" && systems != "")
+				{
+					InitAddSystem(manu, systems);
+				}
+				else if (sources != "" && url != "")
+				{
+					InitAddSource(manu, systems);
+				}
+				else
+				{
+					Build.Help();
+				}
+			}
+
+			// Create a DAT from a directory or set of directories
+			else if (datfromdir)
+			{
+				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
+					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir);
+			}
+
+			// Create a DAT from a directory or set of directories in parallel
+			else if (datfromdirparallel)
+			{
+				InitDatFromDirParallel(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
+					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir, maxParallelism);
+			}
+
+			// Split a DAT by extension
+			else if (extsplit)
+			{
+				InitExtSplit(inputs, exta, extb, outdir);
+			}
+
+			// Generate all DATs
+			else if (genall)
 			{
 				InitImport(ignore);
+				InitGenerateAll(norename, old);
 			}
 
 			// Generate a DAT
@@ -656,11 +704,22 @@ namespace SabreTools
 				InitGenerate(systems, norename, old);
 			}
 
-			// Generate all DATs
-			else if (genall)
+			// Split a DAT by available hashes
+			else if (hashsplit)
+			{
+				InitHashSplit(inputs, outdir);
+			}
+
+			// If we're in headerer mode
+			else if (headerer)
+			{
+				InitHeaderer(inputs, extract, _logger);
+			}
+
+			// Import a file or folder
+			else if (import)
 			{
 				InitImport(ignore);
-				InitGenerateAll(norename, old);
 			}
 
 			// List all available sources
@@ -675,32 +734,6 @@ namespace SabreTools
 				ListSystems();
 			}
 
-			// Convert, update, merge, diff, and filter a DAT or folder of DATs
-			else if (update || tsv != null || outputFormat != 0 || merge || diffMode != 0)
-			{
-				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
-					superdat, forcemerge, forcend, forcepack, outputFormat, usegame, prefix,
-					postfix, quotes, repext, addext, remext, datprefix, romba, tsv, merge, diffMode, cascade, inplace, skip, bare, gamename, romname,
-					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, softlist, dedup, maxParallelism);
-			}
-
-			// Add a source or system
-			else if (add)
-			{
-				if (manu != "" && systems != "")
-				{
-					InitAddSystem(manu, systems);
-				}
-				else if (sources != "" && url != "")
-				{
-					InitAddSource(manu, systems);
-				}
-				else
-				{
-					Build.Help();
-				}
-			} 
-			
 			// Remove a source or system
 			else if (rem)
 			{
@@ -718,16 +751,10 @@ namespace SabreTools
 				}
 			}
 
-			// Split a DAT by extension
-			else if (extsplit)
+			// Get statistics on input files
+			else if (stats)
 			{
-				InitExtSplit(inputs, exta, extb, outdir);
-			}
-
-			// Split a DAT by available hashes
-			else if (hashsplit)
-			{
-				InitHashSplit(inputs, outdir);
+				InitStats(inputs, single);
 			}
 
 			// Split a DAT by item type
@@ -736,24 +763,13 @@ namespace SabreTools
 				InitTypeSplit(inputs, outdir);
 			}
 
-			// Get statistics on input files
-			else if (stats)
+			// Convert, update, merge, diff, and filter a DAT or folder of DATs
+			else if (update || tsv != null || outputFormat != 0 || merge || diffMode != 0)
 			{
-				InitStats(inputs, single);
-			}
-
-			// Create a DAT from a directory or set of directories
-			else if (datfromdir)
-			{
-				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
-					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir);
-			}
-
-			// Create a DAT from a directory or set of directories in parallel
-			else if (datfromdirparallel)
-			{
-				InitDatFromDirParallel(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
-					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir, maxParallelism);
+				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
+					superdat, forcemerge, forcend, forcepack, outputFormat, usegame, prefix,
+					postfix, quotes, repext, addext, remext, datprefix, romba, tsv, merge, diffMode, cascade, inplace, skip, bare, gamename, romname,
+					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, softlist, dedup, maxParallelism);
 			}
 
 			// If nothing is set, show the help
