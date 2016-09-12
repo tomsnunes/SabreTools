@@ -170,6 +170,8 @@ namespace SabreTools.Helper
 					helptext.Add("  -ga, --generate-all	Start tool in generate all mode");
 					helptext.Add("	-nr, --no-rename	Don't auto-rename games");
 					helptext.Add("	-o, --old		Output DAT in CMP format instead of XML");
+					helptext.Add("  -he, --headerer			Extract and remove copier headers");
+					helptext.Add("	-r, --restore	Restore header to file based on SHA-1");
 					helptext.Add("  -hs, --hash-split		Split a DAT or folder by best-available hashes");
 					helptext.Add("	-out=			Output directory");
 					helptext.Add("  -i, --import		Start tool in import mode");
