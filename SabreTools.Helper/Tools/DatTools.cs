@@ -1878,281 +1878,6 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Output non-cascading diffs
-		/// </summary>
-		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
-		/// <param name="outdir">Output directory to write the DATs to</param>
-		/// <param name="userData">Main DatData to draw information from</param>
-		/// <param name="inputs">List of inputs to write out from</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		public static void DiffNoCascade(DiffMode diff, string outdir, Dat userData, List<string> inputs, Logger logger)
-		{
-			DateTime start = DateTime.Now;
-			logger.User("Initializing all output DATs");
-
-			// Default vars for use
-			string post = "";
-			Dat outerDiffData = new Dat();
-			Dat dupeData = new Dat();
-
-			// Don't have External dupes
-			if ((diff & DiffMode.NoDupes) != 0)
-			{
-				post = " (No Duplicates)";
-				outerDiffData = (Dat)userData.CloneHeader();
-				outerDiffData.FileName += post;
-				outerDiffData.Name += post;
-				outerDiffData.Description += post;
-				outerDiffData.Files = new Dictionary<string, List<Rom>>();
-			}
-
-			// Have External dupes
-			if ((diff & DiffMode.Dupes) != 0)
-			{
-				post = " (Duplicates)";
-				dupeData = (Dat)userData.CloneHeader();
-				dupeData.FileName += post;
-				dupeData.Name += post;
-				dupeData.Description += post;
-				dupeData.Files = new Dictionary<string, List<Rom>>();
-			}
-
-			// Create a list of DatData objects representing individual output files
-			List<Dat> outDats = new List<Dat>();
-
-			// Loop through each of the inputs and get or create a new DatData object
-			if ((diff & DiffMode.Individuals) != 0)
-			{
-				Dat[] outDatsArray = new Dat[inputs.Count];
-
-				Parallel.For(0, inputs.Count, j =>
-				{
-					string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
-					Dat diffData = (Dat)userData.CloneHeader();
-					diffData.FileName += innerpost;
-					diffData.Name += innerpost;
-					diffData.Description += innerpost;
-					diffData.Files = new Dictionary<string, List<Rom>>();
-					outDatsArray[j] = diffData;
-				});
-
-				outDats = outDatsArray.ToList();
-			}
-			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			// Now, loop through the dictionary and populate the correct DATs
-			start = DateTime.Now;
-			logger.User("Populating all output DATs");
-			List<string> keys = userData.Files.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<Rom> roms = RomTools.Merge(userData.Files[key], logger);
-
-				if (roms != null && roms.Count > 0)
-				{
-					foreach (Rom rom in roms)
-					{
-						// No duplicates
-						if ((diff & DiffMode.NoDupes) != 0 || (diff & DiffMode.Individuals) != 0)
-						{
-							if (rom.Dupe < DupeType.ExternalHash)
-							{
-								// Individual DATs that are output
-								if ((diff & DiffMode.Individuals) != 0)
-								{
-									if (outDats[rom.Metadata.SystemID].Files.ContainsKey(key))
-									{
-										outDats[rom.Metadata.SystemID].Files[key].Add(rom);
-									}
-									else
-									{
-										List<Rom> tl = new List<Rom>();
-										tl.Add(rom);
-										outDats[rom.Metadata.SystemID].Files.Add(key, tl);
-									}
-								}
-
-								// Merged no-duplicates DAT
-								if ((diff & DiffMode.NoDupes) != 0)
-								{
-									Rom newrom = rom;
-									newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
-
-									if (outerDiffData.Files.ContainsKey(key))
-									{
-										outerDiffData.Files[key].Add(newrom);
-									}
-									else
-									{
-										List<Rom> tl = new List<Rom>();
-										tl.Add(rom);
-										outerDiffData.Files.Add(key, tl);
-									}
-								}
-							}
-						}
-
-						// Duplicates only
-						if ((diff & DiffMode.Dupes) != 0)
-						{
-							if (rom.Dupe >= DupeType.ExternalHash)
-							{
-								Rom newrom = rom;
-								newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
-
-								if (dupeData.Files.ContainsKey(key))
-								{
-									dupeData.Files[key].Add(newrom);
-								}
-								else
-								{
-									List<Rom> tl = new List<Rom>();
-									tl.Add(rom);
-									dupeData.Files.Add(key, tl);
-								}
-							}
-						}
-					}
-				}
-			}
-			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			// Finally, loop through and output each of the DATs
-			start = DateTime.Now;
-			logger.User("Outputting all created DATs");
-
-			// Output the difflist (a-b)+(b-a) diff
-			if ((diff & DiffMode.NoDupes) != 0)
-			{
-				WriteDatfile(outerDiffData, outdir, logger);
-			}
-
-			// Output the (ab) diff
-			if ((diff & DiffMode.Dupes) != 0)
-			{
-				WriteDatfile(dupeData, outdir, logger);
-			}
-
-			// Output the individual (a-b) DATs
-			if ((diff & DiffMode.Individuals) != 0)
-			{
-				for (int j = 0; j < inputs.Count; j++)
-				{
-					// If we have an output directory set, replace the path
-					string path = outdir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
-
-					// If we have more than 0 roms, output
-					if (outDats[j].Files.Count > 0)
-					{
-						WriteDatfile(outDats[j], path, logger);
-					}
-				}
-			}
-			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-		}
-
-		/// <summary>
-		/// Output cascading diffs
-		/// </summary>
-		/// <param name="outdir">Output directory to write the DATs to</param>
-		/// <param name="inplace">True if cascaded diffs are outputted in-place, false otherwise</param>
-		/// <param name="userData">Main DatData to draw information from</param>
-		/// <param name="inputs">List of inputs to write out from</param>
-		/// <param name="datHeaders">Dat headers used optionally</param>
-		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		public static void DiffCascade(string outdir, bool inplace, Dat userData, List<string> inputs, List<Dat> datHeaders, bool skip, Logger logger)
-		{
-			string post = "";
-
-			// Create a list of DatData objects representing output files
-			List<Dat> outDats = new List<Dat>();
-
-			// Loop through each of the inputs and get or create a new DatData object
-			DateTime start = DateTime.Now;
-			logger.User("Initializing all output DATs");
-
-			Dat[] outDatsArray = new Dat[inputs.Count];
-
-			Parallel.For(0, inputs.Count, j =>
-			{
-				string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
-				Dat diffData;
-
-				// If we're in inplace mode, take the appropriate DatData object already stored
-				if (inplace || !String.IsNullOrEmpty(outdir))
-				{
-					diffData = datHeaders[j];
-				}
-				else
-				{
-					diffData = (Dat)userData.CloneHeader();
-					diffData.FileName += post;
-					diffData.Name += post;
-					diffData.Description += post;
-				}
-				diffData.Files = new Dictionary<string, List<Rom>>();
-
-				outDatsArray[j] = diffData;
-			});
-
-			outDats = outDatsArray.ToList();
-			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			// Now, loop through the dictionary and populate the correct DATs
-			start = DateTime.Now;
-			logger.User("Populating all output DATs");
-			List<string> keys = userData.Files.Keys.ToList();
-
-			foreach (string key in keys)
-			{
-				List<Rom> roms = RomTools.Merge(userData.Files[key], logger);
-
-				if (roms != null && roms.Count > 0)
-				{
-					foreach (Rom rom in roms)
-					{
-						if (outDats[rom.Metadata.SystemID].Files.ContainsKey(key))
-						{
-							outDats[rom.Metadata.SystemID].Files[key].Add(rom);
-						}
-						else
-						{
-							List<Rom> tl = new List<Rom>();
-							tl.Add(rom);
-							outDats[rom.Metadata.SystemID].Files.Add(key, tl);
-						}
-					}
-				}
-			}
-			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			// Finally, loop through and output each of the DATs
-			start = DateTime.Now;
-			logger.User("Outputting all created DATs");
-			for (int j = (skip ? 1 : 0); j < inputs.Count; j++)
-			{
-				// If we have an output directory set, replace the path
-				string path = "";
-				if (inplace)
-				{
-					path = Path.GetDirectoryName(inputs[j].Split('¬')[0]);
-				}
-				else if (!String.IsNullOrEmpty(outdir))
-				{
-					path = outdir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
-				}
-
-				// If we have more than 0 roms, output
-				if (outDats[j].Files.Count > 0)
-				{
-					WriteDatfile(outDats[j], path, logger);
-				}
-			}
-			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-		}
-
-		/// <summary>
 		/// Output user defined merge
 		/// </summary>
 		/// <param name="outdir">Output directory to write the DATs to</param>
@@ -2435,6 +2160,281 @@ namespace SabreTools.Helper
 			logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			return datHeaders.ToList();
+		}
+
+		/// <summary>
+		/// Output non-cascading diffs
+		/// </summary>
+		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
+		/// <param name="outdir">Output directory to write the DATs to</param>
+		/// <param name="userData">Main DatData to draw information from</param>
+		/// <param name="inputs">List of inputs to write out from</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		public static void DiffNoCascade(DiffMode diff, string outdir, Dat userData, List<string> inputs, Logger logger)
+		{
+			DateTime start = DateTime.Now;
+			logger.User("Initializing all output DATs");
+
+			// Default vars for use
+			string post = "";
+			Dat outerDiffData = new Dat();
+			Dat dupeData = new Dat();
+
+			// Don't have External dupes
+			if ((diff & DiffMode.NoDupes) != 0)
+			{
+				post = " (No Duplicates)";
+				outerDiffData = (Dat)userData.CloneHeader();
+				outerDiffData.FileName += post;
+				outerDiffData.Name += post;
+				outerDiffData.Description += post;
+				outerDiffData.Files = new Dictionary<string, List<Rom>>();
+			}
+
+			// Have External dupes
+			if ((diff & DiffMode.Dupes) != 0)
+			{
+				post = " (Duplicates)";
+				dupeData = (Dat)userData.CloneHeader();
+				dupeData.FileName += post;
+				dupeData.Name += post;
+				dupeData.Description += post;
+				dupeData.Files = new Dictionary<string, List<Rom>>();
+			}
+
+			// Create a list of DatData objects representing individual output files
+			List<Dat> outDats = new List<Dat>();
+
+			// Loop through each of the inputs and get or create a new DatData object
+			if ((diff & DiffMode.Individuals) != 0)
+			{
+				Dat[] outDatsArray = new Dat[inputs.Count];
+
+				Parallel.For(0, inputs.Count, j =>
+				{
+					string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
+					Dat diffData = (Dat)userData.CloneHeader();
+					diffData.FileName += innerpost;
+					diffData.Name += innerpost;
+					diffData.Description += innerpost;
+					diffData.Files = new Dictionary<string, List<Rom>>();
+					outDatsArray[j] = diffData;
+				});
+
+				outDats = outDatsArray.ToList();
+			}
+			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// Now, loop through the dictionary and populate the correct DATs
+			start = DateTime.Now;
+			logger.User("Populating all output DATs");
+			List<string> keys = userData.Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<Rom> roms = RomTools.Merge(userData.Files[key], logger);
+
+				if (roms != null && roms.Count > 0)
+				{
+					foreach (Rom rom in roms)
+					{
+						// No duplicates
+						if ((diff & DiffMode.NoDupes) != 0 || (diff & DiffMode.Individuals) != 0)
+						{
+							if (rom.Dupe < DupeType.ExternalHash)
+							{
+								// Individual DATs that are output
+								if ((diff & DiffMode.Individuals) != 0)
+								{
+									if (outDats[rom.Metadata.SystemID].Files.ContainsKey(key))
+									{
+										outDats[rom.Metadata.SystemID].Files[key].Add(rom);
+									}
+									else
+									{
+										List<Rom> tl = new List<Rom>();
+										tl.Add(rom);
+										outDats[rom.Metadata.SystemID].Files.Add(key, tl);
+									}
+								}
+
+								// Merged no-duplicates DAT
+								if ((diff & DiffMode.NoDupes) != 0)
+								{
+									Rom newrom = rom;
+									newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
+
+									if (outerDiffData.Files.ContainsKey(key))
+									{
+										outerDiffData.Files[key].Add(newrom);
+									}
+									else
+									{
+										List<Rom> tl = new List<Rom>();
+										tl.Add(rom);
+										outerDiffData.Files.Add(key, tl);
+									}
+								}
+							}
+						}
+
+						// Duplicates only
+						if ((diff & DiffMode.Dupes) != 0)
+						{
+							if (rom.Dupe >= DupeType.ExternalHash)
+							{
+								Rom newrom = rom;
+								newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.Metadata.SystemID].Split('¬')[0]) + ")";
+
+								if (dupeData.Files.ContainsKey(key))
+								{
+									dupeData.Files[key].Add(newrom);
+								}
+								else
+								{
+									List<Rom> tl = new List<Rom>();
+									tl.Add(rom);
+									dupeData.Files.Add(key, tl);
+								}
+							}
+						}
+					}
+				}
+			}
+			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// Finally, loop through and output each of the DATs
+			start = DateTime.Now;
+			logger.User("Outputting all created DATs");
+
+			// Output the difflist (a-b)+(b-a) diff
+			if ((diff & DiffMode.NoDupes) != 0)
+			{
+				WriteDatfile(outerDiffData, outdir, logger);
+			}
+
+			// Output the (ab) diff
+			if ((diff & DiffMode.Dupes) != 0)
+			{
+				WriteDatfile(dupeData, outdir, logger);
+			}
+
+			// Output the individual (a-b) DATs
+			if ((diff & DiffMode.Individuals) != 0)
+			{
+				for (int j = 0; j < inputs.Count; j++)
+				{
+					// If we have an output directory set, replace the path
+					string path = outdir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
+
+					// If we have more than 0 roms, output
+					if (outDats[j].Files.Count > 0)
+					{
+						WriteDatfile(outDats[j], path, logger);
+					}
+				}
+			}
+			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+		}
+
+		/// <summary>
+		/// Output cascading diffs
+		/// </summary>
+		/// <param name="outdir">Output directory to write the DATs to</param>
+		/// <param name="inplace">True if cascaded diffs are outputted in-place, false otherwise</param>
+		/// <param name="userData">Main DatData to draw information from</param>
+		/// <param name="inputs">List of inputs to write out from</param>
+		/// <param name="datHeaders">Dat headers used optionally</param>
+		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		public static void DiffCascade(string outdir, bool inplace, Dat userData, List<string> inputs, List<Dat> datHeaders, bool skip, Logger logger)
+		{
+			string post = "";
+
+			// Create a list of DatData objects representing output files
+			List<Dat> outDats = new List<Dat>();
+
+			// Loop through each of the inputs and get or create a new DatData object
+			DateTime start = DateTime.Now;
+			logger.User("Initializing all output DATs");
+
+			Dat[] outDatsArray = new Dat[inputs.Count];
+
+			Parallel.For(0, inputs.Count, j =>
+			{
+				string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
+				Dat diffData;
+
+				// If we're in inplace mode, take the appropriate DatData object already stored
+				if (inplace || !String.IsNullOrEmpty(outdir))
+				{
+					diffData = datHeaders[j];
+				}
+				else
+				{
+					diffData = (Dat)userData.CloneHeader();
+					diffData.FileName += post;
+					diffData.Name += post;
+					diffData.Description += post;
+				}
+				diffData.Files = new Dictionary<string, List<Rom>>();
+
+				outDatsArray[j] = diffData;
+			});
+
+			outDats = outDatsArray.ToList();
+			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// Now, loop through the dictionary and populate the correct DATs
+			start = DateTime.Now;
+			logger.User("Populating all output DATs");
+			List<string> keys = userData.Files.Keys.ToList();
+
+			foreach (string key in keys)
+			{
+				List<Rom> roms = RomTools.Merge(userData.Files[key], logger);
+
+				if (roms != null && roms.Count > 0)
+				{
+					foreach (Rom rom in roms)
+					{
+						if (outDats[rom.Metadata.SystemID].Files.ContainsKey(key))
+						{
+							outDats[rom.Metadata.SystemID].Files[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> tl = new List<Rom>();
+							tl.Add(rom);
+							outDats[rom.Metadata.SystemID].Files.Add(key, tl);
+						}
+					}
+				}
+			}
+			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// Finally, loop through and output each of the DATs
+			start = DateTime.Now;
+			logger.User("Outputting all created DATs");
+			for (int j = (skip ? 1 : 0); j < inputs.Count; j++)
+			{
+				// If we have an output directory set, replace the path
+				string path = "";
+				if (inplace)
+				{
+					path = Path.GetDirectoryName(inputs[j].Split('¬')[0]);
+				}
+				else if (!String.IsNullOrEmpty(outdir))
+				{
+					path = outdir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
+				}
+
+				// If we have more than 0 roms, output
+				if (outDats[j].Files.Count > 0)
+				{
+					WriteDatfile(outDats[j], path, logger);
+				}
+			}
+			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
 
 		#endregion
