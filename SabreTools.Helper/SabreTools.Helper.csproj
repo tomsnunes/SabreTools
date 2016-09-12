@@ -91,6 +91,7 @@
     <Compile Include="Objects\DATFromDirParallel.cs" />
     <Compile Include="Objects\Generate.cs" />
     <Compile Include="Objects\GenerateTwo.cs" />
+    <Compile Include="Objects\Headerer.cs" />
     <Compile Include="Objects\Import.cs" />
     <Compile Include="Objects\ImportTwo.cs" />
     <Compile Include="Resources\Resources.de-DE.Designer.cs">
