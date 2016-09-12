@@ -49,7 +49,7 @@ namespace SabreTools
 				// If it's a directory, recursively check all
 				else if (Directory.Exists(_input))
 				{
-					foreach (string sub in Directory.GetFiles(_input))
+					foreach (string sub in Directory.EnumerateFiles(_input, "*", SearchOption.AllDirectories))
 					{
 						if (sub != ".." && sub != ".")
 						{
