@@ -349,18 +349,13 @@ namespace SabreTools.Helper
 				i++;
 
 				// If we're not being redirected and we reached the size of the screen, pause
-				if (!Console.IsOutputRedirected && i == Console.WindowHeight - 2)
+				if (i == Console.WindowHeight - 2)
 				{
 					i = 0;
-					Console.WriteLine("Press enter to continue...");
-					Console.ReadLine();
+					Pause();
 				}
 			}
-			if (!Console.IsOutputRedirected)
-			{
-				Console.WriteLine("Press enter to continue...");
-				Console.ReadLine();
-			}
+			Pause();
 		}
 
 		public static void Credits()
@@ -374,6 +369,11 @@ Additional code:	emuLOAD, @tractivo
 Testing:		emuLOAD, @tractivo, Kludge, Obiwantje, edc
 Suggestions:		edc, AcidX, Amiga12, EliUmniCk
 Based on work by:	The Wizard of DATz");
+			Pause();
+		}
+
+		private static void Pause()
+		{
 			if (!Console.IsOutputRedirected)
 			{
 				Console.WriteLine("Press enter to continue...");
