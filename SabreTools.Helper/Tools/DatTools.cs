@@ -2623,6 +2623,7 @@ namespace SabreTools.Helper
 					crc, md5, sha1, nodump, trim, single, root, logger, true, clean, softlist);
 			});
 
+			logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 			logger.User("Populating internal DAT");
 			for (int i = 0; i < inputs.Count; i++)
 			{
@@ -2645,7 +2646,7 @@ namespace SabreTools.Helper
 			userData = (Dat)inputDat.CloneHeader();
 			userData.Files = roms;
 
-			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			return datHeaders.ToList();
 		}
@@ -2862,6 +2863,9 @@ namespace SabreTools.Helper
 							"\turl \"" + datdata.Url + "\"\n" +
 							"\tcomment \"" + datdata.Comment + "\"\n" +
 							(datdata.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
+							(datdata.ForcePacking == ForcePacking.Zip ? "\tforcezipping yes\n" : "") +
+							(datdata.ForceMerging == ForceMerging.Full ? "\tforcemerging full\n" : "") +
+							(datdata.ForceMerging == ForceMerging.Split ? "\tforcemerging split\n" : "") +
 							")\n";
 						break;
 					case OutputFormat.MissFile:
@@ -2928,7 +2932,17 @@ namespace SabreTools.Helper
 							"\t\t<url>" + HttpUtility.HtmlEncode(datdata.Url) + "</url>\n" +
 							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
 							(!String.IsNullOrEmpty(datdata.Type) ? "\t\t<type>" + datdata.Type + "</type>\n" : "") +
-							(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t<clrmamepro forcepacking=\"unzip\" />\n" : "") +
+							(datdata.ForcePacking != ForcePacking.None || datdata.ForceMerging != ForceMerging.None || datdata.ForceNodump != ForceNodump.None ?
+								"\t\t<clrmamepro" + 
+									(datdata.ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
+									(datdata.ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
+									(datdata.ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
+									(datdata.ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
+									(datdata.ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
+									(datdata.ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"ignore\"" : "") +
+									(datdata.ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
+									" />\n"
+							: "") +
 							"\t</header>\n";
 						break;
 				}
