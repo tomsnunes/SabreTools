@@ -8,7 +8,7 @@ This project started as a desktop port of some core features of Wizard of DATz R
 
 <h3>Features</h3>
 
-Currently, the SabreTools suite consists of the following programs:
+For the most complete set of information, see the README.1ST file in SabreTools.Helper OR in the latest release. Currently, the SabreTools suite consists of the following programs:
 
 <!--
 <b>SabreTools UI</b>
