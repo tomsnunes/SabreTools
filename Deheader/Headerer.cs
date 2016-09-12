@@ -13,7 +13,7 @@ namespace SabreTools
 	{
 		// Private instance variables
 		private string _input;
-		private bool _flag;
+		private bool _extract;
 		private Logger _logger;
 
 		// Private required variables
@@ -25,12 +25,12 @@ namespace SabreTools
 		/// Create a new Headerer object
 		/// </summary>
 		/// <param name="input">Input file or folder name</param>
-		/// <param name="flag">True if we're extracting headers (default), false if we're replacing them</param>
+		/// <param name="extract">True if we're extracting headers (default), false if we're replacing them</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public Headerer(string input, bool flag, Logger logger)
+		public Headerer(string input, bool extract, Logger logger)
 		{
 			_input = input;
-			_flag = flag;
+			_extract = extract;
 			_logger = logger;
 		}
 
@@ -72,7 +72,7 @@ namespace SabreTools
 			// Get the filename (or foldername)
 			string input = "";
 			bool help = false,
-				flag = true,
+				extract = true,
 				headerer = true;
 			foreach (string arg in args)
 			{
@@ -86,11 +86,11 @@ namespace SabreTools
 						break;
 					case "-e":
 					case "--extract":
-						flag = true;
+						extract = true;
 						break;
 					case "-r":
 					case "--restore":
-						flag = false;
+						extract = false;
 						break;
 					default:
 						if (File.Exists(temparg) || Directory.Exists(temparg))
@@ -131,7 +131,7 @@ namespace SabreTools
 			// If we're in headerer mode
 			if (headerer)
 			{
-				InitHeaderer(input, flag, logger);
+				InitHeaderer(input, extract, logger);
 			}
 
 			// If nothing is set, show the help
@@ -162,7 +162,7 @@ namespace SabreTools
 		/// <returns>True if it succeeded, false otherwise</returns>
 		public bool Process()
 		{
-			if (_flag)
+			if (_extract)
 			{
 				// If it's a single file, just check it
 				if (File.Exists(_input))
