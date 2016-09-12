@@ -1923,16 +1923,20 @@ namespace SabreTools.Helper
 			// Loop through each of the inputs and get or create a new DatData object
 			if ((diff & DiffMode.Individuals) != 0)
 			{
-				for (int j = 0; j < inputs.Count; j++)
+				Dat[] outDatsArray = new Dat[inputs.Count];
+
+				Parallel.For(0, inputs.Count, j =>
 				{
-					post = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
+					string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
 					Dat diffData = (Dat)userData.CloneHeader();
-					diffData.FileName += post;
-					diffData.Name += post;
-					diffData.Description += post;
+					diffData.FileName += innerpost;
+					diffData.Name += innerpost;
+					diffData.Description += innerpost;
 					diffData.Files = new Dictionary<string, List<Rom>>();
-					outDats.Add(diffData);
-				}
+					outDatsArray[j] = diffData;
+				});
+
+				outDats = outDatsArray.ToList();
 			}
 			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -2067,9 +2071,12 @@ namespace SabreTools.Helper
 			// Loop through each of the inputs and get or create a new DatData object
 			DateTime start = DateTime.Now;
 			logger.User("Initializing all output DATs");
-			for (int j = 0; j < inputs.Count; j++)
+
+			Dat[] outDatsArray = new Dat[inputs.Count];
+
+			Parallel.For(0, inputs.Count, j =>
 			{
-				post = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
+				string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
 				Dat diffData;
 
 				// If we're in inplace mode, take the appropriate DatData object already stored
@@ -2085,8 +2092,11 @@ namespace SabreTools.Helper
 					diffData.Description += post;
 				}
 				diffData.Files = new Dictionary<string, List<Rom>>();
-				outDats.Add(diffData);
-			}
+
+				outDatsArray[j] = diffData;
+			});
+
+			outDats = outDatsArray.ToList();
 			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Now, loop through the dictionary and populate the correct DATs
