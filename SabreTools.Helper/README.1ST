@@ -108,7 +108,35 @@ Options:
 
 ** Section 2.2 - RombaSharp
 
-RombaSharp placeholder text
+RombaSharp is an ongoing "spiritual port" of the Romba tool (https://github.com/uwedeportivo/romba).
+The code is not based on the actual source, rather taking the features and using the code
+already written for a lot of other features. The following descriptions are based on what WILL
+be done with each flag. Not all features are currently available.
+
+Usage:
+	RombaSharp.exe [options] [filename|dirname] ...
+	
+Options:
+	-?, -h, --help		Show the built-in help text
+		Built-in to most of the programs is a basic help text
+		
+	archive		Adds ROM files from the specified directories to depot
+		-only-needed		Only archive ROM files in database
+	build			For each specified DAT file it creates TZip files
+	dbstats		Prints db stats
+	diffdat		Creates a DAT file for entries found in the new DAT
+		-new=			DAT to compare to
+	dir2dat		Creates a DAT file for the specified input directory
+		-out=			Filename to save out to
+	fixdat		For each specified DAT file it creates a fix DAT
+	lookup		For each specified hash, look up available information
+	memstats		Prints memory stats
+	miss			For each specified DAT file, create miss and have file
+	progress		Shows progress of currently running command [OBSOLETE]
+	purge-backup		Moves DAT index entries for orphaned DATs
+	purge-delete		Deletes DAT index entries for orphaned DATs
+	refresh-dats		Refreshes the DAT index from the files in the DAT root
+	shutdown		Gracefully shuts down server [OBSOLETE]
 
 ** Section 2.3 - SabreTools
 
