@@ -122,7 +122,7 @@ namespace SabreTools
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (String.IsNullOrEmpty(input) && (headerer))
 			{
-				logger.Error("This feature requires at exactly one input");
+				logger.Error("This feature requires at least one input");
 				Build.Help();
 				logger.Close();
 				return;
