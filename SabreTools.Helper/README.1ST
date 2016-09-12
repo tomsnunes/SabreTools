@@ -12,8 +12,9 @@ Table of Contents
 	2.3		SabreTools
 	2.4		SimpleSort
 	2.5		TGZConvert
-3.0		Contributors
-4.0		Licensing
+3.0		Examples
+4.0		Contributors
+5.0		Licensing
 
 ** Section 1.0 - Introduction and History
 
@@ -805,7 +806,11 @@ Options:
 			1	Only hash contents of the archive
 			2	Only hash archive itself (treat like a regular file)
 
-** Section 3.0 - Contributors
+** Section 3.0 - Examples
+
+Here, any user-requested examples will go
+
+** Section 4.0 - Contributors
 
 Programmer / Lead:	Matt Nadareski (darksabre76)
 Additional code:	emuLOAD, @tractivo
@@ -816,7 +821,7 @@ Based on work by:	The Wizard of DATz
 We welcome any contributors for coding, suggestions, optimizations, critisism,
 heckling, abject anger, praise, and/or apathy.
 
-** Section 4.0 - Licensing
+** Section 5.0 - Licensing
 
 This program uses, in part or in whole, code, libraries, and/or applications
 from the 7-zip project (www.7-zip.org). 7-zip is licenced under the GNU LGPL.
