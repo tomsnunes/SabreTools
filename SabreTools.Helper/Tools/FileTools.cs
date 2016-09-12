@@ -595,17 +595,19 @@ namespace SabreTools.Helper
 				return new Rom();
 			}
 
+			FileInfo temp = new FileInfo(input);
 			Rom rom = new Rom
 			{
 				Name = Path.GetFileName(input),
 				Type = ItemType.Rom,
 				HashData = new Hash
 				{
-					Size = (new FileInfo(input)).Length,
+					Size = temp.Length,
 					CRC = string.Empty,
 					MD5 = string.Empty,
 					SHA1 = string.Empty,
-				}
+				},
+				Date = temp.CreationTime.ToString(),
 			};
 
 			try
