@@ -12,13 +12,225 @@ namespace SabreTools
 		#region Init Methods
 
 		/// <summary>
-		/// Wrap importing and updating DATs
+		/// Wrap adding a new source to the database
 		/// </summary>
-		/// <param name="ignore"></param>
-		private static void InitImport(bool ignore)
+		/// <param name="name">Source name</param>
+		/// <param name="url">Source URL(s)</param>
+		private static void InitAddSource(string name, string url)
 		{
-			IImport imp = new ImportTwo(_datroot, _databaseConnectionString, _logger, ignore);
-			imp.UpdateDatabase();
+			if (DBTools.AddSource(name, url, _databaseConnectionString))
+			{
+				_logger.Log("Source " + name + " added!");
+			}
+			else
+			{
+				_logger.Error("Source " + name + " could not be added!");
+			}
+		}
+
+		/// <summary>
+		/// Wrap adding a new system to the database
+		/// </summary>
+		/// <param name="manufacturer">Manufacturer name</param>
+		/// <param name="system">System name</param>
+		private static void InitAddSystem(string manufacturer, string system)
+		{
+			if (DBTools.AddSystem(manufacturer, system, _databaseConnectionString))
+			{
+				_logger.Log("System " + manufacturer + " - " + system + " added!");
+			}
+			else
+			{
+				_logger.Error("System " + manufacturer + " - " + system + " could not be added!");
+			}
+		}
+
+		/// <summary>
+		/// Wrap creating a DAT file from files or a directory
+		/// </summary>
+		/// <param name="input">List of innput filenames</param>
+		/// <param name="filename">New filename</param>
+		/// <param name="name">New name</param>
+		/// <param name="description">New description</param>
+		/// <param name="category">New category</param>
+		/// <param name="version">New version</param>
+		/// <param name="author">New author</param>
+		/// <param name="forceunpack">True to set forcepacking="unzip" on the created file, false otherwise</param>
+		/// <param name="outputFormat">OutputFormat to be used for outputting the DAT</param>
+		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
+		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
+		/// <param name="noMD5">True to disable getting MD5 hash, false otherwise</param>
+		/// <param name="noSHA1">True to disable getting SHA-1 hash, false otherwise</param>
+		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
+		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
+		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
+		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
+		private static void InitDatFromDir(List<string> inputs,
+			string filename,
+			string name,
+			string description,
+			string category,
+			string version,
+			string author,
+			bool forceunpack,
+			OutputFormat outputFormat,
+			bool romba,
+			bool superdat,
+			bool noMD5,
+			bool noSHA1,
+			bool bare,
+			bool archivesAsFiles,
+			bool enableGzip,
+			string tempDir)
+		{
+			// Create a new DATFromDir object and process the inputs
+			Dat datdata = new Dat
+			{
+				FileName = filename,
+				Name = name,
+				Description = description,
+				Category = category,
+				Version = version,
+				Date = DateTime.Now.ToString("yyyy-MM-dd"),
+				Author = author,
+				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				OutputFormat = outputFormat,
+				Romba = romba,
+				Type = (superdat ? "SuperDAT" : ""),
+				Files = new Dictionary<string, List<Rom>>(),
+			};
+
+			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
+			bool success = dfd.Start();
+
+			// If we failed, show the help
+			if (!success)
+			{
+				Console.WriteLine();
+				Build.Help();
+			}
+		}
+
+		/// <summary>
+		/// Wrap creating a DAT file from files or a directory in parallel
+		/// </summary>
+		/// <param name="inputs">List of input filenames</param>
+		/// <param name="filename">New filename</param>
+		/// <param name="name">New name</param>
+		/// <param name="description">New description</param>
+		/// <param name="category">New category</param>
+		/// <param name="version">New version</param>
+		/// <param name="author">New author</param>
+		/// <param name="forceunpack">True to set forcepacking="unzip" on the created file, false otherwise</param>
+		/// <param name="outputFormat">OutputFormat to be used for outputting the DAT</param>
+		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
+		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
+		/// <param name="noMD5">True to disable getting MD5 hash, false otherwise</param>
+		/// <param name="noSHA1">True to disable getting SHA-1 hash, false otherwise</param>
+		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
+		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
+		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
+		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
+		private static void InitDatFromDirParallel(List<string> inputs,
+			string filename,
+			string name,
+			string description,
+			string category,
+			string version,
+			string author,
+			bool forceunpack,
+			OutputFormat outputFormat,
+			bool romba,
+			bool superdat,
+			bool noMD5,
+			bool noSHA1,
+			bool bare,
+			bool archivesAsFiles,
+			bool enableGzip,
+			string tempDir,
+			int maxDegreeOfParallelism)
+		{
+			// Create a new DATFromDir object and process the inputs
+			Dat basedat = new Dat
+			{
+				FileName = filename,
+				Name = name,
+				Description = description,
+				Category = category,
+				Version = version,
+				Date = DateTime.Now.ToString("yyyy-MM-dd"),
+				Author = author,
+				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				OutputFormat = outputFormat,
+				Romba = romba,
+				Type = (superdat ? "SuperDAT" : ""),
+			};
+
+			// For each input directory, create a DAT
+			foreach (string path in inputs)
+			{
+				if (Directory.Exists(path))
+				{
+					// Clone the base Dat for information
+					Dat datdata = (Dat)basedat.Clone();
+					datdata.Files = new Dictionary<string, List<Rom>>();
+
+					string basePath = Path.GetFullPath(path);
+					DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, maxDegreeOfParallelism, _logger);
+					bool success = dfd.Start();
+
+					// If it was a success, write the DAT out
+					if (success)
+					{
+						DatTools.WriteDatfile(dfd.DatData, "", _logger);
+					}
+
+					// Otherwise, show the help
+					else
+					{
+						Console.WriteLine();
+						Build.Help();
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Wrap splitting a DAT by 2 extensions
+		/// </summary>
+		/// <param name="inputs">Input files or folders to be split</param>
+		/// <param name="exta">First extension to split on</param>
+		/// <param name="extb">Second extension to split on</param>
+		/// <param name="outdir">Output directory for the split files</param>
+		private static void InitExtSplit(List<string> inputs, string exta, string extb, string outdir)
+		{
+			// Convert comma-separated strings to list
+			List<string> extaList = exta.Split(',').ToList();
+			List<string> extbList = extb.Split(',').ToList();
+
+			// Loop over the input files
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					DatTools.SplitByExt(Path.GetFullPath(input), outdir, Path.GetDirectoryName(input), extaList, extbList, _logger);
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						DatTools.SplitByExt(file, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), extaList, extbList, _logger);
+					}
+				}
+				else
+				{
+					_logger.Error(input + " is not a valid file or folder!");
+					Console.WriteLine();
+					Build.Help();
+					return;
+				}
+			}
 		}
 
 		/// <summary>
@@ -67,6 +279,169 @@ namespace SabreTools
 				{
 					_logger.User("Generating DAT for system id " + system);
 					InitGenerate(system, norename, old);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Wrap splitting a DAT by best available hashes
+		/// </summary>
+		/// <param name="inputs">List of inputs to be used</param>
+		/// <param name="outdir">Output directory for the split files</param>
+		private static void InitHashSplit(List<string> inputs, string outdir)
+		{
+			// Loop over the input files
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					DatTools.SplitByHash(Path.GetFullPath(input), outdir, Path.GetDirectoryName(input), _logger);
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						DatTools.SplitByHash(file, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
+					}
+				}
+				else
+				{
+					_logger.Error(input + " is not a valid file or folder!");
+					Console.WriteLine();
+					Build.Help();
+					return;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Wrap extracting and replacing headers
+		/// </summary>
+		/// <param name="input">Input file or folder name</param>
+		/// <param name="extract">True if we're extracting headers (default), false if we're replacing them</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		private static void InitHeaderer(string input, bool extract, Logger logger)
+		{
+			Headerer headerer = new Headerer(input, extract, logger);
+			headerer.Process();
+		}
+
+		/// <summary>
+		/// Wrap importing and updating DATs
+		/// </summary>
+		/// <param name="ignore"></param>
+		private static void InitImport(bool ignore)
+		{
+			IImport imp = new ImportTwo(_datroot, _databaseConnectionString, _logger, ignore);
+			imp.UpdateDatabase();
+		}
+
+		/// <summary>
+		/// Wrap removing an existing source from the database
+		/// </summary>
+		/// <param name="id">Source ID to be removed from the database</param>
+		private static void InitRemoveSource(string sourceid)
+		{
+			int srcid = -1;
+			if (Int32.TryParse(sourceid, out srcid))
+			{
+				if (DBTools.RemoveSource(srcid, _databaseConnectionString))
+				{
+					_logger.Log("Source '" + srcid + "' removed!");
+				}
+				else
+				{
+					_logger.Error("Source with id '" + srcid + "' could not be removed.");
+				}
+			}
+			else
+			{
+				_logger.Error("Invalid input");
+			}
+		}
+
+		/// <summary>
+		/// Wrap removing an existing system from the database
+		/// </summary>
+		/// <param name="id">System ID to be removed from the database</param>
+		private static void InitRemoveSystem(string systemid)
+		{
+			int sysid = -1;
+			if (Int32.TryParse(systemid, out sysid))
+			{
+				if (DBTools.RemoveSystem(sysid, _databaseConnectionString))
+				{
+					_logger.Log("System '" + sysid + "' removed!");
+				}
+				else
+				{
+					_logger.Error("System with id '" + sysid + "' could not be removed.");
+				}
+			}
+			else
+			{
+				_logger.Error("Invalid input");
+			}
+		}
+
+		/// <summary>
+		/// Wrap getting statistics on a DAT or folder of DATs
+		/// </summary>
+		/// <param name="inputs">List of inputs to be used</param>
+		/// <param name="single">True to show individual DAT statistics, false otherwise</param>
+		private static void InitStats(List<string> inputs, bool single)
+		{
+			List<string> newinputs = new List<string>();
+
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					newinputs.Add(input);
+				}
+				if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.GetFiles(input, "*", SearchOption.AllDirectories))
+					{
+						newinputs.Add(file);
+					}
+				}
+			}
+
+			Logger statlog = new Logger(true, "stats.txt");
+			statlog.Start();
+			Stats stats = new Stats(newinputs, single, statlog);
+			stats.Process();
+			statlog.Close(true);
+		}
+
+		/// <summary>
+		/// Wrap splitting a DAT by item type
+		/// </summary>
+		/// <param name="inputs">List of inputs to be used</param>
+		/// <param name="outdir">Output directory for the split files</param>
+		private static void InitTypeSplit(List<string> inputs, string outdir)
+		{
+			// Loop over the input files
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					DatTools.SplitByType(Path.GetFullPath(input), outdir, Path.GetDirectoryName(input), _logger);
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						DatTools.SplitByType(file, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
+					}
+				}
+				else
+				{
+					_logger.Error(input + " is not a valid file or folder!");
+					Console.WriteLine();
+					Build.Help();
+					return;
 				}
 			}
 		}
@@ -321,369 +696,6 @@ namespace SabreTools
 
 			DatTools.Update(inputs, userInputDat, outputFormat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
 				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
-		}
-
-		/// <summary>
-		/// Wrap creating a DAT file from files or a directory
-		/// </summary>
-		/// <param name="input">List of innput filenames</param>
-		/// <param name="filename">New filename</param>
-		/// <param name="name">New name</param>
-		/// <param name="description">New description</param>
-		/// <param name="category">New category</param>
-		/// <param name="version">New version</param>
-		/// <param name="author">New author</param>
-		/// <param name="forceunpack">True to set forcepacking="unzip" on the created file, false otherwise</param>
-		/// <param name="outputFormat">OutputFormat to be used for outputting the DAT</param>
-		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
-		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
-		/// <param name="noMD5">True to disable getting MD5 hash, false otherwise</param>
-		/// <param name="noSHA1">True to disable getting SHA-1 hash, false otherwise</param>
-		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
-		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
-		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
-		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
-		private static void InitDatFromDir(List<string> inputs,
-			string filename,
-			string name,
-			string description,
-			string category,
-			string version,
-			string author,
-			bool forceunpack,
-			OutputFormat outputFormat,
-			bool romba,
-			bool superdat,
-			bool noMD5,
-			bool noSHA1,
-			bool bare,
-			bool archivesAsFiles,
-			bool enableGzip,
-			string tempDir)
-		{
-			// Create a new DATFromDir object and process the inputs
-			Dat datdata = new Dat
-			{
-				FileName = filename,
-				Name = name,
-				Description = description,
-				Category = category,
-				Version = version,
-				Date = DateTime.Now.ToString("yyyy-MM-dd"),
-				Author = author,
-				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = outputFormat,
-				Romba = romba,
-				Type = (superdat ? "SuperDAT" : ""),
-				Files = new Dictionary<string, List<Rom>>(),
-			};
-
-			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
-			bool success = dfd.Start();
-
-			// If we failed, show the help
-			if (!success)
-			{
-				Console.WriteLine();
-				Build.Help();
-			}
-		}
-
-		/// <summary>
-		/// Wrap creating a DAT file from files or a directory in parallel
-		/// </summary>
-		/// <param name="inputs">List of input filenames</param>
-		/// <param name="filename">New filename</param>
-		/// <param name="name">New name</param>
-		/// <param name="description">New description</param>
-		/// <param name="category">New category</param>
-		/// <param name="version">New version</param>
-		/// <param name="author">New author</param>
-		/// <param name="forceunpack">True to set forcepacking="unzip" on the created file, false otherwise</param>
-		/// <param name="outputFormat">OutputFormat to be used for outputting the DAT</param>
-		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
-		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
-		/// <param name="noMD5">True to disable getting MD5 hash, false otherwise</param>
-		/// <param name="noSHA1">True to disable getting SHA-1 hash, false otherwise</param>
-		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
-		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
-		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
-		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		private static void InitDatFromDirParallel(List<string> inputs,
-			string filename,
-			string name,
-			string description,
-			string category,
-			string version,
-			string author,
-			bool forceunpack,
-			OutputFormat outputFormat,
-			bool romba,
-			bool superdat,
-			bool noMD5,
-			bool noSHA1,
-			bool bare,
-			bool archivesAsFiles,
-			bool enableGzip,
-			string tempDir,
-			int maxDegreeOfParallelism)
-		{
-			// Create a new DATFromDir object and process the inputs
-			Dat basedat = new Dat
-			{
-				FileName = filename,
-				Name = name,
-				Description = description,
-				Category = category,
-				Version = version,
-				Date = DateTime.Now.ToString("yyyy-MM-dd"),
-				Author = author,
-				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = outputFormat,
-				Romba = romba,
-				Type = (superdat ? "SuperDAT" : ""),
-			};
-
-			// For each input directory, create a DAT
-			foreach (string path in inputs)
-			{
-				if (Directory.Exists(path))
-				{
-					// Clone the base Dat for information
-					Dat datdata = (Dat)basedat.Clone();
-					datdata.Files = new Dictionary<string, List<Rom>>();
-
-					string basePath = Path.GetFullPath(path);
-					DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, maxDegreeOfParallelism, _logger);
-					bool success = dfd.Start();
-
-					// If it was a success, write the DAT out
-					if (success)
-					{
-						DatTools.WriteDatfile(dfd.DatData, "", _logger);
-					}
-
-					// Otherwise, show the help
-					else
-					{
-						Console.WriteLine();
-						Build.Help();
-					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// Wrap splitting a DAT by 2 extensions
-		/// </summary>
-		/// <param name="inputs">Input files or folders to be split</param>
-		/// <param name="exta">First extension to split on</param>
-		/// <param name="extb">Second extension to split on</param>
-		/// <param name="outdir">Output directory for the split files</param>
-		private static void InitExtSplit(List<string> inputs, string exta, string extb, string outdir)
-		{
-			// Convert comma-separated strings to list
-			List<string> extaList = exta.Split(',').ToList();
-			List<string> extbList = extb.Split(',').ToList();
-
-			// Loop over the input files
-			foreach (string input in inputs)
-			{
-				if (File.Exists(input))
-				{
-					DatTools.SplitByExt(Path.GetFullPath(input), outdir, Path.GetDirectoryName(input), extaList, extbList, _logger);
-				}
-				else if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-					{
-						DatTools.SplitByExt(file, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), extaList, extbList, _logger);
-					}
-				}
-				else
-				{
-					_logger.Error(input + " is not a valid file or folder!");
-					Console.WriteLine();
-					Build.Help();
-					return;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Wrap splitting a DAT by best available hashes
-		/// </summary>
-		/// <param name="inputs">List of inputs to be used</param>
-		/// <param name="outdir">Output directory for the split files</param>
-		private static void InitHashSplit(List<string> inputs, string outdir)
-		{
-			// Loop over the input files
-			foreach (string input in inputs)
-			{
-				if (File.Exists(input))
-				{
-					DatTools.SplitByHash(Path.GetFullPath(input), outdir, Path.GetDirectoryName(input), _logger);
-				}
-				else if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-					{
-						DatTools.SplitByHash(file, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
-					}
-				}
-				else
-				{
-					_logger.Error(input + " is not a valid file or folder!");
-					Console.WriteLine();
-					Build.Help();
-					return;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Wrap splitting a DAT by item type
-		/// </summary>
-		/// <param name="inputs">List of inputs to be used</param>
-		/// <param name="outdir">Output directory for the split files</param>
-		private static void InitTypeSplit(List<string> inputs, string outdir)
-		{
-			// Loop over the input files
-			foreach (string input in inputs)
-			{
-				if (File.Exists(input))
-				{
-					DatTools.SplitByType(Path.GetFullPath(input), outdir, Path.GetDirectoryName(input), _logger);
-				}
-				else if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-					{
-						DatTools.SplitByType(file, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
-					}
-				}
-				else
-				{
-					_logger.Error(input + " is not a valid file or folder!");
-					Console.WriteLine();
-					Build.Help();
-					return;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Wrap getting statistics on a DAT or folder of DATs
-		/// </summary>
-		/// <param name="inputs">List of inputs to be used</param>
-		/// <param name="single">True to show individual DAT statistics, false otherwise</param>
-		private static void InitStats(List<string> inputs, bool single)
-		{
-			List<string> newinputs = new List<string>();
-
-			foreach (string input in inputs)
-			{
-				if (File.Exists(input))
-				{
-					newinputs.Add(input);
-				}
-				if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.GetFiles(input, "*", SearchOption.AllDirectories))
-					{
-						newinputs.Add(file);
-					}
-				}
-			}
-
-			Logger statlog = new Logger(true, "stats.txt");
-			statlog.Start();
-			Stats stats = new Stats(newinputs, single, statlog);
-			stats.Process();
-			statlog.Close(true);
-		}
-
-		/// <summary>
-		/// Wrap adding a new source to the database
-		/// </summary>
-		/// <param name="name">Source name</param>
-		/// <param name="url">Source URL(s)</param>
-		private static void InitAddSource(string name, string url)
-		{
-			if (DBTools.AddSource(name, url, _databaseConnectionString))
-			{
-				_logger.Log("Source " + name + " added!");
-			}
-			else
-			{
-				_logger.Error("Source " + name + " could not be added!");
-			}
-		}
-
-		/// <summary>
-		/// Wrap removing an existing source from the database
-		/// </summary>
-		/// <param name="id">Source ID to be removed from the database</param>
-		private static void InitRemoveSource(string sourceid)
-		{
-			int srcid = -1;
-			if (Int32.TryParse(sourceid, out srcid))
-			{
-				if (DBTools.RemoveSource(srcid, _databaseConnectionString))
-				{
-					_logger.Log("Source '" + srcid + "' removed!");
-				}
-				else
-				{
-					_logger.Error("Source with id '" + srcid + "' could not be removed.");
-				}
-			}
-			else
-			{
-				_logger.Error("Invalid input");
-			}
-		}
-
-		/// <summary>
-		/// Wrap adding a new system to the database
-		/// </summary>
-		/// <param name="manufacturer">Manufacturer name</param>
-		/// <param name="system">System name</param>
-		private static void InitAddSystem(string manufacturer, string system)
-		{
-			if (DBTools.AddSystem(manufacturer, system, _databaseConnectionString))
-			{
-				_logger.Log("System " + manufacturer + " - " + system + " added!");
-			}
-			else
-			{
-				_logger.Error("System " + manufacturer + " - " + system + " could not be added!");
-			}
-		}
-
-		/// <summary>
-		/// Wrap removing an existing system from the database
-		/// </summary>
-		/// <param name="id">System ID to be removed from the database</param>
-		private static void InitRemoveSystem(string systemid)
-		{
-			int sysid = -1;
-			if (Int32.TryParse(systemid, out sysid))
-			{
-				if (DBTools.RemoveSystem(sysid, _databaseConnectionString))
-				{
-					_logger.Log("System '" + sysid + "' removed!");
-				}
-				else
-				{
-					_logger.Error("System with id '" + sysid + "' could not be removed.");
-				}
-			}
-			else
-			{
-				_logger.Error("Invalid input");
-			}
 		}
 
 		#endregion
