@@ -12,7 +12,7 @@ namespace SabreTools
 	{
 		// Private instance variables
 		private string _input;
-		private bool _extract;
+		private bool _restore;
 		private Logger _logger;
 
 		// Private required variables
@@ -24,12 +24,12 @@ namespace SabreTools
 		/// Create a new Headerer object
 		/// </summary>
 		/// <param name="input">Input file or folder name</param>
-		/// <param name="extract">True if we're extracting headers (default), false if we're replacing them</param>
+		/// <param name="restore">False if we're extracting headers (default), true if we're restoring them</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public Headerer(string input, bool extract, Logger logger)
+		public Headerer(string input, bool restore, Logger logger)
 		{
 			_input = input;
-			_extract = extract;
+			_restore = restore;
 			_logger = logger;
 		}
 
@@ -39,7 +39,26 @@ namespace SabreTools
 		/// <returns>True if it succeeded, false otherwise</returns>
 		public bool Process()
 		{
-			if (_extract)
+			if (_restore)
+			{
+				// If it's a single file, just check it
+				if (File.Exists(_input))
+				{
+					RestoreHeader(_input);
+				}
+				// If it's a directory, recursively check all
+				else if (Directory.Exists(_input))
+				{
+					foreach (string sub in Directory.GetFiles(_input))
+					{
+						if (sub != ".." && sub != ".")
+						{
+							RestoreHeader(sub);
+						}
+					}
+				}
+			}
+			else
 			{
 				// If it's a single file, just check it
 				if (File.Exists(_input))
@@ -54,25 +73,6 @@ namespace SabreTools
 						if (sub != ".." && sub != ".")
 						{
 							DetectSkipperAndTransform(sub);
-						}
-					}
-				}
-			}
-			else
-			{
-				// If it's a single file, just check it
-				if (File.Exists(_input))
-				{
-					ReplaceHeader(_input);
-				}
-				// If it's a directory, recursively check all
-				else if (Directory.Exists(_input))
-				{
-					foreach (string sub in Directory.GetFiles(_input))
-					{
-						if (sub != ".." && sub != ".")
-						{
-							ReplaceHeader(sub);
 						}
 					}
 				}
@@ -184,7 +184,7 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="file">Name of the file to be parsed</param>
 		/// <returns>True if a header was found and appended, false otherwise</returns>
-		public bool ReplaceHeader(string file)
+		public bool RestoreHeader(string file)
 		{
 			// First, get the SHA-1 hash of the file
 			Rom rom = FileTools.GetSingleFileInfo(file);

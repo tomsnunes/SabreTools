@@ -93,7 +93,6 @@ namespace SabreTools
 				datprefix = false,
 				dedup = false,
 				enableGzip = false,
-				extract = true,
 				extsplit = false,
 				forceunpack = false,
 				generate = false,
@@ -113,6 +112,7 @@ namespace SabreTools
 				quotes = false,
 				rem = false,
 				remext = false,
+				restore = true,
 				romba = false,
 				single = false,
 				softlist = false,
@@ -377,7 +377,7 @@ namespace SabreTools
 						break;
 					case "-re":
 					case "--restore":
-						extract = false;
+						restore = true;
 						break;
 					case "-rm":
 					case "--remove":
@@ -713,7 +713,7 @@ namespace SabreTools
 			// If we're in headerer mode
 			else if (headerer)
 			{
-				InitHeaderer(inputs, extract, _logger);
+				InitHeaderer(inputs, restore, _logger);
 			}
 
 			// Import a file or folder

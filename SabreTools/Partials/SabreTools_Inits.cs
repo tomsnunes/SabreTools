@@ -318,13 +318,13 @@ namespace SabreTools
 		/// Wrap extracting and replacing headers
 		/// </summary>
 		/// <param name="inputs">Input file or folder names</param>
-		/// <param name="extract">True if we're extracting headers (default), false if we're replacing them</param>
+		/// <param name="restore">False if we're extracting headers (default), true if we're restoring them</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private static void InitHeaderer(List<string> inputs, bool extract, Logger logger)
+		private static void InitHeaderer(List<string> inputs, bool restore, Logger logger)
 		{
 			foreach (string input in inputs)
 			{
-				Headerer headerer = new Headerer(input, extract, logger);
+				Headerer headerer = new Headerer(input, restore, logger);
 				headerer.Process();
 			}
 		}
