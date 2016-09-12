@@ -170,19 +170,14 @@ namespace SabreTools.Helper
 					helptext.Add("  -ga, --generate-all	Start tool in generate all mode");
 					helptext.Add("	-nr, --no-rename	Don't auto-rename games");
 					helptext.Add("	-o, --old		Output DAT in CMP format instead of XML");
-					helptext.Add("  -he, --headerer			Extract and remove copier headers");
-					helptext.Add("	-r, --restore	Restore header to file based on SHA-1");
-					helptext.Add("  -hs, --hash-split		Split a DAT or folder by best-available hashes");
+					helptext.Add("  -he, --headerer	Extract and remove copier headers");
+					helptext.Add("	-r, --restore		Restore header to file based on SHA-1 instead");
+					helptext.Add("  -hs, --hash-split	Split a DAT or folder by best-available hashes");
 					helptext.Add("	-out=			Output directory");
 					helptext.Add("  -i, --import		Start tool in import mode");
 					helptext.Add("	-ig, --ignore		Don't prompt for new sources");
 					helptext.Add("  -lso, --list-sources	List all sources (id <= name)");
 					helptext.Add("  -lsy, --list-systems	List all systems (id <= name)");
-					helptext.Add("  -ol, --offmerge	Update DATS for offline arrays (see notes)");
-					helptext.Add("	-com=			Complete current DAT");
-					helptext.Add("	-fix=			Complete current Missing");
-					helptext.Add("	-new=			New Complete DAT");
-					helptext.Add("	-fk, --fake		Replace all hashes and sizes by the default");
 					helptext.Add("  -rm, --remove		Remove a system or source from the database");
 					helptext.Add("	-system=		System ID");
 					helptext.Add("	-source=		Source ID");
@@ -283,14 +278,6 @@ namespace SabreTools.Helper
 					helptext.Add("");
 					helptext.Add("Filter parameters for size can use postfixes for inputs:");
 					helptext.Add("    e.g. 8kb => 8000 or 8kib => 8192");
-					helptext.Add("");
-					helptext.Add("Offline merge mode notes:");
-					helptext.Add("  This program will output the following DATs:");
-					helptext.Add("    (a) Net New - (NewComplete)-(Complete)");
-					helptext.Add("    (b) Unneeded - (Complete)-(NewComplete)");
-					helptext.Add("    (c) New Missing - (Net New)+(Missing-(Unneeded))");
-					helptext.Add("    (d) Have - (NewComplete)-(New Missing)");
-					helptext.Add("      OR(Complete or NewComplete) - (Missing) if one is missing");
 					break;
 				case "Headerer":
 					helptext.Add(Resources.Resources.Headerer_Name + " - " + Resources.Resources.Headerer_Desc);
