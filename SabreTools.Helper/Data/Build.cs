@@ -290,8 +290,10 @@ namespace SabreTools.Helper
 					helptext.Add("  -dat=			Input DAT to rebuild against (REQUIRED)");
 					helptext.Add("  -out=			Output directory");
 					helptext.Add("  -t=, --temp=		Set the temporary directory to use");
+					helptext.Add("  -d, --delete	Delete input files");
 					helptext.Add("  -qs, --quick		Enable quick scanning of archives");
 					helptext.Add("  -v, --verify		Enable verification of output directory");
+					helptext.Add("  -c, --convert		Enable conversion of input files to TGZ");
 					helptext.Add("  -tgz, --tgz		Enable TorrentGZ output");
 					helptext.Add("	-r, --romba		Enable Romba depot dir output");
 					helptext.Add("  -do, --directory	Output files as uncompressed");
@@ -300,27 +302,6 @@ namespace SabreTools.Helper
 					helptext.Add("  -rar={2}		Set scanning level for RAR archives");
 					helptext.Add("  -zip={0}		Set scanning level for ZIP archives");
 					helptext.Add("  -ud, --update-dat	Output updated DAT");
-					helptext.Add("");
-					helptext.Add("Archive scanning levels:");
-					helptext.Add("  0	Hash archive and contents");
-					helptext.Add("  1	Only hash contents");
-					helptext.Add("  2	Only hash archive");
-					break;
-				case "TGZConvert":
-					helptext.Add(Resources.Resources.TGZTest_Name + " - " + Resources.Resources.TGZTest_Desc);
-					helptext.Add(barrier);
-					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.TGZTest_Name + " [options] [filename|dirname] ...");
-					helptext.Add("");
-					helptext.Add("Options:");
-					helptext.Add("  -?, -h, --help	Show this help");
-					helptext.Add("  -out=			Output directory");
-					helptext.Add("  -t=, --temp=		Set the temporary directory to use");
-					helptext.Add("  -d, --delete	Delete input files");
-					helptext.Add("  -r, --romba	Enable Romba depot dir output");
-					helptext.Add("  -7z={1}		Set scanning level for 7z archives");
-					helptext.Add("  -gz={2}		Set scanning level for GZip archives");
-					helptext.Add("  -rar={2}		Set scanning level for RAR archives");
-					helptext.Add("  -zip={1}		Set scanning level for ZIP archives");
 					helptext.Add("");
 					helptext.Add("Archive scanning levels:");
 					helptext.Add("  0	Hash archive and contents");

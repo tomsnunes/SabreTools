@@ -10,7 +10,6 @@ Table of Contents
 	2.1		RombaSharp
 	2.2		SabreTools
 	2.3		SimpleSort
-	2.4		TGZConvert
 3.0		Examples
 4.0		Contributors
 5.0		Licensing
@@ -725,6 +724,11 @@ Options:
 		(inside the running folder) is not preferred. This is used for any operations that
 		require an archive to be extracted.
 		
+	-d, --delete		Enable deletion of the input files
+		Optionally, the input files, once processed, can be deleted. This can be useful
+		when the original file structure is no longer needed or if there is limited space
+		on the source drive.
+		
 	-qs, --quick		Enable quick scanning of archives
 		For all archives, if this flag is enabled, it will only use the header information
 		to get the archive entries' file information. The upside to this is that it is much
@@ -736,6 +740,11 @@ Options:
 		Here, the DAT is used to verify the output directory directly and then output a
 		simple FixDAT. This can be misleading, currently, because it only checks for exact
 		matches.
+		
+	-c, --convert		Enable conversion of input files to TGZ
+		This allows conversion of a folder or set of folders to TorrentGZ format without
+		requiring a DAT to rebuild from. It is only useful in a small amount of situations at
+		the present, but it is mostly meant for Romba compatibility at the present.
 		
 	-tgz				Enable Torrent GZ output
 		Instead of outputting the files to ZIP archives, files will be rebuilt to TorrentGZ
@@ -769,50 +778,6 @@ Options:
 	-ud, --update-dat	Output updated DAT (rebuild only)
 		Once the files that were able to rebuilt are taken care of, a DAT of the files
 		that could not be matched will be output to the program directory.
-
-** Section 2.4 - TGZConvert
-
-TGZConvert is a small program that allows conversion of a folder or set of folders to
-TorrentGZ format. It is only useful in a small amount of situations at the present,
-but it is mostly meant for Romba compatibility at the present.
-
-Usage:
-	TGZTest.exe [options] [filename|dirname] ...
-
-Options:
-	-?, -h, --help		Show the built-in help text
-		Built-in to most of the programs is a basic help text
-	
-	-out=				Set the name of the output directory
-		This sets an output folder to be used by when files are rebuilt. It also serves
-		as the base folder if Romba mode is enabled. See -r, --romba for more details
-	
-	-t=, --temp=		Set the name of the temporary directory
-		Optionally, a temp folder can be supplied in the case the default temp directory
-		(inside the running folder) is not preferred. This is used for any operations that
-		require an archive to be extracted.
-	
-	-d, --delete		Enable deletion of the input files
-		Optionally, the input files, once processed, can be deleted. This can be useful
-		when the original file structure is no longer needed or if there is limited space
-		on the source drive.
-		
-	-r, --romba			Enable Romba depot directory output
-		Optionally, this outputs the TGZ files into directories based on the structure
-		used by Romba. This uses nested folders using the first 4 bytes of the SHA-1,
-		1 byte for each layer of the directory name. It also includes two auxilary
-		files, .romba_size and .romba_size.backup, that have the compressed size of the
-		folder inside for use with Romba.
-	
-	-7z={0}				Set scanning level for 7z archives
-	-gz={2}				Set scanning level for GZip archives
-	-rar={2}			Set scanning level for RAR archives
-	-zip={0}			Set scanning level for ZIP archives
-		For each of the major archive types recognized by the libraries used by this
-		program, scan the archive in one of the following ways:
-			0	Hash both archive and its contents
-			1	Only hash contents of the archive
-			2	Only hash archive itself (treat like a regular file)
 
 ** Section 3.0 - Examples
 

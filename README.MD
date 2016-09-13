@@ -59,6 +59,7 @@ A simple rebuild-from-DAT tool that allows users to sort from the commandline.
 	<li>Verify a folder against a DAT (create a fixDat)</li>
 	<li>Rebuild to TGZ archives</li>
 	<li>Rebuild to Romba depot</li>
+	<li>Convert to Romba depot (no DAT required)</li>
 </ul>
 
 <h3>Power User Tools</h3>
@@ -70,14 +71,6 @@ This section is for tools that have been requested for a highly specific purpose
 <b>RombaSharp</b>
 <p/>
 An in-progress tool that will try to act as a C# port of the Go-based Romba program. All features that are not already a part of SabreTools will be attempted to be added to this program. It is NOT ready for use yet.
-
-<b>TGZConvert</b>
-<p/>
-A simple tool to convert a folder to TGZ, optionally to a specific folder.
-<ul>
-	<li>Optionally delete source files (if possible)</li>
-	<li>Create a Romba depot from an input folder</li>
-</ul>
 
 <h3>Licensing</h3>
 <p/>

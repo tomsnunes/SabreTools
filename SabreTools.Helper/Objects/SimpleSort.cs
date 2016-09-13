@@ -14,6 +14,7 @@ namespace SabreTools.Helper
 		private bool _quickScan;
 		private bool _toFolder;
 		private bool _verify;
+		private bool _delete;
 		private bool _tgz;
 		private bool _romba;
 		private bool _updateDat;
@@ -38,6 +39,7 @@ namespace SabreTools.Helper
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
+		/// <param name="delete">True if input files should be deleted, false otherwise</param>
 		/// <param name="tgz">True if files should be output in TorrentGZ format, false for standard zip</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
@@ -47,7 +49,7 @@ namespace SabreTools.Helper
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public SimpleSort(Dat datdata, List<string> inputs, string outdir, string tempdir,
-			bool quickScan, bool toFolder, bool verify, bool tgz, bool romba, int sevenzip,
+			bool quickScan, bool toFolder, bool verify, bool delete, bool tgz, bool romba, int sevenzip,
 			int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			_datdata = datdata;
@@ -57,6 +59,7 @@ namespace SabreTools.Helper
 			_quickScan = quickScan;
 			_toFolder = toFolder;
 			_verify = verify;
+			_delete = delete;
 			_tgz = tgz;
 			_romba = romba;
 			_7z = (ArchiveScanLevel)(sevenzip < 0 || sevenzip > 2 ? 0 : sevenzip);
@@ -708,6 +711,119 @@ namespace SabreTools.Helper
 			// archive to help this along. Everything else rebuilding should be copied from
 			// archive to archive. Once remove has been traversed, we will extract and remove
 			// all of the files that have been found and put them in the temporary folder.
+
+			return success;
+		}
+
+		/// <summary>
+		/// Process inputs and convert to TGZ, optionally converting to Romba
+		/// </summary>
+		/// <returns>True if processing was a success, false otherwise</returns>
+		public bool Convert()
+		{
+			bool success = true;
+
+			// First, check that the output directory exists
+			if (!Directory.Exists(_outdir))
+			{
+				Directory.CreateDirectory(_outdir);
+				_outdir = Path.GetFullPath(_outdir);
+			}
+
+			// Then create or clean the temp directory
+			if (!Directory.Exists(_tempdir))
+			{
+				Directory.CreateDirectory(_tempdir);
+			}
+			else
+			{
+				FileTools.CleanDirectory(_tempdir);
+			}
+
+			// Now process all of the inputs
+			foreach (string input in _inputs)
+			{
+				_logger.User("Examining file " + input);
+
+				// Get if the file should be scanned internally and externally
+				bool shouldExternalProcess, shouldInternalProcess;
+				FileTools.GetInternalExternalProcess(input, _7z, _gz, _rar, _zip, _logger, out shouldExternalProcess, out shouldInternalProcess);
+
+				// Do an external scan of the file, if necessary
+				if (shouldExternalProcess)
+				{
+					_logger.User("Processing file " + input);
+					success &= FileTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
+				}
+
+				// Process the file as an archive, if necessary
+				if (shouldInternalProcess)
+				{
+					// Now, if the file is a supported archive type, also run on all files within
+					bool encounteredErrors = FileTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
+
+					// If no errors were encountered, we loop through the temp directory
+					if (!encounteredErrors)
+					{
+						_logger.Log("Archive found! Successfully extracted");
+						foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
+						{
+							_logger.User("Processing extracted file " + file);
+							success &= FileTools.WriteTorrentGZ(file, _outdir, _romba, _logger);
+						}
+
+						FileTools.CleanDirectory(_tempdir);
+					}
+				}
+
+				// Delete the source file if we're supposed to
+				if (_delete)
+				{
+					try
+					{
+						_logger.User("Attempting to delete " + input);
+						File.Delete(input);
+					}
+					catch (Exception ex)
+					{
+						_logger.Error(ex.ToString());
+						success &= false;
+					}
+				}
+			}
+
+			// Now one final delete of the temp directory
+			while (Directory.Exists(_tempdir))
+			{
+				try
+				{
+					Directory.Delete(_tempdir, true);
+				}
+				catch
+				{
+					continue;
+				}
+			}
+
+			// If we're in romba mode and the size file doesn't exist, create it
+			if (_romba && !File.Exists(Path.Combine(_outdir, ".romba_size")))
+			{
+				// Get the size of all of the files in the output folder
+				long size = 0;
+				foreach (string file in Directory.EnumerateFiles(_outdir, "*", SearchOption.AllDirectories))
+				{
+					FileInfo tempinfo = new FileInfo(file);
+					size += tempinfo.Length;
+				}
+
+				// Write out the value to each of the romba depot files
+				using (StreamWriter tw = new StreamWriter(File.Open(Path.Combine(_outdir, ".romba_size"), FileMode.Create, FileAccess.Write)))
+				using (StreamWriter twb = new StreamWriter(File.Open(Path.Combine(_outdir, ".romba_size.backup"), FileMode.Create, FileAccess.Write)))
+				{
+					tw.Write(size);
+					twb.Write(size);
+				}
+			}
 
 			return success;
 		}
