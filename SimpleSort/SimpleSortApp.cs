@@ -193,7 +193,7 @@ namespace SabreTools
 			// If we are converting the folder to TGZ
 			if (convert)
 			{
-				InitTGZConvert(inputs, outdir, tempdir, delete, romba, sevenzip, gz, rar, zip, logger);
+				InitConvert(inputs, outdir, tempdir, delete, romba, sevenzip, gz, rar, zip, logger);
 			}
 
 			// If we are doing a simple sort
@@ -201,7 +201,7 @@ namespace SabreTools
 			{
 				if (datfiles.Count > 0)
 				{
-					InitSimpleSort(datfiles, inputs, outdir, tempdir, quickScan, toFolder,
+					InitSortVerify(datfiles, inputs, outdir, tempdir, quickScan, toFolder,
 						verify, delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, logger);
 				}
 				else
@@ -242,7 +242,7 @@ namespace SabreTools
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private static void InitSimpleSort(List<string> datfiles, List<string> inputs, string outdir, string tempdir, bool quickScan,
+		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outdir, string tempdir, bool quickScan,
 			bool toFolder, bool verify, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
@@ -270,7 +270,7 @@ namespace SabreTools
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public static bool InitTGZConvert(List<string> inputs, string outdir, string tempdir, bool delete,
+		public static bool InitConvert(List<string> inputs, string outdir, string tempdir, bool delete,
 			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			// Get all individual files from the inputs
