@@ -607,7 +607,7 @@ namespace SabreTools.Helper
 					MD5 = string.Empty,
 					SHA1 = string.Empty,
 				},
-				Date = temp.CreationTime.ToString(),
+				Date = temp.LastWriteTime.ToString(),
 			};
 
 			try
