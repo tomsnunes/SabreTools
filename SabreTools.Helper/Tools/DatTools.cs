@@ -255,7 +255,8 @@ namespace SabreTools.Helper
 			StreamReader sr = new StreamReader(File.OpenRead(filename));
 
 			bool block = false, superdat = false;
-			string blockname = "", tempgamename = "", gamedesc = "";
+			string blockname = "", tempgamename = "", gamedesc = "", cloneof = "",
+				romof = "", sampleof = "", year = "", manufacturer = "";
 			while (!sr.EndOfStream)
 			{
 				string line = sr.ReadLine();
@@ -288,6 +289,11 @@ namespace SabreTools.Helper
 						{
 							Name = tempgamename,
 							Description = gamedesc,
+							CloneOf = cloneof,
+							RomOf = romof,
+							SampleOf = sampleof,
+							Manufacturer = manufacturer,
+							Year = year,
 						},
 						Type = (line.Trim().StartsWith("disk (") ? ItemType.Disk : ItemType.Rom),
 						Metadata = new SourceMetadata { SystemID = sysid, SourceID = srcid },
@@ -415,13 +421,33 @@ namespace SabreTools.Helper
 				{
 					GroupCollection gc = Regex.Match(line, Constants.ItemPatternCMP).Groups;
 
-					if (gc[1].Value == "name" && blockname != "header")
+					if (blockname != "header")
 					{
-						tempgamename = gc[2].Value.Replace("\"", "");
-					}
-					else if (gc[1].Value == "description" && blockname != "header")
-					{
-						gamedesc = gc[2].Value.Replace("\"", "");
+						string itemval = gc[2].Value.Replace("\"", "");
+						switch (gc[1].Value)
+						{
+							case "name":
+								tempgamename = itemval;
+								break;
+							case "description":
+								gamedesc = itemval;
+								break;
+							case "romof":
+								romof = itemval;
+								break;
+							case "cloneof":
+								cloneof = itemval;
+								break;
+							case "year":
+								year = itemval;
+								break;
+							case "manufacturer":
+								manufacturer = itemval;
+								break;
+							case "sampleof":
+								sampleof = itemval;
+								break;
+						}
 					}
 					else
 					{
@@ -666,6 +692,8 @@ namespace SabreTools.Helper
 							{
 								Name = rominfo[3],
 								Description = rominfo[4],
+								CloneOf = rominfo[1],
+								RomOf = rominfo[8],
 							},
 							Name = rominfo[5],
 							HashData = new Hash
@@ -1057,7 +1085,8 @@ namespace SabreTools.Helper
 						case "game":
 						case "software":
 							string temptype = xtr.Name;
-							string tempname = "", gamedesc = "";
+							string tempname = "", gamedesc = "", romof = "",
+								cloneof = "", sampleof = "", year = "", manufacturer = "";
 
 							// We want to process the entire subtree of the game
 							subreader = xtr.ReadSubtree();
@@ -1086,6 +1115,9 @@ namespace SabreTools.Helper
 										continue;
 									}
 									tempname = xtr.GetAttribute("name");
+									romof = (xtr.GetAttribute("romof") != null ? xtr.GetAttribute("romof") : "");
+									cloneof = (xtr.GetAttribute("cloneof") != null ? xtr.GetAttribute("cloneof") : "");
+									sampleof = (xtr.GetAttribute("sampleof") != null ? xtr.GetAttribute("sampleof") : "");
 								}
 
 								if (superdat && !keep)
@@ -1118,6 +1150,12 @@ namespace SabreTools.Helper
 									{
 										case "description":
 											gamedesc = subreader.ReadElementContentAsString();
+											break;
+										case "year":
+											year = subreader.ReadElementContentAsString();
+											break;
+										case "manufacturer":
+											manufacturer = subreader.ReadElementContentAsString();
 											break;
 										case "rom":
 										case "disk":
@@ -1174,6 +1212,9 @@ namespace SabreTools.Helper
 												{
 													Name = tempname,
 													Description = gamedesc,
+													RomOf = romof,
+													CloneOf = cloneof,
+													SampleOf = sampleof,
 												},
 												Name = subreader.GetAttribute("name"),
 												Type = (subreader.Name.ToLowerInvariant() == "disk" ? ItemType.Disk : ItemType.Rom),
@@ -2772,7 +2813,12 @@ namespace SabreTools.Helper
 				{
 					case OutputFormat.ClrMamePro:
 						state += "game (\n\tname \"" + rom.Machine.Name + "\"\n" +
-							"\tdescription \"" + (String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description) + "\"\n";
+							(String.IsNullOrEmpty(rom.Machine.RomOf) ? "" : "\tromof \"" + rom.Machine.RomOf + "\"\n") +
+							(String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : "\tcloneof \"" + rom.Machine.CloneOf + "\"\n") +
+							"\tdescription \"" + (String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description) + "\"\n" +
+							(String.IsNullOrEmpty(rom.Machine.Year) ? "" : "\tyear " + rom.Machine.Year + "\n") +
+							(String.IsNullOrEmpty(rom.Machine.Manufacturer) ? "" : "\tmanufacturer \"" + rom.Machine.Manufacturer + "\"\n");
+
 						break;
 					case OutputFormat.SabreDat:
 						for (int i = (last == -1 ? 0 : last); i < newsplit.Count; i++)
@@ -2787,8 +2833,16 @@ namespace SabreTools.Helper
 						depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
 						break;
 					case OutputFormat.Xml:
-						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Machine.Name) + "\">\n" +
-							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) + "</description>\n";
+						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Machine.Name) + "\"" +
+							(rom.Machine.IsBios ? " isbios=\"yes\"" : "") +
+							(String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : " cloneof=\"" + HttpUtility.HtmlEncode(rom.Machine.CloneOf) + "\"") +
+							(String.IsNullOrEmpty(rom.Machine.RomOf) ? "" : " romof=\"" + HttpUtility.HtmlEncode(rom.Machine.RomOf) + "\"") +
+							(String.IsNullOrEmpty(rom.Machine.SampleOf) ? "" : " romof=\"" + HttpUtility.HtmlEncode(rom.Machine.SampleOf) + "\"") +
+							">\n" +
+							(String.IsNullOrEmpty(rom.Machine.Comment) ? "" : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Machine.Comment) + "</comment>\n") +
+							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) + "</description>\n" +
+							(String.IsNullOrEmpty(rom.Machine.Year) ? "" : "\t\t<year>" + HttpUtility.HtmlEncode(rom.Machine.Year) + "</year>\n") +
+							(String.IsNullOrEmpty(rom.Machine.Manufacturer) ? "" : "\t\t<manufacturer>" + HttpUtility.HtmlEncode(rom.Machine.Manufacturer) + "</manufacturer>\n");
 						break;
 				}
 
@@ -2827,7 +2881,7 @@ namespace SabreTools.Helper
 				switch (outputFormat)
 				{
 					case OutputFormat.ClrMamePro:
-						state += ")\n";
+						state += (String.IsNullOrEmpty(rom.Machine.SampleOf) ? "" : "\tsampleof \"" + rom.Machine.SampleOf + "\"\n") + ")\n";
 						break;
 					case OutputFormat.SabreDat:
 						if (splitpath != null)

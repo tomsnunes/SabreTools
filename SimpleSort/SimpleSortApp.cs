@@ -290,7 +290,8 @@ namespace SabreTools
 				}
 			}
 
-			SimpleSort ss = new SimpleSort(new Dat(), newinputs, outdir, tempdir, false, false, false, delete, true, romba, sevenzip, gz, rar, zip, false, logger);
+			SimpleSort ss = new SimpleSort(new Dat(), newinputs, outdir, tempdir, false, false, false,
+				delete, true, romba, sevenzip, gz, rar, zip, false, logger);
 			return ss.Convert();
 		}
 	}
