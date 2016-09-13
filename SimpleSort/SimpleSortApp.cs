@@ -193,7 +193,7 @@ namespace SabreTools
 			// If we are converting the folder to TGZ
 			if (convert)
 			{
-				InitConvert(inputs, outdir, tempdir, delete, romba, sevenzip, gz, rar, zip, logger);
+				InitConvertFolderTGZ(inputs, outdir, tempdir, delete, romba, sevenzip, gz, rar, zip, logger);
 			}
 
 			// If we are doing a simple sort
@@ -270,7 +270,7 @@ namespace SabreTools
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public static bool InitConvert(List<string> inputs, string outdir, string tempdir, bool delete,
+		public static bool InitConvertFolderTGZ(List<string> inputs, string outdir, string tempdir, bool delete,
 			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			// Get all individual files from the inputs

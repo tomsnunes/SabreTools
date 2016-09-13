@@ -46,6 +46,43 @@ namespace SabreTools
 		}
 
 		/// <summary>
+		/// Wrap sorting files using an input DAT
+		/// </summary>
+		/// <param name="inputs">List of all inputted files and folders</param>
+		/// <param name="outdir">Output directory (empty for default directory)</param>
+		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
+		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
+		/// <param name="gz">Integer representing the archive handling level for GZip</param>
+		/// <param name="rar">Integer representing the archive handling level for RAR</param>
+		/// <param name="zip">Integer representing the archive handling level for Zip</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		public static bool InitConvertFolderTGZ(List<string> inputs, string outdir, string tempdir, bool delete,
+			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
+		{
+			// Get all individual files from the inputs
+			List<string> newinputs = new List<string>();
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					newinputs.Add(Path.GetFullPath(input));
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						newinputs.Add(Path.GetFullPath(file));
+					}
+				}
+			}
+
+			SimpleSort ss = new SimpleSort(new Dat(), newinputs, outdir, tempdir, false, false, false, delete, true, romba, sevenzip, gz, rar, zip, false, logger);
+			return ss.Convert();
+		}
+
+		/// <summary>
 		/// Wrap creating a DAT file from files or a directory
 		/// </summary>
 		/// <param name="input">List of innput filenames</param>
@@ -404,7 +441,7 @@ namespace SabreTools
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private static void InitSimpleSort(List<string> datfiles, List<string> inputs, string outdir, string tempdir, bool quickScan,
+		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outdir, string tempdir, bool quickScan,
 			bool toFolder, bool verify, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
