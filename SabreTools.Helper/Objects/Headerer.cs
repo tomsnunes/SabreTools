@@ -38,6 +38,11 @@ namespace SabreTools
 		/// <returns>True if it succeeded, false otherwise</returns>
 		public bool Process()
 		{
+			if (_outdir != "" && !Directory.Exists(_outdir))
+			{
+				Directory.CreateDirectory(_outdir);
+			}
+
 			bool success = true;
 
 			foreach (string input in _inputs)
@@ -50,10 +55,7 @@ namespace SabreTools
 				{
 					foreach (string sub in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						if (sub != ".." && sub != ".")
-						{
-							success &= RestoreHeader(sub);
-						}
+						success &= ProcessHelper(sub);
 					}
 				}
 			}
