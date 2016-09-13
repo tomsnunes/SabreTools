@@ -4,7 +4,7 @@ using System.IO;
 using SabreTools.Helper;
 namespace SabreTools
 {
-	public class TGZTest
+	public class TGZConvert
 	{
 		// User-defined variables
 		private List<string> _inputs;
@@ -31,7 +31,7 @@ namespace SabreTools
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public TGZTest(List<string> inputs, string outdir, string tempdir, bool delete,
+		public TGZConvert(List<string> inputs, string outdir, string tempdir, bool delete,
 			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			_inputs = inputs;
@@ -234,7 +234,7 @@ namespace SabreTools
 				}
 			}
 
-			TGZTest tgztest = new TGZTest(newinputs, outdir, tempdir, delete, romba, sevenzip, gz, rar, zip, logger);
+			TGZConvert tgztest = new TGZConvert(newinputs, outdir, tempdir, delete, romba, sevenzip, gz, rar, zip, logger);
 			return tgztest.Process();
 		}
 
