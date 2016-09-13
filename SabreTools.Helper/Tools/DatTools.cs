@@ -2837,7 +2837,7 @@ namespace SabreTools.Helper
 							(rom.Machine.IsBios ? " isbios=\"yes\"" : "") +
 							(String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : " cloneof=\"" + HttpUtility.HtmlEncode(rom.Machine.CloneOf) + "\"") +
 							(String.IsNullOrEmpty(rom.Machine.RomOf) ? "" : " romof=\"" + HttpUtility.HtmlEncode(rom.Machine.RomOf) + "\"") +
-							(String.IsNullOrEmpty(rom.Machine.SampleOf) ? "" : " romof=\"" + HttpUtility.HtmlEncode(rom.Machine.SampleOf) + "\"") +
+							(String.IsNullOrEmpty(rom.Machine.SampleOf) ? "" : " sampleof=\"" + HttpUtility.HtmlEncode(rom.Machine.SampleOf) + "\"") +
 							">\n" +
 							(String.IsNullOrEmpty(rom.Machine.Comment) ? "" : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Machine.Comment) + "</comment>\n") +
 							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) + "</description>\n" +
