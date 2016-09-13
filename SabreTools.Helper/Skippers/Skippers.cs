@@ -465,8 +465,7 @@ namespace SabreTools.Helper
 							if (success)
 							{
 								logger.User(" Matching rule found!");
-								skipperRule = rule;
-								break;
+								return rule;
 							}
 						}
 					}

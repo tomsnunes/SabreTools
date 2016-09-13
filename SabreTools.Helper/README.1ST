@@ -399,6 +399,10 @@ Options:
 			to reapply them to files if they match the included hash. More than one header can
 			be applied to a file, so they will be output to new files, suffixed with .newX,
 			where X is a number. No input files are altered in the process.
+			
+		-out=			Set the name of the output directory
+			This sets an output folder to be used when the files are created. If a path
+			is not defined, the application directory is used instead.
 		
 	-hs, --hash-split		Split a DAT or folder by best-available hashes
 		For a DAT, or set of DATs, allow for splitting based on the best available hash for

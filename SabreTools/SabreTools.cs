@@ -713,7 +713,7 @@ namespace SabreTools
 			// If we're in headerer mode
 			else if (headerer)
 			{
-				InitHeaderer(inputs, restore, _logger);
+				InitHeaderer(inputs, restore, outdir, _logger);
 			}
 
 			// Import a file or folder

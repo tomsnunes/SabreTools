@@ -319,10 +319,11 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">Input file or folder names</param>
 		/// <param name="restore">False if we're extracting headers (default), true if we're restoring them</param>
+		/// <param name="outdir">Output directory to write new files to, blank defaults to rom folder</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private static void InitHeaderer(List<string> inputs, bool restore, Logger logger)
+		private static void InitHeaderer(List<string> inputs, bool restore, string outdir, Logger logger)
 		{
-			Headerer headerer = new Headerer(inputs, restore, logger);
+			Headerer headerer = new Headerer(inputs, restore, outdir, logger);
 			headerer.Process();
 		}
 

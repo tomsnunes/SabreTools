@@ -14,6 +14,7 @@ namespace SabreTools
 		// Private instance variables
 		private List<string> _inputs;
 		private bool _restore;
+		private string _outdir;
 		private Logger _logger;
 
 		// Private required variables
@@ -26,11 +27,13 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">Input file or folder names</param>
 		/// <param name="restore">False if we're extracting headers (default), true if we're restoring them</param>
+		/// <param name="outdir">Output directory to write new files to, blank defaults to rom folder</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public Headerer(List<string> inputs, bool restore, Logger logger)
+		public Headerer(List<string> inputs, bool restore, string outdir, Logger logger)
 		{
 			_inputs = inputs;
 			_restore = restore;
+			_outdir = outdir;
 			_logger = logger;
 		}
 
@@ -121,7 +124,7 @@ namespace SabreTools
 				}
 
 				// Otherwise, apply the rule to the file
-				string newfile = file + ".new";
+				string newfile = (_outdir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outdir, Path.GetFileName(file)));
 				Skippers.TransformFile(file, newfile, rule, _logger);
 
 				// If the output file doesn't exist, return false
@@ -207,8 +210,10 @@ namespace SabreTools
 								_logger.Log("Found match with rom type " + sldr.GetString(1));
 								header = sldr.GetString(0);
 
-								_logger.User("Creating reheadered file: " + file + ".new" + sub);
-								FileTools.AppendBytesToFile(file, file + ".new" + sub, header, string.Empty);
+								_logger.User("Creating reheadered file: " + 
+									(_outdir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outdir, Path.GetFileName(file))) + sub);
+								FileTools.AppendBytesToFile(file,
+									(_outdir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outdir, Path.GetFileName(file))) + sub, header, string.Empty);
 								_logger.User("Reheadered file created!");
 							}
 						}
