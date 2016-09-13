@@ -3242,7 +3242,7 @@ namespace SabreTools.Helper
 						break;
 					case OutputFormat.Xml:
 						state += "\t\t<" + rom.Type.ToString().ToLowerInvariant() + " name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\"" +
-							(rom.HashData.Size != -1 ? " size=\"" + rom.HashData.Size + "\"" : "") +
+							(rom.Type == ItemType.Rom && rom.HashData.Size != -1 ? " size=\"" + rom.HashData.Size + "\"" : "") +
 							(!String.IsNullOrEmpty(rom.HashData.CRC) ? " crc=\"" + rom.HashData.CRC.ToLowerInvariant() + "\"" : "") +
 							(!String.IsNullOrEmpty(rom.HashData.MD5) ? " md5=\"" + rom.HashData.MD5.ToLowerInvariant() + "\"" : "") +
 							(!String.IsNullOrEmpty(rom.HashData.SHA1) ? " sha1=\"" + rom.HashData.SHA1.ToLowerInvariant() + "\"" : "") +
@@ -3767,6 +3767,28 @@ namespace SabreTools.Helper
 				MergeRoms = datdata.MergeRoms,
 				Files = new Dictionary<string, List<Rom>>(),
 			};
+			Dat sampledat = new Dat
+			{
+				FileName = datdata.FileName + " (Sample)",
+				Name = datdata.Name + " (Sample)",
+				Description = datdata.Description + " (Sample)",
+				Category = datdata.Category,
+				Version = datdata.Version,
+				Date = datdata.Date,
+				Author = datdata.Author,
+				Email = datdata.Email,
+				Homepage = datdata.Homepage,
+				Url = datdata.Url,
+				Comment = datdata.Comment,
+				Header = datdata.Header,
+				Type = datdata.Type,
+				ForceMerging = datdata.ForceMerging,
+				ForceNodump = datdata.ForceNodump,
+				ForcePacking = datdata.ForcePacking,
+				OutputFormat = outputFormat,
+				MergeRoms = datdata.MergeRoms,
+				Files = new Dictionary<string, List<Rom>>(),
+			};
 
 			// Now populate each of the DAT objects in turn
 			List<string> keys = datdata.Files.Keys.ToList();
@@ -3803,6 +3825,21 @@ namespace SabreTools.Helper
 							diskdat.Files.Add(key, temp);
 						}
 					}
+
+					// If the file is a Sample
+					else if (rom.Type == ItemType.Sample)
+					{
+						if (sampledat.Files.ContainsKey(key))
+						{
+							sampledat.Files[key].Add(rom);
+						}
+						else
+						{
+							List<Rom> temp = new List<Rom>();
+							temp.Add(rom);
+							sampledat.Files.Add(key, temp);
+						}
+					}
 				}
 			}
 
@@ -3826,6 +3863,10 @@ namespace SabreTools.Helper
 			if (diskdat.Files.Count > 0)
 			{
 				success &= WriteDatfile(diskdat, outdir, logger);
+			}
+			if (sampledat.Files.Count > 0)
+			{
+				success &= WriteDatfile(sampledat, outdir, logger);
 			}
 
 			return success;
