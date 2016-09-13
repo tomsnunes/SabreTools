@@ -499,13 +499,13 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					DatTools.SplitByType(Path.GetFullPath(input), outdir, Path.GetDirectoryName(input), _logger);
+					DatTools.SplitByType(Path.GetFullPath(input), outdir, Path.GetFullPath(Path.GetDirectoryName(input)), _logger);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatTools.SplitByType(file, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
+						DatTools.SplitByType(file, outdir, Path.GetFullPath((input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar)), _logger);
 					}
 				}
 				else

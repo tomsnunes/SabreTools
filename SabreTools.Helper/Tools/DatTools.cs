@@ -900,6 +900,15 @@ namespace SabreTools.Helper
 
 					switch (xtr.Name)
 					{
+						// Handle MAME listxml since they're halfway between a SL and a Logiqx XML
+						case "mame":
+							if (xtr.GetAttribute("build") != null)
+							{
+								datdata.Name = (String.IsNullOrEmpty(datdata.Name) ? xtr.GetAttribute("build") : datdata.Name);
+								datdata.Description = (String.IsNullOrEmpty(datdata.Description) ? datdata.Name : datdata.Name);
+							}
+							xtr.Read();
+							break;
 						// New software lists have this behavior
 						case "softwarelist":
 							if (xtr.GetAttribute("name") != null)
@@ -920,6 +929,7 @@ namespace SabreTools.Helper
 							{
 								datdata.Version = (String.IsNullOrEmpty(datdata.Version) ? xtr.GetAttribute("version") : datdata.Version);
 							}
+							xtr.Read();
 							break;
 						// We want to process the entire subtree of the header
 						case "header":

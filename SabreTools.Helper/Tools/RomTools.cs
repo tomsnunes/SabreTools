@@ -236,11 +236,30 @@ namespace SabreTools.Helper
 						{
 							if (x.Machine.Name == y.Machine.Name)
 							{
-								if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
+								if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type == ItemType.Rom || y.Type == ItemType.Disk))
 								{
-									return Style.CompareNumeric(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
+									if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
+									{
+										return Style.CompareNumeric(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
+									}
+									return Style.CompareNumeric(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
 								}
-								return Style.CompareNumeric(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
+								else if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type != ItemType.Rom && y.Type != ItemType.Disk))
+								{
+									return -1;
+								}
+								else if ((x.Type != ItemType.Rom && x.Type != ItemType.Disk) && (y.Type == ItemType.Rom || y.Type == ItemType.Disk))
+								{
+									return 1;
+								}
+								else
+								{
+									if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
+									{
+										return Style.CompareNumeric(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
+									}
+									return Style.CompareNumeric(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
+								}
 							}
 							return Style.CompareNumeric(x.Machine.Name, y.Machine.Name);
 						}
