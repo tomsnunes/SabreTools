@@ -1,6 +1,7 @@
 ﻿using Mono.Data.Sqlite;
 using SabreTools.Helper;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace SabreTools
@@ -11,7 +12,7 @@ namespace SabreTools
 	public class Headerer
 	{
 		// Private instance variables
-		private string _input;
+		private List<string> _inputs;
 		private bool _restore;
 		private Logger _logger;
 
@@ -23,12 +24,12 @@ namespace SabreTools
 		/// <summary>
 		/// Create a new Headerer object
 		/// </summary>
-		/// <param name="input">Input file or folder name</param>
+		/// <param name="inputs">Input file or folder names</param>
 		/// <param name="restore">False if we're extracting headers (default), true if we're restoring them</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public Headerer(string input, bool restore, Logger logger)
+		public Headerer(List<string> inputs, bool restore, Logger logger)
 		{
-			_input = input;
+			_inputs = inputs;
 			_restore = restore;
 			_logger = logger;
 		}
@@ -39,46 +40,44 @@ namespace SabreTools
 		/// <returns>True if it succeeded, false otherwise</returns>
 		public bool Process()
 		{
-			if (_restore)
+			bool success = true;
+
+			foreach (string input in _inputs)
 			{
-				// If it's a single file, just check it
-				if (File.Exists(_input))
+				if (File.Exists(input))
 				{
-					RestoreHeader(_input);
+					success &= ProcessHelper(input);
 				}
-				// If it's a directory, recursively check all
-				else if (Directory.Exists(_input))
+				else if (Directory.Exists(input))
 				{
-					foreach (string sub in Directory.EnumerateFiles(_input, "*", SearchOption.AllDirectories))
+					foreach (string sub in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						if (sub != ".." && sub != ".")
 						{
-							RestoreHeader(sub);
-						}
-					}
-				}
-			}
-			else
-			{
-				// If it's a single file, just check it
-				if (File.Exists(_input))
-				{
-					DetectSkipperAndTransform(_input);
-				}
-				// If it's a directory, recursively check all
-				else if (Directory.Exists(_input))
-				{
-					foreach (string sub in Directory.EnumerateFiles(_input, "*", SearchOption.AllDirectories))
-					{
-						if (sub != ".." && sub != ".")
-						{
-							DetectSkipperAndTransform(sub);
+							success &= RestoreHeader(sub);
 						}
 					}
 				}
 			}
 
-			return true;
+			return success;
+		}
+
+		/// <summary>
+		/// Intermediary to route the input file to the correct method(s)
+		/// </summary>
+		/// <param name="input">Input file name</param>
+		/// <returns>True on success, false otherwise</returns>
+		private bool ProcessHelper(string input)
+		{
+			if (_restore)
+			{
+				return RestoreHeader(input);
+			}
+			else
+			{
+				return DetectSkipperAndTransform(input);
+			}
 		}
 
 		/// <summary>
@@ -86,7 +85,7 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="file">Name of the file to be parsed</param>
 		/// <returns>True if the output file was created, false otherwise</returns>
-		public bool DetectSkipperAndTransform(string file)
+		private bool DetectSkipperAndTransform(string file)
 		{
 			_logger.User("\nGetting skipper information for '" + file + "'");
 
@@ -145,7 +144,7 @@ namespace SabreTools
 		/// <param name="header">String representing the header bytes</param>
 		/// <param name="SHA1">SHA-1 of the deheadered file</param>
 		/// <param name="type">HeaderType representing the detected header</param>
-		public void AddHeaderToDatabase(string header, string SHA1, HeaderType type)
+		private void AddHeaderToDatabase(string header, string SHA1, HeaderType type)
 		{
 			bool exists = false;
 
@@ -184,7 +183,7 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="file">Name of the file to be parsed</param>
 		/// <returns>True if a header was found and appended, false otherwise</returns>
-		public bool RestoreHeader(string file)
+		private bool RestoreHeader(string file)
 		{
 			// First, get the SHA-1 hash of the file
 			Rom rom = FileTools.GetSingleFileInfo(file);

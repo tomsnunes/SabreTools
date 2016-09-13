@@ -322,11 +322,8 @@ namespace SabreTools
 		/// <param name="logger">Logger object for file and console output</param>
 		private static void InitHeaderer(List<string> inputs, bool restore, Logger logger)
 		{
-			foreach (string input in inputs)
-			{
-				Headerer headerer = new Headerer(input, restore, logger);
-				headerer.Process();
-			}
+			Headerer headerer = new Headerer(inputs, restore, logger);
+			headerer.Process();
 		}
 
 		/// <summary>
