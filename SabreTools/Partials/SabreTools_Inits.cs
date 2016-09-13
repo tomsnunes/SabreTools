@@ -386,6 +386,38 @@ namespace SabreTools
 		}
 
 		/// <summary>
+		/// Wrap sorting files using an input DAT
+		/// </summary>
+		/// <param name="datfiles">Names of the DATs to compare against</param>
+		/// <param name="inputs">List of input files/folders to check</param>
+		/// <param name="outdir">Output directory to use to build to</param>
+		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
+		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
+		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
+		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
+		/// <param name="tgz">True if files should be output in TorrentGZ format, false for standard zip</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
+		/// <param name="gz">Integer representing the archive handling level for GZip</param>
+		/// <param name="rar">Integer representing the archive handling level for RAR</param>
+		/// <param name="zip">Integer representing the archive handling level for Zip</param>
+		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		private static void InitSimpleSort(List<string> datfiles, List<string> inputs, string outdir, string tempdir, bool quickScan,
+			bool toFolder, bool verify, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
+		{
+			// Add all of the input DATs into one huge internal DAT
+			Dat datdata = new Dat();
+			foreach (string datfile in datfiles)
+			{
+				datdata = DatTools.Parse(datfile, 99, 99, datdata, logger);
+			}
+
+			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, toFolder, verify, tgz, romba, sevenzip, gz, rar, zip, updateDat, logger);
+			ss.StartProcessing();
+		}
+
+		/// <summary>
 		/// Wrap getting statistics on a DAT or folder of DATs
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
