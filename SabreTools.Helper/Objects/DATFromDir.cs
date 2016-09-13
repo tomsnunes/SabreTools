@@ -25,6 +25,7 @@ namespace SabreTools
 		private bool _bare;
 		private bool _archivesAsFiles;
 		private bool _enableGzip;
+		private bool _addblanks;
 		private bool _nowrite;
 
 		// Other required variables
@@ -60,6 +61,7 @@ namespace SabreTools
 			_enableGzip = enableGzip;
 			_tempDir = tempDir;
 			_logger = logger;
+			_addblanks = false; // This needs a proper flag later
 			_nowrite = nowrite;
 		}
 
@@ -163,8 +165,8 @@ namespace SabreTools
 							lastparent = ProcessPossibleArchive(subitem, sw, lastparent);
 						}
 
-						// In romba mode we ignore empty folders completely
-						if (!_datdata.Romba)
+						// Now find all folders that are empty, if we are supposed to
+						if (!_datdata.Romba && _addblanks)
 						{
 							// If there were no subitems, add a "blank" game to to the set (if not in Romba mode)
 							if (!items)
@@ -253,8 +255,8 @@ namespace SabreTools
 				}
 			}
 
-			// Now output any empties to the stream (if not in Romba mode)
-			if (!_datdata.Romba)
+			// Now find all folders that are empty, if we are supposed to
+			if (!_datdata.Romba && _addblanks)
 			{
 				List<string> keys = _datdata.Files.Keys.ToList();
 				foreach (string key in keys)
