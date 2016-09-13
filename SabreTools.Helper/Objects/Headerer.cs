@@ -17,11 +17,6 @@ namespace SabreTools
 		private string _outdir;
 		private Logger _logger;
 
-		// Private required variables
-		private static string _headererDbSchema = "Headerer";
-		private static string _headererDbName = "Headerer.sqlite";
-		private static string _headererConnectionString = "Data Source=" + _headererDbName + ";Version = 3;";
-
 		/// <summary>
 		/// Create a new Headerer object
 		/// </summary>
@@ -152,7 +147,7 @@ namespace SabreTools
 			bool exists = false;
 
 			string query = @"SELECT * FROM data WHERE sha1='" + SHA1 + "' AND header='" + header + "'";
-			using (SqliteConnection dbc = new SqliteConnection(_headererConnectionString))
+			using (SqliteConnection dbc = new SqliteConnection(Constants.HeadererConnectionString))
 			{
 				dbc.Open();
 				using (SqliteCommand slc = new SqliteCommand(query, dbc))
@@ -170,7 +165,7 @@ namespace SabreTools
 				SHA1 + "', " +
 				"'" + header + "', " +
 				"'" + type.ToString() + "')";
-				using (SqliteConnection dbc = new SqliteConnection(_headererConnectionString))
+				using (SqliteConnection dbc = new SqliteConnection(Constants.HeadererConnectionString))
 				{
 					dbc.Open();
 					using (SqliteCommand slc = new SqliteCommand(query, dbc))
@@ -195,7 +190,7 @@ namespace SabreTools
 			string header = "";
 
 			string query = @"SELECT header, type FROM data WHERE sha1='" + rom.HashData.SHA1 + "'";
-			using (SqliteConnection dbc = new SqliteConnection(_headererConnectionString))
+			using (SqliteConnection dbc = new SqliteConnection(Constants.HeadererConnectionString))
 			{
 				dbc.Open();
 				using (SqliteCommand slc = new SqliteCommand(query, dbc))

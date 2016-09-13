@@ -171,5 +171,16 @@ namespace SabreTools.Helper
 		public static byte[] TorrentGZHeader = new byte[] { 0x1f, 0x8b, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1c, 0x00 };
 
 		#endregion
+
+		#region Database schema
+
+		public static string DATabaseDbSchema = "dats";
+		public static string DATabaseFileName = "dats.sqlite";
+		public static string DATabaseConnectionString = "Data Source=" + DATabaseFileName + ";Version = 3;";
+		public static string HeadererDbSchema = "Headerer";
+		public static string HeadererFileName = "Headerer.sqlite";
+		public static string HeadererConnectionString = "Data Source=" + HeadererFileName + ";Version = 3;";
+
+		#endregion
 	}
 }

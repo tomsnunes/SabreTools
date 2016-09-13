@@ -18,7 +18,7 @@ namespace SabreTools
 		/// <param name="url">Source URL(s)</param>
 		private static void InitAddSource(string name, string url)
 		{
-			if (DBTools.AddSource(name, url, _databaseConnectionString))
+			if (DBTools.AddSource(name, url, Constants.DATabaseConnectionString))
 			{
 				_logger.Log("Source " + name + " added!");
 			}
@@ -35,7 +35,7 @@ namespace SabreTools
 		/// <param name="system">System name</param>
 		private static void InitAddSystem(string manufacturer, string system)
 		{
-			if (DBTools.AddSystem(manufacturer, system, _databaseConnectionString))
+			if (DBTools.AddSystem(manufacturer, system, Constants.DATabaseConnectionString))
 			{
 				_logger.Log("System " + manufacturer + " - " + system + " added!");
 			}
@@ -241,7 +241,7 @@ namespace SabreTools
 		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
 		private static void InitGenerate(string systemid, bool norename, bool old)
 		{
-			IGenerate gen = new GenerateTwo(systemid, "" /* sourceid */, _datroot, _outroot, _databaseConnectionString, _logger, norename, old);
+			IGenerate gen = new GenerateTwo(systemid, "" /* sourceid */, _datroot, _outroot, Constants.DATabaseConnectionString, _logger, norename, old);
 			gen.Export();
 		}
 
@@ -251,7 +251,7 @@ namespace SabreTools
 		private static void InitGenerateAll(bool norename, bool old)
 		{
 			List<string> systems = new List<string>();
-			using (SqliteConnection dbc = new SqliteConnection(_databaseConnectionString))
+			using (SqliteConnection dbc = new SqliteConnection(Constants.DATabaseConnectionString))
 			{
 				dbc.Open();
 
@@ -333,7 +333,7 @@ namespace SabreTools
 		/// <param name="ignore"></param>
 		private static void InitImport(bool ignore)
 		{
-			IImport imp = new ImportTwo(_datroot, _databaseConnectionString, _logger, ignore);
+			IImport imp = new ImportTwo(_datroot, Constants.DATabaseConnectionString, _logger, ignore);
 			imp.UpdateDatabase();
 		}
 
@@ -346,7 +346,7 @@ namespace SabreTools
 			int srcid = -1;
 			if (Int32.TryParse(sourceid, out srcid))
 			{
-				if (DBTools.RemoveSource(srcid, _databaseConnectionString))
+				if (DBTools.RemoveSource(srcid, Constants.DATabaseConnectionString))
 				{
 					_logger.Log("Source '" + srcid + "' removed!");
 				}
@@ -370,7 +370,7 @@ namespace SabreTools
 			int sysid = -1;
 			if (Int32.TryParse(systemid, out sysid))
 			{
-				if (DBTools.RemoveSystem(sysid, _databaseConnectionString))
+				if (DBTools.RemoveSystem(sysid, Constants.DATabaseConnectionString))
 				{
 					_logger.Log("System '" + sysid + "' removed!");
 				}
