@@ -250,9 +250,9 @@ namespace SabreTools.Helper
 				});
 				return true;
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				Console.WriteLine(ex);
+				// Absorb the error
 				return false;
 			}
 		}

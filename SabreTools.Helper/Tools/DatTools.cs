@@ -272,7 +272,7 @@ namespace SabreTools.Helper
 				{
 					GroupCollection gc = Regex.Match(line, Constants.HeaderPatternCMP).Groups;
 
-					if (gc[1].Value == "clrmamepro" || gc[1].Value == "romvault")
+					if (gc[1].Value == "clrmamepro" || gc[1].Value == "romvault" || gc[1].Value.ToLowerInvariant() == "doscenter")
 					{
 						blockname = "header";
 					}
@@ -281,7 +281,7 @@ namespace SabreTools.Helper
 				}
 
 				// If the line is a rom or disk and we're in a block
-				else if ((line.Trim().StartsWith("rom (") || line.Trim().StartsWith("disk (")) && block)
+				else if ((line.Trim().StartsWith("rom (") || line.Trim().StartsWith("disk (") || line.Trim().StartsWith("file (")) && block)
 				{
 					Rom rom = new Rom
 					{
@@ -347,6 +347,10 @@ namespace SabreTools.Helper
 										rom.Nodump = true;
 									}
 									break;
+								case "date":
+									rom.Date = gc[i].Replace("\"", "") + " " + gc[i+1].Replace("\"", "");
+									i++;
+									break;
 							}
 
 							attrib = "";
@@ -404,6 +408,10 @@ namespace SabreTools.Helper
 										rom.Nodump = true;
 									}
 									break;
+								case "date":
+									rom.Date = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
+									i++;
+									break;
 							}
 
 							quote = false;
@@ -455,6 +463,7 @@ namespace SabreTools.Helper
 						switch (gc[1].Value)
 						{
 							case "name":
+							case "Name:":
 								datdata.Name = (String.IsNullOrEmpty(datdata.Name) ? itemval : datdata.Name);
 								superdat = superdat || itemval.Contains(" - SuperDAT");
 								if (keep && superdat)
@@ -463,6 +472,7 @@ namespace SabreTools.Helper
 								}
 								break;
 							case "description":
+							case "Description:":
 								datdata.Description = (String.IsNullOrEmpty(datdata.Description) ? itemval : datdata.Description);
 								break;
 							case "rootdir":
@@ -472,24 +482,29 @@ namespace SabreTools.Helper
 								datdata.Category = (String.IsNullOrEmpty(datdata.Category) ? itemval : datdata.Category);
 								break;
 							case "version":
+							case "Version:":
 								datdata.Version = (String.IsNullOrEmpty(datdata.Version) ? itemval : datdata.Version);
 								break;
 							case "date":
+							case "Date:":
 								datdata.Date = (String.IsNullOrEmpty(datdata.Date) ? itemval : datdata.Date);
 								break;
 							case "author":
+							case "Author:":
 								datdata.Author = (String.IsNullOrEmpty(datdata.Author) ? itemval : datdata.Author);
 								break;
 							case "email":
 								datdata.Email = (String.IsNullOrEmpty(datdata.Email) ? itemval : datdata.Email);
 								break;
 							case "homepage":
+							case "Homepage:":
 								datdata.Homepage = (String.IsNullOrEmpty(datdata.Homepage) ? itemval : datdata.Homepage);
 								break;
 							case "url":
 								datdata.Url = (String.IsNullOrEmpty(datdata.Url) ? itemval : datdata.Url);
 								break;
 							case "comment":
+							case "Comment:":
 								datdata.Comment = (String.IsNullOrEmpty(datdata.Comment) ? itemval : datdata.Comment);
 								break;
 							case "header":
