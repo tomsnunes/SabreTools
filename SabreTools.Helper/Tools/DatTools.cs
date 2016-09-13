@@ -280,9 +280,31 @@ namespace SabreTools.Helper
 					block = true;
 				}
 
-				// If the line is a rom or disk and we're in a block
-				else if ((line.Trim().StartsWith("rom (") || line.Trim().StartsWith("disk (") || line.Trim().StartsWith("file (")) && block)
+				// If the line is a rom-like item and we're in a block
+				else if ((line.Trim().StartsWith("rom (")
+						|| line.Trim().StartsWith("disk (")
+						|| line.Trim().StartsWith("file (")
+						|| (line.Trim().StartsWith("sample") && !line.Trim().StartsWith("sampleof"))
+					) && block)
 				{
+					ItemType temptype = ItemType.Rom;
+					if (line.Trim().StartsWith("rom ("))
+					{
+						temptype = ItemType.Rom;
+					}
+					else if (line.Trim().StartsWith("disk ("))
+					{
+						temptype = ItemType.Disk;
+					}
+					else if (line.Trim().StartsWith("file ("))
+					{
+						temptype = ItemType.Rom;
+					}
+					else if (line.Trim().StartsWith("sample"))
+					{
+						temptype = ItemType.Sample;
+					}
+
 					Rom rom = new Rom
 					{
 						Machine = new Machine
@@ -295,128 +317,139 @@ namespace SabreTools.Helper
 							Manufacturer = manufacturer,
 							Year = year,
 						},
-						Type = (line.Trim().StartsWith("disk (") ? ItemType.Disk : ItemType.Rom),
+						Type = temptype,
 						Metadata = new SourceMetadata { SystemID = sysid, SourceID = srcid },
 					};
 
-					string[] gc = line.Trim().Split(' ');
-
-					// Loop over all attributes and add them if possible
-					bool quote = false;
-					string attrib = "", val = "";
-					for (int i = 2; i < gc.Length; i++)
+					// If we have a sample, treat it special
+					if (temptype == ItemType.Sample)
 					{
-						//If the item is empty, we automatically skip it because it's a fluke
-						if (gc[i].Trim() == String.Empty)
-						{
-							continue;
-						}
-						// Special case for nodump...
-						else if (gc[i] == "nodump" && attrib != "status" && attrib != "flags")
-						{
-							rom.Nodump = true;
-						}
-						// Even number of quotes, not in a quote, not in attribute
-						else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib == "")
-						{
-							attrib = gc[i].Replace("\"", "");
-						}
-						// Even number of quotes, not in a quote, in attribute
-						else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib != "")
-						{
-							switch (attrib.ToLowerInvariant())
-							{
-								case "name":
-									rom.Name = gc[i].Replace("\"", "");
-									break;
-								case "size":
-									Int64.TryParse(gc[i].Replace("\"", ""), out rom.HashData.Size);
-									break;
-								case "crc":
-									rom.HashData.CRC = gc[i].Replace("\"", "").ToLowerInvariant();
-									break;
-								case "md5":
-									rom.HashData.MD5 = gc[i].Replace("\"", "").ToLowerInvariant();
-									break;
-								case "sha1":
-									rom.HashData.SHA1 = gc[i].Replace("\"", "").ToLowerInvariant();
-									break;
-								case "flags":
-									if (gc[i].Replace("\"", "").ToLowerInvariant() == "nodump")
-									{
-										rom.Nodump = true;
-									}
-									break;
-								case "date":
-									rom.Date = gc[i].Replace("\"", "") + " " + gc[i+1].Replace("\"", "");
-									i++;
-									break;
-							}
+						line = line.Trim().Remove(0, 6).Trim().Replace("\"", ""); // Remove "sample" from the input string
+						rom.Name = line;
+					}
 
-							attrib = "";
-						}
-						// Even number of quotes, in a quote, not in attribute
-						else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && quote && attrib == "")
-						{
-							// Attributes can't have quoted names
-						}
-						// Even number of quotes, in a quote, in attribute
-						else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && quote && attrib != "")
-						{
-							val += " " + gc[i];
-						}
-						// Odd number of quotes, not in a quote, not in attribute
-						else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && !quote && attrib == "")
-						{
-							// Attributes can't have quoted names
-						}
-						// Odd number of quotes, not in a quote, in attribute
-						else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && !quote && attrib != "")
-						{
-							val = gc[i].Replace("\"", "");
-							quote = true;
-						}
-						// Odd number of quotes, in a quote, not in attribute
-						else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && quote && attrib == "")
-						{
-							quote = false;
-						}
-						// Odd number of quotes, in a quote, in attribute
-						else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && quote && attrib != "")
-						{
-							val += " " + gc[i].Replace("\"", "");
-							switch (attrib.ToLowerInvariant())
-							{
-								case "name":
-									rom.Name = val;
-									break;
-								case "size":
-									Int64.TryParse(val, out rom.HashData.Size);
-									break;
-								case "crc":
-									rom.HashData.CRC = val.ToLowerInvariant();
-									break;
-								case "md5":
-									rom.HashData.MD5 = val.ToLowerInvariant();
-									break;
-								case "sha1":
-									rom.HashData.SHA1 = val.ToLowerInvariant();
-									break;
-								case "flags":
-									if (val.ToLowerInvariant() == "nodump")
-									{
-										rom.Nodump = true;
-									}
-									break;
-								case "date":
-									rom.Date = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
-									i++;
-									break;
-							}
+					// Otherwise, process the rest of the line
+					else
+					{
+						string[] gc = line.Trim().Split(' ');
 
-							quote = false;
-							attrib = "";
-							val = "";
+						// Loop over all attributes and add them if possible
+						bool quote = false;
+						string attrib = "", val = "";
+						for (int i = 2; i < gc.Length; i++)
+						{
+							//If the item is empty, we automatically skip it because it's a fluke
+							if (gc[i].Trim() == String.Empty)
+							{
+								continue;
+							}
+							// Special case for nodump...
+							else if (gc[i] == "nodump" && attrib != "status" && attrib != "flags")
+							{
+								rom.Nodump = true;
+							}
+							// Even number of quotes, not in a quote, not in attribute
+							else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib == "")
+							{
+								attrib = gc[i].Replace("\"", "");
+							}
+							// Even number of quotes, not in a quote, in attribute
+							else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib != "")
+							{
+								switch (attrib.ToLowerInvariant())
+								{
+									case "name":
+										rom.Name = gc[i].Replace("\"", "");
+										break;
+									case "size":
+										Int64.TryParse(gc[i].Replace("\"", ""), out rom.HashData.Size);
+										break;
+									case "crc":
+										rom.HashData.CRC = gc[i].Replace("\"", "").ToLowerInvariant();
+										break;
+									case "md5":
+										rom.HashData.MD5 = gc[i].Replace("\"", "").ToLowerInvariant();
+										break;
+									case "sha1":
+										rom.HashData.SHA1 = gc[i].Replace("\"", "").ToLowerInvariant();
+										break;
+									case "flags":
+										if (gc[i].Replace("\"", "").ToLowerInvariant() == "nodump")
+										{
+											rom.Nodump = true;
+										}
+										break;
+									case "date":
+										rom.Date = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
+										i++;
+										break;
+								}
+
+								attrib = "";
+							}
+							// Even number of quotes, in a quote, not in attribute
+							else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && quote && attrib == "")
+							{
+								// Attributes can't have quoted names
+							}
+							// Even number of quotes, in a quote, in attribute
+							else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && quote && attrib != "")
+							{
+								val += " " + gc[i];
+							}
+							// Odd number of quotes, not in a quote, not in attribute
+							else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && !quote && attrib == "")
+							{
+								// Attributes can't have quoted names
+							}
+							// Odd number of quotes, not in a quote, in attribute
+							else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && !quote && attrib != "")
+							{
+								val = gc[i].Replace("\"", "");
+								quote = true;
+							}
+							// Odd number of quotes, in a quote, not in attribute
+							else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && quote && attrib == "")
+							{
+								quote = false;
+							}
+							// Odd number of quotes, in a quote, in attribute
+							else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && quote && attrib != "")
+							{
+								val += " " + gc[i].Replace("\"", "");
+								switch (attrib.ToLowerInvariant())
+								{
+									case "name":
+										rom.Name = val;
+										break;
+									case "size":
+										Int64.TryParse(val, out rom.HashData.Size);
+										break;
+									case "crc":
+										rom.HashData.CRC = val.ToLowerInvariant();
+										break;
+									case "md5":
+										rom.HashData.MD5 = val.ToLowerInvariant();
+										break;
+									case "sha1":
+										rom.HashData.SHA1 = val.ToLowerInvariant();
+										break;
+									case "flags":
+										if (val.ToLowerInvariant() == "nodump")
+										{
+											rom.Nodump = true;
+										}
+										break;
+									case "date":
+										rom.Date = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
+										i++;
+										break;
+								}
+
+								quote = false;
+								attrib = "";
+								val = "";
+							}
 						}
 					}
 
@@ -529,7 +562,15 @@ namespace SabreTools.Helper
 								}
 								break;
 							case "forcezipping":
-								datdata.ForcePacking = (itemval == "yes" ? ForcePacking.Zip : ForcePacking.Unzip);
+								switch (itemval)
+								{
+									case "yes":
+										datdata.ForcePacking = ForcePacking.Zip;
+										break;
+									case "no":
+										datdata.ForcePacking = ForcePacking.Unzip;
+										break;
+								}
 								break;
 						}
 					}
@@ -962,9 +1003,14 @@ namespace SabreTools.Helper
 											superdat = superdat || content.Contains("SuperDAT");
 											break;
 										case "clrmamepro":
+										case "romcenter":
 											if (headreader.GetAttribute("header") != null)
 											{
 												datdata.Header = (String.IsNullOrEmpty(datdata.Header) ? headreader.GetAttribute("header") : datdata.Header);
+											}
+											if (headreader.GetAttribute("plugin") != null)
+											{
+												datdata.Header = (String.IsNullOrEmpty(datdata.Header) ? headreader.GetAttribute("plugin") : datdata.Header);
 											}
 											if (headreader.GetAttribute("forcemerging") != null)
 											{
@@ -1171,6 +1217,101 @@ namespace SabreTools.Helper
 											break;
 										case "manufacturer":
 											manufacturer = subreader.ReadElementContentAsString();
+											break;
+										case "release":
+											bool? defaultrel = null;
+											if (subreader.GetAttribute("default") != null)
+											{
+												if (subreader.GetAttribute("default") == "yes")
+												{
+													defaultrel = true;
+												}
+												else if (subreader.GetAttribute("default") == "no")
+												{
+													defaultrel = false;
+												}
+											}
+
+											Rom relrom = new Rom
+											{
+												Machine = new Machine
+												{
+													Name = tempname,
+													Description = gamedesc,
+													RomOf = romof,
+													CloneOf = cloneof,
+													SampleOf = sampleof,
+												},
+												Name = subreader.GetAttribute("name"),
+												Type = ItemType.Release,
+												Region = subreader.GetAttribute("region"),
+												Language = subreader.GetAttribute("language"),
+												Default = defaultrel,
+												Metadata = new SourceMetadata { SystemID = sysid, System = filename, SourceID = srcid },
+											};
+
+											// Now process and add the rom
+											datdata = ParseAddHelper(relrom, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
+
+											subreader.Read();
+											break;
+										case "biosset":
+											bool? defaultbios = null;
+											if (subreader.GetAttribute("default") != null)
+											{
+												if (subreader.GetAttribute("default") == "yes")
+												{
+													defaultbios = true;
+												}
+												else if (subreader.GetAttribute("default") == "no")
+												{
+													defaultbios = false;
+												}
+											}
+
+											Rom biosrom = new Rom
+											{
+												Machine = new Machine
+												{
+													Name = tempname,
+													Description = gamedesc,
+													RomOf = romof,
+													CloneOf = cloneof,
+													SampleOf = sampleof,
+												},
+												Name = subreader.GetAttribute("name"),
+												Type = ItemType.BiosSet,
+												Description = subreader.GetAttribute("description"),
+												Default = defaultbios,
+												Metadata = new SourceMetadata { SystemID = sysid, System = filename, SourceID = srcid },
+											};
+
+											// Now process and add the rom
+											datdata = ParseAddHelper(biosrom, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
+
+											subreader.Read();
+											break;
+										case "archive":
+										case "sample":
+											Rom samplerom = new Rom
+											{
+												Machine = new Machine
+												{
+													Name = tempname,
+													Description = gamedesc,
+													RomOf = romof,
+													CloneOf = cloneof,
+													SampleOf = sampleof,
+												},
+												Name = subreader.GetAttribute("name"),
+												Type = (subreader.Name == "sample" ? ItemType.Sample : ItemType.Archive),
+												Metadata = new SourceMetadata { SystemID = sysid, System = filename, SourceID = srcid },
+											};
+
+											// Now process and add the rom
+											datdata = ParseAddHelper(samplerom, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
+
+											subreader.Read();
 											break;
 										case "rom":
 										case "disk":
@@ -3071,7 +3212,9 @@ namespace SabreTools.Helper
 						state += rom.HashData.SHA1 + " *" + rom.Name + "\n";
 						break;
 					case OutputFormat.RomCenter:
-						state += "¬¬¬" + HttpUtility.HtmlEncode(rom.Machine) +
+						state += "¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
+							"¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
+							"¬" + HttpUtility.HtmlEncode(rom.Machine.Name) +
 							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
 							"¬" + rom.HashData.CRC.ToLowerInvariant() +

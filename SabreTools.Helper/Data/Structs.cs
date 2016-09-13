@@ -205,6 +205,12 @@ namespace SabreTools.Helper
 		public string Date;
 		public SourceMetadata Metadata;
 
+		// Non rom or disk
+		public string Region;
+		public string Language;
+		public bool? Default;
+		public string Description;
+
 		public int CompareTo(object obj)
 		{
 			int ret = 0;
