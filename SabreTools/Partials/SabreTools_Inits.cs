@@ -136,6 +136,7 @@ namespace SabreTools
 				OutputFormat = (outputFormat == 0 ? OutputFormat.Xml : outputFormat),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
+				Files = new Dictionary<string, List<Rom>>(),
 			};
 
 			// If the user has only set a single thread, use the original version
