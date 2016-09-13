@@ -81,7 +81,6 @@ namespace SabreTools
 				bare = false,
 				clean = false,
 				datfromdir = false,
-				datfromdirparallel = false,
 				datprefix = false,
 				dedup = false,
 				enableGzip = false,
@@ -237,11 +236,6 @@ namespace SabreTools
 					case "-din":
 					case "--diff-nd":
 						diffMode |= DiffMode.NoDupes;
-						break;
-					case "-dp":
-					case "--d2dp":
-					case "--dfdp":
-						datfromdirparallel = true;
 						break;
 					case "-es":
 					case "--ext-split":
@@ -624,7 +618,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(add ^ datfromdir ^ datfromdirparallel ^ extsplit ^ generate ^ genall ^ hashsplit ^ headerer ^ import ^ listsrc ^
+			if (!(add ^ datfromdir ^ extsplit ^ generate ^ genall ^ hashsplit ^ headerer ^ import ^ listsrc ^
 				listsys ^ (merge || diffMode != 0 || update || outputFormat != 0 || tsv != null|| trim) ^ rem ^ stats ^ typesplit))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
@@ -634,7 +628,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (datfromdir || datfromdirparallel || extsplit || hashsplit || headerer
+			if (inputs.Count == 0 && (datfromdir || extsplit || hashsplit || headerer
 				|| (merge || diffMode != 0 || update || outputFormat != 0 || tsv != null) || stats || trim || typesplit))
 			{
 				_logger.Error("This feature requires at least one input");
@@ -666,13 +660,6 @@ namespace SabreTools
 			else if (datfromdir)
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
-					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir);
-			}
-
-			// Create a DAT from a directory or set of directories in parallel
-			else if (datfromdirparallel)
-			{
-				InitDatFromDirParallel(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
 					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir, maxParallelism);
 			}
 

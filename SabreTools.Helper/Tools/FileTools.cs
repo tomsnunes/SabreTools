@@ -423,80 +423,6 @@ namespace SabreTools.Helper
 		#region Archive-to-Archive Handling
 
 		/// <summary>
-		/// Attempt to copy a file between archives
-		/// </summary>
-		/// <param name="inputArchive">Source archive name</param>
-		/// <param name="outputArchive">Destination archive name</param>
-		/// <param name="sourceEntryName">Input entry name</param>
-		/// <param name="destEntryName">Output entry name</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>True if the copy was a success, false otherwise</returns>
-		public static bool CopyFileBetweenArchives(string inputArchive, string outputArchive,
-			string sourceEntryName, string destEntryName, Logger logger)
-		{
-			bool success = false;
-
-			// First get the archive types
-			ArchiveType? iat = GetCurrentArchiveType(inputArchive, logger);
-			ArchiveType? oat = (File.Exists(outputArchive) ? GetCurrentArchiveType(outputArchive, logger) : ArchiveType.Zip);
-
-			// If we got back null (or the output is not a Zipfile), then it's not an archive, so we we return
-			if (iat == null || (oat == null || oat != ArchiveType.Zip) || inputArchive == outputArchive)
-			{
-				return success;
-			}
-
-			IReader reader = null;
-			ZipArchive outarchive = null;
-			try
-			{
-				reader = ReaderFactory.Open(File.OpenRead(inputArchive));
-
-				if (iat == ArchiveType.Zip || iat == ArchiveType.SevenZip || iat == ArchiveType.Rar)
-				{
-					while (reader.MoveToNextEntry())
-					{
-						logger.Log("Current entry name: '" + reader.Entry.Key + "'");
-						if (reader.Entry != null && reader.Entry.Key.Contains(sourceEntryName))
-						{
-							if (!File.Exists(outputArchive))
-							{
-								outarchive = ZipFile.Open(outputArchive, ZipArchiveMode.Create);
-							}
-							else
-							{
-								outarchive = ZipFile.Open(outputArchive, ZipArchiveMode.Update);
-							}
-
-							if (outarchive.Mode == ZipArchiveMode.Create || outarchive.GetEntry(destEntryName) == null)
-							{
-								ZipArchiveEntry iae = outarchive.CreateEntry(destEntryName, CompressionLevel.Optimal) as ZipArchiveEntry;
-
-								using (Stream iaestream = iae.Open())
-								{
-									reader.WriteEntryTo(iaestream);
-								}
-							}
-							success = true;
-						}
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				logger.Error(ex.ToString());
-				success = false;
-			}
-			finally
-			{
-				reader?.Dispose();
-				outarchive?.Dispose();
-			}
-
-			return success;
-		}
-
-		/// <summary>
 		/// Attempt to copy a file between archives using SharpCompress
 		/// </summary>
 		/// <param name="inputArchive">Source archive name</param>
@@ -505,7 +431,7 @@ namespace SabreTools.Helper
 		/// <param name="destEntryName">Output entry name</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the copy was a success, false otherwise</returns>
-		public static bool CopyFileBetweenManagedArchives(string inputArchive, string outputArchive,
+		public static bool CopyFileBetweenArchives(string inputArchive, string outputArchive,
 			string sourceEntryName, string destEntryName, Logger logger)
 		{
 			bool success = false;

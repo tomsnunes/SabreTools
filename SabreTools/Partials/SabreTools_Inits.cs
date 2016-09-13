@@ -83,72 +83,6 @@ namespace SabreTools
 		}
 
 		/// <summary>
-		/// Wrap creating a DAT file from files or a directory
-		/// </summary>
-		/// <param name="input">List of innput filenames</param>
-		/// <param name="filename">New filename</param>
-		/// <param name="name">New name</param>
-		/// <param name="description">New description</param>
-		/// <param name="category">New category</param>
-		/// <param name="version">New version</param>
-		/// <param name="author">New author</param>
-		/// <param name="forceunpack">True to set forcepacking="unzip" on the created file, false otherwise</param>
-		/// <param name="outputFormat">OutputFormat to be used for outputting the DAT</param>
-		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
-		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
-		/// <param name="noMD5">True to disable getting MD5 hash, false otherwise</param>
-		/// <param name="noSHA1">True to disable getting SHA-1 hash, false otherwise</param>
-		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
-		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
-		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
-		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
-		private static void InitDatFromDir(List<string> inputs,
-			string filename,
-			string name,
-			string description,
-			string category,
-			string version,
-			string author,
-			bool forceunpack,
-			OutputFormat outputFormat,
-			bool romba,
-			bool superdat,
-			bool noMD5,
-			bool noSHA1,
-			bool bare,
-			bool archivesAsFiles,
-			bool enableGzip,
-			string tempDir)
-		{
-			// Create a new DATFromDir object and process the inputs
-			Dat datdata = new Dat
-			{
-				FileName = filename,
-				Name = name,
-				Description = description,
-				Category = category,
-				Version = version,
-				Date = DateTime.Now.ToString("yyyy-MM-dd"),
-				Author = author,
-				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (outputFormat == 0 ? OutputFormat.Xml : outputFormat),
-				Romba = romba,
-				Type = (superdat ? "SuperDAT" : ""),
-				Files = new Dictionary<string, List<Rom>>(),
-			};
-
-			DATFromDir dfd = new DATFromDir(inputs, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
-			bool success = dfd.Start();
-
-			// If we failed, show the help
-			if (!success)
-			{
-				Console.WriteLine();
-				Build.Help();
-			}
-		}
-
-		/// <summary>
 		/// Wrap creating a DAT file from files or a directory in parallel
 		/// </summary>
 		/// <param name="inputs">List of input filenames</param>
@@ -169,7 +103,7 @@ namespace SabreTools
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		private static void InitDatFromDirParallel(List<string> inputs,
+		private static void InitDatFromDir(List<string> inputs,
 			string filename,
 			string name,
 			string description,
@@ -204,30 +138,48 @@ namespace SabreTools
 				Type = (superdat ? "SuperDAT" : ""),
 			};
 
-			// For each input directory, create a DAT
-			foreach (string path in inputs)
+			// If the user has only set a single thread, use the original version
+			if (maxDegreeOfParallelism == 1)
 			{
-				if (Directory.Exists(path))
+				DATFromDir dfd = new DATFromDir(inputs, basedat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, _logger);
+				bool success = dfd.Start();
+
+				// If we failed, show the help
+				if (!success)
 				{
-					// Clone the base Dat for information
-					Dat datdata = (Dat)basedat.Clone();
-					datdata.Files = new Dictionary<string, List<Rom>>();
-
-					string basePath = Path.GetFullPath(path);
-					DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, maxDegreeOfParallelism, _logger);
-					bool success = dfd.Start();
-
-					// If it was a success, write the DAT out
-					if (success)
+					Console.WriteLine();
+					Build.Help();
+				}
+			}
+			
+			// Otherwise, make full use of the threads
+			else
+			{
+				// For each input directory, create a DAT
+				foreach (string path in inputs)
+				{
+					if (Directory.Exists(path))
 					{
-						DatTools.WriteDatfile(dfd.DatData, "", _logger);
-					}
+						// Clone the base Dat for information
+						Dat datdata = (Dat)basedat.Clone();
+						datdata.Files = new Dictionary<string, List<Rom>>();
 
-					// Otherwise, show the help
-					else
-					{
-						Console.WriteLine();
-						Build.Help();
+						string basePath = Path.GetFullPath(path);
+						DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempDir, maxDegreeOfParallelism, _logger);
+						bool success = dfd.Start();
+
+						// If it was a success, write the DAT out
+						if (success)
+						{
+							DatTools.WriteDatfile(dfd.DatData, "", _logger);
+						}
+
+						// Otherwise, show the help
+						else
+						{
+							Console.WriteLine();
+							Build.Help();
+						}
 					}
 				}
 			}

@@ -234,97 +234,12 @@ Options:
 			Optionally, a temp folder can be supplied in the case the default temp directory
 			(inside the running folder) is not preferred. This is used for any operations
 			that require an archive to be extracted.
-				
-	-dp, --dfdp		Create a DAT from each input directory using parallel code
-		Create a DAT file from an input directory or set of files. By default, this will
-		output a DAT named based on the input directory and the current date. It will also
-		treat all archives as possible games and add all three hashes for each file.
-		
-		-nm, --noMD5		Don't include MD5 in output
-			This allows the user to skip calculating the MD5 for each of the files which will
-			speed up the creation of the DAT.
-			
-		-ns, --noSHA1		Don't include SHA1 in output
-			This allows the user to skip calculating the SHA-1 for each of the files which will
-			speed up the creation of the DAT.
-			
-		-b, --bare			Don't include date in file name
-			Normally, the DAT will be created with the date in the file name. This flag removes
-			that but keeps the date tag intact.
-			
-		-u, --unzip			Force unzipping in created DAT
-			This sets the 'forcepacking="unzip"' flag in the outputted DAT. When used with a
-			file manager that allows for it, this will force the outputted files to be in
-			subdirectories instead of archives.
-			
-		-f, --files			Treat archives as files
-			Instead of trying to enumerate the files within archives, treat the archives as
-			files themselves. This is good for uncompressed sets that include archives that
-			should be read as-is.
-			
-		-oc, --output-cmp	Output in CMP format
-			Add outputting the created DAT to clrmamepro format
-			
-		-om, --output-miss	Output in Missfile format
-			Add outputting the created DAT to GoodTools miss format
-			
-		-omd5, --output-md5	Output in MD5 format
-			Add outputting the created DAT to MD5 format
-			
-		-or, --output-rc	Output in RomCenter format
-			Add outputting the created DAT to RomCenter format
-			
-		-os, --output-sd	Output in SabreDAT format
-			Add outputting the created DAT to SabreDAT XML format
-			
-		-osfv, --ouput-sfv	Output in SFV format
-			Add outputting the created DAT to SFV format
-			
-		-osha1, --output-sha1	Output in SHA-1 format
-			Add outputting the created DAT to SHA1 format
-			
-		-ox, --output-xml	Output in Logiqx XML format (default)
-			Add outputting the created DAT to Logiqx XML format
-		
-		-gz, --gz-files		Allow reading of GZIP files as archives
-			Since GZip files are not commonly used for file storage, this flag allows for
-			any GZip archives to have their contents hashed instead.
-			
-		-ro, --romba		Read files from a Romba input
-			Allow for reading of GZipped files as if they were from a Romba depot. This
-			implies that the files will be in the TorrentGZ format as well, including
-			naming convention.
-			
-		-f=, --filename=	Set the external name of the DAT
-			Set the base filename for the output DAT(s) [default is folder name plus date]
-			
-		-n=, --name=		Set the internal name of the DAT
-			Set the internal name for the output DAT(s) [default is folder name plus date]
-			
-		-de=, --desc=		Set the description of the DAT
-			Set the description for the output DAT(s) [default is the folder name]
-			
-		-c=, --cat=		Set the category of the DAT
-			Set the category for the output DAT(s) [default is blank]
-			
-		-v=, --version=		Set the version of the DAT
-			Set the version for the output DAT(s) [default is blank]
-			
-		-au=, --author=		Set the author of the DAT
-			Set the author for the output DAT(s) [default is blank]
-			
-		-sd, --superdat		Enable SuperDAT creation
-			Set the type flag to "SuperDAT" for the output DAT as well as preserving the
-			directory structure of the inputted folder, if applicable
-			
-		-t=, --temp=		Set the name of the temporary directory
-			Optionally, a temp folder can be supplied in the case the default temp directory
-			(inside the running folder) is not preferred. This is used for any operations
-			that require an archive to be extracted.
 		
 		-mt={4}			Amount of threads to use
 			Optionally, set the number of threads to use for the multithreaded operations.
-			The default is 4 threads; -1 means unlimited threads created.
+			The default is 4 threads; -1 means unlimited threads created. If the user specifies
+			that only 1 thread is to be used, it defaults to the original, serial implementation
+			of the DFD code.
 			
 	-es, --ext-split	Split a DAT by two file extensions
 		For a DAT, or set of DATs, allow for splitting based on a list of input extensions.

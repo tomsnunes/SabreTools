@@ -543,7 +543,7 @@ namespace SabreTools.Helper
 									else
 									{
 										string archiveFileName = Path.Combine(_outdir, found.Machine.Name + ".zip");
-										FileTools.CopyFileBetweenManagedArchives(input, archiveFileName, rom.Name, found.Name, _logger);
+										FileTools.CopyFileBetweenArchives(input, archiveFileName, rom.Name, found.Name, _logger);
 									}
 								}
 							}
