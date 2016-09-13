@@ -1,5 +1,7 @@
 ﻿namespace SabreTools.Helper
 {
+	#region DATabase
+
 	/// <summary>
 	/// Possible DAT import classes
 	/// </summary>
@@ -17,58 +19,9 @@
 		Good,
 	}
 
-	/// <summary>
-	/// Possible detected header type
-	/// </summary>
-	public enum HeaderType
-	{
-		None = 0,
-		a7800,
-		fds,
-		lynx,
-		//n64,
-		nes,
-		pce,
-		psid,
-		snes,
-		spc,
-	}
+	#endregion
 
-	/// <summary>
-	/// Severity of the logging statement
-	/// </summary>
-	public enum LogLevel
-	{
-		VERBOSE = 0,
-		USER,
-		WARNING,
-		ERROR,
-	}
-
-	/// <summary>
-	/// Determines which type of duplicate a file is
-	/// </summary>
-	public enum DupeType
-	{
-		None = 0,
-		InternalHash = 1,
-		InternalAll = 2,
-		ExternalHash = 3,
-		ExternalAll = 4,
-	}
-
-	/// <summary>
-	/// Determine what type of file an item is
-	/// </summary>
-	public enum ItemType
-	{
-		Rom = 0,
-		Disk = 1,
-		Sample = 2,
-		Release = 3,
-		BiosSet = 4,
-		Archive = 5,
-	}
+	#region DAT related
 
 	/// <summary>
 	/// Determines forcemerging tag for DAT output
@@ -101,14 +54,54 @@
 		Unzip,
 	}
 
+	#endregion
+
+	#region Rom related
+
 	/// <summary>
-	/// Determines the level to scan archives at
+	/// Determines which type of duplicate a file is
 	/// </summary>
-	public enum ArchiveScanLevel
+	public enum DupeType
 	{
-		Both = 0,
-		Internal,
-		External,
+		None = 0,
+		InternalHash = 1,
+		InternalAll = 2,
+		ExternalHash = 3,
+		ExternalAll = 4,
+	}
+
+	/// <summary>
+	/// Determine what type of file an item is
+	/// </summary>
+	public enum ItemType
+	{
+		Rom = 0,
+		Disk = 1,
+		Sample = 2,
+		Release = 3,
+		BiosSet = 4,
+		Archive = 5,
+	}
+
+	#endregion
+
+	#region Skippers and Mappers
+
+	/// <summary>
+	/// Possible detected header type
+	/// </summary>
+	public enum HeaderType
+	{
+		None = 0,
+		a7800,
+		fds,
+		lynx,
+		//n64,
+		nes,
+		pce,
+		psid,
+		snes,
+		spc,
 	}
 
 	/// <summary>
@@ -145,15 +138,30 @@
 		Greater,
 	}
 
+	#endregion
+
+	#region Miscellaneous
+
 	/// <summary>
-	/// Determines which fields should be split on
+	/// Severity of the logging statement
 	/// </summary>
-	public enum SplitType
+	public enum LogLevel
 	{
-		None = 0,
-		Extension = 1,
-		BestAvailableHash = 2,
-		Type = 3,
-		Size = 4,
+		VERBOSE = 0,
+		USER,
+		WARNING,
+		ERROR,
 	}
+
+	/// <summary>
+	/// Determines the level to scan archives at
+	/// </summary>
+	public enum ArchiveScanLevel
+	{
+		Both = 0,
+		Internal,
+		External,
+	}
+
+	#endregion
 }
