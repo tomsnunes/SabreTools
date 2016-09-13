@@ -133,7 +133,7 @@ namespace SabreTools
 				Date = DateTime.Now.ToString("yyyy-MM-dd"),
 				Author = author,
 				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = outputFormat,
+				OutputFormat = (outputFormat == 0 ? OutputFormat.Xml : outputFormat),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
 			};
