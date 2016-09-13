@@ -8,16 +8,6 @@ This project started as a desktop port of some core features of Wizard of DATz R
 
 For the most complete set of information, see the <a href="https://raw.githubusercontent.com/mnadareski/wizzardDesktop/master/SabreTools.Helper/README.1ST">README.1ST</a> file. Currently, the SabreTools suite consists of the following programs:
 
-<!--
-<b>SabreTools UI</b>
-<p/>
-A bare-bones attempt at providing a true GUI experience for the SabreTools suite. Currently only provides the following functions:
-<ul>
-	<li>Importing and Generating DAT files in ClrMamePro and XML formats</li>
-</ul>
-This tool is not recommended for any usage.
--->
-
 <b>SabreTools</b>
 <p/>
 The main tool of the SabreTools suite. Performs the majority of the core features of the parent project, including the following (sorted by the original standalone executable, if any):

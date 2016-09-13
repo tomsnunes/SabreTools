@@ -5,8 +5,6 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SabreTools", "SabreTools\SabreTools.csproj", "{3B615702-1866-4D7B-8AF1-7B43FD0CC1D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SabreToolsUI", "SabreToolsUI\SabreToolsUI.csproj", "{7DC54E53-4A46-4323-97E1-062EEFB7E4BC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SabreTools.Helper", "SabreTools.Helper\SabreTools.Helper.csproj", "{225A1AFD-0890-44E8-B779-7502665C23A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSort", "SimpleSort\SimpleSort.csproj", "{7668FFA4-19AF-4F5D-8463-C7EF5B080FA4}"
@@ -32,10 +30,6 @@ Global
 		{3B615702-1866-4D7B-8AF1-7B43FD0CC1D0}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{3B615702-1866-4D7B-8AF1-7B43FD0CC1D0}.Release|x64.ActiveCfg = Release|x64
 		{3B615702-1866-4D7B-8AF1-7B43FD0CC1D0}.Release|x64.Build.0 = Release|x64
-		{7DC54E53-4A46-4323-97E1-062EEFB7E4BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7DC54E53-4A46-4323-97E1-062EEFB7E4BC}.Debug|x64.ActiveCfg = Debug|x64
-		{7DC54E53-4A46-4323-97E1-062EEFB7E4BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7DC54E53-4A46-4323-97E1-062EEFB7E4BC}.Release|x64.ActiveCfg = Release|x64
 		{225A1AFD-0890-44E8-B779-7502665C23A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{225A1AFD-0890-44E8-B779-7502665C23A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{225A1AFD-0890-44E8-B779-7502665C23A5}.Debug|x64.ActiveCfg = Debug|x64
