@@ -66,7 +66,8 @@ namespace SabreTools
 				Files = new Dictionary<string, List<Rom>>(),
 			};
 
-			DATFromDir dfd = new DATFromDir(inputs, datdata, false, false, true, false, true, "__temp__", _logger);
+			DATFromDir dfd = new DATFromDir(inputs, datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */,
+				false /* archivesAsFiles */, true /* enableGzip */, false /* addblanks */, "__temp__" /* tempdir */, _logger);
 			dfd.Start();
 		}
 

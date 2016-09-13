@@ -20,100 +20,65 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Copy a file to an output archive
 		/// </summary>
-		/// <param name="input">Input filename to be moved</param>
-		/// <param name="output">Output directory to build to</param>
+		/// <param name="inputFile">Input filename to be moved</param>
+		/// <param name="outputDirectory">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		public static void WriteToArchive(string input, string output, Rom rom)
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteToArchive(string inputFile, string outputDirectory, Rom rom)
 		{
-			string archiveFileName = Path.Combine(output, rom.Machine + ".zip");
+			bool success = false;
+
+			// If the input file doesn't exist, return
+			if (!File.Exists(inputFile))
+			{
+				return success;
+			}
+
+			string archiveFileName = Path.Combine(outputDirectory, rom.Machine.Name + ".zip");
 
 			ZipArchive outarchive = null;
 			try
 			{
+				// If the archive doesn't exist, create it
 				if (!File.Exists(archiveFileName))
 				{
 					outarchive = ZipFile.Open(archiveFileName, ZipArchiveMode.Create);
-				}
-				else
-				{
-					outarchive = ZipFile.Open(archiveFileName, ZipArchiveMode.Update);
+					outarchive.Dispose();
 				}
 
-				if (File.Exists(input))
+				// Open the archive for writing
+				using (outarchive = ZipFile.Open(archiveFileName, ZipArchiveMode.Update))
 				{
-					if (outarchive.Mode == ZipArchiveMode.Create || outarchive.GetEntry(rom.Name) == null)
+					// If the archive doesn't already contain the entry, add it
+					if (outarchive.GetEntry(rom.Name) == null)
 					{
-						outarchive.CreateEntryFromFile(input, rom.Name, CompressionLevel.Optimal);
+						outarchive.CreateEntryFromFile(inputFile, rom.Name, CompressionLevel.Optimal);
 					}
-				}
-				else if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+
+					// If there's a Date attached to the rom, change the entry to that Date
+					if (!String.IsNullOrEmpty(rom.Date))
 					{
-						if (outarchive.Mode == ZipArchiveMode.Create || outarchive.GetEntry(file) == null)
+						DateTimeOffset dto = DateTimeOffset.Now;
+						if (DateTimeOffset.TryParse(rom.Date, out dto))
 						{
-							outarchive.CreateEntryFromFile(file, file, CompressionLevel.Optimal);
+							outarchive.GetEntry(rom.Name).LastWriteTime = dto;
 						}
 					}
 				}
+
+				success = true;
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex);
+				success = false;
 			}
 			finally
 			{
 				outarchive?.Dispose();
 			}
-		}
 
-		/// <summary>
-		/// Copy a file to an output archive using SharpCompress
-		/// </summary>
-		/// <param name="input">Input filename to be moved</param>
-		/// <param name="output">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
-		public static void WriteToManagedArchive(string input, string output, Rom rom)
-		{
-			string archiveFileName = Path.Combine(output, rom.Machine.Name + ".zip");
-
-			// Delete an empty file first
-			if (File.Exists(archiveFileName) && new FileInfo(archiveFileName).Length == 0)
-			{
-				File.Delete(archiveFileName);
-			}
-
-			// Get if the file should be written out
-			bool newfile = File.Exists(archiveFileName) && new FileInfo(archiveFileName).Length != 0;
-
-			using (SharpCompress.Archive.Zip.ZipArchive archive = (newfile
-				? ArchiveFactory.Open(archiveFileName, Options.LookForHeader) as SharpCompress.Archive.Zip.ZipArchive
-				: ArchiveFactory.Create(ArchiveType.Zip) as SharpCompress.Archive.Zip.ZipArchive))
-			{
-				try
-				{
-					if (File.Exists(input))
-					{
-						archive.AddEntry(rom.Name, input);
-					}
-					else if (Directory.Exists(input))
-					{
-						archive.AddAllFromDirectory(input, "*", SearchOption.AllDirectories);
-					}
-
-					archive.SaveTo(archiveFileName + ".tmp", CompressionType.Deflate);
-				}
-				catch (Exception)
-				{
-					// Don't log archive write errors
-				}
-			}
-
-			if (File.Exists(archiveFileName + ".tmp"))
-			{
-				File.Delete(archiveFileName);
-				File.Move(archiveFileName + ".tmp", archiveFileName);
-			}
+			return success;
 		}
 
 		/// <summary>
@@ -423,82 +388,19 @@ namespace SabreTools.Helper
 		#region Archive-to-Archive Handling
 
 		/// <summary>
-		/// Attempt to copy a file between archives using SharpCompress
+		/// Attempt to copy a file between archives
 		/// </summary>
 		/// <param name="inputArchive">Source archive name</param>
-		/// <param name="outputArchive">Destination archive name</param>
+		/// <param name="outputDirectory">Destination archive name</param>
 		/// <param name="sourceEntryName">Input entry name</param>
 		/// <param name="destEntryName">Output entry name</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the copy was a success, false otherwise</returns>
-		public static bool CopyFileBetweenArchives(string inputArchive, string outputArchive,
-			string sourceEntryName, string destEntryName, Logger logger)
+		public static bool CopyFileBetweenArchives(string inputArchive, string outputDirectory,
+			string sourceEntryName, Rom destEntry, Logger logger)
 		{
-			bool success = false;
-
-			// First get the archive types
-			ArchiveType? iat = GetCurrentArchiveType(inputArchive, logger);
-			ArchiveType? oat = (File.Exists(outputArchive) ? GetCurrentArchiveType(outputArchive, logger) : ArchiveType.Zip);
-
-			// If we got back null (or the output is not a Zipfile), then it's not an archive, so we we return
-			if (iat == null || (oat == null || oat != ArchiveType.Zip) || inputArchive == outputArchive)
-			{
-				return success;
-			}
-
-			try
-			{
-				using (IReader reader = ReaderFactory.Open(File.OpenRead(inputArchive)))
-				{
-					if (iat == ArchiveType.Zip || iat == ArchiveType.SevenZip || iat == ArchiveType.Rar)
-					{
-						while (reader.MoveToNextEntry())
-						{
-							logger.Log("Current entry name: '" + reader.Entry.Key + "'");
-							if (reader.Entry != null && reader.Entry.Key.Contains(sourceEntryName))
-							{
-								// Get if the file should be written out
-								bool newfile = File.Exists(outputArchive) && new FileInfo(outputArchive).Length != 0;
-
-								using (SharpCompress.Archive.Zip.ZipArchive archive = (newfile
-									? ArchiveFactory.Open(outputArchive, Options.LookForHeader) as SharpCompress.Archive.Zip.ZipArchive
-									: ArchiveFactory.Create(ArchiveType.Zip) as SharpCompress.Archive.Zip.ZipArchive))
-								{
-									try
-									{
-										if (!archive.Entries.Contains(reader.Entry))
-										{
-											Stream tempstream = new MemoryStream();
-											reader.WriteEntryTo(tempstream);
-											archive.AddEntry(destEntryName, tempstream);
-											archive.SaveTo(outputArchive + ".tmp", CompressionType.Deflate);
-										}
-									}
-									catch (Exception)
-									{
-										// Don't log archive write errors
-									}
-								}
-
-								if (File.Exists(outputArchive + ".tmp"))
-								{
-									File.Delete(outputArchive);
-									File.Move(outputArchive + ".tmp", outputArchive);
-								}
-
-								success = true;
-							}
-						}
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				logger.Error(ex.ToString());
-				success = false;
-			}
-
-			return success;
+			string tempfile = ExtractSingleItemFromArchive(inputArchive, sourceEntryName, Path.GetTempPath(), logger);
+			return WriteToArchive(tempfile, outputDirectory, destEntry);
 		}
 
 		#endregion

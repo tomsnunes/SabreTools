@@ -468,7 +468,7 @@ namespace SabreTools.Helper
 						switch (gc[1].Value)
 						{
 							case "name":
-								tempgamename = itemval;
+								tempgamename = (itemval.ToLowerInvariant().EndsWith(".zip") ? itemval.Remove(itemval.Length - 4) : itemval);
 								break;
 							case "description":
 								gamedesc = itemval;

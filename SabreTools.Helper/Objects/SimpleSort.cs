@@ -132,7 +132,8 @@ namespace SabreTools.Helper
 
 			// Then, loop through and check each of the inputs
 			_logger.User("Processing files:\n");
-			DATFromDir dfd = new DATFromDir(files, _datdata, false, false, false, false, true, "", _logger, true);
+			DATFromDir dfd = new DATFromDir(files, _datdata, false /* noMD5 */, false /* noSHA1 */, false /* bare */,
+				false /* archivesAsFiles */, true /* enableGzip */, false /* addblanks */, "" /* tempdir */, _logger, true /* nowrite */);
 			dfd.Start();
 
 			// Setup the fixdat
@@ -331,7 +332,7 @@ namespace SabreTools.Helper
 						}
 						else
 						{
-							FileTools.WriteToManagedArchive(input, _outdir, found);
+							FileTools.WriteToArchive(input, _outdir, found);
 						}
 					}
 				}
@@ -398,7 +399,7 @@ namespace SabreTools.Helper
 							}
 							else
 							{
-								FileTools.WriteToManagedArchive(newinput, _outdir, found);
+								FileTools.WriteToArchive(newinput, _outdir, found);
 							}
 						}
 
@@ -444,7 +445,7 @@ namespace SabreTools.Helper
 							}
 							else
 							{
-								FileTools.WriteToManagedArchive(input, _outdir, newfound);
+								FileTools.WriteToArchive(input, _outdir, newfound);
 							}
 						}
 					}
@@ -530,7 +531,7 @@ namespace SabreTools.Helper
 											}
 											else
 											{
-												FileTools.WriteToManagedArchive(outfile, _outdir, found);
+												FileTools.WriteToArchive(outfile, _outdir, found);
 											}
 
 											try
@@ -542,8 +543,7 @@ namespace SabreTools.Helper
 									}
 									else
 									{
-										string archiveFileName = Path.Combine(_outdir, found.Machine.Name + ".zip");
-										FileTools.CopyFileBetweenArchives(input, archiveFileName, rom.Name, found.Name, _logger);
+										FileTools.CopyFileBetweenArchives(input, _outdir, rom.Name, found, _logger);
 									}
 								}
 							}

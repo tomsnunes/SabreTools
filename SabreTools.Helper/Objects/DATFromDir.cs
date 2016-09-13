@@ -47,10 +47,11 @@ namespace SabreTools
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
+		/// <param name="addblanks">True if blank items should be created for empty folders, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
 		/// <param name="nowrite">True if the file should not be written out, false otherwise (default)</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public DATFromDir(List<String> inputs, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, string tempDir, Logger logger, bool nowrite = false)
+		public DATFromDir(List<String> inputs, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, bool addblanks, string tempDir, Logger logger, bool nowrite = false)
 		{
 			_inputs = inputs;
 			_datdata = datdata;
@@ -61,7 +62,7 @@ namespace SabreTools
 			_enableGzip = enableGzip;
 			_tempDir = tempDir;
 			_logger = logger;
-			_addblanks = false; // This needs a proper flag later
+			_addblanks = addblanks;
 			_nowrite = nowrite;
 		}
 

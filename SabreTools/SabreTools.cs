@@ -77,6 +77,7 @@ namespace SabreTools
 			// Set all default values
 			bool help = false,
 				add = false,
+				addblanks = false,
 				archivesAsFiles = false,
 				bare = false,
 				clean = false,
@@ -660,7 +661,7 @@ namespace SabreTools
 			else if (datfromdir)
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
-					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, tempdir, maxParallelism);
+					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addblanks, tempdir, maxParallelism);
 			}
 
 			// Split a DAT by extension
