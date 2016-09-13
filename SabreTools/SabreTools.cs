@@ -104,7 +104,7 @@ namespace SabreTools
 				quotes = false,
 				rem = false,
 				remext = false,
-				restore = true,
+				restore = false,
 				romba = false,
 				single = false,
 				softlist = false,
