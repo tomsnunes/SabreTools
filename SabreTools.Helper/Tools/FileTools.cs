@@ -632,11 +632,13 @@ namespace SabreTools.Helper
 		/// Retrieve file information for a single file
 		/// </summary>
 		/// <param name="input">Filename to get information from</param>
-		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise</param>
-		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise</param>
+		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise (default)</param>
+		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise (default)</param>
+		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
+		/// <param name="date">True if the file Date should be included, false otherwise (default)</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
 		/// <remarks>Add read-offset for hash info</remarks>
-		public static Rom GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false, long offset = 0)
+		public static Rom GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool date = false)
 		{
 			// Add safeguard if file doesn't exist
 			if (!File.Exists(input))
@@ -656,7 +658,7 @@ namespace SabreTools.Helper
 					MD5 = string.Empty,
 					SHA1 = string.Empty,
 				},
-				//Date = temp.LastWriteTime.ToString(),
+				Date = (date ? temp.LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : ""),
 			};
 
 			try

@@ -77,7 +77,8 @@ namespace SabreTools
 			// Set all default values
 			bool help = false,
 				add = false,
-				addblanks = false,
+				addBlanks = false,
+				addDate = false,
 				archivesAsFiles = false,
 				bare = false,
 				clean = false,
@@ -176,6 +177,14 @@ namespace SabreTools
 					case "-a":
 					case "--add":
 						add = true;
+						break;
+					case "-ab":
+					case "--add-blank":
+						addBlanks = true;
+						break;
+					case "-ad":
+					case "--add-date":
+						addDate = true;
 						break;
 					case "-b":
 					case "--bare":
@@ -661,7 +670,7 @@ namespace SabreTools
 			else if (datfromdir)
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
-					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addblanks, tempdir, maxParallelism);
+					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempdir, maxParallelism);
 			}
 
 			// Split a DAT by extension

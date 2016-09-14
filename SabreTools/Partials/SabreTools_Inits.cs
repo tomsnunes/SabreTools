@@ -101,7 +101,8 @@ namespace SabreTools
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
-		/// <param name="addblanks">True if blank items should be created for empty folders, false otherwise</param>
+		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
+		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitDatFromDir(List<string> inputs,
@@ -120,7 +121,8 @@ namespace SabreTools
 			bool bare,
 			bool archivesAsFiles,
 			bool enableGzip,
-			bool addblanks,
+			bool addBlanks,
+			bool addDate,
 			string tempDir,
 			int maxDegreeOfParallelism)
 		{
@@ -144,7 +146,7 @@ namespace SabreTools
 			// If the user has only set a single thread, use the original version
 			if (maxDegreeOfParallelism == 1)
 			{
-				DATFromDir dfd = new DATFromDir(inputs, basedat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addblanks, tempDir, _logger);
+				DATFromDir dfd = new DATFromDir(inputs, basedat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, _logger);
 				bool success = dfd.Start();
 
 				// If we failed, show the help
@@ -168,7 +170,7 @@ namespace SabreTools
 						datdata.Files = new Dictionary<string, List<Rom>>();
 
 						string basePath = Path.GetFullPath(path);
-						DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addblanks, tempDir, maxDegreeOfParallelism, _logger);
+						DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, maxDegreeOfParallelism, _logger);
 						bool success = dfd.Start();
 
 						// If it was a success, write the DAT out

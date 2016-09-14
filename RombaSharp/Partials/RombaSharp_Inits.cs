@@ -67,7 +67,7 @@ namespace SabreTools
 			};
 
 			DATFromDir dfd = new DATFromDir(inputs, datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */,
-				false /* archivesAsFiles */, true /* enableGzip */, false /* addblanks */, "__temp__" /* tempdir */, _logger);
+				false /* archivesAsFiles */, true /* enableGzip */, false /* addBlanks */, false /* addDate */, "__temp__" /* tempdir */, _logger);
 			dfd.Start();
 		}
 

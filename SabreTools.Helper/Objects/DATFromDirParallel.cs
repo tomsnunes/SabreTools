@@ -24,7 +24,8 @@ namespace SabreTools
 		private bool _bare;
 		private bool _archivesAsFiles;
 		private bool _enableGzip;
-		private bool _addblanks;
+		private bool _addBlanks;
+		private bool _addDate;
 		private int _maxDegreeOfParallelism;
 
 		// Other required variables
@@ -46,12 +47,13 @@ namespace SabreTools
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
-		/// <param name="addblanks">True if blank items should be created for empty folders, false otherwise</param>
+		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
+		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public DATFromDirParallel(string basePath, Dat datdata, bool noMD5, bool noSHA1, bool bare,
-			bool archivesAsFiles, bool enableGzip, bool addblanks, string tempDir, int maxDegreeOfParallelism, Logger logger)
+		public DATFromDirParallel(string basePath, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
+			bool enableGzip, bool addBlanks, bool addDate, string tempDir, int maxDegreeOfParallelism, Logger logger)
 		{
 			_basePath = Path.GetFullPath(basePath);
 			_datdata = datdata;
@@ -62,7 +64,8 @@ namespace SabreTools
 			_bare = bare;
 			_archivesAsFiles = archivesAsFiles;
 			_enableGzip = enableGzip;
-			_addblanks = addblanks;
+			_addBlanks = addBlanks;
+			_addDate = addDate;
 			_tempDir = tempDir;
 			_maxDegreeOfParallelism = maxDegreeOfParallelism;
 			_logger = logger;
@@ -105,7 +108,7 @@ namespace SabreTools
 			});
 
 			// Now find all folders that are empty, if we are supposed to
-			if (!_datdata.Romba && _addblanks)
+			if (!_datdata.Romba && _addBlanks)
 			{
 				Parallel.ForEach(Directory.EnumerateDirectories(_basePath, "*", SearchOption.AllDirectories),
 					new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
@@ -297,7 +300,7 @@ namespace SabreTools
 		private void ProcessFile(string item, string basepath, string parent)
 		{
 			_logger.Log(Path.GetFileName(item) + " treated like a file");
-			Rom rom = FileTools.GetSingleFileInfo(item, _noMD5, _noSHA1);
+			Rom rom = FileTools.GetSingleFileInfo(item, noMD5:_noMD5, noSHA1: _noSHA1, date: _addDate);
 
 			ProcessFileHelper(item, rom, basepath, parent);
 		}

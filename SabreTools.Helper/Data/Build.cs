@@ -133,6 +133,8 @@ namespace SabreTools.Helper
 					helptext.Add("	-v=, --version=		Set the version of the DAT");
 					helptext.Add("	-au=, --author=		Set the author of the DAT");
 					helptext.Add("	-sd, --superdat		Enable SuperDAT creation");
+					helptext.Add("	-ab, --add-blank	Output blank files for folders");
+					helptext.Add("	-ad, --add-date		Output dates for each file parsed");
 					helptext.Add("	-t=, --temp=		Set the temporary directory to use");
 					helptext.Add("	-mt={4}			Amount of threads to use (-1 unlimted)");
 					helptext.Add("  -es, --ext-split	Split a DAT by two file extensions");

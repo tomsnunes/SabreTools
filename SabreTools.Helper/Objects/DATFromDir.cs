@@ -25,7 +25,8 @@ namespace SabreTools
 		private bool _bare;
 		private bool _archivesAsFiles;
 		private bool _enableGzip;
-		private bool _addblanks;
+		private bool _addBlanks;
+		private bool _addDate;
 		private bool _nowrite;
 
 		// Other required variables
@@ -47,11 +48,13 @@ namespace SabreTools
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
-		/// <param name="addblanks">True if blank items should be created for empty folders, false otherwise</param>
+		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
+		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
 		/// <param name="nowrite">True if the file should not be written out, false otherwise (default)</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public DATFromDir(List<String> inputs, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles, bool enableGzip, bool addblanks, string tempDir, Logger logger, bool nowrite = false)
+		public DATFromDir(List<String> inputs, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
+			bool enableGzip, bool addBlanks, bool addDate, string tempDir, Logger logger, bool nowrite = false)
 		{
 			_inputs = inputs;
 			_datdata = datdata;
@@ -62,7 +65,8 @@ namespace SabreTools
 			_enableGzip = enableGzip;
 			_tempDir = tempDir;
 			_logger = logger;
-			_addblanks = addblanks;
+			_addBlanks = addBlanks;
+			_addDate = addDate;
 			_nowrite = nowrite;
 		}
 
@@ -167,7 +171,7 @@ namespace SabreTools
 						}
 
 						// Now find all folders that are empty, if we are supposed to
-						if (!_datdata.Romba && _addblanks)
+						if (!_datdata.Romba && _addBlanks)
 						{
 							// If there were no subitems, add a "blank" game to to the set (if not in Romba mode)
 							if (!items)
@@ -257,7 +261,7 @@ namespace SabreTools
 			}
 
 			// Now find all folders that are empty, if we are supposed to
-			if (!_datdata.Romba && _addblanks)
+			if (!_datdata.Romba && _addBlanks)
 			{
 				List<string> keys = _datdata.Files.Keys.ToList();
 				foreach (string key in keys)
@@ -465,7 +469,7 @@ namespace SabreTools
 		private string ProcessFile(string item, StreamWriter sw, string basepath, string parent, Dat datdata, string lastparent)
 		{
 			_logger.Log(Path.GetFileName(item) + " treated like a file");
-			Rom rom = FileTools.GetSingleFileInfo(item, _noMD5, _noSHA1);
+			Rom rom = FileTools.GetSingleFileInfo(item, noMD5: _noMD5, noSHA1: _noSHA1, date: _addDate);
 
 			return ProcessFileHelper(item, rom, sw, basepath, parent, datdata, lastparent);
 		}

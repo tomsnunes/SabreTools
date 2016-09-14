@@ -133,7 +133,7 @@ namespace SabreTools.Helper
 			// Then, loop through and check each of the inputs
 			_logger.User("Processing files:\n");
 			DATFromDir dfd = new DATFromDir(files, _datdata, false /* noMD5 */, false /* noSHA1 */, false /* bare */,
-				false /* archivesAsFiles */, true /* enableGzip */, false /* addblanks */, "" /* tempdir */, _logger, true /* nowrite */);
+				false /* archivesAsFiles */, true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempdir */, _logger, true /* nowrite */);
 			dfd.Start();
 
 			// Setup the fixdat

@@ -230,6 +230,15 @@ Options:
 			Set the type flag to "SuperDAT" for the output DAT as well as preserving the
 			directory structure of the inputted folder, if applicable
 			
+		-ab, --add-blank	Output blank files for folders
+			If this flag is set, then blank entries will be created for each of the empty
+			directories in the source. This is useful for tools that require all folders
+			be accounted for in the output DAT.
+		
+		-ad, --add-date		Output dates for each file parsed
+			If this flag is set, then the Date will be appended to each file information
+			in the output DAT. The output format is standardized as "yyyy/MM/dd HH:mm:ss".
+			
 		-t=, --temp=		Set the name of the temporary directory
 			Optionally, a temp folder can be supplied in the case the default temp directory
 			(inside the running folder) is not preferred. This is used for any operations
