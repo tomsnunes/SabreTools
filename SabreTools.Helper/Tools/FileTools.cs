@@ -180,6 +180,11 @@ namespace SabreTools.Helper
 		/// <param name="zae">ZipArchiveStruct representing the zipfile</param>
 		/// <param name="output">Name of the file to write out to</param>
 		/// <param name="logger">Logger object for file and console output</param>
+		/// <remarks>
+		/// Things that need to be done:
+		///		Compress data instead of just writing it
+		///		Get rid of redundant directories (ones that are implied by files inside them)
+		/// </remarks>
 		public static void WriteTorrentZip(ZipArchiveStruct zae, string output, Logger logger)
 		{
 			// First, rearrange entries by name
@@ -198,18 +203,17 @@ namespace SabreTools.Helper
 				{
 					offsets.Add(bw.BaseStream.Position);
 					bw.Write(new byte[] { 0x50, 0x4b, 0x03, 0x04 }); // local file header signature
-					bw.Write((ushort)zaes.VersionNeeded);
-					bw.Write((ushort)zaes.GeneralPurposeBitFlag);
-					bw.Write((ushort)zaes.CompressionMethod);
-					bw.Write(zaes.LastModFileTime);
-					bw.Write(zaes.LastModFileDate);
+					bw.Write((ushort)20);
+					bw.Write((ushort)GeneralPurposeBitFlag.DeflatingMaximumCompression);
+					bw.Write((ushort)CompressionMethod.Deflated);
+					bw.Write(48128);
+					bw.Write(8600);
 					bw.Write(zaes.CRC);
 					bw.Write(zaes.CompressedSize);
 					bw.Write(zaes.UncompressedSize);
 					bw.Write((ushort)zaes.FileName.Length);
-					bw.Write((ushort)zaes.ExtraField.Length);
-					bw.Write(zaes.FileName);
-					bw.Write(zaes.ExtraField);
+					bw.Write((ushort)0);
+					bw.Write(zaes.FileName.Replace("\\", "/"));
 					bw.Write(zaes.Data);
 					if ((zaes.GeneralPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) != 0)
 					{
@@ -225,20 +229,23 @@ namespace SabreTools.Helper
 				foreach (ZipArchiveEntryStruct zaes in zae.Entries)
 				{
 					bw.Write(new byte[] { 0x50, 0x4b, 0x01, 0x02 }); // central file header signature
-					bw.Write((ushort)zaes.VersionMadeBy);
-					bw.Write((ushort)zaes.VersionNeeded);
-					bw.Write((ushort)zaes.GeneralPurposeBitFlag);
-					bw.Write((ushort)zaes.CompressionMethod);
-					bw.Write(zaes.LastModFileTime);
-					bw.Write(zaes.LastModFileDate);
+					bw.Write((ushort)ArchiveVersion.MSDOSandOS2);
+					bw.Write((ushort)20);
+					bw.Write((ushort)GeneralPurposeBitFlag.DeflatingMaximumCompression);
+					bw.Write((ushort)CompressionMethod.Deflated);
+					bw.Write(48128);
+					bw.Write(8600);
+					bw.Write(zaes.CRC);
+					bw.Write(zaes.CompressedSize);
+					bw.Write(zaes.UncompressedSize);
 					bw.Write((short)zaes.FileName.Length);
-					bw.Write((short)zaes.ExtraField.Length);
-					bw.Write((short)zaes.Comment.Length);
 					bw.Write((short)0);
-					bw.Write((short)zaes.InternalFileAttributes);
-					bw.Write(zaes.ExternalFileAttributes);
+					bw.Write((short)0);
+					bw.Write((short)0);
+					bw.Write((short)0);
+					bw.Write(0);
 					bw.Write((int)offsets[index]);
-					bw.Write(zaes.FileName);
+					bw.Write(zaes.FileName.Replace("\\", "/"));
 					bw.Write(zaes.ExtraField);
 					bw.Write(zaes.Comment);
 					index++;
@@ -250,8 +257,9 @@ namespace SabreTools.Helper
 				bw.Write((short)0);
 				bw.Write((short)0);
 				bw.Write((short)zae.Entries.Count);
-				bw.Write((int)(zae.EOCDOffset - zae.SOCDOffset));
-				bw.Write((int)(zae.EOCDOffset - zae.SOCDOffset));
+				bw.Write((short)zae.Entries.Count);
+				bw.Write(zae.EOCDOffset - zae.SOCDOffset);
+				bw.Write(zae.SOCDOffset);
 				bw.Write((short)22);
 				bw.Write("TORRENTZIPPED-");
 			}
