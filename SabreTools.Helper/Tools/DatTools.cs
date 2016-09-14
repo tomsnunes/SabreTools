@@ -101,6 +101,8 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
+		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
 		/// <returns>DatData object representing the read-in data</returns>
 		public static Dat Parse(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep = false, bool clean = false, bool softlist = false, bool keepext = false)
 		{
