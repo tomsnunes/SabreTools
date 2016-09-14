@@ -2910,17 +2910,24 @@ namespace SabreTools.Helper
 							"\t<header>\n" +
 							"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
 							"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
-							"\t\t<rootdir>" + HttpUtility.HtmlEncode(datdata.RootDir) + "</rootdir>\n" +
-							"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
+							(!String.IsNullOrEmpty(datdata.RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(datdata.RootDir) + "</rootdir>\n" : "") +
+							(!String.IsNullOrEmpty(datdata.Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" : "") +
 							"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
-							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
+							(!String.IsNullOrEmpty(datdata.Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" : "") +
 							"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
-							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
-							(!String.IsNullOrEmpty(datdata.Type) && datdata.ForcePacking != ForcePacking.Unzip ?
+							(!String.IsNullOrEmpty(datdata.Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" : "") +
+							(!String.IsNullOrEmpty(datdata.Type) || datdata.ForcePacking != ForcePacking.None || datdata.ForceMerging != ForceMerging.None || datdata.ForceNodump != ForceNodump.None ?
 								"\t\t<flags>\n" +
-								(!String.IsNullOrEmpty(datdata.Type) ? "\t\t\t<flag name=\"type\" value=\"" + datdata.Type + "\"/>\n" : "") +
-								(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : "") +
-								"\t\t</flags>\n" : "") +
+									(!String.IsNullOrEmpty(datdata.Type) ? "\t\t\t<flag name=\"type\" value=\"" + HttpUtility.HtmlEncode(datdata.Type) + "\"/>\n" : "") +
+									(datdata.ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : "") +
+									(datdata.ForcePacking == ForcePacking.Zip ? "\t\t\t<flag name=\"forcepacking\" value=\"zip\"/>\n" : "") +
+									(datdata.ForceMerging == ForceMerging.Full ? "\t\t\t<flag name=\"forcemerging\" value=\"full\"/>\n" : "") +
+									(datdata.ForceMerging == ForceMerging.Split ? "\t\t\t<flag name=\"forcemerging\" value=\"split\"/>\n" : "") +
+									(datdata.ForceNodump == ForceNodump.Ignore ? "\t\t\t<flag name=\"forcenodump\" value=\"ignore\"/>\n" : "") +
+									(datdata.ForceNodump == ForceNodump.Obsolete ? "\t\t\t<flag name=\"forcenodump\" value=\"obsolete\"/>\n" : "") +
+									(datdata.ForceNodump == ForceNodump.Required ? "\t\t\t<flag name=\"forcenodump\" value=\"required\"/>\n" : "") +
+									"\t\t</flags>\n"
+							: "") +
 							"\t</header>\n" +
 							"\t<data>\n";
 						break;
@@ -2948,7 +2955,7 @@ namespace SabreTools.Helper
 									(datdata.ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
 									(datdata.ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
 									(datdata.ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
-									(datdata.ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"ignore\"" : "") +
+									(datdata.ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"obsolete\"" : "") +
 									(datdata.ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
 									" />\n"
 							: "") +
