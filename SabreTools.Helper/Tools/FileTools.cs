@@ -403,6 +403,86 @@ namespace SabreTools.Helper
 			return WriteToArchive(tempfile, outputDirectory, destEntry);
 		}
 
+		/// <summary>
+		/// Reorder all of the files in the archive based on lowercase filename
+		/// </summary>
+		/// <param name="inputArchive">Source archive name</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the operation succeeded, false otherwise</returns>
+		public static bool TorrentZipArchive(string inputArchive, Logger logger)
+		{
+			bool success = false;
+
+			// If the input file doesn't exist, return
+			if (!File.Exists(inputArchive))
+			{
+				return success;
+			}
+
+			// Make sure the file is a zip file to begin with
+			if (GetCurrentArchiveType(inputArchive, logger) != ArchiveType.Zip)
+			{
+				return success;
+			}
+
+			ZipArchive outarchive = null;
+			try
+			{
+				// If the archive doesn't exist, create it
+				if (!File.Exists(inputArchive))
+				{
+					outarchive = ZipFile.Open(inputArchive, ZipArchiveMode.Create);
+					outarchive.Dispose();
+				}
+
+				// Open the archive for sorting
+				Dictionary<string, string> entries = new Dictionary<string, string>();
+				using (outarchive = ZipFile.Open(inputArchive, ZipArchiveMode.Update))
+				{
+					// Get and sort the entries
+					foreach (ZipArchiveEntry entry in outarchive.Entries)
+					{
+						entries.Add(entry.Name.ToLowerInvariant(), entry.Name);
+					}
+				}
+
+				// Now write out the entries by name
+				List<string> keys = entries.Keys.ToList();
+				keys.Sort(Style.CompareNumeric);
+
+				foreach (string key in keys)
+				{
+					Rom temp = new Rom
+					{
+						Machine = new Machine
+						{
+							Name = Path.GetFileNameWithoutExtension(inputArchive) + ".new",
+						},
+						Name = entries[key],
+						Date = "12/24/1996 11:32 PM",
+					};
+					CopyFileBetweenArchives(inputArchive, Path.GetDirectoryName(inputArchive), entries[key], temp, logger);
+				}
+
+				string newfile = Path.Combine(Path.GetDirectoryName(inputArchive), Path.GetFileNameWithoutExtension(inputArchive) + ".new.zip");
+				File.Delete(inputArchive);
+				File.Move(newfile, inputArchive);
+
+				success = true;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+				success = false;
+			}
+			finally
+			{
+				outarchive?.Dispose();
+			}
+
+			return success;
+		}
+
 		#endregion
 
 		#region File Information

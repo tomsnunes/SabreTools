@@ -50,6 +50,7 @@ namespace SabreTools
 				simpleSort = true,
 				tgz = false,
 				toFolder = false,
+				tzip = false,
 				updateDat = false,
 				verify = false;
 			int sevenzip = 0,
@@ -94,6 +95,10 @@ namespace SabreTools
 					case "-tgz":
 					case "--tgz":
 						tgz = true;
+						break;
+					case "-tzip":
+					case "--tzip":
+						tzip = true;
 						break;
 					case "-ud":
 					case "--updated-dat":
@@ -182,7 +187,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && ((simpleSort && !verify) || convert))
+			if (inputs.Count == 0 && ((simpleSort && !verify) || convert || tzip))
 			{
 				logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -190,8 +195,14 @@ namespace SabreTools
 				return;
 			}
 
+			// TorrentZip a folder
+			if (tzip)
+			{
+				InitTorrentZip(inputs, outdir, tempdir, logger);
+			}
+
 			// If we are converting the folder to TGZ
-			if (convert)
+			else if (convert)
 			{
 				InitConvertFolderTGZ(inputs, outdir, tempdir, delete, romba, sevenzip, gz, rar, zip, logger);
 			}
@@ -221,6 +232,24 @@ namespace SabreTools
 
 			logger.Close();
 			return;
+		}
+
+		private static void InitTorrentZip(List<string> inputs, string outdir, string tempdir, Logger logger)
+		{
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					FileTools.TorrentZipArchive(input, logger);
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						FileTools.TorrentZipArchive(file, logger);
+					}
+				}
+			}
 		}
 
 		/// <summary>
