@@ -495,19 +495,19 @@ namespace SabreTools.Helper
 	/// </summary>
 	public struct ZipArchiveEntryStruct
 	{
-		public short VersionMadeBy;
-		public short VersionNeeded;
-		public short GeneralPurposeFlag;
-		public short CompressionMethod;
-		public short LastModFileTime;
-		public short LastModFileDate;
-		public int CRC;
-		public int CompressedSize;
-		public int UncompressedSize;
+		public ArchiveVersion VersionMadeBy;
+		public ArchiveVersion VersionNeeded;
+		public GeneralPurposeBitFlag GeneralPurposeBitFlag;
+		public CompressionMethod CompressionMethod;
+		public ushort LastModFileTime;
+		public ushort LastModFileDate;
+		public uint CRC;
+		public uint CompressedSize;
+		public uint UncompressedSize;
 		public string FileName;
 		public string ExtraField;
 		public string Comment;
-		public short InternalFileAttributes;
+		public InternalFileAttributes InternalFileAttributes;
 		public int ExternalFileAttributes;
 		public int RelativeOffset;
 	}

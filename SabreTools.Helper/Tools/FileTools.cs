@@ -440,7 +440,7 @@ namespace SabreTools.Helper
 				Console.WriteLine("Entry CRC: " + zaes.CRC.ToString("X8"));
 				Console.WriteLine("Entry External File Attributes: " + zaes.ExternalFileAttributes);
 				Console.WriteLine("Entry Extra Field: " + zaes.ExtraField.Length + " " + zaes.ExtraField);
-				Console.WriteLine("Entry General Purpose Flag: " + zaes.GeneralPurposeFlag);
+				Console.WriteLine("Entry General Purpose Flag: " + zaes.GeneralPurposeBitFlag);
 				Console.WriteLine("Entry Internal File Attributes: " + zaes.InternalFileAttributes);
 				Console.WriteLine("Entry Last Modification File Date: " + zaes.LastModFileDate);
 				Console.WriteLine("Entry Last Modification File Time: " + zaes.LastModFileTime);
@@ -956,20 +956,20 @@ namespace SabreTools.Helper
 
 						br.BaseStream.Seek(position, SeekOrigin.Begin);
 						br.ReadInt32(); // central file header signature
-						zaes.VersionMadeBy = br.ReadInt16();
-						zaes.VersionNeeded = br.ReadInt16();
-						zaes.GeneralPurposeFlag = br.ReadInt16();
-						zaes.CompressionMethod = br.ReadInt16();
-						zaes.LastModFileTime = br.ReadInt16();
-						zaes.LastModFileDate = br.ReadInt16();
-						zaes.CRC = br.ReadInt32();
-						zaes.CompressedSize = br.ReadInt32();
-						zaes.UncompressedSize = br.ReadInt32();
+						zaes.VersionMadeBy = (ArchiveVersion)br.ReadInt16();
+						zaes.VersionNeeded = (ArchiveVersion)br.ReadInt16();
+						zaes.GeneralPurposeBitFlag = (GeneralPurposeBitFlag)br.ReadInt16();
+						zaes.CompressionMethod = (CompressionMethod)br.ReadInt16();
+						zaes.LastModFileTime = br.ReadUInt16();
+						zaes.LastModFileDate = br.ReadUInt16();
+						zaes.CRC = br.ReadUInt32();
+						zaes.CompressedSize = br.ReadUInt32();
+						zaes.UncompressedSize = br.ReadUInt32();
 						int fileNameLength = br.ReadInt16();
 						int extraFieldLength = br.ReadInt16();
 						int fileCommentLength = br.ReadInt16();
 						br.ReadInt16(); // disk number start
-						zaes.InternalFileAttributes = br.ReadInt16();
+						zaes.InternalFileAttributes = (InternalFileAttributes)br.ReadInt16();
 						zaes.ExternalFileAttributes = br.ReadInt32();
 						zaes.RelativeOffset = br.ReadInt32();
 						zaes.FileName = Style.ConvertHex(BitConverter.ToString(br.ReadBytes(fileNameLength)));

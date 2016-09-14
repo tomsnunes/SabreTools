@@ -164,4 +164,66 @@
 	}
 
 	#endregion
+
+	#region Archival
+
+	/// <summary>
+	/// Version of tool archive made by
+	/// </summary>
+	public enum ArchiveVersion
+	{
+		MSDOSandOS2 = 0,
+		Amiga = 1,
+		OpenVMS = 2,
+		UNIX = 3,
+		VMCMS = 4,
+		AtariST = 5,
+		OS2HPFS = 6,
+		Macintosh = 7,
+		ZSystem = 8,
+		CPM = 9,
+		WindowsNTFS = 10,
+		MVS = 11,
+		VSE = 12,
+		AcornRisc = 13,
+		VFAT = 14,
+		AlternateMVS = 15,
+		BeOS = 16,
+		Tandem = 17,
+		OS400 = 18,
+		OSXDarwin = 19,
+	}
+
+	/// <summary>
+	/// Compression method based on flag
+	/// </summary>
+	public enum CompressionMethod
+	{
+		Stored = 0,
+		Shrunk = 1,
+		ReducedCompressionFactor1 = 2,
+		ReducedCompressionFactor2 = 3,
+		ReducedCompressionFactor3 = 4,
+		ReducedCompressionFactor4 = 5,
+		Imploded = 6,
+		Tokenizing = 7,
+		Deflated = 8,
+		Delfate64 = 9,
+		PKWAREDataCompressionLibrary = 10,
+		BZIP2 = 12,
+		LZMA = 14,
+		IBMTERSE = 18,
+		IBMLZ77 = 19,
+		WavPak = 97,
+		PPMdVersionIRev1 = 98,
+
+		// Reserved and unused (SHOULD NOT BE USED)
+		Type11 = 11,
+		Type13 = 13,
+		Type15 = 15,
+		Type16 = 16,
+		Type17 = 17,
+	}
+
+	#endregion
 }

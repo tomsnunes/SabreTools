@@ -30,4 +30,54 @@ namespace SabreTools.Helper
 		RedumpSHA1 = 0x080,
 		RedumpSFV = 0x100,
 	}
+
+	/// <summary>
+	/// Determines the archive general bit flags
+	/// </summary>
+	[Flags]
+	public enum GeneralPurposeBitFlag
+	{
+		Encrypted = 0x0001,
+		ZeroedCRCAndSize = 0x0008,
+		CompressedPatchedData = 0x0020,
+		StrongEncryption = 0x0040,
+		LanguageEncodingFlag = 0x0800,
+		EncryptedCentralDirectory = 0x2000,
+
+		// For Method 6 - Imploding
+		Imploding8KSlidingDictionary = 0x0002,
+		Imploding3ShannonFanoTrees = 0x0004,
+
+		// For Methods 8 and 9 - Deflating
+		DeflatingMaximumCompression = 0x0002,
+		DeflatingFastCompression = 0x0004,
+		DeflatingSuperFastCompression = 0x0006,
+		EnhancedDeflating = 0x0010,
+
+		// For Method 14 - LZMA
+		LZMAEOSMarkerUsed = 0x0002,
+
+		// Reserved and unused (SHOULD NOT BE USED)
+		Bit7 = 0x0080,
+		Bit8 = 0x0100,
+		Bit9 = 0x0200,
+		Bit10 = 0x0400,
+		Bit12 = 0x1000, // Reserved by PKWARE for enhanced compression
+		Bit14 = 0x4000, // Reserved by PKWARE
+		Bit15 = 0x8000, // Reserved by PKWARE
+	}
+
+	/// <summary>
+	/// Internal file attributes used by archives
+	/// </summary>
+	[Flags]
+	public enum InternalFileAttributes
+	{
+		ASCIIOrTextFile = 0x0001,
+		RecordLengthControl = 0x0002,
+
+		// Reserved and unused (SHOULD NOT BE USED)
+		Bit1 = 0x0002,
+		Bit2 = 0x0004,
+	}
 }
