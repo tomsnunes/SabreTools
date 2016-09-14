@@ -425,6 +425,34 @@ namespace SabreTools.Helper
 				return success;
 			}
 
+			ZipArchiveStruct zas = ReadCentralDirectory(inputArchive, logger);
+			Console.WriteLine("Archive Filename: " + zas.FileName);
+			Console.WriteLine("Archive Comment: " + zas.Comment.Length + " " + zas.Comment);
+			Console.WriteLine("Archive Central Directory CRC: " + zas.CentralDirectoryCRC.ToString("X8"));
+			Console.WriteLine();
+			Console.WriteLine("Entries:");
+			foreach (ZipArchiveEntryStruct zaes in zas.Entries)
+			{
+				Console.WriteLine("Entry Filename: " + zaes.FileName.Length + " " + zaes.FileName);
+				Console.WriteLine("Entry Comment: " + zaes.Comment.Length + " " + zaes.Comment);
+				Console.WriteLine("Entry Compressed Size: " + zaes.CompressedSize);
+				Console.WriteLine("Entry Compression Method: " + zaes.CompressionMethod);
+				Console.WriteLine("Entry CRC: " + zaes.CRC.ToString("X8"));
+				Console.WriteLine("Entry External File Attributes: " + zaes.ExternalFileAttributes);
+				Console.WriteLine("Entry Extra Field: " + zaes.ExtraField.Length + " " + zaes.ExtraField);
+				Console.WriteLine("Entry General Purpose Flag: " + zaes.GeneralPurposeFlag);
+				Console.WriteLine("Entry Internal File Attributes: " + zaes.InternalFileAttributes);
+				Console.WriteLine("Entry Last Modification File Date: " + zaes.LastModFileDate);
+				Console.WriteLine("Entry Last Modification File Time: " + zaes.LastModFileTime);
+				Console.WriteLine("Entry Relative Offset: " + zaes.RelativeOffset);
+				Console.WriteLine("Entry Uncompressed Size: " + zaes.UncompressedSize);
+				Console.WriteLine("Entry Version Made By: " + zaes.VersionMadeBy);
+				Console.WriteLine("Entry Version Needed: " + zaes.VersionNeeded);
+				Console.WriteLine();
+			}
+			Console.ReadLine();
+
+			/*
 			ZipArchive outarchive = null;
 			try
 			{
@@ -479,6 +507,7 @@ namespace SabreTools.Helper
 			{
 				outarchive?.Dispose();
 			}
+			*/
 
 			return success;
 		}
@@ -856,6 +885,118 @@ namespace SabreTools.Helper
 					shouldInternalProcess = (zip != ArchiveScanLevel.External);
 					break;
 			}
+		}
+
+		/// <summary>
+		/// Read the current directory record
+		/// </summary>
+		/// <param name="input">Name of the input file to check</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <remarks>This does not do any handling for Zip64 currently</remarks>
+		public static ZipArchiveStruct ReadCentralDirectory(string input, Logger logger)
+		{
+			// Create the zip archive struct to hold all of the information
+			ZipArchiveStruct zas = new ZipArchiveStruct
+			{
+				FileName = Path.GetFileNameWithoutExtension(input),
+				Entries = new List<ZipArchiveEntryStruct>(),
+			};
+
+			int position = -1;
+
+			// Seek backwards to find the EOCD pattern
+			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+			{
+				int sig = 101010256;
+				int read = 0;
+				int index = -5;
+				while (sig != read && (-index) < new FileInfo(input).Length)
+				{
+					br.BaseStream.Seek(index, SeekOrigin.End);
+					read = br.ReadInt32();
+					index--;
+				}
+
+				// If we found the signature, then set the correct position
+				if (sig == read)
+				{
+					position = (int)br.BaseStream.Position - 4;
+				}
+			}
+
+			// If we found the EOCD, get all of the information out of that area
+			if (position != -1)
+			{
+				zas.EOCDOffset = (int)position;
+				using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+				{
+					br.BaseStream.Seek(position, SeekOrigin.Begin);
+					br.ReadInt32(); // end of central dir signature
+					br.ReadInt16(); // number of this disk
+					br.ReadInt16(); // number of the disk with the start of the central directory
+					br.ReadInt16(); // total number of entries in the central directory on this disk
+					br.ReadInt16(); // total number of entries in the central directory
+					br.ReadInt32(); // size of the central directory
+					position = br.ReadInt32(); // offset of start of central directory with respect to the starting disk number
+					int commentlength = br.ReadInt16();
+					zas.Comment = Style.ConvertHex(BitConverter.ToString(br.ReadBytes(commentlength)));
+				}
+			}
+
+			// If we found the SOCD, get all of the information out of that area
+			if (position != -1 && position != zas.EOCDOffset)
+			{
+				zas.SOCDOffset = position;
+				using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+				{
+					int temp = 0;
+					while (temp != 84233040 /* digital signature */ && temp != 101010256 /* eocd */)
+					{
+						ZipArchiveEntryStruct zaes = new ZipArchiveEntryStruct();
+
+						br.BaseStream.Seek(position, SeekOrigin.Begin);
+						br.ReadInt32(); // central file header signature
+						zaes.VersionMadeBy = br.ReadInt16();
+						zaes.VersionNeeded = br.ReadInt16();
+						zaes.GeneralPurposeFlag = br.ReadInt16();
+						zaes.CompressionMethod = br.ReadInt16();
+						zaes.LastModFileTime = br.ReadInt16();
+						zaes.LastModFileDate = br.ReadInt16();
+						zaes.CRC = br.ReadInt32();
+						zaes.CompressedSize = br.ReadInt32();
+						zaes.UncompressedSize = br.ReadInt32();
+						int fileNameLength = br.ReadInt16();
+						int extraFieldLength = br.ReadInt16();
+						int fileCommentLength = br.ReadInt16();
+						br.ReadInt16(); // disk number start
+						zaes.InternalFileAttributes = br.ReadInt16();
+						zaes.ExternalFileAttributes = br.ReadInt32();
+						zaes.RelativeOffset = br.ReadInt32();
+						zaes.FileName = Style.ConvertHex(BitConverter.ToString(br.ReadBytes(fileNameLength)));
+						zaes.ExtraField = Style.ConvertHex(BitConverter.ToString(br.ReadBytes(extraFieldLength)));
+						zaes.Comment = Style.ConvertHex(BitConverter.ToString(br.ReadBytes(fileCommentLength)));
+						position += 46 + fileNameLength + extraFieldLength + fileCommentLength;
+						temp = br.ReadInt32();
+						zas.Entries.Add(zaes);
+					}
+				}
+			}
+
+			// Finally, get a hash of the entire central directory (between SOCD and EOCD)
+			if (zas.SOCDOffset > 0 && zas.EOCDOffset > 0)
+			{
+				using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+				{
+					br.BaseStream.Seek(zas.SOCDOffset, SeekOrigin.Begin);
+					byte[] cd = br.ReadBytes(zas.EOCDOffset - zas.SOCDOffset);
+
+					OptimizedCRC ocrc = new OptimizedCRC();
+					ocrc.Update(cd, 0, cd.Length);
+					zas.CentralDirectoryCRC = ocrc.Value;
+				}
+			}
+
+			return zas;
 		}
 
 		#endregion

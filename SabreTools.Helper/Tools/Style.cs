@@ -525,6 +525,27 @@ namespace SabreTools.Helper
 			return s;
 		}
 
+		/// <summary>
+		/// http://stackoverflow.com/questions/5613279/c-sharp-hex-to-ascii
+		/// </summary>
+		public static string ConvertHex(String hexString)
+		{
+			if (hexString.Contains("-"))
+			{
+				hexString = hexString.Replace("-", "");
+			}
+
+			StringBuilder sb = new StringBuilder();
+
+			for (int i = 0; i < hexString.Length; i += 2)
+			{
+				String hs = hexString.Substring(i, 2);
+				sb.Append(Convert.ToChar(Convert.ToUInt32(hs, 16)));
+			}
+
+			return sb.ToString();
+		}
+
 		#endregion
 	}
 }
