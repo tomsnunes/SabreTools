@@ -39,6 +39,12 @@ namespace SabreTools.Helper
 			ZipArchive outarchive = null;
 			try
 			{
+				// If the full output path doesn't exist, create it
+				if (!Directory.Exists(Path.GetDirectoryName(archiveFileName)))
+				{
+					Directory.CreateDirectory(Path.GetDirectoryName(archiveFileName));
+				}
+
 				// If the archive doesn't exist, create it
 				if (!File.Exists(archiveFileName))
 				{
@@ -650,7 +656,7 @@ namespace SabreTools.Helper
 					MD5 = string.Empty,
 					SHA1 = string.Empty,
 				},
-				Date = temp.LastWriteTime.ToString(),
+				//Date = temp.LastWriteTime.ToString(),
 			};
 
 			try
