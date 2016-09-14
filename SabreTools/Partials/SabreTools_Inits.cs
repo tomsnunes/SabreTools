@@ -153,7 +153,7 @@ namespace SabreTools
 					datdata.Files = new Dictionary<string, List<Rom>>();
 
 					string basePath = Path.GetFullPath(path);
-					DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, maxDegreeOfParallelism, _logger);
+					DATFromDir dfd = new DATFromDir(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, maxDegreeOfParallelism, _logger);
 					bool success = dfd.Start();
 
 					// If it was a success, write the DAT out

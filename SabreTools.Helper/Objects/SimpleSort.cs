@@ -134,7 +134,7 @@ namespace SabreTools.Helper
 			_logger.User("Processing files:\n");
 			foreach (string input in _inputs)
 			{
-				DATFromDirParallel dfd = new DATFromDirParallel(input, _datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
+				DATFromDir dfd = new DATFromDir(input, _datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
 				true /* enableGzip */, false /* addBlanks */, false /* addDate */, "__temp__" /* tempdir */, 4 /* maxDegreeOfParallelism */, _logger);
 				dfd.Start();
 				_datdata = dfd.DatData;

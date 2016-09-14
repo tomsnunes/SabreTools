@@ -11,7 +11,7 @@ namespace SabreTools
 	/// <summary>
 	/// Create a DAT file from a specified file, directory, or set thereof
 	/// </summary>
-	public class DATFromDirParallel
+	public class DATFromDir
 	{
 		// Path-related variables
 		private string _basePath;
@@ -52,7 +52,7 @@ namespace SabreTools
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public DATFromDirParallel(string basePath, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
+		public DATFromDir(string basePath, Dat datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
 			bool enableGzip, bool addBlanks, bool addDate, string tempDir, int maxDegreeOfParallelism, Logger logger)
 		{
 			_basePath = Path.GetFullPath(basePath);
