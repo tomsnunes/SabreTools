@@ -325,12 +325,12 @@ namespace SabreTools
 						lastparent = rom.Machine.Name;
 					}
 				}
+			}
 
-				// If we had roms but not blanks (and not in Romba mode), create an artifical rom for the purposes of outputting
-				if (lastparent != null && _datdata.Files.Count == 0)
-				{
-					_datdata.Files.Add("temp", new List<Rom>());
-				}
+			// If we had roms but not blanks (and not in Romba mode), create an artifical rom for the purposes of outputting
+			if (!_datdata.Romba && lastparent != null && _datdata.Files.Count == 0)
+			{
+				_datdata.Files.Add("temp", new List<Rom>());
 			}
 
 			// Now write the final piece and close the output stream
