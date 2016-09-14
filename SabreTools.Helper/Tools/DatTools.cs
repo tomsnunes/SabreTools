@@ -2931,15 +2931,15 @@ namespace SabreTools.Helper
 							"\t<header>\n" +
 							"\t\t<name>" + HttpUtility.HtmlEncode(datdata.Name) + "</name>\n" +
 							"\t\t<description>" + HttpUtility.HtmlEncode(datdata.Description) + "</description>\n" +
-							"\t\t<rootdir>" + HttpUtility.HtmlEncode(datdata.RootDir) + "</rootdir>\n" +
-							"\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" +
+							(!String.IsNullOrEmpty(datdata.RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(datdata.RootDir) + "</rootdir>\n" : "") +
+							(!String.IsNullOrEmpty(datdata.Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(datdata.Category) + "</category>\n" : "") +
 							"\t\t<version>" + HttpUtility.HtmlEncode(datdata.Version) + "</version>\n" +
-							"\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" +
+							(!String.IsNullOrEmpty(datdata.Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(datdata.Date) + "</date>\n" : "") +
 							"\t\t<author>" + HttpUtility.HtmlEncode(datdata.Author) + "</author>\n" +
-							"\t\t<email>" + HttpUtility.HtmlEncode(datdata.Email) + "</email>\n" +
-							"\t\t<homepage>" + HttpUtility.HtmlEncode(datdata.Homepage) + "</homepage>\n" +
-							"\t\t<url>" + HttpUtility.HtmlEncode(datdata.Url) + "</url>\n" +
-							"\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" +
+							(!String.IsNullOrEmpty(datdata.Email) ? "\t\t<email>" + HttpUtility.HtmlEncode(datdata.Email) + "</email>\n" : "") +
+							(!String.IsNullOrEmpty(datdata.Homepage) ? "\t\t<homepage>" + HttpUtility.HtmlEncode(datdata.Homepage) + "</homepage>\n" : "") +
+							(!String.IsNullOrEmpty(datdata.Url) ? "\t\t<url>" + HttpUtility.HtmlEncode(datdata.Url) + "</url>\n" : "") +
+							(!String.IsNullOrEmpty(datdata.Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" : "") +
 							(!String.IsNullOrEmpty(datdata.Type) ? "\t\t<type>" + HttpUtility.HtmlEncode(datdata.Type) + "</type>\n" : "") +
 							(datdata.ForcePacking != ForcePacking.None || datdata.ForceMerging != ForceMerging.None || datdata.ForceNodump != ForceNodump.None ?
 								"\t\t<clrmamepro" + 
