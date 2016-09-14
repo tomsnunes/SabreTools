@@ -432,7 +432,9 @@ namespace SabreTools
 				if (!encounteredErrors)
 				{
 					_logger.Log(Path.GetFileName(item) + " treated like an archive");
-					foreach (string entry in Directory.EnumerateFiles(tempdir, "*", SearchOption.AllDirectories))
+					List<string> entries = Directory.EnumerateFiles(tempdir, "*", SearchOption.AllDirectories).ToList();
+					entries.Sort(Style.CompareNumeric);
+					foreach (string entry in entries)
 					{
 						string tempbasepath = (Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar);
 						lastparent = ProcessFile(Path.GetFullPath(entry), sw, Path.GetFullPath(tempdir),

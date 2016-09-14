@@ -245,7 +245,9 @@ namespace SabreTools
 					List<Rom> extracted = FileTools.GetArchiveFileInfo(item, _logger);
 					foreach (Rom rom in extracted)
 					{
-						ProcessFileHelper(item, rom, _basePath,
+						ProcessFileHelper(item,
+							rom,
+							_basePath,
 							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) + Path.GetFileNameWithoutExtension(item));
 					}
 				}
@@ -274,7 +276,12 @@ namespace SabreTools
 						new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
 						entry =>
 					{
-						ProcessFile(entry, tempSubDir, Path.GetFileNameWithoutExtension(item));
+						ProcessFile(entry,
+							tempSubDir,
+							Path.Combine((_datdata.Type == "SuperDAT"
+								? (Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length)
+								: ""),
+							Path.GetFileNameWithoutExtension(item)));
 					});
 
 					// Clear the temp directory
