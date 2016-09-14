@@ -1779,9 +1779,12 @@ namespace SabreTools.Helper
 			}
 
 			// Now go through and sort all of the lists
-			foreach (string key in sortable.Keys)
+			List<string> keys = sortable.Keys.ToList();
+			foreach (string key in keys)
 			{
-				RomTools.Sort(sortable[key], norename);
+				List<Rom> sortedlist = sortable[key];
+				RomTools.Sort(ref sortedlist, norename);
+				sortable[key] = sortedlist;
 			}
 
 			// Output the count if told to
@@ -1856,9 +1859,12 @@ namespace SabreTools.Helper
 			}
 
 			// Now go through and sort all of the lists
-			foreach (string key in sortable.Keys)
+			List<string> keys = sortable.Keys.ToList();
+			foreach (string key in keys)
 			{
-				RomTools.Sort(sortable[key], norename);
+				List<Rom> sortedlist = sortable[key];
+				RomTools.Sort(ref sortedlist, norename);
+				sortable[key] = sortedlist;
 			}
 
 			// Output the count if told to

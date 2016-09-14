@@ -401,7 +401,7 @@ namespace SabreTools
 			foreach (string key in sortable.Keys)
 			{
 				List<Rom> roms = sortable[key];
-				RomTools.Sort(roms, true);
+				RomTools.Sort(ref roms, true);
 
 				long gameid = -1;
 				using (SqliteConnection dbc = new SqliteConnection(_connectionString))

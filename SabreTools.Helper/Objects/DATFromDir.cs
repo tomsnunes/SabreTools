@@ -155,7 +155,9 @@ namespace SabreTools
 
 					// Then process each of the subfolders themselves
 					string basePathBackup = _basePath;
-					foreach (string item in Directory.EnumerateDirectories(_basePath))
+					List<string> dirs = Directory.EnumerateDirectories(_basePath).ToList();
+					dirs.Sort(Style.CompareNumeric);
+					foreach (string item in dirs)
 					{
 						if (_datdata.Type != "SuperDAT")
 						{
@@ -164,7 +166,9 @@ namespace SabreTools
 						}
 
 						bool items = false;
-						foreach (string subitem in Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories))
+						List<string> files = Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories).ToList();
+						files.Sort(Style.CompareNumeric);
+						foreach (string subitem in files)
 						{
 							items = true;
 							lastparent = ProcessPossibleArchive(subitem, sw, lastparent);

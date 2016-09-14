@@ -224,7 +224,7 @@ namespace SabreTools.Helper
 		/// <param name="roms">List of RomData objects representing the roms to be sorted</param>
 		/// <param name="norename">True if files are not renamed, false otherwise</param>
 		/// <returns>True if it sorted correctly, false otherwise</returns>
-		public static bool Sort(List<Rom> roms, bool norename)
+		public static bool Sort(ref List<Rom> roms, bool norename)
 		{
 			try
 			{
