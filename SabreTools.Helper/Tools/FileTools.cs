@@ -425,7 +425,7 @@ namespace SabreTools.Helper
 				return success;
 			}
 
-			ZipArchiveStruct zas = ReadCentralDirectory(inputArchive, logger);
+			ZipArchiveStruct zas = GetZipFileInfo(inputArchive, logger);
 			Console.WriteLine("Archive Filename: " + zas.FileName);
 			Console.WriteLine("Archive Comment: " + zas.Comment.Length + " " + zas.Comment);
 			Console.WriteLine("Archive Central Directory CRC: " + zas.CentralDirectoryCRC.ToString("X8"));
@@ -888,12 +888,15 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Read the current directory record
+		/// Read the information from an input zip file
 		/// </summary>
 		/// <param name="input">Name of the input file to check</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		/// <remarks>This does not do any handling for Zip64 currently</remarks>
-		public static ZipArchiveStruct ReadCentralDirectory(string input, Logger logger)
+		/// <remarks>
+		/// This does not do any handling for Zip64 currently
+		/// https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
+		/// </remarks>
+		public static ZipArchiveStruct GetZipFileInfo(string input, Logger logger)
 		{
 			// Create the zip archive struct to hold all of the information
 			ZipArchiveStruct zas = new ZipArchiveStruct
@@ -997,6 +1000,23 @@ namespace SabreTools.Helper
 			}
 
 			return zas;
+		}
+
+		/// <summary>
+		/// Read the information from an input 7z file
+		/// </summary>
+		/// <param name="input">Name of the input file to check</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <remarks>http://cpansearch.perl.org/src/BJOERN/Compress-Deflate7-1.0/7zip/DOC/7zFormat.txt</remarks>
+		public static void GetSevenZipFIleInfo(string input, Logger logger)
+		{
+			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+			{
+				br.ReadBytes(6); // BYTE kSignature[6] = {'7', 'z', 0xBC, 0xAF, 0x27, 0x1C};
+				logger.User("ArchiveVersion (Major.Minor): " + br.ReadByte() + "." + br.ReadByte());
+				logger.User("StartHeaderCRC: " + br.ReadUInt32());
+				logger.User("StartHeader (NextHeaderOffset, NextHeaderSize, NextHeaderCRC)" + br.ReadUInt64() + ", " + br.ReadUInt64() + ", " + br.ReadUInt32());
+			}
 		}
 
 		#endregion
