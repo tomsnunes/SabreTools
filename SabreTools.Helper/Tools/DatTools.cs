@@ -977,7 +977,7 @@ namespace SabreTools.Helper
 											break;
 										case "date":
 											content = headreader.ReadElementContentAsString();
-											datdata.Date = (String.IsNullOrEmpty(datdata.Date) ? content : datdata.Date);
+											datdata.Date = (String.IsNullOrEmpty(datdata.Date) ? content.Replace(".", "/") : datdata.Date);
 											break;
 										case "author":
 											content = headreader.ReadElementContentAsString();
@@ -1340,7 +1340,15 @@ namespace SabreTools.Helper
 											date = "";
 											if (subreader.GetAttribute("date") != null)
 											{
-												date = DateTime.Parse(subreader.GetAttribute("date")).ToString();
+												DateTime dateTime = DateTime.Now;
+												if (DateTime.TryParse(subreader.GetAttribute("date"), out dateTime))
+												{
+													date = dateTime.ToString();
+												}
+												else
+												{
+													date = subreader.GetAttribute("date");
+												}
 											}
 
 											// Take care of hex-sized files
