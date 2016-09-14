@@ -174,6 +174,104 @@ namespace SabreTools.Helper
 			return true;
 		}
 
+		/// <summary>
+		/// Write an existing zip archive construct to a torrent zip file
+		/// </summary>
+		/// <param name="zae">ZipArchiveStruct representing the zipfile</param>
+		/// <param name="output">Name of the file to write out to</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		public static void WriteTorrentZip(ZipArchiveStruct zae, string output, Logger logger)
+		{
+			// First, rearrange entries by name
+			List<ZipArchiveEntryStruct> entries = zae.Entries;
+			entries.Sort((i, j) =>
+			{
+				return Style.CompareNumeric(i.FileName.ToLowerInvariant(), j.FileName.ToLowerInvariant());
+			});
+
+			using (BinaryWriter bw = new BinaryWriter(File.Open(output, FileMode.Create)))
+			{
+				List<long> offsets = new List<long>();
+
+				// First, write out entries
+				foreach (ZipArchiveEntryStruct zaes in zae.Entries)
+				{
+					offsets.Add(bw.BaseStream.Position);
+					bw.Write(new byte[] { 0x50, 0x4b, 0x03, 0x04 }); // local file header signature
+					bw.Write((ushort)zaes.VersionNeeded);
+					bw.Write((ushort)zaes.GeneralPurposeBitFlag);
+					bw.Write((ushort)zaes.CompressionMethod);
+					bw.Write(zaes.LastModFileTime);
+					bw.Write(zaes.LastModFileDate);
+					bw.Write(zaes.CRC);
+					bw.Write(zaes.CompressedSize);
+					bw.Write(zaes.UncompressedSize);
+					bw.Write((ushort)zaes.FileName.Length);
+					bw.Write((ushort)zaes.ExtraField.Length);
+					bw.Write(zaes.FileName);
+					bw.Write(zaes.ExtraField);
+					bw.Write(zaes.Data);
+					if ((zaes.GeneralPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) != 0)
+					{
+						bw.Write(zaes.CRC);
+						bw.Write(zaes.CompressedSize);
+						bw.Write(zaes.UncompressedSize);
+					}
+				}
+
+				// Then write out the central directory
+				int index = 0;
+				zae.SOCDOffset = (int)bw.BaseStream.Position;
+				foreach (ZipArchiveEntryStruct zaes in zae.Entries)
+				{
+					bw.Write(new byte[] { 0x50, 0x4b, 0x01, 0x02 }); // central file header signature
+					bw.Write((ushort)zaes.VersionMadeBy);
+					bw.Write((ushort)zaes.VersionNeeded);
+					bw.Write((ushort)zaes.GeneralPurposeBitFlag);
+					bw.Write((ushort)zaes.CompressionMethod);
+					bw.Write(zaes.LastModFileTime);
+					bw.Write(zaes.LastModFileDate);
+					bw.Write((short)zaes.FileName.Length);
+					bw.Write((short)zaes.ExtraField.Length);
+					bw.Write((short)zaes.Comment.Length);
+					bw.Write((short)0);
+					bw.Write((short)zaes.InternalFileAttributes);
+					bw.Write(zaes.ExternalFileAttributes);
+					bw.Write((int)offsets[index]);
+					bw.Write(zaes.FileName);
+					bw.Write(zaes.ExtraField);
+					bw.Write(zaes.Comment);
+					index++;
+				}
+				zae.EOCDOffset = (int)bw.BaseStream.Position;
+
+				// Finally, write out the end record
+				bw.Write(new byte[] { 0x50, 0x4b, 0x05, 0x06 }); // end of central dir signature
+				bw.Write((short)0);
+				bw.Write((short)0);
+				bw.Write((short)zae.Entries.Count);
+				bw.Write((int)(zae.EOCDOffset - zae.SOCDOffset));
+				bw.Write((int)(zae.EOCDOffset - zae.SOCDOffset));
+				bw.Write((short)22);
+				bw.Write("TORRENTZIPPED-");
+			}
+
+			using (BinaryReader br = new BinaryReader(File.OpenRead(output)))
+			{
+				br.BaseStream.Seek(zae.SOCDOffset, SeekOrigin.Begin);
+				byte[] cd = br.ReadBytes(zae.EOCDOffset - zae.SOCDOffset);
+
+				OptimizedCRC ocrc = new OptimizedCRC();
+				ocrc.Update(cd, 0, cd.Length);
+				zae.CentralDirectoryCRC = ocrc.Value;
+			}
+
+			using (BinaryWriter bw = new BinaryWriter(File.Open(output, FileMode.Append)))
+			{
+				bw.Write(zae.CentralDirectoryCRC);
+			}
+		}
+
 		#endregion
 
 		#region Archive Extraction
