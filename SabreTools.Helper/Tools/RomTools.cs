@@ -263,9 +263,9 @@ namespace SabreTools.Helper
 							}
 							return Style.CompareNumeric(x.Machine.Name, y.Machine.Name);
 						}
-						return (norename ? String.Compare(x.Machine.Name, y.Machine.Name) : x.Metadata.SourceID - y.Metadata.SourceID);
+						return (norename ? Style.CompareNumeric(x.Machine.Name, y.Machine.Name) : x.Metadata.SourceID - y.Metadata.SourceID);
 					}
-					return (norename ? String.Compare(x.Machine.Name, y.Machine.Name) : x.Metadata.SystemID - y.Metadata.SystemID);
+					return (norename ? Style.CompareNumeric(x.Machine.Name, y.Machine.Name) : x.Metadata.SystemID - y.Metadata.SystemID);
 				});
 				return true;
 			}
