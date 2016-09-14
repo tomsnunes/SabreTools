@@ -132,9 +132,13 @@ namespace SabreTools.Helper
 
 			// Then, loop through and check each of the inputs
 			_logger.User("Processing files:\n");
-			DATFromDir dfd = new DATFromDir(files, _datdata, false /* noMD5 */, false /* noSHA1 */, false /* bare */,
-				false /* archivesAsFiles */, true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempdir */, _logger, true /* nowrite */);
-			dfd.Start();
+			foreach (string input in _inputs)
+			{
+				DATFromDirParallel dfd = new DATFromDirParallel(input, _datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
+				true /* enableGzip */, false /* addBlanks */, false /* addDate */, "__temp__" /* tempdir */, 4 /* maxDegreeOfParallelism */, _logger);
+				dfd.Start();
+				_datdata = dfd.DatData;
+			}
 
 			// Setup the fixdat
 			_matched = (Dat)_datdata.CloneHeader();

@@ -66,9 +66,16 @@ namespace SabreTools
 				Files = new Dictionary<string, List<Rom>>(),
 			};
 
-			DATFromDir dfd = new DATFromDir(inputs, datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */,
-				false /* archivesAsFiles */, true /* enableGzip */, false /* addBlanks */, false /* addDate */, "__temp__" /* tempdir */, _logger);
-			dfd.Start();
+			Logger logger = new Logger(false, "");
+			logger.Start();
+			foreach (string input in inputs)
+			{
+				DATFromDirParallel dfd = new DATFromDirParallel(input, datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
+				true /* enableGzip */, false /* addBlanks */, false /* addDate */, "__temp__" /* tempdir */, 4 /* maxDegreeOfParallelism */, _logger);
+				dfd.Start();
+				DatTools.WriteDatfile(dfd.DatData, "", logger);
+			}
+			logger.Close();
 		}
 
 		/// <summary>

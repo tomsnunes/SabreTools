@@ -87,7 +87,6 @@
     <Compile Include="Data\Constants.cs" />
     <Compile Include="Data\Flags.cs" />
     <Compile Include="External\OptimizedCRC.cs" />
-    <Compile Include="Objects\DATFromDir.cs" />
     <Compile Include="Objects\DATFromDirParallel.cs" />
     <Compile Include="Objects\Generate.cs" />
     <Compile Include="Objects\GenerateTwo.cs" />

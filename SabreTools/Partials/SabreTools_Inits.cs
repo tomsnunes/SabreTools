@@ -143,48 +143,30 @@ namespace SabreTools
 				Files = new Dictionary<string, List<Rom>>(),
 			};
 
-			// If the user has only set a single thread, use the original version
-			if (maxDegreeOfParallelism == 1)
+			// For each input directory, create a DAT
+			foreach (string path in inputs)
 			{
-				DATFromDir dfd = new DATFromDir(inputs, basedat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, _logger);
-				bool success = dfd.Start();
+				if (Directory.Exists(path))
+				{
+					// Clone the base Dat for information
+					Dat datdata = (Dat)basedat.Clone();
+					datdata.Files = new Dictionary<string, List<Rom>>();
 
-				// If we failed, show the help
-				if (!success)
-				{
-					Console.WriteLine();
-					Build.Help();
-				}
-			}
-			
-			// Otherwise, make full use of the threads
-			else
-			{
-				// For each input directory, create a DAT
-				foreach (string path in inputs)
-				{
-					if (Directory.Exists(path))
+					string basePath = Path.GetFullPath(path);
+					DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, maxDegreeOfParallelism, _logger);
+					bool success = dfd.Start();
+
+					// If it was a success, write the DAT out
+					if (success)
 					{
-						// Clone the base Dat for information
-						Dat datdata = (Dat)basedat.Clone();
-						datdata.Files = new Dictionary<string, List<Rom>>();
+						DatTools.WriteDatfile(dfd.DatData, "", _logger);
+					}
 
-						string basePath = Path.GetFullPath(path);
-						DATFromDirParallel dfd = new DATFromDirParallel(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, maxDegreeOfParallelism, _logger);
-						bool success = dfd.Start();
-
-						// If it was a success, write the DAT out
-						if (success)
-						{
-							DatTools.WriteDatfile(dfd.DatData, "", _logger);
-						}
-
-						// Otherwise, show the help
-						else
-						{
-							Console.WriteLine();
-							Build.Help();
-						}
+					// Otherwise, show the help
+					else
+					{
+						Console.WriteLine();
+						Build.Help();
 					}
 				}
 			}
