@@ -510,6 +510,7 @@ namespace SabreTools.Helper
 		public InternalFileAttributes InternalFileAttributes;
 		public int ExternalFileAttributes;
 		public int RelativeOffset;
+		public byte[] Data;
 	}
 
 	#endregion
