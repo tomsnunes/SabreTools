@@ -256,7 +256,7 @@ namespace SabreTools.Helper
 					helptext.Add("Filter parameters for size can use postfixes for inputs:");
 					helptext.Add("    e.g. 8kb => 8000 or 8kib => 8192");
 					break;
-				case "SimpleSort":
+				case "SimpleSortApp":
 					helptext.Add(Resources.Resources.SimpleSort_Name + " - " + Resources.Resources.SimpleSort_Desc);
 					helptext.Add(barrier);
 					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.SimpleSort_Name + " [options] [filename|dirname] ...");
