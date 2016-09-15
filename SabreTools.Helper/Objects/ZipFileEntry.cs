@@ -13,7 +13,7 @@ namespace SabreTools.Helper
 	/// Based on work by GordonJ for RomVault
 	/// https://github.com/gjefferyes/RomVault/blob/master/ROMVault2/SupportedFiles/Zip/zipFile.cs
 	/// </remarks>
-	public class ZipFileEntry
+	public class ZipFileEntry : IEquatable<ZipFileEntry>
 	{
 		#region Private instance variables
 
@@ -154,6 +154,16 @@ namespace SabreTools.Helper
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Check if an entry equals another (use only name for now)
+		/// </summary>
+		/// <param name="zfe"></param>
+		/// <returns></returns>
+		public bool Equals(ZipFileEntry zfe)
+		{
+			return (String.Equals(_fileName, zfe.FileName, StringComparison.InvariantCultureIgnoreCase));
+		}
 
 		/// <summary>
 		/// Read the central directory entry from the input stream

@@ -1,10 +1,10 @@
-﻿using OCRC;
+﻿//using Ionic.Zlib;
+using OCRC;
 using SharpCompress.Archive;
 using SharpCompress.Archive.SevenZip;
 using SharpCompress.Common;
 using SharpCompress.Reader;
 using System;
-//using Ionic.Zlib;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;

@@ -1,12 +1,8 @@
-﻿using Ionic.Crc;
-using Ionic.Zlib;
-using OCRC;
+﻿using OCRC;
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SabreTools.Helper
 {
@@ -51,6 +47,10 @@ namespace SabreTools.Helper
 		public ZipStatus ZipStatus
 		{
 			get { return _zipStatus; }
+		}
+		public List<ZipFileEntry> Entries
+		{
+			get { return _entries; }
 		}
 		public int EntriesCount
 		{
