@@ -472,46 +472,4 @@ namespace SabreTools.Helper
 	}
 
 	#endregion
-
-	#region Archive structs
-
-	/// <summary>
-	/// Intermediate struct for holding zip archive information
-	/// </summary>
-	public struct ZipArchiveStruct
-	{
-		public string FileName;
-		public string Comment;
-		public bool Zip64;
-
-		public List<ZipArchiveEntryStruct> Entries;
-		public int SOCDOffset;
-		public int EOCDOffset;
-		public int CentralDirectoryCRC;
-	}
-
-	/// <summary>
-	/// Intermediate struct for holding zip archive entry information
-	/// </summary>
-	public struct ZipArchiveEntryStruct
-	{
-		public ArchiveVersion VersionMadeBy;
-		public ArchiveVersion VersionNeeded;
-		public GeneralPurposeBitFlag GeneralPurposeBitFlag;
-		public CompressionMethod CompressionMethod;
-		public ushort LastModFileTime;
-		public ushort LastModFileDate;
-		public uint CRC;
-		public uint CompressedSize;
-		public uint UncompressedSize;
-		public byte[] FileName;
-		public byte[] ExtraField;
-		public byte[] Comment;
-		public InternalFileAttributes InternalFileAttributes;
-		public int ExternalFileAttributes;
-		public int RelativeOffset;
-		public byte[] Data;
-	}
-
-	#endregion
 }
