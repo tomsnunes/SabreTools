@@ -158,7 +158,7 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Read the central directory entry from the input stream
 		/// </summary>
-		/// <returns>True if the central directory was read correctly, false otherwise</returns>
+		/// <returns>Status of the underlying stream</returns>
 		public ZipReturn ReadCentralDirectory()
 		{
 			try
@@ -381,8 +381,8 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Read the local file header from the input stream
 		/// </summary>
-		/// <returns>True if the local file header was read correctly, false otherwise</returns>
-		public ZipReturn ReadLocalFileHeader()
+		/// <returns>Status of the underlying stream</returns>
+		public ZipReturn ReadHeader()
 		{
 			try
 			{
@@ -587,8 +587,8 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Read the local file header from the input stream, assuming correctness
 		/// </summary>
-		/// <returns>True if the local file header was read correctly, false otherwise</returns>
-		public ZipReturn ReadLocalFileHeaderQuick()
+		/// <returns>Status of the underlying stream</returns>
+		public ZipReturn ReadHeaderQuick()
 		{
 			try
 			{
@@ -707,7 +707,7 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Write the local file header entry to the included stream
 		/// </summary>
-		public void WriteLocalFileHeader()
+		public void WriteHeader()
 		{
 			// Open the stream for writing
 			BinaryWriter bw = new BinaryWriter(_zipstream);
@@ -777,8 +777,8 @@ namespace SabreTools.Helper
 		/// <param name="stream">Output stream representing the correctly compressed stream</param>
 		/// <param name="streamSize">Size of the stream regardless of compression</param>
 		/// <param name="compressionMethod">Compression method to compare against</param>
-		/// <returns>True if the output stream was read, false otherwise</returns>
-		public bool LocalFileOpenReadStream(bool raw, out Stream stream, out ulong streamSize, out CompressionMethod compressionMethod)
+		/// <returns>Status of the underlying stream</returns>
+		public ZipReturn OpenReadStream(bool raw, out Stream stream, out ulong streamSize, out CompressionMethod compressionMethod)
 		{
 			streamSize = 0;
 			compressionMethod = _compressionMethod;
@@ -806,14 +806,14 @@ namespace SabreTools.Helper
 					break;
 			}
 			stream = _readStream;
-			return (stream != null);
+			return (stream == null ? ZipReturn.ZipErrorGettingDataStream : ZipReturn.ZipGood);
 		}
 
 		/// <summary>
 		/// Close the read file stream
 		/// </summary>
-		/// <returns>True if the stream could be closed, false otherwise</returns>
-		public bool LocalFileCloseReadStream()
+		/// <returns>Status of the underlying stream</returns>
+		public ZipReturn CloseReadStream()
 		{
 			DeflateStream dfStream = _readStream as DeflateStream;
 			if (dfStream != null)
@@ -821,7 +821,7 @@ namespace SabreTools.Helper
 				dfStream.Close();
 				dfStream.Dispose();
 			}
-			return true;
+			return ZipReturn.ZipGood;
 		}
 
 		/// <summary>
@@ -832,13 +832,13 @@ namespace SabreTools.Helper
 		/// <param name="uncompressedSize">Uncompressed size of the stream</param>
 		/// <param name="compressionMethod">Compression method to compare against</param>
 		/// <param name="stream">Output stream representing the correctly compressed stream</param>
-		/// <returns>True if the output stream was written, false otherwise</returns>
-		public bool LocalFileOpenWriteStream(bool raw, bool torrentZip, ulong uncompressedSize, CompressionMethod compressionMethod, out Stream stream)
+		/// <returns>Status of the underlying stream</returns>
+		public ZipReturn OpenWriteStream(bool raw, bool torrentZip, ulong uncompressedSize, CompressionMethod compressionMethod, out Stream stream)
 		{
 			_uncompressedSize = uncompressedSize;
 			_compressionMethod = compressionMethod;
 
-			WriteLocalFileHeader();
+			WriteHeader();
 			_dataLocation = (ulong)_zipstream.Position;
 
 			if (raw)
@@ -861,15 +861,15 @@ namespace SabreTools.Helper
 			}
 
 			stream = _writeStream;
-			return (stream != null);
+			return (stream == null ? ZipReturn.ZipErrorGettingDataStream : ZipReturn.ZipGood);
 		}
 
 		/// <summary>
 		/// Close the write file stream
 		/// </summary>
 		/// <param name="crc32">CRC to assign to the current stream</param>
-		/// <returns>True if the stream could be closed, false otherwise</returns>
-		public bool LocalFileCloseWriteStream(uint crc32)
+		/// <returns>Status of the underlying stream</returns>
+		public ZipReturn CloseWriteStream(uint crc32)
 		{
 			DeflateStream dfStream = _writeStream as DeflateStream;
 			if (dfStream != null)
@@ -883,14 +883,14 @@ namespace SabreTools.Helper
 
 			if (_compressedSize == 0 && _uncompressedSize == 0)
 			{
-				LocalFileAddDirectory();
+				AddDirectory();
 				_compressedSize = (ulong)_zipstream.Position - _dataLocation;
 			}
 
 			_crc = crc32;
 			WriteCompressedSize();
 
-			return true;
+			return ZipReturn.ZipGood;
 		}
 
 		/// <summary>
@@ -941,7 +941,7 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Get the data from the current file, if not already checked
 		/// </summary>
-		public void LocalFileCheck()
+		public void Check()
 		{
 			// If the file has been tested or has an error, return
 			if (_fileStatus != ZipReturn.ZipUntested)
@@ -1012,11 +1012,110 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Add a directory marking to a local file
 		/// </summary>
-		public void LocalFileAddDirectory()
+		public void AddDirectory()
 		{
 			Stream ds = _zipstream;
 			ds.WriteByte(03);
 			ds.WriteByte(00);
+		}
+
+		/// <summary>
+		/// Get the text associated with a return status
+		/// </summary>
+		/// <param name="zr">ZipReturn status to parse</param>
+		/// <returns>String associated with the ZipReturn</returns>
+		public static string ZipErrorMessageText(ZipReturn zr)
+		{
+			string ret = "Unknown";
+			switch (zr)
+			{
+				case ZipReturn.ZipGood:
+					ret = "";
+					break;
+				case ZipReturn.ZipFileCountError:
+					ret = "The number of file in the Zip does not mach the number of files in the Zips Centeral Directory";
+					break;
+				case ZipReturn.ZipSignatureError:
+					ret = "An unknown Signature Block was found in the Zip";
+					break;
+				case ZipReturn.ZipExtraDataOnEndOfZip:
+					ret = "Extra Data was found on the end of the Zip";
+					break;
+				case ZipReturn.ZipUnsupportedCompression:
+					ret = "An unsupported Compression method was found in the Zip, if you recompress this zip it will be usable";
+					break;
+				case ZipReturn.ZipLocalFileHeaderError:
+					ret = "Error reading a zipped file header information";
+					break;
+				case ZipReturn.ZipCentralDirError:
+					ret = "There is an error in the Zip Centeral Directory";
+					break;
+				case ZipReturn.ZipReadingFromOutputFile:
+					ret = "Trying to write to a Zip file open for output only";
+					break;
+				case ZipReturn.ZipWritingToInputFile:
+					ret = "Tring to read from a Zip file open for input only";
+					break;
+				case ZipReturn.ZipErrorGettingDataStream:
+					ret = "Error creating Data Stream";
+					break;
+				case ZipReturn.ZipCRCDecodeError:
+					ret = "CRC error";
+					break;
+				case ZipReturn.ZipDecodeError:
+					ret = "Error unzipping a file";
+					break;
+			}
+
+			return ret;
+		}
+
+		/// <summary>
+		/// Compare two strings in TorrentZip format
+		/// </summary>
+		/// <param name="string1"></param>
+		/// <param name="string2"></param>
+		/// <returns></returns>
+		private static int TorrentZipStringCompare(string string1, string string2)
+		{
+			char[] bytes1 = string1.ToCharArray();
+			char[] bytes2 = string2.ToCharArray();
+
+			int pos1 = 0;
+			int pos2 = 0;
+
+			for (;;)
+			{
+				if (pos1 == bytes1.Length)
+				{
+					return ((pos2 == bytes2.Length) ? 0 : -1);
+				}
+				if (pos2 == bytes2.Length)
+				{
+					return 1;
+				}
+
+				int byte1 = bytes1[pos1++];
+				int byte2 = bytes2[pos2++];
+
+				if (byte1 >= 65 && byte1 <= 90)
+				{
+					byte1 += 0x20;
+				}
+				if (byte2 >= 65 && byte2 <= 90)
+				{
+					byte2 += 0x20;
+				}
+
+				if (byte1 < byte2)
+				{
+					return -1;
+				}
+				if (byte1 > byte2)
+				{
+					return 1;
+				}
+			}
 		}
 	}
 }

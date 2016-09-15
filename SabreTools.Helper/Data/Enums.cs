@@ -260,5 +260,16 @@
 		ZipUntested
 	}
 
+	/// <summary>
+	/// Zip open type
+	/// </summary>
+	/// <remarks>https://raw.githubusercontent.com/gjefferyes/RomVault/5a93500001f0d068f32cf77a048950717507f733/ROMVault2/SupportedFiles/ZipEnums.cs</remarks>
+	public enum ZipOpenType
+	{
+		Closed,
+		OpenRead,
+		OpenWrite
+	}
+
 	#endregion
 }

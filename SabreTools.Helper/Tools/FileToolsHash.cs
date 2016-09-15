@@ -32,11 +32,11 @@ namespace SabreTools.Helper
 			{
 				if (!File.Exists(archiveFileName))
 				{
-					outarchive = ZipFile.Open(archiveFileName, ZipArchiveMode.Create);
+					outarchive = System.IO.Compression.ZipFile.Open(archiveFileName, ZipArchiveMode.Create);
 				}
 				else
 				{
-					outarchive = ZipFile.Open(archiveFileName, ZipArchiveMode.Update);
+					outarchive = System.IO.Compression.ZipFile.Open(archiveFileName, ZipArchiveMode.Update);
 				}
 
 				if (File.Exists(input))

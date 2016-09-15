@@ -108,7 +108,7 @@
     <Compile Include="Objects\ImportTwo.cs" />
     <Compile Include="Objects\SimpleSort.cs" />
     <Compile Include="Objects\ZipFileEntry.cs" />
-    <Compile Include="Objects\ZipFIle.cs" />
+    <Compile Include="Objects\ZipFile.cs" />
     <Compile Include="Resources\Resources.de-DE.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

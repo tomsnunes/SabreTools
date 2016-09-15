@@ -178,7 +178,7 @@ namespace SabreTools.Helper
 		public const uint EndOfLocalFileHeaderSignature = 0x08074b50;
 		public const uint CentralDirectoryHeaderSignature = 0x02014b50;
 		public const uint EndOfCentralDirSignature = 0x06054b50;
-		public const uint Zip64EndOfCentralDirSignatue = 0x06064b50;
+		public const uint Zip64EndOfCentralDirSignature = 0x06064b50;
 		public const uint Zip64EndOfCentralDirectoryLocator = 0x07064b50;
 
 		#endregion

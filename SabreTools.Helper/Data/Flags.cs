@@ -80,4 +80,16 @@ namespace SabreTools.Helper
 		Bit1 = 0x0002,
 		Bit2 = 0x0004,
 	}
+
+	/// <summary>
+	/// Zipfile special status
+	/// </summary>
+	/// <remarks>https://github.com/gjefferyes/RomVault/blob/5a93500001f0d068f32cf77a048950717507f733/ROMVault2/SupportedFiles/ZipEnums.cs</remarks>
+	[Flags]
+	public enum ZipStatus
+	{
+		None = 0x0,
+		TorrentZip = 0x1,
+		ExtraData = 0x2
+	}
 }

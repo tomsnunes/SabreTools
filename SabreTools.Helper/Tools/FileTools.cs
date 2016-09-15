@@ -49,12 +49,12 @@ namespace SabreTools.Helper
 				// If the archive doesn't exist, create it
 				if (!File.Exists(archiveFileName))
 				{
-					outarchive = ZipFile.Open(archiveFileName, ZipArchiveMode.Create);
+					outarchive = System.IO.Compression.ZipFile.Open(archiveFileName, ZipArchiveMode.Create);
 					outarchive.Dispose();
 				}
 
 				// Open the archive for writing
-				using (outarchive = ZipFile.Open(archiveFileName, ZipArchiveMode.Update))
+				using (outarchive = System.IO.Compression.ZipFile.Open(archiveFileName, ZipArchiveMode.Update))
 				{
 					// If the archive doesn't already contain the entry, add it
 					if (outarchive.GetEntry(rom.Name) == null)
@@ -63,7 +63,7 @@ namespace SabreTools.Helper
 					}
 
 					// If there's a Date attached to the rom, change the entry to that Date
-					if (!String.IsNullOrEmpty(rom.Date))
+					if (!string.IsNullOrEmpty(rom.Date))
 					{
 						DateTimeOffset dto = DateTimeOffset.Now;
 						if (DateTimeOffset.TryParse(rom.Date, out dto))
