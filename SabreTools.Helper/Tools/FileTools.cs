@@ -89,29 +89,108 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Copy a file to an output archive
+		/// Copy a file to an output torrentzip archive
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outputDirectory">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteToArchiveIonic(string inputFile, string outputDirectory, Rom rom)
+		public static bool WriteTorrentZip(string inputFile, string outputDirectory, Rom rom, Logger logger)
 		{
-			
+			bool success = false;
 
-			return true;
+			// If the input file doesn't exist, return
+			if (!File.Exists(inputFile))
+			{
+				return success;
+			}
+
+			string archiveFileName = Path.Combine(outputDirectory, rom.Machine.Name + ".zip");
+
+			// If the output file exists but isn't a zip archive, return
+			if (File.Exists(archiveFileName) && GetCurrentArchiveType(archiveFileName, logger) != ArchiveType.Zip)
+			{
+				return success;
+			}
+
+			// Set internal variables
+			Stream readStream = null;
+			Stream writeStream = null;
+			ZipFile zipFile = new ZipFile();
+			ZipReturn zipReturn = ZipReturn.ZipGood;
+
+			try
+			{
+				// If the full output path doesn't exist, create it
+				if (!Directory.Exists(Path.GetDirectoryName(archiveFileName)))
+				{
+					Directory.CreateDirectory(Path.GetDirectoryName(archiveFileName));
+				}
+
+				// Open the input file for reading
+				readStream = File.OpenRead(inputFile);
+
+				// If the archive doesn't exist, create it
+				if (!File.Exists(archiveFileName))
+				{
+					zipReturn = zipFile.Create(archiveFileName);
+				}
+				// Otherwise, open the archive
+				else
+				{
+					zipReturn = zipFile.Open(archiveFileName, new FileInfo(archiveFileName).LastWriteTime.Ticks, true);
+				}
+
+				zipReturn = zipFile.OpenWriteStream(false, true, inputFile, (ulong)(new FileInfo(inputFile).Length), CompressionMethod.Deflated, out writeStream);
+				if (zipReturn != ZipReturn.ZipGood)
+				{
+					return success;
+				}
+
+				// Copy the input stream to the output
+				byte[] buffer = new byte[8 * 1024];
+				int len;
+				while ((len = readStream.Read(buffer, 0, buffer.Length)) > 0)
+				{
+					writeStream.Write(buffer, 0, len);
+				}
+				writeStream.Flush();
+
+				// Close the streams
+				readStream.Close();
+
+				zipReturn = zipFile.CloseWriteStream(Convert.ToUInt32(rom.HashData.CRC, 16));
+				if (zipReturn != ZipReturn.ZipGood)
+				{
+					return success;
+				}
+
+				success = true;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+				success = false;
+			}
+			finally
+			{
+				zipFile.Dispose();
+			}
+
+			return success;
 		}
 
 		/// <summary>
 		/// Write an input file to a torrent GZ file
 		/// </summary>
 		/// <param name="input">File to write from</param>
-		/// <param name="outdir">Directory to write archive to</param>
+		/// <param name="outputDirectory">Directory to write archive to</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the write was a success, false otherwise</returns>
 		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
-		public static bool WriteTorrentGZ(string input, string outdir, bool romba, Logger logger)
+		public static bool WriteTorrentGZ(string input, string outputDirectory, bool romba, Logger logger)
 		{
 			// Check that the input file exists
 			if (!File.Exists(input))
@@ -122,17 +201,17 @@ namespace SabreTools.Helper
 			input = Path.GetFullPath(input);
 
 			// Make sure the output directory exists
-			if (!Directory.Exists(outdir))
+			if (!Directory.Exists(outputDirectory))
 			{
-				Directory.CreateDirectory(outdir);
+				Directory.CreateDirectory(outputDirectory);
 			}
-			outdir = Path.GetFullPath(outdir);
+			outputDirectory = Path.GetFullPath(outputDirectory);
 
 			// Now get the Rom info for the file so we have hashes and size
 			Rom rom = FileTools.GetSingleFileInfo(input);
 
 			// If it doesn't exist, create the output file and then write
-			string outfile = Path.Combine(outdir, rom.HashData.SHA1 + ".gz");
+			string outfile = Path.Combine(outputDirectory, rom.HashData.SHA1 + ".gz");
 			using (FileStream inputstream = new FileStream(input, FileMode.Open))
 			using (GZipStream output = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress))
 			{
@@ -175,15 +254,15 @@ namespace SabreTools.Helper
 			if (romba)
 			{
 				string subfolder = Path.Combine(rom.HashData.SHA1.Substring(0, 2), rom.HashData.SHA1.Substring(2, 2), rom.HashData.SHA1.Substring(4, 2), rom.HashData.SHA1.Substring(6, 2));
-				outdir = Path.Combine(outdir, subfolder);
-				if (!Directory.Exists(outdir))
+				outputDirectory = Path.Combine(outputDirectory, subfolder);
+				if (!Directory.Exists(outputDirectory))
 				{
-					Directory.CreateDirectory(outdir);
+					Directory.CreateDirectory(outputDirectory);
 				}
 
 				try
 				{
-					File.Move(outfile, Path.Combine(outdir, Path.GetFileName(outfile)));
+					File.Move(outfile, Path.Combine(outputDirectory, Path.GetFileName(outfile)));
 				}
 				catch (Exception ex)
 				{
