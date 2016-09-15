@@ -195,10 +195,6 @@ namespace SabreTools.Helper
 		{
 			// First, rearrange entries by name
 			List<ZipArchiveEntryStruct> entries = zae.Entries;
-			entries.Sort((i, j) =>
-			{
-				return Style.CompareNumeric(i.FileName.ToLowerInvariant(), j.FileName.ToLowerInvariant());
-			});
 
 			using (BinaryWriter bw = new BinaryWriter(File.Open(output, FileMode.Create)))
 			{
@@ -212,14 +208,14 @@ namespace SabreTools.Helper
 					bw.Write((ushort)20);
 					bw.Write((ushort)GeneralPurposeBitFlag.DeflatingMaximumCompression);
 					bw.Write((ushort)CompressionMethod.Deflated);
-					bw.Write(48128);
-					bw.Write(8600);
+					bw.Write((ushort)48128);
+					bw.Write((ushort)8600);
 					bw.Write(zaes.CRC);
 					bw.Write(zaes.CompressedSize);
 					bw.Write(zaes.UncompressedSize);
 					bw.Write((ushort)zaes.FileName.Length);
 					bw.Write((ushort)0);
-					bw.Write(zaes.FileName.Replace("\\", "/"));
+					bw.Write(zaes.FileName);
 					bw.Write(zaes.Data);
 					if ((zaes.GeneralPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) != 0)
 					{
@@ -239,8 +235,8 @@ namespace SabreTools.Helper
 					bw.Write((ushort)20);
 					bw.Write((ushort)GeneralPurposeBitFlag.DeflatingMaximumCompression);
 					bw.Write((ushort)CompressionMethod.Deflated);
-					bw.Write(48128);
-					bw.Write(8600);
+					bw.Write((ushort)48128);
+					bw.Write((ushort)8600);
 					bw.Write(zaes.CRC);
 					bw.Write(zaes.CompressedSize);
 					bw.Write(zaes.UncompressedSize);
@@ -251,7 +247,7 @@ namespace SabreTools.Helper
 					bw.Write((short)0);
 					bw.Write(0);
 					bw.Write((int)offsets[index]);
-					bw.Write(zaes.FileName.Replace("\\", "/"));
+					bw.Write(zaes.FileName);
 					bw.Write(zaes.ExtraField);
 					bw.Write(zaes.Comment);
 					index++;
@@ -267,7 +263,7 @@ namespace SabreTools.Helper
 				bw.Write(zae.EOCDOffset - zae.SOCDOffset);
 				bw.Write(zae.SOCDOffset);
 				bw.Write((short)22);
-				bw.Write("TORRENTZIPPED-");
+				bw.Write(new char[] { 'T', 'O', 'R', 'R', 'E', 'N', 'T', 'Z', 'I', 'P', 'P', 'E', 'D', '-' });
 			}
 
 			using (BinaryReader br = new BinaryReader(File.OpenRead(output)))
@@ -282,7 +278,7 @@ namespace SabreTools.Helper
 
 			using (BinaryWriter bw = new BinaryWriter(File.Open(output, FileMode.Append)))
 			{
-				bw.Write(zae.CentralDirectoryCRC);
+				bw.Write(zae.CentralDirectoryCRC.ToString("X8").ToCharArray());
 			}
 		}
 
@@ -545,13 +541,13 @@ namespace SabreTools.Helper
 			Console.WriteLine("Entries:");
 			foreach (ZipArchiveEntryStruct zaes in zas.Entries)
 			{
-				Console.WriteLine("Entry Filename: " + zaes.FileName.Length + " " + zaes.FileName);
-				Console.WriteLine("Entry Comment: " + zaes.Comment.Length + " " + zaes.Comment);
+				Console.WriteLine("Entry Filename: " + zaes.FileName.Length + " " + Style.ConvertHex(BitConverter.ToString(zaes.FileName)));
+				Console.WriteLine("Entry Comment: " + zaes.Comment.Length + " " + Style.ConvertHex(BitConverter.ToString(zaes.Comment)));
 				Console.WriteLine("Entry Compressed Size: " + zaes.CompressedSize);
 				Console.WriteLine("Entry Compression Method: " + zaes.CompressionMethod);
 				Console.WriteLine("Entry CRC: " + zaes.CRC.ToString("X8"));
 				Console.WriteLine("Entry External File Attributes: " + zaes.ExternalFileAttributes);
-				Console.WriteLine("Entry Extra Field: " + zaes.ExtraField.Length + " " + zaes.ExtraField);
+				Console.WriteLine("Entry Extra Field: " + zaes.ExtraField.Length + " " + Style.ConvertHex(BitConverter.ToString(zaes.ExtraField)));
 				Console.WriteLine("Entry General Purpose Flag: " + zaes.GeneralPurposeBitFlag);
 				Console.WriteLine("Entry Internal File Attributes: " + zaes.InternalFileAttributes);
 				Console.WriteLine("Entry Last Modification File Date: " + zaes.LastModFileDate);
@@ -562,6 +558,7 @@ namespace SabreTools.Helper
 				Console.WriteLine("Entry Version Needed: " + zaes.VersionNeeded);
 				Console.WriteLine();
 			}
+			WriteTorrentZip(zas, inputArchive + ".new", logger);
 			Console.ReadLine();
 
 			/*
@@ -1089,13 +1086,26 @@ namespace SabreTools.Helper
 						zaes.InternalFileAttributes = (InternalFileAttributes)br.ReadInt16();
 						zaes.ExternalFileAttributes = br.ReadInt32();
 						zaes.RelativeOffset = br.ReadInt32();
-						zaes.FileName = Style.ConvertHex(BitConverter.ToString(br.ReadBytes(fileNameLength)));
-						zaes.ExtraField = Style.ConvertHex(BitConverter.ToString(br.ReadBytes(extraFieldLength)));
-						zaes.Comment = Style.ConvertHex(BitConverter.ToString(br.ReadBytes(fileCommentLength)));
+						zaes.FileName = br.ReadBytes(fileNameLength);
+						zaes.ExtraField = br.ReadBytes(extraFieldLength);
+						zaes.Comment = br.ReadBytes(fileCommentLength);
+						zaes.Data = new byte[zaes.CompressedSize];
 						position += 46 + fileNameLength + extraFieldLength + fileCommentLength;
 						temp = br.ReadInt32();
 						zas.Entries.Add(zaes);
 					}
+				}
+			}
+
+			// Next, use the entries, if any, to get the uncompressed data
+			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+			{
+				for (int i = 0; i < zas.Entries.Count; i++)
+				{
+					ZipArchiveEntryStruct zaes = zas.Entries[i];
+					br.BaseStream.Seek(zaes.RelativeOffset + 30 + zaes.FileName.Length, SeekOrigin.Begin);
+					zaes.Data = br.ReadBytes((int)zaes.CompressedSize);
+					zas.Entries[i] = zaes;
 				}
 			}
 

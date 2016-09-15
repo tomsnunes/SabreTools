@@ -504,9 +504,9 @@ namespace SabreTools.Helper
 		public uint CRC;
 		public uint CompressedSize;
 		public uint UncompressedSize;
-		public string FileName;
-		public string ExtraField;
-		public string Comment;
+		public byte[] FileName;
+		public byte[] ExtraField;
+		public byte[] Comment;
 		public InternalFileAttributes InternalFileAttributes;
 		public int ExternalFileAttributes;
 		public int RelativeOffset;
