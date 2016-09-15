@@ -180,107 +180,6 @@ namespace SabreTools.Helper
 			return true;
 		}
 
-		/// <summary>
-		/// Write an existing zip archive construct to a torrent zip file
-		/// </summary>
-		/// <param name="zae">ZipArchiveStruct representing the zipfile with compressed data</param>
-		/// <param name="output">Name of the file to write out to</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <remarks>
-		/// Things that need to be done:
-		///		Get rid of redundant directories (ones that are implied by files inside them)
-		/// </remarks>
-		public static void WriteTorrentZip(ZipArchiveStruct zae, string output, Logger logger)
-		{
-			// First, rearrange entries by name
-			List<ZipArchiveEntryStruct> entries = zae.Entries;
-
-			using (BinaryWriter bw = new BinaryWriter(File.Open(output, FileMode.Create)))
-			{
-				List<long> offsets = new List<long>();
-
-				// First, write out entries
-				foreach (ZipArchiveEntryStruct zaes in zae.Entries)
-				{
-					offsets.Add(bw.BaseStream.Position);
-					bw.Write(new byte[] { 0x50, 0x4b, 0x03, 0x04 }); // local file header signature
-					bw.Write((ushort)20);
-					bw.Write((ushort)GeneralPurposeBitFlag.DeflatingMaximumCompression);
-					bw.Write((ushort)CompressionMethod.Deflated);
-					bw.Write((ushort)48128);
-					bw.Write((ushort)8600);
-					bw.Write(zaes.CRC);
-					bw.Write(zaes.CompressedSize);
-					bw.Write(zaes.UncompressedSize);
-					bw.Write((ushort)zaes.FileName.Length);
-					bw.Write((ushort)0);
-					bw.Write(zaes.FileName);
-					bw.Write(zaes.Data);
-					if ((zaes.GeneralPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) != 0)
-					{
-						bw.Write(zaes.CRC);
-						bw.Write(zaes.CompressedSize);
-						bw.Write(zaes.UncompressedSize);
-					}
-				}
-
-				// Then write out the central directory
-				int index = 0;
-				zae.SOCDOffset = (int)bw.BaseStream.Position;
-				foreach (ZipArchiveEntryStruct zaes in zae.Entries)
-				{
-					bw.Write(new byte[] { 0x50, 0x4b, 0x01, 0x02 }); // central file header signature
-					bw.Write((ushort)ArchiveVersion.MSDOSandOS2);
-					bw.Write((ushort)20);
-					bw.Write((ushort)GeneralPurposeBitFlag.DeflatingMaximumCompression);
-					bw.Write((ushort)CompressionMethod.Deflated);
-					bw.Write((ushort)48128);
-					bw.Write((ushort)8600);
-					bw.Write(zaes.CRC);
-					bw.Write(zaes.CompressedSize);
-					bw.Write(zaes.UncompressedSize);
-					bw.Write((short)zaes.FileName.Length);
-					bw.Write((short)0);
-					bw.Write((short)0);
-					bw.Write((short)0);
-					bw.Write((short)0);
-					bw.Write(0);
-					bw.Write((int)offsets[index]);
-					bw.Write(zaes.FileName);
-					bw.Write(zaes.ExtraField);
-					bw.Write(zaes.Comment);
-					index++;
-				}
-				zae.EOCDOffset = (int)bw.BaseStream.Position;
-
-				// Finally, write out the end record
-				bw.Write(new byte[] { 0x50, 0x4b, 0x05, 0x06 }); // end of central dir signature
-				bw.Write((short)0);
-				bw.Write((short)0);
-				bw.Write((short)zae.Entries.Count);
-				bw.Write((short)zae.Entries.Count);
-				bw.Write(zae.EOCDOffset - zae.SOCDOffset);
-				bw.Write(zae.SOCDOffset);
-				bw.Write((short)22);
-				bw.Write(new char[] { 'T', 'O', 'R', 'R', 'E', 'N', 'T', 'Z', 'I', 'P', 'P', 'E', 'D', '-' });
-			}
-
-			using (BinaryReader br = new BinaryReader(File.OpenRead(output)))
-			{
-				br.BaseStream.Seek(zae.SOCDOffset, SeekOrigin.Begin);
-				byte[] cd = br.ReadBytes(zae.EOCDOffset - zae.SOCDOffset);
-
-				OptimizedCRC ocrc = new OptimizedCRC();
-				ocrc.Update(cd, 0, cd.Length);
-				zae.CentralDirectoryCRC = ocrc.Value;
-			}
-
-			using (BinaryWriter bw = new BinaryWriter(File.Open(output, FileMode.Append)))
-			{
-				bw.Write(zae.CentralDirectoryCRC.ToString("X8").ToCharArray());
-			}
-		}
-
 		#endregion
 
 		#region Archive Extraction
@@ -508,95 +407,6 @@ namespace SabreTools.Helper
 		{
 			string tempfile = ExtractSingleItemFromArchive(inputArchive, sourceEntryName, Path.GetTempPath(), logger);
 			return WriteToArchive(tempfile, outputDirectory, destEntry);
-		}
-
-		/// <summary>
-		/// Reorder all of the files in the archive based on lowercase filename
-		/// </summary>
-		/// <param name="inputArchive">Source archive name</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>True if the operation succeeded, false otherwise</returns>
-		public static bool TorrentZipArchive(string inputArchive, Logger logger)
-		{
-			bool success = false;
-
-			// If the input file doesn't exist, return
-			if (!File.Exists(inputArchive))
-			{
-				return success;
-			}
-
-			// Make sure the file is a zip file to begin with
-			if (GetCurrentArchiveType(inputArchive, logger) != ArchiveType.Zip)
-			{
-				return success;
-			}
-
-			ZipArchiveStruct zas = GetZipFileInfo(inputArchive, logger);
-
-			for (int i = 0; i < zas.Entries.Count; i++)
-			{
-				zas.Entries[i] = PopulateEntry(zas.Entries[i], inputArchive);
-				zas.Entries[i] = DecompressEntry(zas.Entries[i], inputArchive);
-				zas.Entries[i] = CompressEntry(zas.Entries[i]);
-			}
-
-			WriteTorrentZip(zas, inputArchive + ".new", logger);
-			Console.ReadLine();
-
-			return success;
-		}
-
-		/// <summary>
-		/// Convert uncompressed data in entry to compressed data
-		/// </summary>
-		/// <remarks>Does not seem to create TZIP compatible streams</remarks>
-		private static ZipArchiveEntryStruct CompressEntry(ZipArchiveEntryStruct zaes)
-		{
-			byte[] uncompressedData = zaes.Data;
-			using (MemoryStream cms = new MemoryStream())
-			using (MemoryStream ums = new MemoryStream(uncompressedData))
-			using (DeflateStream ds = new DeflateStream(cms, CompressionMode.Compress))
-			{
-				ums.CopyTo(ds);
-				ds.Flush();
-				zaes.Data = cms.ToArray();
-			}
-			return zaes;
-		}
-
-		/// <summary>
-		/// Populate an archive entry struct with uncompressed data from an input zip archive
-		/// </summary>
-		private static ZipArchiveEntryStruct DecompressEntry(ZipArchiveEntryStruct zaes, string input)
-		{
-			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
-			{
-				br.BaseStream.Seek(zaes.RelativeOffset + 30 + zaes.FileName.Length, SeekOrigin.Begin);
-				byte[] compressedData = br.ReadBytes((int)zaes.CompressedSize);
-				using (MemoryStream ums = new MemoryStream())
-				using (MemoryStream cms = new MemoryStream(compressedData))
-				using (DeflateStream ds = new DeflateStream(cms, CompressionMode.Decompress))
-				{
-					ds.CopyTo(ums);
-					ums.Flush();
-					zaes.Data = ums.ToArray();
-				}
-			}
-			return zaes;
-		}
-
-		/// <summary>
-		/// Populate an archive entry struct with data from an input zip archive
-		/// </summary>
-		private static ZipArchiveEntryStruct PopulateEntry(ZipArchiveEntryStruct zaes, string input)
-		{
-			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
-			{
-				br.BaseStream.Seek(zaes.RelativeOffset + 30 + zaes.FileName.Length, SeekOrigin.Begin);
-				zaes.Data = br.ReadBytes((int)zaes.CompressedSize);
-			}
-			return zaes;
 		}
 
 		#endregion
@@ -1263,6 +1073,200 @@ namespace SabreTools.Helper
 				}
 				catch { }
 			}
+		}
+
+		#endregion
+
+		#region TorrentZip
+
+		/// <summary>
+		/// Write an existing zip archive construct to a torrent zip file
+		/// </summary>
+		/// <param name="zae">ZipArchiveStruct representing the zipfile with compressed data</param>
+		/// <param name="output">Name of the file to write out to</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <remarks>
+		/// Things that need to be done:
+		///		Get rid of redundant directories (ones that are implied by files inside them)
+		/// </remarks>
+		public static void WriteTorrentZip(ZipArchiveStruct zae, string output, Logger logger)
+		{
+			// First, rearrange entries by name
+			List<ZipArchiveEntryStruct> entries = zae.Entries;
+
+			using (BinaryWriter bw = new BinaryWriter(File.Open(output, FileMode.Create)))
+			{
+				List<long> offsets = new List<long>();
+
+				// First, write out entries
+				foreach (ZipArchiveEntryStruct zaes in zae.Entries)
+				{
+					offsets.Add(bw.BaseStream.Position);
+					bw.Write(new byte[] { 0x50, 0x4b, 0x03, 0x04 }); // local file header signature
+					bw.Write((ushort)20);
+					bw.Write((ushort)GeneralPurposeBitFlag.DeflatingMaximumCompression);
+					bw.Write((ushort)CompressionMethod.Deflated);
+					bw.Write((ushort)48128);
+					bw.Write((ushort)8600);
+					bw.Write(zaes.CRC);
+					bw.Write(zaes.CompressedSize);
+					bw.Write(zaes.UncompressedSize);
+					bw.Write((ushort)zaes.FileName.Length);
+					bw.Write((ushort)0);
+					bw.Write(zaes.FileName);
+					bw.Write(zaes.Data);
+					if ((zaes.GeneralPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) != 0)
+					{
+						bw.Write(zaes.CRC);
+						bw.Write(zaes.CompressedSize);
+						bw.Write(zaes.UncompressedSize);
+					}
+				}
+
+				// Then write out the central directory
+				int index = 0;
+				zae.SOCDOffset = (int)bw.BaseStream.Position;
+				foreach (ZipArchiveEntryStruct zaes in zae.Entries)
+				{
+					bw.Write(new byte[] { 0x50, 0x4b, 0x01, 0x02 }); // central file header signature
+					bw.Write((ushort)ArchiveVersion.MSDOSandOS2);
+					bw.Write((ushort)20);
+					bw.Write((ushort)GeneralPurposeBitFlag.DeflatingMaximumCompression);
+					bw.Write((ushort)CompressionMethod.Deflated);
+					bw.Write((ushort)48128);
+					bw.Write((ushort)8600);
+					bw.Write(zaes.CRC);
+					bw.Write(zaes.CompressedSize);
+					bw.Write(zaes.UncompressedSize);
+					bw.Write((short)zaes.FileName.Length);
+					bw.Write((short)0);
+					bw.Write((short)0);
+					bw.Write((short)0);
+					bw.Write((short)0);
+					bw.Write(0);
+					bw.Write((int)offsets[index]);
+					bw.Write(zaes.FileName);
+					bw.Write(zaes.ExtraField);
+					bw.Write(zaes.Comment);
+					index++;
+				}
+				zae.EOCDOffset = (int)bw.BaseStream.Position;
+
+				// Finally, write out the end record
+				bw.Write(new byte[] { 0x50, 0x4b, 0x05, 0x06 }); // end of central dir signature
+				bw.Write((short)0);
+				bw.Write((short)0);
+				bw.Write((short)zae.Entries.Count);
+				bw.Write((short)zae.Entries.Count);
+				bw.Write(zae.EOCDOffset - zae.SOCDOffset);
+				bw.Write(zae.SOCDOffset);
+				bw.Write((short)22);
+				bw.Write(new char[] { 'T', 'O', 'R', 'R', 'E', 'N', 'T', 'Z', 'I', 'P', 'P', 'E', 'D', '-' });
+			}
+
+			using (BinaryReader br = new BinaryReader(File.OpenRead(output)))
+			{
+				br.BaseStream.Seek(zae.SOCDOffset, SeekOrigin.Begin);
+				byte[] cd = br.ReadBytes(zae.EOCDOffset - zae.SOCDOffset);
+
+				OptimizedCRC ocrc = new OptimizedCRC();
+				ocrc.Update(cd, 0, cd.Length);
+				zae.CentralDirectoryCRC = ocrc.Value;
+			}
+
+			using (BinaryWriter bw = new BinaryWriter(File.Open(output, FileMode.Append)))
+			{
+				bw.Write(zae.CentralDirectoryCRC.ToString("X8").ToCharArray());
+			}
+		}
+
+		/// <summary>
+		/// Reorder all of the files in the archive based on lowercase filename
+		/// </summary>
+		/// <param name="inputArchive">Source archive name</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the operation succeeded, false otherwise</returns>
+		public static bool TorrentZipArchive(string inputArchive, Logger logger)
+		{
+			bool success = false;
+
+			// If the input file doesn't exist, return
+			if (!File.Exists(inputArchive))
+			{
+				return success;
+			}
+
+			// Make sure the file is a zip file to begin with
+			if (GetCurrentArchiveType(inputArchive, logger) != ArchiveType.Zip)
+			{
+				return success;
+			}
+
+			ZipArchiveStruct zas = GetZipFileInfo(inputArchive, logger);
+
+			for (int i = 0; i < zas.Entries.Count; i++)
+			{
+				zas.Entries[i] = PopulateEntry(zas.Entries[i], inputArchive);
+				zas.Entries[i] = DecompressEntry(zas.Entries[i], inputArchive);
+				zas.Entries[i] = CompressEntry(zas.Entries[i]);
+			}
+
+			WriteTorrentZip(zas, inputArchive + ".new", logger);
+			Console.ReadLine();
+
+			return success;
+		}
+
+		/// <summary>
+		/// Convert uncompressed data in entry to compressed data
+		/// </summary>
+		/// <remarks>Does not seem to create TZIP compatible streams</remarks>
+		private static ZipArchiveEntryStruct CompressEntry(ZipArchiveEntryStruct zaes)
+		{
+			byte[] uncompressedData = zaes.Data;
+			using (MemoryStream cms = new MemoryStream())
+			using (MemoryStream ums = new MemoryStream(uncompressedData))
+			using (DeflateStream ds = new DeflateStream(cms, CompressionMode.Compress))
+			{
+				ums.CopyTo(ds);
+				ds.Flush();
+				zaes.Data = cms.ToArray();
+			}
+			return zaes;
+		}
+
+		/// <summary>
+		/// Populate an archive entry struct with uncompressed data from an input zip archive
+		/// </summary>
+		private static ZipArchiveEntryStruct DecompressEntry(ZipArchiveEntryStruct zaes, string input)
+		{
+			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+			{
+				br.BaseStream.Seek(zaes.RelativeOffset + 30 + zaes.FileName.Length, SeekOrigin.Begin);
+				byte[] compressedData = br.ReadBytes((int)zaes.CompressedSize);
+				using (MemoryStream ums = new MemoryStream())
+				using (MemoryStream cms = new MemoryStream(compressedData))
+				using (DeflateStream ds = new DeflateStream(cms, CompressionMode.Decompress))
+				{
+					ds.CopyTo(ums);
+					ums.Flush();
+					zaes.Data = ums.ToArray();
+				}
+			}
+			return zaes;
+		}
+
+		/// <summary>
+		/// Populate an archive entry struct with data from an input zip archive
+		/// </summary>
+		private static ZipArchiveEntryStruct PopulateEntry(ZipArchiveEntryStruct zaes, string input)
+		{
+			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+			{
+				br.BaseStream.Seek(zaes.RelativeOffset + 30 + zaes.FileName.Length, SeekOrigin.Begin);
+				zaes.Data = br.ReadBytes((int)zaes.CompressedSize);
+			}
+			return zaes;
 		}
 
 		#endregion
