@@ -528,7 +528,7 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// http://stackoverflow.com/questions/5613279/c-sharp-hex-to-ascii
 		/// </summary>
-		public static string ConvertHex(String hexString)
+		public static string ConvertHexToAscii(String hexString)
 		{
 			if (hexString.Contains("-"))
 			{
@@ -544,6 +544,36 @@ namespace SabreTools.Helper
 			}
 
 			return sb.ToString();
+		}
+
+		/// <summary>
+		/// http://stackoverflow.com/questions/15920741/convert-from-string-ascii-to-string-hex
+		/// </summary>
+		public static string ConvertAsciiToHex(string asciiString)
+		{
+			string hexOutput = "";
+			foreach (char _eachChar in asciiString.ToCharArray())
+			{
+				// Get the integral value of the character.
+				int value = Convert.ToInt32(_eachChar);
+				// Convert the decimal value to a hexadecimal value in string form.
+				hexOutput += String.Format("{0:X2}", value).Remove(0, 2);
+				// to make output as your eg 
+				//  hexOutput +=" "+ String.Format("{0:X}", value);
+			}
+
+			return hexOutput;
+		}
+
+		/// <summary>
+		/// https://github.com/gjefferyes/RomVault/blob/master/ROMVault2/SupportedFiles/Zip/zipFile.cs
+		/// </summary>
+		public static bool IsUnicode(string s)
+		{
+			char[] c = s.ToCharArray();
+			for (int i = 0; i < c.Length; i++)
+				if (c[i] > 255) return true;
+			return false;
 		}
 
 		#endregion

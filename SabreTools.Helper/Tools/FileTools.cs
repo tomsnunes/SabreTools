@@ -4,6 +4,7 @@ using SharpCompress.Archive.SevenZip;
 using SharpCompress.Common;
 using SharpCompress.Reader;
 using System;
+//using Ionic.Zlib;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -85,6 +86,20 @@ namespace SabreTools.Helper
 			}
 
 			return success;
+		}
+
+		/// <summary>
+		/// Copy a file to an output archive
+		/// </summary>
+		/// <param name="inputFile">Input filename to be moved</param>
+		/// <param name="outputDirectory">Output directory to build to</param>
+		/// <param name="rom">RomData representing the new information</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteToArchiveIonic(string inputFile, string outputDirectory, Rom rom)
+		{
+			
+
+			return true;
 		}
 
 		/// <summary>
@@ -841,7 +856,7 @@ namespace SabreTools.Helper
 					br.ReadInt32(); // size of the central directory
 					position = br.ReadInt32(); // offset of start of central directory with respect to the starting disk number
 					int commentlength = br.ReadInt16();
-					zas.Comment = Style.ConvertHex(BitConverter.ToString(br.ReadBytes(commentlength)));
+					zas.Comment = Style.ConvertHexToAscii(BitConverter.ToString(br.ReadBytes(commentlength)));
 				}
 			}
 
@@ -1102,7 +1117,7 @@ namespace SabreTools.Helper
 				foreach (ZipArchiveEntryStruct zaes in zae.Entries)
 				{
 					offsets.Add(bw.BaseStream.Position);
-					bw.Write(new byte[] { 0x50, 0x4b, 0x03, 0x04 }); // local file header signature
+					bw.Write(Constants.LocalFileHeaderSignature);
 					bw.Write((ushort)20);
 					bw.Write((ushort)GeneralPurposeBitFlag.DeflatingMaximumCompression);
 					bw.Write((ushort)CompressionMethod.Deflated);
@@ -1128,7 +1143,7 @@ namespace SabreTools.Helper
 				zae.SOCDOffset = (int)bw.BaseStream.Position;
 				foreach (ZipArchiveEntryStruct zaes in zae.Entries)
 				{
-					bw.Write(new byte[] { 0x50, 0x4b, 0x01, 0x02 }); // central file header signature
+					bw.Write(Constants.CentralDirectoryHeaderSignature);
 					bw.Write((ushort)ArchiveVersion.MSDOSandOS2);
 					bw.Write((ushort)20);
 					bw.Write((ushort)GeneralPurposeBitFlag.DeflatingMaximumCompression);
@@ -1161,7 +1176,7 @@ namespace SabreTools.Helper
 				bw.Write(zae.EOCDOffset - zae.SOCDOffset);
 				bw.Write(zae.SOCDOffset);
 				bw.Write((short)22);
-				bw.Write(new char[] { 'T', 'O', 'R', 'R', 'E', 'N', 'T', 'Z', 'I', 'P', 'P', 'E', 'D', '-' });
+				bw.Write("TORRENTZIPPED-".ToCharArray());
 			}
 
 			using (BinaryReader br = new BinaryReader(File.OpenRead(output)))

@@ -170,7 +170,7 @@
 	/// <summary>
 	/// Version of tool archive made by
 	/// </summary>
-	public enum ArchiveVersion
+	public enum ArchiveVersion : ushort
 	{
 		MSDOSandOS2 = 0,
 		Amiga = 1,
@@ -192,12 +192,14 @@
 		Tandem = 17,
 		OS400 = 18,
 		OSXDarwin = 19,
+		TorrentZip = 20,
+		TorrentZip64 = 45,
 	}
 
 	/// <summary>
 	/// Compression method based on flag
 	/// </summary>
-	public enum CompressionMethod
+	public enum CompressionMethod : ushort
 	{
 		Stored = 0,
 		Shrunk = 1,

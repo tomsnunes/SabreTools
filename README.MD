@@ -75,6 +75,7 @@ An in-progress tool that will try to act as a C# port of the Go-based Romba prog
 <h3>Licensing</h3>
 <p/>
 The preceeding programs use, in part or in whole, code, libraries, and/or applications from the <a href="www.7-zip.org">7-zip project</a>. 7-zip is licenced under the GNU LGPL.<br/>
+The preceeding programs use, in part or in whole, code, libraries, and/or applications from <a href="https://dotnetzip.codeplex.com">DotNetSharp</a>. DotNetSharp is licensed under the Microsoft Public License of October 2006.
 All other external code is marked as such within the source and correctly attributed to the site and/or person(s) that originally wrote the code.
 All code written by project members is licensed under GPL v3. See LICENSE for more details.
 

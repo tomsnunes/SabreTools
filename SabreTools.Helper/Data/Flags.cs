@@ -35,7 +35,7 @@ namespace SabreTools.Helper
 	/// Determines the archive general bit flags
 	/// </summary>
 	[Flags]
-	public enum GeneralPurposeBitFlag
+	public enum GeneralPurposeBitFlag : ushort
 	{
 		Encrypted = 0x0001,
 		ZeroedCRCAndSize = 0x0008,
@@ -71,7 +71,7 @@ namespace SabreTools.Helper
 	/// Internal file attributes used by archives
 	/// </summary>
 	[Flags]
-	public enum InternalFileAttributes
+	public enum InternalFileAttributes : ushort
 	{
 		ASCIIOrTextFile = 0x0001,
 		RecordLengthControl = 0x0002,

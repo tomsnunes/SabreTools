@@ -87,6 +87,19 @@
     <Compile Include="Data\Constants.cs" />
     <Compile Include="Data\Flags.cs" />
     <Compile Include="External\OptimizedCRC.cs" />
+    <Compile Include="External\Zlib\CRC32.cs" />
+    <Compile Include="External\Zlib\Deflate.cs" />
+    <Compile Include="External\Zlib\DeflateStream.cs" />
+    <Compile Include="External\Zlib\GZipStream.cs" />
+    <Compile Include="External\Zlib\Inflate.cs" />
+    <Compile Include="External\Zlib\InfTree.cs" />
+    <Compile Include="External\Zlib\ParallelDeflateOutputStream.cs" />
+    <Compile Include="External\Zlib\Tree.cs" />
+    <Compile Include="External\Zlib\Zlib.cs" />
+    <Compile Include="External\Zlib\ZlibBaseStream.cs" />
+    <Compile Include="External\Zlib\ZlibCodec.cs" />
+    <Compile Include="External\Zlib\ZlibConstants.cs" />
+    <Compile Include="External\Zlib\ZlibStream.cs" />
     <Compile Include="Objects\DATFromDir.cs" />
     <Compile Include="Objects\Generate.cs" />
     <Compile Include="Objects\GenerateTwo.cs" />
@@ -94,7 +107,8 @@
     <Compile Include="Objects\Import.cs" />
     <Compile Include="Objects\ImportTwo.cs" />
     <Compile Include="Objects\SimpleSort.cs" />
-    <Compile Include="Objects\ZipArchiveEntryExtension.cs" />
+    <Compile Include="Objects\ZipArchiveEntry.cs" />
+    <Compile Include="Objects\ZipFIle.cs" />
     <Compile Include="Resources\Resources.de-DE.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -147,6 +161,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="LICENSE.jzlib.txt" />
+    <Content Include="License.zlib.txt" />
     <Content Include="Mappings\*.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
