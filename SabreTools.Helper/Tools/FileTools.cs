@@ -183,12 +183,11 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Write an existing zip archive construct to a torrent zip file
 		/// </summary>
-		/// <param name="zae">ZipArchiveStruct representing the zipfile</param>
+		/// <param name="zae">ZipArchiveStruct representing the zipfile with compressed data</param>
 		/// <param name="output">Name of the file to write out to</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <remarks>
 		/// Things that need to be done:
-		///		Compress data instead of just writing it
 		///		Get rid of redundant directories (ones that are implied by files inside them)
 		/// </remarks>
 		public static void WriteTorrentZip(ZipArchiveStruct zae, string output, Logger logger)
@@ -534,91 +533,70 @@ namespace SabreTools.Helper
 			}
 
 			ZipArchiveStruct zas = GetZipFileInfo(inputArchive, logger);
-			Console.WriteLine("Archive Filename: " + zas.FileName);
-			Console.WriteLine("Archive Comment: " + zas.Comment.Length + " " + zas.Comment);
-			Console.WriteLine("Archive Central Directory CRC: " + zas.CentralDirectoryCRC.ToString("X8"));
-			Console.WriteLine();
-			Console.WriteLine("Entries:");
-			foreach (ZipArchiveEntryStruct zaes in zas.Entries)
+
+			for (int i = 0; i < zas.Entries.Count; i++)
 			{
-				Console.WriteLine("Entry Filename: " + zaes.FileName.Length + " " + Style.ConvertHex(BitConverter.ToString(zaes.FileName)));
-				Console.WriteLine("Entry Comment: " + zaes.Comment.Length + " " + Style.ConvertHex(BitConverter.ToString(zaes.Comment)));
-				Console.WriteLine("Entry Compressed Size: " + zaes.CompressedSize);
-				Console.WriteLine("Entry Compression Method: " + zaes.CompressionMethod);
-				Console.WriteLine("Entry CRC: " + zaes.CRC.ToString("X8"));
-				Console.WriteLine("Entry External File Attributes: " + zaes.ExternalFileAttributes);
-				Console.WriteLine("Entry Extra Field: " + zaes.ExtraField.Length + " " + Style.ConvertHex(BitConverter.ToString(zaes.ExtraField)));
-				Console.WriteLine("Entry General Purpose Flag: " + zaes.GeneralPurposeBitFlag);
-				Console.WriteLine("Entry Internal File Attributes: " + zaes.InternalFileAttributes);
-				Console.WriteLine("Entry Last Modification File Date: " + zaes.LastModFileDate);
-				Console.WriteLine("Entry Last Modification File Time: " + zaes.LastModFileTime);
-				Console.WriteLine("Entry Relative Offset: " + zaes.RelativeOffset);
-				Console.WriteLine("Entry Uncompressed Size: " + zaes.UncompressedSize);
-				Console.WriteLine("Entry Version Made By: " + zaes.VersionMadeBy);
-				Console.WriteLine("Entry Version Needed: " + zaes.VersionNeeded);
-				Console.WriteLine();
+				zas.Entries[i] = PopulateEntry(zas.Entries[i], inputArchive);
+				zas.Entries[i] = DecompressEntry(zas.Entries[i], inputArchive);
+				zas.Entries[i] = CompressEntry(zas.Entries[i]);
 			}
+
 			WriteTorrentZip(zas, inputArchive + ".new", logger);
 			Console.ReadLine();
 
-			/*
-			ZipArchive outarchive = null;
-			try
-			{
-				// If the archive doesn't exist, create it
-				if (!File.Exists(inputArchive))
-				{
-					outarchive = ZipFile.Open(inputArchive, ZipArchiveMode.Create);
-					outarchive.Dispose();
-				}
-
-				// Open the archive for sorting
-				Dictionary<string, string> entries = new Dictionary<string, string>();
-				using (outarchive = ZipFile.Open(inputArchive, ZipArchiveMode.Update))
-				{
-					// Get and sort the entries
-					foreach (ZipArchiveEntry entry in outarchive.Entries)
-					{
-						entries.Add(entry.Name.ToLowerInvariant(), entry.Name);
-					}
-				}
-
-				// Now write out the entries by name
-				List<string> keys = entries.Keys.ToList();
-				keys.Sort(Style.CompareNumeric);
-
-				foreach (string key in keys)
-				{
-					Rom temp = new Rom
-					{
-						Machine = new Machine
-						{
-							Name = Path.GetFileNameWithoutExtension(inputArchive) + ".new",
-						},
-						Name = entries[key],
-						Date = "12/24/1996 11:32 PM",
-					};
-					CopyFileBetweenArchives(inputArchive, Path.GetDirectoryName(inputArchive), entries[key], temp, logger);
-				}
-
-				string newfile = Path.Combine(Path.GetDirectoryName(inputArchive), Path.GetFileNameWithoutExtension(inputArchive) + ".new.zip");
-				File.Delete(inputArchive);
-				File.Move(newfile, inputArchive);
-
-				success = true;
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex);
-				success = false;
-			}
-			finally
-			{
-				outarchive?.Dispose();
-			}
-			*/
-
 			return success;
+		}
+
+		/// <summary>
+		/// Convert uncompressed data in entry to compressed data
+		/// </summary>
+		/// <remarks>Does not seem to create TZIP compatible streams</remarks>
+		private static ZipArchiveEntryStruct CompressEntry(ZipArchiveEntryStruct zaes)
+		{
+			byte[] uncompressedData = zaes.Data;
+			using (MemoryStream cms = new MemoryStream())
+			using (MemoryStream ums = new MemoryStream(uncompressedData))
+			using (DeflateStream ds = new DeflateStream(cms, CompressionMode.Compress))
+			{
+				ums.CopyTo(ds);
+				ds.Flush();
+				zaes.Data = cms.ToArray();
+			}
+			return zaes;
+		}
+
+		/// <summary>
+		/// Populate an archive entry struct with uncompressed data from an input zip archive
+		/// </summary>
+		private static ZipArchiveEntryStruct DecompressEntry(ZipArchiveEntryStruct zaes, string input)
+		{
+			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+			{
+				br.BaseStream.Seek(zaes.RelativeOffset + 30 + zaes.FileName.Length, SeekOrigin.Begin);
+				byte[] compressedData = br.ReadBytes((int)zaes.CompressedSize);
+				using (MemoryStream ums = new MemoryStream())
+				using (MemoryStream cms = new MemoryStream(compressedData))
+				using (DeflateStream ds = new DeflateStream(cms, CompressionMode.Decompress))
+				{
+					ds.CopyTo(ums);
+					ums.Flush();
+					zaes.Data = ums.ToArray();
+				}
+			}
+			return zaes;
+		}
+
+		/// <summary>
+		/// Populate an archive entry struct with data from an input zip archive
+		/// </summary>
+		private static ZipArchiveEntryStruct PopulateEntry(ZipArchiveEntryStruct zaes, string input)
+		{
+			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
+			{
+				br.BaseStream.Seek(zaes.RelativeOffset + 30 + zaes.FileName.Length, SeekOrigin.Begin);
+				zaes.Data = br.ReadBytes((int)zaes.CompressedSize);
+			}
+			return zaes;
 		}
 
 		#endregion
@@ -999,7 +977,7 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Read the information from an input zip file
+		/// Read the information from an input zip file and does not populate data
 		/// </summary>
 		/// <param name="input">Name of the input file to check</param>
 		/// <param name="logger">Logger object for file and console output</param>
@@ -1094,18 +1072,6 @@ namespace SabreTools.Helper
 						temp = br.ReadInt32();
 						zas.Entries.Add(zaes);
 					}
-				}
-			}
-
-			// Next, use the entries, if any, to get the uncompressed data
-			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
-			{
-				for (int i = 0; i < zas.Entries.Count; i++)
-				{
-					ZipArchiveEntryStruct zaes = zas.Entries[i];
-					br.BaseStream.Seek(zaes.RelativeOffset + 30 + zaes.FileName.Length, SeekOrigin.Begin);
-					zaes.Data = br.ReadBytes((int)zaes.CompressedSize);
-					zas.Entries[i] = zaes;
 				}
 			}
 
