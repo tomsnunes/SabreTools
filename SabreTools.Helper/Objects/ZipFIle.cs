@@ -574,7 +574,7 @@ namespace SabreTools.Helper
 						{
 							continue;
 						}
-						if (TorrentZipStringCompare(filename0, filename1.Substring(0, filename0.Length)) = 0)
+						if (TorrentZipStringCompare(filename0, filename1.Substring(0, filename0.Length)) == 0)
 						{
 							continue;
 						}
@@ -897,6 +897,105 @@ namespace SabreTools.Helper
 			foreach (ZipFileEntry zfe in _entries)
 			{
 				zfe.Check();
+			}
+		}
+
+		/// <summary>
+		/// Get the text associated with a return status
+		/// </summary>
+		/// <param name="zr">ZipReturn status to parse</param>
+		/// <returns>String associated with the ZipReturn</returns>
+		public static string ZipErrorMessageText(ZipReturn zr)
+		{
+			string ret = "Unknown";
+			switch (zr)
+			{
+				case ZipReturn.ZipGood:
+					ret = "";
+					break;
+				case ZipReturn.ZipFileCountError:
+					ret = "The number of file in the Zip does not mach the number of files in the Zips Centeral Directory";
+					break;
+				case ZipReturn.ZipSignatureError:
+					ret = "An unknown Signature Block was found in the Zip";
+					break;
+				case ZipReturn.ZipExtraDataOnEndOfZip:
+					ret = "Extra Data was found on the end of the Zip";
+					break;
+				case ZipReturn.ZipUnsupportedCompression:
+					ret = "An unsupported Compression method was found in the Zip, if you recompress this zip it will be usable";
+					break;
+				case ZipReturn.ZipLocalFileHeaderError:
+					ret = "Error reading a zipped file header information";
+					break;
+				case ZipReturn.ZipCentralDirError:
+					ret = "There is an error in the Zip Centeral Directory";
+					break;
+				case ZipReturn.ZipReadingFromOutputFile:
+					ret = "Trying to write to a Zip file open for output only";
+					break;
+				case ZipReturn.ZipWritingToInputFile:
+					ret = "Tring to read from a Zip file open for input only";
+					break;
+				case ZipReturn.ZipErrorGettingDataStream:
+					ret = "Error creating Data Stream";
+					break;
+				case ZipReturn.ZipCRCDecodeError:
+					ret = "CRC error";
+					break;
+				case ZipReturn.ZipDecodeError:
+					ret = "Error unzipping a file";
+					break;
+			}
+
+			return ret;
+		}
+
+		/// <summary>
+		/// Compare two strings in TorrentZip format
+		/// </summary>
+		/// <param name="string1"></param>
+		/// <param name="string2"></param>
+		/// <returns></returns>
+		private static int TorrentZipStringCompare(string string1, string string2)
+		{
+			char[] bytes1 = string1.ToCharArray();
+			char[] bytes2 = string2.ToCharArray();
+
+			int pos1 = 0;
+			int pos2 = 0;
+
+			for (;;)
+			{
+				if (pos1 == bytes1.Length)
+				{
+					return ((pos2 == bytes2.Length) ? 0 : -1);
+				}
+				if (pos2 == bytes2.Length)
+				{
+					return 1;
+				}
+
+				int byte1 = bytes1[pos1++];
+				int byte2 = bytes2[pos2++];
+
+				if (byte1 >= 65 && byte1 <= 90)
+				{
+					byte1 += 0x20;
+				}
+				if (byte2 >= 65 && byte2 <= 90)
+				{
+					byte2 += 0x20;
+				}
+
+				if (byte1 < byte2)
+				{
+					return -1;
+				}
+				if (byte1 > byte2)
+				{
+					return 1;
+				}
 			}
 		}
 	}
