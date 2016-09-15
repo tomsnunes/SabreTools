@@ -1,4 +1,4 @@
-﻿using CRC32;
+﻿using OCRC;
 using SharpCompress.Archive;
 using SharpCompress.Archive.SevenZip;
 using SharpCompress.Common;

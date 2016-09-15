@@ -26,7 +26,7 @@
 using System;
 using System.IO;
 
-namespace CRC32
+namespace OCRC
 {
     public class OptimizedCRC : IDisposable
     {

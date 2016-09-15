@@ -83,34 +83,34 @@ namespace SabreTools.Helper
 		#region Byte (1024-based) size comparisons
 
 		public const long KibiByte = 1024;
-		public const long MibiByte = (long)Math.Pow(KibiByte, 2);
-		public const long GibiByte = (long)Math.Pow(KibiByte, 3);
-		public const long TibiByte = (long)Math.Pow(KibiByte, 4);
-		public const long PibiByte = (long)Math.Pow(KibiByte, 5);
+		public static long MibiByte = (long)Math.Pow(KibiByte, 2);
+		public static long GibiByte = (long)Math.Pow(KibiByte, 3);
+		public static long TibiByte = (long)Math.Pow(KibiByte, 4);
+		public static long PibiByte = (long)Math.Pow(KibiByte, 5);
 
 		#endregion
 
 		#region Byte (1000-based) size comparisons
 
 		public const long KiloByte = 1000;
-		public const long MegaByte = (long)Math.Pow(KiloByte, 2);
-		public const long GigaByte = (long)Math.Pow(KiloByte, 2);
-		public const long TeraByte = (long)Math.Pow(KiloByte, 2);
-		public const long PetaByte = (long)Math.Pow(KiloByte, 2);
+		public static long MegaByte = (long)Math.Pow(KiloByte, 2);
+		public static long GigaByte = (long)Math.Pow(KiloByte, 2);
+		public static long TeraByte = (long)Math.Pow(KiloByte, 2);
+		public static long PetaByte = (long)Math.Pow(KiloByte, 2);
 
 		#endregion
 
 		#region Magic numbers as byte arrays
 
-		public const byte[] SevenZipSigBytes = new byte[] { 0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c };
-		public const byte[] GzSigBytes = new byte[] { 0x1f, 0x8b };
-		public const byte[] RarSigBytes = new byte[] { 0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00 };
-		public const byte[] RarFiveSigBytes = new byte[] { 0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x01, 0x00 };
-		public const byte[] TarSigBytes = new byte[] { 0x75, 0x73, 0x74, 0x61, 0x72, 0x20, 0x20, 0x00 };
-		public const byte[] TarZeroSigBytes = new byte[] { 0x75, 0x73, 0x74, 0x61, 0x72, 0x00, 0x30, 0x30 };
-		public const byte[] ZipSigBytes = new byte[] { 0x50, 0x4b, 0x03, 0x04 };
-		public const byte[] ZipSigEmptyBytes = new byte[] { 0x50, 0x4b, 0x05, 0x06 };
-		public const byte[] ZipSigSpannedBytes = new byte[] { 0x50, 0x4b, 0x07, 0x08 };
+		public static byte[] SevenZipSigBytes = new byte[] { 0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c };
+		public static byte[] GzSigBytes = new byte[] { 0x1f, 0x8b };
+		public static byte[] RarSigBytes = new byte[] { 0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00 };
+		public static byte[] RarFiveSigBytes = new byte[] { 0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x01, 0x00 };
+		public static byte[] TarSigBytes = new byte[] { 0x75, 0x73, 0x74, 0x61, 0x72, 0x20, 0x20, 0x00 };
+		public static byte[] TarZeroSigBytes = new byte[] { 0x75, 0x73, 0x74, 0x61, 0x72, 0x00, 0x30, 0x30 };
+		public static byte[] ZipSigBytes = new byte[] { 0x50, 0x4b, 0x03, 0x04 };
+		public static byte[] ZipSigEmptyBytes = new byte[] { 0x50, 0x4b, 0x05, 0x06 };
+		public static byte[] ZipSigSpannedBytes = new byte[] { 0x50, 0x4b, 0x07, 0x08 };
 
 		#endregion
 
@@ -141,7 +141,7 @@ namespace SabreTools.Helper
 			0A-0B		Last mod file time (0x00, 0xBC)
 			0C-0D		Last mod file date (0x98, 0x21)
 		*/
-		public const byte[] TorrentZipHeader = new byte[] { 0x50, 0x4b, 0x03, 0x04, 0x14, 0x00, 0x02, 0x00, 0x08, 0x00, 0x00, 0xbc, 0x98, 0x21 };
+		public static byte[] TorrentZipHeader = new byte[] { 0x50, 0x4b, 0x03, 0x04, 0x14, 0x00, 0x02, 0x00, 0x08, 0x00, 0x00, 0xbc, 0x98, 0x21 };
 
 		/* Torrent7z Header Format
 			http://cpansearch.perl.org/src/BJOERN/Compress-Deflate7-1.0/7zip/DOC/7zFormat.txt
@@ -150,7 +150,7 @@ namespace SabreTools.Helper
 			06-07		ArchiveVersion (0x00, 0x03)
 			The rest is unknown
 		*/
-		public const byte[] Torrent7ZipHeader = new byte[] { 0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c, 0x00, 0x03 };
+		public static byte[] Torrent7ZipHeader = new byte[] { 0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c, 0x00, 0x03 };
 
 		/* (Torrent)GZ Header Format
 			https://tools.ietf.org/html/rfc1952
@@ -168,7 +168,7 @@ namespace SabreTools.Helper
 				1C-1F	CRC hash
 				20-27	Int64 size (mirrored)
 		*/
-		public const byte[] TorrentGZHeader = new byte[] { 0x1f, 0x8b, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1c, 0x00 };
+		public static byte[] TorrentGZHeader = new byte[] { 0x1f, 0x8b, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1c, 0x00 };
 
 		#endregion
 
