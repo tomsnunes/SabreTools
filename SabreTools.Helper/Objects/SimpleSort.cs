@@ -55,7 +55,7 @@ namespace SabreTools.Helper
 			_datdata = datdata;
 			_inputs = inputs;
 			_outdir = (outdir == "" ? "Rebuild" : outdir);
-			_tempdir = (tempdir == "" ? "__temp__" : tempdir);
+			_tempdir = (tempdir == "" ? Path.Combine(Path.GetTempPath(), "__temp__") : tempdir);
 			_quickScan = quickScan;
 			_toFolder = toFolder;
 			_verify = verify;
@@ -135,7 +135,7 @@ namespace SabreTools.Helper
 			foreach (string input in _inputs)
 			{
 				DATFromDir dfd = new DATFromDir(input, _datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
-				true /* enableGzip */, false /* addBlanks */, false /* addDate */, "__temp__" /* tempdir */, 4 /* maxDegreeOfParallelism */, _logger);
+				true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempdir */, 4 /* maxDegreeOfParallelism */, _logger);
 				dfd.Start();
 				_datdata = dfd.DatData;
 			}

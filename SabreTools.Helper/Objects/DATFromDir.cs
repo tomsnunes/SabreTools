@@ -66,7 +66,7 @@ namespace SabreTools
 			_enableGzip = enableGzip;
 			_addBlanks = addBlanks;
 			_addDate = addDate;
-			_tempDir = (String.IsNullOrEmpty(tempDir) ? Path.Combine(Environment.CurrentDirectory, "__tempdir__") : tempDir);
+			_tempDir = (String.IsNullOrEmpty(tempDir) ? Path.Combine(Path.GetTempPath(), "__temp__") : tempDir);
 			_maxDegreeOfParallelism = maxDegreeOfParallelism;
 			_logger = logger;
 		}
@@ -199,7 +199,7 @@ namespace SabreTools
 		private void ProcessPossibleArchive(string item)
 		{
 			// Define the temporary directory
-			string tempSubDir = Path.GetFullPath(Path.Combine(_tempDir, Path.GetFileNameWithoutExtension(item))) + Path.DirectorySeparatorChar;
+			string tempSubDir = Path.GetFullPath(Path.Combine(_tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
 
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
