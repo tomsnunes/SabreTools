@@ -99,6 +99,7 @@ namespace SabreTools.Helper
 		public static bool WriteTorrentZip(string inputFile, string outputDirectory, Rom rom, Logger logger)
 		{
 			bool success = false;
+			string tempFile = Path.GetTempFileName();
 
 			// If the input file doesn't exist, return
 			if (!File.Exists(inputFile))
@@ -115,7 +116,6 @@ namespace SabreTools.Helper
 			}
 
 			// Set internal variables
-			Stream readStream = null;
 			Stream writeStream = null;
 			ZipFile oldZipFile = new ZipFile();
 			ZipFile zipFile = new ZipFile();
@@ -129,11 +129,30 @@ namespace SabreTools.Helper
 					Directory.CreateDirectory(Path.GetDirectoryName(archiveFileName));
 				}
 
-				// Open or create the archive
+				// If the archive doesn't exist, create it and put the single file
 				if (!File.Exists(archiveFileName))
 				{
-					zipReturn = zipFile.Create(archiveFileName + ".new");
+					zipReturn = zipFile.Create(tempFile);
+
+					// Open the input file for reading
+					Stream readStream = File.OpenRead(inputFile);
+					ulong streamSize = (ulong)(new FileInfo(inputFile).Length);
+					zipReturn = zipFile.OpenWriteStream(false, true, rom.Name, streamSize, CompressionMethod.Deflated, out writeStream);
+
+					// Copy the input stream to the output
+					byte[] buffer = new byte[8 * 1024];
+					int len;
+					while ((len = readStream.Read(buffer, 0, buffer.Length)) > 0)
+					{
+						writeStream.Write(buffer, 0, len);
+					}
+					writeStream.Flush();
+					readStream.Close();
+					readStream.Dispose();
+					zipFile.CloseWriteStream(Convert.ToUInt32(rom.HashData.CRC, 16));
 				}
+
+				// Otherwise, sort the input files and write out in the correct order
 				else
 				{
 					// Open the old archive for reading
@@ -143,63 +162,71 @@ namespace SabreTools.Helper
 					if (oldZipFile.Contains(rom.Name))
 					{
 						success = true;
+						return success;
 					}
-					// Otherwise, process the old zipfile
-					else
-					{
-						zipFile.Create(archiveFileName + ".new");
 
-						// Copy over all files to the new archive
-						for (int i = 0; i < oldZipFile.EntriesCount; i++)
+					// Otherwise, process the old zipfile
+					zipFile.Create(tempFile);
+
+					// Get the order for the entries with the new file
+					Dictionary<string, int> entries = new Dictionary<string, int>();
+					entries.Add(rom.Name, -1);
+					for (int i = 0; i < oldZipFile.EntriesCount; i++)
+					{
+						entries.Add(oldZipFile.Filename(i), i);
+					}
+					List<string> entriesKeys = entries.Keys.ToList();
+					entriesKeys.Sort(ZipFile.TorrentZipStringCompare);
+
+					// Copy over all files to the new archive
+					foreach (string key in entriesKeys)
+					{
+						// Get the index mapped to they key
+						int index = entries[key];
+
+						// If we have the input file, add it now
+						if (index == -1)
 						{
-							// Instantiate the streams
-							CompressionMethod icompressionMethod = CompressionMethod.Stored;
-							ulong istreamSize = 0;
-							oldZipFile.OpenReadStream(i, false, out readStream, out istreamSize, out icompressionMethod);
-							zipFile.OpenWriteStream(false, true, oldZipFile.Filename(i), istreamSize, CompressionMethod.Deflated, out writeStream);
+							// Open the input file for reading
+							Stream freadStream = File.OpenRead(inputFile);
+							ulong istreamSize = (ulong)(new FileInfo(inputFile).Length);
+							zipFile.OpenWriteStream(false, true, rom.Name, istreamSize, CompressionMethod.Deflated, out writeStream);
 
 							// Copy the input stream to the output
 							byte[] ibuffer = new byte[8 * 1024];
 							int ilen;
-							while ((ilen = readStream.Read(ibuffer, 0, ibuffer.Length)) > 0)
+							while ((ilen = freadStream.Read(ibuffer, 0, ibuffer.Length)) > 0)
 							{
 								writeStream.Write(ibuffer, 0, ilen);
 							}
-							writeStream.Flush();
+							freadStream.Close();
+							freadStream.Dispose();
+							zipFile.CloseWriteStream(Convert.ToUInt32(rom.HashData.CRC, 16));
+						}
 
-							zipFile.CloseWriteStream(BitConverter.ToUInt32(oldZipFile.CRC32(i), 0));
+						// Otherwise, copy the file from the old archive
+						else
+						{
+							// Instantiate the streams
+							CompressionMethod icompressionMethod = CompressionMethod.Stored;
+							ulong istreamSize = 0;
+							Stream zreadStream;
+							oldZipFile.OpenReadStream(index, false, out zreadStream, out istreamSize, out icompressionMethod);
+							zipFile.OpenWriteStream(false, true, oldZipFile.Filename(index), istreamSize, CompressionMethod.Deflated, out writeStream);
+
+							// Copy the input stream to the output
+							byte[] ibuffer = new byte[8 * 1024];
+							int ilen;
+							while ((ilen = zreadStream.Read(ibuffer, 0, ibuffer.Length)) > 0)
+							{
+								writeStream.Write(ibuffer, 0, ilen);
+							}
+							zipFile.CloseWriteStream(BitConverter.ToUInt32(oldZipFile.CRC32(index), 0));
 						}
 					}
 				}
 
-				// If the file has already been found, return it
-				if (success)
-				{
-					return success;
-				}
-
-				// Open the input file for reading
-				readStream = File.OpenRead(inputFile);
-				ulong streamSize = (ulong)(new FileInfo(inputFile).Length);
-				zipReturn = zipFile.OpenWriteStream(false, true, rom.Name, streamSize, CompressionMethod.Deflated, out writeStream);
-
-				// Copy the input stream to the output
-				byte[] buffer = new byte[8 * 1024];
-				int len;
-				while ((len = readStream.Read(buffer, 0, buffer.Length)) > 0)
-				{
-					writeStream.Write(buffer, 0, len);
-				}
-				writeStream.Flush();
-
-				// Close the streams
-				readStream.Close();
-
-				zipReturn = zipFile.CloseWriteStream(Convert.ToUInt32(rom.HashData.CRC, 16));
-				if (zipReturn != ZipReturn.ZipGood)
-				{
-					return success;
-				}
+				// Close the output zip file
 				zipFile.Close();
 
 				success = true;
@@ -220,7 +247,7 @@ namespace SabreTools.Helper
 			{
 				File.Delete(archiveFileName);
 			}
-			File.Move(archiveFileName + ".new", archiveFileName);
+			File.Move(tempFile, archiveFileName);
 
 			return success;
 		}
