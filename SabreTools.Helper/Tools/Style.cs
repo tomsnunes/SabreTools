@@ -159,7 +159,7 @@ namespace SabreTools.Helper
 			// Create the output dictionary
 			Dictionary<OutputFormat, string> outfileNames = new Dictionary<OutputFormat, string>();
 
-			// Double check the outdir for the end delim
+			// Double check the outDir for the end delim
 			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
 			{
 				outDir += Path.DirectorySeparatorChar;

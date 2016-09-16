@@ -240,7 +240,7 @@ Make a selection:
 		/// </summary>
 		private static void ConvertMenu()
 		{
-			string selection = "", input = "", outdir = "";
+			string selection = "", input = "", outDir = "";
 			OutputFormat outputFormat = OutputFormat.Xml;
 			while (selection.ToLowerInvariant() != "b")
 			{
@@ -251,7 +251,7 @@ Make a selection:
 Make a selection:
 
     1) File or folder to convert" + (input == "" ? "" : ":\n" + input) + @"
-    2) New output folder" + (outdir == "" ? " (blank means source directory)" : ":\n" + outdir) + @"
+    2) New output folder" + (outDir == "" ? " (blank means source directory)" : ":\n" + outDir) + @"
     3) Current output type: " + (outputFormat.ToString()) + @"
     4) Process file or folder
     B) Go back to the previous menu
@@ -268,7 +268,7 @@ Make a selection:
 					case "2":
 						Console.Clear();
 						Console.Write("Please enter a folder name: ");
-						outdir = Console.ReadLine();
+						outDir = Console.ReadLine();
 						break;
 					case "3":
 						string subsel = "";
@@ -312,11 +312,11 @@ Make a selection:
 						InitUpdate(temp, "", "", "", "", "", "", "", "", "", "", "", "", false, "", "", "",
 							(outputFormat == OutputFormat.ClrMamePro), (outputFormat == OutputFormat.MissFile), (outputFormat == OutputFormat.RomCenter),
 							(outputFormat == OutputFormat.SabreDat), (outputFormat == OutputFormat.Xml), false, "", "", false, "", "", false, false, false,
-							false, false, false, false, false, "", "", "", -1, -1, -1, "", "", "", null, outdir, false, false);
+							false, false, false, false, false, "", "", "", -1, -1, -1, "", "", "", null, outDir, false, false);
 						*/
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
-						input = ""; outdir = "";
+						input = ""; outDir = "";
 						outputFormat = OutputFormat.Xml;
 						break;
 				}
@@ -579,7 +579,7 @@ Make a selection:
 		/// </summary>
 		private static void ExtSplitMenu()
 		{
-			string selection = "", input = "", exta = "", extb = "", outdir = "";
+			string selection = "", input = "", exta = "", extb = "", outDir = "";
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
@@ -591,7 +591,7 @@ Make a selection:
     1) File to split" + (input != "" ? ":\n\t" + input : "") + @"
     2) First file extension" + (exta != "" ? ":\t" + exta : "") + @"
     3) Second file extension" + (extb != "" ? ":\t" + extb : "") + @"
-    4) Output directory" + (outdir != "" ? ":\n\t" + outdir : "") + @"
+    4) Output directory" + (outDir != "" ? ":\n\t" + outDir : "") + @"
     5) Split the file
     B) Go back to the previous menu
 ");
@@ -617,16 +617,16 @@ Make a selection:
 					case "4":
 						Console.Clear();
 						Console.Write("Please enter the output directory: ");
-						outdir = Console.ReadLine();
+						outDir = Console.ReadLine();
 						break;
 					case "5":
 						Console.Clear();
 						List<string> inputs = new List<string>();
 						inputs.Add(input);
-						InitExtSplit(inputs, exta, extb, outdir);
+						InitExtSplit(inputs, exta, extb, outDir);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
-						input = ""; exta = ""; extb = ""; outdir = "";
+						input = ""; exta = ""; extb = ""; outDir = "";
 						break;
 				}
 			}
@@ -637,7 +637,7 @@ Make a selection:
 		/// </summary>
 		private static void HashSplitMenu()
 		{
-			string selection = "", input = "", outdir = "";
+			string selection = "", input = "", outDir = "";
 			while (selection.ToLowerInvariant() != "b")
 			{
 				Console.Clear();
@@ -647,7 +647,7 @@ Make a selection:
 Make a selection:
 
     1) File or folder to split" + (input != "" ? ":\n\t" + input : "") + @"
-    2) Output directory" + (outdir != "" ? ":\n\t" + outdir : "") + @"
+    2) Output directory" + (outDir != "" ? ":\n\t" + outDir : "") + @"
     3) Split the file
     B) Go back to the previous menu
 ");
@@ -663,16 +663,16 @@ Make a selection:
 					case "2":
 						Console.Clear();
 						Console.Write("Please enter the output directory: ");
-						outdir = Console.ReadLine();
+						outDir = Console.ReadLine();
 						break;
 					case "3":
 						Console.Clear();
 						List<string> inputs = new List<string>();
 						inputs.Add(input);
-						InitHashSplit(inputs, outdir);
+						InitHashSplit(inputs, outDir);
 						Console.Write("\nPress any key to continue...");
 						Console.ReadKey();
-						input = ""; outdir = "";
+						input = ""; outDir = "";
 						break;
 				}
 			}

@@ -2103,12 +2103,12 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Output user defined merge
 		/// </summary>
-		/// <param name="outdir">Output directory to write the DATs to</param>
+		/// <param name="outDir">Output directory to write the DATs to</param>
 		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void MergeNoDiff(string outdir, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
+		public static void MergeNoDiff(string outDir, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
 		{
 			// If we're in SuperDAT mode, prefix all games with their respective DATs
 			if (userData.Type == "SuperDAT")
@@ -2137,7 +2137,7 @@ namespace SabreTools.Helper
 			// Output a DAT only if there are roms
 			if (userData.Files.Count != 0)
 			{
-				WriteDatfile(userData, outdir, logger);
+				WriteDatfile(userData, outDir, logger);
 			}
 		}
 
@@ -2151,7 +2151,7 @@ namespace SabreTools.Helper
 		/// <param name="inputFileNames">Names of the input files and/or folders</param>
 		/// <param name="datdata">User specified inputs contained in a DatData object</param>
 		/// <param name="outputFormat">Non-zero flag for output format, zero otherwise for default</param>
-		/// <param name="outputDirectory">Optional param for output directory</param>
+		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
 		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
 		/// <param name="cascade">True if the diffed files should be cascade diffed, false if diffed files should be reverse cascaded, null otherwise</param>
@@ -2175,7 +2175,7 @@ namespace SabreTools.Helper
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void Update(List<string> inputFileNames, Dat datdata, OutputFormat outputFormat, string outputDirectory, bool merge,
+		public static void Update(List<string> inputFileNames, Dat datdata, OutputFormat outputFormat, string outDir, bool merge,
 			DiffMode diff, bool? cascade, bool inplace, bool skip, bool bare, bool clean, bool softlist, string gamename, string romname, string romtype,
 			long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, bool trim, bool single, string root, int maxDegreeOfParallelism,
 			Logger logger)
@@ -2231,23 +2231,23 @@ namespace SabreTools.Helper
 				// Create a dictionary of all ROMs from the input DATs
 				Dat userData;
 				List<Dat> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, softlist,
-					outputDirectory, datdata, out userData, gamename, romname, romtype, sgt, slt, seq,
+					outDir, datdata, out userData, gamename, romname, romtype, sgt, slt, seq,
 					crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, logger);
 
 				// Modify the Dictionary if necessary and output the results
 				if (diff != 0 && cascade == null)
 				{
-					DiffNoCascade(diff, outputDirectory, userData, newInputFileNames, logger);
+					DiffNoCascade(diff, outDir, userData, newInputFileNames, logger);
 				}
 				// If we're in cascade and diff, output only cascaded diffs
 				else if (diff != 0 && cascade != null)
 				{
-					DiffCascade(outputDirectory, inplace, userData, newInputFileNames, datHeaders, skip, logger);
+					DiffCascade(outDir, inplace, userData, newInputFileNames, datHeaders, skip, logger);
 				}
 				// Output all entries with user-defined merge
 				else
 				{
-					MergeNoDiff(outputDirectory, userData, newInputFileNames, datHeaders, logger);
+					MergeNoDiff(outDir, userData, newInputFileNames, datHeaders, logger);
 				}
 			}
 			// Otherwise, loop through all of the inputs individually
@@ -2274,7 +2274,7 @@ namespace SabreTools.Helper
 						// If we have roms, output them
 						if (innerDatdata.Files.Count != 0)
 						{
-							WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(inputFileName) : outputDirectory), logger, overwrite: (outputDirectory != ""));
+							WriteDatfile(innerDatdata, (outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), logger, overwrite: (outDir != ""));
 						}
 					}
 					else if (Directory.Exists(inputFileName))
@@ -2294,7 +2294,7 @@ namespace SabreTools.Helper
 							// If we have roms, output them
 							if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
 							{
-								WriteDatfile(innerDatdata, (outputDirectory == "" ? Path.GetDirectoryName(file) : outputDirectory + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outputDirectory != ""));
+								WriteDatfile(innerDatdata, (outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outDir != ""));
 							}
 						});
 					}
@@ -2327,7 +2327,7 @@ namespace SabreTools.Helper
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		/// <returns>List of DatData objects representing headers</returns>
-		private static List<Dat> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool softlist, string outdir,
+		private static List<Dat> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool softlist, string outDir,
 			Dat inputDat, out Dat userData, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
 			string md5, string sha1, bool? nodump, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
 		{
@@ -2389,11 +2389,11 @@ namespace SabreTools.Helper
 		/// Output non-cascading diffs
 		/// </summary>
 		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
-		/// <param name="outdir">Output directory to write the DATs to</param>
+		/// <param name="outDir">Output directory to write the DATs to</param>
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void DiffNoCascade(DiffMode diff, string outdir, Dat userData, List<string> inputs, Logger logger)
+		public static void DiffNoCascade(DiffMode diff, string outDir, Dat userData, List<string> inputs, Logger logger)
 		{
 			DateTime start = DateTime.Now;
 			logger.User("Initializing all output DATs");
@@ -2532,13 +2532,13 @@ namespace SabreTools.Helper
 			// Output the difflist (a-b)+(b-a) diff
 			if ((diff & DiffMode.NoDupes) != 0)
 			{
-				WriteDatfile(outerDiffData, outdir, logger);
+				WriteDatfile(outerDiffData, outDir, logger);
 			}
 
 			// Output the (ab) diff
 			if ((diff & DiffMode.Dupes) != 0)
 			{
-				WriteDatfile(dupeData, outdir, logger);
+				WriteDatfile(dupeData, outDir, logger);
 			}
 
 			// Output the individual (a-b) DATs
@@ -2547,7 +2547,7 @@ namespace SabreTools.Helper
 				for (int j = 0; j < inputs.Count; j++)
 				{
 					// If we have an output directory set, replace the path
-					string path = outdir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
+					string path = outDir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
 
 					// If we have more than 0 roms, output
 					if (outDats[j].Files.Count > 0)
@@ -2562,14 +2562,14 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Output cascading diffs
 		/// </summary>
-		/// <param name="outdir">Output directory to write the DATs to</param>
+		/// <param name="outDir">Output directory to write the DATs to</param>
 		/// <param name="inplace">True if cascaded diffs are outputted in-place, false otherwise</param>
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void DiffCascade(string outdir, bool inplace, Dat userData, List<string> inputs, List<Dat> datHeaders, bool skip, Logger logger)
+		public static void DiffCascade(string outDir, bool inplace, Dat userData, List<string> inputs, List<Dat> datHeaders, bool skip, Logger logger)
 		{
 			string post = "";
 
@@ -2588,7 +2588,7 @@ namespace SabreTools.Helper
 				Dat diffData;
 
 				// If we're in inplace mode, take the appropriate DatData object already stored
-				if (inplace || !String.IsNullOrEmpty(outdir))
+				if (inplace || !String.IsNullOrEmpty(outDir))
 				{
 					diffData = datHeaders[j];
 				}
@@ -2646,9 +2646,9 @@ namespace SabreTools.Helper
 				{
 					path = Path.GetDirectoryName(inputs[j].Split('¬')[0]);
 				}
-				else if (!String.IsNullOrEmpty(outdir))
+				else if (!String.IsNullOrEmpty(outDir))
 				{
-					path = outdir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
+					path = outDir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
 				}
 
 				// If we have more than 0 roms, output
@@ -3368,13 +3368,13 @@ namespace SabreTools.Helper
 		/// Split a DAT by input extensions
 		/// </summary>
 		/// <param name="filename">Name of the file to be split</param>
-		/// <param name="outdir">Name of the directory to write the DATs out to</param>
+		/// <param name="outDir">Name of the directory to write the DATs out to</param>
 		/// <param name="basepath">Parent path for replacement</param>
 		/// <param name="extA">List of extensions to split on (first DAT)</param>
 		/// <param name="extB">List of extensions to split on (second DAT)</param>
 		/// <param name="logger">Logger object for console and file writing</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public static bool SplitByExt(string filename, string outdir, string basepath, List<string> extA, List<string> extB, Logger logger)
+		public static bool SplitByExt(string filename, string outDir, string basepath, List<string> extA, List<string> extB, Logger logger)
 		{
 			// Make sure all of the extensions have a dot at the beginning
 			List<string> newExtA = new List<string>();
@@ -3500,18 +3500,18 @@ namespace SabreTools.Helper
 			}
 
 			// Get the output directory
-			if (outdir != "")
+			if (outDir != "")
 			{
-				outdir = outdir + Path.GetDirectoryName(filename).Remove(0, basepath.Length - 1);
+				outDir = outDir + Path.GetDirectoryName(filename).Remove(0, basepath.Length - 1);
 			}
 			else
 			{
-				outdir = Path.GetDirectoryName(filename);
+				outDir = Path.GetDirectoryName(filename);
 			}
 
 			// Then write out both files
-			bool success = WriteDatfile(datdataA, outdir, logger);
-			success &= WriteDatfile(datdataB, outdir, logger);
+			bool success = WriteDatfile(datdataA, outDir, logger);
+			success &= WriteDatfile(datdataB, outDir, logger);
 
 			return success;
 		}
@@ -3520,11 +3520,11 @@ namespace SabreTools.Helper
 		/// Split a DAT by best available hashes
 		/// </summary>
 		/// <param name="filename">Name of the file to be split</param>
-		/// <param name="outdir">Name of the directory to write the DATs out to</param>
+		/// <param name="outDir">Name of the directory to write the DATs out to</param>
 		/// <param name="basepath">Parent path for replacement</param>
 		/// <param name="logger">Logger object for console and file writing</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public static bool SplitByHash(string filename, string outdir, string basepath, Logger logger)
+		public static bool SplitByHash(string filename, string outDir, string basepath, Logger logger)
 		{
 			// Sanitize the basepath to be more predictable
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
@@ -3698,13 +3698,13 @@ namespace SabreTools.Helper
 			}
 
 			// Get the output directory
-			if (outdir != "")
+			if (outDir != "")
 			{
-				outdir = outdir + Path.GetDirectoryName(filename).Remove(0, basepath.Length - 1);
+				outDir = outDir + Path.GetDirectoryName(filename).Remove(0, basepath.Length - 1);
 			}
 			else
 			{
-				outdir = Path.GetDirectoryName(filename);
+				outDir = Path.GetDirectoryName(filename);
 			}
 
 			// Now, output all of the files to the output directory
@@ -3712,19 +3712,19 @@ namespace SabreTools.Helper
 			bool success = true;
 			if (nodump.Files.Count > 0)
 			{
-				success &= WriteDatfile(nodump, outdir, logger);
+				success &= WriteDatfile(nodump, outDir, logger);
 			}
 			if (sha1.Files.Count > 0)
 			{
-				success &= WriteDatfile(sha1, outdir, logger);
+				success &= WriteDatfile(sha1, outDir, logger);
 			}
 			if (md5.Files.Count > 0)
 			{
-				success &= WriteDatfile(md5, outdir, logger);
+				success &= WriteDatfile(md5, outDir, logger);
 			}
 			if (crc.Files.Count > 0)
 			{
-				success &= WriteDatfile(crc, outdir, logger);
+				success &= WriteDatfile(crc, outDir, logger);
 			}
 
 			return success;
@@ -3734,11 +3734,11 @@ namespace SabreTools.Helper
 		/// Split a DAT by type of Rom
 		/// </summary>
 		/// <param name="filename">Name of the file to be split</param>
-		/// <param name="outdir">Name of the directory to write the DATs out to</param>
+		/// <param name="outDir">Name of the directory to write the DATs out to</param>
 		/// <param name="basepath">Parent path for replacement</param>
 		/// <param name="logger">Logger object for console and file writing</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public static bool SplitByType(string filename, string outdir, string basepath, Logger logger)
+		public static bool SplitByType(string filename, string outDir, string basepath, Logger logger)
 		{
 			// Sanitize the basepath to be more predictable
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
@@ -3877,13 +3877,13 @@ namespace SabreTools.Helper
 			}
 
 			// Get the output directory
-			if (outdir != "")
+			if (outDir != "")
 			{
-				outdir = outdir + Path.GetDirectoryName(filename).Remove(0, basepath.Length - 1);
+				outDir = outDir + Path.GetDirectoryName(filename).Remove(0, basepath.Length - 1);
 			}
 			else
 			{
-				outdir = Path.GetDirectoryName(filename);
+				outDir = Path.GetDirectoryName(filename);
 			}
 
 			// Now, output all of the files to the output directory
@@ -3891,15 +3891,15 @@ namespace SabreTools.Helper
 			bool success = true;
 			if (romdat.Files.Count > 0)
 			{
-				success &= WriteDatfile(romdat, outdir, logger);
+				success &= WriteDatfile(romdat, outDir, logger);
 			}
 			if (diskdat.Files.Count > 0)
 			{
-				success &= WriteDatfile(diskdat, outdir, logger);
+				success &= WriteDatfile(diskdat, outDir, logger);
 			}
 			if (sampledat.Files.Count > 0)
 			{
-				success &= WriteDatfile(sampledat, outdir, logger);
+				success &= WriteDatfile(sampledat, outDir, logger);
 			}
 
 			return success;

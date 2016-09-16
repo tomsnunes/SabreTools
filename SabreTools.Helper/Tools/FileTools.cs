@@ -22,10 +22,10 @@ namespace SabreTools.Helper
 		/// Copy a file to an output archive
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
-		/// <param name="outputDirectory">Output directory to build to</param>
+		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteToArchive(string inputFile, string outputDirectory, Rom rom)
+		public static bool WriteToArchive(string inputFile, string outDir, Rom rom)
 		{
 			bool success = false;
 
@@ -35,7 +35,7 @@ namespace SabreTools.Helper
 				return success;
 			}
 
-			string archiveFileName = Path.Combine(outputDirectory, rom.Machine.Name + ".zip");
+			string archiveFileName = Path.Combine(outDir, rom.Machine.Name + ".zip");
 
 			ZipArchive outarchive = null;
 			try
@@ -92,11 +92,11 @@ namespace SabreTools.Helper
 		/// Copy a file to an output torrentzip archive
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
-		/// <param name="outputDirectory">Output directory to build to</param>
+		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrentZip(string inputFile, string outputDirectory, Rom rom, Logger logger)
+		public static bool WriteTorrentZip(string inputFile, string outDir, Rom rom, Logger logger)
 		{
 			bool success = false;
 			string tempFile = Path.GetTempFileName();
@@ -107,7 +107,7 @@ namespace SabreTools.Helper
 				return success;
 			}
 
-			string archiveFileName = Path.Combine(outputDirectory, rom.Machine.Name + ".zip");
+			string archiveFileName = Path.Combine(outDir, rom.Machine.Name + ".zip");
 
 			// If the output file exists but isn't a zip archive, return
 			if (File.Exists(archiveFileName) && GetCurrentArchiveType(archiveFileName, logger) != ArchiveType.Zip)
@@ -256,12 +256,12 @@ namespace SabreTools.Helper
 		/// Write an input file to a torrent GZ file
 		/// </summary>
 		/// <param name="input">File to write from</param>
-		/// <param name="outputDirectory">Directory to write archive to</param>
+		/// <param name="outDir">Directory to write archive to</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the write was a success, false otherwise</returns>
 		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
-		public static bool WriteTorrentGZ(string input, string outputDirectory, bool romba, Logger logger)
+		public static bool WriteTorrentGZ(string input, string outDir, bool romba, Logger logger)
 		{
 			// Check that the input file exists
 			if (!File.Exists(input))
@@ -272,17 +272,17 @@ namespace SabreTools.Helper
 			input = Path.GetFullPath(input);
 
 			// Make sure the output directory exists
-			if (!Directory.Exists(outputDirectory))
+			if (!Directory.Exists(outDir))
 			{
-				Directory.CreateDirectory(outputDirectory);
+				Directory.CreateDirectory(outDir);
 			}
-			outputDirectory = Path.GetFullPath(outputDirectory);
+			outDir = Path.GetFullPath(outDir);
 
 			// Now get the Rom info for the file so we have hashes and size
 			Rom rom = FileTools.GetSingleFileInfo(input);
 
 			// If it doesn't exist, create the output file and then write
-			string outfile = Path.Combine(outputDirectory, rom.HashData.SHA1 + ".gz");
+			string outfile = Path.Combine(outDir, rom.HashData.SHA1 + ".gz");
 			using (FileStream inputstream = new FileStream(input, FileMode.Open))
 			using (GZipStream output = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress))
 			{
@@ -325,15 +325,15 @@ namespace SabreTools.Helper
 			if (romba)
 			{
 				string subfolder = Path.Combine(rom.HashData.SHA1.Substring(0, 2), rom.HashData.SHA1.Substring(2, 2), rom.HashData.SHA1.Substring(4, 2), rom.HashData.SHA1.Substring(6, 2));
-				outputDirectory = Path.Combine(outputDirectory, subfolder);
-				if (!Directory.Exists(outputDirectory))
+				outDir = Path.Combine(outDir, subfolder);
+				if (!Directory.Exists(outDir))
 				{
-					Directory.CreateDirectory(outputDirectory);
+					Directory.CreateDirectory(outDir);
 				}
 
 				try
 				{
-					File.Move(outfile, Path.Combine(outputDirectory, Path.GetFileName(outfile)));
+					File.Move(outfile, Path.Combine(outDir, Path.GetFileName(outfile)));
 				}
 				catch (Exception ex)
 				{
@@ -353,43 +353,43 @@ namespace SabreTools.Helper
 		/// Attempt to extract a file as an archive
 		/// </summary>
 		/// <param name="input">Name of the file to be extracted</param>
-		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public static bool ExtractArchive(string input, string tempdir, Logger logger)
+		public static bool ExtractArchive(string input, string tempDir, Logger logger)
 		{
-			return ExtractArchive(input, tempdir, ArchiveScanLevel.Both, ArchiveScanLevel.External, ArchiveScanLevel.External, ArchiveScanLevel.Both, logger);
+			return ExtractArchive(input, tempDir, ArchiveScanLevel.Both, ArchiveScanLevel.External, ArchiveScanLevel.External, ArchiveScanLevel.Both, logger);
 		}
 
 		/// <summary>
 		/// Attempt to extract a file as an archive
 		/// </summary>
 		/// <param name="input">Name of the file to be extracted</param>
-		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public static bool ExtractArchive(string input, string tempdir, int sevenzip,
+		public static bool ExtractArchive(string input, string tempDir, int sevenzip,
 			int gz, int rar, int zip, Logger logger)
 		{
-			return ExtractArchive(input, tempdir, (ArchiveScanLevel)sevenzip, (ArchiveScanLevel)gz, (ArchiveScanLevel)rar, (ArchiveScanLevel)zip, logger);
+			return ExtractArchive(input, tempDir, (ArchiveScanLevel)sevenzip, (ArchiveScanLevel)gz, (ArchiveScanLevel)rar, (ArchiveScanLevel)zip, logger);
 		}
 
 		/// <summary>
 		/// Attempt to extract a file as an archive
 		/// </summary>
 		/// <param name="input">Name of the file to be extracted</param>
-		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="sevenzip">Archive handling level for 7z</param>
 		/// <param name="gz">Archive handling level for GZip</param>
 		/// <param name="rar">Archive handling level for RAR</param>
 		/// <param name="zip">Archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public static bool ExtractArchive(string input, string tempdir, ArchiveScanLevel sevenzip,
+		public static bool ExtractArchive(string input, string tempDir, ArchiveScanLevel sevenzip,
 			ArchiveScanLevel gz, ArchiveScanLevel rar, ArchiveScanLevel zip, Logger logger)
 		{
 			bool encounteredErrors = true;
@@ -413,10 +413,10 @@ namespace SabreTools.Helper
 					logger.Log("Found archive of type: " + at);
 
 					// Create the temp directory
-					Directory.CreateDirectory(tempdir);
+					Directory.CreateDirectory(tempDir);
 
 					// Extract all files to the temp directory
-					sza.WriteToDirectory(tempdir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+					sza.WriteToDirectory(tempDir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
 					encounteredErrors = false;
 				}
 				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
@@ -424,11 +424,11 @@ namespace SabreTools.Helper
 					logger.Log("Found archive of type: " + at);
 
 					// Create the temp directory
-					Directory.CreateDirectory(tempdir);
+					Directory.CreateDirectory(tempDir);
 
 					using (FileStream itemstream = File.OpenRead(input))
 					{
-						using (FileStream outstream = File.Create(Path.Combine(tempdir, Path.GetFileNameWithoutExtension(input))))
+						using (FileStream outstream = File.Create(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input))))
 						{
 							using (GZipStream gzstream = new GZipStream(itemstream, CompressionMode.Decompress))
 							{
@@ -447,10 +447,10 @@ namespace SabreTools.Helper
 						(at == ArchiveType.Rar && rar != ArchiveScanLevel.External))
 					{
 						// Create the temp directory
-						Directory.CreateDirectory(tempdir);
+						Directory.CreateDirectory(tempDir);
 
 						// Extract all files to the temp directory
-						reader.WriteAllToDirectory(tempdir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+						reader.WriteAllToDirectory(tempDir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
 						encounteredErrors = false;
 					}
 				}
@@ -482,11 +482,11 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="input">Name of the archive to be extracted</param>
 		/// <param name="entryname">Name of the entry to be extracted</param>
-		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>Name of the extracted file, null on error</returns>
 		public static string ExtractSingleItemFromArchive(string input, string entryname,
-			string tempdir, Logger logger)
+			string tempDir, Logger logger)
 		{
 			string outfile = null;
 
@@ -507,14 +507,14 @@ namespace SabreTools.Helper
 				if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
 				{
 					// Create the temp directory
-					Directory.CreateDirectory(tempdir);
+					Directory.CreateDirectory(tempDir);
 
 					while (reader.MoveToNextEntry())
 					{
 						logger.Log("Current entry name: '" + reader.Entry.Key + "'");
 						if (reader.Entry != null && reader.Entry.Key.Contains(entryname))
 						{
-							outfile = Path.GetFullPath(Path.Combine(tempdir, reader.Entry.Key));
+							outfile = Path.GetFullPath(Path.Combine(tempDir, reader.Entry.Key));
 							if (!Directory.Exists(Path.GetDirectoryName(outfile)))
 							{
 								Directory.CreateDirectory(Path.GetDirectoryName(outfile));
@@ -530,12 +530,12 @@ namespace SabreTools.Helper
 
 					using(FileStream itemstream = File.OpenRead(input))
 					{
-						using (FileStream outstream = File.Create(Path.Combine(tempdir, Path.GetFileNameWithoutExtension(input))))
+						using (FileStream outstream = File.Create(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input))))
 						{
 							using (GZipStream gzstream = new GZipStream(itemstream, CompressionMode.Decompress))
 							{
 								gzstream.CopyTo(outstream);
-								outfile = Path.GetFullPath(Path.Combine(tempdir, Path.GetFileNameWithoutExtension(input)));
+								outfile = Path.GetFullPath(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input)));
 							}
 						}
 					}
@@ -562,16 +562,16 @@ namespace SabreTools.Helper
 		/// Attempt to copy a file between archives
 		/// </summary>
 		/// <param name="inputArchive">Source archive name</param>
-		/// <param name="outputDirectory">Destination archive name</param>
+		/// <param name="outDir">Destination archive name</param>
 		/// <param name="sourceEntryName">Input entry name</param>
 		/// <param name="destEntryName">Output entry name</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the copy was a success, false otherwise</returns>
-		public static bool CopyFileBetweenArchives(string inputArchive, string outputDirectory,
+		public static bool CopyFileBetweenArchives(string inputArchive, string outDir,
 			string sourceEntryName, Rom destEntry, Logger logger)
 		{
 			string tempfile = ExtractSingleItemFromArchive(inputArchive, sourceEntryName, Path.GetTempPath(), logger);
-			return WriteToArchive(tempfile, outputDirectory, destEntry);
+			return WriteToArchive(tempfile, outDir, destEntry);
 		}
 
 		#endregion

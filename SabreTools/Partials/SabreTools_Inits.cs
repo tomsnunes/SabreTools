@@ -49,8 +49,8 @@ namespace SabreTools
 		/// Wrap sorting files using an input DAT
 		/// </summary>
 		/// <param name="inputs">List of all inputted files and folders</param>
-		/// <param name="outdir">Output directory (empty for default directory)</param>
-		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="outDir">Output directory (empty for default directory)</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
@@ -58,7 +58,7 @@ namespace SabreTools
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public static bool InitConvertFolderTGZ(List<string> inputs, string outdir, string tempdir, bool delete,
+		public static bool InitConvertFolderTGZ(List<string> inputs, string outDir, string tempDir, bool delete,
 			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			// Get all individual files from the inputs
@@ -78,7 +78,7 @@ namespace SabreTools
 				}
 			}
 
-			SimpleSort ss = new SimpleSort(new Dat(), newinputs, outdir, tempdir, false, false, false, delete, false, romba, sevenzip, gz, rar, zip, false, logger);
+			SimpleSort ss = new SimpleSort(new Dat(), newinputs, outDir, tempDir, false, false, false, delete, false, romba, sevenzip, gz, rar, zip, false, logger);
 			return ss.Convert();
 		}
 
@@ -178,8 +178,8 @@ namespace SabreTools
 		/// <param name="inputs">Input files or folders to be split</param>
 		/// <param name="exta">First extension to split on</param>
 		/// <param name="extb">Second extension to split on</param>
-		/// <param name="outdir">Output directory for the split files</param>
-		private static void InitExtSplit(List<string> inputs, string exta, string extb, string outdir)
+		/// <param name="outDir">Output directory for the split files</param>
+		private static void InitExtSplit(List<string> inputs, string exta, string extb, string outDir)
 		{
 			// Convert comma-separated strings to list
 			List<string> extaList = exta.Split(',').ToList();
@@ -190,13 +190,13 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					DatTools.SplitByExt(Path.GetFullPath(input), outdir, Path.GetDirectoryName(input), extaList, extbList, _logger);
+					DatTools.SplitByExt(Path.GetFullPath(input), outDir, Path.GetDirectoryName(input), extaList, extbList, _logger);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatTools.SplitByExt(file, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), extaList, extbList, _logger);
+						DatTools.SplitByExt(file, outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), extaList, extbList, _logger);
 					}
 				}
 				else
@@ -263,21 +263,21 @@ namespace SabreTools
 		/// Wrap splitting a DAT by best available hashes
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
-		/// <param name="outdir">Output directory for the split files</param>
-		private static void InitHashSplit(List<string> inputs, string outdir)
+		/// <param name="outDir">Output directory for the split files</param>
+		private static void InitHashSplit(List<string> inputs, string outDir)
 		{
 			// Loop over the input files
 			foreach (string input in inputs)
 			{
 				if (File.Exists(input))
 				{
-					DatTools.SplitByHash(Path.GetFullPath(input), outdir, Path.GetDirectoryName(input), _logger);
+					DatTools.SplitByHash(Path.GetFullPath(input), outDir, Path.GetDirectoryName(input), _logger);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatTools.SplitByHash(file, outdir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
+						DatTools.SplitByHash(file, outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
 					}
 				}
 				else
@@ -295,11 +295,11 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">Input file or folder names</param>
 		/// <param name="restore">False if we're extracting headers (default), true if we're restoring them</param>
-		/// <param name="outdir">Output directory to write new files to, blank defaults to rom folder</param>
+		/// <param name="outDir">Output directory to write new files to, blank defaults to rom folder</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private static void InitHeaderer(List<string> inputs, bool restore, string outdir, Logger logger)
+		private static void InitHeaderer(List<string> inputs, bool restore, string outDir, Logger logger)
 		{
-			Headerer headerer = new Headerer(inputs, restore, outdir, logger);
+			Headerer headerer = new Headerer(inputs, restore, outDir, logger);
 			headerer.Process();
 		}
 
@@ -366,8 +366,8 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">List of input files/folders to check</param>
-		/// <param name="outdir">Output directory to use to build to</param>
-		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="outDir">Output directory to use to build to</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
@@ -380,7 +380,7 @@ namespace SabreTools
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outdir, string tempdir, bool quickScan,
+		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan,
 			bool toFolder, bool verify, bool delete, bool? torrentX, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
@@ -390,7 +390,7 @@ namespace SabreTools
 				datdata = DatTools.Parse(datfile, 99, 99, datdata, logger);
 			}
 
-			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, toFolder, verify,
+			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
 				delete, torrentX, romba, sevenzip, gz, rar, zip, updateDat, logger);
 			ss.StartProcessing();
 		}
@@ -430,21 +430,21 @@ namespace SabreTools
 		/// Wrap splitting a DAT by item type
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
-		/// <param name="outdir">Output directory for the split files</param>
-		private static void InitTypeSplit(List<string> inputs, string outdir)
+		/// <param name="outDir">Output directory for the split files</param>
+		private static void InitTypeSplit(List<string> inputs, string outDir)
 		{
 			// Loop over the input files
 			foreach (string input in inputs)
 			{
 				if (File.Exists(input))
 				{
-					DatTools.SplitByType(Path.GetFullPath(input), outdir, Path.GetFullPath(Path.GetDirectoryName(input)), _logger);
+					DatTools.SplitByType(Path.GetFullPath(input), outDir, Path.GetFullPath(Path.GetDirectoryName(input)), _logger);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatTools.SplitByType(file, outdir, Path.GetFullPath((input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar)), _logger);
+						DatTools.SplitByType(file, outDir, Path.GetFullPath((input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar)), _logger);
 					}
 				}
 				else
@@ -514,7 +514,7 @@ namespace SabreTools
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// /* Output DAT info */
-		/// <param name="outdir">Optional param for output directory</param>
+		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="dedup">True to dedupe the roms in the DAT, false otherwise (default)</param>
@@ -579,7 +579,7 @@ namespace SabreTools
 			string root,
 
 			/* Output DAT info */
-			string outdir,
+			string outDir,
 			bool clean,
 			bool softlist,
 			bool dedup,
@@ -705,7 +705,7 @@ namespace SabreTools
 				XSV = tsv,
 			};
 
-			DatTools.Update(inputs, userInputDat, outputFormat, outdir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
+			DatTools.Update(inputs, userInputDat, outputFormat, outDir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
 				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
 		}
 

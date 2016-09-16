@@ -57,8 +57,8 @@ namespace SabreTools
 				gz = 2,
 				rar = 2,
 				zip = 0;
-			string outdir = "",
-				tempdir = "";
+			string outDir = "",
+				tempDir = "";
 			List<string> inputs = new List<string>();
 			List<string> datfiles = new List<string>();
 
@@ -140,7 +140,7 @@ namespace SabreTools
 						}
 						else if (temparg.StartsWith("-out=") || temparg.StartsWith("--out="))
 						{
-							outdir = temparg.Split('=')[1];
+							outDir = temparg.Split('=')[1];
 						}
 						else if (temparg.StartsWith("-rar=") || temparg.StartsWith("--rar="))
 						{
@@ -151,7 +151,7 @@ namespace SabreTools
 						}
 						else if (temparg.StartsWith("-t=") || temparg.StartsWith("--temp="))
 						{
-							tempdir = temparg.Split('=')[1];
+							tempDir = temparg.Split('=')[1];
 						}
 						else if (temparg.StartsWith("-zip=") || temparg.StartsWith("--zip="))
 						{
@@ -198,7 +198,7 @@ namespace SabreTools
 			// If we are converting the folder to TGZ
 			else if (convert)
 			{
-				InitConvertFolderTGZ(inputs, outdir, tempdir, delete, romba, sevenzip, gz, rar, zip, logger);
+				InitConvertFolderTGZ(inputs, outDir, tempDir, delete, romba, sevenzip, gz, rar, zip, logger);
 			}
 
 			// If we are doing a simple sort
@@ -206,7 +206,7 @@ namespace SabreTools
 			{
 				if (datfiles.Count > 0)
 				{
-					InitSortVerify(datfiles, inputs, outdir, tempdir, quickScan, toFolder,
+					InitSortVerify(datfiles, inputs, outDir, tempDir, quickScan, toFolder,
 						verify, delete, torrentX, romba, sevenzip, gz, rar, zip, updateDat, logger);
 				}
 				else
@@ -233,8 +233,8 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">List of input files/folders to check</param>
-		/// <param name="outdir">Output directory to use to build to</param>
-		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="outDir">Output directory to use to build to</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
@@ -247,7 +247,7 @@ namespace SabreTools
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outdir, string tempdir, bool quickScan,
+		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan,
 			bool toFolder, bool verify, bool delete, bool? torrentX, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
@@ -257,7 +257,7 @@ namespace SabreTools
 				datdata = DatTools.Parse(datfile, 99, 99, datdata, logger, keep: true, softlist: true);
 			}
 
-			SimpleSort ss = new SimpleSort(datdata, inputs, outdir, tempdir, quickScan, toFolder, verify,
+			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
 				delete, torrentX, romba, sevenzip, gz, rar, zip, updateDat, logger);
 			ss.StartProcessing();
 		}
@@ -266,8 +266,8 @@ namespace SabreTools
 		/// Wrap sorting files using an input DAT
 		/// </summary>
 		/// <param name="inputs">List of all inputted files and folders</param>
-		/// <param name="outdir">Output directory (empty for default directory)</param>
-		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="outDir">Output directory (empty for default directory)</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
@@ -275,7 +275,7 @@ namespace SabreTools
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public static bool InitConvertFolderTGZ(List<string> inputs, string outdir, string tempdir, bool delete,
+		public static bool InitConvertFolderTGZ(List<string> inputs, string outDir, string tempDir, bool delete,
 			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			// Get all individual files from the inputs
@@ -295,7 +295,7 @@ namespace SabreTools
 				}
 			}
 
-			SimpleSort ss = new SimpleSort(new Dat(), newinputs, outdir, tempdir, false, false, false,
+			SimpleSort ss = new SimpleSort(new Dat(), newinputs, outDir, tempDir, false, false, false,
 				delete, false, romba, sevenzip, gz, rar, zip, false, logger);
 			return ss.Convert();
 		}

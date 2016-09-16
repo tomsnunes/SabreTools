@@ -14,7 +14,7 @@ namespace SabreTools
 		// Private instance variables
 		private string _systems;
 		private string _sources;
-		private string _outdir;
+		private string _outDir;
 		private string _connectionString;
 		private bool _norename;
 		private bool _old;
@@ -27,12 +27,12 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="systems">Comma-separated list of systems to be included in the DAT (blank means all)</param>
 		/// <param name="sources">Comma-separated list of sources to be included in the DAT (blank means all)</param>
-		/// <param name="outdir">The output folder where the generated DAT will be put; blank means the current directory</param>
+		/// <param name="outDir">The output folder where the generated DAT will be put; blank means the current directory</param>
 		/// <param name="connectionString">Connection string for SQLite</param>
 		/// <param name="logger">Logger object for file or console output</param>
 		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
 		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
-		public Generate(string systems, string sources, string outdir, string connectionString, Logger logger, bool norename = false, bool old = false)
+		public Generate(string systems, string sources, string outDir, string connectionString, Logger logger, bool norename = false, bool old = false)
 		{
 			_systems = systems;
 			_sources = sources;
@@ -42,12 +42,12 @@ namespace SabreTools
 			_logger = logger;
 
 			// Take care of special outfolder cases
-			_outdir = (outdir == "" ? Environment.CurrentDirectory + Path.DirectorySeparatorChar :
-				(!outdir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? outdir + Path.DirectorySeparatorChar : outdir)
+			_outDir = (outDir == "" ? Environment.CurrentDirectory + Path.DirectorySeparatorChar :
+				(!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()) ? outDir + Path.DirectorySeparatorChar : outDir)
 			);
-			if (_outdir != "" && !Directory.Exists(_outdir))
+			if (_outDir != "" && !Directory.Exists(_outDir))
 			{
-				Directory.CreateDirectory(_outdir);
+				Directory.CreateDirectory(_outDir);
 			}
 		}
 
@@ -179,7 +179,7 @@ namespace SabreTools
 				Files = dict,
 			};
 
-			return DatTools.WriteDatfile(datdata, _outdir, _logger);
+			return DatTools.WriteDatfile(datdata, _outDir, _logger);
 		}
 
 		/// <summary>

@@ -148,7 +148,7 @@ namespace SabreTools
 				name = "",
 				manu = "",
 				md5 = "",
-				outdir = "",
+				outDir = "",
 				postfix = "",
 				prefix = "",
 				repext = "",
@@ -159,7 +159,7 @@ namespace SabreTools
 				sha1 = "",
 				sources = "",
 				systems = "",
-				tempdir = "",
+				tempDir = "",
 				url = "",
 				version = "";
 			List<string> inputs = new List<string>();
@@ -531,7 +531,7 @@ namespace SabreTools
 						}
 						else if (temparg.StartsWith("-out=") || temparg.StartsWith("--out="))
 						{
-							outdir = temparg.Split('=')[1];
+							outDir = temparg.Split('=')[1];
 						}
 						else if (temparg.StartsWith("-post=") || temparg.StartsWith("--postfix="))
 						{
@@ -587,7 +587,7 @@ namespace SabreTools
 						}
 						else if (temparg.StartsWith("-t=") || temparg.StartsWith("--temp="))
 						{
-							tempdir = temparg.Split('=')[1];
+							tempDir = temparg.Split('=')[1];
 						}
 						else if (temparg.StartsWith("-u=") || temparg.StartsWith("--url="))
 						{
@@ -670,13 +670,13 @@ namespace SabreTools
 			else if (datfromdir)
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
-					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempdir, maxParallelism);
+					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, maxParallelism);
 			}
 
 			// Split a DAT by extension
 			else if (extsplit)
 			{
-				InitExtSplit(inputs, exta, extb, outdir);
+				InitExtSplit(inputs, exta, extb, outDir);
 			}
 
 			// Generate all DATs
@@ -696,13 +696,13 @@ namespace SabreTools
 			// Split a DAT by available hashes
 			else if (hashsplit)
 			{
-				InitHashSplit(inputs, outdir);
+				InitHashSplit(inputs, outDir);
 			}
 
 			// If we're in headerer mode
 			else if (headerer)
 			{
-				InitHeaderer(inputs, restore, outdir, _logger);
+				InitHeaderer(inputs, restore, outDir, _logger);
 			}
 
 			// Import a file or folder
@@ -749,7 +749,7 @@ namespace SabreTools
 			// Split a DAT by item type
 			else if (typesplit)
 			{
-				InitTypeSplit(inputs, outdir);
+				InitTypeSplit(inputs, outDir);
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
@@ -758,7 +758,7 @@ namespace SabreTools
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, outputFormat, usegame, prefix,
 					postfix, quotes, repext, addext, remext, datprefix, romba, tsv, merge, diffMode, cascade, inplace, skip, bare, gamename, romname,
-					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outdir, clean, softlist, dedup, maxParallelism);
+					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outDir, clean, softlist, dedup, maxParallelism);
 			}
 
 			// If nothing is set, show the help

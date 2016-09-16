@@ -9,8 +9,8 @@ namespace SabreTools.Helper
 		// Private instance variables
 		private Dat _datdata;
 		private List<string> _inputs;
-		private string _outdir;
-		private string _tempdir;
+		private string _outDir;
+		private string _tempDir;
 		private bool _quickScan;
 		private bool _toFolder;
 		private bool _verify;
@@ -34,8 +34,8 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="datdata">Name of the DAT to compare against</param>
 		/// <param name="inputs">List of input files/folders to check</param>
-		/// <param name="outdir">Output directory to use to build to</param>
-		/// <param name="tempdir">Temporary directory for archive extraction</param>
+		/// <param name="outDir">Output directory to use to build to</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
@@ -48,14 +48,14 @@ namespace SabreTools.Helper
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public SimpleSort(Dat datdata, List<string> inputs, string outdir, string tempdir,
+		public SimpleSort(Dat datdata, List<string> inputs, string outDir, string tempDir,
 			bool quickScan, bool toFolder, bool verify, bool delete, bool? torrentX, bool romba, int sevenzip,
 			int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			_datdata = datdata;
 			_inputs = inputs;
-			_outdir = (outdir == "" ? "Rebuild" : outdir);
-			_tempdir = (tempdir == "" ? Path.Combine(Path.GetTempPath(), "__temp__") : tempdir);
+			_outDir = (outDir == "" ? "Rebuild" : outDir);
+			_tempDir = (String.IsNullOrEmpty(tempDir) ? Path.GetTempPath() : tempDir);
 			_quickScan = quickScan;
 			_toFolder = toFolder;
 			_verify = verify;
@@ -84,20 +84,20 @@ namespace SabreTools.Helper
 		public bool StartProcessing()
 		{
 			// First, check that the output directory exists
-			if (!Directory.Exists(_outdir))
+			if (!Directory.Exists(_outDir))
 			{
-				Directory.CreateDirectory(_outdir);
-				_outdir = Path.GetFullPath(_outdir);
+				Directory.CreateDirectory(_outDir);
+				_outDir = Path.GetFullPath(_outDir);
 			}
 
 			// Then create or clean the temp directory
-			if (!Directory.Exists(_tempdir))
+			if (!Directory.Exists(_tempDir))
 			{
-				Directory.CreateDirectory(_tempdir);
+				Directory.CreateDirectory(_tempDir);
 			}
 			else
 			{
-				FileTools.CleanDirectory(_tempdir);
+				FileTools.CleanDirectory(_tempDir);
 			}
 
 			if (_verify)
@@ -120,7 +120,7 @@ namespace SabreTools.Helper
 
 			// Enumerate all files from the output directory
 			List<string> files = new List<string>();
-			foreach (string file in Directory.EnumerateFiles(_outdir, "*", SearchOption.AllDirectories))
+			foreach (string file in Directory.EnumerateFiles(_outDir, "*", SearchOption.AllDirectories))
 			{
 				_logger.Log("File found: '" + file + "'");
 				files.Add(Path.GetFullPath(file));
@@ -135,7 +135,7 @@ namespace SabreTools.Helper
 			foreach (string input in _inputs)
 			{
 				DATFromDir dfd = new DATFromDir(input, _datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
-				true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempdir */, 4 /* maxDegreeOfParallelism */, _logger);
+				true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempDir */, 4 /* maxDegreeOfParallelism */, _logger);
 				dfd.Start();
 				_datdata = dfd.DatData;
 			}
@@ -224,15 +224,15 @@ namespace SabreTools.Helper
 			for (int i = 0; i < files.Count; i++)
 			{
 				success &= RebuildToOutputHelper(files[i], i, files.Count);
-				FileTools.CleanDirectory(_tempdir);
+				FileTools.CleanDirectory(_tempDir);
 			}
 
 			// Now one final delete of the temp directory
-			while (Directory.Exists(_tempdir))
+			while (Directory.Exists(_tempDir))
 			{
 				try
 				{
-					Directory.Delete(_tempdir, true);
+					Directory.Delete(_tempDir, true);
 				}
 				catch
 				{
@@ -315,7 +315,7 @@ namespace SabreTools.Helper
 					if (_toFolder)
 					{
 						// Copy file to output directory
-						string gamedir = Path.Combine(_outdir, found.Machine.Name);
+						string gamedir = Path.Combine(_outDir, found.Machine.Name);
 						if (!Directory.Exists(gamedir))
 						{
 							Directory.CreateDirectory(gamedir);
@@ -332,15 +332,15 @@ namespace SabreTools.Helper
 					{
 						if (_torrentX == true)
 						{
-							FileTools.WriteTorrentZip(input, _outdir, found, _logger);
+							FileTools.WriteTorrentZip(input, _outDir, found, _logger);
 						}
 						else if (_torrentX == false)
 						{
-							FileTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
+							FileTools.WriteTorrentGZ(input, _outDir, _romba, _logger);
 						}
 						else
 						{
-							FileTools.WriteToArchive(input, _outdir, found);
+							FileTools.WriteToArchive(input, _outDir, found);
 						}
 					}
 				}
@@ -386,7 +386,7 @@ namespace SabreTools.Helper
 						if (_toFolder)
 						{
 							// Copy file to output directory
-							string gamedir = Path.Combine(_outdir, found.Machine.Name);
+							string gamedir = Path.Combine(_outDir, found.Machine.Name);
 							if (!Directory.Exists(gamedir))
 							{
 								Directory.CreateDirectory(gamedir);
@@ -403,15 +403,15 @@ namespace SabreTools.Helper
 						{
 							if (_torrentX == true)
 							{
-								FileTools.WriteTorrentZip(newinput, _outdir, found, _logger);
+								FileTools.WriteTorrentZip(newinput, _outDir, found, _logger);
 							}
 							else if (_torrentX == false)
 							{
-								FileTools.WriteTorrentGZ(newinput, _outdir, _romba, _logger);
+								FileTools.WriteTorrentGZ(newinput, _outDir, _romba, _logger);
 							}
 							else
 							{
-								FileTools.WriteToArchive(newinput, _outdir, found);
+								FileTools.WriteToArchive(newinput, _outDir, found);
 							}
 						}
 
@@ -436,7 +436,7 @@ namespace SabreTools.Helper
 						if (_toFolder)
 						{
 							// Copy file to output directory
-							string gamedir = Path.Combine(_outdir, found.Machine.Name);
+							string gamedir = Path.Combine(_outDir, found.Machine.Name);
 							if (!Directory.Exists(gamedir))
 							{
 								Directory.CreateDirectory(gamedir);
@@ -454,15 +454,15 @@ namespace SabreTools.Helper
 							_logger.Log("Matched name: " + newfound.Name);
 							if (_torrentX == true)
 							{
-								FileTools.WriteTorrentZip(input, _outdir, newfound, _logger);
+								FileTools.WriteTorrentZip(input, _outDir, newfound, _logger);
 							}
 							else if (_torrentX == false)
 							{
-								FileTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
+								FileTools.WriteTorrentGZ(input, _outDir, _romba, _logger);
 							}
 							else
 							{
-								FileTools.WriteToArchive(input, _outdir, newfound);
+								FileTools.WriteToArchive(input, _outDir, newfound);
 							}
 						}
 					}
@@ -516,10 +516,10 @@ namespace SabreTools.Helper
 								{
 									// Copy file to output directory
 									_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
-									string outfile = FileTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
+									string outfile = FileTools.ExtractSingleItemFromArchive(input, rom.Name, _tempDir, _logger);
 									if (File.Exists(outfile))
 									{
-										string gamedir = Path.Combine(_outdir, found.Machine.Name);
+										string gamedir = Path.Combine(_outDir, found.Machine.Name);
 										if (!Directory.Exists(gamedir))
 										{
 											Directory.CreateDirectory(gamedir);
@@ -539,20 +539,20 @@ namespace SabreTools.Helper
 
 									if (Build.MonoEnvironment || _torrentX == false)
 									{
-										string outfile = FileTools.ExtractSingleItemFromArchive(input, rom.Name, _tempdir, _logger);
+										string outfile = FileTools.ExtractSingleItemFromArchive(input, rom.Name, _tempDir, _logger);
 										if (File.Exists(outfile))
 										{
 											if (_torrentX == true)
 											{
-												FileTools.WriteTorrentZip(outfile, _outdir, found, _logger);
+												FileTools.WriteTorrentZip(outfile, _outDir, found, _logger);
 											}
 											else if (_torrentX == false)
 											{
-												FileTools.WriteTorrentGZ(outfile, _outdir, _romba, _logger);
+												FileTools.WriteTorrentGZ(outfile, _outDir, _romba, _logger);
 											}
 											else
 											{
-												FileTools.WriteToArchive(outfile, _outdir, found);
+												FileTools.WriteToArchive(outfile, _outDir, found);
 											}
 
 											try
@@ -564,7 +564,7 @@ namespace SabreTools.Helper
 									}
 									else
 									{
-										FileTools.CopyFileBetweenArchives(input, _outdir, rom.Name, found, _logger);
+										FileTools.CopyFileBetweenArchives(input, _outDir, rom.Name, found, _logger);
 									}
 								}
 							}
@@ -574,7 +574,7 @@ namespace SabreTools.Helper
 				else
 				{
 					// Now, if the file is a supported archive type, also run on all files within
-					bool encounteredErrors = FileTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
+					bool encounteredErrors = FileTools.ExtractArchive(input, _tempDir, _7z, _gz, _rar, _zip, _logger);
 
 					// Remove the current file if we are in recursion so it's not picked up in the next step
 					if (recurse)
@@ -593,7 +593,7 @@ namespace SabreTools.Helper
 					if (!encounteredErrors)
 					{
 						_logger.Log("Archive found! Successfully extracted");
-						foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
+						foreach (string file in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
 						{
 							success &= RebuildToOutputHelper(file, index, total, true);
 						}
@@ -627,14 +627,14 @@ namespace SabreTools.Helper
 			*/
 
 			// Assuming archived sets, move all toplevel folders to temp
-			foreach (string directory in Directory.EnumerateDirectories(_outdir, "*", SearchOption.TopDirectoryOnly))
+			foreach (string directory in Directory.EnumerateDirectories(_outDir, "*", SearchOption.TopDirectoryOnly))
 			{
-				Directory.Move(directory, Path.Combine(_tempdir, Path.GetFileNameWithoutExtension(directory)));
+				Directory.Move(directory, Path.Combine(_tempDir, Path.GetFileNameWithoutExtension(directory)));
 			}
 
 			// Now process the inputs (assumed that it's archived sets as of right now
 			Dictionary<string, List<Rom>> scanned = new Dictionary<string, List<Rom>>();
-			foreach (string archive in Directory.EnumerateFiles(_outdir, "*", SearchOption.AllDirectories))
+			foreach (string archive in Directory.EnumerateFiles(_outDir, "*", SearchOption.AllDirectories))
 			{
 				// If we are in quickscan, get the list of roms that way
 				List<Rom> roms = new List<Rom>();
@@ -645,7 +645,7 @@ namespace SabreTools.Helper
 				// Otherwise, extract it and get info one by one
 				else
 				{
-					string temparcdir = Path.Combine(_tempdir, Path.GetFileNameWithoutExtension(archive));
+					string temparcdir = Path.Combine(_tempDir, Path.GetFileNameWithoutExtension(archive));
 					FileTools.ExtractArchive(Path.GetFullPath(archive), temparcdir, _logger);
 					foreach (string tempfile in Directory.EnumerateFiles(temparcdir, "*", SearchOption.AllDirectories))
 					{
@@ -745,20 +745,20 @@ namespace SabreTools.Helper
 			bool success = true;
 
 			// First, check that the output directory exists
-			if (!Directory.Exists(_outdir))
+			if (!Directory.Exists(_outDir))
 			{
-				Directory.CreateDirectory(_outdir);
-				_outdir = Path.GetFullPath(_outdir);
+				Directory.CreateDirectory(_outDir);
+				_outDir = Path.GetFullPath(_outDir);
 			}
 
 			// Then create or clean the temp directory
-			if (!Directory.Exists(_tempdir))
+			if (!Directory.Exists(_tempDir))
 			{
-				Directory.CreateDirectory(_tempdir);
+				Directory.CreateDirectory(_tempDir);
 			}
 			else
 			{
-				FileTools.CleanDirectory(_tempdir);
+				FileTools.CleanDirectory(_tempDir);
 			}
 
 			// Now process all of the inputs
@@ -774,26 +774,26 @@ namespace SabreTools.Helper
 				if (shouldExternalProcess)
 				{
 					_logger.User("Processing file " + input);
-					success &= FileTools.WriteTorrentGZ(input, _outdir, _romba, _logger);
+					success &= FileTools.WriteTorrentGZ(input, _outDir, _romba, _logger);
 				}
 
 				// Process the file as an archive, if necessary
 				if (shouldInternalProcess)
 				{
 					// Now, if the file is a supported archive type, also run on all files within
-					bool encounteredErrors = FileTools.ExtractArchive(input, _tempdir, _7z, _gz, _rar, _zip, _logger);
+					bool encounteredErrors = FileTools.ExtractArchive(input, _tempDir, _7z, _gz, _rar, _zip, _logger);
 
 					// If no errors were encountered, we loop through the temp directory
 					if (!encounteredErrors)
 					{
 						_logger.Log("Archive found! Successfully extracted");
-						foreach (string file in Directory.EnumerateFiles(_tempdir, "*", SearchOption.AllDirectories))
+						foreach (string file in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
 						{
 							_logger.User("Processing extracted file " + file);
-							success &= FileTools.WriteTorrentGZ(file, _outdir, _romba, _logger);
+							success &= FileTools.WriteTorrentGZ(file, _outDir, _romba, _logger);
 						}
 
-						FileTools.CleanDirectory(_tempdir);
+						FileTools.CleanDirectory(_tempDir);
 					}
 				}
 
@@ -814,11 +814,11 @@ namespace SabreTools.Helper
 			}
 
 			// Now one final delete of the temp directory
-			while (Directory.Exists(_tempdir))
+			while (Directory.Exists(_tempDir))
 			{
 				try
 				{
-					Directory.Delete(_tempdir, true);
+					Directory.Delete(_tempDir, true);
 				}
 				catch
 				{
@@ -827,19 +827,19 @@ namespace SabreTools.Helper
 			}
 
 			// If we're in romba mode and the size file doesn't exist, create it
-			if (_romba && !File.Exists(Path.Combine(_outdir, ".romba_size")))
+			if (_romba && !File.Exists(Path.Combine(_outDir, ".romba_size")))
 			{
 				// Get the size of all of the files in the output folder
 				long size = 0;
-				foreach (string file in Directory.EnumerateFiles(_outdir, "*", SearchOption.AllDirectories))
+				foreach (string file in Directory.EnumerateFiles(_outDir, "*", SearchOption.AllDirectories))
 				{
 					FileInfo tempinfo = new FileInfo(file);
 					size += tempinfo.Length;
 				}
 
 				// Write out the value to each of the romba depot files
-				using (StreamWriter tw = new StreamWriter(File.Open(Path.Combine(_outdir, ".romba_size"), FileMode.Create, FileAccess.Write)))
-				using (StreamWriter twb = new StreamWriter(File.Open(Path.Combine(_outdir, ".romba_size.backup"), FileMode.Create, FileAccess.Write)))
+				using (StreamWriter tw = new StreamWriter(File.Open(Path.Combine(_outDir, ".romba_size"), FileMode.Create, FileAccess.Write)))
+				using (StreamWriter twb = new StreamWriter(File.Open(Path.Combine(_outDir, ".romba_size.backup"), FileMode.Create, FileAccess.Write)))
 				{
 					tw.Write(size);
 					twb.Write(size);

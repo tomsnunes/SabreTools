@@ -66,7 +66,7 @@ namespace SabreTools
 			_enableGzip = enableGzip;
 			_addBlanks = addBlanks;
 			_addDate = addDate;
-			_tempDir = (String.IsNullOrEmpty(tempDir) ? Path.Combine(Path.GetTempPath(), "__temp__") : tempDir);
+			_tempDir = (String.IsNullOrEmpty(tempDir) ? Path.GetTempPath() : tempDir);
 			_maxDegreeOfParallelism = maxDegreeOfParallelism;
 			_logger = logger;
 		}

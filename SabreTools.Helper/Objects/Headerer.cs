@@ -14,7 +14,7 @@ namespace SabreTools
 		// Private instance variables
 		private List<string> _inputs;
 		private bool _restore;
-		private string _outdir;
+		private string _outDir;
 		private Logger _logger;
 
 		/// <summary>
@@ -22,13 +22,13 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">Input file or folder names</param>
 		/// <param name="restore">False if we're extracting headers (default), true if we're restoring them</param>
-		/// <param name="outdir">Output directory to write new files to, blank defaults to rom folder</param>
+		/// <param name="outDir">Output directory to write new files to, blank defaults to rom folder</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public Headerer(List<string> inputs, bool restore, string outdir, Logger logger)
+		public Headerer(List<string> inputs, bool restore, string outDir, Logger logger)
 		{
 			_inputs = inputs;
 			_restore = restore;
-			_outdir = outdir;
+			_outDir = outDir;
 			_logger = logger;
 		}
 
@@ -38,9 +38,9 @@ namespace SabreTools
 		/// <returns>True if it succeeded, false otherwise</returns>
 		public bool Process()
 		{
-			if (_outdir != "" && !Directory.Exists(_outdir))
+			if (_outDir != "" && !Directory.Exists(_outDir))
 			{
-				Directory.CreateDirectory(_outdir);
+				Directory.CreateDirectory(_outDir);
 			}
 
 			bool success = true;
@@ -121,7 +121,7 @@ namespace SabreTools
 				}
 
 				// Otherwise, apply the rule to the file
-				string newfile = (_outdir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outdir, Path.GetFileName(file)));
+				string newfile = (_outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outDir, Path.GetFileName(file)));
 				Skippers.TransformFile(file, newfile, rule, _logger);
 
 				// If the output file doesn't exist, return false
@@ -208,9 +208,9 @@ namespace SabreTools
 								header = sldr.GetString(0);
 
 								_logger.User("Creating reheadered file: " + 
-									(_outdir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outdir, Path.GetFileName(file))) + sub);
+									(_outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outDir, Path.GetFileName(file))) + sub);
 								FileTools.AppendBytesToFile(file,
-									(_outdir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outdir, Path.GetFileName(file))) + sub, header, string.Empty);
+									(_outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outDir, Path.GetFileName(file))) + sub, header, string.Empty);
 								_logger.User("Reheadered file created!");
 							}
 						}
