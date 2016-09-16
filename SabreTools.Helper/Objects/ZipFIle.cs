@@ -834,7 +834,7 @@ namespace SabreTools.Helper
 			}
 
 			// Open the entry stream based on the current position
-			ZipFileEntry zfe = new ZipFileEntry(_zipstream, filename, true);
+			ZipFileEntry zfe = new ZipFileEntry(_zipstream, filename);
 			ZipReturn zr = zfe.OpenWriteStream(raw, torrentZip, uncompressedSize, compressionMethod, out stream);
 			_entries.Add(zfe);
 
@@ -953,7 +953,7 @@ namespace SabreTools.Helper
 		/// <param name="string1"></param>
 		/// <param name="string2"></param>
 		/// <returns></returns>
-		private static int TorrentZipStringCompare(string string1, string string2)
+		public static int TorrentZipStringCompare(string string1, string string2)
 		{
 			char[] bytes1 = string1.ToCharArray();
 			char[] bytes2 = string2.ToCharArray();
