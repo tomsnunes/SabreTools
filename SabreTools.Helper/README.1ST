@@ -670,6 +670,12 @@ Options:
 		requiring a DAT to rebuild from. It is only useful in a small amount of situations at
 		the present, but it is mostly meant for Romba compatibility at the present.
 		
+	-tzip				Enable TorrentZip output
+		Instead of outputting the files to standard ZIP archives, files will be rebuilt to
+		TorrentZip (TZ) files. This format is based on the ZIP archive format, but with
+		custom header information. This is primarily used by external tool RomVault
+		(http://www.romvault.com/) and is already widely used.
+		
 	-tgz				Enable Torrent GZ output
 		Instead of outputting the files to ZIP archives, files will be rebuilt to TorrentGZ
 		(TGZ) files. This format is based on the GZip archive format, but with custom header
@@ -683,12 +689,6 @@ Options:
 			4 bytes of the SHA-1, 1 byte for each layer of the directory name. It also
 			includes two auxilary files, .romba_size and .romba_size.backup, that have the
 			compressed size of the folder inside for use with Romba.
-			
-	-tzip				Enable TorrentZip output
-		Instead of outputting the files to standard ZIP archives, files will be rebuilt to
-		TorrentZip (TZ) files. This format is based on the ZIP archive format, but with
-		custom header information. This is primarily used by external tool RomVault
-		(http://www.romvault.com/) and is already widely used.
 			
 	-do, --directory	Enable outputting files uncompressed
 		Instead of outputting the files to ZIP archives, files will be rebuilt to named

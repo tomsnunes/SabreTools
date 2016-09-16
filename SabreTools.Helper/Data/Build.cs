@@ -272,8 +272,8 @@ namespace SabreTools.Helper
 					helptext.Add("  -qs, --quick		Enable quick scanning of archives");
 					helptext.Add("  -v, --verify		Enable verification of output directory");
 					helptext.Add("  -c, --convert		Enable conversion of input files to TGZ");
-					helptext.Add("  -tgz			Enable TorrentGZ output");
 					helptext.Add("  -tzip			Enable TorrentZip output");
+					helptext.Add("  -tgz			Enable TorrentGZ output");
 					helptext.Add("	-r, --romba		Enable Romba depot dir output");
 					helptext.Add("  -do, --directory	Output files as uncompressed");
 					helptext.Add("  -7z={0}		Set scanning level for 7z archives");
