@@ -55,7 +55,7 @@ namespace SabreTools.Helper
 			_datdata = datdata;
 			_inputs = inputs;
 			_outdir = (outdir == "" ? "Rebuild" : outdir);
-			_tempdir = (tempdir == "" ? "__TEMP__" : tempdir);
+			_tempdir = (tempdir == "" ? "__temp__" : tempdir);
 			_quickScan = quickScan;
 			_toFolder = toFolder;
 			_verify = verify;

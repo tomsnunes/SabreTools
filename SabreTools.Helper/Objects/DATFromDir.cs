@@ -66,7 +66,7 @@ namespace SabreTools
 			_enableGzip = enableGzip;
 			_addBlanks = addBlanks;
 			_addDate = addDate;
-			_tempDir = tempDir;
+			_tempDir = (String.IsNullOrEmpty(tempDir) ? Path.Combine(Environment.CurrentDirectory, "__tempdir__") : tempDir);
 			_maxDegreeOfParallelism = maxDegreeOfParallelism;
 			_logger = logger;
 		}
@@ -199,8 +199,7 @@ namespace SabreTools
 		private void ProcessPossibleArchive(string item)
 		{
 			// Define the temporary directory
-			string tempSubDir = (String.IsNullOrEmpty(_tempDir) ? Environment.CurrentDirectory : _tempDir);
-			tempSubDir = Path.GetFullPath(Path.Combine(tempSubDir, "__temp__", Path.GetFileNameWithoutExtension(item))) + Path.DirectorySeparatorChar;
+			string tempSubDir = Path.GetFullPath(Path.Combine(_tempDir, Path.GetFileNameWithoutExtension(item))) + Path.DirectorySeparatorChar;
 
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
@@ -283,17 +282,17 @@ namespace SabreTools
 								: ""),
 							Path.GetFileNameWithoutExtension(item)));
 					});
-
-					// Clear the temp directory
-					if (Directory.Exists(tempSubDir))
-					{
-						FileTools.CleanDirectory(tempSubDir);
-					}
 				}
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(item))
 				{
 					ProcessFile(item, _basePath, "");
+				}
+
+				// Delete the sub temp directory
+				if (Directory.Exists(tempSubDir))
+				{
+					Directory.Delete(tempSubDir, true);
 				}
 			}
 		}
