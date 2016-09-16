@@ -174,110 +174,109 @@ namespace SabreTools.Helper
 			try
 			{
 				// Open the stream for reading
-				using (BinaryReader br = new BinaryReader(_zipstream))
+				BinaryReader br = new BinaryReader(_zipstream);
+				
+				// If the first bytes aren't a central directory header, log and return
+				if (br.ReadUInt32() != Constants.CentralDirectoryHeaderSignature)
 				{
-					// If the first bytes aren't a central directory header, log and return
-					if (br.ReadUInt32() != Constants.CentralDirectoryHeaderSignature)
+					return ZipReturn.ZipCentralDirError;
+				}
+
+				// Now read in available information, skipping the unnecessary
+				_versionMadeBy = (ArchiveVersion)br.ReadUInt16();
+				_versionNeeded = (ArchiveVersion)br.ReadUInt16();
+				_generalPurposeBitFlag = (GeneralPurposeBitFlag)br.ReadUInt16();
+				_compressionMethod = (CompressionMethod)br.ReadUInt16();
+
+				// If we have an unsupported compression method, log and return
+				if (_compressionMethod != CompressionMethod.Stored && _compressionMethod != CompressionMethod.Deflated)
+				{
+					return ZipReturn.ZipCentralDirError;
+				}
+
+				// Keep reading available information, skipping the unnecessary
+				_lastModFileTime = br.ReadUInt16();
+				_lastModFileDate = br.ReadUInt16();
+				_crc = br.ReadUInt32();
+				_compressedSize = br.ReadUInt32();
+				_uncompressedSize = br.ReadUInt32();
+
+				// Now store some temp vars to find the filename, extra field, and comment
+				ushort fileNameLength = br.ReadUInt16();
+				ushort extraFieldLength = br.ReadUInt16();
+				ushort fileCommentLength = br.ReadUInt16();
+
+				// Even more reading available information, skipping the unnecessary
+				br.ReadUInt16(); // Disk number start
+				_internalFileAttributes = (InternalFileAttributes)br.ReadUInt16();
+				_externalFileAttributes = br.ReadUInt32();
+				_relativeOffset = br.ReadUInt32();
+				byte[] fileNameBytes = br.ReadBytes(fileNameLength);
+				_fileName = ((_generalPurposeBitFlag & GeneralPurposeBitFlag.LanguageEncodingFlag) == 0
+					? Encoding.ASCII.GetString(fileNameBytes)
+					: Encoding.UTF8.GetString(fileNameBytes, 0, fileNameLength));
+				_extraField = br.ReadBytes(extraFieldLength);
+				_comment = br.ReadBytes(fileCommentLength);
+
+				/*
+				Full disclosure: this next section is in GordonJ's work but I honestly
+				have no idea everything that it does. It seems to do something to figure
+				out if it's Zip64, or possibly check for random things but it uses the
+				extra field for this, which I do not fully understand. It's copied in
+				its entirety below in the hope that it makes things better...
+				*/
+
+				int pos = 0;
+				while (extraFieldLength > pos)
+				{
+					ushort type = BitConverter.ToUInt16(_extraField, pos);
+					pos += 2;
+					ushort blockLength = BitConverter.ToUInt16(_extraField, pos);
+					pos += 2;
+					switch (type)
 					{
-						return ZipReturn.ZipCentralDirError;
-					}
+						case 0x0001:
+							Zip64 = true;
+							if (UncompressedSize == 0xffffffff)
+							{
+								UncompressedSize = BitConverter.ToUInt64(_extraField, pos);
+								pos += 8;
+							}
+							if (_compressedSize == 0xffffffff)
+							{
+								_compressedSize = BitConverter.ToUInt64(_extraField, pos);
+								pos += 8;
+							}
+							if (_relativeOffset == 0xffffffff)
+							{
+								_relativeOffset = BitConverter.ToUInt64(_extraField, pos);
+								pos += 8;
+							}
+							break;
+						case 0x7075:
+							//byte version = extraField[pos];
+							pos += 1;
+							uint nameCRC32 = BitConverter.ToUInt32(_extraField, pos);
+							pos += 4;
 
-					// Now read in available information, skipping the unnecessary
-					_versionMadeBy = (ArchiveVersion)br.ReadUInt16();
-					_versionNeeded = (ArchiveVersion)br.ReadUInt16();
-					_generalPurposeBitFlag = (GeneralPurposeBitFlag)br.ReadUInt16();
-					_compressionMethod = (CompressionMethod)br.ReadUInt16();
+							CRC32 crcTest = new CRC32();
+							crcTest.SlurpBlock(fileNameBytes, 0, fileNameLength);
+							uint fCRC = (uint)crcTest.Crc32Result;
 
-					// If we have an unsupported compression method, log and return
-					if (_compressionMethod != CompressionMethod.Stored && _compressionMethod != CompressionMethod.Deflated)
-					{
-						return ZipReturn.ZipCentralDirError;
-					}
+							if (nameCRC32 != fCRC)
+							{
+								return ZipReturn.ZipCentralDirError;
+							}
 
-					// Keep reading available information, skipping the unnecessary
-					_lastModFileTime = br.ReadUInt16();
-					_lastModFileDate = br.ReadUInt16();
-					_crc = br.ReadUInt32();
-					_compressedSize = br.ReadUInt32();
-					_uncompressedSize = br.ReadUInt32();
+							int charLen = blockLength - 5;
 
-					// Now store some temp vars to find the filename, extra field, and comment
-					ushort fileNameLength = br.ReadUInt16();
-					ushort extraFieldLength = br.ReadUInt16();
-					ushort fileCommentLength = br.ReadUInt16();
+							_fileName = Encoding.UTF8.GetString(_extraField, pos, charLen);
+							pos += charLen;
 
-					// Even more reading available information, skipping the unnecessary
-					br.ReadUInt16(); // Disk number start
-					_internalFileAttributes = (InternalFileAttributes)br.ReadUInt16();
-					_externalFileAttributes = br.ReadUInt16();
-					_relativeOffset = br.ReadUInt32();
-					byte[] fileNameBytes = br.ReadBytes(fileNameLength);
-					_fileName = ((_generalPurposeBitFlag & GeneralPurposeBitFlag.LanguageEncodingFlag) == 0
-						? Encoding.ASCII.GetString(fileNameBytes)
-						: Encoding.UTF8.GetString(fileNameBytes, 0, fileNameLength));
-					_extraField = br.ReadBytes(extraFieldLength);
-					_comment = br.ReadBytes(fileCommentLength);
-
-					/*
-					Full disclosure: this next section is in GordonJ's work but I honestly
-					have no idea everything that it does. It seems to do something to figure
-					out if it's Zip64, or possibly check for random things but it uses the
-					extra field for this, which I do not fully understand. It's copied in
-					its entirety below in the hope that it makes things better...
-					*/
-
-					int pos = 0;
-					while (extraFieldLength > pos)
-					{
-						ushort type = BitConverter.ToUInt16(_extraField, pos);
-						pos += 2;
-						ushort blockLength = BitConverter.ToUInt16(_extraField, pos);
-						pos += 2;
-						switch (type)
-						{
-							case 0x0001:
-								Zip64 = true;
-								if (UncompressedSize == 0xffffffff)
-								{
-									UncompressedSize = BitConverter.ToUInt64(_extraField, pos);
-									pos += 8;
-								}
-								if (_compressedSize == 0xffffffff)
-								{
-									_compressedSize = BitConverter.ToUInt64(_extraField, pos);
-									pos += 8;
-								}
-								if (_relativeOffset == 0xffffffff)
-								{
-									_relativeOffset = BitConverter.ToUInt64(_extraField, pos);
-									pos += 8;
-								}
-								break;
-							case 0x7075:
-								//byte version = extraField[pos];
-								pos += 1;
-								uint nameCRC32 = BitConverter.ToUInt32(_extraField, pos);
-								pos += 4;
-
-								CRC32 crcTest = new CRC32();
-								crcTest.SlurpBlock(fileNameBytes, 0, fileNameLength);
-								uint fCRC = (uint)crcTest.Crc32Result;
-
-								if (nameCRC32 != fCRC)
-								{
-									return ZipReturn.ZipCentralDirError;
-								}
-
-								int charLen = blockLength - 5;
-
-								_fileName = Encoding.UTF8.GetString(_extraField, pos, charLen);
-								pos += charLen;
-
-								break;
-							default:
-								pos += blockLength;
-								break;
-						}
+							break;
+						default:
+							pos += blockLength;
+							break;
 					}
 				}
 			}

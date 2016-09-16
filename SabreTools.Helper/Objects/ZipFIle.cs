@@ -397,7 +397,7 @@ namespace SabreTools.Helper
 				}
 
 				// Now try to open the file for reading
-				_zipstream = new FileStream(filename, FileMode.Open, FileAccess.ReadWrite);
+				_zipstream = new FileStream(filename, FileMode.Open, FileAccess.Read);
 				int read = _zipstream.Read(new byte[1], 0, 1);
 				if (read != 1)
 				{

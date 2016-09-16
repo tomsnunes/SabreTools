@@ -117,6 +117,7 @@ namespace SabreTools.Helper
 			// Set internal variables
 			Stream readStream = null;
 			Stream writeStream = null;
+			ZipFile oldZipFile = new ZipFile();
 			ZipFile zipFile = new ZipFile();
 			ZipReturn zipReturn = ZipReturn.ZipGood;
 
@@ -135,27 +136,35 @@ namespace SabreTools.Helper
 				// Open or create the archive
 				if (!File.Exists(archiveFileName))
 				{
-					zipReturn = zipFile.Create(archiveFileName);
+					zipReturn = zipFile.Create(archiveFileName + ".new");
 				}
 				else
 				{
-					zipReturn = zipFile.Open(archiveFileName, new FileInfo(archiveFileName).LastWriteTime.Ticks, false);
-					zipFile.ZipOpen = ZipOpenType.OpenWrite;
-				}
-				
-				if (zipReturn != ZipReturn.ZipGood)
-				{
-					zipFile.Dispose();
-					return success;
+					// Open the old archive for reading
+					oldZipFile.Open(archiveFileName, new FileInfo(archiveFileName).LastWriteTime.Ticks, false);
+					zipFile.Create(archiveFileName + ".new");
+
+					// Copy over all files to the new archive
+					for (int i = 0; i < oldZipFile.EntriesCount; i++)
+					{
+						// Instantiate the streams
+						CompressionMethod icompressionMethod = CompressionMethod.Stored;
+						ulong istreamSize = 0;
+						oldZipFile.OpenReadStream(i, true, out readStream, out istreamSize, out icompressionMethod);
+						zipFile.OpenWriteStream(true, true, oldZipFile.Filename(i), streamSize, CompressionMethod.Deflated, out writeStream);
+
+						// Copy the input stream to the output
+						byte[] ibuffer = new byte[8 * 1024];
+						int ilen;
+						while ((ilen = readStream.Read(ibuffer, 0, ibuffer.Length)) > 0)
+						{
+							writeStream.Write(ibuffer, 0, ilen);
+						}
+					}
 				}
 
-				// Open the stream for writing
+				// Now open the write stream for the new rom
 				zipReturn = zipFile.OpenWriteStream(false, true, rom.Name, streamSize, CompressionMethod.Deflated, out writeStream);
-				if (zipReturn != ZipReturn.ZipGood)
-				{
-					zipFile.Dispose();
-					return success;
-				}
 
 				// Copy the input stream to the output
 				byte[] buffer = new byte[8 * 1024];
@@ -186,7 +195,15 @@ namespace SabreTools.Helper
 			finally
 			{
 				zipFile.Dispose();
+				oldZipFile.Dispose();
 			}
+
+			// If the old file exists, delete it and replace
+			if (File.Exists(archiveFileName))
+			{
+				File.Delete(archiveFileName);
+			}
+			File.Move(archiveFileName + ".new", archiveFileName);
 
 			return success;
 		}
