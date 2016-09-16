@@ -397,17 +397,14 @@ namespace SabreTools.Helper
 				}
 
 				// Now try to open the file for reading
-				FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
-				int errorcode = fs.Read(new byte[1], 0, 1);
-				if (errorcode != 0)
+				_zipstream = new FileStream(filename, FileMode.Open, FileAccess.ReadWrite);
+				int read = _zipstream.Read(new byte[1], 0, 1);
+				if (read != 1)
 				{
 					Close();
-					if (errorcode == 32)
-					{
-						return ZipReturn.ZipFileLocked;
-					}
 					return ZipReturn.ZipErrorOpeningFile;
 				}
+				_zipstream.Position = 0;
 			}
 			catch (PathTooLongException)
 			{
@@ -420,7 +417,7 @@ namespace SabreTools.Helper
 				return ZipReturn.ZipErrorOpeningFile;
 			}
 
-			// If we succedded, set the flag for read
+			// If we succeeded, set the flag for read
 			_zipOpen = ZipOpenType.OpenRead;
 
 			// If we're not reading the headers, return
@@ -618,13 +615,7 @@ namespace SabreTools.Helper
 			_zipFileInfo = new FileInfo(filename);
 
 			// Now try to open the file
-			FileStream fs = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-			int errorcode = fs.Read(new byte[1], 0, 1);
-			if (errorcode != 0)
-			{
-				Close();
-				return ZipReturn.ZipErrorOpeningFile;
-			}
+			_zipstream = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite);
 			ZipOpen = ZipOpenType.OpenWrite;
 			return ZipReturn.ZipGood;
 		}
@@ -838,7 +829,7 @@ namespace SabreTools.Helper
 			}
 
 			// Open the entry stream based on the current position
-			ZipFileEntry zfe = new ZipFileEntry(_zipstream, filename);
+			ZipFileEntry zfe = new ZipFileEntry(_zipstream, filename, true);
 			ZipReturn zr = zfe.OpenWriteStream(raw, torrentZip, uncompressedSize, compressionMethod, out stream);
 			_entries.Add(zfe);
 

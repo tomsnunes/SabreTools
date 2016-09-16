@@ -130,21 +130,30 @@ namespace SabreTools.Helper
 
 				// Open the input file for reading
 				readStream = File.OpenRead(inputFile);
+				ulong streamSize = (ulong)(new FileInfo(inputFile).Length);
 
-				// If the archive doesn't exist, create it
+				// Open or create the archive
 				if (!File.Exists(archiveFileName))
 				{
 					zipReturn = zipFile.Create(archiveFileName);
 				}
-				// Otherwise, open the archive
 				else
 				{
-					zipReturn = zipFile.Open(archiveFileName, new FileInfo(archiveFileName).LastWriteTime.Ticks, true);
+					zipReturn = zipFile.Open(archiveFileName, new FileInfo(archiveFileName).LastWriteTime.Ticks, false);
+					zipFile.ZipOpen = ZipOpenType.OpenWrite;
 				}
-
-				zipReturn = zipFile.OpenWriteStream(false, true, inputFile, (ulong)(new FileInfo(inputFile).Length), CompressionMethod.Deflated, out writeStream);
+				
 				if (zipReturn != ZipReturn.ZipGood)
 				{
+					zipFile.Dispose();
+					return success;
+				}
+
+				// Open the stream for writing
+				zipReturn = zipFile.OpenWriteStream(false, true, rom.Name, streamSize, CompressionMethod.Deflated, out writeStream);
+				if (zipReturn != ZipReturn.ZipGood)
+				{
+					zipFile.Dispose();
 					return success;
 				}
 
@@ -165,6 +174,7 @@ namespace SabreTools.Helper
 				{
 					return success;
 				}
+				zipFile.Close();
 
 				success = true;
 			}
