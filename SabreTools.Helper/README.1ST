@@ -684,6 +684,12 @@ Options:
 			includes two auxilary files, .romba_size and .romba_size.backup, that have the
 			compressed size of the folder inside for use with Romba.
 			
+	-tzip				Enable TorrentZip output
+		Instead of outputting the files to standard ZIP archives, files will be rebuilt to
+		TorrentZip (TZ) files. This format is based on the ZIP archive format, but with
+		custom header information. This is primarily used by external tool RomVault
+		(http://www.romvault.com/) and is already widely used.
+			
 	-do, --directory	Enable outputting files uncompressed
 		Instead of outputting the files to ZIP archives, files will be rebuilt to named
 		subdirectories within the output folder. This is useful for when the DAT does not

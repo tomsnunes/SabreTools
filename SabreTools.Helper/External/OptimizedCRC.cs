@@ -56,7 +56,7 @@ namespace OCRC
             }
         }
 
-        private uint value;
+        public uint UnsignedValue;
 
         public OptimizedCRC()
         {
@@ -68,12 +68,12 @@ namespace OCRC
         /// </summary>
         public void Init()
         {
-            value = kInitial;
+            UnsignedValue = kInitial;
         }
 
         public int Value
         {
-            get { return (int)~value; }
+            get { return (int)~UnsignedValue; }
         }
 
         public void Update(byte[] data, int offset, int count)
@@ -83,7 +83,7 @@ namespace OCRC
 
             var table = OptimizedCRC.Table;
 
-            uint crc = value;
+            uint crc = UnsignedValue;
 
             for (; (offset & 7) != 0 && count != 0; count--)
                 crc = (crc >> 8) ^ table[(byte)crc ^ data[offset++]];
@@ -118,7 +118,7 @@ namespace OCRC
             while (count-- != 0)
                 crc = (crc >> 8) ^ table[(byte)crc ^ data[offset++]];
 
-            value = crc;
+            UnsignedValue = crc;
         }
 
         static public int Compute(byte[] data, int offset, int count)
@@ -140,7 +140,7 @@ namespace OCRC
 
 		public void Dispose()
 		{
-			value = 0;
+			UnsignedValue = 0;
 		}
 	}
 }
