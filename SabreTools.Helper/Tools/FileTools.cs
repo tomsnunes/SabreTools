@@ -129,10 +129,6 @@ namespace SabreTools.Helper
 					Directory.CreateDirectory(Path.GetDirectoryName(archiveFileName));
 				}
 
-				// Open the input file for reading
-				readStream = File.OpenRead(inputFile);
-				ulong streamSize = (ulong)(new FileInfo(inputFile).Length);
-
 				// Open or create the archive
 				if (!File.Exists(archiveFileName))
 				{
@@ -141,29 +137,50 @@ namespace SabreTools.Helper
 				else
 				{
 					// Open the old archive for reading
-					oldZipFile.Open(archiveFileName, new FileInfo(archiveFileName).LastWriteTime.Ticks, false);
-					zipFile.Create(archiveFileName + ".new");
+					oldZipFile.Open(archiveFileName, new FileInfo(archiveFileName).LastWriteTime.Ticks, true);
 
-					// Copy over all files to the new archive
-					for (int i = 0; i < oldZipFile.EntriesCount; i++)
+					// If the old one contains the new file, then just skip out
+					if (oldZipFile.Contains(rom.Name))
 					{
-						// Instantiate the streams
-						CompressionMethod icompressionMethod = CompressionMethod.Stored;
-						ulong istreamSize = 0;
-						oldZipFile.OpenReadStream(i, true, out readStream, out istreamSize, out icompressionMethod);
-						zipFile.OpenWriteStream(true, true, oldZipFile.Filename(i), streamSize, CompressionMethod.Deflated, out writeStream);
+						success = true;
+					}
+					// Otherwise, process the old zipfile
+					else
+					{
+						zipFile.Create(archiveFileName + ".new");
 
-						// Copy the input stream to the output
-						byte[] ibuffer = new byte[8 * 1024];
-						int ilen;
-						while ((ilen = readStream.Read(ibuffer, 0, ibuffer.Length)) > 0)
+						// Copy over all files to the new archive
+						for (int i = 0; i < oldZipFile.EntriesCount; i++)
 						{
-							writeStream.Write(ibuffer, 0, ilen);
+							// Instantiate the streams
+							CompressionMethod icompressionMethod = CompressionMethod.Stored;
+							ulong istreamSize = 0;
+							oldZipFile.OpenReadStream(i, false, out readStream, out istreamSize, out icompressionMethod);
+							zipFile.OpenWriteStream(false, true, oldZipFile.Filename(i), istreamSize, CompressionMethod.Deflated, out writeStream);
+
+							// Copy the input stream to the output
+							byte[] ibuffer = new byte[8 * 1024];
+							int ilen;
+							while ((ilen = readStream.Read(ibuffer, 0, ibuffer.Length)) > 0)
+							{
+								writeStream.Write(ibuffer, 0, ilen);
+							}
+							writeStream.Flush();
+
+							zipFile.CloseWriteStream(BitConverter.ToUInt32(oldZipFile.CRC32(i), 0));
 						}
 					}
 				}
 
-				// Now open the write stream for the new rom
+				// If the file has already been found, return it
+				if (success)
+				{
+					return success;
+				}
+
+				// Open the input file for reading
+				readStream = File.OpenRead(inputFile);
+				ulong streamSize = (ulong)(new FileInfo(inputFile).Length);
 				zipReturn = zipFile.OpenWriteStream(false, true, rom.Name, streamSize, CompressionMethod.Deflated, out writeStream);
 
 				// Copy the input stream to the output

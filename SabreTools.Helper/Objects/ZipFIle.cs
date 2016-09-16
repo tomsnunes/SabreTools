@@ -86,6 +86,10 @@ namespace SabreTools.Helper
 		{
 			return _entries[i].SHA1;
 		}
+		public bool Contains(string n)
+		{
+			return _entries.Contains(new ZipFileEntry(new MemoryStream(), n, true));
+		}
 
 		#endregion
 
@@ -658,6 +662,8 @@ namespace SabreTools.Helper
 				torrentZip &= zfe.TorrentZip;
 			}
 
+			_centerDirSize = (ulong)_zipstream.Position - _centerDirStart;
+
 			// Then get the central directory hash
 			OptimizedCRC ocrc = new OptimizedCRC();
 			byte[] buffer = new byte[_centerDirSize];
@@ -674,7 +680,6 @@ namespace SabreTools.Helper
 			_zipstream.Position = currentPosition;
 
 			// Now set more of the information
-			_centerDirSize = (ulong)_zipstream.Position - _centerDirStart;
 			_fileComment = (torrentZip ? Encoding.ASCII.GetBytes(("TORRENTZIPPED-" + calculatedCrc).ToCharArray()) : new byte[0]);
 			_zipStatus = (torrentZip ? ZipStatus.TorrentZip : ZipStatus.None);
 			

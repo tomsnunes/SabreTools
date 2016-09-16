@@ -399,190 +399,189 @@ namespace SabreTools.Helper
 				_torrentZip = true;
 
 				// Open the stream for reading
-				using (BinaryReader br = new BinaryReader(_zipstream))
+				BinaryReader br = new BinaryReader(_zipstream);
+
+				// Set the position of the writer based on the entry information
+				br.BaseStream.Seek((long)_relativeOffset, SeekOrigin.Begin);
+
+				// If the first bytes aren't a local file header, log and return
+				if (br.ReadUInt32() != Constants.LocalFileHeaderSignature)
 				{
-					// Set the position of the writer based on the entry information
-					br.BaseStream.Seek((long)_relativeOffset, SeekOrigin.Begin);
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
 
-					// If the first bytes aren't a local file header, log and return
-					if (br.ReadUInt32() != Constants.LocalFileHeaderSignature)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
+				// Now read in available information, comparing to the known data
+				if (br.ReadUInt16() != (ushort)_versionNeeded)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
+				if (br.ReadUInt16() != (ushort)_generalPurposeBitFlag)
+				{
+					_torrentZip = false;
+				}
+				if (br.ReadUInt16() != (ushort)_compressionMethod)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
+				if (br.ReadUInt16() != _lastModFileTime)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
+				if (br.ReadUInt16() != _lastModFileDate)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
+				if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == 0 && br.ReadUInt32() != _crc)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
 
-					// Now read in available information, comparing to the known data
-					if (br.ReadUInt16() != (ushort)_versionNeeded)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-					if (br.ReadUInt16() != (ushort)_generalPurposeBitFlag)
-					{
-						_torrentZip = false;
-					}
-					if (br.ReadUInt16() != (ushort)_compressionMethod)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-					if (br.ReadUInt16() != _lastModFileTime)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-					if (br.ReadUInt16() != _lastModFileDate)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-					if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == 0 && br.ReadUInt32() != _crc)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
+				uint readCompressedSize = br.ReadUInt32();
+				// If we have Zip64, the compressed size should be 0xffffffff
+				if (_zip64 && readCompressedSize != 0xffffffff && readCompressedSize != _compressedSize)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
+				// If we have the zeroed flag set, then no size should be included
+				if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == GeneralPurposeBitFlag.ZeroedCRCAndSize && readCompressedSize != 0)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
+				// If we don't have the zeroed flag set, then the size should match
+				if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == 0 && readCompressedSize != _compressedSize)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
 
-					uint readCompressedSize = br.ReadUInt32();
-					// If we have Zip64, the compressed size should be 0xffffffff
-					if (_zip64 && readCompressedSize != 0xffffffff && readCompressedSize != _compressedSize)
+				uint readUncompressedSize = br.ReadUInt32();
+				// If we have Zip64, the uncompressed size should be 0xffffffff
+				if (_zip64 && readUncompressedSize != 0xffffffff && readUncompressedSize != _compressedSize)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
+				// If we have the zeroed flag set, then no size should be included
+				if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == GeneralPurposeBitFlag.ZeroedCRCAndSize && readUncompressedSize != 0)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
+				// If we don't have the zeroed flag set, then the size should match
+				if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == 0 && readUncompressedSize != _uncompressedSize)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
+
+				ushort fileNameLength = br.ReadUInt16();
+				ushort extraFieldLength = br.ReadUInt16();
+
+				byte[] fileNameBytes = br.ReadBytes(fileNameLength);
+				string tempFileName = ((_generalPurposeBitFlag & GeneralPurposeBitFlag.LanguageEncodingFlag) == 0
+					? Encoding.ASCII.GetString(fileNameBytes)
+					: Encoding.UTF8.GetString(fileNameBytes, 0, fileNameLength));
+
+				byte[] extraField = br.ReadBytes(extraFieldLength);
+
+				/*
+				Full disclosure: this next section is in GordonJ's work but I honestly
+				have no idea everything that it does. It seems to do something to figure
+				out if it's Zip64, or possibly check for random things but it uses the
+				extra field for this, which I do not fully understand. It's copied in
+				its entirety below in the hope that it makes things better...
+				*/
+
+				_zip64 = false;
+				int pos = 0;
+				while (extraFieldLength > pos)
+				{
+					ushort type = BitConverter.ToUInt16(extraField, pos);
+					pos += 2;
+					ushort blockLength = BitConverter.ToUInt16(extraField, pos);
+					pos += 2;
+					switch (type)
 					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-					// If we have the zeroed flag set, then no size should be included
-					if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == GeneralPurposeBitFlag.ZeroedCRCAndSize && readCompressedSize != 0)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-					// If we don't have the zeroed flag set, then the size should match
-					if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == 0 && readCompressedSize != _compressedSize)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-
-					uint readUncompressedSize = br.ReadUInt32();
-					// If we have Zip64, the uncompressed size should be 0xffffffff
-					if (_zip64 && readUncompressedSize != 0xffffffff && readUncompressedSize != _compressedSize)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-					// If we have the zeroed flag set, then no size should be included
-					if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == GeneralPurposeBitFlag.ZeroedCRCAndSize && readUncompressedSize != 0)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-					// If we don't have the zeroed flag set, then the size should match
-					if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == 0 && readUncompressedSize != _uncompressedSize)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-
-					ushort fileNameLength = br.ReadUInt16();
-					ushort extraFieldLength = br.ReadUInt16();
-
-					byte[] fileNameBytes = br.ReadBytes(fileNameLength);
-					string tempFileName = ((_generalPurposeBitFlag & GeneralPurposeBitFlag.LanguageEncodingFlag) == 0
-						? Encoding.ASCII.GetString(fileNameBytes)
-						: Encoding.UTF8.GetString(fileNameBytes, 0, fileNameLength));
-
-					byte[] extraField = br.ReadBytes(extraFieldLength);
-
-					/*
-					Full disclosure: this next section is in GordonJ's work but I honestly
-					have no idea everything that it does. It seems to do something to figure
-					out if it's Zip64, or possibly check for random things but it uses the
-					extra field for this, which I do not fully understand. It's copied in
-					its entirety below in the hope that it makes things better...
-					*/
-
-					_zip64 = false;
-					int pos = 0;
-					while (extraFieldLength > pos)
-					{
-						ushort type = BitConverter.ToUInt16(extraField, pos);
-						pos += 2;
-						ushort blockLength = BitConverter.ToUInt16(extraField, pos);
-						pos += 2;
-						switch (type)
-						{
-							case 0x0001:
-								Zip64 = true;
-								if (readUncompressedSize == 0xffffffff)
-								{
-									ulong tLong = BitConverter.ToUInt64(extraField, pos);
-									if (tLong != UncompressedSize)
-									{
-										return ZipReturn.ZipLocalFileHeaderError;
-									}
-									pos += 8;
-								}
-								if (readCompressedSize == 0xffffffff)
-								{
-									ulong tLong = BitConverter.ToUInt64(extraField, pos);
-									if (tLong != _compressedSize)
-									{
-										return ZipReturn.ZipLocalFileHeaderError;
-									}
-									pos += 8;
-								}
-								break;
-							case 0x7075:
-								//byte version = extraField[pos];
-								pos += 1;
-								uint nameCRC32 = BitConverter.ToUInt32(extraField, pos);
-								pos += 4;
-
-								CRC32 crcTest = new CRC32();
-								crcTest.SlurpBlock(fileNameBytes, 0, fileNameLength);
-								uint fCRC = (uint)crcTest.Crc32Result;
-
-								if (nameCRC32 != fCRC)
+						case 0x0001:
+							Zip64 = true;
+							if (readUncompressedSize == 0xffffffff)
+							{
+								ulong tLong = BitConverter.ToUInt64(extraField, pos);
+								if (tLong != UncompressedSize)
 								{
 									return ZipReturn.ZipLocalFileHeaderError;
 								}
+								pos += 8;
+							}
+							if (readCompressedSize == 0xffffffff)
+							{
+								ulong tLong = BitConverter.ToUInt64(extraField, pos);
+								if (tLong != _compressedSize)
+								{
+									return ZipReturn.ZipLocalFileHeaderError;
+								}
+								pos += 8;
+							}
+							break;
+						case 0x7075:
+							//byte version = extraField[pos];
+							pos += 1;
+							uint nameCRC32 = BitConverter.ToUInt32(extraField, pos);
+							pos += 4;
 
-								int charLen = blockLength - 5;
+							CRC32 crcTest = new CRC32();
+							crcTest.SlurpBlock(fileNameBytes, 0, fileNameLength);
+							uint fCRC = (uint)crcTest.Crc32Result;
 
-								tempFileName = Encoding.UTF8.GetString(extraField, pos, charLen);
-								pos += charLen;
+							if (nameCRC32 != fCRC)
+							{
+								return ZipReturn.ZipLocalFileHeaderError;
+							}
 
-								break;
-							default:
-								pos += blockLength;
-								break;
-						}
+							int charLen = blockLength - 5;
+
+							tempFileName = Encoding.UTF8.GetString(extraField, pos, charLen);
+							pos += charLen;
+
+							break;
+						default:
+							pos += blockLength;
+							break;
 					}
+				}
 
-					// Back to code I understand
-					if (String.Equals(_fileName, tempFileName, StringComparison.InvariantCulture))
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
+				// Back to code I understand
+				if (!String.Equals(_fileName, tempFileName, StringComparison.InvariantCulture))
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
 
-					// Set the position of the data
-					_dataLocation = (ulong)_zipstream.Position;
+				// Set the position of the data
+				_dataLocation = (ulong)_zipstream.Position;
 
-					// Now if no other data should be after the data, return
-					if((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == GeneralPurposeBitFlag.ZeroedCRCAndSize)
-					{
-						return ZipReturn.ZipGood;
-					}
+				// Now if no other data should be after the data, return
+				if((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == 0)
+				{
+					return ZipReturn.ZipGood;
+				}
 
-					// Otherwise, compare the data after the file too
-					_zipstream.Seek((long)_compressedSize, SeekOrigin.Current);
+				// Otherwise, compare the data after the file too
+				_zipstream.Position += (long)_compressedSize;
 
-					// If there's no subheader, read the next thing as crc
-					uint tempCrc = br.ReadUInt32();
-					if (tempCrc != Constants.EndOfLocalFileHeaderSignature)
-					{
-						tempCrc = br.ReadUInt32();
-					}
+				// If there's no subheader, read the next thing as crc
+				uint tempCrc = br.ReadUInt32();
+				if (tempCrc != Constants.EndOfLocalFileHeaderSignature)
+				{
+					tempCrc = br.ReadUInt32();
+				}
 
-					if (tempCrc != _crc)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-					if (br.ReadUInt32() != _compressedSize)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-					if (br.ReadUInt32() != _uncompressedSize)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
+				if (tempCrc != _crc)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
+				if (br.ReadUInt32() != _compressedSize)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
+				}
+				if (br.ReadUInt32() != _uncompressedSize)
+				{
+					return ZipReturn.ZipLocalFileHeaderError;
 				}
 			}
 			catch
@@ -605,105 +604,104 @@ namespace SabreTools.Helper
 				_torrentZip = true;
 
 				// Open the stream for reading
-				using (BinaryReader br = new BinaryReader(_zipstream))
+				BinaryReader br = new BinaryReader(_zipstream);
+
+				// Set the position of the writer based on the entry information
+				br.BaseStream.Seek((long)_relativeOffset, SeekOrigin.Begin);
+
+				// If the first bytes aren't a local file header, log and return
+				if (br.ReadUInt32() != Constants.LocalFileHeaderSignature)
 				{
-					// Set the position of the writer based on the entry information
-					br.BaseStream.Seek((long)_relativeOffset, SeekOrigin.Begin);
-
-					// If the first bytes aren't a local file header, log and return
-					if (br.ReadUInt32() != Constants.LocalFileHeaderSignature)
-					{
-						return ZipReturn.ZipLocalFileHeaderError;
-					}
-
-					// Now read in available information, ignoring unneeded
-					_versionNeeded = (ArchiveVersion)br.ReadUInt16();
-					_generalPurposeBitFlag = (GeneralPurposeBitFlag)br.ReadUInt16();
-
-					// If the flag says there's no hash data, then we can't use quick mode
-					if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == GeneralPurposeBitFlag.ZeroedCRCAndSize)
-					{
-						return ZipReturn.ZipCannotFastOpen;
-					}
-
-					_compressionMethod = (CompressionMethod)br.ReadUInt16();
-					_lastModFileTime = br.ReadUInt16();
-					_lastModFileDate = br.ReadUInt16();
-					_crc = br.ReadUInt32();
-					_compressedSize = br.ReadUInt32();
-					_uncompressedSize = br.ReadUInt32();
-
-					ushort fileNameLength = br.ReadUInt16();
-					ushort extraFieldLength = br.ReadUInt16();
-
-					byte[] fileNameBytes = br.ReadBytes(fileNameLength);
-					_fileName = ((_generalPurposeBitFlag & GeneralPurposeBitFlag.LanguageEncodingFlag) == 0
-						? Encoding.ASCII.GetString(fileNameBytes)
-						: Encoding.UTF8.GetString(fileNameBytes, 0, fileNameLength));
-
-					byte[] extraField = br.ReadBytes(extraFieldLength);
-
-					/*
-					Full disclosure: this next section is in GordonJ's work but I honestly
-					have no idea everything that it does. It seems to do something to figure
-					out if it's Zip64, or possibly check for random things but it uses the
-					extra field for this, which I do not fully understand. It's copied in
-					its entirety below in the hope that it makes things better...
-					*/
-
-					_zip64 = false;
-					int pos = 0;
-					while (extraFieldLength > pos)
-					{
-						ushort type = BitConverter.ToUInt16(extraField, pos);
-						pos += 2;
-						ushort blockLength = BitConverter.ToUInt16(extraField, pos);
-						pos += 2;
-						switch (type)
-						{
-							case 0x0001:
-								Zip64 = true;
-								if (_uncompressedSize == 0xffffffff)
-								{
-									_uncompressedSize = BitConverter.ToUInt64(extraField, pos);
-									pos += 8;
-								}
-								if (_compressedSize == 0xffffffff)
-								{
-									_compressedSize = BitConverter.ToUInt64(extraField, pos);
-									pos += 8;
-								}
-								break;
-							case 0x7075:
-								pos += 1;
-								uint nameCRC32 = BitConverter.ToUInt32(extraField, pos);
-								pos += 4;
-
-								CRC32 crcTest = new CRC32();
-								crcTest.SlurpBlock(fileNameBytes, 0, fileNameLength);
-								uint fCRC = (uint)crcTest.Crc32Result;
-
-								if (nameCRC32 != fCRC)
-								{
-									return ZipReturn.ZipLocalFileHeaderError;
-								}
-
-								int charLen = blockLength - 5;
-
-								FileName = Encoding.UTF8.GetString(extraField, pos, charLen);
-
-								pos += charLen;
-
-								break;
-							default:
-								pos += blockLength;
-								break;
-						}
-					}
-
-					// Set the position of the data
-					_dataLocation = (ulong)_zipstream.Position;
+					return ZipReturn.ZipLocalFileHeaderError;
 				}
+
+				// Now read in available information, ignoring unneeded
+				_versionNeeded = (ArchiveVersion)br.ReadUInt16();
+				_generalPurposeBitFlag = (GeneralPurposeBitFlag)br.ReadUInt16();
+
+				// If the flag says there's no hash data, then we can't use quick mode
+				if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == GeneralPurposeBitFlag.ZeroedCRCAndSize)
+				{
+					return ZipReturn.ZipCannotFastOpen;
+				}
+
+				_compressionMethod = (CompressionMethod)br.ReadUInt16();
+				_lastModFileTime = br.ReadUInt16();
+				_lastModFileDate = br.ReadUInt16();
+				_crc = br.ReadUInt32();
+				_compressedSize = br.ReadUInt32();
+				_uncompressedSize = br.ReadUInt32();
+
+				ushort fileNameLength = br.ReadUInt16();
+				ushort extraFieldLength = br.ReadUInt16();
+
+				byte[] fileNameBytes = br.ReadBytes(fileNameLength);
+				_fileName = ((_generalPurposeBitFlag & GeneralPurposeBitFlag.LanguageEncodingFlag) == 0
+					? Encoding.ASCII.GetString(fileNameBytes)
+					: Encoding.UTF8.GetString(fileNameBytes, 0, fileNameLength));
+
+				byte[] extraField = br.ReadBytes(extraFieldLength);
+
+				/*
+				Full disclosure: this next section is in GordonJ's work but I honestly
+				have no idea everything that it does. It seems to do something to figure
+				out if it's Zip64, or possibly check for random things but it uses the
+				extra field for this, which I do not fully understand. It's copied in
+				its entirety below in the hope that it makes things better...
+				*/
+
+				_zip64 = false;
+				int pos = 0;
+				while (extraFieldLength > pos)
+				{
+					ushort type = BitConverter.ToUInt16(extraField, pos);
+					pos += 2;
+					ushort blockLength = BitConverter.ToUInt16(extraField, pos);
+					pos += 2;
+					switch (type)
+					{
+						case 0x0001:
+							Zip64 = true;
+							if (_uncompressedSize == 0xffffffff)
+							{
+								_uncompressedSize = BitConverter.ToUInt64(extraField, pos);
+								pos += 8;
+							}
+							if (_compressedSize == 0xffffffff)
+							{
+								_compressedSize = BitConverter.ToUInt64(extraField, pos);
+								pos += 8;
+							}
+							break;
+						case 0x7075:
+							pos += 1;
+							uint nameCRC32 = BitConverter.ToUInt32(extraField, pos);
+							pos += 4;
+
+							CRC32 crcTest = new CRC32();
+							crcTest.SlurpBlock(fileNameBytes, 0, fileNameLength);
+							uint fCRC = (uint)crcTest.Crc32Result;
+
+							if (nameCRC32 != fCRC)
+							{
+								return ZipReturn.ZipLocalFileHeaderError;
+							}
+
+							int charLen = blockLength - 5;
+
+							FileName = Encoding.UTF8.GetString(extraField, pos, charLen);
+
+							pos += charLen;
+
+							break;
+						default:
+							pos += blockLength;
+							break;
+					}
+				}
+
+				// Set the position of the data
+				_dataLocation = (ulong)_zipstream.Position;
 			}
 			catch
 			{
@@ -750,6 +748,7 @@ namespace SabreTools.Helper
 			bw.Write((ushort)_compressionMethod);
 			bw.Write(_lastModFileTime);
 			bw.Write(_lastModFileDate);
+
 			_crc32Location = (ulong)_zipstream.Position;
 
 			// Now, write dummy bytes for crc, compressed size, and uncompressed size
@@ -984,8 +983,9 @@ namespace SabreTools.Helper
 				using (OptimizedCRC crc = new OptimizedCRC())
 				using (MD5 md5 = System.Security.Cryptography.MD5.Create())
 				using (SHA1 sha1 = System.Security.Cryptography.SHA1.Create())
-				using (BinaryReader fs = new BinaryReader(stream))
 				{
+					BinaryReader fs = new BinaryReader(stream);
+
 					byte[] buffer = new byte[1024];
 					int read;
 					while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
@@ -999,7 +999,7 @@ namespace SabreTools.Helper
 					md5.TransformFinalBlock(buffer, 0, 0);
 					sha1.TransformFinalBlock(buffer, 0, 0);
 
-					tempCrc = (uint)crc.Value;
+					tempCrc = crc.UnsignedValue;
 					_md5 = md5.Hash;
 					_sha1 = sha1.Hash;
 				}

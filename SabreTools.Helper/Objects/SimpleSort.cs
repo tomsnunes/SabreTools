@@ -337,6 +337,7 @@ namespace SabreTools.Helper
 						else
 						{
 							FileTools.WriteToArchive(input, _outdir, found);
+							//FileTools.WriteTorrentZip(input, _outdir, found, _logger);
 						}
 					}
 				}
@@ -404,12 +405,14 @@ namespace SabreTools.Helper
 							else
 							{
 								FileTools.WriteToArchive(newinput, _outdir, found);
+								//FileTools.WriteTorrentZip(newinput, _outdir, found, _logger);
 							}
 						}
 
 						// Then output the headered rom (renamed)
 						Rom newfound = found;
 						newfound.Name = Path.GetFileNameWithoutExtension(newfound.Name) + " (" + rom.HashData.CRC + ")" + Path.GetExtension(newfound.Name);
+						newfound.HashData = rom.HashData;
 
 						// Add rom to the matched list
 						key = newfound.HashData.Size + "-" + newfound.HashData.CRC;
@@ -450,6 +453,7 @@ namespace SabreTools.Helper
 							else
 							{
 								FileTools.WriteToArchive(input, _outdir, newfound);
+								//FileTools.WriteTorrentZip(input, _outdir, newfound, _logger);
 							}
 						}
 					}
@@ -535,7 +539,8 @@ namespace SabreTools.Helper
 											}
 											else
 											{
-												FileTools.WriteToArchive(outfile, _outdir, found);
+												FileTools.WriteToArchive(input, _outdir, found);
+												//FileTools.WriteTorrentZip(input, _outdir, found, _logger);
 											}
 
 											try
