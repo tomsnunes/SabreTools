@@ -137,8 +137,8 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="zipstream">Stream representing the entry</param>
 		/// <param name="filename">Internal filename to use</param>
-		/// <param name="torrentZip">True if the file should be set with TorrentZip defaults, false otherwise (default)</param>
-		public ZipFileEntry(Stream zipstream, string filename, bool torrentZip = false)
+		/// <param name="torrentZip">True if the file should be set with TorrentZip defaults (default), false otherwise</param>
+		public ZipFileEntry(Stream zipstream, string filename, bool torrentZip = true)
 		{
 			_zip64 = false;
 			_zipstream = zipstream;
