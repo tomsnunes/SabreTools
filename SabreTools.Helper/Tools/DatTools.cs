@@ -1976,6 +1976,10 @@ namespace SabreTools.Helper
 			}
 
 			// Filter on rom type
+			if (String.IsNullOrEmpty(romtype) && romdata.Type != ItemType.Rom && romdata.Type != ItemType.Disk)
+			{
+				return false;
+			}
 			if (!String.IsNullOrEmpty(romtype) && !String.Equals(romdata.Type.ToString(), romtype, StringComparison.InvariantCultureIgnoreCase))
 			{
 				return false;
