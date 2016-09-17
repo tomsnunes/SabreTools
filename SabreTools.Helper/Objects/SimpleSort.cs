@@ -232,7 +232,10 @@ namespace SabreTools.Helper
 			{
 				try
 				{
-					Directory.Delete(_tempDir, true);
+					if (_tempDir != Path.GetTempPath())
+					{
+						Directory.Delete(_tempDir, true);
+					}
 				}
 				catch
 				{

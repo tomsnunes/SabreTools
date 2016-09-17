@@ -179,10 +179,13 @@ namespace SabreTools
 				});
 			}
 
-			// Now that we're done, delete the temp folder
+			// Now that we're done, delete the temp folder (if it's not the default)
 			try
 			{
-				Directory.Delete(_tempDir, true);
+				if (_tempDir != Path.GetTempPath())
+				{
+					Directory.Delete(_tempDir, true);
+				}
 			}
 			catch
 			{
