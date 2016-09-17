@@ -55,7 +55,7 @@ namespace SabreTools.Helper
 			_datdata = datdata;
 			_inputs = inputs;
 			_outDir = (outDir == "" ? "Rebuild" : outDir);
-			_tempDir = (String.IsNullOrEmpty(tempDir) ? Path.GetTempPath() : tempDir);
+			_tempDir = (String.IsNullOrEmpty(tempDir) ? Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()) : tempDir);
 			_quickScan = quickScan;
 			_toFolder = toFolder;
 			_verify = verify;
@@ -224,7 +224,10 @@ namespace SabreTools.Helper
 			for (int i = 0; i < files.Count; i++)
 			{
 				success &= RebuildToOutputHelper(files[i], i, files.Count);
-				FileTools.CleanDirectory(_tempDir);
+				if (_tempDir != Path.GetTempPath())
+				{
+					FileTools.CleanDirectory(_tempDir);
+				}
 			}
 
 			// Now one final delete of the temp directory
