@@ -416,7 +416,11 @@ namespace SabreTools.Helper
 					Directory.CreateDirectory(tempDir);
 
 					// Extract all files to the temp directory
-					sza.WriteToDirectory(tempDir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+					foreach (IArchiveEntry iae in sza.Entries)
+					{
+						iae.WriteToDirectory(tempDir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+						File.SetLastWriteTime(Path.Combine(tempDir, iae.Key), (DateTime)iae.LastModifiedTime);
+					}
 					encounteredErrors = false;
 				}
 				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
@@ -450,7 +454,13 @@ namespace SabreTools.Helper
 						Directory.CreateDirectory(tempDir);
 
 						// Extract all files to the temp directory
-						reader.WriteAllToDirectory(tempDir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+						bool succeeded = reader.MoveToNextEntry();
+						while (succeeded)
+						{
+							reader.WriteEntryToDirectory(tempDir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+							File.SetLastWriteTime(Path.Combine(tempDir, reader.Entry.Key), (DateTime)reader.Entry.LastModifiedTime);
+							succeeded = reader.MoveToNextEntry();
+						}
 						encounteredErrors = false;
 					}
 				}
