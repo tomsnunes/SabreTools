@@ -111,6 +111,8 @@ namespace SabreTools.Helper
 
 		#endregion
 
+		#region Central Directory
+
 		/// <summary>
 		/// Find the end of the central directory signature
 		/// </summary>
@@ -226,6 +228,10 @@ namespace SabreTools.Helper
 			bw.Write((ushort)_fileComment.Length);
 			bw.Write(_fileComment, 0, _fileComment.Length);
 		}
+
+		#endregion
+
+		#region Zip64 Central Directory
 
 		/// <summary>
 		/// Read the end of the Zip64 central directory
@@ -360,6 +366,10 @@ namespace SabreTools.Helper
 			bw.Write(_endOfCenterDir64); // relative offset of the zip64 end of central directroy record
 			bw.Write((uint)1); // total number of disks
 		}
+
+		#endregion
+
+		#region Open, Create, Close
 
 		/// <summary>
 		/// Open a new file as an archive
@@ -737,6 +747,10 @@ namespace SabreTools.Helper
 			_zipOpen = ZipOpenType.Closed;
 		}
 
+		#endregion
+
+		#region Read and Write
+
 		/// <summary>
 		/// Open the read file stream
 		/// </summary>
@@ -885,6 +899,10 @@ namespace SabreTools.Helper
 			_entries[_entries.Count - 1].AddDirectory();
 		}
 
+		#endregion
+
+		#region Helpers
+
 		/// <summary>
 		/// Scan every individual entry for validity
 		/// </summary>
@@ -994,5 +1012,7 @@ namespace SabreTools.Helper
 				}
 			}
 		}
+
+		#endregion
 	}
 }

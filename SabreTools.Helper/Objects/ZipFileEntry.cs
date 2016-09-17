@@ -155,15 +155,7 @@ namespace SabreTools.Helper
 
 		#endregion
 
-		/// <summary>
-		/// Check if an entry equals another (use only name for now)
-		/// </summary>
-		/// <param name="zfe"></param>
-		/// <returns></returns>
-		public bool Equals(ZipFileEntry zfe)
-		{
-			return (String.Equals(_fileName, zfe.FileName, StringComparison.InvariantCultureIgnoreCase));
-		}
+		#region Central Directory
 
 		/// <summary>
 		/// Read the central directory entry from the input stream
@@ -386,6 +378,10 @@ namespace SabreTools.Helper
 			bw.Write(extraField.ToArray(), 0, extraFieldLength); // Only write the first bytes if longer than allowed
 			// We have no file comment, so we don't have to write more
 		}
+
+		#endregion
+
+		#region Header
 
 		/// <summary>
 		/// Read the local file header from the input stream
@@ -778,6 +774,10 @@ namespace SabreTools.Helper
 			bw.Write(extraField.ToArray(), 0, extraFieldLength);
 		}
 
+		#endregion
+
+		#region Read and Write
+
 		/// <summary>
 		/// Open the read file stream
 		/// </summary>
@@ -946,6 +946,10 @@ namespace SabreTools.Helper
 			_zipstream.Seek(posNow, SeekOrigin.Begin);
 		}
 
+		#endregion
+
+		#region Helpers
+
 		/// <summary>
 		/// Get the data from the current file, if not already checked
 		/// </summary>
@@ -1027,5 +1031,17 @@ namespace SabreTools.Helper
 			ds.WriteByte(03);
 			ds.WriteByte(00);
 		}
+
+		/// <summary>
+		/// Check if an entry equals another (use only name for now)
+		/// </summary>
+		/// <param name="zfe"></param>
+		/// <returns></returns>
+		public bool Equals(ZipFileEntry zfe)
+		{
+			return (String.Equals(_fileName, zfe.FileName, StringComparison.InvariantCultureIgnoreCase));
+		}
+
+		#endregion
 	}
 }
