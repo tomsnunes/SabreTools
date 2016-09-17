@@ -418,8 +418,7 @@ namespace SabreTools.Helper
 					// Extract all files to the temp directory
 					foreach (IArchiveEntry iae in sza.Entries)
 					{
-						iae.WriteToDirectory(tempDir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
-						File.SetLastWriteTime(Path.Combine(tempDir, iae.Key), (DateTime)iae.LastModifiedTime);
+						iae.WriteToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
 					}
 					encounteredErrors = false;
 				}
@@ -457,8 +456,7 @@ namespace SabreTools.Helper
 						bool succeeded = reader.MoveToNextEntry();
 						while (succeeded)
 						{
-							reader.WriteEntryToDirectory(tempDir, ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
-							File.SetLastWriteTime(Path.Combine(tempDir, reader.Entry.Key), (DateTime)reader.Entry.LastModifiedTime);
+							reader.WriteEntryToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
 							succeeded = reader.MoveToNextEntry();
 						}
 						encounteredErrors = false;
