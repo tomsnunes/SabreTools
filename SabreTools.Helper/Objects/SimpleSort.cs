@@ -439,11 +439,6 @@ namespace SabreTools.Helper
 
 			#region Rebuild all files
 
-			// Another note for this section too: in order for this to rebuild in the fastest way, the handle for the output files
-			// (for zip files ONLY) have to be kept open while writing. Because of this, I need to abstract out the standard
-			// zip read/write as well as tzip read/write to their own methods that are essentially "output stream" writers. How
-			// hard is this going to be? Well, we'll see...
-
 			#endregion
 
 			return success;
