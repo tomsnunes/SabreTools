@@ -419,7 +419,7 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Wrap adding a file to the dictionary in custom DFD
+		/// Wrap adding a file to the dictionary in custom DFD, files that matched a skipper a prefixed with "HEAD::"
 		/// </summary>
 		/// <param name="file">Name of the file to attempt to add</param>
 		/// <param name="matchdat">Reference to the Dat to add to</param>
@@ -438,15 +438,16 @@ namespace SabreTools.Helper
 			rom.Machine.Name = Path.GetDirectoryName(Path.GetFullPath(file));
 
 			// Add the rom information to the Dat
-			if (matchdat.Files.ContainsKey(rom.Machine.Name.ToLowerInvariant()))
+			string key = rom.HashData.Size + "-" + rom.HashData.CRC;
+			if (matchdat.Files.ContainsKey(key))
 			{
-				matchdat.Files[rom.Machine.Name.ToLowerInvariant()].Add(rom);
+				matchdat.Files[key].Add(rom);
 			}
 			else
 			{
 				List<Rom> temp = new List<Rom>();
 				temp.Add(rom);
-				matchdat.Files.Add(rom.Machine.Name.ToLowerInvariant(), temp);
+				matchdat.Files.Add(key, temp);
 			}
 
 			// Now attempt to see if the file has a header
@@ -463,15 +464,16 @@ namespace SabreTools.Helper
 				romNH.Machine.Name = rom.Machine.Name;
 
 				// Add the rom information to the Dat
-				if (matchdat.Files.ContainsKey(romNH.Machine.Name.ToLowerInvariant()))
+				key = romNH.HashData.Size + "-" + romNH.HashData.CRC;
+				if (matchdat.Files.ContainsKey(key))
 				{
-					matchdat.Files[romNH.Machine.Name.ToLowerInvariant()].Add(romNH);
+					matchdat.Files[key].Add(romNH);
 				}
 				else
 				{
 					List<Rom> temp = new List<Rom>();
 					temp.Add(romNH);
-					matchdat.Files.Add(romNH.Machine.Name.ToLowerInvariant(), temp);
+					matchdat.Files.Add(key, temp);
 				}
 			}
 
