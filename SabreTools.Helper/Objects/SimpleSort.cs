@@ -295,6 +295,8 @@ namespace SabreTools.Helper
 		{
 			bool success = true;
 
+			#region Find all files
+
 			// Create a list of just files from inputs
 			_logger.User("Finding all files...");
 			List<string> files = new List<string>();
@@ -333,7 +335,10 @@ namespace SabreTools.Helper
 			});
 			_logger.User("Finding files complete!");
 
+			#endregion
+
 			// TODO: The below code does NOT check for headerless files as well. This is a problem.
+			#region Get source file information
 
 			// Now loop through all of the files and check them, DFD style
 			_logger.User("Getting source file information...");
@@ -414,6 +419,16 @@ namespace SabreTools.Helper
 				}
 			}
 			_logger.User("Getting source file information complete!");
+
+			#endregion
+
+			#region Find all files to rebuild and bucket by game
+
+			#endregion
+
+			#region Rebuild all files
+
+			#endregion
 
 			return success;
 		}
