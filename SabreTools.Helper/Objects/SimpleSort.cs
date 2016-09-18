@@ -409,6 +409,26 @@ namespace SabreTools.Helper
 			// HERE BE DRAGONS
 			#region Find all files to rebuild and bucket by game
 
+			// Create a dictionary of from/to Rom mappings
+			Dictionary<Rom, Rom> toFromMap = new Dictionary<Rom, Rom>();
+
+			// Now populate it
+			foreach (string key in matchdat.Files.Keys)
+			{
+				foreach (Rom rom in matchdat.Files[key])
+				{
+					List<Rom> matched = RomTools.GetDuplicates(rom, _datdata, _logger, true);
+					foreach (Rom match in matched)
+					{
+						try
+						{
+							toFromMap.Add(match, rom);
+						}
+						catch { }
+					}
+				}
+			}
+
 			// So, note here. This is going to be an interesting thing. What I want to do is create a mapping of Rom to output Roms.
 			// There's a couple of problems with this, not least of all is that the output files will all have to be kept open while
 			// rebuilding. On the flip side, we can do a reverse mapping, mapping any output files to their source. This would have
@@ -418,6 +438,11 @@ namespace SabreTools.Helper
 			#endregion
 
 			#region Rebuild all files
+
+			// Another note for this section too: in order for this to rebuild in the fastest way, the handle for the output files
+			// (for zip files ONLY) have to be kept open while writing. Because of this, I need to abstract out the standard
+			// zip read/write as well as tzip read/write to their own methods that are essentially "output stream" writers. How
+			// hard is this going to be? Well, we'll see...
 
 			#endregion
 
