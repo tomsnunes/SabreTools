@@ -409,6 +409,12 @@ namespace SabreTools.Helper
 			// HERE BE DRAGONS
 			#region Find all files to rebuild and bucket by game
 
+			// So, note here. This is going to be an interesting thing. What I want to do is create a mapping of Rom to output Roms.
+			// There's a couple of problems with this, not least of all is that the output files will all have to be kept open while
+			// rebuilding. On the flip side, we can do a reverse mapping, mapping any output files to their source. This would have
+			// the advantage of allowing grouping by game and opening each destination archive at most once. But this will mean
+			// that input archives may have to be opened multiple times...
+
 			#endregion
 
 			#region Rebuild all files
