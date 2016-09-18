@@ -337,7 +337,6 @@ namespace SabreTools.Helper
 
 			#endregion
 
-			// TODO: The below code does NOT check for headerless files as well. This is a problem.
 			#region Get source file information
 
 			// Now loop through all of the files and check them, DFD style
@@ -355,28 +354,7 @@ namespace SabreTools.Helper
 				// Hash and match the external files
 				if (shouldExternalScan)
 				{
-					Rom rom = FileTools.GetSingleFileInfo(file);
-
-					// If we have a blank RomData, it's an error
-					if (rom.Name == null)
-					{
-						continue;
-					}
-
-					// Otherwise, set the machine name as the full path to the file
-					rom.Machine.Name = Path.GetDirectoryName(Path.GetFullPath(file));
-
-					// Add the rom information to the Dat
-					if (matchdat.Files.ContainsKey(rom.Machine.Name.ToLowerInvariant()))
-					{
-						matchdat.Files[rom.Machine.Name.ToLowerInvariant()].Add(rom);
-					}
-					else
-					{
-						List<Rom> temp = new List<Rom>();
-						temp.Add(rom);
-						matchdat.Files.Add(rom.Machine.Name.ToLowerInvariant(), temp);
-					}
+					RebuildToOutputAlternateParseRomHelper(file, ref matchdat);
 				}
 
 				// If we should scan the file as an archive
@@ -415,6 +393,12 @@ namespace SabreTools.Helper
 						{
 							RebuildToOutputAlternateParseRomHelper(file, ref matchdat);
 						}
+
+						// Clean the temp directory for the next round
+						if (Directory.Exists(_tempDir))
+						{
+							FileTools.CleanDirectory(_tempDir);
+						}
 					}
 				}
 			}
@@ -422,6 +406,7 @@ namespace SabreTools.Helper
 
 			#endregion
 
+			// HERE BE DRAGONS
 			#region Find all files to rebuild and bucket by game
 
 			#endregion
@@ -462,6 +447,32 @@ namespace SabreTools.Helper
 				List<Rom> temp = new List<Rom>();
 				temp.Add(rom);
 				matchdat.Files.Add(rom.Machine.Name.ToLowerInvariant(), temp);
+			}
+
+			// Now attempt to see if the file has a header
+			SkipperRule rule = Skippers.MatchesSkipper(file, "", _logger);
+
+			// If there's a match, get the new information from the stream
+			if (rule.Tests != null && rule.Tests.Count != 0)
+			{
+				MemoryStream output = new MemoryStream();
+				FileStream input = File.OpenRead(file);
+				Skippers.TransformStream(input, output, rule, _logger, false, true);
+				Rom romNH = FileTools.GetSingleStreamInfo(output);
+				romNH.Name = "HEAD::" + rom.Name;
+				romNH.Machine.Name = rom.Machine.Name;
+
+				// Add the rom information to the Dat
+				if (matchdat.Files.ContainsKey(romNH.Machine.Name.ToLowerInvariant()))
+				{
+					matchdat.Files[romNH.Machine.Name.ToLowerInvariant()].Add(romNH);
+				}
+				else
+				{
+					List<Rom> temp = new List<Rom>();
+					temp.Add(romNH);
+					matchdat.Files.Add(romNH.Machine.Name.ToLowerInvariant(), temp);
+				}
 			}
 
 			return true;
