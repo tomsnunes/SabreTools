@@ -190,6 +190,23 @@ namespace SabreTools.Helper
 		/// Process the DAT and find all matches in input files and folders
 		/// </summary>
 		/// <returns>True if rebuilding was a success, false otherwise</returns>
+		/// <remarks>
+		/// This currently processes files as follows:
+		/// 1) Get all file names from the input files/folders
+		/// 2) Loop through and process each file individually
+		///		a) Hash the file
+		///		b) Check against the DAT for duplicates
+		///		c) Check for headers
+		///		d) Check headerless rom for duplicates
+		/// 
+		/// This is actually rather slow and inefficient. Instead, it should do the following:
+		/// 1) Get all file names from the input files/folders (parallel)
+		/// 2) Loop through and get the file info from every file (including headerless)
+		///		a) Add a new feature that allows for checking headers of a stream not just of a file
+		/// 3) Find all duplicate files in the input DAT(s)
+		/// 4) Order by output game
+		/// 5) Rebuild all files
+		/// </remarks>
 		public bool RebuildToOutput()
 		{
 			bool success = true;
