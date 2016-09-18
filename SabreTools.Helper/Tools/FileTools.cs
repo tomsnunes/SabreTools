@@ -27,16 +27,45 @@ namespace SabreTools.Helper
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteToArchive(string inputFile, string outDir, Rom rom)
 		{
+			// Wrap the individual inputs into lists
+			List<string> inputFiles = new List<string>();
+			inputFiles.Add(inputFile);
+			List<Rom> roms = new List<Rom>();
+			roms.Add(rom);
+
+			return WriteToArchive(inputFiles, outDir, roms);
+		}
+
+		/// <summary>
+		/// Copy a set of files to an output archive (assuming the same output archive name)
+		/// </summary>
+		/// <param name="inputFiles">Input filenames to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="roms">List of Rom representing the new information</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteToArchive(List<string> inputFiles, string outDir, List<Rom> roms)
+		{
 			bool success = false;
 
-			// If the input file doesn't exist, return
-			if (!File.Exists(inputFile))
+			// If the number of inputs is less than the number of available roms, return
+			if (inputFiles.Count < roms.Count)
 			{
 				return success;
 			}
 
-			string archiveFileName = Path.Combine(outDir, rom.Machine.Name + ".zip");
+			// If one of the files doesn't exist, return
+			foreach (string file in inputFiles)
+			{
+				if (!File.Exists(file))
+				{
+					return success;
+				}
+			}
 
+			// Get the output archive name from the first rebuild rom
+			string archiveFileName = Path.Combine(outDir, roms[0].Machine.Name + ".zip");
+
+			// First, open the archive
 			ZipArchive outarchive = null;
 			try
 			{
@@ -56,19 +85,26 @@ namespace SabreTools.Helper
 				// Open the archive for writing
 				using (outarchive = System.IO.Compression.ZipFile.Open(archiveFileName, ZipArchiveMode.Update))
 				{
-					// If the archive doesn't already contain the entry, add it
-					if (outarchive.GetEntry(rom.Name) == null)
+					// Now loop through and add all files
+					for (int i = 0; i < inputFiles.Count; i++)
 					{
-						outarchive.CreateEntryFromFile(inputFile, rom.Name, CompressionLevel.Optimal);
-					}
+						string inputFile = inputFiles[i];
+						Rom rom = roms[i];
 
-					// If there's a Date attached to the rom, change the entry to that Date
-					if (!string.IsNullOrEmpty(rom.Date))
-					{
-						DateTimeOffset dto = DateTimeOffset.Now;
-						if (DateTimeOffset.TryParse(rom.Date, out dto))
+						// If the archive doesn't already contain the entry, add it
+						if (outarchive.GetEntry(rom.Name) == null)
 						{
-							outarchive.GetEntry(rom.Name).LastWriteTime = dto;
+							outarchive.CreateEntryFromFile(inputFile, rom.Name, CompressionLevel.Optimal);
+						}
+
+						// If there's a Date attached to the rom, change the entry to that Date
+						if (!string.IsNullOrEmpty(rom.Date))
+						{
+							DateTimeOffset dto = DateTimeOffset.Now;
+							if (DateTimeOffset.TryParse(rom.Date, out dto))
+							{
+								outarchive.GetEntry(rom.Name).LastWriteTime = dto;
+							}
 						}
 					}
 				}
@@ -98,22 +134,45 @@ namespace SabreTools.Helper
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrentZip(string inputFile, string outDir, Rom rom, Logger logger)
 		{
+			// Wrap the individual inputs into lists
+			List<string> inputFiles = new List<string>();
+			inputFiles.Add(inputFile);
+			List<Rom> roms = new List<Rom>();
+			roms.Add(rom);
+
+			return WriteTorrentZip(inputFiles, outDir, roms, logger);
+		}
+
+		/// <summary>
+		/// Copy a set of files to an output torrentzip archive (assuming the same output archive name)
+		/// </summary>
+		/// <param name="inputFile">Input filenames to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">List of Rom representing the new information</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteTorrentZip(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger)
+		{
 			bool success = false;
 			string tempFile = Path.GetTempFileName();
 
-			// If the input file doesn't exist, return
-			if (!File.Exists(inputFile))
+			// If the number of inputs is less than the number of available roms, return
+			if (inputFiles.Count < roms.Count)
 			{
 				return success;
 			}
 
-			string archiveFileName = Path.Combine(outDir, rom.Machine.Name + ".zip");
-
-			// If the output file exists but isn't a zip archive, return
-			if (File.Exists(archiveFileName) && GetCurrentArchiveType(archiveFileName, logger) != ArchiveType.Zip)
+			// If one of the files doesn't exist, return
+			foreach (string file in inputFiles)
 			{
-				return success;
+				if (!File.Exists(file))
+				{
+					return success;
+				}
 			}
+
+			// Get the output archive name from the first rebuild rom
+			string archiveFileName = Path.Combine(outDir, roms[0].Machine.Name + ".zip");
 
 			// Set internal variables
 			Stream writeStream = null;
@@ -134,22 +193,40 @@ namespace SabreTools.Helper
 				{
 					zipReturn = zipFile.Create(tempFile);
 
-					// Open the input file for reading
-					Stream readStream = File.OpenRead(inputFile);
-					ulong streamSize = (ulong)(new FileInfo(inputFile).Length);
-					zipReturn = zipFile.OpenWriteStream(false, true, rom.Name, streamSize, CompressionMethod.Deflated, out writeStream);
-
-					// Copy the input stream to the output
-					byte[] buffer = new byte[8 * 1024];
-					int len;
-					while ((len = readStream.Read(buffer, 0, buffer.Length)) > 0)
+					// Map all inputs to index
+					Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
+					for (int i = 0; i < inputFiles.Count; i++)
 					{
-						writeStream.Write(buffer, 0, len);
+						inputIndexMap.Add(inputFiles[i], i);
 					}
-					writeStream.Flush();
-					readStream.Close();
-					readStream.Dispose();
-					zipFile.CloseWriteStream(Convert.ToUInt32(rom.HashData.CRC, 16));
+
+					// Sort the keys in TZIP order
+					List<string> keys = inputIndexMap.Keys.ToList();
+					keys.Sort(ZipFile.TorrentZipStringCompare);
+
+					// Now add all of the files in order
+					foreach (string key in keys)
+					{
+						string inputFile = key;
+						Rom rom = roms[inputIndexMap[key]];
+
+						// Open the input file for reading
+						using (Stream readStream = File.OpenRead(inputFile))
+						{
+							ulong streamSize = (ulong)(new FileInfo(inputFile).Length);
+							zipReturn = zipFile.OpenWriteStream(false, true, rom.Name, streamSize, CompressionMethod.Deflated, out writeStream);
+
+							// Copy the input stream to the output
+							byte[] buffer = new byte[8 * 1024];
+							int len;
+							while ((len = readStream.Read(buffer, 0, buffer.Length)) > 0)
+							{
+								writeStream.Write(buffer, 0, len);
+							}
+							writeStream.Flush();
+							zipFile.CloseWriteStream(Convert.ToUInt32(rom.HashData.CRC, 16));
+						}
+					}
 				}
 
 				// Otherwise, sort the input files and write out in the correct order
@@ -158,8 +235,27 @@ namespace SabreTools.Helper
 					// Open the old archive for reading
 					oldZipFile.Open(archiveFileName, new FileInfo(archiveFileName).LastWriteTime.Ticks, true);
 
-					// If the old one contains the new file, then just skip out
-					if (oldZipFile.Contains(rom.Name))
+					// Map all inputs to index
+					Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
+					for (int i = 0; i < inputFiles.Count; i++)
+					{
+						// If the old one contains the new file, then just skip out
+						if (oldZipFile.Contains(roms[i].Name))
+						{
+							continue;
+						}
+
+						inputIndexMap.Add(inputFiles[i], -(i + 1));
+					}
+
+					// Then add all of the old entries to it too
+					for (int i = 0; i < oldZipFile.EntriesCount; i++)
+					{
+						inputIndexMap.Add(oldZipFile.Filename(i), i);
+					}
+
+					// If the number of entries is the same as the old archive, skip out
+					if (inputIndexMap.Keys.Count <= oldZipFile.EntriesCount)
 					{
 						success = true;
 						return success;
@@ -169,28 +265,22 @@ namespace SabreTools.Helper
 					zipFile.Create(tempFile);
 
 					// Get the order for the entries with the new file
-					Dictionary<string, int> entries = new Dictionary<string, int>();
-					entries.Add(rom.Name, -1);
-					for (int i = 0; i < oldZipFile.EntriesCount; i++)
-					{
-						entries.Add(oldZipFile.Filename(i), i);
-					}
-					List<string> entriesKeys = entries.Keys.ToList();
-					entriesKeys.Sort(ZipFile.TorrentZipStringCompare);
+					List<string>keys = inputIndexMap.Keys.ToList();
+					keys.Sort(ZipFile.TorrentZipStringCompare);
 
 					// Copy over all files to the new archive
-					foreach (string key in entriesKeys)
+					foreach (string key in keys)
 					{
 						// Get the index mapped to they key
-						int index = entries[key];
+						int index = inputIndexMap[key];
 
 						// If we have the input file, add it now
-						if (index == -1)
+						if (index < 0)
 						{
 							// Open the input file for reading
-							Stream freadStream = File.OpenRead(inputFile);
-							ulong istreamSize = (ulong)(new FileInfo(inputFile).Length);
-							zipFile.OpenWriteStream(false, true, rom.Name, istreamSize, CompressionMethod.Deflated, out writeStream);
+							Stream freadStream = File.OpenRead(key);
+							ulong istreamSize = (ulong)(new FileInfo(key).Length);
+							zipFile.OpenWriteStream(false, true, roms[-index - 1].Name, istreamSize, CompressionMethod.Deflated, out writeStream);
 
 							// Copy the input stream to the output
 							byte[] ibuffer = new byte[8 * 1024];
@@ -201,7 +291,7 @@ namespace SabreTools.Helper
 							}
 							freadStream.Close();
 							freadStream.Dispose();
-							zipFile.CloseWriteStream(Convert.ToUInt32(rom.HashData.CRC, 16));
+							zipFile.CloseWriteStream(Convert.ToUInt32(roms[-index - 1].HashData.CRC, 16));
 						}
 
 						// Otherwise, copy the file from the old archive
@@ -249,7 +339,7 @@ namespace SabreTools.Helper
 			}
 			File.Move(tempFile, archiveFileName);
 
-			return success;
+			return true;
 		}
 
 		/// <summary>
