@@ -211,7 +211,7 @@ namespace SabreTools.Helper
 						Rom rom = roms[inputIndexMap[key]];
 
 						// Open the input file for reading
-						using (Stream readStream = File.OpenRead(inputFile))
+						using (Stream readStream = File.Open(inputFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 						{
 							ulong streamSize = (ulong)(new FileInfo(inputFile).Length);
 							zipReturn = zipFile.OpenWriteStream(false, true, rom.Name, streamSize, CompressionMethod.Deflated, out writeStream);
@@ -278,7 +278,7 @@ namespace SabreTools.Helper
 						if (index < 0)
 						{
 							// Open the input file for reading
-							Stream freadStream = File.OpenRead(key);
+							Stream freadStream = File.Open(key, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 							ulong istreamSize = (ulong)(new FileInfo(key).Length);
 							zipFile.OpenWriteStream(false, true, roms[-index - 1].Name, istreamSize, CompressionMethod.Deflated, out writeStream);
 
@@ -710,8 +710,9 @@ namespace SabreTools.Helper
 		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise (default)</param>
 		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise (default)</param>
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
+		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static Rom GetSingleStreamInfo(Stream input, bool noMD5 = false, bool noSHA1 = false, long offset = 0)
+		public static Rom GetSingleStreamInfo(Stream input, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool keepReadOpen = false)
 		{
 			// If we have a negative offset, zero it out since we don't support it yet
 			if (offset < 0)
@@ -776,6 +777,14 @@ namespace SabreTools.Helper
 			catch (IOException)
 			{
 				return new Rom();
+			}
+			finally
+			{
+				if (!keepReadOpen)
+				{
+					input.Close();
+					input.Dispose();
+				}
 			}
 
 			return rom;

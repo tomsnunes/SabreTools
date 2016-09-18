@@ -406,7 +406,6 @@ namespace SabreTools.Helper
 
 			#endregion
 
-			// HERE BE DRAGONS
 			#region Find all files to rebuild and bucket by game
 
 			// Create a dictionary of from/to Rom mappings

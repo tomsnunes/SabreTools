@@ -350,7 +350,7 @@ namespace SabreTools.Helper
 					foreach (SkipperRule rule in skipper.Rules)
 					{
 						// Always reset the stream back to the original place
-						br.BaseStream.Seek(0, SeekOrigin.Begin);
+						input.Seek(0, SeekOrigin.Begin);
 
 						// For each rule, make sure it passes each test
 						bool success = true;
@@ -363,15 +363,15 @@ namespace SabreTools.Helper
 									// First seek to the correct position
 									if (test.Offset == null)
 									{
-										br.BaseStream.Seek(0, SeekOrigin.End);
+										input.Seek(0, SeekOrigin.End);
 									}
-									else if (test.Offset > 0 && test.Offset <= br.BaseStream.Length)
+									else if (test.Offset > 0 && test.Offset <= input.Length)
 									{
-										br.BaseStream.Seek((long)test.Offset, SeekOrigin.Begin);
+										input.Seek((long)test.Offset, SeekOrigin.Begin);
 									}
-									else if (test.Offset < 0 && Math.Abs((long)test.Offset) <= br.BaseStream.Length)
+									else if (test.Offset < 0 && Math.Abs((long)test.Offset) <= input.Length)
 									{
-										br.BaseStream.Seek((long)test.Offset, SeekOrigin.End);
+										input.Seek((long)test.Offset, SeekOrigin.End);
 									}
 
 									// Then read and compare bytewise
@@ -402,15 +402,15 @@ namespace SabreTools.Helper
 									// First seek to the correct position
 									if (test.Offset == null)
 									{
-										br.BaseStream.Seek(0, SeekOrigin.End);
+										input.Seek(0, SeekOrigin.End);
 									}
-									else if (test.Offset > 0 && test.Offset <= br.BaseStream.Length)
+									else if (test.Offset > 0 && test.Offset <= input.Length)
 									{
-										br.BaseStream.Seek((long)test.Offset, SeekOrigin.Begin);
+										input.Seek((long)test.Offset, SeekOrigin.Begin);
 									}
-									else if (test.Offset < 0 && Math.Abs((long)test.Offset) <= br.BaseStream.Length)
+									else if (test.Offset < 0 && Math.Abs((long)test.Offset) <= input.Length)
 									{
-										br.BaseStream.Seek((long)test.Offset, SeekOrigin.End);
+										input.Seek((long)test.Offset, SeekOrigin.End);
 									}
 
 									result = true;
@@ -446,7 +446,7 @@ namespace SabreTools.Helper
 									break;
 								case HeaderSkipTest.File:
 									// First get the file size from stream
-									long size = br.BaseStream.Length;
+									long size = input.Length;
 
 									// If we have a null size, check that the size is a power of 2
 									result = true;
@@ -474,21 +474,28 @@ namespace SabreTools.Helper
 							}
 						}
 
-						// If we're not keeping the stream open, dispose of the binary reader
-						if (!keepOpen)
-						{
-							br.Close();
-							br.Dispose();
-						}
-
 						// If we still have a success, then return this rule
 						if (success)
 						{
+							// If we're not keeping the stream open, dispose of the binary reader
+							if (!keepOpen)
+							{
+								input.Close();
+								input.Dispose();
+							}
+
 							logger.User(" Matching rule found!");
 							return rule;
 						}
 					}
 				}
+			}
+
+			// If we're not keeping the stream open, dispose of the binary reader
+			if (!keepOpen)
+			{
+				input.Close();
+				input.Dispose();
 			}
 
 			// If we have a blank rule, inform the user
@@ -526,7 +533,7 @@ namespace SabreTools.Helper
 			}
 
 			logger.User("Attempting to apply rule to '" + input + "'");
-			success = TransformStream(File.OpenRead(input), File.OpenWrite(output), rule, logger);
+			success = TransformStream(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), File.OpenWrite(output), rule, logger);
 
 			// If the output file has size 0, delete it
 			if (new FileInfo(output).Length == 0)
@@ -534,6 +541,7 @@ namespace SabreTools.Helper
 				try
 				{
 					File.Delete(output);
+					success = false;
 				}
 				catch
 				{
@@ -582,17 +590,17 @@ namespace SabreTools.Helper
 				{
 					success = false;
 				}
-				else if (Math.Abs((long)rule.StartOffset) > br.BaseStream.Length)
+				else if (Math.Abs((long)rule.StartOffset) > input.Length)
 				{
 					success = false;
 				}
 				else if (rule.StartOffset > 0)
 				{
-					br.BaseStream.Seek((long)rule.StartOffset, SeekOrigin.Begin);
+					input.Seek((long)rule.StartOffset, SeekOrigin.Begin);
 				}
 				else if (rule.StartOffset < 0)
 				{
-					br.BaseStream.Seek((long)rule.StartOffset, SeekOrigin.End);
+					input.Seek((long)rule.StartOffset, SeekOrigin.End);
 				}
 
 				// Then read and apply the operation as you go
@@ -600,8 +608,8 @@ namespace SabreTools.Helper
 				{
 					byte[] buffer = new byte[4];
 					int pos = 0;
-					while (br.BaseStream.Position < (rule.EndOffset != null ? rule.EndOffset : br.BaseStream.Length)
-						&& br.BaseStream.Position < br.BaseStream.Length)
+					while (input.Position < (rule.EndOffset != null ? rule.EndOffset : input.Length)
+						&& input.Position < input.Length)
 					{
 						byte b = br.ReadByte();
 						switch (rule.Operation)

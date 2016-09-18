@@ -629,7 +629,7 @@ namespace SabreTools.Helper
 			_zipFileInfo = new FileInfo(filename);
 
 			// Now try to open the file
-			_zipstream = File.OpenWrite(filename);
+			_zipstream = File.Open(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 			ZipOpen = ZipOpenType.OpenWrite;
 			return ZipReturn.ZipGood;
 		}
