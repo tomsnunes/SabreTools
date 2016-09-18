@@ -456,24 +456,26 @@ namespace SabreTools.Helper
 			// If there's a match, get the new information from the stream
 			if (rule.Tests != null && rule.Tests.Count != 0)
 			{
-				MemoryStream output = new MemoryStream();
-				FileStream input = File.OpenRead(file);
-				Skippers.TransformStream(input, output, rule, _logger, false, true);
-				Rom romNH = FileTools.GetSingleStreamInfo(output);
-				romNH.Name = "HEAD::" + rom.Name;
-				romNH.Machine.Name = rom.Machine.Name;
+				using (MemoryStream output = new MemoryStream())
+				{
+					FileStream input = File.OpenRead(file);
+					Skippers.TransformStream(input, output, rule, _logger, false, true);
+					Rom romNH = FileTools.GetSingleStreamInfo(output);
+					romNH.Name = "HEAD::" + rom.Name;
+					romNH.Machine.Name = rom.Machine.Name;
 
-				// Add the rom information to the Dat
-				key = romNH.HashData.Size + "-" + romNH.HashData.CRC;
-				if (matchdat.Files.ContainsKey(key))
-				{
-					matchdat.Files[key].Add(romNH);
-				}
-				else
-				{
-					List<Rom> temp = new List<Rom>();
-					temp.Add(romNH);
-					matchdat.Files.Add(key, temp);
+					// Add the rom information to the Dat
+					key = romNH.HashData.Size + "-" + romNH.HashData.CRC;
+					if (matchdat.Files.ContainsKey(key))
+					{
+						matchdat.Files[key].Add(romNH);
+					}
+					else
+					{
+						List<Rom> temp = new List<Rom>();
+						temp.Add(romNH);
+						matchdat.Files.Add(key, temp);
+					}
 				}
 			}
 
