@@ -595,7 +595,6 @@ namespace SabreTools.Helper
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="date">True if the file Date should be included, false otherwise (default)</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		/// <remarks>Add read-offset for hash info</remarks>
 		public static Rom GetSingleFileInfo(string input, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool date = false)
 		{
 			// Add safeguard if file doesn't exist
@@ -604,19 +603,42 @@ namespace SabreTools.Helper
 				return new Rom();
 			}
 
-			FileInfo temp = new FileInfo(input);
+			// Get the information from the file stream
+			Rom rom = GetSingleStreamInfo(File.OpenRead(input), noMD5, noSHA1, offset);
+
+			// Add unique data from the file
+			rom.Name = Path.GetFileName(input);
+			rom.Date = (date ? new FileInfo(input).LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : "");
+
+			return rom;
+		}
+
+		/// <summary>
+		/// Retrieve file information for a single file
+		/// </summary>
+		/// <param name="input">Filename to get information from</param>
+		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise (default)</param>
+		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise (default)</param>
+		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
+		/// <returns>Populated RomData object if success, empty one on error</returns>
+		public static Rom GetSingleStreamInfo(Stream input, bool noMD5 = false, bool noSHA1 = false, long offset = 0)
+		{
+			// If we have a negative offset, zero it out since we don't support it yet
+			if (offset < 0)
+			{
+				offset = 0;
+			}
+
 			Rom rom = new Rom
 			{
-				Name = Path.GetFileName(input),
 				Type = ItemType.Rom,
 				HashData = new Hash
 				{
-					Size = temp.Length,
+					Size = input.Length - Math.Abs(offset),
 					CRC = string.Empty,
 					MD5 = string.Empty,
 					SHA1 = string.Empty,
 				},
-				Date = (date ? temp.LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : ""),
 			};
 
 			try
@@ -624,17 +646,16 @@ namespace SabreTools.Helper
 				using (OptimizedCRC crc = new OptimizedCRC())
 				using (MD5 md5 = MD5.Create())
 				using (SHA1 sha1 = SHA1.Create())
-				using (FileStream fs = File.OpenRead(input))
 				{
 					// Seek to the starting position, if one is set
 					if (offset > 0)
 					{
-						fs.Seek(offset, SeekOrigin.Begin);
+						input.Seek(offset, SeekOrigin.Begin);
 					}
 
 					byte[] buffer = new byte[1024];
 					int read;
-					while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
+					while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
 					{
 						crc.Update(buffer, 0, read);
 						if (!noMD5)
