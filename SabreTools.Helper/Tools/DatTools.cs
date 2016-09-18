@@ -2784,6 +2784,14 @@ namespace SabreTools.Helper
 						for (int index = 0; index < roms.Count; index++)
 						{
 							Rom rom = roms[index];
+
+							// There are apparently times when a null rom can skip by, skip them
+							if (rom.Name == null || rom.Machine.Name == null)
+							{
+								logger.Warning("Null rom found!");
+								continue;
+							}
+
 							List<string> newsplit = rom.Machine.Name.Split('\\').ToList();
 
 							// If we have a different game and we're not at the start of the list, output the end of last item
@@ -2969,6 +2977,7 @@ namespace SabreTools.Helper
 
 				// Write the header out
 				sw.Write(header);
+				sw.Flush();
 			}
 			catch (Exception ex)
 			{
@@ -3040,6 +3049,7 @@ namespace SabreTools.Helper
 				}
 
 				sw.Write(state);
+				sw.Flush();
 			}
 			catch (Exception ex)
 			{
@@ -3112,6 +3122,7 @@ namespace SabreTools.Helper
 				}
 
 				sw.Write(state);
+				sw.Flush();
 			}
 			catch (Exception ex)
 			{
@@ -3290,6 +3301,7 @@ namespace SabreTools.Helper
 				}
 
 				sw.Write(state);
+				sw.Flush();
 			}
 			catch (Exception ex)
 			{
@@ -3354,6 +3366,7 @@ namespace SabreTools.Helper
 
 				// Write the footer out
 				sw.Write(footer);
+				sw.Flush();
 			}
 			catch (Exception ex)
 			{

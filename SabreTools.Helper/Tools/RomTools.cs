@@ -240,7 +240,7 @@ namespace SabreTools.Helper
 								{
 									if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
 									{
-										return Style.CompareNumeric((x.Name), Path.GetFileName(y.Name));
+										return Style.CompareNumeric(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
 									}
 									return Style.CompareNumeric(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
 								}
