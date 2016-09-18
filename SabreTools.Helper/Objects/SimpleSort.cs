@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SabreTools.Helper
 {
@@ -23,6 +25,7 @@ namespace SabreTools.Helper
 		private ArchiveScanLevel _rar;
 		private ArchiveScanLevel _zip;
 		private Logger _logger;
+		private int _maxDegreeOfParallelism = 4; // Hardcoded for now, should be an input later
 
 		// Other private variables
 		private int _cursorTop;
@@ -32,7 +35,7 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Create a new SimpleSort object
 		/// </summary>
-		/// <param name="datdata">Name of the DAT to compare against</param>
+		/// <param name="datdata">DAT to compare against</param>
 		/// <param name="inputs">List of input files/folders to check</param>
 		/// <param name="outDir">Output directory to use to build to</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
@@ -199,12 +202,7 @@ namespace SabreTools.Helper
 		///		c) Check for headers
 		///		d) Check headerless rom for duplicates
 		/// 
-		/// This is actually rather slow and inefficient. Instead, it should do the following:
-		/// 1) Get all file names from the input files/folders (parallel)
-		/// 2) Loop through and get the file info from every file (including headerless)
-		/// 3) Find all duplicate files in the input DAT(s)
-		/// 4) Order by output game
-		/// 5) Rebuild all files
+		/// This is actually rather slow and inefficient. See below for more correct implemenation
 		/// </remarks>
 		public bool RebuildToOutput()
 		{
@@ -279,6 +277,179 @@ namespace SabreTools.Helper
 			}
 
 			return success;
+		}
+
+		/// <summary>
+		/// Process the DAT and find all matches in input files and folders
+		/// </summary>
+		/// <returns>True if rebuilding was a success, false otherwise</returns>
+		/// <remarks>
+		/// This implemenation of the code should do the following:
+		/// 1) Get all file names from the input files/folders (parallel)
+		/// 2) Loop through and get the file info from every file (including headerless)
+		/// 3) Find all duplicate files in the input DAT(s)
+		/// 4) Order by output game
+		/// 5) Rebuild all files
+		/// </remarks>
+		public bool RebuiltToOutputAlternate()
+		{
+			bool success = true;
+
+			// Create a list of just files from inputs
+			_logger.User("Finding all files...");
+			List<string> files = new List<string>();
+			Parallel.ForEach(_inputs,
+				new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
+				input =>
+			{
+				if (File.Exists(input))
+				{
+					_logger.Log("File found: '" + input + "'");
+					lock (files)
+					{
+						files.Add(Path.GetFullPath(input));
+					}
+				}
+				else if (Directory.Exists(input))
+				{
+					_logger.Log("Directory found: '" + input + "'");
+
+					List<string> infiles = Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories).ToList();
+					Parallel.ForEach(infiles,
+						new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
+						file =>
+					{
+						_logger.Log("File found: '" + input + "'");
+						lock (files)
+						{
+							files.Add(Path.GetFullPath(file));
+						}
+					});
+				}
+				else
+				{
+					_logger.Error("'" + input + "' is not a file or directory!");
+				}
+			});
+			_logger.User("Finding files complete!");
+
+			// TODO: The below code does NOT check for headerless files as well. This is a problem.
+
+			// Now loop through all of the files and check them, DFD style
+			_logger.User("Getting source file information...");
+			Dat matchdat = new Dat
+			{
+				Files = new Dictionary<string, List<Rom>>(),
+			};
+			foreach (string file in files)
+			{
+				// Get if the file should be scanned internally and externally
+				bool shouldExternalScan, shouldInternalScan;
+				FileTools.GetInternalExternalProcess(file, _7z, _gz, _rar, _zip, _logger, out shouldExternalScan, out shouldInternalScan);
+
+				// Hash and match the external files
+				if (shouldExternalScan)
+				{
+					Rom rom = FileTools.GetSingleFileInfo(file);
+
+					// If we have a blank RomData, it's an error
+					if (rom.Name == null)
+					{
+						continue;
+					}
+
+					// Otherwise, set the machine name as the full path to the file
+					rom.Machine.Name = Path.GetDirectoryName(Path.GetFullPath(file));
+
+					// Add the rom information to the Dat
+					if (matchdat.Files.ContainsKey(rom.Machine.Name.ToLowerInvariant()))
+					{
+						matchdat.Files[rom.Machine.Name.ToLowerInvariant()].Add(rom);
+					}
+					else
+					{
+						List<Rom> temp = new List<Rom>();
+						temp.Add(rom);
+						matchdat.Files.Add(rom.Machine.Name.ToLowerInvariant(), temp);
+					}
+				}
+
+				// If we should scan the file as an archive
+				if (shouldInternalScan)
+				{
+					// If external scanning is enabled, use that method instead
+					if (_quickScan)
+					{
+						_logger.Log("Beginning quick scan of contents from '" + file + "'");
+						List<Rom> internalRomData = FileTools.GetArchiveFileInfo(file, _logger);
+						_logger.Log(internalRomData.Count + " entries found in '" + file + "'");
+
+						// Now add all of the roms to the DAT
+						for (int i = 0; i < internalRomData.Count; i++)
+						{
+							RebuildToOutputAlternateParseRomHelper(file, ref matchdat);
+						}
+					}
+					// Otherwise, try to extract the file to the temp folder
+					else
+					{
+						// Now, if the file is a supported archive type, also run on all files within
+						bool encounteredErrors = FileTools.ExtractArchive(file, _tempDir, _7z, _gz, _rar, _zip, _logger);
+
+						// If we succeeded in extracting, loop through the files
+						if (!encounteredErrors)
+						{
+							List<string> extractedFiles = Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories).ToList();
+							foreach (string extractedFile in extractedFiles)
+							{
+								RebuildToOutputAlternateParseRomHelper(extractedFile, ref matchdat);
+							}
+						}
+						// Otherwise, skip extracting and just get information on the file itself (if we didn't already)
+						else if (!shouldExternalScan)
+						{
+							RebuildToOutputAlternateParseRomHelper(file, ref matchdat);
+						}
+					}
+				}
+			}
+			_logger.User("Getting source file information complete!");
+
+			return success;
+		}
+
+		/// <summary>
+		/// Wrap adding a file to the dictionary in custom DFD
+		/// </summary>
+		/// <param name="file">Name of the file to attempt to add</param>
+		/// <param name="matchdat">Reference to the Dat to add to</param>
+		/// <returns>True if the file could be added, false otherwise</returns>
+		public bool RebuildToOutputAlternateParseRomHelper(string file, ref Dat matchdat)
+		{
+			Rom rom = FileTools.GetSingleFileInfo(file);
+
+			// If we have a blank RomData, it's an error
+			if (rom.Name == null)
+			{
+				return false;
+			}
+
+			// Otherwise, set the machine name as the full path to the file
+			rom.Machine.Name = Path.GetDirectoryName(Path.GetFullPath(file));
+
+			// Add the rom information to the Dat
+			if (matchdat.Files.ContainsKey(rom.Machine.Name.ToLowerInvariant()))
+			{
+				matchdat.Files[rom.Machine.Name.ToLowerInvariant()].Add(rom);
+			}
+			else
+			{
+				List<Rom> temp = new List<Rom>();
+				temp.Add(rom);
+				matchdat.Files.Add(rom.Machine.Name.ToLowerInvariant(), temp);
+			}
+
+			return true;
 		}
 
 		/// <summary>
