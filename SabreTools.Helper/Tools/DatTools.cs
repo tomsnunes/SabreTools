@@ -133,7 +133,7 @@ namespace SabreTools.Helper
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
-		public static Dat Parse(
+		public static void Parse(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -168,7 +168,7 @@ namespace SabreTools.Helper
 			string ext = Path.GetExtension(filename).ToLowerInvariant();
 			if (ext != ".txt" && ext != ".dat" && ext != ".xml")
 			{
-				return datdata;
+				return;
 			}
 
 			// If the output filename isn't set already, get the internal filename
@@ -187,14 +187,17 @@ namespace SabreTools.Helper
 			switch (GetOutputFormat(filename, logger))
 			{
 				case OutputFormat.ClrMamePro:
-					return ParseCMP(filename, sysid, srcid, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, keep, clean);
+					ParseCMP(filename, sysid, srcid, ref datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, keep, clean);
+					break;
 				case OutputFormat.RomCenter:
-					return ParseRC(filename, sysid, srcid, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, clean);
+					ParseRC(filename, sysid, srcid, ref datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, clean);
+					break;
 				case OutputFormat.SabreDat:
 				case OutputFormat.Xml:
-					return ParseXML(filename, sysid, srcid, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, keep, clean, softlist);
+					ParseXML(filename, sysid, srcid, ref datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, keep, clean, softlist);
+					break;
 				default:
-					return datdata;
+					return;
 			}
 		}
 
@@ -221,13 +224,12 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <returns>DatData object representing the read-in data</returns>
-		private static Dat ParseCMP(
+		private static void ParseCMP(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
-			Dat datdata,
+			ref Dat datdata,
 
 			// Rom filtering
 			string gamename,
@@ -455,7 +457,7 @@ namespace SabreTools.Helper
 
 					// Now process and add the rom
 					string key = "";
-					datdata = ParseAddHelper(rom, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
+					ParseAddHelper(rom, ref datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
 				}
 				// If the line is anything but a rom or disk and we're in a block
 				else if (Regex.IsMatch(line, Constants.ItemPatternCMP) && block)
@@ -587,8 +589,6 @@ namespace SabreTools.Helper
 
 			sr.Close();
 			sr.Dispose();
-
-			return datdata;
 		}
 
 		/// <summary>
@@ -613,13 +613,12 @@ namespace SabreTools.Helper
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <returns>DatData object representing the read-in data</returns>
-		private static Dat ParseRC(
+		private static void ParseRC(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
-			Dat datdata,
+			ref Dat datdata,
 
 			// Rom filtering
 			string gamename,
@@ -762,15 +761,13 @@ namespace SabreTools.Helper
 
 						// Now process and add the rom
 						string key = "";
-						datdata = ParseAddHelper(rom, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
+						ParseAddHelper(rom, ref datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
 					}
 				}
 			}
 
 			sr.Close();
 			sr.Dispose();
-
-			return datdata;
 		}
 
 		/// <summary>
@@ -797,13 +794,12 @@ namespace SabreTools.Helper
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
-		/// <returns>DatData object representing the read-in data</returns>
-		private static Dat ParseXML(
+		private static void ParseXML(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
-			Dat datdata,
+			ref Dat datdata,
 
 			// Rom filtering
 			string gamename,
@@ -868,7 +864,7 @@ namespace SabreTools.Helper
 							};
 
 							// Now process and add the rom
-							datdata = ParseAddHelper(rom, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
+							ParseAddHelper(rom, ref datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
 						}
 
 						// Regardless, end the current folder
@@ -1261,7 +1257,7 @@ namespace SabreTools.Helper
 											};
 
 											// Now process and add the rom
-											datdata = ParseAddHelper(relrom, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
+											ParseAddHelper(relrom, ref datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
 
 											subreader.Read();
 											break;
@@ -1297,7 +1293,7 @@ namespace SabreTools.Helper
 											};
 
 											// Now process and add the rom
-											datdata = ParseAddHelper(biosrom, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
+											ParseAddHelper(biosrom, ref datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
 
 											subreader.Read();
 											break;
@@ -1319,7 +1315,7 @@ namespace SabreTools.Helper
 											};
 
 											// Now process and add the rom
-											datdata = ParseAddHelper(samplerom, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
+											ParseAddHelper(samplerom, ref datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
 
 											subreader.Read();
 											break;
@@ -1405,7 +1401,7 @@ namespace SabreTools.Helper
 											};
 
 											// Now process and add the rom
-											datdata = ParseAddHelper(inrom, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
+											ParseAddHelper(inrom, ref datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
 
 											subreader.Read();
 											break;
@@ -1440,7 +1436,7 @@ namespace SabreTools.Helper
 								};
 
 								// Now process and add the rom
-								datdata = ParseAddHelper(inrom, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
+								ParseAddHelper(inrom, ref datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
 
 								// Regardless, end the current folder
 								if (parent.Count == 0)
@@ -1570,7 +1566,7 @@ namespace SabreTools.Helper
 							};
 
 							// Now process and add the rom
-							datdata = ParseAddHelper(rom, datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
+							ParseAddHelper(rom, ref datdata, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, clean, logger, out key);
 
 							xtr.Read();
 							break;
@@ -1583,8 +1579,6 @@ namespace SabreTools.Helper
 				xtr.Close();
 				xtr.Dispose();
 			}
-
-			return datdata;
 		}
 
 		/// <summary>
@@ -1606,7 +1600,7 @@ namespace SabreTools.Helper
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
-		private static Dat ParseAddHelper(Rom rom, Dat datdata, string gamename, string romname, string romtype, long sgt, long slt,
+		private static void ParseAddHelper(Rom rom, ref Dat datdata, string gamename, string romname, string romtype, long sgt, long slt,
 			long seq, string crc, string md5, string sha1, bool? nodump, bool trim, bool single, string root, bool clean, Logger logger, out string key)
 		{
 			key = "";
@@ -1615,7 +1609,7 @@ namespace SabreTools.Helper
 			if (String.IsNullOrEmpty(rom.Name))
 			{
 				logger.Warning("Rom with no name found! Skipping...");
-				return datdata;
+				return;
 			}
 
 			// If we're in cleaning mode, sanitize the game name
@@ -1698,8 +1692,6 @@ namespace SabreTools.Helper
 					datdata.NodumpCount += (rom.Nodump ? 1 : 0);
 				}
 			}
-
-			return datdata;
 		}
 
 		#endregion
