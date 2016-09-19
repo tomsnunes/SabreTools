@@ -48,7 +48,7 @@ namespace SabreTools.Helper
 				_logger.Log("Beginning stat collection for '" + filename + "'");
 				List<String> games = new List<String>();
 				Dat datdata = new Dat();
-				datdata = DatTools.Parse(filename, 0, 0, datdata, _logger);
+				DatTools.Parse(filename, 0, 0, ref datdata, _logger);
 				SortedDictionary<string, List<Rom>> newroms = DatTools.BucketByGame(datdata.Files, false, true, _logger, false);
 
 				// Output single DAT stats (if asked)

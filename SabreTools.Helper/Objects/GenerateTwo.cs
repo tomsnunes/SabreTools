@@ -173,7 +173,7 @@ namespace SabreTools
 				{
 					Int32.TryParse(sourcemap[hash], out tempSrcId);
 				}
-				datdata = DatTools.Parse(file, 0, tempSrcId, datdata, _logger);
+				DatTools.Parse(file, 0, tempSrcId, ref datdata, _logger);
 			}
 
 			// If the dictionary is empty for any reason, tell the user and exit

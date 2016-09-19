@@ -103,10 +103,9 @@ namespace SabreTools.Helper
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
-		/// <returns>DatData object representing the read-in data</returns>
-		public static Dat Parse(string filename, int sysid, int srcid, Dat datdata, Logger logger, bool keep = false, bool clean = false, bool softlist = false, bool keepext = false)
+		public static void Parse(string filename, int sysid, int srcid, ref Dat datdata, Logger logger, bool keep = false, bool clean = false, bool softlist = false, bool keepext = false)
 		{
-			return Parse(filename, sysid, srcid, datdata, null, null, null, -1, -1, -1, null, null, null, null, false, false, "", logger, keep, clean, softlist, keepext);
+			Parse(filename, sysid, srcid, ref datdata, null, null, null, -1, -1, -1, null, null, null, null, false, false, "", logger, keep, clean, softlist, keepext);
 		}
 
 		/// <summary>
@@ -134,13 +133,12 @@ namespace SabreTools.Helper
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
-		/// <returns>DatData object representing the read-in data</returns>
 		public static Dat Parse(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
-			Dat datdata,
+			ref Dat datdata,
 
 			// Rom filtering
 			string gamename,
@@ -2271,7 +2269,7 @@ namespace SabreTools.Helper
 					{
 						Dat innerDatdata = (Dat)datdata.CloneHeader();
 						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-						innerDatdata = Parse(inputFileName, 0, 0, innerDatdata, gamename, romname,
+						Parse(inputFileName, 0, 0, ref innerDatdata, gamename, romname,
 							romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single,
 							root, logger, true, clean, softlist, keepext: (innerDatdata.XSV != null));
 
@@ -2292,7 +2290,7 @@ namespace SabreTools.Helper
 							logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 							Dat innerDatdata = (Dat)datdata.Clone();
 							innerDatdata.Files = null;
-							innerDatdata = Parse(file, 0, 0, innerDatdata, gamename, romname, romtype, sgt,
+							Parse(file, 0, 0, ref innerDatdata, gamename, romname, romtype, sgt,
 								slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, true, clean, keepext: (datdata.XSV != null));
 
 							// If we have roms, output them
@@ -2357,7 +2355,7 @@ namespace SabreTools.Helper
 					MergeRoms = inputDat.MergeRoms,
 				};
 
-				datHeaders[i] = Parse(input.Split('¬')[0], i, 0, datHeaders[i], gamename, romname, romtype, sgt, slt, seq,
+				Parse(input.Split('¬')[0], i, 0, ref datHeaders[i], gamename, romname, romtype, sgt, slt, seq,
 					crc, md5, sha1, nodump, trim, single, root, logger, true, clean, softlist);
 			});
 
@@ -3417,7 +3415,7 @@ namespace SabreTools.Helper
 
 			// Get the file data to be split
 			Dat datdata = new Dat();
-			datdata = Parse(filename, 0, 0, datdata, logger, softlist:true);
+			Parse(filename, 0, 0, ref datdata, logger, softlist:true);
 
 			// Set all of the appropriate outputs for each of the subsets
 			Dat datdataA = new Dat
@@ -3555,7 +3553,7 @@ namespace SabreTools.Helper
 
 			// Get the file data to be split
 			Dat datdata = new Dat();
-			datdata = Parse(filename, 0, 0, datdata, logger, true, softlist:true);
+			Parse(filename, 0, 0, ref datdata, logger, true, softlist:true);
 
 			// Create each of the respective output DATs
 			logger.User("Creating and populating new DATs");
@@ -3769,7 +3767,7 @@ namespace SabreTools.Helper
 
 			// Get the file data to be split
 			Dat datdata = new Dat();
-			datdata = Parse(filename, 0, 0, datdata, logger, true, softlist:true);
+			Parse(filename, 0, 0, ref datdata, logger, true, softlist:true);
 
 			// Create each of the respective output DATs
 			logger.User("Creating and populating new DATs");

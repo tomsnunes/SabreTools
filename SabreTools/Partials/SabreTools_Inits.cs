@@ -387,7 +387,7 @@ namespace SabreTools
 			Dat datdata = new Dat();
 			foreach (string datfile in datfiles)
 			{
-				datdata = DatTools.Parse(datfile, 99, 99, datdata, logger);
+				DatTools.Parse(datfile, 99, 99, ref datdata, logger);
 			}
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
