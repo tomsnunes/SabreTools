@@ -10,6 +10,230 @@ namespace SabreTools.Helper
 		#region Rom-based sorting and merging
 
 		/// <summary>
+		/// Determine if a rom should be included based on filters
+		/// </summary>
+		/// <param name="romdata">User supplied Rom to check</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		/// <returns>Returns true if it should be included, false otherwise</returns>
+		public static bool Filter(Rom romdata, string gamename, string romname, string romtype, long sgt,
+			long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
+		{
+			// Filter on nodump status
+			if (nodump == true && !romdata.Nodump)
+			{
+				return false;
+			}
+			if (nodump == false && romdata.Nodump)
+			{
+				return false;
+			}
+
+			// Filter on game name
+			if (!String.IsNullOrEmpty(gamename))
+			{
+				if (gamename.StartsWith("*") && gamename.EndsWith("*"))
+				{
+					if (!romdata.Machine.Name.ToLowerInvariant().Contains(gamename.ToLowerInvariant().Replace("*", "")))
+					{
+						return false;
+					}
+				}
+				else if (gamename.StartsWith("*"))
+				{
+					if (!romdata.Machine.Name.EndsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else if (gamename.EndsWith("*"))
+				{
+					if (!romdata.Machine.Name.StartsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if (!String.Equals(romdata.Machine.Name, gamename, StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+			}
+
+			// Filter on rom name
+			if (!String.IsNullOrEmpty(romname))
+			{
+				if (romname.StartsWith("*") && romname.EndsWith("*"))
+				{
+					if (!romdata.Name.ToLowerInvariant().Contains(romname.ToLowerInvariant().Replace("*", "")))
+					{
+						return false;
+					}
+				}
+				else if (romname.StartsWith("*"))
+				{
+					if (!romdata.Name.EndsWith(romname.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else if (romname.EndsWith("*"))
+				{
+					if (!romdata.Name.StartsWith(romname.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if (!String.Equals(romdata.Name, romname, StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+			}
+
+			// Filter on rom type
+			if (String.IsNullOrEmpty(romtype) && romdata.Type != ItemType.Rom && romdata.Type != ItemType.Disk)
+			{
+				return false;
+			}
+			if (!String.IsNullOrEmpty(romtype) && !String.Equals(romdata.Type.ToString(), romtype, StringComparison.InvariantCultureIgnoreCase))
+			{
+				return false;
+			}
+
+			// Filter on rom size
+			if (seq != -1 && romdata.HashData.Size != seq)
+			{
+				return false;
+			}
+			else
+			{
+				if (sgt != -1 && romdata.HashData.Size < sgt)
+				{
+					return false;
+				}
+				if (slt != -1 && romdata.HashData.Size > slt)
+				{
+					return false;
+				}
+			}
+
+			// Filter on crc
+			if (!String.IsNullOrEmpty(crc))
+			{
+				if (crc.StartsWith("*") && crc.EndsWith("*"))
+				{
+					if (!romdata.HashData.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", "")))
+					{
+						return false;
+					}
+				}
+				else if (crc.StartsWith("*"))
+				{
+					if (!romdata.HashData.CRC.EndsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else if (crc.EndsWith("*"))
+				{
+					if (!romdata.HashData.CRC.StartsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if (!String.Equals(romdata.HashData.CRC, crc, StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+			}
+
+			// Filter on md5
+			if (!String.IsNullOrEmpty(md5))
+			{
+				if (md5.StartsWith("*") && md5.EndsWith("*"))
+				{
+					if (!romdata.HashData.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
+					{
+						return false;
+					}
+				}
+				else if (md5.StartsWith("*"))
+				{
+					if (!romdata.HashData.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else if (md5.EndsWith("*"))
+				{
+					if (!romdata.HashData.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if (!String.Equals(romdata.HashData.MD5, md5, StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+			}
+
+			// Filter on sha1
+			if (!String.IsNullOrEmpty(sha1))
+			{
+				if (sha1.StartsWith("*") && sha1.EndsWith("*"))
+				{
+					if (!romdata.HashData.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
+					{
+						return false;
+					}
+				}
+				else if (sha1.StartsWith("*"))
+				{
+					if (!romdata.HashData.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else if (sha1.EndsWith("*"))
+				{
+					if (!romdata.HashData.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if (!String.Equals(romdata.HashData.SHA1, sha1, StringComparison.InvariantCultureIgnoreCase))
+					{
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Merge an arbitrary set of ROMs based on the supplied information
 		/// </summary>
 		/// <param name="inroms">List of RomData objects representing the roms to be merged</param>
