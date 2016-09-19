@@ -2336,7 +2336,10 @@ namespace SabreTools.Helper
 				MergeRoms = inputDat.MergeRoms,
 			};
 
-			Parallel.For(0, inputs.Count, i =>
+			Parallel.For(0,
+				inputs.Count,
+				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+				i =>
 			{
 				string input = inputs[i];
 				logger.User("Adding DAT: " + input.Split('¬')[0]);
