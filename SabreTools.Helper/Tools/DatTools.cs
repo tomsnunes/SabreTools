@@ -2060,13 +2060,6 @@ namespace SabreTools.Helper
 			DateTime start = DateTime.Now;
 			logger.User("Processing individual DATs");
 
-			userData = new Dat
-			{
-				OutputFormat = (inputDat.OutputFormat != 0 ? inputDat.OutputFormat: 0),
-				Files = new Dictionary<string, List<Rom>>(),
-				MergeRoms = inputDat.MergeRoms,
-			};
-
 			Parallel.For(0,
 				inputs.Count,
 				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
@@ -2086,7 +2079,10 @@ namespace SabreTools.Helper
 			});
 
 			logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
 			logger.User("Populating internal DAT");
+			userData = (Dat)inputDat.CloneHeader();
+			userData.Files = new Dictionary<string, List<Rom>>();
 			for (int i = 0; i < inputs.Count; i++)
 			{
 				List<string> keys = datHeaders[i].Files.Keys.ToList();
@@ -2104,11 +2100,6 @@ namespace SabreTools.Helper
 				}
 				datHeaders[i].Files = null;
 			}
-
-			// Set the output values
-			Dictionary<string, List<Rom>> roms = userData.Files;
-			userData = (Dat)inputDat.CloneHeader();
-			userData.Files = roms;
 
 			logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
