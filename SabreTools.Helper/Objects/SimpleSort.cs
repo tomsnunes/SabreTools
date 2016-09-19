@@ -428,15 +428,22 @@ namespace SabreTools.Helper
 				}
 			}
 
-			// So, note here. This is going to be an interesting thing. What I want to do is create a mapping of Rom to output Roms.
-			// There's a couple of problems with this, not least of all is that the output files will all have to be kept open while
-			// rebuilding. On the flip side, we can do a reverse mapping, mapping any output files to their source. This would have
-			// the advantage of allowing grouping by game and opening each destination archive at most once. But this will mean
-			// that input archives may have to be opened multiple times...
+			// Then bucket the keys by game for better output
+			SortedDictionary<string, List<Rom>> keysByGame = DatTools.BucketByGame(toFromMap.Keys.ToList(), false, true, _logger);
 
 			#endregion
 
 			#region Rebuild all files
+
+			// At this point, we have "toFromMap" which maps output files to input files as well as
+			// as SortedDictionary called keysByGame which is the output files sorted by game in
+			// alphabetical order. We should be able to use these to do everything we need =)
+
+			// Now write out each game sequentially
+			foreach (string key in keysByGame.Keys)
+			{
+				
+			}
 
 			#endregion
 
