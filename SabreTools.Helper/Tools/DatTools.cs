@@ -2099,6 +2099,7 @@ namespace SabreTools.Helper
 					{
 						userData.Files.Add(key, datHeaders[i].Files[key]);
 					}
+					datHeaders[i].Files.Remove(key);
 				}
 				datHeaders[i].Files = null;
 			}
