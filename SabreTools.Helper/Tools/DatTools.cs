@@ -1871,52 +1871,7 @@ namespace SabreTools.Helper
 		#region Converting and Updating
 
 		/// <summary>
-		/// Output user defined merge
-		/// </summary>
-		/// <param name="outDir">Output directory to write the DATs to</param>
-		/// <param name="inputs">List of inputs to write out from</param>
-		/// <param name="userData">Main DatData to draw information from</param>
-		/// <param name="datHeaders">Dat headers used optionally</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		public static void MergeNoDiff(string outDir, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
-		{
-			// If we're in SuperDAT mode, prefix all games with their respective DATs
-			if (userData.Type == "SuperDAT")
-			{
-				List<string> keys = userData.Files.Keys.ToList();
-				foreach (string key in keys)
-				{
-					List<Rom> newroms = new List<Rom>();
-					foreach (Rom rom in userData.Files[key])
-					{
-						Rom newrom = rom;
-						string filename = inputs[newrom.Metadata.SystemID].Split('¬')[0];
-						string rootpath = inputs[newrom.Metadata.SystemID].Split('¬')[1];
-
-						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
-						filename = filename.Remove(0, rootpath.Length);
-						newrom.Machine.Name = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
-							+ Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar
-							+ newrom.Machine.Name;
-						newroms.Add(newrom);
-					}
-					userData.Files[key] = newroms;
-				}
-			}
-
-			// Output a DAT only if there are roms
-			if (userData.Files.Count != 0)
-			{
-				WriteDatfile(userData, outDir, logger);
-			}
-		}
-
-		#endregion
-
-		#region Converting and Updating (Parallel)
-
-		/// <summary>
-		/// Convert, update, and filter a DAT file (Parallel)
+		/// Convert, update, and filter a DAT file
 		/// </summary>
 		/// <param name="inputFileNames">Names of the input files and/or folders</param>
 		/// <param name="datdata">User specified inputs contained in a DatData object</param>
@@ -2431,6 +2386,47 @@ namespace SabreTools.Helper
 				}
 			}
 			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+		}
+
+		/// <summary>
+		/// Output user defined merge
+		/// </summary>
+		/// <param name="outDir">Output directory to write the DATs to</param>
+		/// <param name="inputs">List of inputs to write out from</param>
+		/// <param name="userData">Main DatData to draw information from</param>
+		/// <param name="datHeaders">Dat headers used optionally</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		public static void MergeNoDiff(string outDir, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
+		{
+			// If we're in SuperDAT mode, prefix all games with their respective DATs
+			if (userData.Type == "SuperDAT")
+			{
+				List<string> keys = userData.Files.Keys.ToList();
+				foreach (string key in keys)
+				{
+					List<Rom> newroms = new List<Rom>();
+					foreach (Rom rom in userData.Files[key])
+					{
+						Rom newrom = rom;
+						string filename = inputs[newrom.Metadata.SystemID].Split('¬')[0];
+						string rootpath = inputs[newrom.Metadata.SystemID].Split('¬')[1];
+
+						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
+						filename = filename.Remove(0, rootpath.Length);
+						newrom.Machine.Name = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
+							+ Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar
+							+ newrom.Machine.Name;
+						newroms.Add(newrom);
+					}
+					userData.Files[key] = newroms;
+				}
+			}
+
+			// Output a DAT only if there are roms
+			if (userData.Files.Count != 0)
+			{
+				WriteDatfile(userData, outDir, logger);
+			}
 		}
 
 		#endregion
