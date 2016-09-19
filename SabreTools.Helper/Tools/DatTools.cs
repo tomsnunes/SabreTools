@@ -2089,7 +2089,8 @@ namespace SabreTools.Helper
 			logger.User("Populating internal DAT");
 			for (int i = 0; i < inputs.Count; i++)
 			{
-				foreach (string key in datHeaders[i].Files.Keys)
+				List<string> keys = datHeaders[i].Files.Keys.ToList();
+				foreach (string key in keys)
 				{
 					if (userData.Files.ContainsKey(key))
 					{
