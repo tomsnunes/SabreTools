@@ -9,7 +9,7 @@ namespace SabreTools.Helper
 	public class SimpleSort
 	{
 		// Private instance variables
-		private Dat _datdata;
+		private DatFile _datdata;
 		private List<string> _inputs;
 		private string _outDir;
 		private string _tempDir;
@@ -30,7 +30,7 @@ namespace SabreTools.Helper
 		// Other private variables
 		private int _cursorTop;
 		private int _cursorLeft;
-		private Dat _matched;
+		private DatFile _matched;
 
 		/// <summary>
 		/// Create a new SimpleSort object
@@ -51,7 +51,7 @@ namespace SabreTools.Helper
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public SimpleSort(Dat datdata, List<string> inputs, string outDir, string tempDir,
+		public SimpleSort(DatFile datdata, List<string> inputs, string outDir, string tempDir,
 			bool quickScan, bool toFolder, bool verify, bool delete, bool? torrentX, bool romba, int sevenzip,
 			int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
@@ -74,9 +74,9 @@ namespace SabreTools.Helper
 
 			_cursorTop = Console.CursorTop;
 			_cursorLeft = Console.CursorLeft;
-			_matched = new Dat
+			_matched = new DatFile
 			{
-				Files = new Dictionary<string, List<Rom>>(),
+				Files = new Dictionary<string, List<DatItem>>(),
 			};
 		}
 
@@ -144,8 +144,8 @@ namespace SabreTools.Helper
 			}
 
 			// Setup the fixdat
-			_matched = (Dat)_datdata.CloneHeader();
-			_matched.Files = new Dictionary<string, List<Rom>>();
+			_matched = (DatFile)_datdata.CloneHeader();
+			_matched.Files = new Dictionary<string, List<DatItem>>();
 			_matched.FileName = "fixDat_" + _matched.FileName;
 			_matched.Name = "fixDat_" + _matched.Name;
 			_matched.Description = "fixDat_" + _matched.Description;
@@ -153,22 +153,22 @@ namespace SabreTools.Helper
 
 			// Now that all files are parsed, get only files found in directory
 			bool found = false;
-			foreach (List<Rom> roms in _datdata.Files.Values)
+			foreach (List<DatItem> roms in _datdata.Files.Values)
 			{
-				List<Rom> newroms = RomTools.Merge(roms, _logger);
+				List<DatItem> newroms = DatItem.Merge(roms, _logger);
 				foreach (Rom rom in newroms)
 				{
-					if (rom.Metadata.SourceID == 99)
+					if (rom.SourceID == 99)
 					{
 						found = true;
-						string key = rom.HashData.Size + "-" + rom.HashData.CRC;
+						string key = rom.Size + "-" + rom.CRC;
 						if (_matched.Files.ContainsKey(key))
 						{
 							_matched.Files[key].Add(rom);
 						}
 						else
 						{
-							List<Rom> temp = new List<Rom>();
+							List<DatItem> temp = new List<DatItem>();
 							temp.Add(rom);
 							_matched.Files.Add(key, temp);
 						}
@@ -179,7 +179,7 @@ namespace SabreTools.Helper
 			// Now output the fixdat to the main folder
 			if (found)
 			{
-				DatTools.WriteDatfile(_matched, "", _logger, stats: true);
+				DatFile.WriteDatfile(_matched, "", _logger, stats: true);
 			}
 			else
 			{
@@ -273,7 +273,7 @@ namespace SabreTools.Helper
 				_datdata.Name = "fixDat_" + _datdata.Name;
 				_datdata.Description = "fixDat_" + _datdata.Description;
 				_datdata.OutputFormat = OutputFormat.Xml;
-				DatTools.WriteDatfile(_datdata, "", _logger);
+				DatFile.WriteDatfile(_datdata, "", _logger);
 			}
 
 			return success;
@@ -341,9 +341,9 @@ namespace SabreTools.Helper
 
 			// Now loop through all of the files and check them, DFD style
 			_logger.User("Getting source file information...");
-			Dat matchdat = new Dat
+			DatFile matchdat = new DatFile
 			{
-				Files = new Dictionary<string, List<Rom>>(),
+				Files = new Dictionary<string, List<DatItem>>(),
 			};
 			foreach (string file in files)
 			{
@@ -409,15 +409,15 @@ namespace SabreTools.Helper
 			#region Find all files to rebuild and bucket by game
 
 			// Create a dictionary of from/to Rom mappings
-			Dictionary<Rom, Rom> toFromMap = new Dictionary<Rom, Rom>();
+			Dictionary<DatItem, DatItem> toFromMap = new Dictionary<DatItem, DatItem>();
 
 			// Now populate it
 			foreach (string key in matchdat.Files.Keys)
 			{
-				foreach (Rom rom in matchdat.Files[key])
+				foreach (DatItem rom in matchdat.Files[key])
 				{
-					List<Rom> matched = RomTools.GetDuplicates(rom, _datdata, _logger, true);
-					foreach (Rom match in matched)
+					List<DatItem> matched = DatItem.GetDuplicates(rom, _datdata, _logger, true);
+					foreach (DatItem match in matched)
 					{
 						try
 						{
@@ -429,7 +429,7 @@ namespace SabreTools.Helper
 			}
 
 			// Then bucket the keys by game for better output
-			SortedDictionary<string, List<Rom>> keysByGame = DatTools.BucketByGame(toFromMap.Keys.ToList(), false, true, _logger);
+			SortedDictionary<string, List<DatItem>> keysByGame = DatFile.BucketByGame(toFromMap.Keys.ToList(), false, true, _logger);
 
 			#endregion
 
@@ -456,7 +456,7 @@ namespace SabreTools.Helper
 		/// <param name="file">Name of the file to attempt to add</param>
 		/// <param name="matchdat">Reference to the Dat to add to</param>
 		/// <returns>True if the file could be added, false otherwise</returns>
-		public bool RebuildToOutputAlternateParseRomHelper(string file, ref Dat matchdat)
+		public bool RebuildToOutputAlternateParseRomHelper(string file, ref DatFile matchdat)
 		{
 			Rom rom = FileTools.GetSingleFileInfo(file);
 
@@ -467,17 +467,17 @@ namespace SabreTools.Helper
 			}
 
 			// Otherwise, set the machine name as the full path to the file
-			rom.Machine.Name = Path.GetDirectoryName(Path.GetFullPath(file));
+			rom.MachineName = Path.GetDirectoryName(Path.GetFullPath(file));
 
 			// Add the rom information to the Dat
-			string key = rom.HashData.Size + "-" + rom.HashData.CRC;
+			string key = rom.Size + "-" + rom.CRC;
 			if (matchdat.Files.ContainsKey(key))
 			{
 				matchdat.Files[key].Add(rom);
 			}
 			else
 			{
-				List<Rom> temp = new List<Rom>();
+				List<DatItem> temp = new List<DatItem>();
 				temp.Add(rom);
 				matchdat.Files.Add(key, temp);
 			}
@@ -494,17 +494,17 @@ namespace SabreTools.Helper
 					Skippers.TransformStream(input, output, rule, _logger, false, true);
 					Rom romNH = FileTools.GetSingleStreamInfo(output);
 					romNH.Name = "HEAD::" + rom.Name;
-					romNH.Machine.Name = rom.Machine.Name;
+					romNH.MachineName = rom.MachineName;
 
 					// Add the rom information to the Dat
-					key = romNH.HashData.Size + "-" + romNH.HashData.CRC;
+					key = romNH.Size + "-" + romNH.CRC;
 					if (matchdat.Files.ContainsKey(key))
 					{
 						matchdat.Files[key].Add(romNH);
 					}
 					else
 					{
-						List<Rom> temp = new List<Rom>();
+						List<DatItem> temp = new List<DatItem>();
 						temp.Add(romNH);
 						matchdat.Files.Add(key, temp);
 					}
@@ -548,21 +548,21 @@ namespace SabreTools.Helper
 				}
 
 				// Try to find the matches to the file that was found
-				List<Rom> foundroms = RomTools.GetDuplicates(rom, _datdata, _logger);
+				List<DatItem> foundroms = DatItem.GetDuplicates(rom, _datdata, _logger);
 				_logger.Log("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
 				foreach (Rom found in foundroms)
 				{
 					_logger.Log("Matched name: " + found.Name);
 
 					// Add rom to the matched list
-					string key = found.HashData.Size + "-" + found.HashData.CRC;
+					string key = found.Size + "-" + found.CRC;
 					if (_matched.Files.ContainsKey(key))
 					{
 						_matched.Files[key].Add(found);
 					}
 					else
 					{
-						List<Rom> temp = new List<Rom>();
+						List<DatItem> temp = new List<DatItem>();
 						temp.Add(found);
 						_matched.Files.Add(key, temp);
 					}
@@ -570,13 +570,13 @@ namespace SabreTools.Helper
 					if (_toFolder)
 					{
 						// Copy file to output directory
-						string gamedir = Path.Combine(_outDir, found.Machine.Name);
+						string gamedir = Path.Combine(_outDir, found.MachineName);
 						if (!Directory.Exists(gamedir))
 						{
 							Directory.CreateDirectory(gamedir);
 						}
 
-						_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.HashData.SHA1 : found.Name) + "'");
+						_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
 						try
 						{
 							File.Copy(input, Path.Combine(gamedir, Path.GetFileName(found.Name)));
@@ -618,19 +618,19 @@ namespace SabreTools.Helper
 					}
 
 					// Try to find the matches to the file that was found
-					List<Rom> founddroms = RomTools.GetDuplicates(drom, _datdata, _logger);
+					List<DatItem> founddroms = DatItem.GetDuplicates(drom, _datdata, _logger);
 					_logger.Log("File '" + newinput + "' had " + founddroms.Count + " matches in the DAT!");
 					foreach (Rom found in founddroms)
 					{
 						// Add rom to the matched list
-						string key = found.HashData.Size + "-" + found.HashData.CRC;
+						string key = found.Size + "-" + found.CRC;
 						if (_matched.Files.ContainsKey(key))
 						{
 							_matched.Files[key].Add(found);
 						}
 						else
 						{
-							List<Rom> temp = new List<Rom>();
+							List<DatItem> temp = new List<DatItem>();
 							temp.Add(found);
 							_matched.Files.Add(key, temp);
 						}
@@ -641,13 +641,13 @@ namespace SabreTools.Helper
 						if (_toFolder)
 						{
 							// Copy file to output directory
-							string gamedir = Path.Combine(_outDir, found.Machine.Name);
+							string gamedir = Path.Combine(_outDir, found.MachineName);
 							if (!Directory.Exists(gamedir))
 							{
 								Directory.CreateDirectory(gamedir);
 							}
 
-							_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.HashData.SHA1 : found.Name) + "'");
+							_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
 							try
 							{
 								File.Copy(newinput, Path.Combine(gamedir, Path.GetFileName(found.Name)));
@@ -672,18 +672,21 @@ namespace SabreTools.Helper
 
 						// Then output the headered rom (renamed)
 						Rom newfound = found;
-						newfound.Name = Path.GetFileNameWithoutExtension(newfound.Name) + " (" + rom.HashData.CRC + ")" + Path.GetExtension(newfound.Name);
-						newfound.HashData = rom.HashData;
+						newfound.Name = Path.GetFileNameWithoutExtension(newfound.Name) + " (" + rom.CRC + ")" + Path.GetExtension(newfound.Name);
+						newfound.Size = rom.Size;
+						newfound.CRC = rom.CRC;
+						newfound.MD5 = rom.MD5;
+						newfound.SHA1 = rom.SHA1;
 
 						// Add rom to the matched list
-						key = newfound.HashData.Size + "-" + newfound.HashData.CRC;
+						key = newfound.Size + "-" + newfound.CRC;
 						if (_matched.Files.ContainsKey(key))
 						{
 							_matched.Files[key].Add(newfound);
 						}
 						else
 						{
-							List<Rom> temp = new List<Rom>();
+							List<DatItem> temp = new List<DatItem>();
 							temp.Add(newfound);
 							_matched.Files.Add(key, temp);
 						}
@@ -691,7 +694,7 @@ namespace SabreTools.Helper
 						if (_toFolder)
 						{
 							// Copy file to output directory
-							string gamedir = Path.Combine(_outDir, found.Machine.Name);
+							string gamedir = Path.Combine(_outDir, found.MachineName);
 							if (!Directory.Exists(gamedir))
 							{
 								Directory.CreateDirectory(gamedir);
@@ -750,19 +753,19 @@ namespace SabreTools.Helper
 						foreach (Rom rom in internalRomData)
 						{
 							// Try to find the matches to the file that was found
-							List<Rom> foundroms = RomTools.GetDuplicates(rom, _datdata, _logger);
+							List<DatItem> foundroms = DatItem.GetDuplicates(rom, _datdata, _logger);
 							_logger.Log("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
 							foreach (Rom found in foundroms)
 							{
 								// Add rom to the matched list
-								string key = found.HashData.Size + "-" + found.HashData.CRC;
+								string key = found.Size + "-" + found.CRC;
 								if (_matched.Files.ContainsKey(key))
 								{
 									_matched.Files[key].Add(found);
 								}
 								else
 								{
-									List<Rom> temp = new List<Rom>();
+									List<DatItem> temp = new List<DatItem>();
 									temp.Add(found);
 									_matched.Files.Add(key, temp);
 								}
@@ -774,7 +777,7 @@ namespace SabreTools.Helper
 									string outfile = FileTools.ExtractSingleItemFromArchive(input, rom.Name, _tempDir, _logger);
 									if (File.Exists(outfile))
 									{
-										string gamedir = Path.Combine(_outDir, found.Machine.Name);
+										string gamedir = Path.Combine(_outDir, found.MachineName);
 										if (!Directory.Exists(gamedir))
 										{
 											Directory.CreateDirectory(gamedir);
@@ -790,7 +793,7 @@ namespace SabreTools.Helper
 								else
 								{
 									// Copy file between archives
-									_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.HashData.SHA1 : found.Name) + "'");
+									_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
 
 									if (Build.MonoEnvironment || _torrentX == false)
 									{
@@ -888,7 +891,7 @@ namespace SabreTools.Helper
 			}
 
 			// Now process the inputs (assumed that it's archived sets as of right now
-			Dictionary<string, List<Rom>> scanned = new Dictionary<string, List<Rom>>();
+			Dictionary<string, List<DatItem>> scanned = new Dictionary<string, List<DatItem>>();
 			foreach (string archive in Directory.EnumerateFiles(_outDir, "*", SearchOption.AllDirectories))
 			{
 				// If we are in quickscan, get the list of roms that way
@@ -914,14 +917,14 @@ namespace SabreTools.Helper
 				// Then add each of the found files to the new dictionary
 				foreach (Rom rom in roms)
 				{
-					string key = rom.HashData.Size + "-" + rom.HashData.CRC;
+					string key = rom.Size + "-" + rom.CRC;
 					if (scanned.ContainsKey(key))
 					{
 						scanned[key].Add(rom);
 					}
 					else
 					{
-						List<Rom> templist = new List<Rom>();
+						List<DatItem> templist = new List<DatItem>();
 						templist.Add(rom);
 						scanned.Add(key, templist);
 					}
@@ -935,7 +938,7 @@ namespace SabreTools.Helper
 			}
 
 			// Now that we have all of the from DAT and from folder roms, we try to match them, removing the perfect matches
-			Dictionary<string, List<Rom>> remove = new Dictionary<string, List<Rom>>();
+			Dictionary<string, List<DatItem>> remove = new Dictionary<string, List<DatItem>>();
 			foreach (string key in scanned.Keys)
 			{
 				// If the key doesn't even exist in the DAT, then mark the entire key for removal
@@ -953,8 +956,8 @@ namespace SabreTools.Helper
 				// Otherwise check each of the values individually
 				else
 				{
-					List<Rom> romsList = _datdata.Files[key];
-					List<Rom> scannedList = scanned[key];
+					List<DatItem> romsList = _datdata.Files[key];
+					List<DatItem> scannedList = scanned[key];
 					foreach (Rom rom in scannedList)
 					{
 						if (!romsList.Contains(rom))
@@ -965,7 +968,7 @@ namespace SabreTools.Helper
 							}
 							else
 							{
-								List<Rom> templist = new List<Rom>();
+								List<DatItem> templist = new List<DatItem>();
 								templist.Add(rom);
 								remove.Add(key, templist);
 							}

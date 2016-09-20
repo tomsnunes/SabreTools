@@ -251,10 +251,10 @@ namespace SabreTools
 			bool toFolder, bool verify, bool delete, bool? torrentX, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
-			Dat datdata = new Dat();
+			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				DatTools.Parse(datfile, 99, 99, ref datdata, logger, keep: true, softlist: true);
+				DatFile.Parse(datfile, 99, 99, ref datdata, logger, keep: true, softlist: true);
 			}
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
@@ -295,7 +295,7 @@ namespace SabreTools
 				}
 			}
 
-			SimpleSort ss = new SimpleSort(new Dat(), newinputs, outDir, tempDir, false, false, false,
+			SimpleSort ss = new SimpleSort(new DatFile(), newinputs, outDir, tempDir, false, false, false,
 				delete, false, romba, sevenzip, gz, rar, zip, false, logger);
 			return ss.Convert();
 		}

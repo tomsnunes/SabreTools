@@ -144,7 +144,7 @@ namespace SabreTools
 			}
 
 			// Create the output DatData object
-			Dat datdata = new Dat
+			DatFile datdata = new DatFile
 			{
 				FileName = description,
 				Name = name,
@@ -173,7 +173,7 @@ namespace SabreTools
 				{
 					Int32.TryParse(sourcemap[hash], out tempSrcId);
 				}
-				DatTools.Parse(file, 0, tempSrcId, ref datdata, _logger);
+				DatFile.Parse(file, 0, tempSrcId, ref datdata, _logger);
 			}
 
 			// If the dictionary is empty for any reason, tell the user and exit
@@ -188,14 +188,14 @@ namespace SabreTools
 			List<string> keys = datdata.Files.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<Rom> temp = new List<Rom>();
-				List<Rom> newroms = datdata.Files[key];
+				List<DatItem> temp = new List<DatItem>();
+				List<DatItem> newroms = datdata.Files[key];
 				for (int i = 0; i < newroms.Count; i++)
 				{
-					Rom rom = newroms[i];
+					Rom rom = (Rom)newroms[i];
 
 					// In the case that the RomData is incomplete, skip it
-					if (rom.Name == null || rom.Machine.Name == null)
+					if (rom.Name == null || rom.MachineName == null)
 					{
 						continue;
 					}
@@ -209,27 +209,27 @@ namespace SabreTools
 					rom.Name = Regex.Replace(rom.Name, @"(.*) \.(.*)", "$1.$2");
 
 					// Run the name through the filters to make sure that it's correct
-					rom.Machine.Name = Style.NormalizeChars(rom.Machine.Name);
-					rom.Machine.Name = Style.RussianToLatin(rom.Machine.Name);
-					rom.Machine.Name = Style.SearchPattern(rom.Machine.Name);
+					rom.MachineName = Style.NormalizeChars(rom.MachineName);
+					rom.MachineName = Style.RussianToLatin(rom.MachineName);
+					rom.MachineName = Style.SearchPattern(rom.MachineName);
 
 					// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
 					string stripPattern = @"(([[(].*[\)\]] )?([^([]+))";
 					Regex stripRegex = new Regex(stripPattern);
-					Match stripMatch = stripRegex.Match(rom.Machine.Name);
-					rom.Machine.Name = stripMatch.Groups[1].Value;
+					Match stripMatch = stripRegex.Match(rom.MachineName);
+					rom.MachineName = stripMatch.Groups[1].Value;
 
-					rom.Machine.Name = rom.Machine.Name.TrimEnd().TrimStart();
+					rom.MachineName = rom.MachineName.TrimEnd().TrimStart();
 
 					if (!_norename)
 					{
-						rom.Machine.Name += " [" + sources[rom.Metadata.SourceID] + "]";
+						rom.MachineName += " [" + sources[rom.SourceID] + "]";
 					}
 
 					// If a game has source "0" it's Default. Make this Int32.MaxValue for sorting purposes
-					if (rom.Metadata.SourceID == 0)
+					if (rom.SourceID == 0)
 					{
-						rom.Metadata.SourceID = Int32.MaxValue;
+						rom.SourceID = Int32.MaxValue;
 					}
 
 					temp.Add(rom);
@@ -238,7 +238,7 @@ namespace SabreTools
 			}
 
 			// Then write out the file
-			DatTools.WriteDatfile(datdata, _outroot, _logger, _norename);
+			DatFile.WriteDatfile(datdata, _outroot, _logger, _norename);
 
 			return true;
 		}

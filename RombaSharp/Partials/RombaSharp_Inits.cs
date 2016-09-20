@@ -57,13 +57,13 @@ namespace SabreTools
 		private static void InitDir2Dat(List<string> inputs)
 		{
 			// Create a simple Dat output
-			Dat datdata = new Dat()
+			DatFile datdata = new DatFile()
 			{
 				FileName = Path.GetFileName(inputs[0]) + " Dir2Dat",
 				Name = Path.GetFileName(inputs[0]) + " Dir2Dat",
 				Description = Path.GetFileName(inputs[0]) + " Dir2Dat",
 				OutputFormat = OutputFormat.Xml,
-				Files = new Dictionary<string, List<Rom>>(),
+				Files = new Dictionary<string, List<DatItem>>(),
 			};
 
 			Logger logger = new Logger(false, "");
@@ -73,7 +73,7 @@ namespace SabreTools
 				DATFromDir dfd = new DATFromDir(input, datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
 				true /* enableGzip */, false /* addBlanks */, false /* addDate */, "__temp__" /* tempDir */, 4 /* maxDegreeOfParallelism */, _logger);
 				dfd.Start();
-				DatTools.WriteDatfile(dfd.DatData, "", logger);
+				DatFile.WriteDatfile(dfd.DatData, "", logger);
 			}
 			logger.Close();
 		}

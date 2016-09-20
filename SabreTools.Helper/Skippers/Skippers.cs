@@ -10,7 +10,7 @@ namespace SabreTools.Helper
 	public class Skippers
 	{
 		// Local paths
-		public const string Path = "Skippers";
+		public const string LocalPath = "Skippers";
 
 		// Header skippers represented by a list of skipper objects
 		private static List<Skipper> _list;
@@ -56,9 +56,9 @@ namespace SabreTools.Helper
 				_list = new List<Skipper>();
 			}
 
-			foreach (string skipperFile in Directory.EnumerateFiles(Path, "*", SearchOption.AllDirectories))
+			foreach (string skipperFile in Directory.EnumerateFiles(LocalPath, "*", SearchOption.AllDirectories))
 			{
-				_list.Add(PopulateSkippersHelper(System.IO.Path.GetFullPath(skipperFile)));
+				_list.Add(PopulateSkippersHelper(Path.GetFullPath(skipperFile)));
 			}
 		}
 
@@ -81,7 +81,7 @@ namespace SabreTools.Helper
 
 			Logger logger = new Logger(false, "");
 			logger.Start();
-			XmlTextReader xtr = DatTools.GetXmlTextReader(filename, logger);
+			XmlTextReader xtr = DatFile.GetXmlTextReader(filename, logger);
 
 			if (xtr == null)
 			{
@@ -527,9 +527,9 @@ namespace SabreTools.Helper
 			}
 
 			// Create the output directory if it doesn't already
-			if (!Directory.Exists(System.IO.Path.GetDirectoryName(output)))
+			if (!Directory.Exists(Path.GetDirectoryName(output)))
 			{
-				Directory.CreateDirectory(System.IO.Path.GetDirectoryName(output));
+				Directory.CreateDirectory(Path.GetDirectoryName(output));
 			}
 
 			logger.User("Attempting to apply rule to '" + input + "'");
@@ -725,7 +725,7 @@ namespace SabreTools.Helper
 			XmlDocument doc = new XmlDocument();
 			try
 			{
-				doc.LoadXml(File.ReadAllText(System.IO.Path.Combine(Path, skipper + ".xml")));
+				doc.LoadXml(File.ReadAllText(Path.Combine(LocalPath, skipper + ".xml")));
 			}
 			catch (XmlException ex)
 			{

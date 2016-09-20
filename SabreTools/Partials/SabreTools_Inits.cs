@@ -78,7 +78,7 @@ namespace SabreTools
 				}
 			}
 
-			SimpleSort ss = new SimpleSort(new Dat(), newinputs, outDir, tempDir, false, false, false, delete, false, romba, sevenzip, gz, rar, zip, false, logger);
+			SimpleSort ss = new SimpleSort(new DatFile(), newinputs, outDir, tempDir, false, false, false, delete, false, romba, sevenzip, gz, rar, zip, false, logger);
 			return ss.Convert();
 		}
 
@@ -127,7 +127,7 @@ namespace SabreTools
 			int maxDegreeOfParallelism)
 		{
 			// Create a new DATFromDir object and process the inputs
-			Dat basedat = new Dat
+			DatFile basedat = new DatFile
 			{
 				FileName = filename,
 				Name = name,
@@ -140,7 +140,7 @@ namespace SabreTools
 				OutputFormat = (outputFormat == 0 ? OutputFormat.Xml : outputFormat),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
-				Files = new Dictionary<string, List<Rom>>(),
+				Files = new Dictionary<string, List<DatItem>>(),
 			};
 
 			// For each input directory, create a DAT
@@ -149,8 +149,8 @@ namespace SabreTools
 				if (Directory.Exists(path))
 				{
 					// Clone the base Dat for information
-					Dat datdata = (Dat)basedat.Clone();
-					datdata.Files = new Dictionary<string, List<Rom>>();
+					DatFile datdata = (DatFile)basedat.Clone();
+					datdata.Files = new Dictionary<string, List<DatItem>>();
 
 					string basePath = Path.GetFullPath(path);
 					DATFromDir dfd = new DATFromDir(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, maxDegreeOfParallelism, _logger);
@@ -159,7 +159,7 @@ namespace SabreTools
 					// If it was a success, write the DAT out
 					if (success)
 					{
-						DatTools.WriteDatfile(dfd.DatData, "", _logger);
+						DatFile.WriteDatfile(dfd.DatData, "", _logger);
 					}
 
 					// Otherwise, show the help
@@ -190,13 +190,13 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					DatTools.SplitByExt(Path.GetFullPath(input), outDir, Path.GetDirectoryName(input), extaList, extbList, _logger);
+					DatFile.SplitByExt(Path.GetFullPath(input), outDir, Path.GetDirectoryName(input), extaList, extbList, _logger);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatTools.SplitByExt(file, outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), extaList, extbList, _logger);
+						DatFile.SplitByExt(file, outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), extaList, extbList, _logger);
 					}
 				}
 				else
@@ -271,13 +271,13 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					DatTools.SplitByHash(Path.GetFullPath(input), outDir, Path.GetDirectoryName(input), _logger);
+					DatFile.SplitByHash(Path.GetFullPath(input), outDir, Path.GetDirectoryName(input), _logger);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatTools.SplitByHash(file, outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
+						DatFile.SplitByHash(file, outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
 					}
 				}
 				else
@@ -384,10 +384,10 @@ namespace SabreTools
 			bool toFolder, bool verify, bool delete, bool? torrentX, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
-			Dat datdata = new Dat();
+			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				DatTools.Parse(datfile, 99, 99, ref datdata, logger);
+				DatFile.Parse(datfile, 99, 99, ref datdata, logger);
 			}
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
@@ -438,13 +438,13 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					DatTools.SplitByType(Path.GetFullPath(input), outDir, Path.GetFullPath(Path.GetDirectoryName(input)), _logger);
+					DatFile.SplitByType(Path.GetFullPath(input), outDir, Path.GetFullPath(Path.GetDirectoryName(input)), _logger);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatTools.SplitByType(file, outDir, Path.GetFullPath((input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar)), _logger);
+						DatFile.SplitByType(file, outDir, Path.GetFullPath((input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar)), _logger);
 					}
 				}
 				else
@@ -671,7 +671,7 @@ namespace SabreTools
 			}
 
 			// Populate the DatData object
-			Dat userInputDat = new Dat
+			DatFile userInputDat = new DatFile
 			{
 				FileName = filename,
 				Name = name,
@@ -705,7 +705,7 @@ namespace SabreTools
 				XSV = tsv,
 			};
 
-			DatTools.Update(inputs, userInputDat, outputFormat, outDir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
+			DatFile.Update(inputs, userInputDat, outputFormat, outDir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
 				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
 		}
 

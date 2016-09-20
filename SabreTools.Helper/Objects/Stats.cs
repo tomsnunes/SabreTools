@@ -47,9 +47,9 @@ namespace SabreTools.Helper
 			{
 				_logger.Log("Beginning stat collection for '" + filename + "'");
 				List<String> games = new List<String>();
-				Dat datdata = new Dat();
-				DatTools.Parse(filename, 0, 0, ref datdata, _logger);
-				SortedDictionary<string, List<Rom>> newroms = DatTools.BucketByGame(datdata.Files, false, true, _logger, false);
+				DatFile datdata = new DatFile();
+				DatFile.Parse(filename, 0, 0, ref datdata, _logger);
+				SortedDictionary<string, List<DatItem>> newroms = DatFile.BucketByGame(datdata.Files, false, true, _logger, false);
 
 				// Output single DAT stats (if asked)
 				if (_single)
@@ -76,7 +76,7 @@ namespace SabreTools.Helper
 
 			// Output total DAT stats
 			if (!_single) { _logger.User(""); }
-			Dat totaldata = new Dat
+			DatFile totaldata = new DatFile
 			{
 				TotalSize = totalSize,
 				RomCount = totalRom,
@@ -102,7 +102,7 @@ Please check the log folder if the stats scrolled offscreen");
 		/// <param name="logger">Logger object for file and console writing</param>
 		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
 		/// <param name="game">Number of games to use, -1 means recalculate games (default)</param>
-		public static void OutputStats(Dat datdata, Logger logger, bool recalculate = false, long game = -1)
+		public static void OutputStats(DatFile datdata, Logger logger, bool recalculate = false, long game = -1)
 		{
 			if (recalculate)
 			{
@@ -116,22 +116,22 @@ Please check the log folder if the stats scrolled offscreen");
 				datdata.NodumpCount = 0;
 
 				// Loop through and add
-				foreach (List<Rom> roms in datdata.Files.Values)
+				foreach (List<DatItem> roms in datdata.Files.Values)
 				{
 					foreach (Rom rom in roms)
 					{
 						datdata.RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
 						datdata.DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
-						datdata.TotalSize += (rom.Nodump ? 0 : rom.HashData.Size);
-						datdata.CRCCount += (String.IsNullOrEmpty(rom.HashData.CRC) ? 0 : 1);
-						datdata.MD5Count += (String.IsNullOrEmpty(rom.HashData.MD5) ? 0 : 1);
-						datdata.SHA1Count += (String.IsNullOrEmpty(rom.HashData.SHA1) ? 0 : 1);
+						datdata.TotalSize += (rom.Nodump ? 0 : rom.Size);
+						datdata.CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
+						datdata.MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
+						datdata.SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
 						datdata.NodumpCount += (rom.Nodump ? 1 : 0);
 					}
 				}
 			}
 
-			SortedDictionary<string, List<Rom>> newroms = DatTools.BucketByGame(datdata.Files, false, true, logger, false);
+			SortedDictionary<string, List<DatItem>> newroms = DatFile.BucketByGame(datdata.Files, false, true, logger, false);
 			if (datdata.TotalSize < 0)
 			{
 				datdata.TotalSize = Int64.MaxValue + datdata.TotalSize;
