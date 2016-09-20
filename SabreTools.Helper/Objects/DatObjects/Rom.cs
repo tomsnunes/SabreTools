@@ -73,9 +73,9 @@ namespace SabreTools.Helper
 			_name = name;
 			_itemType = ItemType.Rom;
 			_size = size;
-			_crc = crc.ToLowerInvariant();
-			_md5 = md5.ToLowerInvariant();
-			_sha1 = sha1.ToLowerInvariant();
+			_crc = crc?.ToLowerInvariant();
+			_md5 = md5?.ToLowerInvariant();
+			_sha1 = sha1?.ToLowerInvariant();
 			_nodump = nodump;
 			_date = date;
 		}
@@ -113,9 +113,9 @@ namespace SabreTools.Helper
 			_name = name;
 			_itemType = ItemType.Rom;
 			_size = size;
-			_crc = crc.ToLowerInvariant();
-			_md5 = md5.ToLowerInvariant();
-			_sha1 = sha1.ToLowerInvariant();
+			_crc = crc?.ToLowerInvariant();
+			_md5 = md5?.ToLowerInvariant();
+			_sha1 = sha1?.ToLowerInvariant();
 			_nodump = nodump;
 			_date = date;
 			_machineName = machineName;

@@ -60,8 +60,8 @@ namespace SabreTools.Helper
 		{
 			_name = name;
 			_itemType = ItemType.Disk;
-			_md5 = md5.ToLowerInvariant();
-			_sha1 = sha1.ToLowerInvariant();
+			_md5 = md5?.ToLowerInvariant();
+			_sha1 = sha1?.ToLowerInvariant();
 			_nodump = nodump;
 		}
 
@@ -94,8 +94,8 @@ namespace SabreTools.Helper
 		{
 			_name = name;
 			_itemType = ItemType.Disk;
-			_md5 = md5.ToLowerInvariant();
-			_sha1 = sha1.ToLowerInvariant();
+			_md5 = md5?.ToLowerInvariant();
+			_sha1 = sha1?.ToLowerInvariant();
 			_nodump = nodump;
 			_machineName = machineName;
 			_comment = comment;

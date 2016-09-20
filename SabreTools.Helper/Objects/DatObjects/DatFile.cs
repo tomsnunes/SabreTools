@@ -1866,16 +1866,15 @@ namespace SabreTools.Helper
 											switch (subreader.Name.ToLowerInvariant())
 											{
 												case "disk":
-													inrom = new Disk(subreader.GetAttribute("name"), subreader.GetAttribute("md5")?.ToLowerInvariant(),
-														subreader.GetAttribute("sha1")?.ToLowerInvariant(), isnodump, tempname, null, gamedesc, null, null,
-														romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
+													inrom = new Disk(subreader.GetAttribute("name"), subreader.GetAttribute("md5"), subreader.GetAttribute("sha1"),
+														isnodump, tempname, null, gamedesc, null, null, romof, cloneof, sampleof, null, false, null, null, sysid,
+														filename, srcid, null);
 													break;
 												case "rom":
 												default:
-													inrom = new Rom(subreader.GetAttribute("name"), size, subreader.GetAttribute("crc")?.ToLowerInvariant(),
-														subreader.GetAttribute("md5")?.ToLowerInvariant(), subreader.GetAttribute("sha1")?.ToLowerInvariant(), isnodump,
-														date, tempname, null, gamedesc, null, null, romof, cloneof, sampleof, null, false, null, null, sysid, filename,
-														srcid, null);
+													inrom = new Rom(subreader.GetAttribute("name"), size, subreader.GetAttribute("crc"), subreader.GetAttribute("md5"),
+														subreader.GetAttribute("sha1"), isnodump, date, tempname, null, gamedesc, null, null, romof, cloneof, sampleof,
+														null, false, null, null, sysid, filename, srcid, null);
 													break;
 											}
 
