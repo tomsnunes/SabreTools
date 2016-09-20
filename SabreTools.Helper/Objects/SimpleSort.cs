@@ -161,7 +161,7 @@ namespace SabreTools.Helper
 					if (rom.SourceID == 99)
 					{
 						found = true;
-						string key = rom.HashData.Size + "-" + rom.HashData.CRC;
+						string key = rom.Size + "-" + rom.CRC;
 						if (_matched.Files.ContainsKey(key))
 						{
 							_matched.Files[key].Add(rom);
@@ -470,7 +470,7 @@ namespace SabreTools.Helper
 			rom.MachineName = Path.GetDirectoryName(Path.GetFullPath(file));
 
 			// Add the rom information to the Dat
-			string key = rom.HashData.Size + "-" + rom.HashData.CRC;
+			string key = rom.Size + "-" + rom.CRC;
 			if (matchdat.Files.ContainsKey(key))
 			{
 				matchdat.Files[key].Add(rom);
@@ -497,7 +497,7 @@ namespace SabreTools.Helper
 					romNH.MachineName = rom.MachineName;
 
 					// Add the rom information to the Dat
-					key = romNH.HashData.Size + "-" + romNH.HashData.CRC;
+					key = romNH.Size + "-" + romNH.CRC;
 					if (matchdat.Files.ContainsKey(key))
 					{
 						matchdat.Files[key].Add(romNH);
@@ -555,7 +555,7 @@ namespace SabreTools.Helper
 					_logger.Log("Matched name: " + found.Name);
 
 					// Add rom to the matched list
-					string key = found.HashData.Size + "-" + found.HashData.CRC;
+					string key = found.Size + "-" + found.CRC;
 					if (_matched.Files.ContainsKey(key))
 					{
 						_matched.Files[key].Add(found);
@@ -576,7 +576,7 @@ namespace SabreTools.Helper
 							Directory.CreateDirectory(gamedir);
 						}
 
-						_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.HashData.SHA1 : found.Name) + "'");
+						_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
 						try
 						{
 							File.Copy(input, Path.Combine(gamedir, Path.GetFileName(found.Name)));
@@ -623,7 +623,7 @@ namespace SabreTools.Helper
 					foreach (Rom found in founddroms)
 					{
 						// Add rom to the matched list
-						string key = found.HashData.Size + "-" + found.HashData.CRC;
+						string key = found.Size + "-" + found.CRC;
 						if (_matched.Files.ContainsKey(key))
 						{
 							_matched.Files[key].Add(found);
@@ -647,7 +647,7 @@ namespace SabreTools.Helper
 								Directory.CreateDirectory(gamedir);
 							}
 
-							_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.HashData.SHA1 : found.Name) + "'");
+							_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
 							try
 							{
 								File.Copy(newinput, Path.Combine(gamedir, Path.GetFileName(found.Name)));
@@ -672,11 +672,11 @@ namespace SabreTools.Helper
 
 						// Then output the headered rom (renamed)
 						Rom newfound = found;
-						newfound.Name = Path.GetFileNameWithoutExtension(newfound.Name) + " (" + rom.HashData.CRC + ")" + Path.GetExtension(newfound.Name);
-						newfound.HashData = rom.HashData;
+						newfound.Name = Path.GetFileNameWithoutExtension(newfound.Name) + " (" + rom.CRC + ")" + Path.GetExtension(newfound.Name);
+						newfound = rom;
 
 						// Add rom to the matched list
-						key = newfound.HashData.Size + "-" + newfound.HashData.CRC;
+						key = newfound.Size + "-" + newfound.CRC;
 						if (_matched.Files.ContainsKey(key))
 						{
 							_matched.Files[key].Add(newfound);
@@ -755,7 +755,7 @@ namespace SabreTools.Helper
 							foreach (Rom found in foundroms)
 							{
 								// Add rom to the matched list
-								string key = found.HashData.Size + "-" + found.HashData.CRC;
+								string key = found.Size + "-" + found.CRC;
 								if (_matched.Files.ContainsKey(key))
 								{
 									_matched.Files[key].Add(found);
@@ -790,7 +790,7 @@ namespace SabreTools.Helper
 								else
 								{
 									// Copy file between archives
-									_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.HashData.SHA1 : found.Name) + "'");
+									_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
 
 									if (Build.MonoEnvironment || _torrentX == false)
 									{
@@ -914,7 +914,7 @@ namespace SabreTools.Helper
 				// Then add each of the found files to the new dictionary
 				foreach (Rom rom in roms)
 				{
-					string key = rom.HashData.Size + "-" + rom.HashData.CRC;
+					string key = rom.Size + "-" + rom.CRC;
 					if (scanned.ContainsKey(key))
 					{
 						scanned[key].Add(rom);

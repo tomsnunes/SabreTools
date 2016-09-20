@@ -520,10 +520,10 @@ SELECT files.id FROM files
 	WHERE files.name='" + rom.Name.Replace("'", "''") + @"'
 		AND files.type='" + rom.Type + @"' 
 		AND files.setid=" + gameid +
-		" AND checksums.size=" + rom.HashData.Size +
-		" AND checksums.crc='" + rom.HashData.CRC + "'" +
-		" AND checksums.md5='" + rom.HashData.MD5 + "'" +
-		" AND checksums.sha1='" + rom.HashData.SHA1 + "'";
+		" AND checksums.size=" + rom.Size +
+		" AND checksums.crc='" + rom.CRC + "'" +
+		" AND checksums.md5='" + rom.MD5 + "'" +
+		" AND checksums.sha1='" + rom.SHA1 + "'";
 
 			using (SqliteCommand slc = new SqliteCommand(query, dbc))
 			{
@@ -536,7 +536,7 @@ SELECT files.id FROM files
 INSERT INTO files (setid, name, type, lastupdated)
 VALUES (" + gameid + ", '" + rom.Name.Replace("'", "''") + "', '" + rom.Type + "', '" + date + @"');
 INSERT INTO checksums (file, size, crc, md5, sha1)
-VALUES ((SELECT last_insertConstants.Rowid()), " + rom.HashData.Size + ", '" + rom.HashData.CRC + "'" + ", '" + rom.HashData.MD5 + "'" + ", '" + rom.HashData.SHA1 + @"');
+VALUES ((SELECT last_insertConstants.Rowid()), " + rom.Size + ", '" + rom.CRC + "'" + ", '" + rom.MD5 + "'" + ", '" + rom.SHA1 + @"');
 COMMIT;";
 						using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
 						{
@@ -594,7 +594,7 @@ COMMIT;";
 
 			// Retrieve or insert the hash
 			long hashid = -1;
-			string query = "SELECT id FROM hash WHERE size=" + rom.HashData.Size + " AND crc='" + rom.HashData.CRC + "' AND md5='" + rom.HashData.MD5 + "' AND sha1='" + rom.HashData.SHA1 + "'";
+			string query = "SELECT id FROM hash WHERE size=" + rom.Size + " AND crc='" + rom.CRC + "' AND md5='" + rom.MD5 + "' AND sha1='" + rom.SHA1 + "'";
 			using (SqliteCommand slc = new SqliteCommand(query, dbc))
 			{
 				using (SqliteDataReader sldr = slc.ExecuteReader())
@@ -603,7 +603,7 @@ COMMIT;";
 					if (!sldr.HasRows)
 					{
 						query = "INSERT INTO hash (size, crc, md5, sha1)" +
-							" VALUES (" + rom.HashData.Size + ", '" + rom.HashData.CRC + "', '" + rom.HashData.MD5 + "', '" + rom.HashData.SHA1 + "')";
+							" VALUES (" + rom.Size + ", '" + rom.CRC + "', '" + rom.MD5 + "', '" + rom.SHA1 + "')";
 
 						using (SqliteCommand slc2 = new SqliteCommand(query, dbc))
 						{

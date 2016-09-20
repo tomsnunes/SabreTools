@@ -341,15 +341,15 @@ namespace SabreTools
 					Rom dat = FileTools.GetSingleFileInfo(file);
 
 					// If the Dat isn't in the database and isn't already accounted for in the DatRoot, add it
-					if (!databaseDats.Contains(dat.HashData.SHA1) && !toscan.ContainsKey(dat.HashData.SHA1))
+					if (!databaseDats.Contains(dat.SHA1) && !toscan.ContainsKey(dat.SHA1))
 					{
-						toscan.Add(dat.HashData.SHA1, Path.GetFullPath(file));
+						toscan.Add(dat.SHA1, Path.GetFullPath(file));
 					}
 
 					// If the Dat is in the database already, remove it to find stragglers
-					else if (databaseDats.Contains(dat.HashData.SHA1))
+					else if (databaseDats.Contains(dat.SHA1))
 					{
-						databaseDats.Remove(dat.HashData.SHA1);
+						databaseDats.Remove(dat.SHA1);
 					}
 				}
 
@@ -368,10 +368,10 @@ namespace SabreTools
 						{
 							foreach (Rom rom in tempdat.Files[romkey])
 							{
-								query = "SELECT id FROM data WHERE key=\"size\" AND value=\"" + rom.HashData.Size + "\" AND ("
-									+ "(key=\"crc\" AND (value=\"" + rom.HashData.CRC + "\" OR value=\"null\"))"
-									+ "AND (key=\"md5\" AND value=\"" + rom.HashData.MD5 + "\" OR value=\"null\"))"
-									+ "AND (key=\"sha1\" AND value=\"" + rom.HashData.SHA1 + "\" OR value=\"null\")))";
+								query = "SELECT id FROM data WHERE key=\"size\" AND value=\"" + rom.Size + "\" AND ("
+									+ "(key=\"crc\" AND (value=\"" + rom.CRC + "\" OR value=\"null\"))"
+									+ "AND (key=\"md5\" AND value=\"" + rom.MD5 + "\" OR value=\"null\"))"
+									+ "AND (key=\"sha1\" AND value=\"" + rom.SHA1 + "\" OR value=\"null\")))";
 								using (SqliteCommand slc = new SqliteCommand(query, dbc))
 								{
 									using (SqliteDataReader sldr = slc.ExecuteReader())
@@ -392,7 +392,7 @@ namespace SabreTools
 										// If it doesn't exist, add the hash and the dat hash for a new id
 										else
 										{
-											string squery = "INSERT INTO data (key, value) VALUES (\"size\", \"" + rom.HashData.Size + "\")";
+											string squery = "INSERT INTO data (key, value) VALUES (\"size\", \"" + rom.Size + "\")";
 											using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
 											{
 												sslc.ExecuteNonQuery();
@@ -406,9 +406,9 @@ namespace SabreTools
 												id = (long)sslc.ExecuteScalar();
 											}
 
-											squery = "INSERT INTO data (id, key, value) VALUES (\"" + id + "\", \"crc\", \"" + rom.HashData.CRC + "\"),"
-												+ " (\"" + id + "\", \"md5\", \"" + rom.HashData.MD5 + "\"),"
-												+ " (\"" + id + "\", \"sha1\", \"" + rom.HashData.SHA1 + "\"),"
+											squery = "INSERT INTO data (id, key, value) VALUES (\"" + id + "\", \"crc\", \"" + rom.CRC + "\"),"
+												+ " (\"" + id + "\", \"md5\", \"" + rom.MD5 + "\"),"
+												+ " (\"" + id + "\", \"sha1\", \"" + rom.SHA1 + "\"),"
 												+ " (\"" + id + "\", \"dat\", \"" + key + "\"),"
 												+ " (\"" + id + "\", \"exists\", \"false\")";
 											using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
@@ -451,7 +451,7 @@ namespace SabreTools
 				if (datRootDats.Contains(input.ToLowerInvariant()))
 				{
 					string fullpath = Path.GetFullPath(datRootDats[datRootDats.IndexOf(input.ToLowerInvariant())]);
-					string sha1 = FileTools.GetSingleFileInfo(fullpath).HashData.SHA1;
+					string sha1 = FileTools.GetSingleFileInfo(fullpath).SHA1;
 					foundDats.Add(sha1, fullpath);
 				}
 				else

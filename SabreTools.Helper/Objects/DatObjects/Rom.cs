@@ -1,14 +1,14 @@
-﻿namespace SabreTools.Helper
+﻿using System;
+
+namespace SabreTools.Helper
 {
-	public class Rom : DatItem
+	public class Rom : Disk
 	{
 		#region Private instance variables
 
 		// Rom information
-		private Hash _hashData;
-		// private string _merge;
-		// private RomStatus _romStatus;
-		private bool _nodump;
+		protected long _size;
+		protected string _crc;
 		private string _date;
 
 		#endregion
@@ -16,15 +16,15 @@
 		#region Publicly facing variables
 
 		// Rom information
-		public Hash HashData
+		public long Size
 		{
-			get { return _hashData; }
-			set { _hashData = value; }
+			get { return _size; }
+			set { _size = value; }
 		}
-		public bool Nodump
+		public string CRC
 		{
-			get { return _nodump; }
-			set { _nodump = value; }
+			get { return _crc; }
+			set { _crc = value; }
 		}
 		public string Date
 		{
@@ -72,13 +72,10 @@
 		{
 			_name = name;
 			_itemType = ItemType.Rom;
-			_hashData = new Hash
-			{
-				Size = size,
-				CRC = crc.ToLowerInvariant(),
-				MD5 = md5.ToLowerInvariant(),
-				SHA1 = sha1.ToLowerInvariant(),
-			};
+			_size = size;
+			_crc = crc.ToLowerInvariant();
+			_md5 = md5.ToLowerInvariant();
+			_sha1 = sha1.ToLowerInvariant();
 			_nodump = nodump;
 			_date = date;
 		}
@@ -115,13 +112,10 @@
 		{
 			_name = name;
 			_itemType = ItemType.Rom;
-			_hashData = new Hash
-			{
-				Size = size,
-				CRC = crc.ToLowerInvariant(),
-				MD5 = md5.ToLowerInvariant(),
-				SHA1 = sha1.ToLowerInvariant(),
-			};
+			_size = size;
+			_crc = crc.ToLowerInvariant();
+			_md5 = md5.ToLowerInvariant();
+			_sha1 = sha1.ToLowerInvariant();
 			_nodump = nodump;
 			_date = date;
 			_machineName = machineName;
@@ -165,7 +159,13 @@
 				return dupefound;
 			}
 
-			dupefound = _hashData.Equals(newOther.HashData, false);
+			if ((this.Size == newOther.Size) &&
+				((String.IsNullOrEmpty(this.CRC) || String.IsNullOrEmpty(newOther.CRC)) || this.CRC == newOther.CRC) &&
+				((String.IsNullOrEmpty(this.MD5) || String.IsNullOrEmpty(newOther.MD5)) || this.MD5 == newOther.MD5) &&
+				((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(newOther.SHA1)) || this.SHA1 == newOther.SHA1))
+			{
+				dupefound = true;
+			}
 
 			return dupefound;
 		}

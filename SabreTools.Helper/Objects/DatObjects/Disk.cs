@@ -1,24 +1,32 @@
-﻿namespace SabreTools.Helper
+﻿using System;
+
+namespace SabreTools.Helper
 {
 	public class Disk : DatItem
 	{
 		#region Private instance variables
 
 		// Disk information
-		private Hash _hashData;
+		protected string _md5;
+		protected string _sha1;
 		// private string _merge;
 		// private DiskStatus _romStatus;
-		private bool _nodump;
+		protected bool _nodump;
 
 		#endregion
 
 		#region Publicly facing variables
 
 		// Disk information
-		public Hash HashData
+		public string MD5
 		{
-			get { return _hashData; }
-			set { _hashData = value; }
+			get { return _md5; }
+			set { _md5 = value; }
+		}
+		public string SHA1
+		{
+			get { return _sha1; }
+			set { _sha1 = value; }
 		}
 		public bool Nodump
 		{
@@ -52,11 +60,8 @@
 		{
 			_name = name;
 			_itemType = ItemType.Disk;
-			_hashData = new Hash
-			{
-				MD5 = md5.ToLowerInvariant(),
-				SHA1 = sha1.ToLowerInvariant(),
-			};
+			_md5 = md5.ToLowerInvariant();
+			_sha1 = sha1.ToLowerInvariant();
 			_nodump = nodump;
 		}
 
@@ -89,11 +94,8 @@
 		{
 			_name = name;
 			_itemType = ItemType.Disk;
-			_hashData = new Hash
-			{
-				MD5 = md5.ToLowerInvariant(),
-				SHA1 = sha1.ToLowerInvariant(),
-			};
+			_md5 = md5.ToLowerInvariant();
+			_sha1 = sha1.ToLowerInvariant();
 			_nodump = nodump;
 			_machineName = machineName;
 			_comment = comment;
@@ -136,7 +138,11 @@
 				return dupefound;
 			}
 
-			dupefound = _hashData.Equals(newOther.HashData, false);
+			if (((String.IsNullOrEmpty(_md5) || String.IsNullOrEmpty(newOther.MD5)) || this.MD5 == newOther.MD5) &&
+					((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(newOther.SHA1)) || this.SHA1 == newOther.SHA1))
+			{
+				dupefound = true;
+			}
 
 			return dupefound;
 		}

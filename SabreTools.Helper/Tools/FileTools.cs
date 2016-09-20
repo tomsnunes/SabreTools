@@ -224,7 +224,7 @@ namespace SabreTools.Helper
 								writeStream.Write(buffer, 0, len);
 							}
 							writeStream.Flush();
-							zipFile.CloseWriteStream(Convert.ToUInt32(rom.HashData.CRC, 16));
+							zipFile.CloseWriteStream(Convert.ToUInt32(rom.CRC, 16));
 						}
 					}
 				}
@@ -291,7 +291,7 @@ namespace SabreTools.Helper
 							}
 							freadStream.Close();
 							freadStream.Dispose();
-							zipFile.CloseWriteStream(Convert.ToUInt32(roms[-index - 1].HashData.CRC, 16));
+							zipFile.CloseWriteStream(Convert.ToUInt32(roms[-index - 1].CRC, 16));
 						}
 
 						// Otherwise, copy the file from the old archive
@@ -372,7 +372,7 @@ namespace SabreTools.Helper
 			Rom rom = FileTools.GetSingleFileInfo(input);
 
 			// If it doesn't exist, create the output file and then write
-			string outfile = Path.Combine(outDir, rom.HashData.SHA1 + ".gz");
+			string outfile = Path.Combine(outDir, rom.SHA1 + ".gz");
 			using (FileStream inputstream = new FileStream(input, FileMode.Open))
 			using (GZipStream output = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress))
 			{
@@ -386,9 +386,9 @@ namespace SabreTools.Helper
 				{
 					// Write standard header and TGZ info
 					byte[] data = Constants.TorrentGZHeader
-									.Concat(Style.StringToByteArray(rom.HashData.MD5)) // MD5
-									.Concat(Style.StringToByteArray(rom.HashData.CRC)) // CRC
-									.Concat(BitConverter.GetBytes(rom.HashData.Size).Reverse().ToArray()) // Long size (Mirrored)
+									.Concat(Style.StringToByteArray(rom.MD5)) // MD5
+									.Concat(Style.StringToByteArray(rom.CRC)) // CRC
+									.Concat(BitConverter.GetBytes(rom.Size).Reverse().ToArray()) // Long size (Mirrored)
 								.ToArray();
 					sw.Write(data);
 
@@ -414,7 +414,7 @@ namespace SabreTools.Helper
 			// If we're in romba mode, create the subfolder and move the file
 			if (romba)
 			{
-				string subfolder = Path.Combine(rom.HashData.SHA1.Substring(0, 2), rom.HashData.SHA1.Substring(2, 2), rom.HashData.SHA1.Substring(4, 2), rom.HashData.SHA1.Substring(6, 2));
+				string subfolder = Path.Combine(rom.SHA1.Substring(0, 2), rom.SHA1.Substring(2, 2), rom.SHA1.Substring(4, 2), rom.SHA1.Substring(6, 2));
 				outDir = Path.Combine(outDir, subfolder);
 				if (!Directory.Exists(outDir))
 				{
@@ -723,13 +723,10 @@ namespace SabreTools.Helper
 			Rom rom = new Rom
 			{
 				Type = ItemType.Rom,
-				HashData = new Hash
-				{
-					Size = input.Length - Math.Abs(offset),
-					CRC = string.Empty,
-					MD5 = string.Empty,
-					SHA1 = string.Empty,
-				},
+				Size = input.Length - Math.Abs(offset),
+				CRC = string.Empty,
+				MD5 = string.Empty,
+				SHA1 = string.Empty,
 			};
 
 			try
@@ -760,21 +757,18 @@ namespace SabreTools.Helper
 					}
 
 					crc.Update(buffer, 0, 0);
-					Hash tempHash = new Hash();
-					tempHash.CRC = crc.Value.ToString("X8").ToLowerInvariant();
+					rom.CRC = crc.Value.ToString("X8").ToLowerInvariant();
 
 					if (!noMD5)
 					{
 						md5.TransformFinalBlock(buffer, 0, 0);
-						tempHash.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
+						rom.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
 					}
 					if (!noSHA1)
 					{
 						sha1.TransformFinalBlock(buffer, 0, 0);
-						tempHash.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
+						rom.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
 					}
-
-					rom.HashData = tempHash;
 				}
 			}
 			catch (IOException)
@@ -864,11 +858,8 @@ namespace SabreTools.Helper
 								Type = ItemType.Rom,
 								Name = reader.Entry.Key,
 								MachineName = gamename,
-								HashData = new Hash
-								{
-									Size = (size == 0 ? reader.Entry.Size : size),
-									CRC = (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc),
-								},
+								Size = (size == 0 ? reader.Entry.Size : size),
+								CRC = (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc),
 							});
 						}
 					}
@@ -950,13 +941,10 @@ namespace SabreTools.Helper
 				Type = ItemType.Rom,
 				MachineName = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 				Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
-				HashData = new Hash
-				{
-					Size = extractedsize,
-					CRC = gzcrc.ToLowerInvariant(),
-					MD5 = gzmd5.ToLowerInvariant(),
-					SHA1 = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
-				},
+				Size = extractedsize,
+				CRC = gzcrc.ToLowerInvariant(),
+				MD5 = gzmd5.ToLowerInvariant(),
+				SHA1 = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 			};
 
 			return rom;

@@ -197,7 +197,7 @@ namespace SabreTools
 				if (rom.Name != null)
 				{
 					// Add the list if it doesn't exist already
-					string key = rom.HashData.Size + "-" + rom.HashData.CRC;
+					string key = rom.Size + "-" + rom.CRC;
 					
 					lock (_datdata.Files)
 					{
@@ -317,11 +317,11 @@ namespace SabreTools
 			string key = "";
 			if (datItem.Type == ItemType.Rom)
 			{
-				key = ((Rom)datItem).HashData.Size + "-" + ((Rom)datItem).HashData.CRC;
+				key = ((Rom)datItem).Size + "-" + ((Rom)datItem).CRC;
 			}
 			else
 			{
-				key = ((Disk)datItem).HashData.Size + "-" + ((Disk)datItem).HashData.MD5;
+				key = ((Disk)datItem).MD5;
 			}
 
 			// Add the list if it doesn't exist already

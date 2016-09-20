@@ -245,7 +245,7 @@ JOIN checksums
 										sldr.GetString(6), null, sldr.GetString(0), null, null, null, null, false, null, null, sldr.GetInt32(2),
 										sldr.GetString(1), sldr.GetInt32(5), sldr.GetString(3));
 
-									key = ((Disk)temp).HashData.Size + "-" + ((Disk)temp).HashData.CRC;
+									key = ((Disk)temp).MD5;
 									break;
 								case "rom":
 								default:
@@ -253,7 +253,7 @@ JOIN checksums
 										sldr.GetString(13), sldr.GetString(6), null, sldr.GetString(6), null, sldr.GetString(0), null, null, null, null, false,
 										null, null, sldr.GetInt32(2), sldr.GetString(1), sldr.GetInt32(5), sldr.GetString(3));
 
-									key = ((Disk)temp).HashData.Size + "-" + ((Disk)temp).HashData.CRC;
+									key = ((Rom)temp).Size + "-" + ((Rom)temp).CRC;
 									break;
 							}
 
