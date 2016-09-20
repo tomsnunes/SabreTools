@@ -2306,6 +2306,13 @@ namespace SabreTools.Helper
 					continue;
 				}
 
+				// If we somehow have a null list, just skip it
+				if (sortable[key] == null)
+				{
+					logger.Warning("Blank list found for key: " + key);
+					continue;
+				}
+
 				List<DatItem> sortedlist = sortable[key];
 				DatItem.Sort(ref sortedlist, norename);
 				sortable[key] = sortedlist;
