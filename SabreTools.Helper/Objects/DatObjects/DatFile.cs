@@ -2759,6 +2759,13 @@ namespace SabreTools.Helper
 				{
 					foreach (DatItem rom in roms)
 					{
+						// There's odd cases where there are items with System ID < 0. Skip them for now
+						if (rom.SystemID < 0)
+						{
+							logger.Warning("Item found with a <0 SystemID: " + rom.Name);
+							continue;
+						}
+
 						if (outDats[rom.SystemID].Files.ContainsKey(key))
 						{
 							outDats[rom.SystemID].Files[key].Add(rom);
