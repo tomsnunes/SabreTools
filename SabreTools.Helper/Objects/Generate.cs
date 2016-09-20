@@ -166,7 +166,7 @@ namespace SabreTools
 			string intname = systemname + " (" + sourcename + ")";
 			string datname = systemname + " (" + sourcename + " " + version + ")";
 
-			Dat datdata = new Dat
+			DatFile datdata = new DatFile
 			{
 				Name = intname,
 				Description = datname,
@@ -179,7 +179,7 @@ namespace SabreTools
 				Files = dict,
 			};
 
-			return DatTools.WriteDatfile(datdata, _outDir, _logger);
+			return DatFile.WriteDatfile(datdata, _outDir, _logger);
 		}
 
 		/// <summary>

@@ -144,7 +144,7 @@ namespace SabreTools
 			}
 
 			// Create the output DatData object
-			Dat datdata = new Dat
+			DatFile datdata = new DatFile
 			{
 				FileName = description,
 				Name = name,
@@ -173,7 +173,7 @@ namespace SabreTools
 				{
 					Int32.TryParse(sourcemap[hash], out tempSrcId);
 				}
-				DatTools.Parse(file, 0, tempSrcId, ref datdata, _logger);
+				DatFile.Parse(file, 0, tempSrcId, ref datdata, _logger);
 			}
 
 			// If the dictionary is empty for any reason, tell the user and exit
@@ -238,7 +238,7 @@ namespace SabreTools
 			}
 
 			// Then write out the file
-			DatTools.WriteDatfile(datdata, _outroot, _logger, _norename);
+			DatFile.WriteDatfile(datdata, _outroot, _logger, _norename);
 
 			return true;
 		}

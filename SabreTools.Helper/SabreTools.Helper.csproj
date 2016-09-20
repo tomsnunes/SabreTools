@@ -103,6 +103,7 @@
     <Compile Include="Objects\DATFromDir.cs" />
     <Compile Include="Objects\DatObjects\Archive.cs" />
     <Compile Include="Objects\DatObjects\BiosSet.cs" />
+    <Compile Include="Objects\DatObjects\DatFile.cs" />
     <Compile Include="Objects\DatObjects\DatItem.cs" />
     <Compile Include="Objects\DatObjects\Disk.cs" />
     <Compile Include="Objects\DatObjects\Release.cs" />
@@ -145,9 +146,7 @@
     <Compile Include="Objects\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mappings\Mappings.cs" />
-    <Compile Include="Tools\DatTools.cs" />
     <Compile Include="Data\Structs.cs" />
-    <Compile Include="Tools\FileToolsHash.cs" />
     <Compile Include="Objects\Stats.cs" />
     <Compile Include="Tools\Style.cs" />
     <Compile Include="Data\Build.cs" />

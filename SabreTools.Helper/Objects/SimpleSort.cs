@@ -9,7 +9,7 @@ namespace SabreTools.Helper
 	public class SimpleSort
 	{
 		// Private instance variables
-		private Dat _datdata;
+		private DatFile _datdata;
 		private List<string> _inputs;
 		private string _outDir;
 		private string _tempDir;
@@ -30,7 +30,7 @@ namespace SabreTools.Helper
 		// Other private variables
 		private int _cursorTop;
 		private int _cursorLeft;
-		private Dat _matched;
+		private DatFile _matched;
 
 		/// <summary>
 		/// Create a new SimpleSort object
@@ -51,7 +51,7 @@ namespace SabreTools.Helper
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public SimpleSort(Dat datdata, List<string> inputs, string outDir, string tempDir,
+		public SimpleSort(DatFile datdata, List<string> inputs, string outDir, string tempDir,
 			bool quickScan, bool toFolder, bool verify, bool delete, bool? torrentX, bool romba, int sevenzip,
 			int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
@@ -74,7 +74,7 @@ namespace SabreTools.Helper
 
 			_cursorTop = Console.CursorTop;
 			_cursorLeft = Console.CursorLeft;
-			_matched = new Dat
+			_matched = new DatFile
 			{
 				Files = new Dictionary<string, List<DatItem>>(),
 			};
@@ -144,7 +144,7 @@ namespace SabreTools.Helper
 			}
 
 			// Setup the fixdat
-			_matched = (Dat)_datdata.CloneHeader();
+			_matched = (DatFile)_datdata.CloneHeader();
 			_matched.Files = new Dictionary<string, List<DatItem>>();
 			_matched.FileName = "fixDat_" + _matched.FileName;
 			_matched.Name = "fixDat_" + _matched.Name;
@@ -179,7 +179,7 @@ namespace SabreTools.Helper
 			// Now output the fixdat to the main folder
 			if (found)
 			{
-				DatTools.WriteDatfile(_matched, "", _logger, stats: true);
+				DatFile.WriteDatfile(_matched, "", _logger, stats: true);
 			}
 			else
 			{
@@ -273,7 +273,7 @@ namespace SabreTools.Helper
 				_datdata.Name = "fixDat_" + _datdata.Name;
 				_datdata.Description = "fixDat_" + _datdata.Description;
 				_datdata.OutputFormat = OutputFormat.Xml;
-				DatTools.WriteDatfile(_datdata, "", _logger);
+				DatFile.WriteDatfile(_datdata, "", _logger);
 			}
 
 			return success;
@@ -341,7 +341,7 @@ namespace SabreTools.Helper
 
 			// Now loop through all of the files and check them, DFD style
 			_logger.User("Getting source file information...");
-			Dat matchdat = new Dat
+			DatFile matchdat = new DatFile
 			{
 				Files = new Dictionary<string, List<DatItem>>(),
 			};
@@ -429,7 +429,7 @@ namespace SabreTools.Helper
 			}
 
 			// Then bucket the keys by game for better output
-			SortedDictionary<string, List<DatItem>> keysByGame = DatTools.BucketByGame(toFromMap.Keys.ToList(), false, true, _logger);
+			SortedDictionary<string, List<DatItem>> keysByGame = DatFile.BucketByGame(toFromMap.Keys.ToList(), false, true, _logger);
 
 			#endregion
 
@@ -456,7 +456,7 @@ namespace SabreTools.Helper
 		/// <param name="file">Name of the file to attempt to add</param>
 		/// <param name="matchdat">Reference to the Dat to add to</param>
 		/// <returns>True if the file could be added, false otherwise</returns>
-		public bool RebuildToOutputAlternateParseRomHelper(string file, ref Dat matchdat)
+		public bool RebuildToOutputAlternateParseRomHelper(string file, ref DatFile matchdat)
 		{
 			Rom rom = FileTools.GetSingleFileInfo(file);
 

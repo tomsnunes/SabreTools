@@ -366,8 +366,8 @@ namespace SabreTools
 			}
 
 			// Get all roms that are found in the DAT to see what needs to be added
-			Dat datdata = new Dat();
-			DatTools.Parse(_filepath, sysid, srcid, ref datdata, _logger);
+			DatFile datdata = new DatFile();
+			DatFile.Parse(_filepath, sysid, srcid, ref datdata, _logger);
 
 			// Sort inputted roms into games
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();

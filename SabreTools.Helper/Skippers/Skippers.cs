@@ -81,7 +81,7 @@ namespace SabreTools.Helper
 
 			Logger logger = new Logger(false, "");
 			logger.Start();
-			XmlTextReader xtr = DatTools.GetXmlTextReader(filename, logger);
+			XmlTextReader xtr = DatFile.GetXmlTextReader(filename, logger);
 
 			if (xtr == null)
 			{

@@ -154,7 +154,7 @@ namespace SabreTools.Helper
 		/// <param name="datdata">DAT information</param>
 		/// <param name="overwrite">True if we ignore existing files (default), false otherwise</param>
 		/// <returns>Dictionary of output formats mapped to file names</returns>
-		public static Dictionary<OutputFormat, string> CreateOutfileNames(string outDir, Dat datdata, bool overwrite = true)
+		public static Dictionary<OutputFormat, string> CreateOutfileNames(string outDir, DatFile datdata, bool overwrite = true)
 		{
 			// Create the output dictionary
 			Dictionary<OutputFormat, string> outfileNames = new Dictionary<OutputFormat, string>();
@@ -214,7 +214,7 @@ namespace SabreTools.Helper
 		/// <param name="datdata">DAT information</param>
 		/// <param name="overwrite">True if we ignore existing files, false otherwise</param>
 		/// <returns>String containing the new filename</returns>
-		private static string CreateOutfileNamesHelper(string outDir, string extension, Dat datdata, bool overwrite)
+		private static string CreateOutfileNamesHelper(string outDir, string extension, DatFile datdata, bool overwrite)
 		{
 			string filename = (String.IsNullOrEmpty(datdata.FileName) ? datdata.Description : datdata.FileName);
 			string outfile = outDir + filename + extension;

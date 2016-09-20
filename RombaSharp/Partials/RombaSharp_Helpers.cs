@@ -33,7 +33,7 @@ namespace SabreTools
 			Dictionary<string, Tuple<long, bool>> depots = new Dictionary<string, Tuple<long, bool>>();
 
 			// Get the XML text reader for the configuration file, if possible
-			XmlTextReader xtr = DatTools.GetXmlTextReader(_config, _logger);
+			XmlTextReader xtr = DatFile.GetXmlTextReader(_config, _logger);
 
 			// Now parse the XML file for settings
 			if (xtr != null)
@@ -357,8 +357,8 @@ namespace SabreTools
 				foreach (string key in toscan.Keys)
 				{
 					// Parse the Dat if possible
-					Dat tempdat = new Dat();
-					DatTools.Parse(toscan[key], 0, 0, ref tempdat, _logger);
+					DatFile tempdat = new DatFile();
+					DatFile.Parse(toscan[key], 0, 0, ref tempdat, _logger);
 
 					// If the Dat wasn't empty, add the information
 					if (tempdat.Files.Count != 0)

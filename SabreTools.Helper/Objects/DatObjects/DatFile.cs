@@ -10,11 +10,464 @@ using System.Xml;
 
 namespace SabreTools.Helper
 {
-	/// <summary>
-	/// DAT manipulation tools that rely on Rom and related structs
-	/// </summary>
-	public class DatTools
+	public class DatFile : ICloneable
 	{
+		#region Private instance variables
+
+		// Data common to most DAT types
+		private string _fileName;
+		private string _name;
+		private string _description;
+		private string _rootDir;
+		private string _category;
+		private string _version;
+		private string _date;
+		private string _author;
+		private string _email;
+		private string _homepage;
+		private string _url;
+		private string _comment;
+		private string _header;
+		private string _type; // Generally only used for SuperDAT
+		private ForceMerging _forceMerging;
+		private ForceNodump _forceNodump;
+		private ForcePacking _forcePacking;
+		private OutputFormat _outputFormat;
+		private bool _mergeRoms;
+		private Dictionary<string, List<DatItem>> _files;
+
+		// Data specific to the Miss DAT type
+		private bool _useGame;
+		private string _prefix;
+		private string _postfix;
+		private bool _quotes;
+		private string _repExt;
+		private string _addExt;
+		private bool _remExt;
+		private bool _gameName;
+		private bool _romba;
+		private bool? _xsv; // true for tab-deliminated output, false for comma-deliminated output
+
+		// Statistical data related to the DAT
+		private long _romCount;
+		private long _diskCount;
+		private long _totalSize;
+		private long _crcCount;
+		private long _md5Count;
+		private long _sha1Count;
+		private long _nodumpCount;
+
+		#endregion
+
+		#region Publicly facing variables
+
+		// Data common to most DAT types
+		public string FileName
+		{
+			get { return _fileName; }
+			set { _fileName = value; }
+		}
+		public string Name
+		{
+			get { return _name; }
+			set { _name = value; }
+		}
+		public string Description
+		{
+			get { return _description; }
+			set { _description = value; }
+		}
+		public string RootDir
+		{
+			get { return _rootDir; }
+			set { _rootDir = value; }
+		}
+		public string Category
+		{
+			get { return _category; }
+			set { _category = value; }
+		}
+		public string Version
+		{
+			get { return _version; }
+			set { _version = value; }
+		}
+		public string Date
+		{
+			get { return _date; }
+			set { _date = value; }
+		}
+		public string Author
+		{
+			get { return _author; }
+			set { _author = value; }
+		}
+		public string Email
+		{
+			get { return _email; }
+			set { _email = value; }
+		}
+		public string Homepage
+		{
+			get { return _homepage; }
+			set { _homepage = value; }
+		}
+		public string Url
+		{
+			get { return _url; }
+			set { _url = value; }
+		}
+		public string Comment
+		{
+			get { return _comment; }
+			set { _comment = value; }
+		}
+		public string Header
+		{
+			get { return _header; }
+			set { _header = value; }
+		}
+		public string Type // Generally only used for SuperDAT
+		{
+			get { return _type; }
+			set { _type = value; }
+		}
+		public ForceMerging ForceMerging
+		{
+			get { return _forceMerging; }
+			set { _forceMerging = value; }
+		}
+		public ForceNodump ForceNodump
+		{
+			get { return _forceNodump; }
+			set { _forceNodump = value; }
+		}
+		public ForcePacking ForcePacking
+		{
+			get { return _forcePacking; }
+			set { _forcePacking = value; }
+		}
+		public OutputFormat OutputFormat
+		{
+			get { return _outputFormat; }
+			set { _outputFormat = value; }
+		}
+		public bool MergeRoms
+		{
+			get { return _mergeRoms; }
+			set { _mergeRoms = value; }
+		}
+		public Dictionary<string, List<DatItem>> Files
+		{
+			get
+			{
+				if (_files == null)
+				{
+					_files = new Dictionary<string, List<DatItem>>();
+				}
+				return _files;
+			}
+			set
+			{
+				_files = value;
+			}
+		}
+
+		// Data specific to the Miss DAT type
+		public bool UseGame
+		{
+			get { return _useGame; }
+			set { _useGame = value; }
+		}
+		public string Prefix
+		{
+			get { return _prefix; }
+			set { _prefix = value; }
+		}
+		public string Postfix
+		{
+			get { return _postfix; }
+			set { _postfix = value; }
+		}
+		public bool Quotes
+		{
+			get { return _quotes; }
+			set { _quotes = value; }
+		}
+		public string RepExt
+		{
+			get { return _repExt; }
+			set { _repExt = value; }
+		}
+		public string AddExt
+		{
+			get { return _addExt; }
+			set { _addExt = value; }
+		}
+		public bool RemExt
+		{
+			get { return _remExt; }
+			set { _remExt = value; }
+		}
+		public bool GameName
+		{
+			get { return _gameName; }
+			set { _gameName = value; }
+		}
+		public bool Romba
+		{
+			get { return _romba; }
+			set { _romba = value; }
+		}
+		public bool? XSV // true for tab-deliminated output, false for comma-deliminated output
+		{
+			get { return _xsv; }
+			set { _xsv = value; }
+		}
+
+		// Statistical data related to the DAT
+		public long RomCount
+		{
+			get { return _romCount; }
+			set { _romCount = value; }
+		}
+		public long DiskCount
+		{
+			get { return _diskCount; }
+			set { _diskCount = value; }
+		}
+		public long TotalSize
+		{
+			get { return _totalSize; }
+			set { _totalSize = value; }
+		}
+		public long CRCCount
+		{
+			get { return _crcCount; }
+			set { _crcCount = value; }
+		}
+		public long MD5Count
+		{
+			get { return _md5Count; }
+			set { _md5Count = value; }
+		}
+		public long SHA1Count
+		{
+			get { return _sha1Count; }
+			set { _sha1Count = value; }
+		}
+		public long NodumpCount
+		{
+			get { return _nodumpCount; }
+			set { _nodumpCount = value; }
+		}
+
+		#endregion
+
+		#region Constructors
+
+		/// <summary>
+		/// Create a default, empty Dat object
+		/// </summary>
+		public DatFile()
+		{
+			// Nothing needs to be done
+		}
+
+		/// <summary>
+		/// Create a new Dat object with the included information (standard Dats)
+		/// </summary>
+		/// <param name="filename">New filename</param>
+		/// <param name="name">New name</param>
+		/// <param name="description">New description</param>
+		/// <param name="rootdir">New rootdir</param>
+		/// <param name="category">New category</param>
+		/// <param name="version">New version</param>
+		/// <param name="date">New date</param>
+		/// <param name="author">New author</param>
+		/// <param name="email">New email</param>
+		/// <param name="homepage">New homepage</param>
+		/// <param name="url">New URL</param>
+		/// <param name="comment">New comment</param>
+		/// <param name="header">New header</param>
+		/// <param name="superdat">True to set SuperDAT type, false otherwise</param>
+		/// <param name="forcemerge">None, Split, Full</param>
+		/// <param name="forcend">None, Obsolete, Required, Ignore</param>
+		/// <param name="forcepack">None, Zip, Unzip</param>
+		/// <param name="outputFormat">Non-zero flag for output format, zero otherwise for default</param>
+		/// <param name="mergeRoms">True to dedupe the roms in the DAT, false otherwise (default)</param>
+		/// <param name="files">Dictionary of lists of DatItem objects</param>
+		public DatFile(string fileName, string name, string description, string rootDir, string category, string version, string date,
+			string author, string email, string homepage, string url, string comment, string header, string type, ForceMerging forceMerging,
+			ForceNodump forceNodump, ForcePacking forcePacking, OutputFormat outputFormat, bool mergeRoms, Dictionary<string, List<DatItem>> files)
+		{
+			_fileName = fileName;
+			_name = name;
+			_description = description;
+			_rootDir = rootDir;
+			_category = category;
+			_version = version;
+			_date = date;
+			_author = author;
+			_email = email;
+			_homepage = homepage;
+			_url = url;
+			_comment = comment;
+			_header = header;
+			_type = type;
+			_forceMerging = forceMerging;
+			_forceNodump = forceNodump;
+			_forcePacking = forcePacking;
+			_outputFormat = outputFormat;
+			_mergeRoms = mergeRoms;
+			_files = files;
+
+			_romCount = 0;
+			_diskCount = 0;
+			_totalSize = 0;
+			_crcCount = 0;
+			_md5Count = 0;
+			_sha1Count = 0;
+			_nodumpCount = 0;
+		}
+
+		/// <summary>
+		/// Create a new Dat object with the included information (missfile)
+		/// </summary>
+		/// <param name="filename">New filename</param>
+		/// <param name="name">New name</param>
+		/// <param name="description">New description</param>
+		/// <param name="outputFormat">Non-zero flag for output format, zero otherwise for default</param>
+		/// <param name="mergeRoms">True to dedupe the roms in the DAT, false otherwise (default)</param>
+		/// <param name="files">Dictionary of lists of DatItem objects</param>
+		/// <param name="useGame">True if games are to be used in output, false if roms are</param>
+		/// <param name="prefix">Generic prefix to be added to each line</param>
+		/// <param name="postfix">Generic postfix to be added to each line</param>
+		/// <param name="quotes">Add quotes to each item</param>
+		/// <param name="repExt">Replace all extensions with another</param>
+		/// <param name="addExt">Add an extension to all items</param>
+		/// <param name="remExt">Remove all extensions</param>
+		/// <param name="gameName">Add the dat name as a directory prefix</param>
+		/// <param name="romba">Output files in romba format</param>
+		/// <param name="xsv">True to output files in TSV format, false to output files in CSV format, null otherwise</param>
+		public DatFile(string fileName, string name, string description, OutputFormat outputFormat, bool mergeRoms,
+			Dictionary<string, List<DatItem>> files, bool useGame, string prefix, string postfix, bool quotes,
+			string repExt, string addExt, bool remExt, bool gameName, bool romba, bool? xsv)
+		{
+			_fileName = fileName;
+			_name = name;
+			_description = description;
+			_outputFormat = outputFormat;
+			_mergeRoms = mergeRoms;
+			_files = files;
+
+			_useGame = useGame;
+			_prefix = prefix;
+			_postfix = postfix;
+			_quotes = quotes;
+			_repExt = repExt;
+			_addExt = addExt;
+			_remExt = remExt;
+			_gameName = gameName;
+			_romba = romba;
+			_xsv = xsv;
+
+			_romCount = 0;
+			_diskCount = 0;
+			_totalSize = 0;
+			_crcCount = 0;
+			_md5Count = 0;
+			_sha1Count = 0;
+			_nodumpCount = 0;
+	}
+
+		#endregion
+
+		#region Cloning Methods
+
+		public object Clone()
+		{
+			return new DatFile
+			{
+				FileName = this.FileName,
+				Name = this.Name,
+				Description = this.Description,
+				RootDir = this.RootDir,
+				Category = this.Category,
+				Version = this.Version,
+				Date = this.Date,
+				Author = this.Author,
+				Email = this.Email,
+				Homepage = this.Homepage,
+				Url = this.Url,
+				Comment = this.Comment,
+				Header = this.Header,
+				Type = this.Type,
+				ForceMerging = this.ForceMerging,
+				ForceNodump = this.ForceNodump,
+				ForcePacking = this.ForcePacking,
+				OutputFormat = this.OutputFormat,
+				MergeRoms = this.MergeRoms,
+				Files = this.Files,
+				UseGame = this.UseGame,
+				Prefix = this.Prefix,
+				Postfix = this.Postfix,
+				Quotes = this.Quotes,
+				RepExt = this.RepExt,
+				AddExt = this.AddExt,
+				RemExt = this.RemExt,
+				GameName = this.GameName,
+				Romba = this.Romba,
+				XSV = this.XSV,
+				RomCount = this.RomCount,
+				DiskCount = this.DiskCount,
+				TotalSize = this.TotalSize,
+				CRCCount = this.CRCCount,
+				MD5Count = this.MD5Count,
+				SHA1Count = this.SHA1Count,
+				NodumpCount = this.NodumpCount,
+			};
+		}
+
+		public object CloneHeader()
+		{
+			return new DatFile
+			{
+				FileName = this.FileName,
+				Name = this.Name,
+				Description = this.Description,
+				RootDir = this.RootDir,
+				Category = this.Category,
+				Version = this.Version,
+				Date = this.Date,
+				Author = this.Author,
+				Email = this.Email,
+				Homepage = this.Homepage,
+				Url = this.Url,
+				Comment = this.Comment,
+				Header = this.Header,
+				Type = this.Type,
+				ForceMerging = this.ForceMerging,
+				ForceNodump = this.ForceNodump,
+				ForcePacking = this.ForcePacking,
+				OutputFormat = this.OutputFormat,
+				MergeRoms = this.MergeRoms,
+				Files = new Dictionary<string, List<DatItem>>(),
+				UseGame = this.UseGame,
+				Prefix = this.Prefix,
+				Postfix = this.Postfix,
+				Quotes = this.Quotes,
+				RepExt = this.RepExt,
+				AddExt = this.AddExt,
+				RemExt = this.RemExt,
+				GameName = this.GameName,
+				Romba = this.Romba,
+				XSV = this.XSV,
+			};
+		}
+
+		#endregion
+
 		#region DAT Parsing
 
 		/// <summary>
@@ -103,7 +556,7 @@ namespace SabreTools.Helper
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
-		public static void Parse(string filename, int sysid, int srcid, ref Dat datdata, Logger logger, bool keep = false, bool clean = false, bool softlist = false, bool keepext = false)
+		public static void Parse(string filename, int sysid, int srcid, ref DatFile datdata, Logger logger, bool keep = false, bool clean = false, bool softlist = false, bool keepext = false)
 		{
 			Parse(filename, sysid, srcid, ref datdata, null, null, null, -1, -1, -1, null, null, null, null, false, false, "", logger, keep, clean, softlist, keepext);
 		}
@@ -138,7 +591,7 @@ namespace SabreTools.Helper
 			string filename,
 			int sysid,
 			int srcid,
-			ref Dat datdata,
+			ref DatFile datdata,
 
 			// Rom filtering
 			string gamename,
@@ -229,7 +682,7 @@ namespace SabreTools.Helper
 			string filename,
 			int sysid,
 			int srcid,
-			ref Dat datdata,
+			ref DatFile datdata,
 
 			// Rom filtering
 			string gamename,
@@ -674,7 +1127,7 @@ namespace SabreTools.Helper
 			string filename,
 			int sysid,
 			int srcid,
-			ref Dat datdata,
+			ref DatFile datdata,
 
 			// Rom filtering
 			string gamename,
@@ -840,7 +1293,7 @@ namespace SabreTools.Helper
 			string filename,
 			int sysid,
 			int srcid,
-			ref Dat datdata,
+			ref DatFile datdata,
 
 			// Rom filtering
 			string gamename,
@@ -1574,7 +2027,7 @@ namespace SabreTools.Helper
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
-		private static void ParseAddHelper(DatItem item, ref Dat datdata, string gamename, string romname, string romtype, long sgt, long slt,
+		private static void ParseAddHelper(DatItem item, ref DatFile datdata, string gamename, string romname, string romtype, long sgt, long slt,
 			long seq, string crc, string md5, string sha1, bool? nodump, bool trim, bool single, string root, bool clean, Logger logger, out string key)
 		{
 			key = "";
@@ -1805,7 +2258,7 @@ namespace SabreTools.Helper
 			{
 				logger.User("A total of " + count + " file hashes will be written out to file");
 			}
-			
+
 			return sortable;
 		}
 
@@ -1843,7 +2296,7 @@ namespace SabreTools.Helper
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void Update(List<string> inputFileNames, Dat datdata, OutputFormat outputFormat, string outDir, bool merge,
+		public static void Update(List<string> inputFileNames, DatFile datdata, OutputFormat outputFormat, string outDir, bool merge,
 			DiffMode diff, bool? cascade, bool inplace, bool skip, bool bare, bool clean, bool softlist, string gamename, string romname, string romtype,
 			long sgt, long slt, long seq, string crc, string md5, string sha1, bool? nodump, bool trim, bool single, string root, int maxDegreeOfParallelism,
 			Logger logger)
@@ -1897,8 +2350,8 @@ namespace SabreTools.Helper
 				}
 
 				// Create a dictionary of all ROMs from the input DATs
-				Dat userData;
-				List<Dat> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, softlist,
+				DatFile userData;
+				List<DatFile> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, softlist,
 					outDir, datdata, out userData, gamename, romname, romtype, sgt, slt, seq,
 					crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, logger);
 
@@ -1924,53 +2377,53 @@ namespace SabreTools.Helper
 				Parallel.ForEach(inputFileNames,
 					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 					inputFileName =>
-				{
-					// Clean the input string
-					if (inputFileName != "")
 					{
-						inputFileName = Path.GetFullPath(inputFileName);
-					}
-
-					if (File.Exists(inputFileName))
-					{
-						Dat innerDatdata = (Dat)datdata.CloneHeader();
-						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-						Parse(inputFileName, 0, 0, ref innerDatdata, gamename, romname,
-							romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single,
-							root, logger, true, clean, softlist, keepext: (innerDatdata.XSV != null));
-
-						// If we have roms, output them
-						if (innerDatdata.Files.Count != 0)
+						// Clean the input string
+						if (inputFileName != "")
 						{
-							WriteDatfile(innerDatdata, (outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), logger, overwrite: (outDir != ""));
+							inputFileName = Path.GetFullPath(inputFileName);
 						}
-					}
-					else if (Directory.Exists(inputFileName))
-					{
-						inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
 
-						Parallel.ForEach(Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories),
-							new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-							file =>
+						if (File.Exists(inputFileName))
 						{
-							logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
-							Dat innerDatdata = (Dat)datdata.Clone();
-							innerDatdata.Files = null;
-							Parse(file, 0, 0, ref innerDatdata, gamename, romname, romtype, sgt,
-								slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, true, clean, keepext: (datdata.XSV != null));
+							DatFile innerDatdata = (DatFile)datdata.CloneHeader();
+							logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
+							Parse(inputFileName, 0, 0, ref innerDatdata, gamename, romname,
+								romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single,
+								root, logger, true, clean, softlist, keepext: (innerDatdata.XSV != null));
 
 							// If we have roms, output them
-							if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
+							if (innerDatdata.Files.Count != 0)
 							{
-								WriteDatfile(innerDatdata, (outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outDir != ""));
+								WriteDatfile(innerDatdata, (outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), logger, overwrite: (outDir != ""));
 							}
-						});
-					}
-					else
-					{
-						logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
-					}
-				});
+						}
+						else if (Directory.Exists(inputFileName))
+						{
+							inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
+
+							Parallel.ForEach(Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories),
+								new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+								file =>
+								{
+									logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
+									DatFile innerDatdata = (DatFile)datdata.Clone();
+									innerDatdata.Files = null;
+									Parse(file, 0, 0, ref innerDatdata, gamename, romname, romtype, sgt,
+									slt, seq, crc, md5, sha1, nodump, trim, single, root, logger, true, clean, keepext: (datdata.XSV != null));
+
+								// If we have roms, output them
+								if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
+									{
+										WriteDatfile(innerDatdata, (outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outDir != ""));
+									}
+								});
+						}
+						else
+						{
+							logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
+						}
+					});
 			}
 			return;
 		}
@@ -1995,11 +2448,11 @@ namespace SabreTools.Helper
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		/// <returns>List of DatData objects representing headers</returns>
-		private static List<Dat> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool softlist, string outDir,
-			Dat inputDat, out Dat userData, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
+		private static List<DatFile> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool softlist, string outDir,
+			DatFile inputDat, out DatFile userData, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
 			string md5, string sha1, bool? nodump, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
 		{
-			Dat[] datHeaders = new Dat[inputs.Count];
+			DatFile[] datHeaders = new DatFile[inputs.Count];
 			DateTime start = DateTime.Now;
 			logger.User("Processing individual DATs");
 
@@ -2007,24 +2460,24 @@ namespace SabreTools.Helper
 				inputs.Count,
 				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 				i =>
-			{
-				string input = inputs[i];
-				logger.User("Adding DAT: " + input.Split('¬')[0]);
-				datHeaders[i] = new Dat
 				{
-					OutputFormat = (inputDat.OutputFormat != 0 ? inputDat.OutputFormat: 0),
-					Files = new Dictionary<string, List<DatItem>>(),
-					MergeRoms = inputDat.MergeRoms,
-				};
+					string input = inputs[i];
+					logger.User("Adding DAT: " + input.Split('¬')[0]);
+					datHeaders[i] = new DatFile
+					{
+						OutputFormat = (inputDat.OutputFormat != 0 ? inputDat.OutputFormat : 0),
+						Files = new Dictionary<string, List<DatItem>>(),
+						MergeRoms = inputDat.MergeRoms,
+					};
 
-				Parse(input.Split('¬')[0], i, 0, ref datHeaders[i], gamename, romname, romtype, sgt, slt, seq,
-					crc, md5, sha1, nodump, trim, single, root, logger, true, clean, softlist);
-			});
+					Parse(input.Split('¬')[0], i, 0, ref datHeaders[i], gamename, romname, romtype, sgt, slt, seq,
+						crc, md5, sha1, nodump, trim, single, root, logger, true, clean, softlist);
+				});
 
 			logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			logger.User("Populating internal DAT");
-			userData = (Dat)inputDat.CloneHeader();
+			userData = (DatFile)inputDat.CloneHeader();
 			userData.Files = new Dictionary<string, List<DatItem>>();
 			for (int i = 0; i < inputs.Count; i++)
 			{
@@ -2057,21 +2510,21 @@ namespace SabreTools.Helper
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void DiffNoCascade(DiffMode diff, string outDir, Dat userData, List<string> inputs, Logger logger)
+		public static void DiffNoCascade(DiffMode diff, string outDir, DatFile userData, List<string> inputs, Logger logger)
 		{
 			DateTime start = DateTime.Now;
 			logger.User("Initializing all output DATs");
 
 			// Default vars for use
 			string post = "";
-			Dat outerDiffData = new Dat();
-			Dat dupeData = new Dat();
+			DatFile outerDiffData = new DatFile();
+			DatFile dupeData = new DatFile();
 
 			// Don't have External dupes
 			if ((diff & DiffMode.NoDupes) != 0)
 			{
 				post = " (No Duplicates)";
-				outerDiffData = (Dat)userData.CloneHeader();
+				outerDiffData = (DatFile)userData.CloneHeader();
 				outerDiffData.FileName += post;
 				outerDiffData.Name += post;
 				outerDiffData.Description += post;
@@ -2082,7 +2535,7 @@ namespace SabreTools.Helper
 			if ((diff & DiffMode.Dupes) != 0)
 			{
 				post = " (Duplicates)";
-				dupeData = (Dat)userData.CloneHeader();
+				dupeData = (DatFile)userData.CloneHeader();
 				dupeData.FileName += post;
 				dupeData.Name += post;
 				dupeData.Description += post;
@@ -2090,17 +2543,17 @@ namespace SabreTools.Helper
 			}
 
 			// Create a list of DatData objects representing individual output files
-			List<Dat> outDats = new List<Dat>();
+			List<DatFile> outDats = new List<DatFile>();
 
 			// Loop through each of the inputs and get or create a new DatData object
 			if ((diff & DiffMode.Individuals) != 0)
 			{
-				Dat[] outDatsArray = new Dat[inputs.Count];
+				DatFile[] outDatsArray = new DatFile[inputs.Count];
 
 				Parallel.For(0, inputs.Count, j =>
 				{
 					string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
-					Dat diffData = (Dat)userData.CloneHeader();
+					DatFile diffData = (DatFile)userData.CloneHeader();
 					diffData.FileName += innerpost;
 					diffData.Name += innerpost;
 					diffData.Description += innerpost;
@@ -2233,23 +2686,23 @@ namespace SabreTools.Helper
 		/// <param name="datHeaders">Dat headers used optionally</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void DiffCascade(string outDir, bool inplace, Dat userData, List<string> inputs, List<Dat> datHeaders, bool skip, Logger logger)
+		public static void DiffCascade(string outDir, bool inplace, DatFile userData, List<string> inputs, List<DatFile> datHeaders, bool skip, Logger logger)
 		{
 			string post = "";
 
 			// Create a list of DatData objects representing output files
-			List<Dat> outDats = new List<Dat>();
+			List<DatFile> outDats = new List<DatFile>();
 
 			// Loop through each of the inputs and get or create a new DatData object
 			DateTime start = DateTime.Now;
 			logger.User("Initializing all output DATs");
 
-			Dat[] outDatsArray = new Dat[inputs.Count];
+			DatFile[] outDatsArray = new DatFile[inputs.Count];
 
 			Parallel.For(0, inputs.Count, j =>
 			{
 				string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
-				Dat diffData;
+				DatFile diffData;
 
 				// If we're in inplace mode, take the appropriate DatData object already stored
 				if (inplace || !String.IsNullOrEmpty(outDir))
@@ -2258,7 +2711,7 @@ namespace SabreTools.Helper
 				}
 				else
 				{
-					diffData = (Dat)userData.CloneHeader();
+					diffData = (DatFile)userData.CloneHeader();
 					diffData.FileName += post;
 					diffData.Name += post;
 					diffData.Description += post;
@@ -2278,7 +2731,7 @@ namespace SabreTools.Helper
 
 			foreach (string key in keys)
 			{
-				List< DatItem> roms = DatItem.Merge(userData.Files[key], logger);
+				List<DatItem> roms = DatItem.Merge(userData.Files[key], logger);
 
 				if (roms != null && roms.Count > 0)
 				{
@@ -2332,7 +2785,7 @@ namespace SabreTools.Helper
 		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void MergeNoDiff(string outDir, Dat userData, List<string> inputs, List<Dat> datHeaders, Logger logger)
+		public static void MergeNoDiff(string outDir, DatFile userData, List<string> inputs, List<DatFile> datHeaders, Logger logger)
 		{
 			// If we're in SuperDAT mode, prefix all games with their respective DATs
 			if (userData.Type == "SuperDAT")
@@ -2384,7 +2837,7 @@ namespace SabreTools.Helper
 		/// The following features have been requested for file output:
 		/// - Have the ability to strip special (non-ASCII) characters from rom information
 		/// </remarks>
-		public static bool WriteDatfile(Dat datdata, string outDir, Logger logger, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
+		public static bool WriteDatfile(DatFile datdata, string outDir, Logger logger, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
 		{
 			// If there's nothing there, abort
 			if (datdata.Files == null || datdata.Files.Count == 0)
@@ -2571,7 +3024,7 @@ namespace SabreTools.Helper
 		/// <param name="datdata">DatData object representing DAT information</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		public static bool WriteHeader(StreamWriter sw, OutputFormat outputFormat, Dat datdata, Logger logger)
+		public static bool WriteHeader(StreamWriter sw, OutputFormat outputFormat, DatFile datdata, Logger logger)
 		{
 			try
 			{
@@ -2668,7 +3121,7 @@ namespace SabreTools.Helper
 							(!String.IsNullOrEmpty(datdata.Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(datdata.Comment) + "</comment>\n" : "") +
 							(!String.IsNullOrEmpty(datdata.Type) ? "\t\t<type>" + HttpUtility.HtmlEncode(datdata.Type) + "</type>\n" : "") +
 							(datdata.ForcePacking != ForcePacking.None || datdata.ForceMerging != ForceMerging.None || datdata.ForceNodump != ForceNodump.None ?
-								"\t\t<clrmamepro" + 
+								"\t\t<clrmamepro" +
 									(datdata.ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
 									(datdata.ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
 									(datdata.ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
@@ -2852,7 +3305,7 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		public static bool WriteRomData(StreamWriter sw, OutputFormat outputFormat, DatItem rom, string lastgame, Dat datdata, int depth, Logger logger, bool ignoreblanks = false)
+		public static bool WriteRomData(StreamWriter sw, OutputFormat outputFormat, DatItem rom, string lastgame, DatFile datdata, int depth, Logger logger, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
@@ -2914,7 +3367,7 @@ namespace SabreTools.Helper
 									+ " )\n";
 								break;
 						}
-						
+
 						break;
 					case OutputFormat.MissFile:
 						// Missfile should only output Rom and Disk
@@ -2998,7 +3451,7 @@ namespace SabreTools.Helper
 							{
 								string inline = "\"" + datdata.FileName + "\""
 									+ separator + "\"" + datdata.Name + "\""
-									+ separator + "\"" + datdata.Description+ "\""
+									+ separator + "\"" + datdata.Description + "\""
 									+ separator + "\"" + rom.MachineName + "\""
 									+ separator + "\"" + rom.MachineDescription + "\""
 									+ separator + "\"rom\""
@@ -3110,7 +3563,7 @@ namespace SabreTools.Helper
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
 							"¬¬¬¬¬\n";
 						}
-						
+
 						break;
 					case OutputFormat.SabreDat:
 						string prefix = "";
@@ -3241,7 +3694,7 @@ namespace SabreTools.Helper
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		public static bool WriteFooter(StreamWriter sw, OutputFormat outputFormat, Dat datdata, int depth, Logger logger)
+		public static bool WriteFooter(StreamWriter sw, OutputFormat outputFormat, DatFile datdata, int depth, Logger logger)
 		{
 			try
 			{
@@ -3337,11 +3790,11 @@ namespace SabreTools.Helper
 			}
 
 			// Get the file data to be split
-			Dat datdata = new Dat();
-			Parse(filename, 0, 0, ref datdata, logger, softlist:true);
+			DatFile datdata = new DatFile();
+			Parse(filename, 0, 0, ref datdata, logger, softlist: true);
 
 			// Set all of the appropriate outputs for each of the subsets
-			Dat datdataA = new Dat
+			DatFile datdataA = new DatFile
 			{
 				FileName = datdata.FileName + " (" + newExtAString + ")",
 				Name = datdata.Name + " (" + newExtAString + ")",
@@ -3357,7 +3810,7 @@ namespace SabreTools.Helper
 				Files = new Dictionary<string, List<DatItem>>(),
 				OutputFormat = outputFormat,
 			};
-			Dat datdataB = new Dat
+			DatFile datdataB = new DatFile
 			{
 				FileName = datdata.FileName + " (" + newExtBString + ")",
 				Name = datdata.Name + " (" + newExtBString + ")",
@@ -3475,12 +3928,12 @@ namespace SabreTools.Helper
 			}
 
 			// Get the file data to be split
-			Dat datdata = new Dat();
-			Parse(filename, 0, 0, ref datdata, logger, true, softlist:true);
+			DatFile datdata = new DatFile();
+			Parse(filename, 0, 0, ref datdata, logger, true, softlist: true);
 
 			// Create each of the respective output DATs
 			logger.User("Creating and populating new DATs");
-			Dat nodump = new Dat
+			DatFile nodump = new DatFile
 			{
 				FileName = datdata.FileName + " (Nodump)",
 				Name = datdata.Name + " (Nodump)",
@@ -3502,7 +3955,7 @@ namespace SabreTools.Helper
 				MergeRoms = datdata.MergeRoms,
 				Files = new Dictionary<string, List<DatItem>>(),
 			};
-			Dat sha1 = new Dat
+			DatFile sha1 = new DatFile
 			{
 				FileName = datdata.FileName + " (SHA-1)",
 				Name = datdata.Name + " (SHA-1)",
@@ -3524,7 +3977,7 @@ namespace SabreTools.Helper
 				MergeRoms = datdata.MergeRoms,
 				Files = new Dictionary<string, List<DatItem>>(),
 			};
-			Dat md5 = new Dat
+			DatFile md5 = new DatFile
 			{
 				FileName = datdata.FileName + " (MD5)",
 				Name = datdata.Name + " (MD5)",
@@ -3546,7 +3999,7 @@ namespace SabreTools.Helper
 				MergeRoms = datdata.MergeRoms,
 				Files = new Dictionary<string, List<DatItem>>(),
 			};
-			Dat crc = new Dat
+			DatFile crc = new DatFile
 			{
 				FileName = datdata.FileName + " (CRC)",
 				Name = datdata.Name + " (CRC)",
@@ -3569,7 +4022,7 @@ namespace SabreTools.Helper
 				Files = new Dictionary<string, List<DatItem>>(),
 			};
 
-			Dat other = new Dat
+			DatFile other = new DatFile
 			{
 				FileName = datdata.FileName + " (Other)",
 				Name = datdata.Name + " (Other)",
@@ -3735,12 +4188,12 @@ namespace SabreTools.Helper
 			}
 
 			// Get the file data to be split
-			Dat datdata = new Dat();
-			Parse(filename, 0, 0, ref datdata, logger, true, softlist:true);
+			DatFile datdata = new DatFile();
+			Parse(filename, 0, 0, ref datdata, logger, true, softlist: true);
 
 			// Create each of the respective output DATs
 			logger.User("Creating and populating new DATs");
-			Dat romdat = new Dat
+			DatFile romdat = new DatFile
 			{
 				FileName = datdata.FileName + " (ROM)",
 				Name = datdata.Name + " (ROM)",
@@ -3762,7 +4215,7 @@ namespace SabreTools.Helper
 				MergeRoms = datdata.MergeRoms,
 				Files = new Dictionary<string, List<DatItem>>(),
 			};
-			Dat diskdat = new Dat
+			DatFile diskdat = new DatFile
 			{
 				FileName = datdata.FileName + " (Disk)",
 				Name = datdata.Name + " (Disk)",
@@ -3784,7 +4237,7 @@ namespace SabreTools.Helper
 				MergeRoms = datdata.MergeRoms,
 				Files = new Dictionary<string, List<DatItem>>(),
 			};
-			Dat sampledat = new Dat
+			DatFile sampledat = new DatFile
 			{
 				FileName = datdata.FileName + " (Sample)",
 				Name = datdata.Name + " (Sample)",
