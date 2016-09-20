@@ -2243,16 +2243,16 @@ namespace SabreTools.Helper
 					roms = DatItem.Merge(roms, logger);
 				}
 
-				foreach (Rom rom in roms)
+				foreach (DatItem rom in roms)
 				{
 					count++;
 					string newkey = (norename ? ""
-										: rom.SystemID.ToString().PadLeft(10, '0')
-											+ "-"
-											+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
-									+ (String.IsNullOrEmpty(rom.MachineName)
-											? "Default"
-											: rom.MachineName.ToLowerInvariant());
+							: rom.SystemID.ToString().PadLeft(10, '0')
+								+ "-"
+								+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
+						+ (String.IsNullOrEmpty(rom.MachineName)
+								? "Default"
+								: rom.MachineName.ToLowerInvariant());
 					if (sortable.ContainsKey(newkey))
 					{
 						sortable[newkey].Add(rom);
