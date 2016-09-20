@@ -1123,6 +1123,17 @@ namespace SabreTools.Helper
 										break;
 								}
 								break;
+							case "forcepacking":
+								switch (itemval)
+								{
+									case "zip":
+										datdata.ForcePacking = ForcePacking.Zip;
+										break;
+									case "unzip":
+										datdata.ForcePacking = ForcePacking.Unzip;
+										break;
+								}
+								break;
 						}
 					}
 				}
