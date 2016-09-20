@@ -673,7 +673,10 @@ namespace SabreTools.Helper
 						// Then output the headered rom (renamed)
 						Rom newfound = found;
 						newfound.Name = Path.GetFileNameWithoutExtension(newfound.Name) + " (" + rom.CRC + ")" + Path.GetExtension(newfound.Name);
-						newfound = rom;
+						newfound.Size = rom.Size;
+						newfound.CRC = rom.CRC;
+						newfound.MD5 = rom.MD5;
+						newfound.SHA1 = rom.SHA1;
 
 						// Add rom to the matched list
 						key = newfound.Size + "-" + newfound.CRC;
