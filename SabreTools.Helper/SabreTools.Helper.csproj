@@ -101,20 +101,20 @@
     <Compile Include="External\Zlib\ZlibConstants.cs" />
     <Compile Include="External\Zlib\ZlibStream.cs" />
     <Compile Include="Objects\DATFromDir.cs" />
-    <Compile Include="Objects\DatObjects\Archive.cs" />
-    <Compile Include="Objects\DatObjects\BiosSet.cs" />
-    <Compile Include="Objects\DatObjects\DatFile.cs" />
-    <Compile Include="Objects\DatObjects\DatItem.cs" />
-    <Compile Include="Objects\DatObjects\Disk.cs" />
-    <Compile Include="Objects\DatObjects\Release.cs" />
-    <Compile Include="Objects\DatObjects\Sample.cs" />
+    <Compile Include="Objects\Dat\Archive.cs" />
+    <Compile Include="Objects\Dat\BiosSet.cs" />
+    <Compile Include="Objects\Dat\DatFile.cs" />
+    <Compile Include="Objects\Dat\DatItem.cs" />
+    <Compile Include="Objects\Dat\Disk.cs" />
+    <Compile Include="Objects\Dat\Release.cs" />
+    <Compile Include="Objects\Dat\Sample.cs" />
     <Compile Include="Objects\GenerateTwo.cs" />
     <Compile Include="Objects\Headerer.cs" />
     <Compile Include="Objects\ImportTwo.cs" />
-    <Compile Include="Objects\DatObjects\Rom.cs" />
+    <Compile Include="Objects\Dat\Rom.cs" />
     <Compile Include="Objects\SimpleSort.cs" />
-    <Compile Include="Objects\ZipFileEntry.cs" />
-    <Compile Include="Objects\ZipFile.cs" />
+    <Compile Include="Objects\Archive\ZipFileEntry.cs" />
+    <Compile Include="Objects\Archive\ZipFile.cs" />
     <Compile Include="Resources\Resources.de-DE.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
