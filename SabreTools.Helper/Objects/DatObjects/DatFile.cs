@@ -3630,9 +3630,9 @@ namespace SabreTools.Helper
 							case ItemType.Rom:
 								state += "<file type=\"rom\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
 									+ (((Rom)rom).Nodump ? prefix + "/>\n" + prefix + "\t<flags>\n" +
 										prefix + "\t\t<flag name=\"status\" value=\"nodump\"/>\n" +
@@ -3680,9 +3680,9 @@ namespace SabreTools.Helper
 							case ItemType.Rom:
 								state += "\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
 									+ (((Rom)rom).Nodump ? " status=\"nodump\"" : "")
 									+ "/>\n";
