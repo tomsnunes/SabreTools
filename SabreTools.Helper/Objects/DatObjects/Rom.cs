@@ -145,7 +145,7 @@ namespace SabreTools.Helper
 			bool dupefound = false;
 
 			// If we don't have a rom, return false
-			if (_itemType == other.Type)
+			if (_itemType != other.Type)
 			{
 				return dupefound;
 			}

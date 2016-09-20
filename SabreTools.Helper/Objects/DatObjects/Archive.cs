@@ -73,13 +73,13 @@
 
 		public override bool Equals(DatItem other)
 		{
-			// If we don't have a rom, return false
-			if (_itemType == other.Type)
+			// If we don't have an archive, return false
+			if (_itemType != other.Type)
 			{
 				return false;
 			}
 
-			// Otherwise, treat it as a rom
+			// Otherwise, treat it as an archive
 			Archive newOther = (Archive)other;
 
 			// If the archive information matches
