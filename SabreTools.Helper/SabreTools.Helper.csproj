@@ -108,10 +108,8 @@
     <Compile Include="Objects\DatObjects\Disk.cs" />
     <Compile Include="Objects\DatObjects\Release.cs" />
     <Compile Include="Objects\DatObjects\Sample.cs" />
-    <Compile Include="Objects\Generate.cs" />
     <Compile Include="Objects\GenerateTwo.cs" />
     <Compile Include="Objects\Headerer.cs" />
-    <Compile Include="Objects\Import.cs" />
     <Compile Include="Objects\ImportTwo.cs" />
     <Compile Include="Objects\DatObjects\Rom.cs" />
     <Compile Include="Objects\SimpleSort.cs" />
