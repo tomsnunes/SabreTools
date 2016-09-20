@@ -2249,6 +2249,14 @@ namespace SabreTools.Helper
 			foreach (string key in dict.Keys)
 			{
 				List<DatItem> roms = dict[key];
+
+				// If we somehow have a null list, just skip it
+				if (roms == null)
+				{
+					logger.Warning("Blank list found for key: " + key);
+					continue;
+				}
+
 				if (mergeroms)
 				{
 					roms = DatItem.Merge(roms, logger);
