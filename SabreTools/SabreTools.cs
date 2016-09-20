@@ -36,7 +36,7 @@ namespace SabreTools
 		public static void Main(string[] args)
 		{
 			// Perform initial setup and verification
-			_logger = new Logger(true, "database.log");
+			_logger = new Logger(true, "sabretools.log");
 			_logger.Start();
 
 			// If output is being redirected, don't allow clear screens

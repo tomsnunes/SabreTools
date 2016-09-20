@@ -14,7 +14,7 @@ namespace SabreTools
 		/// </summary>
 		private static void Setup()
 		{
-			Build.Start("DATabase");
+			Build.Start("SabreTools");
 
 			// Perform initial database and folder setup
 			if (!Directory.Exists(_datroot))
