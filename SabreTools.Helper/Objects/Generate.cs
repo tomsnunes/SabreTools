@@ -9,7 +9,7 @@ namespace SabreTools
 	/// <summary>
 	/// Generate a DAT from the data in the database
 	/// </summary>
-	class Generate : IGenerate
+	public class Generate : IGenerate
 	{
 		// Private instance variables
 		private string _systems;
@@ -153,7 +153,7 @@ namespace SabreTools
 			}
 
 			// Retrieve the list of processed roms
-			Dictionary<string, List<Rom>> dict = ProcessRoms();
+			Dictionary<string, List<DatItem>> dict = ProcessRoms();
 
 			// If the output is null, nothing was found so return false
 			if (dict.Count == 0)
@@ -186,9 +186,9 @@ namespace SabreTools
 		/// Preprocess the rom data that is to be included in the outputted DAT
 		/// </summary>
 		/// <returns>A List of Rom objects containing all information about the files</returns>
-		public Dictionary<string, List<Rom>> ProcessRoms()
+		public Dictionary<string, List<DatItem>> ProcessRoms()
 		{
-			Dictionary<string, List<Rom>> roms = new Dictionary<string, List<Rom>>();
+			Dictionary<string, List<DatItem>> roms = new Dictionary<string, List<DatItem>>();
 
 			// Check if we have listed sources or systems
 			bool sysmerged = (_systems == "" || _systems.Split(',').Length > 1);
@@ -236,47 +236,42 @@ JOIN checksums
 						// Retrieve and process the roms for merging
 						while (sldr.Read())
 						{
-							Rom temp = new Rom
+							DatItem temp;
+							string key = "";
+							switch (sldr.GetString(8).ToLowerInvariant())
 							{
-								Name = sldr.GetString(7),
-								Type = (sldr.GetString(8) == "disk" ? ItemType.Disk : ItemType.Rom),
-								Machine = new Machine
-								{
-									Name = sldr.GetString(6),
-									Manufacturer = sldr.GetString(0),
-								},
-								Metadata = new SourceMetadata
-								{
-									System = sldr.GetString(1),
-									SystemID = sldr.GetInt32(2),
-									Source = sldr.GetString(3),
-									SourceID = sldr.GetInt32(5),
-								},
-								HashData = new Hash
-								{
-									Size = sldr.GetInt64(9),
-									CRC = sldr.GetString(10),
-									MD5 = sldr.GetString(11),
-									SHA1 = sldr.GetString(12),
-								},
-							};
+								case "disk":
+									temp = new Disk(sldr.GetString(7), sldr.GetString(11), sldr.GetString(12), false, sldr.GetString(13), sldr.GetString(6),
+										sldr.GetString(6), null, sldr.GetString(0), null, null, null, null, false, null, null, sldr.GetInt32(2),
+										sldr.GetString(1), sldr.GetInt32(5), sldr.GetString(3));
+
+									key = ((Disk)temp).HashData.Size + "-" + ((Disk)temp).HashData.CRC;
+									break;
+								case "rom":
+								default:
+									temp = new Rom(sldr.GetString(7), sldr.GetInt64(9), sldr.GetString(10), sldr.GetString(11), sldr.GetString(12), false,
+										sldr.GetString(13), sldr.GetString(6), null, sldr.GetString(6), null, sldr.GetString(0), null, null, null, null, false,
+										null, null, sldr.GetInt32(2), sldr.GetString(1), sldr.GetInt32(5), sldr.GetString(3));
+
+									key = ((Disk)temp).HashData.Size + "-" + ((Disk)temp).HashData.CRC;
+									break;
+							}
 
 							// Rename the game associated if it's still valid and we allow renames
 							if (merged && !_norename)
 							{
-								temp.Machine.Name = temp.Machine.Name +
-									(sysmerged ? " [" + temp.Machine.Manufacturer + " - " + temp.Metadata.System + "]" : "") +
-									(srcmerged ? " [" + temp.Metadata.Source + "]" : "");
+								temp.MachineName = temp.MachineName +
+									(sysmerged ? " [" + temp.Manufacturer + " - " + temp.System + "]" : "") +
+									(srcmerged ? " [" + temp.Source + "]" : "");
 							}
 
-							string key = temp.HashData.Size + "-" + temp.HashData.CRC;
 							if (roms.ContainsKey(key))
 							{
 								roms[key].Add(temp);
 							}
 							else
 							{
-								List<Rom> templist = new List<Rom>();
+								List<DatItem> templist = new List<DatItem>();
 								templist.Add(temp);
 								roms.Add(key, templist);
 							}
@@ -290,7 +285,7 @@ JOIN checksums
 			{
 				foreach (string key in roms.Keys)
 				{
-					roms[key] = RomTools.Merge(roms[key], _logger);
+					roms[key] = DatItem.Merge(roms[key], _logger);
 				}
 			}
 			// END COMMENT

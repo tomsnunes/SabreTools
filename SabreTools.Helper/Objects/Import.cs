@@ -370,27 +370,27 @@ namespace SabreTools
 			DatTools.Parse(_filepath, sysid, srcid, ref datdata, _logger);
 
 			// Sort inputted roms into games
-			SortedDictionary<string, List<Rom>> sortable = new SortedDictionary<string, List<Rom>>();
+			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
-			foreach (List<Rom> roms in datdata.Files.Values)
+			foreach (List<DatItem> roms in datdata.Files.Values)
 			{
-				List<Rom> newroms = roms;
+				List<DatItem> newroms = roms;
 				if (datdata.MergeRoms)
 				{
-					newroms = RomTools.Merge(newroms, _logger);
+					newroms = DatItem.Merge(newroms, _logger);
 				}
 
 				foreach (Rom rom in newroms)
 				{
 					count++;
-					string key = rom.Metadata.SystemID.ToString().PadLeft(10, '0') + "-" + rom.Metadata.SourceID.ToString().PadLeft(10, '0') + "-" + rom.Machine.Name.ToLowerInvariant();
+					string key = rom.SystemID.ToString().PadLeft(10, '0') + "-" + rom.SourceID.ToString().PadLeft(10, '0') + "-" + rom.MachineName.ToLowerInvariant();
 					if (sortable.ContainsKey(key))
 					{
 						sortable[key].Add(rom);
 					}
 					else
 					{
-						List<Rom> temp = new List<Rom>();
+						List<DatItem> temp = new List<DatItem>();
 						temp.Add(rom);
 						sortable.Add(key, temp);
 					}
@@ -400,8 +400,8 @@ namespace SabreTools
 			// Loop over all roms, checking for adds
 			foreach (string key in sortable.Keys)
 			{
-				List<Rom> roms = sortable[key];
-				RomTools.Sort(ref roms, true);
+				List<DatItem> roms = sortable[key];
+				DatItem.Sort(ref roms, true);
 
 				long gameid = -1;
 				using (SqliteConnection dbc = new SqliteConnection(_connectionString))
@@ -409,7 +409,7 @@ namespace SabreTools
 					dbc.Open();
 
 					// For each game, check for a new ID
-					gameid = AddGame(sysid, roms[0].Machine.Name, srcid, dbc);
+					gameid = AddGame(sysid, roms[0].MachineName, srcid, dbc);
 
 					foreach (Rom rom in roms)
 					{
@@ -573,14 +573,14 @@ COMMIT;";
 			// WoD gets rid of anything past the first "(" or "[" as the name, we will do the same
 			string stripPattern = @"(([[(].*[\)\]] )?([^([]+))";
 			Regex stripRegex = new Regex(stripPattern);
-			Match stripMatch = stripRegex.Match(rom.Machine.Name);
-			rom.Machine.Name = stripMatch.Groups[1].Value;
+			Match stripMatch = stripRegex.Match(rom.MachineName);
+			rom.MachineName = stripMatch.Groups[1].Value;
 
 			// Run the name through the filters to make sure that it's correct
-			rom.Machine.Name = Style.NormalizeChars(rom.Machine.Name);
-			rom.Machine.Name = Style.RussianToLatin(rom.Machine.Name);
-			rom.Machine.Name = Style.SearchPattern(rom.Machine.Name);
-			rom.Machine.Name = rom.Machine.Name.Trim();
+			rom.MachineName = Style.NormalizeChars(rom.MachineName);
+			rom.MachineName = Style.RussianToLatin(rom.MachineName);
+			rom.MachineName = Style.SearchPattern(rom.MachineName);
+			rom.MachineName = rom.MachineName.Trim();
 
 			// Process the rom name
 
@@ -629,11 +629,11 @@ COMMIT;";
 			query = @"BEGIN;
 INSERT OR IGNORE INTO hashdata (hashid, key, value) VALUES " +
 	"(" + hashid + ", 'name', '" + rom.Name.Replace("'", "''") + "'), " +
-	"(" + hashid + ", 'game', '" + rom.Machine.Name.Replace("'", "''") + "'), " +
+	"(" + hashid + ", 'game', '" + rom.MachineName.Replace("'", "''") + "'), " +
 	"(" + hashid + ", 'type', '" + rom.Type + "'), " +
 	"(" + hashid + ", 'lastupdated', '" + date + @"');
-INSERT OR IGNORE INTO gamesystem (game, systemid) VALUES ('" + rom.Machine.Name.Replace("'", "''") + "', " + sysid + @");
-INSERT OR IGNORE INTO gamesource (game, sourceid) VALUES ('" + rom.Machine.Name.Replace("'", "''") + "', " + srcid + @");
+INSERT OR IGNORE INTO gamesystem (game, systemid) VALUES ('" + rom.MachineName.Replace("'", "''") + "', " + sysid + @");
+INSERT OR IGNORE INTO gamesource (game, sourceid) VALUES ('" + rom.MachineName.Replace("'", "''") + "', " + srcid + @");
 COMMIT;";
 
 			using (SqliteCommand slc = new SqliteCommand(query, dbc))

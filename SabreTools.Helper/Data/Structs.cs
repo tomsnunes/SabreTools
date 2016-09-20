@@ -192,116 +192,6 @@ namespace SabreTools.Helper
 	}
 
 	/// <summary>
-	/// Intermediate struct for holding and processing rom data
-	/// </summary>
-	public struct Rom : IComparable, IEquatable<Rom>
-	{
-		public Machine Machine;
-		public string Name;
-		public ItemType Type;
-		public Hash HashData;
-		public DupeType Dupe;
-		public bool Nodump;
-		public string Date;
-		public SourceMetadata Metadata;
-
-		// Non rom or disk
-		public string Region;
-		public string Language;
-		public bool? Default;
-		public string Description;
-
-		public int CompareTo(object obj)
-		{
-			int ret = 0;
-
-			try
-			{
-				Rom comp = (Rom)obj;
-
-				if (this.Machine.Name == comp.Machine.Name)
-				{
-					if (this.Name == comp.Name)
-					{
-						ret = (this.Equals(comp) ? 0 : 1);
-					}
-					ret = String.Compare(this.Name, comp.Name);
-				}
-				ret = String.Compare(this.Machine.Name, comp.Machine.Name);
-			}
-			catch
-			{
-				ret = 1;
-			}
-
-			return ret;
-		}
-
-		public bool Equals(Rom other)
-		{
-			bool dupefound = false;
-
-			// If either is a nodump, it's never a match
-			if (this.Nodump || other.Nodump)
-			{
-				return dupefound;
-			}
-
-			if (this.Type == ItemType.Rom && other.Type == ItemType.Rom)
-			{
-				dupefound = this.HashData.Equals(other.HashData, false);
-			}
-			else if (this.Type == ItemType.Disk && other.Type == ItemType.Disk)
-			{
-				dupefound = this.HashData.Equals(other.HashData, true);
-			}
-
-			return dupefound;
-		}
-	}
-
-	/// <summary>
-	/// Intermediate metadata kept with a RomData object representing source information
-	/// </summary>
-	public struct SourceMetadata
-	{
-		public int SystemID;
-		public string System;
-		public int SourceID;
-		public string Source;
-	}
-
-	/// <summary>
-	/// Intermediate struct for holding and processing Rom/Machine data
-	/// </summary>
-	public struct Machine : IEquatable<Machine>
-	{
-		public string Name;
-		public string Comment;
-		public string Description;
-		public string Year;
-		public string Manufacturer;
-		public string RomOf;
-		public string CloneOf;
-		public string SampleOf;
-		public string SourceFile;
-		public bool IsBios;
-		public string Board;
-		public string RebuildTo;
-		public bool TorrentZipped;
-
-		public bool Equals(Machine other)
-		{
-			if (this.Name == other.Name)
-			{
-				return true;
-			}
-
-			return false;
-		}
-	}
-
-	/// <summary>
 	/// Intermediate struct for holding DAT information
 	/// </summary>
 	public struct Dat : ICloneable
@@ -326,7 +216,7 @@ namespace SabreTools.Helper
 		public ForcePacking ForcePacking;
 		public OutputFormat OutputFormat;
 		public bool MergeRoms;
-		public Dictionary<string, List<Rom>> Files;
+		public Dictionary<string, List<DatItem>> Files;
 
 		// Data specific to the Miss DAT type
 		public bool UseGame;
@@ -416,7 +306,7 @@ namespace SabreTools.Helper
 				ForcePacking = this.ForcePacking,
 				OutputFormat = this.OutputFormat,
 				MergeRoms = this.MergeRoms,
-				Files = new Dictionary<string, List<Rom>>(),
+				Files = new Dictionary<string, List<DatItem>>(),
 				UseGame = this.UseGame,
 				Prefix = this.Prefix,
 				Postfix = this.Postfix,

@@ -140,7 +140,7 @@ namespace SabreTools
 				OutputFormat = (outputFormat == 0 ? OutputFormat.Xml : outputFormat),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
-				Files = new Dictionary<string, List<Rom>>(),
+				Files = new Dictionary<string, List<DatItem>>(),
 			};
 
 			// For each input directory, create a DAT
@@ -150,7 +150,7 @@ namespace SabreTools
 				{
 					// Clone the base Dat for information
 					Dat datdata = (Dat)basedat.Clone();
-					datdata.Files = new Dictionary<string, List<Rom>>();
+					datdata.Files = new Dictionary<string, List<DatItem>>();
 
 					string basePath = Path.GetFullPath(path);
 					DATFromDir dfd = new DATFromDir(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, maxDegreeOfParallelism, _logger);

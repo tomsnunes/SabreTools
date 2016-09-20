@@ -101,11 +101,18 @@
     <Compile Include="External\Zlib\ZlibConstants.cs" />
     <Compile Include="External\Zlib\ZlibStream.cs" />
     <Compile Include="Objects\DATFromDir.cs" />
+    <Compile Include="Objects\DatObjects\Archive.cs" />
+    <Compile Include="Objects\DatObjects\BiosSet.cs" />
+    <Compile Include="Objects\DatObjects\DatItem.cs" />
+    <Compile Include="Objects\DatObjects\Disk.cs" />
+    <Compile Include="Objects\DatObjects\Release.cs" />
+    <Compile Include="Objects\DatObjects\Sample.cs" />
     <Compile Include="Objects\Generate.cs" />
     <Compile Include="Objects\GenerateTwo.cs" />
     <Compile Include="Objects\Headerer.cs" />
     <Compile Include="Objects\Import.cs" />
     <Compile Include="Objects\ImportTwo.cs" />
+    <Compile Include="Objects\DatObjects\Rom.cs" />
     <Compile Include="Objects\SimpleSort.cs" />
     <Compile Include="Objects\ZipFileEntry.cs" />
     <Compile Include="Objects\ZipFile.cs" />
@@ -130,7 +137,6 @@
       <DependentUpon>Resources.fr-FR.resx</DependentUpon>
     </Compile>
     <Compile Include="Skippers\Skippers.cs" />
-    <Compile Include="Tools\DatToolsHash.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\DBTools.cs" />
     <Compile Include="Data\Enums.cs" />
@@ -142,8 +148,6 @@
     <Compile Include="Tools\DatTools.cs" />
     <Compile Include="Data\Structs.cs" />
     <Compile Include="Tools\FileToolsHash.cs" />
-    <Compile Include="Tools\RomTools.cs" />
-    <Compile Include="Tools\RomToolsHash.cs" />
     <Compile Include="Objects\Stats.cs" />
     <Compile Include="Tools\Style.cs" />
     <Compile Include="Data\Build.cs" />

@@ -63,7 +63,7 @@ namespace SabreTools.Helper
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, roms[0].Machine.Name + ".zip");
+			string archiveFileName = Path.Combine(outDir, roms[0].MachineName + ".zip");
 
 			// First, open the archive
 			ZipArchive outarchive = null;
@@ -172,7 +172,7 @@ namespace SabreTools.Helper
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, roms[0].Machine.Name + ".zip");
+			string archiveFileName = Path.Combine(outDir, roms[0].MachineName + ".zip");
 
 			// Set internal variables
 			Stream writeStream = null;
@@ -760,18 +760,21 @@ namespace SabreTools.Helper
 					}
 
 					crc.Update(buffer, 0, 0);
-					rom.HashData.CRC = crc.Value.ToString("X8").ToLowerInvariant();
+					Hash tempHash = new Hash();
+					tempHash.CRC = crc.Value.ToString("X8").ToLowerInvariant();
 
 					if (!noMD5)
 					{
 						md5.TransformFinalBlock(buffer, 0, 0);
-						rom.HashData.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
+						tempHash.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
 					}
 					if (!noSHA1)
 					{
 						sha1.TransformFinalBlock(buffer, 0, 0);
-						rom.HashData.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
+						tempHash.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
 					}
+
+					rom.HashData = tempHash;
 				}
 			}
 			catch (IOException)
@@ -860,10 +863,7 @@ namespace SabreTools.Helper
 							{
 								Type = ItemType.Rom,
 								Name = reader.Entry.Key,
-								Machine = new Machine
-								{
-									Name = gamename,
-								},
+								MachineName = gamename,
 								HashData = new Hash
 								{
 									Size = (size == 0 ? reader.Entry.Size : size),
@@ -948,10 +948,7 @@ namespace SabreTools.Helper
 			Rom rom = new Rom
 			{
 				Type = ItemType.Rom,
-				Machine = new Machine
-				{
-					Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
-				},
+				MachineName = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 				Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 				HashData = new Hash
 				{

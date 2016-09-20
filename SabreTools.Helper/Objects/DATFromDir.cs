@@ -57,8 +57,8 @@ namespace SabreTools
 		{
 			_basePath = Path.GetFullPath(basePath);
 			_datdata = datdata;
-			_datdata.Files = new Dictionary<string, List<Rom>>();
-			_datdata.Files.Add("null", new List<Rom>());
+			_datdata.Files = new Dictionary<string, List<DatItem>>();
+			_datdata.Files.Add("null", new List<DatItem>());
 			_noMD5 = noMD5;
 			_noSHA1 = noSHA1;
 			_bare = bare;
@@ -158,25 +158,7 @@ namespace SabreTools
 						}
 
 						_logger.Log("Adding blank empty folder: " + gamename);
-
-						Rom blankrom = new Rom
-						{
-							Name = romname,
-							Machine = new Machine
-							{
-								Name = gamename,
-								Description = gamename,
-							},
-							HashData = new Hash
-							{
-								Size = -1,
-								CRC = "null",
-								MD5 = "null",
-								SHA1 = "null",
-							},
-						};
-
-						_datdata.Files["null"].Add(blankrom);
+						_datdata.Files["null"].Add(new Rom(romname, gamename));
 					}
 				});
 			}
@@ -221,7 +203,7 @@ namespace SabreTools
 					{
 						if (!_datdata.Files.ContainsKey(key))
 						{
-							_datdata.Files.Add(key, new List<Rom>());
+							_datdata.Files.Add(key, new List<DatItem>());
 						}
 
 						_datdata.Files[key].Add(rom);
@@ -321,18 +303,33 @@ namespace SabreTools
 		/// Process a single file as a file (with found Rom data)
 		/// </summary>
 		/// <param name="item">File to be added</param>
-		/// <param name="rom">Rom data to be used to write to file</param>
+		/// <param name="item">Rom data to be used to write to file</param>
 		/// <param name="basepath">Path the represents the parent directory</param>
 		/// <param name="parent">Parent game to be used</param>
-		private void ProcessFileHelper(string item, Rom rom, string basepath, string parent)
+		private void ProcessFileHelper(string item, DatItem datItem, string basepath, string parent)
 		{
+			// If the datItem isn't a Rom or Disk, return
+			if (datItem.Type != ItemType.Rom && datItem.Type != ItemType.Disk)
+			{
+				return;
+			}
+
+			string key = "";
+			if (datItem.Type == ItemType.Rom)
+			{
+				key = ((Rom)datItem).HashData.Size + "-" + ((Rom)datItem).HashData.CRC;
+			}
+			else
+			{
+				key = ((Disk)datItem).HashData.Size + "-" + ((Disk)datItem).HashData.MD5;
+			}
+
 			// Add the list if it doesn't exist already
-			string key = rom.HashData.Size + "-" + rom.HashData.CRC;
 			lock (_datdata.Files)
 			{
 				if (!_datdata.Files.ContainsKey(key))
 				{
-					_datdata.Files.Add(key, new List<Rom>());
+					_datdata.Files.Add(key, new List<DatItem>());
 				}
 			}
 
@@ -406,17 +403,14 @@ namespace SabreTools
 				}
 
 				// Update rom information
-				rom.Machine = new Machine
-				{
-					Name = gamename,
-					Description = gamename,
-				};
-				rom.Name = romname;
+				datItem.Name = romname;
+				datItem.MachineName = gamename;
+				datItem.MachineDescription = gamename;
 
 				// Add the file information to the DAT
 				lock (_datdata.Files)
 				{
-					_datdata.Files[key].Add(rom);
+					_datdata.Files[key].Add(datItem);
 				}
 
 				_logger.User("File added: " + romname + Environment.NewLine);
