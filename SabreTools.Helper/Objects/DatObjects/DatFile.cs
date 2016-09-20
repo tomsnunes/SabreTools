@@ -2597,7 +2597,7 @@ namespace SabreTools.Helper
 
 				if (roms != null && roms.Count > 0)
 				{
-					foreach (Rom rom in roms)
+					foreach (DatItem rom in roms)
 					{
 						// No duplicates
 						if ((diff & DiffMode.NoDupes) != 0 || (diff & DiffMode.Individuals) != 0)
@@ -2622,7 +2622,7 @@ namespace SabreTools.Helper
 								// Merged no-duplicates DAT
 								if ((diff & DiffMode.NoDupes) != 0)
 								{
-									Rom newrom = rom;
+									DatItem newrom = rom;
 									newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
 
 									if (outerDiffData.Files.ContainsKey(key))
@@ -2644,7 +2644,7 @@ namespace SabreTools.Helper
 						{
 							if (rom.Dupe >= DupeType.ExternalHash)
 							{
-								Rom newrom = rom;
+								DatItem newrom = rom;
 								newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
 
 								if (dupeData.Files.ContainsKey(key))
@@ -2757,7 +2757,7 @@ namespace SabreTools.Helper
 
 				if (roms != null && roms.Count > 0)
 				{
-					foreach (Rom rom in roms)
+					foreach (DatItem rom in roms)
 					{
 						if (outDats[rom.SystemID].Files.ContainsKey(key))
 						{
