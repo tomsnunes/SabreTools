@@ -2246,7 +2246,8 @@ namespace SabreTools.Helper
 			}
 
 			// Process each all of the roms
-			foreach (string key in dict.Keys)
+			List<string> keys = dict.Keys.ToList();
+			foreach (string key in keys)
 			{
 				List<DatItem> roms = dict[key];
 
@@ -2257,11 +2258,13 @@ namespace SabreTools.Helper
 					continue;
 				}
 
+				// If we're merging the roms, do so
 				if (mergeroms)
 				{
 					roms = DatItem.Merge(roms, logger);
 				}
 
+				// Now add each of the roms to their respective games
 				foreach (DatItem rom in roms)
 				{
 					count++;
@@ -2286,7 +2289,7 @@ namespace SabreTools.Helper
 			}
 
 			// Now go through and sort all of the lists
-			List<string> keys = sortable.Keys.ToList();
+			keys = sortable.Keys.ToList();
 			foreach (string key in keys)
 			{
 				List<DatItem> sortedlist = sortable[key];
