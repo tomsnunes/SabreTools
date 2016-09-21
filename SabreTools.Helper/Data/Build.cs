@@ -224,8 +224,9 @@ namespace SabreTools.Helper
 					helptext.Add("	-crc=, --crc=		Filter by CRC hash");
 					helptext.Add("	-md5=, --md5=		Filter by MD5 hash");
 					helptext.Add("	-sha1=, --sha1=		Filter by SHA-1 hash");
-					helptext.Add("	-nd, --nodump		Include only match nodump roms");
-					helptext.Add("	-nnd, --not-nodump	Exclude all nodump roms");
+					helptext.Add("	-is=, --status=		Include only items with a given status");
+					helptext.Add("		Supported values are:");
+					helptext.Add("		  None, Good, BadDump, Nodump, Verified");
 					helptext.Add("	-out=			Output directory (overridden by --inplace)");
 					helptext.Add("");
 					helptext.Add("Filenames and directories can't start with a reserved string");

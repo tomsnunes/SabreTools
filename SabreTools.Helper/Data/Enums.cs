@@ -88,6 +88,7 @@
 	/// </summary>
 	public enum ItemStatus
 	{
+		NULL = -1,
 		None = 0,
 		Good = 1,
 		BadDump = 2,

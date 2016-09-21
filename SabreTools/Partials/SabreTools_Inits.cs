@@ -366,7 +366,7 @@ namespace SabreTools
 		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
 		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// <param name="status">Select roms with the given item status</param>
 		/// /* Trimming info */
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
@@ -429,7 +429,7 @@ namespace SabreTools
 			string crc,
 			string md5,
 			string sha1,
-			bool? nodump,
+			string status,
 
 			/* Trimming info */
 			bool trim,
@@ -491,6 +491,27 @@ namespace SabreTools
 					break;
 				case "unzip":
 					fp = ForcePacking.Unzip;
+					break;
+			}
+
+			// Set the status flag for filtering
+			ItemStatus itemStatus = ItemStatus.NULL;
+			switch(status.ToLowerInvariant())
+			{
+				case "none":
+					itemStatus = ItemStatus.None;
+					break;
+				case "good":
+					itemStatus = ItemStatus.Good;
+					break;
+				case "baddump":
+					itemStatus = ItemStatus.BadDump;
+					break;
+				case "nodump":
+					itemStatus = ItemStatus.Nodump;
+					break;
+				case "verified":
+					itemStatus = ItemStatus.Verified;
 					break;
 			}
 
@@ -564,7 +585,7 @@ namespace SabreTools
 			};
 
 			DatFile.Update(inputs, userInputDat, outputFormat, outDir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
-				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, maxDegreeOfParallelism, _logger);
+				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, maxDegreeOfParallelism, _logger);
 		}
 
 		#endregion

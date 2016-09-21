@@ -249,23 +249,19 @@ namespace SabreTools.Helper
 		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
 		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="nodump">Select roms with nodump status as follows: null (match all), true (match Nodump only), false (exclude Nodump)</param>
+		/// <param name="itemStatus">Select roms with the given status</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		/// <returns>Returns true if it should be included, false otherwise</returns>
 		public static bool Filter(DatItem itemdata, string gamename, string romname, string romtype, long sgt,
-			long slt, long seq, string crc, string md5, string sha1, bool? nodump, Logger logger)
+			long slt, long seq, string crc, string md5, string sha1, ItemStatus itemStatus, Logger logger)
 		{
 			// Take care of Rom and Disk specific differences
 			if (itemdata.Type == ItemType.Rom)
 			{
 				Rom rom = (Rom)itemdata;
 
-				// Filter on nodump status
-				if (nodump == true && rom.ItemStatus != ItemStatus.Nodump)
-				{
-					return false;
-				}
-				if (nodump == false && rom.ItemStatus == ItemStatus.Nodump)
+				// Filter on status
+				if (itemStatus != ItemStatus.NULL && rom.ItemStatus != itemStatus)
 				{
 					return false;
 				}
@@ -390,12 +386,8 @@ namespace SabreTools.Helper
 			{
 				Disk rom = (Disk)itemdata;
 
-				// Filter on nodump status
-				if (nodump == true && rom.ItemStatus != ItemStatus.Nodump)
-				{
-					return false;
-				}
-				if (nodump == false && rom.ItemStatus == ItemStatus.Nodump)
+				// Filter on status
+				if (itemStatus != ItemStatus.NULL && rom.ItemStatus != itemStatus)
 				{
 					return false;
 				}

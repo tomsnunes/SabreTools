@@ -81,7 +81,6 @@ namespace SabreTools
 				update = false,
 				usegame = true;
 			bool? cascade = null,
-				nodump = null,
 				tsv = null;
 			DiffMode diffMode = 0x0;
 			int maxParallelism = 4;
@@ -120,6 +119,7 @@ namespace SabreTools
 				root = "",
 				rootdir = "",
 				sha1 = "",
+				status = "",
 				tempDir = "",
 				url = "",
 				version = "";
@@ -216,17 +216,9 @@ namespace SabreTools
 					case "--merge":
 						merge = true;
 						break;
-					case "-nd":
-					case "--nodump":
-						nodump = true;
-						break;
 					case "-nm":
 					case "--noMD5":
 						noMD5 = true;
-						break;
-					case "-nnd":
-					case "--not-nodump":
-						nodump = false;
 						break;
 					case "-ns":
 					case "--noSHA1":
@@ -415,6 +407,10 @@ namespace SabreTools
 						{
 							inputs.Add(temparg.Split('=')[1]);
 						}
+						else if (temparg.StartsWith("-is=") || temparg.StartsWith("--status="))
+						{
+							status = temparg.Split('=')[1];
+						}
 						else if (temparg.StartsWith("-md5=") || temparg.StartsWith("--md5="))
 						{
 							md5 = temparg.Split('=')[1];
@@ -582,7 +578,7 @@ namespace SabreTools
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, outputFormat, usegame, prefix,
 					postfix, quotes, repext, addext, remext, datprefix, romba, tsv, merge, diffMode, cascade, inplace, skip, bare, gamename, romname,
-					romtype, sgt, slt, seq, crc, md5, sha1, nodump, trim, single, root, outDir, clean, softlist, dedup, maxParallelism);
+					romtype, sgt, slt, seq, crc, md5, sha1, status, trim, single, root, outDir, clean, softlist, dedup, maxParallelism);
 			}
 
 			// If nothing is set, show the help
