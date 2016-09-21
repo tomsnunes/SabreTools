@@ -216,9 +216,17 @@ namespace SabreTools
 					case "--merge":
 						merge = true;
 						break;
+					case "-nd":
+					case "--nodump":
+						status = "Nodump";
+						break;
 					case "-nm":
 					case "--noMD5":
 						noMD5 = true;
+						break;
+					case "-nnd":
+					case "--not-nodump":
+						status = "NotNodump";
 						break;
 					case "-ns":
 					case "--noSHA1":

@@ -819,8 +819,30 @@ namespace SabreTools.Helper
 							{
 								continue;
 							}
-							// Special case for itemStatus...
-							else if (gc[i] == "itemStatus" && attrib != "status" && attrib != "flags")
+							// Special cases for item statuses
+							else if (gc[i] == "good" && attrib != "status" && attrib != "flags")
+							{
+								if (item.Type == ItemType.Rom)
+								{
+									((Rom)item).ItemStatus = ItemStatus.Good;
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									((Disk)item).ItemStatus = ItemStatus.Good;
+								}
+							}
+							else if (gc[i] == "baddump" && attrib != "status" && attrib != "flags")
+							{
+								if (item.Type == ItemType.Rom)
+								{
+									((Rom)item).ItemStatus = ItemStatus.BadDump;
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									((Disk)item).ItemStatus = ItemStatus.BadDump;
+								}
+							}
+							else if (gc[i] == "nodump" && attrib != "status" && attrib != "flags")
 							{
 								if (item.Type == ItemType.Rom)
 								{
@@ -829,6 +851,17 @@ namespace SabreTools.Helper
 								else if (item.Type == ItemType.Disk)
 								{
 									((Disk)item).ItemStatus = ItemStatus.Nodump;
+								}
+							}
+							else if (gc[i] == "verified" && attrib != "status" && attrib != "flags")
+							{
+								if (item.Type == ItemType.Rom)
+								{
+									((Rom)item).ItemStatus = ItemStatus.Verified;
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									((Disk)item).ItemStatus = ItemStatus.Verified;
 								}
 							}
 							// Even number of quotes, not in a quote, not in attribute
@@ -933,6 +966,48 @@ namespace SabreTools.Helper
 											((Rom)item).Date = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
 										}
 										i++;
+										break;
+
+									// Special cases for item statuses
+									case "good":
+										if (item.Type == ItemType.Rom)
+										{
+											((Rom)item).ItemStatus = ItemStatus.Good;
+										}
+										else if (item.Type == ItemType.Disk)
+										{
+											((Disk)item).ItemStatus = ItemStatus.Good;
+										}
+										break;
+									case "baddump":
+										if (item.Type == ItemType.Rom)
+										{
+											((Rom)item).ItemStatus = ItemStatus.BadDump;
+										}
+										else if (item.Type == ItemType.Disk)
+										{
+											((Disk)item).ItemStatus = ItemStatus.BadDump;
+										}
+										break;
+									case "nodump":
+										if (item.Type == ItemType.Rom)
+										{
+											((Rom)item).ItemStatus = ItemStatus.Nodump;
+										}
+										else if (item.Type == ItemType.Disk)
+										{
+											((Disk)item).ItemStatus = ItemStatus.Nodump;
+										}
+										break;
+									case "verified":
+										if (item.Type == ItemType.Rom)
+										{
+											((Rom)item).ItemStatus = ItemStatus.Verified;
+										}
+										else if (item.Type == ItemType.Disk)
+										{
+											((Disk)item).ItemStatus = ItemStatus.Verified;
+										}
 										break;
 								}
 

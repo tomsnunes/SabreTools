@@ -226,7 +226,7 @@ namespace SabreTools.Helper
 					helptext.Add("	-sha1=, --sha1=		Filter by SHA-1 hash");
 					helptext.Add("	-is=, --status=		Include only items with a given status");
 					helptext.Add("		Supported values are:");
-					helptext.Add("		  None, Good, BadDump, Nodump, Verified");
+					helptext.Add("		  None, Good, BadDump, Nodump, Verified, NotNodump");
 					helptext.Add("	-out=			Output directory (overridden by --inplace)");
 					helptext.Add("");
 					helptext.Add("Filenames and directories can't start with a reserved string");

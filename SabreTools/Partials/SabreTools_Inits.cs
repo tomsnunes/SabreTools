@@ -513,6 +513,9 @@ namespace SabreTools
 				case "verified":
 					itemStatus = ItemStatus.Verified;
 					break;
+				case "notnodump":
+					itemStatus = ItemStatus.NotNodump;
+					break;
 			}
 
 			// Normalize the extensions

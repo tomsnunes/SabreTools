@@ -88,12 +88,13 @@
 	/// </summary>
 	public enum ItemStatus
 	{
-		NULL = -1,
+		NULL = -1, // This is a fake flag that is used for filter only
 		None = 0,
 		Good = 1,
 		BadDump = 2,
 		Nodump = 3,
 		Verified = 4,
+		NotNodump = 5, // This is a fake flag that is used for filter only
 	}
 
 	#endregion

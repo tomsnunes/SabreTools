@@ -553,7 +553,7 @@ Options:
 		
 		-is=, status=		Include only items with a given status
 			Include items with one of the supported values:
-				None, Good, BadDump, Nodump, Verified
+				None, Good, BadDump, Nodump, Verified, NotNodump
 		
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If a path
