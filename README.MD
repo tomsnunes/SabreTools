@@ -13,12 +13,12 @@ For the most complete set of information, see the <a href="https://raw.githubuse
 The main tool of the SabreTools suite. Performs the majority of the core features of the parent project, including the following (sorted by the original standalone executable, if any):
 <ul>
 	<li><i>Convert/DATToMiss</i>: Converting DATs from any format to ClrMamePro, Logiqx XML, SabreDAT XML, and to missfile (last part requested by Obiwantje)</li>
-	<li><i>DATabase/DATabaseTwo</i>: Importing and Generating DAT files in ClrMamePro and XML formats
+	<!-- <li><i>DATabase/DATabaseTwo</i>: Importing and Generating DAT files in ClrMamePro and XML formats
 		<ul>
 			<li>Add and remove sources and systems from the database</li>
 			<li>Retrieve a list of all sources and systems that are available</li>
 		</ul>
-	</li>
+	</li> -->
 	<li><i>DATFromDir/DATFromDirParallel</i>: Create a DAT from a file, a folder, or a set of either</li>
 	<li><i>DatSplit</i>: Split a DAT using two different file extensions within the DAT</li>
 	<li><i>Filter</i>: Filter a DAT by any criteria that the user chooses including wildcard searches (requested by Obiwantje and others)</li>

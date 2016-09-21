@@ -44,7 +44,8 @@ namespace SabreTools
 			{
 				Console.Clear();
 			}
-			Setup();
+			Build.Start("SabreTools");
+			DBTools.EnsureDatabase(Constants.HeadererDbSchema, Constants.HeadererFileName, Constants.HeadererConnectionString);
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
@@ -57,18 +58,6 @@ namespace SabreTools
 			// If there's no arguments, show help
 			if (args.Length == 0)
 			{
-				/*
-				// If there are no arguments, show the menu
-				if (!Console.IsOutputRedirected)
-				{
-					ShowMainMenu();
-				}
-				else
-				{
-					Build.Help();
-				}
-				*/
-
 				Build.Help();
 				_logger.Close();
 				return;
@@ -76,7 +65,6 @@ namespace SabreTools
 
 			// Set all default values
 			bool help = false,
-				add = false,
 				addBlanks = false,
 				addDate = false,
 				archivesAsFiles = false,
@@ -88,20 +76,12 @@ namespace SabreTools
 				enableGzip = false,
 				extsplit = false,
 				forceunpack = false,
-				generate = false,
-				genall = false,
 				hashsplit = false,
 				headerer = false,
-				ignore = false,
-				import = false,
 				inplace = false,
-				listsrc = false,
-				listsys = false,
 				merge = false,
 				noMD5 = false,
-				norename = false,
 				noSHA1 = false,
-				old = false,
 				quotes = false,
 				rem = false,
 				remext = false,
@@ -146,7 +126,6 @@ namespace SabreTools
 				header = "",
 				homepage = "",
 				name = "",
-				manu = "",
 				md5 = "",
 				outDir = "",
 				postfix = "",
@@ -157,8 +136,6 @@ namespace SabreTools
 				root = "",
 				rootdir = "",
 				sha1 = "",
-				sources = "",
-				systems = "",
 				tempDir = "",
 				url = "",
 				version = "";
@@ -173,10 +150,6 @@ namespace SabreTools
 					case "-h":
 					case "--help":
 						help = true;
-						break;
-					case "-a":
-					case "--add":
-						add = true;
 						break;
 					case "-ab":
 					case "--add-blank":
@@ -194,29 +167,9 @@ namespace SabreTools
 					case "--cascade":
 						cascade = true;
 						break;
-					case "-cc":
-					case "--convert-cmp":
-						outputFormat |= OutputFormat.ClrMamePro;
-						break;
-					case "-cm":
-					case "--convert-miss":
-						outputFormat |= OutputFormat.MissFile;
-						break;
-					case "-cr":
-					case "--convert-rc":
-						outputFormat |= OutputFormat.RomCenter;
-						break;
-					case "-cs":
-					case "--convert-sd":
-						outputFormat |= OutputFormat.SabreDat;
-						break;
 					case "-csv":
 					case "--csv":
 						tsv = false;
-						break;
-					case "-cx":
-					case "--convert-xml":
-						outputFormat |= OutputFormat.Xml;
 						break;
 					case "-clean":
 					case "--clean":
@@ -255,14 +208,6 @@ namespace SabreTools
 					case "--files":
 						archivesAsFiles = true;
 						break;
-					case "-g":
-					case "--generate":
-						generate = true;
-						break;
-					case "-ga":
-					case "--generate-all":
-						genall = true;
-						break;
 					case "-gp":
 					case "--game-prefix":
 						datprefix = true;
@@ -279,25 +224,9 @@ namespace SabreTools
 					case "--hash-split":
 						hashsplit = true;
 						break;
-					case "-i":
-					case "--import":
-						import = true;
-						break;
-					case "-ig":
-					case "--ignore":
-						ignore = true;
-						break;
 					case "-ip":
 					case "--inplace":
 						inplace = true;
-						break;
-					case "-lso":
-					case "--list-sources":
-						listsrc = true;
-						break;
-					case "-lsy":
-					case "--list-systems":
-						listsys = true;
 						break;
 					case "-m":
 					case "--merge":
@@ -315,17 +244,9 @@ namespace SabreTools
 					case "--not-nodump":
 						nodump = false;
 						break;
-					case "-nr":
-					case "--no-rename":
-						norename = true;
-						break;
 					case "-ns":
 					case "--noSHA1":
 						noSHA1 = true;
-						break;
-					case "-o":
-					case "--old":
-						old = true;
 						break;
 					case "-oc":
 					case "--output-cmp":
@@ -375,10 +296,6 @@ namespace SabreTools
 					case "--restore":
 						restore = true;
 						break;
-					case "-rm":
-					case "--remove":
-						rem = true;
-						break;
 					case "-rme":
 					case "--rem-ext":
 						remext = true;
@@ -408,6 +325,7 @@ namespace SabreTools
 						stats = true;
 						break;
 					case "-trim":
+					case "--trim":
 						trim = true;
 						break;
 					case "-ts":
@@ -509,10 +427,6 @@ namespace SabreTools
 						{
 							inputs.Add(temparg.Split('=')[1]);
 						}
-						else if (temparg.StartsWith("-manu=") && manu == "")
-						{
-							manu = temparg.Split('=')[1];
-						}
 						else if (temparg.StartsWith("-md5=") || temparg.StartsWith("--md5="))
 						{
 							md5 = temparg.Split('=')[1];
@@ -577,23 +491,11 @@ namespace SabreTools
 						{
 							slt = GetSizeFromString(temparg.Split('=')[1]);
 						}
-						else if (temparg.StartsWith("-source=") && sources == "")
-						{
-							sources = temparg.Split('=')[1];
-						}
-						else if (temparg.StartsWith("-system=") && systems == "")
-						{
-							systems = temparg.Split('=')[1];
-						}
 						else if (temparg.StartsWith("-t=") || temparg.StartsWith("--temp="))
 						{
 							tempDir = temparg.Split('=')[1];
 						}
-						else if (temparg.StartsWith("-u=") || temparg.StartsWith("--url="))
-						{
-							url = temparg.Split('=')[1];
-						}
-						else if (temparg.StartsWith("-url=") && url == "")
+						else if (temparg.StartsWith("-u=") || temparg.StartsWith("-url=") || temparg.StartsWith("--url="))
 						{
 							url = temparg.Split('=')[1];
 						}
@@ -628,8 +530,8 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(add ^ datfromdir ^ extsplit ^ generate ^ genall ^ hashsplit ^ headerer ^ import ^ listsrc ^
-				listsys ^ (merge || diffMode != 0 || update || outputFormat != 0 || tsv != null|| trim) ^ rem ^ stats ^ typesplit))
+			if (!(datfromdir ^ extsplit ^ hashsplit ^ headerer ^ (merge || diffMode != 0 || update
+				|| outputFormat != 0 || tsv != null|| trim) ^ rem ^ stats ^ typesplit))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -649,25 +551,8 @@ namespace SabreTools
 
 			// Now take care of each mode in succesion
 
-			// Add a source or system
-			if (add)
-			{
-				if (manu != "" && systems != "")
-				{
-					InitAddSystem(manu, systems);
-				}
-				else if (sources != "" && url != "")
-				{
-					InitAddSource(manu, systems);
-				}
-				else
-				{
-					Build.Help();
-				}
-			}
-
 			// Create a DAT from a directory or set of directories
-			else if (datfromdir)
+			if (datfromdir)
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
 					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, maxParallelism);
@@ -677,20 +562,6 @@ namespace SabreTools
 			else if (extsplit)
 			{
 				InitExtSplit(inputs, exta, extb, outDir);
-			}
-
-			// Generate all DATs
-			else if (genall)
-			{
-				InitImport(ignore);
-				InitGenerateAll(norename, old);
-			}
-
-			// Generate a DAT
-			else if (generate)
-			{
-				InitImport(ignore);
-				InitGenerate(systems, norename, old);
 			}
 
 			// Split a DAT by available hashes
@@ -703,41 +574,6 @@ namespace SabreTools
 			else if (headerer)
 			{
 				InitHeaderer(inputs, restore, outDir, _logger);
-			}
-
-			// Import a file or folder
-			else if (import)
-			{
-				InitImport(ignore);
-			}
-
-			// List all available sources
-			else if (listsrc)
-			{
-				ListSources();
-			}
-
-			// List all available systems
-			else if (listsys)
-			{
-				ListSystems();
-			}
-
-			// Remove a source or system
-			else if (rem)
-			{
-				if (systems != "")
-				{
-					InitRemoveSystem(systems);
-				}
-				else if (sources != "")
-				{
-					InitRemoveSource(sources);
-				}
-				else
-				{
-					Build.Help();
-				}
 			}
 
 			// Get statistics on input files

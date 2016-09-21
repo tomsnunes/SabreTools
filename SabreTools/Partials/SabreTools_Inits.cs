@@ -12,40 +12,6 @@ namespace SabreTools
 		#region Init Methods
 
 		/// <summary>
-		/// Wrap adding a new source to the database
-		/// </summary>
-		/// <param name="name">Source name</param>
-		/// <param name="url">Source URL(s)</param>
-		private static void InitAddSource(string name, string url)
-		{
-			if (DBTools.AddSource(name, url, Constants.DATabaseConnectionString))
-			{
-				_logger.Log("Source " + name + " added!");
-			}
-			else
-			{
-				_logger.Error("Source " + name + " could not be added!");
-			}
-		}
-
-		/// <summary>
-		/// Wrap adding a new system to the database
-		/// </summary>
-		/// <param name="manufacturer">Manufacturer name</param>
-		/// <param name="system">System name</param>
-		private static void InitAddSystem(string manufacturer, string system)
-		{
-			if (DBTools.AddSystem(manufacturer, system, Constants.DATabaseConnectionString))
-			{
-				_logger.Log("System " + manufacturer + " - " + system + " added!");
-			}
-			else
-			{
-				_logger.Error("System " + manufacturer + " - " + system + " could not be added!");
-			}
-		}
-
-		/// <summary>
 		/// Wrap sorting files using an input DAT
 		/// </summary>
 		/// <param name="inputs">List of all inputted files and folders</param>
@@ -210,56 +176,6 @@ namespace SabreTools
 		}
 
 		/// <summary>
-		/// Wrap generating a DAT from the library
-		/// </summary>
-		/// <param name="system">System ID to be used in the DAT (blank means all)</param>
-		/// <param name="norename">True if files should not be renamed with system and/or source in merged mode (default false)</param>
-		/// <param name="old">True if the output file should be in ClrMamePro format (default false)</param>
-		private static void InitGenerate(string systemid, bool norename, bool old)
-		{
-			IGenerate gen = new GenerateTwo(systemid, "" /* sourceid */, _datroot, _outroot, Constants.DATabaseConnectionString, _logger, norename, old);
-			gen.Export();
-		}
-
-		/// <summary>
-		/// Wrap generating all standard DATs from the library
-		/// </summary>
-		private static void InitGenerateAll(bool norename, bool old)
-		{
-			List<string> systems = new List<string>();
-			using (SqliteConnection dbc = new SqliteConnection(Constants.DATabaseConnectionString))
-			{
-				dbc.Open();
-
-				string query = "SELECT id FROM system";
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
-				{
-					using (SqliteDataReader sldr = slc.ExecuteReader())
-					{
-						// If nothing is found, tell the user and exit
-						if (!sldr.HasRows)
-						{
-							_logger.Warning("No systems found! Please add a system and then try again.");
-							return;
-						}
-
-						while (sldr.Read())
-						{
-							systems.Add(sldr.GetInt32(0).ToString());
-						}
-					}
-				}
-
-				// Loop through the inputs
-				foreach (string system in systems)
-				{
-					_logger.User("Generating DAT for system id " + system);
-					InitGenerate(system, norename, old);
-				}
-			}
-		}
-
-		/// <summary>
 		/// Wrap splitting a DAT by best available hashes
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
@@ -301,64 +217,6 @@ namespace SabreTools
 		{
 			Headerer headerer = new Headerer(inputs, restore, outDir, logger);
 			headerer.Process();
-		}
-
-		/// <summary>
-		/// Wrap importing and updating DATs
-		/// </summary>
-		/// <param name="ignore"></param>
-		private static void InitImport(bool ignore)
-		{
-			IImport imp = new ImportTwo(_datroot, Constants.DATabaseConnectionString, _logger, ignore);
-			imp.UpdateDatabase();
-		}
-
-		/// <summary>
-		/// Wrap removing an existing source from the database
-		/// </summary>
-		/// <param name="id">Source ID to be removed from the database</param>
-		private static void InitRemoveSource(string sourceid)
-		{
-			int srcid = -1;
-			if (Int32.TryParse(sourceid, out srcid))
-			{
-				if (DBTools.RemoveSource(srcid, Constants.DATabaseConnectionString))
-				{
-					_logger.Log("Source '" + srcid + "' removed!");
-				}
-				else
-				{
-					_logger.Error("Source with id '" + srcid + "' could not be removed.");
-				}
-			}
-			else
-			{
-				_logger.Error("Invalid input");
-			}
-		}
-
-		/// <summary>
-		/// Wrap removing an existing system from the database
-		/// </summary>
-		/// <param name="id">System ID to be removed from the database</param>
-		private static void InitRemoveSystem(string systemid)
-		{
-			int sysid = -1;
-			if (Int32.TryParse(systemid, out sysid))
-			{
-				if (DBTools.RemoveSystem(sysid, Constants.DATabaseConnectionString))
-				{
-					_logger.Log("System '" + sysid + "' removed!");
-				}
-				else
-				{
-					_logger.Error("System with id '" + sysid + "' could not be removed.");
-				}
-			}
-			else
-			{
-				_logger.Error("Invalid input");
-			}
 		}
 
 		/// <summary>

@@ -108,9 +108,7 @@
     <Compile Include="Objects\Dat\Disk.cs" />
     <Compile Include="Objects\Dat\Release.cs" />
     <Compile Include="Objects\Dat\Sample.cs" />
-    <Compile Include="Objects\GenerateTwo.cs" />
     <Compile Include="Objects\Headerer.cs" />
-    <Compile Include="Objects\ImportTwo.cs" />
     <Compile Include="Objects\Dat\Rom.cs" />
     <Compile Include="Objects\SimpleSort.cs" />
     <Compile Include="Objects\Archive\ZipFileEntry.cs" />
@@ -139,8 +137,6 @@
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\DBTools.cs" />
     <Compile Include="Data\Enums.cs" />
-    <Compile Include="Interfaces\IGenerate.cs" />
-    <Compile Include="Interfaces\IImport.cs" />
     <Compile Include="Objects\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mappings\Mappings.cs" />
@@ -150,9 +146,6 @@
     <Compile Include="Data\Build.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="dats.sqlite">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="LICENSE">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

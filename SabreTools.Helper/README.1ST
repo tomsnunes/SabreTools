@@ -114,8 +114,6 @@ from.
 
 Included within this tool are a few former standalone executables:
 	- Convert/DATToMiss: Convert an arbitrary input DAT to a different format
-	- DATabase/DATabaseTwo: A managed DAT tool that allows for creating automatically merged
-		DATs based on one or more systems, sources, or a combination thereof
 	- DATFromDir: Create a DAT file from a folder or file, sometimes called dir2dat
 	- DatSplit: Split a DAT based on 2 different file extensions
 	- Filter: Filter a DAT based on various user-defined criteria, optionally using wildcards
@@ -125,6 +123,10 @@ Included within this tool are a few former standalone executables:
 		all roms to a single game named "!" and forcing unpack
 	- UncompressedSize: Get statistics from one or more input DATs, including number of
 		roms, disks, files with available hash, and size
+		
+Formerly included within this tool is a former standalone executable:
+	- DATabase/DATabaseTwo: A managed DAT tool that allows for creating automatically merged
+		DATs based on one or more systems, sources, or a combination thereof
 
 Usage:
 	SabreTools.exe [options] [filename|dirname] ...
@@ -132,21 +134,6 @@ Usage:
 Options:
 	-?, -h, --help		Show the built-in help text
 		Built-in to most of the programs is a basic help text
-	
-	-a, --add			Add a new system or source to the database
-		Add a new system or source to the DAT database, including additional information.
-		
-		-manu=				Manufacturer name
-			Used only when adding a system to the database
-		
-		-system=			System name
-			Used only when adding a system to the database
-		
-		-source=			Source name
-			Used only when adding a source to the database
-		
-		-url=				Source URL
-			Used only when adding a source to the database
 	
 	-d, --dfd		Create a DAT from each input directory
 		Create a DAT file from an input directory or set of files. By default, this will
@@ -267,35 +254,6 @@ Options:
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If a path
 			is not defined, the application directory is used instead.
-			
-	-g, --generate		Start tool in generate mode
-		This starts the tool in DATabase generate mode. This will allow for creation of
-		managed DATs based on the inputted systems and sources as defined by other flags.
-		
-		-system=		System ID to generate from
-			Set the system ID to be used to create an output DAT
-			
-		-nr, --no-rename	Don't auto-rename games
-			By default, games are automatically renamed with the source (for system-derived
-			DATs), system (for source-derived DATs), or both (for the complete merged DAT).
-			This flag disables the automatic renaming and uses the game names as they are.
-			
-		-o, --old		Output DAT in CMP format instead of XML
-			As a holdover from only two output formats, this tool defaults to Logiqx XML
-			DAT outputs. If this flag is enabled, a clrmamepro DAT will be created instead.
-			
-	-ga, --generate-all	Start tool in generate all mode
-		This starts the tool in DATabase generate all mode. This will allow for creation of
-		managed DATs based on the entire DAT folder.
-			
-		-nr, --no-rename	Don't auto-rename games
-			By default, games are automatically renamed with the source (for system-derived
-			DATs), system (for source-derived DATs), or both (for the complete merged DAT).
-			This flag disables the automatic renaming and uses the game names as they are.
-			
-		-o, --old		Output DAT in CMP format instead of XML
-			As a holdover from only two output formats, this tool defaults to Logiqx XML
-			DAT outputs. If this flag is enabled, a clrmamepro DAT will be created instead.
 		
 	-hd, --headerer 		Backup or restore copier headers from a variety of file types
 		Headerer is meant as an intermediary between header skipper files (which, a bit
@@ -339,34 +297,10 @@ Options:
 			This sets an output folder to be used when the files are created. If a path
 			is not defined, the application directory is used instead.
 			
-	-i, --import		Start tool in import mode
-		This starts the tool in DATabase import mode. This will allow for hashing of new
-		DAT files in the dats folder. If a source for the DAT cannot be automatically
-		determined, the user will be promted to select a source or enter a new one.
-		
-		-ig, --ignore		Don't prompt for new sources
-			If a source cannot be determined, then use the "Default" source instead of
-			asking the user.
-			
 	-input=				Set an input string
 		This should only be used if one of the inputs starts with a flag or another already
 		defined input.
-			
-	-lso, --list-sources	List all sources (id <= name)
-		List all sources in the database, ordered by the internal ID and mapped to the name
 		
-	-lsy, --list-systems	List all systems (id <= name)
-		List all systems in the database, ordered by the internal ID and mapped to the name
-			
-	-rm, --remove		Remove a system or source from the database
-		Remove a system or source to the DAT database so it can no longer be used
-		
-		-system=		System ID"
-			Internal ID of the system to be removed
-			
-		-source=		Source ID
-			Internal ID of the source to be removed
-			
 	-st, --stats		Get statistics on all input DATs
 		This will output by default the combined statistics for all input DAT files. The stats
 		that are outputted are as follows:

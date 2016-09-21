@@ -185,9 +185,6 @@ namespace SabreTools.Helper
 
 		#region Database schema
 
-		public const string DATabaseDbSchema = "dats";
-		public const string DATabaseFileName = "dats.sqlite";
-		public const string DATabaseConnectionString = "Data Source=" + DATabaseFileName + ";Version = 3;";
 		public const string HeadererDbSchema = "Headerer";
 		public const string HeadererFileName = "Headerer.sqlite";
 		public const string HeadererConnectionString = "Data Source=" + HeadererFileName + ";Version = 3;";
