@@ -3005,6 +3005,20 @@ namespace SabreTools.Helper
 
 					foreach (string key in keys)
 					{
+						// If the dictionary somehow doesn't have the key in question, continue
+						if (!sortable.ContainsKey(key))
+						{
+							logger.Warning("SortedDictionary does not contain key: " + key);
+							continue;
+						}
+
+						// If we somehow have a null list, just skip it
+						if (sortable[key] == null)
+						{
+							logger.Warning("Blank list found for key: " + key);
+							continue;
+						}
+
 						List<DatItem> roms = sortable[key];
 
 						for (int index = 0; index < roms.Count; index++)
