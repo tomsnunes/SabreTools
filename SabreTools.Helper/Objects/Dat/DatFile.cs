@@ -707,7 +707,8 @@ namespace SabreTools.Helper
 			bool clean)
 		{
 			// Open a file reader
-			StreamReader sr = new StreamReader(File.OpenRead(filename));
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
 
 			bool block = false, superdat = false;
 			string blockname = "", tempgamename = "", gamedesc = "", cloneof = "",
@@ -1202,7 +1203,8 @@ namespace SabreTools.Helper
 			bool clean)
 		{
 			// Open a file reader
-			StreamReader sr = new StreamReader(File.OpenRead(filename));
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
 
 			string blocktype = "";
 			while (!sr.EndOfStream)
@@ -2249,21 +2251,7 @@ namespace SabreTools.Helper
 			List<string> keys = dict.Keys.ToList();
 			foreach (string key in keys)
 			{
-				// If the dictionary somehow doesn't have the key in question, continue
-				if (!dict.ContainsKey(key))
-				{
-					logger.Warning("Input Dictionary does not contain key: " + key);
-					continue;
-				}
-
 				List<DatItem> roms = dict[key];
-
-				// If we somehow have a null list, just skip it
-				if (roms == null)
-				{
-					logger.Warning("Blank list found for key: " + key);
-					continue;
-				}
 
 				// If we're merging the roms, do so
 				if (mergeroms)
@@ -2282,6 +2270,7 @@ namespace SabreTools.Helper
 						+ (String.IsNullOrEmpty(rom.MachineName)
 								? "Default"
 								: rom.MachineName.ToLowerInvariant());
+					newkey = HttpUtility.HtmlEncode(newkey);
 					if (sortable.ContainsKey(newkey))
 					{
 						sortable[newkey].Add(rom);
@@ -2303,13 +2292,6 @@ namespace SabreTools.Helper
 				if (!sortable.ContainsKey(key))
 				{
 					logger.Warning("SortedDictionary does not contain key: " + key);
-					continue;
-				}
-
-				// If we somehow have a null list, just skip it
-				if (sortable[key] == null)
-				{
-					logger.Warning("Blank list found for key: " + key);
 					continue;
 				}
 
@@ -3009,13 +2991,6 @@ namespace SabreTools.Helper
 						if (!sortable.ContainsKey(key))
 						{
 							logger.Warning("SortedDictionary does not contain key: " + key);
-							continue;
-						}
-
-						// If we somehow have a null list, just skip it
-						if (sortable[key] == null)
-						{
-							logger.Warning("Blank list found for key: " + key);
 							continue;
 						}
 
