@@ -2288,13 +2288,6 @@ namespace SabreTools.Helper
 			keys = sortable.Keys.ToList();
 			foreach (string key in keys)
 			{
-				// If the dictionary somehow doesn't have the key in question, continue
-				if (!sortable.ContainsKey(key))
-				{
-					logger.Warning("SortedDictionary does not contain key: " + key);
-					continue;
-				}
-
 				List<DatItem> sortedlist = sortable[key];
 				DatItem.Sort(ref sortedlist, norename);
 				sortable[key] = sortedlist;
@@ -2987,13 +2980,6 @@ namespace SabreTools.Helper
 
 					foreach (string key in keys)
 					{
-						// If the dictionary somehow doesn't have the key in question, continue
-						if (!sortable.ContainsKey(key))
-						{
-							logger.Warning("SortedDictionary does not contain key: " + key);
-							continue;
-						}
-
 						List<DatItem> roms = sortable[key];
 
 						for (int index = 0; index < roms.Count; index++)
