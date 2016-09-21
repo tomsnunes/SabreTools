@@ -2989,7 +2989,7 @@ namespace SabreTools.Helper
 
 					logger.User("Opening file for writing: " + outfile);
 					FileStream fs = File.Create(outfile);
-					StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
+					StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
 
 					// Write out the header
 					WriteHeader(sw, outputFormat, datdata, logger);
