@@ -824,11 +824,11 @@ namespace SabreTools.Helper
 							{
 								if (item.Type == ItemType.Rom)
 								{
-									((Rom)item).Nodump = true;
+									((Rom)item).ItemStatus = ItemStatus.Nodump;
 								}
 								else if (item.Type == ItemType.Disk)
 								{
-									((Disk)item).Nodump = true;
+									((Disk)item).ItemStatus = ItemStatus.Nodump;
 								}
 							}
 							// Even number of quotes, not in a quote, not in attribute
@@ -882,15 +882,48 @@ namespace SabreTools.Helper
 										}
 										break;
 									case "flags":
-										if (gc[i].Replace("\"", "").ToLowerInvariant() == "nodump")
+										if (val.ToLowerInvariant() == "good")
 										{
 											if (item.Type == ItemType.Rom)
 											{
-												((Rom)item).Nodump = true;
+												((Rom)item).ItemStatus = ItemStatus.Good;
 											}
 											else if (item.Type == ItemType.Disk)
 											{
-												((Disk)item).Nodump = true;
+												((Disk)item).ItemStatus = ItemStatus.Good;
+											}
+										}
+										else if (val.ToLowerInvariant() == "baddump")
+										{
+											if (item.Type == ItemType.Rom)
+											{
+												((Rom)item).ItemStatus = ItemStatus.BadDump;
+											}
+											else if (item.Type == ItemType.Disk)
+											{
+												((Disk)item).ItemStatus = ItemStatus.BadDump;
+											}
+										}
+										else if (val.ToLowerInvariant() == "nodump")
+										{
+											if (item.Type == ItemType.Rom)
+											{
+												((Rom)item).ItemStatus = ItemStatus.Nodump;
+											}
+											else if (item.Type == ItemType.Disk)
+											{
+												((Disk)item).ItemStatus = ItemStatus.Nodump;
+											}
+										}
+										else if (val.ToLowerInvariant() == "verified")
+										{
+											if (item.Type == ItemType.Rom)
+											{
+												((Rom)item).ItemStatus = ItemStatus.Verified;
+											}
+											else if (item.Type == ItemType.Disk)
+											{
+												((Disk)item).ItemStatus = ItemStatus.Verified;
 											}
 										}
 										break;
@@ -977,15 +1010,48 @@ namespace SabreTools.Helper
 										}
 										break;
 									case "flags":
-										if (val.ToLowerInvariant() == "nodump")
+										if (val.ToLowerInvariant() == "good")
 										{
 											if (item.Type == ItemType.Rom)
 											{
-												((Rom)item).Nodump = true;
+												((Rom)item).ItemStatus = ItemStatus.Good;
 											}
 											else if (item.Type == ItemType.Disk)
 											{
-												((Disk)item).Nodump = true;
+												((Disk)item).ItemStatus = ItemStatus.Good;
+											}
+										}
+										else if (val.ToLowerInvariant() == "baddump")
+										{
+											if (item.Type == ItemType.Rom)
+											{
+												((Rom)item).ItemStatus = ItemStatus.BadDump;
+											}
+											else if (item.Type == ItemType.Disk)
+											{
+												((Disk)item).ItemStatus = ItemStatus.BadDump;
+											}
+										}
+										else if (val.ToLowerInvariant() == "nodump")
+										{
+											if (item.Type == ItemType.Rom)
+											{
+												((Rom)item).ItemStatus = ItemStatus.Nodump;
+											}
+											else if (item.Type == ItemType.Disk)
+											{
+												((Disk)item).ItemStatus = ItemStatus.Nodump;
+											}
+										}
+										else if (val.ToLowerInvariant() == "verified")
+										{
+											if (item.Type == ItemType.Rom)
+											{
+												((Rom)item).ItemStatus = ItemStatus.Verified;
+											}
+											else if (item.Type == ItemType.Disk)
+											{
+												((Disk)item).ItemStatus = ItemStatus.Verified;
 											}
 										}
 										break;
@@ -1303,7 +1369,7 @@ namespace SabreTools.Helper
 						*/
 						string[] rominfo = line.Split('¬');
 
-						Rom rom = new Rom(rominfo[5], Int64.Parse(rominfo[7]), rominfo[6], null, null, false, null, rominfo[3], null,
+						Rom rom = new Rom(rominfo[5], Int64.Parse(rominfo[7]), rominfo[6], null, null, ItemStatus.None, null, rominfo[3], null,
 							rominfo[4], null, null, rominfo[8], rominfo[1], null, null, false, null, null, sysid, null, srcid, null);
 
 						// Now process and add the rom
@@ -1373,9 +1439,10 @@ namespace SabreTools.Helper
 		{
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
-			bool superdat = false, isnodump = false, empty = true;
+			bool superdat = false, empty = true;
 			string key = "", date = "";
 			long size = -1;
+			ItemStatus its = ItemStatus.None;
 			List<string> parent = new List<string>();
 
 			XmlTextReader xtr = GetXmlTextReader(filename, logger);
@@ -1819,13 +1886,27 @@ namespace SabreTools.Helper
 										case "disk":
 											empty = false;
 
-											// If the rom is nodump, flag it
-											isnodump = false;
+											// If the rom has a status, flag it
+											its = ItemStatus.None;
+											if (subreader.GetAttribute("flags") == "good" || subreader.GetAttribute("status") == "good")
+											{
+												its = ItemStatus.Good;
+											}
+											if (subreader.GetAttribute("flags") == "baddump" || subreader.GetAttribute("status") == "baddump")
+											{
+												logger.Log("Bad dump detected: " +
+													(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
+												its = ItemStatus.BadDump;
+											}
 											if (subreader.GetAttribute("flags") == "nodump" || subreader.GetAttribute("status") == "nodump")
 											{
 												logger.Log("Nodump detected: " +
 													(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
-												isnodump = true;
+												its = ItemStatus.Nodump;
+											}
+											if (subreader.GetAttribute("flags") == "verified" || subreader.GetAttribute("status") == "verified")
+											{
+												its = ItemStatus.Verified;
 											}
 
 											// If the rom has a Date attached, read it in and then sanitize it
@@ -1880,13 +1961,13 @@ namespace SabreTools.Helper
 											{
 												case "disk":
 													inrom = new Disk(subreader.GetAttribute("name"), subreader.GetAttribute("md5"), subreader.GetAttribute("sha1"),
-														isnodump, tempname, null, gamedesc, null, null, romof, cloneof, sampleof, null, false, null, null, sysid,
+														its, tempname, null, gamedesc, null, null, romof, cloneof, sampleof, null, false, null, null, sysid,
 														filename, srcid, null);
 													break;
 												case "rom":
 												default:
 													inrom = new Rom(subreader.GetAttribute("name"), size, subreader.GetAttribute("crc"), subreader.GetAttribute("md5"),
-														subreader.GetAttribute("sha1"), isnodump, date, tempname, null, gamedesc, null, null, romof, cloneof, sampleof,
+														subreader.GetAttribute("sha1"), its, date, tempname, null, gamedesc, null, null, romof, cloneof, sampleof,
 														null, false, null, null, sysid, filename, srcid, null);
 													break;
 											}
@@ -1942,7 +2023,7 @@ namespace SabreTools.Helper
 							empty = false;
 
 							// If the rom is nodump, flag it
-							isnodump = false;
+							its = ItemStatus.None;
 							flagreader = xtr.ReadSubtree();
 							if (flagreader != null)
 							{
@@ -1964,10 +2045,21 @@ namespace SabreTools.Helper
 												string content = flagreader.GetAttribute("value");
 												switch (flagreader.GetAttribute("name"))
 												{
+													case "good":
+														its = ItemStatus.Good;
+														break;
+													case "baddump":
+														logger.Log("Bad dump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
+															"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
+														its = ItemStatus.BadDump;
+														break;
 													case "nodump":
 														logger.Log("Nodump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
 															"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
-														isnodump = true;
+														its = ItemStatus.Nodump;
+														break;
+													case "verified":
+														its = ItemStatus.Verified;
 														break;
 												}
 											}
@@ -2028,13 +2120,13 @@ namespace SabreTools.Helper
 							{
 								case "disk":
 									rom = new Disk(xtr.GetAttribute("name"), xtr.GetAttribute("md5")?.ToLowerInvariant(),
-										xtr.GetAttribute("sha1")?.ToLowerInvariant(), isnodump, tempname, null, tempname, null, null,
+										xtr.GetAttribute("sha1")?.ToLowerInvariant(), its, tempname, null, tempname, null, null,
 										null, null, null, null, false, null, null, sysid, filename, srcid, null);
 									break;
 								case "rom":
 								default:
 									rom = new Rom(xtr.GetAttribute("name"), size, xtr.GetAttribute("crc")?.ToLowerInvariant(),
-										xtr.GetAttribute("md5")?.ToLowerInvariant(), xtr.GetAttribute("sha1")?.ToLowerInvariant(), isnodump,
+										xtr.GetAttribute("md5")?.ToLowerInvariant(), xtr.GetAttribute("sha1")?.ToLowerInvariant(), its,
 										date, tempname, null, tempname, null, null, null, null, null, null, false, null, null, sysid, filename,
 										srcid, null);
 									break;
@@ -2115,7 +2207,7 @@ namespace SabreTools.Helper
 				else if (itemRom.Type == ItemType.Rom && (itemRom.Size == 0 || itemRom.Size == -1))
 				{
 					logger.Warning("Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
-					itemRom.Nodump = true;
+					itemRom.ItemStatus = ItemStatus.Nodump;
 				}
 
 				item = itemRom;
@@ -2172,18 +2264,18 @@ namespace SabreTools.Helper
 							datdata.TotalSize += 0;
 							datdata.MD5Count += (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
 							datdata.SHA1Count += (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
-							datdata.NodumpCount += (((Disk)item).Nodump ? 1 : 0);
+							datdata.NodumpCount += (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
 							break;
 						case ItemType.Rom:
 							key = ((Rom)item).Size + "-" + ((Rom)item).CRC;
 
 							// Add statistical data
 							datdata.RomCount += 1;
-							datdata.TotalSize += (((Rom)item).Nodump ? 0 : ((Rom)item).Size);
+							datdata.TotalSize += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 0 : ((Rom)item).Size);
 							datdata.CRCCount += (String.IsNullOrEmpty(((Rom)item).CRC) ? 0 : 1);
 							datdata.MD5Count += (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
 							datdata.SHA1Count += (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
-							datdata.NodumpCount += (((Rom)item).Nodump ? 1 : 0);
+							datdata.NodumpCount += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
 							break;
 						default:
 							key = "default";
@@ -3398,7 +3490,7 @@ namespace SabreTools.Helper
 								state += "\tdisk ( name \"" + rom.Name + "\""
 									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5 " + ((Disk)rom).MD5.ToLowerInvariant() : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1 " + ((Disk)rom).SHA1.ToLowerInvariant() : "")
-									+ (((Disk)rom).Nodump ? " flags nodump" : "")
+									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " flags " + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() : "")
 									+ " )\n";
 								break;
 							case ItemType.Release:
@@ -3418,7 +3510,7 @@ namespace SabreTools.Helper
 									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5 " + ((Rom)rom).MD5.ToLowerInvariant() : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1 " + ((Rom)rom).SHA1.ToLowerInvariant() : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date \"" + ((Rom)rom).Date + "\"" : "")
-									+ (((Rom)rom).Nodump ? " flags nodump" : "")
+									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " flags " + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() : "")
 									+ " )\n";
 								break;
 							case ItemType.Sample:
@@ -3539,7 +3631,7 @@ namespace SabreTools.Helper
 									+ separator + "\"" + ((Rom)rom).CRC + "\""
 									+ separator + "\"" + ((Rom)rom).MD5 + "\""
 									+ separator + "\"" + ((Rom)rom).SHA1 + "\""
-									+ separator + (((Rom)rom).Nodump ? "\"Nodump\"" : "\"\"");
+									+ separator + (((Rom)rom).ItemStatus != ItemStatus.None ? "\"" + ((Rom)rom).ItemStatus.ToString() + "\"" : "\"\"");
 								state += pre + inline + post + "\n";
 							}
 							else if (rom.Type == ItemType.Disk)
@@ -3556,7 +3648,7 @@ namespace SabreTools.Helper
 									+ separator + "\"\""
 									+ separator + "\"" + ((Disk)rom).MD5 + "\""
 									+ separator + "\"" + ((Disk)rom).SHA1 + "\""
-									+ separator + (((Disk)rom).Nodump ? "\"Nodump\"" : "\"\"");
+									+ separator + (((Disk)rom).ItemStatus != ItemStatus.None ? "\"" + ((Disk)rom).ItemStatus.ToString() + "\"" : "\"\"");
 								state += pre + inline + post + "\n";
 							}
 						}
@@ -3669,8 +3761,8 @@ namespace SabreTools.Helper
 								state += "<file type=\"disk\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
-									+ (((Disk)rom).Nodump ? prefix + "/>\n" + prefix + "\t<flags>\n" +
-										prefix + "\t\t<flag name=\"status\" value=\"nodump\"/>\n" +
+									+ (((Disk)rom).ItemStatus != ItemStatus.None ? prefix + "/>\n" + prefix + "\t<flags>\n" +
+										prefix + "\t\t<flag name=\"status\" value=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"/>\n" +
 										prefix + "\t</flags>\n" +
 										prefix + "</file>\n" : "/>\n");
 								break;
@@ -3691,8 +3783,8 @@ namespace SabreTools.Helper
 									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
-									+ (((Rom)rom).Nodump ? prefix + "/>\n" + prefix + "\t<flags>\n" +
-										prefix + "\t\t<flag name=\"status\" value=\"nodump\"/>\n" +
+									+ (((Rom)rom).ItemStatus != ItemStatus.None ? prefix + "/>\n" + prefix + "\t<flags>\n" +
+										prefix + "\t\t<flag name=\"status\" value=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"/>\n" +
 										prefix + "\t</flags>\n" +
 										prefix + "</file>\n" : "/>\n");
 								break;
@@ -3721,7 +3813,7 @@ namespace SabreTools.Helper
 								state += "\t\t<disk name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
-									+ (((Disk)rom).Nodump ? " status=\"nodump\"" : "")
+									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 									+ "/>\n";
 								break;
 							case ItemType.Release:
@@ -3741,7 +3833,7 @@ namespace SabreTools.Helper
 									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
-									+ (((Rom)rom).Nodump ? " status=\"nodump\"" : "")
+									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 									+ "/>\n";
 								break;
 							case ItemType.Sample:
@@ -4138,8 +4230,8 @@ namespace SabreTools.Helper
 					}
 
 					// If the file is a nodump
-					if ((rom.Type == ItemType.Rom && ((Rom)rom).Nodump)
-						|| (rom.Type == ItemType.Disk && ((Disk)rom).Nodump))
+					if ((rom.Type == ItemType.Rom && ((Rom)rom).ItemStatus == ItemStatus.Nodump)
+						|| (rom.Type == ItemType.Disk && ((Disk)rom).ItemStatus == ItemStatus.Nodump))
 					{
 						if (nodump.Files.ContainsKey(key))
 						{

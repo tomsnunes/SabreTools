@@ -83,6 +83,18 @@
 		Archive = 5,
 	}
 
+	/// <summary>
+	/// Determine the status of the item
+	/// </summary>
+	public enum ItemStatus
+	{
+		None = 0,
+		Good = 1,
+		BadDump = 2,
+		Nodump = 3,
+		Verified = 4,
+	}
+
 	#endregion
 
 	#region Skippers and Mappers

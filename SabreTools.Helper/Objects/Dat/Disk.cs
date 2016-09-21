@@ -10,8 +10,7 @@ namespace SabreTools.Helper
 		protected string _md5;
 		protected string _sha1;
 		// private string _merge;
-		// private DiskStatus _romStatus;
-		protected bool _nodump;
+		protected ItemStatus _itemStatus;
 
 		#endregion
 
@@ -28,10 +27,10 @@ namespace SabreTools.Helper
 			get { return _sha1; }
 			set { _sha1 = value; }
 		}
-		public bool Nodump
+		public ItemStatus ItemStatus
 		{
-			get { return _nodump; }
-			set { _nodump = value; }
+			get { return _itemStatus; }
+			set { _itemStatus = value; }
 		}
 
 		#endregion
@@ -46,7 +45,7 @@ namespace SabreTools.Helper
 			_name = "";
 			_itemType = ItemType.Disk;
 			_dupeType = DupeType.None;
-			_nodump = false;
+			_itemStatus = ItemStatus.None;
 		}
 
 		/// <summary>
@@ -55,14 +54,14 @@ namespace SabreTools.Helper
 		/// <param name="name">Name of the item, including extension</param>
 		/// <param name="md5">String representation of the MD5</param>
 		/// <param name="sha1">String representation of the SHA-1</param>
-		/// <param name="nodump">True if the file is a nodump, false otherwise</param>
-		public Disk(string name, string md5, string sha1, bool nodump)
+		/// <param name="itemStatus">Status of the current item</param>
+		public Disk(string name, string md5, string sha1, ItemStatus itemStatus)
 		{
 			_name = name;
 			_itemType = ItemType.Disk;
 			_md5 = md5?.ToLowerInvariant();
 			_sha1 = sha1?.ToLowerInvariant();
-			_nodump = nodump;
+			_itemStatus = itemStatus;
 		}
 
 		/// <summary>
@@ -71,7 +70,7 @@ namespace SabreTools.Helper
 		/// <param name="name">Name of the item, including extension</param>
 		/// <param name="md5">String representation of the MD5</param>
 		/// <param name="sha1">String representation of the SHA-1</param>
-		/// <param name="nodump">True if the file is a nodump, false otherwise</param>
+		/// <param name="itemStatus">Status of the current item</param>
 		/// <param name="machineName">Name for the machine/game</param>
 		/// <param name="comment">Comment for the machine/game</param>
 		/// <param name="machineDescription">Description for the machine/game</param>
@@ -88,7 +87,7 @@ namespace SabreTools.Helper
 		/// <param name="systemName">System Name to be associated with</param>
 		/// <param name="sourceId">Source ID to be associated with</param>
 		/// <param name="sourceName">Source Name to be associated with</param>
-		public Disk(string name, string md5, string sha1, bool nodump, string machineName, string comment,
+		public Disk(string name, string md5, string sha1, ItemStatus itemStatus, string machineName, string comment,
 			string machineDescription, string year, string manufacturer, string romOf, string cloneOf, string sampleOf, string sourceFile,
 			bool isBios, string board, string rebuildTo, int systemId, string systemName, int sourceId, string sourceName)
 		{
@@ -96,7 +95,7 @@ namespace SabreTools.Helper
 			_itemType = ItemType.Disk;
 			_md5 = md5?.ToLowerInvariant();
 			_sha1 = sha1?.ToLowerInvariant();
-			_nodump = nodump;
+			_itemStatus = itemStatus;
 			_machineName = machineName;
 			_comment = comment;
 			_machineDescription = machineDescription;
@@ -133,7 +132,7 @@ namespace SabreTools.Helper
 			Disk newOther = (Disk)other;
 
 			// If either is a nodump, it's never a match
-			if (_nodump || newOther.Nodump)
+			if (_itemStatus == ItemStatus.Nodump || newOther.ItemStatus == ItemStatus.Nodump)
 			{
 				return dupefound;
 			}

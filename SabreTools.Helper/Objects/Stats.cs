@@ -122,11 +122,11 @@ Please check the log folder if the stats scrolled offscreen");
 					{
 						datdata.RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
 						datdata.DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
-						datdata.TotalSize += (rom.Nodump ? 0 : rom.Size);
+						datdata.TotalSize += (rom.ItemStatus == ItemStatus.Nodump ? 0 : rom.Size);
 						datdata.CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
 						datdata.MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
 						datdata.SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
-						datdata.NodumpCount += (rom.Nodump ? 1 : 0);
+						datdata.NodumpCount += (rom.ItemStatus == ItemStatus.Nodump ? 1 : 0);
 					}
 				}
 			}

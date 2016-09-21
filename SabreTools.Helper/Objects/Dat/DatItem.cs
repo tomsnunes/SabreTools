@@ -261,11 +261,11 @@ namespace SabreTools.Helper
 				Rom rom = (Rom)itemdata;
 
 				// Filter on nodump status
-				if (nodump == true && !rom.Nodump)
+				if (nodump == true && rom.ItemStatus != ItemStatus.Nodump)
 				{
 					return false;
 				}
-				if (nodump == false && rom.Nodump)
+				if (nodump == false && rom.ItemStatus == ItemStatus.Nodump)
 				{
 					return false;
 				}
@@ -391,11 +391,11 @@ namespace SabreTools.Helper
 				Disk rom = (Disk)itemdata;
 
 				// Filter on nodump status
-				if (nodump == true && !rom.Nodump)
+				if (nodump == true && rom.ItemStatus != ItemStatus.Nodump)
 				{
 					return false;
 				}
-				if (nodump == false && rom.Nodump)
+				if (nodump == false && rom.ItemStatus == ItemStatus.Nodump)
 				{
 					return false;
 				}
@@ -567,12 +567,12 @@ namespace SabreTools.Helper
 			foreach (DatItem file in infiles)
 			{
 				// If it's a nodump, add and skip
-				if (file.Type == ItemType.Rom && ((Rom)file).Nodump)
+				if (file.Type == ItemType.Rom && ((Rom)file).ItemStatus == ItemStatus.Nodump)
 				{
 					outfiles.Add(file);
 					continue;
 				}
-				else if (file.Type == ItemType.Disk && ((Disk)file).Nodump)
+				else if (file.Type == ItemType.Disk && ((Disk)file).ItemStatus == ItemStatus.Nodump)
 				{
 					outfiles.Add(file);
 					continue;

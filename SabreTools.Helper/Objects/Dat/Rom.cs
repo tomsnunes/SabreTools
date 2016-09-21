@@ -44,7 +44,7 @@ namespace SabreTools.Helper
 			_name = "";
 			_itemType = ItemType.Rom;
 			_dupeType = DupeType.None;
-			_nodump = false;
+			_itemStatus = ItemStatus.None;
 			_date = "";
 		}
 
@@ -54,7 +54,7 @@ namespace SabreTools.Helper
 		/// <param name="name"></param>
 		/// <param name="machineName"></param>
 		public Rom(string name, string machineName) :
-			this(name, -1, "null", "null", "null", false, null, machineName, null, machineName, null, null, null, null, null, null, false, null, null, -1, null, -1, null)
+			this(name, -1, "null", "null", "null", ItemStatus.None, null, machineName, null, machineName, null, null, null, null, null, null, false, null, null, -1, null, -1, null)
 		{
 		}
 
@@ -66,9 +66,9 @@ namespace SabreTools.Helper
 		/// <param name="crc">String representation of the CRC</param>
 		/// <param name="md5">String representation of the MD5</param>
 		/// <param name="sha1">String representation of the SHA-1</param>
-		/// <param name="nodump">True if the file is a nodump, false otherwise</param>
+		/// <param name="itemStatus">Status of the current item</param>
 		/// <param name="date">String representation of the Date</param>
-		public Rom(string name, long size, string crc, string md5, string sha1, bool nodump, string date)
+		public Rom(string name, long size, string crc, string md5, string sha1, ItemStatus itemStatus, string date)
 		{
 			_name = name;
 			_itemType = ItemType.Rom;
@@ -76,7 +76,7 @@ namespace SabreTools.Helper
 			_crc = crc?.ToLowerInvariant();
 			_md5 = md5?.ToLowerInvariant();
 			_sha1 = sha1?.ToLowerInvariant();
-			_nodump = nodump;
+			_itemStatus = itemStatus;
 			_date = date;
 		}
 
@@ -88,7 +88,7 @@ namespace SabreTools.Helper
 		/// <param name="crc">String representation of the CRC</param>
 		/// <param name="md5">String representation of the MD5</param>
 		/// <param name="sha1">String representation of the SHA-1</param>
-		/// <param name="nodump">True if the file is a nodump, false otherwise</param>
+		/// <param name="itemStatus">Status of the current item</param>
 		/// <param name="date">String representation of the Date</param>
 		/// <param name="machineName">Name for the machine/game</param>
 		/// <param name="comment">Comment for the machine/game</param>
@@ -106,7 +106,7 @@ namespace SabreTools.Helper
 		/// <param name="systemName">System Name to be associated with</param>
 		/// <param name="sourceId">Source ID to be associated with</param>
 		/// <param name="sourceName">Source Name to be associated with</param>
-		public Rom(string name, long size, string crc, string md5, string sha1, bool nodump, string date, string machineName,
+		public Rom(string name, long size, string crc, string md5, string sha1, ItemStatus itemStatus, string date, string machineName,
 			string comment, string machineDescription, string year, string manufacturer, string romOf, string cloneOf, string sampleOf,
 			string sourceFile, bool isBios, string board, string rebuildTo, int systemId, string systemName, int sourceId, string sourceName)
 		{
@@ -116,7 +116,7 @@ namespace SabreTools.Helper
 			_crc = crc?.ToLowerInvariant();
 			_md5 = md5?.ToLowerInvariant();
 			_sha1 = sha1?.ToLowerInvariant();
-			_nodump = nodump;
+			_itemStatus = itemStatus;
 			_date = date;
 			_machineName = machineName;
 			_comment = comment;
@@ -154,7 +154,7 @@ namespace SabreTools.Helper
 			Rom newOther = (Rom)other;
 
 			// If either is a nodump, it's never a match
-			if (_nodump || newOther.Nodump)
+			if (_itemStatus == ItemStatus.Nodump || newOther.ItemStatus == ItemStatus.Nodump)
 			{
 				return dupefound;
 			}
