@@ -174,11 +174,19 @@ namespace SabreTools.Helper
 			{
 				outfileNames.Add(OutputFormat.ClrMamePro, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
 			};
-			if ((datdata.OutputFormat & OutputFormat.RomCenter) != 0)
+			if ((datdata.OutputFormat & OutputFormat.RomCenter) != 0 && (datdata.OutputFormat & OutputFormat.ClrMamePro) == 0)
+			{
+				outfileNames.Add(OutputFormat.RomCenter, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
+			};
+			if ((datdata.OutputFormat & OutputFormat.RomCenter) != 0 && (datdata.OutputFormat & OutputFormat.ClrMamePro) != 0)
 			{
 				outfileNames.Add(OutputFormat.RomCenter, CreateOutfileNamesHelper(outDir, ".rc.dat", datdata, overwrite));
 			};
-			if ((datdata.OutputFormat & OutputFormat.DOSCenter) != 0)
+			if ((datdata.OutputFormat & OutputFormat.DOSCenter) != 0 && (datdata.OutputFormat & OutputFormat.ClrMamePro) == 0)
+			{
+				outfileNames.Add(OutputFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
+			};
+			if ((datdata.OutputFormat & OutputFormat.DOSCenter) != 0 && (datdata.OutputFormat & OutputFormat.ClrMamePro) != 0)
 			{
 				outfileNames.Add(OutputFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", datdata, overwrite));
 			};
@@ -186,7 +194,11 @@ namespace SabreTools.Helper
 			{
 				outfileNames.Add(OutputFormat.MissFile, CreateOutfileNamesHelper(outDir, ".txt", datdata, overwrite));
 			};
-			if ((datdata.OutputFormat & OutputFormat.SabreDat) != 0)
+			if ((datdata.OutputFormat & OutputFormat.SabreDat) != 0 && (datdata.OutputFormat & OutputFormat.Xml) == 0)
+			{
+				outfileNames.Add(OutputFormat.SabreDat, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
+			};
+			if ((datdata.OutputFormat & OutputFormat.SabreDat) != 0 && (datdata.OutputFormat & OutputFormat.Xml) != 0)
 			{
 				outfileNames.Add(OutputFormat.SabreDat, CreateOutfileNamesHelper(outDir, ".sd.xml", datdata, overwrite));
 			};
