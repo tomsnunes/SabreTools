@@ -2258,13 +2258,6 @@ namespace SabreTools.Helper
 
 				List<DatItem> roms = dict[key];
 
-				// If we somehow have a null list, just skip it
-				if (roms == null)
-				{
-					logger.Warning("Blank list found for key: " + key);
-					continue;
-				}
-
 				// If we're merging the roms, do so
 				if (mergeroms)
 				{
@@ -2989,7 +2982,7 @@ namespace SabreTools.Helper
 
 					logger.User("Opening file for writing: " + outfile);
 					FileStream fs = File.Create(outfile);
-					StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
+					StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
 
 					// Write out the header
 					WriteHeader(sw, outputFormat, datdata, logger);
@@ -3776,7 +3769,7 @@ namespace SabreTools.Helper
 					switch (outputFormat)
 					{
 						case OutputFormat.ClrMamePro:
-							footer = ")";
+							footer = ")\n";
 							break;
 						case OutputFormat.SabreDat:
 							for (int i = depth - 1; i >= 2; i--)
@@ -3788,10 +3781,10 @@ namespace SabreTools.Helper
 								}
 								footer += "</directory>\n";
 							}
-							footer += "\t</data>\n</datafile>";
+							footer += "\t</data>\n</datafile>\n";
 							break;
 						case OutputFormat.Xml:
-							footer = "\t</machine>\n</datafile>";
+							footer = "\t</machine>\n</datafile>\n";
 							break;
 					}
 				}
@@ -3803,7 +3796,7 @@ namespace SabreTools.Helper
 					{
 						case OutputFormat.SabreDat:
 						case OutputFormat.Xml:
-							footer = "</datafile>";
+							footer = "</datafile>\n";
 							break;
 					}
 				}
