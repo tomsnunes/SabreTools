@@ -163,7 +163,10 @@ Options:
 			should be read as-is.
 			
 		-oc, --output-cmp	Output in CMP format
-			Add outputting the created DAT to clrmamepro format
+			Add outputting the created DAT to CLRMamePro format
+			
+		-od, --output-dc	Output in DOSCenter format
+			Add outputting the created DAT to DOSCenter format
 			
 		-om, --output-miss	Output in Missfile format
 			Add outputting the created DAT to GoodTools miss format
@@ -333,6 +336,9 @@ Options:
 		
 		-oc, --output-cmp	Output in CMP format
 			Add outputting the created DAT to clrmamepro format
+			
+		-od, --output-dc	Output in DOSCenter format
+			Add outputting the created DAT to DOSCenter format
 			
 		-om, --output-miss	Output in Missfile format
 			Add outputting the created DAT to GoodTools miss format

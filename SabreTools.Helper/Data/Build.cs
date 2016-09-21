@@ -112,6 +112,7 @@ namespace SabreTools.Helper
 					helptext.Add("	-u, --unzip		Force unzipping in created DAT");
 					helptext.Add("	-f, --files		Treat archives as files");
 					helptext.Add("	-oc, --output-cmp	Output in CMP format");
+					helptext.Add("	-od, --output-dc	Output in DOSCenter format");
 					helptext.Add("	-om, --output-miss	Output in Missfile format");
 					helptext.Add("	-omd5, --output-md5	Output in MD5 format");
 					helptext.Add("	-or, --output-rc	Output in RomCenter format");
@@ -147,6 +148,7 @@ namespace SabreTools.Helper
 					helptext.Add("	-out=			Output directory");
 					helptext.Add("  -ud, --update		Update a DAT file");
 					helptext.Add("	-oc, --output-cmp	Output in CMP format");
+					helptext.Add("	-od, --output-dc	Output in DOSCenter format");
 					helptext.Add("	-om, --output-miss	Output in Missfile format");
 					helptext.Add("	  -r, --roms			Output roms to miss instead of sets");
 					helptext.Add("	  -gp, --game-prefix		Add game name as a prefix");

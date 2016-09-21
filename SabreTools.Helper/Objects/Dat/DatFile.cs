@@ -3094,6 +3094,17 @@ namespace SabreTools.Helper
 							(datdata.ForceMerging == ForceMerging.Split ? "\tforcemerging split\n" : "") +
 							")\n";
 						break;
+					case OutputFormat.DOSCenter:
+						header = "DOSCenter (\n" +
+							"Name: " + datdata.Name + "\"\n" +
+							"Description: " + datdata.Description + "\"\n" +
+							"Version: " + datdata.Version + "\"\n" +
+							"Date: " + datdata.Date + "\"\n" +
+							"Author: " + datdata.Author + "\"\n" +
+							"Homepage: " + datdata.Homepage + "\"\n" +
+							"Comment: " + datdata.Comment + "\"\n" +
+							")\n";
+						break;
 					case OutputFormat.MissFile:
 						if (datdata.XSV == true)
 						{
@@ -3225,7 +3236,9 @@ namespace SabreTools.Helper
 							"\tdescription \"" + (String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription) + "\"\n" +
 							(String.IsNullOrEmpty(rom.Year) ? "" : "\tyear " + rom.Year + "\n") +
 							(String.IsNullOrEmpty(rom.Manufacturer) ? "" : "\tmanufacturer \"" + rom.Manufacturer + "\"\n");
-
+						break;
+					case OutputFormat.DOSCenter:
+						state += "game (\n\tname \"" + rom.MachineName + ".zip\"\n";
 						break;
 					case OutputFormat.SabreDat:
 						for (int i = (last == -1 ? 0 : last); i < newsplit.Count; i++)
@@ -3289,6 +3302,7 @@ namespace SabreTools.Helper
 				switch (outputFormat)
 				{
 					case OutputFormat.ClrMamePro:
+					case OutputFormat.DOSCenter:
 						state += (String.IsNullOrEmpty(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n") + ")\n";
 						break;
 					case OutputFormat.SabreDat:
@@ -3413,6 +3427,25 @@ namespace SabreTools.Helper
 								break;
 						}
 
+						break;
+					case OutputFormat.DOSCenter:
+						switch (rom.Type)
+						{
+							case ItemType.Archive:
+							case ItemType.BiosSet:
+							case ItemType.Disk:
+							case ItemType.Release:
+							case ItemType.Sample:
+								// We don't output these at all
+								break;
+							case ItemType.Rom:
+								state += "\tfile ( name\"" + ((Rom)rom).Name
+									+ " size " + ((Rom)rom).Size
+									+ " date " + ((Rom)rom).Date
+									+ " crc " + ((Rom)rom).CRC
+									+ " )\n";
+								break;
+						}
 						break;
 					case OutputFormat.MissFile:
 						// Missfile should only output Rom and Disk
@@ -3751,6 +3784,7 @@ namespace SabreTools.Helper
 					switch (outputFormat)
 					{
 						case OutputFormat.ClrMamePro:
+						case OutputFormat.DOSCenter:
 							footer = ")\n";
 							break;
 						case OutputFormat.SabreDat:

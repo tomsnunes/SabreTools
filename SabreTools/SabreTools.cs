@@ -236,6 +236,10 @@ namespace SabreTools
 					case "--output-cmp":
 						outputFormat |= OutputFormat.ClrMamePro;
 						break;
+					case "-od":
+					case "--output-dc":
+						outputFormat |= OutputFormat.DOSCenter;
+						break;
 					case "-om":
 					case "--output-miss":
 						outputFormat |= OutputFormat.MissFile;
