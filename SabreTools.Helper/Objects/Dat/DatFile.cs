@@ -3440,9 +3440,9 @@ namespace SabreTools.Helper
 								break;
 							case ItemType.Rom:
 								state += "\tfile ( name\"" + ((Rom)rom).Name
-									+ " size " + ((Rom)rom).Size
-									+ " date " + ((Rom)rom).Date
-									+ " crc " + ((Rom)rom).CRC
+									+ (((Rom)rom).Size != -1 ? " size " + ((Rom)rom).Size : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date " + ((Rom)rom).Date : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
 									+ " )\n";
 								break;
 						}
