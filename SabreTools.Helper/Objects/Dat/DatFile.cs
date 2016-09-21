@@ -2258,6 +2258,13 @@ namespace SabreTools.Helper
 
 				List<DatItem> roms = dict[key];
 
+				// If we somehow have a null list, just skip it
+				if (roms == null)
+				{
+					logger.Warning("Blank list found for key: " + key);
+					continue;
+				}
+
 				// If we're merging the roms, do so
 				if (mergeroms)
 				{
