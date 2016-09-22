@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -1244,7 +1245,9 @@ namespace SabreTools.Helper
 		/// <param name="filename">Name of the file to be deleted</param>
 		public async static void DeleteFile(string filename)
 		{
+			File.SetAttributes(filename, 0);
 			FileInfo fi = new FileInfo(filename);
+			fi.IsReadOnly = false;
 			await Task.Factory.StartNew(() =>
 			{
 				while (fi.Exists)
