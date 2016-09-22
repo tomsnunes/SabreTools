@@ -31,6 +31,7 @@ namespace SabreTools
 
 		// Other required variables
 		private Logger _logger;
+		private List<string> _clean;
 
 		// Public variables
 		public DatFile DatData
@@ -72,6 +73,7 @@ namespace SabreTools
 			_copyFiles = copyFiles;
 			_maxDegreeOfParallelism = maxDegreeOfParallelism;
 			_logger = logger;
+			_clean = new List<string>();
 		}
 
 		/// <suaxmary>
@@ -167,6 +169,7 @@ namespace SabreTools
 			}
 
 			// Now that we're done, delete the temp folder (if it's not the default)
+			_logger.User("Cleaning temp folder");
 			try
 			{
 				if (_tempDir != Path.GetTempPath())
@@ -177,6 +180,28 @@ namespace SabreTools
 			catch
 			{
 				// Just absorb the error for now
+			}
+
+			// Now if we have other files to delete, do so
+			if (_copyFiles)
+			{
+				_logger.User("Cleaning copied files");
+				Parallel.ForEach(_clean,
+					new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
+					file =>
+				{
+					while (File.Exists(file))
+					{
+						try
+						{
+							Directory.Delete(Path.GetDirectoryName(file), true);
+						}
+						catch
+						{
+						// Just absorb the error for now
+					}
+					}
+				});
 			}
 
 			return true;
@@ -195,7 +220,8 @@ namespace SabreTools
 			string newitem = item;
 			if (_copyFiles)
 			{
-				newitem = Path.Combine(tempSubDir, Path.GetFileName(item));
+				newitem = Path.Combine(_tempDir, Path.GetRandomFileName(), Path.GetFileName(item));
+				Directory.CreateDirectory(Path.GetDirectoryName(newitem));
 				File.Copy(item, newitem, true);
 			}
 
@@ -218,13 +244,13 @@ namespace SabreTools
 						}
 
 						_datdata.Files[key].Add(rom);
-						_logger.User("File added: " + Path.GetFileNameWithoutExtension(newitem) + Environment.NewLine);
+						_logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 					}
 					
 				}
 				else
 				{
-					_logger.User("File not added: " + Path.GetFileNameWithoutExtension(newitem) + Environment.NewLine);
+					_logger.User("File not added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 					return;
 				}
 				
@@ -268,7 +294,7 @@ namespace SabreTools
 				// If the file was an archive and was extracted successfully, check it
 				if (!encounteredErrors)
 				{
-					_logger.Log(Path.GetFileName(newitem) + " treated like an archive");
+					_logger.Log(Path.GetFileName(item) + " treated like an archive");
 					List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(extracted,
 						new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
@@ -279,13 +305,26 @@ namespace SabreTools
 							Path.Combine((_datdata.Type == "SuperDAT"
 								? (Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length)
 								: ""),
-							Path.GetFileNameWithoutExtension(newitem)));
+							Path.GetFileNameWithoutExtension(item)));
 					});
 				}
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(newitem))
 				{
 					ProcessFile(newitem, _basePath, "");
+				}
+
+				// Cue to delete the file if it's a copy
+				if (_copyFiles)
+				{
+					try
+					{
+						Directory.Delete(Path.GetDirectoryName(newitem), true);
+					}
+					catch
+					{
+						_clean.Add(newitem);
+					}
 				}
 
 				// Delete the sub temp directory
