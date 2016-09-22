@@ -21,7 +21,6 @@ namespace SabreTools
 
 			// Perform initial setup and verification
 			Logger logger = new Logger(true, "simplesort.log");
-			logger.Start();
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))

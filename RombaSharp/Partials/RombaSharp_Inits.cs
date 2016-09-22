@@ -67,7 +67,6 @@ namespace SabreTools
 			};
 
 			Logger logger = new Logger(false, "");
-			logger.Start();
 			foreach (string input in inputs)
 			{
 				DATFromDir dfd = new DATFromDir(input, datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,

@@ -21,7 +21,6 @@ namespace SabreTools
 		{
 			// Perform initial setup and verification
 			_logger = new Logger(true, "sabretools.log");
-			_logger.Start();
 
 			// If output is being redirected, don't allow clear screens
 			if (!Console.IsOutputRedirected)

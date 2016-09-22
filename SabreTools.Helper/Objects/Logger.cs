@@ -23,24 +23,6 @@ namespace SabreTools.Helper
 		// Private required variables
 		private string _basepath = "Logs" + Path.DirectorySeparatorChar;
 
-		// Public wrappers
-		public bool ToFile
-		{
-			get { return _tofile; }
-			set
-			{
-				if (!value)
-				{
-					Close();
-				}
-				_tofile = value;
-				if (_tofile)
-				{
-					Start();
-				}
-			}
-		}
-
 		/// <summary>
 		/// Initialize a Logger object with the given information
 		/// </summary>
@@ -55,6 +37,8 @@ namespace SabreTools.Helper
 			{
 				Directory.CreateDirectory(_basepath);
 			}
+
+			Start();
 		}
 
 		/// <summary>

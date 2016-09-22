@@ -42,7 +42,6 @@ namespace SabreTools
 		{
 			// Perform initial setup and verification
 			_logger = new Logger(true, "romba.log");
-			_logger.Start();
 			InitializeConfiguration();
 			DBTools.EnsureDatabase(_dbSchema, _db, _connectionString);
 
