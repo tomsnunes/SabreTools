@@ -499,7 +499,6 @@ namespace SabreTools.Helper
 			{
 				StreamReader sr = File.OpenText(filename);
 				string first = sr.ReadLine();
-				sr.Close();
 				sr.Dispose();
 				if (first.Contains("<") && first.Contains(">"))
 				{
@@ -1289,7 +1288,6 @@ namespace SabreTools.Helper
 				}
 			}
 
-			sr.Close();
 			sr.Dispose();
 		}
 
@@ -1454,7 +1452,6 @@ namespace SabreTools.Helper
 				}
 			}
 
-			sr.Close();
 			sr.Dispose();
 		}
 
@@ -2218,7 +2215,6 @@ namespace SabreTools.Helper
 					}
 				}
 
-				xtr.Close();
 				xtr.Dispose();
 			}
 		}
@@ -3215,8 +3211,8 @@ namespace SabreTools.Helper
 					WriteFooter(sw, outputFormat, datdata, depth, logger);
 
 					logger.Log("File written!" + Environment.NewLine);
-					sw.Close();
-					fs.Close();
+					sw.Dispose();
+					fs.Dispose();
 				}
 			}
 			catch (Exception ex)

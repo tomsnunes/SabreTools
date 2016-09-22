@@ -83,31 +83,33 @@ namespace SabreTools.Helper
 				}
 
 				// Open the archive for writing
-				using (outarchive = System.IO.Compression.ZipFile.Open(archiveFileName, ZipArchiveMode.Update))
+				outarchive = System.IO.Compression.ZipFile.Open(archiveFileName, ZipArchiveMode.Update);
+
+				// Now loop through and add all files
+				for (int i = 0; i < inputFiles.Count; i++)
 				{
-					// Now loop through and add all files
-					for (int i = 0; i < inputFiles.Count; i++)
+					string inputFile = inputFiles[i];
+					Rom rom = roms[i];
+
+					// If the archive doesn't already contain the entry, add it
+					if (outarchive.GetEntry(rom.Name) == null)
 					{
-						string inputFile = inputFiles[i];
-						Rom rom = roms[i];
+						outarchive.CreateEntryFromFile(inputFile, rom.Name, CompressionLevel.Optimal);
+					}
 
-						// If the archive doesn't already contain the entry, add it
-						if (outarchive.GetEntry(rom.Name) == null)
+					// If there's a Date attached to the rom, change the entry to that Date
+					if (!string.IsNullOrEmpty(rom.Date))
+					{
+						DateTimeOffset dto = DateTimeOffset.Now;
+						if (DateTimeOffset.TryParse(rom.Date, out dto))
 						{
-							outarchive.CreateEntryFromFile(inputFile, rom.Name, CompressionLevel.Optimal);
-						}
-
-						// If there's a Date attached to the rom, change the entry to that Date
-						if (!string.IsNullOrEmpty(rom.Date))
-						{
-							DateTimeOffset dto = DateTimeOffset.Now;
-							if (DateTimeOffset.TryParse(rom.Date, out dto))
-							{
-								outarchive.GetEntry(rom.Name).LastWriteTime = dto;
-							}
+							outarchive.GetEntry(rom.Name).LastWriteTime = dto;
 						}
 					}
 				}
+
+				// Dispose of the streams
+				outarchive.Dispose();
 
 				success = true;
 			}
@@ -211,21 +213,23 @@ namespace SabreTools.Helper
 						Rom rom = roms[inputIndexMap[key]];
 
 						// Open the input file for reading
-						using (Stream readStream = File.Open(inputFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-						{
-							ulong streamSize = (ulong)(new FileInfo(inputFile).Length);
-							zipReturn = zipFile.OpenWriteStream(false, true, rom.Name, streamSize, CompressionMethod.Deflated, out writeStream);
+						Stream fs = File.Open(inputFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-							// Copy the input stream to the output
-							byte[] buffer = new byte[8 * 1024];
-							int len;
-							while ((len = readStream.Read(buffer, 0, buffer.Length)) > 0)
-							{
-								writeStream.Write(buffer, 0, len);
-							}
-							writeStream.Flush();
-							zipFile.CloseWriteStream(Convert.ToUInt32(rom.CRC, 16));
+						ulong streamSize = (ulong)(new FileInfo(inputFile).Length);
+						zipReturn = zipFile.OpenWriteStream(false, true, rom.Name, streamSize, CompressionMethod.Deflated, out writeStream);
+
+						// Copy the input stream to the output
+						byte[] buffer = new byte[8 * 1024];
+						int len;
+						while ((len = fs.Read(buffer, 0, buffer.Length)) > 0)
+						{
+							writeStream.Write(buffer, 0, len);
 						}
+						writeStream.Flush();
+						zipFile.CloseWriteStream(Convert.ToUInt32(rom.CRC, 16));
+
+						//Dispose of the file stream
+						fs.Dispose();
 					}
 				}
 
@@ -368,47 +372,53 @@ namespace SabreTools.Helper
 			outDir = Path.GetFullPath(outDir);
 
 			// Now get the Rom info for the file so we have hashes and size
-			Rom rom = FileTools.GetSingleFileInfo(input);
+			Rom rom = GetSingleFileInfo(input);
 
 			// If it doesn't exist, create the output file and then write
 			string outfile = Path.Combine(outDir, rom.SHA1 + ".gz");
-			using (FileStream inputstream = new FileStream(input, FileMode.Open))
-			using (GZipStream output = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress))
-			{
-				inputstream.CopyTo(output);
-			}
+
+			// Compress the input stream
+			FileStream inputStream = File.OpenRead(input);
+			GZipStream outputStream = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress);
+			inputStream.CopyTo(outputStream);
+
+			// Dispose of the streams
+			inputStream.Dispose();
+			outputStream.Dispose();
 
 			// Now that it's ready, inject the header info
-			using (BinaryWriter sw = new BinaryWriter(new MemoryStream()))
+			BinaryWriter sw = new BinaryWriter(new MemoryStream());
+			BinaryReader br = new BinaryReader(File.OpenRead(outfile));
+					
+			// Write standard header and TGZ info
+			byte[] data = Constants.TorrentGZHeader
+							.Concat(Style.StringToByteArray(rom.MD5)) // MD5
+							.Concat(Style.StringToByteArray(rom.CRC)) // CRC
+							.Concat(BitConverter.GetBytes(rom.Size).Reverse().ToArray()) // Long size (Mirrored)
+						.ToArray();
+			sw.Write(data);
+
+			// Finally, copy the rest of the data from the original file
+			br.BaseStream.Seek(10, SeekOrigin.Begin);
+			int i = 10;
+			while (br.BaseStream.Position < br.BaseStream.Length)
 			{
-				using (BinaryReader br = new BinaryReader(File.OpenRead(outfile)))
-				{
-					// Write standard header and TGZ info
-					byte[] data = Constants.TorrentGZHeader
-									.Concat(Style.StringToByteArray(rom.MD5)) // MD5
-									.Concat(Style.StringToByteArray(rom.CRC)) // CRC
-									.Concat(BitConverter.GetBytes(rom.Size).Reverse().ToArray()) // Long size (Mirrored)
-								.ToArray();
-					sw.Write(data);
-
-					// Finally, copy the rest of the data from the original file
-					br.BaseStream.Seek(10, SeekOrigin.Begin);
-					int i = 10;
-					while (br.BaseStream.Position < br.BaseStream.Length)
-					{
-						sw.Write(br.ReadByte());
-						i++;
-					}
-				}
-
-				using (BinaryWriter bw = new BinaryWriter(File.Open(outfile, FileMode.Create)))
-				{
-					// Now write the new file over the original
-					sw.BaseStream.Seek(0, SeekOrigin.Begin);
-					bw.BaseStream.Seek(0, SeekOrigin.Begin);
-					sw.BaseStream.CopyTo(bw.BaseStream);
-				}
+				sw.Write(br.ReadByte());
+				i++;
 			}
+
+			// Dispose of the stream
+			br.Dispose();
+
+			// Now write the new file over the original
+			BinaryWriter bw = new BinaryWriter(File.Open(outfile, FileMode.Create));
+			sw.BaseStream.Seek(0, SeekOrigin.Begin);
+			bw.BaseStream.Seek(0, SeekOrigin.Begin);
+			sw.BaseStream.CopyTo(bw.BaseStream);
+
+			// Dispose of the streams
+			bw.Dispose();
+			sw.Dispose();
 
 			// If we're in romba mode, create the subfolder and move the file
 			if (romba)
@@ -492,27 +502,24 @@ namespace SabreTools.Helper
 				return encounteredErrors;
 			}
 
-			FileStream fs = null;
 			try
 			{
-				fs = File.OpenRead(input);
-
 				if (at == ArchiveType.SevenZip && sevenzip != ArchiveScanLevel.External)
 				{
-					using (SevenZipArchive sza = SevenZipArchive.Open(fs))
+					logger.Log("Found archive of type: " + at);
+
+					// Create the temp directory
+					Directory.CreateDirectory(tempDir);
+
+					// Extract all files to the temp directory
+					SevenZipArchive sza = SevenZipArchive.Open(File.OpenRead(input));
+					foreach (IArchiveEntry iae in sza.Entries)
 					{
-						logger.Log("Found archive of type: " + at);
-
-						// Create the temp directory
-						Directory.CreateDirectory(tempDir);
-
-						// Extract all files to the temp directory
-						foreach (IArchiveEntry iae in sza.Entries)
-						{
-							iae.WriteToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
-						}
-						encounteredErrors = false;
+						iae.WriteToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
 					}
+					encounteredErrors = false;
+					sza.Dispose();
+
 				}
 				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
 				{
@@ -521,37 +528,35 @@ namespace SabreTools.Helper
 					// Create the temp directory
 					Directory.CreateDirectory(tempDir);
 
-					using (FileStream outstream = File.Create(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input))))
-					{
-						using (GZipStream gzstream = new GZipStream(fs, CompressionMode.Decompress))
-						{
-							gzstream.CopyTo(outstream);
-						}
-					}
+					// Decompress the input stream
+					FileStream outstream = File.Create(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input)));
+					GZipStream gzstream = new GZipStream(File.OpenRead(input), CompressionMode.Decompress);
+					gzstream.CopyTo(outstream);
+
+					// Dispose of the streams
+					outstream.Dispose();
+					gzstream.Dispose();
+
 					encounteredErrors = false;
 				}
-				else
+				else if ((at == ArchiveType.Zip && zip != ArchiveScanLevel.External)
+					|| (at == ArchiveType.Rar && rar != ArchiveScanLevel.External))
 				{
-					using (IReader reader = ReaderFactory.Open(fs))
+					logger.Log("Found archive of type: " + at);
+
+					// Create the temp directory
+					Directory.CreateDirectory(tempDir);
+
+					// Extract all files to the temp directory
+					IReader reader = ReaderFactory.Open(File.OpenRead(input));
+					bool succeeded = reader.MoveToNextEntry();
+					while (succeeded)
 					{
-						logger.Log("Found archive of type: " + at);
-
-						if ((at == ArchiveType.Zip && zip != ArchiveScanLevel.External) ||
-							(at == ArchiveType.Rar && rar != ArchiveScanLevel.External))
-						{
-							// Create the temp directory
-							Directory.CreateDirectory(tempDir);
-
-							// Extract all files to the temp directory
-							bool succeeded = reader.MoveToNextEntry();
-							while (succeeded)
-							{
-								reader.WriteEntryToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
-								succeeded = reader.MoveToNextEntry();
-							}
-							encounteredErrors = false;
-						}
+						reader.WriteEntryToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+						succeeded = reader.MoveToNextEntry();
 					}
+					encounteredErrors = false;
+					reader.Dispose();
 				}
 			}
 			catch (EndOfStreamException)
@@ -566,11 +571,6 @@ namespace SabreTools.Helper
 			{
 				// Don't log file open errors
 				encounteredErrors = true;
-			}
-			finally
-			{
-				fs?.Close();
-				fs?.Dispose();
 			}
 
 			return encounteredErrors;
@@ -601,13 +601,12 @@ namespace SabreTools.Helper
 			IReader reader = null;
 			try
 			{
-				reader = ReaderFactory.Open(File.OpenRead(input));
-
 				if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
 				{
 					// Create the temp directory
 					Directory.CreateDirectory(tempDir);
 
+					reader = ReaderFactory.Open(File.OpenRead(input));
 					while (reader.MoveToNextEntry())
 					{
 						logger.Log("Current entry name: '" + reader.Entry.Key + "'");
@@ -624,20 +623,15 @@ namespace SabreTools.Helper
 				}
 				else if (at == ArchiveType.GZip)
 				{
-					// Dispose the original reader
-					reader.Dispose();
+					// Decompress the input stream
+					FileStream outstream = File.Create(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input)));
+					GZipStream gzstream = new GZipStream(File.OpenRead(input), CompressionMode.Decompress);
+					gzstream.CopyTo(outstream);
+					outfile = Path.GetFullPath(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input)));
 
-					using(FileStream itemstream = File.OpenRead(input))
-					{
-						using (FileStream outstream = File.Create(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input))))
-						{
-							using (GZipStream gzstream = new GZipStream(itemstream, CompressionMode.Decompress))
-							{
-								gzstream.CopyTo(outstream);
-								outfile = Path.GetFullPath(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input)));
-							}
-						}
-					}
+					// Dispose of the streams
+					outstream.Dispose();
+					gzstream.Dispose();
 				}
 			}
 			catch (Exception ex)
@@ -831,20 +825,18 @@ namespace SabreTools.Helper
 				if (at == ArchiveType.GZip)
 				{
 					// Get the CRC and size from the file
-					using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
-					{
-						br.BaseStream.Seek(-8, SeekOrigin.End);
-						byte[] headercrc = br.ReadBytes(4);
-						crc = BitConverter.ToString(headercrc.Reverse().ToArray()).Replace("-", string.Empty).ToLowerInvariant();
-						byte[] headersize = br.ReadBytes(4);
-						size = BitConverter.ToInt32(headersize.Reverse().ToArray(), 0);
-					}
+					BinaryReader br = new BinaryReader(File.OpenRead(input));
+					br.BaseStream.Seek(-8, SeekOrigin.End);
+					byte[] headercrc = br.ReadBytes(4);
+					crc = BitConverter.ToString(headercrc.Reverse().ToArray()).Replace("-", string.Empty).ToLowerInvariant();
+					byte[] headersize = br.ReadBytes(4);
+					size = BitConverter.ToInt32(headersize.Reverse().ToArray(), 0);
+					br.Dispose();
 				}
-
-				reader = ReaderFactory.Open(File.OpenRead(input));
 
 				if (at != ArchiveType.Tar)
 				{
+					reader = ReaderFactory.Open(File.OpenRead(input));
 					while (reader.MoveToNextEntry())
 					{
 						if (reader.Entry != null && !reader.Entry.IsDirectory)
@@ -907,13 +899,12 @@ namespace SabreTools.Helper
 			byte[] headermd5; // MD5
 			byte[] headercrc; // CRC
 			byte[] headersz; // Int64 size
-			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
-			{
-				header = br.ReadBytes(12);
-				headermd5 = br.ReadBytes(16);
-				headercrc = br.ReadBytes(4);
-				headersz = br.ReadBytes(8);
-			}
+			BinaryReader br = new BinaryReader(File.OpenRead(input));
+			header = br.ReadBytes(12);
+			headermd5 = br.ReadBytes(16);
+			headercrc = br.ReadBytes(4);
+			headersz = br.ReadBytes(8);
+			br.Dispose();
 
 			// If the header is not correct, return a blank rom
 			bool correct = true;
@@ -978,10 +969,9 @@ namespace SabreTools.Helper
 			try
 			{
 				byte[] magic = new byte[8];
-				using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
-				{
-					magic = br.ReadBytes(8);
-				}
+				BinaryReader br = new BinaryReader(File.OpenRead(input));
+				magic = br.ReadBytes(8);
+				br.Dispose();
 
 				// Convert it to an uppercase string
 				string mstr = string.Empty;
@@ -1070,15 +1060,13 @@ namespace SabreTools.Helper
 		/// <param name="input">Name of the input file to check</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <remarks>http://cpansearch.perl.org/src/BJOERN/Compress-Deflate7-1.0/7zip/DOC/7zFormat.txt</remarks>
-		public static void GetSevenZipFIleInfo(string input, Logger logger)
+		public static void GetSevenZipFileInfo(string input, Logger logger)
 		{
-			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
-			{
-				br.ReadBytes(6); // BYTE kSignature[6] = {'7', 'z', 0xBC, 0xAF, 0x27, 0x1C};
-				logger.User("ArchiveVersion (Major.Minor): " + br.ReadByte() + "." + br.ReadByte());
-				logger.User("StartHeaderCRC: " + br.ReadUInt32());
-				logger.User("StartHeader (NextHeaderOffset, NextHeaderSize, NextHeaderCRC)" + br.ReadUInt64() + ", " + br.ReadUInt64() + ", " + br.ReadUInt32());
-			}
+			BinaryReader br = new BinaryReader(File.OpenRead(input));
+			br.ReadBytes(6); // BYTE kSignature[6] = {'7', 'z', 0xBC, 0xAF, 0x27, 0x1C};
+			logger.User("ArchiveVersion (Major.Minor): " + br.ReadByte() + "." + br.ReadByte());
+			logger.User("StartHeaderCRC: " + br.ReadUInt32());
+			logger.User("StartHeader (NextHeaderOffset, NextHeaderSize, NextHeaderCRC)" + br.ReadUInt64() + ", " + br.ReadUInt64() + ", " + br.ReadUInt32());
 		}
 
 		#endregion
@@ -1101,29 +1089,31 @@ namespace SabreTools.Helper
 			}
 
 			// Read the input file and write to the fail
-			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
-			using (BinaryWriter bw = new BinaryWriter(File.OpenWrite(output)))
+			BinaryReader br = new BinaryReader(File.OpenRead(input));
+			BinaryWriter bw = new BinaryWriter(File.OpenWrite(output));
+
+			int bufferSize = 1024;
+			long adjustedLength = br.BaseStream.Length - bytesToRemoveFromTail;
+
+			// Seek to the correct position
+			br.BaseStream.Seek((bytesToRemoveFromHead < 0 ? 0 : bytesToRemoveFromHead), SeekOrigin.Begin);
+
+			// Now read the file in chunks and write out
+			byte[] buffer = new byte[bufferSize];
+			while (br.BaseStream.Position <= (adjustedLength - bufferSize))
 			{
-				int bufferSize = 1024;
-				long adjustedLength = br.BaseStream.Length - bytesToRemoveFromTail;
-
-				// Seek to the correct position
-				br.BaseStream.Seek((bytesToRemoveFromHead < 0 ? 0 : bytesToRemoveFromHead), SeekOrigin.Begin);
-
-				// Now read the file in chunks and write out
-				byte[] buffer = new byte[bufferSize];
-				while (br.BaseStream.Position <= (adjustedLength - bufferSize))
-				{
-					buffer = br.ReadBytes(bufferSize);
-					bw.Write(buffer);
-				}
-
-				// For the final chunk, if any, write out only that number of bytes
-				int length = (int)(adjustedLength - br.BaseStream.Position);
-				buffer = new byte[length];
-				buffer = br.ReadBytes(length);
+				buffer = br.ReadBytes(bufferSize);
 				bw.Write(buffer);
 			}
+
+			// For the final chunk, if any, write out only that number of bytes
+			int length = (int)(adjustedLength - br.BaseStream.Position);
+			buffer = new byte[length];
+			buffer = br.ReadBytes(length);
+			bw.Write(buffer);
+
+			br.Dispose();
+			bw.Dispose();
 		}
 
 		/// <summary>
@@ -1165,35 +1155,37 @@ namespace SabreTools.Helper
 				return;
 			}
 
-			using (BinaryReader br = new BinaryReader(File.OpenRead(input)))
-			using (BinaryWriter bw = new BinaryWriter(File.OpenWrite(output)))
+			BinaryReader br = new BinaryReader(File.OpenRead(input));
+			BinaryWriter bw = new BinaryWriter(File.OpenWrite(output));
+
+			if (bytesToAddToHead.Count() > 0)
 			{
-				if (bytesToAddToHead.Count() > 0)
-				{
-					bw.Write(bytesToAddToHead);
-				}
-
-				int bufferSize = 1024;
-
-				// Now read the file in chunks and write out
-				byte[] buffer = new byte[bufferSize];
-				while (br.BaseStream.Position <= (br.BaseStream.Length - bufferSize))
-				{
-					buffer = br.ReadBytes(bufferSize);
-					bw.Write(buffer);
-				}
-
-				// For the final chunk, if any, write out only that number of bytes
-				int length = (int)(br.BaseStream.Length - br.BaseStream.Position);
-				buffer = new byte[length];
-				buffer = br.ReadBytes(length);
-				bw.Write(buffer);
-
-				if (bytesToAddToTail.Count() > 0)
-				{
-					bw.Write(bytesToAddToTail);
-				}
+				bw.Write(bytesToAddToHead);
 			}
+
+			int bufferSize = 1024;
+
+			// Now read the file in chunks and write out
+			byte[] buffer = new byte[bufferSize];
+			while (br.BaseStream.Position <= (br.BaseStream.Length - bufferSize))
+			{
+				buffer = br.ReadBytes(bufferSize);
+				bw.Write(buffer);
+			}
+
+			// For the final chunk, if any, write out only that number of bytes
+			int length = (int)(br.BaseStream.Length - br.BaseStream.Position);
+			buffer = new byte[length];
+			buffer = br.ReadBytes(length);
+			bw.Write(buffer);
+
+			if (bytesToAddToTail.Count() > 0)
+			{
+				bw.Write(bytesToAddToTail);
+			}
+
+			br.Dispose();
+			bw.Dispose();
 		}
 
 		/// <summary>

@@ -101,15 +101,16 @@ namespace SabreTools
 
 				// Now take care of the header and new output file
 				string hstr = string.Empty;
-				using (BinaryReader br = new BinaryReader(File.OpenRead(file)))
+				BinaryReader br = new BinaryReader(File.OpenRead(file));
+
+				// Extract the header as a string for the database
+				byte[] hbin = br.ReadBytes(headerSize);
+				for (int i = 0; i < headerSize; i++)
 				{
-					// Extract the header as a string for the database
-					byte[] hbin = br.ReadBytes(headerSize);
-					for (int i = 0; i < headerSize; i++)
-					{
-						hstr += BitConverter.ToString(new byte[] { hbin[i] });
-					}
+					hstr += BitConverter.ToString(new byte[] { hbin[i] });
 				}
+
+				br.Dispose();
 
 				// Then find an apply the exact rule to the file
 				SkipperRule rule = Skippers.MatchesSkipper(file, "", _logger);

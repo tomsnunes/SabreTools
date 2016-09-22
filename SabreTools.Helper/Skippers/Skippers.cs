@@ -480,7 +480,6 @@ namespace SabreTools.Helper
 							// If we're not keeping the stream open, dispose of the binary reader
 							if (!keepOpen)
 							{
-								input.Close();
 								input.Dispose();
 							}
 
@@ -494,7 +493,6 @@ namespace SabreTools.Helper
 			// If we're not keeping the stream open, dispose of the binary reader
 			if (!keepOpen)
 			{
-				input.Close();
 				input.Dispose();
 			}
 
@@ -677,14 +675,12 @@ namespace SabreTools.Helper
 				// If we're not keeping the read stream open, dispose of the binary reader
 				if (!keepReadOpen)
 				{
-					br?.Close();
 					br?.Dispose();
 				}
 
 				// If we're not keeping the write stream open, dispose of the binary reader
 				if (!keepWriteOpen)
 				{
-					bw?.Close();
 					bw?.Dispose();
 				}
 			}

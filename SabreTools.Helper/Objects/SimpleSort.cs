@@ -488,27 +488,32 @@ namespace SabreTools.Helper
 			// If there's a match, get the new information from the stream
 			if (rule.Tests != null && rule.Tests.Count != 0)
 			{
-				using (MemoryStream output = new MemoryStream())
-				{
-					FileStream input = File.OpenRead(file);
-					Skippers.TransformStream(input, output, rule, _logger, false, true);
-					Rom romNH = FileTools.GetSingleStreamInfo(output);
-					romNH.Name = "HEAD::" + rom.Name;
-					romNH.MachineName = rom.MachineName;
+				// Create the input and output streams
+				MemoryStream output = new MemoryStream();
+				FileStream input = File.OpenRead(file);
 
-					// Add the rom information to the Dat
-					key = romNH.Size + "-" + romNH.CRC;
-					if (matchdat.Files.ContainsKey(key))
-					{
-						matchdat.Files[key].Add(romNH);
-					}
-					else
-					{
-						List<DatItem> temp = new List<DatItem>();
-						temp.Add(romNH);
-						matchdat.Files.Add(key, temp);
-					}
+				// Transform the stream and get the information from it
+				Skippers.TransformStream(input, output, rule, _logger, false, true);
+				Rom romNH = FileTools.GetSingleStreamInfo(output);
+				romNH.Name = "HEAD::" + rom.Name;
+				romNH.MachineName = rom.MachineName;
+
+				// Add the rom information to the Dat
+				key = romNH.Size + "-" + romNH.CRC;
+				if (matchdat.Files.ContainsKey(key))
+				{
+					matchdat.Files[key].Add(romNH);
 				}
+				else
+				{
+					List<DatItem> temp = new List<DatItem>();
+					temp.Add(romNH);
+					matchdat.Files.Add(key, temp);
+				}
+
+				// Dispose of the streams
+				output.Dispose();
+				input.Dispose();
 			}
 
 			return true;
@@ -1096,12 +1101,14 @@ namespace SabreTools.Helper
 				}
 
 				// Write out the value to each of the romba depot files
-				using (StreamWriter tw = new StreamWriter(File.Open(Path.Combine(_outDir, ".romba_size"), FileMode.Create, FileAccess.Write)))
-				using (StreamWriter twb = new StreamWriter(File.Open(Path.Combine(_outDir, ".romba_size.backup"), FileMode.Create, FileAccess.Write)))
-				{
-					tw.Write(size);
-					twb.Write(size);
-				}
+				StreamWriter tw = new StreamWriter(File.Open(Path.Combine(_outDir, ".romba_size"), FileMode.Create, FileAccess.Write));
+				StreamWriter twb = new StreamWriter(File.Open(Path.Combine(_outDir, ".romba_size.backup"), FileMode.Create, FileAccess.Write));
+
+				tw.Write(size);
+				twb.Write(size);
+
+				tw.Dispose();
+				twb.Dispose();
 			}
 
 			return success;
