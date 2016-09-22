@@ -297,7 +297,7 @@ namespace SabreTools
 			// Cue to delete the file if it's a copy
 			if (_copyFiles && item != newItem)
 			{
-				Directory.Delete(Path.GetDirectoryName(Path.GetFullPath(newItem)), true);
+				Directory.Delete(newBasePath, true);
 			}
 
 			// Delete the sub temp directory
