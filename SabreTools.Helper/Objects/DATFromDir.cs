@@ -320,11 +320,19 @@ namespace SabreTools
 				// Cue to delete the file if it's a copy
 				if (_copyFiles)
 				{
-					try
+					int i = 0;
+					while (File.Exists(newItem) && i < 50)
 					{
-						Directory.Delete(Path.GetDirectoryName(newItem), true);
+						try
+						{
+							Directory.Delete(Path.GetDirectoryName(newItem), true);
+						}
+						catch
+						{
+							i++;
+						}
 					}
-					catch
+					if (File.Exists(newItem))
 					{
 						_clean.Add(newItem);
 					}

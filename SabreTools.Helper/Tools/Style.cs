@@ -441,11 +441,13 @@ namespace SabreTools.Helper
 		/// </summary>
 		public static int CompareNumeric(string s, string other)
 		{
-			if ((s == null || s.Replace(" ", string.Empty).Length == 0) && (other != null && other.Replace(" ", string.Empty).Length > 0))
+			if ((s == null || s.Replace(" ", string.Empty).Length == 0)
+				&& (other != null && other.Replace(" ", string.Empty).Length > 0))
 			{
 				return -1;
 			}
-			if ((s != null && s.Replace(" ", string.Empty).Length > 0) && (other == null || other.Replace(" ", string.Empty).Length == 0))
+			if ((s != null && s.Replace(" ", string.Empty).Length > 0)
+				&& (other == null || other.Replace(" ", string.Empty).Length == 0))
 			{
 				return 1;
 			}
