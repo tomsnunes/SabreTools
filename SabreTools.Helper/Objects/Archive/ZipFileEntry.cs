@@ -982,31 +982,36 @@ namespace SabreTools.Helper
 					return;
 				}
 
-				// Now get the hash of the stream
+				// Create the hashers
 				uint tempCrc;
-				using (OptimizedCRC crc = new OptimizedCRC())
-				using (MD5 md5 = System.Security.Cryptography.MD5.Create())
-				using (SHA1 sha1 = System.Security.Cryptography.SHA1.Create())
+				OptimizedCRC crc = new OptimizedCRC();
+				MD5 md5 = System.Security.Cryptography.MD5.Create();
+				SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
+
+				// Now get the hash of the stream
+				BinaryReader fs = new BinaryReader(stream);
+
+				byte[] buffer = new byte[1024];
+				int read;
+				while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
 				{
-					BinaryReader fs = new BinaryReader(stream);
-
-					byte[] buffer = new byte[1024];
-					int read;
-					while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
-					{
-						crc.Update(buffer, 0, read);
-						md5.TransformBlock(buffer, 0, read, buffer, 0);
-						sha1.TransformBlock(buffer, 0, read, buffer, 0);
-					}
-
-					crc.Update(buffer, 0, 0);
-					md5.TransformFinalBlock(buffer, 0, 0);
-					sha1.TransformFinalBlock(buffer, 0, 0);
-
-					tempCrc = crc.UnsignedValue;
-					_md5 = md5.Hash;
-					_sha1 = sha1.Hash;
+					crc.Update(buffer, 0, read);
+					md5.TransformBlock(buffer, 0, read, buffer, 0);
+					sha1.TransformBlock(buffer, 0, read, buffer, 0);
 				}
+
+				crc.Update(buffer, 0, 0);
+				md5.TransformFinalBlock(buffer, 0, 0);
+				sha1.TransformFinalBlock(buffer, 0, 0);
+
+				tempCrc = crc.UnsignedValue;
+				_md5 = md5.Hash;
+				_sha1 = sha1.Hash;
+
+				// Dispose of the hashers
+				crc.Dispose();
+				md5.Dispose();
+				sha1.Dispose();
 
 				if (_compressionMethod == CompressionMethod.Deflated)
 				{

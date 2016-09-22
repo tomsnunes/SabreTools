@@ -726,45 +726,50 @@ namespace SabreTools.Helper
 
 			try
 			{
-				using (OptimizedCRC crc = new OptimizedCRC())
-				using (MD5 md5 = MD5.Create())
-				using (SHA1 sha1 = SHA1.Create())
+				// Initialize the hashers
+				OptimizedCRC crc = new OptimizedCRC();
+				MD5 md5 = MD5.Create();
+				SHA1 sha1 = SHA1.Create();
+
+				// Seek to the starting position, if one is set
+				if (offset > 0)
 				{
-					// Seek to the starting position, if one is set
-					if (offset > 0)
-					{
-						input.Seek(offset, SeekOrigin.Begin);
-					}
+					input.Seek(offset, SeekOrigin.Begin);
+				}
 
-					byte[] buffer = new byte[1024];
-					int read;
-					while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-					{
-						crc.Update(buffer, 0, read);
-						if (!noMD5)
-						{
-							md5.TransformBlock(buffer, 0, read, buffer, 0);
-						}
-						if (!noSHA1)
-						{
-							sha1.TransformBlock(buffer, 0, read, buffer, 0);
-						}
-					}
-
-					crc.Update(buffer, 0, 0);
-					rom.CRC = crc.Value.ToString("X8").ToLowerInvariant();
-
+				byte[] buffer = new byte[1024];
+				int read;
+				while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+				{
+					crc.Update(buffer, 0, read);
 					if (!noMD5)
 					{
-						md5.TransformFinalBlock(buffer, 0, 0);
-						rom.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
+						md5.TransformBlock(buffer, 0, read, buffer, 0);
 					}
 					if (!noSHA1)
 					{
-						sha1.TransformFinalBlock(buffer, 0, 0);
-						rom.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
+						sha1.TransformBlock(buffer, 0, read, buffer, 0);
 					}
 				}
+
+				crc.Update(buffer, 0, 0);
+				rom.CRC = crc.Value.ToString("X8").ToLowerInvariant();
+
+				if (!noMD5)
+				{
+					md5.TransformFinalBlock(buffer, 0, 0);
+					rom.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
+				}
+				if (!noSHA1)
+				{
+					sha1.TransformFinalBlock(buffer, 0, 0);
+					rom.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
+				}
+
+				// Dispose of the hashers
+				crc.Dispose();
+				md5.Dispose();
+				sha1.Dispose();
 			}
 			catch (IOException)
 			{

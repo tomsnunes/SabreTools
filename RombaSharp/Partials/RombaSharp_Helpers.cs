@@ -314,110 +314,97 @@ namespace SabreTools
 
 			// Populate the List from the database
 			string query = "SELECT UNIQUE value FROM data WHERE key=\"dat\"";
-			using (SqliteConnection dbc = new SqliteConnection(_connectionString))
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			SqliteDataReader sldr = slc.ExecuteReader();
+			if (sldr.HasRows)
 			{
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
+				sldr.Read();
+				string hash = sldr.GetString(0);
+				if (!databaseDats.Contains(hash))
 				{
-					using (SqliteDataReader sldr = slc.ExecuteReader())
+					databaseDats.Add(hash);
+				}
+			}
+
+			slc.Dispose();
+			sldr.Dispose();
+
+			// Now create a Dictionary of dats to parse from what's not in the database (SHA-1, Path)
+			Dictionary<string, string> toscan = new Dictionary<string, string>();
+
+			// Loop through the datroot and add only needed files
+			foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
+			{
+				Rom dat = FileTools.GetSingleFileInfo(file);
+
+				// If the Dat isn't in the database and isn't already accounted for in the DatRoot, add it
+				if (!databaseDats.Contains(dat.SHA1) && !toscan.ContainsKey(dat.SHA1))
+				{
+					toscan.Add(dat.SHA1, Path.GetFullPath(file));
+				}
+
+				// If the Dat is in the database already, remove it to find stragglers
+				else if (databaseDats.Contains(dat.SHA1))
+				{
+					databaseDats.Remove(dat.SHA1);
+				}
+			}
+
+			// Loop through the Dictionary and add all data
+			foreach (string key in toscan.Keys)
+			{
+				// Parse the Dat if possible
+				DatFile tempdat = new DatFile();
+				DatFile.Parse(toscan[key], 0, 0, ref tempdat, _logger);
+
+				// If the Dat wasn't empty, add the information
+				if (tempdat.Files.Count != 0)
+				{
+					// Loop through the parsed entries
+					foreach (string romkey in tempdat.Files.Keys)
 					{
-						if (sldr.HasRows)
+						foreach (Rom rom in tempdat.Files[romkey])
 						{
-							sldr.Read();
-							string hash = sldr.GetString(0);
-							if (!databaseDats.Contains(hash))
+							query = "SELECT id FROM data WHERE key=\"size\" AND value=\"" + rom.Size + "\" AND ("
+								+ "(key=\"crc\" AND (value=\"" + rom.CRC + "\" OR value=\"null\"))"
+								+ "AND (key=\"md5\" AND value=\"" + rom.MD5 + "\" OR value=\"null\"))"
+								+ "AND (key=\"sha1\" AND value=\"" + rom.SHA1 + "\" OR value=\"null\")))";
+							slc = new SqliteCommand(query, dbc);
+							sldr = slc.ExecuteReader();
+								
+							// If the hash exists in the database, add the dat hash for that id
+							if (sldr.HasRows)
 							{
-								databaseDats.Add(hash);
+								sldr.Read();
+								string id = sldr.GetString(0);
+
+								string squery = "INSERT INTO data (id, key, value) VALUES (\"" + id + "\", \"dat\", \"" + key + "\")";
+								SqliteCommand sslc = new SqliteCommand(squery, dbc);
+								sslc.ExecuteNonQuery();
+								sslc.Dispose();
 							}
-						}
-					}
-				}
 
-				// Now create a Dictionary of dats to parse from what's not in the database (SHA-1, Path)
-				Dictionary<string, string> toscan = new Dictionary<string, string>();
-
-				// Loop through the datroot and add only needed files
-				foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
-				{
-					Rom dat = FileTools.GetSingleFileInfo(file);
-
-					// If the Dat isn't in the database and isn't already accounted for in the DatRoot, add it
-					if (!databaseDats.Contains(dat.SHA1) && !toscan.ContainsKey(dat.SHA1))
-					{
-						toscan.Add(dat.SHA1, Path.GetFullPath(file));
-					}
-
-					// If the Dat is in the database already, remove it to find stragglers
-					else if (databaseDats.Contains(dat.SHA1))
-					{
-						databaseDats.Remove(dat.SHA1);
-					}
-				}
-
-				// Loop through the Dictionary and add all data
-				foreach (string key in toscan.Keys)
-				{
-					// Parse the Dat if possible
-					DatFile tempdat = new DatFile();
-					DatFile.Parse(toscan[key], 0, 0, ref tempdat, _logger);
-
-					// If the Dat wasn't empty, add the information
-					if (tempdat.Files.Count != 0)
-					{
-						// Loop through the parsed entries
-						foreach (string romkey in tempdat.Files.Keys)
-						{
-							foreach (Rom rom in tempdat.Files[romkey])
+							// If it doesn't exist, add the hash and the dat hash for a new id
+							else
 							{
-								query = "SELECT id FROM data WHERE key=\"size\" AND value=\"" + rom.Size + "\" AND ("
-									+ "(key=\"crc\" AND (value=\"" + rom.CRC + "\" OR value=\"null\"))"
-									+ "AND (key=\"md5\" AND value=\"" + rom.MD5 + "\" OR value=\"null\"))"
-									+ "AND (key=\"sha1\" AND value=\"" + rom.SHA1 + "\" OR value=\"null\")))";
-								using (SqliteCommand slc = new SqliteCommand(query, dbc))
-								{
-									using (SqliteDataReader sldr = slc.ExecuteReader())
-									{
-										// If the hash exists in the database, add the dat hash for that id
-										if (sldr.HasRows)
-										{
-											sldr.Read();
-											string id = sldr.GetString(0);
+								string squery = "INSERT INTO data (key, value) VALUES (\"size\", \"" + rom.Size + "\")";
+								SqliteCommand sslc = new SqliteCommand(squery, dbc);
+								sslc.ExecuteNonQuery();
 
-											string squery = "INSERT INTO data (id, key, value) VALUES (\"" + id + "\", \"dat\", \"" + key + "\")";
-											using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
-											{
-												sslc.ExecuteNonQuery();
-											}
-										}
+								long id = -1;
 
-										// If it doesn't exist, add the hash and the dat hash for a new id
-										else
-										{
-											string squery = "INSERT INTO data (key, value) VALUES (\"size\", \"" + rom.Size + "\")";
-											using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
-											{
-												sslc.ExecuteNonQuery();
-											}
+								squery = "SELECT last_insertConstants.Rowid()";
+								sslc = new SqliteCommand(squery, dbc);
+								id = (long)sslc.ExecuteScalar();
 
-											long id = -1;
-
-											squery = "SELECT last_insertConstants.Rowid()";
-											using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
-											{
-												id = (long)sslc.ExecuteScalar();
-											}
-
-											squery = "INSERT INTO data (id, key, value) VALUES (\"" + id + "\", \"crc\", \"" + rom.CRC + "\"),"
-												+ " (\"" + id + "\", \"md5\", \"" + rom.MD5 + "\"),"
-												+ " (\"" + id + "\", \"sha1\", \"" + rom.SHA1 + "\"),"
-												+ " (\"" + id + "\", \"dat\", \"" + key + "\"),"
-												+ " (\"" + id + "\", \"exists\", \"false\")";
-											using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
-											{
-												sslc.ExecuteNonQuery();
-											}
-										}
-									}
-								}
+								squery = "INSERT INTO data (id, key, value) VALUES (\"" + id + "\", \"crc\", \"" + rom.CRC + "\"),"
+									+ " (\"" + id + "\", \"md5\", \"" + rom.MD5 + "\"),"
+									+ " (\"" + id + "\", \"sha1\", \"" + rom.SHA1 + "\"),"
+									+ " (\"" + id + "\", \"dat\", \"" + key + "\"),"
+									+ " (\"" + id + "\", \"exists\", \"false\")";
+								sslc = new SqliteCommand(squery, dbc);
+								sslc.ExecuteNonQuery();
 							}
 						}
 					}
@@ -428,10 +415,9 @@ namespace SabreTools
 				foreach (string dathash in databaseDats)
 				{
 					query = "DELETE FROM data WHERE key=\"dat\" AND value=\"" + dathash + "\"";
-					using (SqliteCommand slc = new SqliteCommand(query, dbc))
-					{
-						slc.ExecuteNonQuery();
-					}
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+					slc.Dispose();
 				}
 			}
 		}

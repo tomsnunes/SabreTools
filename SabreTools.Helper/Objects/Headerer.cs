@@ -149,18 +149,14 @@ namespace SabreTools
 		{
 			bool exists = false;
 
+			// Open the database connection
+			SqliteConnection dbc = new SqliteConnection(Constants.HeadererConnectionString);
+			dbc.Open();
+
 			string query = @"SELECT * FROM data WHERE sha1='" + SHA1 + "' AND header='" + header + "'";
-			using (SqliteConnection dbc = new SqliteConnection(Constants.HeadererConnectionString))
-			{
-				dbc.Open();
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
-				{
-					using (SqliteDataReader sldr = slc.ExecuteReader())
-					{
-						exists = sldr.HasRows;
-					}
-				}
-			}
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			SqliteDataReader sldr = slc.ExecuteReader();
+			exists = sldr.HasRows;
 
 			if (!exists)
 			{
@@ -168,15 +164,14 @@ namespace SabreTools
 				SHA1 + "', " +
 				"'" + header + "', " +
 				"'" + type.ToString() + "')";
-				using (SqliteConnection dbc = new SqliteConnection(Constants.HeadererConnectionString))
-				{
-					dbc.Open();
-					using (SqliteCommand slc = new SqliteCommand(query, dbc))
-					{
-						_logger.Log("Result of inserting header: " + slc.ExecuteNonQuery());
-					}
-				}
+				slc = new SqliteCommand(query, dbc);
+				_logger.Log("Result of inserting header: " + slc.ExecuteNonQuery());
 			}
+
+			// Dispose of database objects
+			slc.Dispose();
+			sldr.Dispose();
+			dbc.Dispose();
 		}
 
 		/// <summary>
@@ -186,45 +181,49 @@ namespace SabreTools
 		/// <returns>True if a header was found and appended, false otherwise</returns>
 		private bool RestoreHeader(string file)
 		{
+			bool success = true;
+
 			// First, get the SHA-1 hash of the file
 			Rom rom = FileTools.GetSingleFileInfo(file);
 
 			// Then try to pull the corresponding headers from the database
 			string header = "";
 
-			string query = @"SELECT header, type FROM data WHERE sha1='" + rom.SHA1 + "'";
-			using (SqliteConnection dbc = new SqliteConnection(Constants.HeadererConnectionString))
-			{
-				dbc.Open();
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
-				{
-					using (SqliteDataReader sldr = slc.ExecuteReader())
-					{
-						if (sldr.HasRows)
-						{
-							int sub = 0;
-							while (sldr.Read())
-							{
-								_logger.Log("Found match with rom type " + sldr.GetString(1));
-								header = sldr.GetString(0);
+			// Open the database connection
+			SqliteConnection dbc = new SqliteConnection(Constants.HeadererConnectionString);
+			dbc.Open();
 
-								_logger.User("Creating reheadered file: " + 
-									(_outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outDir, Path.GetFileName(file))) + sub);
-								FileTools.AppendBytesToFile(file,
-									(_outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outDir, Path.GetFileName(file))) + sub, header, string.Empty);
-								_logger.User("Reheadered file created!");
-							}
-						}
-						else
-						{
-							_logger.Warning("No matching header could be found!");
-							return false;
-						}
-					}
+			string query = @"SELECT header, type FROM data WHERE sha1='" + rom.SHA1 + "'";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			SqliteDataReader sldr = slc.ExecuteReader();
+
+			if (sldr.HasRows)
+			{
+				int sub = 0;
+				while (sldr.Read())
+				{
+					_logger.Log("Found match with rom type " + sldr.GetString(1));
+					header = sldr.GetString(0);
+
+					_logger.User("Creating reheadered file: " + 
+						(_outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outDir, Path.GetFileName(file))) + sub);
+					FileTools.AppendBytesToFile(file,
+						(_outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(_outDir, Path.GetFileName(file))) + sub, header, string.Empty);
+					_logger.User("Reheadered file created!");
 				}
 			}
+			else
+			{
+				_logger.Warning("No matching header could be found!");
+				success = false;
+			}
 
-			return true;
+			// Dispose of database objects
+			slc.Dispose();
+			sldr.Dispose();
+			dbc.Dispose();
+
+			return success;
 		}
 	}
 }

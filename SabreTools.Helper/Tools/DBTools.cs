@@ -26,7 +26,7 @@ namespace SabreTools.Helper
 				SqliteConnection.CreateFile(db);
 			}
 
-			// Connect to the file
+			// Open the database connection
 			SqliteConnection dbc = new SqliteConnection(connectionString);
 			dbc.Open();
 
@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS data (
 )";
 					SqliteCommand slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
+					slc.Dispose();
 				}
 				else if (type == "headerer")
 				{
@@ -56,6 +57,7 @@ CREATE TABLE IF NOT EXISTS data (
 )";
 					SqliteCommand slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
+					slc.Dispose();
 				}
 			}
 			catch (Exception ex)
@@ -64,124 +66,7 @@ CREATE TABLE IF NOT EXISTS data (
 			}
 			finally
 			{
-				// Close and return the database connection
-				dbc.Close();
-			}
-		}
-
-		/// <summary>
-		/// Add a new source to the database if it doesn't already exist
-		/// </summary>
-		/// <param name="name">Source name</param>
-		/// <param name="url">Source URL(s)</param>
-		/// <param name="connectionString">Connection string for SQLite</param>
-		/// <returns>True if the source existed or could be added, false otherwise</returns>
-		public static bool AddSource(string name, string url, string connectionString)
-		{
-			string query = "SELECT id, name, url FROM source WHERE name='" + name + "'";
-			using (SqliteConnection dbc = new SqliteConnection(connectionString))
-			{
-				dbc.Open();
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
-				{
-					using (SqliteDataReader sldr = slc.ExecuteReader())
-					{
-						// If nothing is found, add the source
-						if (!sldr.HasRows)
-						{
-							string squery = "INSERT INTO source (name, url) VALUES ('" + name + "', '" + url + "')";
-							using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
-							{
-								return sslc.ExecuteNonQuery() >= 1;
-							}
-						}
-						// Otherwise, update the source URL if it's different
-						else
-						{
-							sldr.Read();
-							if (url != sldr.GetString(2))
-							{
-								string squery = "UPDATE source SET url='" + url + "' WHERE id=" + sldr.GetInt32(0);
-								using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
-								{
-									return sslc.ExecuteNonQuery() >= 1;
-								}
-							}
-						}
-					}
-				}
-			}
-
-			return true;
-		}
-
-		/// <summary>
-		/// Remove an existing source from the database
-		/// </summary>
-		/// <param name="id">Source ID to be removed from the database</param>
-		/// <param name="connectionString">Connection string for SQLite</param>
-		/// <returns>True if the source was removed, false otherwise</returns>
-		public static bool RemoveSource(int id, string connectionString)
-		{
-			string query = "DELETE FROM source WHERE id=" + id;
-			using (SqliteConnection dbc = new SqliteConnection(connectionString))
-			{
-				dbc.Open();
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
-				{
-					return slc.ExecuteNonQuery() >= 1;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Add a new system to the database if it doesn't already exist
-		/// </summary>
-		/// <param name="manufacturer">Manufacturer name</param>
-		/// <param name="system">System name</param>
-		/// <param name="connectionString">Connection string for SQLite</param>
-		/// <returns>True if the system existed or could be added, false otherwise</returns>
-		public static bool AddSystem(string manufacturer, string system, string connectionString)
-		{
-			string query = "SELECT id, manufacturer, name FROM system WHERE manufacturer='" + manufacturer + "' AND system='" + system + "'";
-			using (SqliteConnection dbc = new SqliteConnection(connectionString))
-			{
-				dbc.Open();
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
-				{
-					using (SqliteDataReader sldr = slc.ExecuteReader())
-					{
-						// If nothing is found, add the system
-						if (!sldr.HasRows)
-						{
-							string squery = "INSERT INTO name (manufacturer, system) VALUES ('" + manufacturer + "', '" + system + "')";
-							using (SqliteCommand sslc = new SqliteCommand(squery, dbc))
-							{
-								return sslc.ExecuteNonQuery() >= 1;
-							}
-						}
-					}
-				}
-			}
-			return true;
-		}
-
-		/// <summary>
-		/// Remove an existing system from the database
-		/// </summary>
-		/// <param name="id">System ID to be removed from the database</param>
-		/// <param name="connectionString">Connection string for SQLite</param>
-		/// <returns>True if the system was removed, false otherwise</returns>
-		public static bool RemoveSystem(int id, string connectionString)
-		{
-			string query = "DELETE FROM system WHERE id=" + id;
-			using (SqliteConnection dbc = new SqliteConnection(connectionString))
-			{
-				dbc.Open();
-				using (SqliteCommand slc = new SqliteCommand(query, dbc))
-				{
-					return slc.ExecuteNonQuery() >= 1;
-				}
+				dbc.Dispose();
 			}
 		}
 	}
