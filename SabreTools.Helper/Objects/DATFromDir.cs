@@ -217,19 +217,10 @@ namespace SabreTools
 			// Define the temporary directory
 			string tempSubDir = Path.GetFullPath(Path.Combine(_tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
 
-			// If we're copying files, copy it first and get the new filename
-			string newitem = item;
-			if (_copyFiles)
-			{
-				newitem = Path.Combine(_tempDir, Path.GetRandomFileName(), Path.GetFileName(item));
-				Directory.CreateDirectory(Path.GetDirectoryName(newitem));
-				File.Copy(item, newitem, true);
-			}
-
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
 			{
-				Rom rom = FileTools.GetTorrentGZFileInfo(newitem, _logger);
+				Rom rom = FileTools.GetTorrentGZFileInfo(item, _logger);
 
 				// If the rom is valid, write it out
 				if (rom.Name != null)
@@ -258,33 +249,44 @@ namespace SabreTools
 				return;
 			}
 
+			// If we're copying files, copy it first and get the new filename
+			string newItem = item;
+			string newBasePath = _basePath;
+			if (_copyFiles)
+			{
+				newBasePath = Path.Combine(_tempDir, Path.GetRandomFileName());
+				newItem = Path.GetFullPath(Path.Combine(newBasePath, Path.GetFullPath(item).Remove(0, _basePath.Length + 1)));
+				Directory.CreateDirectory(Path.GetDirectoryName(newItem));
+				File.Copy(item, newItem, true);
+			}
+
 			// If both deep hash skip flags are set, do a quickscan
 			if (_noMD5 && _noSHA1)
 			{
-				ArchiveType? type = FileTools.GetCurrentArchiveType(newitem, _logger);
+				ArchiveType? type = FileTools.GetCurrentArchiveType(newItem, _logger);
 
 				// If we have an archive, scan it
 				if (type != null && !_archivesAsFiles)
 				{
-					List<Rom> extracted = FileTools.GetArchiveFileInfo(newitem, _logger);
+					List<Rom> extracted = FileTools.GetArchiveFileInfo(newItem, _logger);
 					foreach (Rom rom in extracted)
 					{
-						ProcessFileHelper(newitem,
+						ProcessFileHelper(newItem,
 							rom,
 							_basePath,
 							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) + Path.GetFileNameWithoutExtension(item));
 					}
 				}
 				// Otherwise, just get the info on the file itself
-				else if (File.Exists(newitem))
+				else if (File.Exists(newItem))
 				{
-					ProcessFile(newitem, _basePath, "");
+					ProcessFile(newItem, newBasePath, "");
 				}
 			}
 			// Otherwise, attempt to extract the files to the temporary directory
 			else
 			{
-				bool encounteredErrors = FileTools.ExtractArchive(newitem,
+				bool encounteredErrors = FileTools.ExtractArchive(newItem,
 					tempSubDir,
 					(_archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
 					(!_archivesAsFiles && _enableGzip ? ArchiveScanLevel.Internal : ArchiveScanLevel.External),
@@ -310,9 +312,9 @@ namespace SabreTools
 					});
 				}
 				// Otherwise, just get the info on the file itself
-				else if (File.Exists(newitem))
+				else if (File.Exists(newItem))
 				{
-					ProcessFile(newitem, _basePath, "");
+					ProcessFile(newItem, newBasePath, "");
 				}
 
 				// Cue to delete the file if it's a copy
@@ -320,11 +322,11 @@ namespace SabreTools
 				{
 					try
 					{
-						Directory.Delete(Path.GetDirectoryName(newitem), true);
+						Directory.Delete(Path.GetDirectoryName(newItem), true);
 					}
 					catch
 					{
-						_clean.Add(newitem);
+						_clean.Add(newItem);
 					}
 				}
 

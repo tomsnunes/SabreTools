@@ -118,7 +118,7 @@ namespace SabreTools.Helper
 		/// <returns>String with characters replaced</returns>
 		public static string RussianToLatin(string input)
 		{
-			string [,] charmap = {
+			string[,] charmap = {
 					{ "А", "A" }, { "Б", "B" }, { "В", "V" }, { "Г", "G" }, { "Д", "D" },
 					{ "Е", "E" }, { "Ё", "Yo" }, { "Ж", "Zh" }, { "З", "Z" }, { "И", "I" },
 					{ "Й", "J" }, { "К", "K" }, { "Л", "L" }, { "М", "M" }, { "Н", "N" },
@@ -441,6 +441,15 @@ namespace SabreTools.Helper
 		/// </summary>
 		public static int CompareNumeric(string s, string other)
 		{
+			if ((s == null || s.Replace(" ", string.Empty).Length == 0) && (other != null && other.Replace(" ", string.Empty).Length > 0))
+			{
+				return -1;
+			}
+			if ((s != null && s.Replace(" ", string.Empty).Length > 0) && (other == null || other.Replace(" ", string.Empty).Length == 0))
+			{
+				return 1;
+			}
+
 			if (s != null && other != null &&
 				(s = s.Replace(" ", string.Empty)).Length > 0 &&
 				(other = other.Replace(" ", string.Empty)).Length > 0)
