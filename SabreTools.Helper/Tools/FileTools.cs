@@ -569,8 +569,8 @@ namespace SabreTools.Helper
 			}
 			finally
 			{
-				fs.Close();
-				fs.Dispose();
+				fs?.Close();
+				fs?.Dispose();
 			}
 
 			return encounteredErrors;
