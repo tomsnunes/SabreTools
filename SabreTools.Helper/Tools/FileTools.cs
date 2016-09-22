@@ -289,7 +289,6 @@ namespace SabreTools.Helper
 							{
 								writeStream.Write(ibuffer, 0, ilen);
 							}
-							freadStream.Close();
 							freadStream.Dispose();
 							zipFile.CloseWriteStream(Convert.ToUInt32(roms[-index - 1].CRC, 16));
 						}
@@ -493,63 +492,65 @@ namespace SabreTools.Helper
 				return encounteredErrors;
 			}
 
-			IReader reader = null;
-			SevenZipArchive sza = null;
 			try
 			{
-				if (at == ArchiveType.SevenZip && sevenzip != ArchiveScanLevel.External)
+				using (FileStream fs = File.OpenRead(input))
 				{
-					sza = SevenZipArchive.Open(File.OpenRead(input));
-					logger.Log("Found archive of type: " + at);
-
-					// Create the temp directory
-					Directory.CreateDirectory(tempDir);
-
-					// Extract all files to the temp directory
-					foreach (IArchiveEntry iae in sza.Entries)
+					if (at == ArchiveType.SevenZip && sevenzip != ArchiveScanLevel.External)
 					{
-						iae.WriteToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+						using (SevenZipArchive sza = SevenZipArchive.Open(fs))
+						{
+							logger.Log("Found archive of type: " + at);
+
+							// Create the temp directory
+							Directory.CreateDirectory(tempDir);
+
+							// Extract all files to the temp directory
+							foreach (IArchiveEntry iae in sza.Entries)
+							{
+								iae.WriteToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+							}
+							encounteredErrors = false;
+						}
 					}
-					encounteredErrors = false;
-				}
-				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
-				{
-					logger.Log("Found archive of type: " + at);
-
-					// Create the temp directory
-					Directory.CreateDirectory(tempDir);
-
-					using (FileStream itemstream = File.OpenRead(input))
+					else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
 					{
+						logger.Log("Found archive of type: " + at);
+
+						// Create the temp directory
+						Directory.CreateDirectory(tempDir);
+
 						using (FileStream outstream = File.Create(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input))))
 						{
-							using (GZipStream gzstream = new GZipStream(itemstream, CompressionMode.Decompress))
+							using (GZipStream gzstream = new GZipStream(fs, CompressionMode.Decompress))
 							{
 								gzstream.CopyTo(outstream);
 							}
 						}
-					}
-					encounteredErrors = false;
-				}
-				else
-				{
-					reader = ReaderFactory.Open(File.OpenRead(input));
-					logger.Log("Found archive of type: " + at);
-
-					if ((at == ArchiveType.Zip && zip != ArchiveScanLevel.External) ||
-						(at == ArchiveType.Rar && rar != ArchiveScanLevel.External))
-					{
-						// Create the temp directory
-						Directory.CreateDirectory(tempDir);
-
-						// Extract all files to the temp directory
-						bool succeeded = reader.MoveToNextEntry();
-						while (succeeded)
-						{
-							reader.WriteEntryToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
-							succeeded = reader.MoveToNextEntry();
-						}
 						encounteredErrors = false;
+					}
+					else
+					{
+						using (IReader reader = ReaderFactory.Open(fs))
+						{
+							logger.Log("Found archive of type: " + at);
+
+							if ((at == ArchiveType.Zip && zip != ArchiveScanLevel.External) ||
+								(at == ArchiveType.Rar && rar != ArchiveScanLevel.External))
+							{
+								// Create the temp directory
+								Directory.CreateDirectory(tempDir);
+
+								// Extract all files to the temp directory
+								bool succeeded = reader.MoveToNextEntry();
+								while (succeeded)
+								{
+									reader.WriteEntryToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+									succeeded = reader.MoveToNextEntry();
+								}
+								encounteredErrors = false;
+							}
+						}
 					}
 				}
 			}
@@ -565,11 +566,6 @@ namespace SabreTools.Helper
 			{
 				// Don't log file open errors
 				encounteredErrors = true;
-			}
-			finally
-			{
-				reader?.Dispose();
-				sza?.Dispose();
 			}
 
 			return encounteredErrors;
@@ -694,7 +690,7 @@ namespace SabreTools.Helper
 			}
 
 			// Get the information from the file stream
-			Rom rom = GetSingleStreamInfo(File.OpenRead(input), noMD5, noSHA1, offset);
+			Rom rom = GetSingleStreamInfo(File.OpenRead(input), noMD5, noSHA1, offset, false);
 
 			// Add unique data from the file
 			rom.Name = Path.GetFileName(input);
@@ -779,7 +775,6 @@ namespace SabreTools.Helper
 			{
 				if (!keepReadOpen)
 				{
-					input.Close();
 					input.Dispose();
 				}
 			}
@@ -1243,6 +1238,11 @@ namespace SabreTools.Helper
 		/// <param name="filename">Name of the file to be deleted</param>
 		public async static void DeleteFile(string filename)
 		{
+			if (!File.Exists(filename))
+			{
+				return;
+			}
+
 			File.SetAttributes(filename, 0);
 			FileInfo fi = new FileInfo(filename);
 			fi.IsReadOnly = false;
@@ -1253,6 +1253,31 @@ namespace SabreTools.Helper
 					try
 					{
 						fi.Delete();
+					}
+					catch { }
+				}
+			});
+		}
+
+		/// <summary>
+		/// Delete a directory asynchronously
+		/// </summary>
+		/// <param name="dirname">Name of the directory to be deleted</param>
+		public async static void DeleteDirectory(string dirname)
+		{
+			if (!Directory.Exists(dirname))
+			{
+				return;
+			}
+
+			DirectoryInfo di = new DirectoryInfo(dirname);
+			await Task.Factory.StartNew(() =>
+			{
+				while (di.Exists)
+				{
+					try
+					{
+						di.Delete(true);
 					}
 					catch { }
 				}
