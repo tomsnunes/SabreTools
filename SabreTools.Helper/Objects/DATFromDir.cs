@@ -26,6 +26,7 @@ namespace SabreTools
 		private bool _enableGzip;
 		private bool _addBlanks;
 		private bool _addDate;
+		private bool _copyFiles;
 		private int _maxDegreeOfParallelism;
 
 		// Other required variables
@@ -50,10 +51,11 @@ namespace SabreTools
 		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
+		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		public DATFromDir(string basePath, DatFile datdata, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
-			bool enableGzip, bool addBlanks, bool addDate, string tempDir, int maxDegreeOfParallelism, Logger logger)
+			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, int maxDegreeOfParallelism, Logger logger)
 		{
 			_basePath = Path.GetFullPath(basePath);
 			_datdata = datdata;
@@ -67,6 +69,7 @@ namespace SabreTools
 			_addBlanks = addBlanks;
 			_addDate = addDate;
 			_tempDir = (String.IsNullOrEmpty(tempDir) ? Path.GetTempPath() : tempDir);
+			_copyFiles = copyFiles;
 			_maxDegreeOfParallelism = maxDegreeOfParallelism;
 			_logger = logger;
 		}
@@ -188,10 +191,18 @@ namespace SabreTools
 			// Define the temporary directory
 			string tempSubDir = Path.GetFullPath(Path.Combine(_tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
 
+			// If we're copying files, copy it first and get the new filename
+			string newitem = item;
+			if (_copyFiles)
+			{
+				newitem = Path.Combine(tempSubDir, Path.GetFileName(item));
+				File.Copy(item, newitem, true);
+			}
+
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (_datdata.Romba)
 			{
-				Rom rom = FileTools.GetTorrentGZFileInfo(item, _logger);
+				Rom rom = FileTools.GetTorrentGZFileInfo(newitem, _logger);
 
 				// If the rom is valid, write it out
 				if (rom.Name != null)
@@ -207,13 +218,13 @@ namespace SabreTools
 						}
 
 						_datdata.Files[key].Add(rom);
-						_logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
+						_logger.User("File added: " + Path.GetFileNameWithoutExtension(newitem) + Environment.NewLine);
 					}
 					
 				}
 				else
 				{
-					_logger.User("File not added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
+					_logger.User("File not added: " + Path.GetFileNameWithoutExtension(newitem) + Environment.NewLine);
 					return;
 				}
 				
@@ -223,30 +234,30 @@ namespace SabreTools
 			// If both deep hash skip flags are set, do a quickscan
 			if (_noMD5 && _noSHA1)
 			{
-				ArchiveType? type = FileTools.GetCurrentArchiveType(item, _logger);
+				ArchiveType? type = FileTools.GetCurrentArchiveType(newitem, _logger);
 
 				// If we have an archive, scan it
 				if (type != null && !_archivesAsFiles)
 				{
-					List<Rom> extracted = FileTools.GetArchiveFileInfo(item, _logger);
+					List<Rom> extracted = FileTools.GetArchiveFileInfo(newitem, _logger);
 					foreach (Rom rom in extracted)
 					{
-						ProcessFileHelper(item,
+						ProcessFileHelper(newitem,
 							rom,
 							_basePath,
 							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length) + Path.GetFileNameWithoutExtension(item));
 					}
 				}
 				// Otherwise, just get the info on the file itself
-				else if (File.Exists(item))
+				else if (File.Exists(newitem))
 				{
-					ProcessFile(item, _basePath, "");
+					ProcessFile(newitem, _basePath, "");
 				}
 			}
 			// Otherwise, attempt to extract the files to the temporary directory
 			else
 			{
-				bool encounteredErrors = FileTools.ExtractArchive(item,
+				bool encounteredErrors = FileTools.ExtractArchive(newitem,
 					tempSubDir,
 					(_archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
 					(!_archivesAsFiles && _enableGzip ? ArchiveScanLevel.Internal : ArchiveScanLevel.External),
@@ -257,7 +268,7 @@ namespace SabreTools
 				// If the file was an archive and was extracted successfully, check it
 				if (!encounteredErrors)
 				{
-					_logger.Log(Path.GetFileName(item) + " treated like an archive");
+					_logger.Log(Path.GetFileName(newitem) + " treated like an archive");
 					List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(extracted,
 						new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
@@ -268,13 +279,13 @@ namespace SabreTools
 							Path.Combine((_datdata.Type == "SuperDAT"
 								? (Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, _basePath.Length)
 								: ""),
-							Path.GetFileNameWithoutExtension(item)));
+							Path.GetFileNameWithoutExtension(newitem)));
 					});
 				}
 				// Otherwise, just get the info on the file itself
-				else if (File.Exists(item))
+				else if (File.Exists(newitem))
 				{
-					ProcessFile(item, _basePath, "");
+					ProcessFile(newitem, _basePath, "");
 				}
 
 				// Delete the sub temp directory

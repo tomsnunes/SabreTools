@@ -70,6 +70,7 @@ namespace SabreTools
 		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
+		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitDatFromDir(List<string> inputs,
 			string filename,
@@ -90,6 +91,7 @@ namespace SabreTools
 			bool addBlanks,
 			bool addDate,
 			string tempDir,
+			bool copyFiles,
 			int maxDegreeOfParallelism)
 		{
 			// Create a new DATFromDir object and process the inputs
@@ -119,7 +121,7 @@ namespace SabreTools
 					datdata.Files = new Dictionary<string, List<DatItem>>();
 
 					string basePath = Path.GetFullPath(path);
-					DATFromDir dfd = new DATFromDir(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, maxDegreeOfParallelism, _logger);
+					DATFromDir dfd = new DATFromDir(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, copyFiles, maxDegreeOfParallelism, _logger);
 					bool success = dfd.Start();
 
 					// If it was a success, write the DAT out

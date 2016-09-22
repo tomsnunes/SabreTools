@@ -54,6 +54,7 @@ namespace SabreTools
 				archivesAsFiles = false,
 				bare = false,
 				clean = false,
+				copyFiles = false,
 				datfromdir = false,
 				datprefix = false,
 				dedup = false,
@@ -150,6 +151,10 @@ namespace SabreTools
 					case "-c":
 					case "--cascade":
 						cascade = true;
+						break;
+					case "-cf":
+					case "--copy-files":
+						copyFiles = true;
 						break;
 					case "-csv":
 					case "--csv":
@@ -538,8 +543,8 @@ namespace SabreTools
 			// Create a DAT from a directory or set of directories
 			if (datfromdir)
 			{
-				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, outputFormat,
-					romba, superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, maxParallelism);
+				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, outputFormat, romba,
+					superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, copyFiles, maxParallelism);
 			}
 
 			// Split a DAT by extension

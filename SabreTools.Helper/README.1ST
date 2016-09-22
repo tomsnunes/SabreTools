@@ -231,6 +231,10 @@ Options:
 			If this flag is set, then the Date will be appended to each file information
 			in the output DAT. The output format is standardized as "yyyy/MM/dd HH:mm:ss".
 			
+		-cf, --copy-files	Copy files to the temp directory before parsing
+			If this flag is set, then all files that are going to be parsed are moved to the temporary directory before being hashed. This can be helpful in cases where the
+			temp folder is located on an SSD and the user wants to take advantage of this.
+			
 		-t=, --temp=		Set the name of the temporary directory
 			Optionally, a temp folder can be supplied in the case the default temp directory
 			(inside the running folder) is not preferred. This is used for any operations

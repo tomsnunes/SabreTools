@@ -138,7 +138,7 @@ namespace SabreTools.Helper
 			foreach (string input in _inputs)
 			{
 				DATFromDir dfd = new DATFromDir(input, _datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
-				true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempDir */, 4 /* maxDegreeOfParallelism */, _logger);
+				true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */, 4 /* maxDegreeOfParallelism */, _logger);
 				dfd.Start();
 				_datdata = dfd.DatData;
 			}
