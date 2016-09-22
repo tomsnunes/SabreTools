@@ -273,6 +273,12 @@ namespace SabreTools
 				// If the file was an archive and was extracted successfully, check it
 				if (!encounteredErrors)
 				{
+					// Cue to delete the file if it's a copy
+					if (_copyFiles && item != newItem)
+					{
+						FileTools.CleanDirectory(Path.GetDirectoryName(Path.GetFullPath(newItem)));
+					}
+
 					_logger.Log(Path.GetFileName(item) + " treated like an archive");
 					List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(extracted,
