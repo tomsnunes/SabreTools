@@ -291,18 +291,18 @@ namespace SabreTools
 				{
 					ProcessFile(newItem, newBasePath, "");
 				}
+			}
 
-				// Cue to delete the file if it's a copy
-				if (_copyFiles)
-				{
-					FileTools.DeleteFile(newItem);
-				}
+			// Cue to delete the file if it's a copy
+			if (_copyFiles && item != newItem)
+			{
+				FileTools.DeleteFile(newItem);
+			}
 
-				// Delete the sub temp directory
-				if (Directory.Exists(tempSubDir))
-				{
-					Directory.Delete(tempSubDir, true);
-				}
+			// Delete the sub temp directory
+			if (Directory.Exists(tempSubDir))
+			{
+				Directory.Delete(tempSubDir, true);
 			}
 		}
 

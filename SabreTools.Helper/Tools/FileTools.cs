@@ -1,5 +1,4 @@
-﻿//using Ionic.Zlib;
-using OCRC;
+﻿using OCRC;
 using SharpCompress.Archive;
 using SharpCompress.Archive.SevenZip;
 using SharpCompress.Common;
@@ -9,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -1256,10 +1254,7 @@ namespace SabreTools.Helper
 					{
 						fi.Delete();
 					}
-					catch
-					{
-
-					}
+					catch { }
 				}
 			});
 		}
