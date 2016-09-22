@@ -471,8 +471,7 @@ namespace SabreTools.Helper
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public static bool ExtractArchive(string input, string tempDir, int sevenzip,
-			int gz, int rar, int zip, Logger logger)
+		public static bool ExtractArchive(string input, string tempDir, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			return ExtractArchive(input, tempDir, (ArchiveScanLevel)sevenzip, (ArchiveScanLevel)gz, (ArchiveScanLevel)rar, (ArchiveScanLevel)zip, logger);
 		}
@@ -584,8 +583,7 @@ namespace SabreTools.Helper
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>Name of the extracted file, null on error</returns>
-		public static string ExtractSingleItemFromArchive(string input, string entryname,
-			string tempDir, Logger logger)
+		public static string ExtractSingleItemFromArchive(string input, string entryname, string tempDir, Logger logger)
 		{
 			string outfile = null;
 
@@ -694,94 +692,6 @@ namespace SabreTools.Helper
 			// Add unique data from the file
 			rom.Name = Path.GetFileName(input);
 			rom.Date = (date ? new FileInfo(input).LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : "");
-
-			return rom;
-		}
-
-		/// <summary>
-		/// Retrieve file information for a single file
-		/// </summary>
-		/// <param name="input">Filename to get information from</param>
-		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise (default)</param>
-		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise (default)</param>
-		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
-		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
-		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static Rom GetSingleStreamInfo(Stream input, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool keepReadOpen = false)
-		{
-			// If we have a negative offset, zero it out since we don't support it yet
-			if (offset < 0)
-			{
-				offset = 0;
-			}
-
-			Rom rom = new Rom
-			{
-				Type = ItemType.Rom,
-				Size = input.Length - Math.Abs(offset),
-				CRC = string.Empty,
-				MD5 = string.Empty,
-				SHA1 = string.Empty,
-			};
-
-			try
-			{
-				// Initialize the hashers
-				OptimizedCRC crc = new OptimizedCRC();
-				MD5 md5 = MD5.Create();
-				SHA1 sha1 = SHA1.Create();
-
-				// Seek to the starting position, if one is set
-				if (offset > 0)
-				{
-					input.Seek(offset, SeekOrigin.Begin);
-				}
-
-				byte[] buffer = new byte[1024];
-				int read;
-				while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-				{
-					crc.Update(buffer, 0, read);
-					if (!noMD5)
-					{
-						md5.TransformBlock(buffer, 0, read, buffer, 0);
-					}
-					if (!noSHA1)
-					{
-						sha1.TransformBlock(buffer, 0, read, buffer, 0);
-					}
-				}
-
-				crc.Update(buffer, 0, 0);
-				rom.CRC = crc.Value.ToString("X8").ToLowerInvariant();
-
-				if (!noMD5)
-				{
-					md5.TransformFinalBlock(buffer, 0, 0);
-					rom.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
-				}
-				if (!noSHA1)
-				{
-					sha1.TransformFinalBlock(buffer, 0, 0);
-					rom.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
-				}
-
-				// Dispose of the hashers
-				crc.Dispose();
-				md5.Dispose();
-				sha1.Dispose();
-			}
-			catch (IOException)
-			{
-				return new Rom();
-			}
-			finally
-			{
-				if (!keepReadOpen)
-				{
-					input.Dispose();
-				}
-			}
 
 			return rom;
 		}
@@ -1076,6 +986,98 @@ namespace SabreTools.Helper
 
 		#endregion
 
+		#region Stream Information
+
+		/// <summary>
+		/// Retrieve file information for a single file
+		/// </summary>
+		/// <param name="input">Filename to get information from</param>
+		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise (default)</param>
+		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise (default)</param>
+		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
+		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
+		/// <returns>Populated RomData object if success, empty one on error</returns>
+		public static Rom GetSingleStreamInfo(Stream input, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool keepReadOpen = false)
+		{
+			// If we have a negative offset, zero it out since we don't support it yet
+			if (offset < 0)
+			{
+				offset = 0;
+			}
+
+			Rom rom = new Rom
+			{
+				Type = ItemType.Rom,
+				Size = input.Length - Math.Abs(offset),
+				CRC = string.Empty,
+				MD5 = string.Empty,
+				SHA1 = string.Empty,
+			};
+
+			try
+			{
+				// Initialize the hashers
+				OptimizedCRC crc = new OptimizedCRC();
+				MD5 md5 = MD5.Create();
+				SHA1 sha1 = SHA1.Create();
+
+				// Seek to the starting position, if one is set
+				if (offset > 0)
+				{
+					input.Seek(offset, SeekOrigin.Begin);
+				}
+
+				byte[] buffer = new byte[1024];
+				int read;
+				while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+				{
+					crc.Update(buffer, 0, read);
+					if (!noMD5)
+					{
+						md5.TransformBlock(buffer, 0, read, buffer, 0);
+					}
+					if (!noSHA1)
+					{
+						sha1.TransformBlock(buffer, 0, read, buffer, 0);
+					}
+				}
+
+				crc.Update(buffer, 0, 0);
+				rom.CRC = crc.Value.ToString("X8").ToLowerInvariant();
+
+				if (!noMD5)
+				{
+					md5.TransformFinalBlock(buffer, 0, 0);
+					rom.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
+				}
+				if (!noSHA1)
+				{
+					sha1.TransformFinalBlock(buffer, 0, 0);
+					rom.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
+				}
+
+				// Dispose of the hashers
+				crc.Dispose();
+				md5.Dispose();
+				sha1.Dispose();
+			}
+			catch (IOException)
+			{
+				return new Rom();
+			}
+			finally
+			{
+				if (!keepReadOpen)
+				{
+					input.Dispose();
+				}
+			}
+
+			return rom;
+		}
+
+		#endregion
+
 		#region File Manipulation
 
 		/// <summary>
@@ -1093,32 +1095,14 @@ namespace SabreTools.Helper
 				return;
 			}
 
-			// Read the input file and write to the fail
-			BinaryReader br = new BinaryReader(File.OpenRead(input));
-			BinaryWriter bw = new BinaryWriter(File.OpenWrite(output));
+			// Get the streams
+			FileStream fsr = File.OpenRead(input);
+			FileStream fsw = File.OpenWrite(output);
 
-			int bufferSize = 1024;
-			long adjustedLength = br.BaseStream.Length - bytesToRemoveFromTail;
+			RemoveBytesFromStream(fsr, fsw, bytesToRemoveFromHead, bytesToRemoveFromTail);
 
-			// Seek to the correct position
-			br.BaseStream.Seek((bytesToRemoveFromHead < 0 ? 0 : bytesToRemoveFromHead), SeekOrigin.Begin);
-
-			// Now read the file in chunks and write out
-			byte[] buffer = new byte[bufferSize];
-			while (br.BaseStream.Position <= (adjustedLength - bufferSize))
-			{
-				buffer = br.ReadBytes(bufferSize);
-				bw.Write(buffer);
-			}
-
-			// For the final chunk, if any, write out only that number of bytes
-			int length = (int)(adjustedLength - br.BaseStream.Position);
-			buffer = new byte[length];
-			buffer = br.ReadBytes(length);
-			bw.Write(buffer);
-
-			br.Dispose();
-			bw.Dispose();
+			fsr.Dispose();
+			fsw.Dispose();
 		}
 
 		/// <summary>
@@ -1160,37 +1144,13 @@ namespace SabreTools.Helper
 				return;
 			}
 
-			BinaryReader br = new BinaryReader(File.OpenRead(input));
-			BinaryWriter bw = new BinaryWriter(File.OpenWrite(output));
+			FileStream fsr = File.OpenRead(input);
+			FileStream fsw = File.OpenWrite(output);
 
-			if (bytesToAddToHead.Count() > 0)
-			{
-				bw.Write(bytesToAddToHead);
-			}
+			AppendBytesToStream(fsr, fsw, bytesToAddToHead, bytesToAddToTail);
 
-			int bufferSize = 1024;
-
-			// Now read the file in chunks and write out
-			byte[] buffer = new byte[bufferSize];
-			while (br.BaseStream.Position <= (br.BaseStream.Length - bufferSize))
-			{
-				buffer = br.ReadBytes(bufferSize);
-				bw.Write(buffer);
-			}
-
-			// For the final chunk, if any, write out only that number of bytes
-			int length = (int)(br.BaseStream.Length - br.BaseStream.Position);
-			buffer = new byte[length];
-			buffer = br.ReadBytes(length);
-			bw.Write(buffer);
-
-			if (bytesToAddToTail.Count() > 0)
-			{
-				bw.Write(bytesToAddToTail);
-			}
-
-			br.Dispose();
-			bw.Dispose();
+			fsr.Dispose();
+			fsw.Dispose();
 		}
 
 		/// <summary>
@@ -1284,6 +1244,107 @@ namespace SabreTools.Helper
 					catch { }
 				}
 			});
+		}
+
+		#endregion
+
+		#region Stream Manipulation
+
+		// <summary>
+		/// Remove an arbitrary number of bytes from the inputted stream
+		/// </summary>
+		/// <param name="input">Stream to be cropped</param>
+		/// <param name="output">Stream to output to</param>
+		/// <param name="bytesToRemoveFromHead">Bytes to be removed from head of stream</param>
+		/// <param name="bytesToRemoveFromTail">Bytes to be removed from tail of stream</param>
+		public static void RemoveBytesFromStream(Stream input, Stream output, long bytesToRemoveFromHead, long bytesToRemoveFromTail)
+		{
+			// Read the input file and write to the fail
+			BinaryReader br = new BinaryReader(input);
+			BinaryWriter bw = new BinaryWriter(output);
+
+			int bufferSize = 1024;
+			long adjustedLength = br.BaseStream.Length - bytesToRemoveFromTail;
+
+			// Seek to the correct position
+			br.BaseStream.Seek((bytesToRemoveFromHead < 0 ? 0 : bytesToRemoveFromHead), SeekOrigin.Begin);
+
+			// Now read the file in chunks and write out
+			byte[] buffer = new byte[bufferSize];
+			while (br.BaseStream.Position <= (adjustedLength - bufferSize))
+			{
+				buffer = br.ReadBytes(bufferSize);
+				bw.Write(buffer);
+			}
+
+			// For the final chunk, if any, write out only that number of bytes
+			int length = (int)(adjustedLength - br.BaseStream.Position);
+			buffer = new byte[length];
+			buffer = br.ReadBytes(length);
+			bw.Write(buffer);
+		}
+
+		/// <summary>
+		/// Add an aribtrary number of bytes to the inputted stream
+		/// </summary>
+		/// <param name="input">Stream to be appended to</param>
+		/// <param name="output">Outputted stream</param>
+		/// <param name="bytesToAddToHead">String representing bytes to be added to head of stream</param>
+		/// <param name="bytesToAddToTail">String representing bytes to be added to tail of stream</param>
+		public static void AppendBytesToStream(Stream input, Stream output, string bytesToAddToHead, string bytesToAddToTail)
+		{
+			// Source: http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
+			byte[] bytesToAddToHeadArray = new byte[bytesToAddToHead.Length / 2];
+			for (int i = 0; i < bytesToAddToHead.Length; i += 2)
+			{
+				bytesToAddToHeadArray[i / 2] = Convert.ToByte(bytesToAddToHead.Substring(i, 2), 16);
+			}
+			byte[] bytesToAddToTailArray = new byte[bytesToAddToTail.Length / 2];
+			for (int i = 0; i < bytesToAddToTail.Length; i += 2)
+			{
+				bytesToAddToTailArray[i / 2] = Convert.ToByte(bytesToAddToTail.Substring(i, 2), 16);
+			}
+
+			AppendBytesToStream(input, output, bytesToAddToHeadArray, bytesToAddToTailArray);
+		}
+
+		/// <summary>
+		/// Add an aribtrary number of bytes to the inputted stream
+		/// </summary>
+		/// <param name="input">Stream to be appended to</param>
+		/// <param name="output">Outputted stream</param>
+		/// <param name="bytesToAddToHead">Bytes to be added to head of stream</param>
+		/// <param name="bytesToAddToTail">Bytes to be added to tail of stream</param>
+		public static void AppendBytesToStream(Stream input, Stream output, byte[] bytesToAddToHead, byte[] bytesToAddToTail)
+		{
+			BinaryReader br = new BinaryReader(input);
+			BinaryWriter bw = new BinaryWriter(output);
+
+			if (bytesToAddToHead.Count() > 0)
+			{
+				bw.Write(bytesToAddToHead);
+			}
+
+			int bufferSize = 1024;
+
+			// Now read the file in chunks and write out
+			byte[] buffer = new byte[bufferSize];
+			while (br.BaseStream.Position <= (br.BaseStream.Length - bufferSize))
+			{
+				buffer = br.ReadBytes(bufferSize);
+				bw.Write(buffer);
+			}
+
+			// For the final chunk, if any, write out only that number of bytes
+			int length = (int)(br.BaseStream.Length - br.BaseStream.Position);
+			buffer = new byte[length];
+			buffer = br.ReadBytes(length);
+			bw.Write(buffer);
+
+			if (bytesToAddToTail.Count() > 0)
+			{
+				bw.Write(bytesToAddToTail);
+			}
 		}
 
 		#endregion
