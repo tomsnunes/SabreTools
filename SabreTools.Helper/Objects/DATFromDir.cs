@@ -190,7 +190,8 @@ namespace SabreTools
 					new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
 					file =>
 				{
-					while (File.Exists(file))
+					int i = 0;
+					while (File.Exists(file) && i < 50)
 					{
 						try
 						{
@@ -198,8 +199,8 @@ namespace SabreTools
 						}
 						catch
 						{
-						// Just absorb the error for now
-					}
+							i++;
+						}
 					}
 				});
 			}
