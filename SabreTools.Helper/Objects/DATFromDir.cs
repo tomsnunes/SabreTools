@@ -245,12 +245,6 @@ namespace SabreTools
 				{
 					List<Rom> extracted = FileTools.GetArchiveFileInfo(newItem, _logger);
 
-					// Cue to delete the file if it's a copy
-					if (_copyFiles && item != newItem)
-					{
-						FileTools.DeleteDirectory(Path.GetDirectoryName(newItem));
-					}
-
 					foreach (Rom rom in extracted)
 					{
 						ProcessFileHelper(newItem,
@@ -263,12 +257,6 @@ namespace SabreTools
 				else if (File.Exists(newItem))
 				{
 					ProcessFile(newItem, newBasePath, "");
-
-					// Cue to delete the file if it's a copy
-					if (_copyFiles && item != newItem)
-					{
-						FileTools.DeleteDirectory(Path.GetDirectoryName(newItem));
-					}
 				}
 			}
 			// Otherwise, attempt to extract the files to the temporary directory
@@ -285,12 +273,6 @@ namespace SabreTools
 				// If the file was an archive and was extracted successfully, check it
 				if (!encounteredErrors)
 				{
-					// Cue to delete the file if it's a copy
-					if (_copyFiles && item != newItem)
-					{
-						FileTools.DeleteDirectory(Path.GetDirectoryName(newItem));
-					}
-
 					_logger.Log(Path.GetFileName(item) + " treated like an archive");
 					List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(extracted,
@@ -309,13 +291,13 @@ namespace SabreTools
 				else if (File.Exists(newItem))
 				{
 					ProcessFile(newItem, newBasePath, "");
-
-					// Cue to delete the file if it's a copy
-					if (_copyFiles && item != newItem)
-					{
-						FileTools.DeleteDirectory(Path.GetDirectoryName(newItem));
-					}
 				}
+			}
+
+			// Cue to delete the file if it's a copy
+			if (_copyFiles && item != newItem)
+			{
+				FileTools.DeleteFile(newItem);
 			}
 
 			// Delete the sub temp directory
