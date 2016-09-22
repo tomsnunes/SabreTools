@@ -492,64 +492,64 @@ namespace SabreTools.Helper
 				return encounteredErrors;
 			}
 
+			FileStream fs = null;
 			try
 			{
-				using (FileStream fs = File.OpenRead(input))
+				fs = File.OpenRead(input);
+
+				if (at == ArchiveType.SevenZip && sevenzip != ArchiveScanLevel.External)
 				{
-					if (at == ArchiveType.SevenZip && sevenzip != ArchiveScanLevel.External)
-					{
-						using (SevenZipArchive sza = SevenZipArchive.Open(fs))
-						{
-							logger.Log("Found archive of type: " + at);
-
-							// Create the temp directory
-							Directory.CreateDirectory(tempDir);
-
-							// Extract all files to the temp directory
-							foreach (IArchiveEntry iae in sza.Entries)
-							{
-								iae.WriteToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
-							}
-							encounteredErrors = false;
-						}
-					}
-					else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
+					using (SevenZipArchive sza = SevenZipArchive.Open(fs))
 					{
 						logger.Log("Found archive of type: " + at);
 
 						// Create the temp directory
 						Directory.CreateDirectory(tempDir);
 
-						using (FileStream outstream = File.Create(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input))))
+						// Extract all files to the temp directory
+						foreach (IArchiveEntry iae in sza.Entries)
 						{
-							using (GZipStream gzstream = new GZipStream(fs, CompressionMode.Decompress))
-							{
-								gzstream.CopyTo(outstream);
-							}
+							iae.WriteToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
 						}
 						encounteredErrors = false;
 					}
-					else
+				}
+				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
+				{
+					logger.Log("Found archive of type: " + at);
+
+					// Create the temp directory
+					Directory.CreateDirectory(tempDir);
+
+					using (FileStream outstream = File.Create(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input))))
 					{
-						using (IReader reader = ReaderFactory.Open(fs))
+						using (GZipStream gzstream = new GZipStream(fs, CompressionMode.Decompress))
 						{
-							logger.Log("Found archive of type: " + at);
+							gzstream.CopyTo(outstream);
+						}
+					}
+					encounteredErrors = false;
+				}
+				else
+				{
+					using (IReader reader = ReaderFactory.Open(fs))
+					{
+						logger.Log("Found archive of type: " + at);
 
-							if ((at == ArchiveType.Zip && zip != ArchiveScanLevel.External) ||
-								(at == ArchiveType.Rar && rar != ArchiveScanLevel.External))
+						if ((at == ArchiveType.Zip && zip != ArchiveScanLevel.External) ||
+							(at == ArchiveType.Rar && rar != ArchiveScanLevel.External))
+						{
+							// Create the temp directory
+							Directory.CreateDirectory(tempDir);
+
+							// Extract all files to the temp directory
+							bool succeeded = reader.MoveToNextEntry();
+							while (succeeded)
 							{
-								// Create the temp directory
-								Directory.CreateDirectory(tempDir);
-
-								// Extract all files to the temp directory
-								bool succeeded = reader.MoveToNextEntry();
-								while (succeeded)
-								{
-									reader.WriteEntryToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
-									succeeded = reader.MoveToNextEntry();
-								}
-								encounteredErrors = false;
+								reader.WriteEntryToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+								succeeded = reader.MoveToNextEntry();
 							}
+							encounteredErrors = false;
 						}
 					}
 				}
@@ -566,6 +566,11 @@ namespace SabreTools.Helper
 			{
 				// Don't log file open errors
 				encounteredErrors = true;
+			}
+			finally
+			{
+				fs.Close();
+				fs.Dispose();
 			}
 
 			return encounteredErrors;
