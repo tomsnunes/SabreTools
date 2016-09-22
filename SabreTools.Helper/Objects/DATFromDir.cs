@@ -31,7 +31,6 @@ namespace SabreTools
 
 		// Other required variables
 		private Logger _logger;
-		private List<string> _clean;
 
 		// Public variables
 		public DatFile DatData
@@ -73,7 +72,6 @@ namespace SabreTools
 			_copyFiles = copyFiles;
 			_maxDegreeOfParallelism = maxDegreeOfParallelism;
 			_logger = logger;
-			_clean = new List<string>();
 		}
 
 		/// <suaxmary>
@@ -180,18 +178,6 @@ namespace SabreTools
 			catch
 			{
 				// Just absorb the error for now
-			}
-
-			// Now if we have other files to delete, do so
-			if (_copyFiles)
-			{
-				_logger.User("Cleaning copied files");
-				Parallel.ForEach(_clean,
-					new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
-					file =>
-				{
-					FileTools.DeleteFile(file);
-				});
 			}
 
 			return true;
