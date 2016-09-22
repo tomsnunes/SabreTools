@@ -519,7 +519,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(datfromdir ^ extsplit ^ hashsplit ^ headerer ^ (merge || diffMode != 0 || update
+			if (!(extsplit ^ hashsplit ^ headerer ^ (datfromdir || merge || diffMode != 0 || update
 				|| outputFormat != 0 || tsv != null|| trim) ^ rem ^ stats ^ typesplit))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
