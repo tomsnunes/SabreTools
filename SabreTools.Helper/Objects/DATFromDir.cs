@@ -248,7 +248,7 @@ namespace SabreTools
 					// Cue to delete the file if it's a copy
 					if (_copyFiles && item != newItem)
 					{
-						FileTools.DeleteFile(newItem);
+						FileTools.DeleteDirectory(Path.GetDirectoryName(newItem));
 					}
 
 					foreach (Rom rom in extracted)
@@ -267,7 +267,7 @@ namespace SabreTools
 					// Cue to delete the file if it's a copy
 					if (_copyFiles && item != newItem)
 					{
-						FileTools.DeleteFile(newItem);
+						FileTools.DeleteDirectory(Path.GetDirectoryName(newItem));
 					}
 				}
 			}
@@ -288,7 +288,7 @@ namespace SabreTools
 					// Cue to delete the file if it's a copy
 					if (_copyFiles && item != newItem)
 					{
-						FileTools.DeleteFile(newItem);
+						FileTools.DeleteDirectory(Path.GetDirectoryName(newItem));
 					}
 
 					_logger.Log(Path.GetFileName(item) + " treated like an archive");
@@ -313,7 +313,7 @@ namespace SabreTools
 					// Cue to delete the file if it's a copy
 					if (_copyFiles && item != newItem)
 					{
-						FileTools.DeleteFile(newItem);
+						FileTools.DeleteDirectory(Path.GetDirectoryName(newItem));
 					}
 				}
 			}
