@@ -11,6 +11,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace SabreTools.Helper
 {
@@ -1235,6 +1236,29 @@ namespace SabreTools.Helper
 				}
 				catch { }
 			}
+		}
+
+		/// <summary>
+		/// Delete a file asynchronously
+		/// </summary>
+		/// <param name="filename">Name of the file to be deleted</param>
+		public async static void DeleteFile(string filename)
+		{
+			FileInfo fi = new FileInfo(filename);
+			await Task.Factory.StartNew(() =>
+			{
+				while (fi.Exists)
+				{
+					try
+					{
+						fi.Delete();
+					}
+					catch
+					{
+
+					}
+				}
+			});
 		}
 
 		#endregion

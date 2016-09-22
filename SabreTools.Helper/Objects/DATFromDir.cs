@@ -190,18 +190,7 @@ namespace SabreTools
 					new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
 					file =>
 				{
-					int i = 0;
-					while (File.Exists(file) && i < 50)
-					{
-						try
-						{
-							Directory.Delete(Path.GetDirectoryName(file), true);
-						}
-						catch
-						{
-							i++;
-						}
-					}
+					FileTools.DeleteFile(file);
 				});
 			}
 
@@ -320,22 +309,7 @@ namespace SabreTools
 				// Cue to delete the file if it's a copy
 				if (_copyFiles)
 				{
-					int i = 0;
-					while (File.Exists(newItem) && i < 50)
-					{
-						try
-						{
-							Directory.Delete(Path.GetDirectoryName(newItem), true);
-						}
-						catch
-						{
-							i++;
-						}
-					}
-					if (File.Exists(newItem))
-					{
-						_clean.Add(newItem);
-					}
+					FileTools.DeleteFile(newItem);
 				}
 
 				// Delete the sub temp directory
