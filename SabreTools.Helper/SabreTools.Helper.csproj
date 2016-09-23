@@ -134,7 +134,7 @@
     <Compile Include="Skippers\Skippers.cs" />
     <Compile Include="Tools\ArchiveTools.cs" />
     <Compile Include="Tools\FileTools.cs" />
-    <Compile Include="Tools\DBTools.cs" />
+    <Compile Include="Tools\DatabaseTools.cs" />
     <Compile Include="Data\Enums.cs" />
     <Compile Include="Objects\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

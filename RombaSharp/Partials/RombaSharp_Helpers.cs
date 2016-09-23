@@ -294,7 +294,7 @@ namespace SabreTools
 			// Make sure the file exists
 			if (!File.Exists(_db))
 			{
-				DBTools.EnsureDatabase(_dbSchema, _db, _connectionString);
+				DatabaseTools.EnsureDatabase(_dbSchema, _db, _connectionString);
 			}
 
 			// Make sure the dats dir is set

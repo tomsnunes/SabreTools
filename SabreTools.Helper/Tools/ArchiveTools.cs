@@ -33,7 +33,7 @@ namespace SabreTools.Helper
 
 		#endregion
 
-		#region Archive Extraction
+		#region Extraction
 
 		/// <summary>
 		/// Attempt to extract a file as an archive
@@ -234,7 +234,7 @@ namespace SabreTools.Helper
 
 		#endregion
 
-		#region Archive Information
+		#region Information
 
 		/// <summary>
 		/// Generate a list of RomData objects from the header values in an archive
@@ -526,7 +526,7 @@ namespace SabreTools.Helper
 
 		#endregion
 
-		#region Archive Writing
+		#region Writing
 
 		/// <summary>
 		/// Copy a file to an output archive

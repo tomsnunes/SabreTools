@@ -251,46 +251,10 @@ namespace SabreTools.Helper
 
 				// Now add the information to the database if it's not already there
 				Rom rom = GetSingleFileInfo(newfile);
-				AddHeaderToDatabase(hstr, rom.SHA1, type, logger);
+				DatabaseTools.AddHeaderToDatabase(hstr, rom.SHA1, type, logger);
 			}
 
 			return true;
-		}
-
-		/// <summary>
-		/// Add a header to the database
-		/// </summary>
-		/// <param name="header">String representing the header bytes</param>
-		/// <param name="SHA1">SHA-1 of the deheadered file</param>
-		/// <param name="type">HeaderType representing the detected header</param>
-		/// <param name="logger">Logger object for console and file output</param>
-		private static void AddHeaderToDatabase(string header, string SHA1, HeaderType type, Logger logger)
-		{
-			bool exists = false;
-
-			// Open the database connection
-			SqliteConnection dbc = new SqliteConnection(Constants.HeadererConnectionString);
-			dbc.Open();
-
-			string query = @"SELECT * FROM data WHERE sha1='" + SHA1 + "' AND header='" + header + "'";
-			SqliteCommand slc = new SqliteCommand(query, dbc);
-			SqliteDataReader sldr = slc.ExecuteReader();
-			exists = sldr.HasRows;
-
-			if (!exists)
-			{
-				query = @"INSERT INTO data (sha1, header, type) VALUES ('" +
-				SHA1 + "', " +
-				"'" + header + "', " +
-				"'" + type.ToString() + "')";
-				slc = new SqliteCommand(query, dbc);
-				logger.Log("Result of inserting header: " + slc.ExecuteNonQuery());
-			}
-
-			// Dispose of database objects
-			slc.Dispose();
-			sldr.Dispose();
-			dbc.Dispose();
 		}
 
 		/// <summary>

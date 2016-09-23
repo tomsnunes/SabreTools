@@ -43,7 +43,7 @@ namespace SabreTools
 			// Perform initial setup and verification
 			_logger = new Logger(true, "romba.log");
 			InitializeConfiguration();
-			DBTools.EnsureDatabase(_dbSchema, _db, _connectionString);
+			DatabaseTools.EnsureDatabase(_dbSchema, _db, _connectionString);
 
 			// If output is being redirected, don't allow clear screens
 			if (!Console.IsOutputRedirected)
