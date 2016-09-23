@@ -4381,7 +4381,7 @@ namespace SabreTools.Helper
 			{
 				TotalSize = Int64.MaxValue + TotalSize;
 			}
-			sw.Write("\t\t\t<tr><td>" + FileName + "</td>"
+			sw.Write("\t\t\t<tr><td>" + HttpUtility.HtmlEncode(FileName) + "</td>"
 				+ "<td>" + Style.GetBytesReadable(TotalSize) + "</td>"
 				+ "<td>" + (game == -1 ? Files.Count : game) + "</td>"
 				+ "<td>" + RomCount + "</td>"
