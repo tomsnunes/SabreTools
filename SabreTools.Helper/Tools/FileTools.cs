@@ -671,6 +671,55 @@ namespace SabreTools.Helper
 		#region File Information
 
 		/// <summary>
+		/// Get what type of DAT the input file is
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <returns>The OutputFormat corresponding to the DAT</returns>
+		/// <remarks>There is currently no differentiation between XML and SabreDAT here</remarks>
+		public static OutputFormat GetOutputFormat(string filename, Logger logger)
+		{
+			// Limit the output formats based on extension
+			string ext = Path.GetExtension(filename).ToLowerInvariant();
+			if (ext != ".dat" && ext != ".xml")
+			{
+				return 0;
+			}
+
+			// Read the input file, if possible
+			logger.Log("Attempting to read file: \"" + filename + "\"");
+
+			// Check if file exists
+			if (!File.Exists(filename))
+			{
+				logger.Warning("File '" + filename + "' could not read from!");
+				return 0;
+			}
+
+			try
+			{
+				StreamReader sr = File.OpenText(filename);
+				string first = sr.ReadLine();
+				sr.Dispose();
+				if (first.Contains("<") && first.Contains(">"))
+				{
+					return OutputFormat.Xml;
+				}
+				else if (first.Contains("[") && first.Contains("]"))
+				{
+					return OutputFormat.RomCenter;
+				}
+				else
+				{
+					return OutputFormat.ClrMamePro;
+				}
+			}
+			catch (Exception)
+			{
+				return 0;
+			}
+		}
+
+		/// <summary>
 		/// Retrieve file information for a single file
 		/// </summary>
 		/// <param name="input">Filename to get information from</param>

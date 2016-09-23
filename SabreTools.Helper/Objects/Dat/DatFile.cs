@@ -384,6 +384,8 @@ namespace SabreTools.Helper
 
 		#endregion
 
+		#region Instance Methods
+
 		#region Cloning Methods
 
 		public object Clone()
@@ -472,55 +474,6 @@ namespace SabreTools.Helper
 		#region DAT Parsing
 
 		/// <summary>
-		/// Get what type of DAT the input file is
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <returns>The OutputFormat corresponding to the DAT</returns>
-		/// <remarks>There is currently no differentiation between XML and SabreDAT here</remarks>
-		public static OutputFormat GetOutputFormat(string filename, Logger logger)
-		{
-			// Limit the output formats based on extension
-			string ext = Path.GetExtension(filename).ToLowerInvariant();
-			if (ext != ".dat" && ext != ".xml")
-			{
-				return 0;
-			}
-
-			// Read the input file, if possible
-			logger.Log("Attempting to read file: \"" + filename + "\"");
-
-			// Check if file exists
-			if (!File.Exists(filename))
-			{
-				logger.Warning("File '" + filename + "' could not read from!");
-				return 0;
-			}
-
-			try
-			{
-				StreamReader sr = File.OpenText(filename);
-				string first = sr.ReadLine();
-				sr.Dispose();
-				if (first.Contains("<") && first.Contains(">"))
-				{
-					return OutputFormat.Xml;
-				}
-				else if (first.Contains("[") && first.Contains("]"))
-				{
-					return OutputFormat.RomCenter;
-				}
-				else
-				{
-					return OutputFormat.ClrMamePro;
-				}
-			}
-			catch (Exception)
-			{
-				return 0;
-			}
-		}
-
-		/// <summary>
 		/// Parse a DAT and return all found games and roms within
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
@@ -602,7 +555,7 @@ namespace SabreTools.Helper
 			FileName = (String.IsNullOrEmpty(FileName) ? (keepext ? Path.GetFileName(filename) : Path.GetFileNameWithoutExtension(filename)) : FileName);
 
 			// If the output type isn't set already, get the internal output type
-			OutputFormat = (OutputFormat == 0 ? GetOutputFormat(filename, logger) : OutputFormat);
+			OutputFormat = (OutputFormat == 0 ? FileTools.GetOutputFormat(filename, logger) : OutputFormat);
 
 			// Make sure there's a dictionary to read to
 			if (Files == null)
@@ -611,7 +564,7 @@ namespace SabreTools.Helper
 			}
 
 			// Now parse the correct type of DAT
-			switch (GetOutputFormat(filename, logger))
+			switch (FileTools.GetOutputFormat(filename, logger))
 			{
 				case OutputFormat.ClrMamePro:
 					ParseCMP(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean);
@@ -2338,1227 +2291,6 @@ namespace SabreTools.Helper
 
 		#endregion
 
-		#region Populate DAT from Directory
-
-		/// <summary>
-		/// Create a new Dat from a directory
-		/// </summary>
-		/// <param name="basePath">Base folder to be used in creating the DAT</param>
-		/// <param name="noMD5">True if MD5 hashes should be skipped over, false otherwise</param>
-		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
-		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
-		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
-		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
-		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
-		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
-		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
-		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for console and file output</param>
-		public bool PopulateDatFromDir(string basePath, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
-			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, int maxDegreeOfParallelism, Logger logger)
-		{
-			// If the description is defined but not the name, set the name from the description
-			if (String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
-			{
-				Name = Description;
-			}
-
-			// If the name is defined but not the description, set the description from the name
-			else if (!String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
-			{
-				Description = Name + (bare ? "" : " (" + Date + ")");
-			}
-
-			// If neither the name or description are defined, set them from the automatic values
-			else if (String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
-			{
-				Name = basePath.Split(Path.DirectorySeparatorChar).Last();
-				Description = Name + (bare ? "" : " (" + Date + ")");
-			}
-
-			// Process the input folder
-			logger.Log("Folder found: " + basePath);
-
-			// Process the files in all subfolders
-			List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.AllDirectories).ToList();
-			Parallel.ForEach(files,
-				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-				item =>
-				{
-					DFDProcessPossibleArchive(item, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
-						tempDir, copyFiles, maxDegreeOfParallelism, logger);
-				});
-
-			// Now find all folders that are empty, if we are supposed to
-			if (!Romba && addBlanks)
-			{
-				List<string> empties = Directory.EnumerateDirectories(basePath, "*", SearchOption.AllDirectories).ToList();
-				Parallel.ForEach(empties,
-					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-					dir =>
-					{
-						if (Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).Count() == 0)
-						{
-							// Get the full path for the directory
-							string fulldir = Path.GetFullPath(dir);
-
-							// Set the temporary variables
-							string gamename = "";
-							string romname = "";
-
-							// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
-							if (Type == "SuperDAT")
-							{
-								gamename = fulldir.Remove(0, basePath.Length + 1);
-								romname = "-";
-							}
-
-							// Otherwise, we want just the top level folder as the game, and the file as everything else
-							else
-							{
-								gamename = fulldir.Remove(0, basePath.Length + 1).Split(Path.DirectorySeparatorChar)[0];
-								romname = Path.Combine(fulldir.Remove(0, basePath.Length + 1 + gamename.Length), "-");
-							}
-
-							// Sanitize the names
-							if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								gamename = gamename.Substring(1);
-							}
-							if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								gamename = gamename.Substring(0, gamename.Length - 1);
-							}
-							if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								romname = romname.Substring(1);
-							}
-							if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								romname = romname.Substring(0, romname.Length - 1);
-							}
-
-							logger.Log("Adding blank empty folder: " + gamename);
-							Files["null"].Add(new Rom(romname, gamename));
-						}
-					});
-			}
-
-			// Now that we're done, delete the temp folder (if it's not the default)
-			logger.User("Cleaning temp folder");
-			try
-			{
-				if (tempDir != Path.GetTempPath())
-				{
-					Directory.Delete(tempDir, true);
-				}
-			}
-			catch
-			{
-				// Just absorb the error for now
-			}
-
-			return true;
-		}
-
-		/// <summary>
-		/// Check a given file for hashes, based on current settings
-		/// </summary>
-		/// <param name="item">Filename of the item to be checked</param>
-		/// <param name="basePath">Base folder to be used in creating the DAT</param>
-		/// <param name="noMD5">True if MD5 hashes should be skipped over, false otherwise</param>
-		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
-		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
-		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
-		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
-		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
-		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
-		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
-		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for console and file output</param>
-		private void DFDProcessPossibleArchive(string item, string basePath, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
-			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, int maxDegreeOfParallelism, Logger logger)
-		{
-			// Define the temporary directory
-			string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
-
-			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
-			if (Romba)
-			{
-				Rom rom = FileTools.GetTorrentGZFileInfo(item, logger);
-
-				// If the rom is valid, write it out
-				if (rom.Name != null)
-				{
-					// Add the list if it doesn't exist already
-					string key = rom.Size + "-" + rom.CRC;
-
-					lock (Files)
-					{
-						if (!Files.ContainsKey(key))
-						{
-							Files.Add(key, new List<DatItem>());
-						}
-
-						Files[key].Add(rom);
-						logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
-					}
-
-				}
-				else
-				{
-					logger.User("File not added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
-					return;
-				}
-
-				return;
-			}
-
-			// If we're copying files, copy it first and get the new filename
-			string newItem = item;
-			string newBasePath = basePath;
-			if (copyFiles)
-			{
-				newBasePath = Path.Combine(tempDir, Path.GetRandomFileName());
-				newItem = Path.GetFullPath(Path.Combine(newBasePath, Path.GetFullPath(item).Remove(0, basePath.Length + 1)));
-				Directory.CreateDirectory(Path.GetDirectoryName(newItem));
-				File.Copy(item, newItem, true);
-			}
-
-			// If both deep hash skip flags are set, do a quickscan
-			if (noMD5 && noSHA1)
-			{
-				ArchiveType? type = FileTools.GetCurrentArchiveType(newItem, logger);
-
-				// If we have an archive, scan it
-				if (type != null && !archivesAsFiles)
-				{
-					List<Rom> extracted = FileTools.GetArchiveFileInfo(newItem, logger);
-
-					foreach (Rom rom in extracted)
-					{
-						DFDProcessFileHelper(newItem,
-							rom,
-							basePath,
-							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length) + Path.GetFileNameWithoutExtension(item),
-							logger);
-					}
-				}
-				// Otherwise, just get the info on the file itself
-				else if (File.Exists(newItem))
-				{
-					DFDProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, logger);
-				}
-			}
-			// Otherwise, attempt to extract the files to the temporary directory
-			else
-			{
-				bool encounteredErrors = FileTools.ExtractArchive(newItem,
-					tempSubDir,
-					(archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
-					(!archivesAsFiles && enableGzip ? ArchiveScanLevel.Internal : ArchiveScanLevel.External),
-					(archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
-					(archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
-					logger);
-
-				// If the file was an archive and was extracted successfully, check it
-				if (!encounteredErrors)
-				{
-					logger.Log(Path.GetFileName(item) + " treated like an archive");
-					List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
-					Parallel.ForEach(extracted,
-						new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-						entry =>
-						{
-							DFDProcessFile(entry,
-								Path.Combine((Type == "SuperDAT"
-									? (Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length)
-									: ""),
-								Path.GetFileNameWithoutExtension(item)),
-								tempSubDir,
-								noMD5,
-								noSHA1,
-								addDate,
-								logger);
-						});
-				}
-				// Otherwise, just get the info on the file itself
-				else if (File.Exists(newItem))
-				{
-					DFDProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, logger);
-				}
-			}
-
-			// Cue to delete the file if it's a copy
-			if (copyFiles && item != newItem)
-			{
-				try
-				{
-					Directory.Delete(newBasePath, true);
-				}
-				catch { }
-			}
-
-			// Delete the sub temp directory
-			if (Directory.Exists(tempSubDir))
-			{
-				Directory.Delete(tempSubDir, true);
-			}
-		}
-
-		/// <summary>
-		/// Process a single file as a file
-		/// </summary>
-		/// <param name="item">File to be added</param>
-		/// <param name="basepath">Path the represents the parent directory</param>
-		/// <param name="parent">Parent game to be used</param>
-		private void DFDProcessFile(string item, string parent, string basePath, bool noMD5, bool noSHA1, bool addDate, Logger logger)
-		{
-			logger.Log(Path.GetFileName(item) + " treated like a file");
-			Rom rom = FileTools.GetSingleFileInfo(item, noMD5: noMD5, noSHA1: noSHA1, date: addDate);
-
-			DFDProcessFileHelper(item, rom, basePath, parent, logger);
-		}
-
-		/// <summary>
-		/// Process a single file as a file (with found Rom data)
-		/// </summary>
-		/// <param name="item">File to be added</param>
-		/// <param name="item">Rom data to be used to write to file</param>
-		/// <param name="basepath">Path the represents the parent directory</param>
-		/// <param name="parent">Parent game to be used</param>
-		private void DFDProcessFileHelper(string item, DatItem datItem, string basepath, string parent, Logger logger)
-		{
-			// If the datItem isn't a Rom or Disk, return
-			if (datItem.Type != ItemType.Rom && datItem.Type != ItemType.Disk)
-			{
-				return;
-			}
-
-			string key = "";
-			if (datItem.Type == ItemType.Rom)
-			{
-				key = ((Rom)datItem).Size + "-" + ((Rom)datItem).CRC;
-			}
-			else
-			{
-				key = ((Disk)datItem).MD5;
-			}
-
-			// Add the list if it doesn't exist already
-			lock (Files)
-			{
-				if (!Files.ContainsKey(key))
-				{
-					Files.Add(key, new List<DatItem>());
-				}
-			}
-
-			try
-			{
-				// If the basepath ends with a directory separator, remove it
-				if (!basepath.EndsWith(Path.DirectorySeparatorChar.ToString()))
-				{
-					basepath += Path.DirectorySeparatorChar.ToString();
-				}
-
-				// Make sure we have the full item path
-				item = Path.GetFullPath(item);
-
-				// Get the data to be added as game and item names
-				string gamename = "";
-				string romname = "";
-
-				// If the parent is blank, then we have a non-archive file
-				if (parent == "")
-				{
-					// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
-					if (Type == "SuperDAT")
-					{
-						gamename = Path.GetDirectoryName(item.Remove(0, basepath.Length));
-						romname = Path.GetFileName(item);
-					}
-
-					// Otherwise, we want just the top level folder as the game, and the file as everything else
-					else
-					{
-						gamename = item.Remove(0, basepath.Length).Split(Path.DirectorySeparatorChar)[0];
-						romname = item.Remove(0, (Path.Combine(basepath, gamename).Length));
-					}
-				}
-
-				// Otherwise, we assume that we have an archive
-				else
-				{
-					// If we have a SuperDAT, we want the archive name as the game, and the file as everything else (?)
-					if (Type == "SuperDAT")
-					{
-						gamename = parent;
-						romname = item.Remove(0, basepath.Length);
-					}
-
-					// Otherwise, we want the archive name as the game, and the file as everything else
-					else
-					{
-						gamename = parent;
-						romname = item.Remove(0, basepath.Length);
-					}
-				}
-
-				// Sanitize the names
-				if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
-				{
-					gamename = gamename.Substring(1);
-				}
-				if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
-				{
-					gamename = gamename.Substring(0, gamename.Length - 1);
-				}
-				if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
-				{
-					romname = romname.Substring(1);
-				}
-				if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
-				{
-					romname = romname.Substring(0, romname.Length - 1);
-				}
-
-				// Update rom information
-				datItem.Name = romname;
-				datItem.MachineName = gamename;
-				datItem.MachineDescription = gamename;
-
-				// Add the file information to the DAT
-				lock (Files)
-				{
-					Files[key].Add(datItem);
-				}
-
-				logger.User("File added: " + romname + Environment.NewLine);
-			}
-			catch (IOException ex)
-			{
-				logger.Error(ex.ToString());
-				return;
-			}
-		}
-
-		#endregion
-
-		#region Statistics
-
-		/// <summary>
-		/// Recalculate the statistics for the Dat
-		/// </summary>
-		public void RecalculateStats()
-		{
-			// Wipe out any stats already there
-			RomCount = 0;
-			DiskCount = 0;
-			TotalSize = 0;
-			CRCCount = 0;
-			MD5Count = 0;
-			SHA1Count = 0;
-			NodumpCount = 0;
-
-			// If we have a blank Dat in any way, return
-			if (this == null || Files == null || Files.Count == 0)
-			{
-				return;
-			}
-
-			// Loop through and add
-			foreach (List<DatItem> roms in Files.Values)
-			{
-				foreach (Rom rom in roms)
-				{
-					RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
-					DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
-					TotalSize += (rom.ItemStatus == ItemStatus.Nodump ? 0 : rom.Size);
-					CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
-					MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
-					SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Output the stats for the Dat in a human-readable format
-		/// </summary>
-		/// <param name="logger">Logger object for file and console writing</param>
-		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
-		/// <param name="game">Number of games to use, -1 means recalculate games (default)</param>
-		public void OutputStats(Logger logger, bool recalculate = false, long game = -1)
-		{
-			// If we're supposed to recalculate the statistics, do so
-			if (recalculate)
-			{
-				RecalculateStats();
-			}
-
-			SortedDictionary<string, List<DatItem>> newroms = DatFile.BucketByGame(Files, false, true, logger, false);
-			if (TotalSize < 0)
-			{
-				TotalSize = Int64.MaxValue + TotalSize;
-			}
-			logger.User("    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
-    Games found:             " + (game == -1 ? newroms.Count : game) + @"
-    Roms found:              " + RomCount + @"
-    Disks found:             " + DiskCount + @"
-    Roms with CRC:           " + CRCCount + @"
-    Roms with MD5:           " + MD5Count + @"
-    Roms with SHA-1:         " + SHA1Count + @"
-    Roms with Nodump status: " + NodumpCount + @"
-");
-		}
-
-		/// <summary>
-		/// Output the stats for a list of input dats as files in a human-readable format
-		/// </summary>
-		/// <param name="inputs">List of input files and folders</param>
-		/// <param name="single">True if single DAT stats are output, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		public static void OutputStats(List<string> inputs, bool single, Logger logger)
-		{
-			// Make sure we have all files
-			List<string> newinputs = new List<string>();
-			foreach (string input in inputs)
-			{
-				if (File.Exists(input))
-				{
-					newinputs.Add(input);
-				}
-				if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.GetFiles(input, "*", SearchOption.AllDirectories))
-					{
-						newinputs.Add(file);
-					}
-				}
-			}
-
-			// Init all total variables
-			long totalSize = 0;
-			long totalGame = 0;
-			long totalRom = 0;
-			long totalDisk = 0;
-			long totalCRC = 0;
-			long totalMD5 = 0;
-			long totalSHA1 = 0;
-			long totalNodump = 0;
-
-			/// Now process each of the input files
-			foreach (string filename in newinputs)
-			{
-				logger.Log("Beginning stat collection for '" + filename + "'");
-				List<string> games = new List<string>();
-				DatFile datdata = new DatFile();
-				datdata.Parse(filename, 0, 0, logger);
-				SortedDictionary<string, List<DatItem>> newroms = BucketByGame(datdata.Files, false, true, logger, false);
-
-				// Output single DAT stats (if asked)
-				if (single)
-				{
-					logger.User(@"\nFor file '" + filename + @"':
---------------------------------------------------");
-					datdata.OutputStats(logger);
-				}
-				else
-				{
-					logger.User("Adding stats for file '" + filename + "'\n");
-				}
-
-				// Add single DAT stats to totals
-				totalSize += datdata.TotalSize;
-				totalGame += newroms.Count;
-				totalRom += datdata.RomCount;
-				totalDisk += datdata.DiskCount;
-				totalCRC += datdata.CRCCount;
-				totalMD5 += datdata.MD5Count;
-				totalSHA1 += datdata.SHA1Count;
-				totalNodump += datdata.NodumpCount;
-			}
-
-			// Output total DAT stats
-			if (!single) { logger.User(""); }
-			DatFile totaldata = new DatFile
-			{
-				TotalSize = totalSize,
-				RomCount = totalRom,
-				DiskCount = totalDisk,
-				CRCCount = totalCRC,
-				MD5Count = totalMD5,
-				SHA1Count = totalSHA1,
-				NodumpCount = totalNodump,
-			};
-			logger.User(@"For ALL DATs found
---------------------------------------------------");
-			totaldata.OutputStats(logger, game: totalGame);
-			logger.User(@"
-Please check the log folder if the stats scrolled offscreen");
-		}
-
-		#endregion
-
-		#region Bucketing
-
-		/// <summary>
-		/// Take an arbitrarily ordered List and return a Dictionary sorted by Game
-		/// </summary>
-		/// <param name="list">Input unsorted list</param>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		/// <returns>SortedDictionary bucketed by game name</returns>
-		public static SortedDictionary<string, List<DatItem>> BucketByGame(List<DatItem> list, bool mergeroms, bool norename, Logger logger, bool output = true)
-		{
-			Dictionary<string, List<DatItem>> dict = new Dictionary<string, List<DatItem>>();
-			dict.Add("key", list);
-			return BucketByGame(dict, mergeroms, norename, logger, output);
-		}
-
-		/// <summary>
-		/// Take an arbitrarily bucketed Dictionary and return one sorted by Game
-		/// </summary>
-		/// <param name="dict">Input unsorted dictionary</param>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		/// <returns>SortedDictionary bucketed by game name</returns>
-		public static SortedDictionary<string, List<DatItem>> BucketByGame(IDictionary<string, List<DatItem>> dict, bool mergeroms, bool norename, Logger logger, bool output = true)
-		{
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
-
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-			long count = 0;
-
-			// If we have a null dict or an empty one, output a new dictionary
-			if (dict == null || dict.Count == 0)
-			{
-				return sortable;
-			}
-
-			// Process each all of the roms
-			List<string> keys = dict.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = dict[key];
-
-				// If we're merging the roms, do so
-				if (mergeroms)
-				{
-					roms = DatItem.Merge(roms, logger);
-				}
-
-				// Now add each of the roms to their respective games
-				foreach (DatItem rom in roms)
-				{
-					count++;
-					string newkey = (norename ? ""
-							: rom.SystemID.ToString().PadLeft(10, '0')
-								+ "-"
-								+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
-						+ (String.IsNullOrEmpty(rom.MachineName)
-								? "Default"
-								: rom.MachineName.ToLowerInvariant());
-					newkey = HttpUtility.HtmlEncode(newkey);
-					if (sortable.ContainsKey(newkey))
-					{
-						sortable[newkey].Add(rom);
-					}
-					else
-					{
-						List<DatItem> temp = new List<DatItem>();
-						temp.Add(rom);
-						sortable.Add(newkey, temp);
-					}
-				}
-			}
-
-			// Now go through and sort all of the lists
-			keys = sortable.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> sortedlist = sortable[key];
-				DatItem.Sort(ref sortedlist, norename);
-				sortable[key] = sortedlist;
-			}
-
-			// Output the count if told to
-			if (output)
-			{
-				logger.User("A total of " + count + " file hashes will be written out to file");
-			}
-
-			return sortable;
-		}
-
-		#endregion
-
-		#region Converting and Updating
-
-		/// <summary>
-		/// Convert, update, and filter a DAT file
-		/// </summary>
-		/// <param name="inputFileNames">Names of the input files and/or folders</param>
-		/// <param name="datdata">User specified inputs contained in a DatData object</param>
-		/// <param name="outputFormat">Non-zero flag for output format, zero otherwise for default</param>
-		/// <param name="outDir">Optional param for output directory</param>
-		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
-		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
-		/// <param name="cascade">True if the diffed files should be cascade diffed, false if diffed files should be reverse cascaded, null otherwise</param>
-		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
-		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
-		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
-		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
-		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
-		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="romtype">Type of the rom to match</param>
-		/// <param name="sgt">Find roms greater than or equal to this size</param>
-		/// <param name="slt">Find roms less than or equal to this size</param>
-		/// <param name="seq">Find roms equal to this size</param>
-		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="itemStatus">Select roms with the given status</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		public static void Update(List<string> inputFileNames, DatFile datdata, OutputFormat outputFormat, string outDir, bool merge,
-			DiffMode diff, bool? cascade, bool inplace, bool skip, bool bare, bool clean, bool softlist, string gamename, string romname, string romtype,
-			long sgt, long slt, long seq, string crc, string md5, string sha1, ItemStatus itemStatus, bool trim, bool single, string root, int maxDegreeOfParallelism,
-			Logger logger)
-		{
-			// If we're in merging or diffing mode, use the full list of inputs
-			if (merge || diff != 0)
-			{
-				// Make sure there are no folders in inputs
-				List<string> newInputFileNames = new List<string>();
-				foreach (string input in inputFileNames)
-				{
-					if (Directory.Exists(input))
-					{
-						foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-						{
-							try
-							{
-								newInputFileNames.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(input));
-							}
-							catch (PathTooLongException)
-							{
-								logger.Warning("The path for " + file + " was too long");
-							}
-							catch (Exception ex)
-							{
-								logger.Error(ex.ToString());
-							}
-						}
-					}
-					else if (File.Exists(input))
-					{
-						try
-						{
-							newInputFileNames.Add(Path.GetFullPath(input) + "¬" + Path.GetDirectoryName(Path.GetFullPath(input)));
-						}
-						catch (PathTooLongException)
-						{
-							logger.Warning("The path for " + input + " was too long");
-						}
-						catch (Exception ex)
-						{
-							logger.Error(ex.ToString());
-						}
-					}
-				}
-
-				// If we're in inverse cascade, reverse the list
-				if (cascade == false)
-				{
-					newInputFileNames.Reverse();
-				}
-
-				// Create a dictionary of all ROMs from the input DATs
-				DatFile userData;
-				List<DatFile> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, softlist,
-					outDir, datdata, out userData, gamename, romname, romtype, sgt, slt, seq,
-					crc, md5, sha1, itemStatus, trim, single, root, maxDegreeOfParallelism, logger);
-
-				// Modify the Dictionary if necessary and output the results
-				if (diff != 0 && cascade == null)
-				{
-					userData.DiffNoCascade(diff, outDir, newInputFileNames, logger);
-				}
-				// If we're in cascade and diff, output only cascaded diffs
-				else if (diff != 0 && cascade != null)
-				{
-					userData.DiffCascade(outDir, inplace, newInputFileNames, datHeaders, skip, logger);
-				}
-				// Output all entries with user-defined merge
-				else
-				{
-					userData.MergeNoDiff(outDir, newInputFileNames, datHeaders, logger);
-				}
-			}
-			// Otherwise, loop through all of the inputs individually
-			else
-			{
-				Parallel.ForEach(inputFileNames,
-					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-					inputFileName =>
-					{
-						// Clean the input string
-						if (inputFileName != "")
-						{
-							inputFileName = Path.GetFullPath(inputFileName);
-						}
-
-						if (File.Exists(inputFileName))
-						{
-							DatFile innerDatdata = (DatFile)datdata.CloneHeader();
-							logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-							innerDatdata.Parse(inputFileName, 0, 0, gamename, romname,
-								romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single,
-								root, logger, true, clean, softlist, keepext: (innerDatdata.XSV != null));
-
-							// If we have roms, output them
-							if (innerDatdata.Files.Count != 0)
-							{
-								innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), logger, overwrite: (outDir != ""));
-							}
-						}
-						else if (Directory.Exists(inputFileName))
-						{
-							inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
-
-							Parallel.ForEach(Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories),
-								new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-								file =>
-								{
-									logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
-									DatFile innerDatdata = (DatFile)datdata.Clone();
-									innerDatdata.Files = null;
-									innerDatdata.Parse(file, 0, 0, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus,
-										trim, single, root, logger, true, clean, keepext: (datdata.XSV != null));
-
-								// If we have roms, output them
-								if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
-									{
-										innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outDir != ""));
-									}
-								});
-						}
-						else
-						{
-							logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
-						}
-					});
-			}
-			return;
-		}
-
-		/// <summary>
-		/// Populate the user DatData object from the input files
-		/// </summary>
-		/// <param name="userData">Output user DatData object to output</param>
-		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="romtype">Type of the rom to match</param>
-		/// <param name="sgt">Find roms greater than or equal to this size</param>
-		/// <param name="slt">Find roms less than or equal to this size</param>
-		/// <param name="seq">Find roms equal to this size</param>
-		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="itemStatus">Select roms with the given status</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		/// <returns>List of DatData objects representing headers</returns>
-		private static List<DatFile> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool softlist, string outDir,
-			DatFile inputDat, out DatFile userData, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
-			string md5, string sha1, ItemStatus itemStatus, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
-		{
-			DatFile[] datHeaders = new DatFile[inputs.Count];
-			DateTime start = DateTime.Now;
-			logger.User("Processing individual DATs");
-
-			Parallel.For(0,
-				inputs.Count,
-				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-				i =>
-				{
-					string input = inputs[i];
-					logger.User("Adding DAT: " + input.Split('¬')[0]);
-					datHeaders[i] = new DatFile
-					{
-						OutputFormat = (inputDat.OutputFormat != 0 ? inputDat.OutputFormat : 0),
-						Files = new Dictionary<string, List<DatItem>>(),
-						MergeRoms = inputDat.MergeRoms,
-					};
-
-					datHeaders[i].Parse(input.Split('¬')[0], i, 0, gamename, romname, romtype, sgt, slt, seq,
-						crc, md5, sha1, itemStatus, trim, single, root, logger, true, clean, softlist);
-				});
-
-			logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			logger.User("Populating internal DAT");
-			userData = (DatFile)inputDat.CloneHeader();
-			userData.Files = new Dictionary<string, List<DatItem>>();
-			for (int i = 0; i < inputs.Count; i++)
-			{
-				List<string> keys = datHeaders[i].Files.Keys.ToList();
-				foreach (string key in keys)
-				{
-					if (userData.Files.ContainsKey(key))
-					{
-						userData.Files[key].AddRange(datHeaders[i].Files[key]);
-					}
-					else
-					{
-						userData.Files.Add(key, datHeaders[i].Files[key]);
-					}
-					datHeaders[i].Files.Remove(key);
-				}
-				datHeaders[i].Files = null;
-			}
-
-			logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			return datHeaders.ToList();
-		}
-
-		/// <summary>
-		/// Output non-cascading diffs
-		/// </summary>
-		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
-		/// <param name="outDir">Output directory to write the DATs to</param>
-		/// <param name="inputs">List of inputs to write out from</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		public void DiffNoCascade(DiffMode diff, string outDir, List<string> inputs, Logger logger)
-		{
-			DateTime start = DateTime.Now;
-			logger.User("Initializing all output DATs");
-
-			// Default vars for use
-			string post = "";
-			DatFile outerDiffData = new DatFile();
-			DatFile dupeData = new DatFile();
-
-			// Don't have External dupes
-			if ((diff & DiffMode.NoDupes) != 0)
-			{
-				post = " (No Duplicates)";
-				outerDiffData = (DatFile)CloneHeader();
-				outerDiffData.FileName += post;
-				outerDiffData.Name += post;
-				outerDiffData.Description += post;
-				outerDiffData.Files = new Dictionary<string, List<DatItem>>();
-			}
-
-			// Have External dupes
-			if ((diff & DiffMode.Dupes) != 0)
-			{
-				post = " (Duplicates)";
-				dupeData = (DatFile)CloneHeader();
-				dupeData.FileName += post;
-				dupeData.Name += post;
-				dupeData.Description += post;
-				dupeData.Files = new Dictionary<string, List<DatItem>>();
-			}
-
-			// Create a list of DatData objects representing individual output files
-			List<DatFile> outDats = new List<DatFile>();
-
-			// Loop through each of the inputs and get or create a new DatData object
-			if ((diff & DiffMode.Individuals) != 0)
-			{
-				DatFile[] outDatsArray = new DatFile[inputs.Count];
-
-				Parallel.For(0, inputs.Count, j =>
-				{
-					string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
-					DatFile diffData = (DatFile)CloneHeader();
-					diffData.FileName += innerpost;
-					diffData.Name += innerpost;
-					diffData.Description += innerpost;
-					diffData.Files = new Dictionary<string, List<DatItem>>();
-					outDatsArray[j] = diffData;
-				});
-
-				outDats = outDatsArray.ToList();
-			}
-			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			// Now, loop through the dictionary and populate the correct DATs
-			start = DateTime.Now;
-			logger.User("Populating all output DATs");
-			List<string> keys = Files.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = DatItem.Merge(Files[key], logger);
-
-				if (roms != null && roms.Count > 0)
-				{
-					foreach (DatItem rom in roms)
-					{
-						// No duplicates
-						if ((diff & DiffMode.NoDupes) != 0 || (diff & DiffMode.Individuals) != 0)
-						{
-							if (rom.Dupe < DupeType.ExternalHash)
-							{
-								// Individual DATs that are output
-								if ((diff & DiffMode.Individuals) != 0)
-								{
-									if (outDats[rom.SystemID].Files.ContainsKey(key))
-									{
-										outDats[rom.SystemID].Files[key].Add(rom);
-									}
-									else
-									{
-										List<DatItem> tl = new List<DatItem>();
-										tl.Add(rom);
-										outDats[rom.SystemID].Files.Add(key, tl);
-									}
-								}
-
-								// Merged no-duplicates DAT
-								if ((diff & DiffMode.NoDupes) != 0)
-								{
-									DatItem newrom = rom;
-									newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
-
-									if (outerDiffData.Files.ContainsKey(key))
-									{
-										outerDiffData.Files[key].Add(newrom);
-									}
-									else
-									{
-										List<DatItem> tl = new List<DatItem>();
-										tl.Add(rom);
-										outerDiffData.Files.Add(key, tl);
-									}
-								}
-							}
-						}
-
-						// Duplicates only
-						if ((diff & DiffMode.Dupes) != 0)
-						{
-							if (rom.Dupe >= DupeType.ExternalHash)
-							{
-								DatItem newrom = rom;
-								newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
-
-								if (dupeData.Files.ContainsKey(key))
-								{
-									dupeData.Files[key].Add(newrom);
-								}
-								else
-								{
-									List<DatItem> tl = new List<DatItem>();
-									tl.Add(rom);
-									dupeData.Files.Add(key, tl);
-								}
-							}
-						}
-					}
-				}
-			}
-			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			// Finally, loop through and output each of the DATs
-			start = DateTime.Now;
-			logger.User("Outputting all created DATs");
-
-			// Output the difflist (a-b)+(b-a) diff
-			if ((diff & DiffMode.NoDupes) != 0)
-			{
-				outerDiffData.WriteToFile(outDir, logger);
-			}
-
-			// Output the (ab) diff
-			if ((diff & DiffMode.Dupes) != 0)
-			{
-				dupeData.WriteToFile(outDir, logger);
-			}
-
-			// Output the individual (a-b) DATs
-			if ((diff & DiffMode.Individuals) != 0)
-			{
-				for (int j = 0; j < inputs.Count; j++)
-				{
-					// If we have an output directory set, replace the path
-					string path = outDir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
-
-					// If we have more than 0 roms, output
-					if (outDats[j].Files.Count > 0)
-					{
-						outDats[j].WriteToFile(path, logger);
-					}
-				}
-			}
-			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-		}
-
-		/// <summary>
-		/// Output cascading diffs
-		/// </summary>
-		/// <param name="outDir">Output directory to write the DATs to</param>
-		/// <param name="inplace">True if cascaded diffs are outputted in-place, false otherwise</param>
-		/// <param name="inputs">List of inputs to write out from</param>
-		/// <param name="datHeaders">Dat headers used optionally</param>
-		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		public void DiffCascade(string outDir, bool inplace, List<string> inputs, List<DatFile> datHeaders, bool skip, Logger logger)
-		{
-			string post = "";
-
-			// Create a list of DatData objects representing output files
-			List<DatFile> outDats = new List<DatFile>();
-
-			// Loop through each of the inputs and get or create a new DatData object
-			DateTime start = DateTime.Now;
-			logger.User("Initializing all output DATs");
-
-			DatFile[] outDatsArray = new DatFile[inputs.Count];
-
-			Parallel.For(0, inputs.Count, j =>
-			{
-				string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
-				DatFile diffData;
-
-				// If we're in inplace mode, take the appropriate DatData object already stored
-				if (inplace || !String.IsNullOrEmpty(outDir))
-				{
-					diffData = datHeaders[j];
-				}
-				else
-				{
-					diffData = (DatFile)CloneHeader();
-					diffData.FileName += post;
-					diffData.Name += post;
-					diffData.Description += post;
-				}
-				diffData.Files = new Dictionary<string, List<DatItem>>();
-
-				outDatsArray[j] = diffData;
-			});
-
-			outDats = outDatsArray.ToList();
-			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			// Now, loop through the dictionary and populate the correct DATs
-			start = DateTime.Now;
-			logger.User("Populating all output DATs");
-			List<string> keys = Files.Keys.ToList();
-
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = DatItem.Merge(Files[key], logger);
-
-				if (roms != null && roms.Count > 0)
-				{
-					foreach (DatItem rom in roms)
-					{
-						// There's odd cases where there are items with System ID < 0. Skip them for now
-						if (rom.SystemID < 0)
-						{
-							logger.Warning("Item found with a <0 SystemID: " + rom.Name);
-							continue;
-						}
-
-						if (outDats[rom.SystemID].Files.ContainsKey(key))
-						{
-							outDats[rom.SystemID].Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> tl = new List<DatItem>();
-							tl.Add(rom);
-							outDats[rom.SystemID].Files.Add(key, tl);
-						}
-					}
-				}
-			}
-			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			// Finally, loop through and output each of the DATs
-			start = DateTime.Now;
-			logger.User("Outputting all created DATs");
-			for (int j = (skip ? 1 : 0); j < inputs.Count; j++)
-			{
-				// If we have an output directory set, replace the path
-				string path = "";
-				if (inplace)
-				{
-					path = Path.GetDirectoryName(inputs[j].Split('¬')[0]);
-				}
-				else if (!String.IsNullOrEmpty(outDir))
-				{
-					path = outDir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
-				}
-
-				// If we have more than 0 roms, output
-				if (outDats[j].Files.Count > 0)
-				{
-					outDats[j].WriteToFile(path, logger);
-				}
-			}
-			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-		}
-
-		/// <summary>
-		/// Output user defined merge
-		/// </summary>
-		/// <param name="outDir">Output directory to write the DATs to</param>
-		/// <param name="inputs">List of inputs to write out from</param>
-		/// <param name="datHeaders">Dat headers used optionally</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		public void MergeNoDiff(string outDir, List<string> inputs, List<DatFile> datHeaders, Logger logger)
-		{
-			// If we're in SuperDAT mode, prefix all games with their respective DATs
-			if (Type == "SuperDAT")
-			{
-				List<string> keys = Files.Keys.ToList();
-				foreach (string key in keys)
-				{
-					List<DatItem> newroms = new List<DatItem>();
-					foreach (DatItem rom in Files[key])
-					{
-						DatItem newrom = rom;
-						string filename = inputs[newrom.SystemID].Split('¬')[0];
-						string rootpath = inputs[newrom.SystemID].Split('¬')[1];
-
-						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
-						filename = filename.Remove(0, rootpath.Length);
-						newrom.MachineName = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
-							+ Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar
-							+ newrom.MachineName;
-						newroms.Add(newrom);
-					}
-					Files[key] = newroms;
-				}
-			}
-
-			// Output a DAT only if there are roms
-			if (Files.Count != 0)
-			{
-				WriteToFile(outDir, logger);
-			}
-		}
-
-		#endregion
-
 		#region DAT Writing
 
 		/// <summary>
@@ -4522,6 +3254,1149 @@ Please check the log folder if the stats scrolled offscreen");
 
 		#endregion
 
+		#region Populate DAT from Directory
+
+		/// <summary>
+		/// Create a new Dat from a directory
+		/// </summary>
+		/// <param name="basePath">Base folder to be used in creating the DAT</param>
+		/// <param name="noMD5">True if MD5 hashes should be skipped over, false otherwise</param>
+		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
+		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
+		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
+		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
+		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
+		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
+		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
+		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		public bool PopulateDatFromDir(string basePath, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
+			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, int maxDegreeOfParallelism, Logger logger)
+		{
+			// If the description is defined but not the name, set the name from the description
+			if (String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
+			{
+				Name = Description;
+			}
+
+			// If the name is defined but not the description, set the description from the name
+			else if (!String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
+			{
+				Description = Name + (bare ? "" : " (" + Date + ")");
+			}
+
+			// If neither the name or description are defined, set them from the automatic values
+			else if (String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
+			{
+				Name = basePath.Split(Path.DirectorySeparatorChar).Last();
+				Description = Name + (bare ? "" : " (" + Date + ")");
+			}
+
+			// Process the input folder
+			logger.Log("Folder found: " + basePath);
+
+			// Process the files in all subfolders
+			List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.AllDirectories).ToList();
+			Parallel.ForEach(files,
+				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+				item =>
+				{
+					DFDProcessPossibleArchive(item, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+						tempDir, copyFiles, maxDegreeOfParallelism, logger);
+				});
+
+			// Now find all folders that are empty, if we are supposed to
+			if (!Romba && addBlanks)
+			{
+				List<string> empties = Directory.EnumerateDirectories(basePath, "*", SearchOption.AllDirectories).ToList();
+				Parallel.ForEach(empties,
+					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+					dir =>
+					{
+						if (Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).Count() == 0)
+						{
+							// Get the full path for the directory
+							string fulldir = Path.GetFullPath(dir);
+
+							// Set the temporary variables
+							string gamename = "";
+							string romname = "";
+
+							// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
+							if (Type == "SuperDAT")
+							{
+								gamename = fulldir.Remove(0, basePath.Length + 1);
+								romname = "-";
+							}
+
+							// Otherwise, we want just the top level folder as the game, and the file as everything else
+							else
+							{
+								gamename = fulldir.Remove(0, basePath.Length + 1).Split(Path.DirectorySeparatorChar)[0];
+								romname = Path.Combine(fulldir.Remove(0, basePath.Length + 1 + gamename.Length), "-");
+							}
+
+							// Sanitize the names
+							if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
+							{
+								gamename = gamename.Substring(1);
+							}
+							if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
+							{
+								gamename = gamename.Substring(0, gamename.Length - 1);
+							}
+							if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
+							{
+								romname = romname.Substring(1);
+							}
+							if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
+							{
+								romname = romname.Substring(0, romname.Length - 1);
+							}
+
+							logger.Log("Adding blank empty folder: " + gamename);
+							Files["null"].Add(new Rom(romname, gamename));
+						}
+					});
+			}
+
+			// Now that we're done, delete the temp folder (if it's not the default)
+			logger.User("Cleaning temp folder");
+			try
+			{
+				if (tempDir != Path.GetTempPath())
+				{
+					Directory.Delete(tempDir, true);
+				}
+			}
+			catch
+			{
+				// Just absorb the error for now
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Check a given file for hashes, based on current settings
+		/// </summary>
+		/// <param name="item">Filename of the item to be checked</param>
+		/// <param name="basePath">Base folder to be used in creating the DAT</param>
+		/// <param name="noMD5">True if MD5 hashes should be skipped over, false otherwise</param>
+		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
+		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
+		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
+		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
+		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
+		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
+		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
+		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		private void DFDProcessPossibleArchive(string item, string basePath, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
+			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, int maxDegreeOfParallelism, Logger logger)
+		{
+			// Define the temporary directory
+			string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
+
+			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
+			if (Romba)
+			{
+				Rom rom = FileTools.GetTorrentGZFileInfo(item, logger);
+
+				// If the rom is valid, write it out
+				if (rom.Name != null)
+				{
+					// Add the list if it doesn't exist already
+					string key = rom.Size + "-" + rom.CRC;
+
+					lock (Files)
+					{
+						if (!Files.ContainsKey(key))
+						{
+							Files.Add(key, new List<DatItem>());
+						}
+
+						Files[key].Add(rom);
+						logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
+					}
+
+				}
+				else
+				{
+					logger.User("File not added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
+					return;
+				}
+
+				return;
+			}
+
+			// If we're copying files, copy it first and get the new filename
+			string newItem = item;
+			string newBasePath = basePath;
+			if (copyFiles)
+			{
+				newBasePath = Path.Combine(tempDir, Path.GetRandomFileName());
+				newItem = Path.GetFullPath(Path.Combine(newBasePath, Path.GetFullPath(item).Remove(0, basePath.Length + 1)));
+				Directory.CreateDirectory(Path.GetDirectoryName(newItem));
+				File.Copy(item, newItem, true);
+			}
+
+			// If both deep hash skip flags are set, do a quickscan
+			if (noMD5 && noSHA1)
+			{
+				ArchiveType? type = FileTools.GetCurrentArchiveType(newItem, logger);
+
+				// If we have an archive, scan it
+				if (type != null && !archivesAsFiles)
+				{
+					List<Rom> extracted = FileTools.GetArchiveFileInfo(newItem, logger);
+
+					foreach (Rom rom in extracted)
+					{
+						DFDProcessFileHelper(newItem,
+							rom,
+							basePath,
+							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length) + Path.GetFileNameWithoutExtension(item),
+							logger);
+					}
+				}
+				// Otherwise, just get the info on the file itself
+				else if (File.Exists(newItem))
+				{
+					DFDProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, logger);
+				}
+			}
+			// Otherwise, attempt to extract the files to the temporary directory
+			else
+			{
+				bool encounteredErrors = FileTools.ExtractArchive(newItem,
+					tempSubDir,
+					(archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
+					(!archivesAsFiles && enableGzip ? ArchiveScanLevel.Internal : ArchiveScanLevel.External),
+					(archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
+					(archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
+					logger);
+
+				// If the file was an archive and was extracted successfully, check it
+				if (!encounteredErrors)
+				{
+					logger.Log(Path.GetFileName(item) + " treated like an archive");
+					List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
+					Parallel.ForEach(extracted,
+						new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+						entry =>
+						{
+							DFDProcessFile(entry,
+								Path.Combine((Type == "SuperDAT"
+									? (Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length)
+									: ""),
+								Path.GetFileNameWithoutExtension(item)),
+								tempSubDir,
+								noMD5,
+								noSHA1,
+								addDate,
+								logger);
+						});
+				}
+				// Otherwise, just get the info on the file itself
+				else if (File.Exists(newItem))
+				{
+					DFDProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, logger);
+				}
+			}
+
+			// Cue to delete the file if it's a copy
+			if (copyFiles && item != newItem)
+			{
+				try
+				{
+					Directory.Delete(newBasePath, true);
+				}
+				catch { }
+			}
+
+			// Delete the sub temp directory
+			if (Directory.Exists(tempSubDir))
+			{
+				Directory.Delete(tempSubDir, true);
+			}
+		}
+
+		/// <summary>
+		/// Process a single file as a file
+		/// </summary>
+		/// <param name="item">File to be added</param>
+		/// <param name="basepath">Path the represents the parent directory</param>
+		/// <param name="parent">Parent game to be used</param>
+		private void DFDProcessFile(string item, string parent, string basePath, bool noMD5, bool noSHA1, bool addDate, Logger logger)
+		{
+			logger.Log(Path.GetFileName(item) + " treated like a file");
+			Rom rom = FileTools.GetSingleFileInfo(item, noMD5: noMD5, noSHA1: noSHA1, date: addDate);
+
+			DFDProcessFileHelper(item, rom, basePath, parent, logger);
+		}
+
+		/// <summary>
+		/// Process a single file as a file (with found Rom data)
+		/// </summary>
+		/// <param name="item">File to be added</param>
+		/// <param name="item">Rom data to be used to write to file</param>
+		/// <param name="basepath">Path the represents the parent directory</param>
+		/// <param name="parent">Parent game to be used</param>
+		private void DFDProcessFileHelper(string item, DatItem datItem, string basepath, string parent, Logger logger)
+		{
+			// If the datItem isn't a Rom or Disk, return
+			if (datItem.Type != ItemType.Rom && datItem.Type != ItemType.Disk)
+			{
+				return;
+			}
+
+			string key = "";
+			if (datItem.Type == ItemType.Rom)
+			{
+				key = ((Rom)datItem).Size + "-" + ((Rom)datItem).CRC;
+			}
+			else
+			{
+				key = ((Disk)datItem).MD5;
+			}
+
+			// Add the list if it doesn't exist already
+			lock (Files)
+			{
+				if (!Files.ContainsKey(key))
+				{
+					Files.Add(key, new List<DatItem>());
+				}
+			}
+
+			try
+			{
+				// If the basepath ends with a directory separator, remove it
+				if (!basepath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+				{
+					basepath += Path.DirectorySeparatorChar.ToString();
+				}
+
+				// Make sure we have the full item path
+				item = Path.GetFullPath(item);
+
+				// Get the data to be added as game and item names
+				string gamename = "";
+				string romname = "";
+
+				// If the parent is blank, then we have a non-archive file
+				if (parent == "")
+				{
+					// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
+					if (Type == "SuperDAT")
+					{
+						gamename = Path.GetDirectoryName(item.Remove(0, basepath.Length));
+						romname = Path.GetFileName(item);
+					}
+
+					// Otherwise, we want just the top level folder as the game, and the file as everything else
+					else
+					{
+						gamename = item.Remove(0, basepath.Length).Split(Path.DirectorySeparatorChar)[0];
+						romname = item.Remove(0, (Path.Combine(basepath, gamename).Length));
+					}
+				}
+
+				// Otherwise, we assume that we have an archive
+				else
+				{
+					// If we have a SuperDAT, we want the archive name as the game, and the file as everything else (?)
+					if (Type == "SuperDAT")
+					{
+						gamename = parent;
+						romname = item.Remove(0, basepath.Length);
+					}
+
+					// Otherwise, we want the archive name as the game, and the file as everything else
+					else
+					{
+						gamename = parent;
+						romname = item.Remove(0, basepath.Length);
+					}
+				}
+
+				// Sanitize the names
+				if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
+				{
+					gamename = gamename.Substring(1);
+				}
+				if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
+				{
+					gamename = gamename.Substring(0, gamename.Length - 1);
+				}
+				if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
+				{
+					romname = romname.Substring(1);
+				}
+				if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
+				{
+					romname = romname.Substring(0, romname.Length - 1);
+				}
+
+				// Update rom information
+				datItem.Name = romname;
+				datItem.MachineName = gamename;
+				datItem.MachineDescription = gamename;
+
+				// Add the file information to the DAT
+				lock (Files)
+				{
+					Files[key].Add(datItem);
+				}
+
+				logger.User("File added: " + romname + Environment.NewLine);
+			}
+			catch (IOException ex)
+			{
+				logger.Error(ex.ToString());
+				return;
+			}
+		}
+
+		#endregion
+
+		#region Statistics
+
+		/// <summary>
+		/// Recalculate the statistics for the Dat
+		/// </summary>
+		public void RecalculateStats()
+		{
+			// Wipe out any stats already there
+			RomCount = 0;
+			DiskCount = 0;
+			TotalSize = 0;
+			CRCCount = 0;
+			MD5Count = 0;
+			SHA1Count = 0;
+			NodumpCount = 0;
+
+			// If we have a blank Dat in any way, return
+			if (this == null || Files == null || Files.Count == 0)
+			{
+				return;
+			}
+
+			// Loop through and add
+			foreach (List<DatItem> roms in Files.Values)
+			{
+				foreach (Rom rom in roms)
+				{
+					RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
+					DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
+					TotalSize += (rom.ItemStatus == ItemStatus.Nodump ? 0 : rom.Size);
+					CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
+					MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
+					SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Output the stats for the Dat in a human-readable format
+		/// </summary>
+		/// <param name="logger">Logger object for file and console writing</param>
+		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
+		/// <param name="game">Number of games to use, -1 means recalculate games (default)</param>
+		public void OutputStats(Logger logger, bool recalculate = false, long game = -1)
+		{
+			// If we're supposed to recalculate the statistics, do so
+			if (recalculate)
+			{
+				RecalculateStats();
+			}
+
+			SortedDictionary<string, List<DatItem>> newroms = DatFile.BucketByGame(Files, false, true, logger, false);
+			if (TotalSize < 0)
+			{
+				TotalSize = Int64.MaxValue + TotalSize;
+			}
+			logger.User("    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
+    Games found:             " + (game == -1 ? newroms.Count : game) + @"
+    Roms found:              " + RomCount + @"
+    Disks found:             " + DiskCount + @"
+    Roms with CRC:           " + CRCCount + @"
+    Roms with MD5:           " + MD5Count + @"
+    Roms with SHA-1:         " + SHA1Count + @"
+    Roms with Nodump status: " + NodumpCount + @"
+");
+		}
+
+		#endregion
+
+		#region Converting and Updating
+
+		/// <summary>
+		/// Output non-cascading diffs
+		/// </summary>
+		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
+		/// <param name="outDir">Output directory to write the DATs to</param>
+		/// <param name="inputs">List of inputs to write out from</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		public void DiffNoCascade(DiffMode diff, string outDir, List<string> inputs, Logger logger)
+		{
+			DateTime start = DateTime.Now;
+			logger.User("Initializing all output DATs");
+
+			// Default vars for use
+			string post = "";
+			DatFile outerDiffData = new DatFile();
+			DatFile dupeData = new DatFile();
+
+			// Don't have External dupes
+			if ((diff & DiffMode.NoDupes) != 0)
+			{
+				post = " (No Duplicates)";
+				outerDiffData = (DatFile)CloneHeader();
+				outerDiffData.FileName += post;
+				outerDiffData.Name += post;
+				outerDiffData.Description += post;
+				outerDiffData.Files = new Dictionary<string, List<DatItem>>();
+			}
+
+			// Have External dupes
+			if ((diff & DiffMode.Dupes) != 0)
+			{
+				post = " (Duplicates)";
+				dupeData = (DatFile)CloneHeader();
+				dupeData.FileName += post;
+				dupeData.Name += post;
+				dupeData.Description += post;
+				dupeData.Files = new Dictionary<string, List<DatItem>>();
+			}
+
+			// Create a list of DatData objects representing individual output files
+			List<DatFile> outDats = new List<DatFile>();
+
+			// Loop through each of the inputs and get or create a new DatData object
+			if ((diff & DiffMode.Individuals) != 0)
+			{
+				DatFile[] outDatsArray = new DatFile[inputs.Count];
+
+				Parallel.For(0, inputs.Count, j =>
+				{
+					string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
+					DatFile diffData = (DatFile)CloneHeader();
+					diffData.FileName += innerpost;
+					diffData.Name += innerpost;
+					diffData.Description += innerpost;
+					diffData.Files = new Dictionary<string, List<DatItem>>();
+					outDatsArray[j] = diffData;
+				});
+
+				outDats = outDatsArray.ToList();
+			}
+			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// Now, loop through the dictionary and populate the correct DATs
+			start = DateTime.Now;
+			logger.User("Populating all output DATs");
+			List<string> keys = Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> roms = DatItem.Merge(Files[key], logger);
+
+				if (roms != null && roms.Count > 0)
+				{
+					foreach (DatItem rom in roms)
+					{
+						// No duplicates
+						if ((diff & DiffMode.NoDupes) != 0 || (diff & DiffMode.Individuals) != 0)
+						{
+							if (rom.Dupe < DupeType.ExternalHash)
+							{
+								// Individual DATs that are output
+								if ((diff & DiffMode.Individuals) != 0)
+								{
+									if (outDats[rom.SystemID].Files.ContainsKey(key))
+									{
+										outDats[rom.SystemID].Files[key].Add(rom);
+									}
+									else
+									{
+										List<DatItem> tl = new List<DatItem>();
+										tl.Add(rom);
+										outDats[rom.SystemID].Files.Add(key, tl);
+									}
+								}
+
+								// Merged no-duplicates DAT
+								if ((diff & DiffMode.NoDupes) != 0)
+								{
+									DatItem newrom = rom;
+									newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
+
+									if (outerDiffData.Files.ContainsKey(key))
+									{
+										outerDiffData.Files[key].Add(newrom);
+									}
+									else
+									{
+										List<DatItem> tl = new List<DatItem>();
+										tl.Add(rom);
+										outerDiffData.Files.Add(key, tl);
+									}
+								}
+							}
+						}
+
+						// Duplicates only
+						if ((diff & DiffMode.Dupes) != 0)
+						{
+							if (rom.Dupe >= DupeType.ExternalHash)
+							{
+								DatItem newrom = rom;
+								newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
+
+								if (dupeData.Files.ContainsKey(key))
+								{
+									dupeData.Files[key].Add(newrom);
+								}
+								else
+								{
+									List<DatItem> tl = new List<DatItem>();
+									tl.Add(rom);
+									dupeData.Files.Add(key, tl);
+								}
+							}
+						}
+					}
+				}
+			}
+			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// Finally, loop through and output each of the DATs
+			start = DateTime.Now;
+			logger.User("Outputting all created DATs");
+
+			// Output the difflist (a-b)+(b-a) diff
+			if ((diff & DiffMode.NoDupes) != 0)
+			{
+				outerDiffData.WriteToFile(outDir, logger);
+			}
+
+			// Output the (ab) diff
+			if ((diff & DiffMode.Dupes) != 0)
+			{
+				dupeData.WriteToFile(outDir, logger);
+			}
+
+			// Output the individual (a-b) DATs
+			if ((diff & DiffMode.Individuals) != 0)
+			{
+				for (int j = 0; j < inputs.Count; j++)
+				{
+					// If we have an output directory set, replace the path
+					string path = outDir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
+
+					// If we have more than 0 roms, output
+					if (outDats[j].Files.Count > 0)
+					{
+						outDats[j].WriteToFile(path, logger);
+					}
+				}
+			}
+			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+		}
+
+		/// <summary>
+		/// Output cascading diffs
+		/// </summary>
+		/// <param name="outDir">Output directory to write the DATs to</param>
+		/// <param name="inplace">True if cascaded diffs are outputted in-place, false otherwise</param>
+		/// <param name="inputs">List of inputs to write out from</param>
+		/// <param name="datHeaders">Dat headers used optionally</param>
+		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		public void DiffCascade(string outDir, bool inplace, List<string> inputs, List<DatFile> datHeaders, bool skip, Logger logger)
+		{
+			string post = "";
+
+			// Create a list of DatData objects representing output files
+			List<DatFile> outDats = new List<DatFile>();
+
+			// Loop through each of the inputs and get or create a new DatData object
+			DateTime start = DateTime.Now;
+			logger.User("Initializing all output DATs");
+
+			DatFile[] outDatsArray = new DatFile[inputs.Count];
+
+			Parallel.For(0, inputs.Count, j =>
+			{
+				string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
+				DatFile diffData;
+
+				// If we're in inplace mode, take the appropriate DatData object already stored
+				if (inplace || !String.IsNullOrEmpty(outDir))
+				{
+					diffData = datHeaders[j];
+				}
+				else
+				{
+					diffData = (DatFile)CloneHeader();
+					diffData.FileName += post;
+					diffData.Name += post;
+					diffData.Description += post;
+				}
+				diffData.Files = new Dictionary<string, List<DatItem>>();
+
+				outDatsArray[j] = diffData;
+			});
+
+			outDats = outDatsArray.ToList();
+			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// Now, loop through the dictionary and populate the correct DATs
+			start = DateTime.Now;
+			logger.User("Populating all output DATs");
+			List<string> keys = Files.Keys.ToList();
+
+			foreach (string key in keys)
+			{
+				List<DatItem> roms = DatItem.Merge(Files[key], logger);
+
+				if (roms != null && roms.Count > 0)
+				{
+					foreach (DatItem rom in roms)
+					{
+						// There's odd cases where there are items with System ID < 0. Skip them for now
+						if (rom.SystemID < 0)
+						{
+							logger.Warning("Item found with a <0 SystemID: " + rom.Name);
+							continue;
+						}
+
+						if (outDats[rom.SystemID].Files.ContainsKey(key))
+						{
+							outDats[rom.SystemID].Files[key].Add(rom);
+						}
+						else
+						{
+							List<DatItem> tl = new List<DatItem>();
+							tl.Add(rom);
+							outDats[rom.SystemID].Files.Add(key, tl);
+						}
+					}
+				}
+			}
+			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// Finally, loop through and output each of the DATs
+			start = DateTime.Now;
+			logger.User("Outputting all created DATs");
+			for (int j = (skip ? 1 : 0); j < inputs.Count; j++)
+			{
+				// If we have an output directory set, replace the path
+				string path = "";
+				if (inplace)
+				{
+					path = Path.GetDirectoryName(inputs[j].Split('¬')[0]);
+				}
+				else if (!String.IsNullOrEmpty(outDir))
+				{
+					path = outDir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
+				}
+
+				// If we have more than 0 roms, output
+				if (outDats[j].Files.Count > 0)
+				{
+					outDats[j].WriteToFile(path, logger);
+				}
+			}
+			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+		}
+
+		/// <summary>
+		/// Output user defined merge
+		/// </summary>
+		/// <param name="outDir">Output directory to write the DATs to</param>
+		/// <param name="inputs">List of inputs to write out from</param>
+		/// <param name="datHeaders">Dat headers used optionally</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		public void MergeNoDiff(string outDir, List<string> inputs, List<DatFile> datHeaders, Logger logger)
+		{
+			// If we're in SuperDAT mode, prefix all games with their respective DATs
+			if (Type == "SuperDAT")
+			{
+				List<string> keys = Files.Keys.ToList();
+				foreach (string key in keys)
+				{
+					List<DatItem> newroms = new List<DatItem>();
+					foreach (DatItem rom in Files[key])
+					{
+						DatItem newrom = rom;
+						string filename = inputs[newrom.SystemID].Split('¬')[0];
+						string rootpath = inputs[newrom.SystemID].Split('¬')[1];
+
+						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
+						filename = filename.Remove(0, rootpath.Length);
+						newrom.MachineName = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
+							+ Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar
+							+ newrom.MachineName;
+						newroms.Add(newrom);
+					}
+					Files[key] = newroms;
+				}
+			}
+
+			// Output a DAT only if there are roms
+			if (Files.Count != 0)
+			{
+				WriteToFile(outDir, logger);
+			}
+		}
+
+		#endregion
+
+		#endregion // Instance Methods
+
+		#region Static Methods
+
+		#region Bucketing
+
+		/// <summary>
+		/// Take an arbitrarily ordered List and return a Dictionary sorted by Game
+		/// </summary>
+		/// <param name="list">Input unsorted list</param>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		/// <returns>SortedDictionary bucketed by game name</returns>
+		public static SortedDictionary<string, List<DatItem>> BucketByGame(List<DatItem> list, bool mergeroms, bool norename, Logger logger, bool output = true)
+		{
+			Dictionary<string, List<DatItem>> dict = new Dictionary<string, List<DatItem>>();
+			dict.Add("key", list);
+			return BucketByGame(dict, mergeroms, norename, logger, output);
+		}
+
+		/// <summary>
+		/// Take an arbitrarily bucketed Dictionary and return one sorted by Game
+		/// </summary>
+		/// <param name="dict">Input unsorted dictionary</param>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		/// <returns>SortedDictionary bucketed by game name</returns>
+		public static SortedDictionary<string, List<DatItem>> BucketByGame(IDictionary<string, List<DatItem>> dict, bool mergeroms, bool norename, Logger logger, bool output = true)
+		{
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+
+			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
+			long count = 0;
+
+			// If we have a null dict or an empty one, output a new dictionary
+			if (dict == null || dict.Count == 0)
+			{
+				return sortable;
+			}
+
+			// Process each all of the roms
+			List<string> keys = dict.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> roms = dict[key];
+
+				// If we're merging the roms, do so
+				if (mergeroms)
+				{
+					roms = DatItem.Merge(roms, logger);
+				}
+
+				// Now add each of the roms to their respective games
+				foreach (DatItem rom in roms)
+				{
+					count++;
+					string newkey = (norename ? ""
+							: rom.SystemID.ToString().PadLeft(10, '0')
+								+ "-"
+								+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
+						+ (String.IsNullOrEmpty(rom.MachineName)
+								? "Default"
+								: rom.MachineName.ToLowerInvariant());
+					newkey = HttpUtility.HtmlEncode(newkey);
+					if (sortable.ContainsKey(newkey))
+					{
+						sortable[newkey].Add(rom);
+					}
+					else
+					{
+						List<DatItem> temp = new List<DatItem>();
+						temp.Add(rom);
+						sortable.Add(newkey, temp);
+					}
+				}
+			}
+
+			// Now go through and sort all of the lists
+			keys = sortable.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> sortedlist = sortable[key];
+				DatItem.Sort(ref sortedlist, norename);
+				sortable[key] = sortedlist;
+			}
+
+			// Output the count if told to
+			if (output)
+			{
+				logger.User("A total of " + count + " file hashes will be written out to file");
+			}
+
+			return sortable;
+		}
+
+		#endregion
+
+		#region Converting and Updating
+
+		/// <summary>
+		/// Convert, update, and filter a DAT file
+		/// </summary>
+		/// <param name="inputFileNames">Names of the input files and/or folders</param>
+		/// <param name="datdata">User specified inputs contained in a DatData object</param>
+		/// <param name="outputFormat">Non-zero flag for output format, zero otherwise for default</param>
+		/// <param name="outDir">Optional param for output directory</param>
+		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
+		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
+		/// <param name="cascade">True if the diffed files should be cascade diffed, false if diffed files should be reverse cascaded, null otherwise</param>
+		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
+		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
+		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
+		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
+		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="itemStatus">Select roms with the given status</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		public static void Update(List<string> inputFileNames, DatFile datdata, OutputFormat outputFormat, string outDir, bool merge,
+			DiffMode diff, bool? cascade, bool inplace, bool skip, bool bare, bool clean, bool softlist, string gamename, string romname, string romtype,
+			long sgt, long slt, long seq, string crc, string md5, string sha1, ItemStatus itemStatus, bool trim, bool single, string root, int maxDegreeOfParallelism,
+			Logger logger)
+		{
+			// If we're in merging or diffing mode, use the full list of inputs
+			if (merge || diff != 0)
+			{
+				// Make sure there are no folders in inputs
+				List<string> newInputFileNames = new List<string>();
+				foreach (string input in inputFileNames)
+				{
+					if (Directory.Exists(input))
+					{
+						foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+						{
+							try
+							{
+								newInputFileNames.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(input));
+							}
+							catch (PathTooLongException)
+							{
+								logger.Warning("The path for " + file + " was too long");
+							}
+							catch (Exception ex)
+							{
+								logger.Error(ex.ToString());
+							}
+						}
+					}
+					else if (File.Exists(input))
+					{
+						try
+						{
+							newInputFileNames.Add(Path.GetFullPath(input) + "¬" + Path.GetDirectoryName(Path.GetFullPath(input)));
+						}
+						catch (PathTooLongException)
+						{
+							logger.Warning("The path for " + input + " was too long");
+						}
+						catch (Exception ex)
+						{
+							logger.Error(ex.ToString());
+						}
+					}
+				}
+
+				// If we're in inverse cascade, reverse the list
+				if (cascade == false)
+				{
+					newInputFileNames.Reverse();
+				}
+
+				// Create a dictionary of all ROMs from the input DATs
+				DatFile userData;
+				List<DatFile> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, softlist,
+					outDir, datdata, out userData, gamename, romname, romtype, sgt, slt, seq,
+					crc, md5, sha1, itemStatus, trim, single, root, maxDegreeOfParallelism, logger);
+
+				// Modify the Dictionary if necessary and output the results
+				if (diff != 0 && cascade == null)
+				{
+					userData.DiffNoCascade(diff, outDir, newInputFileNames, logger);
+				}
+				// If we're in cascade and diff, output only cascaded diffs
+				else if (diff != 0 && cascade != null)
+				{
+					userData.DiffCascade(outDir, inplace, newInputFileNames, datHeaders, skip, logger);
+				}
+				// Output all entries with user-defined merge
+				else
+				{
+					userData.MergeNoDiff(outDir, newInputFileNames, datHeaders, logger);
+				}
+			}
+			// Otherwise, loop through all of the inputs individually
+			else
+			{
+				Parallel.ForEach(inputFileNames,
+					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+					inputFileName =>
+					{
+						// Clean the input string
+						if (inputFileName != "")
+						{
+							inputFileName = Path.GetFullPath(inputFileName);
+						}
+
+						if (File.Exists(inputFileName))
+						{
+							DatFile innerDatdata = (DatFile)datdata.CloneHeader();
+							logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
+							innerDatdata.Parse(inputFileName, 0, 0, gamename, romname,
+								romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single,
+								root, logger, true, clean, softlist, keepext: (innerDatdata.XSV != null));
+
+							// If we have roms, output them
+							if (innerDatdata.Files.Count != 0)
+							{
+								innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), logger, overwrite: (outDir != ""));
+							}
+						}
+						else if (Directory.Exists(inputFileName))
+						{
+							inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
+
+							Parallel.ForEach(Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories),
+								new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+								file =>
+								{
+									logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
+									DatFile innerDatdata = (DatFile)datdata.Clone();
+									innerDatdata.Files = null;
+									innerDatdata.Parse(file, 0, 0, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus,
+										trim, single, root, logger, true, clean, keepext: (datdata.XSV != null));
+
+									// If we have roms, output them
+									if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
+									{
+										innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outDir != ""));
+									}
+								});
+						}
+						else
+						{
+							logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
+						}
+					});
+			}
+			return;
+		}
+
+		/// <summary>
+		/// Populate the user DatData object from the input files
+		/// </summary>
+		/// <param name="userData">Output user DatData object to output</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="itemStatus">Select roms with the given status</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		/// <returns>List of DatData objects representing headers</returns>
+		private static List<DatFile> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool softlist, string outDir,
+			DatFile inputDat, out DatFile userData, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
+			string md5, string sha1, ItemStatus itemStatus, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
+		{
+			DatFile[] datHeaders = new DatFile[inputs.Count];
+			DateTime start = DateTime.Now;
+			logger.User("Processing individual DATs");
+
+			Parallel.For(0,
+				inputs.Count,
+				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+				i =>
+				{
+					string input = inputs[i];
+					logger.User("Adding DAT: " + input.Split('¬')[0]);
+					datHeaders[i] = new DatFile
+					{
+						OutputFormat = (inputDat.OutputFormat != 0 ? inputDat.OutputFormat : 0),
+						Files = new Dictionary<string, List<DatItem>>(),
+						MergeRoms = inputDat.MergeRoms,
+					};
+
+					datHeaders[i].Parse(input.Split('¬')[0], i, 0, gamename, romname, romtype, sgt, slt, seq,
+						crc, md5, sha1, itemStatus, trim, single, root, logger, true, clean, softlist);
+				});
+
+			logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			logger.User("Populating internal DAT");
+			userData = (DatFile)inputDat.CloneHeader();
+			userData.Files = new Dictionary<string, List<DatItem>>();
+			for (int i = 0; i < inputs.Count; i++)
+			{
+				List<string> keys = datHeaders[i].Files.Keys.ToList();
+				foreach (string key in keys)
+				{
+					if (userData.Files.ContainsKey(key))
+					{
+						userData.Files[key].AddRange(datHeaders[i].Files[key]);
+					}
+					else
+					{
+						userData.Files.Add(key, datHeaders[i].Files[key]);
+					}
+					datHeaders[i].Files.Remove(key);
+				}
+				datHeaders[i].Files = null;
+			}
+
+			logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			return datHeaders.ToList();
+		}
+
+		#endregion
+
 		#region DAT Splitting
 
 		/// <summary>
@@ -4552,7 +4427,7 @@ Please check the log folder if the stats scrolled offscreen");
 			string newExtBString = string.Join(",", newExtB);
 
 			// Get the file format
-			OutputFormat outputFormat = GetOutputFormat(filename, logger);
+			OutputFormat outputFormat = FileTools.GetOutputFormat(filename, logger);
 			if (outputFormat == 0)
 			{
 				return true;
@@ -4690,7 +4565,7 @@ Please check the log folder if the stats scrolled offscreen");
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
 			// Get the file format
-			OutputFormat outputFormat = GetOutputFormat(filename, logger);
+			OutputFormat outputFormat = FileTools.GetOutputFormat(filename, logger);
 			if (outputFormat == 0)
 			{
 				return true;
@@ -4950,7 +4825,7 @@ Please check the log folder if the stats scrolled offscreen");
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
 			// Get the file format
-			OutputFormat outputFormat = GetOutputFormat(filename, logger);
+			OutputFormat outputFormat = FileTools.GetOutputFormat(filename, logger);
 			if (outputFormat == 0)
 			{
 				return true;
@@ -5112,5 +4987,97 @@ Please check the log folder if the stats scrolled offscreen");
 		}
 
 		#endregion
+
+		#region Statistics
+
+		/// <summary>
+		/// Output the stats for a list of input dats as files in a human-readable format
+		/// </summary>
+		/// <param name="inputs">List of input files and folders</param>
+		/// <param name="single">True if single DAT stats are output, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		public static void OutputStats(List<string> inputs, bool single, Logger logger)
+		{
+			// Make sure we have all files
+			List<string> newinputs = new List<string>();
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					newinputs.Add(input);
+				}
+				if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.GetFiles(input, "*", SearchOption.AllDirectories))
+					{
+						newinputs.Add(file);
+					}
+				}
+			}
+
+			// Init all total variables
+			long totalSize = 0;
+			long totalGame = 0;
+			long totalRom = 0;
+			long totalDisk = 0;
+			long totalCRC = 0;
+			long totalMD5 = 0;
+			long totalSHA1 = 0;
+			long totalNodump = 0;
+
+			/// Now process each of the input files
+			foreach (string filename in newinputs)
+			{
+				logger.Log("Beginning stat collection for '" + filename + "'");
+				List<string> games = new List<string>();
+				DatFile datdata = new DatFile();
+				datdata.Parse(filename, 0, 0, logger);
+				SortedDictionary<string, List<DatItem>> newroms = BucketByGame(datdata.Files, false, true, logger, false);
+
+				// Output single DAT stats (if asked)
+				if (single)
+				{
+					logger.User(@"\nFor file '" + filename + @"':
+--------------------------------------------------");
+					datdata.OutputStats(logger);
+				}
+				else
+				{
+					logger.User("Adding stats for file '" + filename + "'\n");
+				}
+
+				// Add single DAT stats to totals
+				totalSize += datdata.TotalSize;
+				totalGame += newroms.Count;
+				totalRom += datdata.RomCount;
+				totalDisk += datdata.DiskCount;
+				totalCRC += datdata.CRCCount;
+				totalMD5 += datdata.MD5Count;
+				totalSHA1 += datdata.SHA1Count;
+				totalNodump += datdata.NodumpCount;
+			}
+
+			// Output total DAT stats
+			if (!single) { logger.User(""); }
+			DatFile totaldata = new DatFile
+			{
+				TotalSize = totalSize,
+				RomCount = totalRom,
+				DiskCount = totalDisk,
+				CRCCount = totalCRC,
+				MD5Count = totalMD5,
+				SHA1Count = totalSHA1,
+				NodumpCount = totalNodump,
+			};
+			logger.User(@"For ALL DATs found
+--------------------------------------------------");
+			totaldata.OutputStats(logger, game: totalGame);
+			logger.User(@"
+Please check the log folder if the stats scrolled offscreen");
+		}
+
+		#endregion
+
+		#endregion // Static Methods
 	}
 }
