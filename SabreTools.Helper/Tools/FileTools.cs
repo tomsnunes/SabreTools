@@ -1,4 +1,5 @@
-﻿using OCRC;
+﻿using Mono.Data.Sqlite;
+using OCRC;
 using SharpCompress.Archive;
 using SharpCompress.Archive.SevenZip;
 using SharpCompress.Common;
@@ -1225,6 +1226,169 @@ namespace SabreTools.Helper
 
 			fsr.Dispose();
 			fsw.Dispose();
+		}
+
+		/// <summary>
+		/// Detect header skipper compliance and create an output file
+		/// </summary>
+		/// <param name="file">Name of the file to be parsed</param>
+		/// <param name="outDir">Output directory to write the file to, empty means the same directory as the input file</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		/// <returns>True if the output file was created, false otherwise</returns>
+		public static bool DetectSkipperAndTransform(string file, string outDir, Logger logger)
+		{
+			// Create the output directory if it doesn't exist
+			if (outDir != "" && !Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir);
+			}
+
+			logger.User("\nGetting skipper information for '" + file + "'");
+
+			// Then, if the file was headered, store it to the database
+			int headerSize = -1;
+			HeaderType type = Skippers.GetFileHeaderType(file, out headerSize, logger);
+
+			// If we have a valid HeaderType, remove the correct byte count
+			logger.User("File has header: " + (type != HeaderType.None));
+			if (type != HeaderType.None)
+			{
+				logger.Log("Deteched header type: " + type);
+
+				// Now take care of the header and new output file
+				string hstr = string.Empty;
+				BinaryReader br = new BinaryReader(File.OpenRead(file));
+
+				// Extract the header as a string for the database
+				byte[] hbin = br.ReadBytes(headerSize);
+				for (int i = 0; i < headerSize; i++)
+				{
+					hstr += BitConverter.ToString(new byte[] { hbin[i] });
+				}
+
+				br.Dispose();
+
+				// Then find an apply the exact rule to the file
+				SkipperRule rule = Skippers.MatchesSkipper(file, "", logger);
+
+				// If we have an empty rule, return false
+				if (rule.Tests == null || rule.Tests.Count == 0)
+				{
+					return false;
+				}
+
+				// Otherwise, apply the rule to the file
+				string newfile = (outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file)));
+				Skippers.TransformFile(file, newfile, rule, logger);
+
+				// If the output file doesn't exist, return false
+				if (!File.Exists(newfile))
+				{
+					return false;
+				}
+
+				// Now add the information to the database if it's not already there
+				Rom rom = GetSingleFileInfo(newfile);
+				AddHeaderToDatabase(hstr, rom.SHA1, type, logger);
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Add a header to the database
+		/// </summary>
+		/// <param name="header">String representing the header bytes</param>
+		/// <param name="SHA1">SHA-1 of the deheadered file</param>
+		/// <param name="type">HeaderType representing the detected header</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		private static void AddHeaderToDatabase(string header, string SHA1, HeaderType type, Logger logger)
+		{
+			bool exists = false;
+
+			// Open the database connection
+			SqliteConnection dbc = new SqliteConnection(Constants.HeadererConnectionString);
+			dbc.Open();
+
+			string query = @"SELECT * FROM data WHERE sha1='" + SHA1 + "' AND header='" + header + "'";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			SqliteDataReader sldr = slc.ExecuteReader();
+			exists = sldr.HasRows;
+
+			if (!exists)
+			{
+				query = @"INSERT INTO data (sha1, header, type) VALUES ('" +
+				SHA1 + "', " +
+				"'" + header + "', " +
+				"'" + type.ToString() + "')";
+				slc = new SqliteCommand(query, dbc);
+				logger.Log("Result of inserting header: " + slc.ExecuteNonQuery());
+			}
+
+			// Dispose of database objects
+			slc.Dispose();
+			sldr.Dispose();
+			dbc.Dispose();
+		}
+
+		/// <summary>
+		/// Detect and replace header(s) to the given file
+		/// </summary>
+		/// <param name="file">Name of the file to be parsed</param>
+		/// <param name="outDir">Output directory to write the file to, empty means the same directory as the input file</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		/// <returns>True if a header was found and appended, false otherwise</returns>
+		public static bool RestoreHeader(string file, string outDir, Logger logger)
+		{
+			// Create the output directory if it doesn't exist
+			if (outDir != "" && !Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir);
+			}
+
+			bool success = true;
+
+			// First, get the SHA-1 hash of the file
+			Rom rom = GetSingleFileInfo(file);
+
+			// Then try to pull the corresponding headers from the database
+			string header = "";
+
+			// Open the database connection
+			SqliteConnection dbc = new SqliteConnection(Constants.HeadererConnectionString);
+			dbc.Open();
+
+			string query = @"SELECT header, type FROM data WHERE sha1='" + rom.SHA1 + "'";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			SqliteDataReader sldr = slc.ExecuteReader();
+
+			if (sldr.HasRows)
+			{
+				int sub = 0;
+				while (sldr.Read())
+				{
+					logger.Log("Found match with rom type " + sldr.GetString(1));
+					header = sldr.GetString(0);
+
+					logger.User("Creating reheadered file: " +
+						(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + sub);
+					FileTools.AppendBytesToFile(file,
+						(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + sub, header, string.Empty);
+					logger.User("Reheadered file created!");
+				}
+			}
+			else
+			{
+				logger.Warning("No matching header could be found!");
+				success = false;
+			}
+
+			// Dispose of database objects
+			slc.Dispose();
+			sldr.Dispose();
+			dbc.Dispose();
+
+			return success;
 		}
 
 		/// <summary>

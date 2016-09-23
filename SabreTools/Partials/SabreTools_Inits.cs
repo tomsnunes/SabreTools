@@ -216,8 +216,34 @@ namespace SabreTools
 		/// <param name="logger">Logger object for file and console output</param>
 		private static void InitHeaderer(List<string> inputs, bool restore, string outDir, Logger logger)
 		{
-			Headerer headerer = new Headerer(inputs, restore, outDir, logger);
-			headerer.Process();
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					if (restore)
+					{
+						FileTools.RestoreHeader(input, outDir, logger);
+					}
+					else
+					{
+						FileTools.DetectSkipperAndTransform(input, outDir, logger);
+					}
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string sub in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						if (restore)
+						{
+							FileTools.RestoreHeader(sub, outDir, logger);
+						}
+						else
+						{
+							FileTools.DetectSkipperAndTransform(sub, outDir, logger);
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>

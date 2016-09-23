@@ -107,7 +107,6 @@
     <Compile Include="Objects\Dat\Disk.cs" />
     <Compile Include="Objects\Dat\Release.cs" />
     <Compile Include="Objects\Dat\Sample.cs" />
-    <Compile Include="Objects\Headerer.cs" />
     <Compile Include="Objects\Dat\Rom.cs" />
     <Compile Include="Objects\SimpleSort.cs" />
     <Compile Include="Objects\Archive\ZipFileEntry.cs" />
