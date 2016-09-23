@@ -262,7 +262,7 @@ namespace SabreTools.Helper
 			_logger.ClearBeneath(Constants.HeaderHeight);
 			Console.SetCursorPosition(0, Constants.HeaderHeight + 1);
 			_logger.User("Stats of the matched ROMs:");
-			_matched.OutputStats(_logger, true);
+			_matched.OutputStats(_logger, _logger, true);
 
 			// Now output the fixdat based on the original input if asked
 			if (_updateDat)

@@ -1379,17 +1379,6 @@ namespace SabreTools.Helper
 								continue;
 							}
 							// Special cases for item statuses
-							else if (gc[i] == "good" && attrib != "status" && attrib != "flags")
-							{
-								if (item.Type == ItemType.Rom)
-								{
-									((Rom)item).ItemStatus = ItemStatus.Good;
-								}
-								else if (item.Type == ItemType.Disk)
-								{
-									((Disk)item).ItemStatus = ItemStatus.Good;
-								}
-							}
 							else if (gc[i] == "baddump" && attrib != "status" && attrib != "flags")
 							{
 								if (item.Type == ItemType.Rom)
@@ -1410,17 +1399,6 @@ namespace SabreTools.Helper
 								else if (item.Type == ItemType.Disk)
 								{
 									((Disk)item).ItemStatus = ItemStatus.Nodump;
-								}
-							}
-							else if (gc[i] == "verified" && attrib != "status" && attrib != "flags")
-							{
-								if (item.Type == ItemType.Rom)
-								{
-									((Rom)item).ItemStatus = ItemStatus.Verified;
-								}
-								else if (item.Type == ItemType.Disk)
-								{
-									((Disk)item).ItemStatus = ItemStatus.Verified;
 								}
 							}
 							// Even number of quotes, not in a quote, not in attribute
@@ -3023,7 +3001,7 @@ namespace SabreTools.Helper
 			// Output initial statistics, for kicks
 			if (stats)
 			{
-				OutputStats(logger, (RomCount + DiskCount == 0));
+				OutputStats(logger, logger, (RomCount + DiskCount == 0));
 			}
 
 			// Bucket roms by game name and optionally dedupe
@@ -4356,9 +4334,10 @@ namespace SabreTools.Helper
 		/// Output the stats for the Dat in a human-readable format
 		/// </summary>
 		/// <param name="logger">Logger object for file and console writing</param>
+		/// <param name="statLogger">Logger object for file and console output (statistics)</param>
 		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
 		/// <param name="game">Number of games to use, -1 means recalculate games (default)</param>
-		public void OutputStats(Logger logger, bool recalculate = false, long game = -1)
+		public void OutputStats(Logger logger, Logger statLogger, bool recalculate = false, long game = -1)
 		{
 			// If we're supposed to recalculate the statistics, do so
 			if (recalculate)
@@ -4371,7 +4350,7 @@ namespace SabreTools.Helper
 			{
 				TotalSize = Int64.MaxValue + TotalSize;
 			}
-			logger.User("    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
+			statLogger.User("    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
     Games found:             " + (game == -1 ? Files.Count : game) + @"
     Roms found:              " + RomCount + @"
     Disks found:             " + DiskCount + @"
@@ -4379,7 +4358,7 @@ namespace SabreTools.Helper
     Roms with MD5:           " + MD5Count + @"
     Roms with SHA-1:         " + SHA1Count + @"
     Roms with Nodump status: " + NodumpCount + @"
-");
+", false);
 		}
 
 		#endregion
@@ -5046,7 +5025,8 @@ namespace SabreTools.Helper
 		/// <param name="inputs">List of input files and folders</param>
 		/// <param name="single">True if single DAT stats are output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public static void OutputStats(List<string> inputs, bool single, Logger logger)
+		/// <param name="statLogger">Logger object for file and console output (statistics)</param>
+		public static void OutputStats(List<string> inputs, bool single, Logger logger, Logger statLogger)
 		{
 			// Make sure we have all files
 			List<string> newinputs = new List<string>();
@@ -5078,7 +5058,7 @@ namespace SabreTools.Helper
 			/// Now process each of the input files
 			foreach (string filename in newinputs)
 			{
-				logger.Verbose("Beginning stat collection for '" + filename + "'");
+				logger.Verbose("Beginning stat collection for '" + filename + "'", false);
 				List<string> games = new List<string>();
 				DatFile datdata = new DatFile();
 				datdata.Parse(filename, 0, 0, logger);
@@ -5087,13 +5067,13 @@ namespace SabreTools.Helper
 				// Output single DAT stats (if asked)
 				if (single)
 				{
-					logger.User(@"\nFor file '" + filename + @"':
---------------------------------------------------");
-					datdata.OutputStats(logger);
+					statLogger.User(@"\nFor file '" + filename + @"':
+--------------------------------------------------", false);
+					datdata.OutputStats(logger, statLogger);
 				}
 				else
 				{
-					logger.User("Adding stats for file '" + filename + "'\n");
+					logger.User("Adding stats for file '" + filename + "'\n", false);
 				}
 
 				// Add single DAT stats to totals
@@ -5108,7 +5088,7 @@ namespace SabreTools.Helper
 			}
 
 			// Output total DAT stats
-			if (!single) { logger.User(""); }
+			if (!single) { logger.User("", false); }
 			DatFile totaldata = new DatFile
 			{
 				TotalSize = totalSize,
@@ -5119,11 +5099,11 @@ namespace SabreTools.Helper
 				SHA1Count = totalSHA1,
 				NodumpCount = totalNodump,
 			};
-			logger.User(@"For ALL DATs found
---------------------------------------------------");
-			totaldata.OutputStats(logger, game: totalGame);
+			statLogger.User(@"For ALL DATs found
+--------------------------------------------------", false);
+			totaldata.OutputStats(logger, statLogger, game: totalGame);
 			logger.User(@"
-Please check the log folder if the stats scrolled offscreen");
+Please check the log folder if the stats scrolled offscreen", false);
 		}
 
 		#endregion

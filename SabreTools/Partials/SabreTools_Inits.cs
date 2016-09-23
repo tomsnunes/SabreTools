@@ -288,7 +288,7 @@ namespace SabreTools
 		private static void InitStats(List<string> inputs, bool single)
 		{
 			Logger statlog = new Logger(true, "stats.txt");
-			DatFile.OutputStats(inputs, single, statlog);
+			DatFile.OutputStats(inputs, single, _logger, statlog);
 			statlog.Close(true);
 		}
 

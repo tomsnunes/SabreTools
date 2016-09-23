@@ -57,7 +57,7 @@ namespace SabreTools.Helper
 			{
 				_log = new StreamWriter(File.Open(_basepath + _filename, FileMode.OpenOrCreate | FileMode.Append));
 				_log.WriteLine("Logging started " + DateTime.Now);
-				_log.WriteLine(GetCommandLine());
+				_log.WriteLine(Environment.CommandLine);
 				_log.Flush();
 			}
 			catch
@@ -245,8 +245,5 @@ namespace SabreTools.Helper
 			}
 			return true;
 		}
-
-		[DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-		private static extern System.IntPtr GetCommandLine();
 	}
 }
