@@ -262,26 +262,8 @@ namespace SabreTools
 		/// <param name="single">True to show individual DAT statistics, false otherwise</param>
 		private static void InitStats(List<string> inputs, bool single)
 		{
-			List<string> newinputs = new List<string>();
-
-			foreach (string input in inputs)
-			{
-				if (File.Exists(input))
-				{
-					newinputs.Add(input);
-				}
-				if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.GetFiles(input, "*", SearchOption.AllDirectories))
-					{
-						newinputs.Add(file);
-					}
-				}
-			}
-
 			Logger statlog = new Logger(true, "stats.txt");
-			Stats stats = new Stats(newinputs, single, statlog);
-			stats.Process();
+			DatFile.OutputStats(inputs, single, statlog);
 			statlog.Close(true);
 		}
 

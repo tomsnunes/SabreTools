@@ -2370,6 +2370,161 @@ namespace SabreTools.Helper
 
 		#endregion
 
+		#region Statistics
+
+		/// <summary>
+		/// Recalculate the statistics for the Dat
+		/// </summary>
+		public void RecalculateStats()
+		{
+			// Wipe out any stats already there
+			RomCount = 0;
+			DiskCount = 0;
+			TotalSize = 0;
+			CRCCount = 0;
+			MD5Count = 0;
+			SHA1Count = 0;
+			NodumpCount = 0;
+
+			// If we have a blank Dat in any way, return
+			if (this == null || Files == null || Files.Count == 0)
+			{
+				return;
+			}
+
+			// Loop through and add
+			foreach (List<DatItem> roms in Files.Values)
+			{
+				foreach (Rom rom in roms)
+				{
+					RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
+					DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
+					TotalSize += (rom.ItemStatus == ItemStatus.Nodump ? 0 : rom.Size);
+					CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
+					MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
+					SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Output the stats for the Dat in a human-readable format
+		/// </summary>
+		/// <param name="logger">Logger object for file and console writing</param>
+		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
+		/// <param name="game">Number of games to use, -1 means recalculate games (default)</param>
+		public void OutputStats(Logger logger, bool recalculate = false, long game = -1)
+		{
+			// If we're supposed to recalculate the statistics, do so
+			if (recalculate)
+			{
+				RecalculateStats();
+			}
+
+			SortedDictionary<string, List<DatItem>> newroms = DatFile.BucketByGame(Files, false, true, logger, false);
+			if (TotalSize < 0)
+			{
+				TotalSize = Int64.MaxValue + TotalSize;
+			}
+			logger.User("    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
+    Games found:             " + (game == -1 ? newroms.Count : game) + @"
+    Roms found:              " + RomCount + @"
+    Disks found:             " + DiskCount + @"
+    Roms with CRC:           " + CRCCount + @"
+    Roms with MD5:           " + MD5Count + @"
+    Roms with SHA-1:         " + SHA1Count + @"
+    Roms with Nodump status: " + NodumpCount + @"
+");
+		}
+
+		/// <summary>
+		/// Output the stats for a list of input dats as files in a human-readable format
+		/// </summary>
+		/// <param name="inputs">List of input files and folders</param>
+		/// <param name="single">True if single DAT stats are output, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		public static void OutputStats(List<string> inputs, bool single, Logger logger)
+		{
+			// Make sure we have all files
+			List<string> newinputs = new List<string>();
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					newinputs.Add(input);
+				}
+				if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.GetFiles(input, "*", SearchOption.AllDirectories))
+					{
+						newinputs.Add(file);
+					}
+				}
+			}
+
+			// Init all total variables
+			long totalSize = 0;
+			long totalGame = 0;
+			long totalRom = 0;
+			long totalDisk = 0;
+			long totalCRC = 0;
+			long totalMD5 = 0;
+			long totalSHA1 = 0;
+			long totalNodump = 0;
+
+			/// Now process each of the input files
+			foreach (string filename in newinputs)
+			{
+				logger.Log("Beginning stat collection for '" + filename + "'");
+				List<string> games = new List<string>();
+				DatFile datdata = new DatFile();
+				Parse(filename, 0, 0, ref datdata, logger);
+				SortedDictionary<string, List<DatItem>> newroms = BucketByGame(datdata.Files, false, true, logger, false);
+
+				// Output single DAT stats (if asked)
+				if (single)
+				{
+					logger.User(@"\nFor file '" + filename + @"':
+--------------------------------------------------");
+					datdata.OutputStats(logger);
+				}
+				else
+				{
+					logger.User("Adding stats for file '" + filename + "'\n");
+				}
+
+				// Add single DAT stats to totals
+				totalSize += datdata.TotalSize;
+				totalGame += newroms.Count;
+				totalRom += datdata.RomCount;
+				totalDisk += datdata.DiskCount;
+				totalCRC += datdata.CRCCount;
+				totalMD5 += datdata.MD5Count;
+				totalSHA1 += datdata.SHA1Count;
+				totalNodump += datdata.NodumpCount;
+			}
+
+			// Output total DAT stats
+			if (!single) { logger.User(""); }
+			DatFile totaldata = new DatFile
+			{
+				TotalSize = totalSize,
+				RomCount = totalRom,
+				DiskCount = totalDisk,
+				CRCCount = totalCRC,
+				MD5Count = totalMD5,
+				SHA1Count = totalSHA1,
+				NodumpCount = totalNodump,
+			};
+			logger.User(@"For ALL DATs found
+--------------------------------------------------");
+			totaldata.OutputStats(logger, game: totalGame);
+			logger.User(@"
+Please check the log folder if the stats scrolled offscreen");
+		}
+
+		#endregion
+
 		#region Bucketing
 
 		/// <summary>
@@ -3110,7 +3265,7 @@ namespace SabreTools.Helper
 			// Output initial statistics, for kicks
 			if (stats)
 			{
-				Stats.OutputStats(datdata, logger, (datdata.RomCount + datdata.DiskCount == 0));
+				datdata.OutputStats(logger, (datdata.RomCount + datdata.DiskCount == 0));
 			}
 
 			// Bucket roms by game name and optionally dedupe
