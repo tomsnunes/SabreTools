@@ -11,6 +11,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace SabreTools.Helper
 {
@@ -1079,6 +1080,30 @@ namespace SabreTools.Helper
 		#endregion
 
 		#region File Manipulation
+
+		/// <summary>
+		/// Get the XmlTextReader associated with a file, if possible
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		/// <returns>The XmlTextReader representing the (possibly converted) file, null otherwise</returns>
+		public static XmlTextReader GetXmlTextReader(string filename, Logger logger)
+		{
+			logger.Log("Attempting to read file: \"" + filename + "\"");
+
+			// Check if file exists
+			if (!File.Exists(filename))
+			{
+				logger.Warning("File '" + filename + "' could not read from!");
+				return null;
+			}
+
+			XmlTextReader xtr;
+			xtr = new XmlTextReader(filename);
+			xtr.WhitespaceHandling = WhitespaceHandling.None;
+			xtr.DtdProcessing = DtdProcessing.Ignore;
+			return xtr;
+		}
 
 		/// <summary>
 		/// Remove an arbitrary number of bytes from the inputted file
