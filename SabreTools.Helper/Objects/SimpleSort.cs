@@ -125,7 +125,7 @@ namespace SabreTools.Helper
 			List<string> files = new List<string>();
 			foreach (string file in Directory.EnumerateFiles(_outDir, "*", SearchOption.AllDirectories))
 			{
-				_logger.Log("File found: '" + file + "'");
+				_logger.Verbose("File found: '" + file + "'");
 				files.Add(Path.GetFullPath(file));
 			}
 
@@ -212,15 +212,15 @@ namespace SabreTools.Helper
 			{
 				if (File.Exists(input))
 				{
-					_logger.Log("File found: '" + input + "'");
+					_logger.Verbose("File found: '" + input + "'");
 					files.Add(Path.GetFullPath(input));
 				}
 				else if (Directory.Exists(input))
 				{
-					_logger.Log("Directory found: '" + input + "'");
+					_logger.Verbose("Directory found: '" + input + "'");
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						_logger.Log("File found: '" + file + "'");
+						_logger.Verbose("File found: '" + file + "'");
 						files.Add(Path.GetFullPath(file));
 					}
 				}
@@ -304,7 +304,7 @@ namespace SabreTools.Helper
 			{
 				if (File.Exists(input))
 				{
-					_logger.Log("File found: '" + input + "'");
+					_logger.Verbose("File found: '" + input + "'");
 					lock (files)
 					{
 						files.Add(Path.GetFullPath(input));
@@ -312,14 +312,14 @@ namespace SabreTools.Helper
 				}
 				else if (Directory.Exists(input))
 				{
-					_logger.Log("Directory found: '" + input + "'");
+					_logger.Verbose("Directory found: '" + input + "'");
 
 					List<string> infiles = Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(infiles,
 						new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism },
 						file =>
 					{
-						_logger.Log("File found: '" + input + "'");
+						_logger.Verbose("File found: '" + input + "'");
 						lock (files)
 						{
 							files.Add(Path.GetFullPath(file));
@@ -361,9 +361,9 @@ namespace SabreTools.Helper
 					// If external scanning is enabled, use that method instead
 					if (_quickScan)
 					{
-						_logger.Log("Beginning quick scan of contents from '" + file + "'");
+						_logger.Verbose("Beginning quick scan of contents from '" + file + "'");
 						List<Rom> internalRomData = ArchiveTools.GetArchiveFileInfo(file, _logger);
-						_logger.Log(internalRomData.Count + " entries found in '" + file + "'");
+						_logger.Verbose(internalRomData.Count + " entries found in '" + file + "'");
 
 						// Now add all of the roms to the DAT
 						for (int i = 0; i < internalRomData.Count; i++)
@@ -533,7 +533,7 @@ namespace SabreTools.Helper
 			string percentage = (index == 0 ? "0.00" : Math.Round((100 * ((double)index / total)), 2, MidpointRounding.AwayFromZero).ToString());
 			string statement = percentage + "% - " + input;
 			_logger.ClearBeneath(_cursorTop + 1);
-			_logger.Log(statement, _cursorTop, 0);
+			_logger.WriteExact(statement, _cursorTop, 0);
 
 			// Get if the file should be scanned internally and externally
 			bool shouldExternalScan, shouldInternalScan;
@@ -552,10 +552,10 @@ namespace SabreTools.Helper
 
 				// Try to find the matches to the file that was found
 				List<DatItem> foundroms = rom.GetDuplicates(_datdata, _logger);
-				_logger.Log("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
+				_logger.Verbose("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
 				foreach (Rom found in foundroms)
 				{
-					_logger.Log("Matched name: " + found.Name);
+					_logger.Verbose("Matched name: " + found.Name);
 
 					// Add rom to the matched list
 					string key = found.Size + "-" + found.CRC;
@@ -579,7 +579,7 @@ namespace SabreTools.Helper
 							Directory.CreateDirectory(gamedir);
 						}
 
-						_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
+						_logger.Verbose("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
 						try
 						{
 							File.Copy(input, Path.Combine(gamedir, Path.GetFileName(found.Name)));
@@ -622,7 +622,7 @@ namespace SabreTools.Helper
 
 					// Try to find the matches to the file that was found
 					List<DatItem> founddroms = drom.GetDuplicates(_datdata, _logger);
-					_logger.Log("File '" + newinput + "' had " + founddroms.Count + " matches in the DAT!");
+					_logger.Verbose("File '" + newinput + "' had " + founddroms.Count + " matches in the DAT!");
 					foreach (Rom found in founddroms)
 					{
 						// Add rom to the matched list
@@ -639,7 +639,7 @@ namespace SabreTools.Helper
 						}
 
 						// First output the headerless rom
-						_logger.Log("Matched name: " + found.Name);
+						_logger.Verbose("Matched name: " + found.Name);
 
 						if (_toFolder)
 						{
@@ -650,7 +650,7 @@ namespace SabreTools.Helper
 								Directory.CreateDirectory(gamedir);
 							}
 
-							_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
+							_logger.Verbose("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
 							try
 							{
 								File.Copy(newinput, Path.Combine(gamedir, Path.GetFileName(found.Name)));
@@ -703,7 +703,7 @@ namespace SabreTools.Helper
 								Directory.CreateDirectory(gamedir);
 							}
 
-							_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + newfound.Name + "'");
+							_logger.Verbose("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + newfound.Name + "'");
 							try
 							{
 								File.Copy(input, Path.Combine(gamedir, Path.GetFileName(newfound.Name)));
@@ -712,7 +712,7 @@ namespace SabreTools.Helper
 						}
 						else
 						{
-							_logger.Log("Matched name: " + newfound.Name);
+							_logger.Verbose("Matched name: " + newfound.Name);
 							if (_torrentX == true)
 							{
 								ArchiveTools.WriteTorrentZip(input, _outDir, newfound, _logger);
@@ -746,9 +746,9 @@ namespace SabreTools.Helper
 				// If external scanning is enabled, use that method instead
 				if (_quickScan)
 				{
-					_logger.Log("Beginning quick scan of contents from '" + input + "'");
+					_logger.Verbose("Beginning quick scan of contents from '" + input + "'");
 					List<Rom> internalRomData = ArchiveTools.GetArchiveFileInfo(input, _logger);
-					_logger.Log(internalRomData.Count + " entries found in '" + input + "'");
+					_logger.Verbose(internalRomData.Count + " entries found in '" + input + "'");
 
 					// If the list is populated, then the file was a filled archive
 					if (internalRomData.Count > 0)
@@ -757,7 +757,7 @@ namespace SabreTools.Helper
 						{
 							// Try to find the matches to the file that was found
 							List<DatItem> foundroms = rom.GetDuplicates(_datdata, _logger);
-							_logger.Log("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
+							_logger.Verbose("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
 							foreach (Rom found in foundroms)
 							{
 								// Add rom to the matched list
@@ -776,7 +776,7 @@ namespace SabreTools.Helper
 								if (_toFolder)
 								{
 									// Copy file to output directory
-									_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
+									_logger.Verbose("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
 									string outfile = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempDir, _logger);
 									if (File.Exists(outfile))
 									{
@@ -796,7 +796,7 @@ namespace SabreTools.Helper
 								else
 								{
 									// Copy file between archives
-									_logger.Log("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
+									_logger.Verbose("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
 
 									if (Build.MonoEnvironment || _torrentX == false)
 									{
@@ -853,7 +853,7 @@ namespace SabreTools.Helper
 					// If no errors were encountered, we loop through the temp directory
 					if (!encounteredErrors)
 					{
-						_logger.Log("Archive found! Successfully extracted");
+						_logger.Verbose("Archive found! Successfully extracted");
 						foreach (string file in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
 						{
 							success &= RebuildToOutputHelper(file, index, total, true);
@@ -1047,7 +1047,7 @@ namespace SabreTools.Helper
 					// If no errors were encountered, we loop through the temp directory
 					if (!encounteredErrors)
 					{
-						_logger.Log("Archive found! Successfully extracted");
+						_logger.Verbose("Archive found! Successfully extracted");
 						foreach (string file in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
 						{
 							_logger.User("Processing extracted file " + file);

@@ -323,7 +323,7 @@ namespace SabreTools.Helper
 			SkipperRule skipperRule = new SkipperRule();
 
 			// Loop through and find a Skipper that has the right name
-			logger.Log("Beginning search for matching header skip rules");
+			logger.Verbose("Beginning search for matching header skip rules");
 			foreach (Skipper skipper in List)
 			{
 				if (String.IsNullOrEmpty(skipperName) || (!String.IsNullOrEmpty(skipper.Name) && skipperName.ToLowerInvariant() == skipper.Name.ToLowerInvariant()))
@@ -483,7 +483,7 @@ namespace SabreTools.Helper
 			// If we have a blank rule, inform the user
 			if (skipperRule.Tests == null)
 			{
-				logger.Log("No matching rule found!");
+				logger.Verbose("No matching rule found!");
 			}
 
 			return skipperRule;

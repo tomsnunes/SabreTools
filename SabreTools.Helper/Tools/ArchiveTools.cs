@@ -92,7 +92,7 @@ namespace SabreTools.Helper
 			{
 				if (at == ArchiveType.SevenZip && sevenzip != ArchiveScanLevel.External)
 				{
-					logger.Log("Found archive of type: " + at);
+					logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(tempDir);
@@ -109,7 +109,7 @@ namespace SabreTools.Helper
 				}
 				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
 				{
-					logger.Log("Found archive of type: " + at);
+					logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(tempDir);
@@ -128,7 +128,7 @@ namespace SabreTools.Helper
 				else if ((at == ArchiveType.Zip && zip != ArchiveScanLevel.External)
 					|| (at == ArchiveType.Rar && rar != ArchiveScanLevel.External))
 				{
-					logger.Log("Found archive of type: " + at);
+					logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(tempDir);
@@ -194,7 +194,7 @@ namespace SabreTools.Helper
 					reader = ReaderFactory.Open(File.OpenRead(input));
 					while (reader.MoveToNextEntry())
 					{
-						logger.Log("Current entry name: '" + reader.Entry.Key + "'");
+						logger.Verbose("Current entry name: '" + reader.Entry.Key + "'");
 						if (reader.Entry != null && reader.Entry.Key.Contains(entryname))
 						{
 							outfile = Path.GetFullPath(Path.Combine(tempDir, reader.Entry.Key));
@@ -272,7 +272,7 @@ namespace SabreTools.Helper
 			IReader reader = null;
 			try
 			{
-				logger.Log("Found archive of type: " + at);
+				logger.Verbose("Found archive of type: " + at);
 				long size = 0;
 				string crc = "";
 
@@ -296,7 +296,7 @@ namespace SabreTools.Helper
 					{
 						if (reader.Entry != null && !reader.Entry.IsDirectory)
 						{
-							logger.Log("Entry found: '" + reader.Entry.Key + "': "
+							logger.Verbose("Entry found: '" + reader.Entry.Key + "': "
 								+ (size == 0 ? reader.Entry.Size : size) + ", "
 								+ (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc));
 

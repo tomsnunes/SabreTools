@@ -2096,7 +2096,7 @@ namespace SabreTools.Helper
 						int parentcount = parent.Count;
 						if (parentcount == 0)
 						{
-							logger.Log("Empty parent: " + String.Join("\\", parent));
+							logger.Verbose("Empty parent: " + String.Join("\\", parent));
 							empty = true;
 						}
 
@@ -2522,13 +2522,13 @@ namespace SabreTools.Helper
 											}
 											if (subreader.GetAttribute("flags") == "baddump" || subreader.GetAttribute("status") == "baddump")
 											{
-												logger.Log("Bad dump detected: " +
+												logger.Verbose("Bad dump detected: " +
 													(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 												its = ItemStatus.BadDump;
 											}
 											if (subreader.GetAttribute("flags") == "itemStatus" || subreader.GetAttribute("status") == "itemStatus")
 											{
-												logger.Log("Nodump detected: " +
+												logger.Verbose("Nodump detected: " +
 													(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 												its = ItemStatus.Nodump;
 											}
@@ -2677,12 +2677,12 @@ namespace SabreTools.Helper
 														its = ItemStatus.Good;
 														break;
 													case "baddump":
-														logger.Log("Bad dump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
+														logger.Verbose("Bad dump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
 															"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 														its = ItemStatus.BadDump;
 														break;
 													case "itemStatus":
-														logger.Log("Nodump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
+														logger.Verbose("Nodump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
 															"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 														its = ItemStatus.Nodump;
 														break;
@@ -3090,7 +3090,7 @@ namespace SabreTools.Helper
 								&& ((Rom)rom).MD5 == "null"
 								&& ((Rom)rom).SHA1 == "null")
 							{
-								logger.Log("Empty folder found: " + rom.MachineName);
+								logger.Verbose("Empty folder found: " + rom.MachineName);
 
 								// If we're in a mode that doesn't allow for actual empty folders, add the blank info
 								if (outputFormat != OutputFormat.SabreDat && outputFormat != OutputFormat.MissFile)
@@ -3123,7 +3123,7 @@ namespace SabreTools.Helper
 					// Write the file footer out
 					WriteFooter(sw, outputFormat, depth, logger);
 
-					logger.Log("File written!" + Environment.NewLine);
+					logger.Verbose("File written!" + Environment.NewLine);
 					sw.Dispose();
 					fs.Dispose();
 				}
@@ -3946,7 +3946,7 @@ namespace SabreTools.Helper
 			}
 
 			// Process the input folder
-			logger.Log("Folder found: " + basePath);
+			logger.Verbose("Folder found: " + basePath);
 
 			// Process the files in all subfolders
 			List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.AllDirectories).ToList();
@@ -4007,7 +4007,7 @@ namespace SabreTools.Helper
 								romname = romname.Substring(0, romname.Length - 1);
 							}
 
-							logger.Log("Adding blank empty folder: " + gamename);
+							logger.Verbose("Adding blank empty folder: " + gamename);
 							Files["null"].Add(new Rom(romname, gamename));
 						}
 					});
@@ -4134,7 +4134,7 @@ namespace SabreTools.Helper
 				// If the file was an archive and was extracted successfully, check it
 				if (!encounteredErrors)
 				{
-					logger.Log(Path.GetFileName(item) + " treated like an archive");
+					logger.Verbose(Path.GetFileName(item) + " treated like an archive");
 					List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(extracted,
 						new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
@@ -4184,7 +4184,7 @@ namespace SabreTools.Helper
 		/// <param name="parent">Parent game to be used</param>
 		private void DFDProcessFile(string item, string parent, string basePath, bool noMD5, bool noSHA1, bool addDate, Logger logger)
 		{
-			logger.Log(Path.GetFileName(item) + " treated like a file");
+			logger.Verbose(Path.GetFileName(item) + " treated like a file");
 			Rom rom = FileTools.GetSingleFileInfo(item, noMD5: noMD5, noSHA1: noSHA1, date: addDate);
 
 			DFDProcessFileHelper(item, rom, basePath, parent, logger);
@@ -5078,7 +5078,7 @@ namespace SabreTools.Helper
 			/// Now process each of the input files
 			foreach (string filename in newinputs)
 			{
-				logger.Log("Beginning stat collection for '" + filename + "'");
+				logger.Verbose("Beginning stat collection for '" + filename + "'");
 				List<string> games = new List<string>();
 				DatFile datdata = new DatFile();
 				datdata.Parse(filename, 0, 0, logger);

@@ -117,13 +117,14 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="output">String to be written log</param>
 		/// <param name="loglevel">Severity of the information being logged</param>
+		/// <param name="appendPrefix">True if the level and datetime should be prepended to each statement, false otherwise</param>
 		/// <returns>True if the output could be written, false otherwise</returns>
-		public bool Log(string output, LogLevel loglevel = LogLevel.VERBOSE)
+		private bool Log(string output, LogLevel loglevel, bool appendPrefix)
 		{
 			// USER and ERROR writes to console
 			if (loglevel == LogLevel.USER || loglevel == LogLevel.ERROR)
 			{
-				Console.WriteLine((loglevel == LogLevel.ERROR ? loglevel.ToString() + " " : "") + output);
+				Console.WriteLine((loglevel == LogLevel.ERROR && appendPrefix ? loglevel.ToString() + " " : "") + output);
 			}
 
 			// If we're writing to file, use the existing stream
@@ -131,7 +132,7 @@ namespace SabreTools.Helper
 			{
 				try
 				{
-					_log.WriteLine(loglevel.ToString() + " - " + DateTime.Now  + " - " + output);
+					_log.WriteLine((appendPrefix ? loglevel.ToString() + " - " + DateTime.Now + " - " : "" ) + output);
 					_log.Flush();
 				}
 				catch
@@ -151,7 +152,7 @@ namespace SabreTools.Helper
 		/// <param name="line">Line number to write out to</param>
 		/// <param name="column">Column number to write out to</param>
 		/// <returns>True if the output could be written, false otherwise</returns>
-		public bool Log(string output, int line, int column)
+		public bool WriteExact(string output, int line, int column)
 		{
 			// Set the cursor position (if not being redirected)
 			if (!Console.IsOutputRedirected)
@@ -182,33 +183,47 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Write the given string as a verbose message to the log output
+		/// </summary>
+		/// <param name="output">String to be written log</param>
+		/// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
+		/// <returns>True if the output could be written, false otherwise</returns>s
+		public bool Verbose(string output, bool appendPrefix = true)
+		{
+			return Log(output, LogLevel.VERBOSE, appendPrefix);
+		}
+
+		/// <summary>
 		/// Write the given string as a user message to the log output
 		/// </summary>
 		/// <param name="output">String to be written log</param>
+		/// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
 		/// <returns>True if the output could be written, false otherwise</returns>
-		public bool User(string output)
+		public bool User(string output, bool appendPrefix = true)
 		{
-			return Log(output, LogLevel.USER);
+			return Log(output, LogLevel.USER, appendPrefix);
 		}
 
 		/// <summary>
 		/// Write the given string as a warning to the log output
 		/// </summary>
 		/// <param name="output">String to be written log</param>
+		/// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
 		/// <returns>True if the output could be written, false otherwise</returns>
-		public bool Warning(string output)
+		public bool Warning(string output, bool appendPrefix = true)
 		{
-			return Log(output, LogLevel.WARNING);
+			return Log(output, LogLevel.WARNING, appendPrefix);
 		}
 
 		/// <summary>
 		/// Writes the given string as an error in the log
 		/// </summary>
 		/// <param name="output">String to be written log</param>
+		/// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
 		/// <returns>True if the output could be written, false otherwise</returns>
-		public bool Error(string output)
+		public bool Error(string output, bool appendPrefix = true)
 		{
-			return Log(output, LogLevel.ERROR);
+			return Log(output, LogLevel.ERROR, appendPrefix);
 		}
 
 		/// <summary>

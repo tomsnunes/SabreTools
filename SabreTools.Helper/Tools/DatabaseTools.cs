@@ -36,7 +36,7 @@ namespace SabreTools.Helper
 				"'" + header + "', " +
 				"'" + source + "')";
 				slc = new SqliteCommand(query, dbc);
-				logger.Log("Result of inserting header: " + slc.ExecuteNonQuery());
+				logger.Verbose("Result of inserting header: " + slc.ExecuteNonQuery());
 			}
 
 			// Dispose of database objects

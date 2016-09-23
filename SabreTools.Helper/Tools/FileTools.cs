@@ -28,7 +28,7 @@ namespace SabreTools.Helper
 			}
 
 			// Read the input file, if possible
-			logger.Log("Attempting to read file: \"" + filename + "\"");
+			logger.Verbose("Attempting to read file: \"" + filename + "\"");
 
 			// Check if file exists
 			if (!File.Exists(filename))
@@ -100,7 +100,7 @@ namespace SabreTools.Helper
 		/// <returns>The XmlTextReader representing the (possibly converted) file, null otherwise</returns>
 		public static XmlTextReader GetXmlTextReader(string filename, Logger logger)
 		{
-			logger.Log("Attempting to read file: \"" + filename + "\"");
+			logger.Verbose("Attempting to read file: \"" + filename + "\"");
 
 			// Check if file exists
 			if (!File.Exists(filename))
@@ -282,7 +282,7 @@ namespace SabreTools.Helper
 				int sub = 0;
 				while (sldr.Read())
 				{
-					logger.Log("Found match with rom type " + sldr.GetString(1));
+					logger.Verbose("Found match with rom type " + sldr.GetString(1));
 					header = sldr.GetString(0);
 
 					logger.User("Creating reheadered file: " +
