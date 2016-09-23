@@ -356,7 +356,7 @@ namespace SabreTools
 			{
 				// Parse the Dat if possible
 				DatFile tempdat = new DatFile();
-				DatFile.Parse(toscan[key], 0, 0, ref tempdat, _logger);
+				tempdat.Parse(toscan[key], 0, 0, _logger);
 
 				// If the Dat wasn't empty, add the information
 				if (tempdat.Files.Count != 0)
