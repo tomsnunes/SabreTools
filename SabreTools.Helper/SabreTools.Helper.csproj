@@ -154,30 +154,6 @@
   <ItemGroup>
     <Content Include="LICENSE.jzlib.txt" />
     <Content Include="License.zlib.txt" />
-    <Content Include="Mappings\Good.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Mappings\MAME.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Mappings\MaybeIntro.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Mappings\NoIntro.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Mappings\NonGood.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Mappings\Redump.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Mappings\TOSEC.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Mappings\TruRip.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Skippers\*.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
