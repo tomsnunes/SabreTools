@@ -62,6 +62,7 @@ namespace SabreTools
 				forceunpack = false,
 				hashsplit = false,
 				headerer = false,
+				html = false,
 				inplace = false,
 				merge = false,
 				noMD5 = false,
@@ -211,6 +212,10 @@ namespace SabreTools
 					case "-hs":
 					case "--hash-split":
 						hashsplit = true;
+						break;
+					case "-html":
+					case "--html":
+						html = true;
 						break;
 					case "-ip":
 					case "--inplace":
@@ -518,7 +523,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(extsplit ^ hashsplit ^ headerer ^ (datfromdir || merge || diffMode != 0 || update
+			if (!(extsplit ^ hashsplit ^ headerer ^ html ^ (datfromdir || merge || diffMode != 0 || update
 				|| outputFormat != 0 || tsv != null|| trim) ^ rem ^ stats ^ typesplit))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
@@ -528,7 +533,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (datfromdir || extsplit || hashsplit || headerer
+			if (inputs.Count == 0 && (datfromdir || extsplit || hashsplit || headerer || html
 				|| (merge || diffMode != 0 || update || outputFormat != 0 || tsv != null) || stats || trim || typesplit))
 			{
 				_logger.Error("This feature requires at least one input");
@@ -561,7 +566,13 @@ namespace SabreTools
 			// If we're in headerer mode
 			else if (headerer)
 			{
-				InitHeaderer(inputs, restore, outDir, _logger);
+				InitHeaderer(inputs, restore, outDir);
+			}
+
+			// Get statistics on input files to HTML
+			else if (html)
+			{
+				InitHTMLStats(inputs);
 			}
 
 			// Get statistics on input files

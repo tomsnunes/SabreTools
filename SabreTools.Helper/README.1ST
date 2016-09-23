@@ -310,6 +310,18 @@ Options:
 		This should only be used if one of the inputs starts with a flag or another already
 		defined input.
 		
+	-html, --html		Get statistics on all input DATs written to HTML
+		This will output by default the combined statistics for all input DAT files. The stats
+		that are outputted are as follows:
+			- Total uncompressed size
+			- Number of games found
+			- Number of roms found
+			- Number of disks found
+			- Roms that include a CRC
+			- Roms that include a MD5
+			- Roms that include a SHA-1
+			- Roms with Nodump status
+		
 	-st, --stats		Get statistics on all input DATs
 		This will output by default the combined statistics for all input DAT files. The stats
 		that are outputted are as follows:

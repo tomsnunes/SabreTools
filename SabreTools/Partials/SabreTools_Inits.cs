@@ -213,8 +213,7 @@ namespace SabreTools
 		/// <param name="inputs">Input file or folder names</param>
 		/// <param name="restore">False if we're extracting headers (default), true if we're restoring them</param>
 		/// <param name="outDir">Output directory to write new files to, blank defaults to rom folder</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		private static void InitHeaderer(List<string> inputs, bool restore, string outDir, Logger logger)
+		private static void InitHeaderer(List<string> inputs, bool restore, string outDir)
 		{
 			foreach (string input in inputs)
 			{
@@ -222,11 +221,11 @@ namespace SabreTools
 				{
 					if (restore)
 					{
-						FileTools.RestoreHeader(input, outDir, logger);
+						FileTools.RestoreHeader(input, outDir, _logger);
 					}
 					else
 					{
-						FileTools.DetectSkipperAndTransform(input, outDir, logger);
+						FileTools.DetectSkipperAndTransform(input, outDir, _logger);
 					}
 				}
 				else if (Directory.Exists(input))
@@ -235,15 +234,24 @@ namespace SabreTools
 					{
 						if (restore)
 						{
-							FileTools.RestoreHeader(sub, outDir, logger);
+							FileTools.RestoreHeader(sub, outDir, _logger);
 						}
 						else
 						{
-							FileTools.DetectSkipperAndTransform(sub, outDir, logger);
+							FileTools.DetectSkipperAndTransform(sub, outDir, _logger);
 						}
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Wrap getting statistics on a DAT or folder of DATs to HTML
+		/// </summary>
+		/// <param name="inputs">List of inputs to be used</param>
+		private static void InitHTMLStats(List<string> inputs)
+		{
+			DatFile.OutputHTMLStats(inputs, _logger);
 		}
 
 		/// <summary>
