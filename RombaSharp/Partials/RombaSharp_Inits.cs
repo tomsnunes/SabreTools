@@ -63,7 +63,7 @@ namespace SabreTools
 				Name = Path.GetFileName(inputs[0]) + " Dir2Dat",
 				Description = Path.GetFileName(inputs[0]) + " Dir2Dat",
 				OutputFormat = OutputFormat.Xml,
-				Files = new Dictionary<string, List<DatItem>>(),
+				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 
 			Logger logger = new Logger(false, "");

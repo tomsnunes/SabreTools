@@ -108,7 +108,7 @@ namespace SabreTools
 				OutputFormat = (outputFormat == 0 ? OutputFormat.Xml : outputFormat),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
-				Files = new Dictionary<string, List<DatItem>>(),
+				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 
 			// For each input directory, create a DAT
@@ -118,7 +118,7 @@ namespace SabreTools
 				{
 					// Clone the base Dat for information
 					DatFile datdata = (DatFile)basedat.Clone();
-					datdata.Files = new Dictionary<string, List<DatItem>>();
+					datdata.Files = new SortedDictionary<string, List<DatItem>>();
 
 					string basePath = Path.GetFullPath(path);
 					bool success = datdata.PopulateDatFromDir(basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, copyFiles, maxDegreeOfParallelism, _logger);
@@ -569,7 +569,7 @@ namespace SabreTools
 				XSV = tsv,
 			};
 
-			DatFile.Update(inputs, userInputDat, outputFormat, outDir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
+			userInputDat.Update(inputs, outDir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
 				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, maxDegreeOfParallelism, _logger);
 		}
 

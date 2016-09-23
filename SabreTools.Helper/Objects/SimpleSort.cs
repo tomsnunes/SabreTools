@@ -76,7 +76,7 @@ namespace SabreTools.Helper
 			_cursorLeft = Console.CursorLeft;
 			_matched = new DatFile
 			{
-				Files = new Dictionary<string, List<DatItem>>(),
+				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 		}
 
@@ -143,7 +143,7 @@ namespace SabreTools.Helper
 
 			// Setup the fixdat
 			_matched = (DatFile)_datdata.CloneHeader();
-			_matched.Files = new Dictionary<string, List<DatItem>>();
+			_matched.Files = new SortedDictionary<string, List<DatItem>>();
 			_matched.FileName = "fixDat_" + _matched.FileName;
 			_matched.Name = "fixDat_" + _matched.Name;
 			_matched.Description = "fixDat_" + _matched.Description;
@@ -341,7 +341,7 @@ namespace SabreTools.Helper
 			_logger.User("Getting source file information...");
 			DatFile matchdat = new DatFile
 			{
-				Files = new Dictionary<string, List<DatItem>>(),
+				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 			foreach (string file in files)
 			{
@@ -427,7 +427,7 @@ namespace SabreTools.Helper
 			}
 
 			// Then bucket the keys by game for better output
-			SortedDictionary<string, List<DatItem>> keysByGame = DatFile.BucketByGame(toFromMap.Keys.ToList(), false, true, _logger);
+			SortedDictionary<string, List<DatItem>> keysByGame = DatFile.BucketListByGame(toFromMap.Keys.ToList(), false, true, _logger);
 
 			#endregion
 
