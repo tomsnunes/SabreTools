@@ -2683,17 +2683,17 @@ Please check the log folder if the stats scrolled offscreen");
 				// Modify the Dictionary if necessary and output the results
 				if (diff != 0 && cascade == null)
 				{
-					DiffNoCascade(diff, outDir, userData, newInputFileNames, logger);
+					userData.DiffNoCascade(diff, outDir, newInputFileNames, logger);
 				}
 				// If we're in cascade and diff, output only cascaded diffs
 				else if (diff != 0 && cascade != null)
 				{
-					DiffCascade(outDir, inplace, userData, newInputFileNames, datHeaders, skip, logger);
+					userData.DiffCascade(outDir, inplace, newInputFileNames, datHeaders, skip, logger);
 				}
 				// Output all entries with user-defined merge
 				else
 				{
-					MergeNoDiff(outDir, userData, newInputFileNames, datHeaders, logger);
+					userData.MergeNoDiff(outDir, newInputFileNames, datHeaders, logger);
 				}
 			}
 			// Otherwise, loop through all of the inputs individually
@@ -2832,10 +2832,9 @@ Please check the log folder if the stats scrolled offscreen");
 		/// </summary>
 		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
 		/// <param name="outDir">Output directory to write the DATs to</param>
-		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void DiffNoCascade(DiffMode diff, string outDir, DatFile userData, List<string> inputs, Logger logger)
+		public void DiffNoCascade(DiffMode diff, string outDir, List<string> inputs, Logger logger)
 		{
 			DateTime start = DateTime.Now;
 			logger.User("Initializing all output DATs");
@@ -2849,7 +2848,7 @@ Please check the log folder if the stats scrolled offscreen");
 			if ((diff & DiffMode.NoDupes) != 0)
 			{
 				post = " (No Duplicates)";
-				outerDiffData = (DatFile)userData.CloneHeader();
+				outerDiffData = (DatFile)CloneHeader();
 				outerDiffData.FileName += post;
 				outerDiffData.Name += post;
 				outerDiffData.Description += post;
@@ -2860,7 +2859,7 @@ Please check the log folder if the stats scrolled offscreen");
 			if ((diff & DiffMode.Dupes) != 0)
 			{
 				post = " (Duplicates)";
-				dupeData = (DatFile)userData.CloneHeader();
+				dupeData = (DatFile)CloneHeader();
 				dupeData.FileName += post;
 				dupeData.Name += post;
 				dupeData.Description += post;
@@ -2878,7 +2877,7 @@ Please check the log folder if the stats scrolled offscreen");
 				Parallel.For(0, inputs.Count, j =>
 				{
 					string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
-					DatFile diffData = (DatFile)userData.CloneHeader();
+					DatFile diffData = (DatFile)CloneHeader();
 					diffData.FileName += innerpost;
 					diffData.Name += innerpost;
 					diffData.Description += innerpost;
@@ -2893,10 +2892,10 @@ Please check the log folder if the stats scrolled offscreen");
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
 			logger.User("Populating all output DATs");
-			List<string> keys = userData.Files.Keys.ToList();
+			List<string> keys = Files.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = DatItem.Merge(userData.Files[key], logger);
+				List<DatItem> roms = DatItem.Merge(Files[key], logger);
 
 				if (roms != null && roms.Count > 0)
 				{
@@ -3006,12 +3005,11 @@ Please check the log folder if the stats scrolled offscreen");
 		/// </summary>
 		/// <param name="outDir">Output directory to write the DATs to</param>
 		/// <param name="inplace">True if cascaded diffs are outputted in-place, false otherwise</param>
-		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void DiffCascade(string outDir, bool inplace, DatFile userData, List<string> inputs, List<DatFile> datHeaders, bool skip, Logger logger)
+		public void DiffCascade(string outDir, bool inplace, List<string> inputs, List<DatFile> datHeaders, bool skip, Logger logger)
 		{
 			string post = "";
 
@@ -3036,7 +3034,7 @@ Please check the log folder if the stats scrolled offscreen");
 				}
 				else
 				{
-					diffData = (DatFile)userData.CloneHeader();
+					diffData = (DatFile)CloneHeader();
 					diffData.FileName += post;
 					diffData.Name += post;
 					diffData.Description += post;
@@ -3052,11 +3050,11 @@ Please check the log folder if the stats scrolled offscreen");
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
 			logger.User("Populating all output DATs");
-			List<string> keys = userData.Files.Keys.ToList();
+			List<string> keys = Files.Keys.ToList();
 
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = DatItem.Merge(userData.Files[key], logger);
+				List<DatItem> roms = DatItem.Merge(Files[key], logger);
 
 				if (roms != null && roms.Count > 0)
 				{
@@ -3114,19 +3112,18 @@ Please check the log folder if the stats scrolled offscreen");
 		/// </summary>
 		/// <param name="outDir">Output directory to write the DATs to</param>
 		/// <param name="inputs">List of inputs to write out from</param>
-		/// <param name="userData">Main DatData to draw information from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public static void MergeNoDiff(string outDir, DatFile userData, List<string> inputs, List<DatFile> datHeaders, Logger logger)
+		public void MergeNoDiff(string outDir, List<string> inputs, List<DatFile> datHeaders, Logger logger)
 		{
 			// If we're in SuperDAT mode, prefix all games with their respective DATs
-			if (userData.Type == "SuperDAT")
+			if (Type == "SuperDAT")
 			{
-				List<string> keys = userData.Files.Keys.ToList();
+				List<string> keys = Files.Keys.ToList();
 				foreach (string key in keys)
 				{
 					List<DatItem> newroms = new List<DatItem>();
-					foreach (DatItem rom in userData.Files[key])
+					foreach (DatItem rom in Files[key])
 					{
 						DatItem newrom = rom;
 						string filename = inputs[newrom.SystemID].Split('¬')[0];
@@ -3139,14 +3136,14 @@ Please check the log folder if the stats scrolled offscreen");
 							+ newrom.MachineName;
 						newroms.Add(newrom);
 					}
-					userData.Files[key] = newroms;
+					Files[key] = newroms;
 				}
 			}
 
 			// Output a DAT only if there are roms
-			if (userData.Files.Count != 0)
+			if (Files.Count != 0)
 			{
-				WriteDatfile(userData, outDir, logger);
+				WriteDatfile(this, outDir, logger);
 			}
 		}
 
