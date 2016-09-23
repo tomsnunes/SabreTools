@@ -414,7 +414,7 @@ namespace SabreTools.Helper
 			{
 				foreach (DatItem rom in matchdat.Files[key])
 				{
-					List<DatItem> matched = DatItem.GetDuplicates(rom, _datdata, _logger, true);
+					List<DatItem> matched = rom.GetDuplicates(_datdata, _logger, true);
 					foreach (DatItem match in matched)
 					{
 						try
@@ -551,7 +551,7 @@ namespace SabreTools.Helper
 				}
 
 				// Try to find the matches to the file that was found
-				List<DatItem> foundroms = DatItem.GetDuplicates(rom, _datdata, _logger);
+				List<DatItem> foundroms = rom.GetDuplicates(_datdata, _logger);
 				_logger.Log("File '" + input + "' had " + foundroms.Count + " matches in the DAT!");
 				foreach (Rom found in foundroms)
 				{
@@ -621,7 +621,7 @@ namespace SabreTools.Helper
 					}
 
 					// Try to find the matches to the file that was found
-					List<DatItem> founddroms = DatItem.GetDuplicates(drom, _datdata, _logger);
+					List<DatItem> founddroms = drom.GetDuplicates(_datdata, _logger);
 					_logger.Log("File '" + newinput + "' had " + founddroms.Count + " matches in the DAT!");
 					foreach (Rom found in founddroms)
 					{
@@ -756,7 +756,7 @@ namespace SabreTools.Helper
 						foreach (Rom rom in internalRomData)
 						{
 							// Try to find the matches to the file that was found
-							List<DatItem> foundroms = DatItem.GetDuplicates(rom, _datdata, _logger);
+							List<DatItem> foundroms = rom.GetDuplicates(_datdata, _logger);
 							_logger.Log("File '" + rom.Name + "' had " + foundroms.Count + " matches in the DAT!");
 							foreach (Rom found in foundroms)
 							{

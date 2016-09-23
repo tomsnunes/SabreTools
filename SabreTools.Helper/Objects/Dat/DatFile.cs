@@ -2850,7 +2850,7 @@ namespace SabreTools.Helper
 			}
 
 			// If the rom passes the filter, include it
-			if (DatItem.Filter(item, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, logger))
+			if (item.Filter(gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, logger))
 			{
 				// If we are in single game mode, rename all games
 				if (single)

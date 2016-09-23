@@ -234,12 +234,13 @@ namespace SabreTools.Helper
 
 		#endregion
 
-		#region Sorting and merging
+		#region Instance Methods
+
+		#region Sorting and Merging
 
 		/// <summary>
 		/// Determine if a rom should be included based on filters
 		/// </summary>
-		/// <param name="itemdata">User supplied item to check</param>
 		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
 		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
 		/// <param name="romtype">Type of the rom to match</param>
@@ -252,13 +253,13 @@ namespace SabreTools.Helper
 		/// <param name="itemStatus">Select roms with the given status</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		/// <returns>Returns true if it should be included, false otherwise</returns>
-		public static bool Filter(DatItem itemdata, string gamename, string romname, string romtype, long sgt,
+		public bool Filter(string gamename, string romname, string romtype, long sgt,
 			long slt, long seq, string crc, string md5, string sha1, ItemStatus itemStatus, Logger logger)
 		{
 			// Take care of Rom and Disk specific differences
-			if (itemdata.Type == ItemType.Rom)
+			if (Type == ItemType.Rom)
 			{
-				Rom rom = (Rom)itemdata;
+				Rom rom = (Rom)this;
 
 				// Filter on status
 				if (itemStatus != ItemStatus.NULL)
@@ -389,9 +390,9 @@ namespace SabreTools.Helper
 					}
 				}
 			}
-			else if (itemdata.Type == ItemType.Disk)
+			else if (Type == ItemType.Disk)
 			{
-				Disk rom = (Disk)itemdata;
+				Disk rom = (Disk)this;
 
 				// Filter on status
 				if (itemStatus != ItemStatus.NULL && rom.ItemStatus != itemStatus)
@@ -471,28 +472,28 @@ namespace SabreTools.Helper
 			{
 				if (gamename.StartsWith("*") && gamename.EndsWith("*"))
 				{
-					if (!itemdata.MachineName.ToLowerInvariant().Contains(gamename.ToLowerInvariant().Replace("*", "")))
+					if (!MachineName.ToLowerInvariant().Contains(gamename.ToLowerInvariant().Replace("*", "")))
 					{
 						return false;
 					}
 				}
 				else if (gamename.StartsWith("*"))
 				{
-					if (!itemdata.MachineName.EndsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					if (!MachineName.EndsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 					{
 						return false;
 					}
 				}
 				else if (gamename.EndsWith("*"))
 				{
-					if (!itemdata.MachineName.StartsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					if (!MachineName.StartsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 					{
 						return false;
 					}
 				}
 				else
 				{
-					if (!String.Equals(itemdata.MachineName, gamename, StringComparison.InvariantCultureIgnoreCase))
+					if (!String.Equals(MachineName, gamename, StringComparison.InvariantCultureIgnoreCase))
 					{
 						return false;
 					}
@@ -504,28 +505,28 @@ namespace SabreTools.Helper
 			{
 				if (romname.StartsWith("*") && romname.EndsWith("*"))
 				{
-					if (!itemdata.Name.ToLowerInvariant().Contains(romname.ToLowerInvariant().Replace("*", "")))
+					if (!Name.ToLowerInvariant().Contains(romname.ToLowerInvariant().Replace("*", "")))
 					{
 						return false;
 					}
 				}
 				else if (romname.StartsWith("*"))
 				{
-					if (!itemdata.Name.EndsWith(romname.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					if (!Name.EndsWith(romname.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 					{
 						return false;
 					}
 				}
 				else if (romname.EndsWith("*"))
 				{
-					if (!itemdata.Name.StartsWith(romname.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					if (!Name.StartsWith(romname.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 					{
 						return false;
 					}
 				}
 				else
 				{
-					if (!String.Equals(itemdata.Name, romname, StringComparison.InvariantCultureIgnoreCase))
+					if (!String.Equals(Name, romname, StringComparison.InvariantCultureIgnoreCase))
 					{
 						return false;
 					}
@@ -533,17 +534,71 @@ namespace SabreTools.Helper
 			}
 
 			// Filter on rom type
-			if (String.IsNullOrEmpty(romtype) && itemdata.Type != ItemType.Rom && itemdata.Type != ItemType.Disk)
+			if (String.IsNullOrEmpty(romtype) && Type != ItemType.Rom && Type != ItemType.Disk)
 			{
 				return false;
 			}
-			if (!String.IsNullOrEmpty(romtype) && !String.Equals(itemdata.Type.ToString(), romtype, StringComparison.InvariantCultureIgnoreCase))
+			if (!String.IsNullOrEmpty(romtype) && !String.Equals(Type.ToString(), romtype, StringComparison.InvariantCultureIgnoreCase))
 			{
 				return false;
 			}
 
 			return true;
 		}
+
+		/// <summary>
+		/// List all duplicates found in a DAT based on a rom
+		/// </summary>
+		/// <param name="datdata">Dat to match against</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="remove">True to remove matched roms from the input, false otherwise (default)</param>
+		/// <returns>List of matched DatItem objects</returns>
+		public List<DatItem> GetDuplicates(DatFile datdata, Logger logger, bool remove = false)
+		{
+			List<DatItem> output = new List<DatItem>();
+
+			// Check for an empty rom list first
+			if (datdata.Files == null || datdata.Files.Count == 0)
+			{
+				return output;
+			}
+
+			// Try to find duplicates
+			List<string> keys = datdata.Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> roms = datdata.Files[key];
+				List<DatItem> left = new List<DatItem>();
+
+				foreach (DatItem rom in roms)
+				{
+					if (IsDuplicate(rom, logger))
+					{
+						output.Add(rom);
+					}
+					else
+					{
+						left.Add(rom);
+					}
+				}
+
+				// If we're in removal mode, replace the list with the new one
+				if (remove)
+				{
+					datdata.Files[key] = left;
+				}
+			}
+
+			return output;
+		}
+
+		#endregion
+
+		#endregion // Instance Methods
+
+		#region Static Methods
+
+		#region Sorting and Merging
 
 		/// <summary>
 		/// Merge an arbitrary set of ROMs based on the supplied information
@@ -674,53 +729,6 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// List all duplicates found in a DAT based on a rom
-		/// </summary>
-		/// <param name="lastitem">Item to use as a base</param>
-		/// <param name="datdata">Dat to match against</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
-		/// <param name="remove">True to remove matched roms from the input, false otherwise (default)</param>
-		/// <returns>List of matched DatItem objects</returns>
-		public static List<DatItem> GetDuplicates(DatItem lastitem, DatFile datdata, Logger logger, bool remove = false)
-		{
-			List<DatItem> output = new List<DatItem>();
-
-			// Check for an empty rom list first
-			if (datdata.Files == null || datdata.Files.Count == 0)
-			{
-				return output;
-			}
-
-			// Try to find duplicates
-			List<string> keys = datdata.Files.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = datdata.Files[key];
-				List<DatItem> left = new List<DatItem>();
-
-				foreach (DatItem rom in roms)
-				{
-					if (rom.IsDuplicate(lastitem, logger))
-					{
-						output.Add(rom);
-					}
-					else
-					{
-						left.Add(rom);
-					}
-				}
-
-				// If we're in removal mode, replace the list with the new one
-				if (remove)
-				{
-					datdata.Files[key] = left;
-				}
-			}
-
-			return output;
-		}
-
-		/// <summary>
 		/// Sort a list of File objects by SystemID, SourceID, Game, and Name (in order)
 		/// </summary>
 		/// <param name="roms">List of File objects representing the roms to be sorted</param>
@@ -779,5 +787,7 @@ namespace SabreTools.Helper
 		}
 
 		#endregion
+
+		#endregion // Static Methods
 	}
 }
