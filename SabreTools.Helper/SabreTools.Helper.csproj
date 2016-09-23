@@ -138,7 +138,6 @@
     <Compile Include="Data\Enums.cs" />
     <Compile Include="Objects\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Mappings\Mappings.cs" />
     <Compile Include="Data\Structs.cs" />
     <Compile Include="Tools\Style.cs" />
     <Compile Include="Data\Build.cs" />
@@ -155,7 +154,28 @@
   <ItemGroup>
     <Content Include="LICENSE.jzlib.txt" />
     <Content Include="License.zlib.txt" />
-    <Content Include="Mappings\*.xml">
+    <Content Include="Mappings\Good.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Mappings\MAME.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Mappings\MaybeIntro.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Mappings\NoIntro.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Mappings\NonGood.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Mappings\Redump.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Mappings\TOSEC.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Mappings\TruRip.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Skippers\*.xml">
