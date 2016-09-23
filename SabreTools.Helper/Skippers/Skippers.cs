@@ -55,7 +55,7 @@ namespace SabreTools.Helper
 			Skipper skipper = new Skipper
 			{
 				Rules = new List<SkipperRule>(),
-				SourceFile = filename,
+				SourceFile = Path.GetFileName(filename),
 			};
 
 			if (!File.Exists(filename))
@@ -103,7 +103,7 @@ namespace SabreTools.Helper
 							EndOffset = 0,
 							Operation = HeaderSkipOperation.None,
 							Tests = new List<SkipperTest>(),
-							SourceFile = filename,
+							SourceFile = Path.GetFileName(filename),
 						};
 
 						if (xtr.GetAttribute("start_offset") != null)
