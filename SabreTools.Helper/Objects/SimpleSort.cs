@@ -137,10 +137,8 @@ namespace SabreTools.Helper
 			_logger.User("Processing files:\n");
 			foreach (string input in _inputs)
 			{
-				DATFromDir dfd = new DATFromDir(input, _datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
-				true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */, 4 /* maxDegreeOfParallelism */, _logger);
-				dfd.Start();
-				_datdata = dfd.DatData;
+				_datdata.PopulateDatFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
+					true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */, 4 /* maxDegreeOfParallelism */, _logger);
 			}
 
 			// Setup the fixdat
@@ -179,7 +177,7 @@ namespace SabreTools.Helper
 			// Now output the fixdat to the main folder
 			if (found)
 			{
-				DatFile.WriteDatfile(_matched, "", _logger, stats: true);
+				_matched.WriteToFile("", _logger, stats: true);
 			}
 			else
 			{
@@ -273,7 +271,7 @@ namespace SabreTools.Helper
 				_datdata.Name = "fixDat_" + _datdata.Name;
 				_datdata.Description = "fixDat_" + _datdata.Description;
 				_datdata.OutputFormat = OutputFormat.Xml;
-				DatFile.WriteDatfile(_datdata, "", _logger);
+				_datdata.WriteToFile("", _logger);
 			}
 
 			return success;

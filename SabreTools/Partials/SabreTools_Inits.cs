@@ -121,13 +121,12 @@ namespace SabreTools
 					datdata.Files = new Dictionary<string, List<DatItem>>();
 
 					string basePath = Path.GetFullPath(path);
-					DATFromDir dfd = new DATFromDir(basePath, datdata, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, copyFiles, maxDegreeOfParallelism, _logger);
-					bool success = dfd.Start();
+					bool success = datdata.PopulateDatFromDir(basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, copyFiles, maxDegreeOfParallelism, _logger);
 
 					// If it was a success, write the DAT out
 					if (success)
 					{
-						DatFile.WriteDatfile(dfd.DatData, "", _logger);
+						datdata.WriteToFile("", _logger);
 					}
 
 					// Otherwise, show the help

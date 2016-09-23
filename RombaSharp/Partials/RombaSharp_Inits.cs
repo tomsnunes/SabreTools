@@ -69,10 +69,9 @@ namespace SabreTools
 			Logger logger = new Logger(false, "");
 			foreach (string input in inputs)
 			{
-				DATFromDir dfd = new DATFromDir(input, datdata, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
-				true /* enableGzip */, false /* addBlanks */, false /* addDate */, "__temp__" /* tempDir */, false /* copyFiles */, 4 /* maxDegreeOfParallelism */, _logger);
-				dfd.Start();
-				DatFile.WriteDatfile(dfd.DatData, "", logger);
+				datdata.PopulateDatFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
+					true /* enableGzip */, false /* addBlanks */, false /* addDate */, "__temp__" /* tempDir */, false /* copyFiles */, 4 /* maxDegreeOfParallelism */, _logger);
+				datdata.WriteToFile("", logger);
 			}
 			logger.Close();
 		}
