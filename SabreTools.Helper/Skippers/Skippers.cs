@@ -26,22 +26,6 @@ namespace SabreTools.Helper
 			}
 		}
 
-		// Header skippers classes represented by a dictionary of dictionaries (name, (header, size))
-		private static Dictionary<string, Dictionary<string, int>> _headerMaps = new Dictionary<string, Dictionary<string, int>>();
-		public static Dictionary<string, Dictionary<string, int>> HeaderMaps
-		{
-			get
-			{
-				if (_headerMaps.Count == 0)
-				{
-					CreateHeaderSkips();
-				}
-				return _headerMaps;
-			}
-		}
-
-		#region Header Skips (new)
-
 		/// <summary>
 		/// Populate the entire list of header Skippers
 		/// </summary>
@@ -72,6 +56,7 @@ namespace SabreTools.Helper
 			Skipper skipper = new Skipper
 			{
 				Rules = new List<SkipperRule>(),
+				SourceFile = filename,
 			};
 
 			if (!File.Exists(filename))
@@ -119,6 +104,7 @@ namespace SabreTools.Helper
 							EndOffset = 0,
 							Operation = HeaderSkipOperation.None,
 							Tests = new List<SkipperTest>(),
+							SourceFile = filename,
 						};
 
 						if (xtr.GetAttribute("start_offset") != null)
@@ -686,150 +672,5 @@ namespace SabreTools.Helper
 
 			return success;
 		}
-
-		#endregion
-
-		#region Header Skips (old)
-
-		/// <summary>
-		/// Create all header mappings to be used by the program
-		/// </summary>
-		private static void CreateHeaderSkips()
-		{
-			// Create array of dictionary names
-			string[] skippers =
-			{
-				"a7800", "fds", "lynx", /* "n64", */ "nes", "pce", "psid", "snes", "spc",
-			};
-
-			// Loop through and add all remappings
-			foreach (string skipper in skippers)
-			{
-				_headerMaps.Add(skipper, new Dictionary<string, int>());
-				SkipperHelper(skipper);
-			}
-		}
-
-		/// <summary>
-		/// Create a remapping from XML
-		/// </summary>
-		/// <param name="skipper">Name of the header skipper to be populated</param>
-		private static void SkipperHelper(string skipper)
-		{
-			// Read in remapping from file
-			XmlDocument doc = new XmlDocument();
-			try
-			{
-				doc.LoadXml(File.ReadAllText(Path.Combine(LocalPath, skipper + ".xml")));
-			}
-			catch (XmlException ex)
-			{
-				Console.WriteLine(skipper + " header skippers could not be loaded! " + ex.ToString());
-				return;
-			}
-
-			// Get the detector parent node
-			XmlNode node = doc.FirstChild;
-			while (node.Name != "detector")
-			{
-				node = node.NextSibling;
-			}
-
-			// Get the first rule node
-			node = node.SelectSingleNode("rule");
-
-			// Now read in the rules
-			while (node != null && node.Name == "rule")
-			{
-				// Size is the offset for the actual game data
-				int size = (node.Attributes["start_offset"] != null ? Convert.ToInt32(node.Attributes["start_offset"].Value, 16) : 0);
-
-				// Each rule set can have more than one data rule. We can't really use multiples right now
-				if (node.SelectNodes("data") != null)
-				{
-					foreach (XmlNode child in node.SelectNodes("data"))
-					{
-						// Add an offset to the match if one exists
-						string header = (child.Attributes["offset"] != null && child.Attributes["offset"].Value != "0" ? "^.{" + (Convert.ToInt32(child.Attributes["offset"].Value, 16) * 2) + "}" : "^");
-						header += child.Attributes["value"].Value;
-
-						// Now add the header and value to the appropriate skipper dictionary
-						_headerMaps[skipper].Add(header, size);
-					}
-				}
-
-				// Get the next node and skip over anything that's not an element
-				node = node.NextSibling;
-
-				if (node == null)
-				{
-					break;
-				}
-
-				while (node.NodeType != XmlNodeType.Element && node.Name != "rule")
-				{
-					node = node.NextSibling;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Get the header type for the input file
-		/// </summary>
-		/// <param name="input">Input file to parse for header</param>
-		/// <param name="hs">Passed back size of the header</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>The detected HeaderType</returns>
-		public static HeaderType GetFileHeaderType(string input, out int hs, Logger logger)
-		{
-			// Open the file in read mode
-			BinaryReader br = new BinaryReader(File.OpenRead(input));
-
-			// Extract the first 1024 bytes of the file
-			byte[] hbin = br.ReadBytes(1024);
-			string header = BitConverter.ToString(hbin).Replace("-", string.Empty);
-			br.Dispose();
-
-			// Determine the type of the file from the header, if possible
-			HeaderType type = HeaderType.None;
-
-			// Loop over the header types and see if there's a match
-			hs = -1;
-			foreach (HeaderType test in Enum.GetValues(typeof(HeaderType)))
-			{
-				Dictionary<string, int> tempDict = new Dictionary<string, int>();
-
-				// Try populating the dictionary from the master list
-				try
-				{
-					tempDict = Skippers.HeaderMaps[test.ToString()];
-				}
-				catch
-				{
-					continue;
-				}
-
-				// Loop over the dictionary and see if there are matches
-				foreach (KeyValuePair<string, int> entry in tempDict)
-				{
-					if (Regex.IsMatch(header, entry.Key))
-					{
-						type = test;
-						hs = entry.Value;
-						break;
-					}
-				}
-
-				// If we found something, break out
-				if (type != HeaderType.None)
-				{
-					break;
-				}
-			}
-
-			return type;
-		}
-
-		#endregion
 	}
 }

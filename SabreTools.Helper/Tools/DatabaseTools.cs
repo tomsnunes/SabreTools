@@ -14,9 +14,9 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="header">String representing the header bytes</param>
 		/// <param name="SHA1">SHA-1 of the deheadered file</param>
-		/// <param name="type">HeaderType representing the detected header</param>
+		/// <param name="type">Name of the source skipper file</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public static void AddHeaderToDatabase(string header, string SHA1, HeaderType type, Logger logger)
+		public static void AddHeaderToDatabase(string header, string SHA1, string source, Logger logger)
 		{
 			bool exists = false;
 
@@ -34,7 +34,7 @@ namespace SabreTools.Helper
 				query = @"INSERT INTO data (sha1, header, type) VALUES ('" +
 				SHA1 + "', " +
 				"'" + header + "', " +
-				"'" + type.ToString() + "')";
+				"'" + source + "')";
 				slc = new SqliteCommand(query, dbc);
 				logger.Log("Result of inserting header: " + slc.ExecuteNonQuery());
 			}

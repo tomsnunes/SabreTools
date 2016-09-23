@@ -14,6 +14,7 @@ namespace SabreTools.Helper
 		public string Author;
 		public string Version;
 		public List<SkipperRule> Rules;
+		public string SourceFile;
 	}
 
 	/// <summary>
@@ -25,6 +26,7 @@ namespace SabreTools.Helper
 		public long? EndOffset; // null if EOF
 		public HeaderSkipOperation Operation;
 		public List<SkipperTest> Tests;
+		public string SourceFile;
 	}
 
 	/// <summary>

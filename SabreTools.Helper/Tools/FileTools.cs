@@ -207,52 +207,42 @@ namespace SabreTools.Helper
 
 			logger.User("\nGetting skipper information for '" + file + "'");
 
-			// Then, if the file was headered, store it to the database
-			int headerSize = -1;
-			HeaderType type = Skippers.GetFileHeaderType(file, out headerSize, logger);
+			// Get the skipper rule that matches the file, if any
+			SkipperRule rule = Skippers.MatchesSkipper(file, "", logger);
 
-			// If we have a valid HeaderType, remove the correct byte count
-			logger.User("File has header: " + (type != HeaderType.None));
-			if (type != HeaderType.None)
+			// If we have an empty rule, return false
+			if (rule.Tests == null || rule.Tests.Count == 0 || rule.Operation != HeaderSkipOperation.None)
 			{
-				logger.Log("Deteched header type: " + type);
-
-				// Now take care of the header and new output file
-				string hstr = string.Empty;
-				BinaryReader br = new BinaryReader(File.OpenRead(file));
-
-				// Extract the header as a string for the database
-				byte[] hbin = br.ReadBytes(headerSize);
-				for (int i = 0; i < headerSize; i++)
-				{
-					hstr += BitConverter.ToString(new byte[] { hbin[i] });
-				}
-
-				br.Dispose();
-
-				// Then find an apply the exact rule to the file
-				SkipperRule rule = Skippers.MatchesSkipper(file, "", logger);
-
-				// If we have an empty rule, return false
-				if (rule.Tests == null || rule.Tests.Count == 0)
-				{
-					return false;
-				}
-
-				// Otherwise, apply the rule to the file
-				string newfile = (outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file)));
-				Skippers.TransformFile(file, newfile, rule, logger);
-
-				// If the output file doesn't exist, return false
-				if (!File.Exists(newfile))
-				{
-					return false;
-				}
-
-				// Now add the information to the database if it's not already there
-				Rom rom = GetSingleFileInfo(newfile);
-				DatabaseTools.AddHeaderToDatabase(hstr, rom.SHA1, type, logger);
+				return false;
 			}
+
+			logger.User("File has a valid copier header");
+
+			// Get the header bytes from the file first
+			string hstr = string.Empty;
+			BinaryReader br = new BinaryReader(File.OpenRead(file));
+
+			// Extract the header as a string for the database
+			byte[] hbin = br.ReadBytes((int)rule.StartOffset);
+			for (int i = 0; i < (int)rule.StartOffset; i++)
+			{
+				hstr += BitConverter.ToString(new byte[] { hbin[i] });
+			}
+			br.Dispose();
+
+			// Apply the rule to the file
+			string newfile = (outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file)));
+			Skippers.TransformFile(file, newfile, rule, logger);
+
+			// If the output file doesn't exist, return false
+			if (!File.Exists(newfile))
+			{
+				return false;
+			}
+
+			// Now add the information to the database if it's not already there
+			Rom rom = GetSingleFileInfo(newfile);
+			DatabaseTools.AddHeaderToDatabase(hstr, rom.SHA1, rule.SourceFile, logger);
 
 			return true;
 		}

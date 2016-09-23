@@ -21,7 +21,7 @@
 
 	#endregion
 
-	#region DAT related
+	#region DatFile related
 
 	/// <summary>
 	/// Determines forcemerging tag for DAT output
@@ -56,7 +56,7 @@
 
 	#endregion
 
-	#region Rom related
+	#region DatItem related
 
 	/// <summary>
 	/// Determines which type of duplicate a file is
@@ -100,23 +100,6 @@
 	#endregion
 
 	#region Skippers and Mappers
-
-	/// <summary>
-	/// Possible detected header type
-	/// </summary>
-	public enum HeaderType
-	{
-		None = 0,
-		a7800,
-		fds,
-		lynx,
-		//n64,
-		nes,
-		pce,
-		psid,
-		snes,
-		spc,
-	}
 
 	/// <summary>
 	/// Determines the header skip operation
