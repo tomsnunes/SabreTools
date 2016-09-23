@@ -4,7 +4,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace SabreTools.Helper
@@ -308,23 +307,6 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Copy a file to a new location, creating directories as needed
-		/// </summary>
-		/// <param name="input">Input filename</param>
-		/// <param name="output">Output filename</param>
-		public static void CopyFileToNewLocation(string input, string output)
-		{
-			if (File.Exists(input) && !File.Exists(output))
-			{
-				if (!Directory.Exists(Path.GetDirectoryName(output)))
-				{
-					Directory.CreateDirectory(Path.GetDirectoryName(output));
-				}
-				File.Copy(input, output);
-			}
-		}
-
-		/// <summary>
 		/// Cleans out the temporary directory
 		/// </summary>
 		/// <param name="dirname">Name of the directory to clean out</param>
@@ -346,58 +328,6 @@ namespace SabreTools.Helper
 				}
 				catch { }
 			}
-		}
-
-		/// <summary>
-		/// Delete a file asynchronously
-		/// </summary>
-		/// <param name="filename">Name of the file to be deleted</param>
-		public async static void DeleteFile(string filename)
-		{
-			if (!File.Exists(filename))
-			{
-				return;
-			}
-
-			File.SetAttributes(filename, 0);
-			FileInfo fi = new FileInfo(filename);
-			fi.IsReadOnly = false;
-			await Task.Factory.StartNew(() =>
-			{
-				while (fi.Exists)
-				{
-					try
-					{
-						fi.Delete();
-					}
-					catch { }
-				}
-			});
-		}
-
-		/// <summary>
-		/// Delete a directory asynchronously
-		/// </summary>
-		/// <param name="dirname">Name of the directory to be deleted</param>
-		public async static void DeleteDirectory(string dirname)
-		{
-			if (!Directory.Exists(dirname))
-			{
-				return;
-			}
-
-			DirectoryInfo di = new DirectoryInfo(dirname);
-			await Task.Factory.StartNew(() =>
-			{
-				while (di.Exists)
-				{
-					try
-					{
-						di.Delete(true);
-					}
-					catch { }
-				}
-			});
 		}
 
 		#endregion
