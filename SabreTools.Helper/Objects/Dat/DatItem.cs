@@ -397,7 +397,14 @@ namespace SabreTools.Helper
 				// Filter on status
 				if (itemStatus != ItemStatus.NULL && rom.ItemStatus != itemStatus)
 				{
-					return false;
+					if (itemStatus == ItemStatus.NotNodump && rom.ItemStatus == ItemStatus.Nodump)
+					{
+						return false;
+					}
+					else if (itemStatus != ItemStatus.NotNodump && rom.ItemStatus != itemStatus)
+					{
+						return false;
+					}
 				}
 
 				// Filter on md5
