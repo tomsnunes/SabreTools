@@ -2820,19 +2820,29 @@ namespace SabreTools.Helper
 
 				// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 				if ((itemRom.Size == 0 || itemRom.Size == -1)
-					&& ((itemRom.CRC == Constants.CRCZero || itemRom.CRC == "")
-					|| itemRom.MD5 == Constants.MD5Zero
-					|| itemRom.SHA1 == Constants.SHA1Zero))
+					&& ((itemRom.CRC == Constants.CRCZero || String.IsNullOrEmpty(itemRom.CRC))
+						|| itemRom.MD5 == Constants.MD5Zero
+						|| itemRom.SHA1 == Constants.SHA1Zero))
 				{
 					itemRom.Size = Constants.SizeZero;
 					itemRom.CRC = Constants.CRCZero;
 					itemRom.MD5 = Constants.MD5Zero;
 					itemRom.SHA1 = Constants.SHA1Zero;
+					itemRom.ItemStatus = ItemStatus.Nodump;
 				}
 				// If the file has no size and it's not the above case, skip and log
-				else if (itemRom.Type == ItemType.Rom && (itemRom.Size == 0 || itemRom.Size == -1))
+				else if (itemRom.Size == 0 || itemRom.Size == -1)
 				{
-					logger.Warning("Incomplete entry for \"" + itemRom.Name + "\" will be output as itemStatus");
+					logger.Warning("Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
+					itemRom.ItemStatus = ItemStatus.Nodump;
+				}
+				// If the file has a size but aboslutely no hashes, skip and log
+				else if (itemRom.Size > 0
+					&& String.IsNullOrEmpty(itemRom.CRC)
+					&& String.IsNullOrEmpty(itemRom.MD5)
+					&& String.IsNullOrEmpty(itemRom.SHA1))
+				{
+					logger.Warning("Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
 					itemRom.ItemStatus = ItemStatus.Nodump;
 				}
 
@@ -2845,6 +2855,14 @@ namespace SabreTools.Helper
 				// Sanitize the hashes from null, hex sizes, and "true blank" strings
 				itemDisk.MD5 = Style.CleanHashData(itemDisk.MD5, Constants.MD5Length);
 				itemDisk.SHA1 = Style.CleanHashData(itemDisk.SHA1, Constants.SHA1Length);
+
+				// If the file has aboslutely no hashes, skip and log
+				if (String.IsNullOrEmpty(itemDisk.MD5)
+					&& String.IsNullOrEmpty(itemDisk.SHA1))
+				{
+					logger.Warning("Incomplete entry for \"" + itemDisk.Name + "\" will be output as nodump");
+					itemDisk.ItemStatus = ItemStatus.Nodump;
+				}
 
 				item = itemDisk;
 			}
