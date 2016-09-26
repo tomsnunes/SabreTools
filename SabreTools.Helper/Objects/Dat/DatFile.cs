@@ -594,7 +594,9 @@ namespace SabreTools.Helper
 				{
 					if (Directory.Exists(input))
 					{
-						foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+						List<string> files = Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories).ToList();
+						files.Sort(new NaturalComparer());
+						foreach (string file in files)
 						{
 							try
 							{
