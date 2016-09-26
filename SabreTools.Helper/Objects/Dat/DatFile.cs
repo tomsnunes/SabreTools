@@ -5133,7 +5133,10 @@ namespace SabreTools.Helper
 					}
 				}
 			}
-			newinputs.Sort(new NaturalComparer());
+			newinputs = newinputs
+				.OrderBy(i => Path.GetDirectoryName(i))
+				.ThenBy(i => Path.GetFileName(i))
+				.ToList(); // newinputs.Sort(new NaturalComparer())
 
 			// Write the header, if any
 			string head = "";
@@ -5172,9 +5175,110 @@ namespace SabreTools.Helper
 			long totalSHA1 = 0;
 			long totalNodump = 0;
 
-			/// Now process each of the input files
+			// Init directory-level variables
+			string lastdir = null;
+			long dirSize = 0;
+			long dirGame = 0;
+			long dirRom = 0;
+			long dirDisk = 0;
+			long dirCRC = 0;
+			long dirMD5 = 0;
+			long dirSHA1 = 0;
+			long dirNodump = 0;
+
+			// Now process each of the input files
 			foreach (string filename in newinputs)
 			{
+				// Get the directory for the current file
+				string thisdir = Path.GetDirectoryName(filename);
+
+				// If we don't have the first file and the directory has changed, show the previous directory stats and reset
+				if (lastdir != null && thisdir != lastdir)
+				{
+					// Output separator if needed
+					string imid = "";
+					switch (statOutputFormat)
+					{
+						case StatOutputFormat.CSV:
+							break;
+						case StatOutputFormat.HTML:
+							imid = "<tr><td colspan=\"9\"></td></tr>\n";
+							break;
+						case StatOutputFormat.None:
+						default:
+							break;
+					}
+					sw.Write(imid);
+					
+					DatFile lastdirdat = new DatFile
+					{
+						FileName = lastdir,
+						TotalSize = dirSize,
+						RomCount = dirRom,
+						DiskCount = dirDisk,
+						CRCCount = dirCRC,
+						MD5Count = dirMD5,
+						SHA1Count = dirSHA1,
+						NodumpCount = dirNodump,
+					};
+					lastdirdat.OutputStats(sw, statOutputFormat, logger, game: dirGame);
+
+					// Write the footer, if any
+					string iend = "";
+					switch (statOutputFormat)
+					{
+						case StatOutputFormat.CSV:
+							break;
+						case StatOutputFormat.HTML:
+							iend = @"		</table>
+<p/>";
+							break;
+						case StatOutputFormat.None:
+						default:
+							break;
+						case StatOutputFormat.TSV:
+							break;
+					}
+					sw.Write(iend);
+
+					// Write the header, if any
+					string ihead = "";
+					switch (statOutputFormat)
+					{
+						case StatOutputFormat.CSV:
+							ihead = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\",\"Nodumps\"\n";
+							break;
+						case StatOutputFormat.HTML:
+							ihead = @"<!DOCTYPE html>
+<html>
+	<header>
+		<title>DAT Statistics Report</title>
+	</header>
+	<body>
+		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
+			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
+		+ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th><th>Nodumps</th></tr>\n";
+							break;
+						case StatOutputFormat.None:
+						default:
+							break;
+						case StatOutputFormat.TSV:
+							ihead = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\"\t\"Nodumps\"\n";
+							break;
+					}
+					sw.Write(ihead);
+
+					// Reset the directory stats
+					dirSize = 0;
+					dirGame = 0;
+					dirRom = 0;
+					dirDisk = 0;
+					dirCRC = 0;
+					dirMD5 = 0;
+					dirSHA1 = 0;
+					dirNodump = 0;
+				}
+
 				logger.Verbose("Beginning stat collection for '" + filename + "'", false);
 				List<string> games = new List<string>();
 				DatFile datdata = new DatFile();
@@ -5188,6 +5292,16 @@ namespace SabreTools.Helper
 					datdata.OutputStats(sw, statOutputFormat, logger);
 				}
 
+				// Add single DAT stats to dir
+				dirSize += datdata.TotalSize;
+				dirGame += datdata.Files.Count;
+				dirRom += datdata.RomCount;
+				dirDisk += datdata.DiskCount;
+				dirCRC += datdata.CRCCount;
+				dirMD5 += datdata.MD5Count;
+				dirSHA1 += datdata.SHA1Count;
+				dirNodump += datdata.NodumpCount;
+
 				// Add single DAT stats to totals
 				totalSize += datdata.TotalSize;
 				totalGame += datdata.Files.Count;
@@ -5197,9 +5311,12 @@ namespace SabreTools.Helper
 				totalMD5 += datdata.MD5Count;
 				totalSHA1 += datdata.SHA1Count;
 				totalNodump += datdata.NodumpCount;
+
+				// Make sure to assign the new directory
+				lastdir = thisdir;
 			}
 
-			// Output midpoint separator if needed
+			// Output the directory stats one last time
 			string mid = "";
 			switch (statOutputFormat)
 			{
@@ -5213,6 +5330,74 @@ namespace SabreTools.Helper
 					break;
 			}
 			sw.Write(mid);
+
+			DatFile dirdat = new DatFile
+			{
+				FileName = lastdir,
+				TotalSize = dirSize,
+				RomCount = dirRom,
+				DiskCount = dirDisk,
+				CRCCount = dirCRC,
+				MD5Count = dirMD5,
+				SHA1Count = dirSHA1,
+				NodumpCount = dirNodump,
+			};
+			dirdat.OutputStats(sw, statOutputFormat, logger, game: dirGame);
+
+			// Write the footer, if any
+			string end = "";
+			switch (statOutputFormat)
+			{
+				case StatOutputFormat.CSV:
+					break;
+				case StatOutputFormat.HTML:
+					end = @"		</table>
+<p/>";
+					break;
+				case StatOutputFormat.None:
+				default:
+					break;
+				case StatOutputFormat.TSV:
+					break;
+			}
+			sw.Write(end);
+
+			// Write the header, if any
+			head = "";
+			switch (statOutputFormat)
+			{
+				case StatOutputFormat.CSV:
+					head = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\",\"Nodumps\"\n";
+					break;
+				case StatOutputFormat.HTML:
+					head = @"<!DOCTYPE html>
+<html>
+	<header>
+		<title>DAT Statistics Report</title>
+	</header>
+	<body>
+		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
+			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
++ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th><th>Nodumps</th></tr>\n";
+					break;
+				case StatOutputFormat.None:
+				default:
+					break;
+				case StatOutputFormat.TSV:
+					head = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\"\t\"Nodumps\"\n";
+					break;
+			}
+			sw.Write(head);
+
+			// Reset the directory stats
+			dirSize = 0;
+			dirGame = 0;
+			dirRom = 0;
+			dirDisk = 0;
+			dirCRC = 0;
+			dirMD5 = 0;
+			dirSHA1 = 0;
+			dirNodump = 0;
 
 			// Output total DAT stats
 			DatFile totaldata = new DatFile
@@ -5229,7 +5414,7 @@ namespace SabreTools.Helper
 			totaldata.OutputStats(sw, statOutputFormat, logger, game: totalGame);
 
 			// Output footer if needed
-			string end = "";
+			end = "";
 			switch (statOutputFormat)
 			{
 				case StatOutputFormat.CSV:
@@ -5242,6 +5427,8 @@ namespace SabreTools.Helper
 					break;
 				case StatOutputFormat.None:
 				default:
+					break;
+				case StatOutputFormat.TSV:
 					break;
 			}
 			sw.Write(end);
