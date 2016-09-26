@@ -747,6 +747,7 @@ namespace SabreTools.Helper
 			{
 				roms.Sort(delegate (DatItem x, DatItem y)
 				{
+					NaturalComparer nc = new NaturalComparer();
 					if (x.SystemID == y.SystemID)
 					{
 						if (x.SourceID == y.SourceID)
@@ -757,9 +758,9 @@ namespace SabreTools.Helper
 								{
 									if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
 									{
-										return Style.CompareNumeric(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
+										return nc.Compare(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
 									}
-									return Style.CompareNumeric(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
+									return nc.Compare(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
 								}
 								else if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type != ItemType.Rom && y.Type != ItemType.Disk))
 								{
@@ -773,16 +774,16 @@ namespace SabreTools.Helper
 								{
 									if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
 									{
-										return Style.CompareNumeric(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
+										return nc.Compare(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
 									}
-									return Style.CompareNumeric(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
+									return nc.Compare(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
 								}
 							}
-							return Style.CompareNumeric(x.MachineName, y.MachineName);
+							return nc.Compare(x.MachineName, y.MachineName);
 						}
-						return (norename ? Style.CompareNumeric(x.MachineName, y.MachineName) : x.SourceID - y.SourceID);
+						return (norename ? nc.Compare(x.MachineName, y.MachineName) : x.SourceID - y.SourceID);
 					}
-					return (norename ? Style.CompareNumeric(x.MachineName, y.MachineName) : x.SystemID - y.SystemID);
+					return (norename ? nc.Compare(x.MachineName, y.MachineName) : x.SystemID - y.SystemID);
 				});
 				return true;
 			}
