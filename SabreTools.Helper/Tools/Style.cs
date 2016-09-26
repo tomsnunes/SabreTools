@@ -424,7 +424,7 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
 		/// </summary>
-		public static byte[] StringToByteArray(String hex)
+		public static byte[] StringToByteArray(string hex)
 		{
 			int NumberChars = hex.Length;
 			byte[] bytes = new byte[NumberChars / 2];
@@ -436,7 +436,7 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// http://stackoverflow.com/questions/5613279/c-sharp-hex-to-ascii
 		/// </summary>
-		public static string ConvertHexToAscii(String hexString)
+		public static string ConvertHexToAscii(string hexString)
 		{
 			if (hexString.Contains("-"))
 			{
