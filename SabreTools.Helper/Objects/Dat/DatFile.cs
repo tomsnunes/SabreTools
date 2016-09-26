@@ -5155,7 +5155,7 @@ namespace SabreTools.Helper
 				if (lastdir != null && thisdir != lastdir)
 				{
 					// Output separator if needed
-					OutputStatsWriteMid(sw, statOutputFormat);
+					OutputStatsWriteMidSeparator(sw, statOutputFormat);
 					
 					DatFile lastdirdat = new DatFile
 					{
@@ -5225,7 +5225,7 @@ namespace SabreTools.Helper
 			}
 
 			// Output the directory stats one last time
-			OutputStatsWriteMid(sw, statOutputFormat);
+			OutputStatsWriteMidSeparator(sw, statOutputFormat);
 
 			DatFile dirdat = new DatFile
 			{
@@ -5346,7 +5346,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 		/// </summary>
 		/// <param name="sw">StreamWriter representing the output</param>
 		/// <param name="statOutputFormat">StatOutputFormat representing output format</param>
-		private static void OutputStatsWriteMid(StreamWriter sw, StatOutputFormat statOutputFormat)
+		private static void OutputStatsWriteMidSeparator(StreamWriter sw, StatOutputFormat statOutputFormat)
 		{
 			string mid = "";
 			switch (statOutputFormat)
@@ -5374,6 +5374,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			switch (statOutputFormat)
 			{
 				case StatOutputFormat.CSV:
+					end = "\n";
 					break;
 				case StatOutputFormat.HTML:
 					end = @"		</table>
@@ -5381,8 +5382,10 @@ Please check the log folder if the stats scrolled offscreen", false);
 					break;
 				case StatOutputFormat.None:
 				default:
+					end = "\n";
 					break;
 				case StatOutputFormat.TSV:
+					end = "\n";
 					break;
 			}
 			sw.Write(end);
