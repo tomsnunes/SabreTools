@@ -144,9 +144,11 @@ namespace SabreTools.Helper
 					helptext.Add("  -hs, --hash-split	Split a DAT or folder by best-available hashes");
 					helptext.Add("	-out=			Output directory");
 					helptext.Add("  -st, --stats		Get statistics on all input DATs");
+					helptext.Add("	-bc, --baddump-col	Add baddump stats to output");
 					helptext.Add("	-csv, --csv			Output in Comma-Separated Value format");
 					helptext.Add("	-f=, --filename=	Set the filename for the output");
 					helptext.Add("	-html, --html		Output in HTML format");
+					helptext.Add("	-nc, --nodump-col	Add nodump stats to output");
 					helptext.Add("	-si, --single		Show individual statistics");
 					helptext.Add("	-tsv, --tsv			Output in Tab-Separated Value format");
 					helptext.Add("  -ts, --type-split		Split a DAT or folder by file types (rom/disk)");

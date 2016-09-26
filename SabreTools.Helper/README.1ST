@@ -322,6 +322,9 @@ Options:
 			- Roms that include a SHA-1
 			- Roms with Nodump status
 			
+		-bc, --baddump-col	Add statistics for baddumps to output
+			Add a new column or field for counting the number of baddumps in the DAT
+			
 		-csv, --csv			Write all statistics to CSV
 			Output all rom information in standardized CSV format
 			
@@ -330,6 +333,9 @@ Options:
 			
 		-html, --html		Write all statistics to HTML
 			This will output by default the combined statistics for all input DAT files.
+			
+		-nc, --nodump-col	Add statistics for nodumps to output
+			Add a new column or field for counting the number of nodumps in the DAT
 			
 		-si, --single		Show individual statistics
 			Optionally, the statistics for each of the individual input DATs can be output

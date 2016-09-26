@@ -283,11 +283,14 @@ namespace SabreTools
 		/// Wrap getting statistics on a DAT or folder of DATs
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
+		/// <param name="filename">Name of the file to output to, blank for default</param>
 		/// <param name="single">True to show individual DAT statistics, false otherwise</param>
+		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
+		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
 		/// <param name="statOutputFormat">Set the statistics output format to use</param>
-		private static void InitStats(List<string> inputs, string filename, bool single, StatOutputFormat statOutputFormat)
+		private static void InitStats(List<string> inputs, string filename, bool single, bool baddumpCol, bool nodumpCol, StatOutputFormat statOutputFormat)
 		{
-			DatFile.OutputStats(inputs, (String.IsNullOrEmpty(filename) ? "report" : filename), single, statOutputFormat, _logger);
+			DatFile.OutputStats(inputs, (String.IsNullOrEmpty(filename) ? "report" : filename), single, baddumpCol, nodumpCol, statOutputFormat, _logger);
 		}
 
 		/// <summary>

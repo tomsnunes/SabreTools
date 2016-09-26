@@ -56,7 +56,8 @@ namespace SabreTools.Helper
 		private long _crcCount;
 		private long _md5Count;
 		private long _sha1Count;
-		private long _itemStatusCount;
+		private long _baddumpCount;
+		private long _nodumpCount;
 
 		#endregion
 
@@ -257,10 +258,15 @@ namespace SabreTools.Helper
 			get { return _sha1Count; }
 			set { _sha1Count = value; }
 		}
+		public long BaddumpCount
+		{
+			get { return _baddumpCount; }
+			set { _baddumpCount = value; }
+		}
 		public long NodumpCount
 		{
-			get { return _itemStatusCount; }
-			set { _itemStatusCount = value; }
+			get { return _nodumpCount; }
+			set { _nodumpCount = value; }
 		}
 
 		#endregion
@@ -329,7 +335,7 @@ namespace SabreTools.Helper
 			_crcCount = 0;
 			_md5Count = 0;
 			_sha1Count = 0;
-			_itemStatusCount = 0;
+			_nodumpCount = 0;
 		}
 
 		/// <summary>
@@ -379,7 +385,7 @@ namespace SabreTools.Helper
 			_crcCount = 0;
 			_md5Count = 0;
 			_sha1Count = 0;
-			_itemStatusCount = 0;
+			_nodumpCount = 0;
 	}
 
 		#endregion
@@ -508,6 +514,7 @@ namespace SabreTools.Helper
 				CRCCount = this.CRCCount,
 				MD5Count = this.MD5Count,
 				SHA1Count = this.SHA1Count,
+				BaddumpCount = this.BaddumpCount,
 				NodumpCount = this.NodumpCount,
 			};
 		}
@@ -2888,6 +2895,7 @@ namespace SabreTools.Helper
 							TotalSize += 0;
 							MD5Count += (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
 							SHA1Count += (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
+							BaddumpCount += (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
 							NodumpCount += (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
 							break;
 						case ItemType.Rom:
@@ -2899,6 +2907,7 @@ namespace SabreTools.Helper
 							CRCCount += (String.IsNullOrEmpty(((Rom)item).CRC) ? 0 : 1);
 							MD5Count += (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
 							SHA1Count += (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
+							BaddumpCount += (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
 							NodumpCount += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
 							break;
 						default:
@@ -4311,6 +4320,7 @@ namespace SabreTools.Helper
 			CRCCount = 0;
 			MD5Count = 0;
 			SHA1Count = 0;
+			BaddumpCount = 0;
 			NodumpCount = 0;
 
 			// If we have a blank Dat in any way, return
@@ -4330,6 +4340,18 @@ namespace SabreTools.Helper
 					CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
 					MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
 					SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
+					BaddumpCount += (rom.Type == ItemType.Disk 
+						? (((Disk)rom).ItemStatus == ItemStatus.BadDump ? 1 : 0)
+						: (rom.Type == ItemType.Rom
+							? (((Rom)rom).ItemStatus == ItemStatus.BadDump ? 1 : 0)
+							: 0)
+						);
+					NodumpCount += (rom.Type == ItemType.Disk
+							? (((Disk)rom).ItemStatus == ItemStatus.Nodump ? 1 : 0)
+							: (rom.Type == ItemType.Rom
+								? (((Rom)rom).ItemStatus == ItemStatus.Nodump ? 1 : 0)
+								: 0)
+							);
 				}
 			}
 		}
@@ -4342,7 +4364,9 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for file and console writing</param>
 		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
 		/// <param name="game">Number of games to use, -1 means recalculate games (default)</param>
-		public void OutputStats(StreamWriter sw, StatOutputFormat statOutputFormat, Logger logger, bool recalculate = false, long game = -1)
+		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise (default)</param>
+		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise (default)</param>
+		public void OutputStats(StreamWriter sw, StatOutputFormat statOutputFormat, Logger logger, bool recalculate = false, long game = -1, bool baddumpCol = false, bool nodumpCol = false)
 		{
 			// If we're supposed to recalculate the statistics, do so
 			if (recalculate)
@@ -4357,7 +4381,7 @@ namespace SabreTools.Helper
 			}
 
 			// Log the results to screen
-			logger.User(@"For '" + FileName + @"':
+			string results = @"For '" + FileName + @"':
 --------------------------------------------------
     Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
     Games found:             " + (game == -1 ? Files.Count : game) + @"
@@ -4365,10 +4389,18 @@ namespace SabreTools.Helper
     Disks found:             " + DiskCount + @"
     Roms with CRC:           " + CRCCount + @"
     Roms with MD5:           " + MD5Count + @"
-    Roms with SHA-1:         " + SHA1Count + @"
-    Roms with Nodump status: " + NodumpCount + @"
+    Roms with SHA-1:         " + SHA1Count + "\n";
 
-");
+			if (baddumpCol)
+			{
+				results += "    Roms with BadDump status: " + BaddumpCount + "\n";
+			}
+			if (nodumpCol)
+			{
+				results += "    Roms with Nodump status: " + NodumpCount + "\n";
+			}
+
+			logger.User(results);
 
 			// Now write it out to file as well
 			string line = "";
@@ -4382,8 +4414,18 @@ namespace SabreTools.Helper
 						+ "\"" + DiskCount + "\","
 						+ "\"" + CRCCount + "\","
 						+ "\"" + MD5Count + "\","
-						+ "\"" + SHA1Count + "\","
-						+ "\"" + NodumpCount + "\"\n";
+						+ "\"" + SHA1Count + "\"";
+
+					if (baddumpCol)
+					{
+						line += ",\"" + BaddumpCount + "\"";
+					}
+					if (nodumpCol)
+					{
+						line += ",\"" + NodumpCount + "\"";
+					}
+
+					line += "\n";
 					break;
 				case StatOutputFormat.HTML:
 					line = "\t\t\t<tr><td>" + HttpUtility.HtmlEncode(FileName) + "</td>"
@@ -4393,9 +4435,18 @@ namespace SabreTools.Helper
 						+ "<td>" + DiskCount + "</td>"
 						+ "<td>" + CRCCount + "</td>"
 						+ "<td>" + MD5Count + "</td>"
-						+ "<td>" + SHA1Count + "</td>"
-						+ "<td>" + NodumpCount + "</td>"
-						+ "</tr>\n";
+						+ "<td>" + SHA1Count + "</td>";
+
+					if (baddumpCol)
+					{
+						line += "<td>" + BaddumpCount + "</td>";
+					}
+					if (nodumpCol)
+					{
+						line += "<td>" + NodumpCount + "</td>";
+					}
+
+					line += "</tr>\n";
 					break;
 				case StatOutputFormat.None:
 				default:
@@ -4407,10 +4458,16 @@ namespace SabreTools.Helper
     Disks found:             " + DiskCount + @"
     Roms with CRC:           " + CRCCount + @"
     Roms with MD5:           " + MD5Count + @"
-    Roms with SHA-1:         " + SHA1Count + @"
-    Roms with Nodump status: " + NodumpCount + @"
+    Roms with SHA-1:         " + SHA1Count + "\n";
 
-";
+					if (baddumpCol)
+					{
+						line += "    Roms with BadDump status: " + BaddumpCount + "\n";
+					}
+					if (nodumpCol)
+					{
+						line += "    Roms with Nodump status: " + NodumpCount + "\n";
+					}
 					break;
 				case StatOutputFormat.TSV:
 					line = "\"" + FileName + "\"\t"
@@ -4420,8 +4477,18 @@ namespace SabreTools.Helper
 						+ "\"" + DiskCount + "\"\t"
 						+ "\"" + CRCCount + "\"\t"
 						+ "\"" + MD5Count + "\"\t"
-						+ "\"" + SHA1Count + "\"\t"
-						+ "\"" + NodumpCount + "\"\n";
+						+ "\"" + SHA1Count + "\"";
+
+					if (baddumpCol)
+					{
+						line += "\t\"" + BaddumpCount + "\"";
+					}
+					if (nodumpCol)
+					{
+						line += "\t\"" + NodumpCount + "\"";
+					}
+
+					line += "\n";
 					break;
 			}
 
@@ -5093,9 +5160,12 @@ namespace SabreTools.Helper
 		/// <param name="inputs">List of input files and folders</param>
 		/// <param name="reportName">Name of the output file</param>
 		/// <param name="single">True if single DAT stats are output, false otherwise</param>
+		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
+		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
 		/// <param name="statOutputFormat" > Set the statistics output format to use</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public static void OutputStats(List<string> inputs, string reportName, bool single, StatOutputFormat statOutputFormat, Logger logger)
+		public static void OutputStats(List<string> inputs, string reportName, bool single, bool baddumpCol,
+			bool nodumpCol, StatOutputFormat statOutputFormat, Logger logger)
 		{
 			reportName += OutputStatsGetExtension(statOutputFormat);
 			StreamWriter sw = new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write));
@@ -5122,7 +5192,7 @@ namespace SabreTools.Helper
 				.ToList();
 
 			// Write the header, if any
-			OutputStatsWriteHeader(sw, statOutputFormat);
+			OutputStatsWriteHeader(sw, statOutputFormat, baddumpCol, nodumpCol);
 
 			// Init all total variables
 			long totalSize = 0;
@@ -5132,6 +5202,7 @@ namespace SabreTools.Helper
 			long totalCRC = 0;
 			long totalMD5 = 0;
 			long totalSHA1 = 0;
+			long totalBaddump = 0;
 			long totalNodump = 0;
 
 			// Init directory-level variables
@@ -5143,6 +5214,7 @@ namespace SabreTools.Helper
 			long dirCRC = 0;
 			long dirMD5 = 0;
 			long dirSHA1 = 0;
+			long dirBaddump = 0;
 			long dirNodump = 0;
 
 			// Now process each of the input files
@@ -5155,7 +5227,7 @@ namespace SabreTools.Helper
 				if (lastdir != null && thisdir != lastdir)
 				{
 					// Output separator if needed
-					OutputStatsWriteMidSeparator(sw, statOutputFormat);
+					OutputStatsWriteMidSeparator(sw, statOutputFormat, baddumpCol, nodumpCol);
 					
 					DatFile lastdirdat = new DatFile
 					{
@@ -5166,15 +5238,16 @@ namespace SabreTools.Helper
 						CRCCount = dirCRC,
 						MD5Count = dirMD5,
 						SHA1Count = dirSHA1,
+						BaddumpCount = dirBaddump,
 						NodumpCount = dirNodump,
 					};
-					lastdirdat.OutputStats(sw, statOutputFormat, logger, game: dirGame);
+					lastdirdat.OutputStats(sw, statOutputFormat, logger, game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 
 					// Write the mid-footer, if any
 					OutputStatsWriteMidFooter(sw, statOutputFormat);
 
 					// Write the header, if any
-					OutputStatsWriteHeader(sw, statOutputFormat);
+					OutputStatsWriteHeader(sw, statOutputFormat, baddumpCol, nodumpCol);
 
 					// Reset the directory stats
 					dirSize = 0;
@@ -5184,6 +5257,7 @@ namespace SabreTools.Helper
 					dirCRC = 0;
 					dirMD5 = 0;
 					dirSHA1 = 0;
+					dirBaddump = 0;
 					dirNodump = 0;
 				}
 
@@ -5197,7 +5271,7 @@ namespace SabreTools.Helper
 				logger.User("Adding stats for file '" + filename + "'\n", false);
 				if (single)
 				{
-					datdata.OutputStats(sw, statOutputFormat, logger);
+					datdata.OutputStats(sw, statOutputFormat, logger, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 				}
 
 				// Add single DAT stats to dir
@@ -5208,6 +5282,7 @@ namespace SabreTools.Helper
 				dirCRC += datdata.CRCCount;
 				dirMD5 += datdata.MD5Count;
 				dirSHA1 += datdata.SHA1Count;
+				dirBaddump += datdata.BaddumpCount;
 				dirNodump += datdata.NodumpCount;
 
 				// Add single DAT stats to totals
@@ -5218,6 +5293,7 @@ namespace SabreTools.Helper
 				totalCRC += datdata.CRCCount;
 				totalMD5 += datdata.MD5Count;
 				totalSHA1 += datdata.SHA1Count;
+				totalBaddump += datdata.BaddumpCount;
 				totalNodump += datdata.NodumpCount;
 
 				// Make sure to assign the new directory
@@ -5225,26 +5301,30 @@ namespace SabreTools.Helper
 			}
 
 			// Output the directory stats one last time
-			OutputStatsWriteMidSeparator(sw, statOutputFormat);
+			OutputStatsWriteMidSeparator(sw, statOutputFormat, baddumpCol, nodumpCol);
 
-			DatFile dirdat = new DatFile
+			if (single)
 			{
-				FileName = lastdir,
-				TotalSize = dirSize,
-				RomCount = dirRom,
-				DiskCount = dirDisk,
-				CRCCount = dirCRC,
-				MD5Count = dirMD5,
-				SHA1Count = dirSHA1,
-				NodumpCount = dirNodump,
-			};
-			dirdat.OutputStats(sw, statOutputFormat, logger, game: dirGame);
+				DatFile dirdat = new DatFile
+				{
+					FileName = lastdir,
+					TotalSize = dirSize,
+					RomCount = dirRom,
+					DiskCount = dirDisk,
+					CRCCount = dirCRC,
+					MD5Count = dirMD5,
+					SHA1Count = dirSHA1,
+					BaddumpCount = dirBaddump,
+					NodumpCount = dirNodump,
+				};
+				dirdat.OutputStats(sw, statOutputFormat, logger, game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
+			}
 
 			// Write the mid-footer, if any
 			OutputStatsWriteMidFooter(sw, statOutputFormat);
 
 			// Write the header, if any
-			OutputStatsWriteHeader(sw, statOutputFormat);
+			OutputStatsWriteHeader(sw, statOutputFormat, baddumpCol, nodumpCol);
 
 			// Reset the directory stats
 			dirSize = 0;
@@ -5266,6 +5346,7 @@ namespace SabreTools.Helper
 				CRCCount = totalCRC,
 				MD5Count = totalMD5,
 				SHA1Count = totalSHA1,
+				BaddumpCount = totalBaddump,
 				NodumpCount = totalNodump,
 			};
 			totaldata.OutputStats(sw, statOutputFormat, logger, game: totalGame);
@@ -5312,13 +5393,16 @@ Please check the log folder if the stats scrolled offscreen", false);
 		/// </summary>
 		/// <param name="sw">StreamWriter representing the output</param>
 		/// <param name="statOutputFormat">StatOutputFormat representing output format</param>
-		private static void OutputStatsWriteHeader(StreamWriter sw, StatOutputFormat statOutputFormat)
+		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
+		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
+		private static void OutputStatsWriteHeader(StreamWriter sw, StatOutputFormat statOutputFormat, bool baddumpCol, bool nodumpCol)
 		{
 			string head = "";
 			switch (statOutputFormat)
 			{
 				case StatOutputFormat.CSV:
-					head = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\",\"Nodumps\"\n";
+					head = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\""
+						+ (baddumpCol ? ",\"BadDumps\"" : "") + (nodumpCol ? ",\"Nodumps\"" : "") + "\n";
 					break;
 				case StatOutputFormat.HTML:
 					head = @"<!DOCTYPE html>
@@ -5329,13 +5413,14 @@ Please check the log folder if the stats scrolled offscreen", false);
 	<body>
 		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
 			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
-+ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th><th>Nodumps</th></tr>\n";
++ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th>" + (baddumpCol ? "<th>Baddumps</th>" : "") + (nodumpCol ? "<th>Nodumps</th>" : "") + "</tr>\n";
 					break;
 				case StatOutputFormat.None:
 				default:
 					break;
 				case StatOutputFormat.TSV:
-					head = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\"\t\"Nodumps\"\n";
+					head = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\""
+						+ (baddumpCol ? "\t\"BadDumps\"" : "") + (nodumpCol ? "\t\"Nodumps\"" : "") + "\n";
 					break;
 			}
 			sw.Write(head);
@@ -5346,7 +5431,9 @@ Please check the log folder if the stats scrolled offscreen", false);
 		/// </summary>
 		/// <param name="sw">StreamWriter representing the output</param>
 		/// <param name="statOutputFormat">StatOutputFormat representing output format</param>
-		private static void OutputStatsWriteMidSeparator(StreamWriter sw, StatOutputFormat statOutputFormat)
+		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
+		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
+		private static void OutputStatsWriteMidSeparator(StreamWriter sw, StatOutputFormat statOutputFormat, bool baddumpCol, bool nodumpCol)
 		{
 			string mid = "";
 			switch (statOutputFormat)
@@ -5354,7 +5441,14 @@ Please check the log folder if the stats scrolled offscreen", false);
 				case StatOutputFormat.CSV:
 					break;
 				case StatOutputFormat.HTML:
-					mid = "<tr><td colspan=\"9\"></td></tr>\n";
+					mid = "<tr><td colspan=\""
+						+ (baddumpCol && nodumpCol
+							? "11"
+							: (baddumpCol ^ nodumpCol
+								? "10"
+								: "9")
+							)
+						+ "\"></td></tr>\n";
 					break;
 				case StatOutputFormat.None:
 				default:

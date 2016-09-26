@@ -51,6 +51,7 @@ namespace SabreTools
 				addBlanks = false,
 				addDate = false,
 				archivesAsFiles = false,
+				baddumpColumn = false,
 				bare = false,
 				clean = false,
 				copyFiles = false,
@@ -64,6 +65,7 @@ namespace SabreTools
 				headerer = false,
 				inplace = false,
 				merge = false,
+				nodumpColumn = false,
 				noMD5 = false,
 				noSHA1 = false,
 				quotes = false,
@@ -148,6 +150,10 @@ namespace SabreTools
 					case "--bare":
 						bare = true;
 						break;
+					case "-bc":
+					case "--baddump-col":
+						baddumpColumn = true;
+						break;
 					case "-c":
 					case "--cascade":
 						cascade = true;
@@ -225,6 +231,10 @@ namespace SabreTools
 					case "-m":
 					case "--merge":
 						merge = true;
+						break;
+					case "-nc":
+					case "--nodump-col":
+						nodumpColumn = true;
 						break;
 					case "-nm":
 					case "--noMD5":
@@ -574,7 +584,7 @@ namespace SabreTools
 			// Get statistics on input files
 			else if (stats)
 			{
-				InitStats(inputs, filename, single, statOutputFormat);
+				InitStats(inputs, filename, single, baddumpColumn, nodumpColumn, statOutputFormat);
 			}
 
 			// Split a DAT by item type
