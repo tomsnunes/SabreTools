@@ -756,11 +756,7 @@ namespace SabreTools.Helper
 							{
 								if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type == ItemType.Rom || y.Type == ItemType.Disk))
 								{
-									if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
-									{
-										return nc.Compare(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
-									}
-									return nc.Compare(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
+									return nc.Compare(x.Name, y.Name);
 								}
 								else if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type != ItemType.Rom && y.Type != ItemType.Disk))
 								{
@@ -772,11 +768,7 @@ namespace SabreTools.Helper
 								}
 								else
 								{
-									if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
-									{
-										return nc.Compare(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
-									}
-									return nc.Compare(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
+									return nc.Compare(x.Name, y.Name);
 								}
 							}
 							return nc.Compare(x.MachineName, y.MachineName);
