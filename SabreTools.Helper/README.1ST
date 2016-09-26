@@ -310,18 +310,6 @@ Options:
 		This should only be used if one of the inputs starts with a flag or another already
 		defined input.
 		
-	-html, --html		Get statistics on all input DATs written to HTML
-		This will output by default the combined statistics for all input DAT files. The stats
-		that are outputted are as follows:
-			- Total uncompressed size
-			- Number of games found
-			- Number of roms found
-			- Number of disks found
-			- Roms that include a CRC
-			- Roms that include a MD5
-			- Roms that include a SHA-1
-			- Roms with Nodump status
-		
 	-st, --stats		Get statistics on all input DATs
 		This will output by default the combined statistics for all input DAT files. The stats
 		that are outputted are as follows:
@@ -334,10 +322,19 @@ Options:
 			- Roms that include a SHA-1
 			- Roms with Nodump status
 			
+		-csv, --csv			Write all statistics to CSV
+			Output all rom information in standardized CSV format
+			
+		-html, --html		Write all statistics to HTML
+			This will output by default the combined statistics for all input DAT files.
+			
 		-si, --single		Show individual statistics
 			Optionally, the statistics for each of the individual input DATs can be output
 			as well. This can be useful to show where the size or amount of files found
 			in the combined totals can be broken down from.
+			
+		-tsv, --tsv			Output in Tab-Separated Value format
+			Output all rom information in standardized TSV format
 			
 	-ts, --type-split		Split a DAT or folder by file types (rom/disk)
 		For a DAT, or set of DATs, allow for splitting based on the types of the files,

@@ -246,15 +246,6 @@ namespace SabreTools
 		}
 
 		/// <summary>
-		/// Wrap getting statistics on a DAT or folder of DATs to HTML
-		/// </summary>
-		/// <param name="inputs">List of inputs to be used</param>
-		private static void InitHTMLStats(List<string> inputs)
-		{
-			DatFile.OutputHTMLStats(inputs, _logger);
-		}
-
-		/// <summary>
 		/// Wrap sorting files using an input DAT
 		/// </summary>
 		/// <param name="datfiles">Names of the DATs to compare against</param>
@@ -293,11 +284,10 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
 		/// <param name="single">True to show individual DAT statistics, false otherwise</param>
-		private static void InitStats(List<string> inputs, bool single)
+		/// <param name="statOutputFormat">Set the statistics output format to use</param>
+		private static void InitStats(List<string> inputs, bool single, StatOutputFormat statOutputFormat)
 		{
-			Logger statlog = new Logger(true, "stats.txt");
-			DatFile.OutputStats(inputs, single, _logger, statlog);
-			statlog.Close(true);
+			DatFile.OutputStats(inputs, "report", single, statOutputFormat, _logger);
 		}
 
 		/// <summary>

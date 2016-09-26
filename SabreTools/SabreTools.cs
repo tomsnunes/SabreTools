@@ -62,7 +62,6 @@ namespace SabreTools
 				forceunpack = false,
 				hashsplit = false,
 				headerer = false,
-				html = false,
 				inplace = false,
 				merge = false,
 				noMD5 = false,
@@ -89,6 +88,7 @@ namespace SabreTools
 				slt = -1,
 				seq = -1;
 			OutputFormat outputFormat = 0x0;
+			StatOutputFormat statOutputFormat = StatOutputFormat.None;
 			string addext = "",
 				author = "",
 				category = "",
@@ -159,6 +159,7 @@ namespace SabreTools
 					case "-csv":
 					case "--csv":
 						tsv = false;
+						statOutputFormat = StatOutputFormat.CSV;
 						break;
 					case "-clean":
 					case "--clean":
@@ -215,7 +216,7 @@ namespace SabreTools
 						break;
 					case "-html":
 					case "--html":
-						html = true;
+						statOutputFormat = StatOutputFormat.HTML;
 						break;
 					case "-ip":
 					case "--inplace":
@@ -324,6 +325,7 @@ namespace SabreTools
 					case "-tsv":
 					case "--tsv":
 						tsv = true;
+						statOutputFormat = StatOutputFormat.TSV;
 						break;
 					case "-u":
 					case "--unzip":
@@ -523,8 +525,8 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(extsplit ^ hashsplit ^ headerer ^ html ^ (datfromdir || merge || diffMode != 0 || update
-				|| outputFormat != 0 || tsv != null|| trim) ^ rem ^ stats ^ typesplit))
+			if (!(extsplit ^ hashsplit ^ headerer ^ (datfromdir || merge || diffMode != 0 || update
+				|| outputFormat != 0 || trim) ^ rem ^ stats ^ typesplit))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -533,8 +535,8 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (datfromdir || extsplit || hashsplit || headerer || html
-				|| (merge || diffMode != 0 || update || outputFormat != 0 || tsv != null) || stats || trim || typesplit))
+			if (inputs.Count == 0 && (datfromdir || extsplit || hashsplit || headerer
+				|| (merge || diffMode != 0 || update || outputFormat != 0) || stats || trim || typesplit))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -569,16 +571,10 @@ namespace SabreTools
 				InitHeaderer(inputs, restore, outDir);
 			}
 
-			// Get statistics on input files to HTML
-			else if (html)
-			{
-				InitHTMLStats(inputs);
-			}
-
 			// Get statistics on input files
 			else if (stats)
 			{
-				InitStats(inputs, single);
+				InitStats(inputs, single, statOutputFormat);
 			}
 
 			// Split a DAT by item type

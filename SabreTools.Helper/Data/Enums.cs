@@ -1,26 +1,5 @@
 ﻿namespace SabreTools.Helper
 {
-	#region DATabase
-
-	/// <summary>
-	/// Possible DAT import classes
-	/// </summary>
-	public enum DatType
-	{
-		none = 0,
-		Custom,
-		MAME,
-		NoIntro,
-		Redump,
-		TOSEC,
-		TruRip,
-		NonGood,
-		MaybeIntro,
-		Good,
-	}
-
-	#endregion
-
 	#region DatFile related
 
 	/// <summary>
@@ -95,6 +74,17 @@
 		Nodump = 3,
 		Verified = 4,
 		NotNodump = 5, // This is a fake flag that is used for filter only
+	}
+
+	/// <summary>
+	/// Determine which format to output Stats to
+	/// </summary>
+	public enum StatOutputFormat
+	{
+		None = 0,
+		HTML = 1,
+		CSV = 2,
+		TSV = 3,
 	}
 
 	#endregion

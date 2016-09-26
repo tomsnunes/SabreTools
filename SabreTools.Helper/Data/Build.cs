@@ -143,9 +143,11 @@ namespace SabreTools.Helper
 					helptext.Add("	-out=				Output directory");
 					helptext.Add("  -hs, --hash-split	Split a DAT or folder by best-available hashes");
 					helptext.Add("	-out=			Output directory");
-					helptext.Add("  -html, --html		Write statistics on all input DATs to HTML");
 					helptext.Add("  -st, --stats		Get statistics on all input DATs");
+					helptext.Add("	-csv, --csv			Output in Comma-Separated Value format");
+					helptext.Add("	-html, --html		Write stats to HTML");
 					helptext.Add("	-si, --single		Show individual statistics");
+					helptext.Add("	-tsv, --tsv			Output in Tab-Separated Value format");
 					helptext.Add("  -ts, --type-split		Split a DAT or folder by file types (rom/disk)");
 					helptext.Add("	-out=			Output directory");
 					helptext.Add("  -ud, --update		Update a DAT file");

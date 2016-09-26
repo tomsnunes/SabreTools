@@ -3003,7 +3003,9 @@ namespace SabreTools.Helper
 			// Output initial statistics, for kicks
 			if (stats)
 			{
-				OutputStats(logger, logger, (RomCount + DiskCount == 0));
+				StreamWriter sw = new StreamWriter(new MemoryStream());
+				OutputStats(sw, StatOutputFormat.None, logger, (RomCount + DiskCount == 0));
+				sw.Dispose();
 			}
 
 			// Bucket roms by game name and optionally dedupe
@@ -4335,11 +4337,12 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Output the stats for the Dat in a human-readable format
 		/// </summary>
+		/// <param name="sw">StreamWriter representing the output file or stream for the statistics</param>
+		/// <param name="statOutputFormat">Set the statistics output format to use</param>
 		/// <param name="logger">Logger object for file and console writing</param>
-		/// <param name="statLogger">Logger object for file and console output (statistics)</param>
 		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
 		/// <param name="game">Number of games to use, -1 means recalculate games (default)</param>
-		public void OutputStats(Logger logger, Logger statLogger, bool recalculate = false, long game = -1)
+		public void OutputStats(StreamWriter sw, StatOutputFormat statOutputFormat, Logger logger, bool recalculate = false, long game = -1)
 		{
 			// If we're supposed to recalculate the statistics, do so
 			if (recalculate)
@@ -4352,7 +4355,11 @@ namespace SabreTools.Helper
 			{
 				TotalSize = Int64.MaxValue + TotalSize;
 			}
-			statLogger.User("    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
+
+			// Log the results to screen
+			logger.User(@"For file '" + FileName + @"':
+--------------------------------------------------
+    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
     Games found:             " + (game == -1 ? Files.Count : game) + @"
     Roms found:              " + RomCount + @"
     Disks found:             " + DiskCount + @"
@@ -4360,39 +4367,66 @@ namespace SabreTools.Helper
     Roms with MD5:           " + MD5Count + @"
     Roms with SHA-1:         " + SHA1Count + @"
     Roms with Nodump status: " + NodumpCount + @"
-", false);
-		}
 
-		/// <summary>
-		/// Output the stats for the Dat in a human-readable HTML format
-		/// </summary>
-		/// <param name="sw">StreamWriter representing the output file or stream for the statistics</param>
-		/// <param name="logger">Logger object for file and console writing</param>
-		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
-		/// <param name="game">Number of games to use, -1 means recalculate games (default)</param>
-		public void OutputHTMLStats(StreamWriter sw, Logger logger, bool recalculate = false, long game = -1)
-		{
-			// If we're supposed to recalculate the statistics, do so
-			if (recalculate)
+");
+
+			// Now write it out to file as well
+			string line = "";
+			switch (statOutputFormat)
 			{
-				RecalculateStats();
+				case StatOutputFormat.CSV:
+					line = "\"" + FileName + "\","
+						+ "\"" + Style.GetBytesReadable(TotalSize) + "\","
+						+ "\"" + (game == -1 ? Files.Count : game) + "\","
+						+ "\"" + RomCount + "\","
+						+ "\"" + DiskCount + "\","
+						+ "\"" + CRCCount + "\","
+						+ "\"" + MD5Count + "\","
+						+ "\"" + SHA1Count + "\","
+						+ "\"" + NodumpCount + "\"\n";
+					break;
+				case StatOutputFormat.HTML:
+					line = "\t\t\t<tr><td>" + HttpUtility.HtmlEncode(FileName) + "</td>"
+						+ "<td>" + Style.GetBytesReadable(TotalSize) + "</td>"
+						+ "<td>" + (game == -1 ? Files.Count : game) + "</td>"
+						+ "<td>" + RomCount + "</td>"
+						+ "<td>" + DiskCount + "</td>"
+						+ "<td>" + CRCCount + "</td>"
+						+ "<td>" + MD5Count + "</td>"
+						+ "<td>" + SHA1Count + "</td>"
+						+ "<td>" + NodumpCount + "</td>"
+						+ "</tr>\n";
+					break;
+				case StatOutputFormat.None:
+				default:
+					line = @"For file '" + FileName + @"':
+--------------------------------------------------
+    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
+    Games found:             " + (game == -1 ? Files.Count : game) + @"
+    Roms found:              " + RomCount + @"
+    Disks found:             " + DiskCount + @"
+    Roms with CRC:           " + CRCCount + @"
+    Roms with MD5:           " + MD5Count + @"
+    Roms with SHA-1:         " + SHA1Count + @"
+    Roms with Nodump status: " + NodumpCount + @"
+
+";
+					break;
+				case StatOutputFormat.TSV:
+					line = "\"" + FileName + "\"\t"
+						+ "\"" + Style.GetBytesReadable(TotalSize) + "\"\t"
+						+ "\"" + (game == -1 ? Files.Count : game) + "\"\t"
+						+ "\"" + RomCount + "\"\t"
+						+ "\"" + DiskCount + "\"\t"
+						+ "\"" + CRCCount + "\"\t"
+						+ "\"" + MD5Count + "\"\t"
+						+ "\"" + SHA1Count + "\"\t"
+						+ "\"" + NodumpCount + "\"\n";
+					break;
 			}
 
-			BucketByGame(false, true, logger, false);
-			if (TotalSize < 0)
-			{
-				TotalSize = Int64.MaxValue + TotalSize;
-			}
-			sw.Write("\t\t\t<tr><td>" + HttpUtility.HtmlEncode(FileName) + "</td>"
-				+ "<td>" + Style.GetBytesReadable(TotalSize) + "</td>"
-				+ "<td>" + (game == -1 ? Files.Count : game) + "</td>"
-				+ "<td>" + RomCount + "</td>"
-				+ "<td>" + DiskCount + "</td>"
-				+ "<td>" + CRCCount + "</td>"
-				+ "<td>" + MD5Count + "</td>"
-				+ "<td>" + SHA1Count + "</td>"
-				+ "<td>" + NodumpCount + "</td>"
-				+ "</tr>\n");
+			// Output the line to the streamwriter
+			sw.Write(line);
 		}
 
 		#endregion
@@ -5057,99 +5091,31 @@ namespace SabreTools.Helper
 		/// Output the stats for a list of input dats as files in a human-readable format
 		/// </summary>
 		/// <param name="inputs">List of input files and folders</param>
+		/// <param name="reportName">Name of the output file</param>
 		/// <param name="single">True if single DAT stats are output, false otherwise</param>
+		/// <param name="statOutputFormat" > Set the statistics output format to use</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="statLogger">Logger object for file and console output (statistics)</param>
-		public static void OutputStats(List<string> inputs, bool single, Logger logger, Logger statLogger)
+		public static void OutputStats(List<string> inputs, string reportName, bool single, StatOutputFormat statOutputFormat, Logger logger)
 		{
-			// Make sure we have all files
-			List<string> newinputs = new List<string>();
-			foreach (string input in inputs)
+			string reportExtension = "";
+			switch (statOutputFormat)
 			{
-				if (File.Exists(input))
-				{
-					newinputs.Add(input);
-				}
-				if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.GetFiles(input, "*", SearchOption.AllDirectories))
-					{
-						newinputs.Add(file);
-					}
-				}
+				case StatOutputFormat.CSV:
+					reportExtension = ".csv";
+					break;
+				case StatOutputFormat.HTML:
+					reportExtension = ".html";
+					break;
+				case StatOutputFormat.None:
+				default:
+					reportExtension = ".txt";
+					break;
+				case StatOutputFormat.TSV:
+					reportExtension = ".csv";
+					break;
 			}
-
-			// Init all total variables
-			long totalSize = 0;
-			long totalGame = 0;
-			long totalRom = 0;
-			long totalDisk = 0;
-			long totalCRC = 0;
-			long totalMD5 = 0;
-			long totalSHA1 = 0;
-			long totalNodump = 0;
-
-			/// Now process each of the input files
-			foreach (string filename in newinputs)
-			{
-				logger.Verbose("Beginning stat collection for '" + filename + "'", false);
-				List<string> games = new List<string>();
-				DatFile datdata = new DatFile();
-				datdata.Parse(filename, 0, 0, logger);
-				datdata.BucketByGame(false, true, logger, false);
-
-				// Output single DAT stats (if asked)
-				if (single)
-				{
-					statLogger.User(@"\nFor file '" + filename + @"':
---------------------------------------------------", false);
-					datdata.OutputStats(logger, statLogger);
-				}
-				else
-				{
-					logger.User("Adding stats for file '" + filename + "'\n", false);
-				}
-
-				// Add single DAT stats to totals
-				totalSize += datdata.TotalSize;
-				totalGame += datdata.Files.Count;
-				totalRom += datdata.RomCount;
-				totalDisk += datdata.DiskCount;
-				totalCRC += datdata.CRCCount;
-				totalMD5 += datdata.MD5Count;
-				totalSHA1 += datdata.SHA1Count;
-				totalNodump += datdata.NodumpCount;
-			}
-
-			// Output total DAT stats
-			if (!single) { logger.User("", false); }
-			DatFile totaldata = new DatFile
-			{
-				TotalSize = totalSize,
-				RomCount = totalRom,
-				DiskCount = totalDisk,
-				CRCCount = totalCRC,
-				MD5Count = totalMD5,
-				SHA1Count = totalSHA1,
-				NodumpCount = totalNodump,
-			};
-			statLogger.User(@"For ALL DATs found
---------------------------------------------------", false);
-			totaldata.OutputStats(logger, statLogger, game: totalGame);
-			logger.User(@"
-Please check the log folder if the stats scrolled offscreen", false);
-		}
-
-		/// <summary>
-		/// Output the stats for a list of input dats as files in a human-readable HTML format
-		/// </summary>
-		/// <param name="inputs">List of input files and folders</param>
-		/// <param name="single">True if single DAT stats are output, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="statLogger">Logger object for file and console output (statistics)</param>
-		public static void OutputHTMLStats(List<string> inputs, Logger logger)
-		{
-			StreamWriter sw = new StreamWriter(File.OpenWrite("report.html"));
+			reportName += reportExtension;
+			StreamWriter sw = new StreamWriter(File.OpenWrite(reportName));
 
 			// Make sure we have all files
 			List<string> newinputs = new List<string>();
@@ -5167,17 +5133,6 @@ Please check the log folder if the stats scrolled offscreen", false);
 					}
 				}
 			}
-
-			// Write the HTML header
-			sw.Write(@"<!DOCTYPE html>
-<html>
-	<header>
-		<title>DAT Statistics Report</title>
-	</header>
-	<body>
-		<table border=""1"" cellpadding=""0"" cellspacing=""0"">
-			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
-+ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th><th>Nodumps</th></tr>\n");
 
 			// Init all total variables
 			long totalSize = 0;
@@ -5200,7 +5155,36 @@ Please check the log folder if the stats scrolled offscreen", false);
 
 				// Output single DAT stats (if asked)
 				logger.User("Adding stats for file '" + filename + "'\n", false);
-				datdata.OutputHTMLStats(sw, logger);
+				if (single)
+				{
+					string line = "";
+					switch (statOutputFormat)
+					{
+						case StatOutputFormat.CSV:
+							line = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\",\"Nodumps\"\n";
+							break;
+						case StatOutputFormat.HTML:
+							line = @"<!DOCTYPE html>
+<html>
+	<header>
+		<title>DAT Statistics Report</title>
+	</header>
+	<body>
+		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
+			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
++ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th><th>Nodumps</th></tr>\n";
+							break;
+						case StatOutputFormat.None:
+						default:
+							break;
+						case StatOutputFormat.TSV:
+							line = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\"\t\"Nodumps\"\n";
+							break;
+					}
+					sw.Write(line);
+
+					datdata.OutputStats(sw, statOutputFormat, logger);
+				}
 
 				// Add single DAT stats to totals
 				totalSize += datdata.TotalSize;
@@ -5213,12 +5197,25 @@ Please check the log folder if the stats scrolled offscreen", false);
 				totalNodump += datdata.NodumpCount;
 			}
 
-			sw.Write("<tr><td colspan=\"9\"></td></tr>");
+			// Output midpoint separator if needed
+			string mid = "";
+			switch (statOutputFormat)
+			{
+				case StatOutputFormat.CSV:
+					break;
+				case StatOutputFormat.HTML:
+					mid = "<tr><td colspan=\"9\"></td></tr>\n";
+					break;
+				case StatOutputFormat.None:
+				default:
+					break;
+			}
+			sw.Write(mid);
 
 			// Output total DAT stats
 			DatFile totaldata = new DatFile
 			{
-				FileName = "Totals",
+				FileName = "ALL",
 				TotalSize = totalSize,
 				RomCount = totalRom,
 				DiskCount = totalDisk,
@@ -5227,15 +5224,31 @@ Please check the log folder if the stats scrolled offscreen", false);
 				SHA1Count = totalSHA1,
 				NodumpCount = totalNodump,
 			};
-			totaldata.OutputHTMLStats(sw, logger, game: totalGame);
+			totaldata.OutputStats(sw, statOutputFormat, logger, game: totalGame);
 
-			// Write HTML footer
-			sw.Write(@"		</table>
+			// Output footer if needed
+			string end = "";
+			switch (statOutputFormat)
+			{
+				case StatOutputFormat.CSV:
+					break;
+				case StatOutputFormat.HTML:
+					end = @"		</table>
 	</body>
 </html>
-");
+";
+					break;
+				case StatOutputFormat.None:
+				default:
+					break;
+			}
+			sw.Write(end);
+
 			sw.Flush();
 			sw.Dispose();
+
+			logger.User(@"
+Please check the log folder if the stats scrolled offscreen", false);
 		}
 
 		#endregion
