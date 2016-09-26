@@ -5097,24 +5097,7 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for file and console output</param>
 		public static void OutputStats(List<string> inputs, string reportName, bool single, StatOutputFormat statOutputFormat, Logger logger)
 		{
-			string reportExtension = "";
-			switch (statOutputFormat)
-			{
-				case StatOutputFormat.CSV:
-					reportExtension = ".csv";
-					break;
-				case StatOutputFormat.HTML:
-					reportExtension = ".html";
-					break;
-				case StatOutputFormat.None:
-				default:
-					reportExtension = ".txt";
-					break;
-				case StatOutputFormat.TSV:
-					reportExtension = ".csv";
-					break;
-			}
-			reportName += reportExtension;
+			reportName += OutputStatsGetExtension(statOutputFormat);
 			StreamWriter sw = new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write));
 
 			// Make sure we have all files
@@ -5136,34 +5119,10 @@ namespace SabreTools.Helper
 			newinputs = newinputs
 				.OrderBy(i => Path.GetDirectoryName(i))
 				.ThenBy(i => Path.GetFileName(i))
-				.ToList(); // newinputs.Sort(new NaturalComparer())
+				.ToList();
 
 			// Write the header, if any
-			string head = "";
-			switch (statOutputFormat)
-			{
-				case StatOutputFormat.CSV:
-					head = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\",\"Nodumps\"\n";
-					break;
-				case StatOutputFormat.HTML:
-					head = @"<!DOCTYPE html>
-<html>
-	<header>
-		<title>DAT Statistics Report</title>
-	</header>
-	<body>
-		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
-			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
-+ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th><th>Nodumps</th></tr>\n";
-					break;
-				case StatOutputFormat.None:
-				default:
-					break;
-				case StatOutputFormat.TSV:
-					head = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\"\t\"Nodumps\"\n";
-					break;
-			}
-			sw.Write(head);
+			OutputStatsWriteHeader(sw, statOutputFormat);
 
 			// Init all total variables
 			long totalSize = 0;
@@ -5196,19 +5155,7 @@ namespace SabreTools.Helper
 				if (lastdir != null && thisdir != lastdir)
 				{
 					// Output separator if needed
-					string imid = "";
-					switch (statOutputFormat)
-					{
-						case StatOutputFormat.CSV:
-							break;
-						case StatOutputFormat.HTML:
-							imid = "<tr><td colspan=\"9\"></td></tr>\n";
-							break;
-						case StatOutputFormat.None:
-						default:
-							break;
-					}
-					sw.Write(imid);
+					OutputStatsWriteMid(sw, statOutputFormat);
 					
 					DatFile lastdirdat = new DatFile
 					{
@@ -5223,50 +5170,11 @@ namespace SabreTools.Helper
 					};
 					lastdirdat.OutputStats(sw, statOutputFormat, logger, game: dirGame);
 
-					// Write the footer, if any
-					string iend = "";
-					switch (statOutputFormat)
-					{
-						case StatOutputFormat.CSV:
-							break;
-						case StatOutputFormat.HTML:
-							iend = @"		</table>
-<p/>";
-							break;
-						case StatOutputFormat.None:
-						default:
-							break;
-						case StatOutputFormat.TSV:
-							break;
-					}
-					sw.Write(iend);
+					// Write the mid-footer, if any
+					OutputStatsWriteMidFooter(sw, statOutputFormat);
 
 					// Write the header, if any
-					string ihead = "";
-					switch (statOutputFormat)
-					{
-						case StatOutputFormat.CSV:
-							ihead = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\",\"Nodumps\"\n";
-							break;
-						case StatOutputFormat.HTML:
-							ihead = @"<!DOCTYPE html>
-<html>
-	<header>
-		<title>DAT Statistics Report</title>
-	</header>
-	<body>
-		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
-			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
-		+ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th><th>Nodumps</th></tr>\n";
-							break;
-						case StatOutputFormat.None:
-						default:
-							break;
-						case StatOutputFormat.TSV:
-							ihead = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\"\t\"Nodumps\"\n";
-							break;
-					}
-					sw.Write(ihead);
+					OutputStatsWriteHeader(sw, statOutputFormat);
 
 					// Reset the directory stats
 					dirSize = 0;
@@ -5317,19 +5225,7 @@ namespace SabreTools.Helper
 			}
 
 			// Output the directory stats one last time
-			string mid = "";
-			switch (statOutputFormat)
-			{
-				case StatOutputFormat.CSV:
-					break;
-				case StatOutputFormat.HTML:
-					mid = "<tr><td colspan=\"9\"></td></tr>\n";
-					break;
-				case StatOutputFormat.None:
-				default:
-					break;
-			}
-			sw.Write(mid);
+			OutputStatsWriteMid(sw, statOutputFormat);
 
 			DatFile dirdat = new DatFile
 			{
@@ -5344,50 +5240,11 @@ namespace SabreTools.Helper
 			};
 			dirdat.OutputStats(sw, statOutputFormat, logger, game: dirGame);
 
-			// Write the footer, if any
-			string end = "";
-			switch (statOutputFormat)
-			{
-				case StatOutputFormat.CSV:
-					break;
-				case StatOutputFormat.HTML:
-					end = @"		</table>
-<p/>";
-					break;
-				case StatOutputFormat.None:
-				default:
-					break;
-				case StatOutputFormat.TSV:
-					break;
-			}
-			sw.Write(end);
+			// Write the mid-footer, if any
+			OutputStatsWriteMidFooter(sw, statOutputFormat);
 
 			// Write the header, if any
-			head = "";
-			switch (statOutputFormat)
-			{
-				case StatOutputFormat.CSV:
-					head = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\",\"Nodumps\"\n";
-					break;
-				case StatOutputFormat.HTML:
-					head = @"<!DOCTYPE html>
-<html>
-	<header>
-		<title>DAT Statistics Report</title>
-	</header>
-	<body>
-		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
-			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
-+ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th><th>Nodumps</th></tr>\n";
-					break;
-				case StatOutputFormat.None:
-				default:
-					break;
-				case StatOutputFormat.TSV:
-					head = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\"\t\"Nodumps\"\n";
-					break;
-			}
-			sw.Write(head);
+			OutputStatsWriteHeader(sw, statOutputFormat);
 
 			// Reset the directory stats
 			dirSize = 0;
@@ -5414,7 +5271,131 @@ namespace SabreTools.Helper
 			totaldata.OutputStats(sw, statOutputFormat, logger, game: totalGame);
 
 			// Output footer if needed
-			end = "";
+			OutputStatsWriteFooter(sw, statOutputFormat);
+
+			sw.Flush();
+			sw.Dispose();
+
+			logger.User(@"
+Please check the log folder if the stats scrolled offscreen", false);
+		}
+
+		/// <summary>
+		/// Get the proper extension for the stat output format
+		/// </summary>
+		/// <param name="statOutputFormat">StatOutputFormat to get the extension for</param>
+		/// <returns>File extension with leading period</returns>
+		private static string OutputStatsGetExtension(StatOutputFormat statOutputFormat)
+		{
+			string reportExtension = "";
+			switch (statOutputFormat)
+			{
+				case StatOutputFormat.CSV:
+					reportExtension = ".csv";
+					break;
+				case StatOutputFormat.HTML:
+					reportExtension = ".html";
+					break;
+				case StatOutputFormat.None:
+				default:
+					reportExtension = ".txt";
+					break;
+				case StatOutputFormat.TSV:
+					reportExtension = ".csv";
+					break;
+			}
+			return reportExtension;
+		}
+
+		/// <summary>
+		/// Write out the header to the stream, if any exists
+		/// </summary>
+		/// <param name="sw">StreamWriter representing the output</param>
+		/// <param name="statOutputFormat">StatOutputFormat representing output format</param>
+		private static void OutputStatsWriteHeader(StreamWriter sw, StatOutputFormat statOutputFormat)
+		{
+			string head = "";
+			switch (statOutputFormat)
+			{
+				case StatOutputFormat.CSV:
+					head = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\",\"Nodumps\"\n";
+					break;
+				case StatOutputFormat.HTML:
+					head = @"<!DOCTYPE html>
+<html>
+	<header>
+		<title>DAT Statistics Report</title>
+	</header>
+	<body>
+		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
+			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
++ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th><th>Nodumps</th></tr>\n";
+					break;
+				case StatOutputFormat.None:
+				default:
+					break;
+				case StatOutputFormat.TSV:
+					head = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\"\t\"Nodumps\"\n";
+					break;
+			}
+			sw.Write(head);
+		}
+
+		/// <summary>
+		/// Write out the separator to the stream, if any exists
+		/// </summary>
+		/// <param name="sw">StreamWriter representing the output</param>
+		/// <param name="statOutputFormat">StatOutputFormat representing output format</param>
+		private static void OutputStatsWriteMid(StreamWriter sw, StatOutputFormat statOutputFormat)
+		{
+			string mid = "";
+			switch (statOutputFormat)
+			{
+				case StatOutputFormat.CSV:
+					break;
+				case StatOutputFormat.HTML:
+					mid = "<tr><td colspan=\"9\"></td></tr>\n";
+					break;
+				case StatOutputFormat.None:
+				default:
+					break;
+			}
+			sw.Write(mid);
+		}
+
+		/// <summary>
+		/// Write out the footer-separator to the stream, if any exists
+		/// </summary>
+		/// <param name="sw">StreamWriter representing the output</param>
+		/// <param name="statOutputFormat">StatOutputFormat representing output format</param>
+		private static void OutputStatsWriteMidFooter(StreamWriter sw, StatOutputFormat statOutputFormat)
+		{
+			string end = "";
+			switch (statOutputFormat)
+			{
+				case StatOutputFormat.CSV:
+					break;
+				case StatOutputFormat.HTML:
+					end = @"		</table>
+<p/>";
+					break;
+				case StatOutputFormat.None:
+				default:
+					break;
+				case StatOutputFormat.TSV:
+					break;
+			}
+			sw.Write(end);
+		}
+
+		/// <summary>
+		/// Write out the footer to the stream, if any exists
+		/// </summary>
+		/// <param name="sw">StreamWriter representing the output</param>
+		/// <param name="statOutputFormat">StatOutputFormat representing output format</param>
+		private static void OutputStatsWriteFooter(StreamWriter sw, StatOutputFormat statOutputFormat)
+		{
+			string end = "";
 			switch (statOutputFormat)
 			{
 				case StatOutputFormat.CSV:
@@ -5432,12 +5413,6 @@ namespace SabreTools.Helper
 					break;
 			}
 			sw.Write(end);
-
-			sw.Flush();
-			sw.Dispose();
-
-			logger.User(@"
-Please check the log folder if the stats scrolled offscreen", false);
 		}
 
 		#endregion
