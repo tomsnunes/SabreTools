@@ -4357,7 +4357,7 @@ namespace SabreTools.Helper
 			}
 
 			// Log the results to screen
-			logger.User(@"For file '" + FileName + @"':
+			logger.User(@"For '" + FileName + @"':
 --------------------------------------------------
     Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
     Games found:             " + (game == -1 ? Files.Count : game) + @"
@@ -4399,7 +4399,7 @@ namespace SabreTools.Helper
 					break;
 				case StatOutputFormat.None:
 				default:
-					line = @"For file '" + FileName + @"':
+					line = @"'" + FileName + @"':
 --------------------------------------------------
     Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
     Games found:             " + (game == -1 ? Files.Count : game) + @"
