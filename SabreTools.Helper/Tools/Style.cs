@@ -351,6 +351,20 @@ namespace SabreTools.Helper
 
 		#endregion
 
+		#region String Manipulation
+
+		/// <summary>
+		/// Get if a string contains Unicode characters
+		/// </summary>
+		/// <param name="s">Input string to test</param>
+		/// <returns>True if the string contains at least one Unicode character, false otherwise</returns>
+		public static bool IsUnicode(string s)
+		{
+			return (s.Any(c => c > 255));
+		}
+
+		#endregion
+
 		#region Externally sourced methods
 
 		/// <summary>
@@ -408,23 +422,6 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Converts a string to sentence case.
-		/// </summary>
-		/// <param name="input">The string to convert.</param>
-		/// <returns>A string representing a sentence case string</returns>
-		/// <remarks>http://stackoverflow.com/questions/3141426/net-method-to-convert-a-string-to-sentence-case</remarks>
-		public static string SentenceCase(string input)
-		{
-			if (input.Length < 1)
-			{
-				return input;
-			}
-
-			string sentence = input.ToLower();
-			return sentence[0].ToString().ToUpper() + sentence.Substring(1);
-		}
-
-		/// <summary>
 		/// http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
 		/// </summary>
 		public static byte[] StringToByteArray(String hex)
@@ -474,17 +471,6 @@ namespace SabreTools.Helper
 			}
 
 			return hexOutput;
-		}
-
-		/// <summary>
-		/// https://github.com/gjefferyes/RomVault/blob/master/ROMVault2/SupportedFiles/Zip/zipFile.cs
-		/// </summary>
-		public static bool IsUnicode(string s)
-		{
-			char[] c = s.ToCharArray();
-			for (int i = 0; i < c.Length; i++)
-				if (c[i] > 255) return true;
-			return false;
 		}
 
 		/// <summary>
