@@ -5115,7 +5115,7 @@ namespace SabreTools.Helper
 					break;
 			}
 			reportName += reportExtension;
-			StreamWriter sw = new StreamWriter(File.OpenWrite(reportName));
+			StreamWriter sw = new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write));
 
 			// Make sure we have all files
 			List<string> newinputs = new List<string>();
@@ -5123,16 +5123,17 @@ namespace SabreTools.Helper
 			{
 				if (File.Exists(input))
 				{
-					newinputs.Add(input);
+					newinputs.Add(Path.GetFullPath(input));
 				}
 				if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.GetFiles(input, "*", SearchOption.AllDirectories))
 					{
-						newinputs.Add(file);
+						newinputs.Add(Path.GetFullPath(file));
 					}
 				}
 			}
+			newinputs.Sort(new NaturalComparer());
 
 			// Write the header, if any
 			string head = "";
