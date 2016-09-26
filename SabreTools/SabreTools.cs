@@ -574,7 +574,7 @@ namespace SabreTools
 			// Get statistics on input files
 			else if (stats)
 			{
-				InitStats(inputs, single, statOutputFormat);
+				InitStats(inputs, filename, single, statOutputFormat);
 			}
 
 			// Split a DAT by item type

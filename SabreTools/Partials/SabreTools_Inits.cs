@@ -285,9 +285,9 @@ namespace SabreTools
 		/// <param name="inputs">List of inputs to be used</param>
 		/// <param name="single">True to show individual DAT statistics, false otherwise</param>
 		/// <param name="statOutputFormat">Set the statistics output format to use</param>
-		private static void InitStats(List<string> inputs, bool single, StatOutputFormat statOutputFormat)
+		private static void InitStats(List<string> inputs, string filename, bool single, StatOutputFormat statOutputFormat)
 		{
-			DatFile.OutputStats(inputs, "report", single, statOutputFormat, _logger);
+			DatFile.OutputStats(inputs, (String.IsNullOrEmpty(filename) ? "report" : filename), single, statOutputFormat, _logger);
 		}
 
 		/// <summary>

@@ -325,6 +325,9 @@ Options:
 		-csv, --csv			Write all statistics to CSV
 			Output all rom information in standardized CSV format
 			
+		-f=, --filename=	Set the filename for the output
+			Set the filename (without extension) for the outputted report
+			
 		-html, --html		Write all statistics to HTML
 			This will output by default the combined statistics for all input DAT files.
 			

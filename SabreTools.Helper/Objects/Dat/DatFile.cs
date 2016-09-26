@@ -5134,6 +5134,33 @@ namespace SabreTools.Helper
 				}
 			}
 
+			// Write the header, if any
+			string head = "";
+			switch (statOutputFormat)
+			{
+				case StatOutputFormat.CSV:
+					head = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\",\"Nodumps\"\n";
+					break;
+				case StatOutputFormat.HTML:
+					head = @"<!DOCTYPE html>
+<html>
+	<header>
+		<title>DAT Statistics Report</title>
+	</header>
+	<body>
+		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
+			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
++ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th><th>Nodumps</th></tr>\n";
+					break;
+				case StatOutputFormat.None:
+				default:
+					break;
+				case StatOutputFormat.TSV:
+					head = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\"\t\"Nodumps\"\n";
+					break;
+			}
+			sw.Write(head);
+
 			// Init all total variables
 			long totalSize = 0;
 			long totalGame = 0;
@@ -5157,32 +5184,6 @@ namespace SabreTools.Helper
 				logger.User("Adding stats for file '" + filename + "'\n", false);
 				if (single)
 				{
-					string line = "";
-					switch (statOutputFormat)
-					{
-						case StatOutputFormat.CSV:
-							line = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\",\"Nodumps\"\n";
-							break;
-						case StatOutputFormat.HTML:
-							line = @"<!DOCTYPE html>
-<html>
-	<header>
-		<title>DAT Statistics Report</title>
-	</header>
-	<body>
-		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
-			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
-+ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th><th>Nodumps</th></tr>\n";
-							break;
-						case StatOutputFormat.None:
-						default:
-							break;
-						case StatOutputFormat.TSV:
-							line = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\"\t\"Nodumps\"\n";
-							break;
-					}
-					sw.Write(line);
-
 					datdata.OutputStats(sw, statOutputFormat, logger);
 				}
 
