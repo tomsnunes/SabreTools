@@ -4432,7 +4432,7 @@ namespace SabreTools.Helper
 					break;
 				case StatOutputFormat.HTML:
 					line = "\t\t\t<tr><td>" + HttpUtility.HtmlEncode(FileName) + "</td>"
-						+ "<td>" + Style.GetBytesReadable(TotalSize) + "</td>"
+						+ "<td align=\"right\">" + Style.GetBytesReadable(TotalSize) + "</td>"
 						+ "<td align=\"right\">" + (game == -1 ? Files.Count : game) + "</td>"
 						+ "<td align=\"right\">" + RomCount + "</td>"
 						+ "<td align=\"right\">" + DiskCount + "</td>"
@@ -5447,8 +5447,9 @@ Please check the log folder if the stats scrolled offscreen", false);
 						+ (baddumpCol ? ",\"BadDumps\"" : "") + (nodumpCol ? ",\"Nodumps\"" : "") + "\n";
 					break;
 				case StatOutputFormat.HTML:
-					head = @"			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
-+ "<th>&#35; with MD5</th><th>&#35; with SHA-1</th>" + (baddumpCol ? "<th>Baddumps</th>" : "") + (nodumpCol ? "<th>Nodumps</th>" : "") + "</tr>\n";
+					head = @"			<tr><th>File Name</th><th align=""right"">Total Size</th><th align=""right"">Games</th><th align=""right"">Roms</th>"
++ @"<th align=""right"">Disks</th><th align=""right"">&#35; with CRC</th><th align=""right"">&#35; with MD5</th><th align=""right"">&#35; with SHA-1</th>"
++ (baddumpCol ? "<th align=\"right\">Baddumps</th>" : "") + (nodumpCol ? "<th align=\"right\">Nodumps</th>" : "") + "</tr>\n";
 					break;
 				case StatOutputFormat.None:
 				default:
