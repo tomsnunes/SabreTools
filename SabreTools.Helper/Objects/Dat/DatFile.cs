@@ -5270,6 +5270,7 @@ namespace SabreTools.Helper
 				List<string> games = new List<string>();
 				DatFile datdata = new DatFile();
 				datdata.Parse(filename.Item1, 0, 0, logger);
+				datdata.FileName = "FILE: " + datdata.FileName;
 				datdata.BucketByGame(false, true, logger, false);
 
 				// Output single DAT stats (if asked)
