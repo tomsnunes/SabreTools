@@ -601,8 +601,7 @@ namespace SabreTools.Helper
 				{
 					if (Directory.Exists(input))
 					{
-						List<string> files = Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories).ToList();
-						files.Sort(new NaturalComparer());
+						List<string> files = FileTools.RetrieveFiles(input, new List<string>());
 						foreach (string file in files)
 						{
 							try

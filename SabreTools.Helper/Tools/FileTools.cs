@@ -1,6 +1,7 @@
 ﻿using Mono.Data.Sqlite;
 using OCRC;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -11,6 +12,31 @@ namespace SabreTools.Helper
 	public class FileTools
 	{
 		#region File Information
+
+		/// <summary>
+		/// Retrieve a list of files from a directory recursively in proper order
+		/// </summary>
+		/// <param name="directory">Directory to parse</param>
+		/// <param name="infiles">List representing existing files</param>
+		/// <returns>List with all new files</returns>
+		public static List<string> RetrieveFiles(string directory, List<string> infiles)
+		{
+			// Take care of the files in the top directory
+			List<string> toadd = Directory.EnumerateFiles(directory, "*", SearchOption.TopDirectoryOnly).ToList();
+			toadd.Sort(new NaturalComparer());
+			infiles.AddRange(toadd);
+
+			// Then recurse through and add from the directories
+			List<string> dirs = Directory.EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly).ToList();
+			dirs.Sort(new NaturalComparer());
+			foreach (string dir in dirs)
+			{
+				infiles = RetrieveFiles(dir, infiles);
+			}
+
+			// Return the new list
+			return infiles;
+		}
 
 		/// <summary>
 		/// Get what type of DAT the input file is
