@@ -4431,7 +4431,9 @@ namespace SabreTools.Helper
 					line += "\n";
 					break;
 				case StatOutputFormat.HTML:
-					line = "\t\t\t<tr" + (FileName.StartsWith("DIR: ") ? " class=\"red\"" : "") +"><td>" + HttpUtility.HtmlEncode(FileName) + "</td>"
+					line = "\t\t\t<tr" + (FileName.StartsWith("DIR: ")
+							? " class=\"red\"><td>" + HttpUtility.HtmlEncode(FileName.Remove(0, 5))
+							: "><td>" + HttpUtility.HtmlEncode(FileName)) + "</td>"
 						+ "<td align=\"right\">" + Style.GetBytesReadable(TotalSize) + "</td>"
 						+ "<td align=\"right\">" + (game == -1 ? Files.Count : game) + "</td>"
 						+ "<td align=\"right\">" + RomCount + "</td>"
@@ -5270,7 +5272,6 @@ namespace SabreTools.Helper
 				List<string> games = new List<string>();
 				DatFile datdata = new DatFile();
 				datdata.Parse(filename.Item1, 0, 0, logger);
-				datdata.FileName = "FILE: " + datdata.FileName;
 				datdata.BucketByGame(false, true, logger, false);
 
 				// Output single DAT stats (if asked)
@@ -5414,12 +5415,19 @@ Please check the log folder if the stats scrolled offscreen", false);
 	<header>
 		<title>DAT Statistics Report</title>
 		<style>
+			body {
+				background-color: lightgray;
+			}
 			.red {
 				color: red;
 			}
+			.right {
+				align: right;
+			}
 		</style>
 	</header>
-	<body bgcolor=""lightgray"">
+	<body>
+		<h2>DAT Statistics Report (" + DateTime.Now.ToShortDateString() + @")</h2>
 		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
 ";
 					break;
@@ -5454,7 +5462,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 				case StatOutputFormat.HTML:
 					head = @"			<tr bgcolor=""gray""><th>File Name</th><th align=""right"">Total Size</th><th align=""right"">Games</th><th align=""right"">Roms</th>"
 + @"<th align=""right"">Disks</th><th align=""right"">&#35; with CRC</th><th align=""right"">&#35; with MD5</th><th align=""right"">&#35; with SHA-1</th>"
-+ (baddumpCol ? "<th align=\"right\">Baddumps</th>" : "") + (nodumpCol ? "<th align=\"right\">Nodumps</th>" : "") + "</tr>\n";
++ (baddumpCol ? "<th class=\".right\">Baddumps</th>" : "") + (nodumpCol ? "<th class=\".right\">Nodumps</th>" : "") + "</tr>\n";
 					break;
 				case StatOutputFormat.None:
 				default:
