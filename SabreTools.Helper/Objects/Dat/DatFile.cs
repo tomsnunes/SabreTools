@@ -5171,24 +5171,24 @@ namespace SabreTools.Helper
 			StreamWriter sw = new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write));
 
 			// Make sure we have all files
-			List<string> newinputs = new List<string>();
+			List<Tuple<string, string>> newinputs = new List<Tuple<string, string>>(); // item, basepath
 			foreach (string input in inputs)
 			{
 				if (File.Exists(input))
 				{
-					newinputs.Add(Path.GetFullPath(input));
+					newinputs.Add(Tuple.Create(Path.GetFullPath(input), Path.GetDirectoryName(Path.GetFullPath(input))));
 				}
 				if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.GetFiles(input, "*", SearchOption.AllDirectories))
 					{
-						newinputs.Add(Path.GetFullPath(file));
+						newinputs.Add(Tuple.Create(Path.GetFullPath(file), Path.GetFullPath(input)));
 					}
 				}
 			}
 			newinputs = newinputs
-				.OrderBy(i => Path.GetDirectoryName(i))
-				.ThenBy(i => Path.GetFileName(i))
+				.OrderBy(i => Path.GetDirectoryName(i.Item1))
+				.ThenBy(i => Path.GetFileName(i.Item1))
 				.ToList();
 
 			// Write the header, if any
@@ -5207,6 +5207,7 @@ namespace SabreTools.Helper
 
 			// Init directory-level variables
 			string lastdir = null;
+			string basepath = null;
 			long dirSize = 0;
 			long dirGame = 0;
 			long dirRom = 0;
@@ -5218,10 +5219,11 @@ namespace SabreTools.Helper
 			long dirNodump = 0;
 
 			// Now process each of the input files
-			foreach (string filename in newinputs)
+			foreach (Tuple<string, string> filename in newinputs)
 			{
 				// Get the directory for the current file
-				string thisdir = Path.GetDirectoryName(filename);
+				string thisdir = Path.GetDirectoryName(filename.Item1);
+				basepath = Path.GetDirectoryName(filename.Item2);
 
 				// If we don't have the first file and the directory has changed, show the previous directory stats and reset
 				if (lastdir != null && thisdir != lastdir)
@@ -5231,7 +5233,7 @@ namespace SabreTools.Helper
 					
 					DatFile lastdirdat = new DatFile
 					{
-						FileName = lastdir,
+						FileName = lastdir.Remove(0, basepath.Length + (basepath.Length == 0 ? 0 : 1)),
 						TotalSize = dirSize,
 						RomCount = dirRom,
 						DiskCount = dirDisk,
@@ -5244,10 +5246,10 @@ namespace SabreTools.Helper
 					lastdirdat.OutputStats(sw, statOutputFormat, logger, game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 
 					// Write the mid-footer, if any
-					OutputStatsWriteMidFooter(sw, statOutputFormat);
+					OutputStatsWriteMidFooter(sw, statOutputFormat, baddumpCol, nodumpCol);
 
 					// Write the header, if any
-					OutputStatsWriteHeader(sw, statOutputFormat, baddumpCol, nodumpCol);
+					OutputStatsWriteMidHeader(sw, statOutputFormat, baddumpCol, nodumpCol);
 
 					// Reset the directory stats
 					dirSize = 0;
@@ -5264,7 +5266,7 @@ namespace SabreTools.Helper
 				logger.Verbose("Beginning stat collection for '" + filename + "'", false);
 				List<string> games = new List<string>();
 				DatFile datdata = new DatFile();
-				datdata.Parse(filename, 0, 0, logger);
+				datdata.Parse(filename.Item1, 0, 0, logger);
 				datdata.BucketByGame(false, true, logger, false);
 
 				// Output single DAT stats (if asked)
@@ -5307,7 +5309,7 @@ namespace SabreTools.Helper
 			{
 				DatFile dirdat = new DatFile
 				{
-					FileName = lastdir,
+					FileName = lastdir.Remove(0, basepath.Length + (basepath.Length == 0 ? 0 : 1)),
 					TotalSize = dirSize,
 					RomCount = dirRom,
 					DiskCount = dirDisk,
@@ -5321,10 +5323,10 @@ namespace SabreTools.Helper
 			}
 
 			// Write the mid-footer, if any
-			OutputStatsWriteMidFooter(sw, statOutputFormat);
+			OutputStatsWriteMidFooter(sw, statOutputFormat, baddumpCol, nodumpCol);
 
 			// Write the header, if any
-			OutputStatsWriteHeader(sw, statOutputFormat, baddumpCol, nodumpCol);
+			OutputStatsWriteMidHeader(sw, statOutputFormat, baddumpCol, nodumpCol);
 
 			// Reset the directory stats
 			dirSize = 0;
@@ -5349,7 +5351,7 @@ namespace SabreTools.Helper
 				BaddumpCount = totalBaddump,
 				NodumpCount = totalNodump,
 			};
-			totaldata.OutputStats(sw, statOutputFormat, logger, game: totalGame);
+			totaldata.OutputStats(sw, statOutputFormat, logger, game: totalGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 
 			// Output footer if needed
 			OutputStatsWriteFooter(sw, statOutputFormat);
@@ -5401,8 +5403,6 @@ Please check the log folder if the stats scrolled offscreen", false);
 			switch (statOutputFormat)
 			{
 				case StatOutputFormat.CSV:
-					head = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\""
-						+ (baddumpCol ? ",\"BadDumps\"" : "") + (nodumpCol ? ",\"Nodumps\"" : "") + "\n";
 					break;
 				case StatOutputFormat.HTML:
 					head = @"<!DOCTYPE html>
@@ -5412,7 +5412,38 @@ Please check the log folder if the stats scrolled offscreen", false);
 	</header>
 	<body>
 		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
-			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
+";
+					break;
+				case StatOutputFormat.None:
+				default:
+					break;
+				case StatOutputFormat.TSV:
+					break;
+			}
+			sw.Write(head);
+
+			// Now write the mid header for those who need it
+			OutputStatsWriteMidHeader(sw, statOutputFormat, baddumpCol, nodumpCol);
+		}
+
+		/// <summary>
+		/// Write out the mid-header to the stream, if any exists
+		/// </summary>
+		/// <param name="sw">StreamWriter representing the output</param>
+		/// <param name="statOutputFormat">StatOutputFormat representing output format</param>
+		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
+		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
+		private static void OutputStatsWriteMidHeader(StreamWriter sw, StatOutputFormat statOutputFormat, bool baddumpCol, bool nodumpCol)
+		{
+			string head = "";
+			switch (statOutputFormat)
+			{
+				case StatOutputFormat.CSV:
+					head = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\""
+						+ (baddumpCol ? ",\"BadDumps\"" : "") + (nodumpCol ? ",\"Nodumps\"" : "") + "\n";
+					break;
+				case StatOutputFormat.HTML:
+					head = @"			<tr><th>File Name</th><th>Total Size</th><th>Games</th><th>Roms</th><th>Disks</th><th>&#35; with CRC</th>"
 + "<th>&#35; with MD5</th><th>&#35; with SHA-1</th>" + (baddumpCol ? "<th>Baddumps</th>" : "") + (nodumpCol ? "<th>Nodumps</th>" : "") + "</tr>\n";
 					break;
 				case StatOutputFormat.None:
@@ -5462,7 +5493,9 @@ Please check the log folder if the stats scrolled offscreen", false);
 		/// </summary>
 		/// <param name="sw">StreamWriter representing the output</param>
 		/// <param name="statOutputFormat">StatOutputFormat representing output format</param>
-		private static void OutputStatsWriteMidFooter(StreamWriter sw, StatOutputFormat statOutputFormat)
+		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
+		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
+		private static void OutputStatsWriteMidFooter(StreamWriter sw, StatOutputFormat statOutputFormat, bool baddumpCol, bool nodumpCol)
 		{
 			string end = "";
 			switch (statOutputFormat)
@@ -5471,8 +5504,14 @@ Please check the log folder if the stats scrolled offscreen", false);
 					end = "\n";
 					break;
 				case StatOutputFormat.HTML:
-					end = @"		</table>
-<p/>";
+					end = "<tr border=\"0\"><td colspan=\""
+						+ (baddumpCol && nodumpCol
+							? "11"
+							: (baddumpCol ^ nodumpCol
+								? "10"
+								: "9")
+							)
+						+ "\"></td></tr>\n";
 					break;
 				case StatOutputFormat.None:
 				default:
