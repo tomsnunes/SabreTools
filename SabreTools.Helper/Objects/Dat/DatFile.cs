@@ -2066,747 +2066,771 @@ namespace SabreTools.Helper
 			List<string> parent = new List<string>();
 
 			XmlTextReader xtr = FileTools.GetXmlTextReader(filename, logger);
-			if (xtr != null)
+
+			// If we got a null reader, just return
+			if (xtr == null)
 			{
-				xtr.MoveToContent();
-				while (!xtr.EOF)
+				return;
+			}
+
+			// Otherwise, read the file to the end
+			xtr.MoveToContent();
+			while (!xtr.EOF)
+			{
+				// If we're ending a folder or game, take care of possibly empty games and removing from the parent
+				if (xtr.NodeType == XmlNodeType.EndElement && (xtr.Name == "directory" || xtr.Name == "dir"))
 				{
-					// If we're ending a folder or game, take care of possibly empty games and removing from the parent
-					if (xtr.NodeType == XmlNodeType.EndElement && (xtr.Name == "directory" || xtr.Name == "dir"))
+					// If we didn't find any items in the folder, make sure to add the blank rom
+					if (empty)
 					{
-						// If we didn't find any items in the folder, make sure to add the blank rom
-						if (empty)
-						{
-							string tempgame = String.Join("\\", parent);
-							Rom rom = new Rom("null", tempgame);
+						string tempgame = String.Join("\\", parent);
+						Rom rom = new Rom("null", tempgame);
 
-							// Now process and add the rom
-							ParseAddHelper(rom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-						}
-
-						// Regardless, end the current folder
-						int parentcount = parent.Count;
-						if (parentcount == 0)
-						{
-							logger.Verbose("Empty parent: " + String.Join("\\", parent));
-							empty = true;
-						}
-
-						// If we have an end folder element, remove one item from the parent, if possible
-						if (parentcount > 0)
-						{
-							parent.RemoveAt(parent.Count - 1);
-							if (keep && parentcount > 1)
-							{
-								Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
-								superdat = true;
-							}
-						}
+						// Now process and add the rom
+						ParseAddHelper(rom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
 					}
 
-					// We only want elements
-					if (xtr.NodeType != XmlNodeType.Element)
+					// Regardless, end the current folder
+					int parentcount = parent.Count;
+					if (parentcount == 0)
 					{
+						logger.Verbose("Empty parent: " + String.Join("\\", parent));
+						empty = true;
+					}
+
+					// If we have an end folder element, remove one item from the parent, if possible
+					if (parentcount > 0)
+					{
+						parent.RemoveAt(parent.Count - 1);
+						if (keep && parentcount > 1)
+						{
+							Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
+							superdat = true;
+						}
+					}
+				}
+
+				// We only want elements
+				if (xtr.NodeType != XmlNodeType.Element)
+				{
+					xtr.Read();
+					continue;
+				}
+
+				switch (xtr.Name)
+				{
+					// Handle MAME listxml since they're halfway between a SL and a Logiqx XML
+					case "mame":
+						if (xtr.GetAttribute("build") != null)
+						{
+							Name = (String.IsNullOrEmpty(Name) ? xtr.GetAttribute("build") : Name);
+							Description = (String.IsNullOrEmpty(Description) ? Name : Name);
+						}
 						xtr.Read();
-						continue;
-					}
+						break;
+					// New software lists have this behavior
+					case "softwarelist":
+						if (xtr.GetAttribute("name") != null)
+						{
+							Name = (String.IsNullOrEmpty(Name) ? xtr.GetAttribute("name") : Name);
+						}
+						if (xtr.GetAttribute("description") != null)
+						{
+							Description = (String.IsNullOrEmpty(Description) ? xtr.GetAttribute("description") : Description);
+						}
+						if (xtr.GetAttribute("forcemerging") != null)
+						{
+							switch (xtr.GetAttribute("forcemerging"))
+							{
+								case "split":
+									ForceMerging = ForceMerging.Split;
+									break;
+								case "none":
+									ForceMerging = ForceMerging.None;
+									break;
+								case "full":
+									ForceMerging = ForceMerging.Full;
+									break;
+							}
+						}
+						if (xtr.GetAttribute("forceitemStatus") != null)
+						{
+							switch (xtr.GetAttribute("forceitemStatus"))
+							{
+								case "obsolete":
+									ForceNodump = ForceNodump.Obsolete;
+									break;
+								case "required":
+									ForceNodump = ForceNodump.Required;
+									break;
+								case "ignore":
+									ForceNodump = ForceNodump.Ignore;
+									break;
+							}
+						}
+						if (xtr.GetAttribute("forcepacking") != null)
+						{
+							switch (xtr.GetAttribute("forcepacking"))
+							{
+								case "zip":
+									ForcePacking = ForcePacking.Zip;
+									break;
+								case "unzip":
+									ForcePacking = ForcePacking.Unzip;
+									break;
+							}
+						}
+						xtr.Read();
+						break;
+					// Handle M1 DATs since they're 99% the same as a SL DAT
+					case "m1":
+						Name = (String.IsNullOrEmpty(Name) ? "M1" : Name);
+						Description = (String.IsNullOrEmpty(Description) ? "M1" : Description);
+						if (xtr.GetAttribute("version") != null)
+						{
+							Version = (String.IsNullOrEmpty(Version) ? xtr.GetAttribute("version") : Version);
+						}
+						xtr.Read();
+						break;
+					// We want to process the entire subtree of the header
+					case "header":
+						headreader = xtr.ReadSubtree();
 
-					switch (xtr.Name)
-					{
-						// Handle MAME listxml since they're halfway between a SL and a Logiqx XML
-						case "mame":
-							if (xtr.GetAttribute("build") != null)
-							{
-								Name = (String.IsNullOrEmpty(Name) ? xtr.GetAttribute("build") : Name);
-								Description = (String.IsNullOrEmpty(Description) ? Name : Name);
-							}
-							xtr.Read();
-							break;
-						// New software lists have this behavior
-						case "softwarelist":
-							if (xtr.GetAttribute("name") != null)
-							{
-								Name = (String.IsNullOrEmpty(Name) ? xtr.GetAttribute("name") : Name);
-							}
-							if (xtr.GetAttribute("description") != null)
-							{
-								Description = (String.IsNullOrEmpty(Description) ? xtr.GetAttribute("description") : Description);
-							}
-							if (xtr.GetAttribute("forcemerging") != null)
-							{
-								switch (xtr.GetAttribute("forcemerging"))
-								{
-									case "split":
-										ForceMerging = ForceMerging.Split;
-										break;
-									case "none":
-										ForceMerging = ForceMerging.None;
-										break;
-									case "full":
-										ForceMerging = ForceMerging.Full;
-										break;
-								}
-							}
-							if (xtr.GetAttribute("forceitemStatus") != null)
-							{
-								switch (xtr.GetAttribute("forceitemStatus"))
-								{
-									case "obsolete":
-										ForceNodump = ForceNodump.Obsolete;
-										break;
-									case "required":
-										ForceNodump = ForceNodump.Required;
-										break;
-									case "ignore":
-										ForceNodump = ForceNodump.Ignore;
-										break;
-								}
-							}
-							if (xtr.GetAttribute("forcepacking") != null)
-							{
-								switch (xtr.GetAttribute("forcepacking"))
-								{
-									case "zip":
-										ForcePacking = ForcePacking.Zip;
-										break;
-									case "unzip":
-										ForcePacking = ForcePacking.Unzip;
-										break;
-								}
-							}
-							xtr.Read();
-							break;
-						// Handle M1 DATs since they're 99% the same as a SL DAT
-						case "m1":
-							Name = (String.IsNullOrEmpty(Name) ? "M1" : Name);
-							Description = (String.IsNullOrEmpty(Description) ? "M1" : Description);
-							if (xtr.GetAttribute("version") != null)
-							{
-								Version = (String.IsNullOrEmpty(Version) ? xtr.GetAttribute("version") : Version);
-							}
-							xtr.Read();
-							break;
-						// We want to process the entire subtree of the header
-						case "header":
-							headreader = xtr.ReadSubtree();
-
-							if (headreader != null)
-							{
-								while (!headreader.EOF)
-								{
-									// We only want elements
-									if (headreader.NodeType != XmlNodeType.Element || headreader.Name == "header")
-									{
-										headreader.Read();
-										continue;
-									}
-
-									// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
-									string content = "";
-									switch (headreader.Name)
-									{
-										case "name":
-											content = headreader.ReadElementContentAsString(); ;
-											Name = (String.IsNullOrEmpty(Name) ? content : Name);
-											superdat = superdat || content.Contains(" - SuperDAT");
-											if (keep && superdat)
-											{
-												Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
-											}
-											break;
-										case "description":
-											content = headreader.ReadElementContentAsString();
-											Description = (String.IsNullOrEmpty(Description) ? content : Description);
-											break;
-										case "rootdir":
-											content = headreader.ReadElementContentAsString();
-											RootDir = (String.IsNullOrEmpty(RootDir) ? content : RootDir);
-											break;
-										case "category":
-											content = headreader.ReadElementContentAsString();
-											Category = (String.IsNullOrEmpty(Category) ? content : Category);
-											break;
-										case "version":
-											content = headreader.ReadElementContentAsString();
-											Version = (String.IsNullOrEmpty(Version) ? content : Version);
-											break;
-										case "date":
-											content = headreader.ReadElementContentAsString();
-											Date = (String.IsNullOrEmpty(Date) ? content.Replace(".", "/") : Date);
-											break;
-										case "author":
-											content = headreader.ReadElementContentAsString();
-											Author = (String.IsNullOrEmpty(Author) ? content : Author);
-
-											// Special cases for SabreDAT
-											Email = (String.IsNullOrEmpty(Email) && !String.IsNullOrEmpty(headreader.GetAttribute("email")) ?
-												headreader.GetAttribute("email") : Email);
-											Homepage = (String.IsNullOrEmpty(Homepage) && !String.IsNullOrEmpty(headreader.GetAttribute("homepage")) ?
-												headreader.GetAttribute("homepage") : Email);
-											Url = (String.IsNullOrEmpty(Url) && !String.IsNullOrEmpty(headreader.GetAttribute("url")) ?
-												headreader.GetAttribute("url") : Email);
-											break;
-										case "email":
-											content = headreader.ReadElementContentAsString();
-											Email = (String.IsNullOrEmpty(Email) ? content : Email);
-											break;
-										case "homepage":
-											content = headreader.ReadElementContentAsString();
-											Homepage = (String.IsNullOrEmpty(Homepage) ? content : Homepage);
-											break;
-										case "url":
-											content = headreader.ReadElementContentAsString();
-											Url = (String.IsNullOrEmpty(Url) ? content : Url);
-											break;
-										case "comment":
-											content = headreader.ReadElementContentAsString();
-											Comment = (String.IsNullOrEmpty(Comment) ? content : Comment);
-											break;
-										case "type":
-											content = headreader.ReadElementContentAsString();
-											Type = (String.IsNullOrEmpty(Type) ? content : Type);
-											superdat = superdat || content.Contains("SuperDAT");
-											break;
-										case "clrmamepro":
-										case "romcenter":
-											if (headreader.GetAttribute("header") != null)
-											{
-												Header = (String.IsNullOrEmpty(Header) ? headreader.GetAttribute("header") : Header);
-											}
-											if (headreader.GetAttribute("plugin") != null)
-											{
-												Header = (String.IsNullOrEmpty(Header) ? headreader.GetAttribute("plugin") : Header);
-											}
-											if (headreader.GetAttribute("forcemerging") != null)
-											{
-												switch (headreader.GetAttribute("forcemerging"))
-												{
-													case "split":
-														ForceMerging = ForceMerging.Split;
-														break;
-													case "none":
-														ForceMerging = ForceMerging.None;
-														break;
-													case "full":
-														ForceMerging = ForceMerging.Full;
-														break;
-												}
-											}
-											if (headreader.GetAttribute("forceitemStatus") != null)
-											{
-												switch (headreader.GetAttribute("forceitemStatus"))
-												{
-													case "obsolete":
-														ForceNodump = ForceNodump.Obsolete;
-														break;
-													case "required":
-														ForceNodump = ForceNodump.Required;
-														break;
-													case "ignore":
-														ForceNodump = ForceNodump.Ignore;
-														break;
-												}
-											}
-											if (headreader.GetAttribute("forcepacking") != null)
-											{
-												switch (headreader.GetAttribute("forcepacking"))
-												{
-													case "zip":
-														ForcePacking = ForcePacking.Zip;
-														break;
-													case "unzip":
-														ForcePacking = ForcePacking.Unzip;
-														break;
-												}
-											}
-											headreader.Read();
-											break;
-										case "flags":
-											flagreader = xtr.ReadSubtree();
-											if (flagreader != null)
-											{
-												while (!flagreader.EOF)
-												{
-													// We only want elements
-													if (flagreader.NodeType != XmlNodeType.Element || flagreader.Name == "flags")
-													{
-														flagreader.Read();
-														continue;
-													}
-
-													switch (flagreader.Name)
-													{
-														case "flag":
-															if (flagreader.GetAttribute("name") != null && flagreader.GetAttribute("value") != null)
-															{
-																content = flagreader.GetAttribute("value");
-																switch (flagreader.GetAttribute("name"))
-																{
-																	case "type":
-																		Type = (String.IsNullOrEmpty(Type) ? content : Type);
-																		superdat = superdat || content.Contains("SuperDAT");
-																		break;
-																	case "forcemerging":
-																		switch (content)
-																		{
-																			case "split":
-																				ForceMerging = ForceMerging.Split;
-																				break;
-																			case "none":
-																				ForceMerging = ForceMerging.None;
-																				break;
-																			case "full":
-																				ForceMerging = ForceMerging.Full;
-																				break;
-																		}
-																		break;
-																	case "forceitemStatus":
-																		switch (content)
-																		{
-																			case "obsolete":
-																				ForceNodump = ForceNodump.Obsolete;
-																				break;
-																			case "required":
-																				ForceNodump = ForceNodump.Required;
-																				break;
-																			case "ignore":
-																				ForceNodump = ForceNodump.Ignore;
-																				break;
-																		}
-																		break;
-																	case "forcepacking":
-																		switch (content)
-																		{
-																			case "zip":
-																				ForcePacking = ForcePacking.Zip;
-																				break;
-																			case "unzip":
-																				ForcePacking = ForcePacking.Unzip;
-																				break;
-																		}
-																		break;
-																}
-															}
-															flagreader.Read();
-															break;
-														default:
-															flagreader.Read();
-															break;
-													}
-												}
-											}
-											headreader.Skip();
-											break;
-										default:
-											headreader.Read();
-											break;
-									}
-								}
-							}
-
-							// Skip the header node now that we've processed it
+						// If there's no subtree to the header, skip it
+						if (headreader == null)
+						{
 							xtr.Skip();
-							break;
-						case "machine":
-						case "game":
-						case "software":
-							string temptype = xtr.Name;
-							string tempname = "", gamedesc = "", romof = "",
-								cloneof = "", sampleof = "", year = "", manufacturer = "";
+							continue;
+						}
 
-							// We want to process the entire subtree of the game
-							subreader = xtr.ReadSubtree();
-
-							// Safeguard for interesting case of "software" without anything except roms
-							bool software = false;
-
-							// If we have a subtree, add what is possible
-							if (subreader != null)
+						// Otherwise, read what we can from the header
+						while (!headreader.EOF)
+						{
+							// We only want elements
+							if (headreader.NodeType != XmlNodeType.Element || headreader.Name == "header")
 							{
-								subreader.MoveToContent();
-								if (!softlist && temptype == "software" && subreader.ReadToFollowing("description"))
-								{
-									tempname = subreader.ReadElementContentAsString();
-									gamedesc = tempname;
-									tempname = tempname.Replace('/', '_').Replace("\"", "''");
-									software = true;
-								}
-								else
-								{
-									// There are rare cases where a malformed XML will not have the required attributes. We can only skip them.
-									if (xtr.AttributeCount == 0)
+								headreader.Read();
+								continue;
+							}
+
+							// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
+							string content = "";
+							switch (headreader.Name)
+							{
+								case "name":
+									content = headreader.ReadElementContentAsString(); ;
+									Name = (String.IsNullOrEmpty(Name) ? content : Name);
+									superdat = superdat || content.Contains(" - SuperDAT");
+									if (keep && superdat)
 									{
-										logger.Error("No attributes were found");
+										Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
+									}
+									break;
+								case "description":
+									content = headreader.ReadElementContentAsString();
+									Description = (String.IsNullOrEmpty(Description) ? content : Description);
+									break;
+								case "rootdir":
+									content = headreader.ReadElementContentAsString();
+									RootDir = (String.IsNullOrEmpty(RootDir) ? content : RootDir);
+									break;
+								case "category":
+									content = headreader.ReadElementContentAsString();
+									Category = (String.IsNullOrEmpty(Category) ? content : Category);
+									break;
+								case "version":
+									content = headreader.ReadElementContentAsString();
+									Version = (String.IsNullOrEmpty(Version) ? content : Version);
+									break;
+								case "date":
+									content = headreader.ReadElementContentAsString();
+									Date = (String.IsNullOrEmpty(Date) ? content.Replace(".", "/") : Date);
+									break;
+								case "author":
+									content = headreader.ReadElementContentAsString();
+									Author = (String.IsNullOrEmpty(Author) ? content : Author);
+
+									// Special cases for SabreDAT
+									Email = (String.IsNullOrEmpty(Email) && !String.IsNullOrEmpty(headreader.GetAttribute("email")) ?
+										headreader.GetAttribute("email") : Email);
+									Homepage = (String.IsNullOrEmpty(Homepage) && !String.IsNullOrEmpty(headreader.GetAttribute("homepage")) ?
+										headreader.GetAttribute("homepage") : Email);
+									Url = (String.IsNullOrEmpty(Url) && !String.IsNullOrEmpty(headreader.GetAttribute("url")) ?
+										headreader.GetAttribute("url") : Email);
+									break;
+								case "email":
+									content = headreader.ReadElementContentAsString();
+									Email = (String.IsNullOrEmpty(Email) ? content : Email);
+									break;
+								case "homepage":
+									content = headreader.ReadElementContentAsString();
+									Homepage = (String.IsNullOrEmpty(Homepage) ? content : Homepage);
+									break;
+								case "url":
+									content = headreader.ReadElementContentAsString();
+									Url = (String.IsNullOrEmpty(Url) ? content : Url);
+									break;
+								case "comment":
+									content = headreader.ReadElementContentAsString();
+									Comment = (String.IsNullOrEmpty(Comment) ? content : Comment);
+									break;
+								case "type":
+									content = headreader.ReadElementContentAsString();
+									Type = (String.IsNullOrEmpty(Type) ? content : Type);
+									superdat = superdat || content.Contains("SuperDAT");
+									break;
+								case "clrmamepro":
+								case "romcenter":
+									if (headreader.GetAttribute("header") != null)
+									{
+										Header = (String.IsNullOrEmpty(Header) ? headreader.GetAttribute("header") : Header);
+									}
+									if (headreader.GetAttribute("plugin") != null)
+									{
+										Header = (String.IsNullOrEmpty(Header) ? headreader.GetAttribute("plugin") : Header);
+									}
+									if (headreader.GetAttribute("forcemerging") != null)
+									{
+										switch (headreader.GetAttribute("forcemerging"))
+										{
+											case "split":
+												ForceMerging = ForceMerging.Split;
+												break;
+											case "none":
+												ForceMerging = ForceMerging.None;
+												break;
+											case "full":
+												ForceMerging = ForceMerging.Full;
+												break;
+										}
+									}
+									if (headreader.GetAttribute("forceitemStatus") != null)
+									{
+										switch (headreader.GetAttribute("forceitemStatus"))
+										{
+											case "obsolete":
+												ForceNodump = ForceNodump.Obsolete;
+												break;
+											case "required":
+												ForceNodump = ForceNodump.Required;
+												break;
+											case "ignore":
+												ForceNodump = ForceNodump.Ignore;
+												break;
+										}
+									}
+									if (headreader.GetAttribute("forcepacking") != null)
+									{
+										switch (headreader.GetAttribute("forcepacking"))
+										{
+											case "zip":
+												ForcePacking = ForcePacking.Zip;
+												break;
+											case "unzip":
+												ForcePacking = ForcePacking.Unzip;
+												break;
+										}
+									}
+									headreader.Read();
+									break;
+								case "flags":
+									flagreader = xtr.ReadSubtree();
+
+									// If we somehow have a null flag section, skip it
+									if (flagreader == null)
+									{
 										xtr.Skip();
 										continue;
 									}
-									tempname = xtr.GetAttribute("name");
-									romof = (xtr.GetAttribute("romof") != null ? xtr.GetAttribute("romof") : "");
-									cloneof = (xtr.GetAttribute("cloneof") != null ? xtr.GetAttribute("cloneof") : "");
-									sampleof = (xtr.GetAttribute("sampleof") != null ? xtr.GetAttribute("sampleof") : "");
-								}
 
-								if (superdat && !keep)
-								{
-									string tempout = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
-									if (tempout != "")
+									while (!flagreader.EOF)
 									{
-										tempname = tempout;
+										// We only want elements
+										if (flagreader.NodeType != XmlNodeType.Element || flagreader.Name == "flags")
+										{
+											flagreader.Read();
+											continue;
+										}
+
+										switch (flagreader.Name)
+										{
+											case "flag":
+												if (flagreader.GetAttribute("name") != null && flagreader.GetAttribute("value") != null)
+												{
+													content = flagreader.GetAttribute("value");
+													switch (flagreader.GetAttribute("name"))
+													{
+														case "type":
+															Type = (String.IsNullOrEmpty(Type) ? content : Type);
+															superdat = superdat || content.Contains("SuperDAT");
+															break;
+														case "forcemerging":
+															switch (content)
+															{
+																case "split":
+																	ForceMerging = ForceMerging.Split;
+																	break;
+																case "none":
+																	ForceMerging = ForceMerging.None;
+																	break;
+																case "full":
+																	ForceMerging = ForceMerging.Full;
+																	break;
+															}
+															break;
+														case "forceitemStatus":
+															switch (content)
+															{
+																case "obsolete":
+																	ForceNodump = ForceNodump.Obsolete;
+																	break;
+																case "required":
+																	ForceNodump = ForceNodump.Required;
+																	break;
+																case "ignore":
+																	ForceNodump = ForceNodump.Ignore;
+																	break;
+															}
+															break;
+														case "forcepacking":
+															switch (content)
+															{
+																case "zip":
+																	ForcePacking = ForcePacking.Zip;
+																	break;
+																case "unzip":
+																	ForcePacking = ForcePacking.Unzip;
+																	break;
+															}
+															break;
+													}
+												}
+												flagreader.Read();
+												break;
+											default:
+												flagreader.Read();
+												break;
+										}
 									}
-								}
-								// Get the name of the game from the parent
-								else if (superdat && keep && parent.Count > 0)
-								{
-									tempname = String.Join("\\", parent) + "\\" + tempname;
-								}
+									headreader.Skip();
+									break;
+								default:
+									headreader.Read();
+									break;
+							}
+						}
 
-								while (software || !subreader.EOF)
-								{
-									software = false;
+						// Skip the header node now that we've processed it
+						xtr.Skip();
+						break;
+					case "machine":
+					case "game":
+					case "software":
+						string temptype = xtr.Name;
+						string tempname = "", gamedesc = "", romof = "",
+							cloneof = "", sampleof = "", year = "", manufacturer = "";
 
-									// We only want elements
-									if (subreader.NodeType != XmlNodeType.Element)
+						// We want to process the entire subtree of the game
+						subreader = xtr.ReadSubtree();
+
+						// Safeguard for interesting case of "software" without anything except roms
+						bool software = false;
+
+						// If we have an empty machine, skip it
+						if (subreader == null)
+						{
+							xtr.Skip();
+							continue;
+						}
+
+						// Otherwise, add what is possible
+						subreader.MoveToContent();
+						if (!softlist && temptype == "software" && subreader.ReadToFollowing("description"))
+						{
+							tempname = subreader.ReadElementContentAsString();
+							gamedesc = tempname;
+							tempname = tempname.Replace('/', '_').Replace("\"", "''");
+							software = true;
+						}
+						else
+						{
+							// There are rare cases where a malformed XML will not have the required attributes. We can only skip them.
+							if (xtr.AttributeCount == 0)
+							{
+								logger.Error("No attributes were found");
+								xtr.Skip();
+								continue;
+							}
+							tempname = xtr.GetAttribute("name");
+							romof = (xtr.GetAttribute("romof") != null ? xtr.GetAttribute("romof") : "");
+							cloneof = (xtr.GetAttribute("cloneof") != null ? xtr.GetAttribute("cloneof") : "");
+							sampleof = (xtr.GetAttribute("sampleof") != null ? xtr.GetAttribute("sampleof") : "");
+						}
+
+						if (superdat && !keep)
+						{
+							string tempout = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
+							if (tempout != "")
+							{
+								tempname = tempout;
+							}
+						}
+						// Get the name of the game from the parent
+						else if (superdat && keep && parent.Count > 0)
+						{
+							tempname = String.Join("\\", parent) + "\\" + tempname;
+						}
+
+						while (software || !subreader.EOF)
+						{
+							software = false;
+
+							// We only want elements
+							if (subreader.NodeType != XmlNodeType.Element)
+							{
+								subreader.Read();
+								continue;
+							}
+
+							// Get the roms from the machine
+							switch (subreader.Name)
+							{
+								case "description":
+									gamedesc = subreader.ReadElementContentAsString();
+									break;
+								case "year":
+									year = subreader.ReadElementContentAsString();
+									break;
+								case "manufacturer":
+									manufacturer = subreader.ReadElementContentAsString();
+									break;
+								case "release":
+									bool? defaultrel = null;
+									if (subreader.GetAttribute("default") != null)
 									{
+										if (subreader.GetAttribute("default") == "yes")
+										{
+											defaultrel = true;
+										}
+										else if (subreader.GetAttribute("default") == "no")
+										{
+											defaultrel = false;
+										}
+									}
+
+									DatItem relrom = new Release(subreader.GetAttribute("name"), subreader.GetAttribute("region"), subreader.GetAttribute("language"), date, defaultrel);
+
+									// Now process and add the rom
+									ParseAddHelper(relrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+
+									subreader.Read();
+									break;
+								case "biosset":
+									bool? defaultbios = null;
+									if (subreader.GetAttribute("default") != null)
+									{
+										if (subreader.GetAttribute("default") == "yes")
+										{
+											defaultbios = true;
+										}
+										else if (subreader.GetAttribute("default") == "no")
+										{
+											defaultbios = false;
+										}
+									}
+
+									DatItem biosrom = new BiosSet(subreader.GetAttribute("name"), subreader.GetAttribute("description"), defaultbios,
+										tempname, null, gamedesc, null, null, romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
+
+									// Now process and add the rom
+									ParseAddHelper(biosrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+
+									subreader.Read();
+									break;
+								case "archive":
+									DatItem archiverom = new Archive(subreader.GetAttribute("name"), tempname, null, gamedesc, null, null,
+										romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
+
+									// Now process and add the rom
+									ParseAddHelper(archiverom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+
+									subreader.Read();
+									break;
+								case "sample":
+									DatItem samplerom = new Sample(subreader.GetAttribute("name"), tempname, null, gamedesc, null, null,
+										romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
+
+									// Now process and add the rom
+									ParseAddHelper(samplerom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+
+									subreader.Read();
+									break;
+								case "rom":
+								case "disk":
+									empty = false;
+
+									// If the rom has a status, flag it
+									its = ItemStatus.None;
+									if (subreader.GetAttribute("flags") == "good" || subreader.GetAttribute("status") == "good")
+									{
+										its = ItemStatus.Good;
+									}
+									if (subreader.GetAttribute("flags") == "baddump" || subreader.GetAttribute("status") == "baddump")
+									{
+										logger.Verbose("Bad dump detected: " +
+											(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
+										its = ItemStatus.BadDump;
+									}
+									if (subreader.GetAttribute("flags") == "itemStatus" || subreader.GetAttribute("status") == "itemStatus")
+									{
+										logger.Verbose("Nodump detected: " +
+											(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
+										its = ItemStatus.Nodump;
+									}
+									if (subreader.GetAttribute("flags") == "verified" || subreader.GetAttribute("status") == "verified")
+									{
+										its = ItemStatus.Verified;
+									}
+
+									// If the rom has a Date attached, read it in and then sanitize it
+									date = "";
+									if (subreader.GetAttribute("date") != null)
+									{
+										DateTime dateTime = DateTime.Now;
+										if (DateTime.TryParse(subreader.GetAttribute("date"), out dateTime))
+										{
+											date = dateTime.ToString();
+										}
+										else
+										{
+											date = subreader.GetAttribute("date");
+										}
+									}
+
+									// Take care of hex-sized files
+									size = -1;
+									if (subreader.GetAttribute("size") != null && subreader.GetAttribute("size").Contains("0x"))
+									{
+										size = Convert.ToInt64(subreader.GetAttribute("size"), 16);
+									}
+									else if (subreader.GetAttribute("size") != null)
+									{
+										Int64.TryParse(subreader.GetAttribute("size"), out size);
+									}
+
+									// If the rom is continue or ignore, add the size to the previous rom
+									if (subreader.GetAttribute("loadflag") == "continue" || subreader.GetAttribute("loadflag") == "ignore")
+									{
+										int index = Files[key].Count() - 1;
+										DatItem lastrom = Files[key][index];
+										if (lastrom.Type == ItemType.Rom)
+										{
+											((Rom)lastrom).Size += size;
+										}
+										Files[key].RemoveAt(index);
+										Files[key].Add(lastrom);
 										subreader.Read();
 										continue;
 									}
 
-									// Get the roms from the machine
-									switch (subreader.Name)
+									// If we're in clean mode, sanitize the game name
+									if (clean)
 									{
-										case "description":
-											gamedesc = subreader.ReadElementContentAsString();
-											break;
-										case "year":
-											year = subreader.ReadElementContentAsString();
-											break;
-										case "manufacturer":
-											manufacturer = subreader.ReadElementContentAsString();
-											break;
-										case "release":
-											bool? defaultrel = null;
-											if (subreader.GetAttribute("default") != null)
-											{
-												if (subreader.GetAttribute("default") == "yes")
-												{
-													defaultrel = true;
-												}
-												else if (subreader.GetAttribute("default") == "no")
-												{
-													defaultrel = false;
-												}
-											}
+										tempname = Style.CleanGameName(tempname.Split(Path.DirectorySeparatorChar));
+									}
 
-											DatItem relrom = new Release(subreader.GetAttribute("name"), subreader.GetAttribute("region"), subreader.GetAttribute("language"), date, defaultrel);
-
-											// Now process and add the rom
-											ParseAddHelper(relrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-
-											subreader.Read();
-											break;
-										case "biosset":
-											bool? defaultbios = null;
-											if (subreader.GetAttribute("default") != null)
-											{
-												if (subreader.GetAttribute("default") == "yes")
-												{
-													defaultbios = true;
-												}
-												else if (subreader.GetAttribute("default") == "no")
-												{
-													defaultbios = false;
-												}
-											}
-
-											DatItem biosrom = new BiosSet(subreader.GetAttribute("name"), subreader.GetAttribute("description"), defaultbios,
-												tempname, null, gamedesc, null, null, romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
-
-											// Now process and add the rom
-											ParseAddHelper(biosrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-
-											subreader.Read();
-											break;
-										case "archive":
-											DatItem archiverom = new Archive(subreader.GetAttribute("name"), tempname, null, gamedesc, null, null,
-												romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
-
-											// Now process and add the rom
-											ParseAddHelper(archiverom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-
-											subreader.Read();
-											break;
-										case "sample":
-											DatItem samplerom = new Sample(subreader.GetAttribute("name"), tempname, null, gamedesc, null, null,
-												romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
-
-											// Now process and add the rom
-											ParseAddHelper(samplerom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-
-											subreader.Read();
+									DatItem inrom;
+									switch (subreader.Name.ToLowerInvariant())
+									{
+										case "disk":
+											inrom = new Disk(subreader.GetAttribute("name"), subreader.GetAttribute("md5"), subreader.GetAttribute("sha1"),
+												its, tempname, null, gamedesc, null, null, romof, cloneof, sampleof, null, false, null, null, sysid,
+												filename, srcid, null);
 											break;
 										case "rom":
-										case "disk":
-											empty = false;
-
-											// If the rom has a status, flag it
-											its = ItemStatus.None;
-											if (subreader.GetAttribute("flags") == "good" || subreader.GetAttribute("status") == "good")
-											{
-												its = ItemStatus.Good;
-											}
-											if (subreader.GetAttribute("flags") == "baddump" || subreader.GetAttribute("status") == "baddump")
-											{
-												logger.Verbose("Bad dump detected: " +
-													(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
-												its = ItemStatus.BadDump;
-											}
-											if (subreader.GetAttribute("flags") == "itemStatus" || subreader.GetAttribute("status") == "itemStatus")
-											{
-												logger.Verbose("Nodump detected: " +
-													(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
-												its = ItemStatus.Nodump;
-											}
-											if (subreader.GetAttribute("flags") == "verified" || subreader.GetAttribute("status") == "verified")
-											{
-												its = ItemStatus.Verified;
-											}
-
-											// If the rom has a Date attached, read it in and then sanitize it
-											date = "";
-											if (subreader.GetAttribute("date") != null)
-											{
-												DateTime dateTime = DateTime.Now;
-												if (DateTime.TryParse(subreader.GetAttribute("date"), out dateTime))
-												{
-													date = dateTime.ToString();
-												}
-												else
-												{
-													date = subreader.GetAttribute("date");
-												}
-											}
-
-											// Take care of hex-sized files
-											size = -1;
-											if (subreader.GetAttribute("size") != null && subreader.GetAttribute("size").Contains("0x"))
-											{
-												size = Convert.ToInt64(subreader.GetAttribute("size"), 16);
-											}
-											else if (subreader.GetAttribute("size") != null)
-											{
-												Int64.TryParse(subreader.GetAttribute("size"), out size);
-											}
-
-											// If the rom is continue or ignore, add the size to the previous rom
-											if (subreader.GetAttribute("loadflag") == "continue" || subreader.GetAttribute("loadflag") == "ignore")
-											{
-												int index = Files[key].Count() - 1;
-												DatItem lastrom = Files[key][index];
-												if (lastrom.Type == ItemType.Rom)
-												{
-													((Rom)lastrom).Size += size;
-												}
-												Files[key].RemoveAt(index);
-												Files[key].Add(lastrom);
-												subreader.Read();
-												continue;
-											}
-
-											// If we're in clean mode, sanitize the game name
-											if (clean)
-											{
-												tempname = Style.CleanGameName(tempname.Split(Path.DirectorySeparatorChar));
-											}
-
-											DatItem inrom;
-											switch (subreader.Name.ToLowerInvariant())
-											{
-												case "disk":
-													inrom = new Disk(subreader.GetAttribute("name"), subreader.GetAttribute("md5"), subreader.GetAttribute("sha1"),
-														its, tempname, null, gamedesc, null, null, romof, cloneof, sampleof, null, false, null, null, sysid,
-														filename, srcid, null);
-													break;
-												case "rom":
-												default:
-													inrom = new Rom(subreader.GetAttribute("name"), size, subreader.GetAttribute("crc"), subreader.GetAttribute("md5"),
-														subreader.GetAttribute("sha1"), its, date, tempname, null, gamedesc, null, null, romof, cloneof, sampleof,
-														null, false, null, null, sysid, filename, srcid, null);
-													break;
-											}
-
-											// Now process and add the rom
-											ParseAddHelper(inrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-
-											subreader.Read();
-											break;
 										default:
-											subreader.Read();
+											inrom = new Rom(subreader.GetAttribute("name"), size, subreader.GetAttribute("crc"), subreader.GetAttribute("md5"),
+												subreader.GetAttribute("sha1"), its, date, tempname, null, gamedesc, null, null, romof, cloneof, sampleof,
+												null, false, null, null, sysid, filename, srcid, null);
 											break;
 									}
-								}
-							}
 
-							// If we didn't find any items in the folder, make sure to add the blank rom
-							if (empty)
+									// Now process and add the rom
+									ParseAddHelper(inrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+
+									subreader.Read();
+									break;
+								default:
+									subreader.Read();
+									break;
+							}
+						}
+
+						// If we didn't find any items in the folder, make sure to add the blank rom
+						if (empty)
+						{
+							tempname = (parent.Count > 0 ? String.Join("\\", parent) + Path.DirectorySeparatorChar : "") + tempname;
+
+							Rom inrom = new Rom("null", tempname);
+
+							// Now process and add the rom
+							ParseAddHelper(inrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+
+							// Regardless, end the current folder
+							if (parent.Count == 0)
 							{
-								tempname = (parent.Count > 0 ? String.Join("\\", parent) + Path.DirectorySeparatorChar : "") + tempname;
-
-								Rom inrom = new Rom("null", tempname);
-
-								// Now process and add the rom
-								ParseAddHelper(inrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-
-								// Regardless, end the current folder
-								if (parent.Count == 0)
-								{
-									empty = true;
-								}
+								empty = true;
 							}
+						}
+						xtr.Skip();
+						break;
+					case "dir":
+					case "directory":
+						// Set SuperDAT flag for all SabreDAT inputs, regardless of depth
+						superdat = true;
+						if (keep)
+						{
+							Type = (Type == "" ? "SuperDAT" : Type);
+						}
+
+						string foldername = (xtr.GetAttribute("name") == null ? "" : xtr.GetAttribute("name"));
+						if (foldername != "")
+						{
+							parent.Add(foldername);
+						}
+
+						xtr.Read();
+						break;
+					case "file":
+						empty = false;
+
+						// If the rom is itemStatus, flag it
+						its = ItemStatus.None;
+						flagreader = xtr.ReadSubtree();
+
+						// If the subtree is empty, skip it
+						if (flagreader == null)
+						{
 							xtr.Skip();
-							break;
-						case "dir":
-						case "directory":
-							// Set SuperDAT flag for all SabreDAT inputs, regardless of depth
-							superdat = true;
-							if (keep)
+							continue;
+						}
+
+						while (!flagreader.EOF)
+						{
+							// We only want elements
+							if (flagreader.NodeType != XmlNodeType.Element || flagreader.Name == "flags")
 							{
-								Type = (Type == "" ? "SuperDAT" : Type);
-							}
-
-							string foldername = (xtr.GetAttribute("name") == null ? "" : xtr.GetAttribute("name"));
-							if (foldername != "")
-							{
-								parent.Add(foldername);
-							}
-
-							xtr.Read();
-							break;
-						case "file":
-							empty = false;
-
-							// If the rom is itemStatus, flag it
-							its = ItemStatus.None;
-							flagreader = xtr.ReadSubtree();
-							if (flagreader != null)
-							{
-								while (!flagreader.EOF)
-								{
-									// We only want elements
-									if (flagreader.NodeType != XmlNodeType.Element || flagreader.Name == "flags")
-									{
-										flagreader.Read();
-										continue;
-									}
-
-									switch (flagreader.Name)
-									{
-										case "flag":
-										case "status":
-											if (flagreader.GetAttribute("name") != null && flagreader.GetAttribute("value") != null)
-											{
-												string content = flagreader.GetAttribute("value");
-												switch (flagreader.GetAttribute("name"))
-												{
-													case "good":
-														its = ItemStatus.Good;
-														break;
-													case "baddump":
-														logger.Verbose("Bad dump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
-															"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
-														its = ItemStatus.BadDump;
-														break;
-													case "itemStatus":
-														logger.Verbose("Nodump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
-															"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
-														its = ItemStatus.Nodump;
-														break;
-													case "verified":
-														its = ItemStatus.Verified;
-														break;
-												}
-											}
-											break;
-									}
-
-									flagreader.Read();
-								}
-							}
-
-							// If the rom has a Date attached, read it in and then sanitize it
-							date = "";
-							if (xtr.GetAttribute("date") != null)
-							{
-								date = DateTime.Parse(xtr.GetAttribute("date")).ToString();
-							}
-
-							// Take care of hex-sized files
-							size = -1;
-							if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
-							{
-								size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
-							}
-							else if (xtr.GetAttribute("size") != null)
-							{
-								Int64.TryParse(xtr.GetAttribute("size"), out size);
-							}
-
-							// If the rom is continue or ignore, add the size to the previous rom
-							if (xtr.GetAttribute("loadflag") == "continue" || xtr.GetAttribute("loadflag") == "ignore")
-							{
-								int index = Files[key].Count() - 1;
-								DatItem lastrom = Files[key][index];
-								if (lastrom.Type == ItemType.Rom)
-								{
-									((Rom)lastrom).Size += size;
-								}
-								Files[key].RemoveAt(index);
-								Files[key].Add(lastrom);
+								flagreader.Read();
 								continue;
 							}
 
-							// Get the name of the game from the parent
-							tempname = String.Join("\\", parent);
-
-							// If we aren't keeping names, trim out the path
-							if (!keep || !superdat)
+							switch (flagreader.Name)
 							{
-								string tempout = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
-								if (tempout != "")
-								{
-									tempname = tempout;
-								}
+								case "flag":
+								case "status":
+									if (flagreader.GetAttribute("name") != null && flagreader.GetAttribute("value") != null)
+									{
+										string content = flagreader.GetAttribute("value");
+										switch (flagreader.GetAttribute("name"))
+										{
+											case "good":
+												its = ItemStatus.Good;
+												break;
+											case "baddump":
+												logger.Verbose("Bad dump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
+													"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
+												its = ItemStatus.BadDump;
+												break;
+											case "itemStatus":
+												logger.Verbose("Nodump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
+													"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
+												its = ItemStatus.Nodump;
+												break;
+											case "verified":
+												its = ItemStatus.Verified;
+												break;
+										}
+									}
+									break;
 							}
 
-							DatItem rom;
-							switch (xtr.GetAttribute("type").ToLowerInvariant())
+							flagreader.Read();
+						}
+
+						// If the rom has a Date attached, read it in and then sanitize it
+						date = "";
+						if (xtr.GetAttribute("date") != null)
+						{
+							date = DateTime.Parse(xtr.GetAttribute("date")).ToString();
+						}
+
+						// Take care of hex-sized files
+						size = -1;
+						if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
+						{
+							size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
+						}
+						else if (xtr.GetAttribute("size") != null)
+						{
+							Int64.TryParse(xtr.GetAttribute("size"), out size);
+						}
+
+						// If the rom is continue or ignore, add the size to the previous rom
+						if (xtr.GetAttribute("loadflag") == "continue" || xtr.GetAttribute("loadflag") == "ignore")
+						{
+							int index = Files[key].Count() - 1;
+							DatItem lastrom = Files[key][index];
+							if (lastrom.Type == ItemType.Rom)
 							{
-								case "disk":
-									rom = new Disk(xtr.GetAttribute("name"), xtr.GetAttribute("md5")?.ToLowerInvariant(),
-										xtr.GetAttribute("sha1")?.ToLowerInvariant(), its, tempname, null, tempname, null, null,
-										null, null, null, null, false, null, null, sysid, filename, srcid, null);
-									break;
-								case "rom":
-								default:
-									rom = new Rom(xtr.GetAttribute("name"), size, xtr.GetAttribute("crc")?.ToLowerInvariant(),
-										xtr.GetAttribute("md5")?.ToLowerInvariant(), xtr.GetAttribute("sha1")?.ToLowerInvariant(), its,
-										date, tempname, null, tempname, null, null, null, null, null, null, false, null, null, sysid, filename,
-										srcid, null);
-									break;
+								((Rom)lastrom).Size += size;
 							}
+							Files[key].RemoveAt(index);
+							Files[key].Add(lastrom);
+							continue;
+						}
 
-							// Now process and add the rom
-							ParseAddHelper(rom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+						// Get the name of the game from the parent
+						tempname = String.Join("\\", parent);
 
-							xtr.Read();
-							break;
-						default:
-							xtr.Read();
-							break;
-					}
+						// If we aren't keeping names, trim out the path
+						if (!keep || !superdat)
+						{
+							string tempout = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
+							if (tempout != "")
+							{
+								tempname = tempout;
+							}
+						}
+
+						DatItem rom;
+						switch (xtr.GetAttribute("type").ToLowerInvariant())
+						{
+							case "disk":
+								rom = new Disk(xtr.GetAttribute("name"), xtr.GetAttribute("md5")?.ToLowerInvariant(),
+									xtr.GetAttribute("sha1")?.ToLowerInvariant(), its, tempname, null, tempname, null, null,
+									null, null, null, null, false, null, null, sysid, filename, srcid, null);
+								break;
+							case "rom":
+							default:
+								rom = new Rom(xtr.GetAttribute("name"), size, xtr.GetAttribute("crc")?.ToLowerInvariant(),
+									xtr.GetAttribute("md5")?.ToLowerInvariant(), xtr.GetAttribute("sha1")?.ToLowerInvariant(), its,
+									date, tempname, null, tempname, null, null, null, null, null, null, false, null, null, sysid, filename,
+									srcid, null);
+								break;
+						}
+
+						// Now process and add the rom
+						ParseAddHelper(rom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+
+						xtr.Read();
+						break;
+					default:
+						xtr.Read();
+						break;
 				}
-
-				xtr.Dispose();
 			}
+
+			xtr.Dispose();
 		}
 
 		/// <summary>
