@@ -2534,11 +2534,17 @@ namespace SabreTools.Helper
 								case "title":
 									tempname = subreader.ReadElementContentAsString();
 									break;
+								case "romSize":
+									if (!Int64.TryParse(subreader.ReadElementContentAsString(), out size))
+									{
+										size = -1;
+									}
+									break;
 								case "romCRC":
 									tempname += (subreader.GetAttribute("extension") != null ? subreader.GetAttribute("extension") : "");
 									crc = subreader.ReadElementContentAsString();
 
-									DatItem olrom = new Rom(tempname, -1, crc, null, null, ItemStatus.None, null, tempname, null, tempname, null, null,
+									DatItem olrom = new Rom(tempname, size, crc, null, null, ItemStatus.None, null, tempname, null, tempname, null, null,
 										null, null, null, null, false, null, null, sysid, null, srcid, "");
 
 									// Now process and add the rom
