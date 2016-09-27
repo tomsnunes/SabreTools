@@ -30,6 +30,7 @@ namespace SabreTools.Helper
 		RedumpSHA1 = 0x080,
 		RedumpSFV = 0x100,
 		SoftwareList = 0x200,
+		OfflineList = 0x400,
 	}
 
 	/// <summary>

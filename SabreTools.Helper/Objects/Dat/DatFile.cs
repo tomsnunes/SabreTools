@@ -1216,13 +1216,14 @@ namespace SabreTools.Helper
 				case OutputFormat.DOSCenter:
 					ParseCMP(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean);
 					break;
-				case OutputFormat.RomCenter:
-					ParseRC(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, clean);
-					break;
+				case OutputFormat.OfflineList:
 				case OutputFormat.SabreDat:
 				case OutputFormat.SoftwareList:
 				case OutputFormat.Xml:
 					ParseXML(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
+					break;
+				case OutputFormat.RomCenter:
+					ParseRC(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, clean);
 					break;
 				default:
 					return;
@@ -2006,7 +2007,7 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Parse an XML DAT (Logiqx, SabreDAT, or SL) and return all found games and roms within
+		/// Parse an XML DAT (Logiqx, OfflineList, SabreDAT, and Software List) and return all found games and roms within
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
@@ -2191,6 +2192,47 @@ namespace SabreTools.Helper
 							Version = (String.IsNullOrEmpty(Version) ? xtr.GetAttribute("version") : Version);
 						}
 						xtr.Read();
+						break;
+					// OfflineList has a different header format
+					case "configuration":
+						headreader = xtr.ReadSubtree();
+
+						// If there's no subtree to the header, skip it
+						if (headreader == null)
+						{
+							xtr.Skip();
+							continue;
+						}
+
+						// Otherwise, read what we can from the header
+						while (!headreader.EOF)
+						{
+							// We only want elements
+							if (headreader.NodeType != XmlNodeType.Element || headreader.Name == "configuration")
+							{
+								headreader.Read();
+								continue;
+							}
+
+							// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
+							string content = "";
+							switch (headreader.Name.ToLowerInvariant())
+							{
+								case "datname":
+									content = headreader.ReadElementContentAsString(); ;
+									Name = (String.IsNullOrEmpty(Name) ? content : Name);
+									superdat = superdat || content.Contains(" - SuperDAT");
+									if (keep && superdat)
+									{
+										Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
+									}
+									break;
+								default:
+									headreader.Read();
+									break;
+							}
+						}
+
 						break;
 					// We want to process the entire subtree of the header
 					case "header":
@@ -2454,13 +2496,6 @@ namespace SabreTools.Helper
 						}
 						else
 						{
-							// There are rare cases where a malformed XML will not have the required attributes. We can only skip them.
-							if (xtr.AttributeCount == 0)
-							{
-								logger.Error("No attributes were found");
-								xtr.Skip();
-								continue;
-							}
 							tempname = xtr.GetAttribute("name");
 							romof = (xtr.GetAttribute("romof") != null ? xtr.GetAttribute("romof") : "");
 							cloneof = (xtr.GetAttribute("cloneof") != null ? xtr.GetAttribute("cloneof") : "");
@@ -2495,6 +2530,22 @@ namespace SabreTools.Helper
 							// Get the roms from the machine
 							switch (subreader.Name)
 							{
+								// For offline lists only
+								case "title":
+									tempname = subreader.ReadElementContentAsString();
+									break;
+								case "romCRC":
+									tempname += (subreader.GetAttribute("extension") != null ? subreader.GetAttribute("extension") : "");
+									crc = subreader.ReadElementContentAsString();
+
+									DatItem olrom = new Rom(tempname, -1, crc, null, null, ItemStatus.None, null, tempname, null, tempname, null, null,
+										null, null, null, null, false, null, null, sysid, null, srcid, "");
+
+									// Now process and add the rom
+									ParseAddHelper(olrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+									break;
+								
+								// For Logiqx, SabreDAT, and Software List
 								case "description":
 									gamedesc = subreader.ReadElementContentAsString();
 									break;

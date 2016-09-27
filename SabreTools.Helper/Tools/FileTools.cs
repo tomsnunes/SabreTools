@@ -90,6 +90,10 @@ namespace SabreTools.Helper
 					{
 						return OutputFormat.SabreDat;
 					}
+					else if (second.StartsWith("<dat"))
+					{
+						return OutputFormat.OfflineList;
+					}
 				}
 
 				// If we have an INI-based DAT
