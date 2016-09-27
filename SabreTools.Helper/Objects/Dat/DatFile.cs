@@ -2516,6 +2516,10 @@ namespace SabreTools.Helper
 							tempname = String.Join("\\", parent) + "\\" + tempname;
 						}
 
+						// Special offline list parts
+						string ext = "";
+						string releaseNumber = "";
+
 						while (software || !subreader.EOF)
 						{
 							software = false;
@@ -2534,6 +2538,9 @@ namespace SabreTools.Helper
 								case "title":
 									tempname = subreader.ReadElementContentAsString();
 									break;
+								case "releaseNumber":
+									releaseNumber = subreader.ReadElementContentAsString();
+									break;
 								case "romSize":
 									if (!Int64.TryParse(subreader.ReadElementContentAsString(), out size))
 									{
@@ -2541,11 +2548,12 @@ namespace SabreTools.Helper
 									}
 									break;
 								case "romCRC":
-									tempname += (subreader.GetAttribute("extension") != null ? subreader.GetAttribute("extension") : "");
-									crc = subreader.ReadElementContentAsString();
+									empty = false;
 
-									DatItem olrom = new Rom(tempname, size, crc, null, null, ItemStatus.None, null, tempname, null, tempname, null, null,
-										null, null, null, null, false, null, null, sysid, null, srcid, "");
+									ext = (subreader.GetAttribute("extension") != null ? subreader.GetAttribute("extension") : "");
+
+									DatItem olrom = new Rom(releaseNumber + " - " + tempname + ext, size, subreader.ReadElementContentAsString(), null, null, ItemStatus.None,
+										null, tempname, null, tempname, null, null, null, null, null, null, false, null, null, sysid, null, srcid, "");
 
 									// Now process and add the rom
 									ParseAddHelper(olrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
@@ -2562,6 +2570,8 @@ namespace SabreTools.Helper
 									manufacturer = subreader.ReadElementContentAsString();
 									break;
 								case "release":
+									empty = false;
+
 									bool? defaultrel = null;
 									if (subreader.GetAttribute("default") != null)
 									{
@@ -2583,6 +2593,8 @@ namespace SabreTools.Helper
 									subreader.Read();
 									break;
 								case "biosset":
+									empty = false;
+
 									bool? defaultbios = null;
 									if (subreader.GetAttribute("default") != null)
 									{
@@ -2605,6 +2617,8 @@ namespace SabreTools.Helper
 									subreader.Read();
 									break;
 								case "archive":
+									empty = false;
+
 									DatItem archiverom = new Archive(subreader.GetAttribute("name"), tempname, null, gamedesc, null, null,
 										romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
 
@@ -2614,6 +2628,8 @@ namespace SabreTools.Helper
 									subreader.Read();
 									break;
 								case "sample":
+									empty = false;
+
 									DatItem samplerom = new Sample(subreader.GetAttribute("name"), tempname, null, gamedesc, null, null,
 										romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
 
