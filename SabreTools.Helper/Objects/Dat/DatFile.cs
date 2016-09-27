@@ -4431,7 +4431,7 @@ namespace SabreTools.Helper
 					line += "\n";
 					break;
 				case StatOutputFormat.HTML:
-					line = "\t\t\t<tr><td>" + HttpUtility.HtmlEncode(FileName) + "</td>"
+					line = "\t\t\t<tr" + (FileName.StartsWith("DIR: ") ? " class=\"red\"" : "") +"><td>" + HttpUtility.HtmlEncode(FileName) + "</td>"
 						+ "<td align=\"right\">" + Style.GetBytesReadable(TotalSize) + "</td>"
 						+ "<td align=\"right\">" + (game == -1 ? Files.Count : game) + "</td>"
 						+ "<td align=\"right\">" + RomCount + "</td>"
@@ -5345,7 +5345,7 @@ namespace SabreTools.Helper
 			// Output total DAT stats
 			DatFile totaldata = new DatFile
 			{
-				FileName = "ALL",
+				FileName = "DIR: All DATs",
 				TotalSize = totalSize,
 				RomCount = totalRom,
 				DiskCount = totalDisk,
@@ -5413,8 +5413,13 @@ Please check the log folder if the stats scrolled offscreen", false);
 <html>
 	<header>
 		<title>DAT Statistics Report</title>
+		<style>
+			.red {
+				color: red;
+			}
+		</style>
 	</header>
-	<body>
+	<body bgcolor=""lightgray"">
 		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
 ";
 					break;
@@ -5447,7 +5452,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 						+ (baddumpCol ? ",\"BadDumps\"" : "") + (nodumpCol ? ",\"Nodumps\"" : "") + "\n";
 					break;
 				case StatOutputFormat.HTML:
-					head = @"			<tr><th>File Name</th><th align=""right"">Total Size</th><th align=""right"">Games</th><th align=""right"">Roms</th>"
+					head = @"			<tr bgcolor=""gray""><th>File Name</th><th align=""right"">Total Size</th><th align=""right"">Games</th><th align=""right"">Roms</th>"
 + @"<th align=""right"">Disks</th><th align=""right"">&#35; with CRC</th><th align=""right"">&#35; with MD5</th><th align=""right"">&#35; with SHA-1</th>"
 + (baddumpCol ? "<th align=\"right\">Baddumps</th>" : "") + (nodumpCol ? "<th align=\"right\">Nodumps</th>" : "") + "</tr>\n";
 					break;
