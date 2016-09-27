@@ -1213,12 +1213,14 @@ namespace SabreTools.Helper
 			switch (FileTools.GetOutputFormat(filename, logger))
 			{
 				case OutputFormat.ClrMamePro:
+				case OutputFormat.DOSCenter:
 					ParseCMP(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean);
 					break;
 				case OutputFormat.RomCenter:
 					ParseRC(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, clean);
 					break;
 				case OutputFormat.SabreDat:
+				case OutputFormat.SoftwareList:
 				case OutputFormat.Xml:
 					ParseXML(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
 					break;
@@ -2129,6 +2131,48 @@ namespace SabreTools.Helper
 							if (xtr.GetAttribute("description") != null)
 							{
 								Description = (String.IsNullOrEmpty(Description) ? xtr.GetAttribute("description") : Description);
+							}
+							if (xtr.GetAttribute("forcemerging") != null)
+							{
+								switch (xtr.GetAttribute("forcemerging"))
+								{
+									case "split":
+										ForceMerging = ForceMerging.Split;
+										break;
+									case "none":
+										ForceMerging = ForceMerging.None;
+										break;
+									case "full":
+										ForceMerging = ForceMerging.Full;
+										break;
+								}
+							}
+							if (xtr.GetAttribute("forceitemStatus") != null)
+							{
+								switch (xtr.GetAttribute("forceitemStatus"))
+								{
+									case "obsolete":
+										ForceNodump = ForceNodump.Obsolete;
+										break;
+									case "required":
+										ForceNodump = ForceNodump.Required;
+										break;
+									case "ignore":
+										ForceNodump = ForceNodump.Ignore;
+										break;
+								}
+							}
+							if (xtr.GetAttribute("forcepacking") != null)
+							{
+								switch (xtr.GetAttribute("forcepacking"))
+								{
+									case "zip":
+										ForcePacking = ForcePacking.Zip;
+										break;
+									case "unzip":
+										ForcePacking = ForcePacking.Unzip;
+										break;
+								}
 							}
 							xtr.Read();
 							break;
@@ -3202,7 +3246,7 @@ namespace SabreTools.Helper
 						break;
 					case OutputFormat.SabreDat:
 						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
+							"<!DOCTYPE sabredat SYSTEM \"newdat.xsd\">\n\n" +
 							"<datafile>\n" +
 							"\t<header>\n" +
 							"\t\t<name>" + HttpUtility.HtmlEncode(Name) + "</name>\n" +

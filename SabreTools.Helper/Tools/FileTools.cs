@@ -69,26 +69,55 @@ namespace SabreTools.Helper
 
 			try
 			{
+				// Get the first two lines to check
 				StreamReader sr = File.OpenText(filename);
-				string first = sr.ReadLine();
+				string first = sr.ReadLine().ToLowerInvariant();
+				string second = sr.ReadLine().ToLowerInvariant();
 				sr.Dispose();
-				if (first.Contains("<") && first.Contains(">"))
+
+				// If we have an XML-based DAT
+				if (first.StartsWith("<?xml") && first.EndsWith("?>"))
 				{
-					return OutputFormat.Xml;
+					if (second.StartsWith("<!doctype datafile"))
+					{
+						return OutputFormat.Xml;
+					}
+					else if (second.StartsWith("<!doctype softwarelist"))
+					{
+						return OutputFormat.SoftwareList;
+					}
+					else if (second.StartsWith("<!doctype sabredat"))
+					{
+						return OutputFormat.SabreDat;
+					}
 				}
+
+				// If we have an INI-based DAT
 				else if (first.Contains("[") && first.Contains("]"))
 				{
 					return OutputFormat.RomCenter;
 				}
-				else
+
+				// If we have a CMP-based DAT
+				else if (first.StartsWith("clrmamepro"))
 				{
 					return OutputFormat.ClrMamePro;
+				}
+				else if (first.StartsWith("romvault"))
+				{
+					return OutputFormat.ClrMamePro;
+				}
+				else if (first.StartsWith("doscenter"))
+				{
+					return OutputFormat.DOSCenter;
 				}
 			}
 			catch (Exception)
 			{
 				return 0;
 			}
+
+			return 0;
 		}
 
 		/// <summary>

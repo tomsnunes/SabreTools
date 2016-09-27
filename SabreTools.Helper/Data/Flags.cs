@@ -29,6 +29,7 @@ namespace SabreTools.Helper
 		RedumpMD5 = 0x040,
 		RedumpSHA1 = 0x080,
 		RedumpSFV = 0x100,
+		SoftwareList = 0x200,
 	}
 
 	/// <summary>
