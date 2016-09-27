@@ -4430,20 +4430,20 @@ namespace SabreTools.Helper
 				case StatOutputFormat.HTML:
 					line = "\t\t\t<tr><td>" + HttpUtility.HtmlEncode(FileName) + "</td>"
 						+ "<td>" + Style.GetBytesReadable(TotalSize) + "</td>"
-						+ "<td>" + (game == -1 ? Files.Count : game) + "</td>"
-						+ "<td>" + RomCount + "</td>"
-						+ "<td>" + DiskCount + "</td>"
-						+ "<td>" + CRCCount + "</td>"
-						+ "<td>" + MD5Count + "</td>"
-						+ "<td>" + SHA1Count + "</td>";
+						+ "<td align=\"right\">" + (game == -1 ? Files.Count : game) + "</td>"
+						+ "<td align=\"right\">" + RomCount + "</td>"
+						+ "<td align=\"right\">" + DiskCount + "</td>"
+						+ "<td align=\"right\">" + CRCCount + "</td>"
+						+ "<td align=\"right\">" + MD5Count + "</td>"
+						+ "<td align=\"right\">" + SHA1Count + "</td>";
 
 					if (baddumpCol)
 					{
-						line += "<td>" + BaddumpCount + "</td>";
+						line += "<td align=\"right\">" + BaddumpCount + "</td>";
 					}
 					if (nodumpCol)
 					{
-						line += "<td>" + NodumpCount + "</td>";
+						line += "<td align=\"right\">" + NodumpCount + "</td>";
 					}
 
 					line += "</tr>\n";
