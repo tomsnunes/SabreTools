@@ -1189,7 +1189,11 @@ namespace SabreTools.Helper
 		{
 			// Check the file extension first as a safeguard
 			string ext = Path.GetExtension(filename).ToLowerInvariant();
-			if (ext != ".txt" && ext != ".dat" && ext != ".xml")
+			if (ext.StartsWith("."))
+			{
+				ext = ext.Substring(1);
+			}
+			if (ext != "txt" && ext != "dat" && ext != "xml")
 			{
 				return;
 			}
@@ -3013,7 +3017,7 @@ namespace SabreTools.Helper
 			if (stats)
 			{
 				StreamWriter sw = new StreamWriter(new MemoryStream());
-				OutputStats(sw, StatOutputFormat.None, logger, (RomCount + DiskCount == 0));
+				OutputStats(sw, StatOutputFormat.None, logger, recalculate: (RomCount + DiskCount == 0), baddumpCol: true, nodumpCol: true);
 				sw.Dispose();
 			}
 

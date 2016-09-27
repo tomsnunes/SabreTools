@@ -263,7 +263,7 @@ namespace SabreTools.Helper
 			Console.SetCursorPosition(0, Constants.HeaderHeight + 1);
 			_logger.User("Stats of the matched ROMs:");
 			StreamWriter sw = new StreamWriter(new MemoryStream());
-			_matched.OutputStats(sw, StatOutputFormat.None, _logger, true);
+			_matched.OutputStats(sw, StatOutputFormat.None, _logger, recalculate: true, baddumpCol: true, nodumpCol: true);
 			sw.Dispose();
 
 			// Now output the fixdat based on the original input if asked

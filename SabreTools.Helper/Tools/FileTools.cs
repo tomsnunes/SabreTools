@@ -22,7 +22,11 @@ namespace SabreTools.Helper
 		{
 			// Limit the output formats based on extension
 			string ext = Path.GetExtension(filename).ToLowerInvariant();
-			if (ext != ".dat" && ext != ".xml")
+			if (ext.StartsWith("."))
+			{
+				ext = ext.Substring(1);
+			}
+			if (ext != "dat" && ext != "xml")
 			{
 				return 0;
 			}
