@@ -4432,7 +4432,7 @@ namespace SabreTools.Helper
 					break;
 				case StatOutputFormat.HTML:
 					line = "\t\t\t<tr" + (FileName.StartsWith("DIR: ")
-							? " class=\"red\"><td>" + HttpUtility.HtmlEncode(FileName.Remove(0, 5))
+							? " class=\"dir\"><td>" + HttpUtility.HtmlEncode(FileName.Remove(0, 5))
 							: "><td>" + HttpUtility.HtmlEncode(FileName)) + "</td>"
 						+ "<td align=\"right\">" + Style.GetBytesReadable(TotalSize) + "</td>"
 						+ "<td align=\"right\">" + (game == -1 ? Files.Count : game) + "</td>"
@@ -5418,8 +5418,8 @@ Please check the log folder if the stats scrolled offscreen", false);
 			body {
 				background-color: lightgray;
 			}
-			.red {
-				color: red;
+			.dir {
+				color: #0088FF;
 			}
 			.right {
 				align: right;
