@@ -33,7 +33,7 @@ namespace SabreTools
 			Dictionary<string, Tuple<long, bool>> depots = new Dictionary<string, Tuple<long, bool>>();
 
 			// Get the XML text reader for the configuration file, if possible
-			XmlTextReader xtr = FileTools.GetXmlTextReader(_config, _logger);
+			XmlReader xtr = FileTools.GetXmlTextReader(_config, _logger);
 
 			// Now parse the XML file for settings
 			if (xtr != null)

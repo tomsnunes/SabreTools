@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Xml;
+using System.Xml.Schema;
 
 namespace SabreTools.Helper
 {
@@ -176,7 +177,7 @@ namespace SabreTools.Helper
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		/// <returns>The XmlTextReader representing the (possibly converted) file, null otherwise</returns>
-		public static XmlTextReader GetXmlTextReader(string filename, Logger logger)
+		public static XmlReader GetXmlTextReader(string filename, Logger logger)
 		{
 			logger.Verbose("Attempting to read file: \"" + filename + "\"");
 
@@ -187,10 +188,14 @@ namespace SabreTools.Helper
 				return null;
 			}
 
-			XmlTextReader xtr;
-			xtr = new XmlTextReader(filename);
-			xtr.WhitespaceHandling = WhitespaceHandling.None;
-			xtr.DtdProcessing = DtdProcessing.Ignore;
+			XmlReader xtr = XmlReader.Create(filename, new XmlReaderSettings {
+				CheckCharacters = false,
+				DtdProcessing = DtdProcessing.Ignore,
+				IgnoreComments = true,
+				IgnoreWhitespace = true,
+				ValidationFlags = XmlSchemaValidationFlags.None,
+				ValidationType = ValidationType.None,
+			});
 			return xtr;
 		}
 

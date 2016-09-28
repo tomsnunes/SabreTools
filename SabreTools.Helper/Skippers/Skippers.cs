@@ -64,7 +64,7 @@ namespace SabreTools.Helper
 			}
 
 			Logger logger = new Logger(false, "");
-			XmlTextReader xtr = FileTools.GetXmlTextReader(filename, logger);
+			XmlReader xtr = FileTools.GetXmlTextReader(filename, logger);
 
 			if (xtr == null)
 			{
