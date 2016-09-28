@@ -1192,7 +1192,7 @@ namespace SabreTools.Helper
 			{
 				ext = ext.Substring(1);
 			}
-			if (ext != "txt" && ext != "dat" && ext != "xml")
+			if (ext != "dat" && ext != "md5" && ext != "sfv" && ext != "sha1" && ext != "txt" && ext != "xml")
 			{
 				return;
 			}

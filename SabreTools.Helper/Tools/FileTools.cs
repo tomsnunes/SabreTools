@@ -52,7 +52,7 @@ namespace SabreTools.Helper
 			{
 				ext = ext.Substring(1);
 			}
-			if (ext != "dat" && ext != "xml")
+			if (ext != "dat" && ext != "md5" && ext != "sfv" && ext != "sha1" && ext != "txt" && ext != "xml")
 			{
 				return 0;
 			}
@@ -67,6 +67,21 @@ namespace SabreTools.Helper
 				return 0;
 			}
 
+			// Some formats only require the extension to know
+			if (ext == "md5")
+			{
+				return OutputFormat.RedumpMD5;
+			}
+			if (ext == "sfv")
+			{
+				return OutputFormat.RedumpSFV;
+			}
+			if (ext == "sha1")
+			{
+				return OutputFormat.RedumpSHA1;
+			}
+
+			// For everything else, we need to read it
 			try
 			{
 				// Get the first two lines to check
