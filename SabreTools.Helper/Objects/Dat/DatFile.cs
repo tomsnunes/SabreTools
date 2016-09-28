@@ -2227,6 +2227,10 @@ namespace SabreTools.Helper
 										Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
 									}
 									break;
+								case "datversionurl":
+									content = headreader.ReadElementContentAsString(); ;
+									Url = (String.IsNullOrEmpty(Name) ? content : Url);
+									break;
 								default:
 									headreader.Read();
 									break;
@@ -3327,6 +3331,50 @@ namespace SabreTools.Helper
 								"Rom Name\",\"Disk Name\",\"Size\",\"CRC\",\"MD5\",\"SHA1\",\"Nodump\"\n";
 						}
 						break;
+					case OutputFormat.OfflineList:
+						header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+							+ "<dat xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"datas.xsd\">\n"
+							+ "\t<configuration>\n"
+							+ "\t\t<datName>" + HttpUtility.HtmlEncode(Name) + "</datName>\n"
+							+ "\t\t<datVersion>" + Files.Count + "</datVersion>\n"
+							+ "\t\t<system>none</system>\n"
+							+ "\t\t<screenshotsWidth>240</screenshotsWidth>\n"
+							+ "\t\t<screenshotsHeight>160</screenshotsHeight>\n"
+							+ "\t\t<infos>\n"
+							+ "\t\t\t<title visible=\"false\" inNamingOption=\"true\" default=\"false\"/>\n"
+							+ "\t\t\t<location visible=\"true\" inNamingOption=\"true\" default=\"true\"/>\n"
+							+ "\t\t\t<publisher visible=\"true\" inNamingOption=\"true\" default=\"true\"/>\n"
+							+ "\t\t\t<sourceRom visible=\"true\" inNamingOption=\"true\" default=\"true\"/>\n"
+							+ "\t\t\t<saveType visible=\"true\" inNamingOption=\"true\" default=\"true\"/>\n"
+							+ "\t\t\t<romSize visible=\"true\" inNamingOption=\"true\" default=\"true\"/>\n"
+							+ "\t\t\t<releaseNumber visible=\"true\" inNamingOption=\"true\" default=\"false\"/>\n"
+							+ "\t\t\t<languageNumber visible=\"true\" inNamingOption=\"true\" default=\"false\"/>\n"
+							+ "\t\t\t<comment visible=\"true\" inNamingOption=\"true\" default=\"false\"/>\n"
+							+ "\t\t\t<romCRC visible=\"true\" inNamingOption=\"true\" default=\"false\"/>\n"
+							+ "\t\t\t<im1CRC visible=\"false\" inNamingOption=\"false\" default=\"false\"/>\n"
+							+ "\t\t\t<im2CRC visible=\"false\" inNamingOption=\"false\" default=\"false\"/>\n"
+							+ "\t\t\t<languages visible=\"true\" inNamingOption=\"true\" default=\"true\"/>\n"
+							+ "\t\t</infos>\n"
+							+ "\t\t<canOpen>\n"
+							+ "\t\t\t<extension>.bin</extension>\n"
+							+ "\t\t</canOpen>\n"
+							+ "\t\t<newDat>\n"
+							+ "\t\t\t<datVersionURL>" + HttpUtility.HtmlEncode(Url) + "</datVersionURL>\n"
+							+ "\t\t\t<datURL fileName=\"" + HttpUtility.HtmlEncode(FileName) + ".zip\">" + HttpUtility.HtmlEncode(Url) + "</datURL>\n"
+							+ "\t\t\t<imURL>" + HttpUtility.HtmlEncode(Url) + "</imURL>\n"
+							+ "\t\t</newDat>\n"
+							+ "\t\t<search>\n"
+							+ "\t\t\t<to value=\"location\" default=\"true\" auto=\"true\"/>\n"
+							+ "\t\t\t<to value=\"romSize\" default=\"true\" auto=\"false\"/>\n"
+							+ "\t\t\t<to value=\"languages\" default=\"true\" auto=\"true\"/>\n"
+							+ "\t\t\t<to value=\"saveType\" default=\"false\" auto=\"false\"/>\n"
+							+ "\t\t\t<to value=\"publisher\" default=\"false\" auto=\"true\"/>\n"
+							+ "\t\t\t<to value=\"sourceRom\" default=\"false\" auto=\"true\"/>\n"
+							+ "\t\t</search>\n"
+							+ "\t\t<romTitle >%u - %n</romTitle>\n"
+							+ "\t</configuration>\n"
+							+ "\t<games>\n";
+						break;
 					case OutputFormat.RomCenter:
 						header = "[CREDITS]\n" +
 							"author=" + Author + "\n" +
@@ -3384,7 +3432,6 @@ namespace SabreTools.Helper
 								" />\n\n";
 						break;
 					case OutputFormat.Xml:
-					case OutputFormat.OfflineList:
 						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
 							"<datafile>\n" +
@@ -3484,7 +3531,6 @@ namespace SabreTools.Helper
 							+ "\t\t<part name=\"flop1\" interface=\"flop1\">\n";
 						break;
 					case OutputFormat.Xml:
-					case OutputFormat.OfflineList:
 						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
 							(rom.IsBios ? " isbios=\"yes\"" : "") +
 							(String.IsNullOrEmpty(rom.CloneOf) ? "" : " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
@@ -3537,6 +3583,9 @@ namespace SabreTools.Helper
 					case OutputFormat.DOSCenter:
 						state += (String.IsNullOrEmpty(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n") + ")\n";
 						break;
+					case OutputFormat.OfflineList:
+						state += "\t\t</game>\n";
+						break;
 					case OutputFormat.SabreDat:
 						if (splitpath != null)
 						{
@@ -3571,7 +3620,6 @@ namespace SabreTools.Helper
 						state += "\t</software>\n\n";
 						break;
 					case OutputFormat.Xml:
-					case OutputFormat.OfflineList:
 						state += "\t</machine>\n";
 						break;
 				}
@@ -3830,6 +3878,54 @@ namespace SabreTools.Helper
 							}
 						}
 						break;
+					case OutputFormat.OfflineList:
+						state += "\t\t<game>\n"
+							+ "\t\t\t<imageNumber>1</imageNumber>\n"
+							+ "\t\t\t<releaseNumber>1</releaseNumber>\n"
+							+ "\t\t\t<title>" + HttpUtility.HtmlEncode(rom.Name) + "</title>\n"
+							+ "\t\t\t<saveType>None</saveType>\n";
+
+						if (rom.Type == ItemType.Rom)
+						{
+							state += "\t\t\t<romSize>" + ((Rom)rom).Size + "</romSize>\n";
+						}
+
+						state += "\t\t\t<publisher>None</publisher>\n"
+							+ "\t\t\t<location>0</location>\n"
+							+ "\t\t\t<sourceRom>None</sourceRom>\n"
+							+ "\t\t\t<language>0</language>\n";
+
+						if (rom.Type == ItemType.Disk)
+						{
+							state += "\t\t\t<files>\n"
+								+ (((Disk)rom).MD5 != null
+									? "\t\t\t\t<romMD5 extension=\".chd\">" + ((Disk)rom).MD5 + "</romMD5>\n"
+									: "\t\t\t\t<romSHA1 extension=\".chd\">" + ((Disk)rom).SHA1 + "</romSHA1>\n")
+								+ "\t\t\t</files>\n";
+						}
+						else if (rom.Type == ItemType.Rom)
+						{
+							string tempext = Path.GetExtension(((Rom)rom).Name);
+							if (!tempext.StartsWith("."))
+							{
+								tempext = "." + tempext;
+							}
+
+							state += "\t\t\t<files>\n"
+								+ (((Rom)rom).CRC != null
+									? "\t\t\t\t<romCRC extension=\"" + tempext + "\">" + ((Rom)rom).CRC + "</romMD5>\n"
+									: ((Rom)rom).MD5 != null
+										? "\t\t\t\t<romMD5 extension=\"" + tempext + "\">" + ((Rom)rom).MD5 + "</romMD5>\n"
+										: "\t\t\t\t<romSHA1 extension=\"" + tempext + "\">" + ((Rom)rom).SHA1 + "</romSHA1>\n")
+								+ "\t\t\t</files>\n";
+						}
+
+						state += "\t\t\t<im1CRC>00000000</im1CRC>\n"
+							+ "\t\t\t<im2CRC>00000000</im2CRC>\n"
+							+ "\t\t\t<comment></comment>"
+							+ "\t\t\t<duplicateID>0</duplicateID>\n"
+							+ "\t\t</game>\n";
+						break;
 					case OutputFormat.RedumpMD5:
 						if (rom.Type == ItemType.Rom)
 						{
@@ -3998,7 +4094,6 @@ namespace SabreTools.Helper
 						}
 						break;
 					case OutputFormat.Xml:
-					case OutputFormat.OfflineList:
 						switch (rom.Type)
 						{
 							case ItemType.Archive:
@@ -4083,6 +4178,17 @@ namespace SabreTools.Helper
 						case OutputFormat.DOSCenter:
 							footer = ")\n";
 							break;
+						case OutputFormat.OfflineList:
+							footer = "\t\t</game>"
+								+ "\t</games>\n"
+								+ "\t<gui>\n"
+								+ "\t\t<images width=\"487\" height=\"162\">\n"
+								+ "\t\t\t<image x=\"0\" y=\"0\" width=\"240\" height=\"160\"/>\n"
+								+ "\t\t\t<image x=\"245\" y=\"0\" width=\"240\" height=\"160\"/>\n"
+								+ "\t\t</images>\n"
+								+ "\t</gui>\n"
+								+ "</dat>";
+							break;
 						case OutputFormat.SabreDat:
 							for (int i = depth - 1; i >= 2; i--)
 							{
@@ -4099,7 +4205,6 @@ namespace SabreTools.Helper
 							footer = "\t</software>\n\n</softwarelist>\n";
 							break;
 						case OutputFormat.Xml:
-						case OutputFormat.OfflineList:
 							footer = "\t</machine>\n</datafile>\n";
 							break;
 					}
@@ -4110,12 +4215,21 @@ namespace SabreTools.Helper
 				{
 					switch (outputFormat)
 					{
+						case OutputFormat.OfflineList:
+							footer = "\t</games>\n"
+								+ "\t<gui>\n"
+								+ "\t\t<images width=\"487\" height=\"162\">\n"
+								+ "\t\t\t<image x=\"0\" y=\"0\" width=\"240\" height=\"160\"/>\n"
+								+ "\t\t\t<image x=\"245\" y=\"0\" width=\"240\" height=\"160\"/>\n"
+								+ "\t\t</images>\n"
+								+ "\t</gui>\n"
+								+ "</dat>";
+							break;
 						case OutputFormat.SoftwareList:
 							footer = "</softwarelist>\n";
 							break;
 						case OutputFormat.SabreDat:
 						case OutputFormat.Xml:
-						case OutputFormat.OfflineList:
 							footer = "</datafile>\n";
 							break;
 					}
