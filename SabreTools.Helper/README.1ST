@@ -165,8 +165,8 @@ Options:
 			should be read as-is.
 			
 		-oc, --output-cmp	Output in CMP format
-			Add outputting the created DAT to CLRMamePro format
-			
+			Add outputting the created DAT to clrmamepro format
+		
 		-od, --output-dc	Output in DOSCenter format
 			Add outputting the created DAT to DOSCenter format
 			
@@ -176,19 +176,25 @@ Options:
 		-omd5, --output-md5	Output in MD5 format
 			Add outputting the created DAT to MD5 format
 			
+		-ool, --output-ol	Output in OfflineList format
+			Add outputting the created DAT to OfflineList XML format
+			
 		-or, --output-rc	Output in RomCenter format
 			Add outputting the created DAT to RomCenter format
 			
 		-os, --output-sd	Output in SabreDAT format
 			Add outputting the created DAT to SabreDAT XML format
 			
-		-osfv, --ouput-sfv	Output in SFV format
+		-osfv, --output-sfv	Output in SFV format
 			Add outputting the created DAT to SFV format
 			
-		-osha1, --output-sha1	Output in SHA-1 format
+		-osha1, -output-sha1	Output in SHA-1 format
 			Add outputting the created DAT to SHA1 format
 			
-		-ox, --output-xml	Output in Logiqx XML format (default)
+		-osl, --output-sl	Output in Software List format
+			Add outputting the created DAT to Software List XML format
+			
+		-ox, -output-xml	Output in Logiqx XML format (default)
 			Add outputting the created DAT to Logiqx XML format
 		
 		-gz, --gz-files		Allow reading of GZIP files as archives
@@ -357,10 +363,10 @@ Options:
 		This is the multitool part of the program, allowing for almost every manipulation
 		to a DAT, or set of DATs. This is also a combination of many different programs
 		that performed DAT manipulation that work better together.
-		
+			
 		-oc, --output-cmp	Output in CMP format
 			Add outputting the created DAT to clrmamepro format
-			
+		
 		-od, --output-dc	Output in DOSCenter format
 			Add outputting the created DAT to DOSCenter format
 			
@@ -414,19 +420,25 @@ Options:
 		-omd5, --output-md5	Output in MD5 format
 			Add outputting the created DAT to MD5 format
 			
+		-ool, --output-ol	Output in OfflineList format
+			Add outputting the created DAT to OfflineList XML format
+			
 		-or, --output-rc	Output in RomCenter format
 			Add outputting the created DAT to RomCenter format
 			
 		-os, --output-sd	Output in SabreDAT format
 			Add outputting the created DAT to SabreDAT XML format
 			
-		-osfv, --ouput-sfv	Output in SFV format
+		-osfv, --output-sfv	Output in SFV format
 			Add outputting the created DAT to SFV format
 			
-		-osha1, --output-sha1	Output in SHA-1 format
+		-osha1, -output-sha1	Output in SHA-1 format
 			Add outputting the created DAT to SHA1 format
 			
-		-ox, --output-xml	Output in Logiqx XML format (default)
+		-osl, --output-sl	Output in Software List format
+			Add outputting the created DAT to Software List XML format
+			
+		-ox, -output-xml	Output in Logiqx XML format (default)
 			Add outputting the created DAT to Logiqx XML format
 			
 		-f=, --filename=	Set the external name of the DAT
@@ -886,26 +898,35 @@ Below are originally from SabreTools / DATabase -
 			files themselves. This is good for uncompressed sets that include archives that
 			should be read as-is.
 			
-		-oc, -output-cmp	Output in CMP format
+		-oc, --output-cmp	Output in CMP format
 			Add outputting the created DAT to clrmamepro format
+		
+		-od, --output-dc	Output in DOSCenter format
+			Add outputting the created DAT to DOSCenter format
 			
-		-om, -output-miss	Output in Missfile format
+		-om, --output-miss	Output in Missfile format
 			Add outputting the created DAT to GoodTools miss format
 			
-		-omd5, -output-md5	Output in MD5 format
+		-omd5, --output-md5	Output in MD5 format
 			Add outputting the created DAT to MD5 format
 			
-		-or, -output-rc	Output in RomCenter format
+		-ool, --output-ol	Output in OfflineList format
+			Add outputting the created DAT to OfflineList XML format
+			
+		-or, --output-rc	Output in RomCenter format
 			Add outputting the created DAT to RomCenter format
 			
-		-os, -output-sd	Output in SabreDAT format
+		-os, --output-sd	Output in SabreDAT format
 			Add outputting the created DAT to SabreDAT XML format
 			
-		-osfv, -ouput-sfv	Output in SFV format
+		-osfv, --output-sfv	Output in SFV format
 			Add outputting the created DAT to SFV format
 			
 		-osha1, -output-sha1	Output in SHA-1 format
 			Add outputting the created DAT to SHA1 format
+			
+		-osl, --output-sl	Output in Software List format
+			Add outputting the created DAT to Software List XML format
 			
 		-ox, -output-xml	Output in Logiqx XML format (default)
 			Add outputting the created DAT to Logiqx XML format

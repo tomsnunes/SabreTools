@@ -260,6 +260,10 @@ namespace SabreTools
 					case "--output-md5":
 						outputFormat |= OutputFormat.RedumpMD5;
 						break;
+					case "-ool":
+					case "--output-ol":
+						outputFormat |= OutputFormat.OfflineList;
+						break;
 					case "-or":
 					case "--output-rc":
 						outputFormat |= OutputFormat.RomCenter;
@@ -275,6 +279,10 @@ namespace SabreTools
 					case "-osha1":
 					case "--output-sha1":
 						outputFormat |= OutputFormat.RedumpSHA1;
+						break;
+					case "-osl":
+					case "--output-sl":
+						outputFormat |= OutputFormat.SoftwareList;
 						break;
 					case "-ox":
 					case "--output-xml":
