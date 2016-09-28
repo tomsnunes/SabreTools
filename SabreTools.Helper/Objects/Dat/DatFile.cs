@@ -3899,8 +3899,8 @@ namespace SabreTools.Helper
 						{
 							state += "\t\t\t<files>\n"
 								+ (((Disk)rom).MD5 != null
-									? "\t\t\t\t<romMD5 extension=\".chd\">" + ((Disk)rom).MD5 + "</romMD5>\n"
-									: "\t\t\t\t<romSHA1 extension=\".chd\">" + ((Disk)rom).SHA1 + "</romSHA1>\n")
+									? "\t\t\t\t<romMD5 extension=\".chd\">" + ((Disk)rom).MD5.ToUpperInvariant() + "</romMD5>\n"
+									: "\t\t\t\t<romSHA1 extension=\".chd\">" + ((Disk)rom).SHA1.ToUpperInvariant() + "</romSHA1>\n")
 								+ "\t\t\t</files>\n";
 						}
 						else if (rom.Type == ItemType.Rom)
@@ -3913,16 +3913,16 @@ namespace SabreTools.Helper
 
 							state += "\t\t\t<files>\n"
 								+ (((Rom)rom).CRC != null
-									? "\t\t\t\t<romCRC extension=\"" + tempext + "\">" + ((Rom)rom).CRC + "</romMD5>\n"
+									? "\t\t\t\t<romCRC extension=\"" + tempext + "\">" + ((Rom)rom).CRC.ToUpperInvariant() + "</romMD5>\n"
 									: ((Rom)rom).MD5 != null
-										? "\t\t\t\t<romMD5 extension=\"" + tempext + "\">" + ((Rom)rom).MD5 + "</romMD5>\n"
-										: "\t\t\t\t<romSHA1 extension=\"" + tempext + "\">" + ((Rom)rom).SHA1 + "</romSHA1>\n")
+										? "\t\t\t\t<romMD5 extension=\"" + tempext + "\">" + ((Rom)rom).MD5.ToUpperInvariant() + "</romMD5>\n"
+										: "\t\t\t\t<romSHA1 extension=\"" + tempext + "\">" + ((Rom)rom).SHA1.ToUpperInvariant() + "</romSHA1>\n")
 								+ "\t\t\t</files>\n";
 						}
 
 						state += "\t\t\t<im1CRC>00000000</im1CRC>\n"
 							+ "\t\t\t<im2CRC>00000000</im2CRC>\n"
-							+ "\t\t\t<comment></comment>"
+							+ "\t\t\t<comment></comment>\n"
 							+ "\t\t\t<duplicateID>0</duplicateID>\n"
 							+ "\t\t</game>\n";
 						break;
