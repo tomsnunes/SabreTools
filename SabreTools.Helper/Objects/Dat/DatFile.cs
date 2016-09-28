@@ -3372,7 +3372,7 @@ namespace SabreTools.Helper
 					case OutputFormat.SoftwareList:
 						header = "<?xml version=\"1.0\"?>\n" +
 							"<!DOCTYPE softwarelist SYSTEM \"softwarelist.dtd\">\n\n" +
-							"\t<softwarelist name=\"" + HttpUtility.HtmlEncode(Name) + "\"" +
+							"<softwarelist name=\"" + HttpUtility.HtmlEncode(Name) + "\"" +
 								"description=\"" + HttpUtility.HtmlEncode(Description) + "\"" +
 								(ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
 								(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
@@ -3478,7 +3478,7 @@ namespace SabreTools.Helper
 						depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
 						break;
 					case OutputFormat.SoftwareList:
-						state += "\t<software name\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\">\n"
+						state += "\t<software name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\">\n"
 							+ "\t\t<description>" + HttpUtility.HtmlEncode(rom.MachineDescription) + "</description>\n"
 							+ (rom.Year != null ? "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n" : "")
 							+ "\t\t<part name=\"flop1\" interface=\"flop1\">\n";
@@ -3568,7 +3568,7 @@ namespace SabreTools.Helper
 						}
 						break;
 					case OutputFormat.SoftwareList:
-						state += "\t</software>\n";
+						state += "\t</software>\n\n";
 						break;
 					case OutputFormat.Xml:
 					case OutputFormat.OfflineList:
@@ -3978,7 +3978,7 @@ namespace SabreTools.Helper
 									+ "\t\t\t</dataarea>\n";
 								break;
 							case ItemType.Rom:
-								state += "\t\t\t<dataarea name=\"" + HttpUtility.HtmlEncode(Path.GetExtension(rom.Name).ToLowerInvariant()) + "\">\n"
+								state += "\t\t\t<dataarea name=\"" + HttpUtility.HtmlEncode(Path.GetExtension(rom.Name).ToLowerInvariant().Replace(".", String.Empty)) + "\">\n"
 									+ "\t\t\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
@@ -4096,7 +4096,7 @@ namespace SabreTools.Helper
 							footer += "\t</data>\n</datafile>\n";
 							break;
 						case OutputFormat.SoftwareList:
-							footer = "\t</software>\n</softwarelist>\n";
+							footer = "\t</software>\n\n</softwarelist>\n";
 							break;
 						case OutputFormat.Xml:
 						case OutputFormat.OfflineList:
