@@ -115,10 +115,12 @@ namespace SabreTools.Helper
 					helptext.Add("	-od, --output-dc	Output in DOSCenter format");
 					helptext.Add("	-om, --output-miss	Output in Missfile format");
 					helptext.Add("	-omd5, --output-md5	Output in MD5 format");
+					helptext.Add("	-ool, --output-ol	Output in OfflineList format");
 					helptext.Add("	-or, --output-rc	Output in RomCenter format");
 					helptext.Add("	-os, --output-sd	Output in SabreDAT format");
 					helptext.Add("	-osfv, --ouput-sfv	Output in SFV format");
 					helptext.Add("	-osha1, --output-sha1	Output in SHA-1 format");
+					helptext.Add("	-osl, --output-sl	Output in Softwarelist format");
 					helptext.Add("	-ox, --output-xml	Output in Logiqx XML format");
 					helptext.Add("	-gz, --gz-files		Allow reading of GZIP files as archives");
 					helptext.Add("	-ro, --romba		Read files from a Romba input");
@@ -169,10 +171,15 @@ namespace SabreTools.Helper
 					helptext.Add("	  -tsv, --tsv			Output in Tab-Separated Value format");
 					helptext.Add("	  -csv, --csv			Output in Comma-Separated Value format");
 					helptext.Add("	-omd5, --output-md5	Output in MD5 format");
+					helptext.Add("	  -gp, --game-prefix		Add game name as a prefix");
+					helptext.Add("	-ool, --output-ol	Output in OfflineList format");
 					helptext.Add("	-or, --output-rc	Output in RomCenter format");
 					helptext.Add("	-os, --output-sd	Output in SabreDAT format");
 					helptext.Add("	-osfv, --ouput-sfv	Output in SFV format");
+					helptext.Add("	  -gp, --game-prefix		Add game name as a prefix");
 					helptext.Add("	-osha1, --output-sha1	Output in SHA-1 format");
+					helptext.Add("	  -gp, --game-prefix		Add game name as a prefix");
+					helptext.Add("	-osl, --output-sl	Output in Softwarelist format");
 					helptext.Add("	-ox, --output-xml	Output in Logiqx XML format");
 					helptext.Add("	-f=, --filename=	Set a new filename");
 					helptext.Add("	-n=, --name=		Set a new internal name");

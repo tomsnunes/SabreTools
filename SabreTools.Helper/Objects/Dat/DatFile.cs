@@ -4091,27 +4091,27 @@ namespace SabreTools.Helper
 					case OutputFormat.RedumpMD5:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).MD5 + " *" + rom.Name + "\n";
+							state += ((Rom)rom).MD5 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).MD5 + " *" + rom.Name + "\n";
+							state += ((Disk)rom).MD5 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case OutputFormat.RedumpSFV:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += rom.Name + " " + ((Rom)rom).CRC + "\n";
+							state += (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + " " + ((Rom)rom).CRC + "\n";
 						}
 						break;
 					case OutputFormat.RedumpSHA1:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA1 + " *" + rom.Name + "\n";
+							state += ((Rom)rom).SHA1 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA1 + " *" + rom.Name + "\n";
+							state += ((Disk)rom).SHA1 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case OutputFormat.RomCenter:
