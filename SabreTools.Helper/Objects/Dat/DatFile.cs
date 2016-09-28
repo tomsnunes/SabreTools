@@ -3370,6 +3370,8 @@ namespace SabreTools.Helper
 							"\t<data>\n";
 						break;
 					case OutputFormat.Xml:
+					case OutputFormat.SoftwareList:
+					case OutputFormat.OfflineList:
 						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
 							"<datafile>\n" +
@@ -3463,6 +3465,8 @@ namespace SabreTools.Helper
 						depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
 						break;
 					case OutputFormat.Xml:
+					case OutputFormat.SoftwareList:
+					case OutputFormat.OfflineList:
 						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
 							(rom.IsBios ? " isbios=\"yes\"" : "") +
 							(String.IsNullOrEmpty(rom.CloneOf) ? "" : " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
@@ -3546,6 +3550,8 @@ namespace SabreTools.Helper
 						}
 						break;
 					case OutputFormat.Xml:
+					case OutputFormat.SoftwareList:
+					case OutputFormat.OfflineList:
 						state += "\t</machine>\n";
 						break;
 				}
@@ -3912,6 +3918,8 @@ namespace SabreTools.Helper
 						}
 						break;
 					case OutputFormat.Xml:
+					case OutputFormat.SoftwareList:
+					case OutputFormat.OfflineList:
 						switch (rom.Type)
 						{
 							case ItemType.Archive:
@@ -4009,6 +4017,8 @@ namespace SabreTools.Helper
 							footer += "\t</data>\n</datafile>\n";
 							break;
 						case OutputFormat.Xml:
+						case OutputFormat.SoftwareList:
+						case OutputFormat.OfflineList:
 							footer = "\t</machine>\n</datafile>\n";
 							break;
 					}
@@ -4021,6 +4031,8 @@ namespace SabreTools.Helper
 					{
 						case OutputFormat.SabreDat:
 						case OutputFormat.Xml:
+						case OutputFormat.SoftwareList:
+						case OutputFormat.OfflineList:
 							footer = "</datafile>\n";
 							break;
 					}
