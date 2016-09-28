@@ -1222,6 +1222,15 @@ namespace SabreTools.Helper
 				case OutputFormat.Xml:
 					ParseXML(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
 					break;
+				case OutputFormat.RedumpMD5:
+					ParseRedumpMD5(filename, sysid, srcid, romname, md5, trim, single, root, logger, clean);
+					break;
+				case OutputFormat.RedumpSFV:
+					ParseRedumpSFV(filename, sysid, srcid, romname, crc, trim, single, root, logger, clean);
+					break;
+				case OutputFormat.RedumpSHA1:
+					ParseRedumpSHA1(filename, sysid, srcid, romname, sha1, trim, single, root, logger, clean);
+					break;
 				case OutputFormat.RomCenter:
 					ParseRC(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, clean);
 					break;
@@ -1839,6 +1848,159 @@ namespace SabreTools.Helper
 					blockname = "";
 					tempgamename = "";
 				}
+			}
+
+			sr.Dispose();
+		}
+
+		/// <summary>
+		/// Parse a Redump MD5 and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		private void ParseRedumpMD5(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Rom filtering
+			string romname,
+			string md5,
+
+			// Rom renaming
+			bool trim,
+			bool single,
+			string root,
+
+			// Miscellaneous
+			Logger logger,
+			bool clean)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				Rom rom = new Rom(line.Split(' ')[1].Replace("*", String.Empty), -1, null, line.Split(' ')[0], null, ItemStatus.None, null,
+					Path.GetFileNameWithoutExtension(filename), null, null, null, null, null, null, null, null, false, null, null, sysid, null, srcid, null);
+
+				// Now process and add the rom
+				string key = "";
+				ParseAddHelper(rom, null, romname, null, -1, -1, -1, null, md5, null, ItemStatus.NULL, trim, single, root, clean, logger, out key);
+			}
+
+			sr.Dispose();
+		}
+
+		/// <summary>
+		/// Parse a Redump SFV and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		private void ParseRedumpSFV(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Rom filtering
+			string romname,
+			string crc,
+
+			// Rom renaming
+			bool trim,
+			bool single,
+			string root,
+
+			// Miscellaneous
+			Logger logger,
+			bool clean)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				Rom rom = new Rom(line.Split(' ')[0], -1, line.Split(' ')[1], null, null, ItemStatus.None, null,
+					Path.GetFileNameWithoutExtension(filename), null, null, null, null, null, null, null, null, false, null, null, sysid, null, srcid, null);
+
+				// Now process and add the rom
+				string key = "";
+				ParseAddHelper(rom, null, romname, null, -1, -1, -1, crc, null, null, ItemStatus.NULL, trim, single, root, clean, logger, out key);
+			}
+
+			sr.Dispose();
+		}
+
+		/// <summary>
+		/// Parse a Redump SHA-1 and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		private void ParseRedumpSHA1(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Rom filtering
+			string romname,
+			string sha1,
+
+			// Rom renaming
+			bool trim,
+			bool single,
+			string root,
+
+			// Miscellaneous
+			Logger logger,
+			bool clean)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				Rom rom = new Rom(line.Split(' ')[1].Replace("*", String.Empty), -1, null, null, line.Split(' ')[0], ItemStatus.None, null,
+					Path.GetFileNameWithoutExtension(filename), null, null, null, null, null, null, null, null, false, null, null, sysid, null, srcid, null);
+
+				// Now process and add the rom
+				string key = "";
+				ParseAddHelper(rom, null, romname, null, -1, -1, -1, null, null, sha1, ItemStatus.NULL, trim, single, root, clean, logger, out key);
 			}
 
 			sr.Dispose();
