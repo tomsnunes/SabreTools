@@ -3072,8 +3072,10 @@ namespace SabreTools.Helper
 					}
 				}
 			}
-			catch
+			catch (Exception ex)
 			{
+				logger.Warning(ex.ToString());
+
 				// For XML errors, just skip the affected node
 				xtr?.Read();
 			}
