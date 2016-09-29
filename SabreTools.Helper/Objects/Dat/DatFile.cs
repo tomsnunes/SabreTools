@@ -3075,7 +3075,7 @@ namespace SabreTools.Helper
 			catch
 			{
 				// For XML errors, just skip the affected node
-				xtr?.Skip();
+				xtr?.Read();
 			}
 
 			xtr.Dispose();
