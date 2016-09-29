@@ -27,8 +27,9 @@ namespace SabreTools.Helper
 		public static bool CopyFileBetweenArchives(string inputArchive, string outDir,
 			string sourceEntryName, Rom destEntry, Logger logger)
 		{
-			string tempfile = ExtractSingleItemFromArchive(inputArchive, sourceEntryName, Path.GetTempPath(), logger);
-			return WriteToArchive(tempfile, outDir, destEntry);
+			string realName = "";
+			Stream ms = ExtractSingleStreamFromArchive(inputArchive, sourceEntryName, out realName, logger);
+			return WriteToArchive(ms, outDir, destEntry);
 		}
 
 		#endregion
@@ -166,13 +167,48 @@ namespace SabreTools.Helper
 		/// Attempt to extract a file from an archive
 		/// </summary>
 		/// <param name="input">Name of the archive to be extracted</param>
-		/// <param name="entryname">Name of the entry to be extracted</param>
+		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>Name of the extracted file, null on error</returns>
-		public static string ExtractSingleItemFromArchive(string input, string entryname, string tempDir, Logger logger)
+		public static string ExtractSingleItemFromArchive(string input, string entryName, string tempDir, Logger logger)
 		{
 			string outfile = null;
+
+			string realEntry = "";
+			Stream ms = ExtractSingleStreamFromArchive(input, entryName, out realEntry, logger);
+
+			realEntry = Path.GetFullPath(Path.Combine(tempDir, realEntry));
+			if (!Directory.Exists(Path.GetDirectoryName(outfile)))
+			{
+				Directory.CreateDirectory(Path.GetDirectoryName(outfile));
+			}
+
+			FileStream fs = File.Open(realEntry, FileMode.Create, FileAccess.Write);
+			ms.CopyTo(fs);
+			fs.Flush();
+
+			// Dispose of the streams
+			ms.Dispose();
+			fs.Dispose();
+
+			return outfile;
+		}
+
+		/// <summary>
+		/// Attempt to extract a file from an archive
+		/// </summary>
+		/// <param name="input">Name of the archive to be extracted</param>
+		/// <param name="entryName">Name of the entry to be extracted</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>Name of the extracted file, null on error</returns>
+		public static Stream ExtractSingleStreamFromArchive(string input, string entryName, out string realEntry, Logger logger)
+		{
+			// Set the real entry name
+			realEntry = "";
+
+			// Get a writable stream to return
+			Stream st = new MemoryStream();
 
 			// First get the archive type
 			ArchiveType? at = GetCurrentArchiveType(input, logger);
@@ -180,7 +216,7 @@ namespace SabreTools.Helper
 			// If we got back null, then it's not an archive, so we we return
 			if (at == null)
 			{
-				return outfile;
+				return st;
 			}
 
 			IReader reader = null;
@@ -188,48 +224,40 @@ namespace SabreTools.Helper
 			{
 				if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
 				{
-					// Create the temp directory
-					Directory.CreateDirectory(tempDir);
-
 					reader = ReaderFactory.Open(File.OpenRead(input));
 					while (reader.MoveToNextEntry())
 					{
 						logger.Verbose("Current entry name: '" + reader.Entry.Key + "'");
-						if (reader.Entry != null && reader.Entry.Key.Contains(entryname))
+						if (reader.Entry != null && reader.Entry.Key.Contains(entryName))
 						{
-							outfile = Path.GetFullPath(Path.Combine(tempDir, reader.Entry.Key));
-							if (!Directory.Exists(Path.GetDirectoryName(outfile)))
-							{
-								Directory.CreateDirectory(Path.GetDirectoryName(outfile));
-							}
-							reader.WriteEntryToFile(outfile, ExtractOptions.Overwrite);
+							realEntry  = reader.Entry.Key;
+							reader.WriteEntryTo(st);
 						}
 					}
 				}
 				else if (at == ArchiveType.GZip)
 				{
 					// Decompress the input stream
-					FileStream outstream = File.Create(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input)));
+					realEntry = Path.GetFileNameWithoutExtension(input);
 					GZipStream gzstream = new GZipStream(File.OpenRead(input), CompressionMode.Decompress);
-					gzstream.CopyTo(outstream);
-					outfile = Path.GetFullPath(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input)));
+					gzstream.CopyTo(st);
 
 					// Dispose of the streams
-					outstream.Dispose();
+					st.Dispose();
 					gzstream.Dispose();
 				}
 			}
 			catch (Exception ex)
 			{
 				logger.Error(ex.ToString());
-				outfile = null;
+				st = null;
 			}
 			finally
 			{
 				reader?.Dispose();
 			}
 
-			return outfile;
+			return st;
 		}
 
 		#endregion
@@ -537,9 +565,26 @@ namespace SabreTools.Helper
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteToArchive(string inputFile, string outDir, Rom rom)
 		{
+			// Get the stream from the input file
+			Stream fs = File.OpenRead(inputFile);
+			bool success = WriteToArchive(fs, outDir, rom);
+			fs.Dispose();
+
+			return success;
+		}
+
+		/// <summary>
+		/// Copy a stream to an output archive
+		/// </summary>
+		/// <param name="inputStream">Input stream to be written</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">RomData representing the new information</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteToArchive(Stream inputStream, string outDir, Rom rom)
+		{
 			// Wrap the individual inputs into lists
-			List<string> inputFiles = new List<string>();
-			inputFiles.Add(inputFile);
+			List<Stream> inputFiles = new List<Stream>();
+			inputFiles.Add(inputStream);
 			List<Rom> roms = new List<Rom>();
 			roms.Add(rom);
 
@@ -572,6 +617,41 @@ namespace SabreTools.Helper
 				}
 			}
 
+			// Get the streams from the input files
+			List<Stream> inputStreams = new List<Stream>();
+			foreach (string inputFile in inputFiles)
+			{
+				inputStreams.Add(File.OpenRead(inputFile));
+			}
+
+			success = WriteToArchive(inputStreams, outDir, roms);
+
+			// Now close all of the streams
+			foreach (Stream inputStream in inputStreams)
+			{
+				inputStream.Dispose();
+			}
+
+			return success;
+		}
+
+		/// <summary>
+		/// Copy a set of streams to an output archive (assuming the same output archive name)
+		/// </summary>
+		/// <param name="inputStreams">Input streams to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="roms">List of Rom representing the new information</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteToArchive(List<Stream> inputStreams, string outDir, List<Rom> roms)
+		{
+			bool success = false;
+
+			// If the number of inputs is less than the number of available roms, return
+			if (inputStreams.Count < roms.Count)
+			{
+				return success;
+			}
+
 			// Get the output archive name from the first rebuild rom
 			string archiveFileName = Path.Combine(outDir, roms[0].MachineName + ".zip");
 
@@ -596,15 +676,18 @@ namespace SabreTools.Helper
 				outarchive = System.IO.Compression.ZipFile.Open(archiveFileName, ZipArchiveMode.Update);
 
 				// Now loop through and add all files
-				for (int i = 0; i < inputFiles.Count; i++)
+				for (int i = 0; i < inputStreams.Count; i++)
 				{
-					string inputFile = inputFiles[i];
 					Rom rom = roms[i];
 
 					// If the archive doesn't already contain the entry, add it
 					if (outarchive.GetEntry(rom.Name) == null)
 					{
-						outarchive.CreateEntryFromFile(inputFile, rom.Name, CompressionLevel.Optimal);
+						ZipArchiveEntry ae = outarchive.CreateEntry(rom.Name, CompressionLevel.Optimal);
+						Stream outputStream = ae.Open();
+						inputStreams[i].CopyTo(outputStream);
+						outputStream.Flush();
+						outputStream.Dispose();
 					}
 
 					// If there's a Date attached to the rom, change the entry to that Date
