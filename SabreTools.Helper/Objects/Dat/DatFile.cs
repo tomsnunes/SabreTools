@@ -2930,34 +2930,6 @@ namespace SabreTools.Helper
 					}
 				}
 
-				// OfflineList has a different header format
-				else if (line.StartsWith("<configuration"))
-				{
-					while (!line.Contains("</configuration>"))
-					{
-						line = sr.ReadLine().Trim();
-
-						// Get the list of items from the line
-						matched = Regex.Match(line, Constants.XmlPattern).Groups;
-
-						// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
-						if (matched[1].Value.ToLowerInvariant().StartsWith("datname"))
-						{
-							Name = (String.IsNullOrEmpty(Name) ? matched[2].Value : Name);
-							superdat = superdat || Name.Contains(" - SuperDAT");
-							if (keep && superdat)
-							{
-								Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
-							}
-						}
-						else if (matched[1].Value.ToLowerInvariant().StartsWith("datversionurl"))
-						{
-							Url = (String.IsNullOrEmpty(Name) ? matched[2].Value : Url);
-							break;
-						}
-					}
-				}
-
 				// If the line is the header
 				else if (line.Contains("<header>"))
 				{
@@ -3019,7 +2991,7 @@ namespace SabreTools.Helper
 						}
 						else if (matched[1].Value.StartsWith("email"))
 						{
-							Email = (String.IsNullOrEmpty(Date) ? matched[2].Value : Email);
+							Email = (String.IsNullOrEmpty(Email) ? matched[2].Value : Email);
 						}
 						else if (matched[1].Value.StartsWith("homepage"))
 						{
@@ -4011,9 +3983,12 @@ namespace SabreTools.Helper
 
 			// Make sure we don't have any invalid characters in the name
 			item.Name = Style.CleanRomName(item.Name);
+			item.Name = HttpUtility.HtmlDecode(item.Name);
 
 			// If we're in cleaning mode, sanitize the game name
 			item.MachineName = (clean ? Style.CleanGameName(item.MachineName) : item.MachineName);
+			item.MachineName = HttpUtility.HtmlDecode(item.MachineName);
+			item.MachineDescription = HttpUtility.HtmlDecode(item.MachineDescription);
 
 			// If we have a Rom or a Disk, clean the hash data
 			if (item.Type == ItemType.Rom)
