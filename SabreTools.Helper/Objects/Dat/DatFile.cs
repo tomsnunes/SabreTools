@@ -1217,7 +1217,7 @@ namespace SabreTools.Helper
 					ParseCMP(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean);
 					break;
 				case OutputFormat.Logiqx:
-					ParseLogiqx(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
+					ParseLogiqx(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean);
 					break;
 				case OutputFormat.OfflineList:
 				case OutputFormat.SabreDat:
@@ -2397,7 +2397,7 @@ namespace SabreTools.Helper
 								// Get the roms from the machine
 								switch (subreader.Name)
 								{
-									// For offline lists only
+									// For OfflineList only
 									case "title":
 										tempname = subreader.ReadElementContentAsString();
 										break;
@@ -2876,7 +2876,6 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <remarks>This version does not fully support OL or SabreDAT</remarks>
 		private void ParseLogiqx(
 			// Standard Dat parsing
@@ -2904,8 +2903,7 @@ namespace SabreTools.Helper
 			// Miscellaneous
 			Logger logger,
 			bool keep,
-			bool clean,
-			bool softlist)
+			bool clean)
 
 		{
 			// Open a file reader
