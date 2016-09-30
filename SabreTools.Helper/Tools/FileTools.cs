@@ -110,6 +110,11 @@ namespace SabreTools.Helper
 					{
 						return OutputFormat.OfflineList;
 					}
+					// Older and non-compliant DATs
+					else
+					{
+						return OutputFormat.Xml;
+					}
 				}
 
 				// If we have an INI-based DAT
