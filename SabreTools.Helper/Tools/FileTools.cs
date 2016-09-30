@@ -124,15 +124,15 @@ namespace SabreTools.Helper
 				}
 
 				// If we have a CMP-based DAT
-				else if (first.StartsWith("clrmamepro"))
+				else if (first.Contains("clrmamepro"))
 				{
 					return OutputFormat.ClrMamePro;
 				}
-				else if (first.StartsWith("romvault"))
+				else if (first.Contains("romvault"))
 				{
 					return OutputFormat.ClrMamePro;
 				}
-				else if (first.StartsWith("doscenter"))
+				else if (first.Contains("doscenter"))
 				{
 					return OutputFormat.DOSCenter;
 				}
