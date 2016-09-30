@@ -1221,7 +1221,6 @@ namespace SabreTools.Helper
 				case OutputFormat.OfflineList:
 				case OutputFormat.SabreDat:
 				case OutputFormat.SoftwareList:
-				case OutputFormat.Xml:
 					ParseXML(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
 					break;
 				case OutputFormat.RedumpMD5:
@@ -1235,6 +1234,9 @@ namespace SabreTools.Helper
 					break;
 				case OutputFormat.RomCenter:
 					ParseRC(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, clean);
+					break;
+				case OutputFormat.Xml:
+					ParseXMLString(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
 					break;
 				default:
 					return;
@@ -3108,851 +3110,6 @@ namespace SabreTools.Helper
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
-		private void ParseXMLLinq(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Rom filtering
-			string gamename,
-			string romname,
-			string romtype,
-			long sgt,
-			long slt,
-			long seq,
-			string crc,
-			string md5,
-			string sha1,
-			ItemStatus itemStatus,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
-
-			// Miscellaneous
-			Logger logger,
-			bool keep,
-			bool clean,
-			bool softlist)
-
-		{
-			// Prepare all internal variables
-			bool superdat = false, empty = true;
-			string key = "", date = "";
-			long size = -1;
-			ItemStatus its = ItemStatus.None;
-			List<string> parent = new List<string>();
-
-			Encoding enc = Style.GetEncoding(filename);
-			XElement xtr = XElement.Load(FileTools.GetXmlTextReader(filename, logger), LoadOptions.None);
-
-			// If we got a null reader, just return
-			if (xtr == null)
-			{
-				return;
-			}
-
-			// Otherwise, read the file to the end
-			foreach (XElement node in xtr.Nodes())
-			{
-				// If we're ending a folder or game, take care of possibly empty games and removing from the parent
-				if (node.NodeType == XmlNodeType.EndElement && (node.Name == "directory" || node.Name == "dir"))
-				{
-					// If we didn't find any items in the folder, make sure to add the blank rom
-					if (empty)
-					{
-						string tempgame = String.Join("\\", parent);
-						Rom rom = new Rom("null", tempgame);
-
-						// Now process and add the rom
-						ParseAddHelper(rom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-					}
-
-					// Regardless, end the current folder
-					int parentcount = parent.Count;
-					if (parentcount == 0)
-					{
-						logger.Verbose("Empty parent: " + String.Join("\\", parent));
-						empty = true;
-					}
-
-					// If we have an end folder element, remove one item from the parent, if possible
-					if (parentcount > 0)
-					{
-						parent.RemoveAt(parent.Count - 1);
-						if (keep && parentcount > 1)
-						{
-							Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
-							superdat = true;
-						}
-					}
-				}
-
-				// We only want elements
-				if (node.NodeType != XmlNodeType.Element)
-				{
-					continue;
-				}
-
-				switch (node.Name.ToString())
-				{
-					// Handle MAME listxml since they're halfway between a SL and a Logiqx XML
-					case "mame":
-						if (node.Attribute("build") != null)
-						{
-							Name = (String.IsNullOrEmpty(Name) ? node.Attribute("build").ToString() : Name);
-							Description = (String.IsNullOrEmpty(Description) ? Name : Name);
-						}
-						break;
-					// New software lists have this behavior
-					case "softwarelist":
-						if (node.Attribute("name") != null)
-						{
-							Name = (String.IsNullOrEmpty(Name) ? node.Attribute("name").ToString() : Name);
-						}
-						if (node.Attribute("description") != null)
-						{
-							Description = (String.IsNullOrEmpty(Description) ? node.Attribute("description").ToString() : Description);
-						}
-						if (node.Attribute("forcemerging") != null)
-						{
-							switch (node.Attribute("forcemerging").ToString())
-							{
-								case "split":
-									ForceMerging = ForceMerging.Split;
-									break;
-								case "none":
-									ForceMerging = ForceMerging.None;
-									break;
-								case "full":
-									ForceMerging = ForceMerging.Full;
-									break;
-							}
-						}
-						if (node.Attribute("forceitemStatus") != null)
-						{
-							switch (node.Attribute("forceitemStatus").ToString())
-							{
-								case "obsolete":
-									ForceNodump = ForceNodump.Obsolete;
-									break;
-								case "required":
-									ForceNodump = ForceNodump.Required;
-									break;
-								case "ignore":
-									ForceNodump = ForceNodump.Ignore;
-									break;
-							}
-						}
-						if (node.Attribute("forcepacking") != null)
-						{
-							switch (node.Attribute("forcepacking").ToString())
-							{
-								case "zip":
-									ForcePacking = ForcePacking.Zip;
-									break;
-								case "unzip":
-									ForcePacking = ForcePacking.Unzip;
-									break;
-							}
-						}
-						break;
-					// Handle M1 DATs since they're 99% the same as a SL DAT
-					case "m1":
-						Name = (String.IsNullOrEmpty(Name) ? "M1" : Name);
-						Description = (String.IsNullOrEmpty(Description) ? "M1" : Description);
-						if (node.Attribute("version") != null)
-						{
-							Version = (String.IsNullOrEmpty(Version) ? node.Attribute("version").ToString() : Version);
-						}
-						break;
-					// OfflineList has a different header format
-					case "configuration":
-						// If there's no subtree to the header, skip it
-						if (!node.HasElements)
-						{
-							continue;
-						}
-
-						// Otherwise, read what we can from the header
-						foreach (XElement headnode in node.Elements())
-						{
-							// We only want elements
-							if (headnode.NodeType != XmlNodeType.Element || headnode.Name == "configuration")
-							{
-								continue;
-							}
-
-							// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
-							string content = "";
-							switch (headnode.Name.ToString().ToLowerInvariant())
-							{
-								case "datname":
-									content = headnode.Value;
-									Name = (String.IsNullOrEmpty(Name) ? content : Name);
-									superdat = superdat || content.Contains(" - SuperDAT");
-									if (keep && superdat)
-									{
-										Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
-									}
-									break;
-								case "datversionurl":
-									content = headnode.Value;
-									Url = (String.IsNullOrEmpty(Name) ? content : Url);
-									break;
-								default:
-									break;
-							}
-						}
-
-						break;
-					// We want to process the entire subtree of the header
-					case "header":
-						// If there's no subtree to the header, skip it
-						if (!node.HasElements)
-						{
-							continue;
-						}
-
-						// Otherwise, read what we can from the header
-						foreach (XElement headnode in node.Elements())
-						{
-							// We only want elements
-							if (headnode.NodeType != XmlNodeType.Element || headnode.Name == "header")
-							{
-								continue;
-							}
-
-							// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
-							string content = "";
-							switch (headnode.Name.ToString())
-							{
-								case "name":
-									content = headnode.Value;
-									Name = (String.IsNullOrEmpty(Name) ? content : Name);
-									superdat = superdat || content.Contains(" - SuperDAT");
-									if (keep && superdat)
-									{
-										Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
-									}
-									break;
-								case "description":
-									content = headnode.Value;
-									Description = (String.IsNullOrEmpty(Description) ? content : Description);
-									break;
-								case "rootdir":
-									content = headnode.Value;
-									RootDir = (String.IsNullOrEmpty(RootDir) ? content : RootDir);
-									break;
-								case "category":
-									content = headnode.Value;
-									Category = (String.IsNullOrEmpty(Category) ? content : Category);
-									break;
-								case "version":
-									content = headnode.Value;
-									Version = (String.IsNullOrEmpty(Version) ? content : Version);
-									break;
-								case "date":
-									content = headnode.Value;
-									Date = (String.IsNullOrEmpty(Date) ? content.Replace(".", "/") : Date);
-									break;
-								case "author":
-									content = headnode.Value;
-									Author = (String.IsNullOrEmpty(Author) ? content : Author);
-
-									// Special cases for SabreDAT
-									Email = (String.IsNullOrEmpty(Email) && headnode.Attribute("email") != null ?
-										headnode.Attribute("email").ToString() : Email);
-									Homepage = (String.IsNullOrEmpty(Homepage) && headnode.Attribute("homepage") != null ?
-										headnode.Attribute("homepage").ToString() : Email);
-									Url = (String.IsNullOrEmpty(Url) && headnode.Attribute("url") != null ?
-										headnode.Attribute("url").ToString() : Email);
-									break;
-								case "email":
-									content = headnode.Value;
-									Email = (String.IsNullOrEmpty(Email) ? content : Email);
-									break;
-								case "homepage":
-									content = headnode.Value;
-									Homepage = (String.IsNullOrEmpty(Homepage) ? content : Homepage);
-									break;
-								case "url":
-									content = headnode.Value;
-									Url = (String.IsNullOrEmpty(Url) ? content : Url);
-									break;
-								case "comment":
-									content = headnode.Value;
-									Comment = (String.IsNullOrEmpty(Comment) ? content : Comment);
-									break;
-								case "type":
-									content = headnode.Value;
-									Type = (String.IsNullOrEmpty(Type) ? content : Type);
-									superdat = superdat || content.Contains("SuperDAT");
-									break;
-								case "clrmamepro":
-								case "romcenter":
-									if (headnode.Attribute("header") != null)
-									{
-										Header = (String.IsNullOrEmpty(Header) ? headnode.Attribute("header").ToString() : Header);
-									}
-									if (headnode.Attribute("plugin") != null)
-									{
-										Header = (String.IsNullOrEmpty(Header) ? headnode.Attribute("plugin").ToString() : Header);
-									}
-									if (headnode.Attribute("forcemerging") != null)
-									{
-										switch (headnode.Attribute("forcemerging").ToString())
-										{
-											case "split":
-												ForceMerging = ForceMerging.Split;
-												break;
-											case "none":
-												ForceMerging = ForceMerging.None;
-												break;
-											case "full":
-												ForceMerging = ForceMerging.Full;
-												break;
-										}
-									}
-									if (headnode.Attribute("forceitemStatus") != null)
-									{
-										switch (headnode.Attribute("forceitemStatus").ToString())
-										{
-											case "obsolete":
-												ForceNodump = ForceNodump.Obsolete;
-												break;
-											case "required":
-												ForceNodump = ForceNodump.Required;
-												break;
-											case "ignore":
-												ForceNodump = ForceNodump.Ignore;
-												break;
-										}
-									}
-									if (headnode.Attribute("forcepacking") != null)
-									{
-										switch (headnode.Attribute("forcepacking").ToString())
-										{
-											case "zip":
-												ForcePacking = ForcePacking.Zip;
-												break;
-											case "unzip":
-												ForcePacking = ForcePacking.Unzip;
-												break;
-										}
-									}
-									break;
-								case "flags":
-									// If there's no subtree to the flags, skip it
-									if (!headnode.HasElements)
-									{
-										continue;
-									}
-
-									// Otherwise, read what we can from the flags
-									foreach (XElement flagnode in node.Elements())
-									{
-										// We only want elements
-										if (flagnode.NodeType != XmlNodeType.Element || flagnode.Name == "flags")
-										{
-											continue;
-										}
-
-										switch (flagnode.Name.ToString())
-										{
-											case "flag":
-												if (flagnode.Attribute("name") != null && flagnode.Attribute("value") != null)
-												{
-													content = flagnode.Attribute("value").ToString();
-													switch (flagnode.Attribute("name").ToString())
-													{
-														case "type":
-															Type = (String.IsNullOrEmpty(Type) ? content : Type);
-															superdat = superdat || content.Contains("SuperDAT");
-															break;
-														case "forcemerging":
-															switch (content)
-															{
-																case "split":
-																	ForceMerging = ForceMerging.Split;
-																	break;
-																case "none":
-																	ForceMerging = ForceMerging.None;
-																	break;
-																case "full":
-																	ForceMerging = ForceMerging.Full;
-																	break;
-															}
-															break;
-														case "forceitemStatus":
-															switch (content)
-															{
-																case "obsolete":
-																	ForceNodump = ForceNodump.Obsolete;
-																	break;
-																case "required":
-																	ForceNodump = ForceNodump.Required;
-																	break;
-																case "ignore":
-																	ForceNodump = ForceNodump.Ignore;
-																	break;
-															}
-															break;
-														case "forcepacking":
-															switch (content)
-															{
-																case "zip":
-																	ForcePacking = ForcePacking.Zip;
-																	break;
-																case "unzip":
-																	ForcePacking = ForcePacking.Unzip;
-																	break;
-															}
-															break;
-													}
-												}
-												break;
-											default:
-												break;
-										}
-									}
-									break;
-								default:
-									break;
-							}
-						}
-						break;
-					case "machine":
-					case "game":
-					case "software":
-						string temptype = node.Name.ToString();
-						string tempname = "", gamedesc = "", romof = "",
-							cloneof = "", sampleof = "", year = "", manufacturer = "";
-
-						// If there's no subtree to the header, skip it
-						if (!node.HasElements)
-						{
-							continue;
-						}
-
-						// Otherwise, add what is possible
-						if (!softlist && temptype == "software" && node.Element("description") != null)
-						{
-							tempname = node.Element("description").Value;
-							gamedesc = tempname;
-							tempname = tempname.Replace('/', '_').Replace("\"", "''");
-						}
-						else
-						{
-							tempname = node.Attribute("name").ToString();
-							romof = (node.Attribute("romof") != null ? node.Attribute("romof").ToString() : "");
-							cloneof = (node.Attribute("cloneof") != null ? node.Attribute("cloneof").ToString() : "");
-							sampleof = (node.Attribute("sampleof") != null ? node.Attribute("sampleof").ToString() : "");
-						}
-
-						if (superdat && !keep)
-						{
-							string tempout = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
-							if (tempout != "")
-							{
-								tempname = tempout;
-							}
-						}
-						// Get the name of the game from the parent
-						else if (superdat && keep && parent.Count > 0)
-						{
-							tempname = String.Join("\\", parent) + "\\" + tempname;
-						}
-
-						// Special offline list parts
-						string ext = "";
-						string releaseNumber = "";
-
-						// Now loop through the rest of the child nodes
-						foreach (XElement gamenode in node.Elements())
-						{
-							// We only want elements
-							if (gamenode.NodeType != XmlNodeType.Element)
-							{
-								continue;
-							}
-
-							// Get the roms from the machine
-							switch (gamenode.Name.ToString())
-							{
-								// For offline lists only
-								case "title":
-									tempname = gamenode.Value;
-									break;
-								case "releaseNumber":
-									releaseNumber = gamenode.Value;
-									break;
-								case "romSize":
-									if (!Int64.TryParse(gamenode.Value, out size))
-									{
-										size = -1;
-									}
-									break;
-								case "romCRC":
-									empty = false;
-
-									ext = (gamenode.Attribute("extension") != null ? gamenode.Attribute("extension").ToString() : "");
-
-									DatItem olrom = new Rom(releaseNumber + " - " + tempname + ext, size, gamenode.Value, null, null, ItemStatus.None,
-										null, tempname, null, tempname, null, null, null, null, null, null, false, null, null, sysid, null, srcid, "");
-
-									// Now process and add the rom
-									ParseAddHelper(olrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-									break;
-
-								// For Logiqx, SabreDAT, and Software List
-								case "description":
-									gamedesc = gamenode.Value;
-									break;
-								case "year":
-									year = gamenode.Value;
-									break;
-								case "manufacturer":
-									manufacturer = gamenode.Value;
-									break;
-								case "release":
-									empty = false;
-
-									bool? defaultrel = null;
-									if (gamenode.Attribute("default") != null)
-									{
-										if (gamenode.Attribute("default").ToString() == "yes")
-										{
-											defaultrel = true;
-										}
-										else if (gamenode.Attribute("default").ToString() == "no")
-										{
-											defaultrel = false;
-										}
-									}
-
-									DatItem relrom = new Release(gamenode.Attribute("name").ToString(),
-										gamenode.Attribute("region").ToString(), gamenode.Attribute("language").ToString(), date, defaultrel);
-
-									// Now process and add the rom
-									ParseAddHelper(relrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-									break;
-								case "biosset":
-									empty = false;
-
-									bool? defaultbios = null;
-									if (gamenode.Attribute("default") != null)
-									{
-										if (gamenode.Attribute("default").ToString() == "yes")
-										{
-											defaultbios = true;
-										}
-										else if (gamenode.Attribute("default").ToString() == "no")
-										{
-											defaultbios = false;
-										}
-									}
-
-									DatItem biosrom = new BiosSet(gamenode.Attribute("name").ToString(), gamenode.Attribute("description").ToString(), defaultbios,
-										tempname, null, gamedesc, null, null, romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
-
-									// Now process and add the rom
-									ParseAddHelper(biosrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-									break;
-								case "archive":
-									empty = false;
-
-									DatItem archiverom = new Archive(gamenode.Attribute("name").ToString(), tempname, null, gamedesc, null, null,
-										romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
-
-									// Now process and add the rom
-									ParseAddHelper(archiverom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-									break;
-								case "sample":
-									empty = false;
-
-									DatItem samplerom = new Sample(gamenode.Attribute("name").ToString(), tempname, null, gamedesc, null, null,
-										romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
-
-									// Now process and add the rom
-									ParseAddHelper(samplerom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-									break;
-								case "rom":
-								case "disk":
-									empty = false;
-
-									// If the rom has a status, flag it
-									its = ItemStatus.None;
-									if (gamenode.Attribute("flags").ToString() == "good" || gamenode.Attribute("status").ToString() == "good")
-									{
-										its = ItemStatus.Good;
-									}
-									if (gamenode.Attribute("flags").ToString() == "baddump" || gamenode.Attribute("status").ToString() == "baddump")
-									{
-										logger.Verbose("Bad dump detected: " +
-											(gamenode.Attribute("name") != null ? "\"" + node.Attribute("name") + "\"" : "ROM NAME NOT FOUND"));
-										its = ItemStatus.BadDump;
-									}
-									if (gamenode.Attribute("flags").ToString() == "itemStatus" || gamenode.Attribute("status").ToString() == "itemStatus")
-									{
-										logger.Verbose("Nodump detected: " +
-											(gamenode.Attribute("name") != null ? "\"" + node.Attribute("name") + "\"" : "ROM NAME NOT FOUND"));
-										its = ItemStatus.Nodump;
-									}
-									if (gamenode.Attribute("flags").ToString() == "verified" || gamenode.Attribute("status").ToString() == "verified")
-									{
-										its = ItemStatus.Verified;
-									}
-
-									// If the rom has a Date attached, read it in and then sanitize it
-									date = "";
-									if (gamenode.Attribute("date") != null)
-									{
-										DateTime dateTime = DateTime.Now;
-										if (DateTime.TryParse(gamenode.Attribute("date").ToString(), out dateTime))
-										{
-											date = dateTime.ToString();
-										}
-										else
-										{
-											date = gamenode.Attribute("date").ToString();
-										}
-									}
-
-									// Take care of hex-sized files
-									size = -1;
-									if (gamenode.Attribute("size") != null && gamenode.Attribute("size").ToString().Contains("0x"))
-									{
-										size = Convert.ToInt64(gamenode.Attribute("size").ToString(), 16);
-									}
-									else if (gamenode.Attribute("size") != null)
-									{
-										Int64.TryParse(gamenode.Attribute("size").ToString(), out size);
-									}
-
-									// If the rom is continue or ignore, add the size to the previous rom
-									if (gamenode.Attribute("loadflag").ToString() == "continue" || gamenode.Attribute("loadflag").ToString() == "ignore")
-									{
-										int index = Files[key].Count() - 1;
-										DatItem lastrom = Files[key][index];
-										if (lastrom.Type == ItemType.Rom)
-										{
-											((Rom)lastrom).Size += size;
-										}
-										Files[key].RemoveAt(index);
-										Files[key].Add(lastrom);
-										continue;
-									}
-
-									// If we're in clean mode, sanitize the game name
-									if (clean)
-									{
-										tempname = Style.CleanGameName(tempname.Split(Path.DirectorySeparatorChar));
-									}
-
-									DatItem inrom;
-									switch (gamenode.Name.ToString().ToLowerInvariant())
-									{
-										case "disk":
-											inrom = new Disk(gamenode.Attribute("name").ToString(), gamenode.Attribute("md5").ToString(), gamenode.Attribute("sha1").ToString(),
-												its, tempname, null, gamedesc, null, null, romof, cloneof, sampleof, null, false, null, null, sysid,
-												filename, srcid, null);
-											break;
-										case "rom":
-										default:
-											inrom = new Rom(gamenode.Attribute("name").ToString(), size, gamenode.Attribute("crc").ToString(), gamenode.Attribute("md5").ToString(),
-												gamenode.Attribute("sha1").ToString(), its, date, tempname, null, gamedesc, null, null, romof, cloneof, sampleof,
-												null, false, null, null, sysid, filename, srcid, null);
-											break;
-									}
-
-									// Now process and add the rom
-									ParseAddHelper(inrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-									break;
-								default:
-									break;
-							}
-						}
-
-						// If we didn't find any items in the folder, make sure to add the blank rom
-						if (empty)
-						{
-							tempname = (parent.Count > 0 ? String.Join("\\", parent) + Path.DirectorySeparatorChar : "") + tempname;
-
-							Rom inrom = new Rom("null", tempname);
-
-							// Now process and add the rom
-							ParseAddHelper(inrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-
-							// Regardless, end the current folder
-							if (parent.Count == 0)
-							{
-								empty = true;
-							}
-						}
-						break;
-					case "dir":
-					case "directory":
-						// Set SuperDAT flag for all SabreDAT inputs, regardless of depth
-						superdat = true;
-						if (keep)
-						{
-							Type = (Type == "" ? "SuperDAT" : Type);
-						}
-
-						string foldername = (node.Attribute("name") == null ? "" : node.Attribute("name").ToString());
-						if (foldername != "")
-						{
-							parent.Add(foldername);
-						}
-						break;
-					case "file":
-						empty = false;
-
-						// If the rom is itemStatus, flag it
-						its = ItemStatus.None;
-						// If there's no subtree to the flags, skip it
-						if (!node.HasElements)
-						{
-							continue;
-						}
-
-						// Otherwise, read what we can from the flags
-						foreach (XElement flagnode in node.Elements())
-						{
-							// We only want elements
-							if (flagnode.NodeType != XmlNodeType.Element || flagnode.Name == "flags")
-							{
-								continue;
-							}
-
-							switch (flagnode.Name.ToString())
-							{
-								case "flag":
-								case "status":
-									if (flagnode.Attribute("name") != null && flagnode.Attribute("value") != null)
-									{
-										string content = flagnode.Attribute("value").ToString();
-										switch (flagnode.Attribute("name").ToString())
-										{
-											case "good":
-												its = ItemStatus.Good;
-												break;
-											case "baddump":
-												logger.Verbose("Bad dump detected: " + (node.Attribute("name") != null ?
-													"\"" + node.Attribute("name") + "\"" : "ROM NAME NOT FOUND"));
-												its = ItemStatus.BadDump;
-												break;
-											case "itemStatus":
-												logger.Verbose("Nodump detected: " + (node.Attribute("name") != null ?
-													"\"" + node.Attribute("name") + "\"" : "ROM NAME NOT FOUND"));
-												its = ItemStatus.Nodump;
-												break;
-											case "verified":
-												its = ItemStatus.Verified;
-												break;
-										}
-									}
-									break;
-							}
-						}
-
-						// If the rom has a Date attached, read it in and then sanitize it
-						date = "";
-						if (node.Attribute("date") != null)
-						{
-							date = DateTime.Parse(node.Attribute("date").ToString()).ToString();
-						}
-
-						// Take care of hex-sized files
-						size = -1;
-						if (node.Attribute("size") != null && node.Attribute("size").ToString().Contains("0x"))
-						{
-							size = Convert.ToInt64(node.Attribute("size").ToString(), 16);
-						}
-						else if (node.Attribute("size") != null)
-						{
-							Int64.TryParse(node.Attribute("size").ToString(), out size);
-						}
-
-						// If the rom is continue or ignore, add the size to the previous rom
-						if (node.Attribute("loadflag").ToString() == "continue" || node.Attribute("loadflag").ToString() == "ignore")
-						{
-							int index = Files[key].Count() - 1;
-							DatItem lastrom = Files[key][index];
-							if (lastrom.Type == ItemType.Rom)
-							{
-								((Rom)lastrom).Size += size;
-							}
-							Files[key].RemoveAt(index);
-							Files[key].Add(lastrom);
-							continue;
-						}
-
-						// Get the name of the game from the parent
-						tempname = String.Join("\\", parent);
-
-						// If we aren't keeping names, trim out the path
-						if (!keep || !superdat)
-						{
-							string tempout = Regex.Match(tempname, @".*?\\(.*)").Groups[1].Value;
-							if (tempout != "")
-							{
-								tempname = tempout;
-							}
-						}
-
-						DatItem rom;
-						switch (node.Attribute("type").ToString().ToLowerInvariant())
-						{
-							case "disk":
-								rom = new Disk(node.Attribute("name").ToString(), node.Attribute("md5")?.ToString().ToLowerInvariant(),
-									node.Attribute("sha1")?.ToString().ToLowerInvariant(), its, tempname, null, tempname, null, null,
-									null, null, null, null, false, null, null, sysid, filename, srcid, null);
-								break;
-							case "rom":
-							default:
-								rom = new Rom(node.Attribute("name").ToString(), size, node.Attribute("crc")?.ToString().ToLowerInvariant(),
-									node.Attribute("md5")?.ToString().ToLowerInvariant(), node.Attribute("sha1")?.ToString().ToLowerInvariant(), its,
-									date, tempname, null, tempname, null, null, null, null, null, null, false, null, null, sysid, filename,
-									srcid, null);
-								break;
-						}
-
-						// Now process and add the rom
-						ParseAddHelper(rom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-						break;
-					default:
-						break;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Parse an XML DAT (Logiqx, OfflineList, SabreDAT, and Software List) and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="romtype">Type of the rom to match</param>
-		/// <param name="sgt">Find roms greater than or equal to this size</param>
-		/// <param name="slt">Find roms less than or equal to this size</param>
-		/// <param name="seq">Find roms equal to this size</param>
-		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="itemStatus">Select roms with the given status</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
-		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <remarks>This version does not fully support OL or SabreDAT</remarks>
 		private void ParseXMLString(
 			// Standard Dat parsing
@@ -4099,18 +3256,18 @@ namespace SabreTools.Helper
 						matched = Regex.Match(line, Constants.XmlPattern).Groups;
 
 						// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
-						if (matched[0].Value.ToLowerInvariant().StartsWith("datname"))
+						if (matched[1].Value.ToLowerInvariant().StartsWith("datname"))
 						{
-							Name = (String.IsNullOrEmpty(Name) ? matched[1].Value : Name);
+							Name = (String.IsNullOrEmpty(Name) ? matched[2].Value : Name);
 							superdat = superdat || Name.Contains(" - SuperDAT");
 							if (keep && superdat)
 							{
 								Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
 							}
 						}
-						else if (matched[0].Value.ToLowerInvariant().StartsWith("datversionurl"))
+						else if (matched[1].Value.ToLowerInvariant().StartsWith("datversionurl"))
 						{
-							Url = (String.IsNullOrEmpty(Name) ? matched[1].Value : Url);
+							Url = (String.IsNullOrEmpty(Name) ? matched[2].Value : Url);
 							break;
 						}
 					}
@@ -4127,41 +3284,41 @@ namespace SabreTools.Helper
 						matched = Regex.Match(line, Constants.XmlPattern).Groups;
 
 						// Now check for all of the header items
-						if (matched[0].Value.StartsWith("name"))
+						if (matched[1].Value.StartsWith("name"))
 						{
-							Name = (String.IsNullOrEmpty(Name) ? matched[1].Value : Name);
+							Name = (String.IsNullOrEmpty(Name) ? matched[2].Value : Name);
 							superdat = superdat || Name.Contains(" - SuperDAT");
 							if (keep && superdat)
 							{
 								Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
 							}
 						}
-						else if (matched[0].Value.StartsWith("description"))
+						else if (matched[1].Value.StartsWith("description"))
 						{
-							Description = (String.IsNullOrEmpty(Description) ? matched[1].Value : Description);
+							Description = (String.IsNullOrEmpty(Description) ? matched[2].Value : Description);
 						}
-						else if (matched[0].Value.StartsWith("rootdir"))
+						else if (matched[1].Value.StartsWith("rootdir"))
 						{
-							RootDir = (String.IsNullOrEmpty(RootDir) ? matched[1].Value : RootDir);
+							RootDir = (String.IsNullOrEmpty(RootDir) ? matched[2].Value : RootDir);
 						}
-						else if (matched[0].Value.StartsWith("category"))
+						else if (matched[1].Value.StartsWith("category"))
 						{
-							Category = (String.IsNullOrEmpty(Category) ? matched[1].Value : Category);
+							Category = (String.IsNullOrEmpty(Category) ? matched[2].Value : Category);
 						}
-						else if (matched[0].Value.StartsWith("version"))
+						else if (matched[1].Value.StartsWith("version"))
 						{
-							Version = (String.IsNullOrEmpty(Version) ? matched[1].Value : Version);
+							Version = (String.IsNullOrEmpty(Version) ? matched[2].Value : Version);
 						}
-						else if (matched[0].Value.StartsWith("date"))
+						else if (matched[1].Value.StartsWith("date"))
 						{
-							Date = (String.IsNullOrEmpty(Date) ? matched[1].Value : Date);
+							Date = (String.IsNullOrEmpty(Date) ? matched[2].Value : Date);
 						}
-						else if (matched[0].Value.StartsWith("author"))
+						else if (matched[1].Value.StartsWith("author"))
 						{
-							Author = (String.IsNullOrEmpty(Author) ? matched[1].Value : Author);
+							Author = (String.IsNullOrEmpty(Author) ? matched[2].Value : Author);
 
 							// Special cases for SabreDAT
-							Dictionary<string, string> attribs = GetAttributes(matched[0].Value);
+							Dictionary<string, string> attribs = GetAttributes(matched[1].Value);
 							if (attribs.ContainsKey("email"))
 							{
 								Email = (String.IsNullOrEmpty(Email) ? attribs["email"] : Email);
@@ -4175,31 +3332,31 @@ namespace SabreTools.Helper
 								Url = (String.IsNullOrEmpty(Url) ? attribs["url"] : Url);
 							}
 						}
-						else if (matched[0].Value.StartsWith("email"))
+						else if (matched[1].Value.StartsWith("email"))
 						{
-							Email = (String.IsNullOrEmpty(Date) ? matched[1].Value : Email);
+							Email = (String.IsNullOrEmpty(Date) ? matched[2].Value : Email);
 						}
-						else if (matched[0].Value.StartsWith("homepage"))
+						else if (matched[1].Value.StartsWith("homepage"))
 						{
-							Homepage = (String.IsNullOrEmpty(Homepage) ? matched[1].Value : Homepage);
+							Homepage = (String.IsNullOrEmpty(Homepage) ? matched[2].Value : Homepage);
 						}
-						else if (matched[0].Value.StartsWith("url"))
+						else if (matched[1].Value.StartsWith("url"))
 						{
-							Url = (String.IsNullOrEmpty(Url) ? matched[1].Value : Url);
+							Url = (String.IsNullOrEmpty(Url) ? matched[2].Value : Url);
 						}
-						else if (matched[0].Value.StartsWith("comment"))
+						else if (matched[1].Value.StartsWith("comment"))
 						{
-							Comment = (String.IsNullOrEmpty(Comment) ? matched[1].Value : Comment);
+							Comment = (String.IsNullOrEmpty(Comment) ? matched[2].Value : Comment);
 						}
-						else if (matched[0].Value.StartsWith("type"))
+						else if (matched[1].Value.StartsWith("type"))
 						{
-							Type = (String.IsNullOrEmpty(Type) ? matched[1].Value : Type);
-							superdat = superdat || matched[1].Value.Contains("SuperDAT");
+							Type = (String.IsNullOrEmpty(Type) ? matched[2].Value : Type);
+							superdat = superdat || matched[2].Value.Contains("SuperDAT");
 							break;
 						}
-						else if (matched[0].Value.StartsWith("clrmamepro") || matched[0].Value.StartsWith("romcenter"))
+						else if (matched[1].Value.StartsWith("clrmamepro") || matched[1].Value.StartsWith("romcenter"))
 						{
-							Dictionary<string, string> attribs = GetAttributes(matched[0].Value);
+							Dictionary<string, string> attribs = GetAttributes(matched[1].Value);
 							if (attribs.ContainsKey("header"))
 							{
 								Header = (String.IsNullOrEmpty(Header) ? attribs["header"].ToString() : Header);
@@ -4267,7 +3424,7 @@ namespace SabreTools.Helper
 										{
 											case "type":
 												Type = (String.IsNullOrEmpty(Type) ? attribs["value"] : Type);
-												superdat = superdat || matched[1].Value.Contains("SuperDAT");
+												superdat = superdat || matched[2].Value.Contains("SuperDAT");
 												break;
 											case "forcemerging":
 												switch (attribs["value"])
@@ -4317,13 +3474,13 @@ namespace SabreTools.Helper
 				}
 
 				// If the line is a game/machine
-				if (matched[0].Value.StartsWith("game") || matched[0].Value.StartsWith("machine") || matched[0].Value.StartsWith("software"))
+				if (line.StartsWith("<game") || line.StartsWith("<machine") || line.StartsWith("<software"))
 				{
 					string gamedesc = "", comment = "", year = "", manufacturer = "", key = "";
 					bool isbios = false;
 
 					// Get the game information
-					Dictionary<string, string> gameattribs = GetAttributes(matched[0].Value);
+					Dictionary<string, string> gameattribs = GetAttributes(line.Substring(1, line.Length - 3));
 
 					string tempname = (gameattribs.ContainsKey("name") ? gameattribs["name"] : "");
 					string sourcefile = (gameattribs.ContainsKey("sourcefile") ? gameattribs["sourcefile"] : "");
@@ -4353,21 +3510,21 @@ namespace SabreTools.Helper
 						matched = Regex.Match(line, Constants.XmlPattern).Groups;
 
 						// Standalone game values
-						if (matched[0].Value.StartsWith("comment"))
+						if (matched[1].Value.StartsWith("comment"))
 						{
-							comment = matched[1].Value;
+							comment = matched[2].Value;
 						}
-						else if (matched[0].Value.StartsWith("description"))
+						else if (matched[1].Value.StartsWith("description"))
 						{
-							gamedesc = matched[1].Value;
+							gamedesc = matched[2].Value;
 						}
-						else if (matched[0].Value.StartsWith("year"))
+						else if (matched[1].Value.StartsWith("year"))
 						{
-							year = matched[1].Value;
+							year = matched[2].Value;
 						}
-						else if (matched[0].Value.StartsWith("manufacturer"))
+						else if (matched[1].Value.StartsWith("manufacturer"))
 						{
-							manufacturer = matched[1].Value;
+							manufacturer = matched[2].Value;
 						}
 
 						// Now for the different file types
@@ -4729,6 +3886,17 @@ namespace SabreTools.Helper
 						}
 					}
 				}
+
+				// For directories, we handle them specially
+				else if (line.StartsWith("<dir"))
+				{
+					// Set SuperDAT flag for all SabreDAT inputs, regardless of depth
+					superdat = true;
+					if (keep)
+					{
+						Type = (Type == "" ? "SuperDAT" : Type);
+					}
+				}
 			}
 
 			sr.Dispose();
@@ -4780,10 +3948,16 @@ namespace SabreTools.Helper
 					attribs.Add(gc[i], null);
 				}
 
-				// Contains no equal sign, (even number of quotes XOR not in attribute)
-				else if (!gc[i].Contains("=") && (Regex.Matches(gc[i], "\"").Count % 2 == 0 ^ attrib == ""))
+				// Contains no equal sign, even number of quotes, in attribute
+				else if (!gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 0 && attrib != "")
 				{
-					// Impossible in XML, singular attributes can't be quoted
+					val += " " + gc[i];
+				}
+
+				// Contains no equal sign, odd number of quotes, not in attribute
+				else if (!gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 1 && attrib == "")
+				{
+					val += " " + gc[i];
 				}
 
 				// Contains odd number of quotes, in attribute
@@ -4794,6 +3968,12 @@ namespace SabreTools.Helper
 					attrib = "";
 					val = "";
 				}
+			}
+
+			// There can be leftovers, add them
+			if (attrib != "" && val != "")
+			{
+				attribs.Add(attrib, val);
 			}
 
 			return attribs;
@@ -4828,6 +4008,9 @@ namespace SabreTools.Helper
 				logger.Warning("Rom with no name found! Skipping...");
 				return;
 			}
+
+			// Make sure we don't have any invalid characters in the name
+			item.Name = Style.CleanRomName(item.Name);
 
 			// If we're in cleaning mode, sanitize the game name
 			item.MachineName = (clean ? Style.CleanGameName(item.MachineName) : item.MachineName);
