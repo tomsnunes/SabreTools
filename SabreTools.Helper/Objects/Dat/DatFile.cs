@@ -3583,7 +3583,12 @@ namespace SabreTools.Helper
 				// Contains an equal sign, even number of quotes, not in attribute
 				else if (gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 0 && attrib == "")
 				{
-					attribs.Add(gc[i].Split('=')[0], gc[i].Split('=')[1].Replace("\"", ""));
+					string[] split = gc[i].Split('=');
+					attrib = split[0];
+					val = gc[i].Substring(split[0].Length + 1).Replace("\"", "");
+					attribs.Add(attrib, val);
+					attrib = "";
+					val = "";
 				}
 
 				// Contains an equal sign, even number of quotes, in attribute
@@ -3595,8 +3600,9 @@ namespace SabreTools.Helper
 				// Contains an equal sign, odd number of quotes, not in attribute
 				else if (gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 1 && attrib == "")
 				{
-					attrib = gc[i].Split('=')[0];
-					val = gc[i].Split('=')[1].Replace("\"", "");
+					string[] split = gc[i].Split('=');
+					attrib = split[0];
+					val = gc[i].Substring(split[0].Length + 1).Replace("\"", "");
 				}
 
 				// Contains no equal sign, even number of quotes, not in attribute
@@ -4468,7 +4474,7 @@ namespace SabreTools.Helper
 						header = "<?xml version=\"1.0\"?>\n" +
 							"<!DOCTYPE softwarelist SYSTEM \"softwarelist.dtd\">\n\n" +
 							"<softwarelist name=\"" + HttpUtility.HtmlEncode(Name) + "\"" +
-								"description=\"" + HttpUtility.HtmlEncode(Description) + "\"" +
+								" description=\"" + HttpUtility.HtmlEncode(Description) + "\"" +
 								(ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
 								(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
 								(ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
