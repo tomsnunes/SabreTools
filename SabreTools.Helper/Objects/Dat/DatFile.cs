@@ -2324,9 +2324,13 @@ namespace SabreTools.Helper
 						case "machine":
 						case "game":
 						case "software":
-							string temptype = xtr.Name;
-							string tempname = "", gamedesc = "", romof = "",
-								cloneof = "", sampleof = "", year = "", manufacturer = "";
+							string temptype = xtr.Name, tempname = "", gamedesc = "", romof = "",
+								cloneof = "", sampleof = "", year = "", manufacturer = "", publisher = "",
+								partname = "", partinterface = "", areaname = "";
+							bool? supported = null;
+							long? areasize = null;
+							Dictionary<string, string> infos = new Dictionary<string, string>();
+							Dictionary<string, string> features = new Dictionary<string, string>();
 
 							// We want to process the entire subtree of the game
 							subreader = xtr.ReadSubtree();
@@ -2343,19 +2347,22 @@ namespace SabreTools.Helper
 
 							// Otherwise, add what is possible
 							subreader.MoveToContent();
-							if (!softlist && temptype == "software" && subreader.ReadToFollowing("description"))
+
+							tempname = xtr.GetAttribute("name");
+							romof = (xtr.GetAttribute("romof") != null ? xtr.GetAttribute("romof") : "");
+							cloneof = (xtr.GetAttribute("cloneof") != null ? xtr.GetAttribute("cloneof") : "");
+							sampleof = (xtr.GetAttribute("sampleof") != null ? xtr.GetAttribute("sampleof") : "");
+							if (subreader.GetAttribute("supported") != null)
 							{
-								tempname = subreader.ReadElementContentAsString();
-								gamedesc = tempname;
-								tempname = tempname.Replace('/', '_').Replace("\"", "''");
-								software = true;
-							}
-							else
-							{
-								tempname = xtr.GetAttribute("name");
-								romof = (xtr.GetAttribute("romof") != null ? xtr.GetAttribute("romof") : "");
-								cloneof = (xtr.GetAttribute("cloneof") != null ? xtr.GetAttribute("cloneof") : "");
-								sampleof = (xtr.GetAttribute("sampleof") != null ? xtr.GetAttribute("sampleof") : "");
+								switch (subreader.GetAttribute("supported"))
+								{
+									case "no":
+										supported = false;
+										break;
+									case "yes":
+										supported = true;
+										break;
+								}
 							}
 
 							if (superdat && !keep)
@@ -2415,9 +2422,41 @@ namespace SabreTools.Helper
 										ParseAddHelper(olrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
 										break;
 
+									// For Software List only
+									case "publisher":
+										publisher = subreader.ReadElementContentAsString();
+										break;
+									case "info":
+										infos.Add(subreader.GetAttribute("name"), subreader.GetAttribute("value"));
+										subreader.Read();
+										break;
+									case "part":
+										partname = subreader.GetAttribute("name");
+										partinterface = subreader.GetAttribute("interface");
+										subreader.Read();
+										break;
+									case "feature":
+										features.Add(subreader.GetAttribute("name"), subreader.GetAttribute("value"));
+										subreader.Read();
+										break;
+									case "dataarea":
+									case "diskarea":
+										areaname = subreader.GetAttribute("name");
+										long areasizetemp = -1;
+										if (Int64.TryParse(subreader.GetAttribute("size"), out areasizetemp))
+										{
+											areasize = areasizetemp;
+										}
+										subreader.Read();
+										break;
+
 									// For Logiqx, SabreDAT, and Software List
 									case "description":
 										gamedesc = subreader.ReadElementContentAsString();
+										if (softlist)
+										{
+											tempname = gamedesc.Replace('/', '_').Replace("\"", "''");
+										}
 										break;
 									case "year":
 										year = subreader.ReadElementContentAsString();
@@ -2442,6 +2481,15 @@ namespace SabreTools.Helper
 										}
 
 										DatItem relrom = new Release(subreader.GetAttribute("name"), subreader.GetAttribute("region"), subreader.GetAttribute("language"), date, defaultrel);
+										relrom.Supported = supported;
+										relrom.Year = year;
+										relrom.Publisher = publisher;
+										relrom.Infos = infos;
+										relrom.PartName = partname;
+										relrom.PartInterface = partinterface;
+										relrom.Features = features;
+										relrom.AreaName = areaname;
+										relrom.AreaSize = areasize;
 
 										// Now process and add the rom
 										ParseAddHelper(relrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
@@ -2466,6 +2514,15 @@ namespace SabreTools.Helper
 
 										DatItem biosrom = new BiosSet(subreader.GetAttribute("name"), subreader.GetAttribute("description"), defaultbios,
 											tempname, null, gamedesc, null, null, romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
+										biosrom.Supported = supported;
+										biosrom.Year = year;
+										biosrom.Publisher = publisher;
+										biosrom.Infos = infos;
+										biosrom.PartName = partname;
+										biosrom.PartInterface = partinterface;
+										biosrom.Features = features;
+										biosrom.AreaName = areaname;
+										biosrom.AreaSize = areasize;
 
 										// Now process and add the rom
 										ParseAddHelper(biosrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
@@ -2477,6 +2534,15 @@ namespace SabreTools.Helper
 
 										DatItem archiverom = new Archive(subreader.GetAttribute("name"), tempname, null, gamedesc, null, null,
 											romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
+										archiverom.Supported = supported;
+										archiverom.Year = year;
+										archiverom.Publisher = publisher;
+										archiverom.Infos = infos;
+										archiverom.PartName = partname;
+										archiverom.PartInterface = partinterface;
+										archiverom.Features = features;
+										archiverom.AreaName = areaname;
+										archiverom.AreaSize = areasize;
 
 										// Now process and add the rom
 										ParseAddHelper(archiverom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
@@ -2488,6 +2554,15 @@ namespace SabreTools.Helper
 
 										DatItem samplerom = new Sample(subreader.GetAttribute("name"), tempname, null, gamedesc, null, null,
 											romof, cloneof, sampleof, null, false, null, null, sysid, filename, srcid, null);
+										samplerom.Supported = supported;
+										samplerom.Year = year;
+										samplerom.Publisher = publisher;
+										samplerom.Infos = infos;
+										samplerom.PartName = partname;
+										samplerom.PartInterface = partinterface;
+										samplerom.Features = features;
+										samplerom.AreaName = areaname;
+										samplerom.AreaSize = areasize;
 
 										// Now process and add the rom
 										ParseAddHelper(samplerom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
@@ -2583,6 +2658,15 @@ namespace SabreTools.Helper
 													null, false, null, null, sysid, filename, srcid, null);
 												break;
 										}
+										inrom.Supported = supported;
+										inrom.Year = year;
+										inrom.Publisher = publisher;
+										inrom.Infos = infos;
+										inrom.PartName = partname;
+										inrom.PartInterface = partinterface;
+										inrom.Features = features;
+										inrom.AreaName = areaname;
+										inrom.AreaSize = areasize;
 
 										// Now process and add the rom
 										ParseAddHelper(inrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
@@ -4576,10 +4660,23 @@ namespace SabreTools.Helper
 						depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
 						break;
 					case OutputFormat.SoftwareList:
-						state += "\t<software name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\">\n"
+						state += "\t<software name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\""
+							+ (rom.Supported != null ? " supported=\"" + (rom.Supported == true ? "yes" : "no") + "\"" : "") + ">\n"
 							+ "\t\t<description>" + HttpUtility.HtmlEncode(rom.MachineDescription) + "</description>\n"
 							+ (rom.Year != null ? "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n" : "")
-							+ "\t\t<part name=\"flop1\" interface=\"flop1\">\n";
+							+ (rom.Publisher != null ? "\t\t<publisher>" + HttpUtility.HtmlEncode(rom.Publisher) + "</publisher>\n" : "");
+
+						foreach (KeyValuePair<string, string> kvp in rom.Infos)
+						{
+							state += "\t\t<info name=\"" + kvp.Key + "\" value=\"" + kvp.Value + "\">\n";
+						}
+
+						state += "\t\t<part name=\"" + rom.PartName + "\" interface=\"" + rom.PartInterface + "\">\n";
+
+						foreach (KeyValuePair<string, string> kvp in rom.Features)
+						{
+							state += "\t\t\t<feature name=\"" + kvp.Key + "\" value=\"" + kvp.Value + "\">\n";
+						}
 						break;
 					case OutputFormat.Logiqx:
 						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
@@ -5088,13 +5185,15 @@ namespace SabreTools.Helper
 						switch (rom.Type)
 						{
 							case ItemType.Archive:
-								state += "\t\t\t<dataarea name=\"archive\">\n"
+								state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "archive" : rom.AreaName) + "\""
+										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 									+ "\t\t\t\t<archive name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ "/>\n"
 									+ "\t\t\t</dataarea>\n";
 								break;
 							case ItemType.BiosSet:
-								state += "\t\t\t<dataarea name=\"biosset\">\n"
+								state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "biosset" : rom.AreaName) + "\""
+										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 									+ "\t\t\t\t<biosset name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
 									+ (((BiosSet)rom).Default != null
@@ -5104,7 +5203,8 @@ namespace SabreTools.Helper
 									+ "\t\t\t</dataarea>\n";
 								break;
 							case ItemType.Disk:
-								state += "\t\t\t<diskarea name=\"cdrom\">\n"
+								state += "\t\t\t<diskarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "cdrom" : rom.AreaName) + "\""
+										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 									+ "\t\t\t\t<disk name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
@@ -5113,7 +5213,8 @@ namespace SabreTools.Helper
 									+ "\t\t\t</diskarea>\n";
 								break;
 							case ItemType.Release:
-								state += "\t\t\t<dataarea name=\"release\">\n"
+								state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "release" : rom.AreaName) + "\""
+										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 									+ "\t\t\t\t<release name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : "")
@@ -5125,7 +5226,8 @@ namespace SabreTools.Helper
 									+ "\t\t\t</dataarea>\n";
 								break;
 							case ItemType.Rom:
-								state += "\t\t\t<dataarea name=\"" + HttpUtility.HtmlEncode(Path.GetExtension(rom.Name).ToLowerInvariant().Replace(".", String.Empty)) + "\">\n"
+								state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "rom" : rom.AreaName) + "\""
+										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 									+ "\t\t\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
@@ -5137,8 +5239,9 @@ namespace SabreTools.Helper
 									+ "\t\t\t</dataarea>\n";
 								break;
 							case ItemType.Sample:
-								state += "\t\t\t<dataarea name=\"sample\">\n"
-									+ "\t\t\t\t<file type=\"sample\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+								state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "sample" : rom.AreaName) + "\""
+										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
+									+ "\t\t\t\t<sample type=\"sample\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ "/>\n"
 									+ "\t\t\t</dataarea>\n";
 								break;

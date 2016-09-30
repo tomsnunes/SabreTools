@@ -28,6 +28,16 @@ namespace SabreTools.Helper
 		protected string _board;
 		protected string _rebuildTo;
 
+		// Software list information
+		protected bool? _supported;
+		protected string _publisher;
+		protected Dictionary<string, string> _infos;
+		protected string _partName;
+		protected string _partInterface;
+		protected Dictionary<string, string> _features;
+		protected string _areaName;
+		protected long? _areaSize;
+
 		// Source metadata information
 		protected int _systemId;
 		protected string _systemName;
@@ -115,6 +125,48 @@ namespace SabreTools.Helper
 		{
 			get { return _rebuildTo; }
 			set { _rebuildTo = value; }
+		}
+
+		// Software list information
+		public bool? Supported
+		{
+			get { return _supported; }
+			set { _supported = value; }
+		}
+		public string Publisher
+		{
+			get { return _publisher; }
+			set { _publisher = value; }
+		}
+		public Dictionary<string, string> Infos
+		{
+			get { return _infos; }
+			set { _infos = value; }
+		}
+		public string PartName
+		{
+			get { return _partName; }
+			set { _partName = value; }
+		}
+		public string PartInterface
+		{
+			get { return _partInterface; }
+			set { _partInterface = value; }
+		}
+		public Dictionary<string, string> Features
+		{
+			get { return _features; }
+			set { _features = value; }
+		}
+		public string AreaName
+		{
+			get { return _areaName; }
+			set { _areaName = value; }
+		}
+		public long? AreaSize
+		{
+			get { return _areaSize; }
+			set { _areaSize = value; }
 		}
 
 		// Source metadata information
