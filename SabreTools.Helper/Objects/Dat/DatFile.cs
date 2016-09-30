@@ -8,8 +8,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Xml;
-using System.Xml.Linq;
-using System.Xml.Schema;
 
 namespace SabreTools.Helper
 {
@@ -4670,7 +4668,7 @@ namespace SabreTools.Helper
 						}
 						break;
 					case OutputFormat.SoftwareList:
-						state += "\t</software>\n\n";
+						state += "\t\t</part>\n\t</software>\n\n";
 						break;
 					case OutputFormat.Logiqx:
 						state += "\t</machine>\n";
