@@ -1218,10 +1218,13 @@ namespace SabreTools.Helper
 				case OutputFormat.DOSCenter:
 					ParseCMP(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean);
 					break;
+				case OutputFormat.Logiqx:
+					ParseLogiqx(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
+					break;
 				case OutputFormat.OfflineList:
 				case OutputFormat.SabreDat:
 				case OutputFormat.SoftwareList:
-					ParseXML(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
+					ParseGenericXML(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
 					break;
 				case OutputFormat.RedumpMD5:
 					ParseRedumpMD5(filename, sysid, srcid, romname, md5, trim, single, root, logger, clean);
@@ -1234,9 +1237,6 @@ namespace SabreTools.Helper
 					break;
 				case OutputFormat.RomCenter:
 					ParseRC(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, clean);
-					break;
-				case OutputFormat.Xml:
-					ParseXMLString(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
 					break;
 				default:
 					return;
@@ -1858,321 +1858,6 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Parse a Redump MD5 and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		private void ParseRedumpMD5(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Rom filtering
-			string romname,
-			string md5,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
-
-			// Miscellaneous
-			Logger logger,
-			bool clean)
-		{
-			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
-
-			while (!sr.EndOfStream)
-			{
-				string line = sr.ReadLine();
-
-				Rom rom = new Rom(line.Split(' ')[1].Replace("*", String.Empty), -1, null, line.Split(' ')[0], null, ItemStatus.None, null,
-					Path.GetFileNameWithoutExtension(filename), null, null, null, null, null, null, null, null, false, null, null, sysid, null, srcid, null);
-
-				// Now process and add the rom
-				string key = "";
-				ParseAddHelper(rom, null, romname, null, -1, -1, -1, null, md5, null, ItemStatus.NULL, trim, single, root, clean, logger, out key);
-			}
-
-			sr.Dispose();
-		}
-
-		/// <summary>
-		/// Parse a Redump SFV and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		private void ParseRedumpSFV(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Rom filtering
-			string romname,
-			string crc,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
-
-			// Miscellaneous
-			Logger logger,
-			bool clean)
-		{
-			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
-
-			while (!sr.EndOfStream)
-			{
-				string line = sr.ReadLine();
-
-				Rom rom = new Rom(line.Split(' ')[0], -1, line.Split(' ')[1], null, null, ItemStatus.None, null,
-					Path.GetFileNameWithoutExtension(filename), null, null, null, null, null, null, null, null, false, null, null, sysid, null, srcid, null);
-
-				// Now process and add the rom
-				string key = "";
-				ParseAddHelper(rom, null, romname, null, -1, -1, -1, crc, null, null, ItemStatus.NULL, trim, single, root, clean, logger, out key);
-			}
-
-			sr.Dispose();
-		}
-
-		/// <summary>
-		/// Parse a Redump SHA-1 and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		private void ParseRedumpSHA1(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Rom filtering
-			string romname,
-			string sha1,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
-
-			// Miscellaneous
-			Logger logger,
-			bool clean)
-		{
-			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
-
-			while (!sr.EndOfStream)
-			{
-				string line = sr.ReadLine();
-
-				Rom rom = new Rom(line.Split(' ')[1].Replace("*", String.Empty), -1, null, null, line.Split(' ')[0], ItemStatus.None, null,
-					Path.GetFileNameWithoutExtension(filename), null, null, null, null, null, null, null, null, false, null, null, sysid, null, srcid, null);
-
-				// Now process and add the rom
-				string key = "";
-				ParseAddHelper(rom, null, romname, null, -1, -1, -1, null, null, sha1, ItemStatus.NULL, trim, single, root, clean, logger, out key);
-			}
-
-			sr.Dispose();
-		}
-
-		/// <summary>
-		/// Parse a RomCenter DAT and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="romtype">Type of the rom to match</param>
-		/// <param name="sgt">Find roms greater than or equal to this size</param>
-		/// <param name="slt">Find roms less than or equal to this size</param>
-		/// <param name="seq">Find roms equal to this size</param>
-		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="itemStatus">Select roms with the given status</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		private void ParseRC(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Rom filtering
-			string gamename,
-			string romname,
-			string romtype,
-			long sgt,
-			long slt,
-			long seq,
-			string crc,
-			string md5,
-			string sha1,
-			ItemStatus itemStatus,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
-
-			// Miscellaneous
-			Logger logger,
-			bool clean)
-		{
-			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
-
-			string blocktype = "";
-			while (!sr.EndOfStream)
-			{
-				string line = sr.ReadLine();
-
-				// If the line is the start of the credits section
-				if (line.ToLowerInvariant().Contains("[credits]"))
-				{
-					blocktype = "credits";
-				}
-				// If the line is the start of the dat section
-				else if (line.ToLowerInvariant().Contains("[dat]"))
-				{
-					blocktype = "dat";
-				}
-				// If the line is the start of the emulator section
-				else if (line.ToLowerInvariant().Contains("[emulator]"))
-				{
-					blocktype = "emulator";
-				}
-				// If the line is the start of the game section
-				else if (line.ToLowerInvariant().Contains("[games]"))
-				{
-					blocktype = "games";
-				}
-				// Otherwise, it's not a section and it's data, so get out all data
-				else
-				{
-					// If we have an author
-					if (line.StartsWith("author="))
-					{
-						Author = (String.IsNullOrEmpty(Author) ? line.Split('=')[1] : Author);
-					}
-					// If we have one of the three version tags
-					else if (line.StartsWith("version="))
-					{
-						switch (blocktype)
-						{
-							case "credits":
-								Version = (String.IsNullOrEmpty(Version) ? line.Split('=')[1] : Version);
-								break;
-							case "emulator":
-								Description = (String.IsNullOrEmpty(Description) ? line.Split('=')[1] : Description);
-								break;
-						}
-					}
-					// If we have a comment
-					else if (line.StartsWith("comment="))
-					{
-						Comment = (String.IsNullOrEmpty(Comment) ? line.Split('=')[1] : Comment);
-					}
-					// If we have the split flag
-					else if (line.StartsWith("split="))
-					{
-						int split = 0;
-						if (Int32.TryParse(line.Split('=')[1], out split))
-						{
-							if (split == 1)
-							{
-								ForceMerging = ForceMerging.Split;
-							}
-						}
-					}
-					// If we have the merge tag
-					else if (line.StartsWith("merge="))
-					{
-						int merge = 0;
-						if (Int32.TryParse(line.Split('=')[1], out merge))
-						{
-							if (merge == 1)
-							{
-								ForceMerging = ForceMerging.Full;
-							}
-						}
-					}
-					// If we have the refname tag
-					else if (line.StartsWith("refname="))
-					{
-						Name = (String.IsNullOrEmpty(Name) ? line.Split('=')[1] : Name);
-					}
-					// If we have a rom
-					else if (line.StartsWith("¬"))
-					{
-						/*
-						The rominfo order is as follows:
-						1 - parent name
-						2 - parent description
-						3 - game name
-						4 - game description
-						5 - rom name
-						6 - rom crc
-						7 - rom size
-						8 - romof name
-						9 - merge name
-						*/
-						string[] rominfo = line.Split('¬');
-
-						Rom rom = new Rom(rominfo[5], Int64.Parse(rominfo[7]), rominfo[6], null, null, ItemStatus.None, null, rominfo[3], null,
-							rominfo[4], null, null, rominfo[8], rominfo[1], null, null, false, null, null, sysid, null, srcid, null);
-
-						// Now process and add the rom
-						string key = "";
-						ParseAddHelper(rom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-					}
-				}
-			}
-
-			sr.Dispose();
-		}
-
-		/// <summary>
 		/// Parse an XML DAT (Logiqx, OfflineList, SabreDAT, and Software List) and return all found games and roms within
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
@@ -2195,7 +1880,7 @@ namespace SabreTools.Helper
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
-		private void ParseXML(
+		private void ParseGenericXML(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -3111,7 +2796,7 @@ namespace SabreTools.Helper
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <remarks>This version does not fully support OL or SabreDAT</remarks>
-		private void ParseXMLString(
+		private void ParseLogiqx(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -3165,7 +2850,7 @@ namespace SabreTools.Helper
 				// Handle MAME listxml since they're halfway between a SL and a Logiqx XML
 				else if (line.StartsWith("<mame"))
 				{
-					Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+					Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
 
 					if (attribs.ContainsKey("build"))
 					{
@@ -3177,7 +2862,7 @@ namespace SabreTools.Helper
 				// New software lists have this behavior
 				else if (line.StartsWith("<softwarelist"))
 				{
-					Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+					Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
 
 					if (attribs.ContainsKey("name"))
 					{
@@ -3230,14 +2915,14 @@ namespace SabreTools.Helper
 						}
 					}
 				}
-				
+
 				// Handle M1 DATs since they're 99% the same as a SL DAT
 				else if (line.StartsWith("<m1"))
 				{
 					Name = (String.IsNullOrEmpty(Name) ? "M1" : Name);
 					Description = (String.IsNullOrEmpty(Description) ? "M1" : Description);
 
-					Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+					Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
 
 					if (attribs.ContainsKey("version"))
 					{
@@ -3318,7 +3003,7 @@ namespace SabreTools.Helper
 							Author = (String.IsNullOrEmpty(Author) ? matched[2].Value : Author);
 
 							// Special cases for SabreDAT
-							Dictionary<string, string> attribs = GetAttributes(matched[1].Value);
+							Dictionary<string, string> attribs = GetLogiqxAttributes(matched[1].Value);
 							if (attribs.ContainsKey("email"))
 							{
 								Email = (String.IsNullOrEmpty(Email) ? attribs["email"] : Email);
@@ -3356,7 +3041,7 @@ namespace SabreTools.Helper
 						}
 						else if (matched[1].Value.StartsWith("clrmamepro") || matched[1].Value.StartsWith("romcenter"))
 						{
-							Dictionary<string, string> attribs = GetAttributes(matched[1].Value);
+							Dictionary<string, string> attribs = GetLogiqxAttributes(matched[1].Value);
 							if (attribs.ContainsKey("header"))
 							{
 								Header = (String.IsNullOrEmpty(Header) ? attribs["header"].ToString() : Header);
@@ -3416,7 +3101,7 @@ namespace SabreTools.Helper
 
 								if (line.StartsWith("flag"))
 								{
-									Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+									Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
 
 									if (attribs.ContainsKey("name") && attribs.ContainsKey("value"))
 									{
@@ -3480,7 +3165,7 @@ namespace SabreTools.Helper
 					bool isbios = false;
 
 					// Get the game information
-					Dictionary<string, string> gameattribs = GetAttributes(line.Substring(1, line.Length - 3));
+					Dictionary<string, string> gameattribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
 
 					string tempname = (gameattribs.ContainsKey("name") ? gameattribs["name"] : "");
 					string sourcefile = (gameattribs.ContainsKey("sourcefile") ? gameattribs["sourcefile"] : "");
@@ -3530,7 +3215,7 @@ namespace SabreTools.Helper
 						// Now for the different file types
 						else if (line.StartsWith("<archive"))
 						{
-							Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
 
 							Archive item = new Archive((attribs.ContainsKey("name") ? attribs["name"] : ""),
 								tempname,
@@ -3556,7 +3241,7 @@ namespace SabreTools.Helper
 						}
 						else if (line.StartsWith("<biosset"))
 						{
-							Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
 
 							bool @default = false;
 							if (attribs.ContainsKey("default"))
@@ -3598,7 +3283,7 @@ namespace SabreTools.Helper
 						}
 						else if (line.StartsWith("<disk"))
 						{
-							Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
 
 							ItemStatus its = ItemStatus.None;
 							if (attribs.ContainsKey("flags"))
@@ -3696,7 +3381,7 @@ namespace SabreTools.Helper
 						}
 						else if (line.StartsWith("<release"))
 						{
-							Dictionary <string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
 
 							bool @default = false;
 							if (attribs.ContainsKey("default"))
@@ -3740,7 +3425,7 @@ namespace SabreTools.Helper
 						}
 						else if (line.StartsWith("<rom"))
 						{
-							Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
 
 							ItemStatus its = ItemStatus.None;
 							if (attribs.ContainsKey("flags"))
@@ -3860,7 +3545,7 @@ namespace SabreTools.Helper
 						}
 						else if (line.StartsWith("<sample"))
 						{
-							Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
 
 							Sample item = new Sample((attribs.ContainsKey("name") ? attribs["name"] : ""),
 								tempname,
@@ -3907,7 +3592,7 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="line">Opening tag to be parsed</param>
 		/// <returns>Mapping of attribute to values</returns>
-		private Dictionary<string, string> GetAttributes(string line)
+		private Dictionary<string, string> GetLogiqxAttributes(string line)
 		{
 			Dictionary<string, string> attribs = new Dictionary<string, string>();
 
@@ -3977,6 +3662,321 @@ namespace SabreTools.Helper
 			}
 
 			return attribs;
+		}
+
+		/// <summary>
+		/// Parse a Redump MD5 and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		private void ParseRedumpMD5(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Rom filtering
+			string romname,
+			string md5,
+
+			// Rom renaming
+			bool trim,
+			bool single,
+			string root,
+
+			// Miscellaneous
+			Logger logger,
+			bool clean)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				Rom rom = new Rom(line.Split(' ')[1].Replace("*", String.Empty), -1, null, line.Split(' ')[0], null, ItemStatus.None, null,
+					Path.GetFileNameWithoutExtension(filename), null, null, null, null, null, null, null, null, false, null, null, sysid, null, srcid, null);
+
+				// Now process and add the rom
+				string key = "";
+				ParseAddHelper(rom, null, romname, null, -1, -1, -1, null, md5, null, ItemStatus.NULL, trim, single, root, clean, logger, out key);
+			}
+
+			sr.Dispose();
+		}
+
+		/// <summary>
+		/// Parse a Redump SFV and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		private void ParseRedumpSFV(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Rom filtering
+			string romname,
+			string crc,
+
+			// Rom renaming
+			bool trim,
+			bool single,
+			string root,
+
+			// Miscellaneous
+			Logger logger,
+			bool clean)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				Rom rom = new Rom(line.Split(' ')[0], -1, line.Split(' ')[1], null, null, ItemStatus.None, null,
+					Path.GetFileNameWithoutExtension(filename), null, null, null, null, null, null, null, null, false, null, null, sysid, null, srcid, null);
+
+				// Now process and add the rom
+				string key = "";
+				ParseAddHelper(rom, null, romname, null, -1, -1, -1, crc, null, null, ItemStatus.NULL, trim, single, root, clean, logger, out key);
+			}
+
+			sr.Dispose();
+		}
+
+		/// <summary>
+		/// Parse a Redump SHA-1 and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		private void ParseRedumpSHA1(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Rom filtering
+			string romname,
+			string sha1,
+
+			// Rom renaming
+			bool trim,
+			bool single,
+			string root,
+
+			// Miscellaneous
+			Logger logger,
+			bool clean)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				Rom rom = new Rom(line.Split(' ')[1].Replace("*", String.Empty), -1, null, null, line.Split(' ')[0], ItemStatus.None, null,
+					Path.GetFileNameWithoutExtension(filename), null, null, null, null, null, null, null, null, false, null, null, sysid, null, srcid, null);
+
+				// Now process and add the rom
+				string key = "";
+				ParseAddHelper(rom, null, romname, null, -1, -1, -1, null, null, sha1, ItemStatus.NULL, trim, single, root, clean, logger, out key);
+			}
+
+			sr.Dispose();
+		}
+
+		/// <summary>
+		/// Parse a RomCenter DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="itemStatus">Select roms with the given status</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		private void ParseRC(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Rom filtering
+			string gamename,
+			string romname,
+			string romtype,
+			long sgt,
+			long slt,
+			long seq,
+			string crc,
+			string md5,
+			string sha1,
+			ItemStatus itemStatus,
+
+			// Rom renaming
+			bool trim,
+			bool single,
+			string root,
+
+			// Miscellaneous
+			Logger logger,
+			bool clean)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+
+			string blocktype = "";
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				// If the line is the start of the credits section
+				if (line.ToLowerInvariant().Contains("[credits]"))
+				{
+					blocktype = "credits";
+				}
+				// If the line is the start of the dat section
+				else if (line.ToLowerInvariant().Contains("[dat]"))
+				{
+					blocktype = "dat";
+				}
+				// If the line is the start of the emulator section
+				else if (line.ToLowerInvariant().Contains("[emulator]"))
+				{
+					blocktype = "emulator";
+				}
+				// If the line is the start of the game section
+				else if (line.ToLowerInvariant().Contains("[games]"))
+				{
+					blocktype = "games";
+				}
+				// Otherwise, it's not a section and it's data, so get out all data
+				else
+				{
+					// If we have an author
+					if (line.StartsWith("author="))
+					{
+						Author = (String.IsNullOrEmpty(Author) ? line.Split('=')[1] : Author);
+					}
+					// If we have one of the three version tags
+					else if (line.StartsWith("version="))
+					{
+						switch (blocktype)
+						{
+							case "credits":
+								Version = (String.IsNullOrEmpty(Version) ? line.Split('=')[1] : Version);
+								break;
+							case "emulator":
+								Description = (String.IsNullOrEmpty(Description) ? line.Split('=')[1] : Description);
+								break;
+						}
+					}
+					// If we have a comment
+					else if (line.StartsWith("comment="))
+					{
+						Comment = (String.IsNullOrEmpty(Comment) ? line.Split('=')[1] : Comment);
+					}
+					// If we have the split flag
+					else if (line.StartsWith("split="))
+					{
+						int split = 0;
+						if (Int32.TryParse(line.Split('=')[1], out split))
+						{
+							if (split == 1)
+							{
+								ForceMerging = ForceMerging.Split;
+							}
+						}
+					}
+					// If we have the merge tag
+					else if (line.StartsWith("merge="))
+					{
+						int merge = 0;
+						if (Int32.TryParse(line.Split('=')[1], out merge))
+						{
+							if (merge == 1)
+							{
+								ForceMerging = ForceMerging.Full;
+							}
+						}
+					}
+					// If we have the refname tag
+					else if (line.StartsWith("refname="))
+					{
+						Name = (String.IsNullOrEmpty(Name) ? line.Split('=')[1] : Name);
+					}
+					// If we have a rom
+					else if (line.StartsWith("¬"))
+					{
+						/*
+						The rominfo order is as follows:
+						1 - parent name
+						2 - parent description
+						3 - game name
+						4 - game description
+						5 - rom name
+						6 - rom crc
+						7 - rom size
+						8 - romof name
+						9 - merge name
+						*/
+						string[] rominfo = line.Split('¬');
+
+						Rom rom = new Rom(rominfo[5], Int64.Parse(rominfo[7]), rominfo[6], null, null, ItemStatus.None, null, rominfo[3], null,
+							rominfo[4], null, null, rominfo[8], rominfo[1], null, null, false, null, null, sysid, null, srcid, null);
+
+						// Now process and add the rom
+						string key = "";
+						ParseAddHelper(rom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+					}
+				}
+			}
+
+			sr.Dispose();
 		}
 
 		/// <summary>
@@ -4192,7 +4192,7 @@ namespace SabreTools.Helper
 			// If the DAT has no output format, default to XML
 			if (OutputFormat == 0)
 			{
-				OutputFormat = OutputFormat.Xml;
+				OutputFormat = OutputFormat.Logiqx;
 			}
 
 			// Make sure that the three essential fields are filled in
@@ -4503,7 +4503,7 @@ namespace SabreTools.Helper
 								(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : "") +
 								" />\n\n";
 						break;
-					case OutputFormat.Xml:
+					case OutputFormat.Logiqx:
 						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
 							"<datafile>\n" +
@@ -4602,7 +4602,7 @@ namespace SabreTools.Helper
 							+ (rom.Year != null ? "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n" : "")
 							+ "\t\t<part name=\"flop1\" interface=\"flop1\">\n";
 						break;
-					case OutputFormat.Xml:
+					case OutputFormat.Logiqx:
 						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
 							(rom.IsBios ? " isbios=\"yes\"" : "") +
 							(String.IsNullOrEmpty(rom.CloneOf) ? "" : " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
@@ -4691,7 +4691,7 @@ namespace SabreTools.Helper
 					case OutputFormat.SoftwareList:
 						state += "\t</software>\n\n";
 						break;
-					case OutputFormat.Xml:
+					case OutputFormat.Logiqx:
 						state += "\t</machine>\n";
 						break;
 				}
@@ -5165,7 +5165,7 @@ namespace SabreTools.Helper
 								break;
 						}
 						break;
-					case OutputFormat.Xml:
+					case OutputFormat.Logiqx:
 						switch (rom.Type)
 						{
 							case ItemType.Archive:
@@ -5276,7 +5276,7 @@ namespace SabreTools.Helper
 						case OutputFormat.SoftwareList:
 							footer = "\t</software>\n\n</softwarelist>\n";
 							break;
-						case OutputFormat.Xml:
+						case OutputFormat.Logiqx:
 							footer = "\t</machine>\n</datafile>\n";
 							break;
 					}
@@ -5301,7 +5301,7 @@ namespace SabreTools.Helper
 							footer = "</softwarelist>\n";
 							break;
 						case OutputFormat.SabreDat:
-						case OutputFormat.Xml:
+						case OutputFormat.Logiqx:
 							footer = "</datafile>\n";
 							break;
 					}

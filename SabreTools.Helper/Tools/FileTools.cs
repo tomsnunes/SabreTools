@@ -96,7 +96,7 @@ namespace SabreTools.Helper
 				{
 					if (second.StartsWith("<!doctype datafile"))
 					{
-						return OutputFormat.Xml;
+						return OutputFormat.Logiqx;
 					}
 					else if (second.StartsWith("<!doctype softwarelist"))
 					{
@@ -113,7 +113,7 @@ namespace SabreTools.Helper
 					// Older and non-compliant DATs
 					else
 					{
-						return OutputFormat.Xml;
+						return OutputFormat.Logiqx;
 					}
 				}
 

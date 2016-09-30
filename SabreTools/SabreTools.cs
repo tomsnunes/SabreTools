@@ -286,7 +286,7 @@ namespace SabreTools
 						break;
 					case "-ox":
 					case "--output-xml":
-						outputFormat |= OutputFormat.Xml;
+						outputFormat |= OutputFormat.Logiqx;
 						break;
 					case "-q":
 					case "--quotes":

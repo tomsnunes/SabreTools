@@ -20,7 +20,7 @@ namespace SabreTools.Helper
 	[Flags]
 	public enum OutputFormat
 	{
-		Xml = 0x001,
+		Logiqx = 0x001,
 		ClrMamePro = 0x002,
 		RomCenter = 0x004,
 		DOSCenter = 0x008,

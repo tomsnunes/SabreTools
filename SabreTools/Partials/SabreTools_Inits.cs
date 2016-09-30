@@ -105,7 +105,7 @@ namespace SabreTools
 				Date = DateTime.Now.ToString("yyyy-MM-dd"),
 				Author = author,
 				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
-				OutputFormat = (outputFormat == 0 ? OutputFormat.Xml : outputFormat),
+				OutputFormat = (outputFormat == 0 ? OutputFormat.Logiqx : outputFormat),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
 				Files = new SortedDictionary<string, List<DatItem>>(),
