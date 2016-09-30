@@ -74,6 +74,7 @@ namespace SabreTools.Helper
 
 		#region Regex conversion patterns
 
+		public const string XmlPattern = @"<(.*?)>(.*?)</(.*?)>";
 		public const string HeaderPatternCMP = @"(^.*?) \($";
 		public const string ItemPatternCMP = @"^\s*(\S*?) (.*)";
 		public const string EndPatternCMP = @"^\s*\)\s*$";

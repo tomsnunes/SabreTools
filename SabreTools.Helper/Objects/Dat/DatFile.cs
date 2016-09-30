@@ -2825,7 +2825,7 @@ namespace SabreTools.Helper
 												(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 											its = ItemStatus.BadDump;
 										}
-										if (subreader.GetAttribute("flags") == "itemStatus" || subreader.GetAttribute("status") == "itemStatus")
+										if (subreader.GetAttribute("flags") == "nodump" || subreader.GetAttribute("status") == "nodump")
 										{
 											logger.Verbose("Nodump detected: " +
 												(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
@@ -2985,7 +2985,7 @@ namespace SabreTools.Helper
 														"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 													its = ItemStatus.BadDump;
 													break;
-												case "itemStatus":
+												case "nodump":
 													logger.Verbose("Nodump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
 														"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 													its = ItemStatus.Nodump;
@@ -3928,6 +3928,875 @@ namespace SabreTools.Helper
 						break;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Parse an XML DAT (Logiqx, OfflineList, SabreDAT, and Software List) and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="itemStatus">Select roms with the given status</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
+		/// <remarks>This version does not fully support OL or SabreDAT</remarks>
+		private void ParseXMLString(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Rom filtering
+			string gamename,
+			string romname,
+			string romtype,
+			long sgt,
+			long slt,
+			long seq,
+			string crc,
+			string md5,
+			string sha1,
+			ItemStatus itemStatus,
+
+			// Rom renaming
+			bool trim,
+			bool single,
+			string root,
+
+			// Miscellaneous
+			Logger logger,
+			bool keep,
+			bool clean,
+			bool softlist)
+
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+
+			bool superdat = false;
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine().Trim();
+
+				GroupCollection matched = Regex.Match(line, Constants.XmlPattern).Groups;
+
+				// Comments in XML DATs start with a <!--
+				if (line.StartsWith("<!--"))
+				{
+					while (!line.EndsWith("-->"))
+					{
+						sr.ReadLine();
+					}
+					continue;
+				}
+
+				// Handle MAME listxml since they're halfway between a SL and a Logiqx XML
+				else if (line.StartsWith("<mame"))
+				{
+					Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+
+					if (attribs.ContainsKey("build"))
+					{
+						Name = (String.IsNullOrEmpty(Name) ? attribs["build"] : Name);
+						Description = (String.IsNullOrEmpty(Description) ? Name : Name);
+					}
+				}
+
+				// New software lists have this behavior
+				else if (line.StartsWith("<softwarelist"))
+				{
+					Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+
+					if (attribs.ContainsKey("name"))
+					{
+						Name = (String.IsNullOrEmpty(Name) ? attribs["name"] : Name);
+					}
+					if (attribs.ContainsKey("description"))
+					{
+						Description = (String.IsNullOrEmpty(Description) ? attribs["description"] : Description);
+					}
+					if (attribs.ContainsKey("forcemerging"))
+					{
+						switch (attribs["forcemerging"])
+						{
+							case "split":
+								ForceMerging = ForceMerging.Split;
+								break;
+							case "none":
+								ForceMerging = ForceMerging.None;
+								break;
+							case "full":
+								ForceMerging = ForceMerging.Full;
+								break;
+						}
+					}
+					if (attribs.ContainsKey("forceitemstatus"))
+					{
+						switch (attribs["forceitemstatus"])
+						{
+							case "obsolete":
+								ForceNodump = ForceNodump.Obsolete;
+								break;
+							case "required":
+								ForceNodump = ForceNodump.Required;
+								break;
+							case "ignore":
+								ForceNodump = ForceNodump.Ignore;
+								break;
+						}
+					}
+					if (attribs.ContainsKey("forcepacking"))
+					{
+						switch (attribs["forcepacking"])
+						{
+							case "zip":
+								ForcePacking = ForcePacking.Zip;
+								break;
+							case "unzip":
+								ForcePacking = ForcePacking.Unzip;
+								break;
+						}
+					}
+				}
+				
+				// Handle M1 DATs since they're 99% the same as a SL DAT
+				else if (line.StartsWith("<m1"))
+				{
+					Name = (String.IsNullOrEmpty(Name) ? "M1" : Name);
+					Description = (String.IsNullOrEmpty(Description) ? "M1" : Description);
+
+					Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+
+					if (attribs.ContainsKey("version"))
+					{
+						Version = (String.IsNullOrEmpty(Version) ? attribs["version"] : Version);
+					}
+				}
+
+				// OfflineList has a different header format
+				else if (line.StartsWith("<configuration"))
+				{
+					while (!line.Contains("</configuration>"))
+					{
+						line = sr.ReadLine().Trim();
+
+						// Get the list of items from the line
+						matched = Regex.Match(line, Constants.XmlPattern).Groups;
+
+						// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
+						if (matched[0].Value.ToLowerInvariant().StartsWith("datname"))
+						{
+							Name = (String.IsNullOrEmpty(Name) ? matched[1].Value : Name);
+							superdat = superdat || Name.Contains(" - SuperDAT");
+							if (keep && superdat)
+							{
+								Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
+							}
+						}
+						else if (matched[0].Value.ToLowerInvariant().StartsWith("datversionurl"))
+						{
+							Url = (String.IsNullOrEmpty(Name) ? matched[1].Value : Url);
+							break;
+						}
+					}
+				}
+
+				// If the line is the header
+				else if (line.Contains("<header>"))
+				{
+					while (!line.Contains("</header>"))
+					{
+						line = sr.ReadLine().Trim();
+
+						// Get the list of items from the line
+						matched = Regex.Match(line, Constants.XmlPattern).Groups;
+
+						// Now check for all of the header items
+						if (matched[0].Value.StartsWith("name"))
+						{
+							Name = (String.IsNullOrEmpty(Name) ? matched[1].Value : Name);
+							superdat = superdat || Name.Contains(" - SuperDAT");
+							if (keep && superdat)
+							{
+								Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
+							}
+						}
+						else if (matched[0].Value.StartsWith("description"))
+						{
+							Description = (String.IsNullOrEmpty(Description) ? matched[1].Value : Description);
+						}
+						else if (matched[0].Value.StartsWith("rootdir"))
+						{
+							RootDir = (String.IsNullOrEmpty(RootDir) ? matched[1].Value : RootDir);
+						}
+						else if (matched[0].Value.StartsWith("category"))
+						{
+							Category = (String.IsNullOrEmpty(Category) ? matched[1].Value : Category);
+						}
+						else if (matched[0].Value.StartsWith("version"))
+						{
+							Version = (String.IsNullOrEmpty(Version) ? matched[1].Value : Version);
+						}
+						else if (matched[0].Value.StartsWith("date"))
+						{
+							Date = (String.IsNullOrEmpty(Date) ? matched[1].Value : Date);
+						}
+						else if (matched[0].Value.StartsWith("author"))
+						{
+							Author = (String.IsNullOrEmpty(Author) ? matched[1].Value : Author);
+
+							// Special cases for SabreDAT
+							Dictionary<string, string> attribs = GetAttributes(matched[0].Value);
+							if (attribs.ContainsKey("email"))
+							{
+								Email = (String.IsNullOrEmpty(Email) ? attribs["email"] : Email);
+							}
+							if (attribs.ContainsKey("homepage"))
+							{
+								Homepage = (String.IsNullOrEmpty(Homepage) ? attribs["homepage"] : Homepage);
+							}
+							if (attribs.ContainsKey("url"))
+							{
+								Url = (String.IsNullOrEmpty(Url) ? attribs["url"] : Url);
+							}
+						}
+						else if (matched[0].Value.StartsWith("email"))
+						{
+							Email = (String.IsNullOrEmpty(Date) ? matched[1].Value : Email);
+						}
+						else if (matched[0].Value.StartsWith("homepage"))
+						{
+							Homepage = (String.IsNullOrEmpty(Homepage) ? matched[1].Value : Homepage);
+						}
+						else if (matched[0].Value.StartsWith("url"))
+						{
+							Url = (String.IsNullOrEmpty(Url) ? matched[1].Value : Url);
+						}
+						else if (matched[0].Value.StartsWith("comment"))
+						{
+							Comment = (String.IsNullOrEmpty(Comment) ? matched[1].Value : Comment);
+						}
+						else if (matched[0].Value.StartsWith("type"))
+						{
+							Type = (String.IsNullOrEmpty(Type) ? matched[1].Value : Type);
+							superdat = superdat || matched[1].Value.Contains("SuperDAT");
+							break;
+						}
+						else if (matched[0].Value.StartsWith("clrmamepro") || matched[0].Value.StartsWith("romcenter"))
+						{
+							Dictionary<string, string> attribs = GetAttributes(matched[0].Value);
+							if (attribs.ContainsKey("header"))
+							{
+								Header = (String.IsNullOrEmpty(Header) ? attribs["header"].ToString() : Header);
+							}
+							if (attribs.ContainsKey("plugin"))
+							{
+								Header = (String.IsNullOrEmpty(Header) ? attribs["plugin"].ToString() : Header);
+							}
+							if (attribs.ContainsKey("forcemerging"))
+							{
+								switch (attribs["forcemerging"])
+								{
+									case "split":
+										ForceMerging = ForceMerging.Split;
+										break;
+									case "none":
+										ForceMerging = ForceMerging.None;
+										break;
+									case "full":
+										ForceMerging = ForceMerging.Full;
+										break;
+								}
+							}
+							if (attribs.ContainsKey("forceitemstatus"))
+							{
+								switch (attribs["forceitemstatus"])
+								{
+									case "obsolete":
+										ForceNodump = ForceNodump.Obsolete;
+										break;
+									case "required":
+										ForceNodump = ForceNodump.Required;
+										break;
+									case "ignore":
+										ForceNodump = ForceNodump.Ignore;
+										break;
+								}
+							}
+							if (attribs.ContainsKey("forcepacking"))
+							{
+								switch (attribs["forcepacking"])
+								{
+									case "zip":
+										ForcePacking = ForcePacking.Zip;
+										break;
+									case "unzip":
+										ForcePacking = ForcePacking.Unzip;
+										break;
+								}
+							}
+						}
+						else if (line.Contains("<flags>"))
+						{
+							while (!line.Contains("</flags>"))
+							{
+								line = sr.ReadLine().Trim();
+
+								if (line.StartsWith("flag"))
+								{
+									Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+
+									if (attribs.ContainsKey("name") && attribs.ContainsKey("value"))
+									{
+										switch (attribs["name"])
+										{
+											case "type":
+												Type = (String.IsNullOrEmpty(Type) ? attribs["value"] : Type);
+												superdat = superdat || matched[1].Value.Contains("SuperDAT");
+												break;
+											case "forcemerging":
+												switch (attribs["value"])
+												{
+													case "split":
+														ForceMerging = ForceMerging.Split;
+														break;
+													case "none":
+														ForceMerging = ForceMerging.None;
+														break;
+													case "full":
+														ForceMerging = ForceMerging.Full;
+														break;
+												}
+												break;
+											case "forceitemStatus":
+												switch (attribs["value"])
+												{
+													case "obsolete":
+														ForceNodump = ForceNodump.Obsolete;
+														break;
+													case "required":
+														ForceNodump = ForceNodump.Required;
+														break;
+													case "ignore":
+														ForceNodump = ForceNodump.Ignore;
+														break;
+												}
+												break;
+											case "forcepacking":
+												switch (attribs["value"])
+												{
+													case "zip":
+														ForcePacking = ForcePacking.Zip;
+														break;
+													case "unzip":
+														ForcePacking = ForcePacking.Unzip;
+														break;
+												}
+												break;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				// If the line is a game/machine
+				if (matched[0].Value.StartsWith("game") || matched[0].Value.StartsWith("machine") || matched[0].Value.StartsWith("software"))
+				{
+					string gamedesc = "", comment = "", year = "", manufacturer = "", key = "";
+					bool isbios = false;
+
+					// Get the game information
+					Dictionary<string, string> gameattribs = GetAttributes(matched[0].Value);
+
+					string tempname = (gameattribs.ContainsKey("name") ? gameattribs["name"] : "");
+					string sourcefile = (gameattribs.ContainsKey("sourcefile") ? gameattribs["sourcefile"] : "");
+					if (gameattribs.ContainsKey("isbios"))
+					{
+						switch (gameattribs["isbios"])
+						{
+							case "no":
+								isbios = false;
+								break;
+							case "yes":
+								isbios = true;
+								break;
+						}
+					}
+					string cloneof = (gameattribs.ContainsKey("cloneof") ? gameattribs["cloneof"] : "");
+					string romof = (gameattribs.ContainsKey("romof") ? gameattribs["romof"] : "");
+					string sampleof = (gameattribs.ContainsKey("sampleof") ? gameattribs["sampleof"] : "");
+					string board = (gameattribs.ContainsKey("board") ? gameattribs["board"] : "");
+					string rebuildto = (gameattribs.ContainsKey("rebuildto") ? gameattribs["rebuildto"] : "");
+
+					while (!line.Contains("</game>") && !line.Contains("</machine>") && !line.Contains("</software>"))
+					{
+						line = sr.ReadLine().Trim();
+
+						// Get the list of items from the line
+						matched = Regex.Match(line, Constants.XmlPattern).Groups;
+
+						// Standalone game values
+						if (matched[0].Value.StartsWith("comment"))
+						{
+							comment = matched[1].Value;
+						}
+						else if (matched[0].Value.StartsWith("description"))
+						{
+							gamedesc = matched[1].Value;
+						}
+						else if (matched[0].Value.StartsWith("year"))
+						{
+							year = matched[1].Value;
+						}
+						else if (matched[0].Value.StartsWith("manufacturer"))
+						{
+							manufacturer = matched[1].Value;
+						}
+
+						// Now for the different file types
+						else if (line.StartsWith("<archive"))
+						{
+							Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+
+							Archive item = new Archive((attribs.ContainsKey("name") ? attribs["name"] : ""),
+								tempname,
+								comment,
+								gamedesc,
+								year,
+								manufacturer,
+								romof,
+								cloneof,
+								sampleof,
+								sourcefile,
+								isbios,
+								board,
+								rebuildto,
+								sysid,
+								"",
+								srcid,
+								"");
+
+							// Now process and add the item
+							key = "";
+							ParseAddHelper(item, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+						}
+						else if (line.StartsWith("<biosset"))
+						{
+							Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+
+							bool @default = false;
+							if (attribs.ContainsKey("default"))
+							{
+								switch (attribs["default"])
+								{
+									case "no":
+										@default = false;
+										break;
+									case "yes":
+										@default = true;
+										break;
+								}
+							}
+
+							BiosSet item = new BiosSet((attribs.ContainsKey("name") ? attribs["name"] : ""),
+								(attribs.ContainsKey("description") ? attribs["description"] : ""),
+								@default,
+								tempname,
+								comment,
+								gamedesc,
+								year,
+								manufacturer,
+								romof,
+								cloneof,
+								sampleof,
+								sourcefile,
+								isbios,
+								board,
+								rebuildto,
+								sysid,
+								"",
+								srcid,
+								"");
+
+							// Now process and add the item
+							key = "";
+							ParseAddHelper(item, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+						}
+						else if (line.StartsWith("<disk"))
+						{
+							Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+
+							ItemStatus its = ItemStatus.None;
+							if (attribs.ContainsKey("flags"))
+							{
+								if (attribs["flags"] == "good")
+								{
+									its = ItemStatus.Good;
+								}
+								if (attribs["flags"] == "baddump")
+								{
+									logger.Verbose("Bad dump detected: " +
+										(attribs.ContainsKey("name") ? "\"" + attribs["name"] + "\"" : "ROM NAME NOT FOUND"));
+									its = ItemStatus.BadDump;
+								}
+								if (attribs["flags"] == "nodump")
+								{
+									logger.Verbose("Nodump detected: " +
+										(attribs.ContainsKey("name") ? "\"" + attribs["name"] + "\"" : "ROM NAME NOT FOUND"));
+									its = ItemStatus.Nodump;
+								}
+								if (attribs["flags"] == "verified")
+								{
+									its = ItemStatus.Verified;
+								}
+							}
+							if (attribs.ContainsKey("status"))
+							{
+								if (attribs["status"] == "good")
+								{
+									its = ItemStatus.Good;
+								}
+								if (attribs["status"] == "baddump")
+								{
+									logger.Verbose("Bad dump detected: " +
+										(attribs.ContainsKey("name") ? "\"" + attribs["name"] + "\"" : "ROM NAME NOT FOUND"));
+									its = ItemStatus.BadDump;
+								}
+								if (attribs["status"] == "nodump")
+								{
+									logger.Verbose("Nodump detected: " +
+										(attribs.ContainsKey("name") ? "\"" + attribs["name"] + "\"" : "ROM NAME NOT FOUND"));
+									its = ItemStatus.Nodump;
+								}
+								if (attribs["status"] == "verified")
+								{
+									its = ItemStatus.Verified;
+								}
+							}
+
+							// If the rom has a Date attached, read it in and then sanitize it
+							string date = "";
+							if (attribs.ContainsKey("date"))
+							{
+								DateTime dateTime = DateTime.Now;
+								if (DateTime.TryParse(attribs["date"], out dateTime))
+								{
+									date = dateTime.ToString();
+								}
+								else
+								{
+									date = attribs["date"];
+								}
+							}
+
+							// If we're in clean mode, sanitize the game name
+							if (clean)
+							{
+								tempname = Style.CleanGameName(tempname.Split(Path.DirectorySeparatorChar));
+							}
+
+							Disk item = new Disk((attribs.ContainsKey("name") ? attribs["name"] : ""),
+								(attribs.ContainsKey("md5") ? attribs["md5"] : ""),
+								(attribs.ContainsKey("sha1") ? attribs["sha1"] : ""),
+								its,
+								tempname,
+								comment,
+								gamedesc,
+								year,
+								manufacturer,
+								romof,
+								cloneof,
+								sampleof,
+								sourcefile,
+								isbios,
+								board,
+								rebuildto,
+								sysid,
+								"",
+								srcid,
+								"");
+
+							// Now process and add the item
+							key = "";
+							ParseAddHelper(item, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+						}
+						else if (line.StartsWith("<release"))
+						{
+							Dictionary <string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+
+							bool @default = false;
+							if (attribs.ContainsKey("default"))
+							{
+								switch (attribs["default"])
+								{
+									case "no":
+										@default = false;
+										break;
+									case "yes":
+										@default = true;
+										break;
+								}
+							}
+
+							Release item = new Release((attribs.ContainsKey("name") ? attribs["name"] : ""),
+								(attribs.ContainsKey("region") ? attribs["region"] : ""),
+								(attribs.ContainsKey("language") ? attribs["language"] : ""),
+								(attribs.ContainsKey("date") ? attribs["date"] : ""),
+								@default,
+								tempname,
+								comment,
+								gamedesc,
+								year,
+								manufacturer,
+								romof,
+								cloneof,
+								sampleof,
+								sourcefile,
+								isbios,
+								board,
+								rebuildto,
+								sysid,
+								"",
+								srcid,
+								"");
+
+							// Now process and add the item
+							key = "";
+							ParseAddHelper(item, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+						}
+						else if (line.StartsWith("<rom"))
+						{
+							Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+
+							ItemStatus its = ItemStatus.None;
+							if (attribs.ContainsKey("flags"))
+							{
+								if (attribs["flags"] == "good")
+								{
+									its = ItemStatus.Good;
+								}
+								if (attribs["flags"] == "baddump")
+								{
+									logger.Verbose("Bad dump detected: " +
+										(attribs.ContainsKey("name") ? "\"" + attribs["name"] + "\"" : "ROM NAME NOT FOUND"));
+									its = ItemStatus.BadDump;
+								}
+								if (attribs["flags"] == "nodump")
+								{
+									logger.Verbose("Nodump detected: " +
+										(attribs.ContainsKey("name") ? "\"" + attribs["name"] + "\"" : "ROM NAME NOT FOUND"));
+									its = ItemStatus.Nodump;
+								}
+								if (attribs["flags"] == "verified")
+								{
+									its = ItemStatus.Verified;
+								}
+							}
+							if (attribs.ContainsKey("status"))
+							{
+								if (attribs["status"] == "good")
+								{
+									its = ItemStatus.Good;
+								}
+								if (attribs["status"] == "baddump")
+								{
+									logger.Verbose("Bad dump detected: " +
+										(attribs.ContainsKey("name") ? "\"" + attribs["name"] + "\"" : "ROM NAME NOT FOUND"));
+									its = ItemStatus.BadDump;
+								}
+								if (attribs["status"] == "nodump")
+								{
+									logger.Verbose("Nodump detected: " +
+										(attribs.ContainsKey("name") ? "\"" + attribs["name"] + "\"" : "ROM NAME NOT FOUND"));
+									its = ItemStatus.Nodump;
+								}
+								if (attribs["status"] == "verified")
+								{
+									its = ItemStatus.Verified;
+								}
+							}
+
+							// If the rom has a Date attached, read it in and then sanitize it
+							string date = "";
+							if (attribs.ContainsKey("date"))
+							{
+								DateTime dateTime = DateTime.Now;
+								if (DateTime.TryParse(attribs["date"], out dateTime))
+								{
+									date = dateTime.ToString();
+								}
+								else
+								{
+									date = attribs["date"];
+								}
+							}
+
+							// Take care of hex-sized files
+							long size = -1;
+							if (attribs.ContainsKey("size") && attribs["size"].Contains("0x"))
+							{
+								size = Convert.ToInt64(attribs["size"], 16);
+							}
+							else if (attribs.ContainsKey("size"))
+							{
+								Int64.TryParse(attribs["size"], out size);
+							}
+
+							// If the rom is continue or ignore, add the size to the previous rom
+							if (attribs.ContainsKey("loadflag") && (attribs["loadflag"] == "continue" || attribs["loadflag"] == "ignore"))
+							{
+								int index = Files[key].Count() - 1;
+								DatItem lastrom = Files[key][index];
+								if (lastrom.Type == ItemType.Rom)
+								{
+									((Rom)lastrom).Size += size;
+								}
+								Files[key].RemoveAt(index);
+								Files[key].Add(lastrom);
+								continue;
+							}
+
+							Rom item = new Rom((attribs.ContainsKey("name") ? attribs["name"] : ""),
+								size,
+								(attribs.ContainsKey("crc") ? attribs["crc"] : ""),
+								(attribs.ContainsKey("md5") ? attribs["md5"] : ""),
+								(attribs.ContainsKey("sha1") ? attribs["sha1"] : ""),
+								its,
+								(attribs.ContainsKey("date") ? attribs["date"] : ""),
+								tempname,
+								comment,
+								gamedesc,
+								year,
+								manufacturer,
+								romof,
+								cloneof,
+								sampleof,
+								sourcefile,
+								isbios,
+								board,
+								rebuildto,
+								sysid,
+								"",
+								srcid,
+								"");
+
+							// Now process and add the item
+							key = "";
+							ParseAddHelper(item, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+						}
+						else if (line.StartsWith("<sample"))
+						{
+							Dictionary<string, string> attribs = GetAttributes(line.Substring(1, line.Length - 3));
+
+							Sample item = new Sample((attribs.ContainsKey("name") ? attribs["name"] : ""),
+								tempname,
+								comment,
+								gamedesc,
+								year,
+								manufacturer,
+								romof,
+								cloneof,
+								sampleof,
+								sourcefile,
+								isbios,
+								board,
+								rebuildto,
+								sysid,
+								"",
+								srcid,
+								"");
+
+							// Now process and add the item
+							key = "";
+							ParseAddHelper(item, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
+						}
+					}
+				}
+			}
+
+			sr.Dispose();
+		}
+
+		/// <summary>
+		/// Get attributes from an XML element
+		/// </summary>
+		/// <param name="line">Opening tag to be parsed</param>
+		/// <returns>Mapping of attribute to values</returns>
+		private Dictionary<string, string> GetAttributes(string line)
+		{
+			Dictionary<string, string> attribs = new Dictionary<string, string>();
+
+			string[] gc = line.Trim().Split(' ');
+
+			// Loop over all attributes and add them if possible
+			string attrib = "", val = "";
+			for (int i = 1; i < gc.Length; i++)
+			{
+				//If the item is empty, we automatically skip it because it's a fluke
+				if (gc[i].Trim() == String.Empty)
+				{
+					continue;
+				}
+
+				// Contains an equal sign, even number of quotes, not in attribute
+				else if (gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 0 && attrib == "")
+				{
+					attribs.Add(gc[i].Split('=')[0], gc[i].Split('=')[1].Replace("\"", ""));
+				}
+
+				// Contains an equal sign, even number of quotes, in attribute
+				else if (gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 0 && attrib != "")
+				{
+					val += " " + gc[i];
+				}
+
+				// Contains an equal sign, odd number of quotes, not in attribute
+				else if (gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 1 && attrib == "")
+				{
+					attrib = gc[i].Split('=')[0];
+					val = gc[i].Split('=')[1].Replace("\"", "");
+				}
+
+				// Contains no equal sign, even number of quotes, not in attribute
+				else if (!gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 0 && attrib == "")
+				{
+					attribs.Add(gc[i], null);
+				}
+
+				// Contains no equal sign, (even number of quotes XOR not in attribute)
+				else if (!gc[i].Contains("=") && (Regex.Matches(gc[i], "\"").Count % 2 == 0 ^ attrib == ""))
+				{
+					// Impossible in XML, singular attributes can't be quoted
+				}
+
+				// Contains odd number of quotes, in attribute
+				else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && attrib != "")
+				{
+					val += " " + gc[i].Replace("\"", "");
+					attribs.Add(attrib, val);
+					attrib = "";
+					val = "";
+				}
+			}
+
+			return attribs;
 		}
 
 		/// <summary>
