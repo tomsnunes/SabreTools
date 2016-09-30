@@ -4482,7 +4482,7 @@ namespace SabreTools.Helper
 								(ForceNodump == ForceNodump.Ignore ? " forceitemStatus=\"ignore\"" : "") +
 								(ForceNodump == ForceNodump.Obsolete ? " forceitemStatus=\"obsolete\"" : "") +
 								(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : "") +
-								" />\n\n";
+								">\n\n";
 						break;
 					case OutputFormat.Logiqx:
 						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -5106,13 +5106,13 @@ namespace SabreTools.Helper
 									+ "\t\t\t</dataarea>\n";
 								break;
 							case ItemType.Disk:
-								state += "\t\t\t<dataarea name=\"cdrom\">\n"
+								state += "\t\t\t<diskarea name=\"cdrom\">\n"
 									+ "\t\t\t\t<disk name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
 									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 									+ "/>\n"
-									+ "\t\t\t</dataarea>\n";
+									+ "\t\t\t</diskarea>\n";
 								break;
 							case ItemType.Release:
 								state += "\t\t\t<dataarea name=\"release\">\n"
@@ -5255,7 +5255,7 @@ namespace SabreTools.Helper
 							footer += "\t</data>\n</datafile>\n";
 							break;
 						case OutputFormat.SoftwareList:
-							footer = "\t</software>\n\n</softwarelist>\n";
+							footer = "\t\t</part>\n\t</software>\n\n</softwarelist>\n";
 							break;
 						case OutputFormat.Logiqx:
 							footer = "\t</machine>\n</datafile>\n";
