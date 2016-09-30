@@ -1221,7 +1221,6 @@ namespace SabreTools.Helper
 				case OutputFormat.OfflineList:
 				case OutputFormat.SabreDat:
 				case OutputFormat.SoftwareList:
-				case OutputFormat.Xml:
 					ParseXML(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
 					break;
 				case OutputFormat.RedumpMD5:
@@ -1235,6 +1234,9 @@ namespace SabreTools.Helper
 					break;
 				case OutputFormat.RomCenter:
 					ParseRC(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, clean);
+					break;
+				case OutputFormat.Xml:
+					ParseXMLString(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
 					break;
 				default:
 					return;
@@ -2236,19 +2238,6 @@ namespace SabreTools.Helper
 			// If we got a null reader, just return
 			if (xtr == null)
 			{
-				return;
-			}
-
-			// Check if the input has invalid characters. If it does, then close the reader and use the string version
-			try
-			{
-				XElement x = XElement.Load(xtr, LoadOptions.None);
-				x = null;
-			}
-			catch
-			{
-				xtr.Dispose();
-				ParseXMLString(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
 				return;
 			}
 
