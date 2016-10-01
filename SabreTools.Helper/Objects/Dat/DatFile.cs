@@ -4010,12 +4010,9 @@ namespace SabreTools.Helper
 
 			// Make sure we don't have any invalid characters in the name
 			item.Name = Style.CleanRomName(item.Name);
-			item.Name = HttpUtility.HtmlDecode(item.Name);
 
 			// If we're in cleaning mode, sanitize the game name
 			item.MachineName = (clean ? Style.CleanGameName(item.MachineName) : item.MachineName);
-			item.MachineName = HttpUtility.HtmlDecode(item.MachineName);
-			item.MachineDescription = HttpUtility.HtmlDecode(item.MachineDescription);
 
 			// If we have a Rom or a Disk, clean the hash data
 			if (item.Type == ItemType.Rom)
