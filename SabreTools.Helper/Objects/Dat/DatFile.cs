@@ -4393,6 +4393,36 @@ namespace SabreTools.Helper
 							"Comment: " + Comment + "\"\n" +
 							")\n";
 						break;
+					case OutputFormat.Logiqx:
+						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
+							"<datafile>\n" +
+							"\t<header>\n" +
+							"\t\t<name>" + HttpUtility.HtmlEncode(Name) + "</name>\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode(Description) + "</description>\n" +
+							(!String.IsNullOrEmpty(RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(RootDir) + "</rootdir>\n" : "") +
+							(!String.IsNullOrEmpty(Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(Category) + "</category>\n" : "") +
+							"\t\t<version>" + HttpUtility.HtmlEncode(Version) + "</version>\n" +
+							(!String.IsNullOrEmpty(Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(Date) + "</date>\n" : "") +
+							"\t\t<author>" + HttpUtility.HtmlEncode(Author) + "</author>\n" +
+							(!String.IsNullOrEmpty(Email) ? "\t\t<email>" + HttpUtility.HtmlEncode(Email) + "</email>\n" : "") +
+							(!String.IsNullOrEmpty(Homepage) ? "\t\t<homepage>" + HttpUtility.HtmlEncode(Homepage) + "</homepage>\n" : "") +
+							(!String.IsNullOrEmpty(Url) ? "\t\t<url>" + HttpUtility.HtmlEncode(Url) + "</url>\n" : "") +
+							(!String.IsNullOrEmpty(Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(Comment) + "</comment>\n" : "") +
+							(!String.IsNullOrEmpty(Type) ? "\t\t<type>" + HttpUtility.HtmlEncode(Type) + "</type>\n" : "") +
+							(ForcePacking != ForcePacking.None || ForceMerging != ForceMerging.None || ForceNodump != ForceNodump.None ?
+								"\t\t<clrmamepro" +
+									(ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
+									(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
+									(ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
+									(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
+									(ForceNodump == ForceNodump.Ignore ? " forceitemStatus=\"ignore\"" : "") +
+									(ForceNodump == ForceNodump.Obsolete ? " forceitemStatus=\"obsolete\"" : "") +
+									(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : "") +
+									" />\n"
+							: "") +
+							"\t</header>\n";
+						break;
 					case OutputFormat.MissFile:
 						if (XSV == true)
 						{
@@ -4504,36 +4534,6 @@ namespace SabreTools.Helper
 								(ForceNodump == ForceNodump.Obsolete ? " forceitemStatus=\"obsolete\"" : "") +
 								(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : "") +
 								">\n\n";
-						break;
-					case OutputFormat.Logiqx:
-						header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
-							"<datafile>\n" +
-							"\t<header>\n" +
-							"\t\t<name>" + HttpUtility.HtmlEncode(Name) + "</name>\n" +
-							"\t\t<description>" + HttpUtility.HtmlEncode(Description) + "</description>\n" +
-							(!String.IsNullOrEmpty(RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(RootDir) + "</rootdir>\n" : "") +
-							(!String.IsNullOrEmpty(Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(Category) + "</category>\n" : "") +
-							"\t\t<version>" + HttpUtility.HtmlEncode(Version) + "</version>\n" +
-							(!String.IsNullOrEmpty(Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(Date) + "</date>\n" : "") +
-							"\t\t<author>" + HttpUtility.HtmlEncode(Author) + "</author>\n" +
-							(!String.IsNullOrEmpty(Email) ? "\t\t<email>" + HttpUtility.HtmlEncode(Email) + "</email>\n" : "") +
-							(!String.IsNullOrEmpty(Homepage) ? "\t\t<homepage>" + HttpUtility.HtmlEncode(Homepage) + "</homepage>\n" : "") +
-							(!String.IsNullOrEmpty(Url) ? "\t\t<url>" + HttpUtility.HtmlEncode(Url) + "</url>\n" : "") +
-							(!String.IsNullOrEmpty(Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(Comment) + "</comment>\n" : "") +
-							(!String.IsNullOrEmpty(Type) ? "\t\t<type>" + HttpUtility.HtmlEncode(Type) + "</type>\n" : "") +
-							(ForcePacking != ForcePacking.None || ForceMerging != ForceMerging.None || ForceNodump != ForceNodump.None ?
-								"\t\t<clrmamepro" +
-									(ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
-									(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
-									(ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
-									(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
-									(ForceNodump == ForceNodump.Ignore ? " forceitemStatus=\"ignore\"" : "") +
-									(ForceNodump == ForceNodump.Obsolete ? " forceitemStatus=\"obsolete\"" : "") +
-									(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : "") +
-									" />\n"
-							: "") +
-							"\t</header>\n";
 						break;
 				}
 
@@ -4676,6 +4676,9 @@ namespace SabreTools.Helper
 					case OutputFormat.DOSCenter:
 						state += (String.IsNullOrEmpty(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n") + ")\n";
 						break;
+					case OutputFormat.Logiqx:
+						state += "\t</machine>\n";
+						break;
 					case OutputFormat.OfflineList:
 						state += "\t\t</game>\n";
 						break;
@@ -4711,9 +4714,6 @@ namespace SabreTools.Helper
 						break;
 					case OutputFormat.SoftwareList:
 						state += "\t\t</part>\n\t</software>\n\n";
-						break;
-					case OutputFormat.Logiqx:
-						state += "\t</machine>\n";
 						break;
 				}
 
@@ -4820,6 +4820,54 @@ namespace SabreTools.Helper
 									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date " + ((Rom)rom).Date : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
 									+ " )\n";
+								break;
+						}
+						break;
+					case OutputFormat.Logiqx:
+						switch (rom.Type)
+						{
+							case ItemType.Archive:
+								state += "\t\t<archive name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+									+ "/>\n";
+								break;
+							case ItemType.BiosSet:
+								state += "\t\t<biosset name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+									+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
+									+ (((BiosSet)rom).Default != null
+										? ((BiosSet)rom).Default.ToString().ToLowerInvariant()
+										: "")
+									+ "/>\n";
+								break;
+							case ItemType.Disk:
+								state += "\t\t<disk name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
+									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
+									+ "/>\n";
+								break;
+							case ItemType.Release:
+								state += "\t\t<release name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+									+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : "")
+									+ (((Release)rom).Default != null
+										? ((Release)rom).Default.ToString().ToLowerInvariant()
+										: "")
+									+ "/>\n";
+								break;
+							case ItemType.Rom:
+								state += "\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+									+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
+									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
+									+ "/>\n";
+								break;
+							case ItemType.Sample:
+								state += "\t\t<file type=\"sample\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+									+ "/>\n";
 								break;
 						}
 						break;
@@ -5192,54 +5240,6 @@ namespace SabreTools.Helper
 								break;
 						}
 						break;
-					case OutputFormat.Logiqx:
-						switch (rom.Type)
-						{
-							case ItemType.Archive:
-								state += "\t\t<archive name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ "/>\n";
-								break;
-							case ItemType.BiosSet:
-								state += "\t\t<biosset name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
-									+ (((BiosSet)rom).Default != null
-										? ((BiosSet)rom).Default.ToString().ToLowerInvariant()
-										: "")
-									+ "/>\n";
-								break;
-							case ItemType.Disk:
-								state += "\t\t<disk name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
-									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
-									+ "/>\n";
-								break;
-							case ItemType.Release:
-								state += "\t\t<release name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : "")
-									+ (((Release)rom).Default != null
-										? ((Release)rom).Default.ToString().ToLowerInvariant()
-										: "")
-									+ "/>\n";
-								break;
-							case ItemType.Rom:
-								state += "\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
-									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
-									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
-									+ "/>\n";
-								break;
-							case ItemType.Sample:
-								state += "\t\t<file type=\"sample\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ "/>\n";
-								break;
-						}
-						break;
 				}
 
 				sw.Write(state);
@@ -5277,6 +5277,9 @@ namespace SabreTools.Helper
 						case OutputFormat.DOSCenter:
 							footer = ")\n";
 							break;
+						case OutputFormat.Logiqx:
+							footer = "\t</machine>\n</datafile>\n";
+							break;
 						case OutputFormat.OfflineList:
 							footer = "\t\t</game>"
 								+ "\t</games>\n"
@@ -5303,9 +5306,6 @@ namespace SabreTools.Helper
 						case OutputFormat.SoftwareList:
 							footer = "\t\t</part>\n\t</software>\n\n</softwarelist>\n";
 							break;
-						case OutputFormat.Logiqx:
-							footer = "\t</machine>\n</datafile>\n";
-							break;
 					}
 				}
 
@@ -5314,6 +5314,10 @@ namespace SabreTools.Helper
 				{
 					switch (outputFormat)
 					{
+						case OutputFormat.Logiqx:
+						case OutputFormat.SabreDat:
+							footer = "</datafile>\n";
+							break;
 						case OutputFormat.OfflineList:
 							footer = "\t</games>\n"
 								+ "\t<gui>\n"
@@ -5326,10 +5330,6 @@ namespace SabreTools.Helper
 							break;
 						case OutputFormat.SoftwareList:
 							footer = "</softwarelist>\n";
-							break;
-						case OutputFormat.SabreDat:
-						case OutputFormat.Logiqx:
-							footer = "</datafile>\n";
 							break;
 					}
 				}
