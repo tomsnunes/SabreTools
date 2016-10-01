@@ -1217,7 +1217,7 @@ namespace SabreTools.Helper
 					ParseCMP(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean);
 					break;
 				case OutputFormat.Logiqx:
-					ParseLogiqx(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean);
+					ParseLogiqx(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
 					break;
 				case OutputFormat.OfflineList:
 				case OutputFormat.SabreDat:
@@ -2453,7 +2453,7 @@ namespace SabreTools.Helper
 									// For Logiqx, SabreDAT, and Software List
 									case "description":
 										gamedesc = subreader.ReadElementContentAsString();
-										if (softlist)
+										if (!softlist)
 										{
 											tempname = gamedesc.Replace('/', '_').Replace("\"", "''");
 										}
@@ -2876,6 +2876,7 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <remarks>This version does not fully support OL or SabreDAT</remarks>
 		private void ParseLogiqx(
 			// Standard Dat parsing
@@ -2903,7 +2904,8 @@ namespace SabreTools.Helper
 			// Miscellaneous
 			Logger logger,
 			bool keep,
-			bool clean)
+			bool clean,
+			bool softlist)
 
 		{
 			// Open a file reader
@@ -3254,6 +3256,10 @@ namespace SabreTools.Helper
 						else if (matched[1].Value.StartsWith("description"))
 						{
 							gamedesc = matched[2].Value;
+							if (!softlist)
+							{
+								tempname = gamedesc.Replace('/', '_').Replace("\"", "''");
+							}
 						}
 						else if (matched[1].Value.StartsWith("year"))
 						{
