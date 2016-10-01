@@ -2930,7 +2930,7 @@ namespace SabreTools.Helper
 				// Handle MAME listxml since they're halfway between a SL and a Logiqx XML
 				else if (line.StartsWith("<mame"))
 				{
-					Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
+					Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 2));
 
 					if (attribs.ContainsKey("build"))
 					{
@@ -2942,7 +2942,7 @@ namespace SabreTools.Helper
 				// New software lists have this behavior
 				else if (line.StartsWith("<softwarelist"))
 				{
-					Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
+					Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 2));
 
 					if (attribs.ContainsKey("name"))
 					{
@@ -3002,7 +3002,7 @@ namespace SabreTools.Helper
 					Name = (String.IsNullOrEmpty(Name) ? "M1" : Name);
 					Description = (String.IsNullOrEmpty(Description) ? "M1" : Description);
 
-					Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
+					Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 2));
 
 					if (attribs.ContainsKey("version"))
 					{
@@ -3153,7 +3153,7 @@ namespace SabreTools.Helper
 
 								if (line.StartsWith("flag"))
 								{
-									Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
+									Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 2));
 
 									if (attribs.ContainsKey("name") && attribs.ContainsKey("value"))
 									{
@@ -3217,7 +3217,7 @@ namespace SabreTools.Helper
 					bool isbios = false;
 
 					// Get the game information
-					Dictionary<string, string> gameattribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
+					Dictionary<string, string> gameattribs = GetLogiqxAttributes(line.Substring(1, line.Length - 2));
 
 					string tempname = (gameattribs.ContainsKey("name") ? gameattribs["name"] : "");
 					string sourcefile = (gameattribs.ContainsKey("sourcefile") ? gameattribs["sourcefile"] : "");
@@ -3267,7 +3267,7 @@ namespace SabreTools.Helper
 						// Now for the different file types
 						else if (line.StartsWith("<archive"))
 						{
-							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
+							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 2));
 
 							Archive item = new Archive((attribs.ContainsKey("name") ? attribs["name"] : ""),
 								tempname,
@@ -3293,7 +3293,7 @@ namespace SabreTools.Helper
 						}
 						else if (line.StartsWith("<biosset"))
 						{
-							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
+							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 2));
 
 							bool @default = false;
 							if (attribs.ContainsKey("default"))
@@ -3335,7 +3335,7 @@ namespace SabreTools.Helper
 						}
 						else if (line.StartsWith("<disk"))
 						{
-							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
+							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 2));
 
 							ItemStatus its = ItemStatus.None;
 							if (attribs.ContainsKey("flags"))
@@ -3433,7 +3433,7 @@ namespace SabreTools.Helper
 						}
 						else if (line.StartsWith("<release"))
 						{
-							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
+							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 2));
 
 							bool @default = false;
 							if (attribs.ContainsKey("default"))
@@ -3477,7 +3477,7 @@ namespace SabreTools.Helper
 						}
 						else if (line.StartsWith("<rom"))
 						{
-							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
+							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 2));
 
 							ItemStatus its = ItemStatus.None;
 							if (attribs.ContainsKey("flags"))
@@ -3597,7 +3597,7 @@ namespace SabreTools.Helper
 						}
 						else if (line.StartsWith("<sample"))
 						{
-							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 3));
+							Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 2));
 
 							Sample item = new Sample((attribs.ContainsKey("name") ? attribs["name"] : ""),
 								tempname,
@@ -3647,6 +3647,12 @@ namespace SabreTools.Helper
 		private Dictionary<string, string> GetLogiqxAttributes(string line)
 		{
 			Dictionary<string, string> attribs = new Dictionary<string, string>();
+
+			// If the line ends with a '/', remove it
+			if (line.EndsWith("/"))
+			{
+				line = line.TrimEnd('/');
+			}
 
 			string[] gc = line.Trim().Split(' ');
 
