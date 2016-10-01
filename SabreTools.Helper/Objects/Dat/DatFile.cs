@@ -2855,7 +2855,7 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Parse an XML DAT (Logiqx, OfflineList, SabreDAT, and Software List) and return all found games and roms within
+		/// Parse a Logiqx XML DAT and return all found games and roms within
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
@@ -3025,7 +3025,7 @@ namespace SabreTools.Helper
 						// Now check for all of the header items
 						if (matched[1].Value.StartsWith("name"))
 						{
-							Name = (String.IsNullOrEmpty(Name) ? matched[2].Value : Name);
+							Name = (String.IsNullOrEmpty(Name) ? HttpUtility.HtmlDecode(matched[2].Value) : Name);
 							superdat = superdat || Name.Contains(" - SuperDAT");
 							if (keep && superdat)
 							{
@@ -3034,27 +3034,27 @@ namespace SabreTools.Helper
 						}
 						else if (matched[1].Value.StartsWith("description"))
 						{
-							Description = (String.IsNullOrEmpty(Description) ? matched[2].Value : Description);
+							Description = (String.IsNullOrEmpty(Description) ? HttpUtility.HtmlDecode(matched[2].Value) : Description);
 						}
 						else if (matched[1].Value.StartsWith("rootdir"))
 						{
-							RootDir = (String.IsNullOrEmpty(RootDir) ? matched[2].Value : RootDir);
+							RootDir = (String.IsNullOrEmpty(RootDir) ? HttpUtility.HtmlDecode(matched[2].Value) : RootDir);
 						}
 						else if (matched[1].Value.StartsWith("category"))
 						{
-							Category = (String.IsNullOrEmpty(Category) ? matched[2].Value : Category);
+							Category = (String.IsNullOrEmpty(Category) ? HttpUtility.HtmlDecode(matched[2].Value) : Category);
 						}
 						else if (matched[1].Value.StartsWith("version"))
 						{
-							Version = (String.IsNullOrEmpty(Version) ? matched[2].Value : Version);
+							Version = (String.IsNullOrEmpty(Version) ? HttpUtility.HtmlDecode(matched[2].Value) : Version);
 						}
 						else if (matched[1].Value.StartsWith("date"))
 						{
-							Date = (String.IsNullOrEmpty(Date) ? matched[2].Value : Date);
+							Date = (String.IsNullOrEmpty(Date) ? HttpUtility.HtmlDecode(matched[2].Value) : Date);
 						}
 						else if (matched[1].Value.StartsWith("author"))
 						{
-							Author = (String.IsNullOrEmpty(Author) ? matched[2].Value : Author);
+							Author = (String.IsNullOrEmpty(Author) ? HttpUtility.HtmlDecode(matched[2].Value) : Author);
 
 							// Special cases for SabreDAT
 							Dictionary<string, string> attribs = GetLogiqxAttributes(matched[1].Value);
@@ -3073,24 +3073,24 @@ namespace SabreTools.Helper
 						}
 						else if (matched[1].Value.StartsWith("email"))
 						{
-							Email = (String.IsNullOrEmpty(Email) ? matched[2].Value : Email);
+							Email = (String.IsNullOrEmpty(Email) ? HttpUtility.HtmlDecode(matched[2].Value) : Email);
 						}
 						else if (matched[1].Value.StartsWith("homepage"))
 						{
-							Homepage = (String.IsNullOrEmpty(Homepage) ? matched[2].Value : Homepage);
+							Homepage = (String.IsNullOrEmpty(Homepage) ? HttpUtility.HtmlDecode(matched[2].Value) : Homepage);
 						}
 						else if (matched[1].Value.StartsWith("url"))
 						{
-							Url = (String.IsNullOrEmpty(Url) ? matched[2].Value : Url);
+							Url = (String.IsNullOrEmpty(Url) ? HttpUtility.HtmlDecode(matched[2].Value) : Url);
 						}
 						else if (matched[1].Value.StartsWith("comment"))
 						{
-							Comment = (String.IsNullOrEmpty(Comment) ? matched[2].Value : Comment);
+							Comment = (String.IsNullOrEmpty(Comment) ? HttpUtility.HtmlDecode(matched[2].Value) : Comment);
 						}
 						else if (matched[1].Value.StartsWith("type"))
 						{
-							Type = (String.IsNullOrEmpty(Type) ? matched[2].Value : Type);
-							superdat = superdat || matched[2].Value.Contains("SuperDAT");
+							Type = (String.IsNullOrEmpty(Type) ? HttpUtility.HtmlDecode(matched[2].Value) : Type);
+							superdat = superdat || Type.Contains("SuperDAT");
 							break;
 						}
 						else if (matched[1].Value.StartsWith("clrmamepro") || matched[1].Value.StartsWith("romcenter"))
@@ -3153,7 +3153,7 @@ namespace SabreTools.Helper
 							{
 								line = sr.ReadLine().Trim();
 
-								if (line.StartsWith("flag"))
+								if (line.StartsWith("<flag"))
 								{
 									Dictionary<string, string> attribs = GetLogiqxAttributes(line.Substring(1, line.Length - 2));
 
@@ -3163,7 +3163,7 @@ namespace SabreTools.Helper
 										{
 											case "type":
 												Type = (String.IsNullOrEmpty(Type) ? attribs["value"] : Type);
-												superdat = superdat || matched[2].Value.Contains("SuperDAT");
+												superdat = superdat || Type.Contains("SuperDAT");
 												break;
 											case "forcemerging":
 												switch (attribs["value"])
@@ -3251,11 +3251,11 @@ namespace SabreTools.Helper
 						// Standalone game values
 						if (matched[1].Value.StartsWith("comment"))
 						{
-							comment = matched[2].Value;
+							comment = HttpUtility.HtmlDecode(matched[2].Value);
 						}
 						else if (matched[1].Value.StartsWith("description"))
 						{
-							gamedesc = matched[2].Value;
+							gamedesc = HttpUtility.HtmlDecode(matched[2].Value);
 							if (!softlist)
 							{
 								tempname = gamedesc.Replace('/', '_').Replace("\"", "''");
@@ -3263,11 +3263,11 @@ namespace SabreTools.Helper
 						}
 						else if (matched[1].Value.StartsWith("year"))
 						{
-							year = matched[2].Value;
+							year = HttpUtility.HtmlDecode(matched[2].Value);
 						}
 						else if (matched[1].Value.StartsWith("manufacturer"))
 						{
-							manufacturer = matched[2].Value;
+							manufacturer = HttpUtility.HtmlDecode(matched[2].Value);
 						}
 
 						// Now for the different file types
@@ -3657,7 +3657,7 @@ namespace SabreTools.Helper
 			MatchCollection mc = Regex.Matches(line, @"(\S*?)=""(.*?)""");
 			foreach (Match match in mc)
 			{
-				attribs.Add(match.Groups[1].Value, match.Groups[2].Value);
+				attribs.Add(HttpUtility.HtmlDecode(match.Groups[1].Value), HttpUtility.HtmlDecode(match.Groups[2].Value));
 			}
 			
 			return attribs;
