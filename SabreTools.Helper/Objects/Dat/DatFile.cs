@@ -3648,83 +3648,12 @@ namespace SabreTools.Helper
 		{
 			Dictionary<string, string> attribs = new Dictionary<string, string>();
 
-			// If the line ends with a '/', remove it
-			if (line.EndsWith("/"))
+			MatchCollection mc = Regex.Matches(line, @"(\S*?)=""(.*?)""");
+			foreach (Match match in mc)
 			{
-				line = line.TrimEnd('/');
+				attribs.Add(match.Groups[1].Value, match.Groups[2].Value);
 			}
-
-			string[] gc = line.Trim().Split(' ');
-
-			// Loop over all attributes and add them if possible
-			string attrib = "", val = "";
-			for (int i = 1; i < gc.Length; i++)
-			{
-				//If the item is empty, we automatically skip it because it's a fluke
-				if (gc[i].Trim() == String.Empty)
-				{
-					continue;
-				}
-
-				// Contains an equal sign, even number of quotes, not in attribute
-				else if (gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 0 && attrib == "")
-				{
-					string[] split = gc[i].Split('=');
-					attrib = split[0];
-					val = gc[i].Substring(split[0].Length + 1).Replace("\"", "");
-					attribs.Add(attrib, val);
-					attrib = "";
-					val = "";
-				}
-
-				// Contains an equal sign, even number of quotes, in attribute
-				else if (gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 0 && attrib != "")
-				{
-					val += " " + gc[i];
-				}
-
-				// Contains an equal sign, odd number of quotes, not in attribute
-				else if (gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 1 && attrib == "")
-				{
-					string[] split = gc[i].Split('=');
-					attrib = split[0];
-					val = gc[i].Substring(split[0].Length + 1).Replace("\"", "");
-				}
-
-				// Contains no equal sign, even number of quotes, not in attribute
-				else if (!gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 0 && attrib == "")
-				{
-					attribs.Add(gc[i], null);
-				}
-
-				// Contains no equal sign, even number of quotes, in attribute
-				else if (!gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 0 && attrib != "")
-				{
-					val += " " + gc[i];
-				}
-
-				// Contains no equal sign, odd number of quotes, not in attribute
-				else if (!gc[i].Contains("=") && Regex.Matches(gc[i], "\"").Count % 2 == 1 && attrib == "")
-				{
-					val += " " + gc[i];
-				}
-
-				// Contains odd number of quotes, in attribute
-				else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && attrib != "")
-				{
-					val += " " + gc[i].Replace("\"", "");
-					attribs.Add(attrib, val);
-					attrib = "";
-					val = "";
-				}
-			}
-
-			// There can be leftovers, add them
-			if (attrib != "" && val != "")
-			{
-				attribs.Add(attrib, val);
-			}
-
+			
 			return attribs;
 		}
 
