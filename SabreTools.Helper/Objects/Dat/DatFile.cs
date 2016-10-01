@@ -4586,6 +4586,24 @@ namespace SabreTools.Helper
 					case OutputFormat.DOSCenter:
 						state += "game (\n\tname \"" + rom.MachineName + ".zip\"\n";
 						break;
+					case OutputFormat.Logiqx:
+						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
+								(rom.IsBios ? " isbios=\"yes\"" : "") +
+								(String.IsNullOrEmpty(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
+									? ""
+									: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
+								(String.IsNullOrEmpty(rom.RomOf) || (rom.MachineName.ToLowerInvariant() == rom.RomOf.ToLowerInvariant())
+									? ""
+									: " romof=\"" + HttpUtility.HtmlEncode(rom.RomOf) + "\"") +
+								(String.IsNullOrEmpty(rom.SampleOf) || (rom.MachineName.ToLowerInvariant() == rom.SampleOf.ToLowerInvariant())
+									? ""
+									: " sampleof=\"" + HttpUtility.HtmlEncode(rom.SampleOf) + "\"") +
+								">\n" +
+							(String.IsNullOrEmpty(rom.Comment) ? "" : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Comment) + "</comment>\n") +
+							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) + "</description>\n" +
+							(String.IsNullOrEmpty(rom.Year) ? "" : "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n") +
+							(String.IsNullOrEmpty(rom.Manufacturer) ? "" : "\t\t<manufacturer>" + HttpUtility.HtmlEncode(rom.Manufacturer) + "</manufacturer>\n");
+						break;
 					case OutputFormat.SabreDat:
 						for (int i = (last == -1 ? 0 : last); i < newsplit.Count; i++)
 						{
@@ -4616,18 +4634,6 @@ namespace SabreTools.Helper
 						{
 							state += "\t\t\t<feature name=\"" + kvp.Key + "\" value=\"" + kvp.Value + "\">\n";
 						}
-						break;
-					case OutputFormat.Logiqx:
-						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
-							(rom.IsBios ? " isbios=\"yes\"" : "") +
-							(String.IsNullOrEmpty(rom.CloneOf) ? "" : " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
-							(String.IsNullOrEmpty(rom.RomOf) ? "" : " romof=\"" + HttpUtility.HtmlEncode(rom.RomOf) + "\"") +
-							(String.IsNullOrEmpty(rom.SampleOf) ? "" : " sampleof=\"" + HttpUtility.HtmlEncode(rom.SampleOf) + "\"") +
-							">\n" +
-							(String.IsNullOrEmpty(rom.Comment) ? "" : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Comment) + "</comment>\n") +
-							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) + "</description>\n" +
-							(String.IsNullOrEmpty(rom.Year) ? "" : "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n") +
-							(String.IsNullOrEmpty(rom.Manufacturer) ? "" : "\t\t<manufacturer>" + HttpUtility.HtmlEncode(rom.Manufacturer) + "</manufacturer>\n");
 						break;
 				}
 
