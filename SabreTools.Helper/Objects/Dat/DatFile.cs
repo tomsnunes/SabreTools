@@ -1217,8 +1217,6 @@ namespace SabreTools.Helper
 					ParseCMP(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean);
 					break;
 				case OutputFormat.Logiqx:
-					ParseLogiqx(filename, sysid, srcid, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, logger, keep, clean, softlist);
-					break;
 				case OutputFormat.OfflineList:
 				case OutputFormat.SabreDat:
 				case OutputFormat.SoftwareList:
