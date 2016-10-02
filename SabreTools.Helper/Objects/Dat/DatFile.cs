@@ -4032,7 +4032,6 @@ namespace SabreTools.Helper
 					itemRom.CRC = Constants.CRCZero;
 					itemRom.MD5 = Constants.MD5Zero;
 					itemRom.SHA1 = Constants.SHA1Zero;
-					itemRom.ItemStatus = ItemStatus.Nodump;
 				}
 				// If the file has no size and it's not the above case, skip and log
 				else if (itemRom.Size == 0 || itemRom.Size == -1)
