@@ -2451,7 +2451,7 @@ namespace SabreTools.Helper
 									// For Logiqx, SabreDAT, and Software List
 									case "description":
 										gamedesc = subreader.ReadElementContentAsString();
-										if (!softlist)
+										if (!softlist && temptype == "software")
 										{
 											tempname = gamedesc.Replace('/', '_').Replace("\"", "''");
 										}
