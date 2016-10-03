@@ -3895,12 +3895,12 @@ namespace SabreTools.Helper
 				else
 				{
 					// If we have an author
-					if (line.StartsWith("author="))
+					if (line.ToLowerInvariant().StartsWith("author="))
 					{
 						Author = (String.IsNullOrEmpty(Author) ? line.Split('=')[1] : Author);
 					}
 					// If we have one of the three version tags
-					else if (line.StartsWith("version="))
+					else if (line.ToLowerInvariant().StartsWith("version="))
 					{
 						switch (blocktype)
 						{
@@ -3913,12 +3913,12 @@ namespace SabreTools.Helper
 						}
 					}
 					// If we have a comment
-					else if (line.StartsWith("comment="))
+					else if (line.ToLowerInvariant().StartsWith("comment="))
 					{
 						Comment = (String.IsNullOrEmpty(Comment) ? line.Split('=')[1] : Comment);
 					}
 					// If we have the split flag
-					else if (line.StartsWith("split="))
+					else if (line.ToLowerInvariant().StartsWith("split="))
 					{
 						int split = 0;
 						if (Int32.TryParse(line.Split('=')[1], out split))
@@ -3930,7 +3930,7 @@ namespace SabreTools.Helper
 						}
 					}
 					// If we have the merge tag
-					else if (line.StartsWith("merge="))
+					else if (line.ToLowerInvariant().StartsWith("merge="))
 					{
 						int merge = 0;
 						if (Int32.TryParse(line.Split('=')[1], out merge))
@@ -3942,13 +3942,19 @@ namespace SabreTools.Helper
 						}
 					}
 					// If we have the refname tag
-					else if (line.StartsWith("refname="))
+					else if (line.ToLowerInvariant().StartsWith("refname="))
 					{
 						Name = (String.IsNullOrEmpty(Name) ? line.Split('=')[1] : Name);
 					}
 					// If we have a rom
 					else if (line.StartsWith("¬"))
 					{
+						// Some old RC DATs have this behavior
+						if (line.Contains("¬N¬O"))
+						{
+							line = line.Replace("¬N¬O", "") + "¬¬";
+						}
+
 						/*
 						The rominfo order is as follows:
 						1 - parent name
