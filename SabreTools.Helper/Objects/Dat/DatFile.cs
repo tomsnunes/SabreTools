@@ -2327,8 +2327,8 @@ namespace SabreTools.Helper
 								partname = "", partinterface = "", areaname = "";
 							bool? supported = null;
 							long? areasize = null;
-							Dictionary<string, string> infos = new Dictionary<string, string>();
-							Dictionary<string, string> features = new Dictionary<string, string>();
+							List<Tuple<string, string>> infos = new List<Tuple<string, string>>();
+							List<Tuple<string, string>> features = new List<Tuple<string, string>>();
 
 							// We want to process the entire subtree of the game
 							subreader = xtr.ReadSubtree();
@@ -2392,7 +2392,7 @@ namespace SabreTools.Helper
 									{
 										partname = "";
 										partinterface = "";
-										features = new Dictionary<string, string>();
+										features = new List<Tuple<string, string>>();
 									}
 									if (subreader.NodeType == XmlNodeType.EndElement && (subreader.Name == "dataarea" || subreader.Name == "diskarea"))
 									{
@@ -2437,7 +2437,7 @@ namespace SabreTools.Helper
 										publisher = subreader.ReadElementContentAsString();
 										break;
 									case "info":
-										infos.Add(subreader.GetAttribute("name"), subreader.GetAttribute("value"));
+										infos.Add(Tuple.Create(subreader.GetAttribute("name"), subreader.GetAttribute("value")));
 										subreader.Read();
 										break;
 									case "part":
@@ -2446,7 +2446,7 @@ namespace SabreTools.Helper
 										subreader.Read();
 										break;
 									case "feature":
-										features.Add(subreader.GetAttribute("name"), subreader.GetAttribute("value"));
+										features.Add(Tuple.Create(subreader.GetAttribute("name"), subreader.GetAttribute("value")));
 										subreader.Read();
 										break;
 									case "dataarea":
@@ -4635,9 +4635,9 @@ namespace SabreTools.Helper
 							+ (rom.Year != null ? "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n" : "")
 							+ (rom.Publisher != null ? "\t\t<publisher>" + HttpUtility.HtmlEncode(rom.Publisher) + "</publisher>\n" : "");
 
-						foreach (KeyValuePair<string, string> kvp in rom.Infos)
+						foreach (Tuple<string, string> kvp in rom.Infos)
 						{
-							state += "\t\t<info name=\"" + kvp.Key + "\" value=\"" + kvp.Value + "\">\n";
+							state += "\t\t<info name=\"" + kvp.Item1 + "\" value=\"" + kvp.Item2 + "\">\n";
 						}
 						break;
 				}
@@ -5182,9 +5182,9 @@ namespace SabreTools.Helper
 					case OutputFormat.SoftwareList:
 						state += "\t\t<part name=\"" + rom.PartName + "\" interface=\"" + rom.PartInterface + "\">\n";
 
-						foreach (KeyValuePair<string, string> kvp in rom.Features)
+						foreach (Tuple<string, string> kvp in rom.Features)
 						{
-							state += "\t\t\t<feature name=\"" + kvp.Key + "\" value=\"" + kvp.Value + "\"/>\n";
+							state += "\t\t\t<feature name=\"" + kvp.Item1 + "\" value=\"" + kvp.Item2 + "\"/>\n";
 						}
 
 						switch (rom.Type)

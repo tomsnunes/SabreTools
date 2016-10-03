@@ -31,10 +31,10 @@ namespace SabreTools.Helper
 		// Software list information
 		protected bool? _supported;
 		protected string _publisher;
-		protected Dictionary<string, string> _infos;
+		protected List<Tuple<string, string>> _infos;
 		protected string _partName;
 		protected string _partInterface;
-		protected Dictionary<string, string> _features;
+		protected List<Tuple<string, string>> _features;
 		protected string _areaName;
 		protected long? _areaSize;
 
@@ -138,7 +138,7 @@ namespace SabreTools.Helper
 			get { return _publisher; }
 			set { _publisher = value; }
 		}
-		public Dictionary<string, string> Infos
+		public List<Tuple<string, string>> Infos
 		{
 			get { return _infos; }
 			set { _infos = value; }
@@ -153,7 +153,7 @@ namespace SabreTools.Helper
 			get { return _partInterface; }
 			set { _partInterface = value; }
 		}
-		public Dictionary<string, string> Features
+		public List<Tuple<string, string>> Features
 		{
 			get { return _features; }
 			set { _features = value; }
