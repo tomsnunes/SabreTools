@@ -2388,6 +2388,18 @@ namespace SabreTools.Helper
 								// We only want elements
 								if (subreader.NodeType != XmlNodeType.Element)
 								{
+									if (subreader.NodeType == XmlNodeType.EndElement && subreader.Name == "part")
+									{
+										partname = "";
+										partinterface = "";
+										features = new Dictionary<string, string>();
+									}
+									if (subreader.NodeType == XmlNodeType.EndElement && (subreader.Name == "dataarea" || subreader.Name == "diskarea"))
+									{
+										areaname = "";
+										areasize = null;
+									}
+
 									subreader.Read();
 									continue;
 								}
@@ -5172,7 +5184,7 @@ namespace SabreTools.Helper
 
 						foreach (KeyValuePair<string, string> kvp in rom.Features)
 						{
-							state += "\t\t\t<feature name=\"" + kvp.Key + "\" value=\"" + kvp.Value + "\" />\n";
+							state += "\t\t\t<feature name=\"" + kvp.Key + "\" value=\"" + kvp.Value + "\"/>\n";
 						}
 
 						switch (rom.Type)
