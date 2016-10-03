@@ -336,7 +336,7 @@ namespace SabreTools
 			// Loop through the datroot and add only needed files
 			foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
 			{
-				Rom dat = FileTools.GetSingleFileInfo(file);
+				Rom dat = FileTools.GetSingleFileInfo(file, _logger);
 
 				// If the Dat isn't in the database and isn't already accounted for in the DatRoot, add it
 				if (!databaseDats.Contains(dat.SHA1) && !toscan.ContainsKey(dat.SHA1))
@@ -437,7 +437,7 @@ namespace SabreTools
 				if (datRootDats.Contains(input.ToLowerInvariant()))
 				{
 					string fullpath = Path.GetFullPath(datRootDats[datRootDats.IndexOf(input.ToLowerInvariant())]);
-					string sha1 = FileTools.GetSingleFileInfo(fullpath).SHA1;
+					string sha1 = FileTools.GetSingleFileInfo(fullpath, _logger).SHA1;
 					foundDats.Add(sha1, fullpath);
 				}
 				else

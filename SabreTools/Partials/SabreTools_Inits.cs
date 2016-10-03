@@ -64,13 +64,14 @@ namespace SabreTools
 		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
 		/// <param name="noMD5">True to disable getting MD5 hash, false otherwise</param>
 		/// <param name="noSHA1">True to disable getting SHA-1 hash, false otherwise</param>
-		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
-		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
+		/// <param name="removeDateFromAutomaticName">True if the date should be omitted from the DAT, false otherwise</param>
+		/// <param name="parseArchivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
-		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
-		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
+		/// <param name="addBlankFilesForEmptyFolder">True if blank items should be created for empty folders, false otherwise</param>
+		/// <param name="addFileDates">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
+		/// <param name="removeHeader">True if headers should be removed from files if possible, false otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitDatFromDir(List<string> inputs,
 			string filename,
@@ -79,21 +80,37 @@ namespace SabreTools
 			string category,
 			string version,
 			string author,
-			bool forceunpack,
+			string forcepack,
 			OutputFormat outputFormat,
 			bool romba,
 			bool superdat,
 			bool noMD5,
 			bool noSHA1,
-			bool bare,
-			bool archivesAsFiles,
+			bool removeDateFromAutomaticName,
+			bool parseArchivesAsFiles,
 			bool enableGzip,
-			bool addBlanks,
-			bool addDate,
+			bool addBlankFilesForEmptyFolder,
+			bool addFileDates,
 			string tempDir,
 			bool copyFiles,
+			bool removeHeader,
 			int maxDegreeOfParallelism)
 		{
+			ForcePacking fp = ForcePacking.None;
+			switch (forcepack.ToLowerInvariant())
+			{
+				case "none":
+				default:
+					fp = ForcePacking.None;
+					break;
+				case "zip":
+					fp = ForcePacking.Zip;
+					break;
+				case "unzip":
+					fp = ForcePacking.Unzip;
+					break;
+			}
+
 			// Create a new DATFromDir object and process the inputs
 			DatFile basedat = new DatFile
 			{
@@ -104,7 +121,7 @@ namespace SabreTools
 				Version = version,
 				Date = DateTime.Now.ToString("yyyy-MM-dd"),
 				Author = author,
-				ForcePacking = (forceunpack ? ForcePacking.Unzip : ForcePacking.None),
+				ForcePacking = fp,
 				OutputFormat = (outputFormat == 0 ? OutputFormat.Logiqx : outputFormat),
 				Romba = romba,
 				Type = (superdat ? "SuperDAT" : ""),
@@ -121,7 +138,8 @@ namespace SabreTools
 					datdata.Files = new SortedDictionary<string, List<DatItem>>();
 
 					string basePath = Path.GetFullPath(path);
-					bool success = datdata.PopulateDatFromDir(basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, copyFiles, maxDegreeOfParallelism, _logger);
+					bool success = datdata.PopulateDatFromDir(basePath, noMD5, noSHA1, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,
+						addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, removeHeader, maxDegreeOfParallelism, _logger);
 
 					// If it was a success, write the DAT out
 					if (success)

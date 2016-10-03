@@ -134,6 +134,7 @@ namespace SabreTools.Helper
 					helptext.Add("	-ab, --add-blank	Output blank files for folders");
 					helptext.Add("	-ad, --add-date		Output dates for each file parsed");
 					helptext.Add("	-cf, --copy-files	Copy files to the temp directory before parsing");
+					helptext.Add("	-rh, --rem-head		Remove headers from hash calculations");
 					helptext.Add("	-t=, --temp=		Set the temporary directory to use");
 					helptext.Add("	-mt={4}			Amount of threads to use (-1 unlimted)");
 					helptext.Add("  -es, --ext-split	Split a DAT by two file extensions");

@@ -965,7 +965,7 @@ namespace SabreTools.Helper
 			outDir = Path.GetFullPath(outDir);
 
 			// Now get the Rom info for the file so we have hashes and size
-			Rom rom = FileTools.GetSingleFileInfo(input);
+			Rom rom = FileTools.GetSingleFileInfo(input, logger);
 
 			// If it doesn't exist, create the output file and then write
 			string outfile = Path.Combine(outDir, rom.SHA1 + ".gz");

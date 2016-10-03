@@ -154,10 +154,9 @@ Options:
 			Normally, the DAT will be created with the date in the file name. This flag removes
 			that but keeps the date tag intact.
 			
-		-u, --unzip			Force unzipping in created DAT
-			This sets the 'forcepacking="unzip"' flag in the outputted DAT. When used with a
-			file manager that allows for it, this will force the outputted files to be in
-			subdirectories instead of archives.
+		-fp=, --forcepack=	Set force packing
+			Set the forcepacking flag to one of the supported values:
+				None, Zip, Unzip
 			
 		-f, --files			Treat archives as files
 			Instead of trying to enumerate the files within archives, treat the archives as
@@ -240,6 +239,11 @@ Options:
 		-cf, --copy-files	Copy files to the temp directory before parsing
 			If this flag is set, then all files that are going to be parsed are moved to the temporary directory before being hashed. This can be helpful in cases where the
 			temp folder is located on an SSD and the user wants to take advantage of this.
+			
+		-rh, --rem-head		Remove headers from hash calculations
+			If this flag is set, then all files that have copier headers that are detected will
+			have them removed from the hash calculation. This will allow for a headered collection
+			to be hashed without possibly variant information.
 			
 		-t=, --temp=		Set the name of the temporary directory
 			Optionally, a temp folder can be supplied in the case the default temp directory
@@ -1101,6 +1105,11 @@ Below are originally from SabreTools / DATabase -
 			By default, this will set the forcepacking="unzip" flag on the output DAT. This
 			flag disables this output
 			
+	-u, --unzip			Force unzipping in created DAT
+		This sets the 'forcepacking="unzip"' flag in the outputted DAT. When used with a
+		file manager that allows for it, this will force the outputted files to be in
+		subdirectories instead of archives.
+		
 Below are originally from SingleGame (Standalone) -
 
 	-r=rootdir		Set the directory name for path size

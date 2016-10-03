@@ -48,39 +48,43 @@ namespace SabreTools
 
 			// Set all default values
 			bool help = false,
-				addBlanks = false,
-				addDate = false,
-				archivesAsFiles = false,
-				baddumpColumn = false,
-				bare = false,
-				clean = false,
+
+				// Feature flags
+				datFromDir = false,
+				headerer = false,
+				splitByExt = false,
+				splitByHash = false,
+				splitByType = false,
+				stats = false,
+				update = false,
+
+				// Other flags
+				addBlankFilesForEmptyFolder = false,
+				addFileDates = false,
+				cleanGameNames = false,
 				copyFiles = false,
-				datfromdir = false,
-				datprefix = false,
+				datPrefix = false,
 				dedup = false,
 				enableGzip = false,
-				extsplit = false,
-				forceunpack = false,
-				hashsplit = false,
-				headerer = false,
 				inplace = false,
 				merge = false,
-				nodumpColumn = false,
 				noMD5 = false,
 				noSHA1 = false,
+				parseArchivesAsFiles = false,
 				quotes = false,
 				rem = false,
 				remext = false,
+				removeDateFromAutomaticName = false,
+				removeHeader = false,
 				restore = false,
 				romba = false,
+				showBaddumpColumn = false,
+				showNodumpColumn = false,
 				single = false,
 				softlist = false,
-				stats = false,
 				superdat = false,
 				trim = false,
-				typesplit = false,
 				skip = false,
-				update = false,
 				usegame = true;
 			bool? cascade = null,
 				tsv = null;
@@ -140,19 +144,19 @@ namespace SabreTools
 						break;
 					case "-ab":
 					case "--add-blank":
-						addBlanks = true;
+						addBlankFilesForEmptyFolder = true;
 						break;
 					case "-ad":
 					case "--add-date":
-						addDate = true;
+						addFileDates = true;
 						break;
 					case "-b":
 					case "--bare":
-						bare = true;
+						removeDateFromAutomaticName = true;
 						break;
 					case "-bc":
 					case "--baddump-col":
-						baddumpColumn = true;
+						showBaddumpColumn = true;
 						break;
 					case "-c":
 					case "--cascade":
@@ -169,12 +173,12 @@ namespace SabreTools
 						break;
 					case "-clean":
 					case "--clean":
-						clean = true;
+						cleanGameNames = true;
 						break;
 					case "-d":
 					case "--d2d":
 					case "--dfd":
-						datfromdir = true;
+						datFromDir = true;
 						break;
 					case "-dd":
 					case "--dedup":
@@ -198,15 +202,15 @@ namespace SabreTools
 						break;
 					case "-es":
 					case "--ext-split":
-						extsplit = true;
+						splitByExt = true;
 						break;
 					case "-f":
 					case "--files":
-						archivesAsFiles = true;
+						parseArchivesAsFiles = true;
 						break;
 					case "-gp":
 					case "--game-prefix":
-						datprefix = true;
+						datPrefix = true;
 						break;
 					case "-gz":
 					case "--gz-files":
@@ -218,7 +222,7 @@ namespace SabreTools
 						break;
 					case "-hs":
 					case "--hash-split":
-						hashsplit = true;
+						splitByHash = true;
 						break;
 					case "-html":
 					case "--html":
@@ -234,7 +238,7 @@ namespace SabreTools
 						break;
 					case "-nc":
 					case "--nodump-col":
-						nodumpColumn = true;
+						showNodumpColumn = true;
 						break;
 					case "-nm":
 					case "--noMD5":
@@ -304,6 +308,10 @@ namespace SabreTools
 					case "--restore":
 						restore = true;
 						break;
+					case "-rh":
+					case "--rem-head":
+						removeHeader = true;
+						break;
 					case "-rme":
 					case "--rem-ext":
 						remext = true;
@@ -338,16 +346,12 @@ namespace SabreTools
 						break;
 					case "-ts":
 					case "--type-split":
-						typesplit = true;
+						splitByType = true;
 						break;
 					case "-tsv":
 					case "--tsv":
 						tsv = true;
 						statOutputFormat = StatOutputFormat.TSV;
-						break;
-					case "-u":
-					case "--unzip":
-						forceunpack = true;
 						break;
 					case "-ud":
 					case "--update":
@@ -543,8 +547,8 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(extsplit ^ hashsplit ^ headerer ^ (datfromdir || merge || diffMode != 0 || update
-				|| outputFormat != 0 || trim) ^ rem ^ stats ^ typesplit))
+			if (!(splitByExt ^ splitByHash ^ headerer ^ (datFromDir || merge || diffMode != 0 || update
+				|| outputFormat != 0 || trim) ^ rem ^ stats ^ splitByType))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -553,8 +557,8 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (datfromdir || extsplit || hashsplit || headerer
-				|| (merge || diffMode != 0 || update || outputFormat != 0) || stats || trim || typesplit))
+			if (inputs.Count == 0 && (datFromDir || splitByExt || splitByHash || headerer
+				|| (merge || diffMode != 0 || update || outputFormat != 0) || stats || trim || splitByType))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -565,20 +569,40 @@ namespace SabreTools
 			// Now take care of each mode in succesion
 
 			// Create a DAT from a directory or set of directories
-			if (datfromdir)
+			if (datFromDir)
 			{
-				InitDatFromDir(inputs, filename, name, description, category, version, author, forceunpack, outputFormat, romba,
-					superdat, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate, tempDir, copyFiles, maxParallelism);
+				InitDatFromDir(inputs,
+					filename,
+					name,
+					description,
+					category,
+					version,
+					author,
+					forcepack,
+					outputFormat,
+					romba,
+					superdat,
+					noMD5,
+					noSHA1,
+					removeDateFromAutomaticName,
+					parseArchivesAsFiles,
+					enableGzip,
+					addBlankFilesForEmptyFolder,
+					addFileDates,
+					tempDir,
+					copyFiles,
+					removeHeader,
+					maxParallelism);
 			}
 
 			// Split a DAT by extension
-			else if (extsplit)
+			else if (splitByExt)
 			{
 				InitExtSplit(inputs, exta, extb, outDir);
 			}
 
 			// Split a DAT by available hashes
-			else if (hashsplit)
+			else if (splitByHash)
 			{
 				InitHashSplit(inputs, outDir);
 			}
@@ -592,11 +616,11 @@ namespace SabreTools
 			// Get statistics on input files
 			else if (stats)
 			{
-				InitStats(inputs, filename, single, baddumpColumn, nodumpColumn, statOutputFormat);
+				InitStats(inputs, filename, single, showBaddumpColumn, showNodumpColumn, statOutputFormat);
 			}
 
 			// Split a DAT by item type
-			else if (typesplit)
+			else if (splitByType)
 			{
 				InitTypeSplit(inputs, outDir);
 			}
@@ -606,8 +630,8 @@ namespace SabreTools
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, outputFormat, usegame, prefix,
-					postfix, quotes, repext, addext, remext, datprefix, romba, tsv, merge, diffMode, cascade, inplace, skip, bare, gamename, romname,
-					romtype, sgt, slt, seq, crc, md5, sha1, status, trim, single, root, outDir, clean, softlist, dedup, maxParallelism);
+					postfix, quotes, repext, addext, remext, datPrefix, romba, tsv, merge, diffMode, cascade, inplace, skip, removeDateFromAutomaticName, gamename, romname,
+					romtype, sgt, slt, seq, crc, md5, sha1, status, trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
 			}
 
 			// If nothing is set, show the help

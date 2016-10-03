@@ -138,7 +138,8 @@ namespace SabreTools.Helper
 			foreach (string input in _inputs)
 			{
 				_datdata.PopulateDatFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
-					true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */, 4 /* maxDegreeOfParallelism */, _logger);
+					true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */,
+					false /* removeHeader */, 4 /* maxDegreeOfParallelism */, _logger);
 			}
 
 			// Setup the fixdat
@@ -354,7 +355,7 @@ namespace SabreTools.Helper
 				// Hash and match the external files
 				if (shouldExternalScan)
 				{
-					RebuildToOutputAlternateParseRomHelper(file, ref matchdat);
+					RebuildToOutputAlternateParseRomHelper(file, ref matchdat, _logger);
 				}
 
 				// If we should scan the file as an archive
@@ -370,7 +371,7 @@ namespace SabreTools.Helper
 						// Now add all of the roms to the DAT
 						for (int i = 0; i < internalRomData.Count; i++)
 						{
-							RebuildToOutputAlternateParseRomHelper(file, ref matchdat);
+							RebuildToOutputAlternateParseRomHelper(file, ref matchdat, _logger);
 						}
 					}
 					// Otherwise, try to extract the file to the temp folder
@@ -385,13 +386,13 @@ namespace SabreTools.Helper
 							List<string> extractedFiles = Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories).ToList();
 							foreach (string extractedFile in extractedFiles)
 							{
-								RebuildToOutputAlternateParseRomHelper(extractedFile, ref matchdat);
+								RebuildToOutputAlternateParseRomHelper(extractedFile, ref matchdat, _logger);
 							}
 						}
 						// Otherwise, skip extracting and just get information on the file itself (if we didn't already)
 						else if (!shouldExternalScan)
 						{
-							RebuildToOutputAlternateParseRomHelper(file, ref matchdat);
+							RebuildToOutputAlternateParseRomHelper(file, ref matchdat, _logger);
 						}
 
 						// Clean the temp directory for the next round
@@ -455,10 +456,11 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="file">Name of the file to attempt to add</param>
 		/// <param name="matchdat">Reference to the Dat to add to</param>
+		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the file could be added, false otherwise</returns>
-		public bool RebuildToOutputAlternateParseRomHelper(string file, ref DatFile matchdat)
+		public bool RebuildToOutputAlternateParseRomHelper(string file, ref DatFile matchdat, Logger logger)
 		{
-			Rom rom = FileTools.GetSingleFileInfo(file);
+			Rom rom = FileTools.GetSingleFileInfo(file, logger);
 
 			// If we have a blank RomData, it's an error
 			if (rom.Name == null)
@@ -494,7 +496,7 @@ namespace SabreTools.Helper
 
 				// Transform the stream and get the information from it
 				Skippers.TransformStream(input, output, rule, _logger, false, true);
-				Rom romNH = FileTools.GetSingleStreamInfo(output);
+				Rom romNH = FileTools.GetSingleStreamInfo(output, output.Length);
 				romNH.Name = "HEAD::" + rom.Name;
 				romNH.MachineName = rom.MachineName;
 
@@ -544,7 +546,7 @@ namespace SabreTools.Helper
 			// Hash and match the external files
 			if (shouldExternalScan)
 			{
-				Rom rom = FileTools.GetSingleFileInfo(input);
+				Rom rom = FileTools.GetSingleFileInfo(input, _logger);
 
 				// If we have a blank RomData, it's an error
 				if (rom.Name == null)
@@ -614,7 +616,7 @@ namespace SabreTools.Helper
 					// Otherwise, apply the rule to the file
 					string newinput = input + ".new";
 					Skippers.TransformFile(input, newinput, rule, _logger);
-					Rom drom = FileTools.GetSingleFileInfo(newinput);
+					Rom drom = FileTools.GetSingleFileInfo(newinput, _logger);
 
 					// If we have a blank RomData, it's an error
 					if (drom.Name == null)
@@ -912,7 +914,7 @@ namespace SabreTools.Helper
 					ArchiveTools.ExtractArchive(Path.GetFullPath(archive), temparcdir, _logger);
 					foreach (string tempfile in Directory.EnumerateFiles(temparcdir, "*", SearchOption.AllDirectories))
 					{
-						roms.Add(FileTools.GetSingleFileInfo(Path.GetFullPath(tempfile)));
+						roms.Add(FileTools.GetSingleFileInfo(Path.GetFullPath(tempfile), _logger));
 					}
 
 					// Clear the temporary archive directory
