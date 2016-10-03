@@ -92,7 +92,7 @@ namespace SabreTools.Helper
 				sr.Dispose();
 
 				// If we have an XML-based DAT
-				if (first.StartsWith("<?xml") && first.EndsWith("?>"))
+				if (first.Contains("<?xml") && first.Contains("?>"))
 				{
 					if (second.StartsWith("<!doctype datafile"))
 					{
