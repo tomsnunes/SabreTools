@@ -467,12 +467,6 @@ namespace SabreTools.Helper
 		/// <returns>Populated RomData object if success, empty one on error</returns>
 		public static Rom GetSingleStreamInfo(Stream input, long size, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool keepReadOpen = false)
 		{
-			// If we have a negative offset, zero it out since we don't support it yet
-			if (offset < 0)
-			{
-				offset = 0;
-			}
-
 			Rom rom = new Rom
 			{
 				Type = ItemType.Rom,
@@ -490,7 +484,14 @@ namespace SabreTools.Helper
 				SHA1 sha1 = SHA1.Create();
 
 				// Seek to the starting position, if one is set
-				input.Seek(offset, SeekOrigin.Begin);
+				if (offset < 0)
+				{
+					input.Seek(offset, SeekOrigin.End);
+				}
+				else
+				{
+					input.Seek(offset, SeekOrigin.Begin);
+				}
 
 				byte[] buffer = new byte[1024];
 				int read;
