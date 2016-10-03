@@ -4564,11 +4564,11 @@ namespace SabreTools.Helper
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
-		/// <param name="removeHeader">True if headers should be removed from files if possible, false otherwise</param>
+		/// <param name="tryRemoveHeader">True if headers should be removed from files if possible, false otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		public bool PopulateDatFromDir(string basePath, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
-			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, bool removeHeader, int maxDegreeOfParallelism, Logger logger)
+			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, bool tryRemoveHeader, int maxDegreeOfParallelism, Logger logger)
 		{
 			// If the description is defined but not the name, set the name from the description
 			if (String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
@@ -4599,7 +4599,7 @@ namespace SabreTools.Helper
 				item =>
 				{
 					DFDProcessPossibleArchive(item, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
-						tempDir, copyFiles, removeHeader, maxDegreeOfParallelism, logger);
+						tempDir, copyFiles, tryRemoveHeader, maxDegreeOfParallelism, logger);
 				});
 
 			// Now find all folders that are empty, if we are supposed to
@@ -4688,11 +4688,11 @@ namespace SabreTools.Helper
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
-		/// <param name="removeHeader">True if headers should be removed from files if possible, false otherwise</param>
+		/// <param name="tryRemoveHeader">True if headers should be removed from files if possible, false otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file output</param>
 		private void DFDProcessPossibleArchive(string item, string basePath, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
-			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, bool removeHeader, int maxDegreeOfParallelism, Logger logger)
+			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, bool tryRemoveHeader, int maxDegreeOfParallelism, Logger logger)
 		{
 			// Define the temporary directory
 			string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
@@ -4762,7 +4762,7 @@ namespace SabreTools.Helper
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(newItem))
 				{
-					DFDProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, removeHeader, logger);
+					DFDProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, tryRemoveHeader, logger);
 				}
 			}
 			// Otherwise, attempt to extract the files to the temporary directory
@@ -4794,14 +4794,14 @@ namespace SabreTools.Helper
 								noMD5,
 								noSHA1,
 								addDate,
-								removeHeader,
+								tryRemoveHeader,
 								logger);
 						});
 				}
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(newItem))
 				{
-					DFDProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, removeHeader, logger);
+					DFDProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, tryRemoveHeader, logger);
 				}
 			}
 
@@ -4831,12 +4831,12 @@ namespace SabreTools.Helper
 		/// <param name="noMD5">True if MD5 hashes should be skipped over, false otherwise</param>
 		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
-		/// <param name="removeHeader">True if headers should be removed from files if possible, false otherwise</param>
+		/// <param name="tryRemoveHeader">True if headers should be removed from files if possible, false otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		private void DFDProcessFile(string item, string parent, string basePath, bool noMD5, bool noSHA1, bool addDate, bool removeHeader, Logger logger)
+		private void DFDProcessFile(string item, string parent, string basePath, bool noMD5, bool noSHA1, bool addDate, bool tryRemoveHeader, Logger logger)
 		{
 			logger.Verbose(Path.GetFileName(item) + " treated like a file");
-			Rom rom = FileTools.GetSingleFileInfo(item, logger, noMD5: noMD5, noSHA1: noSHA1, date: addDate, removeHeader: removeHeader);
+			Rom rom = FileTools.GetFileInfo(item, logger, noMD5: noMD5, noSHA1: noSHA1, date: addDate, tryRemoveHeader: tryRemoveHeader);
 
 			DFDProcessFileHelper(item, rom, basePath, parent, logger);
 		}

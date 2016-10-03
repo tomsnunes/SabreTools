@@ -298,7 +298,7 @@ namespace SabreTools.Helper
 		/// <param name="skipperName">Name of the skipper to be used</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>The SkipperRule that matched the file</returns>
-		public static SkipperRule MatchesSkipper(string input, string skipperName, Logger logger)
+		public static SkipperRule GetMatchingRule(string input, string skipperName, Logger logger)
 		{
 			// If the file doesn't exist, return a blank skipper rule
 			if (!File.Exists(input))
@@ -307,7 +307,7 @@ namespace SabreTools.Helper
 				return new SkipperRule();
 			}
 
-			return MatchesSkipper(File.OpenRead(input), skipperName, logger);
+			return GetMatchingRule(File.OpenRead(input), skipperName, logger);
 		}
 
 		/// <summary>
@@ -318,7 +318,7 @@ namespace SabreTools.Helper
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="keepOpen">True if the underlying stream should be kept open, false otherwise</param>
 		/// <returns>The SkipperRule that matched the file</returns>
-		public static SkipperRule MatchesSkipper(Stream input, string skipperName, Logger logger, bool keepOpen = false)
+		public static SkipperRule GetMatchingRule(Stream input, string skipperName, Logger logger, bool keepOpen = false)
 		{
 			SkipperRule skipperRule = new SkipperRule();
 

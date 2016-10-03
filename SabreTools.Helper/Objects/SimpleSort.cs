@@ -460,7 +460,7 @@ namespace SabreTools.Helper
 		/// <returns>True if the file could be added, false otherwise</returns>
 		public bool RebuildToOutputAlternateParseRomHelper(string file, ref DatFile matchdat, Logger logger)
 		{
-			Rom rom = FileTools.GetSingleFileInfo(file, logger);
+			Rom rom = FileTools.GetFileInfo(file, logger);
 
 			// If we have a blank RomData, it's an error
 			if (rom.Name == null)
@@ -485,18 +485,18 @@ namespace SabreTools.Helper
 			}
 
 			// Now attempt to see if the file has a header
-			SkipperRule rule = Skippers.MatchesSkipper(file, "", _logger);
+			FileStream input = File.OpenRead(file);
+			SkipperRule rule = Skippers.GetMatchingRule(input, "", _logger);
 
 			// If there's a match, get the new information from the stream
 			if (rule.Tests != null && rule.Tests.Count != 0)
 			{
 				// Create the input and output streams
 				MemoryStream output = new MemoryStream();
-				FileStream input = File.OpenRead(file);
 
 				// Transform the stream and get the information from it
 				Skippers.TransformStream(input, output, rule, _logger, false, true);
-				Rom romNH = FileTools.GetSingleStreamInfo(output, output.Length);
+				Rom romNH = FileTools.GetStreamInfo(output, output.Length);
 				romNH.Name = "HEAD::" + rom.Name;
 				romNH.MachineName = rom.MachineName;
 
@@ -513,10 +513,12 @@ namespace SabreTools.Helper
 					matchdat.Files.Add(key, temp);
 				}
 
-				// Dispose of the streams
+				// Dispose of the stream
 				output.Dispose();
-				input.Dispose();
 			}
+
+			// Dispose of the stream
+			input.Dispose();
 
 			return true;
 		}
@@ -546,7 +548,7 @@ namespace SabreTools.Helper
 			// Hash and match the external files
 			if (shouldExternalScan)
 			{
-				Rom rom = FileTools.GetSingleFileInfo(input, _logger);
+				Rom rom = FileTools.GetFileInfo(input, _logger);
 
 				// If we have a blank RomData, it's an error
 				if (rom.Name == null)
@@ -608,7 +610,7 @@ namespace SabreTools.Helper
 				}
 
 				// Now get the transformed file if it exists
-				SkipperRule rule = Skippers.MatchesSkipper(input, "", _logger);
+				SkipperRule rule = Skippers.GetMatchingRule(input, "", _logger);
 
 				// If we have have a non-empty rule, apply it
 				if (rule.Tests != null && rule.Tests.Count != 0)
@@ -616,7 +618,7 @@ namespace SabreTools.Helper
 					// Otherwise, apply the rule to the file
 					string newinput = input + ".new";
 					Skippers.TransformFile(input, newinput, rule, _logger);
-					Rom drom = FileTools.GetSingleFileInfo(newinput, _logger);
+					Rom drom = FileTools.GetFileInfo(newinput, _logger);
 
 					// If we have a blank RomData, it's an error
 					if (drom.Name == null)
@@ -914,7 +916,7 @@ namespace SabreTools.Helper
 					ArchiveTools.ExtractArchive(Path.GetFullPath(archive), temparcdir, _logger);
 					foreach (string tempfile in Directory.EnumerateFiles(temparcdir, "*", SearchOption.AllDirectories))
 					{
-						roms.Add(FileTools.GetSingleFileInfo(Path.GetFullPath(tempfile), _logger));
+						roms.Add(FileTools.GetFileInfo(Path.GetFullPath(tempfile), _logger));
 					}
 
 					// Clear the temporary archive directory

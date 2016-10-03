@@ -156,9 +156,9 @@ namespace SabreTools.Helper
 		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise (default)</param>
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="date">True if the file Date should be included, false otherwise (default)</param>
-		/// <param name="removeHeader">True if headers should be removed from files if possible, false otherwise (default)</param>
+		/// <param name="tryRemoveHeader">True if headers should be removed from files if possible, false otherwise (default)</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static Rom GetSingleFileInfo(string input, Logger logger, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool date = false, bool removeHeader = false)
+		public static Rom GetFileInfo(string input, Logger logger, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool date = false, bool tryRemoveHeader = false)
 		{
 			// Add safeguard if file doesn't exist
 			if (!File.Exists(input))
@@ -168,9 +168,9 @@ namespace SabreTools.Helper
 
 			// Get the information from the file stream
 			Rom rom = new Rom();
-			if (removeHeader)
+			if (tryRemoveHeader)
 			{
-				SkipperRule rule = Skippers.MatchesSkipper(input, "", logger);
+				SkipperRule rule = Skippers.GetMatchingRule(input, "", logger);
 
 				// If there's a match, get the new information from the stream
 				if (rule.Tests != null && rule.Tests.Count != 0)
@@ -180,8 +180,8 @@ namespace SabreTools.Helper
 					FileStream inputStream = File.OpenRead(input);
 
 					// Transform the stream and get the information from it
-					Skippers.TransformStream(inputStream, outputStream, rule, logger, false, true);
-					rom = GetSingleStreamInfo(outputStream, outputStream.Length);
+					Skippers.TransformStream(inputStream, outputStream, rule, logger, keepReadOpen: false, keepWriteOpen: true);
+					rom = GetStreamInfo(outputStream, outputStream.Length);
 
 					// Dispose of the streams
 					outputStream.Dispose();
@@ -190,12 +190,12 @@ namespace SabreTools.Helper
 				// Otherwise, just get the info
 				else
 				{
-					rom = GetSingleStreamInfo(File.OpenRead(input), new FileInfo(input).Length, noMD5, noSHA1, offset, false);
+					rom = GetStreamInfo(File.OpenRead(input), new FileInfo(input).Length, noMD5, noSHA1, offset, false);
 				}
 			}
 			else
 			{
-				rom = GetSingleStreamInfo(File.OpenRead(input), new FileInfo(input).Length, noMD5, noSHA1, offset, false);
+				rom = GetStreamInfo(File.OpenRead(input), new FileInfo(input).Length, noMD5, noSHA1, offset, false);
 			}
 
 			// Add unique data from the file
@@ -328,7 +328,7 @@ namespace SabreTools.Helper
 			logger.User("\nGetting skipper information for '" + file + "'");
 
 			// Get the skipper rule that matches the file, if any
-			SkipperRule rule = Skippers.MatchesSkipper(file, "", logger);
+			SkipperRule rule = Skippers.GetMatchingRule(file, "", logger);
 
 			// If we have an empty rule, return false
 			if (rule.Tests == null || rule.Tests.Count == 0 || rule.Operation != HeaderSkipOperation.None)
@@ -361,7 +361,7 @@ namespace SabreTools.Helper
 			}
 
 			// Now add the information to the database if it's not already there
-			Rom rom = GetSingleFileInfo(newfile, logger);
+			Rom rom = GetFileInfo(newfile, logger);
 			DatabaseTools.AddHeaderToDatabase(hstr, rom.SHA1, rule.SourceFile, logger);
 
 			return true;
@@ -385,7 +385,7 @@ namespace SabreTools.Helper
 			bool success = true;
 
 			// First, get the SHA-1 hash of the file
-			Rom rom = GetSingleFileInfo(file, logger);
+			Rom rom = GetFileInfo(file, logger);
 
 			// Then try to pull the corresponding headers from the database
 			string header = "";
@@ -465,7 +465,7 @@ namespace SabreTools.Helper
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static Rom GetSingleStreamInfo(Stream input, long size, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool keepReadOpen = false)
+		public static Rom GetStreamInfo(Stream input, long size, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool keepReadOpen = false)
 		{
 			Rom rom = new Rom
 			{
