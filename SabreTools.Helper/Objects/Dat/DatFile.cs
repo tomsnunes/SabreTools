@@ -4621,13 +4621,6 @@ namespace SabreTools.Helper
 						{
 							state += "\t\t<info name=\"" + kvp.Key + "\" value=\"" + kvp.Value + "\">\n";
 						}
-
-						state += "\t\t<part name=\"" + rom.PartName + "\" interface=\"" + rom.PartInterface + "\">\n";
-
-						foreach (KeyValuePair<string, string> kvp in rom.Features)
-						{
-							state += "\t\t\t<feature name=\"" + kvp.Key + "\" value=\"" + kvp.Value + "\">\n";
-						}
 						break;
 				}
 
@@ -5169,6 +5162,13 @@ namespace SabreTools.Helper
 						}
 						break;
 					case OutputFormat.SoftwareList:
+						state += "\t\t<part name=\"" + rom.PartName + "\" interface=\"" + rom.PartInterface + "\">\n";
+
+						foreach (KeyValuePair<string, string> kvp in rom.Features)
+						{
+							state += "\t\t\t<feature name=\"" + kvp.Key + "\" value=\"" + kvp.Value + "\" />\n";
+						}
+
 						switch (rom.Type)
 						{
 							case ItemType.Archive:
