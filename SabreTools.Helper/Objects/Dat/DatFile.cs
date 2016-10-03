@@ -4018,7 +4018,7 @@ namespace SabreTools.Helper
 			key = "";
 
 			// If there's no name in the rom, we log and skip it
-			if (String.IsNullOrEmpty(item.Name))
+			if (item.Name == null)
 			{
 				logger.Warning("Rom with no name found! Skipping...");
 				return;
