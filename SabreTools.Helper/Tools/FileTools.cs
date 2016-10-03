@@ -136,13 +136,15 @@ namespace SabreTools.Helper
 				{
 					return OutputFormat.DOSCenter;
 				}
+				else
+				{
+					return OutputFormat.ClrMamePro;
+				}
 			}
 			catch (Exception)
 			{
 				return 0;
 			}
-
-			return 0;
 		}
 
 		/// <summary>
