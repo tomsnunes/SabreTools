@@ -4024,9 +4024,6 @@ namespace SabreTools.Helper
 				return;
 			}
 
-			// Make sure we don't have any invalid characters in the name
-			item.Name = Style.CleanRomName(item.Name);
-
 			// If we're in cleaning mode, sanitize the game name
 			item.MachineName = (clean ? Style.CleanGameName(item.MachineName) : item.MachineName);
 

@@ -304,16 +304,6 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Clean a rom name from invalid characters
-		/// </summary>
-		/// <param name="name">Name of the item to be cleaned</param>
-		/// <returns>The cleaned name</returns>
-		public static string CleanRomName(string name)
-		{
-			return new string(name.Where(c => !char.IsControl(c)).ToArray());
-		}
-
-		/// <summary>
 		/// Clean a game (or rom) name to the WoD standard
 		/// </summary>
 		/// <param name="game">Name of the game to be cleaned</param>
