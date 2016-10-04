@@ -94,41 +94,48 @@ namespace SabreTools
 				seq = -1;
 			OutputFormat outputFormat = 0x0;
 			StatOutputFormat statOutputFormat = StatOutputFormat.None;
-			string addext = "",
+			string 
+				
+				// DAT fields
 				author = null,
 				category = null,
 				comment = null,
-				crc = "",
-				currentAllMerged = "",
-				currentMissingMerged = "",
-				currentNewMerged = "",
 				date = null,
 				description = null,
 				email = null,
-				exta = "",
-				extb = "",
 				filename = null,
 				forcemerge = "",
 				forcend = "",
 				forcepack = "",
-				gamename = "",
 				header = null,
-				homepage = "",
+				homepage = null,
 				name = null,
+				rootdir = null,
+				url = null,
+				version = null,
+
+				// Filter fields
+				crc = "",
+				gamename = "",
 				md5 = "",
-				outDir = "",
-				postfix = "",
-				prefix = "",
-				repext = "",
 				romname = "",
 				romtype = "",
 				root = "",
-				rootdir = null,
 				sha1 = "",
 				status = "",
-				tempDir = "",
-				url = null,
-				version = null;
+
+				// Missfile fields
+				addext = "",
+				postfix = "",
+				prefix = "",
+				repext = "",
+
+				// Misc fields
+				exta = "",
+				extb = "",
+				outDir = "",
+
+				tempDir = "";
 			List<string> inputs = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
@@ -371,10 +378,6 @@ namespace SabreTools
 						{
 							comment = temparg.Split('=')[1] ?? "";
 						}
-						else if (temparg.StartsWith("-com=") || temparg.StartsWith("--com="))
-						{
-							currentAllMerged = temparg.Split('=')[1] ?? "";
-						}
 						else if (temparg.StartsWith("-crc=") || temparg.StartsWith("--crc="))
 						{
 							crc = temparg.Split('=')[1] ?? "";
@@ -402,10 +405,6 @@ namespace SabreTools
 						else if (temparg.StartsWith("-f=") || temparg.StartsWith("--filename="))
 						{
 							filename = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-fix=") || temparg.StartsWith("--fix="))
-						{
-							currentMissingMerged = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-fm=") || temparg.StartsWith("--forcemerge="))
 						{
@@ -450,10 +449,6 @@ namespace SabreTools
 						else if (temparg.StartsWith("-n=") || temparg.StartsWith("--name="))
 						{
 							name = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-new=") || temparg.StartsWith("--new="))
-						{
-							currentNewMerged = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-out=") || temparg.StartsWith("--out="))
 						{
