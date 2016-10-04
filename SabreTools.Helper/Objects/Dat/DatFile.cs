@@ -290,10 +290,10 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Create a new Dat object with the included information (standard Dats)
 		/// </summary>
-		/// <param name="filename">New filename</param>
+		/// <param name="fileName">New filename</param>
 		/// <param name="name">New name</param>
 		/// <param name="description">New description</param>
-		/// <param name="rootdir">New rootdir</param>
+		/// <param name="rootDir">New rootdir</param>
 		/// <param name="category">New category</param>
 		/// <param name="version">New version</param>
 		/// <param name="date">New date</param>
@@ -304,9 +304,9 @@ namespace SabreTools.Helper
 		/// <param name="comment">New comment</param>
 		/// <param name="header">New header</param>
 		/// <param name="superdat">True to set SuperDAT type, false otherwise</param>
-		/// <param name="forcemerge">None, Split, Full</param>
-		/// <param name="forcend">None, Obsolete, Required, Ignore</param>
-		/// <param name="forcepack">None, Zip, Unzip</param>
+		/// <param name="forceMerging">None, Split, Full</param>
+		/// <param name="forceNodump">None, Obsolete, Required, Ignore</param>
+		/// <param name="forcePacking">None, Zip, Unzip</param>
 		/// <param name="outputFormat">Non-zero flag for output format, zero otherwise for default</param>
 		/// <param name="mergeRoms">True to dedupe the roms in the DAT, false otherwise (default)</param>
 		/// <param name="files">SortedDictionary of lists of DatItem objects</param>
@@ -501,6 +501,7 @@ namespace SabreTools.Helper
 				ForceMerging = this.ForceMerging,
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
+				ExcludeOf = this.ExcludeOf,
 				OutputFormat = this.OutputFormat,
 				MergeRoms = this.MergeRoms,
 				Files = this.Files,
@@ -546,6 +547,7 @@ namespace SabreTools.Helper
 				ForceMerging = this.ForceMerging,
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
+				ExcludeOf = this.ExcludeOf,
 				OutputFormat = this.OutputFormat,
 				MergeRoms = this.MergeRoms,
 				Files = new SortedDictionary<string, List<DatItem>>(),
