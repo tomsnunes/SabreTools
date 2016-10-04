@@ -58,7 +58,8 @@ namespace SabreTools
 		/// <param name="category">New category</param>
 		/// <param name="version">New version</param>
 		/// <param name="author">New author</param>
-		/// <param name="forceunpack">True to set forcepacking="unzip" on the created file, false otherwise</param>
+		/// <param name="forcepack">String representing the forcepacking flag</param>
+		/// <param name="excludeOf">True if cloneof, romof, and sampleof fields should be omitted from output, false otherwise</param>
 		/// <param name="outputFormat">OutputFormat to be used for outputting the DAT</param>
 		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
 		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
@@ -81,6 +82,7 @@ namespace SabreTools
 			string version,
 			string author,
 			string forcepack,
+			bool excludeOf,
 			OutputFormat outputFormat,
 			bool romba,
 			bool superdat,
@@ -124,6 +126,7 @@ namespace SabreTools
 				ForcePacking = fp,
 				OutputFormat = (outputFormat == 0 ? OutputFormat.Logiqx : outputFormat),
 				Romba = romba,
+				ExcludeOf = excludeOf,
 				Type = (superdat ? "SuperDAT" : ""),
 				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
@@ -364,6 +367,7 @@ namespace SabreTools
 		/// <param name="forcemerge">None, Split, Full</param>
 		/// <param name="forcend">None, Obsolete, Required, Ignore</param>
 		/// <param name="forcepack">None, Zip, Unzip</param>
+		/// <param name="excludeOf">True if cloneof, romof, and sampleof fields should be omitted from output, false otherwise</param>
 		/// <param name="outputFormat">Non-zero flag for output format, zero otherwise for default</param>
 		/// /* Missfile-specific DAT info */
 		/// <param name="usegame">True if games are to be used in output, false if roms are</param>
@@ -379,7 +383,6 @@ namespace SabreTools
 		/// /* Merging and Diffing info */
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
 		/// <param name="diffMode">Non-zero flag for diffing mode, zero otherwise</param>
-		/// <param name="cascade">True if the diffed files should be cascade diffed, false if diffed files should be reverse cascaded, null otherwise</param>
 		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
@@ -424,6 +427,7 @@ namespace SabreTools
 			string forcemerge,
 			string forcend,
 			string forcepack,
+			bool excludeOf,
 			OutputFormat outputFormat,
 
 			/* Missfile-specific DAT info */
@@ -441,7 +445,6 @@ namespace SabreTools
 			/* Merging and Diffing info */
 			bool merge,
 			DiffMode diffMode,
-			bool? cascade,
 			bool inplace,
 			bool skip,
 			bool bare,
@@ -600,6 +603,7 @@ namespace SabreTools
 				ForceNodump = fn,
 				ForcePacking = fp,
 				MergeRoms = dedup,
+				ExcludeOf = excludeOf,
 				OutputFormat = outputFormat,
 
 				UseGame = usegame,
@@ -614,7 +618,7 @@ namespace SabreTools
 				XSV = tsv,
 			};
 
-			userInputDat.Update(inputs, outDir, merge, diffMode, cascade, inplace, skip, bare, clean, softlist,
+			userInputDat.Update(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,
 				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, maxDegreeOfParallelism, _logger);
 		}
 

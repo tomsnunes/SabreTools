@@ -66,6 +66,7 @@ namespace SabreTools
 				datPrefix = false,
 				dedup = false,
 				enableGzip = false,
+				excludeOf = false,
 				inplace = false,
 				merge = false,
 				noMD5 = false,
@@ -85,8 +86,7 @@ namespace SabreTools
 				trim = false,
 				skip = false,
 				usegame = true;
-			bool? cascade = null,
-				tsv = null;
+			bool? tsv = null;
 			DiffMode diffMode = 0x0;
 			int maxParallelism = 4;
 			long sgt = -1,
@@ -94,9 +94,9 @@ namespace SabreTools
 				seq = -1;
 			OutputFormat outputFormat = 0x0;
 			StatOutputFormat statOutputFormat = StatOutputFormat.None;
-			string 
-				
-				// DAT fields
+			
+			// DAT fields
+			string
 				author = null,
 				category = null,
 				comment = null,
@@ -131,8 +131,8 @@ namespace SabreTools
 				repext = "",
 
 				// Misc fields
-				exta = "",
-				extb = "",
+				exta = null,
+				extb = null,
 				outDir = "",
 
 				tempDir = "";
@@ -166,7 +166,7 @@ namespace SabreTools
 						break;
 					case "-c":
 					case "--cascade":
-						cascade = true;
+						diffMode |= DiffMode.Cascade;
 						break;
 					case "-cf":
 					case "--copy-files":
@@ -308,7 +308,7 @@ namespace SabreTools
 						break;
 					case "-rc":
 					case "--rev-cascade":
-						cascade = false;
+						diffMode |= DiffMode.ReverseCascade;
 						break;
 					case "-re":
 					case "--restore":
@@ -358,6 +358,10 @@ namespace SabreTools
 					case "-ud":
 					case "--update":
 						update = true;
+						break;
+					case "-xof":
+					case "--exclude-of":
+						excludeOf = true;
 						break;
 					default:
 						string temparg = arg.Replace("\"", "").Replace("file://", "");
@@ -569,6 +573,7 @@ namespace SabreTools
 					version,
 					author,
 					forcepack,
+					excludeOf,
 					outputFormat,
 					romba,
 					superdat,
@@ -619,8 +624,8 @@ namespace SabreTools
 			else if (update || tsv != null || outputFormat != 0 || merge || diffMode != 0)
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
-					superdat, forcemerge, forcend, forcepack, outputFormat, usegame, prefix,
-					postfix, quotes, repext, addext, remext, datPrefix, romba, tsv, merge, diffMode, cascade, inplace, skip, removeDateFromAutomaticName, gamename, romname,
+					superdat, forcemerge, forcend, forcepack, excludeOf, outputFormat, usegame, prefix,
+					postfix, quotes, repext, addext, remext, datPrefix, romba, tsv, merge, diffMode, inplace, skip, removeDateFromAutomaticName, gamename, romname,
 					romtype, sgt, slt, seq, crc, md5, sha1, status, trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
 			}
 

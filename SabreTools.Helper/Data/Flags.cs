@@ -8,10 +8,15 @@ namespace SabreTools.Helper
 	[Flags]
 	public enum DiffMode
 	{
+		// Standard diffs
 		Dupes = 0x01,
 		NoDupes = 0x02,
 		Individuals = 0x04,
 		All = Dupes | NoDupes | Individuals,
+
+		// Cascaded diffs
+		Cascade = 0x08,
+		ReverseCascade = 0x10,
 	}
 
 	/// <summary>

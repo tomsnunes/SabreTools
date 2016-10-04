@@ -34,6 +34,7 @@ namespace SabreTools.Helper
 		private ForceNodump _forceNodump;
 		private ForcePacking _forcePacking;
 		private OutputFormat _outputFormat;
+		private bool _excludeOf;
 		private bool _mergeRoms;
 		private SortedDictionary<string, List<DatItem>> _files;
 
@@ -153,6 +154,11 @@ namespace SabreTools.Helper
 		{
 			get { return _outputFormat; }
 			set { _outputFormat = value; }
+		}
+		public bool ExcludeOf
+		{
+			get { return _excludeOf; }
+			set { _excludeOf = value; }
 		}
 		public bool MergeRoms
 		{
@@ -567,7 +573,6 @@ namespace SabreTools.Helper
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
 		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
-		/// <param name="cascade">True if the diffed files should be cascade diffed, false if diffed files should be reverse cascaded, null otherwise</param>
 		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
@@ -588,7 +593,7 @@ namespace SabreTools.Helper
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public void Update(List<string> inputFileNames, string outDir, bool merge, DiffMode diff, bool? cascade, bool inplace, bool skip,
+		public void Update(List<string> inputFileNames, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
 			bool bare, bool clean, bool softlist, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
 			string md5, string sha1, ItemStatus itemStatus, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
 		{
@@ -636,7 +641,7 @@ namespace SabreTools.Helper
 				}
 
 				// If we're in inverse cascade, reverse the list
-				if (cascade == false)
+				if ((diff & DiffMode.ReverseCascade) != 0)
 				{
 					newInputFileNames.Reverse();
 				}
@@ -647,12 +652,12 @@ namespace SabreTools.Helper
 					crc, md5, sha1, itemStatus, trim, single, root, maxDegreeOfParallelism, logger);
 
 				// Modify the Dictionary if necessary and output the results
-				if (diff != 0 && cascade == null)
+				if (diff != 0 && diff < DiffMode.Cascade)
 				{
 					DiffNoCascade(diff, outDir, newInputFileNames, logger);
 				}
 				// If we're in cascade and diff, output only cascaded diffs
-				else if (diff != 0 && cascade != null)
+				else if (diff != 0 && diff >= DiffMode.Cascade)
 				{
 					DiffCascade(outDir, inplace, newInputFileNames, datHeaders, skip, logger);
 				}
@@ -3777,8 +3782,11 @@ namespace SabreTools.Helper
 				{
 					case OutputFormat.ClrMamePro:
 						state += "game (\n\tname \"" + rom.MachineName + "\"\n" +
-							(String.IsNullOrEmpty(rom.RomOf) ? "" : "\tromof \"" + rom.RomOf + "\"\n") +
-							(String.IsNullOrEmpty(rom.CloneOf) ? "" : "\tcloneof \"" + rom.CloneOf + "\"\n") +
+							(ExcludeOf ? "" :
+								(String.IsNullOrEmpty(rom.RomOf) ? "" : "\tromof \"" + rom.RomOf + "\"\n") +
+								(String.IsNullOrEmpty(rom.CloneOf) ? "" : "\tcloneof \"" + rom.CloneOf + "\"\n") +
+								(String.IsNullOrEmpty(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n")
+							) +
 							"\tdescription \"" + (String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription) + "\"\n" +
 							(String.IsNullOrEmpty(rom.Year) ? "" : "\tyear " + rom.Year + "\n") +
 							(String.IsNullOrEmpty(rom.Manufacturer) ? "" : "\tmanufacturer \"" + rom.Manufacturer + "\"\n");
@@ -3789,15 +3797,17 @@ namespace SabreTools.Helper
 					case OutputFormat.Logiqx:
 						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
 								(rom.IsBios ? " isbios=\"yes\"" : "") +
-								(String.IsNullOrEmpty(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
-									? ""
-									: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
-								(String.IsNullOrEmpty(rom.RomOf) || (rom.MachineName.ToLowerInvariant() == rom.RomOf.ToLowerInvariant())
-									? ""
-									: " romof=\"" + HttpUtility.HtmlEncode(rom.RomOf) + "\"") +
-								(String.IsNullOrEmpty(rom.SampleOf) || (rom.MachineName.ToLowerInvariant() == rom.SampleOf.ToLowerInvariant())
-									? ""
-									: " sampleof=\"" + HttpUtility.HtmlEncode(rom.SampleOf) + "\"") +
+								(ExcludeOf ? "" :
+									(String.IsNullOrEmpty(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
+										? ""
+										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
+									(String.IsNullOrEmpty(rom.RomOf) || (rom.MachineName.ToLowerInvariant() == rom.RomOf.ToLowerInvariant())
+										? ""
+										: " romof=\"" + HttpUtility.HtmlEncode(rom.RomOf) + "\"") +
+									(String.IsNullOrEmpty(rom.SampleOf) || (rom.MachineName.ToLowerInvariant() == rom.SampleOf.ToLowerInvariant())
+										? ""
+										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.SampleOf) + "\"")
+								) +
 								">\n" +
 							(String.IsNullOrEmpty(rom.Comment) ? "" : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Comment) + "</comment>\n") +
 							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) + "</description>\n" +

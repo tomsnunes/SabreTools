@@ -227,6 +227,10 @@ Options:
 			Set the type flag to "SuperDAT" for the output DAT as well as preserving the
 			directory structure of the inputted folder, if applicable
 			
+		-xof, --exclude-of	Exclude romof, cloneof, sampleof tags
+			If this flag is enabled, then the romof, cloneof, and sampleof tags will be
+			omitted from the outputted DAT or DATs.
+			
 		-ab, --add-blank	Output blank files for folders
 			If this flag is set, then blank entries will be created for each of the empty
 			directories in the source. This is useful for tools that require all folders
@@ -509,6 +513,10 @@ Options:
 		-fp=, --forcepack=	Set force packing
 			Set the forcepacking flag to one of the supported values:
 				None, Zip, Unzip
+		
+		-xof, --exclude-of	Exclude romof, cloneof, sampleof tags
+			If this flag is enabled, then the romof, cloneof, and sampleof tags will be
+			omitted from the outputted DAT or DATs.
 				
 		-clean			Clean game names according to WoD standards
 			Game names will be santitized to remove what the original WoD standards

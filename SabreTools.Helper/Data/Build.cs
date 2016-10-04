@@ -131,6 +131,7 @@ namespace SabreTools.Helper
 					helptext.Add("	-v=, --version=		Set the version of the DAT");
 					helptext.Add("	-au=, --author=		Set the author of the DAT");
 					helptext.Add("	-sd, --superdat		Enable SuperDAT creation");
+					helptext.Add("	-xof, --exclude-of	Exclude romof, cloneof, sampleof tags");
 					helptext.Add("	-ab, --add-blank	Output blank files for folders");
 					helptext.Add("	-ad, --add-date		Output dates for each file parsed");
 					helptext.Add("	-cf, --copy-files	Copy files to the temp directory before parsing");
@@ -205,6 +206,7 @@ namespace SabreTools.Helper
 					helptext.Add("	-fp=, --forcepack=	Set force packing");
 					helptext.Add("		Supported values are:");
 					helptext.Add("		  None, Zip, Unzip");
+					helptext.Add("	-xof, --exclude-of	Exclude romof, cloneof, sampleof tags");
 					helptext.Add("	-clean			Clean game names according to WoD standards");
 					helptext.Add("	-sl, --softlist	Use Software List name instead of description");
 					helptext.Add("	-trim			Trim file names to fit NTFS length");
