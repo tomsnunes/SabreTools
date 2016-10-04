@@ -6,8 +6,16 @@ using System.Xml;
 
 namespace SabreTools.Helper
 {
-	public class Skippers
+	public class Skipper
 	{
+		#region Fields
+
+		public string Name;
+		public string Author;
+		public string Version;
+		public List<SkipperRule> Rules;
+		public string SourceFile;
+
 		// Local paths
 		public const string LocalPath = "Skippers";
 
@@ -25,50 +33,30 @@ namespace SabreTools.Helper
 			}
 		}
 
-		/// <summary>
-		/// Populate the entire list of header Skippers
-		/// </summary>
-		/// <remarks>
-		/// http://mamedev.emulab.it/clrmamepro/docs/xmlheaders.txt
-		/// http://www.emulab.it/forum/index.php?topic=127.0
-		/// </remarks>
-		private static void PopulateSkippers()
-		{
-			if (_list == null)
-			{
-				_list = new List<Skipper>();
-			}
+		#endregion
 
-			foreach (string skipperFile in Directory.EnumerateFiles(LocalPath, "*", SearchOption.AllDirectories))
-			{
-				_list.Add(PopulateSkippersHelper(Path.GetFullPath(skipperFile)));
-			}
+		#region Constructors
+
+		public Skipper()
+		{
+			Name = "";
+			Author = "";
+			Version = "";
+			Rules = new List<SkipperRule>();
+			SourceFile = "";
 		}
 
-		/// <summary>
-		/// Populate an individual Skipper from file
-		/// </summary>
-		/// <param name="filename">Name of the file to be read from</param>
-		/// <returns>The Skipper object associated with the file</returns>
-		private static Skipper PopulateSkippersHelper(string filename)
+		public Skipper(string filename)
 		{
-			Skipper skipper = new Skipper
-			{
-				Rules = new List<SkipperRule>(),
-				SourceFile = Path.GetFileName(filename),
-			};
-
-			if (!File.Exists(filename))
-			{
-				return skipper;
-			}
+			Rules = new List<SkipperRule>();
+			SourceFile = Path.GetFileNameWithoutExtension(filename);
 
 			Logger logger = new Logger(false, "");
 			XmlReader xtr = FileTools.GetXmlTextReader(filename, logger);
 
 			if (xtr == null)
 			{
-				return skipper;
+				return;
 			}
 
 			bool valid = false;
@@ -87,13 +75,13 @@ namespace SabreTools.Helper
 						xtr.Read();
 						break;
 					case "name":
-						skipper.Name = xtr.ReadElementContentAsString();
+						Name = xtr.ReadElementContentAsString();
 						break;
 					case "author":
-						skipper.Author = xtr.ReadElementContentAsString();
+						Author = xtr.ReadElementContentAsString();
 						break;
 					case "version":
-						skipper.Version = xtr.ReadElementContentAsString();
+						Version = xtr.ReadElementContentAsString();
 						break;
 					case "rule":
 						// Get the information from the rule first
@@ -103,7 +91,7 @@ namespace SabreTools.Helper
 							EndOffset = 0,
 							Operation = HeaderSkipOperation.None,
 							Tests = new List<SkipperTest>(),
-							SourceFile = Path.GetFileName(filename),
+							SourceFile = Path.GetFileNameWithoutExtension(filename),
 						};
 
 						if (xtr.GetAttribute("start_offset") != null)
@@ -279,7 +267,7 @@ namespace SabreTools.Helper
 						}
 
 						// Add the created rule to the skipper
-						skipper.Rules.Add(rule);
+						Rules.Add(rule);
 						xtr.Skip();
 						break;
 					default:
@@ -288,14 +276,46 @@ namespace SabreTools.Helper
 				}
 			}
 
-			return (valid ? skipper : new Skipper());
+			// If we somehow have an invalid file, zero out the fields
+			if (!valid)
+			{
+				Name = null;
+				Author = null;
+				Version = null;
+				Rules = null;
+				SourceFile = null;
+			}
+		}
+
+		#endregion
+
+		#region Static Methods
+
+		/// <summary>
+		/// Populate the entire list of header Skippers
+		/// </summary>
+		/// <remarks>
+		/// http://mamedev.emulab.it/clrmamepro/docs/xmlheaders.txt
+		/// http://www.emulab.it/forum/index.php?topic=127.0
+		/// </remarks>
+		private static void PopulateSkippers()
+		{
+			if (_list == null)
+			{
+				_list = new List<Skipper>();
+			}
+
+			foreach (string skipperFile in Directory.EnumerateFiles(LocalPath, "*", SearchOption.AllDirectories))
+			{
+				_list.Add(new Skipper(Path.GetFullPath(skipperFile)));
+			}
 		}
 
 		/// <summary>
 		/// Get the SkipperRule associated with a given file
 		/// </summary>
 		/// <param name="input">Name of the file to be checked</param>
-		/// <param name="skipperName">Name of the skipper to be used</param>
+		/// <param name="skipperName">Name of the skipper to be used, blank to find a matching skipper</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>The SkipperRule that matched the file</returns>
 		public static SkipperRule GetMatchingRule(string input, string skipperName, Logger logger)
@@ -314,7 +334,7 @@ namespace SabreTools.Helper
 		/// Get the SkipperRule associated with a given stream
 		/// </summary>
 		/// <param name="input">Name of the file to be checked</param>
-		/// <param name="skipperName">Name of the skipper to be used</param>
+		/// <param name="skipperName">Name of the skipper to be used, blank to find a matching skipper</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="keepOpen">True if the underlying stream should be kept open, false otherwise</param>
 		/// <returns>The SkipperRule that matched the file</returns>
@@ -329,7 +349,10 @@ namespace SabreTools.Helper
 
 			foreach (Skipper skipper in tempList)
 			{
-				if (String.IsNullOrEmpty(skipperName) || (!String.IsNullOrEmpty(skipper.Name) && skipperName.ToLowerInvariant() == skipper.Name.ToLowerInvariant()))
+				// If we're searching for the skipper OR we have a match to an inputted one
+				if (String.IsNullOrEmpty(skipperName)
+					|| (!String.IsNullOrEmpty(skipper.Name) && skipperName.ToLowerInvariant() == skipper.Name.ToLowerInvariant())
+					|| (!String.IsNullOrEmpty(skipper.Name) && skipperName.ToLowerInvariant() == skipper.SourceFile.ToLowerInvariant()))
 				{
 					// Loop through the rules until one is found that works
 					BinaryReader br = new BinaryReader(input);
@@ -492,187 +515,6 @@ namespace SabreTools.Helper
 			return skipperRule;
 		}
 
-		/// <summary>
-		/// Transform an input file using the given rule
-		/// </summary>
-		/// <param name="input">Input file name</param>
-		/// <param name="output">Output file name</param>
-		/// <param name="rule">SkipperRule to apply to the file</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>True if the file was transformed properly, false otherwise</returns>
-		public static bool TransformFile(string input, string output, SkipperRule rule, Logger logger)
-		{
-			bool success = true;
-
-			// If the input file doesn't exist, fail
-			if (!File.Exists(input))
-			{
-				logger.Error("I'm sorry but '" + input + "' doesn't exist!");
-				return false;
-			}
-
-			// Create the output directory if it doesn't already
-			if (!Directory.Exists(Path.GetDirectoryName(output)))
-			{
-				Directory.CreateDirectory(Path.GetDirectoryName(output));
-			}
-
-			logger.User("Attempting to apply rule to '" + input + "'");
-			success = TransformStream(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), File.OpenWrite(output), rule, logger);
-
-			// If the output file has size 0, delete it
-			if (new FileInfo(output).Length == 0)
-			{
-				try
-				{
-					File.Delete(output);
-					success = false;
-				}
-				catch
-				{
-					// Don't log this file deletion error
-				}
-			}
-
-			return success;
-		}
-
-		/// <summary>
-		/// Transform an input stream using the given rule
-		/// </summary>
-		/// <param name="input">Input stream</param>
-		/// <param name="output">Output stream</param>
-		/// <param name="rule">SkipperRule to apply to the stream</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
-		/// <param name="keepWriteOpen">True if the underlying write stream should be kept open, false otherwise</param>
-		/// <returns>True if the file was transformed properly, false otherwise</returns>
-		public static bool TransformStream(Stream input, Stream output, SkipperRule rule, Logger logger, bool keepReadOpen = false, bool keepWriteOpen = false)
-		{
-			bool success = true;
-
-			// If the sizes are wrong for the values, fail
-			long extsize = input.Length;
-			if ((rule.Operation > HeaderSkipOperation.Bitswap && (extsize % 2) != 0)
-				|| (rule.Operation > HeaderSkipOperation.Byteswap && (extsize % 4) != 0)
-				|| (rule.Operation > HeaderSkipOperation.Bitswap && (rule.StartOffset == null || rule.StartOffset % 2 == 0)))
-			{
-				logger.Error("The stream did not have the correct size to be transformed!");
-				return false;
-			}
-
-			// Now read the proper part of the file and apply the rule
-			BinaryWriter bw = null;
-			BinaryReader br = null;
-			try
-			{
-				logger.User("Applying found rule to input stream");
-				bw = new BinaryWriter(output);
-				br = new BinaryReader(input);
-
-				// Seek to the beginning offset
-				if (rule.StartOffset == null)
-				{
-					success = false;
-				}
-				else if (Math.Abs((long)rule.StartOffset) > input.Length)
-				{
-					success = false;
-				}
-				else if (rule.StartOffset > 0)
-				{
-					input.Seek((long)rule.StartOffset, SeekOrigin.Begin);
-				}
-				else if (rule.StartOffset < 0)
-				{
-					input.Seek((long)rule.StartOffset, SeekOrigin.End);
-				}
-
-				// Then read and apply the operation as you go
-				if (success)
-				{
-					byte[] buffer = new byte[4];
-					int pos = 0;
-					while (input.Position < (rule.EndOffset != null ? rule.EndOffset : input.Length)
-						&& input.Position < input.Length)
-					{
-						byte b = br.ReadByte();
-						switch (rule.Operation)
-						{
-							case HeaderSkipOperation.Bitswap:
-								// http://stackoverflow.com/questions/3587826/is-there-a-built-in-function-to-reverse-bit-order
-								uint r = b;
-								int s = 7;
-								for (b >>= 1; b != 0; b >>= 1)
-								{
-									r <<= 1;
-									r |= (byte)(b & 1);
-									s--;
-								}
-								r <<= s;
-								buffer[pos] = (byte)r;
-								break;
-							case HeaderSkipOperation.Byteswap:
-								if (pos % 2 == 1)
-								{
-									buffer[pos - 1] = b;
-								}
-								if (pos % 2 == 0)
-								{
-									buffer[pos + 1] = b;
-								}
-								break;
-							case HeaderSkipOperation.Wordswap:
-								buffer[3 - pos] = b;
-								break;
-							case HeaderSkipOperation.WordByteswap:
-								buffer[(pos + 2) % 4] = b;
-								break;
-							case HeaderSkipOperation.None:
-							default:
-								buffer[pos] = b;
-								break;
-						}
-
-						// Set the buffer position to default write to
-						pos = (pos + 1) % 4;
-
-						// If we filled a buffer, flush to the stream
-						if (pos == 0)
-						{
-							bw.Write(buffer);
-							bw.Flush();
-							buffer = new byte[4];
-						}
-					}
-					// If there's anything more in the buffer, write only the left bits
-					for (int i = 0; i < pos; i++)
-					{
-						bw.Write(buffer[i]);
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				logger.Error(ex.ToString());
-				return false;
-			}
-			finally
-			{
-				// If we're not keeping the read stream open, dispose of the binary reader
-				if (!keepReadOpen)
-				{
-					br?.Dispose();
-				}
-
-				// If we're not keeping the write stream open, dispose of the binary reader
-				if (!keepWriteOpen)
-				{
-					bw?.Dispose();
-				}
-			}
-
-			return success;
-		}
+		#endregion
 	}
 }

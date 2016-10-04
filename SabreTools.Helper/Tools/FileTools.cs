@@ -156,9 +156,9 @@ namespace SabreTools.Helper
 		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise (default)</param>
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="date">True if the file Date should be included, false otherwise (default)</param>
-		/// <param name="tryRemoveHeader">True if headers should be removed from files if possible, false otherwise (default)</param>
+		/// <param name="header">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static Rom GetFileInfo(string input, Logger logger, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool date = false, bool tryRemoveHeader = false)
+		public static Rom GetFileInfo(string input, Logger logger, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool date = false, string header = null)
 		{
 			// Add safeguard if file doesn't exist
 			if (!File.Exists(input))
@@ -168,9 +168,9 @@ namespace SabreTools.Helper
 
 			// Get the information from the file stream
 			Rom rom = new Rom();
-			if (tryRemoveHeader)
+			if (header != null)
 			{
-				SkipperRule rule = Skippers.GetMatchingRule(input, "", logger);
+				SkipperRule rule = Skipper.GetMatchingRule(input, Path.GetFileNameWithoutExtension(header), logger);
 
 				// If there's a match, get the new information from the stream
 				if (rule.Tests != null && rule.Tests.Count != 0)
@@ -180,7 +180,7 @@ namespace SabreTools.Helper
 					FileStream inputStream = File.OpenRead(input);
 
 					// Transform the stream and get the information from it
-					Skippers.TransformStream(inputStream, outputStream, rule, logger, keepReadOpen: false, keepWriteOpen: true);
+					rule.TransformStream(inputStream, outputStream, logger, keepReadOpen: false, keepWriteOpen: true);
 					rom = GetStreamInfo(outputStream, outputStream.Length);
 
 					// Dispose of the streams
@@ -328,7 +328,7 @@ namespace SabreTools.Helper
 			logger.User("\nGetting skipper information for '" + file + "'");
 
 			// Get the skipper rule that matches the file, if any
-			SkipperRule rule = Skippers.GetMatchingRule(file, "", logger);
+			SkipperRule rule = Skipper.GetMatchingRule(file, "", logger);
 
 			// If we have an empty rule, return false
 			if (rule.Tests == null || rule.Tests.Count == 0 || rule.Operation != HeaderSkipOperation.None)
@@ -352,7 +352,7 @@ namespace SabreTools.Helper
 
 			// Apply the rule to the file
 			string newfile = (outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file)));
-			Skippers.TransformFile(file, newfile, rule, logger);
+			rule.TransformFile(file, newfile, logger);
 
 			// If the output file doesn't exist, return false
 			if (!File.Exists(newfile))

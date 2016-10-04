@@ -75,7 +75,6 @@ namespace SabreTools
 				rem = false,
 				remext = false,
 				removeDateFromAutomaticName = false,
-				removeHeader = false,
 				restore = false,
 				romba = false,
 				showBaddumpColumn = false,
@@ -95,41 +94,41 @@ namespace SabreTools
 				seq = -1;
 			OutputFormat outputFormat = 0x0;
 			StatOutputFormat statOutputFormat = StatOutputFormat.None;
-			string addext = "",
-				author = "",
-				category = "",
-				comment = "",
-				crc = "",
-				currentAllMerged = "",
-				currentMissingMerged = "",
-				currentNewMerged = "",
-				date = "",
-				description = "",
-				email = "",
-				exta = "",
-				extb = "",
-				filename = "",
-				forcemerge = "",
-				forcend = "",
-				forcepack = "",
-				gamename = "",
-				header = "",
-				homepage = "",
-				name = "",
-				md5 = "",
-				outDir = "",
-				postfix = "",
-				prefix = "",
-				repext = "",
-				romname = "",
-				romtype = "",
-				root = "",
-				rootdir = "",
-				sha1 = "",
-				status = "",
-				tempDir = "",
-				url = "",
-				version = "";
+			string addext = null,
+				author = null,
+				category = null,
+				comment = null,
+				crc = null,
+				currentAllMerged = null,
+				currentMissingMerged = null,
+				currentNewMerged = null,
+				date = null,
+				description = null,
+				email = null,
+				exta = null,
+				extb = null,
+				filename = null,
+				forcemerge = null,
+				forcend = null,
+				forcepack = null,
+				gamename = null,
+				header = null,
+				homepage = null,
+				name = null,
+				md5 = null,
+				outDir = null,
+				postfix = null,
+				prefix = null,
+				repext = null,
+				romname = null,
+				romtype = null,
+				root = null,
+				rootdir = null,
+				sha1 = null,
+				status = null,
+				tempDir = null,
+				url = null,
+				version = null;
 			List<string> inputs = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
@@ -307,10 +306,6 @@ namespace SabreTools
 					case "-re":
 					case "--restore":
 						restore = true;
-						break;
-					case "-rh":
-					case "--rem-head":
-						removeHeader = true;
 						break;
 					case "-rme":
 					case "--rem-ext":
@@ -591,7 +586,7 @@ namespace SabreTools
 					addFileDates,
 					tempDir,
 					copyFiles,
-					removeHeader,
+					header,
 					maxParallelism);
 			}
 

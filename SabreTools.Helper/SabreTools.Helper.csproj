@@ -113,6 +113,8 @@
     <Compile Include="Objects\SimpleSort.cs" />
     <Compile Include="Objects\Archive\ZipFileEntry.cs" />
     <Compile Include="Objects\Archive\ZipFile.cs" />
+    <Compile Include="Objects\Skippers\Skipper.cs" />
+    <Compile Include="Objects\Skippers\SkipperRule.cs" />
     <Compile Include="Resources\Resources.de-DE.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -133,14 +135,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.fr-FR.resx</DependentUpon>
     </Compile>
-    <Compile Include="Skippers\Skippers.cs" />
     <Compile Include="Tools\ArchiveTools.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\DatabaseTools.cs" />
     <Compile Include="Data\Enums.cs" />
     <Compile Include="Objects\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Data\Structs.cs" />
     <Compile Include="Tools\Style.cs" />
     <Compile Include="Data\Build.cs" />
   </ItemGroup>

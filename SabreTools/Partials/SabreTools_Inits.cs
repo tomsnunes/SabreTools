@@ -71,7 +71,7 @@ namespace SabreTools
 		/// <param name="addFileDates">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
-		/// <param name="removeHeader">True if headers should be removed from files if possible, false otherwise</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitDatFromDir(List<string> inputs,
 			string filename,
@@ -93,7 +93,7 @@ namespace SabreTools
 			bool addFileDates,
 			string tempDir,
 			bool copyFiles,
-			bool removeHeader,
+			string headerToCheckAgainst,
 			int maxDegreeOfParallelism)
 		{
 			ForcePacking fp = ForcePacking.None;
@@ -139,7 +139,7 @@ namespace SabreTools
 
 					string basePath = Path.GetFullPath(path);
 					bool success = datdata.PopulateDatFromDir(basePath, noMD5, noSHA1, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,
-						addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, removeHeader, maxDegreeOfParallelism, _logger);
+						addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
 
 					// If it was a success, write the DAT out
 					if (success)

@@ -139,7 +139,7 @@ namespace SabreTools.Helper
 			{
 				_datdata.PopulateDatFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */,
-					false /* removeHeader */, 4 /* maxDegreeOfParallelism */, _logger);
+					null /* headerToCheckAgainst */, 4 /* maxDegreeOfParallelism */, _logger);
 			}
 
 			// Setup the fixdat
@@ -486,7 +486,7 @@ namespace SabreTools.Helper
 
 			// Now attempt to see if the file has a header
 			FileStream input = File.OpenRead(file);
-			SkipperRule rule = Skippers.GetMatchingRule(input, "", _logger);
+			SkipperRule rule = Skipper.GetMatchingRule(input, "", _logger);
 
 			// If there's a match, get the new information from the stream
 			if (rule.Tests != null && rule.Tests.Count != 0)
@@ -495,7 +495,7 @@ namespace SabreTools.Helper
 				MemoryStream output = new MemoryStream();
 
 				// Transform the stream and get the information from it
-				Skippers.TransformStream(input, output, rule, _logger, false, true);
+				rule.TransformStream(input, output, _logger, false, true);
 				Rom romNH = FileTools.GetStreamInfo(output, output.Length);
 				romNH.Name = "HEAD::" + rom.Name;
 				romNH.MachineName = rom.MachineName;
@@ -610,14 +610,14 @@ namespace SabreTools.Helper
 				}
 
 				// Now get the transformed file if it exists
-				SkipperRule rule = Skippers.GetMatchingRule(input, "", _logger);
+				SkipperRule rule = Skipper.GetMatchingRule(input, "", _logger);
 
 				// If we have have a non-empty rule, apply it
 				if (rule.Tests != null && rule.Tests.Count != 0)
 				{
 					// Otherwise, apply the rule to the file
 					string newinput = input + ".new";
-					Skippers.TransformFile(input, newinput, rule, _logger);
+					rule.TransformFile(input, newinput, _logger);
 					Rom drom = FileTools.GetFileInfo(newinput, _logger);
 
 					// If we have a blank RomData, it's an error

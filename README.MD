@@ -4,6 +4,8 @@
 
 This project started as a desktop port of some core features of Wizard of DATz Redux, but it has since grown into a fully-featured DAT management tool. Below is a brief description of the features available in the suite. For more information about each feature, see the help text in each of the programs. For more information about the parent project, see <a href="https://github.com/mnadareski/wizzardRedux">here</a>.
 
+<!-- "tbh...  i have no real idea what sabretools is xD. my best guess   some prehistoric sort of swiss army knife" - Executer -->
+
 <h3>Features</h3>
 
 For the most complete set of information, see the <a href="https://raw.githubusercontent.com/mnadareski/wizzardDesktop/master/SabreTools.Helper/README.1ST">README.1ST</a> file. Currently, the SabreTools suite consists of the following programs:
