@@ -32,6 +32,30 @@ namespace SabreTools.Helper
 			return WriteToArchive(ms, outDir, destEntry);
 		}
 
+		/// <summary>
+		/// Convert a compressed DeflateStream to a compressed GZipStream
+		/// </summary>
+		/// <param name="input">DeflateStream to convert</param>
+		/// <returns>Converted GZipStream</returns>
+		public static Stream DeflateStreamToGZipStream(Stream input)
+		{
+			DeflateStream ds = new DeflateStream(input, CompressionMode.Decompress);
+			GZipStream gz = new GZipStream(ds, CompressionMode.Compress);
+			return gz;
+		}
+
+		/// <summary>
+		/// Convert a compressed GZipStream to a compressed DeflateStream
+		/// </summary>
+		/// <param name="input">GZipStream to convert</param>
+		/// <returns>Converted DeflateStream</returns>
+		public static Stream GZipStreamToDeflateStream(Stream input)
+		{
+			GZipStream gz = new GZipStream(input, CompressionMode.Decompress);
+			DeflateStream ds = new DeflateStream(gz, CompressionMode.Compress);
+			return ds;
+		}
+
 		#endregion
 
 		#region Extraction
