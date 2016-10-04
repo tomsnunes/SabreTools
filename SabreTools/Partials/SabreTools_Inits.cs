@@ -379,7 +379,6 @@ namespace SabreTools
 		/// <param name="remext">Remove all extensions</param>
 		/// <param name="datprefix">Add the dat name as a directory prefix</param>
 		/// <param name="romba">Output files in romba format</param>
-		/// <param name="tsv">True to output files in TSV format, false to output files in CSV format, null otherwise</param>
 		/// /* Merging and Diffing info */
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
 		/// <param name="diffMode">Non-zero flag for diffing mode, zero otherwise</param>
@@ -440,7 +439,6 @@ namespace SabreTools
 			bool remext,
 			bool datprefix,
 			bool romba,
-			bool? tsv,
 
 			/* Merging and Diffing info */
 			bool merge,
@@ -615,7 +613,6 @@ namespace SabreTools
 				RemExt = remext,
 				GameName = datprefix,
 				Romba = romba,
-				XSV = tsv,
 			};
 
 			userInputDat.Update(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,

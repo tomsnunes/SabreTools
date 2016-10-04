@@ -111,7 +111,9 @@ namespace SabreTools.Helper
 					helptext.Add("	-b, --bare		Don't include date in file name");
 					helptext.Add("	-u, --unzip		Force unzipping in created DAT");
 					helptext.Add("	-f, --files		Treat archives as files");
+					helptext.Add("	-oa, --output-all	Output in all formats");
 					helptext.Add("	-oc, --output-cmp	Output in CMP format");
+					helptext.Add("	-ocsv, --output-csv	Output in CSV format");
 					helptext.Add("	-od, --output-dc	Output in DOSCenter format");
 					helptext.Add("	-om, --output-miss	Output in Missfile format");
 					helptext.Add("	-omd5, --output-md5	Output in MD5 format");
@@ -121,6 +123,7 @@ namespace SabreTools.Helper
 					helptext.Add("	-osfv, --ouput-sfv	Output in SFV format");
 					helptext.Add("	-osha1, --output-sha1	Output in SHA-1 format");
 					helptext.Add("	-osl, --output-sl	Output in Softwarelist format");
+					helptext.Add("	-otsv, --output-tsv	Output in TSV format");
 					helptext.Add("	-ox, --output-xml	Output in Logiqx XML format");
 					helptext.Add("	-gz, --gz-files		Allow reading of GZIP files as archives");
 					helptext.Add("	-ro, --romba		Read files from a Romba input");
@@ -158,7 +161,12 @@ namespace SabreTools.Helper
 					helptext.Add("  -ts, --type-split		Split a DAT or folder by file types (rom/disk)");
 					helptext.Add("	-out=			Output directory");
 					helptext.Add("  -ud, --update		Update a DAT file");
+					helptext.Add("	-oa, --output-all	Output in all formats");
 					helptext.Add("	-oc, --output-cmp	Output in CMP format");
+					helptext.Add("	-ocsv, --output-csv	Output in CSV format");
+					helptext.Add("	  -pre=, --prefix=		Set prefix for all lines");
+					helptext.Add("	  -post=, --postfix=		Set postfix for all lines");
+					helptext.Add("	  -q, --quotes			Put double-quotes around each item");
 					helptext.Add("	-od, --output-dc	Output in DOSCenter format");
 					helptext.Add("	-om, --output-miss	Output in Missfile format");
 					helptext.Add("	  -r, --roms			Output roms to miss instead of sets");
@@ -182,6 +190,10 @@ namespace SabreTools.Helper
 					helptext.Add("	-osha1, --output-sha1	Output in SHA-1 format");
 					helptext.Add("	  -gp, --game-prefix		Add game name as a prefix");
 					helptext.Add("	-osl, --output-sl	Output in Softwarelist format");
+					helptext.Add("	-otsv, --output-tsv	Output in TSV format");
+					helptext.Add("	  -pre=, --prefix=		Set prefix for all lines");
+					helptext.Add("	  -post=, --postfix=		Set postfix for all lines");
+					helptext.Add("	  -q, --quotes			Put double-quotes around each item");
 					helptext.Add("	-ox, --output-xml	Output in Logiqx XML format");
 					helptext.Add("	-f=, --filename=	Set a new filename");
 					helptext.Add("	-n=, --name=		Set a new internal name");

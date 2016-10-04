@@ -86,7 +86,6 @@ namespace SabreTools
 				trim = false,
 				skip = false,
 				usegame = true;
-			bool? tsv = null;
 			DiffMode diffMode = 0x0;
 			int maxParallelism = 4;
 			long sgt = -1,
@@ -174,7 +173,6 @@ namespace SabreTools
 						break;
 					case "-csv":
 					case "--csv":
-						tsv = false;
 						statOutputFormat = StatOutputFormat.CSV;
 						break;
 					case "-clean":
@@ -254,9 +252,17 @@ namespace SabreTools
 					case "--noSHA1":
 						noSHA1 = true;
 						break;
+					case "-oa":
+					case "--output-all":
+						outputFormat |= OutputFormat.ALL;
+						break;
 					case "-oc":
 					case "--output-cmp":
 						outputFormat |= OutputFormat.ClrMamePro;
+						break;
+					case "-ocsv":
+					case "--output-csv":
+						outputFormat |= OutputFormat.CSV;
 						break;
 					case "-od":
 					case "--output-dc":
@@ -293,6 +299,10 @@ namespace SabreTools
 					case "-osl":
 					case "--output-sl":
 						outputFormat |= OutputFormat.SoftwareList;
+						break;
+					case "-otsv":
+					case "--output-tsv":
+						outputFormat |= OutputFormat.TSV;
 						break;
 					case "-ox":
 					case "--output-xml":
@@ -352,7 +362,6 @@ namespace SabreTools
 						break;
 					case "-tsv":
 					case "--tsv":
-						tsv = true;
 						statOutputFormat = StatOutputFormat.TSV;
 						break;
 					case "-ud":
@@ -621,11 +630,11 @@ namespace SabreTools
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
-			else if (update || tsv != null || outputFormat != 0 || merge || diffMode != 0)
+			else if (update || outputFormat != 0 || merge || diffMode != 0)
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, outputFormat, usegame, prefix,
-					postfix, quotes, repext, addext, remext, datPrefix, romba, tsv, merge, diffMode, inplace, skip, removeDateFromAutomaticName, gamename, romname,
+					postfix, quotes, repext, addext, remext, datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName, gamename, romname,
 					romtype, sgt, slt, seq, crc, md5, sha1, status, trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
 			}
 

@@ -48,7 +48,6 @@ namespace SabreTools.Helper
 		private bool _remExt;
 		private bool _gameName;
 		private bool _romba;
-		private bool? _xsv; // true for tab-deliminated output, false for comma-deliminated output
 
 		// Statistical data related to the DAT
 		private long _romCount;
@@ -227,11 +226,6 @@ namespace SabreTools.Helper
 			get { return _romba; }
 			set { _romba = value; }
 		}
-		public bool? XSV // true for tab-deliminated output, false for comma-deliminated output
-		{
-			get { return _xsv; }
-			set { _xsv = value; }
-		}
 
 		// Statistical data related to the DAT
 		public long RomCount
@@ -362,10 +356,9 @@ namespace SabreTools.Helper
 		/// <param name="remExt">Remove all extensions</param>
 		/// <param name="gameName">Add the dat name as a directory prefix</param>
 		/// <param name="romba">Output files in romba format</param>
-		/// <param name="xsv">True to output files in TSV format, false to output files in CSV format, null otherwise</param>
 		public DatFile(string fileName, string name, string description, OutputFormat outputFormat, bool mergeRoms,
 			SortedDictionary<string, List<DatItem>> files, bool useGame, string prefix, string postfix, bool quotes,
-			string repExt, string addExt, bool remExt, bool gameName, bool romba, bool? xsv)
+			string repExt, string addExt, bool remExt, bool gameName, bool romba)
 		{
 			_fileName = fileName;
 			_name = name;
@@ -383,7 +376,6 @@ namespace SabreTools.Helper
 			_remExt = remExt;
 			_gameName = gameName;
 			_romba = romba;
-			_xsv = xsv;
 
 			_romCount = 0;
 			_diskCount = 0;
@@ -514,7 +506,6 @@ namespace SabreTools.Helper
 				RemExt = this.RemExt,
 				GameName = this.GameName,
 				Romba = this.Romba,
-				XSV = this.XSV,
 				RomCount = this.RomCount,
 				DiskCount = this.DiskCount,
 				TotalSize = this.TotalSize,
@@ -560,7 +551,6 @@ namespace SabreTools.Helper
 				RemExt = this.RemExt,
 				GameName = this.GameName,
 				Romba = this.Romba,
-				XSV = this.XSV,
 			};
 		}
 
@@ -688,7 +678,8 @@ namespace SabreTools.Helper
 							logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
 							innerDatdata.Parse(inputFileName, 0, 0, gamename, romname,
 								romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single,
-								root, logger, true, clean, softlist, keepext: (innerDatdata.XSV != null));
+								root, logger, true, clean, softlist,
+								keepext: ((innerDatdata.OutputFormat & OutputFormat.TSV) != 0 || (innerDatdata.OutputFormat & OutputFormat.CSV) != 0));
 
 							// If we have roms, output them
 							if (innerDatdata.Files.Count != 0)
@@ -708,7 +699,8 @@ namespace SabreTools.Helper
 									DatFile innerDatdata = (DatFile)Clone();
 									innerDatdata.Files = null;
 									innerDatdata.Parse(file, 0, 0, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus,
-										trim, single, root, logger, true, clean, keepext: (XSV != null));
+										trim, single, root, logger, true, clean,
+										keepext: ((innerDatdata.OutputFormat & OutputFormat.TSV) != 0 || (innerDatdata.OutputFormat & OutputFormat.CSV) != 0));
 
 									// If we have roms, output them
 									if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
@@ -3513,7 +3505,10 @@ namespace SabreTools.Helper
 								logger.Verbose("Empty folder found: " + rom.MachineName);
 
 								// If we're in a mode that doesn't allow for actual empty folders, add the blank info
-								if (outputFormat != OutputFormat.SabreDat && outputFormat != OutputFormat.MissFile)
+								if (outputFormat != OutputFormat.CSV
+									&& outputFormat != OutputFormat.MissFile
+									&& outputFormat != OutputFormat.SabreDat
+									&& outputFormat != OutputFormat.TSV)
 								{
 									rom.Name = (rom.Name == "null" ? "-" : rom.Name);
 									((Rom)rom).Size = Constants.SizeZero;
@@ -3589,6 +3584,10 @@ namespace SabreTools.Helper
 							(ForceMerging == ForceMerging.Split ? "\tforcemerging split\n" : "") +
 							")\n";
 						break;
+					case OutputFormat.CSV:
+						header = "\"File Name\",\"Internal Name\",\"Description\",\"Game Name\",\"Game Description\",\"Type\",\"" +
+								"Rom Name\",\"Disk Name\",\"Size\",\"CRC\",\"MD5\",\"SHA1\",\"Nodump\"\n";
+						break;
 					case OutputFormat.DOSCenter:
 						header = "DOSCenter (\n" +
 							"Name: " + Name + "\"\n" +
@@ -3630,17 +3629,9 @@ namespace SabreTools.Helper
 							: "") +
 							"\t</header>\n";
 						break;
-					case OutputFormat.MissFile:
-						if (XSV == true)
-						{
-							header = "\"File Name\"\t\"Internal Name\"\t\"Description\"\t\"Game Name\"\t\"Game Description\"\t\"Type\"\t\"" +
+					case OutputFormat.TSV:
+						header = "\"File Name\"\t\"Internal Name\"\t\"Description\"\t\"Game Name\"\t\"Game Description\"\t\"Type\"\t\"" +
 								"Rom Name\"\t\"Disk Name\"\t\"Size\"\t\"CRC\"\t\"MD5\"\t\"SHA1\"\t\"Nodump\"\n";
-						}
-						else if (XSV == false)
-						{
-							header = "\"File Name\",\"Internal Name\",\"Description\",\"Game Name\",\"Game Description\",\"Type\",\"" +
-								"Rom Name\",\"Disk Name\",\"Size\",\"CRC\",\"MD5\",\"SHA1\",\"Nodump\"\n";
-						}
 						break;
 					case OutputFormat.OfflineList:
 						header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
@@ -3957,7 +3948,7 @@ namespace SabreTools.Helper
 
 			try
 			{
-				string state = "";
+				string state = "", name = "", pre = "", post = "";
 				switch (outputFormat)
 				{
 					case OutputFormat.ClrMamePro:
@@ -4008,6 +3999,84 @@ namespace SabreTools.Helper
 								break;
 						}
 
+						break;
+					case OutputFormat.CSV:
+						// CSV should only output Rom and Disk
+						if (rom.Type != ItemType.Disk && rom.Type != ItemType.Rom)
+						{
+							return true;
+						}
+
+						pre = Prefix + (Quotes ? "\"" : "");
+						post = (Quotes ? "\"" : "") + Postfix;
+
+						if (rom.Type == ItemType.Rom)
+						{
+							// Check for special strings in prefix and postfix
+							pre = pre
+								.Replace("%game%", rom.MachineName)
+								.Replace("%name%", rom.Name)
+								.Replace("%crc%", ((Rom)rom).CRC)
+								.Replace("%md5%", ((Rom)rom).MD5)
+								.Replace("%sha1%", ((Rom)rom).SHA1)
+								.Replace("%size%", ((Rom)rom).Size.ToString());
+							post = post
+								.Replace("%game%", rom.MachineName)
+								.Replace("%name%", rom.Name)
+								.Replace("%crc%", ((Rom)rom).CRC)
+								.Replace("%md5%", ((Rom)rom).MD5)
+								.Replace("%sha1%", ((Rom)rom).SHA1)
+								.Replace("%size%", ((Rom)rom).Size.ToString());
+						}
+						else if (rom.Type == ItemType.Disk)
+						{
+							// Check for special strings in prefix and postfix
+							pre = pre
+								.Replace("%game%", rom.MachineName)
+								.Replace("%name%", rom.Name)
+								.Replace("%md5%", ((Disk)rom).MD5)
+								.Replace("%sha1%", ((Disk)rom).SHA1);
+							post = post
+								.Replace("%game%", rom.MachineName)
+								.Replace("%name%", rom.Name)
+								.Replace("%md5%", ((Disk)rom).MD5)
+								.Replace("%sha1%", ((Disk)rom).SHA1);
+						}
+
+						if (rom.Type == ItemType.Rom)
+						{
+							string inline = "\"" + FileName + "\""
+								+ ",\"" + Name + "\""
+								+ ",\"" + Description + "\""
+								+ ",\"" + rom.MachineName + "\""
+								+ ",\"" + rom.MachineDescription + "\""
+								+ "," + "\"rom\""
+								+ ",\"" + rom.Name + "\""
+								+ "," + "\"\""
+								+ ",\"" + ((Rom)rom).Size + "\""
+								+ ",\"" + ((Rom)rom).CRC + "\""
+								+ ",\"" + ((Rom)rom).MD5 + "\""
+								+ ",\"" + ((Rom)rom).SHA1 + "\""
+								+ "," + (((Rom)rom).ItemStatus != ItemStatus.None ? "\"" + ((Rom)rom).ItemStatus.ToString() + "\"" : "\"\"");
+							state += pre + inline + post + "\n";
+						}
+						else if (rom.Type == ItemType.Disk)
+						{
+							string inline = "\"" + FileName + "\""
+								+ ",\"" + Name + "\""
+								+ ",\"" + Description + "\""
+								+ ",\"" + rom.MachineName + "\""
+								+ ",\"" + rom.MachineDescription + "\""
+								+ "," + "\"disk\""
+								+ "," + "\"\""
+								+ ",\"" + rom.Name + "\""
+								+ "," + "\"\""
+								+ "," + "\"\""
+								+ ",\"" + ((Disk)rom).MD5 + "\""
+								+ ",\"" + ((Disk)rom).SHA1 + "\""
+								+ "," + (((Disk)rom).ItemStatus != ItemStatus.None ? "\"" + ((Disk)rom).ItemStatus.ToString() + "\"" : "\"\"");
+							state += pre + inline + post + "\n";
+						}
 						break;
 					case OutputFormat.DOSCenter:
 						switch (rom.Type)
@@ -4078,13 +4147,13 @@ namespace SabreTools.Helper
 						break;
 					case OutputFormat.MissFile:
 						// Missfile should only output Rom and Disk
-						if (rom.Type != ItemType.Disk && rom.Type != ItemType.Disk)
+						if (rom.Type != ItemType.Disk && rom.Type != ItemType.Rom)
 						{
 							return true;
 						}
 
-						string pre = Prefix + (Quotes ? "\"" : "");
-						string post = (Quotes ? "\"" : "") + Postfix;
+						pre = Prefix + (Quotes ? "\"" : "");
+						post = (Quotes ? "\"" : "") + Postfix;
 
 						if (rom.Type == ItemType.Rom)
 						{
@@ -4127,7 +4196,7 @@ namespace SabreTools.Helper
 								// We can only write out if there's a SHA-1
 								if (((Rom)rom).SHA1 != "")
 								{
-									string name = ((Rom)rom).SHA1.Substring(0, 2)
+									name = ((Rom)rom).SHA1.Substring(0, 2)
 										+ "/" + ((Rom)rom).SHA1.Substring(2, 2)
 										+ "/" + ((Rom)rom).SHA1.Substring(4, 2)
 										+ "/" + ((Rom)rom).SHA1.Substring(6, 2)
@@ -4140,7 +4209,7 @@ namespace SabreTools.Helper
 								// We can only write out if there's a SHA-1
 								if (((Disk)rom).SHA1 != "")
 								{
-									string name = ((Disk)rom).SHA1.Substring(0, 2)
+									name = ((Disk)rom).SHA1.Substring(0, 2)
 										+ "/" + ((Disk)rom).SHA1.Substring(2, 2)
 										+ "/" + ((Disk)rom).SHA1.Substring(4, 2)
 										+ "/" + ((Disk)rom).SHA1.Substring(6, 2)
@@ -4149,79 +4218,37 @@ namespace SabreTools.Helper
 								}
 							}
 						}
-						// If we're in TSV/CSV mode, similarly the state is consistent
-						else if (XSV != null)
-						{
-							string separator = (XSV == true ? "\t" : ",");
 
-							if (rom.Type == ItemType.Rom)
-							{
-								string inline = "\"" + FileName + "\""
-									+ separator + "\"" + Name + "\""
-									+ separator + "\"" + Description + "\""
-									+ separator + "\"" + rom.MachineName + "\""
-									+ separator + "\"" + rom.MachineDescription + "\""
-									+ separator + "\"rom\""
-									+ separator + "\"" + rom.Name + "\""
-									+ separator + "\"\""
-									+ separator + "\"" + ((Rom)rom).Size + "\""
-									+ separator + "\"" + ((Rom)rom).CRC + "\""
-									+ separator + "\"" + ((Rom)rom).MD5 + "\""
-									+ separator + "\"" + ((Rom)rom).SHA1 + "\""
-									+ separator + (((Rom)rom).ItemStatus != ItemStatus.None ? "\"" + ((Rom)rom).ItemStatus.ToString() + "\"" : "\"\"");
-								state += pre + inline + post + "\n";
-							}
-							else if (rom.Type == ItemType.Disk)
-							{
-								string inline = "\"" + FileName + "\""
-									+ separator + "\"" + Name + "\""
-									+ separator + "\"" + Description + "\""
-									+ separator + "\"" + rom.MachineName + "\""
-									+ separator + "\"" + rom.MachineDescription + "\""
-									+ separator + "\"disk\""
-									+ separator + "\"\""
-									+ separator + "\"" + rom.Name + "\""
-									+ separator + "\"\""
-									+ separator + "\"\""
-									+ separator + "\"" + ((Disk)rom).MD5 + "\""
-									+ separator + "\"" + ((Disk)rom).SHA1 + "\""
-									+ separator + (((Disk)rom).ItemStatus != ItemStatus.None ? "\"" + ((Disk)rom).ItemStatus.ToString() + "\"" : "\"\"");
-								state += pre + inline + post + "\n";
-							}
-						}
 						// Otherwise, use any flags
-						else
+						name = (UseGame ? rom.MachineName : rom.Name);
+						if (RepExt != "" || RemExt)
 						{
-							string name = (UseGame ? rom.MachineName : rom.Name);
-							if (RepExt != "" || RemExt)
+							if (RemExt)
 							{
-								if (RemExt)
-								{
-									RepExt = "";
-								}
-
-								string dir = Path.GetDirectoryName(name);
-								dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
-								name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + RepExt);
-							}
-							if (AddExt != "")
-							{
-								name += AddExt;
-							}
-							if (!UseGame && GameName)
-							{
-								name = Path.Combine(rom.MachineName, name);
+								RepExt = "";
 							}
 
-							if (UseGame && rom.MachineName != lastgame)
-							{
-								state += pre + name + post + "\n";
-								lastgame = rom.MachineName;
-							}
-							else if (!UseGame)
-							{
-								state += pre + name + post + "\n";
-							}
+							string dir = Path.GetDirectoryName(name);
+							dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
+							name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + RepExt);
+						}
+						if (AddExt != "")
+						{
+							name += AddExt;
+						}
+						if (!UseGame && GameName)
+						{
+							name = Path.Combine(rom.MachineName, name);
+						}
+
+						if (UseGame && rom.MachineName != lastgame)
+						{
+							state += pre + name + post + "\n";
+							lastgame = rom.MachineName;
+						}
+						else if (!UseGame)
+						{
+							state += pre + name + post + "\n";
 						}
 						break;
 					case OutputFormat.OfflineList:
@@ -4450,6 +4477,84 @@ namespace SabreTools.Helper
 									+ "/>\n"
 									+ "\t\t\t</dataarea>\n";
 								break;
+						}
+						break;
+					case OutputFormat.TSV:
+						// TSV should only output Rom and Disk
+						if (rom.Type != ItemType.Disk && rom.Type != ItemType.Rom)
+						{
+							return true;
+						}
+
+						pre = Prefix + (Quotes ? "\"" : "");
+						post = (Quotes ? "\"" : "") + Postfix;
+
+						if (rom.Type == ItemType.Rom)
+						{
+							// Check for special strings in prefix and postfix
+							pre = pre
+								.Replace("%game%", rom.MachineName)
+								.Replace("%name%", rom.Name)
+								.Replace("%crc%", ((Rom)rom).CRC)
+								.Replace("%md5%", ((Rom)rom).MD5)
+								.Replace("%sha1%", ((Rom)rom).SHA1)
+								.Replace("%size%", ((Rom)rom).Size.ToString());
+							post = post
+								.Replace("%game%", rom.MachineName)
+								.Replace("%name%", rom.Name)
+								.Replace("%crc%", ((Rom)rom).CRC)
+								.Replace("%md5%", ((Rom)rom).MD5)
+								.Replace("%sha1%", ((Rom)rom).SHA1)
+								.Replace("%size%", ((Rom)rom).Size.ToString());
+						}
+						else if (rom.Type == ItemType.Disk)
+						{
+							// Check for special strings in prefix and postfix
+							pre = pre
+								.Replace("%game%", rom.MachineName)
+								.Replace("%name%", rom.Name)
+								.Replace("%md5%", ((Disk)rom).MD5)
+								.Replace("%sha1%", ((Disk)rom).SHA1);
+							post = post
+								.Replace("%game%", rom.MachineName)
+								.Replace("%name%", rom.Name)
+								.Replace("%md5%", ((Disk)rom).MD5)
+								.Replace("%sha1%", ((Disk)rom).SHA1);
+						}
+
+						if (rom.Type == ItemType.Rom)
+						{
+							string inline = "\"" + FileName + "\""
+								+ "\t\"" + Name + "\""
+								+ "\t\"" + Description + "\""
+								+ "\t\"" + rom.MachineName + "\""
+								+ "\t\"" + rom.MachineDescription + "\""
+								+ "\t" + "\"rom\""
+								+ "\t\"" + rom.Name + "\""
+								+ "\t" + "\"\""
+								+ "\t\"" + ((Rom)rom).Size + "\""
+								+ "\t\"" + ((Rom)rom).CRC + "\""
+								+ "\t\"" + ((Rom)rom).MD5 + "\""
+								+ "\t\"" + ((Rom)rom).SHA1 + "\""
+								+ "\t" + (((Rom)rom).ItemStatus != ItemStatus.None ? "\"" + ((Rom)rom).ItemStatus.ToString() + "\"" : "\"\"");
+							state += pre + inline + post + "\n";
+						}
+						else if (rom.Type == ItemType.Disk)
+						{
+							string inline = "\"" + FileName + "\""
+								+ "\t\"" + Name + "\""
+								+ "\t\"" + Description + "\""
+								+ "\t\"" + rom.MachineName + "\""
+								+ "\t\"" + rom.MachineDescription + "\""
+								+ "\t" + "\"disk\""
+								+ "\t" + "\"\""
+								+ "\t\"" + rom.Name + "\""
+								+ "\t" + "\"\""
+								+ "\t" + "\"\""
+								+ "\t\"" + ((Disk)rom).MD5 + "\""
+								+ "\t\"" + ((Disk)rom).SHA1 + "\""
+								+ "\t" + (((Disk)rom).ItemStatus != ItemStatus.None ? "\"" + ((Disk)rom).ItemStatus.ToString() + "\"" : "\"\"");
+							state += pre + inline + post + "\n";
 						}
 						break;
 				}

@@ -163,8 +163,15 @@ Options:
 			files themselves. This is good for uncompressed sets that include archives that
 			should be read as-is.
 			
+		-oa, --output-all	Output in all available formats
+			Add outputting the created DAT in all available formats. See specific formats for
+			additional flags that may be used.
+			
 		-oc, --output-cmp	Output in CMP format
 			Add outputting the created DAT to clrmamepro format
+			
+		-ocsv, --output-csv	Output in Comma-Separated Value format
+			Add outputting the created DAT to standardized CSV format
 		
 		-od, --output-dc	Output in DOSCenter format
 			Add outputting the created DAT to DOSCenter format
@@ -192,6 +199,9 @@ Options:
 			
 		-osl, --output-sl	Output in Software List format
 			Add outputting the created DAT to Software List XML format
+			
+		-otsv, --output-tsv	Output in Tab-Separated Value format
+			Add outputting the created DAT to standardized TSV format
 			
 		-ox, -output-xml	Output in Logiqx XML format (default)
 			Add outputting the created DAT to Logiqx XML format
@@ -374,8 +384,32 @@ Options:
 		to a DAT, or set of DATs. This is also a combination of many different programs
 		that performed DAT manipulation that work better together.
 			
+		-oa, --output-all	Output in all available formats
+			Add outputting the created DAT in all available formats. See specific formats for
+			additional flags that may be used.
+		
 		-oc, --output-cmp	Output in CMP format
 			Add outputting the created DAT to clrmamepro format
+			
+		-ocsv, --output-csv	Output in Comma-Separated Value format
+			Add outputting the created DAT to standardized CSV format
+			
+			-pre=, --prefix=		Set prefix for all lines
+				Set a generic prefix to be prepended to all outputted lines
+				
+			-post=, --postfix=		Set postfix for all lines
+				Set a generic postfix to be appended to all outputted lines
+				
+				Both prefix and postfix can use one of the following special strings:
+					- %game% - Replaced with the Game/Machine name
+					- %name% - Replaced with the Rom name
+					- %crc% - Replaced with the CRC
+					- %md5% - Replaced with the MD5
+					- %sha1% - Replaced with the SHA-1
+					- %size% - Replaced with the size
+			
+			-q, --quotes			Put double-quotes around each item
+				This quotes only the item and not the prefix and postfix
 		
 		-od, --output-dc	Output in DOSCenter format
 			Add outputting the created DAT to DOSCenter format
@@ -421,12 +455,6 @@ Options:
 				Instead of outputting the game or rom name, output the SHA-1 of the files
 				instead. This requires the source DAT to have SHA-1 hashes.
 			
-			-tsv, --tsv			Output in Tab-Separated Value format
-				Output all rom information in standardized TSV format
-			
-			-csv, --csv			Output in Comma-Separated Value format
-				Output all rom information in standardized CSV format
-			
 		-omd5, --output-md5	Output in MD5 format
 			Add outputting the created DAT to MD5 format
 			
@@ -456,6 +484,26 @@ Options:
 			
 		-osl, --output-sl	Output in Software List format
 			Add outputting the created DAT to Software List XML format
+			
+		-otsv, --output-tsv	Output in Tab-Separated Value format
+			Add outputting the created DAT to standardized TSV format
+			
+			-pre=, --prefix=		Set prefix for all lines
+				Set a generic prefix to be prepended to all outputted lines
+				
+			-post=, --postfix=		Set postfix for all lines
+				Set a generic postfix to be appended to all outputted lines
+				
+				Both prefix and postfix can use one of the following special strings:
+					- %game% - Replaced with the Game/Machine name
+					- %name% - Replaced with the Rom name
+					- %crc% - Replaced with the CRC
+					- %md5% - Replaced with the MD5
+					- %sha1% - Replaced with the SHA-1
+					- %size% - Replaced with the size
+			
+			-q, --quotes			Put double-quotes around each item
+				This quotes only the item and not the prefix and postfix
 			
 		-ox, -output-xml	Output in Logiqx XML format (default)
 			Add outputting the created DAT to Logiqx XML format

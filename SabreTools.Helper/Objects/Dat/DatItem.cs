@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Web;
 
 namespace SabreTools.Helper
 {
@@ -808,11 +809,11 @@ namespace SabreTools.Helper
 							{
 								if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type == ItemType.Rom || y.Type == ItemType.Disk))
 								{
-									if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
+									if (Path.GetDirectoryName(HttpUtility.HtmlEncode(x.Name)) == Path.GetDirectoryName(HttpUtility.HtmlEncode(y.Name)))
 									{
-										return nc.Compare(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
+										return nc.Compare(Path.GetFileName(HttpUtility.HtmlEncode(x.Name)), Path.GetFileName(HttpUtility.HtmlEncode(y.Name)));
 									}
-									return nc.Compare(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
+									return nc.Compare(Path.GetDirectoryName(HttpUtility.HtmlEncode(x.Name)), Path.GetDirectoryName(HttpUtility.HtmlEncode(y.Name)));
 								}
 								else if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type != ItemType.Rom && y.Type != ItemType.Disk))
 								{

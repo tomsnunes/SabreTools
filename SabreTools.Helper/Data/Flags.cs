@@ -25,17 +25,21 @@ namespace SabreTools.Helper
 	[Flags]
 	public enum OutputFormat
 	{
-		Logiqx = 0x001,
-		ClrMamePro = 0x002,
-		RomCenter = 0x004,
-		DOSCenter = 0x008,
-		MissFile = 0x010,
-		SabreDat = 0x020,
-		RedumpMD5 = 0x040,
-		RedumpSHA1 = 0x080,
-		RedumpSFV = 0x100,
-		SoftwareList = 0x200,
-		OfflineList = 0x400,
+		Logiqx = 0x0001,
+		ClrMamePro = 0x0002,
+		RomCenter = 0x0004,
+		DOSCenter = 0x0008,
+		MissFile = 0x0010,
+		SabreDat = 0x0020,
+		RedumpMD5 = 0x0040,
+		RedumpSHA1 = 0x0080,
+		RedumpSFV = 0x0100,
+		SoftwareList = 0x0200,
+		OfflineList = 0x0400,
+		TSV = 0x0800,
+		CSV = 0x1000,
+
+		ALL = 0xFFFF,
 	}
 
 	/// <summary>

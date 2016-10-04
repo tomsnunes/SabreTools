@@ -173,6 +173,12 @@ namespace SabreTools.Helper
 				outfileNames.Add(OutputFormat.ClrMamePro, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
 			};
 
+			// CSV
+			if ((datdata.OutputFormat & OutputFormat.CSV) != 0)
+			{
+				outfileNames.Add(OutputFormat.CSV, CreateOutfileNamesHelper(outDir, ".csv", datdata, overwrite));
+			};
+
 			// DOSCenter
 			if ((datdata.OutputFormat & OutputFormat.DOSCenter) != 0
 				&& (datdata.OutputFormat & OutputFormat.ClrMamePro) == 0
@@ -185,6 +191,12 @@ namespace SabreTools.Helper
 					|| (datdata.OutputFormat & OutputFormat.RomCenter) != 0))
 			{
 				outfileNames.Add(OutputFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", datdata, overwrite));
+			};
+
+			// Logiqx XML
+			if ((datdata.OutputFormat & OutputFormat.Logiqx) != 0)
+			{
+				outfileNames.Add(OutputFormat.Logiqx, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
 			};
 
 			// Missfile
@@ -263,10 +275,10 @@ namespace SabreTools.Helper
 				outfileNames.Add(OutputFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".sl.xml", datdata, overwrite));
 			}
 
-			// Logiqx XML
-			if ((datdata.OutputFormat & OutputFormat.Logiqx) != 0)
+			// TSV
+			if ((datdata.OutputFormat & OutputFormat.TSV) != 0)
 			{
-				outfileNames.Add(OutputFormat.Logiqx, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
+				outfileNames.Add(OutputFormat.TSV, CreateOutfileNamesHelper(outDir, ".tsv", datdata, overwrite));
 			};
 
 			return outfileNames;
