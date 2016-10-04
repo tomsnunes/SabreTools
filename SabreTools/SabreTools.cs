@@ -94,39 +94,39 @@ namespace SabreTools
 				seq = -1;
 			OutputFormat outputFormat = 0x0;
 			StatOutputFormat statOutputFormat = StatOutputFormat.None;
-			string addext = null,
+			string addext = "",
 				author = null,
 				category = null,
 				comment = null,
-				crc = null,
-				currentAllMerged = null,
-				currentMissingMerged = null,
-				currentNewMerged = null,
+				crc = "",
+				currentAllMerged = "",
+				currentMissingMerged = "",
+				currentNewMerged = "",
 				date = null,
 				description = null,
 				email = null,
-				exta = null,
-				extb = null,
+				exta = "",
+				extb = "",
 				filename = null,
-				forcemerge = null,
-				forcend = null,
-				forcepack = null,
-				gamename = null,
+				forcemerge = "",
+				forcend = "",
+				forcepack = "",
+				gamename = "",
 				header = null,
-				homepage = null,
+				homepage = "",
 				name = null,
-				md5 = null,
-				outDir = null,
-				postfix = null,
-				prefix = null,
-				repext = null,
-				romname = null,
-				romtype = null,
-				root = null,
+				md5 = "",
+				outDir = "",
+				postfix = "",
+				prefix = "",
+				repext = "",
+				romname = "",
+				romtype = "",
+				root = "",
 				rootdir = null,
-				sha1 = null,
-				status = null,
-				tempDir = null,
+				sha1 = "",
+				status = "",
+				tempDir = "",
 				url = null,
 				version = null;
 			List<string> inputs = new List<string>();
@@ -357,163 +357,163 @@ namespace SabreTools
 
 						if (temparg.StartsWith("-ae=") || temparg.StartsWith("--add-ext="))
 						{
-							addext = temparg.Split('=')[1];
+							addext = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-au=") || temparg.StartsWith("--author="))
 						{
-							author = temparg.Split('=')[1];
+							author = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-ca=") || temparg.StartsWith("--category="))
 						{
-							category = temparg.Split('=')[1];
+							category = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-co=") || temparg.StartsWith("--comment="))
 						{
-							comment = temparg.Split('=')[1];
+							comment = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-com=") || temparg.StartsWith("--com="))
 						{
-							currentAllMerged = temparg.Split('=')[1];
+							currentAllMerged = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-crc=") || temparg.StartsWith("--crc="))
 						{
-							crc = temparg.Split('=')[1];
+							crc = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-da=") || temparg.StartsWith("--date="))
 						{
-							date = temparg.Split('=')[1];
+							date = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-de=") || temparg.StartsWith("--desc="))
 						{
-							description = temparg.Split('=')[1];
+							description = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-em=") || temparg.StartsWith("--email="))
 						{
-							email = temparg.Split('=')[1];
+							email = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-exta="))
 						{
-							exta = temparg.Split('=')[1];
+							exta = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-extb="))
 						{
-							extb = temparg.Split('=')[1];
+							extb = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-f=") || temparg.StartsWith("--filename="))
 						{
-							filename = temparg.Split('=')[1];
+							filename = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-fix=") || temparg.StartsWith("--fix="))
 						{
-							currentMissingMerged = temparg.Split('=')[1];
+							currentMissingMerged = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-fm=") || temparg.StartsWith("--forcemerge="))
 						{
-							forcemerge = temparg.Split('=')[1];
+							forcemerge = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-fn=") || temparg.StartsWith("--forcend="))
 						{
-							forcend = temparg.Split('=')[1];
+							forcend = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-fp=") || temparg.StartsWith("--forcepack="))
 						{
-							forcepack = temparg.Split('=')[1];
+							forcepack = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-gn=") || temparg.StartsWith("--game-name="))
 						{
-							gamename = temparg.Split('=')[1];
+							gamename = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-h=") || temparg.StartsWith("--header="))
 						{
-							header = temparg.Split('=')[1];
+							header = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-hp=") || temparg.StartsWith("--homepage="))
 						{
-							homepage = temparg.Split('=')[1];
+							homepage = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-input="))
 						{
-							inputs.Add(temparg.Split('=')[1]);
+							inputs.Add(temparg.Split('=')[1] ?? "");
 						}
 						else if (temparg.StartsWith("-is=") || temparg.StartsWith("--status="))
 						{
-							status = temparg.Split('=')[1];
+							status = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-md5=") || temparg.StartsWith("--md5="))
 						{
-							md5 = temparg.Split('=')[1];
+							md5 = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-mt=") || temparg.StartsWith("--mt="))
 						{
-							Int32.TryParse(temparg.Split('=')[1], out maxParallelism);
+							Int32.TryParse(temparg.Split('=')[1] ?? "", out maxParallelism);
 						}
 						else if (temparg.StartsWith("-n=") || temparg.StartsWith("--name="))
 						{
-							name = temparg.Split('=')[1];
+							name = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-new=") || temparg.StartsWith("--new="))
 						{
-							currentNewMerged = temparg.Split('=')[1];
+							currentNewMerged = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-out=") || temparg.StartsWith("--out="))
 						{
-							outDir = temparg.Split('=')[1];
+							outDir = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-post=") || temparg.StartsWith("--postfix="))
 						{
-							postfix = temparg.Split('=')[1];
+							postfix = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-pre=") || temparg.StartsWith("--prefix="))
 						{
-							prefix = temparg.Split('=')[1];
+							prefix = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-r=") || temparg.StartsWith("--root="))
 						{
-							rootdir = temparg.Split('=')[1];
+							rootdir = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-rd=") || temparg.StartsWith("--root-dir="))
 						{
-							root = temparg.Split('=')[1];
+							root = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-re=") || temparg.StartsWith("--rep-ext="))
 						{
-							repext = temparg.Split('=')[1];
+							repext = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-rn=") || temparg.StartsWith("--rom-name="))
 						{
-							romname = temparg.Split('=')[1];
+							romname = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-rt=") || temparg.StartsWith("--rom-type="))
 						{
-							romtype = temparg.Split('=')[1];
+							romtype = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-seq=") || temparg.StartsWith("--equal="))
 						{
-							seq = GetSizeFromString(temparg.Split('=')[1]);
+							seq = GetSizeFromString(temparg.Split('=')[1] ?? "");
 						}
 						else if (temparg.StartsWith("-sgt=") || temparg.StartsWith("--greater="))
 						{
-							sgt = GetSizeFromString(temparg.Split('=')[1]);
+							sgt = GetSizeFromString(temparg.Split('=')[1] ?? "");
 						}
 						else if (temparg.StartsWith("-sha1=") || temparg.StartsWith("--sha1="))
 						{
-							sha1 = temparg.Split('=')[1];
+							sha1 = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-slt=") || temparg.StartsWith("--less="))
 						{
-							slt = GetSizeFromString(temparg.Split('=')[1]);
+							slt = GetSizeFromString(temparg.Split('=')[1] ?? "");
 						}
 						else if (temparg.StartsWith("-t=") || temparg.StartsWith("--temp="))
 						{
-							tempDir = temparg.Split('=')[1];
+							tempDir = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-u=") || temparg.StartsWith("-url=") || temparg.StartsWith("--url="))
 						{
-							url = temparg.Split('=')[1];
+							url = temparg.Split('=')[1] ?? "";
 						}
 						else if (temparg.StartsWith("-v=") || temparg.StartsWith("--version="))
 						{
-							version = temparg.Split('=')[1];
+							version = temparg.Split('=')[1] ?? "";
 						}
 						else if (File.Exists(temparg) || Directory.Exists(temparg))
 						{

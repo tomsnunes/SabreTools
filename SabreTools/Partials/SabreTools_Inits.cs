@@ -97,7 +97,7 @@ namespace SabreTools
 			int maxDegreeOfParallelism)
 		{
 			ForcePacking fp = ForcePacking.None;
-			switch (forcepack.ToLowerInvariant())
+			switch (forcepack?.ToLowerInvariant())
 			{
 				case "none":
 				default:
@@ -474,7 +474,7 @@ namespace SabreTools
 		{
 			// Set the special flags
 			ForceMerging fm = ForceMerging.None;
-			switch (forcemerge.ToLowerInvariant())
+			switch (forcemerge?.ToLowerInvariant())
 			{
 				case "none":
 				default:
@@ -489,7 +489,7 @@ namespace SabreTools
 			}
 
 			ForceNodump fn = ForceNodump.None;
-			switch (forcend.ToLowerInvariant())
+			switch (forcend?.ToLowerInvariant())
 			{
 				case "none":
 				default:
@@ -507,7 +507,7 @@ namespace SabreTools
 			}
 
 			ForcePacking fp = ForcePacking.None;
-			switch (forcepack.ToLowerInvariant())
+			switch (forcepack?.ToLowerInvariant())
 			{
 				case "none":
 				default:
@@ -523,7 +523,7 @@ namespace SabreTools
 
 			// Set the status flag for filtering
 			ItemStatus itemStatus = ItemStatus.NULL;
-			switch(status.ToLowerInvariant())
+			switch(status?.ToLowerInvariant())
 			{
 				case "none":
 					itemStatus = ItemStatus.None;
