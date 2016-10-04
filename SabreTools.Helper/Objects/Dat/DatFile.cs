@@ -1402,7 +1402,7 @@ namespace SabreTools.Helper
 								continue;
 							}
 							// Special cases for item statuses
-							else if (gc[i] == "baddump" && attrib != "status" && attrib != "flags")
+							else if (gc[i] == "baddump" && attrib != "name" && attrib != "status" && attrib != "flags")
 							{
 								if (item.Type == ItemType.Rom)
 								{
@@ -1413,7 +1413,7 @@ namespace SabreTools.Helper
 									((Disk)item).ItemStatus = ItemStatus.BadDump;
 								}
 							}
-							else if (gc[i] == "nodump" && attrib != "status" && attrib != "flags")
+							else if (gc[i] == "nodump" && attrib != "name" && attrib != "status" && attrib != "flags")
 							{
 								if (item.Type == ItemType.Rom)
 								{
