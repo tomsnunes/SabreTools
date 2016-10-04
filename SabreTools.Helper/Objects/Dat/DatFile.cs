@@ -1401,7 +1401,8 @@ namespace SabreTools.Helper
 							{
 								continue;
 							}
-							// Special cases for item statuses
+
+							// Special cases for standalone item statuses
 							else if (gc[i] == "baddump" && attrib != "name" && attrib != "status" && attrib != "flags")
 							{
 								if (item.Type == ItemType.Rom)
@@ -1411,6 +1412,17 @@ namespace SabreTools.Helper
 								else if (item.Type == ItemType.Disk)
 								{
 									((Disk)item).ItemStatus = ItemStatus.BadDump;
+								}
+							}
+							else if (gc[i] == "good" && attrib != "name" && attrib != "status" && attrib != "flags")
+							{
+								if (item.Type == ItemType.Rom)
+								{
+									((Rom)item).ItemStatus = ItemStatus.Good;
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									((Disk)item).ItemStatus = ItemStatus.Good;
 								}
 							}
 							else if (gc[i] == "nodump" && attrib != "name" && attrib != "status" && attrib != "flags")
@@ -1424,6 +1436,18 @@ namespace SabreTools.Helper
 									((Disk)item).ItemStatus = ItemStatus.Nodump;
 								}
 							}
+							else if (gc[i] == "verified" && attrib != "name" && attrib != "status" && attrib != "flags")
+							{
+								if (item.Type == ItemType.Rom)
+								{
+									((Rom)item).ItemStatus = ItemStatus.Verified;
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									((Disk)item).ItemStatus = ItemStatus.Verified;
+								}
+							}
+
 							// Even number of quotes, not in a quote, not in attribute
 							else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib == "")
 							{
