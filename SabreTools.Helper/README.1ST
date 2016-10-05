@@ -715,7 +715,8 @@ Options:
 	-c, --convert		Enable conversion of input files to TGZ
 		This allows conversion of a folder or set of folders to TorrentGZ format without
 		requiring a DAT to rebuild from. It is only useful in a small amount of situations at
-		the present, but it is mostly meant for Romba compatibility at the present.
+		the present, but it is mostly meant for Romba compatibility at the present. If a DAT
+		is supplied, then files NOT matching the DAT will be written out only.
 		
 	-tzip				Enable TorrentZip output
 		Instead of outputting the files to standard ZIP archives, files will be rebuilt to
