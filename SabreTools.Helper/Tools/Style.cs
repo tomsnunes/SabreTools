@@ -429,6 +429,18 @@ namespace SabreTools.Helper
 			return (s.Any(c => c > 255));
 		}
 
+		/// <summary>
+		/// Remove all chars that are considered path unsafe
+		/// </summary>
+		/// <param name="s">Input string to clean</param>
+		/// <returns>Cleaned string</returns>
+		public static string RemovePathUnsafeCharacters(string s)
+		{
+			List<char> invalidPath = Path.GetInvalidPathChars().ToList();
+			List<char> invalidName = Path.GetInvalidFileNameChars().ToList();
+			return new string(s.Where(c => !invalidPath.Contains(c) && !invalidName.Contains(c)).ToArray());
+		}
+
 		#endregion
 
 		#region Externally sourced methods

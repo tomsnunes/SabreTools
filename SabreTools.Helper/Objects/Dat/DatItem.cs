@@ -809,11 +809,11 @@ namespace SabreTools.Helper
 							{
 								if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type == ItemType.Rom || y.Type == ItemType.Disk))
 								{
-									if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
+									if (Path.GetDirectoryName(Style.RemovePathUnsafeCharacters(x.Name)) == Path.GetDirectoryName(Style.RemovePathUnsafeCharacters(y.Name)))
 									{
-										return nc.Compare(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
+										return nc.Compare(Path.GetFileName(Style.RemovePathUnsafeCharacters(x.Name)), Path.GetFileName(Style.RemovePathUnsafeCharacters(y.Name)));
 									}
-									return nc.Compare(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
+									return nc.Compare(Path.GetDirectoryName(Style.RemovePathUnsafeCharacters(x.Name)), Path.GetDirectoryName(Style.RemovePathUnsafeCharacters(y.Name)));
 								}
 								else if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type != ItemType.Rom && y.Type != ItemType.Disk))
 								{
