@@ -3852,7 +3852,7 @@ namespace SabreTools.Helper
 
 						foreach (Tuple<string, string> kvp in rom.Infos)
 						{
-							state += "\t\t<info name=\"" + kvp.Item1 + "\" value=\"" + kvp.Item2 + "\" />\n";
+							state += "\t\t<info name=\"" + HttpUtility.HtmlEncode(kvp.Item1) + "\" value=\"" + HttpUtility.HtmlEncode(kvp.Item2) + "\" />\n";
 						}
 						break;
 				}
@@ -4435,7 +4435,7 @@ namespace SabreTools.Helper
 
 						foreach (Tuple<string, string> kvp in rom.Features)
 						{
-							state += "\t\t\t<feature name=\"" + kvp.Item1 + "\" value=\"" + kvp.Item2 + "\"/>\n";
+							state += "\t\t\t<feature name=\"" + HttpUtility.HtmlEncode(kvp.Item1) + "\" value=\"" + HttpUtility.HtmlEncode(kvp.Item2) + "\"/>\n";
 						}
 
 						switch (rom.Type)
