@@ -106,7 +106,7 @@ namespace SabreTools.Helper
 					{
 						return OutputFormat.SabreDat;
 					}
-					else if (second.StartsWith("<dat"))
+					else if (second.StartsWith("<dat") && !second.StartsWith("<datafile"))
 					{
 						return OutputFormat.OfflineList;
 					}
