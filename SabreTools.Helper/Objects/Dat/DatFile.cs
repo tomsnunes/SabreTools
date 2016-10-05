@@ -4647,7 +4647,7 @@ namespace SabreTools.Helper
 							footer += "\t</data>\n</datafile>\n";
 							break;
 						case OutputFormat.SoftwareList:
-							footer = "\t\t</part>\n\t</software>\n\n</softwarelist>\n";
+							footer = "\t</software>\n\n</softwarelist>\n";
 							break;
 					}
 				}
