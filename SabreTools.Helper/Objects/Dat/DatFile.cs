@@ -3852,7 +3852,7 @@ namespace SabreTools.Helper
 
 						foreach (Tuple<string, string> kvp in rom.Infos)
 						{
-							state += "\t\t<info name=\"" + kvp.Item1 + "\" value=\"" + kvp.Item2 + "\">\n";
+							state += "\t\t<info name=\"" + kvp.Item1 + "\" value=\"" + kvp.Item2 + "\" />\n";
 						}
 						break;
 				}
@@ -3933,7 +3933,7 @@ namespace SabreTools.Helper
 						}
 						break;
 					case OutputFormat.SoftwareList:
-						state += "\t\t</part>\n\t</software>\n\n";
+						state += "\t</software>\n\n";
 						break;
 				}
 
@@ -4502,6 +4502,8 @@ namespace SabreTools.Helper
 									+ "\t\t\t</dataarea>\n";
 								break;
 						}
+
+						state += "\t\t</part>\n";
 						break;
 					case OutputFormat.TSV:
 						// TSV should only output Rom and Disk
