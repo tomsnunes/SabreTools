@@ -437,8 +437,7 @@ namespace SabreTools.Helper
 		public static string RemovePathUnsafeCharacters(string s)
 		{
 			List<char> invalidPath = Path.GetInvalidPathChars().ToList();
-			List<char> invalidName = Path.GetInvalidFileNameChars().ToList();
-			return new string(s.Where(c => !invalidPath.Contains(c) && !invalidName.Contains(c)).ToArray());
+			return new string(s.Where(c => !invalidPath.Contains(c)).ToArray());
 		}
 
 		#endregion
