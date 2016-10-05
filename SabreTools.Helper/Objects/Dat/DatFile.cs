@@ -3594,14 +3594,14 @@ namespace SabreTools.Helper
 						header = "clrmamepro (\n" +
 							"\tname \"" + Name + "\"\n" +
 							"\tdescription \"" + Description + "\"\n" +
-							"\tcategory \"" + Category + "\"\n" +
+							(!String.IsNullOrEmpty(Category) ? "\tcategory \"" + Category + "\"\n" : "") +
 							"\tversion \"" + Version + "\"\n" +
-							"\tdate \"" + Date + "\"\n" +
+							(!String.IsNullOrEmpty(Date) ? "\tdate \"" + Date + "\"\n" : "") +
 							"\tauthor \"" + Author + "\"\n" +
-							"\temail \"" + Email + "\"\n" +
-							"\thomepage \"" + Homepage + "\"\n" +
-							"\turl \"" + Url + "\"\n" +
-							"\tcomment \"" + Comment + "\"\n" +
+							(!String.IsNullOrEmpty(Email) ? "\temail \"" + Email + "\"\n" : "") +
+							(!String.IsNullOrEmpty(Homepage) ? "\thomepage \"" + Homepage + "\"\n" : "") +
+							(!String.IsNullOrEmpty(Url) ? "\turl \"" + Url + "\"\n" : "") +
+							(!String.IsNullOrEmpty(Comment) ? "\tcomment \"" + Comment + "\"\n" : "") +
 							(ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
 							(ForcePacking == ForcePacking.Zip ? "\tforcezipping yes\n" : "") +
 							(ForceMerging == ForceMerging.Full ? "\tforcemerging full\n" : "") +
