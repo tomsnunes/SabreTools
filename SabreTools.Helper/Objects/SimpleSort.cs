@@ -1035,7 +1035,7 @@ namespace SabreTools.Helper
 					if (_datdata != null && _datdata.Files.Count > 0)
 					{
 						Rom rom = FileTools.GetFileInfo(input, _logger);
-						if (rom.GetDuplicates(_datdata, _logger).Count > 0)
+						if (rom.HasDuplicates(_datdata, _logger))
 						{
 							_logger.User("File '" + input + "' existed in the DAT, skipping...");
 							continue;
@@ -1062,7 +1062,7 @@ namespace SabreTools.Helper
 							if (_datdata != null && _datdata.Files.Count > 0)
 							{
 								Rom rom = FileTools.GetFileInfo(file, _logger);
-								if (rom.GetDuplicates(_datdata, _logger).Count > 0)
+								if (rom.HasDuplicates(_datdata, _logger))
 								{
 									_logger.User("File '" + file + "' existed in the DAT, skipping...");
 									continue;

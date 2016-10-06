@@ -607,6 +607,78 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Check if a DAT contains the given rom
+		/// </summary>
+		/// <param name="datdata">Dat to match against</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>True if it contains the rom, false otherwise</returns>
+		public bool HasDuplicates(DatFile datdata, Logger logger)
+		{
+			// Check for an empty rom list first
+			if (datdata.Files == null || datdata.Files.Count == 0)
+			{
+				return false;
+			}
+
+			// Get the correct dictionary based on what is available
+			string key = "";
+			if (_itemType == ItemType.Rom && ((Rom)this).CRC != null)
+			{
+				key = ((Rom)this).CRC;
+				datdata.BucketByCRC(false, logger, false);
+			}
+			else if (_itemType == ItemType.Rom && ((Rom)this).MD5 != null)
+			{
+				key = ((Rom)this).MD5;
+				datdata.BucketByMD5(false, logger, false);
+			}
+			else if (_itemType == ItemType.Disk && ((Disk)this).MD5 != null)
+			{
+				key = ((Disk)this).MD5;
+				datdata.BucketByMD5(false, logger, false);
+			}
+			else if (_itemType == ItemType.Rom && ((Rom)this).SHA1 != null)
+			{
+				key = ((Rom)this).SHA1;
+				datdata.BucketBySHA1(false, logger, false);
+			}
+			else if (_itemType == ItemType.Disk && ((Disk)this).SHA1 != null)
+			{
+				key = ((Disk)this).SHA1;
+				datdata.BucketBySHA1(false, logger, false);
+			}
+			else if (_itemType == ItemType.Rom)
+			{
+				key = ((Rom)this).Size.ToString();
+				datdata.BucketBySize(false, logger, false);
+			}
+			else
+			{
+				key = "-1";
+				datdata.BucketBySize(false, logger, false);
+			}
+
+			// If the key doesn't exist, return the empty list
+			if (!datdata.Files.ContainsKey(key))
+			{
+				return false;
+			}
+
+			// Try to find duplicates
+			List<DatItem> roms = datdata.Files[key];
+
+			foreach (DatItem rom in roms)
+			{
+				if (IsDuplicate(rom, logger))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// List all duplicates found in a DAT based on a rom
 		/// </summary>
 		/// <param name="datdata">Dat to match against</param>
