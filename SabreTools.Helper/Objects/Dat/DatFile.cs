@@ -1664,6 +1664,43 @@ namespace SabreTools.Helper
 								}
 							}
 
+							// Special cases for DOSCenter DATs only
+							else if (line.Trim().StartsWith("file ("))
+							{
+								// If we have a properly formed line...
+								if (gc[i] == "name")
+								{
+									// Advance to the first part of the name
+									i++;
+									item.Name = gc[i];
+
+									// Advance to the next item, adding until we find "size"
+									i++;
+									while (gc[i] != "size")
+									{
+										item.Name += " " + gc[i];
+										i++;
+									}
+
+									// Advance to the size and process it
+									i++;
+									long tempsize = -1;
+									if (!Int64.TryParse(gc[i], out tempsize))
+									{
+										tempsize = 0;
+									}
+									((Rom)item).Size = tempsize;
+
+									// Advance to the date and add it
+									i += 2;
+									((Rom)item).Date = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
+
+									// Advance to the CRC and add it
+									i += 3;
+									((Rom)item).CRC = gc[i].Replace("\"", "").ToLowerInvariant();
+								}
+							}
+
 							// Even number of quotes, not in a quote, not in attribute
 							else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib == "")
 							{
@@ -1987,15 +2024,15 @@ namespace SabreTools.Helper
 					{
 						string itemval = gc[2].Value.Replace("\"", "");
 
-						if (line.StartsWith("Name:"))
+						if (line.Trim().StartsWith("Name:"))
 						{
-							Name = (String.IsNullOrEmpty(Name) ? line.Remove(5) : Name);
+							Name = (String.IsNullOrEmpty(Name) ? line.Substring(6) : Name);
 							superdat = superdat || itemval.Contains(" - SuperDAT");
 							if (keep && superdat)
 							{
 								Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
 							}
-							break;
+							continue;
 						}
 
 						switch (gc[1].Value)
@@ -3849,13 +3886,13 @@ namespace SabreTools.Helper
 						break;
 					case OutputFormat.DOSCenter:
 						header = "DOSCenter (\n" +
-							"Name: " + Name + "\n" +
-							"Description: " + Description + "\n" +
-							"Version: " + Version + "\n" +
-							"Date: " + Date + "\n" +
-							"Author: " + Author + "\n" +
-							"Homepage: " + Homepage + "\n" +
-							"Comment: " + Comment + "\n" +
+							"\tName: " + Name + "\n" +
+							"\tDescription: " + Description + "\n" +
+							"\tVersion: " + Version + "\n" +
+							"\tDate: " + Date + "\n" +
+							"\tAuthor: " + Author + "\n" +
+							"\tHomepage: " + Homepage + "\n" +
+							"\tComment: " + Comment + "\n" +
 							")\n";
 						break;
 					case OutputFormat.Logiqx:
