@@ -197,7 +197,7 @@ namespace SabreTools
 			// If we are converting the folder to TGZ
 			else if (convert)
 			{
-				InitConvertFolderTGZ(inputs, outDir, tempDir, delete, romba, sevenzip, gz, rar, zip, logger);
+				InitConvertFolderTGZ(datfiles, inputs, outDir, tempDir, delete, romba, sevenzip, gz, rar, zip, logger);
 			}
 
 			// If we are doing a simple sort
@@ -225,6 +225,55 @@ namespace SabreTools
 
 			logger.Close();
 			return;
+		}
+
+		/// <summary>
+		/// Wrap converting a folder to TGZ, optionally filtering by an input DAT(s)
+		/// </summary>
+		/// <param name="datfiles">Names of the DATs to compare against</param>
+		/// <param name="inputs">List of all inputted files and folders</param>
+		/// <param name="outDir">Output directory (empty for default directory)</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
+		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
+		/// <param name="gz">Integer representing the archive handling level for GZip</param>
+		/// <param name="rar">Integer representing the archive handling level for RAR</param>
+		/// <param name="zip">Integer representing the archive handling level for Zip</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		public static bool InitConvertFolderTGZ(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool delete,
+			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
+		{
+			// Add all of the input DATs into one huge internal DAT
+			DatFile datdata = new DatFile();
+			foreach (string datfile in datfiles)
+			{
+				datdata.Parse(datfile, 99, 99, logger, keep: true, softlist: true);
+			}
+
+			// Get the archive scanning level
+			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
+
+			// Get all individual files from the inputs
+			List<string> newinputs = new List<string>();
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					newinputs.Add(Path.GetFullPath(input));
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						newinputs.Add(Path.GetFullPath(file));
+					}
+				}
+			}
+
+			SimpleSort ss = new SimpleSort(datdata, newinputs, outDir, tempDir, false, false, false,
+				delete, false, romba, asl, false, logger);
+			return ss.Convert();
 		}
 
 		/// <summary>
@@ -262,47 +311,6 @@ namespace SabreTools
 			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
 				delete, torrentX, romba, asl, updateDat, logger);
 			ss.StartProcessing();
-		}
-
-		/// <summary>
-		/// Wrap sorting files using an input DAT
-		/// </summary>
-		/// <param name="inputs">List of all inputted files and folders</param>
-		/// <param name="outDir">Output directory (empty for default directory)</param>
-		/// <param name="tempDir">Temporary directory for archive extraction</param>
-		/// <param name="delete">True if input files should be deleted, false otherwise</param>
-		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
-		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
-		/// <param name="gz">Integer representing the archive handling level for GZip</param>
-		/// <param name="rar">Integer representing the archive handling level for RAR</param>
-		/// <param name="zip">Integer representing the archive handling level for Zip</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		public static bool InitConvertFolderTGZ(List<string> inputs, string outDir, string tempDir, bool delete,
-			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
-		{
-			// Get the archive scanning level
-			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
-
-			// Get all individual files from the inputs
-			List<string> newinputs = new List<string>();
-			foreach (string input in inputs)
-			{
-				if (File.Exists(input))
-				{
-					newinputs.Add(Path.GetFullPath(input));
-				}
-				else if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-					{
-						newinputs.Add(Path.GetFullPath(file));
-					}
-				}
-			}
-
-			SimpleSort ss = new SimpleSort(new DatFile(), newinputs, outDir, tempDir, false, false, false,
-				delete, false, romba, asl, false, logger);
-			return ss.Convert();
 		}
 	}
 }

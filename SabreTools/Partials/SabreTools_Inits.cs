@@ -12,8 +12,9 @@ namespace SabreTools
 		#region Init Methods
 
 		/// <summary>
-		/// Wrap sorting files using an input DAT
+		/// Wrap converting a folder to TGZ, optionally filtering by an input DAT(s)
 		/// </summary>
+		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">List of all inputted files and folders</param>
 		/// <param name="outDir">Output directory (empty for default directory)</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
@@ -24,10 +25,17 @@ namespace SabreTools
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public static bool InitConvertFolderTGZ(List<string> inputs, string outDir, string tempDir, bool delete,
+		public static bool InitConvertFolderTGZ(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool delete,
 			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
-			// Get the archive scanning levels
+			// Add all of the input DATs into one huge internal DAT
+			DatFile datdata = new DatFile();
+			foreach (string datfile in datfiles)
+			{
+				datdata.Parse(datfile, 99, 99, logger, keep: true, softlist: true);
+			}
+
+			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
 
 			// Get all individual files from the inputs
@@ -47,7 +55,8 @@ namespace SabreTools
 				}
 			}
 
-			SimpleSort ss = new SimpleSort(new DatFile(), newinputs, outDir, tempDir, false, false, false, delete, false, romba, asl, false, logger);
+			SimpleSort ss = new SimpleSort(datdata, newinputs, outDir, tempDir, false, false, false,
+				delete, false, romba, asl, false, logger);
 			return ss.Convert();
 		}
 
@@ -298,7 +307,7 @@ namespace SabreTools
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, logger);
+				datdata.Parse(datfile, 99, 99, logger, keep: true, softlist: true);
 			}
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
