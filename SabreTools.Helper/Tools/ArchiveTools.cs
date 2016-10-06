@@ -1043,8 +1043,14 @@ namespace SabreTools.Helper
 			// Now get the Rom info for the file so we have hashes and size
 			Rom rom = FileTools.GetFileInfo(input, logger);
 
-			// If it doesn't exist, create the output file and then write
+			// Get the output file name
 			string outfile = Path.Combine(outDir, rom.SHA1 + ".gz");
+
+			// If the output file exists, don't try to write again
+			if (File.Exists(outfile))
+			{
+				return true;
+			}
 
 			// Compress the input stream
 			FileStream inputStream = File.OpenRead(input);
