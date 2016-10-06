@@ -1667,37 +1667,52 @@ namespace SabreTools.Helper
 							// Special cases for DOSCenter DATs only
 							else if (line.Trim().StartsWith("file ("))
 							{
-								// If we have a properly formed line...
-								if (gc[i] == "name")
+								// Loop over the specifics
+								for (int j = i; j < gc.Length; j++)
 								{
-									// Advance to the first part of the name
-									i++;
-									item.Name = gc[i];
-
-									// Advance to the next item, adding until we find "size"
-									i++;
-									while (gc[i] != "size")
+									// Names are not quoted, for some stupid reason
+									if (gc[j] == "name")
 									{
-										item.Name += " " + gc[i];
-										i++;
+										// Advance to the first part of the name
+										j++;
+										item.Name = gc[j];
+
+										// Advance to the next item, adding until we find "size"
+										j++;
+										while (j < gc.Length && gc[j] != "size" && gc[j] != "date" && gc[j] != "crc")
+										{
+											item.Name += " " + gc[j];
+											j++;
+										}
 									}
 
-									// Advance to the size and process it
-									i++;
-									long tempsize = -1;
-									if (!Int64.TryParse(gc[i], out tempsize))
+									// Get the size from the next part
+									else if (gc[j] == "size")
 									{
-										tempsize = 0;
+										j++;
+										long tempsize = -1;
+										if (!Int64.TryParse(gc[j], out tempsize))
+										{
+											tempsize = 0;
+										}
+										((Rom)item).Size = tempsize;
+										j++;
 									}
-									((Rom)item).Size = tempsize;
 
-									// Advance to the date and add it
-									i += 2;
-									((Rom)item).Date = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
+									// Get the date from the next part
+									else if (gc[j] == "date")
+									{
+										j++;
+										((Rom)item).Date = gc[j].Replace("\"", "") + " " + gc[j + 1].Replace("\"", "");
+										j += 3;
+									}
 
-									// Advance to the CRC and add it
-									i += 3;
-									((Rom)item).CRC = gc[i].Replace("\"", "").ToLowerInvariant();
+									// Get the CRC from the next part
+									else if (gc[j] == "crc")
+									{
+										j++;
+										((Rom)item).CRC = gc[j].Replace("\"", "").ToLowerInvariant();
+									}
 								}
 							}
 
