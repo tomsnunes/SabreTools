@@ -244,17 +244,23 @@ namespace SabreTools
 		public static bool InitConvertFolderTGZ(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool delete,
 			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
+			// Get the archive scanning level
+			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
+
+			DateTime start = DateTime.Now;
+			logger.User("Populating internal DAT...");
+
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
 				datdata.Parse(datfile, 99, 99, logger, keep: true, softlist: true);
 			}
-
-			// Get the archive scanning level
-			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
+			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Get all individual files from the inputs
+			start = DateTime.Now;
+			logger.User("Organizing input files...");
 			List<string> newinputs = new List<string>();
 			foreach (string input in inputs)
 			{
@@ -270,6 +276,7 @@ namespace SabreTools
 					}
 				}
 			}
+			logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			SimpleSort ss = new SimpleSort(datdata, newinputs, outDir, tempDir, false, false, false,
 				delete, false, romba, asl, false, logger);
@@ -301,12 +308,16 @@ namespace SabreTools
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
 
+			DateTime start = DateTime.Now;
+			logger.User("Populating internal DAT...");
+
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
 				datdata.Parse(datfile, 99, 99, logger, keep: true, softlist: true);
 			}
+			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
 				delete, torrentX, romba, asl, updateDat, logger);
