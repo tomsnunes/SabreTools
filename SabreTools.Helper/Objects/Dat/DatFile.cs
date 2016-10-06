@@ -308,7 +308,7 @@ namespace SabreTools.Helper
 				Files = sortable;
 			}
 
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by game");
 
 			// Process each all of the roms
 			List<string> keys = Files.Keys.ToList();
@@ -392,7 +392,7 @@ namespace SabreTools.Helper
 				Files = sortable;
 			}
 
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by size");
 
 			// Process each all of the roms
 			List<string> keys = Files.Keys.ToList();
@@ -469,7 +469,7 @@ namespace SabreTools.Helper
 				Files = sortable;
 			}
 
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by CRC");
 
 			// Process each all of the roms
 			List<string> keys = Files.Keys.ToList();
@@ -546,7 +546,7 @@ namespace SabreTools.Helper
 				Files = sortable;
 			}
 
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by MD5");
 
 			// Process each all of the roms
 			List<string> keys = Files.Keys.ToList();
@@ -627,7 +627,7 @@ namespace SabreTools.Helper
 				Files = sortable;
 			}
 
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by SHA-1");
 
 			// Process each all of the roms
 			List<string> keys = Files.Keys.ToList();
