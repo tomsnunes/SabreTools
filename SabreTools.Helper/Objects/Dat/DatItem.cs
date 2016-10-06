@@ -623,30 +623,70 @@ namespace SabreTools.Helper
 				return output;
 			}
 
-			// Try to find duplicates
-			List<string> keys = datdata.Files.Keys.ToList();
-			foreach (string key in keys)
+			// Get the correct dictionary based on what is available
+			string key = "";
+			if (_itemType == ItemType.Rom && ((Rom)this).CRC != null)
 			{
-				List<DatItem> roms = datdata.Files[key];
-				List<DatItem> left = new List<DatItem>();
+				key = ((Rom)this).CRC;
+				datdata.BucketByCRC(false, logger, false);
+			}
+			else if (_itemType == ItemType.Rom && ((Rom)this).MD5 != null)
+			{
+				key = ((Rom)this).MD5;
+				datdata.BucketByMD5(false, logger, false);
+			}
+			else if (_itemType == ItemType.Disk && ((Disk)this).MD5 != null)
+			{
+				key = ((Disk)this).MD5;
+				datdata.BucketByMD5(false, logger, false);
+			}
+			else if (_itemType == ItemType.Rom && ((Rom)this).SHA1 != null)
+			{
+				key = ((Rom)this).SHA1;
+				datdata.BucketBySHA1(false, logger, false);
+			}
+			else if (_itemType == ItemType.Disk && ((Disk)this).SHA1 != null)
+			{
+				key = ((Disk)this).SHA1;
+				datdata.BucketBySHA1(false, logger, false);
+			}
+			else if (_itemType == ItemType.Rom)
+			{
+				key = ((Rom)this).Size.ToString();
+				datdata.BucketBySize(false, logger, false);
+			}
+			else
+			{
+				key = "-1";
+				datdata.BucketBySize(false, logger, false);
+			}
 
-				foreach (DatItem rom in roms)
-				{
-					if (IsDuplicate(rom, logger))
-					{
-						output.Add(rom);
-					}
-					else
-					{
-						left.Add(rom);
-					}
-				}
+			// If the key doesn't exist, return the empty list
+			if (!datdata.Files.ContainsKey(key))
+			{
+				return output;
+			}
 
-				// If we're in removal mode, replace the list with the new one
-				if (remove)
+			// Try to find duplicates
+			List<DatItem> roms = datdata.Files[key];
+			List<DatItem> left = new List<DatItem>();
+
+			foreach (DatItem rom in roms)
+			{
+				if (IsDuplicate(rom, logger))
 				{
-					datdata.Files[key] = left;
+					output.Add(rom);
 				}
+				else
+				{
+					left.Add(rom);
+				}
+			}
+
+			// If we're in removal mode, replace the list with the new one
+			if (remove)
+			{
+				datdata.Files[key] = left;
 			}
 
 			return output;

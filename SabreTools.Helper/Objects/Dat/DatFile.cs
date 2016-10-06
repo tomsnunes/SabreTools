@@ -37,6 +37,7 @@ namespace SabreTools.Helper
 		private bool _excludeOf;
 		private bool _mergeRoms;
 		private SortedDictionary<string, List<DatItem>> _files;
+		private SortedBy _sortedBy;
 
 		// Data specific to the Miss DAT type
 		private bool _useGame;
@@ -179,6 +180,11 @@ namespace SabreTools.Helper
 				_files = value;
 			}
 		}
+		public SortedBy SortedBy
+		{
+			get { return _sortedBy; }
+			set { _sortedBy = value; }
+		}
 
 		// Data specific to the Miss DAT type
 		public bool UseGame
@@ -271,123 +277,6 @@ namespace SabreTools.Helper
 
 		#endregion
 
-		#region Constructors
-
-		/// <summary>
-		/// Create a default, empty Dat object
-		/// </summary>
-		public DatFile()
-		{
-			// Nothing needs to be done
-		}
-
-		/// <summary>
-		/// Create a new Dat object with the included information (standard Dats)
-		/// </summary>
-		/// <param name="fileName">New filename</param>
-		/// <param name="name">New name</param>
-		/// <param name="description">New description</param>
-		/// <param name="rootDir">New rootdir</param>
-		/// <param name="category">New category</param>
-		/// <param name="version">New version</param>
-		/// <param name="date">New date</param>
-		/// <param name="author">New author</param>
-		/// <param name="email">New email</param>
-		/// <param name="homepage">New homepage</param>
-		/// <param name="url">New URL</param>
-		/// <param name="comment">New comment</param>
-		/// <param name="header">New header</param>
-		/// <param name="superdat">True to set SuperDAT type, false otherwise</param>
-		/// <param name="forceMerging">None, Split, Full</param>
-		/// <param name="forceNodump">None, Obsolete, Required, Ignore</param>
-		/// <param name="forcePacking">None, Zip, Unzip</param>
-		/// <param name="outputFormat">Non-zero flag for output format, zero otherwise for default</param>
-		/// <param name="mergeRoms">True to dedupe the roms in the DAT, false otherwise (default)</param>
-		/// <param name="files">SortedDictionary of lists of DatItem objects</param>
-		public DatFile(string fileName, string name, string description, string rootDir, string category, string version, string date,
-			string author, string email, string homepage, string url, string comment, string header, string type, ForceMerging forceMerging,
-			ForceNodump forceNodump, ForcePacking forcePacking, OutputFormat outputFormat, bool mergeRoms, SortedDictionary<string, List<DatItem>> files)
-		{
-			_fileName = fileName;
-			_name = name;
-			_description = description;
-			_rootDir = rootDir;
-			_category = category;
-			_version = version;
-			_date = date;
-			_author = author;
-			_email = email;
-			_homepage = homepage;
-			_url = url;
-			_comment = comment;
-			_header = header;
-			_type = type;
-			_forceMerging = forceMerging;
-			_forceNodump = forceNodump;
-			_forcePacking = forcePacking;
-			_outputFormat = outputFormat;
-			_mergeRoms = mergeRoms;
-			_files = files;
-
-			_romCount = 0;
-			_diskCount = 0;
-			_totalSize = 0;
-			_crcCount = 0;
-			_md5Count = 0;
-			_sha1Count = 0;
-			_nodumpCount = 0;
-		}
-
-		/// <summary>
-		/// Create a new Dat object with the included information (missfile)
-		/// </summary>
-		/// <param name="filename">New filename</param>
-		/// <param name="name">New name</param>
-		/// <param name="description">New description</param>
-		/// <param name="outputFormat">Non-zero flag for output format, zero otherwise for default</param>
-		/// <param name="mergeRoms">True to dedupe the roms in the DAT, false otherwise (default)</param>
-		/// <param name="files">SortedDictionary of lists of DatItem objects</param>
-		/// <param name="useGame">True if games are to be used in output, false if roms are</param>
-		/// <param name="prefix">Generic prefix to be added to each line</param>
-		/// <param name="postfix">Generic postfix to be added to each line</param>
-		/// <param name="quotes">Add quotes to each item</param>
-		/// <param name="repExt">Replace all extensions with another</param>
-		/// <param name="addExt">Add an extension to all items</param>
-		/// <param name="remExt">Remove all extensions</param>
-		/// <param name="gameName">Add the dat name as a directory prefix</param>
-		/// <param name="romba">Output files in romba format</param>
-		public DatFile(string fileName, string name, string description, OutputFormat outputFormat, bool mergeRoms,
-			SortedDictionary<string, List<DatItem>> files, bool useGame, string prefix, string postfix, bool quotes,
-			string repExt, string addExt, bool remExt, bool gameName, bool romba)
-		{
-			_fileName = fileName;
-			_name = name;
-			_description = description;
-			_outputFormat = outputFormat;
-			_mergeRoms = mergeRoms;
-			_files = files;
-
-			_useGame = useGame;
-			_prefix = prefix;
-			_postfix = postfix;
-			_quotes = quotes;
-			_repExt = repExt;
-			_addExt = addExt;
-			_remExt = remExt;
-			_gameName = gameName;
-			_romba = romba;
-
-			_romCount = 0;
-			_diskCount = 0;
-			_totalSize = 0;
-			_crcCount = 0;
-			_md5Count = 0;
-			_sha1Count = 0;
-			_nodumpCount = 0;
-		}
-
-		#endregion
-
 		#region Instance Methods
 
 		#region Bucketing
@@ -401,7 +290,14 @@ namespace SabreTools.Helper
 		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
 		public void BucketByGame(bool mergeroms, bool norename, Logger logger, bool output = true)
 		{
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+			// If we already have the right sorting, trust it
+			if (_sortedBy == SortedBy.Game)
+			{
+				return;
+			}
+
+			// Set the sorted type
+			_sortedBy = SortedBy.Game;
 
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
@@ -411,6 +307,8 @@ namespace SabreTools.Helper
 			{
 				Files = sortable;
 			}
+
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
 
 			// Process each all of the roms
 			List<string> keys = Files.Keys.ToList();
@@ -468,6 +366,322 @@ namespace SabreTools.Helper
 			Files = sortable;
 		}
 
+		/// <summary>
+		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by Size
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		public void BucketBySize(bool mergeroms, Logger logger, bool output = true)
+		{
+			// If we already have the right sorting, trust it
+			if (_sortedBy == SortedBy.Size)
+			{
+				return;
+			}
+
+			// Set the sorted type
+			_sortedBy = SortedBy.Size;
+
+			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
+			long count = 0;
+
+			// If we have a null dict or an empty one, output a new dictionary
+			if (Files == null || Files.Count == 0)
+			{
+				Files = sortable;
+			}
+
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+
+			// Process each all of the roms
+			List<string> keys = Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> roms = Files[key];
+
+				// If we're merging the roms, do so
+				if (mergeroms)
+				{
+					roms = DatItem.Merge(roms, logger);
+				}
+
+				// Now add each of the roms to their respective games
+				foreach (DatItem rom in roms)
+				{
+					count++;
+					string newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).Size.ToString() : "-1");
+					if (sortable.ContainsKey(newkey))
+					{
+						sortable[newkey].Add(rom);
+					}
+					else
+					{
+						List<DatItem> temp = new List<DatItem>();
+						temp.Add(rom);
+						sortable.Add(newkey, temp);
+					}
+				}
+			}
+
+			// Now go through and sort all of the lists
+			keys = sortable.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> sortedlist = sortable[key];
+				DatItem.Sort(ref sortedlist, false);
+				sortable[key] = sortedlist;
+			}
+
+			// Output the count if told to
+			if (output)
+			{
+				logger.User("A total of " + count + " file hashes will be written out to file");
+			}
+
+			// Now assign the dictionary back
+			Files = sortable;
+		}
+
+		/// <summary>
+		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by CRC
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		public void BucketByCRC(bool mergeroms, Logger logger, bool output = true)
+		{
+			// If we already have the right sorting, trust it
+			if (_sortedBy == SortedBy.CRC)
+			{
+				return;
+			}
+
+			// Set the sorted type
+			_sortedBy = SortedBy.CRC;
+
+			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
+			long count = 0;
+
+			// If we have a null dict or an empty one, output a new dictionary
+			if (Files == null || Files.Count == 0)
+			{
+				Files = sortable;
+			}
+
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+
+			// Process each all of the roms
+			List<string> keys = Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> roms = Files[key];
+
+				// If we're merging the roms, do so
+				if (mergeroms)
+				{
+					roms = DatItem.Merge(roms, logger);
+				}
+
+				// Now add each of the roms to their respective games
+				foreach (DatItem rom in roms)
+				{
+					count++;
+					string newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).CRC : Constants.CRCZero);
+					if (sortable.ContainsKey(newkey))
+					{
+						sortable[newkey].Add(rom);
+					}
+					else
+					{
+						List<DatItem> temp = new List<DatItem>();
+						temp.Add(rom);
+						sortable.Add(newkey, temp);
+					}
+				}
+			}
+
+			// Now go through and sort all of the lists
+			keys = sortable.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> sortedlist = sortable[key];
+				DatItem.Sort(ref sortedlist, false);
+				sortable[key] = sortedlist;
+			}
+
+			// Output the count if told to
+			if (output)
+			{
+				logger.User("A total of " + count + " file hashes will be written out to file");
+			}
+
+			// Now assign the dictionary back
+			Files = sortable;
+		}
+
+		/// <summary>
+		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by MD5
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		public void BucketByMD5(bool mergeroms, Logger logger, bool output = true)
+		{
+			// If we already have the right sorting, trust it
+			if (_sortedBy == SortedBy.MD5)
+			{
+				return;
+			}
+
+			// Set the sorted type
+			_sortedBy = SortedBy.MD5;
+
+			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
+			long count = 0;
+
+			// If we have a null dict or an empty one, output a new dictionary
+			if (Files == null || Files.Count == 0)
+			{
+				Files = sortable;
+			}
+
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+
+			// Process each all of the roms
+			List<string> keys = Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> roms = Files[key];
+
+				// If we're merging the roms, do so
+				if (mergeroms)
+				{
+					roms = DatItem.Merge(roms, logger);
+				}
+
+				// Now add each of the roms to their respective games
+				foreach (DatItem rom in roms)
+				{
+					count++;
+					string newkey = (rom.Type == ItemType.Rom
+						? ((Rom)rom).MD5
+						: (rom.Type == ItemType.Disk
+							? ((Disk)rom).MD5
+							: Constants.MD5Zero));
+					if (sortable.ContainsKey(newkey))
+					{
+						sortable[newkey].Add(rom);
+					}
+					else
+					{
+						List<DatItem> temp = new List<DatItem>();
+						temp.Add(rom);
+						sortable.Add(newkey, temp);
+					}
+				}
+			}
+
+			// Now go through and sort all of the lists
+			keys = sortable.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> sortedlist = sortable[key];
+				DatItem.Sort(ref sortedlist, false);
+				sortable[key] = sortedlist;
+			}
+
+			// Output the count if told to
+			if (output)
+			{
+				logger.User("A total of " + count + " file hashes will be written out to file");
+			}
+
+			// Now assign the dictionary back
+			Files = sortable;
+		}
+
+		/// <summary>
+		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by SHA1
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		public void BucketBySHA1(bool mergeroms, Logger logger, bool output = true)
+		{
+			// If we already have the right sorting, trust it
+			if (_sortedBy == SortedBy.SHA1)
+			{
+				return;
+			}
+
+			// Set the sorted type
+			_sortedBy = SortedBy.SHA1;
+
+			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
+			long count = 0;
+
+			// If we have a null dict or an empty one, output a new dictionary
+			if (Files == null || Files.Count == 0)
+			{
+				Files = sortable;
+			}
+
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+
+			// Process each all of the roms
+			List<string> keys = Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> roms = Files[key];
+
+				// If we're merging the roms, do so
+				if (mergeroms)
+				{
+					roms = DatItem.Merge(roms, logger);
+				}
+
+				// Now add each of the roms to their respective games
+				foreach (DatItem rom in roms)
+				{
+					count++;
+					string newkey = (rom.Type == ItemType.Rom
+						? ((Rom)rom).SHA1
+						: (rom.Type == ItemType.Disk
+							? ((Disk)rom).SHA1
+							: Constants.MD5Zero));
+					if (sortable.ContainsKey(newkey))
+					{
+						sortable[newkey].Add(rom);
+					}
+					else
+					{
+						List<DatItem> temp = new List<DatItem>();
+						temp.Add(rom);
+						sortable.Add(newkey, temp);
+					}
+				}
+			}
+
+			// Now go through and sort all of the lists
+			keys = sortable.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> sortedlist = sortable[key];
+				DatItem.Sort(ref sortedlist, false);
+				sortable[key] = sortedlist;
+			}
+
+			// Output the count if told to
+			if (output)
+			{
+				logger.User("A total of " + count + " file hashes will be written out to file");
+			}
+
+			// Now assign the dictionary back
+			Files = sortable;
+		}
+
 		#endregion
 
 		#region Cloning Methods
@@ -476,44 +690,45 @@ namespace SabreTools.Helper
 		{
 			return new DatFile
 			{
-				FileName = this.FileName,
-				Name = this.Name,
-				Description = this.Description,
-				RootDir = this.RootDir,
-				Category = this.Category,
-				Version = this.Version,
-				Date = this.Date,
-				Author = this.Author,
-				Email = this.Email,
-				Homepage = this.Homepage,
-				Url = this.Url,
-				Comment = this.Comment,
-				Header = this.Header,
-				Type = this.Type,
-				ForceMerging = this.ForceMerging,
-				ForceNodump = this.ForceNodump,
-				ForcePacking = this.ForcePacking,
-				ExcludeOf = this.ExcludeOf,
-				OutputFormat = this.OutputFormat,
-				MergeRoms = this.MergeRoms,
-				Files = this.Files,
-				UseGame = this.UseGame,
-				Prefix = this.Prefix,
-				Postfix = this.Postfix,
-				Quotes = this.Quotes,
-				RepExt = this.RepExt,
-				AddExt = this.AddExt,
-				RemExt = this.RemExt,
-				GameName = this.GameName,
-				Romba = this.Romba,
-				RomCount = this.RomCount,
-				DiskCount = this.DiskCount,
-				TotalSize = this.TotalSize,
-				CRCCount = this.CRCCount,
-				MD5Count = this.MD5Count,
-				SHA1Count = this.SHA1Count,
-				BaddumpCount = this.BaddumpCount,
-				NodumpCount = this.NodumpCount,
+				FileName = _fileName,
+				Name = _name,
+				Description = _description,
+				RootDir = _rootDir,
+				Category = _category,
+				Version = _version,
+				Date = _date,
+				Author = _author,
+				Email = _email,
+				Homepage = _homepage,
+				Url = _url,
+				Comment = _comment,
+				Header = _header,
+				Type = _type,
+				ForceMerging = _forceMerging,
+				ForceNodump = _forceNodump,
+				ForcePacking = _forcePacking,
+				ExcludeOf = _excludeOf,
+				OutputFormat = _outputFormat,
+				MergeRoms = _mergeRoms,
+				Files = _files,
+				SortedBy = _sortedBy,
+				UseGame = _useGame,
+				Prefix = _prefix,
+				Postfix = _postfix,
+				Quotes = _quotes,
+				RepExt = _repExt,
+				AddExt = _addExt,
+				RemExt = _remExt,
+				GameName = _gameName,
+				Romba = _romba,
+				RomCount = _romCount,
+				DiskCount = _diskCount,
+				TotalSize = _totalSize,
+				CRCCount = _crcCount,
+				MD5Count = _md5Count,
+				SHA1Count = _sha1Count,
+				BaddumpCount = _baddumpCount,
+				NodumpCount = _nodumpCount,
 			};
 		}
 
@@ -521,36 +736,37 @@ namespace SabreTools.Helper
 		{
 			return new DatFile
 			{
-				FileName = this.FileName,
-				Name = this.Name,
-				Description = this.Description,
-				RootDir = this.RootDir,
-				Category = this.Category,
-				Version = this.Version,
-				Date = this.Date,
-				Author = this.Author,
-				Email = this.Email,
-				Homepage = this.Homepage,
-				Url = this.Url,
-				Comment = this.Comment,
-				Header = this.Header,
-				Type = this.Type,
-				ForceMerging = this.ForceMerging,
-				ForceNodump = this.ForceNodump,
-				ForcePacking = this.ForcePacking,
-				ExcludeOf = this.ExcludeOf,
-				OutputFormat = this.OutputFormat,
-				MergeRoms = this.MergeRoms,
+				FileName = _fileName,
+				Name = _name,
+				Description = _description,
+				RootDir = _rootDir,
+				Category = _category,
+				Version = _version,
+				Date = _date,
+				Author = _author,
+				Email = _email,
+				Homepage = _homepage,
+				Url = _url,
+				Comment = _comment,
+				Header = _header,
+				Type = _type,
+				ForceMerging = _forceMerging,
+				ForceNodump = _forceNodump,
+				ForcePacking = _forcePacking,
+				ExcludeOf = _excludeOf,
+				OutputFormat = _outputFormat,
+				MergeRoms = _mergeRoms,
 				Files = new SortedDictionary<string, List<DatItem>>(),
-				UseGame = this.UseGame,
-				Prefix = this.Prefix,
-				Postfix = this.Postfix,
-				Quotes = this.Quotes,
-				RepExt = this.RepExt,
-				AddExt = this.AddExt,
-				RemExt = this.RemExt,
-				GameName = this.GameName,
-				Romba = this.Romba,
+				SortedBy = SortedBy.Default,
+				UseGame = _useGame,
+				Prefix = _prefix,
+				Postfix = _postfix,
+				Quotes = _quotes,
+				RepExt = _repExt,
+				AddExt = _addExt,
+				RemExt = _remExt,
+				GameName = _gameName,
+				Romba = _romba,
 			};
 		}
 
@@ -3195,7 +3411,14 @@ namespace SabreTools.Helper
 						*/
 						string[] rominfo = line.Split('¬');
 
-						Rom rom = new Rom(rominfo[5], Int64.Parse(rominfo[7]), rominfo[6], null, null, ItemStatus.None, null, rominfo[3], null,
+						// Try getting the size separately
+						long size = 0;
+						if (!Int64.TryParse(rominfo[7], out size))
+						{
+							size = 0;
+						}
+
+						Rom rom = new Rom(rominfo[5], size, rominfo[6], null, null, ItemStatus.None, null, rominfo[3], null,
 							rominfo[4], null, null, rominfo[8], rominfo[1], null, null, false, null, null, sysid, null, srcid, null);
 
 						// Now process and add the rom

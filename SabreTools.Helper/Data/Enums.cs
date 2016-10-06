@@ -33,6 +33,19 @@
 		Unzip,
 	}
 
+	/// <summary>
+	/// Determines how the current dictionary is sorted by
+	/// </summary>
+	public enum SortedBy
+	{
+		Default = 0,
+		Size,
+		CRC,
+		MD5,
+		SHA1,
+		Game,
+	}
+
 	#endregion
 
 	#region DatItem related
