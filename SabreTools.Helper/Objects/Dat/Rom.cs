@@ -43,7 +43,7 @@ namespace SabreTools.Helper
 		{
 			_name = "";
 			_itemType = ItemType.Rom;
-			_dupeType = DupeType.None;
+			_dupeType = 0x00;
 			_itemStatus = ItemStatus.None;
 			_date = "";
 		}

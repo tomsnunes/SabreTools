@@ -248,7 +248,7 @@ namespace SabreTools.Helper
 		/// <returns>The DupeType corresponding to the relationship between the two</returns>
 		public DupeType GetDuplicateStatus(DatItem lastItem, Logger logger)
 		{
-			DupeType output = DupeType.None;
+			DupeType output = 0x00;
 
 			// If we don't have a duplicate at all, return none
 			if (!this.IsDuplicate(lastItem, logger))
@@ -257,15 +257,15 @@ namespace SabreTools.Helper
 			}
 
 			// If the duplicate is external already or should be, set it
-			if (lastItem.Dupe >= DupeType.ExternalHash || lastItem.SystemID != this.SystemID || lastItem.SourceID != this.SourceID)
+			if ((lastItem.Dupe & DupeType.External) != 0 || lastItem.SystemID != this.SystemID || lastItem.SourceID != this.SourceID)
 			{
 				if (lastItem.MachineName == this.MachineName && lastItem.Name == this.Name)
 				{
-					output = DupeType.ExternalAll;
+					output = DupeType.External | DupeType.All;
 				}
 				else
 				{
-					output = DupeType.ExternalHash;
+					output = DupeType.External | DupeType.Hash;
 				}
 			}
 
@@ -274,11 +274,11 @@ namespace SabreTools.Helper
 			{
 				if (lastItem.MachineName == this.MachineName && lastItem.Name == this.Name)
 				{
-					output = DupeType.InternalAll;
+					output = DupeType.Internal | DupeType.All;
 				}
 				else
 				{
-					output = DupeType.InternalHash;
+					output = DupeType.Internal | DupeType.Hash;
 				}
 			}
 
@@ -696,7 +696,7 @@ namespace SabreTools.Helper
 				if (outfiles.Count != 0)
 				{
 					// Check if the rom is a duplicate
-					DupeType dupetype = DupeType.None;
+					DupeType dupetype = 0x00;
 					DatItem saveditem = new Rom();
 					int pos = -1;
 					for (int i = 0; i < outfiles.Count; i++)
@@ -707,7 +707,7 @@ namespace SabreTools.Helper
 						dupetype = file.GetDuplicateStatus(lastrom, logger);
 
 						// If it's a duplicate, skip adding it to the output but add any missing information
-						if (dupetype != DupeType.None)
+						if (dupetype != 0x00)
 						{
 							// If we don't have a rom or disk, then just skip adding
 							if (file.Type != ItemType.Rom && file.Type != ItemType.Disk)
@@ -767,7 +767,7 @@ namespace SabreTools.Helper
 					}
 
 					// If no duplicate is found, add it to the list
-					if (dupetype == DupeType.None)
+					if (dupetype == 0x00)
 					{
 						outfiles.Add(file);
 					}

@@ -3,6 +3,33 @@
 namespace SabreTools.Helper
 {
 	/// <summary>
+	/// Determines the level to scan archives at
+	/// </summary>
+	[Flags]
+	public enum ArchiveScanLevel
+	{
+		// 7zip
+		SevenZipExternal = 0x0001,
+		SevenZipInternal = 0x0002,
+		SevenZipBoth = SevenZipExternal | SevenZipInternal,
+
+		// GZip
+		GZipExternal = 0x0010,
+		GZipInternal = 0x0020,
+		GZipBoth = GZipExternal | GZipInternal,
+
+		// RAR
+		RarExternal = 0x0100,
+		RarInternal = 0x0200,
+		RarBoth = RarExternal | RarInternal,
+
+		// Zip
+		ZipExternal = 0x1000,
+		ZipInternal = 0x2000,
+		ZipBoth = ZipExternal | ZipInternal,
+	}
+
+	/// <summary>
 	/// Determines which diffs should be created
 	/// </summary>
 	[Flags]
@@ -17,6 +44,21 @@ namespace SabreTools.Helper
 		// Cascaded diffs
 		Cascade = 0x08,
 		ReverseCascade = 0x10,
+	}
+
+	/// <summary>
+	/// Determines which type of duplicate a file is
+	/// </summary>
+	[Flags]
+	public enum DupeType
+	{
+		// Type of match
+		Hash = 0x01,
+		All = 0x02,
+
+		// Location of match
+		Internal = 0x10,
+		External = 0x20,
 	}
 
 	/// <summary>
@@ -90,33 +132,6 @@ namespace SabreTools.Helper
 		// Reserved and unused (SHOULD NOT BE USED)
 		Bit1 = 0x0002,
 		Bit2 = 0x0004,
-	}
-
-	/// <summary>
-	/// Determines the level to scan archives at
-	/// </summary>
-	[Flags]
-	public enum ArchiveScanLevel
-	{
-		// 7zip
-		SevenZipExternal = 0x0001,
-		SevenZipInternal = 0x0002,
-		SevenZipBoth = SevenZipExternal | SevenZipInternal,
-
-		// GZip
-		GZipExternal = 0x0010,
-		GZipInternal = 0x0020,
-		GZipBoth = GZipExternal | GZipInternal,
-
-		// RAR
-		RarExternal = 0x0100,
-		RarInternal = 0x0200,
-		RarBoth = RarExternal | RarInternal,
-
-		// Zip
-		ZipExternal = 0x1000,
-		ZipInternal = 0x2000,
-		ZipBoth = ZipExternal | ZipInternal,
 	}
 
 	/// <summary>

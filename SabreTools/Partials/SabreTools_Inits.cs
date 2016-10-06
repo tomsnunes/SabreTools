@@ -1,5 +1,4 @@
-﻿using Mono.Data.Sqlite;
-using SabreTools.Helper;
+﻿using SabreTools.Helper;
 using System;
 using System.Collections.Generic;
 using System.IO;

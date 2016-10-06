@@ -38,18 +38,6 @@
 	#region DatItem related
 
 	/// <summary>
-	/// Determines which type of duplicate a file is
-	/// </summary>
-	public enum DupeType
-	{
-		None = 0,
-		InternalHash = 1,
-		InternalAll = 2,
-		ExternalHash = 3,
-		ExternalAll = 4,
-	}
-
-	/// <summary>
 	/// Determine what type of file an item is
 	/// </summary>
 	public enum ItemType

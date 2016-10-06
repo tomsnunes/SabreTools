@@ -867,7 +867,7 @@ namespace SabreTools.Helper
 						// No duplicates
 						if ((diff & DiffMode.NoDupes) != 0 || (diff & DiffMode.Individuals) != 0)
 						{
-							if (rom.Dupe < DupeType.ExternalHash)
+							if ((rom.Dupe & DupeType.Internal) != 0)
 							{
 								// Individual DATs that are output
 								if ((diff & DiffMode.Individuals) != 0)
@@ -907,7 +907,7 @@ namespace SabreTools.Helper
 						// Duplicates only
 						if ((diff & DiffMode.Dupes) != 0)
 						{
-							if (rom.Dupe >= DupeType.ExternalHash)
+							if ((rom.Dupe & DupeType.External) != 0)
 							{
 								DatItem newrom = rom;
 								newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
