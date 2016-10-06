@@ -1987,7 +1987,7 @@ namespace SabreTools.Helper
 					{
 						string itemval = gc[2].Value.Replace("\"", "");
 
-						if (line.StartsWith("Name:") && (gc == null || gc[2] == null))
+						if (line.StartsWith("Name:"))
 						{
 							Name = (String.IsNullOrEmpty(Name) ? line.Remove(5) : Name);
 							superdat = superdat || itemval.Contains(" - SuperDAT");
