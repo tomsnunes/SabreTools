@@ -1047,53 +1047,51 @@ namespace SabreTools.Helper
 			string outfile = Path.Combine(outDir, rom.SHA1 + ".gz");
 
 			// If the output file exists, don't try to write again
-			if (File.Exists(outfile))
+			if (!File.Exists(outfile))
 			{
-				return true;
+				// Compress the input stream
+				FileStream inputStream = File.OpenRead(input);
+				GZipStream outputStream = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress);
+				inputStream.CopyTo(outputStream);
+
+				// Dispose of the streams
+				inputStream.Dispose();
+				outputStream.Dispose();
+				
+				// Now that it's ready, inject the header info
+				BinaryWriter sw = new BinaryWriter(new MemoryStream());
+				BinaryReader br = new BinaryReader(File.OpenRead(outfile));
+
+				// Write standard header and TGZ info
+				byte[] data = Constants.TorrentGZHeader
+								.Concat(Style.StringToByteArray(rom.MD5)) // MD5
+								.Concat(Style.StringToByteArray(rom.CRC)) // CRC
+								.Concat(BitConverter.GetBytes(rom.Size).Reverse().ToArray()) // Long size (Mirrored)
+							.ToArray();
+				sw.Write(data);
+
+				// Finally, copy the rest of the data from the original file
+				br.BaseStream.Seek(10, SeekOrigin.Begin);
+				int i = 10;
+				while (br.BaseStream.Position < br.BaseStream.Length)
+				{
+					sw.Write(br.ReadByte());
+					i++;
+				}
+
+				// Dispose of the stream
+				br.Dispose();
+
+				// Now write the new file over the original
+				BinaryWriter bw = new BinaryWriter(File.Open(outfile, FileMode.Create));
+				sw.BaseStream.Seek(0, SeekOrigin.Begin);
+				bw.BaseStream.Seek(0, SeekOrigin.Begin);
+				sw.BaseStream.CopyTo(bw.BaseStream);
+
+				// Dispose of the streams
+				bw.Dispose();
+				sw.Dispose();
 			}
-
-			// Compress the input stream
-			FileStream inputStream = File.OpenRead(input);
-			GZipStream outputStream = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress);
-			inputStream.CopyTo(outputStream);
-
-			// Dispose of the streams
-			inputStream.Dispose();
-			outputStream.Dispose();
-
-			// Now that it's ready, inject the header info
-			BinaryWriter sw = new BinaryWriter(new MemoryStream());
-			BinaryReader br = new BinaryReader(File.OpenRead(outfile));
-
-			// Write standard header and TGZ info
-			byte[] data = Constants.TorrentGZHeader
-							.Concat(Style.StringToByteArray(rom.MD5)) // MD5
-							.Concat(Style.StringToByteArray(rom.CRC)) // CRC
-							.Concat(BitConverter.GetBytes(rom.Size).Reverse().ToArray()) // Long size (Mirrored)
-						.ToArray();
-			sw.Write(data);
-
-			// Finally, copy the rest of the data from the original file
-			br.BaseStream.Seek(10, SeekOrigin.Begin);
-			int i = 10;
-			while (br.BaseStream.Position < br.BaseStream.Length)
-			{
-				sw.Write(br.ReadByte());
-				i++;
-			}
-
-			// Dispose of the stream
-			br.Dispose();
-
-			// Now write the new file over the original
-			BinaryWriter bw = new BinaryWriter(File.Open(outfile, FileMode.Create));
-			sw.BaseStream.Seek(0, SeekOrigin.Begin);
-			bw.BaseStream.Seek(0, SeekOrigin.Begin);
-			sw.BaseStream.CopyTo(bw.BaseStream);
-
-			// Dispose of the streams
-			bw.Dispose();
-			sw.Dispose();
 
 			// If we're in romba mode, create the subfolder and move the file
 			if (romba)
