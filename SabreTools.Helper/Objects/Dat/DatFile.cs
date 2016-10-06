@@ -4913,13 +4913,12 @@ namespace SabreTools.Helper
 			// Otherwise, attempt to extract the files to the temporary directory
 			else
 			{
-				bool encounteredErrors = ArchiveTools.ExtractArchive(newItem,
-					tempSubDir,
-					(archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
-					(!archivesAsFiles && enableGzip ? ArchiveScanLevel.Internal : ArchiveScanLevel.External),
-					(archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
-					(archivesAsFiles ? ArchiveScanLevel.External : ArchiveScanLevel.Internal),
-					logger);
+				ArchiveScanLevel asl = (archivesAsFiles ? ArchiveScanLevel.SevenZipExternal : ArchiveScanLevel.SevenZipInternal)
+					| (!archivesAsFiles && enableGzip ? ArchiveScanLevel.GZipInternal : ArchiveScanLevel.GZipExternal)
+					| (archivesAsFiles ? ArchiveScanLevel.RarExternal : ArchiveScanLevel.RarInternal)
+					| (archivesAsFiles ? ArchiveScanLevel.ZipExternal : ArchiveScanLevel.ZipInternal);
+
+				bool encounteredErrors = ArchiveTools.ExtractArchive(newItem, tempSubDir, asl, logger);
 
 				// If the file was an archive and was extracted successfully, check it
 				if (!encounteredErrors)

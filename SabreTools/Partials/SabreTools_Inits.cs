@@ -27,6 +27,9 @@ namespace SabreTools
 		public static bool InitConvertFolderTGZ(List<string> inputs, string outDir, string tempDir, bool delete,
 			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
+			// Get the archive scanning levels
+			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
+
 			// Get all individual files from the inputs
 			List<string> newinputs = new List<string>();
 			foreach (string input in inputs)
@@ -44,7 +47,7 @@ namespace SabreTools
 				}
 			}
 
-			SimpleSort ss = new SimpleSort(new DatFile(), newinputs, outDir, tempDir, false, false, false, delete, false, romba, sevenzip, gz, rar, zip, false, logger);
+			SimpleSort ss = new SimpleSort(new DatFile(), newinputs, outDir, tempDir, false, false, false, delete, false, romba, asl, false, logger);
 			return ss.Convert();
 		}
 
@@ -288,6 +291,9 @@ namespace SabreTools
 		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan,
 			bool toFolder, bool verify, bool delete, bool? torrentX, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
+			// Get the archive scanning level
+			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
+
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
@@ -296,7 +302,7 @@ namespace SabreTools
 			}
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
-				delete, torrentX, romba, sevenzip, gz, rar, zip, updateDat, logger);
+				delete, torrentX, romba, asl, updateDat, logger);
 			ss.StartProcessing();
 		}
 

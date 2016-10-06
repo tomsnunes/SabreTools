@@ -93,6 +93,33 @@ namespace SabreTools.Helper
 	}
 
 	/// <summary>
+	/// Determines the level to scan archives at
+	/// </summary>
+	[Flags]
+	public enum ArchiveScanLevel
+	{
+		// 7zip
+		SevenZipExternal = 0x0001,
+		SevenZipInternal = 0x0002,
+		SevenZipBoth = SevenZipExternal | SevenZipInternal,
+
+		// GZip
+		GZipExternal = 0x0010,
+		GZipInternal = 0x0020,
+		GZipBoth = GZipExternal | GZipInternal,
+
+		// RAR
+		RarExternal = 0x0100,
+		RarInternal = 0x0200,
+		RarBoth = RarExternal | RarInternal,
+
+		// Zip
+		ZipExternal = 0x1000,
+		ZipInternal = 0x2000,
+		ZipBoth = ZipExternal | ZipInternal,
+	}
+
+	/// <summary>
 	/// Zipfile special status
 	/// </summary>
 	/// <remarks>https://github.com/gjefferyes/RomVault/blob/5a93500001f0d068f32cf77a048950717507f733/ROMVault2/SupportedFiles/ZipEnums.cs</remarks>

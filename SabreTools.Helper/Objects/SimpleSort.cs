@@ -20,10 +20,7 @@ namespace SabreTools.Helper
 		private bool? _torrentX; // True is for TorrentZip, False is for TorrentGZ, Null is for standard zip
 		private bool _romba;
 		private bool _updateDat;
-		private ArchiveScanLevel _7z;
-		private ArchiveScanLevel _gz;
-		private ArchiveScanLevel _rar;
-		private ArchiveScanLevel _zip;
+		private ArchiveScanLevel _archiveScanLevel;
 		private Logger _logger;
 		private int _maxDegreeOfParallelism = 4; // Hardcoded for now, should be an input later
 
@@ -45,15 +42,12 @@ namespace SabreTools.Helper
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
 		/// <param name="torrentX">True is for TorrentZip, False is for TorrentGZ, Null is for standard zip</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
-		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
-		/// <param name="gz">Integer representing the archive handling level for GZip</param>
-		/// <param name="rar">Integer representing the archive handling level for RAR</param>
-		/// <param name="zip">Integer representing the archive handling level for Zip</param>
+		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public SimpleSort(DatFile datdata, List<string> inputs, string outDir, string tempDir,
-			bool quickScan, bool toFolder, bool verify, bool delete, bool? torrentX, bool romba, int sevenzip,
-			int gz, int rar, int zip, bool updateDat, Logger logger)
+			bool quickScan, bool toFolder, bool verify, bool delete, bool? torrentX, bool romba,
+			ArchiveScanLevel archiveScanLevel, bool updateDat, Logger logger)
 		{
 			_datdata = datdata;
 			_inputs = inputs;
@@ -65,10 +59,7 @@ namespace SabreTools.Helper
 			_delete = delete;
 			_torrentX = torrentX;
 			_romba = romba;
-			_7z = (ArchiveScanLevel)(sevenzip < 0 || sevenzip > 2 ? 0 : sevenzip);
-			_gz = (ArchiveScanLevel)(gz < 0 || gz > 2 ? 0 : gz);
-			_rar = (ArchiveScanLevel)(rar < 0 || rar > 2 ? 0 : rar);
-			_zip = (ArchiveScanLevel)(zip < 0 || zip > 2 ? 0 : zip);
+			_archiveScanLevel = archiveScanLevel;
 			_updateDat = updateDat;
 			_logger = logger;
 
@@ -300,7 +291,7 @@ namespace SabreTools.Helper
 
 			// Get if the file should be scanned internally and externally
 			bool shouldExternalScan, shouldInternalScan;
-			ArchiveTools.GetInternalExternalProcess(input, _7z, _gz, _rar, _zip, _logger, out shouldExternalScan, out shouldInternalScan);
+			ArchiveTools.GetInternalExternalProcess(input, _archiveScanLevel, _logger, out shouldExternalScan, out shouldInternalScan);
 
 			// Hash and match the external files
 			if (shouldExternalScan)
@@ -598,7 +589,7 @@ namespace SabreTools.Helper
 				else
 				{
 					// Now, if the file is a supported archive type, also run on all files within
-					bool encounteredErrors = ArchiveTools.ExtractArchive(input, _tempDir, _7z, _gz, _rar, _zip, _logger);
+					bool encounteredErrors = ArchiveTools.ExtractArchive(input, _tempDir, _archiveScanLevel, _logger);
 
 					// Remove the current file if we are in recursion so it's not picked up in the next step
 					if (recurse)
@@ -698,7 +689,7 @@ namespace SabreTools.Helper
 			{
 				// Get if the file should be scanned internally and externally
 				bool shouldExternalScan, shouldInternalScan;
-				ArchiveTools.GetInternalExternalProcess(file, _7z, _gz, _rar, _zip, _logger, out shouldExternalScan, out shouldInternalScan);
+				ArchiveTools.GetInternalExternalProcess(file, _archiveScanLevel, _logger, out shouldExternalScan, out shouldInternalScan);
 
 				// Hash and match the external files
 				if (shouldExternalScan)
@@ -726,7 +717,7 @@ namespace SabreTools.Helper
 					else
 					{
 						// Now, if the file is a supported archive type, also run on all files within
-						bool encounteredErrors = ArchiveTools.ExtractArchive(file, _tempDir, _7z, _gz, _rar, _zip, _logger);
+						bool encounteredErrors = ArchiveTools.ExtractArchive(file, _tempDir, _archiveScanLevel, _logger);
 
 						// If we succeeded in extracting, loop through the files
 						if (!encounteredErrors)
@@ -1035,7 +1026,7 @@ namespace SabreTools.Helper
 
 				// Get if the file should be scanned internally and externally
 				bool shouldExternalProcess, shouldInternalProcess;
-				ArchiveTools.GetInternalExternalProcess(input, _7z, _gz, _rar, _zip, _logger, out shouldExternalProcess, out shouldInternalProcess);
+				ArchiveTools.GetInternalExternalProcess(input, _archiveScanLevel, _logger, out shouldExternalProcess, out shouldInternalProcess);
 
 				// Do an external scan of the file, if necessary
 				if (shouldExternalProcess)
@@ -1059,7 +1050,7 @@ namespace SabreTools.Helper
 				if (shouldInternalProcess)
 				{
 					// Now, if the file is a supported archive type, also run on all files within
-					bool encounteredErrors = ArchiveTools.ExtractArchive(input, _tempDir, _7z, _gz, _rar, _zip, _logger);
+					bool encounteredErrors = ArchiveTools.ExtractArchive(input, _tempDir, _archiveScanLevel, _logger);
 
 					// If no errors were encountered, we loop through the temp directory
 					if (!encounteredErrors)

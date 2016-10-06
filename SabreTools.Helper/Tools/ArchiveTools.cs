@@ -69,7 +69,7 @@ namespace SabreTools.Helper
 		/// <returns>True if the extraction was a success, false otherwise</returns>
 		public static bool ExtractArchive(string input, string tempDir, Logger logger)
 		{
-			return ExtractArchive(input, tempDir, ArchiveScanLevel.Both, ArchiveScanLevel.External, ArchiveScanLevel.External, ArchiveScanLevel.Both, logger);
+			return ExtractArchive(input, tempDir, GetArchiveScanLevelFromNumbers(0, 2, 2, 0), logger);
 		}
 
 		/// <summary>
@@ -77,30 +77,10 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="input">Name of the file to be extracted</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
-		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
-		/// <param name="gz">Integer representing the archive handling level for GZip</param>
-		/// <param name="rar">Integer representing the archive handling level for RAR</param>
-		/// <param name="zip">Integer representing the archive handling level for Zip</param>
+		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public static bool ExtractArchive(string input, string tempDir, int sevenzip, int gz, int rar, int zip, Logger logger)
-		{
-			return ExtractArchive(input, tempDir, (ArchiveScanLevel)sevenzip, (ArchiveScanLevel)gz, (ArchiveScanLevel)rar, (ArchiveScanLevel)zip, logger);
-		}
-
-		/// <summary>
-		/// Attempt to extract a file as an archive
-		/// </summary>
-		/// <param name="input">Name of the file to be extracted</param>
-		/// <param name="tempDir">Temporary directory for archive extraction</param>
-		/// <param name="sevenzip">Archive handling level for 7z</param>
-		/// <param name="gz">Archive handling level for GZip</param>
-		/// <param name="rar">Archive handling level for RAR</param>
-		/// <param name="zip">Archive handling level for Zip</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public static bool ExtractArchive(string input, string tempDir, ArchiveScanLevel sevenzip,
-			ArchiveScanLevel gz, ArchiveScanLevel rar, ArchiveScanLevel zip, Logger logger)
+		public static bool ExtractArchive(string input, string tempDir, ArchiveScanLevel archiveScanLevel, Logger logger)
 		{
 			bool encounteredErrors = true;
 
@@ -115,7 +95,7 @@ namespace SabreTools.Helper
 
 			try
 			{
-				if (at == ArchiveType.SevenZip && sevenzip != ArchiveScanLevel.External)
+				if (at == ArchiveType.SevenZip && (archiveScanLevel & ArchiveScanLevel.SevenZipInternal) != 0)
 				{
 					logger.Verbose("Found archive of type: " + at);
 
@@ -132,7 +112,7 @@ namespace SabreTools.Helper
 					sza.Dispose();
 
 				}
-				else if (at == ArchiveType.GZip && gz != ArchiveScanLevel.External)
+				else if (at == ArchiveType.GZip && (archiveScanLevel & ArchiveScanLevel.GZipInternal) != 0)
 				{
 					logger.Verbose("Found archive of type: " + at);
 
@@ -150,8 +130,8 @@ namespace SabreTools.Helper
 
 					encounteredErrors = false;
 				}
-				else if ((at == ArchiveType.Zip && zip != ArchiveScanLevel.External)
-					|| (at == ArchiveType.Rar && rar != ArchiveScanLevel.External))
+				else if ((at == ArchiveType.Zip && (archiveScanLevel & ArchiveScanLevel.ZipInternal) != 0)
+					|| (at == ArchiveType.Rar && (archiveScanLevel & ArchiveScanLevel.RarInternal) != 0))
 				{
 					logger.Verbose("Found archive of type: " + at);
 
@@ -522,15 +502,12 @@ namespace SabreTools.Helper
 		/// Get if the current file should be scanned internally and externally
 		/// </summary>
 		/// <param name="input">Name of the input file to check</param>
-		/// <param name="sevenzip">User-defined scan level for 7z archives</param>
-		/// <param name="gzip">User-defined scan level for GZ archives</param>
-		/// <param name="rar">User-defined scan level for RAR archives</param>
-		/// <param name="zip">User-defined scan level for Zip archives</param>
+		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="shouldExternalProcess">Output parameter determining if file should be processed externally</param>
 		/// <param name="shouldInternalProcess">Output parameter determining if file should be processed internally</param>
-		public static void GetInternalExternalProcess(string input, ArchiveScanLevel sevenzip, ArchiveScanLevel gzip,
-			ArchiveScanLevel rar, ArchiveScanLevel zip, Logger logger, out bool shouldExternalProcess, out bool shouldInternalProcess)
+		public static void GetInternalExternalProcess(string input, ArchiveScanLevel archiveScanLevel,
+			Logger logger, out bool shouldExternalProcess, out bool shouldInternalProcess)
 		{
 			shouldExternalProcess = true;
 			shouldInternalProcess = true;
@@ -543,22 +520,97 @@ namespace SabreTools.Helper
 					shouldInternalProcess = false;
 					break;
 				case ArchiveType.GZip:
-					shouldExternalProcess = (gzip != ArchiveScanLevel.Internal);
-					shouldInternalProcess = (gzip != ArchiveScanLevel.External);
+					shouldExternalProcess = ((archiveScanLevel & ArchiveScanLevel.GZipExternal) != 0);
+					shouldInternalProcess = ((archiveScanLevel & ArchiveScanLevel.GZipInternal) != 0);
 					break;
 				case ArchiveType.Rar:
-					shouldExternalProcess = (rar != ArchiveScanLevel.Internal);
-					shouldInternalProcess = (rar != ArchiveScanLevel.External);
+					shouldExternalProcess = ((archiveScanLevel & ArchiveScanLevel.RarExternal) != 0);
+					shouldInternalProcess = ((archiveScanLevel & ArchiveScanLevel.RarInternal) != 0);
 					break;
 				case ArchiveType.SevenZip:
-					shouldExternalProcess = (sevenzip != ArchiveScanLevel.Internal);
-					shouldInternalProcess = (sevenzip != ArchiveScanLevel.External);
+					shouldExternalProcess = ((archiveScanLevel & ArchiveScanLevel.SevenZipExternal) != 0);
+					shouldInternalProcess = ((archiveScanLevel & ArchiveScanLevel.SevenZipInternal) != 0);
 					break;
 				case ArchiveType.Zip:
-					shouldExternalProcess = (zip != ArchiveScanLevel.Internal);
-					shouldInternalProcess = (zip != ArchiveScanLevel.External);
+					shouldExternalProcess = ((archiveScanLevel & ArchiveScanLevel.ZipExternal) != 0);
+					shouldInternalProcess = ((archiveScanLevel & ArchiveScanLevel.ZipInternal) != 0);
 					break;
 			}
+		}
+
+		/// <summary>
+		/// Get the archive scan level based on the inputs
+		/// </summary>
+		/// <param name="sevenzip">User-defined scan level for 7z archives</param>
+		/// <param name="gzip">User-defined scan level for GZ archives</param>
+		/// <param name="rar">User-defined scan level for RAR archives</param>
+		/// <param name="zip">User-defined scan level for Zip archives</param>
+		/// <returns>ArchiveScanLevel representing the levels</returns>
+		public static ArchiveScanLevel GetArchiveScanLevelFromNumbers(int sevenzip, int gzip, int rar, int zip)
+		{
+			ArchiveScanLevel archiveScanLevel = 0x0000;
+
+			// 7z
+			sevenzip = (sevenzip < 0 || sevenzip > 2 ? 0 : sevenzip);
+			switch (sevenzip)
+			{
+				case 0:
+					archiveScanLevel |= ArchiveScanLevel.SevenZipBoth;
+					break;
+				case 1:
+					archiveScanLevel |= ArchiveScanLevel.SevenZipInternal;
+					break;
+				case 2:
+					archiveScanLevel |= ArchiveScanLevel.SevenZipExternal;
+					break;
+			}
+
+			// GZip
+			gzip = (gzip < 0 || gzip > 2 ? 0 : gzip);
+			switch (gzip)
+			{
+				case 0:
+					archiveScanLevel |= ArchiveScanLevel.GZipBoth;
+					break;
+				case 1:
+					archiveScanLevel |= ArchiveScanLevel.GZipInternal;
+					break;
+				case 2:
+					archiveScanLevel |= ArchiveScanLevel.GZipExternal;
+					break;
+			}
+
+			// RAR
+			rar = (rar < 0 || rar > 2 ? 0 : rar);
+			switch (rar)
+			{
+				case 0:
+					archiveScanLevel |= ArchiveScanLevel.RarBoth;
+					break;
+				case 1:
+					archiveScanLevel |= ArchiveScanLevel.RarInternal;
+					break;
+				case 2:
+					archiveScanLevel |= ArchiveScanLevel.RarExternal;
+					break;
+			}
+
+			// Zip
+			zip = (zip < 0 || zip > 2 ? 0 : zip);
+			switch (zip)
+			{
+				case 0:
+					archiveScanLevel |= ArchiveScanLevel.ZipBoth;
+					break;
+				case 1:
+					archiveScanLevel |= ArchiveScanLevel.ZipInternal;
+					break;
+				case 2:
+					archiveScanLevel |= ArchiveScanLevel.ZipExternal;
+					break;
+			}
+
+			return archiveScanLevel;
 		}
 
 		/// <summary>
