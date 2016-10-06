@@ -1986,6 +1986,18 @@ namespace SabreTools.Helper
 					else
 					{
 						string itemval = gc[2].Value.Replace("\"", "");
+
+						if (line.StartsWith("Name:") && (gc == null || gc[2] == null))
+						{
+							Name = (String.IsNullOrEmpty(Name) ? line.Remove(5) : Name);
+							superdat = superdat || itemval.Contains(" - SuperDAT");
+							if (keep && superdat)
+							{
+								Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
+							}
+							break;
+						}
+
 						switch (gc[1].Value)
 						{
 							case "name":
@@ -3837,13 +3849,13 @@ namespace SabreTools.Helper
 						break;
 					case OutputFormat.DOSCenter:
 						header = "DOSCenter (\n" +
-							"Name: " + Name + "\"\n" +
-							"Description: " + Description + "\"\n" +
-							"Version: " + Version + "\"\n" +
-							"Date: " + Date + "\"\n" +
-							"Author: " + Author + "\"\n" +
-							"Homepage: " + Homepage + "\"\n" +
-							"Comment: " + Comment + "\"\n" +
+							"Name: " + Name + "\n" +
+							"Description: " + Description + "\n" +
+							"Version: " + Version + "\n" +
+							"Date: " + Date + "\n" +
+							"Author: " + Author + "\n" +
+							"Homepage: " + Homepage + "\n" +
+							"Comment: " + Comment + "\n" +
 							")\n";
 						break;
 					case OutputFormat.Logiqx:
