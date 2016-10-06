@@ -4348,7 +4348,7 @@ namespace SabreTools.Helper
 								// We don't output these at all
 								break;
 							case ItemType.Rom:
-								state += "\tfile ( name\"" + ((Rom)rom).Name
+								state += "\tfile ( name " + ((Rom)rom).Name
 									+ (((Rom)rom).Size != -1 ? " size " + ((Rom)rom).Size : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date " + ((Rom)rom).Date : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
