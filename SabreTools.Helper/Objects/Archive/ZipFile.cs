@@ -88,7 +88,7 @@ namespace SabreTools.Helper
 		}
 		public bool Contains(string n)
 		{
-			return _entries.Contains(new ZipFileEntry(new MemoryStream(), n, true));
+			return _entries.Contains(new ZipFileEntry(new MemoryStream(), n));
 		}
 
 		#endregion

@@ -13,6 +13,8 @@ namespace SabreTools.Helper
 {
 	public class ArchiveTools
 	{
+		private const int _bufferSize = 4096 * 128;
+
 		#region Archive-to-Archive Handling
 
 		/// <summary>
@@ -759,7 +761,7 @@ namespace SabreTools.Helper
 					// If the archive doesn't already contain the entry, add it
 					if (outarchive.GetEntry(rom.Name) == null)
 					{
-						ZipArchiveEntry ae = outarchive.CreateEntry(rom.Name, CompressionLevel.Optimal);
+						ZipArchiveEntry ae = outarchive.CreateEntry(rom.Name);
 						Stream outputStream = ae.Open();
 						inputStreams[i].CopyTo(outputStream);
 						outputStream.Flush();
@@ -888,9 +890,9 @@ namespace SabreTools.Helper
 						zipReturn = zipFile.OpenWriteStream(false, true, rom.Name, streamSize, CompressionMethod.Deflated, out writeStream);
 
 						// Copy the input stream to the output
-						byte[] buffer = new byte[8 * 1024];
+						byte[] buffer = new byte[_bufferSize];
 						int len;
-						while ((len = fs.Read(buffer, 0, buffer.Length)) > 0)
+						while ((len = fs.Read(buffer, 0, _bufferSize)) > 0)
 						{
 							writeStream.Write(buffer, 0, len);
 						}
@@ -956,9 +958,9 @@ namespace SabreTools.Helper
 							zipFile.OpenWriteStream(false, true, roms[-index - 1].Name, istreamSize, CompressionMethod.Deflated, out writeStream);
 
 							// Copy the input stream to the output
-							byte[] ibuffer = new byte[8 * 1024];
+							byte[] ibuffer = new byte[_bufferSize];
 							int ilen;
-							while ((ilen = freadStream.Read(ibuffer, 0, ibuffer.Length)) > 0)
+							while ((ilen = freadStream.Read(ibuffer, 0, _bufferSize)) > 0)
 							{
 								writeStream.Write(ibuffer, 0, ilen);
 							}
@@ -977,9 +979,9 @@ namespace SabreTools.Helper
 							zipFile.OpenWriteStream(false, true, oldZipFile.Filename(index), istreamSize, CompressionMethod.Deflated, out writeStream);
 
 							// Copy the input stream to the output
-							byte[] ibuffer = new byte[8 * 1024];
+							byte[] ibuffer = new byte[_bufferSize];
 							int ilen;
-							while ((ilen = zreadStream.Read(ibuffer, 0, ibuffer.Length)) > 0)
+							while ((ilen = zreadStream.Read(ibuffer, 0, _bufferSize)) > 0)
 							{
 								writeStream.Write(ibuffer, 0, ilen);
 							}
