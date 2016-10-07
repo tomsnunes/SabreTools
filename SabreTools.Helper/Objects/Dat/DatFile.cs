@@ -2991,23 +2991,6 @@ namespace SabreTools.Helper
 										break;
 								}
 							}
-
-							// If we didn't find any items in the folder, make sure to add the blank rom
-							if (empty)
-							{
-								tempname = (parent.Count > 0 ? String.Join("\\", parent) + Path.DirectorySeparatorChar : "") + tempname;
-
-								Rom inrom = new Rom("null", tempname);
-
-								// Now process and add the rom
-								ParseAddHelper(inrom, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, clean, logger, out key);
-
-								// Regardless, end the current folder
-								if (parent.Count == 0)
-								{
-									empty = true;
-								}
-							}
 							xtr.Skip();
 							break;
 						case "dir":
