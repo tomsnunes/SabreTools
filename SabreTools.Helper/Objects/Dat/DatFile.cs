@@ -915,7 +915,7 @@ namespace SabreTools.Helper
 									DatFile innerDatdata = (DatFile)Clone();
 									innerDatdata.Files = null;
 									innerDatdata.Parse(file, 0, 0, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus,
-										trim, single, root, logger, true, clean,
+										trim, single, root, logger, true, clean, softlist,
 										keepext: ((innerDatdata.OutputFormat & OutputFormat.TSV) != 0 || (innerDatdata.OutputFormat & OutputFormat.CSV) != 0));
 
 									// If we have roms, output them
