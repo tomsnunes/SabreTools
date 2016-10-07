@@ -870,7 +870,7 @@ namespace SabreTools.Helper
 					Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
 					for (int i = 0; i < inputFiles.Count; i++)
 					{
-						inputIndexMap.Add(inputFiles[i], i);
+						inputIndexMap.Add(roms[i].Name.Replace('\\', '/'), i);
 					}
 
 					// Sort the keys in TZIP order
@@ -880,27 +880,23 @@ namespace SabreTools.Helper
 					// Now add all of the files in order
 					foreach (string key in keys)
 					{
-						string inputFile = key;
-						Rom rom = roms[inputIndexMap[key]];
+						// Get the index mapped to the key
+						int index = inputIndexMap[key];
 
 						// Open the input file for reading
-						Stream fs = File.Open(inputFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
-						ulong streamSize = (ulong)(new FileInfo(inputFile).Length);
-						zipReturn = zipFile.OpenWriteStream(false, true, rom.Name, streamSize, CompressionMethod.Deflated, out writeStream);
+						Stream freadStream = File.Open(inputFiles[index], FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+						ulong istreamSize = (ulong)(new FileInfo(inputFiles[index]).Length);
+						zipFile.OpenWriteStream(false, true, roms[index].Name.Replace('\\', '/'), istreamSize, CompressionMethod.Deflated, out writeStream);
 
 						// Copy the input stream to the output
-						byte[] buffer = new byte[_bufferSize];
-						int len;
-						while ((len = fs.Read(buffer, 0, _bufferSize)) > 0)
+						byte[] ibuffer = new byte[_bufferSize];
+						int ilen;
+						while ((ilen = freadStream.Read(ibuffer, 0, _bufferSize)) > 0)
 						{
-							writeStream.Write(buffer, 0, len);
+							writeStream.Write(ibuffer, 0, ilen);
 						}
-						writeStream.Flush();
-						zipFile.CloseWriteStream(Convert.ToUInt32(rom.CRC, 16));
-
-						//Dispose of the file stream
-						fs.Dispose();
+						freadStream.Dispose();
+						zipFile.CloseWriteStream(Convert.ToUInt32(roms[index].CRC, 16));
 					}
 				}
 
@@ -915,12 +911,12 @@ namespace SabreTools.Helper
 					for (int i = 0; i < inputFiles.Count; i++)
 					{
 						// If the old one contains the new file, then just skip out
-						if (oldZipFile.Contains(roms[i].Name))
+						if (oldZipFile.Contains(roms[i].Name.Replace('\\', '/')))
 						{
 							continue;
 						}
 
-						inputIndexMap.Add(inputFiles[i], -(i + 1));
+						inputIndexMap.Add(roms[i].Name.Replace('\\', '/'), -(i + 1));
 					}
 
 					// Then add all of the old entries to it too
@@ -946,16 +942,16 @@ namespace SabreTools.Helper
 					// Copy over all files to the new archive
 					foreach (string key in keys)
 					{
-						// Get the index mapped to they key
+						// Get the index mapped to the key
 						int index = inputIndexMap[key];
 
 						// If we have the input file, add it now
 						if (index < 0)
 						{
 							// Open the input file for reading
-							Stream freadStream = File.Open(key, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-							ulong istreamSize = (ulong)(new FileInfo(key).Length);
-							zipFile.OpenWriteStream(false, true, roms[-index - 1].Name, istreamSize, CompressionMethod.Deflated, out writeStream);
+							Stream freadStream = File.Open(inputFiles[-index - 1], FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+							ulong istreamSize = (ulong)(new FileInfo(inputFiles[-index - 1]).Length);
+							zipFile.OpenWriteStream(false, true, roms[-index - 1].Name.Replace('\\', '/'), istreamSize, CompressionMethod.Deflated, out writeStream);
 
 							// Copy the input stream to the output
 							byte[] ibuffer = new byte[_bufferSize];
