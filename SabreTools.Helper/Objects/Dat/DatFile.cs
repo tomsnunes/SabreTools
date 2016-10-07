@@ -3361,22 +3361,22 @@ namespace SabreTools.Helper
 				string line = sr.ReadLine();
 
 				// If the line is the start of the credits section
-				if (line.ToLowerInvariant().Contains("[credits]"))
+				if (line.ToLowerInvariant().StartsWith("[credits]"))
 				{
 					blocktype = "credits";
 				}
 				// If the line is the start of the dat section
-				else if (line.ToLowerInvariant().Contains("[dat]"))
+				else if (line.ToLowerInvariant().StartsWith("[dat]"))
 				{
 					blocktype = "dat";
 				}
 				// If the line is the start of the emulator section
-				else if (line.ToLowerInvariant().Contains("[emulator]"))
+				else if (line.ToLowerInvariant().StartsWith("[emulator]"))
 				{
 					blocktype = "emulator";
 				}
 				// If the line is the start of the game section
-				else if (line.ToLowerInvariant().Contains("[games]"))
+				else if (line.ToLowerInvariant().StartsWith("[games]"))
 				{
 					blocktype = "games";
 				}
