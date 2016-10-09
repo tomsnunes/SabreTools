@@ -57,15 +57,58 @@ namespace SabreTools.Helper
 				string[] vals = _attributes.GetValues(key);
 				string[] ovals = other.GetValues(key);
 
-				// TODO: This does a flat check on all items. This needs to have some finesse when it comes to comparing hashes and sizes for roms,
-				// disks, and files since they are all separate now
+				// Special case for "rom"
+				if (_name == "rom")
+				{
+					// If either is a nodump, it's never a match
+					if (Get("status") == "nodump" || other.Get("status") == "nodump")
+					{
+						success = false;
+					}
 
-				// http://stackoverflow.com/questions/649444/testing-equality-of-arrays-in-c-sharp
-				var q = from a in vals
-						join b in ovals on a equals b
-						select a;
+					// If the size is the same and any combination of metadata matches
+					if ((Get("size") == other.Get("size")) &&
+						((String.IsNullOrEmpty(Get("crc")) || String.IsNullOrEmpty(other.Get("crc"))) || Get("crc") == other.Get("crc")) &&
+						((String.IsNullOrEmpty(Get("md5")) || String.IsNullOrEmpty(other.Get("md5"))) || Get("md5") == other.Get("md5")) &&
+						((String.IsNullOrEmpty(Get("sha1")) || String.IsNullOrEmpty(other.Get("sha1"))) || Get("sha1") == other.Get("sha1")))
+					{
+						success = true;
+					}
+					else
+					{
+						success = false;
+					}
+				}
+				// Special case for "disk"
+				else if (_name == "disk")
+				{
+					// If either is a nodump, it's never a match
+					if (Get("status") == "nodump" || other.Get("status") == "nodump")
+					{
+						success = false;
+					}
 
-				success &= vals.Length == ovals.Length && q.Count() == vals.Length;
+					// If any combination of metadata matches
+					if (((String.IsNullOrEmpty(Get("md5")) || String.IsNullOrEmpty(other.Get("md5"))) || Get("md5") == other.Get("md5")) &&
+						((String.IsNullOrEmpty(Get("sha1")) || String.IsNullOrEmpty(other.Get("sha1"))) || Get("sha1") == other.Get("sha1")))
+					{
+						success = true;
+					}
+					else
+					{
+						success = false;
+					}
+				}
+				// For everything else
+				else
+				{
+					// http://stackoverflow.com/questions/649444/testing-equality-of-arrays-in-c-sharp
+					var q = from a in vals
+							join b in ovals on a equals b
+							select a;
+
+					success &= vals.Length == ovals.Length && q.Count() == vals.Length;
+				}
 			}
 
 			return success;
