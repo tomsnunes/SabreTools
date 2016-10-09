@@ -11,7 +11,7 @@ namespace SabreTools
 		#region Init Methods
 
 		/// <summary>
-		/// Wrap converting a folder to TGZ, optionally filtering by an input DAT(s)
+		/// Wrap converting a folder to TorrentZip or TorrentGZ, optionally filtering by an input DAT(s)
 		/// </summary>
 		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">List of all inputted files and folders</param>
@@ -24,7 +24,7 @@ namespace SabreTools
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public static bool InitConvertFolderTGZ(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool delete,
+		public static bool InitConvertFolder(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool delete,
 			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			// Add all of the input DATs into one huge internal DAT
@@ -297,7 +297,7 @@ namespace SabreTools
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan,
-			bool toFolder, bool verify, bool delete, bool? torrentX, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
+			bool toFolder, bool verify, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
@@ -310,7 +310,7 @@ namespace SabreTools
 			}
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
-				delete, torrentX, romba, asl, updateDat, logger);
+				delete, tgz, romba, asl, updateDat, logger);
 			ss.StartProcessing();
 		}
 

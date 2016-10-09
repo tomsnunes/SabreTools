@@ -438,7 +438,7 @@ namespace SabreTools.Helper
 					return ZipReturn.ZipLocalFileHeaderError;
 				}
 				// If we don't have the zeroed flag set, then the size should match
-				if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == 0 && readCompressedSize != _compressedSize)
+				if (!_zip64 && (_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == 0 && readCompressedSize != _compressedSize)
 				{
 					return ZipReturn.ZipLocalFileHeaderError;
 				}
@@ -455,7 +455,7 @@ namespace SabreTools.Helper
 					return ZipReturn.ZipLocalFileHeaderError;
 				}
 				// If we don't have the zeroed flag set, then the size should match
-				if ((_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == 0 && readUncompressedSize != _uncompressedSize)
+				if (!_zip64 && (_generalPurposeBitFlag & GeneralPurposeBitFlag.ZeroedCRCAndSize) == 0 && readUncompressedSize != _uncompressedSize)
 				{
 					return ZipReturn.ZipLocalFileHeaderError;
 				}

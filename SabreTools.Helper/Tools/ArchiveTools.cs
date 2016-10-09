@@ -5,7 +5,6 @@ using SharpCompress.Reader;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -26,12 +25,13 @@ namespace SabreTools.Helper
 		/// <param name="destEntryName">Output entry name</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the copy was a success, false otherwise</returns>
-		public static bool CopyFileBetweenArchives(string inputArchive, string outDir,
-			string sourceEntryName, Rom destEntry, Logger logger)
+		public static bool CopyFileBetweenArchives(string inputArchive, string outDir, string sourceEntryName, Rom destEntry, Logger logger)
 		{
-			string realName = "";
-			Stream ms = ExtractSingleStreamFromArchive(inputArchive, sourceEntryName, out realName, logger);
-			return WriteToArchive(ms, outDir, destEntry);
+			string temp = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+			string realName = ExtractSingleItemFromArchive(inputArchive, sourceEntryName, temp, logger);
+			bool success = WriteToArchive(realName, outDir, destEntry, logger);
+			Directory.Delete(temp, true);
+			return success;
 		}
 
 		/// <summary>
@@ -132,8 +132,46 @@ namespace SabreTools.Helper
 
 					encounteredErrors = false;
 				}
-				else if ((at == ArchiveType.Zip && (archiveScanLevel & ArchiveScanLevel.ZipInternal) != 0)
-					|| (at == ArchiveType.Rar && (archiveScanLevel & ArchiveScanLevel.RarInternal) != 0))
+				else if (at == ArchiveType.Zip && (archiveScanLevel & ArchiveScanLevel.ZipInternal) != 0)
+				{
+					logger.Verbose("Found archive of type: " + at);
+
+					// Create the temp directory
+					Directory.CreateDirectory(tempDir);
+
+					// Extract all files to the temp directory
+					ZipFile zf = new ZipFile();
+					ZipReturn zr = zf.Open(input, new FileInfo(input).LastWriteTime.Ticks, true);
+					if (zr != ZipReturn.ZipGood)
+					{
+						throw new Exception(ZipFile.ZipErrorMessageText(zr));
+					}
+
+					for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
+					{
+						// Set defaults before writing out
+						Stream readStream;
+						ulong streamsize = 0;
+						CompressionMethod cm = CompressionMethod.Stored;
+
+						zr = zf.OpenReadStream(i, false, out readStream, out streamsize, out cm);
+
+						FileStream writeStream = File.OpenWrite(Path.Combine(tempDir, zf.Entries[i].FileName));
+
+						byte[] ibuffer = new byte[_bufferSize];
+						int ilen;
+						while ((ilen = readStream.Read(ibuffer, 0, _bufferSize)) > 0)
+						{
+							writeStream.Write(ibuffer, 0, ilen);
+							writeStream.Flush();
+						}
+
+						encounteredErrors = false;
+						zr = zf.CloseReadStream();
+						writeStream.Dispose();
+					}
+				}
+				else if (at == ArchiveType.Rar && (archiveScanLevel & ArchiveScanLevel.RarInternal) != 0)
 				{
 					logger.Verbose("Found archive of type: " + at);
 
@@ -179,26 +217,30 @@ namespace SabreTools.Helper
 		/// <returns>Name of the extracted file, null on error</returns>
 		public static string ExtractSingleItemFromArchive(string input, string entryName, string tempDir, Logger logger)
 		{
-			string outfile = null;
-
 			string realEntry = "";
 			Stream ms = ExtractSingleStreamFromArchive(input, entryName, out realEntry, logger);
 
 			realEntry = Path.GetFullPath(Path.Combine(tempDir, realEntry));
-			if (!Directory.Exists(Path.GetDirectoryName(outfile)))
+			if (!Directory.Exists(Path.GetDirectoryName(realEntry)))
 			{
-				Directory.CreateDirectory(Path.GetDirectoryName(outfile));
+				Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
 			}
 
 			FileStream fs = File.Open(realEntry, FileMode.Create, FileAccess.Write);
-			ms.CopyTo(fs);
-			fs.Flush();
+
+			byte[] ibuffer = new byte[_bufferSize];
+			int ilen;
+			while ((ilen = ms.Read(ibuffer, 0, _bufferSize)) > 0)
+			{
+				fs.Write(ibuffer, 0, ilen);
+				fs.Flush();
+			}
 
 			// Dispose of the streams
 			ms.Dispose();
 			fs.Dispose();
 
-			return outfile;
+			return realEntry;
 		}
 
 		/// <summary>
@@ -228,7 +270,42 @@ namespace SabreTools.Helper
 			IReader reader = null;
 			try
 			{
-				if (at == ArchiveType.Zip || at == ArchiveType.SevenZip || at == ArchiveType.Rar)
+				if (at == ArchiveType.Zip)
+				{
+					ZipFile zf = new ZipFile();
+					ZipReturn zr = zf.Open(input, new FileInfo(input).LastWriteTime.Ticks, true);
+					if (zr != ZipReturn.ZipGood)
+					{
+						throw new Exception(ZipFile.ZipErrorMessageText(zr));
+					}
+
+					for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
+					{
+						logger.Verbose("Current entry name: '" + zf.Entries[i].FileName + "'");
+						if (zf.Entries[i].FileName.Contains(entryName))
+						{
+							realEntry = zf.Entries[i].FileName;
+
+							// Set defaults before writing out
+							Stream readStream;
+							ulong streamsize = 0;
+							CompressionMethod cm = CompressionMethod.Stored;
+
+							zr = zf.OpenReadStream(i, false, out readStream, out streamsize, out cm);
+
+							byte[] ibuffer = new byte[_bufferSize];
+							int ilen;
+							while ((ilen = readStream.Read(ibuffer, 0, _bufferSize)) > 0)
+							{
+								st.Write(ibuffer, 0, ilen);
+								st.Flush();
+							}
+
+							zr = zf.CloseReadStream();
+						}
+					}
+				}
+				else if (at == ArchiveType.SevenZip || at == ArchiveType.Rar)
 				{
 					reader = ReaderFactory.Open(File.OpenRead(input));
 					while (reader.MoveToNextEntry())
@@ -263,6 +340,7 @@ namespace SabreTools.Helper
 				reader?.Dispose();
 			}
 
+			st.Position = 0;
 			return st;
 		}
 
@@ -322,8 +400,34 @@ namespace SabreTools.Helper
 					size = BitConverter.ToInt32(headersize.Reverse().ToArray(), 0);
 					br.Dispose();
 				}
+				else if (at == ArchiveType.Zip)
+				{
+					ZipFile zf = new ZipFile();
+					ZipReturn zr = zf.Open(input, new FileInfo(input).LastWriteTime.Ticks, true);
+					if (zr != ZipReturn.ZipGood)
+					{
+						throw new Exception(ZipFile.ZipErrorMessageText(zr));
+					}
 
-				if (at != ArchiveType.Tar)
+					for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
+					{
+						string newname = zf.Entries[i].FileName;
+						long newsize = (size == 0 ? (long)zf.Entries[i].UncompressedSize : size);
+						string newcrc = BitConverter.ToString(zf.Entries[i].CRC.Reverse().ToArray(), 0, zf.Entries[i].CRC.Length).Replace("-", string.Empty).ToLowerInvariant();
+
+						logger.Verbose("Entry found: '" + newname + "': " + newsize + ", " + newcrc);
+
+						roms.Add(new Rom
+						{
+							Type = ItemType.Rom,
+							Name = newname,
+							MachineName = gamename,
+							Size = newsize,
+							CRC = newcrc,
+						});
+					}
+				}
+				else if (at != ArchiveType.Tar)
 				{
 					reader = ReaderFactory.Open(File.OpenRead(input));
 					while (reader.MoveToNextEntry())
@@ -635,169 +739,6 @@ namespace SabreTools.Helper
 		#region Writing
 
 		/// <summary>
-		/// Copy a file to an output archive
-		/// </summary>
-		/// <param name="inputFile">Input filename to be moved</param>
-		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
-		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteToArchive(string inputFile, string outDir, Rom rom)
-		{
-			// Get the stream from the input file
-			Stream fs = File.OpenRead(inputFile);
-			bool success = WriteToArchive(fs, outDir, rom);
-			fs.Dispose();
-
-			return success;
-		}
-
-		/// <summary>
-		/// Copy a stream to an output archive
-		/// </summary>
-		/// <param name="inputStream">Input stream to be written</param>
-		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
-		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteToArchive(Stream inputStream, string outDir, Rom rom)
-		{
-			// Wrap the individual inputs into lists
-			List<Stream> inputFiles = new List<Stream>();
-			inputFiles.Add(inputStream);
-			List<Rom> roms = new List<Rom>();
-			roms.Add(rom);
-
-			return WriteToArchive(inputFiles, outDir, roms);
-		}
-
-		/// <summary>
-		/// Copy a set of files to an output archive (assuming the same output archive name)
-		/// </summary>
-		/// <param name="inputFiles">Input filenames to be moved</param>
-		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="roms">List of Rom representing the new information</param>
-		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteToArchive(List<string> inputFiles, string outDir, List<Rom> roms)
-		{
-			bool success = false;
-
-			// If the number of inputs is less than the number of available roms, return
-			if (inputFiles.Count < roms.Count)
-			{
-				return success;
-			}
-
-			// If one of the files doesn't exist, return
-			foreach (string file in inputFiles)
-			{
-				if (!File.Exists(file))
-				{
-					return success;
-				}
-			}
-
-			// Get the streams from the input files
-			List<Stream> inputStreams = new List<Stream>();
-			foreach (string inputFile in inputFiles)
-			{
-				inputStreams.Add(File.OpenRead(inputFile));
-			}
-
-			success = WriteToArchive(inputStreams, outDir, roms);
-
-			// Now close all of the streams
-			foreach (Stream inputStream in inputStreams)
-			{
-				inputStream.Dispose();
-			}
-
-			return success;
-		}
-
-		/// <summary>
-		/// Copy a set of streams to an output archive (assuming the same output archive name)
-		/// </summary>
-		/// <param name="inputStreams">Input streams to be moved</param>
-		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="roms">List of Rom representing the new information</param>
-		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteToArchive(List<Stream> inputStreams, string outDir, List<Rom> roms)
-		{
-			bool success = false;
-
-			// If the number of inputs is less than the number of available roms, return
-			if (inputStreams.Count < roms.Count)
-			{
-				return success;
-			}
-
-			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, roms[0].MachineName + ".zip");
-
-			// First, open the archive
-			ZipArchive outarchive = null;
-			try
-			{
-				// If the full output path doesn't exist, create it
-				if (!Directory.Exists(Path.GetDirectoryName(archiveFileName)))
-				{
-					Directory.CreateDirectory(Path.GetDirectoryName(archiveFileName));
-				}
-
-				// If the archive doesn't exist, create it
-				if (!File.Exists(archiveFileName))
-				{
-					outarchive = System.IO.Compression.ZipFile.Open(archiveFileName, ZipArchiveMode.Create);
-					outarchive.Dispose();
-				}
-
-				// Open the archive for writing
-				outarchive = System.IO.Compression.ZipFile.Open(archiveFileName, ZipArchiveMode.Update);
-
-				// Now loop through and add all files
-				for (int i = 0; i < inputStreams.Count; i++)
-				{
-					Rom rom = roms[i];
-
-					// If the archive doesn't already contain the entry, add it
-					if (outarchive.GetEntry(rom.Name) == null)
-					{
-						ZipArchiveEntry ae = outarchive.CreateEntry(rom.Name);
-						Stream outputStream = ae.Open();
-						inputStreams[i].CopyTo(outputStream);
-						outputStream.Flush();
-						outputStream.Dispose();
-					}
-
-					// If there's a Date attached to the rom, change the entry to that Date
-					if (!string.IsNullOrEmpty(rom.Date))
-					{
-						DateTimeOffset dto = DateTimeOffset.Now;
-						if (DateTimeOffset.TryParse(rom.Date, out dto))
-						{
-							outarchive.GetEntry(rom.Name).LastWriteTime = dto;
-						}
-					}
-				}
-
-				// Dispose of the streams
-				outarchive.Dispose();
-
-				success = true;
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex);
-				success = false;
-			}
-			finally
-			{
-				outarchive?.Dispose();
-			}
-
-			return success;
-		}
-
-		/// <summary>
 		/// Copy a file to an output torrentzip archive
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
@@ -805,7 +746,7 @@ namespace SabreTools.Helper
 		/// <param name="rom">RomData representing the new information</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrentZip(string inputFile, string outDir, Rom rom, Logger logger)
+		public static bool WriteToArchive(string inputFile, string outDir, Rom rom, Logger logger)
 		{
 			// Wrap the individual inputs into lists
 			List<string> inputFiles = new List<string>();
@@ -813,7 +754,7 @@ namespace SabreTools.Helper
 			List<Rom> roms = new List<Rom>();
 			roms.Add(rom);
 
-			return WriteTorrentZip(inputFiles, outDir, roms, logger);
+			return WriteToArchive(inputFiles, outDir, roms, logger);
 		}
 
 		/// <summary>
@@ -824,7 +765,7 @@ namespace SabreTools.Helper
 		/// <param name="rom">List of Rom representing the new information</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrentZip(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger)
+		public static bool WriteToArchive(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger)
 		{
 			bool success = false;
 			string tempFile = Path.GetTempFileName();
@@ -894,6 +835,7 @@ namespace SabreTools.Helper
 						while ((ilen = freadStream.Read(ibuffer, 0, _bufferSize)) > 0)
 						{
 							writeStream.Write(ibuffer, 0, ilen);
+							writeStream.Flush();
 						}
 						freadStream.Dispose();
 						zipFile.CloseWriteStream(Convert.ToUInt32(roms[index].CRC, 16));
@@ -959,6 +901,7 @@ namespace SabreTools.Helper
 							while ((ilen = freadStream.Read(ibuffer, 0, _bufferSize)) > 0)
 							{
 								writeStream.Write(ibuffer, 0, ilen);
+								writeStream.Flush();
 							}
 							freadStream.Dispose();
 							zipFile.CloseWriteStream(Convert.ToUInt32(roms[-index - 1].CRC, 16));
@@ -980,6 +923,7 @@ namespace SabreTools.Helper
 							while ((ilen = zreadStream.Read(ibuffer, 0, _bufferSize)) > 0)
 							{
 								writeStream.Write(ibuffer, 0, ilen);
+								writeStream.Flush();
 							}
 							zipFile.CloseWriteStream(BitConverter.ToUInt32(oldZipFile.CRC32(index), 0));
 						}

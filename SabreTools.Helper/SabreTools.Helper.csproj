@@ -106,6 +106,7 @@
     <Compile Include="Objects\Dat\BiosSet.cs" />
     <Compile Include="Objects\Dat\DatFile.cs" />
     <Compile Include="Objects\Dat\DatItem.cs" />
+    <Compile Include="Objects\Dat\DatItemKV.cs" />
     <Compile Include="Objects\Dat\Disk.cs" />
     <Compile Include="Objects\Dat\Release.cs" />
     <Compile Include="Objects\Dat\Sample.cs" />

@@ -42,16 +42,15 @@ namespace SabreTools
 
 			// Set all default values
 			bool help = false,
-				convert = false,
 				delete = false,
+				convert = false,
 				quickScan = false,
 				romba = false,
 				simpleSort = true,
 				toFolder = false,
-				tzip = false,
+				tgz = false,
 				updateDat = false,
 				verify = false;
-			bool? torrentX = null;
 			int sevenzip = 0,
 				gz = 2,
 				rar = 2,
@@ -93,11 +92,7 @@ namespace SabreTools
 						break;
 					case "-tgz":
 					case "--tgz":
-						torrentX = false;
-						break;
-					case "-tzip":
-					case "--tzip":
-						torrentX = true;
+						tgz = true;
 						break;
 					case "-ud":
 					case "--updated-dat":
@@ -186,7 +181,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && ((simpleSort && !verify) || convert || tzip))
+			if (inputs.Count == 0 && ((simpleSort && !verify) || convert))
 			{
 				logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -194,10 +189,11 @@ namespace SabreTools
 				return;
 			}
 
-			// If we are converting the folder to TGZ
+			// If we are converting the folder
 			else if (convert)
 			{
-				InitConvertFolderTGZ(datfiles, inputs, outDir, tempDir, delete, romba, sevenzip, gz, rar, zip, logger);
+				InitConvertFolder(datfiles, inputs, outDir, tempDir, delete, tgz, romba, sevenzip,
+					gz, rar, zip, logger);
 			}
 
 			// If we are doing a simple sort
@@ -206,7 +202,7 @@ namespace SabreTools
 				if (datfiles.Count > 0)
 				{
 					InitSortVerify(datfiles, inputs, outDir, tempDir, quickScan, toFolder,
-						verify, delete, torrentX, romba, sevenzip, gz, rar, zip, updateDat, logger);
+						verify, delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, logger);
 				}
 				else
 				{
@@ -228,21 +224,22 @@ namespace SabreTools
 		}
 
 		/// <summary>
-		/// Wrap converting a folder to TGZ, optionally filtering by an input DAT(s)
+		/// Wrap converting a folder to TorrentZip or TorrentGZ, optionally filtering by an input DAT(s)
 		/// </summary>
 		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">List of all inputted files and folders</param>
 		/// <param name="outDir">Output directory (empty for default directory)</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="tgz">True to output files in TorrentGZ format, false for TorrentZip</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public static bool InitConvertFolderTGZ(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool delete,
-			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
+		public static bool InitConvertFolder(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool delete,
+			bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
@@ -279,7 +276,7 @@ namespace SabreTools
 			logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			SimpleSort ss = new SimpleSort(datdata, newinputs, outDir, tempDir, false, false, false,
-				delete, false, romba, asl, false, logger);
+				delete, tgz, romba, asl, false, logger);
 			return ss.Convert();
 		}
 
@@ -295,7 +292,7 @@ namespace SabreTools
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
-		/// <param name="torrentX">True is for TorrentZip, False is for TorrentGZ, Null is for standard zip</param>
+		/// <param name="tgz">True to output files in TorrentGZ format, false for TorrentZip</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
@@ -303,7 +300,7 @@ namespace SabreTools
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan,
-			bool toFolder, bool verify, bool delete, bool? torrentX, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
+			bool toFolder, bool verify, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
@@ -320,7 +317,7 @@ namespace SabreTools
 			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
-				delete, torrentX, romba, asl, updateDat, logger);
+				delete, tgz, romba, asl, updateDat, logger);
 			ss.StartProcessing();
 		}
 	}

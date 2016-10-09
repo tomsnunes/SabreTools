@@ -493,7 +493,7 @@ namespace SabreTools.Helper
 					input.Seek(offset, SeekOrigin.Begin);
 				}
 
-				byte[] buffer = new byte[1024];
+				byte[] buffer = new byte[8 * 1024];
 				int read;
 				while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
 				{

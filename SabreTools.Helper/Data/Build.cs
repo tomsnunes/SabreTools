@@ -286,8 +286,6 @@ namespace SabreTools.Helper
 					helptext.Add("  -v, --verify		Enable verification of output directory");
 					helptext.Add("  -c, --convert		Enable conversion of input files to TGZ");
 					helptext.Add("	Note: If a DAT is used, only files NOT included will rebuild");
-					helptext.Add("	-r, --romba		Enable Romba depot dir output");
-					helptext.Add("  -tzip			Enable TorrentZip output");
 					helptext.Add("  -tgz			Enable TorrentGZ output");
 					helptext.Add("	-r, --romba		Enable Romba depot dir output");
 					helptext.Add("  -do, --directory	Output files as uncompressed");

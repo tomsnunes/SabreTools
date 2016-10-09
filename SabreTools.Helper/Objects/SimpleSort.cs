@@ -17,7 +17,7 @@ namespace SabreTools.Helper
 		private bool _toFolder;
 		private bool _verify;
 		private bool _delete;
-		private bool? _torrentX; // True is for TorrentZip, False is for TorrentGZ, Null is for standard zip
+		private bool _tgz;
 		private bool _romba;
 		private bool _updateDat;
 		private ArchiveScanLevel _archiveScanLevel;
@@ -40,13 +40,13 @@ namespace SabreTools.Helper
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
-		/// <param name="torrentX">True is for TorrentZip, False is for TorrentGZ, Null is for standard zip</param>
+		/// <param name="tgz">True if output files should be written to TorrentGZ instead of TorrentZip</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public SimpleSort(DatFile datdata, List<string> inputs, string outDir, string tempDir,
-			bool quickScan, bool toFolder, bool verify, bool delete, bool? torrentX, bool romba,
+			bool quickScan, bool toFolder, bool verify, bool delete, bool tgz, bool romba,
 			ArchiveScanLevel archiveScanLevel, bool updateDat, Logger logger)
 		{
 			_datdata = datdata;
@@ -57,7 +57,7 @@ namespace SabreTools.Helper
 			_toFolder = toFolder;
 			_verify = verify;
 			_delete = delete;
-			_torrentX = torrentX;
+			_tgz = tgz;
 			_romba = romba;
 			_archiveScanLevel = archiveScanLevel;
 			_updateDat = updateDat;
@@ -333,7 +333,7 @@ namespace SabreTools.Helper
 							Directory.CreateDirectory(gamedir);
 						}
 
-						_logger.Verbose("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
+						_logger.Verbose("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_tgz ? found.SHA1 : found.Name) + "'");
 						try
 						{
 							File.Copy(input, Path.Combine(gamedir, Path.GetFileName(found.Name)));
@@ -342,17 +342,13 @@ namespace SabreTools.Helper
 					}
 					else
 					{
-						if (_torrentX == true)
-						{
-							ArchiveTools.WriteTorrentZip(input, _outDir, found, _logger);
-						}
-						else if (_torrentX == false)
+						if (_tgz)
 						{
 							ArchiveTools.WriteTorrentGZ(input, _outDir, _romba, _logger);
 						}
 						else
 						{
-							ArchiveTools.WriteToArchive(input, _outDir, found);
+							ArchiveTools.WriteToArchive(input, _outDir, found, _logger);
 						}
 					}
 				}
@@ -404,7 +400,7 @@ namespace SabreTools.Helper
 								Directory.CreateDirectory(gamedir);
 							}
 
-							_logger.Verbose("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
+							_logger.Verbose("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_tgz ? found.SHA1 : found.Name) + "'");
 							try
 							{
 								File.Copy(newinput, Path.Combine(gamedir, Path.GetFileName(found.Name)));
@@ -413,17 +409,13 @@ namespace SabreTools.Helper
 						}
 						else
 						{
-							if (_torrentX == true)
-							{
-								ArchiveTools.WriteTorrentZip(newinput, _outDir, found, _logger);
-							}
-							else if (_torrentX == false)
+							if (_tgz)
 							{
 								ArchiveTools.WriteTorrentGZ(newinput, _outDir, _romba, _logger);
 							}
 							else
 							{
-								ArchiveTools.WriteToArchive(newinput, _outDir, found);
+								ArchiveTools.WriteToArchive(newinput, _outDir, found, _logger);
 							}
 						}
 
@@ -467,17 +459,13 @@ namespace SabreTools.Helper
 						else
 						{
 							_logger.Verbose("Matched name: " + newfound.Name);
-							if (_torrentX == true)
-							{
-								ArchiveTools.WriteTorrentZip(input, _outDir, newfound, _logger);
-							}
-							else if (_torrentX == false)
+							if (_tgz)
 							{
 								ArchiveTools.WriteTorrentGZ(input, _outDir, _romba, _logger);
 							}
 							else
 							{
-								ArchiveTools.WriteToArchive(input, _outDir, newfound);
+								ArchiveTools.WriteToArchive(input, _outDir, newfound, _logger);
 							}
 						}
 					}
@@ -550,24 +538,20 @@ namespace SabreTools.Helper
 								else
 								{
 									// Copy file between archives
-									_logger.Verbose("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_torrentX == false ? found.SHA1 : found.Name) + "'");
+									_logger.Verbose("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + (_tgz ? found.SHA1 : found.Name) + "'");
 
-									if (Build.MonoEnvironment || _torrentX == false)
+									if (Build.MonoEnvironment || _tgz)
 									{
 										string outfile = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, _tempDir, _logger);
 										if (File.Exists(outfile))
 										{
-											if (_torrentX == true)
-											{
-												ArchiveTools.WriteTorrentZip(outfile, _outDir, found, _logger);
-											}
-											else if (_torrentX == false)
+											if (_tgz)
 											{
 												ArchiveTools.WriteTorrentGZ(outfile, _outDir, _romba, _logger);
 											}
 											else
 											{
-												ArchiveTools.WriteToArchive(outfile, _outDir, found);
+												ArchiveTools.WriteToArchive(outfile, _outDir, found, _logger);
 											}
 
 											try
@@ -995,7 +979,7 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Process inputs and convert to TGZ, optionally converting to Romba
+		/// Process inputs and convert to TorrentZip or TorrentGZ, optionally converting to Romba
 		/// </summary>
 		/// <returns>True if processing was a success, false otherwise</returns>
 		public bool Convert()
@@ -1032,9 +1016,9 @@ namespace SabreTools.Helper
 				if (shouldExternalProcess)
 				{
 					// If a DAT is defined, we want to make sure that this file is not in there
+					Rom rom = FileTools.GetFileInfo(input, _logger);
 					if (_datdata != null && _datdata.Files.Count > 0)
 					{
-						Rom rom = FileTools.GetFileInfo(input, _logger);
 						if (rom.HasDuplicates(_datdata, _logger))
 						{
 							_logger.User("File '" + input + "' existed in the DAT, skipping...");
@@ -1043,7 +1027,15 @@ namespace SabreTools.Helper
 					}
 
 					_logger.User("Processing file " + input);
-					success &= ArchiveTools.WriteTorrentGZ(input, _outDir, _romba, _logger);
+
+					if (_tgz)
+					{
+						success &= ArchiveTools.WriteTorrentGZ(input, _outDir, _romba, _logger);
+					}
+					else
+					{
+						success &= ArchiveTools.WriteToArchive(input, _outDir, rom, _logger);
+					}
 				}
 
 				// Process the file as an archive, if necessary
@@ -1059,9 +1051,9 @@ namespace SabreTools.Helper
 						foreach (string file in Directory.EnumerateFiles(_tempDir, "*", SearchOption.AllDirectories))
 						{
 							// If a DAT is defined, we want to make sure that this file is not in there
+							Rom rom = FileTools.GetFileInfo(file, _logger);
 							if (_datdata != null && _datdata.Files.Count > 0)
 							{
-								Rom rom = FileTools.GetFileInfo(file, _logger);
 								if (rom.HasDuplicates(_datdata, _logger))
 								{
 									_logger.User("File '" + file + "' existed in the DAT, skipping...");
@@ -1069,8 +1061,16 @@ namespace SabreTools.Helper
 								}
 							}
 
-							_logger.User("Processing extracted file " + file);
-							success &= ArchiveTools.WriteTorrentGZ(file, _outDir, _romba, _logger);
+							_logger.User("Processing file " + input);
+
+							if (_tgz)
+							{
+								success &= ArchiveTools.WriteTorrentGZ(input, _outDir, _romba, _logger);
+							}
+							else
+							{
+								success &= ArchiveTools.WriteToArchive(input, _outDir, rom, _logger);
+							}
 						}
 
 						FileTools.CleanDirectory(_tempDir);

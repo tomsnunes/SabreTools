@@ -670,7 +670,10 @@ Options:
 
 SimpleSort is a WIP program that is meant as a command-line tool to quickly rebuild and
 verify files based on a supplied DAT file. The eventual aim for this program is to have
-a full rom management tool without a GUI, though this may not happen for a while.
+a full rom management tool without a GUI, though this may not happen for a while. By default
+all files will be rebuilt to TorrentZip (TZ) files. This format is based on the ZIP archive
+format, but with custom header information. This is primarily used by external tool RomVault
+(http://www.romvault.com/) and is already widely used.
 
 Usage:
 	SimpleSort.exe [options] [filename|dirname] ...
@@ -712,24 +715,10 @@ Options:
 		simple FixDAT. This can be misleading, currently, because it only checks for exact
 		matches.
 		
-	-c, --convert		Enable conversion of input files to TGZ
-		This allows conversion of a folder or set of folders to TorrentGZ format without
-		requiring a DAT to rebuild from. It is only useful in a small amount of situations at
-		the present, but it is mostly meant for Romba compatibility at the present. If a DAT
-		is supplied, then files NOT matching the DAT will be written out only.
-		
-		-r, --romba			Enable Romba depot directory output
-			As an extension of the parent flag, this outputs the TGZ files into directories
-			based on the structure used by Romba. This uses nested folders using the first
-			4 bytes of the SHA-1, 1 byte for each layer of the directory name. It also
-			includes two auxilary files, .romba_size and .romba_size.backup, that have the
-			compressed size of the folder inside for use with Romba.
-		
-	-tzip				Enable TorrentZip output
-		Instead of outputting the files to standard ZIP archives, files will be rebuilt to
-		TorrentZip (TZ) files. This format is based on the ZIP archive format, but with
-		custom header information. This is primarily used by external tool RomVault
-		(http://www.romvault.com/) and is already widely used.
+	-c, --convert		Enable filtering by input DAT
+		This overrides the default rebuilding by using the DAT as a filter of what not to
+		output. If no DAT is supplied, the entire input folder will be rebuild file-by-file
+		to the output folder.
 		
 	-tgz				Enable Torrent GZ output
 		Instead of outputting the files to ZIP archives, files will be rebuilt to TorrentGZ
@@ -1176,6 +1165,14 @@ Below are originally from SabreTools / DATabase -
 		file manager that allows for it, this will force the outputted files to be in
 		subdirectories instead of archives.
 		
+Below are originally from SimpleSort (Standalone) -
+		
+	-tzip				Enable TorrentZip output
+		Instead of outputting the files to ZIP archives, files will be rebuilt to TorrentZip
+		(TZip) files. This format is based on the ZIP archive format, but with custom header
+		information. This is primarily used by external tool RomVault (http://www.romvault.com/)
+		and is already widely used.
+	
 Below are originally from SingleGame (Standalone) -
 
 	-r=rootdir		Set the directory name for path size
