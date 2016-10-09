@@ -42,8 +42,8 @@ namespace SabreTools
 
 			// Set all default values
 			bool help = false,
-				delete = false,
 				convert = false,
+				delete = false,
 				quickScan = false,
 				romba = false,
 				simpleSort = true,
