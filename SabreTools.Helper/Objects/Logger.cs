@@ -16,6 +16,7 @@ namespace SabreTools.Helper
 	{
 		// Private instance variables
 		private bool _tofile;
+		private bool _warnings;
 		private string _filename;
 		private DateTime _start;
 		private StreamWriter _log;
@@ -31,6 +32,7 @@ namespace SabreTools.Helper
 		public Logger(bool tofile, string filename)
 		{
 			_tofile = tofile;
+			_warnings = false;
 			_filename = Path.GetFileNameWithoutExtension(filename) + " (" + DateTime.Now.ToString("yyyy-MM-dd HHmmss") + ")" + Path.GetExtension(filename);
 
 			if (!Directory.Exists(_basepath))
@@ -75,6 +77,11 @@ namespace SabreTools.Helper
 		/// <returns>True if the logging was ended correctly, false otherwise</returns>
 		public bool Close(bool suppress = false)
 		{
+			if (_warnings)
+			{
+				Console.WriteLine("There were warnings or errors in the last run! Check the log for more details");
+			}
+
 			if (!suppress)
 			{
 				TimeSpan span = DateTime.Now.Subtract(_start);
@@ -212,6 +219,7 @@ namespace SabreTools.Helper
 		/// <returns>True if the output could be written, false otherwise</returns>
 		public bool Warning(string output, bool appendPrefix = true)
 		{
+			_warnings = true;
 			return Log(output, LogLevel.WARNING, appendPrefix);
 		}
 
@@ -223,6 +231,7 @@ namespace SabreTools.Helper
 		/// <returns>True if the output could be written, false otherwise</returns>
 		public bool Error(string output, bool appendPrefix = true)
 		{
+			_warnings = true;
 			return Log(output, LogLevel.ERROR, appendPrefix);
 		}
 
