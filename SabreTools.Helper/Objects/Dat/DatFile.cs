@@ -4115,7 +4115,18 @@ namespace SabreTools.Helper
 						break;
 					case OutputFormat.SoftwareList:
 						state += "\t<software name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\""
-							+ (rom.Supported != null ? " supported=\"" + (rom.Supported == true ? "yes" : "no") + "\"" : "") + ">\n"
+							+ (rom.Supported != null ? " supported=\"" + (rom.Supported == true ? "yes" : "no") + "\"" : "") +
+							(ExcludeOf ? "" :
+									(String.IsNullOrEmpty(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
+										? ""
+										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
+									(String.IsNullOrEmpty(rom.RomOf) || (rom.MachineName.ToLowerInvariant() == rom.RomOf.ToLowerInvariant())
+										? ""
+										: " romof=\"" + HttpUtility.HtmlEncode(rom.RomOf) + "\"") +
+									(String.IsNullOrEmpty(rom.SampleOf) || (rom.MachineName.ToLowerInvariant() == rom.SampleOf.ToLowerInvariant())
+										? ""
+										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.SampleOf) + "\"")
+								) + ">\n"
 							+ "\t\t<description>" + HttpUtility.HtmlEncode(rom.MachineDescription) + "</description>\n"
 							+ (rom.Year != null ? "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n" : "")
 							+ (rom.Publisher != null ? "\t\t<publisher>" + HttpUtility.HtmlEncode(rom.Publisher) + "</publisher>\n" : "");
