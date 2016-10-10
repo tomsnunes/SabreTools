@@ -349,6 +349,7 @@ namespace SabreTools
 			dbc.Open();
 
 			// Populate the List from the database
+			_logger.User("Populating the list of existing DATs");
 			string query = "SELECT DISTINCT hash FROM dats";
 			SqliteCommand slc = new SqliteCommand(query, dbc);
 			SqliteDataReader sldr = slc.ExecuteReader();
@@ -361,6 +362,7 @@ namespace SabreTools
 					databaseDats.Add(hash);
 				}
 			}
+			_logger.User("Populating complete");
 
 			slc.Dispose();
 			sldr.Dispose();
@@ -369,6 +371,7 @@ namespace SabreTools
 			Dictionary<string, string> toscan = new Dictionary<string, string>();
 
 			// Loop through the datroot and add only needed files
+			_logger.User("Scanning DAT folder: '" + _dats);
 			foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
 			{
 				Rom dat = FileTools.GetFileInfo(file, _logger);
@@ -385,11 +388,14 @@ namespace SabreTools
 					databaseDats.Remove(dat.SHA1);
 				}
 			}
+			_logger.User("Scanning complete");
 
 			// Loop through the Dictionary and add all data
+			_logger.User("Adding new DAT information");
 			foreach (string key in toscan.Keys)
 			{
 				// Parse the Dat if possible
+				_logger.User("Adding from '" + toscan[key]);
 				DatFile tempdat = new DatFile();
 				tempdat.Parse(toscan[key], 0, 0, _logger);
 
@@ -401,6 +407,8 @@ namespace SabreTools
 					{
 						foreach (Rom rom in tempdat.Files[romkey])
 						{
+							_logger.Verbose("Checking and adding file '" + rom.Name);
+
 							query = "SELECT id FROM data WHERE size=" + rom.Size + " AND ("
 								+ "(crc=\"" + rom.CRC + "\" OR crc=\"null\")"
 								+ " AND (md5=\"" + rom.MD5 + "\" OR md5=\"null\")"
@@ -456,9 +464,11 @@ namespace SabreTools
 						}
 					}
 				}
+				_logger.User("Adding complete");
 
 				// Now loop through and remove all references to old Dats
 				// TODO: Remove orphaned files as well
+				_logger.User("Removing unmatched DAT information");
 				foreach (string dathash in databaseDats)
 				{
 					query = "DELETE FROM dats WHERE hash=\"" + dathash + "\"";
@@ -466,6 +476,7 @@ namespace SabreTools
 					slc.ExecuteNonQuery();
 					slc.Dispose();
 				}
+				_logger.User("Removing complete");
 			}
 
 			dbc.Dispose();
