@@ -158,7 +158,7 @@ namespace SabreTools
 			foreach (string input in inputs)
 			{
 				datdata.PopulateDatFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
-					true /* enableGzip */, false /* addBlanks */, false /* addDate */, "__temp__" /* tempDir */, false /* copyFiles */,
+					true /* enableGzip */, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
 					null /* headerToCheckAgainst */, 4 /* maxDegreeOfParallelism */, _logger);
 				datdata.WriteToFile("", logger);
 			}
