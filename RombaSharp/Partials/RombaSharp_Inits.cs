@@ -1,4 +1,6 @@
-﻿using SabreTools.Helper;
+﻿using Mono.Data.Sqlite;
+using SabreTools.Helper;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -100,12 +102,53 @@ namespace SabreTools
 		/// <param name="inputs"></param>
 		private static void InitLookup(List<string> inputs)
 		{
-			_logger.User("This feature is not yet implemented: lookup");
+			// First, try to figure out what type of hash each is by length and clean it
+			List<string> cleanedInputs = new List<string>();
+			foreach (string input in inputs)
+			{
+				string temp = "";
+				if (input.Length == Constants.CRCLength)
+				{
+					temp = Style.CleanHashData(input, Constants.CRCLength);
+				}
+				else if (input.Length == Constants.MD5Length)
+				{
+					temp = Style.CleanHashData(input, Constants.MD5Length);
+				}
+				else if (input.Length == Constants.SHA1Length)
+				{
+					temp = Style.CleanHashData(input, Constants.SHA1Length);
+				}
 
-			// First things first is that the inputs have to be lower-cased. Then, we have to check
-			// to see what sort of hashes we're dealing with. Like [0-9a-f]{8} for CRC. Might add
-			// these to the constants while I'm at it. Once we have the hashes separated, we check
-			// and add a simple bool for each that's found.
+				// If the hash isn't empty, add it
+				if (temp != "")
+				{
+					cleanedInputs.Add(temp);
+				}
+			}
+
+			// Now, search for each of them and return true or false for each
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+
+			foreach (string input in cleanedInputs)
+			{
+				string query = "SELECT * FROM data WHERE value=\"" + input + "\"";
+				SqliteCommand slc = new SqliteCommand(query, dbc);
+				SqliteDataReader sldr = slc.ExecuteReader();
+				if (sldr.HasRows)
+				{
+					_logger.User("For hash '" + input + "' there were " + sldr.RecordsAffected + " matches in the database");
+				}
+				else
+				{
+					_logger.User("Hash '" + input + "' had no matches in the database");
+				}
+
+				sldr.Dispose();
+				slc.Dispose();
+			}
+
+			dbc.Dispose();
 		}
 
 		/// <summary>
