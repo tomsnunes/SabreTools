@@ -38,8 +38,10 @@ namespace SabreTools
 			DatFile need = new DatFile();
 			need.Files = new SortedDictionary<string, List<DatItem>>();
 
-			// Now that we have the Dats, add the files to the database
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			dbc.Open();
+
+			// Now that we have the Dats, add the files to the database
 			foreach (string key in df.Files.Keys)
 			{
 				List<DatItem> datItems = df.Files[key];
@@ -49,7 +51,7 @@ namespace SabreTools
 								+ "(crc=\"" + rom.CRC + "\" OR value=\"null\")"
 								+ " AND (md5=\"" + rom.MD5 + "\" OR value=\"null\")"
 								+ " AND (sha1=\"" + rom.SHA1 + "\" OR value=\"null\")"
-								+ " AND exists=0";
+								+ " AND indepot=0";
 					SqliteCommand slc = new SqliteCommand(query, dbc);
 					SqliteDataReader sldr = slc.ExecuteReader();
 
@@ -57,9 +59,9 @@ namespace SabreTools
 					if (sldr.HasRows)
 					{
 						sldr.Read();
-						string id = sldr.GetString(0);
+						long id = sldr.GetInt64(0);
 
-						string squery = "UPDATE data SET exists=1 WHERE id=" + id;
+						string squery = "UPDATE data SET indepot=1 WHERE id=" + id;
 						SqliteCommand sslc = new SqliteCommand(squery, dbc);
 						sslc.ExecuteNonQuery();
 						sslc.Dispose();
@@ -80,12 +82,12 @@ namespace SabreTools
 					// If it doesn't exist, and we're not adding only needed files
 					else if (!onlyNeeded)
 					{
-						string squery = "INSERT INTO data (size, crc, md5, sha1, exists) VALUES"
-							+ " size=" + rom.Size + ","
-							+ " crc=\"" + (rom.CRC == "" ? "null" : rom.CRC) + "\","
-							+ " md5=\"" + (rom.MD5 == "" ? "null" : rom.MD5) + "\","
-							+ " sha1=\"" + (rom.SHA1 == "" ? "null" : rom.SHA1) + "\","
-							+ " exists=1)";
+						string squery = "INSERT INTO data (size, crc, md5, sha1, indepot) VALUES ("
+							+ rom.Size + ","
+							+ "\"" + (rom.CRC == "" ? "null" : rom.CRC) + "\","
+							+ "\"" + (rom.MD5 == "" ? "null" : rom.MD5) + "\","
+							+ "\"" + (rom.SHA1 == "" ? "null" : rom.SHA1) + "\","
+							+ "1)";
 						SqliteCommand sslc = new SqliteCommand(squery, dbc);
 						sslc.ExecuteNonQuery();
 						sslc.Dispose();
@@ -221,8 +223,10 @@ namespace SabreTools
 				}
 			}
 
-			// Now, search for each of them and return true or false for each
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			dbc.Open();
+
+			// Now, search for each of them and return true or false for each
 			foreach (string input in crc)
 			{
 				string query = "SELECT * FROM data WHERE crc=\"" + input + "\"";

@@ -230,6 +230,7 @@ namespace SabreTools
 		private static void DisplayDBStats()
 		{
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			dbc.Open();
 
 			// Total uncompressed size
 			string query = "SELECT SUM(size) FROM data";
@@ -242,12 +243,12 @@ namespace SabreTools
 			_logger.User("Total files: " + (long)slc.ExecuteScalar());
 
 			// Total number of files that exist
-			query = "SELECT COUNT(*) FROM data WHERE exists=1";
+			query = "SELECT COUNT(*) FROM data WHERE indepot=1";
 			slc = new SqliteCommand(query, dbc);
 			_logger.User("Total files in depots: " + (long)slc.ExecuteScalar());
 
 			// Total number of files that are missing
-			query = "SELECT COUNT(*) FROM data WHERE exists=0";
+			query = "SELECT COUNT(*) FROM data WHERE indepot=0";
 			slc = new SqliteCommand(query, dbc);
 			_logger.User("Total files missing: " + (long)slc.ExecuteScalar());
 
@@ -313,7 +314,7 @@ namespace SabreTools
 		/// <summary>
 		/// Populate or refresh the database information
 		/// </summary>
-		/// <remarks>Each hash has the following attributes: size, crc, md5, sha-1, dathash, existss</remarks>
+		/// <remarks>Each hash has the following attributes: size, crc, md5, sha-1, dathash, indepot</remarks>
 		private static void RefreshDatabase()
 		{
 			// Make sure the db is set
@@ -344,9 +345,11 @@ namespace SabreTools
 			// Create a List of dat hashes in the database (SHA-1)
 			List<string> databaseDats = new List<string>();
 
-			// Populate the List from the database
-			string query = "SELECT UNIQUE hash FROM dats";
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			dbc.Open();
+
+			// Populate the List from the database
+			string query = "SELECT hash FROM dats";
 			SqliteCommand slc = new SqliteCommand(query, dbc);
 			SqliteDataReader sldr = slc.ExecuteReader();
 			if (sldr.HasRows)
@@ -399,9 +402,9 @@ namespace SabreTools
 						foreach (Rom rom in tempdat.Files[romkey])
 						{
 							query = "SELECT id FROM data WHERE size=" + rom.Size + " AND ("
-								+ "(crc=\"" + rom.CRC + "\" OR value=\"null\")"
-								+ " AND (md5=\"" + rom.MD5 + "\" OR value=\"null\")"
-								+ " AND (sha1=\"" + rom.SHA1 + "\" OR value=\"null\"))";
+								+ "(crc=\"" + rom.CRC + "\" OR crc=\"null\")"
+								+ " AND (md5=\"" + rom.MD5 + "\" OR md5=\"null\")"
+								+ " AND (sha1=\"" + rom.SHA1 + "\" OR sha1=\"null\"))";
 							slc = new SqliteCommand(query, dbc);
 							sldr = slc.ExecuteReader();
 								
@@ -409,7 +412,7 @@ namespace SabreTools
 							if (sldr.HasRows)
 							{
 								sldr.Read();
-								string id = sldr.GetString(0);
+								long id = sldr.GetInt64(0);
 
 								string squery = "SELECT * FROM dats WHERE id=" + id;
 								SqliteCommand sslc = new SqliteCommand(squery, dbc);
@@ -430,18 +433,18 @@ namespace SabreTools
 							// If it doesn't exist, add the hash and the dat hash for a new id
 							else
 							{
-								string squery = "INSERT INTO data (size, crc, md5, sha1, exists) VALUES"
-									+ " size=" + rom.Size + ","
-									+ " crc=\"" + (rom.CRC == "" ? "null" : rom.CRC) + "\","
-									+ " md5=\"" + (rom.MD5 == "" ? "null" : rom.MD5) + "\","
-									+ " sha1=\"" + (rom.SHA1 == "" ? "null" : rom.SHA1) + "\","
-									+ " exists=0)";
+								string squery = "INSERT INTO data (size, crc, md5, sha1, indepot) VALUES ("
+									+ rom.Size + ","
+									+ "\"" + (rom.CRC == "" ? "null" : rom.CRC) + "\","
+									+ "\"" + (rom.MD5 == "" ? "null" : rom.MD5) + "\","
+									+ "\"" + (rom.SHA1 == "" ? "null" : rom.SHA1) + "\","
+									+ "0)";
 								SqliteCommand sslc = new SqliteCommand(squery, dbc);
 								sslc.ExecuteNonQuery();
 
 								long id = -1;
 
-								squery = "SELECT last_insertConstants.Rowid()";
+								squery = @"select last_insert_rowid()";
 								sslc = new SqliteCommand(squery, dbc);
 								id = (long)sslc.ExecuteScalar();
 
