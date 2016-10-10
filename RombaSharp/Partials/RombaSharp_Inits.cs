@@ -1,8 +1,8 @@
 ﻿using Mono.Data.Sqlite;
 using SabreTools.Helper;
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace SabreTools
 {
@@ -13,16 +13,102 @@ namespace SabreTools
 		/// <summary>
 		/// Wrap adding files to the depots
 		/// </summary>
-		/// <param name="inputs"></param>
-		/// <param name="onlyNeeded"></param>
+		/// <param name="inputs">List of input folders to use</param>
+		/// <param name="onlyNeeded">True if only files in the database and don't exist are added, false otherwise</param>
 		private static void InitArchive(List<string> inputs, bool onlyNeeded)
 		{
-			_logger.User("This feature is not yet implemented: archive");
+			// First we want to get just all directories from the inputs
+			List<string> onlyDirs = new List<string>();
+			foreach (string input in inputs)
+			{
+				if (Directory.Exists(input))
+				{
+					onlyDirs.Add(Path.GetFullPath(input));
+				}
+			}
 
-			// This should use the same thing as something like in SimpleSort, as in scan the archive and scan the files inside equally
-			// Either during or after, we then check against the database to see if there's any matches. If there's no match and
-			// we say onlyNeeded, then don't add it. If there's no match and not onlyNeeded, add it with no DAT hash. If there's a match,
-			// and it doesn't say exists, add it and change the flag. If there's a match and says exists, skip it.
+			// Then process all of the input directories into an internal DAT
+			DatFile df = new DatFile();
+			foreach (string dir in onlyDirs)
+			{
+				df.PopulateDatFromDir(dir, false, false, false, false, true, false, false, _tmpdir, false, null, 4, _logger);
+			}
+
+			// Create an empty Dat for files that need to be rebuilt
+			DatFile need = new DatFile();
+			need.Files = new SortedDictionary<string, List<DatItem>>();
+
+			// Now that we have the Dats, add the files to the database
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			foreach (string key in df.Files.Keys)
+			{
+				List<DatItem> datItems = df.Files[key];
+				foreach (Rom rom in datItems)
+				{
+					string query = "SELECT id FROM data WHERE size=" + rom.Size + " AND ("
+								+ "(crc=\"" + rom.CRC + "\" OR value=\"null\")"
+								+ " AND (md5=\"" + rom.MD5 + "\" OR value=\"null\")"
+								+ " AND (sha1=\"" + rom.SHA1 + "\" OR value=\"null\")"
+								+ " AND exists=0";
+					SqliteCommand slc = new SqliteCommand(query, dbc);
+					SqliteDataReader sldr = slc.ExecuteReader();
+
+					// If a row is returned, add the file and change the existence
+					if (sldr.HasRows)
+					{
+						sldr.Read();
+						string id = sldr.GetString(0);
+
+						string squery = "UPDATE data SET exists=1 WHERE id=" + id;
+						SqliteCommand sslc = new SqliteCommand(squery, dbc);
+						sslc.ExecuteNonQuery();
+						sslc.Dispose();
+
+						// Add the rom to the files that need to be rebuilt
+						if (need.Files.ContainsKey(key))
+						{
+							need.Files[key].Add(rom);
+						}
+						else
+						{
+							List<DatItem> temp = new List<DatItem>();
+							temp.Add(rom);
+							need.Files.Add(key, temp);
+						}
+					}
+
+					// If it doesn't exist, and we're not adding only needed files
+					else if (!onlyNeeded)
+					{
+						string squery = "INSERT INTO data (size, crc, md5, sha1, exists) VALUES"
+							+ " size=" + rom.Size + ","
+							+ " crc=\"" + (rom.CRC == "" ? "null" : rom.CRC) + "\","
+							+ " md5=\"" + (rom.MD5 == "" ? "null" : rom.MD5) + "\","
+							+ " sha1=\"" + (rom.SHA1 == "" ? "null" : rom.SHA1) + "\","
+							+ " exists=1)";
+						SqliteCommand sslc = new SqliteCommand(squery, dbc);
+						sslc.ExecuteNonQuery();
+						sslc.Dispose();
+
+						// Add the rom to the files that need to be rebuilt
+						if (need.Files.ContainsKey(key))
+						{
+							need.Files[key].Add(rom);
+						}
+						else
+						{
+							List<DatItem> temp = new List<DatItem>();
+							temp.Add(rom);
+							need.Files.Add(key, temp);
+						}
+					}
+				}
+			}
+
+			// Create the sorting object to use and rebuild the needed files
+			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(0, 0, 0, 0);
+			SimpleSort ss = new SimpleSort(need, onlyDirs, _depots.Keys.ToList()[0], _tmpdir, false, false, false, false, true, true, asl, false, _logger);
+			ss.StartProcessing();
 		}
 
 		/// <summary>
@@ -99,40 +185,81 @@ namespace SabreTools
 		/// <summary>
 		/// Wrap looking up if hashes exist in the database
 		/// </summary>
-		/// <param name="inputs"></param>
+		/// <param name="inputs">List of input strings representing hashes to check for</param>
 		private static void InitLookup(List<string> inputs)
 		{
 			// First, try to figure out what type of hash each is by length and clean it
-			List<string> cleanedInputs = new List<string>();
+			List<string> crc = new List<string>();
+			List<string> md5 = new List<string>();
+			List<string> sha1 = new List<string>();
 			foreach (string input in inputs)
 			{
 				string temp = "";
 				if (input.Length == Constants.CRCLength)
 				{
 					temp = Style.CleanHashData(input, Constants.CRCLength);
+					if (temp != "")
+					{
+						crc.Add(temp);
+					}
 				}
 				else if (input.Length == Constants.MD5Length)
 				{
 					temp = Style.CleanHashData(input, Constants.MD5Length);
+					if (temp != "")
+					{
+						md5.Add(temp);
+					}
 				}
 				else if (input.Length == Constants.SHA1Length)
 				{
 					temp = Style.CleanHashData(input, Constants.SHA1Length);
-				}
-
-				// If the hash isn't empty, add it
-				if (temp != "")
-				{
-					cleanedInputs.Add(temp);
+					if (temp != "")
+					{
+						sha1.Add(temp);
+					}
 				}
 			}
 
 			// Now, search for each of them and return true or false for each
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
-
-			foreach (string input in cleanedInputs)
+			foreach (string input in crc)
 			{
-				string query = "SELECT * FROM data WHERE value=\"" + input + "\"";
+				string query = "SELECT * FROM data WHERE crc=\"" + input + "\"";
+				SqliteCommand slc = new SqliteCommand(query, dbc);
+				SqliteDataReader sldr = slc.ExecuteReader();
+				if (sldr.HasRows)
+				{
+					_logger.User("For hash '" + input + "' there were " + sldr.RecordsAffected + " matches in the database");
+				}
+				else
+				{
+					_logger.User("Hash '" + input + "' had no matches in the database");
+				}
+
+				sldr.Dispose();
+				slc.Dispose();
+			}
+			foreach (string input in md5)
+			{
+				string query = "SELECT * FROM data WHERE md5=\"" + input + "\"";
+				SqliteCommand slc = new SqliteCommand(query, dbc);
+				SqliteDataReader sldr = slc.ExecuteReader();
+				if (sldr.HasRows)
+				{
+					_logger.User("For hash '" + input + "' there were " + sldr.RecordsAffected + " matches in the database");
+				}
+				else
+				{
+					_logger.User("Hash '" + input + "' had no matches in the database");
+				}
+
+				sldr.Dispose();
+				slc.Dispose();
+			}
+			foreach (string input in sha1)
+			{
+				string query = "SELECT * FROM data WHERE sha1=\"" + input + "\"";
 				SqliteCommand slc = new SqliteCommand(query, dbc);
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)

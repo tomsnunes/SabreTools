@@ -73,12 +73,24 @@ namespace SabreTools.Helper
 				{
 					string query = @"
 CREATE TABLE IF NOT EXISTS data (
-	'id'	INTEGER		NOT NULL
-	'key'	TEXT		NOT NULL
-	'value'	TEXT		NOT NULL
-	PRIMARY KEY (id, key, value)
+	'id'		INTEGER		NOT NULL
+	'size'		INTEGER		NOT NULL
+	'crc'		TEXT		NOT NULL
+	'md5'		TEXT		NOT NULL
+	'sha1'		TEXT		NOT NULL
+	'exists'	INTEGER		NOT NULL
+	PRIMARY KEY (id)
 )";
 					SqliteCommand slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS dats (
+	'id'	INTEGER		NOT NULL
+	'hash'	TEXT		NOT NULL
+	PRIMARY KEY (id, hash)
+)";
+					slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 					slc.Dispose();
 				}

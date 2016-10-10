@@ -313,7 +313,7 @@ namespace SabreTools
 			List<string> databaseDats = new List<string>();
 
 			// Populate the List from the database
-			string query = "SELECT UNIQUE value FROM data WHERE key=\"dat\"";
+			string query = "SELECT UNIQUE hash FROM dats";
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
 			SqliteCommand slc = new SqliteCommand(query, dbc);
 			SqliteDataReader sldr = slc.ExecuteReader();
@@ -366,29 +366,44 @@ namespace SabreTools
 					{
 						foreach (Rom rom in tempdat.Files[romkey])
 						{
-							query = "SELECT id FROM data WHERE key=\"size\" AND value=\"" + rom.Size + "\" AND ("
-								+ "(key=\"crc\" AND (value=\"" + rom.CRC + "\" OR value=\"null\"))"
-								+ "AND (key=\"md5\" AND value=\"" + rom.MD5 + "\" OR value=\"null\"))"
-								+ "AND (key=\"sha1\" AND value=\"" + rom.SHA1 + "\" OR value=\"null\")))";
+							query = "SELECT id FROM data WHERE size=" + rom.Size + " AND ("
+								+ "(crc=\"" + rom.CRC + "\" OR value=\"null\")"
+								+ " AND (md5=\"" + rom.MD5 + "\" OR value=\"null\")"
+								+ " AND (sha1=\"" + rom.SHA1 + "\" OR value=\"null\"))";
 							slc = new SqliteCommand(query, dbc);
 							sldr = slc.ExecuteReader();
 								
-							// If the hash exists in the database, add the dat hash for that id
+							// If the hash exists in the database, add the dat hash for that id if needed
 							if (sldr.HasRows)
 							{
 								sldr.Read();
 								string id = sldr.GetString(0);
 
-								string squery = "INSERT INTO data (id, key, value) VALUES (\"" + id + "\", \"dat\", \"" + key + "\")";
+								string squery = "SELECT * FROM dats WHERE id=" + id;
 								SqliteCommand sslc = new SqliteCommand(squery, dbc);
-								sslc.ExecuteNonQuery();
+								SqliteDataReader ssldr = sslc.ExecuteReader();
+
+								// If the hash doesn't already exist, add it
+								if (!ssldr.HasRows)
+								{
+									squery = "INSERT INTO dats (id, hash) VALUES (\"" + id + "\", \"" + key + "\")";
+									sslc = new SqliteCommand(squery, dbc);
+									sslc.ExecuteNonQuery();
+								}
+
+								ssldr.Dispose();
 								sslc.Dispose();
 							}
 
 							// If it doesn't exist, add the hash and the dat hash for a new id
 							else
 							{
-								string squery = "INSERT INTO data (key, value) VALUES (\"size\", \"" + rom.Size + "\")";
+								string squery = "INSERT INTO data (size, crc, md5, sha1, exists) VALUES"
+									+ " size=" + rom.Size + ","
+									+ " crc=\"" + (rom.CRC == "" ? "null" : rom.CRC) + "\","
+									+ " md5=\"" + (rom.MD5 == "" ? "null" : rom.MD5) + "\","
+									+ " sha1=\"" + (rom.SHA1 == "" ? "null" : rom.SHA1) + "\","
+									+ " exists=0)";
 								SqliteCommand sslc = new SqliteCommand(squery, dbc);
 								sslc.ExecuteNonQuery();
 
@@ -398,13 +413,10 @@ namespace SabreTools
 								sslc = new SqliteCommand(squery, dbc);
 								id = (long)sslc.ExecuteScalar();
 
-								squery = "INSERT INTO data (id, key, value) VALUES (\"" + id + "\", \"crc\", \"" + rom.CRC + "\"),"
-									+ " (\"" + id + "\", \"md5\", \"" + rom.MD5 + "\"),"
-									+ " (\"" + id + "\", \"sha1\", \"" + rom.SHA1 + "\"),"
-									+ " (\"" + id + "\", \"dat\", \"" + key + "\"),"
-									+ " (\"" + id + "\", \"exists\", \"false\")";
+								squery = "INSERT INTO dats (id, hash) VALUES (\"" + id + "\", \"" + key + "\")";
 								sslc = new SqliteCommand(squery, dbc);
 								sslc.ExecuteNonQuery();
+								sslc.Dispose();
 							}
 						}
 					}
@@ -414,12 +426,14 @@ namespace SabreTools
 				// TODO: Remove orphaned files as well
 				foreach (string dathash in databaseDats)
 				{
-					query = "DELETE FROM data WHERE key=\"dat\" AND value=\"" + dathash + "\"";
+					query = "DELETE FROM dats WHERE hash=\"" + dathash + "\"";
 					slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 					slc.Dispose();
 				}
 			}
+
+			dbc.Dispose();
 		}
 
 		/// <summary>
