@@ -9,6 +9,8 @@ namespace SabreTools.Helper
 		// Private instance variables
 		private string _name;
 		private NameValueCollection _attributes;
+		private NameValueCollection _machineAttributes;
+		private NameValueCollection _machineElements;
 
 		// Public instance variables
 		public string Name
@@ -39,6 +41,8 @@ namespace SabreTools.Helper
 		{
 			_name = name;
 			_attributes = new NameValueCollection();
+			_machineAttributes = new NameValueCollection();
+			_machineElements = new NameValueCollection();
 		}
 
 		// Comparison methods
@@ -132,6 +136,48 @@ namespace SabreTools.Helper
 			return _attributes.GetValues(name);
 		}
 		public string[] GetValues(int index)
+		{
+			return _attributes.GetValues(index);
+		}
+
+		public void MachineAttributesAdd(string name, string value)
+		{
+			_machineAttributes.Add(name, value);
+		}
+		public string MachineAttributesGet(string name)
+		{
+			return _attributes.Get(name);
+		}
+		public string MachineAttributesGet(int index)
+		{
+			return _attributes.Get(index);
+		}
+		public string[] MachineAttributesGetValues(string name)
+		{
+			return _attributes.GetValues(name);
+		}
+		public string[] MachineAttributesGetValues(int index)
+		{
+			return _attributes.GetValues(index);
+		}
+
+		public void MachineElementsAdd(string name, string value)
+		{
+			_machineAttributes.Add(name, value);
+		}
+		public string MachineElementsGet(string name)
+		{
+			return _attributes.Get(name);
+		}
+		public string MachineElementsGet(int index)
+		{
+			return _attributes.Get(index);
+		}
+		public string[] MachineElementsGetValues(string name)
+		{
+			return _attributes.GetValues(name);
+		}
+		public string[] MachineElementsGetValues(int index)
 		{
 			return _attributes.GetValues(index);
 		}
