@@ -350,6 +350,8 @@ namespace SabreTools
 
 			// Populate the List from the database
 			_logger.User("Populating the list of existing DATs");
+			DateTime start = DateTime.Now;
+
 			string query = "SELECT DISTINCT hash FROM dats";
 			SqliteCommand slc = new SqliteCommand(query, dbc);
 			SqliteDataReader sldr = slc.ExecuteReader();
@@ -362,7 +364,7 @@ namespace SabreTools
 					databaseDats.Add(hash);
 				}
 			}
-			_logger.User("Populating complete");
+			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			slc.Dispose();
 			sldr.Dispose();
@@ -371,7 +373,9 @@ namespace SabreTools
 			Dictionary<string, string> toscan = new Dictionary<string, string>();
 
 			// Loop through the datroot and add only needed files
-			_logger.User("Scanning DAT folder: '" + _dats);
+			_logger.User("Scanning DAT folder: '" + _dats + "'");
+			start = DateTime.Now;
+
 			foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
 			{
 				Rom dat = FileTools.GetFileInfo(file, _logger);
@@ -388,14 +392,16 @@ namespace SabreTools
 					databaseDats.Remove(dat.SHA1);
 				}
 			}
-			_logger.User("Scanning complete");
+			_logger.User("Scanning complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Loop through the Dictionary and add all data
 			_logger.User("Adding new DAT information");
+			start = DateTime.Now;
+
 			foreach (string key in toscan.Keys)
 			{
 				// Parse the Dat if possible
-				_logger.User("Adding from '" + toscan[key]);
+				_logger.User("Adding from '" + toscan[key] + "'");
 				DatFile tempdat = new DatFile();
 				tempdat.Parse(toscan[key], 0, 0, _logger);
 
@@ -464,11 +470,13 @@ namespace SabreTools
 						}
 					}
 				}
-				_logger.User("Adding complete");
+				_logger.User("Adding complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 				// Now loop through and remove all references to old Dats
 				// TODO: Remove orphaned files as well
 				_logger.User("Removing unmatched DAT information");
+				start = DateTime.Now;
+
 				foreach (string dathash in databaseDats)
 				{
 					query = "DELETE FROM dats WHERE hash=\"" + dathash + "\"";
@@ -476,7 +484,7 @@ namespace SabreTools
 					slc.ExecuteNonQuery();
 					slc.Dispose();
 				}
-				_logger.User("Removing complete");
+				_logger.User("Removing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 			}
 
 			dbc.Dispose();
