@@ -470,22 +470,22 @@ namespace SabreTools
 						}
 					}
 				}
-				_logger.User("Adding complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-				// Now loop through and remove all references to old Dats
-				// TODO: Remove orphaned files as well
-				_logger.User("Removing unmatched DAT information");
-				start = DateTime.Now;
-
-				foreach (string dathash in databaseDats)
-				{
-					query = "DELETE FROM dats WHERE hash=\"" + dathash + "\"";
-					slc = new SqliteCommand(query, dbc);
-					slc.ExecuteNonQuery();
-					slc.Dispose();
-				}
-				_logger.User("Removing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 			}
+			_logger.User("Adding complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// Now loop through and remove all references to old Dats
+			// TODO: Remove orphaned files as well
+			_logger.User("Removing unmatched DAT information");
+			start = DateTime.Now;
+
+			foreach (string dathash in databaseDats)
+			{
+				query = "DELETE FROM dats WHERE hash=\"" + dathash + "\"";
+				slc = new SqliteCommand(query, dbc);
+				slc.ExecuteNonQuery();
+				slc.Dispose();
+			}
+			_logger.User("Removing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			dbc.Dispose();
 		}
