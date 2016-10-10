@@ -349,7 +349,7 @@ namespace SabreTools
 			dbc.Open();
 
 			// Populate the List from the database
-			string query = "SELECT hash FROM dats";
+			string query = "SELECT DISTINCT hash FROM dats";
 			SqliteCommand slc = new SqliteCommand(query, dbc);
 			SqliteDataReader sldr = slc.ExecuteReader();
 			if (sldr.HasRows)
