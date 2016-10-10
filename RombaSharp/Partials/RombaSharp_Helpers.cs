@@ -227,20 +227,52 @@ namespace SabreTools
 		/// <summary>
 		/// Display the statistics in the database
 		/// </summary>
-		/// <remarks>
-		/// This list of stats should include:
-		///		- Total uncompressed size of the files
-		///		- Total number of files
-		///		- Total number of files that exist
-		///		- Total number of files that don't exist
-		///		- Total number of files with CRC
-		///		- Total number of files with MD5
-		///		- Total number of files with SHA-1
-		///		- Total number of unique DAT hashes
-		/// </remarks>
 		private static void DisplayDBStats()
 		{
-			_logger.User("This feature is not yet implemented: dbstats");
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+
+			// Total uncompressed size
+			string query = "SELECT SUM(size) FROM data";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			_logger.User("Uncompressed size: " + Style.GetBytesReadable((long)slc.ExecuteScalar()));
+
+			// Total number of files
+			query = "SELECT COUNT(*) FROM data";
+			slc = new SqliteCommand(query, dbc);
+			_logger.User("Total files: " + (long)slc.ExecuteScalar());
+
+			// Total number of files that exist
+			query = "SELECT COUNT(*) FROM data WHERE exists=1";
+			slc = new SqliteCommand(query, dbc);
+			_logger.User("Total files in depots: " + (long)slc.ExecuteScalar());
+
+			// Total number of files that are missing
+			query = "SELECT COUNT(*) FROM data WHERE exists=0";
+			slc = new SqliteCommand(query, dbc);
+			_logger.User("Total files missing: " + (long)slc.ExecuteScalar());
+
+			// Total number of CRCs
+			query = "SELECT COUNT(crc) FROM data WHERE NOT crc=\"null\"";
+			slc = new SqliteCommand(query, dbc);
+			_logger.User("Total  CRCs: " + (long)slc.ExecuteScalar());
+
+			// Total number of MD5s
+			query = "SELECT COUNT(md5) FROM data WHERE NOT md5=\"null\"";
+			slc = new SqliteCommand(query, dbc);
+			_logger.User("Total MD5s: " + (long)slc.ExecuteScalar());
+
+			// Total number of SHA1s
+			query = "SELECT COUNT(sha1) FROM data WHERE NOT sha1=\"null\"";
+			slc = new SqliteCommand(query, dbc);
+			_logger.User("Total SHA1s: " + (long)slc.ExecuteScalar());
+
+			// Total number of DATs
+			query = "SELECT COUNT(*) FROM dats";
+			slc = new SqliteCommand(query, dbc);
+			_logger.User("Total DATs: " + (long)slc.ExecuteScalar());
+
+			slc.Dispose();
+			dbc.Dispose();
 		}
 
 		/// <summary>
