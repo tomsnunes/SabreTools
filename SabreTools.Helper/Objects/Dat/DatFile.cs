@@ -1789,7 +1789,7 @@ namespace SabreTools.Helper
 												((Disk)item).ItemStatus = ItemStatus.BadDump;
 											}
 										}
-										else if (val.ToLowerInvariant() == "itemStatus")
+										else if (val.ToLowerInvariant() == "nodump")
 										{
 											if (item.Type == ItemType.Rom)
 											{
@@ -1959,7 +1959,7 @@ namespace SabreTools.Helper
 												((Disk)item).ItemStatus = ItemStatus.BadDump;
 											}
 										}
-										else if (val.ToLowerInvariant() == "itemStatus")
+										else if (val.ToLowerInvariant() == "nodump")
 										{
 											if (item.Type == ItemType.Rom)
 											{
