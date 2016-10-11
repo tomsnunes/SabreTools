@@ -2148,8 +2148,8 @@ namespace SabreTools.Helper
 				else if (Regex.IsMatch(line, Constants.EndPatternCMP) && block)
 				{
 					block = false;
-					blockname = "", tempgamename = "", gamedesc = "", cloneof = "",
-						romof = "", sampleof = "", year = "", manufacturer = "";
+					blockname = ""; tempgamename = ""; gamedesc = ""; cloneof = "";
+						romof = ""; sampleof = ""; year = ""; manufacturer = "";
 				}
 			}
 
