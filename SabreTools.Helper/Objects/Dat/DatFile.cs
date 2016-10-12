@@ -6257,21 +6257,26 @@ namespace SabreTools.Helper
 		#region Serialization
 
 		/// <summary>
-		/// Serialze the current object to file
+		/// Serialze object to file
 		/// </summary>
-		public static void Serialize(DatFile df)
+		/// <param name="df">DatFile to serialize</param>
+		/// <returns>Name of the outputted file</returns>
+		public static string Serialize(DatFile df)
 		{
 			BinaryFormatter bf = new BinaryFormatter();
-			Stream output = File.Open((String.IsNullOrEmpty(df.Name) ? "default" : df.Name) + ".bin", FileMode.Create);
+			string filename = (String.IsNullOrEmpty(df.Name) ? "default" : df.Name) + ".bin";
+			Stream output = File.Open(filename, FileMode.Create);
 			bf.Serialize(output, df);
 			output.Flush();
 			output.Dispose();
+			return filename;
 		}
 
 		/// <summary>
-		/// Repopulate the current object from a file
+		/// Repopulate object from a file
 		/// </summary>
 		/// <param name="input">Name of the input file to populate from</param>
+		/// <returns>DatFile populated from the input file</returns>
 		public static DatFile Deserialize(string input)
 		{
 			if (!File.Exists(input))
