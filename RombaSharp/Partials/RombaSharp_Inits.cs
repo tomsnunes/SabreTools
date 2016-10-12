@@ -47,10 +47,10 @@ namespace SabreTools
 				List<DatItem> datItems = df.Files[key];
 				foreach (Rom rom in datItems)
 				{
-					string query = "SELECT id FROM data WHERE size=" + rom.Size + " AND ("
-								+ "(crc=\"" + rom.CRC + "\" OR value=\"null\")"
-								+ " AND (md5=\"" + rom.MD5 + "\" OR value=\"null\")"
-								+ " AND (sha1=\"" + rom.SHA1 + "\" OR value=\"null\")"
+					string query = "SELECT id FROM data WHERE size=" + rom.Size
+								+ " AND (crc=\"" + rom.CRC + "\" OR crc=\"null\")"
+								+ " AND (md5=\"" + rom.MD5 + "\" OR md5=\"null\")"
+								+ " AND (sha1=\"" + rom.SHA1 + "\" OR sha1=\"null\")"
 								+ " AND indepot=0";
 					SqliteCommand slc = new SqliteCommand(query, dbc);
 					SqliteDataReader sldr = slc.ExecuteReader();
@@ -119,13 +119,69 @@ namespace SabreTools
 		/// <param name="inputs"></param>
 		private static void InitBuild(List<string> inputs)
 		{
-			_logger.User("This feature is not yet implemented: build");
-
 			// Verify the filenames
 			Dictionary<string, string> foundDats = GetValidDats(inputs);
 
-			// Now that we have the dictionary, we can loop through and output to a new folder for each
+			// Create a base output folder
+			if (!Directory.Exists("out"))
+			{
+				Directory.CreateDirectory("out");
+			}
 
+			// Open the database
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			dbc.Open();
+
+			// Now that we have the dictionary, we can loop through and output to a new folder for each
+			foreach (string key in foundDats.Keys)
+			{
+				// Get the DAT file associated with the key
+				DatFile datFile = new DatFile();
+				datFile.Parse(Path.Combine(_dats, foundDats[key]), 0, 0, _logger, softlist: true);
+				ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(0, 0, 0, 0);
+
+				// Create the new output directory if it doesn't exist
+				string outputFolder = Path.Combine("out", Path.GetFileNameWithoutExtension(foundDats[key]));
+				if (!Directory.Exists(outputFolder))
+				{
+					Directory.CreateDirectory(outputFolder);
+				}
+
+				// Then get all hashes associated with this DAT
+				string query = "SELECT sha1 FROM dats JOIN data ON dats.id=data.id WHERE hash=\"" + key + "\"";
+				SqliteCommand slc = new SqliteCommand(query, dbc);
+				SqliteDataReader sldr = slc.ExecuteReader();
+				if (sldr.HasRows)
+				{
+					while (sldr.Read())
+					{
+						string sha1 = sldr.GetString(0);
+						string filename = Path.Combine(sha1.Substring(0, 2), sha1.Substring(2, 2), sha1.Substring(4, 2), sha1.Substring(6, 2), sha1 + ".gz");
+
+						// Find the first depot that contains the folder
+						foreach (string depot in _depots.Keys)
+						{
+							// If the depot is online, check it
+							if (_depots[depot].Item2)
+							{
+								if (File.Exists(Path.Combine(depot, filename)))
+								{
+									ArchiveTools.ExtractArchive(Path.Combine(depot, filename), _tmpdir, asl, _logger);
+									continue;
+								}
+							}
+						}
+					}
+				}
+
+				// Now that we have extracted everything, we rebuild to the output folder
+				List<string> temp = new List<string>();
+				temp.Add(_tmpdir);
+				SimpleSort ss = new SimpleSort(datFile, temp, outputFolder, "", false, false, false, true, false, false, asl, false, _logger);
+				ss.StartProcessing();
+			}
+
+			dbc.Dispose();
 		}
 
 		/// <summary>

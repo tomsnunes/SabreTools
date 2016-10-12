@@ -255,7 +255,7 @@ namespace SabreTools
 			// Total number of CRCs
 			query = "SELECT COUNT(crc) FROM data WHERE NOT crc=\"null\"";
 			slc = new SqliteCommand(query, dbc);
-			_logger.User("Total  CRCs: " + (long)slc.ExecuteScalar());
+			_logger.User("Total CRCs: " + (long)slc.ExecuteScalar());
 
 			// Total number of MD5s
 			query = "SELECT COUNT(md5) FROM data WHERE NOT md5=\"null\"";
@@ -268,7 +268,7 @@ namespace SabreTools
 			_logger.User("Total SHA1s: " + (long)slc.ExecuteScalar());
 
 			// Total number of DATs
-			query = "SELECT COUNT(*) FROM dats";
+			query = "SELECT COUNT(*) FROM dats GROUP BY hash";
 			slc = new SqliteCommand(query, dbc);
 			_logger.User("Total DATs: " + (long)slc.ExecuteScalar());
 
@@ -498,13 +498,14 @@ namespace SabreTools
 		private static Dictionary<string, string> GetValidDats(List<string> inputs)
 		{
 			// Get a dictionary of filenames that actually exist in the DATRoot, logging which ones are not
-			List<string> datRootDats = Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories).ToList().ConvertAll(i => i.ToLowerInvariant());
+			List<string> datRootDats = Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories).ToList();
+			List<string> lowerCaseDats = datRootDats.ConvertAll(i => Path.GetFileName(i).ToLowerInvariant());
 			Dictionary<string, string> foundDats = new Dictionary<string, string>();
 			foreach (string input in inputs)
 			{
-				if (datRootDats.Contains(input.ToLowerInvariant()))
+				if (lowerCaseDats.Contains(input.ToLowerInvariant()))
 				{
-					string fullpath = Path.GetFullPath(datRootDats[datRootDats.IndexOf(input.ToLowerInvariant())]);
+					string fullpath = Path.GetFullPath(datRootDats[lowerCaseDats.IndexOf(input.ToLowerInvariant())]);
 					string sha1 = FileTools.GetFileInfo(fullpath, _logger).SHA1;
 					foundDats.Add(sha1, fullpath);
 				}

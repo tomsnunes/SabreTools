@@ -108,7 +108,7 @@ namespace SabreTools.Helper
 		/// Process the DAT and verify the output directory
 		/// </summary>
 		/// <returns>True if verification was a success, false otherwise</returns>
-		public bool VerifyDirectory()
+		private bool VerifyDirectory()
 		{
 			bool success = true;
 
@@ -194,7 +194,7 @@ namespace SabreTools.Helper
 		/// 
 		/// This is actually rather slow and inefficient. See below for more correct implemenation
 		/// </remarks>
-		public bool RebuildToOutput()
+		private bool RebuildToOutput()
 		{
 			bool success = true;
 
@@ -231,6 +231,14 @@ namespace SabreTools.Helper
 				if (_tempDir != Path.GetTempPath())
 				{
 					FileTools.CleanDirectory(_tempDir);
+				}
+				if (success && _delete)
+				{
+					try
+					{
+						File.Delete(files[i]);
+					}
+					catch { }
 				}
 			}
 
@@ -615,7 +623,7 @@ namespace SabreTools.Helper
 		/// 4) Order by output game
 		/// 5) Rebuild all files
 		/// </remarks>
-		public bool RebuiltToOutputAlternate()
+		private bool RebuiltToOutputAlternate()
 		{
 			bool success = true;
 
@@ -781,7 +789,7 @@ namespace SabreTools.Helper
 		/// <param name="matchdat">Reference to the Dat to add to</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the file could be added, false otherwise</returns>
-		public bool RebuildToOutputAlternateParseRomHelper(string file, ref DatFile matchdat, Logger logger)
+		private bool RebuildToOutputAlternateParseRomHelper(string file, ref DatFile matchdat, Logger logger)
 		{
 			Rom rom = FileTools.GetFileInfo(file, logger);
 
@@ -851,7 +859,7 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <returns>True if the cleaning succeeded, false otherwise</returns>
 		/// <remarks>This method is incomplete, it need to be finished before it can be used</remarks>
-		public bool InplaceRebuild()
+		private bool InplaceRebuild()
 		{
 			bool success = true;
 

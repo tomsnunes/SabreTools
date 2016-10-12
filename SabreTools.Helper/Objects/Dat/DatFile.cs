@@ -5381,7 +5381,16 @@ namespace SabreTools.Helper
 				// Add the file information to the DAT
 				lock (Files)
 				{
-					Files[key].Add(datItem);
+					if (Files.ContainsKey(key))
+					{
+						Files[key].Add(datItem);
+					}
+					else
+					{
+						List<DatItem> temp = new List<DatItem>();
+						temp.Add(datItem);
+						Files.Add(key, temp);
+					}
 				}
 
 				logger.User("File added: " + romname + Environment.NewLine);

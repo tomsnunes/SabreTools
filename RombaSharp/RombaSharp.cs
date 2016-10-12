@@ -155,19 +155,9 @@ namespace SabreTools
 						{
 							outdat = temparg.Split('=')[1];
 						}
-						else if (File.Exists(temparg) || Directory.Exists(temparg))
-						{
-							inputs.Add(temparg);
-						}
 						else
 						{
-							_logger.Error("Invalid input detected: " + arg);
-							Console.WriteLine();
-							Build.Help();
-							Console.WriteLine();
-							_logger.Error("Invalid input detected: " + arg);
-							_logger.Close();
-							return;
+							inputs.Add(temparg);
 						}
 						break;
 				}
