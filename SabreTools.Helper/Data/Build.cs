@@ -83,6 +83,7 @@ namespace SabreTools.Helper
 					helptext.Add("  archive		Adds ROM files from the specified directories to depot");
 					helptext.Add("	-only-needed		Only archive ROM files in database");
 					helptext.Add("  build			For each specified DAT file it creates TZip files");
+					helptext.Add("	-copy				Copy files instead of rebuilding");
 					helptext.Add("  dbstats		Prints db stats");
 					helptext.Add("  diffdat		Creates a DAT file for entries found in the new DAT");
 					helptext.Add("	-new=			DAT to compare to");

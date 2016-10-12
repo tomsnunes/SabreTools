@@ -116,8 +116,9 @@ namespace SabreTools
 		/// <summary>
 		/// Wrap building all files from a set of DATs
 		/// </summary>
-		/// <param name="inputs"></param>
-		private static void InitBuild(List<string> inputs)
+		/// <param name="inputs">List of input DATs to rebuild from</param>
+		/// <param name="copy">True if files should be copied to output, false for rebuild</param>
+		private static void InitBuild(List<string> inputs, bool copy)
 		{
 			// Verify the filenames
 			Dictionary<string, string> foundDats = GetValidDats(inputs);
@@ -166,7 +167,23 @@ namespace SabreTools
 							{
 								if (File.Exists(Path.Combine(depot, filename)))
 								{
-									ArchiveTools.ExtractArchive(Path.Combine(depot, filename), _tmpdir, asl, _logger);
+									if (copy)
+									{
+										if (!Directory.Exists(Path.Combine(outputFolder, Path.GetDirectoryName(filename))))
+										{
+											Directory.CreateDirectory(Path.Combine(outputFolder, Path.GetDirectoryName(filename)));
+										}
+
+										try
+										{
+											File.Copy(Path.Combine(depot, filename), Path.Combine(outputFolder, filename), true);
+										}
+										catch { }
+									}
+									else
+									{
+										ArchiveTools.ExtractArchive(Path.Combine(depot, filename), _tmpdir, asl, _logger);
+									}
 									continue;
 								}
 							}
@@ -175,10 +192,13 @@ namespace SabreTools
 				}
 
 				// Now that we have extracted everything, we rebuild to the output folder
-				List<string> temp = new List<string>();
-				temp.Add(_tmpdir);
-				SimpleSort ss = new SimpleSort(datFile, temp, outputFolder, "", false, false, false, true, false, false, asl, false, _logger);
-				ss.StartProcessing();
+				if (!copy)
+				{
+					List<string> temp = new List<string>();
+					temp.Add(_tmpdir);
+					SimpleSort ss = new SimpleSort(datFile, temp, outputFolder, "", false, false, false, true, false, false, asl, false, _logger);
+					ss.StartProcessing();
+				}
 			}
 
 			dbc.Dispose();

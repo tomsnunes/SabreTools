@@ -71,6 +71,7 @@ namespace SabreTools
 			bool help = false,
 				archive = false,
 				build = false,
+				copy = false,
 				dbstats = false,
 				diffdat = false,
 				dir2dat = false,
@@ -103,6 +104,9 @@ namespace SabreTools
 						break;
 					case "build":
 						build = true;
+						break;
+					case "-copy":
+						copy = true;
 						break;
 					case "dbstats":
 						dbstats = true;
@@ -201,7 +205,7 @@ namespace SabreTools
 			// For each specified DAT file it creates the torrentzip files
 			else if (build)
 			{
-				InitBuild(inputs);
+				InitBuild(inputs, copy);
 			}
 
 			// Prints db stats
