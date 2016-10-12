@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -6249,6 +6250,42 @@ namespace SabreTools.Helper
 			}
 
 			return success;
+		}
+
+		#endregion
+
+		#region Serialization
+
+		/// <summary>
+		/// Serialze the current object to file
+		/// </summary>
+		public static void Serialize(DatFile df)
+		{
+			BinaryFormatter bf = new BinaryFormatter();
+			Stream output = File.Open((String.IsNullOrEmpty(df.Name) ? "default" : df.Name) + ".bin", FileMode.Create);
+			bf.Serialize(output, df);
+			output.Flush();
+			output.Dispose();
+		}
+
+		/// <summary>
+		/// Repopulate the current object from a file
+		/// </summary>
+		/// <param name="input">Name of the input file to populate from</param>
+		public static DatFile Deserialize(string input)
+		{
+			if (!File.Exists(input))
+			{
+				return new DatFile();
+			}
+
+			BinaryFormatter bf = new BinaryFormatter();
+			Stream output = File.Open(input, FileMode.Open);
+			DatFile df = (DatFile)bf.Deserialize(output);
+
+			output.Flush();
+			output.Dispose();
+			return df;
 		}
 
 		#endregion
