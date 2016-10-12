@@ -89,6 +89,7 @@ namespace SabreTools.Helper
 					helptext.Add("	-new=			DAT to compare to");
 					helptext.Add("  dir2dat		Creates a DAT file for the specified input directory");
 					helptext.Add("	-out=			Filename to save out to");
+					helptext.Add("  export		Exports db to export.csv");
 					helptext.Add("  fixdat		For each specified DAT file it creates a fix DAT");
 					helptext.Add("  lookup		For each specified hash, look up available information");
 					helptext.Add("  memstats		Prints memory stats");

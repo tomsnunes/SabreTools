@@ -296,6 +296,42 @@ namespace SabreTools
 		}
 
 		/// <summary>
+		/// Export the current database to CSV
+		/// </summary>
+		private static void ExportDatabase()
+		{
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			dbc.Open();
+			StreamWriter sw = new StreamWriter(File.Open("export.csv", FileMode.Create, FileAccess.Write));
+
+			sw.WriteLine("\"ID\",\"Size\",\"CRC\",\"MD5\",\"SHA-1\",\"In Depot\",\"DAT Hash\"");
+
+			string query = "SELECT dats.id, size, crc, md5, sha1, indepot, hash FROM data JOIN dats ON data.id=dats.id";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			SqliteDataReader sldr = slc.ExecuteReader();
+
+			if (sldr.HasRows)
+			{
+				while (sldr.Read())
+				{
+					string line = "\"" + sldr.GetInt32(0) + "\","
+							+ "\"" + sldr.GetInt64(1) + "\","
+							+ "\"" + sldr.GetString(2) + "\","
+							+ "\"" + sldr.GetString(3) + "\","
+							+ "\"" + sldr.GetString(4) + "\","
+							+ "\"" + sldr.GetInt32(5) + "\","
+							+ "\"" + sldr.GetString(6) + "\"";
+					sw.WriteLine(line);
+				}
+			}
+
+			sldr.Dispose();
+			slc.Dispose();
+			sw.Dispose();
+			dbc.Dispose();
+		}
+
+		/// <summary>
 		/// Moves DAT index entries for orphaned DATs to backup folder
 		/// </summary>
 		private static void PurgeBackup()

@@ -75,6 +75,7 @@ namespace SabreTools
 				dbstats = false,
 				diffdat = false,
 				dir2dat = false,
+				export = false,
 				fixdat = false,
 				lookup = false,
 				memstats = false,
@@ -116,6 +117,9 @@ namespace SabreTools
 						break;
 					case "dir2dat":
 						dir2dat = true;
+						break;
+					case "export":
+						export = true;
 						break;
 					case "fixdat":
 						fixdat = true;
@@ -176,8 +180,8 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(archive ^ build ^ dbstats ^ diffdat ^ dir2dat ^ fixdat ^ lookup ^ memstats ^ miss ^
-				progress ^ purgeBackup ^ purgeDelete ^ refreshDats ^ shutdown))
+			if (!(archive ^ build ^ dbstats ^ diffdat ^ dir2dat ^ export ^ fixdat ^ lookup ^ memstats ^
+				miss ^ progress ^ purgeBackup ^ purgeDelete ^ refreshDats ^ shutdown))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -224,6 +228,12 @@ namespace SabreTools
 			else if (dir2dat)
 			{
 				InitDir2Dat(inputs);
+			}
+
+			// Export the database to file
+			else if (export)
+			{
+				ExportDatabase();
 			}
 
 			// For each specified DAT file it creates a fix DAT
