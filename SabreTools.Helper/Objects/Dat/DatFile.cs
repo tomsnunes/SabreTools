@@ -3535,18 +3535,19 @@ namespace SabreTools.Helper
 					itemRom.SHA1 = Constants.SHA1Zero;
 				}
 				// If the file has no size and it's not the above case, skip and log
-				else if (itemRom.Size == 0 || itemRom.Size == -1)
+				else if (itemRom.ItemStatus != ItemStatus.Nodump && (itemRom.Size == 0 || itemRom.Size == -1))
 				{
-					logger.Warning("Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
+					logger.Verbose("Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
 					itemRom.ItemStatus = ItemStatus.Nodump;
 				}
 				// If the file has a size but aboslutely no hashes, skip and log
-				else if (itemRom.Size > 0
+				else if (itemRom.ItemStatus != ItemStatus.Nodump
+					&& itemRom.Size > 0
 					&& String.IsNullOrEmpty(itemRom.CRC)
 					&& String.IsNullOrEmpty(itemRom.MD5)
 					&& String.IsNullOrEmpty(itemRom.SHA1))
 				{
-					logger.Warning("Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
+					logger.Verbose("Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
 					itemRom.ItemStatus = ItemStatus.Nodump;
 				}
 
@@ -3561,10 +3562,11 @@ namespace SabreTools.Helper
 				itemDisk.SHA1 = Style.CleanHashData(itemDisk.SHA1, Constants.SHA1Length);
 
 				// If the file has aboslutely no hashes, skip and log
-				if (String.IsNullOrEmpty(itemDisk.MD5)
+				if (itemDisk.ItemStatus != ItemStatus.Nodump
+					&& String.IsNullOrEmpty(itemDisk.MD5)
 					&& String.IsNullOrEmpty(itemDisk.SHA1))
 				{
-					logger.Warning("Incomplete entry for \"" + itemDisk.Name + "\" will be output as nodump");
+					logger.Verbose("Incomplete entry for \"" + itemDisk.Name + "\" will be output as nodump");
 					itemDisk.ItemStatus = ItemStatus.Nodump;
 				}
 
