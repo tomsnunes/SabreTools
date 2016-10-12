@@ -4,6 +4,7 @@ using System.IO;
 
 namespace SabreTools.Helper
 {
+	[Serializable]
 	public abstract class DatItem : IEquatable<DatItem>, IComparable<DatItem>
 	{
 		#region Protected instance variables

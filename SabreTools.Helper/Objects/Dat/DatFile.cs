@@ -11,6 +11,7 @@ using System.Xml;
 
 namespace SabreTools.Helper
 {
+	[Serializable]
 	public class DatFile : ICloneable
 	{
 		#region Private instance variables
