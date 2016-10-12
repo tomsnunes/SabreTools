@@ -16,6 +16,7 @@ namespace SabreTools.Helper
 		// Private instance variables
 		private bool _tofile;
 		private bool _warnings;
+		private bool _errors;
 		private string _filename;
 		private DateTime _start;
 		private StreamWriter _log;
@@ -78,7 +79,11 @@ namespace SabreTools.Helper
 		{
 			if (_warnings)
 			{
-				Console.WriteLine("There were warnings or errors in the last run! Check the log for more details");
+				Console.WriteLine("There were warnings in the last run! Check the log for more details");
+			}
+			if (_errors)
+			{
+				Console.WriteLine("There were errors in the last run! Check the log for more details");
 			}
 
 			if (!suppress)
@@ -230,7 +235,7 @@ namespace SabreTools.Helper
 		/// <returns>True if the output could be written, false otherwise</returns>
 		public bool Error(string output, bool appendPrefix = true)
 		{
-			_warnings = true;
+			_errors = true;
 			return Log(output, LogLevel.ERROR, appendPrefix);
 		}
 
