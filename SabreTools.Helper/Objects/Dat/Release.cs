@@ -1,5 +1,8 @@
-﻿namespace SabreTools.Helper
+﻿using System;
+
+namespace SabreTools.Helper
 {
+	[Serializable]
 	public class Release : DatItem
 	{
 		#region Private instance variables

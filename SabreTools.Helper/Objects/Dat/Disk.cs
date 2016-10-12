@@ -2,6 +2,7 @@
 
 namespace SabreTools.Helper
 {
+	[Serializable]
 	public class Disk : DatItem
 	{
 		#region Private instance variables

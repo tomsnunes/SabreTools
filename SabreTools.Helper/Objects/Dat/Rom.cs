@@ -2,6 +2,7 @@
 
 namespace SabreTools.Helper
 {
+	[Serializable]
 	public class Rom : Disk
 	{
 		#region Private instance variables

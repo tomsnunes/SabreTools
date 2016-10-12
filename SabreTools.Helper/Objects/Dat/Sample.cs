@@ -1,5 +1,8 @@
-﻿namespace SabreTools.Helper
+﻿using System;
+
+namespace SabreTools.Helper
 {
+	[Serializable]
 	public class Sample : DatItem
 	{
 		#region Constructors
