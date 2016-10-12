@@ -1766,8 +1766,9 @@ namespace SabreTools.Helper
 											((Disk)item).SHA1 = gc[i].Replace("\"", "").ToLowerInvariant();
 										}
 										break;
+									case "status":
 									case "flags":
-										if (val.ToLowerInvariant() == "good")
+										if (gc[i].ToLowerInvariant() == "good")
 										{
 											if (item.Type == ItemType.Rom)
 											{
@@ -1778,7 +1779,7 @@ namespace SabreTools.Helper
 												((Disk)item).ItemStatus = ItemStatus.Good;
 											}
 										}
-										else if (val.ToLowerInvariant() == "baddump")
+										else if (gc[i].ToLowerInvariant() == "baddump")
 										{
 											if (item.Type == ItemType.Rom)
 											{
@@ -1789,7 +1790,7 @@ namespace SabreTools.Helper
 												((Disk)item).ItemStatus = ItemStatus.BadDump;
 											}
 										}
-										else if (val.ToLowerInvariant() == "nodump")
+										else if (gc[i].ToLowerInvariant() == "nodump")
 										{
 											if (item.Type == ItemType.Rom)
 											{
@@ -1800,7 +1801,7 @@ namespace SabreTools.Helper
 												((Disk)item).ItemStatus = ItemStatus.Nodump;
 											}
 										}
-										else if (val.ToLowerInvariant() == "verified")
+										else if (gc[i].ToLowerInvariant() == "verified")
 										{
 											if (item.Type == ItemType.Rom)
 											{
@@ -1936,8 +1937,9 @@ namespace SabreTools.Helper
 											((Disk)item).SHA1 = gc[i].Replace("\"", "").ToLowerInvariant();
 										}
 										break;
+									case "status":
 									case "flags":
-										if (val.ToLowerInvariant() == "good")
+										if (gc[i].ToLowerInvariant() == "good")
 										{
 											if (item.Type == ItemType.Rom)
 											{
@@ -1948,7 +1950,7 @@ namespace SabreTools.Helper
 												((Disk)item).ItemStatus = ItemStatus.Good;
 											}
 										}
-										else if (val.ToLowerInvariant() == "baddump")
+										else if (gc[i].ToLowerInvariant() == "baddump")
 										{
 											if (item.Type == ItemType.Rom)
 											{
@@ -1959,7 +1961,7 @@ namespace SabreTools.Helper
 												((Disk)item).ItemStatus = ItemStatus.BadDump;
 											}
 										}
-										else if (val.ToLowerInvariant() == "nodump")
+										else if (gc[i].ToLowerInvariant() == "nodump")
 										{
 											if (item.Type == ItemType.Rom)
 											{
@@ -1970,7 +1972,7 @@ namespace SabreTools.Helper
 												((Disk)item).ItemStatus = ItemStatus.Nodump;
 											}
 										}
-										else if (val.ToLowerInvariant() == "verified")
+										else if (gc[i].ToLowerInvariant() == "verified")
 										{
 											if (item.Type == ItemType.Rom)
 											{
