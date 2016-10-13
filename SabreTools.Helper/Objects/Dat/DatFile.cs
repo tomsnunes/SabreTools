@@ -6260,15 +6260,16 @@ namespace SabreTools.Helper
 		/// Serialze object to file
 		/// </summary>
 		/// <param name="df">DatFile to serialize</param>
+		/// <param name="output">File to write out to</param>
 		/// <returns>Name of the outputted file</returns>
-		public static string Serialize(DatFile df)
+		public static string Serialize(DatFile df, string output)
 		{
 			BinaryFormatter bf = new BinaryFormatter();
-			string filename = (String.IsNullOrEmpty(df.Name) ? "default" : df.Name) + ".bin";
-			Stream output = File.Open(filename, FileMode.Create);
-			bf.Serialize(output, df);
-			output.Flush();
-			output.Dispose();
+			string filename = (String.IsNullOrEmpty(output) ? "default.bin" : output);
+			Stream outStream = File.Open(filename, FileMode.Create);
+			bf.Serialize(outStream, df);
+			outStream.Flush();
+			outStream.Dispose();
 			return filename;
 		}
 
