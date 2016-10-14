@@ -43,6 +43,7 @@ namespace SabreTools
 			// Set all default values
 			bool help = false,
 				convert = false,
+				date = false,
 				delete = false,
 				quickScan = false,
 				romba = false,
@@ -69,6 +70,10 @@ namespace SabreTools
 					case "-h":
 					case "--help":
 						help = true;
+						break;
+					case "-ad":
+					case "--add-date":
+						date = true;
 						break;
 					case "-c":
 					case "--convert":
@@ -201,7 +206,7 @@ namespace SabreTools
 			{
 				if (datfiles.Count > 0)
 				{
-					InitSortVerify(datfiles, inputs, outDir, tempDir, quickScan, toFolder,
+					InitSortVerify(datfiles, inputs, outDir, tempDir, quickScan, date, toFolder,
 						verify, delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, logger);
 				}
 				else
@@ -275,8 +280,8 @@ namespace SabreTools
 			}
 			logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			SimpleSort ss = new SimpleSort(datdata, newinputs, outDir, tempDir, false, false, false,
-				delete, tgz, romba, asl, false, logger);
+			SimpleSort ss = new SimpleSort(datdata, newinputs, outDir, tempDir, false, false,
+				false, false, delete, tgz, romba, asl, false, logger);
 			return ss.Convert();
 		}
 
@@ -288,6 +293,7 @@ namespace SabreTools
 		/// <param name="outDir">Output directory to use to build to</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
@@ -299,7 +305,7 @@ namespace SabreTools
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan,
+		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
 			bool toFolder, bool verify, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			// Get the archive scanning level
@@ -316,8 +322,8 @@ namespace SabreTools
 			}
 			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
-				delete, tgz, romba, asl, updateDat, logger);
+			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, date,
+				toFolder, verify, delete, tgz, romba, asl, updateDat, logger);
 			ss.StartProcessing();
 		}
 	}

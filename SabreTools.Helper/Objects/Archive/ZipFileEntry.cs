@@ -23,8 +23,7 @@ namespace SabreTools.Helper
 		private ArchiveVersion _versionMadeBy;
 		private ArchiveVersion _versionNeeded;
 		private GeneralPurposeBitFlag _generalPurposeBitFlag;
-		private ushort _lastModFileTime;
-		private ushort _lastModFileDate;
+		private uint _lastMod;
 		private uint _crc;
 		private ulong _compressedSize;
 		private ulong _uncompressedSize;
@@ -56,15 +55,10 @@ namespace SabreTools.Helper
 			get { return _generalPurposeBitFlag; }
 			private set { _generalPurposeBitFlag = value; }
 		}
-		public ushort LastModFileTime
+		public uint LastMod
 		{
-			get { return _lastModFileTime; }
-			set { _lastModFileTime = value; }
-		}
-		public ushort LastModFileDate
-		{
-			get { return _lastModFileDate; }
-			set { _lastModFileDate = value; }
+			get { return _lastMod; }
+			set { _lastMod = value; }
 		}
 		public byte[] CRC
 		{
@@ -135,14 +129,13 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="zipstream">Stream representing the entry</param>
 		/// <param name="filename">Internal filename to use</param>
-		public ZipFileEntry(Stream zipstream, string filename)
+		public ZipFileEntry(Stream zipstream, string filename, uint lastMod = Constants.TorrentZipFileDateTime)
 		{
 			_zip64 = false;
 			_zipstream = zipstream;
 			_generalPurposeBitFlag = GeneralPurposeBitFlag.DeflatingMaximumCompression;
 			_compressionMethod = CompressionMethod.Deflated;
-			_lastModFileTime = 48128;
-			_lastModFileDate = 8600;
+			_lastMod = lastMod;
 
 			FileName = filename;
 		}
@@ -181,8 +174,7 @@ namespace SabreTools.Helper
 				}
 
 				// Keep reading available information, skipping the unnecessary
-				_lastModFileTime = br.ReadUInt16();
-				_lastModFileDate = br.ReadUInt16();
+				_lastMod = br.ReadUInt32();
 				_crc = br.ReadUInt32();
 				_compressedSize = br.ReadUInt32();
 				_uncompressedSize = br.ReadUInt32();
@@ -356,8 +348,7 @@ namespace SabreTools.Helper
 			bw.Write(versionNeededToExtract);
 			bw.Write((ushort)_generalPurposeBitFlag);
 			bw.Write((ushort)_compressionMethod);
-			bw.Write(_lastModFileTime);
-			bw.Write(_lastModFileDate);
+			bw.Write(_lastMod);
 			bw.Write(_crc);
 			bw.Write(compressedSize32);
 			bw.Write(uncompressedSize32);
@@ -413,11 +404,7 @@ namespace SabreTools.Helper
 				{
 					return ZipReturn.ZipLocalFileHeaderError;
 				}
-				if (br.ReadUInt16() != _lastModFileTime)
-				{
-					return ZipReturn.ZipLocalFileHeaderError;
-				}
-				if (br.ReadUInt16() != _lastModFileDate)
+				if (br.ReadUInt32() != _lastMod)
 				{
 					return ZipReturn.ZipLocalFileHeaderError;
 				}
@@ -616,8 +603,7 @@ namespace SabreTools.Helper
 				}
 
 				_compressionMethod = (CompressionMethod)br.ReadUInt16();
-				_lastModFileTime = br.ReadUInt16();
-				_lastModFileDate = br.ReadUInt16();
+				_lastMod = br.ReadUInt32();
 				_crc = br.ReadUInt32();
 				_compressedSize = br.ReadUInt32();
 				_uncompressedSize = br.ReadUInt32();
@@ -736,8 +722,7 @@ namespace SabreTools.Helper
 			bw.Write(versionNeededToExtract);
 			bw.Write((ushort)_generalPurposeBitFlag);
 			bw.Write((ushort)_compressionMethod);
-			bw.Write(_lastModFileTime);
-			bw.Write(_lastModFileDate);
+			bw.Write(_lastMod);
 
 			_crc32Location = (ulong)_zipstream.Position;
 
@@ -780,10 +765,11 @@ namespace SabreTools.Helper
 		/// <param name="streamSize">Size of the stream regardless of compression</param>
 		/// <param name="compressionMethod">Compression method to compare against</param>
 		/// <returns>Status of the underlying stream</returns>
-		public ZipReturn OpenReadStream(bool raw, out Stream stream, out ulong streamSize, out CompressionMethod compressionMethod)
+		public ZipReturn OpenReadStream(bool raw, out Stream stream, out ulong streamSize, out CompressionMethod compressionMethod, out uint lastMod)
 		{
 			streamSize = 0;
 			compressionMethod = _compressionMethod;
+			lastMod = _lastMod;
 
 			_readStream = null;
 			_zipstream.Seek((long)_dataLocation, SeekOrigin.Begin);
@@ -834,6 +820,7 @@ namespace SabreTools.Helper
 		/// <param name="uncompressedSize">Uncompressed size of the stream</param>
 		/// <param name="compressionMethod">Compression method to compare against</param>
 		/// <param name="stream">Output stream representing the correctly compressed stream</param>
+		/// <param name="tzip">True if the file should use the TorrentZip date (default), false otherwise</param>
 		/// <returns>Status of the underlying stream</returns>
 		public ZipReturn OpenWriteStream(bool raw, bool torrentZip, ulong uncompressedSize, CompressionMethod compressionMethod, out Stream stream)
 		{

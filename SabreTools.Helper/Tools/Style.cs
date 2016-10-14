@@ -551,6 +551,30 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
+		/// Adapted from 7-zip Source Code: CPP/Windows/TimeUtils.cpp:FileTimeToDosTime
+		/// </summary>
+		public static uint ConvertDateTimeToMsDosTimeFormat(DateTime dateTime)
+		{
+			uint year = (uint)((dateTime.Year - 1980) % 128);
+			uint mon = (uint)dateTime.Month;
+			uint day = (uint)dateTime.Day;
+			uint hour = (uint)dateTime.Hour;
+			uint min = (uint)dateTime.Minute;
+			uint sec = (uint)dateTime.Second;
+
+			return (year << 25) | (mon << 21) | (day << 16) | (hour << 11) | (min << 5) | (sec >> 1);
+		}
+
+		/// <summary>
+		/// Adapted from 7-zip Source Code: CPP/Windows/TimeUtils.cpp:DosTimeToFileTime
+		/// </summary>
+		public static DateTime ConvertMsDosTimeFormatToDateTime(uint msDosDateTime)
+		{
+			return new DateTime((int)(1980 + (msDosDateTime >> 25)), (int)((msDosDateTime >> 21) & 0xF), (int)((msDosDateTime >> 16) & 0x1F),
+				(int)((msDosDateTime >> 11) & 0x1F), (int)((msDosDateTime >> 5) & 0x3F), (int)((msDosDateTime & 0x1F) * 2));
+		}
+
+		/// <summary>
 		/// Determines a text file's encoding by analyzing its byte order mark (BOM).
 		/// Defaults to ASCII when detection of the text file's endianness fails.
 		/// http://stackoverflow.com/questions/3825390/effective-way-to-find-any-files-encoding

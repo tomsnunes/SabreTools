@@ -18,6 +18,7 @@ namespace SabreTools
 		/// <param name="outDir">Output directory (empty for default directory)</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="tgz">True to output files in TorrentGZ format, false for TorrentZip</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
@@ -25,19 +26,25 @@ namespace SabreTools
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public static bool InitConvertFolder(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool delete,
-			bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
+			bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
 		{
+			// Get the archive scanning level
+			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
+
+			DateTime start = DateTime.Now;
+			logger.User("Populating internal DAT...");
+
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
 				datdata.Parse(datfile, 99, 99, logger, keep: true, softlist: true);
 			}
-
-			// Get the archive scanning level
-			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
+			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Get all individual files from the inputs
+			start = DateTime.Now;
+			logger.User("Organizing input files...");
 			List<string> newinputs = new List<string>();
 			foreach (string input in inputs)
 			{
@@ -53,9 +60,10 @@ namespace SabreTools
 					}
 				}
 			}
+			logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			SimpleSort ss = new SimpleSort(datdata, newinputs, outDir, tempDir, false, false, false,
-				delete, false, romba, asl, false, logger);
+			SimpleSort ss = new SimpleSort(datdata, newinputs, outDir, tempDir, false, false,
+				false, false, delete, tgz, romba, asl, false, logger);
 			return ss.Convert();
 		}
 
@@ -285,22 +293,26 @@ namespace SabreTools
 		/// <param name="outDir">Output directory to use to build to</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
-		/// <param name="torrentX">True is for TorrentZip, False is for TorrentGZ, Null is for standard zip</param>
+		/// <param name="tgz">True to output files in TorrentGZ format, false for TorrentZip</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan,
+		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
 			bool toFolder, bool verify, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
+
+			DateTime start = DateTime.Now;
+			logger.User("Populating internal DAT...");
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
@@ -308,9 +320,10 @@ namespace SabreTools
 			{
 				datdata.Parse(datfile, 99, 99, logger, keep: true, softlist: true);
 			}
+			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, toFolder, verify,
-				delete, tgz, romba, asl, updateDat, logger);
+			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, date,
+				toFolder, verify, delete, tgz, romba, asl, updateDat, logger);
 			ss.StartProcessing();
 		}
 

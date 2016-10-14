@@ -709,6 +709,12 @@ Options:
 		quicker than extracting all files to the temp folder. On the downside, it can only
 		get the CRC and size from most archive formats, leading to possible issues.
 		
+	-ad, --add-date		Write dates for each file parsed, if available
+		If this flag is set, the the date in the DAT will be used for the output file
+		instead of the standard date and time for TorrentZip. This will technically
+		invalidate the output files as proper TorrentZip files because the date will not
+		match the standard.
+		
 	-v, --verify		Enable verification of output directory
 		This overrides the default rebuilding and only requires the DAT and the output folder.
 		Here, the DAT is used to verify the output directory directly and then output a

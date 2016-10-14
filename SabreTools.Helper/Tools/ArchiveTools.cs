@@ -153,8 +153,9 @@ namespace SabreTools.Helper
 						Stream readStream;
 						ulong streamsize = 0;
 						CompressionMethod cm = CompressionMethod.Stored;
+						uint lastMod = 0;
 
-						zr = zf.OpenReadStream(i, false, out readStream, out streamsize, out cm);
+						zr = zf.OpenReadStream(i, false, out readStream, out streamsize, out cm, out lastMod);
 
 						FileStream writeStream = File.OpenWrite(Path.Combine(tempDir, zf.Entries[i].FileName));
 
@@ -290,8 +291,9 @@ namespace SabreTools.Helper
 							Stream readStream;
 							ulong streamsize = 0;
 							CompressionMethod cm = CompressionMethod.Stored;
+							uint lastMod = 0;
 
-							zr = zf.OpenReadStream(i, false, out readStream, out streamsize, out cm);
+							zr = zf.OpenReadStream(i, false, out readStream, out streamsize, out cm, out lastMod);
 
 							byte[] ibuffer = new byte[_bufferSize];
 							int ilen;
@@ -745,8 +747,9 @@ namespace SabreTools.Helper
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
 		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteToArchive(string inputFile, string outDir, Rom rom, Logger logger)
+		public static bool WriteToArchive(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
 		{
 			// Wrap the individual inputs into lists
 			List<string> inputFiles = new List<string>();
@@ -754,7 +757,7 @@ namespace SabreTools.Helper
 			List<Rom> roms = new List<Rom>();
 			roms.Add(rom);
 
-			return WriteToArchive(inputFiles, outDir, roms, logger);
+			return WriteToArchive(inputFiles, outDir, roms, logger, date: date);
 		}
 
 		/// <summary>
@@ -764,8 +767,9 @@ namespace SabreTools.Helper
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">List of Rom representing the new information</param>
 		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteToArchive(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger)
+		public static bool WriteToArchive(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
 		{
 			bool success = false;
 			string tempFile = Path.GetTempFileName();
@@ -827,7 +831,26 @@ namespace SabreTools.Helper
 						// Open the input file for reading
 						Stream freadStream = File.Open(inputFiles[index], FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 						ulong istreamSize = (ulong)(new FileInfo(inputFiles[index]).Length);
-						zipFile.OpenWriteStream(false, true, roms[index].Name.Replace('\\', '/'), istreamSize, CompressionMethod.Deflated, out writeStream);
+
+						DateTime dt = DateTime.Now;
+						if (date && !String.IsNullOrEmpty(roms[index].Date) && DateTime.TryParse(roms[index].Date.Replace('\\', '/'), out dt))
+						{
+							// https://referencesource.microsoft.com/#WindowsBase/Base/MS/Internal/IO/Zip/ZipIOBlockManager.cs,760eb7714f02c41e
+							uint msDosDateTime = 0;
+							msDosDateTime |= (((uint)dt.Second) / 2) & 0x1F;
+							msDosDateTime |= (((uint)dt.Minute) & 0x3F) << 5;
+							msDosDateTime |= (((uint)dt.Hour) & 0x1F) << 11;
+							msDosDateTime |= (((uint)dt.Day) & 0x1F) << 16;
+							msDosDateTime |= (((uint)dt.Month) & 0xF) << 21;
+							msDosDateTime |= (((uint)(dt.Year - 1980)) & 0x7F) << 25;
+
+							zipFile.OpenWriteStream(false, false, roms[index].Name.Replace('\\', '/'), istreamSize,
+								CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
+						}
+						else
+						{
+							zipFile.OpenWriteStream(false, true, roms[index].Name.Replace('\\', '/'), istreamSize, CompressionMethod.Deflated, out writeStream);
+						}
 
 						// Copy the input stream to the output
 						byte[] ibuffer = new byte[_bufferSize];
@@ -893,7 +916,26 @@ namespace SabreTools.Helper
 							// Open the input file for reading
 							Stream freadStream = File.Open(inputFiles[-index - 1], FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 							ulong istreamSize = (ulong)(new FileInfo(inputFiles[-index - 1]).Length);
-							zipFile.OpenWriteStream(false, true, roms[-index - 1].Name.Replace('\\', '/'), istreamSize, CompressionMethod.Deflated, out writeStream);
+
+							DateTime dt = DateTime.Now;
+							if (date && !String.IsNullOrEmpty(roms[-index - 1].Date) && DateTime.TryParse(roms[-index - 1].Date.Replace('\\', '/'), out dt))
+							{
+								// https://referencesource.microsoft.com/#WindowsBase/Base/MS/Internal/IO/Zip/ZipIOBlockManager.cs,760eb7714f02c41e
+								uint msDosDateTime = 0;
+								msDosDateTime |= (((uint)dt.Second) / 2) & 0x1F;
+								msDosDateTime |= (((uint)dt.Minute) & 0x3F) << 5;
+								msDosDateTime |= (((uint)dt.Hour) & 0x1F) << 11;
+								msDosDateTime |= (((uint)dt.Day) & 0x1F) << 16;
+								msDosDateTime |= (((uint)dt.Month) & 0xF) << 21;
+								msDosDateTime |= (((uint)(dt.Year - 1980)) & 0x7F) << 25;
+
+								zipFile.OpenWriteStream(false, false, roms[-index - 1].Name.Replace('\\', '/'), istreamSize,
+									CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
+							}
+							else
+							{
+								zipFile.OpenWriteStream(false, true, roms[-index - 1].Name.Replace('\\', '/'), istreamSize, CompressionMethod.Deflated, out writeStream);
+							}
 
 							// Copy the input stream to the output
 							byte[] ibuffer = new byte[_bufferSize];
@@ -912,10 +954,12 @@ namespace SabreTools.Helper
 						{
 							// Instantiate the streams
 							CompressionMethod icompressionMethod = CompressionMethod.Stored;
+							uint lastMod = 0;
 							ulong istreamSize = 0;
 							Stream zreadStream;
-							oldZipFile.OpenReadStream(index, false, out zreadStream, out istreamSize, out icompressionMethod);
-							zipFile.OpenWriteStream(false, true, oldZipFile.Filename(index), istreamSize, CompressionMethod.Deflated, out writeStream);
+							oldZipFile.OpenReadStream(index, false, out zreadStream, out istreamSize, out icompressionMethod, out lastMod);
+							zipFile.OpenWriteStream(false, lastMod == Constants.TorrentZipFileDateTime, oldZipFile.Filename(index),
+								istreamSize, CompressionMethod.Deflated, out writeStream, lastMod: lastMod);
 
 							// Copy the input stream to the output
 							byte[] ibuffer = new byte[_bufferSize];
