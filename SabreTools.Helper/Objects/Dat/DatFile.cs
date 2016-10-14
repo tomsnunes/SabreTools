@@ -6254,48 +6254,6 @@ namespace SabreTools.Helper
 
 		#endregion
 
-		#region Serialization
-
-		/// <summary>
-		/// Serialze object to file
-		/// </summary>
-		/// <param name="df">DatFile to serialize</param>
-		/// <param name="output">File to write out to</param>
-		/// <returns>Name of the outputted file</returns>
-		public static string Serialize(DatFile df, string output)
-		{
-			BinaryFormatter bf = new BinaryFormatter();
-			string filename = (String.IsNullOrEmpty(output) ? "default.bin" : output);
-			Stream outStream = File.Open(filename, FileMode.Create);
-			bf.Serialize(outStream, df);
-			outStream.Flush();
-			outStream.Dispose();
-			return filename;
-		}
-
-		/// <summary>
-		/// Repopulate object from a file
-		/// </summary>
-		/// <param name="input">Name of the input file to populate from</param>
-		/// <returns>DatFile populated from the input file</returns>
-		public static DatFile Deserialize(string input)
-		{
-			if (!File.Exists(input))
-			{
-				return new DatFile();
-			}
-
-			BinaryFormatter bf = new BinaryFormatter();
-			Stream output = File.Open(input, FileMode.Open);
-			DatFile df = (DatFile)bf.Deserialize(output);
-
-			output.Flush();
-			output.Dispose();
-			return df;
-		}
-
-		#endregion
-
 		#region Statistics
 
 		/// <summary>
