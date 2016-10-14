@@ -181,6 +181,7 @@ namespace SabreTools.Helper
 		public const uint EndOfCentralDirSignature = 0x06054b50;
 		public const uint Zip64EndOfCentralDirSignature = 0x06064b50;
 		public const uint Zip64EndOfCentralDirectoryLocator = 0x07064b50;
+		public const uint TorrentZipFileDateTime = 0x2198BC00;
 
 		#endregion
 

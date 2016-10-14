@@ -285,6 +285,7 @@ namespace SabreTools.Helper
 					helptext.Add("  -t=, --temp=		Set the temporary directory to use");
 					helptext.Add("  -d, --delete	Delete input files");
 					helptext.Add("  -qs, --quick		Enable quick scanning of archives");
+					helptext.Add("  -ad, --add-date		Add original dates from DAT, if possible");
 					helptext.Add("  -v, --verify		Enable verification of output directory");
 					helptext.Add("  -c, --convert		Enable conversion of input files to TGZ");
 					helptext.Add("	Note: If a DAT is used, only files NOT included will rebuild");

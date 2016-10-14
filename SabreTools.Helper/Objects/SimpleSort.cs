@@ -14,6 +14,7 @@ namespace SabreTools.Helper
 		private string _outDir;
 		private string _tempDir;
 		private bool _quickScan;
+		private bool _date;
 		private bool _toFolder;
 		private bool _verify;
 		private bool _delete;
@@ -37,6 +38,7 @@ namespace SabreTools.Helper
 		/// <param name="outDir">Output directory to use to build to</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
@@ -46,7 +48,7 @@ namespace SabreTools.Helper
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public SimpleSort(DatFile datdata, List<string> inputs, string outDir, string tempDir,
-			bool quickScan, bool toFolder, bool verify, bool delete, bool tgz, bool romba,
+			bool quickScan, bool date, bool toFolder, bool verify, bool delete, bool tgz, bool romba,
 			ArchiveScanLevel archiveScanLevel, bool updateDat, Logger logger)
 		{
 			_datdata = datdata;
@@ -54,6 +56,7 @@ namespace SabreTools.Helper
 			_outDir = (outDir == "" ? "Rebuild" : outDir);
 			_tempDir = (String.IsNullOrEmpty(tempDir) ? Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()) : tempDir);
 			_quickScan = quickScan;
+			_date = date;
 			_toFolder = toFolder;
 			_verify = verify;
 			_delete = delete;
@@ -356,7 +359,7 @@ namespace SabreTools.Helper
 						}
 						else
 						{
-							ArchiveTools.WriteToArchive(input, _outDir, found, _logger);
+							ArchiveTools.WriteToArchive(input, _outDir, found, _logger, date: _date);
 						}
 					}
 				}
@@ -373,7 +376,7 @@ namespace SabreTools.Helper
 					Rom drom = FileTools.GetFileInfo(newinput, _logger);
 
 					// If we have a blank RomData, it's an error
-					if (drom.Name == null)
+					if (String.IsNullOrEmpty(drom.Name))
 					{
 						return false;
 					}
@@ -423,7 +426,7 @@ namespace SabreTools.Helper
 							}
 							else
 							{
-								ArchiveTools.WriteToArchive(newinput, _outDir, found, _logger);
+								ArchiveTools.WriteToArchive(newinput, _outDir, found, _logger, date: _date);
 							}
 						}
 
@@ -473,7 +476,7 @@ namespace SabreTools.Helper
 							}
 							else
 							{
-								ArchiveTools.WriteToArchive(input, _outDir, newfound, _logger);
+								ArchiveTools.WriteToArchive(input, _outDir, newfound, _logger, date: _date);
 							}
 						}
 					}

@@ -760,11 +760,12 @@ namespace SabreTools.Helper
 		/// <param name="streamSize">Size of the stream regardless of compression</param>
 		/// <param name="compressionMethod">Compression method to compare against</param>
 		/// <returns>Status of the underlying stream</returns>
-		public ZipReturn OpenReadStream(int index, bool raw, out Stream stream, out ulong streamSize, out CompressionMethod compressionMethod)
+		public ZipReturn OpenReadStream(int index, bool raw, out Stream stream, out ulong streamSize, out CompressionMethod compressionMethod, out uint lastMod)
 		{
 			// Set all of the defaults
 			streamSize = 0;
 			compressionMethod = CompressionMethod.Stored;
+			lastMod = 0;
 			_readIndex = index;
 			stream = null;
 
@@ -783,7 +784,7 @@ namespace SabreTools.Helper
 			}
 
 			// Now return the results of opening the local file
-			return _entries[index].OpenReadStream(raw, out stream, out streamSize, out compressionMethod);
+			return _entries[index].OpenReadStream(raw, out stream, out streamSize, out compressionMethod, out lastMod);
 		}
 
 		/// <summary>
@@ -795,7 +796,7 @@ namespace SabreTools.Helper
 		/// <param name="streamSize">Size of the stream regardless of compression</param>
 		/// <param name="compressionMethod">Compression method to compare against</param>
 		/// <returns>Status of the underlying stream</returns>
-		public ZipReturn OpenReadStreamQuick(ulong pos, bool raw, out Stream stream, out ulong streamSize, out CompressionMethod compressionMethod)
+		public ZipReturn OpenReadStreamQuick(ulong pos, bool raw, out Stream stream, out ulong streamSize, out CompressionMethod compressionMethod, out uint lastMod)
 		{
 			// Get the temporary entry based on the defined position
 			ZipFileEntry tempEntry = new ZipFileEntry(_zipstream);
@@ -812,12 +813,13 @@ namespace SabreTools.Helper
 				stream = null;
 				streamSize = 0;
 				compressionMethod = CompressionMethod.Stored;
+				lastMod = 0;
 				return zr;
 			}
 			_readIndex = 0;
 
 			// Return the file stream if it worked
-			return tempEntry.OpenReadStream(raw, out stream, out streamSize, out compressionMethod);
+			return tempEntry.OpenReadStream(raw, out stream, out streamSize, out compressionMethod, out lastMod);
 		}
 
 		/// <summary>
@@ -838,7 +840,8 @@ namespace SabreTools.Helper
 		/// <param name="compressionMethod">Compression method to compare against</param>
 		/// <param name="stream">Output stream representing the correctly compressed stream</param>
 		/// <returns>Status of the underlying stream</returns>
-		public ZipReturn OpenWriteStream(bool raw, bool torrentZip, string filename, ulong uncompressedSize, CompressionMethod compressionMethod, out Stream stream)
+		public ZipReturn OpenWriteStream(bool raw, bool torrentZip, string filename, ulong uncompressedSize,
+			CompressionMethod compressionMethod, out Stream stream, uint lastMod = Constants.TorrentZipFileDateTime)
 		{
 			// Check to see if the stream is writable
 			stream = null;
@@ -848,7 +851,7 @@ namespace SabreTools.Helper
 			}
 
 			// Open the entry stream based on the current position
-			ZipFileEntry zfe = new ZipFileEntry(_zipstream, filename);
+			ZipFileEntry zfe = new ZipFileEntry(_zipstream, filename, lastMod: lastMod);
 			ZipReturn zr = zfe.OpenWriteStream(raw, torrentZip, uncompressedSize, compressionMethod, out stream);
 			_entries.Add(zfe);
 
