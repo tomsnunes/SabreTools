@@ -47,50 +47,54 @@ namespace SabreTools
 				List<DatItem> datItems = df.Files[key];
 				foreach (Rom rom in datItems)
 				{
-					string query = "SELECT id FROM data WHERE size=" + rom.Size
-								+ " AND (crc=\"" + rom.CRC + "\" OR crc=\"null\")"
-								+ " AND (md5=\"" + rom.MD5 + "\" OR md5=\"null\")"
-								+ " AND (sha1=\"" + rom.SHA1 + "\" OR sha1=\"null\")"
-								+ " AND indepot=0";
-					SqliteCommand slc = new SqliteCommand(query, dbc);
-					SqliteDataReader sldr = slc.ExecuteReader();
-
-					// If a row is returned, add the file and change the existence
-					if (sldr.HasRows)
+					bool add = false;
+					if (onlyNeeded)
 					{
-						sldr.Read();
-						long id = sldr.GetInt64(0);
+						string query = @"
+SELECT crcsha1.crc, md5sha1.md5, md5sha1.sha1 FROM crcsha1
+	JOIN md5sha1 ON crcsha1.sha1=md5sha1.sha1
+WHERE crcsha1.crc=""" + rom.CRC + @"""
+	OR md5sha1.md5=""" + rom.MD5 + @"""
+	OR md5sha1.sha1=""" + rom.SHA1 + "\"";
+						SqliteCommand slc = new SqliteCommand(query, dbc);
+						SqliteDataReader sldr = slc.ExecuteReader();
 
-						string squery = "UPDATE data SET indepot=1 WHERE id=" + id;
-						SqliteCommand sslc = new SqliteCommand(squery, dbc);
-						sslc.ExecuteNonQuery();
-						sslc.Dispose();
-
-						// Add the rom to the files that need to be rebuilt
-						if (need.Files.ContainsKey(key))
+						// If a row is returned, add the file and change the existence
+						if (sldr.HasRows)
 						{
-							need.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							need.Files.Add(key, temp);
+							add = true;
 						}
 					}
-
-					// If it doesn't exist, and we're not adding only needed files
-					else if (!onlyNeeded)
+					else
 					{
-						string squery = "INSERT INTO data (size, crc, md5, sha1, indepot) VALUES ("
-							+ rom.Size + ","
-							+ "\"" + (rom.CRC == "" ? "null" : rom.CRC) + "\","
-							+ "\"" + (rom.MD5 == "" ? "null" : rom.MD5) + "\","
-							+ "\"" + (rom.SHA1 == "" ? "null" : rom.SHA1) + "\","
-							+ "1)";
-						SqliteCommand sslc = new SqliteCommand(squery, dbc);
-						sslc.ExecuteNonQuery();
-						sslc.Dispose();
+						add = true;
+					}
+					
+					// If we're supposed to add the file to the depot, add it to the list
+					if (add)
+					{
+						_logger.User("Adding file \"" + rom.Name + "\" to the database");
+
+						// Insert new or updated information into the database
+						string query = "INSERT OR IGNORE INTO crc (crc) VALUES (\"" + rom.CRC + "\")";
+						SqliteCommand slc = new SqliteCommand(query, dbc);
+						slc.ExecuteNonQuery();
+
+						query = "INSERT OR IGNORE INTO md5 (md5) VALUES (\"" + rom.MD5 + "\")";
+						slc = new SqliteCommand(query, dbc);
+						slc.ExecuteNonQuery();
+
+						query = "INSERT OR IGNORE INTO sha1 (sha1) VALUES (\"" + rom.SHA1 + "\")";
+						slc = new SqliteCommand(query, dbc);
+						slc.ExecuteNonQuery();
+
+						query = "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\")";
+						slc = new SqliteCommand(query, dbc);
+						slc.ExecuteNonQuery();
+
+						query = "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\")";
+						slc = new SqliteCommand(query, dbc);
+						slc.ExecuteNonQuery();
 
 						// Add the rom to the files that need to be rebuilt
 						if (need.Files.ContainsKey(key))
@@ -148,57 +152,12 @@ namespace SabreTools
 					Directory.CreateDirectory(outputFolder);
 				}
 
-				// Then get all hashes associated with this DAT
-				string query = "SELECT sha1 FROM dats JOIN data ON dats.id=data.id WHERE hash=\"" + key + "\"";
-				SqliteCommand slc = new SqliteCommand(query, dbc);
-				SqliteDataReader sldr = slc.ExecuteReader();
-				if (sldr.HasRows)
-				{
-					while (sldr.Read())
-					{
-						string sha1 = sldr.GetString(0);
-						string filename = Path.Combine(sha1.Substring(0, 2), sha1.Substring(2, 2), sha1.Substring(4, 2), sha1.Substring(6, 2), sha1 + ".gz");
+				// Get the depots that are online
+				List<string> onlineDepots = _depots.Where(d => d.Value.Item2).Select(d => d.Key).ToList();
 
-						// Find the first depot that contains the folder
-						foreach (string depot in _depots.Keys)
-						{
-							// If the depot is online, check it
-							if (_depots[depot].Item2)
-							{
-								if (File.Exists(Path.Combine(depot, filename)))
-								{
-									if (copy)
-									{
-										if (!Directory.Exists(Path.Combine(outputFolder, Path.GetDirectoryName(filename))))
-										{
-											Directory.CreateDirectory(Path.Combine(outputFolder, Path.GetDirectoryName(filename)));
-										}
-
-										try
-										{
-											File.Copy(Path.Combine(depot, filename), Path.Combine(outputFolder, filename), true);
-										}
-										catch { }
-									}
-									else
-									{
-										ArchiveTools.ExtractArchive(Path.Combine(depot, filename), _tmpdir, asl, _logger);
-									}
-									continue;
-								}
-							}
-						}
-					}
-				}
-
-				// Now that we have extracted everything, we rebuild to the output folder
-				if (!copy)
-				{
-					List<string> temp = new List<string>();
-					temp.Add(_tmpdir);
-					SimpleSort ss = new SimpleSort(datFile, temp, outputFolder, "", false, false, false, true, false, false, asl, false, _logger);
-					ss.StartProcessing();
-				}
+				// Loop over the depots and rebuild as needed
+				SimpleSort ss = new SimpleSort(datFile, onlineDepots, outputFolder, _tmpdir, false, false, false, false, copy, copy, asl, false, _logger);
+				ss.StartProcessing();
 			}
 
 			dbc.Dispose();
@@ -305,7 +264,7 @@ namespace SabreTools
 			// Now, search for each of them and return true or false for each
 			foreach (string input in crc)
 			{
-				string query = "SELECT * FROM data WHERE crc=\"" + input + "\"";
+				string query = "SELECT * FROM crc WHERE crc=\"" + input + "\"";
 				SqliteCommand slc = new SqliteCommand(query, dbc);
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
@@ -322,7 +281,7 @@ namespace SabreTools
 			}
 			foreach (string input in md5)
 			{
-				string query = "SELECT * FROM data WHERE md5=\"" + input + "\"";
+				string query = "SELECT * FROM md5 WHERE md5=\"" + input + "\"";
 				SqliteCommand slc = new SqliteCommand(query, dbc);
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
@@ -339,7 +298,7 @@ namespace SabreTools
 			}
 			foreach (string input in sha1)
 			{
-				string query = "SELECT * FROM data WHERE sha1=\"" + input + "\"";
+				string query = "SELECT * FROM sha1 WHERE sha1=\"" + input + "\"";
 				SqliteCommand slc = new SqliteCommand(query, dbc);
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)

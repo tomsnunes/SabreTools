@@ -72,23 +72,51 @@ namespace SabreTools.Helper
 				if (type == "rombasharp")
 				{
 					string query = @"
-CREATE TABLE IF NOT EXISTS data (
-	'id'		INTEGER		NOT NULL,
-	'size'		INTEGER		NOT NULL,
-	'crc'		TEXT		NOT NULL,
-	'md5'		TEXT		NOT NULL,
-	'sha1'		TEXT		NOT NULL,
-	'indepot'	INTEGER		NOT NULL,
-	PRIMARY KEY (id)
+CREATE TABLE IF NOT EXISTS crc (
+	'crc'	TEXT		NOT NULL,
+	PRIMARY KEY (crc)
 )";
 					SqliteCommand slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();
 
 					query = @"
-CREATE TABLE IF NOT EXISTS dats (
-	'id'	INTEGER		NOT NULL,
+CREATE TABLE IF NOT EXISTS md5 (
+	'md5'	TEXT		NOT NULL,
+	PRIMARY KEY (md5)
+)";
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS sha1 (
+	'sha1'	TEXT		NOT NULL,
+	PRIMARY KEY (sha1)
+)";
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS crcsha1 (
+	'crc'	TEXT		NOT NULL,
+	'sha1'	TEXT		NOT NULL,
+	PRIMARY KEY (crc, sha1)
+)";
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS md5sha1 (
+	'md5'	TEXT		NOT NULL,
+	'sha1'	TEXT		NOT NULL,
+	PRIMARY KEY (md5, sha1)
+)";
+					slc = new SqliteCommand(query, dbc);
+					slc.ExecuteNonQuery();
+
+					query = @"
+CREATE TABLE IF NOT EXISTS dat (
 	'hash'	TEXT		NOT NULL,
-	PRIMARY KEY (id, hash)
+	PRIMARY KEY (hash)
 )";
 					slc = new SqliteCommand(query, dbc);
 					slc.ExecuteNonQuery();

@@ -232,43 +232,23 @@ namespace SabreTools
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
 			dbc.Open();
 
-			// Total uncompressed size
-			string query = "SELECT SUM(size) FROM data";
-			SqliteCommand slc = new SqliteCommand(query, dbc);
-			_logger.User("Uncompressed size: " + Style.GetBytesReadable((long)slc.ExecuteScalar()));
-
-			// Total number of files
-			query = "SELECT COUNT(*) FROM data";
-			slc = new SqliteCommand(query, dbc);
-			_logger.User("Total files: " + (long)slc.ExecuteScalar());
-
-			// Total number of files that exist
-			query = "SELECT COUNT(*) FROM data WHERE indepot=1";
-			slc = new SqliteCommand(query, dbc);
-			_logger.User("Total files in depots: " + (long)slc.ExecuteScalar());
-
-			// Total number of files that are missing
-			query = "SELECT COUNT(*) FROM data WHERE indepot=0";
-			slc = new SqliteCommand(query, dbc);
-			_logger.User("Total files missing: " + (long)slc.ExecuteScalar());
-
 			// Total number of CRCs
-			query = "SELECT COUNT(crc) FROM data WHERE NOT crc=\"null\"";
-			slc = new SqliteCommand(query, dbc);
+			string query = "SELECT COUNT(*) FROM crc";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
 			_logger.User("Total CRCs: " + (long)slc.ExecuteScalar());
 
 			// Total number of MD5s
-			query = "SELECT COUNT(md5) FROM data WHERE NOT md5=\"null\"";
+			query = "SELECT COUNT(*) FROM md5";
 			slc = new SqliteCommand(query, dbc);
 			_logger.User("Total MD5s: " + (long)slc.ExecuteScalar());
 
 			// Total number of SHA1s
-			query = "SELECT COUNT(sha1) FROM data WHERE NOT sha1=\"null\"";
+			query = "SELECT COUNT(*) FROM sha1";
 			slc = new SqliteCommand(query, dbc);
 			_logger.User("Total SHA1s: " + (long)slc.ExecuteScalar());
 
 			// Total number of DATs
-			query = "SELECT COUNT(*) FROM dats GROUP BY hash";
+			query = "SELECT COUNT(*) FROM dat";
 			slc = new SqliteCommand(query, dbc);
 			_logger.User("Total DATs: " + (long)slc.ExecuteScalar());
 
@@ -298,6 +278,7 @@ namespace SabreTools
 		/// <summary>
 		/// Export the current database to CSV
 		/// </summary>
+		/// <remarks>REDO</remarks>
 		private static void ExportDatabase()
 		{
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
@@ -350,7 +331,7 @@ namespace SabreTools
 		/// <summary>
 		/// Populate or refresh the database information
 		/// </summary>
-		/// <remarks>Each hash has the following attributes: size, crc, md5, sha-1, dathash, indepot</remarks>
+		/// <remarks>This has no link between Dat and file at all...</remarks>
 		private static void RefreshDatabase()
 		{
 			// Make sure the db is set
@@ -388,7 +369,7 @@ namespace SabreTools
 			_logger.User("Populating the list of existing DATs");
 			DateTime start = DateTime.Now;
 
-			string query = "SELECT DISTINCT hash FROM dats";
+			string query = "SELECT DISTINCT hash FROM dat";
 			SqliteCommand slc = new SqliteCommand(query, dbc);
 			SqliteDataReader sldr = slc.ExecuteReader();
 			if (sldr.HasRows)
@@ -444,6 +425,12 @@ namespace SabreTools
 				// If the Dat wasn't empty, add the information
 				if (tempdat.Files.Count != 0)
 				{
+					string crcquery = "INSERT OR IGNORE INTO crc (crc) VALUES";
+					string md5query = "INSERT OR IGNORE INTO md5 (md5) VALUES";
+					string sha1query = "INSERT OR IGNORE INTO sha1 (sha1) VALUES";
+					string crcsha1query = "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES";
+					string md5sha1query = "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES";
+
 					// Loop through the parsed entries
 					foreach (string romkey in tempdat.Files.Keys)
 					{
@@ -451,59 +438,54 @@ namespace SabreTools
 						{
 							_logger.Verbose("Checking and adding file '" + rom.Name);
 
-							query = "SELECT id FROM data WHERE size=" + rom.Size + " AND ("
-								+ "(crc=\"" + rom.CRC + "\" OR crc=\"null\")"
-								+ " AND (md5=\"" + rom.MD5 + "\" OR md5=\"null\")"
-								+ " AND (sha1=\"" + rom.SHA1 + "\" OR sha1=\"null\"))";
-							slc = new SqliteCommand(query, dbc);
-							sldr = slc.ExecuteReader();
-								
-							// If the hash exists in the database, add the dat hash for that id if needed
-							if (sldr.HasRows)
+							if (!String.IsNullOrEmpty(rom.CRC))
 							{
-								sldr.Read();
-								long id = sldr.GetInt64(0);
-
-								string squery = "SELECT * FROM dats WHERE id=" + id;
-								SqliteCommand sslc = new SqliteCommand(squery, dbc);
-								SqliteDataReader ssldr = sslc.ExecuteReader();
-
-								// If the hash doesn't already exist, add it
-								if (!ssldr.HasRows)
-								{
-									squery = "INSERT INTO dats (id, hash) VALUES (\"" + id + "\", \"" + key + "\")";
-									sslc = new SqliteCommand(squery, dbc);
-									sslc.ExecuteNonQuery();
-								}
-
-								ssldr.Dispose();
-								sslc.Dispose();
+								crcquery += " (\"" + rom.CRC + "\"),";
 							}
-
-							// If it doesn't exist, add the hash and the dat hash for a new id
-							else
+							if (!String.IsNullOrEmpty(rom.MD5))
 							{
-								string squery = "INSERT INTO data (size, crc, md5, sha1, indepot) VALUES ("
-									+ rom.Size + ","
-									+ "\"" + (rom.CRC == "" ? "null" : rom.CRC) + "\","
-									+ "\"" + (rom.MD5 == "" ? "null" : rom.MD5) + "\","
-									+ "\"" + (rom.SHA1 == "" ? "null" : rom.SHA1) + "\","
-									+ "0)";
-								SqliteCommand sslc = new SqliteCommand(squery, dbc);
-								sslc.ExecuteNonQuery();
-
-								long id = -1;
-
-								squery = @"select last_insert_rowid()";
-								sslc = new SqliteCommand(squery, dbc);
-								id = (long)sslc.ExecuteScalar();
-
-								squery = "INSERT INTO dats (id, hash) VALUES (\"" + id + "\", \"" + key + "\")";
-								sslc = new SqliteCommand(squery, dbc);
-								sslc.ExecuteNonQuery();
-								sslc.Dispose();
+								md5query += " (\"" + rom.MD5 + "\"),";
+							}
+							if (!String.IsNullOrEmpty(rom.SHA1))
+							{
+								sha1query += " (\"" + rom.SHA1 + "\"),";
+							}
+							if (!String.IsNullOrEmpty(rom.CRC) && !String.IsNullOrEmpty(rom.SHA1))
+							{
+								crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
+							}
+							if (!String.IsNullOrEmpty(rom.MD5) && !String.IsNullOrEmpty(rom.SHA1))
+							{
+								md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
 							}
 						}
+					}
+
+					// Now run the queries after fixing them
+					if (crcquery != "INSERT OR IGNORE INTO crc (crc) VALUES")
+					{
+						slc = new SqliteCommand(crcquery.TrimEnd(','), dbc);
+						slc.ExecuteNonQuery();
+					}
+					if (md5query != "INSERT OR IGNORE INTO md5 (md5) VALUES")
+					{
+						slc = new SqliteCommand(md5query.TrimEnd(','), dbc);
+						slc.ExecuteNonQuery();
+					}
+					if (sha1query != "INSERT OR IGNORE INTO sha1 (sha1) VALUES")
+					{
+						slc = new SqliteCommand(sha1query.TrimEnd(','), dbc);
+						slc.ExecuteNonQuery();
+					}
+					if (crcsha1query != "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES")
+					{
+						slc = new SqliteCommand(crcsha1query.TrimEnd(','), dbc);
+						slc.ExecuteNonQuery();
+					}
+					if (md5sha1query != "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES")
+					{
+						slc = new SqliteCommand(md5sha1query.TrimEnd(','), dbc);
+						slc.ExecuteNonQuery();
 					}
 				}
 			}
