@@ -835,15 +835,7 @@ namespace SabreTools.Helper
 						DateTime dt = DateTime.Now;
 						if (date && !String.IsNullOrEmpty(roms[index].Date) && DateTime.TryParse(roms[index].Date.Replace('\\', '/'), out dt))
 						{
-							// https://referencesource.microsoft.com/#WindowsBase/Base/MS/Internal/IO/Zip/ZipIOBlockManager.cs,760eb7714f02c41e
-							uint msDosDateTime = 0;
-							msDosDateTime |= (((uint)dt.Second) / 2) & 0x1F;
-							msDosDateTime |= (((uint)dt.Minute) & 0x3F) << 5;
-							msDosDateTime |= (((uint)dt.Hour) & 0x1F) << 11;
-							msDosDateTime |= (((uint)dt.Day) & 0x1F) << 16;
-							msDosDateTime |= (((uint)dt.Month) & 0xF) << 21;
-							msDosDateTime |= (((uint)(dt.Year - 1980)) & 0x7F) << 25;
-
+							uint msDosDateTime = Style.ConvertDateTimeToMsDosTimeFormat(dt);
 							zipFile.OpenWriteStream(false, false, roms[index].Name.Replace('\\', '/'), istreamSize,
 								CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
 						}
@@ -920,15 +912,7 @@ namespace SabreTools.Helper
 							DateTime dt = DateTime.Now;
 							if (date && !String.IsNullOrEmpty(roms[-index - 1].Date) && DateTime.TryParse(roms[-index - 1].Date.Replace('\\', '/'), out dt))
 							{
-								// https://referencesource.microsoft.com/#WindowsBase/Base/MS/Internal/IO/Zip/ZipIOBlockManager.cs,760eb7714f02c41e
-								uint msDosDateTime = 0;
-								msDosDateTime |= (((uint)dt.Second) / 2) & 0x1F;
-								msDosDateTime |= (((uint)dt.Minute) & 0x3F) << 5;
-								msDosDateTime |= (((uint)dt.Hour) & 0x1F) << 11;
-								msDosDateTime |= (((uint)dt.Day) & 0x1F) << 16;
-								msDosDateTime |= (((uint)dt.Month) & 0xF) << 21;
-								msDosDateTime |= (((uint)(dt.Year - 1980)) & 0x7F) << 25;
-
+								uint msDosDateTime = Style.ConvertDateTimeToMsDosTimeFormat(dt);
 								zipFile.OpenWriteStream(false, false, roms[-index - 1].Name.Replace('\\', '/'), istreamSize,
 									CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
 							}
