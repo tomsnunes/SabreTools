@@ -138,9 +138,9 @@ namespace SabreTools
 			List<string> inputs = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
-			foreach (string arg in args)
+			for (int i = 0; i < args.Length; i++)
 			{
-				switch (arg)
+				switch (args[i])
 				{
 					case "-?":
 					case "-h":
@@ -155,6 +155,16 @@ namespace SabreTools
 					case "--add-date":
 						addFileDates = true;
 						break;
+					case "-ae":
+					case "--add-ext":
+						i++;
+						addext = args[i];
+						break;
+					case "-au":
+					case "--author":
+						i++;
+						author = args[i];
+						break;
 					case "-b":
 					case "--bare":
 						removeDateFromAutomaticName = true;
@@ -167,9 +177,24 @@ namespace SabreTools
 					case "--cascade":
 						diffMode |= DiffMode.Cascade;
 						break;
+					case "-ca":
+					case "--category=":
+						i++;
+						category = args[i];
+						break;
 					case "-cf":
 					case "--copy-files":
 						copyFiles = true;
+						break;
+					case "-co":
+					case "--comment":
+						i++;
+						comment = args[i];
+						break;
+					case "-crc":
+					case "--crc":
+						i++;
+						crc = args[i];
 						break;
 					case "-csv":
 					case "--csv":
@@ -184,9 +209,19 @@ namespace SabreTools
 					case "--dfd":
 						datFromDir = true;
 						break;
+					case "-da":
+					case "--date":
+						i++;
+						date = args[i];
+						break;
 					case "-dd":
 					case "--dedup":
 						dedup = true;
+						break;
+					case "-de":
+					case "--desc":
+						i++;
+						description = args[i];
 						break;
 					case "-di":
 					case "--diff":
@@ -204,13 +239,53 @@ namespace SabreTools
 					case "--diff-nd":
 						diffMode |= DiffMode.NoDupes;
 						break;
+					case "-em":
+					case "--email":
+						i++;
+						email = args[i];
+						break;
 					case "-es":
 					case "--ext-split":
 						splitByExt = true;
 						break;
+					case "-exta":
+					case "--exta":
+						i++;
+						exta = args[i];
+						break;
+					case "-extb":
+					case "--extb":
+						i++;
+						extb = args[i];
+						break;
 					case "-f":
 					case "--files":
 						parseArchivesAsFiles = true;
+						break;
+					case "-fi":
+					case "--filename":
+						i++;
+						filename = args[i];
+						break;
+					case "-fm":
+					case "--forcemerge":
+						i++;
+						forcemerge = args[i];
+						break;
+					case "-fn":
+					case "--forcend":
+						i++;
+						forcend = args[i];
+						break;
+					case "-fp":
+					case "--forcepack":
+						i++;
+						forcepack = args[i];
+						break;
+					case "-gn":
+					case "--game-name":
+						i++;
+						gamename = args[i];
 						break;
 					case "-gp":
 					case "--game-prefix":
@@ -224,6 +299,16 @@ namespace SabreTools
 					case "--headerer":
 						headerer = true;
 						break;
+					case "-he":
+					case "--header":
+						i++;
+						header = args[i];
+						break;
+					case "-hp":
+					case "--homepage":
+						i++;
+						homepage = args[i];
+						break;
 					case "-hs":
 					case "--hash-split":
 						splitByHash = true;
@@ -232,13 +317,51 @@ namespace SabreTools
 					case "--html":
 						statOutputFormat = StatOutputFormat.HTML;
 						break;
+					case "-input":
+					case "--input":
+						i++;
+						if (File.Exists(args[i]) || Directory.Exists(args[i]))
+						{
+							inputs.Add(args[i]);
+						}
+						else
+						{
+							_logger.Error("Invalid input detected: " + args[i]);
+							Console.WriteLine();
+							Build.Help();
+							Console.WriteLine();
+							_logger.Error("Invalid input detected: " + args[i]);
+							_logger.Close();
+							return;
+						}
+						break;
 					case "-ip":
 					case "--inplace":
 						inplace = true;
 						break;
+					case "-is":
+					case "--status":
+						i++;
+						status = args[i];
+						break;
 					case "-m":
 					case "--merge":
 						merge = true;
+						break;
+					case "-md5":
+					case "--md5":
+						i++;
+						md5 = args[i];
+						break;
+					case "-mt":
+					case "--mt":
+						i++;
+						Int32.TryParse(args[i], out maxParallelism);
+						break;
+					case "-n":
+					case "--name":
+						i++;
+						name = args[i];
 						break;
 					case "-nc":
 					case "--nodump-col":
@@ -304,9 +427,24 @@ namespace SabreTools
 					case "--output-tsv":
 						outputFormat |= OutputFormat.TSV;
 						break;
+					case "-out":
+					case "--out":
+						i++;
+						outDir = args[i];
+						break;
 					case "-ox":
 					case "--output-xml":
 						outputFormat |= OutputFormat.Logiqx;
+						break;
+					case "-post":
+					case "--postfix":
+						i++;
+						postfix = args[i];
+						break;
+					case "-pre":
+					case "--prefix":
+						i++;
+						prefix = args[i];
 						break;
 					case "-q":
 					case "--quotes":
@@ -320,25 +458,65 @@ namespace SabreTools
 					case "--rev-cascade":
 						diffMode |= DiffMode.ReverseCascade;
 						break;
+					case "-rd":
+					case "--root-dir":
+						i++;
+						root = args[i];
+						break;
 					case "-re":
 					case "--restore":
 						restore = true;
+						break;
+					case "-rep":
+					case "--rep-ext":
+						i++;
+						repext = args[i];
 						break;
 					case "-rme":
 					case "--rem-ext":
 						remext = true;
 						break;
+					case "-rn":
+					case "--rom-name":
+						i++;
+						romname = args[i];
+						break;
 					case "-ro":
 					case "--romba":
 						romba = true;
+						break;
+					case "-root":
+					case "--root":
+						i++;
+						rootdir = args[i];
+						break;
+					case "-rt":
+					case "--rom-type":
+						i++;
+						romtype = args[i];
 						break;
 					case "-sd":
 					case "--superdat":
 						superdat = true;
 						break;
+					case "-seq":
+					case "--equal":
+						i++;
+						seq = GetSizeFromString(args[i]);
+						break;
 					case "-sf":
 					case "--skip":
 						skip = true;
+						break;
+					case "-sgt":
+					case "--greater":
+						i++;
+						sgt = GetSizeFromString(args[i]);
+						break;
+					case "-sha1":
+					case "--sha1":
+						i++;
+						sha1 = args[i];
 						break;
 					case "-si":
 					case "--single":
@@ -348,9 +526,19 @@ namespace SabreTools
 					case "--softlist":
 						softlist = true;
 						break;
+					case "-slt":
+					case "--less":
+						i++;
+						slt = GetSizeFromString(args[i]);
+						break;
 					case "-st":
 					case "--stats":
 						stats = true;
+						break;
+					case "-t":
+					case "--temp":
+						i++;
+						tempDir = args[i];
 						break;
 					case "-trim":
 					case "--trim":
@@ -364,164 +552,218 @@ namespace SabreTools
 					case "--tsv":
 						statOutputFormat = StatOutputFormat.TSV;
 						break;
+					case "-u":
+					case "-url":
+					case "--url":
+						i++;
+						url = args[i];
+						break;
 					case "-ud":
 					case "--update":
 						update = true;
+						break;
+					case "-v":
+					case "--version":
+						i++;
+						version = args[i];
 						break;
 					case "-xof":
 					case "--exclude-of":
 						excludeOf = true;
 						break;
 					default:
-						string temparg = arg.Replace("\"", "").Replace("file://", "");
+						string temparg = args[i].Replace("\"", "").Replace("file://", "");
 
-						if (temparg.StartsWith("-ae=") || temparg.StartsWith("--add-ext="))
+						if (temparg.StartsWith("-") && temparg.Contains("="))
 						{
-							addext = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-au=") || temparg.StartsWith("--author="))
-						{
-							author = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-ca=") || temparg.StartsWith("--category="))
-						{
-							category = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-co=") || temparg.StartsWith("--comment="))
-						{
-							comment = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-crc=") || temparg.StartsWith("--crc="))
-						{
-							crc = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-da=") || temparg.StartsWith("--date="))
-						{
-							date = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-de=") || temparg.StartsWith("--desc="))
-						{
-							description = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-em=") || temparg.StartsWith("--email="))
-						{
-							email = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-exta="))
-						{
-							exta = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-extb="))
-						{
-							extb = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-f=") || temparg.StartsWith("--filename="))
-						{
-							filename = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-fm=") || temparg.StartsWith("--forcemerge="))
-						{
-							forcemerge = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-fn=") || temparg.StartsWith("--forcend="))
-						{
-							forcend = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-fp=") || temparg.StartsWith("--forcepack="))
-						{
-							forcepack = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-gn=") || temparg.StartsWith("--game-name="))
-						{
-							gamename = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-h=") || temparg.StartsWith("--header="))
-						{
-							header = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-hp=") || temparg.StartsWith("--homepage="))
-						{
-							homepage = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-input="))
-						{
-							inputs.Add(temparg.Split('=')[1] ?? "");
-						}
-						else if (temparg.StartsWith("-is=") || temparg.StartsWith("--status="))
-						{
-							status = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-md5=") || temparg.StartsWith("--md5="))
-						{
-							md5 = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-mt=") || temparg.StartsWith("--mt="))
-						{
-							Int32.TryParse(temparg.Split('=')[1] ?? "", out maxParallelism);
-						}
-						else if (temparg.StartsWith("-n=") || temparg.StartsWith("--name="))
-						{
-							name = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-out=") || temparg.StartsWith("--out="))
-						{
-							outDir = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-post=") || temparg.StartsWith("--postfix="))
-						{
-							postfix = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-pre=") || temparg.StartsWith("--prefix="))
-						{
-							prefix = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-r=") || temparg.StartsWith("--root="))
-						{
-							rootdir = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-rd=") || temparg.StartsWith("--root-dir="))
-						{
-							root = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-re=") || temparg.StartsWith("--rep-ext="))
-						{
-							repext = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-rn=") || temparg.StartsWith("--rom-name="))
-						{
-							romname = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-rt=") || temparg.StartsWith("--rom-type="))
-						{
-							romtype = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-seq=") || temparg.StartsWith("--equal="))
-						{
-							seq = GetSizeFromString(temparg.Split('=')[1] ?? "");
-						}
-						else if (temparg.StartsWith("-sgt=") || temparg.StartsWith("--greater="))
-						{
-							sgt = GetSizeFromString(temparg.Split('=')[1] ?? "");
-						}
-						else if (temparg.StartsWith("-sha1=") || temparg.StartsWith("--sha1="))
-						{
-							sha1 = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-slt=") || temparg.StartsWith("--less="))
-						{
-							slt = GetSizeFromString(temparg.Split('=')[1] ?? "");
-						}
-						else if (temparg.StartsWith("-t=") || temparg.StartsWith("--temp="))
-						{
-							tempDir = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-u=") || temparg.StartsWith("-url=") || temparg.StartsWith("--url="))
-						{
-							url = temparg.Split('=')[1] ?? "";
-						}
-						else if (temparg.StartsWith("-v=") || temparg.StartsWith("--version="))
-						{
-							version = temparg.Split('=')[1] ?? "";
+							// Split the argument
+							string[] split = temparg.Split('=');
+							if (split[1] == null)
+							{
+								split[1] = "";
+							}
+
+							switch (split[0])
+							{
+								case "-ae":
+								case "--add-ext":
+									addext = split[1];
+									break;
+								case "-au":
+								case "--author":
+									author = split[1];
+									break;
+								case "-ca":
+								case "--category=":
+									category = split[1];
+									break;
+								case "-co":
+								case "--comment":
+									comment = split[1];
+									break;
+								case "-crc":
+								case "--crc":
+									crc = split[1];
+									break;
+								case "-da":
+								case "--date":
+									date = split[1];
+									break;
+								case "-de":
+								case "--desc":
+									description = split[1];
+									break;
+								case "-em":
+								case "--email":
+									email = split[1];
+									break;
+								case "-exta":
+								case "--exta":
+									exta = split[1];
+									break;
+								case "-extb":
+								case "--extb":
+									extb = split[1];
+									break;
+								case "-f":
+								case "--filename":
+									filename = split[1];
+									break;
+								case "-fm":
+								case "--forcemerge":
+									forcemerge = split[1];
+									break;
+								case "-fn":
+								case "--forcend":
+									forcend = split[1];
+									break;
+								case "-fp":
+								case "--forcepack":
+									forcepack = split[1];
+									break;
+								case "-gn":
+								case "--game-name":
+									gamename = split[1];
+									break;
+								case "-h":
+								case "--header":
+									header = split[1];
+									break;
+								case "-hp":
+								case "--homepage":
+									homepage = split[1];
+									break;
+								case "-input":
+								case "--input":
+									if (File.Exists(split[1]) || Directory.Exists(split[1]))
+									{
+										inputs.Add(split[1]);
+									}
+									else
+									{
+										_logger.Error("Invalid input detected: " + args[i]);
+										Console.WriteLine();
+										Build.Help();
+										Console.WriteLine();
+										_logger.Error("Invalid input detected: " + args[i]);
+										_logger.Close();
+										return;
+									}
+									break;
+								case "-is":
+								case "--status":
+									status = split[1];
+									break;
+								case "-md5":
+								case "--md5":
+									md5 = split[1];
+									break;
+								case "-mt":
+								case "--mt":
+									Int32.TryParse(split[1], out maxParallelism);
+									break;
+								case "-n":
+								case "--name":
+									name = split[1];
+									break;
+								case "-out":
+								case "--out":
+									outDir = split[1];
+									break;
+								case "-post":
+								case "--postfix":
+									postfix = split[1];
+									break;
+								case "-pre":
+								case "--prefix":
+									prefix = split[1];
+									break;
+								case "-r":
+								case "--root":
+									rootdir = split[1];
+									break;
+								case "-rd":
+								case "--root-dir":
+									root = split[1];
+									break;
+								case "-re":
+								case "--rep-ext":
+									repext = split[1];
+									break;
+								case "-rn":
+								case "--rom-name":
+									romname = split[1];
+									break;
+								case "-rt":
+								case "--rom-type":
+									romtype = split[1];
+									break;
+								case "-seq":
+								case "--equal":
+									seq = GetSizeFromString(split[1]);
+									break;
+								case "-sgt":
+								case "--greater":
+									sgt = GetSizeFromString(split[1]);
+									break;
+								case "-sha1":
+								case "--sha1":
+									sha1 = split[1];
+									break;
+								case "-slt":
+								case "--less":
+									slt = GetSizeFromString(split[1]);
+									break;
+								case "-t":
+								case "--temp":
+									tempDir = split[1];
+									break;
+								case "-u":
+								case "-url":
+								case "--url":
+									url = split[1];
+									break;
+								case "-v":
+								case "--version":
+									version = split[1];
+									break;
+								default:
+									if (File.Exists(temparg) || Directory.Exists(temparg))
+									{
+										inputs.Add(temparg);
+									}
+									else
+									{
+										_logger.Error("Invalid input detected: " + args[i]);
+										Console.WriteLine();
+										Build.Help();
+										Console.WriteLine();
+										_logger.Error("Invalid input detected: " + args[i]);
+										_logger.Close();
+										return;
+									}
+									break;
+							}
 						}
 						else if (File.Exists(temparg) || Directory.Exists(temparg))
 						{
@@ -529,11 +771,11 @@ namespace SabreTools
 						}
 						else
 						{
-							_logger.Error("Invalid input detected: " + arg);
+							_logger.Error("Invalid input detected: " + args[i]);
 							Console.WriteLine();
 							Build.Help();
 							Console.WriteLine();
-							_logger.Error("Invalid input detected: " + arg);
+							_logger.Error("Invalid input detected: " + args[i]);
 							_logger.Close();
 							return;
 						}

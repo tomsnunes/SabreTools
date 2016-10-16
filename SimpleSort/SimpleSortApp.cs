@@ -62,14 +62,22 @@ namespace SabreTools
 			List<string> datfiles = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
-			foreach (string arg in args)
+			for (int i = 0; i < args.Length; i++)
 			{
-				switch (arg)
+				switch (args[i])
 				{
 					case "-?":
 					case "-h":
 					case "--help":
 						help = true;
+						break;
+					case "-7z":
+					case "--7z":
+						i++;
+						if (!Int32.TryParse(args[i], out sevenzip))
+						{
+							sevenzip = 0;
+						}
 						break;
 					case "-ad":
 					case "--add-date":
@@ -83,9 +91,35 @@ namespace SabreTools
 					case "--delete":
 						delete = true;
 						break;
+					case "-dat":
+					case "--dat":
+						i++;
+						if (!File.Exists(args[i]))
+						{
+							logger.Error("DAT must be a valid file: " + args[i]);
+							Console.WriteLine();
+							Build.Help();
+							logger.Close();
+							return;
+						}
+						datfiles.Add(args[i]);
+						break;
 					case "-do":
 					case "--directory":
 						toFolder = true;
+						break;
+					case "-gz":
+					case "--gz":
+						i++;
+						if (!Int32.TryParse(args[i], out gz))
+						{
+							gz = 2;
+						}
+						break;
+					case "-out":
+					case "--out":
+						i++;
+						outDir = args[i];
 						break;
 					case "-qs":
 					case "--quick":
@@ -94,6 +128,19 @@ namespace SabreTools
 					case "-r":
 					case "--romba":
 						romba = true;
+						break;
+					case "-rar":
+					case "--rar":
+						i++;
+						if (!Int32.TryParse(args[i], out rar))
+						{
+							rar = 2;
+						}
+						break;
+					case "-t":
+					case "--temp":
+						i++;
+						tempDir = args[i];
 						break;
 					case "-tgz":
 					case "--tgz":
@@ -107,56 +154,92 @@ namespace SabreTools
 					case "--verify":
 						verify = true;
 						break;
+					case "-zip":
+					case "--zip":
+						i++;
+						if (!Int32.TryParse(args[i], out zip))
+						{
+							zip = 0;
+						}
+						break;
 					default:
-						string temparg = arg.Replace("\"", "").Replace("file://", "");
+						string temparg = args[i].Replace("\"", "").Replace("file://", "");
 
-						if (temparg.StartsWith("-7z=") || temparg.StartsWith("--7z="))
+						if (temparg.StartsWith("-") && temparg.Contains("="))
 						{
-							if (!Int32.TryParse(temparg.Split('=')[1], out sevenzip))
+							// Split the argument
+							string[] split = temparg.Split('=');
+							if (split[1] == null)
 							{
-								sevenzip = 0;
+								split[1] = "";
 							}
-						}
-						else if (temparg.StartsWith("-dat=") || temparg.StartsWith("--dat="))
-						{
-							string datfile = temparg.Split('=')[1];
-							if (!File.Exists(datfile))
+
+							switch (split[0])
 							{
-								logger.Error("DAT must be a valid file: " + datfile);
-								Console.WriteLine();
-								Build.Help();
-								logger.Close();
-								return;
-							}
-							datfiles.Add(datfile);
-						}
-						else if (temparg.StartsWith("-gz=") || temparg.StartsWith("--gz="))
-						{
-							if (!Int32.TryParse(temparg.Split('=')[1], out gz))
-							{
-								gz = 2;
-							}
-						}
-						else if (temparg.StartsWith("-out=") || temparg.StartsWith("--out="))
-						{
-							outDir = temparg.Split('=')[1];
-						}
-						else if (temparg.StartsWith("-rar=") || temparg.StartsWith("--rar="))
-						{
-							if (!Int32.TryParse(temparg.Split('=')[1], out rar))
-							{
-								rar = 2;
-							}
-						}
-						else if (temparg.StartsWith("-t=") || temparg.StartsWith("--temp="))
-						{
-							tempDir = temparg.Split('=')[1];
-						}
-						else if (temparg.StartsWith("-zip=") || temparg.StartsWith("--zip="))
-						{
-							if (!Int32.TryParse(temparg.Split('=')[1], out zip))
-							{
-								zip = 0;
+								case "-7z":
+								case "--7z":
+									if (!Int32.TryParse(split[1], out sevenzip))
+									{
+										sevenzip = 0;
+									}
+									break;
+								case "-dat":
+								case "--dat":
+									if (!File.Exists(split[1]))
+									{
+										logger.Error("DAT must be a valid file: " + split[1]);
+										Console.WriteLine();
+										Build.Help();
+										logger.Close();
+										return;
+									}
+									datfiles.Add(split[1]);
+									break;
+								case "-gz":
+								case "--gz":
+									if (!Int32.TryParse(split[1], out gz))
+									{
+										gz = 2;
+									}
+									break;
+								case "-out":
+								case "--out":
+									outDir = split[1];
+									break;
+								case "-rar":
+								case "--rar":
+									if (!Int32.TryParse(split[1], out rar))
+									{
+										rar = 2;
+									}
+									break;
+								case "-t":
+								case "--temp":
+									tempDir = split[1];
+									break;
+								case "-zip":
+								case "--zip":
+									if (!Int32.TryParse(split[1], out zip))
+									{
+										zip = 0;
+									}
+									break;
+								default:
+									if (File.Exists(temparg) || Directory.Exists(temparg))
+									{
+										inputs.Add(temparg);
+									}
+									else
+									{
+										logger.Error("Invalid input detected: " + args[i]);
+										Console.WriteLine();
+										Build.Help();
+										Console.WriteLine();
+										logger.Error("Invalid input detected: " + args[i]);
+										logger.Close();
+										return;
+									}
+									break;
 							}
 						}
 						else if (File.Exists(temparg) || Directory.Exists(temparg))
@@ -165,11 +248,11 @@ namespace SabreTools
 						}
 						else
 						{
-							logger.Error("Invalid input detected: " + arg);
+							logger.Error("Invalid input detected: " + args[i]);
 							Console.WriteLine();
 							Build.Help();
 							Console.WriteLine();
-							logger.Error("Invalid input detected: " + arg);
+							logger.Error("Invalid input detected: " + args[i]);
 							logger.Close();
 							return;
 						}
