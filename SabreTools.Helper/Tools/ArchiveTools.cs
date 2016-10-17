@@ -327,8 +327,7 @@ namespace SabreTools.Helper
 					GZipStream gzstream = new GZipStream(File.OpenRead(input), CompressionMode.Decompress);
 					gzstream.CopyTo(st);
 
-					// Dispose of the streams
-					st.Dispose();
+					// Dispose of the stream
 					gzstream.Dispose();
 				}
 			}
