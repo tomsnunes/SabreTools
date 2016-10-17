@@ -653,7 +653,22 @@ namespace SabreTools
 				slc.ExecuteNonQuery();
 			}
 
+			// Now that we've added the information, we get to remove all of the hashes that we want to
+			query = @"DELETE FROM sha1
+JOIN crcsha1
+	ON sha1.sha1=crcsha1.sha1
+JOIN md5sha1
+	ON sha1.sha1=md5sha1.sha1
+JOIN crc
+	ON crcsha1.crc=crc.crc
+JOIN md5
+	ON md5sha1.md5=md5.md5
+WHERE sha1.sha1 IN (""" + String.Join("\",\"", hashes) + "\")";
+			slc = new SqliteCommand(query, dbc);
+			slc.ExecuteNonQuery();
+
 			// Dispose of the database connection
+			slc.Dispose();
 			dbc.Dispose();
 		}
 
