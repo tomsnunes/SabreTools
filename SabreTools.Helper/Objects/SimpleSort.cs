@@ -201,6 +201,9 @@ namespace SabreTools.Helper
 		{
 			bool success = true;
 
+			_logger.User("Retrieving list all files from input");
+			DateTime start = DateTime.Now;
+
 			// Create a list of just files from inputs
 			List<string> files = new List<string>();
 			foreach (string input in _inputs)
@@ -224,6 +227,7 @@ namespace SabreTools.Helper
 					_logger.Error("'" + input + "' is not a file or directory!");
 				}
 			}
+			_logger.User("Retrieving complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Then, loop through and check each of the inputs
 			_logger.User("Processing files:\n");
