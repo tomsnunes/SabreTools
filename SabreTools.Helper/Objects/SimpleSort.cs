@@ -209,27 +209,30 @@ namespace SabreTools.Helper
 
 			// Create a list of just files from inputs
 			List<string> files = new List<string>();
-			foreach (string input in _inputs)
-			{
-				if (File.Exists(input))
-				{
-					_logger.Verbose("File found: '" + input + "'");
-					files.Add(Path.GetFullPath(input));
-				}
-				else if (Directory.Exists(input))
-				{
-					_logger.Verbose("Directory found: '" + input + "'");
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+			Parallel.ForEach(_inputs,
+				new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism, },
+				input => {
+					if (File.Exists(input))
 					{
-						_logger.Verbose("File found: '" + file + "'");
-						files.Add(Path.GetFullPath(file));
+						_logger.Verbose("File found: '" + input + "'");
+						files.Add(Path.GetFullPath(input));
 					}
-				}
-				else
-				{
-					_logger.Error("'" + input + "' is not a file or directory!");
-				}
-			}
+					else if (Directory.Exists(input))
+					{
+						_logger.Verbose("Directory found: '" + input + "'");
+						Parallel.ForEach(Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories),
+							new ParallelOptions { MaxDegreeOfParallelism = _maxDegreeOfParallelism, },
+							file =>
+							{
+								_logger.Verbose("File found: '" + file + "'");
+								files.Add(Path.GetFullPath(file));
+							});
+					}
+					else
+					{
+						_logger.Error("'" + input + "' is not a file or directory!");
+					}
+				});
 			_logger.User("Retrieving complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Then, loop through and check each of the inputs
