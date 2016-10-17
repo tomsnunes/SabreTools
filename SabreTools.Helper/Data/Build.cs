@@ -85,6 +85,7 @@ namespace SabreTools.Helper
 					helptext.Add("  build			For each specified DAT file it creates TZip files");
 					helptext.Add("	-copy				Copy files instead of rebuilding");
 					helptext.Add("  dbstats		Prints db stats");
+					helptext.Add("  depot-rescan	Rescan a specific depot to get new information");
 					helptext.Add("  diffdat		Creates a DAT file for entries found in the new DAT");
 					helptext.Add("	-new=			DAT to compare to");
 					helptext.Add("  dir2dat		Creates a DAT file for the specified input directory");

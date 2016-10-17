@@ -73,6 +73,7 @@ namespace SabreTools
 				build = false,
 				copy = false,
 				dbstats = false,
+				depotRescan = false,
 				diffdat = false,
 				dir2dat = false,
 				export = false,
@@ -111,6 +112,9 @@ namespace SabreTools
 						break;
 					case "dbstats":
 						dbstats = true;
+						break;
+					case "depot-rescan":
+						depotRescan = true;
 						break;
 					case "diffdat":
 						diffdat = true;
@@ -180,8 +184,8 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(archive ^ build ^ dbstats ^ diffdat ^ dir2dat ^ export ^ fixdat ^ lookup ^ memstats ^
-				miss ^ progress ^ purgeBackup ^ purgeDelete ^ refreshDats ^ shutdown))
+			if (!(archive ^ build ^ dbstats ^ depotRescan ^ diffdat ^ dir2dat ^ export ^ fixdat ^ lookup ^
+				memstats ^ miss ^ progress ^ purgeBackup ^ purgeDelete ^ refreshDats ^ shutdown))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -190,7 +194,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (archive || build || dir2dat || fixdat || lookup || miss))
+			if (inputs.Count == 0 && (archive || build || depotRescan || dir2dat || fixdat || lookup || miss))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -216,6 +220,15 @@ namespace SabreTools
 			else if (dbstats)
 			{
 				DisplayDBStats();
+			}
+
+			// Rescan a specific depot
+			else if (depotRescan)
+			{
+				foreach (string input in inputs)
+				{
+					Rescan(input);
+				}
 			}
 
 			// Creates a DAT file with those entries that are in new DAT
