@@ -56,7 +56,8 @@ namespace SabreTools
 				gz = 2,
 				rar = 2,
 				zip = 0;
-			string outDir = "",
+			string header = "",
+				outDir = "",
 				tempDir = "";
 			List<string> inputs = new List<string>();
 			List<string> datfiles = new List<string>();
@@ -115,6 +116,11 @@ namespace SabreTools
 						{
 							gz = 2;
 						}
+						break;
+					case "-he":
+					case "--header":
+						i++;
+						header = args[i];
 						break;
 					case "-out":
 					case "--out":
@@ -201,6 +207,10 @@ namespace SabreTools
 									{
 										gz = 2;
 									}
+									break;
+								case "-h":
+								case "--header":
+									header = split[1];
 									break;
 								case "-out":
 								case "--out":
@@ -290,7 +300,7 @@ namespace SabreTools
 				if (datfiles.Count > 0)
 				{
 					InitSortVerify(datfiles, inputs, outDir, tempDir, quickScan, date, toFolder,
-						verify, delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, logger);
+						verify, delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, header, logger);
 				}
 				else
 				{
@@ -364,7 +374,7 @@ namespace SabreTools
 			logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			SimpleSort ss = new SimpleSort(datdata, newinputs, outDir, tempDir, false, false,
-				false, false, delete, tgz, romba, asl, false, logger);
+				false, false, delete, tgz, romba, asl, false, null, logger);
 			return ss.Convert();
 		}
 
@@ -387,9 +397,10 @@ namespace SabreTools
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
-			bool toFolder, bool verify, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, Logger logger)
+			bool toFolder, bool verify, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst, Logger logger)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
@@ -406,7 +417,7 @@ namespace SabreTools
 			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, date,
-				toFolder, verify, delete, tgz, romba, asl, updateDat, logger);
+				toFolder, verify, delete, tgz, romba, asl, updateDat, headerToCheckAgainst, logger);
 			ss.StartProcessing();
 		}
 	}

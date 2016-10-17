@@ -293,6 +293,7 @@ namespace SabreTools.Helper
 					helptext.Add("  -tgz			Enable TorrentGZ output");
 					helptext.Add("	-r, --romba		Enable Romba depot dir output");
 					helptext.Add("  -do, --directory	Output files as uncompressed");
+					helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
 					helptext.Add("  -7z={0}		Set scanning level for 7z archives");
 					helptext.Add("  -gz={2}		Set scanning level for GZip archives");
 					helptext.Add("  -rar={2}		Set scanning level for RAR archives");

@@ -178,7 +178,7 @@ namespace SabreTools
 
 			// Create the sorting object to use and rebuild the needed files
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(0, 0, 0, 0);
-			SimpleSort ss = new SimpleSort(need, onlyDirs, _depots.Keys.ToList()[0], _tmpdir, false, false, false, false, false, true, true, asl, false, _logger);
+			SimpleSort ss = new SimpleSort(need, onlyDirs, _depots.Keys.ToList()[0], _tmpdir, false, false, false, false, false, true, true, asl, false, null, _logger);
 			ss.StartProcessing();
 		}
 
@@ -217,7 +217,7 @@ namespace SabreTools
 				List<string> onlineDepots = _depots.Where(d => d.Value.Item2).Select(d => d.Key).ToList();
 
 				// Now scan all of those depots and rebuild
-				SimpleSort ss = new SimpleSort(datFile, onlineDepots, outputFolder, _tmpdir, false, false, false, false, false, copy, copy, asl, false, _logger);
+				SimpleSort ss = new SimpleSort(datFile, onlineDepots, outputFolder, _tmpdir, false, false, false, false, false, copy, copy, asl, false, null, _logger);
 				ss.StartProcessing();
 			}
 		}

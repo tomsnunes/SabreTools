@@ -22,6 +22,7 @@ namespace SabreTools.Helper
 		private bool _romba;
 		private bool _updateDat;
 		private ArchiveScanLevel _archiveScanLevel;
+		private string _headerToCheckAgainst;
 		private Logger _logger;
 		private int _maxDegreeOfParallelism = 4; // Hardcoded for now, should be an input later
 
@@ -46,10 +47,11 @@ namespace SabreTools.Helper
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public SimpleSort(DatFile datdata, List<string> inputs, string outDir, string tempDir,
 			bool quickScan, bool date, bool toFolder, bool verify, bool delete, bool tgz, bool romba,
-			ArchiveScanLevel archiveScanLevel, bool updateDat, Logger logger)
+			ArchiveScanLevel archiveScanLevel, bool updateDat, string headerToCheckAgainst, Logger logger)
 		{
 			_datdata = datdata;
 			_inputs = inputs;
@@ -64,6 +66,7 @@ namespace SabreTools.Helper
 			_romba = romba;
 			_archiveScanLevel = archiveScanLevel;
 			_updateDat = updateDat;
+			_headerToCheckAgainst = headerToCheckAgainst;
 			_logger = logger;
 
 			_cursorTop = Console.CursorTop;
@@ -133,7 +136,7 @@ namespace SabreTools.Helper
 			{
 				_datdata.PopulateDatFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */,
-					null /* headerToCheckAgainst */, 4 /* maxDegreeOfParallelism */, _logger);
+					_headerToCheckAgainst, 4 /* maxDegreeOfParallelism */, _logger);
 			}
 
 			// Setup the fixdat
@@ -369,7 +372,7 @@ namespace SabreTools.Helper
 				}
 
 				// Now get the transformed file if it exists
-				SkipperRule rule = Skipper.GetMatchingRule(input, "", _logger);
+				SkipperRule rule = Skipper.GetMatchingRule(input, _headerToCheckAgainst, _logger);
 
 				// If we have have a non-empty rule, apply it
 				if (rule.Tests != null && rule.Tests.Count != 0)
@@ -824,7 +827,7 @@ namespace SabreTools.Helper
 
 			// Now attempt to see if the file has a header
 			FileStream input = File.OpenRead(file);
-			SkipperRule rule = Skipper.GetMatchingRule(input, "", _logger);
+			SkipperRule rule = Skipper.GetMatchingRule(input, _headerToCheckAgainst, _logger);
 
 			// If there's a match, get the new information from the stream
 			if (rule.Tests != null && rule.Tests.Count != 0)
