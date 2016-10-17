@@ -178,7 +178,7 @@ namespace SabreTools
 
 			// Create the sorting object to use and rebuild the needed files
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(0, 0, 0, 0);
-			SimpleSort ss = new SimpleSort(need, onlyDirs, _depots.Keys.ToList()[0], _tmpdir, true, false, false, false, false, true, true, asl, false, null, _logger);
+			SimpleSort ss = new SimpleSort(need, onlyDirs, _depots.Keys.ToList()[0], _tmpdir, false, false, false, false, false, true, true, asl, false, null, _logger);
 			ss.StartProcessing();
 		}
 
