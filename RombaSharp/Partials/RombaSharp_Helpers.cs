@@ -477,14 +477,15 @@ namespace SabreTools
 							if (!String.IsNullOrEmpty(rom.SHA1))
 							{
 								sha1query += " (\"" + rom.SHA1 + "\"),";
-							}
-							if (!String.IsNullOrEmpty(rom.CRC) && !String.IsNullOrEmpty(rom.SHA1))
-							{
-								crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
-							}
-							if (!String.IsNullOrEmpty(rom.MD5) && !String.IsNullOrEmpty(rom.SHA1))
-							{
-								md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
+
+								if (!String.IsNullOrEmpty(rom.CRC))
+								{
+									crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
+								}
+								if (!String.IsNullOrEmpty(rom.MD5))
+								{
+									md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
+								}
 							}
 						}
 					}
@@ -578,6 +579,13 @@ namespace SabreTools
 			depot.PopulateDatFromDir(depotname, false, false, false, false, true, false, false, _tmpdir, false, null, 4, _logger);
 			depot.BucketBySHA1(false, _logger, false);
 
+			// Set the base queries to use
+			string crcquery = "INSERT OR IGNORE INTO crc (crc) VALUES";
+			string md5query = "INSERT OR IGNORE INTO md5 (md5) VALUES";
+			string sha1query = "INSERT OR IGNORE INTO sha1 (sha1, depot) VALUES";
+			string crcsha1query = "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES";
+			string md5sha1query = "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES";
+
 			// Once we have both, check for any new files
 			List<string> dupehashes = new List<string>();
 			List<string> keys = depot.Files.Keys.ToList();
@@ -593,9 +601,56 @@ namespace SabreTools
 					}
 					else if (!dupehashes.Contains(rom.SHA1))
 					{
+						if (!String.IsNullOrEmpty(rom.CRC))
+						{
+							crcquery += " (\"" + rom.CRC + "\"),";
+						}
+						if (!String.IsNullOrEmpty(rom.MD5))
+						{
+							md5query += " (\"" + rom.MD5 + "\"),";
+						}
+						if (!String.IsNullOrEmpty(rom.SHA1))
+						{
+							sha1query += " (\"" + rom.SHA1 + "\", \"" + depotname + "\"),";
 
+							if (!String.IsNullOrEmpty(rom.CRC))
+							{
+								crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
+							}
+							if (!String.IsNullOrEmpty(rom.MD5))
+							{
+								md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
+							}
+						}
 					}
 				}
+			}
+
+			// Now run the queries after fixing them
+			if (crcquery != "INSERT OR IGNORE INTO crc (crc) VALUES")
+			{
+				slc = new SqliteCommand(crcquery.TrimEnd(','), dbc);
+				slc.ExecuteNonQuery();
+			}
+			if (md5query != "INSERT OR IGNORE INTO md5 (md5) VALUES")
+			{
+				slc = new SqliteCommand(md5query.TrimEnd(','), dbc);
+				slc.ExecuteNonQuery();
+			}
+			if (sha1query != "INSERT OR IGNORE INTO sha1 (sha1, depot) VALUES")
+			{
+				slc = new SqliteCommand(sha1query.TrimEnd(','), dbc);
+				slc.ExecuteNonQuery();
+			}
+			if (crcsha1query != "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES")
+			{
+				slc = new SqliteCommand(crcsha1query.TrimEnd(','), dbc);
+				slc.ExecuteNonQuery();
+			}
+			if (md5sha1query != "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES")
+			{
+				slc = new SqliteCommand(md5sha1query.TrimEnd(','), dbc);
+				slc.ExecuteNonQuery();
 			}
 
 			// Dispose of the database connection

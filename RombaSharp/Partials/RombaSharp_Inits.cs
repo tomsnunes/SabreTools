@@ -46,7 +46,7 @@ namespace SabreTools
 			// Now that we have the Dats, add the files to the database
 			string crcquery = "INSERT OR IGNORE INTO crc (crc) VALUES";
 			string md5query = "INSERT OR IGNORE INTO md5 (md5) VALUES";
-			string sha1query = "INSERT OR IGNORE INTO sha1 (sha1) VALUES";
+			string sha1query = "INSERT OR IGNORE INTO sha1 (sha1, depot) VALUES";
 			string crcsha1query = "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES";
 			string md5sha1query = "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES";
 
@@ -70,23 +70,23 @@ namespace SabreTools
 							// Add to the queries
 							if (!String.IsNullOrEmpty(rom.CRC))
 							{
-								crcquery += " ('" + rom.CRC + "'),";
+								crcquery += " (\"" + rom.CRC + "\"),";
 							}
 							if (!String.IsNullOrEmpty(rom.MD5))
 							{
-								md5query += " ('" + rom.MD5 + "'),";
+								md5query += " (\"" + rom.MD5 + "\"),";
 							}
 							if (!String.IsNullOrEmpty(rom.SHA1))
 							{
-								sha1query += " ('" + rom.SHA1 + "'),";
+								sha1query += " (\"" + rom.SHA1 + "\", \"" + _depots.Keys.ToList()[0] + "\"),";
 
 								if (!String.IsNullOrEmpty(rom.CRC))
 								{
-									crcsha1query += " ('" + rom.CRC + "', '" + rom.SHA1 + "'),";
+									crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
 								}
 								if (!String.IsNullOrEmpty(rom.MD5))
 								{
-									md5sha1query += " ('" + rom.MD5 + "', '" + rom.SHA1 + "'),";
+									md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
 								}
 							}
 
@@ -109,23 +109,23 @@ namespace SabreTools
 						// Add to the queries
 						if (!String.IsNullOrEmpty(rom.CRC))
 						{
-							crcquery += " ('" + rom.CRC + "'),";
+							crcquery += " (\"" + rom.CRC + "\"),";
 						}
 						if (!String.IsNullOrEmpty(rom.MD5))
 						{
-							md5query += " ('" + rom.MD5 + "'),";
+							md5query += " (\"" + rom.MD5 + "\"),";
 						}
 						if (!String.IsNullOrEmpty(rom.SHA1))
 						{
-							sha1query += " ('" + rom.SHA1 + "'),";
-							
+							sha1query += " (\"" + rom.SHA1 + "\", \"" + _depots.Keys.ToList()[0] + "\"),";
+
 							if (!String.IsNullOrEmpty(rom.CRC))
 							{
-								crcsha1query += " ('" + rom.CRC + "', '" + rom.SHA1 + "'),";
+								crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
 							}
 							if (!String.IsNullOrEmpty(rom.MD5))
 							{
-								md5sha1query += " ('" + rom.MD5 + "', '" + rom.SHA1 + "'),";
+								md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
 							}
 						}
 
