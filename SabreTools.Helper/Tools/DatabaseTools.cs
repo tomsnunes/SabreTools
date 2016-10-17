@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS md5 (
 					query = @"
 CREATE TABLE IF NOT EXISTS sha1 (
 	'sha1'	TEXT		NOT NULL,
+	'depot'	TEXT,
 	PRIMARY KEY (sha1)
 )";
 					slc = new SqliteCommand(query, dbc);

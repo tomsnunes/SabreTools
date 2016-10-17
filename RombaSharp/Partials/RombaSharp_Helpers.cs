@@ -14,6 +14,122 @@ namespace SabreTools
 		#region Helper methods
 
 		/// <summary>
+		/// Display the statistics in the database
+		/// </summary>
+		private static void DisplayDBStats()
+		{
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			dbc.Open();
+
+			// Total number of CRCs
+			string query = "SELECT COUNT(*) FROM crc";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			_logger.User("Total CRCs: " + (long)slc.ExecuteScalar());
+
+			// Total number of MD5s
+			query = "SELECT COUNT(*) FROM md5";
+			slc = new SqliteCommand(query, dbc);
+			_logger.User("Total MD5s: " + (long)slc.ExecuteScalar());
+
+			// Total number of SHA1s
+			query = "SELECT COUNT(*) FROM sha1";
+			slc = new SqliteCommand(query, dbc);
+			_logger.User("Total SHA1s: " + (long)slc.ExecuteScalar());
+
+			// Total number of DATs
+			query = "SELECT COUNT(*) FROM dat";
+			slc = new SqliteCommand(query, dbc);
+			_logger.User("Total DATs: " + (long)slc.ExecuteScalar());
+
+			slc.Dispose();
+			dbc.Dispose();
+		}
+
+		/// <summary>
+		/// Display the current memory usage of the application
+		/// </summary>
+		private static void DisplayMemoryStats()
+		{
+			Process proc = Process.GetCurrentProcess();
+
+			_logger.User("Current Nonpaged Memory: " + Style.GetBytesReadable(proc.NonpagedSystemMemorySize64));
+			_logger.User("Current Paged Memory: " + Style.GetBytesReadable(proc.PagedMemorySize64));
+			_logger.User("Peak Paged Memory: " + Style.GetBytesReadable(proc.PeakPagedMemorySize64));
+			_logger.User("Peak Virtual Memory: " + Style.GetBytesReadable(proc.PeakVirtualMemorySize64));
+			_logger.User("Peak Working Memory: " + Style.GetBytesReadable(proc.PeakWorkingSet64));
+			_logger.User("Private Memory: " + Style.GetBytesReadable(proc.PrivateMemorySize64));
+			_logger.User("Virtual Memory: " + Style.GetBytesReadable(proc.VirtualMemorySize64));
+			_logger.User("Working Memory: " + Style.GetBytesReadable(proc.WorkingSet64));
+			_logger.User("Total Processor Time: " + proc.TotalProcessorTime);
+			_logger.User("User Processor Time: " + proc.UserProcessorTime);
+		}
+
+		/// <summary>
+		/// Export the current database to CSV
+		/// </summary>
+		/// <remarks>REDO</remarks>
+		private static void ExportDatabase()
+		{
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			dbc.Open();
+			StreamWriter sw = new StreamWriter(File.Open("export.csv", FileMode.Create, FileAccess.Write));
+
+			sw.WriteLine("\"ID\",\"Size\",\"CRC\",\"MD5\",\"SHA-1\",\"In Depot\",\"DAT Hash\"");
+
+			string query = "SELECT dats.id, size, crc, md5, sha1, indepot, hash FROM data JOIN dats ON data.id=dats.id";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			SqliteDataReader sldr = slc.ExecuteReader();
+
+			if (sldr.HasRows)
+			{
+				while (sldr.Read())
+				{
+					string line = "\"" + sldr.GetInt32(0) + "\","
+							+ "\"" + sldr.GetInt64(1) + "\","
+							+ "\"" + sldr.GetString(2) + "\","
+							+ "\"" + sldr.GetString(3) + "\","
+							+ "\"" + sldr.GetString(4) + "\","
+							+ "\"" + sldr.GetInt32(5) + "\","
+							+ "\"" + sldr.GetString(6) + "\"";
+					sw.WriteLine(line);
+				}
+			}
+
+			sldr.Dispose();
+			slc.Dispose();
+			sw.Dispose();
+			dbc.Dispose();
+		}
+
+		/// <summary>
+		/// Gets all valid DATs that match in the DAT root
+		/// </summary>
+		/// <param name="inputs">List of input strings to check for, presumably file names</param>
+		/// <returns>Dictionary of hash/full path for each of the valid DATs</returns>
+		private static Dictionary<string, string> GetValidDats(List<string> inputs)
+		{
+			// Get a dictionary of filenames that actually exist in the DATRoot, logging which ones are not
+			List<string> datRootDats = Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories).ToList();
+			List<string> lowerCaseDats = datRootDats.ConvertAll(i => Path.GetFileName(i).ToLowerInvariant());
+			Dictionary<string, string> foundDats = new Dictionary<string, string>();
+			foreach (string input in inputs)
+			{
+				if (lowerCaseDats.Contains(input.ToLowerInvariant()))
+				{
+					string fullpath = Path.GetFullPath(datRootDats[lowerCaseDats.IndexOf(input.ToLowerInvariant())]);
+					string sha1 = FileTools.GetFileInfo(fullpath, _logger).SHA1;
+					foundDats.Add(sha1, fullpath);
+				}
+				else
+				{
+					_logger.Warning("The file '" + input + "' could not be found in the DAT root");
+				}
+			}
+
+			return foundDats;
+		}
+
+		/// <summary>
 		/// Initialize the Romba application from XML config
 		/// </summary>
 		private static void InitializeConfiguration()
@@ -225,94 +341,6 @@ namespace SabreTools
 		}
 
 		/// <summary>
-		/// Display the statistics in the database
-		/// </summary>
-		private static void DisplayDBStats()
-		{
-			SqliteConnection dbc = new SqliteConnection(_connectionString);
-			dbc.Open();
-
-			// Total number of CRCs
-			string query = "SELECT COUNT(*) FROM crc";
-			SqliteCommand slc = new SqliteCommand(query, dbc);
-			_logger.User("Total CRCs: " + (long)slc.ExecuteScalar());
-
-			// Total number of MD5s
-			query = "SELECT COUNT(*) FROM md5";
-			slc = new SqliteCommand(query, dbc);
-			_logger.User("Total MD5s: " + (long)slc.ExecuteScalar());
-
-			// Total number of SHA1s
-			query = "SELECT COUNT(*) FROM sha1";
-			slc = new SqliteCommand(query, dbc);
-			_logger.User("Total SHA1s: " + (long)slc.ExecuteScalar());
-
-			// Total number of DATs
-			query = "SELECT COUNT(*) FROM dat";
-			slc = new SqliteCommand(query, dbc);
-			_logger.User("Total DATs: " + (long)slc.ExecuteScalar());
-
-			slc.Dispose();
-			dbc.Dispose();
-		}
-
-		/// <summary>
-		/// Display the current memory usage of the application
-		/// </summary>
-		private static void DisplayMemoryStats()
-		{
-			Process proc = Process.GetCurrentProcess();
-
-			_logger.User("Current Nonpaged Memory: " + Style.GetBytesReadable(proc.NonpagedSystemMemorySize64));
-			_logger.User("Current Paged Memory: " + Style.GetBytesReadable(proc.PagedMemorySize64));
-			_logger.User("Peak Paged Memory: " + Style.GetBytesReadable(proc.PeakPagedMemorySize64));
-			_logger.User("Peak Virtual Memory: " + Style.GetBytesReadable(proc.PeakVirtualMemorySize64));
-			_logger.User("Peak Working Memory: " + Style.GetBytesReadable(proc.PeakWorkingSet64));
-			_logger.User("Private Memory: " + Style.GetBytesReadable(proc.PrivateMemorySize64));
-			_logger.User("Virtual Memory: " + Style.GetBytesReadable(proc.VirtualMemorySize64));
-			_logger.User("Working Memory: " + Style.GetBytesReadable(proc.WorkingSet64));
-			_logger.User("Total Processor Time: " + proc.TotalProcessorTime);
-			_logger.User("User Processor Time: " + proc.UserProcessorTime);
-		}
-
-		/// <summary>
-		/// Export the current database to CSV
-		/// </summary>
-		/// <remarks>REDO</remarks>
-		private static void ExportDatabase()
-		{
-			SqliteConnection dbc = new SqliteConnection(_connectionString);
-			dbc.Open();
-			StreamWriter sw = new StreamWriter(File.Open("export.csv", FileMode.Create, FileAccess.Write));
-
-			sw.WriteLine("\"ID\",\"Size\",\"CRC\",\"MD5\",\"SHA-1\",\"In Depot\",\"DAT Hash\"");
-
-			string query = "SELECT dats.id, size, crc, md5, sha1, indepot, hash FROM data JOIN dats ON data.id=dats.id";
-			SqliteCommand slc = new SqliteCommand(query, dbc);
-			SqliteDataReader sldr = slc.ExecuteReader();
-
-			if (sldr.HasRows)
-			{
-				while (sldr.Read())
-				{
-					string line = "\"" + sldr.GetInt32(0) + "\","
-							+ "\"" + sldr.GetInt64(1) + "\","
-							+ "\"" + sldr.GetString(2) + "\","
-							+ "\"" + sldr.GetString(3) + "\","
-							+ "\"" + sldr.GetString(4) + "\","
-							+ "\"" + sldr.GetInt32(5) + "\","
-							+ "\"" + sldr.GetString(6) + "\"";
-					sw.WriteLine(line);
-				}
-			}
-
-			sldr.Dispose();
-			slc.Dispose();
-			sw.Dispose();
-			dbc.Dispose();
-		}
-
-		/// <summary>
 		/// Moves DAT index entries for orphaned DATs to backup folder
 		/// </summary>
 		private static void PurgeBackup()
@@ -509,31 +537,69 @@ namespace SabreTools
 		}
 
 		/// <summary>
-		/// Gets all valid DATs that match in the DAT root
+		/// Rescan a particular depot path into the database
 		/// </summary>
-		/// <param name="inputs">List of input strings to check for, presumably file names</param>
-		/// <returns>Dictionary of hash/full path for each of the valid DATs</returns>
-		private static Dictionary<string, string> GetValidDats(List<string> inputs)
+		/// <param name="depotname">Path to the depot to be rescanned</param>
+		private static void Rescan(string depotname)
 		{
-			// Get a dictionary of filenames that actually exist in the DATRoot, logging which ones are not
-			List<string> datRootDats = Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories).ToList();
-			List<string> lowerCaseDats = datRootDats.ConvertAll(i => Path.GetFileName(i).ToLowerInvariant());
-			Dictionary<string, string> foundDats = new Dictionary<string, string>();
-			foreach (string input in inputs)
+			// Check that it's a valid depot first
+			if (!_depots.ContainsKey(depotname))
 			{
-				if (lowerCaseDats.Contains(input.ToLowerInvariant()))
+				_logger.User("'" + depotname + "' is not a recognized depot. Please add it to your configuration file and try again");
+				return;
+			}
+
+			// Then check that the depot is online
+			if (!Directory.Exists(depotname))
+			{
+				_logger.User("'" + depotname + "' does not appear to be online. Please check its status and try again");
+				return;
+			}
+
+			// Open the database connection
+			SqliteConnection dbc = new SqliteConnection(_connectionString);
+			dbc.Open();
+
+			// If we have it, then check for all hashes that are in that depot
+			List<string> hashes = new List<string>();
+			string query = "SELECT sha1 FROM sha1 WHERE depot=\"" + depotname + "\"";
+			SqliteCommand slc = new SqliteCommand(query, dbc);
+			SqliteDataReader sldr = slc.ExecuteReader();
+			if (sldr.HasRows)
+			{
+				while (sldr.Read())
 				{
-					string fullpath = Path.GetFullPath(datRootDats[lowerCaseDats.IndexOf(input.ToLowerInvariant())]);
-					string sha1 = FileTools.GetFileInfo(fullpath, _logger).SHA1;
-					foundDats.Add(sha1, fullpath);
-				}
-				else
-				{
-					_logger.Warning("The file '" + input + "' could not be found in the DAT root");
+					hashes.Add(sldr.GetString(0));
 				}
 			}
 
-			return foundDats;
+			// Now rescan the depot itself
+			DatFile depot = new DatFile();
+			depot.PopulateDatFromDir(depotname, false, false, false, false, true, false, false, _tmpdir, false, null, 4, _logger);
+			depot.BucketBySHA1(false, _logger, false);
+
+			// Once we have both, check for any new files
+			List<string> dupehashes = new List<string>();
+			List<string> keys = depot.Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> roms = depot.Files[key];
+				foreach (Rom rom in roms)
+				{
+					if (hashes.Contains(rom.SHA1))
+					{
+						dupehashes.Add(rom.SHA1);
+						hashes.Remove(rom.SHA1);
+					}
+					else if (!dupehashes.Contains(rom.SHA1))
+					{
+
+					}
+				}
+			}
+
+			// Dispose of the database connection
+			dbc.Dispose();
 		}
 
 		#endregion
