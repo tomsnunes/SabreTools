@@ -88,22 +88,25 @@ Options:
 	-?, -h, --help		Show the built-in help text
 		Built-in to most of the programs is a basic help text
 		
-	archive		Adds ROM files from the specified directories to depot
+	archive			Adds ROM files from the specified directories to depot
 		-only-needed		Only archive ROM files in database
 	build			For each specified DAT file it creates TZip files
-	dbstats		Prints db stats
-	diffdat		Creates a DAT file for entries found in the new DAT
+		-copy				Copy files instead of rebuilding
+	dbstats			Prints db stats
+	depot-rescan	Rescan a specific depot to get new information
+	diffdat			Creates a DAT file for entries found in the new DAT
 		-new=			DAT to compare to
-	dir2dat		Creates a DAT file for the specified input directory
+	dir2dat			Creates a DAT file for the specified input directory
 		-out=			Filename to save out to
-	fixdat		For each specified DAT file it creates a fix DAT
-	lookup		For each specified hash, look up available information
+	export			Exports db to export.csv
+	fixdat			For each specified DAT file it creates a fix DAT
+	lookup			For each specified hash, look up available information
 	memstats		Prints memory stats
 	miss			For each specified DAT file, create miss and have file
 	progress		Shows progress of currently running command [OBSOLETE]
-	purge-backup		Moves DAT index entries for orphaned DATs
-	purge-delete		Deletes DAT index entries for orphaned DATs
-	refresh-dats		Refreshes the DAT index from the files in the DAT root
+	purge-backup	Moves DAT index entries for orphaned DATs
+	purge-delete	Deletes DAT index entries for orphaned DATs
+	refresh-dats	Refreshes the DAT index from the files in the DAT root
 	shutdown		Gracefully shuts down server [OBSOLETE]
 
 ** Section 2.2 - SabreTools
@@ -744,6 +747,13 @@ Options:
 		Instead of outputting the files to ZIP archives, files will be rebuilt to named
 		subdirectories within the output folder. This is useful for when the DAT does not
 		already have the flag specified.
+		
+	-h=, --header=		Remove headers from hash calculations
+		If this is set, then all files that have copier headers that are detected will
+		have them removed from the hash calculation. This will allow for a headered collection
+		to be hashed without possibly variant information. If a particular header skipper is
+		defined, and that skipper exists, then it will be used instead of trying to find one
+		that matches.
 		
 	-7z={0}				Set scanning level for 7z archives
 	-gz={2}				Set scanning level for GZip archives
