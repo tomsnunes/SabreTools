@@ -1020,16 +1020,10 @@ namespace SabreTools.Helper
 			{
 				// Compress the input stream
 				FileStream inputStream = File.OpenRead(input);
-				GZipStream outputStream = new GZipStream(File.Open(outfile, FileMode.Create, FileAccess.Write), CompressionMode.Compress);
-				inputStream.CopyTo(outputStream);
+				FileStream outputStream = File.Open(outfile, FileMode.Create, FileAccess.Write);
 
-				// Dispose of the streams
-				inputStream.Dispose();
-				outputStream.Dispose();
-				
-				// Now that it's ready, inject the header info
-				BinaryWriter sw = new BinaryWriter(new MemoryStream());
-				BinaryReader br = new BinaryReader(File.OpenRead(outfile));
+				// Open the output file for writing
+				BinaryWriter sw = new BinaryWriter(outputStream);
 
 				// Write standard header and TGZ info
 				byte[] data = Constants.TorrentGZHeader
@@ -1039,27 +1033,27 @@ namespace SabreTools.Helper
 				sw.Write(data);
 				sw.Write((ulong)rom.Size); // Long size (Unsigned, Mirrored)
 
-				// Finally, copy the rest of the data from the original file
-				br.BaseStream.Seek(10, SeekOrigin.Begin);
-				int i = 10;
-				while (br.BaseStream.Position < br.BaseStream.Length)
+				// Now create a deflatestream from the input file
+				DeflateStream ds = new DeflateStream(outputStream, CompressionMode.Compress, CompressionLevel.BestCompression, true);
+
+				// Copy the input stream to the output
+				byte[] ibuffer = new byte[_bufferSize];
+				int ilen;
+				while ((ilen = inputStream.Read(ibuffer, 0, _bufferSize)) > 0)
 				{
-					sw.Write(br.ReadByte());
-					i++;
+					ds.Write(ibuffer, 0, ilen);
+					ds.Flush();
 				}
+				ds.Dispose();
 
-				// Dispose of the stream
-				br.Dispose();
+				// Now write the standard footer
+				sw.Write(Style.StringToByteArray(rom.CRC).Reverse().ToArray());
+				sw.Write((uint)rom.Size);
 
-				// Now write the new file over the original
-				BinaryWriter bw = new BinaryWriter(File.Open(outfile, FileMode.Create));
-				sw.BaseStream.Seek(0, SeekOrigin.Begin);
-				bw.BaseStream.Seek(0, SeekOrigin.Begin);
-				sw.BaseStream.CopyTo(bw.BaseStream);
-
-				// Dispose of the streams
-				bw.Dispose();
+				// Dispose of everything
 				sw.Dispose();
+				outputStream.Dispose();
+				inputStream.Dispose();
 			}
 
 			// If we're in romba mode, create the subfolder and move the file
