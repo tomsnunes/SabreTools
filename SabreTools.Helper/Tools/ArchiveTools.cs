@@ -478,26 +478,26 @@ namespace SabreTools.Helper
 			if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}\.gz"))
 			{
 				logger.Warning("Non SHA-1 filename found, skipping: '" + datum + "'");
-				return new Rom();
+				return null;
 			}
 
 			// Check if the file is at least the minimum length
 			if (filesize < 40 /* bytes */)
 			{
 				logger.Warning("Possibly corrupt file '" + input + "' with size " + Style.GetBytesReadable(filesize));
-				return new Rom();
+				return null;
 			}
 
 			// Get the Romba-specific header data
 			byte[] header; // Get preamble header for checking
 			byte[] headermd5; // MD5
 			byte[] headercrc; // CRC
-			byte[] headersz; // Int64 size
+			ulong headersz; // Int64 size
 			BinaryReader br = new BinaryReader(File.OpenRead(input));
 			header = br.ReadBytes(12);
 			headermd5 = br.ReadBytes(16);
 			headercrc = br.ReadBytes(4);
-			headersz = br.ReadBytes(8);
+			headersz = br.ReadUInt64();
 			br.Dispose();
 
 			// If the header is not correct, return a blank rom
@@ -513,13 +513,13 @@ namespace SabreTools.Helper
 			}
 			if (!correct)
 			{
-				return new Rom();
+				return null;
 			}
 
 			// Now convert the data and get the right position
 			string gzmd5 = BitConverter.ToString(headermd5).Replace("-", string.Empty);
 			string gzcrc = BitConverter.ToString(headercrc).Replace("-", string.Empty);
-			long extractedsize = BitConverter.ToInt64(headersz, 0);
+			long extractedsize = (long)headersz;
 
 			Rom rom = new Rom
 			{
@@ -1035,9 +1035,9 @@ namespace SabreTools.Helper
 				byte[] data = Constants.TorrentGZHeader
 								.Concat(Style.StringToByteArray(rom.MD5)) // MD5
 								.Concat(Style.StringToByteArray(rom.CRC)) // CRC
-								.Concat(BitConverter.GetBytes(rom.Size).Reverse().ToArray()) // Long size (Mirrored)
 							.ToArray();
 				sw.Write(data);
+				sw.Write((ulong)rom.Size); // Long size (Unsigned, Mirrored)
 
 				// Finally, copy the rest of the data from the original file
 				br.BaseStream.Seek(10, SeekOrigin.Begin);
@@ -1065,25 +1065,48 @@ namespace SabreTools.Helper
 			// If we're in romba mode, create the subfolder and move the file
 			if (romba)
 			{
-				string subfolder = Path.Combine(rom.SHA1.Substring(0, 2), rom.SHA1.Substring(2, 2), rom.SHA1.Substring(4, 2), rom.SHA1.Substring(6, 2));
-				outDir = Path.Combine(outDir, subfolder);
-				if (!Directory.Exists(outDir))
-				{
-					Directory.CreateDirectory(outDir);
-				}
-
-				try
-				{
-					File.Move(outfile, Path.Combine(outDir, Path.GetFileName(outfile)));
-				}
-				catch (Exception ex)
-				{
-					logger.Warning(ex.ToString());
-					File.Delete(outfile);
-				}
+				MoveToRombaFolder(rom, outDir, outfile, logger);
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Get the romba path for a file based on the rom's SHA-1
+		/// </summary>
+		/// <param name="rom">Rom to get the sha1 from</param>
+		/// <param name="baseOutDir">Base output folder</param>
+		/// <returns>Formatted path string to use</returns>
+		public static string GetRombaPath(Rom rom, string baseOutDir)
+		{
+			string subfolder = Path.Combine(rom.SHA1.Substring(0, 2), rom.SHA1.Substring(2, 2), rom.SHA1.Substring(4, 2), rom.SHA1.Substring(6, 2));
+			return Path.Combine(baseOutDir, subfolder);
+		}
+
+		/// <summary>
+		/// Move a file to a named, Romba-style subdirectory
+		/// </summary>
+		/// <param name="rom">Rom to get the sha1 from</param>
+		/// <param name="baseOutDir">Base output folder</param>
+		/// <param name="filename">Name of the file to be moved</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		public static void MoveToRombaFolder(Rom rom, string baseOutDir, string filename, Logger logger)
+		{
+			string outDir = GetRombaPath(rom, baseOutDir);
+			if (!Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir);
+			}
+
+			try
+			{
+				File.Move(filename, Path.Combine(outDir, Path.GetFileName(filename)));
+			}
+			catch (Exception ex)
+			{
+				logger.Warning(ex.ToString());
+				File.Delete(filename);
+			}
 		}
 
 		#endregion
