@@ -177,7 +177,7 @@ namespace SabreTools
 			}
 
 			// Create the sorting object to use and rebuild the needed files
-			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(0, 0, 0, 0);
+			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
 			SimpleSort ss = new SimpleSort(need, onlyDirs, _depots.Keys.ToList()[0], _tmpdir, false, false, false, false, false, true, true, asl, false, null, _logger);
 			ss.StartProcessing();
 		}
@@ -204,7 +204,6 @@ namespace SabreTools
 				// Get the DAT file associated with the key
 				DatFile datFile = new DatFile();
 				datFile.Parse(Path.Combine(_dats, foundDats[key]), 0, 0, _logger, softlist: true);
-				ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(0, 0, 0, 0);
 
 				// Create the new output directory if it doesn't exist
 				string outputFolder = Path.Combine("out", Path.GetFileNameWithoutExtension(foundDats[key]));
@@ -217,6 +216,7 @@ namespace SabreTools
 				List<string> onlineDepots = _depots.Where(d => d.Value.Item2).Select(d => d.Key).ToList();
 
 				// Now scan all of those depots and rebuild
+				ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
 				SimpleSort ss = new SimpleSort(datFile, onlineDepots, outputFolder, _tmpdir, true, false, false, false, false, copy, copy, asl, false, null, _logger);
 				ss.StartProcessing();
 			}
