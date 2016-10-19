@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace SabreTools.Helper
 {
@@ -438,6 +439,25 @@ namespace SabreTools.Helper
 		{
 			List<char> invalidPath = Path.GetInvalidPathChars().ToList();
 			return new string(s.Where(c => !invalidPath.Contains(c)).ToArray());
+		}
+
+		/// <summary>
+		/// Convert all characters that are not considered XML-safe
+		/// </summary>
+		/// <param name="s">Input string to clean</param>
+		/// <returns>Cleaned string</returns>
+		public static string ConvertXMLUnsafeCharacters(string s)
+		{
+			return new String(s.Select(c =>
+				(c == 0x9
+					|| c == 0xA
+					|| c == 0xD
+					|| (c >= 0x20 && c <= 0xD77F)
+					|| (c >= 0xE000 && c <= 0xFFFD)
+					|| (c >= 0x10000 && c <= 0x10FFFF)
+						? c
+						: HttpUtility.HtmlEncode(c)[0]))
+				.ToArray());
 		}
 
 		#endregion
