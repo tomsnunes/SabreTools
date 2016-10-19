@@ -33,6 +33,12 @@ namespace SabreTools
 			foreach (string dir in onlyDirs)
 			{
 				df.PopulateDatFromDir(dir, false, false, false, false, true, false, false, _tmpdir, false, null, _workers, _logger);
+
+				// If we're looking for only needed, consider the zipfiles themselves too
+				if (onlyNeeded)
+				{
+					df.PopulateDatFromDir(dir, false, false, false, true, true, false, false, _tmpdir, false, null, _workers, _logger);
+				}
 			}
 
 			// Create an empty Dat for files that need to be rebuilt
