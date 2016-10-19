@@ -22,7 +22,6 @@ namespace SabreTools
 		// DatRoot settings
 		private static string _dats;		// DatRoot folder location
 		private static string _db;			// Database name
-		private static SqliteConnection _dbc;
 
 		// Depot settings
 		private static Dictionary<string, Tuple<long, bool>> _depots; // Folder location, Max size
