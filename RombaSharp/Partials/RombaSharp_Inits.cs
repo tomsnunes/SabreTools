@@ -32,7 +32,7 @@ namespace SabreTools
 			DatFile df = new DatFile();
 			foreach (string dir in onlyDirs)
 			{
-				df.PopulateDatFromDir(dir, false, false, false, false, true, false, false, _tmpdir, false, null, 4, _logger);
+				df.PopulateDatFromDir(dir, false, false, false, false, true, false, false, _tmpdir, false, null, _workers, _logger);
 			}
 
 			// Create an empty Dat for files that need to be rebuilt
@@ -255,7 +255,7 @@ namespace SabreTools
 			{
 				datdata.PopulateDatFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
-					null /* headerToCheckAgainst */, 4 /* maxDegreeOfParallelism */, _logger);
+					null /* headerToCheckAgainst */, _workers /* maxDegreeOfParallelism */, _logger);
 				datdata.WriteToFile("", logger);
 			}
 			logger.Close();

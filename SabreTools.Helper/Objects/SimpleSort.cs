@@ -1086,11 +1086,11 @@ namespace SabreTools.Helper
 
 							if (_tgz)
 							{
-								success &= ArchiveTools.WriteTorrentGZ(input, _outDir, _romba, _logger);
+								success &= ArchiveTools.WriteTorrentGZ(file, _outDir, _romba, _logger);
 							}
 							else
 							{
-								success &= ArchiveTools.WriteToArchive(input, _outDir, rom, _logger);
+								success &= ArchiveTools.WriteToArchive(file, _outDir, rom, _logger);
 							}
 						}
 

@@ -387,8 +387,14 @@ namespace SabreTools
 				Directory.CreateDirectory(_dats);
 			}
 
+			// First get a list of SHA-1's from the input DATs
+			DatFile datroot = new DatFile { Type = "SuperDAT", };
+			datroot.PopulateDatFromDir(_dats, false, false, false, false, false, false, false, _tmpdir, false, null, 4, _logger);
+			datroot.BucketBySHA1(false, _logger, false);
+
 			// Create a List of dat hashes in the database (SHA-1)
 			List<string> databaseDats = new List<string>();
+			List<string> unneeded = new List<string>();
 
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
 			dbc.Open();
@@ -404,67 +410,82 @@ namespace SabreTools
 			{
 				sldr.Read();
 				string hash = sldr.GetString(0);
-				if (!databaseDats.Contains(hash))
+				if (datroot.Files.ContainsKey(hash))
 				{
+					datroot.Files[hash] = null;
 					databaseDats.Add(hash);
 				}
+				else if (!databaseDats.Contains(hash))
+				{
+					unneeded.Add(hash);
+				}
 			}
+			datroot.BucketByGame(false, true, _logger, false);
+
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			slc.Dispose();
 			sldr.Dispose();
 
-			// Now create a Dictionary of dats to parse from what's not in the database (SHA-1, Path)
-			Dictionary<string, string> toscan = new Dictionary<string, string>();
-
-			// Loop through the datroot and add only needed files
-			_logger.User("Scanning DAT folder: '" + _dats + "'");
-			start = DateTime.Now;
-
-			foreach (string file in Directory.EnumerateFiles(_dats, "*", SearchOption.AllDirectories))
-			{
-				Rom dat = FileTools.GetFileInfo(file, _logger);
-
-				// If the Dat isn't in the database and isn't already accounted for in the DatRoot, add it
-				if (!databaseDats.Contains(dat.SHA1) && !toscan.ContainsKey(dat.SHA1))
-				{
-					toscan.Add(dat.SHA1, Path.GetFullPath(file));
-				}
-
-				// If the Dat is in the database already, remove it to find stragglers
-				else if (databaseDats.Contains(dat.SHA1))
-				{
-					databaseDats.Remove(dat.SHA1);
-				}
-			}
-			_logger.User("Scanning complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
 			// Loop through the Dictionary and add all data
 			_logger.User("Adding new DAT information");
 			start = DateTime.Now;
-
-			foreach (string key in toscan.Keys)
+			foreach (string key in datroot.Files.Keys)
 			{
-				// Parse the Dat if possible
-				_logger.User("Adding from '" + toscan[key] + "'");
-				DatFile tempdat = new DatFile();
-				tempdat.Parse(toscan[key], 0, 0, _logger);
-
-				// If the Dat wasn't empty, add the information
-				if (tempdat.Files.Count != 0)
+				foreach (Rom value in datroot.Files[key])
 				{
-					string crcquery = "INSERT OR IGNORE INTO crc (crc) VALUES";
-					string md5query = "INSERT OR IGNORE INTO md5 (md5) VALUES";
-					string sha1query = "INSERT OR IGNORE INTO sha1 (sha1) VALUES";
-					string crcsha1query = "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES";
-					string md5sha1query = "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES";
+					AddDatToDatabase(value, dbc);
+				}
+			}
 
-					// Loop through the parsed entries
-					foreach (string romkey in tempdat.Files.Keys)
+			_logger.User("Adding complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// Now loop through and remove all references to old Dats
+			_logger.User("Removing unmatched DAT information");
+			start = DateTime.Now;
+
+			foreach (string dathash in unneeded)
+			{
+				query = "DELETE FROM dats WHERE hash=\"" + dathash + "\"";
+				slc = new SqliteCommand(query, dbc);
+				slc.ExecuteNonQuery();
+				slc.Dispose();
+			}
+			_logger.User("Removing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			dbc.Dispose();
+		}
+
+		private static void AddDatToDatabase(Rom dat, SqliteConnection dbc)
+		{
+			// Get the dat full path
+			string fullpath = Path.Combine(_dats, (dat.MachineName == "dats" ? "" : dat.MachineName), dat.Name);
+
+			// Parse the Dat if possible
+			_logger.User("Adding from '" + dat.Name + "'");
+			DatFile tempdat = new DatFile();
+			tempdat.Parse(fullpath, 0, 0, _logger);
+
+			// If the Dat wasn't empty, add the information
+			SqliteCommand slc = new SqliteCommand();
+			if (tempdat.Files.Count != 0)
+			{
+				string crcquery = "INSERT OR IGNORE INTO crc (crc) VALUES";
+				string md5query = "INSERT OR IGNORE INTO md5 (md5) VALUES";
+				string sha1query = "INSERT OR IGNORE INTO sha1 (sha1) VALUES";
+				string crcsha1query = "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES";
+				string md5sha1query = "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES";
+
+				// Loop through the parsed entries
+				foreach (string romkey in tempdat.Files.Keys)
+				{
+					foreach (DatItem datItem in tempdat.Files[romkey])
 					{
-						foreach (Rom rom in tempdat.Files[romkey])
+						_logger.Verbose("Checking and adding file '" + datItem.Name);
+
+						if (datItem.Type == ItemType.Rom)
 						{
-							_logger.Verbose("Checking and adding file '" + rom.Name);
+							Rom rom = (Rom)datItem;
 
 							if (!String.IsNullOrEmpty(rom.CRC))
 							{
@@ -488,53 +509,59 @@ namespace SabreTools
 								}
 							}
 						}
-					}
+						else if (datItem.Type == ItemType.Disk)
+						{
+							Disk disk = (Disk)datItem;
 
-					// Now run the queries after fixing them
-					if (crcquery != "INSERT OR IGNORE INTO crc (crc) VALUES")
-					{
-						slc = new SqliteCommand(crcquery.TrimEnd(','), dbc);
-						slc.ExecuteNonQuery();
-					}
-					if (md5query != "INSERT OR IGNORE INTO md5 (md5) VALUES")
-					{
-						slc = new SqliteCommand(md5query.TrimEnd(','), dbc);
-						slc.ExecuteNonQuery();
-					}
-					if (sha1query != "INSERT OR IGNORE INTO sha1 (sha1) VALUES")
-					{
-						slc = new SqliteCommand(sha1query.TrimEnd(','), dbc);
-						slc.ExecuteNonQuery();
-					}
-					if (crcsha1query != "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES")
-					{
-						slc = new SqliteCommand(crcsha1query.TrimEnd(','), dbc);
-						slc.ExecuteNonQuery();
-					}
-					if (md5sha1query != "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES")
-					{
-						slc = new SqliteCommand(md5sha1query.TrimEnd(','), dbc);
-						slc.ExecuteNonQuery();
+							if (!String.IsNullOrEmpty(disk.MD5))
+							{
+								md5query += " (\"" + disk.MD5 + "\"),";
+							}
+							if (!String.IsNullOrEmpty(disk.SHA1))
+							{
+								sha1query += " (\"" + disk.SHA1 + "\"),";
+
+								if (!String.IsNullOrEmpty(disk.MD5))
+								{
+									md5sha1query += " (\"" + disk.MD5 + "\", \"" + disk.SHA1 + "\"),";
+								}
+							}
+						}
 					}
 				}
+
+				// Now run the queries after fixing them
+				if (crcquery != "INSERT OR IGNORE INTO crc (crc) VALUES")
+				{
+					slc = new SqliteCommand(crcquery.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+				if (md5query != "INSERT OR IGNORE INTO md5 (md5) VALUES")
+				{
+					slc = new SqliteCommand(md5query.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+				if (sha1query != "INSERT OR IGNORE INTO sha1 (sha1) VALUES")
+				{
+					slc = new SqliteCommand(sha1query.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+				if (crcsha1query != "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES")
+				{
+					slc = new SqliteCommand(crcsha1query.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
+				if (md5sha1query != "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES")
+				{
+					slc = new SqliteCommand(md5sha1query.TrimEnd(','), dbc);
+					slc.ExecuteNonQuery();
+				}
 			}
-			_logger.User("Adding complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			// Now loop through and remove all references to old Dats
-			// TODO: Remove orphaned files as well
-			_logger.User("Removing unmatched DAT information");
-			start = DateTime.Now;
-
-			foreach (string dathash in databaseDats)
-			{
-				query = "DELETE FROM dats WHERE hash=\"" + dathash + "\"";
-				slc = new SqliteCommand(query, dbc);
-				slc.ExecuteNonQuery();
-				slc.Dispose();
-			}
-			_logger.User("Removing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			dbc.Dispose();
+			string datquery = "INSERT OR IGNORE INTO dat (hash) VALUES (\"" + dat.SHA1 + "\")";
+			slc = new SqliteCommand(datquery, dbc);
+			slc.ExecuteNonQuery();
+			slc.Dispose();
 		}
 
 		/// <summary>
@@ -576,7 +603,7 @@ namespace SabreTools
 
 			// Now rescan the depot itself
 			DatFile depot = new DatFile();
-			depot.PopulateDatFromDir(depotname, false, false, false, false, true, false, false, _tmpdir, false, null, 4, _logger);
+			depot.PopulateDatFromDir(depotname, false, false, false, false, true, false, false, _tmpdir, false, null, _workers, _logger);
 			depot.BucketBySHA1(false, _logger, false);
 
 			// Set the base queries to use

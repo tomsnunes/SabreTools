@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Mono.Data.Sqlite;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using SabreTools.Helper;
 
 namespace SabreTools
@@ -13,7 +13,7 @@ namespace SabreTools
 		// General settings
 		private static int _workers;		//Number of parallel threads
 		private static string _logdir;		//Log folder location
-		private static string _tmpdir;	//Temp folder location
+		private static string _tmpdir;		//Temp folder location
 		private static string _webdir;		// Web frontend location
 		private static string _baddir;		// Fail-to-unpack file folder location
 		private static int _verbosity;		// Verbosity of the output
@@ -22,6 +22,7 @@ namespace SabreTools
 		// DatRoot settings
 		private static string _dats;		// DatRoot folder location
 		private static string _db;			// Database name
+		private static SqliteConnection _dbc;
 
 		// Depot settings
 		private static Dictionary<string, Tuple<long, bool>> _depots; // Folder location, Max size
