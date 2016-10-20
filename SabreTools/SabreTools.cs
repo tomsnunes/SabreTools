@@ -836,6 +836,7 @@ namespace SabreTools
 					addBlankFilesForEmptyFolder,
 					addFileDates,
 					tempDir,
+					outDir,
 					copyFiles,
 					header,
 					maxParallelism);
