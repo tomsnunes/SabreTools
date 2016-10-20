@@ -89,7 +89,8 @@ namespace SabreTools
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
 		/// <param name="addBlankFilesForEmptyFolder">True if blank items should be created for empty folders, false otherwise</param>
 		/// <param name="addFileDates">True if dates should be archived for all files, false otherwise</param>
-		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory</param>
+		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is default temp directory)</param>
+		/// <param name="outDir">Name of the directory to output the DAT to (blank is the current directory)</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
@@ -113,6 +114,7 @@ namespace SabreTools
 			bool addBlankFilesForEmptyFolder,
 			bool addFileDates,
 			string tempDir,
+			string outDir,
 			bool copyFiles,
 			string headerToCheckAgainst,
 			int maxDegreeOfParallelism)
@@ -150,6 +152,9 @@ namespace SabreTools
 				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 
+			// Clean the temp directory
+			tempDir = (String.IsNullOrEmpty(tempDir) ? Path.GetTempPath() : tempDir);
+
 			// For each input directory, create a DAT
 			foreach (string path in inputs)
 			{
@@ -166,7 +171,7 @@ namespace SabreTools
 					// If it was a success, write the DAT out
 					if (success)
 					{
-						datdata.WriteToFile("", _logger);
+						datdata.WriteToFile(outDir, _logger);
 					}
 
 					// Otherwise, show the help

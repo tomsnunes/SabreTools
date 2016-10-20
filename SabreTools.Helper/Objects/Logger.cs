@@ -22,7 +22,7 @@ namespace SabreTools.Helper
 		private StreamWriter _log;
 
 		// Private required variables
-		private string _basepath = "Logs" + Path.DirectorySeparatorChar;
+		private string _basepath = "logs" + Path.DirectorySeparatorChar;
 
 		/// <summary>
 		/// Initialize a Logger object with the given information
