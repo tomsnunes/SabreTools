@@ -73,7 +73,6 @@ namespace SabreTools
 				noSHA1 = false,
 				parseArchivesAsFiles = false,
 				quotes = false,
-				rem = false,
 				remext = false,
 				removeDateFromAutomaticName = false,
 				restore = false,
@@ -792,8 +791,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(splitByExt ^ splitByHash ^ headerer ^ (datFromDir || merge || diffMode != 0 || update
-				|| outputFormat != 0 || trim) ^ rem ^ stats ^ splitByType))
+			if (!(datFromDir ^ headerer ^ splitByExt ^ splitByHash ^ splitByType ^ stats ^ update))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help();
@@ -802,8 +800,8 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (datFromDir || splitByExt || splitByHash || headerer
-				|| (merge || diffMode != 0 || update || outputFormat != 0) || stats || trim || splitByType))
+			if (inputs.Count == 0
+				&& (datFromDir || headerer || splitByExt || splitByHash || splitByType || stats || update))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -842,6 +840,12 @@ namespace SabreTools
 					maxParallelism);
 			}
 
+			// If we're in headerer mode
+			else if (headerer)
+			{
+				InitHeaderer(inputs, restore, outDir);
+			}
+
 			// Split a DAT by extension
 			else if (splitByExt)
 			{
@@ -852,12 +856,6 @@ namespace SabreTools
 			else if (splitByHash)
 			{
 				InitHashSplit(inputs, outDir);
-			}
-
-			// If we're in headerer mode
-			else if (headerer)
-			{
-				InitHeaderer(inputs, restore, outDir);
 			}
 
 			// Get statistics on input files
@@ -873,7 +871,7 @@ namespace SabreTools
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
-			else if (update || outputFormat != 0 || merge || diffMode != 0)
+			else if (update)
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, outputFormat, usegame, prefix,
