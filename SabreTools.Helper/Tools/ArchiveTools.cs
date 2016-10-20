@@ -157,6 +157,20 @@ namespace SabreTools.Helper
 
 						zr = zf.OpenReadStream(i, false, out readStream, out streamsize, out cm, out lastMod);
 
+						// Create the rest of the path, if needed
+						if (!String.IsNullOrEmpty(Path.GetDirectoryName(zf.Entries[i].FileName)))
+						{
+							Directory.CreateDirectory(Path.Combine(tempDir, Path.GetDirectoryName(zf.Entries[i].FileName)));
+						}
+
+						// If the entry ends with a directory separator, continue to the next item, if any
+						if (zf.Entries[i].FileName.EndsWith(Path.DirectorySeparatorChar.ToString())
+							|| zf.Entries[i].FileName.EndsWith(Path.AltDirectorySeparatorChar.ToString())
+							|| zf.Entries[i].FileName.EndsWith(Path.PathSeparator.ToString()))
+						{
+							continue;
+						}
+
 						FileStream writeStream = File.OpenWrite(Path.Combine(tempDir, zf.Entries[i].FileName));
 
 						byte[] ibuffer = new byte[_bufferSize];
@@ -167,10 +181,10 @@ namespace SabreTools.Helper
 							writeStream.Flush();
 						}
 
-						encounteredErrors = false;
 						zr = zf.CloseReadStream();
 						writeStream.Dispose();
 					}
+					encounteredErrors = false;
 				}
 				else if (at == ArchiveType.Rar && (archiveScanLevel & ArchiveScanLevel.RarInternal) != 0)
 				{
