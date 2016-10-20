@@ -40,18 +40,22 @@ namespace SabreTools
 			// Output the title
 			Build.Start("SimpleSort");
 
-			// Set all default values
+			// Feature flags
 			bool help = false,
-				convert = false,
+				simpleSort = true;
+
+			// User flags
+			bool convert = false,
 				date = false,
 				delete = false,
 				quickScan = false,
 				romba = false,
-				simpleSort = true,
 				toFolder = false,
 				tgz = false,
 				updateDat = false,
 				verify = false;
+
+			// User inputs
 			int sevenzip = 0,
 				gz = 2,
 				rar = 2,
@@ -67,19 +71,18 @@ namespace SabreTools
 			{
 				switch (args[i])
 				{
+					// Feature flags
 					case "-?":
 					case "-h":
 					case "--help":
 						help = true;
 						break;
-					case "-7z":
-					case "--7z":
-						i++;
-						if (!Int32.TryParse(args[i], out sevenzip))
-						{
-							sevenzip = 0;
-						}
+					case "-ss":
+					case "--sort":
+						simpleSort = true;
 						break;
+
+					// User flags
 					case "-ad":
 					case "--add-date":
 						date = true;
@@ -91,6 +94,40 @@ namespace SabreTools
 					case "-d":
 					case "--delete":
 						delete = true;
+						break;
+					case "-do":
+					case "--directory":
+						toFolder = true;
+						break;
+					case "-qs":
+					case "--quick":
+						quickScan = true;
+						break;
+					case "-r":
+					case "--romba":
+						romba = true;
+						break;
+					case "-tgz":
+					case "--tgz":
+						tgz = true;
+						break;
+					case "-ud":
+					case "--updated-dat":
+						updateDat = true;
+						break;
+					case "-v":
+					case "--verify":
+						verify = true;
+						break;
+
+					// User inputs
+					case "-7z":
+					case "--7z":
+						i++;
+						if (!Int32.TryParse(args[i], out sevenzip))
+						{
+							sevenzip = 0;
+						}
 						break;
 					case "-dat":
 					case "--dat":
@@ -104,10 +141,6 @@ namespace SabreTools
 							return;
 						}
 						datfiles.Add(args[i]);
-						break;
-					case "-do":
-					case "--directory":
-						toFolder = true;
 						break;
 					case "-gz":
 					case "--gz":
@@ -127,14 +160,6 @@ namespace SabreTools
 						i++;
 						outDir = args[i];
 						break;
-					case "-qs":
-					case "--quick":
-						quickScan = true;
-						break;
-					case "-r":
-					case "--romba":
-						romba = true;
-						break;
 					case "-rar":
 					case "--rar":
 						i++;
@@ -147,18 +172,6 @@ namespace SabreTools
 					case "--temp":
 						i++;
 						tempDir = args[i];
-						break;
-					case "-tgz":
-					case "--tgz":
-						tgz = true;
-						break;
-					case "-ud":
-					case "--updated-dat":
-						updateDat = true;
-						break;
-					case "-v":
-					case "--verify":
-						verify = true;
 						break;
 					case "-zip":
 					case "--zip":

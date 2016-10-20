@@ -67,11 +67,10 @@ namespace SabreTools
 				return;
 			}
 
-			// Set all default values
+			// Feature flags
 			bool help = false,
 				archive = false,
 				build = false,
-				copy = false,
 				dbstats = false,
 				depotRescan = false,
 				diffdat = false,
@@ -81,21 +80,27 @@ namespace SabreTools
 				lookup = false,
 				memstats = false,
 				miss = false,
-				onlyNeeded = false,
 				progress = false,
 				purgeBackup = false,
 				purgeDelete = false,
 				refreshDats = false,
 				shutdown = false;
+
+			// User flags
+			bool copy = false,
+				onlyNeeded = false;
+
+			// User inputs
 			string newdat ="",
 				outdat = "";
 			List<string> inputs = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
-			foreach (string arg in args)
+			for (int i = 0; i < args.Length; i++)
 			{
-				switch (arg)
+				switch (args[i])
 				{
+					// Feature flags
 					case "-?":
 					case "-h":
 					case "--help":
@@ -106,9 +111,6 @@ namespace SabreTools
 						break;
 					case "build":
 						build = true;
-						break;
-					case "-copy":
-						copy = true;
 						break;
 					case "dbstats":
 						dbstats = true;
@@ -137,10 +139,6 @@ namespace SabreTools
 					case "miss":
 						miss = true;
 						break;
-					case "-only-needed":
-					case "--only-needed":
-						onlyNeeded = true;
-						break;
 					case "purge-backup":
 						purgeBackup = true;
 						break;
@@ -156,16 +154,53 @@ namespace SabreTools
 					case "shutdown":
 						shutdown = true;
 						break;
-					default:
-						string temparg = arg.Replace("\"", "").Replace("file://", "");
 
-						if (temparg.StartsWith("-new=") || temparg.StartsWith("--new="))
+					// User flags
+					case "-copy":
+						copy = true;
+						break;
+					case "-only-needed":
+					case "--only-needed":
+						onlyNeeded = true;
+						break;
+
+					// User inputs
+					case "-new":
+					case "--new":
+						i++;
+						newdat = args[i];
+						break;
+					case "-out":
+					case "--out":
+						i++;
+						outdat = args[i];
+						break;
+					default:
+						string temparg = args[i].Replace("\"", "").Replace("file://", "");
+
+						if (temparg.StartsWith("-") && temparg.Contains("="))
 						{
-							newdat = temparg.Split('=')[1];
-						}
-						else if (temparg.StartsWith("-out=") || temparg.StartsWith("--out="))
-						{
-							outdat = temparg.Split('=')[1];
+							// Split the argument
+							string[] split = temparg.Split('=');
+							if (split[1] == null)
+							{
+								split[1] = "";
+							}
+
+							switch (split[0])
+							{
+								case "-new":
+								case "--new":
+									newdat = split[1];
+									break;
+								case "-out":
+								case "--out":
+									outdat = split[i];
+									break;
+								default:
+									inputs.Add(temparg);
+									break;
+							}
 						}
 						else
 						{
