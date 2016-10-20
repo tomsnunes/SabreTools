@@ -128,7 +128,7 @@ namespace SabreTools.Helper
 					helptext.Add("	-osl, --output-sl	Output in Softwarelist format");
 					helptext.Add("	-otsv, --output-tsv	Output in TSV format");
 					helptext.Add("	-ox, --output-xml	Output in Logiqx XML format");
-					helptext.Add("	-gz, --gz-files		Allow reading of GZIP files as archives");
+					helptext.Add("	-gzf, --gz-files	Allow reading of GZIP files as archives");
 					helptext.Add("	-ro, --romba		Read files from a Romba input");
 					helptext.Add("	-f=, --filename=	Set the external name of the DAT");
 					helptext.Add("	-n=, --name=		Set the internal name of the DAT");

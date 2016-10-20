@@ -24,27 +24,26 @@ namespace SabreTools
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		public static bool InitConvertFolder(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool delete,
-			bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, Logger logger)
+			bool tgz, bool romba, int sevenzip, int gz, int rar, int zip)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
 
 			DateTime start = DateTime.Now;
-			logger.User("Populating internal DAT...");
+			_logger.User("Populating internal DAT...");
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, logger, keep: true, softlist: true);
+				datdata.Parse(datfile, 99, 99, _logger, keep: true, softlist: true);
 			}
-			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Get all individual files from the inputs
 			start = DateTime.Now;
-			logger.User("Organizing input files...");
+			_logger.User("Organizing input files...");
 			List<string> newinputs = new List<string>();
 			foreach (string input in inputs)
 			{
@@ -60,10 +59,10 @@ namespace SabreTools
 					}
 				}
 			}
-			logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			_logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			SimpleSort ss = new SimpleSort(datdata, newinputs, outDir, tempDir, false, false,
-				false, false, delete, tgz, romba, asl, false, null, logger);
+				false, false, delete, tgz, romba, asl, false, null, _logger);
 			return ss.Convert();
 		}
 
@@ -310,26 +309,25 @@ namespace SabreTools
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
-			bool toFolder, bool verify, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst, Logger logger)
+			bool toFolder, bool verify, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
 
 			DateTime start = DateTime.Now;
-			logger.User("Populating internal DAT...");
+			_logger.User("Populating internal DAT...");
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, logger, keep: true, softlist: true);
+				datdata.Parse(datfile, 99, 99, _logger, keep: true, softlist: true);
 			}
-			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, date,
-				toFolder, verify, delete, tgz, romba, asl, updateDat, headerToCheckAgainst, logger);
+				toFolder, verify, delete, tgz, romba, asl, updateDat, headerToCheckAgainst, _logger);
 			ss.StartProcessing();
 		}
 

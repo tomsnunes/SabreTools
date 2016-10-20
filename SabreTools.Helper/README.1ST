@@ -1006,7 +1006,7 @@ Below are originally from SabreTools / DATabase -
 		-ox, -output-xml	Output in Logiqx XML format (default)
 			Add outputting the created DAT to Logiqx XML format
 		
-		-gz, -gz-files		Allow reading of GZIP files as archives
+		-gzf, -gz-files		Allow reading of GZIP files as archives
 			Since GZip files are not commonly used for file storage, this flag allows for
 			any GZip archives to have their contents hashed instead.
 			

@@ -48,13 +48,16 @@ namespace SabreTools
 
 			// Feature flags
 			bool help = false,
+				convert = false, // SimpleSort
 				datFromDir = false,
 				headerer = false,
+				sort = false, // SimpleSort
 				splitByExt = false,
 				splitByHash = false,
 				splitByType = false,
 				stats = false,
-				update = false;
+				update = false,
+				verify = false; // SimpleSort
 
 			// User flags
 			bool addBlankFilesForEmptyFolder = false,
@@ -63,6 +66,7 @@ namespace SabreTools
 				copyFiles = false,
 				datPrefix = false,
 				dedup = false,
+				delete = false, // SimpleSort
 				enableGzip = false,
 				excludeOf = false,
 				inplace = false,
@@ -70,6 +74,7 @@ namespace SabreTools
 				noMD5 = false,
 				noSHA1 = false,
 				parseArchivesAsFiles = false,
+				quickScan = false, // SimpleSort
 				quotes = false,
 				remext = false,
 				removeDateFromAutomaticName = false,
@@ -80,15 +85,22 @@ namespace SabreTools
 				single = false,
 				softlist = false,
 				superdat = false,
+				tgz = false, // SimpleSort
+				toFolder = false, // SimpleSort
 				trim = false,
 				skip = false,
+				updateDat = false, // SimpleSort
 				usegame = true;
 			DiffMode diffMode = 0x0;
 			OutputFormat outputFormat = 0x0;
 			StatOutputFormat statOutputFormat = StatOutputFormat.None;
 
 			// User inputs
-			int maxParallelism = 4;
+			int gz = 2, // SimpleSort
+				maxParallelism = 4,
+				rar = 2, // SimpleSort
+				sevenzip = 0, // SimpleSort
+				zip = 0; // SimpleSort
 			long sgt = -1,
 				slt = -1,
 				seq = -1;
@@ -124,6 +136,7 @@ namespace SabreTools
 				tempDir = "",
 				url = null,
 				version = null;
+			List<string> datfiles = new List<string>(); // SimpleSort
 			List<string> inputs = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
@@ -136,6 +149,10 @@ namespace SabreTools
 					case "-h":
 					case "--help":
 						help = true;
+						break;
+					case "-cv":
+					case "--convert":
+						convert = true;
 						break;
 					case "-d":
 					case "--d2d":
@@ -154,6 +171,10 @@ namespace SabreTools
 					case "--hash-split":
 						splitByHash = true;
 						break;
+					case "-ss":
+					case "--sort":
+						sort = true;
+						break;
 					case "-st":
 					case "--stats":
 						stats = true;
@@ -161,6 +182,10 @@ namespace SabreTools
 					case "-ts":
 					case "--type-split":
 						splitByType = true;
+						break;
+					case "-ve":
+					case "--verify":
+						verify = true;
 						break;
 
 					// User flags
@@ -200,6 +225,10 @@ namespace SabreTools
 					case "--dedup":
 						dedup = true;
 						break;
+					case "-del":
+					case "--delete":
+						delete = true;
+						break;
 					case "-di":
 					case "--diff":
 						diffMode |= DiffMode.All;
@@ -216,6 +245,10 @@ namespace SabreTools
 					case "--diff-nd":
 						diffMode |= DiffMode.NoDupes;
 						break;
+					case "-do":
+					case "--directory":
+						toFolder = true;
+						break;
 					case "-f":
 					case "--files":
 						parseArchivesAsFiles = true;
@@ -224,7 +257,7 @@ namespace SabreTools
 					case "--game-prefix":
 						datPrefix = true;
 						break;
-					case "-gz":
+					case "-gzf":
 					case "--gz-files":
 						enableGzip = true;
 						break;
@@ -312,6 +345,10 @@ namespace SabreTools
 					case "--quotes":
 						quotes = true;
 						break;
+					case "-qs":
+					case "--quick":
+						quickScan = true;
+						break;
 					case "-r":
 					case "--roms":
 						usegame = false;
@@ -348,6 +385,10 @@ namespace SabreTools
 					case "--softlist":
 						softlist = true;
 						break;
+					case "-tgz":
+					case "--tgz":
+						tgz = true;
+						break;
 					case "-trim":
 					case "--trim":
 						trim = true;
@@ -360,12 +401,24 @@ namespace SabreTools
 					case "--update":
 						update = true;
 						break;
+					case "-upd":
+					case "--updated-dat":
+						updateDat = true;
+						break;
 					case "-xof":
 					case "--exclude-of":
 						excludeOf = true;
 						break;
 
 					// User inputs
+					case "-7z":
+					case "--7z":
+						i++;
+						if (!Int32.TryParse(args[i], out sevenzip))
+						{
+							sevenzip = 0;
+						}
+						break;
 					case "-ae":
 					case "--add-ext":
 						i++;
@@ -395,6 +448,19 @@ namespace SabreTools
 					case "--date":
 						i++;
 						date = args[i];
+						break;
+					case "-dat":
+					case "--dat":
+						i++;
+						if (!File.Exists(args[i]))
+						{
+							_logger.Error("DAT must be a valid file: " + args[i]);
+							Console.WriteLine();
+							Build.Help();
+							_logger.Close();
+							return;
+						}
+						datfiles.Add(args[i]);
 						break;
 					case "-de":
 					case "--desc":
@@ -440,6 +506,14 @@ namespace SabreTools
 					case "--game-name":
 						i++;
 						gamename = args[i];
+						break;
+					case "-gz":
+					case "--gz":
+						i++;
+						if (!Int32.TryParse(args[i], out gz))
+						{
+							gz = 2;
+						}
 						break;
 					case "-he":
 					case "--header":
@@ -504,6 +578,14 @@ namespace SabreTools
 						i++;
 						prefix = args[i];
 						break;
+					case "-rar":
+					case "--rar":
+						i++;
+						if (!Int32.TryParse(args[i], out rar))
+						{
+							rar = 2;
+						}
+						break;
 					case "-rd":
 					case "--root-dir":
 						i++;
@@ -565,6 +647,14 @@ namespace SabreTools
 						i++;
 						version = args[i];
 						break;
+					case "-zip":
+					case "--zip":
+						i++;
+						if (!Int32.TryParse(args[i], out zip))
+						{
+							zip = 0;
+						}
+						break;
 					default:
 						string temparg = args[i].Replace("\"", "").Replace("file://", "");
 
@@ -579,6 +669,13 @@ namespace SabreTools
 
 							switch (split[0])
 							{
+								case "-7z":
+								case "--7z":
+									if (!Int32.TryParse(split[1], out sevenzip))
+									{
+										sevenzip = 0;
+									}
+									break;
 								case "-ae":
 								case "--add-ext":
 									addext = split[1];
@@ -602,6 +699,18 @@ namespace SabreTools
 								case "-da":
 								case "--date":
 									date = split[1];
+									break;
+								case "-dat":
+								case "--dat":
+									if (!File.Exists(split[1]))
+									{
+										_logger.Error("DAT must be a valid file: " + split[1]);
+										Console.WriteLine();
+										Build.Help();
+										_logger.Close();
+										return;
+									}
+									datfiles.Add(split[1]);
 									break;
 								case "-de":
 								case "--desc":
@@ -638,6 +747,13 @@ namespace SabreTools
 								case "-gn":
 								case "--game-name":
 									gamename = split[1];
+									break;
+								case "-gz":
+								case "--gz":
+									if (!Int32.TryParse(split[1], out gz))
+									{
+										gz = 2;
+									}
 									break;
 								case "-h":
 								case "--header":
@@ -696,6 +812,13 @@ namespace SabreTools
 								case "--root":
 									rootdir = split[1];
 									break;
+								case "-rar":
+								case "--rar":
+									if (!Int32.TryParse(split[1], out rar))
+									{
+										rar = 2;
+									}
+									break;
 								case "-rd":
 								case "--root-dir":
 									root = split[1];
@@ -740,6 +863,13 @@ namespace SabreTools
 								case "-v":
 								case "--version":
 									version = split[1];
+									break;
+								case "-zip":
+								case "--zip":
+									if (!Int32.TryParse(split[1], out zip))
+									{
+										zip = 0;
+									}
 									break;
 								default:
 									if (File.Exists(temparg) || Directory.Exists(temparg))
@@ -806,8 +936,15 @@ namespace SabreTools
 
 			// Now take care of each mode in succesion
 
+			// Convert a folder to TGZ or TorrentZip
+			if (convert)
+			{
+				InitConvertFolder(datfiles, inputs, outDir, tempDir, delete, tgz, romba, sevenzip,
+					gz, rar, zip);
+			}
+
 			// Create a DAT from a directory or set of directories
-			if (datFromDir)
+			else if (datFromDir)
 			{
 				InitDatFromDir(inputs,
 					filename,
@@ -841,6 +978,13 @@ namespace SabreTools
 				InitHeaderer(inputs, restore, outDir);
 			}
 
+			// If we're using the sorter
+			else if (sort)
+			{
+				InitSortVerify(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, toFolder,
+						verify, delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, header);
+			}
+
 			// Split a DAT by extension
 			else if (splitByExt)
 			{
@@ -853,16 +997,16 @@ namespace SabreTools
 				InitHashSplit(inputs, outDir);
 			}
 
-			// Get statistics on input files
-			else if (stats)
-			{
-				InitStats(inputs, filename, single, showBaddumpColumn, showNodumpColumn, statOutputFormat);
-			}
-
 			// Split a DAT by item type
 			else if (splitByType)
 			{
 				InitTypeSplit(inputs, outDir);
+			}
+
+			// Get statistics on input files
+			else if (stats)
+			{
+				InitStats(inputs, filename, single, showBaddumpColumn, showNodumpColumn, statOutputFormat);
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
@@ -872,6 +1016,13 @@ namespace SabreTools
 					superdat, forcemerge, forcend, forcepack, excludeOf, outputFormat, usegame, prefix,
 					postfix, quotes, repext, addext, remext, datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName, gamename, romname,
 					romtype, sgt, slt, seq, crc, md5, sha1, status, trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
+			}
+
+			// If we're using the verifier
+			else if (verify)
+			{
+				InitSortVerify(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, toFolder,
+						verify, delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, header);
 			}
 
 			// If nothing is set, show the help

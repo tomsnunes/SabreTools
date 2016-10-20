@@ -42,18 +42,18 @@ namespace SabreTools
 
 			// Feature flags
 			bool help = false,
-				simpleSort = true;
+				convert = false,
+				sort = true,
+				verify = false;
 
 			// User flags
-			bool convert = false,
-				date = false,
+			bool date = false,
 				delete = false,
 				quickScan = false,
 				romba = false,
 				toFolder = false,
 				tgz = false,
-				updateDat = false,
-				verify = false;
+				updateDat = false;
 
 			// User inputs
 			int sevenzip = 0,
@@ -63,8 +63,8 @@ namespace SabreTools
 			string header = "",
 				outDir = "",
 				tempDir = "";
-			List<string> inputs = new List<string>();
 			List<string> datfiles = new List<string>();
+			List<string> inputs = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
 			for (int i = 0; i < args.Length; i++)
@@ -77,19 +77,23 @@ namespace SabreTools
 					case "--help":
 						help = true;
 						break;
+					case "-c":
+					case "--convert":
+						convert = true;
+						break;
 					case "-ss":
 					case "--sort":
-						simpleSort = true;
+						sort = true;
+						break;
+					case "-v":
+					case "--verify":
+						verify = true;
 						break;
 
 					// User flags
 					case "-ad":
 					case "--add-date":
 						date = true;
-						break;
-					case "-c":
-					case "--convert":
-						convert = true;
 						break;
 					case "-d":
 					case "--delete":
@@ -114,10 +118,6 @@ namespace SabreTools
 					case "-ud":
 					case "--updated-dat":
 						updateDat = true;
-						break;
-					case "-v":
-					case "--verify":
-						verify = true;
 						break;
 
 					// User inputs
@@ -292,7 +292,7 @@ namespace SabreTools
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && ((simpleSort && !verify) || convert))
+			if (inputs.Count == 0 && ((sort && !verify) || convert))
 			{
 				logger.Error("This feature requires at least one input");
 				Build.Help();
@@ -308,7 +308,7 @@ namespace SabreTools
 			}
 
 			// If we are doing a simple sort
-			else if (simpleSort)
+			else if (sort)
 			{
 				if (datfiles.Count > 0)
 				{
