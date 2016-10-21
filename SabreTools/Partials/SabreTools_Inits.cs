@@ -323,9 +323,7 @@ namespace SabreTools
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, date,
-				toFolder, delete, tgz, romba, asl, updateDat, headerToCheckAgainst, _logger);
-			ss.RebuildToOutput();
+			FileTools.RebuildToOutput(datdata, inputs, outDir, tempDir, quickScan, date, toFolder, delete, tgz, romba, asl, updateDat, headerToCheckAgainst, 4, _logger);
 		}
 
 		/// <summary>
