@@ -11,7 +11,7 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// Include character normalization and replacement mappings
 	/// </summary>
-	public class Style
+	public static class Style
 	{
 		#region WoD-based String Cleaning
 

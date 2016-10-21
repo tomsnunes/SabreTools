@@ -11,7 +11,7 @@ using System.Xml.Schema;
 
 namespace SabreTools.Helper
 {
-	public class FileTools
+	public static class FileTools
 	{
 		#region File Information
 

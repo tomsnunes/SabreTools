@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace SabreTools.Helper
 {
-	public class ArchiveTools
+	public static class ArchiveTools
 	{
 		private const int _bufferSize = 4096 * 128;
 

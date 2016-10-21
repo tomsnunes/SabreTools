@@ -7,7 +7,7 @@ namespace SabreTools.Helper
 	/// <summary>
 	/// All general database operations
 	/// </summary>
-	public class DatabaseTools
+	public static class DatabaseTools
 	{
 		/// <summary>
 		/// Add a header to the database

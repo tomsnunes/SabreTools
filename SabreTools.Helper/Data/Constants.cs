@@ -2,7 +2,7 @@
 
 namespace SabreTools.Helper
 {
-	public class Constants
+	public static class Constants
 	{
 		/// <summary>
 		/// The current toolset version to be used by all child applications

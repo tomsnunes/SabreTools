@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace SabreTools.Helper
 {
-	public class Build
+	public static class Build
 	{
 		/// <summary>
 		/// Returns true if running in a Mono environment
@@ -388,6 +388,9 @@ namespace SabreTools.Helper
 			Pause();
 		}
 
+		/// <summary>
+		/// Display the credits for the program
+		/// </summary>
 		public static void Credits()
 		{
 			Console.WriteLine(@"-----------------------------------------
@@ -402,6 +405,9 @@ Based on work by:	The Wizard of DATz");
 			Pause();
 		}
 
+		/// <summary>
+		/// Pause on console output
+		/// </summary>
 		private static void Pause()
 		{
 			if (!Console.IsOutputRedirected)
