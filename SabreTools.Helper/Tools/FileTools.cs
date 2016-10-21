@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Xml;
 using System.Xml.Schema;
@@ -455,6 +454,169 @@ namespace SabreTools.Helper
 		#endregion
 
 		#region Rebuilding and Verifying
+
+		/// <summary>
+		/// Process inputs and convert to TorrentZip or TorrentGZ, optionally converting to Romba format
+		/// </summary>
+		/// <param name="datFile">DatFile to use as a filter in conversion, null otherwise</param>
+		/// <param name="inputs">List of inputs to convert over to TorrentZip or TorrentGZ</param>
+		/// <param name="outDir">Output folder to rebuild to, blank is the current directory</param>
+		/// <param name="tempDir">Temporary directory to use in file extraction</param>
+		/// <param name="tgz">True if files should be output in TorrentGZ format, false for TorrentZip</param>
+		/// <param name="romba">True if TorrentGZ files should be output in romba depot format, false otherwise</param>
+		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="archiveScanLevel">ArchiveScanLevel representing how files should be treated</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if processing was a success, false otherwise</returns>
+		public static bool ConvertFiles(DatFile datFile, List<string> inputs, string outDir, string tempDir, bool tgz,
+			bool romba, bool delete, ArchiveScanLevel archiveScanLevel, Logger logger)
+		{
+			bool success = true;
+
+			// First, check that the output directory exists
+			if (!Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir);
+				outDir = Path.GetFullPath(outDir);
+			}
+
+			// Then create or clean the temp directory
+			if (!Directory.Exists(tempDir))
+			{
+				Directory.CreateDirectory(tempDir);
+			}
+			else
+			{
+				CleanDirectory(tempDir);
+			}
+
+			// Now process all of the inputs
+			foreach (string input in inputs)
+			{
+				logger.User("Examining file " + input);
+
+				// Get if the file should be scanned internally and externally
+				bool shouldExternalProcess, shouldInternalProcess;
+				ArchiveTools.GetInternalExternalProcess(input, archiveScanLevel, logger, out shouldExternalProcess, out shouldInternalProcess);
+
+				// Do an external scan of the file, if necessary
+				if (shouldExternalProcess)
+				{
+					// If a DAT is defined, we want to make sure that this file is not in there
+					Rom rom = FileTools.GetFileInfo(input, logger);
+					if (datFile != null && datFile.Files.Count > 0)
+					{
+						if (rom.HasDuplicates(datFile, logger))
+						{
+							logger.User("File '" + input + "' existed in the DAT, skipping...");
+							continue;
+						}
+					}
+
+					logger.User("Processing file " + input);
+
+					if (tgz)
+					{
+						success &= ArchiveTools.WriteTorrentGZ(input, outDir, romba, logger);
+					}
+					else
+					{
+						success &= ArchiveTools.WriteToArchive(input, outDir, rom, logger);
+					}
+				}
+
+				// Process the file as an archive, if necessary
+				if (shouldInternalProcess)
+				{
+					// Now, if the file is a supported archive type, also run on all files within
+					bool encounteredErrors = ArchiveTools.ExtractArchive(input, tempDir, archiveScanLevel, logger);
+
+					// If no errors were encountered, we loop through the temp directory
+					if (!encounteredErrors)
+					{
+						logger.Verbose("Archive found! Successfully extracted");
+						foreach (string file in Directory.EnumerateFiles(tempDir, "*", SearchOption.AllDirectories))
+						{
+							// If a DAT is defined, we want to make sure that this file is not in there
+							Rom rom = FileTools.GetFileInfo(file, logger);
+							if (datFile != null && datFile.Files.Count > 0)
+							{
+								if (rom.HasDuplicates(datFile, logger))
+								{
+									logger.User("File '" + file + "' existed in the DAT, skipping...");
+									continue;
+								}
+							}
+
+							logger.User("Processing file " + input);
+
+							if (tgz)
+							{
+								success &= ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
+							}
+							else
+							{
+								success &= ArchiveTools.WriteToArchive(file, outDir, rom, logger);
+							}
+						}
+
+						FileTools.CleanDirectory(tempDir);
+					}
+				}
+
+				// Delete the source file if we're supposed to
+				if (delete)
+				{
+					try
+					{
+						logger.User("Attempting to delete " + input);
+						File.Delete(input);
+					}
+					catch (Exception ex)
+					{
+						logger.Error(ex.ToString());
+						success &= false;
+					}
+				}
+			}
+
+			// Now one final delete of the temp directory
+			while (Directory.Exists(tempDir))
+			{
+				try
+				{
+					Directory.Delete(tempDir, true);
+				}
+				catch
+				{
+					continue;
+				}
+			}
+
+			// If we're in romba mode and the size file doesn't exist, create it
+			if (romba && !File.Exists(Path.Combine(outDir, ".romba_size")))
+			{
+				// Get the size of all of the files in the output folder
+				long size = 0;
+				foreach (string file in Directory.EnumerateFiles(outDir, "*", SearchOption.AllDirectories))
+				{
+					FileInfo tempinfo = new FileInfo(file);
+					size += tempinfo.Length;
+				}
+
+				// Write out the value to each of the romba depot files
+				StreamWriter tw = new StreamWriter(File.Open(Path.Combine(outDir, ".romba_size"), FileMode.Create, FileAccess.Write));
+				StreamWriter twb = new StreamWriter(File.Open(Path.Combine(outDir, ".romba_size.backup"), FileMode.Create, FileAccess.Write));
+
+				tw.Write(size);
+				twb.Write(size);
+
+				tw.Dispose();
+				twb.Dispose();
+			}
+
+			return success;
+		}
 
 		/// <summary>
 		/// Process the DAT and verify the output directory

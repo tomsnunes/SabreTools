@@ -386,9 +386,7 @@ namespace SabreTools
 			}
 			logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			SimpleSort ss = new SimpleSort(datdata, newinputs, outDir, tempDir, false, false,
-				false, delete, tgz, romba, asl, false, null, logger);
-			return ss.Convert();
+			return FileTools.ConvertFiles(datdata, inputs, outDir, tempDir, tgz, romba, delete, asl, logger);
 		}
 
 		/// <summary>

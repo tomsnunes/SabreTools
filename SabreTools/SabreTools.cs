@@ -939,8 +939,7 @@ namespace SabreTools
 			// Convert a folder to TGZ or TorrentZip
 			if (convert)
 			{
-				InitConvertFolder(datfiles, inputs, outDir, tempDir, delete, tgz, romba, sevenzip,
-					gz, rar, zip);
+				InitConvertFolder(datfiles, inputs, outDir, tempDir, delete, tgz, romba, sevenzip, gz, rar, zip);
 			}
 
 			// Create a DAT from a directory or set of directories
