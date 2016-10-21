@@ -981,7 +981,7 @@ namespace SabreTools
 			else if (sort)
 			{
 				InitSort(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, toFolder,
-						delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, header);
+						delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, header, maxParallelism);
 			}
 
 			// Split a DAT by extension

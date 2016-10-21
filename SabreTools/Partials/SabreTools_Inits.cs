@@ -306,8 +306,10 @@ namespace SabreTools
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
-			bool toFolder, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst)
+			bool toFolder, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst,
+			int maxDegreeOfParallelism)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
@@ -323,7 +325,8 @@ namespace SabreTools
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			FileTools.RebuildToOutput(datdata, inputs, outDir, tempDir, quickScan, date, toFolder, delete, tgz, romba, asl, updateDat, headerToCheckAgainst, 4, _logger);
+			FileTools.RebuildToOutput(datdata, inputs, outDir, tempDir, quickScan, date, toFolder, delete, tgz, romba, asl,
+				updateDat, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
 		}
 
 		/// <summary>

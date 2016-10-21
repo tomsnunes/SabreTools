@@ -192,6 +192,7 @@ namespace SabreTools.Helper
 						helptext.Add("	-rar={2}		Set scanning level for RAR archives");
 						helptext.Add("	-zip={0}		Set scanning level for ZIP archives");
 						helptext.Add("	-ud, --update-dat	Output updated DAT");
+						helptext.Add("	-mt={4}			Amount of threads to use (-1 unlimted)");
 
 					// Stats
 					helptext.Add("  -st, --stats		Get statistics on all input DATs");
@@ -305,6 +306,7 @@ namespace SabreTools.Helper
 							helptext.Add("		Supported values are:");
 							helptext.Add("		  None, Good, BadDump, Nodump, Verified, NotNodump");
 						helptext.Add("	-out=			Output directory (overridden by --inplace)");
+						helptext.Add("	-mt={4}			Amount of threads to use (-1 unlimted)");
 
 					// Verify
 					helptext.Add("  -ve, --verify		Verify a folder against DATs");
@@ -329,7 +331,7 @@ namespace SabreTools.Helper
 					helptext.Add("Filter parameters for size can use postfixes for inputs:");
 					helptext.Add("    e.g. 8kb => 8000 or 8kib => 8192");
 					break;
-				case "SimpleSortApp":
+				case "SimpleSort":
 					helptext.Add(Resources.Resources.SimpleSort_Name + " - " + Resources.Resources.SimpleSort_Desc);
 					helptext.Add(barrier);
 					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.SimpleSort_Name + " [options] [filename|dirname] ...");

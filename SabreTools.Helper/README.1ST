@@ -458,6 +458,12 @@ Options:
 				0	Hash both archive and its contents
 				1	Only hash contents of the archive
 				2	Only hash archive itself (treat like a regular file)
+				
+		-mt={4}			Amount of threads to use
+			Optionally, set the number of threads to use for the multithreaded operations.
+			The default is 4 threads; -1 means unlimited threads created. If the user specifies
+			that only 1 thread is to be used, it defaults to the original, serial implementation
+			of the DFD code.
 			
 	-ud, --update-dat	Output updated DAT (rebuild only)
 		Once the files that were able to rebuilt are taken care of, a DAT of the files
@@ -792,6 +798,12 @@ Options:
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If a path
 			is not defined, the application directory is used instead.
+			
+		-mt={4}			Amount of threads to use
+			Optionally, set the number of threads to use for the multithreaded operations.
+			The default is 4 threads; -1 means unlimited threads created. If the user specifies
+			that only 1 thread is to be used, it defaults to the original, serial implementation
+			of the DFD code.
 			
 	-ve, --verify		Verify a folder against an input DAT
 		When used, this will use an input DAT or set of DATs to blindly check against an input

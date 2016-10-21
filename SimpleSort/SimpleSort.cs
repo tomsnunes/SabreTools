@@ -5,7 +5,7 @@ using System.IO;
 
 namespace SabreTools
 {
-	public class SimpleSortApp
+	public class SimpleSort
 	{
 		/// <summary>
 		/// Main entry point for the program
