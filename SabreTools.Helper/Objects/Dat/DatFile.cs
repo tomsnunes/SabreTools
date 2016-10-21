@@ -3404,6 +3404,11 @@ namespace SabreTools.Helper
 								break;
 						}
 					}
+					// If we have a URL
+					else if (line.ToLowerInvariant().StartsWith("url="))
+					{
+						Url = (String.IsNullOrEmpty(Url) ? line.Split('=')[1] : Url);
+					}
 					// If we have a comment
 					else if (line.ToLowerInvariant().StartsWith("comment="))
 					{
