@@ -62,7 +62,7 @@ namespace SabreTools
 			_logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			SimpleSort ss = new SimpleSort(datdata, newinputs, outDir, tempDir, false, false,
-				false, false, delete, tgz, romba, asl, false, null, _logger);
+				false, delete, tgz, romba, asl, false, null, _logger);
 			return ss.Convert();
 		}
 
@@ -300,7 +300,6 @@ namespace SabreTools
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
-		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
 		/// <param name="tgz">True to output files in TorrentGZ format, false for TorrentZip</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
@@ -309,8 +308,8 @@ namespace SabreTools
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		private static void InitSortVerify(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
-			bool toFolder, bool verify, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst)
+		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
+			bool toFolder, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
@@ -327,8 +326,8 @@ namespace SabreTools
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			SimpleSort ss = new SimpleSort(datdata, inputs, outDir, tempDir, quickScan, date,
-				toFolder, verify, delete, tgz, romba, asl, updateDat, headerToCheckAgainst, _logger);
-			ss.StartProcessing();
+				toFolder, delete, tgz, romba, asl, updateDat, headerToCheckAgainst, _logger);
+			ss.RebuildToOutput();
 		}
 
 		/// <summary>
@@ -648,6 +647,32 @@ namespace SabreTools
 
 			userInputDat.Update(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,
 				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, maxDegreeOfParallelism, _logger);
+		}
+
+		/// <summary>
+		/// Wrap verifying files using an input DAT
+		/// </summary>
+		/// <param name="datfiles">Names of the DATs to compare against</param>
+		/// <param name="inputs">Input directories to compare against</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		private static void InitVerify(List<string> datfiles, List<string> inputs, string tempDir, string headerToCheckAgainst)
+		{
+			// Get the archive scanning level
+			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
+
+			DateTime start = DateTime.Now;
+			_logger.User("Populating internal DAT...");
+
+			// Add all of the input DATs into one huge internal DAT
+			DatFile datdata = new DatFile();
+			foreach (string datfile in datfiles)
+			{
+				datdata.Parse(datfile, 99, 99, _logger, keep: true, softlist: true);
+			}
+			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			FileTools.VerifyDirectory(datdata, inputs, tempDir, headerToCheckAgainst, _logger);
 		}
 
 		#endregion

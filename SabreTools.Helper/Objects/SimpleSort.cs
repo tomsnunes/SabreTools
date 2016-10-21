@@ -16,7 +16,6 @@ namespace SabreTools.Helper
 		private bool _quickScan;
 		private bool _date;
 		private bool _toFolder;
-		private bool _verify;
 		private bool _delete;
 		private bool _tgz;
 		private bool _romba;
@@ -41,7 +40,6 @@ namespace SabreTools.Helper
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
 		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
-		/// <param name="verify">True if output directory should be checked instead of rebuilt to, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
 		/// <param name="tgz">True if output files should be written to TorrentGZ instead of TorrentZip</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
@@ -50,7 +48,7 @@ namespace SabreTools.Helper
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		public SimpleSort(DatFile datdata, List<string> inputs, string outDir, string tempDir,
-			bool quickScan, bool date, bool toFolder, bool verify, bool delete, bool tgz, bool romba,
+			bool quickScan, bool date, bool toFolder, bool delete, bool tgz, bool romba,
 			ArchiveScanLevel archiveScanLevel, bool updateDat, string headerToCheckAgainst, Logger logger)
 		{
 			_datdata = datdata;
@@ -60,7 +58,6 @@ namespace SabreTools.Helper
 			_quickScan = quickScan;
 			_date = date;
 			_toFolder = toFolder;
-			_verify = verify;
 			_delete = delete;
 			_tgz = tgz;
 			_romba = romba;
@@ -78,10 +75,21 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Pick the appropriate action based on the inputs
+		/// Process the DAT and find all matches in input files and folders
 		/// </summary>
-		/// <returns>True if success, false otherwise</returns>
-		public bool StartProcessing()
+		/// <returns>True if rebuilding was a success, false otherwise</returns>
+		/// <remarks>
+		/// This currently processes files as follows:
+		/// 1) Get all file names from the input files/folders
+		/// 2) Loop through and process each file individually
+		///		a) Hash the file
+		///		b) Check against the DAT for duplicates
+		///		c) Check for headers
+		///		d) Check headerless rom for duplicates
+		/// 
+		/// This is actually rather slow and inefficient. See below for more correct implemenation
+		/// </remarks>
+		public bool RebuildToOutput()
 		{
 			// First, check that the output directory exists
 			if (!Directory.Exists(_outDir))
@@ -100,108 +108,6 @@ namespace SabreTools.Helper
 				FileTools.CleanDirectory(_tempDir);
 			}
 
-			if (_verify)
-			{
-				return VerifyDirectory();
-			}
-			else
-			{
-				return RebuildToOutput();
-			}
-		}
-
-		/// <summary>
-		/// Process the DAT and verify the output directory
-		/// </summary>
-		/// <returns>True if verification was a success, false otherwise</returns>
-		private bool VerifyDirectory()
-		{
-			bool success = true;
-
-			// Enumerate all files from the output directory
-			List<string> files = new List<string>();
-			foreach (string file in Directory.EnumerateFiles(_outDir, "*", SearchOption.AllDirectories))
-			{
-				_logger.Verbose("File found: '" + file + "'");
-				files.Add(Path.GetFullPath(file));
-			}
-
-			/*
-			We want the cross section of what's the folder and what's in the DAT. Right now, it just has what's in the DAT that's not in the folder
-			*/
-
-			// Then, loop through and check each of the inputs
-			_logger.User("Processing files:\n");
-			foreach (string input in _inputs)
-			{
-				_datdata.PopulateDatFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
-					true /* enableGzip */, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */,
-					_headerToCheckAgainst, 4 /* maxDegreeOfParallelism */, _logger);
-			}
-
-			// Setup the fixdat
-			_matched = (DatFile)_datdata.CloneHeader();
-			_matched.Files = new SortedDictionary<string, List<DatItem>>();
-			_matched.FileName = "fixDat_" + _matched.FileName;
-			_matched.Name = "fixDat_" + _matched.Name;
-			_matched.Description = "fixDat_" + _matched.Description;
-			_matched.OutputFormat = OutputFormat.Logiqx;
-
-			// Now that all files are parsed, get only files found in directory
-			bool found = false;
-			foreach (List<DatItem> roms in _datdata.Files.Values)
-			{
-				List<DatItem> newroms = DatItem.Merge(roms, _logger);
-				foreach (Rom rom in newroms)
-				{
-					if (rom.SourceID == 99)
-					{
-						found = true;
-						string key = rom.Size + "-" + rom.CRC;
-						if (_matched.Files.ContainsKey(key))
-						{
-							_matched.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							_matched.Files.Add(key, temp);
-						}
-					}
-				}
-			}
-
-			// Now output the fixdat to the main folder
-			if (found)
-			{
-				_matched.WriteToFile("", _logger, stats: true);
-			}
-			else
-			{
-				_logger.User("No fixDat needed");
-			}
-
-			return success;
-		}
-
-		/// <summary>
-		/// Process the DAT and find all matches in input files and folders
-		/// </summary>
-		/// <returns>True if rebuilding was a success, false otherwise</returns>
-		/// <remarks>
-		/// This currently processes files as follows:
-		/// 1) Get all file names from the input files/folders
-		/// 2) Loop through and process each file individually
-		///		a) Hash the file
-		///		b) Check against the DAT for duplicates
-		///		c) Check for headers
-		///		d) Check headerless rom for duplicates
-		/// 
-		/// This is actually rather slow and inefficient. See below for more correct implemenation
-		/// </remarks>
-		private bool RebuildToOutput()
-		{
 			bool success = true;
 
 			_logger.User("Retrieving list all files from input");
@@ -636,8 +542,25 @@ namespace SabreTools.Helper
 		/// 4) Order by output game
 		/// 5) Rebuild all files
 		/// </remarks>
-		private bool RebuiltToOutputAlternate()
+		public bool RebuiltToOutputAlternate()
 		{
+			// First, check that the output directory exists
+			if (!Directory.Exists(_outDir))
+			{
+				Directory.CreateDirectory(_outDir);
+				_outDir = Path.GetFullPath(_outDir);
+			}
+
+			// Then create or clean the temp directory
+			if (!Directory.Exists(_tempDir))
+			{
+				Directory.CreateDirectory(_tempDir);
+			}
+			else
+			{
+				FileTools.CleanDirectory(_tempDir);
+			}
+
 			bool success = true;
 
 			#region Find all files

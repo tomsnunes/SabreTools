@@ -981,8 +981,8 @@ namespace SabreTools
 			// If we're using the sorter
 			else if (sort)
 			{
-				InitSortVerify(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, toFolder,
-						verify, delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, header);
+				InitSort(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, toFolder,
+						delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, header);
 			}
 
 			// Split a DAT by extension
@@ -1021,8 +1021,7 @@ namespace SabreTools
 			// If we're using the verifier
 			else if (verify)
 			{
-				InitSortVerify(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, toFolder,
-						verify, delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, header);
+				InitVerify(datfiles, inputs, tempDir, header);
 			}
 
 			// If nothing is set, show the help

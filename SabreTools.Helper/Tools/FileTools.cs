@@ -454,6 +454,92 @@ namespace SabreTools.Helper
 
 		#endregion
 
+		#region Rebuilding and Verifying
+
+		/// <summary>
+		/// Process the DAT and verify the output directory
+		/// </summary>
+		/// <param name="datFile">DAT to use to verify the directory</param>
+		/// <param name="inputs">List of input directories to compare against</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if verification was a success, false otherwise</returns>
+		public static bool VerifyDirectory(DatFile datFile, List<string> inputs, string tempDir, string headerToCheckAgainst, Logger logger)
+		{
+			// First create or clean the temp directory
+			if (!Directory.Exists(tempDir))
+			{
+				Directory.CreateDirectory(tempDir);
+			}
+			else
+			{
+				CleanDirectory(tempDir);
+			}
+
+			bool success = true;
+
+			/*
+			We want the cross section of what's the folder and what's in the DAT. Right now, it just has what's in the DAT that's not in the folder
+			*/
+
+			// Then, loop through and check each of the inputs
+			logger.User("Processing files:\n");
+			foreach (string input in inputs)
+			{
+				datFile.PopulateDatFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
+					true /* enableGzip */, false /* addBlanks */, false /* addDate */, tempDir /* tempDir */, false /* copyFiles */,
+					headerToCheckAgainst, 4 /* maxDegreeOfParallelism */, logger);
+			}
+
+			// Setup the fixdat
+			DatFile matched = (DatFile)datFile.CloneHeader();
+			matched.Files = new SortedDictionary<string, List<DatItem>>();
+			matched.FileName = "fixDat_" + matched.FileName;
+			matched.Name = "fixDat_" + matched.Name;
+			matched.Description = "fixDat_" + matched.Description;
+			matched.OutputFormat = OutputFormat.Logiqx;
+
+			// Now that all files are parsed, get only files found in directory
+			bool found = false;
+			foreach (List<DatItem> roms in datFile.Files.Values)
+			{
+				List<DatItem> newroms = DatItem.Merge(roms, logger);
+				foreach (Rom rom in newroms)
+				{
+					if (rom.SourceID == 99)
+					{
+						found = true;
+						string key = rom.Size + "-" + rom.CRC;
+						if (matched.Files.ContainsKey(key))
+						{
+							matched.Files[key].Add(rom);
+						}
+						else
+						{
+							List<DatItem> temp = new List<DatItem>();
+							temp.Add(rom);
+							matched.Files.Add(key, temp);
+						}
+					}
+				}
+			}
+
+			// Now output the fixdat to the main folder
+			if (found)
+			{
+				matched.WriteToFile("", logger, stats: true);
+			}
+			else
+			{
+				logger.User("No fixDat needed");
+			}
+
+			return success;
+		}
+
+		#endregion
+
 		#region Stream Information
 
 		/// <summary>
