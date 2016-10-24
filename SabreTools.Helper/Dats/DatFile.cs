@@ -5188,72 +5188,80 @@ namespace SabreTools.Helper.Dats
 				Description = Name + (bare ? "" : " (" + Date + ")");
 			}
 
-			// Process the input folder
-			logger.Verbose("Folder found: " + basePath);
-
-			// Process the files in all subfolders
-			List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.AllDirectories).ToList();
-			Parallel.ForEach(files,
-				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-				item =>
-				{
-					DFDProcessPossibleArchive(item, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
-						tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
-				});
-
-			// Now find all folders that are empty, if we are supposed to
-			if (!Romba && addBlanks)
+			// Process the input
+			if (Directory.Exists(basePath))
 			{
-				List<string> empties = Directory.EnumerateDirectories(basePath, "*", SearchOption.AllDirectories).ToList();
-				Parallel.ForEach(empties,
+				logger.Verbose("Folder found: " + basePath);
+
+				// Process the files in all subfolders
+				List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.AllDirectories).ToList();
+				Parallel.ForEach(files,
 					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-					dir =>
+					item =>
 					{
-						if (Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).Count() == 0)
+						DFDProcessPossibleArchive(item, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+							tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+					});
+
+				// Now find all folders that are empty, if we are supposed to
+				if (!Romba && addBlanks)
+				{
+					List<string> empties = Directory.EnumerateDirectories(basePath, "*", SearchOption.AllDirectories).ToList();
+					Parallel.ForEach(empties,
+						new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+						dir =>
 						{
+							if (Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).Count() == 0)
+							{
 							// Get the full path for the directory
 							string fulldir = Path.GetFullPath(dir);
 
 							// Set the temporary variables
 							string gamename = "";
-							string romname = "";
+								string romname = "";
 
 							// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
 							if (Type == "SuperDAT")
-							{
-								gamename = fulldir.Remove(0, basePath.Length + 1);
-								romname = "-";
-							}
+								{
+									gamename = fulldir.Remove(0, basePath.Length + 1);
+									romname = "-";
+								}
 
 							// Otherwise, we want just the top level folder as the game, and the file as everything else
 							else
-							{
-								gamename = fulldir.Remove(0, basePath.Length + 1).Split(Path.DirectorySeparatorChar)[0];
-								romname = Path.Combine(fulldir.Remove(0, basePath.Length + 1 + gamename.Length), "-");
-							}
+								{
+									gamename = fulldir.Remove(0, basePath.Length + 1).Split(Path.DirectorySeparatorChar)[0];
+									romname = Path.Combine(fulldir.Remove(0, basePath.Length + 1 + gamename.Length), "-");
+								}
 
 							// Sanitize the names
 							if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								gamename = gamename.Substring(1);
-							}
-							if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								gamename = gamename.Substring(0, gamename.Length - 1);
-							}
-							if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								romname = romname.Substring(1);
-							}
-							if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								romname = romname.Substring(0, romname.Length - 1);
-							}
+								{
+									gamename = gamename.Substring(1);
+								}
+								if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
+								{
+									gamename = gamename.Substring(0, gamename.Length - 1);
+								}
+								if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
+								{
+									romname = romname.Substring(1);
+								}
+								if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
+								{
+									romname = romname.Substring(0, romname.Length - 1);
+								}
 
-							logger.Verbose("Adding blank empty folder: " + gamename);
-							Files["null"].Add(new Rom(romname, gamename));
-						}
-					});
+								logger.Verbose("Adding blank empty folder: " + gamename);
+								Files["null"].Add(new Rom(romname, gamename));
+							}
+						});
+				}
+			}
+			else if (File.Exists(basePath))
+			{
+				DFDProcessPossibleArchive(basePath, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+					tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 			}
 
 			// Now that we're done, delete the temp folder (if it's not the default)
@@ -5545,8 +5553,19 @@ namespace SabreTools.Helper.Dats
 
 				// Update rom information
 				datItem.Name = romname;
-				datItem.Machine.Name = gamename;
-				datItem.Machine.Description = gamename;
+				if (datItem.Machine == null)
+				{
+					datItem.Machine = new Machine
+					{
+						Name = gamename,
+						Description = gamename,
+					};
+				}
+				else
+				{
+					datItem.Machine.Name = gamename;
+					datItem.Machine.Description = gamename;
+				}
 
 				// Add the file information to the DAT
 				lock (Files)

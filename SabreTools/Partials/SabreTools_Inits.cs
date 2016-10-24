@@ -158,7 +158,7 @@ namespace SabreTools
 			// For each input directory, create a DAT
 			foreach (string path in inputs)
 			{
-				if (Directory.Exists(path))
+				if (Directory.Exists(path) || File.Exists(path))
 				{
 					// Clone the base Dat for information
 					DatFile datdata = (DatFile)basedat.Clone();
