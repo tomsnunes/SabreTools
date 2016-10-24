@@ -50,22 +50,6 @@ namespace SabreTools.Helper.Dats
 			_itemStatus = ItemStatus.None;
 		}
 
-		/// <summary>
-		/// Create a new Disk object with the included information
-		/// </summary>
-		/// <param name="name">Name of the item, including extension</param>
-		/// <param name="md5">String representation of the MD5</param>
-		/// <param name="sha1">String representation of the SHA-1</param>
-		/// <param name="itemStatus">Status of the current item</param>
-		public Disk(string name, string md5, string sha1, ItemStatus itemStatus)
-		{
-			_name = name;
-			_itemType = ItemType.Disk;
-			_md5 = md5?.ToLowerInvariant();
-			_sha1 = sha1?.ToLowerInvariant();
-			_itemStatus = itemStatus;
-		}
-
 		#endregion
 
 		#region Comparision Methods

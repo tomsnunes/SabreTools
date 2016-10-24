@@ -55,24 +55,6 @@ namespace SabreTools.Helper.Dats
 			_default = null;
 		}
 
-		/// <summary>
-		/// Create a new Release object with the included information
-		/// </summary>
-		/// <param name="name">Name of the item, including extension</param>
-		/// <param name="region">Region of the item</param>
-		/// <param name="language">Language of the item</param>
-		/// <param name="date">String representation of the Date</param>
-		/// <param name="default">True if this is the default BIOS, false if it is not, null for undefined</param>
-		public Release(string name, string region, string language, string date, bool? @default)
-		{
-			_name = name;
-			_itemType = ItemType.Release;
-			_region = region;
-			_language = language;
-			_date = date;
-			_default = @default;
-		}
-
 		#endregion
 
 		#region Comparision Methods

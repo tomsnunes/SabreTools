@@ -39,20 +39,6 @@ namespace SabreTools.Helper.Dats
 			_itemType = ItemType.BiosSet;
 		}
 
-		/// <summary>
-		/// Create a new Sample object with the included information
-		/// </summary>
-		/// <param name="name">Name of the item, including extension</param>
-		/// <param name="description">Description of the Bios set item</param>
-		/// <param name="default">True if this is the default BIOS, false if it is not, null for undefined</param>
-		public BiosSet(string name, string description, bool? @default)
-		{
-			_name = name;
-			_itemType = ItemType.BiosSet;
-			_description = description;
-			_default = @default;
-		}
-
 		#endregion
 
 		#region Comparision Methods

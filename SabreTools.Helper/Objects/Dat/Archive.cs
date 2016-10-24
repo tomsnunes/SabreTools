@@ -17,16 +17,6 @@ namespace SabreTools.Helper.Dats
 			_itemType = ItemType.Archive;
 		}
 
-		/// <summary>
-		/// Create a new Archive object with the included information
-		/// </summary>
-		/// <param name="name">Name of the item, including extension</param>
-		public Archive(string name)
-		{
-			_name = name;
-			_itemType = ItemType.Archive;
-		}
-
 		#endregion
 
 		#region Comparision Methods

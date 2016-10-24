@@ -55,36 +55,21 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="name"></param>
 		/// <param name="machineName"></param>
-		public Rom(string name, string machineName) :
-			this(name, -1, "null", "null", "null", ItemStatus.None, null)
+		public Rom(string name, string machineName)
 		{
+			_name = name;
+			_itemType = ItemType.Rom;
+			_size = -1;
+			_crc = "null";
+			_md5 = "null";
+			_sha1 = "null";
+			_itemStatus = ItemStatus.None;
+
 			_machine = new Machine
 			{
 				Name = machineName,
 				Description = machineName,
 			};
-		}
-
-		/// <summary>
-		/// Create a new Rom object with the included information
-		/// </summary>
-		/// <param name="name">Name of the item, including extension</param>
-		/// <param name="size">Long size of the item</param>
-		/// <param name="crc">String representation of the CRC</param>
-		/// <param name="md5">String representation of the MD5</param>
-		/// <param name="sha1">String representation of the SHA-1</param>
-		/// <param name="itemStatus">Status of the current item</param>
-		/// <param name="date">String representation of the Date</param>
-		public Rom(string name, long size, string crc, string md5, string sha1, ItemStatus itemStatus, string date)
-		{
-			_name = name;
-			_itemType = ItemType.Rom;
-			_size = size;
-			_crc = crc?.ToLowerInvariant();
-			_md5 = md5?.ToLowerInvariant();
-			_sha1 = sha1?.ToLowerInvariant();
-			_itemStatus = itemStatus;
-			_date = date;
 		}
 
 		#endregion

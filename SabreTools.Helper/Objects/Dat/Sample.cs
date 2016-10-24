@@ -17,16 +17,6 @@ namespace SabreTools.Helper.Dats
 			_itemType = ItemType.Sample;
 		}
 
-		/// <summary>
-		/// Create a new Sample object with the included information
-		/// </summary>
-		/// <param name="name">Name of the item, including extension</param>
-		public Sample(string name)
-		{
-			_name = name;
-			_itemType = ItemType.Sample;
-		}
-
 		#endregion
 
 		#region Comparision Methods
