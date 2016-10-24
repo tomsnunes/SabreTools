@@ -9,7 +9,6 @@ using NaturalSort;
 
 namespace SabreTools.Helper.Dats
 {
-	[Serializable]
 	public abstract class DatItem : IEquatable<DatItem>, IComparable<DatItem>
 	{
 		#region Protected instance variables

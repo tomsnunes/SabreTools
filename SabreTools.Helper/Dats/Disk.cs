@@ -4,7 +4,6 @@ using SabreTools.Helper.Data;
 
 namespace SabreTools.Helper.Dats
 {
-	[Serializable]
 	public class Disk : DatItem
 	{
 		#region Private instance variables

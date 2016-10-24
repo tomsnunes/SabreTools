@@ -1,10 +1,7 @@
-﻿using System;
-
-using SabreTools.Helper.Data;
+﻿using SabreTools.Helper.Data;
 
 namespace SabreTools.Helper.Dats
 {
-	[Serializable]
 	public class BiosSet : DatItem
 	{
 		#region Private instance variables

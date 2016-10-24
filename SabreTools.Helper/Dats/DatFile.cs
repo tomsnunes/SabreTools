@@ -16,7 +16,6 @@ using SharpCompress.Common;
 
 namespace SabreTools.Helper.Dats
 {
-	[Serializable]
 	public class DatFile : ICloneable
 	{
 		#region Private instance variables
