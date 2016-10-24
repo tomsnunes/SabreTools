@@ -6533,14 +6533,14 @@ namespace SabreTools.Helper.Dats
 					dirNodump = 0;
 				}
 
-				logger.Verbose("Beginning stat collection for '" + filename + "'", false);
+				logger.Verbose("Beginning stat collection for '" + filename.Item1 + "'", false);
 				List<string> games = new List<string>();
 				DatFile datdata = new DatFile();
 				datdata.Parse(filename.Item1, 0, 0, logger);
 				datdata.BucketByGame(false, true, logger, false);
 
 				// Output single DAT stats (if asked)
-				logger.User("Adding stats for file '" + filename + "'\n", false);
+				logger.User("Adding stats for file '" + filename.Item1 + "'\n", false);
 				if (single)
 				{
 					datdata.OutputStats(sw, statOutputFormat, logger, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
