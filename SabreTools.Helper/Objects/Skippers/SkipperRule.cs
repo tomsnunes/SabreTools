@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using SabreTools.Helper.Data;
 
-namespace SabreTools.Helper
+namespace SabreTools.Helper.Skippers
 {
 	public class SkipperRule
 	{

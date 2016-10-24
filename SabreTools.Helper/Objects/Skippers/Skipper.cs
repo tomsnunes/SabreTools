@@ -6,7 +6,7 @@ using System.Xml;
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Tools;
 
-namespace SabreTools.Helper
+namespace SabreTools.Helper.Skippers
 {
 	public class Skipper
 	{
