@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mono.Data.Sqlite;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,10 +7,11 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
+
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
 using SabreTools.Helper.Skippers;
-using Mono.Data.Sqlite;
+
 using NaturalSort;
 using OCRC;
 

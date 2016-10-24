@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Tools;
+
 using NaturalSort;
 
 namespace SabreTools.Helper.Dats
