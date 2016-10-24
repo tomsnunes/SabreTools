@@ -102,20 +102,20 @@
     <Compile Include="External\Zlib\ZlibCodec.cs" />
     <Compile Include="External\Zlib\ZlibConstants.cs" />
     <Compile Include="External\Zlib\ZlibStream.cs" />
-    <Compile Include="Objects\Dats\Archive.cs" />
-    <Compile Include="Objects\Dats\BiosSet.cs" />
-    <Compile Include="Objects\Dats\DatFile.cs" />
-    <Compile Include="Objects\Dats\DatItem.cs" />
-    <Compile Include="Objects\Dats\DatItemKV.cs" />
-    <Compile Include="Objects\Dats\Disk.cs" />
-    <Compile Include="Objects\Dats\Machine.cs" />
-    <Compile Include="Objects\Dats\Release.cs" />
-    <Compile Include="Objects\Dats\Sample.cs" />
-    <Compile Include="Objects\Dats\Rom.cs" />
+    <Compile Include="Dats\Archive.cs" />
+    <Compile Include="Dats\BiosSet.cs" />
+    <Compile Include="Dats\DatFile.cs" />
+    <Compile Include="Dats\DatItem.cs" />
+    <Compile Include="Dats\DatItemKV.cs" />
+    <Compile Include="Dats\Disk.cs" />
+    <Compile Include="Dats\Machine.cs" />
+    <Compile Include="Dats\Release.cs" />
+    <Compile Include="Dats\Sample.cs" />
+    <Compile Include="Dats\Rom.cs" />
     <Compile Include="External\SupportedFiles\ZipFileEntry.cs" />
     <Compile Include="External\SupportedFiles\ZipFile.cs" />
-    <Compile Include="Objects\Skippers\Skipper.cs" />
-    <Compile Include="Objects\Skippers\SkipperRule.cs" />
+    <Compile Include="Skippers\Skipper.cs" />
+    <Compile Include="Skippers\SkipperRule.cs" />
     <Compile Include="Resources\Resources.de-DE.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -140,7 +140,7 @@
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\DatabaseTools.cs" />
     <Compile Include="Data\Enums.cs" />
-    <Compile Include="Objects\Logger.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\Style.cs" />
     <Compile Include="Data\Build.cs" />
