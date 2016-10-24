@@ -3934,7 +3934,7 @@ namespace SabreTools.Helper.Dats
 			}
 			else if (File.Exists(basePath))
 			{
-				DFDProcessPossibleArchive(basePath, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+				DFDProcessPossibleArchive(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
 					tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 			}
 
