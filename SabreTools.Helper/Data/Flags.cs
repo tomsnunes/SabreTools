@@ -1,7 +1,9 @@
 ﻿using System;
 
-namespace SabreTools.Helper
+namespace SabreTools.Helper.Data
 {
+	#region Archival
+
 	/// <summary>
 	/// Determines the level to scan archives at
 	/// </summary>
@@ -27,61 +29,6 @@ namespace SabreTools.Helper
 		ZipExternal = 0x1000,
 		ZipInternal = 0x2000,
 		ZipBoth = ZipExternal | ZipInternal,
-	}
-
-	/// <summary>
-	/// Determines which diffs should be created
-	/// </summary>
-	[Flags]
-	public enum DiffMode
-	{
-		// Standard diffs
-		Dupes = 0x01,
-		NoDupes = 0x02,
-		Individuals = 0x04,
-		All = Dupes | NoDupes | Individuals,
-
-		// Cascaded diffs
-		Cascade = 0x08,
-		ReverseCascade = 0x10,
-	}
-
-	/// <summary>
-	/// Determines which type of duplicate a file is
-	/// </summary>
-	[Flags]
-	public enum DupeType
-	{
-		// Type of match
-		Hash = 0x01,
-		All = 0x02,
-
-		// Location of match
-		Internal = 0x10,
-		External = 0x20,
-	}
-
-	/// <summary>
-	/// Determines the DAT output format
-	/// </summary>
-	[Flags]
-	public enum OutputFormat
-	{
-		Logiqx = 0x0001,
-		ClrMamePro = 0x0002,
-		RomCenter = 0x0004,
-		DOSCenter = 0x0008,
-		MissFile = 0x0010,
-		SabreDat = 0x0020,
-		RedumpMD5 = 0x0040,
-		RedumpSHA1 = 0x0080,
-		RedumpSFV = 0x0100,
-		SoftwareList = 0x0200,
-		OfflineList = 0x0400,
-		TSV = 0x0800,
-		CSV = 0x1000,
-
-		ALL = 0xFFFF,
 	}
 
 	/// <summary>
@@ -145,4 +92,69 @@ namespace SabreTools.Helper
 		TorrentZip = 0x1,
 		ExtraData = 0x2
 	}
+
+	#endregion
+
+	#region DatFile related
+
+	/// <summary>
+	/// Determines which diffs should be created
+	/// </summary>
+	[Flags]
+	public enum DiffMode
+	{
+		// Standard diffs
+		Dupes = 0x01,
+		NoDupes = 0x02,
+		Individuals = 0x04,
+		All = Dupes | NoDupes | Individuals,
+
+		// Cascaded diffs
+		Cascade = 0x08,
+		ReverseCascade = 0x10,
+	}
+
+	/// <summary>
+	/// Determines the DAT output format
+	/// </summary>
+	[Flags]
+	public enum OutputFormat
+	{
+		Logiqx = 0x0001,
+		ClrMamePro = 0x0002,
+		RomCenter = 0x0004,
+		DOSCenter = 0x0008,
+		MissFile = 0x0010,
+		SabreDat = 0x0020,
+		RedumpMD5 = 0x0040,
+		RedumpSHA1 = 0x0080,
+		RedumpSFV = 0x0100,
+		SoftwareList = 0x0200,
+		OfflineList = 0x0400,
+		TSV = 0x0800,
+		CSV = 0x1000,
+
+		ALL = 0xFFFF,
+	}
+
+	#endregion
+
+	#region DatItem related
+
+	/// <summary>
+	/// Determines which type of duplicate a file is
+	/// </summary>
+	[Flags]
+	public enum DupeType
+	{
+		// Type of match
+		Hash = 0x01,
+		All = 0x02,
+
+		// Location of match
+		Internal = 0x10,
+		External = 0x20,
+	}
+
+	#endregion
 }

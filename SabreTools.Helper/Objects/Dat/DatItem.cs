@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using SabreTools.Helper.Data;
+using SabreTools.Helper.Tools;
+using NaturalSort;
 
-namespace SabreTools.Helper
+namespace SabreTools.Helper.Dats
 {
 	[Serializable]
 	public abstract class DatItem : IEquatable<DatItem>, IComparable<DatItem>
@@ -15,18 +18,7 @@ namespace SabreTools.Helper
 		protected DupeType _dupeType;
 
 		// Machine information
-		protected string _machineName;
-		protected string _comment;
-		protected string _machineDescription;
-		protected string _year;
-		protected string _manufacturer;
-		protected string _romOf;
-		protected string _cloneOf;
-		protected string _sampleOf;
-		protected string _sourceFile;
-		protected bool _isBios;
-		protected string _board;
-		protected string _rebuildTo;
+		protected Machine _machine;
 
 		// Software list information
 		protected bool? _supported;
@@ -66,65 +58,10 @@ namespace SabreTools.Helper
 		}
 
 		// Machine information
-		public string MachineName
+		public Machine Machine
 		{
-			get { return _machineName; }
-			set { _machineName = value; }
-		}
-		public string Comment
-		{
-			get { return _comment; }
-			set { _comment = value; }
-		}
-		public string MachineDescription
-		{
-			get { return _machineDescription; }
-			set { _machineDescription = value; }
-		}
-		public string Year
-		{
-			get { return _year; }
-			set { _year = value; }
-		}
-		public string Manufacturer
-		{
-			get { return _manufacturer; }
-			set { _manufacturer = value; }
-		}
-		public string RomOf
-		{
-			get { return _romOf; }
-			set { _romOf = value; }
-		}
-		public string CloneOf
-		{
-			get { return _cloneOf; }
-			set { _cloneOf = value; }
-		}
-		public string SampleOf
-		{
-			get { return _sampleOf; }
-			set { _sampleOf = value; }
-		}
-		public string SourceFile
-		{
-			get { return _sourceFile; }
-			set { _sourceFile = value; }
-		}
-		public bool IsBios
-		{
-			get { return _isBios; }
-			set { _isBios = value; }
-		}
-		public string Board
-		{
-			get { return _board; }
-			set { _board = value; }
-		}
-		public string RebuildTo
-		{
-			get { return _rebuildTo; }
-			set { _rebuildTo = value; }
+			get { return _machine; }
+			set { _machine = value; }
 		}
 
 		// Software list information
@@ -258,7 +195,7 @@ namespace SabreTools.Helper
 			// If the duplicate is external already or should be, set it
 			if ((lastItem.Dupe & DupeType.External) != 0 || lastItem.SystemID != this.SystemID || lastItem.SourceID != this.SourceID)
 			{
-				if (lastItem.MachineName == this.MachineName && lastItem.Name == this.Name)
+				if (lastItem.Machine.Name == this.Machine.Name && lastItem.Name == this.Name)
 				{
 					output = DupeType.External | DupeType.All;
 				}
@@ -271,7 +208,7 @@ namespace SabreTools.Helper
 			// Otherwise, it's considered an internal dupe
 			else
 			{
-				if (lastItem.MachineName == this.MachineName && lastItem.Name == this.Name)
+				if (lastItem.Machine.Name == this.Machine.Name && lastItem.Name == this.Name)
 				{
 					output = DupeType.Internal | DupeType.All;
 				}
@@ -531,28 +468,28 @@ namespace SabreTools.Helper
 			{
 				if (gamename.StartsWith("*") && gamename.EndsWith("*"))
 				{
-					if (!MachineName.ToLowerInvariant().Contains(gamename.ToLowerInvariant().Replace("*", "")))
+					if (!Machine.Name.ToLowerInvariant().Contains(gamename.ToLowerInvariant().Replace("*", "")))
 					{
 						return false;
 					}
 				}
 				else if (gamename.StartsWith("*"))
 				{
-					if (!MachineName.EndsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					if (!Machine.Name.EndsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 					{
 						return false;
 					}
 				}
 				else if (gamename.EndsWith("*"))
 				{
-					if (!MachineName.StartsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+					if (!Machine.Name.StartsWith(gamename.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 					{
 						return false;
 					}
 				}
 				else
 				{
-					if (!String.Equals(MachineName, gamename, StringComparison.InvariantCultureIgnoreCase))
+					if (!String.Equals(Machine.Name, gamename, StringComparison.InvariantCultureIgnoreCase))
 					{
 						return false;
 					}
@@ -860,7 +797,7 @@ namespace SabreTools.Helper
 							{
 								saveditem.SystemID = file.SystemID;
 								saveditem.System = file.System;
-								saveditem.MachineName = file.MachineName;
+								saveditem.Machine.Name = file.Machine.Name;
 								saveditem.Name = file.Name;
 							}
 
@@ -869,7 +806,7 @@ namespace SabreTools.Helper
 							{
 								saveditem.SourceID = file.SourceID;
 								saveditem.Source = file.Source;
-								saveditem.MachineName = file.MachineName;
+								saveditem.Machine.Name = file.Machine.Name;
 								saveditem.Name = file.Name;
 							}
 
@@ -916,7 +853,7 @@ namespace SabreTools.Helper
 					{
 						if (x.SourceID == y.SourceID)
 						{
-							if (x.MachineName == y.MachineName)
+							if (x.Machine.Name == y.Machine.Name)
 							{
 								if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type == ItemType.Rom || y.Type == ItemType.Disk))
 								{
@@ -943,11 +880,11 @@ namespace SabreTools.Helper
 									return nc.Compare(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
 								}
 							}
-							return nc.Compare(x.MachineName, y.MachineName);
+							return nc.Compare(x.Machine.Name, y.Machine.Name);
 						}
-						return (norename ? nc.Compare(x.MachineName, y.MachineName) : x.SourceID - y.SourceID);
+						return (norename ? nc.Compare(x.Machine.Name, y.Machine.Name) : x.SourceID - y.SourceID);
 					}
-					return (norename ? nc.Compare(x.MachineName, y.MachineName) : x.SystemID - y.SystemID);
+					return (norename ? nc.Compare(x.Machine.Name, y.Machine.Name) : x.SystemID - y.SystemID);
 				});
 				return true;
 			}

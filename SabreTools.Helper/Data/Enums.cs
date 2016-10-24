@@ -1,5 +1,113 @@
-﻿namespace SabreTools.Helper
+﻿namespace SabreTools.Helper.Data
 {
+	#region Archival
+
+	/// <summary>
+	/// Version of tool archive made by
+	/// </summary>
+	public enum ArchiveVersion : ushort
+	{
+		MSDOSandOS2 = 0,
+		Amiga = 1,
+		OpenVMS = 2,
+		UNIX = 3,
+		VMCMS = 4,
+		AtariST = 5,
+		OS2HPFS = 6,
+		Macintosh = 7,
+		ZSystem = 8,
+		CPM = 9,
+		WindowsNTFS = 10,
+		MVS = 11,
+		VSE = 12,
+		AcornRisc = 13,
+		VFAT = 14,
+		AlternateMVS = 15,
+		BeOS = 16,
+		Tandem = 17,
+		OS400 = 18,
+		OSXDarwin = 19,
+		TorrentZip = 20,
+		TorrentZip64 = 45,
+	}
+
+	/// <summary>
+	/// Compression method based on flag
+	/// </summary>
+	public enum CompressionMethod : ushort
+	{
+		Stored = 0,
+		Shrunk = 1,
+		ReducedCompressionFactor1 = 2,
+		ReducedCompressionFactor2 = 3,
+		ReducedCompressionFactor3 = 4,
+		ReducedCompressionFactor4 = 5,
+		Imploded = 6,
+		Tokenizing = 7,
+		Deflated = 8,
+		Delfate64 = 9,
+		PKWAREDataCompressionLibrary = 10,
+		BZIP2 = 12,
+		LZMA = 14,
+		IBMTERSE = 18,
+		IBMLZ77 = 19,
+		WavPak = 97,
+		PPMdVersionIRev1 = 98,
+
+		// Reserved and unused (SHOULD NOT BE USED)
+		Type11 = 11,
+		Type13 = 13,
+		Type15 = 15,
+		Type16 = 16,
+		Type17 = 17,
+	}
+
+	/// <summary>
+	/// Zip open type
+	/// </summary>
+	/// <remarks>https://raw.githubusercontent.com/gjefferyes/RomVault/5a93500001f0d068f32cf77a048950717507f733/ROMVault2/SupportedFiles/ZipEnums.cs</remarks>
+	public enum ZipOpenType
+	{
+		Closed,
+		OpenRead,
+		OpenWrite
+	}
+
+	/// <summary>
+	/// Zip testing type
+	/// </summary>
+	/// <remarks>https://raw.githubusercontent.com/gjefferyes/RomVault/5a93500001f0d068f32cf77a048950717507f733/ROMVault2/SupportedFiles/ZipEnums.cs</remarks>
+	public enum ZipReturn
+	{
+		ZipGood,
+		ZipFileLocked,
+		ZipFileCountError,
+		ZipSignatureError,
+		ZipExtraDataOnEndOfZip,
+		ZipUnsupportedCompression,
+		ZipLocalFileHeaderError,
+		ZipCentralDirError,
+		ZipEndOfCentralDirectoryError,
+		Zip64EndOfCentralDirError,
+		Zip64EndOfCentralDirectoryLocatorError,
+		ZipReadingFromOutputFile,
+		ZipWritingToInputFile,
+		ZipErrorGettingDataStream,
+		ZipCRCDecodeError,
+		ZipDecodeError,
+		ZipFileNameToLong,
+		ZipFileAlreadyOpen,
+		ZipCannotFastOpen,
+		ZipErrorOpeningFile,
+		ZipErrorFileNotFound,
+		ZipErrorReadingFile,
+		ZipErrorTimeStamp,
+		ZipErrorRollBackFile,
+		ZipUntested
+	}
+
+	#endregion
+
 	#region DatFile related
 
 	/// <summary>
@@ -124,129 +232,6 @@
 		Equal = 0,
 		Less,
 		Greater,
-	}
-
-	#endregion
-
-	#region Miscellaneous
-
-	/// <summary>
-	/// Severity of the logging statement
-	/// </summary>
-	public enum LogLevel
-	{
-		VERBOSE = 0,
-		USER,
-		WARNING,
-		ERROR,
-	}
-
-	#endregion
-
-	#region Archival
-
-	/// <summary>
-	/// Version of tool archive made by
-	/// </summary>
-	public enum ArchiveVersion : ushort
-	{
-		MSDOSandOS2 = 0,
-		Amiga = 1,
-		OpenVMS = 2,
-		UNIX = 3,
-		VMCMS = 4,
-		AtariST = 5,
-		OS2HPFS = 6,
-		Macintosh = 7,
-		ZSystem = 8,
-		CPM = 9,
-		WindowsNTFS = 10,
-		MVS = 11,
-		VSE = 12,
-		AcornRisc = 13,
-		VFAT = 14,
-		AlternateMVS = 15,
-		BeOS = 16,
-		Tandem = 17,
-		OS400 = 18,
-		OSXDarwin = 19,
-		TorrentZip = 20,
-		TorrentZip64 = 45,
-	}
-
-	/// <summary>
-	/// Compression method based on flag
-	/// </summary>
-	public enum CompressionMethod : ushort
-	{
-		Stored = 0,
-		Shrunk = 1,
-		ReducedCompressionFactor1 = 2,
-		ReducedCompressionFactor2 = 3,
-		ReducedCompressionFactor3 = 4,
-		ReducedCompressionFactor4 = 5,
-		Imploded = 6,
-		Tokenizing = 7,
-		Deflated = 8,
-		Delfate64 = 9,
-		PKWAREDataCompressionLibrary = 10,
-		BZIP2 = 12,
-		LZMA = 14,
-		IBMTERSE = 18,
-		IBMLZ77 = 19,
-		WavPak = 97,
-		PPMdVersionIRev1 = 98,
-
-		// Reserved and unused (SHOULD NOT BE USED)
-		Type11 = 11,
-		Type13 = 13,
-		Type15 = 15,
-		Type16 = 16,
-		Type17 = 17,
-	}
-
-	/// <summary>
-	/// Zip testing type
-	/// </summary>
-	/// <remarks>https://raw.githubusercontent.com/gjefferyes/RomVault/5a93500001f0d068f32cf77a048950717507f733/ROMVault2/SupportedFiles/ZipEnums.cs</remarks>
-	public enum ZipReturn
-	{
-		ZipGood,
-		ZipFileLocked,
-		ZipFileCountError,
-		ZipSignatureError,
-		ZipExtraDataOnEndOfZip,
-		ZipUnsupportedCompression,
-		ZipLocalFileHeaderError,
-		ZipCentralDirError,
-		ZipEndOfCentralDirectoryError,
-		Zip64EndOfCentralDirError,
-		Zip64EndOfCentralDirectoryLocatorError,
-		ZipReadingFromOutputFile,
-		ZipWritingToInputFile,
-		ZipErrorGettingDataStream,
-		ZipCRCDecodeError,
-		ZipDecodeError,
-		ZipFileNameToLong,
-		ZipFileAlreadyOpen,
-		ZipCannotFastOpen,
-		ZipErrorOpeningFile,
-		ZipErrorFileNotFound,
-		ZipErrorReadingFile,
-		ZipErrorTimeStamp,
-		ZipErrorRollBackFile,
-		ZipUntested
-	}
-
-	/// <summary>
-	/// Zip open type
-	/// </summary>
-	/// <remarks>https://raw.githubusercontent.com/gjefferyes/RomVault/5a93500001f0d068f32cf77a048950717507f733/ROMVault2/SupportedFiles/ZipEnums.cs</remarks>
-	public enum ZipOpenType
-	{
-		Closed,
-		OpenRead,
-		OpenWrite
 	}
 
 	#endregion

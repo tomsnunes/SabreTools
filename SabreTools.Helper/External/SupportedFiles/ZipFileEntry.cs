@@ -1,11 +1,16 @@
-﻿using OCRC;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace SabreTools.Helper
+using SabreTools.Helper.Data;
+using SabreTools.Helper.Tools;
+
+using Ionic.Zlib;
+using OCRC;
+
+namespace ROMVault2.SupportedFiles.Zip
 {
 	/// <remarks>
 	/// Based on work by GordonJ for RomVault

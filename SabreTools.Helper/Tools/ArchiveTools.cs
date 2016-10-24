@@ -1,14 +1,20 @@
-﻿using SharpCompress.Archive;
-using SharpCompress.Archive.SevenZip;
-using SharpCompress.Common;
-using SharpCompress.Reader;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace SabreTools.Helper
+using SabreTools.Helper.Data;
+using SabreTools.Helper.Dats;
+
+using Ionic.Zlib;
+using ROMVault2.SupportedFiles.Zip;
+using SharpCompress.Archive;
+using SharpCompress.Archive.SevenZip;
+using SharpCompress.Common;
+using SharpCompress.Reader;
+
+namespace SabreTools.Helper.Tools
 {
 	public static class ArchiveTools
 	{
@@ -28,51 +34,15 @@ namespace SabreTools.Helper
 		public static bool CopyFileBetweenArchives(string inputArchive, string outDir, string sourceEntryName, Rom destEntry, Logger logger)
 		{
 			string temp = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-			string realName = ExtractSingleItemFromArchive(inputArchive, sourceEntryName, temp, logger);
+			string realName = ExtractItem(inputArchive, sourceEntryName, temp, logger);
 			bool success = WriteToArchive(realName, outDir, destEntry, logger);
 			Directory.Delete(temp, true);
 			return success;
 		}
 
-		/// <summary>
-		/// Convert a compressed DeflateStream to a compressed GZipStream
-		/// </summary>
-		/// <param name="input">DeflateStream to convert</param>
-		/// <returns>Converted GZipStream</returns>
-		public static Stream DeflateStreamToGZipStream(Stream input)
-		{
-			DeflateStream ds = new DeflateStream(input, CompressionMode.Decompress);
-			GZipStream gz = new GZipStream(ds, CompressionMode.Compress);
-			return gz;
-		}
-
-		/// <summary>
-		/// Convert a compressed GZipStream to a compressed DeflateStream
-		/// </summary>
-		/// <param name="input">GZipStream to convert</param>
-		/// <returns>Converted DeflateStream</returns>
-		public static Stream GZipStreamToDeflateStream(Stream input)
-		{
-			GZipStream gz = new GZipStream(input, CompressionMode.Decompress);
-			DeflateStream ds = new DeflateStream(gz, CompressionMode.Compress);
-			return ds;
-		}
-
 		#endregion
 
 		#region Extraction
-
-		/// <summary>
-		/// Attempt to extract a file as an archive
-		/// </summary>
-		/// <param name="input">Name of the file to be extracted</param>
-		/// <param name="tempDir">Temporary directory for archive extraction</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public static bool ExtractArchive(string input, string tempDir, Logger logger)
-		{
-			return ExtractArchive(input, tempDir, GetArchiveScanLevelFromNumbers(0, 2, 2, 0), logger);
-		}
 
 		/// <summary>
 		/// Attempt to extract a file as an archive
@@ -230,10 +200,10 @@ namespace SabreTools.Helper
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>Name of the extracted file, null on error</returns>
-		public static string ExtractSingleItemFromArchive(string input, string entryName, string tempDir, Logger logger)
+		public static string ExtractItem(string input, string entryName, string tempDir, Logger logger)
 		{
 			string realEntry = "";
-			Stream ms = ExtractSingleStreamFromArchive(input, entryName, out realEntry, logger);
+			Stream ms = ExtractStream(input, entryName, out realEntry, logger);
 
 			realEntry = Path.GetFullPath(Path.Combine(tempDir, realEntry));
 			if (!Directory.Exists(Path.GetDirectoryName(realEntry)))
@@ -259,13 +229,13 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Attempt to extract a file from an archive
+		/// Attempt to extract a stream from an archive
 		/// </summary>
 		/// <param name="input">Name of the archive to be extracted</param>
 		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>Name of the extracted file, null on error</returns>
-		public static Stream ExtractSingleStreamFromArchive(string input, string entryName, out string realEntry, Logger logger)
+		public static Stream ExtractStream(string input, string entryName, out string realEntry, Logger logger)
 		{
 			// Set the real entry name
 			realEntry = "";
@@ -436,9 +406,13 @@ namespace SabreTools.Helper
 						{
 							Type = ItemType.Rom,
 							Name = newname,
-							MachineName = gamename,
 							Size = newsize,
 							CRC = newcrc,
+
+							Machine = new Machine
+							{
+								Name = gamename,
+							},
 						});
 					}
 				}
@@ -457,9 +431,13 @@ namespace SabreTools.Helper
 							{
 								Type = ItemType.Rom,
 								Name = reader.Entry.Key,
-								MachineName = gamename,
 								Size = (size == 0 ? reader.Entry.Size : size),
 								CRC = (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc),
+
+								Machine = new Machine
+								{
+									Name = gamename,
+								},
 							});
 						}
 					}
@@ -538,12 +516,16 @@ namespace SabreTools.Helper
 			Rom rom = new Rom
 			{
 				Type = ItemType.Rom,
-				MachineName = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 				Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 				Size = extractedsize,
 				CRC = gzcrc.ToLowerInvariant(),
 				MD5 = gzmd5.ToLowerInvariant(),
 				SHA1 = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
+
+				Machine = new Machine
+				{
+					Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
+				},
 			};
 
 			return rom;
@@ -735,11 +717,12 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Read the information from an input 7z file
+		/// (UNIMPLEMENTED) Read the information from an input 7z file
 		/// </summary>
 		/// <param name="input">Name of the input file to check</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		/// <remarks>http://cpansearch.perl.org/src/BJOERN/Compress-Deflate7-1.0/7zip/DOC/7zFormat.txt</remarks>
+		/// <remarks>
+		/// http://cpansearch.perl.org/src/BJOERN/Compress-Deflate7-1.0/7zip/DOC/7zFormat.txt</remarks>
 		public static void GetSevenZipFileInfo(string input, Logger logger)
 		{
 			BinaryReader br = new BinaryReader(File.OpenRead(input));
@@ -803,7 +786,7 @@ namespace SabreTools.Helper
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, roms[0].MachineName + ".zip");
+			string archiveFileName = Path.Combine(outDir, roms[0].Machine.Name + ".zip");
 
 			// Set internal variables
 			Stream writeStream = null;

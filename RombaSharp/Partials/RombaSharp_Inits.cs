@@ -1,9 +1,13 @@
-﻿using Mono.Data.Sqlite;
-using SabreTools.Helper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Mono.Data.Sqlite;
+
+using SabreTools.Helper;
+using SabreTools.Helper.Data;
+using SabreTools.Helper.Dats;
+using SabreTools.Helper.Tools;
 
 namespace SabreTools
 {
@@ -254,7 +258,7 @@ namespace SabreTools
 				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 
-			Logger logger = new Logger(false, "");
+			Logger logger = new Logger();
 			foreach (string input in inputs)
 			{
 				datdata.PopulateDatFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,

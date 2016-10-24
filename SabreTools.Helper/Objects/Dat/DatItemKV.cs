@@ -2,7 +2,7 @@
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace SabreTools.Helper
+namespace SabreTools.Helper.Dats
 {
 	public class DatItemKV : IEquatable<DatItemKV>
 	{

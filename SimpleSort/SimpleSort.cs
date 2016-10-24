@@ -1,7 +1,10 @@
-﻿using SabreTools.Helper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using SabreTools.Helper;
+using SabreTools.Helper.Data;
+using SabreTools.Helper.Dats;
+using SabreTools.Helper.Tools;
 
 namespace SabreTools
 {
@@ -25,14 +28,14 @@ namespace SabreTools
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
 			{
-				Build.Credits();
+				Build.Help("Credits");
 				return;
 			}
 
 			// If there's no arguments, show help
 			if (args.Length == 0)
 			{
-				Build.Help();
+				Build.Help("SimpleSort");
 				logger.Close();
 				return;
 			}
@@ -136,7 +139,7 @@ namespace SabreTools
 						{
 							logger.Error("DAT must be a valid file: " + args[i]);
 							Console.WriteLine();
-							Build.Help();
+							Build.Help("SimpleSort");
 							logger.Close();
 							return;
 						}
@@ -208,7 +211,7 @@ namespace SabreTools
 									{
 										logger.Error("DAT must be a valid file: " + split[1]);
 										Console.WriteLine();
-										Build.Help();
+										Build.Help("SimpleSort");
 										logger.Close();
 										return;
 									}
@@ -256,7 +259,7 @@ namespace SabreTools
 									{
 										logger.Error("Invalid input detected: " + args[i]);
 										Console.WriteLine();
-										Build.Help();
+										Build.Help("SimpleSort");
 										Console.WriteLine();
 										logger.Error("Invalid input detected: " + args[i]);
 										logger.Close();
@@ -273,7 +276,7 @@ namespace SabreTools
 						{
 							logger.Error("Invalid input detected: " + args[i]);
 							Console.WriteLine();
-							Build.Help();
+							Build.Help("SimpleSort");
 							Console.WriteLine();
 							logger.Error("Invalid input detected: " + args[i]);
 							logger.Close();
@@ -286,7 +289,7 @@ namespace SabreTools
 			// If help is set, show the help screen
 			if (help)
 			{
-				Build.Help();
+				Build.Help("SimpleSort");
 				logger.Close();
 				return;
 			}
@@ -295,7 +298,7 @@ namespace SabreTools
 			if (inputs.Count == 0 && ((sort && !verify) || convert))
 			{
 				logger.Error("This feature requires at least one input");
-				Build.Help();
+				Build.Help("SimpleSort");
 				logger.Close();
 				return;
 			}
@@ -318,7 +321,7 @@ namespace SabreTools
 				else
 				{
 					logger.Error("A datfile is required to use this feature");
-					Build.Help();
+					Build.Help("SimpleSort");
 					logger.Close();
 					return;
 				}
@@ -327,7 +330,7 @@ namespace SabreTools
 			// If nothing is set, show the help
 			else
 			{
-				Build.Help();
+				Build.Help("SimpleSort");
 			}
 
 			logger.Close();

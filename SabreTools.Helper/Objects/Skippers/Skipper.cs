@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Xml;
+using SabreTools.Helper.Data;
+using SabreTools.Helper.Tools;
 
 namespace SabreTools.Helper
 {
@@ -37,6 +39,9 @@ namespace SabreTools.Helper
 
 		#region Constructors
 
+		/// <summary>
+		/// Create an empty Skipper object
+		/// </summary>
 		public Skipper()
 		{
 			Name = "";
@@ -46,12 +51,16 @@ namespace SabreTools.Helper
 			SourceFile = "";
 		}
 
+		/// <summary>
+		/// Create a Skipper object parsed from an input file
+		/// </summary>
+		/// <param name="filename">Name of the file to parse</param>
 		public Skipper(string filename)
 		{
 			Rules = new List<SkipperRule>();
 			SourceFile = Path.GetFileNameWithoutExtension(filename);
 
-			Logger logger = new Logger(false, "");
+			Logger logger = new Logger();
 			XmlReader xtr = FileTools.GetXmlTextReader(filename, logger);
 
 			if (xtr == null)

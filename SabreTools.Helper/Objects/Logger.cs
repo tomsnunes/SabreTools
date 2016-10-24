@@ -13,6 +13,17 @@ namespace SabreTools.Helper
 	/// </remarks>
 	public class Logger
 	{
+		/// <summary>
+		/// Severity of the logging statement
+		/// </summary>
+		private enum LogLevel
+		{
+			VERBOSE = 0,
+			USER,
+			WARNING,
+			ERROR,
+		}
+
 		// Private instance variables
 		private bool _tofile;
 		private bool _warnings;
@@ -25,6 +36,19 @@ namespace SabreTools.Helper
 		private string _basepath = "logs" + Path.DirectorySeparatorChar;
 
 		/// <summary>
+		/// Initialize a console-only logger object
+		/// </summary>
+		public Logger()
+		{
+			_tofile = false;
+			_warnings = false;
+			_errors = false;
+			_filename = null;
+
+			Start();
+		}
+
+		/// <summary>
 		/// Initialize a Logger object with the given information
 		/// </summary>
 		/// <param name="tofile">True if file should be written to instead of console</param>
@@ -33,6 +57,7 @@ namespace SabreTools.Helper
 		{
 			_tofile = tofile;
 			_warnings = false;
+			_errors = false;
 			_filename = Path.GetFileNameWithoutExtension(filename) + " (" + DateTime.Now.ToString("yyyy-MM-dd HHmmss") + ")" + Path.GetExtension(filename);
 
 			if (!Directory.Exists(_basepath))
@@ -77,17 +102,17 @@ namespace SabreTools.Helper
 		/// <returns>True if the logging was ended correctly, false otherwise</returns>
 		public bool Close(bool suppress = false)
 		{
-			if (_warnings)
-			{
-				Console.WriteLine("There were warnings in the last run! Check the log for more details");
-			}
-			if (_errors)
-			{
-				Console.WriteLine("There were errors in the last run! Check the log for more details");
-			}
-
 			if (!suppress)
 			{
+				if (_warnings)
+				{
+					Console.WriteLine("There were warnings in the last run! Check the log for more details");
+				}
+				if (_errors)
+				{
+					Console.WriteLine("There were errors in the last run! Check the log for more details");
+				}
+
 				TimeSpan span = DateTime.Now.Subtract(_start);
 				string total = span.ToString(@"hh\:mm\:ss\.fffff");
 				if (!_tofile)

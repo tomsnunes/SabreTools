@@ -1,6 +1,4 @@
-﻿using Mono.Data.Sqlite;
-using OCRC;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,8 +6,13 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
+using SabreTools.Helper.Data;
+using SabreTools.Helper.Dats;
+using Mono.Data.Sqlite;
+using NaturalSort;
+using OCRC;
 
-namespace SabreTools.Helper
+namespace SabreTools.Helper.Tools
 {
 	public static class FileTools
 	{
@@ -239,31 +242,6 @@ namespace SabreTools.Helper
 		}
 
 		/// <summary>
-		/// Remove an arbitrary number of bytes from the inputted file
-		/// </summary>
-		/// <param name="input">File to be cropped</param>
-		/// <param name="output">Outputted file</param>
-		/// <param name="bytesToRemoveFromHead">Bytes to be removed from head of file</param>
-		/// <param name="bytesToRemoveFromTail">Bytes to be removed from tail of file</param>
-		public static void RemoveBytesFromFile(string input, string output, long bytesToRemoveFromHead, long bytesToRemoveFromTail)
-		{
-			// If any of the inputs are invalid, skip
-			if (!File.Exists(input) || new FileInfo(input).Length <= (bytesToRemoveFromHead + bytesToRemoveFromTail))
-			{
-				return;
-			}
-
-			// Get the streams
-			FileStream fsr = File.OpenRead(input);
-			FileStream fsw = File.OpenWrite(output);
-
-			RemoveBytesFromStream(fsr, fsw, bytesToRemoveFromHead, bytesToRemoveFromTail);
-
-			fsr.Dispose();
-			fsw.Dispose();
-		}
-
-		/// <summary>
 		/// Add an aribtrary number of bytes to the inputted file
 		/// </summary>
 		/// <param name="input">File to be appended to</param>
@@ -409,7 +387,7 @@ namespace SabreTools.Helper
 
 					logger.User("Creating reheadered file: " +
 						(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + sub);
-					FileTools.AppendBytesToFile(file,
+					AppendBytesToFile(file,
 						(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + sub, header, string.Empty);
 					logger.User("Reheadered file created!");
 				}
@@ -833,7 +811,7 @@ namespace SabreTools.Helper
 					if (toFolder)
 					{
 						// Copy file to output directory
-						string gamedir = Path.Combine(outDir, found.MachineName);
+						string gamedir = Path.Combine(outDir, found.Machine.Name);
 						if (!Directory.Exists(gamedir))
 						{
 							Directory.CreateDirectory(gamedir);
@@ -900,7 +878,7 @@ namespace SabreTools.Helper
 						if (toFolder)
 						{
 							// Copy file to output directory
-							string gamedir = Path.Combine(outDir, found.MachineName);
+							string gamedir = Path.Combine(outDir, found.Machine.Name);
 							if (!Directory.Exists(gamedir))
 							{
 								Directory.CreateDirectory(gamedir);
@@ -949,7 +927,7 @@ namespace SabreTools.Helper
 						if (toFolder)
 						{
 							// Copy file to output directory
-							string gamedir = Path.Combine(outDir, found.MachineName);
+							string gamedir = Path.Combine(outDir, found.Machine.Name);
 							if (!Directory.Exists(gamedir))
 							{
 								Directory.CreateDirectory(gamedir);
@@ -1025,10 +1003,10 @@ namespace SabreTools.Helper
 								{
 									// Copy file to output directory
 									logger.Verbose("Rebuilding file '" + Path.GetFileName(rom.Name) + "' to '" + found.Name + "'");
-									string outfile = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, tempDir, logger);
+									string outfile = ArchiveTools.ExtractItem(input, rom.Name, tempDir, logger);
 									if (File.Exists(outfile))
 									{
-										string gamedir = Path.Combine(outDir, found.MachineName);
+										string gamedir = Path.Combine(outDir, found.Machine.Name);
 										if (!Directory.Exists(gamedir))
 										{
 											Directory.CreateDirectory(gamedir);
@@ -1048,7 +1026,7 @@ namespace SabreTools.Helper
 
 									if (Build.MonoEnvironment || tgz)
 									{
-										string outfile = ArchiveTools.ExtractSingleItemFromArchive(input, rom.Name, tempDir, logger);
+										string outfile = ArchiveTools.ExtractItem(input, rom.Name, tempDir, logger);
 										if (File.Exists(outfile))
 										{
 											if (tgz)
@@ -1333,7 +1311,7 @@ namespace SabreTools.Helper
 			}
 
 			// Otherwise, set the machine name as the full path to the file
-			rom.MachineName = Path.GetDirectoryName(Path.GetFullPath(file));
+			rom.Machine.Name = Path.GetDirectoryName(Path.GetFullPath(file));
 
 			// Add the rom information to the Dat
 			string key = rom.Size + "-" + rom.CRC;
@@ -1362,7 +1340,7 @@ namespace SabreTools.Helper
 				rule.TransformStream(input, output, logger, false, true);
 				Rom romNH = FileTools.GetStreamInfo(output, output.Length);
 				romNH.Name = "HEAD::" + rom.Name;
-				romNH.MachineName = rom.MachineName;
+				romNH.Machine.Name = rom.Machine.Name;
 
 				// Add the rom information to the Dat
 				key = romNH.Size + "-" + romNH.CRC;
@@ -1563,64 +1541,6 @@ namespace SabreTools.Helper
 		#endregion
 
 		#region Stream Manipulation
-
-		// <summary>
-		/// Remove an arbitrary number of bytes from the inputted stream
-		/// </summary>
-		/// <param name="input">Stream to be cropped</param>
-		/// <param name="output">Stream to output to</param>
-		/// <param name="bytesToRemoveFromHead">Bytes to be removed from head of stream</param>
-		/// <param name="bytesToRemoveFromTail">Bytes to be removed from tail of stream</param>
-		public static void RemoveBytesFromStream(Stream input, Stream output, long bytesToRemoveFromHead, long bytesToRemoveFromTail)
-		{
-			// Read the input file and write to the fail
-			BinaryReader br = new BinaryReader(input);
-			BinaryWriter bw = new BinaryWriter(output);
-
-			int bufferSize = 1024;
-			long adjustedLength = br.BaseStream.Length - bytesToRemoveFromTail;
-
-			// Seek to the correct position
-			br.BaseStream.Seek((bytesToRemoveFromHead < 0 ? 0 : bytesToRemoveFromHead), SeekOrigin.Begin);
-
-			// Now read the file in chunks and write out
-			byte[] buffer = new byte[bufferSize];
-			while (br.BaseStream.Position <= (adjustedLength - bufferSize))
-			{
-				buffer = br.ReadBytes(bufferSize);
-				bw.Write(buffer);
-			}
-
-			// For the final chunk, if any, write out only that number of bytes
-			int length = (int)(adjustedLength - br.BaseStream.Position);
-			buffer = new byte[length];
-			buffer = br.ReadBytes(length);
-			bw.Write(buffer);
-		}
-
-		/// <summary>
-		/// Add an aribtrary number of bytes to the inputted stream
-		/// </summary>
-		/// <param name="input">Stream to be appended to</param>
-		/// <param name="output">Outputted stream</param>
-		/// <param name="bytesToAddToHead">String representing bytes to be added to head of stream</param>
-		/// <param name="bytesToAddToTail">String representing bytes to be added to tail of stream</param>
-		public static void AppendBytesToStream(Stream input, Stream output, string bytesToAddToHead, string bytesToAddToTail)
-		{
-			// Source: http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
-			byte[] bytesToAddToHeadArray = new byte[bytesToAddToHead.Length / 2];
-			for (int i = 0; i < bytesToAddToHead.Length; i += 2)
-			{
-				bytesToAddToHeadArray[i / 2] = Convert.ToByte(bytesToAddToHead.Substring(i, 2), 16);
-			}
-			byte[] bytesToAddToTailArray = new byte[bytesToAddToTail.Length / 2];
-			for (int i = 0; i < bytesToAddToTail.Length; i += 2)
-			{
-				bytesToAddToTailArray[i / 2] = Convert.ToByte(bytesToAddToTail.Substring(i, 2), 16);
-			}
-
-			AppendBytesToStream(input, output, bytesToAddToHeadArray, bytesToAddToTailArray);
-		}
 
 		/// <summary>
 		/// Add an aribtrary number of bytes to the inputted stream

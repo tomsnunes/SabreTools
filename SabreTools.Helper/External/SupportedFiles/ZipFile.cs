@@ -1,10 +1,13 @@
-﻿using OCRC;
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SabreTools.Helper
+using SabreTools.Helper.Data;
+
+using OCRC;
+
+namespace ROMVault2.SupportedFiles.Zip
 {
 	/// <remarks>
 	/// Based on work by GordonJ for RomVault

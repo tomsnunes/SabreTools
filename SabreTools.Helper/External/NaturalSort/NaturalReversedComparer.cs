@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace SabreTools.Helper
+namespace NaturalSort
 {
 	public class NaturalReversedComparer : Comparer<string>, IDisposable
 	{

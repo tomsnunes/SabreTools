@@ -108,11 +108,12 @@
     <Compile Include="Objects\Dat\DatItem.cs" />
     <Compile Include="Objects\Dat\DatItemKV.cs" />
     <Compile Include="Objects\Dat\Disk.cs" />
+    <Compile Include="Objects\Dat\Machine.cs" />
     <Compile Include="Objects\Dat\Release.cs" />
     <Compile Include="Objects\Dat\Sample.cs" />
     <Compile Include="Objects\Dat\Rom.cs" />
-    <Compile Include="Objects\Archive\ZipFileEntry.cs" />
-    <Compile Include="Objects\Archive\ZipFile.cs" />
+    <Compile Include="External\SupportedFiles\ZipFileEntry.cs" />
+    <Compile Include="External\SupportedFiles\ZipFile.cs" />
     <Compile Include="Objects\Skippers\Skipper.cs" />
     <Compile Include="Objects\Skippers\SkipperRule.cs" />
     <Compile Include="Resources\Resources.de-DE.Designer.cs">

@@ -1,8 +1,11 @@
-﻿using SabreTools.Helper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
+using SabreTools.Helper.Data;
+using SabreTools.Helper.Dats;
+using SabreTools.Helper.Tools;
 
 namespace SabreTools
 {
@@ -175,7 +178,7 @@ namespace SabreTools
 					else
 					{
 						Console.WriteLine();
-						Build.Help();
+						Build.Help("SabreTools");
 					}
 				}
 			}
@@ -212,7 +215,7 @@ namespace SabreTools
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
-					Build.Help();
+					Build.Help("SabreTools");
 					return;
 				}
 			}
@@ -243,7 +246,7 @@ namespace SabreTools
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
-					Build.Help();
+					Build.Help("SabreTools");
 					return;
 				}
 			}
@@ -368,7 +371,7 @@ namespace SabreTools
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
-					Build.Help();
+					Build.Help("SabreTools");
 					return;
 				}
 			}

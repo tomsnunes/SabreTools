@@ -1,7 +1,10 @@
-﻿using SabreTools.Helper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+
+using SabreTools.Helper;
+using SabreTools.Helper.Data;
+using SabreTools.Helper.Tools;
 
 namespace SabreTools
 {
@@ -33,7 +36,7 @@ namespace SabreTools
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
 			{
-				Build.Credits();
+				Build.Help("Credits");
 				_logger.Close();
 				return;
 			}
@@ -41,7 +44,7 @@ namespace SabreTools
 			// If there's no arguments, show help
 			if (args.Length == 0)
 			{
-				Build.Help();
+				Build.Help("SabreTools");
 				_logger.Close();
 				return;
 			}
@@ -456,7 +459,7 @@ namespace SabreTools
 						{
 							_logger.Error("DAT must be a valid file: " + args[i]);
 							Console.WriteLine();
-							Build.Help();
+							Build.Help("SabreTools");
 							_logger.Close();
 							return;
 						}
@@ -536,7 +539,7 @@ namespace SabreTools
 						{
 							_logger.Error("Invalid input detected: " + args[i]);
 							Console.WriteLine();
-							Build.Help();
+							Build.Help("SabreTools");
 							Console.WriteLine();
 							_logger.Error("Invalid input detected: " + args[i]);
 							_logger.Close();
@@ -706,7 +709,7 @@ namespace SabreTools
 									{
 										_logger.Error("DAT must be a valid file: " + split[1]);
 										Console.WriteLine();
-										Build.Help();
+										Build.Help("SabreTools");
 										_logger.Close();
 										return;
 									}
@@ -773,7 +776,7 @@ namespace SabreTools
 									{
 										_logger.Error("Invalid input detected: " + args[i]);
 										Console.WriteLine();
-										Build.Help();
+										Build.Help("SabreTools");
 										Console.WriteLine();
 										_logger.Error("Invalid input detected: " + args[i]);
 										_logger.Close();
@@ -880,7 +883,7 @@ namespace SabreTools
 									{
 										_logger.Error("Invalid input detected: " + args[i]);
 										Console.WriteLine();
-										Build.Help();
+										Build.Help("SabreTools");
 										Console.WriteLine();
 										_logger.Error("Invalid input detected: " + args[i]);
 										_logger.Close();
@@ -897,7 +900,7 @@ namespace SabreTools
 						{
 							_logger.Error("Invalid input detected: " + args[i]);
 							Console.WriteLine();
-							Build.Help();
+							Build.Help("SabreTools");
 							Console.WriteLine();
 							_logger.Error("Invalid input detected: " + args[i]);
 							_logger.Close();
@@ -910,7 +913,7 @@ namespace SabreTools
 			// If help is set, show the help screen
 			if (help)
 			{
-				Build.Help();
+				Build.Help("SabreTools");
 				_logger.Close();
 				return;
 			}
@@ -919,7 +922,7 @@ namespace SabreTools
 			if (!(datFromDir ^ headerer ^ splitByExt ^ splitByHash ^ splitByType ^ stats ^ update))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
-				Build.Help();
+				Build.Help("SabreTools");
 				_logger.Close();
 				return;
 			}
@@ -929,7 +932,7 @@ namespace SabreTools
 				&& (datFromDir || headerer || splitByExt || splitByHash || splitByType || stats || update))
 			{
 				_logger.Error("This feature requires at least one input");
-				Build.Help();
+				Build.Help("SabreTools");
 				_logger.Close();
 				return;
 			}
@@ -1026,7 +1029,7 @@ namespace SabreTools
 			// If nothing is set, show the help
 			else
 			{
-				Build.Help();
+				Build.Help("SabreTools");
 			}
 
 			_logger.Close();

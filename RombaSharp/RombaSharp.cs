@@ -1,7 +1,9 @@
-﻿using Mono.Data.Sqlite;
-using System;
+﻿using System;
 using System.Collections.Generic;
+
 using SabreTools.Helper;
+using SabreTools.Helper.Data;
+using SabreTools.Helper.Tools;
 
 namespace SabreTools
 {
@@ -54,7 +56,7 @@ namespace SabreTools
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
 			{
-				Build.Credits();
+				Build.Help("Credits");
 				_logger.Close();
 				return;
 			}
@@ -62,7 +64,7 @@ namespace SabreTools
 			// If there's no arguments, show help
 			if (args.Length == 0)
 			{
-				Build.Help();
+				Build.Help("RombaSharp");
 				_logger.Close();
 				return;
 			}
@@ -213,7 +215,7 @@ namespace SabreTools
 			// If help is set, show the help screen
 			if (help)
 			{
-				Build.Help();
+				Build.Help("RombaSharp");
 				_logger.Close();
 				return;
 			}
@@ -223,7 +225,7 @@ namespace SabreTools
 				memstats ^ miss ^ progress ^ purgeBackup ^ purgeDelete ^ refreshDats ^ shutdown))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
-				Build.Help();
+				Build.Help("RombaSharp");
 				_logger.Close();
 				return;
 			}
@@ -232,7 +234,7 @@ namespace SabreTools
 			if (inputs.Count == 0 && (archive || build || depotRescan || dir2dat || fixdat || lookup || miss))
 			{
 				_logger.Error("This feature requires at least one input");
-				Build.Help();
+				Build.Help("RombaSharp");
 				_logger.Close();
 				return;
 			}
@@ -341,7 +343,7 @@ namespace SabreTools
 			// If nothing is set, show the help
 			else
 			{
-				Build.Help();
+				Build.Help("RombaSharp");
 			}
 
 			_logger.Close();

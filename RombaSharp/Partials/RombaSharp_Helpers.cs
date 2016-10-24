@@ -1,11 +1,14 @@
-﻿using Mono.Data.Sqlite;
-using SabreTools.Helper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using Mono.Data.Sqlite;
+
+using SabreTools.Helper.Data;
+using SabreTools.Helper.Dats;
+using SabreTools.Helper.Tools;
 
 namespace SabreTools
 {
@@ -459,7 +462,7 @@ namespace SabreTools
 		private static void AddDatToDatabase(Rom dat, SqliteConnection dbc)
 		{
 			// Get the dat full path
-			string fullpath = Path.Combine(_dats, (dat.MachineName == "dats" ? "" : dat.MachineName), dat.Name);
+			string fullpath = Path.Combine(_dats, (dat.Machine.Name == "dats" ? "" : dat.Machine.Name), dat.Name);
 
 			// Parse the Dat if possible
 			_logger.User("Adding from '" + dat.Name + "'");

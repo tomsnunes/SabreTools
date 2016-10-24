@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
-namespace SabreTools.Helper
+namespace SabreTools.Helper.Data
 {
 	public static class Build
 	{
@@ -18,10 +17,9 @@ namespace SabreTools.Helper
 		/// Readies the console and outputs the header
 		/// </summary>
 		/// <param name="name">The name to be displayed as the program</param>
-		/// <remarks>Adapted from http://stackoverflow.com/questions/8200661/how-to-align-string-in-fixed-length-string</remarks>
 		public static void Start(string name)
 		{
-			// Dynamically create the header string
+			// Dynamically create the header string, adapted from http://stackoverflow.com/questions/8200661/how-to-align-string-in-fixed-length-string
 			int width = Console.WindowWidth - 3;
 			string border = "+" + new string('-', width) + "+";
 			string mid = name + " " + Constants.Version;
@@ -62,17 +60,28 @@ namespace SabreTools.Helper
 		/// <summary>
 		/// Show the help dialog for a given class
 		/// </summary>
-		public static void Help()
+		/// <param name="className">Name of the class to get help for, "Credits" for developer credits</param>
+		public static void Help(string className)
 		{
 			//http://stackoverflow.com/questions/14849367/how-to-determine-calling-method-and-class-name
-			StackTrace st = new StackTrace();
-			string className = st.GetFrame(1).GetMethod().ReflectedType.Name;
 			string barrier = "-----------------------------------------";
-			List<String> helptext = new List<string>();
+			List<string> helptext = new List<string>();
 
 			// Set the help text
 			switch (className)
 			{
+				case "Credits":
+					helptext.Add(barrier);
+					helptext.Add("Credits");
+					helptext.Add(barrier);
+					helptext.Add("");
+					helptext.Add("Programmer / Lead:	Matt Nadareski (darksabre76)");
+					helptext.Add("Additional code:	emuLOAD, @tractivo, motoschifo");
+					helptext.Add("Testing:		emuLOAD, @tractivo, Kludge, Obiwantje, edc");
+					helptext.Add("Suggestions:		edc, AcidX, Amiga12, EliUmniCk");
+					helptext.Add("Based on work by:	The Wizard of DATz");
+					break;
+
 				case "RombaSharp":
 					helptext.Add(Resources.Resources.RombaSharp_Name + " - " + Resources.Resources.RombaSharp_Desc);
 					helptext.Add(barrier);
@@ -80,27 +89,56 @@ namespace SabreTools.Helper
 					helptext.Add("");
 					helptext.Add("Options:");
 					helptext.Add("  -?, -h, --help	Show this help");
+
+					// Archive
 					helptext.Add("  archive		Adds ROM files from the specified directories to depot");
-					helptext.Add("	-only-needed		Only archive ROM files in database");
+						helptext.Add("	-only-needed		Only archive ROM files in database");
+
+					// Build
 					helptext.Add("  build			For each specified DAT file it creates TZip files");
-					helptext.Add("	-copy				Copy files instead of rebuilding");
+						helptext.Add("	-copy				Copy files instead of rebuilding");
+
+					// Stats
 					helptext.Add("  dbstats		Prints db stats");
+
+					// Rescan Depots
 					helptext.Add("  depot-rescan	Rescan a specific depot to get new information");
+
+					// Diffdat
 					helptext.Add("  diffdat		Creates a DAT file for entries found in the new DAT");
-					helptext.Add("	-new=			DAT to compare to");
+						helptext.Add("	-new=			DAT to compare to");
+
+					// Dir2DAT / DATFromDir
 					helptext.Add("  dir2dat		Creates a DAT file for the specified input directory");
-					helptext.Add("	-out=			Filename to save out to");
+						helptext.Add("	-out=			Filename to save out to");
+
+					// Export
 					helptext.Add("  export		Exports db to export.csv");
+
+					// Fixdat
 					helptext.Add("  fixdat		For each specified DAT file it creates a fix DAT");
+
+					// Lookup
 					helptext.Add("  lookup		For each specified hash, look up available information");
+
+					// Memstats
 					helptext.Add("  memstats		Prints memory stats");
+
+					// Miss
 					helptext.Add("  miss			For each specified DAT file, create miss and have file");
-					helptext.Add("  progress		Shows progress of currently running command [OBSOLETE]");
+					
+					// Purge
 					helptext.Add("  purge-backup		Moves DAT index entries for orphaned DATs");
 					helptext.Add("  purge-delete		Deletes DAT index entries for orphaned DATs");
+
+					// Refresh DATs
 					helptext.Add("  refresh-dats		Refreshes the DAT index from the files in the DAT root");
+
+					// Obsolete
+					helptext.Add("  progress		Shows progress of currently running command [OBSOLETE]");
 					helptext.Add("  shutdown		Gracefully shuts down server [OBSOLETE]");
 					break;
+
 				case "SabreTools":
 					helptext.Add(Resources.Resources.SabreTools_Name + " - " + Resources.Resources.SabreTools_Desc);
 					helptext.Add(barrier);
@@ -322,15 +360,16 @@ namespace SabreTools.Helper
 					helptext.Add("");
 					helptext.Add("Filter parameters game name, rom name, CRC, MD5, SHA-1 can");
 						helptext.Add("do partial matches using asterisks as follows (case insensitive):");
-						helptext.Add("    *00 means ends with '00'");
-						helptext.Add("    00* means starts with '00'");
-						helptext.Add("    *00* means contains '00'");
-						helptext.Add("    00 means exactly equals '00'");
+						helptext.Add("	*00 means ends with '00'");
+						helptext.Add("	00* means starts with '00'");
+						helptext.Add("	*00* means contains '00'");
+						helptext.Add("	00 means exactly equals '00'");
 
 					helptext.Add("");
 					helptext.Add("Filter parameters for size can use postfixes for inputs:");
-					helptext.Add("    e.g. 8kb => 8000 or 8kib => 8192");
+					helptext.Add("	e.g. 8kb => 8000 or 8kib => 8192");
 					break;
+
 				case "SimpleSort":
 					helptext.Add(Resources.Resources.SimpleSort_Name + " - " + Resources.Resources.SimpleSort_Desc);
 					helptext.Add(barrier);
@@ -385,23 +424,6 @@ namespace SabreTools.Helper
 					Pause();
 				}
 			}
-			Pause();
-		}
-
-		/// <summary>
-		/// Display the credits for the program
-		/// </summary>
-		public static void Credits()
-		{
-			Console.WriteLine(@"-----------------------------------------
-Credits
------------------------------------------
-
-Programmer / Lead:	Matt Nadareski (darksabre76)
-Additional code:	emuLOAD, @tractivo, motoschifo
-Testing:		emuLOAD, @tractivo, Kludge, Obiwantje, edc
-Suggestions:		edc, AcidX, Amiga12, EliUmniCk
-Based on work by:	The Wizard of DATz");
 			Pause();
 		}
 

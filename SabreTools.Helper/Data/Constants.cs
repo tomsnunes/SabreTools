@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SabreTools.Helper
+namespace SabreTools.Helper.Data
 {
 	public static class Constants
 	{
@@ -14,70 +14,21 @@ namespace SabreTools.Helper
 
 		public const long SizeZero = 0;
 		public const string CRCZero = "00000000";
-		public static byte[] CRCZeroBytes = new byte[] { 0x00, 0x00, 0x00, 0x00 };
 		public const string MD5Zero = "d41d8cd98f00b204e9800998ecf8427e";
-		public static byte[] MD5ZeroBytes = new byte[] { 0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04, 0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e };
 		public const string SHA1Zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
-		public static byte[] SHA1ZeroBytes = new byte[] { 0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d, 0x32, 0x55, 0xbf, 0xef, 0x95, 0x60, 0x18, 0x90, 0xaf, 0xd8, 0x07, 0x09 };
 
 		#endregion
 
-		#region Hash string length constants
+		#region Byte (1000-based) size comparisons
 
-		public const int CRCLength = 8;
-		public const int CRCBytesLength = 4;
-		public const int MD5Length = 32;
-		public const int MD5BytesLength = 16;
-		public const int SHA1Length = 40;
-		public const int SHA1BytesLength = 20;
-
-		#endregion
-
-		#region Regex File Name Patterns
-
-		public const string DefaultPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.dat$";
-		public const string DefaultSpecialPattern = @"^(.+?) - (.+?) \((.*) (.*)\)\.xml$";
-		public const string GoodPattern = @"^(Good.*?)_.*\.dat";
-		public const string GoodXmlPattern = @"^(Good.*?)_.*\.xml";
-		public const string MamePattern = @"^(.*)\.xml$";
-		public const string MaybeIntroPattern = @"(.*?) \[T-En\].*\((\d{8})\)\.dat$";
-		public const string NoIntroPattern = @"^(.*?) \((\d{8}-\d{6})_CM\).*\.dat$";
-		public const string NoIntroNumberedPattern = @"(.*? - .*?) \(\d.*?_CM\).*.dat";
-		public const string NoIntroSpecialPattern = @"(.*? - .*?) \((\d{8})\).*\.dat";
-		public const string NonGoodPattern = @"^(NonGood.*?)( .*?)?.xml";
-		public const string NonGoodSpecialPattern = @"^(NonGood.*?)( .*)?.dat";
-		public const string RedumpPattern = @"^(.*?) \((\d{8} \d{2}-\d{2}-\d{2})\)\.dat$";
-		public const string RedumpBiosPattern = @"^(.*?) \(\d+\) \((\d{4}-\d{2}-\d{2})\)\.dat$";
-		public const string TosecPattern = @"^(.*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\).*\.dat$";
-		public const string TosecSpecialPatternA = @"^(.*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\).*\.dat$";
-		public const string TosecSpecialPatternB = @"^(.*? - .*? - .*?) - .* \(TOSEC-v(\d{4}-\d{2}-\d{2})_CM\).*\.dat$";
-		public const string TruripPattern = @"^(.*) - .* \(trurip_XML\)\.dat$";
-		public const string ZandroPattern = @"^SMW-.*.xml";
-
-		#endregion
-
-		#region Regex Mapped Name Patterns
-
-		public const string RemappedPattern = @"^(.*) - (.*)$";
-
-		#endregion
-
-		#region Regex Date Patterns
-
-		public const string DefaultDatePattern = @"(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})";
-		public const string NoIntroDatePattern = @"(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})";
-		public const string NoIntroSpecialDatePattern = @"(\d{4})(\d{2})(\d{2})";
-		public const string RedumpDatePattern = @"(\d{4})(\d{2})(\d{2}) (\d{2})-(\d{2})-(\d{2})";
-		public const string TosecDatePattern = @"(\d{4})-(\d{2})-(\d{2})";
-
-		#endregion
-
-		#region Regex conversion patterns
-
-		public const string XmlPattern = @"<(.*?)>(.*?)</(.*?)>";
-		public const string HeaderPatternCMP = @"(^.*?) \($";
-		public const string ItemPatternCMP = @"^\s*(\S*?) (.*)";
-		public const string EndPatternCMP = @"^\s*\)\s*$";
+		public const long KiloByte = 1000;
+		public static long MegaByte = (long)Math.Pow(KiloByte, 2);
+		public static long GigaByte = (long)Math.Pow(KiloByte, 3);
+		public static long TeraByte = (long)Math.Pow(KiloByte, 4);
+		public static long PetaByte = (long)Math.Pow(KiloByte, 5);
+		public static long ExaByte = (long)Math.Pow(KiloByte, 6);
+		public static long ZettaByte = (long)Math.Pow(KiloByte, 7);
+		public static long YottaByte = (long)Math.Pow(KiloByte, 8);
 
 		#endregion
 
@@ -88,30 +39,25 @@ namespace SabreTools.Helper
 		public static long GibiByte = (long)Math.Pow(KibiByte, 3);
 		public static long TibiByte = (long)Math.Pow(KibiByte, 4);
 		public static long PibiByte = (long)Math.Pow(KibiByte, 5);
+		public static long ExiByte = (long)Math.Pow(KibiByte, 6);
+		public static long ZittiByte = (long)Math.Pow(KibiByte, 7);
+		public static long YittiByte = (long)Math.Pow(KibiByte, 8);
 
 		#endregion
 
-		#region Byte (1000-based) size comparisons
+		#region Database schema
 
-		public const long KiloByte = 1000;
-		public static long MegaByte = (long)Math.Pow(KiloByte, 2);
-		public static long GigaByte = (long)Math.Pow(KiloByte, 2);
-		public static long TeraByte = (long)Math.Pow(KiloByte, 2);
-		public static long PetaByte = (long)Math.Pow(KiloByte, 2);
+		public const string HeadererDbSchema = "Headerer";
+		public const string HeadererFileName = "Headerer.sqlite";
+		public const string HeadererConnectionString = "Data Source=" + HeadererFileName + ";Version = 3;";
 
 		#endregion
 
-		#region Magic numbers as byte arrays
+		#region Hash string length constants
 
-		public static byte[] SevenZipSigBytes = new byte[] { 0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c };
-		public static byte[] GzSigBytes = new byte[] { 0x1f, 0x8b };
-		public static byte[] RarSigBytes = new byte[] { 0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00 };
-		public static byte[] RarFiveSigBytes = new byte[] { 0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x01, 0x00 };
-		public static byte[] TarSigBytes = new byte[] { 0x75, 0x73, 0x74, 0x61, 0x72, 0x20, 0x20, 0x00 };
-		public static byte[] TarZeroSigBytes = new byte[] { 0x75, 0x73, 0x74, 0x61, 0x72, 0x00, 0x30, 0x30 };
-		public static byte[] ZipSigBytes = new byte[] { 0x50, 0x4b, 0x03, 0x04 };
-		public static byte[] ZipSigEmptyBytes = new byte[] { 0x50, 0x4b, 0x05, 0x06 };
-		public static byte[] ZipSigSpannedBytes = new byte[] { 0x50, 0x4b, 0x07, 0x08 };
+		public const int CRCLength = 8;
+		public const int MD5Length = 32;
+		public const int SHA1Length = 40;
 
 		#endregion
 
@@ -126,6 +72,15 @@ namespace SabreTools.Helper
 		public const string ZipSig = "504B0304";
 		public const string ZipSigEmpty = "504B0506";
 		public const string ZipSigSpanned = "504B0708";
+
+		#endregion
+
+		#region Regular Expressions
+
+		public const string XmlPattern = @"<(.*?)>(.*?)</(.*?)>";
+		public const string HeaderPatternCMP = @"(^.*?) \($";
+		public const string ItemPatternCMP = @"^\s*(\S*?) (.*)";
+		public const string EndPatternCMP = @"^\s*\)\s*$";
 
 		#endregion
 
@@ -182,14 +137,6 @@ namespace SabreTools.Helper
 		public const uint Zip64EndOfCentralDirSignature = 0x06064b50;
 		public const uint Zip64EndOfCentralDirectoryLocator = 0x07064b50;
 		public const uint TorrentZipFileDateTime = 0x2198BC00;
-
-		#endregion
-
-		#region Database schema
-
-		public const string HeadererDbSchema = "Headerer";
-		public const string HeadererFileName = "Headerer.sqlite";
-		public const string HeadererConnectionString = "Data Source=" + HeadererFileName + ";Version = 3;";
 
 		#endregion
 	}

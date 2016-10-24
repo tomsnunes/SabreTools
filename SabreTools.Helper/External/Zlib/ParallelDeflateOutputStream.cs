@@ -29,8 +29,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.IO;
 
-
-namespace SabreTools.Helper
+namespace Ionic.Zlib
 {
 	internal class WorkItem
 	{
@@ -104,31 +103,31 @@ namespace SabreTools.Helper
 		private static readonly int BufferPairsPerCore = 4;
 
 		private System.Collections.Generic.List<WorkItem> _pool;
-		private bool                        _leaveOpen;
-		private bool                        emitting;
-		private System.IO.Stream            _outStream;
-		private int                         _maxBufferPairs;
-		private int                         _bufferSize = IO_BUFFER_SIZE_DEFAULT;
-		private AutoResetEvent              _newlyCompressedBlob;
-		//private ManualResetEvent            _writingDone;
-		//private ManualResetEvent            _sessionReset;
-		private object                      _outputLock = new object();
-		private bool                        _isClosed;
-		private bool                        _firstWriteDone;
-		private int                         _currentlyFilling;
-		private int                         _lastFilled;
-		private int                         _lastWritten;
-		private int                         _latestCompressed;
-		private int                         _Crc32;
-		private CRC32                       _runningCrc;
-		private object                      _latestLock = new object();
-		private System.Collections.Generic.Queue<int>     _toWrite;
-		private System.Collections.Generic.Queue<int>     _toFill;
-		private Int64                       _totalBytesProcessed;
-		private CompressionLevel            _compressLevel;
-		private volatile Exception          _pendingException;
-		private bool                        _handlingException;
-		private object                      _eLock = new Object();  // protects _pendingException
+		private bool						_leaveOpen;
+		private bool						emitting;
+		private System.IO.Stream			_outStream;
+		private int						 _maxBufferPairs;
+		private int						 _bufferSize = IO_BUFFER_SIZE_DEFAULT;
+		private AutoResetEvent			  _newlyCompressedBlob;
+		//private ManualResetEvent			_writingDone;
+		//private ManualResetEvent			_sessionReset;
+		private object					  _outputLock = new object();
+		private bool						_isClosed;
+		private bool						_firstWriteDone;
+		private int						 _currentlyFilling;
+		private int						 _lastFilled;
+		private int						 _lastWritten;
+		private int						 _latestCompressed;
+		private int						 _Crc32;
+		private CRC32					   _runningCrc;
+		private object					  _latestLock = new object();
+		private System.Collections.Generic.Queue<int>	 _toWrite;
+		private System.Collections.Generic.Queue<int>	 _toFill;
+		private Int64					   _totalBytesProcessed;
+		private CompressionLevel			_compressLevel;
+		private volatile Exception		  _pendingException;
+		private bool						_handlingException;
+		private object					  _eLock = new Object();  // protects _pendingException
 
 		// This bitfield is used only when Trace is defined.
 		//private TraceBits _DesiredTrace = TraceBits.Write | TraceBits.WriteBegin |
@@ -188,16 +187,16 @@ namespace SabreTools.Helper
 		/// String outputFile = fileToCompress + ".compressed";
 		/// using (System.IO.Stream input = System.IO.File.OpenRead(fileToCompress))
 		/// {
-		///     using (var raw = System.IO.File.Create(outputFile))
-		///     {
-		///         using (Stream compressor = new ParallelDeflateOutputStream(raw))
-		///         {
-		///             while ((n= input.Read(buffer, 0, buffer.Length)) != 0)
-		///             {
-		///                 compressor.Write(buffer, 0, n);
-		///             }
-		///         }
-		///     }
+		///	 using (var raw = System.IO.File.Create(outputFile))
+		///	 {
+		///		 using (Stream compressor = new ParallelDeflateOutputStream(raw))
+		///		 {
+		///			 while ((n= input.Read(buffer, 0, buffer.Length)) != 0)
+		///			 {
+		///				 compressor.Write(buffer, 0, n);
+		///			 }
+		///		 }
+		///	 }
 		/// }
 		/// </code>
 		/// <code lang="VB">
@@ -205,16 +204,16 @@ namespace SabreTools.Helper
 		/// Dim n As Integer = -1
 		/// Dim outputFile As String = (fileToCompress &amp; ".compressed")
 		/// Using input As Stream = File.OpenRead(fileToCompress)
-		///     Using raw As FileStream = File.Create(outputFile)
-		///         Using compressor As Stream = New ParallelDeflateOutputStream(raw)
-		///             Do While (n &lt;&gt; 0)
-		///                 If (n &gt; 0) Then
-		///                     compressor.Write(buffer, 0, n)
-		///                 End If
-		///                 n = input.Read(buffer, 0, buffer.Length)
-		///             Loop
-		///         End Using
-		///     End Using
+		///	 Using raw As FileStream = File.Create(outputFile)
+		///		 Using compressor As Stream = New ParallelDeflateOutputStream(raw)
+		///			 Do While (n &lt;&gt; 0)
+		///				 If (n &gt; 0) Then
+		///					 compressor.Write(buffer, 0, n)
+		///				 End If
+		///				 n = input.Read(buffer, 0, buffer.Length)
+		///			 Loop
+		///		 End Using
+		///	 End Using
 		/// End Using
 		/// </code>
 		/// </example>
@@ -248,7 +247,7 @@ namespace SabreTools.Helper
 		/// </remarks>
 		/// <param name="stream">The stream to which compressed data will be written.</param>
 		/// <param name="leaveOpen">
-		///    true if the application would like the stream to remain open after inflation/deflation.
+		///	true if the application would like the stream to remain open after inflation/deflation.
 		/// </param>
 		public ParallelDeflateOutputStream(System.IO.Stream stream, bool leaveOpen)
 			: this(stream, CompressionLevel.Default, CompressionStrategy.Default, leaveOpen)
@@ -266,7 +265,7 @@ namespace SabreTools.Helper
 		/// <param name="stream">The stream to which compressed data will be written.</param>
 		/// <param name="level">A tuning knob to trade speed for effectiveness.</param>
 		/// <param name="leaveOpen">
-		///    true if the application would like the stream to remain open after inflation/deflation.
+		///	true if the application would like the stream to remain open after inflation/deflation.
 		/// </param>
 		public ParallelDeflateOutputStream(System.IO.Stream stream, CompressionLevel level, bool leaveOpen)
 			: this(stream, CompressionLevel.Default, CompressionStrategy.Default, leaveOpen)
@@ -290,7 +289,7 @@ namespace SabreTools.Helper
 		///   data with particular characteristics.
 		/// </param>
 		/// <param name="leaveOpen">
-		///    true if the application would like the stream to remain open after inflation/deflation.
+		///	true if the application would like the stream to remain open after inflation/deflation.
 		/// </param>
 		public ParallelDeflateOutputStream(System.IO.Stream stream,
 										   CompressionLevel level,
@@ -305,7 +304,6 @@ namespace SabreTools.Helper
 			_leaveOpen = leaveOpen;
 			this.MaxBufferPairs = 16; // default
 		}
-
 
 		/// <summary>
 		///   The ZLIB strategy to be used during compression.
@@ -397,8 +395,10 @@ namespace SabreTools.Helper
 			set
 			{
 				if (value < 4)
+				{
 					throw new ArgumentException("MaxBufferPairs",
-												"Value must be 4 or greater.");
+												  "Value must be 4 or greater.");
+				}
 				_maxBufferPairs = value;
 			}
 		}
@@ -449,8 +449,10 @@ namespace SabreTools.Helper
 			set
 			{
 				if (value < 1024)
+				{
 					throw new ArgumentOutOfRangeException("BufferSize",
-														  "BufferSize must be greater than 1024 bytes");
+															"BufferSize must be greater than 1024 bytes");
+				}
 				_bufferSize = value;
 			}
 		}
@@ -463,7 +465,6 @@ namespace SabreTools.Helper
 		/// </remarks>
 		public int Crc32 { get { return _Crc32; } }
 
-
 		/// <summary>
 		/// The total number of uncompressed bytes processed by the ParallelDeflateOutputStream.
 		/// </summary>
@@ -471,7 +472,6 @@ namespace SabreTools.Helper
 		/// This value is meaningful only after a call to Close().
 		/// </remarks>
 		public Int64 BytesProcessed { get { return _totalBytesProcessed; } }
-
 
 		private void _InitializePoolOfWorkItems()
 		{
@@ -493,9 +493,6 @@ namespace SabreTools.Helper
 			_lastWritten = -1;
 			_latestCompressed = -1;
 		}
-
-
-
 
 		/// <summary>
 		///   Write data to the stream.
@@ -531,7 +528,9 @@ namespace SabreTools.Helper
 			//   3. if more data to be written,  goto step 1
 
 			if (_isClosed)
+			{
 				throw new InvalidOperationException();
+			}
 
 			// dispense any exceptions that occurred on the BG threads
 			if (_pendingException != null)
@@ -553,7 +552,6 @@ namespace SabreTools.Helper
 				_firstWriteDone = true;
 			}
 
-
 			do
 			{
 				// may need to make buffers available
@@ -566,13 +564,13 @@ namespace SabreTools.Helper
 				{
 					ix = _currentlyFilling;
 					TraceOutput(TraceBits.WriteTake,
-								"Write    notake   wi({0}) lf({1})",
+								"Write	notake   wi({0}) lf({1})",
 								ix,
 								_lastFilled);
 				}
 				else
 				{
-					TraceOutput(TraceBits.WriteTake, "Write    take?");
+					TraceOutput(TraceBits.WriteTake, "Write	take?");
 					if (_toFill.Count == 0)
 					{
 						// no available buffers, so... need to emit
@@ -583,7 +581,7 @@ namespace SabreTools.Helper
 
 					ix = _toFill.Dequeue();
 					TraceOutput(TraceBits.WriteTake,
-								"Write    take     wi({0}) lf({1})",
+								"Write	take	 wi({0}) lf({1})",
 								ix,
 								_lastFilled);
 					++_lastFilled; // TODO: consider rollover?
@@ -598,7 +596,7 @@ namespace SabreTools.Helper
 				workitem.ordinal = _lastFilled;
 
 				TraceOutput(TraceBits.Write,
-							"Write    lock     wi({0}) ord({1}) iba({2})",
+							"Write	lock	 wi({0}) ord({1}) iba({2})",
 							workitem.index,
 							workitem.ordinal,
 							workitem.inputBytesAvailable
@@ -622,29 +620,33 @@ namespace SabreTools.Helper
 					// we can assume Write() calls come in from only one
 					// thread.
 					TraceOutput(TraceBits.Write,
-								"Write    QUWI     wi({0}) ord({1}) iba({2}) nf({3})",
+								"Write	QUWI	 wi({0}) ord({1}) iba({2}) nf({3})",
 								workitem.index,
 								workitem.ordinal,
-								workitem.inputBytesAvailable );
+								workitem.inputBytesAvailable);
 
-					if (!ThreadPool.QueueUserWorkItem( _DeflateOne, workitem ))
+					if (!ThreadPool.QueueUserWorkItem(_DeflateOne, workitem))
+					{
 						throw new Exception("Cannot enqueue workitem");
+					}
 
 					_currentlyFilling = -1; // will get a new buffer next time
 				}
 				else
+				{
 					_currentlyFilling = ix;
+				}
 
 				if (count > 0)
-					TraceOutput(TraceBits.WriteEnter, "Write    more");
+				{
+					TraceOutput(TraceBits.WriteEnter, "Write	more");
+				}
 			}
 			while (count > 0);  // until no more to write
 
-			TraceOutput(TraceBits.WriteEnter, "Write    exit");
+			TraceOutput(TraceBits.WriteEnter, "Write	exit");
 			return;
 		}
-
-
 
 		private void _FlushFinish()
 		{
@@ -663,18 +665,20 @@ namespace SabreTools.Helper
 			rc = compressor.Deflate(FlushType.Finish);
 
 			if (rc != ZlibConstants.Z_STREAM_END && rc != ZlibConstants.Z_OK)
+			{
 				throw new Exception("deflating: " + compressor.Message);
+			}
 
 			if (buffer.Length - compressor.AvailableBytesOut > 0)
 			{
 				TraceOutput(TraceBits.EmitBegin,
-							"Emit     begin    flush bytes({0})",
+							"Emit	 begin	flush bytes({0})",
 							buffer.Length - compressor.AvailableBytesOut);
 
 				_outStream.Write(buffer, 0, buffer.Length - compressor.AvailableBytesOut);
 
 				TraceOutput(TraceBits.EmitDone,
-							"Emit     done     flush");
+							"Emit	 done	 flush");
 			}
 
 			compressor.EndDeflate();
@@ -682,13 +686,17 @@ namespace SabreTools.Helper
 			_Crc32 = _runningCrc.Crc32Result;
 		}
 
-
 		private void _Flush(bool lastInput)
 		{
 			if (_isClosed)
+			{
 				throw new InvalidOperationException();
+			}
 
-			if (emitting) return;
+			if (emitting)
+			{
+				return;
+			}
 
 			// compress any partial buffer
 			if (_currentlyFilling >= 0)
@@ -709,8 +717,6 @@ namespace SabreTools.Helper
 			}
 		}
 
-
-
 		/// <summary>
 		/// Flush the stream.
 		/// </summary>
@@ -724,11 +730,12 @@ namespace SabreTools.Helper
 				throw pe;
 			}
 			if (_handlingException)
+			{
 				return;
+			}
 
 			_Flush(false);
 		}
-
 
 		/// <summary>
 		/// Close the stream.
@@ -750,31 +757,36 @@ namespace SabreTools.Helper
 			}
 
 			if (_handlingException)
+			{
 				return;
+			}
 
-			if (_isClosed) return;
+			if (_isClosed)
+			{
+				return;
+			}
 
 			_Flush(true);
 
 			if (!_leaveOpen)
+			{
 				_outStream.Close();
+			}
 
 			_isClosed= true;
 		}
-
-
 
 		// workitem 10030 - implement a new Dispose method
 
 		/// <summary>Dispose the object</summary>
 		/// <remarks>
 		///   <para>
-		///     Because ParallelDeflateOutputStream is IDisposable, the
-		///     application must call this method when finished using the instance.
+		///	 Because ParallelDeflateOutputStream is IDisposable, the
+		///	 application must call this method when finished using the instance.
 		///   </para>
 		///   <para>
-		///     This method is generally called implicitly upon exit from
-		///     a <c>using</c> scope in C# (<c>Using</c> in VB).
+		///	 This method is generally called implicitly upon exit from
+		///	 a <c>using</c> scope in C# (<c>Using</c> in VB).
 		///   </para>
 		/// </remarks>
 		new public void Dispose()
@@ -785,8 +797,6 @@ namespace SabreTools.Helper
 			Dispose(true);
 		}
 
-
-
 		/// <summary>The Dispose method</summary>
 		/// <param name="disposing">
 		///   indicates whether the Dispose method was invoked by user code.
@@ -795,7 +805,6 @@ namespace SabreTools.Helper
 		{
 			base.Dispose(disposing);
 		}
-
 
 		/// <summary>
 		///   Resets the stream for use with another stream.
@@ -816,24 +825,24 @@ namespace SabreTools.Helper
 		/// ParallelDeflateOutputStream deflater = null;
 		/// foreach (var inputFile in listOfFiles)
 		/// {
-		///     string outputFile = inputFile + ".compressed";
-		///     using (System.IO.Stream input = System.IO.File.OpenRead(inputFile))
-		///     {
-		///         using (var outStream = System.IO.File.Create(outputFile))
-		///         {
-		///             if (deflater == null)
-		///                 deflater = new ParallelDeflateOutputStream(outStream,
-		///                                                            CompressionLevel.Best,
-		///                                                            CompressionStrategy.Default,
-		///                                                            true);
-		///             deflater.Reset(outStream);
+		///	 string outputFile = inputFile + ".compressed";
+		///	 using (System.IO.Stream input = System.IO.File.OpenRead(inputFile))
+		///	 {
+		///		 using (var outStream = System.IO.File.Create(outputFile))
+		///		 {
+		///			 if (deflater == null)
+		///				 deflater = new ParallelDeflateOutputStream(outStream,
+		///															CompressionLevel.Best,
+		///															CompressionStrategy.Default,
+		///															true);
+		///			 deflater.Reset(outStream);
 		///
-		///             while ((n= input.Read(buffer, 0, buffer.Length)) != 0)
-		///             {
-		///                 deflater.Write(buffer, 0, n);
-		///             }
-		///         }
-		///     }
+		///			 while ((n= input.Read(buffer, 0, buffer.Length)) != 0)
+		///			 {
+		///				 deflater.Write(buffer, 0, n);
+		///			 }
+		///		 }
+		///	 }
 		/// }
 		/// </code>
 		/// </example>
@@ -842,7 +851,10 @@ namespace SabreTools.Helper
 			TraceOutput(TraceBits.Session, "-------------------------------------------------------");
 			TraceOutput(TraceBits.Session, "Reset {0:X8} firstDone({1})", this.GetHashCode(), _firstWriteDone);
 
-			if (!_firstWriteDone) return;
+			if (!_firstWriteDone)
+			{
+				return;
+			}
 
 			// reset all status
 			_toWrite.Clear();
@@ -864,9 +876,6 @@ namespace SabreTools.Helper
 			_outStream = stream;
 		}
 
-
-
-
 		private void EmitPendingBuffers(bool doAll, bool mustWait)
 		{
 			// When combining parallel deflation with a ZipSegmentedStream, it's
@@ -877,10 +886,15 @@ namespace SabreTools.Helper
 			// method invokes this method AGAIN.  This can lead to a deadlock.
 			// Therefore, failfast if re-entering.
 
-			if (emitting) return;
+			if (emitting)
+			{
+				return;
+			}
 			emitting = true;
 			if (doAll || mustWait)
+			{
 				_newlyCompressedBlob.WaitOne();
+			}
 
 			do
 			{
@@ -896,7 +910,9 @@ namespace SabreTools.Helper
 						try
 						{
 							if (_toWrite.Count > 0)
+							{
 								nextToWrite = _toWrite.Dequeue();
+							}
 						}
 						finally
 						{
@@ -910,13 +926,13 @@ namespace SabreTools.Helper
 							{
 								// out of order. requeue and try again.
 								TraceOutput(TraceBits.EmitSkip,
-											"Emit     skip     wi({0}) ord({1}) lw({2}) fs({3})",
+											"Emit	 skip	 wi({0}) ord({1}) lw({2}) fs({3})",
 											workitem.index,
 											workitem.ordinal,
 											_lastWritten,
 											firstSkip);
 
-								lock(_toWrite)
+								lock (_toWrite)
 								{
 									_toWrite.Enqueue(nextToWrite);
 								}
@@ -930,7 +946,9 @@ namespace SabreTools.Helper
 									firstSkip = -1;
 								}
 								else if (firstSkip == -1)
+								{
 									firstSkip = nextToWrite;
+								}
 
 								continue;
 							}
@@ -938,7 +956,7 @@ namespace SabreTools.Helper
 							firstSkip = -1;
 
 							TraceOutput(TraceBits.EmitBegin,
-										"Emit     begin    wi({0}) ord({1})              cba({2})",
+										"Emit	 begin	wi({0}) ord({1})			  cba({2})",
 										workitem.index,
 										workitem.ordinal,
 										workitem.compressedBytesAvailable);
@@ -949,7 +967,7 @@ namespace SabreTools.Helper
 							workitem.inputBytesAvailable = 0;
 
 							TraceOutput(TraceBits.EmitDone,
-										"Emit     done     wi({0}) ord({1})              cba({2}) mtw({3})",
+										"Emit	 done	 wi({0}) ord({1})			  cba({2}) mtw({3})",
 										workitem.index,
 										workitem.ordinal,
 										workitem.compressedBytesAvailable,
@@ -959,20 +977,22 @@ namespace SabreTools.Helper
 							_toFill.Enqueue(workitem.index);
 
 							// don't wait next time through
-							if (millisecondsToWait == -1) millisecondsToWait = 0;
+							if (millisecondsToWait == -1)
+							{
+								millisecondsToWait = 0;
+							}
 						}
 					}
 					else
+					{
 						nextToWrite = -1;
-
+					}
 				} while (nextToWrite >= 0);
 
 			} while (doAll && (_lastWritten != _latestCompressed));
 
 			emitting = false;
 		}
-
-
 
 #if OLD
 		private void _PerpetualWriterMethod(object state)
@@ -984,13 +1004,15 @@ namespace SabreTools.Helper
 				do
 				{
 					// wait for the next session
-					TraceOutput(TraceBits.Synch | TraceBits.WriterThread, "Synch    _sessionReset.WaitOne(begin) PWM");
+					TraceOutput(TraceBits.Synch | TraceBits.WriterThread, "Synch	_sessionReset.WaitOne(begin) PWM");
 					_sessionReset.WaitOne();
-					TraceOutput(TraceBits.Synch | TraceBits.WriterThread, "Synch    _sessionReset.WaitOne(done)  PWM");
+					TraceOutput(TraceBits.Synch | TraceBits.WriterThread, "Synch	_sessionReset.WaitOne(done)  PWM");
 
-					if (_isDisposed) break;
-
-					TraceOutput(TraceBits.Synch | TraceBits.WriterThread, "Synch    _sessionReset.Reset()        PWM");
+					if (_isDisposed)
+					{
+						break;
+					}
+					TraceOutput(TraceBits.Synch | TraceBits.WriterThread, "Synch	_sessionReset.Reset()		PWM");
 					_sessionReset.Reset();
 
 					// repeatedly write buffers as they become ready
@@ -1003,7 +1025,7 @@ namespace SabreTools.Helper
 						{
 							if (_noMoreInputForThisSegment)
 								TraceOutput(TraceBits.Write,
-											   "Write    drain    wi({0}) stat({1}) canuse({2})  cba({3})",
+											   "Write	drain	wi({0}) stat({1}) canuse({2})  cba({3})",
 											   workitem.index,
 											   workitem.status,
 											   (workitem.status == (int)WorkItem.Status.Compressed),
@@ -1014,7 +1036,7 @@ namespace SabreTools.Helper
 								if (workitem.status == (int)WorkItem.Status.Compressed)
 								{
 									TraceOutput(TraceBits.WriteBegin,
-												   "Write    begin    wi({0}) stat({1})              cba({2})",
+												   "Write	begin	wi({0}) stat({1})			  cba({2})",
 												   workitem.index,
 												   workitem.status,
 												   workitem.compressedBytesAvailable);
@@ -1028,7 +1050,7 @@ namespace SabreTools.Helper
 									workitem.status = (int)WorkItem.Status.Done;
 
 									TraceOutput(TraceBits.WriteDone,
-												   "Write    done     wi({0}) stat({1})              cba({2})",
+												   "Write	done	 wi({0}) stat({1})			  cba({2})",
 												   workitem.index,
 												   workitem.status,
 												   workitem.compressedBytesAvailable);
@@ -1045,7 +1067,7 @@ namespace SabreTools.Helper
 									while (workitem.status != (int)WorkItem.Status.Compressed)
 									{
 										TraceOutput(TraceBits.WriteWait,
-													   "Write    waiting  wi({0}) stat({1}) nw({2}) nf({3}) nomore({4})",
+													   "Write	waiting  wi({0}) stat({1}) nw({2}) nf({3}) nomore({4})",
 													   workitem.index,
 													   workitem.status,
 													   _nextToWrite, _nextToFill,
@@ -1063,7 +1085,7 @@ namespace SabreTools.Helper
 
 										if (workitem.status == (int)WorkItem.Status.Compressed)
 											TraceOutput(TraceBits.WriteWait,
-														   "Write    A-OK     wi({0}) stat({1}) iba({2}) cba({3}) cyc({4})",
+														   "Write	A-OK	 wi({0}) stat({1}) iba({2}) cba({3}) cyc({4})",
 														   workitem.index,
 														   workitem.status,
 														   workitem.inputBytesAvailable,
@@ -1081,7 +1103,7 @@ namespace SabreTools.Helper
 
 						if (_noMoreInputForThisSegment)
 							TraceOutput(TraceBits.Write,
-										   "Write    nomore  nw({0}) nf({1}) break({2})",
+										   "Write	nomore  nw({0}) nf({1}) break({2})",
 										   _nextToWrite, _nextToFill, (_nextToWrite == _nextToFill));
 
 						if (_noMoreInputForThisSegment && _nextToWrite == _nextToFill)
@@ -1111,13 +1133,13 @@ namespace SabreTools.Helper
 					if (buffer.Length - compressor.AvailableBytesOut > 0)
 					{
 						TraceOutput(TraceBits.WriteBegin,
-									   "Write    begin    flush bytes({0})",
+									   "Write	begin	flush bytes({0})",
 									   buffer.Length - compressor.AvailableBytesOut);
 
 						_outStream.Write(buffer, 0, buffer.Length - compressor.AvailableBytesOut);
 
 						TraceOutput(TraceBits.WriteBegin,
-									   "Write    done     flush");
+									   "Write	done	 flush");
 					}
 
 					compressor.EndDeflate();
@@ -1125,7 +1147,7 @@ namespace SabreTools.Helper
 					_Crc32 = c.Crc32Result;
 
 					// signal that writing is complete:
-					TraceOutput(TraceBits.Synch, "Synch    _writingDone.Set()           PWM");
+					TraceOutput(TraceBits.Synch, "Synch	_writingDone.Set()		   PWM");
 					_writingDone.Set();
 				}
 				while (true);
@@ -1143,9 +1165,6 @@ namespace SabreTools.Helper
 			TraceOutput(TraceBits.WriterThread, "_PerpetualWriterMethod FINIS");
 		}
 #endif
-
-
-
 
 		private void _DeflateOne(Object wi)
 		{
@@ -1165,7 +1184,7 @@ namespace SabreTools.Helper
 				// update status
 				workitem.crc = crc.Crc32Result;
 				TraceOutput(TraceBits.Compress,
-							"Compress          wi({0}) ord({1}) len({2})",
+							"Compress		  wi({0}) ord({1}) len({2})",
 							workitem.index,
 							workitem.ordinal,
 							workitem.compressedBytesAvailable
@@ -1174,7 +1193,9 @@ namespace SabreTools.Helper
 				lock(_latestLock)
 				{
 					if (workitem.ordinal > _latestCompressed)
+					{
 						_latestCompressed = workitem.ordinal;
+					}
 				}
 				lock (_toWrite)
 				{
@@ -1187,14 +1208,13 @@ namespace SabreTools.Helper
 				lock(_eLock)
 				{
 					// expose the exception to the main thread
-					if (_pendingException!=null)
+					if (_pendingException != null)
+					{
 						_pendingException = exc1;
+					}
 				}
 			}
 		}
-
-
-
 
 		private bool DeflateOneSegment(WorkItem workitem)
 		{
@@ -1221,7 +1241,6 @@ namespace SabreTools.Helper
 			return true;
 		}
 
-
 		[System.Diagnostics.ConditionalAttribute("Trace")]
 		private void TraceOutput(TraceBits bits, string format, params object[] varParams)
 		{
@@ -1242,32 +1261,29 @@ namespace SabreTools.Helper
 			}
 		}
 
-
 		// used only when Trace is defined
 		[Flags]
 		enum TraceBits : uint
 		{
-			None         = 0,
-			NotUsed1     = 1,
-			EmitLock     = 2,
-			EmitEnter    = 4,    // enter _EmitPending
-			EmitBegin    = 8,    // begin to write out
-			EmitDone     = 16,   // done writing out
-			EmitSkip     = 32,   // writer skipping a workitem
-			EmitAll      = 58,   // All Emit flags
-			Flush        = 64,
-			Lifecycle    = 128,  // constructor/disposer
-			Session      = 256,  // Close/Reset
-			Synch        = 512,  // thread synchronization
-			Instance     = 1024, // instance settings
-			Compress     = 2048,  // compress task
-			Write        = 4096,    // filling buffers, when caller invokes Write()
-			WriteEnter   = 8192,    // upon entry to Write()
-			WriteTake    = 16384,    // on _toFill.Take()
-			All          = 0xffffffff,
+			None		 = 0,
+			NotUsed1	 = 1,
+			EmitLock	 = 2,
+			EmitEnter	= 4,	// enter _EmitPending
+			EmitBegin	= 8,	// begin to write out
+			EmitDone	 = 16,   // done writing out
+			EmitSkip	 = 32,   // writer skipping a workitem
+			EmitAll	  = 58,   // All Emit flags
+			Flush		= 64,
+			Lifecycle	= 128,  // constructor/disposer
+			Session	  = 256,  // Close/Reset
+			Synch		= 512,  // thread synchronization
+			Instance	 = 1024, // instance settings
+			Compress	 = 2048,  // compress task
+			Write		= 4096,	// filling buffers, when caller invokes Write()
+			WriteEnter   = 8192,	// upon entry to Write()
+			WriteTake	= 16384,	// on _toFill.Take()
+			All		  = 0xffffffff,
 		}
-
-
 
 		/// <summary>
 		/// Indicates whether the stream supports Seek operations.
@@ -1279,7 +1295,6 @@ namespace SabreTools.Helper
 		{
 			get { return false; }
 		}
-
 
 		/// <summary>
 		/// Indicates whether the stream supports Read operations.
@@ -1316,9 +1331,9 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <remarks>
 		///   <para>
-		///     Because the output gets written by a background thread,
-		///     the value may change asynchronously.  Setting this
-		///     property always throws a NotSupportedException.
+		///	 Because the output gets written by a background thread,
+		///	 the value may change asynchronously.  Setting this
+		///	 property always throws a NotSupportedException.
 		///   </para>
 		/// </remarks>
 		public override long Position
@@ -1377,9 +1392,5 @@ namespace SabreTools.Helper
 		{
 			throw new NotSupportedException();
 		}
-
 	}
-
 }
-
-
