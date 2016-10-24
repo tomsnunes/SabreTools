@@ -202,13 +202,17 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					DatFile.SplitByExt(Path.GetFullPath(input), outDir, Path.GetDirectoryName(input), extaList, extbList, _logger);
+					DatFile datFile = new DatFile();
+					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, softlist: true);
+					datFile.SplitByExt(outDir, Path.GetDirectoryName(input), extaList, extbList, _logger);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatFile.SplitByExt(file, outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), extaList, extbList, _logger);
+						DatFile datFile = new DatFile();
+						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, softlist: true);
+						datFile.SplitByExt(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), extaList, extbList, _logger);
 					}
 				}
 				else
@@ -233,13 +237,17 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					DatFile.SplitByHash(Path.GetFullPath(input), outDir, Path.GetDirectoryName(input), _logger);
+					DatFile datFile = new DatFile();
+					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, softlist: true);
+					datFile.SplitByHash(outDir, Path.GetDirectoryName(input), _logger);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatFile.SplitByHash(file, outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
+						DatFile datFile = new DatFile();
+						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, softlist: true);
+						datFile.SplitByHash(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
 					}
 				}
 				else
@@ -358,13 +366,17 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					DatFile.SplitByType(Path.GetFullPath(input), outDir, Path.GetFullPath(Path.GetDirectoryName(input)), _logger);
+					DatFile datFile = new DatFile();
+					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, softlist: true);
+					datFile.SplitByType(outDir, Path.GetFullPath(Path.GetDirectoryName(input)), _logger);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						DatFile.SplitByType(file, outDir, Path.GetFullPath((input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar)), _logger);
+						DatFile datFile = new DatFile();
+						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, softlist: true);
+						datFile.SplitByType(outDir, Path.GetFullPath((input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar)), _logger);
 					}
 				}
 				else
