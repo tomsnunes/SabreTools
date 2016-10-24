@@ -180,7 +180,7 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-osha1, --output-sha1	Output in SHA-1 format");
 						helptext.Add("	-osl, --output-sl	Output in Softwarelist format");
 						helptext.Add("	-otsv, --output-tsv	Output in TSV format");
-						helptext.Add("	-ox, --output-xml	Output in Logiqx XML format");
+						helptext.Add("	-ox, --output-xml	Output in Logiqx XML format [default]");
 						helptext.Add("	-gzf, --gz-files	Allow reading of GZIP files as archives");
 						helptext.Add("	-ro, --romba		Read files from a Romba input");
 						helptext.Add("	-f=, --filename=	Set the external name of the DAT");
