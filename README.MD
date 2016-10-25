@@ -46,23 +46,21 @@ The main tool of the SabreTools suite. Performs the majority of the core feature
 			<li>Optionally merge the output DAT so no partial duplicates are included</li>
 		</ul>
 	</li>
+	<li><i>SimpleSort</i>: Convert, rebuild, and verify using DAT files (requested by many)
+		<ul>
+			<li>Rebuild from multiple sources</li>
+			<li>Single DAT and output directory support</li>
+			<li>Header skipper support</li>
+			<li>Verify a folder against a DAT (create a fixDat)</li>
+			<li>Rebuild to TGZ archives</li>
+			<li>Rebuild to Romba depot</li>
+			<li>Convert to Romba depot (no DAT required)</li>
+		</ul>
+	</li>
 	<li><i>SingleGame</i>: Trim DAT entries and optionally merge into a single game (requested by Kludge)</li>
 	<li><i>UncompressedSize</i>: Get various statistics on a DAT or folder of DATs including number of roms, disks, and even total size in a human readable format (requested by Obiwantje and others)</li>
 </ul>
 This tool has a comprehensive list of command line parameters that can be used to do the above and much more.
-
-<b>SimpleSort</b>
-<p/>
-A simple rebuild-from-DAT tool that allows users to sort from the commandline.
-<ul>
-	<li>Rebuild from multiple sources</li>
-	<li>Single DAT and output directory support</li>
-	<li>Header skipper support</li>
-	<li>Verify a folder against a DAT (create a fixDat)</li>
-	<li>Rebuild to TGZ archives</li>
-	<li>Rebuild to Romba depot</li>
-	<li>Convert to Romba depot (no DAT required)</li>
-</ul>
 
 <h3>Power User Tools</h3>
 

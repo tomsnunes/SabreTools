@@ -88,8 +88,6 @@ namespace SabreTools
 				single = false,
 				softlist = false,
 				superdat = false,
-				tgz = false, // SimpleSort
-				toFolder = false, // SimpleSort
 				trim = false,
 				skip = false,
 				updateDat = false, // SimpleSort
@@ -249,10 +247,6 @@ namespace SabreTools
 					case "--diff-nd":
 						diffMode |= DiffMode.NoDupes;
 						break;
-					case "-do":
-					case "--directory":
-						toFolder = true;
-						break;
 					case "-f":
 					case "--files":
 						parseArchivesAsFiles = true;
@@ -399,7 +393,6 @@ namespace SabreTools
 						break;
 					case "-tgz":
 					case "--tgz":
-						tgz = true;
 						outputFormat = OutputFormat.TorrentGzip;
 						break;
 					case "-tlrz":
@@ -974,8 +967,8 @@ namespace SabreTools
 			// If we're using the sorter
 			else if (sort)
 			{
-				InitSort(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, toFolder,
-						delete, tgz, romba, sevenzip, gz, rar, zip, updateDat, header, maxParallelism);
+				InitSort(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, delete, outputFormat,
+					romba, sevenzip, gz, rar, zip, updateDat, header, maxParallelism);
 			}
 
 			// Split a DAT by extension
