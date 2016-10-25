@@ -4331,6 +4331,7 @@ namespace SabreTools.Helper.Dats
 				{
 					// If a DAT is defined, we want to make sure that this file is not in there
 					Rom rom = FileTools.GetFileInfo(input, logger);
+					rom.Machine = new Machine { Name = Path.GetFileNameWithoutExtension(rom.Name) };
 					if (this != null && Files.Count > 0)
 					{
 						if (rom.HasDuplicates(this, logger))
@@ -4351,6 +4352,17 @@ namespace SabreTools.Helper.Dats
 							success &= ArchiveTools.WriteTorrentZip(input, outDir, rom, logger);
 							break;
 						case OutputFormat.Folder:
+							try
+							{
+								string outfile = Path.Combine(outDir, rom.Machine.Name, rom.Name);
+								Directory.CreateDirectory(Path.GetDirectoryName(outfile));
+								File.Copy(input, outfile);
+							}
+							catch
+							{
+								success = false;
+							}
+							break;
 						default:
 							break;
 					}
@@ -4370,6 +4382,7 @@ namespace SabreTools.Helper.Dats
 						{
 							// If a DAT is defined, we want to make sure that this file is not in there
 							Rom rom = FileTools.GetFileInfo(file, logger);
+							rom.Machine = new Machine { Name = Path.GetFileNameWithoutExtension(input) };
 							if (this != null && Files.Count > 0)
 							{
 								if (rom.HasDuplicates(this, logger))
@@ -4390,6 +4403,17 @@ namespace SabreTools.Helper.Dats
 									success &= ArchiveTools.WriteTorrentZip(file, outDir, rom, logger);
 									break;
 								case OutputFormat.Folder:
+									try
+									{
+										string outfile = Path.Combine(outDir, rom.Machine.Name, rom.Name);
+										Directory.CreateDirectory(Path.GetDirectoryName(outfile));
+										File.Copy(file, outfile);
+									}
+									catch
+									{
+										success = false;
+									}
+									break;
 								default:
 									break;
 							}
@@ -4868,7 +4892,7 @@ namespace SabreTools.Helper.Dats
 						{
 							string infile = pathsToFiles[i];
 							Rom outrom = romsInGame[i];
-							string outfile = Path.Combine(outDir, outrom.Machine.Name, outrom.Machine.Name);
+							string outfile = Path.Combine(outDir, outrom.Machine.Name, outrom.Name);
 
 							// Make sure the output folder is created
 							Directory.CreateDirectory(Path.GetDirectoryName(outfile));
