@@ -51,9 +51,9 @@ namespace SabreTools.Helper.Tools
 		/// Get what type of DAT the input file is
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
-		/// <returns>The OutputFormat corresponding to the DAT</returns>
+		/// <returns>The DatFormat corresponding to the DAT</returns>
 		/// <remarks>There is currently no differentiation between XML and SabreDAT here</remarks>
-		public static OutputFormat GetOutputFormat(string filename, Logger logger)
+		public static DatFormat GetDatFormat(string filename, Logger logger)
 		{
 			// Limit the output formats based on extension
 			string ext = Path.GetExtension(filename).ToLowerInvariant();
@@ -79,15 +79,15 @@ namespace SabreTools.Helper.Tools
 			// Some formats only require the extension to know
 			if (ext == "md5")
 			{
-				return OutputFormat.RedumpMD5;
+				return DatFormat.RedumpMD5;
 			}
 			if (ext == "sfv")
 			{
-				return OutputFormat.RedumpSFV;
+				return DatFormat.RedumpSFV;
 			}
 			if (ext == "sha1")
 			{
-				return OutputFormat.RedumpSHA1;
+				return DatFormat.RedumpSHA1;
 			}
 
 			// For everything else, we need to read it
@@ -104,49 +104,49 @@ namespace SabreTools.Helper.Tools
 				{
 					if (second.StartsWith("<!doctype datafile"))
 					{
-						return OutputFormat.Logiqx;
+						return DatFormat.Logiqx;
 					}
 					else if (second.StartsWith("<!doctype softwarelist"))
 					{
-						return OutputFormat.SoftwareList;
+						return DatFormat.SoftwareList;
 					}
 					else if (second.StartsWith("<!doctype sabredat"))
 					{
-						return OutputFormat.SabreDat;
+						return DatFormat.SabreDat;
 					}
 					else if (second.StartsWith("<dat") && !second.StartsWith("<datafile"))
 					{
-						return OutputFormat.OfflineList;
+						return DatFormat.OfflineList;
 					}
 					// Older and non-compliant DATs
 					else
 					{
-						return OutputFormat.Logiqx;
+						return DatFormat.Logiqx;
 					}
 				}
 
 				// If we have an INI-based DAT
 				else if (first.Contains("[") && first.Contains("]"))
 				{
-					return OutputFormat.RomCenter;
+					return DatFormat.RomCenter;
 				}
 
 				// If we have a CMP-based DAT
 				else if (first.Contains("clrmamepro"))
 				{
-					return OutputFormat.ClrMamePro;
+					return DatFormat.ClrMamePro;
 				}
 				else if (first.Contains("romvault"))
 				{
-					return OutputFormat.ClrMamePro;
+					return DatFormat.ClrMamePro;
 				}
 				else if (first.Contains("doscenter"))
 				{
-					return OutputFormat.DOSCenter;
+					return DatFormat.DOSCenter;
 				}
 				else
 				{
-					return OutputFormat.ClrMamePro;
+					return DatFormat.ClrMamePro;
 				}
 			}
 			catch (Exception)

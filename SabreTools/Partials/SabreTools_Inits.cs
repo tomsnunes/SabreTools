@@ -79,7 +79,7 @@ namespace SabreTools
 		/// <param name="author">New author</param>
 		/// <param name="forcepack">String representing the forcepacking flag</param>
 		/// <param name="excludeOf">True if cloneof, romof, and sampleof fields should be omitted from output, false otherwise</param>
-		/// <param name="outputFormat">OutputFormat to be used for outputting the DAT</param>
+		/// <param name="datFormat">DatFormat to be used for outputting the DAT</param>
 		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
 		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
 		/// <param name="noMD5">True to disable getting MD5 hash, false otherwise</param>
@@ -103,7 +103,7 @@ namespace SabreTools
 			string author,
 			string forcepack,
 			bool excludeOf,
-			OutputFormat outputFormat,
+			DatFormat datFormat,
 			bool romba,
 			bool superdat,
 			bool noMD5,
@@ -145,7 +145,7 @@ namespace SabreTools
 				Date = DateTime.Now.ToString("yyyy-MM-dd"),
 				Author = author,
 				ForcePacking = fp,
-				OutputFormat = (outputFormat == 0 ? OutputFormat.Logiqx : outputFormat),
+				DatFormat = (datFormat == 0 ? DatFormat.Logiqx : datFormat),
 				Romba = romba,
 				ExcludeOf = excludeOf,
 				Type = (superdat ? "SuperDAT" : ""),
@@ -348,10 +348,10 @@ namespace SabreTools
 		/// <param name="single">True to show individual DAT statistics, false otherwise</param>
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-		/// <param name="statOutputFormat">Set the statistics output format to use</param>
-		private static void InitStats(List<string> inputs, string filename, bool single, bool baddumpCol, bool nodumpCol, StatOutputFormat statOutputFormat)
+		/// <param name="statDatFormat">Set the statistics output format to use</param>
+		private static void InitStats(List<string> inputs, string filename, bool single, bool baddumpCol, bool nodumpCol, StatDatFormat statDatFormat)
 		{
-			DatFile.OutputStats(inputs, (String.IsNullOrEmpty(filename) ? "report" : filename), single, baddumpCol, nodumpCol, statOutputFormat, _logger);
+			DatFile.OutputStats(inputs, (String.IsNullOrEmpty(filename) ? "report" : filename), single, baddumpCol, nodumpCol, statDatFormat, _logger);
 		}
 
 		/// <summary>
@@ -412,7 +412,7 @@ namespace SabreTools
 		/// <param name="forcend">None, Obsolete, Required, Ignore</param>
 		/// <param name="forcepack">None, Zip, Unzip</param>
 		/// <param name="excludeOf">True if cloneof, romof, and sampleof fields should be omitted from output, false otherwise</param>
-		/// <param name="outputFormat">Non-zero flag for output format, zero otherwise for default</param>
+		/// <param name="datFormat">Non-zero flag for output format, zero otherwise for default</param>
 		/// /* Missfile-specific DAT info */
 		/// <param name="usegame">True if games are to be used in output, false if roms are</param>
 		/// <param name="prefix">Generic prefix to be added to each line</param>
@@ -471,7 +471,7 @@ namespace SabreTools
 			string forcend,
 			string forcepack,
 			bool excludeOf,
-			OutputFormat outputFormat,
+			DatFormat datFormat,
 
 			/* Missfile-specific DAT info */
 			bool usegame,
@@ -646,7 +646,7 @@ namespace SabreTools
 				ForcePacking = fp,
 				MergeRoms = dedup,
 				ExcludeOf = excludeOf,
-				OutputFormat = outputFormat,
+				DatFormat = datFormat,
 
 				UseGame = usegame,
 				Prefix = prefix,

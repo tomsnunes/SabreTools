@@ -95,8 +95,8 @@ namespace SabreTools
 				updateDat = false, // SimpleSort
 				usegame = true;
 			DiffMode diffMode = 0x0;
-			OutputFormat outputFormat = 0x0;
-			StatOutputFormat statOutputFormat = StatOutputFormat.None;
+			DatFormat datFormat = 0x0;
+			StatDatFormat statDatFormat = StatDatFormat.None;
 
 			// User inputs
 			int gz = 2, // SimpleSort
@@ -222,7 +222,7 @@ namespace SabreTools
 						break;
 					case "-csv":
 					case "--csv":
-						statOutputFormat = StatOutputFormat.CSV;
+						statDatFormat = StatDatFormat.CSV;
 						break;
 					case "-dd":
 					case "--dedup":
@@ -266,7 +266,7 @@ namespace SabreTools
 						break;
 					case "-html":
 					case "--html":
-						statOutputFormat = StatOutputFormat.HTML;
+						statDatFormat = StatDatFormat.HTML;
 						break;
 					case "-ip":
 					case "--inplace":
@@ -290,59 +290,59 @@ namespace SabreTools
 						break;
 					case "-oa":
 					case "--output-all":
-						outputFormat |= OutputFormat.ALL;
+						datFormat |= DatFormat.ALL;
 						break;
 					case "-oc":
 					case "--output-cmp":
-						outputFormat |= OutputFormat.ClrMamePro;
+						datFormat |= DatFormat.ClrMamePro;
 						break;
 					case "-ocsv":
 					case "--output-csv":
-						outputFormat |= OutputFormat.CSV;
+						datFormat |= DatFormat.CSV;
 						break;
 					case "-od":
 					case "--output-dc":
-						outputFormat |= OutputFormat.DOSCenter;
+						datFormat |= DatFormat.DOSCenter;
 						break;
 					case "-om":
 					case "--output-miss":
-						outputFormat |= OutputFormat.MissFile;
+						datFormat |= DatFormat.MissFile;
 						break;
 					case "-omd5":
 					case "--output-md5":
-						outputFormat |= OutputFormat.RedumpMD5;
+						datFormat |= DatFormat.RedumpMD5;
 						break;
 					case "-ool":
 					case "--output-ol":
-						outputFormat |= OutputFormat.OfflineList;
+						datFormat |= DatFormat.OfflineList;
 						break;
 					case "-or":
 					case "--output-rc":
-						outputFormat |= OutputFormat.RomCenter;
+						datFormat |= DatFormat.RomCenter;
 						break;
 					case "-os":
 					case "--output-sd":
-						outputFormat |= OutputFormat.SabreDat;
+						datFormat |= DatFormat.SabreDat;
 						break;
 					case "-osfv":
 					case "--output-sfv":
-						outputFormat |= OutputFormat.RedumpSFV;
+						datFormat |= DatFormat.RedumpSFV;
 						break;
 					case "-osha1":
 					case "--output-sha1":
-						outputFormat |= OutputFormat.RedumpSHA1;
+						datFormat |= DatFormat.RedumpSHA1;
 						break;
 					case "-osl":
 					case "--output-sl":
-						outputFormat |= OutputFormat.SoftwareList;
+						datFormat |= DatFormat.SoftwareList;
 						break;
 					case "-otsv":
 					case "--output-tsv":
-						outputFormat |= OutputFormat.TSV;
+						datFormat |= DatFormat.TSV;
 						break;
 					case "-ox":
 					case "--output-xml":
-						outputFormat |= OutputFormat.Logiqx;
+						datFormat |= DatFormat.Logiqx;
 						break;
 					case "-q":
 					case "--quotes":
@@ -398,7 +398,7 @@ namespace SabreTools
 						break;
 					case "-tsv":
 					case "--tsv":
-						statOutputFormat = StatOutputFormat.TSV;
+						statDatFormat = StatDatFormat.TSV;
 						break;
 					case "-ud":
 					case "--update":
@@ -957,7 +957,7 @@ namespace SabreTools
 					author,
 					forcepack,
 					excludeOf,
-					outputFormat,
+					datFormat,
 					romba,
 					superdat,
 					noMD5,
@@ -1008,14 +1008,14 @@ namespace SabreTools
 			// Get statistics on input files
 			else if (stats)
 			{
-				InitStats(inputs, filename, single, showBaddumpColumn, showNodumpColumn, statOutputFormat);
+				InitStats(inputs, filename, single, showBaddumpColumn, showNodumpColumn, statDatFormat);
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
 			else if (update)
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
-					superdat, forcemerge, forcend, forcepack, excludeOf, outputFormat, usegame, prefix,
+					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix,
 					postfix, quotes, repext, addext, remext, datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName, gamename, romname,
 					romtype, sgt, slt, seq, crc, md5, sha1, status, trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
 			}

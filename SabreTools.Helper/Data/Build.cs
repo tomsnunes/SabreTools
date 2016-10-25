@@ -148,15 +148,15 @@ namespace SabreTools.Helper.Data
 					helptext.Add("  -?, -h, --help	Show this help");
 
 					// Convert
-					helptext.Add("  -cv, --convert		Enable conversion of input files to TZip");
+					helptext.Add("  -cv, --convert	Enable conversion of input files to TZip");
 						helptext.Add("	-dat=			DAT to be used as a filter for conversion");
 						helptext.Add("	-out=			Output directory");
 						helptext.Add("	-t=, --temp=		Set the temporary directory to use");
-						helptext.Add("	-del, --delete	Delete input files [DO NOT USE]");
+						helptext.Add("	-del, --delete		Delete input files [DO NOT USE]");
 						helptext.Add("	-tgz			Enable TorrentGZ output");
 							helptext.Add("		-r, --romba		Enable Romba depot dir output");
-						helptext.Add("	-7z={0}		Set scanning level for 7z archives");
-						helptext.Add("	-gz={2}		Set scanning level for GZip archives");
+						helptext.Add("	-7z={0}			Set scanning level for 7z archives");
+						helptext.Add("	-gz={2}			Set scanning level for GZip archives");
 						helptext.Add("	-rar={2}		Set scanning level for RAR archives");
 						helptext.Add("	-zip={0}		Set scanning level for ZIP archives");
 
@@ -354,6 +354,12 @@ namespace SabreTools.Helper.Data
 
 					// Additional Notes
 					helptext.Add("");
+					helptext.Add("Archive scanning levels:");
+						helptext.Add("  0	Hash archive and contents");
+						helptext.Add("  1	Only hash contents");
+						helptext.Add("  2	Only hash archive");
+
+					helptext.Add("");
 					helptext.Add("Filenames and directories can't start with a reserved string");
 						helptext.Add("unless prefixed by 'input='");
 
@@ -401,9 +407,9 @@ namespace SabreTools.Helper.Data
 					// Additional Notes
 					helptext.Add("");
 					helptext.Add("Archive scanning levels:");
-					helptext.Add("  0	Hash archive and contents");
-					helptext.Add("  1	Only hash contents");
-					helptext.Add("  2	Only hash archive");
+						helptext.Add("  0	Hash archive and contents");
+						helptext.Add("  1	Only hash contents");
+						helptext.Add("  2	Only hash archive");
 					break;
 				default:
 					helptext.Add(Resources.Resources.Default_Desc);

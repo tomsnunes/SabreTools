@@ -25,10 +25,10 @@ namespace SabreTools.Helper.Tools
 		/// <param name="datdata">DAT information</param>
 		/// <param name="overwrite">True if we ignore existing files (default), false otherwise</param>
 		/// <returns>Dictionary of output formats mapped to file names</returns>
-		public static Dictionary<OutputFormat, string> CreateOutfileNames(string outDir, DatFile datdata, bool overwrite = true)
+		public static Dictionary<DatFormat, string> CreateOutfileNames(string outDir, DatFile datdata, bool overwrite = true)
 		{
 			// Create the output dictionary
-			Dictionary<OutputFormat, string> outfileNames = new Dictionary<OutputFormat, string>();
+			Dictionary<DatFormat, string> outfileNames = new Dictionary<DatFormat, string>();
 
 			// Double check the outDir for the end delim
 			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
@@ -39,117 +39,117 @@ namespace SabreTools.Helper.Tools
 			// Get the extensions from the output type
 
 			// ClrMamePro
-			if ((datdata.OutputFormat & OutputFormat.ClrMamePro) != 0)
+			if ((datdata.DatFormat & DatFormat.ClrMamePro) != 0)
 			{
-				outfileNames.Add(OutputFormat.ClrMamePro, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
+				outfileNames.Add(DatFormat.ClrMamePro, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
 			};
 
 			// CSV
-			if ((datdata.OutputFormat & OutputFormat.CSV) != 0)
+			if ((datdata.DatFormat & DatFormat.CSV) != 0)
 			{
-				outfileNames.Add(OutputFormat.CSV, CreateOutfileNamesHelper(outDir, ".csv", datdata, overwrite));
+				outfileNames.Add(DatFormat.CSV, CreateOutfileNamesHelper(outDir, ".csv", datdata, overwrite));
 			};
 
 			// DOSCenter
-			if ((datdata.OutputFormat & OutputFormat.DOSCenter) != 0
-				&& (datdata.OutputFormat & OutputFormat.ClrMamePro) == 0
-				&& (datdata.OutputFormat & OutputFormat.RomCenter) == 0)
+			if ((datdata.DatFormat & DatFormat.DOSCenter) != 0
+				&& (datdata.DatFormat & DatFormat.ClrMamePro) == 0
+				&& (datdata.DatFormat & DatFormat.RomCenter) == 0)
 			{
-				outfileNames.Add(OutputFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
+				outfileNames.Add(DatFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
 			};
-			if ((datdata.OutputFormat & OutputFormat.DOSCenter) != 0
-				&& ((datdata.OutputFormat & OutputFormat.ClrMamePro) != 0
-					|| (datdata.OutputFormat & OutputFormat.RomCenter) != 0))
+			if ((datdata.DatFormat & DatFormat.DOSCenter) != 0
+				&& ((datdata.DatFormat & DatFormat.ClrMamePro) != 0
+					|| (datdata.DatFormat & DatFormat.RomCenter) != 0))
 			{
-				outfileNames.Add(OutputFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", datdata, overwrite));
+				outfileNames.Add(DatFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", datdata, overwrite));
 			};
 
 			// Logiqx XML
-			if ((datdata.OutputFormat & OutputFormat.Logiqx) != 0)
+			if ((datdata.DatFormat & DatFormat.Logiqx) != 0)
 			{
-				outfileNames.Add(OutputFormat.Logiqx, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
+				outfileNames.Add(DatFormat.Logiqx, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
 			};
 
 			// Missfile
-			if ((datdata.OutputFormat & OutputFormat.MissFile) != 0)
+			if ((datdata.DatFormat & DatFormat.MissFile) != 0)
 			{
-				outfileNames.Add(OutputFormat.MissFile, CreateOutfileNamesHelper(outDir, ".txt", datdata, overwrite));
+				outfileNames.Add(DatFormat.MissFile, CreateOutfileNamesHelper(outDir, ".txt", datdata, overwrite));
 			};
 
 			// OfflineList
-			if (((datdata.OutputFormat & OutputFormat.OfflineList) != 0)
-				&& (datdata.OutputFormat & OutputFormat.Logiqx) == 0
-				&& (datdata.OutputFormat & OutputFormat.SabreDat) == 0
-				&& (datdata.OutputFormat & OutputFormat.SoftwareList) == 0)
+			if (((datdata.DatFormat & DatFormat.OfflineList) != 0)
+				&& (datdata.DatFormat & DatFormat.Logiqx) == 0
+				&& (datdata.DatFormat & DatFormat.SabreDat) == 0
+				&& (datdata.DatFormat & DatFormat.SoftwareList) == 0)
 			{
-				outfileNames.Add(OutputFormat.OfflineList, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
+				outfileNames.Add(DatFormat.OfflineList, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
 			}
-			if (((datdata.OutputFormat & OutputFormat.OfflineList) != 0
-				&& ((datdata.OutputFormat & OutputFormat.Logiqx) != 0
-					|| (datdata.OutputFormat & OutputFormat.SabreDat) != 0
-					|| (datdata.OutputFormat & OutputFormat.SoftwareList) != 0)))
+			if (((datdata.DatFormat & DatFormat.OfflineList) != 0
+				&& ((datdata.DatFormat & DatFormat.Logiqx) != 0
+					|| (datdata.DatFormat & DatFormat.SabreDat) != 0
+					|| (datdata.DatFormat & DatFormat.SoftwareList) != 0)))
 			{
-				outfileNames.Add(OutputFormat.OfflineList, CreateOutfileNamesHelper(outDir, ".ol.xml", datdata, overwrite));
+				outfileNames.Add(DatFormat.OfflineList, CreateOutfileNamesHelper(outDir, ".ol.xml", datdata, overwrite));
 			}
 
 			// Redump MD5
-			if ((datdata.OutputFormat & OutputFormat.RedumpMD5) != 0)
+			if ((datdata.DatFormat & DatFormat.RedumpMD5) != 0)
 			{
-				outfileNames.Add(OutputFormat.RedumpMD5, CreateOutfileNamesHelper(outDir, ".md5", datdata, overwrite));
+				outfileNames.Add(DatFormat.RedumpMD5, CreateOutfileNamesHelper(outDir, ".md5", datdata, overwrite));
 			};
 
 			// Redump SFV
-			if ((datdata.OutputFormat & OutputFormat.RedumpSFV) != 0)
+			if ((datdata.DatFormat & DatFormat.RedumpSFV) != 0)
 			{
-				outfileNames.Add(OutputFormat.RedumpSFV, CreateOutfileNamesHelper(outDir, ".sfv", datdata, overwrite));
+				outfileNames.Add(DatFormat.RedumpSFV, CreateOutfileNamesHelper(outDir, ".sfv", datdata, overwrite));
 			};
 
 			// Redump SHA-1
-			if ((datdata.OutputFormat & OutputFormat.RedumpSHA1) != 0)
+			if ((datdata.DatFormat & DatFormat.RedumpSHA1) != 0)
 			{
-				outfileNames.Add(OutputFormat.RedumpSHA1, CreateOutfileNamesHelper(outDir, ".sha1", datdata, overwrite));
+				outfileNames.Add(DatFormat.RedumpSHA1, CreateOutfileNamesHelper(outDir, ".sha1", datdata, overwrite));
 			};
 
 			// RomCenter
-			if ((datdata.OutputFormat & OutputFormat.RomCenter) != 0
-				&& (datdata.OutputFormat & OutputFormat.ClrMamePro) == 0)
+			if ((datdata.DatFormat & DatFormat.RomCenter) != 0
+				&& (datdata.DatFormat & DatFormat.ClrMamePro) == 0)
 			{
-				outfileNames.Add(OutputFormat.RomCenter, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
+				outfileNames.Add(DatFormat.RomCenter, CreateOutfileNamesHelper(outDir, ".dat", datdata, overwrite));
 			};
-			if ((datdata.OutputFormat & OutputFormat.RomCenter) != 0
-				&& (datdata.OutputFormat & OutputFormat.ClrMamePro) != 0)
+			if ((datdata.DatFormat & DatFormat.RomCenter) != 0
+				&& (datdata.DatFormat & DatFormat.ClrMamePro) != 0)
 			{
-				outfileNames.Add(OutputFormat.RomCenter, CreateOutfileNamesHelper(outDir, ".rc.dat", datdata, overwrite));
+				outfileNames.Add(DatFormat.RomCenter, CreateOutfileNamesHelper(outDir, ".rc.dat", datdata, overwrite));
 			};
 
 			// SabreDAT
-			if ((datdata.OutputFormat & OutputFormat.SabreDat) != 0 && (datdata.OutputFormat & OutputFormat.Logiqx) == 0)
+			if ((datdata.DatFormat & DatFormat.SabreDat) != 0 && (datdata.DatFormat & DatFormat.Logiqx) == 0)
 			{
-				outfileNames.Add(OutputFormat.SabreDat, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
+				outfileNames.Add(DatFormat.SabreDat, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
 			};
-			if ((datdata.OutputFormat & OutputFormat.SabreDat) != 0 && (datdata.OutputFormat & OutputFormat.Logiqx) != 0)
+			if ((datdata.DatFormat & DatFormat.SabreDat) != 0 && (datdata.DatFormat & DatFormat.Logiqx) != 0)
 			{
-				outfileNames.Add(OutputFormat.SabreDat, CreateOutfileNamesHelper(outDir, ".sd.xml", datdata, overwrite));
+				outfileNames.Add(DatFormat.SabreDat, CreateOutfileNamesHelper(outDir, ".sd.xml", datdata, overwrite));
 			};
 
 			// Software List
-			if ((datdata.OutputFormat & OutputFormat.SoftwareList) != 0
-				&& (datdata.OutputFormat & OutputFormat.Logiqx) == 0
-				&& (datdata.OutputFormat & OutputFormat.SabreDat) == 0)
+			if ((datdata.DatFormat & DatFormat.SoftwareList) != 0
+				&& (datdata.DatFormat & DatFormat.Logiqx) == 0
+				&& (datdata.DatFormat & DatFormat.SabreDat) == 0)
 			{
-				outfileNames.Add(OutputFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
+				outfileNames.Add(DatFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
 			}
-			if ((datdata.OutputFormat & OutputFormat.SoftwareList) != 0
-				&& ((datdata.OutputFormat & OutputFormat.Logiqx) != 0
-					|| (datdata.OutputFormat & OutputFormat.SabreDat) != 0))
+			if ((datdata.DatFormat & DatFormat.SoftwareList) != 0
+				&& ((datdata.DatFormat & DatFormat.Logiqx) != 0
+					|| (datdata.DatFormat & DatFormat.SabreDat) != 0))
 			{
-				outfileNames.Add(OutputFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".sl.xml", datdata, overwrite));
+				outfileNames.Add(DatFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".sl.xml", datdata, overwrite));
 			}
 
 			// TSV
-			if ((datdata.OutputFormat & OutputFormat.TSV) != 0)
+			if ((datdata.DatFormat & DatFormat.TSV) != 0)
 			{
-				outfileNames.Add(OutputFormat.TSV, CreateOutfileNamesHelper(outDir, ".tsv", datdata, overwrite));
+				outfileNames.Add(DatFormat.TSV, CreateOutfileNamesHelper(outDir, ".tsv", datdata, overwrite));
 			};
 
 			return outfileNames;

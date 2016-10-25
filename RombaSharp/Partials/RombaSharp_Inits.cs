@@ -254,7 +254,7 @@ namespace SabreTools
 				FileName = Path.GetFileName(inputs[0]) + " Dir2Dat",
 				Name = Path.GetFileName(inputs[0]) + " Dir2Dat",
 				Description = Path.GetFileName(inputs[0]) + " Dir2Dat",
-				OutputFormat = OutputFormat.Logiqx,
+				DatFormat = DatFormat.Logiqx,
 				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 

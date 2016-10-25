@@ -118,7 +118,7 @@ namespace SabreTools.Helper.Data
 	/// Determines the DAT output format
 	/// </summary>
 	[Flags]
-	public enum OutputFormat
+	public enum DatFormat
 	{
 		Logiqx = 0x0001,
 		ClrMamePro = 0x0002,

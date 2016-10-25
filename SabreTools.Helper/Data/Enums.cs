@@ -188,7 +188,7 @@
 	/// <summary>
 	/// Determine which format to output Stats to
 	/// </summary>
-	public enum StatOutputFormat
+	public enum StatDatFormat
 	{
 		None = 0,
 		HTML = 1,
