@@ -63,6 +63,24 @@
 	}
 
 	/// <summary>
+	/// Output format for rebuilt files
+	/// </summary>
+	public enum OutputFormat
+	{
+		// Currently implemented
+		Folder = 0,
+		TorrentZip = 1,
+		TorrentGzip = 2,
+
+		// Currently unimplemented
+		Torrent7Zip = 3,
+		TorrentRar = 4,
+		TapeArchive = 5,
+		TorrentXZ = 6,
+		TorrentLrzip = 7,
+	}
+
+	/// <summary>
 	/// Zip open type
 	/// </summary>
 	/// <remarks>https://raw.githubusercontent.com/gjefferyes/RomVault/5a93500001f0d068f32cf77a048950717507f733/ROMVault2/SupportedFiles/ZipEnums.cs</remarks>
