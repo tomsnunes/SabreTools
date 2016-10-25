@@ -14,6 +14,7 @@ using SabreTools.Helper.Skippers;
 
 using NaturalSort;
 using OCRC;
+using SharpCompress.Common;
 
 namespace SabreTools.Helper.Tools
 {
@@ -626,8 +627,6 @@ namespace SabreTools.Helper.Tools
 		///		b) Check against the DAT for duplicates
 		///		c) Check for headers
 		///		d) Check headerless rom for duplicates
-		/// 
-		/// This is actually rather slow and inefficient. See below for more correct implemenation
 		/// </remarks>
 		public static bool RebuildToOutput(DatFile datFile, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
 			bool toFolder, bool delete, bool tgz, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat, string headerToCheckAgainst,
@@ -738,6 +737,341 @@ namespace SabreTools.Helper.Tools
 				datFile.OutputFormat = OutputFormat.Logiqx;
 				datFile.WriteToFile("", logger);
 			}
+
+			return success;
+		}
+
+		/// <summary>
+		/// Process the DAT and find all matches in input files and folders
+		/// </summary>
+		/// <param name="datFile">DAT to compare against</param>
+		/// <param name="inputs">List of input files/folders to check</param>
+		/// <param name="outDir">Output directory to use to build to</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
+		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
+		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="tgz">True if output files should be written to TorrentGZ instead of TorrentZip</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
+		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
+		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if rebuilding was a success, false otherwise</returns>
+		/// <remarks>
+		/// This is a slightly different implementation of the RebuildToOutput code:
+		/// 1) Create a DFD from the input files (custom DFD with full pathnames?)
+		/// 2) Find the files that need to be used for rebuild
+		/// 3) Order them by game(if not outputting to TGZ)
+		/// 4) Write out each archive in order
+		/// </remarks>
+		public static bool RebuildToOutputAlternate(DatFile datFile, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
+			bool toFolder, bool delete, bool tgz, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat, string headerToCheckAgainst,
+			int maxDegreeOfParallelism, Logger logger)
+		{
+			// First, check that the output directory exists
+			if (!Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir);
+				outDir = Path.GetFullPath(outDir);
+			}
+
+			// Then create or clean the temp directory
+			if (!Directory.Exists(tempDir))
+			{
+				Directory.CreateDirectory(tempDir);
+			}
+			else
+			{
+				CleanDirectory(tempDir);
+			}
+
+			bool success = true;
+			DatFile matched = new DatFile();
+			List<string> files = new List<string>();
+
+			#region Retrieve a list of all files
+
+			logger.User("Retrieving list all files from input");
+			DateTime start = DateTime.Now;
+
+			// Create a list of just files from inputs
+			Parallel.ForEach(inputs,
+				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism, },
+				input => {
+					if (File.Exists(input))
+					{
+						logger.Verbose("File found: '" + input + "'");
+						files.Add(Path.GetFullPath(input));
+					}
+					else if (Directory.Exists(input))
+					{
+						logger.Verbose("Directory found: '" + input + "'");
+						Parallel.ForEach(Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories),
+							new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism, },
+							file =>
+							{
+								logger.Verbose("File found: '" + file + "'");
+								files.Add(Path.GetFullPath(file));
+							});
+					}
+					else
+					{
+						logger.Error("'" + input + "' is not a file or directory!");
+					}
+				});
+			logger.User("Retrieving complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			#endregion
+
+			DatFile current = new DatFile();
+
+			#region Create a dat from input files
+
+			// Now that we have a list of just files, we get a DAT from the input files
+			foreach (string file in files)
+			{
+				// Define the temporary directory
+				string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
+
+				// Get the required scanning level for the file
+				bool shouldExternalProcess = false;
+				bool shouldInternalProcess = false;
+				ArchiveTools.GetInternalExternalProcess(file, archiveScanLevel, logger, out shouldExternalProcess, out shouldInternalProcess);
+
+				// If we're supposed to scan the file externally
+				if (shouldExternalProcess)
+				{
+					Rom rom = GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
+					rom.Name = Path.GetFullPath(file);
+
+					string key = rom.Size + "-" + rom.CRC;
+					if (current.Files.ContainsKey(key))
+					{
+						current.Files[key].Add(rom);
+					}
+					else
+					{
+						List<DatItem> temp = new List<DatItem>();
+						temp.Add(rom);
+						current.Files.Add(key, temp);
+					}
+				}
+
+				// If we're supposed to scan the file internally
+				if (shouldInternalProcess)
+				{
+					// If quickscan is set, do so
+					if (quickScan)
+					{
+						List<Rom> extracted = ArchiveTools.GetArchiveFileInfo(file, logger);
+
+						foreach (Rom rom in extracted)
+						{
+							Rom newrom = rom;
+							newrom.Machine = new Machine(Path.GetFullPath(file), "");
+
+							string key = rom.Size + "-" + rom.CRC;
+							if (current.Files.ContainsKey(key))
+							{
+								current.Files[key].Add(newrom);
+							}
+							else
+							{
+								List<DatItem> temp = new List<DatItem>();
+								temp.Add(newrom);
+								current.Files.Add(key, temp);
+							}
+						}
+					}
+					// Otherwise, attempt to extract the files to the temporary directory
+					else
+					{
+						bool encounteredErrors = ArchiveTools.ExtractArchive(file, tempSubDir, archiveScanLevel, logger);
+
+						// If the file was an archive and was extracted successfully, check it
+						if (!encounteredErrors)
+						{
+							logger.Verbose(Path.GetFileName(file) + " treated like an archive");
+							List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
+							Parallel.ForEach(extracted,
+								new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+								entry =>
+								{
+									Rom rom = GetFileInfo(entry, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
+									rom.Name = Path.Combine(Path.GetFullPath(file), Path.GetFileName(entry));
+									rom.Machine = new Machine(Path.GetFullPath(file), "");
+
+									string key = rom.Size + "-" + rom.CRC;
+									if (current.Files.ContainsKey(key))
+									{
+										current.Files[key].Add(rom);
+									}
+									else
+									{
+										List<DatItem> temp = new List<DatItem>();
+										temp.Add(rom);
+										current.Files.Add(key, temp);
+									}
+								});
+						}
+						// Otherwise, just get the info on the file itself
+						else if (File.Exists(file))
+						{
+							Rom rom = GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
+							rom.Name = Path.GetFullPath(file);
+
+							string key = rom.Size + "-" + rom.CRC;
+							if (current.Files.ContainsKey(key))
+							{
+								current.Files[key].Add(rom);
+							}
+							else
+							{
+								List<DatItem> temp = new List<DatItem>();
+								temp.Add(rom);
+								current.Files.Add(key, temp);
+							}
+						}
+					}
+				}
+
+				// Now delete the temp directory
+				try
+				{
+					Directory.Delete(tempSubDir, true);
+				}
+				catch { }
+			}
+
+			#endregion
+
+			// Create a mapping from destination file to source file
+			Dictionary<DatItem, DatItem> toFromMap = new Dictionary<DatItem, DatItem>();
+
+			#region Find all required files for rebuild
+
+			// Order the DATs by hash first to make things easier
+			datFile.BucketByCRC(false, logger, output: false);
+			current.BucketByCRC(false, logger, output: false);
+
+			// Now loop over and find all files that need to be rebuilt
+			List<string> keys = current.Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				// If the input DAT doesn't have the key, then nothing from the current DAT are there
+				if (!datFile.Files.ContainsKey(key))
+				{
+					continue;
+				}
+
+				// Otherwise, we try to find duplicates
+				List<DatItem> datItems = current.Files[key];
+				foreach (Rom rom in datItems)
+				{
+					List<DatItem> found = rom.GetDuplicates(datFile, logger, false);
+
+					// Now add all of the duplicates mapped to the current file
+					foreach (Rom mid in found)
+					{
+						try
+						{
+							toFromMap.Add(mid, rom);
+						}
+						catch { }
+					}
+				}
+			}
+
+			#endregion
+
+			// Now bucket the list of keys by game so that we can rebuild properly
+			SortedDictionary<string, List<DatItem>> keysGroupedByGame = DatFile.BucketListByGame(toFromMap.Keys.ToList(), false, true, logger, output: false);
+
+			#region Rebuild games in order
+
+			// Now loop through the keys and create the correct output items
+			List<string> games = keysGroupedByGame.Keys.ToList();
+			foreach (string game in games)
+			{
+				// Define the temporary directory
+				string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
+
+				// Create an empty list for getting paths for rebuilding
+				List<string> pathsToFiles = new List<string>();
+
+				// Loop through all of the matched items in the game
+				List<DatItem> itemsInGame = keysGroupedByGame[game];
+				List<Rom> romsInGame = new List<Rom>();
+				foreach (Rom rom in itemsInGame)
+				{
+					// Get the rom that's mapped to this item
+					Rom source = (Rom)toFromMap[rom];
+
+					// If the file is in an archive, we need to treat it specially
+					string machinename = source.Machine.Name.ToLowerInvariant();
+					if (machinename.EndsWith(".7z")
+						|| machinename.EndsWith(".gz")
+						|| machinename.EndsWith(".rar")
+						|| machinename.EndsWith(".zip"))
+					{
+						pathsToFiles.Add(ArchiveTools.ExtractItem(source.Machine.Name, source.Name, tempSubDir, logger));
+					}
+
+					// Otherwise, we want to just add the full path
+					else
+					{
+						pathsToFiles.Add(source.Name);
+					}
+
+					// Now add the rom to the output list
+					romsInGame.Add(source);
+				}
+
+				// And now rebuild accordingly
+				if (toFolder)
+				{
+					for (int i = 0; i < romsInGame.Count; i++)
+					{
+						string infile = pathsToFiles[i];
+						Rom outrom = romsInGame[i];
+						string outfile = Path.Combine(outDir, outrom.Machine.Name, outrom.Machine.Name);
+
+						// Make sure the output folder is created
+						Directory.CreateDirectory(Path.GetDirectoryName(outfile));
+
+						// Now copy the file over
+						try
+						{
+							File.Copy(infile, outfile);
+						}
+						catch { }
+					}
+				}
+				else if (tgz)
+				{
+					for (int i = 0; i < itemsInGame.Count; i++)
+					{
+						string infile = pathsToFiles[i];
+						Rom outrom = romsInGame[i];
+						ArchiveTools.WriteTorrentGZ(infile, outDir, romba, logger);
+					}
+				}
+				else
+				{
+					ArchiveTools.WriteToArchive(pathsToFiles, outDir, romsInGame, logger);
+				}
+
+				// And now clear the temp folder to get rid of any transient files
+				try
+				{
+					Directory.Delete(tempSubDir, true);
+				}
+				catch { }
+			}
+
+			#endregion
 
 			return success;
 		}
