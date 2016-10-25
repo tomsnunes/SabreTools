@@ -64,7 +64,7 @@ namespace SabreTools
 			}
 			_logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			return datdata.ConvertFiles(inputs, outDir, tempDir, outputFormat, romba, delete, asl, _logger);
+			return datdata.ConvertFiles(newinputs, outDir, tempDir, outputFormat, romba, delete, asl, _logger);
 		}
 
 		/// <summary>
