@@ -9,6 +9,7 @@ using System.Web;
 using System.Xml;
 
 using SabreTools.Helper.Data;
+using SabreTools.Helper.Skippers;
 using SabreTools.Helper.Tools;
 
 using NaturalSort;
@@ -4455,6 +4456,8 @@ namespace SabreTools.Helper.Dats
 			bool toFolder, bool delete, bool tgz, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat, string headerToCheckAgainst,
 			int maxDegreeOfParallelism, Logger logger)
 		{
+			#region Perform setup
+
 			// First, check that the output directory exists
 			if (!Directory.Exists(outDir))
 			{
@@ -4477,6 +4480,11 @@ namespace SabreTools.Helper.Dats
 			{
 				FileTools.CleanDirectory(tempDir);
 			}
+
+			// Preload the Skipper list
+			int listcount = Skipper.List.Count;
+
+			#endregion
 
 			bool success = true;
 			DatFile matched = new DatFile();
@@ -4517,6 +4525,7 @@ namespace SabreTools.Helper.Dats
 			#endregion
 
 			DatFile current = new DatFile();
+			Dictionary<string, SkipperRule> fileToSkipperRule = new Dictionary<string, SkipperRule>();
 
 			#region Create a dat from input files
 
@@ -4524,7 +4533,9 @@ namespace SabreTools.Helper.Dats
 			start = DateTime.Now;
 
 			// Now that we have a list of just files, we get a DAT from the input files
-			foreach (string file in files)
+			Parallel.ForEach(files,
+				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+				file =>
 			{
 				// Define the temporary directory
 				string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
@@ -4540,16 +4551,41 @@ namespace SabreTools.Helper.Dats
 					Rom rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
 					rom.Name = Path.GetFullPath(file);
 
-					string key = rom.Size + "-" + rom.CRC;
-					if (current.Files.ContainsKey(key))
+					lock (Files)
 					{
-						current.Files[key].Add(rom);
+						string key = rom.Size + "-" + rom.CRC;
+						if (current.Files.ContainsKey(key))
+						{
+							current.Files[key].Add(rom);
+						}
+						else
+						{
+							List<DatItem> temp = new List<DatItem>();
+							temp.Add(rom);
+							current.Files.Add(key, temp);
+						}
 					}
-					else
+
+					// If we had a header, we want the full file information too
+					if (headerToCheckAgainst != null)
 					{
-						List<DatItem> temp = new List<DatItem>();
-						temp.Add(rom);
-						current.Files.Add(key, temp);
+						rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan);
+						rom.Name = Path.GetFullPath(file);
+
+						lock (Files)
+						{
+							string key = rom.Size + "-" + rom.CRC;
+							if (current.Files.ContainsKey(key))
+							{
+								current.Files[key].Add(rom);
+							}
+							else
+							{
+								List<DatItem> temp = new List<DatItem>();
+								temp.Add(rom);
+								current.Files.Add(key, temp);
+							}
+						}
 					}
 				}
 
@@ -4566,16 +4602,19 @@ namespace SabreTools.Helper.Dats
 							Rom newrom = rom;
 							newrom.Machine = new Machine(Path.GetFullPath(file), "");
 
-							string key = rom.Size + "-" + rom.CRC;
-							if (current.Files.ContainsKey(key))
+							lock (Files)
 							{
-								current.Files[key].Add(newrom);
-							}
-							else
-							{
-								List<DatItem> temp = new List<DatItem>();
-								temp.Add(newrom);
-								current.Files.Add(key, temp);
+								string key = rom.Size + "-" + rom.CRC;
+								if (current.Files.ContainsKey(key))
+								{
+									current.Files[key].Add(newrom);
+								}
+								else
+								{
+									List<DatItem> temp = new List<DatItem>();
+									temp.Add(newrom);
+									current.Files.Add(key, temp);
+								}
 							}
 						}
 					}
@@ -4592,10 +4631,12 @@ namespace SabreTools.Helper.Dats
 							Parallel.ForEach(extracted,
 								new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 								entry =>
-								{
-									Rom rom = FileTools.GetFileInfo(entry, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
-									rom.Machine = new Machine(Path.GetFullPath(file), "");
+							{
+								Rom rom = FileTools.GetFileInfo(entry, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
+								rom.Machine = new Machine(Path.GetFullPath(file), "");
 
+								lock (Files)
+								{
 									string key = rom.Size + "-" + rom.CRC;
 									if (current.Files.ContainsKey(key))
 									{
@@ -4607,7 +4648,30 @@ namespace SabreTools.Helper.Dats
 										temp.Add(rom);
 										current.Files.Add(key, temp);
 									}
-								});
+								}
+
+								// If we had a header, we want the full file information too
+								if (headerToCheckAgainst != null)
+								{
+									rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan);
+									rom.Machine = new Machine(Path.GetFullPath(file), "");
+
+									lock (Files)
+									{
+										string key = rom.Size + "-" + rom.CRC;
+										if (current.Files.ContainsKey(key))
+										{
+											current.Files[key].Add(rom);
+										}
+										else
+										{
+											List<DatItem> temp = new List<DatItem>();
+											temp.Add(rom);
+											current.Files.Add(key, temp);
+										}
+									}
+								}
+							});
 						}
 						// Otherwise, just get the info on the file itself
 						else if (File.Exists(file))
@@ -4615,16 +4679,19 @@ namespace SabreTools.Helper.Dats
 							Rom rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
 							rom.Name = Path.GetFullPath(file);
 
-							string key = rom.Size + "-" + rom.CRC;
-							if (current.Files.ContainsKey(key))
+							lock (Files)
 							{
-								current.Files[key].Add(rom);
-							}
-							else
-							{
-								List<DatItem> temp = new List<DatItem>();
-								temp.Add(rom);
-								current.Files.Add(key, temp);
+								string key = rom.Size + "-" + rom.CRC;
+								if (current.Files.ContainsKey(key))
+								{
+									current.Files[key].Add(rom);
+								}
+								else
+								{
+									List<DatItem> temp = new List<DatItem>();
+									temp.Add(rom);
+									current.Files.Add(key, temp);
+								}
 							}
 						}
 					}
@@ -4636,7 +4703,7 @@ namespace SabreTools.Helper.Dats
 					Directory.Delete(tempSubDir, true);
 				}
 				catch { }
-			}
+			});
 
 			logger.User("Getting hash information complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -4656,12 +4723,14 @@ namespace SabreTools.Helper.Dats
 
 			// Now loop over and find all files that need to be rebuilt
 			List<string> keys = current.Files.Keys.ToList();
-			foreach (string key in keys)
+			Parallel.ForEach(keys,
+				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+				key =>
 			{
 				// If the input DAT doesn't have the key, then nothing from the current DAT are there
 				if (!Files.ContainsKey(key))
 				{
-					continue;
+					return;
 				}
 
 				// Otherwise, we try to find duplicates
@@ -4680,14 +4749,14 @@ namespace SabreTools.Helper.Dats
 						catch { }
 					}
 				}
-			}
+			});
 
 			logger.User("Determining complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			#endregion
 
 			// Now bucket the list of keys by game so that we can rebuild properly
-			SortedDictionary<string, List<DatItem>> keysGroupedByGame = DatFile.BucketListByGame(toFromMap.Keys.ToList(), false, true, logger, output: false);
+			SortedDictionary<string, List<DatItem>> keysGroupedByGame = BucketListByGame(toFromMap.Keys.ToList(), false, true, logger, output: false);
 
 			#region Rebuild games in order
 
@@ -4696,7 +4765,9 @@ namespace SabreTools.Helper.Dats
 
 			// Now loop through the keys and create the correct output items
 			List<string> games = keysGroupedByGame.Keys.ToList();
-			foreach (string game in games)
+			Parallel.ForEach(games,
+				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+				game =>
 			{
 				// Define the temporary directory
 				string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
@@ -4719,13 +4790,27 @@ namespace SabreTools.Helper.Dats
 						|| machinename.EndsWith(".rar")
 						|| machinename.EndsWith(".zip"))
 					{
-						pathsToFiles.Add(ArchiveTools.ExtractItem(source.Machine.Name, Path.GetFileName(source.Name), tempSubDir, logger));
+						string tempPath = ArchiveTools.ExtractItem(source.Machine.Name, Path.GetFileName(source.Name), tempSubDir, logger);
+						pathsToFiles.Add(tempPath);
 					}
 
 					// Otherwise, we want to just add the full path
 					else
 					{
 						pathsToFiles.Add(source.Name);
+					}
+
+					// If the size doesn't match, then we add the CRC as a postfix to the file
+					Rom fi = FileTools.GetFileInfo(pathsToFiles.Last(), logger);
+					if (fi.Size != source.Size)
+					{
+						rom.Name = Path.GetDirectoryName(rom.Name)
+									+ (String.IsNullOrEmpty(Path.GetDirectoryName(rom.Name)) ? "" : Path.DirectorySeparatorChar.ToString())
+									+ Path.GetFileNameWithoutExtension(rom.Name)
+									+ " (" + fi.CRC + ")"
+									+ Path.GetExtension(rom.Name);
+						rom.CRC = fi.CRC;
+						rom.Size = fi.Size;
 					}
 
 					// Now add the rom to the output list
@@ -4772,7 +4857,7 @@ namespace SabreTools.Helper.Dats
 					Directory.Delete(tempSubDir, true);
 				}
 				catch { }
-			}
+			});
 
 			logger.User("Rebuilding complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -6977,12 +7062,17 @@ namespace SabreTools.Helper.Dats
 			// Now add each of the roms to their respective games
 			foreach (DatItem rom in list)
 			{
+				if (rom == null)
+				{
+					continue;
+				}
+
 				count++;
 				string newkey = (norename ? ""
 						: rom.SystemID.ToString().PadLeft(10, '0')
 							+ "-"
 							+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
-					+ (String.IsNullOrEmpty(rom.Machine.Name)
+					+ (rom.Machine == null || String.IsNullOrEmpty(rom.Machine.Name)
 							? "Default"
 							: rom.Machine.Name.ToLowerInvariant());
 				newkey = HttpUtility.HtmlEncode(newkey);

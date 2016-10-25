@@ -352,6 +352,12 @@ namespace SabreTools.Helper.Skippers
 		{
 			SkipperRule skipperRule = new SkipperRule();
 
+			// If we have a null skipper name, we return since we're not matching skippers
+			if (skipperName == null)
+			{
+				return skipperRule;
+			}
+
 			// Loop through and find a Skipper that has the right name
 			logger.Verbose("Beginning search for matching header skip rules");
 			List<Skipper> tempList = new List<Skipper>();
