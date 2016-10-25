@@ -390,7 +390,7 @@ namespace SabreTools
 			}
 			logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			return datdata.ConvertFiles(inputs, outDir, tempDir, tgz, romba, delete, asl, logger);
+			return datdata.ConvertFiles(inputs, outDir, tempDir, (tgz ? OutputFormat.TorrentGzip : OutputFormat.TorrentZip), romba, delete, asl, logger);
 		}
 
 		/// <summary>

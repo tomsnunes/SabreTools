@@ -35,7 +35,7 @@ namespace SabreTools.Helper.Tools
 		{
 			string temp = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 			string realName = ExtractItem(inputArchive, sourceEntryName, temp, logger);
-			bool success = WriteToArchive(realName, outDir, destEntry, logger);
+			bool success = WriteTorrentZip(realName, outDir, destEntry, logger);
 			Directory.Delete(temp, true);
 			return success;
 		}
@@ -738,7 +738,7 @@ namespace SabreTools.Helper.Tools
 		#region Writing
 
 		/// <summary>
-		/// Copy a file to an output torrentzip archive
+		/// Write an input file to a tape archive
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -746,7 +746,7 @@ namespace SabreTools.Helper.Tools
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteToArchive(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
+		public static bool WriteTAR(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
 		{
 			// Wrap the individual inputs into lists
 			List<string> inputFiles = new List<string>();
@@ -754,11 +754,11 @@ namespace SabreTools.Helper.Tools
 			List<Rom> roms = new List<Rom>();
 			roms.Add(rom);
 
-			return WriteToArchive(inputFiles, outDir, roms, logger, date: date);
+			return WriteTAR(inputFiles, outDir, roms, logger, date: date);
 		}
 
 		/// <summary>
-		/// Copy a set of files to an output torrentzip archive (assuming the same output archive name)
+		/// Write a set of input files to a tape archive (assuming the same output archive name)
 		/// </summary>
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -766,7 +766,259 @@ namespace SabreTools.Helper.Tools
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteToArchive(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
+		public static bool WriteTAR(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Write an input file to a torrent7z archive
+		/// </summary>
+		/// <param name="inputFile">Input filename to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteTorrent7Zip(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
+		{
+			// Wrap the individual inputs into lists
+			List<string> inputFiles = new List<string>();
+			inputFiles.Add(inputFile);
+			List<Rom> roms = new List<Rom>();
+			roms.Add(rom);
+
+			return WriteTorrent7Zip(inputFiles, outDir, roms, logger, date: date);
+		}
+
+		/// <summary>
+		/// Write a set of input files to a torrent7z archive (assuming the same output archive name)
+		/// </summary>
+		/// <param name="inputFile">Input filenames to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">List of Rom representing the new information</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteTorrent7Zip(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Write an input file to a torrent GZ file
+		/// </summary>
+		/// <param name="input">File to write from</param>
+		/// <param name="outDir">Directory to write archive to</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if the write was a success, false otherwise</returns>
+		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
+		public static bool WriteTorrentGZ(string input, string outDir, bool romba, Logger logger)
+		{
+			// Check that the input file exists
+			if (!File.Exists(input))
+			{
+				logger.Warning("File " + input + " does not exist!");
+				return false;
+			}
+			input = Path.GetFullPath(input);
+
+			// Make sure the output directory exists
+			if (!Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir);
+			}
+			outDir = Path.GetFullPath(outDir);
+
+			// Now get the Rom info for the file so we have hashes and size
+			Rom rom = FileTools.GetFileInfo(input, logger);
+
+			// Get the output file name
+			string outfile = Path.Combine(outDir, rom.SHA1 + ".gz");
+
+			// If the output file exists, don't try to write again
+			if (!File.Exists(outfile))
+			{
+				// Compress the input stream
+				FileStream inputStream = File.OpenRead(input);
+				FileStream outputStream = File.Open(outfile, FileMode.Create, FileAccess.Write);
+
+				// Open the output file for writing
+				BinaryWriter sw = new BinaryWriter(outputStream);
+
+				// Write standard header and TGZ info
+				byte[] data = Constants.TorrentGZHeader
+								.Concat(Style.StringToByteArray(rom.MD5)) // MD5
+								.Concat(Style.StringToByteArray(rom.CRC)) // CRC
+							.ToArray();
+				sw.Write(data);
+				sw.Write((ulong)rom.Size); // Long size (Unsigned, Mirrored)
+
+				// Now create a deflatestream from the input file
+				DeflateStream ds = new DeflateStream(outputStream, CompressionMode.Compress, CompressionLevel.BestCompression, true);
+
+				// Copy the input stream to the output
+				byte[] ibuffer = new byte[_bufferSize];
+				int ilen;
+				while ((ilen = inputStream.Read(ibuffer, 0, _bufferSize)) > 0)
+				{
+					ds.Write(ibuffer, 0, ilen);
+					ds.Flush();
+				}
+				ds.Dispose();
+
+				// Now write the standard footer
+				sw.Write(Style.StringToByteArray(rom.CRC).Reverse().ToArray());
+				sw.Write((uint)rom.Size);
+
+				// Dispose of everything
+				sw.Dispose();
+				outputStream.Dispose();
+				inputStream.Dispose();
+			}
+
+			// If we're in romba mode, create the subfolder and move the file
+			if (romba)
+			{
+				MoveToRombaFolder(rom, outDir, outfile, logger);
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Write an input file to a torrentlrzip archive
+		/// </summary>
+		/// <param name="inputFile">Input filename to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteTorrentLRZ(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
+		{
+			// Wrap the individual inputs into lists
+			List<string> inputFiles = new List<string>();
+			inputFiles.Add(inputFile);
+			List<Rom> roms = new List<Rom>();
+			roms.Add(rom);
+
+			return WriteTorrentLRZ(inputFiles, outDir, roms, logger, date: date);
+		}
+
+		/// <summary>
+		/// Write a set of input files to a torrentlrzip archive (assuming the same output archive name)
+		/// </summary>
+		/// <param name="inputFile">Input filenames to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">List of Rom representing the new information</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteTorrentLRZ(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Write an input file to a torrentrar archive
+		/// </summary>
+		/// <param name="inputFile">Input filename to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteTorrentRAR(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
+		{
+			// Wrap the individual inputs into lists
+			List<string> inputFiles = new List<string>();
+			inputFiles.Add(inputFile);
+			List<Rom> roms = new List<Rom>();
+			roms.Add(rom);
+
+			return WriteTorrentRAR(inputFiles, outDir, roms, logger, date: date);
+		}
+
+		/// <summary>
+		/// Write a set of input files to a torrentrar archive (assuming the same output archive name)
+		/// </summary>
+		/// <param name="inputFile">Input filenames to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">List of Rom representing the new information</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteTorrentRAR(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Write an input file to a torrentxz archive
+		/// </summary>
+		/// <param name="inputFile">Input filename to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteTorrentXZ(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
+		{
+			// Wrap the individual inputs into lists
+			List<string> inputFiles = new List<string>();
+			inputFiles.Add(inputFile);
+			List<Rom> roms = new List<Rom>();
+			roms.Add(rom);
+
+			return WriteTorrentXZ(inputFiles, outDir, roms, logger, date: date);
+		}
+
+		/// <summary>
+		/// Write a set of input files to a torrentxz archive (assuming the same output archive name)
+		/// </summary>
+		/// <param name="inputFile">Input filenames to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">List of Rom representing the new information</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteTorrentXZ(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Write an input file to a torrentzip archive
+		/// </summary>
+		/// <param name="inputFile">Input filename to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteTorrentZip(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
+		{
+			// Wrap the individual inputs into lists
+			List<string> inputFiles = new List<string>();
+			inputFiles.Add(inputFile);
+			List<Rom> roms = new List<Rom>();
+			roms.Add(rom);
+
+			return WriteTorrentZip(inputFiles, outDir, roms, logger, date: date);
+		}
+
+		/// <summary>
+		/// Write a set of input files to a torrentzip archive (assuming the same output archive name)
+		/// </summary>
+		/// <param name="inputFile">Input filenames to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">List of Rom representing the new information</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
+		public static bool WriteTorrentZip(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
 		{
 			bool success = false;
 			string tempFile = Path.GetTempFileName();
@@ -977,88 +1229,6 @@ namespace SabreTools.Helper.Tools
 				File.Delete(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
-
-			return true;
-		}
-
-		/// <summary>
-		/// Write an input file to a torrent GZ file
-		/// </summary>
-		/// <param name="input">File to write from</param>
-		/// <param name="outDir">Directory to write archive to</param>
-		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>True if the write was a success, false otherwise</returns>
-		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
-		public static bool WriteTorrentGZ(string input, string outDir, bool romba, Logger logger)
-		{
-			// Check that the input file exists
-			if (!File.Exists(input))
-			{
-				logger.Warning("File " + input + " does not exist!");
-				return false;
-			}
-			input = Path.GetFullPath(input);
-
-			// Make sure the output directory exists
-			if (!Directory.Exists(outDir))
-			{
-				Directory.CreateDirectory(outDir);
-			}
-			outDir = Path.GetFullPath(outDir);
-
-			// Now get the Rom info for the file so we have hashes and size
-			Rom rom = FileTools.GetFileInfo(input, logger);
-
-			// Get the output file name
-			string outfile = Path.Combine(outDir, rom.SHA1 + ".gz");
-
-			// If the output file exists, don't try to write again
-			if (!File.Exists(outfile))
-			{
-				// Compress the input stream
-				FileStream inputStream = File.OpenRead(input);
-				FileStream outputStream = File.Open(outfile, FileMode.Create, FileAccess.Write);
-
-				// Open the output file for writing
-				BinaryWriter sw = new BinaryWriter(outputStream);
-
-				// Write standard header and TGZ info
-				byte[] data = Constants.TorrentGZHeader
-								.Concat(Style.StringToByteArray(rom.MD5)) // MD5
-								.Concat(Style.StringToByteArray(rom.CRC)) // CRC
-							.ToArray();
-				sw.Write(data);
-				sw.Write((ulong)rom.Size); // Long size (Unsigned, Mirrored)
-
-				// Now create a deflatestream from the input file
-				DeflateStream ds = new DeflateStream(outputStream, CompressionMode.Compress, CompressionLevel.BestCompression, true);
-
-				// Copy the input stream to the output
-				byte[] ibuffer = new byte[_bufferSize];
-				int ilen;
-				while ((ilen = inputStream.Read(ibuffer, 0, _bufferSize)) > 0)
-				{
-					ds.Write(ibuffer, 0, ilen);
-					ds.Flush();
-				}
-				ds.Dispose();
-
-				// Now write the standard footer
-				sw.Write(Style.StringToByteArray(rom.CRC).Reverse().ToArray());
-				sw.Write((uint)rom.Size);
-
-				// Dispose of everything
-				sw.Dispose();
-				outputStream.Dispose();
-				inputStream.Dispose();
-			}
-
-			// If we're in romba mode, create the subfolder and move the file
-			if (romba)
-			{
-				MoveToRombaFolder(rom, outDir, outfile, logger);
-			}
 
 			return true;
 		}

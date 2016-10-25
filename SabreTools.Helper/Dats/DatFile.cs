@@ -4279,16 +4279,26 @@ namespace SabreTools.Helper.Dats
 		/// <param name="inputs">List of inputs to convert over to TorrentZip or TorrentGZ</param>
 		/// <param name="outDir">Output folder to rebuild to, blank is the current directory</param>
 		/// <param name="tempDir">Temporary directory to use in file extraction</param>
-		/// <param name="tgz">True if files should be output in TorrentGZ format, false for TorrentZip</param>
+		/// <param name="outputFormat">Output format that files should be written to</param>
 		/// <param name="romba">True if TorrentGZ files should be output in romba depot format, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing how files should be treated</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if processing was a success, false otherwise</returns>
-		public bool ConvertFiles(List<string> inputs, string outDir, string tempDir, bool tgz,
+		public bool ConvertFiles(List<string> inputs, string outDir, string tempDir, OutputFormat outputFormat,
 			bool romba, bool delete, ArchiveScanLevel archiveScanLevel, Logger logger)
 		{
 			bool success = true;
+
+			// Check to see that there's an output directory and a temp directory defined
+			if (String.IsNullOrEmpty(outDir))
+			{
+				outDir = "output";
+			}
+			if (String.IsNullOrEmpty(tempDir))
+			{
+				tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+			}
 
 			// First, check that the output directory exists
 			if (!Directory.Exists(outDir))
@@ -4332,13 +4342,17 @@ namespace SabreTools.Helper.Dats
 
 					logger.User("Processing file " + input);
 
-					if (tgz)
+					switch (outputFormat)
 					{
-						success &= ArchiveTools.WriteTorrentGZ(input, outDir, romba, logger);
-					}
-					else
-					{
-						success &= ArchiveTools.WriteToArchive(input, outDir, rom, logger);
+						case OutputFormat.TorrentGzip:
+							success &= ArchiveTools.WriteTorrentGZ(input, outDir, romba, logger);
+							break;
+						case OutputFormat.TorrentZip:
+							success &= ArchiveTools.WriteTorrentZip(input, outDir, rom, logger);
+							break;
+						case OutputFormat.Folder:
+						default:
+							break;
 					}
 				}
 
@@ -4365,15 +4379,19 @@ namespace SabreTools.Helper.Dats
 								}
 							}
 
-							logger.User("Processing file " + input);
+							logger.User("Processing file " + file);
 
-							if (tgz)
+							switch (outputFormat)
 							{
-								success &= ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
-							}
-							else
-							{
-								success &= ArchiveTools.WriteToArchive(file, outDir, rom, logger);
+								case OutputFormat.TorrentGzip:
+									success &= ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
+									break;
+								case OutputFormat.TorrentZip:
+									success &= ArchiveTools.WriteTorrentZip(file, outDir, rom, logger);
+									break;
+								case OutputFormat.Folder:
+								default:
+									break;
 							}
 						}
 
@@ -4443,9 +4461,8 @@ namespace SabreTools.Helper.Dats
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
-		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
-		/// <param name="tgz">True if output files should be written to TorrentGZ instead of TorrentZip</param>
+		/// <param name="outputFormat">Output format that files should be written to</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
@@ -4453,7 +4470,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if rebuilding was a success, false otherwise</returns>
 		public bool RebuildToOutput(List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
-			bool toFolder, bool delete, bool tgz, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat, string headerToCheckAgainst,
+			bool delete, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat, string headerToCheckAgainst,
 			int maxDegreeOfParallelism, Logger logger)
 		{
 			#region Perform setup
@@ -4760,7 +4777,33 @@ namespace SabreTools.Helper.Dats
 
 			#region Rebuild games in order
 
-			logger.User("Rebuilding all files to " + (toFolder ? "directory" : (tgz ? "TorrentGZ" : "TorrentZip")));
+			switch (outputFormat)
+			{
+				case OutputFormat.Folder:
+					logger.User("Rebuilding all files to directory");
+					break;
+				case OutputFormat.TapeArchive:
+					logger.User("Rebuilding all files to TAR");
+					break;
+				case OutputFormat.Torrent7Zip:
+					logger.User("Rebuilding all files to Torrent7Z");
+					break;
+				case OutputFormat.TorrentGzip:
+					logger.User("Rebuilding all files to TorrentGZ");
+					break;
+				case OutputFormat.TorrentLrzip:
+					logger.User("Rebuilding all files to TorrentLRZ");
+					break;
+				case OutputFormat.TorrentRar:
+					logger.User("Rebuilding all files to TorrentRAR");
+					break;
+				case OutputFormat.TorrentXZ:
+					logger.User("Rebuilding all files to TorrentXZ");
+					break;
+				case OutputFormat.TorrentZip:
+					logger.User("Rebuilding all files to TorrentZip");
+					break;
+			}
 			start = DateTime.Now;
 
 			// Now loop through the keys and create the correct output items
@@ -4818,37 +4861,47 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// And now rebuild accordingly
-				if (toFolder)
+				switch (outputFormat)
 				{
-					for (int i = 0; i < romsInGame.Count; i++)
-					{
-						string infile = pathsToFiles[i];
-						Rom outrom = romsInGame[i];
-						string outfile = Path.Combine(outDir, outrom.Machine.Name, outrom.Machine.Name);
-
-						// Make sure the output folder is created
-						Directory.CreateDirectory(Path.GetDirectoryName(outfile));
-
-						// Now copy the file over
-						try
+					case OutputFormat.Folder:
+						for (int i = 0; i < romsInGame.Count; i++)
 						{
-							File.Copy(infile, outfile);
+							string infile = pathsToFiles[i];
+							Rom outrom = romsInGame[i];
+							string outfile = Path.Combine(outDir, outrom.Machine.Name, outrom.Machine.Name);
+
+							// Make sure the output folder is created
+							Directory.CreateDirectory(Path.GetDirectoryName(outfile));
+
+							// Now copy the file over
+							try
+							{
+								File.Copy(infile, outfile);
+							}
+							catch { }
 						}
-						catch { }
-					}
-				}
-				else if (tgz)
-				{
-					for (int i = 0; i < itemsInGame.Count; i++)
-					{
-						string infile = pathsToFiles[i];
-						Rom outrom = romsInGame[i];
-						ArchiveTools.WriteTorrentGZ(infile, outDir, romba, logger);
-					}
-				}
-				else
-				{
-					ArchiveTools.WriteToArchive(pathsToFiles, outDir, romsInGame, logger);
+						break;
+					case OutputFormat.TapeArchive:
+						break;
+					case OutputFormat.Torrent7Zip:
+						break;
+					case OutputFormat.TorrentGzip:
+						for (int i = 0; i < itemsInGame.Count; i++)
+						{
+							string infile = pathsToFiles[i];
+							Rom outrom = romsInGame[i];
+							ArchiveTools.WriteTorrentGZ(infile, outDir, romba, logger);
+						}
+						break;
+					case OutputFormat.TorrentLrzip:
+						break;
+					case OutputFormat.TorrentRar:
+						break;
+					case OutputFormat.TorrentXZ:
+						break;
+					case OutputFormat.TorrentZip:
+						ArchiveTools.WriteTorrentZip(pathsToFiles, outDir, romsInGame, logger);
+						break;
 				}
 
 				// And now clear the temp folder to get rid of any transient files

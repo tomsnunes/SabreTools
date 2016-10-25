@@ -389,9 +389,26 @@ namespace SabreTools
 					case "--softlist":
 						softlist = true;
 						break;
+					case "-t7z":
+					case "--t7z":
+						outputFormat = OutputFormat.Torrent7Zip;
+						break;
+					case "-tar":
+					case "--tar":
+						outputFormat = OutputFormat.TapeArchive;
+						break;
 					case "-tgz":
 					case "--tgz":
 						tgz = true;
+						outputFormat = OutputFormat.TorrentGzip;
+						break;
+					case "-tlrz":
+					case "--tlrz":
+						outputFormat = OutputFormat.TorrentLrzip;
+						break;
+					case "-trar":
+					case "--trar":
+						outputFormat = OutputFormat.TorrentRar;
 						break;
 					case "-trim":
 					case "--trim":
@@ -400,6 +417,14 @@ namespace SabreTools
 					case "-tsv":
 					case "--tsv":
 						statDatFormat = StatDatFormat.TSV;
+						break;
+					case "-txz":
+					case "--txz":
+						outputFormat = OutputFormat.TorrentXZ;
+						break;
+					case "-tzip":
+					case "--tzip":
+						outputFormat = OutputFormat.TorrentZip;
 						break;
 					case "-ud":
 					case "--update":
@@ -908,7 +933,7 @@ namespace SabreTools
 			// Convert a folder to TGZ or TorrentZip
 			if (convert)
 			{
-				InitConvertFolder(datfiles, inputs, outDir, tempDir, delete, tgz, romba, sevenzip, gz, rar, zip);
+				InitConvertFolder(datfiles, inputs, outDir, tempDir, delete, outputFormat, romba, sevenzip, gz, rar, zip);
 			}
 
 			// Create a DAT from a directory or set of directories

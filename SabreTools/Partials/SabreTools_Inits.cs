@@ -21,14 +21,14 @@ namespace SabreTools
 		/// <param name="outDir">Output directory (empty for default directory)</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
-		/// <param name="tgz">True to output files in TorrentGZ format, false for TorrentZip</param>
+		/// <param name="outputFormat">Output format that files should be written to</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		public static bool InitConvertFolder(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool delete,
-			bool tgz, bool romba, int sevenzip, int gz, int rar, int zip)
+			OutputFormat outputFormat, bool romba, int sevenzip, int gz, int rar, int zip)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
@@ -64,7 +64,7 @@ namespace SabreTools
 			}
 			_logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			return datdata.ConvertFiles(inputs, outDir, tempDir, tgz, romba, delete, asl, _logger);
+			return datdata.ConvertFiles(inputs, outDir, tempDir, outputFormat, romba, delete, asl, _logger);
 		}
 
 		/// <summary>
@@ -307,19 +307,18 @@ namespace SabreTools
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
-		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
-		/// <param name="toFolder">True if files should be output to folder, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
-		/// <param name="tgz">True to output files in TorrentGZ format, false for TorrentZip</param>
+		/// <param name="outputFormat">Output format that files should be written to</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
+		/// <param name="sevenzip">Integer representing the archive handling level for 7z</param>
 		/// <param name="gz">Integer representing the archive handling level for GZip</param>
 		/// <param name="rar">Integer representing the archive handling level for RAR</param>
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
-			bool toFolder, bool delete, bool tgz, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst,
+		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date, bool delete,
+			OutputFormat outputFormat, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst,
 			int maxDegreeOfParallelism)
 		{
 			// Get the archive scanning level
@@ -336,7 +335,7 @@ namespace SabreTools
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			datdata.RebuildToOutput(inputs, outDir, tempDir, quickScan, date, toFolder, delete, tgz, romba, asl,
+			datdata.RebuildToOutput(inputs, outDir, tempDir, quickScan, date, delete, outputFormat, romba, asl,
 				updateDat, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
 		}
 
