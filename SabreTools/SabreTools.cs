@@ -94,8 +94,9 @@ namespace SabreTools
 				skip = false,
 				updateDat = false, // SimpleSort
 				usegame = true;
-			DiffMode diffMode = 0x0;
 			DatFormat datFormat = 0x0;
+			DiffMode diffMode = 0x0;
+			OutputFormat outputFormat = OutputFormat.Folder;
 			StatDatFormat statDatFormat = StatDatFormat.None;
 
 			// User inputs
@@ -528,24 +529,6 @@ namespace SabreTools
 						i++;
 						homepage = args[i];
 						break;
-					case "-input":
-					case "--input":
-						i++;
-						if (File.Exists(args[i]) || Directory.Exists(args[i]))
-						{
-							inputs.Add(args[i]);
-						}
-						else
-						{
-							_logger.Error("Invalid input detected: " + args[i]);
-							Console.WriteLine();
-							Build.Help("SabreTools");
-							Console.WriteLine();
-							_logger.Error("Invalid input detected: " + args[i]);
-							_logger.Close();
-							return;
-						}
-						break;
 					case "-is":
 					case "--status":
 						i++;
@@ -765,23 +748,6 @@ namespace SabreTools
 								case "-hp":
 								case "--homepage":
 									homepage = split[1];
-									break;
-								case "-input":
-								case "--input":
-									if (File.Exists(split[1]) || Directory.Exists(split[1]))
-									{
-										inputs.Add(split[1]);
-									}
-									else
-									{
-										_logger.Error("Invalid input detected: " + args[i]);
-										Console.WriteLine();
-										Build.Help("SabreTools");
-										Console.WriteLine();
-										_logger.Error("Invalid input detected: " + args[i]);
-										_logger.Close();
-										return;
-									}
 									break;
 								case "-is":
 								case "--status":

@@ -360,10 +360,6 @@ namespace SabreTools.Helper.Data
 						helptext.Add("  2	Only hash archive");
 
 					helptext.Add("");
-					helptext.Add("Filenames and directories can't start with a reserved string");
-						helptext.Add("unless prefixed by 'input='");
-
-					helptext.Add("");
 					helptext.Add("Filter parameters game name, rom name, CRC, MD5, SHA-1 can");
 						helptext.Add("do partial matches using asterisks as follows (case insensitive):");
 						helptext.Add("	*00 means ends with '00'");
