@@ -64,7 +64,7 @@ namespace SabreTools
 			}
 			_logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			return FileTools.ConvertFiles(datdata, inputs, outDir, tempDir, tgz, romba, delete, asl, _logger);
+			return datdata.ConvertFiles(inputs, outDir, tempDir, tgz, romba, delete, asl, _logger);
 		}
 
 		/// <summary>
@@ -336,7 +336,7 @@ namespace SabreTools
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			FileTools.RebuildToOutput(datdata, inputs, outDir, tempDir, quickScan, date, toFolder, delete, tgz, romba, asl,
+			datdata.RebuildToOutput(inputs, outDir, tempDir, quickScan, date, toFolder, delete, tgz, romba, asl,
 				updateDat, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
 		}
 
@@ -686,7 +686,7 @@ namespace SabreTools
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			FileTools.VerifyDirectory(datdata, inputs, tempDir, headerToCheckAgainst, _logger);
+			datdata.VerifyDirectory(inputs, tempDir, headerToCheckAgainst, _logger);
 		}
 
 		#endregion

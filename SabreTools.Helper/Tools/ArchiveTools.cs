@@ -205,7 +205,7 @@ namespace SabreTools.Helper.Tools
 			string realEntry = "";
 			Stream ms = ExtractStream(input, entryName, out realEntry, logger);
 
-			realEntry = Path.GetFullPath(Path.Combine(tempDir, realEntry));
+			realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
 			if (!Directory.Exists(Path.GetDirectoryName(realEntry)))
 			{
 				Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
@@ -217,6 +217,7 @@ namespace SabreTools.Helper.Tools
 			int ilen;
 			while ((ilen = ms.Read(ibuffer, 0, _bufferSize)) > 0)
 			{
+
 				fs.Write(ibuffer, 0, ilen);
 				fs.Flush();
 			}
@@ -786,7 +787,7 @@ namespace SabreTools.Helper.Tools
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, roms[0].Machine.Name + ".zip");
+			string archiveFileName = Path.Combine(outDir, roms[0].Machine.Name + (roms[0].Machine.Name.EndsWith(".zip") ? "" : ".zip"));
 
 			// Set internal variables
 			Stream writeStream = null;

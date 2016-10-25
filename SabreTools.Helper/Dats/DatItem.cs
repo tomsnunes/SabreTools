@@ -845,16 +845,16 @@ namespace SabreTools.Helper.Dats
 		/// <returns>True if it sorted correctly, false otherwise</returns>
 		public static bool Sort(ref List<DatItem> roms, bool norename)
 		{
-			try
+			roms.Sort(delegate (DatItem x, DatItem y)
 			{
-				roms.Sort(delegate (DatItem x, DatItem y)
+				try
 				{
 					NaturalComparer nc = new NaturalComparer();
 					if (x.SystemID == y.SystemID)
 					{
 						if (x.SourceID == y.SourceID)
 						{
-							if (x.Machine.Name == y.Machine.Name)
+							if (x.Machine != null && y.Machine != null && x.Machine.Name == y.Machine.Name)
 							{
 								if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type == ItemType.Rom || y.Type == ItemType.Disk))
 								{
@@ -886,14 +886,15 @@ namespace SabreTools.Helper.Dats
 						return (norename ? nc.Compare(x.Machine.Name, y.Machine.Name) : x.SourceID - y.SourceID);
 					}
 					return (norename ? nc.Compare(x.Machine.Name, y.Machine.Name) : x.SystemID - y.SystemID);
-				});
-				return true;
-			}
-			catch (Exception)
-			{
-				// Absorb the error
-				return false;
-			}
+				}
+				catch (Exception)
+				{
+					// Absorb the error
+					return 0;
+				}
+			});
+			
+			return true;
 		}
 
 		#endregion

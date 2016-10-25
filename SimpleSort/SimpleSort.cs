@@ -64,7 +64,7 @@ namespace SabreTools
 				gz = 2,
 				rar = 2,
 				zip = 0;
-			string header = "",
+			string header = null,
 				outDir = "",
 				tempDir = "";
 			List<string> datfiles = new List<string>();
@@ -390,7 +390,7 @@ namespace SabreTools
 			}
 			logger.User("Organizing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			return FileTools.ConvertFiles(datdata, inputs, outDir, tempDir, tgz, romba, delete, asl, logger);
+			return datdata.ConvertFiles(inputs, outDir, tempDir, tgz, romba, delete, asl, logger);
 		}
 
 		/// <summary>
@@ -430,7 +430,7 @@ namespace SabreTools
 			}
 			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			FileTools.RebuildToOutput(datdata, inputs, outDir, tempDir, quickScan, date, toFolder, delete, tgz, romba, asl, updateDat, headerToCheckAgainst, 4, logger);
+			datdata.RebuildToOutput(inputs, outDir, tempDir, quickScan, date, toFolder, delete, tgz, romba, asl, updateDat, headerToCheckAgainst, 4, logger);
 		}
 
 		/// <summary>
@@ -457,7 +457,7 @@ namespace SabreTools
 			}
 			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			FileTools.VerifyDirectory(datdata, inputs, tempDir, headerToCheckAgainst, logger);
+			datdata.VerifyDirectory(inputs, tempDir, headerToCheckAgainst, logger);
 		}
 	}
 }
