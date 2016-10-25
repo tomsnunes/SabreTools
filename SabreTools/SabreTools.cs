@@ -919,7 +919,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(datFromDir ^ headerer ^ splitByExt ^ splitByHash ^ splitByType ^ stats ^ update))
+			if (!(convert ^ datFromDir ^ headerer ^ sort ^ splitByExt ^ splitByHash ^ splitByType ^ stats ^ update ^ verify))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help("SabreTools");
