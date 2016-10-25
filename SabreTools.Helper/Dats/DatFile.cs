@@ -4452,28 +4452,6 @@ namespace SabreTools.Helper.Dats
 				}
 			}
 
-			// If we're in romba mode and the size file doesn't exist, create it
-			if (romba && !File.Exists(Path.Combine(outDir, ".romba_size")))
-			{
-				// Get the size of all of the files in the output folder
-				long size = 0;
-				foreach (string file in Directory.EnumerateFiles(outDir, "*", SearchOption.AllDirectories))
-				{
-					FileInfo tempinfo = new FileInfo(file);
-					size += tempinfo.Length;
-				}
-
-				// Write out the value to each of the romba depot files
-				StreamWriter tw = new StreamWriter(File.Open(Path.Combine(outDir, ".romba_size"), FileMode.Create, FileAccess.Write));
-				StreamWriter twb = new StreamWriter(File.Open(Path.Combine(outDir, ".romba_size.backup"), FileMode.Create, FileAccess.Write));
-
-				tw.Write(size);
-				twb.Write(size);
-
-				tw.Dispose();
-				twb.Dispose();
-			}
-
 			return success;
 		}
 
