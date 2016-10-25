@@ -40,7 +40,7 @@ namespace SabreTools.Helper.Data
 					Console.BackgroundColor = ConsoleColor.Blue;
 				}
 
-				Console.Title = "SabreTools-" + name + " " + Constants.Version;
+				Console.Title = name + " " + Constants.Version;
 
 				// Output the header
 				Console.WriteLine(border);
