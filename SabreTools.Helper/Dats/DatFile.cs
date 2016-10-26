@@ -5265,6 +5265,66 @@ namespace SabreTools.Helper.Dats
 		}
 
 		/// <summary>
+		/// Split a SuperDAT by lowest available directory level
+		/// </summary>
+		/// <param name="outDir">Name of the directory to write the DATs out to</param>
+		/// <param name="basepath">Parent path for replacement</param>
+		/// <param name="logger">Logger object for console and file writing</param>
+		/// <returns>True if split succeeded, false otherwise</returns>
+		public bool SplitByLevel(string outDir, string basepath, Logger logger)
+		{
+			// Sanitize the basepath to be more predictable
+			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
+
+			// First, organize by games so that we can do the right thing
+			BucketByGame(false, true, logger, output: false);
+
+			// Create a temporary DAT to add things to
+			DatFile tempDat = (DatFile)CloneHeader();
+			tempDat.Name = null;
+
+			// Then, we loop over the games
+			foreach (string key in Files.Keys)
+			{
+				// Here, the key is the name of the game to be used for comparison
+				if (tempDat.Name != null && tempDat.Name != Path.GetDirectoryName(key))
+				{
+					// Get the path that the file will be written out to
+					string path = (String.IsNullOrEmpty(tempDat.Name)
+						? outDir
+						: Path.Combine(outDir, tempDat.Name));
+
+					// Now use the original DAT values and append the path to them
+					tempDat.FileName += " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
+					tempDat.Description += " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
+					tempDat.Name = Name + " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
+
+					// Write out the temporary DAT to the proper directory
+					WriteToFile(path, logger);
+
+					// Reset the DAT for the next items
+					tempDat = (DatFile)CloneHeader();
+					tempDat.Name = null;
+				}
+
+				// Otherwise, we just add the game to the output DAT
+				if (tempDat.Files.ContainsKey(key))
+				{
+					tempDat.Files[key].AddRange(Files[key]);
+				}
+				else
+				{
+					tempDat.Files.Add(key, Files[key]);
+				}
+
+				// Then set the DAT name to be the parent directory name
+				tempDat.Name = Path.GetDirectoryName(key);
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Split a DAT by type of Rom
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
