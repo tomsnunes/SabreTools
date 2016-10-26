@@ -338,7 +338,7 @@ namespace SabreTools.Helper.Dats
 								+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
 						+ (String.IsNullOrEmpty(rom.Machine.Name)
 								? "Default"
-								: rom.Machine.Name.ToLowerInvariant());
+								: rom.Machine.Name);
 					newkey = HttpUtility.HtmlEncode(newkey);
 					if (sortable.ContainsKey(newkey))
 					{
@@ -5290,17 +5290,18 @@ namespace SabreTools.Helper.Dats
 				if (tempDat.Name != null && tempDat.Name != Path.GetDirectoryName(key))
 				{
 					// Get the path that the file will be written out to
-					string path = (String.IsNullOrEmpty(tempDat.Name)
+					string path = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name)
 						? outDir
 						: Path.Combine(outDir, tempDat.Name));
 
-					// Now use the original DAT values and append the path to them
-					tempDat.FileName += " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
+					// Now set the new output values
+					tempDat.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name) ? FileName : Path.GetFileName(tempDat.Name));
 					tempDat.Description += " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
 					tempDat.Name = Name + " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
+					tempDat.Type = null;
 
 					// Write out the temporary DAT to the proper directory
-					WriteToFile(path, logger);
+					tempDat.WriteToFile(path, logger);
 
 					// Reset the DAT for the next items
 					tempDat = (DatFile)CloneHeader();
@@ -5310,6 +5311,7 @@ namespace SabreTools.Helper.Dats
 				// Clean the input list and set all games to be pathless
 				List<DatItem> items = Files[key];
 				items.ForEach(item => item.Machine.Name = Path.GetFileName(item.Machine.Name));
+				items.ForEach(item => item.Machine.Description = Path.GetFileName(item.Machine.Description));
 
 				// Now add the game to the output DAT
 				if (tempDat.Files.ContainsKey(key))
