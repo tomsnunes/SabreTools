@@ -11,6 +11,7 @@ using Ionic.Zlib;
 using ROMVault2.SupportedFiles.Zip;
 using SharpCompress.Archive;
 using SharpCompress.Archive.SevenZip;
+using SharpCompress.Archive.Tar;
 using SharpCompress.Common;
 using SharpCompress.Reader;
 
@@ -540,6 +541,7 @@ namespace SabreTools.Helper.Tools
 		/// <returns>ArchiveType of inputted file (null on error)</returns>
 		public static ArchiveType? GetCurrentArchiveType(string input, Logger logger)
 		{
+
 			ArchiveType? outtype = null;
 
 			// First line of defense is going to be the extension, for better or worse
@@ -768,7 +770,74 @@ namespace SabreTools.Helper.Tools
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTAR(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
 		{
-			return false;
+			bool success = false;
+
+			// If the number of inputs is less than the number of available roms, return
+			if (inputFiles.Count < roms.Count)
+			{
+				return success;
+			}
+
+			// If one of the files doesn't exist, return
+			foreach (string file in inputFiles)
+			{
+				if (!File.Exists(file))
+				{
+					return success;
+				}
+			}
+
+			// Get the output archive name from the first rebuild rom
+			string archiveFileName = Path.Combine(outDir, roms[0].Machine.Name + (roms[0].Machine.Name.EndsWith(".tar") ? "" : ".tar"));
+
+			// Set internal variables
+			Stream tarstream = new MemoryStream();
+			TarArchive tarchive = TarArchive.Create();
+
+			try
+			{
+				// If the full output path doesn't exist, create it
+				if (!Directory.Exists(Path.GetDirectoryName(archiveFileName)))
+				{
+					Directory.CreateDirectory(Path.GetDirectoryName(archiveFileName));
+				}
+
+				// We can only overwrite at this point, sorry
+				tarstream = File.Open(archiveFileName, FileMode.Create, FileAccess.Write);
+
+				// Map all inputs to index
+				Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
+				for (int i = 0; i < inputFiles.Count; i++)
+				{
+					inputIndexMap.Add(roms[i].Name.Replace('\\', '/'), i);
+				}
+
+				// Sort the keys in TZIP order
+				List<string> keys = inputIndexMap.Keys.ToList();
+				keys.Sort(ZipFile.TorrentZipStringCompare);
+
+				// Now add each of the files
+				foreach (string key in keys)
+				{
+					int index = inputIndexMap[key];
+					tarchive.AddEntry(key, inputFiles[index]);
+				}
+
+				tarchive.SaveTo(tarstream, new CompressionInfo { Type = CompressionType.None });
+				success = true;
+			}
+			catch (Exception ex)
+			{
+				success = false;
+				logger.Error(ex.ToString());
+			}
+			finally
+			{
+				tarstream?.Dispose();
+				tarchive?.Dispose();
+			}
+
+			return success;
 		}
 
 		/// <summary>

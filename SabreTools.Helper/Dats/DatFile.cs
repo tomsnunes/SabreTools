@@ -4752,6 +4752,7 @@ namespace SabreTools.Helper.Dats
 						}
 						break;
 					case OutputFormat.TapeArchive:
+						ArchiveTools.WriteTAR(pathsToFiles, outDir, romsInGame, logger);
 						break;
 					case OutputFormat.Torrent7Zip:
 						break;

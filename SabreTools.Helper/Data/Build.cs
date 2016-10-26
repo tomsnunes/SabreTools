@@ -210,7 +210,7 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-qs, --quick		Enable quick scanning of archives");
 						helptext.Add("	-ad, --add-date		Add original dates from DAT, if possible");
 						//helptext.Add("	-t7z			Enable Torrent7z output");
-						//helptext.Add("	-tar			Enable TAR output");
+						helptext.Add("	-tar			Enable TAR output");
 						helptext.Add("	-tgz			Enable TorrentGZ output");
 						helptext.Add("		-r, --romba		Enable Romba depot dir output");
 						//helptext.Add("	-tlrz			Enable TorrentLRZ output");

@@ -384,7 +384,7 @@ Options:
 			files. This format is based on the LZMA container format 7zip, but with custom header
 			information. This is currently unused by any major application.
 			
-		-tar				Enable Tape ARchive output [NOT IMPLEMENTED]
+		-tar				Enable Tape ARchive output
 			Instead of outputting the fiels to folder, files will be rebuilt to Tape ARchive (TAR)
 			files. This format is a standardized storage archive without any compression, usually
 			used with other compression formats around it. It is widely used in backup applications
