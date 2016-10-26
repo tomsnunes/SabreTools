@@ -51,7 +51,6 @@ namespace SabreTools
 
 			// Feature flags
 			bool help = false,
-				convert = false, // SimpleSort
 				datFromDir = false,
 				headerer = false,
 				sort = false, // SimpleSort
@@ -73,6 +72,7 @@ namespace SabreTools
 				enableGzip = false,
 				excludeOf = false,
 				inplace = false,
+				inverse = false, // SimpleSort
 				merge = false,
 				noMD5 = false,
 				noSHA1 = false,
@@ -151,10 +151,6 @@ namespace SabreTools
 					case "-h":
 					case "--help":
 						help = true;
-						break;
-					case "-cv":
-					case "--convert":
-						convert = true;
 						break;
 					case "-d":
 					case "--d2d":
@@ -262,6 +258,10 @@ namespace SabreTools
 					case "-html":
 					case "--html":
 						statDatFormat = StatDatFormat.HTML;
+						break;
+					case "-in":
+					case "--inverse":
+						inverse = true;
 						break;
 					case "-ip":
 					case "--inplace":
@@ -903,7 +903,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(convert ^ datFromDir ^ headerer ^ sort ^ splitByExt ^ splitByHash ^ splitByType ^ stats ^ update ^ verify))
+			if (!(datFromDir ^ headerer ^ sort ^ splitByExt ^ splitByHash ^ splitByType ^ stats ^ update ^ verify))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help("SabreTools");
@@ -923,14 +923,8 @@ namespace SabreTools
 
 			// Now take care of each mode in succesion
 
-			// Convert a folder to TGZ or TorrentZip
-			if (convert)
-			{
-				InitConvertFolder(datfiles, inputs, outDir, tempDir, delete, outputFormat, romba, sevenzip, gz, rar, zip);
-			}
-
 			// Create a DAT from a directory or set of directories
-			else if (datFromDir)
+			if (datFromDir)
 			{
 				InitDatFromDir(inputs,
 					filename,
@@ -967,8 +961,8 @@ namespace SabreTools
 			// If we're using the sorter
 			else if (sort)
 			{
-				InitSort(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, delete, outputFormat,
-					romba, sevenzip, gz, rar, zip, updateDat, header, maxParallelism);
+				InitSort(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, delete, inverse,
+					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, maxParallelism);
 			}
 
 			// Split a DAT by extension

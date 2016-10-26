@@ -147,25 +147,6 @@ namespace SabreTools.Helper.Data
 					helptext.Add("Options:");
 					helptext.Add("  -?, -h, --help	Show this help");
 
-					// Convert
-					helptext.Add("  -cv, --convert	Enable conversion of input files to folder");
-						helptext.Add("	-dat=			DAT to be used as a filter for conversion");
-						helptext.Add("	-out=			Output directory");
-						helptext.Add("	-t=, --temp=		Set the temporary directory to use");
-						helptext.Add("	-del, --delete		Delete input files [DO NOT USE]");
-						//helptext.Add("	-t7z			Enable Torrent7z output");
-						//helptext.Add("	-tar			Enable TAR output");
-						helptext.Add("	-tgz			Enable TorrentGZ output");
-							helptext.Add("		-r, --romba		Enable Romba depot dir output");
-						//helptext.Add("	-tlrz			Enable TorrentLRZ output");
-						//helptext.Add("	-trar			Enable TorrentRAR output");
-						//helptext.Add("	-txz			Enable TorrentXZ output");
-						helptext.Add("	-tzip			Enable TorrentZip output");
-						helptext.Add("	-7z={0}			Set scanning level for 7z archives");
-						helptext.Add("	-gz={2}			Set scanning level for GZip archives");
-						helptext.Add("	-rar={2}		Set scanning level for RAR archives");
-						helptext.Add("	-zip={0}		Set scanning level for ZIP archives");
-
 					// DATFromDir
 					helptext.Add("  -d, --dfd		Create a DAT from an input directory");
 						helptext.Add("	-nm, --noMD5		Don't include MD5 in output");
@@ -225,6 +206,7 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-out=			Output directory");
 						helptext.Add("	-t=, --temp=		Set the temporary directory to use");
 						helptext.Add("	-del, --delete	Delete input files [DO NOT USE]");
+						helptext.Add("	-in, --inverse	Rebuild only files not in DAT");
 						helptext.Add("	-qs, --quick		Enable quick scanning of archives");
 						helptext.Add("	-ad, --add-date		Add original dates from DAT, if possible");
 						//helptext.Add("	-t7z			Enable Torrent7z output");

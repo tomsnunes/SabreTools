@@ -4274,188 +4274,6 @@ namespace SabreTools.Helper.Dats
 		#region Rebuilding and Verifying
 
 		/// <summary>
-		/// Process inputs and convert to TorrentZip or TorrentGZ, optionally converting to Romba format
-		/// </summary>
-		/// <param name="inputs">List of inputs to convert over to TorrentZip or TorrentGZ</param>
-		/// <param name="outDir">Output folder to rebuild to, blank is the current directory</param>
-		/// <param name="tempDir">Temporary directory to use in file extraction</param>
-		/// <param name="outputFormat">Output format that files should be written to</param>
-		/// <param name="romba">True if TorrentGZ files should be output in romba depot format, false otherwise</param>
-		/// <param name="delete">True if input files should be deleted, false otherwise</param>
-		/// <param name="archiveScanLevel">ArchiveScanLevel representing how files should be treated</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>True if processing was a success, false otherwise</returns>
-		public bool ConvertFiles(List<string> inputs, string outDir, string tempDir, OutputFormat outputFormat,
-			bool romba, bool delete, ArchiveScanLevel archiveScanLevel, Logger logger)
-		{
-			bool success = true;
-
-			// Check to see that there's an output directory and a temp directory defined
-			if (String.IsNullOrEmpty(outDir))
-			{
-				outDir = "output";
-			}
-			if (String.IsNullOrEmpty(tempDir))
-			{
-				tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-			}
-
-			// First, check that the output directory exists
-			if (!Directory.Exists(outDir))
-			{
-				Directory.CreateDirectory(outDir);
-				outDir = Path.GetFullPath(outDir);
-			}
-
-			// Then create or clean the temp directory
-			if (!Directory.Exists(tempDir))
-			{
-				Directory.CreateDirectory(tempDir);
-			}
-			else
-			{
-				FileTools.CleanDirectory(tempDir);
-			}
-
-			// Now process all of the inputs
-			foreach (string input in inputs)
-			{
-				logger.User("Examining file " + input);
-
-				// Get if the file should be scanned internally and externally
-				bool shouldExternalProcess, shouldInternalProcess;
-				ArchiveTools.GetInternalExternalProcess(input, archiveScanLevel, logger, out shouldExternalProcess, out shouldInternalProcess);
-
-				// Do an external scan of the file, if necessary
-				if (shouldExternalProcess)
-				{
-					// If a DAT is defined, we want to make sure that this file is not in there
-					Rom rom = FileTools.GetFileInfo(input, logger);
-					rom.Machine = new Machine { Name = Path.GetFileNameWithoutExtension(rom.Name) };
-					if (this != null && Files.Count > 0)
-					{
-						if (rom.HasDuplicates(this, logger))
-						{
-							logger.User("File '" + input + "' existed in the DAT, skipping...");
-							continue;
-						}
-					}
-
-					logger.User("Processing file " + input);
-
-					switch (outputFormat)
-					{
-						case OutputFormat.TorrentGzip:
-							success &= ArchiveTools.WriteTorrentGZ(input, outDir, romba, logger);
-							break;
-						case OutputFormat.TorrentZip:
-							success &= ArchiveTools.WriteTorrentZip(input, outDir, rom, logger);
-							break;
-						case OutputFormat.Folder:
-							try
-							{
-								string outfile = Path.Combine(outDir, rom.Machine.Name, rom.Name);
-								Directory.CreateDirectory(Path.GetDirectoryName(outfile));
-								File.Copy(input, outfile);
-							}
-							catch
-							{
-								success = false;
-							}
-							break;
-						default:
-							break;
-					}
-				}
-
-				// Process the file as an archive, if necessary
-				if (shouldInternalProcess)
-				{
-					// Now, if the file is a supported archive type, also run on all files within
-					bool encounteredErrors = ArchiveTools.ExtractArchive(input, tempDir, archiveScanLevel, logger);
-
-					// If no errors were encountered, we loop through the temp directory
-					if (!encounteredErrors)
-					{
-						logger.Verbose("Archive found! Successfully extracted");
-						foreach (string file in Directory.EnumerateFiles(tempDir, "*", SearchOption.AllDirectories))
-						{
-							// If a DAT is defined, we want to make sure that this file is not in there
-							Rom rom = FileTools.GetFileInfo(file, logger);
-							rom.Machine = new Machine { Name = Path.GetFileNameWithoutExtension(input) };
-							if (this != null && Files.Count > 0)
-							{
-								if (rom.HasDuplicates(this, logger))
-								{
-									logger.User("File '" + file + "' existed in the DAT, skipping...");
-									continue;
-								}
-							}
-
-							logger.User("Processing file " + file);
-
-							switch (outputFormat)
-							{
-								case OutputFormat.TorrentGzip:
-									success &= ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
-									break;
-								case OutputFormat.TorrentZip:
-									success &= ArchiveTools.WriteTorrentZip(file, outDir, rom, logger);
-									break;
-								case OutputFormat.Folder:
-									try
-									{
-										string outfile = Path.Combine(outDir, rom.Machine.Name, rom.Name);
-										Directory.CreateDirectory(Path.GetDirectoryName(outfile));
-										File.Copy(file, outfile);
-									}
-									catch
-									{
-										success = false;
-									}
-									break;
-								default:
-									break;
-							}
-						}
-
-						FileTools.CleanDirectory(tempDir);
-					}
-				}
-
-				// Delete the source file if we're supposed to
-				if (delete)
-				{
-					try
-					{
-						logger.User("Attempting to delete " + input);
-						File.Delete(input);
-					}
-					catch (Exception ex)
-					{
-						logger.Error(ex.ToString());
-						success &= false;
-					}
-				}
-			}
-
-			// Now one final delete of the temp directory
-			while (Directory.Exists(tempDir))
-			{
-				try
-				{
-					Directory.Delete(tempDir, true);
-				}
-				catch
-				{
-					continue;
-				}
-			}
-
-			return success;
-		}
-
-		/// <summary>
 		/// Process the DAT and find all matches in input files and folders
 		/// </summary>
 		/// <param name="inputs">List of input files/folders to check</param>
@@ -4464,6 +4282,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="inverse">True if the DAT should be used as a filter instead of a template, false otherwise</param>
 		/// <param name="outputFormat">Output format that files should be written to</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
@@ -4472,8 +4291,8 @@ namespace SabreTools.Helper.Dats
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if rebuilding was a success, false otherwise</returns>
 		public bool RebuildToOutput(List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
-			bool delete, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat, string headerToCheckAgainst,
-			int maxDegreeOfParallelism, Logger logger)
+			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
+			string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
 		{
 			#region Perform setup
 
@@ -4746,26 +4565,73 @@ namespace SabreTools.Helper.Dats
 				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 				key =>
 			{
-				// If the input DAT doesn't have the key, then nothing from the current DAT are there
-				if (!Files.ContainsKey(key))
+				// If we are using the DAT as a filter, treat the files one way
+				if (inverse)
 				{
-					return;
-				}
-
-				// Otherwise, we try to find duplicates
-				List<DatItem> datItems = current.Files[key];
-				foreach (Rom rom in datItems)
-				{
-					List<DatItem> found = rom.GetDuplicates(this, logger, false);
-
-					// Now add all of the duplicates mapped to the current file
-					foreach (Rom mid in found)
+					// Check for duplicates
+					List<DatItem> datItems = current.Files[key];
+					foreach (Rom rom in datItems)
 					{
+						// If the rom has duplicates, we skip it
+						if (rom.HasDuplicates(this, logger))
+						{
+							return;
+						}
+
+						// Otherwise, map the file to itself
 						try
 						{
-							toFromMap.Add(mid, rom);
+							Rom newrom = new Rom
+							{
+								Name = rom.Name.Remove(0, Path.GetDirectoryName(rom.Name).Length),
+								Size = rom.Size,
+								CRC = rom.CRC,
+								MD5 = rom.MD5,
+								SHA1 = rom.SHA1,
+
+								Machine = new Machine
+								{
+									Name = Path.GetFileNameWithoutExtension(rom.Machine.Name),
+								},
+							};
+							newrom.Name = newrom.Name.Remove(0, (newrom.Name.StartsWith("\\") || newrom.Name.StartsWith("/") ? 1 : 0));
+
+							lock (toFromMap)
+							{
+								toFromMap.Add(newrom, rom);
+							}
 						}
 						catch { }
+					}
+				}
+
+				// Otherwise, treat it like a standard rebuild
+				else
+				{
+					// If the input DAT doesn't have the key, then nothing from the current DAT are there
+					if (!Files.ContainsKey(key))
+					{
+						return;
+					}
+
+					// Otherwise, we try to find duplicates
+					List<DatItem> datItems = current.Files[key];
+					foreach (Rom rom in datItems)
+					{
+						List<DatItem> found = rom.GetDuplicates(this, logger, false);
+
+						// Now add all of the duplicates mapped to the current file
+						foreach (Rom mid in found)
+						{
+							try
+							{
+								lock (toFromMap)
+								{
+									toFromMap.Add(mid, rom);
+								}
+							}
+							catch { }
+						}
 					}
 				}
 			});
