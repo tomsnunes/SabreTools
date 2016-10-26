@@ -245,6 +245,41 @@ namespace SabreTools
 		}
 
 		/// <summary>
+		/// Wrap splitting a SuperDAT by lowest available level
+		/// </summary>
+		/// <param name="inputs">List of inputs to be used</param>
+		/// <param name="outDir">Output directory for the split files</param>
+		private static void InitLevelSplit(List<string> inputs, string outDir)
+		{
+			// Loop over the input files
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					DatFile datFile = new DatFile();
+					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, softlist: true);
+					datFile.SplitByLevel(outDir, Path.GetDirectoryName(input), _logger);
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						DatFile datFile = new DatFile();
+						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, softlist: true);
+						datFile.SplitByLevel(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
+					}
+				}
+				else
+				{
+					_logger.Error(input + " is not a valid file or folder!");
+					Console.WriteLine();
+					Build.Help("SabreTools");
+					return;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Wrap sorting files using an input DAT
 		/// </summary>
 		/// <param name="datfiles">Names of the DATs to compare against</param>

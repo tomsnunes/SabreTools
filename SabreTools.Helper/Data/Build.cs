@@ -200,6 +200,10 @@ namespace SabreTools.Helper.Data
 					helptext.Add("  -hs, --hash-split	Split a DAT or folder by best-available hashes");
 						helptext.Add("	-out=			Output directory");
 
+					// Level/SuperDAT Split
+					helptext.Add("  -ls, --lvl-split	Split a SuperDAT or folder by internal path");
+					helptext.Add("	-out=			Output directory");
+
 					// Sort
 					helptext.Add("  -ss, --sort		Sort input files by a set of DATs");
 						helptext.Add("	-dat=			Input DAT to rebuild against");

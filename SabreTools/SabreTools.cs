@@ -56,6 +56,7 @@ namespace SabreTools
 				sort = false, // SimpleSort
 				splitByExt = false,
 				splitByHash = false,
+				splitByLevel = false,
 				splitByType = false,
 				stats = false,
 				update = false,
@@ -168,6 +169,10 @@ namespace SabreTools
 					case "-hs":
 					case "--hash-split":
 						splitByHash = true;
+						break;
+					case "-ls":
+					case "--lvl-split":
+						splitByLevel = true;
 						break;
 					case "-ss":
 					case "--sort":
@@ -903,7 +908,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(datFromDir ^ headerer ^ sort ^ splitByExt ^ splitByHash ^ splitByType ^ stats ^ update ^ verify))
+			if (!(datFromDir ^ headerer ^ sort ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help("SabreTools");
@@ -913,7 +918,7 @@ namespace SabreTools
 
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (inputs.Count == 0
-				&& (datFromDir || headerer || splitByExt || splitByHash || splitByType || stats || update))
+				&& (datFromDir || headerer || splitByExt || splitByHash || splitByLevel || splitByType || stats || update))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help("SabreTools");
@@ -975,6 +980,12 @@ namespace SabreTools
 			else if (splitByHash)
 			{
 				InitHashSplit(inputs, outDir);
+			}
+
+			// Split a SuperDAT by lowest available level
+			else if (splitByLevel)
+			{
+				InitLevelSplit(inputs, outDir);
 			}
 
 			// Split a DAT by item type
