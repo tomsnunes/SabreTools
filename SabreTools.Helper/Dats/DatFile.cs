@@ -5295,7 +5295,9 @@ namespace SabreTools.Helper.Dats
 						: Path.Combine(outDir, tempDat.Name));
 
 					// Now set the new output values
-					tempDat.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name) ? FileName : Path.GetFileName(tempDat.Name));
+					tempDat.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name)
+						? FileName
+						: tempDat.Name.Replace(Path.DirectorySeparatorChar.ToString(), " - ").Replace(Path.AltDirectorySeparatorChar.ToString(), " - "));
 					tempDat.Description += " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
 					tempDat.Name = Name + " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
 					tempDat.Type = null;
@@ -5333,7 +5335,9 @@ namespace SabreTools.Helper.Dats
 				: Path.Combine(outDir, tempDat.Name));
 
 			// Now set the new output values
-			tempDat.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name) ? FileName : Path.GetFileName(tempDat.Name));
+			tempDat.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name)
+				? FileName
+				: tempDat.Name.Replace(Path.DirectorySeparatorChar.ToString(), " - ").Replace(Path.AltDirectorySeparatorChar.ToString(), " - "));
 			tempDat.Description += " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
 			tempDat.Name = Name + " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
 			tempDat.Type = null;
