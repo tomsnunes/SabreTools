@@ -257,7 +257,7 @@ namespace SabreTools
 				if (File.Exists(input))
 				{
 					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, softlist: true);
+					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, softlist: true, keep: true);
 					datFile.SplitByLevel(outDir, Path.GetDirectoryName(input), _logger);
 				}
 				else if (Directory.Exists(input))
@@ -265,7 +265,7 @@ namespace SabreTools
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, softlist: true);
+						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, softlist: true, keep: true);
 						datFile.SplitByLevel(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
 					}
 				}
