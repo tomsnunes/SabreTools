@@ -5307,14 +5307,18 @@ namespace SabreTools.Helper.Dats
 					tempDat.Name = null;
 				}
 
-				// Otherwise, we just add the game to the output DAT
+				// Clean the input list and set all games to be pathless
+				List<DatItem> items = Files[key];
+				items.ForEach(item => item.Machine.Name = Path.GetFileName(item.Machine.Name));
+
+				// Now add the game to the output DAT
 				if (tempDat.Files.ContainsKey(key))
 				{
-					tempDat.Files[key].AddRange(Files[key]);
+					tempDat.Files[key].AddRange(items);
 				}
 				else
 				{
-					tempDat.Files.Add(key, Files[key]);
+					tempDat.Files.Add(key, items);
 				}
 
 				// Then set the DAT name to be the parent directory name
