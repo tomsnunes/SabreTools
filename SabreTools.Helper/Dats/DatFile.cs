@@ -5327,6 +5327,20 @@ namespace SabreTools.Helper.Dats
 				tempDat.Name = Path.GetDirectoryName(key);
 			}
 
+			// Then we write the last DAT out since it would be skipped otherwise
+			string lastpath = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name)
+				? outDir
+				: Path.Combine(outDir, tempDat.Name));
+
+			// Now set the new output values
+			tempDat.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name) ? FileName : Path.GetFileName(tempDat.Name));
+			tempDat.Description += " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
+			tempDat.Name = Name + " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
+			tempDat.Type = null;
+
+			// Write out the temporary DAT to the proper directory
+			tempDat.WriteToFile(lastpath, logger);
+
 			return true;
 		}
 
