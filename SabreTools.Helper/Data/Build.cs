@@ -201,12 +201,12 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-out=			Output directory");
 
 					// Sort
-					helptext.Add("  -ss, --sort			Sort input files by a set of DATs");
+					helptext.Add("  -ss, --sort		Sort input files by a set of DATs");
 						helptext.Add("	-dat=			Input DAT to rebuild against");
 						helptext.Add("	-out=			Output directory");
 						helptext.Add("	-t=, --temp=		Set the temporary directory to use");
-						helptext.Add("	-del, --delete	Delete input files [DO NOT USE]");
-						helptext.Add("	-in, --inverse	Rebuild only files not in DAT");
+						helptext.Add("	-del, --delete		Delete input files [DO NOT USE]");
+						helptext.Add("	-in, --inverse		Rebuild only files not in DAT");
 						helptext.Add("	-qs, --quick		Enable quick scanning of archives");
 						helptext.Add("	-ad, --add-date		Add original dates from DAT, if possible");
 						//helptext.Add("	-t7z			Enable Torrent7z output");
@@ -218,8 +218,8 @@ namespace SabreTools.Helper.Data
 						//helptext.Add("	-txz			Enable TorrentXZ output");
 						helptext.Add("	-tzip			Enable TorrentZip output");
 						helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
-						helptext.Add("	-7z={0}		Set scanning level for 7z archives");
-						helptext.Add("	-gz={2}		Set scanning level for GZip archives");
+						helptext.Add("	-7z={0}			Set scanning level for 7z archives");
+						helptext.Add("	-gz={2}			Set scanning level for GZip archives");
 						helptext.Add("	-rar={2}		Set scanning level for RAR archives");
 						helptext.Add("	-zip={0}		Set scanning level for ZIP archives");
 						helptext.Add("	-ud, --update-dat	Output updated DAT");
@@ -228,12 +228,12 @@ namespace SabreTools.Helper.Data
 					// Stats
 					helptext.Add("  -st, --stats		Get statistics on all input DATs");
 						helptext.Add("	-bc, --baddump-col	Add baddump stats to output");
-						helptext.Add("	-csv, --csv			Output in Comma-Separated Value format");
+						helptext.Add("	-csv, --csv		Output in Comma-Separated Value format");
 						helptext.Add("	-f=, --filename=	Set the filename for the output");
 						helptext.Add("	-html, --html		Output in HTML format");
 						helptext.Add("	-nc, --nodump-col	Add nodump stats to output");
 						helptext.Add("	-si, --single		Show individual statistics");
-						helptext.Add("	-tsv, --tsv			Output in Tab-Separated Value format");
+						helptext.Add("	-tsv, --tsv		Output in Tab-Separated Value format");
 
 					// Type Split
 					helptext.Add("  -ts, --type-split		Split a DAT or folder by file types (rom/disk)");
@@ -315,13 +315,13 @@ namespace SabreTools.Helper.Data
 							helptext.Add("		-rc, --rev-cascade	Enable reverse cascaded diffing");
 								helptext.Add("			-ip, --inplace		Enable inplace, cascaded diff");
 								helptext.Add("			-sf, --skip		Skip output of first DAT");
-						helptext.Add("	-did, --diff-du	Create diffdat containing just duplicates");
+						helptext.Add("	-did, --diff-du		Create diffdat containing just duplicates");
 							helptext.Add("		[Can be used with other -diX flags]");
 							helptext.Add("		-b, --bare		Don't include date in automatic name");
-						helptext.Add("	-dii, --diff-in	Create diffdats for individual DATs");
+						helptext.Add("	-dii, --diff-in		Create diffdats for individual DATs");
 							helptext.Add("		[Can be used with other -diX flags]");
 							helptext.Add("		-b, --bare		Don't include date in automatic name");
-						helptext.Add("	-din, --diff-nd	Create diffdat containing no duplicates");
+						helptext.Add("	-din, --diff-nd		Create diffdat containing no duplicates");
 							helptext.Add("		[Can be used with other -diX flags]");
 							helptext.Add("		-b, --bare		Don't include date in automatic name");
 						helptext.Add("	-gn=, --game-name=	Filter by game name");

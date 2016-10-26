@@ -4556,7 +4556,9 @@ namespace SabreTools.Helper.Dats
 			start = DateTime.Now;
 
 			// Order the DATs by hash first to make things easier
+			logger.User("Sorting input DAT...");
 			BucketByCRC(false, logger, output: false);
+			logger.User("Sorting found files...");
 			current.BucketByCRC(false, logger, output: false);
 
 			// Now loop over and find all files that need to be rebuilt

@@ -114,7 +114,7 @@ namespace SabreTools.Helper
 				}
 
 				TimeSpan span = DateTime.Now.Subtract(_start);
-				string total = span.ToString(@"hh\:mm\:ss\.fffff");
+				string total = span.ToString(@"hh\:mm\:ss");
 				if (!_tofile)
 				{
 					Console.WriteLine("Total runtime: " + total);
