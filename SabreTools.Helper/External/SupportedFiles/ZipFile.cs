@@ -4,7 +4,11 @@ using System.Text;
 
 using SabreTools.Helper.Data;
 
+#if __MonoCS__
+using System.IO;
+#else
 using Alphaleonis.Win32.Filesystem;
+#endif
 using OCRC;
 
 using BinaryReader = System.IO.BinaryReader;

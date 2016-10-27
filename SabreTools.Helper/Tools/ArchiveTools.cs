@@ -6,7 +6,11 @@ using System.Text.RegularExpressions;
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
 
+#if __MonoCS__
+using System.IO;
+#else
 using Alphaleonis.Win32.Filesystem;
+#endif
 using Ionic.Zlib;
 using ROMVault2.SupportedFiles.Zip;
 using SharpCompress.Archives;

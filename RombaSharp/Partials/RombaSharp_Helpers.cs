@@ -9,7 +9,11 @@ using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
 using SabreTools.Helper.Tools;
 
+#if __MonoCS__
+using System.IO;
+#else
 using Alphaleonis.Win32.Filesystem;
+#endif
 
 using FileAccess = System.IO.FileAccess;
 using FileMode = System.IO.FileMode;

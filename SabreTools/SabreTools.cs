@@ -5,7 +5,11 @@ using SabreTools.Helper;
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Tools;
 
+#if __MonoCS__
+using System.IO;
+#else
 using Alphaleonis.Win32.Filesystem;
+#endif
 
 namespace SabreTools
 {

@@ -3,7 +3,11 @@ using System.Collections.Generic;
 
 using SabreTools.Helper.Data;
 
+#if __MonoCS__
+using System.IO;
+#else
 using Alphaleonis.Win32.Filesystem;
+#endif
 
 using BinaryReader = System.IO.BinaryReader;
 using BinaryWriter = System.IO.BinaryWriter;
