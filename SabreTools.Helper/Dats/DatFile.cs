@@ -781,7 +781,7 @@ namespace SabreTools.Helper.Dats
 		#region Converting and Updating
 
 		/// <summary>
-		/// Convert, update, and filter a DAT file or set of files using a base
+		/// Determine if input files should be merged, diffed, or processed invidually
 		/// </summary>
 		/// <param name="inputFileNames">Names of the input files and/or folders</param>
 		/// <param name="outDir">Optional param for output directory</param>
@@ -807,7 +807,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public void Update(List<string> inputFileNames, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
+		public void DetermineUpdateType(List<string> inputFileNames, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
 			bool bare, bool clean, bool softlist, string gamename, string romname, string romtype, long sgt, long slt, long seq, string crc,
 			string md5, string sha1, ItemStatus itemStatus, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
 		{
@@ -884,58 +884,8 @@ namespace SabreTools.Helper.Dats
 			// Otherwise, loop through all of the inputs individually
 			else
 			{
-				Parallel.ForEach(inputFileNames,
-					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-					inputFileName =>
-					{
-						// Clean the input string
-						if (inputFileName != "")
-						{
-							inputFileName = Path.GetFullPath(inputFileName);
-						}
-
-						if (File.Exists(inputFileName))
-						{
-							DatFile innerDatdata = (DatFile)CloneHeader();
-							logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-							innerDatdata.Parse(inputFileName, 0, 0, gamename, romname,
-								romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single,
-								root, logger, true, clean, softlist,
-								keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
-
-							// If we have roms, output them
-							if (innerDatdata.Files.Count != 0)
-							{
-								innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), logger, overwrite: (outDir != ""));
-							}
-						}
-						else if (Directory.Exists(inputFileName))
-						{
-							inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
-
-							Parallel.ForEach(Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories),
-								new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-								file =>
-								{
-									logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
-									DatFile innerDatdata = (DatFile)Clone();
-									innerDatdata.Files = null;
-									innerDatdata.Parse(file, 0, 0, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus,
-										trim, single, root, logger, true, clean, softlist,
-										keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
-
-									// If we have roms, output them
-									if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
-									{
-										innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outDir != ""));
-									}
-								});
-						}
-						else
-						{
-							logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
-						}
-					});
+				Update(inputFileNames, outDir, clean, softlist, gamename, romname, romtype, sgt, slt, seq,
+					crc, md5, sha1, itemStatus, trim, single, root, maxDegreeOfParallelism, logger);
 			}
 			return;
 		}
@@ -1330,6 +1280,91 @@ namespace SabreTools.Helper.Dats
 			{
 				WriteToFile(outDir, logger);
 			}
+		}
+
+		/// <summary>
+		/// Convert, update, and filter a DAT file or set of files using a base
+		/// </summary>
+		/// <param name="inputFileNames">Names of the input files and/or folders</param>
+		/// <param name="outDir">Optional param for output directory</param>
+		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
+		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
+		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
+		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
+		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
+		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
+		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
+		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="sgt">Find roms greater than or equal to this size</param>
+		/// <param name="slt">Find roms less than or equal to this size</param>
+		/// <param name="seq">Find roms equal to this size</param>
+		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="itemStatus">Select roms with the given status</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
+		/// <param name="logger">Logging object for console and file output</param>
+		public void Update(List<string> inputFileNames, string outDir, bool clean, bool softlist, string gamename, string romname,
+			string romtype, long sgt, long slt, long seq, string crc, string md5, string sha1, ItemStatus itemStatus, bool trim,
+			bool single, string root, int maxDegreeOfParallelism, Logger logger)
+		{
+			Parallel.ForEach(inputFileNames,
+				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+				inputFileName =>
+			{
+				// Clean the input string
+				if (inputFileName != "")
+				{
+					inputFileName = Path.GetFullPath(inputFileName);
+				}
+
+				if (File.Exists(inputFileName))
+				{
+					DatFile innerDatdata = (DatFile)CloneHeader();
+					logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
+					innerDatdata.Parse(inputFileName, 0, 0, gamename, romname,
+						romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single,
+						root, logger, true, clean, softlist,
+						keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
+
+					// If we have roms, output them
+					if (innerDatdata.Files.Count != 0)
+					{
+						innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), logger, overwrite: (outDir != ""));
+					}
+				}
+				else if (Directory.Exists(inputFileName))
+				{
+					inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
+
+					Parallel.ForEach(Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories),
+						new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+						file =>
+						{
+							logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
+							DatFile innerDatdata = (DatFile)Clone();
+							innerDatdata.Files = null;
+							innerDatdata.Parse(file, 0, 0, gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus,
+								trim, single, root, logger, true, clean, softlist,
+								keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
+
+							// If we have roms, output them
+							if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
+							{
+								innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outDir != ""));
+							}
+						});
+				}
+				else
+				{
+					logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
+				}
+			});
 		}
 
 		#endregion

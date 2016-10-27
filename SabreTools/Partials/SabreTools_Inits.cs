@@ -640,7 +640,7 @@ namespace SabreTools
 				Romba = romba,
 			};
 
-			userInputDat.Update(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,
+			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,
 				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, maxDegreeOfParallelism, _logger);
 		}
 
