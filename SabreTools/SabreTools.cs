@@ -102,8 +102,8 @@ namespace SabreTools
 			int gz = 2, // SimpleSort
 				maxParallelism = 4,
 				rar = 2, // SimpleSort
-				sevenzip = 0, // SimpleSort
-				zip = 0; // SimpleSort
+				sevenzip = 1, // SimpleSort
+				zip = 1; // SimpleSort
 			long sgt = -1,
 				slt = -1,
 				seq = -1;
@@ -443,7 +443,7 @@ namespace SabreTools
 						i++;
 						if (!Int32.TryParse(args[i], out sevenzip))
 						{
-							sevenzip = 0;
+							sevenzip = 1;
 						}
 						break;
 					case "-ae":
@@ -661,7 +661,7 @@ namespace SabreTools
 						i++;
 						if (!Int32.TryParse(args[i], out zip))
 						{
-							zip = 0;
+							zip = 1;
 						}
 						break;
 					default:
@@ -682,7 +682,7 @@ namespace SabreTools
 								case "--7z":
 									if (!Int32.TryParse(split[1], out sevenzip))
 									{
-										sevenzip = 0;
+										sevenzip = 1;
 									}
 									break;
 								case "-ae":
@@ -860,7 +860,7 @@ namespace SabreTools
 								case "--zip":
 									if (!Int32.TryParse(split[1], out zip))
 									{
-										zip = 0;
+										zip = 1;
 									}
 									break;
 								default:
