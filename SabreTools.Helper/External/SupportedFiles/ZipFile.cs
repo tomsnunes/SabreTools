@@ -1,11 +1,20 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Text;
 
 using SabreTools.Helper.Data;
 
+using Alphaleonis.Win32.Filesystem;
 using OCRC;
+
+using BinaryReader = System.IO.BinaryReader;
+using BinaryWriter = System.IO.BinaryWriter;
+using FileAccess = System.IO.FileAccess;
+using FileMode = System.IO.FileMode;
+using IOException = System.IO.IOException;
+using MemoryStream = System.IO.MemoryStream;
+using PathTooLongException = System.IO.PathTooLongException;
+using Stream = System.IO.Stream;
 
 namespace ROMVault2.SupportedFiles.Zip
 {

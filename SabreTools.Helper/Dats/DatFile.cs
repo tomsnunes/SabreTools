@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -12,8 +11,19 @@ using SabreTools.Helper.Data;
 using SabreTools.Helper.Skippers;
 using SabreTools.Helper.Tools;
 
+using Alphaleonis.Win32.Filesystem;
 using NaturalSort;
 using SharpCompress.Common;
+
+using FileAccess = System.IO.FileAccess;
+using FileMode = System.IO.FileMode;
+using FileStream = System.IO.FileStream;
+using IOException = System.IO.IOException;
+using MemoryStream = System.IO.MemoryStream;
+using PathTooLongException = System.IO.PathTooLongException;
+using SearchOption = System.IO.SearchOption;
+using StreamReader = System.IO.StreamReader;
+using StreamWriter = System.IO.StreamWriter;
 
 namespace SabreTools.Helper.Dats
 {

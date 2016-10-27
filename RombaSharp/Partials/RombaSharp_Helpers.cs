@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Xml;
 using Mono.Data.Sqlite;
@@ -9,6 +8,13 @@ using Mono.Data.Sqlite;
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
 using SabreTools.Helper.Tools;
+
+using Alphaleonis.Win32.Filesystem;
+
+using FileAccess = System.IO.FileAccess;
+using FileMode = System.IO.FileMode;
+using SearchOption = System.IO.SearchOption;
+using StreamWriter = System.IO.StreamWriter;
 
 namespace SabreTools
 {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -9,6 +8,12 @@ using System.Web;
 
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
+
+using Alphaleonis.Win32.Filesystem;
+
+using FileAccess = System.IO.FileAccess;
+using FileMode = System.IO.FileMode;
+using FileStream = System.IO.FileStream;
 
 namespace SabreTools.Helper.Tools
 {

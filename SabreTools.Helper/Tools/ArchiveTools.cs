@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
 
+using Alphaleonis.Win32.Filesystem;
 using Ionic.Zlib;
 using ROMVault2.SupportedFiles.Zip;
 using SharpCompress.Archives;
@@ -15,6 +15,17 @@ using SharpCompress.Archives.Tar;
 using SharpCompress.Common;
 using SharpCompress.Readers;
 using SharpCompress.Writers;
+
+using BinaryReader = System.IO.BinaryReader;
+using BinaryWriter = System.IO.BinaryWriter;
+using EndOfStreamException = System.IO.EndOfStreamException;
+using FileAccess = System.IO.FileAccess;
+using FileMode = System.IO.FileMode;
+using FileShare = System.IO.FileShare;
+using FileStream = System.IO.FileStream;
+using MemoryStream = System.IO.MemoryStream;
+using SeekOrigin = System.IO.SeekOrigin;
+using Stream = System.IO.Stream;
 
 namespace SabreTools.Helper.Tools
 {

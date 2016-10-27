@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
 using SabreTools.Helper.Tools;
+
+using Alphaleonis.Win32.Filesystem;
+
+using SearchOption = System.IO.SearchOption;
 
 namespace SabreTools
 {

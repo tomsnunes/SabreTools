@@ -1,8 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
 using SabreTools.Helper.Data;
+
+using Alphaleonis.Win32.Filesystem;
+
+using BinaryReader = System.IO.BinaryReader;
+using BinaryWriter = System.IO.BinaryWriter;
+using FileAccess = System.IO.FileAccess;
+using FileMode = System.IO.FileMode;
+using FileShare = System.IO.FileShare;
+using FileStream = System.IO.FileStream;
+using SeekOrigin = System.IO.SeekOrigin;
+using Stream = System.IO.Stream;
 
 namespace SabreTools.Helper.Skippers
 {

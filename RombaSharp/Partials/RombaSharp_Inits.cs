@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Mono.Data.Sqlite;
 
@@ -8,6 +7,8 @@ using SabreTools.Helper;
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
 using SabreTools.Helper.Tools;
+
+using Alphaleonis.Win32.Filesystem;
 
 namespace SabreTools
 {

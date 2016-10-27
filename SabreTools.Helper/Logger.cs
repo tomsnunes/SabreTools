@@ -1,5 +1,9 @@
 ﻿using System;
-using System.IO;
+
+using Alphaleonis.Win32.Filesystem;
+
+using FileMode = System.IO.FileMode;
+using StreamWriter = System.IO.StreamWriter;
 
 namespace SabreTools.Helper
 {

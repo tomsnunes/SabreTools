@@ -1,7 +1,6 @@
 ﻿using Mono.Data.Sqlite;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Xml;
@@ -11,8 +10,19 @@ using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
 using SabreTools.Helper.Skippers;
 
+using Alphaleonis.Win32.Filesystem;
 using NaturalSort;
 using OCRC;
+
+using BinaryReader = System.IO.BinaryReader;
+using BinaryWriter = System.IO.BinaryWriter;
+using FileStream = System.IO.FileStream;
+using IOException = System.IO.IOException;
+using MemoryStream = System.IO.MemoryStream;
+using SearchOption = System.IO.SearchOption;
+using SeekOrigin = System.IO.SeekOrigin;
+using Stream = System.IO.Stream;
+using StreamReader = System.IO.StreamReader;
 
 namespace SabreTools.Helper.Tools
 {

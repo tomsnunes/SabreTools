@@ -27,7 +27,12 @@
 // ------------------------------------------------------------------
 
 using System;
-using System.IO;
+
+using Alphaleonis.Win32.Filesystem;
+
+using MemoryStream = System.IO.MemoryStream;
+using SeekOrigin = System.IO.SeekOrigin;
+using Stream = System.IO.Stream;
 
 namespace Ionic.Zlib
 {
