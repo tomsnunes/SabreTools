@@ -222,10 +222,10 @@ namespace SabreTools.Helper.Data
 						//helptext.Add("	-txz			Enable TorrentXZ output");
 						helptext.Add("	-tzip			Enable TorrentZip output");
 						helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
-						helptext.Add("	-7z={0}			Set scanning level for 7z archives");
+						helptext.Add("	-7z={1}			Set scanning level for 7z archives");
 						helptext.Add("	-gz={2}			Set scanning level for GZip archives");
 						helptext.Add("	-rar={2}		Set scanning level for RAR archives");
-						helptext.Add("	-zip={0}		Set scanning level for ZIP archives");
+						helptext.Add("	-zip={1}		Set scanning level for ZIP archives");
 						helptext.Add("	-ud, --update-dat	Output updated DAT");
 						helptext.Add("	-mt={4}			Amount of threads to use (-1 unlimted)");
 

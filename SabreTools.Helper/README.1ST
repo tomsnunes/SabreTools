@@ -439,10 +439,10 @@ Options:
 			defined, and that skipper exists, then it will be used instead of trying to find one
 			that matches.
 			
-		-7z={0}				Set scanning level for 7z archives
+		-7z={1}				Set scanning level for 7z archives
 		-gz={2}				Set scanning level for GZip archives
 		-rar={2}			Set scanning level for RAR archives
-		-zip={0}			Set scanning level for ZIP archives
+		-zip={1}			Set scanning level for ZIP archives
 			For each of the major archive types recognized by the libraries used by this
 			program, scan the archive in one of the following ways:
 				0	Hash both archive and its contents
