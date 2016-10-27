@@ -4296,7 +4296,14 @@ namespace SabreTools.Helper.Dats
 		{
 			#region Perform setup
 
-			// First, check that the output directory exists
+			// If the DAT is not populated and inverse is not set, inform the user and quit
+			if ((Files == null || Files.Count == 0) && !inverse)
+			{
+				logger.User("No entries were found to rebuild, exiting...");
+				return false;
+			}
+
+			// Check that the output directory exists
 			if (!Directory.Exists(outDir))
 			{
 				Directory.CreateDirectory(outDir);
