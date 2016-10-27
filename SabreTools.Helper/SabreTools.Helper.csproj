@@ -57,8 +57,8 @@
       <HintPath>..\packages\Mono.Data.Sqlite.Portable.1.0.3.5\lib\net4\Mono.Data.Sqlite.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SharpCompress, Version=0.12.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCompress.0.12.4\lib\net45\SharpCompress.dll</HintPath>
+    <Reference Include="SharpCompress, Version=0.14.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpCompress.0.14.0\lib\net45\SharpCompress.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

@@ -9,11 +9,12 @@ using SabreTools.Helper.Dats;
 
 using Ionic.Zlib;
 using ROMVault2.SupportedFiles.Zip;
-using SharpCompress.Archive;
-using SharpCompress.Archive.SevenZip;
-using SharpCompress.Archive.Tar;
+using SharpCompress.Archives;
+using SharpCompress.Archives.SevenZip;
+using SharpCompress.Archives.Tar;
 using SharpCompress.Common;
-using SharpCompress.Reader;
+using SharpCompress.Readers;
+using SharpCompress.Writers;
 
 namespace SabreTools.Helper.Tools
 {
@@ -79,7 +80,7 @@ namespace SabreTools.Helper.Tools
 					SevenZipArchive sza = SevenZipArchive.Open(File.OpenRead(input));
 					foreach (IArchiveEntry iae in sza.Entries)
 					{
-						iae.WriteToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+						iae.WriteToDirectory(tempDir, new ExtractionOptions{ PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
 					}
 					encounteredErrors = false;
 					sza.Dispose();
@@ -169,7 +170,7 @@ namespace SabreTools.Helper.Tools
 					bool succeeded = reader.MoveToNextEntry();
 					while (succeeded)
 					{
-						reader.WriteEntryToDirectory(tempDir, ExtractOptions.PreserveFileTime | ExtractOptions.ExtractFullPath | ExtractOptions.Overwrite);
+						reader.WriteEntryToDirectory(tempDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
 						succeeded = reader.MoveToNextEntry();
 					}
 					encounteredErrors = false;
@@ -823,7 +824,7 @@ namespace SabreTools.Helper.Tools
 					tarchive.AddEntry(key, inputFiles[index]);
 				}
 
-				tarchive.SaveTo(tarstream, new CompressionInfo { Type = CompressionType.None });
+				tarchive.SaveTo(tarstream, new WriterOptions(CompressionType.None));
 				success = true;
 			}
 			catch (Exception ex)
