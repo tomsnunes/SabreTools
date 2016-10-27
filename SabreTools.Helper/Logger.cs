@@ -1,9 +1,5 @@
 ﻿using System;
-
-using Alphaleonis.Win32.Filesystem;
-
-using FileMode = System.IO.FileMode;
-using StreamWriter = System.IO.StreamWriter;
+using System.IO;
 
 namespace SabreTools.Helper
 {
@@ -86,10 +82,11 @@ namespace SabreTools.Helper
 
 			try
 			{
-				_log = new StreamWriter(File.Open(_basepath + _filename, FileMode.OpenOrCreate | FileMode.Append));
+				_log = new StreamWriter(File.Open(_basepath + _filename, FileMode.OpenOrCreate | FileMode.Append, FileAccess.Write));
+				_log.AutoFlush = true;
+
 				_log.WriteLine("Logging started " + DateTime.Now);
 				_log.WriteLine(Environment.CommandLine);
-				_log.Flush();
 			}
 			catch
 			{
@@ -173,7 +170,6 @@ namespace SabreTools.Helper
 				try
 				{
 					_log.WriteLine((appendPrefix ? loglevel.ToString() + " - " + DateTime.Now + " - " : "" ) + output);
-					_log.Flush();
 				}
 				catch
 				{
@@ -210,7 +206,6 @@ namespace SabreTools.Helper
 				try
 				{
 					_log.Write(DateTime.Now + " - " + output);
-					_log.Flush();
 				}
 				catch
 				{
