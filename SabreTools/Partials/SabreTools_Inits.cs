@@ -640,8 +640,11 @@ namespace SabreTools
 				Romba = romba,
 			};
 
+			// Create the Filter object to be used
+			Filter filter = new Filter(gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus);
+
 			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,
-				gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, trim, single, root, maxDegreeOfParallelism, _logger);
+				filter, trim, single, root, maxDegreeOfParallelism, _logger);
 		}
 
 		/// <summary>
