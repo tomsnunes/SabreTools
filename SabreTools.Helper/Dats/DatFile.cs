@@ -308,7 +308,8 @@ namespace SabreTools.Helper.Dats
 		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void BucketByGame(bool mergeroms, bool norename, Logger logger, bool output = true)
+		/// <param name="lower">True if the game should be lowercased (default), false otherwise</param>
+		public void BucketByGame(bool mergeroms, bool norename, Logger logger, bool output = true, bool lower = true)
 		{
 			// If we already have the right sorting, trust it
 			if (_sortedBy == SortedBy.Game)
@@ -353,6 +354,10 @@ namespace SabreTools.Helper.Dats
 						+ (String.IsNullOrEmpty(rom.Machine.Name)
 								? "Default"
 								: rom.Machine.Name);
+					if (lower)
+					{
+						newkey = newkey.ToLowerInvariant();
+					}
 					newkey = HttpUtility.HtmlEncode(newkey);
 					if (sortable.ContainsKey(newkey))
 					{
@@ -5211,7 +5216,7 @@ namespace SabreTools.Helper.Dats
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
 			// First, organize by games so that we can do the right thing
-			BucketByGame(false, true, logger, output: false);
+			BucketByGame(false, true, logger, output: false, lower: false);
 
 			// Create a temporary DAT to add things to
 			DatFile tempDat = (DatFile)CloneHeader();
