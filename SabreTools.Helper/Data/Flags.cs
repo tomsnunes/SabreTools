@@ -11,24 +11,29 @@ namespace SabreTools.Helper.Data
 	public enum ArchiveScanLevel
 	{
 		// 7zip
-		SevenZipExternal = 0x0001,
-		SevenZipInternal = 0x0002,
+		SevenZipExternal = 0x00001,
+		SevenZipInternal = 0x00002,
 		SevenZipBoth = SevenZipExternal | SevenZipInternal,
 
 		// GZip
-		GZipExternal = 0x0010,
-		GZipInternal = 0x0020,
+		GZipExternal = 0x00010,
+		GZipInternal = 0x00020,
 		GZipBoth = GZipExternal | GZipInternal,
 
 		// RAR
-		RarExternal = 0x0100,
-		RarInternal = 0x0200,
+		RarExternal = 0x00100,
+		RarInternal = 0x00200,
 		RarBoth = RarExternal | RarInternal,
 
 		// Zip
-		ZipExternal = 0x1000,
-		ZipInternal = 0x2000,
+		ZipExternal = 0x01000,
+		ZipInternal = 0x02000,
 		ZipBoth = ZipExternal | ZipInternal,
+
+		// Tar
+		TarExternal = 0x10000,
+		TarInternal = 0x20000,
+		TarBoth = TarExternal | TarInternal,
 	}
 
 	/// <summary>
