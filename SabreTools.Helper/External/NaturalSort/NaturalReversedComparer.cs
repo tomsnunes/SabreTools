@@ -11,7 +11,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
+
+using SabreTools.Helper.Tools;
 
 namespace NaturalSort
 {
@@ -40,13 +43,13 @@ namespace NaturalSort
 			if (!table.TryGetValue(x, out x1))
 			{
 				//x1 = Regex.Split(x.Replace(" ", ""), "([0-9]+)");
-				x1 = Regex.Split(x, "([0-9]+)");
+				x1 = Regex.Split(x, "([0-9]+)").Where(s => s != "").ToArray();
 				table.Add(x, x1);
 			}
 			if (!table.TryGetValue(y, out y1))
 			{
 				//y1 = Regex.Split(y.Replace(" ", ""), "([0-9]+)");
-				y1 = Regex.Split(y, "([0-9]+)");
+				y1 = Regex.Split(y, "([0-9]+)").Where(s => s != "").ToArray();
 				table.Add(y, y1);
 			}
 
@@ -76,12 +79,12 @@ namespace NaturalSort
 			int x, y;
 			if (!int.TryParse(left, out x))
 			{
-				return right.CompareTo(left);
+				return Style.CompareNumeric(right, left);
 			}
 
 			if (!int.TryParse(right, out y))
 			{
-				return right.CompareTo(left);
+				return Style.CompareNumeric(right, left);
 			}
 
 			return -x.CompareTo(y);

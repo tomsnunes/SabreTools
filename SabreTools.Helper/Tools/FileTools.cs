@@ -44,12 +44,12 @@ namespace SabreTools.Helper.Tools
 		{
 			// Take care of the files in the top directory
 			List<string> toadd = Directory.EnumerateFiles(directory, "*", SearchOption.TopDirectoryOnly).ToList();
-			toadd.Sort(Style.CompareNumeric);
+			toadd.Sort(new NaturalComparer());
 			infiles.AddRange(toadd);
 
 			// Then recurse through and add from the directories
 			List<string> dirs = Directory.EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly).ToList();
-			dirs.Sort(Style.CompareNumeric);
+			dirs.Sort(new NaturalComparer());
 			foreach (string dir in dirs)
 			{
 				infiles = RetrieveFiles(dir, infiles);

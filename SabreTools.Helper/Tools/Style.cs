@@ -278,9 +278,10 @@ namespace SabreTools.Helper.Tools
 		/// <summary>
 		/// Compare strings as numeric
 		/// </summary>
-		/// <param name="s1"></param>
-		/// <param name="s2"></param>
-		/// <returns></returns>
+		/// <param name="s1">First string to compare</param>
+		/// <param name="s2">Second string to compare</param>
+		/// <returns>-1 if s1 comes before s2, 0 if s1 and s2 are equal, 1 if s1 comes after s2</returns>
+		/// <remarks>I want to be able to handle paths properly with no issue, can I do a recursive call based on separated by path separator?</remarks>
 		public static int CompareNumeric(string s1, string s2)
 		{
 			// We want to normalize the strings, so we set both to lower case

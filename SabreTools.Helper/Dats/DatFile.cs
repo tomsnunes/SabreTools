@@ -5757,7 +5757,7 @@ namespace SabreTools.Helper.Dats
 
 					// Get a properly sorted set of keys
 					List<string> keys = Files.Keys.ToList();
-					keys.Sort(Style.CompareNumeric);
+					keys.Sort(new NaturalComparer());
 
 					foreach (string key in keys)
 					{

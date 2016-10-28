@@ -538,6 +538,7 @@ namespace SabreTools.Helper.Dats
 			{
 				try
 				{
+					NaturalComparer nc = new NaturalComparer();
 					if (x.SystemID == y.SystemID)
 					{
 						if (x.SourceID == y.SourceID)
@@ -548,9 +549,9 @@ namespace SabreTools.Helper.Dats
 								{
 									if (Path.GetDirectoryName(Style.RemovePathUnsafeCharacters(x.Name)) == Path.GetDirectoryName(Style.RemovePathUnsafeCharacters(y.Name)))
 									{
-										return Style.CompareNumeric(Path.GetFileName(Style.RemovePathUnsafeCharacters(x.Name)), Path.GetFileName(Style.RemovePathUnsafeCharacters(y.Name)));
+										return nc.Compare(Path.GetFileName(Style.RemovePathUnsafeCharacters(x.Name)), Path.GetFileName(Style.RemovePathUnsafeCharacters(y.Name)));
 									}
-									return Style.CompareNumeric(Path.GetDirectoryName(Style.RemovePathUnsafeCharacters(x.Name)), Path.GetDirectoryName(Style.RemovePathUnsafeCharacters(y.Name)));
+									return nc.Compare(Path.GetDirectoryName(Style.RemovePathUnsafeCharacters(x.Name)), Path.GetDirectoryName(Style.RemovePathUnsafeCharacters(y.Name)));
 								}
 								else if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type != ItemType.Rom && y.Type != ItemType.Disk))
 								{
@@ -564,16 +565,16 @@ namespace SabreTools.Helper.Dats
 								{
 									if (Path.GetDirectoryName(x.Name) == Path.GetDirectoryName(y.Name))
 									{
-										return Style.CompareNumeric(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
+										return nc.Compare(Path.GetFileName(x.Name), Path.GetFileName(y.Name));
 									}
-									return Style.CompareNumeric(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
+									return nc.Compare(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
 								}
 							}
-							return Style.CompareNumeric(x.Machine.Name, y.Machine.Name);
+							return nc.Compare(x.Machine.Name, y.Machine.Name);
 						}
-						return (norename ? Style.CompareNumeric(x.Machine.Name, y.Machine.Name) : x.SourceID - y.SourceID);
+						return (norename ? nc.Compare(x.Machine.Name, y.Machine.Name) : x.SourceID - y.SourceID);
 					}
-					return (norename ? Style.CompareNumeric(x.Machine.Name, y.Machine.Name) : x.SystemID - y.SystemID);
+					return (norename ? nc.Compare(x.Machine.Name, y.Machine.Name) : x.SystemID - y.SystemID);
 				}
 				catch (Exception)
 				{
