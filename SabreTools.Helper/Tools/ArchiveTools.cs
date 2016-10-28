@@ -14,6 +14,7 @@ using Alphaleonis.Win32.Filesystem;
 using Ionic.Zlib;
 using ROMVault2.SupportedFiles.Zip;
 using SharpCompress.Archives;
+using SharpCompress.Archives.Rar;
 using SharpCompress.Archives.SevenZip;
 using SharpCompress.Archives.Tar;
 using SharpCompress.Common;
@@ -36,28 +37,6 @@ namespace SabreTools.Helper.Tools
 	public static class ArchiveTools
 	{
 		private const int _bufferSize = 4096 * 128;
-
-		#region Archive-to-Archive Handling
-
-		/// <summary>
-		/// Attempt to copy a file between archives
-		/// </summary>
-		/// <param name="inputArchive">Source archive name</param>
-		/// <param name="outDir">Destination archive name</param>
-		/// <param name="sourceEntryName">Input entry name</param>
-		/// <param name="destEntryName">Output entry name</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>True if the copy was a success, false otherwise</returns>
-		public static bool CopyFileBetweenArchives(string inputArchive, string outDir, string sourceEntryName, Rom destEntry, Logger logger)
-		{
-			string temp = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-			string realName = ExtractItem(inputArchive, sourceEntryName, temp, logger);
-			bool success = WriteTorrentZip(realName, outDir, destEntry, logger);
-			Directory.Delete(temp, true);
-			return success;
-		}
-
-		#endregion
 
 		#region Extraction
 
@@ -84,6 +63,7 @@ namespace SabreTools.Helper.Tools
 
 			try
 			{
+				// 7-zip
 				if (at == ArchiveType.SevenZip && (archiveScanLevel & ArchiveScanLevel.SevenZipInternal) != 0)
 				{
 					logger.Verbose("Found archive of type: " + at);
@@ -93,14 +73,15 @@ namespace SabreTools.Helper.Tools
 
 					// Extract all files to the temp directory
 					SevenZipArchive sza = SevenZipArchive.Open(File.OpenRead(input));
-					foreach (IArchiveEntry iae in sza.Entries)
+					foreach (SevenZipArchiveEntry entry in sza.Entries)
 					{
-						iae.WriteToDirectory(tempDir, new ExtractionOptions{ PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
+						entry.WriteToDirectory(tempDir, new ExtractionOptions{ PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
 					}
 					encounteredErrors = false;
 					sza.Dispose();
-
 				}
+
+				// GZip
 				else if (at == ArchiveType.GZip && (archiveScanLevel & ArchiveScanLevel.GZipInternal) != 0)
 				{
 					logger.Verbose("Found archive of type: " + at);
@@ -119,6 +100,44 @@ namespace SabreTools.Helper.Tools
 
 					encounteredErrors = false;
 				}
+
+				// RAR
+				else if (at == ArchiveType.Rar && (archiveScanLevel & ArchiveScanLevel.RarInternal) != 0)
+				{
+					logger.Verbose("Found archive of type: " + at);
+
+					// Create the temp directory
+					Directory.CreateDirectory(tempDir);
+
+					// Extract all files to the temp directory
+					RarArchive ra = RarArchive.Open(input);
+					foreach (RarArchiveEntry entry in ra.Entries)
+					{
+						entry.WriteToDirectory(tempDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
+					}
+					encounteredErrors = false;
+					ra.Dispose();
+				}
+
+				// TAR
+				else if (at == ArchiveType.Tar && (archiveScanLevel & ArchiveScanLevel.TarInternal) != 0)
+				{
+					logger.Verbose("Found archive of type: " + at);
+
+					// Create the temp directory
+					Directory.CreateDirectory(tempDir);
+
+					// Extract all files to the temp directory
+					TarArchive ta = TarArchive.Open(input);
+					foreach (TarArchiveEntry entry in ta.Entries)
+					{
+						entry.WriteToDirectory(tempDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
+					}
+					encounteredErrors = false;
+					ta.Dispose();
+				}
+
+				// Zip
 				else if (at == ArchiveType.Zip && (archiveScanLevel & ArchiveScanLevel.ZipInternal) != 0)
 				{
 					logger.Verbose("Found archive of type: " + at);
@@ -172,24 +191,6 @@ namespace SabreTools.Helper.Tools
 						writeStream.Dispose();
 					}
 					encounteredErrors = false;
-				}
-				else if (at == ArchiveType.Rar && (archiveScanLevel & ArchiveScanLevel.RarInternal) != 0)
-				{
-					logger.Verbose("Found archive of type: " + at);
-
-					// Create the temp directory
-					Directory.CreateDirectory(tempDir);
-
-					// Extract all files to the temp directory
-					IReader reader = ReaderFactory.Open(File.OpenRead(input));
-					bool succeeded = reader.MoveToNextEntry();
-					while (succeeded)
-					{
-						reader.WriteEntryToDirectory(tempDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
-						succeeded = reader.MoveToNextEntry();
-					}
-					encounteredErrors = false;
-					reader.Dispose();
 				}
 			}
 			catch (EndOfStreamException)
@@ -270,77 +271,106 @@ namespace SabreTools.Helper.Tools
 				return st;
 			}
 
-			IReader reader = null;
 			try
 			{
-				if (at == ArchiveType.Zip)
+				switch (at)
 				{
-					ZipFile zf = new ZipFile();
-					ZipReturn zr = zf.Open(input, new FileInfo(input).LastWriteTime.Ticks, true);
-					if (zr != ZipReturn.ZipGood)
-					{
-						throw new Exception(ZipFile.ZipErrorMessageText(zr));
-					}
-
-					for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
-					{
-						logger.Verbose("Current entry name: '" + zf.Entries[i].FileName + "'");
-						if (zf.Entries[i].FileName.Contains(entryName))
+					case ArchiveType.SevenZip:
+						SevenZipArchive sza = SevenZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
+						foreach (SevenZipArchiveEntry entry in sza.Entries)
 						{
-							realEntry = zf.Entries[i].FileName;
-
-							// Set defaults before writing out
-							Stream readStream;
-							ulong streamsize = 0;
-							CompressionMethod cm = CompressionMethod.Stored;
-							uint lastMod = 0;
-
-							zr = zf.OpenReadStream(i, false, out readStream, out streamsize, out cm, out lastMod);
-
-							byte[] ibuffer = new byte[_bufferSize];
-							int ilen;
-							while ((ilen = readStream.Read(ibuffer, 0, _bufferSize)) > 0)
+							logger.Verbose("Current entry name: '" + entry.Key + "'");
+							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
 							{
-								st.Write(ibuffer, 0, ilen);
-								st.Flush();
+								realEntry = entry.Key;
+								entry.WriteTo(st);
+								break;
 							}
-
-							zr = zf.CloseReadStream();
 						}
-					}
-				}
-				else if (at == ArchiveType.SevenZip || at == ArchiveType.Rar)
-				{
-					reader = ReaderFactory.Open(File.OpenRead(input));
-					while (reader.MoveToNextEntry())
-					{
-						logger.Verbose("Current entry name: '" + reader.Entry.Key + "'");
-						if (reader.Entry != null && reader.Entry.Key.Contains(entryName))
+						sza.Dispose();
+						break;
+
+					case ArchiveType.GZip:
+						// Decompress the input stream
+						realEntry = Path.GetFileNameWithoutExtension(input);
+						GZipStream gzstream = new GZipStream(File.OpenRead(input), CompressionMode.Decompress);
+						gzstream.CopyTo(st);
+
+						// Dispose of the stream
+						gzstream.Dispose();
+						break;
+
+					case ArchiveType.Rar:
+						RarArchive ra = RarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
+						foreach (RarArchiveEntry entry in ra.Entries)
 						{
-							realEntry  = reader.Entry.Key;
-							reader.WriteEntryTo(st);
+							logger.Verbose("Current entry name: '" + entry.Key + "'");
+							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
+							{
+								realEntry = entry.Key;
+								entry.WriteTo(st);
+								break;
+							}
 						}
-					}
-				}
-				else if (at == ArchiveType.GZip)
-				{
-					// Decompress the input stream
-					realEntry = Path.GetFileNameWithoutExtension(input);
-					GZipStream gzstream = new GZipStream(File.OpenRead(input), CompressionMode.Decompress);
-					gzstream.CopyTo(st);
+						ra.Dispose();
+						break;
 
-					// Dispose of the stream
-					gzstream.Dispose();
+					case ArchiveType.Tar:
+						TarArchive ta = TarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
+						foreach (TarArchiveEntry entry in ta.Entries)
+						{
+							logger.Verbose("Current entry name: '" + entry.Key + "'");
+							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
+							{
+								realEntry = entry.Key;
+								entry.WriteTo(st);
+								break;
+							}
+						}
+						ta.Dispose();
+						break;
+
+					case ArchiveType.Zip:
+						ZipFile zf = new ZipFile();
+						ZipReturn zr = zf.Open(input, new FileInfo(input).LastWriteTime.Ticks, true);
+						if (zr != ZipReturn.ZipGood)
+						{
+							throw new Exception(ZipFile.ZipErrorMessageText(zr));
+						}
+
+						for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
+						{
+							logger.Verbose("Current entry name: '" + zf.Entries[i].FileName + "'");
+							if (zf.Entries[i].FileName.Contains(entryName))
+							{
+								realEntry = zf.Entries[i].FileName;
+
+								// Set defaults before writing out
+								Stream readStream;
+								ulong streamsize = 0;
+								CompressionMethod cm = CompressionMethod.Stored;
+								uint lastMod = 0;
+
+								zr = zf.OpenReadStream(i, false, out readStream, out streamsize, out cm, out lastMod);
+
+								byte[] ibuffer = new byte[_bufferSize];
+								int ilen;
+								while ((ilen = readStream.Read(ibuffer, 0, _bufferSize)) > 0)
+								{
+									st.Write(ibuffer, 0, ilen);
+									st.Flush();
+								}
+
+								zr = zf.CloseReadStream();
+							}
+						}
+						break;
 				}
 			}
 			catch (Exception ex)
 			{
 				logger.Error(ex.ToString());
 				st = null;
-			}
-			finally
-			{
-				reader?.Dispose();
 			}
 
 			st.Position = 0;
