@@ -276,6 +276,66 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
+		/// Compare strings as numeric
+		/// </summary>
+		/// <param name="s1"></param>
+		/// <param name="s2"></param>
+		/// <returns></returns>
+		public static int CompareNumeric(string s1, string s2)
+		{
+			// If the strings are the same exactly, return
+			if (s1 == s2)
+			{
+				return 0;
+			}
+
+			// If one is null, then say that's less than
+			if (s1 == null)
+			{
+				return -1;
+			}
+			if (s2 == null)
+			{
+				return 1;
+			}
+
+			// Otherwise, loop through until we have an answer
+			for (int i = 0; i < s1.Length && i < s2.Length; i++)
+			{
+				int s1c = s1[i];
+				int s2c = s2[i];
+
+				// If the characters are the same, continue
+				if (s1c == s2c)
+				{
+					continue;
+				}
+
+				// If they're different, check which one was larger
+				if (s1c > s2c)
+				{
+					return 1;
+				}
+				if (s1c < s2c)
+				{
+					return -1;
+				}
+			}
+
+			// If we got out here, then it looped through at least one of the strings
+			if (s1.Length > s2.Length)
+			{
+				return 1;
+			}
+			if (s1.Length < s2.Length)
+			{
+				return -1;
+			}
+
+			return 0;
+		}
+
+		/// <summary>
 		/// Convert all characters that are not considered XML-safe
 		/// </summary>
 		/// <param name="s">Input string to clean</param>
