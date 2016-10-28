@@ -434,6 +434,32 @@ namespace SabreTools.Helper.Tools
 						});
 					}
 				}
+				else if (at == ArchiveType.SevenZip)
+				{
+					SevenZipArchive sza = SevenZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
+					foreach (SevenZipArchiveEntry entry in sza.Entries)
+					{
+						if (entry != null && !entry.IsDirectory)
+						{
+							logger.Verbose("Entry found: '" + entry.Key + "': "
+								+ (size == 0 ? entry.Size : size) + ", "
+								+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
+
+							roms.Add(new Rom
+							{
+								Type = ItemType.Rom,
+								Name = entry.Key,
+								Size = (size == 0 ? entry.Size : size),
+								CRC = (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
+
+								Machine = new Machine
+								{
+									Name = gamename,
+								},
+							});
+						}
+					}
+				}
 				else if (at != ArchiveType.Tar)
 				{
 					reader = ReaderFactory.Open(File.OpenRead(input));
@@ -557,8 +583,13 @@ namespace SabreTools.Helper.Tools
 		/// <returns>ArchiveType of inputted file (null on error)</returns>
 		public static ArchiveType? GetCurrentArchiveType(string input, Logger logger)
 		{
-
 			ArchiveType? outtype = null;
+
+			// If the file is null, then we have no archive type
+			if (input == null)
+			{
+				return outtype;
+			}
 
 			// First line of defense is going to be the extension, for better or worse
 			string ext = Path.GetExtension(input).ToLowerInvariant();

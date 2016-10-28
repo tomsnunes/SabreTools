@@ -304,6 +304,43 @@ namespace SabreTools.Helper.Tools
 				return 1;
 			}
 
+			// Now split into path parts after converting AltDirSeparator to DirSeparator
+			s1 = s1.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+			s2 = s2.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+			string[] s1parts = s1.Split(Path.DirectorySeparatorChar);
+			string[] s2parts = s2.Split(Path.DirectorySeparatorChar);
+
+			// Then compare each part in turn
+			for (int j = 0; j < s1parts.Length && j < s2parts.Length; j++)
+			{
+				int compared = CompareNumericPart(s1parts[j], s2parts[j]);
+				if (compared != 0)
+				{
+					return compared;
+				}
+			}
+
+			// If we got out here, then it looped through at least one of the strings
+			if (s1parts.Length > s2parts.Length)
+			{
+				return 1;
+			}
+			if (s1parts.Length < s2parts.Length)
+			{
+				return -1;
+			}
+
+			return 0;
+		}
+
+		/// <summary>
+		/// Helper for CompareNumeric
+		/// </summary>
+		/// <param name="s1">First string to compare</param>
+		/// <param name="s2">Second string to compare</param>
+		/// <returns>-1 if s1 comes before s2, 0 if s1 and s2 are equal, 1 if s1 comes after s2</returns>
+		private static int CompareNumericPart(string s1, string s2)
+		{
 			// Otherwise, loop through until we have an answer
 			for (int i = 0; i < s1.Length && i < s2.Length; i++)
 			{
@@ -674,6 +711,18 @@ namespace SabreTools.Helper.Tools
 			var localTime = TimeZoneInfo.ConvertTimeFromUtc(linkTimeUtc, tz);
 
 			return localTime;
+		}
+
+		/// <summary>
+		/// http://stackoverflow.com/questions/248603/natural-sort-order-in-c-sharp
+		/// </summary>
+		public static IEnumerable<T> OrderByAlphaNumeric<T>(this IEnumerable<T> source, Func<T, string> selector)
+		{
+			int max = source
+				.SelectMany(i => Regex.Matches(selector(i), @"\d+").Cast<Match>().Select(m => (int?)m.Value.Length))
+				.Max() ?? 0;
+
+			return source.OrderBy(i => Regex.Replace(selector(i), @"\d+", m => m.Value.PadLeft(max, '0')));
 		}
 
 		#endregion

@@ -49,7 +49,7 @@ namespace SabreTools.Helper.Tools
 
 			// Then recurse through and add from the directories
 			List<string> dirs = Directory.EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly).ToList();
-			dirs.Sort(new NaturalComparer());
+			dirs = Style.OrderByAlphaNumeric(dirs, s => s).ToList();
 			foreach (string dir in dirs)
 			{
 				infiles = RetrieveFiles(dir, infiles);

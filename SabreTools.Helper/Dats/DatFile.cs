@@ -864,7 +864,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Sort the list first
-				newInputFileNames.Sort(new NaturalComparer());
+				newInputFileNames = Style.OrderByAlphaNumeric(newInputFileNames, s => s).ToList();
 
 				// If we're in inverse cascade, reverse the list
 				if ((diff & DiffMode.ReverseCascade) != 0)
@@ -4320,6 +4320,12 @@ namespace SabreTools.Helper.Dats
 				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 				file =>
 			{
+				// If we somehow have a null filename, return
+				if (file == null)
+				{
+					return;
+				}
+
 				// Define the temporary directory
 				string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
 
