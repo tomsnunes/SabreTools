@@ -863,6 +863,9 @@ namespace SabreTools.Helper.Dats
 					}
 				}
 
+				// Sort the list first
+				newInputFileNames.Sort(new NaturalComparer());
+
 				// If we're in inverse cascade, reverse the list
 				if ((diff & DiffMode.ReverseCascade) != 0)
 				{
