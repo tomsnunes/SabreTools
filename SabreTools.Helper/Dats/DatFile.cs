@@ -1299,6 +1299,9 @@ namespace SabreTools.Helper.Dats
 		public void Update(List<string> inputFileNames, string outDir, bool clean, bool softlist, Filter filter,
 			bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
 		{
+			// Sort the input filenames
+			inputFileNames.Sort(new NaturalComparer());
+
 			Parallel.ForEach(inputFileNames,
 				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 				inputFileName =>
