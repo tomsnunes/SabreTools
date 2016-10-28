@@ -5234,8 +5234,23 @@ namespace SabreTools.Helper.Dats
 			DatFile tempDat = (DatFile)CloneHeader();
 			tempDat.Name = null;
 
+			// Sort the input keys
+			List<string> keys = Files.Keys.ToList();
+			keys.Sort((a, b) =>
+			{
+				NaturalComparer nc = new NaturalComparer();
+				int adeep = a.Count(c => c == Path.AltDirectorySeparatorChar || c == Path.DirectorySeparatorChar);
+				int bdeep = b.Count(c => c == Path.AltDirectorySeparatorChar || c == Path.DirectorySeparatorChar);
+
+				if (adeep == bdeep)
+				{
+					return nc.Compare(a, b);
+				}
+				return adeep - bdeep;
+			});
+
 			// Then, we loop over the games
-			foreach (string key in Files.Keys)
+			foreach (string key in keys)
 			{
 				// Here, the key is the name of the game to be used for comparison
 				if (tempDat.Name != null && tempDat.Name != Path.GetDirectoryName(key))
