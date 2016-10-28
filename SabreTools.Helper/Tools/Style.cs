@@ -283,6 +283,10 @@ namespace SabreTools.Helper.Tools
 		/// <returns></returns>
 		public static int CompareNumeric(string s1, string s2)
 		{
+			// We want to normalize the strings, so we set both to lower case
+			s1 = s1.ToLowerInvariant();
+			s2 = s2.ToLowerInvariant();
+
 			// If the strings are the same exactly, return
 			if (s1 == s2)
 			{
