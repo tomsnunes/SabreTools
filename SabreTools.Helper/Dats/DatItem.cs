@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Tools;
 
-#if __MonoCS__
+#if mono
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;

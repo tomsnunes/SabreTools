@@ -10,7 +10,7 @@ using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
 using SabreTools.Helper.Skippers;
 
-#if __MonoCS__
+#if mono
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;

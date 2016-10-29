@@ -28,7 +28,7 @@
 
 using System;
 
-#if __MonoCS__
+#if mono
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
