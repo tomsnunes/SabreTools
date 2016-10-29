@@ -223,6 +223,13 @@ namespace SabreTools.Helper.Tools
 			string realEntry = "";
 			Stream ms = ExtractStream(input, entryName, out realEntry, logger);
 
+			// If we got out a null or empty entry, then we don't have a stream
+			if (String.IsNullOrEmpty(realEntry))
+			{
+				ms.Dispose();
+				return null;
+			}
+
 			realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
 			if (!Directory.Exists(Path.GetDirectoryName(realEntry)))
 			{
@@ -421,66 +428,118 @@ namespace SabreTools.Helper.Tools
 				long size = 0;
 				string crc = "";
 
-				// If we have a gzip file, get the crc directly
-				if (at == ArchiveType.GZip)
+				switch (at)
 				{
-					// Get the CRC and size from the file
-					BinaryReader br = new BinaryReader(File.OpenRead(input));
-					br.BaseStream.Seek(-8, SeekOrigin.End);
-					byte[] headercrc = br.ReadBytes(4);
-					crc = BitConverter.ToString(headercrc.Reverse().ToArray()).Replace("-", string.Empty).ToLowerInvariant();
-					byte[] headersize = br.ReadBytes(4);
-					size = BitConverter.ToInt32(headersize.Reverse().ToArray(), 0);
-					br.Dispose();
-				}
-				else if (at == ArchiveType.Zip)
-				{
-					ZipFile zf = new ZipFile();
-					ZipReturn zr = zf.Open(input, new FileInfo(input).LastWriteTime.Ticks, true);
-					if (zr != ZipReturn.ZipGood)
-					{
-						throw new Exception(ZipFile.ZipErrorMessageText(zr));
-					}
-
-					for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
-					{
-						string newname = zf.Entries[i].FileName;
-						long newsize = (size == 0 ? (long)zf.Entries[i].UncompressedSize : size);
-						string newcrc = BitConverter.ToString(zf.Entries[i].CRC.Reverse().ToArray(), 0, zf.Entries[i].CRC.Length).Replace("-", string.Empty).ToLowerInvariant();
-
-						logger.Verbose("Entry found: '" + newname + "': " + newsize + ", " + newcrc);
-
-						roms.Add(new Rom
+					case ArchiveType.SevenZip:
+						SevenZipArchive sza = SevenZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
+						foreach (SevenZipArchiveEntry entry in sza.Entries)
 						{
-							Type = ItemType.Rom,
-							Name = newname,
-							Size = newsize,
-							CRC = newcrc,
-
-							Machine = new Machine
+							if (entry != null && !entry.IsDirectory)
 							{
-								Name = gamename,
-							},
-						});
-					}
-				}
-				else if (at == ArchiveType.SevenZip)
-				{
-					SevenZipArchive sza = SevenZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
-					foreach (SevenZipArchiveEntry entry in sza.Entries)
-					{
-						if (entry != null && !entry.IsDirectory)
+								logger.Verbose("Entry found: '" + entry.Key + "': "
+									+ (size == 0 ? entry.Size : size) + ", "
+									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
+
+								roms.Add(new Rom
+								{
+									Type = ItemType.Rom,
+									Name = entry.Key,
+									Size = (size == 0 ? entry.Size : size),
+									CRC = (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
+
+									Machine = new Machine
+									{
+										Name = gamename,
+									},
+								});
+							}
+						}
+						break;
+
+					case ArchiveType.GZip:// Get the CRC and size from the file
+						BinaryReader br = new BinaryReader(File.OpenRead(input));
+						br.BaseStream.Seek(-8, SeekOrigin.End);
+						byte[] headercrc = br.ReadBytes(4);
+						crc = BitConverter.ToString(headercrc.Reverse().ToArray()).Replace("-", string.Empty).ToLowerInvariant();
+						byte[] headersize = br.ReadBytes(4);
+						size = BitConverter.ToInt32(headersize.Reverse().ToArray(), 0);
+						br.Dispose();
+						break;
+
+					case ArchiveType.Rar:
+						RarArchive ra = RarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
+						foreach (RarArchiveEntry entry in ra.Entries)
 						{
-							logger.Verbose("Entry found: '" + entry.Key + "': "
-								+ (size == 0 ? entry.Size : size) + ", "
-								+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
+							if (entry != null && !entry.IsDirectory)
+							{
+								logger.Verbose("Entry found: '" + entry.Key + "': "
+									+ (size == 0 ? entry.Size : size) + ", "
+									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
+
+								roms.Add(new Rom
+								{
+									Type = ItemType.Rom,
+									Name = entry.Key,
+									Size = (size == 0 ? entry.Size : size),
+									CRC = (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
+
+									Machine = new Machine
+									{
+										Name = gamename,
+									},
+								});
+							}
+						}
+						break;
+
+					case ArchiveType.Tar:
+						TarArchive ta = TarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
+						foreach (TarArchiveEntry entry in ta.Entries)
+						{
+							if (entry != null && !entry.IsDirectory)
+							{
+								logger.Verbose("Entry found: '" + entry.Key + "': "
+									+ (size == 0 ? entry.Size : size) + ", "
+									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
+
+								roms.Add(new Rom
+								{
+									Type = ItemType.Rom,
+									Name = entry.Key,
+									Size = (size == 0 ? entry.Size : size),
+									CRC = (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
+
+									Machine = new Machine
+									{
+										Name = gamename,
+									},
+								});
+							}
+						}
+						break;
+
+					case ArchiveType.Zip:
+						ZipFile zf = new ZipFile();
+						ZipReturn zr = zf.Open(input, new FileInfo(input).LastWriteTime.Ticks, true);
+						if (zr != ZipReturn.ZipGood)
+						{
+							throw new Exception(ZipFile.ZipErrorMessageText(zr));
+						}
+
+						for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
+						{
+							string newname = zf.Entries[i].FileName;
+							long newsize = (size == 0 ? (long)zf.Entries[i].UncompressedSize : size);
+							string newcrc = BitConverter.ToString(zf.Entries[i].CRC.Reverse().ToArray(), 0, zf.Entries[i].CRC.Length).Replace("-", string.Empty).ToLowerInvariant();
+
+							logger.Verbose("Entry found: '" + newname + "': " + newsize + ", " + newcrc);
 
 							roms.Add(new Rom
 							{
 								Type = ItemType.Rom,
-								Name = entry.Key,
-								Size = (size == 0 ? entry.Size : size),
-								CRC = (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
+								Name = newname,
+								Size = newsize,
+								CRC = newcrc,
 
 								Machine = new Machine
 								{
@@ -488,33 +547,7 @@ namespace SabreTools.Helper.Tools
 								},
 							});
 						}
-					}
-				}
-				else if (at != ArchiveType.Tar)
-				{
-					reader = ReaderFactory.Open(File.OpenRead(input));
-					while (reader.MoveToNextEntry())
-					{
-						if (reader.Entry != null && !reader.Entry.IsDirectory)
-						{
-							logger.Verbose("Entry found: '" + reader.Entry.Key + "': "
-								+ (size == 0 ? reader.Entry.Size : size) + ", "
-								+ (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc));
-
-							roms.Add(new Rom
-							{
-								Type = ItemType.Rom,
-								Name = reader.Entry.Key,
-								Size = (size == 0 ? reader.Entry.Size : size),
-								CRC = (crc == "" ? reader.Entry.Crc.ToString("X").ToLowerInvariant() : crc),
-
-								Machine = new Machine
-								{
-									Name = gamename,
-								},
-							});
-						}
-					}
+						break;
 				}
 			}
 			catch (Exception ex)
@@ -1168,6 +1201,12 @@ namespace SabreTools.Helper.Tools
 		{
 			bool success = false;
 			string tempFile = Path.GetTempFileName();
+
+			// If either list of roms is null or empty, return
+			if (inputFiles == null || roms == null || inputFiles.Count == 0 || roms.Count == 0)
+			{
+				return success;
+			}
 
 			// If the number of inputs is less than the number of available roms, return
 			if (inputFiles.Count < roms.Count)
