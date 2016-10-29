@@ -11,7 +11,7 @@ using SabreTools.Helper.Data;
 using SabreTools.Helper.Skippers;
 using SabreTools.Helper.Tools;
 
-#if mono
+#if MONO
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;

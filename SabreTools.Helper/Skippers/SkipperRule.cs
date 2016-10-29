@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using SabreTools.Helper.Data;
 
-#if mono
+#if MONO
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;

@@ -9,7 +9,7 @@ using System.Web;
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
 
-#if mono
+#if MONO
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
