@@ -91,6 +91,7 @@ namespace SabreTools
 				romba = false,
 				showBaddumpColumn = false,
 				showNodumpColumn = false,
+				shortname = false,
 				single = false,
 				softlist = false,
 				superdat = false,
@@ -376,6 +377,10 @@ namespace SabreTools
 					case "-ro":
 					case "--romba":
 						romba = true;
+						break;
+					case "-s":
+					case "--short":
+						shortname = true;
 						break;
 					case "-sd":
 					case "--superdat":
@@ -990,7 +995,7 @@ namespace SabreTools
 			// Split a SuperDAT by lowest available level
 			else if (splitByLevel)
 			{
-				InitLevelSplit(inputs, outDir);
+				InitLevelSplit(inputs, outDir, shortname);
 			}
 
 			// Split a DAT by item type

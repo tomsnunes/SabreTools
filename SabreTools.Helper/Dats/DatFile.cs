@@ -4647,6 +4647,12 @@ namespace SabreTools.Helper.Dats
 					// Get the rom that's mapped to this item
 					Rom source = (Rom)toFromMap[rom];
 
+					// If we have an empty rom or machine, there was an issue
+					if (source == null || source.Machine == null || source.Machine.Name == null)
+					{
+						continue;
+					}
+
 					// If the file is in an archive, we need to treat it specially
 					string machinename = source.Machine.Name.ToLowerInvariant();
 					if (machinename.EndsWith(".7z")
@@ -5220,9 +5226,10 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
 		/// <param name="basepath">Parent path for replacement</param>
+		/// <param name="shortname">True if short names should be used, false otherwise</param>
 		/// <param name="logger">Logger object for console and file writing</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByLevel(string outDir, string basepath, Logger logger)
+		public bool SplitByLevel(string outDir, string basepath, bool shortname, Logger logger)
 		{
 			// Sanitize the basepath to be more predictable
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
@@ -5263,7 +5270,11 @@ namespace SabreTools.Helper.Dats
 					// Now set the new output values
 					tempDat.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name)
 						? FileName
-						: tempDat.Name.Replace(Path.DirectorySeparatorChar.ToString(), " - ").Replace(Path.AltDirectorySeparatorChar.ToString(), " - "));
+						: (shortname
+							? Path.GetFileName(tempDat.Name)
+							: tempDat.Name.Replace(Path.DirectorySeparatorChar.ToString(), " - ").Replace(Path.AltDirectorySeparatorChar.ToString(), " - ")
+							)
+						);
 					tempDat.Description += " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
 					tempDat.Name = Name + " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
 					tempDat.Type = null;

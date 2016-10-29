@@ -345,6 +345,10 @@ Options:
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If a path
 			is not defined, the application directory is used instead.
+			
+		-s, --short		Use short names for outputted DATs
+			Instead of using ClrMamePro-style long names for DATs, use just the name of the
+			folder as the name of the DAT.
 		
 	-ss, --sort			Sort input files by a set of DATs
 		This feature allows the user to quickly rebuild based on a supplied DAT file(s). By

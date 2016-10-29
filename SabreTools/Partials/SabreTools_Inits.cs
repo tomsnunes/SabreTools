@@ -256,7 +256,8 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
 		/// <param name="outDir">Output directory for the split files</param>
-		private static void InitLevelSplit(List<string> inputs, string outDir)
+		/// <param name="shortname">True if short filenames should be used, false otherwise</param>
+		private static void InitLevelSplit(List<string> inputs, string outDir, bool shortname)
 		{
 			// Loop over the input files
 			foreach (string input in inputs)
@@ -265,7 +266,7 @@ namespace SabreTools
 				{
 					DatFile datFile = new DatFile();
 					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, softlist: true, keep: true);
-					datFile.SplitByLevel(outDir, Path.GetDirectoryName(input), _logger);
+					datFile.SplitByLevel(outDir, Path.GetDirectoryName(input), shortname, _logger);
 				}
 				else if (Directory.Exists(input))
 				{
@@ -273,7 +274,7 @@ namespace SabreTools
 					{
 						DatFile datFile = new DatFile();
 						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, softlist: true, keep: true);
-						datFile.SplitByLevel(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
+						datFile.SplitByLevel(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), shortname, _logger);
 					}
 				}
 				else

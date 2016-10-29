@@ -203,6 +203,7 @@ namespace SabreTools.Helper.Data
 					// Level/SuperDAT Split
 					helptext.Add("  -ls, --lvl-split	Split a SuperDAT or folder by internal path");
 					helptext.Add("	-out=			Output directory");
+					helptext.Add("	-s, --short		Use short output names");
 
 					// Sort
 					helptext.Add("  -ss, --sort		Sort input files by a set of DATs");
