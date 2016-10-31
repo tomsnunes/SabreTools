@@ -412,15 +412,15 @@ namespace SabreTools.Helper.Tools
 				return "";
 			}
 
-			if (s.Contains(Path.AltDirectorySeparatorChar.ToString()))
+			if (s.Contains("/"))
 			{
-				string[] tempkey = s.Split(Path.AltDirectorySeparatorChar);
-				return String.Join(Path.AltDirectorySeparatorChar.ToString(), tempkey.Take(tempkey.Length - 1));
+				string[] tempkey = s.Split('/');
+				return String.Join("/", tempkey.Take(tempkey.Length - 1));
 			}
-			else if (s.Contains(Path.DirectorySeparatorChar.ToString()))
+			else if (s.Contains("\\"))
 			{
-				string[] tempkey = s.Split(Path.DirectorySeparatorChar);
-				return String.Join(Path.DirectorySeparatorChar.ToString(), tempkey.Take(tempkey.Length - 1));
+				string[] tempkey = s.Split('\\');
+				return String.Join("\\", tempkey.Take(tempkey.Length - 1));
 			}
 
 			return "";
@@ -438,14 +438,14 @@ namespace SabreTools.Helper.Tools
 				return "";
 			}
 
-			if (s.Contains(Path.AltDirectorySeparatorChar.ToString()))
+			if (s.Contains("/"))
 			{
-				string[] tempkey = s.Split(Path.AltDirectorySeparatorChar);
+				string[] tempkey = s.Split('/');
 				return tempkey.Last();
 			}
-			else if (s.Contains(Path.DirectorySeparatorChar.ToString()))
+			else if (s.Contains("\\"))
 			{
-				string[] tempkey = s.Split(Path.DirectorySeparatorChar);
+				string[] tempkey = s.Split('\\');
 				return tempkey.Last();
 			}
 
