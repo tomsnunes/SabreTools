@@ -5113,22 +5113,26 @@ namespace SabreTools.Helper.Dats
 		/// <param name="logger">Logger object for file and console output</param>
 		private void SplitByLevelHelper(DatFile datFile, string outDir, bool shortname, bool restore, Logger logger)
 		{
+			// Get the name from the DAT to use separately
+			string name = datFile.Name;
+			string expName = name.Replace("/", " - ").Replace("\\", " - ");
+
 			// Get the path that the file will be written out to
-			string path = HttpUtility.HtmlDecode(String.IsNullOrEmpty(datFile.Name)
+			string path = HttpUtility.HtmlDecode(String.IsNullOrEmpty(name)
 				? outDir
-				: Path.Combine(outDir, datFile.Name));
+				: Path.Combine(outDir, name));
 
 			// Now set the new output values
-			datFile.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(datFile.Name)
+			datFile.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(name)
 				? FileName
 				: (shortname
-					? Style.GetFileName(datFile.Name)
-					: datFile.Name.Replace("/", " - ").Replace("\\", " - ")
+					? Style.GetFileName(name)
+					: expName
 					)
 				);
 			datFile.FileName = (restore ? FileName + " (" + datFile.FileName + ")" : datFile.FileName);
-			datFile.Description = Description + " (" + datFile.Name.Replace("/", " - ").Replace("\\", " - ") + ")";
-			datFile.Name = Name + " (" + datFile.Name.Replace("/", " - ").Replace("\\", " - ") + ")";
+			datFile.Name = Name + " (" + expName + ")";
+			datFile.Description = (String.IsNullOrEmpty(Description) ? datFile.Name : Description + " (" + expName + ")");
 			datFile.Type = null;
 
 			// Write out the temporary DAT to the proper directory
