@@ -5026,10 +5026,10 @@ namespace SabreTools.Helper.Dats
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
 		/// <param name="basepath">Parent path for replacement</param>
 		/// <param name="shortname">True if short names should be used, false otherwise</param>
-		/// <param name="restore">True if original filenames should be used as the base for output filename, false otherwise</param>
+		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise</param>
 		/// <param name="logger">Logger object for console and file writing</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByLevel(string outDir, string basepath, bool shortname, bool restore, Logger logger)
+		public bool SplitByLevel(string outDir, string basepath, bool shortname, bool basedat, Logger logger)
 		{
 			// Sanitize the basepath to be more predictable
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
@@ -5052,7 +5052,7 @@ namespace SabreTools.Helper.Dats
 				if (tempDat.Name != null && tempDat.Name != Style.GetDirectoryName(key))
 				{
 					// Process and output the DAT
-					SplitByLevelHelper(tempDat, outDir, shortname, restore, logger);
+					SplitByLevelHelper(tempDat, outDir, shortname, basedat, logger);
 
 					// Reset the DAT for the next items
 					tempDat = (DatFile)CloneHeader();
@@ -5079,7 +5079,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Then we write the last DAT out since it would be skipped otherwise
-			SplitByLevelHelper(tempDat, outDir, shortname, restore, logger);
+			SplitByLevelHelper(tempDat, outDir, shortname, basedat, logger);
 
 			return true;
 		}

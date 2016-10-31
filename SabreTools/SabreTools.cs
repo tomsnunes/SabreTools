@@ -69,6 +69,7 @@ namespace SabreTools
 			// User flags
 			bool addBlankFilesForEmptyFolder = false,
 				addFileDates = false,
+				basedat = false,
 				cleanGameNames = false,
 				copyFiles = false,
 				datPrefix = false,
@@ -208,6 +209,10 @@ namespace SabreTools
 					case "-b":
 					case "--bare":
 						removeDateFromAutomaticName = true;
+						break;
+					case "-ba":
+					case "--base":
+						basedat = true;
 						break;
 					case "-bc":
 					case "--baddump-col":
@@ -994,7 +999,7 @@ namespace SabreTools
 			// Split a SuperDAT by lowest available level
 			else if (splitByLevel)
 			{
-				InitLevelSplit(inputs, outDir, shortname, restore);
+				InitLevelSplit(inputs, outDir, shortname, basedat);
 			}
 
 			// Split a DAT by item type
