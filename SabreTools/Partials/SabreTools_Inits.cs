@@ -118,7 +118,7 @@ namespace SabreTools
 					datdata.Files = new SortedDictionary<string, List<DatItem>>();
 
 					string basePath = Path.GetFullPath(path);
-					bool success = datdata.PopulateDatFromDir(basePath, noMD5, noSHA1, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,
+					bool success = datdata.PopulateFromDir(basePath, noMD5, noSHA1, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,
 						addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
 
 					// If it was a success, write the DAT out

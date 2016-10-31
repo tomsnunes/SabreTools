@@ -396,6 +396,31 @@ namespace SabreTools.Helper.Tools
 				.ToArray());
 		}
 
+		/// <summary>
+		/// Split a line as if it were a CMP rom line
+		/// </summary>
+		/// <param name="s">Line to split</param>
+		/// <returns>Line split</returns>
+		/// <remarks>Uses code from http://stackoverflow.com/questions/554013/regular-expression-to-split-on-spaces-unless-in-quotes</remarks>
+		public static string[] SplitLineAsCMP(string s)
+		{
+			// Preprocess the string
+			s = Regex.Replace(s, @"^\S* \(", ""); // Remove item identifier and opening brace
+			s = Regex.Replace(s, @"#.*$", ""); // Remove trailing comments
+			s = s.TrimEnd(')'); // Remove closing brace
+			s = s.Trim(); // Remove leading and trailing whitespace
+
+			// Now we get each string, divided up as cleanly as possible
+			string[] matches = Regex
+				//.Matches(s, @"([^\s]*""[^""]+""[^\s]*)|[^""]?\w+[^""]?")
+				.Matches(s, @"[^\s""]+|""[^""]*""")
+				.Cast<Match>()
+				.Select(m => m.Groups[0].Value)
+				.ToArray();
+
+			return matches;
+		}
+
 		#endregion
 
 		#region System.IO.Path Replacements

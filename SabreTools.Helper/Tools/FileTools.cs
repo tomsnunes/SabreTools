@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 
@@ -20,6 +21,7 @@ using BinaryWriter = System.IO.BinaryWriter;
 using FileStream = System.IO.FileStream;
 using IOException = System.IO.IOException;
 using MemoryStream = System.IO.MemoryStream;
+using PathTooLongException = System.IO.PathTooLongException;
 using SearchOption = System.IO.SearchOption;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
@@ -79,7 +81,7 @@ namespace SabreTools.Helper.Tools
 			}
 
 			// Read the input file, if possible
-			logger.Verbose("Attempting to read file: \"" + filename + "\"");
+			logger.Verbose("Attempting to read file to get format: \"" + filename + "\"");
 
 			// Check if file exists
 			if (!File.Exists(filename))
@@ -444,6 +446,66 @@ namespace SabreTools.Helper.Tools
 				}
 				catch { }
 			}
+		}
+
+		/// <summary>
+		/// Retrieve a list of just files from inputs
+		/// </summary>
+		/// <param name="inputs">List of strings representing directories and files</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="appendparent">True if the parent name should be appended after the special character "¬", false otherwise</param>
+		/// <returns>List of strings representing just files from the inputs</returns>
+		public static List<string> GetOnlyFilesFromInputs(List<string> inputs, int maxDegreeOfParallelism, Logger logger, bool appendparent = false)
+		{
+			List<string> outputs = new List<string>();
+			Parallel.ForEach(inputs,
+				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism, },
+				input =>
+			{
+				if (Directory.Exists(input))
+				{
+					List<string> files = FileTools.RetrieveFiles(input, new List<string>());
+					foreach (string file in files)
+					{
+						try
+						{
+							lock (outputs)
+							{
+								outputs.Add(Path.GetFullPath(file) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
+							}
+						}
+						catch (PathTooLongException)
+						{
+							logger.Warning("The path for " + file + " was too long");
+						}
+						catch (Exception ex)
+						{
+							logger.Error(ex.ToString());
+						}
+					}
+				}
+				else if (File.Exists(input))
+				{
+					try
+					{
+						lock (outputs)
+						{
+							outputs.Add(Path.GetFullPath(input) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
+						}
+					}
+					catch (PathTooLongException)
+					{
+						logger.Warning("The path for " + input + " was too long");
+					}
+					catch (Exception ex)
+					{
+						logger.Error(ex.ToString());
+					}
+				}
+			});
+
+			return outputs;
 		}
 
 		#endregion

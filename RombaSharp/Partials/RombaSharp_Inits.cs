@@ -41,12 +41,12 @@ namespace SabreTools
 			DatFile df = new DatFile();
 			foreach (string dir in onlyDirs)
 			{
-				df.PopulateDatFromDir(dir, false, false, false, false, true, false, false, _tmpdir, false, null, _workers, _logger);
+				df.PopulateFromDir(dir, false, false, false, false, true, false, false, _tmpdir, false, null, _workers, _logger);
 
 				// If we're looking for only needed, consider the zipfiles themselves too
 				if (onlyNeeded)
 				{
-					df.PopulateDatFromDir(dir, false, false, false, true, true, false, false, _tmpdir, false, null, _workers, _logger);
+					df.PopulateFromDir(dir, false, false, false, true, true, false, false, _tmpdir, false, null, _workers, _logger);
 				}
 			}
 
@@ -266,7 +266,7 @@ namespace SabreTools
 			Logger logger = new Logger();
 			foreach (string input in inputs)
 			{
-				datdata.PopulateDatFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
+				datdata.PopulateFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
 					null /* headerToCheckAgainst */, _workers /* maxDegreeOfParallelism */, _logger);
 				datdata.WriteToFile("", logger);

@@ -21,7 +21,6 @@ using FileMode = System.IO.FileMode;
 using FileStream = System.IO.FileStream;
 using IOException = System.IO.IOException;
 using MemoryStream = System.IO.MemoryStream;
-using PathTooLongException = System.IO.PathTooLongException;
 using SearchOption = System.IO.SearchOption;
 using StreamReader = System.IO.StreamReader;
 using StreamWriter = System.IO.StreamWriter;
@@ -299,7 +298,84 @@ namespace SabreTools.Helper.Dats
 
 		#region Instance Methods
 
-		#region Bucketing
+		#region Bucketing [MODULAR DONE]
+
+		/// <summary>
+		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by CRC
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		public void BucketByCRC(bool mergeroms, Logger logger, bool output = true)
+		{
+			// If we already have the right sorting, trust it
+			if (_sortedBy == SortedBy.CRC)
+			{
+				return;
+			}
+
+			// Set the sorted type
+			_sortedBy = SortedBy.CRC;
+
+			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
+			long count = 0;
+
+			// If we have a null dict or an empty one, output a new dictionary
+			if (Files == null || Files.Count == 0)
+			{
+				Files = sortable;
+			}
+
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by CRC");
+
+			// Process each all of the roms
+			List<string> keys = Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> roms = Files[key];
+
+				// If we're merging the roms, do so
+				if (mergeroms)
+				{
+					roms = DatItem.Merge(roms, logger);
+				}
+
+				// Now add each of the roms to their respective games
+				foreach (DatItem rom in roms)
+				{
+					count++;
+					string newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).CRC : Constants.CRCZero);
+					if (sortable.ContainsKey(newkey))
+					{
+						sortable[newkey].Add(rom);
+					}
+					else
+					{
+						List<DatItem> temp = new List<DatItem>();
+						temp.Add(rom);
+						sortable.Add(newkey, temp);
+					}
+				}
+			}
+
+			// Now go through and sort all of the lists
+			keys = sortable.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> sortedlist = sortable[key];
+				DatItem.Sort(ref sortedlist, false);
+				sortable[key] = sortedlist;
+			}
+
+			// Output the count if told to
+			if (output)
+			{
+				logger.User("A total of " + count + " file hashes will be written out to file");
+			}
+
+			// Now assign the dictionary back
+			Files = sortable;
+		}
 
 		/// <summary>
 		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by Game
@@ -378,160 +454,6 @@ namespace SabreTools.Helper.Dats
 			{
 				List<DatItem> sortedlist = sortable[key];
 				DatItem.Sort(ref sortedlist, norename);
-				sortable[key] = sortedlist;
-			}
-
-			// Output the count if told to
-			if (output)
-			{
-				logger.User("A total of " + count + " file hashes will be written out to file");
-			}
-
-			// Now assign the dictionary back
-			Files = sortable;
-		}
-
-		/// <summary>
-		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by Size
-		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void BucketBySize(bool mergeroms, Logger logger, bool output = true)
-		{
-			// If we already have the right sorting, trust it
-			if (_sortedBy == SortedBy.Size)
-			{
-				return;
-			}
-
-			// Set the sorted type
-			_sortedBy = SortedBy.Size;
-
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-			long count = 0;
-
-			// If we have a null dict or an empty one, output a new dictionary
-			if (Files == null || Files.Count == 0)
-			{
-				Files = sortable;
-			}
-
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by size");
-
-			// Process each all of the roms
-			List<string> keys = Files.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = Files[key];
-
-				// If we're merging the roms, do so
-				if (mergeroms)
-				{
-					roms = DatItem.Merge(roms, logger);
-				}
-
-				// Now add each of the roms to their respective games
-				foreach (DatItem rom in roms)
-				{
-					count++;
-					string newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).Size.ToString() : "-1");
-					if (sortable.ContainsKey(newkey))
-					{
-						sortable[newkey].Add(rom);
-					}
-					else
-					{
-						List<DatItem> temp = new List<DatItem>();
-						temp.Add(rom);
-						sortable.Add(newkey, temp);
-					}
-				}
-			}
-
-			// Now go through and sort all of the lists
-			keys = sortable.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> sortedlist = sortable[key];
-				DatItem.Sort(ref sortedlist, false);
-				sortable[key] = sortedlist;
-			}
-
-			// Output the count if told to
-			if (output)
-			{
-				logger.User("A total of " + count + " file hashes will be written out to file");
-			}
-
-			// Now assign the dictionary back
-			Files = sortable;
-		}
-
-		/// <summary>
-		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by CRC
-		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void BucketByCRC(bool mergeroms, Logger logger, bool output = true)
-		{
-			// If we already have the right sorting, trust it
-			if (_sortedBy == SortedBy.CRC)
-			{
-				return;
-			}
-
-			// Set the sorted type
-			_sortedBy = SortedBy.CRC;
-
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-			long count = 0;
-
-			// If we have a null dict or an empty one, output a new dictionary
-			if (Files == null || Files.Count == 0)
-			{
-				Files = sortable;
-			}
-
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by CRC");
-
-			// Process each all of the roms
-			List<string> keys = Files.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = Files[key];
-
-				// If we're merging the roms, do so
-				if (mergeroms)
-				{
-					roms = DatItem.Merge(roms, logger);
-				}
-
-				// Now add each of the roms to their respective games
-				foreach (DatItem rom in roms)
-				{
-					count++;
-					string newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).CRC : Constants.CRCZero);
-					if (sortable.ContainsKey(newkey))
-					{
-						sortable[newkey].Add(rom);
-					}
-					else
-					{
-						List<DatItem> temp = new List<DatItem>();
-						temp.Add(rom);
-						sortable.Add(newkey, temp);
-					}
-				}
-			}
-
-			// Now go through and sort all of the lists
-			keys = sortable.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> sortedlist = sortable[key];
-				DatItem.Sort(ref sortedlist, false);
 				sortable[key] = sortedlist;
 			}
 
@@ -707,9 +629,86 @@ namespace SabreTools.Helper.Dats
 			Files = sortable;
 		}
 
+		/// <summary>
+		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by Size
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		public void BucketBySize(bool mergeroms, Logger logger, bool output = true)
+		{
+			// If we already have the right sorting, trust it
+			if (_sortedBy == SortedBy.Size)
+			{
+				return;
+			}
+
+			// Set the sorted type
+			_sortedBy = SortedBy.Size;
+
+			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
+			long count = 0;
+
+			// If we have a null dict or an empty one, output a new dictionary
+			if (Files == null || Files.Count == 0)
+			{
+				Files = sortable;
+			}
+
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by size");
+
+			// Process each all of the roms
+			List<string> keys = Files.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> roms = Files[key];
+
+				// If we're merging the roms, do so
+				if (mergeroms)
+				{
+					roms = DatItem.Merge(roms, logger);
+				}
+
+				// Now add each of the roms to their respective games
+				foreach (DatItem rom in roms)
+				{
+					count++;
+					string newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).Size.ToString() : "-1");
+					if (sortable.ContainsKey(newkey))
+					{
+						sortable[newkey].Add(rom);
+					}
+					else
+					{
+						List<DatItem> temp = new List<DatItem>();
+						temp.Add(rom);
+						sortable.Add(newkey, temp);
+					}
+				}
+			}
+
+			// Now go through and sort all of the lists
+			keys = sortable.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> sortedlist = sortable[key];
+				DatItem.Sort(ref sortedlist, false);
+				sortable[key] = sortedlist;
+			}
+
+			// Output the count if told to
+			if (output)
+			{
+				logger.User("A total of " + count + " file hashes will be written out to file");
+			}
+
+			// Now assign the dictionary back
+			Files = sortable;
+		}
+
 		#endregion
 
-		#region Cloning Methods
+		#region Cloning Methods [MODULAR DONE]
 
 		public object Clone()
 		{
@@ -797,12 +796,12 @@ namespace SabreTools.Helper.Dats
 
 		#endregion
 
-		#region Converting and Updating
+		#region Converting and Updating [MODULAR DONE]
 
 		/// <summary>
 		/// Determine if input files should be merged, diffed, or processed invidually
 		/// </summary>
-		/// <param name="inputFileNames">Names of the input files and/or folders</param>
+		/// <param name="inputPaths">Names of the input files and/or folders</param>
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
 		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
@@ -817,51 +816,14 @@ namespace SabreTools.Helper.Dats
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public void DetermineUpdateType(List<string> inputFileNames, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
+		public void DetermineUpdateType(List<string> inputPaths, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
 			bool bare, bool clean, bool softlist, Filter filter, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || diff != 0)
 			{
 				// Make sure there are no folders in inputs
-				List<string> newInputFileNames = new List<string>();
-				foreach (string input in inputFileNames)
-				{
-					if (Directory.Exists(input))
-					{
-						List<string> files = FileTools.RetrieveFiles(input, new List<string>());
-						foreach (string file in files)
-						{
-							try
-							{
-								newInputFileNames.Add(Path.GetFullPath(file) + "¬" + Path.GetFullPath(input));
-							}
-							catch (PathTooLongException)
-							{
-								logger.Warning("The path for " + file + " was too long");
-							}
-							catch (Exception ex)
-							{
-								logger.Error(ex.ToString());
-							}
-						}
-					}
-					else if (File.Exists(input))
-					{
-						try
-						{
-							newInputFileNames.Add(Path.GetFullPath(input) + "¬" + Path.GetDirectoryName(Path.GetFullPath(input)));
-						}
-						catch (PathTooLongException)
-						{
-							logger.Warning("The path for " + input + " was too long");
-						}
-						catch (Exception ex)
-						{
-							logger.Error(ex.ToString());
-						}
-					}
-				}
+				List<string> newInputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, maxDegreeOfParallelism, logger, appendparent: true);
 
 				// Sort the list first
 				newInputFileNames = Style.OrderByAlphaNumeric(newInputFileNames, s => s).ToList();
@@ -895,7 +857,7 @@ namespace SabreTools.Helper.Dats
 			// Otherwise, loop through all of the inputs individually
 			else
 			{
-				Update(inputFileNames, outDir, clean, softlist, filter, trim, single, root, maxDegreeOfParallelism, logger);
+				Update(inputPaths, outDir, clean, softlist, filter, trim, single, root, maxDegreeOfParallelism, logger);
 			}
 			return;
 		}
@@ -1360,7 +1322,7 @@ namespace SabreTools.Helper.Dats
 
 		#endregion
 
-		#region Parsing
+		#region Parsing [MODULAR DONE, FOR NOW]
 
 		/// <summary>
 		/// Parse a DAT and return all found games and roms within
@@ -1595,32 +1557,95 @@ namespace SabreTools.Helper.Dats
 					item.SystemID = sysid;
 					item.SourceID = srcid;
 
+					// Get the blank key to write to
+					string key = "";
+
 					// If we have a sample, treat it special
 					if (temptype == ItemType.Sample)
 					{
 						line = line.Trim().Remove(0, 6).Trim().Replace("\"", ""); // Remove "sample" from the input string
 						item.Name = line;
+
+						// Now process and add the sample
+						key = "";
+						ParseAddHelper(item, filter, trim, single, root, clean, logger, out key);
+
+						continue;
 					}
 
-					// Otherwise, process the rest of the line
-					else
-					{
-						string[] gc = line.Trim().Split(' ');
+					// Get the line split by spaces and quotes
+					string[] gc = Style.SplitLineAsCMP(line);
 
-						// Loop over all attributes and add them if possible
-						bool quote = false;
-						string attrib = "", val = "";
-						for (int i = 2; i < gc.Length; i++)
+					// Special cases for DOSCenter DATs only because of how the lines are arranged
+					if (line.Trim().StartsWith("file ("))
+					{
+						// Loop over the specifics
+						for (int i = 0; i < gc.Length; i++)
 						{
-							//If the item is empty, we automatically skip it because it's a fluke
-							if (gc[i].Trim() == String.Empty)
+							// Names are not quoted, for some stupid reason
+							if (gc[i] == "name")
 							{
-								continue;
+								// Advance to the first part of the name
+								i++;
+								item.Name = gc[i];
+
+								// Advance to the next item, adding until we find "size"
+								i++;
+								while (i < gc.Length && gc[i] != "size" && gc[i] != "date" && gc[i] != "crc")
+								{
+									item.Name += " " + gc[i];
+									i++;
+								}
 							}
 
-							// Special cases for standalone item statuses
-							else if (gc[i] == "baddump" && attrib != "name" && attrib != "status" && attrib != "flags")
+							// Get the size from the next part
+							else if (gc[i] == "size")
 							{
+								i++;
+								long tempsize = -1;
+								if (!Int64.TryParse(gc[i], out tempsize))
+								{
+									tempsize = 0;
+								}
+								((Rom)item).Size = tempsize;
+								i++;
+							}
+
+							// Get the date from the next part
+							else if (gc[i] == "date")
+							{
+								i++;
+								((Rom)item).Date = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
+								i += 3;
+							}
+
+							// Get the CRC from the next part
+							else if (gc[i] == "crc")
+							{
+								i++;
+								((Rom)item).CRC = gc[i].Replace("\"", "").ToLowerInvariant();
+							}
+						}
+
+						// Now process and add the rom
+						key = "";
+						ParseAddHelper(item, filter, trim, single, root, clean, logger, out key);
+						continue;
+					}
+
+					// Loop over all attributes normally and add them if possible
+					for (int i = 0; i < gc.Length; i++)
+					{
+						// Look at the current item and use it if possible
+						string quoteless = gc[i].Replace("\"", "");
+						switch (quoteless)
+						{
+							//If the item is empty, we automatically skip it because it's a fluke
+							case "":
+								continue;
+
+							// Special cases for standalone item statuses
+							case "baddump":
 								if (item.Type == ItemType.Rom)
 								{
 									((Rom)item).ItemStatus = ItemStatus.BadDump;
@@ -1629,9 +1654,8 @@ namespace SabreTools.Helper.Dats
 								{
 									((Disk)item).ItemStatus = ItemStatus.BadDump;
 								}
-							}
-							else if (gc[i] == "good" && attrib != "name" && attrib != "status" && attrib != "flags")
-							{
+								break;
+							case "good":
 								if (item.Type == ItemType.Rom)
 								{
 									((Rom)item).ItemStatus = ItemStatus.Good;
@@ -1640,9 +1664,8 @@ namespace SabreTools.Helper.Dats
 								{
 									((Disk)item).ItemStatus = ItemStatus.Good;
 								}
-							}
-							else if (gc[i] == "nodump" && attrib != "name" && attrib != "status" && attrib != "flags")
-							{
+								break;
+							case "nodump":
 								if (item.Type == ItemType.Rom)
 								{
 									((Rom)item).ItemStatus = ItemStatus.Nodump;
@@ -1651,9 +1674,8 @@ namespace SabreTools.Helper.Dats
 								{
 									((Disk)item).ItemStatus = ItemStatus.Nodump;
 								}
-							}
-							else if (gc[i] == "verified" && attrib != "name" && attrib != "status" && attrib != "flags")
-							{
+								break;
+							case "verified":
 								if (item.Type == ItemType.Rom)
 								{
 									((Rom)item).ItemStatus = ItemStatus.Verified;
@@ -1662,348 +1684,120 @@ namespace SabreTools.Helper.Dats
 								{
 									((Disk)item).ItemStatus = ItemStatus.Verified;
 								}
-							}
+								break;
 
-							// Special cases for DOSCenter DATs only
-							else if (line.Trim().StartsWith("file ("))
-							{
-								// Loop over the specifics
-								for (int j = i; j < gc.Length; j++)
+							// Regular attributes
+							case "name":
+								i++;
+								item.Name = quoteless;
+								break;
+							case "size":
+								if (item.Type == ItemType.Rom)
 								{
-									// Names are not quoted, for some stupid reason
-									if (gc[j] == "name")
+									i++;
+									long size = -1;
+									if (Int64.TryParse(quoteless, out size))
 									{
-										// Advance to the first part of the name
-										j++;
-										item.Name = gc[j];
-
-										// Advance to the next item, adding until we find "size"
-										j++;
-										while (j < gc.Length && gc[j] != "size" && gc[j] != "date" && gc[j] != "crc")
-										{
-											item.Name += " " + gc[j];
-											j++;
-										}
-									}
-
-									// Get the size from the next part
-									else if (gc[j] == "size")
-									{
-										j++;
-										long tempsize = -1;
-										if (!Int64.TryParse(gc[j], out tempsize))
-										{
-											tempsize = 0;
-										}
-										((Rom)item).Size = tempsize;
-										j++;
-									}
-
-									// Get the date from the next part
-									else if (gc[j] == "date")
-									{
-										j++;
-										((Rom)item).Date = gc[j].Replace("\"", "") + " " + gc[j + 1].Replace("\"", "");
-										j += 3;
-									}
-
-									// Get the CRC from the next part
-									else if (gc[j] == "crc")
-									{
-										j++;
-										((Rom)item).CRC = gc[j].Replace("\"", "").ToLowerInvariant();
+										((Rom)item).Size = size;
 									}
 								}
-							}
 
-							// Even number of quotes, not in a quote, not in attribute
-							else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib == "")
-							{
-								attrib = gc[i].Replace("\"", "");
-							}
-							// Even number of quotes, not in a quote, in attribute
-							else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && !quote && attrib != "")
-							{
-								switch (attrib.ToLowerInvariant())
+								break;
+							case "crc":
+								if (item.Type == ItemType.Rom)
 								{
-									case "name":
-										item.Name = gc[i].Replace("\"", "");
-										break;
-									case "size":
-										if (item.Type == ItemType.Rom)
-										{
-											long size = -1;
-											if (Int64.TryParse(gc[i].Replace("\"", ""), out size))
-											{
-												((Rom)item).Size = size;
-											}
-										}
-										
-										break;
-									case "crc":
-										if (item.Type == ItemType.Rom)
-										{
-											((Rom)item).CRC = gc[i].Replace("\"", "").ToLowerInvariant();
-										}
-										break;
-									case "md5":
-										if (item.Type == ItemType.Rom)
-										{
-											((Rom)item).MD5 = gc[i].Replace("\"", "").ToLowerInvariant();
-										}
-										else if (item.Type == ItemType.Disk)
-										{
-											((Disk)item).MD5 = gc[i].Replace("\"", "").ToLowerInvariant();
-										}
-										break;
-									case "sha1":
-										if (item.Type == ItemType.Rom)
-										{
-											((Rom)item).SHA1 = gc[i].Replace("\"", "").ToLowerInvariant();
-										}
-										else if (item.Type == ItemType.Disk)
-										{
-											((Disk)item).SHA1 = gc[i].Replace("\"", "").ToLowerInvariant();
-										}
-										break;
-									case "status":
-									case "flags":
-										if (gc[i].ToLowerInvariant() == "good")
-										{
-											if (item.Type == ItemType.Rom)
-											{
-												((Rom)item).ItemStatus = ItemStatus.Good;
-											}
-											else if (item.Type == ItemType.Disk)
-											{
-												((Disk)item).ItemStatus = ItemStatus.Good;
-											}
-										}
-										else if (gc[i].ToLowerInvariant() == "baddump")
-										{
-											if (item.Type == ItemType.Rom)
-											{
-												((Rom)item).ItemStatus = ItemStatus.BadDump;
-											}
-											else if (item.Type == ItemType.Disk)
-											{
-												((Disk)item).ItemStatus = ItemStatus.BadDump;
-											}
-										}
-										else if (gc[i].ToLowerInvariant() == "nodump")
-										{
-											if (item.Type == ItemType.Rom)
-											{
-												((Rom)item).ItemStatus = ItemStatus.Nodump;
-											}
-											else if (item.Type == ItemType.Disk)
-											{
-												((Disk)item).ItemStatus = ItemStatus.Nodump;
-											}
-										}
-										else if (gc[i].ToLowerInvariant() == "verified")
-										{
-											if (item.Type == ItemType.Rom)
-											{
-												((Rom)item).ItemStatus = ItemStatus.Verified;
-											}
-											else if (item.Type == ItemType.Disk)
-											{
-												((Disk)item).ItemStatus = ItemStatus.Verified;
-											}
-										}
-										break;
-									case "date":
-										if (item.Type == ItemType.Rom)
-										{
-											((Rom)item).Date = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
-										}
-										i++;
-										break;
-
-									// Special cases for item statuses
-									case "good":
-										if (item.Type == ItemType.Rom)
-										{
-											((Rom)item).ItemStatus = ItemStatus.Good;
-										}
-										else if (item.Type == ItemType.Disk)
-										{
-											((Disk)item).ItemStatus = ItemStatus.Good;
-										}
-										break;
-									case "baddump":
-										if (item.Type == ItemType.Rom)
-										{
-											((Rom)item).ItemStatus = ItemStatus.BadDump;
-										}
-										else if (item.Type == ItemType.Disk)
-										{
-											((Disk)item).ItemStatus = ItemStatus.BadDump;
-										}
-										break;
-									case "nodump":
-										if (item.Type == ItemType.Rom)
-										{
-											((Rom)item).ItemStatus = ItemStatus.Nodump;
-										}
-										else if (item.Type == ItemType.Disk)
-										{
-											((Disk)item).ItemStatus = ItemStatus.Nodump;
-										}
-										break;
-									case "verified":
-										if (item.Type == ItemType.Rom)
-										{
-											((Rom)item).ItemStatus = ItemStatus.Verified;
-										}
-										else if (item.Type == ItemType.Disk)
-										{
-											((Disk)item).ItemStatus = ItemStatus.Verified;
-										}
-										break;
+									i++;
+									((Rom)item).CRC = quoteless.ToLowerInvariant();
 								}
-
-								attrib = "";
-							}
-							// Even number of quotes, in a quote, not in attribute
-							else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && quote && attrib == "")
-							{
-								// Attributes can't have quoted names
-							}
-							// Even number of quotes, in a quote, in attribute
-							else if (Regex.Matches(gc[i], "\"").Count % 2 == 0 && quote && attrib != "")
-							{
-								val += " " + gc[i];
-							}
-							// Odd number of quotes, not in a quote, not in attribute
-							else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && !quote && attrib == "")
-							{
-								// Attributes can't have quoted names
-							}
-							// Odd number of quotes, not in a quote, in attribute
-							else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && !quote && attrib != "")
-							{
-								val = gc[i].Replace("\"", "");
-								quote = true;
-							}
-							// Odd number of quotes, in a quote, not in attribute
-							else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && quote && attrib == "")
-							{
-								quote = false;
-							}
-							// Odd number of quotes, in a quote, in attribute
-							else if (Regex.Matches(gc[i], "\"").Count % 2 == 1 && quote && attrib != "")
-							{
-								val += " " + gc[i].Replace("\"", "");
-								switch (attrib.ToLowerInvariant())
+								break;
+							case "md5":
+								if (item.Type == ItemType.Rom)
 								{
-									case "name":
-										item.Name = val;
-										break;
-									case "size":
-										if (item.Type == ItemType.Rom)
-										{
-											long size = -1;
-											if (Int64.TryParse(gc[i].Replace("\"", ""), out size))
-											{
-												((Rom)item).Size = size;
-											}
-										}
-										break;
-									case "crc":
-										if (item.Type == ItemType.Rom)
-										{
-											((Rom)item).CRC = gc[i].Replace("\"", "").ToLowerInvariant();
-										}
-										break;
-									case "md5":
-										if (item.Type == ItemType.Rom)
-										{
-											((Rom)item).MD5 = gc[i].Replace("\"", "").ToLowerInvariant();
-										}
-										else if (item.Type == ItemType.Disk)
-										{
-											((Disk)item).MD5 = gc[i].Replace("\"", "").ToLowerInvariant();
-										}
-										break;
-									case "sha1":
-										if (item.Type == ItemType.Rom)
-										{
-											((Rom)item).SHA1 = gc[i].Replace("\"", "").ToLowerInvariant();
-										}
-										else if (item.Type == ItemType.Disk)
-										{
-											((Disk)item).SHA1 = gc[i].Replace("\"", "").ToLowerInvariant();
-										}
-										break;
-									case "status":
-									case "flags":
-										if (gc[i].ToLowerInvariant() == "good")
-										{
-											if (item.Type == ItemType.Rom)
-											{
-												((Rom)item).ItemStatus = ItemStatus.Good;
-											}
-											else if (item.Type == ItemType.Disk)
-											{
-												((Disk)item).ItemStatus = ItemStatus.Good;
-											}
-										}
-										else if (gc[i].ToLowerInvariant() == "baddump")
-										{
-											if (item.Type == ItemType.Rom)
-											{
-												((Rom)item).ItemStatus = ItemStatus.BadDump;
-											}
-											else if (item.Type == ItemType.Disk)
-											{
-												((Disk)item).ItemStatus = ItemStatus.BadDump;
-											}
-										}
-										else if (gc[i].ToLowerInvariant() == "nodump")
-										{
-											if (item.Type == ItemType.Rom)
-											{
-												((Rom)item).ItemStatus = ItemStatus.Nodump;
-											}
-											else if (item.Type == ItemType.Disk)
-											{
-												((Disk)item).ItemStatus = ItemStatus.Nodump;
-											}
-										}
-										else if (gc[i].ToLowerInvariant() == "verified")
-										{
-											if (item.Type == ItemType.Rom)
-											{
-												((Rom)item).ItemStatus = ItemStatus.Verified;
-											}
-											else if (item.Type == ItemType.Disk)
-											{
-												((Disk)item).ItemStatus = ItemStatus.Verified;
-											}
-										}
-										break;
-									case "date":
-										if (item.Type == ItemType.Rom)
-										{
-											((Rom)item).Date = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
-										}
-										i++;
-										break;
+									i++;
+									((Rom)item).MD5 = quoteless.ToLowerInvariant();
 								}
-
-								quote = false;
-								attrib = "";
-								val = "";
-							}
+								else if (item.Type == ItemType.Disk)
+								{
+									i++;
+									((Disk)item).MD5 = quoteless.ToLowerInvariant();
+								}
+								break;
+							case "sha1":
+								if (item.Type == ItemType.Rom)
+								{
+									i++;
+									((Rom)item).SHA1 = quoteless.ToLowerInvariant();
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									i++;
+									((Disk)item).SHA1 = quoteless.ToLowerInvariant();
+								}
+								break;
+							case "status":
+							case "flags":
+								i++;
+								if (gc[i].ToLowerInvariant() == "good")
+								{
+									if (item.Type == ItemType.Rom)
+									{
+										((Rom)item).ItemStatus = ItemStatus.Good;
+									}
+									else if (item.Type == ItemType.Disk)
+									{
+										((Disk)item).ItemStatus = ItemStatus.Good;
+									}
+								}
+								else if (gc[i].ToLowerInvariant() == "baddump")
+								{
+									if (item.Type == ItemType.Rom)
+									{
+										((Rom)item).ItemStatus = ItemStatus.BadDump;
+									}
+									else if (item.Type == ItemType.Disk)
+									{
+										((Disk)item).ItemStatus = ItemStatus.BadDump;
+									}
+								}
+								else if (gc[i].ToLowerInvariant() == "nodump")
+								{
+									if (item.Type == ItemType.Rom)
+									{
+										((Rom)item).ItemStatus = ItemStatus.Nodump;
+									}
+									else if (item.Type == ItemType.Disk)
+									{
+										((Disk)item).ItemStatus = ItemStatus.Nodump;
+									}
+								}
+								else if (gc[i].ToLowerInvariant() == "verified")
+								{
+									if (item.Type == ItemType.Rom)
+									{
+										((Rom)item).ItemStatus = ItemStatus.Verified;
+									}
+									else if (item.Type == ItemType.Disk)
+									{
+										((Disk)item).ItemStatus = ItemStatus.Verified;
+									}
+								}
+								break;
+							case "date":
+								if (item.Type == ItemType.Rom)
+								{
+									i++;
+									((Rom)item).Date = quoteless + " " + gc[i + 1].Replace("\"", "");
+								}
+								i++;
+								break;
 						}
 					}
 
 					// Now process and add the rom
-					string key = "";
+					key = "";
 					ParseAddHelper(item, filter, trim, single, root, clean, logger, out key);
 				}
+
 				// If the line is anything but a rom or disk and we're in a block
 				else if (Regex.IsMatch(line, Constants.ItemPatternCMP) && block)
 				{
@@ -3762,7 +3556,7 @@ namespace SabreTools.Helper.Dats
 
 		#endregion
 
-		#region Populate DAT from Directory
+		#region Populate DAT from Directory [MODULAR DONE, FOR NOW]
 
 		/// <summary>
 		/// Create a new Dat from a directory
@@ -3781,7 +3575,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public bool PopulateDatFromDir(string basePath, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
+		public bool PopulateFromDir(string basePath, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
 			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst,
 			int maxDegreeOfParallelism, Logger logger)
 		{
@@ -3815,7 +3609,7 @@ namespace SabreTools.Helper.Dats
 					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 					item =>
 					{
-						DFDProcessPossibleArchive(item, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+						PopulateFromDirCheckFile(item, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
 							tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 					});
 
@@ -3876,7 +3670,7 @@ namespace SabreTools.Helper.Dats
 			}
 			else if (File.Exists(basePath))
 			{
-				DFDProcessPossibleArchive(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+				PopulateFromDirCheckFile(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
 					tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 			}
 
@@ -3914,7 +3708,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		private void DFDProcessPossibleArchive(string item, string basePath, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
+		private void PopulateFromDirCheckFile(string item, string basePath, bool noMD5, bool noSHA1, bool bare, bool archivesAsFiles,
 			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst,
 			int maxDegreeOfParallelism, Logger logger)
 		{
@@ -3976,7 +3770,7 @@ namespace SabreTools.Helper.Dats
 
 					foreach (Rom rom in extracted)
 					{
-						DFDProcessFileHelper(newItem,
+						PopulateFromDirProcessFileHelper(newItem,
 							rom,
 							basePath,
 							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length) + Path.GetFileNameWithoutExtension(item),
@@ -3986,7 +3780,7 @@ namespace SabreTools.Helper.Dats
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(newItem))
 				{
-					DFDProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, headerToCheckAgainst, logger);
+					PopulateFromDirProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, headerToCheckAgainst, logger);
 				}
 			}
 			// Otherwise, attempt to extract the files to the temporary directory
@@ -4008,7 +3802,7 @@ namespace SabreTools.Helper.Dats
 						new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 						entry =>
 						{
-							DFDProcessFile(entry,
+							PopulateFromDirProcessFile(entry,
 								Path.Combine((Type == "SuperDAT"
 									? (Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length)
 									: ""),
@@ -4024,7 +3818,7 @@ namespace SabreTools.Helper.Dats
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(newItem))
 				{
-					DFDProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, headerToCheckAgainst, logger);
+					PopulateFromDirProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, headerToCheckAgainst, logger);
 				}
 			}
 
@@ -4056,12 +3850,12 @@ namespace SabreTools.Helper.Dats
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		private void DFDProcessFile(string item, string parent, string basePath, bool noMD5, bool noSHA1, bool addDate, string headerToCheckAgainst, Logger logger)
+		private void PopulateFromDirProcessFile(string item, string parent, string basePath, bool noMD5, bool noSHA1, bool addDate, string headerToCheckAgainst, Logger logger)
 		{
 			logger.Verbose(Path.GetFileName(item) + " treated like a file");
 			Rom rom = FileTools.GetFileInfo(item, logger, noMD5: noMD5, noSHA1: noSHA1, date: addDate, header: headerToCheckAgainst);
 
-			DFDProcessFileHelper(item, rom, basePath, parent, logger);
+			PopulateFromDirProcessFileHelper(item, rom, basePath, parent, logger);
 		}
 
 		/// <summary>
@@ -4071,7 +3865,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="item">Rom data to be used to write to file</param>
 		/// <param name="basepath">Path the represents the parent directory</param>
 		/// <param name="parent">Parent game to be used</param>
-		private void DFDProcessFileHelper(string item, DatItem datItem, string basepath, string parent, Logger logger)
+		private void PopulateFromDirProcessFileHelper(string item, DatItem datItem, string basepath, string parent, Logger logger)
 		{
 			// If the datItem isn't a Rom or Disk, return
 			if (datItem.Type != ItemType.Rom && datItem.Type != ItemType.Disk)
@@ -4214,7 +4008,7 @@ namespace SabreTools.Helper.Dats
 
 		#endregion
 
-		#region Rebuilding and Verifying
+		#region Rebuilding and Verifying [MODULAR DONE, FOR NOW]
 
 		/// <summary>
 		/// Process the DAT and find all matches in input files and folders
@@ -4783,7 +4577,7 @@ namespace SabreTools.Helper.Dats
 			logger.User("Processing files:\n");
 			foreach (string input in inputs)
 			{
-				PopulateDatFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
+				PopulateFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, tempDir /* tempDir */, false /* copyFiles */,
 					headerToCheckAgainst, 4 /* maxDegreeOfParallelism */, logger);
 			}
@@ -4836,7 +4630,7 @@ namespace SabreTools.Helper.Dats
 
 		#endregion
 
-		#region Splitting
+		#region Splitting [MODULAR DONE]
 
 		/// <summary>
 		/// Split a DAT by input extensions
@@ -5503,7 +5297,7 @@ namespace SabreTools.Helper.Dats
 
 		#endregion
 
-		#region Statistics
+		#region Statistics [MODULAR DONE]
 
 		/// <summary>
 		/// Recalculate the statistics for the Dat
@@ -5697,7 +5491,7 @@ namespace SabreTools.Helper.Dats
 
 		#endregion
 
-		#region Writing
+		#region Writing [MODULAR DONE]
 
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
@@ -7027,7 +6821,7 @@ namespace SabreTools.Helper.Dats
 
 		#region Static Methods
 
-		#region Bucketing
+		#region Bucketing [MODULAR DONE]
 
 		/// <summary>
 		/// Take an arbitrarily ordered List and return a Dictionary sorted by Game
@@ -7091,7 +6885,7 @@ namespace SabreTools.Helper.Dats
 
 		#endregion
 
-		#region Statistics
+		#region Statistics [MODULAR DONE]
 
 		/// <summary>
 		/// Output the stats for a list of input dats as files in a human-readable format
