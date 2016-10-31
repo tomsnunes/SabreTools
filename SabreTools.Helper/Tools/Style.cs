@@ -405,6 +405,7 @@ namespace SabreTools.Helper.Tools
 		/// </summary>
 		/// <param name="s">Path to get directory name out of</param>
 		/// <returns>Directory name from path</returns>
+		/// <see cref="System.IO.Path.GetDirectoryName(string)"/>
 		public static string GetDirectoryName(string s)
 		{
 			if (s == null)
@@ -431,6 +432,7 @@ namespace SabreTools.Helper.Tools
 		/// </summary>
 		/// <param name="s">Path to get file name out of</param>
 		/// <returns>File name from path</returns>
+		/// <see cref="System.IO.Path.GetFileName(string)"/>
 		public static string GetFileName(string s)
 		{
 			if (s == null)
@@ -457,6 +459,7 @@ namespace SabreTools.Helper.Tools
 		/// </summary>
 		/// <param name="s">Path to get file name out of</param>
 		/// <returns>File name without extension from path</returns>
+		/// <see cref="System.IO.Path.GetFileNameWithoutExtension(string)"/>
 		public static string GetFileNameWithoutExtension(string s)
 		{
 			s = GetFileName(s);
