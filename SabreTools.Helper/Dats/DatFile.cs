@@ -5314,9 +5314,9 @@ namespace SabreTools.Helper.Dats
 			// Now set the new output values
 			tempDat.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name)
 				? FileName
-				: tempDat.Name.Replace(Path.DirectorySeparatorChar.ToString(), " - ").Replace(Path.AltDirectorySeparatorChar.ToString(), " - "));
-			tempDat.Description += " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
-			tempDat.Name = Name + " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
+				: tempDat.Name.Replace("/", " - ").Replace("\\", " - "), " - "));
+			tempDat.Description += " (" + tempDat.Name.Replace("/", " - ").Replace("\\", " - ") + ")";
+			tempDat.Name = Name + " (" + tempDat.Name.Replace("/", " - ").Replace("\\", " - ") + ")";
 			tempDat.Type = null;
 
 			// Write out the temporary DAT to the proper directory
