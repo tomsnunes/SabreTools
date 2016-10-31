@@ -994,7 +994,7 @@ namespace SabreTools
 			// Split a SuperDAT by lowest available level
 			else if (splitByLevel)
 			{
-				InitLevelSplit(inputs, outDir, shortname);
+				InitLevelSplit(inputs, outDir, shortname, restore);
 			}
 
 			// Split a DAT by item type
