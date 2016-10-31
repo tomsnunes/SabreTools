@@ -398,6 +398,74 @@ namespace SabreTools.Helper.Tools
 
 		#endregion
 
+		#region System.IO.Path Replacements
+
+		/// <summary>
+		/// Replacement for System.IO.Path.GetDirectoryName
+		/// </summary>
+		/// <param name="s">Path to get directory name out of</param>
+		/// <returns>Directory name from path</returns>
+		public static string GetDirectoryName(string s)
+		{
+			if (s == null)
+			{
+				return "";
+			}
+
+			if (s.Contains(Path.AltDirectorySeparatorChar.ToString()))
+			{
+				string[] tempkey = s.Split(Path.AltDirectorySeparatorChar);
+				return String.Join(Path.AltDirectorySeparatorChar.ToString(), tempkey.Take(tempkey.Length - 1));
+			}
+			else if (s.Contains(Path.DirectorySeparatorChar.ToString()))
+			{
+				string[] tempkey = s.Split(Path.DirectorySeparatorChar);
+				return String.Join(Path.DirectorySeparatorChar.ToString(), tempkey.Take(tempkey.Length - 1));
+			}
+
+			return "";
+		}
+
+		/// <summary>
+		/// Replacement for System.IO.Path.GetFileName
+		/// </summary>
+		/// <param name="s">Path to get file name out of</param>
+		/// <returns>File name from path</returns>
+		public static string GetFileName(string s)
+		{
+			if (s == null)
+			{
+				return "";
+			}
+
+			if (s.Contains(Path.AltDirectorySeparatorChar.ToString()))
+			{
+				string[] tempkey = s.Split(Path.AltDirectorySeparatorChar);
+				return tempkey.Last();
+			}
+			else if (s.Contains(Path.DirectorySeparatorChar.ToString()))
+			{
+				string[] tempkey = s.Split(Path.DirectorySeparatorChar);
+				return tempkey.Last();
+			}
+
+			return s;
+		}
+
+		/// <summary>
+		/// Replacement for System.IO.Path.GetFileNameWithoutExtension
+		/// </summary>
+		/// <param name="s">Path to get file name out of</param>
+		/// <returns>File name without extension from path</returns>
+		public static string GetFileNameWithoutExtension(string s)
+		{
+			s = GetFileName(s);
+			string[] tempkey = s.Split('.');
+			return String.Join(".", tempkey.Take(tempkey.Length - 1));
+		}
+
+		#endregion
+
 		#region WoD-based String Cleaning
 
 		/// <summary>

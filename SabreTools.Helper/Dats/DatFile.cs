@@ -5260,7 +5260,7 @@ namespace SabreTools.Helper.Dats
 			foreach (string key in keys)
 			{
 				// Here, the key is the name of the game to be used for comparison
-				if (tempDat.Name != null && tempDat.Name != Path.GetDirectoryName(key))
+				if (tempDat.Name != null && tempDat.Name != Style.GetDirectoryName(key))
 				{
 					// Get the path that the file will be written out to
 					string path = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name)
@@ -5303,7 +5303,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Then set the DAT name to be the parent directory name
-				tempDat.Name = Path.GetDirectoryName(key);
+				tempDat.Name = Style.GetDirectoryName(key);
 			}
 
 			// Then we write the last DAT out since it would be skipped otherwise
