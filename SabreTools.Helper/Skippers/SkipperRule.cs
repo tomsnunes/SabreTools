@@ -7,7 +7,6 @@ using SabreTools.Helper.Data;
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
-#endif
 
 using BinaryReader = System.IO.BinaryReader;
 using BinaryWriter = System.IO.BinaryWriter;
@@ -17,6 +16,7 @@ using FileShare = System.IO.FileShare;
 using FileStream = System.IO.FileStream;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
+#endif
 
 namespace SabreTools.Helper.Skippers
 {

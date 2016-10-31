@@ -10,12 +10,12 @@ using SabreTools.Helper.Tools;
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
-#endif
 
 using BinaryReader = System.IO.BinaryReader;
 using SearchOption = System.IO.SearchOption;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
+#endif
 
 namespace SabreTools.Helper.Skippers
 {

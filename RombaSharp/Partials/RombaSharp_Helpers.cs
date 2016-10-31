@@ -13,12 +13,12 @@ using SabreTools.Helper.Tools;
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
-#endif
 
 using FileAccess = System.IO.FileAccess;
 using FileMode = System.IO.FileMode;
 using SearchOption = System.IO.SearchOption;
 using StreamWriter = System.IO.StreamWriter;
+#endif
 
 namespace SabreTools
 {

@@ -8,8 +8,6 @@ using SabreTools.Helper.Data;
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
-#endif
-using OCRC;
 
 using BinaryReader = System.IO.BinaryReader;
 using BinaryWriter = System.IO.BinaryWriter;
@@ -19,6 +17,8 @@ using IOException = System.IO.IOException;
 using MemoryStream = System.IO.MemoryStream;
 using PathTooLongException = System.IO.PathTooLongException;
 using Stream = System.IO.Stream;
+#endif
+using OCRC;
 
 namespace ROMVault2.SupportedFiles.Zip
 {

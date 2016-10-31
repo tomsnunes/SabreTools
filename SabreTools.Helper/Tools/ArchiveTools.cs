@@ -10,16 +10,6 @@ using SabreTools.Helper.Dats;
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
-#endif
-using Ionic.Zlib;
-using ROMVault2.SupportedFiles.Zip;
-using SharpCompress.Archives;
-using SharpCompress.Archives.Rar;
-using SharpCompress.Archives.SevenZip;
-using SharpCompress.Archives.Tar;
-using SharpCompress.Common;
-using SharpCompress.Readers;
-using SharpCompress.Writers;
 
 using BinaryReader = System.IO.BinaryReader;
 using BinaryWriter = System.IO.BinaryWriter;
@@ -31,6 +21,16 @@ using FileStream = System.IO.FileStream;
 using MemoryStream = System.IO.MemoryStream;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
+#endif
+using Ionic.Zlib;
+using ROMVault2.SupportedFiles.Zip;
+using SharpCompress.Archives;
+using SharpCompress.Archives.Rar;
+using SharpCompress.Archives.SevenZip;
+using SharpCompress.Archives.Tar;
+using SharpCompress.Common;
+using SharpCompress.Readers;
+using SharpCompress.Writers;
 
 namespace SabreTools.Helper.Tools
 {

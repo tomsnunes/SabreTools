@@ -10,9 +10,9 @@ using SabreTools.Helper.Tools;
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
-#endif
 
 using SearchOption = System.IO.SearchOption;
+#endif
 
 namespace SabreTools
 {

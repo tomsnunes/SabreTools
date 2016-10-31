@@ -32,11 +32,11 @@ using System;
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
-#endif
 
 using MemoryStream = System.IO.MemoryStream;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
+#endif
 
 namespace Ionic.Zlib
 {

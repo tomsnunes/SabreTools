@@ -14,9 +14,6 @@ using SabreTools.Helper.Skippers;
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
-#endif
-using NaturalSort;
-using OCRC;
 
 using BinaryReader = System.IO.BinaryReader;
 using BinaryWriter = System.IO.BinaryWriter;
@@ -27,6 +24,9 @@ using SearchOption = System.IO.SearchOption;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 using StreamReader = System.IO.StreamReader;
+#endif
+using NaturalSort;
+using OCRC;
 
 namespace SabreTools.Helper.Tools
 {

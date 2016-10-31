@@ -15,9 +15,6 @@ using SabreTools.Helper.Tools;
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
-#endif
-using NaturalSort;
-using SharpCompress.Common;
 
 using FileAccess = System.IO.FileAccess;
 using FileMode = System.IO.FileMode;
@@ -28,6 +25,9 @@ using PathTooLongException = System.IO.PathTooLongException;
 using SearchOption = System.IO.SearchOption;
 using StreamReader = System.IO.StreamReader;
 using StreamWriter = System.IO.StreamWriter;
+#endif
+using NaturalSort;
+using SharpCompress.Common;
 
 namespace SabreTools.Helper.Dats
 {
