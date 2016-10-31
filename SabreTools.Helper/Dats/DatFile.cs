@@ -5246,8 +5246,8 @@ namespace SabreTools.Helper.Dats
 			keys.Sort((a, b) =>
 			{
 				NaturalComparer nc = new NaturalComparer();
-				int adeep = a.Count(c => c == Path.AltDirectorySeparatorChar || c == Path.DirectorySeparatorChar);
-				int bdeep = b.Count(c => c == Path.AltDirectorySeparatorChar || c == Path.DirectorySeparatorChar);
+				int adeep = a.Count(c => c == '/' || c == '\\');
+				int bdeep = b.Count(c => c == '/' || c == '\\');
 
 				if (adeep == bdeep)
 				{
@@ -5271,12 +5271,12 @@ namespace SabreTools.Helper.Dats
 					tempDat.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name)
 						? FileName
 						: (shortname
-							? Path.GetFileName(tempDat.Name)
-							: tempDat.Name.Replace(Path.DirectorySeparatorChar.ToString(), " - ").Replace(Path.AltDirectorySeparatorChar.ToString(), " - ")
+							? Style.GetFileName(tempDat.Name)
+							: tempDat.Name.Replace("/", " - ").Replace("\\", " - ")
 							)
 						);
-					tempDat.Description += " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
-					tempDat.Name = Name + " (" + tempDat.Name.Replace(Path.DirectorySeparatorChar, '-').Replace(Path.AltDirectorySeparatorChar, '-') + ")";
+					tempDat.Description += " (" + tempDat.Name.Replace("/", " - ").Replace("\\", " - ") + ")";
+					tempDat.Name = Name + " (" + tempDat.Name.Replace("/", " - ").Replace("\\", " - ") + ")";
 					tempDat.Type = null;
 
 					// Write out the temporary DAT to the proper directory
@@ -5289,8 +5289,8 @@ namespace SabreTools.Helper.Dats
 
 				// Clean the input list and set all games to be pathless
 				List<DatItem> items = Files[key];
-				items.ForEach(item => item.Machine.Name = Path.GetFileName(item.Machine.Name));
-				items.ForEach(item => item.Machine.Description = Path.GetFileName(item.Machine.Description));
+				items.ForEach(item => item.Machine.Name = Style.GetFileName(item.Machine.Name));
+				items.ForEach(item => item.Machine.Description = Style.GetFileName(item.Machine.Description));
 
 				// Now add the game to the output DAT
 				if (tempDat.Files.ContainsKey(key))
