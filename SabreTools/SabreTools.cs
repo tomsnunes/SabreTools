@@ -36,7 +36,6 @@ namespace SabreTools
 				Console.Clear();
 			}
 			Build.Start("SabreTools");
-			DatabaseTools.EnsureDatabase(Constants.HeadererDbSchema, Constants.HeadererFileName, Constants.HeadererConnectionString);
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))

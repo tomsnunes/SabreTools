@@ -232,34 +232,6 @@ namespace SabreTools.Helper.Tools
 		#region File Manipulation
 
 		/// <summary>
-		/// Get the XmlTextReader associated with a file, if possible
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="logger">Logger object for console and file output</param>
-		/// <returns>The XmlTextReader representing the (possibly converted) file, null otherwise</returns>
-		public static XmlReader GetXmlTextReader(string filename, Logger logger)
-		{
-			logger.Verbose("Attempting to read file: \"" + filename + "\"");
-
-			// Check if file exists
-			if (!File.Exists(filename))
-			{
-				logger.Warning("File '" + filename + "' could not read from!");
-				return null;
-			}
-
-			XmlReader xtr = XmlReader.Create(filename, new XmlReaderSettings {
-				CheckCharacters = false,
-				DtdProcessing = DtdProcessing.Ignore,
-				IgnoreComments = true,
-				IgnoreWhitespace = true,
-				ValidationFlags = XmlSchemaValidationFlags.None,
-				ValidationType = ValidationType.None,
-			});
-			return xtr;
-		}
-
-		/// <summary>
 		/// Add an aribtrary number of bytes to the inputted file
 		/// </summary>
 		/// <param name="input">File to be appended to</param>
@@ -305,6 +277,30 @@ namespace SabreTools.Helper.Tools
 
 			fsr.Dispose();
 			fsw.Dispose();
+		}
+
+		/// <summary>
+		/// Cleans out the temporary directory
+		/// </summary>
+		/// <param name="dirname">Name of the directory to clean out</param>
+		public static void CleanDirectory(string dirname)
+		{
+			foreach (string file in Directory.EnumerateFiles(dirname, "*", SearchOption.TopDirectoryOnly))
+			{
+				try
+				{
+					File.Delete(file);
+				}
+				catch { }
+			}
+			foreach (string dir in Directory.EnumerateDirectories(dirname, "*", SearchOption.TopDirectoryOnly))
+			{
+				try
+				{
+					Directory.Delete(dir, true);
+				}
+				catch { }
+			}
 		}
 
 		/// <summary>
@@ -365,6 +361,133 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
+		/// Retrieve a list of just files from inputs
+		/// </summary>
+		/// <param name="inputs">List of strings representing directories and files</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="appendparent">True if the parent name should be appended after the special character "¬", false otherwise</param>
+		/// <returns>List of strings representing just files from the inputs</returns>
+		public static List<string> GetOnlyFilesFromInputs(List<string> inputs, int maxDegreeOfParallelism, Logger logger, bool appendparent = false)
+		{
+			List<string> outputs = new List<string>();
+			Parallel.ForEach(inputs,
+				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism, },
+				input =>
+				{
+					if (Directory.Exists(input))
+					{
+						List<string> files = FileTools.RetrieveFiles(input, new List<string>());
+						foreach (string file in files)
+						{
+							try
+							{
+								lock (outputs)
+								{
+									outputs.Add(Path.GetFullPath(file) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
+								}
+							}
+							catch (PathTooLongException)
+							{
+								logger.Warning("The path for " + file + " was too long");
+							}
+							catch (Exception ex)
+							{
+								logger.Error(ex.ToString());
+							}
+						}
+					}
+					else if (File.Exists(input))
+					{
+						try
+						{
+							lock (outputs)
+							{
+								outputs.Add(Path.GetFullPath(input) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
+							}
+						}
+						catch (PathTooLongException)
+						{
+							logger.Warning("The path for " + input + " was too long");
+						}
+						catch (Exception ex)
+						{
+							logger.Error(ex.ToString());
+						}
+					}
+				});
+
+			return outputs;
+		}
+
+		/// <summary>
+		/// Get the romba path for a file based on the rom's SHA-1
+		/// </summary>
+		/// <param name="rom">Rom to get the sha1 from</param>
+		/// <param name="baseOutDir">Base output folder</param>
+		/// <returns>Formatted path string to use</returns>
+		public static string GetRombaPath(Rom rom, string baseOutDir)
+		{
+			string subfolder = Path.Combine(rom.SHA1.Substring(0, 2), rom.SHA1.Substring(2, 2), rom.SHA1.Substring(4, 2), rom.SHA1.Substring(6, 2));
+			return Path.Combine(baseOutDir, subfolder);
+		}
+
+		/// <summary>
+		/// Get the XmlTextReader associated with a file, if possible
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="logger">Logger object for console and file output</param>
+		/// <returns>The XmlTextReader representing the (possibly converted) file, null otherwise</returns>
+		public static XmlReader GetXmlTextReader(string filename, Logger logger)
+		{
+			logger.Verbose("Attempting to read file: \"" + filename + "\"");
+
+			// Check if file exists
+			if (!File.Exists(filename))
+			{
+				logger.Warning("File '" + filename + "' could not read from!");
+				return null;
+			}
+
+			XmlReader xtr = XmlReader.Create(filename, new XmlReaderSettings
+			{
+				CheckCharacters = false,
+				DtdProcessing = DtdProcessing.Ignore,
+				IgnoreComments = true,
+				IgnoreWhitespace = true,
+				ValidationFlags = XmlSchemaValidationFlags.None,
+				ValidationType = ValidationType.None,
+			});
+			return xtr;
+		}
+
+		/// <summary>
+		/// Move a file to a named, Romba-style subdirectory
+		/// </summary>
+		/// <param name="rom">Rom to get the sha1 from</param>
+		/// <param name="baseOutDir">Base output folder</param>
+		/// <param name="filename">Name of the file to be moved</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		public static void MoveToRombaFolder(Rom rom, string baseOutDir, string filename, Logger logger)
+		{
+			string outDir = GetRombaPath(rom, baseOutDir);
+			if (!Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir);
+			}
+
+			try
+			{
+				File.Move(filename, Path.Combine(outDir, Path.GetFileName(filename)));
+			}
+			catch (Exception ex)
+			{
+				logger.Warning(ex.ToString());
+				File.Delete(filename);
+			}
+		}
+
+		/// <summary>
 		/// Detect and replace header(s) to the given file
 		/// </summary>
 		/// <param name="file">Name of the file to be parsed</param>
@@ -379,133 +502,29 @@ namespace SabreTools.Helper.Tools
 				Directory.CreateDirectory(outDir);
 			}
 
-			bool success = true;
-
 			// First, get the SHA-1 hash of the file
 			Rom rom = GetFileInfo(file, logger);
 
-			// Then try to pull the corresponding headers from the database
-			string header = "";
+			// Retrieve a list of all related headers from the database
+			List<string> headers = DatabaseTools.RetrieveHeadersFromDatabase(rom.SHA1, logger);
 
-			// Open the database connection
-			SqliteConnection dbc = new SqliteConnection(Constants.HeadererConnectionString);
-			dbc.Open();
-
-			string query = @"SELECT header, type FROM data WHERE sha1='" + rom.SHA1 + "'";
-			SqliteCommand slc = new SqliteCommand(query, dbc);
-			SqliteDataReader sldr = slc.ExecuteReader();
-
-			if (sldr.HasRows)
+			// If we have nothing retrieved, we return false
+			if (headers.Count == 0)
 			{
-				int sub = 0;
-				while (sldr.Read())
-				{
-					logger.Verbose("Found match with rom type " + sldr.GetString(1));
-					header = sldr.GetString(0);
-
-					logger.User("Creating reheadered file: " +
-						(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + sub);
-					AppendBytesToFile(file,
-						(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + sub, header, string.Empty);
-					logger.User("Reheadered file created!");
-				}
-			}
-			else
-			{
-				logger.Warning("No matching header could be found!");
-				success = false;
+				return false;
 			}
 
-			// Dispose of database objects
-			slc.Dispose();
-			sldr.Dispose();
-			dbc.Dispose();
-
-			return success;
-		}
-
-		/// <summary>
-		/// Cleans out the temporary directory
-		/// </summary>
-		/// <param name="dirname">Name of the directory to clean out</param>
-		public static void CleanDirectory(string dirname)
-		{
-			foreach (string file in Directory.EnumerateFiles(dirname, "*", SearchOption.TopDirectoryOnly))
+			// Now loop through and create the reheadered files, if possible
+			for (int i = 0; i < headers.Count; i++)
 			{
-				try
-				{
-					File.Delete(file);
-				}
-				catch { }
+				logger.User("Creating reheadered file: " +
+						(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i);
+				AppendBytesToFile(file,
+					(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i, headers[i], string.Empty);
+				logger.User("Reheadered file created!");
 			}
-			foreach (string dir in Directory.EnumerateDirectories(dirname, "*", SearchOption.TopDirectoryOnly))
-			{
-				try
-				{
-					Directory.Delete(dir, true);
-				}
-				catch { }
-			}
-		}
 
-		/// <summary>
-		/// Retrieve a list of just files from inputs
-		/// </summary>
-		/// <param name="inputs">List of strings representing directories and files</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="appendparent">True if the parent name should be appended after the special character "¬", false otherwise</param>
-		/// <returns>List of strings representing just files from the inputs</returns>
-		public static List<string> GetOnlyFilesFromInputs(List<string> inputs, int maxDegreeOfParallelism, Logger logger, bool appendparent = false)
-		{
-			List<string> outputs = new List<string>();
-			Parallel.ForEach(inputs,
-				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism, },
-				input =>
-			{
-				if (Directory.Exists(input))
-				{
-					List<string> files = FileTools.RetrieveFiles(input, new List<string>());
-					foreach (string file in files)
-					{
-						try
-						{
-							lock (outputs)
-							{
-								outputs.Add(Path.GetFullPath(file) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
-							}
-						}
-						catch (PathTooLongException)
-						{
-							logger.Warning("The path for " + file + " was too long");
-						}
-						catch (Exception ex)
-						{
-							logger.Error(ex.ToString());
-						}
-					}
-				}
-				else if (File.Exists(input))
-				{
-					try
-					{
-						lock (outputs)
-						{
-							outputs.Add(Path.GetFullPath(input) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
-						}
-					}
-					catch (PathTooLongException)
-					{
-						logger.Warning("The path for " + input + " was too long");
-					}
-					catch (Exception ex)
-					{
-						logger.Error(ex.ToString());
-					}
-				}
-			});
-
-			return outputs;
+			return true;
 		}
 
 		#endregion

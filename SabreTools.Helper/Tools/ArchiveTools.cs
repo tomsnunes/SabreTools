@@ -44,11 +44,11 @@ namespace SabreTools.Helper.Tools
 		/// Attempt to extract a file as an archive
 		/// </summary>
 		/// <param name="input">Name of the file to be extracted</param>
-		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="outDir">Output directory for archive extraction</param>
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public static bool ExtractArchive(string input, string tempDir, ArchiveScanLevel archiveScanLevel, Logger logger)
+		public static bool ExtractArchive(string input, string outDir, ArchiveScanLevel archiveScanLevel, Logger logger)
 		{
 			bool encounteredErrors = true;
 
@@ -69,13 +69,13 @@ namespace SabreTools.Helper.Tools
 					logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
-					Directory.CreateDirectory(tempDir);
+					Directory.CreateDirectory(outDir);
 
 					// Extract all files to the temp directory
 					SevenZipArchive sza = SevenZipArchive.Open(File.OpenRead(input));
 					foreach (SevenZipArchiveEntry entry in sza.Entries)
 					{
-						entry.WriteToDirectory(tempDir, new ExtractionOptions{ PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
+						entry.WriteToDirectory(outDir, new ExtractionOptions{ PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
 					}
 					encounteredErrors = false;
 					sza.Dispose();
@@ -87,10 +87,10 @@ namespace SabreTools.Helper.Tools
 					logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
-					Directory.CreateDirectory(tempDir);
+					Directory.CreateDirectory(outDir);
 
 					// Decompress the input stream
-					FileStream outstream = File.Create(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(input)));
+					FileStream outstream = File.Create(Path.Combine(outDir, Path.GetFileNameWithoutExtension(input)));
 					GZipStream gzstream = new GZipStream(File.OpenRead(input), CompressionMode.Decompress);
 					gzstream.CopyTo(outstream);
 
@@ -107,13 +107,13 @@ namespace SabreTools.Helper.Tools
 					logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
-					Directory.CreateDirectory(tempDir);
+					Directory.CreateDirectory(outDir);
 
 					// Extract all files to the temp directory
 					RarArchive ra = RarArchive.Open(input);
 					foreach (RarArchiveEntry entry in ra.Entries)
 					{
-						entry.WriteToDirectory(tempDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
+						entry.WriteToDirectory(outDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
 					}
 					encounteredErrors = false;
 					ra.Dispose();
@@ -125,13 +125,13 @@ namespace SabreTools.Helper.Tools
 					logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
-					Directory.CreateDirectory(tempDir);
+					Directory.CreateDirectory(outDir);
 
 					// Extract all files to the temp directory
 					TarArchive ta = TarArchive.Open(input);
 					foreach (TarArchiveEntry entry in ta.Entries)
 					{
-						entry.WriteToDirectory(tempDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
+						entry.WriteToDirectory(outDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
 					}
 					encounteredErrors = false;
 					ta.Dispose();
@@ -143,7 +143,7 @@ namespace SabreTools.Helper.Tools
 					logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
-					Directory.CreateDirectory(tempDir);
+					Directory.CreateDirectory(outDir);
 
 					// Extract all files to the temp directory
 					ZipFile zf = new ZipFile();
@@ -166,7 +166,7 @@ namespace SabreTools.Helper.Tools
 						// Create the rest of the path, if needed
 						if (!String.IsNullOrEmpty(Path.GetDirectoryName(zf.Entries[i].FileName)))
 						{
-							Directory.CreateDirectory(Path.Combine(tempDir, Path.GetDirectoryName(zf.Entries[i].FileName)));
+							Directory.CreateDirectory(Path.Combine(outDir, Path.GetDirectoryName(zf.Entries[i].FileName)));
 						}
 
 						// If the entry ends with a directory separator, continue to the next item, if any
@@ -177,7 +177,7 @@ namespace SabreTools.Helper.Tools
 							continue;
 						}
 
-						FileStream writeStream = File.OpenWrite(Path.Combine(tempDir, zf.Entries[i].FileName));
+						FileStream writeStream = File.OpenWrite(Path.Combine(outDir, zf.Entries[i].FileName));
 
 						byte[] ibuffer = new byte[_bufferSize];
 						int ilen;
@@ -971,7 +971,7 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
-		/// Write a set of input files to a torrent7z archive (assuming the same output archive name)
+		/// (UNIMPLEMENTED) Write a set of input files to a torrent7z archive (assuming the same output archive name)
 		/// </summary>
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -1060,7 +1060,7 @@ namespace SabreTools.Helper.Tools
 			// If we're in romba mode, create the subfolder and move the file
 			if (romba)
 			{
-				MoveToRombaFolder(rom, outDir, outfile, logger);
+				FileTools.MoveToRombaFolder(rom, outDir, outfile, logger);
 			}
 
 			return true;
@@ -1087,7 +1087,7 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
-		/// Write a set of input files to a torrentlrzip archive (assuming the same output archive name)
+		/// (UNIMPLEMENTED) Write a set of input files to a torrentlrzip archive (assuming the same output archive name)
 		/// </summary>
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -1121,7 +1121,7 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
-		/// Write a set of input files to a torrentrar archive (assuming the same output archive name)
+		/// (UNIMPLEMENTED) Write a set of input files to a torrentrar archive (assuming the same output archive name)
 		/// </summary>
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -1155,7 +1155,7 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
-		/// Write a set of input files to a torrentxz archive (assuming the same output archive name)
+		/// (UNIMPLEMENTED) Write a set of input files to a torrentxz archive (assuming the same output archive name)
 		/// </summary>
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -1416,44 +1416,6 @@ namespace SabreTools.Helper.Tools
 			File.Move(tempFile, archiveFileName);
 
 			return true;
-		}
-
-		/// <summary>
-		/// Get the romba path for a file based on the rom's SHA-1
-		/// </summary>
-		/// <param name="rom">Rom to get the sha1 from</param>
-		/// <param name="baseOutDir">Base output folder</param>
-		/// <returns>Formatted path string to use</returns>
-		public static string GetRombaPath(Rom rom, string baseOutDir)
-		{
-			string subfolder = Path.Combine(rom.SHA1.Substring(0, 2), rom.SHA1.Substring(2, 2), rom.SHA1.Substring(4, 2), rom.SHA1.Substring(6, 2));
-			return Path.Combine(baseOutDir, subfolder);
-		}
-
-		/// <summary>
-		/// Move a file to a named, Romba-style subdirectory
-		/// </summary>
-		/// <param name="rom">Rom to get the sha1 from</param>
-		/// <param name="baseOutDir">Base output folder</param>
-		/// <param name="filename">Name of the file to be moved</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		public static void MoveToRombaFolder(Rom rom, string baseOutDir, string filename, Logger logger)
-		{
-			string outDir = GetRombaPath(rom, baseOutDir);
-			if (!Directory.Exists(outDir))
-			{
-				Directory.CreateDirectory(outDir);
-			}
-
-			try
-			{
-				File.Move(filename, Path.Combine(outDir, Path.GetFileName(filename)));
-			}
-			catch (Exception ex)
-			{
-				logger.Warning(ex.ToString());
-				File.Delete(filename);
-			}
 		}
 
 		#endregion
