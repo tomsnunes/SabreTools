@@ -5248,18 +5248,7 @@ namespace SabreTools.Helper.Dats
 
 			// Sort the input keys
 			List<string> keys = Files.Keys.ToList();
-			keys.Sort((a, b) =>
-			{
-				NaturalComparer nc = new NaturalComparer();
-				int adeep = a.Count(c => c == '/' || c == '\\');
-				int bdeep = b.Count(c => c == '/' || c == '\\');
-
-				if (adeep == bdeep)
-				{
-					return nc.Compare(a, b);
-				}
-				return adeep - bdeep;
-			});
+			keys.Sort(SplitByLevelSort);
 
 			// Then, we loop over the games
 			foreach (string key in keys)
@@ -5267,25 +5256,8 @@ namespace SabreTools.Helper.Dats
 				// Here, the key is the name of the game to be used for comparison
 				if (tempDat.Name != null && tempDat.Name != Style.GetDirectoryName(key))
 				{
-					// Get the path that the file will be written out to
-					string path = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name)
-						? outDir
-						: Path.Combine(outDir, tempDat.Name));
-
-					// Now set the new output values
-					tempDat.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name)
-						? FileName
-						: (shortname
-							? Style.GetFileName(tempDat.Name)
-							: tempDat.Name.Replace("/", " - ").Replace("\\", " - ")
-							)
-						);
-					tempDat.Description += " (" + tempDat.Name.Replace("/", " - ").Replace("\\", " - ") + ")";
-					tempDat.Name = Name + " (" + tempDat.Name.Replace("/", " - ").Replace("\\", " - ") + ")";
-					tempDat.Type = null;
-
-					// Write out the temporary DAT to the proper directory
-					tempDat.WriteToFile(path, logger);
+					// Process and output the DAT
+					SplitByLevelHelper(tempDat, outDir, shortname, logger);
 
 					// Reset the DAT for the next items
 					tempDat = (DatFile)CloneHeader();
@@ -5312,22 +5284,58 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Then we write the last DAT out since it would be skipped otherwise
-			string lastpath = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name)
-				? outDir
-				: Path.Combine(outDir, tempDat.Name));
-
-			// Now set the new output values
-			tempDat.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(tempDat.Name)
-				? FileName
-				: tempDat.Name.Replace("/", " - ").Replace("\\", " - "));
-			tempDat.Description += " (" + tempDat.Name.Replace("/", " - ").Replace("\\", " - ") + ")";
-			tempDat.Name = Name + " (" + tempDat.Name.Replace("/", " - ").Replace("\\", " - ") + ")";
-			tempDat.Type = null;
-
-			// Write out the temporary DAT to the proper directory
-			tempDat.WriteToFile(lastpath, logger);
+			SplitByLevelHelper(tempDat, outDir, shortname, logger);
 
 			return true;
+		}
+
+		/// <summary>
+		/// Helper function for SplitByLevel to sort the input game names
+		/// </summary>
+		/// <param name="a">First string to compare</param>
+		/// <param name="b">Second string to compare</param>
+		/// <returns>-1 for a coming before b, 0 for a == b, 1 for a coming after b</returns>
+		private int SplitByLevelSort(string a, string b)
+		{
+			NaturalComparer nc = new NaturalComparer();
+			int adeep = a.Count(c => c == '/' || c == '\\');
+			int bdeep = b.Count(c => c == '/' || c == '\\');
+
+			if (adeep == bdeep)
+			{
+				return nc.Compare(a, b);
+			}
+			return adeep - bdeep;
+		}
+
+		/// <summary>
+		/// Helper function for SplitByLevel to clean and write out a DAT
+		/// </summary>
+		/// <param name="datFile">DAT to clean and write out</param>
+		/// <param name="outDir">Directory to write out to</param>
+		/// <param name="shortname">True if short naming scheme should be used, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		private void SplitByLevelHelper(DatFile datFile, string outDir, bool shortname, Logger logger)
+		{
+			// Get the path that the file will be written out to
+			string path = HttpUtility.HtmlDecode(String.IsNullOrEmpty(datFile.Name)
+				? outDir
+				: Path.Combine(outDir, datFile.Name));
+
+			// Now set the new output values
+			datFile.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(datFile.Name)
+				? FileName
+				: (shortname
+					? Style.GetFileName(datFile.Name)
+					: datFile.Name.Replace("/", " - ").Replace("\\", " - ")
+					)
+				);
+			datFile.Description += " (" + datFile.Name.Replace("/", " - ").Replace("\\", " - ") + ")";
+			datFile.Name = Name + " (" + datFile.Name.Replace("/", " - ").Replace("\\", " - ") + ")";
+			datFile.Type = null;
+
+			// Write out the temporary DAT to the proper directory
+			datFile.WriteToFile(path, logger);
 		}
 
 		/// <summary>
