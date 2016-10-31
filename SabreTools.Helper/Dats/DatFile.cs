@@ -4166,6 +4166,11 @@ namespace SabreTools.Helper.Dats
 				{
 					romname = romname.Substring(0, romname.Length - 1);
 				}
+				if (!String.IsNullOrEmpty(gamename) && String.IsNullOrEmpty(romname))
+				{
+					romname = gamename;
+					gamename = "Default";
+				}
 
 				// Update rom information
 				datItem.Name = romname;
