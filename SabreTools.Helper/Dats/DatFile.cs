@@ -4494,7 +4494,7 @@ namespace SabreTools.Helper.Dats
 						{
 							string infile = pathsToFiles[i];
 							Rom outrom = romsInGame[i];
-							string outfile = Path.Combine(outDir, outrom.Machine.Name, outrom.Name);
+							string outfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(outrom.Machine.Name), outrom.Name);
 
 							// Make sure the output folder is created
 							Directory.CreateDirectory(Path.GetDirectoryName(outfile));
@@ -4517,6 +4517,7 @@ namespace SabreTools.Helper.Dats
 						{
 							string infile = pathsToFiles[i];
 							Rom outrom = romsInGame[i];
+							outrom.Machine.Name = Style.RemovePathUnsafeCharacters(outrom.Machine.Name);
 							ArchiveTools.WriteTorrentGZ(infile, outDir, romba, logger);
 						}
 						break;
