@@ -570,20 +570,33 @@ namespace SabreTools.Helper.Tools
 		/// <returns>Populated RomData object if success, empty one on error</returns>
 		public static Rom GetTorrentGZFileInfo(string input, Logger logger)
 		{
+			// Check for the file existing first
+			if (!File.Exists(input))
+			{
+				return null;
+			}
+
 			string datum = Path.GetFileName(input).ToLowerInvariant();
 			long filesize = new FileInfo(input).Length;
+
+			// If we have the romba depot files, just skip them gracefully
+			if (datum == ".romba_size" || datum == ".romba_size.backup")
+			{
+				logger.Verbose("Romba depot file found, skipping: " + input);
+				return null;
+			}
 
 			// Check if the name is the right length
 			if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}\.gz"))
 			{
-				logger.Warning("Non SHA-1 filename found, skipping: '" + datum + "'");
+				logger.Warning("Non SHA-1 filename found, skipping: '" + Path.GetFullPath(input) + "'");
 				return null;
 			}
 
 			// Check if the file is at least the minimum length
 			if (filesize < 40 /* bytes */)
 			{
-				logger.Warning("Possibly corrupt file '" + input + "' with size " + Style.GetBytesReadable(filesize));
+				logger.Warning("Possibly corrupt file '" + Path.GetFullPath(input) + "' with size " + Style.GetBytesReadable(filesize));
 				return null;
 			}
 

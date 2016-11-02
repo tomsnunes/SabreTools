@@ -3598,20 +3598,52 @@ namespace SabreTools.Helper.Dats
 				Description = Name + (bare ? "" : " (" + Date + ")");
 			}
 
+			// Make sure the dictionary is defined
+			if (Files == null || Files.Keys.Count == 0)
+			{
+				Files = new SortedDictionary<string, List<DatItem>>();
+			}
+
 			// Process the input
 			if (Directory.Exists(basePath))
 			{
 				logger.Verbose("Folder found: " + basePath);
 
-				// Process the files in all subfolders
-				List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.AllDirectories).ToList();
+				// Process the files in the main folder
+				List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
 				Parallel.ForEach(files,
 					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 					item =>
+				{
+					PopulateFromDirCheckFile(item, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+						tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+				});
+
+				// Find all top-level subfolders
+				files = Directory.EnumerateDirectories(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
+				Parallel.ForEach(files,
+					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+					item =>
+				{
+					List<string> subfiles = Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories).ToList();
+					Parallel.ForEach(subfiles,
+						new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+						subitem =>
 					{
-						PopulateFromDirCheckFile(item, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+						PopulateFromDirCheckFile(subitem, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
 							tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 					});
+				});
+
+				// Process the files in all subfolders
+				files = Directory.EnumerateFiles(basePath, "*", SearchOption.AllDirectories).ToList();
+				Parallel.ForEach(files,
+					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+					item =>
+				{
+					PopulateFromDirCheckFile(item, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+						tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+				});
 
 				// Now find all folders that are empty, if we are supposed to
 				if (!Romba && addBlanks)
@@ -3721,7 +3753,7 @@ namespace SabreTools.Helper.Dats
 				Rom rom = ArchiveTools.GetTorrentGZFileInfo(item, logger);
 
 				// If the rom is valid, write it out
-				if (rom.Name != null)
+				if (rom != null && rom.Name != null)
 				{
 					// Add the list if it doesn't exist already
 					string key = rom.Size + "-" + rom.CRC;
@@ -3736,7 +3768,6 @@ namespace SabreTools.Helper.Dats
 						Files[key].Add(rom);
 						logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 					}
-
 				}
 				else
 				{
