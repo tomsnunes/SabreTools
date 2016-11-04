@@ -825,9 +825,6 @@ namespace SabreTools.Helper.Dats
 				// Make sure there are no folders in inputs
 				List<string> newInputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, maxDegreeOfParallelism, logger, appendparent: true);
 
-				// Sort the list first
-				newInputFileNames = Style.OrderByAlphaNumeric(newInputFileNames, s => s).ToList();
-
 				// If we're in inverse cascade, reverse the list
 				if ((diff & DiffMode.ReverseCascade) != 0)
 				{

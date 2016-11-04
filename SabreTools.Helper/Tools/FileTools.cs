@@ -371,51 +371,52 @@ namespace SabreTools.Helper.Tools
 		public static List<string> GetOnlyFilesFromInputs(List<string> inputs, int maxDegreeOfParallelism, Logger logger, bool appendparent = false)
 		{
 			List<string> outputs = new List<string>();
-			Parallel.ForEach(inputs,
-				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism, },
-				input =>
+			foreach (string input in inputs)
+			{
+				if (Directory.Exists(input))
 				{
-					if (Directory.Exists(input))
-					{
-						List<string> files = FileTools.RetrieveFiles(input, new List<string>());
-						foreach (string file in files)
-						{
-							try
-							{
-								lock (outputs)
-								{
-									outputs.Add(Path.GetFullPath(file) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
-								}
-							}
-							catch (PathTooLongException)
-							{
-								logger.Warning("The path for " + file + " was too long");
-							}
-							catch (Exception ex)
-							{
-								logger.Error(ex.ToString());
-							}
-						}
-					}
-					else if (File.Exists(input))
+					List<string> files = FileTools.RetrieveFiles(input, new List<string>());
+
+					// Make sure the files in the directory are ordered correctly
+					files = Style.OrderByAlphaNumeric(files, s => s).ToList();
+					foreach (string file in files)
 					{
 						try
 						{
 							lock (outputs)
 							{
-								outputs.Add(Path.GetFullPath(input) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
+								outputs.Add(Path.GetFullPath(file) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
 							}
 						}
 						catch (PathTooLongException)
 						{
-							logger.Warning("The path for " + input + " was too long");
+							logger.Warning("The path for " + file + " was too long");
 						}
 						catch (Exception ex)
 						{
 							logger.Error(ex.ToString());
 						}
 					}
-				});
+				}
+				else if (File.Exists(input))
+				{
+					try
+					{
+						lock (outputs)
+						{
+							outputs.Add(Path.GetFullPath(input) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
+						}
+					}
+					catch (PathTooLongException)
+					{
+						logger.Warning("The path for " + input + " was too long");
+					}
+					catch (Exception ex)
+					{
+						logger.Error(ex.ToString());
+					}
+				}
+			}
 
 			return outputs;
 		}
