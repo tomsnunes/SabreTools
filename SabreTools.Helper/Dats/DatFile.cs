@@ -5623,6 +5623,10 @@ namespace SabreTools.Helper.Dats
 
 			try
 			{
+				// Get a properly sorted set of keys
+				List<string> keys = Files.Keys.ToList();
+				keys.Sort(new NaturalComparer());
+				
 				foreach (DatFormat datFormat in outfiles.Keys)
 				{
 					string outfile = outfiles[datFormat];
@@ -5638,10 +5642,6 @@ namespace SabreTools.Helper.Dats
 					int depth = 2, last = -1;
 					string lastgame = null;
 					List<string> splitpath = new List<string>();
-
-					// Get a properly sorted set of keys
-					List<string> keys = Files.Keys.ToList();
-					keys.Sort(new NaturalComparer());
 
 					foreach (string key in keys)
 					{
