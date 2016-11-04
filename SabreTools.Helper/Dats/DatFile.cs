@@ -876,6 +876,7 @@ namespace SabreTools.Helper.Dats
 			DateTime start = DateTime.Now;
 			logger.User("Processing individual DATs");
 
+			/// BEGIN
 			Parallel.For(0,
 				inputs.Count,
 				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
@@ -914,6 +915,7 @@ namespace SabreTools.Helper.Dats
 				}
 				datHeaders[i].Files = null;
 			}
+			/// END
 
 			logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -1692,12 +1694,14 @@ namespace SabreTools.Helper.Dats
 							// Regular attributes
 							case "name":
 								i++;
+								quoteless = gc[i].Replace("\"", "");
 								item.Name = quoteless;
 								break;
 							case "size":
 								if (item.Type == ItemType.Rom)
 								{
 									i++;
+									quoteless = gc[i].Replace("\"", "");
 									long size = -1;
 									if (Int64.TryParse(quoteless, out size))
 									{
@@ -1710,6 +1714,7 @@ namespace SabreTools.Helper.Dats
 								if (item.Type == ItemType.Rom)
 								{
 									i++;
+									quoteless = gc[i].Replace("\"", "");
 									((Rom)item).CRC = quoteless.ToLowerInvariant();
 								}
 								break;
@@ -1717,11 +1722,13 @@ namespace SabreTools.Helper.Dats
 								if (item.Type == ItemType.Rom)
 								{
 									i++;
+									quoteless = gc[i].Replace("\"", "");
 									((Rom)item).MD5 = quoteless.ToLowerInvariant();
 								}
 								else if (item.Type == ItemType.Disk)
 								{
 									i++;
+									quoteless = gc[i].Replace("\"", "");
 									((Disk)item).MD5 = quoteless.ToLowerInvariant();
 								}
 								break;
@@ -1729,18 +1736,21 @@ namespace SabreTools.Helper.Dats
 								if (item.Type == ItemType.Rom)
 								{
 									i++;
+									quoteless = gc[i].Replace("\"", "");
 									((Rom)item).SHA1 = quoteless.ToLowerInvariant();
 								}
 								else if (item.Type == ItemType.Disk)
 								{
 									i++;
+									quoteless = gc[i].Replace("\"", "");
 									((Disk)item).SHA1 = quoteless.ToLowerInvariant();
 								}
 								break;
 							case "status":
 							case "flags":
 								i++;
-								if (gc[i].ToLowerInvariant() == "good")
+								quoteless = gc[i].Replace("\"", "");
+								if (quoteless.ToLowerInvariant() == "good")
 								{
 									if (item.Type == ItemType.Rom)
 									{
@@ -1751,7 +1761,7 @@ namespace SabreTools.Helper.Dats
 										((Disk)item).ItemStatus = ItemStatus.Good;
 									}
 								}
-								else if (gc[i].ToLowerInvariant() == "baddump")
+								else if (quoteless.ToLowerInvariant() == "baddump")
 								{
 									if (item.Type == ItemType.Rom)
 									{
@@ -1762,7 +1772,7 @@ namespace SabreTools.Helper.Dats
 										((Disk)item).ItemStatus = ItemStatus.BadDump;
 									}
 								}
-								else if (gc[i].ToLowerInvariant() == "nodump")
+								else if (quoteless.ToLowerInvariant() == "nodump")
 								{
 									if (item.Type == ItemType.Rom)
 									{
@@ -1773,7 +1783,7 @@ namespace SabreTools.Helper.Dats
 										((Disk)item).ItemStatus = ItemStatus.Nodump;
 									}
 								}
-								else if (gc[i].ToLowerInvariant() == "verified")
+								else if (quoteless.ToLowerInvariant() == "verified")
 								{
 									if (item.Type == ItemType.Rom)
 									{
@@ -1789,6 +1799,7 @@ namespace SabreTools.Helper.Dats
 								if (item.Type == ItemType.Rom)
 								{
 									i++;
+									quoteless = gc[i].Replace("\"", "");
 									((Rom)item).Date = quoteless + " " + gc[i + 1].Replace("\"", "");
 								}
 								i++;

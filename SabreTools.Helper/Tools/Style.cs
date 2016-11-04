@@ -405,6 +405,7 @@ namespace SabreTools.Helper.Tools
 		public static string[] SplitLineAsCMP(string s)
 		{
 			// Preprocess the string
+			s = s.Trim();
 			s = Regex.Replace(s, @"^\S* \(", ""); // Remove item identifier and opening brace
 			s = Regex.Replace(s, @"#.*$", ""); // Remove trailing comments
 			s = s.TrimEnd(')'); // Remove closing brace
