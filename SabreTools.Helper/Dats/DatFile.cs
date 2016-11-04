@@ -1408,6 +1408,9 @@ namespace SabreTools.Helper.Dats
 			// Now parse the correct type of DAT
 			switch (FileTools.GetDatFormat(filename, logger))
 			{
+				case DatFormat.AttractMode:
+					ParseAttractMode(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean);
+					break;
 				case DatFormat.ClrMamePro:
 				case DatFormat.DOSCenter:
 					ParseCMP(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean);
