@@ -155,6 +155,7 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-u, --unzip		Force unzipping in created DAT");
 						helptext.Add("	-f, --files		Treat archives as files");
 						helptext.Add("	-oa, --output-all	Output in all formats");
+						helptext.Add("	-oam, --output-am	Output in AttractMode format");
 						helptext.Add("	-oc, --output-cmp	Output in CMP format");
 						helptext.Add("	-ocsv, --output-csv	Output in CSV format");
 						helptext.Add("	-od, --output-dc	Output in DOSCenter format");
@@ -248,6 +249,7 @@ namespace SabreTools.Helper.Data
 					// Update
 					helptext.Add("  -ud, --update		Update a DAT file");
 						helptext.Add("	-oa, --output-all	Output in all formats");
+						helptext.Add("	-oam, --output-am	Output in AttractMode format");
 						helptext.Add("	-oc, --output-cmp	Output in CMP format");
 						helptext.Add("	-ocsv, --output-csv	Output in CSV format");
 							helptext.Add("	  -pre=, --prefix=		Set prefix for all lines");

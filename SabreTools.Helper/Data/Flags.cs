@@ -138,6 +138,7 @@ namespace SabreTools.Helper.Data
 		OfflineList = 0x0400,
 		TSV = 0x0800,
 		CSV = 0x1000,
+		AttractMode = 0x2000,
 
 		ALL = 0xFFFF,
 	}

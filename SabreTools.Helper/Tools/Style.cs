@@ -102,6 +102,12 @@ namespace SabreTools.Helper.Tools
 
 			// Get the extensions from the output type
 
+			// AttractMode
+			if ((datdata.DatFormat & DatFormat.AttractMode) != 0)
+			{
+				outfileNames.Add(DatFormat.AttractMode, CreateOutfileNamesHelper(outDir, ".txt", datdata, overwrite));
+			}
+
 			// ClrMamePro
 			if ((datdata.DatFormat & DatFormat.ClrMamePro) != 0)
 			{
@@ -135,9 +141,15 @@ namespace SabreTools.Helper.Tools
 			};
 
 			// Missfile
-			if ((datdata.DatFormat & DatFormat.MissFile) != 0)
+			if ((datdata.DatFormat & DatFormat.MissFile) != 0
+				&& (datdata.DatFormat & DatFormat.AttractMode) == 0)
 			{
 				outfileNames.Add(DatFormat.MissFile, CreateOutfileNamesHelper(outDir, ".txt", datdata, overwrite));
+			};
+			if ((datdata.DatFormat & DatFormat.MissFile) != 0
+				&& (datdata.DatFormat & DatFormat.AttractMode) != 0)
+			{
+				outfileNames.Add(DatFormat.MissFile, CreateOutfileNamesHelper(outDir, ".miss.txt", datdata, overwrite));
 			};
 
 			// OfflineList

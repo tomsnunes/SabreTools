@@ -1196,7 +1196,7 @@ namespace SabreTools.Helper.Dats
 					string[] split = inputs[j].Split('¬');
 					path = outDir + (split[0] == split[1]
 						? Path.GetFileName(split[0])
-						: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length)));;
+						: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length))); ;
 				}
 
 				// If we have more than 0 roms, output
@@ -1433,6 +1433,98 @@ namespace SabreTools.Helper.Dats
 				default:
 					return;
 			}
+		}
+
+		/// <summary>
+		/// Parse an AttractMode DAT and return all found games within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="filter">Filter object for passing to the DatItem level</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		private void ParseAttractMode(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Rom filtering
+			Filter filter,
+
+			// Rom renaming
+			bool trim,
+			bool single,
+			string root,
+
+			// Miscellaneous
+			Logger logger,
+			bool keep,
+			bool clean)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+
+			sr.ReadLine(); // Skip the first line since it's the header
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				/*
+				The gameinfo order is as follows
+				0 - game name
+				1 - game description
+				2 - emulator name (filename)
+				3 - cloneof
+				4 - year
+				5 - manufacturer
+				6 - category
+				7 - players
+				8 - rotation
+				9 - control
+				10 - status
+				11 - displaycount
+				12 - displaytype
+				13 - alt romname
+				14 - alt title
+				15 - extra
+				16 - buttons
+				*/
+
+				string[] gameinfo = line.Split(';');
+
+				Rom rom = new Rom
+				{
+					Name = "-",
+					Size = Constants.SizeZero,
+					CRC = Constants.CRCZero,
+					MD5 = Constants.MD5Zero,
+					SHA1 = Constants.SHA1Zero,
+					ItemStatus = ItemStatus.None,
+
+					Machine = new Machine
+					{
+						Name = gameinfo[0],
+						Description = gameinfo[1],
+						CloneOf = gameinfo[3],
+						Year = gameinfo[4],
+						Manufacturer = gameinfo[5],
+						Comment = gameinfo[15],
+					}
+				};
+
+				// Now process and add the rom
+				string key = "";
+				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+			}
+
+			sr.Dispose();
 		}
 
 		/// <summary>
@@ -5757,6 +5849,9 @@ namespace SabreTools.Helper.Dats
 				string header = "";
 				switch (datFormat)
 				{
+					case DatFormat.AttractMode:
+						header = "#Name;Title;Emulator;CloneOf;Year;Manufacturer;Category;Players;Rotation;Control;Status;DisplayCount;DisplayType;AltRomname;AltTitle;Extra;Buttons\n";
+						break;
 					case DatFormat.ClrMamePro:
 						header = "clrmamepro (\n" +
 							"\tname \"" + Name + "\"\n" +
@@ -5964,6 +6059,25 @@ namespace SabreTools.Helper.Dats
 				string state = "";
 				switch (datFormat)
 				{
+					case DatFormat.AttractMode:
+						state += rom.Machine.Description + ";"
+							+ rom.Machine.Name + ";"
+							+ FileName + ";"
+							+ rom.Machine.CloneOf + ";"
+							+ rom.Machine.Year + ";"
+							+ rom.Machine.Manufacturer + ";"
+							/* + rom.Machine.Category */ + ";"
+							/* + rom.Machine.Players */ + ";"
+							/* + rom.Machine.Rotation */ + ";"
+							/* + rom.Machine.Control */ + ";"
+							/* + rom.Machine.Status */ + ";"
+							/* + rom.Machine.DisplayCount */ + ";"
+							/* + rom.Machine.DisplayType */ + ";"
+							/* + rom.Machine.AltRomname */ + ";"
+							/* + rom.Machine.AltTitle */ + ";"
+							+ rom.Machine.Comment + ";"
+							/* + rom.Machine.Buttons */ + "\n";
+						break;
 					case DatFormat.ClrMamePro:
 						state += "game (\n\tname \"" + rom.Machine.Name + "\"\n" +
 							(ExcludeOf ? "" :

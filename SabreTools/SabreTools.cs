@@ -302,6 +302,10 @@ namespace SabreTools
 					case "--output-all":
 						datFormat |= DatFormat.ALL;
 						break;
+					case "-oam":
+					case "--output-am":
+						datFormat |= DatFormat.AttractMode;
+						break;
 					case "-oc":
 					case "--output-cmp":
 						datFormat |= DatFormat.ClrMamePro;

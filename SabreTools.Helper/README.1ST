@@ -171,6 +171,9 @@ Options:
 			Add outputting the created DAT in all available formats. See specific formats for
 			additional flags that may be used.
 			
+		-oam, --output-am	Output in AttractMode format
+			Add outputting the created DAT to AttractMode format
+			
 		-oc, --output-cmp	Output in CMP format
 			Add outputting the created DAT to clrmamepro format
 			
@@ -348,7 +351,14 @@ Options:
 			
 		-s, --short		Use short names for outputted DATs
 			Instead of using ClrMamePro-style long names for DATs, use just the name of the
-			folder as the name of the DAT.
+			folder as the name of the DAT. This can be used inc onjunction with --base to
+			output in the format of "Original Name (Name)" instead.
+			
+		-ba, --base		Use source DAT as base name for outputs
+			If splitting an entire folder of DATs, some output files may be normally overwritten
+			since the names would be the same. With this flag, the original DAT name is used in
+			the output name, in the format of "Original Name (Dir - Name)". This can be used in
+			conjunction with --short to output in the format of "Original Name (Name)" instead.
 		
 	-ss, --sort			Sort input files by a set of DATs
 		This feature allows the user to quickly rebuild based on a supplied DAT file(s). By
@@ -515,6 +525,9 @@ Options:
 		-oa, --output-all	Output in all available formats
 			Add outputting the created DAT in all available formats. See specific formats for
 			additional flags that may be used.
+			
+		-oam, --output-am	Output in AttractMode format
+			Add outputting the created DAT to AttractMode format
 		
 		-oc, --output-cmp	Output in CMP format
 			Add outputting the created DAT to clrmamepro format

@@ -158,6 +158,10 @@ namespace SabreTools.Helper.Tools
 				{
 					return DatFormat.DOSCenter;
 				}
+				else if (first.Contains("#Name;Title;Emulator;CloneOf;Year;Manufacturer;Category;Players;Rotation;Control;Status;DisplayCount;DisplayType;AltRomname;AltTitle;Extra"))
+				{
+					return DatFormat.AttractMode;
+				}
 				else
 				{
 					return DatFormat.ClrMamePro;
