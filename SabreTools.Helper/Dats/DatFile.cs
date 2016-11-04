@@ -1799,8 +1799,8 @@ namespace SabreTools.Helper.Dats
 								if (item.Type == ItemType.Rom)
 								{
 									i++;
-									quoteless = gc[i].Replace("\"", "");
-									((Rom)item).Date = quoteless + " " + gc[i + 1].Replace("\"", "");
+									quoteless = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
+									((Rom)item).Date = quoteless;
 								}
 								i++;
 								break;
