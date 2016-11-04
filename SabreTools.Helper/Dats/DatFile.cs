@@ -1081,7 +1081,10 @@ namespace SabreTools.Helper.Dats
 				for (int j = 0; j < inputs.Count; j++)
 				{
 					// If we have an output directory set, replace the path
-					string path = outDir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
+					string[] split = inputs[j].Split('¬');
+					string path = outDir + (split[0] == split[1]
+						? Path.GetFileName(split[0])
+						: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length)));
 
 					// If we have more than 0 roms, output
 					if (outDats[j].Files.Count > 0)
@@ -1188,7 +1191,10 @@ namespace SabreTools.Helper.Dats
 				}
 				else if (!String.IsNullOrEmpty(outDir))
 				{
-					path = outDir + (Path.GetDirectoryName(inputs[j].Split('¬')[0]).Remove(0, inputs[j].Split('¬')[1].Length));
+					string[] split = inputs[j].Split('¬');
+					path = outDir + (split[0] == split[1]
+						? Path.GetFileName(split[0])
+						: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length)));;
 				}
 
 				// If we have more than 0 roms, output
