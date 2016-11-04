@@ -109,7 +109,15 @@
   <ItemGroup>
     <Compile Include="Data\Constants.cs" />
     <Compile Include="Data\Flags.cs" />
+    <Compile Include="Dats\Partials\DatFile.Bucketing.cs" />
+    <Compile Include="Dats\Partials\DatFile.ConvertUpdate.cs" />
+    <Compile Include="Dats\Partials\DatFile.DFD.cs" />
+    <Compile Include="Dats\Partials\DatFile.Parsers.cs" />
     <Compile Include="Dats\Filter.cs" />
+    <Compile Include="Dats\Partials\DatFile.Rebuild.cs" />
+    <Compile Include="Dats\Partials\DatFile.Splitters.cs" />
+    <Compile Include="Dats\Partials\DatFile.Statistics.cs" />
+    <Compile Include="Dats\Partials\DatFile.Writers.cs" />
     <Compile Include="External\NaturalSort\NaturalComparer.cs" />
     <Compile Include="External\NaturalSort\NaturalReversedComparer.cs" />
     <Compile Include="External\OptimizedCRC.cs" />
