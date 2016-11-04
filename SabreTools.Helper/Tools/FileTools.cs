@@ -383,10 +383,7 @@ namespace SabreTools.Helper.Tools
 					{
 						try
 						{
-							lock (outputs)
-							{
-								outputs.Add(Path.GetFullPath(file) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
-							}
+							outputs.Add(Path.GetFullPath(file) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
 						}
 						catch (PathTooLongException)
 						{
@@ -402,10 +399,7 @@ namespace SabreTools.Helper.Tools
 				{
 					try
 					{
-						lock (outputs)
-						{
-							outputs.Add(Path.GetFullPath(input) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
-						}
+						outputs.Add(Path.GetFullPath(input) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
 					}
 					catch (PathTooLongException)
 					{
