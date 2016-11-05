@@ -100,13 +100,13 @@ namespace SabreTools.Helper.Dats
 			// Log the results to screen
 			string results = @"For '" + FileName + @"':
 --------------------------------------------------
-	Uncompressed size:	   " + Style.GetBytesReadable(TotalSize) + @"
-	Games found:			 " + (game == -1 ? Files.Count : game) + @"
-	Roms found:			  " + RomCount + @"
-	Disks found:			 " + DiskCount + @"
-	Roms with CRC:		   " + CRCCount + @"
-	Roms with MD5:		   " + MD5Count + @"
-	Roms with SHA-1:		 " + SHA1Count + "\n";
+    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
+    Games found:             " + (game == -1 ? Files.Count : game) + @"
+    Roms found:              " + RomCount + @"
+    Disks found:             " + DiskCount + @"
+    Roms with CRC:           " + CRCCount + @"
+    Roms with MD5            " + MD5Count + @"
+    Roms with SHA-1:         " + SHA1Count + "\n";
 
 			if (baddumpCol)
 			{
@@ -171,13 +171,13 @@ namespace SabreTools.Helper.Dats
 				default:
 					line = @"'" + FileName + @"':
 --------------------------------------------------
-	Uncompressed size:	   " + Style.GetBytesReadable(TotalSize) + @"
-	Games found:			 " + (game == -1 ? Files.Count : game) + @"
-	Roms found:			  " + RomCount + @"
-	Disks found:			 " + DiskCount + @"
-	Roms with CRC:		   " + CRCCount + @"
-	Roms with MD5:		   " + MD5Count + @"
-	Roms with SHA-1:		 " + SHA1Count + "\n";
+    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
+    Games found:             " + (game == -1 ? Files.Count : game) + @"
+    Roms found:              " + RomCount + @"
+    Disks found:             " + DiskCount + @"
+    Roms with CRC:           " + CRCCount + @"
+    Roms with MD5:           " + MD5Count + @"
+    Roms with SHA-1:         " + SHA1Count + "\n";
 
 					if (baddumpCol)
 					{
