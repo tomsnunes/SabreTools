@@ -56,7 +56,8 @@ namespace SabreTools
 			// Feature flags
 			bool help = false,
 				datFromDir = false,
-				headerer = false,
+				extract = false,
+				restore = false,
 				sort = false, // SimpleSort
 				splitByExt = false,
 				splitByHash = false,
@@ -87,7 +88,6 @@ namespace SabreTools
 				quotes = false,
 				remext = false,
 				removeDateFromAutomaticName = false,
-				restore = false,
 				romba = false,
 				showBaddumpColumn = false,
 				showNodumpColumn = false,
@@ -168,9 +168,9 @@ namespace SabreTools
 					case "--ext-split":
 						splitByExt = true;
 						break;
-					case "-hd":
-					case "--headerer":
-						headerer = true;
+					case "-ex":
+					case "--extract":
+						extract = true;
 						break;
 					case "-hs":
 					case "--hash-split":
@@ -179,6 +179,10 @@ namespace SabreTools
 					case "-ls":
 					case "--lvl-split":
 						splitByLevel = true;
+						break;
+					case "-re":
+					case "--restore":
+						restore = true;
 						break;
 					case "-ss":
 					case "--sort":
@@ -373,10 +377,6 @@ namespace SabreTools
 					case "-rc":
 					case "--rev-cascade":
 						diffMode |= DiffMode.ReverseCascade;
-						break;
-					case "-re":
-					case "--restore":
-						restore = true;
 						break;
 					case "-rme":
 					case "--rem-ext":
@@ -833,7 +833,7 @@ namespace SabreTools
 								case "--root-dir":
 									root = split[1];
 									break;
-								case "-re":
+								case "-rep":
 								case "--rep-ext":
 									repext = split[1];
 									break;
@@ -926,7 +926,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(datFromDir ^ headerer ^ sort ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify))
+			if (!(datFromDir ^ extract ^ restore ^ sort ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				Build.Help("SabreTools");
@@ -936,7 +936,7 @@ namespace SabreTools
 
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (inputs.Count == 0
-				&& (datFromDir || headerer || splitByExt || splitByHash || splitByLevel || splitByType || stats || update))
+				&& (datFromDir || extract || restore || splitByExt || splitByHash || splitByLevel || splitByType || stats || update))
 			{
 				_logger.Error("This feature requires at least one input");
 				Build.Help("SabreTools");
@@ -975,10 +975,16 @@ namespace SabreTools
 					maxParallelism);
 			}
 
-			// If we're in headerer mode
-			else if (headerer)
+			// If we're in header extract and remove mode
+			else if (extract)
 			{
-				InitHeaderer(inputs, restore, outDir);
+				InitExtractRemoveHeader(inputs, outDir);
+			}
+
+			// If we're in header restore mode
+			else if (restore)
+			{
+				InitReplaceHeader(inputs, outDir);
 			}
 
 			// If we're using the sorter

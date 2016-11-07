@@ -192,9 +192,8 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-extb=			Second set of extensions (comma-separated)");
 						helptext.Add("	-out=			Output directory");
 
-					// Headerer
-					helptext.Add("  -he, --headerer	Extract and remove copier headers");
-						helptext.Add("	-r, --restore		Restore header to file based on SHA-1 instead");
+					// Extract and Remove Headers
+					helptext.Add("  -ex, --extract	Extract and remove copier headers");
 						helptext.Add("	-out=				Output directory");
 
 					// Hash Split
@@ -203,9 +202,13 @@ namespace SabreTools.Helper.Data
 
 					// Level/SuperDAT Split
 					helptext.Add("  -ls, --lvl-split	Split a SuperDAT or folder by internal path");
-					helptext.Add("	-out=			Output directory");
-					helptext.Add("	-s, --short		Use short output names");
-					helptext.Add("	-ba, --base		Use source DAT as base name for outputs");
+						helptext.Add("	-out=			Output directory");
+						helptext.Add("	-s, --short		Use short output names");
+						helptext.Add("	-ba, --base		Use source DAT as base name for outputs");
+
+					// Restore Headers
+					helptext.Add("	-re, --restore		Restore header to file based on SHA-1");
+						helptext.Add("	-out=				Output directory");
 
 					// Sort
 					helptext.Add("  -ss, --sort		Sort input files by a set of DATs");
@@ -263,7 +266,7 @@ namespace SabreTools.Helper.Data
 							helptext.Add("	  -post=, --postfix=		Set postfix for all lines");
 							helptext.Add("	  -q, --quotes			Put double-quotes around each item");
 							helptext.Add("	  -ae=, --add-ext=		Add an extension to each item");
-							helptext.Add("	  -re=, --rep-ext=		Replace all extensions with specified");
+							helptext.Add("	  -rep=, --rep-ext=		Replace all extensions with specified");
 							helptext.Add("	  -rme, --rem-ext		Remove all extensions from each item");
 							helptext.Add("	  -ro, --romba			Output in Romba format (requires SHA-1)");
 							helptext.Add("	  -tsv, --tsv			Output in Tab-Separated Value format");

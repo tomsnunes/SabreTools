@@ -138,6 +138,29 @@ namespace SabreTools
 		}
 
 		/// <summary>
+		/// Wrap extracting headers
+		/// </summary>
+		/// <param name="inputs">Input file or folder names</param>
+		/// <param name="outDir">Output directory to write new files to, blank defaults to rom folder</param>
+		private static void InitExtractRemoveHeader(List<string> inputs, string outDir)
+		{
+			foreach (string input in inputs)
+			{
+				if (File.Exists(input))
+				{
+					FileTools.DetectSkipperAndTransform(input, outDir, _logger);
+				}
+				else if (Directory.Exists(input))
+				{
+					foreach (string sub in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
+					{
+						FileTools.DetectSkipperAndTransform(sub, outDir, _logger);
+					}
+				}
+			}
+		}
+
+		/// <summary>
 		/// Wrap splitting a DAT by 2 extensions
 		/// </summary>
 		/// <param name="inputs">Input files or folders to be split</param>
@@ -214,38 +237,23 @@ namespace SabreTools
 		}
 
 		/// <summary>
-		/// Wrap extracting and replacing headers
+		/// Wrap replacing headers
 		/// </summary>
 		/// <param name="inputs">Input file or folder names</param>
-		/// <param name="restore">False if we're extracting headers (default), true if we're restoring them</param>
 		/// <param name="outDir">Output directory to write new files to, blank defaults to rom folder</param>
-		private static void InitHeaderer(List<string> inputs, bool restore, string outDir)
+		private static void InitReplaceHeader(List<string> inputs, string outDir)
 		{
 			foreach (string input in inputs)
 			{
 				if (File.Exists(input))
 				{
-					if (restore)
-					{
-						FileTools.RestoreHeader(input, outDir, _logger);
-					}
-					else
-					{
-						FileTools.DetectSkipperAndTransform(input, outDir, _logger);
-					}
+					FileTools.RestoreHeader(input, outDir, _logger);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string sub in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						if (restore)
-						{
-							FileTools.RestoreHeader(sub, outDir, _logger);
-						}
-						else
-						{
-							FileTools.DetectSkipperAndTransform(sub, outDir, _logger);
-						}
+						FileTools.RestoreHeader(sub, outDir, _logger);
 					}
 				}
 			}

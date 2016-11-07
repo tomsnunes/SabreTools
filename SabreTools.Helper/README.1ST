@@ -296,17 +296,13 @@ Options:
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If a path
 			is not defined, the application directory is used instead.
-		
-	-hd, --headerer 		Backup or restore copier headers from a variety of file types
-		Headerer is meant as an intermediary between header skipper files (which, a bit
-		apart from their name, do not just show how to skip copier headers) and rom managers
-		that do not use them.
-		
-		By default, this will detect, store, and remove copier headers from a file or folder
+			
+	-ex, --extract		Backup and remove copier headers from a variety of file types
+		This will detect, store, and remove copier headers from a file or folder
 		of files. The headers are backed up and collated by the hash of the unheadered file.
 		Files are then output without the detected copier header alongside the originals with
 		the suffix .new. No input files are altered in the process.
-
+		
 		The following systems have headers that this program can work with:
 			- Atari 7800
 			- Atari Lynx
@@ -316,12 +312,6 @@ Options:
 			- Nintendo Famicom Disk System
 			- Nintendo Super Famicom / Super Nintendo Entertainment System
 			- Nintendo Super Famicom / Super Nintendo Entertainment System SPC Music
-			
-		-re, --restore		Restore headers to file(s)
-			Instead of the default extraction, this flag enables use of stored copier headers
-			to reapply them to files if they match the included hash. More than one header can
-			be applied to a file, so they will be output to new files, suffixed with .newX,
-			where X is a number. No input files are altered in the process.
 			
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If a path
@@ -359,6 +349,26 @@ Options:
 			since the names would be the same. With this flag, the original DAT name is used in
 			the output name, in the format of "Original Name (Dir - Name)". This can be used in
 			conjunction with --short to output in the format of "Original Name (Name)" instead.
+			
+	-re, --restore		Restore copier headers from a variety of file types
+		This will make use of stored copier headers and reapply them to files if they match the
+		included hash. More than one header can be applied to a file, so they will be output to
+		new files, suffixed with .newX, where X is a number. No input files are altered in the
+		process.
+		
+		The following systems have headers that this program can work with:
+			- Atari 7800
+			- Atari Lynx
+			- Commodore PSID Music
+			- NEC PC-Engine / TurboGrafx 16
+			- Nintendo Famicom / Nintendo Entertainment System
+			- Nintendo Famicom Disk System
+			- Nintendo Super Famicom / Super Nintendo Entertainment System
+			- Nintendo Super Famicom / Super Nintendo Entertainment System SPC Music
+			
+		-out=			Set the name of the output directory
+			This sets an output folder to be used when the files are created. If a path
+			is not defined, the application directory is used instead.
 		
 	-ss, --sort			Sort input files by a set of DATs
 		This feature allows the user to quickly rebuild based on a supplied DAT file(s). By
@@ -1247,6 +1257,36 @@ Below are originally from SabreTools / DATabase -
 			DAT outputs. If this flag is enabled, a clrmamepro DAT will be created instead.
 			
 		-old, --romvault	Produce a DAT in RV format
+		
+	-hd, --headerer 		Backup or restore copier headers from a variety of file types
+		Headerer is meant as an intermediary between header skipper files (which, a bit
+		apart from their name, do not just show how to skip copier headers) and rom managers
+		that do not use them.
+		
+		By default, this will detect, store, and remove copier headers from a file or folder
+		of files. The headers are backed up and collated by the hash of the unheadered file.
+		Files are then output without the detected copier header alongside the originals with
+		the suffix .new. No input files are altered in the process.
+
+		The following systems have headers that this program can work with:
+			- Atari 7800
+			- Atari Lynx
+			- Commodore PSID Music
+			- NEC PC-Engine / TurboGrafx 16
+			- Nintendo Famicom / Nintendo Entertainment System
+			- Nintendo Famicom Disk System
+			- Nintendo Super Famicom / Super Nintendo Entertainment System
+			- Nintendo Super Famicom / Super Nintendo Entertainment System SPC Music
+			
+		-re, --restore		Restore headers to file(s)
+			Instead of the default extraction, this flag enables use of stored copier headers
+			to reapply them to files if they match the included hash. More than one header can
+			be applied to a file, so they will be output to new files, suffixed with .newX,
+			where X is a number. No input files are altered in the process.
+			
+		-out=			Set the name of the output directory
+			This sets an output folder to be used when the files are created. If a path
+			is not defined, the application directory is used instead.
 			
 	-i, -import		Start tool in import mode
 		This starts the tool in DATabase import mode. This will allow for hashing of new
