@@ -703,39 +703,48 @@ namespace SabreTools.Helper.Dats
 								superdat = superdat || itemval.Contains("SuperDAT");
 								break;
 							case "forcemerging":
-								switch (itemval)
+								if (ForceMerging == ForceMerging.None)
 								{
-									case "none":
-										ForceMerging = ForceMerging.None;
-										break;
-									case "split":
-										ForceMerging = ForceMerging.Split;
-										break;
-									case "full":
-										ForceMerging = ForceMerging.Full;
-										break;
+									switch (itemval)
+									{
+										case "none":
+											ForceMerging = ForceMerging.None;
+											break;
+										case "split":
+											ForceMerging = ForceMerging.Split;
+											break;
+										case "full":
+											ForceMerging = ForceMerging.Full;
+											break;
+									}
 								}
 								break;
 							case "forcezipping":
-								switch (itemval)
+								if (ForcePacking == ForcePacking.None)
 								{
-									case "yes":
-										ForcePacking = ForcePacking.Zip;
-										break;
-									case "no":
-										ForcePacking = ForcePacking.Unzip;
-										break;
+									switch (itemval)
+									{
+										case "yes":
+											ForcePacking = ForcePacking.Zip;
+											break;
+										case "no":
+											ForcePacking = ForcePacking.Unzip;
+											break;
+									}
 								}
 								break;
 							case "forcepacking":
-								switch (itemval)
+								if (ForcePacking == ForcePacking.None)
 								{
-									case "zip":
-										ForcePacking = ForcePacking.Zip;
-										break;
-									case "unzip":
-										ForcePacking = ForcePacking.Unzip;
-										break;
+									switch (itemval)
+									{
+										case "zip":
+											ForcePacking = ForcePacking.Zip;
+											break;
+										case "unzip":
+											ForcePacking = ForcePacking.Unzip;
+											break;
+									}
 								}
 								break;
 						}
@@ -872,7 +881,7 @@ namespace SabreTools.Helper.Dats
 							{
 								Description = (String.IsNullOrEmpty(Description) ? xtr.GetAttribute("description") : Description);
 							}
-							if (xtr.GetAttribute("forcemerging") != null)
+							if (xtr.GetAttribute("forcemerging") != null && ForceMerging == ForceMerging.None)
 							{
 								switch (xtr.GetAttribute("forcemerging"))
 								{
@@ -887,9 +896,9 @@ namespace SabreTools.Helper.Dats
 										break;
 								}
 							}
-							if (xtr.GetAttribute("forceitemStatus") != null)
+							if (xtr.GetAttribute("forcenodump") != null && ForceNodump == ForceNodump.None)
 							{
-								switch (xtr.GetAttribute("forceitemStatus"))
+								switch (xtr.GetAttribute("forcenodump"))
 								{
 									case "obsolete":
 										ForceNodump = ForceNodump.Obsolete;
@@ -902,7 +911,7 @@ namespace SabreTools.Helper.Dats
 										break;
 								}
 							}
-							if (xtr.GetAttribute("forcepacking") != null)
+							if (xtr.GetAttribute("forcepacking") != null && ForcePacking == ForcePacking.None)
 							{
 								switch (xtr.GetAttribute("forcepacking"))
 								{
@@ -1068,7 +1077,7 @@ namespace SabreTools.Helper.Dats
 										{
 											Header = (String.IsNullOrEmpty(Header) ? headreader.GetAttribute("plugin") : Header);
 										}
-										if (headreader.GetAttribute("forcemerging") != null)
+										if (headreader.GetAttribute("forcemerging") != null && ForceMerging == ForceMerging.None)
 										{
 											switch (headreader.GetAttribute("forcemerging"))
 											{
@@ -1083,9 +1092,9 @@ namespace SabreTools.Helper.Dats
 													break;
 											}
 										}
-										if (headreader.GetAttribute("forceitemStatus") != null)
+										if (headreader.GetAttribute("forcenodump") != null && ForceNodump == ForceNodump.None)
 										{
-											switch (headreader.GetAttribute("forceitemStatus"))
+											switch (headreader.GetAttribute("forcenodump"))
 											{
 												case "obsolete":
 													ForceNodump = ForceNodump.Obsolete;
@@ -1098,7 +1107,7 @@ namespace SabreTools.Helper.Dats
 													break;
 											}
 										}
-										if (headreader.GetAttribute("forcepacking") != null)
+										if (headreader.GetAttribute("forcepacking") != null && ForcePacking == ForcePacking.None)
 										{
 											switch (headreader.GetAttribute("forcepacking"))
 											{
@@ -1144,42 +1153,51 @@ namespace SabreTools.Helper.Dats
 																superdat = superdat || content.Contains("SuperDAT");
 																break;
 															case "forcemerging":
-																switch (content)
+																if (ForceMerging == ForceMerging.None)
 																{
-																	case "split":
-																		ForceMerging = ForceMerging.Split;
-																		break;
-																	case "none":
-																		ForceMerging = ForceMerging.None;
-																		break;
-																	case "full":
-																		ForceMerging = ForceMerging.Full;
-																		break;
+																	switch (content)
+																	{
+																		case "split":
+																			ForceMerging = ForceMerging.Split;
+																			break;
+																		case "none":
+																			ForceMerging = ForceMerging.None;
+																			break;
+																		case "full":
+																			ForceMerging = ForceMerging.Full;
+																			break;
+																	}
 																}
 																break;
-															case "forceitemStatus":
-																switch (content)
+															case "forcenodump":
+																if (ForceNodump == ForceNodump.None)
 																{
-																	case "obsolete":
-																		ForceNodump = ForceNodump.Obsolete;
-																		break;
-																	case "required":
-																		ForceNodump = ForceNodump.Required;
-																		break;
-																	case "ignore":
-																		ForceNodump = ForceNodump.Ignore;
-																		break;
+																	switch (content)
+																	{
+																		case "obsolete":
+																			ForceNodump = ForceNodump.Obsolete;
+																			break;
+																		case "required":
+																			ForceNodump = ForceNodump.Required;
+																			break;
+																		case "ignore":
+																			ForceNodump = ForceNodump.Ignore;
+																			break;
+																	}
 																}
 																break;
 															case "forcepacking":
-																switch (content)
+																if (ForcePacking == ForcePacking.None)
 																{
-																	case "zip":
-																		ForcePacking = ForcePacking.Zip;
-																		break;
-																	case "unzip":
-																		ForcePacking = ForcePacking.Unzip;
-																		break;
+																	switch (content)
+																	{
+																		case "zip":
+																			ForcePacking = ForcePacking.Zip;
+																			break;
+																		case "unzip":
+																			ForcePacking = ForcePacking.Unzip;
+																			break;
+																	}
 																}
 																break;
 														}
@@ -2115,7 +2133,7 @@ namespace SabreTools.Helper.Dats
 						int split = 0;
 						if (Int32.TryParse(line.Split('=')[1], out split))
 						{
-							if (split == 1)
+							if (split == 1 && ForcePacking == ForcePacking.None)
 							{
 								ForceMerging = ForceMerging.Split;
 							}
@@ -2127,7 +2145,7 @@ namespace SabreTools.Helper.Dats
 						int merge = 0;
 						if (Int32.TryParse(line.Split('=')[1], out merge))
 						{
-							if (merge == 1)
+							if (merge == 1 && ForceMerging == ForceMerging.None)
 							{
 								ForceMerging = ForceMerging.Full;
 							}
