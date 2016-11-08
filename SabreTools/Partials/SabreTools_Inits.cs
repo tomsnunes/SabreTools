@@ -114,7 +114,6 @@ namespace SabreTools
 				{
 					// Clone the base Dat for information
 					DatFile datdata = (DatFile)basedat.Clone();
-					datdata.Reset();
 
 					string basePath = Path.GetFullPath(path);
 					bool success = datdata.PopulateFromDir(basePath, noMD5, noSHA1, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,

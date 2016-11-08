@@ -490,54 +490,6 @@ namespace SabreTools.Helper.Dats
 
 		public object Clone()
 		{
-			DatFile df = new DatFile
-			{
-				FileName = _fileName,
-				Name = _name,
-				Description = _description,
-				RootDir = _rootDir,
-				Category = _category,
-				Version = _version,
-				Date = _date,
-				Author = _author,
-				Email = _email,
-				Homepage = _homepage,
-				Url = _url,
-				Comment = _comment,
-				Header = _header,
-				Type = _type,
-				ForceMerging = _forceMerging,
-				ForceNodump = _forceNodump,
-				ForcePacking = _forcePacking,
-				ExcludeOf = _excludeOf,
-				DatFormat = _datFormat,
-				MergeRoms = _mergeRoms,
-				SortedBy = _sortedBy,
-				UseGame = _useGame,
-				Prefix = _prefix,
-				Postfix = _postfix,
-				Quotes = _quotes,
-				RepExt = _repExt,
-				AddExt = _addExt,
-				RemExt = _remExt,
-				GameName = _gameName,
-				Romba = _romba,
-				RomCount = _romCount,
-				DiskCount = _diskCount,
-				TotalSize = _totalSize,
-				CRCCount = _crcCount,
-				MD5Count = _md5Count,
-				SHA1Count = _sha1Count,
-				BaddumpCount = _baddumpCount,
-				NodumpCount = _nodumpCount,
-			};
-
-			df.Set(_files);
-			return df;
-		}
-
-		public object CloneHeader()
-		{
 			return new DatFile
 			{
 				FileName = _fileName,

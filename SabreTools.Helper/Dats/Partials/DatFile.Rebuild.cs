@@ -511,7 +511,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Setup the fixdat
-			DatFile matched = (DatFile)CloneHeader();
+			DatFile matched = (DatFile)Clone();
 			matched.Reset();
 			matched.FileName = "fixDat_" + matched.FileName;
 			matched.Name = "fixDat_" + matched.Name;
