@@ -41,14 +41,15 @@ namespace SabreTools.Helper.Dats
 			NodumpCount = 0;
 
 			// If we have a blank Dat in any way, return
-			if (this == null || Files == null || Files.Count == 0)
+			if (this == null || Count == 0)
 			{
 				return;
 			}
 
 			// Loop through and add
-			foreach (List<DatItem> roms in Files.Values)
+			foreach (string key in Keys)
 			{
+				List<DatItem> roms = this[key];
 				foreach (Rom rom in roms)
 				{
 					RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
@@ -101,7 +102,7 @@ namespace SabreTools.Helper.Dats
 			string results = @"For '" + FileName + @"':
 --------------------------------------------------
     Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
-    Games found:             " + (game == -1 ? Files.Count : game) + @"
+    Games found:             " + (game == -1 ? Count : game) + @"
     Roms found:              " + RomCount + @"
     Disks found:             " + DiskCount + @"
     Roms with CRC:           " + CRCCount + @"
@@ -126,7 +127,7 @@ namespace SabreTools.Helper.Dats
 				case StatDatFormat.CSV:
 					line = "\"" + FileName + "\","
 						+ "\"" + Style.GetBytesReadable(TotalSize) + "\","
-						+ "\"" + (game == -1 ? Files.Count : game) + "\","
+						+ "\"" + (game == -1 ? Count : game) + "\","
 						+ "\"" + RomCount + "\","
 						+ "\"" + DiskCount + "\","
 						+ "\"" + CRCCount + "\","
@@ -149,7 +150,7 @@ namespace SabreTools.Helper.Dats
 							? " class=\"dir\"><td>" + HttpUtility.HtmlEncode(FileName.Remove(0, 5))
 							: "><td>" + HttpUtility.HtmlEncode(FileName)) + "</td>"
 						+ "<td align=\"right\">" + Style.GetBytesReadable(TotalSize) + "</td>"
-						+ "<td align=\"right\">" + (game == -1 ? Files.Count : game) + "</td>"
+						+ "<td align=\"right\">" + (game == -1 ? Count : game) + "</td>"
 						+ "<td align=\"right\">" + RomCount + "</td>"
 						+ "<td align=\"right\">" + DiskCount + "</td>"
 						+ "<td align=\"right\">" + CRCCount + "</td>"
@@ -172,7 +173,7 @@ namespace SabreTools.Helper.Dats
 					line = @"'" + FileName + @"':
 --------------------------------------------------
     Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
-    Games found:             " + (game == -1 ? Files.Count : game) + @"
+    Games found:             " + (game == -1 ? Count : game) + @"
     Roms found:              " + RomCount + @"
     Disks found:             " + DiskCount + @"
     Roms with CRC:           " + CRCCount + @"
@@ -191,7 +192,7 @@ namespace SabreTools.Helper.Dats
 				case StatDatFormat.TSV:
 					line = "\"" + FileName + "\"\t"
 						+ "\"" + Style.GetBytesReadable(TotalSize) + "\"\t"
-						+ "\"" + (game == -1 ? Files.Count : game) + "\"\t"
+						+ "\"" + (game == -1 ? Count : game) + "\"\t"
 						+ "\"" + RomCount + "\"\t"
 						+ "\"" + DiskCount + "\"\t"
 						+ "\"" + CRCCount + "\"\t"
@@ -347,7 +348,7 @@ namespace SabreTools.Helper.Dats
 
 				// Add single DAT stats to dir
 				dirSize += datdata.TotalSize;
-				dirGame += datdata.Files.Count;
+				dirGame += datdata.Count;
 				dirRom += datdata.RomCount;
 				dirDisk += datdata.DiskCount;
 				dirCRC += datdata.CRCCount;
@@ -358,7 +359,7 @@ namespace SabreTools.Helper.Dats
 
 				// Add single DAT stats to totals
 				totalSize += datdata.TotalSize;
-				totalGame += datdata.Files.Count;
+				totalGame += datdata.Count;
 				totalRom += datdata.RomCount;
 				totalDisk += datdata.DiskCount;
 				totalCRC += datdata.CRCCount;

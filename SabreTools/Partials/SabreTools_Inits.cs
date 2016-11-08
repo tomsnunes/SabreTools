@@ -102,7 +102,6 @@ namespace SabreTools
 				Romba = romba,
 				ExcludeOf = excludeOf,
 				Type = (superdat ? "SuperDAT" : ""),
-				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 
 			// Clean the temp directory
@@ -115,7 +114,7 @@ namespace SabreTools
 				{
 					// Clone the base Dat for information
 					DatFile datdata = (DatFile)basedat.Clone();
-					datdata.Files = new SortedDictionary<string, List<DatItem>>();
+					datdata.Reset();
 
 					string basePath = Path.GetFullPath(path);
 					bool success = datdata.PopulateFromDir(basePath, noMD5, noSHA1, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,

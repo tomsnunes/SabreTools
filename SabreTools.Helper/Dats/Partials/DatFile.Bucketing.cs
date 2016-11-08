@@ -33,19 +33,13 @@ namespace SabreTools.Helper.Dats
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
 
-			// If we have a null dict or an empty one, output a new dictionary
-			if (Files == null || Files.Count == 0)
-			{
-				Files = sortable;
-			}
-
 			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by CRC");
 
 			// Process each all of the roms
-			List<string> keys = Files.Keys.ToList();
+			List<string> keys = Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = Files[key];
+				List<DatItem> roms = this[key];
 
 				// If we're merging the roms, do so
 				if (mergeroms)
@@ -83,7 +77,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now assign the dictionary back
-			Files = sortable;
+			_files = sortable;
 		}
 
 		/// <summary>
@@ -108,19 +102,13 @@ namespace SabreTools.Helper.Dats
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
 
-			// If we have a null dict or an empty one, output a new dictionary
-			if (Files == null || Files.Count == 0)
-			{
-				Files = sortable;
-			}
-
 			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by game");
 
 			// Process each all of the roms
-			List<string> keys = Files.Keys.ToList();
+			List<string> keys = Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = Files[key];
+				List<DatItem> roms = this[key];
 
 				// If we're merging the roms, do so
 				if (mergeroms)
@@ -170,7 +158,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now assign the dictionary back
-			Files = sortable;
+			_files = sortable;
 		}
 
 		/// <summary>
@@ -193,19 +181,13 @@ namespace SabreTools.Helper.Dats
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
 
-			// If we have a null dict or an empty one, output a new dictionary
-			if (Files == null || Files.Count == 0)
-			{
-				Files = sortable;
-			}
-
 			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by MD5");
 
 			// Process each all of the roms
-			List<string> keys = Files.Keys.ToList();
+			List<string> keys = Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = Files[key];
+				List<DatItem> roms = this[key];
 
 				// If we're merging the roms, do so
 				if (mergeroms)
@@ -247,7 +229,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now assign the dictionary back
-			Files = sortable;
+			_files = sortable;
 		}
 
 		/// <summary>
@@ -270,19 +252,13 @@ namespace SabreTools.Helper.Dats
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
 
-			// If we have a null dict or an empty one, output a new dictionary
-			if (Files == null || Files.Count == 0)
-			{
-				Files = sortable;
-			}
-
 			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by SHA-1");
 
 			// Process each all of the roms
-			List<string> keys = Files.Keys.ToList();
+			List<string> keys = Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = Files[key];
+				List<DatItem> roms = this[key];
 
 				// If we're merging the roms, do so
 				if (mergeroms)
@@ -324,7 +300,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now assign the dictionary back
-			Files = sortable;
+			_files = sortable;
 		}
 
 		/// <summary>
@@ -347,19 +323,13 @@ namespace SabreTools.Helper.Dats
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
 
-			// If we have a null dict or an empty one, output a new dictionary
-			if (Files == null || Files.Count == 0)
-			{
-				Files = sortable;
-			}
-
 			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by size");
 
 			// Process each all of the roms
-			List<string> keys = Files.Keys.ToList();
+			List<string> keys = Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = Files[key];
+				List<DatItem> roms = this[key];
 
 				// If we're merging the roms, do so
 				if (mergeroms)
@@ -397,7 +367,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now assign the dictionary back
-			Files = sortable;
+			_files = sortable;
 		}
 
 		#endregion

@@ -52,7 +52,6 @@ namespace SabreTools
 
 			// Create an empty Dat for files that need to be rebuilt
 			DatFile need = new DatFile();
-			need.Files = new SortedDictionary<string, List<DatItem>>();
 
 			// Open the database connection
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
@@ -65,9 +64,9 @@ namespace SabreTools
 			string crcsha1query = "INSERT OR IGNORE INTO crcsha1 (crc, sha1) VALUES";
 			string md5sha1query = "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES";
 
-			foreach (string key in df.Files.Keys)
+			foreach (string key in df.Keys)
 			{
-				List<DatItem> datItems = df.Files[key];
+				List<DatItem> datItems = df[key];
 				foreach (Rom rom in datItems)
 				{
 					// If we care about if the file exists, check the databse first
@@ -242,7 +241,6 @@ namespace SabreTools
 				Name = Path.GetFileName(inputs[0]) + " Dir2Dat",
 				Description = Path.GetFileName(inputs[0]) + " Dir2Dat",
 				DatFormat = DatFormat.Logiqx,
-				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 
 			Logger logger = new Logger();

@@ -62,12 +62,6 @@ namespace SabreTools.Helper.Dats
 				Description = Name + (bare ? "" : " (" + Date + ")");
 			}
 
-			// Make sure the dictionary is defined
-			if (Files == null || Files.Keys.Count == 0)
-			{
-				Files = new SortedDictionary<string, List<DatItem>>();
-			}
-
 			// Process the input
 			if (Directory.Exists(basePath))
 			{
@@ -159,7 +153,7 @@ namespace SabreTools.Helper.Dats
 								}
 
 								logger.Verbose("Adding blank empty folder: " + gamename);
-								Files["null"].Add(new Rom(romname, gamename));
+								this["null"].Add(new Rom(romname, gamename));
 							}
 						});
 				}

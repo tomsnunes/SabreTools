@@ -42,7 +42,7 @@ namespace SabreTools.Helper.Dats
 		public bool WriteToFile(string outDir, Logger logger, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
 		{
 			// If there's nothing there, abort
-			if (Files == null || Files.Count == 0)
+			if (Count == 0)
 			{
 				return false;
 			}
@@ -116,7 +116,7 @@ namespace SabreTools.Helper.Dats
 			try
 			{
 				// Get a properly sorted set of keys
-				List<string> keys = Files.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
 				foreach (DatFormat datFormat in outfiles.Keys)
@@ -137,7 +137,7 @@ namespace SabreTools.Helper.Dats
 
 					foreach (string key in keys)
 					{
-						List<DatItem> roms = Files[key];
+						List<DatItem> roms = this[key];
 
 						for (int index = 0; index < roms.Count; index++)
 						{
@@ -310,7 +310,7 @@ namespace SabreTools.Helper.Dats
 							+ "<dat xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"datas.xsd\">\n"
 							+ "\t<configuration>\n"
 							+ "\t\t<datName>" + HttpUtility.HtmlEncode(Name) + "</datName>\n"
-							+ "\t\t<datVersion>" + Files.Count + "</datVersion>\n"
+							+ "\t\t<datVersion>" + Count + "</datVersion>\n"
 							+ "\t\t<system>none</system>\n"
 							+ "\t\t<screenshotsWidth>240</screenshotsWidth>\n"
 							+ "\t\t<screenshotsHeight>160</screenshotsHeight>\n"
@@ -1290,7 +1290,7 @@ namespace SabreTools.Helper.Dats
 				string footer = "";
 
 				// If we have roms, output the full footer
-				if (Files != null && Files.Count > 0)
+				if (Count > 0)
 				{
 					switch (datFormat)
 					{

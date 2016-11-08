@@ -92,12 +92,6 @@ namespace SabreTools.Helper.Dats
 			// If the output type isn't set already, get the internal output type
 			DatFormat = (DatFormat == 0 ? FileTools.GetDatFormat(filename, logger) : DatFormat);
 
-			// Make sure there's a dictionary to read to
-			if (Files == null)
-			{
-				Files = new SortedDictionary<string, List<DatItem>>();
-			}
-
 			// Now parse the correct type of DAT
 			switch (FileTools.GetDatFormat(filename, logger))
 			{
@@ -1582,14 +1576,14 @@ namespace SabreTools.Helper.Dats
 										// If the rom is continue or ignore, add the size to the previous rom
 										if (subreader.GetAttribute("loadflag") == "continue" || subreader.GetAttribute("loadflag") == "ignore")
 										{
-											int index = Files[key].Count() - 1;
-											DatItem lastrom = Files[key][index];
+											int index = this[key].Count() - 1;
+											DatItem lastrom = this[key][index];
 											if (lastrom.Type == ItemType.Rom)
 											{
 												((Rom)lastrom).Size += size;
 											}
-											Files[key].RemoveAt(index);
-											Files[key].Add(lastrom);
+											this[key].RemoveAt(index);
+											this[key].Add(lastrom);
 											subreader.Read();
 											continue;
 										}
@@ -1763,14 +1757,14 @@ namespace SabreTools.Helper.Dats
 							// If the rom is continue or ignore, add the size to the previous rom
 							if (xtr.GetAttribute("loadflag") == "continue" || xtr.GetAttribute("loadflag") == "ignore")
 							{
-								int index = Files[key].Count() - 1;
-								DatItem lastrom = Files[key][index];
+								int index = this[key].Count() - 1;
+								DatItem lastrom = this[key][index];
 								if (lastrom.Type == ItemType.Rom)
 								{
 									((Rom)lastrom).Size += size;
 								}
-								Files[key].RemoveAt(index);
-								Files[key].Add(lastrom);
+								this[key].RemoveAt(index);
+								this[key].Add(lastrom);
 								continue;
 							}
 
@@ -2320,48 +2314,45 @@ namespace SabreTools.Helper.Dats
 					}
 				}
 
-				lock (Files)
+				// Get the key and add statistical data
+				switch (item.Type)
 				{
-					// Get the key and add statistical data
-					switch (item.Type)
-					{
-						case ItemType.Archive:
-						case ItemType.BiosSet:
-						case ItemType.Release:
-						case ItemType.Sample:
-							key = item.Type.ToString();
-							break;
-						case ItemType.Disk:
-							key = ((Disk)item).MD5;
+					case ItemType.Archive:
+					case ItemType.BiosSet:
+					case ItemType.Release:
+					case ItemType.Sample:
+						key = item.Type.ToString();
+						break;
+					case ItemType.Disk:
+						key = ((Disk)item).MD5;
 
-							// Add statistical data
-							DiskCount += 1;
-							TotalSize += 0;
-							MD5Count += (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
-							SHA1Count += (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
-							BaddumpCount += (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
-							NodumpCount += (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
-							break;
-						case ItemType.Rom:
-							key = ((Rom)item).Size + "-" + ((Rom)item).CRC;
+						// Add statistical data
+						DiskCount += 1;
+						TotalSize += 0;
+						MD5Count += (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
+						SHA1Count += (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
+						BaddumpCount += (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
+						NodumpCount += (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
+						break;
+					case ItemType.Rom:
+						key = ((Rom)item).Size + "-" + ((Rom)item).CRC;
 
-							// Add statistical data
-							RomCount += 1;
-							TotalSize += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 0 : ((Rom)item).Size);
-							CRCCount += (String.IsNullOrEmpty(((Rom)item).CRC) ? 0 : 1);
-							MD5Count += (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
-							SHA1Count += (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
-							BaddumpCount += (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
-							NodumpCount += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
-							break;
-						default:
-							key = "default";
-							break;
-					}
-
-					// Add the item to the DAT
-					Add(key, item);
+						// Add statistical data
+						RomCount += 1;
+						TotalSize += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 0 : ((Rom)item).Size);
+						CRCCount += (String.IsNullOrEmpty(((Rom)item).CRC) ? 0 : 1);
+						MD5Count += (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
+						SHA1Count += (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
+						BaddumpCount += (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
+						NodumpCount += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
+						break;
+					default:
+						key = "default";
+						break;
 				}
+
+				// Add the item to the DAT
+				Add(key, item);
 			}
 		}
 

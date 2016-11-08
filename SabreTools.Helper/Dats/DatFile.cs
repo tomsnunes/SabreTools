@@ -159,21 +159,6 @@ namespace SabreTools.Helper.Dats
 			get { return _mergeRoms; }
 			set { _mergeRoms = value; }
 		}
-		protected SortedDictionary<string, List<DatItem>> Files
-		{
-			get
-			{
-				if (_files == null)
-				{
-					_files = new SortedDictionary<string, List<DatItem>>();
-				}
-				return _files;
-			}
-			set
-			{
-				_files = value;
-			}
-		}
 		public SortedBy SortedBy
 		{
 			get { return _sortedBy; }
@@ -432,6 +417,14 @@ namespace SabreTools.Helper.Dats
 		}
 
 		/// <summary>
+		/// Delete the file dictionary
+		/// </summary>
+		public void Delete()
+		{
+			_files = null;
+		}
+
+		/// <summary>
 		/// Get the keys from the file dictionary
 		/// </summary>
 		/// <returns>IEnumerable of the keys</returns>
@@ -474,13 +467,30 @@ namespace SabreTools.Helper.Dats
 			}
 		}
 
+		/// <summary>
+		/// Reset the file dictionary
+		/// </summary>
+		public void Reset()
+		{
+			_files = new SortedDictionary<string, List<DatItem>>();
+		}
+
+		/// <summary>
+		/// Set a new file dictionary from an existing one
+		/// </summary>
+		/// <param name="newdict"></param>
+		public void Set(SortedDictionary<string, List<DatItem>> newdict)
+		{
+			_files = newdict;
+		}
+
 		#endregion
 
 		#region Cloning Methods [MODULAR DONE]
 
 		public object Clone()
 		{
-			return new DatFile
+			DatFile df = new DatFile
 			{
 				FileName = _fileName,
 				Name = _name,
@@ -502,7 +512,6 @@ namespace SabreTools.Helper.Dats
 				ExcludeOf = _excludeOf,
 				DatFormat = _datFormat,
 				MergeRoms = _mergeRoms,
-				Files = _files,
 				SortedBy = _sortedBy,
 				UseGame = _useGame,
 				Prefix = _prefix,
@@ -522,6 +531,9 @@ namespace SabreTools.Helper.Dats
 				BaddumpCount = _baddumpCount,
 				NodumpCount = _nodumpCount,
 			};
+
+			df.Set(_files);
+			return df;
 		}
 
 		public object CloneHeader()
@@ -548,7 +560,6 @@ namespace SabreTools.Helper.Dats
 				ExcludeOf = _excludeOf,
 				DatFormat = _datFormat,
 				MergeRoms = _mergeRoms,
-				Files = new SortedDictionary<string, List<DatItem>>(),
 				SortedBy = SortedBy.Default,
 				UseGame = _useGame,
 				Prefix = _prefix,

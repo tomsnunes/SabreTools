@@ -110,7 +110,6 @@ namespace SabreTools.Helper.Dats
 					datHeaders[i] = new DatFile
 					{
 						DatFormat = (DatFormat != 0 ? DatFormat : 0),
-						Files = new SortedDictionary<string, List<DatItem>>(),
 						MergeRoms = MergeRoms,
 					};
 
@@ -120,16 +119,15 @@ namespace SabreTools.Helper.Dats
 			logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			logger.User("Populating internal DAT");
-			Files = new SortedDictionary<string, List<DatItem>>();
 			for (int i = 0; i < inputs.Count; i++)
 			{
-				List<string> keys = datHeaders[i].Files.Keys.ToList();
+				List<string> keys = datHeaders[i].Keys.ToList();
 				foreach (string key in keys)
 				{
 					AddRange(key, datHeaders[i][key]);
 					datHeaders[i].Remove(key);
 				}
-				datHeaders[i].Files = null;
+				datHeaders[i].Delete();
 			}
 			/// END
 
@@ -163,7 +161,7 @@ namespace SabreTools.Helper.Dats
 				outerDiffData.FileName += post;
 				outerDiffData.Name += post;
 				outerDiffData.Description += post;
-				outerDiffData.Files = new SortedDictionary<string, List<DatItem>>();
+				outerDiffData.Reset();
 			}
 
 			// Have External dupes
@@ -174,7 +172,7 @@ namespace SabreTools.Helper.Dats
 				dupeData.FileName += post;
 				dupeData.Name += post;
 				dupeData.Description += post;
-				dupeData.Files = new SortedDictionary<string, List<DatItem>>();
+				dupeData.Reset();
 			}
 
 			// Create a list of DatData objects representing individual output files
@@ -192,7 +190,7 @@ namespace SabreTools.Helper.Dats
 					diffData.FileName += innerpost;
 					diffData.Name += innerpost;
 					diffData.Description += innerpost;
-					diffData.Files = new SortedDictionary<string, List<DatItem>>();
+					diffData.Reset();
 					outDatsArray[j] = diffData;
 				});
 
@@ -203,10 +201,10 @@ namespace SabreTools.Helper.Dats
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
 			logger.User("Populating all output DATs");
-			List<string> keys = Files.Keys.ToList();
+			List<string> keys = Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = DatItem.Merge(Files[key], logger);
+				List<DatItem> roms = DatItem.Merge(this[key], logger);
 
 				if (roms != null && roms.Count > 0)
 				{
@@ -278,7 +276,7 @@ namespace SabreTools.Helper.Dats
 						: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length)));
 
 					// If we have more than 0 roms, output
-					if (outDats[j].Files.Count > 0)
+					if (outDats[j].Count > 0)
 					{
 						outDats[j].WriteToFile(path, logger);
 					}
@@ -326,7 +324,7 @@ namespace SabreTools.Helper.Dats
 					diffData.Name += post;
 					diffData.Description += post;
 				}
-				diffData.Files = new SortedDictionary<string, List<DatItem>>();
+				diffData.Reset();
 
 				outDatsArray[j] = diffData;
 			});
@@ -337,11 +335,11 @@ namespace SabreTools.Helper.Dats
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
 			logger.User("Populating all output DATs");
-			List<string> keys = Files.Keys.ToList();
+			List<string> keys = Keys.ToList();
 
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = DatItem.Merge(Files[key], logger);
+				List<DatItem> roms = DatItem.Merge(this[key], logger);
 
 				if (roms != null && roms.Count > 0)
 				{
@@ -380,7 +378,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// If we have more than 0 roms, output
-				if (outDats[j].Files.Count > 0)
+				if (outDats[j].Count > 0)
 				{
 					outDats[j].WriteToFile(path, logger);
 				}
@@ -400,11 +398,11 @@ namespace SabreTools.Helper.Dats
 			// If we're in SuperDAT mode, prefix all games with their respective DATs
 			if (Type == "SuperDAT")
 			{
-				List<string> keys = Files.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				foreach (string key in keys)
 				{
 					List<DatItem> newroms = new List<DatItem>();
-					foreach (DatItem rom in Files[key])
+					foreach (DatItem rom in this[key])
 					{
 						DatItem newrom = rom;
 						string filename = inputs[newrom.SystemID].Split('¬')[0];
@@ -417,12 +415,12 @@ namespace SabreTools.Helper.Dats
 							+ newrom.Machine.Name;
 						newroms.Add(newrom);
 					}
-					Files[key] = newroms;
+					this[key] = newroms;
 				}
 			}
 
 			// Output a DAT only if there are roms
-			if (Files.Count != 0)
+			if (Count != 0)
 			{
 				WriteToFile(outDir, logger);
 			}
@@ -468,7 +466,7 @@ namespace SabreTools.Helper.Dats
 							keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 
 						// If we have roms, output them
-						if (innerDatdata.Files.Count != 0)
+						if (innerDatdata.Count != 0)
 						{
 							innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), logger, overwrite: (outDir != ""));
 						}
@@ -483,13 +481,13 @@ namespace SabreTools.Helper.Dats
 							{
 								logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 								DatFile innerDatdata = (DatFile)Clone();
-								innerDatdata.Files = null;
+								innerDatdata.Delete();
 								innerDatdata.Parse(file, 0, 0, filter,
 									trim, single, root, logger, true, clean, softlist,
 									keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 
-							// If we have roms, output them
-							if (innerDatdata.Files != null && innerDatdata.Files.Count != 0)
+								// If we have roms, output them
+								if (innerDatdata.Count > 0)
 								{
 									innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outDir != ""));
 								}

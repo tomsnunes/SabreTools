@@ -45,7 +45,7 @@ namespace SabreTools.Helper.Dats
 			#region Perform setup
 
 			// If the DAT is not populated and inverse is not set, inform the user and quit
-			if ((Files == null || Files.Count == 0) && !inverse)
+			if (Count == 0 && !inverse)
 			{
 				logger.User("No entries were found to rebuild, exiting...");
 				return false;
@@ -149,22 +149,14 @@ namespace SabreTools.Helper.Dats
 					{
 						Rom rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
 						rom.Name = Path.GetFullPath(file);
-
-						lock (Files)
-						{
-							current.Add(rom.Size + "-" + rom.CRC, rom);
-						}
+						current.Add(rom.Size + "-" + rom.CRC, rom);
 
 						// If we had a header, we want the full file information too
 						if (headerToCheckAgainst != null)
 						{
 							rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan);
 							rom.Name = Path.GetFullPath(file);
-
-							lock (Files)
-							{
-								current.Add(rom.Size + "-" + rom.CRC, rom);
-							}
+							current.Add(rom.Size + "-" + rom.CRC, rom);
 						}
 					}
 
@@ -180,11 +172,7 @@ namespace SabreTools.Helper.Dats
 							{
 								Rom newrom = rom;
 								newrom.Machine = new Machine(Path.GetFullPath(file), "");
-
-								lock (Files)
-								{
-									current.Add(rom.Size + "-" + rom.CRC, newrom);
-								}
+								current.Add(rom.Size + "-" + rom.CRC, newrom);
 							}
 						}
 						// Otherwise, attempt to extract the files to the temporary directory
@@ -203,22 +191,14 @@ namespace SabreTools.Helper.Dats
 									{
 										Rom rom = FileTools.GetFileInfo(entry, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
 										rom.Machine = new Machine(Path.GetFullPath(file), "");
-
-										lock (Files)
-										{
-											current.Add(rom.Size + "-" + rom.CRC, rom);
-										}
+										current.Add(rom.Size + "-" + rom.CRC, rom);
 
 									// If we had a header, we want the full file information too
 									if (headerToCheckAgainst != null)
 										{
 											rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan);
 											rom.Machine = new Machine(Path.GetFullPath(file), "");
-
-											lock (Files)
-											{
-												current.Add(rom.Size + "-" + rom.CRC, rom);
-											}
+											current.Add(rom.Size + "-" + rom.CRC, rom);
 										}
 									});
 							}
@@ -227,11 +207,7 @@ namespace SabreTools.Helper.Dats
 							{
 								Rom rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
 								rom.Name = Path.GetFullPath(file);
-
-								lock (Files)
-								{
-									current.Add(rom.Size + "-" + rom.CRC, rom);
-								}
+								current.Add(rom.Size + "-" + rom.CRC, rom);
 							}
 						}
 					}
@@ -263,7 +239,7 @@ namespace SabreTools.Helper.Dats
 			current.BucketByCRC(false, logger, output: false);
 
 			// Now loop over and find all files that need to be rebuilt
-			List<string> keys = current.Files.Keys.ToList();
+			List<string> keys = current.Keys.ToList();
 			Parallel.ForEach(keys,
 				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 				key =>
@@ -272,7 +248,7 @@ namespace SabreTools.Helper.Dats
 					if (inverse)
 					{
 						// Check for duplicates
-						List<DatItem> datItems = current.Files[key];
+						List<DatItem> datItems = current[key];
 						foreach (Rom rom in datItems)
 						{
 							// If the rom has duplicates, we skip it
@@ -312,13 +288,13 @@ namespace SabreTools.Helper.Dats
 					else
 					{
 						// If the input DAT doesn't have the key, then nothing from the current DAT are there
-						if (!Files.ContainsKey(key))
+						if (!ContainsKey(key))
 						{
 							return;
 						}
 
 						// Otherwise, we try to find duplicates
-						List<DatItem> datItems = current.Files[key];
+						List<DatItem> datItems = current[key];
 						foreach (Rom rom in datItems)
 						{
 							List<DatItem> found = rom.GetDuplicates(this, logger, false);
@@ -536,7 +512,7 @@ namespace SabreTools.Helper.Dats
 
 			// Setup the fixdat
 			DatFile matched = (DatFile)CloneHeader();
-			matched.Files = new SortedDictionary<string, List<DatItem>>();
+			matched.Reset();
 			matched.FileName = "fixDat_" + matched.FileName;
 			matched.Name = "fixDat_" + matched.Name;
 			matched.Description = "fixDat_" + matched.Description;
@@ -544,8 +520,9 @@ namespace SabreTools.Helper.Dats
 
 			// Now that all files are parsed, get only files found in directory
 			bool found = false;
-			foreach (List<DatItem> roms in Files.Values)
+			foreach (string key in Keys)
 			{
+				List<DatItem> roms = this[key];
 				List<DatItem> newroms = DatItem.Merge(roms, logger);
 				foreach (Rom rom in newroms)
 				{

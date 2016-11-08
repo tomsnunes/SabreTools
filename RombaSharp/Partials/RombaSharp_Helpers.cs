@@ -423,9 +423,9 @@ namespace SabreTools
 			{
 				sldr.Read();
 				string hash = sldr.GetString(0);
-				if (datroot.Files.ContainsKey(hash))
+				if (datroot.ContainsKey(hash))
 				{
-					datroot.Files[hash] = null;
+					datroot[hash] = null;
 					databaseDats.Add(hash);
 				}
 				else if (!databaseDats.Contains(hash))
@@ -443,7 +443,7 @@ namespace SabreTools
 			// Loop through the Dictionary and add all data
 			_logger.User("Adding new DAT information");
 			start = DateTime.Now;
-			foreach (string key in datroot.Keys())
+			foreach (string key in datroot.Keys)
 			{
 				foreach (Rom value in datroot[key])
 				{
@@ -490,9 +490,9 @@ namespace SabreTools
 				string md5sha1query = "INSERT OR IGNORE INTO md5sha1 (md5, sha1) VALUES";
 
 				// Loop through the parsed entries
-				foreach (string romkey in tempdat.Files.Keys)
+				foreach (string romkey in tempdat.Keys)
 				{
-					foreach (DatItem datItem in tempdat.Files[romkey])
+					foreach (DatItem datItem in tempdat[romkey])
 					{
 						_logger.Verbose("Checking and adding file '" + datItem.Name);
 
@@ -628,10 +628,10 @@ namespace SabreTools
 
 			// Once we have both, check for any new files
 			List<string> dupehashes = new List<string>();
-			List<string> keys = depot.Files.Keys.ToList();
+			List<string> keys = depot.Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = depot.Files[key];
+				List<DatItem> roms = depot[key];
 				foreach (Rom rom in roms)
 				{
 					if (hashes.Contains(rom.SHA1))

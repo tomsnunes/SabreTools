@@ -59,7 +59,6 @@ namespace SabreTools.Helper.Dats
 				Homepage = this.Homepage,
 				Url = this.Url,
 				Comment = this.Comment,
-				Files = new SortedDictionary<string, List<DatItem>>(),
 				DatFormat = this.DatFormat,
 			};
 			DatFile datdataB = new DatFile
@@ -75,20 +74,19 @@ namespace SabreTools.Helper.Dats
 				Homepage = this.Homepage,
 				Url = this.Url,
 				Comment = this.Comment,
-				Files = new SortedDictionary<string, List<DatItem>>(),
 				DatFormat = this.DatFormat,
 			};
 
 			// If roms is empty, return false
-			if (this.Files.Count == 0)
+			if (Count == 0)
 			{
 				return false;
 			}
 
 			// Now separate the roms accordingly
-			foreach (string key in this.Files.Keys)
+			foreach (string key in Keys)
 			{
-				foreach (DatItem rom in this.Files[key])
+				foreach (DatItem rom in this[key])
 				{
 					if (newExtA.Contains(Path.GetExtension(rom.Name.ToUpperInvariant())))
 					{
@@ -157,7 +155,6 @@ namespace SabreTools.Helper.Dats
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
 				MergeRoms = this.MergeRoms,
-				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 			DatFile sha1 = new DatFile
 			{
@@ -179,7 +176,6 @@ namespace SabreTools.Helper.Dats
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
 				MergeRoms = this.MergeRoms,
-				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 			DatFile md5 = new DatFile
 			{
@@ -201,7 +197,6 @@ namespace SabreTools.Helper.Dats
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
 				MergeRoms = this.MergeRoms,
-				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 			DatFile crc = new DatFile
 			{
@@ -223,7 +218,6 @@ namespace SabreTools.Helper.Dats
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
 				MergeRoms = this.MergeRoms,
-				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 
 			DatFile other = new DatFile
@@ -246,14 +240,13 @@ namespace SabreTools.Helper.Dats
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
 				MergeRoms = this.MergeRoms,
-				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 
 			// Now populate each of the DAT objects in turn
-			List<string> keys = this.Files.Keys.ToList();
+			List<string> keys = Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = this.Files[key];
+				List<DatItem> roms = this[key];
 				foreach (DatItem rom in roms)
 				{
 					// If the file is not a Rom or Disk, continue
@@ -306,19 +299,19 @@ namespace SabreTools.Helper.Dats
 			// Now, output all of the files to the output directory
 			logger.User("DAT information created, outputting new files");
 			bool success = true;
-			if (nodump.Files.Count > 0)
+			if (nodump.Count > 0)
 			{
 				success &= nodump.WriteToFile(outDir, logger);
 			}
-			if (sha1.Files.Count > 0)
+			if (sha1.Count > 0)
 			{
 				success &= sha1.WriteToFile(outDir, logger);
 			}
-			if (md5.Files.Count > 0)
+			if (md5.Count > 0)
 			{
 				success &= md5.WriteToFile(outDir, logger);
 			}
-			if (crc.Files.Count > 0)
+			if (crc.Count > 0)
 			{
 				success &= crc.WriteToFile(outDir, logger);
 			}
@@ -348,7 +341,7 @@ namespace SabreTools.Helper.Dats
 			tempDat.Name = null;
 
 			// Sort the input keys
-			List<string> keys = Files.Keys.ToList();
+			List<string> keys = Keys.ToList();
 			keys.Sort(SplitByLevelSort);
 
 			// Then, we loop over the games
@@ -366,7 +359,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Clean the input list and set all games to be pathless
-				List<DatItem> items = Files[key];
+				List<DatItem> items = this[key];
 				items.ForEach(item => item.Machine.Name = Style.GetFileName(item.Machine.Name));
 				items.ForEach(item => item.Machine.Description = Style.GetFileName(item.Machine.Description));
 
@@ -472,7 +465,6 @@ namespace SabreTools.Helper.Dats
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
 				MergeRoms = this.MergeRoms,
-				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 			DatFile diskdat = new DatFile
 			{
@@ -494,7 +486,6 @@ namespace SabreTools.Helper.Dats
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
 				MergeRoms = this.MergeRoms,
-				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 			DatFile sampledat = new DatFile
 			{
@@ -516,14 +507,13 @@ namespace SabreTools.Helper.Dats
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
 				MergeRoms = this.MergeRoms,
-				Files = new SortedDictionary<string, List<DatItem>>(),
 			};
 
 			// Now populate each of the DAT objects in turn
-			List<string> keys = this.Files.Keys.ToList();
+			List<string> keys = Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = this.Files[key];
+				List<DatItem> roms = this[key];
 				foreach (DatItem rom in roms)
 				{
 					// If the file is a Rom
@@ -557,15 +547,15 @@ namespace SabreTools.Helper.Dats
 			// Now, output all of the files to the output directory
 			logger.User("DAT information created, outputting new files");
 			bool success = true;
-			if (romdat.Files.Count > 0)
+			if (romdat.Count > 0)
 			{
 				success &= romdat.WriteToFile(outDir, logger);
 			}
-			if (diskdat.Files.Count > 0)
+			if (diskdat.Count > 0)
 			{
 				success &= diskdat.WriteToFile(outDir, logger);
 			}
-			if (sampledat.Files.Count > 0)
+			if (sampledat.Count > 0)
 			{
 				success &= sampledat.WriteToFile(outDir, logger);
 			}
