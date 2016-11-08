@@ -92,52 +92,16 @@ namespace SabreTools.Helper.Dats
 				{
 					if (newExtA.Contains(Path.GetExtension(rom.Name.ToUpperInvariant())))
 					{
-						if (datdataA.Files.ContainsKey(key))
-						{
-							datdataA.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							datdataA.Files.Add(key, temp);
-						}
+						datdataA.Add(key, rom);
 					}
 					else if (newExtB.Contains(Path.GetExtension(rom.Name.ToUpperInvariant())))
 					{
-						if (datdataB.Files.ContainsKey(key))
-						{
-							datdataB.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							datdataB.Files.Add(key, temp);
-						}
+						datdataB.Add(key, rom);
 					}
 					else
 					{
-						if (datdataA.Files.ContainsKey(key))
-						{
-							datdataA.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							datdataA.Files.Add(key, temp);
-						}
-						if (datdataB.Files.ContainsKey(key))
-						{
-							datdataB.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							datdataB.Files.Add(key, temp);
-						}
+						datdataA.Add(key, rom);
+						datdataB.Add(key, rom);
 					}
 				}
 			}
@@ -173,7 +137,7 @@ namespace SabreTools.Helper.Dats
 
 			// Create each of the respective output DATs
 			logger.User("Creating and populating new DATs");
-			DatFile itemStatus = new DatFile
+			DatFile nodump = new DatFile
 			{
 				FileName = this.FileName + " (Nodump)",
 				Name = this.Name + " (Nodump)",
@@ -298,78 +262,33 @@ namespace SabreTools.Helper.Dats
 						continue;
 					}
 
-					// If the file is a itemStatus
+					// If the file is a nodump
 					if ((rom.Type == ItemType.Rom && ((Rom)rom).ItemStatus == ItemStatus.Nodump)
 						|| (rom.Type == ItemType.Disk && ((Disk)rom).ItemStatus == ItemStatus.Nodump))
 					{
-						if (itemStatus.Files.ContainsKey(key))
-						{
-							itemStatus.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							itemStatus.Files.Add(key, temp);
-						}
+						nodump.Add(key, rom);
 					}
 					// If the file has a SHA-1
 					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).SHA1))
 						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).SHA1)))
 					{
-						if (sha1.Files.ContainsKey(key))
-						{
-							sha1.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							sha1.Files.Add(key, temp);
-						}
+						sha1.Add(key, rom);
 					}
 					// If the file has no SHA-1 but has an MD5
 					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).MD5))
 						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).MD5)))
 					{
-						if (md5.Files.ContainsKey(key))
-						{
-							md5.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							md5.Files.Add(key, temp);
-						}
+						md5.Add(key, rom);
 					}
 					// If the file has no MD5 but a CRC
 					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).SHA1))
 						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).SHA1)))
 					{
-						if (crc.Files.ContainsKey(key))
-						{
-							crc.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							crc.Files.Add(key, temp);
-						}
+						crc.Add(key, rom);
 					}
 					else
 					{
-						if (other.Files.ContainsKey(key))
-						{
-							other.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							other.Files.Add(key, temp);
-						}
+						other.Add(key, rom);
 					}
 				}
 			}
@@ -387,9 +306,9 @@ namespace SabreTools.Helper.Dats
 			// Now, output all of the files to the output directory
 			logger.User("DAT information created, outputting new files");
 			bool success = true;
-			if (itemStatus.Files.Count > 0)
+			if (nodump.Files.Count > 0)
 			{
-				success &= itemStatus.WriteToFile(outDir, logger);
+				success &= nodump.WriteToFile(outDir, logger);
 			}
 			if (sha1.Files.Count > 0)
 			{
@@ -452,14 +371,7 @@ namespace SabreTools.Helper.Dats
 				items.ForEach(item => item.Machine.Description = Style.GetFileName(item.Machine.Description));
 
 				// Now add the game to the output DAT
-				if (tempDat.Files.ContainsKey(key))
-				{
-					tempDat.Files[key].AddRange(items);
-				}
-				else
-				{
-					tempDat.Files.Add(key, items);
-				}
+				tempDat.AddRange(key, items);
 
 				// Then set the DAT name to be the parent directory name
 				tempDat.Name = Style.GetDirectoryName(key);
@@ -617,45 +529,17 @@ namespace SabreTools.Helper.Dats
 					// If the file is a Rom
 					if (rom.Type == ItemType.Rom)
 					{
-						if (romdat.Files.ContainsKey(key))
-						{
-							romdat.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							romdat.Files.Add(key, temp);
-						}
+						romdat.Add(key, rom);
 					}
 					// If the file is a Disk
 					else if (rom.Type == ItemType.Disk)
 					{
-						if (diskdat.Files.ContainsKey(key))
-						{
-							diskdat.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							diskdat.Files.Add(key, temp);
-						}
+						diskdat.Add(key, rom);
 					}
-
 					// If the file is a Sample
 					else if (rom.Type == ItemType.Sample)
 					{
-						if (sampledat.Files.ContainsKey(key))
-						{
-							sampledat.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							sampledat.Files.Add(key, temp);
-						}
+						sampledat.Add(key, rom);
 					}
 				}
 			}

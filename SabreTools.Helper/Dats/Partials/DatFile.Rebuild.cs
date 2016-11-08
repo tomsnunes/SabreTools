@@ -152,17 +152,7 @@ namespace SabreTools.Helper.Dats
 
 						lock (Files)
 						{
-							string key = rom.Size + "-" + rom.CRC;
-							if (current.Files.ContainsKey(key))
-							{
-								current.Files[key].Add(rom);
-							}
-							else
-							{
-								List<DatItem> temp = new List<DatItem>();
-								temp.Add(rom);
-								current.Files.Add(key, temp);
-							}
+							current.Add(rom.Size + "-" + rom.CRC, rom);
 						}
 
 						// If we had a header, we want the full file information too
@@ -173,17 +163,7 @@ namespace SabreTools.Helper.Dats
 
 							lock (Files)
 							{
-								string key = rom.Size + "-" + rom.CRC;
-								if (current.Files.ContainsKey(key))
-								{
-									current.Files[key].Add(rom);
-								}
-								else
-								{
-									List<DatItem> temp = new List<DatItem>();
-									temp.Add(rom);
-									current.Files.Add(key, temp);
-								}
+								current.Add(rom.Size + "-" + rom.CRC, rom);
 							}
 						}
 					}
@@ -203,17 +183,7 @@ namespace SabreTools.Helper.Dats
 
 								lock (Files)
 								{
-									string key = rom.Size + "-" + rom.CRC;
-									if (current.Files.ContainsKey(key))
-									{
-										current.Files[key].Add(newrom);
-									}
-									else
-									{
-										List<DatItem> temp = new List<DatItem>();
-										temp.Add(newrom);
-										current.Files.Add(key, temp);
-									}
+									current.Add(rom.Size + "-" + rom.CRC, newrom);
 								}
 							}
 						}
@@ -236,17 +206,7 @@ namespace SabreTools.Helper.Dats
 
 										lock (Files)
 										{
-											string key = rom.Size + "-" + rom.CRC;
-											if (current.Files.ContainsKey(key))
-											{
-												current.Files[key].Add(rom);
-											}
-											else
-											{
-												List<DatItem> temp = new List<DatItem>();
-												temp.Add(rom);
-												current.Files.Add(key, temp);
-											}
+											current.Add(rom.Size + "-" + rom.CRC, rom);
 										}
 
 									// If we had a header, we want the full file information too
@@ -257,17 +217,7 @@ namespace SabreTools.Helper.Dats
 
 											lock (Files)
 											{
-												string key = rom.Size + "-" + rom.CRC;
-												if (current.Files.ContainsKey(key))
-												{
-													current.Files[key].Add(rom);
-												}
-												else
-												{
-													List<DatItem> temp = new List<DatItem>();
-													temp.Add(rom);
-													current.Files.Add(key, temp);
-												}
+												current.Add(rom.Size + "-" + rom.CRC, rom);
 											}
 										}
 									});
@@ -280,17 +230,7 @@ namespace SabreTools.Helper.Dats
 
 								lock (Files)
 								{
-									string key = rom.Size + "-" + rom.CRC;
-									if (current.Files.ContainsKey(key))
-									{
-										current.Files[key].Add(rom);
-									}
-									else
-									{
-										List<DatItem> temp = new List<DatItem>();
-										temp.Add(rom);
-										current.Files.Add(key, temp);
-									}
+									current.Add(rom.Size + "-" + rom.CRC, rom);
 								}
 							}
 						}
@@ -612,17 +552,7 @@ namespace SabreTools.Helper.Dats
 					if (rom.SourceID == 99)
 					{
 						found = true;
-						string key = rom.Size + "-" + rom.CRC;
-						if (matched.Files.ContainsKey(key))
-						{
-							matched.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							matched.Files.Add(key, temp);
-						}
+						matched.Add(rom.Size + "-" + rom.CRC, rom);
 					}
 				}
 			}

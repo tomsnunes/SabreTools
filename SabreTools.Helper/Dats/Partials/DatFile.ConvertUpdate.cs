@@ -126,15 +126,8 @@ namespace SabreTools.Helper.Dats
 				List<string> keys = datHeaders[i].Files.Keys.ToList();
 				foreach (string key in keys)
 				{
-					if (Files.ContainsKey(key))
-					{
-						Files[key].AddRange(datHeaders[i].Files[key]);
-					}
-					else
-					{
-						Files.Add(key, datHeaders[i].Files[key]);
-					}
-					datHeaders[i].Files.Remove(key);
+					AddRange(key, datHeaders[i][key]);
+					datHeaders[i].Remove(key);
 				}
 				datHeaders[i].Files = null;
 			}
@@ -227,16 +220,7 @@ namespace SabreTools.Helper.Dats
 								// Individual DATs that are output
 								if ((diff & DiffMode.Individuals) != 0)
 								{
-									if (outDats[rom.SystemID].Files.ContainsKey(key))
-									{
-										outDats[rom.SystemID].Files[key].Add(rom);
-									}
-									else
-									{
-										List<DatItem> tl = new List<DatItem>();
-										tl.Add(rom);
-										outDats[rom.SystemID].Files.Add(key, tl);
-									}
+									outDats[rom.SystemID].Add(key, rom);
 								}
 
 								// Merged no-duplicates DAT
@@ -245,16 +229,7 @@ namespace SabreTools.Helper.Dats
 									DatItem newrom = rom;
 									newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
 
-									if (outerDiffData.Files.ContainsKey(key))
-									{
-										outerDiffData.Files[key].Add(newrom);
-									}
-									else
-									{
-										List<DatItem> tl = new List<DatItem>();
-										tl.Add(rom);
-										outerDiffData.Files.Add(key, tl);
-									}
+									outerDiffData.Add(key, newrom);
 								}
 							}
 						}
@@ -267,16 +242,7 @@ namespace SabreTools.Helper.Dats
 								DatItem newrom = rom;
 								newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
 
-								if (dupeData.Files.ContainsKey(key))
-								{
-									dupeData.Files[key].Add(newrom);
-								}
-								else
-								{
-									List<DatItem> tl = new List<DatItem>();
-									tl.Add(rom);
-									dupeData.Files.Add(key, tl);
-								}
+								dupeData.Add(key, newrom);
 							}
 						}
 					}
@@ -388,16 +354,7 @@ namespace SabreTools.Helper.Dats
 							continue;
 						}
 
-						if (outDats[rom.SystemID].Files.ContainsKey(key))
-						{
-							outDats[rom.SystemID].Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> tl = new List<DatItem>();
-							tl.Add(rom);
-							outDats[rom.SystemID].Files.Add(key, tl);
-						}
+						outDats[rom.SystemID].Add(key, rom);
 					}
 				}
 			}

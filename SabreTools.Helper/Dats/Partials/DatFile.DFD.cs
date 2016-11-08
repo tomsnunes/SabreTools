@@ -220,18 +220,8 @@ namespace SabreTools.Helper.Dats
 				if (rom != null && rom.Name != null)
 				{
 					// Add the list if it doesn't exist already
-					string key = rom.Size + "-" + rom.CRC;
-
-					lock (Files)
-					{
-						if (!Files.ContainsKey(key))
-						{
-							Files.Add(key, new List<DatItem>());
-						}
-
-						Files[key].Add(rom);
-						logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
-					}
+					Add(rom.Size + "-" + rom.CRC, rom);
+					logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 				}
 				else
 				{
@@ -379,13 +369,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Add the list if it doesn't exist already
-			lock (Files)
-			{
-				if (!Files.ContainsKey(key))
-				{
-					Files.Add(key, new List<DatItem>());
-				}
-			}
+			Add(key);
 
 			try
 			{
@@ -478,19 +462,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Add the file information to the DAT
-				lock (Files)
-				{
-					if (Files.ContainsKey(key))
-					{
-						Files[key].Add(datItem);
-					}
-					else
-					{
-						List<DatItem> temp = new List<DatItem>();
-						temp.Add(datItem);
-						Files.Add(key, temp);
-					}
-				}
+				Add(key, datItem);
 
 				logger.User("File added: " + romname + Environment.NewLine);
 			}

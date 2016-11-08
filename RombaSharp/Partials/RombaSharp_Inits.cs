@@ -106,16 +106,7 @@ namespace SabreTools
 							}
 
 							// Add to the Dat
-							if (need.Files.ContainsKey(key))
-							{
-								need.Files[key].Add(rom);
-							}
-							else
-							{
-								List<DatItem> temp = new List<DatItem>();
-								temp.Add(rom);
-								need.Files.Add(key, temp);
-							}
+							need.Add(key, rom);
 						}
 					}
 					// Otherwise, just add the file to the list
@@ -145,16 +136,7 @@ namespace SabreTools
 						}
 
 						// Add to the Dat
-						if (need.Files.ContainsKey(key))
-						{
-							need.Files[key].Add(rom);
-						}
-						else
-						{
-							List<DatItem> temp = new List<DatItem>();
-							temp.Add(rom);
-							need.Files.Add(key, temp);
-						}
+						need.Add(key, rom);
 					}
 				}
 			}

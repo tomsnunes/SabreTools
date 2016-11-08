@@ -58,16 +58,12 @@ namespace SabreTools.Helper.Dats
 				{
 					count++;
 					string newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).CRC : Constants.CRCZero);
-					if (sortable.ContainsKey(newkey))
+
+					if (!sortable.ContainsKey(newkey))
 					{
-						sortable[newkey].Add(rom);
+						sortable.Add(newkey, new List<DatItem>());
 					}
-					else
-					{
-						List<DatItem> temp = new List<DatItem>();
-						temp.Add(rom);
-						sortable.Add(newkey, temp);
-					}
+					sortable[newkey].Add(rom);
 				}
 			}
 
@@ -147,17 +143,14 @@ namespace SabreTools.Helper.Dats
 					{
 						newkey = newkey.ToLowerInvariant();
 					}
+
 					newkey = HttpUtility.HtmlEncode(newkey);
-					if (sortable.ContainsKey(newkey))
+
+					if (!sortable.ContainsKey(newkey))
 					{
-						sortable[newkey].Add(rom);
+						sortable.Add(newkey, new List<DatItem>());
 					}
-					else
-					{
-						List<DatItem> temp = new List<DatItem>();
-						temp.Add(rom);
-						sortable.Add(newkey, temp);
-					}
+					sortable[newkey].Add(rom);
 				}
 			}
 
@@ -229,16 +222,12 @@ namespace SabreTools.Helper.Dats
 						: (rom.Type == ItemType.Disk
 							? ((Disk)rom).MD5
 							: Constants.MD5Zero));
-					if (sortable.ContainsKey(newkey))
+
+					if (!sortable.ContainsKey(newkey))
 					{
-						sortable[newkey].Add(rom);
+						sortable.Add(newkey, new List<DatItem>());
 					}
-					else
-					{
-						List<DatItem> temp = new List<DatItem>();
-						temp.Add(rom);
-						sortable.Add(newkey, temp);
-					}
+					sortable[newkey].Add(rom);
 				}
 			}
 
@@ -310,16 +299,12 @@ namespace SabreTools.Helper.Dats
 						: (rom.Type == ItemType.Disk
 							? ((Disk)rom).SHA1
 							: Constants.MD5Zero));
-					if (sortable.ContainsKey(newkey))
+
+					if (!sortable.ContainsKey(newkey))
 					{
-						sortable[newkey].Add(rom);
+						sortable.Add(newkey, new List<DatItem>());
 					}
-					else
-					{
-						List<DatItem> temp = new List<DatItem>();
-						temp.Add(rom);
-						sortable.Add(newkey, temp);
-					}
+					sortable[newkey].Add(rom);
 				}
 			}
 
@@ -387,16 +372,12 @@ namespace SabreTools.Helper.Dats
 				{
 					count++;
 					string newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).Size.ToString() : "-1");
-					if (sortable.ContainsKey(newkey))
+
+					if (!sortable.ContainsKey(newkey))
 					{
-						sortable[newkey].Add(rom);
+						sortable.Add(newkey, new List<DatItem>());
 					}
-					else
-					{
-						List<DatItem> temp = new List<DatItem>();
-						temp.Add(rom);
-						sortable.Add(newkey, temp);
-					}
+					sortable[newkey].Add(rom);
 				}
 			}
 
@@ -472,16 +453,12 @@ namespace SabreTools.Helper.Dats
 							? "Default"
 							: rom.Machine.Name.ToLowerInvariant());
 				newkey = HttpUtility.HtmlEncode(newkey);
-				if (sortable.ContainsKey(newkey))
+
+				if (!sortable.ContainsKey(newkey))
 				{
-					sortable[newkey].Add(rom);
+					sortable.Add(newkey, new List<DatItem>());
 				}
-				else
-				{
-					List<DatItem> temp = new List<DatItem>();
-					temp.Add(rom);
-					sortable.Add(newkey, temp);
-				}
+				sortable[newkey].Add(rom);
 			}
 
 			return sortable;

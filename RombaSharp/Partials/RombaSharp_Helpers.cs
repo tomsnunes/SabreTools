@@ -443,9 +443,9 @@ namespace SabreTools
 			// Loop through the Dictionary and add all data
 			_logger.User("Adding new DAT information");
 			start = DateTime.Now;
-			foreach (string key in datroot.Files.Keys)
+			foreach (string key in datroot.Keys())
 			{
-				foreach (Rom value in datroot.Files[key])
+				foreach (Rom value in datroot[key])
 				{
 					AddDatToDatabase(value, dbc);
 				}
@@ -481,7 +481,7 @@ namespace SabreTools
 
 			// If the Dat wasn't empty, add the information
 			SqliteCommand slc = new SqliteCommand();
-			if (tempdat.Files.Count != 0)
+			if (tempdat.Count != 0)
 			{
 				string crcquery = "INSERT OR IGNORE INTO crc (crc) VALUES";
 				string md5query = "INSERT OR IGNORE INTO md5 (md5) VALUES";

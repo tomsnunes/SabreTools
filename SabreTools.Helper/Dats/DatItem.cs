@@ -241,7 +241,7 @@ namespace SabreTools.Helper.Dats
 		public bool HasDuplicates(DatFile datdata, Logger logger)
 		{
 			// Check for an empty rom list first
-			if (datdata.Files == null || datdata.Files.Count == 0)
+			if (datdata.Count == 0)
 			{
 				return false;
 			}
@@ -285,13 +285,13 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// If the key doesn't exist, return the empty list
-			if (!datdata.Files.ContainsKey(key))
+			if (!datdata.ContainsKey(key))
 			{
 				return false;
 			}
 
 			// Try to find duplicates
-			List<DatItem> roms = datdata.Files[key];
+			List<DatItem> roms = datdata[key];
 
 			foreach (DatItem rom in roms)
 			{
@@ -316,7 +316,7 @@ namespace SabreTools.Helper.Dats
 			List<DatItem> output = new List<DatItem>();
 
 			// Check for an empty rom list first
-			if (datdata.Files == null || datdata.Files.Count == 0)
+			if (datdata.Count == 0)
 			{
 				return output;
 			}
@@ -360,13 +360,13 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// If the key doesn't exist, return the empty list
-			if (!datdata.Files.ContainsKey(key))
+			if (!datdata.ContainsKey(key))
 			{
 				return output;
 			}
 
 			// Try to find duplicates
-			List<DatItem> roms = datdata.Files[key];
+			List<DatItem> roms = datdata[key];
 			List<DatItem> left = new List<DatItem>();
 
 			foreach (DatItem rom in roms)
@@ -384,7 +384,7 @@ namespace SabreTools.Helper.Dats
 			// If we're in removal mode, replace the list with the new one
 			if (remove)
 			{
-				datdata.Files[key] = left;
+				datdata[key] = left;
 			}
 
 			return output;

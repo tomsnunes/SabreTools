@@ -2360,16 +2360,7 @@ namespace SabreTools.Helper.Dats
 					}
 
 					// Add the item to the DAT
-					if (Files.ContainsKey(key))
-					{
-						Files[key].Add(item);
-					}
-					else
-					{
-						List<DatItem> newvalue = new List<DatItem>();
-						newvalue.Add(item);
-						Files.Add(key, newvalue);
-					}
+					Add(key, item);
 				}
 			}
 		}

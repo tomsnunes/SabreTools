@@ -159,7 +159,7 @@ namespace SabreTools.Helper.Dats
 			get { return _mergeRoms; }
 			set { _mergeRoms = value; }
 		}
-		public SortedDictionary<string, List<DatItem>> Files
+		protected SortedDictionary<string, List<DatItem>> Files
 		{
 			get
 			{
@@ -272,6 +272,209 @@ namespace SabreTools.Helper.Dats
 		#endregion
 
 		#region Instance Methods
+
+		#region Accessors
+
+		/// <summary>
+		/// Passthrough to access the file dictionary
+		/// </summary>
+		/// <param name="key">Key in the dictionary to reference</param>
+		public List<DatItem> this[string key]
+		{
+			get
+			{
+				// If the dictionary is null, create it
+				if (_files == null)
+				{
+					_files = new SortedDictionary<string, List<DatItem>>();
+				}
+
+				// If the key is missing from the dictionary, add it
+				if (!_files.ContainsKey(key))
+				{
+					_files.Add(key, new List<DatItem>());
+				}
+
+				// Now return the value
+				return _files[key];
+			}
+			set
+			{
+				// If the dictionary is null, create it
+				if (_files == null)
+				{
+					_files = new SortedDictionary<string, List<DatItem>>();
+				}
+
+				// If the key is missing from the dictionary, add it
+				if (!_files.ContainsKey(key))
+				{
+					_files.Add(key, new List<DatItem>());
+				}
+
+				// Now set the value
+				_files[key] = value;
+			}
+		}
+
+		/// <summary>
+		/// Add a new key to the file dictionary
+		/// </summary>
+		/// <param name="key">Key in the dictionary to add to</param>
+		public void Add(string key)
+		{
+			lock (_files)
+			{
+				// If the dictionary is null, create it
+				if (_files == null)
+				{
+					_files = new SortedDictionary<string, List<DatItem>>();
+				}
+
+				// If the key is missing from the dictionary, add it
+				if (!_files.ContainsKey(key))
+				{
+					_files.Add(key, new List<DatItem>());
+				}
+			}
+		}
+
+		/// <summary>
+		/// Add a value to the file dictionary
+		/// </summary>
+		/// <param name="key">Key in the dictionary to add to</param>
+		/// <param name="value">Value to add to the dictionary</param>
+		public void Add(string key, DatItem value)
+		{
+			lock (_files)
+			{
+				// If the dictionary is null, create it
+				if (_files == null)
+				{
+					_files = new SortedDictionary<string, List<DatItem>>();
+				}
+
+				// If the key is missing from the dictionary, add it
+				if (!_files.ContainsKey(key))
+				{
+					_files.Add(key, new List<DatItem>());
+				}
+
+				// Now add the value
+				_files[key].Add(value);
+			}
+		}
+
+		/// <summary>
+		/// Add a range of values to the file dictionary
+		/// </summary>
+		/// <param name="key">Key in the dictionary to add to</param>
+		/// <param name="value">Value to add to the dictionary</param>
+		public void AddRange(string key, List<DatItem> value)
+		{
+			lock (_files)
+			{
+				// If the dictionary is null, create it
+				if (_files == null)
+				{
+					_files = new SortedDictionary<string, List<DatItem>>();
+				}
+
+				// If the key is missing from the dictionary, add it
+				if (!_files.ContainsKey(key))
+				{
+					_files.Add(key, new List<DatItem>());
+				}
+
+				// Now add the value
+				_files[key].AddRange(value);
+			}
+		}
+
+		/// <summary>
+		/// Get if the file dictionary contains the key
+		/// </summary>
+		/// <param name="key">Key in the dictionary to check</param>
+		/// <returns>True if the key exists, false otherwise</returns>
+		public bool ContainsKey(string key)
+		{
+			lock (_files)
+			{
+				// If the dictionary is null, create it
+				if (_files == null)
+				{
+					_files = new SortedDictionary<string, List<DatItem>>();
+				}
+
+				return _files.ContainsKey(key);
+			}
+		}
+
+		/// <summary>
+		/// Get the number of keys in the file dictionary
+		/// </summary>
+		/// <returns>Number of keys in the file dictionary</returns>
+		public long Count
+		{
+			get
+			{
+				lock (_files)
+				{
+					// If the dictionary is null, create it
+					if (_files == null)
+					{
+						_files = new SortedDictionary<string, List<DatItem>>();
+					}
+
+					return _files.Count;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Get the keys from the file dictionary
+		/// </summary>
+		/// <returns>IEnumerable of the keys</returns>
+		public IEnumerable<string> Keys
+		{
+			get
+			{
+				lock (_files)
+				{
+					// If the dictionary is null, create it
+					if (_files == null)
+					{
+						_files = new SortedDictionary<string, List<DatItem>>();
+					}
+
+					return _files.Keys;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Remove a key from the file dictionary
+		/// </summary>
+		/// <param name="key"></param>
+		public void Remove(string key)
+		{
+			lock (_files)
+			{
+				// If the dictionary is null, create it
+				if (_files == null)
+				{
+					_files = new SortedDictionary<string, List<DatItem>>();
+				}
+
+				// If the key is in the dictionary, remove it
+				if (_files.ContainsKey(key))
+				{
+					_files.Remove(key);
+				}
+			}
+		}
+
+		#endregion
 
 		#region Cloning Methods [MODULAR DONE]
 
