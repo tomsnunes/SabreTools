@@ -87,6 +87,90 @@ namespace SabreTools.Helper.Data
 	}
 
 	/// <summary>
+	/// RAR archive flags
+	/// </summary>
+	[Flags]
+	public enum RarArchiveFlags : uint
+	{
+		Volume = 0x0001, // Volume. Archive is a part of multivolume set.
+		VolumeNumberField = 0x0002, // Volume number field is present. This flag is present in all volumes except first.
+		Solid = 0x0004, // Solid archive.
+		RecoveryRecordPresent = 0x0008, // Recovery record is present.
+		Locked = 0x0010, // Locked archive.
+	}
+
+	/// <summary>
+	/// RAR entry encryption flags
+	/// </summary>
+	[Flags]
+	public enum RarEncryptionFlags : uint
+	{
+		PasswordCheckDataPresent = 0x0001,
+		UseTweakedChecksums = 0x0002,
+
+		/*
+		If flag 0x0002 is present, RAR transforms the checksum preserving file or service data integrity, so it becomes dependent on 
+		encryption key. It makes guessing file contents based on checksum impossible. It affects both data CRC32 in file header and 
+		checksums in file hash record in extra area.
+		*/
+	}
+
+	/// <summary>
+	/// RAR file flags
+	/// </summary>
+	[Flags]
+	public enum RarFileFlags : uint
+	{
+		Directory = 0x0001, // Directory file system object (file header only)
+		TimeInUnix = 0x0002, // Time field in Unix format is present
+		CRCPresent = 0x0004, // CRC32 field is present
+		UnpackedSizeUnknown = 0x0008, // Unpacked size is unknown
+
+		/*
+		If flag 0x0008 is set, unpacked size field is still present, but must be ignored and extraction
+		must be performed until reaching the end of compression stream. This flag can be set if actual
+		file size is larger than reported by OS or if file size is unknown such as for all volumes except
+		last when archiving from stdin to multivolume archive
+		*/
+	}
+
+	/// <summary>
+	/// RAR header flags
+	/// </summary>
+	[Flags]
+	public enum RarHeaderFlags : uint
+	{
+		ExtraAreaPresent = 0x0001, // Extra area is present in the end of header
+		DataAreaPresent = 0x0002, // Data area is present in the end of header
+		BlocksWithUnknownType = 0x0004, //  Blocks with unknown type and this flag must be skipped when updating an archive
+		DataAreaContinuingFromPrevious = 0x0008, // Data area is continuing from previous volume
+		DataAreaContinuingToNext = 0x0010, // Data area is continuing in next volume
+		BlockDependsOnPreceding = 0x0020, // Block depends on preceding file block
+		PreserveChildBlock = 0x0040, // Preserve a child block if host block is modified
+	}
+
+	[Flags]
+	public enum RarUnixOwnerRecordFlags : uint
+	{
+		UserNameStringIsPresent = 0x0001,
+		GroupNameStringIsPresent = 0x0002,
+		NumericUserIdIsPresent = 0x0004,
+		NumericGroupIdIsPresent = 0x0008,
+	}
+
+	/// <summary>
+	/// RAR entry time flags
+	/// </summary>
+	[Flags]
+	public enum RarTimeFlags : uint
+	{
+		TimeInUnixFormat = 0x0001,
+		ModificationTimePresent = 0x0002,
+		CreationTimePresent = 0x0004,
+		LastAccessTimePresent = 0x0008,
+	}
+
+	/// <summary>
 	/// Zipfile special status
 	/// </summary>
 	/// <remarks>https://github.com/gjefferyes/RomVault/blob/5a93500001f0d068f32cf77a048950717507f733/ROMVault2/SupportedFiles/ZipEnums.cs</remarks>

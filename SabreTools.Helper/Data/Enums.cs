@@ -81,6 +81,88 @@
 	}
 
 	/// <summary>
+	/// RAR extra area flag
+	/// </summary>
+	public enum RarExtraAreaFlag : uint
+	{
+		FileEncryption = 0x01,
+		FileHash = 0x02,
+		FileTime = 0x03,
+		FileVersion = 0x04,
+		Redirection = 0x05,
+		UnixOwner = 0x06,
+		ServiceData = 0x07,
+	}
+
+	/// <summary>
+	/// RAR header types
+	/// </summary>
+	public enum RarHeaderType : uint
+	{
+		MainArchiveHeader = 1,
+		File = 2,
+		Service = 3,
+		ArchiveEncryption = 4,
+		EndOfArchive = 5,
+	}
+
+	/// <summary>
+	/// RAR entry redirection type
+	/// </summary>
+	public enum RarRedirectionType : uint
+	{
+		UnixSymlink = 0x0001,
+		WindowsSymlink = 0x0002,
+		WindowsJunction = 0x0003,
+		HardLink = 0x0004,
+		FileCopy = 0x0005,
+	}
+
+	/// <summary>
+	/// 7zip Properties
+	/// </summary>
+	public enum SevenZipProperties : uint
+	{
+		kEnd = 0x00,
+
+		kHeader = 0x01,
+
+		kArchiveProperties = 0x02,
+
+		kAdditionalStreamsInfo = 0x03,
+		kMainStreamsInfo = 0x04,
+		kFilesInfo = 0x05,
+
+		kPackInfo = 0x06,
+		kUnPackInfo = 0x07,
+		kSubStreamsInfo = 0x08,
+
+		kSize = 0x09,
+		kCRC = 0x0A,
+
+		kFolder = 0x0B,
+
+		kCodersUnPackSize = 0x0C,
+		kNumUnPackStream = 0x0D,
+
+		kEmptyStream = 0x0E,
+		kEmptyFile = 0x0F,
+		kAnti = 0x10,
+
+		kName = 0x11,
+		kCTime = 0x12,
+		kATime = 0x13,
+		kMTime = 0x14,
+		kWinAttributes = 0x15,
+		kComment = 0x16,
+
+		kEncodedHeader = 0x17,
+
+		kStartPos = 0x18,
+		kDummy = 0x19,
+	}
+
+	/// <summary>
 	/// Zip open type
 	/// </summary>
 	/// <remarks>https://raw.githubusercontent.com/gjefferyes/RomVault/5a93500001f0d068f32cf77a048950717507f733/ROMVault2/SupportedFiles/ZipEnums.cs</remarks>
