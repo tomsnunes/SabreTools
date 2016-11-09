@@ -113,7 +113,7 @@ namespace SabreTools
 				if (Directory.Exists(path) || File.Exists(path))
 				{
 					// Clone the base Dat for information
-					DatFile datdata = (DatFile)basedat.Clone();
+					DatFile datdata = new DatFile(basedat);
 
 					string basePath = Path.GetFullPath(path);
 					bool success = datdata.PopulateFromDir(basePath, noMD5, noSHA1, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,

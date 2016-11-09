@@ -5,7 +5,7 @@ using SabreTools.Helper.Data;
 
 namespace SabreTools.Helper.Dats
 {
-	public partial class DatFile : ICloneable
+	public partial class DatFile
 	{
 		#region Private instance variables
 
@@ -486,43 +486,52 @@ namespace SabreTools.Helper.Dats
 
 		#endregion
 
-		#region Cloning Methods [MODULAR DONE]
+		#region Constructors
 
-		public object Clone()
+		/// <summary>
+		///  Create a new, empty DatFile object
+		/// </summary>
+		public DatFile()
 		{
-			return new DatFile
-			{
-				FileName = _fileName,
-				Name = _name,
-				Description = _description,
-				RootDir = _rootDir,
-				Category = _category,
-				Version = _version,
-				Date = _date,
-				Author = _author,
-				Email = _email,
-				Homepage = _homepage,
-				Url = _url,
-				Comment = _comment,
-				Header = _header,
-				Type = _type,
-				ForceMerging = _forceMerging,
-				ForceNodump = _forceNodump,
-				ForcePacking = _forcePacking,
-				ExcludeOf = _excludeOf,
-				DatFormat = _datFormat,
-				MergeRoms = _mergeRoms,
-				SortedBy = SortedBy.Default,
-				UseGame = _useGame,
-				Prefix = _prefix,
-				Postfix = _postfix,
-				Quotes = _quotes,
-				RepExt = _repExt,
-				AddExt = _addExt,
-				RemExt = _remExt,
-				GameName = _gameName,
-				Romba = _romba,
-			};
+			_files = new SortedDictionary<string, List<DatItem>>();
+		}
+
+		/// <summary>
+		/// Create a new DatFile from an existing one
+		/// </summary>
+		/// <param name="df"></param>
+		public DatFile(DatFile datFile)
+		{
+			_fileName = datFile.FileName;
+			_name = datFile.Name;
+			_description = datFile.Description;
+			_rootDir = datFile.RootDir;
+			_category = datFile.Category;
+			_version = datFile.Version;
+			_date = datFile.Date;
+			_author = datFile.Author;
+			_email = datFile.Email;
+			_homepage = datFile.Homepage;
+			_url = datFile.Url;
+			_comment = datFile.Comment;
+			_header = datFile.Header;
+			_type = datFile.Type;
+			_forceMerging = datFile.ForceMerging;
+			_forceNodump = datFile.ForceNodump;
+			_forcePacking = datFile.ForcePacking;
+			_excludeOf = datFile.ExcludeOf;
+			_datFormat = datFile.DatFormat;
+			_mergeRoms = datFile.MergeRoms;
+			_sortedBy = SortedBy.Default;
+			_useGame = datFile.UseGame;
+			_prefix = datFile.Prefix;
+			_postfix = datFile.Postfix;
+			_quotes = datFile.Quotes;
+			_repExt = datFile.RepExt;
+			_addExt = datFile.AddExt;
+			_remExt = datFile.RemExt;
+			_gameName = datFile.GameName;
+			_romba = datFile.Romba;
 		}
 
 		#endregion

@@ -157,7 +157,7 @@ namespace SabreTools.Helper.Dats
 			if ((diff & DiffMode.NoDupes) != 0)
 			{
 				post = " (No Duplicates)";
-				outerDiffData = (DatFile)Clone();
+				outerDiffData = new DatFile(this);
 				outerDiffData.FileName += post;
 				outerDiffData.Name += post;
 				outerDiffData.Description += post;
@@ -168,7 +168,7 @@ namespace SabreTools.Helper.Dats
 			if ((diff & DiffMode.Dupes) != 0)
 			{
 				post = " (Duplicates)";
-				dupeData = (DatFile)Clone();
+				dupeData = new DatFile(this);
 				dupeData.FileName += post;
 				dupeData.Name += post;
 				dupeData.Description += post;
@@ -186,7 +186,7 @@ namespace SabreTools.Helper.Dats
 				Parallel.For(0, inputs.Count, j =>
 				{
 					string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
-					DatFile diffData = (DatFile)Clone();
+					DatFile diffData = new DatFile(this);
 					diffData.FileName += innerpost;
 					diffData.Name += innerpost;
 					diffData.Description += innerpost;
@@ -319,7 +319,7 @@ namespace SabreTools.Helper.Dats
 				}
 				else
 				{
-					diffData = (DatFile)Clone();
+					diffData = new DatFile(this);
 					diffData.FileName += post;
 					diffData.Name += post;
 					diffData.Description += post;
@@ -459,7 +459,7 @@ namespace SabreTools.Helper.Dats
 
 					if (File.Exists(inputFileName))
 					{
-						DatFile innerDatdata = (DatFile)Clone();
+						DatFile innerDatdata = new DatFile(this);
 						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
 						innerDatdata.Parse(inputFileName, 0, 0, filter, trim, single,
 							root, logger, true, clean, softlist,
@@ -480,7 +480,7 @@ namespace SabreTools.Helper.Dats
 							file =>
 							{
 								logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
-								DatFile innerDatdata = (DatFile)Clone();
+								DatFile innerDatdata = new DatFile(this);
 								innerDatdata.Parse(file, 0, 0, filter,
 									trim, single, root, logger, true, clean, softlist,
 									keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));

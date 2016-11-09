@@ -337,7 +337,7 @@ namespace SabreTools.Helper.Dats
 			BucketByGame(false, true, logger, output: false, lower: false);
 
 			// Create a temporary DAT to add things to
-			DatFile tempDat = (DatFile)Clone();
+			DatFile tempDat = new DatFile(this);
 			tempDat.Name = null;
 
 			// Sort the input keys
@@ -354,7 +354,7 @@ namespace SabreTools.Helper.Dats
 					SplitByLevelHelper(tempDat, outDir, shortname, basedat, logger);
 
 					// Reset the DAT for the next items
-					tempDat = (DatFile)Clone();
+					tempDat = new DatFile(this);
 					tempDat.Name = null;
 				}
 
