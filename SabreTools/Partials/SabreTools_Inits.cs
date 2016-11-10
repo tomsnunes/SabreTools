@@ -341,13 +341,14 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
 		/// <param name="filename">Name of the file to output to, blank for default</param>
+		/// <param name="outDir">Output directory for the report files</param>
 		/// <param name="single">True to show individual DAT statistics, false otherwise</param>
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
 		/// <param name="statDatFormat">Set the statistics output format to use</param>
-		private static void InitStats(List<string> inputs, string filename, bool single, bool baddumpCol, bool nodumpCol, StatDatFormat statDatFormat)
+		private static void InitStats(List<string> inputs, string filename, string outDir, bool single, bool baddumpCol, bool nodumpCol, StatDatFormat statDatFormat)
 		{
-			DatFile.OutputStats(inputs, (String.IsNullOrEmpty(filename) ? "report" : filename), single, baddumpCol, nodumpCol, statDatFormat, _logger);
+			DatFile.OutputStats(inputs, filename, outDir, single, baddumpCol, nodumpCol, statDatFormat, _logger);
 		}
 
 		/// <summary>

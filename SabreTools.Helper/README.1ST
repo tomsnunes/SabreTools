@@ -505,6 +505,10 @@ Options:
 		-f=, --filename=	Set the filename for the output
 			Set the filename (without extension) for the outputted report
 			
+		-out=			Set the name of the output directory
+			This sets an output folder to be used when the files are created. If a path
+			is not defined, the application directory is used instead.
+			
 		-html, --html		Write all statistics to HTML
 			This will output by default the combined statistics for all input DAT files.
 			

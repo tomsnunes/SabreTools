@@ -1021,7 +1021,7 @@ namespace SabreTools
 			// Get statistics on input files
 			else if (stats)
 			{
-				InitStats(inputs, filename, single, showBaddumpColumn, showNodumpColumn, statDatFormat);
+				InitStats(inputs, filename, outDir, single, showBaddumpColumn, showNodumpColumn, statDatFormat);
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs

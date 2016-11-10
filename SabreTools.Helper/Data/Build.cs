@@ -240,6 +240,7 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-bc, --baddump-col	Add baddump stats to output");
 						helptext.Add("	-csv, --csv		Output in Comma-Separated Value format");
 						helptext.Add("	-f=, --filename=	Set the filename for the output");
+						helptext.Add("	-out=			Output directory");
 						helptext.Add("	-html, --html		Output in HTML format");
 						helptext.Add("	-nc, --nodump-col	Add nodump stats to output");
 						helptext.Add("	-si, --single		Show individual statistics");

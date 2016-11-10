@@ -234,10 +234,23 @@ namespace SabreTools.Helper.Dats
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
 		/// <param name="statDatFormat" > Set the statistics output format to use</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public static void OutputStats(List<string> inputs, string reportName, bool single, bool baddumpCol,
-			bool nodumpCol, StatDatFormat statDatFormat, Logger logger)
+		public static void OutputStats(List<string> inputs, string reportName, string outDir, bool single,
+			bool baddumpCol, bool nodumpCol, StatDatFormat statDatFormat, Logger logger)
 		{
-			reportName += OutputStatsGetExtension(statDatFormat);
+			// Get the proper output file name
+			if (String.IsNullOrEmpty(outDir))
+			{
+				outDir = Environment.CurrentDirectory;
+			}
+			if (String.IsNullOrEmpty(reportName))
+			{
+				reportName = "report";
+			}
+			outDir = Path.GetFullPath(outDir);
+			reportName = Style.GetFileNameWithoutExtension(reportName) + OutputStatsGetExtension(statDatFormat);
+			Path.Combine(outDir, reportName);
+
+			// Create the StreamWriter for this file
 			StreamWriter sw = new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write));
 
 			// Make sure we have all files
