@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 using SabreTools.Helper;
 using SabreTools.Helper.Data;
-using SabreTools.Helper.Tools;
 
 #if MONO
 using System.IO;

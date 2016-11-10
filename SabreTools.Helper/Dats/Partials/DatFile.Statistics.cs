@@ -126,7 +126,7 @@ namespace SabreTools.Helper.Dats
 			{
 				case StatDatFormat.CSV:
 					line = "\"" + FileName + "\","
-						+ "\"" + Style.GetBytesReadable(TotalSize) + "\","
+						+ "\"" + TotalSize + "\","
 						+ "\"" + (game == -1 ? Count : game) + "\","
 						+ "\"" + RomCount + "\","
 						+ "\"" + DiskCount + "\","
@@ -191,7 +191,7 @@ namespace SabreTools.Helper.Dats
 					break;
 				case StatDatFormat.TSV:
 					line = "\"" + FileName + "\"\t"
-						+ "\"" + Style.GetBytesReadable(TotalSize) + "\"\t"
+						+ "\"" + TotalSize + "\"\t"
 						+ "\"" + (game == -1 ? Count : game) + "\"\t"
 						+ "\"" + RomCount + "\"\t"
 						+ "\"" + DiskCount + "\"\t"
