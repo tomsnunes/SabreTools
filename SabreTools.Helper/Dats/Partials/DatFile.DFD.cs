@@ -93,16 +93,6 @@ namespace SabreTools.Helper.Dats
 							});
 					});
 
-				// Process the files in all subfolders
-				files = Directory.EnumerateFiles(basePath, "*", SearchOption.AllDirectories).ToList();
-				Parallel.ForEach(files,
-					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
-					item =>
-					{
-						PopulateFromDirCheckFile(item, basePath, noMD5, noSHA1, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
-							tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
-					});
-
 				// Now find all folders that are empty, if we are supposed to
 				if (!Romba && addBlanks)
 				{
