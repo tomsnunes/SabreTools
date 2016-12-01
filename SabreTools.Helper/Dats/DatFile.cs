@@ -30,7 +30,7 @@ namespace SabreTools.Helper.Dats
 		private DatFormat _datFormat;
 		private bool _excludeOf;
 		private bool _mergeRoms;
-		private SortedDictionary<string, List<DatItem>> _files;
+		private SortedDictionary<string, List<DatItem>> _files = new SortedDictionary<string, List<DatItem>>();
 		private SortedBy _sortedBy;
 
 		// Data specific to the Miss DAT type
@@ -274,14 +274,17 @@ namespace SabreTools.Helper.Dats
 					_files = new SortedDictionary<string, List<DatItem>>();
 				}
 
-				// If the key is missing from the dictionary, add it
-				if (!_files.ContainsKey(key))
+				lock (_files)
 				{
-					_files.Add(key, new List<DatItem>());
-				}
+					// If the key is missing from the dictionary, add it
+					if (!_files.ContainsKey(key))
+					{
+						_files.Add(key, new List<DatItem>());
+					}
 
-				// Now return the value
-				return _files[key];
+					// Now return the value
+					return _files[key];
+				}
 			}
 			set
 			{
@@ -291,14 +294,17 @@ namespace SabreTools.Helper.Dats
 					_files = new SortedDictionary<string, List<DatItem>>();
 				}
 
-				// If the key is missing from the dictionary, add it
-				if (!_files.ContainsKey(key))
+				lock (_files)
 				{
-					_files.Add(key, new List<DatItem>());
-				}
+					// If the key is missing from the dictionary, add it
+					if (!_files.ContainsKey(key))
+					{
+						_files.Add(key, new List<DatItem>());
+					}
 
-				// Now set the value
-				_files[key] = value;
+					// Now set the value
+					_files[key] = value;
+				}
 			}
 		}
 
@@ -308,14 +314,14 @@ namespace SabreTools.Helper.Dats
 		/// <param name="key">Key in the dictionary to add to</param>
 		public void Add(string key)
 		{
+			// If the dictionary is null, create it
+			if (_files == null)
+			{
+				_files = new SortedDictionary<string, List<DatItem>>();
+			}
+
 			lock (_files)
 			{
-				// If the dictionary is null, create it
-				if (_files == null)
-				{
-					_files = new SortedDictionary<string, List<DatItem>>();
-				}
-
 				// If the key is missing from the dictionary, add it
 				if (!_files.ContainsKey(key))
 				{
@@ -331,14 +337,14 @@ namespace SabreTools.Helper.Dats
 		/// <param name="value">Value to add to the dictionary</param>
 		public void Add(string key, DatItem value)
 		{
+			// If the dictionary is null, create it
+			if (_files == null)
+			{
+				_files = new SortedDictionary<string, List<DatItem>>();
+			}
+
 			lock (_files)
 			{
-				// If the dictionary is null, create it
-				if (_files == null)
-				{
-					_files = new SortedDictionary<string, List<DatItem>>();
-				}
-
 				// If the key is missing from the dictionary, add it
 				if (!_files.ContainsKey(key))
 				{
@@ -357,14 +363,14 @@ namespace SabreTools.Helper.Dats
 		/// <param name="value">Value to add to the dictionary</param>
 		public void AddRange(string key, List<DatItem> value)
 		{
+			// If the dictionary is null, create it
+			if (_files == null)
+			{
+				_files = new SortedDictionary<string, List<DatItem>>();
+			}
+
 			lock (_files)
 			{
-				// If the dictionary is null, create it
-				if (_files == null)
-				{
-					_files = new SortedDictionary<string, List<DatItem>>();
-				}
-
 				// If the key is missing from the dictionary, add it
 				if (!_files.ContainsKey(key))
 				{
@@ -383,14 +389,14 @@ namespace SabreTools.Helper.Dats
 		/// <returns>True if the key exists, false otherwise</returns>
 		public bool ContainsKey(string key)
 		{
+			// If the dictionary is null, create it
+			if (_files == null)
+			{
+				_files = new SortedDictionary<string, List<DatItem>>();
+			}
+
 			lock (_files)
 			{
-				// If the dictionary is null, create it
-				if (_files == null)
-				{
-					_files = new SortedDictionary<string, List<DatItem>>();
-				}
-
 				return _files.ContainsKey(key);
 			}
 		}
@@ -403,14 +409,14 @@ namespace SabreTools.Helper.Dats
 		{
 			get
 			{
+				// If the dictionary is null, create it
+				if (_files == null)
+				{
+					_files = new SortedDictionary<string, List<DatItem>>();
+				}
+
 				lock (_files)
 				{
-					// If the dictionary is null, create it
-					if (_files == null)
-					{
-						_files = new SortedDictionary<string, List<DatItem>>();
-					}
-
 					return _files.Count;
 				}
 			}
@@ -432,14 +438,14 @@ namespace SabreTools.Helper.Dats
 		{
 			get
 			{
+				// If the dictionary is null, create it
+				if (_files == null)
+				{
+					_files = new SortedDictionary<string, List<DatItem>>();
+				}
+
 				lock (_files)
 				{
-					// If the dictionary is null, create it
-					if (_files == null)
-					{
-						_files = new SortedDictionary<string, List<DatItem>>();
-					}
-
 					return _files.Keys;
 				}
 			}
@@ -451,14 +457,14 @@ namespace SabreTools.Helper.Dats
 		/// <param name="key"></param>
 		public void Remove(string key)
 		{
+			// If the dictionary is null, create it
+			if (_files == null)
+			{
+				_files = new SortedDictionary<string, List<DatItem>>();
+			}
+
 			lock (_files)
 			{
-				// If the dictionary is null, create it
-				if (_files == null)
-				{
-					_files = new SortedDictionary<string, List<DatItem>>();
-				}
-
 				// If the key is in the dictionary, remove it
 				if (_files.ContainsKey(key))
 				{
