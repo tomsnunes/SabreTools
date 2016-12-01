@@ -457,226 +457,184 @@ namespace SabreTools
 					// User inputs
 					case "-7z":
 					case "--7z":
-						i++;
-						if (!Int32.TryParse(args[i], out sevenzip))
+						if (!Int32.TryParse(args[++i], out sevenzip))
 						{
 							sevenzip = 1;
 						}
 						break;
 					case "-ae":
 					case "--add-ext":
-						i++;
-						addext = args[i];
+						addext = args[++i];
 						break;
 					case "-au":
 					case "--author":
-						i++;
-						author = args[i];
+						author = args[++i];
 						break;
 					case "-ca":
 					case "--category=":
-						i++;
-						category = args[i];
+						category = args[++i];
 						break;
 					case "-co":
 					case "--comment":
-						i++;
-						comment = args[i];
+						comment = args[++i];
 						break;
 					case "-crc":
 					case "--crc":
-						i++;
-						crc = args[i];
+						crc = args[++i];
 						break;
 					case "-da":
 					case "--date":
 						i++;
-						date = args[i];
+						date = args[++i];
 						break;
 					case "-dat":
 					case "--dat":
-						i++;
-						if (!File.Exists(args[i]))
+						if (!File.Exists(args[++i]))
 						{
 							_logger.Error("DAT must be a valid file: " + args[i]);
-							Console.WriteLine();
-							Build.Help("SabreTools");
 							_logger.Close();
 							return;
 						}
-						datfiles.Add(args[i]);
+						datfiles.Add(args[++i]);
 						break;
 					case "-de":
 					case "--desc":
-						i++;
-						description = args[i];
+						description = args[++i];
 						break;
 					case "-em":
 					case "--email":
-						i++;
-						email = args[i];
+						email = args[++i];
 						break;
 					case "-exta":
 					case "--exta":
-						i++;
-						exta = args[i];
+						exta = args[++i];
 						break;
 					case "-extb":
 					case "--extb":
-						i++;
-						extb = args[i];
+						extb = args[++i];
 						break;
 					case "-fi":
 					case "--filename":
-						i++;
-						filename = args[i];
+						filename = args[++i];
 						break;
 					case "-fm":
 					case "--forcemerge":
-						i++;
-						forcemerge = args[i];
+						forcemerge = args[++i];
 						break;
 					case "-fn":
 					case "--forcend":
-						i++;
-						forcend = args[i];
+						forcend = args[++i];
 						break;
 					case "-fp":
 					case "--forcepack":
-						i++;
-						forcepack = args[i];
+						forcepack = args[++i];
 						break;
 					case "-gn":
 					case "--game-name":
-						i++;
-						gamename = args[i];
+						gamename = args[++i];
 						break;
 					case "-gz":
 					case "--gz":
-						i++;
-						if (!Int32.TryParse(args[i], out gz))
+						if (!Int32.TryParse(args[++i], out gz))
 						{
 							gz = 2;
 						}
 						break;
 					case "-he":
 					case "--header":
-						i++;
-						header = args[i];
+						header = args[++i];
 						break;
 					case "-hp":
 					case "--homepage":
-						i++;
-						homepage = args[i];
+						homepage = args[++i];
 						break;
 					case "-is":
 					case "--status":
-						i++;
-						status = args[i];
+						status = args[++i];
 						break;
 					case "-md5":
 					case "--md5":
-						i++;
-						md5 = args[i];
+						md5 = args[++i];
 						break;
 					case "-mt":
 					case "--mt":
-						i++;
-						Int32.TryParse(args[i], out maxParallelism);
+						Int32.TryParse(args[++i], out maxParallelism);
 						break;
 					case "-n":
 					case "--name":
-						i++;
-						name = args[i];
+						name = args[++i];
 						break;
 					case "-out":
 					case "--out":
-						i++;
-						outDir = args[i];
+						outDir = args[++i];
 						break;
 					case "-post":
 					case "--postfix":
-						i++;
-						postfix = args[i];
+						postfix = args[++i];
 						break;
 					case "-pre":
 					case "--prefix":
-						i++;
-						prefix = args[i];
+						prefix = args[++i];
 						break;
 					case "-rar":
 					case "--rar":
-						i++;
-						if (!Int32.TryParse(args[i], out rar))
+						if (!Int32.TryParse(args[++i], out rar))
 						{
 							rar = 2;
 						}
 						break;
 					case "-rd":
 					case "--root-dir":
-						i++;
-						root = args[i];
+						root = args[++i];
 						break;
 					case "-rep":
 					case "--rep-ext":
-						i++;
-						repext = args[i];
+						repext = args[++i];
 						break;
 					case "-rn":
 					case "--rom-name":
-						i++;
-						romname = args[i];
+						romname = args[++i];
 						break;
 					case "-root":
 					case "--root":
-						i++;
-						rootdir = args[i];
+						rootdir = args[++i];
 						break;
 					case "-rt":
 					case "--rom-type":
-						i++;
-						romtype = args[i];
+						romtype = args[++i];
 						break;
 					case "-seq":
 					case "--equal":
-						i++;
-						seq = GetSizeFromString(args[i]);
+						seq = GetSizeFromString(args[++i]);
 						break;
 					case "-sgt":
 					case "--greater":
-						i++;
-						sgt = GetSizeFromString(args[i]);
+						sgt = GetSizeFromString(args[++i]);
 						break;
 					case "-sha1":
 					case "--sha1":
-						i++;
-						sha1 = args[i];
+						sha1 = args[++i];
 						break;
 					case "-slt":
 					case "--less":
-						i++;
-						slt = GetSizeFromString(args[i]);
+						slt = GetSizeFromString(args[++i]);
 						break;
 					case "-t":
 					case "--temp":
-						i++;
-						tempDir = args[i];
+						tempDir = args[++i];
 						break;
 					case "-u":
 					case "-url":
 					case "--url":
-						i++;
-						url = args[i];
+						url = args[++i];
 						break;
 					case "-v":
 					case "--version":
-						i++;
-						version = args[i];
+						version = args[++i];
 						break;
 					case "-zip":
 					case "--zip":
-						i++;
-						if (!Int32.TryParse(args[i], out zip))
+						if (!Int32.TryParse(args[++i], out zip))
 						{
 							zip = 1;
 						}
@@ -731,8 +689,6 @@ namespace SabreTools
 									if (!File.Exists(split[1]))
 									{
 										_logger.Error("DAT must be a valid file: " + split[1]);
-										Console.WriteLine();
-										Build.Help("SabreTools");
 										_logger.Close();
 										return;
 									}
@@ -888,10 +844,6 @@ namespace SabreTools
 									else
 									{
 										_logger.Error("Invalid input detected: " + args[i]);
-										Console.WriteLine();
-										Build.Help("SabreTools");
-										Console.WriteLine();
-										_logger.Error("Invalid input detected: " + args[i]);
 										_logger.Close();
 										return;
 									}
@@ -904,10 +856,6 @@ namespace SabreTools
 						}
 						else
 						{
-							_logger.Error("Invalid input detected: " + args[i]);
-							Console.WriteLine();
-							Build.Help("SabreTools");
-							Console.WriteLine();
 							_logger.Error("Invalid input detected: " + args[i]);
 							_logger.Close();
 							return;
@@ -928,7 +876,6 @@ namespace SabreTools
 			if (!(datFromDir ^ extract ^ restore ^ sort ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
-				Build.Help("SabreTools");
 				_logger.Close();
 				return;
 			}
@@ -938,7 +885,6 @@ namespace SabreTools
 				&& (datFromDir || extract || restore || splitByExt || splitByHash || splitByLevel || splitByType || stats || update))
 			{
 				_logger.Error("This feature requires at least one input");
-				Build.Help("SabreTools");
 				_logger.Close();
 				return;
 			}
