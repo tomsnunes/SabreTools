@@ -152,7 +152,9 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-nm, --noMD5		Don't include MD5 in output");
 						helptext.Add("	-ns, --noSHA1		Don't include SHA1 in output");
 						helptext.Add("	-b, --bare		Don't include date in file name");
-						helptext.Add("	-u, --unzip		Force unzipping in created DAT");
+						helptext.Add("	-fp=, --forcepack=	Set force packing");
+						helptext.Add("		Supported values are:");
+						helptext.Add("		  None, Zip, Unzip");
 						helptext.Add("	-f, --files		Treat archives as files");
 						helptext.Add("	-oa, --output-all	Output in all formats");
 						helptext.Add("	-oam, --output-am	Output in AttractMode format");
