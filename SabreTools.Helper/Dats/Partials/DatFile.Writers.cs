@@ -102,9 +102,7 @@ namespace SabreTools.Helper.Dats
 			// Output initial statistics, for kicks
 			if (stats)
 			{
-				StreamWriter sw = new StreamWriter(new MemoryStream());
-				OutputStats(sw, StatDatFormat.None, logger, recalculate: (RomCount + DiskCount == 0), baddumpCol: true, nodumpCol: true);
-				sw.Dispose();
+				OutputStats(new Dictionary<StatDatFormat, StreamWriter>(), StatDatFormat.None, logger, recalculate: (RomCount + DiskCount == 0), baddumpCol: true, nodumpCol: true);
 			}
 
 			// Bucket roms by game name and optionally dedupe
