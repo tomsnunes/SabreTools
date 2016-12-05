@@ -77,14 +77,15 @@ namespace SabreTools.Helper.Dats
 		/// <summary>
 		/// Output the stats for the Dat in a human-readable format
 		/// </summary>
-		/// <param name="sw">StreamWriter representing the output file or stream for the statistics</param>
+		/// <param name="outputs">Dictionary representing the outputs</param>
 		/// <param name="statDatFormat">Set the statistics output format to use</param>
 		/// <param name="logger">Logger object for file and console writing</param>
 		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
 		/// <param name="game">Number of games to use, -1 means recalculate games (default)</param>
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise (default)</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise (default)</param>
-		public void OutputStats(StreamWriter sw, StatDatFormat statDatFormat, Logger logger, bool recalculate = false, long game = -1, bool baddumpCol = false, bool nodumpCol = false)
+		public void OutputStats(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, Logger logger, bool recalculate = false,
+			long game = -1, bool baddumpCol = false, bool nodumpCol = false)
 		{
 			// If we're supposed to recalculate the statistics, do so
 			if (recalculate)
@@ -122,10 +123,31 @@ namespace SabreTools.Helper.Dats
 
 			// Now write it out to file as well
 			string line = "";
-			switch (statDatFormat)
+			if (outputs.ContainsKey(StatDatFormat.None))
 			{
-				case StatDatFormat.CSV:
-					line = "\"" + FileName + "\","
+				line = @"'" + FileName + @"':
+--------------------------------------------------
+    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
+    Games found:             " + (game == -1 ? Count : game) + @"
+    Roms found:              " + RomCount + @"
+    Disks found:             " + DiskCount + @"
+    Roms with CRC:           " + CRCCount + @"
+    Roms with MD5:           " + MD5Count + @"
+    Roms with SHA-1:         " + SHA1Count + "\n";
+
+				if (baddumpCol)
+				{
+					line += "	Roms with BadDump status: " + BaddumpCount + "\n";
+				}
+				if (nodumpCol)
+				{
+					line += "	Roms with Nodump status: " + NodumpCount + "\n";
+				}
+				outputs[StatDatFormat.None].Write(line);
+			}
+			if (outputs.ContainsKey(StatDatFormat.CSV))
+			{
+				line = "\"" + FileName + "\","
 						+ "\"" + TotalSize + "\","
 						+ "\"" + (game == -1 ? Count : game) + "\","
 						+ "\"" + RomCount + "\","
@@ -134,19 +156,21 @@ namespace SabreTools.Helper.Dats
 						+ "\"" + MD5Count + "\","
 						+ "\"" + SHA1Count + "\"";
 
-					if (baddumpCol)
-					{
-						line += ",\"" + BaddumpCount + "\"";
-					}
-					if (nodumpCol)
-					{
-						line += ",\"" + NodumpCount + "\"";
-					}
+				if (baddumpCol)
+				{
+					line += ",\"" + BaddumpCount + "\"";
+				}
+				if (nodumpCol)
+				{
+					line += ",\"" + NodumpCount + "\"";
+				}
 
-					line += "\n";
-					break;
-				case StatDatFormat.HTML:
-					line = "\t\t\t<tr" + (FileName.StartsWith("DIR: ")
+				line += "\n";
+				outputs[StatDatFormat.CSV].Write(line);
+			}
+			if (outputs.ContainsKey(StatDatFormat.HTML))
+			{
+				line = "\t\t\t<tr" + (FileName.StartsWith("DIR: ")
 							? " class=\"dir\"><td>" + HttpUtility.HtmlEncode(FileName.Remove(0, 5))
 							: "><td>" + HttpUtility.HtmlEncode(FileName)) + "</td>"
 						+ "<td align=\"right\">" + Style.GetBytesReadable(TotalSize) + "</td>"
@@ -157,40 +181,21 @@ namespace SabreTools.Helper.Dats
 						+ "<td align=\"right\">" + MD5Count + "</td>"
 						+ "<td align=\"right\">" + SHA1Count + "</td>";
 
-					if (baddumpCol)
-					{
-						line += "<td align=\"right\">" + BaddumpCount + "</td>";
-					}
-					if (nodumpCol)
-					{
-						line += "<td align=\"right\">" + NodumpCount + "</td>";
-					}
+				if (baddumpCol)
+				{
+					line += "<td align=\"right\">" + BaddumpCount + "</td>";
+				}
+				if (nodumpCol)
+				{
+					line += "<td align=\"right\">" + NodumpCount + "</td>";
+				}
 
-					line += "</tr>\n";
-					break;
-				case StatDatFormat.None:
-				default:
-					line = @"'" + FileName + @"':
---------------------------------------------------
-    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
-    Games found:             " + (game == -1 ? Count : game) + @"
-    Roms found:              " + RomCount + @"
-    Disks found:             " + DiskCount + @"
-    Roms with CRC:           " + CRCCount + @"
-    Roms with MD5:           " + MD5Count + @"
-    Roms with SHA-1:         " + SHA1Count + "\n";
-
-					if (baddumpCol)
-					{
-						line += "	Roms with BadDump status: " + BaddumpCount + "\n";
-					}
-					if (nodumpCol)
-					{
-						line += "	Roms with Nodump status: " + NodumpCount + "\n";
-					}
-					break;
-				case StatDatFormat.TSV:
-					line = "\"" + FileName + "\"\t"
+				line += "</tr>\n";
+				outputs[StatDatFormat.HTML].Write(line);
+			}
+			if (outputs.ContainsKey(StatDatFormat.TSV))
+			{
+				line = "\"" + FileName + "\"\t"
 						+ "\"" + TotalSize + "\"\t"
 						+ "\"" + (game == -1 ? Count : game) + "\"\t"
 						+ "\"" + RomCount + "\"\t"
@@ -199,21 +204,18 @@ namespace SabreTools.Helper.Dats
 						+ "\"" + MD5Count + "\"\t"
 						+ "\"" + SHA1Count + "\"";
 
-					if (baddumpCol)
-					{
-						line += "\t\"" + BaddumpCount + "\"";
-					}
-					if (nodumpCol)
-					{
-						line += "\t\"" + NodumpCount + "\"";
-					}
+				if (baddumpCol)
+				{
+					line += "\t\"" + BaddumpCount + "\"";
+				}
+				if (nodumpCol)
+				{
+					line += "\t\"" + NodumpCount + "\"";
+				}
 
-					line += "\n";
-					break;
+				line += "\n";
+				outputs[StatDatFormat.TSV].Write(line);
 			}
-
-			// Output the line to the streamwriter
-			sw.Write(line);
 		}
 
 		#endregion
@@ -237,6 +239,12 @@ namespace SabreTools.Helper.Dats
 		public static void OutputStats(List<string> inputs, string reportName, string outDir, bool single,
 			bool baddumpCol, bool nodumpCol, StatDatFormat statDatFormat, Logger logger)
 		{
+			// If there's no output format, set the default
+			if (statDatFormat == 0x0)
+			{
+				statDatFormat = StatDatFormat.None;
+			}
+
 			// Get the proper output file name
 			if (String.IsNullOrEmpty(outDir))
 			{
@@ -247,11 +255,9 @@ namespace SabreTools.Helper.Dats
 				reportName = "report";
 			}
 			outDir = Path.GetFullPath(outDir);
-			reportName = Style.GetFileNameWithoutExtension(reportName) + OutputStatsGetExtension(statDatFormat);
-			Path.Combine(outDir, reportName);
 
-			// Create the StreamWriter for this file
-			StreamWriter sw = new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write));
+			// Get the dictionary of desired outputs
+			Dictionary<StatDatFormat, StreamWriter> outputs = OutputStatsGetOutputWriters(statDatFormat, reportName, outDir);
 
 			// Make sure we have all files
 			List<Tuple<string, string>> newinputs = new List<Tuple<string, string>>(); // item, basepath
@@ -275,7 +281,7 @@ namespace SabreTools.Helper.Dats
 				.ToList();
 
 			// Write the header, if any
-			OutputStatsWriteHeader(sw, statDatFormat, baddumpCol, nodumpCol);
+			OutputStatsWriteHeader(outputs, statDatFormat, baddumpCol, nodumpCol);
 
 			// Init all total variables
 			long totalSize = 0;
@@ -312,7 +318,7 @@ namespace SabreTools.Helper.Dats
 				if (lastdir != null && thisdir != lastdir)
 				{
 					// Output separator if needed
-					OutputStatsWriteMidSeparator(sw, statDatFormat, baddumpCol, nodumpCol);
+					OutputStatsWriteMidSeparator(outputs, statDatFormat, baddumpCol, nodumpCol);
 
 					DatFile lastdirdat = new DatFile
 					{
@@ -326,13 +332,13 @@ namespace SabreTools.Helper.Dats
 						BaddumpCount = dirBaddump,
 						NodumpCount = dirNodump,
 					};
-					lastdirdat.OutputStats(sw, statDatFormat, logger, game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
+					lastdirdat.OutputStats(outputs, statDatFormat, logger, game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 
 					// Write the mid-footer, if any
-					OutputStatsWriteMidFooter(sw, statDatFormat, baddumpCol, nodumpCol);
+					OutputStatsWriteMidFooter(outputs, statDatFormat, baddumpCol, nodumpCol);
 
 					// Write the header, if any
-					OutputStatsWriteMidHeader(sw, statDatFormat, baddumpCol, nodumpCol);
+					OutputStatsWriteMidHeader(outputs, statDatFormat, baddumpCol, nodumpCol);
 
 					// Reset the directory stats
 					dirSize = 0;
@@ -356,7 +362,7 @@ namespace SabreTools.Helper.Dats
 				logger.User("Adding stats for file '" + filename.Item1 + "'\n", false);
 				if (single)
 				{
-					datdata.OutputStats(sw, statDatFormat, logger, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
+					datdata.OutputStats(outputs, statDatFormat, logger, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 				}
 
 				// Add single DAT stats to dir
@@ -386,7 +392,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Output the directory stats one last time
-			OutputStatsWriteMidSeparator(sw, statDatFormat, baddumpCol, nodumpCol);
+			OutputStatsWriteMidSeparator(outputs, statDatFormat, baddumpCol, nodumpCol);
 
 			if (single)
 			{
@@ -402,14 +408,14 @@ namespace SabreTools.Helper.Dats
 					BaddumpCount = dirBaddump,
 					NodumpCount = dirNodump,
 				};
-				dirdat.OutputStats(sw, statDatFormat, logger, game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
+				dirdat.OutputStats(outputs, statDatFormat, logger, game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 			}
 
 			// Write the mid-footer, if any
-			OutputStatsWriteMidFooter(sw, statDatFormat, baddumpCol, nodumpCol);
+			OutputStatsWriteMidFooter(outputs, statDatFormat, baddumpCol, nodumpCol);
 
 			// Write the header, if any
-			OutputStatsWriteMidHeader(sw, statDatFormat, baddumpCol, nodumpCol);
+			OutputStatsWriteMidHeader(outputs, statDatFormat, baddumpCol, nodumpCol);
 
 			// Reset the directory stats
 			dirSize = 0;
@@ -434,13 +440,17 @@ namespace SabreTools.Helper.Dats
 				BaddumpCount = totalBaddump,
 				NodumpCount = totalNodump,
 			};
-			totaldata.OutputStats(sw, statDatFormat, logger, game: totalGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
+			totaldata.OutputStats(outputs, statDatFormat, logger, game: totalGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 
 			// Output footer if needed
-			OutputStatsWriteFooter(sw, statDatFormat);
+			OutputStatsWriteFooter(outputs, statDatFormat);
 
-			sw.Flush();
-			sw.Dispose();
+			// Flush and dispose of the stream writers
+			foreach (StatDatFormat format in outputs.Keys)
+			{
+				outputs[format].Flush();
+				outputs[format].Dispose();
+			}
 
 			logger.User(@"
 Please check the log folder if the stats scrolled offscreen", false);
@@ -450,47 +460,71 @@ Please check the log folder if the stats scrolled offscreen", false);
 		/// Get the proper extension for the stat output format
 		/// </summary>
 		/// <param name="statDatFormat">StatDatFormat to get the extension for</param>
-		/// <returns>File extension with leading period</returns>
-		private static string OutputStatsGetExtension(StatDatFormat statDatFormat)
+		/// <param name="reportName">Name of the input file to use</param>
+		/// <param name="outDir">Output path to use</param>
+		/// <returns>Dictionary of file types to StreamWriters</returns>
+		private static Dictionary<StatDatFormat, StreamWriter> OutputStatsGetOutputWriters(StatDatFormat statDatFormat, string reportName, string outDir)
 		{
-			string reportExtension = "";
-			switch (statDatFormat)
+			Dictionary<StatDatFormat, StreamWriter> output = new Dictionary<StatDatFormat, System.IO.StreamWriter>();
+
+			// For each output format, get the appropriate stream writer
+			if ((statDatFormat & StatDatFormat.None) != 0)
 			{
-				case StatDatFormat.CSV:
-					reportExtension = ".csv";
-					break;
-				case StatDatFormat.HTML:
-					reportExtension = ".html";
-					break;
-				case StatDatFormat.None:
-				default:
-					reportExtension = ".txt";
-					break;
-				case StatDatFormat.TSV:
-					reportExtension = ".csv";
-					break;
+				reportName = Style.GetFileNameWithoutExtension(reportName) + ".txt";
+				Path.Combine(outDir, reportName);
+
+				// Create the StreamWriter for this file
+				output.Add(StatDatFormat.None, new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write)));
 			}
-			return reportExtension;
+			if ((statDatFormat & StatDatFormat.CSV) != 0)
+			{
+				reportName = Style.GetFileNameWithoutExtension(reportName) + ".csv";
+				Path.Combine(outDir, reportName);
+
+				// Create the StreamWriter for this file
+				output.Add(StatDatFormat.CSV, new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write)));
+			}
+			if ((statDatFormat & StatDatFormat.HTML) != 0)
+			{
+				reportName = Style.GetFileNameWithoutExtension(reportName) + ".html";
+				Path.Combine(outDir, reportName);
+
+				// Create the StreamWriter for this file
+				output.Add(StatDatFormat.HTML, new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write)));
+			}
+			if ((statDatFormat & StatDatFormat.TSV) != 0)
+			{
+				reportName = Style.GetFileNameWithoutExtension(reportName) + ".csv";
+				Path.Combine(outDir, reportName);
+
+				// Create the StreamWriter for this file
+				output.Add(StatDatFormat.TSV, new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write)));
+			}
+
+			return output;
 		}
 
 		/// <summary>
 		/// Write out the header to the stream, if any exists
 		/// </summary>
-		/// <param name="sw">StreamWriter representing the output</param>
+		/// <param name="outputs">Dictionary representing the outputs</param>
 		/// <param name="statDatFormat">StatDatFormat representing output format</param>
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-		private static void OutputStatsWriteHeader(StreamWriter sw, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
+		private static void OutputStatsWriteHeader(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
 		{
-			string head = "";
-			switch (statDatFormat)
+			if (outputs.ContainsKey(StatDatFormat.None))
 			{
-				case StatDatFormat.CSV:
-					head = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\""
-						+ (baddumpCol ? ",\"BadDumps\"" : "") + (nodumpCol ? ",\"Nodumps\"" : "") + "\n";
-					break;
-				case StatDatFormat.HTML:
-					head = @"<!DOCTYPE html>
+				// Nothing
+			}
+			if (outputs.ContainsKey(StatDatFormat.CSV))
+			{
+				outputs[StatDatFormat.CSV].Write("\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\""
+					+ (baddumpCol ? ",\"BadDumps\"" : "") + (nodumpCol ? ",\"Nodumps\"" : "") + "\n");
+			}
+			if (outputs.ContainsKey(StatDatFormat.HTML))
+			{
+				outputs[StatDatFormat.HTML].Write(@"<!DOCTYPE html>
 <html>
 	<header>
 		<title>DAT Statistics Report</title>
@@ -509,115 +543,113 @@ Please check the log folder if the stats scrolled offscreen", false);
 	<body>
 		<h2>DAT Statistics Report (" + DateTime.Now.ToShortDateString() + @")</h2>
 		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
-";
-					break;
-				case StatDatFormat.None:
-				default:
-					break;
-				case StatDatFormat.TSV:
-					head = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\""
-						+ (baddumpCol ? "\t\"BadDumps\"" : "") + (nodumpCol ? "\t\"Nodumps\"" : "") + "\n";
-					break;
+");
 			}
-			sw.Write(head);
+			if (outputs.ContainsKey(StatDatFormat.TSV))
+			{
+				outputs[StatDatFormat.TSV].Write("\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\""
+						+ (baddumpCol ? "\t\"BadDumps\"" : "") + (nodumpCol ? "\t\"Nodumps\"" : "") + "\n");
+			}
 
 			// Now write the mid header for those who need it
-			OutputStatsWriteMidHeader(sw, statDatFormat, baddumpCol, nodumpCol);
+			OutputStatsWriteMidHeader(outputs, statDatFormat, baddumpCol, nodumpCol);
 		}
 
 		/// <summary>
 		/// Write out the mid-header to the stream, if any exists
 		/// </summary>
-		/// <param name="sw">StreamWriter representing the output</param>
+		/// <param name="outputs">Dictionary representing the outputs</param>
 		/// <param name="statDatFormat">StatDatFormat representing output format</param>
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-		private static void OutputStatsWriteMidHeader(StreamWriter sw, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
+		private static void OutputStatsWriteMidHeader(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
 		{
-			string head = "";
-			switch (statDatFormat)
+			if (outputs.ContainsKey(StatDatFormat.None))
 			{
-				case StatDatFormat.CSV:
-					break;
-				case StatDatFormat.HTML:
-					head = @"			<tr bgcolor=""gray""><th>File Name</th><th align=""right"">Total Size</th><th align=""right"">Games</th><th align=""right"">Roms</th>"
-+ @"<th align=""right"">Disks</th><th align=""right"">&#35; with CRC</th><th align=""right"">&#35; with MD5</th><th align=""right"">&#35; with SHA-1</th>"
-+ (baddumpCol ? "<th class=\".right\">Baddumps</th>" : "") + (nodumpCol ? "<th class=\".right\">Nodumps</th>" : "") + "</tr>\n";
-					break;
-				case StatDatFormat.None:
-				default:
-					break;
-				case StatDatFormat.TSV:
-					break;
+				// Nothing
 			}
-			sw.Write(head);
+			if (outputs.ContainsKey(StatDatFormat.CSV))
+			{
+				// Nothing
+			}
+			if (outputs.ContainsKey(StatDatFormat.HTML))
+			{
+				outputs[StatDatFormat.HTML].Write(@"			<tr bgcolor=""gray""><th>File Name</th><th align=""right"">Total Size</th><th align=""right"">Games</th><th align=""right"">Roms</th>"
++ @"<th align=""right"">Disks</th><th align=""right"">&#35; with CRC</th><th align=""right"">&#35; with MD5</th><th align=""right"">&#35; with SHA-1</th>"
++ (baddumpCol ? "<th class=\".right\">Baddumps</th>" : "") + (nodumpCol ? "<th class=\".right\">Nodumps</th>" : "") + "</tr>\n");
+			}
+			if (outputs.ContainsKey(StatDatFormat.TSV))
+			{
+				// Nothing
+			}
 		}
 
 		/// <summary>
 		/// Write out the separator to the stream, if any exists
 		/// </summary>
-		/// <param name="sw">StreamWriter representing the output</param>
+		/// <param name="outputs">Dictionary representing the outputs</param>
 		/// <param name="statDatFormat">StatDatFormat representing output format</param>
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-		private static void OutputStatsWriteMidSeparator(StreamWriter sw, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
+		private static void OutputStatsWriteMidSeparator(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
 		{
-			string mid = "";
-			switch (statDatFormat)
+			if (outputs.ContainsKey(StatDatFormat.None))
 			{
-				case StatDatFormat.CSV:
-					break;
-				case StatDatFormat.HTML:
-					mid = "<tr><td colspan=\""
+				// Nothing
+			}
+			if (outputs.ContainsKey(StatDatFormat.CSV))
+			{
+				// Nothing
+			}
+			if (outputs.ContainsKey(StatDatFormat.HTML))
+			{
+				outputs[StatDatFormat.HTML].Write("<tr><td colspan=\""
 						+ (baddumpCol && nodumpCol
 							? "11"
 							: (baddumpCol ^ nodumpCol
 								? "10"
 								: "9")
 							)
-						+ "\"></td></tr>\n";
-					break;
-				case StatDatFormat.None:
-				default:
-					break;
+						+ "\"></td></tr>\n");
 			}
-			sw.Write(mid);
+			if (outputs.ContainsKey(StatDatFormat.TSV))
+			{
+				// Nothing
+			}
 		}
 
 		/// <summary>
 		/// Write out the footer-separator to the stream, if any exists
 		/// </summary>
-		/// <param name="sw">StreamWriter representing the output</param>
+		/// <param name="outputs">Dictionary representing the outputs</param>
 		/// <param name="statDatFormat">StatDatFormat representing output format</param>
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-		private static void OutputStatsWriteMidFooter(StreamWriter sw, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
+		private static void OutputStatsWriteMidFooter(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
 		{
-			string end = "";
-			switch (statDatFormat)
+			if (outputs.ContainsKey(StatDatFormat.None))
 			{
-				case StatDatFormat.CSV:
-					end = "\n";
-					break;
-				case StatDatFormat.HTML:
-					end = "<tr border=\"0\"><td colspan=\""
+				outputs[StatDatFormat.None].Write("\n");
+			}
+			if (outputs.ContainsKey(StatDatFormat.CSV))
+			{
+				outputs[StatDatFormat.CSV].Write("\n");
+			}
+			if (outputs.ContainsKey(StatDatFormat.HTML))
+			{
+				outputs[StatDatFormat.HTML].Write("<tr border=\"0\"><td colspan=\""
 						+ (baddumpCol && nodumpCol
 							? "11"
 							: (baddumpCol ^ nodumpCol
 								? "10"
 								: "9")
 							)
-						+ "\"></td></tr>\n";
-					break;
-				case StatDatFormat.None:
-				default:
-					end = "\n";
-					break;
-				case StatDatFormat.TSV:
-					end = "\n";
-					break;
+						+ "\"></td></tr>\n");
 			}
-			sw.Write(end);
+			if (outputs.ContainsKey(StatDatFormat.TSV))
+			{
+				outputs[StatDatFormat.TSV].Write("\n");
+			}
 		}
 
 		/// <summary>
@@ -625,26 +657,27 @@ Please check the log folder if the stats scrolled offscreen", false);
 		/// </summary>
 		/// <param name="sw">StreamWriter representing the output</param>
 		/// <param name="statDatFormat">StatDatFormat representing output format</param>
-		private static void OutputStatsWriteFooter(StreamWriter sw, StatDatFormat statDatFormat)
+		private static void OutputStatsWriteFooter(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat)
 		{
-			string end = "";
-			switch (statDatFormat)
+			if (outputs.ContainsKey(StatDatFormat.None))
 			{
-				case StatDatFormat.CSV:
-					break;
-				case StatDatFormat.HTML:
-					end = @"		</table>
+				// Nothing
+			}
+			if (outputs.ContainsKey(StatDatFormat.CSV))
+			{
+				// Nothing
+			}
+			if (outputs.ContainsKey(StatDatFormat.HTML))
+			{
+				outputs[StatDatFormat.HTML].Write(@"		</table>
 	</body>
 </html>
-";
-					break;
-				case StatDatFormat.None:
-				default:
-					break;
-				case StatDatFormat.TSV:
-					break;
+");
 			}
-			sw.Write(end);
+			if (outputs.ContainsKey(StatDatFormat.TSV))
+			{
+				// Nothing
+			}
 		}
 
 		#endregion

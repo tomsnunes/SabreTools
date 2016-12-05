@@ -227,6 +227,18 @@ namespace SabreTools.Helper.Data
 		ALL = 0xFFFF,
 	}
 
+	/// <summary>
+	/// Determine which format to output Stats to
+	/// </summary>
+	/// [Flags]
+	public enum StatDatFormat
+	{
+		None = 0x01,
+		HTML = 0x02,
+		CSV = 0x04,
+		TSV = 0x08,
+	}
+
 	#endregion
 
 	#region DatItem related

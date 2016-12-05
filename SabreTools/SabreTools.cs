@@ -101,7 +101,7 @@ namespace SabreTools
 			DatFormat datFormat = 0x0;
 			DiffMode diffMode = 0x0;
 			OutputFormat outputFormat = OutputFormat.Folder;
-			StatDatFormat statDatFormat = StatDatFormat.None;
+			StatDatFormat statDatFormat = 0x0;
 
 			// User inputs
 			int gz = 2, // SimpleSort
@@ -242,7 +242,7 @@ namespace SabreTools
 						break;
 					case "-csv":
 					case "--csv":
-						statDatFormat = StatDatFormat.CSV;
+						statDatFormat |= StatDatFormat.CSV;
 						break;
 					case "-dd":
 					case "--dedup":
@@ -282,7 +282,7 @@ namespace SabreTools
 						break;
 					case "-html":
 					case "--html":
-						statDatFormat = StatDatFormat.HTML;
+						statDatFormat |= StatDatFormat.HTML;
 						break;
 					case "-in":
 					case "--inverse":
@@ -438,7 +438,7 @@ namespace SabreTools
 						break;
 					case "-tsv":
 					case "--tsv":
-						statDatFormat = StatDatFormat.TSV;
+						statDatFormat |= StatDatFormat.TSV;
 						break;
 					case "-txz":
 					case "--txz":

@@ -285,17 +285,6 @@
 		NotNodump = 5, // This is a fake flag that is used for filter only
 	}
 
-	/// <summary>
-	/// Determine which format to output Stats to
-	/// </summary>
-	public enum StatDatFormat
-	{
-		None = 0,
-		HTML = 1,
-		CSV = 2,
-		TSV = 3,
-	}
-
 	#endregion
 
 	#region Skippers and Mappers
