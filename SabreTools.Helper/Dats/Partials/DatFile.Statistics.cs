@@ -486,6 +486,8 @@ Please check the log folder if the stats scrolled offscreen", false);
 			switch (statDatFormat)
 			{
 				case StatDatFormat.CSV:
+					head = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\""
+						+ (baddumpCol ? ",\"BadDumps\"" : "") + (nodumpCol ? ",\"Nodumps\"" : "") + "\n";
 					break;
 				case StatDatFormat.HTML:
 					head = @"<!DOCTYPE html>
@@ -513,6 +515,8 @@ Please check the log folder if the stats scrolled offscreen", false);
 				default:
 					break;
 				case StatDatFormat.TSV:
+					head = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\""
+						+ (baddumpCol ? "\t\"BadDumps\"" : "") + (nodumpCol ? "\t\"Nodumps\"" : "") + "\n";
 					break;
 			}
 			sw.Write(head);
@@ -534,8 +538,6 @@ Please check the log folder if the stats scrolled offscreen", false);
 			switch (statDatFormat)
 			{
 				case StatDatFormat.CSV:
-					head = "\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\""
-						+ (baddumpCol ? ",\"BadDumps\"" : "") + (nodumpCol ? ",\"Nodumps\"" : "") + "\n";
 					break;
 				case StatDatFormat.HTML:
 					head = @"			<tr bgcolor=""gray""><th>File Name</th><th align=""right"">Total Size</th><th align=""right"">Games</th><th align=""right"">Roms</th>"
@@ -546,8 +548,6 @@ Please check the log folder if the stats scrolled offscreen", false);
 				default:
 					break;
 				case StatDatFormat.TSV:
-					head = "\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\""
-						+ (baddumpCol ? "\t\"BadDumps\"" : "") + (nodumpCol ? "\t\"Nodumps\"" : "") + "\n";
 					break;
 			}
 			sw.Write(head);
