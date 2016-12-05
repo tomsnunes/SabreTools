@@ -437,6 +437,13 @@ namespace SabreTools
 		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="status">Select roms with the given item status</param>
+		/// <param name="notgamename">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="notromname">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="notromtype">Type of the rom to match</param>
+		/// <param name="notcrc">CRC of the rom to match (can use asterisk-partials)</param>
+		/// <param name="notmd5">MD5 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="notsha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="notstatus">Select roms with the given item status</param>
 		/// /* Trimming info */
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
@@ -499,6 +506,13 @@ namespace SabreTools
 			string md5,
 			string sha1,
 			string status,
+			string notgamename,
+			string notromname,
+			string notromtype,
+			string notcrc,
+			string notmd5,
+			string notsha1,
+			string notstatus,
 
 			/* Trimming info */
 			bool trim,
@@ -582,8 +596,26 @@ namespace SabreTools
 				case "verified":
 					itemStatus = ItemStatus.Verified;
 					break;
-				case "notnodump":
-					itemStatus = ItemStatus.NotNodump;
+			}
+
+			// Set the not status flag for filtering
+			ItemStatus itemNotStatus = ItemStatus.NULL;
+			switch (status?.ToLowerInvariant())
+			{
+				case "none":
+					itemNotStatus = ItemStatus.None;
+					break;
+				case "good":
+					itemNotStatus = ItemStatus.Good;
+					break;
+				case "baddump":
+					itemNotStatus = ItemStatus.BadDump;
+					break;
+				case "nodump":
+					itemNotStatus = ItemStatus.Nodump;
+					break;
+				case "verified":
+					itemNotStatus = ItemStatus.Verified;
 					break;
 			}
 
@@ -657,7 +689,8 @@ namespace SabreTools
 			};
 
 			// Create the Filter object to be used
-			Filter filter = new Filter(gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus);
+			Filter filter = new Filter(gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus,
+				notgamename, notromname, notromtype, notcrc, notmd5, notsha1, itemNotStatus);
 
 			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,
 				filter, trim, single, root, maxDegreeOfParallelism, _logger);

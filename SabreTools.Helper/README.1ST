@@ -791,11 +791,16 @@ Options:
 					In times where the first DAT does not need to be written out a second time,
 					this will skip writing it. This can often speed up the output process.
 
-		-gn=, --game-name=	Filter by game name
+		-gn=, --not-game=	Filter by game name
+		-ngn=, --game-name=	Exclude by game name
 		-rn=, --rom-name=	Filter by rom name
+		-nrn=, --not-rom=	Exclude by rom name
 		-crc=, --crc=		Filter by CRC hash
+		-ncrc=, --not-crc=	Exclude by CRC hash
 		-md5=, --md5=		Filter by MD5 hash
+		-nmd5=, --not-md5=	Exclude by MD5 hash
 		-sha1=, --sha1=		Filter by SHA-1 hash
+		-nsha1=, --not-sha1= Exclude by SHA-1 hash
 			For each of the flags above, the user can specify either an exact match or can use a
 			wildcard as defined below (case-insensitive):
 				*00 means ends with '00'
@@ -806,6 +811,9 @@ Options:
 		-rt=, --rom-type=	Filter by rom type
 			This allows users to only include roms or disks to their liking
 		
+		-nrt=, --not-type=	Exclude by rom type
+			This allows users to only exclude roms or disks to their liking
+		
 		-sgt=, --greater=	Filter by size >=
 		-slt=, --less=		Filter by size <=
 		-seq=, --equal=		Filter by size ==
@@ -813,9 +821,13 @@ Options:
 			various standard postfixes for size:
 				e.g. 8kb => 8000 or 8kib => 8192
 		
-		-is=, status=		Include only items with a given status
+		-is=, --status=		Include only items with a given status
 			Include items with one of the supported values:
-				None, Good, BadDump, Nodump, Verified, NotNodump
+				None, Good, BadDump, Nodump, Verified
+
+		-nis=, --not-status=	Exclude only items with a given status
+			Include items with one of the supported values:
+				None, Good, BadDump, Nodump, Verified
 		
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If a path

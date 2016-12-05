@@ -339,17 +339,26 @@ namespace SabreTools.Helper.Data
 							helptext.Add("		[Can be used with other -diX flags]");
 							helptext.Add("		-b, --bare		Don't include date in automatic name");
 						helptext.Add("	-gn=, --game-name=	Filter by game name");
+						helptext.Add("	-ngn=, --not-game=	Filter by not game name");
 						helptext.Add("	-rn=, --rom-name=	Filter by rom name");
+						helptext.Add("	-nrn=, --not-rom=	Filter by not rom name");
 						helptext.Add("	-rt=, --rom-type=	Filter by rom type");
+						helptext.Add("	-nrt=, --not-type=	Filter by not rom type");
 						helptext.Add("	-sgt=, --greater=	Filter by size >=");
 						helptext.Add("	-slt=, --less=		Filter by size <=");
 						helptext.Add("	-seq=, --equal=		Filter by size ==");
 						helptext.Add("	-crc=, --crc=		Filter by CRC hash");
+						helptext.Add("	-ncrc=, --not-crc=	Filter by not CRC hash");
 						helptext.Add("	-md5=, --md5=		Filter by MD5 hash");
+						helptext.Add("	-nmd5=, --not-md5=	Filter by not MD5 hash");
 						helptext.Add("	-sha1=, --sha1=		Filter by SHA-1 hash");
+						helptext.Add("	-nsha1=, --not-sha1=	Filter by not SHA-1 hash");
 						helptext.Add("	-is=, --status=		Include only items with a given status");
 							helptext.Add("		Supported values are:");
-							helptext.Add("		  None, Good, BadDump, Nodump, Verified, NotNodump");
+							helptext.Add("		  None, Good, BadDump, Nodump, Verified");
+						helptext.Add("	-nis=, --not-status=	Exclude items with a given status");
+						helptext.Add("		Supported values are:");
+						helptext.Add("		  None, Good, BadDump, Nodump, Verified");
 						helptext.Add("	-out=			Output directory (overridden by --inplace)");
 						helptext.Add("	-mt={4}			Amount of threads to use (-1 unlimted)");
 

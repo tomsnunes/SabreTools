@@ -131,6 +131,13 @@ namespace SabreTools
 				homepage = null,
 				md5 = "",
 				name = null,
+				notcrc = null,
+				notgamename = null,
+				notmd5 = null,
+				notromname = null,
+				notromtype = null,
+				notsha1 = null,
+				notstatus = null,
 				outDir = "",
 				postfix = "",
 				prefix = "",
@@ -564,6 +571,34 @@ namespace SabreTools
 					case "--name":
 						name = args[++i];
 						break;
+					case "-ncrc":
+					case "--not-crc":
+						notcrc = args[++i];
+						break;
+					case "-ngn":
+					case "--not-game":
+						notgamename = args[++i];
+						break;
+					case "-nis":
+					case "--not-status":
+						notstatus = args[++i];
+						break;
+					case "-nmd5":
+					case "--not-md5":
+						notmd5 = args[++i];
+						break;
+					case "-nrn":
+					case "--not-rom":
+						notromname = args[++i];
+						break;
+					case "-nrt":
+					case "--not-type":
+						notromtype = args[++i];
+						break;
+					case "-nsha1":
+					case "--not-sha1":
+						notsha1 = args[++i];
+						break;
 					case "-out":
 					case "--out":
 						outDir = args[++i];
@@ -760,6 +795,34 @@ namespace SabreTools
 								case "-n":
 								case "--name":
 									name = split[1];
+									break;
+								case "-ncrc":
+								case "--not-crc":
+									notcrc = split[1];
+									break;
+								case "-ngn":
+								case "--not-game":
+									notgamename = split[1];
+									break;
+								case "-nis":
+								case "--not-status":
+									notstatus = split[1];
+									break;
+								case "-nmd5":
+								case "--not-md5":
+									notmd5 = split[1];
+									break;
+								case "-nrn":
+								case "--not-rom":
+									notromname = split[1];
+									break;
+								case "-nrt":
+								case "--not-type":
+									notromtype = split[1];
+									break;
+								case "-nsha1":
+								case "--not-sha1":
+									notsha1 = split[1];
 									break;
 								case "-out":
 								case "--out":
@@ -974,8 +1037,10 @@ namespace SabreTools
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix,
-					postfix, quotes, repext, addext, remext, datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName, gamename, romname,
-					romtype, sgt, slt, seq, crc, md5, sha1, status, trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
+					postfix, quotes, repext, addext, remext, datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, status,
+					notgamename, notromname, notromtype, notcrc, notmd5, notsha1, notstatus,
+					trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
 			}
 
 			// If we're using the verifier
