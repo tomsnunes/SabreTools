@@ -234,7 +234,7 @@ namespace SabreTools.Helper.Dats
 				switch (datFormat)
 				{
 					case DatFormat.AttractMode:
-						header = "#Name;Title;Emulator;CloneOf;Year;Manufacturer;Category;Players;Rotation;Control;Status;DisplayCount;DisplayType;AltRomname;AltTitle;Extra;Buttons\n";
+						header = "#Title;Name;Emulator;CloneOf;Year;Manufacturer;Category;Players;Rotation;Control;Status;DisplayCount;DisplayType;AltRomname;AltTitle;Extra;Buttons\n";
 						break;
 					case DatFormat.ClrMamePro:
 						header = "clrmamepro (\n" +
@@ -444,8 +444,8 @@ namespace SabreTools.Helper.Dats
 				switch (datFormat)
 				{
 					case DatFormat.AttractMode:
-						state += rom.Machine.Description + ";"
-							+ rom.Machine.Name + ";"
+						state += rom.Machine.Name + ";"
+							+ rom.Machine.Description + ";"
 							+ FileName + ";"
 							+ rom.Machine.CloneOf + ";"
 							+ rom.Machine.Year + ";"
