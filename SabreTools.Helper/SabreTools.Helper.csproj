@@ -185,6 +185,7 @@
     <None Include="README.1ST">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="README.DEPRECIATED" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="LICENSE.jzlib.txt" />
