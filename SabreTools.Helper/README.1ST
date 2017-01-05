@@ -1,5 +1,5 @@
 ************************************************
-*	 SabreTools - DAT management software	 *
+*     SabreTools - DAT management software     *
 * https://github.com/mnadareski/wizzardDesktop *
 ************************************************
 
@@ -22,7 +22,7 @@ care? Well, the first two can be answered, though the last one is up to you.
 
 SabreTools has its roots in an internal tool developed by RomShepherd member
 The Wizard of DATz (WoD). The aim of the PHP-based program was to collate data
-frommultiple sources and create new DAT files for custom sources as well as
+from multiple sources and create new DAT files for custom sources as well as
 DAT files that have duplicate data removed. WoD maintained this software and
 used it to create near-monthly releases for quite a while.
 
@@ -39,13 +39,13 @@ rewrite while maintaining functionality. He was given a lot of support and got
 started with the aim to keep the code completely open source so that anyone can
 help. It took a lot of work and help from fellow user emuLOAD, but the code
 finally started to shape up in the form of WoD Redux. This project is still
-active and can be found at https://github.com/mnadareski/wizzardRedux.
+partially active and can be found at https://github.com/mnadareski/wizzardRedux.
 
 After about a month of work on this, and continued support from the community,
 a relatively new user to the site, now known as @tractivo, sent him a message
 and asked if a desktop port of some of the core features was possible. It was
 difficult for most people to run the PHP code locally, so it made sense. With
-the aim for people to use the web version primarlily, the desktop version,
+the aim for people to use the web version primarily, the desktop version,
 originally called DATabase, was written. Pretty soon, this got even more support
 and soon became the main focus. For a while, code parity between the C# and PHP
 versions was attempted, but it became apparent that the desktop version was going
@@ -873,7 +873,7 @@ Here, any user-requested examples will go
 Programmer / Lead:	Matt Nadareski (darksabre76)
 Additional code:	emuLOAD, @tractivo
 Testing:			emuLOAD, @tractivo, Kludge, Obiwantje, edc
-Suggestions:		edc, AcidX, Amiga12, EliUmniCk
+Suggestions:		Obiwantje, edc, AcidX, Amiga12, EliUmniCk
 Based on work by:	The Wizard of DATz
 
 We welcome any contributors for coding, suggestions, optimizations, critisism,
