@@ -600,7 +600,7 @@ namespace SabreTools
 
 			// Set the not status flag for filtering
 			ItemStatus itemNotStatus = ItemStatus.NULL;
-			switch (status?.ToLowerInvariant())
+			switch (notstatus?.ToLowerInvariant())
 			{
 				case "none":
 					itemNotStatus = ItemStatus.None;
