@@ -137,7 +137,7 @@ namespace SabreTools.Helper.Dats
 			}
 			else if (splitType == SplitType.MergedWithDevice)
 			{
-				logger.User("Full merging is not yet available. Sorry for the inconvenience");
+				CreateFullyMergedSets(false, logger, output: false);
 			}
 		}
 
