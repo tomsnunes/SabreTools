@@ -1,8 +1,10 @@
-﻿using SabreTools.Helper.Data;
+﻿using System;
+
+using SabreTools.Helper.Data;
 
 namespace SabreTools.Helper.Dats
 {
-	public class Release : DatItem
+	public class Release : DatItem, ICloneable
 	{
 		#region Private instance variables
 
@@ -51,6 +53,41 @@ namespace SabreTools.Helper.Dats
 			_language = "";
 			_date = "";
 			_default = null;
+		}
+
+		#endregion
+
+		#region Cloning Methods
+
+		public object Clone()
+		{
+			return new Release()
+			{
+				Name = this.Name,
+				Type = this.Type,
+				Dupe = this.Dupe,
+
+				Machine = this.Machine,
+
+				Supported = this.Supported,
+				Publisher = this.Publisher,
+				Infos = this.Infos,
+				PartName = this.PartName,
+				PartInterface = this.PartInterface,
+				Features = this.Features,
+				AreaName = this.AreaName,
+				AreaSize = this.AreaSize,
+
+				SystemID = this.SystemID,
+				System = this.System,
+				SourceID = this.SourceID,
+				Source = this.Source,
+
+				Region = this.Region,
+				Language = this.Language,
+				Date = this.Date,
+				Default = this.Default,
+			};
 		}
 
 		#endregion

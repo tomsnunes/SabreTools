@@ -1,8 +1,10 @@
-﻿using SabreTools.Helper.Data;
+﻿using System;
+
+using SabreTools.Helper.Data;
 
 namespace SabreTools.Helper.Dats
 {
-	public class Sample : DatItem
+	public class Sample : DatItem, ICloneable
 	{
 		#region Constructors
 
@@ -13,6 +15,36 @@ namespace SabreTools.Helper.Dats
 		{
 			_name = "";
 			_itemType = ItemType.Sample;
+		}
+
+		#endregion
+
+		#region Cloning Methods
+
+		public object Clone()
+		{
+			return new Sample()
+			{
+				Name = this.Name,
+				Type = this.Type,
+				Dupe = this.Dupe,
+
+				Machine = this.Machine,
+
+				Supported = this.Supported,
+				Publisher = this.Publisher,
+				Infos = this.Infos,
+				PartName = this.PartName,
+				PartInterface = this.PartInterface,
+				Features = this.Features,
+				AreaName = this.AreaName,
+				AreaSize = this.AreaSize,
+
+				SystemID = this.SystemID,
+				System = this.System,
+				SourceID = this.SourceID,
+				Source = this.Source,
+			};
 		}
 
 		#endregion

@@ -1,8 +1,9 @@
-﻿using SabreTools.Helper.Data;
+﻿using System;
+using SabreTools.Helper.Data;
 
 namespace SabreTools.Helper.Dats
 {
-	public class BiosSet : DatItem
+	public class BiosSet : DatItem, ICloneable
 	{
 		#region Private instance variables
 
@@ -35,6 +36,39 @@ namespace SabreTools.Helper.Dats
 		{
 			_name = "";
 			_itemType = ItemType.BiosSet;
+		}
+
+		#endregion
+
+		#region Cloning Methods
+
+		public object Clone()
+		{
+			return new BiosSet()
+			{
+				Name = this.Name,
+				Type = this.Type,
+				Dupe = this.Dupe,
+
+				Machine = this.Machine,
+
+				Supported = this.Supported,
+				Publisher = this.Publisher,
+				Infos = this.Infos,
+				PartName = this.PartName,
+				PartInterface = this.PartInterface,
+				Features = this.Features,
+				AreaName = this.AreaName,
+				AreaSize = this.AreaSize,
+
+				SystemID = this.SystemID,
+				System = this.System,
+				SourceID = this.SourceID,
+				Source = this.Source,
+
+				Description = this.Description,
+				Default = this.Default,
+			};
 		}
 
 		#endregion

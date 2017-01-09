@@ -4,7 +4,7 @@ using SabreTools.Helper.Data;
 
 namespace SabreTools.Helper.Dats
 {
-	public class Rom : Disk
+	public class Rom : Disk, ICloneable
 	{
 		#region Private instance variables
 
@@ -69,6 +69,43 @@ namespace SabreTools.Helper.Dats
 			{
 				Name = machineName,
 				Description = machineName,
+			};
+		}
+
+		#endregion
+
+		#region Cloning Methods
+
+		public new object Clone()
+		{
+			return new Rom()
+			{
+				Name = this.Name,
+				Type = this.Type,
+				Dupe = this.Dupe,
+
+				Machine = this.Machine,
+
+				Supported = this.Supported,
+				Publisher = this.Publisher,
+				Infos = this.Infos,
+				PartName = this.PartName,
+				PartInterface = this.PartInterface,
+				Features = this.Features,
+				AreaName = this.AreaName,
+				AreaSize = this.AreaSize,
+
+				SystemID = this.SystemID,
+				System = this.System,
+				SourceID = this.SourceID,
+				Source = this.Source,
+
+				MD5 = this.MD5,
+				SHA1 = this.SHA1,
+				ItemStatus = this.ItemStatus,
+				Size = this.Size,
+				CRC = this.CRC,
+				Date = this.Date,
 			};
 		}
 

@@ -4,7 +4,7 @@ using SabreTools.Helper.Data;
 
 namespace SabreTools.Helper.Dats
 {
-	public class Disk : DatItem
+	public class Disk : DatItem, ICloneable
 	{
 		#region Private instance variables
 
@@ -48,6 +48,40 @@ namespace SabreTools.Helper.Dats
 			_itemType = ItemType.Disk;
 			_dupeType = 0x00;
 			_itemStatus = ItemStatus.None;
+		}
+
+		#endregion
+
+		#region Cloning Methods
+
+		public object Clone()
+		{
+			return new Disk()
+			{
+				Name = this.Name,
+				Type = this.Type,
+				Dupe = this.Dupe,
+
+				Machine = this.Machine,
+
+				Supported = this.Supported,
+				Publisher = this.Publisher,
+				Infos = this.Infos,
+				PartName = this.PartName,
+				PartInterface = this.PartInterface,
+				Features = this.Features,
+				AreaName = this.AreaName,
+				AreaSize = this.AreaSize,
+
+				SystemID = this.SystemID,
+				System = this.System,
+				SourceID = this.SourceID,
+				Source = this.Source,
+
+				MD5 = this.MD5,
+				SHA1 = this.SHA1,
+				ItemStatus = this.ItemStatus,
+			};
 		}
 
 		#endregion
