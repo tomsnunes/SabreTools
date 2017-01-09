@@ -25,6 +25,8 @@ namespace SabreTools.Helper.Dats
 		private string _notSha1;
 		private ItemStatus _itemStatus;
 		private ItemStatus _itemNotStatus;
+		private MachineType _machineType;
+		private MachineType _machineNotType;
 
 		#endregion
 
@@ -65,17 +67,19 @@ namespace SabreTools.Helper.Dats
 		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="itemStatus">Select roms with the given status</param>
+		/// <param name="machineType">Select games with the given type</param>
 		/// <param name="notgamename">Name of the game to match (can use asterisk-partials)</param>
 		/// <param name="notromname">Name of the rom to match (can use asterisk-partials)</param>
 		/// <param name="notromtype">Type of the rom to match</param>
 		/// <param name="notcrc">CRC of the rom to match (can use asterisk-partials)</param>
 		/// <param name="notmd5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="notsha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="itemNotStatus">Select roms with the given status</param>
+		/// <param name="itemNotStatus">Select roms without the given status</param>
+		/// <param name="machineNotType">Select games without the given type</param>
 		public Filter(string gamename, string romname, string romtype, long sgt,
 			long slt, long seq, string crc, string md5, string sha1, ItemStatus itemStatus,
-			string notgamename, string notromname, string notromtype, string notcrc, string notmd5,
-			string notsha1, ItemStatus itemNotStatus)
+			MachineType machineType, string notgamename, string notromname, string notromtype,
+			string notcrc, string notmd5, string notsha1, ItemStatus itemNotStatus, MachineType machineNotType)
 		{
 			_gameName = gamename;
 			_notGameName = notgamename;
@@ -94,6 +98,8 @@ namespace SabreTools.Helper.Dats
 			_notSha1 = notsha1;
 			_itemStatus = itemStatus;
 			_itemNotStatus = itemNotStatus;
+			_machineType = machineType;
+			_machineNotType = machineNotType;
 		}
 
 		/// <summary>
@@ -115,6 +121,16 @@ namespace SabreTools.Helper.Dats
 					return false;
 				}
 				if (_itemNotStatus != ItemStatus.NULL && rom.ItemStatus == _itemNotStatus)
+				{
+					return false;
+				}
+
+				// Filter on machine type
+				if (_machineType != MachineType.NULL && rom.Machine.MachineType != _machineType)
+				{
+					return false;
+				}
+				if (_machineNotType != MachineType.NULL && rom.Machine.MachineType == _machineNotType)
 				{
 					return false;
 				}

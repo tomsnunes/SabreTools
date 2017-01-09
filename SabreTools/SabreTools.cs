@@ -127,12 +127,14 @@ namespace SabreTools
 				forcend = "",
 				forcepack = "",
 				gamename = "",
+				gametype = "",
 				header = null,
 				homepage = null,
 				md5 = "",
 				name = null,
 				notcrc = null,
 				notgamename = null,
+				notgametype = "",
 				notmd5 = null,
 				notromname = null,
 				notromtype = null,
@@ -540,6 +542,10 @@ namespace SabreTools
 					case "--game-name":
 						gamename = args[++i];
 						break;
+					case "-gt":
+					case "--game-type":
+						gametype = args[++i];
+						break;
 					case "-gz":
 					case "--gz":
 						if (!Int32.TryParse(args[++i], out gz))
@@ -578,6 +584,10 @@ namespace SabreTools
 					case "-ngn":
 					case "--not-game":
 						notgamename = args[++i];
+						break;
+					case "-ngt":
+					case "--not-gtype":
+						notgametype = args[++i];
 						break;
 					case "-nis":
 					case "--not-status":
@@ -765,6 +775,10 @@ namespace SabreTools
 								case "--game-name":
 									gamename = split[1];
 									break;
+								case "-gt":
+								case "--game-type":
+									gametype = split[1];
+									break;
 								case "-gz":
 								case "--gz":
 									if (!Int32.TryParse(split[1], out gz))
@@ -803,6 +817,10 @@ namespace SabreTools
 								case "-ngn":
 								case "--not-game":
 									notgamename = split[1];
+									break;
+								case "-ngt":
+								case "--not-gtype":
+									notgametype = split[1];
 									break;
 								case "-nis":
 								case "--not-status":
@@ -1038,8 +1056,8 @@ namespace SabreTools
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix,
 					postfix, quotes, repext, addext, remext, datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, status,
-					notgamename, notromname, notromtype, notcrc, notmd5, notsha1, notstatus,
+					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, status, gametype,
+					notgamename, notromname, notromtype, notcrc, notmd5, notsha1, notstatus, notgametype,
 					trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
 			}
 

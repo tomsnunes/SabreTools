@@ -355,10 +355,16 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-nsha1=, --not-sha1=	Filter by not SHA-1 hash");
 						helptext.Add("	-is=, --status=		Include only items with a given status");
 							helptext.Add("		Supported values are:");
-							helptext.Add("		  None, Good, BadDump, Nodump, Verified");
+								helptext.Add("		  None, Good, BadDump, Nodump, Verified");
 						helptext.Add("	-nis=, --not-status=	Exclude items with a given status");
-						helptext.Add("		Supported values are:");
-						helptext.Add("		  None, Good, BadDump, Nodump, Verified");
+							helptext.Add("		Supported values are:");
+								helptext.Add("		  None, Good, BadDump, Nodump, Verified");
+						helptext.Add("	-gt=, --game-type=	Include only games with a given type");
+							helptext.Add("		Supported values are:");
+								helptext.Add("		  None, Bios, Device, Mechanical");
+						helptext.Add("	-ngt=, --not-gtype=	Exclude only games with a given type");
+							helptext.Add("		Supported values are:");
+								helptext.Add("		  None, Bios, Device, Mechanical");
 						helptext.Add("	-out=			Output directory (overridden by --inplace)");
 						helptext.Add("	-mt={4}			Amount of threads to use (-1 unlimted)");
 

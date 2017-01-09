@@ -389,7 +389,7 @@ namespace SabreTools
 		/// <summary>
 		/// Wrap converting and updating DAT file from any format to any format
 		/// </summary>
-		/// <param name="input">List of input filenames</param>
+		/// <param name="inputs">List of input filenames</param>
 		/// /* Normal DAT header info */
 		/// <param name="filename">New filename</param>
 		/// <param name="name">New name</param>
@@ -437,13 +437,15 @@ namespace SabreTools
 		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="status">Select roms with the given item status</param>
+		/// <param name="gametype">Select games with the given type</param>
 		/// <param name="notgamename">Name of the game to match (can use asterisk-partials)</param>
 		/// <param name="notromname">Name of the rom to match (can use asterisk-partials)</param>
 		/// <param name="notromtype">Type of the rom to match</param>
 		/// <param name="notcrc">CRC of the rom to match (can use asterisk-partials)</param>
 		/// <param name="notmd5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="notsha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="notstatus">Select roms with the given item status</param>
+		/// <param name="notstatus">Select roms without the given item status</param>
+		/// <param name="notgametype">Select games without the given type</param>
 		/// /* Trimming info */
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
@@ -506,6 +508,7 @@ namespace SabreTools
 			string md5,
 			string sha1,
 			string status,
+			string gametype,
 			string notgamename,
 			string notromname,
 			string notromtype,
@@ -513,6 +516,7 @@ namespace SabreTools
 			string notmd5,
 			string notsha1,
 			string notstatus,
+			string notgametype,
 
 			/* Trimming info */
 			bool trim,
@@ -619,6 +623,44 @@ namespace SabreTools
 					break;
 			}
 
+			// Set the machine type flag for filtering
+			MachineType machineType = MachineType.NULL;
+			switch(gametype?.ToLowerInvariant())
+			{
+				case "none":
+					machineType = MachineType.None;
+					break;
+				case "bios":
+					machineType = MachineType.Bios;
+					break;
+				case "device":
+					machineType = MachineType.Device;
+					break;
+				case "mech":
+				case "mechanical":
+					machineType = MachineType.Mechanical;
+					break;
+			}
+
+			// Set the not machine type flag for filtering
+			MachineType machineNotType = MachineType.NULL;
+			switch (gametype?.ToLowerInvariant())
+			{
+				case "none":
+					machineNotType = MachineType.None;
+					break;
+				case "bios":
+					machineNotType = MachineType.Bios;
+					break;
+				case "device":
+					machineNotType = MachineType.Device;
+					break;
+				case "mech":
+				case "mechanical":
+					machineNotType = MachineType.Mechanical;
+					break;
+			}
+
 			// Normalize the extensions
 			addext = (addext == "" || addext.StartsWith(".") ? addext : "." + addext);
 			repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
@@ -689,8 +731,8 @@ namespace SabreTools
 			};
 
 			// Create the Filter object to be used
-			Filter filter = new Filter(gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus,
-				notgamename, notromname, notromtype, notcrc, notmd5, notsha1, itemNotStatus);
+			Filter filter = new Filter(gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, machineType,
+				notgamename, notromname, notromtype, notcrc, notmd5, notsha1, itemNotStatus, machineNotType);
 
 			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,
 				filter, trim, single, root, maxDegreeOfParallelism, _logger);

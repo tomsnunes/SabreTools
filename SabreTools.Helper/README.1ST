@@ -825,8 +825,16 @@ Options:
 				None, Good, BadDump, Nodump, Verified
 
 		-nis=, --not-status=	Exclude only items with a given status
-			Include items with one of the supported values:
+			Exclude items with one of the supported values:
 				None, Good, BadDump, Nodump, Verified
+				
+		-gt=, --game-type=	Include only items with the given game type
+			Include items with one of the supported values:
+				None, Bios, Device, Mechanical
+		
+		-ngt=, --not-gtype=	Exclude only items with a given game type
+			Exclude items with one of the supported values:
+				None, Bios, Device, Mechanical
 		
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If a path
