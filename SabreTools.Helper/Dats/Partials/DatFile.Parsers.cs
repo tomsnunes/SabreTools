@@ -127,7 +127,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now we pre-process the DAT with the splitting/merging mode
-			if (splitType == SplitType.Split)
+			if (splitType == SplitType.NonMerged)
 			{
 				CreateSplitSets(false, logger, output: false);
 			}

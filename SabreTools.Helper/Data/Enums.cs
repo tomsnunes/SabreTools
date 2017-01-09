@@ -260,7 +260,7 @@
 	public enum SplitType
 	{
 		None = 0,
-		Split,
+		NonMerged,
 		Merged,
 		MergedWithDevice,
 	}

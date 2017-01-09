@@ -730,7 +730,7 @@ Options:
 			Enabling this flag allows for the original name to be preserved and keeping
 			the description as just a description.
 			
-		-ds, --dat-split	Create split sets in the output DAT
+		-dnm, --dat-nm		Create non-merged sets in the output DAT
 		-dm, --dat-merge	Create merged sets in the output DAT
 		-df, --dat-fm		Create fully merged sets (including devices) in the output DAT
 			Each of the above flags allow for preprocessing an outputted DAT in the case that

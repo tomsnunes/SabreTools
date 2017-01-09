@@ -280,9 +280,9 @@ namespace SabreTools
 					case "--dat-merge":
 						splitType = SplitType.Merged;
 						break;
-					case "-ds":
-					case "--dat-split":
-						splitType = SplitType.Split;
+					case "-dnm":
+					case "--dat-nm":
+						splitType = SplitType.NonMerged;
 						break;
 					case "-f":
 					case "--files":
