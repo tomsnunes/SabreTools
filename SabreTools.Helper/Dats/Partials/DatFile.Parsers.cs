@@ -135,9 +135,9 @@ namespace SabreTools.Helper.Dats
 			{
 				CreateMergedSets(false, logger, output: false);
 			}
-			else if (splitType == SplitType.MergedWithDevice)
+			else if (splitType == SplitType.NotMergedWithDevice)
 			{
-				CreateFullyMergedSets(false, logger, output: false);
+				CreateFullyNonMergedSets(false, logger, output: false);
 			}
 		}
 

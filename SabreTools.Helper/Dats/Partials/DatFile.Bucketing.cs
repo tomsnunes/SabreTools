@@ -371,12 +371,13 @@ namespace SabreTools.Helper.Dats
 		}
 
 		/// <summary>
-		/// Use cloneof tags to create merged sets and remove the tags plus using the device_ref tags to get full sets
+		/// Use cloneof tags to create non-merged sets and remove the tags plus using the device_ref tags to get full sets
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void CreateFullyMergedSets(bool mergeroms, Logger logger, bool output = true)
+		/// <remarks>TODO: This is not actually complete currently as it copies the code from CreateMergedSets</remarks>
+		public void CreateFullyNonMergedSets(bool mergeroms, Logger logger, bool output = true)
 		{
 			// First, we try to add all device items first
 			/*
@@ -385,94 +386,6 @@ namespace SabreTools.Helper.Dats
 				order to get this working correctly. At least this is a good placeholder for now.
 			*/
 
-			// For sake of ease, the first thing we want to do is sort by game
-			BucketByGame(mergeroms, true, logger, output);
-			_sortedBy = SortedBy.Default;
-
-			// Now we want to loop through all of the games and set the correct information
-			List<string> games = Keys.ToList();
-			foreach (string game in games)
-			{
-				// Determine if the game has a parent or not
-				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].Machine.CloneOf))
-				{
-					parent = this[game][0].Machine.CloneOf;
-				}
-
-				// If there is no parent, then we continue
-				if (String.IsNullOrEmpty(parent))
-				{
-					continue;
-				}
-
-				// Otherwise, move the items from the current game to a subfolder of the parent game
-				Machine parentMachine = this[parent].Count == 0 ? new Machine { Name = parent, Description = parent } : this[parent][0].Machine;
-				List<DatItem> items = this[game];
-				foreach (DatItem item in items)
-				{
-					item.Name = item.Machine.Name + "\\" + item.Name;
-					item.Machine = parentMachine;
-					this[parent].Add(item);
-				}
-
-				// Finally, remove the old game so it's not picked up by the writer
-				Remove(game);
-			}
-		}
-
-		/// <summary>
-		/// Use cloneof tags to create merged sets and remove the tags
-		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void CreateMergedSets(bool mergeroms, Logger logger, bool output = true)
-		{
-			// For sake of ease, the first thing we want to do is sort by game
-			BucketByGame(mergeroms, true, logger, output);
-			_sortedBy = SortedBy.Default;
-
-			// Now we want to loop through all of the games and set the correct information
-			List<string> games = Keys.ToList();
-			foreach (string game in games)
-			{
-				// Determine if the game has a parent or not
-				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].Machine.CloneOf))
-				{
-					parent = this[game][0].Machine.CloneOf;
-				}
-
-				// If there is no parent, then we continue
-				if (String.IsNullOrEmpty(parent))
-				{
-					continue;
-				}
-
-				// Otherwise, move the items from the current game to a subfolder of the parent game
-				Machine parentMachine = this[parent].Count == 0 ? new Machine { Name = parent, Description = parent } : this[parent][0].Machine;
-				List<DatItem> items = this[game];
-				foreach (DatItem item in items)
-				{
-					item.Name = item.Machine.Name + "\\" + item.Name;
-					item.Machine = parentMachine;
-					this[parent].Add(item);
-				}
-
-				// Finally, remove the old game so it's not picked up by the writer
-				Remove(game);
-			}
-		}
-
-		/// <summary>
-		/// Use cloneof tags to create non-merged sets and remove the tags
-		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void CreateNonMergedSets(bool mergeroms, Logger logger, bool output = true)
-		{
 			// For sake of ease, the first thing we want to do is sort by game
 			BucketByGame(mergeroms, true, logger, output);
 			_sortedBy = SortedBy.Default;
@@ -522,32 +435,220 @@ namespace SabreTools.Helper.Dats
 						case ItemType.Archive:
 							Archive archive = ((Archive)item).Clone() as Archive;
 							archive.Machine = currentMachine;
-							this[game].Add(archive);
+							if (!this[game].Contains(archive))
+							{
+								this[game].Add(archive);
+							}
+
 							break;
 						case ItemType.BiosSet:
 							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
 							biosSet.Machine = currentMachine;
-							this[game].Add(biosSet);
+							if (!this[game].Contains(biosSet))
+							{
+								this[game].Add(biosSet);
+							}
+
 							break;
 						case ItemType.Disk:
 							Disk disk = ((Disk)item).Clone() as Disk;
 							disk.Machine = currentMachine;
-							this[game].Add(disk);
+							if (!this[game].Contains(disk))
+							{
+								this[game].Add(disk);
+							}
+
 							break;
 						case ItemType.Release:
 							Release release = ((Release)item).Clone() as Release;
 							release.Machine = currentMachine;
-							this[game].Add(release);
+							if (!this[game].Contains(release))
+							{
+								this[game].Add(release);
+							}
+
 							break;
 						case ItemType.Rom:
 							Rom rom = ((Rom)item).Clone() as Rom;
 							rom.Machine = currentMachine;
-							this[game].Add(rom);
+							if (!this[game].Contains(rom))
+							{
+								this[game].Add(rom);
+							}
+
 							break;
 						case ItemType.Sample:
 							Sample sample = ((Sample)item).Clone() as Sample;
 							sample.Machine = currentMachine;
-							this[game].Add(sample);
+							if (!this[game].Contains(sample))
+							{
+								this[game].Add(sample);
+							}
+
+							break;
+					}
+				}
+
+				// Finally, remove the romof and cloneof tags so it's not picked up by the manager
+				items = this[game];
+				foreach (DatItem item in items)
+				{
+					item.Machine.CloneOf = null;
+					item.Machine.RomOf = null;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Use cloneof tags to create merged sets and remove the tags
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		public void CreateMergedSets(bool mergeroms, Logger logger, bool output = true)
+		{
+			// For sake of ease, the first thing we want to do is sort by game
+			BucketByGame(mergeroms, true, logger, output);
+			_sortedBy = SortedBy.Default;
+
+			// Now we want to loop through all of the games and set the correct information
+			List<string> games = Keys.ToList();
+			foreach (string game in games)
+			{
+				// Determine if the game has a parent or not
+				string parent = null;
+				if (!String.IsNullOrEmpty(this[game][0].Machine.CloneOf))
+				{
+					parent = this[game][0].Machine.CloneOf;
+				}
+
+				// If there is no parent, then we continue
+				if (String.IsNullOrEmpty(parent))
+				{
+					continue;
+				}
+
+				// Otherwise, move the items from the current game to a subfolder of the parent game
+				Machine parentMachine = this[parent].Count == 0 ? new Machine { Name = parent, Description = parent } : this[parent][0].Machine;
+				List<DatItem> items = this[game];
+				foreach (DatItem item in items)
+				{
+					if (!this[parent].Contains(item))
+					{
+						item.Name = item.Machine.Name + "\\" + item.Name;
+						item.Machine = parentMachine;
+						this[parent].Add(item);
+					}
+				}
+
+				// Finally, remove the old game so it's not picked up by the writer
+				Remove(game);
+			}
+		}
+
+		/// <summary>
+		/// Use cloneof tags to create non-merged sets and remove the tags
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		public void CreateNonMergedSets(bool mergeroms, Logger logger, bool output = true)
+		{
+			// For sake of ease, the first thing we want to do is sort by game
+			BucketByGame(mergeroms, true, logger, output);
+			_sortedBy = SortedBy.Default;
+
+			// Now we want to loop through all of the games and set the correct information
+			List<string> games = Keys.ToList();
+			foreach (string game in games)
+			{
+				// Determine if the game has a parent or not
+				string parent = null;
+				if (!String.IsNullOrEmpty(this[game][0].Machine.CloneOf))
+				{
+					parent = this[game][0].Machine.CloneOf;
+				}
+
+				// If there is no parent, then we continue
+				if (String.IsNullOrEmpty(parent))
+				{
+					continue;
+				}
+
+				// If the parent doesn't exist, then we continue and remove
+				if (this[parent].Count == 0)
+				{
+					List<DatItem> curitems = this[game];
+					foreach (DatItem item in curitems)
+					{
+						item.Machine.CloneOf = null;
+						item.Machine.RomOf = null;
+					}
+
+					continue;
+				}
+
+				// Otherwise, copy the items from the parent to the current game
+				Machine currentMachine = this[game][0].Machine;
+				List<DatItem> items = this[parent];
+				foreach (DatItem item in items)
+				{
+					// Figure out the type of the item and add it accordingly
+					switch (item.Type)
+					{
+						case ItemType.Archive:
+							Archive archive = ((Archive)item).Clone() as Archive;
+							archive.Machine = currentMachine;
+							if (!this[game].Contains(archive))
+							{
+								this[game].Add(archive);
+							}
+							
+							break;
+						case ItemType.BiosSet:
+							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
+							biosSet.Machine = currentMachine;
+							if (!this[game].Contains(biosSet))
+							{
+								this[game].Add(biosSet);
+							}
+
+							break;
+						case ItemType.Disk:
+							Disk disk = ((Disk)item).Clone() as Disk;
+							disk.Machine = currentMachine;
+							if (!this[game].Contains(disk))
+							{
+								this[game].Add(disk);
+							}
+
+							break;
+						case ItemType.Release:
+							Release release = ((Release)item).Clone() as Release;
+							release.Machine = currentMachine;
+							if (!this[game].Contains(release))
+							{
+								this[game].Add(release);
+							}
+
+							break;
+						case ItemType.Rom:
+							Rom rom = ((Rom)item).Clone() as Rom;
+							rom.Machine = currentMachine;
+							if (!this[game].Contains(rom))
+							{
+								this[game].Add(rom);
+							}
+
+							break;
+						case ItemType.Sample:
+							Sample sample = ((Sample)item).Clone() as Sample;
+							sample.Machine = currentMachine;
+							if (!this[game].Contains(sample))
+							{
+								this[game].Add(sample);
+							}
+
 							break;
 					}
 				}

@@ -258,7 +258,7 @@ namespace SabreTools
 						break;
 					case "-df":
 					case "--dat-fm":
-						splitType = SplitType.MergedWithDevice;
+						splitType = SplitType.NotMergedWithDevice;
 						break;
 					case "-di":
 					case "--diff":

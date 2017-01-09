@@ -262,7 +262,7 @@
 		None = 0,
 		NonMerged,
 		Merged,
-		MergedWithDevice,
+		NotMergedWithDevice,
 	}
 
 	#endregion
