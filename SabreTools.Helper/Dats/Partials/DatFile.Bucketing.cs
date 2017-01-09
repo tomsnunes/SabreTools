@@ -370,6 +370,112 @@ namespace SabreTools.Helper.Dats
 			_files = sortable;
 		}
 
+		/// <summary>
+		/// Use cloneof tags to create merged sets and remove the tags
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		public void CreateMergedSets(bool mergeroms, Logger logger, bool output = true)
+		{
+			// For sake of ease, the first thing we want to do is sort by game
+			BucketByGame(mergeroms, false, logger, output);
+
+			// Now we want to loop through all of the games and set the correct information
+			List<string> games = Keys.ToList();
+			foreach (string game in games)
+			{
+				// Determine if the game has a parent or not
+				string parent = null;
+				if (this[game][0].Machine.CloneOf != null)
+				{
+					parent = this[game][0].Machine.CloneOf;
+				}
+				else if (this[game][0].Machine.RomOf != null)
+				{
+					parent = this[game][0].Machine.RomOf;
+				}
+
+				// If there is no parent, then we continue
+				if (parent == null)
+				{
+					continue;
+				}
+
+				// If the parent doesn't exist, then we continue
+				if (this[parent].Count == 0)
+				{
+					continue;
+				}
+
+				// Otherwise, move the items from the current game to a subfolder of the parent game
+				Machine parentMachine = this[parent][0].Machine;
+				List<DatItem> items = this[game];
+				foreach (DatItem item in items)
+				{
+					item.Name = item.Machine.Name + "\\" + item.Name;
+					item.Machine = parentMachine;
+				}
+
+				// Finally, remove the old game so it's not picked up by the writer
+				Remove(game);
+			}
+		}
+
+		/// <summary>
+		/// Use cloneof tags to create split sets and remove the tags
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		public void CreateSplitSets(bool mergeroms, Logger logger, bool output = true)
+		{
+			// For sake of ease, the first thing we want to do is sort by game
+			BucketByGame(mergeroms, false, logger, output);
+
+			// Now we want to loop through all of the games and set the correct information
+			List<string> games = Keys.ToList();
+			foreach (string game in games)
+			{
+				// Determine if the game has a parent or not
+				string parent = null;
+				if (this[game][0].Machine.CloneOf != null)
+				{
+					parent = this[game][0].Machine.CloneOf;
+				}
+				else if (this[game][0].Machine.RomOf != null)
+				{
+					parent = this[game][0].Machine.RomOf;
+				}
+
+				// If there is no parent, then we continue
+				if (parent == null)
+				{
+					continue;
+				}
+
+				// If the parent doesn't exist, then we continue
+				if (this[parent].Count == 0)
+				{
+					continue;
+				}
+
+				/*
+				 * Okay, so here actual copies of the roms need to be copied into the current game, so
+				 * you need to make sure that you make a copy and don't ruin the original version since the original 
+				 * parnt is still a valid piece of set
+				 */
+
+				// Otherwise, copy the items from the parent to the current game
+				Machine parentMachine = this[game][0].Machine;
+				List<DatItem> items = this[parent];
+				foreach (DatItem item in items)
+				{
+					
+				}
+			}
+		}
+
 		#endregion
 
 		#endregion // Instance Methods
