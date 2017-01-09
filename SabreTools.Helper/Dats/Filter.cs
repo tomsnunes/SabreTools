@@ -27,6 +27,7 @@ namespace SabreTools.Helper.Dats
 		private ItemStatus _itemNotStatus;
 		private MachineType _machineType;
 		private MachineType _machineNotType;
+		private bool? _runnable;
 
 		#endregion
 
@@ -52,6 +53,9 @@ namespace SabreTools.Helper.Dats
 			_notSha1 = null;
 			_itemStatus = ItemStatus.NULL;
 			_itemNotStatus = ItemStatus.NULL;
+			_machineType = MachineType.NULL;
+			_machineNotType = MachineType.NULL;
+			_runnable = null;
 		}
 
 		/// <summary>
@@ -76,10 +80,12 @@ namespace SabreTools.Helper.Dats
 		/// <param name="notsha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="itemNotStatus">Select roms without the given status</param>
 		/// <param name="machineNotType">Select games without the given type</param>
+		/// <param name="runnable">Select games that have a value for runnable</param>
 		public Filter(string gamename, string romname, string romtype, long sgt,
 			long slt, long seq, string crc, string md5, string sha1, ItemStatus itemStatus,
 			MachineType machineType, string notgamename, string notromname, string notromtype,
-			string notcrc, string notmd5, string notsha1, ItemStatus itemNotStatus, MachineType machineNotType)
+			string notcrc, string notmd5, string notsha1, ItemStatus itemNotStatus,
+			MachineType machineNotType, bool? runnable)
 		{
 			_gameName = gamename;
 			_notGameName = notgamename;
@@ -100,6 +106,7 @@ namespace SabreTools.Helper.Dats
 			_itemNotStatus = itemNotStatus;
 			_machineType = machineType;
 			_machineNotType = machineNotType;
+			_runnable = runnable;
 		}
 
 		/// <summary>
@@ -110,6 +117,22 @@ namespace SabreTools.Helper.Dats
 		/// <returns>True if the file passed the filter, false otherwise</returns>
 		public bool ItemPasses(DatItem item, Logger logger)
 		{
+			// Filter on machine type
+			if (_machineType != MachineType.NULL && item.Machine.MachineType != _machineType)
+			{
+				return false;
+			}
+			if (_machineNotType != MachineType.NULL && item.Machine.MachineType == _machineNotType)
+			{
+				return false;
+			}
+
+			// Filter on machine runability
+			if (_runnable != null && item.Machine.Runnable != _runnable)
+			{
+				return false;
+			}
+
 			// Take care of Rom and Disk specific differences
 			if (item.Type == ItemType.Rom)
 			{
@@ -121,16 +144,6 @@ namespace SabreTools.Helper.Dats
 					return false;
 				}
 				if (_itemNotStatus != ItemStatus.NULL && rom.ItemStatus == _itemNotStatus)
-				{
-					return false;
-				}
-
-				// Filter on machine type
-				if (_machineType != MachineType.NULL && rom.Machine.MachineType != _machineType)
-				{
-					return false;
-				}
-				if (_machineNotType != MachineType.NULL && rom.Machine.MachineType == _machineNotType)
 				{
 					return false;
 				}
