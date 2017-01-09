@@ -478,7 +478,9 @@ namespace SabreTools.Helper.Dats
 						break;
 					case DatFormat.Logiqx:
 						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Machine.Name) + "\"" +
-								(rom.Machine.IsBios ? " isbios=\"yes\"" : "") +
+								(rom.Machine.MachineType == MachineType.Bios ? " isbios=\"yes\"" : "") +
+								(rom.Machine.MachineType == MachineType.Device ? " isdevice=\"yes\"" : "") +
+								(rom.Machine.MachineType == MachineType.Mechanical ? " ismechanical=\"yes\"" : "") +
 								(ExcludeOf ? "" :
 									(String.IsNullOrEmpty(rom.Machine.CloneOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.CloneOf.ToLowerInvariant())
 										? ""
