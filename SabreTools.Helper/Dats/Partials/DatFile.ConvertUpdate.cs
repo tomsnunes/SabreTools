@@ -34,13 +34,15 @@ namespace SabreTools.Helper.Dats
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		public void DetermineUpdateType(List<string> inputPaths, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
-			bool bare, bool clean, bool softlist, Filter filter, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
+			bool bare, bool clean, bool softlist, Filter filter, SplitType splitType, bool trim, bool single, string root,
+			int maxDegreeOfParallelism, Logger logger)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || diff != 0)
@@ -56,7 +58,7 @@ namespace SabreTools.Helper.Dats
 
 				// Create a dictionary of all ROMs from the input DATs
 				List<DatFile> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, softlist,
-					outDir, filter, trim, single, root, maxDegreeOfParallelism, logger);
+					outDir, filter, splitType, trim, single, root, maxDegreeOfParallelism, logger);
 
 				// Modify the Dictionary if necessary and output the results
 				if (diff != 0 && diff < DiffMode.Cascade)
@@ -77,7 +79,7 @@ namespace SabreTools.Helper.Dats
 			// Otherwise, loop through all of the inputs individually
 			else
 			{
-				Update(inputPaths, outDir, clean, softlist, filter, trim, single, root, maxDegreeOfParallelism, logger);
+				Update(inputPaths, outDir, clean, softlist, filter, splitType, trim, single, root, maxDegreeOfParallelism, logger);
 			}
 			return;
 		}
@@ -85,6 +87,7 @@ namespace SabreTools.Helper.Dats
 		/// <summary>
 		/// Populate the user DatData object from the input files
 		/// </summary>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
@@ -93,7 +96,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="logger">Logging object for console and file output</param>
 		/// <returns>List of DatData objects representing headers</returns>
 		private List<DatFile> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool softlist, string outDir,
-			Filter filter, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
+			Filter filter, SplitType splitType, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
 		{
 			DatFile[] datHeaders = new DatFile[inputs.Count];
 			DateTime start = DateTime.Now;
@@ -439,13 +442,14 @@ namespace SabreTools.Helper.Dats
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		public void Update(List<string> inputFileNames, string outDir, bool clean, bool softlist, Filter filter,
-			bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
+			SplitType splitType, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
 		{
 			Parallel.ForEach(inputFileNames,
 				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },

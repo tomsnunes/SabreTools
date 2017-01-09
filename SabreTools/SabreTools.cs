@@ -1080,7 +1080,7 @@ namespace SabreTools
 					postfix, quotes, repext, addext, remext, datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName,
 					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, status, gametype,
 					notgamename, notromname, notromtype, notcrc, notmd5, notsha1, notstatus, notgametype, runnable,
-					trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
+					splitType, trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
 			}
 
 			// If we're using the verifier

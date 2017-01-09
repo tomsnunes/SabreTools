@@ -448,6 +448,7 @@ namespace SabreTools
 		/// <param name="notgametype">Select games without the given type</param>
 		/// <param name="runnable">Select games with the given runability</param>
 		/// /* Trimming info */
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
@@ -521,6 +522,7 @@ namespace SabreTools
 			bool? runnable,
 
 			/* Trimming info */
+			SplitType splitType,
 			bool trim,
 			bool single,
 			string root,
@@ -654,6 +656,7 @@ namespace SabreTools
 				case "bios":
 					machineNotType = MachineType.Bios;
 					break;
+				case "dev":
 				case "device":
 					machineNotType = MachineType.Device;
 					break;
@@ -737,7 +740,7 @@ namespace SabreTools
 				notgamename, notromname, notromtype, notcrc, notmd5, notsha1, itemNotStatus, machineNotType, runnable);
 
 			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,
-				filter, trim, single, root, maxDegreeOfParallelism, _logger);
+				filter, splitType, trim, single, root, maxDegreeOfParallelism, _logger);
 		}
 
 		/// <summary>
