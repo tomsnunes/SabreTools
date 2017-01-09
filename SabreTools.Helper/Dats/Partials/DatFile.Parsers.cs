@@ -1244,9 +1244,15 @@ namespace SabreTools.Helper.Dats
 							{
 								Name = xtr.GetAttribute("name"),
 								Description = xtr.GetAttribute("name"),
+
 								RomOf = xtr.GetAttribute("romof") ?? "",
 								CloneOf = xtr.GetAttribute("cloneof") ?? "",
 								SampleOf = xtr.GetAttribute("sampleof") ?? "",
+
+								IsBios = xtr.GetAttribute("isbios") == "yes",
+								IsDevice = xtr.GetAttribute("isdevice") == "yes",
+								IsMechanical = xtr.GetAttribute("ismechanical") == "yes",
+								Runnable = xtr.GetAttribute("runnable") == "yes",
 							};
 
 							if (subreader.GetAttribute("supported") != null)
