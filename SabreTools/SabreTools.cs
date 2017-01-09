@@ -102,6 +102,7 @@ namespace SabreTools
 			DatFormat datFormat = 0x0;
 			DiffMode diffMode = 0x0;
 			OutputFormat outputFormat = OutputFormat.Folder;
+			SplitType splitType = SplitType.None;
 			StatDatFormat statDatFormat = 0x0;
 
 			// User inputs
@@ -255,6 +256,10 @@ namespace SabreTools
 					case "--delete":
 						delete = true;
 						break;
+					case "-df":
+					case "--dat-fm":
+						splitType = SplitType.MergedWithDevice;
+						break;
 					case "-di":
 					case "--diff":
 						diffMode |= DiffMode.All;
@@ -270,6 +275,14 @@ namespace SabreTools
 					case "-din":
 					case "--diff-nd":
 						diffMode |= DiffMode.NoDupes;
+						break;
+					case "-dm":
+					case "--dat-merge":
+						splitType = SplitType.Merged;
+						break;
+					case "-ds":
+					case "--dat-split":
+						splitType = SplitType.Split;
 						break;
 					case "-f":
 					case "--files":

@@ -730,6 +730,16 @@ Options:
 			Enabling this flag allows for the original name to be preserved and keeping
 			the description as just a description.
 			
+		-ds, --dat-split	Create split sets in the output DAT
+		-dm, --dat-merge	Create merged sets in the output DAT
+		-df, --dat-fm		Create fully merged sets (including devices) in the output DAT
+			Each of the above flags allow for preprocessing an outputted DAT in the case that
+			your DAT manager of choice doesn't allow these on the fly. Split will copy all
+			parent items to the children so that each archive or folder contains everything
+			necessary for each game. Merge will copy all child items to a subfolder of the
+			parent, reducing the space taken up on disk. Fully Merged attempts to copy device
+			files as well (usually only used for listxml inputs).
+			
 		-trim			Trim file names to fit NTFS length
 			In the cases where files will have too long a name, this allows for trimming
 			the name of the files to the NTFS maximum length at most
@@ -789,7 +799,7 @@ Options:
 				-sf, --skip		Skip output of first DAT
 					In times where the first DAT does not need to be written out a second time,
 					this will skip writing it. This can often speed up the output process.
-
+		
 		-gn=, --not-game=	Filter by game name
 		-ngn=, --game-name=	Exclude by game name
 		-rn=, --rom-name=	Filter by rom name
