@@ -254,6 +254,17 @@
 		Game,
 	}
 
+	/// <summary>
+	/// Determines how a DAT will be split internally
+	/// </summary>
+	public enum SplitType
+	{
+		None = 0,
+		Split,
+		Merged,
+		MergedWithDevice,
+	}
+
 	#endregion
 
 	#region DatItem related
