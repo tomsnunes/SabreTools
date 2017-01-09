@@ -1,4 +1,6 @@
-﻿namespace SabreTools.Helper.Dats
+﻿using SabreTools.Helper.Data;
+
+namespace SabreTools.Helper.Dats
 {
 	public class Machine
 	{
@@ -14,12 +16,10 @@
 		protected string _cloneOf;
 		protected string _sampleOf;
 		protected string _sourceFile;
-		protected bool _isBios;
-		protected bool _isDevice;
-		protected bool _isMechanical;
 		protected bool _runnable;
 		protected string _board;
 		protected string _rebuildTo;
+		protected MachineType _machineType;
 
 		#endregion
 
@@ -71,21 +71,6 @@
 			get { return _sourceFile; }
 			set { _sourceFile = value; }
 		}
-		public bool IsBios
-		{
-			get { return _isBios; }
-			set { _isBios = value; }
-		}
-		public bool IsDevice
-		{
-			get { return _isDevice; }
-			set { _isDevice = value; }
-		}
-		public bool IsMechanical
-		{
-			get { return _isMechanical; }
-			set { _isMechanical = value; }
-		}
 		public bool Runnable
 		{
 			get { return _runnable; }
@@ -100,6 +85,11 @@
 		{
 			get { return _rebuildTo; }
 			set { _rebuildTo = value; }
+		}
+		public MachineType MachineType
+		{
+			get { return _machineType; }
+			set { _machineType = value; }
 		}
 
 		#endregion

@@ -1249,9 +1249,11 @@ namespace SabreTools.Helper.Dats
 								CloneOf = xtr.GetAttribute("cloneof") ?? "",
 								SampleOf = xtr.GetAttribute("sampleof") ?? "",
 
-								IsBios = xtr.GetAttribute("isbios") == "yes",
-								IsDevice = xtr.GetAttribute("isdevice") == "yes",
-								IsMechanical = xtr.GetAttribute("ismechanical") == "yes",
+								MachineType =
+									xtr.GetAttribute("isbios") == "yes" ? MachineType.Bios :
+									xtr.GetAttribute("isdevice") == "yes" ? MachineType.Device :
+									xtr.GetAttribute("ismechanical") == "yes" ? MachineType.Mechanical :
+									MachineType.None,
 								Runnable = xtr.GetAttribute("runnable") == "yes",
 							};
 
@@ -1267,6 +1269,7 @@ namespace SabreTools.Helper.Dats
 										break;
 								}
 							}
+
 
 							if (superdat && !keep)
 							{

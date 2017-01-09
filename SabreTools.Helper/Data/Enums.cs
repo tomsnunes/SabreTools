@@ -282,7 +282,18 @@
 		BadDump = 2,
 		Nodump = 3,
 		Verified = 4,
-		NotNodump = 5, // This is a fake flag that is used for filter only
+	}
+
+	/// <summary>
+	/// Determine what type of machine it is
+	/// </summary>
+	public enum MachineType
+	{
+		NULL = -1, // This is a fake flag used for filter only
+		None = 0,
+		Bios = 1,
+		Device = 2,
+		Mechanical = 3,
 	}
 
 	#endregion
