@@ -836,6 +836,12 @@ Options:
 			Exclude items with one of the supported values:
 				None, Bios, Device, Mechanical
 		
+		-run, --runnable	Include only items that are marked runnable
+			This allows users to include only verified runnable games
+			
+		-nrun, --not-run	Include only items that are not marked runnable
+			This allows users to include only unrunnable games
+		
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If a path
 			is not defined, the application directory is used instead.

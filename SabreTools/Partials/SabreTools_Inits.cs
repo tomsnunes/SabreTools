@@ -446,6 +446,7 @@ namespace SabreTools
 		/// <param name="notsha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="notstatus">Select roms without the given item status</param>
 		/// <param name="notgametype">Select games without the given type</param>
+		/// <param name="runnable">Select games with the given runability</param>
 		/// /* Trimming info */
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
@@ -517,6 +518,7 @@ namespace SabreTools
 			string notsha1,
 			string notstatus,
 			string notgametype,
+			bool? runnable,
 
 			/* Trimming info */
 			bool trim,
@@ -732,7 +734,7 @@ namespace SabreTools
 
 			// Create the Filter object to be used
 			Filter filter = new Filter(gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, machineType,
-				notgamename, notromname, notromtype, notcrc, notmd5, notsha1, itemNotStatus, machineNotType);
+				notgamename, notromname, notromtype, notcrc, notmd5, notsha1, itemNotStatus, machineNotType, runnable);
 
 			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,
 				filter, trim, single, root, maxDegreeOfParallelism, _logger);

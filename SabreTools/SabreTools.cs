@@ -98,6 +98,7 @@ namespace SabreTools
 				skip = false,
 				updateDat = false, // SimpleSort
 				usegame = true;
+			bool? runnable = null;
 			DatFormat datFormat = 0x0;
 			DiffMode diffMode = 0x0;
 			OutputFormat outputFormat = OutputFormat.Folder;
@@ -306,6 +307,10 @@ namespace SabreTools
 					case "--noMD5":
 						noMD5 = true;
 						break;
+					case "-nrun":
+					case "--not-run":
+						runnable = false;
+						break;
 					case "-ns":
 					case "--noSHA1":
 						noSHA1 = true;
@@ -393,6 +398,10 @@ namespace SabreTools
 					case "-ro":
 					case "--romba":
 						romba = true;
+						break;
+					case "-run":
+					case "--runnable":
+						runnable = true;
 						break;
 					case "-s":
 					case "--short":
@@ -1057,7 +1066,7 @@ namespace SabreTools
 					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix,
 					postfix, quotes, repext, addext, remext, datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName,
 					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, status, gametype,
-					notgamename, notromname, notromtype, notcrc, notmd5, notsha1, notstatus, notgametype,
+					notgamename, notromname, notromtype, notcrc, notmd5, notsha1, notstatus, notgametype, runnable,
 					trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
 			}
 

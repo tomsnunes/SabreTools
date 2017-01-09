@@ -1254,7 +1254,7 @@ namespace SabreTools.Helper.Dats
 									xtr.GetAttribute("isdevice") == "yes" ? MachineType.Device :
 									xtr.GetAttribute("ismechanical") == "yes" ? MachineType.Mechanical :
 									MachineType.None,
-								Runnable = xtr.GetAttribute("runnable") == "yes",
+								Runnable = xtr.GetAttribute("runnable") == "yes" || xtr.GetAttribute("runnable") == null,
 							};
 
 							if (subreader.GetAttribute("supported") != null)

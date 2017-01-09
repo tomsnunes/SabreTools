@@ -365,6 +365,8 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-ngt=, --not-gtype=	Exclude only games with a given type");
 							helptext.Add("		Supported values are:");
 								helptext.Add("		  None, Bios, Device, Mechanical");
+						helptext.Add("	-run, --runnable	Include only items that are marked runnable");
+						helptext.Add("	-nrun, --not-run	Include only items that are marked unrunnable");
 						helptext.Add("	-out=			Output directory (overridden by --inplace)");
 						helptext.Add("	-mt={4}			Amount of threads to use (-1 unlimted)");
 
