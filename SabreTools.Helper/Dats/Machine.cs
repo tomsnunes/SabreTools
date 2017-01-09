@@ -1,4 +1,6 @@
-﻿using SabreTools.Helper.Data;
+﻿using System.Collections.Generic;
+
+using SabreTools.Helper.Data;
 
 namespace SabreTools.Helper.Dats
 {
@@ -19,6 +21,7 @@ namespace SabreTools.Helper.Dats
 		protected bool _runnable;
 		protected string _board;
 		protected string _rebuildTo;
+		protected List<string> _devices;
 		protected MachineType _machineType;
 
 		#endregion
@@ -85,6 +88,11 @@ namespace SabreTools.Helper.Dats
 		{
 			get { return _rebuildTo; }
 			set { _rebuildTo = value; }
+		}
+		public List<string> Devices
+		{
+			get { return _devices; }
+			set { _devices = value; }
 		}
 		public MachineType MachineType
 		{

@@ -376,16 +376,8 @@ namespace SabreTools.Helper.Dats
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		/// <remarks>TODO: This is not actually complete currently as it copies the code from CreateMergedSets</remarks>
 		public void CreateFullyNonMergedSets(bool mergeroms, Logger logger, bool output = true)
 		{
-			// First, we try to add all device items first
-			/*
-				Here, we require that device_ref tags got read first, and then we can add them accordingly.
-				As of right now, those tags are NOT being read into the machine. We'd have to do this in
-				order to get this working correctly. At least this is a good placeholder for now.
-			*/
-
 			// For sake of ease, the first thing we want to do is sort by game
 			BucketByGame(mergeroms, true, logger, output);
 			_sortedBy = SortedBy.Default;
@@ -394,6 +386,93 @@ namespace SabreTools.Helper.Dats
 			List<string> games = Keys.ToList();
 			foreach (string game in games)
 			{
+				// Determine if the game has any devices or not
+				if (this[game][0].Machine.Devices.Count > 0)
+				{
+					List<string> devices = this[game][0].Machine.Devices;
+					foreach (string device in devices)
+					{
+						// If the device doesn't exist then we continue
+						if (this[device].Count == 0)
+						{
+							continue;
+						}
+
+						// Otherwise, copy the items from the device to the current game
+						Machine musheen = this[game][0].Machine;
+						List<DatItem> devItems = this[device];
+						foreach (DatItem item in devItems)
+						{
+							// Figure out the type of the item and add it accordingly
+							switch (item.Type)
+							{
+								case ItemType.Archive:
+									Archive archive = ((Archive)item).Clone() as Archive;
+									archive.Machine = musheen;
+									if (!this[game].Contains(archive))
+									{
+										this[game].Add(archive);
+									}
+
+									break;
+								case ItemType.BiosSet:
+									BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
+									biosSet.Machine = musheen;
+									if (!this[game].Contains(biosSet))
+									{
+										this[game].Add(biosSet);
+									}
+
+									break;
+								case ItemType.Disk:
+									Disk disk = ((Disk)item).Clone() as Disk;
+									disk.Machine = musheen;
+									if (!this[game].Contains(disk))
+									{
+										this[game].Add(disk);
+									}
+
+									break;
+								case ItemType.Release:
+									Release release = ((Release)item).Clone() as Release;
+									release.Machine = musheen;
+									if (!this[game].Contains(release))
+									{
+										this[game].Add(release);
+									}
+
+									break;
+								case ItemType.Rom:
+									Rom rom = ((Rom)item).Clone() as Rom;
+									rom.Machine = musheen;
+									if (!this[game].Contains(rom))
+									{
+										this[game].Add(rom);
+									}
+
+									break;
+								case ItemType.Sample:
+									Sample sample = ((Sample)item).Clone() as Sample;
+									sample.Machine = musheen;
+									if (!this[game].Contains(sample))
+									{
+										this[game].Add(sample);
+									}
+
+									break;
+							}
+						}
+
+						// Then, remove the romof and cloneof tags so it's not picked up by the manager
+						devItems = this[game];
+						foreach (DatItem item in devItems)
+						{
+							item.Machine.CloneOf = null;
+							item.Machine.RomOf = null;
+						}
+					}
+				}
+
 				// Determine if the game has a parent or not
 				string parent = null;
 				if (!String.IsNullOrEmpty(this[game][0].Machine.CloneOf))
@@ -489,12 +568,22 @@ namespace SabreTools.Helper.Dats
 					}
 				}
 
-				// Finally, remove the romof and cloneof tags so it's not picked up by the manager
+				// Then, remove the romof and cloneof tags so it's not picked up by the manager
 				items = this[game];
 				foreach (DatItem item in items)
 				{
 					item.Machine.CloneOf = null;
 					item.Machine.RomOf = null;
+				}
+			}
+
+			// Finally, we want to remove all games that have the BIOS or Device tags
+			games = Keys.ToList();
+			foreach (string game in games)
+			{
+				if (this[game][0].Machine.MachineType == MachineType.Bios || this[game][0].Machine.MachineType == MachineType.Device)
+				{
+					Remove(game);
 				}
 			}
 		}
