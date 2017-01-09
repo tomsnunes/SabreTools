@@ -513,9 +513,15 @@ namespace SabreTools.Helper.Dats
 					continue;
 				}
 
-				// If the parent doesn't exist, then we continue
+				// If the parent doesn't exist, then we continue and remove
 				if (this[parent].Count == 0)
 				{
+					List<DatItem> curitems = this[game];
+					foreach (DatItem item in curitems)
+					{
+						item.Machine.CloneOf = null;
+						item.Machine.RomOf = null;
+					}
 					continue;
 				}
 
@@ -530,32 +536,32 @@ namespace SabreTools.Helper.Dats
 						case ItemType.Archive:
 							Archive archive = (Archive)item;
 							archive.Machine = currentMachine;
-							this[parent].Add(archive);
+							this[game].Add(archive);
 							break;
 						case ItemType.BiosSet:
 							BiosSet biosSet = (BiosSet)item;
 							biosSet.Machine = currentMachine;
-							this[parent].Add(biosSet);
+							this[game].Add(biosSet);
 							break;
 						case ItemType.Disk:
 							Disk disk = (Disk)item;
 							disk.Machine = currentMachine;
-							this[parent].Add(disk);
+							this[game].Add(disk);
 							break;
 						case ItemType.Release:
 							Release release = (Release)item;
 							release.Machine = currentMachine;
-							this[parent].Add(release);
+							this[game].Add(release);
 							break;
 						case ItemType.Rom:
 							Rom rom = (Rom)item;
 							rom.Machine = currentMachine;
-							this[parent].Add(rom);
+							this[game].Add(rom);
 							break;
 						case ItemType.Sample:
 							Sample sample = (Sample)item;
 							sample.Machine = currentMachine;
-							this[parent].Add(sample);
+							this[game].Add(sample);
 							break;
 					}
 				}
