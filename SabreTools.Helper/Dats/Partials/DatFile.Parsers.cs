@@ -36,7 +36,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
 		public void Parse(string filename, int sysid, int srcid, Logger logger, bool keep = false, bool clean = false, bool softlist = false, bool keepext = false)
 		{
-			Parse(filename, sysid, srcid, new Filter(), false, false, "", logger, keep, clean, softlist, keepext);
+			Parse(filename, sysid, srcid, new Filter(), SplitType.None, false, false, "", logger, keep, clean, softlist, keepext);
 		}
 
 		/// <summary>
@@ -46,6 +46,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="filter">Filter object for passing to the DatItem level</param>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
@@ -64,6 +65,7 @@ namespace SabreTools.Helper.Dats
 			Filter filter,
 
 			// Rom renaming
+			SplitType splitType,
 			bool trim,
 			bool single,
 			string root,
@@ -100,13 +102,13 @@ namespace SabreTools.Helper.Dats
 					break;
 				case DatFormat.ClrMamePro:
 				case DatFormat.DOSCenter:
-					ParseCMP(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean);
+					ParseCMP(filename, sysid, srcid, filter, splitType, trim, single, root, logger, keep, clean);
 					break;
 				case DatFormat.Logiqx:
 				case DatFormat.OfflineList:
 				case DatFormat.SabreDat:
 				case DatFormat.SoftwareList:
-					ParseGenericXML(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, softlist);
+					ParseGenericXML(filename, sysid, srcid, filter, splitType, trim, single, root, logger, keep, clean, softlist);
 					break;
 				case DatFormat.RedumpMD5:
 					ParseRedumpMD5(filename, sysid, srcid, filter, trim, single, root, logger, clean);
@@ -118,7 +120,7 @@ namespace SabreTools.Helper.Dats
 					ParseRedumpSHA1(filename, sysid, srcid, filter, trim, single, root, logger, clean);
 					break;
 				case DatFormat.RomCenter:
-					ParseRC(filename, sysid, srcid, filter, trim, single, root, logger, clean);
+					ParseRC(filename, sysid, srcid, filter, splitType, trim, single, root, logger, clean);
 					break;
 				default:
 					return;
@@ -211,7 +213,7 @@ namespace SabreTools.Helper.Dats
 
 				// Now process and add the rom
 				string key = "";
-				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+				ParseAddHelper(rom, filter, SplitType.None, trim, single, root, clean, logger, out key);
 			}
 
 			sr.Dispose();
@@ -224,6 +226,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="filter">Filter object for passing to the DatItem level</param>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
@@ -240,6 +243,7 @@ namespace SabreTools.Helper.Dats
 			Filter filter,
 
 			// Rom renaming
+			SplitType splitType,
 			bool trim,
 			bool single,
 			string root,
@@ -355,7 +359,7 @@ namespace SabreTools.Helper.Dats
 
 						// Now process and add the sample
 						key = "";
-						ParseAddHelper(item, filter, trim, single, root, clean, logger, out key);
+						ParseAddHelper(item, filter, splitType, trim, single, root, clean, logger, out key);
 
 						continue;
 					}
@@ -416,7 +420,7 @@ namespace SabreTools.Helper.Dats
 
 						// Now process and add the rom
 						key = "";
-						ParseAddHelper(item, filter, trim, single, root, clean, logger, out key);
+						ParseAddHelper(item, filter, splitType, trim, single, root, clean, logger, out key);
 						continue;
 					}
 
@@ -591,7 +595,7 @@ namespace SabreTools.Helper.Dats
 
 					// Now process and add the rom
 					key = "";
-					ParseAddHelper(item, filter, trim, single, root, clean, logger, out key);
+					ParseAddHelper(item, filter, splitType, trim, single, root, clean, logger, out key);
 				}
 
 				// If the line is anything but a rom or disk and we're in a block
@@ -764,6 +768,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="filter">Filter object for passing to the DatItem level</param>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
@@ -781,6 +786,7 @@ namespace SabreTools.Helper.Dats
 			Filter filter,
 
 			// Rom renaming
+			SplitType splitType,
 			bool trim,
 			bool single,
 			string root,
@@ -824,7 +830,7 @@ namespace SabreTools.Helper.Dats
 							Rom rom = new Rom("null", tempgame);
 
 							// Now process and add the rom
-							ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+							ParseAddHelper(rom, filter, splitType, trim, single, root, clean, logger, out key);
 						}
 
 						// Regardless, end the current folder
@@ -1344,7 +1350,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(olrom, filter, trim, single, root, clean, logger, out key);
+										ParseAddHelper(olrom, filter, splitType, trim, single, root, clean, logger, out key);
 										break;
 
 									// For Software List only
@@ -1426,7 +1432,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(relrom, filter, trim, single, root, clean, logger, out key);
+										ParseAddHelper(relrom, filter, splitType, trim, single, root, clean, logger, out key);
 
 										subreader.Read();
 										break;
@@ -1469,7 +1475,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(biosrom, filter, trim, single, root, clean, logger, out key);
+										ParseAddHelper(biosrom, filter, splitType, trim, single, root, clean, logger, out key);
 
 										subreader.Read();
 										break;
@@ -1497,7 +1503,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(archiverom, filter, trim, single, root, clean, logger, out key);
+										ParseAddHelper(archiverom, filter, splitType, trim, single, root, clean, logger, out key);
 
 										subreader.Read();
 										break;
@@ -1525,7 +1531,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(samplerom, filter, trim, single, root, clean, logger, out key);
+										ParseAddHelper(samplerom, filter, splitType, trim, single, root, clean, logger, out key);
 
 										subreader.Read();
 										break;
@@ -1661,7 +1667,7 @@ namespace SabreTools.Helper.Dats
 										}
 
 										// Now process and add the rom
-										ParseAddHelper(inrom, filter, trim, single, root, clean, logger, out key);
+										ParseAddHelper(inrom, filter, splitType, trim, single, root, clean, logger, out key);
 
 										subreader.Read();
 										break;
@@ -1833,7 +1839,7 @@ namespace SabreTools.Helper.Dats
 							}
 
 							// Now process and add the rom
-							ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+							ParseAddHelper(rom, filter, splitType, trim, single, root, clean, logger, out key);
 
 							xtr.Read();
 							break;
@@ -1910,7 +1916,7 @@ namespace SabreTools.Helper.Dats
 
 				// Now process and add the rom
 				string key = "";
-				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+				ParseAddHelper(rom, filter, SplitType.None, trim, single, root, clean, logger, out key);
 			}
 
 			sr.Dispose();
@@ -1972,7 +1978,7 @@ namespace SabreTools.Helper.Dats
 
 				// Now process and add the rom
 				string key = "";
-				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+				ParseAddHelper(rom, filter, SplitType.None, trim, single, root, clean, logger, out key);
 			}
 
 			sr.Dispose();
@@ -2034,7 +2040,7 @@ namespace SabreTools.Helper.Dats
 
 				// Now process and add the rom
 				string key = "";
-				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+				ParseAddHelper(rom, filter, SplitType.None, trim, single, root, clean, logger, out key);
 			}
 
 			sr.Dispose();
@@ -2047,6 +2053,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="filter">Filter object for passing to the DatItem level</param>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
@@ -2062,6 +2069,7 @@ namespace SabreTools.Helper.Dats
 			Filter filter,
 
 			// Rom renaming
+			SplitType splitType,
 			bool trim,
 			bool single,
 			string root,
@@ -2210,7 +2218,7 @@ namespace SabreTools.Helper.Dats
 
 						// Now process and add the rom
 						string key = "";
-						ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+						ParseAddHelper(rom, filter, splitType, trim, single, root, clean, logger, out key);
 					}
 				}
 			}
@@ -2223,11 +2231,12 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="item">Item data to check against</param>
 		/// <param name="filter">Filter object for passing to the DatItem level</param>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
-		private void ParseAddHelper(DatItem item, Filter filter, bool trim, bool single, string root, bool clean, Logger logger, out string key)
+		private void ParseAddHelper(DatItem item, Filter filter, SplitType splitType, bool trim, bool single, string root, bool clean, Logger logger, out string key)
 		{
 			key = "";
 

@@ -116,7 +116,7 @@ namespace SabreTools.Helper.Dats
 						MergeRoms = MergeRoms,
 					};
 
-					datHeaders[i].Parse(input.Split('¬')[0], i, 0, filter, trim, single, root, logger, true, clean, softlist);
+					datHeaders[i].Parse(input.Split('¬')[0], i, 0, filter, splitType, trim, single, root, logger, true, clean, softlist);
 				});
 
 			logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
@@ -465,7 +465,7 @@ namespace SabreTools.Helper.Dats
 					{
 						DatFile innerDatdata = new DatFile(this);
 						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-						innerDatdata.Parse(inputFileName, 0, 0, filter, trim, single,
+						innerDatdata.Parse(inputFileName, 0, 0, filter, splitType, trim, single,
 							root, logger, true, clean, softlist,
 							keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 
@@ -485,7 +485,7 @@ namespace SabreTools.Helper.Dats
 							{
 								logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 								DatFile innerDatdata = new DatFile(this);
-								innerDatdata.Parse(file, 0, 0, filter,
+								innerDatdata.Parse(file, 0, 0, filter, splitType,
 									trim, single, root, logger, true, clean, softlist,
 									keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 
