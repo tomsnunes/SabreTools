@@ -127,17 +127,20 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now we pre-process the DAT with the splitting/merging mode
-			if (splitType == SplitType.NonMerged)
+			switch (splitType)
 			{
-				CreateNonMergedSets(false, logger, output: false);
-			}
-			else if (splitType == SplitType.Merged)
-			{
-				CreateMergedSets(false, logger, output: false);
-			}
-			else if (splitType == SplitType.FullNonMerged)
-			{
-				CreateFullyNonMergedSets(false, logger, output: false);
+				case SplitType.FullNonMerged:
+					CreateFullyNonMergedSets(false, logger, output: false);
+					break;
+				case SplitType.NonMerged:
+					CreateNonMergedSets(false, logger, output: false);
+					break;
+				case SplitType.Merged:
+					CreateMergedSets(false, logger, output: false);
+					break;
+				case SplitType.Split:
+					CreateSplitSets(false, logger, output: false);
+					break;
 			}
 		}
 

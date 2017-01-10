@@ -730,15 +730,21 @@ Options:
 			Enabling this flag allows for the original name to be preserved and keeping
 			the description as just a description.
 			
-		-dnm, --dat-nm		Create non-merged sets in the output DAT
 		-dm, --dat-merge	Create merged sets in the output DAT
-		-df, --dat-fnm		Create fully merged sets (including devices) in the output DAT
-			Each of the above flags allow for preprocessing an outputted DAT in the case that
-			your DAT manager of choice doesn't allow these on the fly. Non-merged will copy all
-			parent items to the children so that each archive or folder contains everything
-			necessary for each game. Fully non-merged copies all parent and device items to the
-			children as well. Merge will copy all child items to a subfolder of the parent,
-			reducing the space taken up on disk.
+			Preprocess the DAT to have parent sets contain all items from the children based
+			on the cloneof tag.
+		
+		-ds, --dat-sp		Create split sets in the output DAT
+			Preprocess the DAT to remove redundant files between parents and children based
+			on the romof and cloneof tags.
+		
+		-dnm, --dat-nm		Create non-merged sets in the output DAT
+			Preprocess the DAT to have child sets contain all items from the parent set based
+			on the cloneof tag.
+		
+		-df, --dat-fnm		Create fully non-merged sets in the output DAT
+			Preprocess the DAT to have child sets contain all items from the parent sets based
+			on the cloneof and romof tags as well as device references.
 			
 		-trim			Trim file names to fit NTFS length
 			In the cases where files will have too long a name, this allows for trimming

@@ -284,6 +284,10 @@ namespace SabreTools
 					case "--dat-nm":
 						splitType = SplitType.NonMerged;
 						break;
+					case "-ds":
+					case "--dat-sp":
+						splitType = SplitType.Split;
+						break;
 					case "-f":
 					case "--files":
 						parseArchivesAsFiles = true;

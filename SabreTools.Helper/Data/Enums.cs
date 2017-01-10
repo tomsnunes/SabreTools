@@ -263,6 +263,7 @@
 		NonMerged,
 		Merged,
 		FullNonMerged,
+		Split,
 	}
 
 	#endregion
