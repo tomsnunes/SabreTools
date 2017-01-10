@@ -736,9 +736,9 @@ Options:
 			Each of the above flags allow for preprocessing an outputted DAT in the case that
 			your DAT manager of choice doesn't allow these on the fly. Non-merged will copy all
 			parent items to the children so that each archive or folder contains everything
-			necessary for each game. Merge will copy all child items to a subfolder of the
-			parent, reducing the space taken up on disk. Fully Merged attempts to copy device
-			files as well (usually only used for listxml inputs).
+			necessary for each game. Fully non-merged copies all parent and device items to the
+			children as well. Merge will copy all child items to a subfolder of the parent,
+			reducing the space taken up on disk.
 			
 		-trim			Trim file names to fit NTFS length
 			In the cases where files will have too long a name, this allows for trimming

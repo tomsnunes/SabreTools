@@ -642,8 +642,20 @@ namespace SabreTools.Helper.Dats
 					}
 				}
 
-				// Finally, remove the old game so it's not picked up by the writer
+				// Then, remove the old game so it's not picked up by the writer
 				Remove(game);
+			}
+
+			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
+			games = Keys.ToList();
+			foreach (string game in games)
+			{
+				List<DatItem> items = this[game];
+				foreach (DatItem item in items)
+				{
+					item.Machine.CloneOf = null;
+					item.Machine.RomOf = null;
+				}
 			}
 		}
 
@@ -863,7 +875,7 @@ namespace SabreTools.Helper.Dats
 					item.Machine.CloneOf = null;
 					item.Machine.RomOf = null;
 				}
-			}	
+			}
 		}
 
 		#endregion
