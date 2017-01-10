@@ -257,8 +257,8 @@ namespace SabreTools
 						delete = true;
 						break;
 					case "-df":
-					case "--dat-fm":
-						splitType = SplitType.NotMergedWithDevice;
+					case "--dat-fnm":
+						splitType = SplitType.FullNonMerged;
 						break;
 					case "-di":
 					case "--diff":

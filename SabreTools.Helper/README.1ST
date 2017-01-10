@@ -732,7 +732,7 @@ Options:
 			
 		-dnm, --dat-nm		Create non-merged sets in the output DAT
 		-dm, --dat-merge	Create merged sets in the output DAT
-		-df, --dat-fm		Create fully merged sets (including devices) in the output DAT
+		-df, --dat-fnm		Create fully merged sets (including devices) in the output DAT
 			Each of the above flags allow for preprocessing an outputted DAT in the case that
 			your DAT manager of choice doesn't allow these on the fly. Non-merged will copy all
 			parent items to the children so that each archive or folder contains everything

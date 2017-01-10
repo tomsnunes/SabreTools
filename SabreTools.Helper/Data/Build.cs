@@ -317,7 +317,7 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-sl, --softlist	Use Software List name instead of description");
 						helptext.Add("	-dnm, --dat-nm	Create non-merged sets in the output DAT");
 						helptext.Add("	-dm, --dat-merge Create merged sets in the output DAT");
-						helptext.Add("	-df, --dat-fm	Create fully merged sets in the output");
+						helptext.Add("	-df, --dat-fnm	Create fully merged sets in the output");
 						helptext.Add("	-trim			Trim file names to fit NTFS length");
 							helptext.Add("		-rd=, --root-dir=	Set the root directory for calc");
 						helptext.Add("	-si, --single		All game names replaced by '!'");
