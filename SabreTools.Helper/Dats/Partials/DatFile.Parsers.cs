@@ -1265,6 +1265,7 @@ namespace SabreTools.Helper.Dats
 								CloneOf = xtr.GetAttribute("cloneof") ?? "",
 								SampleOf = xtr.GetAttribute("sampleof") ?? "",
 
+								Devices = new List<string>(),
 								MachineType =
 									xtr.GetAttribute("isbios") == "yes" ? MachineType.Bios :
 									xtr.GetAttribute("isdevice") == "yes" ? MachineType.Device :
@@ -1273,6 +1274,7 @@ namespace SabreTools.Helper.Dats
 								Runnable = xtr.GetAttribute("runnable") == "yes" || xtr.GetAttribute("runnable") == null,
 							};
 
+							// Get the supported value from the reader
 							if (subreader.GetAttribute("supported") != null)
 							{
 								switch (subreader.GetAttribute("supported"))
@@ -1285,7 +1287,6 @@ namespace SabreTools.Helper.Dats
 										break;
 								}
 							}
-
 
 							if (superdat && !keep)
 							{
@@ -1363,7 +1364,16 @@ namespace SabreTools.Helper.Dats
 										ParseAddHelper(olrom, filter, trim, single, root, clean, logger, out key);
 										break;
 
-									// For Software List only
+									// For Software List and MAME listxml only
+									case "device_ref":
+										string device = subreader.GetAttribute("name");
+										if (!machine.Devices.Contains(device))
+										{
+											machine.Devices.Add(device);
+										}
+										subreader.Read();
+										
+										break;
 									case "publisher":
 										publisher = subreader.ReadElementContentAsString();
 										break;
@@ -1686,6 +1696,7 @@ namespace SabreTools.Helper.Dats
 										break;
 								}
 							}
+
 							xtr.Skip();
 							break;
 						case "dir":

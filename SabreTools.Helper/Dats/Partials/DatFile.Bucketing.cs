@@ -386,6 +386,11 @@ namespace SabreTools.Helper.Dats
 			List<string> games = Keys.ToList();
 			foreach (string game in games)
 			{
+				if (game.Contains("galaga"))
+				{
+					logger.Verbose("");
+				}
+
 				// Determine if the game has any devices or not
 				if (this[game][0].Machine.Devices.Count > 0)
 				{
@@ -581,9 +586,12 @@ namespace SabreTools.Helper.Dats
 			games = Keys.ToList();
 			foreach (string game in games)
 			{
-				if (this[game][0].Machine.MachineType == MachineType.Bios || this[game][0].Machine.MachineType == MachineType.Device)
+				if (this[game].Count > 0)
 				{
-					Remove(game);
+					if (this[game][0].Machine.MachineType == MachineType.Bios || this[game][0].Machine.MachineType == MachineType.Device)
+					{
+						Remove(game);
+					}
 				}
 			}
 		}
