@@ -370,6 +370,10 @@ namespace SabreTools.Helper.Dats
 			_files = sortable;
 		}
 
+		#endregion
+
+		#region Merging/Splitting Methods [MODULAR DONE]
+
 		/// <summary>
 		/// Use cloneof tags to create non-merged sets and remove the tags plus using the device_ref tags to get full sets
 		/// </summary>
@@ -469,7 +473,7 @@ namespace SabreTools.Helper.Dats
 
 		#endregion
 
-		#region Helper Methods
+		#region Merging/Splitting Helper Methods [MODULAR DONE]
 
 		/// <summary>
 		/// Use device_ref tags to add roms to the children
