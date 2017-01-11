@@ -648,7 +648,7 @@ namespace SabreTools
 
 			// Set the not machine type flag for filtering
 			MachineType machineNotType = MachineType.NULL;
-			switch (gametype?.ToLowerInvariant())
+			switch (notgametype?.ToLowerInvariant())
 			{
 				case "none":
 					machineNotType = MachineType.None;
