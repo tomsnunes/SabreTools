@@ -315,10 +315,10 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-xof, --exclude-of	Exclude romof, cloneof, sampleof tags");
 						helptext.Add("	-clean			Clean game names according to WoD standards");
 						helptext.Add("	-sl, --softlist	Use Software List name instead of description");
-						helptext.Add("	-dm, --dat-merge Create merged sets in the output DAT");
-						helptext.Add("	-ds, --dat-split Create split sets in the output DAT");
-						helptext.Add("	-dnm, --dat-nonmerge Create non-merged sets in the output DAT");
-						helptext.Add("	-df, --dat-fullnonmerge Create fully non-merged sets in the output");
+						helptext.Add("	-dm, --dat-merged Create merged sets");
+						helptext.Add("	-ds, --dat-split Create split sets");
+						helptext.Add("	-dnm, --dat-nonmerged Create non-merged sets");
+						helptext.Add("	-df, --dat-fullnonmerged Create fully non-merged sets");
 						helptext.Add("	-trim			Trim file names to fit NTFS length");
 							helptext.Add("		-rd=, --root-dir=	Set the root directory for calc");
 						helptext.Add("	-si, --single		All game names replaced by '!'");

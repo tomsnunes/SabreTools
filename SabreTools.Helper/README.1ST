@@ -730,7 +730,7 @@ Options:
 			Enabling this flag allows for the original name to be preserved and keeping
 			the description as just a description.
 			
-		-dm, --dat-merge	Create merged sets in the output DAT
+		-dm, --dat-merged	Create merged sets in the output DAT
 			Preprocess the DAT to have parent sets contain all items from the children based
 			on the cloneof tag. This is incompatible with the other --dat-X flags.
 		
@@ -738,11 +738,11 @@ Options:
 			Preprocess the DAT to remove redundant files between parents and children based
 			on the romof and cloneof tags. This is incompatible with the other --dat-X flags.
 		
-		-dnm, --dat-nonmerge Create non-merged sets in the output DAT
+		-dnm, --dat-nonmerged Create non-merged sets in the output DAT
 			Preprocess the DAT to have child sets contain all items from the parent set based
 			on the cloneof tag. This is incompatible with the other --dat-X flags.
 		
-		-df, --dat-fullnonmerge Create fully non-merged sets in the output DAT
+		-df, --dat-fullnonmerged Create fully non-merged sets in the output DAT
 			Preprocess the DAT to have child sets contain all items from the parent sets based
 			on the cloneof and romof tags as well as device references. This is incompatible with
 			the other --dat-X flags.
