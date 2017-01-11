@@ -399,7 +399,13 @@ namespace SabreTools.Helper.Tools
 			List<Rom> roms = new List<Rom>();
 			string gamename = Path.GetFileNameWithoutExtension(input);
 
-			// First get the archive type
+			// First, we check that there is anything being passed as the input
+			if (String.IsNullOrEmpty(input))
+			{
+				return roms;
+			}
+
+			// Next, get the archive type
 			ArchiveType? at = GetCurrentArchiveType(input, logger);
 
 			// If we got back null, then it's not an archive, so we we return
