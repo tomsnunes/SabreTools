@@ -384,10 +384,8 @@ namespace SabreTools.Helper.Dats
 			BucketByGame(mergeroms, true, logger, output);
 			_sortedBy = SortedBy.Default;
 
-			// Now we want to loop through all of the games and add the information from devices
-			AddRomsFromDevices(logger);
-
 			// Now we want to loop through all of the games and set the correct information
+			AddRomsFromDevices(logger);
 			AddRomsFromParent(logger);
 
 			// Now that we have looped through the cloneof tags, we loop through the romof tags
