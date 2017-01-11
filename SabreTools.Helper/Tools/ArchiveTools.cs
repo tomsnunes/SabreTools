@@ -420,7 +420,7 @@ namespace SabreTools.Helper.Tools
 				Rom possibleTgz = GetTorrentGZFileInfo(input, logger);
 
 				// If it was, then add it to the outputs and continue
-				if (possibleTgz.Name != null)
+				if (possibleTgz != null && possibleTgz.Name != null)
 				{
 					roms.Add(possibleTgz);
 					return roms;
