@@ -384,213 +384,17 @@ namespace SabreTools.Helper.Dats
 			BucketByGame(mergeroms, true, logger, output);
 			_sortedBy = SortedBy.Default;
 
+			// Now we want to loop through all of the games and add the information from devices
+			AddRomsFromDevices(logger);
+
 			// Now we want to loop through all of the games and set the correct information
-			List<string> games = Keys.ToList();
-			foreach (string game in games)
-			{
-				// Determine if the game has any devices or not
-				if (this[game][0].Machine.Devices.Count > 0)
-				{
-					List<string> devices = this[game][0].Machine.Devices;
-					foreach (string device in devices)
-					{
-						// If the device doesn't exist then we continue
-						if (this[device].Count == 0)
-						{
-							continue;
-						}
+			AddRomsFromParent(logger);
 
-						// Otherwise, copy the items from the device to the current game
-						Machine musheen = this[game][0].Machine;
-						List<DatItem> devItems = this[device];
-						foreach (DatItem item in devItems)
-						{
-							// Figure out the type of the item and add it accordingly
-							switch (item.Type)
-							{
-								case ItemType.Archive:
-									Archive archive = ((Archive)item).Clone() as Archive;
-									archive.Machine = musheen;
-									if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
-									{
-										this[game].Add(archive);
-									}
+			// Now that we have looped through the cloneof tags, we loop through the romof tags
+			RemoveBiosRomsFromChild(logger);
 
-									break;
-								case ItemType.BiosSet:
-									BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-									biosSet.Machine = musheen;
-									if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
-									{
-										this[game].Add(biosSet);
-									}
-
-									break;
-								case ItemType.Disk:
-									Disk disk = ((Disk)item).Clone() as Disk;
-									disk.Machine = musheen;
-									if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
-									{
-										this[game].Add(disk);
-									}
-
-									break;
-								case ItemType.Release:
-									Release release = ((Release)item).Clone() as Release;
-									release.Machine = musheen;
-									if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
-									{
-										this[game].Add(release);
-									}
-
-									break;
-								case ItemType.Rom:
-									Rom rom = ((Rom)item).Clone() as Rom;
-									rom.Machine = musheen;
-									if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
-									{
-										this[game].Add(rom);
-									}
-
-									break;
-								case ItemType.Sample:
-									Sample sample = ((Sample)item).Clone() as Sample;
-									sample.Machine = musheen;
-									if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
-									{
-										this[game].Add(sample);
-									}
-
-									break;
-							}
-						}
-
-						// Then, remove the romof and cloneof tags so it's not picked up by the manager
-						devItems = this[game];
-						foreach (DatItem item in devItems)
-						{
-							item.Machine.CloneOf = null;
-							item.Machine.RomOf = null;
-						}
-					}
-				}
-
-				// Determine if the game has a parent or not
-				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].Machine.CloneOf))
-				{
-					parent = this[game][0].Machine.CloneOf;
-				}
-				else if (!String.IsNullOrEmpty(this[game][0].Machine.RomOf))
-				{
-					parent = this[game][0].Machine.RomOf;
-				}
-
-				// If there is no parent, then we continue
-				if (String.IsNullOrEmpty(parent))
-				{
-					continue;
-				}
-
-				// If the parent doesn't exist, then we continue and remove
-				if (this[parent].Count == 0)
-				{
-					List<DatItem> curitems = this[game];
-					foreach (DatItem item in curitems)
-					{
-						item.Machine.CloneOf = null;
-						item.Machine.RomOf = null;
-					}
-
-					continue;
-				}
-
-				// Otherwise, copy the items from the parent to the current game
-				Machine currentMachine = this[game][0].Machine;
-				List<DatItem> items = this[parent];
-				foreach (DatItem item in items)
-				{
-					// Figure out the type of the item and add it accordingly
-					switch (item.Type)
-					{
-						case ItemType.Archive:
-							Archive archive = ((Archive)item).Clone() as Archive;
-							archive.Machine = currentMachine;
-							if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
-							{
-								this[game].Add(archive);
-							}
-
-							break;
-						case ItemType.BiosSet:
-							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							biosSet.Machine = currentMachine;
-							if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
-							{
-								this[game].Add(biosSet);
-							}
-
-							break;
-						case ItemType.Disk:
-							Disk disk = ((Disk)item).Clone() as Disk;
-							disk.Machine = currentMachine;
-							if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
-							{
-								this[game].Add(disk);
-							}
-
-							break;
-						case ItemType.Release:
-							Release release = ((Release)item).Clone() as Release;
-							release.Machine = currentMachine;
-							if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
-							{
-								this[game].Add(release);
-							}
-
-							break;
-						case ItemType.Rom:
-							Rom rom = ((Rom)item).Clone() as Rom;
-							rom.Machine = currentMachine;
-							if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
-							{
-								this[game].Add(rom);
-							}
-
-							break;
-						case ItemType.Sample:
-							Sample sample = ((Sample)item).Clone() as Sample;
-							sample.Machine = currentMachine;
-							if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
-							{
-								this[game].Add(sample);
-							}
-
-							break;
-					}
-				}
-
-				// Then, remove the romof and cloneof tags so it's not picked up by the manager
-				items = this[game];
-				foreach (DatItem item in items)
-				{
-					item.Machine.CloneOf = null;
-					item.Machine.RomOf = null;
-				}
-			}
-
-			// Finally, we want to remove all games that have the BIOS or Device tags
-			games = Keys.ToList();
-			foreach (string game in games)
-			{
-				if (this[game].Count > 0)
-				{
-					if (this[game][0].Machine.MachineType == MachineType.Bios || this[game][0].Machine.MachineType == MachineType.Device)
-					{
-						Remove(game);
-					}
-				}
-			}
+			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
+			RemoveTagsFromChild(logger);
 		}
 
 		/// <summary>
@@ -608,50 +412,13 @@ namespace SabreTools.Helper.Dats
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
-			List<string> games = Keys.ToList();
-			foreach (string game in games)
-			{
-				// Determine if the game has a parent or not
-				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].Machine.CloneOf))
-				{
-					parent = this[game][0].Machine.CloneOf;
-				}
+			AddRomsToParent(logger);
 
-				// If there is no parent, then we continue
-				if (String.IsNullOrEmpty(parent))
-				{
-					continue;
-				}
-
-				// Otherwise, move the items from the current game to a subfolder of the parent game
-				Machine parentMachine = this[parent].Count == 0 ? new Machine { Name = parent, Description = parent } : this[parent][0].Machine;
-				List<DatItem> items = this[game];
-				foreach (DatItem item in items)
-				{
-					if (!this[parent].Contains(item))
-					{
-						item.Name = item.Machine.Name + "\\" + item.Name;
-						item.Machine = parentMachine;
-						this[parent].Add(item);
-					}
-				}
-
-				// Then, remove the old game so it's not picked up by the writer
-				Remove(game);
-			}
+			// Now that we have looped through the cloneof tags, we loop through the romof tags
+			RemoveBiosRomsFromChild(logger);
 
 			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
-			games = Keys.ToList();
-			foreach (string game in games)
-			{
-				List<DatItem> items = this[game];
-				foreach (DatItem item in items)
-				{
-					item.Machine.CloneOf = null;
-					item.Machine.RomOf = null;
-				}
-			}
+			RemoveTagsFromChild(logger);
 		}
 
 		/// <summary>
@@ -669,6 +436,142 @@ namespace SabreTools.Helper.Dats
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
+			AddRomsFromParent(logger);
+
+			// Now that we have looped through the cloneof tags, we loop through the romof tags
+			RemoveBiosRomsFromChild(logger);
+
+			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
+			RemoveTagsFromChild(logger);
+		}
+
+		/// <summary>
+		/// Use cloneof and romof tags to create split sets and remove the tags
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		public void CreateSplitSets(bool mergeroms, Logger logger, bool output = true)
+		{
+			logger.User("Creating split sets from the DAT");
+
+			// For sake of ease, the first thing we want to do is sort by game
+			BucketByGame(mergeroms, true, logger, output);
+			_sortedBy = SortedBy.Default;
+
+			// Now we want to loop through all of the games and set the correct information
+			RemoveRomsFromChild(logger);
+
+			// Now that we have looped through the cloneof tags, we loop through the romof tags
+			RemoveBiosRomsFromChild(logger);
+
+			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
+			RemoveTagsFromChild(logger);
+		}
+
+		#endregion
+
+		#region Helper Methods
+
+		/// <summary>
+		/// Use device_ref tags to add roms to the children
+		/// </summary>
+		/// <param name="logger">Logger object for file and console output</param>
+		private void AddRomsFromDevices(Logger logger)
+		{
+			List<string> games = Keys.ToList();
+			foreach (string game in games)
+			{
+				// If the game has no devices, we continue
+				if (this[game][0].Machine.Devices.Count == 0)
+				{
+					continue;
+				}
+
+				// Determine if the game has any devices or not
+				List<string> devices = this[game][0].Machine.Devices;
+				foreach (string device in devices)
+				{
+					// If the device doesn't exist then we continue
+					if (this[device].Count == 0)
+					{
+						continue;
+					}
+
+					// Otherwise, copy the items from the device to the current game
+					Machine musheen = this[game][0].Machine;
+					List<DatItem> devItems = this[device];
+					foreach (DatItem item in devItems)
+					{
+						// Figure out the type of the item and add it accordingly
+						switch (item.Type)
+						{
+							case ItemType.Archive:
+								Archive archive = ((Archive)item).Clone() as Archive;
+								archive.Machine = musheen;
+								if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
+								{
+									this[game].Add(archive);
+								}
+
+								break;
+							case ItemType.BiosSet:
+								BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
+								biosSet.Machine = musheen;
+								if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
+								{
+									this[game].Add(biosSet);
+								}
+
+								break;
+							case ItemType.Disk:
+								Disk disk = ((Disk)item).Clone() as Disk;
+								disk.Machine = musheen;
+								if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
+								{
+									this[game].Add(disk);
+								}
+
+								break;
+							case ItemType.Release:
+								Release release = ((Release)item).Clone() as Release;
+								release.Machine = musheen;
+								if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
+								{
+									this[game].Add(release);
+								}
+
+								break;
+							case ItemType.Rom:
+								Rom rom = ((Rom)item).Clone() as Rom;
+								rom.Machine = musheen;
+								if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
+								{
+									this[game].Add(rom);
+								}
+
+								break;
+							case ItemType.Sample:
+								Sample sample = ((Sample)item).Clone() as Sample;
+								sample.Machine = musheen;
+								if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
+								{
+									this[game].Add(sample);
+								}
+
+								break;
+						}
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Use cloneof tags to add roms to the children, setting the new romof tag in the process
+		/// </summary>
+		/// <param name="logger">Logger object for file and console output</param>
+		private void AddRomsFromParent(Logger logger)
+		{
 			List<string> games = Keys.ToList();
 			foreach (string game in games)
 			{
@@ -770,9 +673,57 @@ namespace SabreTools.Helper.Dats
 					item.Machine.RomOf = romof;
 				}
 			}
+		}
 
-			// Now that we have looped through the cloneof tags, we loop through the romof tags
-			games = Keys.ToList();
+		/// <summary>
+		/// Use cloneof tags to add roms to the parents, removing the child sets in the process
+		/// </summary>
+		/// <param name="logger"></param>
+		private void AddRomsToParent(Logger logger)
+		{
+			List<string> games = Keys.ToList();
+			foreach (string game in games)
+			{
+				// Determine if the game has a parent or not
+				string parent = null;
+				if (!String.IsNullOrEmpty(this[game][0].Machine.CloneOf))
+				{
+					parent = this[game][0].Machine.CloneOf;
+				}
+
+				// If there is no parent, then we continue
+				if (String.IsNullOrEmpty(parent))
+				{
+					continue;
+				}
+
+				// Otherwise, move the items from the current game to a subfolder of the parent game
+				Machine parentMachine = this[parent].Count == 0 ? new Machine { Name = parent, Description = parent } : this[parent][0].Machine;
+				List<DatItem> items = this[game];
+				foreach (DatItem item in items)
+				{
+					if (!this[parent].Contains(item))
+					{
+						item.Name = item.Machine.Name + "\\" + item.Name;
+						item.Machine = parentMachine;
+
+						this[parent].Add(item);
+					}
+				}
+
+				// Then, remove the old game so it's not picked up by the writer
+				Remove(game);
+			}
+		}
+
+		/// <summary>
+		/// Use romof tags to remove roms from the children
+		/// </summary>
+		/// <param name="logger">Logger object for file and console output</param>
+		private void RemoveBiosRomsFromChild(Logger logger)
+		{
+			// Loop through the romof tags
+			List<string> games = Keys.ToList();
 			foreach (string game in games)
 			{
 				// If the game has no items in it, we want to continue
@@ -859,35 +810,14 @@ namespace SabreTools.Helper.Dats
 					}
 				}
 			}
-
-			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
-			games = Keys.ToList();
-			foreach (string game in games)
-			{
-				List<DatItem> items = this[game];
-				foreach (DatItem item in items)
-				{
-					item.Machine.CloneOf = null;
-					item.Machine.RomOf = null;
-				}
-			}
 		}
 
 		/// <summary>
-		/// Use cloneof and romof tags to create split sets and remove the tags
+		/// Use cloneof tags to remove roms from the children
 		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void CreateSplitSets(bool mergeroms, Logger logger, bool output = true)
+		private void RemoveRomsFromChild(Logger logger)
 		{
-			logger.User("Creating split sets from the DAT");
-
-			// For sake of ease, the first thing we want to do is sort by game
-			BucketByGame(mergeroms, true, logger, output);
-			_sortedBy = SortedBy.Default;
-
-			// Now we want to loop through all of the games and set the correct information
 			List<string> games = Keys.ToList();
 			foreach (string game in games)
 			{
@@ -983,98 +913,15 @@ namespace SabreTools.Helper.Dats
 					item.Machine.RomOf = romof;
 				}
 			}
+		}
 
-			// Now that we have looped through the cloneof tags, we loop through the romof tags
-			games = Keys.ToList();
-			foreach (string game in games)
-			{
-				// If the game has no items in it, we want to continue
-				if (this[game].Count == 0)
-				{
-					continue;
-				}
-
-				// Determine if the game has a parent or not
-				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].Machine.RomOf))
-				{
-					parent = this[game][0].Machine.RomOf;
-				}
-
-				// If the parent doesnt exist, we want to continue
-				if (String.IsNullOrEmpty(parent))
-				{
-					continue;
-				}
-
-				// If the parent doesn't have any items, we want to continue
-				if (this[parent].Count == 0)
-				{
-					continue;
-				}
-
-				// If the parent exists and has items, we remove the items that are in the parent from the current game
-				Machine currentMachine = this[game][0].Machine;
-				List<DatItem> parentItems = this[parent];
-				foreach (DatItem item in parentItems)
-				{
-					// Figure out the type of the item and add it accordingly
-					switch (item.Type)
-					{
-						case ItemType.Archive:
-							Archive archive = ((Archive)item).Clone() as Archive;
-							if (this[game].Contains(archive))
-							{
-								this[game].Remove(archive);
-							}
-
-							break;
-						case ItemType.BiosSet:
-							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							if (this[game].Contains(biosSet))
-							{
-								this[game].Remove(biosSet);
-							}
-
-							break;
-						case ItemType.Disk:
-							Disk disk = ((Disk)item).Clone() as Disk;
-							if (this[game].Contains(disk))
-							{
-								this[game].Remove(disk);
-							}
-
-							break;
-						case ItemType.Release:
-							Release release = ((Release)item).Clone() as Release;
-							if (this[game].Contains(release))
-							{
-								this[game].Remove(release);
-							}
-
-							break;
-						case ItemType.Rom:
-							Rom rom = ((Rom)item).Clone() as Rom;
-							if (this[game].Contains(rom))
-							{
-								this[game].Remove(rom);
-							}
-
-							break;
-						case ItemType.Sample:
-							Sample sample = ((Sample)item).Clone() as Sample;
-							if (this[game].Contains(sample))
-							{
-								this[game].Remove(sample);
-							}
-
-							break;
-					}
-				}
-			}
-
-			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
-			games = Keys.ToList();
+		/// <summary>
+		/// Remove all romof and cloneof tags from all games
+		/// </summary>
+		/// <param name="logger"></param>
+		private void RemoveTagsFromChild(Logger logger)
+		{
+			List<string> games = Keys.ToList();
 			foreach (string game in games)
 			{
 				List<DatItem> items = this[game];
