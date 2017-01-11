@@ -257,7 +257,7 @@ namespace SabreTools
 						delete = true;
 						break;
 					case "-df":
-					case "--dat-fnm":
+					case "--dat-fullnonmerge":
 						splitType = SplitType.FullNonMerged;
 						break;
 					case "-di":
@@ -281,11 +281,11 @@ namespace SabreTools
 						splitType = SplitType.Merged;
 						break;
 					case "-dnm":
-					case "--dat-nm":
+					case "--dat-nonmerge":
 						splitType = SplitType.NonMerged;
 						break;
 					case "-ds":
-					case "--dat-sp":
+					case "--dat-split":
 						splitType = SplitType.Split;
 						break;
 					case "-f":
