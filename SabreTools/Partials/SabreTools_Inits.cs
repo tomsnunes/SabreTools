@@ -538,57 +538,66 @@ namespace SabreTools
 		{
 			// Set the special flags
 			ForceMerging fm = ForceMerging.None;
-			switch (forcemerge?.ToLowerInvariant())
+			if (!String.IsNullOrEmpty(forcemerge))
 			{
-				case "none":
-					fm = ForceMerging.None;
-					break;
-				case "split":
-					fm = ForceMerging.Split;
-					break;
-				case "full":
-					fm = ForceMerging.Full;
-					break;
-				default:
-					_logger.Warning(forcemerge + " is not a valid merge flag");
-					break;
+				switch (forcemerge.ToLowerInvariant())
+				{
+					case "none":
+						fm = ForceMerging.None;
+						break;
+					case "split":
+						fm = ForceMerging.Split;
+						break;
+					case "full":
+						fm = ForceMerging.Full;
+						break;
+					default:
+						_logger.Warning(forcemerge + " is not a valid merge flag");
+						break;
+				}
 			}
 
 			ForceNodump fn = ForceNodump.None;
-			switch (forcend?.ToLowerInvariant())
+			if (!String.IsNullOrEmpty(forcend))
 			{
-				case "none":
-					fn = ForceNodump.None;
-					break;
-				case "obsolete":
-					fn = ForceNodump.Obsolete;
-					break;
-				case "required":
-					fn = ForceNodump.Required;
-					break;
-				case "ignore":
-					fn = ForceNodump.Ignore;
-					break;
-				default:
-					_logger.Warning(forcend + " is not a valid nodump flag");
-					break;
+				switch (forcend.ToLowerInvariant())
+				{
+					case "none":
+						fn = ForceNodump.None;
+						break;
+					case "obsolete":
+						fn = ForceNodump.Obsolete;
+						break;
+					case "required":
+						fn = ForceNodump.Required;
+						break;
+					case "ignore":
+						fn = ForceNodump.Ignore;
+						break;
+					default:
+						_logger.Warning(forcend + " is not a valid nodump flag");
+						break;
+				}
 			}
 
 			ForcePacking fp = ForcePacking.None;
-			switch (forcepack?.ToLowerInvariant())
+			if (!String.IsNullOrEmpty(forcepack))
 			{
-				case "none":
-					fp = ForcePacking.None;
-					break;
-				case "zip":
-					fp = ForcePacking.Zip;
-					break;
-				case "unzip":
-					fp = ForcePacking.Unzip;
-					break;
-				default:
-					_logger.Warning(forcepack + " is not a valid packing flag");
-					break;
+				switch (forcepack.ToLowerInvariant())
+				{
+					case "none":
+						fp = ForcePacking.None;
+						break;
+					case "zip":
+						fp = ForcePacking.Zip;
+						break;
+					case "unzip":
+						fp = ForcePacking.Unzip;
+						break;
+					default:
+						_logger.Warning(forcepack + " is not a valid packing flag");
+						break;
+				}
 			}
 
 			// Set the status flag for filtering
