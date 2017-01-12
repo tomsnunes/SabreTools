@@ -399,7 +399,7 @@ namespace SabreTools.Helper.Dats
 			RemoveTagsFromChild(logger);
 
 			// Finally, remove all sets that are labeled as bios or device
-			RemoveBiosAndDeviceSets(logger);
+			//RemoveBiosAndDeviceSets(logger);
 		}
 
 		/// <summary>
