@@ -840,18 +840,22 @@ Options:
 		-is=, --status=		Include only items with a given status
 			Include items with one of the supported values:
 				None, Good, BadDump, Nodump, Verified
+			Multiples of this input are allowed.
 
 		-nis=, --not-status=	Exclude only items with a given status
 			Exclude items with one of the supported values:
 				None, Good, BadDump, Nodump, Verified
+			Multiples of this input are allowed.
 				
 		-gt=, --game-type=	Include only items with the given game type
 			Include items with one of the supported values:
 				None, Bios, Device, Mechanical
+			Multiples of this input are allowed.
 		
 		-ngt=, --not-gtype=	Exclude only items with a given game type
 			Exclude items with one of the supported values:
 				None, Bios, Device, Mechanical
+			Multiples of this input are allowed.
 		
 		-run, --runnable	Include only items that are marked runnable
 			This allows users to include only verified runnable games

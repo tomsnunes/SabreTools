@@ -541,7 +541,6 @@ namespace SabreTools
 			switch (forcemerge?.ToLowerInvariant())
 			{
 				case "none":
-				default:
 					fm = ForceMerging.None;
 					break;
 				case "split":
@@ -550,13 +549,15 @@ namespace SabreTools
 				case "full":
 					fm = ForceMerging.Full;
 					break;
+				default:
+					_logger.Warning(forcemerge + " is not a valid merge flag");
+					break;
 			}
 
 			ForceNodump fn = ForceNodump.None;
 			switch (forcend?.ToLowerInvariant())
 			{
 				case "none":
-				default:
 					fn = ForceNodump.None;
 					break;
 				case "obsolete":
@@ -568,13 +569,15 @@ namespace SabreTools
 				case "ignore":
 					fn = ForceNodump.Ignore;
 					break;
+				default:
+					_logger.Warning(forcend + " is not a valid nodump flag");
+					break;
 			}
 
 			ForcePacking fp = ForcePacking.None;
 			switch (forcepack?.ToLowerInvariant())
 			{
 				case "none":
-				default:
 					fp = ForcePacking.None;
 					break;
 				case "zip":
@@ -582,6 +585,9 @@ namespace SabreTools
 					break;
 				case "unzip":
 					fp = ForcePacking.Unzip;
+					break;
+				default:
+					_logger.Warning(forcepack + " is not a valid packing flag");
 					break;
 			}
 
@@ -605,6 +611,9 @@ namespace SabreTools
 						break;
 					case "verified":
 						itemStatus |= ItemStatus.Verified;
+						break;
+					default:
+						_logger.Warning(status + " is not a valid status");
 						break;
 				}
 			}
@@ -630,6 +639,9 @@ namespace SabreTools
 					case "verified":
 						itemNotStatus |= ItemStatus.Verified;
 						break;
+					default:
+						_logger.Warning(status + " is not a valid status");
+						break;
 				}
 			}
 
@@ -653,6 +665,9 @@ namespace SabreTools
 					case "mechanical":
 						machineType |= MachineType.Mechanical;
 						break;
+					default:
+						_logger.Warning(gametype + " is not a valid type");
+						break;
 				}
 			}
 
@@ -675,6 +690,9 @@ namespace SabreTools
 					case "mech":
 					case "mechanical":
 						machineNotType = MachineType.Mechanical;
+						break;
+					default:
+						_logger.Warning(gametype + " is not a valid type");
 						break;
 				}
 			}

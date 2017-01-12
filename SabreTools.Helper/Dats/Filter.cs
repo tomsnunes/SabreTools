@@ -118,11 +118,11 @@ namespace SabreTools.Helper.Dats
 		public bool ItemPasses(DatItem item, Logger logger)
 		{
 			// Filter on machine type
-			if (_machineType != MachineType.NULL && item.Machine.MachineType != _machineType)
+			if (_machineType != MachineType.NULL && (item.Machine.MachineType & _machineType) == 0)
 			{
 				return false;
 			}
-			if (_machineNotType != MachineType.NULL && item.Machine.MachineType == _machineNotType)
+			if (_machineNotType != MachineType.NULL && (item.Machine.MachineType & _machineNotType) != 0)
 			{
 				return false;
 			}
@@ -139,11 +139,11 @@ namespace SabreTools.Helper.Dats
 				Rom rom = (Rom)item;
 
 				// Filter on status
-				if (_itemStatus != ItemStatus.NULL && rom.ItemStatus != _itemStatus)
+				if (_itemStatus != ItemStatus.NULL && (rom.ItemStatus & _itemStatus) == 0)
 				{
 					return false;
 				}
-				if (_itemNotStatus != ItemStatus.NULL && rom.ItemStatus == _itemNotStatus)
+				if (_itemNotStatus != ItemStatus.NULL && (rom.ItemStatus & _itemNotStatus) != 0)
 				{
 					return false;
 				}
@@ -362,11 +362,11 @@ namespace SabreTools.Helper.Dats
 				Disk rom = (Disk)item;
 
 				// Filter on status
-				if (_itemStatus != ItemStatus.NULL && rom.ItemStatus != _itemStatus)
+				if (_itemStatus != ItemStatus.NULL && (rom.ItemStatus & _itemStatus) == 0)
 				{
 					return false;
 				}
-				if (_itemNotStatus != ItemStatus.NULL && rom.ItemStatus == _itemNotStatus)
+				if (_itemNotStatus != ItemStatus.NULL && (rom.ItemStatus & _itemNotStatus) != 0)
 				{
 					return false;
 				}
