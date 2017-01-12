@@ -151,11 +151,25 @@ namespace SabreTools
 				tempDir = "",
 				url = null,
 				version = null;
+			//List<string> crc = new List<string>();
 			List<string> datfiles = new List<string>(); // SimpleSort
+			//List<string> exta = new List<string>();
+			//List<string> extb = new List<string>();
+			//List<string> gamename = new List<string>();
 			List<string> gametype = new List<string>();
 			List<string> inputs = new List<string>();
+			//List<string> md5 = new List<string>();
+			//List<string> notcrc = new List<string>();
+			//List<string> notgamename = new List<string>();
 			List<string> notgametype = new List<string>();
+			//List<string> notmd5 = new List<string>();
+			//List<string> notromname = new List<string>();
+			//List<string> notromtype = new List<string>();
+			//List<string> notsha1 = new List<string>();
 			List<string> notstatus = new List<string>();
+			//List<string> romname = new List<string>();
+			//List<string> romtype = new List<string>();
+			//List<string> sha1 = new List<string>();
 			List<string> status = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
