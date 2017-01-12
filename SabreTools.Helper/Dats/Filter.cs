@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using SabreTools.Helper.Data;
 
@@ -8,25 +9,25 @@ namespace SabreTools.Helper.Dats
 	{
 		#region Private instance variables
 
-		private string _gameName;
-		private string _notGameName;
-		private string _romName;
-		private string _notRomName;
-		private string _romType;
-		private string _notRomType;
+		private List<string> _gameNames;
+		private List<string> _notGameNames;
+		private List<string> _romNames;
+		private List<string> _notRomNames;
+		private List<string> _romTypes;
+		private List<string> _notRomTypes;
 		private long _sizeGreaterThanOrEqual;
 		private long _sizeLessThanOrEqual;
 		private long _sizeEqualTo;
-		private string _crc;
-		private string _notCrc;
-		private string _md5;
-		private string _notMd5;
-		private string _sha1;
-		private string _notSha1;
-		private ItemStatus _itemStatus;
-		private ItemStatus _itemNotStatus;
-		private MachineType _machineType;
-		private MachineType _machineNotType;
+		private List<string> _crcs;
+		private List<string> _notCrcs;
+		private List<string> _md5s;
+		private List<string> _notMd5s;
+		private List<string> _sha1s;
+		private List<string> _notSha1s;
+		private ItemStatus _itemStatuses;
+		private ItemStatus _itemNotStatuses;
+		private MachineType _machineTypes;
+		private MachineType _machineNotTypes;
 		private bool? _runnable;
 
 		#endregion
@@ -36,76 +37,76 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		public Filter()
 		{
-			_gameName = null;
-			_notGameName = null;
-			_romName = null;
-			_notRomName = null;
-			_romType = null;
-			_notRomType = null;
+			_gameNames = null;
+			_notGameNames = null;
+			_romNames = null;
+			_notRomNames = null;
+			_romTypes = null;
+			_notRomTypes = null;
 			_sizeGreaterThanOrEqual = -1;
 			_sizeLessThanOrEqual = -1;
 			_sizeEqualTo = -1;
-			_crc = null;
-			_notCrc = null;
-			_md5 = null;
-			_notMd5 = null;
-			_sha1 = null;
-			_notSha1 = null;
-			_itemStatus = ItemStatus.NULL;
-			_itemNotStatus = ItemStatus.NULL;
-			_machineType = MachineType.NULL;
-			_machineNotType = MachineType.NULL;
+			_crcs = null;
+			_notCrcs = null;
+			_md5s = null;
+			_notMd5s = null;
+			_sha1s = null;
+			_notSha1s = null;
+			_itemStatuses = ItemStatus.NULL;
+			_itemNotStatuses = ItemStatus.NULL;
+			_machineTypes = MachineType.NULL;
+			_machineNotTypes = MachineType.NULL;
 			_runnable = null;
 		}
 
 		/// <summary>
 		/// Create a populated Filter object
 		/// </summary>
-		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="gamenames">Names of the games to match (can use asterisk-partials)</param>
+		/// <param name="romnames">Names of the roms to match (can use asterisk-partials)</param>
+		/// <param name="romtypes">Types of the roms to match</param>
 		/// <param name="sgt">Find roms greater than or equal to this size</param>
 		/// <param name="slt">Find roms less than or equal to this size</param>
 		/// <param name="seq">Find roms equal to this size</param>
-		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="itemStatus">Select roms with the given status</param>
-		/// <param name="machineType">Select games with the given type</param>
-		/// <param name="notgamename">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="notromname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="notromtype">Type of the rom to match</param>
-		/// <param name="notcrc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="notmd5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="notsha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="itemNotStatus">Select roms without the given status</param>
-		/// <param name="machineNotType">Select games without the given type</param>
+		/// <param name="crcs">CRCs of the roms to match (can use asterisk-partials)</param>
+		/// <param name="md5s">MD5s of the roms to match (can use asterisk-partials)</param>
+		/// <param name="sha1s">SHA-1s of the roms to match (can use asterisk-partials)</param>
+		/// <param name="itemStatuses">Select roms with the given status</param>
+		/// <param name="machineTypes">Select games with the given type</param>
+		/// <param name="notgamenames">Names of the games to match (can use asterisk-partials)</param>
+		/// <param name="notromnames">Names of the roms to match (can use asterisk-partials)</param>
+		/// <param name="notromtypes">Type of the roms to match</param>
+		/// <param name="notcrcs">CRCs of the roms to match (can use asterisk-partials)</param>
+		/// <param name="notmd5s">MD5s of the roms to match (can use asterisk-partials)</param>
+		/// <param name="notsha1s">SHA-1s of the roms to match (can use asterisk-partials)</param>
+		/// <param name="itemNotStatuses">Select roms without the given status</param>
+		/// <param name="machineNotTypes">Select games without the given type</param>
 		/// <param name="runnable">Select games that have a value for runnable</param>
-		public Filter(string gamename, string romname, string romtype, long sgt,
-			long slt, long seq, string crc, string md5, string sha1, ItemStatus itemStatus,
-			MachineType machineType, string notgamename, string notromname, string notromtype,
-			string notcrc, string notmd5, string notsha1, ItemStatus itemNotStatus,
-			MachineType machineNotType, bool? runnable)
+		public Filter(List<string> gamenames, List<string> romnames, List<string> romtypes, long sgt,
+			long slt, long seq, List<string> crcs, List<string> md5s, List<string> sha1s, ItemStatus itemStatuses,
+			MachineType machineTypes, List<string> notgamenames, List<string> notromnames, List<string> notromtypes,
+			List<string> notcrcs, List<string> notmd5s, List<string> notsha1s, ItemStatus itemNotStatuses,
+			MachineType machineNotTypes, bool? runnable)
 		{
-			_gameName = gamename;
-			_notGameName = notgamename;
-			_romName = romname;
-			_notRomName = notromname;
-			_romType = romtype;
-			_notRomType = notromtype;
+			_gameNames = gamenames;
+			_notGameNames = notgamenames;
+			_romNames = romnames;
+			_notRomNames = notromnames;
+			_romTypes = romtypes;
+			_notRomTypes = notromtypes;
 			_sizeGreaterThanOrEqual = sgt;
 			_sizeLessThanOrEqual = slt;
 			_sizeEqualTo = seq;
-			_crc = crc;
-			_notCrc = notcrc;
-			_md5 = md5;
-			_notMd5 = notmd5;
-			_sha1 = sha1;
-			_notSha1 = notsha1;
-			_itemStatus = itemStatus;
-			_itemNotStatus = itemNotStatus;
-			_machineType = machineType;
-			_machineNotType = machineNotType;
+			_crcs = crcs;
+			_notCrcs = notcrcs;
+			_md5s = md5s;
+			_notMd5s = notmd5s;
+			_sha1s = sha1s;
+			_notSha1s = notsha1s;
+			_itemStatuses = itemStatuses;
+			_itemNotStatuses = itemNotStatuses;
+			_machineTypes = machineTypes;
+			_machineNotTypes = machineNotTypes;
 			_runnable = runnable;
 		}
 
@@ -118,11 +119,11 @@ namespace SabreTools.Helper.Dats
 		public bool ItemPasses(DatItem item, Logger logger)
 		{
 			// Filter on machine type
-			if (_machineType != MachineType.NULL && (item.Machine.MachineType & _machineType) == 0)
+			if (_machineTypes != MachineType.NULL && (item.Machine.MachineType & _machineTypes) == 0)
 			{
 				return false;
 			}
-			if (_machineNotType != MachineType.NULL && (item.Machine.MachineType & _machineNotType) != 0)
+			if (_machineNotTypes != MachineType.NULL && (item.Machine.MachineType & _machineNotTypes) != 0)
 			{
 				return false;
 			}
@@ -139,11 +140,11 @@ namespace SabreTools.Helper.Dats
 				Rom rom = (Rom)item;
 
 				// Filter on status
-				if (_itemStatus != ItemStatus.NULL && (rom.ItemStatus & _itemStatus) == 0)
+				if (_itemStatuses != ItemStatus.NULL && (rom.ItemStatus & _itemStatuses) == 0)
 				{
 					return false;
 				}
-				if (_itemNotStatus != ItemStatus.NULL && (rom.ItemStatus & _itemNotStatus) != 0)
+				if (_itemNotStatuses != ItemStatus.NULL && (rom.ItemStatus & _itemNotStatuses) != 0)
 				{
 					return false;
 				}
@@ -166,194 +167,263 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Filter on CRC
-				if (!String.IsNullOrEmpty(_crc))
+				if (_crcs.Count > 0)
 				{
-					if (_crc.StartsWith("*") && _crc.EndsWith("*"))
+					bool found = true;
+					foreach (string crc in _crcs)
 					{
-						if (!rom.CRC.ToLowerInvariant().Contains(_crc.ToLowerInvariant().Replace("*", "")))
+						if (!String.IsNullOrEmpty(crc))
 						{
-							return false;
+							if (crc.StartsWith("*") && crc.EndsWith("*"))
+							{
+								if (!rom.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", "")))
+								{
+									found = false;
+								}
+							}
+							else if (crc.StartsWith("*"))
+							{
+								if (!rom.CRC.EndsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
+							else if (crc.EndsWith("*"))
+							{
+								if (!rom.CRC.StartsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
+							else
+							{
+								if (!String.Equals(rom.CRC, crc, StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
 						}
 					}
-					else if (_crc.StartsWith("*"))
+
+					// If the CRC didn't match, return false
+					if (!found)
 					{
-						if (!rom.CRC.EndsWith(_crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else if (_crc.EndsWith("*"))
-					{
-						if (!rom.CRC.StartsWith(_crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else
-					{
-						if (!String.Equals(rom.CRC, _crc, StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
+						return false;
 					}
 				}
-				if (!String.IsNullOrEmpty(_notCrc))
+				if (_notCrcs.Count > 0)
 				{
-					if (_notCrc.StartsWith("*") && _notCrc.EndsWith("*"))
+					bool found = true;
+					foreach (string crc in _notCrcs)
 					{
-						if (rom.CRC.ToLowerInvariant().Contains(_notCrc.ToLowerInvariant().Replace("*", "")))
+						if (crc.StartsWith("*") && crc.EndsWith("*"))
 						{
-							return false;
+							if (rom.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", "")))
+							{
+								found = false;
+							}
+						}
+						else if (crc.StartsWith("*"))
+						{
+							if (rom.CRC.EndsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
+						}
+						else if (crc.EndsWith("*"))
+						{
+							if (rom.CRC.StartsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
+						}
+						else
+						{
+							if (String.Equals(rom.CRC, crc, StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
 						}
 					}
-					else if (_notCrc.StartsWith("*"))
+
+					// If the CRC matched, return false
+					if (!found)
 					{
-						if (rom.CRC.EndsWith(_notCrc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else if (_notCrc.EndsWith("*"))
-					{
-						if (rom.CRC.StartsWith(_notCrc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else
-					{
-						if (String.Equals(rom.CRC, _notCrc, StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
+						return false;
 					}
 				}
 
 				// Filter on MD5
-				if (!String.IsNullOrEmpty(_md5))
+				if (_md5s.Count > 0)
 				{
-					if (_md5.StartsWith("*") && _md5.EndsWith("*"))
+					bool found = true;
+					foreach (string md5 in _md5s)
 					{
-						if (!rom.MD5.ToLowerInvariant().Contains(_md5.ToLowerInvariant().Replace("*", "")))
+						if (!String.IsNullOrEmpty(md5))
 						{
-							return false;
+							if (md5.StartsWith("*") && md5.EndsWith("*"))
+							{
+								if (!rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
+								{
+									found = false;
+								}
+							}
+							else if (md5.StartsWith("*"))
+							{
+								if (!rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
+							else if (md5.EndsWith("*"))
+							{
+								if (!rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
+							else
+							{
+								if (!String.Equals(rom.MD5, md5, StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
 						}
 					}
-					else if (_md5.StartsWith("*"))
+
+					// If the MD5 didn't match, return false
+					if (!found)
 					{
-						if (!rom.MD5.EndsWith(_md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else if (_md5.EndsWith("*"))
-					{
-						if (!rom.MD5.StartsWith(_md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else
-					{
-						if (!String.Equals(rom.MD5, _md5, StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
+						return false;
 					}
 				}
-				if (!String.IsNullOrEmpty(_notMd5))
+				if (_notMd5s.Count > 0)
 				{
-					if (_notMd5.StartsWith("*") && _notMd5.EndsWith("*"))
+					bool found = true;
+					foreach (string md5 in _notMd5s)
 					{
-						if (rom.MD5.ToLowerInvariant().Contains(_notMd5.ToLowerInvariant().Replace("*", "")))
+						if (md5.StartsWith("*") && md5.EndsWith("*"))
 						{
-							return false;
+							if (rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
+							{
+								found = false;
+							}
+						}
+						else if (md5.StartsWith("*"))
+						{
+							if (rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
+						}
+						else if (md5.EndsWith("*"))
+						{
+							if (rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
+						}
+						else
+						{
+							if (String.Equals(rom.MD5, md5, StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
 						}
 					}
-					else if (_notMd5.StartsWith("*"))
+
+					// If the MD5 matched, return false
+					if (!found)
 					{
-						if (rom.MD5.EndsWith(_notMd5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else if (_notMd5.EndsWith("*"))
-					{
-						if (rom.MD5.StartsWith(_notMd5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else
-					{
-						if (String.Equals(rom.MD5, _notMd5, StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
+						return false;
 					}
 				}
 
 				// Filter on SHA1
-				if (!String.IsNullOrEmpty(_sha1))
+				if (_sha1s.Count > 0)
 				{
-					if (_sha1.StartsWith("*") && _sha1.EndsWith("*"))
+					bool found = true;
+					foreach (string sha1 in _sha1s)
 					{
-						if (!rom.SHA1.ToLowerInvariant().Contains(_sha1.ToLowerInvariant().Replace("*", "")))
+						if (!String.IsNullOrEmpty(sha1))
 						{
-							return false;
+							if (sha1.StartsWith("*") && sha1.EndsWith("*"))
+							{
+								if (!rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
+								{
+									found = false;
+								}
+							}
+							else if (sha1.StartsWith("*"))
+							{
+								if (!rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
+							else if (sha1.EndsWith("*"))
+							{
+								if (!rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
+							else
+							{
+								if (!String.Equals(rom.SHA1, sha1, StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
 						}
 					}
-					else if (_sha1.StartsWith("*"))
+
+					// If the SHA1 didn't match, return false
+					if (!found)
 					{
-						if (!rom.SHA1.EndsWith(_sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else if (_sha1.EndsWith("*"))
-					{
-						if (!rom.SHA1.StartsWith(_sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else
-					{
-						if (!String.Equals(rom.SHA1, _sha1, StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
+						return false;
 					}
 				}
-				if (!String.IsNullOrEmpty(_notSha1))
+				if (_notSha1s.Count > 0)
 				{
-					if (_notSha1.StartsWith("*") && _notSha1.EndsWith("*"))
+					bool found = true;
+					foreach (string sha1 in _notSha1s)
 					{
-						if (rom.SHA1.ToLowerInvariant().Contains(_notSha1.ToLowerInvariant().Replace("*", "")))
+						if (sha1.StartsWith("*") && sha1.EndsWith("*"))
 						{
-							return false;
+							if (rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
+							{
+								found = false;
+							}
+						}
+						else if (sha1.StartsWith("*"))
+						{
+							if (rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
+						}
+						else if (sha1.EndsWith("*"))
+						{
+							if (rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
+						}
+						else
+						{
+							if (String.Equals(rom.SHA1, sha1, StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
 						}
 					}
-					else if (_notSha1.StartsWith("*"))
+
+					// If the SHA1 matched, return false
+					if (!found)
 					{
-						if (rom.SHA1.EndsWith(_notSha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else if (_notSha1.EndsWith("*"))
-					{
-						if (rom.SHA1.StartsWith(_notSha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else
-					{
-						if (String.Equals(rom.SHA1, _notSha1, StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
+						return false;
 					}
 				}
 			}
@@ -362,284 +432,396 @@ namespace SabreTools.Helper.Dats
 				Disk rom = (Disk)item;
 
 				// Filter on status
-				if (_itemStatus != ItemStatus.NULL && (rom.ItemStatus & _itemStatus) == 0)
+				if (_itemStatuses != ItemStatus.NULL && (rom.ItemStatus & _itemStatuses) == 0)
 				{
 					return false;
 				}
-				if (_itemNotStatus != ItemStatus.NULL && (rom.ItemStatus & _itemNotStatus) != 0)
+				if (_itemNotStatuses != ItemStatus.NULL && (rom.ItemStatus & _itemNotStatuses) != 0)
 				{
 					return false;
 				}
 
 				// Filter on MD5
-				if (!String.IsNullOrEmpty(_md5))
+				if (_md5s.Count > 0)
 				{
-					if (_md5.StartsWith("*") && _md5.EndsWith("*"))
+					bool found = true;
+					foreach (string md5 in _md5s)
 					{
-						if (!rom.MD5.ToLowerInvariant().Contains(_md5.ToLowerInvariant().Replace("*", "")))
+						if (!String.IsNullOrEmpty(md5))
 						{
-							return false;
+							if (md5.StartsWith("*") && md5.EndsWith("*"))
+							{
+								if (!rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
+								{
+									found = false;
+								}
+							}
+							else if (md5.StartsWith("*"))
+							{
+								if (!rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
+							else if (md5.EndsWith("*"))
+							{
+								if (!rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
+							else
+							{
+								if (!String.Equals(rom.MD5, md5, StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
 						}
 					}
-					else if (_md5.StartsWith("*"))
+
+					// If the MD5 didn't match, return false
+					if (!found)
 					{
-						if (!rom.MD5.EndsWith(_md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else if (_md5.EndsWith("*"))
-					{
-						if (!rom.MD5.StartsWith(_md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else
-					{
-						if (!String.Equals(rom.MD5, _md5, StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
+						return false;
 					}
 				}
-				if (!String.IsNullOrEmpty(_notMd5))
+				if (_notMd5s.Count > 0)
 				{
-					if (_notMd5.StartsWith("*") && _notMd5.EndsWith("*"))
+					bool found = true;
+					foreach (string md5 in _notMd5s)
 					{
-						if (rom.MD5.ToLowerInvariant().Contains(_notMd5.ToLowerInvariant().Replace("*", "")))
+						if (md5.StartsWith("*") && md5.EndsWith("*"))
 						{
-							return false;
+							if (rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
+							{
+								found = false;
+							}
+						}
+						else if (md5.StartsWith("*"))
+						{
+							if (rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
+						}
+						else if (md5.EndsWith("*"))
+						{
+							if (rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
+						}
+						else
+						{
+							if (String.Equals(rom.MD5, md5, StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
 						}
 					}
-					else if (_notMd5.StartsWith("*"))
+
+					// If the MD5 matched, return false
+					if (!found)
 					{
-						if (rom.MD5.EndsWith(_notMd5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else if (_notMd5.EndsWith("*"))
-					{
-						if (rom.MD5.StartsWith(_notMd5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else
-					{
-						if (String.Equals(rom.MD5, _notMd5, StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
+						return false;
 					}
 				}
 
 				// Filter on SHA1
-				if (!String.IsNullOrEmpty(_sha1))
+				if (_sha1s.Count > 0)
 				{
-					if (_sha1.StartsWith("*") && _sha1.EndsWith("*"))
+					bool found = true;
+					foreach (string sha1 in _sha1s)
 					{
-						if (!rom.SHA1.ToLowerInvariant().Contains(_sha1.ToLowerInvariant().Replace("*", "")))
+						if (!String.IsNullOrEmpty(sha1))
 						{
-							return false;
+							if (sha1.StartsWith("*") && sha1.EndsWith("*"))
+							{
+								if (!rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
+								{
+									found = false;
+								}
+							}
+							else if (sha1.StartsWith("*"))
+							{
+								if (!rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
+							else if (sha1.EndsWith("*"))
+							{
+								if (!rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
+							else
+							{
+								if (!String.Equals(rom.SHA1, sha1, StringComparison.InvariantCultureIgnoreCase))
+								{
+									found = false;
+								}
+							}
 						}
 					}
-					else if (_sha1.StartsWith("*"))
+
+					// If the SHA1 didn't match, return false
+					if (!found)
 					{
-						if (!rom.SHA1.EndsWith(_sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else if (_sha1.EndsWith("*"))
-					{
-						if (!rom.SHA1.StartsWith(_sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else
-					{
-						if (!String.Equals(rom.SHA1, _sha1, StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
+						return false;
 					}
 				}
-				if (!String.IsNullOrEmpty(_notSha1))
+				if (_notSha1s.Count > 0)
 				{
-					if (_notSha1.StartsWith("*") && _notSha1.EndsWith("*"))
+					bool found = true;
+					foreach (string sha1 in _notSha1s)
 					{
-						if (rom.SHA1.ToLowerInvariant().Contains(_notSha1.ToLowerInvariant().Replace("*", "")))
+						if (sha1.StartsWith("*") && sha1.EndsWith("*"))
 						{
-							return false;
+							if (rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
+							{
+								found = false;
+							}
+						}
+						else if (sha1.StartsWith("*"))
+						{
+							if (rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
+						}
+						else if (sha1.EndsWith("*"))
+						{
+							if (rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
+						}
+						else
+						{
+							if (String.Equals(rom.SHA1, sha1, StringComparison.InvariantCultureIgnoreCase))
+							{
+								found = false;
+							}
 						}
 					}
-					else if (_notSha1.StartsWith("*"))
+
+					// If the SHA1 matched, return false
+					if (!found)
 					{
-						if (rom.SHA1.EndsWith(_notSha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else if (_notSha1.EndsWith("*"))
-					{
-						if (rom.SHA1.StartsWith(_notSha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
-					}
-					else
-					{
-						if (String.Equals(rom.SHA1, _notSha1, StringComparison.InvariantCultureIgnoreCase))
-						{
-							return false;
-						}
+						return false;
 					}
 				}
 			}
 
 			// Filter on game name
-			if (!String.IsNullOrEmpty(_gameName))
+			if (_gameNames.Count > 0)
 			{
-				if (_gameName.StartsWith("*") && _gameName.EndsWith("*"))
+				bool found = true;
+				foreach (string name in _gameNames)
 				{
-					if (!item.Machine.Name.ToLowerInvariant().Contains(_gameName.ToLowerInvariant().Replace("*", "")))
+					if (name.StartsWith("*") && name.EndsWith("*"))
 					{
-						return false;
+						if (!item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", "")))
+						{
+							found = false;
+						}
+					}
+					else if (name.StartsWith("*"))
+					{
+						if (!item.Machine.Name.EndsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = false;
+						}
+					}
+					else if (name.EndsWith("*"))
+					{
+						if (!item.Machine.Name.StartsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = false;
+						}
+					}
+					else
+					{
+						if (!String.Equals(item.Machine.Name, name, StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = false;
+						}
 					}
 				}
-				else if (_gameName.StartsWith("*"))
+
+				// If the game name was not matched, return false
+				if (!found)
 				{
-					if (!item.Machine.Name.EndsWith(_gameName.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-					{
-						return false;
-					}
-				}
-				else if (_gameName.EndsWith("*"))
-				{
-					if (!item.Machine.Name.StartsWith(_gameName.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-					{
-						return false;
-					}
-				}
-				else
-				{
-					if (!String.Equals(item.Machine.Name, _gameName, StringComparison.InvariantCultureIgnoreCase))
-					{
-						return false;
-					}
+					return false;
 				}
 			}
-			if (!String.IsNullOrEmpty(_notGameName))
+			if (_notGameNames.Count > 0)
 			{
-				if (_notGameName.StartsWith("*") && _notGameName.EndsWith("*"))
+				bool found = true;
+				foreach (string name in _notGameNames)
 				{
-					if (item.Machine.Name.ToLowerInvariant().Contains(_notGameName.ToLowerInvariant().Replace("*", "")))
+					if (name.StartsWith("*") && name.EndsWith("*"))
 					{
-						return false;
+						if (item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", "")))
+						{
+							found = false;
+						}
+					}
+					else if (name.StartsWith("*"))
+					{
+						if (item.Machine.Name.EndsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = false;
+						}
+					}
+					else if (name.EndsWith("*"))
+					{
+						if (item.Machine.Name.StartsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = false;
+						}
+					}
+					else
+					{
+						if (String.Equals(item.Machine.Name, name, StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = false;
+						}
 					}
 				}
-				else if (_notGameName.StartsWith("*"))
+
+				// If the game name was matched, return false
+				if (!found)
 				{
-					if (item.Machine.Name.EndsWith(_notGameName.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-					{
-						return false;
-					}
-				}
-				else if (_notGameName.EndsWith("*"))
-				{
-					if (item.Machine.Name.StartsWith(_notGameName.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-					{
-						return false;
-					}
-				}
-				else
-				{
-					if (String.Equals(item.Machine.Name, _notGameName, StringComparison.InvariantCultureIgnoreCase))
-					{
-						return false;
-					}
+					return false;
 				}
 			}
 
 			// Filter on rom name
-			if (!String.IsNullOrEmpty(_romName))
+			if (_romNames.Count > 0)
 			{
-				if (_romName.StartsWith("*") && _romName.EndsWith("*"))
+				bool found = true;
+				foreach (string name in _romNames)
 				{
-					if (!item.Name.ToLowerInvariant().Contains(_romName.ToLowerInvariant().Replace("*", "")))
+					if (name.StartsWith("*") && name.EndsWith("*"))
 					{
-						return false;
+						if (!item.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", "")))
+						{
+							found = false;
+						}
+					}
+					else if (name.StartsWith("*"))
+					{
+						if (!item.Name.EndsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = false;
+						}
+					}
+					else if (name.EndsWith("*"))
+					{
+						if (!item.Name.StartsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = false;
+						}
+					}
+					else
+					{
+						if (!String.Equals(item.Name, name, StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = false;
+						}
 					}
 				}
-				else if (_romName.StartsWith("*"))
+
+				// If the rom name was not matched, return false
+				if (!found)
 				{
-					if (!item.Name.EndsWith(_romName.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-					{
-						return false;
-					}
-				}
-				else if (_romName.EndsWith("*"))
-				{
-					if (!item.Name.StartsWith(_romName.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-					{
-						return false;
-					}
-				}
-				else
-				{
-					if (!String.Equals(item.Name, _romName, StringComparison.InvariantCultureIgnoreCase))
-					{
-						return false;
-					}
+					return false;
 				}
 			}
-			if (!String.IsNullOrEmpty(_notRomName))
+			if (_notRomNames.Count > 0)
 			{
-				if (_notRomName.StartsWith("*") && _notRomName.EndsWith("*"))
+				bool found = true;
+				foreach (string name in _notRomNames)
 				{
-					if (item.Name.ToLowerInvariant().Contains(_notRomName.ToLowerInvariant().Replace("*", "")))
+					if (name.StartsWith("*") && name.EndsWith("*"))
 					{
-						return false;
+						if (item.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", "")))
+						{
+							found = false;
+						}
+					}
+					else if (name.StartsWith("*"))
+					{
+						if (item.Name.EndsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = false;
+						}
+					}
+					else if (name.EndsWith("*"))
+					{
+						if (item.Name.StartsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = false;
+						}
+					}
+					else
+					{
+						if (String.Equals(item.Name, name, StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = false;
+						}
 					}
 				}
-				else if (_notRomName.StartsWith("*"))
+
+				// If the rom name was matched, return false
+				if (!found)
 				{
-					if (item.Name.EndsWith(_notRomName.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-					{
-						return false;
-					}
-				}
-				else if (_notRomName.EndsWith("*"))
-				{
-					if (item.Name.StartsWith(_notRomName.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-					{
-						return false;
-					}
-				}
-				else
-				{
-					if (String.Equals(item.Name, _notRomName, StringComparison.InvariantCultureIgnoreCase))
-					{
-						return false;
-					}
+					return false;
 				}
 			}
 
 			// Filter on rom type
-			if (String.IsNullOrEmpty(_romType) && String.IsNullOrEmpty(_notRomType) && item.Type != ItemType.Rom && item.Type != ItemType.Disk)
+			if (_romTypes.Count == 0 && _notRomTypes.Count == 0 && item.Type != ItemType.Rom && item.Type != ItemType.Disk)
 			{
 				return false;
 			}
-			if (!String.IsNullOrEmpty(_romType) && !String.Equals(item.Type.ToString(), _romType, StringComparison.InvariantCultureIgnoreCase))
+			if (_romTypes.Count > 0)
 			{
-				return false;
+				bool found = true;
+				foreach (string type in _romTypes)
+				{
+					if (!String.Equals(item.Type.ToString(), type, StringComparison.InvariantCultureIgnoreCase))
+					{
+						found = false;
+					}
+				}
+				
+				// If the rom type was not found, return false
+				if (!found)
+				{
+					return false;
+				}
 			}
-			if (!String.IsNullOrEmpty(_notRomType) && String.Equals(item.Type.ToString(), _notRomType, StringComparison.InvariantCultureIgnoreCase))
+			if (_notRomTypes.Count > 0)
 			{
-				return false;
+				bool found = true;
+				foreach (string type in _notRomTypes)
+				{
+					if (String.Equals(item.Type.ToString(), type, StringComparison.InvariantCultureIgnoreCase))
+					{
+						found = false;
+					}
+				}
+
+				// If the rom type was found, return false
+				if (!found)
+				{
+					return false;
+				}
 			}
 
 			return true;

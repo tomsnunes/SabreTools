@@ -118,7 +118,6 @@ namespace SabreTools
 				author = null,
 				category = null,
 				comment = null,
-				crc = "",
 				date = null,
 				description = null,
 				email = null,
@@ -128,48 +127,37 @@ namespace SabreTools
 				forcemerge = "",
 				forcend = "",
 				forcepack = "",
-				gamename = "",
 				header = null,
 				homepage = null,
-				md5 = "",
 				name = null,
-				notcrc = null,
-				notgamename = null,
-				notmd5 = null,
-				notromname = null,
-				notromtype = null,
-				notsha1 = null,
 				outDir = "",
 				postfix = "",
 				prefix = "",
 				repext = "",
-				romname = "",
-				romtype = "",
 				root = "",
 				rootdir = null,
-				sha1 = "",
 				tempDir = "",
 				url = null,
 				version = null;
-			//List<string> crc = new List<string>();
+			List<string> crc = new List<string>();
 			List<string> datfiles = new List<string>(); // SimpleSort
 			//List<string> exta = new List<string>();
 			//List<string> extb = new List<string>();
-			//List<string> gamename = new List<string>();
+			List<string> gamename = new List<string>();
 			List<string> gametype = new List<string>();
 			List<string> inputs = new List<string>();
-			//List<string> md5 = new List<string>();
-			//List<string> notcrc = new List<string>();
-			//List<string> notgamename = new List<string>();
+			List<string> md5 = new List<string>();
+			List<string> notcrc = new List<string>();
+			List<string> notgamename = new List<string>();
 			List<string> notgametype = new List<string>();
-			//List<string> notmd5 = new List<string>();
-			//List<string> notromname = new List<string>();
-			//List<string> notromtype = new List<string>();
-			//List<string> notsha1 = new List<string>();
+			List<string> notmd5 = new List<string>();
+			List<string> notromname = new List<string>();
+			List<string> notromtype = new List<string>();
+			List<string> notsha1 = new List<string>();
 			List<string> notstatus = new List<string>();
-			//List<string> romname = new List<string>();
-			//List<string> romtype = new List<string>();
-			//List<string> sha1 = new List<string>();
+			List<string> romname = new List<string>();
+			List<string> romtype = new List<string>();
+			List<string> sha1 = new List<string>();
 			List<string> status = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
@@ -529,7 +517,7 @@ namespace SabreTools
 						break;
 					case "-crc":
 					case "--crc":
-						crc = args[++i];
+						crc.Add(args[++i]);
 						break;
 					case "-da":
 					case "--date":
@@ -580,7 +568,7 @@ namespace SabreTools
 						break;
 					case "-gn":
 					case "--game-name":
-						gamename = args[++i];
+						gamename.Add(args[++i]);
 						break;
 					case "-gt":
 					case "--game-type":
@@ -607,7 +595,7 @@ namespace SabreTools
 						break;
 					case "-md5":
 					case "--md5":
-						md5 = args[++i];
+						md5.Add(args[++i]);
 						break;
 					case "-mt":
 					case "--mt":
@@ -619,11 +607,11 @@ namespace SabreTools
 						break;
 					case "-ncrc":
 					case "--not-crc":
-						notcrc = args[++i];
+						notcrc.Add(args[++i]);
 						break;
 					case "-ngn":
 					case "--not-game":
-						notgamename = args[++i];
+						notgamename.Add(args[++i]);
 						break;
 					case "-ngt":
 					case "--not-gtype":
@@ -635,19 +623,19 @@ namespace SabreTools
 						break;
 					case "-nmd5":
 					case "--not-md5":
-						notmd5 = args[++i];
+						notmd5.Add(args[++i]);
 						break;
 					case "-nrn":
 					case "--not-rom":
-						notromname = args[++i];
+						notromname.Add(args[++i]);
 						break;
 					case "-nrt":
 					case "--not-type":
-						notromtype = args[++i];
+						notromtype.Add(args[++i]);
 						break;
 					case "-nsha1":
 					case "--not-sha1":
-						notsha1 = args[++i];
+						notsha1.Add(args[++i]);
 						break;
 					case "-out":
 					case "--out":
@@ -678,7 +666,7 @@ namespace SabreTools
 						break;
 					case "-rn":
 					case "--rom-name":
-						romname = args[++i];
+						romname.Add(args[++i]);
 						break;
 					case "-root":
 					case "--root":
@@ -686,7 +674,7 @@ namespace SabreTools
 						break;
 					case "-rt":
 					case "--rom-type":
-						romtype = args[++i];
+						romtype.Add(args[++i]);
 						break;
 					case "-seq":
 					case "--equal":
@@ -698,7 +686,7 @@ namespace SabreTools
 						break;
 					case "-sha1":
 					case "--sha1":
-						sha1 = args[++i];
+						sha1.Add(args[++i]);
 						break;
 					case "-slt":
 					case "--less":
@@ -763,7 +751,7 @@ namespace SabreTools
 									break;
 								case "-crc":
 								case "--crc":
-									crc = split[1];
+									crc.Add(split[1]);
 									break;
 								case "-da":
 								case "--date":
@@ -813,7 +801,7 @@ namespace SabreTools
 									break;
 								case "-gn":
 								case "--game-name":
-									gamename = split[1];
+									gamename.Add(split[1]);
 									break;
 								case "-gt":
 								case "--game-type":
@@ -840,7 +828,7 @@ namespace SabreTools
 									break;
 								case "-md5":
 								case "--md5":
-									md5 = split[1];
+									md5.Add(split[1]);
 									break;
 								case "-mt":
 								case "--mt":
@@ -852,11 +840,11 @@ namespace SabreTools
 									break;
 								case "-ncrc":
 								case "--not-crc":
-									notcrc = split[1];
+									notcrc.Add(split[1]);
 									break;
 								case "-ngn":
 								case "--not-game":
-									notgamename = split[1];
+									notgamename.Add(split[1]);
 									break;
 								case "-ngt":
 								case "--not-gtype":
@@ -868,19 +856,19 @@ namespace SabreTools
 									break;
 								case "-nmd5":
 								case "--not-md5":
-									notmd5 = split[1];
+									notmd5.Add(split[1]);
 									break;
 								case "-nrn":
 								case "--not-rom":
-									notromname = split[1];
+									notromname.Add(split[1]);
 									break;
 								case "-nrt":
 								case "--not-type":
-									notromtype = split[1];
+									notromtype.Add(split[1]);
 									break;
 								case "-nsha1":
 								case "--not-sha1":
-									notsha1 = split[1];
+									notsha1.Add(split[1]);
 									break;
 								case "-out":
 								case "--out":
@@ -915,11 +903,11 @@ namespace SabreTools
 									break;
 								case "-rn":
 								case "--rom-name":
-									romname = split[1];
+									romname.Add(split[1]);
 									break;
 								case "-rt":
 								case "--rom-type":
-									romtype = split[1];
+									romtype.Add(split[1]);
 									break;
 								case "-seq":
 								case "--equal":
@@ -931,7 +919,7 @@ namespace SabreTools
 									break;
 								case "-sha1":
 								case "--sha1":
-									sha1 = split[1];
+									sha1.Add(split[1]);
 									break;
 								case "-slt":
 								case "--less":

@@ -398,6 +398,10 @@ namespace SabreTools.Helper.Data
 					helptext.Add("");
 					helptext.Add("Filter parameters for size can use postfixes for inputs:");
 					helptext.Add("	e.g. 8kb => 8000 or 8kib => 8192");
+
+					helptext.Add("");
+					helptext.Add("Most of the filter parameters allow for multiple inputs:");
+					helptext.Add("	e.g. --game-name=foo --game-name=bar");
 					break;
 
 				default:

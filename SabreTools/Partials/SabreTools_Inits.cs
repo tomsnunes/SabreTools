@@ -427,23 +427,23 @@ namespace SabreTools
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// /* Filtering info */
-		/// <param name="gamename">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="romname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="romtype">Type of the rom to match</param>
+		/// <param name="gamenames">Names of the games to match (can use asterisk-partials)</param>
+		/// <param name="romnames">Names of the roms to match (can use asterisk-partials)</param>
+		/// <param name="romtypes">Types of the roms to match</param>
 		/// <param name="sgt">Find roms greater than or equal to this size</param>
 		/// <param name="slt">Find roms less than or equal to this size</param>
 		/// <param name="seq">Find roms equal to this size</param>
-		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="crcs">CRCs of the roms to match (can use asterisk-partials)</param>
+		/// <param name="md5s">MD5s of the roms to match (can use asterisk-partials)</param>
+		/// <param name="sha1s">SHA-1s of the roms to match (can use asterisk-partials)</param>
 		/// <param name="statuses">Select roms with the given item statuses</param>
 		/// <param name="gametypes">Select games with the given types</param>
-		/// <param name="notgamename">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="notromname">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="notromtype">Type of the rom to match</param>
-		/// <param name="notcrc">CRC of the rom to match (can use asterisk-partials)</param>
-		/// <param name="notmd5">MD5 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="notsha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
+		/// <param name="notgamenames">Name of the game to match (can use asterisk-partials)</param>
+		/// <param name="notromnames">Name of the rom to match (can use asterisk-partials)</param>
+		/// <param name="notromtypes">Type of the rom to match</param>
+		/// <param name="notcrcs">CRCs of the roms to match (can use asterisk-partials)</param>
+		/// <param name="notmd5s">MD5s of the roms to match (can use asterisk-partials)</param>
+		/// <param name="notsha1s">SHA-1s of the roms to match (can use asterisk-partials)</param>
 		/// <param name="notstatuses">Select roms without the given item statuses</param>
 		/// <param name="notgametypes">Select games without the given types</param>
 		/// <param name="runnable">Select games with the given runability</param>
@@ -500,23 +500,23 @@ namespace SabreTools
 			bool bare,
 
 			/* Filtering info */
-			string gamename,
-			string romname,
-			string romtype,
+			List<string> gamenames,
+			List<string> romnames,
+			List<string> romtypes,
 			long sgt,
 			long slt,
 			long seq,
-			string crc,
-			string md5,
-			string sha1,
+			List<string> crcs,
+			List<string> md5s,
+			List<string> sha1s,
 			List<string> statuses,
 			List<string> gametypes,
-			string notgamename,
-			string notromname,
-			string notromtype,
-			string notcrc,
-			string notmd5,
-			string notsha1,
+			List<string> notgamenames,
+			List<string> notromnames,
+			List<string> notromtypes,
+			List<string> notcrcs,
+			List<string> notmd5s,
+			List<string> notsha1s,
 			List<string> notstatuses,
 			List<string> notgametypes,
 			bool? runnable,
@@ -767,8 +767,8 @@ namespace SabreTools
 			};
 
 			// Create the Filter object to be used
-			Filter filter = new Filter(gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, itemStatus, machineType,
-				notgamename, notromname, notromtype, notcrc, notmd5, notsha1, itemNotStatus, machineNotType, runnable);
+			Filter filter = new Filter(gamenames, romnames, romtypes, sgt, slt, seq, crcs, md5s, sha1s, itemStatus, machineType,
+				notgamenames, notromnames, notromtypes, notcrcs, notmd5s, notsha1s, itemNotStatus, machineNotType, runnable);
 
 			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,
 				filter, splitType, trim, single, root, maxDegreeOfParallelism, _logger);

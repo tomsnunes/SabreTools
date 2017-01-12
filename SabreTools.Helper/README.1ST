@@ -823,12 +823,15 @@ Options:
 				00* means starts with '00'
 				*00* means contains '00'
 				00 means exactly equals '00'
+			Multiples of each of the above inputs are allowed.
 		
 		-rt=, --rom-type=	Filter by rom type
-			This allows users to only include roms or disks to their liking
+			This allows users to only include roms or disks to their liking. Multiples of this
+			input are allowed.
 		
 		-nrt=, --not-type=	Exclude by rom type
-			This allows users to only exclude roms or disks to their liking
+			This allows users to only exclude roms or disks to their liking. Multiples of this
+			input are allowed.
 		
 		-sgt=, --greater=	Filter by size >=
 		-slt=, --less=		Filter by size <=
