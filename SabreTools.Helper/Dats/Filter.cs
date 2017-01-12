@@ -118,6 +118,18 @@ namespace SabreTools.Helper.Dats
 		/// <returns>True if the file passed the filter, false otherwise</returns>
 		public bool ItemPasses(DatItem item, Logger logger)
 		{
+			// If the item is null, we automatically fail it
+			if (item == null)
+			{
+				return false;
+			}
+
+			// If the item's machine is null, we automatically fail it
+			if (item.Machine == null)
+			{
+				return false;
+			}
+
 			// Filter on machine type
 			if (_machineTypes != MachineType.NULL && (item.Machine.MachineType & _machineTypes) == 0)
 			{
