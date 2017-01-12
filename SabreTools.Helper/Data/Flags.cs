@@ -258,5 +258,32 @@ namespace SabreTools.Helper.Data
 		External = 0x20,
 	}
 
+	/// <summary>
+	/// Determine the status of the item
+	/// </summary>
+	[Flags]
+	public enum ItemStatus
+	{
+		NULL = -0x01, // This is a fake flag that is used for filter only
+		None = 0x00,
+		Good = 0x01,
+		BadDump = 0x02,
+		Nodump = 0x04,
+		Verified = 0x08,
+	}
+
+	/// <summary>
+	/// Determine what type of machine it is
+	/// </summary>
+	[Flags]
+	public enum MachineType
+	{
+		NULL = -0x01, // This is a fake flag used for filter only
+		None = 0x00,
+		Bios = 0x01,
+		Device = 0x02,
+		Mechanical = 0x04,
+	}
+
 	#endregion
 }
