@@ -85,7 +85,7 @@ namespace SabreTools.Helper
 				_log = new StreamWriter(File.Open(_basepath + _filename, FileMode.OpenOrCreate | FileMode.Append, FileAccess.Write));
 				_log.AutoFlush = true;
 
-				_log.WriteLine("Logging started " + DateTime.Now);
+				_log.WriteLine("Logging started " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 				_log.WriteLine(Environment.CommandLine);
 			}
 			catch
@@ -124,7 +124,7 @@ namespace SabreTools.Helper
 
 				try
 				{
-					_log.WriteLine("Logging ended " + DateTime.Now);
+					_log.WriteLine("Logging ended " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 					_log.WriteLine("Total runtime: " + total);
 					Console.WriteLine("Total runtime: " + total);
 					_log.Close();
