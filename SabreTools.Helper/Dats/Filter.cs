@@ -37,21 +37,21 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		public Filter()
 		{
-			_gameNames = null;
-			_notGameNames = null;
-			_romNames = null;
-			_notRomNames = null;
-			_romTypes = null;
-			_notRomTypes = null;
+			_gameNames = new List<string>();
+			_notGameNames = new List<string>();
+			_romNames = new List<string>();
+			_notRomNames = new List<string>();
+			_romTypes = new List<string>();
+			_notRomTypes = new List<string>();
 			_sizeGreaterThanOrEqual = -1;
 			_sizeLessThanOrEqual = -1;
 			_sizeEqualTo = -1;
-			_crcs = null;
-			_notCrcs = null;
-			_md5s = null;
-			_notMd5s = null;
-			_sha1s = null;
-			_notSha1s = null;
+			_crcs = new List<string>();
+			_notCrcs = new List<string>();
+			_md5s = new List<string>();
+			_notMd5s = new List<string>();
+			_sha1s = new List<string>();
+			_notSha1s = new List<string>();
 			_itemStatuses = ItemStatus.NULL;
 			_itemNotStatuses = ItemStatus.NULL;
 			_machineTypes = MachineType.NULL;
