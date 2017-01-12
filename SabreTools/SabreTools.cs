@@ -129,19 +129,16 @@ namespace SabreTools
 				forcend = "",
 				forcepack = "",
 				gamename = "",
-				gametype = "",
 				header = null,
 				homepage = null,
 				md5 = "",
 				name = null,
 				notcrc = null,
 				notgamename = null,
-				notgametype = "",
 				notmd5 = null,
 				notromname = null,
 				notromtype = null,
 				notsha1 = null,
-				notstatus = null,
 				outDir = "",
 				postfix = "",
 				prefix = "",
@@ -151,12 +148,15 @@ namespace SabreTools
 				root = "",
 				rootdir = null,
 				sha1 = "",
-				status = "",
 				tempDir = "",
 				url = null,
 				version = null;
 			List<string> datfiles = new List<string>(); // SimpleSort
+			List<string> gametype = new List<string>();
 			List<string> inputs = new List<string>();
+			List<string> notgametype = new List<string>();
+			List<string> notstatus = new List<string>();
+			List<string> status = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
 			for (int i = 0; i < args.Length; i++)
@@ -570,7 +570,7 @@ namespace SabreTools
 						break;
 					case "-gt":
 					case "--game-type":
-						gametype = args[++i];
+						gametype.Add(args[++i]);
 						break;
 					case "-gz":
 					case "--gz":
@@ -589,7 +589,7 @@ namespace SabreTools
 						break;
 					case "-is":
 					case "--status":
-						status = args[++i];
+						status.Add(args[++i]);
 						break;
 					case "-md5":
 					case "--md5":
@@ -613,11 +613,11 @@ namespace SabreTools
 						break;
 					case "-ngt":
 					case "--not-gtype":
-						notgametype = args[++i];
+						notgametype.Add(args[++i]);
 						break;
 					case "-nis":
 					case "--not-status":
-						notstatus = args[++i];
+						notstatus.Add(args[++i]);
 						break;
 					case "-nmd5":
 					case "--not-md5":
@@ -803,7 +803,7 @@ namespace SabreTools
 									break;
 								case "-gt":
 								case "--game-type":
-									gametype = split[1];
+									gametype.Add(split[1]);
 									break;
 								case "-gz":
 								case "--gz":
@@ -822,7 +822,7 @@ namespace SabreTools
 									break;
 								case "-is":
 								case "--status":
-									status = split[1];
+									status.Add(split[1]);
 									break;
 								case "-md5":
 								case "--md5":
@@ -846,11 +846,11 @@ namespace SabreTools
 									break;
 								case "-ngt":
 								case "--not-gtype":
-									notgametype = split[1];
+									notgametype.Add(split[1]);
 									break;
 								case "-nis":
 								case "--not-status":
-									notstatus = split[1];
+									notstatus.Add(split[1]);
 									break;
 								case "-nmd5":
 								case "--not-md5":

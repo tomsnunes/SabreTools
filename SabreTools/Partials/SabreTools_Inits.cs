@@ -436,16 +436,16 @@ namespace SabreTools
 		/// <param name="crc">CRC of the rom to match (can use asterisk-partials)</param>
 		/// <param name="md5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="sha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="status">Select roms with the given item status</param>
-		/// <param name="gametype">Select games with the given type</param>
+		/// <param name="statuses">Select roms with the given item statuses</param>
+		/// <param name="gametypes">Select games with the given types</param>
 		/// <param name="notgamename">Name of the game to match (can use asterisk-partials)</param>
 		/// <param name="notromname">Name of the rom to match (can use asterisk-partials)</param>
 		/// <param name="notromtype">Type of the rom to match</param>
 		/// <param name="notcrc">CRC of the rom to match (can use asterisk-partials)</param>
 		/// <param name="notmd5">MD5 of the rom to match (can use asterisk-partials)</param>
 		/// <param name="notsha1">SHA-1 of the rom to match (can use asterisk-partials)</param>
-		/// <param name="notstatus">Select roms without the given item status</param>
-		/// <param name="notgametype">Select games without the given type</param>
+		/// <param name="notstatuses">Select roms without the given item statuses</param>
+		/// <param name="notgametypes">Select games without the given types</param>
 		/// <param name="runnable">Select games with the given runability</param>
 		/// /* Trimming info */
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
@@ -509,16 +509,16 @@ namespace SabreTools
 			string crc,
 			string md5,
 			string sha1,
-			string status,
-			string gametype,
+			List<string> statuses,
+			List<string> gametypes,
 			string notgamename,
 			string notromname,
 			string notromtype,
 			string notcrc,
 			string notmd5,
 			string notsha1,
-			string notstatus,
-			string notgametype,
+			List<string> notstatuses,
+			List<string> notgametypes,
 			bool? runnable,
 
 			/* Trimming info */
@@ -587,83 +587,96 @@ namespace SabreTools
 
 			// Set the status flag for filtering
 			ItemStatus itemStatus = ItemStatus.NULL;
-			switch(status?.ToLowerInvariant())
+			foreach (string status in statuses)
 			{
-				case "none":
-					itemStatus = ItemStatus.None;
-					break;
-				case "good":
-					itemStatus = ItemStatus.Good;
-					break;
-				case "baddump":
-					itemStatus = ItemStatus.BadDump;
-					break;
-				case "nodump":
-					itemStatus = ItemStatus.Nodump;
-					break;
-				case "verified":
-					itemStatus = ItemStatus.Verified;
-					break;
+				switch (status.ToLowerInvariant())
+				{
+					case "none":
+						itemStatus |= ItemStatus.None;
+						break;
+					case "good":
+						itemStatus |= ItemStatus.Good;
+						break;
+					case "baddump":
+						itemStatus |= ItemStatus.BadDump;
+						break;
+					case "nodump":
+						itemStatus |= ItemStatus.Nodump;
+						break;
+					case "verified":
+						itemStatus |= ItemStatus.Verified;
+						break;
+				}
 			}
 
 			// Set the not status flag for filtering
 			ItemStatus itemNotStatus = ItemStatus.NULL;
-			switch (notstatus?.ToLowerInvariant())
+			foreach (string status in notstatuses)
 			{
-				case "none":
-					itemNotStatus = ItemStatus.None;
-					break;
-				case "good":
-					itemNotStatus = ItemStatus.Good;
-					break;
-				case "baddump":
-					itemNotStatus = ItemStatus.BadDump;
-					break;
-				case "nodump":
-					itemNotStatus = ItemStatus.Nodump;
-					break;
-				case "verified":
-					itemNotStatus = ItemStatus.Verified;
-					break;
+				switch (status.ToLowerInvariant())
+				{
+					case "none":
+						itemNotStatus |= ItemStatus.None;
+						break;
+					case "good":
+						itemNotStatus |= ItemStatus.Good;
+						break;
+					case "baddump":
+						itemNotStatus |= ItemStatus.BadDump;
+						break;
+					case "nodump":
+						itemNotStatus |= ItemStatus.Nodump;
+						break;
+					case "verified":
+						itemNotStatus |= ItemStatus.Verified;
+						break;
+				}
 			}
 
 			// Set the machine type flag for filtering
 			MachineType machineType = MachineType.NULL;
-			switch(gametype?.ToLowerInvariant())
+			foreach (string gametype in gametypes)
 			{
-				case "none":
-					machineType = MachineType.None;
-					break;
-				case "bios":
-					machineType = MachineType.Bios;
-					break;
-				case "device":
-					machineType = MachineType.Device;
-					break;
-				case "mech":
-				case "mechanical":
-					machineType = MachineType.Mechanical;
-					break;
+				switch (gametype.ToLowerInvariant())
+				{
+					case "none":
+						machineType |= MachineType.None;
+						break;
+					case "bios":
+						machineType |= MachineType.Bios;
+						break;
+					case "dev":
+					case "device":
+						machineType |= MachineType.Device;
+						break;
+					case "mech":
+					case "mechanical":
+						machineType |= MachineType.Mechanical;
+						break;
+				}
 			}
 
 			// Set the not machine type flag for filtering
 			MachineType machineNotType = MachineType.NULL;
-			switch (notgametype?.ToLowerInvariant())
+			foreach (string gametype in notgametypes)
 			{
-				case "none":
-					machineNotType = MachineType.None;
-					break;
-				case "bios":
-					machineNotType = MachineType.Bios;
-					break;
-				case "dev":
-				case "device":
-					machineNotType = MachineType.Device;
-					break;
-				case "mech":
-				case "mechanical":
-					machineNotType = MachineType.Mechanical;
-					break;
+				switch (gametype.ToLowerInvariant())
+				{
+					case "none":
+						machineNotType = MachineType.None;
+						break;
+					case "bios":
+						machineNotType = MachineType.Bios;
+						break;
+					case "dev":
+					case "device":
+						machineNotType = MachineType.Device;
+						break;
+					case "mech":
+					case "mechanical":
+						machineNotType = MachineType.Mechanical;
+						break;
+				}
 			}
 
 			// Normalize the extensions
