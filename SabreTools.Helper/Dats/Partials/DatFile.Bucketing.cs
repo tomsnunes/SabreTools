@@ -395,8 +395,11 @@ namespace SabreTools.Helper.Dats
 			// Now that we have looped through the cloneof tags, we loop through the romof tags
 			AddRomsFromBios(logger);
 
-			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
+			// Then, remove the romof and cloneof tags so it's not picked up by the manager
 			RemoveTagsFromChild(logger);
+
+			// Finally, remove all sets that are labeled as bios or device
+			RemoveBiosAndDeviceSets(logger);
 		}
 
 		/// <summary>
@@ -816,6 +819,24 @@ namespace SabreTools.Helper.Dats
 
 				// Then, remove the old game so it's not picked up by the writer
 				Remove(game);
+			}
+		}
+
+		/// <summary>
+		/// Remove all BIOS and device sets
+		/// </summary>
+		/// <param name="logger"></param>
+		private void RemoveBiosAndDeviceSets(Logger logger)
+		{
+			List<string> games = Keys.ToList();
+			foreach (string game in games)
+			{
+				if (this[game].Count > 0
+					&& (this[game][0].Machine.MachineType == MachineType.Bios
+						|| this[game][0].Machine.MachineType == MachineType.Device))
+				{
+					Remove(game);
+				}
 			}
 		}
 
