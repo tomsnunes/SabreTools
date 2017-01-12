@@ -1374,8 +1374,17 @@ namespace SabreTools.Helper.Dats
 										{
 											machine.Devices.Add(device);
 										}
+
 										subreader.Read();
-										
+										break;
+									case "slotoption":
+										string slotoption = subreader.GetAttribute("devname");
+										if (!machine.Devices.Contains(slotoption))
+										{
+											machine.Devices.Add(slotoption);
+										}
+
+										subreader.Read();
 										break;
 									case "publisher":
 										publisher = subreader.ReadElementContentAsString();
