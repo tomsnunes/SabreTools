@@ -44,12 +44,14 @@ namespace SabreTools.Helper.Dats
 			// If there's nothing there, abort
 			if (Count == 0)
 			{
+				logger.User("There were no items to write out!");
 				return false;
 			}
 
 			// If output directory is empty, use the current folder
 			if (outDir.Trim() == "")
 			{
+				logger.Verbose("No output directory defined, defaulting to curent folder");
 				outDir = Environment.CurrentDirectory;
 			}
 
@@ -62,6 +64,7 @@ namespace SabreTools.Helper.Dats
 			// If the DAT has no output format, default to XML
 			if (DatFormat == 0)
 			{
+				logger.Verbose("No DAT format defined, defaulting to XML");
 				DatFormat = DatFormat.Logiqx;
 			}
 
@@ -108,7 +111,7 @@ namespace SabreTools.Helper.Dats
 			// Bucket roms by game name and optionally dedupe
 			BucketByGame(MergeRoms, norename, logger);
 
-			// Get the outfile name
+			// Get the outfile names
 			Dictionary<DatFormat, string> outfiles = Style.CreateOutfileNames(outDir, this, overwrite);
 
 			try
