@@ -377,7 +377,7 @@ Options:
 			The user-supplied DAT used to check which files need to be rebuilt. Multiple
 			occurrences of this flag are allowed.
 		
-		-out=			Set the name of the output directory
+		-out=				Set the name of the output directory
 			This sets an output folder to be used when the files are created. If a path
 			is not defined, the application directory is used instead.
 			
@@ -385,6 +385,13 @@ Options:
 			Optionally, a temp folder can be supplied in the case the default temp directory
 			(inside the running folder) is not preferred. This is used for any operations that
 			require an archive to be extracted.
+			
+		-set				Enable set-creation mode (lower I/O, slower)
+			Optionally for slower computers, set-creation mode can be enabled. This mode parses
+			through all inputs and creates the logical sets first, reducing the amount of I/O
+			that is required to rebuild all sets by opening each output folder or archive only
+			once. This is much slower than the standard mode, however, because of the preprocessing
+			that it requires.
 			
 		-d, --delete		Enable deletion of the input files [DO NOT USE]
 			Optionally, the input files, once processed, can be deleted. This can be useful

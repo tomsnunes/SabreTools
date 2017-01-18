@@ -88,6 +88,7 @@ namespace SabreTools
 				remext = false,
 				removeDateFromAutomaticName = false,
 				romba = false,
+				set = false,
 				showBaddumpColumn = false,
 				showNodumpColumn = false,
 				shortname = false,
@@ -429,6 +430,10 @@ namespace SabreTools
 					case "-sd":
 					case "--superdat":
 						superdat = true;
+						break;
+					case "-set":
+					case "--set":
+						set = true;
 						break;
 					case "-sf":
 					case "--skip":
@@ -1052,7 +1057,7 @@ namespace SabreTools
 			// If we're using the sorter
 			else if (sort)
 			{
-				InitSort(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, delete, inverse,
+				InitSort(datfiles, inputs, outDir, tempDir, set, quickScan, addFileDates, delete, inverse,
 					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, maxParallelism);
 			}
 

@@ -158,6 +158,7 @@ namespace SabreTools.Helper.Dats
 				// If the input is a file
 				if (File.Exists(input))
 				{
+					logger.User("Checking file: '" + input + "'");
 					RebuildToOutputWithoutSetsHelper(input, outDir, tempDir, quickScan, date, delete, inverse,
 						outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 				}
@@ -165,9 +166,10 @@ namespace SabreTools.Helper.Dats
 				// If the input is a directory
 				else if (Directory.Exists(input))
 				{
-					List<string> files = Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories).ToList();
-					foreach (string file in files)
+					logger.User("Checking directory: '" + input + "'");
+					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
+						logger.User("Checking file: '" + file + "'");
 						RebuildToOutputWithoutSetsHelper(file, outDir, tempDir, quickScan, date, delete, inverse,
 							outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 					}
