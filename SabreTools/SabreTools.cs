@@ -981,6 +981,14 @@ namespace SabreTools
 				return;
 			}
 
+			// If none of the feature flags is enabled, show the help screen
+			if (!(datFromDir | extract | restore | sort | splitByExt | splitByHash | splitByLevel | splitByType | stats | update | verify))
+			{
+				_logger.Error("At least one feature switch must be enabled");
+				_logger.Close();
+				return;
+			}
+
 			// If more than one switch is enabled, show the help screen
 			if (!(datFromDir ^ extract ^ restore ^ sort ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify))
 			{
