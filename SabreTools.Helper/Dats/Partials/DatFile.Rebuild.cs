@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Skippers;
 using SabreTools.Helper.Tools;
+using SharpCompress.Common;
 
 #if MONO
 using System.IO;
@@ -27,6 +28,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="inputs">List of input files/folders to check</param>
 		/// <param name="outDir">Output directory to use to build to</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="set">True to enable set building output, false otherwise</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
@@ -38,7 +40,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if rebuilding was a success, false otherwise</returns>
-		public bool RebuildToOutput(List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
+		public bool RebuildToOutput(List<string> inputs, string outDir, string tempDir, bool set, bool quickScan, bool date,
 			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
 			string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
 		{
@@ -79,6 +81,316 @@ namespace SabreTools.Helper.Dats
 
 			#endregion
 
+			bool success = true;
+
+			// Now choose the correct rebuilder
+			if (set)
+			{
+				success = RebuildToOutputWithSets(inputs, outDir, tempDir, quickScan, date, delete, inverse,
+					outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+			}
+			else
+			{
+				success = RebuildToOutputWithoutSets(inputs, outDir, tempDir, quickScan, date, delete, inverse,
+					outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+			}	
+
+			return success;
+		}
+
+		/// <summary>
+		/// Rebuild sets using CMP-style linear rebuilding
+		/// </summary>
+		/// <param name="inputs">List of input files/folders to check</param>
+		/// <param name="outDir">Output directory to use to build to</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
+		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="inverse">True if the DAT should be used as a filter instead of a template, false otherwise</param>
+		/// <param name="outputFormat">Output format that files should be written to</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
+		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
+		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if rebuilding was a success, false otherwise</returns>
+		private bool RebuildToOutputWithoutSets(List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
+			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
+			string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
+		{
+			bool success = true;
+
+			#region Rebuild from sources in order
+
+			switch (outputFormat)
+			{
+				case OutputFormat.Folder:
+					logger.User("Rebuilding all files to directory");
+					break;
+				case OutputFormat.TapeArchive:
+					logger.User("Rebuilding all files to TAR");
+					break;
+				case OutputFormat.Torrent7Zip:
+					logger.User("Rebuilding all files to Torrent7Z");
+					break;
+				case OutputFormat.TorrentGzip:
+					logger.User("Rebuilding all files to TorrentGZ");
+					break;
+				case OutputFormat.TorrentLrzip:
+					logger.User("Rebuilding all files to TorrentLRZ");
+					break;
+				case OutputFormat.TorrentRar:
+					logger.User("Rebuilding all files to TorrentRAR");
+					break;
+				case OutputFormat.TorrentXZ:
+					logger.User("Rebuilding all files to TorrentXZ");
+					break;
+				case OutputFormat.TorrentZip:
+					logger.User("Rebuilding all files to TorrentZip");
+					break;
+			}
+			DateTime start = DateTime.Now;
+
+			// Now loop through all of the files in all of the inputs
+			foreach (string input in inputs)
+			{
+				// If the input is a file
+				if (File.Exists(input))
+				{
+					RebuildToOutputWithoutSetsHelper(input, outDir, tempDir, quickScan, date, delete, inverse,
+						outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+				}
+
+				// If the input is a directory
+				else if (Directory.Exists(input))
+				{
+					List<string> files = Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories).ToList();
+					foreach (string file in files)
+					{
+						RebuildToOutputWithoutSetsHelper(file, outDir, tempDir, quickScan, date, delete, inverse,
+							outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+					}
+				}
+			}
+
+			logger.User("Rebuilding complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			#endregion
+
+			return success;
+		}
+
+		/// <summary>
+		/// Attempt to add a file to the output if it matches
+		/// </summary>
+		/// <param name="file">Name of the file to process</param>
+		/// <param name="outDir">Output directory to use to build to</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
+		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="inverse">True if the DAT should be used as a filter instead of a template, false otherwise</param>
+		/// <param name="outputFormat">Output format that files should be written to</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
+		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
+		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		private void RebuildToOutputWithoutSetsHelper(string file, string outDir, string tempDir, bool quickScan, bool date,
+			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
+			string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
+		{
+			// If we somehow have a null filename, return
+			if (file == null)
+			{
+				return;
+			}
+
+			// Define the temporary directory
+			string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
+
+			// Get the required scanning level for the file
+			bool shouldExternalProcess = false;
+			bool shouldInternalProcess = false;
+			ArchiveTools.GetInternalExternalProcess(file, archiveScanLevel, logger, out shouldExternalProcess, out shouldInternalProcess);
+
+			// If we're supposed to scan the file externally
+			if (shouldExternalProcess)
+			{
+				Rom rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
+				RebuildToOutputWithoutSetsIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
+					romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
+			}
+
+			// If we're supposed to scan the file internally
+			if (shouldInternalProcess)
+			{
+				// If quickscan is set, do so
+				if (quickScan)
+				{
+					List<Rom> extracted = ArchiveTools.GetArchiveFileInfo(file, logger);
+
+					foreach (Rom rom in extracted)
+					{
+						RebuildToOutputWithoutSetsIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
+							romba, updateDat, true /* isZip */, headerToCheckAgainst, logger);
+					}
+				}
+				// Otherwise, attempt to extract the files to the temporary directory
+				else
+				{
+					bool encounteredErrors = ArchiveTools.ExtractArchive(file, tempSubDir, archiveScanLevel, logger);
+
+					// If the file was an archive and was extracted successfully, check it
+					if (!encounteredErrors)
+					{
+						logger.Verbose(Path.GetFileName(file) + " treated like an archive");
+						List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
+						foreach (string entry in extracted)
+						{
+							Rom rom = FileTools.GetFileInfo(entry, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
+							RebuildToOutputWithoutSetsIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
+								romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
+						}
+					}
+					// Otherwise, just get the info on the file itself
+					else if (File.Exists(file))
+					{
+						Rom rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
+						RebuildToOutputWithoutSetsIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
+							romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
+					}
+				}
+			}
+
+			// Now delete the temp directory
+			try
+			{
+				Directory.Delete(tempSubDir, true);
+			}
+			catch { }
+		}
+
+		/// <summary>
+		/// Find duplicates and rebuild individual files to output
+		/// </summary>
+		/// <param name="rom">Information for the current file to rebuild from</param>
+		/// <param name="file">Name of the file to process</param>
+		/// <param name="outDir">Output directory to use to build to</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
+		/// <param name="inverse">True if the DAT should be used as a filter instead of a template, false otherwise</param>
+		/// <param name="outputFormat">Output format that files should be written to</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
+		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
+		/// <param name="isZip">True if the input file is an archive, false otherwise</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		private void RebuildToOutputWithoutSetsIndividual(Rom rom, string file, string outDir, string tempDir, bool date,
+			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool isZip, string headerToCheckAgainst, Logger logger)
+		{
+			// Find if the file has duplicates in the DAT
+			bool hasDuplicates = rom.HasDuplicates(this, logger);
+
+			// If it has duplicates and we're not filtering or we have no duplicates and we're filtering, rebuild it
+			if (hasDuplicates ^ inverse)
+			{
+				// Get the list of duplicates to rebuild to
+				List<DatItem> dupes = rom.GetDuplicates(this, logger, remove: updateDat);
+
+				// If we don't have any duplicates, continue
+				if (dupes.Count == 0)
+				{
+					return;
+				}
+
+				// If we have an archive input, get the real name of the file to use
+				if (isZip)
+				{
+					// Otherwise, extract the file to the temp folder
+					file = ArchiveTools.ExtractItem(file, rom.Name, tempDir, logger);
+				}				
+
+				// If we couldn't extract the file, then continue,
+				if (String.IsNullOrEmpty(file))
+				{
+					return;
+				}
+
+				// Now loop through the list and rebuild accordingly
+				foreach (Rom item in dupes)
+				{
+					switch (outputFormat)
+					{
+						case OutputFormat.Folder:
+							string outfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(item.Machine.Name), item.Name);
+
+							// Make sure the output folder is created
+							Directory.CreateDirectory(Path.GetDirectoryName(outfile));
+
+							// Now copy the file over
+							try
+							{
+								File.Copy(file, outfile);
+								if (date && !String.IsNullOrEmpty(item.Date))
+								{
+									File.SetCreationTime(outfile, DateTime.Parse(item.Date));
+								}
+							}
+							catch { }
+
+							break;
+						case OutputFormat.TapeArchive:
+							ArchiveTools.WriteTAR(file, outDir, item, logger, date: date);
+							break;
+						case OutputFormat.Torrent7Zip:
+							break;
+						case OutputFormat.TorrentGzip:
+							ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
+							break;
+						case OutputFormat.TorrentLrzip:
+							break;
+						case OutputFormat.TorrentRar:
+							break;
+						case OutputFormat.TorrentXZ:
+							break;
+						case OutputFormat.TorrentZip:
+							ArchiveTools.WriteTorrentZip(file, outDir, item, logger, date: date);
+							break;
+					}
+
+					// And now clear the temp folder to get rid of any transient files
+					try
+					{
+						Directory.Delete(tempDir, true);
+					}
+					catch { }
+				}
+			}
+		}
+
+		/// <summary>
+		/// Rebuild sets using RV-style set rebuilding
+		/// </summary>
+		/// <param name="inputs">List of input files/folders to check</param>
+		/// <param name="outDir">Output directory to use to build to</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
+		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="inverse">True if the DAT should be used as a filter instead of a template, false otherwise</param>
+		/// <param name="outputFormat">Output format that files should be written to</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
+		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
+		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if rebuilding was a success, false otherwise</returns>
+		private bool RebuildToOutputWithSets(List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
+			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
+			string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
+		{
 			bool success = true;
 			DatFile matched = new DatFile();
 			List<string> files = new List<string>();
@@ -193,8 +505,8 @@ namespace SabreTools.Helper.Dats
 										rom.Machine = new Machine(Path.GetFullPath(file), "");
 										current.Add(rom.Size + "-" + rom.CRC, rom);
 
-									// If we had a header, we want the full file information too
-									if (headerToCheckAgainst != null)
+										// If we had a header, we want the full file information too
+										if (headerToCheckAgainst != null)
 										{
 											rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan);
 											rom.Machine = new Machine(Path.GetFullPath(file), "");

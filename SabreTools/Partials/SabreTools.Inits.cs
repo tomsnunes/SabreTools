@@ -332,7 +332,7 @@ namespace SabreTools
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			datdata.RebuildToOutput(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
+			datdata.RebuildToOutput(inputs, outDir, tempDir, true /*set*/, quickScan, date, delete, inverse, outputFormat, romba, asl,
 				updateDat, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
 		}
 

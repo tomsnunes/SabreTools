@@ -174,7 +174,9 @@ namespace SabreTools
 
 			// Create the sorting object to use and rebuild the needed files
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers((onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1));
-			need.RebuildToOutput(onlyDirs, _depots.Keys.ToList()[0], _tmpdir, false, false, false, false /*inverse*/, OutputFormat.TorrentGzip, true, asl, false, null, 4, _logger);
+			need.RebuildToOutput(onlyDirs, _depots.Keys.ToList()[0], _tmpdir, false /*set*/, false /*quickScan*/, false /*date*/,
+				false /*delete*/, false /*inverse*/, OutputFormat.TorrentGzip, true /*romba*/, asl, false /*updateDat*/,
+				null /*headerToCheckAgainst*/, 4 /*maxDegreeOfParallelism*/, _logger);
 		}
 
 		/// <summary>
@@ -212,7 +214,9 @@ namespace SabreTools
 
 				// Now scan all of those depots and rebuild
 				ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
-				datFile.RebuildToOutput(onlineDepots, outputFolder, _tmpdir, true, false, false, false /*inverse*/, (copy ? OutputFormat.TorrentGzip : OutputFormat.TorrentZip), copy, asl, false, null, 4, _logger);
+				datFile.RebuildToOutput(onlineDepots, outputFolder, _tmpdir, true /*set*/, true /*quickscan*/, false /*date*/,
+					false /*delete*/, false /*inverse*/, (copy ? OutputFormat.TorrentGzip : OutputFormat.TorrentZip), copy, asl,
+					false /*updateDat*/, null /*headerToCheckAgainst*/, 4 /*maxDegreeOfParallelism*/, _logger);
 			}
 		}
 
