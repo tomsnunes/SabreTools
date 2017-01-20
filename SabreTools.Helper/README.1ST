@@ -485,7 +485,7 @@ Options:
 			that only 1 thread is to be used, it defaults to the original, serial implementation
 			of the DFD code.
 			
-		-ud, --update-dat	Output updated DAT (rebuild only)
+		-upd, --update-dat	Output updated DAT (rebuild only)
 			Once the files that were able to rebuilt are taken care of, a DAT of the files
 			that could not be matched will be output to the program directory.
 			that could not be matched will be output to the program directory.
