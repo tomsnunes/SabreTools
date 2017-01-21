@@ -139,6 +139,12 @@ Usage:
 Options:
 	-?, -h, --help		Show the built-in help text
 		Built-in to most of the programs is a basic help text
+		
+	--script			Enable script mode (no clear screen)
+		For times when SabreTools is being used in a scripted environement, the user may
+		not want the screen to be cleared every time that it is called. This flag allows
+		the user to skip clearing the screen on run just like if the console was being
+		redirected.
 	
 	-d, --dfd		Create a DAT from each input directory
 		Create a DAT file from an input directory or set of files. By default, this will

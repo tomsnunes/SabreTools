@@ -146,6 +146,7 @@ namespace SabreTools.Helper.Data
 					helptext.Add("");
 					helptext.Add("Options:");
 					helptext.Add("  -?, -h, --help	Show this help");
+					helptext.Add("  --script		Enable script mode (no clear screen)");
 
 					// DATFromDir
 					helptext.Add("  -d, --dfd		Create a DAT from an input directory");

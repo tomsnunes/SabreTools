@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using SabreTools.Helper;
 using SabreTools.Helper.Data;
@@ -29,8 +30,8 @@ namespace SabreTools
 			// Perform initial setup and verification
 			_logger = new Logger(true, "sabretools.log");
 
-			// If output is being redirected, don't allow clear screens
-			if (!Console.IsOutputRedirected)
+			// If output is being redirected or we are in script mode, don't allow clear screens
+			if (!Console.IsOutputRedirected && !args.Contains("--script"))
 			{
 				Console.Clear();
 			}
@@ -196,6 +197,9 @@ namespace SabreTools
 					case "-re":
 					case "--restore":
 						restore = true;
+						break;
+					case "--script":
+						// No-op for script mode, allowing for retaining the screen
 						break;
 					case "-ss":
 					case "--sort":
