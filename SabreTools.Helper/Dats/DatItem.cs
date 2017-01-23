@@ -172,7 +172,7 @@ namespace SabreTools.Helper.Dats
 			bool dupefound = this.Equals(lastItem);
 
 			// More wonderful SHA-1 logging that has to be done
-			if (_itemType == ItemType.Rom)
+			if (_itemType == ItemType.Rom && lastItem.Type == ItemType.Rom)
 			{
 				if (((Rom)this).SHA1 == ((Rom)lastItem).SHA1 && ((Rom)this).Size != ((Rom)lastItem).Size)
 				{
