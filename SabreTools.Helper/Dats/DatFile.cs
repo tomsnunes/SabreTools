@@ -417,7 +417,13 @@ namespace SabreTools.Helper.Dats
 
 				lock (_files)
 				{
-					return _files.Count;
+					int count = 0;
+					foreach (string key in _files.Keys)
+					{
+						count += _files[key].Count;
+					}
+
+					return count;
 				}
 			}
 		}
