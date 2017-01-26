@@ -212,6 +212,10 @@ namespace SabreTools.Helper.Dats
 			// Define the temporary directory
 			string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
 
+			// Set the deletion variables
+			bool usedExternally = false;
+			bool usedInternally = false;
+
 			// Get the required scanning level for the file
 			bool shouldExternalProcess = false;
 			bool shouldInternalProcess = false;
@@ -221,7 +225,7 @@ namespace SabreTools.Helper.Dats
 			if (shouldExternalProcess)
 			{
 				Rom rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
-				RebuildToOutputWithoutSetsIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
+				usedExternally = RebuildToOutputWithoutSetsIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
 					romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
 			}
 
@@ -232,10 +236,11 @@ namespace SabreTools.Helper.Dats
 				if (quickScan)
 				{
 					List<Rom> extracted = ArchiveTools.GetArchiveFileInfo(file, logger);
+					usedInternally = true;
 
 					foreach (Rom rom in extracted)
 					{
-						RebuildToOutputWithoutSetsIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
+						usedInternally &= RebuildToOutputWithoutSetsIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
 							romba, updateDat, true /* isZip */, headerToCheckAgainst, logger);
 					}
 				}
@@ -254,16 +259,39 @@ namespace SabreTools.Helper.Dats
 							Rom rom = FileTools.GetFileInfo(entry, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
 							RebuildToOutputWithoutSetsIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
 								romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
+
+							// Now we want to remove the file from the temp directory
+							try
+							{
+								File.Delete(entry);
+							}
+							catch { }
+						}
+
+						// If the temp directory is empty, we assume that everything inside was used
+						if (Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).Count() == 0)
+						{
+							usedInternally = true;
 						}
 					}
 					// Otherwise, just get the info on the file itself
 					else if (File.Exists(file))
 					{
 						Rom rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
-						RebuildToOutputWithoutSetsIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
+						usedExternally = RebuildToOutputWithoutSetsIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
 							romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
 					}
 				}
+			}
+
+			// If we are supposed to delete the file, do so
+			if (delete && (usedExternally || usedInternally))
+			{
+				try
+				{
+					File.Delete(file);
+				}
+				catch { }
 			}
 
 			// Now delete the temp directory
@@ -289,9 +317,13 @@ namespace SabreTools.Helper.Dats
 		/// <param name="isZip">True if the input file is an archive, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private void RebuildToOutputWithoutSetsIndividual(Rom rom, string file, string outDir, string tempDir, bool date,
+		/// <returns>True if the file was able to be rebuilt, false otherwise</returns>
+		private bool RebuildToOutputWithoutSetsIndividual(Rom rom, string file, string outDir, string tempDir, bool date,
 			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool isZip, string headerToCheckAgainst, Logger logger)
 		{
+			// Set the output value
+			bool rebuilt = false;
+
 			// Find if the file has duplicates in the DAT
 			bool hasDuplicates = rom.HasDuplicates(this, logger);
 
@@ -304,7 +336,7 @@ namespace SabreTools.Helper.Dats
 				// If we don't have any duplicates, continue
 				if (dupes.Count == 0)
 				{
-					return;
+					return rebuilt;
 				}
 
 				// If we have an archive input, get the real name of the file to use
@@ -317,12 +349,14 @@ namespace SabreTools.Helper.Dats
 				// If we couldn't extract the file, then continue,
 				if (String.IsNullOrEmpty(file))
 				{
-					return;
+					return rebuilt;
 				}
 
 				// Now loop through the list and rebuild accordingly
 				foreach (Rom item in dupes)
 				{
+					rebuilt = true;
+
 					switch (outputFormat)
 					{
 						case OutputFormat.Folder:
@@ -339,17 +373,22 @@ namespace SabreTools.Helper.Dats
 								{
 									File.SetCreationTime(outfile, DateTime.Parse(item.Date));
 								}
+
+								rebuilt &= true;
 							}
-							catch { }
+							catch
+							{
+								rebuilt &= false;
+							}
 
 							break;
 						case OutputFormat.TapeArchive:
-							ArchiveTools.WriteTAR(file, outDir, item, logger, date: date);
+							rebuilt &= ArchiveTools.WriteTAR(file, outDir, item, logger, date: date);
 							break;
 						case OutputFormat.Torrent7Zip:
 							break;
 						case OutputFormat.TorrentGzip:
-							ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
+							rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
 							break;
 						case OutputFormat.TorrentLrzip:
 							break;
@@ -358,7 +397,7 @@ namespace SabreTools.Helper.Dats
 						case OutputFormat.TorrentXZ:
 							break;
 						case OutputFormat.TorrentZip:
-							ArchiveTools.WriteTorrentZip(file, outDir, item, logger, date: date);
+							rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, item, logger, date: date);
 							break;
 					}
 
@@ -370,6 +409,8 @@ namespace SabreTools.Helper.Dats
 					catch { }
 				}
 			}
+
+			return rebuilt;
 		}
 
 		/// <summary>
