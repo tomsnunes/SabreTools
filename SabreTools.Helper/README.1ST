@@ -392,13 +392,6 @@ Options:
 			(inside the running folder) is not preferred. This is used for any operations that
 			require an archive to be extracted.
 			
-		-set				Enable set-creation mode (lower I/O, slower)
-			Optionally for slower computers, set-creation mode can be enabled. This mode parses
-			through all inputs and creates the logical sets first, reducing the amount of I/O
-			that is required to rebuild all sets by opening each output folder or archive only
-			once. This is much slower than the standard mode, however, because of the preprocessing
-			that it requires.
-			
 		-d, --delete		Enable deletion of the input files [DO NOT USE]
 			Optionally, the input files, once processed, can be deleted. This can be useful
 			when the original file structure is no longer needed or if there is limited space

@@ -218,7 +218,6 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-dat=			Input DAT to rebuild against");
 						helptext.Add("	-out=			Output directory");
 						helptext.Add("	-t=, --temp=		Set the temporary directory to use");
-						helptext.Add("	-set				Enable set-creation mode (lower I/O, slower)");
 						helptext.Add("	-del, --delete		Delete input files [DO NOT USE]");
 						helptext.Add("	-in, --inverse		Rebuild only files not in DAT");
 						helptext.Add("	-qs, --quick		Enable quick scanning of archives");

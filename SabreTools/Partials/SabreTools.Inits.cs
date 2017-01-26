@@ -301,7 +301,6 @@ namespace SabreTools
 		/// <param name="inputs">List of input files/folders to check</param>
 		/// <param name="outDir">Output directory to use to build to</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
-		/// <param name="set">True if set-building mode should be enabled, false otherwise</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
@@ -315,7 +314,7 @@ namespace SabreTools
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool set, bool quickScan, bool date, bool delete,
+		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date, bool delete,
 			bool inverse, OutputFormat outputFormat, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst,
 			int maxDegreeOfParallelism)
 		{
@@ -333,7 +332,7 @@ namespace SabreTools
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			datdata.RebuildToOutput(inputs, outDir, tempDir, set, quickScan, date, delete, inverse, outputFormat, romba, asl,
+			datdata.RebuildToOutput(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
 				updateDat, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
 		}
 
