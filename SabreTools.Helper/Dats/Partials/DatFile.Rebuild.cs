@@ -469,10 +469,11 @@ namespace SabreTools.Helper.Dats
 		/// <param name="inputs">List of input directories to compare against</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="hashOnly">True if only hashes should be checked, false for full file information</param>
+		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if verification was a success, false otherwise</returns>
-		public bool VerifyDirectory(List<string> inputs, string tempDir, bool hashOnly, string headerToCheckAgainst, Logger logger)
+		public bool VerifyDirectory(List<string> inputs, string tempDir, bool hashOnly, bool quickScan, string headerToCheckAgainst, Logger logger)
 		{
 			// Check the temp directory exists
 			if (String.IsNullOrEmpty(tempDir))
@@ -500,7 +501,7 @@ namespace SabreTools.Helper.Dats
 			logger.User("Processing files:\n");
 			foreach (string input in inputs)
 			{
-				PopulateFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
+				PopulateFromDir(input, quickScan /* noMD5 */, quickScan /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, tempDir /* tempDir */, false /* copyFiles */,
 					headerToCheckAgainst, 4 /* maxDegreeOfParallelism */, logger);
 			}

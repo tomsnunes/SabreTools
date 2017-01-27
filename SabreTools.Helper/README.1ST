@@ -906,6 +906,12 @@ Options:
 			This allows verification of (possibly) incorrectly named folders and sets to be
 			verified without worrying about the proper set structure to be there.
 			
+		-qs, --quick		Enable quick scanning of archives
+			For all archives, if this flag is enabled, it will only use the header information
+			to get the archive entries' file information. The upside to this is that it is much
+			quicker than extracting all files to the temp folder. On the downside, it can only
+			get the CRC and size from most archive formats, leading to possible issues.
+			
 		-h=, --header=		Remove headers from hash calculations
 			If this is set, then all files that have copier headers that are detected will
 			have them removed from the hash calculation. This will allow for a headered collection

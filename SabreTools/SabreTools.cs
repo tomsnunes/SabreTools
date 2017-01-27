@@ -1109,7 +1109,7 @@ namespace SabreTools
 			// If we're using the verifier
 			else if (verify)
 			{
-				InitVerify(datfiles, inputs, tempDir, hashOnly, header);
+				InitVerify(datfiles, inputs, tempDir, hashOnly, quickScan, header);
 			}
 
 			// If nothing is set, show the help
