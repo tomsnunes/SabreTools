@@ -230,7 +230,7 @@ namespace SabreTools.Helper.Data
 						//helptext.Add("	-trar			Enable TorrentRAR output");
 						//helptext.Add("	-txz			Enable TorrentXZ output");
 						helptext.Add("	-tzip			Enable TorrentZip output");
-						//helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
+						helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
 						helptext.Add("	-7z={1}			Set scanning level for 7z archives");
 						helptext.Add("	-gz={2}			Set scanning level for GZip archives");
 						helptext.Add("	-rar={2}		Set scanning level for RAR archives");

@@ -461,7 +461,7 @@ Options:
 			This is primarily used by external tool RomVault (http://www.romvault.com/) and is
 			already widely used.
 			
-		-h=, --header=		Remove headers from hash calculations [NOT IMPLEMENTED]
+		-h=, --header=		Remove headers from hash calculations
 			If this is set, then all files that have copier headers that are detected will
 			have them removed from the hash calculation. This will allow for a headered collection
 			to be hashed without possibly variant information. If a particular header skipper is
