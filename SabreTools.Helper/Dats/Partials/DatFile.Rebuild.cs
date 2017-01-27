@@ -524,12 +524,15 @@ namespace SabreTools.Helper.Dats
 				foreach (string key in Keys)
 				{
 					List<DatItem> roms = this[key];
-					foreach (Rom rom in roms)
+					foreach (DatItem rom in roms)
 					{
 						if (rom.SourceID == 99)
 						{
 							found = true;
-							matched.Add(rom.Size + "-" + rom.CRC, rom);
+							if (rom.Type == ItemType.Disk || rom.Type == ItemType.Rom)
+							{
+								matched.Add(((Disk)rom).SHA1, rom);
+							}
 						}
 					}
 				}

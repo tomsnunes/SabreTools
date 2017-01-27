@@ -49,27 +49,38 @@ namespace SabreTools.Helper.Dats
 			// Loop through and add
 			foreach (string key in Keys)
 			{
-				List<DatItem> roms = this[key];
-				foreach (Rom rom in roms)
+				List<DatItem> items = this[key];
+				foreach (DatItem item in items)
 				{
-					RomCount += (rom.Type == ItemType.Rom ? 1 : 0);
-					DiskCount += (rom.Type == ItemType.Disk ? 1 : 0);
-					TotalSize += (rom.ItemStatus == ItemStatus.Nodump ? 0 : rom.Size);
-					CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
-					MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
-					SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
-					BaddumpCount += (rom.Type == ItemType.Disk
-						? (((Disk)rom).ItemStatus == ItemStatus.BadDump ? 1 : 0)
-						: (rom.Type == ItemType.Rom
-							? (((Rom)rom).ItemStatus == ItemStatus.BadDump ? 1 : 0)
-							: 0)
-						);
-					NodumpCount += (rom.Type == ItemType.Disk
-							? (((Disk)rom).ItemStatus == ItemStatus.Nodump ? 1 : 0)
-							: (rom.Type == ItemType.Rom
-								? (((Rom)rom).ItemStatus == ItemStatus.Nodump ? 1 : 0)
-								: 0)
-							);
+					switch (item.Type)
+					{
+						case ItemType.Archive:
+							break;
+						case ItemType.BiosSet:
+							break;
+						case ItemType.Disk:
+							Disk disk = (Disk)item;
+							DiskCount += 1;
+							MD5Count += (String.IsNullOrEmpty(disk.MD5) ? 0 : 1);
+							SHA1Count += (String.IsNullOrEmpty(disk.SHA1) ? 0 : 1);
+							BaddumpCount += (disk.ItemStatus == ItemStatus.BadDump ? 1 : 0);
+							NodumpCount += (disk.ItemStatus == ItemStatus.Nodump ? 1 : 0);
+							break;
+						case ItemType.Release:
+							break;
+						case ItemType.Rom:
+							Rom rom = (Rom)item;
+							RomCount += 1;
+							TotalSize += (rom.ItemStatus == ItemStatus.Nodump ? 0 : rom.Size);
+							CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
+							MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
+							SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
+							BaddumpCount += (rom.ItemStatus == ItemStatus.BadDump ? 1 : 0);
+							NodumpCount += (rom.ItemStatus == ItemStatus.Nodump ? 1 : 0);
+							break;
+						case ItemType.Sample:
+							break;
+					}
 				}
 			}
 		}
