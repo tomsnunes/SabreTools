@@ -288,8 +288,8 @@ namespace SabreTools.Helper.Dats
 			// Find if the file has duplicates in the DAT
 			bool hasDuplicates = rom.HasDuplicates(this, logger);
 
-			// If it has duplicates and we're not filtering or we have no duplicates and we're filtering, rebuild it
-			if (hasDuplicates ^ inverse)
+			// If it has duplicates and we're not filtering, rebuild it
+			if (hasDuplicates && !inverse)
 			{
 				// Get the list of duplicates to rebuild to
 				List<DatItem> dupes = rom.GetDuplicates(this, logger, remove: updateDat);
@@ -369,6 +369,78 @@ namespace SabreTools.Helper.Dats
 					}
 					catch { }
 				}
+			}
+
+			// If we have no duplicates and we're filtering, rebuild it
+			else if (!hasDuplicates && inverse)
+			{
+				// If we have an archive input, get the real name of the file to use
+				if (isZip)
+				{
+					// Otherwise, extract the file to the temp folder
+					file = ArchiveTools.ExtractItem(file, rom.Name, tempDir, logger);
+				}
+
+				// If we couldn't extract the file, then continue,
+				if (String.IsNullOrEmpty(file))
+				{
+					return rebuilt;
+				}
+
+				// Get the item from the current file
+				Rom item = FileTools.GetFileInfo(file, logger);
+
+				// Now rebuild to the output file
+				switch (outputFormat)
+				{
+					case OutputFormat.Folder:
+						string outfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(item.Machine.Name), item.Name);
+
+						// Make sure the output folder is created
+						Directory.CreateDirectory(Path.GetDirectoryName(outfile));
+
+						// Now copy the file over
+						try
+						{
+							File.Copy(file, outfile);
+							if (date && !String.IsNullOrEmpty(item.Date))
+							{
+								File.SetCreationTime(outfile, DateTime.Parse(item.Date));
+							}
+
+							rebuilt &= true;
+						}
+						catch
+						{
+							rebuilt &= false;
+						}
+
+						break;
+					case OutputFormat.TapeArchive:
+						rebuilt &= ArchiveTools.WriteTAR(file, outDir, item, logger, date: date);
+						break;
+					case OutputFormat.Torrent7Zip:
+						break;
+					case OutputFormat.TorrentGzip:
+						rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
+						break;
+					case OutputFormat.TorrentLrzip:
+						break;
+					case OutputFormat.TorrentRar:
+						break;
+					case OutputFormat.TorrentXZ:
+						break;
+					case OutputFormat.TorrentZip:
+						rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, item, logger, date: date);
+						break;
+				}
+
+				// And now clear the temp folder to get rid of any transient files
+				try
+				{
+					Directory.Delete(tempDir, true);
+				}
+				catch { }
 			}
 
 			return rebuilt;
