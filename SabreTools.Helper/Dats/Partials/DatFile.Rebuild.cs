@@ -474,7 +474,13 @@ namespace SabreTools.Helper.Dats
 		/// <returns>True if verification was a success, false otherwise</returns>
 		public bool VerifyDirectory(List<string> inputs, string tempDir, bool hashOnly, string headerToCheckAgainst, Logger logger)
 		{
-			// First create or clean the temp directory
+			// Check the temp directory exists
+			if (String.IsNullOrEmpty(tempDir))
+			{
+				tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+			}
+
+			// Then create or clean the temp directory
 			if (!Directory.Exists(tempDir))
 			{
 				Directory.CreateDirectory(tempDir);
