@@ -891,10 +891,6 @@ Options:
 		-dat=				Name of the DAT to be used for the various options
 			The user-supplied DAT used to check which files need to be verified. Multiple
 			occurrences of this flag are allowed.
-		
-		-out=			Set the name of the output directory
-			This sets an output folder to be used where the files will be verified. If a path
-			is not defined, the application directory is used instead.
 			
 		-t=, --temp=		Set the name of the temporary directory
 			Optionally, a temp folder can be supplied in the case the default temp directory
