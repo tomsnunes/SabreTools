@@ -218,7 +218,7 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-dat=			Input DAT to rebuild against");
 						helptext.Add("	-out=			Output directory");
 						helptext.Add("	-t=, --temp=		Set the temporary directory to use");
-						helptext.Add("	-del, --delete		Delete input files [DO NOT USE]");
+						helptext.Add("	-del, --delete		Delete fully rebuilt input files");
 						helptext.Add("	-in, --inverse		Rebuild only files not in DAT");
 						helptext.Add("	-qs, --quick		Enable quick scanning of archives");
 						helptext.Add("	-ad, --add-date		Add original dates from DAT, if possible");
@@ -230,7 +230,7 @@ namespace SabreTools.Helper.Data
 						//helptext.Add("	-trar			Enable TorrentRAR output");
 						//helptext.Add("	-txz			Enable TorrentXZ output");
 						helptext.Add("	-tzip			Enable TorrentZip output");
-						helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
+						//helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
 						helptext.Add("	-7z={1}			Set scanning level for 7z archives");
 						helptext.Add("	-gz={2}			Set scanning level for GZip archives");
 						helptext.Add("	-rar={2}		Set scanning level for RAR archives");

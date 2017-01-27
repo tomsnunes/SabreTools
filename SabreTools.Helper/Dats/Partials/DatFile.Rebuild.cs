@@ -119,7 +119,7 @@ namespace SabreTools.Helper.Dats
 				// If the input is a file
 				if (File.Exists(input))
 				{
-					logger.User("Checking file: '" + input + "'");
+					logger.Verbose("Checking file: '" + input + "'");
 					RebuildToOutputHelper(input, outDir, tempDir, quickScan, date, delete, inverse,
 						outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 				}
@@ -127,10 +127,10 @@ namespace SabreTools.Helper.Dats
 				// If the input is a directory
 				else if (Directory.Exists(input))
 				{
-					logger.User("Checking directory: '" + input + "'");
+					logger.Verbose("Checking directory: '" + input + "'");
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						logger.User("Checking file: '" + file + "'");
+						logger.Verbose("Checking file: '" + file + "'");
 						RebuildToOutputHelper(file, outDir, tempDir, quickScan, date, delete, inverse,
 							outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 					}
@@ -213,26 +213,15 @@ namespace SabreTools.Helper.Dats
 					// If the file was an archive and was extracted successfully, check it
 					if (!encounteredErrors)
 					{
+						usedInternally = true;
+
 						logger.Verbose(Path.GetFileName(file) + " treated like an archive");
 						List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 						foreach (string entry in extracted)
 						{
 							Rom rom = FileTools.GetFileInfo(entry, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
-							RebuildToOutputIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
+							usedInternally &= RebuildToOutputIndividual(rom, entry, outDir, tempSubDir, date, inverse, outputFormat,
 								romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
-
-							// Now we want to remove the file from the temp directory
-							try
-							{
-								File.Delete(entry);
-							}
-							catch { }
-						}
-
-						// If the temp directory is empty, we assume that everything inside was used
-						if (Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).Count() == 0)
-						{
-							usedInternally = true;
 						}
 					}
 					// Otherwise, just get the info on the file itself
@@ -250,9 +239,14 @@ namespace SabreTools.Helper.Dats
 			{
 				try
 				{
+					logger.Verbose("Attempting to delete input file '" + file + "'");
 					File.Delete(file);
+					logger.Verbose("File '" + file + "' deleted");
 				}
-				catch { }
+				catch (Exception ex)
+				{
+					logger.Error("An error occurred while trying to delete '" + file + "' " + ex.ToString());
+				}
 			}
 
 			// Now delete the temp directory
@@ -313,6 +307,8 @@ namespace SabreTools.Helper.Dats
 					return rebuilt;
 				}
 
+				logger.User("Matches found for '" + file + "', rebuilding accordingly...");
+
 				// Now loop through the list and rebuild accordingly
 				foreach (Rom item in dupes)
 				{
@@ -339,7 +335,7 @@ namespace SabreTools.Helper.Dats
 							}
 							catch
 							{
-								rebuilt &= false;
+								rebuilt = false;
 							}
 
 							break;
@@ -361,8 +357,11 @@ namespace SabreTools.Helper.Dats
 							rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, item, logger, date: date);
 							break;
 					}
+				}
 
-					// And now clear the temp folder to get rid of any transient files
+				// And now clear the temp folder to get rid of any transient files if we unzipped
+				if (isZip)
+				{
 					try
 					{
 						Directory.Delete(tempDir, true);
@@ -374,10 +373,13 @@ namespace SabreTools.Helper.Dats
 			// If we have no duplicates and we're filtering, rebuild it
 			else if (!hasDuplicates && inverse)
 			{
+				string machinename = null;
+
 				// If we have an archive input, get the real name of the file to use
 				if (isZip)
 				{
 					// Otherwise, extract the file to the temp folder
+					machinename = Style.GetFileNameWithoutExtension(file);
 					file = ArchiveTools.ExtractItem(file, rom.Name, tempDir, logger);
 				}
 
@@ -389,6 +391,20 @@ namespace SabreTools.Helper.Dats
 
 				// Get the item from the current file
 				Rom item = FileTools.GetFileInfo(file, logger);
+				item.Machine = new Machine()
+				{
+					Name = Style.GetFileNameWithoutExtension(item.Name),
+					Description = Style.GetFileNameWithoutExtension(item.Name),
+				};
+
+				// If we are coming from an archive, set the correct machine name
+				if (machinename != null)
+				{
+					item.Machine.Name = machinename;
+					item.Machine.Description = machinename;
+				}
+
+				logger.User("Matches found for '" + file + "', rebuilding accordingly...");
 
 				// Now rebuild to the output file
 				switch (outputFormat)
@@ -435,12 +451,15 @@ namespace SabreTools.Helper.Dats
 						break;
 				}
 
-				// And now clear the temp folder to get rid of any transient files
-				try
+				// And now clear the temp folder to get rid of any transient files if we unzipped
+				if (isZip)
 				{
-					Directory.Delete(tempDir, true);
+					try
+					{
+						Directory.Delete(tempDir, true);
+					}
+					catch { }
 				}
-				catch { }
 			}
 
 			return rebuilt;

@@ -190,6 +190,7 @@ namespace SabreTools.Helper.Tools
 						zr = zf.CloseReadStream();
 						writeStream.Dispose();
 					}
+					zf.Close();
 					encounteredErrors = false;
 				}
 			}

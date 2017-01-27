@@ -392,10 +392,10 @@ Options:
 			(inside the running folder) is not preferred. This is used for any operations that
 			require an archive to be extracted.
 			
-		-d, --delete		Enable deletion of the input files [DO NOT USE]
-			Optionally, the input files, once processed, can be deleted. This can be useful
-			when the original file structure is no longer needed or if there is limited space
-			on the source drive.
+		-d, --delete		Delete fully rebuilt input files
+			Optionally, the input files, once processed and fully matched, can be deleted. This
+			can be useful when the original file structure is no longer needed or if there is
+			limited space on the source drive.
 			
 		-in, --inverse		Match files not in the DAT
 			Instead of the normal behavior of rebuilding using a DAT, this flag allows the user
@@ -461,7 +461,7 @@ Options:
 			This is primarily used by external tool RomVault (http://www.romvault.com/) and is
 			already widely used.
 			
-		-h=, --header=		Remove headers from hash calculations
+		-h=, --header=		Remove headers from hash calculations [NOT IMPLEMENTED]
 			If this is set, then all files that have copier headers that are detected will
 			have them removed from the hash calculation. This will allow for a headered collection
 			to be hashed without possibly variant information. If a particular header skipper is
