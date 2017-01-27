@@ -156,6 +156,20 @@ namespace SabreTools.Helper.Dats
 			DatFile outerDiffData = new DatFile();
 			DatFile dupeData = new DatFile();
 
+			// Fill in any information not in the base DAT
+			if (String.IsNullOrEmpty(_fileName))
+			{
+				_fileName = "All DATs";
+			}
+			if (String.IsNullOrEmpty(_name))
+			{
+				_name = "All DATs";
+			}
+			if (String.IsNullOrEmpty(_description))
+			{
+				_description = "All DATs";
+			}
+
 			// Don't have External dupes
 			if ((diff & DiffMode.NoDupes) != 0)
 			{
