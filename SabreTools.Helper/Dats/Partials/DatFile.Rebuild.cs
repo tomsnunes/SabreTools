@@ -305,7 +305,7 @@ namespace SabreTools.Helper.Dats
 					return rebuilt;
 				}
 
-				logger.User("Matches found for '" + file + "', rebuilding accordingly...");
+				logger.User("Matches found for '" + Style.GetFileName(file) + "', rebuilding accordingly...");
 				rebuilt = true;
 
 				// Now loop through the list and rebuild accordingly
@@ -391,7 +391,7 @@ namespace SabreTools.Helper.Dats
 					item.Machine.Description = machinename;
 				}
 
-				logger.User("No matches found for '" + file + "', rebuilding accordingly from inverse flag...");
+				logger.User("No matches found for '" + Style.GetFileName(file) + "', rebuilding accordingly from inverse flag...");
 
 				// Now rebuild to the output file
 				switch (outputFormat)
@@ -469,7 +469,7 @@ namespace SabreTools.Helper.Dats
 								return rebuilt;
 							}
 
-							logger.User("Headerless matches found for '" + file + "', rebuilding accordingly...");
+							logger.User("Headerless matches found for '" + Style.GetFileName(file) + "', rebuilding accordingly...");
 							rebuilt = true;
 
 							// Now loop through the list and rebuild accordingly
