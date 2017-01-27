@@ -217,7 +217,7 @@ namespace SabreTools.Helper.Dats
 						List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 						foreach (string entry in extracted)
 						{
-							Rom rom = FileTools.GetFileInfo(entry, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
+							Rom rom = FileTools.GetFileInfo(entry, logger, noMD5: quickScan, noSHA1: quickScan);
 							usedInternally &= RebuildToOutputIndividual(rom, entry, outDir, tempSubDir, date, inverse, outputFormat,
 								romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
 						}
@@ -225,7 +225,7 @@ namespace SabreTools.Helper.Dats
 					// Otherwise, just get the info on the file itself
 					else if (File.Exists(file))
 					{
-						Rom rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
+						Rom rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan);
 						usedExternally = RebuildToOutputIndividual(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
 							romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
 					}
@@ -476,17 +476,20 @@ namespace SabreTools.Helper.Dats
 							foreach (Rom item in dupes)
 							{
 								// Create a headered item to use as well
-								Rom headeredItem = (Rom)item.Clone();
-								headeredItem.Name += "_" + headeredItem.CRC;
+								rom.Machine = item.Machine;
+								rom.Name += "_" + rom.CRC;
 
 								switch (outputFormat)
 								{
 									case OutputFormat.Folder:
 										string outfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(item.Machine.Name), item.Name);
-										string headeredOutfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(headeredItem.Machine.Name), headeredItem.Name);
+										string headeredOutfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.Machine.Name), rom.Name);
 
 										// Make sure the output folder is created
 										Directory.CreateDirectory(Path.GetDirectoryName(outfile));
+
+										// If either copy succeeds, then we want to set rebuilt to true
+										bool eitherSuccess = false;
 
 										// Now copy the files over
 										try
@@ -497,23 +500,28 @@ namespace SabreTools.Helper.Dats
 												File.SetCreationTime(outfile, DateTime.Parse(item.Date));
 											}
 
+											eitherSuccess |= true;
+										}
+										catch { }
+										try
+										{
 											File.Copy(file, headeredOutfile);
-											if (date && !String.IsNullOrEmpty(headeredItem.Date))
+											if (date && !String.IsNullOrEmpty(rom.Date))
 											{
-												File.SetCreationTime(outfile, DateTime.Parse(headeredItem.Date));
+												File.SetCreationTime(outfile, DateTime.Parse(rom.Date));
 											}
 
-											rebuilt &= true;
+											eitherSuccess |= true;
 										}
-										catch
-										{
-											rebuilt = false;
-										}
+										catch { }
+
+										// Now add the success of either rebuild
+										rebuilt &= eitherSuccess;
 
 										break;
 									case OutputFormat.TapeArchive:
 										rebuilt &= ArchiveTools.WriteTAR(file + ".new", outDir, item, logger, date: date);
-										rebuilt &= ArchiveTools.WriteTAR(file, outDir, headeredItem, logger, date: date);
+										rebuilt &= ArchiveTools.WriteTAR(file, outDir, rom, logger, date: date);
 										break;
 									case OutputFormat.Torrent7Zip:
 										break;
@@ -529,7 +537,7 @@ namespace SabreTools.Helper.Dats
 										break;
 									case OutputFormat.TorrentZip:
 										rebuilt &= ArchiveTools.WriteTorrentZip(file + ".new", outDir, item, logger, date: date);
-										rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, headeredItem, logger, date: date);
+										rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, rom, logger, date: date);
 										break;
 								}
 							}
