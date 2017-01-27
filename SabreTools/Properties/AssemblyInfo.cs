@@ -7,12 +7,12 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("SabreTools")]
 [assembly: AssemblyDescription("DAT manipulation toolset")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyConfiguration(String.Empty)]
+[assembly: AssemblyCompany(String.Empty)]
 [assembly: AssemblyProduct("SabreTools")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyTrademark(String.Empty)]
+[assembly: AssemblyCulture(String.Empty)]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

@@ -109,8 +109,8 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		public Machine()
 		{
-			_name = "";
-			_description = "";
+			_name = String.Empty;
+			_description = String.Empty;
 			_runnable = true;
 		}
 

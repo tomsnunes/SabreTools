@@ -93,8 +93,8 @@ namespace SabreTools
 				onlyNeeded = false;
 
 			// User inputs
-			string newdat ="",
-				outdat = "";
+			string newdat =String.Empty,
+				outdat = String.Empty;
 			List<string> inputs = new List<string>();
 
 			// Determine which switches are enabled (with values if necessary)
@@ -178,7 +178,7 @@ namespace SabreTools
 						outdat = args[i];
 						break;
 					default:
-						string temparg = args[i].Replace("\"", "").Replace("file://", "");
+						string temparg = args[i].Replace(""", String.Empty).Replace("file://", String.Empty);
 
 						if (temparg.StartsWith("-") && temparg.Contains("="))
 						{
@@ -186,7 +186,7 @@ namespace SabreTools
 							string[] split = temparg.Split('=');
 							if (split[1] == null)
 							{
-								split[1] = "";
+								split[1] = String.Empty;
 							}
 
 							switch (split[0])

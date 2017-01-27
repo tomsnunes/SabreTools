@@ -655,7 +655,7 @@ namespace SabreTools.Helper.Dats
 			// Now output the fixdat to the main folder
 			if (found)
 			{
-				matched.WriteToFile("", logger, stats: true);
+				matched.WriteToFile(String.Empty, logger, stats: true);
 			}
 			else
 			{

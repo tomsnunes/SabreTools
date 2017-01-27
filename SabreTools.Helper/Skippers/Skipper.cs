@@ -55,11 +55,11 @@ namespace SabreTools.Helper.Skippers
 		/// </summary>
 		public Skipper()
 		{
-			Name = "";
-			Author = "";
-			Version = "";
+			Name = String.Empty;
+			Author = String.Empty;
+			Version = String.Empty;
 			Rules = new List<SkipperRule>();
-			SourceFile = "";
+			SourceFile = String.Empty;
 		}
 
 		/// <summary>

@@ -44,7 +44,7 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		public Disk()
 		{
-			_name = "";
+			_name = String.Empty;
 			_itemType = ItemType.Disk;
 			_dupeType = 0x00;
 			_itemStatus = ItemStatus.None;

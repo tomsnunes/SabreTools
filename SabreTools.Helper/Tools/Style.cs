@@ -67,16 +67,16 @@ namespace SabreTools.Helper.Tools
 		public static string CleanHashData(string hash, int padding)
 		{
 			// First get the hash to the correct length
-			hash = (String.IsNullOrEmpty(hash) ? "" : hash.Trim());
+			hash = (String.IsNullOrEmpty(hash) ? String.Empty : hash.Trim());
 			hash = (hash.StartsWith("0x") ? hash.Remove(0, 2) : hash);
-			hash = (hash == "-" ? "" : hash);
-			hash = (String.IsNullOrEmpty(hash) ? "" : hash.PadLeft(padding, '0'));
+			hash = (hash == "-" ? String.Empty : hash);
+			hash = (String.IsNullOrEmpty(hash) ? String.Empty : hash.PadLeft(padding, '0'));
 			hash = hash.ToLowerInvariant();
 
 			// Then make sure that it has the correct characters
 			if (!Regex.IsMatch(hash, "[0-9a-f]{" + padding + "}"))
 			{
-				hash = "";
+				hash = String.Empty;
 			}
 
 			return hash;
@@ -418,15 +418,15 @@ namespace SabreTools.Helper.Tools
 		{
 			// Preprocess the string
 			s = s.Trim();
-			s = Regex.Replace(s, @"^\S* \(", ""); // Remove item identifier and opening brace
-			s = Regex.Replace(s, @"\)\S*#.*$", ""); // Remove trailing comments
+			s = Regex.Replace(s, @"^\S* \(", String.Empty); // Remove item identifier and opening brace
+			s = Regex.Replace(s, @"\)\S*#.*$", String.Empty); // Remove trailing comments
 			s = s.TrimEnd(')'); // Remove closing brace
 			s = s.Trim(); // Remove leading and trailing whitespace
 
 			// Now we get each string, divided up as cleanly as possible
 			string[] matches = Regex
-				//.Matches(s, @"([^\s]*""[^""]+""[^\s]*)|[^""]?\w+[^""]?")
-				.Matches(s, @"[^\s""]+|""[^""]*""")
+				//.Matches(s, @"([^\s]*String.Empty[^String.Empty]+String.Empty[^\s]*)|[^String.Empty]?\w+[^String.Empty]?")
+				.Matches(s, @"[^\sString.Empty]+|String.Empty[^String.Empty]*String.Empty")
 				.Cast<Match>()
 				.Select(m => m.Groups[0].Value)
 				.ToArray();
@@ -448,7 +448,7 @@ namespace SabreTools.Helper.Tools
 		{
 			if (s == null)
 			{
-				return "";
+				return String.Empty;
 			}
 
 			if (s.Contains("/"))
@@ -462,7 +462,7 @@ namespace SabreTools.Helper.Tools
 				return String.Join("\\", tempkey.Take(tempkey.Length - 1));
 			}
 
-			return "";
+			return String.Empty;
 		}
 
 		/// <summary>
@@ -475,7 +475,7 @@ namespace SabreTools.Helper.Tools
 		{
 			if (s == null)
 			{
-				return "";
+				return String.Empty;
 			}
 
 			if (s.Contains("/"))
@@ -575,14 +575,14 @@ namespace SabreTools.Helper.Tools
 					{ "Й", "J" }, { "К", "K" }, { "Л", "L" }, { "М", "M" }, { "Н", "N" },
 					{ "О", "O" }, { "П", "P" }, { "Р", "R" }, { "С", "S" }, { "Т", "T" },
 					{ "У", "U" }, { "Ф", "f" }, { "Х", "Kh" }, { "Ц", "Ts" }, { "Ч", "Ch" },
-					{ "Ш", "Sh" }, { "Щ", "Sch" }, { "Ъ", "" }, { "Ы", "y" }, { "Ь", "" },
+					{ "Ш", "Sh" }, { "Щ", "Sch" }, { "Ъ", String.Empty }, { "Ы", "y" }, { "Ь", String.Empty },
 					{ "Э", "e" }, { "Ю", "yu" }, { "Я", "ya" }, { "а", "a" }, { "б", "b" },
 					{ "в", "v" }, { "г", "g" }, { "д", "d" }, { "е", "e" }, { "ё", "yo" },
 					{ "ж", "zh" }, { "з", "z" }, { "и", "i" }, { "й", "j" }, { "к", "k" },
 					{ "л", "l" }, { "м", "m" }, { "н", "n" }, { "о", "o" }, { "п", "p" },
 					{ "р", "r" }, { "с", "s" }, { "т", "t" }, { "у", "u" }, { "ф", "f" },
 					{ "х", "kh" }, { "ц", "ts" }, { "ч", "ch" }, { "ш", "sh" }, { "щ", "sch" },
-					{ "ъ", "" }, { "ы", "y" }, { "ь", "" }, { "э", "e" }, { "ю", "yu" },
+					{ "ъ", String.Empty }, { "ы", "y" }, { "ь", String.Empty }, { "э", "e" }, { "ю", "yu" },
 					{ "я", "ya" },
 			};
 
@@ -715,7 +715,7 @@ namespace SabreTools.Helper.Tools
 		{
 			if (hexString.Contains("-"))
 			{
-				hexString = hexString.Replace("-", "");
+				hexString = hexString.Replace("-", String.Empty);
 			}
 
 			StringBuilder sb = new StringBuilder();
@@ -734,7 +734,7 @@ namespace SabreTools.Helper.Tools
 		/// </summary>
 		public static string ConvertAsciiToHex(string asciiString)
 		{
-			string hexOutput = "";
+			string hexOutput = String.Empty;
 			foreach (char _eachChar in asciiString.ToCharArray())
 			{
 				// Get the integral value of the character.

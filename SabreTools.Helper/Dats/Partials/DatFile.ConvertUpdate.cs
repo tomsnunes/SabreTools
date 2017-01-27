@@ -152,7 +152,7 @@ namespace SabreTools.Helper.Dats
 			logger.User("Initializing all output DATs");
 
 			// Default vars for use
-			string post = "";
+			string post = String.Empty;
 			DatFile outerDiffData = new DatFile();
 			DatFile dupeData = new DatFile();
 
@@ -313,7 +313,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="logger">Logging object for console and file output</param>
 		public void DiffCascade(string outDir, bool inplace, List<string> inputs, List<DatFile> datHeaders, bool skip, Logger logger)
 		{
-			string post = "";
+			string post = String.Empty;
 
 			// Create a list of DatData objects representing output files
 			List<DatFile> outDats = new List<DatFile>();
@@ -381,7 +381,7 @@ namespace SabreTools.Helper.Dats
 			for (int j = (skip ? 1 : 0); j < inputs.Count; j++)
 			{
 				// If we have an output directory set, replace the path
-				string path = "";
+				string path = String.Empty;
 				if (inplace)
 				{
 					path = Path.GetDirectoryName(inputs[j].Split('¬')[0]);
@@ -425,7 +425,7 @@ namespace SabreTools.Helper.Dats
 						string filename = inputs[newrom.SystemID].Split('¬')[0];
 						string rootpath = inputs[newrom.SystemID].Split('¬')[1];
 
-						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
+						rootpath += (rootpath == String.Empty ? String.Empty : Path.DirectorySeparatorChar.ToString());
 						filename = filename.Remove(0, rootpath.Length);
 						newrom.Machine.Name = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
 							+ Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar
@@ -470,7 +470,7 @@ namespace SabreTools.Helper.Dats
 				inputFileName =>
 				{
 					// Clean the input string
-					if (inputFileName != "")
+					if (inputFileName != String.Empty)
 					{
 						inputFileName = Path.GetFullPath(inputFileName);
 					}
@@ -478,7 +478,7 @@ namespace SabreTools.Helper.Dats
 					if (File.Exists(inputFileName))
 					{
 						DatFile innerDatdata = new DatFile(this);
-						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
+						logger.User("Processing "" + Path.GetFileName(inputFileName) + """);
 						innerDatdata.Parse(inputFileName, 0, 0, filter, splitType, trim, single,
 							root, logger, true, clean, softlist,
 							keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
@@ -486,7 +486,7 @@ namespace SabreTools.Helper.Dats
 						// If we have roms, output them
 						if (innerDatdata.Count != 0)
 						{
-							innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), logger, overwrite: (outDir != ""));
+							innerDatdata.WriteToFile((outDir == String.Empty ? Path.GetDirectoryName(inputFileName) : outDir), logger, overwrite: (outDir != String.Empty));
 						}
 					}
 					else if (Directory.Exists(inputFileName))
@@ -497,7 +497,7 @@ namespace SabreTools.Helper.Dats
 							new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 							file =>
 							{
-								logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
+								logger.User("Processing "" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + """);
 								DatFile innerDatdata = new DatFile(this);
 								innerDatdata.Parse(file, 0, 0, filter, splitType,
 									trim, single, root, logger, true, clean, softlist,
@@ -506,7 +506,7 @@ namespace SabreTools.Helper.Dats
 								// If we have roms, output them
 								if (innerDatdata.Count > 0)
 								{
-									innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outDir != ""));
+									innerDatdata.WriteToFile((outDir == String.Empty ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outDir != String.Empty));
 								}
 							});
 					}

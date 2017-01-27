@@ -116,7 +116,7 @@ namespace SabreTools
 			long sgt = -1,
 				slt = -1,
 				seq = -1;
-			string addext = "",
+			string addext = String.Empty,
 				author = null,
 				category = null,
 				comment = null,
@@ -126,19 +126,19 @@ namespace SabreTools
 				exta = null,
 				extb = null,
 				filename = null,
-				forcemerge = "",
-				forcend = "",
-				forcepack = "",
+				forcemerge = String.Empty,
+				forcend = String.Empty,
+				forcepack = String.Empty,
 				header = null,
 				homepage = null,
 				name = null,
-				outDir = "",
-				postfix = "",
-				prefix = "",
-				repext = "",
-				root = "",
+				outDir = String.Empty,
+				postfix = String.Empty,
+				prefix = String.Empty,
+				repext = String.Empty,
+				root = String.Empty,
 				rootdir = null,
-				tempDir = "",
+				tempDir = String.Empty,
 				url = null,
 				version = null;
 			List<string> crc = new List<string>();
@@ -722,7 +722,7 @@ namespace SabreTools
 						}
 						break;
 					default:
-						string temparg = args[i].Replace("\"", "").Replace("file://", "");
+						string temparg = args[i].Replace("\"", String.Empty).Replace("file://", String.Empty);
 
 						if (temparg.StartsWith("-") && temparg.Contains("="))
 						{
@@ -730,7 +730,7 @@ namespace SabreTools
 							string[] split = temparg.Split('=');
 							if (split[1] == null)
 							{
-								split[1] = "";
+								split[1] = String.Empty;
 							}
 
 							switch (split[0])

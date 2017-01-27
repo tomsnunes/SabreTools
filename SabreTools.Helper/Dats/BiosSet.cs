@@ -34,7 +34,7 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		public BiosSet()
 		{
-			_name = "";
+			_name = String.Empty;
 			_itemType = ItemType.BiosSet;
 		}
 

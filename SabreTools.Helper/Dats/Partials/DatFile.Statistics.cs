@@ -133,7 +133,7 @@ namespace SabreTools.Helper.Dats
 			logger.User(results);
 
 			// Now write it out to file as well
-			string line = "";
+			string line = String.Empty;
 			if (outputs.ContainsKey(StatDatFormat.None))
 			{
 				line = @"'" + FileName + @"':
@@ -158,22 +158,22 @@ namespace SabreTools.Helper.Dats
 			}
 			if (outputs.ContainsKey(StatDatFormat.CSV))
 			{
-				line = "\"" + FileName + "\","
-						+ "\"" + TotalSize + "\","
-						+ "\"" + (game == -1 ? Count : game) + "\","
-						+ "\"" + RomCount + "\","
-						+ "\"" + DiskCount + "\","
-						+ "\"" + CRCCount + "\","
-						+ "\"" + MD5Count + "\","
-						+ "\"" + SHA1Count + "\"";
+				line = """ + FileName + "\","
+						+ """ + TotalSize + "\","
+						+ """ + (game == -1 ? Count : game) + "\","
+						+ """ + RomCount + "\","
+						+ """ + DiskCount + "\","
+						+ """ + CRCCount + "\","
+						+ """ + MD5Count + "\","
+						+ """ + SHA1Count + """;
 
 				if (baddumpCol)
 				{
-					line += ",\"" + BaddumpCount + "\"";
+					line += ","" + BaddumpCount + """;
 				}
 				if (nodumpCol)
 				{
-					line += ",\"" + NodumpCount + "\"";
+					line += ","" + NodumpCount + """;
 				}
 
 				line += "\n";
@@ -206,22 +206,22 @@ namespace SabreTools.Helper.Dats
 			}
 			if (outputs.ContainsKey(StatDatFormat.TSV))
 			{
-				line = "\"" + FileName + "\"\t"
-						+ "\"" + TotalSize + "\"\t"
-						+ "\"" + (game == -1 ? Count : game) + "\"\t"
-						+ "\"" + RomCount + "\"\t"
-						+ "\"" + DiskCount + "\"\t"
-						+ "\"" + CRCCount + "\"\t"
-						+ "\"" + MD5Count + "\"\t"
-						+ "\"" + SHA1Count + "\"";
+				line = """ + FileName + "\"\t"
+						+ """ + TotalSize + "\"\t"
+						+ """ + (game == -1 ? Count : game) + "\"\t"
+						+ """ + RomCount + "\"\t"
+						+ """ + DiskCount + "\"\t"
+						+ """ + CRCCount + "\"\t"
+						+ """ + MD5Count + "\"\t"
+						+ """ + SHA1Count + """;
 
 				if (baddumpCol)
 				{
-					line += "\t\"" + BaddumpCount + "\"";
+					line += "\t"" + BaddumpCount + """;
 				}
 				if (nodumpCol)
 				{
-					line += "\t\"" + NodumpCount + "\"";
+					line += "\t"" + NodumpCount + """;
 				}
 
 				line += "\n";
@@ -530,8 +530,8 @@ Please check the log folder if the stats scrolled offscreen", false);
 			}
 			if (outputs.ContainsKey(StatDatFormat.CSV))
 			{
-				outputs[StatDatFormat.CSV].Write("\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\""
-					+ (baddumpCol ? ",\"BadDumps\"" : "") + (nodumpCol ? ",\"Nodumps\"" : "") + "\n");
+				outputs[StatDatFormat.CSV].Write("\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1""
+					+ (baddumpCol ? ",\"BadDumps"" : String.Empty) + (nodumpCol ? ",\"Nodumps"" : String.Empty) + "\n");
 			}
 			if (outputs.ContainsKey(StatDatFormat.HTML))
 			{
@@ -553,13 +553,13 @@ Please check the log folder if the stats scrolled offscreen", false);
 	</header>
 	<body>
 		<h2>DAT Statistics Report (" + DateTime.Now.ToShortDateString() + @")</h2>
-		<table border=""1"" cellpadding=""5"" cellspacing=""0"">
+		<table border=String.Empty1String.Empty cellpadding=String.Empty5String.Empty cellspacing=String.Empty0String.Empty>
 ");
 			}
 			if (outputs.ContainsKey(StatDatFormat.TSV))
 			{
-				outputs[StatDatFormat.TSV].Write("\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\""
-						+ (baddumpCol ? "\t\"BadDumps\"" : "") + (nodumpCol ? "\t\"Nodumps\"" : "") + "\n");
+				outputs[StatDatFormat.TSV].Write("\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1""
+						+ (baddumpCol ? "\t\"BadDumps"" : String.Empty) + (nodumpCol ? "\t\"Nodumps"" : String.Empty) + "\n");
 			}
 
 			// Now write the mid header for those who need it
@@ -585,9 +585,9 @@ Please check the log folder if the stats scrolled offscreen", false);
 			}
 			if (outputs.ContainsKey(StatDatFormat.HTML))
 			{
-				outputs[StatDatFormat.HTML].Write(@"			<tr bgcolor=""gray""><th>File Name</th><th align=""right"">Total Size</th><th align=""right"">Games</th><th align=""right"">Roms</th>"
-+ @"<th align=""right"">Disks</th><th align=""right"">&#35; with CRC</th><th align=""right"">&#35; with MD5</th><th align=""right"">&#35; with SHA-1</th>"
-+ (baddumpCol ? "<th class=\".right\">Baddumps</th>" : "") + (nodumpCol ? "<th class=\".right\">Nodumps</th>" : "") + "</tr>\n");
+				outputs[StatDatFormat.HTML].Write(@"			<tr bgcolor=String.EmptygrayString.Empty><th>File Name</th><th align=String.EmptyrightString.Empty>Total Size</th><th align=String.EmptyrightString.Empty>Games</th><th align=String.EmptyrightString.Empty>Roms</th>"
++ @"<th align=String.EmptyrightString.Empty>Disks</th><th align=String.EmptyrightString.Empty>&#35; with CRC</th><th align=String.EmptyrightString.Empty>&#35; with MD5</th><th align=String.EmptyrightString.Empty>&#35; with SHA-1</th>"
++ (baddumpCol ? "<th class=\".right\">Baddumps</th>" : String.Empty) + (nodumpCol ? "<th class=\".right\">Nodumps</th>" : String.Empty) + "</tr>\n");
 			}
 			if (outputs.ContainsKey(StatDatFormat.TSV))
 			{
@@ -614,7 +614,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			}
 			if (outputs.ContainsKey(StatDatFormat.HTML))
 			{
-				outputs[StatDatFormat.HTML].Write("<tr><td colspan=\""
+				outputs[StatDatFormat.HTML].Write("<tr><td colspan=""
 						+ (baddumpCol && nodumpCol
 							? "11"
 							: (baddumpCol ^ nodumpCol
@@ -648,7 +648,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			}
 			if (outputs.ContainsKey(StatDatFormat.HTML))
 			{
-				outputs[StatDatFormat.HTML].Write("<tr border=\"0\"><td colspan=\""
+				outputs[StatDatFormat.HTML].Write("<tr border=\"0\"><td colspan=""
 						+ (baddumpCol && nodumpCol
 							? "11"
 							: (baddumpCol ^ nodumpCol

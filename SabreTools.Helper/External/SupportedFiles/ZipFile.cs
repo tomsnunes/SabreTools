@@ -49,7 +49,7 @@ namespace ROMVault2.SupportedFiles.Zip
 
 		public string ZipFilename
 		{
-			get { return (_zipFileInfo != null ? _zipFileInfo.FullName : ""); }
+			get { return (_zipFileInfo != null ? _zipFileInfo.FullName : String.Empty); }
 		}
 		public long TimeStamp
 		{
@@ -944,7 +944,7 @@ namespace ROMVault2.SupportedFiles.Zip
 			switch (zr)
 			{
 				case ZipReturn.ZipGood:
-					ret = "";
+					ret = String.Empty;
 					break;
 				case ZipReturn.ZipFileCountError:
 					ret = "The number of file in the Zip does not mach the number of files in the Zips Centeral Directory";

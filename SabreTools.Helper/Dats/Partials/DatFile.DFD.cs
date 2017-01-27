@@ -52,14 +52,14 @@ namespace SabreTools.Helper.Dats
 			// If the name is defined but not the description, set the description from the name
 			else if (!String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
 			{
-				Description = Name + (bare ? "" : " (" + Date + ")");
+				Description = Name + (bare ? String.Empty : " (" + Date + ")");
 			}
 
 			// If neither the name or description are defined, set them from the automatic values
 			else if (String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
 			{
 				Name = basePath.Split(Path.DirectorySeparatorChar).Last();
-				Description = Name + (bare ? "" : " (" + Date + ")");
+				Description = Name + (bare ? String.Empty : " (" + Date + ")");
 			}
 
 			// Process the input
@@ -107,8 +107,8 @@ namespace SabreTools.Helper.Dats
 								string fulldir = Path.GetFullPath(dir);
 
 								// Set the temporary variables
-								string gamename = "";
-								string romname = "";
+								string gamename = String.Empty;
+								string romname = String.Empty;
 
 								// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
 								if (Type == "SuperDAT")
@@ -249,7 +249,7 @@ namespace SabreTools.Helper.Dats
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(newItem))
 				{
-					PopulateFromDirProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, headerToCheckAgainst, logger);
+					PopulateFromDirProcessFile(newItem, String.Empty, newBasePath, noMD5, noSHA1, addDate, headerToCheckAgainst, logger);
 				}
 			}
 			// Otherwise, attempt to extract the files to the temporary directory
@@ -274,7 +274,7 @@ namespace SabreTools.Helper.Dats
 							PopulateFromDirProcessFile(entry,
 								Path.Combine((Type == "SuperDAT"
 									? (Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length)
-									: ""),
+									: String.Empty),
 								Path.GetFileNameWithoutExtension(item)),
 								tempSubDir,
 								noMD5,
@@ -287,7 +287,7 @@ namespace SabreTools.Helper.Dats
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(newItem))
 				{
-					PopulateFromDirProcessFile(newItem, "", newBasePath, noMD5, noSHA1, addDate, headerToCheckAgainst, logger);
+					PopulateFromDirProcessFile(newItem, String.Empty, newBasePath, noMD5, noSHA1, addDate, headerToCheckAgainst, logger);
 				}
 			}
 
@@ -342,7 +342,7 @@ namespace SabreTools.Helper.Dats
 				return;
 			}
 
-			string key = "";
+			string key = String.Empty;
 			if (datItem.Type == ItemType.Rom)
 			{
 				key = ((Rom)datItem).Size + "-" + ((Rom)datItem).CRC;
@@ -367,11 +367,11 @@ namespace SabreTools.Helper.Dats
 				item = Path.GetFullPath(item);
 
 				// Get the data to be added as game and item names
-				string gamename = "";
-				string romname = "";
+				string gamename = String.Empty;
+				string romname = String.Empty;
 
 				// If the parent is blank, then we have a non-archive file
-				if (parent == "")
+				if (parent == String.Empty)
 				{
 					// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
 					if (Type == "SuperDAT")

@@ -42,14 +42,14 @@ namespace NaturalSort
 			string[] x1, y1;
 			if (!table.TryGetValue(x, out x1))
 			{
-				//x1 = Regex.Split(x.Replace(" ", ""), "([0-9]+)");
-				x1 = Regex.Split(x, "([0-9]+)").Where(s => s != "").ToArray();
+				//x1 = Regex.Split(x.Replace(" ", String.Empty), "([0-9]+)");
+				x1 = Regex.Split(x, "([0-9]+)").Where(s => s != String.Empty).ToArray();
 				table.Add(x, x1);
 			}
 			if (!table.TryGetValue(y, out y1))
 			{
-				//y1 = Regex.Split(y.Replace(" ", ""), "([0-9]+)");
-				y1 = Regex.Split(y, "([0-9]+)").Where(s => s != "").ToArray();
+				//y1 = Regex.Split(y.Replace(" ", String.Empty), "([0-9]+)");
+				y1 = Regex.Split(y, "([0-9]+)").Where(s => s != String.Empty).ToArray();
 				table.Add(y, y1);
 			}
 

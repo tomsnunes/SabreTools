@@ -247,7 +247,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Get the correct dictionary based on what is available
-			string key = "";
+			string key = String.Empty;
 			if (_itemType == ItemType.Rom && ((Rom)this).CRC != null)
 			{
 				key = ((Rom)this).CRC;
@@ -322,7 +322,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Get the correct dictionary based on what is available
-			string key = "";
+			string key = String.Empty;
 			if (_itemType == ItemType.Rom && ((Rom)this).CRC != null)
 			{
 				key = ((Rom)this).CRC;
