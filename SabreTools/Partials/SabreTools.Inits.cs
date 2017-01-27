@@ -789,8 +789,9 @@ namespace SabreTools
 		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">Input directories to compare against</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="hashOnly">True if only hashes should be checked, false for full file information</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		private static void InitVerify(List<string> datfiles, List<string> inputs, string tempDir, string headerToCheckAgainst)
+		private static void InitVerify(List<string> datfiles, List<string> inputs, string tempDir, bool hashOnly, string headerToCheckAgainst)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
@@ -806,7 +807,7 @@ namespace SabreTools
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			datdata.VerifyDirectory(inputs, tempDir, headerToCheckAgainst, _logger);
+			datdata.VerifyDirectory(inputs, tempDir, hashOnly, headerToCheckAgainst, _logger);
 		}
 
 		#endregion

@@ -901,6 +901,11 @@ Options:
 			(inside the running folder) is not preferred. This is used for any operations that
 			require an archive to be extracted.
 			
+		-ho, --hash-only	Check files by hash only
+			This sets a mode where files are not checked based on name but rather hash alone.
+			This allows verification of (possibly) incorrectly named folders and sets to be
+			verified without worrying about the proper set structure to be there.
+			
 		-h=, --header=		Remove headers from hash calculations
 			If this is set, then all files that have copier headers that are detected will
 			have them removed from the hash calculation. This will allow for a headered collection

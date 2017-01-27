@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Skippers;
 using SabreTools.Helper.Tools;
-using SharpCompress.Common;
 
 #if MONO
 using System.IO;
@@ -468,13 +466,13 @@ namespace SabreTools.Helper.Dats
 		/// <summary>
 		/// Process the DAT and verify the output directory
 		/// </summary>
-		/// <param name="datFile">DAT to use to verify the directory</param>
 		/// <param name="inputs">List of input directories to compare against</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="hashOnly">True if only hashes should be checked, false for full file information</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if verification was a success, false otherwise</returns>
-		public bool VerifyDirectory(List<string> inputs, string tempDir, string headerToCheckAgainst, Logger logger)
+		public bool VerifyDirectory(List<string> inputs, string tempDir, bool hashOnly, string headerToCheckAgainst, Logger logger)
 		{
 			// First create or clean the temp directory
 			if (!Directory.Exists(tempDir))
@@ -509,18 +507,41 @@ namespace SabreTools.Helper.Dats
 			matched.Description = "fixDat_" + matched.Description;
 			matched.DatFormat = DatFormat.Logiqx;
 
-			// Now that all files are parsed, get only files found in directory
+			// If we are checking hashes only, essentially diff the inputs
 			bool found = false;
-			foreach (string key in Keys)
+			if (hashOnly)
 			{
-				List<DatItem> roms = this[key];
-				List<DatItem> newroms = DatItem.Merge(roms, logger);
-				foreach (Rom rom in newroms)
+				// First we need to sort by hash to get duplicates
+				BucketBySHA1(true, logger, output: false);
+
+				// Then follow the same tactics as before
+				foreach (string key in Keys)
 				{
-					if (rom.SourceID == 99)
+					List<DatItem> roms = this[key];
+					foreach (Rom rom in roms)
 					{
-						found = true;
-						matched.Add(rom.Size + "-" + rom.CRC, rom);
+						if (rom.SourceID == 99)
+						{
+							found = true;
+							matched.Add(rom.Size + "-" + rom.CRC, rom);
+						}
+					}
+				}
+			}
+			// If we are checking full names, get only files found in directory
+			else
+			{
+				foreach (string key in Keys)
+				{
+					List<DatItem> roms = this[key];
+					List<DatItem> newroms = DatItem.Merge(roms, logger);
+					foreach (Rom rom in newroms)
+					{
+						if (rom.SourceID == 99)
+						{
+							found = true;
+							matched.Add(rom.Size + "-" + rom.CRC, rom);
+						}
 					}
 				}
 			}

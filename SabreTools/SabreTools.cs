@@ -78,6 +78,7 @@ namespace SabreTools
 				delete = false, // SimpleSort
 				enableGzip = false,
 				excludeOf = false,
+				hashOnly = false,
 				inplace = false,
 				inverse = false, // SimpleSort
 				merge = false,
@@ -305,6 +306,10 @@ namespace SabreTools
 					case "-gzf":
 					case "--gz-files":
 						enableGzip = true;
+						break;
+					case "-ho":
+					case "--hash-only":
+						hashOnly = true;
 						break;
 					case "-html":
 					case "--html":
@@ -1104,7 +1109,7 @@ namespace SabreTools
 			// If we're using the verifier
 			else if (verify)
 			{
-				InitVerify(datfiles, inputs, tempDir, header);
+				InitVerify(datfiles, inputs, tempDir, hashOnly, header);
 			}
 
 			// If nothing is set, show the help

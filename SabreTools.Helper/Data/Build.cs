@@ -379,6 +379,7 @@ namespace SabreTools.Helper.Data
 					helptext.Add("  -ve, --verify		Verify a folder against DATs");
 						helptext.Add("	-dat=			Input DAT to verify against");
 						helptext.Add("	-t=, --temp=		Set the temporary directory to use");
+						helptext.Add("	-ho, --hash-only	Check files by hash only");
 						helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
 
 					// Additional Notes
