@@ -306,12 +306,11 @@ namespace SabreTools.Helper.Dats
 				}
 
 				logger.User("Matches found for '" + file + "', rebuilding accordingly...");
+				rebuilt = true;
 
 				// Now loop through the list and rebuild accordingly
 				foreach (Rom item in dupes)
 				{
-					rebuilt = true;
-
 					switch (outputFormat)
 					{
 						case OutputFormat.Folder:
