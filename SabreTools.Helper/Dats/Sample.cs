@@ -13,7 +13,7 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		public Sample()
 		{
-			_name = String.Empty;
+			_name = "";
 			_itemType = ItemType.Sample;
 		}
 

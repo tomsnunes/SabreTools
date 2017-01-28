@@ -74,7 +74,7 @@ namespace SabreTools.Helper.Data
 					helptext.Add(barrier);
 					helptext.Add("Credits");
 					helptext.Add(barrier);
-					helptext.Add(String.Empty);
+					helptext.Add("");
 					helptext.Add("Programmer / Lead:	Matt Nadareski (darksabre76)");
 					helptext.Add("Additional code:	emuLOAD, @tractivo, motoschifo");
 					helptext.Add("Testing:		emuLOAD, @tractivo, Kludge, Obiwantje, edc");
@@ -86,7 +86,7 @@ namespace SabreTools.Helper.Data
 					helptext.Add(Resources.Resources.RombaSharp_Name + " - " + Resources.Resources.RombaSharp_Desc);
 					helptext.Add(barrier);
 					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.RombaSharp_Name + " [option] [filename|dirname] ...");
-					helptext.Add(String.Empty);
+					helptext.Add("");
 					helptext.Add("Options:");
 					helptext.Add("  -?, -h, --help	Show this help");
 
@@ -143,7 +143,7 @@ namespace SabreTools.Helper.Data
 					helptext.Add(Resources.Resources.SabreTools_Name + " - " + Resources.Resources.SabreTools_Desc);
 					helptext.Add(barrier);
 					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.SabreTools_Name + " [option] [filename|dirname] ...");
-					helptext.Add(String.Empty);
+					helptext.Add("");
 					helptext.Add("Options:");
 					helptext.Add("  -?, -h, --help	Show this help");
 					helptext.Add("  --script		Enable script mode (no clear screen)");
@@ -384,13 +384,13 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
 
 					// Additional Notes
-					helptext.Add(String.Empty);
+					helptext.Add("");
 					helptext.Add("Archive scanning levels:");
 						helptext.Add("  0	Hash archive and contents");
 						helptext.Add("  1	Only hash contents");
 						helptext.Add("  2	Only hash archive");
 
-					helptext.Add(String.Empty);
+					helptext.Add("");
 					helptext.Add("Filter parameters game name, rom name, CRC, MD5, SHA-1 can");
 						helptext.Add("do partial matches using asterisks as follows (case insensitive):");
 						helptext.Add("	*00 means ends with '00'");
@@ -398,11 +398,11 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	*00* means contains '00'");
 						helptext.Add("	00 means exactly equals '00'");
 
-					helptext.Add(String.Empty);
+					helptext.Add("");
 					helptext.Add("Filter parameters for size can use postfixes for inputs:");
 					helptext.Add("	e.g. 8kb => 8000 or 8kib => 8192");
 
-					helptext.Add(String.Empty);
+					helptext.Add("");
 					helptext.Add("Most of the filter parameters allow for multiple inputs:");
 					helptext.Add("	e.g. --game-name=foo --game-name=bar");
 					break;

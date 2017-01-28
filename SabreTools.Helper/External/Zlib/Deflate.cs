@@ -153,14 +153,14 @@ namespace Ionic.Zlib
 		{
 			"need dictionary",
 			"stream end",
-			String.Empty,
+			"",
 			"file error",
 			"stream error",
 			"data error",
 			"insufficient memory",
 			"buffer error",
 			"incompatible version",
-			String.Empty
+			""
 		};
 
 		// preset dictionary flag in zlib header

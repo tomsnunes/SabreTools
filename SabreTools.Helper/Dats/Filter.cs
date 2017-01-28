@@ -188,21 +188,21 @@ namespace SabreTools.Helper.Dats
 						{
 							if (crc.StartsWith("*") && crc.EndsWith("*"))
 							{
-								if (!rom.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", String.Empty)))
+								if (!rom.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", "")))
 								{
 									found = false;
 								}
 							}
 							else if (crc.StartsWith("*"))
 							{
-								if (!rom.CRC.EndsWith(crc.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+								if (!rom.CRC.EndsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 								{
 									found = false;
 								}
 							}
 							else if (crc.EndsWith("*"))
 							{
-								if (!rom.CRC.StartsWith(crc.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+								if (!rom.CRC.StartsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 								{
 									found = false;
 								}
@@ -230,21 +230,21 @@ namespace SabreTools.Helper.Dats
 					{
 						if (crc.StartsWith("*") && crc.EndsWith("*"))
 						{
-							if (rom.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", String.Empty)))
+							if (rom.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", "")))
 							{
 								found = false;
 							}
 						}
 						else if (crc.StartsWith("*"))
 						{
-							if (rom.CRC.EndsWith(crc.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+							if (rom.CRC.EndsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 							{
 								found = false;
 							}
 						}
 						else if (crc.EndsWith("*"))
 						{
-							if (rom.CRC.StartsWith(crc.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+							if (rom.CRC.StartsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 							{
 								found = false;
 							}
@@ -275,21 +275,21 @@ namespace SabreTools.Helper.Dats
 						{
 							if (md5.StartsWith("*") && md5.EndsWith("*"))
 							{
-								if (!rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", String.Empty)))
+								if (!rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
 								{
 									found = false;
 								}
 							}
 							else if (md5.StartsWith("*"))
 							{
-								if (!rom.MD5.EndsWith(md5.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+								if (!rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 								{
 									found = false;
 								}
 							}
 							else if (md5.EndsWith("*"))
 							{
-								if (!rom.MD5.StartsWith(md5.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+								if (!rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 								{
 									found = false;
 								}
@@ -317,21 +317,21 @@ namespace SabreTools.Helper.Dats
 					{
 						if (md5.StartsWith("*") && md5.EndsWith("*"))
 						{
-							if (rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", String.Empty)))
+							if (rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
 							{
 								found = false;
 							}
 						}
 						else if (md5.StartsWith("*"))
 						{
-							if (rom.MD5.EndsWith(md5.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+							if (rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 							{
 								found = false;
 							}
 						}
 						else if (md5.EndsWith("*"))
 						{
-							if (rom.MD5.StartsWith(md5.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+							if (rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 							{
 								found = false;
 							}
@@ -362,21 +362,21 @@ namespace SabreTools.Helper.Dats
 						{
 							if (sha1.StartsWith("*") && sha1.EndsWith("*"))
 							{
-								if (!rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", String.Empty)))
+								if (!rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
 								{
 									found = false;
 								}
 							}
 							else if (sha1.StartsWith("*"))
 							{
-								if (!rom.SHA1.EndsWith(sha1.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+								if (!rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 								{
 									found = false;
 								}
 							}
 							else if (sha1.EndsWith("*"))
 							{
-								if (!rom.SHA1.StartsWith(sha1.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+								if (!rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 								{
 									found = false;
 								}
@@ -404,21 +404,21 @@ namespace SabreTools.Helper.Dats
 					{
 						if (sha1.StartsWith("*") && sha1.EndsWith("*"))
 						{
-							if (rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", String.Empty)))
+							if (rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
 							{
 								found = false;
 							}
 						}
 						else if (sha1.StartsWith("*"))
 						{
-							if (rom.SHA1.EndsWith(sha1.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+							if (rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 							{
 								found = false;
 							}
 						}
 						else if (sha1.EndsWith("*"))
 						{
-							if (rom.SHA1.StartsWith(sha1.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+							if (rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 							{
 								found = false;
 							}
@@ -463,21 +463,21 @@ namespace SabreTools.Helper.Dats
 						{
 							if (md5.StartsWith("*") && md5.EndsWith("*"))
 							{
-								if (!rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", String.Empty)))
+								if (!rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
 								{
 									found = false;
 								}
 							}
 							else if (md5.StartsWith("*"))
 							{
-								if (!rom.MD5.EndsWith(md5.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+								if (!rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 								{
 									found = false;
 								}
 							}
 							else if (md5.EndsWith("*"))
 							{
-								if (!rom.MD5.StartsWith(md5.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+								if (!rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 								{
 									found = false;
 								}
@@ -505,21 +505,21 @@ namespace SabreTools.Helper.Dats
 					{
 						if (md5.StartsWith("*") && md5.EndsWith("*"))
 						{
-							if (rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", String.Empty)))
+							if (rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
 							{
 								found = false;
 							}
 						}
 						else if (md5.StartsWith("*"))
 						{
-							if (rom.MD5.EndsWith(md5.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+							if (rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 							{
 								found = false;
 							}
 						}
 						else if (md5.EndsWith("*"))
 						{
-							if (rom.MD5.StartsWith(md5.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+							if (rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 							{
 								found = false;
 							}
@@ -550,21 +550,21 @@ namespace SabreTools.Helper.Dats
 						{
 							if (sha1.StartsWith("*") && sha1.EndsWith("*"))
 							{
-								if (!rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", String.Empty)))
+								if (!rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
 								{
 									found = false;
 								}
 							}
 							else if (sha1.StartsWith("*"))
 							{
-								if (!rom.SHA1.EndsWith(sha1.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+								if (!rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 								{
 									found = false;
 								}
 							}
 							else if (sha1.EndsWith("*"))
 							{
-								if (!rom.SHA1.StartsWith(sha1.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+								if (!rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 								{
 									found = false;
 								}
@@ -592,21 +592,21 @@ namespace SabreTools.Helper.Dats
 					{
 						if (sha1.StartsWith("*") && sha1.EndsWith("*"))
 						{
-							if (rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", String.Empty)))
+							if (rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
 							{
 								found = false;
 							}
 						}
 						else if (sha1.StartsWith("*"))
 						{
-							if (rom.SHA1.EndsWith(sha1.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+							if (rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 							{
 								found = false;
 							}
 						}
 						else if (sha1.EndsWith("*"))
 						{
-							if (rom.SHA1.StartsWith(sha1.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+							if (rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 							{
 								found = false;
 							}
@@ -636,21 +636,21 @@ namespace SabreTools.Helper.Dats
 				{
 					if (name.StartsWith("*") && name.EndsWith("*"))
 					{
-						if (!item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", String.Empty)))
+						if (!item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", "")))
 						{
 							found = false;
 						}
 					}
 					else if (name.StartsWith("*"))
 					{
-						if (!item.Machine.Name.EndsWith(name.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+						if (!item.Machine.Name.EndsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 						{
 							found = false;
 						}
 					}
 					else if (name.EndsWith("*"))
 					{
-						if (!item.Machine.Name.StartsWith(name.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+						if (!item.Machine.Name.StartsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 						{
 							found = false;
 						}
@@ -677,21 +677,21 @@ namespace SabreTools.Helper.Dats
 				{
 					if (name.StartsWith("*") && name.EndsWith("*"))
 					{
-						if (item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", String.Empty)))
+						if (item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", "")))
 						{
 							found = false;
 						}
 					}
 					else if (name.StartsWith("*"))
 					{
-						if (item.Machine.Name.EndsWith(name.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+						if (item.Machine.Name.EndsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 						{
 							found = false;
 						}
 					}
 					else if (name.EndsWith("*"))
 					{
-						if (item.Machine.Name.StartsWith(name.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+						if (item.Machine.Name.StartsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 						{
 							found = false;
 						}
@@ -720,21 +720,21 @@ namespace SabreTools.Helper.Dats
 				{
 					if (name.StartsWith("*") && name.EndsWith("*"))
 					{
-						if (!item.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", String.Empty)))
+						if (!item.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", "")))
 						{
 							found = false;
 						}
 					}
 					else if (name.StartsWith("*"))
 					{
-						if (!item.Name.EndsWith(name.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+						if (!item.Name.EndsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 						{
 							found = false;
 						}
 					}
 					else if (name.EndsWith("*"))
 					{
-						if (!item.Name.StartsWith(name.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+						if (!item.Name.StartsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 						{
 							found = false;
 						}
@@ -761,21 +761,21 @@ namespace SabreTools.Helper.Dats
 				{
 					if (name.StartsWith("*") && name.EndsWith("*"))
 					{
-						if (item.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", String.Empty)))
+						if (item.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", "")))
 						{
 							found = false;
 						}
 					}
 					else if (name.StartsWith("*"))
 					{
-						if (item.Name.EndsWith(name.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+						if (item.Name.EndsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 						{
 							found = false;
 						}
 					}
 					else if (name.EndsWith("*"))
 					{
-						if (item.Name.StartsWith(name.Replace("*", String.Empty), StringComparison.InvariantCultureIgnoreCase))
+						if (item.Name.StartsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
 						{
 							found = false;
 						}

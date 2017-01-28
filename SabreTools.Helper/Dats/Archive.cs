@@ -12,7 +12,7 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		public Archive()
 		{
-			_name = String.Empty;
+			_name = "";
 			_itemType = ItemType.Archive;
 		}
 

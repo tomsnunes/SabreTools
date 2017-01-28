@@ -73,9 +73,9 @@ namespace SabreTools
 					if (onlyNeeded)
 					{
 						string query = "SELECT * FROM crcsha1 JOIN md5sha1 ON crcsha1.sha1=md5sha1.sha1"
-									+ " WHERE crcsha1.crc="" + rom.CRC + """
-									+ " OR md5sha1.md5="" + rom.MD5 + """
-									+ " OR md5sha1.sha1="" + rom.SHA1 + """;
+									+ " WHERE crcsha1.crc=\"" + rom.CRC + "\""
+									+ " OR md5sha1.md5=\"" + rom.MD5 + "\""
+									+ " OR md5sha1.sha1=\"" + rom.SHA1 + "\"";
 						SqliteCommand slc = new SqliteCommand(query, dbc);
 						SqliteDataReader sldr = slc.ExecuteReader();
 						
@@ -84,23 +84,23 @@ namespace SabreTools
 							// Add to the queries
 							if (!String.IsNullOrEmpty(rom.CRC))
 							{
-								crcquery += " ("" + rom.CRC + "\"),";
+								crcquery += " (\"" + rom.CRC + "\"),";
 							}
 							if (!String.IsNullOrEmpty(rom.MD5))
 							{
-								md5query += " ("" + rom.MD5 + "\"),";
+								md5query += " (\"" + rom.MD5 + "\"),";
 							}
 							if (!String.IsNullOrEmpty(rom.SHA1))
 							{
-								sha1query += " ("" + rom.SHA1 + "\", "" + _depots.Keys.ToList()[0] + "\"),";
+								sha1query += " (\"" + rom.SHA1 + "\", \"" + _depots.Keys.ToList()[0] + "\"),";
 
 								if (!String.IsNullOrEmpty(rom.CRC))
 								{
-									crcsha1query += " ("" + rom.CRC + "\", "" + rom.SHA1 + "\"),";
+									crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
 								}
 								if (!String.IsNullOrEmpty(rom.MD5))
 								{
-									md5sha1query += " ("" + rom.MD5 + "\", "" + rom.SHA1 + "\"),";
+									md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
 								}
 							}
 
@@ -114,23 +114,23 @@ namespace SabreTools
 						// Add to the queries
 						if (!String.IsNullOrEmpty(rom.CRC))
 						{
-							crcquery += " ("" + rom.CRC + "\"),";
+							crcquery += " (\"" + rom.CRC + "\"),";
 						}
 						if (!String.IsNullOrEmpty(rom.MD5))
 						{
-							md5query += " ("" + rom.MD5 + "\"),";
+							md5query += " (\"" + rom.MD5 + "\"),";
 						}
 						if (!String.IsNullOrEmpty(rom.SHA1))
 						{
-							sha1query += " ("" + rom.SHA1 + "\", "" + _depots.Keys.ToList()[0] + "\"),";
+							sha1query += " (\"" + rom.SHA1 + "\", \"" + _depots.Keys.ToList()[0] + "\"),";
 
 							if (!String.IsNullOrEmpty(rom.CRC))
 							{
-								crcsha1query += " ("" + rom.CRC + "\", "" + rom.SHA1 + "\"),";
+								crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
 							}
 							if (!String.IsNullOrEmpty(rom.MD5))
 							{
-								md5sha1query += " ("" + rom.MD5 + "\", "" + rom.SHA1 + "\"),";
+								md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
 							}
 						}
 
@@ -253,7 +253,7 @@ namespace SabreTools
 				datdata.PopulateFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
 					null /* headerToCheckAgainst */, _workers /* maxDegreeOfParallelism */, _logger);
-				datdata.WriteToFile(String.Empty, logger);
+				datdata.WriteToFile("", logger);
 			}
 			logger.Close();
 		}
@@ -287,11 +287,11 @@ namespace SabreTools
 			List<string> sha1 = new List<string>();
 			foreach (string input in inputs)
 			{
-				string temp = String.Empty;
+				string temp = "";
 				if (input.Length == Constants.CRCLength)
 				{
 					temp = Style.CleanHashData(input, Constants.CRCLength);
-					if (temp != String.Empty)
+					if (temp != "")
 					{
 						crc.Add(temp);
 					}
@@ -299,7 +299,7 @@ namespace SabreTools
 				else if (input.Length == Constants.MD5Length)
 				{
 					temp = Style.CleanHashData(input, Constants.MD5Length);
-					if (temp != String.Empty)
+					if (temp != "")
 					{
 						md5.Add(temp);
 					}
@@ -307,7 +307,7 @@ namespace SabreTools
 				else if (input.Length == Constants.SHA1Length)
 				{
 					temp = Style.CleanHashData(input, Constants.SHA1Length);
-					if (temp != String.Empty)
+					if (temp != "")
 					{
 						sha1.Add(temp);
 					}
@@ -320,7 +320,7 @@ namespace SabreTools
 			// Now, search for each of them and return true or false for each
 			foreach (string input in crc)
 			{
-				string query = "SELECT * FROM crc WHERE crc="" + input + """;
+				string query = "SELECT * FROM crc WHERE crc=\"" + input + "\"";
 				SqliteCommand slc = new SqliteCommand(query, dbc);
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
@@ -337,7 +337,7 @@ namespace SabreTools
 			}
 			foreach (string input in md5)
 			{
-				string query = "SELECT * FROM md5 WHERE md5="" + input + """;
+				string query = "SELECT * FROM md5 WHERE md5=\"" + input + "\"";
 				SqliteCommand slc = new SqliteCommand(query, dbc);
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
@@ -354,7 +354,7 @@ namespace SabreTools
 			}
 			foreach (string input in sha1)
 			{
-				string query = "SELECT * FROM sha1 WHERE sha1="" + input + """;
+				string query = "SELECT * FROM sha1 WHERE sha1=\"" + input + "\"";
 				SqliteCommand slc = new SqliteCommand(query, dbc);
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)

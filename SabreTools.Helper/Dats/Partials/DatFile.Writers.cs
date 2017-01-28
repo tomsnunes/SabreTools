@@ -49,7 +49,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// If output directory is empty, use the current folder
-			if (outDir.Trim() == String.Empty)
+			if (outDir.Trim() == "")
 			{
 				logger.Verbose("No output directory defined, defaulting to curent folder");
 				outDir = Environment.CurrentDirectory;
@@ -233,7 +233,7 @@ namespace SabreTools.Helper.Dats
 		{
 			try
 			{
-				string header = String.Empty;
+				string header = "";
 				switch (datFormat)
 				{
 					case DatFormat.AttractMode:
@@ -243,18 +243,18 @@ namespace SabreTools.Helper.Dats
 						header = "clrmamepro (\n" +
 							"\tname \"" + Name + "\"\n" +
 							"\tdescription \"" + Description + "\"\n" +
-							(!String.IsNullOrEmpty(Category) ? "\tcategory \"" + Category + "\"\n" : String.Empty) +
+							(!String.IsNullOrEmpty(Category) ? "\tcategory \"" + Category + "\"\n" : "") +
 							"\tversion \"" + Version + "\"\n" +
-							(!String.IsNullOrEmpty(Date) ? "\tdate \"" + Date + "\"\n" : String.Empty) +
+							(!String.IsNullOrEmpty(Date) ? "\tdate \"" + Date + "\"\n" : "") +
 							"\tauthor \"" + Author + "\"\n" +
-							(!String.IsNullOrEmpty(Email) ? "\temail \"" + Email + "\"\n" : String.Empty) +
-							(!String.IsNullOrEmpty(Homepage) ? "\thomepage \"" + Homepage + "\"\n" : String.Empty) +
-							(!String.IsNullOrEmpty(Url) ? "\turl \"" + Url + "\"\n" : String.Empty) +
-							(!String.IsNullOrEmpty(Comment) ? "\tcomment \"" + Comment + "\"\n" : String.Empty) +
-							(ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : String.Empty) +
-							(ForcePacking == ForcePacking.Zip ? "\tforcezipping yes\n" : String.Empty) +
-							(ForceMerging == ForceMerging.Full ? "\tforcemerging full\n" : String.Empty) +
-							(ForceMerging == ForceMerging.Split ? "\tforcemerging split\n" : String.Empty) +
+							(!String.IsNullOrEmpty(Email) ? "\temail \"" + Email + "\"\n" : "") +
+							(!String.IsNullOrEmpty(Homepage) ? "\thomepage \"" + Homepage + "\"\n" : "") +
+							(!String.IsNullOrEmpty(Url) ? "\turl \"" + Url + "\"\n" : "") +
+							(!String.IsNullOrEmpty(Comment) ? "\tcomment \"" + Comment + "\"\n" : "") +
+							(ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
+							(ForcePacking == ForcePacking.Zip ? "\tforcezipping yes\n" : "") +
+							(ForceMerging == ForceMerging.Full ? "\tforcemerging full\n" : "") +
+							(ForceMerging == ForceMerging.Split ? "\tforcemerging split\n" : "") +
 							")\n";
 						break;
 					case DatFormat.CSV:
@@ -279,27 +279,27 @@ namespace SabreTools.Helper.Dats
 							"\t<header>\n" +
 							"\t\t<name>" + HttpUtility.HtmlEncode(Name) + "</name>\n" +
 							"\t\t<description>" + HttpUtility.HtmlEncode(Description) + "</description>\n" +
-							(!String.IsNullOrEmpty(RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(RootDir) + "</rootdir>\n" : String.Empty) +
-							(!String.IsNullOrEmpty(Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(Category) + "</category>\n" : String.Empty) +
+							(!String.IsNullOrEmpty(RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(RootDir) + "</rootdir>\n" : "") +
+							(!String.IsNullOrEmpty(Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(Category) + "</category>\n" : "") +
 							"\t\t<version>" + HttpUtility.HtmlEncode(Version) + "</version>\n" +
-							(!String.IsNullOrEmpty(Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(Date) + "</date>\n" : String.Empty) +
+							(!String.IsNullOrEmpty(Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(Date) + "</date>\n" : "") +
 							"\t\t<author>" + HttpUtility.HtmlEncode(Author) + "</author>\n" +
-							(!String.IsNullOrEmpty(Email) ? "\t\t<email>" + HttpUtility.HtmlEncode(Email) + "</email>\n" : String.Empty) +
-							(!String.IsNullOrEmpty(Homepage) ? "\t\t<homepage>" + HttpUtility.HtmlEncode(Homepage) + "</homepage>\n" : String.Empty) +
-							(!String.IsNullOrEmpty(Url) ? "\t\t<url>" + HttpUtility.HtmlEncode(Url) + "</url>\n" : String.Empty) +
-							(!String.IsNullOrEmpty(Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(Comment) + "</comment>\n" : String.Empty) +
-							(!String.IsNullOrEmpty(Type) ? "\t\t<type>" + HttpUtility.HtmlEncode(Type) + "</type>\n" : String.Empty) +
+							(!String.IsNullOrEmpty(Email) ? "\t\t<email>" + HttpUtility.HtmlEncode(Email) + "</email>\n" : "") +
+							(!String.IsNullOrEmpty(Homepage) ? "\t\t<homepage>" + HttpUtility.HtmlEncode(Homepage) + "</homepage>\n" : "") +
+							(!String.IsNullOrEmpty(Url) ? "\t\t<url>" + HttpUtility.HtmlEncode(Url) + "</url>\n" : "") +
+							(!String.IsNullOrEmpty(Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(Comment) + "</comment>\n" : "") +
+							(!String.IsNullOrEmpty(Type) ? "\t\t<type>" + HttpUtility.HtmlEncode(Type) + "</type>\n" : "") +
 							(ForcePacking != ForcePacking.None || ForceMerging != ForceMerging.None || ForceNodump != ForceNodump.None ?
 								"\t\t<clrmamepro" +
-									(ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : String.Empty) +
-									(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : String.Empty) +
-									(ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : String.Empty) +
-									(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : String.Empty) +
-									(ForceNodump == ForceNodump.Ignore ? " forceitemStatus=\"ignore\"" : String.Empty) +
-									(ForceNodump == ForceNodump.Obsolete ? " forceitemStatus=\"obsolete\"" : String.Empty) +
-									(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : String.Empty) +
+									(ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
+									(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
+									(ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
+									(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
+									(ForceNodump == ForceNodump.Ignore ? " forceitemStatus=\"ignore\"" : "") +
+									(ForceNodump == ForceNodump.Obsolete ? " forceitemStatus=\"obsolete\"" : "") +
+									(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : "") +
 									" />\n"
-							: String.Empty) +
+							: "") +
 							"\t</header>\n";
 						break;
 					case DatFormat.TSV:
@@ -371,24 +371,24 @@ namespace SabreTools.Helper.Dats
 							"\t<header>\n" +
 							"\t\t<name>" + HttpUtility.HtmlEncode(Name) + "</name>\n" +
 							"\t\t<description>" + HttpUtility.HtmlEncode(Description) + "</description>\n" +
-							(!String.IsNullOrEmpty(RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(RootDir) + "</rootdir>\n" : String.Empty) +
-							(!String.IsNullOrEmpty(Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(Category) + "</category>\n" : String.Empty) +
+							(!String.IsNullOrEmpty(RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(RootDir) + "</rootdir>\n" : "") +
+							(!String.IsNullOrEmpty(Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(Category) + "</category>\n" : "") +
 							"\t\t<version>" + HttpUtility.HtmlEncode(Version) + "</version>\n" +
-							(!String.IsNullOrEmpty(Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(Date) + "</date>\n" : String.Empty) +
+							(!String.IsNullOrEmpty(Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(Date) + "</date>\n" : "") +
 							"\t\t<author>" + HttpUtility.HtmlEncode(Author) + "</author>\n" +
-							(!String.IsNullOrEmpty(Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(Comment) + "</comment>\n" : String.Empty) +
+							(!String.IsNullOrEmpty(Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(Comment) + "</comment>\n" : "") +
 							(!String.IsNullOrEmpty(Type) || ForcePacking != ForcePacking.None || ForceMerging != ForceMerging.None || ForceNodump != ForceNodump.None ?
 								"\t\t<flags>\n" +
-									(!String.IsNullOrEmpty(Type) ? "\t\t\t<flag name=\"type\" value=\"" + HttpUtility.HtmlEncode(Type) + "\"/>\n" : String.Empty) +
-									(ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : String.Empty) +
-									(ForcePacking == ForcePacking.Zip ? "\t\t\t<flag name=\"forcepacking\" value=\"zip\"/>\n" : String.Empty) +
-									(ForceMerging == ForceMerging.Full ? "\t\t\t<flag name=\"forcemerging\" value=\"full\"/>\n" : String.Empty) +
-									(ForceMerging == ForceMerging.Split ? "\t\t\t<flag name=\"forcemerging\" value=\"split\"/>\n" : String.Empty) +
-									(ForceNodump == ForceNodump.Ignore ? "\t\t\t<flag name=\"forceitemStatus\" value=\"ignore\"/>\n" : String.Empty) +
-									(ForceNodump == ForceNodump.Obsolete ? "\t\t\t<flag name=\"forceitemStatus\" value=\"obsolete\"/>\n" : String.Empty) +
-									(ForceNodump == ForceNodump.Required ? "\t\t\t<flag name=\"forceitemStatus\" value=\"required\"/>\n" : String.Empty) +
+									(!String.IsNullOrEmpty(Type) ? "\t\t\t<flag name=\"type\" value=\"" + HttpUtility.HtmlEncode(Type) + "\"/>\n" : "") +
+									(ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : "") +
+									(ForcePacking == ForcePacking.Zip ? "\t\t\t<flag name=\"forcepacking\" value=\"zip\"/>\n" : "") +
+									(ForceMerging == ForceMerging.Full ? "\t\t\t<flag name=\"forcemerging\" value=\"full\"/>\n" : "") +
+									(ForceMerging == ForceMerging.Split ? "\t\t\t<flag name=\"forcemerging\" value=\"split\"/>\n" : "") +
+									(ForceNodump == ForceNodump.Ignore ? "\t\t\t<flag name=\"forceitemStatus\" value=\"ignore\"/>\n" : "") +
+									(ForceNodump == ForceNodump.Obsolete ? "\t\t\t<flag name=\"forceitemStatus\" value=\"obsolete\"/>\n" : "") +
+									(ForceNodump == ForceNodump.Required ? "\t\t\t<flag name=\"forceitemStatus\" value=\"required\"/>\n" : "") +
 									"\t\t</flags>\n"
-							: String.Empty) +
+							: "") +
 							"\t</header>\n" +
 							"\t<data>\n";
 						break;
@@ -397,13 +397,13 @@ namespace SabreTools.Helper.Dats
 							"<!DOCTYPE softwarelist SYSTEM \"softwarelist.dtd\">\n\n" +
 							"<softwarelist name=\"" + HttpUtility.HtmlEncode(Name) + "\"" +
 								" description=\"" + HttpUtility.HtmlEncode(Description) + "\"" +
-								(ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : String.Empty) +
-								(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : String.Empty) +
-								(ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : String.Empty) +
-								(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : String.Empty) +
-								(ForceNodump == ForceNodump.Ignore ? " forceitemStatus=\"ignore\"" : String.Empty) +
-								(ForceNodump == ForceNodump.Obsolete ? " forceitemStatus=\"obsolete\"" : String.Empty) +
-								(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : String.Empty) +
+								(ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
+								(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
+								(ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
+								(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
+								(ForceNodump == ForceNodump.Ignore ? " forceitemStatus=\"ignore\"" : "") +
+								(ForceNodump == ForceNodump.Obsolete ? " forceitemStatus=\"obsolete\"" : "") +
+								(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : "") +
 								">\n\n";
 						break;
 				}
@@ -443,7 +443,7 @@ namespace SabreTools.Helper.Dats
 					rom.Machine.Name = rom.Machine.Name.Substring(1);
 				}
 
-				string state = String.Empty;
+				string state = "";
 				switch (datFormat)
 				{
 					case DatFormat.AttractMode:
@@ -467,40 +467,40 @@ namespace SabreTools.Helper.Dats
 						break;
 					case DatFormat.ClrMamePro:
 						state += "game (\n\tname \"" + rom.Machine.Name + "\"\n" +
-							(ExcludeOf ? String.Empty :
-								(String.IsNullOrEmpty(rom.Machine.RomOf) ? String.Empty : "\tromof \"" + rom.Machine.RomOf + "\"\n") +
-								(String.IsNullOrEmpty(rom.Machine.CloneOf) ? String.Empty : "\tcloneof \"" + rom.Machine.CloneOf + "\"\n") +
-								(String.IsNullOrEmpty(rom.Machine.SampleOf) ? String.Empty : "\tsampleof \"" + rom.Machine.SampleOf + "\"\n")
+							(ExcludeOf ? "" :
+								(String.IsNullOrEmpty(rom.Machine.RomOf) ? "" : "\tromof \"" + rom.Machine.RomOf + "\"\n") +
+								(String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : "\tcloneof \"" + rom.Machine.CloneOf + "\"\n") +
+								(String.IsNullOrEmpty(rom.Machine.SampleOf) ? "" : "\tsampleof \"" + rom.Machine.SampleOf + "\"\n")
 							) +
 							"\tdescription \"" + (String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description) + "\"\n" +
-							(String.IsNullOrEmpty(rom.Machine.Year) ? String.Empty : "\tyear " + rom.Machine.Year + "\n") +
-							(String.IsNullOrEmpty(rom.Machine.Manufacturer) ? String.Empty : "\tmanufacturer \"" + rom.Machine.Manufacturer + "\"\n");
+							(String.IsNullOrEmpty(rom.Machine.Year) ? "" : "\tyear " + rom.Machine.Year + "\n") +
+							(String.IsNullOrEmpty(rom.Machine.Manufacturer) ? "" : "\tmanufacturer \"" + rom.Machine.Manufacturer + "\"\n");
 						break;
 					case DatFormat.DOSCenter:
 						state += "game (\n\tname \"" + rom.Machine.Name + ".zip\"\n";
 						break;
 					case DatFormat.Logiqx:
 						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Machine.Name) + "\"" +
-								(ExcludeOf ? String.Empty :
-									(rom.Machine.MachineType == MachineType.Bios ? " isbios=\"yes\"" : String.Empty) +
-									(rom.Machine.MachineType == MachineType.Device ? " isdevice=\"yes\"" : String.Empty) +
-									(rom.Machine.MachineType == MachineType.Mechanical ? " ismechanical=\"yes\"" : String.Empty) +
-									(rom.Machine.Runnable ? " runnable=\"yes\"" : String.Empty) +
+								(ExcludeOf ? "" :
+									(rom.Machine.MachineType == MachineType.Bios ? " isbios=\"yes\"" : "") +
+									(rom.Machine.MachineType == MachineType.Device ? " isdevice=\"yes\"" : "") +
+									(rom.Machine.MachineType == MachineType.Mechanical ? " ismechanical=\"yes\"" : "") +
+									(rom.Machine.Runnable ? " runnable=\"yes\"" : "") +
 									(String.IsNullOrEmpty(rom.Machine.CloneOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.CloneOf.ToLowerInvariant())
-										? String.Empty
+										? ""
 										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.Machine.CloneOf) + "\"") +
 									(String.IsNullOrEmpty(rom.Machine.RomOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.RomOf.ToLowerInvariant())
-										? String.Empty
+										? ""
 										: " romof=\"" + HttpUtility.HtmlEncode(rom.Machine.RomOf) + "\"") +
 									(String.IsNullOrEmpty(rom.Machine.SampleOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.SampleOf.ToLowerInvariant())
-										? String.Empty
+										? ""
 										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.Machine.SampleOf) + "\"")
 								) +
 								">\n" +
-							(String.IsNullOrEmpty(rom.Machine.Comment) ? String.Empty : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Machine.Comment) + "</comment>\n") +
+							(String.IsNullOrEmpty(rom.Machine.Comment) ? "" : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Machine.Comment) + "</comment>\n") +
 							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) + "</description>\n" +
-							(String.IsNullOrEmpty(rom.Machine.Year) ? String.Empty : "\t\t<year>" + HttpUtility.HtmlEncode(rom.Machine.Year) + "</year>\n") +
-							(String.IsNullOrEmpty(rom.Machine.Manufacturer) ? String.Empty : "\t\t<manufacturer>" + HttpUtility.HtmlEncode(rom.Machine.Manufacturer) + "</manufacturer>\n");
+							(String.IsNullOrEmpty(rom.Machine.Year) ? "" : "\t\t<year>" + HttpUtility.HtmlEncode(rom.Machine.Year) + "</year>\n") +
+							(String.IsNullOrEmpty(rom.Machine.Manufacturer) ? "" : "\t\t<manufacturer>" + HttpUtility.HtmlEncode(rom.Machine.Manufacturer) + "</manufacturer>\n");
 						break;
 					case DatFormat.SabreDat:
 						for (int i = (last == -1 ? 0 : last); i < newsplit.Count; i++)
@@ -516,21 +516,21 @@ namespace SabreTools.Helper.Dats
 						break;
 					case DatFormat.SoftwareList:
 						state += "\t<software name=\"" + HttpUtility.HtmlEncode(rom.Machine.Name) + "\""
-							+ (rom.Supported != null ? " supported=\"" + (rom.Supported == true ? "yes" : "no") + "\"" : String.Empty) +
-							(ExcludeOf ? String.Empty :
+							+ (rom.Supported != null ? " supported=\"" + (rom.Supported == true ? "yes" : "no") + "\"" : "") +
+							(ExcludeOf ? "" :
 									(String.IsNullOrEmpty(rom.Machine.CloneOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.CloneOf.ToLowerInvariant())
-										? String.Empty
+										? ""
 										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.Machine.CloneOf) + "\"") +
 									(String.IsNullOrEmpty(rom.Machine.RomOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.RomOf.ToLowerInvariant())
-										? String.Empty
+										? ""
 										: " romof=\"" + HttpUtility.HtmlEncode(rom.Machine.RomOf) + "\"") +
 									(String.IsNullOrEmpty(rom.Machine.SampleOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.SampleOf.ToLowerInvariant())
-										? String.Empty
+										? ""
 										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.Machine.SampleOf) + "\"")
 								) + ">\n"
 							+ "\t\t<description>" + HttpUtility.HtmlEncode(rom.Machine.Description) + "</description>\n"
-							+ (rom.Machine.Year != null ? "\t\t<year>" + HttpUtility.HtmlEncode(rom.Machine.Year) + "</year>\n" : String.Empty)
-							+ (rom.Publisher != null ? "\t\t<publisher>" + HttpUtility.HtmlEncode(rom.Publisher) + "</publisher>\n" : String.Empty);
+							+ (rom.Machine.Year != null ? "\t\t<year>" + HttpUtility.HtmlEncode(rom.Machine.Year) + "</year>\n" : "")
+							+ (rom.Publisher != null ? "\t\t<publisher>" + HttpUtility.HtmlEncode(rom.Publisher) + "</publisher>\n" : "");
 
 						foreach (Tuple<string, string> kvp in rom.Infos)
 						{
@@ -570,13 +570,13 @@ namespace SabreTools.Helper.Dats
 
 			try
 			{
-				string state = String.Empty;
+				string state = "";
 
 				switch (datFormat)
 				{
 					case DatFormat.ClrMamePro:
 					case DatFormat.DOSCenter:
-						state += (String.IsNullOrEmpty(rom.Machine.SampleOf) ? String.Empty : "\tsampleof \"" + rom.Machine.SampleOf + "\"\n") + ")\n";
+						state += (String.IsNullOrEmpty(rom.Machine.SampleOf) ? "" : "\tsampleof \"" + rom.Machine.SampleOf + "\"\n") + ")\n";
 						break;
 					case DatFormat.Logiqx:
 						state += "\t</machine>\n";
@@ -654,7 +654,7 @@ namespace SabreTools.Helper.Dats
 
 			try
 			{
-				string state = String.Empty, name = String.Empty, pre = String.Empty, post = String.Empty;
+				string state = "", name = "", pre = "", post = "";
 				switch (datFormat)
 				{
 					case DatFormat.ClrMamePro:
@@ -666,37 +666,37 @@ namespace SabreTools.Helper.Dats
 								break;
 							case ItemType.BiosSet:
 								state += "\tbiosset ( name\"" + rom.Name + "\""
-									+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description \"" + ((BiosSet)rom).Description + "\"" : String.Empty)
+									+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description \"" + ((BiosSet)rom).Description + "\"" : "")
 									+ (((BiosSet)rom).Default != null
 										? "default " + ((BiosSet)rom).Default.ToString().ToLowerInvariant()
-										: String.Empty)
+										: "")
 									+ " )\n";
 								break;
 							case ItemType.Disk:
 								state += "\tdisk ( name \"" + rom.Name + "\""
-									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5 " + ((Disk)rom).MD5.ToLowerInvariant() : String.Empty)
-									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1 " + ((Disk)rom).SHA1.ToLowerInvariant() : String.Empty)
-									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " flags " + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() : String.Empty)
+									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5 " + ((Disk)rom).MD5.ToLowerInvariant() : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1 " + ((Disk)rom).SHA1.ToLowerInvariant() : "")
+									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " flags " + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() : "")
 									+ " )\n";
 								break;
 							case ItemType.Release:
 								state += "\trelease ( name\"" + rom.Name + "\""
-									+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region \"" + ((Release)rom).Region + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language \"" + ((Release)rom).Language + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date \"" + ((Release)rom).Date + "\"" : String.Empty)
+									+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region \"" + ((Release)rom).Region + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language \"" + ((Release)rom).Language + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date \"" + ((Release)rom).Date + "\"" : "")
 									+ (((Release)rom).Default != null
 										? "default " + ((Release)rom).Default.ToString().ToLowerInvariant()
-										: String.Empty)
+										: "")
 									+ " )\n";
 								break;
 							case ItemType.Rom:
 								state += "\trom ( name \"" + rom.Name + "\""
-									+ (((Rom)rom).Size != -1 ? " size " + ((Rom)rom).Size : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5 " + ((Rom)rom).MD5.ToLowerInvariant() : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1 " + ((Rom)rom).SHA1.ToLowerInvariant() : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date \"" + ((Rom)rom).Date + "\"" : String.Empty)
-									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " flags " + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() : String.Empty)
+									+ (((Rom)rom).Size != -1 ? " size " + ((Rom)rom).Size : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5 " + ((Rom)rom).MD5.ToLowerInvariant() : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1 " + ((Rom)rom).SHA1.ToLowerInvariant() : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date \"" + ((Rom)rom).Date + "\"" : "")
+									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " flags " + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() : "")
 									+ " )\n";
 								break;
 							case ItemType.Sample:
@@ -713,8 +713,8 @@ namespace SabreTools.Helper.Dats
 							return true;
 						}
 
-						pre = Prefix + (Quotes ? "\"" : String.Empty);
-						post = (Quotes ? "\"" : String.Empty) + Postfix;
+						pre = Prefix + (Quotes ? "\"" : "");
+						post = (Quotes ? "\"" : "") + Postfix;
 
 						if (rom.Type == ItemType.Rom)
 						{
@@ -796,9 +796,9 @@ namespace SabreTools.Helper.Dats
 								break;
 							case ItemType.Rom:
 								state += "\tfile ( name " + ((Rom)rom).Name
-									+ (((Rom)rom).Size != -1 ? " size " + ((Rom)rom).Size : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date " + ((Rom)rom).Date : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : String.Empty)
+									+ (((Rom)rom).Size != -1 ? " size " + ((Rom)rom).Size : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date " + ((Rom)rom).Date : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
 									+ " )\n";
 								break;
 						}
@@ -812,37 +812,37 @@ namespace SabreTools.Helper.Dats
 								break;
 							case ItemType.BiosSet:
 								state += "\t\t<biosset name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : String.Empty)
+									+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
 									+ (((BiosSet)rom).Default != null
 										? ((BiosSet)rom).Default.ToString().ToLowerInvariant()
-										: String.Empty)
+										: "")
 									+ "/>\n";
 								break;
 							case ItemType.Disk:
 								state += "\t\t<disk name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : String.Empty)
-									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : String.Empty)
+									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
+									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 									+ "/>\n";
 								break;
 							case ItemType.Release:
 								state += "\t\t<release name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : String.Empty)
+									+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : "")
 									+ (((Release)rom).Default != null
 										? ((Release)rom).Default.ToString().ToLowerInvariant()
-										: String.Empty)
+										: "")
 									+ "/>\n";
 								break;
 							case ItemType.Rom:
 								state += "\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : String.Empty)
-									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : String.Empty)
+									+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
+									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 									+ "/>\n";
 								break;
 							case ItemType.Sample:
@@ -858,8 +858,8 @@ namespace SabreTools.Helper.Dats
 							return true;
 						}
 
-						pre = Prefix + (Quotes ? "\"" : String.Empty);
-						post = (Quotes ? "\"" : String.Empty) + Postfix;
+						pre = Prefix + (Quotes ? "\"" : "");
+						post = (Quotes ? "\"" : "") + Postfix;
 
 						if (rom.Type == ItemType.Rom)
 						{
@@ -900,7 +900,7 @@ namespace SabreTools.Helper.Dats
 							if (rom.Type == ItemType.Rom)
 							{
 								// We can only write out if there's a SHA-1
-								if (((Rom)rom).SHA1 != String.Empty)
+								if (((Rom)rom).SHA1 != "")
 								{
 									name = ((Rom)rom).SHA1.Substring(0, 2)
 										+ "/" + ((Rom)rom).SHA1.Substring(2, 2)
@@ -913,7 +913,7 @@ namespace SabreTools.Helper.Dats
 							else if (rom.Type == ItemType.Disk)
 							{
 								// We can only write out if there's a SHA-1
-								if (((Disk)rom).SHA1 != String.Empty)
+								if (((Disk)rom).SHA1 != "")
 								{
 									name = ((Disk)rom).SHA1.Substring(0, 2)
 										+ "/" + ((Disk)rom).SHA1.Substring(2, 2)
@@ -927,18 +927,18 @@ namespace SabreTools.Helper.Dats
 
 						// Otherwise, use any flags
 						name = (UseGame ? rom.Machine.Name : rom.Name);
-						if (RepExt != String.Empty || RemExt)
+						if (RepExt != "" || RemExt)
 						{
 							if (RemExt)
 							{
-								RepExt = String.Empty;
+								RepExt = "";
 							}
 
 							string dir = Path.GetDirectoryName(name);
 							dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
 							name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + RepExt);
 						}
-						if (AddExt != String.Empty)
+						if (AddExt != "")
 						{
 							name += AddExt;
 						}
@@ -1008,44 +1008,44 @@ namespace SabreTools.Helper.Dats
 					case DatFormat.RedumpMD5:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).MD5 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : String.Empty) + rom.Name + "\n";
+							state += ((Rom)rom).MD5 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).MD5 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : String.Empty) + rom.Name + "\n";
+							state += ((Disk)rom).MD5 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case DatFormat.RedumpSFV:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : String.Empty) + rom.Name + " " + ((Rom)rom).CRC + "\n";
+							state += (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + " " + ((Rom)rom).CRC + "\n";
 						}
 						break;
 					case DatFormat.RedumpSHA1:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA1 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : String.Empty) + rom.Name + "\n";
+							state += ((Rom)rom).SHA1 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA1 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : String.Empty) + rom.Name + "\n";
+							state += ((Disk)rom).SHA1 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case DatFormat.RomCenter:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += "¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? String.Empty : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
-							"¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? String.Empty : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
+							state += "¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
+							"¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Machine.Name) +
 							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
 							"¬" + ((Rom)rom).CRC.ToLowerInvariant() +
-							"¬" + (((Rom)rom).Size != -1 ? ((Rom)rom).Size.ToString() : String.Empty) + "¬¬¬\n";
+							"¬" + (((Rom)rom).Size != -1 ? ((Rom)rom).Size.ToString() : "") + "¬¬¬\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += "¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? String.Empty : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
-							"¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? String.Empty : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
+							state += "¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
+							"¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Machine.Name) +
 							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
@@ -1054,7 +1054,7 @@ namespace SabreTools.Helper.Dats
 
 						break;
 					case DatFormat.SabreDat:
-						string prefix = String.Empty;
+						string prefix = "";
 						for (int i = 0; i < depth; i++)
 						{
 							prefix += "\t";
@@ -1069,16 +1069,16 @@ namespace SabreTools.Helper.Dats
 								break;
 							case ItemType.BiosSet:
 								state += "<file type=\"biosset\" name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : String.Empty)
+									+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
 									+ (((BiosSet)rom).Default != null
 										? ((BiosSet)rom).Default.ToString().ToLowerInvariant()
-										: String.Empty)
+										: "")
 									+ "/>\n";
 								break;
 							case ItemType.Disk:
 								state += "<file type=\"disk\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : String.Empty)
+									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
 									+ (((Disk)rom).ItemStatus != ItemStatus.None ? prefix + "/>\n" + prefix + "\t<flags>\n" +
 										prefix + "\t\t<flag name=\"status\" value=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"/>\n" +
 										prefix + "\t</flags>\n" +
@@ -1086,21 +1086,21 @@ namespace SabreTools.Helper.Dats
 								break;
 							case ItemType.Release:
 								state += "<file type=\"release\" name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : String.Empty)
+									+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : "")
 									+ (((Release)rom).Default != null
 										? ((Release)rom).Default.ToString().ToLowerInvariant()
-										: String.Empty)
+										: "")
 									+ "/>\n";
 								break;
 							case ItemType.Rom:
 								state += "<file type=\"rom\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : String.Empty)
+									+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
 									+ (((Rom)rom).ItemStatus != ItemStatus.None ? prefix + "/>\n" + prefix + "\t<flags>\n" +
 										prefix + "\t\t<flag name=\"status\" value=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"/>\n" +
 										prefix + "\t</flags>\n" +
@@ -1124,61 +1124,61 @@ namespace SabreTools.Helper.Dats
 						{
 							case ItemType.Archive:
 								state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "archive" : rom.AreaName) + "\""
-										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : String.Empty) + ">\n"
+										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 									+ "\t\t\t\t<archive name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ "/>\n"
 									+ "\t\t\t</dataarea>\n";
 								break;
 							case ItemType.BiosSet:
 								state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "biosset" : rom.AreaName) + "\""
-										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : String.Empty) + ">\n"
+										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 									+ "\t\t\t\t<biosset name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : String.Empty)
+									+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
 									+ (((BiosSet)rom).Default != null
 										? ((BiosSet)rom).Default.ToString().ToLowerInvariant()
-										: String.Empty)
+										: "")
 									+ "/>\n"
 									+ "\t\t\t</dataarea>\n";
 								break;
 							case ItemType.Disk:
 								state += "\t\t\t<diskarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "cdrom" : rom.AreaName) + "\""
-										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : String.Empty) + ">\n"
+										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 									+ "\t\t\t\t<disk name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : String.Empty)
-									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : String.Empty)
+									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
+									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 									+ "/>\n"
 									+ "\t\t\t</diskarea>\n";
 								break;
 							case ItemType.Release:
 								state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "release" : rom.AreaName) + "\""
-										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : String.Empty) + ">\n"
+										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 									+ "\t\t\t\t<release name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : String.Empty)
+									+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : "")
 									+ (((Release)rom).Default != null
 										? ((Release)rom).Default.ToString().ToLowerInvariant()
-										: String.Empty)
+										: "")
 									+ "/>\n"
 									+ "\t\t\t</dataarea>\n";
 								break;
 							case ItemType.Rom:
 								state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "rom" : rom.AreaName) + "\""
-										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : String.Empty) + ">\n"
+										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 									+ "\t\t\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-									+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : String.Empty)
-									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : String.Empty)
-									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : String.Empty)
+									+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
+									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 									+ "/>\n"
 									+ "\t\t\t</dataarea>\n";
 								break;
 							case ItemType.Sample:
 								state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "sample" : rom.AreaName) + "\""
-										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : String.Empty) + ">\n"
+										+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 									+ "\t\t\t\t<sample type=\"sample\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ "/>\n"
 									+ "\t\t\t</dataarea>\n";
@@ -1194,8 +1194,8 @@ namespace SabreTools.Helper.Dats
 							return true;
 						}
 
-						pre = Prefix + (Quotes ? "\"" : String.Empty);
-						post = (Quotes ? "\"" : String.Empty) + Postfix;
+						pre = Prefix + (Quotes ? "\"" : "");
+						post = (Quotes ? "\"" : "") + Postfix;
 
 						if (rom.Type == ItemType.Rom)
 						{
@@ -1291,7 +1291,7 @@ namespace SabreTools.Helper.Dats
 		{
 			try
 			{
-				string footer = String.Empty;
+				string footer = "";
 
 				// If we have roms, output the full footer
 				if (Count > 0)

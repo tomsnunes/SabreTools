@@ -43,11 +43,11 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		public Rom()
 		{
-			_name = String.Empty;
+			_name = "";
 			_itemType = ItemType.Rom;
 			_dupeType = 0x00;
 			_itemStatus = ItemStatus.None;
-			_date = String.Empty;
+			_date = "";
 		}
 
 		/// <summary>

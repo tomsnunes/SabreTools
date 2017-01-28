@@ -105,7 +105,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Get the output directory
-			if (outDir != String.Empty)
+			if (outDir != "")
 			{
 				outDir = outDir + Path.GetDirectoryName(this.FileName).Remove(0, basepath.Length - 1);
 			}
@@ -287,7 +287,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Get the output directory
-			if (outDir != String.Empty)
+			if (outDir != "")
 			{
 				outDir = outDir + Path.GetDirectoryName(this.FileName).Remove(0, basepath.Length - 1);
 			}
@@ -535,7 +535,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Get the output directory
-			if (outDir != String.Empty)
+			if (outDir != "")
 			{
 				outDir = outDir + Path.GetDirectoryName(this.FileName).Remove(0, basepath.Length - 1);
 			}

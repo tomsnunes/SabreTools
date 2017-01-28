@@ -79,7 +79,7 @@ namespace SabreTools.Helper.Tools
 			}
 
 			// Read the input file, if possible
-			logger.Verbose("Attempting to read file to get format: "" + filename + """);
+			logger.Verbose("Attempting to read file to get format: \"" + filename + "\"");
 
 			// Check if file exists
 			if (!File.Exists(filename))
@@ -224,7 +224,7 @@ namespace SabreTools.Helper.Tools
 
 			// Add unique data from the file
 			rom.Name = Path.GetFileName(input);
-			rom.Date = (date ? new FileInfo(input).LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : String.Empty);
+			rom.Date = (date ? new FileInfo(input).LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : "");
 
 			return rom;
 		}
@@ -315,7 +315,7 @@ namespace SabreTools.Helper.Tools
 		public static bool DetectSkipperAndTransform(string file, string outDir, Logger logger)
 		{
 			// Create the output directory if it doesn't exist
-			if (outDir != String.Empty && !Directory.Exists(outDir))
+			if (outDir != "" && !Directory.Exists(outDir))
 			{
 				Directory.CreateDirectory(outDir);
 			}
@@ -323,7 +323,7 @@ namespace SabreTools.Helper.Tools
 			logger.User("\nGetting skipper information for '" + file + "'");
 
 			// Get the skipper rule that matches the file, if any
-			SkipperRule rule = Skipper.GetMatchingRule(file, String.Empty, logger);
+			SkipperRule rule = Skipper.GetMatchingRule(file, "", logger);
 
 			// If we have an empty rule, return false
 			if (rule.Tests == null || rule.Tests.Count == 0 || rule.Operation != HeaderSkipOperation.None)
@@ -346,7 +346,7 @@ namespace SabreTools.Helper.Tools
 			br.Dispose();
 
 			// Apply the rule to the file
-			string newfile = (outDir == String.Empty ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file)));
+			string newfile = (outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file)));
 			rule.TransformFile(file, newfile, logger);
 
 			// If the output file doesn't exist, return false
@@ -385,7 +385,7 @@ namespace SabreTools.Helper.Tools
 					{
 						try
 						{
-							outputs.Add(Path.GetFullPath(file) + (appendparent ? "¬" + Path.GetFullPath(input) : String.Empty));
+							outputs.Add(Path.GetFullPath(file) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
 						}
 						catch (PathTooLongException)
 						{
@@ -401,7 +401,7 @@ namespace SabreTools.Helper.Tools
 				{
 					try
 					{
-						outputs.Add(Path.GetFullPath(input) + (appendparent ? "¬" + Path.GetFullPath(input) : String.Empty));
+						outputs.Add(Path.GetFullPath(input) + (appendparent ? "¬" + Path.GetFullPath(input) : ""));
 					}
 					catch (PathTooLongException)
 					{
@@ -437,7 +437,7 @@ namespace SabreTools.Helper.Tools
 		/// <returns>The XmlTextReader representing the (possibly converted) file, null otherwise</returns>
 		public static XmlReader GetXmlTextReader(string filename, Logger logger)
 		{
-			logger.Verbose("Attempting to read file: "" + filename + """);
+			logger.Verbose("Attempting to read file: \"" + filename + "\"");
 
 			// Check if file exists
 			if (!File.Exists(filename))
@@ -494,7 +494,7 @@ namespace SabreTools.Helper.Tools
 		public static bool RestoreHeader(string file, string outDir, Logger logger)
 		{
 			// Create the output directory if it doesn't exist
-			if (outDir != String.Empty && !Directory.Exists(outDir))
+			if (outDir != "" && !Directory.Exists(outDir))
 			{
 				Directory.CreateDirectory(outDir);
 			}
@@ -515,9 +515,9 @@ namespace SabreTools.Helper.Tools
 			for (int i = 0; i < headers.Count; i++)
 			{
 				logger.User("Creating reheadered file: " +
-						(outDir == String.Empty ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i);
+						(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i);
 				AppendBytesToFile(file,
-					(outDir == String.Empty ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i, headers[i], string.Empty);
+					(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i, headers[i], string.Empty);
 				logger.User("Reheadered file created!");
 			}
 
@@ -587,12 +587,12 @@ namespace SabreTools.Helper.Tools
 				if (!noMD5)
 				{
 					md5.TransformFinalBlock(buffer, 0, 0);
-					rom.MD5 = BitConverter.ToString(md5.Hash).Replace("-", String.Empty).ToLowerInvariant();
+					rom.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
 				}
 				if (!noSHA1)
 				{
 					sha1.TransformFinalBlock(buffer, 0, 0);
-					rom.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", String.Empty).ToLowerInvariant();
+					rom.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
 				}
 
 				// Dispose of the hashers

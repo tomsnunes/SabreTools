@@ -221,7 +221,7 @@ namespace SabreTools.Helper.Tools
 		/// <returns>Name of the extracted file, null on error</returns>
 		public static string ExtractItem(string input, string entryName, string tempDir, Logger logger)
 		{
-			string realEntry = String.Empty;
+			string realEntry = "";
 			Stream ms = ExtractStream(input, entryName, out realEntry, logger);
 
 			// If we got out a null or empty entry, then we don't have a stream
@@ -265,7 +265,7 @@ namespace SabreTools.Helper.Tools
 		public static Stream ExtractStream(string input, string entryName, out string realEntry, Logger logger)
 		{
 			// Set the real entry name
-			realEntry = String.Empty;
+			realEntry = "";
 
 			// Get a writable stream to return
 			Stream st = new MemoryStream();
@@ -433,7 +433,7 @@ namespace SabreTools.Helper.Tools
 			{
 				logger.Verbose("Found archive of type: " + at);
 				long size = 0;
-				string crc = String.Empty;
+				string crc = "";
 
 				switch (at)
 				{
@@ -445,14 +445,14 @@ namespace SabreTools.Helper.Tools
 							{
 								logger.Verbose("Entry found: '" + entry.Key + "': "
 									+ (size == 0 ? entry.Size : size) + ", "
-									+ (crc == String.Empty ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
+									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
 
 								roms.Add(new Rom
 								{
 									Type = ItemType.Rom,
 									Name = entry.Key,
 									Size = (size == 0 ? entry.Size : size),
-									CRC = (crc == String.Empty ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
+									CRC = (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
 
 									Machine = new Machine
 									{
@@ -481,14 +481,14 @@ namespace SabreTools.Helper.Tools
 							{
 								logger.Verbose("Entry found: '" + entry.Key + "': "
 									+ (size == 0 ? entry.Size : size) + ", "
-									+ (crc == String.Empty ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
+									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
 
 								roms.Add(new Rom
 								{
 									Type = ItemType.Rom,
 									Name = entry.Key,
 									Size = (size == 0 ? entry.Size : size),
-									CRC = (crc == String.Empty ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
+									CRC = (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
 
 									Machine = new Machine
 									{
@@ -507,14 +507,14 @@ namespace SabreTools.Helper.Tools
 							{
 								logger.Verbose("Entry found: '" + entry.Key + "': "
 									+ (size == 0 ? entry.Size : size) + ", "
-									+ (crc == String.Empty ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
+									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
 
 								roms.Add(new Rom
 								{
 									Type = ItemType.Rom,
 									Name = entry.Key,
 									Size = (size == 0 ? entry.Size : size),
-									CRC = (crc == String.Empty ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
+									CRC = (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
 
 									Machine = new Machine
 									{
@@ -1119,7 +1119,7 @@ namespace SabreTools.Helper.Tools
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].Machine.Name) + (roms[0].Machine.Name.EndsWith(".tar") ? String.Empty : ".tar"));
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].Machine.Name) + (roms[0].Machine.Name.EndsWith(".tar") ? "" : ".tar"));
 
 			// Set internal variables
 			Stream tarstream = new MemoryStream();
@@ -1445,7 +1445,7 @@ namespace SabreTools.Helper.Tools
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].Machine.Name) + (roms[0].Machine.Name.EndsWith(".zip") ? String.Empty : ".zip"));
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].Machine.Name) + (roms[0].Machine.Name.EndsWith(".zip") ? "" : ".zip"));
 
 			// Set internal variables
 			Stream writeStream = null;

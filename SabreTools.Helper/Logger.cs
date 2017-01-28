@@ -161,7 +161,7 @@ namespace SabreTools.Helper
 			// USER and ERROR writes to console
 			if (loglevel == LogLevel.USER || loglevel == LogLevel.ERROR)
 			{
-				Console.WriteLine((loglevel == LogLevel.ERROR && appendPrefix ? loglevel.ToString() + " " : String.Empty) + output);
+				Console.WriteLine((loglevel == LogLevel.ERROR && appendPrefix ? loglevel.ToString() + " " : "") + output);
 			}
 
 			// If we're writing to file, use the existing stream
@@ -169,7 +169,7 @@ namespace SabreTools.Helper
 			{
 				try
 				{
-					_log.WriteLine((appendPrefix ? loglevel.ToString() + " - " + DateTime.Now + " - " : String.Empty ) + output);
+					_log.WriteLine((appendPrefix ? loglevel.ToString() + " - " + DateTime.Now + " - " : "" ) + output);
 				}
 				catch
 				{

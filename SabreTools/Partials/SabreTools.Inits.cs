@@ -101,7 +101,7 @@ namespace SabreTools
 				DatFormat = (datFormat == 0 ? DatFormat.Logiqx : datFormat),
 				Romba = romba,
 				ExcludeOf = excludeOf,
-				Type = (superdat ? "SuperDAT" : String.Empty),
+				Type = (superdat ? "SuperDAT" : ""),
 			};
 
 			// Clean the temp directory
@@ -707,34 +707,34 @@ namespace SabreTools
 			}
 
 			// Normalize the extensions
-			addext = (addext == String.Empty || addext.StartsWith(".") ? addext : "." + addext);
-			repext = (repext == String.Empty || repext.StartsWith(".") ? repext : "." + repext);
+			addext = (addext == "" || addext.StartsWith(".") ? addext : "." + addext);
+			repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
 
 			// If we're in merge or diff mode and the names aren't set, set defaults
 			if (merge || diffMode != 0)
 			{
 				// Get the values that will be used
-				if (date == String.Empty)
+				if (date == "")
 				{
 					date = DateTime.Now.ToString("yyyy-MM-dd");
 				}
-				if (name == String.Empty)
+				if (name == "")
 				{
-					name = (diffMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : String.Empty) + (dedup ? "-deduped" : String.Empty);
+					name = (diffMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup ? "-deduped" : "");
 				}
-				if (description == String.Empty)
+				if (description == "")
 				{
-					description = (diffMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : String.Empty) + (dedup ? " - deduped" : String.Empty);
+					description = (diffMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup ? " - deduped" : "");
 					if (!bare)
 					{
 						description += " (" + date + ")";
 					}
 				}
-				if (category == String.Empty && diffMode != 0)
+				if (category == "" && diffMode != 0)
 				{
 					category = "DiffDAT";
 				}
-				if (author == String.Empty)
+				if (author == "")
 				{
 					author = "SabreTools";
 				}

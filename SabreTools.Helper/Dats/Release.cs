@@ -47,11 +47,11 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		public Release()
 		{
-			_name = String.Empty;
+			_name = "";
 			_itemType = ItemType.Release;
-			_region = String.Empty;
-			_language = String.Empty;
-			_date = String.Empty;
+			_region = "";
+			_language = "";
+			_date = "";
 			_default = null;
 		}
 

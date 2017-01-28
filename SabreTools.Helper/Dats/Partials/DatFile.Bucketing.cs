@@ -33,7 +33,7 @@ namespace SabreTools.Helper.Dats
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
 
-			logger.User("Organizing " + (mergeroms ? "and merging " : String.Empty) + "roms by CRC");
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by CRC");
 
 			// Process each all of the roms
 			List<string> keys = Keys.ToList();
@@ -102,7 +102,7 @@ namespace SabreTools.Helper.Dats
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
 
-			logger.User("Organizing " + (mergeroms ? "and merging " : String.Empty) + "roms by game");
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by game");
 
 			// Process each all of the roms
 			List<string> keys = Keys.ToList();
@@ -120,7 +120,7 @@ namespace SabreTools.Helper.Dats
 				foreach (DatItem rom in roms)
 				{
 					count++;
-					string newkey = (norename ? String.Empty
+					string newkey = (norename ? ""
 							: rom.SystemID.ToString().PadLeft(10, '0')
 								+ "-"
 								+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
@@ -188,7 +188,7 @@ namespace SabreTools.Helper.Dats
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
 
-			logger.User("Organizing " + (mergeroms ? "and merging " : String.Empty) + "roms by MD5");
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by MD5");
 
 			// Process each all of the roms
 			List<string> keys = Keys.ToList();
@@ -259,7 +259,7 @@ namespace SabreTools.Helper.Dats
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
 
-			logger.User("Organizing " + (mergeroms ? "and merging " : String.Empty) + "roms by SHA-1");
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by SHA-1");
 
 			// Process each all of the roms
 			List<string> keys = Keys.ToList();
@@ -330,7 +330,7 @@ namespace SabreTools.Helper.Dats
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
 
-			logger.User("Organizing " + (mergeroms ? "and merging " : String.Empty) + "roms by size");
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by size");
 
 			// Process each all of the roms
 			List<string> keys = Keys.ToList();
@@ -1083,7 +1083,7 @@ namespace SabreTools.Helper.Dats
 		/// <returns>SortedDictionary bucketed by game name</returns>
 		public static SortedDictionary<string, List<DatItem>> BucketListByGame(List<DatItem> list, bool mergeroms, bool norename, Logger logger, bool output = true)
 		{
-			logger.User("Organizing " + (mergeroms ? "and merging " : String.Empty) + "roms for output");
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
 
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
@@ -1109,7 +1109,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				count++;
-				string newkey = (norename ? String.Empty
+				string newkey = (norename ? ""
 						: rom.SystemID.ToString().PadLeft(10, '0')
 							+ "-"
 							+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
