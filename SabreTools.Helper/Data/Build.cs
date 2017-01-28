@@ -235,7 +235,7 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-gz={2}			Set scanning level for GZip archives");
 						helptext.Add("	-rar={2}		Set scanning level for RAR archives");
 						helptext.Add("	-zip={1}		Set scanning level for ZIP archives");
-						helptext.Add("	-ud, --update-dat	Output updated DAT");
+						helptext.Add("	-ud, --update-dat	Output updated DAT to output directory");
 						helptext.Add("	-mt={4}			Amount of threads to use (-1 unlimted)");
 
 					// Stats

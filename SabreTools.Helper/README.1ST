@@ -486,7 +486,7 @@ Options:
 			
 		-upd, --update-dat	Output updated DAT
 			Once the files that were able to rebuilt are taken care of, a DAT of the files
-			that could not be matched will be output to the program directory.
+			that could not be matched will be output to the output directory.
 		
 	-st, --stats		Get statistics on all input DATs
 		This will output by default the combined statistics for all input DAT files. The stats
