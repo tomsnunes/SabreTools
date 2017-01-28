@@ -492,7 +492,7 @@ namespace SabreTools
 						update = true;
 						break;
 					case "-upd":
-					case "--updated-dat":
+					case "--update-dat":
 						updateDat = true;
 						break;
 					case "-xof":
