@@ -369,7 +369,7 @@ namespace SabreTools.Helper.Dats
 					// If we have a sample, treat it special
 					if (temptype == ItemType.Sample)
 					{
-						line = line.Trim().Remove(0, 6).Trim().Replace(""", String.Empty); // Remove "sample" from the input string
+						line = line.Trim().Remove(0, 6).Trim().Replace("\"", String.Empty); // Remove "sample" from the input string
 						item.Name = line;
 
 						// Now process and add the sample
@@ -421,7 +421,7 @@ namespace SabreTools.Helper.Dats
 							else if (gc[i] == "date")
 							{
 								i++;
-								((Rom)item).Date = gc[i].Replace(""", String.Empty) + " " + gc[i + 1].Replace(""", String.Empty);
+								((Rom)item).Date = gc[i].Replace("\"", String.Empty) + " " + gc[i + 1].Replace("\"", String.Empty);
 								i += 3;
 							}
 
@@ -429,7 +429,7 @@ namespace SabreTools.Helper.Dats
 							else if (gc[i] == "crc")
 							{
 								i++;
-								((Rom)item).CRC = gc[i].Replace(""", String.Empty).ToLowerInvariant();
+								((Rom)item).CRC = gc[i].Replace("\"", String.Empty).ToLowerInvariant();
 							}
 						}
 
@@ -443,11 +443,11 @@ namespace SabreTools.Helper.Dats
 					for (int i = 0; i < gc.Length; i++)
 					{
 						// Look at the current item and use it if possible
-						string quoteless = gc[i].Replace(""", String.Empty);
+						string quoteless = gc[i].Replace("\"", String.Empty);
 						switch (quoteless)
 						{
 							//If the item is empty, we automatically skip it because it's a fluke
-							case String.Empty:
+							case "":
 								continue;
 
 							// Special cases for standalone item statuses
@@ -495,14 +495,14 @@ namespace SabreTools.Helper.Dats
 							// Regular attributes
 							case "name":
 								i++;
-								quoteless = gc[i].Replace(""", String.Empty);
+								quoteless = gc[i].Replace("\"", String.Empty);
 								item.Name = quoteless;
 								break;
 							case "size":
 								if (item.Type == ItemType.Rom)
 								{
 									i++;
-									quoteless = gc[i].Replace(""", String.Empty);
+									quoteless = gc[i].Replace("\"", String.Empty);
 									long size = -1;
 									if (Int64.TryParse(quoteless, out size))
 									{
@@ -515,7 +515,7 @@ namespace SabreTools.Helper.Dats
 								if (item.Type == ItemType.Rom)
 								{
 									i++;
-									quoteless = gc[i].Replace(""", String.Empty);
+									quoteless = gc[i].Replace("\"", String.Empty);
 									((Rom)item).CRC = quoteless.ToLowerInvariant();
 								}
 								break;
@@ -523,13 +523,13 @@ namespace SabreTools.Helper.Dats
 								if (item.Type == ItemType.Rom)
 								{
 									i++;
-									quoteless = gc[i].Replace(""", String.Empty);
+									quoteless = gc[i].Replace("\"", String.Empty);
 									((Rom)item).MD5 = quoteless.ToLowerInvariant();
 								}
 								else if (item.Type == ItemType.Disk)
 								{
 									i++;
-									quoteless = gc[i].Replace(""", String.Empty);
+									quoteless = gc[i].Replace("\"", String.Empty);
 									((Disk)item).MD5 = quoteless.ToLowerInvariant();
 								}
 								break;
@@ -537,20 +537,20 @@ namespace SabreTools.Helper.Dats
 								if (item.Type == ItemType.Rom)
 								{
 									i++;
-									quoteless = gc[i].Replace(""", String.Empty);
+									quoteless = gc[i].Replace("\"", String.Empty);
 									((Rom)item).SHA1 = quoteless.ToLowerInvariant();
 								}
 								else if (item.Type == ItemType.Disk)
 								{
 									i++;
-									quoteless = gc[i].Replace(""", String.Empty);
+									quoteless = gc[i].Replace("\"", String.Empty);
 									((Disk)item).SHA1 = quoteless.ToLowerInvariant();
 								}
 								break;
 							case "status":
 							case "flags":
 								i++;
-								quoteless = gc[i].Replace(""", String.Empty);
+								quoteless = gc[i].Replace("\"", String.Empty);
 								if (quoteless.ToLowerInvariant() == "good")
 								{
 									if (item.Type == ItemType.Rom)
@@ -600,7 +600,7 @@ namespace SabreTools.Helper.Dats
 								if (item.Type == ItemType.Rom)
 								{
 									i++;
-									quoteless = gc[i].Replace(""", String.Empty) + " " + gc[i + 1].Replace(""", String.Empty);
+									quoteless = gc[i].Replace("\"", String.Empty) + " " + gc[i + 1].Replace("\"", String.Empty);
 									((Rom)item).Date = quoteless;
 								}
 								i++;
@@ -620,7 +620,7 @@ namespace SabreTools.Helper.Dats
 
 					if (blockname != "header")
 					{
-						string itemval = gc[2].Value.Replace(""", String.Empty);
+						string itemval = gc[2].Value.Replace("\"", String.Empty);
 						switch (gc[1].Value)
 						{
 							case "name":
@@ -648,7 +648,7 @@ namespace SabreTools.Helper.Dats
 					}
 					else
 					{
-						string itemval = gc[2].Value.Replace(""", String.Empty);
+						string itemval = gc[2].Value.Replace("\"", String.Empty);
 
 						if (line.Trim().StartsWith("Name:"))
 						{
@@ -1418,7 +1418,7 @@ namespace SabreTools.Helper.Dats
 										machine.Description = subreader.ReadElementContentAsString();
 										if (!softlist && temptype == "software")
 										{
-											machine.Name = machine.Description.Replace('/', '_').Replace(""", "''");
+											machine.Name = machine.Description.Replace('/', '_').Replace("\"", "''");
 										}
 										break;
 									case "year":
@@ -1580,13 +1580,13 @@ namespace SabreTools.Helper.Dats
 										if (subreader.GetAttribute("flags") == "baddump" || subreader.GetAttribute("status") == "baddump")
 										{
 											logger.Verbose("Bad dump detected: " +
-												(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != String.Empty ? """ + xtr.GetAttribute("name") + """ : "ROM NAME NOT FOUND"));
+												(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != String.Empty ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 											its = ItemStatus.BadDump;
 										}
 										if (subreader.GetAttribute("flags") == "nodump" || subreader.GetAttribute("status") == "nodump")
 										{
 											logger.Verbose("Nodump detected: " +
-												(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != String.Empty ? """ + xtr.GetAttribute("name") + """ : "ROM NAME NOT FOUND"));
+												(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != String.Empty ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 											its = ItemStatus.Nodump;
 										}
 										if (subreader.GetAttribute("flags") == "verified" || subreader.GetAttribute("status") == "verified")
@@ -1765,12 +1765,12 @@ namespace SabreTools.Helper.Dats
 													break;
 												case "baddump":
 													logger.Verbose("Bad dump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != String.Empty ?
-														""" + xtr.GetAttribute("name") + """ : "ROM NAME NOT FOUND"));
+														"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 													its = ItemStatus.BadDump;
 													break;
 												case "nodump":
 													logger.Verbose("Nodump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != String.Empty ?
-														""" + xtr.GetAttribute("name") + """ : "ROM NAME NOT FOUND"));
+														"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 													its = ItemStatus.Nodump;
 													break;
 												case "verified":
@@ -2304,7 +2304,7 @@ namespace SabreTools.Helper.Dats
 				// If the file has no size and it's not the above case, skip and log
 				else if (itemRom.ItemStatus != ItemStatus.Nodump && (itemRom.Size == 0 || itemRom.Size == -1))
 				{
-					logger.Verbose("Incomplete entry for "" + itemRom.Name + "\" will be output as nodump");
+					logger.Verbose("Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
 					itemRom.ItemStatus = ItemStatus.Nodump;
 				}
 				// If the file has a size but aboslutely no hashes, skip and log
@@ -2314,7 +2314,7 @@ namespace SabreTools.Helper.Dats
 					&& String.IsNullOrEmpty(itemRom.MD5)
 					&& String.IsNullOrEmpty(itemRom.SHA1))
 				{
-					logger.Verbose("Incomplete entry for "" + itemRom.Name + "\" will be output as nodump");
+					logger.Verbose("Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
 					itemRom.ItemStatus = ItemStatus.Nodump;
 				}
 
@@ -2333,7 +2333,7 @@ namespace SabreTools.Helper.Dats
 					&& String.IsNullOrEmpty(itemDisk.MD5)
 					&& String.IsNullOrEmpty(itemDisk.SHA1))
 				{
-					logger.Verbose("Incomplete entry for "" + itemDisk.Name + "\" will be output as nodump");
+					logger.Verbose("Incomplete entry for \"" + itemDisk.Name + "\" will be output as nodump");
 					itemDisk.ItemStatus = ItemStatus.Nodump;
 				}
 

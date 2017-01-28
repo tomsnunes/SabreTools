@@ -158,22 +158,22 @@ namespace SabreTools.Helper.Dats
 			}
 			if (outputs.ContainsKey(StatDatFormat.CSV))
 			{
-				line = """ + FileName + "\","
-						+ """ + TotalSize + "\","
-						+ """ + (game == -1 ? Count : game) + "\","
-						+ """ + RomCount + "\","
-						+ """ + DiskCount + "\","
-						+ """ + CRCCount + "\","
-						+ """ + MD5Count + "\","
-						+ """ + SHA1Count + """;
+				line = "\"" + FileName + "\","
+						+ "\"" + TotalSize + "\","
+						+ "\"" + (game == -1 ? Count : game) + "\","
+						+ "\"" + RomCount + "\","
+						+ "\"" + DiskCount + "\","
+						+ "\"" + CRCCount + "\","
+						+ "\"" + MD5Count + "\","
+						+ "\"" + SHA1Count + "\"";
 
 				if (baddumpCol)
 				{
-					line += ","" + BaddumpCount + """;
+					line += ",\"" + BaddumpCount + "\"";
 				}
 				if (nodumpCol)
 				{
-					line += ","" + NodumpCount + """;
+					line += ",\"" + NodumpCount + "\"";
 				}
 
 				line += "\n";
@@ -206,22 +206,22 @@ namespace SabreTools.Helper.Dats
 			}
 			if (outputs.ContainsKey(StatDatFormat.TSV))
 			{
-				line = """ + FileName + "\"\t"
-						+ """ + TotalSize + "\"\t"
-						+ """ + (game == -1 ? Count : game) + "\"\t"
-						+ """ + RomCount + "\"\t"
-						+ """ + DiskCount + "\"\t"
-						+ """ + CRCCount + "\"\t"
-						+ """ + MD5Count + "\"\t"
-						+ """ + SHA1Count + """;
+				line = "\"" + FileName + "\"\t"
+						+ "\"" + TotalSize + "\"\t"
+						+ "\"" + (game == -1 ? Count : game) + "\"\t"
+						+ "\"" + RomCount + "\"\t"
+						+ "\"" + DiskCount + "\"\t"
+						+ "\"" + CRCCount + "\"\t"
+						+ "\"" + MD5Count + "\"\t"
+						+ "\"" + SHA1Count + "\"";
 
 				if (baddumpCol)
 				{
-					line += "\t"" + BaddumpCount + """;
+					line += "\t\"" + BaddumpCount + "\"";
 				}
 				if (nodumpCol)
 				{
-					line += "\t"" + NodumpCount + """;
+					line += "\t\"" + NodumpCount + "\"";
 				}
 
 				line += "\n";
@@ -530,8 +530,8 @@ Please check the log folder if the stats scrolled offscreen", false);
 			}
 			if (outputs.ContainsKey(StatDatFormat.CSV))
 			{
-				outputs[StatDatFormat.CSV].Write("\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1""
-					+ (baddumpCol ? ",\"BadDumps"" : String.Empty) + (nodumpCol ? ",\"Nodumps"" : String.Empty) + "\n");
+				outputs[StatDatFormat.CSV].Write("\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\""
+					+ (baddumpCol ? ",\"BadDumps\"" : String.Empty) + (nodumpCol ? ",\"Nodumps\"" : String.Empty) + "\n");
 			}
 			if (outputs.ContainsKey(StatDatFormat.HTML))
 			{
@@ -558,8 +558,8 @@ Please check the log folder if the stats scrolled offscreen", false);
 			}
 			if (outputs.ContainsKey(StatDatFormat.TSV))
 			{
-				outputs[StatDatFormat.TSV].Write("\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1""
-						+ (baddumpCol ? "\t\"BadDumps"" : String.Empty) + (nodumpCol ? "\t\"Nodumps"" : String.Empty) + "\n");
+				outputs[StatDatFormat.TSV].Write("\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\""
+						+ (baddumpCol ? "\t\"BadDumps\"" : String.Empty) + (nodumpCol ? "\t\"Nodumps\"" : String.Empty) + "\n");
 			}
 
 			// Now write the mid header for those who need it
@@ -614,7 +614,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			}
 			if (outputs.ContainsKey(StatDatFormat.HTML))
 			{
-				outputs[StatDatFormat.HTML].Write("<tr><td colspan=""
+				outputs[StatDatFormat.HTML].Write("<tr><td colspan=\""
 						+ (baddumpCol && nodumpCol
 							? "11"
 							: (baddumpCol ^ nodumpCol
@@ -648,7 +648,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			}
 			if (outputs.ContainsKey(StatDatFormat.HTML))
 			{
-				outputs[StatDatFormat.HTML].Write("<tr border=\"0\"><td colspan=""
+				outputs[StatDatFormat.HTML].Write("<tr border=\"0\"><td colspan=\""
 						+ (baddumpCol && nodumpCol
 							? "11"
 							: (baddumpCol ^ nodumpCol
