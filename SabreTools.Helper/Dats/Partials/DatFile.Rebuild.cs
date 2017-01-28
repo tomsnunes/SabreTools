@@ -139,6 +139,15 @@ namespace SabreTools.Helper.Dats
 
 			#endregion
 
+			// If we're updating the DAT, output to the rebuild directory
+			if (updateDat)
+			{
+				_fileName = "fixDAT_" + _fileName;
+				_name = "fixDAT_" + _name;
+				_description = "fixDAT_" + _description;
+				WriteToFile(outDir, logger);
+			}
+
 			return success;
 		}
 
