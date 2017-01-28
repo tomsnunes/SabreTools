@@ -478,7 +478,7 @@ namespace SabreTools.Helper.Dats
 					if (File.Exists(inputFileName))
 					{
 						DatFile innerDatdata = new DatFile(this);
-						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
+						logger.User("Processing "" + Path.GetFileName(inputFileName) + """);
 						innerDatdata.Parse(inputFileName, 0, 0, filter, splitType, trim, single,
 							root, logger, true, clean, softlist,
 							keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
@@ -497,7 +497,7 @@ namespace SabreTools.Helper.Dats
 							new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 							file =>
 							{
-								logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
+								logger.User("Processing "" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + """);
 								DatFile innerDatdata = new DatFile(this);
 								innerDatdata.Parse(file, 0, 0, filter, splitType,
 									trim, single, root, logger, true, clean, softlist,

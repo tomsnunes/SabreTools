@@ -1102,13 +1102,6 @@ namespace SabreTools.Helper.Tools
 		public static bool WriteTAR(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
 		{
 			bool success = false;
-			string tempFile = Path.GetTempFileName();
-
-			// If either list of roms is null or empty, return
-			if (inputFiles == null || roms == null || inputFiles.Count == 0 || roms.Count == 0)
-			{
-				return success;
-			}
 
 			// If the number of inputs is less than the number of available roms, return
 			if (inputFiles.Count < roms.Count)
@@ -1129,8 +1122,8 @@ namespace SabreTools.Helper.Tools
 			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].Machine.Name) + (roms[0].Machine.Name.EndsWith(".tar") ? String.Empty : ".tar"));
 
 			// Set internal variables
-			TarArchive oldTarFile = TarArchive.Create();
-			TarArchive tarFile = TarArchive.Create();
+			Stream tarstream = new MemoryStream();
+			TarArchive tarchive = TarArchive.Create();
 
 			try
 			{
@@ -1140,120 +1133,42 @@ namespace SabreTools.Helper.Tools
 					Directory.CreateDirectory(Path.GetDirectoryName(archiveFileName));
 				}
 
-				// If the archive doesn't exist, create it and put the single file
-				if (!File.Exists(archiveFileName))
+				// We can only overwrite at this point, sorry
+				tarstream = File.Open(archiveFileName, FileMode.Create, FileAccess.Write);
+
+				// Map all inputs to index
+				Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
+				for (int i = 0; i < inputFiles.Count; i++)
 				{
-					// Map all inputs to index
-					Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
-					for (int i = 0; i < inputFiles.Count; i++)
-					{
-						inputIndexMap.Add(roms[i].Name.Replace('\\', '/'), i);
-					}
-
-					// Sort the keys in TZIP order
-					List<string> keys = inputIndexMap.Keys.ToList();
-					keys.Sort(ZipFile.TorrentZipStringCompare);
-
-					// Now add all of the files in order
-					foreach (string key in keys)
-					{
-						// Get the index mapped to the key
-						int index = inputIndexMap[key];
-
-						// Copy the input stream to the output
-						tarFile.AddEntry(roms[index].Name, inputFiles[index]);
-					}
+					inputIndexMap.Add(roms[i].Name.Replace('\\', '/'), i);
 				}
 
-				// Otherwise, sort the input files and write out in the correct order
-				else
+				// Sort the keys in TZIP order
+				List<string> keys = inputIndexMap.Keys.ToList();
+				keys.Sort(ZipFile.TorrentZipStringCompare);
+
+				// Now add each of the files
+				foreach (string key in keys)
 				{
-					// Open the old archive for reading
-					oldTarFile = TarArchive.Open(archiveFileName);
-
-					// Get a list of all current entries
-					List<string> entries = oldTarFile.Entries.Select(i => i.Key).ToList();
-
-					// Map all inputs to index
-					Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
-					for (int i = 0; i < inputFiles.Count; i++)
-					{
-						// If the old one contains the new file, then just skip out
-						if (entries.Contains(roms[i].Name.Replace('\\', '/')))
-						{
-							continue;
-						}
-
-						inputIndexMap.Add(roms[i].Name.Replace('\\', '/'), -(i + 1));
-					}
-
-					// Then add all of the old entries to it too
-					for (int i = 0; i < entries.Count; i++)
-					{
-						inputIndexMap.Add(entries[i], i);
-					}
-
-					// If the number of entries is the same as the old archive, skip out
-					if (inputIndexMap.Keys.Count <= entries.Count)
-					{
-						success = true;
-						return success;
-					}
-
-					// Get the order for the entries with the new file
-					List<string> keys = inputIndexMap.Keys.ToList();
-					keys.Sort(ZipFile.TorrentZipStringCompare);
-
-					// Copy over all files to the new archive
-					foreach (string key in keys)
-					{
-						// Get the index mapped to the key
-						int index = inputIndexMap[key];
-
-						// If we have the input file, add it now
-						if (index < 0)
-						{
-							// Copy the input file to the output
-							tarFile.AddEntry(roms[-index - 1].Name, inputFiles[-index - 1]);
-						}
-
-						// Otherwise, copy the file from the old archive
-						else
-						{
-							// Get the stream from the original archive
-							MemoryStream readStream = new MemoryStream();
-							oldTarFile.Entries.Where(e => e.Key == key).ToList()[0].WriteTo(readStream);
-
-							// Copy the input stream to the output
-							tarFile.AddEntry(key, readStream);
-						}
-					}
+					int index = inputIndexMap[key];
+					tarchive.AddEntry(key, inputFiles[index]);
 				}
 
-				// Close the output tar file
-				tarFile.SaveTo(tempFile, new WriterOptions(CompressionType.None));
-
+				tarchive.SaveTo(tarstream, new WriterOptions(CompressionType.None));
 				success = true;
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex);
 				success = false;
+				logger.Error(ex.ToString());
 			}
 			finally
 			{
-				tarFile.Dispose();
-				oldTarFile.Dispose();
+				tarstream?.Dispose();
+				tarchive?.Dispose();
 			}
 
-			// If the old file exists, delete it and replace
-			if (File.Exists(archiveFileName))
-			{
-				File.Delete(archiveFileName);
-			}
-			File.Move(tempFile, archiveFileName);
-
-			return true;
+			return success;
 		}
 
 		/// <summary>

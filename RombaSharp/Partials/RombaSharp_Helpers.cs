@@ -87,7 +87,7 @@ namespace SabreTools
 			dbc.Open();
 			StreamWriter sw = new StreamWriter(File.Open("export.csv", FileMode.Create, FileAccess.Write));
 
-			sw.WriteLine("\"ID\",\"Size\",\"CRC\",\"MD5\",\"SHA-1\",\"In Depot\",\"DAT Hash\"");
+			sw.WriteLine("\"ID\",\"Size\",\"CRC\",\"MD5\",\"SHA-1\",\"In Depot\",\"DAT Hash"");
 
 			string query = "SELECT dats.id, size, crc, md5, sha1, indepot, hash FROM data JOIN dats ON data.id=dats.id";
 			SqliteCommand slc = new SqliteCommand(query, dbc);
@@ -97,13 +97,13 @@ namespace SabreTools
 			{
 				while (sldr.Read())
 				{
-					string line = "\"" + sldr.GetInt32(0) + "\","
-							+ "\"" + sldr.GetInt64(1) + "\","
-							+ "\"" + sldr.GetString(2) + "\","
-							+ "\"" + sldr.GetString(3) + "\","
-							+ "\"" + sldr.GetString(4) + "\","
-							+ "\"" + sldr.GetInt32(5) + "\","
-							+ "\"" + sldr.GetString(6) + "\"";
+					string line = """ + sldr.GetInt32(0) + "\","
+							+ """ + sldr.GetInt64(1) + "\","
+							+ """ + sldr.GetString(2) + "\","
+							+ """ + sldr.GetString(3) + "\","
+							+ """ + sldr.GetString(4) + "\","
+							+ """ + sldr.GetInt32(5) + "\","
+							+ """ + sldr.GetString(6) + """;
 					sw.WriteLine(line);
 				}
 			}
@@ -459,7 +459,7 @@ namespace SabreTools
 
 			foreach (string dathash in unneeded)
 			{
-				query = "DELETE FROM dats WHERE hash=\"" + dathash + "\"";
+				query = "DELETE FROM dats WHERE hash="" + dathash + """;
 				slc = new SqliteCommand(query, dbc);
 				slc.ExecuteNonQuery();
 				slc.Dispose();
@@ -502,23 +502,23 @@ namespace SabreTools
 
 							if (!String.IsNullOrEmpty(rom.CRC))
 							{
-								crcquery += " (\"" + rom.CRC + "\"),";
+								crcquery += " ("" + rom.CRC + "\"),";
 							}
 							if (!String.IsNullOrEmpty(rom.MD5))
 							{
-								md5query += " (\"" + rom.MD5 + "\"),";
+								md5query += " ("" + rom.MD5 + "\"),";
 							}
 							if (!String.IsNullOrEmpty(rom.SHA1))
 							{
-								sha1query += " (\"" + rom.SHA1 + "\"),";
+								sha1query += " ("" + rom.SHA1 + "\"),";
 
 								if (!String.IsNullOrEmpty(rom.CRC))
 								{
-									crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
+									crcsha1query += " ("" + rom.CRC + "\", "" + rom.SHA1 + "\"),";
 								}
 								if (!String.IsNullOrEmpty(rom.MD5))
 								{
-									md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
+									md5sha1query += " ("" + rom.MD5 + "\", "" + rom.SHA1 + "\"),";
 								}
 							}
 						}
@@ -528,15 +528,15 @@ namespace SabreTools
 
 							if (!String.IsNullOrEmpty(disk.MD5))
 							{
-								md5query += " (\"" + disk.MD5 + "\"),";
+								md5query += " ("" + disk.MD5 + "\"),";
 							}
 							if (!String.IsNullOrEmpty(disk.SHA1))
 							{
-								sha1query += " (\"" + disk.SHA1 + "\"),";
+								sha1query += " ("" + disk.SHA1 + "\"),";
 
 								if (!String.IsNullOrEmpty(disk.MD5))
 								{
-									md5sha1query += " (\"" + disk.MD5 + "\", \"" + disk.SHA1 + "\"),";
+									md5sha1query += " ("" + disk.MD5 + "\", "" + disk.SHA1 + "\"),";
 								}
 							}
 						}
@@ -571,7 +571,7 @@ namespace SabreTools
 				}
 			}
 
-			string datquery = "INSERT OR IGNORE INTO dat (hash) VALUES (\"" + dat.SHA1 + "\")";
+			string datquery = "INSERT OR IGNORE INTO dat (hash) VALUES ("" + dat.SHA1 + "\")";
 			slc = new SqliteCommand(datquery, dbc);
 			slc.ExecuteNonQuery();
 			slc.Dispose();
@@ -603,7 +603,7 @@ namespace SabreTools
 
 			// If we have it, then check for all hashes that are in that depot
 			List<string> hashes = new List<string>();
-			string query = "SELECT sha1 FROM sha1 WHERE depot=\"" + depotname + "\"";
+			string query = "SELECT sha1 FROM sha1 WHERE depot="" + depotname + """;
 			SqliteCommand slc = new SqliteCommand(query, dbc);
 			SqliteDataReader sldr = slc.ExecuteReader();
 			if (sldr.HasRows)
@@ -643,23 +643,23 @@ namespace SabreTools
 					{
 						if (!String.IsNullOrEmpty(rom.CRC))
 						{
-							crcquery += " (\"" + rom.CRC + "\"),";
+							crcquery += " ("" + rom.CRC + "\"),";
 						}
 						if (!String.IsNullOrEmpty(rom.MD5))
 						{
-							md5query += " (\"" + rom.MD5 + "\"),";
+							md5query += " ("" + rom.MD5 + "\"),";
 						}
 						if (!String.IsNullOrEmpty(rom.SHA1))
 						{
-							sha1query += " (\"" + rom.SHA1 + "\", \"" + depotname + "\"),";
+							sha1query += " ("" + rom.SHA1 + "\", "" + depotname + "\"),";
 
 							if (!String.IsNullOrEmpty(rom.CRC))
 							{
-								crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
+								crcsha1query += " ("" + rom.CRC + "\", "" + rom.SHA1 + "\"),";
 							}
 							if (!String.IsNullOrEmpty(rom.MD5))
 							{
-								md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
+								md5sha1query += " ("" + rom.MD5 + "\", "" + rom.SHA1 + "\"),";
 							}
 						}
 					}
@@ -703,7 +703,7 @@ JOIN crc
 	ON crcsha1.crc=crc.crc
 JOIN md5
 	ON md5sha1.md5=md5.md5
-WHERE sha1.sha1 IN (String.Empty" + String.Join("\",\"", hashes) + "\")";
+WHERE sha1.sha1 IN (String.Empty" + String.Join("\","", hashes) + "\")";
 			slc = new SqliteCommand(query, dbc);
 			slc.ExecuteNonQuery();
 

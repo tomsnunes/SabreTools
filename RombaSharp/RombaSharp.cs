@@ -178,7 +178,7 @@ namespace SabreTools
 						outdat = args[i];
 						break;
 					default:
-						string temparg = args[i].Replace("\"", String.Empty).Replace("file://", String.Empty);
+						string temparg = args[i].Replace(""", String.Empty).Replace("file://", String.Empty);
 
 						if (temparg.StartsWith("-") && temparg.Contains("="))
 						{

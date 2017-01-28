@@ -79,7 +79,7 @@ namespace SabreTools.Helper.Tools
 			}
 
 			// Read the input file, if possible
-			logger.Verbose("Attempting to read file to get format: \"" + filename + "\"");
+			logger.Verbose("Attempting to read file to get format: "" + filename + """);
 
 			// Check if file exists
 			if (!File.Exists(filename))
@@ -437,7 +437,7 @@ namespace SabreTools.Helper.Tools
 		/// <returns>The XmlTextReader representing the (possibly converted) file, null otherwise</returns>
 		public static XmlReader GetXmlTextReader(string filename, Logger logger)
 		{
-			logger.Verbose("Attempting to read file: \"" + filename + "\"");
+			logger.Verbose("Attempting to read file: "" + filename + """);
 
 			// Check if file exists
 			if (!File.Exists(filename))
