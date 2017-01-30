@@ -381,7 +381,12 @@ namespace SabreTools.Helper.Tools
 				st = null;
 			}
 
-			st.Position = 0;
+			// If we have a non-null stream, we seek to the beginning
+			if (st != null)
+			{
+				st.Position = 0;
+			}
+
 			return st;
 		}
 
