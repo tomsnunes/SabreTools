@@ -238,6 +238,26 @@ namespace SabreTools.Helper.Data
 						helptext.Add("	-ud, --update-dat	Output updated DAT to output directory");
 						helptext.Add("	-mt={4}			Amount of threads to use (-1 unlimted)");
 
+					// Sort Depot
+					helptext.Add("  -ssd, --sort		Sort input files by a set of DATs");
+						helptext.Add("	-dat=			Input DAT to rebuild against");
+						helptext.Add("	-out=			Output directory");
+						helptext.Add("	-t=, --temp=		Set the temporary directory to use");
+						helptext.Add("	-del, --delete		Delete fully rebuilt input files");
+						helptext.Add("	-in, --inverse		Rebuild only files not in DAT");
+						helptext.Add("	-ad, --add-date		Add original dates from DAT, if possible");
+						//helptext.Add("	-t7z			Enable Torrent7z output");
+						helptext.Add("	-tar			Enable TAR output");
+						helptext.Add("	-tgz			Enable TorrentGZ output");
+						helptext.Add("		-r, --romba		Enable Romba depot dir output");
+						//helptext.Add("	-tlrz			Enable TorrentLRZ output");
+						//helptext.Add("	-trar			Enable TorrentRAR output");
+						//helptext.Add("	-txz			Enable TorrentXZ output");
+						helptext.Add("	-tzip			Enable TorrentZip output");
+						helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
+						helptext.Add("	-ud, --update-dat	Output updated DAT to output directory");
+						helptext.Add("	-mt={4}			Amount of threads to use (-1 unlimted)");
+
 					// Stats
 					helptext.Add("  -st, --stats		Get statistics on all input DATs");
 						helptext.Add("	-bc, --baddump-col	Add baddump stats to output");

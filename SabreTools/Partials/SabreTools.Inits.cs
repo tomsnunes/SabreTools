@@ -332,7 +332,40 @@ namespace SabreTools
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			datdata.RebuildToOutput(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
+			datdata.RebuildFromInputs(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
+				updateDat, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
+		}
+
+		/// <summary>
+		/// Wrap sorting files from a depot using an input DAT
+		/// </summary>
+		/// <param name="datfiles">Names of the DATs to compare against</param>
+		/// <param name="inputs">List of input files/folders to check</param>
+		/// <param name="outDir">Output directory to use to build to</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
+		/// <param name="delete">True if input files should be deleted, false otherwise</param>
+		/// <param name="inverse">True if the DAT should be used as a filter instead of a template, false otherwise</param>
+		/// <param name="outputFormat">Output format that files should be written to</param>
+		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
+		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
+		private static void InitSortDepot(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool date, bool delete,
+			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, string headerToCheckAgainst, int maxDegreeOfParallelism)
+		{
+			DateTime start = DateTime.Now;
+			_logger.User("Populating internal DAT...");
+
+			// Add all of the input DATs into one huge internal DAT
+			DatFile datdata = new DatFile();
+			foreach (string datfile in datfiles)
+			{
+				datdata.Parse(datfile, 99, 99, _logger, keep: true, softlist: true);
+			}
+			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			datdata.RebuildFromDepot(inputs, outDir, tempDir, date, delete, inverse, outputFormat, romba,
 				updateDat, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
 		}
 

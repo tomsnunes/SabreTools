@@ -58,14 +58,15 @@ namespace SabreTools
 				datFromDir = false,
 				extract = false,
 				restore = false,
-				sort = false, // SimpleSort
+				sort = false,
+				sortDepot = false,
 				splitByExt = false,
 				splitByHash = false,
 				splitByLevel = false,
 				splitByType = false,
 				stats = false,
 				update = false,
-				verify = false; // SimpleSort
+				verify = false;
 
 			// User flags
 			bool addBlankFilesForEmptyFolder = false,
@@ -75,17 +76,17 @@ namespace SabreTools
 				copyFiles = false,
 				datPrefix = false,
 				dedup = false,
-				delete = false, // SimpleSort
+				delete = false,
 				enableGzip = false,
 				excludeOf = false,
 				hashOnly = false,
 				inplace = false,
-				inverse = false, // SimpleSort
+				inverse = false,
 				merge = false,
 				noMD5 = false,
 				noSHA1 = false,
 				parseArchivesAsFiles = false,
-				quickScan = false, // SimpleSort
+				quickScan = false,
 				quotes = false,
 				remext = false,
 				removeDateFromAutomaticName = false,
@@ -98,7 +99,7 @@ namespace SabreTools
 				superdat = false,
 				trim = false,
 				skip = false,
-				updateDat = false, // SimpleSort
+				updateDat = false,
 				usegame = true;
 			bool? runnable = null;
 			DatFormat datFormat = 0x0;
@@ -108,11 +109,11 @@ namespace SabreTools
 			StatDatFormat statDatFormat = 0x0;
 
 			// User inputs
-			int gz = 2, // SimpleSort
+			int gz = 2,
 				maxParallelism = 4,
-				rar = 2, // SimpleSort
-				sevenzip = 1, // SimpleSort
-				zip = 1; // SimpleSort
+				rar = 2,
+				sevenzip = 1,
+				zip = 1;
 			long sgt = -1,
 				slt = -1,
 				seq = -1;
@@ -142,7 +143,7 @@ namespace SabreTools
 				url = null,
 				version = null;
 			List<string> crc = new List<string>();
-			List<string> datfiles = new List<string>(); // SimpleSort
+			List<string> datfiles = new List<string>();
 			//List<string> exta = new List<string>();
 			//List<string> extb = new List<string>();
 			List<string> gamename = new List<string>();
@@ -204,6 +205,10 @@ namespace SabreTools
 					case "-ss":
 					case "--sort":
 						sort = true;
+						break;
+					case "-ssd":
+					case "--sort-depot":
+						sortDepot = true;
 						break;
 					case "-st":
 					case "--stats":
@@ -991,7 +996,7 @@ namespace SabreTools
 			}
 
 			// If none of the feature flags is enabled, show the help screen
-			if (!(datFromDir | extract | restore | sort | splitByExt | splitByHash | splitByLevel | splitByType | stats | update | verify))
+			if (!(datFromDir | extract | restore | sort | sortDepot | splitByExt | splitByHash | splitByLevel | splitByType | stats | update | verify))
 			{
 				_logger.Error("At least one feature switch must be enabled");
 				_logger.Close();
@@ -999,7 +1004,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(datFromDir ^ extract ^ restore ^ sort ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify))
+			if (!(datFromDir ^ extract ^ restore ^ sort ^ sortDepot ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				_logger.Close();
@@ -1063,6 +1068,13 @@ namespace SabreTools
 			{
 				InitSort(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, delete, inverse,
 					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, maxParallelism);
+			}
+
+			// If we're using the sorter from depot
+			else if (sortDepot)
+			{
+				InitSortDepot(datfiles, inputs, outDir, tempDir, addFileDates, delete, inverse,
+					outputFormat, romba, updateDat, header, maxParallelism);
 			}
 
 			// Split a DAT by extension

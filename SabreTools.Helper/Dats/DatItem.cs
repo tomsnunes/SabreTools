@@ -248,10 +248,15 @@ namespace SabreTools.Helper.Dats
 
 			// Get the correct dictionary based on what is available
 			string key = "";
-			if (_itemType == ItemType.Rom && ((Rom)this).CRC != null)
+			if (_itemType == ItemType.Rom && ((Rom)this).SHA1 != null)
 			{
-				key = ((Rom)this).CRC;
-				datdata.BucketByCRC(false, logger, false);
+				key = ((Rom)this).SHA1;
+				datdata.BucketBySHA1(false, logger, false);
+			}
+			else if (_itemType == ItemType.Disk && ((Disk)this).SHA1 != null)
+			{
+				key = ((Disk)this).SHA1;
+				datdata.BucketBySHA1(false, logger, false);
 			}
 			else if (_itemType == ItemType.Rom && ((Rom)this).MD5 != null)
 			{
@@ -263,15 +268,10 @@ namespace SabreTools.Helper.Dats
 				key = ((Disk)this).MD5;
 				datdata.BucketByMD5(false, logger, false);
 			}
-			else if (_itemType == ItemType.Rom && ((Rom)this).SHA1 != null)
+			else if (_itemType == ItemType.Rom && ((Rom)this).CRC != null)
 			{
-				key = ((Rom)this).SHA1;
-				datdata.BucketBySHA1(false, logger, false);
-			}
-			else if (_itemType == ItemType.Disk && ((Disk)this).SHA1 != null)
-			{
-				key = ((Disk)this).SHA1;
-				datdata.BucketBySHA1(false, logger, false);
+				key = ((Rom)this).CRC;
+				datdata.BucketByCRC(false, logger, false);
 			}
 			else if (_itemType == ItemType.Rom)
 			{
@@ -323,10 +323,15 @@ namespace SabreTools.Helper.Dats
 
 			// Get the correct dictionary based on what is available
 			string key = "";
-			if (_itemType == ItemType.Rom && ((Rom)this).CRC != null)
+			if (_itemType == ItemType.Rom && ((Rom)this).SHA1 != null)
 			{
-				key = ((Rom)this).CRC;
-				datdata.BucketByCRC(false, logger, false);
+				key = ((Rom)this).SHA1;
+				datdata.BucketBySHA1(false, logger, false);
+			}
+			else if (_itemType == ItemType.Disk && ((Disk)this).SHA1 != null)
+			{
+				key = ((Disk)this).SHA1;
+				datdata.BucketBySHA1(false, logger, false);
 			}
 			else if (_itemType == ItemType.Rom && ((Rom)this).MD5 != null)
 			{
@@ -338,15 +343,10 @@ namespace SabreTools.Helper.Dats
 				key = ((Disk)this).MD5;
 				datdata.BucketByMD5(false, logger, false);
 			}
-			else if (_itemType == ItemType.Rom && ((Rom)this).SHA1 != null)
+			else if (_itemType == ItemType.Rom && ((Rom)this).CRC != null)
 			{
-				key = ((Rom)this).SHA1;
-				datdata.BucketBySHA1(false, logger, false);
-			}
-			else if (_itemType == ItemType.Disk && ((Disk)this).SHA1 != null)
-			{
-				key = ((Disk)this).SHA1;
-				datdata.BucketBySHA1(false, logger, false);
+				key = ((Rom)this).CRC;
+				datdata.BucketByCRC(false, logger, false);
 			}
 			else if (_itemType == ItemType.Rom)
 			{
