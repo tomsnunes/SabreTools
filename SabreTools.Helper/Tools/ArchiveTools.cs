@@ -225,9 +225,9 @@ namespace SabreTools.Helper.Tools
 			Stream ms = ExtractStream(input, entryName, out realEntry, logger);
 
 			// If we got out a null or empty entry, then we don't have a stream
-			if (String.IsNullOrEmpty(realEntry))
+			if (String.IsNullOrEmpty(realEntry) || ms == null)
 			{
-				ms.Dispose();
+				ms?.Dispose();
 				return null;
 			}
 
