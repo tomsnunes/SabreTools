@@ -143,7 +143,7 @@ namespace SabreTools.Helper.Dats
 				logger.User("Checking hash '" + hash + "'");
 
 				// Get the extension path for the hash
-				string subpath = Path.Combine(hash.Substring(0, 2), hash.Substring(2, 2), hash.Substring(4, 2), hash.Substring(6, 2), hash + ".gz");
+				string subpath = Style.GetRombaPath(hash);
 
 				// Find the first depot that includes the hash
 				string foundpath = null;

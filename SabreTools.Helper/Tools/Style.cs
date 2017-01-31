@@ -388,6 +388,22 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
+		/// Get a proper romba sub path
+		/// </summary>
+		/// <param name="hash">SHA-1 hash to get the path for</param>
+		/// <returns>Subfolder path for the given hash</returns>
+		public static string GetRombaPath(string hash)
+		{
+			// If the hash isn't the right size, then we return null
+			if (hash.Length != Constants.SHA1Length)
+			{
+				return null;
+			}
+
+			return Path.Combine(hash.Substring(0, 2), hash.Substring(2, 2), hash.Substring(4, 2), hash.Substring(6, 2), hash + ".gz");
+		}
+
+		/// <summary>
 		/// Get if a string contains Unicode characters
 		/// </summary>
 		/// <param name="s">Input string to test</param>

@@ -1330,7 +1330,18 @@ namespace SabreTools.Helper.Tools
 			Rom rom = FileTools.GetFileInfo(input, logger);
 
 			// Get the output file name
-			string outfile = Path.Combine(outDir, rom.SHA1 + ".gz");
+			string outfile = null;
+
+			// If we have a romba output, add the romba path
+			if (romba)
+			{
+				outfile = Path.Combine(outDir, Style.GetRombaPath(rom.SHA1));
+			}
+			// Otherwise, we're just rebuilding to the main directory
+			else
+			{
+				outfile = Path.Combine(outDir, rom.SHA1 + ".gz");
+			}
 
 			// If the output file exists, don't try to write again
 			if (!File.Exists(outfile))
@@ -1371,12 +1382,6 @@ namespace SabreTools.Helper.Tools
 				sw.Dispose();
 				outputStream.Dispose();
 				inputStream.Dispose();
-			}
-
-			// If we're in romba mode, create the subfolder and move the file
-			if (romba)
-			{
-				FileTools.MoveToRombaFolder(rom, outDir, outfile, logger);
 			}
 
 			return true;

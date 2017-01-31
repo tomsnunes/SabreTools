@@ -418,18 +418,6 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
-		/// Get the romba path for a file based on the rom's SHA-1
-		/// </summary>
-		/// <param name="rom">Rom to get the sha1 from</param>
-		/// <param name="baseOutDir">Base output folder</param>
-		/// <returns>Formatted path string to use</returns>
-		public static string GetRombaPath(Rom rom, string baseOutDir)
-		{
-			string subfolder = Path.Combine(rom.SHA1.Substring(0, 2), rom.SHA1.Substring(2, 2), rom.SHA1.Substring(4, 2), rom.SHA1.Substring(6, 2));
-			return Path.Combine(baseOutDir, subfolder);
-		}
-
-		/// <summary>
 		/// Get the XmlTextReader associated with a file, if possible
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
@@ -456,32 +444,6 @@ namespace SabreTools.Helper.Tools
 				ValidationType = ValidationType.None,
 			});
 			return xtr;
-		}
-
-		/// <summary>
-		/// Move a file to a named, Romba-style subdirectory
-		/// </summary>
-		/// <param name="rom">Rom to get the sha1 from</param>
-		/// <param name="baseOutDir">Base output folder</param>
-		/// <param name="filename">Name of the file to be moved</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		public static void MoveToRombaFolder(Rom rom, string baseOutDir, string filename, Logger logger)
-		{
-			string outDir = GetRombaPath(rom, baseOutDir);
-			if (!Directory.Exists(outDir))
-			{
-				Directory.CreateDirectory(outDir);
-			}
-
-			try
-			{
-				File.Move(filename, Path.Combine(outDir, Path.GetFileName(filename)));
-			}
-			catch (Exception ex)
-			{
-				logger.Warning(ex.ToString());
-				File.Delete(filename);
-			}
 		}
 
 		/// <summary>
