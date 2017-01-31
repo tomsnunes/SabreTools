@@ -222,53 +222,9 @@ namespace SabreTools.Helper.Tools
 		public static string ExtractItem(string input, string entryName, string tempDir, Logger logger)
 		{
 			string realEntry = "";
-			Stream ms = ExtractStream(input, entryName, out realEntry, logger);
 
-			// If we got out a null or empty entry, then we don't have a stream
-			if (String.IsNullOrEmpty(realEntry) || ms == null)
-			{
-				ms?.Dispose();
-				return null;
-			}
-
-			realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
-			if (!Directory.Exists(Path.GetDirectoryName(realEntry)))
-			{
-				Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
-			}
-
-			FileStream fs = File.Open(realEntry, FileMode.Create, FileAccess.Write);
-
-			byte[] ibuffer = new byte[_bufferSize];
-			int ilen;
-			while ((ilen = ms.Read(ibuffer, 0, _bufferSize)) > 0)
-			{
-
-				fs.Write(ibuffer, 0, ilen);
-				fs.Flush();
-			}
-
-			// Dispose of the streams
-			ms.Dispose();
-			fs.Dispose();
-
-			return realEntry;
-		}
-
-		/// <summary>
-		/// Attempt to extract a stream from an archive
-		/// </summary>
-		/// <param name="input">Name of the archive to be extracted</param>
-		/// <param name="entryName">Name of the entry to be extracted</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <returns>Name of the extracted file, null on error</returns>
-		public static Stream ExtractStream(string input, string entryName, out string realEntry, Logger logger)
-		{
 			// Set the real entry name
 			realEntry = "";
-
-			// Get a writable stream to return
-			Stream st = new MemoryStream();
 
 			// First get the archive type
 			ArchiveType? at = GetCurrentArchiveType(input, logger);
@@ -276,7 +232,7 @@ namespace SabreTools.Helper.Tools
 			// If we got back null, then it's not an archive, so we we return
 			if (at == null)
 			{
-				return st;
+				return realEntry;
 			}
 
 			try
@@ -291,7 +247,16 @@ namespace SabreTools.Helper.Tools
 							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
 							{
 								realEntry = entry.Key;
-								entry.WriteTo(st);
+
+								// Get the output path
+								realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
+								if (!Directory.Exists(Path.GetDirectoryName(realEntry)))
+								{
+									Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
+								}
+
+								// Write the file out
+								entry.WriteToFile(realEntry);
 								break;
 							}
 						}
@@ -302,10 +267,28 @@ namespace SabreTools.Helper.Tools
 						// Decompress the input stream
 						realEntry = Path.GetFileNameWithoutExtension(input);
 						GZipStream gzstream = new GZipStream(File.OpenRead(input), CompressionMode.Decompress);
-						gzstream.CopyTo(st);
 
-						// Dispose of the stream
+						// Get the output path
+						realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
+						if (!Directory.Exists(Path.GetDirectoryName(realEntry)))
+						{
+							Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
+						}
+
+						// Write the file out
+						FileStream gzfileout = File.Open(realEntry, FileMode.Create, FileAccess.Write);
+						byte[] gbuffer = new byte[_bufferSize];
+						int glen;
+						while ((glen = gzstream.Read(gbuffer, 0, _bufferSize)) > 0)
+						{
+
+							gzfileout.Write(gbuffer, 0, glen);
+							gzfileout.Flush();
+						}
+
+						// Dispose of the streams
 						gzstream.Dispose();
+						gzfileout.Dispose();
 						break;
 
 					case ArchiveType.Rar:
@@ -316,7 +299,16 @@ namespace SabreTools.Helper.Tools
 							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
 							{
 								realEntry = entry.Key;
-								entry.WriteTo(st);
+
+								// Get the output path
+								realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
+								if (!Directory.Exists(Path.GetDirectoryName(realEntry)))
+								{
+									Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
+								}
+
+								// Write the file out
+								entry.WriteToFile(realEntry);
 								break;
 							}
 						}
@@ -331,7 +323,16 @@ namespace SabreTools.Helper.Tools
 							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
 							{
 								realEntry = entry.Key;
-								entry.WriteTo(st);
+
+								// Get the output path
+								realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
+								if (!Directory.Exists(Path.GetDirectoryName(realEntry)))
+								{
+									Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
+								}
+
+								// Write the file out
+								entry.WriteToFile(realEntry);
 								break;
 							}
 						}
@@ -361,15 +362,25 @@ namespace SabreTools.Helper.Tools
 
 								zr = zf.OpenReadStream(i, false, out readStream, out streamsize, out cm, out lastMod);
 
-								byte[] ibuffer = new byte[_bufferSize];
-								int ilen;
-								while ((ilen = readStream.Read(ibuffer, 0, _bufferSize)) > 0)
+								// Get the output path
+								realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
+								if (!Directory.Exists(Path.GetDirectoryName(realEntry)))
 								{
-									st.Write(ibuffer, 0, ilen);
-									st.Flush();
+									Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
+								}
+
+								// Write the file out
+								FileStream zipfileout = File.Open(realEntry, FileMode.Create, FileAccess.Write);
+								byte[] zbuffer = new byte[_bufferSize];
+								int zlen;
+								while ((zlen = readStream.Read(zbuffer, 0, _bufferSize)) > 0)
+								{
+									zipfileout.Write(zbuffer, 0, zlen);
+									zipfileout.Flush();
 								}
 
 								zr = zf.CloseReadStream();
+								zipfileout.Dispose();
 							}
 						}
 						break;
@@ -378,16 +389,10 @@ namespace SabreTools.Helper.Tools
 			catch (Exception ex)
 			{
 				logger.Error(ex.ToString());
-				st = null;
+				realEntry = "";
 			}
 
-			// If we have a non-null stream, we seek to the beginning
-			if (st != null)
-			{
-				st.Position = 0;
-			}
-
-			return st;
+			return realEntry;
 		}
 
 		#endregion
