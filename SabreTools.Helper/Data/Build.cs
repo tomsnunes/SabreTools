@@ -163,11 +163,11 @@ namespace SabreTools.Helper.Data
 							helptext.Add("  -ex, --extract	Extract and remove copier headers");
 							helptext.Add("  -hs, --hash-split	Split a DAT or folder by best-available hashes");
 							helptext.Add("  -ls, --lvl-split	Split a SuperDAT or folder by internal path");
-							helptext.Add("  -re, --restore		Restore header to file based on SHA-1");
+							helptext.Add("  -re, --restore	Restore header to file based on SHA-1");
 							helptext.Add("  -ss, --sort		Sort input files by a set of DATs");
 							helptext.Add("  -ssd, --sort-depot	Sort input files by a set of DATs");
 							helptext.Add("  -st, --stats		Get statistics on all input DATs");
-							helptext.Add("  -ts, --type-split		Split a DAT or folder by file types (rom/disk)");
+							helptext.Add("  -ts, --type-split	Split a DAT or folder by file types (rom/disk)");
 							helptext.Add("  -ud, --update		Update a DAT file");
 							helptext.Add("  -ve, --verify		Verify a folder against DATs");
 							helptext.Add("  -ved, --verify-depot  Verify a folder against DATs");
