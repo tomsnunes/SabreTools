@@ -149,7 +149,7 @@ namespace SabreTools.Helper.Data
 					helptext.Add("  --script		Enable script mode (no clear screen)");
 
 					// DATFromDir
-					helptext.Add("  -d, --dfd		Create a DAT from an input directory");
+					helptext.Add("  -d, --dfd, --d2d	Create a DAT from an input directory");
 						helptext.Add("	-nm, --noMD5		Don't include MD5 in output");
 						helptext.Add("	-ns, --noSHA1		Don't include SHA1 in output");
 						helptext.Add("	-b, --bare		Don't include date in file name");

@@ -146,7 +146,7 @@ Options:
 		the user to skip clearing the screen on run just like if the console was being
 		redirected.
 	
-	-d, --dfd		Create a DAT from each input directory
+	-d, --dfd, --d2d	Create a DAT from each input directory
 		Create a DAT file from an input directory or set of files. By default, this will
 		output a DAT named based on the input directory and the current date. It will also
 		treat all archives as possible games and add all three hashes for each file.
