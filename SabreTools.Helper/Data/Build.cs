@@ -16,7 +16,7 @@ namespace SabreTools.Helper.Data
 		/// <summary>
 		/// Readies the console and outputs the header
 		/// </summary>
-		/// <param name="name">The name to be displayed as the program</param>
+		/// <param name="name">The name to be displayed as the program</param>B
 		public static void Start(string name)
 		{
 			// Dynamically create the header string, adapted from http://stackoverflow.com/questions/8200661/how-to-align-string-in-fixed-length-string
@@ -582,6 +582,7 @@ namespace SabreTools.Helper.Data
 		{
 			if (!Console.IsOutputRedirected)
 			{
+				Console.WriteLine();
 				Console.WriteLine("Press enter to continue...");
 				Console.ReadLine();
 			}
