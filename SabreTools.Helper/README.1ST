@@ -1012,6 +1012,27 @@ Options:
 			to be hashed without possibly variant information. If a particular header skipper is
 			defined, and that skipper exists, then it will be used instead of trying to find one
 			that matches.
+			
+	-ved, --verify-depot	Verify a depot against an input DAT
+		When used, this will use an input DAT or set of DATs to blindly check against an input
+		depot. This is based on the sort-depot code in which the base directories are assumed
+		to be romba-style depots.
+		
+		-dat=				Name of the DAT to be used for the various options
+			The user-supplied DAT used to check which files need to be verified. Multiple
+			occurrences of this flag are allowed.
+			
+		-t=, --temp=		Set the name of the temporary directory
+			Optionally, a temp folder can be supplied in the case the default temp directory
+			(inside the running folder) is not preferred. This is used for any operations that
+			require an archive to be extracted.
+			
+		-h=, --header=		Remove headers from hash calculations
+			If this is set, then all files that have copier headers that are detected will
+			have them removed from the hash calculation. This will allow for a headered collection
+			to be hashed without possibly variant information. If a particular header skipper is
+			defined, and that skipper exists, then it will be used instead of trying to find one
+			that matches.
 
 ** Section 3.0 - Examples
 
