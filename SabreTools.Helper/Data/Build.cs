@@ -155,6 +155,14 @@ namespace SabreTools.Helper.Data
 					switch (subset)
 					{
 						// Easter eggs
+						case "ds76":
+						case "darksabre":
+						case "darksabre76":
+							helptext.Add("darksabre76 needs to write better help");
+							break;
+						case "edc":
+							helptext.Add("edc is S T U B B O R N about help");
+							break;
 						case "gordonj":
 							helptext.Add("GordonJ doesn't want any help");
 							break;
@@ -163,7 +171,7 @@ namespace SabreTools.Helper.Data
 							break;
 						case "obi":
 						case "obiwantje":
-							helptext.Add("Obiwantje needs to RTFM :D");
+							helptext.Add("Obiwantje needs to RTFM for help :D");
 							break;
 
 						// Help
