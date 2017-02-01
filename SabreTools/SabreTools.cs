@@ -54,8 +54,7 @@ namespace SabreTools
 			}
 
 			// Feature flags
-			bool help = false,
-				datFromDir = false,
+			bool datFromDir = false,
 				extract = false,
 				restore = false,
 				sort = false,
@@ -172,8 +171,9 @@ namespace SabreTools
 					case "-?":
 					case "-h":
 					case "--help":
-						help = true;
-						break;
+						Build.Help("SabreTools", (i + 1 < args.Length ? args[i + 1] : null));
+						_logger.Close();
+						return;
 					case "-d":
 					case "--d2d":
 					case "--dfd":
@@ -985,14 +985,6 @@ namespace SabreTools
 						}
 						break;
 				}
-			}
-
-			// If help is set, show the help screen
-			if (help)
-			{
-				Build.Help("SabreTools");
-				_logger.Close();
-				return;
 			}
 
 			// If none of the feature flags is enabled, show the help screen

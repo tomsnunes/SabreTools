@@ -157,6 +157,7 @@ namespace SabreTools.Helper.Data
 					// DATFromDir
 					if (subset == null || subset == "d" || subset == "dfd" || subset == "d2d")
 					{
+						helptext.Add("");
 						helptext.Add("  -d, --dfd, --d2d	Create a DAT from an input directory");
 							helptext.Add("	-nm, --noMD5		Don't include MD5 in output");
 							helptext.Add("	-ns, --noSHA1		Don't include SHA1 in output");
@@ -202,6 +203,7 @@ namespace SabreTools.Helper.Data
 					// Extension Split
 					if (subset == null || subset == "es" || subset == "ext-split")
 					{
+						helptext.Add("");
 						helptext.Add("  -es, --ext-split	Split a DAT by two file extensions");
 							helptext.Add("	-exta=			First set of extensions (comma-separated)");
 							helptext.Add("	-extb=			Second set of extensions (comma-separated)");
@@ -211,6 +213,7 @@ namespace SabreTools.Helper.Data
 					// Extract and Remove Headers
 					if (subset == null || subset == "ex" || subset == "extract")
 					{
+						helptext.Add("");
 						helptext.Add("  -ex, --extract	Extract and remove copier headers");
 							helptext.Add("	-out=				Output directory");
 					}
@@ -218,6 +221,7 @@ namespace SabreTools.Helper.Data
 					// Hash Split
 					if (subset == null || subset == "hs" || subset == "hash-split")
 					{
+						helptext.Add("");
 						helptext.Add("  -hs, --hash-split	Split a DAT or folder by best-available hashes");
 							helptext.Add("	-out=			Output directory");
 					}
@@ -225,6 +229,7 @@ namespace SabreTools.Helper.Data
 					// Level/SuperDAT Split
 					if (subset == null || subset == "ls" || subset == "lvl-split")
 					{
+						helptext.Add("");
 						helptext.Add("  -ls, --lvl-split	Split a SuperDAT or folder by internal path");
 							helptext.Add("	-out=			Output directory");
 							helptext.Add("	-s, --short		Use short output names");
@@ -234,6 +239,7 @@ namespace SabreTools.Helper.Data
 					// Restore Headers
 					if (subset == null || subset == "re" || subset == "restore")
 					{
+						helptext.Add("");
 						helptext.Add("	-re, --restore		Restore header to file based on SHA-1");
 							helptext.Add("	-out=				Output directory");
 					}
@@ -241,6 +247,7 @@ namespace SabreTools.Helper.Data
 					// Sort
 					if (subset == null || subset == "ss" || subset == "sort")
 					{
+						helptext.Add("");
 						helptext.Add("  -ss, --sort		Sort input files by a set of DATs");
 							helptext.Add("	-dat=			Input DAT to rebuild against");
 							helptext.Add("	-out=			Output directory");
@@ -269,6 +276,7 @@ namespace SabreTools.Helper.Data
 					// Sort Depot
 					if (subset == null || subset == "ssd" || subset == "sort-depot")
 					{
+						helptext.Add("");
 						helptext.Add("  -ssd, --sort-depot	Sort input files by a set of DATs");
 							helptext.Add("	-dat=			Input DAT to rebuild against");
 							helptext.Add("	-out=			Output directory");
@@ -292,6 +300,7 @@ namespace SabreTools.Helper.Data
 					// Stats
 					if (subset == null || subset == "st" || subset == "stats")
 					{
+						helptext.Add("");
 						helptext.Add("  -st, --stats		Get statistics on all input DATs");
 							helptext.Add("	-bc, --baddump-col	Add baddump stats to output");
 							helptext.Add("	-csv, --csv		Output in Comma-Separated Value format");
@@ -306,6 +315,7 @@ namespace SabreTools.Helper.Data
 					// Type Split
 					if (subset == null || subset == "ts" || subset == "type-split")
 					{
+						helptext.Add("");
 						helptext.Add("  -ts, --type-split		Split a DAT or folder by file types (rom/disk)");
 							helptext.Add("	-out=			Output directory");
 					}
@@ -313,6 +323,7 @@ namespace SabreTools.Helper.Data
 					// Update
 					if (subset == null || subset == "ud" || subset == "update")
 					{
+						helptext.Add("");
 						helptext.Add("  -ud, --update		Update a DAT file");
 							helptext.Add("	-oa, --output-all	Output in all formats");
 							helptext.Add("	-oam, --output-am	Output in AttractMode format");
@@ -438,10 +449,22 @@ namespace SabreTools.Helper.Data
 					// Verify
 					if (subset == null || subset == "ve" || subset == "verify")
 					{
+						helptext.Add("");
 						helptext.Add("  -ve, --verify		Verify a folder against DATs");
 							helptext.Add("	-dat=			Input DAT to verify against");
 							helptext.Add("	-t=, --temp=		Set the temporary directory to use");
 							helptext.Add("	-ho, --hash-only	Check files by hash only");
+							helptext.Add("	-qs, --quick		Enable quick scanning of archives");
+							helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
+					}
+
+					// Verify Depot
+					if (/*subset == null* ||*/ subset == "ved" || subset == "verify-depot")
+					{
+						helptext.Add("");
+						helptext.Add("  -ved, --verify-depot  Verify a folder against DATs");
+							helptext.Add("	-dat=			Input DAT to verify against");
+							helptext.Add("	-t=, --temp=		Set the temporary directory to use");
 							helptext.Add("	-qs, --quick		Enable quick scanning of archives");
 							helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
 					}
@@ -469,11 +492,12 @@ namespace SabreTools.Helper.Data
 						helptext.Add("");
 						helptext.Add("Filter parameters for size can use postfixes for inputs:");
 						helptext.Add("	e.g. 8kb => 8000 or 8kib => 8192");
-						}
 
-					helptext.Add("");
-					helptext.Add("Most of the filter parameters allow for multiple inputs:");
-					helptext.Add("	e.g. --game-name=foo --game-name=bar");
+						helptext.Add("");
+						helptext.Add("Most of the filter parameters allow for multiple inputs:");
+						helptext.Add("	e.g. --game-name=foo --game-name=bar");
+					}
+					
 					break;
 
 				default:
