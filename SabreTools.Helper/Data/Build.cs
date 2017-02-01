@@ -155,6 +155,9 @@ namespace SabreTools.Helper.Data
 					switch (subset)
 					{
 						case null:
+						case "?":
+						case "h":
+						case "help":
 							helptext.Add("Available Options (only one allowed per run):");
 							helptext.Add("  -?, -h, --help	Show this help");
 							helptext.Add("  --script		Enable script mode (no clear screen)");
@@ -173,6 +176,10 @@ namespace SabreTools.Helper.Data
 							helptext.Add("  -ved, --verify-depot  Verify a folder against DATs");
 							helptext.Add("");
 							helptext.Add("For information on available flags, put the option name after help");
+							break;
+
+						case "script":
+							helptext.Add("Script is a standalone option");
 							break;
 
 						//DATFromDir
@@ -500,10 +507,49 @@ namespace SabreTools.Helper.Data
 
 						// Default
 						default:
-							helptext.Add("Available Flags:");
-							helptext.Add("  No flags found for " + subset);
+							helptext.Add("No flags found for " + subset + ", did you mean:");
+							switch (subset[0])
+							{
+								case 'd':
+									helptext.Add("  -d, --dfd, --d2d	Create a DAT from an input directory");
+									break;
+								case 'e':
+									helptext.Add("  -es, --ext-split	Split a DAT by two file extensions");
+									helptext.Add("  -ex, --extract	Extract and remove copier headers");
+									break;
+								case 'h':
+									helptext.Add("  -?, -h, --help	Show application help");
+									helptext.Add("  -hs, --hash-split	Split a DAT or folder by best-available hashes");
+									break;
+								case 'l':
+									helptext.Add("  -ls, --lvl-split	Split a SuperDAT or folder by internal path");
+									break;
+								case 'r':
+									helptext.Add("  -re, --restore	Restore header to file based on SHA-1");
+									break;
+								case 's':
+									helptext.Add("  --script		Enable script mode (no clear screen)");
+									helptext.Add("  -ss, --sort		Sort input files by a set of DATs");
+									helptext.Add("  -ssd, --sort-depot	Sort input files by a set of DATs");
+									helptext.Add("  -st, --stats		Get statistics on all input DATs");
+									break;
+								case 't':
+									helptext.Add("  -ts, --type-split	Split a DAT or folder by file types (rom/disk)");
+									break;
+								case 'u':
+									helptext.Add("  -ud, --update		Update a DAT file");
+									break;
+								case 'v':
+									helptext.Add("  -ve, --verify		Verify a folder against DATs");
+									helptext.Add("  -ved, --verify-depot  Verify a folder against DATs");
+									break;
+								default:
+									helptext.Add("  No options found starting with '" + subset[0] + "'");
+									break;
+							}
+
 							break;
-					}
+						}
 					
 					break;
 
