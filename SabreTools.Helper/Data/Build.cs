@@ -154,6 +154,19 @@ namespace SabreTools.Helper.Data
 					// Determine which help to show
 					switch (subset)
 					{
+						// Easter eggs
+						case "gordonj":
+							helptext.Add("GordonJ doesn't want any help");
+							break;
+						case "kludge":
+							helptext.Add("Kludge can't be helped");
+							break;
+						case "obi":
+						case "obiwantje":
+							helptext.Add("Obiwantje needs to RTFM :D");
+							break;
+
+						// Help
 						case null:
 						case "?":
 						case "h":
