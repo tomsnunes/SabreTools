@@ -165,12 +165,8 @@ namespace SabreTools
 		/// <param name="exta">First extension to split on</param>
 		/// <param name="extb">Second extension to split on</param>
 		/// <param name="outDir">Output directory for the split files</param>
-		private static void InitExtSplit(List<string> inputs, string exta, string extb, string outDir)
+		private static void InitExtSplit(List<string> inputs, List<string> exta, List<string> extb, string outDir)
 		{
-			// Convert comma-separated strings to list
-			List<string> extaList = exta.Split(',').ToList();
-			List<string> extbList = extb.Split(',').ToList();
-
 			// Loop over the input files
 			foreach (string input in inputs)
 			{
@@ -178,7 +174,7 @@ namespace SabreTools
 				{
 					DatFile datFile = new DatFile();
 					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, softlist: true);
-					datFile.SplitByExt(outDir, Path.GetDirectoryName(input), extaList, extbList, _logger);
+					datFile.SplitByExt(outDir, Path.GetDirectoryName(input), exta, extb, _logger);
 				}
 				else if (Directory.Exists(input))
 				{
@@ -186,7 +182,7 @@ namespace SabreTools
 					{
 						DatFile datFile = new DatFile();
 						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, softlist: true);
-						datFile.SplitByExt(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), extaList, extbList, _logger);
+						datFile.SplitByExt(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), exta, extb, _logger);
 					}
 				}
 				else

@@ -290,13 +290,13 @@ Options:
 		to be split. Files with any extensions not listed in the input lists will be included
 		in both outputted DAT files.
 		
-		-exta=			First set of extensions (comma-separated)
+		-exta=			First extension (multiple allowed)
 			Set the extensions to be used to populate the first DAT. If more than one
-			extension is defined, they must be separated by commas.
+			extension is defined, they must be placed in separate flags.
 			
-		-extb=			Second set of extensions (comma-separated)
+		-extb=			Second extension (multiple allowed)
 			Set the extensions to be used to populate the second DAT. If more than one
-			extension is defined, they must be separated by commas.
+			extension is defined, they must be placed in separate flags.
 			
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If a path

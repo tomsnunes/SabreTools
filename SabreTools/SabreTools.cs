@@ -124,8 +124,6 @@ namespace SabreTools
 				date = null,
 				description = null,
 				email = null,
-				exta = null,
-				extb = null,
 				filename = null,
 				forcemerge = "",
 				forcend = "",
@@ -144,8 +142,8 @@ namespace SabreTools
 				version = null;
 			List<string> crc = new List<string>();
 			List<string> datfiles = new List<string>();
-			//List<string> exta = new List<string>();
-			//List<string> extb = new List<string>();
+			List<string> exta = new List<string>();
+			List<string> extb = new List<string>();
 			List<string> gamename = new List<string>();
 			List<string> gametype = new List<string>();
 			List<string> inputs = new List<string>();
@@ -563,11 +561,11 @@ namespace SabreTools
 						break;
 					case "-exta":
 					case "--exta":
-						exta = args[++i];
+						exta.Add(args[++i]);
 						break;
 					case "-extb":
 					case "--extb":
-						extb = args[++i];
+						extb.Add(args[++i]);
 						break;
 					case "-fi":
 					case "--filename":
@@ -796,11 +794,11 @@ namespace SabreTools
 									break;
 								case "-exta":
 								case "--exta":
-									exta = split[1];
+									exta.Add(split[1]);
 									break;
 								case "-extb":
 								case "--extb":
-									extb = split[1];
+									extb.Add(split[1]);
 									break;
 								case "-f":
 								case "--filename":
