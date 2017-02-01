@@ -35,7 +35,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if rebuilding was a success, false otherwise</returns>
-		public bool RebuildFromDepot(List<string> inputs, string outDir, string tempDir, bool date, bool delete,
+		public bool RebuildDepot(List<string> inputs, string outDir, string tempDir, bool date, bool delete,
 			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, string headerToCheckAgainst,
 			int maxDegreeOfParallelism, Logger logger)
 		{
@@ -172,7 +172,6 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Otherwise, we rebuild that file to all locations that we need to
-
 				RebuildIndividualFile(fileinfo, foundpath, outDir, tempDir, date, inverse, outputFormat, romba, updateDat, true /*isZip*/, headerToCheckAgainst, logger);
 			}
 
@@ -209,7 +208,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if rebuilding was a success, false otherwise</returns>
-		public bool RebuildFromInputs(List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
+		public bool RebuildGeneric(List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
 			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
 			string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
 		{
@@ -290,7 +289,7 @@ namespace SabreTools.Helper.Dats
 				if (File.Exists(input))
 				{
 					logger.User("Checking file: '" + input + "'");
-					RebuildFromInputsHelper(input, outDir, tempDir, quickScan, date, delete, inverse,
+					RebuildGenericHelper(input, outDir, tempDir, quickScan, date, delete, inverse,
 						outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 				}
 
@@ -301,7 +300,7 @@ namespace SabreTools.Helper.Dats
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						logger.User("Checking file: '" + file + "'");
-						RebuildFromInputsHelper(file, outDir, tempDir, quickScan, date, delete, inverse,
+						RebuildGenericHelper(file, outDir, tempDir, quickScan, date, delete, inverse,
 							outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 					}
 				}
@@ -339,7 +338,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private void RebuildFromInputsHelper(string file, string outDir, string tempDir, bool quickScan, bool date,
+		private void RebuildGenericHelper(string file, string outDir, string tempDir, bool quickScan, bool date,
 			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
 			string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
 		{
@@ -741,6 +740,116 @@ namespace SabreTools.Helper.Dats
 		}
 
 		/// <summary>
+		/// Process the DAT and verify from the depots
+		/// </summary>
+		/// <param name="inputs">List of input directories to compare against</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="hashOnly">True if only hashes should be checked, false for full file information</param>
+		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>True if verification was a success, false otherwise</returns>
+		public bool VerifyDepot(List<string> inputs, string tempDir, string headerToCheckAgainst, Logger logger)
+		{
+			// Check the temp directory
+			if (String.IsNullOrEmpty(tempDir))
+			{
+				tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+			}
+
+			// Then create or clean the temp directory
+			if (!Directory.Exists(tempDir))
+			{
+				Directory.CreateDirectory(tempDir);
+			}
+			else
+			{
+				FileTools.CleanDirectory(tempDir);
+			}
+
+			bool success = true;
+
+			logger.User("Verifying all from supplied depots");
+			DateTime start = DateTime.Now;
+
+			// Now loop through and get only directories from the input paths
+			List<string> directories = new List<string>();
+			foreach (string input in inputs)
+			{
+				// Add to the list if the input is a directory
+				if (Directory.Exists(input))
+				{
+					logger.Verbose("Adding depot: '" + input + "'");
+					directories.Add(input);
+				}
+			}
+
+			// If we don't have any directories, we want to exit
+			if (directories.Count == 0)
+			{
+				return success;
+			}
+
+			// Now that we have a list of depots, we want to sort the input DAT by SHA-1
+			BucketBySHA1(false, logger, output: false);
+
+			// Then we want to loop through each of the hashes and see if we can rebuild
+			List<string> hashes = Keys.ToList();
+			foreach (string hash in hashes)
+			{
+				// Pre-empt any issues that could arise from string length
+				if (hash.Length != Constants.SHA1Length)
+				{
+					continue;
+				}
+
+				logger.User("Checking hash '" + hash + "'");
+
+				// Get the extension path for the hash
+				string subpath = Style.GetRombaPath(hash);
+
+				// Find the first depot that includes the hash
+				string foundpath = null;
+				foreach (string directory in directories)
+				{
+					if (File.Exists(Path.Combine(directory, subpath)))
+					{
+						foundpath = Path.Combine(directory, subpath);
+						break;
+					}
+				}
+
+				// If we didn't find a path, then we continue
+				if (foundpath == null)
+				{
+					continue;
+				}
+
+				// If we have a path, we want to try to get the rom information
+				Rom fileinfo = ArchiveTools.GetTorrentGZFileInfo(foundpath, logger);
+
+				// If the file information is null, then we continue
+				if (fileinfo == null)
+				{
+					continue;
+				}
+
+				// Now we want to remove all duplicates from the DAT
+				fileinfo.GetDuplicates(this, logger, remove: true);
+			}
+
+			logger.User("Verifying complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// If there are any entries in the DAT, output to the rebuild directory
+			_fileName = "fixDAT_" + _fileName;
+			_name = "fixDAT_" + _name;
+			_description = "fixDAT_" + _description;
+			WriteToFile(null, logger);
+
+			return success;
+		}
+
+		/// <summary>
 		/// Process the DAT and verify the output directory
 		/// </summary>
 		/// <param name="inputs">List of input directories to compare against</param>
@@ -750,7 +859,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if verification was a success, false otherwise</returns>
-		public bool VerifyDirectory(List<string> inputs, string tempDir, bool hashOnly, bool quickScan, string headerToCheckAgainst, Logger logger)
+		public bool VerifyGeneric(List<string> inputs, string tempDir, bool hashOnly, bool quickScan, string headerToCheckAgainst, Logger logger)
 		{
 			// Check the temp directory exists
 			if (String.IsNullOrEmpty(tempDir))

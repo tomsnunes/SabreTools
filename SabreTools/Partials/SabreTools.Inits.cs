@@ -332,7 +332,7 @@ namespace SabreTools
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			datdata.RebuildFromInputs(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
+			datdata.RebuildGeneric(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
 				updateDat, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
 		}
 
@@ -365,7 +365,7 @@ namespace SabreTools
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			datdata.RebuildFromDepot(inputs, outDir, tempDir, date, delete, inverse, outputFormat, romba,
+			datdata.RebuildDepot(inputs, outDir, tempDir, date, delete, inverse, outputFormat, romba,
 				updateDat, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
 		}
 
@@ -841,7 +841,30 @@ namespace SabreTools
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			datdata.VerifyDirectory(inputs, tempDir, hashOnly, quickScan, headerToCheckAgainst, _logger);
+			datdata.VerifyGeneric(inputs, tempDir, hashOnly, quickScan, headerToCheckAgainst, _logger);
+		}
+
+		/// <summary>
+		/// Wrap verifying files from a depot using an input DAT
+		/// </summary>
+		/// <param name="datfiles">Names of the DATs to compare against</param>
+		/// <param name="inputs">Input directories to compare against</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		private static void InitVerifyDepot(List<string> datfiles, List<string> inputs, string tempDir, string headerToCheckAgainst)
+		{
+			DateTime start = DateTime.Now;
+			_logger.User("Populating internal DAT...");
+
+			// Add all of the input DATs into one huge internal DAT
+			DatFile datdata = new DatFile();
+			foreach (string datfile in datfiles)
+			{
+				datdata.Parse(datfile, 99, 99, _logger, keep: true, softlist: true);
+			}
+			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			datdata.VerifyDepot(inputs, tempDir, headerToCheckAgainst, _logger);
 		}
 
 		#endregion

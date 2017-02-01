@@ -459,13 +459,12 @@ namespace SabreTools.Helper.Data
 					}
 
 					// Verify Depot
-					if (/*subset == null* ||*/ subset == "ved" || subset == "verify-depot")
+					if (subset == null || subset == "ved" || subset == "verify-depot")
 					{
 						helptext.Add("");
 						helptext.Add("  -ved, --verify-depot  Verify a folder against DATs");
 							helptext.Add("	-dat=			Input DAT to verify against");
 							helptext.Add("	-t=, --temp=		Set the temporary directory to use");
-							helptext.Add("	-qs, --quick		Enable quick scanning of archives");
 							helptext.Add("	-h=, --header=		Set a header skipper to use, blank means all");
 					}
 

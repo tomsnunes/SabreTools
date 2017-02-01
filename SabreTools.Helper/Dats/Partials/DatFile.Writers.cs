@@ -49,7 +49,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// If output directory is empty, use the current folder
-			if (outDir.Trim() == "")
+			if (outDir == null || outDir.Trim() == "")
 			{
 				logger.Verbose("No output directory defined, defaulting to curent folder");
 				outDir = Environment.CurrentDirectory;

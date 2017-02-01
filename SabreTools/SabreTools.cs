@@ -65,7 +65,8 @@ namespace SabreTools
 				splitByType = false,
 				stats = false,
 				update = false,
-				verify = false;
+				verify = false,
+				verifyDepot = false;
 
 			// User flags
 			bool addBlankFilesForEmptyFolder = false,
@@ -221,6 +222,10 @@ namespace SabreTools
 					case "-ve":
 					case "--verify":
 						verify = true;
+						break;
+					case "-ved":
+					case "--verify-depot":
+						verifyDepot = true;
 						break;
 
 					// User flags
@@ -988,7 +993,7 @@ namespace SabreTools
 			}
 
 			// If none of the feature flags is enabled, show the help screen
-			if (!(datFromDir | extract | restore | sort | sortDepot | splitByExt | splitByHash | splitByLevel | splitByType | stats | update | verify))
+			if (!(datFromDir | extract | restore | sort | sortDepot | splitByExt | splitByHash | splitByLevel | splitByType | stats | update | verify | verifyDepot))
 			{
 				_logger.Error("At least one feature switch must be enabled");
 				_logger.Close();
@@ -1005,7 +1010,7 @@ namespace SabreTools
 
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (inputs.Count == 0
-				&& (datFromDir || extract || restore || splitByExt || splitByHash || splitByLevel || splitByType || stats || update))
+				&& (datFromDir || extract || restore || splitByExt || splitByHash || splitByLevel || splitByType || stats || update || verify || verifyDepot))
 			{
 				_logger.Error("This feature requires at least one input");
 				_logger.Close();
@@ -1114,6 +1119,12 @@ namespace SabreTools
 			else if (verify)
 			{
 				InitVerify(datfiles, inputs, tempDir, hashOnly, quickScan, header);
+			}
+
+			// If we're using the depot verifier
+			else if (verifyDepot)
+			{
+				InitVerifyDepot(datfiles, inputs, tempDir, header);
 			}
 
 			// If nothing is set, show the help
