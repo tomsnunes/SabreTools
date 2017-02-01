@@ -155,7 +155,7 @@ namespace SabreTools.Helper.Data
 					switch (subset)
 					{
 						case null:
-							helptext.Add("Options:");
+							helptext.Add("Available Options (use only one):");
 							helptext.Add("  -?, -h, --help	Show this help");
 							helptext.Add("  --script		Enable script mode (no clear screen)");
 							helptext.Add("  -d, --dfd, --d2d	Create a DAT from an input directory");
