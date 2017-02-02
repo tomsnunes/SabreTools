@@ -751,17 +751,29 @@ namespace SabreTools
 			helptext.Add("  -qs, --quick		Enable quick scanning of archives");
 			helptext.Add("  -h=, --header=	Set a header skipper to use, blank means all");
 
+			*/
+
 			// Create the Verify Depot feature
 			Feature verifyDepot = new Feature(
 				new List<string>() { "-ved", "--verify-depot" },
 				"Verify a depot against DATs",
 				FeatureType.Flag,
 				null);
-			helptext.Add("  -dat=			Input DAT to verify against");
-			helptext.Add("  -t=, --temp=		Set the temporary directory to use");
-			helptext.Add("  -h=, --header=	Set a header skipper to use, blank means all");
-
-			*/
+			verifyDepot.AddFeature("dat", new Feature(
+				new List<string>() { "-dat", "--dat" },
+				"Input DAT to verify against",
+				FeatureType.List,
+				null));
+			verifyDepot.AddFeature("temp", new Feature(
+				new List<string>() { "-t", "--temp" },
+				"Set the temporary directory to use",
+				FeatureType.String,
+				null));
+			verifyDepot.AddFeature("header", new Feature(
+				new List<string>() { "-h", "--header" },
+				"Set a header skipper to use, blank means all",
+				FeatureType.String,
+				null));
 
 			// Now, add all of the main features to the Help object
 			help.Add("Help", helpFeature);
@@ -778,7 +790,7 @@ namespace SabreTools
 			//help.Add("Type Split", typeSplit);
 			//help.Add("Update", update);
 			//help.Add("Verify", verify);
-			//help.Add("Verify Depot", verifyDepot);
+			help.Add("Verify Depot", verifyDepot);
 
 			return help;
 		}
