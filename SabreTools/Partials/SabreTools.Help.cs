@@ -907,32 +907,105 @@ namespace SabreTools
 				"Use Software List name instead of description",
 				FeatureType.Flag,
 				null));
+			update.AddFeature("dat-merged", new Feature(
+				new List<string>() { "-dm", "--dat-merged" },
+				"Create merged sets",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("dat-split", new Feature(
+				new List<string>() { "-ds", "--dat-split" },
+				"Create split sets",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("dat-nonmerged", new Feature(
+				new List<string>() { "-dnm", "--dat-nonmerged" },
+				"Create non-merged sets",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("dat-fullnonmerged", new Feature(
+				new List<string>() { "-df", "--dat-fullnonmerged" },
+				"Create fully non-merged sets",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("trim", new Feature(
+				new List<string>() { "-trim", "--trim" },
+				"Trim file names to fit NTFS length",
+				FeatureType.Flag,
+				null));
+				update["trim"].AddFeature("root-dir", new Feature(
+					new List<string>() { "-rd", "--root-dir" },
+					"Set the root directory for calc",
+					FeatureType.String,
+					null));
+			update.AddFeature("single", new Feature(
+				new List<string>() { "-si", "--single" },
+				"All game names replaced by '!'",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("dedup", new Feature(
+				new List<string>() { "-dd", "--dedup" },
+				"Enable deduping in the created DAT",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("merge", new Feature(
+				new List<string>() { "-m", "--merge" },
+				"Merge the input DATs",
+				FeatureType.Flag,
+				null));
+				update["merge"].AddFeature("bare", new Feature(
+					new List<string>() { "-b", "--bare" },
+					"Don't include the date in automatic name",
+					FeatureType.Flag,
+					null));
+			update.AddFeature("diff", new Feature(
+				new List<string>() { "-di", "--diff" },
+				"Create diffdats from inputs (all outputs)s",
+				FeatureType.Flag,
+				null));
+				update["diff"].AddFeature("bare", new Feature(
+					new List<string>() { "-b", "--bare" },
+					"Don't include the date in automatic name",
+					FeatureType.Flag,
+					null));
+				update["diff"].AddFeature("cascade", new Feature(
+					new List<string>() { "-c", "--cascade" },
+					"Enable cascaded diffing",
+					FeatureType.Flag,
+					null));
+					update["diff"]["cascade"].AddFeature("inplace", new Feature(
+						new List<string>() { "-ip", "--inplace" },
+						"Enable inplace, cascaded diff",
+						FeatureType.Flag,
+						null));
+					update["diff"]["cascade"].AddFeature("skip", new Feature(
+						new List<string>() { "-sf", "--skip" },
+						"Skip output of first DAT",
+						FeatureType.Flag,
+						null));
+				update["diff"].AddFeature("rev-cascade", new Feature(
+						new List<string>() { "-rc", "--rev-cascade" },
+						"Enable reverse cascaded diffing",
+						FeatureType.Flag,
+						null));
+					update["diff"]["rev-cascade"].AddFeature("inplace", new Feature(
+						new List<string>() { "-ip", "--inplace" },
+						"Enable inplace, cascaded diff",
+						FeatureType.Flag,
+						null));
+					update["diff"]["rev-cascade"].AddFeature("skip", new Feature(
+						new List<string>() { "-sf", "--skip" },
+						"Skip output of first DAT",
+						FeatureType.Flag,
+						null));
+
 
 			/*
-			helptext.Add("  -dm, --dat-merged	    Create merged sets");
-			helptext.Add("  -ds, --dat-split	    Create split sets");
-			helptext.Add("  -dnm, --dat-nonmerged     Create non-merged sets");
-			helptext.Add("  -df, --dat-fullnonmerged  Create fully non-merged sets");
-			helptext.Add("  -trim			    Trim file names to fit NTFS length");
-			helptext.Add("	-rd=, --root-dir=	Set the root directory for calc");
-			helptext.Add("  -si, --single		    All game names replaced by '!'");
-			helptext.Add("  -dd, --dedup		    Enable deduping in the created DAT");
-			helptext.Add("  -m, --merge		    Merge the input DATs");
-			helptext.Add("	-b, --bare		Don't include date in automatic name");
-			helptext.Add("  -di, --diff		    Create diffdats from inputs (all outputs)");
-			helptext.Add("	-b, --bare		Don't include date in automatic name");
-			helptext.Add("	-c, --cascade		Enable cascaded diffing");
-			helptext.Add("		-ip, --inplace		Enable inplace, cascaded diff");
-			helptext.Add("		-sf, --skip		Skip output of first DAT");
-			helptext.Add("	-rc, --rev-cascade	Enable reverse cascaded diffing");
-			helptext.Add("		-ip, --inplace		Enable inplace, cascaded diff");
-			helptext.Add("		-sf, --skip		Skip output of first DAT");
 			helptext.Add("  -did, --diff-du	    Create diffdat containing just duplicates");
-			helptext.Add("	-b, --bare		Don't include date in automatic name");
+				helptext.Add("	-b, --bare		Don't include date in automatic name");
 			helptext.Add("  -dii, --diff-in	    Create diffdats for individual DATs");
-			helptext.Add("	-b, --bare		Don't include date in automatic name");
+				helptext.Add("	-b, --bare		Don't include date in automatic name");
 			helptext.Add("  -din, --diff-nd	    Create diffdat containing no duplicates");
-			helptext.Add("	-b, --bare		Don't include date in automatic name");
+				helptext.Add("	-b, --bare		Don't include date in automatic name");
 			helptext.Add("  -gn=, --game-name=	    Filter by game name");
 			helptext.Add("  -ngn=, --not-game=	    Filter by not game name");
 			helptext.Add("  -rn=, --rom-name=	    Filter by rom name");
@@ -949,17 +1022,17 @@ namespace SabreTools
 			helptext.Add("  -sha1=, --sha1=	    Filter by SHA-1 hash");
 			helptext.Add("  -nsha1=, --not-sha1=	    Filter by not SHA-1 hash");
 			helptext.Add("  -is=, --status=	    Include only items with a given status");
-			helptext.Add("			    Supported values are:");
-			helptext.Add("			        None, Good, BadDump, Nodump, Verified");
+				helptext.Add("			    Supported values are:");
+				helptext.Add("			        None, Good, BadDump, Nodump, Verified");
 			helptext.Add("  -nis=, --not-status=	    Exclude items with a given status");
-			helptext.Add("			    Supported values are:");
-			helptext.Add("			        None, Good, BadDump, Nodump, Verified");
+				helptext.Add("			    Supported values are:");
+				helptext.Add("			        None, Good, BadDump, Nodump, Verified");
 			helptext.Add("  -gt=, --game-type=	    Include only games with a given type");
-			helptext.Add("			    Supported values are:");
-			helptext.Add("			        None, Bios, Device, Mechanical");
+				helptext.Add("			    Supported values are:");
+				helptext.Add("			        None, Bios, Device, Mechanical");
 			helptext.Add("  -ngt=, --not-gtype=	    Exclude only games with a given type");
-			helptext.Add("			    Supported values are:");
-			helptext.Add("			        None, Bios, Device, Mechanical");
+				helptext.Add("			    Supported values are:");
+				helptext.Add("			        None, Bios, Device, Mechanical");
 			helptext.Add("  -run, --runnable	    Include only items that are marked runnable");
 			helptext.Add("  -nrun, --not-run	    Include only items that are marked unrunnable");
 			helptext.Add("  -out=			    Output directory (overridden by --inplace)");
