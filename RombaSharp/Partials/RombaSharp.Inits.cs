@@ -14,7 +14,7 @@ using System.IO;
 using Alphaleonis.Win32.Filesystem;
 #endif
 
-namespace SabreTools
+namespace RombaSharp
 {
 	public partial class RombaSharp
 	{

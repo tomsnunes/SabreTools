@@ -20,7 +20,7 @@ using SearchOption = System.IO.SearchOption;
 using StreamWriter = System.IO.StreamWriter;
 #endif
 
-namespace SabreTools
+namespace RombaSharp
 {
 	public partial class RombaSharp
 	{

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 
 using SabreTools.Helper;
 using SabreTools.Helper.Data;
+using SabreTools.Helper.Help;
 using SabreTools.Helper.Tools;
 
-namespace SabreTools
+namespace RombaSharp
 {
 	/// <summary>
 	/// Entry class for the RombaSharp application
@@ -36,6 +37,7 @@ namespace SabreTools
 		private static string _dbSchema = "rombasharp";
 		private static string _connectionString;
 		private static Logger _logger;
+		private static Help _help;
 
 		/// <summary>
 		/// Entry class for the RombaSharp application
@@ -44,8 +46,12 @@ namespace SabreTools
 		{
 			// Perform initial setup and verification
 			_logger = new Logger(true, "romba.log");
+
 			InitializeConfiguration();
 			DatabaseTools.EnsureDatabase(_dbSchema, _db, _connectionString);
+
+			// Create a new Help object for this program
+			_help = RetrieveHelp();
 
 			// If output is being redirected, don't allow clear screens
 			if (!Console.IsOutputRedirected)
@@ -64,14 +70,13 @@ namespace SabreTools
 			// If there's no arguments, show help
 			if (args.Length == 0)
 			{
-				Build.Help("RombaSharp");
+				_help.OutputGenericHelp();
 				_logger.Close();
 				return;
 			}
 
 			// Feature flags
-			bool help = false,
-				archive = false,
+			bool archive = false,
 				build = false,
 				dbstats = false,
 				depotRescan = false,
@@ -106,8 +111,15 @@ namespace SabreTools
 					case "-?":
 					case "-h":
 					case "--help":
-						help = true;
-						break;
+						if (i + 1 < args.Length)
+						{
+							_help.OutputIndividualFeature(args[i + 1]);
+						}
+						else
+						{
+							_help.OutputGenericHelp();
+						}
+						return;
 					case "archive":
 						archive = true;
 						break;
@@ -212,20 +224,12 @@ namespace SabreTools
 				}
 			}
 
-			// If help is set, show the help screen
-			if (help)
-			{
-				Build.Help("RombaSharp");
-				_logger.Close();
-				return;
-			}
-
 			// If more than one switch is enabled, show the help screen
 			if (!(archive ^ build ^ dbstats ^ depotRescan ^ diffdat ^ dir2dat ^ export ^ fixdat ^ lookup ^
 				memstats ^ miss ^ progress ^ purgeBackup ^ purgeDelete ^ refreshDats ^ shutdown))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
-				Build.Help("RombaSharp");
+				_help.OutputGenericHelp();
 				_logger.Close();
 				return;
 			}
@@ -234,7 +238,7 @@ namespace SabreTools
 			if (inputs.Count == 0 && (archive || build || depotRescan || dir2dat || fixdat || lookup || miss))
 			{
 				_logger.Error("This feature requires at least one input");
-				Build.Help("RombaSharp");
+				_help.OutputGenericHelp();
 				_logger.Close();
 				return;
 			}
@@ -343,7 +347,7 @@ namespace SabreTools
 			// If nothing is set, show the help
 			else
 			{
-				Build.Help("RombaSharp");
+				_help.OutputGenericHelp();
 			}
 
 			_logger.Close();
