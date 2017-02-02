@@ -5,7 +5,6 @@ using System.Linq;
 using SabreTools.Helper;
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Help;
-using SabreTools.Helper.Resources;
 
 #if MONO
 using System.IO;
@@ -39,6 +38,9 @@ namespace SabreTools
 			}
 			Build.Start("SabreTools");
 
+			// Create a new Help object for this program
+			Help help = RetrieveHelp();
+
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
 			{
@@ -50,13 +52,10 @@ namespace SabreTools
 			// If there's no arguments, show help
 			if (args.Length == 0)
 			{
-				Build.Help("SabreTools");
+				help.OutputGenericHelp();
 				_logger.Close();
 				return;
 			}
-
-			// Create a new Help object for this program
-			//Help help = RetrieveHelp();
 
 			// Feature flags
 			bool datFromDir = false,
@@ -175,7 +174,14 @@ namespace SabreTools
 					case "-?":
 					case "-h":
 					case "--help":
-						Build.Help("SabreTools", (i + 1 < args.Length ? args[i + 1] : null));
+						if (i + 1 < args.Length)
+						{
+							help.OutputIndividualFeature(args[i + 1]);
+						}
+						else
+						{
+							help.OutputGenericHelp();
+						}
 						_logger.Close();
 						return;
 					case "-d":
@@ -1133,7 +1139,7 @@ namespace SabreTools
 			// If nothing is set, show the help
 			else
 			{
-				Build.Help("SabreTools");
+				help.OutputGenericHelp();
 			}
 
 			_logger.Close();
