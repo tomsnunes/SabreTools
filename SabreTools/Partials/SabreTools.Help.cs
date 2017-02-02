@@ -795,33 +795,120 @@ namespace SabreTools
 				"Output in Logiqx XML format [default]",
 				FeatureType.Flag,
 				null));
+			update.AddFeature("filename", new Feature(
+				new List<string>() { "-f", "--filename" },
+				"Set a new filename",
+				FeatureType.String,
+				null));
+			update.AddFeature("name", new Feature(
+				new List<string>() { "-n", "--name" },
+				"Set a new internal name",
+				FeatureType.String,
+				null));
+			update.AddFeature("desc", new Feature(
+				new List<string>() { "-de", "--desc" },
+				"Set a new description",
+				FeatureType.String,
+				null));
+			update.AddFeature("rootdir", new Feature(
+				new List<string>() { "-r", "--root" },
+				"Set a new rootdir",
+				FeatureType.String,
+				null));
+			update.AddFeature("category", new Feature(
+				new List<string>() { "-ca", "--category" },
+				"Set a new category",
+				FeatureType.String,
+				null));
+			update.AddFeature("version", new Feature(
+				new List<string>() { "-v", "--version" },
+				"Set a new version",
+				FeatureType.String,
+				null));
+			update.AddFeature("date", new Feature(
+				new List<string>() { "-da", "--date" },
+				"Set a new date",
+				FeatureType.String,
+				null));
+			update.AddFeature("author", new Feature(
+				new List<string>() { "-au", "--author" },
+				"Set a new author",
+				FeatureType.String,
+				null));
+			update.AddFeature("email", new Feature(
+				new List<string>() { "-em", "--email" },
+				"Set a new email",
+				FeatureType.String,
+				null));
+			update.AddFeature("homepage", new Feature(
+				new List<string>() { "-hp", "--homepage" },
+				"Set a new homepage",
+				FeatureType.String,
+				null));
+			update.AddFeature("url", new Feature(
+				new List<string>() { "-u", "--url" },
+				"Set a new URL",
+				FeatureType.String,
+				null));
+			update.AddFeature("comment", new Feature(
+				new List<string>() { "-co", "--comment" },
+				"Set a new comment",
+				FeatureType.String,
+				null));
+			update.AddFeature("header", new Feature(
+				new List<string>() { "-h", "--header" },
+				"Set a new header skipper",
+				FeatureType.String,
+				null));
+			update.AddFeature("superdat", new Feature(
+				new List<string>() { "-sd", "--superdat" },
+				"Set SuperDAT type",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("forcemerge", new Feature(
+				new List<string>() { "-fm", "--forcemerge" },
+				"Set force merging",
+				FeatureType.String,
+				new List<string>()
+				{
+					"			    Supported values are:",
+					"			        None, Split, Full",
+				}));
+			update.AddFeature("forcend", new Feature(
+				new List<string>() { "-fn", "--forcend" },
+				"Set force nodump",
+				FeatureType.String,
+				new List<string>()
+				{
+					"			    Supported values are:",
+					"			        None, Obsolete, Required, Ignore",
+				}));
+			update.AddFeature("forcepack", new Feature(
+				new List<string>() { "-fp", "--forcepack" },
+				"Set force packing",
+				FeatureType.String,
+				new List<string>()
+				{
+					"			    Supported values are:",
+					"			        None, Zip, Unzip",
+				}));
+			update.AddFeature("exclude-of", new Feature(
+				new List<string>() { "-xof", "--exclude-of" },
+				"Exclude romof, cloneof, sampleof tags",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("clean", new Feature(
+				new List<string>() { "-clean", "--clean" },
+				"Clean game names according to WoD standards",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("softlist", new Feature(
+				new List<string>() { "-sl", "--softlist" },
+				"Use Software List name instead of description",
+				FeatureType.Flag,
+				null));
+
 			/*
-			helptext.Add("  -f=, --filename=	    Set a new filename");
-			helptext.Add("  -n=, --name=		    Set a new internal name");
-			helptext.Add("  -de=, --desc=		    Set a new description");
-			helptext.Add("  -r=, --root=		    Set a new rootdir");
-			helptext.Add("  -ca=, --category=	    Set a new category");
-			helptext.Add("  -v=, --version=	    Set a new version");
-			helptext.Add("  -da=, --date=		    Set a new date");
-			helptext.Add("  -au=, --author=	    Set a new author");
-			helptext.Add("  -em=, --email=	    Set a new email");
-			helptext.Add("  -hp=, --homepage=	    Set a new homepage");
-			helptext.Add("  -u=, --url=		    Set a new URL");
-			helptext.Add("  -co=, --comment=	    Set a new comment");
-			helptext.Add("  -h=, --header=	    Set a new header skipper");
-			helptext.Add("  -sd=, --superdat	    Set SuperDAT type");
-			helptext.Add("  -fm=, --forcemerge=	    Set force merging");
-			helptext.Add("			    Supported values are:");
-			helptext.Add("			        None, Split, Full");
-			helptext.Add("  -fn=, --forcend=	    Set force nodump");
-			helptext.Add("			    Supported values are:");
-			helptext.Add("			        None, Obsolete, Required, Ignore");
-			helptext.Add("  -fp=, --forcepack=	    Set force packing");
-			helptext.Add("			    Supported values are:");
-			helptext.Add("			        None, Zip, Unzip");
-			helptext.Add("  -xof, --exclude-of	    Exclude romof, cloneof, sampleof tags");
-			helptext.Add("  -clean		    Clean game names according to WoD standards");
-			helptext.Add("  -sl, --softlist	    Use Software List name instead of description");
 			helptext.Add("  -dm, --dat-merged	    Create merged sets");
 			helptext.Add("  -ds, --dat-split	    Create split sets");
 			helptext.Add("  -dnm, --dat-nonmerged     Create non-merged sets");
