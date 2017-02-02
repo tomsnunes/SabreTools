@@ -582,15 +582,19 @@ namespace SabreTools
 				FeatureType.Flag,
 				null));
 
-			/*
-
 			// Create the Type Split feature
 			Feature typeSplit = new Feature(
 				new List<string>() { "-ts", "--type-split" },
 				"Split a DAT or folder by file types (rom/disk)",
 				FeatureType.Flag,
 				null);
-			elptext.Add("  -out=			Output directory");
+			typeSplit.AddFeature("out", new Feature(
+				new List<string>() { "-out", "--out" },
+				"Output directory",
+				FeatureType.String,
+				null));
+
+			/*
 
 			// Create the Update feature
 			Feature update = new Feature(
@@ -807,7 +811,7 @@ namespace SabreTools
 			help.Add("Sort", sort);
 			help.Add("Sort Depot", sortDepot);
 			help.Add("Stats", stats);
-			//help.Add("Type Split", typeSplit);
+			help.Add("Type Split", typeSplit);
 			//help.Add("Update", update);
 			help.Add("Verify", verify);
 			help.Add("Verify Depot", verifyDepot);
