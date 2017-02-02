@@ -594,49 +594,166 @@ namespace SabreTools
 				FeatureType.String,
 				null));
 
-			/*
-
 			// Create the Update feature
 			Feature update = new Feature(
 				new List<string>() { "-ud", "--update" },
 				"Update a DAT file",
 				FeatureType.Flag,
 				null);
-			helptext.Add("  -oa, --output-all	    Output in all formats");
-			helptext.Add("  -oam, --output-am	    Output in AttractMode format");
-			helptext.Add("  -oc, --output-cmp	    Output in CMP format");
-			helptext.Add("  -ocsv, --output-csv	    Output in CSV format");
-			helptext.Add("    -pre=, --prefix=		Set prefix for all lines");
-			helptext.Add("    -post=, --postfix=		Set postfix for all lines");
-			helptext.Add("    -q, --quotes		Put double-quotes around each item");
-			helptext.Add("  -od, --output-dc	    Output in DOSCenter format");
-			helptext.Add("  -om, --output-miss	    Output in Missfile format");
-			helptext.Add("    -r, --roms			Output roms to miss instead of sets");
-			helptext.Add("    -gp, --game-prefix		Add game name as a prefix");
-			helptext.Add("    -pre=, --prefix=		Set prefix for all lines");
-			helptext.Add("    -post=, --postfix=		Set postfix for all lines");
-			helptext.Add("    -q, --quotes		Put double-quotes around each item");
+			update.AddFeature("output-all", new Feature(
+				new List<string>() { "-oa", "--output-all" },
+				"Output in all formats",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("output-am", new Feature(
+				new List<string>() { "-oam", "--output-am" },
+				"Output in AttractMode format",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("output-cmp", new Feature(
+				new List<string>() { "-oc", "--output-cmp" },
+				"Output in CMP format",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("output-csv", new Feature(
+				new List<string>() { "-ocsv", "--output-csv" },
+				"Output in CSV format",
+				FeatureType.Flag,
+				null));
+				update["output-csv"].AddFeature("prefix", new Feature(
+					new List<string>() { "-pre", "--prefix" },
+					"Set prefix for all lines",
+					FeatureType.String,
+					null));
+				update["output-csv"].AddFeature("postfix", new Feature(
+					new List<string>() { "-post", "--postfix" },
+					"Set postfix for all lines",
+					FeatureType.String,
+					null));
+				update["output-csv"].AddFeature("quotes", new Feature(
+					new List<string>() { "-q", "--quotes" },
+					"Put double-quotes around each item",
+					FeatureType.Flag,
+					null));
+			update.AddFeature("output-dc", new Feature(
+				new List<string>() { "-od", "--output-dc" },
+				"Output in DOSCenter format",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("output-miss", new Feature(
+				new List<string>() { "-om", "--output-miss" },
+				"Output in Missfile format",
+				FeatureType.Flag,
+				null));
+				update["output-miss"].AddFeature("roms", new Feature(
+					new List<string>() { "-r", "--roms" },
+					"Output roms to miss instead of sets",
+					FeatureType.Flag,
+					null));
+				update["output-miss"].AddFeature("game-prefix", new Feature(
+					new List<string>() { "-gp", "--game-prefix" },
+					"Add game name as a prefix",
+					FeatureType.Flag,
+					null));
+				update["output-miss"].AddFeature("prefix", new Feature(
+					new List<string>() { "-pre", "--prefix" },
+					"Set prefix for all lines",
+					FeatureType.String,
+					null));
+				update["output-miss"].AddFeature("postfix", new Feature(
+					new List<string>() { "-post", "--postfix" },
+					"Set postfix for all lines",
+					FeatureType.String,
+					null));
+				update["output-miss"].AddFeature("quotes", new Feature(
+					new List<string>() { "-q", "--quotes" },
+					"Put double-quotes around each item",
+					FeatureType.Flag,
+					null));
+			/*
 			helptext.Add("    -ae=, --add-ext=		Add an extension to each item");
 			helptext.Add("    -rep=, --rep-ext=		Replace all extensions with specified");
 			helptext.Add("    -rme, --rem-ext		Remove all extensions from each item");
 			helptext.Add("    -ro, --romba		Output in Romba format (requires SHA-1)");
 			helptext.Add("    -tsv, --tsv			Output in Tab-Separated Value format");
 			helptext.Add("    -csv, --csv			Output in Comma-Separated Value format");
-			helptext.Add("  -omd5, --output-md5	    Output in MD5 format");
-			helptext.Add("    -gp, --game-prefix		Add game name as a prefix");
-			helptext.Add("  -ool, --output-ol	    Output in OfflineList format");
-			helptext.Add("  -or, --output-rc	    Output in RomCenter format");
-			helptext.Add("  -os, --output-sd	    Output in SabreDAT format");
-			helptext.Add("  -osfv, --ouput-sfv	    Output in SFV format");
-			helptext.Add("    -gp, --game-prefix		Add game name as a prefix");
-			helptext.Add("  -osha1, --output-sha1	    Output in SHA-1 format");
-			helptext.Add("    -gp, --game-prefix		Add game name as a prefix");
-			helptext.Add("  -osl, --output-sl	    Output in Softwarelist format");
-			helptext.Add("  -otsv, --output-tsv	    Output in TSV format");
-			helptext.Add("    -pre=, --prefix=		Set prefix for all lines");
-			helptext.Add("    -post=, --postfix=		Set postfix for all lines");
-			helptext.Add("    -q, --quotes		Put double-quotes around each item");
-			helptext.Add("  -ox, --output-xml	    Output in Logiqx XML format");
+			*/
+			update.AddFeature("output-md5", new Feature(
+				new List<string>() { "-oa", "--output-md5" },
+				"Output in MD5 format",
+				FeatureType.Flag,
+				null));
+				update["output-md5"].AddFeature("game-prefix", new Feature(
+					new List<string>() { "-gp", "--game-prefix" },
+					"Add game name as a prefix",
+					FeatureType.Flag,
+					null));
+			update.AddFeature("output-ol", new Feature(
+				new List<string>() { "-ool", "--output-ol" },
+				"Output in OfflineList format",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("output-rc", new Feature(
+				new List<string>() { "-or", "--output-rc" },
+				"Output in RomCenter format",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("output-sd", new Feature(
+				new List<string>() { "-os", "--output-sd" },
+				"Output in SabreDat format",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("output-sfv", new Feature(
+				new List<string>() { "-osfv", "--output-sfv" },
+				"Output in SFV format",
+				FeatureType.Flag,
+				null));
+				update["output-sfv"].AddFeature("game-prefix", new Feature(
+					new List<string>() { "-gp", "--game-prefix" },
+					"Add game name as a prefix",
+					FeatureType.Flag,
+					null));
+			update.AddFeature("output-sha1", new Feature(
+				new List<string>() { "-osfv", "--output-sha1" },
+				"Output in SHA-1 format",
+				FeatureType.Flag,
+				null));
+				update["output-sha1"].AddFeature("game-prefix", new Feature(
+					new List<string>() { "-gp", "--game-prefix" },
+					"Add game name as a prefix",
+					FeatureType.Flag,
+					null));
+			update.AddFeature("output-sl", new Feature(
+				new List<string>() { "-osl", "--output-sl" },
+				"Output in Softwarelist format",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("output-tsv", new Feature(
+				new List<string>() { "-otsv", "--output-tsv" },
+				"Output in TSV format",
+				FeatureType.Flag,
+				null));
+				update["output-tsv"].AddFeature("prefix", new Feature(
+					new List<string>() { "-pre", "--prefix" },
+					"Set prefix for all lines",
+					FeatureType.String,
+					null));
+				update["output-tsv"].AddFeature("postfix", new Feature(
+					new List<string>() { "-post", "--postfix" },
+					"Set postfix for all lines",
+					FeatureType.String,
+					null));
+				update["output-tsv"].AddFeature("quotes", new Feature(
+					new List<string>() { "-q", "--quotes" },
+					"Put double-quotes around each item",
+					FeatureType.Flag,
+					null));
+			update.AddFeature("output-xml", new Feature(
+				new List<string>() { "-ox", "--output-xml" },
+				"Output in Logiqx XML format [default]",
+				FeatureType.Flag,
+				null));
+			/*
 			helptext.Add("  -f=, --filename=	    Set a new filename");
 			helptext.Add("  -n=, --name=		    Set a new internal name");
 			helptext.Add("  -de=, --desc=		    Set a new description");
@@ -812,7 +929,7 @@ namespace SabreTools
 			help.Add("Sort Depot", sortDepot);
 			help.Add("Stats", stats);
 			help.Add("Type Split", typeSplit);
-			//help.Add("Update", update);
+			help.Add("Update", update);
 			help.Add("Verify", verify);
 			help.Add("Verify Depot", verifyDepot);
 
