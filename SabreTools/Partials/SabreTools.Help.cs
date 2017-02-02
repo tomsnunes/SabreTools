@@ -690,14 +690,36 @@ namespace SabreTools
 					"Put double-quotes around each item",
 					FeatureType.Flag,
 					null));
-			/*
-			helptext.Add("    -ae=, --add-ext=		Add an extension to each item");
-			helptext.Add("    -rep=, --rep-ext=		Replace all extensions with specified");
-			helptext.Add("    -rme, --rem-ext		Remove all extensions from each item");
-			helptext.Add("    -ro, --romba		Output in Romba format (requires SHA-1)");
-			helptext.Add("    -tsv, --tsv			Output in Tab-Separated Value format");
-			helptext.Add("    -csv, --csv			Output in Comma-Separated Value format");
-			*/
+				update["output-miss"].AddFeature("add-ext", new Feature(
+					new List<string>() { "-ae", "--add-ext" },
+					"Add an extension to each item",
+					FeatureType.String,
+					null));
+				update["output-miss"].AddFeature("rep-ext", new Feature(
+					new List<string>() { "-rep", "--rep-ext" },
+					"Replace all extensions with specified",
+					FeatureType.String,
+					null));
+				update["output-miss"].AddFeature("rem-ext", new Feature(
+					new List<string>() { "-rme", "--rem-ext" },
+					"Remove all extensions from each item",
+					FeatureType.String,
+					null));
+				update["output-miss"].AddFeature("romba", new Feature(
+					new List<string>() { "-ro", "--romba" },
+					"Output in Romba format (requires SHA-1)",
+					FeatureType.Flag,
+					null));
+				update["output-miss"].AddFeature("tsv", new Feature(
+					new List<string>() { "-tsv", "--tsv" },
+					"Output in Tab-Separated Value format",
+					FeatureType.Flag,
+					null));
+				update["output-miss"].AddFeature("csv", new Feature(
+					new List<string>() { "-csv", "--csv" },
+					"Output in Comma-Separated Value format",
+					FeatureType.Flag,
+					null));
 			update.AddFeature("output-md5", new Feature(
 				new List<string>() { "-oa", "--output-md5" },
 				"Output in MD5 format",
