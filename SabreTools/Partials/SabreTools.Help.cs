@@ -599,7 +599,27 @@ namespace SabreTools
 				new List<string>() { "-ud", "--update" },
 				"Update a DAT file",
 				FeatureType.Flag,
-				null);
+				new List<string>()
+				{
+					"",
+					"All -diX, --diff-XX flags can be used with each other",
+
+					"",
+					"Filter parameters game name, rom name, CRC, MD5, SHA-1 can",
+					"do partial matches using asterisks as follows (case insensitive):",
+					"  *00 means ends with '00'",
+					"  00* means starts with '00'",
+					"  *00* means contains '00'",
+					"  00 means exactly equals '00'",
+
+					"",
+					"Filter parameters for size can use postfixes for inputs:",
+					"  e.g. 8kb => 8000 or 8kib => 8192",
+
+					"",
+					"Most of the filter parameters allow for multiple inputs:",
+					"  e.g. --game-name=foo --game-name=bar",
+				});
 			update.AddFeature("output-all", new Feature(
 				new List<string>() { "-oa", "--output-all" },
 				"Output in all formats",
@@ -840,25 +860,6 @@ namespace SabreTools
 			helptext.Add("");
 			helptext.Add(barrier);
 			helptext.Add("Additional Notes:");
-
-			helptext.Add("");
-			helptext.Add("All -diX, --diff-XX flags can be used with each other");
-
-			helptext.Add("");
-			helptext.Add("Filter parameters game name, rom name, CRC, MD5, SHA-1 can");
-			helptext.Add("do partial matches using asterisks as follows (case insensitive):");
-			helptext.Add("  *00 means ends with '00'");
-			helptext.Add("  00* means starts with '00'");
-			helptext.Add("  *00* means contains '00'");
-			helptext.Add("  00 means exactly equals '00'");
-
-			helptext.Add("");
-			helptext.Add("Filter parameters for size can use postfixes for inputs:");
-			helptext.Add("  e.g. 8kb => 8000 or 8kib => 8192");
-
-			helptext.Add("");
-			helptext.Add("Most of the filter parameters allow for multiple inputs:");
-			helptext.Add("  e.g. --game-name=foo --game-name=bar");
 
 			*/
 
