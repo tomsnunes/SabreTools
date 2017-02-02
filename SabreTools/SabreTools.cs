@@ -4,6 +4,8 @@ using System.Linq;
 
 using SabreTools.Helper;
 using SabreTools.Helper.Data;
+using SabreTools.Helper.Help;
+using SabreTools.Helper.Resources;
 
 #if MONO
 using System.IO;
@@ -52,6 +54,9 @@ namespace SabreTools
 				_logger.Close();
 				return;
 			}
+
+			// Create a new Help object for this program
+			//Help help = RetrieveHelp();
 
 			// Feature flags
 			bool datFromDir = false,

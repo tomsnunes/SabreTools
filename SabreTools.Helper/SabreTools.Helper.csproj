@@ -146,6 +146,8 @@
     <Compile Include="Dats\Rom.cs" />
     <Compile Include="External\SupportedFiles\ZipFileEntry.cs" />
     <Compile Include="External\SupportedFiles\ZipFile.cs" />
+    <Compile Include="Help\Feature.cs" />
+    <Compile Include="Help\Help.cs" />
     <Compile Include="Skippers\Skipper.cs" />
     <Compile Include="Skippers\SkipperRule.cs" />
     <Compile Include="Resources\Resources.de-DE.Designer.cs">

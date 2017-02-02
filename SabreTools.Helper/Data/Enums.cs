@@ -285,6 +285,20 @@
 
 	#endregion
 
+	#region Help related
+
+	/// <summary>
+	/// Determines the feature type to check for
+	/// </summary>
+	public enum FeatureType
+	{
+		Flag = 0,
+		String,
+		List,
+	}
+
+	#endregion
+
 	#region Skippers and Mappers
 
 	/// <summary>
