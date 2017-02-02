@@ -88,63 +88,6 @@ namespace SabreTools.Helper.Data
 					helptext.Add("Based on work by:	The Wizard of DATz");
 					break;
 
-				case "RombaSharp":
-					helptext.Add(Resources.Resources.RombaSharp_Name + " - " + Resources.Resources.RombaSharp_Desc);
-					helptext.Add(barrier);
-					helptext.Add(Resources.Resources.Usage + ": " + Resources.Resources.RombaSharp_Name + " [option] [filename|dirname] ...");
-					helptext.Add("");
-					helptext.Add("Options:");
-					helptext.Add("  -?, -h, --help	Show this help");
-
-					// Archive
-					helptext.Add("  archive		Adds ROM files from the specified directories to depot");
-						helptext.Add("	-only-needed		Only archive ROM files in database");
-
-					// Build
-					helptext.Add("  build			For each specified DAT file it creates TZip files");
-						helptext.Add("	-copy				Copy files instead of rebuilding");
-
-					// Stats
-					helptext.Add("  dbstats		Prints db stats");
-
-					// Rescan Depots
-					helptext.Add("  depot-rescan	Rescan a specific depot to get new information");
-
-					// Diffdat
-					helptext.Add("  diffdat		Creates a DAT file for entries found in the new DAT");
-						helptext.Add("	-new=			DAT to compare to");
-
-					// Dir2DAT / DATFromDir
-					helptext.Add("  dir2dat		Creates a DAT file for the specified input directory");
-						helptext.Add("	-out=			Filename to save out to");
-
-					// Export
-					helptext.Add("  export		Exports db to export.csv");
-
-					// Fixdat
-					helptext.Add("  fixdat		For each specified DAT file it creates a fix DAT");
-
-					// Lookup
-					helptext.Add("  lookup		For each specified hash, look up available information");
-
-					// Memstats
-					helptext.Add("  memstats		Prints memory stats");
-
-					// Miss
-					helptext.Add("  miss			For each specified DAT file, create miss and have file");
-					
-					// Purge
-					helptext.Add("  purge-backup		Moves DAT index entries for orphaned DATs");
-					helptext.Add("  purge-delete		Deletes DAT index entries for orphaned DATs");
-
-					// Refresh DATs
-					helptext.Add("  refresh-dats		Refreshes the DAT index from the files in the DAT root");
-
-					// Obsolete
-					helptext.Add("  progress		Shows progress of currently running command [OBSOLETE]");
-					helptext.Add("  shutdown		Gracefully shuts down server [OBSOLETE]");
-					break;
-
 				default:
 					helptext.Add(Resources.Resources.Default_Desc);
 					break;
