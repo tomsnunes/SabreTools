@@ -129,7 +129,7 @@ namespace SabreTools
 					else
 					{
 						Console.WriteLine();
-						Build.Help("SabreTools");
+						_help.OutputIndividualFeature("DATFromDir");
 					}
 				}
 			}
@@ -189,7 +189,7 @@ namespace SabreTools
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
-					Build.Help("SabreTools");
+					_help.OutputIndividualFeature("Extension Split");
 					return;
 				}
 			}
@@ -224,7 +224,7 @@ namespace SabreTools
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
-					Build.Help("SabreTools");
+					_help.OutputIndividualFeature("Hash Split");
 					return;
 				}
 			}
@@ -284,7 +284,7 @@ namespace SabreTools
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
-					Build.Help("SabreTools");
+					_help.OutputIndividualFeature("Level Split");
 					return;
 				}
 			}
@@ -409,7 +409,7 @@ namespace SabreTools
 				{
 					_logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
-					Build.Help("SabreTools");
+					_help.OutputIndividualFeature("Type Split");
 					return;
 				}
 			}

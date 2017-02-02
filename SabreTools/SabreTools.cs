@@ -21,6 +21,7 @@ namespace SabreTools
 	{
 		// Private required variables
 		private static Logger _logger;
+		private static Help _help;
 
 		/// <summary>
 		/// Start menu or use supplied parameters
@@ -39,7 +40,7 @@ namespace SabreTools
 			Build.Start("SabreTools");
 
 			// Create a new Help object for this program
-			Help help = RetrieveHelp();
+			_help = RetrieveHelp();
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
@@ -52,7 +53,7 @@ namespace SabreTools
 			// If there's no arguments, show help
 			if (args.Length == 0)
 			{
-				help.OutputGenericHelp();
+				_help.OutputGenericHelp();
 				_logger.Close();
 				return;
 			}
@@ -176,11 +177,11 @@ namespace SabreTools
 					case "--help":
 						if (i + 1 < args.Length)
 						{
-							help.OutputIndividualFeature(args[i + 1]);
+							_help.OutputIndividualFeature(args[i + 1]);
 						}
 						else
 						{
-							help.OutputGenericHelp();
+							_help.OutputGenericHelp();
 						}
 						_logger.Close();
 						return;
@@ -1139,7 +1140,7 @@ namespace SabreTools
 			// If nothing is set, show the help
 			else
 			{
-				help.OutputGenericHelp();
+				_help.OutputGenericHelp();
 			}
 
 			_logger.Close();
