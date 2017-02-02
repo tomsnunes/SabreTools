@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 using SabreTools.Helper.Data;
 
@@ -356,6 +357,12 @@ namespace SabreTools.Helper.Help
 			if (valid && _foundOnce && _featureType != FeatureType.List)
 			{
 				valid = false;
+			}
+
+			// If we're not valid at this point, we want to check if this flag is a file or a folder
+			if (!valid)
+			{
+				valid = File.Exists(input) || Directory.Exists(input);
 			}
 
 			return valid;

@@ -535,22 +535,54 @@ namespace SabreTools
 				FeatureType.String,
 				null));
 
-			/*
-
 			// Create the Stats feature
 			Feature stats = new Feature(
 				new List<string>() { "-st", "--stats" },
 				"Get statistics on all input DATs",
 				FeatureType.Flag,
 				null);
-			helptext.Add("  -bc, --baddump-col	Add baddump stats to output");
-			helptext.Add("  -csv, --csv		Output in Comma-Separated Value format");
-			helptext.Add("  -f=, --filename=	Set the filename for the output");
-			helptext.Add("  -out=			Output directory");
-			helptext.Add("  -html, --html		Output in HTML format");
-			helptext.Add("  -nc, --nodump-col	Add nodump stats to output");
-			helptext.Add("  -si, --single		Show individual statistics");
-			helptext.Add("  -tsv, --tsv		Output in Tab-Separated Value format");
+			stats.AddFeature("baddump-col", new Feature(
+				new List<string>() { "-bc", "--baddump-col" },
+				"Add baddump stats to output",
+				FeatureType.Flag,
+				null));
+			stats.AddFeature("csv", new Feature(
+				new List<string>() { "-csv", "--csv" },
+				"Output in Comma-Separated Value format",
+				FeatureType.Flag,
+				null));
+			stats.AddFeature("filename", new Feature(
+				new List<string>() { "-f", "--filename" },
+				"Set the filename for the output",
+				FeatureType.String,
+				null));
+			stats.AddFeature("out", new Feature(
+				new List<string>() { "-out", "--out" },
+				"Output directory",
+				FeatureType.String,
+				null));
+			stats.AddFeature("html", new Feature(
+				new List<string>() { "-html", "--html" },
+				"Output in HTML format",
+				FeatureType.Flag,
+				null));
+			stats.AddFeature("nodump-col", new Feature(
+				new List<string>() { "-nc", "--nodump-col" },
+				"Add nodump stats to output",
+				FeatureType.Flag,
+				null));
+			stats.AddFeature("single", new Feature(
+				new List<string>() { "-si", "--single" },
+				"Show individual statistics",
+				FeatureType.Flag,
+				null));
+			stats.AddFeature("tsv", new Feature(
+				new List<string>() { "-tsv", "--csv" },
+				"Output in Tab-Separated Value format",
+				FeatureType.Flag,
+				null));
+
+			/*
 
 			// Create the Type Split feature
 			Feature typeSplit = new Feature(
@@ -742,7 +774,7 @@ namespace SabreTools
 			help.Add("Restore", restore);
 			help.Add("Sort", sort);
 			help.Add("Sort Depot", sortDepot);
-			//help.Add("Stats", stats);
+			help.Add("Stats", stats);
 			//help.Add("Type Split", typeSplit);
 			//help.Add("Update", update);
 			//help.Add("Verify", verify);
