@@ -223,10 +223,12 @@ namespace SabreTools.Helper.Help
 			string output = "";
 
 			// Add the pre-space first
+			string prespace = "";
 			for (int i = 0; i < pre; i++)
 			{
-				output += " ";
+				prespace += " ";
 			}
+			output += prespace;
 
 			// Now add all flags
 			output += String.Join(", ", _flags);
@@ -277,10 +279,12 @@ namespace SabreTools.Helper.Help
 			}
 
 			// Add the pre-space first
+			string prespace = "";
 			for (int i = 0; i < preAdjusted; i++)
 			{
-				output += " ";
+				prespace += " ";
 			}
+			output += prespace;
 
 			// Now add all flags
 			output += String.Join(", ", _flags);
@@ -308,6 +312,16 @@ namespace SabreTools.Helper.Help
 			foreach (string feature in _features.Keys)
 			{
 				outputList.AddRange(_features[feature].OutputRecursive(tabLevel + 1, pre, midpoint));
+			}
+
+			// Finally, let's append all additional notes
+			if (_additionalNotes != null && _additionalNotes.Count > 0)
+			{
+				outputList.Add("");
+				foreach (string note in _additionalNotes)
+				{
+					outputList.Add(prespace + note);
+				}
 			}
 
 			return outputList;
