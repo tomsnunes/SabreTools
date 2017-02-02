@@ -739,19 +739,39 @@ namespace SabreTools
 			helptext.Add("Most of the filter parameters allow for multiple inputs:");
 			helptext.Add("  e.g. --game-name=foo --game-name=bar");
 
+			*/
+
 			// Create the Verify feature
 			Feature verify = new Feature(
 				new List<string>() { "-ve", "--verify" },
 				"Verify a folder against DATs",
 				FeatureType.Flag,
 				null);
-			helptext.Add("  -dat=			Input DAT to verify against");
-			helptext.Add("  -t=, --temp=		Set the temporary directory to use");
-			helptext.Add("  -ho, --hash-only	Check files by hash only");
-			helptext.Add("  -qs, --quick		Enable quick scanning of archives");
-			helptext.Add("  -h=, --header=	Set a header skipper to use, blank means all");
-
-			*/
+			verify.AddFeature("dat", new Feature(
+				new List<string>() { "-dat", "--dat" },
+				"Input DAT to verify against",
+				FeatureType.List,
+				null));
+			verify.AddFeature("temp", new Feature(
+				new List<string>() { "-t", "--temp" },
+				"Set the temporary directory to use",
+				FeatureType.String,
+				null));
+			verify.AddFeature("hash-only", new Feature(
+				new List<string>() { "-ho", "--hash-only" },
+				"Check files by hash only",
+				FeatureType.Flag,
+				null));
+			verify.AddFeature("quick", new Feature(
+				new List<string>() { "-qs", "--quick" },
+				"Enable quick scanning of archives",
+				FeatureType.Flag,
+				null));
+			verify.AddFeature("header", new Feature(
+				new List<string>() { "-h", "--header" },
+				"Set a header skipper to use, blank means all",
+				FeatureType.String,
+				null));
 
 			// Create the Verify Depot feature
 			Feature verifyDepot = new Feature(
@@ -789,7 +809,7 @@ namespace SabreTools
 			help.Add("Stats", stats);
 			//help.Add("Type Split", typeSplit);
 			//help.Add("Update", update);
-			//help.Add("Verify", verify);
+			help.Add("Verify", verify);
 			help.Add("Verify Depot", verifyDepot);
 
 			return help;
