@@ -435,31 +435,107 @@ namespace SabreTools
 				FeatureType.String,
 				null));	
 
-			/*
-
 			// Create the Sort Depot feature
 			Feature sortDepot = new Feature(
 				new List<string>() { "-ssd", "--sort-depot" },
 				"Sort romba depots by a set of DATs",
 				FeatureType.Flag,
 				null);
-			helptext.Add("  -dat=			Input DAT to rebuild against");
-			helptext.Add("  -out=			Output directory");
-			helptext.Add("  -t=, --temp=		Set the temporary directory to use");
-			helptext.Add("  -del, --delete	Delete fully rebuilt input files");
-			helptext.Add("  -in, --inverse	Rebuild only files not in DAT");
-			helptext.Add("  -ad, --add-date	Add original dates from DAT, if possible");
-			//helptext.Add("  -t7z			Enable Torrent7z output");
-			helptext.Add("  -tar			Enable TAR output");
-			helptext.Add("  -tgz			Enable TorrentGZ output");
-			helptext.Add("	-r, --romba	Enable Romba depot dir output");
-			//helptext.Add("  -tlrz			Enable TorrentLRZ output");
-			//helptext.Add("  -trar			Enable TorrentRAR output");
-			//helptext.Add("  -txz			Enable TorrentXZ output");
-			helptext.Add("  -tzip			Enable TorrentZip output");
-			helptext.Add("  -h=, --header=	Set a header skipper to use, blank means all");
-			helptext.Add("  -ud, --update-dat	Output updated DAT to output directory");
-			helptext.Add("  -mt={4}		Amount of threads to use (-1 unlimted)");
+			sortDepot.AddFeature("dat", new Feature(
+				new List<string>() { "-dat", "--dat" },
+				"Input DAT to rebuild against",
+				FeatureType.List,
+				null));
+			sortDepot.AddFeature("out", new Feature(
+				new List<string>() { "-out", "--out" },
+				"Output directory",
+				FeatureType.String,
+				null));
+			sortDepot.AddFeature("temp", new Feature(
+				new List<string>() { "-temp", "--temp" },
+				"Set the temporary directory to use",
+				FeatureType.String,
+				null));
+			sortDepot.AddFeature("delete", new Feature(
+				new List<string>() { "-del", "--delete" },
+				"Delete fully rebuilt input files",
+				FeatureType.Flag,
+				null));
+			sortDepot.AddFeature("inverse", new Feature(
+				new List<string>() { "-in", "--inverse" },
+				"Rebuild only files not in DAT",
+				FeatureType.Flag,
+				null));
+			sortDepot.AddFeature("add-date", new Feature(
+				new List<string>() { "-ad", "--add-date" },
+				"Add original dates from DAT, if possible",
+				FeatureType.Flag,
+				null));
+			/*
+			sortDepot.AddFeature("t7z", new Feature(
+				new List<string>() { "-t7z", "--t7z" },
+				"Enable Torrent7z output",
+				FeatureType.Flag,
+				null));
+			*/
+			sortDepot.AddFeature("tar", new Feature(
+				new List<string>() { "-tar", "--tar" },
+				"Enable TAR output",
+				FeatureType.Flag,
+				null));
+			sortDepot.AddFeature("tgz", new Feature(
+				new List<string>() { "-tgz", "--tgz" },
+				"Enable TorrentGZ output",
+				FeatureType.Flag,
+				null));
+			sort["tgz"].AddFeature("romba", new Feature(
+				new List<string>() { "-r", "--romba" },
+				"Enable Romba depot dir output",
+				FeatureType.Flag,
+				null));
+			/*
+			sortDepot.AddFeature("tlrz", new Feature(
+				new List<string>() { "-tlrz", "--tlrz" },
+				"Enable TorrentLRZ output",
+				FeatureType.Flag,
+				null));
+			*/
+			/*
+			sortDepot.AddFeature("trar", new Feature(
+				new List<string>() { "-trar", "--trar" },
+				"Enable TorrentRAR output",
+				FeatureType.Flag,
+				null));
+			*/
+			/*
+			sortDepot.AddFeature("txz", new Feature(
+				new List<string>() { "-txz", "--txz" },
+				"Enable TorrentXZ output",
+				FeatureType.Flag,
+				null));
+			*/
+			sortDepot.AddFeature("tzip", new Feature(
+				new List<string>() { "-tzip", "--tzip" },
+				"Enable TorrentZip output",
+				FeatureType.Flag,
+				null));
+			sortDepot.AddFeature("header", new Feature(
+				new List<string>() { "-h", "--header" },
+				"Set a header skipper to use, blank means all",
+				FeatureType.String,
+				null));
+			sortDepot.AddFeature("update-dat", new Feature(
+				new List<string>() { "-ud", "--update-dat" },
+				"Output updated DAT to output directory",
+				FeatureType.Flag,
+				null));
+			sortDepot.AddFeature("mt", new Feature(
+				new List<string>() { "-mt", "--mt" },
+				"Amount of threads to use (default 4, -1 unlimted)",
+				FeatureType.String,
+				null));
+
+			/*
 
 			// Create the Stats feature
 			Feature stats = new Feature(
@@ -665,7 +741,7 @@ namespace SabreTools
 			help.Add("Level Split", levelSplit);
 			help.Add("Restore", restore);
 			help.Add("Sort", sort);
-			//help.Add("Sort Depot", sortDepot);
+			help.Add("Sort Depot", sortDepot);
 			//help.Add("Stats", stats);
 			//help.Add("Type Split", typeSplit);
 			//help.Add("Update", update);
