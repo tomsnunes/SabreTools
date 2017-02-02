@@ -32,15 +32,15 @@ namespace SabreTools
 			// Perform initial setup and verification
 			_logger = new Logger(true, "sabretools.log");
 
+			// Create a new Help object for this program
+			_help = RetrieveHelp();
+
 			// If output is being redirected or we are in script mode, don't allow clear screens
 			if (!Console.IsOutputRedirected && !args.Contains("--script"))
 			{
 				Console.Clear();
 			}
 			Build.Start("SabreTools");
-
-			// Create a new Help object for this program
-			_help = RetrieveHelp();
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
