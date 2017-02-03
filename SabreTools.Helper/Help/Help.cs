@@ -259,13 +259,15 @@ namespace SabreTools.Helper.Help
 		{
 			// Now output based on the size of the screen
 			int i = 0;
-			foreach (string help in helptext)
+			for (int line = 0; line < helptext.Count; line++)
 			{
+				string help = helptext[line];
+
 				Console.WriteLine(help);
 				i++;
 
 				// If we're not being redirected and we reached the size of the screen, pause
-				if (i == Console.WindowHeight - 3)
+				if (i == Console.WindowHeight - 3 && line != helptext.Count - 1)
 				{
 					i = 0;
 					Pause();
