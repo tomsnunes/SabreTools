@@ -311,6 +311,7 @@ namespace SabreTools
 				FeatureType.Flag,
 				new List<string>()
 				{
+					"",
 					"Archive scanning levels:",
 					"  0	Hash archive and contents",
 					"  1	Only hash contents",

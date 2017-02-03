@@ -317,7 +317,6 @@ namespace SabreTools.Helper.Help
 			// Finally, let's append all additional notes
 			if (_additionalNotes != null && _additionalNotes.Count > 0)
 			{
-				outputList.Add("");
 				foreach (string note in _additionalNotes)
 				{
 					outputList.Add(prespace + note);
