@@ -45,7 +45,7 @@ namespace SabreTools
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
 			{
-				Build.Help("Credits");
+				_help.OutputCredits();
 				_logger.Close();
 				return;
 			}

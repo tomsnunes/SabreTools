@@ -9,6 +9,7 @@ namespace SabreTools.Helper.Help
 
 		private List<string> _header;
 		private Dictionary<string, Feature> _features;
+		private static string _barrier = "-----------------------------------------";
 
 		#endregion
 
@@ -153,6 +154,24 @@ namespace SabreTools.Helper.Help
 
 			// Now write out everything in a staged manner
 			WriteOutWithPauses(output);
+		}
+
+		/// <summary>
+		/// Output the SabreTools suite credits
+		/// </summary>
+		public void OutputCredits()
+		{
+			List<string> credits = new List<string>();
+			credits.Add(_barrier);
+			credits.Add("Credits");
+			credits.Add(_barrier);
+			credits.Add("");
+			credits.Add("Programmer / Lead:	Matt Nadareski (darksabre76)");
+			credits.Add("Additional code:	emuLOAD, @tractivo, motoschifo");
+			credits.Add("Testing:		emuLOAD, @tractivo, Kludge, Obiwantje, edc");
+			credits.Add("Suggestions:		edc, AcidX, Amiga12, EliUmniCk");
+			credits.Add("Based on work by:	The Wizard of DATz");
+			WriteOutWithPauses(credits);
 		}
 
 		/// <summary>
