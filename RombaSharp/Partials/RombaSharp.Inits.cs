@@ -374,6 +374,17 @@ namespace RombaSharp
 		}
 
 		/// <summary>
+		/// Wrap merging an external depot into an existing one
+		/// </summary>
+		/// <param name="inputs"></param>
+		/// <param name="depotPath"></param>
+		/// <param name="onlyNeeded"></param>
+		private static void InitMerge(List<string> inputs, string depotPath, bool onlyNeeded)
+		{
+			_logger.User("This feature is not yet implemented: merge");
+		}
+
+		/// <summary>
 		/// Wrap creating a havefile and a missfile for each Dat
 		/// </summary>
 		/// <param name="inputs"></param>

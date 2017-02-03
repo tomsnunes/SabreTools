@@ -86,6 +86,7 @@ namespace RombaSharp
 				fixdat = false,
 				lookup = false,
 				memstats = false,
+				merge = false,
 				miss = false,
 				progress = false,
 				purgeBackup = false,
@@ -98,7 +99,8 @@ namespace RombaSharp
 				onlyNeeded = false;
 
 			// User inputs
-			string newdat ="",
+			string depotPath = "",
+				newdat = "",
 				outdat = "";
 			List<string> inputs = new List<string>();
 
@@ -150,6 +152,9 @@ namespace RombaSharp
 					case "memstats":
 						memstats = true;
 						break;
+					case "merge":
+						merge = true;
+						break;
 					case "miss":
 						miss = true;
 						break;
@@ -179,6 +184,11 @@ namespace RombaSharp
 						break;
 
 					// User inputs
+					case "-depot":
+					case "--depot":
+						i++;
+						depotPath = args[i];
+						break;
 					case "-new":
 					case "--new":
 						i++;
@@ -203,6 +213,11 @@ namespace RombaSharp
 
 							switch (split[0])
 							{
+								case "-depot":
+								case "--depot":
+									i++;
+									depotPath = split[1];
+									break;
 								case "-new":
 								case "--new":
 									newdat = split[1];
@@ -226,7 +241,7 @@ namespace RombaSharp
 
 			// If more than one switch is enabled, show the help screen
 			if (!(archive ^ build ^ dbstats ^ depotRescan ^ diffdat ^ dir2dat ^ export ^ fixdat ^ lookup ^
-				memstats ^ miss ^ progress ^ purgeBackup ^ purgeDelete ^ refreshDats ^ shutdown))
+				memstats ^ merge ^ miss ^ progress ^ purgeBackup ^ purgeDelete ^ refreshDats ^ shutdown))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				_help.OutputGenericHelp();
@@ -235,7 +250,7 @@ namespace RombaSharp
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (archive || build || depotRescan || dir2dat || fixdat || lookup || miss))
+			if (inputs.Count == 0 && (archive || build || depotRescan || dir2dat || fixdat || lookup || merge || miss))
 			{
 				_logger.Error("This feature requires at least one input");
 				_help.OutputGenericHelp();
@@ -306,6 +321,12 @@ namespace RombaSharp
 			else if (memstats)
 			{
 				DisplayMemoryStats();
+			}
+
+			// Merges depots
+			else if (merge)
+			{
+				InitMerge(inputs, depotPath, onlyNeeded);
 			}
 
 			// For each specified DAT file it creates a miss file and a have file

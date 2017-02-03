@@ -116,6 +116,23 @@ namespace RombaSharp
 				FeatureType.Flag,
 				null);
 
+			// Create the Merge feature
+			Feature merge = new Feature(
+				"merge",
+				"Merges a depot into the existing one",
+				FeatureType.Flag,
+				null);
+			merge.AddFeature("depot", new Feature(
+				"-depot",
+				"Depot path to merge into",
+				FeatureType.String,
+				null));
+			merge.AddFeature("only-needed", new Feature(
+				"-only-needed",
+				"Only merge files in if needed",
+				FeatureType.Flag,
+				null));
+
 			// Create the Miss feature
 			Feature miss = new Feature(
 				"miss",
@@ -170,6 +187,7 @@ namespace RombaSharp
 			help.Add("Fixdat", fixdat);
 			help.Add("Lookup", lookup);
 			help.Add("Memstats", memstats);
+			help.Add("Merge", merge);
 			help.Add("Miss", miss);
 			help.Add("Purge Backup", purgeBackup);
 			help.Add("Purge Delete", purgeDelete);
