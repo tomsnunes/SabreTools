@@ -959,7 +959,7 @@ namespace SabreTools
 					null));
 			update.AddFeature("diff", new Feature(
 				new List<string>() { "-di", "--diff" },
-				"Create diffdats from inputs (all outputs)s",
+				"Create diffdats from inputs (all outputs)",
 				FeatureType.Flag,
 				null));
 				update["diff"].AddFeature("bare", new Feature(
@@ -997,30 +997,113 @@ namespace SabreTools
 						"Skip output of first DAT",
 						FeatureType.Flag,
 						null));
-
+			update.AddFeature("diff-du", new Feature(
+				new List<string>() { "-did", "--diff-du" },
+				"Create diffdat containing just duplicates",
+				FeatureType.Flag,
+				null));
+				update["diff-du"].AddFeature("bare", new Feature(
+					new List<string>() { "-b", "--bare" },
+					"Don't include the date in automatic name",
+					FeatureType.Flag,
+					null));
+			update.AddFeature("diff-in", new Feature(
+				new List<string>() { "-dii", "--diff-in" },
+				"Create diffdats for individual DATs",
+				FeatureType.Flag,
+				null));
+				update["diff-in"].AddFeature("bare", new Feature(
+					new List<string>() { "-b", "--bare" },
+					"Don't include the date in automatic name",
+					FeatureType.Flag,
+					null));
+			update.AddFeature("diff-nd", new Feature(
+				new List<string>() { "-din", "--diff-nd" },
+				"Create diffdat containing no duplicates",
+				FeatureType.Flag,
+				null));
+				update["diff-nd"].AddFeature("bare", new Feature(
+					new List<string>() { "-b", "--bare" },
+					"Don't include the date in automatic name",
+					FeatureType.Flag,
+					null));
+			update.AddFeature("game-name", new Feature(
+				new List<string>() { "-gn", "--game-name" },
+				"Filter by game name",
+				FeatureType.List,
+				null));
+			update.AddFeature("not-game", new Feature(
+				new List<string>() { "-ngn", "--not-game" },
+				"Filter by not game name",
+				FeatureType.List,
+				null));
+			update.AddFeature("rom-name", new Feature(
+				new List<string>() { "-rn", "--rom-name" },
+				"Filter by rom name",
+				FeatureType.List,
+				null));
+			update.AddFeature("not-rom", new Feature(
+				new List<string>() { "-nrn", "--not-rom" },
+				"Filter by not rom name",
+				FeatureType.List,
+				null));
+			update.AddFeature("rom-type", new Feature(
+				new List<string>() { "-rt", "--rom-type" },
+				"Filter by rom type",
+				FeatureType.List,
+				null));
+			update.AddFeature("not-type", new Feature(
+				new List<string>() { "-nrt", "--not-type" },
+				"Filter by not rom type",
+				FeatureType.List,
+				null));
+			update.AddFeature("greater", new Feature(
+				new List<string>() { "-sgt", "--greater" },
+				"Filter by size >=",
+				FeatureType.String,
+				null));
+			update.AddFeature("less", new Feature(
+				new List<string>() { "-slt", "--less" },
+				"Filter by size =<",
+				FeatureType.String,
+				null));
+			update.AddFeature("equal", new Feature(
+				new List<string>() { "-seq", "--equal" },
+				"Filter by size ==",
+				FeatureType.String,
+				null));
+			update.AddFeature("crc", new Feature(
+				new List<string>() { "-crc", "--crc" },
+				"Filter by CRC hash",
+				FeatureType.List,
+				null));
+			update.AddFeature("not-crc", new Feature(
+				new List<string>() { "-ncrc", "--not-crc" },
+				"Filter by not CRC hash",
+				FeatureType.List,
+				null));
+			update.AddFeature("md5", new Feature(
+				new List<string>() { "-md5", "--md5" },
+				"Filter by MD5 hash",
+				FeatureType.List,
+				null));
+			update.AddFeature("not-md5", new Feature(
+				new List<string>() { "-nmd5", "--not-md5" },
+				"Filter by not MD5 hash",
+				FeatureType.List,
+				null));
+			update.AddFeature("sha1", new Feature(
+				new List<string>() { "-sha1", "--sha1" },
+				"Filter by SHA-1 hash",
+				FeatureType.List,
+				null));
+			update.AddFeature("not-sha1", new Feature(
+				new List<string>() { "-nsha1", "--not-sha1" },
+				"Filter by not SHA-1 hash",
+				FeatureType.List,
+				null));
 
 			/*
-			helptext.Add("  -did, --diff-du	    Create diffdat containing just duplicates");
-				helptext.Add("	-b, --bare		Don't include date in automatic name");
-			helptext.Add("  -dii, --diff-in	    Create diffdats for individual DATs");
-				helptext.Add("	-b, --bare		Don't include date in automatic name");
-			helptext.Add("  -din, --diff-nd	    Create diffdat containing no duplicates");
-				helptext.Add("	-b, --bare		Don't include date in automatic name");
-			helptext.Add("  -gn=, --game-name=	    Filter by game name");
-			helptext.Add("  -ngn=, --not-game=	    Filter by not game name");
-			helptext.Add("  -rn=, --rom-name=	    Filter by rom name");
-			helptext.Add("  -nrn=, --not-rom=	    Filter by not rom name");
-			helptext.Add("  -rt=, --rom-type=	    Filter by rom type");
-			helptext.Add("  -nrt=, --not-type=	    Filter by not rom type");
-			helptext.Add("  -sgt=, --greater=	    Filter by size >=");
-			helptext.Add("  -slt=, --less=	    Filter by size <=");
-			helptext.Add("  -seq=, --equal=	    Filter by size ==");
-			helptext.Add("  -crc=, --crc=		    Filter by CRC hash");
-			helptext.Add("  -ncrc=, --not-crc=	    Filter by not CRC hash");
-			helptext.Add("  -md5=, --md5=		    Filter by MD5 hash");
-			helptext.Add("  -nmd5=, --not-md5=	    Filter by not MD5 hash");
-			helptext.Add("  -sha1=, --sha1=	    Filter by SHA-1 hash");
-			helptext.Add("  -nsha1=, --not-sha1=	    Filter by not SHA-1 hash");
 			helptext.Add("  -is=, --status=	    Include only items with a given status");
 				helptext.Add("			    Supported values are:");
 				helptext.Add("			        None, Good, BadDump, Nodump, Verified");
@@ -1037,11 +1120,6 @@ namespace SabreTools
 			helptext.Add("  -nrun, --not-run	    Include only items that are marked unrunnable");
 			helptext.Add("  -out=			    Output directory (overridden by --inplace)");
 			helptext.Add("  -mt={4}		    Amount of threads to use (-1 unlimted)");
-
-
-			helptext.Add("");
-			helptext.Add(barrier);
-			helptext.Add("Additional Notes:");
 
 			*/
 
