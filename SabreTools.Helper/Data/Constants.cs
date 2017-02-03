@@ -10,7 +10,7 @@ namespace SabreTools.Helper.Data
 		/// <summary>
 		/// The current toolset version to be used by all child applications
 		/// </summary>
-		public static string Version = "v0.9.3-" + Assembly.GetExecutingAssembly().GetLinkerTime().ToString("yyyy-MM-dd HH:mm:ss");
+		public static string Version = "v0.9.5-" + Assembly.GetExecutingAssembly().GetLinkerTime().ToString("yyyy-MM-dd HH:mm:ss");
 		public const int HeaderHeight = 3;
 
 		#region 0-byte file constants
