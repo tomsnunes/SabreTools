@@ -292,11 +292,8 @@ namespace SabreTools.Helper.Dats
 						? Path.GetFileName(split[0])
 						: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length)));
 
-					// If we have more than 0 roms, output
-					if (outDats[j].Count > 0)
-					{
-						outDats[j].WriteToFile(path, logger);
-					}
+					// Try to output the file
+					outDats[j].WriteToFile(path, logger);
 				}
 			}
 			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
@@ -394,11 +391,8 @@ namespace SabreTools.Helper.Dats
 						: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length))); ;
 				}
 
-				// If we have more than 0 roms, output
-				if (outDats[j].Count > 0)
-				{
-					outDats[j].WriteToFile(path, logger);
-				}
+				// Try to output the file
+				outDats[j].WriteToFile(path, logger);
 			}
 			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
@@ -436,11 +430,8 @@ namespace SabreTools.Helper.Dats
 				}
 			}
 
-			// Output a DAT only if there are roms
-			if (Count != 0)
-			{
-				WriteToFile(outDir, logger);
-			}
+			// Try to output the file
+			WriteToFile(outDir, logger);
 		}
 
 		/// <summary>
@@ -483,11 +474,8 @@ namespace SabreTools.Helper.Dats
 							root, logger, true, clean, softlist,
 							keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 
-						// If we have roms, output them
-						if (innerDatdata.Count != 0)
-						{
-							innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), logger, overwrite: (outDir != ""));
-						}
+						// Try to output the file
+						innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), logger, overwrite: (outDir != ""));
 					}
 					else if (Directory.Exists(inputFileName))
 					{
@@ -503,11 +491,8 @@ namespace SabreTools.Helper.Dats
 									trim, single, root, logger, true, clean, softlist,
 									keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 
-								// If we have roms, output them
-								if (innerDatdata.Count > 0)
-								{
-									innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outDir != ""));
-								}
+								// Try to output the file
+								innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)), logger, overwrite: (outDir != ""));
 							});
 					}
 					else

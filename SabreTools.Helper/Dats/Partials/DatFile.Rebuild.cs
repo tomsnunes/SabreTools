@@ -901,7 +901,6 @@ namespace SabreTools.Helper.Dats
 			matched.DatFormat = DatFormat.Logiqx;
 
 			// If we are checking hashes only, essentially diff the inputs
-			bool found = false;
 			if (hashOnly)
 			{
 				// First we need to sort by hash to get duplicates
@@ -915,7 +914,6 @@ namespace SabreTools.Helper.Dats
 					{
 						if (rom.SourceID == 99)
 						{
-							found = true;
 							if (rom.Type == ItemType.Disk || rom.Type == ItemType.Rom)
 							{
 								matched.Add(((Disk)rom).SHA1, rom);
@@ -935,7 +933,6 @@ namespace SabreTools.Helper.Dats
 					{
 						if (rom.SourceID == 99)
 						{
-							found = true;
 							matched.Add(rom.Size + "-" + rom.CRC, rom);
 						}
 					}
@@ -943,14 +940,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now output the fixdat to the main folder
-			if (found)
-			{
-				matched.WriteToFile("", logger, stats: true);
-			}
-			else
-			{
-				logger.User("No fixDat needed");
-			}
+			success &= matched.WriteToFile("", logger, stats: true);
 
 			return success;
 		}

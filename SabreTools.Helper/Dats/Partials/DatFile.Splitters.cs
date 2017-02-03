@@ -299,22 +299,10 @@ namespace SabreTools.Helper.Dats
 			// Now, output all of the files to the output directory
 			logger.User("DAT information created, outputting new files");
 			bool success = true;
-			if (nodump.Count > 0)
-			{
-				success &= nodump.WriteToFile(outDir, logger);
-			}
-			if (sha1.Count > 0)
-			{
-				success &= sha1.WriteToFile(outDir, logger);
-			}
-			if (md5.Count > 0)
-			{
-				success &= md5.WriteToFile(outDir, logger);
-			}
-			if (crc.Count > 0)
-			{
-				success &= crc.WriteToFile(outDir, logger);
-			}
+			success &= nodump.WriteToFile(outDir, logger);
+			success &= sha1.WriteToFile(outDir, logger);
+			success &= md5.WriteToFile(outDir, logger);
+			success &= crc.WriteToFile(outDir, logger);
 
 			return success;
 		}
@@ -547,18 +535,9 @@ namespace SabreTools.Helper.Dats
 			// Now, output all of the files to the output directory
 			logger.User("DAT information created, outputting new files");
 			bool success = true;
-			if (romdat.Count > 0)
-			{
-				success &= romdat.WriteToFile(outDir, logger);
-			}
-			if (diskdat.Count > 0)
-			{
-				success &= diskdat.WriteToFile(outDir, logger);
-			}
-			if (sampledat.Count > 0)
-			{
-				success &= sampledat.WriteToFile(outDir, logger);
-			}
+			success &= romdat.WriteToFile(outDir, logger);
+			success &= diskdat.WriteToFile(outDir, logger);
+			success &= sampledat.WriteToFile(outDir, logger);
 
 			return success;
 		}
