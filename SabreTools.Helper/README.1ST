@@ -763,7 +763,7 @@ Options:
 			-q, --quotes			Put double-quotes around each item
 				This quotes only the item and not the prefix and postfix
 			
-		-ox, -output-xml	Output in Logiqx XML format (default)
+		-ox, -output-xml	Output in Logiqx XML format
 			Add outputting the created DAT to Logiqx XML format
 			
 		-f=, --filename=	Set the external name of the DAT

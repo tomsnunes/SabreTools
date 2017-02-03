@@ -793,7 +793,7 @@ namespace SabreTools
 					null));
 			update.AddFeature("output-xml", new Feature(
 				new List<string>() { "-ox", "--output-xml" },
-				"Output in Logiqx XML format [default]",
+				"Output in Logiqx XML format",
 				FeatureType.Flag,
 				null));
 			update.AddFeature("filename", new Feature(
