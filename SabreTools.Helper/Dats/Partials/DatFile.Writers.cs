@@ -141,7 +141,7 @@ namespace SabreTools.Helper.Dats
 						List<DatItem> roms = this[key];
 
 						// Resolve the names in the block
-						DatItem.ResolveNames(roms, logger);
+						roms = DatItem.ResolveNames(roms, logger);
 
 						for (int index = 0; index < roms.Count; index++)
 						{

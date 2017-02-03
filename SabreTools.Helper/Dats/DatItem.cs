@@ -544,16 +544,33 @@ namespace SabreTools.Helper.Dats
 			Sort(ref infiles, true);
 
 			// Now we want to loop through and check names
-			string last = null;
+			DatItem lastItem = null;
 			string lastrenamed = null;
 			int lastid = 0;
 			for (int i = 0; i < infiles.Count; i++)
 			{
 				DatItem datItem = infiles[i];
 
-				// If the current name matches the previous name, rename the current item
-				if (datItem.Name == last)
+				// If we have the first item, we automatically add it
+				if (lastItem == null)
 				{
+					output.Add(datItem);
+					lastItem = datItem;
+					continue;
+				}
+
+				// If the current item exactly matches the last item, then we don't add it
+				if ((datItem.GetDuplicateStatus(lastItem, logger) & DupeType.All) != 0)
+				{
+					logger.Verbose("Exact duplicate found for '" + datItem.Name + "'");
+					continue;
+				}
+
+				// If the current name matches the previous name, rename the current item
+				else if (datItem.Name == lastItem.Name)
+				{
+					logger.Verbose("Name duplicate found for '" + datItem.Name + "'");
+
 					if (datItem.Type == ItemType.Disk)
 					{
 						Disk disk = (Disk)datItem;
@@ -591,8 +608,9 @@ namespace SabreTools.Helper.Dats
 				// Otherwise, we say that we have a valid named file
 				else
 				{
+					logger.Verbose("Adding unmatched file '" + datItem.Name + "'");
 					output.Add(datItem);
-					last = datItem.Name;
+					lastItem = datItem;
 					lastrenamed = null;
 					lastid = 0;
 				}
