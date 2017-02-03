@@ -258,6 +258,9 @@ namespace SabreTools
 					return;
 			}
 
+			// Now get the proper name for the feature
+			feature = _help.GetFeatureName(feature);
+
 			// Determine which switches are enabled (with values if necessary)
 			for (int i = 1; i < args.Length; i++)
 			{

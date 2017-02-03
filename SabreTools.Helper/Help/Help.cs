@@ -32,8 +32,36 @@ namespace SabreTools.Helper.Help
 
 		public Feature this[string name]
 		{
-			get { return _features[name]; }
-			set { _features[name] = value; }
+			get
+			{
+				if (_features == null)
+				{
+					_features = new Dictionary<string, Feature>();
+				}
+
+				if (!_features.ContainsKey(name))
+				{
+					return null;
+				}
+
+				return _features[name];
+			}
+			set
+			{
+				if (_features == null)
+				{
+					_features = new Dictionary<string, Feature>();
+				}
+
+				if (_features.ContainsKey(name))
+				{
+					_features[name] = value;
+				}
+				else
+				{
+					_features.Add(name, value);
+				}
+			}
 		}
 
 		/// <summary>
@@ -59,25 +87,24 @@ namespace SabreTools.Helper.Help
 		#region Instance Methods
 
 		/// <summary>
-		/// Check if a flag is a top-level (main application) flag
+		/// Get the feature name for a given flag or short name
 		/// </summary>
-		/// <param name="flag">Name of the flag to check</param>
-		/// <returns>True if the feature was found, false otherwise</returns>
-		public bool TopLevelFlag(string flag)
+		/// <returns>Feature name</returns>
+		public string GetFeatureName(string name)
 		{
-			bool success = false;
+			string feature = "";
 
-			// Loop through the features and check
-			foreach (string feature in _features.Keys)
+			// Loop through the features
+			foreach (string featureName in _features.Keys)
 			{
-				if (_features[feature].ValidateInput(flag, exact: true))
+				if (_features[featureName].ValidateInput(name, exact: true))
 				{
-					success = true;
+					feature = featureName;
 					break;
 				}
 			}
 
-			return success;
+			return feature;
 		}
 
 		/// <summary>
@@ -181,6 +208,28 @@ namespace SabreTools.Helper.Help
 
 			// Now write out everything in a staged manner
 			WriteOutWithPauses(output);
+		}
+
+		/// <summary>
+		/// Check if a flag is a top-level (main application) flag
+		/// </summary>
+		/// <param name="flag">Name of the flag to check</param>
+		/// <returns>True if the feature was found, false otherwise</returns>
+		public bool TopLevelFlag(string flag)
+		{
+			bool success = false;
+
+			// Loop through the features and check
+			foreach (string feature in _features.Keys)
+			{
+				if (_features[feature].ValidateInput(flag, exact: true))
+				{
+					success = true;
+					break;
+				}
+			}
+
+			return success;
 		}
 
 		/// <summary>
