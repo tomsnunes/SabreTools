@@ -590,7 +590,7 @@ namespace SabreTools.Helper.Dats
 			foreach (string game in games)
 			{
 				// If the game has no devices, we continue
-				if (this[game][0].Machine.Devices.Count == 0)
+				if (this[game][0].Machine.Devices == null || this[game][0].Machine.Devices.Count == 0)
 				{
 					continue;
 				}
