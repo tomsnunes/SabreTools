@@ -545,7 +545,8 @@ namespace SabreTools.Helper.Dats
 
 			// Now we want to loop through and check names
 			string last = null;
-			int lastid = 1;
+			string lastrenamed = null;
+			int lastid = 0;
 			for (int i = 0; i < infiles.Count; i++)
 			{
 				DatItem datItem = infiles[i];
@@ -558,17 +559,30 @@ namespace SabreTools.Helper.Dats
 						Disk disk = (Disk)datItem;
 						disk.Name += "_" + (!String.IsNullOrEmpty(disk.MD5) ? disk.MD5 : disk.SHA1);
 						datItem = disk;
+						lastrenamed = lastrenamed == null ? datItem.Name : lastrenamed;
 					}
 					else if (datItem.Type == ItemType.Rom)
 					{
 						Rom rom = (Rom)datItem;
-						rom.Name += "_" + (!String.IsNullOrEmpty(rom.CRC) ? rom.CRC : !String.IsNullOrEmpty(rom.MD5) ? rom.MD5 : rom.SHA1);
+						rom.Name += "_" + (!String.IsNullOrEmpty(rom.CRC) ? rom.CRC :
+							!String.IsNullOrEmpty(rom.MD5) ? rom.MD5 :
+								!String.IsNullOrEmpty(rom.SHA1) ? rom.SHA1 : "(alt)");
 						datItem = rom;
+						lastrenamed = lastrenamed == null ? datItem.Name : lastrenamed;
 					}
+
+					// If we have a conflict with the last renamed item, do the right thing
+					if (datItem.Name == lastrenamed)
+					{
+						lastrenamed = datItem.Name;
+						datItem.Name += (lastid == 0 ? "" : "_" + lastid);
+						lastid++;
+					}
+					// If we have no conflict, then we want to reset the lastrenamed and id
 					else
 					{
-						datItem.Name += "_" + lastid;
-						lastid++;
+						lastrenamed = null;
+						lastid = 0;
 					}
 
 					output.Add(datItem);
@@ -579,7 +593,8 @@ namespace SabreTools.Helper.Dats
 				{
 					output.Add(datItem);
 					last = datItem.Name;
-					lastid = 1;
+					lastrenamed = null;
+					lastid = 0;
 				}
 			}
 

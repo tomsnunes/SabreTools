@@ -139,11 +139,13 @@ namespace SabreTools.Helper.Dats
 						sortable.Add(newkey, new List<DatItem>());
 					}
 
+					/*
 					// Here, we want to see if there is a duplicate-named file already in the game
 					if (sortable[newkey].Where(i => i.Name == rom.Name).Count() > 0)
 					{
 						logger.Error("Duplicate named-file '" + rom.Name + "' detected in machine '" + newkey + "'");
 					}
+					*/
 
 					sortable[newkey].Add(rom);
 				}
