@@ -527,6 +527,66 @@ namespace SabreTools.Helper.Dats
 		}
 
 		/// <summary>
+		/// Resolve name duplicates in an arbitrary set of ROMs based on the supplied information
+		/// </summary>
+		/// <param name="infiles">List of File objects representing the roms to be merged</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>A List of RomData objects representing the renamed roms</returns>
+		/// <remarks>
+		/// Eventually, we want this to use the CRC/MD5/SHA-1 of relavent items instead of just _1
+		/// </remarks>
+		public static List<DatItem> ResolveNames(List<DatItem> infiles, Logger logger)
+		{
+			// Create the output list
+			List<DatItem> output = new List<DatItem>();
+
+			// First we want to make sure the list is in alphabetical order
+			Sort(ref infiles, true);
+
+			// Now we want to loop through and check names
+			string last = null;
+			int lastid = 1;
+			for (int i = 0; i < infiles.Count; i++)
+			{
+				DatItem datItem = infiles[i];
+
+				// If the current name matches the previous name, rename the current item
+				if (datItem.Name == last)
+				{
+					if (datItem.Type == ItemType.Disk)
+					{
+						Disk disk = (Disk)datItem;
+						disk.Name += "_" + (!String.IsNullOrEmpty(disk.MD5) ? disk.MD5 : disk.SHA1);
+						datItem = disk;
+					}
+					else if (datItem.Type == ItemType.Rom)
+					{
+						Rom rom = (Rom)datItem;
+						rom.Name += "_" + (!String.IsNullOrEmpty(rom.CRC) ? rom.CRC : !String.IsNullOrEmpty(rom.MD5) ? rom.MD5 : rom.SHA1);
+						datItem = rom;
+					}
+					else
+					{
+						datItem.Name += "_" + lastid;
+						lastid++;
+					}
+
+					output.Add(datItem);
+				}
+
+				// Otherwise, we say that we have a valid named file
+				else
+				{
+					output.Add(datItem);
+					last = datItem.Name;
+					lastid = 1;
+				}
+			}
+
+			return output;
+		}
+
+		/// <summary>
 		/// Sort a list of File objects by SystemID, SourceID, Game, and Name (in order)
 		/// </summary>
 		/// <param name="roms">List of File objects representing the roms to be sorted</param>
