@@ -174,7 +174,7 @@ namespace SabreTools.Helper.Dats
 			// More wonderful SHA-1 logging that has to be done
 			if (_itemType == ItemType.Rom && lastItem.Type == ItemType.Rom)
 			{
-				if (((Rom)this).SHA1 == ((Rom)lastItem).SHA1 && ((Rom)this).Size != ((Rom)lastItem).Size)
+				if (!String.IsNullOrEmpty(((Rom)this).SHA1) && ((Rom)this).SHA1 == ((Rom)lastItem).SHA1 && ((Rom)this).Size != ((Rom)lastItem).Size)
 				{
 					logger.User("SHA-1 mismatch - Hash: " + ((Rom)this).SHA1);
 				}
