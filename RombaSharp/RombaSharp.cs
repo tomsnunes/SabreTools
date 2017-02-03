@@ -11,12 +11,17 @@ namespace RombaSharp
 	/// <summary>
 	/// Entry class for the RombaSharp application
 	/// </summary>
+	/// <remarks>
+	/// In the database, we want to enable "offline mode". That is, when a user does an operation
+	/// that needs to read from the depot themselves, if the depot folder cannot be found, the
+	/// user is prompted to reconnect the depot OR skip that depot entirely.
+	/// </remarks>
 	public partial class RombaSharp
 	{
 		// General settings
-		private static int _workers;		//Number of parallel threads
-		private static string _logdir;		//Log folder location
-		private static string _tmpdir;		//Temp folder location
+		private static int _workers;		// Number of parallel threads
+		private static string _logdir;		// Log folder location
+		private static string _tmpdir;		// Temp folder location
 		private static string _webdir;		// Web frontend location
 		private static string _baddir;		// Fail-to-unpack file folder location
 		private static int _verbosity;		// Verbosity of the output
@@ -84,6 +89,7 @@ namespace RombaSharp
 				dir2dat = false,
 				export = false,
 				fixdat = false,
+				import = false,
 				lookup = false,
 				memstats = false,
 				merge = false,
@@ -96,6 +102,7 @@ namespace RombaSharp
 
 			// User flags
 			bool copy = false,
+				logOnly = false,
 				onlyNeeded = false;
 
 			// User inputs
@@ -146,6 +153,9 @@ namespace RombaSharp
 					case "fixdat":
 						fixdat = true;
 						break;
+					case "import":
+						import = true;
+						break;
 					case "lookup":
 						lookup = true;
 						break;
@@ -176,7 +186,12 @@ namespace RombaSharp
 
 					// User flags
 					case "-copy":
+					case "--copy":
 						copy = true;
+						break;
+					case "-log-only":
+					case "--log-only":
+						logOnly = true;
 						break;
 					case "-only-needed":
 					case "--only-needed":
@@ -240,7 +255,7 @@ namespace RombaSharp
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(archive ^ build ^ dbstats ^ depotRescan ^ diffdat ^ dir2dat ^ export ^ fixdat ^ lookup ^
+			if (!(archive ^ build ^ dbstats ^ depotRescan ^ diffdat ^ dir2dat ^ export ^ fixdat ^ import ^ lookup ^
 				memstats ^ merge ^ miss ^ progress ^ purgeBackup ^ purgeDelete ^ refreshDats ^ shutdown))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
@@ -250,7 +265,8 @@ namespace RombaSharp
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (archive || build || depotRescan || dir2dat || fixdat || lookup || merge || miss))
+			if (inputs.Count == 0 && (archive || build || depotRescan || dir2dat || fixdat || 
+				import || lookup || merge || miss))
 			{
 				_logger.Error("This feature requires at least one input");
 				_help.OutputGenericHelp();
@@ -311,6 +327,12 @@ namespace RombaSharp
 				InitFixdat(inputs);
 			}
 
+			// Import a CSV into the database
+			else if (import)
+			{
+				InitImport(inputs);
+			}
+
 			// For each specified hash it looks up any available information
 			else if (lookup)
 			{
@@ -344,13 +366,13 @@ namespace RombaSharp
 			// Moves DAT index entries for orphaned DATs
 			else if (purgeBackup)
 			{
-				PurgeBackup();
+				PurgeBackup(logOnly);
 			}
 
 			// Deletes DAT index entries for orphaned DATs
 			else if (purgeDelete)
 			{
-				PurgeDelete();
+				PurgeDelete(logOnly);
 			}
 
 			// Refreshes the DAT index from the files in the DAT master directory tree

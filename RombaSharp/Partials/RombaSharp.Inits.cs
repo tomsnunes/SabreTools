@@ -276,6 +276,15 @@ namespace RombaSharp
 		}
 
 		/// <summary>
+		/// Wrap importing CSVs into the database
+		/// </summary>
+		/// <param name="inputs"></param>
+		private static void InitImport(List<string> inputs)
+		{
+			_logger.User("This feature is not yet implemented: import");
+		}
+
+		/// <summary>
 		/// Wrap looking up if hashes exist in the database
 		/// </summary>
 		/// <param name="inputs">List of input strings representing hashes to check for</param>

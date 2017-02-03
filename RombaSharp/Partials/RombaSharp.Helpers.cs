@@ -356,7 +356,8 @@ namespace RombaSharp
 		/// <summary>
 		/// Moves DAT index entries for orphaned DATs to backup folder
 		/// </summary>
-		private static void PurgeBackup()
+		/// <param name="logOnly">Only write out actions to log</param>
+		private static void PurgeBackup(bool logOnly)
 		{
 			_logger.User("This feature is not yet implemented: purge-backup");
 		}
@@ -364,7 +365,8 @@ namespace RombaSharp
 		/// <summary>
 		/// Deletes DAT index entries for orphaned DATs
 		/// </summary>
-		private static void PurgeDelete()
+		/// <param name="logOnly">Only write out actions to log</param>
+		private static void PurgeDelete(bool logOnly)
 		{
 			_logger.User("This feature is not yet implemented: purge-delete");
 		}

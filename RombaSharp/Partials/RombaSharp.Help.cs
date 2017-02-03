@@ -102,6 +102,13 @@ namespace RombaSharp
 				FeatureType.Flag,
 				null);
 
+			// Create the Import feature
+			Feature import = new Feature(
+				"import",
+				"Import a database from a formatted CSV file",
+				FeatureType.Flag,
+				null);
+
 			// Create the Lookup feature
 			Feature lookup = new Feature(
 				"lookup",
@@ -146,6 +153,11 @@ namespace RombaSharp
 				"Moves DAT index entries for orphaned DATs",
 				FeatureType.Flag,
 				null);
+			purgeBackup.AddFeature("log-only", new Feature(
+				"-log-only",
+				"Only write out actions to log",
+				FeatureType.Flag,
+				null));
 
 			// Create the Purge Delete feature
 			Feature purgeDelete = new Feature(
@@ -153,6 +165,11 @@ namespace RombaSharp
 				"Deletes DAT index entries for orphaned DATs",
 				FeatureType.Flag,
 				null);
+			purgeDelete.AddFeature("log-only", new Feature(
+				"-log-only",
+				"Only write out actions to log",
+				FeatureType.Flag,
+				null));
 
 			// Create the Refresh DATs feature
 			Feature refreshDats = new Feature(
@@ -185,6 +202,7 @@ namespace RombaSharp
 			help.Add("Dir2Dat", dir2dat);
 			help.Add("Export", export);
 			help.Add("Fixdat", fixdat);
+			help.Add("Import", import);
 			help.Add("Lookup", lookup);
 			help.Add("Memstats", memstats);
 			help.Add("Merge", merge);
