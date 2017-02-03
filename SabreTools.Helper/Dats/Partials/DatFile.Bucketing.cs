@@ -811,7 +811,7 @@ namespace SabreTools.Helper.Dats
 				{
 					if (!this[parent].Contains(item))
 					{
-						item.Name = item.Machine.Name + "\\" + item.Name;
+						item.Name = (item.Type != ItemType.Disk ? item.Machine.Name + "\\" : "") + item.Name;
 						item.Machine = parentMachine;
 
 						this[parent].Add(item);
