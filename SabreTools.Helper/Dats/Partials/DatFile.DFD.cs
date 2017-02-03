@@ -437,6 +437,7 @@ namespace SabreTools.Helper.Dats
 					{
 						Name = gamename,
 						Description = gamename,
+						Runnable = false,
 					};
 				}
 				else
