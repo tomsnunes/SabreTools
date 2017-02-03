@@ -35,11 +35,23 @@ namespace SabreTools
 			// Create a new Help object for this program
 			_help = RetrieveHelp();
 
+			// Get the location of the script tag, if it exists
+			int scriptLocation = (new List<string>(args)).IndexOf("--script");
+
 			// If output is being redirected or we are in script mode, don't allow clear screens
-			if (!Console.IsOutputRedirected && !args.Contains("--script"))
+			if (!Console.IsOutputRedirected && scriptLocation == -1)
 			{
 				Console.Clear();
 			}
+
+			// Now we remove the script tag because it messes things up
+			if (scriptLocation > -1)
+			{
+				List<string> newargs = new List<string>(args);
+				newargs.RemoveAt(scriptLocation);
+				args = newargs.ToArray();
+			}
+
 			Build.Start("SabreTools");
 
 			// Credits take precidence over all
