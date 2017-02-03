@@ -166,8 +166,20 @@ namespace SabreTools
 			List<string> sha1 = new List<string>();
 			List<string> status = new List<string>();
 
+			// Get the first argument as a feature flag
+			string feature = args[0];
+
+			// Verify that the flag is valid
+			if (!_help.TopLevelFlag(feature))
+			{
+				_logger.User("\"" + feature + "\" is not valid feature flag");
+				_help.OutputIndividualFeature(feature);
+				_logger.Close();
+				return;
+			}
+
 			// Check the first argument for being a feature flag
-			switch (args[0])
+			switch (feature)
 			{
 				case "-?":
 				case "-h":
@@ -226,6 +238,10 @@ namespace SabreTools
 				case "--type-split":
 					splitByType = true;
 					break;
+				case "-ud":
+				case "--update":
+					update = true;
+					break;
 				case "-ve":
 				case "--verify":
 					verify = true;
@@ -237,13 +253,23 @@ namespace SabreTools
 
 				// If we don't have a valid flag, feed it through the help system
 				default:
-					_help.OutputIndividualFeature(args[0]);
+					_help.OutputIndividualFeature(feature);
+					_logger.Close();
 					return;
 			}
 
 			// Determine which switches are enabled (with values if necessary)
 			for (int i = 1; i < args.Length; i++)
 			{
+				// Verify that the current flag is proper for the feature
+				if (!_help[feature].ValidateInput(args[i]))
+				{
+					_logger.Error("Invalid input detected: " + args[i]);
+					_help.OutputIndividualFeature(feature);
+					_logger.Close();
+					return;
+				}
+
 				switch (args[i])
 				{
 					// User flags
@@ -514,10 +540,6 @@ namespace SabreTools
 					case "-tzip":
 					case "--tzip":
 						outputFormat = OutputFormat.TorrentZip;
-						break;
-					case "-ud":
-					case "--update":
-						update = true;
 						break;
 					case "-upd":
 					case "--update-dat":
@@ -1014,6 +1036,7 @@ namespace SabreTools
 			if (!(datFromDir | extract | restore | sort | sortDepot | splitByExt | splitByHash | splitByLevel | splitByType | stats | update | verify | verifyDepot))
 			{
 				_logger.Error("At least one feature switch must be enabled");
+				_help.OutputGenericHelp();
 				_logger.Close();
 				return;
 			}
@@ -1022,6 +1045,7 @@ namespace SabreTools
 			if (!(datFromDir ^ extract ^ restore ^ sort ^ sortDepot ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
+				_help.OutputGenericHelp();
 				_logger.Close();
 				return;
 			}
@@ -1031,6 +1055,7 @@ namespace SabreTools
 				&& (datFromDir || extract || restore || splitByExt || splitByHash || splitByLevel || splitByType || stats || update || verify || verifyDepot))
 			{
 				_logger.Error("This feature requires at least one input");
+				_help.OutputIndividualFeature(feature);
 				_logger.Close();
 				return;
 			}

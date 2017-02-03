@@ -30,6 +30,12 @@ namespace SabreTools.Helper.Help
 
 		#region Accessors
 
+		public Feature this[string name]
+		{
+			get { return _features[name]; }
+			set { _features[name] = value; }
+		}
+
 		/// <summary>
 		/// Add a new feature to the help
 		/// </summary>
@@ -51,6 +57,28 @@ namespace SabreTools.Helper.Help
 		#endregion
 
 		#region Instance Methods
+
+		/// <summary>
+		/// Check if a flag is a top-level (main application) flag
+		/// </summary>
+		/// <param name="flag">Name of the flag to check</param>
+		/// <returns>True if the feature was found, false otherwise</returns>
+		public bool TopLevelFlag(string flag)
+		{
+			bool success = false;
+
+			// Loop through the features and check
+			foreach (string feature in _features.Keys)
+			{
+				if (_features[feature].ValidateInput(flag, exact: true))
+				{
+					success = true;
+					break;
+				}
+			}
+
+			return success;
+		}
 
 		/// <summary>
 		/// Output top-level features only
@@ -108,9 +136,6 @@ namespace SabreTools.Helper.Help
 			// Start building the output list
 			List<string> output = new List<string>();
 
-			// Append the header first
-			output.AddRange(_header);
-
 			// Now try to find the feature that has the name included
 			string realname = null;
 			List<string> startsWith = new List<string>();
@@ -147,7 +172,7 @@ namespace SabreTools.Helper.Help
 			// If no name was found but we have possible matches, show them
 			else if (startsWith.Count > 0)
 			{
-				output.Add(featurename + " not found. Did you mean:");
+				output.Add("\"" + featurename + "\" not found. Did you mean:");
 				foreach (string possible in startsWith)
 				{
 					output.AddRange(_features[possible].Output(pre: 2, midpoint: 25));
