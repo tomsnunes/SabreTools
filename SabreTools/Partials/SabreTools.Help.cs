@@ -1102,26 +1102,62 @@ namespace SabreTools
 				"Filter by not SHA-1 hash",
 				FeatureType.List,
 				null));
-
-			/*
-			helptext.Add("  -is=, --status=	    Include only items with a given status");
-				helptext.Add("			    Supported values are:");
-				helptext.Add("			        None, Good, BadDump, Nodump, Verified");
-			helptext.Add("  -nis=, --not-status=	    Exclude items with a given status");
-				helptext.Add("			    Supported values are:");
-				helptext.Add("			        None, Good, BadDump, Nodump, Verified");
-			helptext.Add("  -gt=, --game-type=	    Include only games with a given type");
-				helptext.Add("			    Supported values are:");
-				helptext.Add("			        None, Bios, Device, Mechanical");
-			helptext.Add("  -ngt=, --not-gtype=	    Exclude only games with a given type");
-				helptext.Add("			    Supported values are:");
-				helptext.Add("			        None, Bios, Device, Mechanical");
-			helptext.Add("  -run, --runnable	    Include only items that are marked runnable");
-			helptext.Add("  -nrun, --not-run	    Include only items that are marked unrunnable");
-			helptext.Add("  -out=			    Output directory (overridden by --inplace)");
-			helptext.Add("  -mt={4}		    Amount of threads to use (-1 unlimted)");
-
-			*/
+			update.AddFeature("status", new Feature(
+				new List<string>() { "-is", "--status" },
+				"Include only items with a given status",
+				FeatureType.List,
+				new List<string>()
+				{
+					"			    Supported values are:",
+					"			        None, Good, BadDump, Nodump, Verified",
+				}));
+			update.AddFeature("not-status", new Feature(
+				new List<string>() { "-nis", "--not-status" },
+				"Exclude only items with a given status",
+				FeatureType.List,
+				new List<string>()
+				{
+					"			    Supported values are:",
+					"			        None, Good, BadDump, Nodump, Verified",
+				}));
+			update.AddFeature("game-type", new Feature(
+				new List<string>() { "-gt", "--game-type" },
+				"Include only games with a given type",
+				FeatureType.List,
+				new List<string>()
+				{
+					"			    Supported values are:",
+					"			        None, Bios, Device, Mechanical",
+				}));
+			update.AddFeature("not-gtype", new Feature(
+				new List<string>() { "-ngt", "--not-gtype" },
+				"Exclude only games with a given type",
+				FeatureType.List,
+				new List<string>()
+				{
+					"			    Supported values are:",
+					"			        None, Bios, Device, Mechanical",
+				}));
+			update.AddFeature("runnable", new Feature(
+				new List<string>() { "-run", "--runnable" },
+				"Include only items that are marked runnable",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("not-run", new Feature(
+				new List<string>() { "-nrun", "--not-run" },
+				"Include only items that are marked unrunnable",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("out", new Feature(
+				new List<string>() { "-out", "--out" },
+				"Output directory (overridden by --inplace)",
+				FeatureType.String,
+				null));
+			update.AddFeature("mt", new Feature(
+				new List<string>() { "-mt", "--mt" },
+				"Amount of threads to use (default 4, -1 unlimited)",
+				FeatureType.String,
+				null));
 
 			// Create the Verify feature
 			Feature verify = new Feature(
