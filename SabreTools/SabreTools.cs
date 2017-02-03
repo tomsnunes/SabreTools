@@ -166,78 +166,86 @@ namespace SabreTools
 			List<string> sha1 = new List<string>();
 			List<string> status = new List<string>();
 
+			// Check the first argument for being a feature flag
+			switch (args[0])
+			{
+				case "-?":
+				case "-h":
+				case "--help":
+					if (1 < args.Length)
+					{
+						_help.OutputIndividualFeature(args[1]);
+					}
+					else
+					{
+						_help.OutputGenericHelp();
+					}
+					_logger.Close();
+					return;
+				case "-d":
+				case "--d2d":
+				case "--dfd":
+					datFromDir = true;
+					break;
+				case "-es":
+				case "--ext-split":
+					splitByExt = true;
+					break;
+				case "-ex":
+				case "--extract":
+					extract = true;
+					break;
+				case "-hs":
+				case "--hash-split":
+					splitByHash = true;
+					break;
+				case "-ls":
+				case "--lvl-split":
+					splitByLevel = true;
+					break;
+				case "-re":
+				case "--restore":
+					restore = true;
+					break;
+				case "--script":
+					// No-op for script mode, allowing for retaining the screen
+					break;
+				case "-ss":
+				case "--sort":
+					sort = true;
+					break;
+				case "-ssd":
+				case "--sort-depot":
+					sortDepot = true;
+					break;
+				case "-st":
+				case "--stats":
+					stats = true;
+					break;
+				case "-ts":
+				case "--type-split":
+					splitByType = true;
+					break;
+				case "-ve":
+				case "--verify":
+					verify = true;
+					break;
+				case "-ved":
+				case "--verify-depot":
+					verifyDepot = true;
+					break;
+
+				// If we don't have a valid flag, feed it through the help system
+				default:
+					_help.OutputIndividualFeature(args[0]);
+					return;
+			}
+
 			// Determine which switches are enabled (with values if necessary)
-			for (int i = 0; i < args.Length; i++)
+			for (int i = 1; i < args.Length; i++)
 			{
 				switch (args[i])
 				{
-					// Feature flags
-					case "-?":
-					case "-h":
-					case "--help":
-						if (i + 1 < args.Length)
-						{
-							_help.OutputIndividualFeature(args[i + 1]);
-						}
-						else
-						{
-							_help.OutputGenericHelp();
-						}
-						_logger.Close();
-						return;
-					case "-d":
-					case "--d2d":
-					case "--dfd":
-						datFromDir = true;
-						break;
-					case "-es":
-					case "--ext-split":
-						splitByExt = true;
-						break;
-					case "-ex":
-					case "--extract":
-						extract = true;
-						break;
-					case "-hs":
-					case "--hash-split":
-						splitByHash = true;
-						break;
-					case "-ls":
-					case "--lvl-split":
-						splitByLevel = true;
-						break;
-					case "-re":
-					case "--restore":
-						restore = true;
-						break;
-					case "--script":
-						// No-op for script mode, allowing for retaining the screen
-						break;
-					case "-ss":
-					case "--sort":
-						sort = true;
-						break;
-					case "-ssd":
-					case "--sort-depot":
-						sortDepot = true;
-						break;
-					case "-st":
-					case "--stats":
-						stats = true;
-						break;
-					case "-ts":
-					case "--type-split":
-						splitByType = true;
-						break;
-					case "-ve":
-					case "--verify":
-						verify = true;
-						break;
-					case "-ved":
-					case "--verify-depot":
-						verifyDepot = true;
-						break;
-
 					// User flags
 					case "-ab":
 					case "--add-blank":
