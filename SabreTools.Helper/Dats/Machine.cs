@@ -19,7 +19,7 @@ namespace SabreTools.Helper.Dats
 		protected string _cloneOf;
 		protected string _sampleOf;
 		protected string _sourceFile;
-		protected bool _runnable;
+		protected bool? _runnable;
 		protected string _board;
 		protected string _rebuildTo;
 		protected List<string> _devices;
@@ -75,7 +75,7 @@ namespace SabreTools.Helper.Dats
 			get { return _sourceFile; }
 			set { _sourceFile = value; }
 		}
-		public bool Runnable
+		public bool? Runnable
 		{
 			get { return _runnable; }
 			set { _runnable = value; }
@@ -112,7 +112,7 @@ namespace SabreTools.Helper.Dats
 		{
 			_name = "";
 			_description = "";
-			_runnable = true;
+			_runnable = null;
 		}
 
 		/// <summary>
@@ -124,7 +124,7 @@ namespace SabreTools.Helper.Dats
 		{
 			_name = name;
 			_description = description;
-			_runnable = true;
+			_runnable = null;
 		}
 
 		#endregion

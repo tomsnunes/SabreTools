@@ -488,7 +488,7 @@ namespace SabreTools.Helper.Dats
 									(rom.Machine.MachineType == MachineType.Bios ? " isbios=\"yes\"" : "") +
 									(rom.Machine.MachineType == MachineType.Device ? " isdevice=\"yes\"" : "") +
 									(rom.Machine.MachineType == MachineType.Mechanical ? " ismechanical=\"yes\"" : "") +
-									(rom.Machine.Runnable ? " runnable=\"yes\"" : "") +
+									(rom.Machine.Runnable == true ? " runnable=\"yes\"" : "") +
 									(String.IsNullOrEmpty(rom.Machine.CloneOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.CloneOf.ToLowerInvariant())
 										? ""
 										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.Machine.CloneOf) + "\"") +

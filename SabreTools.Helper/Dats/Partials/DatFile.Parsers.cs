@@ -1274,7 +1274,6 @@ namespace SabreTools.Helper.Dats
 									xtr.GetAttribute("isdevice") == "yes" ? MachineType.Device :
 									xtr.GetAttribute("ismechanical") == "yes" ? MachineType.Mechanical :
 									MachineType.None,
-								Runnable = xtr.GetAttribute("runnable") == "yes" || xtr.GetAttribute("runnable") == null,
 							};
 
 							// Get the supported value from the reader
@@ -1287,6 +1286,20 @@ namespace SabreTools.Helper.Dats
 										break;
 									case "yes":
 										supported = true;
+										break;
+								}
+							}
+
+							// Get the runnable value from the reader
+							if (subreader.GetAttribute("runnable") != null)
+							{
+								switch (subreader.GetAttribute("runnable"))
+								{
+									case "no":
+										machine.Runnable = false;
+										break;
+									case "yes":
+										machine.Runnable = true;
 										break;
 								}
 							}
