@@ -811,6 +811,7 @@ namespace SabreTools.Helper.Dats
 				{
 					if (!this[parent].Contains(item))
 					{
+						// TODO: Remove hack for just disks at a later date
 						item.Name = (item.Type != ItemType.Disk ? item.Machine.Name + "\\" : "") + item.Name;
 						item.Machine = parentMachine;
 
