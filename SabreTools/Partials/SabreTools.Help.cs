@@ -425,6 +425,26 @@ namespace SabreTools
 				"Set scanning level for ZIP archives (default 1)",
 				FeatureType.String,
 				null));
+			sort.AddFeature("dat-merged", new Feature(
+				new List<string>() { "-dm", "--dat-merged" },
+				"Force creating merged sets",
+				FeatureType.Flag,
+				null));
+			sort.AddFeature("dat-split", new Feature(
+				new List<string>() { "-ds", "--dat-split" },
+				"Force creating split sets",
+				FeatureType.Flag,
+				null));
+			sort.AddFeature("dat-nonmerged", new Feature(
+				new List<string>() { "-dnm", "--dat-nonmerged" },
+				"Force creating non-merged sets",
+				FeatureType.Flag,
+				null));
+			sort.AddFeature("dat-fullnonmerged", new Feature(
+				new List<string>() { "-df", "--dat-fullnonmerged" },
+				"Force creating fully non-merged sets",
+				FeatureType.Flag,
+				null));
 			sort.AddFeature("update-dat", new Feature(
 				new List<string>() { "-ud", "--update-dat" },
 				"Output updated DAT to output directory",
@@ -524,6 +544,26 @@ namespace SabreTools
 				new List<string>() { "-h", "--header" },
 				"Set a header skipper to use, blank means all",
 				FeatureType.String,
+				null));
+			sortDepot.AddFeature("dat-merged", new Feature(
+				new List<string>() { "-dm", "--dat-merged" },
+				"Force creating merged sets",
+				FeatureType.Flag,
+				null));
+			sortDepot.AddFeature("dat-split", new Feature(
+				new List<string>() { "-ds", "--dat-split" },
+				"Force creating split sets",
+				FeatureType.Flag,
+				null));
+			sortDepot.AddFeature("dat-nonmerged", new Feature(
+				new List<string>() { "-dnm", "--dat-nonmerged" },
+				"Force creating non-merged sets",
+				FeatureType.Flag,
+				null));
+			sortDepot.AddFeature("dat-fullnonmerged", new Feature(
+				new List<string>() { "-df", "--dat-fullnonmerged" },
+				"Force creating fully non-merged sets",
+				FeatureType.Flag,
 				null));
 			sortDepot.AddFeature("update-dat", new Feature(
 				new List<string>() { "-ud", "--update-dat" },

@@ -478,6 +478,23 @@ Options:
 				1	Only hash contents of the archive
 				2	Only hash archive itself (treat like a regular file)
 				
+		-dm, --dat-merged	Force creating merged sets in the output
+			Preprocess the DAT to have parent sets contain all items from the children based
+			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		
+		-ds, --dat-split	Force creating split sets in the output
+			Preprocess the DAT to remove redundant files between parents and children based
+			on the romof and cloneof tags. This is incompatible with the other --dat-X flags.
+		
+		-dnm, --dat-nonmerged Force creating non-merged sets in the output
+			Preprocess the DAT to have child sets contain all items from the parent set based
+			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		
+		-df, --dat-fullnonmerged Force creating fully non-merged sets in the output
+			Preprocess the DAT to have child sets contain all items from the parent sets based
+			on the cloneof and romof tags as well as device references. This is incompatible with
+			the other --dat-X flags.
+				
 		-mt={4}			Amount of threads to use
 			Optionally, set the number of threads to use for the multithreaded operations.
 			The default is 4 threads; -1 means unlimited threads created. If the user specifies
@@ -576,6 +593,23 @@ Options:
 			to be hashed without possibly variant information. If a particular header skipper is
 			defined, and that skipper exists, then it will be used instead of trying to find one
 			that matches.
+			
+		-dm, --dat-merged	Force creating merged sets in the output
+			Preprocess the DAT to have parent sets contain all items from the children based
+			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		
+		-ds, --dat-split	Force creating split sets in the output
+			Preprocess the DAT to remove redundant files between parents and children based
+			on the romof and cloneof tags. This is incompatible with the other --dat-X flags.
+		
+		-dnm, --dat-nonmerged Force creating non-merged sets in the output
+			Preprocess the DAT to have child sets contain all items from the parent set based
+			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		
+		-df, --dat-fullnonmerged Force creating fully non-merged sets in the output
+			Preprocess the DAT to have child sets contain all items from the parent sets based
+			on the cloneof and romof tags as well as device references. This is incompatible with
+			the other --dat-X flags.
 				
 		-mt={4}			Amount of threads to use
 			Optionally, set the number of threads to use for the multithreaded operations.

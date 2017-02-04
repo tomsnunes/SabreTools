@@ -1122,14 +1122,14 @@ namespace SabreTools
 			else if (sort)
 			{
 				InitSort(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, delete, inverse,
-					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, maxParallelism);
+					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, splitType, maxParallelism);
 			}
 
 			// If we're using the sorter from depot
 			else if (sortDepot)
 			{
 				InitSortDepot(datfiles, inputs, outDir, tempDir, addFileDates, delete, inverse,
-					outputFormat, romba, updateDat, header, maxParallelism);
+					outputFormat, romba, updateDat, header, splitType, maxParallelism);
 			}
 
 			// Split a DAT by extension

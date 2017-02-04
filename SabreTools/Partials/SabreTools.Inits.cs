@@ -309,10 +309,11 @@ namespace SabreTools
 		/// <param name="zip">Integer representing the archive handling level for Zip</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date, bool delete,
 			bool inverse, OutputFormat outputFormat, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst,
-			int maxDegreeOfParallelism)
+			SplitType splitType, int maxDegreeOfParallelism)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
@@ -324,7 +325,7 @@ namespace SabreTools
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, _logger, keep: true, softlist: true);
+				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, _logger, keep: true, softlist: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -346,9 +347,10 @@ namespace SabreTools
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitSortDepot(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool date, bool delete,
-			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, string headerToCheckAgainst, int maxDegreeOfParallelism)
+			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, string headerToCheckAgainst, SplitType splitType, int maxDegreeOfParallelism)
 		{
 			DateTime start = DateTime.Now;
 			_logger.User("Populating internal DAT...");
@@ -357,7 +359,7 @@ namespace SabreTools
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, _logger, keep: true, softlist: true);
+				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, _logger, keep: true, softlist: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
