@@ -809,7 +809,15 @@ namespace SabreTools.Helper.Dats
 				List<DatItem> items = this[game];
 				foreach (DatItem item in items)
 				{
-					if (!this[parent].Contains(item))
+					// If we have a disk, we have to see ONLY if the name is in the list
+					if (item.Type == ItemType.Disk && !this[parent].Select(i => i.Name).Contains(item.Name))
+					{
+						item.Machine = parentMachine;
+						this[parent].Add(item);
+					}
+
+					// Otherwise, we want to add it normally
+					else if (!this[parent].Contains(item))
 					{
 						// TODO: Remove hack for just disks at a later date
 						item.Name = (item.Type != ItemType.Disk ? item.Machine.Name + "\\" : "") + item.Name;
