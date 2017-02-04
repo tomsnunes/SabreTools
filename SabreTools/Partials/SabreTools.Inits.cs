@@ -325,7 +325,8 @@ namespace SabreTools
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, _logger, keep: true, softlist: true);
+				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, _logger,
+					keep: true, softlist: true, useTags: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -359,7 +360,8 @@ namespace SabreTools
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, _logger, keep: true, softlist: true);
+				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, _logger,
+					keep: true, softlist: true, useTags: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -823,7 +825,9 @@ namespace SabreTools
 		/// <param name="hashOnly">True if only hashes should be checked, false for full file information</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		private static void InitVerify(List<string> datfiles, List<string> inputs, string tempDir, bool hashOnly, bool quickScan, string headerToCheckAgainst)
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
+		private static void InitVerify(List<string> datfiles, List<string> inputs, string tempDir,
+			bool hashOnly, bool quickScan, string headerToCheckAgainst, SplitType splitType)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
@@ -835,7 +839,8 @@ namespace SabreTools
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, _logger, keep: true, softlist: true);
+				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, _logger,
+					keep: true, softlist: true, useTags: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -849,7 +854,9 @@ namespace SabreTools
 		/// <param name="inputs">Input directories to compare against</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		private static void InitVerifyDepot(List<string> datfiles, List<string> inputs, string tempDir, string headerToCheckAgainst)
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
+		private static void InitVerifyDepot(List<string> datfiles, List<string> inputs, string tempDir,
+			string headerToCheckAgainst, SplitType splitType)
 		{
 			DateTime start = DateTime.Now;
 			_logger.User("Populating internal DAT...");
@@ -858,7 +865,8 @@ namespace SabreTools
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, _logger, keep: true, softlist: true);
+				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, _logger,
+					keep: true, softlist: true, useTags: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 

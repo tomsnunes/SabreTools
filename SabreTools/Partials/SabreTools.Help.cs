@@ -1231,6 +1231,26 @@ namespace SabreTools
 				"Set a header skipper to use, blank means all",
 				FeatureType.String,
 				null));
+			verify.AddFeature("dat-merged", new Feature(
+				new List<string>() { "-dm", "--dat-merged" },
+				"Force checking merged sets",
+				FeatureType.Flag,
+				null));
+			verify.AddFeature("dat-split", new Feature(
+				new List<string>() { "-ds", "--dat-split" },
+				"Force checking split sets",
+				FeatureType.Flag,
+				null));
+			verify.AddFeature("dat-nonmerged", new Feature(
+				new List<string>() { "-dnm", "--dat-nonmerged" },
+				"Force checking non-merged sets",
+				FeatureType.Flag,
+				null));
+			verify.AddFeature("dat-fullnonmerged", new Feature(
+				new List<string>() { "-df", "--dat-fullnonmerged" },
+				"Force checking fully non-merged sets",
+				FeatureType.Flag,
+				null));
 
 			// Create the Verify Depot feature
 			Feature verifyDepot = new Feature(
@@ -1252,6 +1272,26 @@ namespace SabreTools
 				new List<string>() { "-h", "--header" },
 				"Set a header skipper to use, blank means all",
 				FeatureType.String,
+				null));
+			verifyDepot.AddFeature("dat-merged", new Feature(
+				new List<string>() { "-dm", "--dat-merged" },
+				"Force checking merged sets",
+				FeatureType.Flag,
+				null));
+			verifyDepot.AddFeature("dat-split", new Feature(
+				new List<string>() { "-ds", "--dat-split" },
+				"Force checking split sets",
+				FeatureType.Flag,
+				null));
+			verifyDepot.AddFeature("dat-nonmerged", new Feature(
+				new List<string>() { "-dnm", "--dat-nonmerged" },
+				"Force checking non-merged sets",
+				FeatureType.Flag,
+				null));
+			verifyDepot.AddFeature("dat-fullnonmerged", new Feature(
+				new List<string>() { "-df", "--dat-fullnonmerged" },
+				"Force checking fully non-merged sets",
+				FeatureType.Flag,
 				null));
 
 			// Now, add all of the main features to the Help object

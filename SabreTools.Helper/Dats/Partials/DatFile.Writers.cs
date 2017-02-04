@@ -258,6 +258,8 @@ namespace SabreTools.Helper.Dats
 							(ForcePacking == ForcePacking.Zip ? "\tforcezipping yes\n" : "") +
 							(ForceMerging == ForceMerging.Full ? "\tforcemerging full\n" : "") +
 							(ForceMerging == ForceMerging.Split ? "\tforcemerging split\n" : "") +
+							(ForceMerging == ForceMerging.Merged ? "\tforcemerging merged\n" : "") +
+							(ForceMerging == ForceMerging.NonMerged ? "\tforcemerging nonmerged\n" : "") +
 							")\n";
 						break;
 					case DatFormat.CSV:
@@ -298,6 +300,8 @@ namespace SabreTools.Helper.Dats
 									(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
 									(ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
 									(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
+									(ForceMerging == ForceMerging.Merged ? " forcemerging=\"merged\"" : "") +
+									(ForceMerging == ForceMerging.NonMerged ? " forcemerging=\"nonmerged\"" : "") +
 									(ForceNodump == ForceNodump.Ignore ? " forceitemStatus=\"ignore\"" : "") +
 									(ForceNodump == ForceNodump.Obsolete ? " forceitemStatus=\"obsolete\"" : "") +
 									(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : "") +
@@ -361,7 +365,7 @@ namespace SabreTools.Helper.Dats
 							"[DAT]\n" +
 							"version=2.50\n" +
 							"split=" + (ForceMerging == ForceMerging.Split ? "1" : "0") + "\n" +
-							"merge=" + (ForceMerging == ForceMerging.Full ? "1" : "0") + "\n" +
+							"merge=" + (ForceMerging == ForceMerging.Full || ForceMerging == ForceMerging.Merged ? "1" : "0") + "\n" +
 							"[EMULATOR]\n" +
 							"refname=" + Name + "\n" +
 							"version=" + Description + "\n" +
@@ -387,6 +391,8 @@ namespace SabreTools.Helper.Dats
 									(ForcePacking == ForcePacking.Zip ? "\t\t\t<flag name=\"forcepacking\" value=\"zip\"/>\n" : "") +
 									(ForceMerging == ForceMerging.Full ? "\t\t\t<flag name=\"forcemerging\" value=\"full\"/>\n" : "") +
 									(ForceMerging == ForceMerging.Split ? "\t\t\t<flag name=\"forcemerging\" value=\"split\"/>\n" : "") +
+									(ForceMerging == ForceMerging.Merged ? "\t\t\t<flag name=\"forcemerging\" value=\"merged\"/>\n" : "") +
+									(ForceMerging == ForceMerging.NonMerged ? "\t\t\t<flag name=\"forcemerging\" value=\"nonmerged\"/>\n" : "") +
 									(ForceNodump == ForceNodump.Ignore ? "\t\t\t<flag name=\"forceitemStatus\" value=\"ignore\"/>\n" : "") +
 									(ForceNodump == ForceNodump.Obsolete ? "\t\t\t<flag name=\"forceitemStatus\" value=\"obsolete\"/>\n" : "") +
 									(ForceNodump == ForceNodump.Required ? "\t\t\t<flag name=\"forceitemStatus\" value=\"required\"/>\n" : "") +
@@ -404,6 +410,8 @@ namespace SabreTools.Helper.Dats
 								(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
 								(ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
 								(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
+								(ForceMerging == ForceMerging.Merged ? " forcemerging=\"merged\"" : "") +
+								(ForceMerging == ForceMerging.NonMerged ? " forcemerging=\"nonmerged\"" : "") +
 								(ForceNodump == ForceNodump.Ignore ? " forceitemStatus=\"ignore\"" : "") +
 								(ForceNodump == ForceNodump.Obsolete ? " forceitemStatus=\"obsolete\"" : "") +
 								(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : "") +

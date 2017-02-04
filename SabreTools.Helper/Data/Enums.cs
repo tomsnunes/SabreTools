@@ -217,6 +217,8 @@
 	{
 		None = 0,
 		Split,
+		Merged,
+		NonMerged,
 		Full,
 	}
 

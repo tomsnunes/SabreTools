@@ -34,9 +34,12 @@ namespace SabreTools.Helper.Dats
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
-		public void Parse(string filename, int sysid, int srcid, Logger logger, bool keep = false, bool clean = false, bool softlist = false, bool keepext = false)
+		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
+		public void Parse(string filename, int sysid, int srcid, Logger logger,
+			bool keep = false, bool clean = false, bool softlist = false, bool keepext = false, bool useTags = false)
 		{
-			Parse(filename, sysid, srcid, new Filter(), SplitType.None, false, false, "", logger, keep, clean, softlist, keepext);
+			Parse(filename, sysid, srcid, new Filter(), SplitType.None, false, false, "", logger,
+				keep: keep, clean: clean, softlist: softlist, keepext: keepext, useTags: useTags);
 		}
 
 		/// <summary>
@@ -55,6 +58,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
+		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
 		public void Parse(
 			// Standard Dat parsing
 			string filename,
@@ -75,7 +79,8 @@ namespace SabreTools.Helper.Dats
 			bool keep = false,
 			bool clean = false,
 			bool softlist = false,
-			bool keepext = false)
+			bool keepext = false,
+			bool useTags = false)
 		{
 			// Check the file extension first as a safeguard
 			string ext = Path.GetExtension(filename).ToLowerInvariant();
@@ -124,6 +129,29 @@ namespace SabreTools.Helper.Dats
 					break;
 				default:
 					return;
+			}
+
+			// If we are using tags from the DAT, set the proper input for split type unless overridden
+			if (useTags && splitType == SplitType.None)
+			{
+				switch (_forceMerging)
+				{
+					case ForceMerging.None:
+						// No-op
+						break;
+					case ForceMerging.Split:
+						splitType = SplitType.Split;
+						break;
+					case ForceMerging.Merged:
+						splitType = SplitType.Merged;
+						break;
+					case ForceMerging.NonMerged:
+						splitType = SplitType.NonMerged;
+						break;
+					case ForceMerging.Full:
+						splitType = SplitType.FullNonMerged;
+						break;
+				}
 			}
 
 			// Now we pre-process the DAT with the splitting/merging mode
@@ -726,6 +754,12 @@ namespace SabreTools.Helper.Dats
 										case "split":
 											ForceMerging = ForceMerging.Split;
 											break;
+										case "merged":
+											ForceMerging = ForceMerging.Merged;
+											break;
+										case "nonmerged":
+											ForceMerging = ForceMerging.NonMerged;
+											break;
 										case "full":
 											ForceMerging = ForceMerging.Full;
 											break;
@@ -898,11 +932,17 @@ namespace SabreTools.Helper.Dats
 							{
 								switch (xtr.GetAttribute("forcemerging"))
 								{
+									case "none":
+										ForceMerging = ForceMerging.None;
+										break;
 									case "split":
 										ForceMerging = ForceMerging.Split;
 										break;
-									case "none":
-										ForceMerging = ForceMerging.None;
+									case "merged":
+										ForceMerging = ForceMerging.Merged;
+										break;
+									case "nonmerged":
+										ForceMerging = ForceMerging.NonMerged;
 										break;
 									case "full":
 										ForceMerging = ForceMerging.Full;
@@ -1094,11 +1134,17 @@ namespace SabreTools.Helper.Dats
 										{
 											switch (headreader.GetAttribute("forcemerging"))
 											{
+												case "none":
+													ForceMerging = ForceMerging.None;
+													break;
 												case "split":
 													ForceMerging = ForceMerging.Split;
 													break;
-												case "none":
-													ForceMerging = ForceMerging.None;
+												case "merged":
+													ForceMerging = ForceMerging.Merged;
+													break;
+												case "nonmerged":
+													ForceMerging = ForceMerging.NonMerged;
 													break;
 												case "full":
 													ForceMerging = ForceMerging.Full;
