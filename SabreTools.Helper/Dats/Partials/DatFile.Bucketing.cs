@@ -809,6 +809,14 @@ namespace SabreTools.Helper.Dats
 				List<DatItem> items = this[game];
 				foreach (DatItem item in items)
 				{
+					// We want a log statement for a unique case so that bug reports can be filed
+					if (item.Type == ItemType.Disk
+						&& !this[parent].Select(i => i.Name).Contains(item.Name)
+						&& this[parent].Contains(item))
+					{
+						logger.Warning("For disk '" + item.Name + "', a hash-duplicate was found with a different name in set '" + parent + "'");
+					}
+
 					// If we have a disk, we have to see ONLY if the name is in the list
 					if (item.Type == ItemType.Disk && !this[parent].Select(i => i.Name).Contains(item.Name))
 					{
