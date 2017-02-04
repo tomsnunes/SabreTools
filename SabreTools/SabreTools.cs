@@ -1176,13 +1176,13 @@ namespace SabreTools
 			// If we're using the verifier
 			else if (verify)
 			{
-				InitVerify(datfiles, inputs, tempDir, hashOnly, quickScan, header);
+				InitVerify(datfiles, inputs, tempDir, hashOnly, quickScan, header, splitType);
 			}
 
 			// If we're using the depot verifier
 			else if (verifyDepot)
 			{
-				InitVerifyDepot(datfiles, inputs, tempDir, header);
+				InitVerifyDepot(datfiles, inputs, tempDir, header, splitType);
 			}
 
 			// If nothing is set, show the help
