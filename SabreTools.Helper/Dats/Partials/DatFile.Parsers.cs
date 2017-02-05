@@ -1630,6 +1630,9 @@ namespace SabreTools.Helper.Dats
 									case "disk":
 										empty = false;
 
+										// If the rom has a merge tag, add it
+										string merge = subreader.GetAttribute("merge");
+
 										// If the rom has a status, flag it
 										its = ItemStatus.None;
 										if (subreader.GetAttribute("flags") == "good" || subreader.GetAttribute("status") == "good")
@@ -1709,6 +1712,7 @@ namespace SabreTools.Helper.Dats
 													Name = subreader.GetAttribute("name"),
 													MD5 = subreader.GetAttribute("md5")?.ToLowerInvariant(),
 													SHA1 = subreader.GetAttribute("sha1")?.ToLowerInvariant(),
+													MergeTag = merge,
 													ItemStatus = its,
 
 													Machine = machine,
@@ -1737,6 +1741,7 @@ namespace SabreTools.Helper.Dats
 													MD5 = subreader.GetAttribute("md5")?.ToLowerInvariant(),
 													SHA1 = subreader.GetAttribute("sha1")?.ToLowerInvariant(),
 													ItemStatus = its,
+													MergeTag = merge,
 													Date = date,
 
 													Machine = machine,

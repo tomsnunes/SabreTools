@@ -19,6 +19,7 @@ namespace SabreTools.Helper.Dats
 
 		// Standard item information
 		protected string _name;
+		private string _merge;
 		protected ItemType _itemType;
 		protected DupeType _dupeType;
 
@@ -50,6 +51,11 @@ namespace SabreTools.Helper.Dats
 		{
 			get { return _name; }
 			set { _name = value; }
+		}
+		public string MergeTag
+		{
+			get { return _merge; }
+			set { _merge = value; }
 		}
 		public ItemType Type
 		{

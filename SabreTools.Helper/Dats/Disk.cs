@@ -11,7 +11,6 @@ namespace SabreTools.Helper.Dats
 		// Disk information
 		protected string _md5;
 		protected string _sha1;
-		// private string _merge;
 		protected ItemStatus _itemStatus;
 
 		#endregion
