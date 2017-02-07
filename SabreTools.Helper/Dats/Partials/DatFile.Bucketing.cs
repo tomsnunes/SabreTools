@@ -809,27 +809,21 @@ namespace SabreTools.Helper.Dats
 				List<DatItem> items = this[game];
 				foreach (DatItem item in items)
 				{
-					// If the item doesn't have a valid merge tag OR the merged file doesn't exist in the parent, then add it
-					if (item.MergeTag == null || !this[parent].Select(i => i.Name).Contains(item.MergeTag))
+					// If the disk doesn't have a valid merge tag OR the merged file doesn't exist in the parent, then add it
+					if (item.Type == ItemType.Disk && (item.MergeTag == null || !this[parent].Select(i => i.Name).Contains(item.MergeTag)))
 					{
-						// TODO: Remove hack for just disks at a later date
-						item.Name = (item.Type != ItemType.Disk ? item.Machine.Name + "\\" : "") + item.Name;
+						item.Machine = parentMachine;
+						this[parent].Add(item);
+					}
+
+					// Otherwise, if the parent doesn't already contain the non-disk, add it
+					else if (item.Type != ItemType.Disk && !this[parent].Contains(item))
+					{
+						item.Name = item.Machine.Name + "\\" + item.Name;
 						item.Machine = parentMachine;
 
 						this[parent].Add(item);
 					}
-
-					/*
-					// If the parent doesn't already contain the item, add it
-					if (!this[parent].Contains(item))
-					{
-						// TODO: Remove hack for just disks at a later date
-						item.Name = (item.Type != ItemType.Disk ? item.Machine.Name + "\\" : "") + item.Name;
-						item.Machine = parentMachine;
-
-						this[parent].Add(item);
-					}
-					*/
 				}
 
 				// Then, remove the old game so it's not picked up by the writer
