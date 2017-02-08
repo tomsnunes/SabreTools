@@ -40,6 +40,7 @@ namespace SabreTools.Helper.Dats
 		private long _sizeGreaterThanOrEqual;
 		private long _sizeLessThanOrEqual;
 		private long _sizeEqualTo;
+		private bool _includeOfInGame;
 		private bool? _runnable;
 
 		#endregion
@@ -155,6 +156,11 @@ namespace SabreTools.Helper.Dats
 			get { return _sizeEqualTo; }
 			set { _sizeEqualTo = value; }
 		}
+		public bool IncludeOfInGame
+		{
+			get { return _includeOfInGame; }
+			set { _includeOfInGame = value; }
+		}
 		public bool? Runnable
 		{
 			get { return _runnable; }
@@ -196,6 +202,7 @@ namespace SabreTools.Helper.Dats
 			_sizeGreaterThanOrEqual = -1;
 			_sizeLessThanOrEqual = -1;
 			_sizeEqualTo = -1;
+			_includeOfInGame = false;
 			_runnable = null;
 		}
 
