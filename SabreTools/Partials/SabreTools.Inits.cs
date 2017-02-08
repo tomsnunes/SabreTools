@@ -460,26 +460,7 @@ namespace SabreTools
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// /* Filtering info */
-		/// <param name="gamenames">Names of the games to match (can use asterisk-partials)</param>
-		/// <param name="romnames">Names of the roms to match (can use asterisk-partials)</param>
-		/// <param name="romtypes">Types of the roms to match</param>
-		/// <param name="sgt">Find roms greater than or equal to this size</param>
-		/// <param name="slt">Find roms less than or equal to this size</param>
-		/// <param name="seq">Find roms equal to this size</param>
-		/// <param name="crcs">CRCs of the roms to match (can use asterisk-partials)</param>
-		/// <param name="md5s">MD5s of the roms to match (can use asterisk-partials)</param>
-		/// <param name="sha1s">SHA-1s of the roms to match (can use asterisk-partials)</param>
-		/// <param name="statuses">Select roms with the given item statuses</param>
-		/// <param name="gametypes">Select games with the given types</param>
-		/// <param name="notgamenames">Name of the game to match (can use asterisk-partials)</param>
-		/// <param name="notromnames">Name of the rom to match (can use asterisk-partials)</param>
-		/// <param name="notromtypes">Type of the rom to match</param>
-		/// <param name="notcrcs">CRCs of the roms to match (can use asterisk-partials)</param>
-		/// <param name="notmd5s">MD5s of the roms to match (can use asterisk-partials)</param>
-		/// <param name="notsha1s">SHA-1s of the roms to match (can use asterisk-partials)</param>
-		/// <param name="notstatuses">Select roms without the given item statuses</param>
-		/// <param name="notgametypes">Select games without the given types</param>
-		/// <param name="runnable">Select games with the given runability</param>
+		/// <param name="filter">Pre-populated filter object for DAT filtering</param>
 		/// /* Trimming info */
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
@@ -533,26 +514,7 @@ namespace SabreTools
 			bool bare,
 
 			/* Filtering info */
-			List<string> gamenames,
-			List<string> romnames,
-			List<string> romtypes,
-			long sgt,
-			long slt,
-			long seq,
-			List<string> crcs,
-			List<string> md5s,
-			List<string> sha1s,
-			List<string> statuses,
-			List<string> gametypes,
-			List<string> notgamenames,
-			List<string> notromnames,
-			List<string> notromtypes,
-			List<string> notcrcs,
-			List<string> notmd5s,
-			List<string> notsha1s,
-			List<string> notstatuses,
-			List<string> notgametypes,
-			bool? runnable,
+			Filter filter,
 
 			/* Trimming info */
 			SplitType splitType,
@@ -565,7 +527,7 @@ namespace SabreTools
 			bool clean,
 			bool softlist,
 			bool dedup,
-			
+
 			/* Multithreading info */
 			int maxDegreeOfParallelism)
 		{
@@ -629,112 +591,6 @@ namespace SabreTools
 						break;
 					default:
 						_logger.Warning(forcepack + " is not a valid packing flag");
-						break;
-				}
-			}
-
-			// Set the status flag for filtering
-			ItemStatus itemStatus = ItemStatus.NULL;
-			foreach (string status in statuses)
-			{
-				switch (status.ToLowerInvariant())
-				{
-					case "none":
-						itemStatus |= ItemStatus.None;
-						break;
-					case "good":
-						itemStatus |= ItemStatus.Good;
-						break;
-					case "baddump":
-						itemStatus |= ItemStatus.BadDump;
-						break;
-					case "nodump":
-						itemStatus |= ItemStatus.Nodump;
-						break;
-					case "verified":
-						itemStatus |= ItemStatus.Verified;
-						break;
-					default:
-						_logger.Warning(status + " is not a valid status");
-						break;
-				}
-			}
-
-			// Set the not status flag for filtering
-			ItemStatus itemNotStatus = ItemStatus.NULL;
-			foreach (string status in notstatuses)
-			{
-				switch (status.ToLowerInvariant())
-				{
-					case "none":
-						itemNotStatus |= ItemStatus.None;
-						break;
-					case "good":
-						itemNotStatus |= ItemStatus.Good;
-						break;
-					case "baddump":
-						itemNotStatus |= ItemStatus.BadDump;
-						break;
-					case "nodump":
-						itemNotStatus |= ItemStatus.Nodump;
-						break;
-					case "verified":
-						itemNotStatus |= ItemStatus.Verified;
-						break;
-					default:
-						_logger.Warning(status + " is not a valid status");
-						break;
-				}
-			}
-
-			// Set the machine type flag for filtering
-			MachineType machineType = MachineType.NULL;
-			foreach (string gametype in gametypes)
-			{
-				switch (gametype.ToLowerInvariant())
-				{
-					case "none":
-						machineType |= MachineType.None;
-						break;
-					case "bios":
-						machineType |= MachineType.Bios;
-						break;
-					case "dev":
-					case "device":
-						machineType |= MachineType.Device;
-						break;
-					case "mech":
-					case "mechanical":
-						machineType |= MachineType.Mechanical;
-						break;
-					default:
-						_logger.Warning(gametype + " is not a valid type");
-						break;
-				}
-			}
-
-			// Set the not machine type flag for filtering
-			MachineType machineNotType = MachineType.NULL;
-			foreach (string gametype in notgametypes)
-			{
-				switch (gametype.ToLowerInvariant())
-				{
-					case "none":
-						machineNotType = MachineType.None;
-						break;
-					case "bios":
-						machineNotType = MachineType.Bios;
-						break;
-					case "dev":
-					case "device":
-						machineNotType = MachineType.Device;
-						break;
-					case "mech":
-					case "mechanical":
-						machineNotType = MachineType.Mechanical;
-						break;
-					default:
-						_logger.Warning(gametype + " is not a valid type");
 						break;
 				}
 			}
@@ -807,11 +663,7 @@ namespace SabreTools
 				GameName = datprefix,
 				Romba = romba,
 			};
-
-			// Create the Filter object to be used
-			Filter filter = new Filter(gamenames, romnames, romtypes, sgt, slt, seq, crcs, md5s, sha1s, itemStatus, machineType,
-				notgamenames, notromnames, notromtypes, notcrcs, notmd5s, notsha1s, itemNotStatus, machineNotType, runnable);
-
+			
 			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,
 				filter, splitType, trim, single, root, maxDegreeOfParallelism, _logger);
 		}

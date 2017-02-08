@@ -9,106 +9,199 @@ namespace SabreTools.Helper.Dats
 	{
 		#region Private instance variables
 
+		#region Positive
+		
 		private List<string> _gameNames;
-		private List<string> _notGameNames;
 		private List<string> _romNames;
-		private List<string> _notRomNames;
 		private List<string> _romTypes;
+		private List<string> _crcs;
+		private List<string> _md5s;
+		private List<string> _sha1s;
+		private ItemStatus _itemStatuses;
+		private MachineType _machineTypes;
+
+		#endregion
+
+		#region Negative
+
+		private List<string> _notGameNames;
+		private List<string> _notRomNames;
 		private List<string> _notRomTypes;
+		private List<string> _notCrcs;
+		private List<string> _notMd5s;
+		private List<string> _notSha1s;
+		private ItemStatus _itemNotStatuses;
+		private MachineType _machineNotTypes;
+
+		#endregion
+
+		#region Neutral
+
 		private long _sizeGreaterThanOrEqual;
 		private long _sizeLessThanOrEqual;
 		private long _sizeEqualTo;
-		private List<string> _crcs;
-		private List<string> _notCrcs;
-		private List<string> _md5s;
-		private List<string> _notMd5s;
-		private List<string> _sha1s;
-		private List<string> _notSha1s;
-		private ItemStatus _itemStatuses;
-		private ItemStatus _itemNotStatuses;
-		private MachineType _machineTypes;
-		private MachineType _machineNotTypes;
 		private bool? _runnable;
 
 		#endregion
+
+		#endregion // Private instance variables
+
+		#region Pubically facing variables
+
+		#region Positive
+
+		public List<string> GameNames
+		{
+			get { return _gameNames; }
+			set { _gameNames = value; }
+		}
+		public List<string> RomNames
+		{
+			get { return _romNames; }
+			set { _romNames = value; }
+		}
+		public List<string> RomTypes
+		{
+			get { return _romTypes; }
+			set { _romTypes = value; }
+		}
+		public List<string> CRCs
+		{
+			get { return _crcs; }
+			set { _crcs = value; }
+		}
+		public List<string> MD5s
+		{
+			get { return _md5s; }
+			set { _md5s = value; }
+		}
+		public List<string> SHA1s
+		{
+			get { return _sha1s; }
+			set { _sha1s = value; }
+		}
+		public ItemStatus ItemStatuses
+		{
+			get { return _itemStatuses; }
+			set { _itemStatuses = value; }
+		}
+		public MachineType MachineTypes
+		{
+			get { return _machineTypes; }
+			set { _machineTypes = value; }
+		}
+
+		#endregion
+
+		#region Negative
+
+		public List<string> NotGameNames
+		{
+			get { return _notGameNames; }
+			set { _notGameNames = value; }
+		}
+		public List<string> NotRomNames
+		{
+			get { return _notRomNames; }
+			set { _notRomNames = value; }
+		}
+		public List<string> NotRomTypes
+		{
+			get { return _notRomTypes; }
+			set { _notRomTypes = value; }
+		}
+		public List<string> NotCRCs
+		{
+			get { return _notCrcs; }
+			set { _notCrcs = value; }
+		}
+		public List<string> NotMD5s
+		{
+			get { return _notMd5s; }
+			set { _notMd5s = value; }
+		}
+		public List<string> NotSHA1s
+		{
+			get { return _notSha1s; }
+			set { _notSha1s = value; }
+		}
+		public ItemStatus NotItemStatuses
+		{
+			get { return _itemNotStatuses; }
+			set { _itemNotStatuses = value; }
+		}
+		public MachineType NotMachineTypes
+		{
+			get { return _machineNotTypes; }
+			set { _machineNotTypes = value; }
+		}
+
+		#endregion
+
+		#region Neutral
+
+		public long SizeGreaterThanOrEqual
+		{
+			get { return _sizeGreaterThanOrEqual; }
+			set { _sizeGreaterThanOrEqual = value; }
+		}
+		public long SizeLessThanOrEqual
+		{
+			get { return _sizeLessThanOrEqual; }
+			set { _sizeLessThanOrEqual = value; }
+		}
+		public long SizeEqualTo
+		{
+			get { return _sizeEqualTo; }
+			set { _sizeEqualTo = value; }
+		}
+		public bool? Runnable
+		{
+			get { return _runnable; }
+			set { _runnable = value; }
+		}
+
+		#endregion
+
+		#endregion // Pubically facing variables
+
+		#region Constructors
 
 		/// <summary>
 		/// Create an empty Filter object
 		/// </summary>
 		public Filter()
 		{
+			// Positive
 			_gameNames = new List<string>();
-			_notGameNames = new List<string>();
 			_romNames = new List<string>();
-			_notRomNames = new List<string>();
 			_romTypes = new List<string>();
+			_crcs = new List<string>();
+			_md5s = new List<string>();
+			_sha1s = new List<string>();
+			_itemStatuses = ItemStatus.NULL;
+			_machineTypes = MachineType.NULL;
+
+			// Negative
+			_notGameNames = new List<string>();
+			_notRomNames = new List<string>();
 			_notRomTypes = new List<string>();
+			_notCrcs = new List<string>();
+			_notMd5s = new List<string>();
+			_notSha1s = new List<string>();
+			_itemNotStatuses = ItemStatus.NULL;
+			_machineNotTypes = MachineType.NULL;
+
+			// Neutral
 			_sizeGreaterThanOrEqual = -1;
 			_sizeLessThanOrEqual = -1;
 			_sizeEqualTo = -1;
-			_crcs = new List<string>();
-			_notCrcs = new List<string>();
-			_md5s = new List<string>();
-			_notMd5s = new List<string>();
-			_sha1s = new List<string>();
-			_notSha1s = new List<string>();
-			_itemStatuses = ItemStatus.NULL;
-			_itemNotStatuses = ItemStatus.NULL;
-			_machineTypes = MachineType.NULL;
-			_machineNotTypes = MachineType.NULL;
 			_runnable = null;
 		}
 
-		/// <summary>
-		/// Create a populated Filter object
-		/// </summary>
-		/// <param name="gamenames">Names of the games to match (can use asterisk-partials)</param>
-		/// <param name="romnames">Names of the roms to match (can use asterisk-partials)</param>
-		/// <param name="romtypes">Types of the roms to match</param>
-		/// <param name="sgt">Find roms greater than or equal to this size</param>
-		/// <param name="slt">Find roms less than or equal to this size</param>
-		/// <param name="seq">Find roms equal to this size</param>
-		/// <param name="crcs">CRCs of the roms to match (can use asterisk-partials)</param>
-		/// <param name="md5s">MD5s of the roms to match (can use asterisk-partials)</param>
-		/// <param name="sha1s">SHA-1s of the roms to match (can use asterisk-partials)</param>
-		/// <param name="itemStatuses">Select roms with the given status</param>
-		/// <param name="machineTypes">Select games with the given type</param>
-		/// <param name="notgamenames">Names of the games to match (can use asterisk-partials)</param>
-		/// <param name="notromnames">Names of the roms to match (can use asterisk-partials)</param>
-		/// <param name="notromtypes">Type of the roms to match</param>
-		/// <param name="notcrcs">CRCs of the roms to match (can use asterisk-partials)</param>
-		/// <param name="notmd5s">MD5s of the roms to match (can use asterisk-partials)</param>
-		/// <param name="notsha1s">SHA-1s of the roms to match (can use asterisk-partials)</param>
-		/// <param name="itemNotStatuses">Select roms without the given status</param>
-		/// <param name="machineNotTypes">Select games without the given type</param>
-		/// <param name="runnable">Select games that have a value for runnable</param>
-		public Filter(List<string> gamenames, List<string> romnames, List<string> romtypes, long sgt,
-			long slt, long seq, List<string> crcs, List<string> md5s, List<string> sha1s, ItemStatus itemStatuses,
-			MachineType machineTypes, List<string> notgamenames, List<string> notromnames, List<string> notromtypes,
-			List<string> notcrcs, List<string> notmd5s, List<string> notsha1s, ItemStatus itemNotStatuses,
-			MachineType machineNotTypes, bool? runnable)
-		{
-			_gameNames = gamenames;
-			_notGameNames = notgamenames;
-			_romNames = romnames;
-			_notRomNames = notromnames;
-			_romTypes = romtypes;
-			_notRomTypes = notromtypes;
-			_sizeGreaterThanOrEqual = sgt;
-			_sizeLessThanOrEqual = slt;
-			_sizeEqualTo = seq;
-			_crcs = crcs;
-			_notCrcs = notcrcs;
-			_md5s = md5s;
-			_notMd5s = notmd5s;
-			_sha1s = sha1s;
-			_notSha1s = notsha1s;
-			_itemStatuses = itemStatuses;
-			_itemNotStatuses = itemNotStatuses;
-			_machineTypes = machineTypes;
-			_machineNotTypes = machineNotTypes;
-			_runnable = runnable;
-		}
+		#endregion
+
+		#region Instance methods
 
 		/// <summary>
 		/// Check to see if a DatItem passes the filter
@@ -838,5 +931,78 @@ namespace SabreTools.Helper.Dats
 
 			return true;
 		}
+
+		#endregion
+
+		#region Static methods
+
+		/// <summary>
+		/// Get the machine type from a string
+		/// </summary>
+		/// <param name="gametype">Machine type as a string</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>A machine type based on the input</returns>
+		public static MachineType GetMachneTypeFromString(string gametype, Logger logger)
+		{
+			MachineType machineType = MachineType.NULL;
+			switch (gametype.ToLowerInvariant())
+			{
+				case "none":
+					machineType |= MachineType.None;
+					break;
+				case "bios":
+					machineType |= MachineType.Bios;
+					break;
+				case "dev":
+				case "device":
+					machineType |= MachineType.Device;
+					break;
+				case "mech":
+				case "mechanical":
+					machineType |= MachineType.Mechanical;
+					break;
+				default:
+					logger.Warning(gametype + " is not a valid type");
+					break;
+			}
+
+			return machineType;
+		}
+
+		/// <summary>
+		/// Get the item status from a string
+		/// </summary>
+		/// <param name="status">Item status as a string</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>An item status based on the input</returns>
+		public static ItemStatus GetStatusFromString(string status, Logger logger)
+		{
+			ItemStatus itemStatus = ItemStatus.NULL;
+			switch (status.ToLowerInvariant())
+			{
+				case "none":
+					itemStatus |= ItemStatus.None;
+					break;
+				case "good":
+					itemStatus |= ItemStatus.Good;
+					break;
+				case "baddump":
+					itemStatus |= ItemStatus.BadDump;
+					break;
+				case "nodump":
+					itemStatus |= ItemStatus.Nodump;
+					break;
+				case "verified":
+					itemStatus |= ItemStatus.Verified;
+					break;
+				default:
+					logger.Warning(status + " is not a valid status");
+					break;
+			}
+
+			return itemStatus;
+		}
+
+		#endregion
 	}
 }

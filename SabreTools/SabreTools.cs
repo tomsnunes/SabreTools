@@ -4,6 +4,7 @@ using System.Linq;
 
 using SabreTools.Helper;
 using SabreTools.Helper.Data;
+using SabreTools.Helper.Dats;
 using SabreTools.Helper.Help;
 
 #if MONO
@@ -118,7 +119,6 @@ namespace SabreTools
 				skip = false,
 				updateDat = false,
 				usegame = true;
-			bool? runnable = null;
 			DatFormat datFormat = 0x0;
 			DiffMode diffMode = 0x0;
 			OutputFormat outputFormat = OutputFormat.Folder;
@@ -131,9 +131,6 @@ namespace SabreTools
 				rar = 2,
 				sevenzip = 1,
 				zip = 1;
-			long sgt = -1,
-				slt = -1,
-				seq = -1;
 			string addext = "",
 				author = null,
 				category = null,
@@ -157,26 +154,11 @@ namespace SabreTools
 				tempDir = "",
 				url = null,
 				version = null;
-			List<string> crc = new List<string>();
+			Filter filter = new Filter();
 			List<string> datfiles = new List<string>();
 			List<string> exta = new List<string>();
 			List<string> extb = new List<string>();
-			List<string> gamename = new List<string>();
-			List<string> gametype = new List<string>();
 			List<string> inputs = new List<string>();
-			List<string> md5 = new List<string>();
-			List<string> notcrc = new List<string>();
-			List<string> notgamename = new List<string>();
-			List<string> notgametype = new List<string>();
-			List<string> notmd5 = new List<string>();
-			List<string> notromname = new List<string>();
-			List<string> notromtype = new List<string>();
-			List<string> notsha1 = new List<string>();
-			List<string> notstatus = new List<string>();
-			List<string> romname = new List<string>();
-			List<string> romtype = new List<string>();
-			List<string> sha1 = new List<string>();
-			List<string> status = new List<string>();
 
 			// Get the first argument as a feature flag
 			string feature = args[0];
@@ -406,7 +388,7 @@ namespace SabreTools
 						break;
 					case "-nrun":
 					case "--not-run":
-						runnable = false;
+						filter.Runnable = false;
 						break;
 					case "-ns":
 					case "--noSHA1":
@@ -498,7 +480,7 @@ namespace SabreTools
 						break;
 					case "-run":
 					case "--runnable":
-						runnable = true;
+						filter.Runnable = true;
 						break;
 					case "-s":
 					case "--short":
@@ -591,7 +573,7 @@ namespace SabreTools
 						break;
 					case "-crc":
 					case "--crc":
-						crc.Add(args[++i]);
+						filter.CRCs.Add(args[++i]);
 						break;
 					case "-da":
 					case "--date":
@@ -642,11 +624,11 @@ namespace SabreTools
 						break;
 					case "-gn":
 					case "--game-name":
-						gamename.Add(args[++i]);
+						filter.GameNames.Add(args[++i]);
 						break;
 					case "-gt":
 					case "--game-type":
-						gametype.Add(args[++i]);
+						filter.MachineTypes |= Filter.GetMachneTypeFromString(args[++i], _logger);
 						break;
 					case "-gz":
 					case "--gz":
@@ -665,11 +647,11 @@ namespace SabreTools
 						break;
 					case "-is":
 					case "--status":
-						status.Add(args[++i]);
+						filter.ItemStatuses |= Filter.GetStatusFromString(args[++i], _logger);
 						break;
 					case "-md5":
 					case "--md5":
-						md5.Add(args[++i]);
+						filter.MD5s.Add(args[++i]);
 						break;
 					case "-mt":
 					case "--mt":
@@ -681,35 +663,35 @@ namespace SabreTools
 						break;
 					case "-ncrc":
 					case "--not-crc":
-						notcrc.Add(args[++i]);
+						filter.NotCRCs.Add(args[++i]);
 						break;
 					case "-ngn":
 					case "--not-game":
-						notgamename.Add(args[++i]);
+						filter.NotGameNames.Add(args[++i]);
 						break;
 					case "-ngt":
 					case "--not-gtype":
-						notgametype.Add(args[++i]);
+						filter.NotMachineTypes |= Filter.GetMachneTypeFromString(args[++i], _logger);
 						break;
 					case "-nis":
 					case "--not-status":
-						notstatus.Add(args[++i]);
+						filter.NotItemStatuses |= Filter.GetStatusFromString(args[++i], _logger);
 						break;
 					case "-nmd5":
 					case "--not-md5":
-						notmd5.Add(args[++i]);
+						filter.NotMD5s.Add(args[++i]);
 						break;
 					case "-nrn":
 					case "--not-rom":
-						notromname.Add(args[++i]);
+						filter.NotRomNames.Add(args[++i]);
 						break;
 					case "-nrt":
 					case "--not-type":
-						notromtype.Add(args[++i]);
+						filter.NotRomTypes.Add(args[++i]);
 						break;
 					case "-nsha1":
 					case "--not-sha1":
-						notsha1.Add(args[++i]);
+						filter.NotSHA1s.Add(args[++i]);
 						break;
 					case "-out":
 					case "--out":
@@ -740,7 +722,7 @@ namespace SabreTools
 						break;
 					case "-rn":
 					case "--rom-name":
-						romname.Add(args[++i]);
+						filter.RomNames.Add(args[++i]);
 						break;
 					case "-root":
 					case "--root":
@@ -748,23 +730,23 @@ namespace SabreTools
 						break;
 					case "-rt":
 					case "--rom-type":
-						romtype.Add(args[++i]);
+						filter.RomTypes.Add(args[++i]);
 						break;
 					case "-seq":
 					case "--equal":
-						seq = GetSizeFromString(args[++i]);
+						filter.SizeEqualTo = GetSizeFromString(args[++i]);
 						break;
 					case "-sgt":
 					case "--greater":
-						sgt = GetSizeFromString(args[++i]);
+						filter.SizeGreaterThanOrEqual = GetSizeFromString(args[++i]);
 						break;
 					case "-sha1":
 					case "--sha1":
-						sha1.Add(args[++i]);
+						filter.SHA1s.Add(args[++i]);
 						break;
 					case "-slt":
 					case "--less":
-						slt = GetSizeFromString(args[++i]);
+						filter.SizeLessThanOrEqual = GetSizeFromString(args[++i]);
 						break;
 					case "-t":
 					case "--temp":
@@ -825,7 +807,7 @@ namespace SabreTools
 									break;
 								case "-crc":
 								case "--crc":
-									crc.Add(split[1]);
+									filter.CRCs.Add(split[1]);
 									break;
 								case "-da":
 								case "--date":
@@ -875,11 +857,11 @@ namespace SabreTools
 									break;
 								case "-gn":
 								case "--game-name":
-									gamename.Add(split[1]);
+									filter.GameNames.Add(split[1]);
 									break;
 								case "-gt":
 								case "--game-type":
-									gametype.Add(split[1]);
+									filter.MachineTypes |= Filter.GetMachneTypeFromString(split[1], _logger);
 									break;
 								case "-gz":
 								case "--gz":
@@ -898,11 +880,11 @@ namespace SabreTools
 									break;
 								case "-is":
 								case "--status":
-									status.Add(split[1]);
+									filter.ItemStatuses |= Filter.GetStatusFromString(split[1], _logger);
 									break;
 								case "-md5":
 								case "--md5":
-									md5.Add(split[1]);
+									filter.MD5s.Add(split[1]);
 									break;
 								case "-mt":
 								case "--mt":
@@ -914,35 +896,35 @@ namespace SabreTools
 									break;
 								case "-ncrc":
 								case "--not-crc":
-									notcrc.Add(split[1]);
+									filter.NotCRCs.Add(split[i]);
 									break;
 								case "-ngn":
 								case "--not-game":
-									notgamename.Add(split[1]);
+									filter.NotGameNames.Add(split[1]);
 									break;
 								case "-ngt":
 								case "--not-gtype":
-									notgametype.Add(split[1]);
+									filter.NotMachineTypes |= Filter.GetMachneTypeFromString(split[1], _logger);
 									break;
 								case "-nis":
 								case "--not-status":
-									notstatus.Add(split[1]);
+									filter.NotItemStatuses |= Filter.GetStatusFromString(split[1], _logger);
 									break;
 								case "-nmd5":
 								case "--not-md5":
-									notmd5.Add(split[1]);
+									filter.NotMD5s.Add(split[1]);
 									break;
 								case "-nrn":
 								case "--not-rom":
-									notromname.Add(split[1]);
+									filter.NotRomNames.Add(split[1]);
 									break;
 								case "-nrt":
 								case "--not-type":
-									notromtype.Add(split[1]);
+									filter.NotRomTypes.Add(split[1]);
 									break;
 								case "-nsha1":
 								case "--not-sha1":
-									notsha1.Add(split[1]);
+									filter.NotSHA1s.Add(split[1]);
 									break;
 								case "-out":
 								case "--out":
@@ -977,27 +959,27 @@ namespace SabreTools
 									break;
 								case "-rn":
 								case "--rom-name":
-									romname.Add(split[1]);
+									filter.RomNames.Add(split[1]);
 									break;
 								case "-rt":
 								case "--rom-type":
-									romtype.Add(split[1]);
+									filter.RomTypes.Add(split[1]);
 									break;
 								case "-seq":
 								case "--equal":
-									seq = GetSizeFromString(split[1]);
+									filter.SizeEqualTo = GetSizeFromString(split[1]);
 									break;
 								case "-sgt":
 								case "--greater":
-									sgt = GetSizeFromString(split[1]);
+									filter.SizeGreaterThanOrEqual = GetSizeFromString(split[1]);
 									break;
 								case "-sha1":
 								case "--sha1":
-									sha1.Add(split[1]);
+									filter.SHA1s.Add(split[1]);
 									break;
 								case "-slt":
 								case "--less":
-									slt = GetSizeFromString(split[1]);
+									filter.SizeLessThanOrEqual = GetSizeFromString(split[1]);
 									break;
 								case "-t":
 								case "--temp":
@@ -1168,9 +1150,7 @@ namespace SabreTools
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix,
 					postfix, quotes, repext, addext, remext, datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName,
-					gamename, romname, romtype, sgt, slt, seq, crc, md5, sha1, status, gametype,
-					notgamename, notromname, notromtype, notcrc, notmd5, notsha1, notstatus, notgametype, runnable,
-					splitType, trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
+					filter, splitType, trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
 			}
 
 			// If we're using the verifier
