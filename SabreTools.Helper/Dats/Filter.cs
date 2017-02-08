@@ -736,28 +736,44 @@ namespace SabreTools.Helper.Dats
 				{
 					if (name.StartsWith("*") && name.EndsWith("*"))
 					{
-						if (!item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", "")))
+						if (_includeOfInGame
+							? (!item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*')))
+								&& (!item.Machine.CloneOf.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*')))
+								&& (!item.Machine.RomOf.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*')))
+							: (!item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*'))))
 						{
 							found = false;
 						}
 					}
 					else if (name.StartsWith("*"))
 					{
-						if (!item.Machine.Name.EndsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						if (_includeOfInGame
+							? (!item.Machine.Name.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
+								&& (!item.Machine.CloneOf.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
+								&& (!item.Machine.RomOf.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
+							: (!item.Machine.Name.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase)))
 						{
 							found = false;
 						}
 					}
 					else if (name.EndsWith("*"))
 					{
-						if (!item.Machine.Name.StartsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						if (_includeOfInGame
+							? (!item.Machine.Name.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
+								&& (!item.Machine.CloneOf.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
+								&& (!item.Machine.RomOf.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
+							: (!item.Machine.Name.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase)))
 						{
 							found = false;
 						}
 					}
 					else
 					{
-						if (!String.Equals(item.Machine.Name, name, StringComparison.InvariantCultureIgnoreCase))
+						if (_includeOfInGame
+							? (!String.Equals(item.Machine.Name, name, StringComparison.InvariantCultureIgnoreCase))
+								&& (!String.Equals(item.Machine.CloneOf, name, StringComparison.InvariantCultureIgnoreCase))
+								&& (!String.Equals(item.Machine.RomOf, name, StringComparison.InvariantCultureIgnoreCase))
+							: (!String.Equals(item.Machine.Name, name, StringComparison.InvariantCultureIgnoreCase)))
 						{
 							found = false;
 						}
@@ -777,28 +793,44 @@ namespace SabreTools.Helper.Dats
 				{
 					if (name.StartsWith("*") && name.EndsWith("*"))
 					{
-						if (item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", "")))
+						if (_includeOfInGame
+							? (item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*')))
+								|| (item.Machine.CloneOf.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*')))
+								|| (item.Machine.RomOf.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*')))
+							: (item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*'))))
 						{
 							found = false;
 						}
 					}
 					else if (name.StartsWith("*"))
 					{
-						if (item.Machine.Name.EndsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						if (_includeOfInGame
+							? (item.Machine.Name.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
+								|| (item.Machine.CloneOf.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
+								|| (item.Machine.RomOf.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
+							: (item.Machine.Name.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase)))
 						{
 							found = false;
 						}
 					}
 					else if (name.EndsWith("*"))
 					{
-						if (item.Machine.Name.StartsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						if (_includeOfInGame
+							? (item.Machine.Name.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
+								|| (item.Machine.CloneOf.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
+								|| (item.Machine.RomOf.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
+							: (item.Machine.Name.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase)))
 						{
 							found = false;
 						}
 					}
 					else
 					{
-						if (String.Equals(item.Machine.Name, name, StringComparison.InvariantCultureIgnoreCase))
+						if (_includeOfInGame
+							? (String.Equals(item.Machine.Name, name, StringComparison.InvariantCultureIgnoreCase))
+								|| (String.Equals(item.Machine.CloneOf, name, StringComparison.InvariantCultureIgnoreCase))
+								|| (String.Equals(item.Machine.RomOf, name, StringComparison.InvariantCultureIgnoreCase))
+							: (String.Equals(item.Machine.Name, name, StringComparison.InvariantCultureIgnoreCase)))
 						{
 							found = false;
 						}
