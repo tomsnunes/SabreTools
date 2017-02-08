@@ -1078,6 +1078,11 @@ namespace SabreTools
 				"Filter by not game name",
 				FeatureType.List,
 				null));
+			update.AddFeature("of-as-game", new Feature(
+				new List<string>() { "-ofg", "--of-as-game" },
+				"Allow cloneof and romof tags to match game name filters",
+				FeatureType.Flag,
+				null));
 			update.AddFeature("rom-name", new Feature(
 				new List<string>() { "-rn", "--rom-name" },
 				"Filter by rom name",

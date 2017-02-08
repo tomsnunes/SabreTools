@@ -962,6 +962,11 @@ Options:
 				*00* means contains '00'
 				00 means exactly equals '00'
 			Multiples of each of the above inputs are allowed.
+			
+		-ofg, --of-as-game	Allow cloneof and romof tags to match game name filters
+			If filter or exclude by game name is used, this flag will allow those filters to
+			be checked against the romof and cloneof tags as well. This can allow for more
+			advanced set-building, especially in arcade-based sets.
 		
 		-rt=, --rom-type=	Filter by rom type
 			This allows users to only include roms or disks to their liking. Multiples of this

@@ -414,6 +414,10 @@ namespace SabreTools
 					case "--output-dc":
 						datFormat |= DatFormat.DOSCenter;
 						break;
+					case "-ofg":
+					case "--of-as-game":
+						filter.IncludeOfInGame = true;
+						break;
 					case "-om":
 					case "--output-miss":
 						datFormat |= DatFormat.MissFile;
