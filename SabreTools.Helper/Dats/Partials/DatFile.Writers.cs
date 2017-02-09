@@ -857,7 +857,7 @@ namespace SabreTools.Helper.Dats
 									+ "/>\n";
 								break;
 							case ItemType.Sample:
-								state += "\t\t<file type=\"sample\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+								state += "\t\t<sample name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 									+ "/>\n";
 								break;
 						}
