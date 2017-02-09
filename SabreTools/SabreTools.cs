@@ -632,7 +632,7 @@ namespace SabreTools
 						break;
 					case "-gt":
 					case "--game-type":
-						filter.MachineTypes |= Filter.GetMachneTypeFromString(args[++i], _logger);
+						filter.MachineTypes |= Filter.GetMachineTypeFromString(args[++i], _logger);
 						break;
 					case "-gz":
 					case "--gz":
@@ -675,7 +675,7 @@ namespace SabreTools
 						break;
 					case "-ngt":
 					case "--not-gtype":
-						filter.NotMachineTypes |= Filter.GetMachneTypeFromString(args[++i], _logger);
+						filter.NotMachineTypes |= Filter.GetMachineTypeFromString(args[++i], _logger);
 						break;
 					case "-nis":
 					case "--not-status":
@@ -865,7 +865,7 @@ namespace SabreTools
 									break;
 								case "-gt":
 								case "--game-type":
-									filter.MachineTypes |= Filter.GetMachneTypeFromString(split[1], _logger);
+									filter.MachineTypes |= Filter.GetMachineTypeFromString(split[1], _logger);
 									break;
 								case "-gz":
 								case "--gz":
@@ -908,7 +908,7 @@ namespace SabreTools
 									break;
 								case "-ngt":
 								case "--not-gtype":
-									filter.NotMachineTypes |= Filter.GetMachneTypeFromString(split[1], _logger);
+									filter.NotMachineTypes |= Filter.GetMachineTypeFromString(split[1], _logger);
 									break;
 								case "-nis":
 								case "--not-status":

@@ -498,7 +498,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="gametype">Machine type as a string</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>A machine type based on the input</returns>
-		public static MachineType GetMachneTypeFromString(string gametype, Logger logger)
+		public static MachineType GetMachineTypeFromString(string gametype, Logger logger)
 		{
 			MachineType machineType = MachineType.NULL;
 			switch (gametype.ToLowerInvariant())
