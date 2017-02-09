@@ -863,12 +863,6 @@ namespace SabreTools.Helper.Dats
 						}
 						break;
 					case DatFormat.MissFile:
-						// Missfile should only output Rom and Disk
-						if (rom.Type != ItemType.Disk && rom.Type != ItemType.Rom)
-						{
-							return true;
-						}
-
 						pre = Prefix + (Quotes ? "\"" : "");
 						post = (Quotes ? "\"" : "") + Postfix;
 
@@ -896,13 +890,35 @@ namespace SabreTools.Helper.Dats
 							pre = pre
 								.Replace("%game%", rom.Machine.Name)
 								.Replace("%name%", rom.Name)
+								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", ((Disk)rom).MD5)
-								.Replace("%sha1%", ((Disk)rom).SHA1);
+								.Replace("%sha1%", ((Disk)rom).SHA1)
+								.Replace("%size%", string.Empty);
 							post = post
 								.Replace("%game%", rom.Machine.Name)
 								.Replace("%name%", rom.Name)
+								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", ((Disk)rom).MD5)
-								.Replace("%sha1%", ((Disk)rom).SHA1);
+								.Replace("%sha1%", ((Disk)rom).SHA1)
+								.Replace("%size%", string.Empty);
+						}
+						else
+						{
+							// Check for special strings in prefix and postfix
+							pre = pre
+								.Replace("%game%", rom.Machine.Name)
+								.Replace("%name%", rom.Name)
+								.Replace("%crc%", string.Empty)
+								.Replace("%md5%", string.Empty)
+								.Replace("%sha1%", string.Empty)
+								.Replace("%size%", string.Empty);
+							post = post
+								.Replace("%game%", rom.Machine.Name)
+								.Replace("%name%", rom.Name)
+								.Replace("%crc%", string.Empty)
+								.Replace("%md5%", string.Empty)
+								.Replace("%sha1%", string.Empty)
+								.Replace("%size%", string.Empty);
 						}
 
 						// If we're in Romba mode, the state is consistent
