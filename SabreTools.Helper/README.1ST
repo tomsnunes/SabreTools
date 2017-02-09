@@ -955,13 +955,9 @@ Options:
 		-nmd5=, --not-md5=	Exclude by MD5 hash
 		-sha1=, --sha1=		Filter by SHA-1 hash
 		-nsha1=, --not-sha1= Exclude by SHA-1 hash
-			For each of the flags above, the user can specify either an exact match or can use a
-			wildcard as defined below (case-insensitive):
-				*00 means ends with '00'
-				00* means starts with '00'
-				*00* means contains '00'
-				00 means exactly equals '00'
-			Multiples of each of the above inputs are allowed.
+			For each of the flags above, the user can specify either an exact match or can use
+			full C#-style regex for pattern matching. Multiples of each of the above inputs are
+			allowed.
 			
 		-ofg, --of-as-game	Allow cloneof and romof tags to match game name filters
 			If filter or exclude by game name is used, this flag will allow those filters to

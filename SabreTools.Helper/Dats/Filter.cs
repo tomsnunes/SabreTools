@@ -469,19 +469,15 @@ namespace SabreTools.Helper.Dats
 		/// <param name="haystack">List to search for the value in</param>
 		/// <param name="needle">Value to search the list for</param>
 		/// <returns>True if the value could be found, false otherwise</returns>
-		/// <remarks>TODO: Add proper regex matching to all strings</remarks>
-		private bool FindValueInList(List<string> haystack, string needle, bool regex = false)
+		private bool FindValueInList(List<string> haystack, string needle)
 		{
 			bool found = false;
 			foreach (string straw in haystack)
 			{
 				if (!String.IsNullOrEmpty(straw))
 				{
-					// Pre-process the straw to make it regex-compatibile
-					string regexStraw = (!regex ? "^" + (straw.StartsWith("*") ? ".*" : "") + Regex.Escape(straw.Trim('*')) + (straw.EndsWith("*") ? ".*" : "") + "$" : straw);
-
 					// Check if a match is found with the regex
-					found |= Regex.IsMatch(needle, regexStraw, RegexOptions.IgnoreCase);
+					found |= Regex.IsMatch(needle, straw, RegexOptions.IgnoreCase);
 				}
 			}
 

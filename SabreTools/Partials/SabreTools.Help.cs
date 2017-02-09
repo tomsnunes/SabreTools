@@ -647,11 +647,7 @@ namespace SabreTools
 
 					"",
 					"Filter parameters game name, rom name, CRC, MD5, SHA-1 can",
-					"do partial matches using asterisks as follows (case insensitive):",
-					"  *00 means ends with '00'",
-					"  00* means starts with '00'",
-					"  *00* means contains '00'",
-					"  00 means exactly equals '00'",
+					"be matched using full C#-style regex.",
 
 					"",
 					"Filter parameters for size can use postfixes for inputs:",
