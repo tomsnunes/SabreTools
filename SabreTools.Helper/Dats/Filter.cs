@@ -485,7 +485,7 @@ namespace SabreTools.Helper.Dats
 					}
 
 					// Check if a match is found with the regex
-					found |= Regex.IsMatch(needle, regexStraw, RegexOptions.IgnoreCase);
+					found |= Regex.IsMatch(needle, regexStraw, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 				}
 			}
 
