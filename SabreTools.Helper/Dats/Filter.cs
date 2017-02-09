@@ -281,85 +281,16 @@ namespace SabreTools.Helper.Dats
 				// Filter on CRC
 				if (_crcs.Count > 0)
 				{
-					bool found = true;
-					foreach (string crc in _crcs)
-					{
-						if (!String.IsNullOrEmpty(crc))
-						{
-							if (crc.StartsWith("*") && crc.EndsWith("*"))
-							{
-								if (!rom.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", "")))
-								{
-									found = false;
-								}
-							}
-							else if (crc.StartsWith("*"))
-							{
-								if (!rom.CRC.EndsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-							else if (crc.EndsWith("*"))
-							{
-								if (!rom.CRC.StartsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-							else
-							{
-								if (!String.Equals(rom.CRC, crc, StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-						}
-					}
-
-					// If the CRC didn't match, return false
-					if (!found)
+					// If the CRC isn't in the list, return false
+					if (!FindValueInList(_crcs, rom.CRC))
 					{
 						return false;
 					}
 				}
 				if (_notCrcs.Count > 0)
 				{
-					bool found = true;
-					foreach (string crc in _notCrcs)
-					{
-						if (crc.StartsWith("*") && crc.EndsWith("*"))
-						{
-							if (rom.CRC.ToLowerInvariant().Contains(crc.ToLowerInvariant().Replace("*", "")))
-							{
-								found = false;
-							}
-						}
-						else if (crc.StartsWith("*"))
-						{
-							if (rom.CRC.EndsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-						else if (crc.EndsWith("*"))
-						{
-							if (rom.CRC.StartsWith(crc.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-						else
-						{
-							if (String.Equals(rom.CRC, crc, StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-					}
-
-					// If the CRC matched, return false
-					if (!found)
+					// If the CRC is in the list, return false
+					if (FindValueInList(_notCrcs, rom.CRC))
 					{
 						return false;
 					}
@@ -368,85 +299,16 @@ namespace SabreTools.Helper.Dats
 				// Filter on MD5
 				if (_md5s.Count > 0)
 				{
-					bool found = true;
-					foreach (string md5 in _md5s)
-					{
-						if (!String.IsNullOrEmpty(md5))
-						{
-							if (md5.StartsWith("*") && md5.EndsWith("*"))
-							{
-								if (!rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
-								{
-									found = false;
-								}
-							}
-							else if (md5.StartsWith("*"))
-							{
-								if (!rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-							else if (md5.EndsWith("*"))
-							{
-								if (!rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-							else
-							{
-								if (!String.Equals(rom.MD5, md5, StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-						}
-					}
-
-					// If the MD5 didn't match, return false
-					if (!found)
+					// If the MD5 isn't in the list, return false
+					if (!FindValueInList(_md5s, rom.MD5))
 					{
 						return false;
 					}
 				}
 				if (_notMd5s.Count > 0)
 				{
-					bool found = true;
-					foreach (string md5 in _notMd5s)
-					{
-						if (md5.StartsWith("*") && md5.EndsWith("*"))
-						{
-							if (rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
-							{
-								found = false;
-							}
-						}
-						else if (md5.StartsWith("*"))
-						{
-							if (rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-						else if (md5.EndsWith("*"))
-						{
-							if (rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-						else
-						{
-							if (String.Equals(rom.MD5, md5, StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-					}
-
-					// If the MD5 matched, return false
-					if (!found)
+					// If the MD5 is in the list, return false
+					if (FindValueInList(_notMd5s, rom.MD5))
 					{
 						return false;
 					}
@@ -455,85 +317,16 @@ namespace SabreTools.Helper.Dats
 				// Filter on SHA1
 				if (_sha1s.Count > 0)
 				{
-					bool found = true;
-					foreach (string sha1 in _sha1s)
-					{
-						if (!String.IsNullOrEmpty(sha1))
-						{
-							if (sha1.StartsWith("*") && sha1.EndsWith("*"))
-							{
-								if (!rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
-								{
-									found = false;
-								}
-							}
-							else if (sha1.StartsWith("*"))
-							{
-								if (!rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-							else if (sha1.EndsWith("*"))
-							{
-								if (!rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-							else
-							{
-								if (!String.Equals(rom.SHA1, sha1, StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-						}
-					}
-
-					// If the SHA1 didn't match, return false
-					if (!found)
+					// If the SHA-1 isn't in the list, return false
+					if (!FindValueInList(_sha1s, rom.SHA1))
 					{
 						return false;
 					}
 				}
 				if (_notSha1s.Count > 0)
 				{
-					bool found = true;
-					foreach (string sha1 in _notSha1s)
-					{
-						if (sha1.StartsWith("*") && sha1.EndsWith("*"))
-						{
-							if (rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
-							{
-								found = false;
-							}
-						}
-						else if (sha1.StartsWith("*"))
-						{
-							if (rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-						else if (sha1.EndsWith("*"))
-						{
-							if (rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-						else
-						{
-							if (String.Equals(rom.SHA1, sha1, StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-					}
-
-					// If the SHA1 matched, return false
-					if (!found)
+					// If the SHA-1 is in the list, return false
+					if (FindValueInList(_notSha1s, rom.SHA1))
 					{
 						return false;
 					}
@@ -556,85 +349,16 @@ namespace SabreTools.Helper.Dats
 				// Filter on MD5
 				if (_md5s.Count > 0)
 				{
-					bool found = true;
-					foreach (string md5 in _md5s)
-					{
-						if (!String.IsNullOrEmpty(md5))
-						{
-							if (md5.StartsWith("*") && md5.EndsWith("*"))
-							{
-								if (!rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
-								{
-									found = false;
-								}
-							}
-							else if (md5.StartsWith("*"))
-							{
-								if (!rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-							else if (md5.EndsWith("*"))
-							{
-								if (!rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-							else
-							{
-								if (!String.Equals(rom.MD5, md5, StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-						}
-					}
-
-					// If the MD5 didn't match, return false
-					if (!found)
+					// If the MD5 isn't in the list, return false
+					if (!FindValueInList(_md5s, rom.MD5))
 					{
 						return false;
 					}
 				}
 				if (_notMd5s.Count > 0)
 				{
-					bool found = true;
-					foreach (string md5 in _notMd5s)
-					{
-						if (md5.StartsWith("*") && md5.EndsWith("*"))
-						{
-							if (rom.MD5.ToLowerInvariant().Contains(md5.ToLowerInvariant().Replace("*", "")))
-							{
-								found = false;
-							}
-						}
-						else if (md5.StartsWith("*"))
-						{
-							if (rom.MD5.EndsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-						else if (md5.EndsWith("*"))
-						{
-							if (rom.MD5.StartsWith(md5.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-						else
-						{
-							if (String.Equals(rom.MD5, md5, StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-					}
-
-					// If the MD5 matched, return false
-					if (!found)
+					// If the MD5 is in the list, return false
+					if (FindValueInList(_notMd5s, rom.MD5))
 					{
 						return false;
 					}
@@ -643,85 +367,16 @@ namespace SabreTools.Helper.Dats
 				// Filter on SHA1
 				if (_sha1s.Count > 0)
 				{
-					bool found = true;
-					foreach (string sha1 in _sha1s)
-					{
-						if (!String.IsNullOrEmpty(sha1))
-						{
-							if (sha1.StartsWith("*") && sha1.EndsWith("*"))
-							{
-								if (!rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
-								{
-									found = false;
-								}
-							}
-							else if (sha1.StartsWith("*"))
-							{
-								if (!rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-							else if (sha1.EndsWith("*"))
-							{
-								if (!rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-							else
-							{
-								if (!String.Equals(rom.SHA1, sha1, StringComparison.InvariantCultureIgnoreCase))
-								{
-									found = false;
-								}
-							}
-						}
-					}
-
-					// If the SHA1 didn't match, return false
-					if (!found)
+					// If the SHA-1 isn't in the list, return false
+					if (!FindValueInList(_sha1s, rom.SHA1))
 					{
 						return false;
 					}
 				}
 				if (_notSha1s.Count > 0)
 				{
-					bool found = true;
-					foreach (string sha1 in _notSha1s)
-					{
-						if (sha1.StartsWith("*") && sha1.EndsWith("*"))
-						{
-							if (rom.SHA1.ToLowerInvariant().Contains(sha1.ToLowerInvariant().Replace("*", "")))
-							{
-								found = false;
-							}
-						}
-						else if (sha1.StartsWith("*"))
-						{
-							if (rom.SHA1.EndsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-						else if (sha1.EndsWith("*"))
-						{
-							if (rom.SHA1.StartsWith(sha1.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-						else
-						{
-							if (String.Equals(rom.SHA1, sha1, StringComparison.InvariantCultureIgnoreCase))
-							{
-								found = false;
-							}
-						}
-					}
-
-					// If the SHA1 matched, return false
-					if (!found)
+					// If the SHA-1 is in the list, return false
+					if (FindValueInList(_notSha1s, rom.SHA1))
 					{
 						return false;
 					}
@@ -731,56 +386,16 @@ namespace SabreTools.Helper.Dats
 			// Filter on game name
 			if (_gameNames.Count > 0)
 			{
-				bool found = true;
-				foreach (string name in _gameNames)
+				bool found = FindValueInList(_gameNames, item.Machine.Name);
+
+				// If we are checking CloneOf and RomOf, add them in as well
+				if (_includeOfInGame)
 				{
-					if (name.StartsWith("*") && name.EndsWith("*"))
-					{
-						if (_includeOfInGame
-							? (!item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*')))
-								&& (!item.Machine.CloneOf.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*')))
-								&& (!item.Machine.RomOf.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*')))
-							: (!item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*'))))
-						{
-							found = false;
-						}
-					}
-					else if (name.StartsWith("*"))
-					{
-						if (_includeOfInGame
-							? (!item.Machine.Name.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
-								&& (!item.Machine.CloneOf.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
-								&& (!item.Machine.RomOf.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
-							: (!item.Machine.Name.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase)))
-						{
-							found = false;
-						}
-					}
-					else if (name.EndsWith("*"))
-					{
-						if (_includeOfInGame
-							? (!item.Machine.Name.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
-								&& (!item.Machine.CloneOf.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
-								&& (!item.Machine.RomOf.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
-							: (!item.Machine.Name.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase)))
-						{
-							found = false;
-						}
-					}
-					else
-					{
-						if (_includeOfInGame
-							? (!String.Equals(item.Machine.Name, name, StringComparison.InvariantCultureIgnoreCase))
-								&& (!String.Equals(item.Machine.CloneOf, name, StringComparison.InvariantCultureIgnoreCase))
-								&& (!String.Equals(item.Machine.RomOf, name, StringComparison.InvariantCultureIgnoreCase))
-							: (!String.Equals(item.Machine.Name, name, StringComparison.InvariantCultureIgnoreCase)))
-						{
-							found = false;
-						}
-					}
+					found |= FindValueInList(_gameNames, item.Machine.CloneOf);
+					found |= FindValueInList(_gameNames, item.Machine.RomOf);
 				}
 
-				// If the game name was not matched, return false
+				// If the game name was not found in the list, return false
 				if (!found)
 				{
 					return false;
@@ -788,57 +403,17 @@ namespace SabreTools.Helper.Dats
 			}
 			if (_notGameNames.Count > 0)
 			{
-				bool found = true;
-				foreach (string name in _notGameNames)
+				bool found = FindValueInList(_gameNames, item.Machine.Name);
+
+				// If we are checking CloneOf and RomOf, add them in as well
+				if (_includeOfInGame)
 				{
-					if (name.StartsWith("*") && name.EndsWith("*"))
-					{
-						if (_includeOfInGame
-							? (item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*')))
-								|| (item.Machine.CloneOf.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*')))
-								|| (item.Machine.RomOf.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*')))
-							: (item.Machine.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Trim('*'))))
-						{
-							found = false;
-						}
-					}
-					else if (name.StartsWith("*"))
-					{
-						if (_includeOfInGame
-							? (item.Machine.Name.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
-								|| (item.Machine.CloneOf.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
-								|| (item.Machine.RomOf.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
-							: (item.Machine.Name.EndsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase)))
-						{
-							found = false;
-						}
-					}
-					else if (name.EndsWith("*"))
-					{
-						if (_includeOfInGame
-							? (item.Machine.Name.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
-								|| (item.Machine.CloneOf.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
-								|| (item.Machine.RomOf.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase))
-							: (item.Machine.Name.StartsWith(name.Trim('*'), StringComparison.InvariantCultureIgnoreCase)))
-						{
-							found = false;
-						}
-					}
-					else
-					{
-						if (_includeOfInGame
-							? (String.Equals(item.Machine.Name, name, StringComparison.InvariantCultureIgnoreCase))
-								|| (String.Equals(item.Machine.CloneOf, name, StringComparison.InvariantCultureIgnoreCase))
-								|| (String.Equals(item.Machine.RomOf, name, StringComparison.InvariantCultureIgnoreCase))
-							: (String.Equals(item.Machine.Name, name, StringComparison.InvariantCultureIgnoreCase)))
-						{
-							found = false;
-						}
-					}
+					found |= FindValueInList(_gameNames, item.Machine.CloneOf);
+					found |= FindValueInList(_gameNames, item.Machine.RomOf);
 				}
 
-				// If the game name was matched, return false
-				if (!found)
+				// If the game name was found in the list, return false
+				if (found)
 				{
 					return false;
 				}
@@ -847,82 +422,16 @@ namespace SabreTools.Helper.Dats
 			// Filter on rom name
 			if (_romNames.Count > 0)
 			{
-				bool found = true;
-				foreach (string name in _romNames)
-				{
-					if (name.StartsWith("*") && name.EndsWith("*"))
-					{
-						if (!item.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", "")))
-						{
-							found = false;
-						}
-					}
-					else if (name.StartsWith("*"))
-					{
-						if (!item.Name.EndsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							found = false;
-						}
-					}
-					else if (name.EndsWith("*"))
-					{
-						if (!item.Name.StartsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							found = false;
-						}
-					}
-					else
-					{
-						if (!String.Equals(item.Name, name, StringComparison.InvariantCultureIgnoreCase))
-						{
-							found = false;
-						}
-					}
-				}
-
-				// If the rom name was not matched, return false
-				if (!found)
+				// If the rom name was not found in the list, return false
+				if (!FindValueInList(_romNames, item.Name))
 				{
 					return false;
 				}
 			}
 			if (_notRomNames.Count > 0)
 			{
-				bool found = true;
-				foreach (string name in _notRomNames)
-				{
-					if (name.StartsWith("*") && name.EndsWith("*"))
-					{
-						if (item.Name.ToLowerInvariant().Contains(name.ToLowerInvariant().Replace("*", "")))
-						{
-							found = false;
-						}
-					}
-					else if (name.StartsWith("*"))
-					{
-						if (item.Name.EndsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							found = false;
-						}
-					}
-					else if (name.EndsWith("*"))
-					{
-						if (item.Name.StartsWith(name.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							found = false;
-						}
-					}
-					else
-					{
-						if (String.Equals(item.Name, name, StringComparison.InvariantCultureIgnoreCase))
-						{
-							found = false;
-						}
-					}
-				}
-
-				// If the rom name was matched, return false
-				if (!found)
+				// If the rom name was found in the list, return false
+				if (FindValueInList(_notRomNames, item.Name))
 				{
 					return false;
 				}
@@ -935,40 +444,69 @@ namespace SabreTools.Helper.Dats
 			}
 			if (_romTypes.Count > 0)
 			{
-				bool found = true;
-				foreach (string type in _romTypes)
-				{
-					if (!String.Equals(item.Type.ToString(), type, StringComparison.InvariantCultureIgnoreCase))
-					{
-						found = false;
-					}
-				}
-				
-				// If the rom type was not found, return false
-				if (!found)
+				// If the rom type was not found in the list, return false
+				if (!FindValueInList(_romTypes, item.Type.ToString()))
 				{
 					return false;
 				}
 			}
 			if (_notRomTypes.Count > 0)
 			{
-				bool found = true;
-				foreach (string type in _notRomTypes)
-				{
-					if (String.Equals(item.Type.ToString(), type, StringComparison.InvariantCultureIgnoreCase))
-					{
-						found = false;
-					}
-				}
-
-				// If the rom type was found, return false
-				if (!found)
+				// If the rom type was found in the list, return false
+				if (FindValueInList(_notRomTypes, item.Type.ToString()))
 				{
 					return false;
 				}
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Generic code to check if a specific value is in the list given
+		/// </summary>
+		/// <param name="haystack">List to search for the value in</param>
+		/// <param name="needle">Value to search the list for</param>
+		/// <returns>True if the value could be found, false otherwise</returns>
+		private bool FindValueInList(List<string> haystack, string needle)
+		{
+			bool found = false;
+			foreach (string straw in haystack)
+			{
+				if (!String.IsNullOrEmpty(straw))
+				{
+					if (straw.StartsWith("*") && straw.EndsWith("*"))
+					{
+						if (needle.ToLowerInvariant().Contains(straw.ToLowerInvariant().Replace("*", "")))
+						{
+							found = true;
+						}
+					}
+					else if (straw.StartsWith("*"))
+					{
+						if (needle.EndsWith(straw.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = true;
+						}
+					}
+					else if (straw.EndsWith("*"))
+					{
+						if (needle.StartsWith(straw.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = true;
+						}
+					}
+					else
+					{
+						if (String.Equals(needle, straw, StringComparison.InvariantCultureIgnoreCase))
+						{
+							found = true;
+						}
+					}
+				}
+			}
+
+			return found;
 		}
 
 		#endregion
