@@ -476,8 +476,16 @@ namespace SabreTools.Helper.Dats
 			{
 				if (!String.IsNullOrEmpty(straw))
 				{
+					string regexStraw = straw;
+
+					// If the straw has no special characters at all, treat it as an exact match
+					if (regexStraw == Regex.Escape(regexStraw))
+					{
+						regexStraw = "^" + regexStraw + "$";
+					}
+
 					// Check if a match is found with the regex
-					found |= Regex.IsMatch(needle, straw, RegexOptions.IgnoreCase);
+					found |= Regex.IsMatch(needle, regexStraw, RegexOptions.IgnoreCase);
 				}
 			}
 
