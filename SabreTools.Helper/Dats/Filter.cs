@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 using SabreTools.Helper.Data;
 
@@ -468,6 +469,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="haystack">List to search for the value in</param>
 		/// <param name="needle">Value to search the list for</param>
 		/// <returns>True if the value could be found, false otherwise</returns>
+		/// <remarks>TODO: Add proper regex matching to all strings</remarks>
 		private bool FindValueInList(List<string> haystack, string needle)
 		{
 			bool found = false;
@@ -475,34 +477,11 @@ namespace SabreTools.Helper.Dats
 			{
 				if (!String.IsNullOrEmpty(straw))
 				{
-					if (straw.StartsWith("*") && straw.EndsWith("*"))
-					{
-						if (needle.ToLowerInvariant().Contains(straw.ToLowerInvariant().Replace("*", "")))
-						{
-							found = true;
-						}
-					}
-					else if (straw.StartsWith("*"))
-					{
-						if (needle.EndsWith(straw.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							found = true;
-						}
-					}
-					else if (straw.EndsWith("*"))
-					{
-						if (needle.StartsWith(straw.Replace("*", ""), StringComparison.InvariantCultureIgnoreCase))
-						{
-							found = true;
-						}
-					}
-					else
-					{
-						if (String.Equals(needle, straw, StringComparison.InvariantCultureIgnoreCase))
-						{
-							found = true;
-						}
-					}
+					// Pre-process the straw to make it regex-compatibile
+					string regexStraw = "^" + (straw.StartsWith("*") ? ".*" : "") + Regex.Escape(straw.Trim('*')) + (straw.EndsWith("*") ? ".*" : "") + "$";
+
+					// Check if a match is found with the regex
+					found |= Regex.IsMatch(needle, straw, RegexOptions.IgnoreCase);
 				}
 			}
 
