@@ -509,7 +509,7 @@ namespace SabreTools
 				"Enable TorrentGZ output",
 				FeatureType.Flag,
 				null));
-			sort["tgz"].AddFeature("romba", new Feature(
+			sortDepot["tgz"].AddFeature("romba", new Feature(
 				new List<string>() { "-r", "--romba" },
 				"Enable Romba depot dir output",
 				FeatureType.Flag,
