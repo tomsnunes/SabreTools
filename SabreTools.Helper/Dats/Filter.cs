@@ -481,7 +481,7 @@ namespace SabreTools.Helper.Dats
 					string regexStraw = (!regex ? "^" + (straw.StartsWith("*") ? ".*" : "") + Regex.Escape(straw.Trim('*')) + (straw.EndsWith("*") ? ".*" : "") + "$" : straw);
 
 					// Check if a match is found with the regex
-					found |= Regex.IsMatch(needle, straw, RegexOptions.IgnoreCase);
+					found |= Regex.IsMatch(needle, regexStraw, RegexOptions.IgnoreCase);
 				}
 			}
 
