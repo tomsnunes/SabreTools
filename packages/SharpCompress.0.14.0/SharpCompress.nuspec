@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>SharpCompress</id>
+    <version>0.14.0</version>
+    <title>SharpCompress - Pure C# Decompression/Compression</title>
+    <authors>Adam Hathcock</authors>
+    <owners>Adam Hathcock</owners>
+    <licenseUrl>https://github.com/adamhathcock/sharpcompress/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/adamhathcock/sharpcompress</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>SharpCompress</description>
+    <language>en-US</language>
+    <tags>rar unrar zip unzip bzip2 gzip tar 7zip</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework3.5" />
+      <group targetFramework=".NETFramework4.0" />
+      <group targetFramework=".NETFramework4.5" />
+      <group targetFramework=".NETPortable4.0-Profile328" />
+      <group targetFramework=".NETPortable4.5-Profile259" />
+      <group targetFramework=".NETStandard1.0">
+        <dependency id="System.Collections" version="[4.0.11, )" />
+        <dependency id="System.Diagnostics.Debug" version="[4.0.11, )" />
+        <dependency id="System.IO" version="[4.1.0, )" />
+        <dependency id="System.Linq" version="[4.1.0, )" />
+        <dependency id="System.Resources.ResourceManager" version="[4.0.1, )" />
+        <dependency id="System.Runtime.Extensions" version="[4.1.0, )" />
+        <dependency id="System.Text.Encoding.Extensions" version="[4.0.11, )" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="System.Collections" version="[4.0.11, )" />
+        <dependency id="System.Diagnostics.Debug" version="[4.0.11, )" />
+        <dependency id="System.IO" version="[4.1.0, )" />
+        <dependency id="System.IO.FileSystem" version="[4.0.1, )" />
+        <dependency id="System.Linq" version="[4.1.0, )" />
+        <dependency id="System.Resources.ResourceManager" version="[4.0.1, )" />
+        <dependency id="System.Runtime.Extensions" version="[4.1.0, )" />
+        <dependency id="System.Security.Cryptography.Algorithms" version="[4.2.0, )" />
+        <dependency id="System.Text.Encoding.Extensions" version="[4.0.11, )" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
