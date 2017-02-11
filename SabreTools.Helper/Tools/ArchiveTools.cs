@@ -1336,6 +1336,12 @@ namespace SabreTools.Helper.Tools
 			if (romba)
 			{
 				outfile = Path.Combine(outDir, Style.GetRombaPath(rom.SHA1));
+				
+				// Check to see if the folder needs to be created
+				if (!Directory.Exists(Path.GetDirectoryName(outfile)))
+				{
+					Directory.CreateDirectory(Path.GetDirectoryName(outfile));
+				}
 			}
 			// Otherwise, we're just rebuilding to the main directory
 			else
