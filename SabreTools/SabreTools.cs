@@ -1043,7 +1043,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(datFromDir ^ extract ^ restore ^ sort ^ sortDepot ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify))
+			if (!(datFromDir ^ extract ^ restore ^ sort ^ sortDepot ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify ^ verifyDepot))
 			{
 				_logger.Error("Only one feature switch is allowed at a time");
 				_help.OutputGenericHelp();
