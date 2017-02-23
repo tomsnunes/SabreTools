@@ -32,7 +32,7 @@ namespace SabreTools.Helper.Dats
 		private List<string> _notCrcs;
 		private List<string> _notMd5s;
 		private List<string> _notSha1s;
-		private List<string> _notSha256s
+		private List<string> _notSha256s;
 		private ItemStatus _itemNotStatuses;
 		private MachineType _machineNotTypes;
 
