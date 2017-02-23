@@ -63,6 +63,7 @@ namespace SabreTools.Helper.Dats
 			_crc = "null";
 			_md5 = "null";
 			_sha1 = "null";
+			_sha256 = "null";
 			_itemStatus = ItemStatus.None;
 
 			_machine = new Machine
@@ -102,6 +103,7 @@ namespace SabreTools.Helper.Dats
 
 				MD5 = this.MD5,
 				SHA1 = this.SHA1,
+				SHA256 = this.SHA256,
 				ItemStatus = this.ItemStatus,
 				Size = this.Size,
 				CRC = this.CRC,
@@ -132,10 +134,11 @@ namespace SabreTools.Helper.Dats
 				return dupefound;
 			}
 
-			if ((this.Size == newOther.Size) &&
-				((String.IsNullOrEmpty(this.CRC) || String.IsNullOrEmpty(newOther.CRC)) || this.CRC == newOther.CRC) &&
-				((String.IsNullOrEmpty(this.MD5) || String.IsNullOrEmpty(newOther.MD5)) || this.MD5 == newOther.MD5) &&
-				((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(newOther.SHA1)) || this.SHA1 == newOther.SHA1))
+			if ((this.Size == newOther.Size)
+				&& ((String.IsNullOrEmpty(this.CRC) || String.IsNullOrEmpty(newOther.CRC)) || this.CRC == newOther.CRC)
+				&& ((String.IsNullOrEmpty(this.MD5) || String.IsNullOrEmpty(newOther.MD5)) || this.MD5 == newOther.MD5) &&
+				&& ((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(newOther.SHA1)) || this.SHA1 == newOther.SHA1)
+				&& ((String.IsNullOrEmpty(this.SHA256) || String.IsNullOrEmpty(newOther.SHA256)) || this.SHA256 == newOther.SHA256))
 			{
 				dupefound = true;
 			}

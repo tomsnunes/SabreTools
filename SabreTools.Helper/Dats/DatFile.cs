@@ -51,6 +51,7 @@ namespace SabreTools.Helper.Dats
 		private long _crcCount;
 		private long _md5Count;
 		private long _sha1Count;
+		private long _sha256Count;
 		private long _baddumpCount;
 		private long _nodumpCount;
 
@@ -242,6 +243,11 @@ namespace SabreTools.Helper.Dats
 		{
 			get { return _sha1Count; }
 			set { _sha1Count = value; }
+		}
+		public long _sha256Count
+		{
+			get { return _sha256Count; }
+			set { _sha256Count = value; }
 		}
 		public long BaddumpCount
 		{

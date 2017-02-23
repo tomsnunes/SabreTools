@@ -19,6 +19,9 @@ namespace SabreTools.Helper.Data
 		public const string CRCZero = "00000000";
 		public const string MD5Zero = "d41d8cd98f00b204e9800998ecf8427e";
 		public const string SHA1Zero = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+		public const string SHA256Zero = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
+		public const string SHA384Zero = "cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7";
+		public const string SHA512Zero = "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f";
 
 		#endregion
 
@@ -61,6 +64,9 @@ namespace SabreTools.Helper.Data
 		public const int CRCLength = 8;
 		public const int MD5Length = 32;
 		public const int SHA1Length = 40;
+		public const int SHA256Length = 64;
+		public const int SHA384Length = 96;
+		public const int SHA512Length = 128;
 
 		#endregion
 

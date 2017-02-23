@@ -49,6 +49,11 @@ namespace SabreTools
 				"Don't include SHA1 in output",
 				FeatureType.Flag,
 				null));
+			datFromDir.AddFeature("noSHA256", new Feature(
+				new List<string>() { "-ns256", "--noSHA256" },
+				"Don't include SHA256 in output",
+				FeatureType.Flag,
+				null));
 			datFromDir.AddFeature("bare", new Feature(
 				new List<string>() { "-b", "--bare" },
 				"Don't include date in file name",
@@ -99,7 +104,7 @@ namespace SabreTools
 				FeatureType.Flag,
 				null));
 			datFromDir.AddFeature("output-md5", new Feature(
-				new List<string>() { "-oa", "--output-md5" },
+				new List<string>() { "-omd5", "--output-md5" },
 				"Output in MD5 format",
 				FeatureType.Flag,
 				null));
@@ -124,8 +129,13 @@ namespace SabreTools
 				FeatureType.Flag,
 				null));
 			datFromDir.AddFeature("output-sha1", new Feature(
-				new List<string>() { "-osfv", "--output-sha1" },
+				new List<string>() { "-osha1", "--output-sha1" },
 				"Output in SHA-1 format",
+				FeatureType.Flag,
+				null));
+			datFromDir.AddFeature("output-sha256", new Feature(
+				new List<string>() { "-osha256", "--output-sha256" },
+				"Output in SHA-256 format",
 				FeatureType.Flag,
 				null));
 			datFromDir.AddFeature("output-sl", new Feature(
@@ -701,7 +711,14 @@ namespace SabreTools
 				new List<string>() { "-om", "--output-miss" },
 				"Output in Missfile format",
 				FeatureType.Flag,
-				null));
+				new List<string>()
+				{
+					"",
+					"Prefix and postfix can include certain fields from the",
+					"items by including %blah% in the input.",
+					"A list of features that can be used are:",
+					"  game, name, crc, md5, sha1, sha256, size",
+				}));
 				update["output-miss"].AddFeature("roms", new Feature(
 					new List<string>() { "-r", "--roms" },
 					"Output roms to miss instead of sets",
@@ -758,7 +775,7 @@ namespace SabreTools
 					FeatureType.Flag,
 					null));
 			update.AddFeature("output-md5", new Feature(
-				new List<string>() { "-oa", "--output-md5" },
+				new List<string>() { "-omd5", "--output-md5" },
 				"Output in MD5 format",
 				FeatureType.Flag,
 				null));
@@ -793,11 +810,21 @@ namespace SabreTools
 					FeatureType.Flag,
 					null));
 			update.AddFeature("output-sha1", new Feature(
-				new List<string>() { "-osfv", "--output-sha1" },
+				new List<string>() { "-osha1", "--output-sha1" },
 				"Output in SHA-1 format",
 				FeatureType.Flag,
 				null));
 				update["output-sha1"].AddFeature("game-prefix", new Feature(
+					new List<string>() { "-gp", "--game-prefix" },
+					"Add game name as a prefix",
+					FeatureType.Flag,
+					null));
+			update.AddFeature("output-sha256", new Feature(
+				new List<string>() { "-osha256", "--output-sha256" },
+				"Output in SHA-256 format",
+				FeatureType.Flag,
+				null));
+				update["output-sha256"].AddFeature("game-prefix", new Feature(
 					new List<string>() { "-gp", "--game-prefix" },
 					"Add game name as a prefix",
 					FeatureType.Flag,
@@ -1142,6 +1169,16 @@ namespace SabreTools
 			update.AddFeature("not-sha1", new Feature(
 				new List<string>() { "-nsha1", "--not-sha1" },
 				"Filter by not SHA-1 hash",
+				FeatureType.List,
+				null));
+			update.AddFeature("sha256", new Feature(
+				new List<string>() { "-sha256", "--sha256" },
+				"Filter by SHA-256 hash",
+				FeatureType.List,
+				null));
+			update.AddFeature("not-sha256", new Feature(
+				new List<string>() { "-nsha256", "--not-sha256" },
+				"Filter by not SHA-256 hash",
 				FeatureType.List,
 				null));
 			update.AddFeature("status", new Feature(

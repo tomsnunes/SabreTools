@@ -11,6 +11,7 @@ namespace SabreTools.Helper.Dats
 		// Disk information
 		protected string _md5;
 		protected string _sha1;
+		protected string _sha256;
 		protected ItemStatus _itemStatus;
 
 		#endregion
@@ -27,6 +28,11 @@ namespace SabreTools.Helper.Dats
 		{
 			get { return _sha1; }
 			set { _sha1 = value; }
+		}
+		public string SHA256
+		{
+			get { return _sha256; }
+			set { _sha256 = value; }
 		}
 		public ItemStatus ItemStatus
 		{
@@ -79,6 +85,7 @@ namespace SabreTools.Helper.Dats
 
 				MD5 = this.MD5,
 				SHA1 = this.SHA1,
+				SHA256 = this.SHA256,
 				ItemStatus = this.ItemStatus,
 			};
 		}
@@ -106,8 +113,9 @@ namespace SabreTools.Helper.Dats
 				return dupefound;
 			}
 
-			if (((String.IsNullOrEmpty(_md5) || String.IsNullOrEmpty(newOther.MD5)) || this.MD5 == newOther.MD5) &&
-					((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(newOther.SHA1)) || this.SHA1 == newOther.SHA1))
+			if (((String.IsNullOrEmpty(_md5) || String.IsNullOrEmpty(newOther.MD5)) || this.MD5 == newOther.MD5)
+					&& ((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(newOther.SHA1)) || this.SHA1 == newOther.SHA1)
+					&& ((String.IsNullOrEmpty(this.SHA256) || String.IsNullOrEmpty(newOther.SHA256)) || this.SHA256 == newOther.SHA256))
 			{
 				dupefound = true;
 			}

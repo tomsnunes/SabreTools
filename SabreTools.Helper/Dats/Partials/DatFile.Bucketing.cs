@@ -275,7 +275,78 @@ namespace SabreTools.Helper.Dats
 						? ((Rom)rom).SHA1
 						: (rom.Type == ItemType.Disk
 							? ((Disk)rom).SHA1
-							: Constants.MD5Zero));
+							: Constants.SHA1Zero));
+
+					if (!sortable.ContainsKey(newkey))
+					{
+						sortable.Add(newkey, new List<DatItem>());
+					}
+					sortable[newkey].Add(rom);
+				}
+			}
+
+			// Now go through and sort all of the lists
+			keys = sortable.Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> sortedlist = sortable[key];
+				DatItem.Sort(ref sortedlist, false);
+				sortable[key] = sortedlist;
+			}
+
+			// Output the count if told to
+			if (output)
+			{
+				logger.User("A total of " + count + " file hashes will be written out to file");
+			}
+
+			// Now assign the dictionary back
+			_files = sortable;
+		}
+
+		/// <summary>
+		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by SHA256
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
+		public void BucketBySHA256(bool mergeroms, Logger logger, bool output = true)
+		{
+			// If we already have the right sorting, trust it
+			if (_sortedBy == SortedBy.SHA256)
+			{
+				return;
+			}
+
+			// Set the sorted type
+			_sortedBy = SortedBy.SHA256;
+
+			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
+			long count = 0;
+
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by SHA-256");
+
+			// Process each all of the roms
+			List<string> keys = Keys.ToList();
+			foreach (string key in keys)
+			{
+				List<DatItem> roms = this[key];
+
+				// If we're merging the roms, do so
+				if (mergeroms)
+				{
+					roms = DatItem.Merge(roms, logger);
+				}
+
+				// Now add each of the roms to their respective games
+				foreach (DatItem rom in roms)
+				{
+					count++;
+					string newkey = (rom.Type == ItemType.Rom
+						? ((Rom)rom).SHA256
+						: (rom.Type == ItemType.Disk
+							? ((Disk)rom).SHA256
+							: Constants.SHA256Zero));
 
 					if (!sortable.ContainsKey(newkey))
 					{

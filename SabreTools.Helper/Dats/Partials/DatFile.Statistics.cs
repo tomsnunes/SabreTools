@@ -37,6 +37,7 @@ namespace SabreTools.Helper.Dats
 			CRCCount = 0;
 			MD5Count = 0;
 			SHA1Count = 0;
+			SHA256Count = 0;
 			BaddumpCount = 0;
 			NodumpCount = 0;
 
@@ -63,6 +64,7 @@ namespace SabreTools.Helper.Dats
 							DiskCount += 1;
 							MD5Count += (String.IsNullOrEmpty(disk.MD5) ? 0 : 1);
 							SHA1Count += (String.IsNullOrEmpty(disk.SHA1) ? 0 : 1);
+							SHA256Count += (String.IsNullOrEmpty(disk.SHA256) ? 0 : 1);
 							BaddumpCount += (disk.ItemStatus == ItemStatus.BadDump ? 1 : 0);
 							NodumpCount += (disk.ItemStatus == ItemStatus.Nodump ? 1 : 0);
 							break;
@@ -75,6 +77,7 @@ namespace SabreTools.Helper.Dats
 							CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
 							MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
 							SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
+							SHA256Count += (String.IsNullOrEmpty(rom.SHA256) ? 0 : 1);
 							BaddumpCount += (rom.ItemStatus == ItemStatus.BadDump ? 1 : 0);
 							NodumpCount += (rom.ItemStatus == ItemStatus.Nodump ? 1 : 0);
 							break;
@@ -118,8 +121,9 @@ namespace SabreTools.Helper.Dats
     Roms found:              " + RomCount + @"
     Disks found:             " + DiskCount + @"
     Roms with CRC:           " + CRCCount + @"
-    Roms with MD5            " + MD5Count + @"
-    Roms with SHA-1:         " + SHA1Count + "\n";
+    Roms with MD5:           " + MD5Count + @"
+    Roms with SHA-1:         " + SHA1Count + @"
+    Roms with SHA-256:       " + SHA256Count + "\n";
 
 			if (baddumpCol)
 			{
@@ -143,8 +147,8 @@ namespace SabreTools.Helper.Dats
     Roms found:              " + RomCount + @"
     Disks found:             " + DiskCount + @"
     Roms with CRC:           " + CRCCount + @"
-    Roms with MD5:           " + MD5Count + @"
-    Roms with SHA-1:         " + SHA1Count + "\n";
+    Roms with SHA-1:         " + SHA1Count + @"
+    Roms with SHA-256:       " + SHA256Count + "\n";
 
 				if (baddumpCol)
 				{
@@ -165,7 +169,8 @@ namespace SabreTools.Helper.Dats
 						+ "\"" + DiskCount + "\","
 						+ "\"" + CRCCount + "\","
 						+ "\"" + MD5Count + "\","
-						+ "\"" + SHA1Count + "\"";
+						+ "\"" + SHA1Count + "\","
+						+ "\"" + SHA256Count + "\"";
 
 				if (baddumpCol)
 				{
@@ -190,7 +195,8 @@ namespace SabreTools.Helper.Dats
 						+ "<td align=\"right\">" + DiskCount + "</td>"
 						+ "<td align=\"right\">" + CRCCount + "</td>"
 						+ "<td align=\"right\">" + MD5Count + "</td>"
-						+ "<td align=\"right\">" + SHA1Count + "</td>";
+						+ "<td align=\"right\">" + SHA1Count + "</td>"
+						+ "<td align=\"right\">" + SHA256Count + "</td>";
 
 				if (baddumpCol)
 				{
@@ -213,7 +219,8 @@ namespace SabreTools.Helper.Dats
 						+ "\"" + DiskCount + "\"\t"
 						+ "\"" + CRCCount + "\"\t"
 						+ "\"" + MD5Count + "\"\t"
-						+ "\"" + SHA1Count + "\"";
+						+ "\"" + SHA1Count + "\"\t"
+						+ "\"" + SHA256Count + "\"";
 
 				if (baddumpCol)
 				{
@@ -302,6 +309,7 @@ namespace SabreTools.Helper.Dats
 			long totalCRC = 0;
 			long totalMD5 = 0;
 			long totalSHA1 = 0;
+			long totalSHA256 = 0;
 			long totalBaddump = 0;
 			long totalNodump = 0;
 
@@ -315,6 +323,7 @@ namespace SabreTools.Helper.Dats
 			long dirCRC = 0;
 			long dirMD5 = 0;
 			long dirSHA1 = 0;
+			long dirSHA256 = 0;
 			long dirBaddump = 0;
 			long dirNodump = 0;
 
@@ -340,6 +349,7 @@ namespace SabreTools.Helper.Dats
 						CRCCount = dirCRC,
 						MD5Count = dirMD5,
 						SHA1Count = dirSHA1,
+						SHA256Count = dirSHA256,
 						BaddumpCount = dirBaddump,
 						NodumpCount = dirNodump,
 					};
@@ -359,6 +369,7 @@ namespace SabreTools.Helper.Dats
 					dirCRC = 0;
 					dirMD5 = 0;
 					dirSHA1 = 0;
+					dirSHA256 = 0;
 					dirBaddump = 0;
 					dirNodump = 0;
 				}
@@ -384,6 +395,7 @@ namespace SabreTools.Helper.Dats
 				dirCRC += datdata.CRCCount;
 				dirMD5 += datdata.MD5Count;
 				dirSHA1 += datdata.SHA1Count;
+				dirSHA256 += datdata.SHA256Count;
 				dirBaddump += datdata.BaddumpCount;
 				dirNodump += datdata.NodumpCount;
 
@@ -395,6 +407,7 @@ namespace SabreTools.Helper.Dats
 				totalCRC += datdata.CRCCount;
 				totalMD5 += datdata.MD5Count;
 				totalSHA1 += datdata.SHA1Count;
+				totalSHA256 += datdata.SHA256Count;
 				totalBaddump += datdata.BaddumpCount;
 				totalNodump += datdata.NodumpCount;
 
@@ -416,6 +429,7 @@ namespace SabreTools.Helper.Dats
 					CRCCount = dirCRC,
 					MD5Count = dirMD5,
 					SHA1Count = dirSHA1,
+					SHA256Count = dirSHA256,
 					BaddumpCount = dirBaddump,
 					NodumpCount = dirNodump,
 				};
@@ -436,6 +450,7 @@ namespace SabreTools.Helper.Dats
 			dirCRC = 0;
 			dirMD5 = 0;
 			dirSHA1 = 0;
+			dirSHA256 = 0;
 			dirNodump = 0;
 
 			// Output total DAT stats
@@ -448,6 +463,7 @@ namespace SabreTools.Helper.Dats
 				CRCCount = totalCRC,
 				MD5Count = totalMD5,
 				SHA1Count = totalSHA1,
+				SHA256Count = totalSHA256,
 				BaddumpCount = totalBaddump,
 				NodumpCount = totalNodump,
 			};
@@ -530,7 +546,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			}
 			if (outputs.ContainsKey(StatDatFormat.CSV))
 			{
-				outputs[StatDatFormat.CSV].Write("\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\""
+				outputs[StatDatFormat.CSV].Write("\"File Name\",\"Total Size\",\"Games\",\"Roms\",\"Disks\",\"# with CRC\",\"# with MD5\",\"# with SHA-1\",\"# with SHA-256\""
 					+ (baddumpCol ? ",\"BadDumps\"" : "") + (nodumpCol ? ",\"Nodumps\"" : "") + "\n");
 			}
 			if (outputs.ContainsKey(StatDatFormat.HTML))
@@ -558,7 +574,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			}
 			if (outputs.ContainsKey(StatDatFormat.TSV))
 			{
-				outputs[StatDatFormat.TSV].Write("\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\""
+				outputs[StatDatFormat.TSV].Write("\"File Name\"\t\"Total Size\"\t\"Games\"\t\"Roms\"\t\"Disks\"\t\"# with CRC\"\t\"# with MD5\"\t\"# with SHA-1\"\t\"# with SHA-256\""
 						+ (baddumpCol ? "\t\"BadDumps\"" : "") + (nodumpCol ? "\t\"Nodumps\"" : "") + "\n");
 			}
 
@@ -586,7 +602,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			if (outputs.ContainsKey(StatDatFormat.HTML))
 			{
 				outputs[StatDatFormat.HTML].Write(@"			<tr bgcolor=""gray""><th>File Name</th><th align=""right"">Total Size</th><th align=""right"">Games</th><th align=""right"">Roms</th>"
-+ @"<th align=""right"">Disks</th><th align=""right"">&#35; with CRC</th><th align=""right"">&#35; with MD5</th><th align=""right"">&#35; with SHA-1</th>"
++ @"<th align=""right"">Disks</th><th align=""right"">&#35; with CRC</th><th align=""right"">&#35; with MD5</th><th align=""right"">&#35; with SHA-1</th><th align=""right"">&#35; with SHA-256</th>"
 + (baddumpCol ? "<th class=\".right\">Baddumps</th>" : "") + (nodumpCol ? "<th class=\".right\">Nodumps</th>" : "") + "</tr>\n");
 			}
 			if (outputs.ContainsKey(StatDatFormat.TSV))
@@ -616,10 +632,10 @@ Please check the log folder if the stats scrolled offscreen", false);
 			{
 				outputs[StatDatFormat.HTML].Write("<tr><td colspan=\""
 						+ (baddumpCol && nodumpCol
-							? "11"
+							? "12"
 							: (baddumpCol ^ nodumpCol
-								? "10"
-								: "9")
+								? "11"
+								: "10")
 							)
 						+ "\"></td></tr>\n");
 			}
@@ -650,10 +666,10 @@ Please check the log folder if the stats scrolled offscreen", false);
 			{
 				outputs[StatDatFormat.HTML].Write("<tr border=\"0\"><td colspan=\""
 						+ (baddumpCol && nodumpCol
-							? "11"
+							? "12"
 							: (baddumpCol ^ nodumpCol
-								? "10"
-								: "9")
+								? "11"
+								: "10")
 							)
 						+ "\"></td></tr>\n");
 			}

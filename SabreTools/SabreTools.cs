@@ -103,6 +103,7 @@ namespace SabreTools
 				merge = false,
 				noMD5 = false,
 				noSHA1 = false,
+				noSHA256 = true, // TODO: This will eventually need to be inversed
 				parseArchivesAsFiles = false,
 				quickScan = false,
 				quotes = false,
@@ -394,6 +395,10 @@ namespace SabreTools
 					case "--noSHA1":
 						noSHA1 = true;
 						break;
+					case "-ns256":
+					case "--noSHA256":
+						noSHA256 = false;
+						break;
 					case "-oa":
 					case "--output-all":
 						datFormat |= DatFormat.ALL;
@@ -445,6 +450,10 @@ namespace SabreTools
 					case "-osha1":
 					case "--output-sha1":
 						datFormat |= DatFormat.RedumpSHA1;
+						break;
+					case "-osha256":
+					case "--output-sha256":
+						datFormat |= DatFormat.RedumpSHA256;
 						break;
 					case "-osl":
 					case "--output-sl":
@@ -697,6 +706,10 @@ namespace SabreTools
 					case "--not-sha1":
 						filter.NotSHA1s.Add(args[++i]);
 						break;
+					case "-nsha256":
+					case "--not-sha256":
+						filter.NotSHA256s.Add(args[++i]);
+						break;
 					case "-out":
 					case "--out":
 						outDir = args[++i];
@@ -747,6 +760,10 @@ namespace SabreTools
 					case "-sha1":
 					case "--sha1":
 						filter.SHA1s.Add(args[++i]);
+						break;
+					case "-sha256":
+					case "--sha256":
+						filter.SHA256s.Add(args[++i]);
 						break;
 					case "-slt":
 					case "--less":
@@ -930,6 +947,10 @@ namespace SabreTools
 								case "--not-sha1":
 									filter.NotSHA1s.Add(split[1]);
 									break;
+								case "-nsha256":
+								case "--not-sha256":
+									filter.NotSHA256s.Add(split[1]);
+									break;
 								case "-out":
 								case "--out":
 									outDir = split[1];
@@ -980,6 +1001,10 @@ namespace SabreTools
 								case "-sha1":
 								case "--sha1":
 									filter.SHA1s.Add(split[1]);
+									break;
+								case "-sha256":
+								case "--sha256":
+									filter.SHA256s.Add(split[1]);
 									break;
 								case "-slt":
 								case "--less":
@@ -1080,6 +1105,7 @@ namespace SabreTools
 					superdat,
 					noMD5,
 					noSHA1,
+					noSHA256,
 					removeDateFromAutomaticName,
 					parseArchivesAsFiles,
 					enableGzip,

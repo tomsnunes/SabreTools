@@ -178,11 +178,13 @@ namespace SabreTools.Helper.Tools
 		/// <param name="logger">Logger object for console and file output</param>
 		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise (default)</param>
 		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise (default)</param>
+		/// <param name="noSHA256">True if SHA-256 hashes should not be calcluated, false otherwise (default)</param>
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="date">True if the file Date should be included, false otherwise (default)</param>
 		/// <param name="header">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static Rom GetFileInfo(string input, Logger logger, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool date = false, string header = null)
+		public static Rom GetFileInfo(string input, Logger logger, bool noMD5 = false, bool noSHA1 = false,
+			bool noSHA256 = false, long offset = 0, bool date = false, string header = null)
 		{
 			// Add safeguard if file doesn't exist
 			if (!File.Exists(input))
@@ -214,12 +216,12 @@ namespace SabreTools.Helper.Tools
 				// Otherwise, just get the info
 				else
 				{
-					rom = GetStreamInfo(File.OpenRead(input), new FileInfo(input).Length, noMD5, noSHA1, offset, false);
+					rom = GetStreamInfo(File.OpenRead(input), new FileInfo(input).Length, noMD5, noSHA1, noSHA256, offset, false);
 				}
 			}
 			else
 			{
-				rom = GetStreamInfo(File.OpenRead(input), new FileInfo(input).Length, noMD5, noSHA1, offset, false);
+				rom = GetStreamInfo(File.OpenRead(input), new FileInfo(input).Length, noMD5, noSHA1, noSHA256, offset, false);
 			}
 
 			// Add unique data from the file
@@ -497,10 +499,12 @@ namespace SabreTools.Helper.Tools
 		/// <param name="size">Size of the input stream</param>
 		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise (default)</param>
 		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise (default)</param>
+		/// <param name="noSHA256">True if SHA-256 hashes should not be calcluated, false otherwise (default)</param>
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static Rom GetStreamInfo(Stream input, long size, bool noMD5 = false, bool noSHA1 = false, long offset = 0, bool keepReadOpen = false)
+		public static Rom GetStreamInfo(Stream input, long size, bool noMD5 = false, bool noSHA1 = false,
+			bool noSHA256 = false, long offset = 0, bool keepReadOpen = false)
 		{
 			Rom rom = new Rom
 			{
@@ -509,6 +513,7 @@ namespace SabreTools.Helper.Tools
 				CRC = string.Empty,
 				MD5 = string.Empty,
 				SHA1 = string.Empty,
+				SHA256 = string.Empty,
 			};
 
 			try
@@ -517,6 +522,7 @@ namespace SabreTools.Helper.Tools
 				OptimizedCRC crc = new OptimizedCRC();
 				MD5 md5 = MD5.Create();
 				SHA1 sha1 = SHA1.Create();
+				SHA256 sha256 = SHA256.Create();
 
 				// Seek to the starting position, if one is set
 				if (offset < 0)
@@ -541,6 +547,10 @@ namespace SabreTools.Helper.Tools
 					{
 						sha1.TransformBlock(buffer, 0, read, buffer, 0);
 					}
+					if (!noSHA256)
+					{
+						sha256.TransformBlock(buffer, 0, read, buffer, 0);
+					}
 				}
 
 				crc.Update(buffer, 0, 0);
@@ -556,11 +566,17 @@ namespace SabreTools.Helper.Tools
 					sha1.TransformFinalBlock(buffer, 0, 0);
 					rom.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
 				}
+				if (!noSHA256)
+				{
+					sha256.TransformFinalBlock(buffer, 0, 0);
+					rom.SHA256 = BitConverter.ToString(sha256.Hash).Replace("-", "").ToLowerInvariant();
+				}
 
 				// Dispose of the hashers
 				crc.Dispose();
 				md5.Dispose();
 				sha1.Dispose();
+				sha256.Dispose();
 			}
 			catch (IOException)
 			{

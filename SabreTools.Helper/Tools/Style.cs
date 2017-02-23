@@ -186,6 +186,12 @@ namespace SabreTools.Helper.Tools
 				outfileNames.Add(DatFormat.RedumpSHA1, CreateOutfileNamesHelper(outDir, ".sha1", datdata, overwrite));
 			};
 
+			// Redump SHA-256
+			if ((datdata.DatFormat & DatFormat.RedumpSHA256) != 0)
+			{
+				outfileNames.Add(DatFormat.RedumpSHA256, CreateOutfileNamesHelper(outDir, ".sha256", datdata, overwrite));
+			};
+
 			// RomCenter
 			if ((datdata.DatFormat & DatFormat.RomCenter) != 0
 				&& (datdata.DatFormat & DatFormat.ClrMamePro) == 0)

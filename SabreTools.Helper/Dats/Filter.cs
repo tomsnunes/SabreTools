@@ -18,6 +18,7 @@ namespace SabreTools.Helper.Dats
 		private List<string> _crcs;
 		private List<string> _md5s;
 		private List<string> _sha1s;
+		private List<string> _sha256s;
 		private ItemStatus _itemStatuses;
 		private MachineType _machineTypes;
 
@@ -31,6 +32,7 @@ namespace SabreTools.Helper.Dats
 		private List<string> _notCrcs;
 		private List<string> _notMd5s;
 		private List<string> _notSha1s;
+		private List<string> _notSha256s
 		private ItemStatus _itemNotStatuses;
 		private MachineType _machineNotTypes;
 
@@ -82,6 +84,11 @@ namespace SabreTools.Helper.Dats
 			get { return _sha1s; }
 			set { _sha1s = value; }
 		}
+		public List<string> SHA256s
+		{
+			get { return _sha256s; }
+			set { _sha256s = value; }
+		}
 		public ItemStatus ItemStatuses
 		{
 			get { return _itemStatuses; }
@@ -126,6 +133,11 @@ namespace SabreTools.Helper.Dats
 		{
 			get { return _notSha1s; }
 			set { _notSha1s = value; }
+		}
+		public List<string> NotSHA256s
+		{
+			get { return _notSha256s; }
+			set { _notSha256s = value; }
 		}
 		public ItemStatus NotItemStatuses
 		{
@@ -186,6 +198,7 @@ namespace SabreTools.Helper.Dats
 			_crcs = new List<string>();
 			_md5s = new List<string>();
 			_sha1s = new List<string>();
+			_sha256s = new List<string>();
 			_itemStatuses = ItemStatus.NULL;
 			_machineTypes = MachineType.NULL;
 
@@ -196,6 +209,7 @@ namespace SabreTools.Helper.Dats
 			_notCrcs = new List<string>();
 			_notMd5s = new List<string>();
 			_notSha1s = new List<string>();
+			_notSha256s = new List<string>();
 			_itemNotStatuses = ItemStatus.NULL;
 			_machineNotTypes = MachineType.NULL;
 
@@ -332,6 +346,24 @@ namespace SabreTools.Helper.Dats
 						return false;
 					}
 				}
+
+				// Filter on SHA256
+				if (_sha256s.Count > 0)
+				{
+					// If the SHA-1 isn't in the list, return false
+					if (!FindValueInList(_sha256s, rom.SHA256))
+					{
+						return false;
+					}
+				}
+				if (_notSha256s.Count > 0)
+				{
+					// If the SHA-1 is in the list, return false
+					if (FindValueInList(_notSha256s, rom.SHA256))
+					{
+						return false;
+					}
+				}
 			}
 			else if (item.Type == ItemType.Disk)
 			{
@@ -378,6 +410,24 @@ namespace SabreTools.Helper.Dats
 				{
 					// If the SHA-1 is in the list, return false
 					if (FindValueInList(_notSha1s, rom.SHA1))
+					{
+						return false;
+					}
+				}
+
+				// Filter on SHA256
+				if (_sha256s.Count > 0)
+				{
+					// If the SHA-1 isn't in the list, return false
+					if (!FindValueInList(_sha256s, rom.SHA256))
+					{
+						return false;
+					}
+				}
+				if (_notSha256s.Count > 0)
+				{
+					// If the SHA-1 is in the list, return false
+					if (FindValueInList(_notSha256s, rom.SHA256))
 					{
 						return false;
 					}

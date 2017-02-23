@@ -223,6 +223,7 @@ namespace SabreTools.Helper.Data
 		TSV = 0x0800,
 		CSV = 0x1000,
 		AttractMode = 0x2000,
+		RedumpSHA256 = 0x4000,
 
 		ALL = 0xFFFF,
 	}
