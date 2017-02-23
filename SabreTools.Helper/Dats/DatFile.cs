@@ -244,7 +244,7 @@ namespace SabreTools.Helper.Dats
 			get { return _sha1Count; }
 			set { _sha1Count = value; }
 		}
-		public long _sha256Count
+		public long SHA256Count
 		{
 			get { return _sha256Count; }
 			set { _sha256Count = value; }
