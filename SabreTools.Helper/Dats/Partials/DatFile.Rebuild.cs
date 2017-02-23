@@ -887,7 +887,8 @@ namespace SabreTools.Helper.Dats
 			logger.User("Processing files:\n");
 			foreach (string input in inputs)
 			{
-				PopulateFromDir(input, quickScan /* noMD5 */, quickScan /* noSHA1 */, true /* bare */, false /* archivesAsFiles */,
+				// TODO: Eventually migrate noSHA256 to quickScan instead of true
+				PopulateFromDir(input, quickScan /* noMD5 */, quickScan /* noSHA1 */, true /* noSHA256 */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, tempDir /* tempDir */, false /* copyFiles */,
 					headerToCheckAgainst, 4 /* maxDegreeOfParallelism */, logger);
 			}

@@ -2499,7 +2499,7 @@ namespace SabreTools.Helper.Dats
 				// Sanitize the hashes from null, hex sizes, and "true blank" strings
 				itemDisk.MD5 = Style.CleanHashData(itemDisk.MD5, Constants.MD5Length);
 				itemDisk.SHA1 = Style.CleanHashData(itemDisk.SHA1, Constants.SHA1Length);
-				itemDisk.SHA256 = Style.CleanHashData(itemRom.SHA256, Constants.SHA256Length);
+				itemDisk.SHA256 = Style.CleanHashData(itemDisk.SHA256, Constants.SHA256Length);
 
 				// If the file has aboslutely no hashes, skip and log
 				if (itemDisk.ItemStatus != ItemStatus.Nodump
