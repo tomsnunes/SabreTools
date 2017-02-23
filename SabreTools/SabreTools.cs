@@ -796,9 +796,16 @@ namespace SabreTools
 						{
 							// Split the argument
 							string[] split = temparg.Split('=');
+							
+							// If we have a null second argument, we set it to be a blank
 							if (split[1] == null)
 							{
 								split[1] = "";
+							}
+							// If we have more than 2 items in the split, we want to combine the other parts again
+							else if (split.Length > 2)
+							{
+								split[1] = string.Join("=", split.Skip(1));
 							}
 
 							switch (split[0])
