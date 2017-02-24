@@ -1112,7 +1112,7 @@ namespace SabreTools.Helper.Tools
 		public static bool WriteTAR(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
 		{
 			bool success = false;
-			string tempFile = Path.GetTempFileName();
+			string tempFile = Path.Combine(Path.GetTempPath(), "tmp" + Guid.NewGuid().ToString());
 
 			// If either list of roms is null or empty, return
 			if (inputFiles == null || roms == null || inputFiles.Count == 0 || roms.Count == 0)
@@ -1231,7 +1231,7 @@ namespace SabreTools.Helper.Tools
 						else
 						{
 							// Get the stream from the original archive
-							string tempEntry = Path.GetTempFileName();
+							string tempEntry = Path.Combine(Path.GetTempPath(), "tmp" + Guid.NewGuid().ToString());
 							oldTarFile.Entries.Where(e => e.Key == key).ToList()[0].WriteToFile(tempEntry);
 
 							// Copy the input stream to the output
@@ -1527,7 +1527,7 @@ namespace SabreTools.Helper.Tools
 		public static bool WriteTorrentZip(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
 		{
 			bool success = false;
-			string tempFile = Path.GetTempFileName();
+			string tempFile = Path.Combine(Path.GetTempPath(), "tmp" + Guid.NewGuid().ToString());
 
 			// If either list of roms is null or empty, return
 			if (inputFiles == null || roms == null || inputFiles.Count == 0 || roms.Count == 0)
