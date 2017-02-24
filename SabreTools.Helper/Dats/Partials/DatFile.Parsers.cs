@@ -906,7 +906,6 @@ namespace SabreTools.Helper.Dats
 			bool keep,
 			bool clean,
 			bool descAsName)
-		)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -967,7 +966,7 @@ namespace SabreTools.Helper.Dats
 								parsed.Add("DatItem.Size");
 								break;
 							case "crc":
-							case "crc hash"
+							case "crc hash":
 								parsed.Add("DatItem.CRC");
 								break;
 							case "md5":
@@ -1021,7 +1020,7 @@ namespace SabreTools.Helper.Dats
 						case "DatFile.FileName":
 							Filename = (String.IsNullOrEmpty(FileName) ? value : FileName);
 							break;
-						case "DatFile.Name"):
+						case "DatFile.Name":
 							Name = (String.IsNullOrEmpty(Name) ? value : Name);
 							break;
 						case "DatFile.Description":

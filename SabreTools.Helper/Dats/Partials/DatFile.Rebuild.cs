@@ -79,7 +79,7 @@ namespace SabreTools.Helper.Dats
 					case ForcePacking.Zip:
 						outputFormat = OutputFormat.TorrentZip;
 						break;
-					case ForcePacking.Unzip;
+					case ForcePacking.Unzip:
 						outputFormat = OutputFormat.Folder;
 						break;
 				}
@@ -266,7 +266,7 @@ namespace SabreTools.Helper.Dats
 					case ForcePacking.Zip:
 						outputFormat = OutputFormat.TorrentZip;
 						break;
-					case ForcePacking.Unzip;
+					case ForcePacking.Unzip:
 						outputFormat = OutputFormat.Folder;
 						break;
 				}
