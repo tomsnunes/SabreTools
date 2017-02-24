@@ -59,6 +59,13 @@ namespace SabreTools.Helper.Dats
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
 		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
+		/// <remarks>
+		/// TODO: Add CSV and TSV parsing.
+		///        Can they be in the same parser? All it would technically need is the delimiter that it should be looking
+		///        for and it would be able to read them individually. Also, take into account different types of formats,
+		///        possibly by looking at the first line headings, determining what columns those correspond to, and then
+		///        keeping track of what goes to what in the map. That would allow for a VERY flexible reading of inputs.
+		/// </remarks>
 		public void Parse(
 			// Standard Dat parsing
 			string filename,
@@ -88,7 +95,7 @@ namespace SabreTools.Helper.Dats
 			{
 				ext = ext.Substring(1);
 			}
-			if (ext != "dat" && ext != "md5" && ext != "sfv" && ext != "sha1" && ext != "sha256" && ext != "txt" && ext != "xml")
+			if (ext != "dat" && ext != "csv" && ext != "md5" && ext != "sfv" && ext != "sha1" && ext != "sha256" && ext != "tsv" && ext != "txt" && ext != "xml")
 			{
 				return;
 			}
@@ -108,6 +115,9 @@ namespace SabreTools.Helper.Dats
 				case DatFormat.ClrMamePro:
 				case DatFormat.DOSCenter:
 					ParseCMP(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, descAsName);
+					break;
+				case DatFormat.CSV:
+					// Nothing yet
 					break;
 				case DatFormat.Logiqx:
 				case DatFormat.OfflineList:
@@ -129,6 +139,9 @@ namespace SabreTools.Helper.Dats
 					break;
 				case DatFormat.RomCenter:
 					ParseRC(filename, sysid, srcid, filter, trim, single, root, logger, clean, descAsName);
+					break;
+				case DatFormat.TSV:
+					// Nothing yet
 					break;
 				default:
 					return;

@@ -73,7 +73,7 @@ namespace SabreTools.Helper.Tools
 			{
 				ext = ext.Substring(1);
 			}
-			if (ext != "dat" && ext != "md5" && ext != "sfv" && ext != "sha1" && ext != "txt" && ext != "xml")
+			if (ext != "csv" && ext != "dat" && ext != "md5" && ext != "sfv" && ext != "sha1" && ext != "tsv" && ext != "txt" && ext != "xml")
 			{
 				return 0;
 			}
@@ -100,6 +100,10 @@ namespace SabreTools.Helper.Tools
 			if (ext == "sha1")
 			{
 				return DatFormat.RedumpSHA1;
+			}
+			if (ext == "sha256")
+			{
+				return DatFormat.RedumpSHA256;
 			}
 
 			// For everything else, we need to read it
@@ -159,6 +163,14 @@ namespace SabreTools.Helper.Tools
 				else if (first.Contains("#Name;Title;Emulator;CloneOf;Year;Manufacturer;Category;Players;Rotation;Control;Status;DisplayCount;DisplayType;AltRomname;AltTitle;Extra"))
 				{
 					return DatFormat.AttractMode;
+				}
+				else if (first.Contains("\"File Name\",\"Internal Name\",\"Description\""))
+				{
+					return DatFormat.CSV;
+				}
+				else if (first.Contains("\"File Name\"\t\"Internal Name\"\t\"Description\""))
+				{
+					return DatFormat.TSV;
 				}
 				else
 				{
