@@ -999,7 +999,6 @@ namespace SabreTools.Helper.Dats
 								RepExt = "";
 							}
 
-							// TODO: Find out why this code strips out partial paths
 							string dir = Path.GetDirectoryName(name);
 							dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
 							name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + RepExt);

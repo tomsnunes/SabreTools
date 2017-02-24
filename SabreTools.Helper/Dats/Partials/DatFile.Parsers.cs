@@ -59,13 +59,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
 		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
-		/// <remarks>
-		/// TODO: Add CSV and TSV parsing.
-		///        Can they be in the same parser? All it would technically need is the delimiter that it should be looking
-		///        for and it would be able to read them individually. Also, take into account different types of formats,
-		///        possibly by looking at the first line headings, determining what columns those correspond to, and then
-		///        keeping track of what goes to what in the map. That would allow for a VERY flexible reading of inputs.
-		/// </remarks>
 		public void Parse(
 			// Standard Dat parsing
 			string filename,
