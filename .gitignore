@@ -1,4 +1,5 @@
 /.vs
+/build.bat
 /CommandVault/obj
 /CommandVault/obj/Debug
 /CommandVault/obj/Release
