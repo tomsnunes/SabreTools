@@ -383,10 +383,8 @@ namespace SabreTools.Helper.Dats
 			bool usedExternally = false;
 			bool usedInternally = false;
 
-			// Get the required scanning level for the file
-			bool shouldExternalProcess = false;
-			bool shouldInternalProcess = false;
-			ArchiveTools.GetInternalExternalProcess(file, archiveScanLevel, logger, out shouldExternalProcess, out shouldInternalProcess);
+            // Get the required scanning level for the file
+            ArchiveTools.GetInternalExternalProcess(file, archiveScanLevel, logger, out bool shouldExternalProcess, out bool shouldInternalProcess);
 
 			// If we're supposed to scan the file externally
 			if (shouldExternalProcess)
