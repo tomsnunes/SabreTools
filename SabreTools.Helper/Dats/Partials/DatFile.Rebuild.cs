@@ -71,6 +71,20 @@ namespace SabreTools.Helper.Dats
 				FileTools.CleanDirectory(tempDir);
 			}
 
+			// Now we want to get forcepack flag if it's not overridden
+			if (outputFormat == OutputFormat.Folder && ForcePacking != ForcePacking.None)
+			{
+				switch (ForcePacking)
+				{
+					case ForcePacking.Zip:
+						outputFormat = OutputFormat.TorrentZip;
+						break;
+					case ForcePacking.Unzip;
+						outputFormat = OutputFormat.Folder;
+						break;
+				}
+			}
+
 			// Preload the Skipper list
 			int listcount = Skipper.List.Count;
 
@@ -242,6 +256,20 @@ namespace SabreTools.Helper.Dats
 			else
 			{
 				FileTools.CleanDirectory(tempDir);
+			}
+
+			// Now we want to get forcepack flag if it's not overridden
+			if (outputFormat == OutputFormat.Folder && ForcePacking != ForcePacking.None)
+			{
+				switch (ForcePacking)
+				{
+					case ForcePacking.Zip:
+						outputFormat = OutputFormat.TorrentZip;
+						break;
+					case ForcePacking.Unzip;
+						outputFormat = OutputFormat.Folder;
+						break;
+				}
 			}
 
 			// Preload the Skipper list
