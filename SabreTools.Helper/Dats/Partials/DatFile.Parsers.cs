@@ -117,7 +117,7 @@ namespace SabreTools.Helper.Dats
 					ParseCMP(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, descAsName);
 					break;
 				case DatFormat.CSV:
-					// Nothing yet
+					ParseCSVTSV(filename, sysid, srcid, ',', filter, trim, single, root, logger, keep, clean, descAsName);
 					break;
 				case DatFormat.Logiqx:
 				case DatFormat.OfflineList:
@@ -141,7 +141,7 @@ namespace SabreTools.Helper.Dats
 					ParseRC(filename, sysid, srcid, filter, trim, single, root, logger, clean, descAsName);
 					break;
 				case DatFormat.TSV:
-					// Nothing yet
+					ParseCSVTSV(filename, sysid, srcid, '\t', filter, trim, single, root, logger, keep, clean, descAsName);
 					break;
 				default:
 					return;
@@ -869,6 +869,343 @@ namespace SabreTools.Helper.Dats
 			}
 
 			sr.Dispose();
+		}
+
+		/// <summary>
+		/// Parse a CSV or a TSV and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="delim">Delimiter for parsing individual lines</param>
+		/// <param name="filter">Filter object for passing to the DatItem level</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="descAsName">True if SL XML names should be kept, false otherwise (default)</param>
+		private void ParseCSVTSV(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+			char delim,
+
+			// Rom filtering
+			Filter filter,
+
+			// Rom renaming
+			bool trim,
+			bool single,
+			string root,
+
+			// Miscellaneous
+			Logger logger,
+			bool keep,
+			bool clean,
+			bool descAsName)
+		)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+
+			// Create an empty list of columns to parse though
+			List<string> columns = new List<string>();
+
+			long linenum = -1;
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+				linenum++;
+
+				// Parse the first line, getting types from the column names
+				if (linenum == 0)
+				{
+					string[] parsedColumns = line.Split(delim);
+					foreach (string parsed in parsedColumns)
+					{
+						switch (parsed.ToLowerInvariant())
+						{
+							case "file":
+							case "filename":
+							case "file name":
+								parsed.Add("DatFile.FileName");
+								break;
+							case "internal name":
+								parsed.Add("DatFile.Name");
+								break;
+							case "description":
+							case "dat description":
+								parsed.Add("DatFile.Description");
+								break;
+							case "game name":
+							case "game":
+							case "machine":
+								parsed.Add("Machine.Name");
+								break;
+							case "game description":
+								parsed.Add("Machine.Description");
+								break;
+							case "type":
+								parsed.Add("DatItem.Type");
+								break;
+							case "rom":
+							case "romname":
+							case "rom name":
+							case "name":
+								parsed.Add("Rom.Name");
+								break;
+							case "disk":
+							case "diskname":
+							case "disk name":
+								parsed.Add("Disk.Name");
+								break;
+							case "size":
+								parsed.Add("DatItem.Size");
+								break;
+							case "crc":
+							case "crc hash"
+								parsed.Add("DatItem.CRC");
+								break;
+							case "md5":
+							case "md5 hash":
+								parsed.Add("DatItem.MD5");
+								break;
+							case "sha1":
+							case "sha-1":
+							case "sha1 hash":
+							case "sha-1 hash":
+								parsed.Add("DatItem.SHA1");
+								break;
+							case "sha256":
+							case "sha-256":
+							case "sha256 hash":
+							case "sha-256 hash":
+								parsed.Add("DatItem.SHA256");
+								break;
+							case "nodump":
+							case "no dump":
+								parsed.Add("DatItem.Nodump");
+								break;
+						}
+					}
+
+					continue;
+				}
+
+				// Otherwise, we want to split the line and parse
+				string[] parsedLine = line.Split(delim);
+				
+				// If the line doesn't have the correct number of columns, we log and skip
+				if (parsedLine.Length != columns.Count)
+				{
+					logger.Warning("Malformed line found in '" + filename + " at line " + linenum);
+					continue;
+				}
+
+				// Set the output item information
+				string machineName = null, machineDesc = null, name = null, crc = null, md5 = null, sha1 = null, sha256 = null;
+				long size = -1;
+				ItemType itemType = ItemType.Rom;
+				ItemStatus status = ItemStatus.None;
+
+				// Now we loop through and get values for everything
+				for (int i = 0; i < columns.Count; i++)
+				{
+					string value = parsedLine[i];
+					switch (columns[i])
+					{
+						case "DatFile.FileName":
+							Filename = (String.IsNullOrEmpty(FileName) ? value : FileName);
+							break;
+						case "DatFile.Name"):
+							Name = (String.IsNullOrEmpty(Name) ? value : Name);
+							break;
+						case "DatFile.Description":
+							Description = (String.IsNullOrEmpty(Description) ? value : Description);
+							break;
+						case "Machine.Name":
+							machineName = value;
+							break;
+						case "Machine.Description":
+							machineDesc = value;
+							machineName = (descAsName ? value : machineName);
+							break;
+						case "DatItem.Type":
+							switch (value.ToLowerInvariant())
+							{
+								case "archive":
+									itemType = ItemType.Archive;
+									break;
+								case "biosset":
+									itemType = ItemType.BiosSet;
+									break;
+								case "disk":
+									itemType = ItemType.Disk;
+									break;
+								case "release":
+									itemType = ItemType.Release;
+									break;
+								case "rom":
+									itemType = ItemType.Rom;
+									break;
+								case "sample":
+									itemType = ItemType.Sample;
+									break;
+							}
+							break;
+						case "Rom.Name":
+						case "Disk.Name":
+							name = value;
+							break;
+						case "DatItem.Size":
+							if (!Int64.TryParse(value, out size))
+							{
+								size = -1;
+							}
+							break;
+						case "DatItem.CRC":
+							crc = value;
+							break;
+						case "DatItem.MD5":
+							md5 = value;
+							break;
+						case "DatItem.SHA1":
+							sha1 = value;
+							break;
+						case "DatItem.SHA256":
+							sha256 = value;
+							break;
+						case "DatItem.Nodump":
+							switch (value.ToLowerInvariant())
+							{
+								case "baddump":
+									status = ItemStatus.BadDump;
+									break;
+								case "good":
+									status = ItemStatus.Good;
+									break;
+								case "no":
+								case "none":
+									status = ItemStatus.None;
+									break;
+								case "nodump":
+								case "yes":
+									nodump = true;
+									break;
+								case "verified":
+									status = ItemStatus.Verified;
+									break;
+							}
+							break;
+					}
+				}
+
+				// And now we populate and add the new item
+				string key = "";
+				switch (itemType)
+				{
+					case ItemType.Archive:
+						Archive archive = new Archive()
+						{
+							Name = name,
+
+							Machine = new Machine()
+							{
+								Name = machineName,
+								Description = machineDesc,
+							},
+						};
+
+						ParseAddHelper(archive, filter, trim, single, root, clean, logger, out key);
+						break;
+					case ItemType.BiosSet:
+						BiosSet biosset = new BiosSet()
+						{
+							Name = name,
+
+							Machine = new Machine()
+							{
+								Name = machineName,
+								Description = machineDesc,
+							},
+						};
+
+						ParseAddHelper(biosset, filter, trim, single, root, clean, logger, out key);
+						break;
+					case ItemType.Disk:
+						Disk disk = new Disk()
+						{
+							Name = name,
+							MD5 = md5,
+							SHA1 = sha1,
+							SHA256 = sha256,
+
+							Machine = new Machine()
+							{
+								Name = machineName,
+								Description = machineDesc,
+							},
+
+							ItemStatus = status,
+						};
+
+						ParseAddHelper(disk, filter, trim, single, root, clean, logger, out key);
+						break;
+					case ItemType.Release:
+						Release release = new Release()
+						{
+							Name = name,
+
+							Machine = new Machine()
+							{
+								Name = machineName,
+								Description = machineDesc,
+							},
+						};
+
+						ParseAddHelper(release, filter, trim, single, root, clean, logger, out key);
+						break;
+					case ItemType.Rom:
+						Rom disk = new Rom()
+						{
+							Name = name,
+							Size = size,
+							CRC = crc,
+							MD5 = md5,
+							SHA1 = sha1,
+							SHA256 = sha256,
+
+							Machine = new Machine()
+							{
+								Name = machineName,
+								Description = machineDesc,
+							},
+
+							ItemStatus = status,
+						};
+
+						ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+						break;
+					case ItemType.Sample:
+						Sample sample = new Sample()
+						{
+							Name = name,
+
+							Machine = new Machine()
+							{
+								Name = machineName,
+								Description = machineDesc,
+							},
+						};
+
+						ParseAddHelper(sample, filter, trim, single, root, clean, logger, out key);
+						break;
+				}
+			}			
 		}
 
 		/// <summary>
