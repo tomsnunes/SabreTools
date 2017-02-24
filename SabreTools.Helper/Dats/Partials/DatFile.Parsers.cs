@@ -931,63 +931,65 @@ namespace SabreTools.Helper.Dats
 							case "file":
 							case "filename":
 							case "file name":
-								parsed.Add("DatFile.FileName");
+								columns.Add("DatFile.FileName");
 								break;
 							case "internal name":
-								parsed.Add("DatFile.Name");
+								columns.Add("DatFile.Name");
 								break;
 							case "description":
 							case "dat description":
-								parsed.Add("DatFile.Description");
+								columns.Add("DatFile.Description");
 								break;
 							case "game name":
 							case "game":
 							case "machine":
-								parsed.Add("Machine.Name");
+								columns.Add("Machine.Name");
 								break;
 							case "game description":
-								parsed.Add("Machine.Description");
+								columns.Add("Machine.Description");
 								break;
 							case "type":
-								parsed.Add("DatItem.Type");
+								columns.Add("DatItem.Type");
 								break;
 							case "rom":
 							case "romname":
 							case "rom name":
 							case "name":
-								parsed.Add("Rom.Name");
+								columns.Add("Rom.Name");
 								break;
 							case "disk":
 							case "diskname":
 							case "disk name":
-								parsed.Add("Disk.Name");
+								columns.Add("Disk.Name");
 								break;
 							case "size":
-								parsed.Add("DatItem.Size");
+								columns.Add("DatItem.Size");
 								break;
 							case "crc":
 							case "crc hash":
-								parsed.Add("DatItem.CRC");
+								columns.Add("DatItem.CRC");
 								break;
 							case "md5":
 							case "md5 hash":
-								parsed.Add("DatItem.MD5");
+								columns.Add("DatItem.MD5");
 								break;
 							case "sha1":
 							case "sha-1":
 							case "sha1 hash":
 							case "sha-1 hash":
-								parsed.Add("DatItem.SHA1");
+								columns.Add("DatItem.SHA1");
 								break;
 							case "sha256":
 							case "sha-256":
 							case "sha256 hash":
 							case "sha-256 hash":
-								parsed.Add("DatItem.SHA256");
+								columns.Add("DatItem.SHA256");
 								break;
 							case "nodump":
 							case "no dump":
-								parsed.Add("DatItem.Nodump");
+							case "status":
+							case "item status":
+								columns.Add("DatItem.Nodump");
 								break;
 						}
 					}
@@ -1018,7 +1020,7 @@ namespace SabreTools.Helper.Dats
 					switch (columns[i])
 					{
 						case "DatFile.FileName":
-							Filename = (String.IsNullOrEmpty(FileName) ? value : FileName);
+							FileName = (String.IsNullOrEmpty(FileName) ? value : FileName);
 							break;
 						case "DatFile.Name":
 							Name = (String.IsNullOrEmpty(Name) ? value : Name);
@@ -1093,7 +1095,7 @@ namespace SabreTools.Helper.Dats
 									break;
 								case "nodump":
 								case "yes":
-									nodump = true;
+									status = ItemStatus.Nodump;
 									break;
 								case "verified":
 									status = ItemStatus.Verified;
@@ -1169,7 +1171,7 @@ namespace SabreTools.Helper.Dats
 						ParseAddHelper(release, filter, trim, single, root, clean, logger, out key);
 						break;
 					case ItemType.Rom:
-						Rom disk = new Rom()
+						Rom rom = new Rom()
 						{
 							Name = name,
 							Size = size,
