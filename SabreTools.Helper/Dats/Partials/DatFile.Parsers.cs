@@ -1513,6 +1513,16 @@ namespace SabreTools.Helper.Dats
 									// For Logiqx, SabreDAT, and Software List
 									case "description":
 										machine.Description = subreader.ReadElementContentAsString();
+
+										/*
+										// If we want to have the description as the name, do so
+										if (decAsName)
+										{
+											machine.Name = machine.Description.Replace('/', '_').Replace("\"", "''");
+										}
+										*/
+
+										// If we have a softlist and we don't want preserve the name
 										if (!softlist && temptype == "software")
 										{
 											machine.Name = machine.Description.Replace('/', '_').Replace("\"", "''");
