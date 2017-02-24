@@ -71,11 +71,11 @@
 		Folder = 0,
 		TorrentZip = 1,
 		TorrentGzip = 2,
+		TapeArchive = 5,
 
 		// Currently unimplemented
 		Torrent7Zip = 3,
 		TorrentRar = 4,
-		TapeArchive = 5,
 		TorrentXZ = 6,
 		TorrentLrzip = 7,
 	}
