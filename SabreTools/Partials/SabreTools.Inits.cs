@@ -399,7 +399,7 @@ namespace SabreTools
 				if (File.Exists(input))
 				{
 					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger;
+					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger);
 					datFile.SplitByType(outDir, Path.GetFullPath(Path.GetDirectoryName(input)), _logger);
 				}
 				else if (Directory.Exists(input))
