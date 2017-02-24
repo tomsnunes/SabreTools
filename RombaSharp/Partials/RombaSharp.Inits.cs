@@ -200,7 +200,7 @@ namespace RombaSharp
 			{
 				// Get the DAT file associated with the key
 				DatFile datFile = new DatFile();
-				datFile.Parse(Path.Combine(_dats, foundDats[key]), 0, 0, _logger, softlist: true);
+				datFile.Parse(Path.Combine(_dats, foundDats[key]), 0, 0, _logger);
 
 				// Create the new output directory if it doesn't exist
 				string outputFolder = Path.Combine("out", Path.GetFileNameWithoutExtension(foundDats[key]));

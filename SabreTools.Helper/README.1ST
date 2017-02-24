@@ -158,6 +158,10 @@ Options:
 		-ns, --noSHA1		Don't include SHA1 in output
 			This allows the user to skip calculating the SHA-1 for each of the files which will
 			speed up the creation of the DAT.
+
+		-ns256, --noSHA256	Don't include SHA256 in output
+			This allows the user to skip calculating the SHA-256 for each of the files which will
+			speed up the creation of the DAT.
 			
 		-b, --bare			Don't include date in file name
 			Normally, the DAT will be created with the date in the file name. This flag removes
@@ -206,8 +210,11 @@ Options:
 		-osfv, --output-sfv	Output in SFV format
 			Add outputting the created DAT to SFV format
 			
-		-osha1, -output-sha1	Output in SHA-1 format
+		-osha1, --output-sha1	Output in SHA-1 format
 			Add outputting the created DAT to SHA1 format
+
+		-osha256, --output-sha256	Output in SHA-256 format
+			Add outputting the created DAT to SHA256 format
 			
 		-osl, --output-sl	Output in Software List format
 			Add outputting the created DAT to Software List XML format
@@ -698,6 +705,7 @@ Options:
 					- %crc% - Replaced with the CRC
 					- %md5% - Replaced with the MD5
 					- %sha1% - Replaced with the SHA-1
+					- %sha256% - Replaced with the SHA-256
 					- %size% - Replaced with the size
 			
 			-q, --quotes			Put double-quotes around each item
@@ -729,6 +737,7 @@ Options:
 					- %crc% - Replaced with the CRC
 					- %md5% - Replaced with the MD5
 					- %sha1% - Replaced with the SHA-1
+					- %sha256% - Replaced with the SHA-256
 					- %size% - Replaced with the size
 			
 			-q, --quotes			Put double-quotes around each item
@@ -768,9 +777,15 @@ Options:
 			-gp, --game-prefix		Add game name as a prefix
 				This allows for the name of the game to be used as a prefix to each file
 			
-		-osha1, -output-sha1	Output in SHA-1 format
+		-osha1, --output-sha1	Output in SHA-1 format
 			Add outputting the created DAT to SHA1 format
 			
+			-gp, --game-prefix		Add game name as a prefix
+				This allows for the name of the game to be used as a prefix to each file
+
+		-osha256, --output-sha256	Output in SHA-256 format
+			Add outputting the created DAT to SHA256 format
+
 			-gp, --game-prefix		Add game name as a prefix
 				This allows for the name of the game to be used as a prefix to each file
 			
@@ -792,6 +807,7 @@ Options:
 					- %crc% - Replaced with the CRC
 					- %md5% - Replaced with the MD5
 					- %sha1% - Replaced with the SHA-1
+					- %sha256% - Replaced with the SHA-256
 					- %size% - Replaced with the size
 			
 			-q, --quotes			Put double-quotes around each item
@@ -862,11 +878,12 @@ Options:
 			Game names will be santitized to remove what the original WoD standards
 			deemed as unneeded information, such as parenthized or bracketed strings
 			
-		-sl, --softlist	Use Software List name instead of description
-			By default, software list DATs are treated as "incorrect", using the game
-			descriptions as the name instead, since they tend to be more descriptive.
-			Enabling this flag allows for the original name to be preserved and keeping
-			the description as just a description.
+		-dan, --desc-name	Use Software List name instead of description
+			By default, all DATs are converted exactly as they are input. Enabling this flag
+			allows for the machine names in the DAT to be replaced by the machine description
+			instead. In most cases, this will result in no change in the output DAT, but a
+			notable example would be a software list DAT where the machine names are
+			generally DOS-friendly while the description is more complete.
 			
 		-dm, --dat-merged	Create merged sets in the output DAT
 			Preprocess the DAT to have parent sets contain all items from the children based
@@ -955,6 +972,8 @@ Options:
 		-nmd5=, --not-md5=	Exclude by MD5 hash
 		-sha1=, --sha1=		Filter by SHA-1 hash
 		-nsha1=, --not-sha1= Exclude by SHA-1 hash
+		-sha256=, --sha256=	Filter by SHA-256 hash
+		-nsha256=, --not-sha256  Exclude by SHA-256 hash
 			For each of the flags above, the user can specify either an exact match or can use
 			full C#-style regex for pattern matching. Multiples of each of the above inputs are
 			allowed.

@@ -32,14 +32,14 @@ namespace SabreTools.Helper.Dats
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
+		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
 		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
 		public void Parse(string filename, int sysid, int srcid, Logger logger,
-			bool keep = false, bool clean = false, bool softlist = false, bool keepext = false, bool useTags = false)
+			bool keep = false, bool clean = false, bool descAsName = false, bool keepext = false, bool useTags = false)
 		{
 			Parse(filename, sysid, srcid, new Filter(), SplitType.None, false, false, "", logger,
-				keep: keep, clean: clean, softlist: softlist, keepext: keepext, useTags: useTags);
+				keep: keep, clean: clean, descAsName: descAsName, keepext: keepext, useTags: useTags);
 		}
 
 		/// <summary>
@@ -56,7 +56,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
+		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
 		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
 		public void Parse(
@@ -78,7 +78,7 @@ namespace SabreTools.Helper.Dats
 			Logger logger,
 			bool keep = false,
 			bool clean = false,
-			bool softlist = false,
+			bool descAsName = false,
 			bool keepext = false,
 			bool useTags = false)
 		{
@@ -103,17 +103,17 @@ namespace SabreTools.Helper.Dats
 			switch (FileTools.GetDatFormat(filename, logger))
 			{
 				case DatFormat.AttractMode:
-					ParseAttractMode(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean);
+					ParseAttractMode(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, descAsName);
 					break;
 				case DatFormat.ClrMamePro:
 				case DatFormat.DOSCenter:
-					ParseCMP(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean);
+					ParseCMP(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, descAsName);
 					break;
 				case DatFormat.Logiqx:
 				case DatFormat.OfflineList:
 				case DatFormat.SabreDat:
 				case DatFormat.SoftwareList:
-					ParseGenericXML(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, softlist);
+					ParseGenericXML(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, descAsName);
 					break;
 				case DatFormat.RedumpMD5:
 					ParseRedumpMD5(filename, sysid, srcid, filter, trim, single, root, logger, clean);
@@ -128,7 +128,7 @@ namespace SabreTools.Helper.Dats
 					ParseRedumpSHA256(filename, sysid, srcid, filter, trim, single, root, logger, clean);
 					break;
 				case DatFormat.RomCenter:
-					ParseRC(filename, sysid, srcid, filter, trim, single, root, logger, clean);
+					ParseRC(filename, sysid, srcid, filter, trim, single, root, logger, clean, descAsName);
 					break;
 				default:
 					return;
@@ -188,6 +188,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		private void ParseAttractMode(
 			// Standard Dat parsing
 			string filename,
@@ -205,7 +206,8 @@ namespace SabreTools.Helper.Dats
 			// Miscellaneous
 			Logger logger,
 			bool keep,
-			bool clean)
+			bool clean,
+			bool descAsName)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -250,7 +252,7 @@ namespace SabreTools.Helper.Dats
 
 					Machine = new Machine
 					{
-						Name = gameinfo[0],
+						Name = (descAsName ? gameinfo[1] : gameinfo[0]),
 						Description = gameinfo[1],
 						CloneOf = gameinfo[3],
 						Year = gameinfo[4],
@@ -280,6 +282,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		private void ParseCMP(
 			// Standard Dat parsing
 			string filename,
@@ -297,7 +300,8 @@ namespace SabreTools.Helper.Dats
 			// Miscellaneous
 			Logger logger,
 			bool keep,
-			bool clean)
+			bool clean,
+			bool descAsName)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -694,6 +698,12 @@ namespace SabreTools.Helper.Dats
 								break;
 							case "description":
 								gamedesc = itemval;
+
+								// If we want to have the description as the name, do so
+								if (descAsName)
+								{
+									tempgamename = gamedesc.Replace('/', '_').Replace("\"", "''");
+								}
 								break;
 							case "romof":
 								romof = itemval;
@@ -861,7 +871,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="softlist">True if SL XML names should be kept, false otherwise (default)</param>
+		/// <param name="descAsName">True if SL XML names should be kept, false otherwise (default)</param>
 		private void ParseGenericXML(
 			// Standard Dat parsing
 			string filename,
@@ -880,7 +890,7 @@ namespace SabreTools.Helper.Dats
 			Logger logger,
 			bool keep,
 			bool clean,
-			bool softlist)
+			bool descAsName)
 		{
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
@@ -1514,16 +1524,8 @@ namespace SabreTools.Helper.Dats
 									case "description":
 										machine.Description = subreader.ReadElementContentAsString();
 
-										/*
 										// If we want to have the description as the name, do so
-										if (decAsName)
-										{
-											machine.Name = machine.Description.Replace('/', '_').Replace("\"", "''");
-										}
-										*/
-
-										// If we have a softlist and we don't want preserve the name
-										if (!softlist && temptype == "software")
+										if (descAsName)
 										{
 											machine.Name = machine.Description.Replace('/', '_').Replace("\"", "''");
 										}
@@ -2269,6 +2271,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		private void ParseRC(
 			// Standard Dat parsing
 			string filename,
@@ -2285,7 +2288,8 @@ namespace SabreTools.Helper.Dats
 
 			// Miscellaneous
 			Logger logger,
-			bool clean)
+			bool clean,
+			bool descAsName)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -2415,7 +2419,7 @@ namespace SabreTools.Helper.Dats
 
 							Machine = new Machine
 							{
-								Name = rominfo[3],
+								Name = (descAsName ? rominfo[4] : rominfo[3]),
 								Description = rominfo[4],
 								CloneOf = rominfo[1],
 								RomOf = rominfo[8],

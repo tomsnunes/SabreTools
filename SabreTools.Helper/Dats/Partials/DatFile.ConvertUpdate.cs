@@ -32,7 +32,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
-		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
+		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
@@ -41,7 +41,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		public void DetermineUpdateType(List<string> inputPaths, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
-			bool bare, bool clean, bool softlist, Filter filter, SplitType splitType, bool trim, bool single, string root,
+			bool bare, bool clean, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root,
 			int maxDegreeOfParallelism, Logger logger)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
@@ -57,7 +57,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Create a dictionary of all ROMs from the input DATs
-				List<DatFile> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, softlist,
+				List<DatFile> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, descAsName,
 					outDir, filter, splitType, trim, single, root, maxDegreeOfParallelism, logger);
 
 				// Modify the Dictionary if necessary and output the results
@@ -79,7 +79,7 @@ namespace SabreTools.Helper.Dats
 			// Otherwise, loop through all of the inputs individually
 			else
 			{
-				Update(inputPaths, outDir, clean, softlist, filter, splitType, trim, single, root, maxDegreeOfParallelism, logger);
+				Update(inputPaths, outDir, clean, descAsName, filter, splitType, trim, single, root, maxDegreeOfParallelism, logger);
 			}
 			return;
 		}
@@ -95,7 +95,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
 		/// <returns>List of DatData objects representing headers</returns>
-		private List<DatFile> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool softlist, string outDir,
+		private List<DatFile> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool descAsName, string outDir,
 			Filter filter, SplitType splitType, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
 		{
 			DatFile[] datHeaders = new DatFile[inputs.Count];
@@ -116,7 +116,7 @@ namespace SabreTools.Helper.Dats
 						MergeRoms = MergeRoms,
 					};
 
-					datHeaders[i].Parse(input.Split('¬')[0], i, 0, filter, splitType, trim, single, root, logger, true, clean, softlist);
+					datHeaders[i].Parse(input.Split('¬')[0], i, 0, filter, splitType, trim, single, root, logger, true, clean, descAsName);
 				});
 
 			logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
@@ -445,7 +445,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
-		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
+		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
@@ -453,7 +453,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
-		public void Update(List<string> inputFileNames, string outDir, bool clean, bool softlist, Filter filter,
+		public void Update(List<string> inputFileNames, string outDir, bool clean, bool descAsName, Filter filter,
 			SplitType splitType, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
 		{
 			Parallel.ForEach(inputFileNames,
@@ -471,7 +471,7 @@ namespace SabreTools.Helper.Dats
 						DatFile innerDatdata = new DatFile(this);
 						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
 						innerDatdata.Parse(inputFileName, 0, 0, filter, splitType, trim, single,
-							root, logger, true, clean, softlist,
+							root, logger, true, clean, descAsName,
 							keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 
 						// Try to output the file
@@ -488,7 +488,7 @@ namespace SabreTools.Helper.Dats
 								logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 								DatFile innerDatdata = new DatFile(this);
 								innerDatdata.Parse(file, 0, 0, filter, splitType,
-									trim, single, root, logger, true, clean, softlist,
+									trim, single, root, logger, true, clean, descAsName,
 									keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 
 								// Try to output the file

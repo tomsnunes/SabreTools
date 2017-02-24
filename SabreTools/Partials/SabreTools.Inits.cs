@@ -175,7 +175,7 @@ namespace SabreTools
 				if (File.Exists(input))
 				{
 					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, softlist: true);
+					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger);
 					datFile.SplitByExt(outDir, Path.GetDirectoryName(input), exta, extb, _logger);
 				}
 				else if (Directory.Exists(input))
@@ -183,7 +183,7 @@ namespace SabreTools
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, softlist: true);
+						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger);
 						datFile.SplitByExt(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), exta, extb, _logger);
 					}
 				}
@@ -210,7 +210,7 @@ namespace SabreTools
 				if (File.Exists(input))
 				{
 					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, softlist: true);
+					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger);
 					datFile.SplitByHash(outDir, Path.GetDirectoryName(input), _logger);
 				}
 				else if (Directory.Exists(input))
@@ -218,7 +218,7 @@ namespace SabreTools
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, softlist: true);
+						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger);
 						datFile.SplitByHash(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), _logger);
 					}
 				}
@@ -270,7 +270,7 @@ namespace SabreTools
 				if (File.Exists(input))
 				{
 					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, softlist: true, keep: true);
+					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, keep: true);
 					datFile.SplitByLevel(outDir, Path.GetDirectoryName(input), shortname, basedat, _logger);
 				}
 				else if (Directory.Exists(input))
@@ -278,7 +278,7 @@ namespace SabreTools
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, softlist: true, keep: true);
+						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, keep: true);
 						datFile.SplitByLevel(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar), shortname, basedat, _logger);
 					}
 				}
@@ -328,7 +328,7 @@ namespace SabreTools
 			foreach (string datfile in datfiles)
 			{
 				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, _logger,
-					keep: true, softlist: true, useTags: true);
+					keep: true, useTags: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -363,7 +363,7 @@ namespace SabreTools
 			foreach (string datfile in datfiles)
 			{
 				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, _logger,
-					keep: true, softlist: true, useTags: true);
+					keep: true, useTags: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -399,7 +399,7 @@ namespace SabreTools
 				if (File.Exists(input))
 				{
 					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, softlist: true);
+					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger;
 					datFile.SplitByType(outDir, Path.GetFullPath(Path.GetDirectoryName(input)), _logger);
 				}
 				else if (Directory.Exists(input))
@@ -407,7 +407,7 @@ namespace SabreTools
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, softlist: true);
+						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger);
 						datFile.SplitByType(outDir, Path.GetFullPath((input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar)), _logger);
 					}
 				}
@@ -471,7 +471,7 @@ namespace SabreTools
 		/// /* Output DAT info */
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
-		/// <param name="softlist">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
+		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="dedup">True to dedupe the roms in the DAT, false otherwise (default)</param>
 		/// /* Multithreading info */
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
@@ -527,7 +527,7 @@ namespace SabreTools
 			/* Output DAT info */
 			string outDir,
 			bool clean,
-			bool softlist,
+			bool descAsName,
 			bool dedup,
 
 			/* Multithreading info */
@@ -666,7 +666,7 @@ namespace SabreTools
 				Romba = romba,
 			};
 			
-			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, softlist,
+			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, descAsName,
 				filter, splitType, trim, single, root, maxDegreeOfParallelism, _logger);
 		}
 
@@ -694,7 +694,7 @@ namespace SabreTools
 			foreach (string datfile in datfiles)
 			{
 				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, _logger,
-					keep: true, softlist: true, useTags: true);
+					keep: true, useTags: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -720,7 +720,7 @@ namespace SabreTools
 			foreach (string datfile in datfiles)
 			{
 				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, _logger,
-					keep: true, softlist: true, useTags: true);
+					keep: true, useTags: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 

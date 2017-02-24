@@ -95,6 +95,7 @@ namespace SabreTools
 				datPrefix = false,
 				dedup = false,
 				delete = false,
+				descAsName = false,
 				enableGzip = false,
 				excludeOf = false,
 				hashOnly = false,
@@ -114,7 +115,6 @@ namespace SabreTools
 				showNodumpColumn = false,
 				shortname = false,
 				single = false,
-				softlist = false,
 				superdat = false,
 				trim = false,
 				skip = false,
@@ -306,6 +306,10 @@ namespace SabreTools
 					case "-csv":
 					case "--csv":
 						statDatFormat |= StatDatFormat.CSV;
+						break;
+					case "-dan":
+					case "--desc-name":
+						descAsName = true;
 						break;
 					case "-dd":
 					case "--dedup":
@@ -510,10 +514,6 @@ namespace SabreTools
 					case "-si":
 					case "--single":
 						single = true;
-						break;
-					case "-sl":
-					case "--softlist":
-						softlist = true;
 						break;
 					case "-t7z":
 					case "--t7z":
@@ -1187,7 +1187,7 @@ namespace SabreTools
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix,
 					postfix, quotes, repext, addext, remext, datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName,
-					filter, splitType, trim, single, root, outDir, cleanGameNames, softlist, dedup, maxParallelism);
+					filter, splitType, trim, single, root, outDir, cleanGameNames, descAsName, dedup, maxParallelism);
 			}
 
 			// If we're using the verifier

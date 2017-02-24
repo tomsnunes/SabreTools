@@ -966,9 +966,9 @@ namespace SabreTools
 				"Clean game names according to WoD standards",
 				FeatureType.Flag,
 				null));
-			update.AddFeature("softlist", new Feature(
-				new List<string>() { "-sl", "--softlist" },
-				"Use Software List name instead of description",
+			update.AddFeature("desc-name", new Feature(
+				new List<string>() { "-dan", "--desc-name" },
+				"Use description instead of machine name",
 				FeatureType.Flag,
 				null));
 			update.AddFeature("dat-merged", new Feature(
