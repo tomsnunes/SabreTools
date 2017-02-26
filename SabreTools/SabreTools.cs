@@ -125,6 +125,7 @@ namespace SabreTools
 			OutputFormat outputFormat = OutputFormat.Folder;
 			SplitType splitType = SplitType.None;
 			StatDatFormat statDatFormat = 0x0;
+			StripHash stripHash = 0x0;
 
 			// User inputs
 			int gz = 2,
@@ -487,6 +488,10 @@ namespace SabreTools
 					case "--rev-cascade":
 						diffMode |= DiffMode.ReverseCascade;
 						break;
+					case "-rmd5":
+					case "--rem-md5":
+						stripHash |= StripHash.MD5;
+						break;
 					case "-rme":
 					case "--rem-ext":
 						remext = true;
@@ -494,6 +499,14 @@ namespace SabreTools
 					case "-ro":
 					case "--romba":
 						romba = true;
+						break;
+					case "-rsha1":
+					case "--rem-sha1":
+						stripHash |= StripHash.SHA1;
+						break;
+					case "-rsha256":
+					case "--rem-sha256":
+						stripHash |= StripHash.SHA256;
 						break;
 					case "-run":
 					case "--runnable":
@@ -1187,7 +1200,7 @@ namespace SabreTools
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix,
 					postfix, quotes, repext, addext, remext, datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName,
-					filter, splitType, trim, single, root, outDir, cleanGameNames, descAsName, dedup, maxParallelism);
+					filter, splitType, trim, single, root, outDir, cleanGameNames, descAsName, dedup, stripHash, maxParallelism);
 			}
 
 			// If we're using the verifier

@@ -111,6 +111,12 @@ namespace SabreTools.Helper.Dats
 			// Bucket roms by game name and optionally dedupe
 			BucketByGame(MergeRoms, norename, logger);
 
+			// If we are removing hashes, do that now
+			if (_stripHash != 0x0)
+			{
+				StripHashesFromItems(logger);
+			}
+
 			// Get the outfile names
 			Dictionary<DatFormat, string> outfiles = Style.CreateOutfileNames(outDir, this, overwrite);
 

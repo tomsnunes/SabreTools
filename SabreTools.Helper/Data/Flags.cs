@@ -182,14 +182,39 @@ namespace SabreTools.Helper.Data
 		ExtraData = 0x2
 	}
 
-	#endregion
+    #endregion
 
-	#region DatFile related
+    #region DatFile related
 
-	/// <summary>
-	/// Determines which diffs should be created
-	/// </summary>
-	[Flags]
+    /// <summary>
+    /// Determines the DAT output format
+    /// </summary>
+    [Flags]
+    public enum DatFormat
+    {
+        Logiqx = 0x0001,
+        ClrMamePro = 0x0002,
+        RomCenter = 0x0004,
+        DOSCenter = 0x0008,
+        MissFile = 0x0010,
+        SabreDat = 0x0020,
+        RedumpMD5 = 0x0040,
+        RedumpSHA1 = 0x0080,
+        RedumpSFV = 0x0100,
+        SoftwareList = 0x0200,
+        OfflineList = 0x0400,
+        TSV = 0x0800,
+        CSV = 0x1000,
+        AttractMode = 0x2000,
+        RedumpSHA256 = 0x4000,
+
+        ALL = 0xFFFF,
+    }
+
+    /// <summary>
+    /// Determines which diffs should be created
+    /// </summary>
+    [Flags]
 	public enum DiffMode
 	{
 		// Standard diffs
@@ -204,31 +229,6 @@ namespace SabreTools.Helper.Data
 	}
 
 	/// <summary>
-	/// Determines the DAT output format
-	/// </summary>
-	[Flags]
-	public enum DatFormat
-	{
-		Logiqx = 0x0001,
-		ClrMamePro = 0x0002,
-		RomCenter = 0x0004,
-		DOSCenter = 0x0008,
-		MissFile = 0x0010,
-		SabreDat = 0x0020,
-		RedumpMD5 = 0x0040,
-		RedumpSHA1 = 0x0080,
-		RedumpSFV = 0x0100,
-		SoftwareList = 0x0200,
-		OfflineList = 0x0400,
-		TSV = 0x0800,
-		CSV = 0x1000,
-		AttractMode = 0x2000,
-		RedumpSHA256 = 0x4000,
-
-		ALL = 0xFFFF,
-	}
-
-	/// <summary>
 	/// Determine which format to output Stats to
 	/// </summary>
 	/// [Flags]
@@ -240,14 +240,25 @@ namespace SabreTools.Helper.Data
 		TSV = 0x08,
 	}
 
-	#endregion
+    /// <summary>
+    /// Determine what hashes to strip from the DAT
+    /// </summary>
+    [Flags]
+    public enum StripHash
+    {
+        MD5 = 0x01,
+        SHA1 = 0x02,
+        SHA256 = 0x04,
+    }
 
-	#region DatItem related
+    #endregion
 
-	/// <summary>
-	/// Determines which type of duplicate a file is
-	/// </summary>
-	[Flags]
+    #region DatItem related
+
+    /// <summary>
+    /// Determines which type of duplicate a file is
+    /// </summary>
+    [Flags]
 	public enum DupeType
 	{
 		// Type of match

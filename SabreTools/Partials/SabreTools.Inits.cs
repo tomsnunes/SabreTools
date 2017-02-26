@@ -473,6 +473,7 @@ namespace SabreTools
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="dedup">True to dedupe the roms in the DAT, false otherwise (default)</param>
+		/// <param name="stripHash">StripHash that represents the hash(es) that you want to remove from the output</param>
 		/// /* Multithreading info */
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitUpdate(List<string> inputs,
@@ -529,6 +530,7 @@ namespace SabreTools
 			bool clean,
 			bool descAsName,
 			bool dedup,
+			StripHash stripHash,
 
 			/* Multithreading info */
 			int maxDegreeOfParallelism)
@@ -654,6 +656,7 @@ namespace SabreTools
 				MergeRoms = dedup,
 				ExcludeOf = excludeOf,
 				DatFormat = datFormat,
+				StripHash = stripHash,
 
 				UseGame = usegame,
 				Prefix = prefix,

@@ -435,6 +435,88 @@ namespace SabreTools.Helper.Dats
 		}
 
 		/// <summary>
+		/// Strip the given hash types from the DAT
+		/// </summary>
+		/// <param name="logger">Logging object for console and file output</param>
+		private void StripHashesFromItems(Logger logger)
+		{
+			// Output the logging statement
+			string set = "";
+			switch ((int)StripHash)
+			{
+				case 0x01:
+					set = "MD5";
+					break;
+				case 0x02:
+					set = "SHA-1";
+					break;
+				case 0x03:
+					set = "MD5 and SHA-1";
+					break;
+				case 0x04:
+					set = "SHA-256";
+					break;
+				case 0x05:
+					set = "MD5 and SHA-256";
+					break;
+				case 0x06:
+					set = "SHA-1 and SHA-256";
+					break;
+				case 0x07:
+					set = "MD5, SHA-1, and SHA-256";
+					break;
+			}
+			logger.User("Stripping " + set + " hashes");
+
+			// Now process all of the roms
+			List<string> keys = Keys.ToList();
+			for (int i = 0; i < keys.Count; i++)
+			{
+				List<DatItem> items = this[keys[i]];
+				for (int j = 0; j < items.Count; j++)
+				{
+					DatItem item = items[j];
+					if (item.Type == ItemType.Rom)
+					{
+						Rom rom = (Rom)item;
+						if ((StripHash & StripHash.MD5) != 0)
+						{
+							rom.MD5 = null;
+						}
+						if ((StripHash & StripHash.SHA1) != 0)
+						{
+							rom.SHA1 = null;
+						}
+						if ((StripHash & StripHash.SHA256) != 0)
+						{
+							rom.SHA256 = null;
+						}
+						items[j] = rom;
+					}
+					else if (item.Type == ItemType.Disk)
+					{
+						Disk disk = (Disk)item;
+						if ((StripHash & StripHash.MD5) != 0)
+						{
+							disk.MD5 = null;
+						}
+						if ((StripHash & StripHash.SHA1) != 0)
+						{
+							disk.SHA1 = null;
+						}
+						if ((StripHash & StripHash.SHA256) != 0)
+						{
+							disk.SHA256 = null;
+						}
+						items[j] = disk;
+					}
+				}
+
+				this[keys[i]] = items;
+			}
+		}
+
+		/// <summary>
 		/// Convert, update, and filter a DAT file or set of files using a base
 		/// </summary>
 		/// <param name="inputFileNames">Names of the input files and/or folders</param>

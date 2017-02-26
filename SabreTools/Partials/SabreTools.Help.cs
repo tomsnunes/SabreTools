@@ -966,6 +966,21 @@ namespace SabreTools
 				"Clean game names according to WoD standards",
 				FeatureType.Flag,
 				null));
+			update.AddFeature("rem-md5", new Feature(
+				new List<string>() { "-rmd5", "--rem-md5" },
+				"Remove MD5 hashes from the output",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("rem-sha1", new Feature(
+				new List<string>() { "-rsha1", "--rem-sha1" },
+				"Remove SHA-1 hashes from the output",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("rem-sha256", new Feature(
+				new List<string>() { "-rsha256", "--rem-sha256" },
+				"Remove SHA-256 hashes from the output",
+				FeatureType.Flag,
+				null));
 			update.AddFeature("desc-name", new Feature(
 				new List<string>() { "-dan", "--desc-name" },
 				"Use description instead of machine name",

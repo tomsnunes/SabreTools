@@ -878,6 +878,18 @@ Options:
 			Game names will be santitized to remove what the original WoD standards
 			deemed as unneeded information, such as parenthized or bracketed strings
 			
+		-rmd5, --rem-md5	Remove MD5 hashes from the output
+			By default, all available hashes will be written out to the DAT. This will
+			remove all MD5 hashes from the output file(s).
+			
+		-rsha1, --rem-sha1	Remove SHA-1 hashes from the output
+			By default, all available hashes will be written out to the DAT. This will
+			remove all SHA-1 hashes from the output file(s).
+		
+		-rsha256, --rem-sha256	Remove SHA-256 hashes from the output
+			By default, all available hashes will be written out to the DAT. This will
+			remove all SHA-256 hashes from the output file(s).
+			
 		-dan, --desc-name	Use Software List name instead of description
 			By default, all DATs are converted exactly as they are input. Enabling this flag
 			allows for the machine names in the DAT to be replaced by the machine description
