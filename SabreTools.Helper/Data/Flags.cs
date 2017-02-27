@@ -244,11 +244,14 @@ namespace SabreTools.Helper.Data
     /// Determine what hashes to strip from the DAT
     /// </summary>
     [Flags]
-    public enum StripHash
+    public enum Hash
     {
-        MD5 = 0x01,
-        SHA1 = 0x02,
-        SHA256 = 0x04,
+		CRC = 0x0001,
+        MD5 = 0x0002,
+        SHA1 = 0x0004,
+        SHA256 = 0x0008,
+		SHA384 = 0x0010,
+		SHA512 = 0x0020,
     }
 
     #endregion

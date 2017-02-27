@@ -12,6 +12,8 @@ namespace SabreTools.Helper.Dats
 		protected string _md5;
 		protected string _sha1;
 		protected string _sha256;
+		protected string _sha384;
+		protected string _sha512;
 		protected ItemStatus _itemStatus;
 
 		#endregion
@@ -33,6 +35,16 @@ namespace SabreTools.Helper.Dats
 		{
 			get { return _sha256; }
 			set { _sha256 = value; }
+		}
+		public string SHA384
+		{
+			get { return _sha384; }
+			set { _sha384 = value; }
+		}
+		public string SHA512
+		{
+			get { return _sha512; }
+			set { _sha512 = value; }
 		}
 		public ItemStatus ItemStatus
 		{

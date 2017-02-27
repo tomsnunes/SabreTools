@@ -30,7 +30,7 @@ namespace SabreTools.Helper.Dats
 		private DatFormat _datFormat;
 		private bool _excludeOf;
 		private bool _mergeRoms;
-		private StripHash _stripHash;
+		private Hash _stripHash;
 		private SortedDictionary<string, List<DatItem>> _files = new SortedDictionary<string, List<DatItem>>();
 		private SortedBy _sortedBy;
 
@@ -161,7 +161,7 @@ namespace SabreTools.Helper.Dats
 			get { return _mergeRoms; }
 			set { _mergeRoms = value; }
 		}
-		public StripHash StripHash
+		public Hash StripHash
 		{
 			get { return _stripHash; }
 			set { _stripHash = value; }

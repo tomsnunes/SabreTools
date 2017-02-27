@@ -441,32 +441,7 @@ namespace SabreTools.Helper.Dats
 		private void StripHashesFromItems(Logger logger)
 		{
 			// Output the logging statement
-			string set = "";
-			switch ((int)StripHash)
-			{
-				case 0x01:
-					set = "MD5";
-					break;
-				case 0x02:
-					set = "SHA-1";
-					break;
-				case 0x03:
-					set = "MD5 and SHA-1";
-					break;
-				case 0x04:
-					set = "SHA-256";
-					break;
-				case 0x05:
-					set = "MD5 and SHA-256";
-					break;
-				case 0x06:
-					set = "SHA-1 and SHA-256";
-					break;
-				case 0x07:
-					set = "MD5, SHA-1, and SHA-256";
-					break;
-			}
-			logger.User("Stripping " + set + " hashes");
+			logger.User("Stripping requested hashes");
 
 			// Now process all of the roms
 			List<string> keys = Keys.ToList();
@@ -479,34 +454,43 @@ namespace SabreTools.Helper.Dats
 					if (item.Type == ItemType.Rom)
 					{
 						Rom rom = (Rom)item;
-						if ((StripHash & StripHash.MD5) != 0)
+						if ((StripHash & Hash.MD5) != 0)
 						{
 							rom.MD5 = null;
 						}
-						if ((StripHash & StripHash.SHA1) != 0)
+						if ((StripHash & Hash.SHA1) != 0)
 						{
 							rom.SHA1 = null;
 						}
-						if ((StripHash & StripHash.SHA256) != 0)
+						if ((StripHash & Hash.SHA256) != 0)
 						{
 							rom.SHA256 = null;
 						}
+						
 						items[j] = rom;
 					}
 					else if (item.Type == ItemType.Disk)
 					{
 						Disk disk = (Disk)item;
-						if ((StripHash & StripHash.MD5) != 0)
+						if ((StripHash & Hash.MD5) != 0)
 						{
 							disk.MD5 = null;
 						}
-						if ((StripHash & StripHash.SHA1) != 0)
+						if ((StripHash & Hash.SHA1) != 0)
 						{
 							disk.SHA1 = null;
 						}
-						if ((StripHash & StripHash.SHA256) != 0)
+						if ((StripHash & Hash.SHA256) != 0)
 						{
 							disk.SHA256 = null;
+						}
+						if ((StripHash & Hash.SHA384) != 0)
+						{
+							disk.SHA384 = null;
+						}
+						if ((StripHash & Hash.SHA512) != 0)
+						{
+							disk.SHA512 = null;
 						}
 						items[j] = disk;
 					}

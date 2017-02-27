@@ -125,7 +125,7 @@ namespace SabreTools
 			OutputFormat outputFormat = OutputFormat.Folder;
 			SplitType splitType = SplitType.None;
 			StatDatFormat statDatFormat = 0x0;
-			StripHash stripHash = 0x0;
+			Hash stripHash = 0x0;
 
 			// User inputs
 			int gz = 2,
@@ -490,7 +490,7 @@ namespace SabreTools
 						break;
 					case "-rmd5":
 					case "--rem-md5":
-						stripHash |= StripHash.MD5;
+						stripHash |= Hash.MD5;
 						break;
 					case "-rme":
 					case "--rem-ext":
@@ -502,11 +502,11 @@ namespace SabreTools
 						break;
 					case "-rsha1":
 					case "--rem-sha1":
-						stripHash |= StripHash.SHA1;
+						stripHash |= Hash.SHA1;
 						break;
 					case "-rsha256":
 					case "--rem-sha256":
-						stripHash |= StripHash.SHA256;
+						stripHash |= Hash.SHA256;
 						break;
 					case "-run":
 					case "--runnable":

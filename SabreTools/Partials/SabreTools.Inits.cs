@@ -530,7 +530,7 @@ namespace SabreTools
 			bool clean,
 			bool descAsName,
 			bool dedup,
-			StripHash stripHash,
+			Hash stripHash,
 
 			/* Multithreading info */
 			int maxDegreeOfParallelism)
