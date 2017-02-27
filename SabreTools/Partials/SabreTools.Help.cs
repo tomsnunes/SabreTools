@@ -51,7 +51,17 @@ namespace SabreTools
 				null));
 			datFromDir.AddFeature("noSHA256", new Feature(
 				new List<string>() { "-ns256", "--noSHA256" },
-				"Don't include SHA256 in output",
+				"Don't include SHA-256 in output",
+				FeatureType.Flag,
+				null));
+			datFromDir.AddFeature("noSHA384", new Feature(
+				new List<string>() { "-ns384", "--noSHA384" },
+				"Don't include SHA-384 in output",
+				FeatureType.Flag,
+				null));
+			datFromDir.AddFeature("noSHA512", new Feature(
+				new List<string>() { "-ns512", "--noSHA512" },
+				"Don't include SHA-512 in output",
 				FeatureType.Flag,
 				null));
 			datFromDir.AddFeature("bare", new Feature(
@@ -135,6 +145,16 @@ namespace SabreTools
 				null));
 			datFromDir.AddFeature("output-sha256", new Feature(
 				new List<string>() { "-osha256", "--output-sha256" },
+				"Output in SHA-256 format",
+				FeatureType.Flag,
+				null));
+			datFromDir.AddFeature("output-sha384", new Feature(
+				new List<string>() { "-osha384", "--output-sha384" },
+				"Output in SHA-256 format",
+				FeatureType.Flag,
+				null));
+			datFromDir.AddFeature("output-sha512", new Feature(
+				new List<string>() { "-osha512", "--output-sha512" },
 				"Output in SHA-256 format",
 				FeatureType.Flag,
 				null));
@@ -717,7 +737,7 @@ namespace SabreTools
 					"Prefix and postfix can include certain fields from the",
 					"items by including %blah% in the input.",
 					"A list of features that can be used are:",
-					"  game, name, crc, md5, sha1, sha256, size",
+					"  game, name, crc, md5, sha1, sha256, sha384, sha512, size",
 				}));
 				update["output-miss"].AddFeature("roms", new Feature(
 					new List<string>() { "-r", "--roms" },
@@ -825,6 +845,26 @@ namespace SabreTools
 				FeatureType.Flag,
 				null));
 				update["output-sha256"].AddFeature("game-prefix", new Feature(
+					new List<string>() { "-gp", "--game-prefix" },
+					"Add game name as a prefix",
+					FeatureType.Flag,
+					null));
+			update.AddFeature("output-sha384", new Feature(
+				new List<string>() { "-osha384", "--output-sha384" },
+				"Output in SHA-384 format",
+				FeatureType.Flag,
+				null));
+				update["output-sha384"].AddFeature("game-prefix", new Feature(
+					new List<string>() { "-gp", "--game-prefix" },
+					"Add game name as a prefix",
+					FeatureType.Flag,
+					null));
+			update.AddFeature("output-sha512", new Feature(
+				new List<string>() { "-osha512", "--output-sha512" },
+				"Output in SHA-512 format",
+				FeatureType.Flag,
+				null));
+				update["output-sha512"].AddFeature("game-prefix", new Feature(
 					new List<string>() { "-gp", "--game-prefix" },
 					"Add game name as a prefix",
 					FeatureType.Flag,
@@ -979,6 +1019,16 @@ namespace SabreTools
 			update.AddFeature("rem-sha256", new Feature(
 				new List<string>() { "-rsha256", "--rem-sha256" },
 				"Remove SHA-256 hashes from the output",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("rem-sha384", new Feature(
+				new List<string>() { "-rsha384", "--rem-sha384" },
+				"Remove SHA-384 hashes from the output",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("rem-sha512", new Feature(
+				new List<string>() { "-rsha512", "--rem-sha512" },
+				"Remove SHA-512 hashes from the output",
 				FeatureType.Flag,
 				null));
 			update.AddFeature("desc-name", new Feature(
@@ -1194,6 +1244,26 @@ namespace SabreTools
 			update.AddFeature("not-sha256", new Feature(
 				new List<string>() { "-nsha256", "--not-sha256" },
 				"Filter by not SHA-256 hash",
+				FeatureType.List,
+				null));
+			update.AddFeature("sha384", new Feature(
+				new List<string>() { "-sha384", "--sha384" },
+				"Filter by SHA-384 hash",
+				FeatureType.List,
+				null));
+			update.AddFeature("not-sha384", new Feature(
+				new List<string>() { "-nsha384", "--not-sha384" },
+				"Filter by not SHA-384 hash",
+				FeatureType.List,
+				null));
+			update.AddFeature("sha512", new Feature(
+				new List<string>() { "-sha512", "--sha512" },
+				"Filter by SHA-512 hash",
+				FeatureType.List,
+				null));
+			update.AddFeature("not-sha512", new Feature(
+				new List<string>() { "-nsha512", "--not-sha512" },
+				"Filter by not SHA-512 hash",
 				FeatureType.List,
 				null));
 			update.AddFeature("status", new Feature(

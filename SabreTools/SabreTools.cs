@@ -466,6 +466,14 @@ namespace SabreTools
 					case "--output-sha256":
 						datFormat |= DatFormat.RedumpSHA256;
 						break;
+					case "-osha384":
+					case "--output-sha384":
+						datFormat |= DatFormat.RedumpSHA384;
+						break;
+					case "-osha512":
+					case "--output-sha512":
+						datFormat |= DatFormat.RedumpSHA512;
+						break;
 					case "-osl":
 					case "--output-sl":
 						datFormat |= DatFormat.SoftwareList;
@@ -737,6 +745,14 @@ namespace SabreTools
 					case "--not-sha256":
 						filter.NotSHA256s.Add(args[++i]);
 						break;
+					case "-nsha384":
+					case "--not-sha384":
+						filter.NotSHA384s.Add(args[++i]);
+						break;
+					case "-nsha512":
+					case "--not-sha512":
+						filter.NotSHA512s.Add(args[++i]);
+						break;
 					case "-out":
 					case "--out":
 						outDir = args[++i];
@@ -791,6 +807,14 @@ namespace SabreTools
 					case "-sha256":
 					case "--sha256":
 						filter.SHA256s.Add(args[++i]);
+						break;
+					case "-sha384":
+					case "--sha384":
+						filter.SHA384s.Add(args[++i]);
+						break;
+					case "-sha512":
+					case "--sha512":
+						filter.SHA512s.Add(args[++i]);
 						break;
 					case "-slt":
 					case "--less":
@@ -985,6 +1009,14 @@ namespace SabreTools
 								case "--not-sha256":
 									filter.NotSHA256s.Add(split[1]);
 									break;
+								case "-nsha384":
+								case "--not-sha384":
+									filter.NotSHA384s.Add(split[1]);
+									break;
+								case "-nsha512":
+								case "--not-sha512":
+									filter.NotSHA512s.Add(split[1]);
+									break;
 								case "-out":
 								case "--out":
 									outDir = split[1];
@@ -1039,6 +1071,14 @@ namespace SabreTools
 								case "-sha256":
 								case "--sha256":
 									filter.SHA256s.Add(split[1]);
+									break;
+								case "-sha384":
+								case "--sha384":
+									filter.SHA384s.Add(split[1]);
+									break;
+								case "-sha512":
+								case "--sha512":
+									filter.SHA512s.Add(split[1]);
 									break;
 								case "-slt":
 								case "--less":
