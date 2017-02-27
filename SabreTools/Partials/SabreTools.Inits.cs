@@ -35,9 +35,7 @@ namespace SabreTools
 		/// <param name="datFormat">DatFormat to be used for outputting the DAT</param>
 		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
 		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
-		/// <param name="noMD5">True to disable getting MD5 hash, false otherwise</param>
-		/// <param name="noSHA1">True to disable getting SHA-1 hash, false otherwise</param>
-		/// <param name="noSHA256">True to disable getting SHA-256 hash, false otherwise</param>
+		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
 		/// <param name="removeDateFromAutomaticName">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="parseArchivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
@@ -60,9 +58,7 @@ namespace SabreTools
 			DatFormat datFormat,
 			bool romba,
 			bool superdat,
-			bool noMD5,
-			bool noSHA1,
-			bool noSHA256,
+			Hash omitFromScan,
 			bool removeDateFromAutomaticName,
 			bool parseArchivesAsFiles,
 			bool enableGzip,
@@ -118,7 +114,7 @@ namespace SabreTools
 					DatFile datdata = new DatFile(basedat);
 
 					string basePath = Path.GetFullPath(path);
-					bool success = datdata.PopulateFromDir(basePath, noMD5, noSHA1, noSHA256, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,
+					bool success = datdata.PopulateFromDir(basePath, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,
 						addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
 
 					// If it was a success, write the DAT out

@@ -26,9 +26,7 @@ namespace SabreTools.Helper.Dats
 		/// Create a new Dat from a directory
 		/// </summary>
 		/// <param name="basePath">Base folder to be used in creating the DAT</param>
-		/// <param name="noMD5">True if MD5 hashes should be skipped over, false otherwise</param>
-		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
-		/// <param name="noSHA256">True if SHA-256 hashes should be skipped over, false otherwise</param>
+		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
@@ -40,7 +38,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		public bool PopulateFromDir(string basePath, bool noMD5, bool noSHA1, bool noSHA256, bool bare, bool archivesAsFiles,
+		public bool PopulateFromDir(string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles,
 			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst,
 			int maxDegreeOfParallelism, Logger logger)
 		{
@@ -74,7 +72,7 @@ namespace SabreTools.Helper.Dats
 					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 					item =>
 					{
-						PopulateFromDirCheckFile(item, basePath, noMD5, noSHA1, noSHA256, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+						PopulateFromDirCheckFile(item, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
 							tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 					});
 
@@ -89,7 +87,7 @@ namespace SabreTools.Helper.Dats
 							new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 							subitem =>
 							{
-								PopulateFromDirCheckFile(subitem, basePath, noMD5, noSHA1, noSHA256, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+								PopulateFromDirCheckFile(subitem, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
 								tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 							});
 					});
@@ -151,7 +149,7 @@ namespace SabreTools.Helper.Dats
 			}
 			else if (File.Exists(basePath))
 			{
-				PopulateFromDirCheckFile(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), noMD5, noSHA1, noSHA256, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+				PopulateFromDirCheckFile(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
 					tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 			}
 
@@ -177,9 +175,7 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="item">Filename of the item to be checked</param>
 		/// <param name="basePath">Base folder to be used in creating the DAT</param>
-		/// <param name="noMD5">True if MD5 hashes should be skipped over, false otherwise</param>
-		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
-		/// <param name="noSHA256">True if SHA-256 hashes should be skipped over, false otherwise</param>
+		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
@@ -190,7 +186,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		private void PopulateFromDirCheckFile(string item, string basePath, bool noMD5, bool noSHA1, bool noSHA256, bool bare, bool archivesAsFiles,
+		private void PopulateFromDirCheckFile(string item, string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles,
 			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst,
 			int maxDegreeOfParallelism, Logger logger)
 		{
@@ -230,7 +226,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// If all deep hash skip flags are set, do a quickscan
-			if (noMD5 && noSHA1 && noSHA256)
+			if (omitFromScan == (Hash.MD5 & Hash.SHA1 & Hash.SHA256 & Hash.SHA384 & Hash.SHA512))
 			{
 				ArchiveType? type = ArchiveTools.GetCurrentArchiveType(newItem, logger);
 
@@ -251,7 +247,7 @@ namespace SabreTools.Helper.Dats
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(newItem))
 				{
-					PopulateFromDirProcessFile(newItem, "", newBasePath, noMD5, noSHA1, noSHA256, addDate, headerToCheckAgainst, logger);
+					PopulateFromDirProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst, logger);
 				}
 			}
 			// Otherwise, attempt to extract the files to the temporary directory
@@ -279,9 +275,7 @@ namespace SabreTools.Helper.Dats
 									: ""),
 								Path.GetFileNameWithoutExtension(item)),
 								tempSubDir,
-								noMD5,
-								noSHA1,
-								noSHA256,
+								omitFromScan,
 								addDate,
 								headerToCheckAgainst,
 								logger);
@@ -290,7 +284,7 @@ namespace SabreTools.Helper.Dats
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(newItem))
 				{
-					PopulateFromDirProcessFile(newItem, "", newBasePath, noMD5, noSHA1, noSHA256, addDate, headerToCheckAgainst, logger);
+					PopulateFromDirProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst, logger);
 				}
 			}
 
@@ -317,17 +311,15 @@ namespace SabreTools.Helper.Dats
 		/// <param name="item">File to be added</param>
 		/// <param name="parent">Parent game to be used</param>
 		/// <param name="basePath">Path the represents the parent directory</param>
-		/// <param name="noMD5">True if MD5 hashes should be skipped over, false otherwise</param>
-		/// <param name="noSHA1">True if SHA-1 hashes should be skipped over, false otherwise</param>
-		/// <param name="noSHA256">True if SHA-256 hashes should be skipped over, false otherwise</param>
+		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		private void PopulateFromDirProcessFile(string item, string parent, string basePath, bool noMD5, bool noSHA1,
-			bool noSHA256, bool addDate, string headerToCheckAgainst, Logger logger)
+		private void PopulateFromDirProcessFile(string item, string parent, string basePath, Hash omitFromScan,
+			bool addDate, string headerToCheckAgainst, Logger logger)
 		{
 			logger.Verbose(Path.GetFileName(item) + " treated like a file");
-			Rom rom = FileTools.GetFileInfo(item, logger, noMD5: noMD5, noSHA1: noSHA1, noSHA256: noSHA256, date: addDate, header: headerToCheckAgainst);
+			Rom rom = FileTools.GetFileInfo(item, logger, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst);
 
 			PopulateFromDirProcessFileHelper(item, rom, basePath, parent, logger);
 		}

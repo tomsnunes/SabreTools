@@ -102,9 +102,6 @@ namespace SabreTools
 				inplace = false,
 				inverse = false,
 				merge = false,
-				noMD5 = false,
-				noSHA1 = false,
-				noSHA256 = true, // TODO: This will eventually need to be inversed
 				parseArchivesAsFiles = false,
 				quickScan = false,
 				quotes = false,
@@ -122,10 +119,11 @@ namespace SabreTools
 				usegame = true;
 			DatFormat datFormat = 0x0;
 			DiffMode diffMode = 0x0;
+			Hash omitFromScan = Hash.SHA256 & Hash.SHA384 & Hash.SHA512; // Should be set to 0x0 later
+			Hash stripHash = 0x0;
 			OutputFormat outputFormat = OutputFormat.Folder;
 			SplitType splitType = SplitType.None;
 			StatDatFormat statDatFormat = 0x0;
-			Hash stripHash = 0x0;
 
 			// User inputs
 			int gz = 2,
@@ -390,7 +388,7 @@ namespace SabreTools
 						break;
 					case "-nm":
 					case "--noMD5":
-						noMD5 = true;
+						omitFromScan |= Hash.MD5;
 						break;
 					case "-nrun":
 					case "--not-run":
@@ -398,11 +396,19 @@ namespace SabreTools
 						break;
 					case "-ns":
 					case "--noSHA1":
-						noSHA1 = true;
+						omitFromScan |= Hash.SHA1;
 						break;
 					case "-ns256":
 					case "--noSHA256":
-						noSHA256 = false;
+						omitFromScan &= ~Hash.SHA256; // This needs to be inverted later
+						break;
+					case "-ns384":
+					case "--noSHA384":
+						omitFromScan &= ~Hash.SHA384; // This needs to be inverted later
+						break;
+					case "-ns512":
+					case "--noSHA512":
+						omitFromScan &= ~Hash.SHA512; // This needs to be inverted later
 						break;
 					case "-oa":
 					case "--output-all":
@@ -1123,9 +1129,7 @@ namespace SabreTools
 					datFormat,
 					romba,
 					superdat,
-					noMD5,
-					noSHA1,
-					noSHA256,
+					omitFromScan,
 					removeDateFromAutomaticName,
 					parseArchivesAsFiles,
 					enableGzip,

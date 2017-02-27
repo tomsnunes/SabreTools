@@ -188,15 +188,13 @@ namespace SabreTools.Helper.Tools
 		/// </summary>
 		/// <param name="input">Filename to get information from</param>
 		/// <param name="logger">Logger object for console and file output</param>
-		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise (default)</param>
-		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise (default)</param>
-		/// <param name="noSHA256">True if SHA-256 hashes should not be calcluated, false otherwise (default)</param>
+		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated (defaults to none)</param>
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="date">True if the file Date should be included, false otherwise (default)</param>
 		/// <param name="header">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static Rom GetFileInfo(string input, Logger logger, bool noMD5 = false, bool noSHA1 = false,
-			bool noSHA256 = false, long offset = 0, bool date = false, string header = null)
+		public static Rom GetFileInfo(string input, Logger logger, Hash omitFromScan = 0x0,
+			long offset = 0, bool date = false, string header = null)
 		{
 			// Add safeguard if file doesn't exist
 			if (!File.Exists(input))
@@ -228,12 +226,12 @@ namespace SabreTools.Helper.Tools
 				// Otherwise, just get the info
 				else
 				{
-					rom = GetStreamInfo(File.OpenRead(input), new FileInfo(input).Length, noMD5, noSHA1, noSHA256, offset, false);
+					rom = GetStreamInfo(File.OpenRead(input), new FileInfo(input).Length, omitFromScan, offset, false);
 				}
 			}
 			else
 			{
-				rom = GetStreamInfo(File.OpenRead(input), new FileInfo(input).Length, noMD5, noSHA1, noSHA256, offset, false);
+				rom = GetStreamInfo(File.OpenRead(input), new FileInfo(input).Length, omitFromScan, offset, false);
 			}
 
 			// Add unique data from the file
@@ -509,14 +507,12 @@ namespace SabreTools.Helper.Tools
 		/// </summary>
 		/// <param name="input">Filename to get information from</param>
 		/// <param name="size">Size of the input stream</param>
-		/// <param name="noMD5">True if MD5 hashes should not be calculated, false otherwise (default)</param>
-		/// <param name="noSHA1">True if SHA-1 hashes should not be calcluated, false otherwise (default)</param>
-		/// <param name="noSHA256">True if SHA-256 hashes should not be calcluated, false otherwise (default)</param>
+		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated (defaults to none)</param>
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static Rom GetStreamInfo(Stream input, long size, bool noMD5 = false, bool noSHA1 = false,
-			bool noSHA256 = false, long offset = 0, bool keepReadOpen = false)
+		public static Rom GetStreamInfo(Stream input, long size, Hash omitFromScan = 0x0,
+			long offset = 0, bool keepReadOpen = false)
 		{
 			Rom rom = new Rom
 			{
@@ -551,15 +547,15 @@ namespace SabreTools.Helper.Tools
 				while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
 				{
 					crc.Update(buffer, 0, read);
-					if (!noMD5)
+					if ((omitFromScan & Hash.MD5) == 0)
 					{
 						md5.TransformBlock(buffer, 0, read, buffer, 0);
 					}
-					if (!noSHA1)
+					if ((omitFromScan & Hash.SHA1) == 0)
 					{
 						sha1.TransformBlock(buffer, 0, read, buffer, 0);
 					}
-					if (!noSHA256)
+					if ((omitFromScan & Hash.SHA256) == 0)
 					{
 						sha256.TransformBlock(buffer, 0, read, buffer, 0);
 					}
@@ -568,17 +564,17 @@ namespace SabreTools.Helper.Tools
 				crc.Update(buffer, 0, 0);
 				rom.CRC = crc.Value.ToString("X8").ToLowerInvariant();
 
-				if (!noMD5)
+				if ((omitFromScan & Hash.MD5) == 0)
 				{
 					md5.TransformFinalBlock(buffer, 0, 0);
 					rom.MD5 = BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
 				}
-				if (!noSHA1)
+				if ((omitFromScan & Hash.SHA1) == 0)
 				{
 					sha1.TransformFinalBlock(buffer, 0, 0);
 					rom.SHA1 = BitConverter.ToString(sha1.Hash).Replace("-", "").ToLowerInvariant();
 				}
-				if (!noSHA256)
+				if ((omitFromScan & Hash.SHA256) == 0)
 				{
 					sha256.TransformFinalBlock(buffer, 0, 0);
 					rom.SHA256 = BitConverter.ToString(sha256.Hash).Replace("-", "").ToLowerInvariant();
