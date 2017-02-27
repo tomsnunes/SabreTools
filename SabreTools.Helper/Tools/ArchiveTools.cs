@@ -155,13 +155,8 @@ namespace SabreTools.Helper.Tools
 
 					for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
 					{
-						// Set defaults before writing out
-						Stream readStream;
-						ulong streamsize = 0;
-						CompressionMethod cm = CompressionMethod.Stored;
-						uint lastMod = 0;
-
-						zr = zf.OpenReadStream(i, false, out readStream, out streamsize, out cm, out lastMod);
+						// Open the read stream
+						zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out CompressionMethod cm, out uint lastMod);
 
 						// Create the rest of the path, if needed
 						if (!String.IsNullOrEmpty(Path.GetDirectoryName(zf.Entries[i].FileName)))
@@ -354,13 +349,8 @@ namespace SabreTools.Helper.Tools
 							{
 								realEntry = zf.Entries[i].FileName;
 
-								// Set defaults before writing out
-								Stream readStream;
-								ulong streamsize = 0;
-								CompressionMethod cm = CompressionMethod.Stored;
-								uint lastMod = 0;
-
-								zr = zf.OpenReadStream(i, false, out readStream, out streamsize, out cm, out lastMod);
+								// Open the read stream
+								zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out CompressionMethod cm, out uint lastMod);
 
 								// Get the output path
 								realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
@@ -1527,7 +1517,7 @@ namespace SabreTools.Helper.Tools
 		public static bool WriteTorrentZip(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
 		{
 			bool success = false;
-			string tempFile = Path.Combine(Path.GetTempPath(), "tmp" + Guid.NewGuid().ToString());
+			string tempFile = Path.Combine(outDir, "tmp" + Guid.NewGuid().ToString());
 
 			// If either list of roms is null or empty, return
 			if (inputFiles == null || roms == null || inputFiles.Count == 0 || roms.Count == 0)
@@ -1698,11 +1688,7 @@ namespace SabreTools.Helper.Tools
 						else
 						{
 							// Instantiate the streams
-							CompressionMethod icompressionMethod = CompressionMethod.Stored;
-							uint lastMod = 0;
-							ulong istreamSize = 0;
-							Stream zreadStream;
-							oldZipFile.OpenReadStream(index, false, out zreadStream, out istreamSize, out icompressionMethod, out lastMod);
+							oldZipFile.OpenReadStream(index, false, out Stream zreadStream, out ulong istreamSize, out CompressionMethod icompressionMethod, out uint lastMod);
 							zipFile.OpenWriteStream(false, lastMod == Constants.TorrentZipFileDateTime, oldZipFile.Filename(index),
 								istreamSize, CompressionMethod.Deflated, out writeStream, lastMod: lastMod);
 
