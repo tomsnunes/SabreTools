@@ -256,8 +256,8 @@ namespace SabreTools.Helper.Data
 		SHA512 = 0x0020,
 
 		// Special combinations
-		Standard = CRC & MD5 & SHA1,
-		DeepHashes = MD5 & SHA1 & SHA256 & SHA384 & SHA512,
+		Standard = CRC | MD5 | SHA1,
+		DeepHashes = MD5 | SHA1 | SHA256 | SHA384 | SHA512,
     }
 
     #endregion

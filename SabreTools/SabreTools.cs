@@ -119,7 +119,7 @@ namespace SabreTools
 				usegame = true;
 			DatFormat datFormat = 0x0;
 			DiffMode diffMode = 0x0;
-			Hash omitFromScan = Hash.SHA256 & Hash.SHA384 & Hash.SHA512; // Should be set to 0x0 later
+			Hash omitFromScan = Hash.SHA256 | Hash.SHA384 | Hash.SHA512; // Should be set to 0x0 later
 			Hash stripHash = 0x0;
 			OutputFormat outputFormat = OutputFormat.Folder;
 			SplitType splitType = SplitType.None;
