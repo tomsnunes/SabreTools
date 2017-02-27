@@ -159,8 +159,16 @@ Options:
 			This allows the user to skip calculating the SHA-1 for each of the files which will
 			speed up the creation of the DAT.
 
-		-ns256, --noSHA256	Don't include SHA256 in output
+		-ns256, --noSHA256	Don't include SHA-256 in output
 			This allows the user to skip calculating the SHA-256 for each of the files which will
+			speed up the creation of the DAT.
+			
+		-ns384, --noSHA384	Don't include SHA-384 in output
+			This allows the user to skip calculating the SHA-384 for each of the files which will
+			speed up the creation of the DAT.
+			
+		-ns512, --noSHA512	Don't include SHA-512 in output
+			This allows the user to skip calculating the SHA-512 for each of the files which will
 			speed up the creation of the DAT.
 			
 		-b, --bare			Don't include date in file name
@@ -214,7 +222,13 @@ Options:
 			Add outputting the created DAT to SHA1 format
 
 		-osha256, --output-sha256	Output in SHA-256 format
-			Add outputting the created DAT to SHA256 format
+			Add outputting the created DAT to SHA-256 format
+			
+		-osha384, --output-sha384	Output in SHA-384 format
+			Add outputting the created DAT to SHA-384 format
+			
+		-osha512, --output-sha512	Output in SHA-512 format
+			Add outputting the created DAT to SHA-512 format
 			
 		-osl, --output-sl	Output in Software List format
 			Add outputting the created DAT to Software List XML format
@@ -706,6 +720,8 @@ Options:
 					- %md5% - Replaced with the MD5
 					- %sha1% - Replaced with the SHA-1
 					- %sha256% - Replaced with the SHA-256
+					- %sha384% - Replaced with the SHA-384
+					- %sha512% - Replaced with the SHA-512
 					- %size% - Replaced with the size
 			
 			-q, --quotes			Put double-quotes around each item
@@ -738,6 +754,8 @@ Options:
 					- %md5% - Replaced with the MD5
 					- %sha1% - Replaced with the SHA-1
 					- %sha256% - Replaced with the SHA-256
+					- %sha384% - Replaced with the SHA-384
+					- %sha512% - Replaced with the SHA-512
 					- %size% - Replaced with the size
 			
 			-q, --quotes			Put double-quotes around each item
@@ -784,7 +802,19 @@ Options:
 				This allows for the name of the game to be used as a prefix to each file
 
 		-osha256, --output-sha256	Output in SHA-256 format
-			Add outputting the created DAT to SHA256 format
+			Add outputting the created DAT to SHA-256 format
+
+			-gp, --game-prefix		Add game name as a prefix
+				This allows for the name of the game to be used as a prefix to each file
+				
+		-osha384, --output-sha384	Output in SHA-384 format
+			Add outputting the created DAT to SHA-384 format
+
+			-gp, --game-prefix		Add game name as a prefix
+				This allows for the name of the game to be used as a prefix to each file
+				
+		-osha512, --output-sha512	Output in SHA-512 format
+			Add outputting the created DAT to SHA-512 format
 
 			-gp, --game-prefix		Add game name as a prefix
 				This allows for the name of the game to be used as a prefix to each file
@@ -808,6 +838,8 @@ Options:
 					- %md5% - Replaced with the MD5
 					- %sha1% - Replaced with the SHA-1
 					- %sha256% - Replaced with the SHA-256
+					- %sha384% - Replaced with the SHA-384
+					- %sha512% - Replaced with the SHA-512
 					- %size% - Replaced with the size
 			
 			-q, --quotes			Put double-quotes around each item
@@ -889,6 +921,14 @@ Options:
 		-rsha256, --rem-sha256	Remove SHA-256 hashes from the output
 			By default, all available hashes will be written out to the DAT. This will
 			remove all SHA-256 hashes from the output file(s).
+			
+		-rsha384, --rem-sha384	Remove SHA-384 hashes from the output
+			By default, all available hashes will be written out to the DAT. This will
+			remove all SHA-384 hashes from the output file(s).
+			
+		-rsha512, --rem-sha512	Remove SHA-512 hashes from the output
+			By default, all available hashes will be written out to the DAT. This will
+			remove all SHA-512 hashes from the output file(s).
 			
 		-dan, --desc-name	Use Software List name instead of description
 			By default, all DATs are converted exactly as they are input. Enabling this flag
@@ -986,6 +1026,10 @@ Options:
 		-nsha1=, --not-sha1= Exclude by SHA-1 hash
 		-sha256=, --sha256=	Filter by SHA-256 hash
 		-nsha256=, --not-sha256  Exclude by SHA-256 hash
+		-sha384=, --sha384=	Filter by SHA-384 hash
+		-nsha384=, --not-sha384  Exclude by SHA-384 hash
+		-sha512=, --sha512=	Filter by SHA-512 hash
+		-nsha512=, --not-sha512  Exclude by SHA-512 hash
 			For each of the flags above, the user can specify either an exact match or can use
 			full C#-style regex for pattern matching. Multiples of each of the above inputs are
 			allowed.
