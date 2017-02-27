@@ -466,7 +466,15 @@ namespace SabreTools.Helper.Dats
 						{
 							rom.SHA256 = null;
 						}
-						
+						if ((StripHash & Hash.SHA384) != 0)
+						{
+							rom.SHA384 = null;
+						}
+						if ((StripHash & Hash.SHA512) != 0)
+						{
+							rom.SHA512 = null;
+						}
+
 						items[j] = rom;
 					}
 					else if (item.Type == ItemType.Disk)

@@ -531,6 +531,8 @@ namespace SabreTools.Helper.Tools
 				MD5 md5 = MD5.Create();
 				SHA1 sha1 = SHA1.Create();
 				SHA256 sha256 = SHA256.Create();
+				SHA384 sha384 = SHA384.Create();
+				SHA512 sha512 = SHA512.Create();
 
 				// Seek to the starting position, if one is set
 				if (offset < 0)
@@ -559,6 +561,14 @@ namespace SabreTools.Helper.Tools
 					{
 						sha256.TransformBlock(buffer, 0, read, buffer, 0);
 					}
+					if ((omitFromScan & Hash.SHA384) == 0)
+					{
+						sha384.TransformBlock(buffer, 0, read, buffer, 0);
+					}
+					if ((omitFromScan & Hash.SHA512) == 0)
+					{
+						sha512.TransformBlock(buffer, 0, read, buffer, 0);
+					}
 				}
 
 				crc.Update(buffer, 0, 0);
@@ -579,12 +589,24 @@ namespace SabreTools.Helper.Tools
 					sha256.TransformFinalBlock(buffer, 0, 0);
 					rom.SHA256 = BitConverter.ToString(sha256.Hash).Replace("-", "").ToLowerInvariant();
 				}
+				if ((omitFromScan & Hash.SHA384) == 0)
+				{
+					sha384.TransformFinalBlock(buffer, 0, 0);
+					rom.SHA384 = BitConverter.ToString(sha384.Hash).Replace("-", "").ToLowerInvariant();
+				}
+				if ((omitFromScan & Hash.SHA512) == 0)
+				{
+					sha512.TransformFinalBlock(buffer, 0, 0);
+					rom.SHA512 = BitConverter.ToString(sha512.Hash).Replace("-", "").ToLowerInvariant();
+				}
 
 				// Dispose of the hashers
 				crc.Dispose();
 				md5.Dispose();
 				sha1.Dispose();
 				sha256.Dispose();
+				sha384.Dispose();
+				sha512.Dispose();
 			}
 			catch (IOException)
 			{

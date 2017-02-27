@@ -514,6 +514,14 @@ namespace SabreTools
 					case "--rem-sha256":
 						stripHash |= Hash.SHA256;
 						break;
+					case "-rsha384":
+					case "--rem-sha384":
+						stripHash |= Hash.SHA384;
+						break;
+					case "-rsha512":
+					case "--rem-sha512":
+						stripHash |= Hash.SHA512;
+						break;
 					case "-run":
 					case "--runnable":
 						filter.Runnable = true;

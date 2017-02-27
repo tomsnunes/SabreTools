@@ -226,7 +226,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// If all deep hash skip flags are set, do a quickscan
-			if (omitFromScan == (Hash.MD5 & Hash.SHA1 & Hash.SHA256 & Hash.SHA384 & Hash.SHA512))
+			if (omitFromScan == Hash.DeepHashes)
 			{
 				ArchiveType? type = ArchiveTools.GetCurrentArchiveType(newItem, logger);
 
