@@ -192,24 +192,32 @@ namespace SabreTools.Helper.Data
     [Flags]
     public enum DatFormat
     {
-        Logiqx = 0x00001,
-        ClrMamePro = 0x00002,
-        RomCenter = 0x00004,
-        DOSCenter = 0x00008,
-        MissFile = 0x00010,
-        SabreDat = 0x00020,
-        RedumpMD5 = 0x00040,
-        RedumpSHA1 = 0x00080,
-        RedumpSFV = 0x00100,
-        SoftwareList = 0x00200,
-        OfflineList = 0x00400,
-        TSV = 0x00800,
-        CSV = 0x01000,
-        AttractMode = 0x02000,
-        RedumpSHA256 = 0x04000,
-		RedumpSHA384 = 0x08000,
-		RedumpSHA512 = 0x10000,
+		// XML Formats
+		Logiqx = 0x01,
+		SoftwareList = Logiqx << 1,
+		OfflineList = SoftwareList << 1,
+		SabreDat = OfflineList << 1,
 
+		// Propietary Formats
+		ClrMamePro = SabreDat << 1,
+		RomCenter = ClrMamePro << 1,
+		DOSCenter = RomCenter << 1,
+		AttractMode = DOSCenter << 1,
+
+		// Standardized Text Formats
+		MissFile = AttractMode << 1,
+		CSV = MissFile << 1,
+		TSV = CSV << 1,
+
+		// SFV-similar Formats
+		RedumpSFV = TSV << 1,
+		RedumpMD5 = RedumpSFV << 1,
+		RedumpSHA1 = RedumpMD5 << 1,
+		RedumpSHA256 = RedumpSHA1 << 1,
+		RedumpSHA384 = RedumpSHA256 << 1,
+		RedumpSHA512 = RedumpSHA384 << 1,
+
+		// Specialty combinations
         ALL = 0xFFFFF,
     }
 
@@ -221,13 +229,13 @@ namespace SabreTools.Helper.Data
 	{
 		// Standard diffs
 		Dupes = 0x01,
-		NoDupes = 0x02,
-		Individuals = 0x04,
+		NoDupes = Dupes << 1,
+		Individuals = NoDupes << 1,
 		All = Dupes | NoDupes | Individuals,
 
 		// Cascaded diffs
-		Cascade = 0x08,
-		ReverseCascade = 0x10,
+		Cascade = Individuals << 1,
+		ReverseCascade = Cascade << 1,
 	}
 
 	/// <summary>
@@ -237,9 +245,9 @@ namespace SabreTools.Helper.Data
 	public enum StatDatFormat
 	{
 		None = 0x01,
-		HTML = 0x02,
-		CSV = 0x04,
-		TSV = 0x08,
+		HTML = None << 1,
+		CSV = HTML << 1,
+		TSV = CSV << 1,
 	}
 
     /// <summary>
@@ -249,11 +257,11 @@ namespace SabreTools.Helper.Data
     public enum Hash
     {
 		CRC = 0x0001,
-        MD5 = 0x0002,
-        SHA1 = 0x0004,
-        SHA256 = 0x0008,
-		SHA384 = 0x0010,
-		SHA512 = 0x0020,
+        MD5 = CRC << 1,
+        SHA1 = MD5 << 1,
+        SHA256 = SHA1 << 1,
+		SHA384 = SHA256 << 1,
+		SHA512 = SHA384 << 1,
 
 		// Special combinations
 		Standard = CRC | MD5 | SHA1,
