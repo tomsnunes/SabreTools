@@ -192,23 +192,25 @@ namespace SabreTools.Helper.Data
     [Flags]
     public enum DatFormat
     {
-        Logiqx = 0x0001,
-        ClrMamePro = 0x0002,
-        RomCenter = 0x0004,
-        DOSCenter = 0x0008,
-        MissFile = 0x0010,
-        SabreDat = 0x0020,
-        RedumpMD5 = 0x0040,
-        RedumpSHA1 = 0x0080,
-        RedumpSFV = 0x0100,
-        SoftwareList = 0x0200,
-        OfflineList = 0x0400,
-        TSV = 0x0800,
-        CSV = 0x1000,
-        AttractMode = 0x2000,
-        RedumpSHA256 = 0x4000,
+        Logiqx = 0x00001,
+        ClrMamePro = 0x00002,
+        RomCenter = 0x00004,
+        DOSCenter = 0x00008,
+        MissFile = 0x00010,
+        SabreDat = 0x00020,
+        RedumpMD5 = 0x00040,
+        RedumpSHA1 = 0x00080,
+        RedumpSFV = 0x00100,
+        SoftwareList = 0x00200,
+        OfflineList = 0x00400,
+        TSV = 0x00800,
+        CSV = 0x01000,
+        AttractMode = 0x02000,
+        RedumpSHA256 = 0x04000,
+		RedumpSHA384 = 0x08000,
+		RedumpSHA512 = 0x10000,
 
-        ALL = 0xFFFF,
+        ALL = 0xFFFFF,
     }
 
     /// <summary>

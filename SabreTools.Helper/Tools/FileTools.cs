@@ -73,7 +73,8 @@ namespace SabreTools.Helper.Tools
 			{
 				ext = ext.Substring(1);
 			}
-			if (ext != "csv" && ext != "dat" && ext != "md5" && ext != "sfv" && ext != "sha1" && ext != "tsv" && ext != "txt" && ext != "xml")
+			if (ext != "csv" && ext != "dat" && ext != "md5" && ext != "sfv" && ext != "sha1"
+				&& ext != "sha384" && ext != "sha512" && ext != "tsv" && ext != "txt" && ext != "xml")
 			{
 				return 0;
 			}
@@ -104,6 +105,14 @@ namespace SabreTools.Helper.Tools
 			if (ext == "sha256")
 			{
 				return DatFormat.RedumpSHA256;
+			}
+			if (ext == "sha384")
+			{
+				return DatFormat.RedumpSHA384;
+			}
+			if (ext == "sha512")
+			{
+				return DatFormat.RedumpSHA512;
 			}
 
 			// For everything else, we need to read it

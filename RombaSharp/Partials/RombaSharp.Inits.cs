@@ -41,12 +41,12 @@ namespace RombaSharp
 			DatFile df = new DatFile();
 			foreach (string dir in onlyDirs)
 			{
-				df.PopulateFromDir(dir, false, false, true, false, false, true, false, false, _tmpdir, false, null, _workers, _logger);
+				df.PopulateFromDir(dir, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, false, true, false, false, _tmpdir, false, null, _workers, _logger);
 
 				// If we're looking for only needed, consider the zipfiles themselves too
 				if (onlyNeeded)
 				{
-					df.PopulateFromDir(dir, false, false, true, false, true, true, false, false, _tmpdir, false, null, _workers, _logger);
+					df.PopulateFromDir(dir, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, true, true, false, false, _tmpdir, false, null, _workers, _logger);
 				}
 			}
 
@@ -250,7 +250,7 @@ namespace RombaSharp
 			Logger logger = new Logger();
 			foreach (string input in inputs)
 			{
-				datdata.PopulateFromDir(input, false /* noMD5 */, false /* noSHA1 */, true /* noSHA256 */, true /* bare */, false /* archivesAsFiles */,
+				datdata.PopulateFromDir(input, Hash.SHA256 & Hash.SHA384 & Hash.SHA512 /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
 					null /* headerToCheckAgainst */, _workers /* maxDegreeOfParallelism */, _logger);
 				datdata.WriteToFile("", logger);

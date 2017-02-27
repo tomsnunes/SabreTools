@@ -389,7 +389,7 @@ namespace SabreTools.Helper.Dats
 			// If we're supposed to scan the file externally
 			if (shouldExternalProcess)
 			{
-				Rom rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan, header: headerToCheckAgainst);
+				Rom rom = FileTools.GetFileInfo(file, logger, omitFromScan: (quickScan ? Hash.DeepHashes : 0x0), header: headerToCheckAgainst);
 				usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
 					romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
 			}
@@ -423,7 +423,7 @@ namespace SabreTools.Helper.Dats
 						List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 						foreach (string entry in extracted)
 						{
-							Rom rom = FileTools.GetFileInfo(entry, logger, noMD5: quickScan, noSHA1: quickScan);
+							Rom rom = FileTools.GetFileInfo(entry, logger, omitFromScan: (quickScan ? Hash.DeepHashes : 0x0));
 							usedInternally &= RebuildIndividualFile(rom, entry, outDir, tempSubDir, date, inverse, outputFormat,
 								romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
 						}
@@ -431,7 +431,7 @@ namespace SabreTools.Helper.Dats
 					// Otherwise, just get the info on the file itself
 					else if (File.Exists(file))
 					{
-						Rom rom = FileTools.GetFileInfo(file, logger, noMD5: quickScan, noSHA1: quickScan);
+						Rom rom = FileTools.GetFileInfo(file, logger, omitFromScan: (quickScan ? Hash.DeepHashes : 0x0));
 						usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
 							romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
 					}
@@ -914,7 +914,7 @@ namespace SabreTools.Helper.Dats
 			foreach (string input in inputs)
 			{
 				// TODO: Eventually migrate noSHA256 to quickScan instead of true
-				PopulateFromDir(input, quickScan /* noMD5 */, quickScan /* noSHA1 */, true /* noSHA256 */, true /* bare */, false /* archivesAsFiles */,
+				PopulateFromDir(input, (quickScan ? Hash.DeepHashes : 0x0) /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, tempDir /* tempDir */, false /* copyFiles */,
 					headerToCheckAgainst, 4 /* maxDegreeOfParallelism */, logger);
 			}

@@ -98,6 +98,8 @@ namespace SabreTools.Helper.Dats
 				MD5 = this.MD5,
 				SHA1 = this.SHA1,
 				SHA256 = this.SHA256,
+				SHA384 = this.SHA384,
+				SHA512 = this.SHA512,
 				ItemStatus = this.ItemStatus,
 			};
 		}
@@ -127,7 +129,9 @@ namespace SabreTools.Helper.Dats
 
 			if (((String.IsNullOrEmpty(_md5) || String.IsNullOrEmpty(newOther.MD5)) || this.MD5 == newOther.MD5)
 					&& ((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(newOther.SHA1)) || this.SHA1 == newOther.SHA1)
-					&& ((String.IsNullOrEmpty(this.SHA256) || String.IsNullOrEmpty(newOther.SHA256)) || this.SHA256 == newOther.SHA256))
+					&& ((String.IsNullOrEmpty(this.SHA256) || String.IsNullOrEmpty(newOther.SHA256)) || this.SHA256 == newOther.SHA256)
+					&& ((String.IsNullOrEmpty(this.SHA384) || String.IsNullOrEmpty(newOther.SHA384)) || this.SHA384 == newOther.SHA384)
+					&& ((String.IsNullOrEmpty(this.SHA512) || String.IsNullOrEmpty(newOther.SHA512)) || this.SHA256 == newOther.SHA512))
 			{
 				dupefound = true;
 			}

@@ -88,7 +88,8 @@ namespace SabreTools.Helper.Dats
 			{
 				ext = ext.Substring(1);
 			}
-			if (ext != "dat" && ext != "csv" && ext != "md5" && ext != "sfv" && ext != "sha1" && ext != "sha256" && ext != "tsv" && ext != "txt" && ext != "xml")
+			if (ext != "dat" && ext != "csv" && ext != "md5" && ext != "sfv" && ext != "sha1" && ext != "sha256"
+				&& ext != "sha384" && ext != "sha512" && ext != "tsv" && ext != "txt" && ext != "xml")
 			{
 				return;
 			}
@@ -129,6 +130,12 @@ namespace SabreTools.Helper.Dats
 					break;
 				case DatFormat.RedumpSHA256:
 					ParseRedumpSHA256(filename, sysid, srcid, filter, trim, single, root, logger, clean);
+					break;
+				case DatFormat.RedumpSHA384:
+					ParseRedumpSHA384(filename, sysid, srcid, filter, trim, single, root, logger, clean);
+					break;
+				case DatFormat.RedumpSHA512:
+					ParseRedumpSHA512(filename, sysid, srcid, filter, trim, single, root, logger, clean);
 					break;
 				case DatFormat.RomCenter:
 					ParseRC(filename, sysid, srcid, filter, trim, single, root, logger, clean, descAsName);
@@ -493,6 +500,20 @@ namespace SabreTools.Helper.Dats
 								i++;
 								((Rom)item).SHA256 = gc[i].Replace("\"", "").ToLowerInvariant();
 							}
+
+							// Get the SHA384 from the next part
+							else if (gc[i] == "sha384")
+							{
+								i++;
+								((Rom)item).SHA384 = gc[i].Replace("\"", "").ToLowerInvariant();
+							}
+
+							// Get the SHA512 from the next part
+							else if (gc[i] == "sha512")
+							{
+								i++;
+								((Rom)item).SHA512 = gc[i].Replace("\"", "").ToLowerInvariant();
+							}
 						}
 
 						// Now process and add the rom
@@ -621,6 +642,34 @@ namespace SabreTools.Helper.Dats
 									i++;
 									quoteless = gc[i].Replace("\"", "");
 									((Disk)item).SHA256 = quoteless.ToLowerInvariant();
+								}
+								break;
+							case "sha384":
+								if (item.Type == ItemType.Rom)
+								{
+									i++;
+									quoteless = gc[i].Replace("\"", "");
+									((Rom)item).SHA384 = quoteless.ToLowerInvariant();
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									i++;
+									quoteless = gc[i].Replace("\"", "");
+									((Disk)item).SHA384 = quoteless.ToLowerInvariant();
+								}
+								break;
+							case "sha512":
+								if (item.Type == ItemType.Rom)
+								{
+									i++;
+									quoteless = gc[i].Replace("\"", "");
+									((Rom)item).SHA512 = quoteless.ToLowerInvariant();
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									i++;
+									quoteless = gc[i].Replace("\"", "");
+									((Disk)item).SHA512 = quoteless.ToLowerInvariant();
 								}
 								break;
 							case "status":
@@ -978,6 +1027,18 @@ namespace SabreTools.Helper.Dats
 							case "sha-256 hash":
 								columns.Add("DatItem.SHA256");
 								break;
+							case "sha384":
+							case "sha-384":
+							case "sha384 hash":
+							case "sha-384 hash":
+								columns.Add("DatItem.SHA384");
+								break;
+							case "sha512":
+							case "sha-512":
+							case "sha512 hash":
+							case "sha-512 hash":
+								columns.Add("DatItem.SHA512");
+								break;
 							case "nodump":
 							case "no dump":
 							case "status":
@@ -1001,7 +1062,8 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Set the output item information
-				string machineName = null, machineDesc = null, name = null, crc = null, md5 = null, sha1 = null, sha256 = null;
+				string machineName = null, machineDesc = null, name = null, crc = null, md5 = null, sha1 = null,
+					sha256 = null, sha384 = null, sha512 = null;
 				long size = -1;
 				ItemType itemType = ItemType.Rom;
 				ItemStatus status = ItemStatus.None;
@@ -1073,6 +1135,12 @@ namespace SabreTools.Helper.Dats
 						case "DatItem.SHA256":
 							sha256 = value;
 							break;
+						case "DatItem.SHA384":
+							sha384 = value;
+							break;
+						case "DatItem.SHA512":
+							sha512 = value;
+							break;
 						case "DatItem.Nodump":
 							switch (value.ToLowerInvariant())
 							{
@@ -1137,6 +1205,8 @@ namespace SabreTools.Helper.Dats
 							MD5 = md5,
 							SHA1 = sha1,
 							SHA256 = sha256,
+							SHA384 = sha384,
+							SHA512 = sha512,
 
 							Machine = new Machine()
 							{
@@ -1172,6 +1242,8 @@ namespace SabreTools.Helper.Dats
 							MD5 = md5,
 							SHA1 = sha1,
 							SHA256 = sha256,
+							SHA384 = sha384,
+							SHA512 = sha512,
 
 							Machine = new Machine()
 							{
@@ -2107,6 +2179,8 @@ namespace SabreTools.Helper.Dats
 													MD5 = subreader.GetAttribute("md5")?.ToLowerInvariant(),
 													SHA1 = subreader.GetAttribute("sha1")?.ToLowerInvariant(),
 													SHA256 = subreader.GetAttribute("sha256")?.ToLowerInvariant(),
+													SHA384 = subreader.GetAttribute("sha384")?.ToLowerInvariant(),
+													SHA512 = subreader.GetAttribute("sha512")?.ToLowerInvariant(),
 													MergeTag = merge,
 													ItemStatus = its,
 
@@ -2136,6 +2210,8 @@ namespace SabreTools.Helper.Dats
 													MD5 = subreader.GetAttribute("md5")?.ToLowerInvariant(),
 													SHA1 = subreader.GetAttribute("sha1")?.ToLowerInvariant(),
 													SHA256 = subreader.GetAttribute("sha256")?.ToLowerInvariant(),
+													SHA384 = subreader.GetAttribute("sha384")?.ToLowerInvariant(),
+													SHA512 = subreader.GetAttribute("sha512")?.ToLowerInvariant(),
 													ItemStatus = its,
 													MergeTag = merge,
 													Date = date,
@@ -2302,6 +2378,8 @@ namespace SabreTools.Helper.Dats
 										MD5 = xtr.GetAttribute("md5")?.ToLowerInvariant(),
 										SHA1 = xtr.GetAttribute("sha1")?.ToLowerInvariant(),
 										SHA256 = xtr.GetAttribute("sha256")?.ToLowerInvariant(),
+										SHA384 = xtr.GetAttribute("sha384")?.ToLowerInvariant(),
+										SHA512 = xtr.GetAttribute("sha512")?.ToLowerInvariant(),
 										ItemStatus = its,
 
 										Machine = dir,
@@ -2321,6 +2399,8 @@ namespace SabreTools.Helper.Dats
 										MD5 = xtr.GetAttribute("md5")?.ToLowerInvariant(),
 										SHA1 = xtr.GetAttribute("sha1")?.ToLowerInvariant(),
 										SHA256 = xtr.GetAttribute("sha256")?.ToLowerInvariant(),
+										SHA384 = xtr.GetAttribute("sha384")?.ToLowerInvariant(),
+										SHA512 = xtr.GetAttribute("sha512")?.ToLowerInvariant(),
 										ItemStatus = its,
 										Date = date,
 
@@ -2604,6 +2684,130 @@ namespace SabreTools.Helper.Dats
 		}
 
 		/// <summary>
+		/// Parse a Redump SHA-256 and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="filter">Filter object for passing to the DatItem level</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		private void ParseRedumpSHA384(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Rom filtering
+			Filter filter,
+
+			// Rom renaming
+			bool trim,
+			bool single,
+			string root,
+
+			// Miscellaneous
+			Logger logger,
+			bool clean)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				Rom rom = new Rom
+				{
+					Name = line.Split(' ')[1].Replace("*", String.Empty),
+					Size = -1,
+					SHA384 = line.Split(' ')[0],
+					ItemStatus = ItemStatus.None,
+
+					Machine = new Machine
+					{
+						Name = Path.GetFileNameWithoutExtension(filename),
+					},
+
+					SystemID = sysid,
+					SourceID = srcid,
+				};
+
+				// Now process and add the rom
+				string key = "";
+				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+			}
+
+			sr.Dispose();
+		}
+
+		/// <summary>
+		/// Parse a Redump SHA-512 and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="filter">Filter object for passing to the DatItem level</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		private void ParseRedumpSHA512(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Rom filtering
+			Filter filter,
+
+			// Rom renaming
+			bool trim,
+			bool single,
+			string root,
+
+			// Miscellaneous
+			Logger logger,
+			bool clean)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				Rom rom = new Rom
+				{
+					Name = line.Split(' ')[1].Replace("*", String.Empty),
+					Size = -1,
+					SHA512 = line.Split(' ')[0],
+					ItemStatus = ItemStatus.None,
+
+					Machine = new Machine
+					{
+						Name = Path.GetFileNameWithoutExtension(filename),
+					},
+
+					SystemID = sysid,
+					SourceID = srcid,
+				};
+
+				// Now process and add the rom
+				string key = "";
+				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+			}
+
+			sr.Dispose();
+		}
+
+		/// <summary>
 		/// Parse a RomCenter DAT and return all found games and roms within
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
@@ -2816,19 +3020,25 @@ namespace SabreTools.Helper.Dats
 				itemRom.MD5 = Style.CleanHashData(itemRom.MD5, Constants.MD5Length);
 				itemRom.SHA1 = Style.CleanHashData(itemRom.SHA1, Constants.SHA1Length);
 				itemRom.SHA256 = Style.CleanHashData(itemRom.SHA256, Constants.SHA256Length);
+				itemRom.SHA384 = Style.CleanHashData(itemRom.SHA384, Constants.SHA384Length);
+				itemRom.SHA512 = Style.CleanHashData(itemRom.SHA512, Constants.SHA512Length);
 
 				// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 				if ((itemRom.Size == 0 || itemRom.Size == -1)
 					&& ((itemRom.CRC == Constants.CRCZero || String.IsNullOrEmpty(itemRom.CRC))
 						|| itemRom.MD5 == Constants.MD5Zero
 						|| itemRom.SHA1 == Constants.SHA1Zero
-						|| itemRom.SHA256 == Constants.SHA256Zero))
+						|| itemRom.SHA256 == Constants.SHA256Zero
+						|| itemRom.SHA384 == Constants.SHA384Zero
+						|| itemRom.SHA512 == Constants.SHA512Zero))
 				{
 					itemRom.Size = Constants.SizeZero;
 					itemRom.CRC = Constants.CRCZero;
 					itemRom.MD5 = Constants.MD5Zero;
 					itemRom.SHA1 = Constants.SHA1Zero;
 					itemRom.SHA256 = Constants.SHA256Zero;
+					itemRom.SHA384 = Constants.SHA384Zero;
+					itemRom.SHA512 = Constants.SHA512Zero;
 				}
 				// If the file has no size and it's not the above case, skip and log
 				else if (itemRom.ItemStatus != ItemStatus.Nodump && (itemRom.Size == 0 || itemRom.Size == -1))
@@ -2842,7 +3052,9 @@ namespace SabreTools.Helper.Dats
 					&& String.IsNullOrEmpty(itemRom.CRC)
 					&& String.IsNullOrEmpty(itemRom.MD5)
 					&& String.IsNullOrEmpty(itemRom.SHA1)
-					&& String.IsNullOrEmpty(itemRom.SHA256))
+					&& String.IsNullOrEmpty(itemRom.SHA256)
+					&& String.IsNullOrEmpty(itemRom.SHA384)
+					&& String.IsNullOrEmpty(itemRom.SHA512))
 				{
 					logger.Verbose("Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
 					itemRom.ItemStatus = ItemStatus.Nodump;
@@ -2858,12 +3070,16 @@ namespace SabreTools.Helper.Dats
 				itemDisk.MD5 = Style.CleanHashData(itemDisk.MD5, Constants.MD5Length);
 				itemDisk.SHA1 = Style.CleanHashData(itemDisk.SHA1, Constants.SHA1Length);
 				itemDisk.SHA256 = Style.CleanHashData(itemDisk.SHA256, Constants.SHA256Length);
+				itemDisk.SHA384 = Style.CleanHashData(itemDisk.SHA384, Constants.SHA384Length);
+				itemDisk.SHA512 = Style.CleanHashData(itemDisk.SHA512, Constants.SHA512Length);
 
 				// If the file has aboslutely no hashes, skip and log
 				if (itemDisk.ItemStatus != ItemStatus.Nodump
 					&& String.IsNullOrEmpty(itemDisk.MD5)
 					&& String.IsNullOrEmpty(itemDisk.SHA1)
-					&& String.IsNullOrEmpty(itemDisk.SHA256))
+					&& String.IsNullOrEmpty(itemDisk.SHA256)
+					&& String.IsNullOrEmpty(itemDisk.SHA384)
+					&& String.IsNullOrEmpty(itemDisk.SHA512))
 				{
 					logger.Verbose("Incomplete entry for \"" + itemDisk.Name + "\" will be output as nodump");
 					itemDisk.ItemStatus = ItemStatus.Nodump;
@@ -2912,6 +3128,8 @@ namespace SabreTools.Helper.Dats
 						MD5Count += (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
 						SHA1Count += (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
 						SHA256Count += (String.IsNullOrEmpty(((Disk)item).SHA256) ? 0 : 1);
+						SHA384Count += (String.IsNullOrEmpty(((Disk)item).SHA384) ? 0 : 1);
+						SHA512Count += (String.IsNullOrEmpty(((Disk)item).SHA512) ? 0 : 1);
 						BaddumpCount += (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
 						NodumpCount += (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
 						break;
@@ -2925,6 +3143,8 @@ namespace SabreTools.Helper.Dats
 						MD5Count += (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
 						SHA1Count += (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
 						SHA256Count += (String.IsNullOrEmpty(((Rom)item).SHA256) ? 0 : 1);
+						SHA384Count += (String.IsNullOrEmpty(((Rom)item).SHA384) ? 0 : 1);
+						SHA512Count += (String.IsNullOrEmpty(((Rom)item).SHA512) ? 0 : 1);
 						BaddumpCount += (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
 						NodumpCount += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
 						break;

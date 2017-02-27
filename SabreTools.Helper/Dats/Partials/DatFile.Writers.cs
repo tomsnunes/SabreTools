@@ -180,7 +180,9 @@ namespace SabreTools.Helper.Dats
 								&& ((Rom)rom).CRC == "null"
 								&& ((Rom)rom).MD5 == "null"
 								&& ((Rom)rom).SHA1 == "null"
-								&& ((Rom)rom).SHA256 == "null")
+								&& ((Rom)rom).SHA256 == "null"
+								&& ((Rom)rom).SHA384 == "null"
+								&& ((Rom)rom).SHA512 == "null")
 							{
 								logger.Verbose("Empty folder found: " + rom.Machine.Name);
 
@@ -196,6 +198,8 @@ namespace SabreTools.Helper.Dats
 									((Rom)rom).MD5 = Constants.MD5Zero;
 									((Rom)rom).SHA1 = Constants.SHA1Zero;
 									((Rom)rom).SHA256 = Constants.SHA256Zero;
+									((Rom)rom).SHA384 = Constants.SHA384Zero;
+									((Rom)rom).SHA512 = Constants.SHA512Zero;
 								}
 
 								// Otherwise, set the new path and such, write out, and continue
@@ -696,6 +700,8 @@ namespace SabreTools.Helper.Dats
 									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5 " + ((Disk)rom).MD5.ToLowerInvariant() : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1 " + ((Disk)rom).SHA1.ToLowerInvariant() : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA256) ? " sha256 " + ((Disk)rom).SHA256.ToLowerInvariant() : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA384) ? " sha384 " + ((Disk)rom).SHA384.ToLowerInvariant() : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA512) ? " sha512 " + ((Disk)rom).SHA512.ToLowerInvariant() : "")
 									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " flags " + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() : "")
 									+ " )\n";
 								break;
@@ -716,6 +722,8 @@ namespace SabreTools.Helper.Dats
 									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5 " + ((Rom)rom).MD5.ToLowerInvariant() : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1 " + ((Rom)rom).SHA1.ToLowerInvariant() : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).SHA256) ? " sha256 " + ((Rom)rom).SHA256.ToLowerInvariant() : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA384) ? " sha384 " + ((Rom)rom).SHA384.ToLowerInvariant() : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA512) ? " sha512 " + ((Rom)rom).SHA512.ToLowerInvariant() : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date \"" + ((Rom)rom).Date + "\"" : "")
 									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " flags " + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() : "")
 									+ " )\n";
@@ -747,6 +755,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", ((Rom)rom).MD5)
 								.Replace("%sha1%", ((Rom)rom).SHA1)
 								.Replace("%sha256%", ((Rom)rom).SHA256)
+								.Replace("%sha384%", ((Rom)rom).SHA384)
+								.Replace("%sha512%", ((Rom)rom).SHA512)
 								.Replace("%size%", ((Rom)rom).Size.ToString());
 							post = post
 								.Replace("%game%", rom.Machine.Name)
@@ -755,6 +765,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", ((Rom)rom).MD5)
 								.Replace("%sha1%", ((Rom)rom).SHA1)
 								.Replace("%sha256%", ((Rom)rom).SHA256)
+								.Replace("%sha384%", ((Rom)rom).SHA384)
+								.Replace("%sha512%", ((Rom)rom).SHA512)
 								.Replace("%size%", ((Rom)rom).Size.ToString());
 						}
 						else if (rom.Type == ItemType.Disk)
@@ -767,6 +779,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", ((Disk)rom).MD5)
 								.Replace("%sha1%", ((Disk)rom).SHA1)
 								.Replace("%sha256%", ((Disk)rom).SHA256)
+								.Replace("%sha384%", ((Disk)rom).SHA384)
+								.Replace("%sha512%", ((Disk)rom).SHA512)
 								.Replace("%size%", string.Empty);;
 							post = post
 								.Replace("%game%", rom.Machine.Name)
@@ -775,6 +789,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", ((Disk)rom).MD5)
 								.Replace("%sha1%", ((Disk)rom).SHA1)
 								.Replace("%sha256%", ((Disk)rom).SHA256)
+								.Replace("%sha384%", ((Disk)rom).SHA384)
+								.Replace("%sha512%", ((Disk)rom).SHA512)
 								.Replace("%size%", string.Empty);;
 						}
 						else
@@ -811,6 +827,8 @@ namespace SabreTools.Helper.Dats
 								+ ",\"" + ((Rom)rom).MD5 + "\""
 								+ ",\"" + ((Rom)rom).SHA1 + "\""
 								+ ",\"" + ((Rom)rom).SHA256 + "\""
+								// + ",\"" + ((Rom)rom).SHA384 + "\""
+								// + ",\"" + ((Rom)rom).SHA512 + "\""
 								+ "," + (((Rom)rom).ItemStatus != ItemStatus.None ? "\"" + ((Rom)rom).ItemStatus.ToString() + "\"" : "\"\"");
 							state += pre + inline + post + "\n";
 						}
@@ -829,6 +847,8 @@ namespace SabreTools.Helper.Dats
 								+ ",\"" + ((Disk)rom).MD5 + "\""
 								+ ",\"" + ((Disk)rom).SHA1 + "\""
 								+ ",\"" + ((Disk)rom).SHA256 + "\""
+								// + ",\"" + ((Rom)rom).SHA384 + "\""
+								// + ",\"" + ((Rom)rom).SHA512 + "\""
 								+ "," + (((Disk)rom).ItemStatus != ItemStatus.None ? "\"" + ((Disk)rom).ItemStatus.ToString() + "\"" : "\"\"");
 							state += pre + inline + post + "\n";
 						}
@@ -872,6 +892,8 @@ namespace SabreTools.Helper.Dats
 									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA256) ? " sha256=\"" + ((Disk)rom).SHA256.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA384) ? " sha384=\"" + ((Disk)rom).SHA384.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA512) ? " sha512=\"" + ((Disk)rom).SHA512.ToLowerInvariant() + "\"" : "")
 									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 									+ "/>\n";
 								break;
@@ -892,6 +914,8 @@ namespace SabreTools.Helper.Dats
 									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).SHA256) ? " sha256=\"" + ((Rom)rom).SHA256.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA384) ? " sha384=\"" + ((Rom)rom).SHA384.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA512) ? " sha512=\"" + ((Rom)rom).SHA512.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
 									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 									+ "/>\n";
@@ -916,6 +940,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", ((Rom)rom).MD5)
 								.Replace("%sha1%", ((Rom)rom).SHA1)
 								.Replace("%sha256%", ((Rom)rom).SHA256)
+								.Replace("%sha384%", ((Rom)rom).SHA384)
+								.Replace("%sha512%", ((Rom)rom).SHA512)
 								.Replace("%size%", ((Rom)rom).Size.ToString());
 							post = post
 								.Replace("%game%", rom.Machine.Name)
@@ -924,6 +950,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", ((Rom)rom).MD5)
 								.Replace("%sha1%", ((Rom)rom).SHA1)
 								.Replace("%sha256%", ((Rom)rom).SHA256)
+								.Replace("%sha384%", ((Rom)rom).SHA384)
+								.Replace("%sha512%", ((Rom)rom).SHA512)
 								.Replace("%size%", ((Rom)rom).Size.ToString());
 						}
 						else if (rom.Type == ItemType.Disk)
@@ -936,6 +964,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", ((Disk)rom).MD5)
 								.Replace("%sha1%", ((Disk)rom).SHA1)
 								.Replace("%sha256%", ((Disk)rom).SHA256)
+								.Replace("%sha384%", ((Disk)rom).SHA384)
+								.Replace("%sha512%", ((Disk)rom).SHA512)
 								.Replace("%size%", string.Empty);
 							post = post
 								.Replace("%game%", rom.Machine.Name)
@@ -944,6 +974,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", ((Disk)rom).MD5)
 								.Replace("%sha1%", ((Disk)rom).SHA1)
 								.Replace("%sha256%", ((Disk)rom).SHA256)
+								.Replace("%sha384%", ((Disk)rom).SHA384)
+								.Replace("%sha512%", ((Disk)rom).SHA512)
 								.Replace("%size%", string.Empty);
 						}
 						else
@@ -1112,6 +1144,26 @@ namespace SabreTools.Helper.Dats
 							state += ((Disk)rom).SHA256 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
+					case DatFormat.RedumpSHA384:
+						if (rom.Type == ItemType.Rom)
+						{
+							state += ((Rom)rom).SHA384 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+						}
+						else if (rom.Type == ItemType.Disk)
+						{
+							state += ((Disk)rom).SHA384 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+						}
+						break;
+					case DatFormat.RedumpSHA512:
+						if (rom.Type == ItemType.Rom)
+						{
+							state += ((Rom)rom).SHA512 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+						}
+						else if (rom.Type == ItemType.Disk)
+						{
+							state += ((Disk)rom).SHA512 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+						}
+						break;
 					case DatFormat.RomCenter:
 						if (rom.Type == ItemType.Rom)
 						{
@@ -1161,6 +1213,8 @@ namespace SabreTools.Helper.Dats
 									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA256) ? " sha256=\"" + ((Disk)rom).SHA256.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA384) ? " sha384=\"" + ((Disk)rom).SHA384.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA512) ? " sha512=\"" + ((Disk)rom).SHA512.ToLowerInvariant() + "\"" : "")
 									+ (((Disk)rom).ItemStatus != ItemStatus.None ? prefix + "/>\n" + prefix + "\t<flags>\n" +
 										prefix + "\t\t<flag name=\"status\" value=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"/>\n" +
 										prefix + "\t</flags>\n" +
@@ -1183,6 +1237,8 @@ namespace SabreTools.Helper.Dats
 									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).SHA256) ? " sha256=\"" + ((Rom)rom).SHA256.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA384) ? " sha384=\"" + ((Rom)rom).SHA384.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA512) ? " sha512=\"" + ((Rom)rom).SHA512.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
 									+ (((Rom)rom).ItemStatus != ItemStatus.None ? prefix + "/>\n" + prefix + "\t<flags>\n" +
 										prefix + "\t\t<flag name=\"status\" value=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"/>\n" +
@@ -1230,6 +1286,8 @@ namespace SabreTools.Helper.Dats
 									+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Disk)rom).SHA256) ? " sha256=\"" + ((Disk)rom).SHA256.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA384) ? " sha384=\"" + ((Disk)rom).SHA384.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Disk)rom).SHA512) ? " sha512=\"" + ((Disk)rom).SHA512.ToLowerInvariant() + "\"" : "")
 									+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 									+ "/>\n"
 									+ "\t\t\t</diskarea>\n";
@@ -1256,6 +1314,8 @@ namespace SabreTools.Helper.Dats
 									+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).SHA256) ? " sha256=\"" + ((Rom)rom).SHA256.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA384) ? " sha384=\"" + ((Rom)rom).SHA384.ToLowerInvariant() + "\"" : "")
+									+ (!String.IsNullOrEmpty(((Rom)rom).SHA512) ? " sha512=\"" + ((Rom)rom).SHA512.ToLowerInvariant() + "\"" : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
 									+ (((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 									+ "/>\n"
@@ -1292,6 +1352,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", ((Rom)rom).MD5)
 								.Replace("%sha1%", ((Rom)rom).SHA1)
 								.Replace("%sha256%", ((Rom)rom).SHA256)
+								.Replace("%sha384%", ((Rom)rom).SHA384)
+								.Replace("%sha512%", ((Rom)rom).SHA512)
 								.Replace("%size%", ((Rom)rom).Size.ToString());
 							post = post
 								.Replace("%game%", rom.Machine.Name)
@@ -1300,6 +1362,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", ((Rom)rom).MD5)
 								.Replace("%sha1%", ((Rom)rom).SHA1)
 								.Replace("%sha256%", ((Rom)rom).SHA256)
+								.Replace("%sha384%", ((Rom)rom).SHA384)
+								.Replace("%sha512%", ((Rom)rom).SHA512)
 								.Replace("%size%", ((Rom)rom).Size.ToString());
 						}
 						else if (rom.Type == ItemType.Disk)
@@ -1312,6 +1376,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", ((Disk)rom).MD5)
 								.Replace("%sha1%", ((Disk)rom).SHA1)
 								.Replace("%sha256%", ((Disk)rom).SHA256)
+								.Replace("%sha384%", ((Disk)rom).SHA384)
+								.Replace("%sha512%", ((Disk)rom).SHA512)
 								.Replace("%size%", string.Empty);
 							post = post
 								.Replace("%game%", rom.Machine.Name)
@@ -1320,6 +1386,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", ((Disk)rom).MD5)
 								.Replace("%sha1%", ((Disk)rom).SHA1)
 								.Replace("%sha256%", ((Disk)rom).SHA256)
+								.Replace("%sha384%", ((Disk)rom).SHA384)
+								.Replace("%sha512%", ((Disk)rom).SHA512)
 								.Replace("%size%", string.Empty);;
 						}
 						else
@@ -1332,6 +1400,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", string.Empty)
 								.Replace("%sha1%", string.Empty)
 								.Replace("%sha256%", string.Empty)
+								.Replace("%sha384%", string.Empty)
+								.Replace("%sha512%", string.Empty)
 								.Replace("%size%", string.Empty);
 							post = post
 								.Replace("%game%", rom.Machine.Name)
@@ -1340,6 +1410,8 @@ namespace SabreTools.Helper.Dats
 								.Replace("%md5%", string.Empty)
 								.Replace("%sha1%", string.Empty)
 								.Replace("%sha256%", string.Empty)
+								.Replace("%sha384%", string.Empty)
+								.Replace("%sha512%", string.Empty)
 								.Replace("%size%", string.Empty);;
 						}
 						
@@ -1359,6 +1431,8 @@ namespace SabreTools.Helper.Dats
 								+ "\t\"" + ((Rom)rom).MD5 + "\""
 								+ "\t\"" + ((Rom)rom).SHA1 + "\""
 								+ "\t\"" + ((Rom)rom).SHA256 + "\""
+								// + "\t\"" + ((Rom)rom).SHA384 + "\""
+								// + "\t\"" + ((Rom)rom).SHA512 + "\""
 								+ "\t" + (((Rom)rom).ItemStatus != ItemStatus.None ? "\"" + ((Rom)rom).ItemStatus.ToString() + "\"" : "\"\"");
 							state += pre + inline + post + "\n";
 						}
@@ -1377,6 +1451,8 @@ namespace SabreTools.Helper.Dats
 								+ "\t\"" + ((Disk)rom).MD5 + "\""
 								+ "\t\"" + ((Disk)rom).SHA1 + "\""
 								+ "\t\"" + ((Disk)rom).SHA256 + "\""
+								// + "\t\"" + ((Disk)rom).SHA384 + "\""
+								// + "\t\"" + ((Disk)rom).SHA512 + "\""
 								+ "\t" + (((Disk)rom).ItemStatus != ItemStatus.None ? "\"" + ((Disk)rom).ItemStatus.ToString() + "\"" : "\"\"");
 							state += pre + inline + post + "\n";
 						}
