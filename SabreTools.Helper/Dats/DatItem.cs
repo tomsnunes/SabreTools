@@ -337,8 +337,59 @@ namespace SabreTools.Helper.Dats
 		{
 			string key = null;
 
+			// If all items are supposed to have a SHA-512, we sort by that
+			if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA512Count
+				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA512))
+					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA512))))
+			{
+				if (_itemType == ItemType.Rom)
+				{
+					key = ((Rom)this).SHA512;
+					datdata.BucketBySHA512(false, logger, false);
+				}
+				else
+				{
+					key = ((Disk)this).SHA512;
+					datdata.BucketBySHA512(false, logger, false);
+				}
+			}
+
+			// If all items are supposed to have a SHA-384, we sort by that
+			else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA384Count
+				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA384))
+					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA384))))
+			{
+				if (_itemType == ItemType.Rom)
+				{
+					key = ((Rom)this).SHA384;
+					datdata.BucketBySHA384(false, logger, false);
+				}
+				else
+				{
+					key = ((Disk)this).SHA384;
+					datdata.BucketBySHA384(false, logger, false);
+				}
+			}
+
+			// If all items are supposed to have a SHA-256, we sort by that
+			else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA256Count
+				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA256))
+					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA256))))
+			{
+				if (_itemType == ItemType.Rom)
+				{
+					key = ((Rom)this).SHA256;
+					datdata.BucketBySHA256(false, logger, false);
+				}
+				else
+				{
+					key = ((Disk)this).SHA256;
+					datdata.BucketBySHA256(false, logger, false);
+				}
+			}
+
 			// If all items are supposed to have a SHA-1, we sort by that
-			if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA1Count
+			else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA1Count
 				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA1))
 					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA1))))
 			{
