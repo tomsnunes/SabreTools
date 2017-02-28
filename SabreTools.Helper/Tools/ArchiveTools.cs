@@ -594,7 +594,7 @@ namespace SabreTools.Helper.Tools
 			}
 
 			// Check if the name is the right length
-			if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}\.gz"))
+			if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}\.gz")) // TODO: When updating to SHA-256, this needs to update to Constants.SHA256Length
 			{
 				logger.Warning("Non SHA-1 filename found, skipping: '" + Path.GetFullPath(input) + "'");
 				return null;
@@ -647,7 +647,7 @@ namespace SabreTools.Helper.Tools
 				Size = extractedsize,
 				CRC = gzcrc.ToLowerInvariant(),
 				MD5 = gzmd5.ToLowerInvariant(),
-				SHA1 = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
+				SHA1 = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(), // TODO: When updating to SHA-256, this needs to update to SHA256
 
 				Machine = new Machine
 				{
@@ -1325,8 +1325,8 @@ namespace SabreTools.Helper.Tools
 			// If we have a romba output, add the romba path
 			if (romba)
 			{
-				outfile = Path.Combine(outDir, Style.GetRombaPath(rom.SHA1));
-				
+				outfile = Path.Combine(outDir, Style.GetRombaPath(rom.SHA1)); // TODO: When updating to SHA-256, this needs to update to SHA256
+
 				// Check to see if the folder needs to be created
 				if (!Directory.Exists(Path.GetDirectoryName(outfile)))
 				{
@@ -1336,7 +1336,7 @@ namespace SabreTools.Helper.Tools
 			// Otherwise, we're just rebuilding to the main directory
 			else
 			{
-				outfile = Path.Combine(outDir, rom.SHA1 + ".gz");
+				outfile = Path.Combine(outDir, rom.SHA1 + ".gz"); // TODO: When updating to SHA-256, this needs to update to SHA256
 			}
 
 			// If the output file exists, don't try to write again
