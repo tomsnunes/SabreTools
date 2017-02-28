@@ -275,8 +275,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				string key = "";
-				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out string key);
 			}
 
 			sr.Dispose();
@@ -1863,7 +1862,7 @@ namespace SabreTools.Helper.Dats
 									case "romCRC":
 										empty = false;
 
-										ext = (subreader.GetAttribute("extension") != null ? subreader.GetAttribute("extension") : "");
+										ext = (subreader.GetAttribute("extension") ?? "");
 
 										DatItem olrom = new Rom
 										{
@@ -2245,7 +2244,7 @@ namespace SabreTools.Helper.Dats
 								Type = (Type == "" ? "SuperDAT" : Type);
 							}
 
-							string foldername = (xtr.GetAttribute("name") == null ? "" : xtr.GetAttribute("name"));
+							string foldername = (xtr.GetAttribute("name") ?? "");
 							if (foldername != "")
 							{
 								parent.Add(foldername);
@@ -2479,8 +2478,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				string key = "";
-				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out string key);
 			}
 
 			sr.Dispose();
@@ -2541,8 +2539,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				string key = "";
-				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out string key);
 			}
 
 			sr.Dispose();
@@ -2603,8 +2600,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				string key = "";
-				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out string key);
 			}
 
 			sr.Dispose();
@@ -2665,8 +2661,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				string key = "";
-				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out string key);
 			}
 
 			sr.Dispose();
@@ -2727,8 +2722,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				string key = "";
-				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out string key);
 			}
 
 			sr.Dispose();
@@ -2789,8 +2783,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				string key = "";
-				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+				ParseAddHelper(rom, filter, trim, single, root, clean, logger, out string key);
 			}
 
 			sr.Dispose();
@@ -2891,8 +2884,7 @@ namespace SabreTools.Helper.Dats
 					// If we have the split flag
 					else if (line.ToLowerInvariant().StartsWith("split="))
 					{
-						int split = 0;
-						if (Int32.TryParse(line.Split('=')[1], out split))
+						if (Int32.TryParse(line.Split('=')[1], out int split))
 						{
 							if (split == 1 && ForcePacking == ForcePacking.None)
 							{
@@ -2903,8 +2895,7 @@ namespace SabreTools.Helper.Dats
 					// If we have the merge tag
 					else if (line.ToLowerInvariant().StartsWith("merge="))
 					{
-						int merge = 0;
-						if (Int32.TryParse(line.Split('=')[1], out merge))
+						if (Int32.TryParse(line.Split('=')[1], out int merge))
 						{
 							if (merge == 1 && ForceMerging == ForceMerging.None)
 							{
@@ -2941,8 +2932,7 @@ namespace SabreTools.Helper.Dats
 						string[] rominfo = line.Split('¬');
 
 						// Try getting the size separately
-						long size = 0;
-						if (!Int64.TryParse(rominfo[7], out size))
+						if (!Int64.TryParse(rominfo[7], out long size))
 						{
 							size = 0;
 						}
@@ -2967,8 +2957,7 @@ namespace SabreTools.Helper.Dats
 						};
 
 						// Now process and add the rom
-						string key = "";
-						ParseAddHelper(rom, filter, trim, single, root, clean, logger, out key);
+						ParseAddHelper(rom, filter, trim, single, root, clean, logger, out string key);
 					}
 				}
 			}
