@@ -253,25 +253,55 @@ namespace SabreTools.Helper.Dats
 				return false;
 			}
 
-			// How about this: If RomCount + DiskCount = SHA1Count, sort by SHA1
-			// then if RomCount + DiskCount == MD5Count, sort by MD5 (or make this default for Disk)
-			// then if RomCount == CRCCount, sort by CRC (or make this default for Rom)
-
-			// We assume that we check by CRC for Rom and MD5 for Disk
+			// We want to get the proper key for the DatItem
 			string key = "";
 
-			// For Roms, we get the CRC
-			if (_itemType == ItemType.Rom)
+			// If all items are supposed to have a SHA-1, we sort by that
+			if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA1Count
+				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA1))
+					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA1))))
 			{
-				key = ((Rom)this).CRC;
-				datdata.BucketByCRC(false, logger, false);
+				if (_itemType == ItemType.Rom)
+				{
+					key = ((Rom)this).SHA1;
+					datdata.BucketBySHA1(false, logger, false);
+				}
+				else
+				{
+					key = ((Disk)this).SHA1;
+					datdata.BucketBySHA1(false, logger, false);
+				}
 			}
 
-			// For Disks, we get the MD5
+			// If all items are supposed to have an MD5, we sort by that
+			else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.MD5Count
+				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).MD5))
+					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).MD5))))
+			{
+				if (_itemType == ItemType.Rom)
+				{
+					key = ((Rom)this).MD5;
+					datdata.BucketByMD5(false, logger, false);
+				}
+				else
+				{
+					key = ((Disk)this).MD5;
+					datdata.BucketByMD5(false, logger, false);
+				}
+			}
+
+			// If we've gotten here and we have a Disk, sort by MD5
 			else if (_itemType == ItemType.Disk)
 			{
 				key = ((Disk)this).MD5;
 				datdata.BucketByMD5(false, logger, false);
+			}
+
+			// If we've gotten here and we have a Rom, sort by CRC
+			if (_itemType == ItemType.Rom)
+			{
+				key = ((Rom)this).CRC;
+				datdata.BucketByCRC(false, logger, false);
 			}
 
 			// Otherwise, we use -1 as the key
@@ -318,23 +348,57 @@ namespace SabreTools.Helper.Dats
 				return output;
 			}
 
-			// We assume that we check by CRC for Rom and MD5 for Disk
+			// We want to get the proper key for the DatItem
 			string key = "";
 
-			// For Roms, we get the CRC
+			// If all items are supposed to have a SHA-1, we sort by that
+			if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA1Count
+				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA1))
+					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA1))))
+			{
+				if (_itemType == ItemType.Rom)
+				{
+					key = ((Rom)this).SHA1;
+					datdata.BucketBySHA1(false, logger, false);
+				}
+				else
+				{
+					key = ((Disk)this).SHA1;
+					datdata.BucketBySHA1(false, logger, false);
+				}
+			}
+
+			// If all items are supposed to have an MD5, we sort by that
+			else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.MD5Count
+				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).MD5))
+					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).MD5))))
+			{
+				if (_itemType == ItemType.Rom)
+				{
+					key = ((Rom)this).MD5;
+					datdata.BucketByMD5(false, logger, false);
+				}
+				else
+				{
+					key = ((Disk)this).MD5;
+					datdata.BucketByMD5(false, logger, false);
+				}
+			}
+
+			// If we've gotten here and we have a Disk, sort by MD5
+			else if (_itemType == ItemType.Disk)
+			{
+				key = ((Disk)this).MD5;
+				datdata.BucketByMD5(false, logger, false);
+			}
+
+			// If we've gotten here and we have a Rom, sort by CRC
 			if (_itemType == ItemType.Rom)
 			{
 				key = ((Rom)this).CRC;
 				datdata.BucketByCRC(false, logger, false);
 			}
 
-			// For Disks, we get the MD5
-			else if (_itemType == ItemType.Disk)
-			{
-				key = ((Disk)this).MD5;
-				datdata.BucketByMD5(false, logger, false);
-			}
-			
 			// Otherwise, we use -1 as the key
 			else
 			{
