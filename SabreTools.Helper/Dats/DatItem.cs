@@ -559,7 +559,7 @@ namespace SabreTools.Helper.Dats
 						Disk disk = (Disk)datItem;
 						disk.Name += "_" + (!String.IsNullOrEmpty(disk.MD5) ? disk.MD5 : disk.SHA1);
 						datItem = disk;
-						lastrenamed = lastrenamed == null ? datItem.Name : lastrenamed;
+						lastrenamed = lastrenamed ?? datItem.Name;
 					}
 					else if (datItem.Type == ItemType.Rom)
 					{
@@ -568,7 +568,7 @@ namespace SabreTools.Helper.Dats
 							!String.IsNullOrEmpty(rom.MD5) ? rom.MD5 :
 								!String.IsNullOrEmpty(rom.SHA1) ? rom.SHA1 : "(alt)");
 						datItem = rom;
-						lastrenamed = lastrenamed == null ? datItem.Name : lastrenamed;
+						lastrenamed = lastrenamed ?? datItem.Name;
 					}
 
 					// If we have a conflict with the last renamed item, do the right thing

@@ -13,11 +13,13 @@ namespace SabreTools
 		{
 			// Create and add the header to the Help object
 			string barrier = "-----------------------------------------";
-			List<string> helpHeader = new List<string>();
-			helpHeader.Add(Resources.SabreTools_Name + " - " + Resources.SabreTools_Desc);
-			helpHeader.Add(barrier);
-			helpHeader.Add(Resources.Usage + ": " + Resources.SabreTools_Name + " [option] [flags] [filename|dirname] ...");
-			helpHeader.Add("");
+			List<string> helpHeader = new List<string>()
+			{
+				Resources.SabreTools_Name + " - " + Resources.SabreTools_Desc,
+				barrier,
+				Resources.Usage + ": " + Resources.SabreTools_Name + " [option] [flags] [filename|dirname] ...",
+				""
+			};
 			Help help = new Help(helpHeader);
 
 			// Create the Help feature
