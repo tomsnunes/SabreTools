@@ -54,17 +54,17 @@ namespace SabreTools
 				null));
 			datFromDir.AddFeature("noSHA256", new Feature(
 				new List<string>() { "-ns256", "--noSHA256" },
-				"Don't include SHA-256 in output",
+				"Include SHA-256 in output", // TODO: Invert this later
 				FeatureType.Flag,
 				null));
 			datFromDir.AddFeature("noSHA384", new Feature(
 				new List<string>() { "-ns384", "--noSHA384" },
-				"Don't include SHA-384 in output",
+				"Include SHA-384 in output", // TODO: Invert this later
 				FeatureType.Flag,
 				null));
 			datFromDir.AddFeature("noSHA512", new Feature(
 				new List<string>() { "-ns512", "--noSHA512" },
-				"Don't include SHA-512 in output",
+				"Include SHA-512 in output", // TODO: Invert this later
 				FeatureType.Flag,
 				null));
 			datFromDir.AddFeature("bare", new Feature(

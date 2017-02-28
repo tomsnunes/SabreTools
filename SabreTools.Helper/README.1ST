@@ -159,17 +159,17 @@ Options:
 			This allows the user to skip calculating the SHA-1 for each of the files which will
 			speed up the creation of the DAT.
 
-		-ns256, --noSHA256	Don't include SHA-256 in output
-			This allows the user to skip calculating the SHA-256 for each of the files which will
-			speed up the creation of the DAT.
+		-ns256, --noSHA256	Include SHA-256 in output
+			This allows the user to include calculating the SHA-256 for each of the files which will
+			speed up the creation of the DAT. (Will be inverted later)
 			
-		-ns384, --noSHA384	Don't include SHA-384 in output
-			This allows the user to skip calculating the SHA-384 for each of the files which will
-			speed up the creation of the DAT.
+		-ns384, --noSHA384	Include SHA-384 in output
+			This allows the user to include calculating the SHA-384 for each of the files which will
+			speed up the creation of the DAT. (Will be inverted later)
 			
-		-ns512, --noSHA512	Don't include SHA-512 in output
-			This allows the user to skip calculating the SHA-512 for each of the files which will
-			speed up the creation of the DAT.
+		-ns512, --noSHA512	Include SHA-512 in output
+			This allows the user to include calculating the SHA-512 for each of the files which will
+			speed up the creation of the DAT. (Will be inverted later)
 			
 		-b, --bare			Don't include date in file name
 			Normally, the DAT will be created with the date in the file name. This flag removes
