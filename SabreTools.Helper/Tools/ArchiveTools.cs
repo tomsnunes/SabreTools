@@ -594,7 +594,7 @@ namespace SabreTools.Helper.Tools
 			}
 
 			// Check if the name is the right length
-			if (!Regex.IsMatch(datum, @"^[0-9a-f]{40}\.gz")) // TODO: When updating to SHA-256, this needs to update to Constants.SHA256Length
+			if (!Regex.IsMatch(datum, @"^[0-9a-f]{" + Constants.SHA1Length + @"}\.gz")) // TODO: When updating to SHA-256, this needs to update to Constants.SHA256Length
 			{
 				logger.Warning("Non SHA-1 filename found, skipping: '" + Path.GetFullPath(input) + "'");
 				return null;
