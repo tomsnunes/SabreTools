@@ -385,13 +385,11 @@ namespace SabreTools
 				"Add original dates from DAT, if possible",
 				FeatureType.Flag,
 				null));
-			/*
 			sort.AddFeature("t7z", new Feature(
 				new List<string>() { "-t7z", "--t7z" },
 				"Enable Torrent7z output",
 				FeatureType.Flag,
 				null));
-			*/
 			sort.AddFeature("tar", new Feature(
 				new List<string>() { "-tar", "--tar" },
 				"Enable TAR output",
@@ -525,13 +523,11 @@ namespace SabreTools
 				"Add original dates from DAT, if possible",
 				FeatureType.Flag,
 				null));
-			/*
 			sortDepot.AddFeature("t7z", new Feature(
 				new List<string>() { "-t7z", "--t7z" },
 				"Enable Torrent7z output",
 				FeatureType.Flag,
 				null));
-			*/
 			sortDepot.AddFeature("tar", new Feature(
 				new List<string>() { "-tar", "--tar" },
 				"Enable TAR output",

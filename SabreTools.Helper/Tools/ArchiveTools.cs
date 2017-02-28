@@ -1070,6 +1070,50 @@ namespace SabreTools.Helper.Tools
 			}
 		}
 
+		/// <summary>
+		/// (INCOMPLETE) Get the T7Z status of the file
+		/// </summary>
+		/// <param name="filename">Name of the file to check</param>
+		/// <param name="logger">Logger object for file and console output</param>
+		/// <returns>0 if the file isn't 7z, 1 if the file is t7z, 2 if the file is 7z</returns>
+		public static int IsT7z(string filename, Logger logger)
+		{
+			int ist7z = 0;
+
+			if (File.Exists(filename))
+			{
+				try
+				{
+					Stream fread = File.Open(filename, FileMode.Open, FileAccess.Read);
+					uint ar, offs = 0;
+					fread.Seek(0, SeekOrigin.Begin);
+					byte[] buffer = new byte[128];
+					ar = (uint)fread.Read(buffer, 0, 4 + Constants.Torrent7ZipSignature.Length + 4);
+					if (ar < (4 + Constants.Torrent7ZipSignature.Length + 4))
+					{
+						if (ar >= Constants.Torrent7ZipSignature.Length + 4)
+						{
+							ar -= (uint)(Constants.Torrent7ZipSignature.Length + 4);
+						}
+						if (ar <= Constants.Torrent7ZipHeader.Length)
+						{
+							ar = (uint)Constants.Torrent7ZipHeader.Length;
+						}
+						// memset(buffer+offs+ar,0,crcsz-ar)
+					}
+
+					fread.Dispose();
+				}
+				catch
+				{
+					logger.Warning("File '" + filename + "' could not be opened");
+					ist7z = 0;
+				}
+			}
+
+			return ist7z;
+		}
+
 		#endregion
 
 		#region Writing
@@ -1291,8 +1335,6 @@ namespace SabreTools.Helper.Tools
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrent7Zip(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
 		{
-			//return false;
-
 			bool success = false;
 			string tempFile = Path.Combine(outDir, "tmp" + Guid.NewGuid().ToString());
 
@@ -1321,6 +1363,7 @@ namespace SabreTools.Helper.Tools
 			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].Machine.Name) + (roms[0].Machine.Name.EndsWith(".7z") ? "" : ".7z"));
 
 			// Set internal variables
+			SevenZipBase.SetLibraryPath("7za.dll");
 			SevenZipExtractor oldZipFile;
 			SevenZipCompressor zipFile;
 
@@ -1350,15 +1393,37 @@ namespace SabreTools.Helper.Tools
 					List<string> keys = inputIndexMap.Keys.ToList();
 					keys.Sort(ZipFile.TorrentZipStringCompare);
 
+					// Create the temp directory
+					string tempPath = Path.Combine(Path.GetTempPath(), new Guid().ToString());
+					if (!Directory.Exists(tempPath))
+					{
+						Directory.CreateDirectory(tempPath);
+					}
+
 					// Now add all of the files in order
-					zipFile.CompressFiles(File.OpenWrite(tempFile), keys.ToArray());
+					foreach (string key in keys)
+					{
+						string newkey = Path.Combine(tempPath, key);
+
+						File.Move(inputFiles[inputIndexMap[key]], newkey);
+						zipFile.CompressFiles(tempFile, newkey);
+						File.Move(newkey, inputFiles[inputIndexMap[key]]);
+					}
+
+					FileTools.CleanDirectory(tempPath);
+					try
+					{
+						Directory.Delete(tempPath);
+					}
+					catch { }
 				}
 
 				// Otherwise, sort the input files and write out in the correct order
 				else
 				{
 					// Open the old archive for reading
-					oldZipFile = new SevenZipExtractor(File.OpenRead(archiveFileName));
+					Stream oldZipFileStream = File.OpenRead(archiveFileName);
+					oldZipFile = new SevenZipExtractor(oldZipFileStream);
 
 					// Map all inputs to index
 					Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
@@ -1411,12 +1476,21 @@ namespace SabreTools.Helper.Tools
 						// Otherwise, copy the file from the old archive
 						else
 						{
-							string oldZipFileStreamName = new Guid().ToString();
-							Stream oldZipFileStream = File.Open(oldZipFileStreamName, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
-							oldZipFile.ExtractFile(index, oldZipFileStream);
-							zipFile.CompressFiles(zipFileStream, oldZipFileStreamName);
+							Stream oldZipFileEntryStream = File.Open(inputFiles[index], FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+							oldZipFile.ExtractFile(index, oldZipFileEntryStream);
+							zipFile.CompressFiles(zipFileStream, inputFiles[index]);
+
+							oldZipFileEntryStream.Dispose();
+							try
+							{
+								File.Delete(inputFiles[index]);
+							}
+							catch { }
 						}
 					}
+
+					zipFileStream.Dispose();
+					oldZipFile.Dispose();
 				}
 
 				success = true;
@@ -1426,10 +1500,6 @@ namespace SabreTools.Helper.Tools
 				Console.WriteLine(ex);
 				success = false;
 			}
-			finally
-			{
-				oldZipFile.Dispose();
-			}
 
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
@@ -1437,6 +1507,30 @@ namespace SabreTools.Helper.Tools
 				File.Delete(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
+
+			// Now make the file T7Z
+			// TODO: Add ACTUAL T7Z compatible code
+
+			BinaryWriter bw = new BinaryWriter(File.Open(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite));
+			bw.Seek(0, SeekOrigin.Begin);
+			bw.Write(Constants.Torrent7ZipHeader);
+			bw.Seek(0, SeekOrigin.End);
+
+			oldZipFile = new SevenZipExtractor(File.Open(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite));
+
+			// Get the correct signature to use (Default 0, Unicode 1, SingleFile 2, StripFileNames 4)
+			byte[] tempsig = Constants.Torrent7ZipSignature;
+			if (oldZipFile.FilesCount > 1)
+			{
+				tempsig[16] = 0x2;
+			}
+			else
+			{
+				tempsig[16] = 0;
+			}
+
+			bw.Write(tempsig);
+			bw.Dispose();
 
 			return true;
 		}

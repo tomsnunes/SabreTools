@@ -555,6 +555,7 @@ namespace SabreTools.Helper.Dats
 							rebuilt &= ArchiveTools.WriteTAR(file, outDir, item, logger, date: date);
 							break;
 						case OutputFormat.Torrent7Zip:
+							rebuilt &= ArchiveTools.WriteTorrent7Zip(file, outDir, item, logger, date: date);
 							break;
 						case OutputFormat.TorrentGzip:
 							rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
@@ -638,6 +639,7 @@ namespace SabreTools.Helper.Dats
 						rebuilt &= ArchiveTools.WriteTAR(file, outDir, item, logger, date: date);
 						break;
 					case OutputFormat.Torrent7Zip:
+						rebuilt &= ArchiveTools.WriteTorrent7Zip(file, outDir, item, logger, date: date);
 						break;
 					case OutputFormat.TorrentGzip:
 						rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
@@ -739,6 +741,8 @@ namespace SabreTools.Helper.Dats
 										rebuilt &= ArchiveTools.WriteTAR(file, outDir, rom, logger, date: date);
 										break;
 									case OutputFormat.Torrent7Zip:
+										rebuilt &= ArchiveTools.WriteTorrent7Zip(file + ".new", outDir, item, logger, date: date);
+										rebuilt &= ArchiveTools.WriteTorrent7Zip(file, outDir, rom, logger, date: date);
 										break;
 									case OutputFormat.TorrentGzip:
 										rebuilt &= ArchiveTools.WriteTorrentGZ(file + ".new", outDir, romba, logger);
