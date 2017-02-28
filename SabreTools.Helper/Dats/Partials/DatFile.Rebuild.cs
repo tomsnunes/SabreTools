@@ -390,6 +390,7 @@ namespace SabreTools.Helper.Dats
 			// If we're supposed to scan the file externally
 			if (shouldExternalProcess)
 			{
+				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				Rom rom = FileTools.GetFileInfo(file, logger, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), header: headerToCheckAgainst);
 				usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
 					romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
@@ -424,6 +425,7 @@ namespace SabreTools.Helper.Dats
 						List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 						foreach (string entry in extracted)
 						{
+							// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 							Rom rom = FileTools.GetFileInfo(entry, logger, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
 							usedInternally &= RebuildIndividualFile(rom, entry, outDir, tempSubDir, date, inverse, outputFormat,
 								romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
@@ -432,6 +434,7 @@ namespace SabreTools.Helper.Dats
 					// Otherwise, just get the info on the file itself
 					else if (File.Exists(file))
 					{
+						// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 						Rom rom = FileTools.GetFileInfo(file, logger, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
 						usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
 							romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
@@ -914,7 +917,7 @@ namespace SabreTools.Helper.Dats
 			logger.User("Processing files:\n");
 			foreach (string input in inputs)
 			{
-				// TODO: Eventually migrate noSHA256 to quickScan instead of true
+				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				PopulateFromDir(input, (quickScan ? Hash.SecureHashes : Hash.DeepHashes) /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, tempDir /* tempDir */, false /* copyFiles */,
 					headerToCheckAgainst, 4 /* maxDegreeOfParallelism */, logger);
