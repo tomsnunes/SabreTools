@@ -102,6 +102,7 @@ namespace SabreTools
 				inplace = false,
 				inverse = false,
 				merge = false,
+				oneGameOneRegion = false,
 				parseArchivesAsFiles = false,
 				quickScan = false,
 				quotes = false,
@@ -159,6 +160,7 @@ namespace SabreTools
 			List<string> exta = new List<string>();
 			List<string> extb = new List<string>();
 			List<string> inputs = new List<string>();
+			List<string> regions = new List<string>();
 
 			// Get the first argument as a feature flag
 			string feature = args[0];
@@ -270,6 +272,10 @@ namespace SabreTools
 				switch (args[i])
 				{
 					// User flags
+					case "-1g1r":
+					case "--1g1r":
+						oneGameOneRegion = true;
+						break;
 					case "-ab":
 					case "--add-blank":
 						addBlankFilesForEmptyFolder = true;
@@ -776,6 +782,10 @@ namespace SabreTools
 					case "--root-dir":
 						root = args[++i];
 						break;
+					case "-reg":
+					case "--region":
+						regions.Add(args[++i]);
+						break;
 					case "-rep":
 					case "--rep-ext":
 						repext = args[++i];
@@ -1044,6 +1054,10 @@ namespace SabreTools
 								case "--root-dir":
 									root = split[1];
 									break;
+								case "-reg":
+								case "--region":
+									regions.Add(split[1]);
+									break;
 								case "-rep":
 								case "--rep-ext":
 									repext = split[1];
@@ -1165,29 +1179,9 @@ namespace SabreTools
 			// Create a DAT from a directory or set of directories
 			if (datFromDir)
 			{
-				InitDatFromDir(inputs,
-					filename,
-					name,
-					description,
-					category,
-					version,
-					author,
-					forcepack,
-					excludeOf,
-					datFormat,
-					romba,
-					superdat,
-					omitFromScan,
-					removeDateFromAutomaticName,
-					parseArchivesAsFiles,
-					enableGzip,
-					addBlankFilesForEmptyFolder,
-					addFileDates,
-					tempDir,
-					outDir,
-					copyFiles,
-					header,
-					maxParallelism);
+				InitDatFromDir(inputs, filename, name, description, category, version, author, forcepack, excludeOf,
+					datFormat, romba, superdat, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,
+					addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header, maxParallelism);
 			}
 
 			// If we're in header extract and remove mode
@@ -1250,9 +1244,9 @@ namespace SabreTools
 			else if (update)
 			{
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
-					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix,
-					postfix, quotes, repext, addext, remext, datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName,
-					filter, splitType, trim, single, root, outDir, cleanGameNames, descAsName, dedup, stripHash, maxParallelism);
+					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix, postfix, quotes, repext, addext, remext,
+					datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName, filter, oneGameOneRegion, regions,
+					splitType, trim, single, root, outDir, cleanGameNames, descAsName, dedup, stripHash, maxParallelism);
 			}
 
 			// If we're using the verifier

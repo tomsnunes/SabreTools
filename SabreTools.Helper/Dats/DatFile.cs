@@ -31,6 +31,8 @@ namespace SabreTools.Helper.Dats
 		private bool _excludeOf;
 		private bool _mergeRoms;
 		private Hash _stripHash;
+		private bool _oneGameOneRegion;
+		private List<string> _regions = new List<string>();
 		private SortedDictionary<string, List<DatItem>> _files = new SortedDictionary<string, List<DatItem>>();
 		private SortedBy _sortedBy;
 
@@ -167,6 +169,16 @@ namespace SabreTools.Helper.Dats
 		{
 			get { return _stripHash; }
 			set { _stripHash = value; }
+		}
+		public bool OneGameOneRegion
+		{
+			get { return _oneGameOneRegion; }
+			set { _oneGameOneRegion = value; }
+		}
+		public List<string> Regions
+		{
+			get { return _regions; }
+			set { _regions = value; }
 		}
 		public SortedBy SortedBy
 		{
