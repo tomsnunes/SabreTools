@@ -254,62 +254,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// We want to get the proper key for the DatItem
-			string key = "";
-
-			// If all items are supposed to have a SHA-1, we sort by that
-			if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA1Count
-				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA1))
-					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA1))))
-			{
-				if (_itemType == ItemType.Rom)
-				{
-					key = ((Rom)this).SHA1;
-					datdata.BucketBySHA1(false, logger, false);
-				}
-				else
-				{
-					key = ((Disk)this).SHA1;
-					datdata.BucketBySHA1(false, logger, false);
-				}
-			}
-
-			// If all items are supposed to have an MD5, we sort by that
-			else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.MD5Count
-				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).MD5))
-					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).MD5))))
-			{
-				if (_itemType == ItemType.Rom)
-				{
-					key = ((Rom)this).MD5;
-					datdata.BucketByMD5(false, logger, false);
-				}
-				else
-				{
-					key = ((Disk)this).MD5;
-					datdata.BucketByMD5(false, logger, false);
-				}
-			}
-
-			// If we've gotten here and we have a Disk, sort by MD5
-			else if (_itemType == ItemType.Disk)
-			{
-				key = ((Disk)this).MD5;
-				datdata.BucketByMD5(false, logger, false);
-			}
-
-			// If we've gotten here and we have a Rom, sort by CRC
-			else if (_itemType == ItemType.Rom)
-			{
-				key = ((Rom)this).CRC;
-				datdata.BucketByCRC(false, logger, false);
-			}
-
-			// Otherwise, we use -1 as the key
-			else
-			{
-				key = "-1";
-				datdata.BucketBySize(false, logger, false);
-			}
+			string key = SortAndGetKey(datdata, logger);
 
 			// If the key doesn't exist, return the empty list
 			if (!datdata.ContainsKey(key))
@@ -349,7 +294,48 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// We want to get the proper key for the DatItem
-			string key = "";
+			string key = SortAndGetKey(datdata, logger);
+
+			// If the key doesn't exist, return the empty list
+			if (!datdata.ContainsKey(key))
+			{
+				return output;
+			}
+
+			// Try to find duplicates
+			List<DatItem> roms = datdata[key];
+			List<DatItem> left = new List<DatItem>();
+
+			foreach (DatItem rom in roms)
+			{
+				if (IsDuplicate(rom, logger))
+				{
+					output.Add(rom);
+				}
+				else
+				{
+					left.Add(rom);
+				}
+			}
+
+			// If we're in removal mode, replace the list with the new one
+			if (remove)
+			{
+				datdata[key] = left;
+			}
+
+			return output;
+		}
+
+		/// <summary>
+		/// Sort the input DAT and get the key to be used by the item
+		/// </summary>
+		/// <param name="datdata">Dat to match against</param>
+		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <returns>Key to try to use</returns>
+		private string SortAndGetKey(DatFile datdata, Logger logger)
+		{
+			string key = null;
 
 			// If all items are supposed to have a SHA-1, we sort by that
 			if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA1Count
@@ -406,35 +392,7 @@ namespace SabreTools.Helper.Dats
 				datdata.BucketBySize(false, logger, false);
 			}
 
-			// If the key doesn't exist, return the empty list
-			if (!datdata.ContainsKey(key))
-			{
-				return output;
-			}
-
-			// Try to find duplicates
-			List<DatItem> roms = datdata[key];
-			List<DatItem> left = new List<DatItem>();
-
-			foreach (DatItem rom in roms)
-			{
-				if (IsDuplicate(rom, logger))
-				{
-					output.Add(rom);
-				}
-				else
-				{
-					left.Add(rom);
-				}
-			}
-
-			// If we're in removal mode, replace the list with the new one
-			if (remove)
-			{
-				datdata[key] = left;
-			}
-
-			return output;
+			return key;
 		}
 
 		#endregion
