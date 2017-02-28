@@ -24,6 +24,7 @@ using Stream = System.IO.Stream;
 #endif
 using Ionic.Zlib;
 using ROMVault2.SupportedFiles.Zip;
+using SevenZip;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Rar;
 using SharpCompress.Archives.SevenZip;
@@ -94,7 +95,7 @@ namespace SabreTools.Helper.Tools
 
 					// Decompress the input stream
 					FileStream outstream = File.Create(Path.Combine(outDir, Path.GetFileNameWithoutExtension(input)));
-					GZipStream gzstream = new GZipStream(File.OpenRead(input), CompressionMode.Decompress);
+					GZipStream gzstream = new GZipStream(File.OpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
 					gzstream.CopyTo(outstream);
 
 					// Dispose of the streams
@@ -159,7 +160,7 @@ namespace SabreTools.Helper.Tools
 					for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
 					{
 						// Open the read stream
-						zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out CompressionMethod cm, out uint lastMod);
+						zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Helper.Data.CompressionMethod cm, out uint lastMod);
 
 						// Create the rest of the path, if needed
 						if (!String.IsNullOrEmpty(Path.GetDirectoryName(zf.Entries[i].FileName)))
@@ -264,7 +265,7 @@ namespace SabreTools.Helper.Tools
 					case ArchiveType.GZip:
 						// Decompress the input stream
 						realEntry = Path.GetFileNameWithoutExtension(input);
-						GZipStream gzstream = new GZipStream(File.OpenRead(input), CompressionMode.Decompress);
+						GZipStream gzstream = new GZipStream(File.OpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
 
 						// Get the output path
 						realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
@@ -353,7 +354,7 @@ namespace SabreTools.Helper.Tools
 								realEntry = zf.Entries[i].FileName;
 
 								// Open the read stream
-								zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out CompressionMethod cm, out uint lastMod);
+								zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Helper.Data.CompressionMethod cm, out uint lastMod);
 
 								// Get the output path
 								realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
@@ -1290,7 +1291,154 @@ namespace SabreTools.Helper.Tools
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrent7Zip(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
 		{
-			return false;
+			//return false;
+
+			bool success = false;
+			string tempFile = Path.Combine(outDir, "tmp" + Guid.NewGuid().ToString());
+
+			// If either list of roms is null or empty, return
+			if (inputFiles == null || roms == null || inputFiles.Count == 0 || roms.Count == 0)
+			{
+				return success;
+			}
+
+			// If the number of inputs is less than the number of available roms, return
+			if (inputFiles.Count < roms.Count)
+			{
+				return success;
+			}
+
+			// If one of the files doesn't exist, return
+			foreach (string file in inputFiles)
+			{
+				if (!File.Exists(file))
+				{
+					return success;
+				}
+			}
+
+			// Get the output archive name from the first rebuild rom
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].Machine.Name) + (roms[0].Machine.Name.EndsWith(".7z") ? "" : ".7z"));
+
+			// Set internal variables
+			SevenZipExtractor oldZipFile;
+			SevenZipCompressor zipFile;
+
+			try
+			{
+				// If the full output path doesn't exist, create it
+				if (!Directory.Exists(Path.GetDirectoryName(archiveFileName)))
+				{
+					Directory.CreateDirectory(Path.GetDirectoryName(archiveFileName));
+				}
+
+				// If the archive doesn't exist, create it and put the single file
+				if (!File.Exists(archiveFileName))
+				{
+					zipFile = new SevenZipCompressor();
+					zipFile.ArchiveFormat = OutArchiveFormat.SevenZip;
+					zipFile.CompressionLevel = SevenZip.CompressionLevel.Normal;
+
+					// Map all inputs to index
+					Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
+					for (int i = 0; i < inputFiles.Count; i++)
+					{
+						inputIndexMap.Add(roms[i].Name.Replace('\\', '/'), i);
+					}
+
+					// Sort the keys in TZIP order
+					List<string> keys = inputIndexMap.Keys.ToList();
+					keys.Sort(ZipFile.TorrentZipStringCompare);
+
+					// Now add all of the files in order
+					zipFile.CompressFiles(File.OpenWrite(tempFile), keys.ToArray());
+				}
+
+				// Otherwise, sort the input files and write out in the correct order
+				else
+				{
+					// Open the old archive for reading
+					oldZipFile = new SevenZipExtractor(File.OpenRead(archiveFileName));
+
+					// Map all inputs to index
+					Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
+					for (int i = 0; i < inputFiles.Count; i++)
+					{
+						// If the old one contains the new file, then just skip out
+						if (oldZipFile.ArchiveFileNames.Contains(roms[i].Name.Replace('\\', '/')))
+						{
+							continue;
+						}
+
+						inputIndexMap.Add(roms[i].Name.Replace('\\', '/'), -(i + 1));
+					}
+
+					// Then add all of the old entries to it too
+					for (int i = 0; i < oldZipFile.FilesCount; i++)
+					{
+						inputIndexMap.Add(oldZipFile.ArchiveFileNames[i], i);
+					}
+
+					// If the number of entries is the same as the old archive, skip out
+					if (inputIndexMap.Keys.Count <= oldZipFile.FilesCount)
+					{
+						success = true;
+						return success;
+					}
+
+					// Otherwise, process the old zipfile
+					zipFile = new SevenZipCompressor();
+					zipFile.ArchiveFormat = OutArchiveFormat.SevenZip;
+					zipFile.CompressionLevel = SevenZip.CompressionLevel.Normal;
+					Stream zipFileStream = File.OpenWrite(tempFile);
+
+					// Get the order for the entries with the new file
+					List<string> keys = inputIndexMap.Keys.ToList();
+					keys.Sort(ZipFile.TorrentZipStringCompare);
+
+					// Copy over all files to the new archive
+					foreach (string key in keys)
+					{
+						// Get the index mapped to the key
+						int index = inputIndexMap[key];
+
+						// If we have the input file, add it now
+						if (index < 0)
+						{
+							zipFile.CompressFiles(zipFileStream, inputFiles[-index - 1]);
+						}
+
+						// Otherwise, copy the file from the old archive
+						else
+						{
+							string oldZipFileStreamName = new Guid().ToString();
+							Stream oldZipFileStream = File.Open(oldZipFileStreamName, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+							oldZipFile.ExtractFile(index, oldZipFileStream);
+							zipFile.CompressFiles(zipFileStream, oldZipFileStreamName);
+						}
+					}
+				}
+
+				success = true;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+				success = false;
+			}
+			finally
+			{
+				oldZipFile.Dispose();
+			}
+
+			// If the old file exists, delete it and replace
+			if (File.Exists(archiveFileName))
+			{
+				File.Delete(archiveFileName);
+			}
+			File.Move(tempFile, archiveFileName);
+
+			return true;
 		}
 
 		/// <summary>
@@ -1361,7 +1509,7 @@ namespace SabreTools.Helper.Tools
 				sw.Write((ulong)rom.Size); // Long size (Unsigned, Mirrored)
 
 				// Now create a deflatestream from the input file
-				DeflateStream ds = new DeflateStream(outputStream, CompressionMode.Compress, CompressionLevel.BestCompression, true);
+				DeflateStream ds = new DeflateStream(outputStream, Ionic.Zlib.CompressionMode.Compress, Ionic.Zlib.CompressionLevel.BestCompression, true);
 
 				// Copy the input stream to the output
 				byte[] ibuffer = new byte[_bufferSize];
@@ -1591,11 +1739,11 @@ namespace SabreTools.Helper.Tools
 						{
 							uint msDosDateTime = Style.ConvertDateTimeToMsDosTimeFormat(dt);
 							zipFile.OpenWriteStream(false, false, roms[index].Name.Replace('\\', '/'), istreamSize,
-								CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
+								SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
 						}
 						else
 						{
-							zipFile.OpenWriteStream(false, true, roms[index].Name.Replace('\\', '/'), istreamSize, CompressionMethod.Deflated, out writeStream);
+							zipFile.OpenWriteStream(false, true, roms[index].Name.Replace('\\', '/'), istreamSize, SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream);
 						}
 
 						// Copy the input stream to the output
@@ -1668,11 +1816,11 @@ namespace SabreTools.Helper.Tools
 							{
 								uint msDosDateTime = Style.ConvertDateTimeToMsDosTimeFormat(dt);
 								zipFile.OpenWriteStream(false, false, roms[-index - 1].Name.Replace('\\', '/'), istreamSize,
-									CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
+									SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
 							}
 							else
 							{
-								zipFile.OpenWriteStream(false, true, roms[-index - 1].Name.Replace('\\', '/'), istreamSize, CompressionMethod.Deflated, out writeStream);
+								zipFile.OpenWriteStream(false, true, roms[-index - 1].Name.Replace('\\', '/'), istreamSize, SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream);
 							}
 
 							// Copy the input stream to the output
@@ -1691,9 +1839,9 @@ namespace SabreTools.Helper.Tools
 						else
 						{
 							// Instantiate the streams
-							oldZipFile.OpenReadStream(index, false, out Stream zreadStream, out ulong istreamSize, out CompressionMethod icompressionMethod, out uint lastMod);
+							oldZipFile.OpenReadStream(index, false, out Stream zreadStream, out ulong istreamSize, out SabreTools.Helper.Data.CompressionMethod icompressionMethod, out uint lastMod);
 							zipFile.OpenWriteStream(false, lastMod == Constants.TorrentZipFileDateTime, oldZipFile.Filename(index),
-								istreamSize, CompressionMethod.Deflated, out writeStream, lastMod: lastMod);
+								istreamSize, SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream, lastMod: lastMod);
 
 							// Copy the input stream to the output
 							byte[] ibuffer = new byte[_bufferSize];
