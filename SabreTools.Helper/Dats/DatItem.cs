@@ -298,7 +298,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// If we've gotten here and we have a Rom, sort by CRC
-			if (_itemType == ItemType.Rom)
+			else if (_itemType == ItemType.Rom)
 			{
 				key = ((Rom)this).CRC;
 				datdata.BucketByCRC(false, logger, false);
