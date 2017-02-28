@@ -439,80 +439,69 @@ namespace SabreTools.Helper.Dats
 							// Names are not quoted, for some stupid reason
 							if (gc[i] == "name")
 							{
-								// Advance to the first part of the name
-								i++;
-								item.Name = gc[i];
-
-								// Advance to the next item, adding until we find "size"
-								i++;
-								while (i < gc.Length && gc[i] != "size" && gc[i] != "date" && gc[i] != "crc")
+								// Get the name in order until we find the next flag
+								while (++i < gc.Length && gc[i] != "size" && gc[i] != "date" && gc[i] != "crc" && gc[i] != "md5"
+									&& gc[i] != "sha1" && gc[i] != "sha256" && gc[i] != "sha384" && gc[i] != "sha512")
 								{
 									item.Name += " " + gc[i];
-									i++;
 								}
+
+								// Perform correction
+								item.Name = item.Name.TrimStart();
+								i--;
 							}
 
 							// Get the size from the next part
 							else if (gc[i] == "size")
 							{
-								i++;
 								long tempsize = -1;
-								if (!Int64.TryParse(gc[i], out tempsize))
+								if (!Int64.TryParse(gc[++i], out tempsize))
 								{
 									tempsize = 0;
 								}
 								((Rom)item).Size = tempsize;
-								i++;
 							}
 
 							// Get the date from the next part
 							else if (gc[i] == "date")
 							{
-								i++;
-								((Rom)item).Date = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
-								i += 3;
+								((Rom)item).Date = gc[++i].Replace("\"", "") + " " + gc[++i].Replace("\"", "");
 							}
 
 							// Get the CRC from the next part
 							else if (gc[i] == "crc")
 							{
-								i++;
-								((Rom)item).CRC = gc[i].Replace("\"", "").ToLowerInvariant();
+								((Rom)item).CRC = gc[++i].Replace("\"", "").ToLowerInvariant();
 							}
 
 							// Get the MD5 from the next part
 							else if (gc[i] == "md5")
 							{
-								i++;
-								((Rom)item).MD5 = gc[i].Replace("\"", "").ToLowerInvariant();
+								((Rom)item).MD5 = gc[++i].Replace("\"", "").ToLowerInvariant();
 							}
 
 							// Get the SHA1 from the next part
 							else if (gc[i] == "sha1")
 							{
-								i++;
-								((Rom)item).SHA1 = gc[i].Replace("\"", "").ToLowerInvariant();
+								((Rom)item).SHA1 = gc[++i].Replace("\"", "").ToLowerInvariant();
 							}
 
 							// Get the SHA256 from the next part
 							else if (gc[i] == "sha256")
 							{
-								i++;
-								((Rom)item).SHA256 = gc[i].Replace("\"", "").ToLowerInvariant();
+								((Rom)item).SHA256 = gc[++i].Replace("\"", "").ToLowerInvariant();
 							}
 
 							// Get the SHA384 from the next part
 							else if (gc[i] == "sha384")
 							{
-								i++;
-								((Rom)item).SHA384 = gc[i].Replace("\"", "").ToLowerInvariant();
+								((Rom)item).SHA384 = gc[++i].Replace("\"", "").ToLowerInvariant();
 							}
 
 							// Get the SHA512 from the next part
 							else if (gc[i] == "sha512")
 							{
-								i++;
-								((Rom)item).SHA512 = gc[i].Replace("\"", "").ToLowerInvariant();
+								((Rom)item).SHA512 = gc[++i].Replace("\"", "").ToLowerInvariant();
 							}
 						}
 
@@ -3007,6 +2996,13 @@ namespace SabreTools.Helper.Dats
 				return;
 			}
 
+			// If the name ends with a directory separator, we log and skip it (DOSCenter only?)
+			if (item.Name.EndsWith("/") || item.Name.EndsWith("\\"))
+			{
+				logger.Warning("Rom with directory separator found: '" + item.Name + "'. Skipping...");
+				return;
+			}
+
 			// If we're in cleaning mode, sanitize the game name
 			item.Machine.Name = (clean ? Style.CleanGameName(item.Machine.Name) : item.Machine.Name);
 
@@ -3124,12 +3120,15 @@ namespace SabreTools.Helper.Dats
 
 						// Add statistical data
 						DiskCount += 1;
-						TotalSize += 0;
-						MD5Count += (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
-						SHA1Count += (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
-						SHA256Count += (String.IsNullOrEmpty(((Disk)item).SHA256) ? 0 : 1);
-						SHA384Count += (String.IsNullOrEmpty(((Disk)item).SHA384) ? 0 : 1);
-						SHA512Count += (String.IsNullOrEmpty(((Disk)item).SHA512) ? 0 : 1);
+						if (((Disk)item).ItemStatus != ItemStatus.Nodump)
+						{
+							TotalSize += 0;
+							MD5Count += (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
+							SHA1Count += (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
+							SHA256Count += (String.IsNullOrEmpty(((Disk)item).SHA256) ? 0 : 1);
+							SHA384Count += (String.IsNullOrEmpty(((Disk)item).SHA384) ? 0 : 1);
+							SHA512Count += (String.IsNullOrEmpty(((Disk)item).SHA512) ? 0 : 1);
+						}
 						BaddumpCount += (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
 						NodumpCount += (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
 						break;
@@ -3138,13 +3137,16 @@ namespace SabreTools.Helper.Dats
 
 						// Add statistical data
 						RomCount += 1;
-						TotalSize += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 0 : ((Rom)item).Size);
-						CRCCount += (String.IsNullOrEmpty(((Rom)item).CRC) ? 0 : 1);
-						MD5Count += (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
-						SHA1Count += (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
-						SHA256Count += (String.IsNullOrEmpty(((Rom)item).SHA256) ? 0 : 1);
-						SHA384Count += (String.IsNullOrEmpty(((Rom)item).SHA384) ? 0 : 1);
-						SHA512Count += (String.IsNullOrEmpty(((Rom)item).SHA512) ? 0 : 1);
+						if (((Rom)item).ItemStatus != ItemStatus.Nodump)
+						{
+							TotalSize += ((Rom)item).Size;
+							CRCCount += (String.IsNullOrEmpty(((Rom)item).CRC) ? 0 : 1);
+							MD5Count += (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
+							SHA1Count += (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
+							SHA256Count += (String.IsNullOrEmpty(((Rom)item).SHA256) ? 0 : 1);
+							SHA384Count += (String.IsNullOrEmpty(((Rom)item).SHA384) ? 0 : 1);
+							SHA512Count += (String.IsNullOrEmpty(((Rom)item).SHA512) ? 0 : 1);
+						}
 						BaddumpCount += (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
 						NodumpCount += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
 						break;

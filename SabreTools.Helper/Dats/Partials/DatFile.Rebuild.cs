@@ -16,6 +16,7 @@ using SearchOption = System.IO.SearchOption;
 
 namespace SabreTools.Helper.Dats
 {
+	// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 	public partial class DatFile
 	{
 		#region Rebuilding and Verifying [MODULAR DONE, FOR NOW]
@@ -389,7 +390,7 @@ namespace SabreTools.Helper.Dats
 			// If we're supposed to scan the file externally
 			if (shouldExternalProcess)
 			{
-				Rom rom = FileTools.GetFileInfo(file, logger, omitFromScan: (quickScan ? Hash.DeepHashes : 0x0), header: headerToCheckAgainst);
+				Rom rom = FileTools.GetFileInfo(file, logger, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), header: headerToCheckAgainst);
 				usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
 					romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
 			}
@@ -423,7 +424,7 @@ namespace SabreTools.Helper.Dats
 						List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 						foreach (string entry in extracted)
 						{
-							Rom rom = FileTools.GetFileInfo(entry, logger, omitFromScan: (quickScan ? Hash.DeepHashes : 0x0));
+							Rom rom = FileTools.GetFileInfo(entry, logger, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
 							usedInternally &= RebuildIndividualFile(rom, entry, outDir, tempSubDir, date, inverse, outputFormat,
 								romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
 						}
@@ -431,7 +432,7 @@ namespace SabreTools.Helper.Dats
 					// Otherwise, just get the info on the file itself
 					else if (File.Exists(file))
 					{
-						Rom rom = FileTools.GetFileInfo(file, logger, omitFromScan: (quickScan ? Hash.DeepHashes : 0x0));
+						Rom rom = FileTools.GetFileInfo(file, logger, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
 						usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
 							romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
 					}
@@ -914,7 +915,7 @@ namespace SabreTools.Helper.Dats
 			foreach (string input in inputs)
 			{
 				// TODO: Eventually migrate noSHA256 to quickScan instead of true
-				PopulateFromDir(input, (quickScan ? Hash.DeepHashes : 0x0) /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
+				PopulateFromDir(input, (quickScan ? Hash.SecureHashes : Hash.DeepHashes) /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, tempDir /* tempDir */, false /* copyFiles */,
 					headerToCheckAgainst, 4 /* maxDegreeOfParallelism */, logger);
 			}

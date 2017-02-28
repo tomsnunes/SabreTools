@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Tools;
@@ -252,38 +253,28 @@ namespace SabreTools.Helper.Dats
 				return false;
 			}
 
-			// Get the correct dictionary based on what is available
+			// How about this: If RomCount + DiskCount = SHA1Count, sort by SHA1
+			// then if RomCount + DiskCount == MD5Count, sort by MD5 (or make this default for Disk)
+			// then if RomCount == CRCCount, sort by CRC (or make this default for Rom)
+
+			// We assume that we check by CRC for Rom and MD5 for Disk
 			string key = "";
-			if (_itemType == ItemType.Rom && ((Rom)this).SHA1 != null)
-			{
-				key = ((Rom)this).SHA1;
-				datdata.BucketBySHA1(false, logger, false);
-			}
-			else if (_itemType == ItemType.Disk && ((Disk)this).SHA1 != null)
-			{
-				key = ((Disk)this).SHA1;
-				datdata.BucketBySHA1(false, logger, false);
-			}
-			else if (_itemType == ItemType.Rom && ((Rom)this).MD5 != null)
-			{
-				key = ((Rom)this).MD5;
-				datdata.BucketByMD5(false, logger, false);
-			}
-			else if (_itemType == ItemType.Disk && ((Disk)this).MD5 != null)
-			{
-				key = ((Disk)this).MD5;
-				datdata.BucketByMD5(false, logger, false);
-			}
-			else if (_itemType == ItemType.Rom && ((Rom)this).CRC != null)
+
+			// For Roms, we get the CRC
+			if (_itemType == ItemType.Rom)
 			{
 				key = ((Rom)this).CRC;
 				datdata.BucketByCRC(false, logger, false);
 			}
-			else if (_itemType == ItemType.Rom)
+
+			// For Disks, we get the MD5
+			else if (_itemType == ItemType.Disk)
 			{
-				key = ((Rom)this).Size.ToString();
-				datdata.BucketBySize(false, logger, false);
+				key = ((Disk)this).MD5;
+				datdata.BucketByMD5(false, logger, false);
 			}
+
+			// Otherwise, we use -1 as the key
 			else
 			{
 				key = "-1";
@@ -327,38 +318,24 @@ namespace SabreTools.Helper.Dats
 				return output;
 			}
 
-			// Get the correct dictionary based on what is available
+			// We assume that we check by CRC for Rom and MD5 for Disk
 			string key = "";
-			if (_itemType == ItemType.Rom && ((Rom)this).SHA1 != null)
-			{
-				key = ((Rom)this).SHA1;
-				datdata.BucketBySHA1(false, logger, false);
-			}
-			else if (_itemType == ItemType.Disk && ((Disk)this).SHA1 != null)
-			{
-				key = ((Disk)this).SHA1;
-				datdata.BucketBySHA1(false, logger, false);
-			}
-			else if (_itemType == ItemType.Rom && ((Rom)this).MD5 != null)
-			{
-				key = ((Rom)this).MD5;
-				datdata.BucketByMD5(false, logger, false);
-			}
-			else if (_itemType == ItemType.Disk && ((Disk)this).MD5 != null)
-			{
-				key = ((Disk)this).MD5;
-				datdata.BucketByMD5(false, logger, false);
-			}
-			else if (_itemType == ItemType.Rom && ((Rom)this).CRC != null)
+
+			// For Roms, we get the CRC
+			if (_itemType == ItemType.Rom)
 			{
 				key = ((Rom)this).CRC;
 				datdata.BucketByCRC(false, logger, false);
 			}
-			else if (_itemType == ItemType.Rom)
+
+			// For Disks, we get the MD5
+			else if (_itemType == ItemType.Disk)
 			{
-				key = ((Rom)this).Size.ToString();
-				datdata.BucketBySize(false, logger, false);
+				key = ((Disk)this).MD5;
+				datdata.BucketByMD5(false, logger, false);
 			}
+			
+			// Otherwise, we use -1 as the key
 			else
 			{
 				key = "-1";
