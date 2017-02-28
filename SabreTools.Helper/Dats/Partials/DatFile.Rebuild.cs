@@ -907,11 +907,8 @@ namespace SabreTools.Helper.Dats
 				FileTools.CleanDirectory(tempDir);
 			}
 
+			// TODO: We want the cross section of what's the folder and what's in the DAT. Right now, it just has what's in the DAT that's not in the folder
 			bool success = true;
-
-			/*
-			We want the cross section of what's the folder and what's in the DAT. Right now, it just has what's in the DAT that's not in the folder
-			*/
 
 			// Then, loop through and check each of the inputs
 			logger.User("Processing files:\n");
