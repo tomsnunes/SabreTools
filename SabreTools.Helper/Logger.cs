@@ -7,9 +7,9 @@ namespace SabreTools.Helper
 	/// Log either to file or to the console
 	/// </summary>
 	/// <remarks>
-	/// Things to do:
-	/// - Allow for "triggerable" logging done on an interval (async)
-	/// - Log filtering? (#if debug?)
+	/// TODO: Allow for "triggerable" logging done on an interval (async)
+	/// TODO: Log filtering? (#if debug?)
+	/// TODO: Reduce user-verbosity in later builds
 	/// </remarks>
 	public class Logger
 	{

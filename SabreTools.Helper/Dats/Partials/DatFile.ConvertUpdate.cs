@@ -40,6 +40,9 @@ namespace SabreTools.Helper.Dats
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logging object for console and file output</param>
+		/// <remarks>
+		/// TODO: Folder-wise output for update (similar to level-split)
+		/// </remarks>
 		public void DetermineUpdateType(List<string> inputPaths, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
 			bool bare, bool clean, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root,
 			int maxDegreeOfParallelism, Logger logger)
@@ -102,7 +105,8 @@ namespace SabreTools.Helper.Dats
 			DateTime start = DateTime.Now;
 			logger.User("Processing individual DATs");
 
-			/// BEGIN
+			// TODO: Can parsing headers be separated from parsing content?
+			// TODO: Can all DATs be parsed into the same structure in one loop?
 			Parallel.For(0,
 				inputs.Count,
 				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
@@ -132,7 +136,6 @@ namespace SabreTools.Helper.Dats
 				}
 				datHeaders[i].Delete();
 			}
-			/// END
 
 			logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 

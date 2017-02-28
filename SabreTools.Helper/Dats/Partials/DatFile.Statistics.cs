@@ -19,6 +19,15 @@ using StreamWriter = System.IO.StreamWriter;
 
 namespace SabreTools.Helper.Dats
 {
+	/*
+	 * TODO: Make output standard width (HTML, without making the entire thing a table)
+	 * TODO: Multithreading? Either StringBuilder or locking
+	 * TODO: Deduped size?
+	 * TODO: Sort by size?
+	 * TODO: Fix alignment for stats output (text)
+	 * TODO: Add compressed size (10-50% of total file size based on averages)
+	 * TODO: Add "gain" based on compressed compared to total size
+	 */
 	public partial class DatFile
 	{
 		#region Instance Methods

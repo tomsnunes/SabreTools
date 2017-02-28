@@ -111,6 +111,9 @@ namespace SabreTools.Helper.Dats
 			// Bucket roms by game name and optionally dedupe
 			BucketByGame(MergeRoms, norename, logger);
 
+			// Filter the DAT by 1G1R rules, if we're supposed to
+			// TODO: Create 1G1R logic before write
+
 			// If we are removing hashes, do that now
 			if (_stripHash != 0x0)
 			{

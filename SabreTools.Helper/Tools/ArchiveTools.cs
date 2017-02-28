@@ -34,6 +34,9 @@ using SharpCompress.Writers;
 
 namespace SabreTools.Helper.Tools
 {
+	/*
+	 * TODO: Full archive support for: 7-Zip, RAR, XZ, LRZip
+	 */
 	public static class ArchiveTools
 	{
 		private const int _bufferSize = 4096 * 128;

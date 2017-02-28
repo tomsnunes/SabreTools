@@ -16,7 +16,9 @@ using SearchOption = System.IO.SearchOption;
 
 namespace SabreTools.Helper.Dats
 {
-	// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
+	/*
+	 * TODO: Delete flags - Remove files from archive if only some are used (rebuild to TZip)
+	 */
 	public partial class DatFile
 	{
 		#region Rebuilding and Verifying [MODULAR DONE, FOR NOW]
@@ -481,6 +483,9 @@ namespace SabreTools.Helper.Dats
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the file was able to be rebuilt, false otherwise</returns>
+		/// <remarks>
+		/// TODO: If going from a TGZ file to a TGZ file, don't extract, just copy
+		/// </remarks>
 		private bool RebuildIndividualFile(Rom rom, string file, string outDir, string tempDir, bool date,
 			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool isZip, string headerToCheckAgainst, Logger logger)
 		{
