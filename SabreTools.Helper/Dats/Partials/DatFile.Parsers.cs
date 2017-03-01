@@ -101,50 +101,57 @@ namespace SabreTools.Helper.Dats
 			DatFormat = (DatFormat == 0 ? FileTools.GetDatFormat(filename, logger) : DatFormat);
 
 			// Now parse the correct type of DAT
-			switch (FileTools.GetDatFormat(filename, logger))
+			try
 			{
-				case DatFormat.AttractMode:
-					ParseAttractMode(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, descAsName);
-					break;
-				case DatFormat.ClrMamePro:
-				case DatFormat.DOSCenter:
-					ParseCMP(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, descAsName);
-					break;
-				case DatFormat.CSV:
-					ParseCSVTSV(filename, sysid, srcid, ',', filter, trim, single, root, logger, keep, clean, descAsName);
-					break;
-				case DatFormat.Logiqx:
-				case DatFormat.OfflineList:
-				case DatFormat.SabreDat:
-				case DatFormat.SoftwareList:
-					ParseGenericXML(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, descAsName);
-					break;
-				case DatFormat.RedumpMD5:
-					ParseRedumpMD5(filename, sysid, srcid, filter, trim, single, root, logger, clean);
-					break;
-				case DatFormat.RedumpSFV:
-					ParseRedumpSFV(filename, sysid, srcid, filter, trim, single, root, logger, clean);
-					break;
-				case DatFormat.RedumpSHA1:
-					ParseRedumpSHA1(filename, sysid, srcid, filter, trim, single, root, logger, clean);
-					break;
-				case DatFormat.RedumpSHA256:
-					ParseRedumpSHA256(filename, sysid, srcid, filter, trim, single, root, logger, clean);
-					break;
-				case DatFormat.RedumpSHA384:
-					ParseRedumpSHA384(filename, sysid, srcid, filter, trim, single, root, logger, clean);
-					break;
-				case DatFormat.RedumpSHA512:
-					ParseRedumpSHA512(filename, sysid, srcid, filter, trim, single, root, logger, clean);
-					break;
-				case DatFormat.RomCenter:
-					ParseRC(filename, sysid, srcid, filter, trim, single, root, logger, clean, descAsName);
-					break;
-				case DatFormat.TSV:
-					ParseCSVTSV(filename, sysid, srcid, '\t', filter, trim, single, root, logger, keep, clean, descAsName);
-					break;
-				default:
-					return;
+				switch (FileTools.GetDatFormat(filename, logger))
+				{
+					case DatFormat.AttractMode:
+						ParseAttractMode(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, descAsName);
+						break;
+					case DatFormat.ClrMamePro:
+					case DatFormat.DOSCenter:
+						ParseCMP(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, descAsName);
+						break;
+					case DatFormat.CSV:
+						ParseCSVTSV(filename, sysid, srcid, ',', filter, trim, single, root, logger, keep, clean, descAsName);
+						break;
+					case DatFormat.Logiqx:
+					case DatFormat.OfflineList:
+					case DatFormat.SabreDat:
+					case DatFormat.SoftwareList:
+						ParseGenericXML(filename, sysid, srcid, filter, trim, single, root, logger, keep, clean, descAsName);
+						break;
+					case DatFormat.RedumpMD5:
+						ParseRedumpMD5(filename, sysid, srcid, filter, trim, single, root, logger, clean);
+						break;
+					case DatFormat.RedumpSFV:
+						ParseRedumpSFV(filename, sysid, srcid, filter, trim, single, root, logger, clean);
+						break;
+					case DatFormat.RedumpSHA1:
+						ParseRedumpSHA1(filename, sysid, srcid, filter, trim, single, root, logger, clean);
+						break;
+					case DatFormat.RedumpSHA256:
+						ParseRedumpSHA256(filename, sysid, srcid, filter, trim, single, root, logger, clean);
+						break;
+					case DatFormat.RedumpSHA384:
+						ParseRedumpSHA384(filename, sysid, srcid, filter, trim, single, root, logger, clean);
+						break;
+					case DatFormat.RedumpSHA512:
+						ParseRedumpSHA512(filename, sysid, srcid, filter, trim, single, root, logger, clean);
+						break;
+					case DatFormat.RomCenter:
+						ParseRC(filename, sysid, srcid, filter, trim, single, root, logger, clean, descAsName);
+						break;
+					case DatFormat.TSV:
+						ParseCSVTSV(filename, sysid, srcid, '\t', filter, trim, single, root, logger, keep, clean, descAsName);
+						break;
+					default:
+						return;
+				}
+			}
+			catch (Exception ex)
+			{
+				logger.Error("Error with file '" + filename + "': " + ex.ToString());
 			}
 
 			// If we are using tags from the DAT, set the proper input for split type unless overridden
@@ -565,36 +572,34 @@ namespace SabreTools.Helper.Dats
 
 							// Regular attributes
 							case "name":
-								i++;
-								quoteless = gc[i].Replace("\"", "");
+								quoteless = gc[++i].Replace("\"", "");
 								item.Name = quoteless;
 								break;
 							case "size":
 								if (item.Type == ItemType.Rom)
 								{
-									i++;
-									quoteless = gc[i].Replace("\"", "");
-									long size = -1;
-									if (Int64.TryParse(quoteless, out size))
+									quoteless = gc[++i].Replace("\"", "");
+									if (Int64.TryParse(quoteless, out long size))
 									{
 										((Rom)item).Size = size;
 									}
+									else
+									{
+										((Rom)item).Size = -1;
+									}
 								}
-
 								break;
 							case "crc":
 								if (item.Type == ItemType.Rom)
 								{
-									i++;
-									quoteless = gc[i].Replace("\"", "");
+									quoteless = gc[++i].Replace("\"", "");
 									((Rom)item).CRC = quoteless.ToLowerInvariant();
 								}
 								break;
 							case "md5":
 								if (item.Type == ItemType.Rom)
 								{
-									i++;
-									quoteless = gc[i].Replace("\"", "");
+									quoteless = gc[++i].Replace("\"", "");
 									((Rom)item).MD5 = quoteless.ToLowerInvariant();
 								}
 								else if (item.Type == ItemType.Disk)
@@ -607,63 +612,54 @@ namespace SabreTools.Helper.Dats
 							case "sha1":
 								if (item.Type == ItemType.Rom)
 								{
-									i++;
-									quoteless = gc[i].Replace("\"", "");
+									quoteless = gc[++i].Replace("\"", "");
 									((Rom)item).SHA1 = quoteless.ToLowerInvariant();
 								}
 								else if (item.Type == ItemType.Disk)
 								{
-									i++;
-									quoteless = gc[i].Replace("\"", "");
+									quoteless = gc[++i].Replace("\"", "");
 									((Disk)item).SHA1 = quoteless.ToLowerInvariant();
 								}
 								break;
 							case "sha256":
 								if (item.Type == ItemType.Rom)
 								{
-									i++;
-									quoteless = gc[i].Replace("\"", "");
+									quoteless = gc[++i].Replace("\"", "");
 									((Rom)item).SHA256 = quoteless.ToLowerInvariant();
 								}
 								else if (item.Type == ItemType.Disk)
 								{
-									i++;
-									quoteless = gc[i].Replace("\"", "");
+									quoteless = gc[++i].Replace("\"", "");
 									((Disk)item).SHA256 = quoteless.ToLowerInvariant();
 								}
 								break;
 							case "sha384":
 								if (item.Type == ItemType.Rom)
 								{
-									i++;
-									quoteless = gc[i].Replace("\"", "");
+									quoteless = gc[++i].Replace("\"", "");
 									((Rom)item).SHA384 = quoteless.ToLowerInvariant();
 								}
 								else if (item.Type == ItemType.Disk)
 								{
-									i++;
-									quoteless = gc[i].Replace("\"", "");
+									quoteless = gc[++i].Replace("\"", "");
 									((Disk)item).SHA384 = quoteless.ToLowerInvariant();
 								}
 								break;
 							case "sha512":
 								if (item.Type == ItemType.Rom)
 								{
-									i++;
-									quoteless = gc[i].Replace("\"", "");
+									quoteless = gc[++i].Replace("\"", "");
 									((Rom)item).SHA512 = quoteless.ToLowerInvariant();
 								}
 								else if (item.Type == ItemType.Disk)
 								{
-									i++;
-									quoteless = gc[i].Replace("\"", "");
+									quoteless = gc[++i].Replace("\"", "");
 									((Disk)item).SHA512 = quoteless.ToLowerInvariant();
 								}
 								break;
 							case "status":
 							case "flags":
-								i++;
-								quoteless = gc[i].Replace("\"", "");
+								quoteless = gc[++i].Replace("\"", "");
 								if (quoteless.ToLowerInvariant() == "good")
 								{
 									if (item.Type == ItemType.Rom)
@@ -712,8 +708,7 @@ namespace SabreTools.Helper.Dats
 							case "date":
 								if (item.Type == ItemType.Rom)
 								{
-									i++;
-									quoteless = gc[i].Replace("\"", "") + " " + gc[i + 1].Replace("\"", "");
+									quoteless = gc[++i].Replace("\"", "") + " " + gc[++i].Replace("\"", "");
 									((Rom)item).Date = quoteless;
 								}
 								i++;
