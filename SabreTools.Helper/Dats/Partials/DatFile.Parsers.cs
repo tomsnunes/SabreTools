@@ -708,10 +708,18 @@ namespace SabreTools.Helper.Dats
 							case "date":
 								if (item.Type == ItemType.Rom)
 								{
-									quoteless = gc[++i].Replace("\"", "") + " " + gc[++i].Replace("\"", "");
+									// If we have quotes in the next item, assume only one item
+									if (gc[i + 1].Contains("\""))
+									{
+										quoteless = gc[++i].Replace("\"", "");
+									}
+									// Otherwise, we assume we need to read the next two items
+									else
+									{
+										quoteless = gc[++i].Replace("\"", "") + " " + gc[++i].Replace("\"", "");
+									}
 									((Rom)item).Date = quoteless;
 								}
-								i++;
 								break;
 						}
 					}
