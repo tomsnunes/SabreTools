@@ -115,7 +115,18 @@ namespace SabreTools.Helper
 				}
 
 				TimeSpan span = DateTime.Now.Subtract(_start);
-				string total = span.ToString(@"hh\:mm\:ss");
+
+				// Special case for multi-day runs
+				string total = "";
+				if (span >= TimeSpan.FromDays(1))
+				{
+					total = span.ToString(@"d\:hh\:mm\:ss");
+				}
+				else
+				{
+					total = span.ToString(@"hh\:mm\:ss");
+				}
+
 				if (!_tofile)
 				{
 					Console.WriteLine("Total runtime: " + total);
