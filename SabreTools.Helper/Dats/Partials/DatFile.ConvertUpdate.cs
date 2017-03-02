@@ -100,8 +100,7 @@ namespace SabreTools.Helper.Dats
 			DateTime start = DateTime.Now;
 			Globals.Logger.User("Processing individual DATs");
 
-			// TODO: Can parsing headers be separated from parsing content?
-			// TODO: Can all DATs be parsed into the same structure in one loop?
+			// Parse all of the DATs into their own DatFiles in the array
 			Parallel.For(0,
 				inputs.Count,
 				new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },

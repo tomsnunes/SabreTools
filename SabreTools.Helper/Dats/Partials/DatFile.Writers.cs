@@ -38,8 +38,7 @@ namespace SabreTools.Helper.Dats
 		/// The following features have been requested for file output:
 		/// - Have the ability to strip special (non-ASCII) characters from rom information
 		/// </remarks>
-		public bool WriteToFile(string outDir,
-			bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
+		public bool WriteToFile(string outDir, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
 		{
 			// If there's nothing there, abort
 			if (Count == 0)
@@ -109,8 +108,14 @@ namespace SabreTools.Helper.Dats
 					recalculate: (RomCount + DiskCount == 0), baddumpCol: true, nodumpCol: true);
 			}
 
-			// Bucket roms by game name and optionally dedupe
-			BucketBy(SortedBy.Game, MergeRoms, norename: norename);
+			// First bucket by CRC to dedupe if required
+			if (MergeRoms)
+			{
+				BucketBy(SortedBy.CRC, MergeRoms, norename: norename);
+			}
+
+			// Bucket roms by game name
+			BucketBy(SortedBy.Game, false /* mergeRoms */, norename: norename);
 
 			// Output the number of items we're going to be writing
 			Globals.Logger.User("A total of " + Count + " items will be written out to file");

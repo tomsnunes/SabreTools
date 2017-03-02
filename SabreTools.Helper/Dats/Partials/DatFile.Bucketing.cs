@@ -35,96 +35,92 @@ namespace SabreTools.Helper.Dats
 			// Create the temporary dictionary to sort into
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 
-			Globals.Logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by " + bucketBy);
+			Globals.Logger.User("Organizing roms by " + bucketBy +(mergeroms ? " and merging" : ""));
 
 			// First do the initial sort of all of the roms
 			List<string> keys = Keys.ToList();
 			Parallel.ForEach(keys,
 				new ParallelOptions() { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 				key =>
-				{
-					List<DatItem> roms = this[key];
+			{
+				List<DatItem> roms = this[key];
 
-					// If we're merging the roms, do so
-					if (mergeroms)
+				// Now add each of the roms to their respective games
+				Parallel.ForEach(roms,
+					new ParallelOptions() { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+					rom =>
+				{
+					string newkey = "";
+
+					// We want to get the key most appropriate for the given sorting type
+					switch (bucketBy)
 					{
-						roms = DatItem.Merge(roms);
+						case SortedBy.CRC:
+							newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).CRC : Constants.CRCZero);
+							break;
+						case SortedBy.Game:
+							newkey = (norename ? ""
+								: rom.SystemID.ToString().PadLeft(10, '0')
+									+ "-"
+									+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
+							+ (String.IsNullOrEmpty(rom.Machine.Name)
+									? "Default"
+									: rom.Machine.Name);
+							if (lower)
+							{
+								newkey = newkey.ToLowerInvariant();
+							}
+
+							newkey = HttpUtility.HtmlEncode(newkey);
+							break;
+						case SortedBy.MD5:
+							newkey = (rom.Type == ItemType.Rom
+								? ((Rom)rom).MD5
+								: (rom.Type == ItemType.Disk
+									? ((Disk)rom).MD5
+									: Constants.MD5Zero));
+							break;
+						case SortedBy.SHA1:
+							newkey = (rom.Type == ItemType.Rom
+								? ((Rom)rom).SHA1
+								: (rom.Type == ItemType.Disk
+									? ((Disk)rom).SHA1
+									: Constants.SHA1Zero));
+							break;
+						case SortedBy.SHA256:
+							newkey = (rom.Type == ItemType.Rom
+								? ((Rom)rom).SHA256
+								: (rom.Type == ItemType.Disk
+									? ((Disk)rom).SHA256
+									: Constants.SHA256Zero));
+							break;
+						case SortedBy.SHA384:
+							newkey = (rom.Type == ItemType.Rom
+								? ((Rom)rom).SHA384
+								: (rom.Type == ItemType.Disk
+									? ((Disk)rom).SHA384
+									: Constants.SHA384Zero));
+							break;
+						case SortedBy.SHA512:
+							newkey = (rom.Type == ItemType.Rom
+								? ((Rom)rom).SHA512
+								: (rom.Type == ItemType.Disk
+									? ((Disk)rom).SHA512
+									: Constants.SHA512Zero));
+							break;
 					}
 
-					// Now add each of the roms to their respective games
-					foreach (DatItem rom in roms)
+					// Add the DatItem to the temp dictionary
+					lock (sortable)
 					{
-						string newkey = "";
-
-						// We want to get the key most appropriate for the given sorting type
-						switch (bucketBy)
+						if (!sortable.ContainsKey(newkey))
 						{
-							case SortedBy.CRC:
-								newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).CRC : Constants.CRCZero);
-								break;
-							case SortedBy.Game:
-								newkey = (norename ? ""
-									: rom.SystemID.ToString().PadLeft(10, '0')
-										+ "-"
-										+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
-								+ (String.IsNullOrEmpty(rom.Machine.Name)
-										? "Default"
-										: rom.Machine.Name);
-										if (lower)
-										{
-											newkey = newkey.ToLowerInvariant();
-										}
-
-								newkey = HttpUtility.HtmlEncode(newkey);
-								break;
-							case SortedBy.MD5:
-								newkey = (rom.Type == ItemType.Rom
-									? ((Rom)rom).MD5
-									: (rom.Type == ItemType.Disk
-										? ((Disk)rom).MD5
-										: Constants.MD5Zero));
-								break;
-							case SortedBy.SHA1:
-								newkey = (rom.Type == ItemType.Rom
-									? ((Rom)rom).SHA1
-									: (rom.Type == ItemType.Disk
-										? ((Disk)rom).SHA1
-										: Constants.SHA1Zero));
-								break;
-							case SortedBy.SHA256:
-								newkey = (rom.Type == ItemType.Rom
-									? ((Rom)rom).SHA256
-									: (rom.Type == ItemType.Disk
-										? ((Disk)rom).SHA256
-										: Constants.SHA256Zero));
-								break;
-							case SortedBy.SHA384:
-								newkey = (rom.Type == ItemType.Rom
-									? ((Rom)rom).SHA384
-									: (rom.Type == ItemType.Disk
-										? ((Disk)rom).SHA384
-										: Constants.SHA384Zero));
-								break;
-							case SortedBy.SHA512:
-								newkey = (rom.Type == ItemType.Rom
-									? ((Rom)rom).SHA512
-									: (rom.Type == ItemType.Disk
-										? ((Disk)rom).SHA512
-										: Constants.SHA512Zero));
-								break;
+							sortable.Add(newkey, new List<DatItem>());
 						}
-
-						// Add the DatItem to the temp dictionary
-						lock (sortable)
-						{
-							if (!sortable.ContainsKey(newkey))
-							{
-								sortable.Add(newkey, new List<DatItem>());
-							}
-							sortable[newkey].Add(rom);
-						}
+						sortable[newkey].Add(rom);
 					}
 				});
+			});
 
 			// Now go through and sort all of the individual lists
 			keys = sortable.Keys.ToList();
@@ -132,9 +128,19 @@ namespace SabreTools.Helper.Dats
 				new ParallelOptions() { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 				key =>
 			{
+				// Get the possibly unsorted list
 				List<DatItem> sortedlist = sortable[key];
+
+				// Sort the list of items to be consistent
 				DatItem.Sort(ref sortedlist, false);
 
+				// If we're merging the roms, do so
+				if (mergeroms)
+				{
+					sortedlist = DatItem.Merge(sortedlist);
+				}
+
+				// Add the list back to the temp dictionary
 				lock (sortable)
 				{
 					sortable[key] = sortedlist;
