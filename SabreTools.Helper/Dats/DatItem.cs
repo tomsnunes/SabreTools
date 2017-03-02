@@ -172,9 +172,8 @@ namespace SabreTools.Helper.Dats
 		/// Determine if an item is a duplicate using partial matching logic
 		/// </summary>
 		/// <param name="lastItem">DatItem to use as a baseline</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>True if the roms are duplicates, false otherwise</returns>
-		public bool IsDuplicate(DatItem lastItem, Logger logger)
+		public bool IsDuplicate(DatItem lastItem)
 		{
 			bool dupefound = this.Equals(lastItem);
 
@@ -183,7 +182,7 @@ namespace SabreTools.Helper.Dats
 			{
 				if (!String.IsNullOrEmpty(((Rom)this).SHA1) && ((Rom)this).SHA1 == ((Rom)lastItem).SHA1 && ((Rom)this).Size != ((Rom)lastItem).Size)
 				{
-					logger.User("SHA-1 mismatch - Hash: " + ((Rom)this).SHA1);
+					Globals.Logger.User("SHA-1 mismatch - Hash: " + ((Rom)this).SHA1);
 				}
 			}
 
@@ -194,14 +193,13 @@ namespace SabreTools.Helper.Dats
 		/// Return the duplicate status of two items
 		/// </summary>
 		/// <param name="lastItem">DatItem to check against</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>The DupeType corresponding to the relationship between the two</returns>
-		public DupeType GetDuplicateStatus(DatItem lastItem, Logger logger)
+		public DupeType GetDuplicateStatus(DatItem lastItem)
 		{
 			DupeType output = 0x00;
 
 			// If we don't have a duplicate at all, return none
-			if (!this.IsDuplicate(lastItem, logger))
+			if (!this.IsDuplicate(lastItem))
 			{
 				return output;
 			}
@@ -243,10 +241,8 @@ namespace SabreTools.Helper.Dats
 		/// Check if a DAT contains the given rom
 		/// </summary>
 		/// <param name="datdata">Dat to match against</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>True if it contains the rom, false otherwise</returns>
-		public bool HasDuplicates(DatFile datdata, int maxDegreeOfParallelism, Logger logger)
+		public bool HasDuplicates(DatFile datdata)
 		{
 			// Check for an empty rom list first
 			if (datdata.Count == 0)
@@ -255,7 +251,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// We want to get the proper key for the DatItem
-			string key = SortAndGetKey(datdata, maxDegreeOfParallelism, logger);
+			string key = SortAndGetKey(datdata);
 
 			// If the key doesn't exist, return the empty list
 			if (!datdata.ContainsKey(key))
@@ -268,7 +264,7 @@ namespace SabreTools.Helper.Dats
 
 			foreach (DatItem rom in roms)
 			{
-				if (IsDuplicate(rom, logger))
+				if (IsDuplicate(rom))
 				{
 					return true;
 				}
@@ -281,11 +277,9 @@ namespace SabreTools.Helper.Dats
 		/// List all duplicates found in a DAT based on a rom
 		/// </summary>
 		/// <param name="datdata">Dat to match against</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="remove">True to remove matched roms from the input, false otherwise (default)</param>
 		/// <returns>List of matched DatItem objects</returns>
-		public List<DatItem> GetDuplicates(DatFile datdata, int maxDegreeOfParallelism, Logger logger, bool remove = false)
+		public List<DatItem> GetDuplicates(DatFile datdata, bool remove = false)
 		{
 			List<DatItem> output = new List<DatItem>();
 
@@ -296,7 +290,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// We want to get the proper key for the DatItem
-			string key = SortAndGetKey(datdata, maxDegreeOfParallelism, logger);
+			string key = SortAndGetKey(datdata);
 
 			// If the key doesn't exist, return the empty list
 			if (!datdata.ContainsKey(key))
@@ -310,7 +304,7 @@ namespace SabreTools.Helper.Dats
 
 			foreach (DatItem rom in roms)
 			{
-				if (IsDuplicate(rom, logger))
+				if (IsDuplicate(rom))
 				{
 					output.Add(rom);
 				}
@@ -333,9 +327,8 @@ namespace SabreTools.Helper.Dats
 		/// Sort the input DAT and get the key to be used by the item
 		/// </summary>
 		/// <param name="datdata">Dat to match against</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>Key to try to use</returns>
-		private string SortAndGetKey(DatFile datdata, int maxDegreeOfParallelism, Logger logger)
+		private string SortAndGetKey(DatFile datdata)
 		{
 			string key = null;
 
@@ -347,12 +340,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).SHA512;
-					datdata.BucketBy(SortedBy.SHA512, false /* mergeroms */, maxDegreeOfParallelism, logger);
+					datdata.BucketBy(SortedBy.SHA512, false /* mergeroms */);
 				}
 				else
 				{
 					key = ((Disk)this).SHA512;
-					datdata.BucketBy(SortedBy.SHA512, false /* mergeroms */, maxDegreeOfParallelism, logger);
+					datdata.BucketBy(SortedBy.SHA512, false /* mergeroms */);
 				}
 			}
 
@@ -364,12 +357,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).SHA384;
-					datdata.BucketBy(SortedBy.SHA384, false /* mergeroms */, maxDegreeOfParallelism, logger);
+					datdata.BucketBy(SortedBy.SHA384, false /* mergeroms */);
 				}
 				else
 				{
 					key = ((Disk)this).SHA384;
-					datdata.BucketBy(SortedBy.SHA384, false /* mergeroms */, maxDegreeOfParallelism, logger);
+					datdata.BucketBy(SortedBy.SHA384, false /* mergeroms */);
 				}
 			}
 
@@ -381,12 +374,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).SHA256;
-					datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */, maxDegreeOfParallelism, logger);
+					datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */);
 				}
 				else
 				{
 					key = ((Disk)this).SHA256;
-					datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */, maxDegreeOfParallelism, logger);
+					datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */);
 				}
 			}
 
@@ -398,12 +391,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).SHA1;
-					datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */, maxDegreeOfParallelism, logger);
+					datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */);
 				}
 				else
 				{
 					key = ((Disk)this).SHA1;
-					datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */, maxDegreeOfParallelism, logger);
+					datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */);
 				}
 			}
 
@@ -415,12 +408,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).MD5;
-					datdata.BucketBy(SortedBy.MD5, false /* mergeroms */, maxDegreeOfParallelism, logger);
+					datdata.BucketBy(SortedBy.MD5, false /* mergeroms */);
 				}
 				else
 				{
 					key = ((Disk)this).MD5;
-					datdata.BucketBy(SortedBy.MD5, false /* mergeroms */, maxDegreeOfParallelism, logger);
+					datdata.BucketBy(SortedBy.MD5, false /* mergeroms */);
 				}
 			}
 
@@ -428,21 +421,21 @@ namespace SabreTools.Helper.Dats
 			else if (_itemType == ItemType.Disk)
 			{
 				key = ((Disk)this).MD5;
-				datdata.BucketBy(SortedBy.MD5, false /* mergeroms */, maxDegreeOfParallelism, logger);
+				datdata.BucketBy(SortedBy.MD5, false /* mergeroms */);
 			}
 
 			// If we've gotten here and we have a Rom, sort by CRC
 			else if (_itemType == ItemType.Rom)
 			{
 				key = ((Rom)this).CRC;
-				datdata.BucketBy(SortedBy.CRC, false /* mergeroms */, maxDegreeOfParallelism, logger);
+				datdata.BucketBy(SortedBy.CRC, false /* mergeroms */);
 			}
 
 			// Otherwise, we use -1 as the key
 			else
 			{
 				key = "-1";
-				datdata.BucketBy(SortedBy.Size, false /* mergeroms */, maxDegreeOfParallelism, logger);
+				datdata.BucketBy(SortedBy.Size, false /* mergeroms */);
 			}
 
 			return key;
@@ -460,9 +453,8 @@ namespace SabreTools.Helper.Dats
 		/// Merge an arbitrary set of ROMs based on the supplied information
 		/// </summary>
 		/// <param name="infiles">List of File objects representing the roms to be merged</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>A List of RomData objects representing the merged roms</returns>
-		public static List<DatItem> Merge(List<DatItem> infiles, Logger logger)
+		public static List<DatItem> Merge(List<DatItem> infiles)
 		{
 			// Check for null or blank roms first
 			if (infiles == null || infiles.Count == 0)
@@ -500,7 +492,7 @@ namespace SabreTools.Helper.Dats
 						DatItem lastrom = outfiles[i];
 
 						// Get the duplicate status
-						dupetype = file.GetDuplicateStatus(lastrom, logger);
+						dupetype = file.GetDuplicateStatus(lastrom);
 
 						// If it's a duplicate, skip adding it to the output but add any missing information
 						if (dupetype != 0x00)
@@ -588,12 +580,11 @@ namespace SabreTools.Helper.Dats
 		/// Resolve name duplicates in an arbitrary set of ROMs based on the supplied information
 		/// </summary>
 		/// <param name="infiles">List of File objects representing the roms to be merged</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>A List of RomData objects representing the renamed roms</returns>
 		/// <remarks>
 		/// Eventually, we want this to use the CRC/MD5/SHA-1 of relavent items instead of just _1
 		/// </remarks>
-		public static List<DatItem> ResolveNames(List<DatItem> infiles, Logger logger)
+		public static List<DatItem> ResolveNames(List<DatItem> infiles)
 		{
 			// Create the output list
 			List<DatItem> output = new List<DatItem>();
@@ -618,16 +609,16 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// If the current item exactly matches the last item, then we don't add it
-				if ((datItem.GetDuplicateStatus(lastItem, logger) & DupeType.All) != 0)
+				if ((datItem.GetDuplicateStatus(lastItem) & DupeType.All) != 0)
 				{
-					logger.Verbose("Exact duplicate found for '" + datItem.Name + "'");
+					Globals.Logger.Verbose("Exact duplicate found for '" + datItem.Name + "'");
 					continue;
 				}
 
 				// If the current name matches the previous name, rename the current item
 				else if (datItem.Name == lastItem.Name)
 				{
-					logger.Verbose("Name duplicate found for '" + datItem.Name + "'");
+					Globals.Logger.Verbose("Name duplicate found for '" + datItem.Name + "'");
 
 					if (datItem.Type == ItemType.Disk)
 					{
@@ -666,7 +657,7 @@ namespace SabreTools.Helper.Dats
 				// Otherwise, we say that we have a valid named file
 				else
 				{
-					logger.Verbose("Adding unmatched file '" + datItem.Name + "'");
+					Globals.Logger.Verbose("Adding unmatched file '" + datItem.Name + "'");
 					output.Add(datItem);
 					lastItem = datItem;
 					lastrenamed = null;

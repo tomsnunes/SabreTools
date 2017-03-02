@@ -29,8 +29,6 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="datdata">All information for creating the datfile header</param>
 		/// <param name="outDir">Set the output directory</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
 		/// <param name="stats">True if DAT statistics should be output on write, false otherwise (default)</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
@@ -40,20 +38,20 @@ namespace SabreTools.Helper.Dats
 		/// The following features have been requested for file output:
 		/// - Have the ability to strip special (non-ASCII) characters from rom information
 		/// </remarks>
-		public bool WriteToFile(string outDir, int maxDegreeOfParallelism, Logger logger,
+		public bool WriteToFile(string outDir,
 			bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
 		{
 			// If there's nothing there, abort
 			if (Count == 0)
 			{
-				logger.User("There were no items to write out!");
+				Globals.Logger.User("There were no items to write out!");
 				return false;
 			}
 
 			// If output directory is empty, use the current folder
 			if (outDir == null || outDir.Trim() == "")
 			{
-				logger.Verbose("No output directory defined, defaulting to curent folder");
+				Globals.Logger.Verbose("No output directory defined, defaulting to curent folder");
 				outDir = Environment.CurrentDirectory;
 			}
 
@@ -66,7 +64,7 @@ namespace SabreTools.Helper.Dats
 			// If the DAT has no output format, default to XML
 			if (DatFormat == 0)
 			{
-				logger.Verbose("No DAT format defined, defaulting to XML");
+				Globals.Logger.Verbose("No DAT format defined, defaulting to XML");
 				DatFormat = DatFormat.Logiqx;
 			}
 
@@ -107,15 +105,15 @@ namespace SabreTools.Helper.Dats
 			// Output initial statistics, for kicks
 			if (stats)
 			{
-				OutputStats(new Dictionary<StatDatFormat, StreamWriter>(), StatDatFormat.None, maxDegreeOfParallelism, logger,
+				OutputStats(new Dictionary<StatDatFormat, StreamWriter>(), StatDatFormat.None,
 					recalculate: (RomCount + DiskCount == 0), baddumpCol: true, nodumpCol: true);
 			}
 
 			// Bucket roms by game name and optionally dedupe
-			BucketBy(SortedBy.Game, MergeRoms, maxDegreeOfParallelism, logger, norename: norename);
+			BucketBy(SortedBy.Game, MergeRoms, norename: norename);
 
 			// Output the number of items we're going to be writing
-			logger.User("A total of " + Count + " items will be written out to file");
+			Globals.Logger.User("A total of " + Count + " items will be written out to file");
 
 			// Filter the DAT by 1G1R rules, if we're supposed to
 			// TODO: Create 1G1R logic before write
@@ -123,7 +121,7 @@ namespace SabreTools.Helper.Dats
 			// If we are removing hashes, do that now
 			if (_stripHash != 0x0)
 			{
-				StripHashesFromItems(logger);
+				StripHashesFromItems();
 			}
 
 			// Get the outfile names
@@ -139,12 +137,12 @@ namespace SabreTools.Helper.Dats
 				{
 					string outfile = outfiles[datFormat];
 
-					logger.User("Opening file for writing: " + outfile);
+					Globals.Logger.User("Opening file for writing: " + outfile);
 					FileStream fs = File.Create(outfile);
 					StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
 
 					// Write out the header
-					WriteHeader(sw, datFormat, logger);
+					WriteHeader(sw, datFormat);
 
 					// Write out each of the machines and roms
 					int depth = 2, last = -1;
@@ -156,7 +154,7 @@ namespace SabreTools.Helper.Dats
 						List<DatItem> roms = this[key];
 
 						// Resolve the names in the block
-						roms = DatItem.ResolveNames(roms, logger);
+						roms = DatItem.ResolveNames(roms);
 
 						for (int index = 0; index < roms.Count; index++)
 						{
@@ -165,7 +163,7 @@ namespace SabreTools.Helper.Dats
 							// There are apparently times when a null rom can skip by, skip them
 							if (rom.Name == null || rom.Machine.Name == null)
 							{
-								logger.Warning("Null rom found!");
+								Globals.Logger.Warning("Null rom found!");
 								continue;
 							}
 
@@ -174,13 +172,13 @@ namespace SabreTools.Helper.Dats
 							// If we have a different game and we're not at the start of the list, output the end of last item
 							if (lastgame != null && lastgame.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 							{
-								depth = WriteEndGame(sw, datFormat, rom, splitpath, newsplit, lastgame, depth, out last, logger);
+								depth = WriteEndGame(sw, datFormat, rom, splitpath, newsplit, lastgame, depth, out last);
 							}
 
 							// If we have a new game, output the beginning of the new item
 							if (lastgame == null || lastgame.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
 							{
-								depth = WriteStartGame(sw, datFormat, rom, newsplit, lastgame, depth, last, logger);
+								depth = WriteStartGame(sw, datFormat, rom, newsplit, lastgame, depth, last);
 							}
 
 							// If we have a "null" game (created by DATFromDir or something similar), log it to file
@@ -193,7 +191,7 @@ namespace SabreTools.Helper.Dats
 								&& ((Rom)rom).SHA384 == "null"
 								&& ((Rom)rom).SHA512 == "null")
 							{
-								logger.Verbose("Empty folder found: " + rom.Machine.Name);
+								Globals.Logger.Verbose("Empty folder found: " + rom.Machine.Name);
 
 								// If we're in a mode that doesn't allow for actual empty folders, add the blank info
 								if (datFormat != DatFormat.CSV
@@ -221,7 +219,7 @@ namespace SabreTools.Helper.Dats
 							}
 
 							// Now, output the rom data
-							WriteRomData(sw, datFormat, rom, lastgame, depth, logger, ignoreblanks);
+							WriteRomData(sw, datFormat, rom, lastgame, depth, ignoreblanks);
 
 							// Set the new data to compare against
 							splitpath = newsplit;
@@ -230,16 +228,16 @@ namespace SabreTools.Helper.Dats
 					}
 
 					// Write the file footer out
-					WriteFooter(sw, datFormat, depth, logger);
+					WriteFooter(sw, datFormat, depth);
 
-					logger.Verbose("File written!" + Environment.NewLine);
+					Globals.Logger.Verbose("File written!" + Environment.NewLine);
 					sw.Dispose();
 					fs.Dispose();
 				}
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				Globals.Logger.Error(ex.ToString());
 				return false;
 			}
 
@@ -251,9 +249,8 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="datFormat">Output format to write to</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private bool WriteHeader(StreamWriter sw, DatFormat datFormat, Logger logger)
+		private bool WriteHeader(StreamWriter sw, DatFormat datFormat)
 		{
 			try
 			{
@@ -446,7 +443,7 @@ namespace SabreTools.Helper.Dats
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				Globals.Logger.Error(ex.ToString());
 				return false;
 			}
 
@@ -463,9 +460,8 @@ namespace SabreTools.Helper.Dats
 		/// <param name="lastgame">The name of the last game to be output</param>
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>The new depth of the tag</returns>
-		private int WriteStartGame(StreamWriter sw, DatFormat datFormat, DatItem rom, List<string> newsplit, string lastgame, int depth, int last, Logger logger)
+		private int WriteStartGame(StreamWriter sw, DatFormat datFormat, DatItem rom, List<string> newsplit, string lastgame, int depth, int last)
 		{
 			try
 			{
@@ -576,7 +572,7 @@ namespace SabreTools.Helper.Dats
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				Globals.Logger.Error(ex.ToString());
 				return depth;
 			}
 
@@ -594,9 +590,8 @@ namespace SabreTools.Helper.Dats
 		/// <param name="lastgame">The name of the last game to be output</param>
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>The new depth of the tag</returns>
-		private int WriteEndGame(StreamWriter sw, DatFormat datFormat, DatItem rom, List<string> splitpath, List<string> newsplit, string lastgame, int depth, out int last, Logger logger)
+		private int WriteEndGame(StreamWriter sw, DatFormat datFormat, DatItem rom, List<string> splitpath, List<string> newsplit, string lastgame, int depth, out int last)
 		{
 			last = 0;
 
@@ -656,7 +651,7 @@ namespace SabreTools.Helper.Dats
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				Globals.Logger.Error(ex.ToString());
 				return depth;
 			}
 
@@ -671,10 +666,9 @@ namespace SabreTools.Helper.Dats
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="lastgame">The name of the last game to be output</param>
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private bool WriteRomData(StreamWriter sw, DatFormat datFormat, DatItem rom, string lastgame, int depth, Logger logger, bool ignoreblanks = false)
+		private bool WriteRomData(StreamWriter sw, DatFormat datFormat, DatItem rom, string lastgame, int depth, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
@@ -1473,7 +1467,7 @@ namespace SabreTools.Helper.Dats
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				Globals.Logger.Error(ex.ToString());
 				return false;
 			}
 
@@ -1486,9 +1480,8 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="datFormat">Output format to write to</param>
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private bool WriteFooter(StreamWriter sw, DatFormat datFormat, int depth, Logger logger)
+		private bool WriteFooter(StreamWriter sw, DatFormat datFormat, int depth)
 		{
 			try
 			{
@@ -1566,7 +1559,7 @@ namespace SabreTools.Helper.Dats
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				Globals.Logger.Error(ex.ToString());
 				return false;
 			}
 

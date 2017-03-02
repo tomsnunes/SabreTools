@@ -72,7 +72,7 @@ namespace SabreTools.Helper.Skippers
 			SourceFile = Path.GetFileNameWithoutExtension(filename);
 
 			Logger logger = new Logger();
-			XmlReader xtr = FileTools.GetXmlTextReader(filename, logger);
+			XmlReader xtr = FileTools.GetXmlTextReader(filename);
 
 			if (xtr == null)
 			{
@@ -338,16 +338,16 @@ namespace SabreTools.Helper.Skippers
 		/// <param name="skipperName">Name of the skipper to be used, blank to find a matching skipper</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>The SkipperRule that matched the file</returns>
-		public static SkipperRule GetMatchingRule(string input, string skipperName, Logger logger)
+		public static SkipperRule GetMatchingRule(string input, string skipperName)
 		{
 			// If the file doesn't exist, return a blank skipper rule
 			if (!File.Exists(input))
 			{
-				logger.Error("The file '" + input + "' does not exist so it cannot be tested");
+				Globals.Logger.Error("The file '" + input + "' does not exist so it cannot be tested");
 				return new SkipperRule();
 			}
 
-			return GetMatchingRule(File.OpenRead(input), skipperName, logger);
+			return GetMatchingRule(File.OpenRead(input), skipperName);
 		}
 
 		/// <summary>
@@ -358,7 +358,7 @@ namespace SabreTools.Helper.Skippers
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="keepOpen">True if the underlying stream should be kept open, false otherwise</param>
 		/// <returns>The SkipperRule that matched the file</returns>
-		public static SkipperRule GetMatchingRule(Stream input, string skipperName, Logger logger, bool keepOpen = false)
+		public static SkipperRule GetMatchingRule(Stream input, string skipperName, bool keepOpen = false)
 		{
 			SkipperRule skipperRule = new SkipperRule();
 
@@ -369,7 +369,7 @@ namespace SabreTools.Helper.Skippers
 			}
 
 			// Loop through and find a Skipper that has the right name
-			logger.Verbose("Beginning search for matching header skip rules");
+			Globals.Logger.Verbose("Beginning search for matching header skip rules");
 			List<Skipper> tempList = new List<Skipper>();
 			tempList.AddRange(List);
 
@@ -519,7 +519,7 @@ namespace SabreTools.Helper.Skippers
 								input.Dispose();
 							}
 
-							logger.User(" Matching rule found!");
+							Globals.Logger.User(" Matching rule found!");
 							return rule;
 						}
 					}
@@ -535,7 +535,7 @@ namespace SabreTools.Helper.Skippers
 			// If we have a blank rule, inform the user
 			if (skipperRule.Tests == null)
 			{
-				logger.Verbose("No matching rule found!");
+				Globals.Logger.Verbose("No matching rule found!");
 			}
 
 			return skipperRule;

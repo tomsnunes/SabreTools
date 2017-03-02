@@ -50,14 +50,13 @@ namespace SabreTools.Helper.Tools
 		/// <param name="input">Name of the file to be extracted</param>
 		/// <param name="outDir">Output directory for archive extraction</param>
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the extraction was a success, false otherwise</returns>
-		public static bool ExtractArchive(string input, string outDir, ArchiveScanLevel archiveScanLevel, Logger logger)
+		public static bool ExtractArchive(string input, string outDir, ArchiveScanLevel archiveScanLevel)
 		{
 			bool encounteredErrors = true;
 
 			// First get the archive type
-			ArchiveType? at = GetCurrentArchiveType(input, logger);
+			ArchiveType? at = GetCurrentArchiveType(input);
 
 			// If we got back null, then it's not an archive, so we we return
 			if (at == null)
@@ -70,7 +69,7 @@ namespace SabreTools.Helper.Tools
 				// 7-zip
 				if (at == ArchiveType.SevenZip && (archiveScanLevel & ArchiveScanLevel.SevenZipInternal) != 0)
 				{
-					logger.Verbose("Found archive of type: " + at);
+					Globals.Logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(outDir);
@@ -88,7 +87,7 @@ namespace SabreTools.Helper.Tools
 				// GZip
 				else if (at == ArchiveType.GZip && (archiveScanLevel & ArchiveScanLevel.GZipInternal) != 0)
 				{
-					logger.Verbose("Found archive of type: " + at);
+					Globals.Logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(outDir);
@@ -108,7 +107,7 @@ namespace SabreTools.Helper.Tools
 				// RAR
 				else if (at == ArchiveType.Rar && (archiveScanLevel & ArchiveScanLevel.RarInternal) != 0)
 				{
-					logger.Verbose("Found archive of type: " + at);
+					Globals.Logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(outDir);
@@ -126,7 +125,7 @@ namespace SabreTools.Helper.Tools
 				// TAR
 				else if (at == ArchiveType.Tar && (archiveScanLevel & ArchiveScanLevel.TarInternal) != 0)
 				{
-					logger.Verbose("Found archive of type: " + at);
+					Globals.Logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(outDir);
@@ -144,7 +143,7 @@ namespace SabreTools.Helper.Tools
 				// Zip
 				else if (at == ArchiveType.Zip && (archiveScanLevel & ArchiveScanLevel.ZipInternal) != 0)
 				{
-					logger.Verbose("Found archive of type: " + at);
+					Globals.Logger.Verbose("Found archive of type: " + at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(outDir);
@@ -216,9 +215,8 @@ namespace SabreTools.Helper.Tools
 		/// <param name="input">Name of the archive to be extracted</param>
 		/// <param name="entryName">Name of the entry to be extracted</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>Name of the extracted file, null on error</returns>
-		public static string ExtractItem(string input, string entryName, string tempDir, Logger logger)
+		public static string ExtractItem(string input, string entryName, string tempDir)
 		{
 			string realEntry = "";
 
@@ -226,7 +224,7 @@ namespace SabreTools.Helper.Tools
 			realEntry = "";
 
 			// First get the archive type
-			ArchiveType? at = GetCurrentArchiveType(input, logger);
+			ArchiveType? at = GetCurrentArchiveType(input);
 
 			// If we got back null, then it's not an archive, so we we return
 			if (at == null)
@@ -242,7 +240,7 @@ namespace SabreTools.Helper.Tools
 						SevenZipArchive sza = SevenZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
 						foreach (SevenZipArchiveEntry entry in sza.Entries)
 						{
-							logger.Verbose("Current entry name: '" + entry.Key + "'");
+							Globals.Logger.Verbose("Current entry name: '" + entry.Key + "'");
 							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
 							{
 								realEntry = entry.Key;
@@ -294,7 +292,7 @@ namespace SabreTools.Helper.Tools
 						RarArchive ra = RarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
 						foreach (RarArchiveEntry entry in ra.Entries)
 						{
-							logger.Verbose("Current entry name: '" + entry.Key + "'");
+							Globals.Logger.Verbose("Current entry name: '" + entry.Key + "'");
 							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
 							{
 								realEntry = entry.Key;
@@ -318,7 +316,7 @@ namespace SabreTools.Helper.Tools
 						TarArchive ta = TarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
 						foreach (TarArchiveEntry entry in ta.Entries)
 						{
-							logger.Verbose("Current entry name: '" + entry.Key + "'");
+							Globals.Logger.Verbose("Current entry name: '" + entry.Key + "'");
 							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
 							{
 								realEntry = entry.Key;
@@ -348,7 +346,7 @@ namespace SabreTools.Helper.Tools
 
 						for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
 						{
-							logger.Verbose("Current entry name: '" + zf.Entries[i].FileName + "'");
+							Globals.Logger.Verbose("Current entry name: '" + zf.Entries[i].FileName + "'");
 							if (zf.Entries[i].FileName.Contains(entryName))
 							{
 								realEntry = zf.Entries[i].FileName;
@@ -382,7 +380,7 @@ namespace SabreTools.Helper.Tools
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				Globals.Logger.Error(ex.ToString());
 				realEntry = "";
 			}
 
@@ -397,9 +395,8 @@ namespace SabreTools.Helper.Tools
 		/// Generate a list of RomData objects from the header values in an archive
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>List of RomData objects representing the found data</returns>
-		public static List<Rom> GetArchiveFileInfo(string input, Logger logger)
+		public static List<Rom> GetArchiveFileInfo(string input)
 		{
 			List<Rom> roms = new List<Rom>();
 			string gamename = Path.GetFileNameWithoutExtension(input);
@@ -411,7 +408,7 @@ namespace SabreTools.Helper.Tools
 			}
 
 			// Next, get the archive type
-			ArchiveType? at = GetCurrentArchiveType(input, logger);
+			ArchiveType? at = GetCurrentArchiveType(input);
 
 			// If we got back null, then it's not an archive, so we we return
 			if (at == null)
@@ -422,7 +419,7 @@ namespace SabreTools.Helper.Tools
 			// If we got back GZip, try to get TGZ info first
 			else if (at == ArchiveType.GZip)
 			{
-				Rom possibleTgz = GetTorrentGZFileInfo(input, logger);
+				Rom possibleTgz = GetTorrentGZFileInfo(input);
 
 				// If it was, then add it to the outputs and continue
 				if (possibleTgz != null && possibleTgz.Name != null)
@@ -435,7 +432,7 @@ namespace SabreTools.Helper.Tools
 			IReader reader = null;
 			try
 			{
-				logger.Verbose("Found archive of type: " + at);
+				Globals.Logger.Verbose("Found archive of type: " + at);
 				long size = 0;
 				string crc = "";
 
@@ -447,7 +444,7 @@ namespace SabreTools.Helper.Tools
 						{
 							if (entry != null && !entry.IsDirectory)
 							{
-								logger.Verbose("Entry found: '" + entry.Key + "': "
+								Globals.Logger.Verbose("Entry found: '" + entry.Key + "': "
 									+ (size == 0 ? entry.Size : size) + ", "
 									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
 
@@ -483,7 +480,7 @@ namespace SabreTools.Helper.Tools
 						{
 							if (entry != null && !entry.IsDirectory)
 							{
-								logger.Verbose("Entry found: '" + entry.Key + "': "
+								Globals.Logger.Verbose("Entry found: '" + entry.Key + "': "
 									+ (size == 0 ? entry.Size : size) + ", "
 									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
 
@@ -509,7 +506,7 @@ namespace SabreTools.Helper.Tools
 						{
 							if (entry != null && !entry.IsDirectory)
 							{
-								logger.Verbose("Entry found: '" + entry.Key + "': "
+								Globals.Logger.Verbose("Entry found: '" + entry.Key + "': "
 									+ (size == 0 ? entry.Size : size) + ", "
 									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
 
@@ -543,7 +540,7 @@ namespace SabreTools.Helper.Tools
 							long newsize = (size == 0 ? (long)zf.Entries[i].UncompressedSize : size);
 							string newcrc = BitConverter.ToString(zf.Entries[i].CRC.Reverse().ToArray(), 0, zf.Entries[i].CRC.Length).Replace("-", string.Empty).ToLowerInvariant();
 
-							logger.Verbose("Entry found: '" + newname + "': " + newsize + ", " + newcrc);
+							Globals.Logger.Verbose("Entry found: '" + newname + "': " + newsize + ", " + newcrc);
 
 							roms.Add(new Rom
 							{
@@ -563,7 +560,7 @@ namespace SabreTools.Helper.Tools
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				Globals.Logger.Error(ex.ToString());
 			}
 			finally
 			{
@@ -577,9 +574,8 @@ namespace SabreTools.Helper.Tools
 		/// Retrieve file information for a single torrent GZ file
 		/// </summary>
 		/// <param name="input">Filename to get information from</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static Rom GetTorrentGZFileInfo(string input, Logger logger)
+		public static Rom GetTorrentGZFileInfo(string input)
 		{
 			// Check for the file existing first
 			if (!File.Exists(input))
@@ -593,21 +589,21 @@ namespace SabreTools.Helper.Tools
 			// If we have the romba depot files, just skip them gracefully
 			if (datum == ".romba_size" || datum == ".romba_size.backup")
 			{
-				logger.Verbose("Romba depot file found, skipping: " + input);
+				Globals.Logger.Verbose("Romba depot file found, skipping: " + input);
 				return null;
 			}
 
 			// Check if the name is the right length
 			if (!Regex.IsMatch(datum, @"^[0-9a-f]{" + Constants.SHA1Length + @"}\.gz")) // TODO: When updating to SHA-256, this needs to update to Constants.SHA256Length
 			{
-				logger.Warning("Non SHA-1 filename found, skipping: '" + Path.GetFullPath(input) + "'");
+				Globals.Logger.Warning("Non SHA-1 filename found, skipping: '" + Path.GetFullPath(input) + "'");
 				return null;
 			}
 
 			// Check if the file is at least the minimum length
 			if (filesize < 40 /* bytes */)
 			{
-				logger.Warning("Possibly corrupt file '" + Path.GetFullPath(input) + "' with size " + Style.GetBytesReadable(filesize));
+				Globals.Logger.Warning("Possibly corrupt file '" + Path.GetFullPath(input) + "' with size " + Style.GetBytesReadable(filesize));
 				return null;
 			}
 
@@ -666,9 +662,8 @@ namespace SabreTools.Helper.Tools
 		/// Returns the archive type of an input file
 		/// </summary>
 		/// <param name="input">Input file to check</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>ArchiveType of inputted file (null on error)</returns>
-		public static ArchiveType? GetCurrentArchiveType(string input, Logger logger)
+		public static ArchiveType? GetCurrentArchiveType(string input)
 		{
 			ArchiveType? outtype = null;
 
@@ -743,16 +738,15 @@ namespace SabreTools.Helper.Tools
 		/// </summary>
 		/// <param name="input">Name of the input file to check</param>
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="shouldExternalProcess">Output parameter determining if file should be processed externally</param>
 		/// <param name="shouldInternalProcess">Output parameter determining if file should be processed internally</param>
 		public static void GetInternalExternalProcess(string input, ArchiveScanLevel archiveScanLevel,
-			Logger logger, out bool shouldExternalProcess, out bool shouldInternalProcess)
+			out bool shouldExternalProcess, out bool shouldInternalProcess)
 		{
 			shouldExternalProcess = true;
 			shouldInternalProcess = true;
 
-			ArchiveType? archiveType = GetCurrentArchiveType(input, logger);
+			ArchiveType? archiveType = GetCurrentArchiveType(input);
 			switch (archiveType)
 			{
 				case null:
@@ -857,8 +851,7 @@ namespace SabreTools.Helper.Tools
 		/// (INCOMPLETE) Retrieve file information for a RAR file
 		/// </summary>
 		/// <param name="input">Filename to get information from</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		public static void GetRarFileInfo(string input, Logger logger)
+		public static void GetRarFileInfo(string input)
 		{
 			if (!File.Exists(input))
 			{
@@ -1074,9 +1067,8 @@ namespace SabreTools.Helper.Tools
 		/// (INCOMPLETE) Get the T7Z status of the file
 		/// </summary>
 		/// <param name="filename">Name of the file to check</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>0 if the file isn't 7z, 1 if the file is t7z, 2 if the file is 7z</returns>
-		public static int IsT7z(string filename, Logger logger)
+		public static int IsT7z(string filename)
 		{
 			int ist7z = 0;
 
@@ -1106,7 +1098,7 @@ namespace SabreTools.Helper.Tools
 				}
 				catch
 				{
-					logger.Warning("File '" + filename + "' could not be opened");
+					Globals.Logger.Warning("File '" + filename + "' could not be opened");
 					ist7z = 0;
 				}
 			}
@@ -1124,16 +1116,15 @@ namespace SabreTools.Helper.Tools
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTAR(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
+		public static bool WriteTAR(string inputFile, string outDir, Rom rom, bool date = false)
 		{
 			// Wrap the individual inputs into lists
 			List<string> inputFiles = new List<string>() { inputFile };
 			List<Rom> roms = new List<Rom>() { rom };
 
-			return WriteTAR(inputFiles, outDir, roms, logger, date: date);
+			return WriteTAR(inputFiles, outDir, roms, date: date);
 		}
 
 		/// <summary>
@@ -1142,10 +1133,9 @@ namespace SabreTools.Helper.Tools
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">List of Rom representing the new information</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTAR(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
+		public static bool WriteTAR(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false)
 		{
 			bool success = false;
 			string tempFile = Path.Combine(Path.GetTempPath(), "tmp" + Guid.NewGuid().ToString());
@@ -1308,16 +1298,15 @@ namespace SabreTools.Helper.Tools
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrent7Zip(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
+		public static bool WriteTorrent7Zip(string inputFile, string outDir, Rom rom, bool date = false)
 		{
 			// Wrap the individual inputs into lists
 			List<string> inputFiles = new List<string>() { inputFile };
 			List<Rom> roms = new List<Rom>() { rom };
 
-			return WriteTorrent7Zip(inputFiles, outDir, roms, logger, date: date);
+			return WriteTorrent7Zip(inputFiles, outDir, roms, date: date);
 		}
 
 		/// <summary>
@@ -1326,10 +1315,9 @@ namespace SabreTools.Helper.Tools
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">List of Rom representing the new information</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrent7Zip(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
+		public static bool WriteTorrent7Zip(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false)
 		{
 			bool success = false;
 			string tempFile = Path.Combine(outDir, "tmp" + Guid.NewGuid().ToString());
@@ -1541,15 +1529,14 @@ namespace SabreTools.Helper.Tools
 		/// <param name="input">File to write from</param>
 		/// <param name="outDir">Directory to write archive to</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the write was a success, false otherwise</returns>
 		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
-		public static bool WriteTorrentGZ(string input, string outDir, bool romba, Logger logger)
+		public static bool WriteTorrentGZ(string input, string outDir, bool romba)
 		{
 			// Check that the input file exists
 			if (!File.Exists(input))
 			{
-				logger.Warning("File " + input + " does not exist!");
+				Globals.Logger.Warning("File " + input + " does not exist!");
 				return false;
 			}
 			input = Path.GetFullPath(input);
@@ -1562,7 +1549,7 @@ namespace SabreTools.Helper.Tools
 			outDir = Path.GetFullPath(outDir);
 
 			// Now get the Rom info for the file so we have hashes and size
-			Rom rom = FileTools.GetFileInfo(input, logger);
+			Rom rom = FileTools.GetFileInfo(input);
 
 			// Get the output file name
 			string outfile = null;
@@ -1634,16 +1621,15 @@ namespace SabreTools.Helper.Tools
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrentLRZ(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
+		public static bool WriteTorrentLRZ(string inputFile, string outDir, Rom rom, bool date = false)
 		{
 			// Wrap the individual inputs into lists
 			List<string> inputFiles = new List<string>() { inputFile };
 			List<Rom> roms = new List<Rom>() { rom };
 
-			return WriteTorrentLRZ(inputFiles, outDir, roms, logger, date: date);
+			return WriteTorrentLRZ(inputFiles, outDir, roms, date: date);
 		}
 
 		/// <summary>
@@ -1652,10 +1638,9 @@ namespace SabreTools.Helper.Tools
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">List of Rom representing the new information</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrentLRZ(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
+		public static bool WriteTorrentLRZ(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false)
 		{
 			return false;
 		}
@@ -1666,16 +1651,15 @@ namespace SabreTools.Helper.Tools
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrentRAR(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
+		public static bool WriteTorrentRAR(string inputFile, string outDir, Rom rom, bool date = false)
 		{
 			// Wrap the individual inputs into lists
 			List<string> inputFiles = new List<string>() { inputFile };
 			List<Rom> roms = new List<Rom>() { rom };
 
-			return WriteTorrentRAR(inputFiles, outDir, roms, logger, date: date);
+			return WriteTorrentRAR(inputFiles, outDir, roms, date: date);
 		}
 
 		/// <summary>
@@ -1684,10 +1668,9 @@ namespace SabreTools.Helper.Tools
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">List of Rom representing the new information</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrentRAR(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
+		public static bool WriteTorrentRAR(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false)
 		{
 			return false;
 		}
@@ -1698,16 +1681,15 @@ namespace SabreTools.Helper.Tools
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrentXZ(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
+		public static bool WriteTorrentXZ(string inputFile, string outDir, Rom rom, bool date = false)
 		{
 			// Wrap the individual inputs into lists
 			List<string> inputFiles = new List<string>() { inputFile };
 			List<Rom> roms = new List<Rom>() { rom };
 
-			return WriteTorrentXZ(inputFiles, outDir, roms, logger, date: date);
+			return WriteTorrentXZ(inputFiles, outDir, roms, date: date);
 		}
 
 		/// <summary>
@@ -1716,10 +1698,9 @@ namespace SabreTools.Helper.Tools
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">List of Rom representing the new information</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrentXZ(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
+		public static bool WriteTorrentXZ(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false)
 		{
 			return false;
 		}
@@ -1730,16 +1711,15 @@ namespace SabreTools.Helper.Tools
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">RomData representing the new information</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrentZip(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
+		public static bool WriteTorrentZip(string inputFile, string outDir, Rom rom, bool date = false)
 		{
 			// Wrap the individual inputs into lists
 			List<string> inputFiles = new List<string>() { inputFile };
 			List<Rom> roms = new List<Rom>() { rom };
 
-			return WriteTorrentZip(inputFiles, outDir, roms, logger, date: date);
+			return WriteTorrentZip(inputFiles, outDir, roms, date: date);
 		}
 
 		/// <summary>
@@ -1748,10 +1728,9 @@ namespace SabreTools.Helper.Tools
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">List of Rom representing the new information</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public static bool WriteTorrentZip(List<string> inputFiles, string outDir, List<Rom> roms, Logger logger, bool date = false)
+		public static bool WriteTorrentZip(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false)
 		{
 			bool success = false;
 			string tempFile = Path.Combine(outDir, "tmp" + Guid.NewGuid().ToString());

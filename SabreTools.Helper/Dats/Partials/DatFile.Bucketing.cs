@@ -19,11 +19,9 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="bucketBy">SortedBy enum representing how to sort the individual items</param>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="lower">True if the key should be lowercased (default), false otherwise</param>
 		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
-		public void BucketBy(SortedBy bucketBy, bool mergeroms, int maxDegreeOfParallelism, Logger logger, bool lower = true, bool norename = true)
+		public void BucketBy(SortedBy bucketBy, bool mergeroms, bool lower = true, bool norename = true)
 		{
 			// If we already have the right sorting, trust it
 			if (_sortedBy == bucketBy)
@@ -37,12 +35,12 @@ namespace SabreTools.Helper.Dats
 			// Create the temporary dictionary to sort into
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by " + bucketBy);
+			Globals.Logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by " + bucketBy);
 
 			// First do the initial sort of all of the roms
 			List<string> keys = Keys.ToList();
 			Parallel.ForEach(keys,
-				new ParallelOptions() { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+				new ParallelOptions() { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 				key =>
 				{
 					List<DatItem> roms = this[key];
@@ -50,7 +48,7 @@ namespace SabreTools.Helper.Dats
 					// If we're merging the roms, do so
 					if (mergeroms)
 					{
-						roms = DatItem.Merge(roms, logger);
+						roms = DatItem.Merge(roms);
 					}
 
 					// Now add each of the roms to their respective games
@@ -131,7 +129,7 @@ namespace SabreTools.Helper.Dats
 			// Now go through and sort all of the individual lists
 			keys = sortable.Keys.ToList();
 			Parallel.ForEach(keys,
-				new ParallelOptions() { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+				new ParallelOptions() { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 				key =>
 			{
 				List<DatItem> sortedlist = sortable[key];
@@ -155,25 +153,23 @@ namespace SabreTools.Helper.Dats
 		/// Use cloneof tags to create non-merged sets and remove the tags plus using the device_ref tags to get full sets
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		public void CreateFullyNonMergedSets(bool mergeroms, int maxDegreeOfParallelism, Logger logger)
+		public void CreateFullyNonMergedSets(bool mergeroms)
 		{
-			logger.User("Creating fully non-merged sets from the DAT");
+			Globals.Logger.User("Creating fully non-merged sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketBy(SortedBy.Game, mergeroms, maxDegreeOfParallelism, logger, norename: true);
+			BucketBy(SortedBy.Game, mergeroms, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
-			AddRomsFromDevices(logger);
-			AddRomsFromParent(logger);
+			AddRomsFromDevices();
+			AddRomsFromParent();
 
 			// Now that we have looped through the cloneof tags, we loop through the romof tags
-			AddRomsFromBios(logger);
+			AddRomsFromBios();
 
 			// Then, remove the romof and cloneof tags so it's not picked up by the manager
-			RemoveTagsFromChild(logger);
+			RemoveTagsFromChild();
 
 			// Finally, remove all sets that are labeled as bios or device
 			//RemoveBiosAndDeviceSets(logger);
@@ -183,72 +179,66 @@ namespace SabreTools.Helper.Dats
 		/// Use cloneof tags to create merged sets and remove the tags
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		public void CreateMergedSets(bool mergeroms, int maxDegreeOfParallelism, Logger logger)
+		public void CreateMergedSets(bool mergeroms)
 		{
-			logger.User("Creating merged sets from the DAT");
+			Globals.Logger.User("Creating merged sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketBy(SortedBy.Game, mergeroms, maxDegreeOfParallelism, logger, norename: true);
+			BucketBy(SortedBy.Game, mergeroms, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
-			AddRomsToParent(logger);
+			AddRomsToParent();
 
 			// Now that we have looped through the cloneof tags, we loop through the romof tags
-			RemoveBiosRomsFromChild(logger);
+			RemoveBiosRomsFromChild();
 
 			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
-			RemoveTagsFromChild(logger);
+			RemoveTagsFromChild();
 		}
 
 		/// <summary>
 		/// Use cloneof tags to create non-merged sets and remove the tags
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		public void CreateNonMergedSets(bool mergeroms, int maxDegreeOfParallelism, Logger logger)
+		public void CreateNonMergedSets(bool mergeroms)
 		{
-			logger.User("Creating non-merged sets from the DAT");
+			Globals.Logger.User("Creating non-merged sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketBy(SortedBy.Game, mergeroms, maxDegreeOfParallelism, logger, norename: true);
+			BucketBy(SortedBy.Game, mergeroms, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
-			AddRomsFromParent(logger);
+			AddRomsFromParent();
 
 			// Now that we have looped through the cloneof tags, we loop through the romof tags
-			RemoveBiosRomsFromChild(logger);
+			RemoveBiosRomsFromChild();
 
 			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
-			RemoveTagsFromChild(logger);
+			RemoveTagsFromChild();
 		}
 
 		/// <summary>
 		/// Use cloneof and romof tags to create split sets and remove the tags
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		public void CreateSplitSets(bool mergeroms, int maxDegreeOfParallelism, Logger logger)
+		public void CreateSplitSets(bool mergeroms)
 		{
-			logger.User("Creating split sets from the DAT");
+			Globals.Logger.User("Creating split sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketBy(SortedBy.Game, mergeroms, maxDegreeOfParallelism, logger, norename: true);
+			BucketBy(SortedBy.Game, mergeroms, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
-			RemoveRomsFromChild(logger);
+			RemoveRomsFromChild();
 
 			// Now that we have looped through the cloneof tags, we loop through the romof tags
-			RemoveBiosRomsFromChild(logger);
+			RemoveBiosRomsFromChild();
 
 			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
-			RemoveTagsFromChild(logger);
+			RemoveTagsFromChild();
 		}
 
 		#endregion
@@ -258,8 +248,7 @@ namespace SabreTools.Helper.Dats
 		/// <summary>
 		/// Use romof tags to add roms to the children
 		/// </summary>
-		/// <param name="logger">Logger object for file and console output</param>
-		private void AddRomsFromBios(Logger logger)
+		private void AddRomsFromBios()
 		{
 			List<string> games = Keys.ToList();
 			foreach (string game in games)
@@ -359,8 +348,7 @@ namespace SabreTools.Helper.Dats
 		/// <summary>
 		/// Use device_ref tags to add roms to the children
 		/// </summary>
-		/// <param name="logger">Logger object for file and console output</param>
-		private void AddRomsFromDevices(Logger logger)
+		private void AddRomsFromDevices()
 		{
 			List<string> games = Keys.ToList();
 			foreach (string game in games)
@@ -452,8 +440,7 @@ namespace SabreTools.Helper.Dats
 		/// <summary>
 		/// Use cloneof tags to add roms to the children, setting the new romof tag in the process
 		/// </summary>
-		/// <param name="logger">Logger object for file and console output</param>
-		private void AddRomsFromParent(Logger logger)
+		private void AddRomsFromParent()
 		{
 			List<string> games = Keys.ToList();
 			foreach (string game in games)
@@ -561,8 +548,7 @@ namespace SabreTools.Helper.Dats
 		/// <summary>
 		/// Use cloneof tags to add roms to the parents, removing the child sets in the process
 		/// </summary>
-		/// <param name="logger"></param>
-		private void AddRomsToParent(Logger logger)
+		private void AddRomsToParent()
 		{
 			List<string> games = Keys.ToList();
 			foreach (string game in games)
@@ -610,8 +596,7 @@ namespace SabreTools.Helper.Dats
 		/// <summary>
 		/// Remove all BIOS and device sets
 		/// </summary>
-		/// <param name="logger"></param>
-		private void RemoveBiosAndDeviceSets(Logger logger)
+		private void RemoveBiosAndDeviceSets()
 		{
 			List<string> games = Keys.ToList();
 			foreach (string game in games)
@@ -628,8 +613,7 @@ namespace SabreTools.Helper.Dats
 		/// <summary>
 		/// Use romof tags to remove roms from the children
 		/// </summary>
-		/// <param name="logger">Logger object for file and console output</param>
-		private void RemoveBiosRomsFromChild(Logger logger)
+		private void RemoveBiosRomsFromChild()
 		{
 			// Loop through the romof tags
 			List<string> games = Keys.ToList();
@@ -724,8 +708,7 @@ namespace SabreTools.Helper.Dats
 		/// <summary>
 		/// Use cloneof tags to remove roms from the children
 		/// </summary>
-		/// <param name="logger">Logger object for file and console output</param>
-		private void RemoveRomsFromChild(Logger logger)
+		private void RemoveRomsFromChild()
 		{
 			List<string> games = Keys.ToList();
 			foreach (string game in games)
@@ -827,8 +810,7 @@ namespace SabreTools.Helper.Dats
 		/// <summary>
 		/// Remove all romof and cloneof tags from all games
 		/// </summary>
-		/// <param name="logger"></param>
-		private void RemoveTagsFromChild(Logger logger)
+		private void RemoveTagsFromChild()
 		{
 			List<string> games = Keys.ToList();
 			foreach (string game in games)
@@ -856,12 +838,11 @@ namespace SabreTools.Helper.Dats
 		/// <param name="list">Input unsorted list</param>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
 		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
 		/// <returns>SortedDictionary bucketed by game name</returns>
-		public static SortedDictionary<string, List<DatItem>> BucketListByGame(List<DatItem> list, bool mergeroms, bool norename, Logger logger, bool output = true)
+		public static SortedDictionary<string, List<DatItem>> BucketListByGame(List<DatItem> list, bool mergeroms, bool norename, bool output = true)
 		{
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
+			Globals.Logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
 
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
@@ -875,7 +856,7 @@ namespace SabreTools.Helper.Dats
 			// If we're merging the roms, do so
 			if (mergeroms)
 			{
-				list = DatItem.Merge(list, logger);
+				list = DatItem.Merge(list);
 			}
 
 			// Now add each of the roms to their respective games

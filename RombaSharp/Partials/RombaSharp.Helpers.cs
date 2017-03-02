@@ -37,22 +37,22 @@ namespace RombaSharp
 			// Total number of CRCs
 			string query = "SELECT COUNT(*) FROM crc";
 			SqliteCommand slc = new SqliteCommand(query, dbc);
-			_logger.User("Total CRCs: " + (long)slc.ExecuteScalar());
+			Globals.Logger.User("Total CRCs: " + (long)slc.ExecuteScalar());
 
 			// Total number of MD5s
 			query = "SELECT COUNT(*) FROM md5";
 			slc = new SqliteCommand(query, dbc);
-			_logger.User("Total MD5s: " + (long)slc.ExecuteScalar());
+			Globals.Logger.User("Total MD5s: " + (long)slc.ExecuteScalar());
 
 			// Total number of SHA1s
 			query = "SELECT COUNT(*) FROM sha1";
 			slc = new SqliteCommand(query, dbc);
-			_logger.User("Total SHA1s: " + (long)slc.ExecuteScalar());
+			Globals.Logger.User("Total SHA1s: " + (long)slc.ExecuteScalar());
 
 			// Total number of DATs
 			query = "SELECT COUNT(*) FROM dat";
 			slc = new SqliteCommand(query, dbc);
-			_logger.User("Total DATs: " + (long)slc.ExecuteScalar());
+			Globals.Logger.User("Total DATs: " + (long)slc.ExecuteScalar());
 
 			slc.Dispose();
 			dbc.Dispose();
@@ -65,16 +65,16 @@ namespace RombaSharp
 		{
 			Process proc = Process.GetCurrentProcess();
 
-			_logger.User("Current Nonpaged Memory: " + Style.GetBytesReadable(proc.NonpagedSystemMemorySize64));
-			_logger.User("Current Paged Memory: " + Style.GetBytesReadable(proc.PagedMemorySize64));
-			_logger.User("Peak Paged Memory: " + Style.GetBytesReadable(proc.PeakPagedMemorySize64));
-			_logger.User("Peak Virtual Memory: " + Style.GetBytesReadable(proc.PeakVirtualMemorySize64));
-			_logger.User("Peak Working Memory: " + Style.GetBytesReadable(proc.PeakWorkingSet64));
-			_logger.User("Private Memory: " + Style.GetBytesReadable(proc.PrivateMemorySize64));
-			_logger.User("Virtual Memory: " + Style.GetBytesReadable(proc.VirtualMemorySize64));
-			_logger.User("Working Memory: " + Style.GetBytesReadable(proc.WorkingSet64));
-			_logger.User("Total Processor Time: " + proc.TotalProcessorTime);
-			_logger.User("User Processor Time: " + proc.UserProcessorTime);
+			Globals.Logger.User("Current Nonpaged Memory: " + Style.GetBytesReadable(proc.NonpagedSystemMemorySize64));
+			Globals.Logger.User("Current Paged Memory: " + Style.GetBytesReadable(proc.PagedMemorySize64));
+			Globals.Logger.User("Peak Paged Memory: " + Style.GetBytesReadable(proc.PeakPagedMemorySize64));
+			Globals.Logger.User("Peak Virtual Memory: " + Style.GetBytesReadable(proc.PeakVirtualMemorySize64));
+			Globals.Logger.User("Peak Working Memory: " + Style.GetBytesReadable(proc.PeakWorkingSet64));
+			Globals.Logger.User("Private Memory: " + Style.GetBytesReadable(proc.PrivateMemorySize64));
+			Globals.Logger.User("Virtual Memory: " + Style.GetBytesReadable(proc.VirtualMemorySize64));
+			Globals.Logger.User("Working Memory: " + Style.GetBytesReadable(proc.WorkingSet64));
+			Globals.Logger.User("Total Processor Time: " + proc.TotalProcessorTime);
+			Globals.Logger.User("User Processor Time: " + proc.UserProcessorTime);
 		}
 
 		/// <summary>
@@ -130,12 +130,12 @@ namespace RombaSharp
 				if (lowerCaseDats.Contains(input.ToLowerInvariant()))
 				{
 					string fullpath = Path.GetFullPath(datRootDats[lowerCaseDats.IndexOf(input.ToLowerInvariant())]);
-					string sha1 = FileTools.GetFileInfo(fullpath, _logger).SHA1;
+					string sha1 = FileTools.GetFileInfo(fullpath).SHA1;
 					foundDats.Add(sha1, fullpath);
 				}
 				else
 				{
-					_logger.Warning("The file '" + input + "' could not be found in the DAT root");
+					Globals.Logger.Warning("The file '" + input + "' could not be found in the DAT root");
 				}
 			}
 
@@ -162,7 +162,7 @@ namespace RombaSharp
 			Dictionary<string, Tuple<long, bool>> depots = new Dictionary<string, Tuple<long, bool>>();
 
 			// Get the XML text reader for the configuration file, if possible
-			XmlReader xtr = FileTools.GetXmlTextReader(_config, _logger);
+			XmlReader xtr = FileTools.GetXmlTextReader(_config);
 
 			// Now parse the XML file for settings
 			if (xtr != null)
@@ -339,7 +339,7 @@ namespace RombaSharp
 			}
 
 			// Finally set all of the fields
-			_workers = workers;
+			Globals.MaxDegreeOfParallelism = workers;
 			_logdir = logdir;
 			_tmpdir = tmpdir;
 			_webdir = webdir;
@@ -359,7 +359,7 @@ namespace RombaSharp
 		/// <param name="logOnly">Only write out actions to log</param>
 		private static void PurgeBackup(bool logOnly)
 		{
-			_logger.User("This feature is not yet implemented: purge-backup");
+			Globals.Logger.User("This feature is not yet implemented: purge-backup");
 		}
 
 		/// <summary>
@@ -368,7 +368,7 @@ namespace RombaSharp
 		/// <param name="logOnly">Only write out actions to log</param>
 		private static void PurgeDelete(bool logOnly)
 		{
-			_logger.User("This feature is not yet implemented: purge-delete");
+			Globals.Logger.User("This feature is not yet implemented: purge-delete");
 		}
 
 		/// <summary>
@@ -404,8 +404,8 @@ namespace RombaSharp
 
 			// First get a list of SHA-1's from the input DATs
 			DatFile datroot = new DatFile { Type = "SuperDAT", };
-			datroot.PopulateFromDir(_dats, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, false, false, false, false, _tmpdir, false, null, 4, _logger);
-			datroot.BucketBy(SortedBy.SHA1, false /* mergeroms */, 4 /* maxDegreeOfParallelism */, _logger);
+			datroot.PopulateFromDir(_dats, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, false, false, false, false, _tmpdir, false, null);
+			datroot.BucketBy(SortedBy.SHA1, false /* mergeroms */);
 
 			// Create a List of dat hashes in the database (SHA-1)
 			List<string> databaseDats = new List<string>();
@@ -415,7 +415,7 @@ namespace RombaSharp
 			dbc.Open();
 
 			// Populate the List from the database
-			_logger.User("Populating the list of existing DATs");
+			Globals.Logger.User("Populating the list of existing DATs");
 			DateTime start = DateTime.Now;
 
 			string query = "SELECT DISTINCT hash FROM dat";
@@ -435,15 +435,15 @@ namespace RombaSharp
 					unneeded.Add(hash);
 				}
 			}
-			datroot.BucketBy(SortedBy.Game, false /* mergeroms */, 4 /* maxDegreeOfParallelism */, _logger, norename: true);
+			datroot.BucketBy(SortedBy.Game, false /* mergeroms */, norename: true);
 
-			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			slc.Dispose();
 			sldr.Dispose();
 
 			// Loop through the Dictionary and add all data
-			_logger.User("Adding new DAT information");
+			Globals.Logger.User("Adding new DAT information");
 			start = DateTime.Now;
 			foreach (string key in datroot.Keys)
 			{
@@ -453,10 +453,10 @@ namespace RombaSharp
 				}
 			}
 
-			_logger.User("Adding complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Adding complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Now loop through and remove all references to old Dats
-			_logger.User("Removing unmatched DAT information");
+			Globals.Logger.User("Removing unmatched DAT information");
 			start = DateTime.Now;
 
 			foreach (string dathash in unneeded)
@@ -466,7 +466,7 @@ namespace RombaSharp
 				slc.ExecuteNonQuery();
 				slc.Dispose();
 			}
-			_logger.User("Removing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Removing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			dbc.Dispose();
 		}
@@ -477,9 +477,9 @@ namespace RombaSharp
 			string fullpath = Path.Combine(_dats, (dat.Machine.Name == "dats" ? "" : dat.Machine.Name), dat.Name);
 
 			// Parse the Dat if possible
-			_logger.User("Adding from '" + dat.Name + "'");
+			Globals.Logger.User("Adding from '" + dat.Name + "'");
 			DatFile tempdat = new DatFile();
-			tempdat.Parse(fullpath, 0, 0, _logger);
+			tempdat.Parse(fullpath, 0, 0);
 
 			// If the Dat wasn't empty, add the information
 			SqliteCommand slc = new SqliteCommand();
@@ -496,7 +496,7 @@ namespace RombaSharp
 				{
 					foreach (DatItem datItem in tempdat[romkey])
 					{
-						_logger.Verbose("Checking and adding file '" + datItem.Name);
+						Globals.Logger.Verbose("Checking and adding file '" + datItem.Name);
 
 						if (datItem.Type == ItemType.Rom)
 						{
@@ -588,14 +588,14 @@ namespace RombaSharp
 			// Check that it's a valid depot first
 			if (!_depots.ContainsKey(depotname))
 			{
-				_logger.User("'" + depotname + "' is not a recognized depot. Please add it to your configuration file and try again");
+				Globals.Logger.User("'" + depotname + "' is not a recognized depot. Please add it to your configuration file and try again");
 				return;
 			}
 
 			// Then check that the depot is online
 			if (!Directory.Exists(depotname))
 			{
-				_logger.User("'" + depotname + "' does not appear to be online. Please check its status and try again");
+				Globals.Logger.User("'" + depotname + "' does not appear to be online. Please check its status and try again");
 				return;
 			}
 
@@ -618,8 +618,8 @@ namespace RombaSharp
 
 			// Now rescan the depot itself
 			DatFile depot = new DatFile();
-			depot.PopulateFromDir(depotname, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, false, true, false, false, _tmpdir, false, null, _workers, _logger);
-			depot.BucketBy(SortedBy.SHA1, false /* mergeroms */, 4 /* maxDegreeOfParallelism */, _logger);
+			depot.PopulateFromDir(depotname, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, false, true, false, false, _tmpdir, false, null);
+			depot.BucketBy(SortedBy.SHA1, false /* mergeroms */);
 
 			// Set the base queries to use
 			string crcquery = "INSERT OR IGNORE INTO crc (crc) VALUES";

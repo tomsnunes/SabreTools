@@ -34,16 +34,15 @@ namespace SabreTools.Helper.Skippers
 		/// </summary>
 		/// <param name="input">Input file name</param>
 		/// <param name="output">Output file name</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the file was transformed properly, false otherwise</returns>
-		public bool TransformFile(string input, string output, Logger logger)
+		public bool TransformFile(string input, string output)
 		{
 			bool success = true;
 
 			// If the input file doesn't exist, fail
 			if (!File.Exists(input))
 			{
-				logger.Error("I'm sorry but '" + input + "' doesn't exist!");
+				Globals.Logger.Error("I'm sorry but '" + input + "' doesn't exist!");
 				return false;
 			}
 
@@ -53,8 +52,8 @@ namespace SabreTools.Helper.Skippers
 				Directory.CreateDirectory(Path.GetDirectoryName(output));
 			}
 
-			logger.User("Attempting to apply rule to '" + input + "'");
-			success = TransformStream(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), File.OpenWrite(output), logger);
+			Globals.Logger.User("Attempting to apply rule to '" + input + "'");
+			success = TransformStream(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), File.OpenWrite(output));
 
 			// If the output file has size 0, delete it
 			if (new FileInfo(output).Length == 0)
@@ -78,11 +77,10 @@ namespace SabreTools.Helper.Skippers
 		/// </summary>
 		/// <param name="input">Input stream</param>
 		/// <param name="output">Output stream</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
 		/// <param name="keepWriteOpen">True if the underlying write stream should be kept open, false otherwise</param>
 		/// <returns>True if the file was transformed properly, false otherwise</returns>
-		public bool TransformStream(Stream input, Stream output, Logger logger, bool keepReadOpen = false, bool keepWriteOpen = false)
+		public bool TransformStream(Stream input, Stream output, bool keepReadOpen = false, bool keepWriteOpen = false)
 		{
 			bool success = true;
 
@@ -92,7 +90,7 @@ namespace SabreTools.Helper.Skippers
 				|| (Operation > HeaderSkipOperation.Byteswap && (extsize % 4) != 0)
 				|| (Operation > HeaderSkipOperation.Bitswap && (StartOffset == null || StartOffset % 2 == 0)))
 			{
-				logger.Error("The stream did not have the correct size to be transformed!");
+				Globals.Logger.Error("The stream did not have the correct size to be transformed!");
 				return false;
 			}
 
@@ -101,7 +99,7 @@ namespace SabreTools.Helper.Skippers
 			BinaryReader br = null;
 			try
 			{
-				logger.User("Applying found rule to input stream");
+				Globals.Logger.User("Applying found rule to input stream");
 				bw = new BinaryWriter(output);
 				br = new BinaryReader(input);
 
@@ -189,7 +187,7 @@ namespace SabreTools.Helper.Skippers
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex.ToString());
+				Globals.Logger.Error(ex.ToString());
 				return false;
 			}
 			finally

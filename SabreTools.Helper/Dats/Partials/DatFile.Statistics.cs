@@ -102,13 +102,11 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="outputs">Dictionary representing the outputs</param>
 		/// <param name="statDatFormat">Set the statistics output format to use</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for file and console writing</param>
 		/// <param name="recalculate">True if numbers should be recalculated for the DAT, false otherwise (default)</param>
 		/// <param name="game">Number of games to use, -1 means recalculate games (default)</param>
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise (default)</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise (default)</param>
-		public void OutputStats(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, int maxDegreeOfParallelism, Logger logger,
+		public void OutputStats(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat,
 			bool recalculate = false, long game = -1, bool baddumpCol = false, bool nodumpCol = false)
 		{
 			// If we're supposed to recalculate the statistics, do so
@@ -117,7 +115,7 @@ namespace SabreTools.Helper.Dats
 				RecalculateStats();
 			}
 
-			BucketBy(SortedBy.Game, false /* mergeroms */, maxDegreeOfParallelism, logger, norename: true);
+			BucketBy(SortedBy.Game, false /* mergeroms */, norename: true);
 			if (TotalSize < 0)
 			{
 				TotalSize = Int64.MaxValue + TotalSize;
@@ -144,7 +142,7 @@ namespace SabreTools.Helper.Dats
 				results += "	Roms with Nodump status: " + NodumpCount + "\n";
 			}
 
-			logger.User(results);
+			Globals.Logger.User(results);
 
 			// Now write it out to file as well
 			string line = "";
@@ -263,10 +261,8 @@ namespace SabreTools.Helper.Dats
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
 		/// <param name="statDatFormat" > Set the statistics output format to use</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		public static void OutputStats(List<string> inputs, string reportName, string outDir, bool single,
-			bool baddumpCol, bool nodumpCol, StatDatFormat statDatFormat, int maxDegreeOfParallelism, Logger logger)
+			bool baddumpCol, bool nodumpCol, StatDatFormat statDatFormat)
 		{
 			// If there's no output format, set the default
 			if (statDatFormat == 0x0)
@@ -364,7 +360,7 @@ namespace SabreTools.Helper.Dats
 						BaddumpCount = dirBaddump,
 						NodumpCount = dirNodump,
 					};
-					lastdirdat.OutputStats(outputs, statDatFormat, maxDegreeOfParallelism, logger,
+					lastdirdat.OutputStats(outputs, statDatFormat,
 						game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 
 					// Write the mid-footer, if any
@@ -386,17 +382,17 @@ namespace SabreTools.Helper.Dats
 					dirNodump = 0;
 				}
 
-				logger.Verbose("Beginning stat collection for '" + filename.Item1 + "'", false);
+				Globals.Logger.Verbose("Beginning stat collection for '" + filename.Item1 + "'", false);
 				List<string> games = new List<string>();
 				DatFile datdata = new DatFile();
-				datdata.Parse(filename.Item1, 0, 0, logger);
-				datdata.BucketBy(SortedBy.Game, false /* mergeroms */, maxDegreeOfParallelism, logger, norename: true);
+				datdata.Parse(filename.Item1, 0, 0);
+				datdata.BucketBy(SortedBy.Game, false /* mergeroms */, norename: true);
 
 				// Output single DAT stats (if asked)
-				logger.User("Adding stats for file '" + filename.Item1 + "'\n", false);
+				Globals.Logger.User("Adding stats for file '" + filename.Item1 + "'\n", false);
 				if (single)
 				{
-					datdata.OutputStats(outputs, statDatFormat, maxDegreeOfParallelism, logger,
+					datdata.OutputStats(outputs, statDatFormat,
 						baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 				}
 
@@ -446,7 +442,7 @@ namespace SabreTools.Helper.Dats
 					BaddumpCount = dirBaddump,
 					NodumpCount = dirNodump,
 				};
-				dirdat.OutputStats(outputs, statDatFormat, maxDegreeOfParallelism, logger,
+				dirdat.OutputStats(outputs, statDatFormat,
 					game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 			}
 
@@ -481,7 +477,7 @@ namespace SabreTools.Helper.Dats
 				BaddumpCount = totalBaddump,
 				NodumpCount = totalNodump,
 			};
-			totaldata.OutputStats(outputs, statDatFormat, maxDegreeOfParallelism, logger,
+			totaldata.OutputStats(outputs, statDatFormat,
 				game: totalGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 
 			// Output footer if needed
@@ -494,7 +490,7 @@ namespace SabreTools.Helper.Dats
 				outputs[format].Dispose();
 			}
 
-			logger.User(@"
+			Globals.Logger.User(@"
 Please check the log folder if the stats scrolled offscreen", false);
 		}
 

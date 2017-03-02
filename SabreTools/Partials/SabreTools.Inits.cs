@@ -113,12 +113,12 @@ namespace SabreTools
 
 					string basePath = Path.GetFullPath(path);
 					bool success = datdata.PopulateFromDir(basePath, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,
-						addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, headerToCheckAgainst, _maxDegreeOfParallelism, _logger);
+						addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, headerToCheckAgainst);
 
 					// If it was a success, write the DAT out
 					if (success)
 					{
-						datdata.WriteToFile(outDir, _maxDegreeOfParallelism, _logger);
+						datdata.WriteToFile(outDir);
 					}
 
 					// Otherwise, show the help
@@ -142,13 +142,13 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					FileTools.DetectSkipperAndTransform(input, outDir, _logger);
+					FileTools.DetectSkipperAndTransform(input, outDir);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string sub in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						FileTools.DetectSkipperAndTransform(sub, outDir, _logger);
+						FileTools.DetectSkipperAndTransform(sub, outDir);
 					}
 				}
 			}
@@ -169,22 +169,22 @@ namespace SabreTools
 				if (File.Exists(input))
 				{
 					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger);
-					datFile.SplitByExt(outDir, Path.GetDirectoryName(input), exta, extb, _maxDegreeOfParallelism, _logger);
+					datFile.Parse(Path.GetFullPath(input), 0, 0);
+					datFile.SplitByExt(outDir, Path.GetDirectoryName(input), exta, extb);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger);
+						datFile.Parse(Path.GetFullPath(file), 0, 0);
 						datFile.SplitByExt(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar),
-							exta, extb, _maxDegreeOfParallelism, _logger);
+							exta, extb);
 					}
 				}
 				else
 				{
-					_logger.Error(input + " is not a valid file or folder!");
+					Globals.Logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
 					_help.OutputIndividualFeature("Extension Split");
 					return;
@@ -205,22 +205,21 @@ namespace SabreTools
 				if (File.Exists(input))
 				{
 					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger);
-					datFile.SplitByHash(outDir, Path.GetDirectoryName(input), _maxDegreeOfParallelism, _logger);
+					datFile.Parse(Path.GetFullPath(input), 0, 0);
+					datFile.SplitByHash(outDir, Path.GetDirectoryName(input));
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger);
-						datFile.SplitByHash(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar),
-							_maxDegreeOfParallelism, _logger);
+						datFile.Parse(Path.GetFullPath(file), 0, 0);
+						datFile.SplitByHash(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar));
 					}
 				}
 				else
 				{
-					_logger.Error(input + " is not a valid file or folder!");
+					Globals.Logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
 					_help.OutputIndividualFeature("Hash Split");
 					return;
@@ -239,13 +238,13 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					FileTools.RestoreHeader(input, outDir, _logger);
+					FileTools.RestoreHeader(input, outDir);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string sub in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						FileTools.RestoreHeader(sub, outDir, _logger);
+						FileTools.RestoreHeader(sub, outDir);
 					}
 				}
 			}
@@ -266,22 +265,22 @@ namespace SabreTools
 				if (File.Exists(input))
 				{
 					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, keep: true);
-					datFile.SplitByLevel(outDir, Path.GetDirectoryName(input), shortname, basedat, _maxDegreeOfParallelism, _logger);
+					datFile.Parse(Path.GetFullPath(input), 0, 0, keep: true);
+					datFile.SplitByLevel(outDir, Path.GetDirectoryName(input), shortname, basedat);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, keep: true);
+						datFile.Parse(Path.GetFullPath(file), 0, 0, keep: true);
 						datFile.SplitByLevel(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar),
-							shortname, basedat, _maxDegreeOfParallelism, _logger);
+							shortname, basedat);
 					}
 				}
 				else
 				{
-					_logger.Error(input + " is not a valid file or folder!");
+					Globals.Logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
 					_help.OutputIndividualFeature("Level Split");
 					return;
@@ -317,19 +316,18 @@ namespace SabreTools
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
 
 			DateTime start = DateTime.Now;
-			_logger.User("Populating internal DAT...");
+			Globals.Logger.User("Populating internal DAT...");
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */,
-					_maxDegreeOfParallelism, _logger, keep: true, useTags: true);
+				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, keep: true, useTags: true);
 			}
-			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			datdata.RebuildGeneric(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
-				updateDat, headerToCheckAgainst, _maxDegreeOfParallelism, _logger);
+				updateDat, headerToCheckAgainst);
 		}
 
 		/// <summary>
@@ -351,19 +349,18 @@ namespace SabreTools
 			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, string headerToCheckAgainst, SplitType splitType)
 		{
 			DateTime start = DateTime.Now;
-			_logger.User("Populating internal DAT...");
+			Globals.Logger.User("Populating internal DAT...");
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */,
-					_maxDegreeOfParallelism, _logger, keep: true, useTags: true);
+				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, keep: true, useTags: true);
 			}
-			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			datdata.RebuildDepot(inputs, outDir, tempDir, date, delete, inverse, outputFormat, romba,
-				updateDat, headerToCheckAgainst, _maxDegreeOfParallelism, _logger);
+				updateDat, headerToCheckAgainst);
 		}
 
 		/// <summary>
@@ -379,7 +376,7 @@ namespace SabreTools
 		private static void InitStats(List<string> inputs, string filename, string outDir, bool single, bool baddumpCol, bool nodumpCol,
 			StatDatFormat statDatFormat)
 		{
-			DatFile.OutputStats(inputs, filename, outDir, single, baddumpCol, nodumpCol, statDatFormat, _maxDegreeOfParallelism, _logger);
+			DatFile.OutputStats(inputs, filename, outDir, single, baddumpCol, nodumpCol, statDatFormat);
 		}
 
 		/// <summary>
@@ -395,22 +392,21 @@ namespace SabreTools
 				if (File.Exists(input))
 				{
 					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger);
-					datFile.SplitByType(outDir, Path.GetFullPath(Path.GetDirectoryName(input)), _maxDegreeOfParallelism, _logger);
+					datFile.Parse(Path.GetFullPath(input), 0, 0);
+					datFile.SplitByType(outDir, Path.GetFullPath(Path.GetDirectoryName(input)));
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
 						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger);
-						datFile.SplitByType(outDir, Path.GetFullPath((input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar)),
-							_maxDegreeOfParallelism, _logger);
+						datFile.Parse(Path.GetFullPath(file), 0, 0);
+						datFile.SplitByType(outDir, Path.GetFullPath((input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar)));
 					}
 				}
 				else
 				{
-					_logger.Error(input + " is not a valid file or folder!");
+					Globals.Logger.Error(input + " is not a valid file or folder!");
 					Console.WriteLine();
 					_help.OutputIndividualFeature("Type Split");
 					return;
@@ -547,7 +543,7 @@ namespace SabreTools
 						fm = ForceMerging.Full;
 						break;
 					default:
-						_logger.Warning(forcemerge + " is not a valid merge flag");
+						Globals.Logger.Warning(forcemerge + " is not a valid merge flag");
 						break;
 				}
 			}
@@ -570,7 +566,7 @@ namespace SabreTools
 						fn = ForceNodump.Ignore;
 						break;
 					default:
-						_logger.Warning(forcend + " is not a valid nodump flag");
+						Globals.Logger.Warning(forcend + " is not a valid nodump flag");
 						break;
 				}
 			}
@@ -590,7 +586,7 @@ namespace SabreTools
 						fp = ForcePacking.Unzip;
 						break;
 					default:
-						_logger.Warning(forcepack + " is not a valid packing flag");
+						Globals.Logger.Warning(forcepack + " is not a valid packing flag");
 						break;
 				}
 			}
@@ -697,7 +693,7 @@ namespace SabreTools
 			};
 			
 			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, descAsName,
-				filter, splitType, trim, single, root, _maxDegreeOfParallelism, _logger);
+				filter, splitType, trim, single, root);
 		}
 
 		/// <summary>
@@ -717,18 +713,17 @@ namespace SabreTools
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
 
 			DateTime start = DateTime.Now;
-			_logger.User("Populating internal DAT...");
+			Globals.Logger.User("Populating internal DAT...");
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */,
-					_maxDegreeOfParallelism, _logger, keep: true, useTags: true);
+				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, keep: true, useTags: true);
 			}
-			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			datdata.VerifyGeneric(inputs, tempDir, hashOnly, quickScan, headerToCheckAgainst, _maxDegreeOfParallelism, _logger);
+			datdata.VerifyGeneric(inputs, tempDir, hashOnly, quickScan, headerToCheckAgainst);
 		}
 
 		/// <summary>
@@ -743,18 +738,17 @@ namespace SabreTools
 			string headerToCheckAgainst, SplitType splitType)
 		{
 			DateTime start = DateTime.Now;
-			_logger.User("Populating internal DAT...");
+			Globals.Logger.User("Populating internal DAT...");
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
 			foreach (string datfile in datfiles)
 			{
-				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */,
-					_maxDegreeOfParallelism, _logger, keep: true, useTags: true);
+				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */, keep: true, useTags: true);
 			}
-			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			datdata.VerifyDepot(inputs, tempDir, headerToCheckAgainst, _maxDegreeOfParallelism, _logger);
+			datdata.VerifyDepot(inputs, tempDir, headerToCheckAgainst);
 		}
 
 		#endregion

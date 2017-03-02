@@ -65,7 +65,7 @@ namespace SabreTools.Helper.Tools
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <returns>The DatFormat corresponding to the DAT</returns>
 		/// <remarks>There is currently no differentiation between XML and SabreDAT here</remarks>
-		public static DatFormat GetDatFormat(string filename, Logger logger)
+		public static DatFormat GetDatFormat(string filename)
 		{
 			// Limit the output formats based on extension
 			string ext = Path.GetExtension(filename).ToLowerInvariant();
@@ -80,12 +80,12 @@ namespace SabreTools.Helper.Tools
 			}
 
 			// Read the input file, if possible
-			logger.Verbose("Attempting to read file to get format: \"" + filename + "\"");
+			Globals.Logger.Verbose("Attempting to read file to get format: \"" + filename + "\"");
 
 			// Check if file exists
 			if (!File.Exists(filename))
 			{
-				logger.Warning("File '" + filename + "' could not read from!");
+				Globals.Logger.Warning("File '" + filename + "' could not read from!");
 				return 0;
 			}
 
@@ -196,13 +196,12 @@ namespace SabreTools.Helper.Tools
 		/// Retrieve file information for a single file
 		/// </summary>
 		/// <param name="input">Filename to get information from</param>
-		/// <param name="logger">Logger object for console and file output</param>
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated (defaults to none)</param>
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="date">True if the file Date should be included, false otherwise (default)</param>
 		/// <param name="header">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <returns>Populated RomData object if success, empty one on error</returns>
-		public static Rom GetFileInfo(string input, Logger logger, Hash omitFromScan = 0x0,
+		public static Rom GetFileInfo(string input, Hash omitFromScan = 0x0,
 			long offset = 0, bool date = false, string header = null)
 		{
 			// Add safeguard if file doesn't exist
@@ -215,7 +214,7 @@ namespace SabreTools.Helper.Tools
 			Rom rom = new Rom();
 			if (header != null)
 			{
-				SkipperRule rule = Skipper.GetMatchingRule(input, Path.GetFileNameWithoutExtension(header), logger);
+				SkipperRule rule = Skipper.GetMatchingRule(input, Path.GetFileNameWithoutExtension(header));
 
 				// If there's a match, get the new information from the stream
 				if (rule.Tests != null && rule.Tests.Count != 0)
@@ -225,7 +224,7 @@ namespace SabreTools.Helper.Tools
 					FileStream inputStream = File.OpenRead(input);
 
 					// Transform the stream and get the information from it
-					rule.TransformStream(inputStream, outputStream, logger, keepReadOpen: false, keepWriteOpen: true);
+					rule.TransformStream(inputStream, outputStream, keepReadOpen: false, keepWriteOpen: true);
 					rom = GetStreamInfo(outputStream, outputStream.Length);
 
 					// Dispose of the streams
@@ -331,9 +330,8 @@ namespace SabreTools.Helper.Tools
 		/// </summary>
 		/// <param name="file">Name of the file to be parsed</param>
 		/// <param name="outDir">Output directory to write the file to, empty means the same directory as the input file</param>
-		/// <param name="logger">Logger object for console and file output</param>
 		/// <returns>True if the output file was created, false otherwise</returns>
-		public static bool DetectSkipperAndTransform(string file, string outDir, Logger logger)
+		public static bool DetectSkipperAndTransform(string file, string outDir)
 		{
 			// Create the output directory if it doesn't exist
 			if (outDir != "" && !Directory.Exists(outDir))
@@ -341,10 +339,10 @@ namespace SabreTools.Helper.Tools
 				Directory.CreateDirectory(outDir);
 			}
 
-			logger.User("\nGetting skipper information for '" + file + "'");
+			Globals.Logger.User("\nGetting skipper information for '" + file + "'");
 
 			// Get the skipper rule that matches the file, if any
-			SkipperRule rule = Skipper.GetMatchingRule(file, "", logger);
+			SkipperRule rule = Skipper.GetMatchingRule(file, "");
 
 			// If we have an empty rule, return false
 			if (rule.Tests == null || rule.Tests.Count == 0 || rule.Operation != HeaderSkipOperation.None)
@@ -352,7 +350,7 @@ namespace SabreTools.Helper.Tools
 				return false;
 			}
 
-			logger.User("File has a valid copier header");
+			Globals.Logger.User("File has a valid copier header");
 
 			// Get the header bytes from the file first
 			string hstr = string.Empty;
@@ -368,7 +366,7 @@ namespace SabreTools.Helper.Tools
 
 			// Apply the rule to the file
 			string newfile = (outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file)));
-			rule.TransformFile(file, newfile, logger);
+			rule.TransformFile(file, newfile);
 
 			// If the output file doesn't exist, return false
 			if (!File.Exists(newfile))
@@ -377,8 +375,8 @@ namespace SabreTools.Helper.Tools
 			}
 
 			// Now add the information to the database if it's not already there
-			Rom rom = GetFileInfo(newfile, logger);
-			DatabaseTools.AddHeaderToDatabase(hstr, rom.SHA1, rule.SourceFile, logger);
+			Rom rom = GetFileInfo(newfile);
+			DatabaseTools.AddHeaderToDatabase(hstr, rom.SHA1, rule.SourceFile);
 
 			return true;
 		}
@@ -387,11 +385,9 @@ namespace SabreTools.Helper.Tools
 		/// Retrieve a list of just files from inputs
 		/// </summary>
 		/// <param name="inputs">List of strings representing directories and files</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="appendparent">True if the parent name should be appended after the special character "¬", false otherwise</param>
 		/// <returns>List of strings representing just files from the inputs</returns>
-		public static List<string> GetOnlyFilesFromInputs(List<string> inputs, int maxDegreeOfParallelism, Logger logger, bool appendparent = false)
+		public static List<string> GetOnlyFilesFromInputs(List<string> inputs, bool appendparent = false)
 		{
 			List<string> outputs = new List<string>();
 			foreach (string input in inputs)
@@ -410,11 +406,11 @@ namespace SabreTools.Helper.Tools
 						}
 						catch (PathTooLongException)
 						{
-							logger.Warning("The path for " + file + " was too long");
+							Globals.Logger.Warning("The path for " + file + " was too long");
 						}
 						catch (Exception ex)
 						{
-							logger.Error(ex.ToString());
+							Globals.Logger.Error(ex.ToString());
 						}
 					}
 				}
@@ -426,11 +422,11 @@ namespace SabreTools.Helper.Tools
 					}
 					catch (PathTooLongException)
 					{
-						logger.Warning("The path for " + input + " was too long");
+						Globals.Logger.Warning("The path for " + input + " was too long");
 					}
 					catch (Exception ex)
 					{
-						logger.Error(ex.ToString());
+						Globals.Logger.Error(ex.ToString());
 					}
 				}
 			}
@@ -442,16 +438,15 @@ namespace SabreTools.Helper.Tools
 		/// Get the XmlTextReader associated with a file, if possible
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="logger">Logger object for console and file output</param>
 		/// <returns>The XmlTextReader representing the (possibly converted) file, null otherwise</returns>
-		public static XmlReader GetXmlTextReader(string filename, Logger logger)
+		public static XmlReader GetXmlTextReader(string filename)
 		{
-			logger.Verbose("Attempting to read file: \"" + filename + "\"");
+			Globals.Logger.Verbose("Attempting to read file: \"" + filename + "\"");
 
 			// Check if file exists
 			if (!File.Exists(filename))
 			{
-				logger.Warning("File '" + filename + "' could not read from!");
+				Globals.Logger.Warning("File '" + filename + "' could not read from!");
 				return null;
 			}
 
@@ -472,9 +467,8 @@ namespace SabreTools.Helper.Tools
 		/// </summary>
 		/// <param name="file">Name of the file to be parsed</param>
 		/// <param name="outDir">Output directory to write the file to, empty means the same directory as the input file</param>
-		/// <param name="logger">Logger object for console and file output</param>
 		/// <returns>True if a header was found and appended, false otherwise</returns>
-		public static bool RestoreHeader(string file, string outDir, Logger logger)
+		public static bool RestoreHeader(string file, string outDir)
 		{
 			// Create the output directory if it doesn't exist
 			if (outDir != "" && !Directory.Exists(outDir))
@@ -483,10 +477,10 @@ namespace SabreTools.Helper.Tools
 			}
 
 			// First, get the SHA-1 hash of the file
-			Rom rom = GetFileInfo(file, logger);
+			Rom rom = GetFileInfo(file);
 
 			// Retrieve a list of all related headers from the database
-			List<string> headers = DatabaseTools.RetrieveHeadersFromDatabase(rom.SHA1, logger);
+			List<string> headers = DatabaseTools.RetrieveHeadersFromDatabase(rom.SHA1);
 
 			// If we have nothing retrieved, we return false
 			if (headers.Count == 0)
@@ -497,11 +491,11 @@ namespace SabreTools.Helper.Tools
 			// Now loop through and create the reheadered files, if possible
 			for (int i = 0; i < headers.Count; i++)
 			{
-				logger.User("Creating reheadered file: " +
+				Globals.Logger.User("Creating reheadered file: " +
 						(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i);
 				AppendBytesToFile(file,
 					(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i, headers[i], string.Empty);
-				logger.User("Reheadered file created!");
+				Globals.Logger.User("Reheadered file created!");
 			}
 
 			return true;

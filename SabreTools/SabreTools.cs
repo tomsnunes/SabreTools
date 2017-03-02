@@ -26,9 +26,7 @@ namespace SabreTools
 	public partial class SabreTools
 	{
 		// Private required variables
-		private static Logger _logger;
 		private static Help _help;
-		private static int _maxDegreeOfParallelism;
 
 		/// <summary>
 		/// Start menu or use supplied parameters
@@ -37,7 +35,7 @@ namespace SabreTools
 		public static void Main(string[] args)
 		{
 			// Perform initial setup and verification
-			_logger = new Logger(true, "sabretools.log");
+			Globals.Logger = new Logger(true, "sabretools.log");
 
 			// Create a new Help object for this program
 			_help = RetrieveHelp();
@@ -65,7 +63,7 @@ namespace SabreTools
 			if ((new List<string>(args)).Contains("--credits"))
 			{
 				_help.OutputCredits();
-				_logger.Close();
+				Globals.Logger.Close();
 				return;
 			}
 
@@ -73,7 +71,7 @@ namespace SabreTools
 			if (args.Length == 0)
 			{
 				_help.OutputGenericHelp();
-				_logger.Close();
+				Globals.Logger.Close();
 				return;
 			}
 
@@ -173,9 +171,9 @@ namespace SabreTools
 			// Verify that the flag is valid
 			if (!_help.TopLevelFlag(feature))
 			{
-				_logger.User("\"" + feature + "\" is not valid feature flag");
+				Globals.Logger.User("\"" + feature + "\" is not valid feature flag");
 				_help.OutputIndividualFeature(feature);
-				_logger.Close();
+				Globals.Logger.Close();
 				return;
 			}
 
@@ -193,7 +191,7 @@ namespace SabreTools
 					{
 						_help.OutputGenericHelp();
 					}
-					_logger.Close();
+					Globals.Logger.Close();
 					return;
 				case "-d":
 				case "--d2d":
@@ -255,7 +253,7 @@ namespace SabreTools
 				// If we don't have a valid flag, feed it through the help system
 				default:
 					_help.OutputIndividualFeature(feature);
-					_logger.Close();
+					Globals.Logger.Close();
 					return;
 			}
 
@@ -268,9 +266,9 @@ namespace SabreTools
 				// Verify that the current flag is proper for the feature
 				if (!_help[feature].ValidateInput(args[i]))
 				{
-					_logger.Error("Invalid input detected: " + args[i]);
+					Globals.Logger.Error("Invalid input detected: " + args[i]);
 					_help.OutputIndividualFeature(feature);
-					_logger.Close();
+					Globals.Logger.Close();
 					return;
 				}
 
@@ -643,8 +641,8 @@ namespace SabreTools
 					case "--dat":
 						if (!File.Exists(args[++i]))
 						{
-							_logger.Error("DAT must be a valid file: " + args[i]);
-							_logger.Close();
+							Globals.Logger.Error("DAT must be a valid file: " + args[i]);
+							Globals.Logger.Close();
 							return;
 						}
 						datfiles.Add(args[++i]);
@@ -687,7 +685,7 @@ namespace SabreTools
 						break;
 					case "-gt":
 					case "--game-type":
-						filter.MachineTypes |= Filter.GetMachineTypeFromString(args[++i], _logger);
+						filter.MachineTypes |= Filter.GetMachineTypeFromString(args[++i]);
 						break;
 					case "-gz":
 					case "--gz":
@@ -706,7 +704,7 @@ namespace SabreTools
 						break;
 					case "-is":
 					case "--status":
-						filter.ItemStatuses |= Filter.GetStatusFromString(args[++i], _logger);
+						filter.ItemStatuses |= Filter.GetStatusFromString(args[++i]);
 						break;
 					case "-md5":
 					case "--md5":
@@ -714,7 +712,14 @@ namespace SabreTools
 						break;
 					case "-mt":
 					case "--mt":
-						Int32.TryParse(args[++i], out _maxDegreeOfParallelism);
+						if (Int32.TryParse(args[++i], out int mdop))
+						{
+							Globals.MaxDegreeOfParallelism = mdop;
+						}
+						else
+						{
+							Globals.MaxDegreeOfParallelism = 4;
+						}
 						break;
 					case "-n":
 					case "--name":
@@ -730,11 +735,11 @@ namespace SabreTools
 						break;
 					case "-ngt":
 					case "--not-gtype":
-						filter.NotMachineTypes |= Filter.GetMachineTypeFromString(args[++i], _logger);
+						filter.NotMachineTypes |= Filter.GetMachineTypeFromString(args[++i]);
 						break;
 					case "-nis":
 					case "--not-status":
-						filter.NotItemStatuses |= Filter.GetStatusFromString(args[++i], _logger);
+						filter.NotItemStatuses |= Filter.GetStatusFromString(args[++i]);
 						break;
 					case "-nmd5":
 					case "--not-md5":
@@ -911,8 +916,8 @@ namespace SabreTools
 								case "--dat":
 									if (!File.Exists(split[1]))
 									{
-										_logger.Error("DAT must be a valid file: " + split[1]);
-										_logger.Close();
+										Globals.Logger.Error("DAT must be a valid file: " + split[1]);
+										Globals.Logger.Close();
 										return;
 									}
 									datfiles.Add(split[1]);
@@ -955,7 +960,7 @@ namespace SabreTools
 									break;
 								case "-gt":
 								case "--game-type":
-									filter.MachineTypes |= Filter.GetMachineTypeFromString(split[1], _logger);
+									filter.MachineTypes |= Filter.GetMachineTypeFromString(split[1]);
 									break;
 								case "-gz":
 								case "--gz":
@@ -974,7 +979,7 @@ namespace SabreTools
 									break;
 								case "-is":
 								case "--status":
-									filter.ItemStatuses |= Filter.GetStatusFromString(split[1], _logger);
+									filter.ItemStatuses |= Filter.GetStatusFromString(split[1]);
 									break;
 								case "-md5":
 								case "--md5":
@@ -982,7 +987,14 @@ namespace SabreTools
 									break;
 								case "-mt":
 								case "--mt":
-									Int32.TryParse(split[1], out _maxDegreeOfParallelism);
+									if (Int32.TryParse(split[1], out int odop))
+									{
+										Globals.MaxDegreeOfParallelism = odop;
+									}
+									else
+									{
+										Globals.MaxDegreeOfParallelism = 4;
+									}
 									break;
 								case "-n":
 								case "--name":
@@ -998,11 +1010,11 @@ namespace SabreTools
 									break;
 								case "-ngt":
 								case "--not-gtype":
-									filter.NotMachineTypes |= Filter.GetMachineTypeFromString(split[1], _logger);
+									filter.NotMachineTypes |= Filter.GetMachineTypeFromString(split[1]);
 									break;
 								case "-nis":
 								case "--not-status":
-									filter.NotItemStatuses |= Filter.GetStatusFromString(split[1], _logger);
+									filter.NotItemStatuses |= Filter.GetStatusFromString(split[1]);
 									break;
 								case "-nmd5":
 								case "--not-md5":
@@ -1130,8 +1142,8 @@ namespace SabreTools
 									}
 									else
 									{
-										_logger.Error("Invalid input detected: " + args[i]);
-										_logger.Close();
+										Globals.Logger.Error("Invalid input detected: " + args[i]);
+										Globals.Logger.Close();
 										return;
 									}
 									break;
@@ -1143,8 +1155,8 @@ namespace SabreTools
 						}
 						else
 						{
-							_logger.Error("Invalid input detected: " + args[i]);
-							_logger.Close();
+							Globals.Logger.Error("Invalid input detected: " + args[i]);
+							Globals.Logger.Close();
 							return;
 						}
 						break;
@@ -1154,18 +1166,18 @@ namespace SabreTools
 			// If none of the feature flags is enabled, show the help screen
 			if (!(datFromDir | extract | restore | sort | sortDepot | splitByExt | splitByHash | splitByLevel | splitByType | stats | update | verify | verifyDepot))
 			{
-				_logger.Error("At least one feature switch must be enabled");
+				Globals.Logger.Error("At least one feature switch must be enabled");
 				_help.OutputGenericHelp();
-				_logger.Close();
+				Globals.Logger.Close();
 				return;
 			}
 
 			// If more than one switch is enabled, show the help screen
 			if (!(datFromDir ^ extract ^ restore ^ sort ^ sortDepot ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify ^ verifyDepot))
 			{
-				_logger.Error("Only one feature switch is allowed at a time");
+				Globals.Logger.Error("Only one feature switch is allowed at a time");
 				_help.OutputGenericHelp();
-				_logger.Close();
+				Globals.Logger.Close();
 				return;
 			}
 
@@ -1173,9 +1185,9 @@ namespace SabreTools
 			if (inputs.Count == 0
 				&& (datFromDir || extract || restore || splitByExt || splitByHash || splitByLevel || splitByType || stats || update || verify || verifyDepot))
 			{
-				_logger.Error("This feature requires at least one input");
+				Globals.Logger.Error("This feature requires at least one input");
 				_help.OutputIndividualFeature(feature);
-				_logger.Close();
+				Globals.Logger.Close();
 				return;
 			}
 
@@ -1272,7 +1284,7 @@ namespace SabreTools
 				_help.OutputGenericHelp();
 			}
 
-			_logger.Close();
+			Globals.Logger.Close();
 			return;
 		}
 	}

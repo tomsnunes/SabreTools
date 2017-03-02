@@ -36,11 +36,8 @@ namespace SabreTools.Helper.Dats
 		/// <param name="outDir">Output directory to </param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for console and file output</param>
 		public bool PopulateFromDir(string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles,
-			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst,
-			int maxDegreeOfParallelism, Logger logger)
+			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst)
 		{
 			// If the description is defined but not the name, set the name from the description
 			if (String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
@@ -64,31 +61,31 @@ namespace SabreTools.Helper.Dats
 			// Process the input
 			if (Directory.Exists(basePath))
 			{
-				logger.Verbose("Folder found: " + basePath);
+				Globals.Logger.Verbose("Folder found: " + basePath);
 
 				// Process the files in the main folder
 				List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
 				Parallel.ForEach(files,
-					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+					new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 					item =>
 					{
 						PopulateFromDirCheckFile(item, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
-							tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+							tempDir, copyFiles, headerToCheckAgainst);
 					});
 
 				// Find all top-level subfolders
 				files = Directory.EnumerateDirectories(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
 				Parallel.ForEach(files,
-					new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+					new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 					item =>
 					{
 						List<string> subfiles = Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories).ToList();
 						Parallel.ForEach(subfiles,
-							new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+							new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 							subitem =>
 							{
 								PopulateFromDirCheckFile(subitem, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
-								tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+								tempDir, copyFiles, headerToCheckAgainst);
 							});
 					});
 
@@ -97,7 +94,7 @@ namespace SabreTools.Helper.Dats
 				{
 					List<string> empties = Directory.EnumerateDirectories(basePath, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(empties,
-						new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+						new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 						dir =>
 						{
 							if (Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).Count() == 0)
@@ -141,7 +138,7 @@ namespace SabreTools.Helper.Dats
 									romname = romname.Substring(0, romname.Length - 1);
 								}
 
-								logger.Verbose("Adding blank empty folder: " + gamename);
+								Globals.Logger.Verbose("Adding blank empty folder: " + gamename);
 								this["null"].Add(new Rom(romname, gamename));
 							}
 						});
@@ -150,11 +147,11 @@ namespace SabreTools.Helper.Dats
 			else if (File.Exists(basePath))
 			{
 				PopulateFromDirCheckFile(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
-					tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+					tempDir, copyFiles, headerToCheckAgainst);
 			}
 
 			// Now that we're done, delete the temp folder (if it's not the default)
-			logger.User("Cleaning temp folder");
+			Globals.Logger.User("Cleaning temp folder");
 			try
 			{
 				if (tempDir != Path.GetTempPath())
@@ -184,11 +181,8 @@ namespace SabreTools.Helper.Dats
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for console and file output</param>
 		private void PopulateFromDirCheckFile(string item, string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles,
-			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst,
-			int maxDegreeOfParallelism, Logger logger)
+			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst)
 		{
 			// Define the temporary directory
 			string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
@@ -196,18 +190,18 @@ namespace SabreTools.Helper.Dats
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (Romba)
 			{
-				Rom rom = ArchiveTools.GetTorrentGZFileInfo(item, logger);
+				Rom rom = ArchiveTools.GetTorrentGZFileInfo(item);
 
 				// If the rom is valid, write it out
 				if (rom != null && rom.Name != null)
 				{
 					// Add the list if it doesn't exist already
 					Add(rom.Size + "-" + rom.CRC, rom);
-					logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
+					Globals.Logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 				}
 				else
 				{
-					logger.User("File not added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
+					Globals.Logger.User("File not added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 					return;
 				}
 
@@ -228,26 +222,25 @@ namespace SabreTools.Helper.Dats
 			// If all deep hash skip flags are set, do a quickscan
 			if (omitFromScan == Hash.SecureHashes)
 			{
-				ArchiveType? type = ArchiveTools.GetCurrentArchiveType(newItem, logger);
+				ArchiveType? type = ArchiveTools.GetCurrentArchiveType(newItem);
 
 				// If we have an archive, scan it
 				if (type != null && !archivesAsFiles)
 				{
-					List<Rom> extracted = ArchiveTools.GetArchiveFileInfo(newItem, logger);
+					List<Rom> extracted = ArchiveTools.GetArchiveFileInfo(newItem);
 
 					foreach (Rom rom in extracted)
 					{
 						PopulateFromDirProcessFileHelper(newItem,
 							rom,
 							basePath,
-							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length) + Path.GetFileNameWithoutExtension(item),
-							logger);
+							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length) + Path.GetFileNameWithoutExtension(item));
 					}
 				}
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(newItem))
 				{
-					PopulateFromDirProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst, logger);
+					PopulateFromDirProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst);
 				}
 			}
 			// Otherwise, attempt to extract the files to the temporary directory
@@ -258,15 +251,15 @@ namespace SabreTools.Helper.Dats
 					| (archivesAsFiles ? ArchiveScanLevel.RarExternal : ArchiveScanLevel.RarInternal)
 					| (archivesAsFiles ? ArchiveScanLevel.ZipExternal : ArchiveScanLevel.ZipInternal);
 
-				bool encounteredErrors = ArchiveTools.ExtractArchive(newItem, tempSubDir, asl, logger);
+				bool encounteredErrors = ArchiveTools.ExtractArchive(newItem, tempSubDir, asl);
 
 				// If the file was an archive and was extracted successfully, check it
 				if (!encounteredErrors)
 				{
-					logger.Verbose(Path.GetFileName(item) + " treated like an archive");
+					Globals.Logger.Verbose(Path.GetFileName(item) + " treated like an archive");
 					List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(extracted,
-						new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+						new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 						entry =>
 						{
 							PopulateFromDirProcessFile(entry,
@@ -277,14 +270,13 @@ namespace SabreTools.Helper.Dats
 								tempSubDir,
 								omitFromScan,
 								addDate,
-								headerToCheckAgainst,
-								logger);
+								headerToCheckAgainst);
 						});
 				}
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(newItem))
 				{
-					PopulateFromDirProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst, logger);
+					PopulateFromDirProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst);
 				}
 			}
 
@@ -314,14 +306,13 @@ namespace SabreTools.Helper.Dats
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="logger">Logger object for console and file output</param>
 		private void PopulateFromDirProcessFile(string item, string parent, string basePath, Hash omitFromScan,
-			bool addDate, string headerToCheckAgainst, Logger logger)
+			bool addDate, string headerToCheckAgainst)
 		{
-			logger.Verbose(Path.GetFileName(item) + " treated like a file");
-			Rom rom = FileTools.GetFileInfo(item, logger, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst);
+			Globals.Logger.Verbose(Path.GetFileName(item) + " treated like a file");
+			Rom rom = FileTools.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst);
 
-			PopulateFromDirProcessFileHelper(item, rom, basePath, parent, logger);
+			PopulateFromDirProcessFileHelper(item, rom, basePath, parent);
 		}
 
 		/// <summary>
@@ -331,7 +322,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="item">Rom data to be used to write to file</param>
 		/// <param name="basepath">Path the represents the parent directory</param>
 		/// <param name="parent">Parent game to be used</param>
-		private void PopulateFromDirProcessFileHelper(string item, DatItem datItem, string basepath, string parent, Logger logger)
+		private void PopulateFromDirProcessFileHelper(string item, DatItem datItem, string basepath, string parent)
 		{
 			// If the datItem isn't a Rom or Disk, return
 			if (datItem.Type != ItemType.Rom && datItem.Type != ItemType.Disk)
@@ -445,11 +436,11 @@ namespace SabreTools.Helper.Dats
 				// Add the file information to the DAT
 				Add(key, datItem);
 
-				logger.User("File added: " + romname + Environment.NewLine);
+				Globals.Logger.User("File added: " + romname + Environment.NewLine);
 			}
 			catch (IOException ex)
 			{
-				logger.Error(ex.ToString());
+				Globals.Logger.Error(ex.ToString());
 				return;
 			}
 		}

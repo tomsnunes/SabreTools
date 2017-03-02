@@ -36,18 +36,16 @@ namespace SabreTools.Helper.Dats
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if rebuilding was a success, false otherwise</returns>
 		public bool RebuildDepot(List<string> inputs, string outDir, string tempDir, bool date, bool delete,
-			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, string headerToCheckAgainst,
-			int maxDegreeOfParallelism, Logger logger)
+			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, string headerToCheckAgainst)
 		{
 			#region Perform setup
 
 			// If the DAT is not populated and inverse is not set, inform the user and quit
 			if (Count == 0 && !inverse)
 			{
-				logger.User("No entries were found to rebuild, exiting...");
+				Globals.Logger.User("No entries were found to rebuild, exiting...");
 				return false;
 			}
 
@@ -100,28 +98,28 @@ namespace SabreTools.Helper.Dats
 			switch (outputFormat)
 			{
 				case OutputFormat.Folder:
-					logger.User("Rebuilding all files to directory");
+					Globals.Logger.User("Rebuilding all files to directory");
 					break;
 				case OutputFormat.TapeArchive:
-					logger.User("Rebuilding all files to TAR");
+					Globals.Logger.User("Rebuilding all files to TAR");
 					break;
 				case OutputFormat.Torrent7Zip:
-					logger.User("Rebuilding all files to Torrent7Z");
+					Globals.Logger.User("Rebuilding all files to Torrent7Z");
 					break;
 				case OutputFormat.TorrentGzip:
-					logger.User("Rebuilding all files to TorrentGZ");
+					Globals.Logger.User("Rebuilding all files to TorrentGZ");
 					break;
 				case OutputFormat.TorrentLrzip:
-					logger.User("Rebuilding all files to TorrentLRZ");
+					Globals.Logger.User("Rebuilding all files to TorrentLRZ");
 					break;
 				case OutputFormat.TorrentRar:
-					logger.User("Rebuilding all files to TorrentRAR");
+					Globals.Logger.User("Rebuilding all files to TorrentRAR");
 					break;
 				case OutputFormat.TorrentXZ:
-					logger.User("Rebuilding all files to TorrentXZ");
+					Globals.Logger.User("Rebuilding all files to TorrentXZ");
 					break;
 				case OutputFormat.TorrentZip:
-					logger.User("Rebuilding all files to TorrentZip");
+					Globals.Logger.User("Rebuilding all files to TorrentZip");
 					break;
 			}
 			DateTime start = DateTime.Now;
@@ -133,7 +131,7 @@ namespace SabreTools.Helper.Dats
 				// Add to the list if the input is a directory
 				if (Directory.Exists(input))
 				{
-					logger.Verbose("Adding depot: '" + input + "'");
+					Globals.Logger.Verbose("Adding depot: '" + input + "'");
 					directories.Add(input);
 				}
 			}
@@ -145,7 +143,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now that we have a list of depots, we want to sort the input DAT by SHA-1
-			BucketBy(SortedBy.SHA1, false /* mergeroms */, maxDegreeOfParallelism, logger);
+			BucketBy(SortedBy.SHA1, false /* mergeroms */);
 
 			// Then we want to loop through each of the hashes and see if we can rebuild
 			List<string> hashes = Keys.ToList();
@@ -157,7 +155,7 @@ namespace SabreTools.Helper.Dats
 					continue;
 				}
 
-				logger.User("Checking hash '" + hash + "'");
+				Globals.Logger.User("Checking hash '" + hash + "'");
 
 				// Get the extension path for the hash
 				string subpath = Style.GetRombaPath(hash);
@@ -180,7 +178,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// If we have a path, we want to try to get the rom information
-				Rom fileinfo = ArchiveTools.GetTorrentGZFileInfo(foundpath, logger);
+				Rom fileinfo = ArchiveTools.GetTorrentGZFileInfo(foundpath);
 
 				// If the file information is null, then we continue
 				if (fileinfo == null)
@@ -190,10 +188,10 @@ namespace SabreTools.Helper.Dats
 
 				// Otherwise, we rebuild that file to all locations that we need to
 				RebuildIndividualFile(fileinfo, foundpath, outDir, tempDir, date, inverse, outputFormat, romba,
-					updateDat, true /*isZip*/, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+					updateDat, true /*isZip*/, headerToCheckAgainst);
 			}
 
-			logger.User("Rebuilding complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Rebuilding complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			#endregion
 
@@ -203,7 +201,7 @@ namespace SabreTools.Helper.Dats
 				_fileName = "fixDAT_" + _fileName;
 				_name = "fixDAT_" + _name;
 				_description = "fixDAT_" + _description;
-				WriteToFile(outDir, maxDegreeOfParallelism, logger);
+				WriteToFile(outDir);
 			}
 
 			return success;
@@ -224,18 +222,17 @@ namespace SabreTools.Helper.Dats
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if rebuilding was a success, false otherwise</returns>
 		public bool RebuildGeneric(List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
 			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
-			string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
+			string headerToCheckAgainst)
 		{
 			#region Perform setup
 
 			// If the DAT is not populated and inverse is not set, inform the user and quit
 			if (Count == 0 && !inverse)
 			{
-				logger.User("No entries were found to rebuild, exiting...");
+				Globals.Logger.User("No entries were found to rebuild, exiting...");
 				return false;
 			}
 
@@ -288,28 +285,28 @@ namespace SabreTools.Helper.Dats
 			switch (outputFormat)
 			{
 				case OutputFormat.Folder:
-					logger.User("Rebuilding all files to directory");
+					Globals.Logger.User("Rebuilding all files to directory");
 					break;
 				case OutputFormat.TapeArchive:
-					logger.User("Rebuilding all files to TAR");
+					Globals.Logger.User("Rebuilding all files to TAR");
 					break;
 				case OutputFormat.Torrent7Zip:
-					logger.User("Rebuilding all files to Torrent7Z");
+					Globals.Logger.User("Rebuilding all files to Torrent7Z");
 					break;
 				case OutputFormat.TorrentGzip:
-					logger.User("Rebuilding all files to TorrentGZ");
+					Globals.Logger.User("Rebuilding all files to TorrentGZ");
 					break;
 				case OutputFormat.TorrentLrzip:
-					logger.User("Rebuilding all files to TorrentLRZ");
+					Globals.Logger.User("Rebuilding all files to TorrentLRZ");
 					break;
 				case OutputFormat.TorrentRar:
-					logger.User("Rebuilding all files to TorrentRAR");
+					Globals.Logger.User("Rebuilding all files to TorrentRAR");
 					break;
 				case OutputFormat.TorrentXZ:
-					logger.User("Rebuilding all files to TorrentXZ");
+					Globals.Logger.User("Rebuilding all files to TorrentXZ");
 					break;
 				case OutputFormat.TorrentZip:
-					logger.User("Rebuilding all files to TorrentZip");
+					Globals.Logger.User("Rebuilding all files to TorrentZip");
 					break;
 			}
 			DateTime start = DateTime.Now;
@@ -320,25 +317,25 @@ namespace SabreTools.Helper.Dats
 				// If the input is a file
 				if (File.Exists(input))
 				{
-					logger.User("Checking file: '" + input + "'");
+					Globals.Logger.User("Checking file: '" + input + "'");
 					RebuildGenericHelper(input, outDir, tempDir, quickScan, date, delete, inverse,
-						outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+						outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst);
 				}
 
 				// If the input is a directory
 				else if (Directory.Exists(input))
 				{
-					logger.Verbose("Checking directory: '" + input + "'");
+					Globals.Logger.Verbose("Checking directory: '" + input + "'");
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						logger.User("Checking file: '" + file + "'");
+						Globals.Logger.User("Checking file: '" + file + "'");
 						RebuildGenericHelper(file, outDir, tempDir, quickScan, date, delete, inverse,
-							outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+							outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst);
 					}
 				}
 			}
 
-			logger.User("Rebuilding complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Rebuilding complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			#endregion
 
@@ -348,7 +345,7 @@ namespace SabreTools.Helper.Dats
 				_fileName = "fixDAT_" + _fileName;
 				_name = "fixDAT_" + _name;
 				_description = "fixDAT_" + _description;
-				WriteToFile(outDir, maxDegreeOfParallelism, logger);
+				WriteToFile(outDir);
 			}
 
 			return success;
@@ -369,10 +366,9 @@ namespace SabreTools.Helper.Dats
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		private void RebuildGenericHelper(string file, string outDir, string tempDir, bool quickScan, bool date,
 			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
-			string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
+			string headerToCheckAgainst)
 		{
 			// If we somehow have a null filename, return
 			if (file == null)
@@ -388,15 +384,15 @@ namespace SabreTools.Helper.Dats
 			bool usedInternally = false;
 
             // Get the required scanning level for the file
-            ArchiveTools.GetInternalExternalProcess(file, archiveScanLevel, logger, out bool shouldExternalProcess, out bool shouldInternalProcess);
+            ArchiveTools.GetInternalExternalProcess(file, archiveScanLevel, out bool shouldExternalProcess, out bool shouldInternalProcess);
 
 			// If we're supposed to scan the file externally
 			if (shouldExternalProcess)
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-				Rom rom = FileTools.GetFileInfo(file, logger, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), header: headerToCheckAgainst);
+				Rom rom = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), header: headerToCheckAgainst);
 				usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
-					romba, updateDat, false /* isZip */, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+					romba, updateDat, false /* isZip */, headerToCheckAgainst);
 			}
 
 			// If we're supposed to scan the file internally
@@ -405,42 +401,42 @@ namespace SabreTools.Helper.Dats
 				// If quickscan is set, do so
 				if (quickScan)
 				{
-					List<Rom> extracted = ArchiveTools.GetArchiveFileInfo(file, logger);
+					List<Rom> extracted = ArchiveTools.GetArchiveFileInfo(file);
 					usedInternally = true;
 
 					foreach (Rom rom in extracted)
 					{
 						usedInternally &= RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
-							romba, updateDat, true /* isZip */, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+							romba, updateDat, true /* isZip */, headerToCheckAgainst);
 					}
 				}
 				// Otherwise, attempt to extract the files to the temporary directory
 				else
 				{
-					bool encounteredErrors = ArchiveTools.ExtractArchive(file, tempSubDir, archiveScanLevel, logger);
+					bool encounteredErrors = ArchiveTools.ExtractArchive(file, tempSubDir, archiveScanLevel);
 
 					// If the file was an archive and was extracted successfully, check it
 					if (!encounteredErrors)
 					{
 						usedInternally = true;
 
-						logger.Verbose(Path.GetFileName(file) + " treated like an archive");
+						Globals.Logger.Verbose(Path.GetFileName(file) + " treated like an archive");
 						List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 						foreach (string entry in extracted)
 						{
 							// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-							Rom rom = FileTools.GetFileInfo(entry, logger, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
+							Rom rom = FileTools.GetFileInfo(entry, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
 							usedInternally &= RebuildIndividualFile(rom, entry, outDir, tempSubDir, date, inverse, outputFormat,
-								romba, updateDat, false /* isZip */, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+								romba, updateDat, false /* isZip */, headerToCheckAgainst);
 						}
 					}
 					// Otherwise, just get the info on the file itself
 					else if (File.Exists(file))
 					{
 						// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-						Rom rom = FileTools.GetFileInfo(file, logger, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
+						Rom rom = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
 						usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
-							romba, updateDat, false /* isZip */, headerToCheckAgainst, maxDegreeOfParallelism, logger);
+							romba, updateDat, false /* isZip */, headerToCheckAgainst);
 					}
 				}
 			}
@@ -450,13 +446,13 @@ namespace SabreTools.Helper.Dats
 			{
 				try
 				{
-					logger.Verbose("Attempting to delete input file '" + file + "'");
+					Globals.Logger.Verbose("Attempting to delete input file '" + file + "'");
 					File.Delete(file);
-					logger.Verbose("File '" + file + "' deleted");
+					Globals.Logger.Verbose("File '" + file + "' deleted");
 				}
 				catch (Exception ex)
 				{
-					logger.Error("An error occurred while trying to delete '" + file + "' " + ex.ToString());
+					Globals.Logger.Error("An error occurred while trying to delete '" + file + "' " + ex.ToString());
 				}
 			}
 
@@ -482,27 +478,24 @@ namespace SabreTools.Helper.Dats
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="isZip">True if the input file is an archive, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the file was able to be rebuilt, false otherwise</returns>
 		/// <remarks>
 		/// TODO: If going from a TGZ file to a TGZ file, don't extract, just copy
 		/// </remarks>
 		private bool RebuildIndividualFile(Rom rom, string file, string outDir, string tempDir, bool date,
-			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool isZip, string headerToCheckAgainst,
-			int maxDegreeOfParallelism, Logger logger)
+			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool isZip, string headerToCheckAgainst)
 		{
 			// Set the output value
 			bool rebuilt = false;
 
 			// Find if the file has duplicates in the DAT
-			bool hasDuplicates = rom.HasDuplicates(this, maxDegreeOfParallelism, logger);
+			bool hasDuplicates = rom.HasDuplicates(this);
 
 			// If it has duplicates and we're not filtering, rebuild it
 			if (hasDuplicates && !inverse)
 			{
 				// Get the list of duplicates to rebuild to
-				List<DatItem> dupes = rom.GetDuplicates(this, maxDegreeOfParallelism, logger, remove: updateDat);
+				List<DatItem> dupes = rom.GetDuplicates(this, remove: updateDat);
 
 				// If we don't have any duplicates, continue
 				if (dupes.Count == 0)
@@ -514,7 +507,7 @@ namespace SabreTools.Helper.Dats
 				if (isZip)
 				{
 					// Otherwise, extract the file to the temp folder
-					file = ArchiveTools.ExtractItem(file, rom.Name, tempDir, logger);
+					file = ArchiveTools.ExtractItem(file, rom.Name, tempDir);
 				}				
 
 				// If we couldn't extract the file, then continue,
@@ -523,7 +516,7 @@ namespace SabreTools.Helper.Dats
 					return rebuilt;
 				}
 
-				logger.User("Matches found for '" + Style.GetFileName(file) + "', rebuilding accordingly...");
+				Globals.Logger.User("Matches found for '" + Style.GetFileName(file) + "', rebuilding accordingly...");
 				rebuilt = true;
 
 				// Now loop through the list and rebuild accordingly
@@ -555,13 +548,13 @@ namespace SabreTools.Helper.Dats
 
 							break;
 						case OutputFormat.TapeArchive:
-							rebuilt &= ArchiveTools.WriteTAR(file, outDir, item, logger, date: date);
+							rebuilt &= ArchiveTools.WriteTAR(file, outDir, item, date: date);
 							break;
 						case OutputFormat.Torrent7Zip:
-							rebuilt &= ArchiveTools.WriteTorrent7Zip(file, outDir, item, logger, date: date);
+							rebuilt &= ArchiveTools.WriteTorrent7Zip(file, outDir, item, date: date);
 							break;
 						case OutputFormat.TorrentGzip:
-							rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
+							rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba);
 							break;
 						case OutputFormat.TorrentLrzip:
 							break;
@@ -570,7 +563,7 @@ namespace SabreTools.Helper.Dats
 						case OutputFormat.TorrentXZ:
 							break;
 						case OutputFormat.TorrentZip:
-							rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, item, logger, date: date);
+							rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, item, date: date);
 							break;
 					}
 				}
@@ -586,7 +579,7 @@ namespace SabreTools.Helper.Dats
 				{
 					// Otherwise, extract the file to the temp folder
 					machinename = Style.GetFileNameWithoutExtension(file);
-					file = ArchiveTools.ExtractItem(file, rom.Name, tempDir, logger);
+					file = ArchiveTools.ExtractItem(file, rom.Name, tempDir);
 				}
 
 				// If we couldn't extract the file, then continue,
@@ -596,7 +589,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Get the item from the current file
-				Rom item = FileTools.GetFileInfo(file, logger);
+				Rom item = FileTools.GetFileInfo(file);
 				item.Machine = new Machine()
 				{
 					Name = Style.GetFileNameWithoutExtension(item.Name),
@@ -610,7 +603,7 @@ namespace SabreTools.Helper.Dats
 					item.Machine.Description = machinename;
 				}
 
-				logger.User("No matches found for '" + Style.GetFileName(file) + "', rebuilding accordingly from inverse flag...");
+				Globals.Logger.User("No matches found for '" + Style.GetFileName(file) + "', rebuilding accordingly from inverse flag...");
 
 				// Now rebuild to the output file
 				switch (outputFormat)
@@ -639,13 +632,13 @@ namespace SabreTools.Helper.Dats
 
 						break;
 					case OutputFormat.TapeArchive:
-						rebuilt &= ArchiveTools.WriteTAR(file, outDir, item, logger, date: date);
+						rebuilt &= ArchiveTools.WriteTAR(file, outDir, item, date: date);
 						break;
 					case OutputFormat.Torrent7Zip:
-						rebuilt &= ArchiveTools.WriteTorrent7Zip(file, outDir, item, logger, date: date);
+						rebuilt &= ArchiveTools.WriteTorrent7Zip(file, outDir, item, date: date);
 						break;
 					case OutputFormat.TorrentGzip:
-						rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
+						rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba);
 						break;
 					case OutputFormat.TorrentLrzip:
 						break;
@@ -654,7 +647,7 @@ namespace SabreTools.Helper.Dats
 					case OutputFormat.TorrentXZ:
 						break;
 					case OutputFormat.TorrentZip:
-						rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, item, logger, date: date);
+						rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, item, date: date);
 						break;
 				}
 			}
@@ -663,25 +656,25 @@ namespace SabreTools.Helper.Dats
 			if (headerToCheckAgainst != null)
 			{
 				// Check to see if we have a matching header first
-				SkipperRule rule = Skipper.GetMatchingRule(file, Path.GetFileNameWithoutExtension(headerToCheckAgainst), logger);
+				SkipperRule rule = Skipper.GetMatchingRule(file, Path.GetFileNameWithoutExtension(headerToCheckAgainst));
 
 				// If there's a match, create the new file to write
 				if (rule.Tests != null && rule.Tests.Count != 0)
 				{
 					// If the file could be transformed correctly
-					if (rule.TransformFile(file, file + ".new", logger))
+					if (rule.TransformFile(file, file + ".new"))
 					{
 						// Get the file informations that we will be using
-						Rom headerless = FileTools.GetFileInfo(file + ".new", logger);
+						Rom headerless = FileTools.GetFileInfo(file + ".new");
 
 						// Find if the file has duplicates in the DAT
-						hasDuplicates = headerless.HasDuplicates(this, maxDegreeOfParallelism, logger);
+						hasDuplicates = headerless.HasDuplicates(this);
 
 						// If it has duplicates and we're not filtering, rebuild it
 						if (hasDuplicates && !inverse)
 						{
 							// Get the list of duplicates to rebuild to
-							List<DatItem> dupes = headerless.GetDuplicates(this, maxDegreeOfParallelism, logger, remove: updateDat);
+							List<DatItem> dupes = headerless.GetDuplicates(this, remove: updateDat);
 
 							// If we don't have any duplicates, continue
 							if (dupes.Count == 0)
@@ -689,7 +682,7 @@ namespace SabreTools.Helper.Dats
 								return rebuilt;
 							}
 
-							logger.User("Headerless matches found for '" + Style.GetFileName(file) + "', rebuilding accordingly...");
+							Globals.Logger.User("Headerless matches found for '" + Style.GetFileName(file) + "', rebuilding accordingly...");
 							rebuilt = true;
 
 							// Now loop through the list and rebuild accordingly
@@ -740,16 +733,16 @@ namespace SabreTools.Helper.Dats
 
 										break;
 									case OutputFormat.TapeArchive:
-										rebuilt &= ArchiveTools.WriteTAR(file + ".new", outDir, item, logger, date: date);
-										rebuilt &= ArchiveTools.WriteTAR(file, outDir, rom, logger, date: date);
+										rebuilt &= ArchiveTools.WriteTAR(file + ".new", outDir, item, date: date);
+										rebuilt &= ArchiveTools.WriteTAR(file, outDir, rom, date: date);
 										break;
 									case OutputFormat.Torrent7Zip:
-										rebuilt &= ArchiveTools.WriteTorrent7Zip(file + ".new", outDir, item, logger, date: date);
-										rebuilt &= ArchiveTools.WriteTorrent7Zip(file, outDir, rom, logger, date: date);
+										rebuilt &= ArchiveTools.WriteTorrent7Zip(file + ".new", outDir, item, date: date);
+										rebuilt &= ArchiveTools.WriteTorrent7Zip(file, outDir, rom, date: date);
 										break;
 									case OutputFormat.TorrentGzip:
-										rebuilt &= ArchiveTools.WriteTorrentGZ(file + ".new", outDir, romba, logger);
-										rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba, logger);
+										rebuilt &= ArchiveTools.WriteTorrentGZ(file + ".new", outDir, romba);
+										rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba);
 										break;
 									case OutputFormat.TorrentLrzip:
 										break;
@@ -758,8 +751,8 @@ namespace SabreTools.Helper.Dats
 									case OutputFormat.TorrentXZ:
 										break;
 									case OutputFormat.TorrentZip:
-										rebuilt &= ArchiveTools.WriteTorrentZip(file + ".new", outDir, item, logger, date: date);
-										rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, rom, logger, date: date);
+										rebuilt &= ArchiveTools.WriteTorrentZip(file + ".new", outDir, item, date: date);
+										rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, rom, date: date);
 										break;
 								}
 							}
@@ -789,10 +782,8 @@ namespace SabreTools.Helper.Dats
 		/// <param name="hashOnly">True if only hashes should be checked, false for full file information</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if verification was a success, false otherwise</returns>
-		public bool VerifyDepot(List<string> inputs, string tempDir, string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
+		public bool VerifyDepot(List<string> inputs, string tempDir, string headerToCheckAgainst)
 		{
 			// Check the temp directory
 			if (String.IsNullOrEmpty(tempDir))
@@ -812,7 +803,7 @@ namespace SabreTools.Helper.Dats
 
 			bool success = true;
 
-			logger.User("Verifying all from supplied depots");
+			Globals.Logger.User("Verifying all from supplied depots");
 			DateTime start = DateTime.Now;
 
 			// Now loop through and get only directories from the input paths
@@ -822,7 +813,7 @@ namespace SabreTools.Helper.Dats
 				// Add to the list if the input is a directory
 				if (Directory.Exists(input))
 				{
-					logger.Verbose("Adding depot: '" + input + "'");
+					Globals.Logger.Verbose("Adding depot: '" + input + "'");
 					directories.Add(input);
 				}
 			}
@@ -834,7 +825,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now that we have a list of depots, we want to sort the input DAT by SHA-1
-			BucketBy(SortedBy.SHA1, false /* mergeroms */, maxDegreeOfParallelism, logger);
+			BucketBy(SortedBy.SHA1, false /* mergeroms */);
 
 			// Then we want to loop through each of the hashes and see if we can rebuild
 			List<string> hashes = Keys.ToList();
@@ -846,7 +837,7 @@ namespace SabreTools.Helper.Dats
 					continue;
 				}
 
-				logger.User("Checking hash '" + hash + "'");
+				Globals.Logger.User("Checking hash '" + hash + "'");
 
 				// Get the extension path for the hash
 				string subpath = Style.GetRombaPath(hash);
@@ -869,7 +860,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// If we have a path, we want to try to get the rom information
-				Rom fileinfo = ArchiveTools.GetTorrentGZFileInfo(foundpath, logger);
+				Rom fileinfo = ArchiveTools.GetTorrentGZFileInfo(foundpath);
 
 				// If the file information is null, then we continue
 				if (fileinfo == null)
@@ -878,16 +869,16 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Now we want to remove all duplicates from the DAT
-				fileinfo.GetDuplicates(this, maxDegreeOfParallelism, logger, remove: true);
+				fileinfo.GetDuplicates(this, remove: true);
 			}
 
-			logger.User("Verifying complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Verifying complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// If there are any entries in the DAT, output to the rebuild directory
 			_fileName = "fixDAT_" + _fileName;
 			_name = "fixDAT_" + _name;
 			_description = "fixDAT_" + _description;
-			WriteToFile(null, maxDegreeOfParallelism, logger);
+			WriteToFile(null);
 
 			return success;
 		}
@@ -900,11 +891,9 @@ namespace SabreTools.Helper.Dats
 		/// <param name="hashOnly">True if only hashes should be checked, false for full file information</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if verification was a success, false otherwise</returns>
 		public bool VerifyGeneric(List<string> inputs, string tempDir, bool hashOnly, bool quickScan,
-			string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
+			string headerToCheckAgainst)
 		{
 			// Check the temp directory exists
 			if (String.IsNullOrEmpty(tempDir))
@@ -926,13 +915,13 @@ namespace SabreTools.Helper.Dats
 			bool success = true;
 
 			// Then, loop through and check each of the inputs
-			logger.User("Processing files:\n");
+			Globals.Logger.User("Processing files:\n");
 			foreach (string input in inputs)
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				PopulateFromDir(input, (quickScan ? Hash.SecureHashes : Hash.DeepHashes) /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, tempDir /* tempDir */, false /* copyFiles */,
-					headerToCheckAgainst, 4 /* maxDegreeOfParallelism */, logger);
+					headerToCheckAgainst);
 			}
 
 			// Setup the fixdat
@@ -947,7 +936,7 @@ namespace SabreTools.Helper.Dats
 			if (hashOnly)
 			{
 				// First we need to sort by hash to get duplicates
-				BucketBy(SortedBy.SHA1, false /* mergeroms */, maxDegreeOfParallelism, logger);
+				BucketBy(SortedBy.SHA1, false /* mergeroms */);
 
 				// Then follow the same tactics as before
 				foreach (string key in Keys)
@@ -971,7 +960,7 @@ namespace SabreTools.Helper.Dats
 				foreach (string key in Keys)
 				{
 					List<DatItem> roms = this[key];
-					List<DatItem> newroms = DatItem.Merge(roms, logger);
+					List<DatItem> newroms = DatItem.Merge(roms);
 					foreach (Rom rom in newroms)
 					{
 						if (rom.SourceID == 99)
@@ -983,7 +972,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now output the fixdat to the main folder
-			success &= matched.WriteToFile("", maxDegreeOfParallelism, logger, stats: true);
+			success &= matched.WriteToFile("", stats: true);
 
 			return success;
 		}

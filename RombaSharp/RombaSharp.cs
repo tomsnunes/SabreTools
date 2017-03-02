@@ -19,7 +19,6 @@ namespace RombaSharp
 	public partial class RombaSharp
 	{
 		// General settings
-		private static int _workers;		// Number of parallel threads
 		private static string _logdir;		// Log folder location
 		private static string _tmpdir;		// Temp folder location
 		private static string _webdir;		// Web frontend location
@@ -41,7 +40,6 @@ namespace RombaSharp
 		private static string _config = "config.xml";
 		private static string _dbSchema = "rombasharp";
 		private static string _connectionString;
-		private static Logger _logger;
 		private static Help _help;
 
 		/// <summary>
@@ -50,7 +48,7 @@ namespace RombaSharp
 		public static void Main(string[] args)
 		{
 			// Perform initial setup and verification
-			_logger = new Logger(true, "romba.log");
+			Globals.Logger = new Logger(true, "romba.log");
 
 			InitializeConfiguration();
 			DatabaseTools.EnsureDatabase(_dbSchema, _db, _connectionString);
@@ -68,7 +66,7 @@ namespace RombaSharp
 			if ((new List<string>(args)).Contains("--credits"))
 			{
 				_help.OutputCredits();
-				_logger.Close();
+				Globals.Logger.Close();
 				return;
 			}
 
@@ -76,7 +74,7 @@ namespace RombaSharp
 			if (args.Length == 0)
 			{
 				_help.OutputGenericHelp();
-				_logger.Close();
+				Globals.Logger.Close();
 				return;
 			}
 
@@ -258,9 +256,9 @@ namespace RombaSharp
 			if (!(archive ^ build ^ dbstats ^ depotRescan ^ diffdat ^ dir2dat ^ export ^ fixdat ^ import ^ lookup ^
 				memstats ^ merge ^ miss ^ progress ^ purgeBackup ^ purgeDelete ^ refreshDats ^ shutdown))
 			{
-				_logger.Error("Only one feature switch is allowed at a time");
+				Globals.Logger.Error("Only one feature switch is allowed at a time");
 				_help.OutputGenericHelp();
-				_logger.Close();
+				Globals.Logger.Close();
 				return;
 			}
 
@@ -268,9 +266,9 @@ namespace RombaSharp
 			if (inputs.Count == 0 && (archive || build || depotRescan || dir2dat || fixdat || 
 				import || lookup || merge || miss))
 			{
-				_logger.Error("This feature requires at least one input");
+				Globals.Logger.Error("This feature requires at least one input");
 				_help.OutputGenericHelp();
-				_logger.Close();
+				Globals.Logger.Close();
 				return;
 			}
 
@@ -360,7 +358,7 @@ namespace RombaSharp
 			// Shows progress of the currently running command
 			else if (progress)
 			{
-				_logger.User("This feature is not used in RombaSharp: progress");
+				Globals.Logger.User("This feature is not used in RombaSharp: progress");
 			}
 
 			// Moves DAT index entries for orphaned DATs
@@ -384,7 +382,7 @@ namespace RombaSharp
 			// Gracefully shuts down server
 			else if (shutdown)
 			{
-				_logger.User("This feature is not used in RombaSharp: shutdown");
+				Globals.Logger.User("This feature is not used in RombaSharp: shutdown");
 			}
 
 			// If nothing is set, show the help
@@ -393,7 +391,7 @@ namespace RombaSharp
 				_help.OutputGenericHelp();
 			}
 
-			_logger.Close();
+			Globals.Logger.Close();
 			return;
 		}
 	}

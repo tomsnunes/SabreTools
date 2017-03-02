@@ -23,8 +23,7 @@ namespace SabreTools.Helper.Tools
 		/// <param name="header">String representing the header bytes</param>
 		/// <param name="SHA1">SHA-1 of the deheadered file</param>
 		/// <param name="type">Name of the source skipper file</param>
-		/// <param name="logger">Logger object for console and file output</param>
-		public static void AddHeaderToDatabase(string header, string SHA1, string source, Logger logger)
+		public static void AddHeaderToDatabase(string header, string SHA1, string source)
 		{
 			bool exists = false;
 
@@ -47,7 +46,7 @@ namespace SabreTools.Helper.Tools
 				"'" + header + "', " +
 				"'" + source + "')";
 				slc = new SqliteCommand(query, dbc);
-				logger.Verbose("Result of inserting header: " + slc.ExecuteNonQuery());
+				Globals.Logger.Verbose("Result of inserting header: " + slc.ExecuteNonQuery());
 			}
 
 			// Dispose of database objects
@@ -162,9 +161,8 @@ CREATE TABLE IF NOT EXISTS data (
 		/// Retrieve headers from the database
 		/// </summary>
 		/// <param name="SHA1">SHA-1 of the deheadered file</param>
-		/// <param name="logger">Logger object for console and file output</param>
 		/// <returns>List of strings representing the headers to add</returns>
-		public static List<string> RetrieveHeadersFromDatabase(string SHA1, Logger logger)
+		public static List<string> RetrieveHeadersFromDatabase(string SHA1)
 		{
 			// Ensure the database exists
 			EnsureDatabase(Constants.HeadererDbSchema, Constants.HeadererFileName, Constants.HeadererConnectionString);
@@ -184,13 +182,13 @@ CREATE TABLE IF NOT EXISTS data (
 			{
 				while (sldr.Read())
 				{
-					logger.Verbose("Found match with rom type " + sldr.GetString(1));
+					Globals.Logger.Verbose("Found match with rom type " + sldr.GetString(1));
 					headers.Add(sldr.GetString(0));
 				}
 			}
 			else
 			{
-				logger.Warning("No matching header could be found!");
+				Globals.Logger.Warning("No matching header could be found!");
 			}
 
 			// Dispose of database objects

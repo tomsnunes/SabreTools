@@ -38,20 +38,17 @@ namespace SabreTools.Helper.Dats
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logging object for console and file output</param>
 		/// <remarks>
 		/// TODO: Folder-wise output for update (similar to level-split)
 		/// </remarks>
 		public void DetermineUpdateType(List<string> inputPaths, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
-			bool bare, bool clean, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root,
-			int maxDegreeOfParallelism, Logger logger)
+			bool bare, bool clean, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || diff != 0)
 			{
 				// Make sure there are no folders in inputs
-				List<string> newInputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, maxDegreeOfParallelism, logger, appendparent: true);
+				List<string> newInputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
 
 				// If we're in inverse cascade, reverse the list
 				if ((diff & DiffMode.ReverseCascade) != 0)
@@ -61,28 +58,28 @@ namespace SabreTools.Helper.Dats
 
 				// Create a dictionary of all ROMs from the input DATs
 				List<DatFile> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, descAsName,
-					outDir, filter, splitType, trim, single, root, maxDegreeOfParallelism, logger);
+					outDir, filter, splitType, trim, single, root);
 
 				// Modify the Dictionary if necessary and output the results
 				if (diff != 0 && diff < DiffMode.Cascade)
 				{
-					DiffNoCascade(diff, outDir, newInputFileNames, maxDegreeOfParallelism, logger);
+					DiffNoCascade(diff, outDir, newInputFileNames);
 				}
 				// If we're in cascade and diff, output only cascaded diffs
 				else if (diff != 0 && diff >= DiffMode.Cascade)
 				{
-					DiffCascade(outDir, inplace, newInputFileNames, datHeaders, skip, maxDegreeOfParallelism, logger);
+					DiffCascade(outDir, inplace, newInputFileNames, datHeaders, skip);
 				}
 				// Output all entries with user-defined merge
 				else
 				{
-					MergeNoDiff(outDir, newInputFileNames, datHeaders, maxDegreeOfParallelism, logger);
+					MergeNoDiff(outDir, newInputFileNames, datHeaders);
 				}
 			}
 			// Otherwise, loop through all of the inputs individually
 			else
 			{
-				Update(inputPaths, outDir, clean, descAsName, filter, splitType, trim, single, root, maxDegreeOfParallelism, logger);
+				Update(inputPaths, outDir, clean, descAsName, filter, splitType, trim, single, root);
 			}
 			return;
 		}
@@ -95,25 +92,23 @@ namespace SabreTools.Helper.Dats
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logging object for console and file output</param>
 		/// <returns>List of DatData objects representing headers</returns>
 		private List<DatFile> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool descAsName, string outDir,
-			Filter filter, SplitType splitType, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
+			Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			DatFile[] datHeaders = new DatFile[inputs.Count];
 			DateTime start = DateTime.Now;
-			logger.User("Processing individual DATs");
+			Globals.Logger.User("Processing individual DATs");
 
 			// TODO: Can parsing headers be separated from parsing content?
 			// TODO: Can all DATs be parsed into the same structure in one loop?
 			Parallel.For(0,
 				inputs.Count,
-				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+				new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 				i =>
 				{
 					string input = inputs[i];
-					logger.User("Adding DAT: " + input.Split('¬')[0]);
+					Globals.Logger.User("Adding DAT: " + input.Split('¬')[0]);
 					datHeaders[i] = new DatFile
 					{
 						DatFormat = (DatFormat != 0 ? DatFormat : 0),
@@ -121,12 +116,12 @@ namespace SabreTools.Helper.Dats
 					};
 
 					datHeaders[i].Parse(input.Split('¬')[0], i, 0, filter, splitType, trim, single,
-						root, maxDegreeOfParallelism, logger, true, clean, descAsName);
+						root, true, clean, descAsName);
 				});
 
-			logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			logger.User("Populating internal DAT");
+			Globals.Logger.User("Populating internal DAT");
 			for (int i = 0; i < inputs.Count; i++)
 			{
 				List<string> keys = datHeaders[i].Keys.ToList();
@@ -138,7 +133,7 @@ namespace SabreTools.Helper.Dats
 				datHeaders[i].Delete();
 			}
 
-			logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			return datHeaders.ToList();
 		}
@@ -149,12 +144,10 @@ namespace SabreTools.Helper.Dats
 		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
 		/// <param name="outDir">Output directory to write the DATs to</param>
 		/// <param name="inputs">List of inputs to write out from</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		public void DiffNoCascade(DiffMode diff, string outDir, List<string> inputs, int maxDegreeOfParallelism, Logger logger)
+		public void DiffNoCascade(DiffMode diff, string outDir, List<string> inputs)
 		{
 			DateTime start = DateTime.Now;
-			logger.User("Initializing all output DATs");
+			Globals.Logger.User("Initializing all output DATs");
 
 			// Default vars for use
 			string post = "";
@@ -218,15 +211,15 @@ namespace SabreTools.Helper.Dats
 
 				outDats = outDatsArray.ToList();
 			}
-			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
-			logger.User("Populating all output DATs");
+			Globals.Logger.User("Populating all output DATs");
 			List<string> keys = Keys.ToList();
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = DatItem.Merge(this[key], logger);
+				List<DatItem> roms = DatItem.Merge(this[key]);
 
 				if (roms != null && roms.Count > 0)
 				{
@@ -268,22 +261,22 @@ namespace SabreTools.Helper.Dats
 					}
 				}
 			}
-			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Finally, loop through and output each of the DATs
 			start = DateTime.Now;
-			logger.User("Outputting all created DATs");
+			Globals.Logger.User("Outputting all created DATs");
 
 			// Output the difflist (a-b)+(b-a) diff
 			if ((diff & DiffMode.NoDupes) != 0)
 			{
-				outerDiffData.WriteToFile(outDir, maxDegreeOfParallelism, logger);
+				outerDiffData.WriteToFile(outDir);
 			}
 
 			// Output the (ab) diff
 			if ((diff & DiffMode.Dupes) != 0)
 			{
-				dupeData.WriteToFile(outDir, maxDegreeOfParallelism, logger);
+				dupeData.WriteToFile(outDir);
 			}
 
 			// Output the individual (a-b) DATs
@@ -298,10 +291,10 @@ namespace SabreTools.Helper.Dats
 						: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length)));
 
 					// Try to output the file
-					outDats[j].WriteToFile(path, maxDegreeOfParallelism, logger);
+					outDats[j].WriteToFile(path);
 				}
 			}
-			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
 
 		/// <summary>
@@ -312,9 +305,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		public void DiffCascade(string outDir, bool inplace, List<string> inputs, List<DatFile> datHeaders, bool skip, int maxDegreeOfParallelism, Logger logger)
+		public void DiffCascade(string outDir, bool inplace, List<string> inputs, List<DatFile> datHeaders, bool skip)
 		{
 			string post = "";
 
@@ -323,7 +314,7 @@ namespace SabreTools.Helper.Dats
 
 			// Loop through each of the inputs and get or create a new DatData object
 			DateTime start = DateTime.Now;
-			logger.User("Initializing all output DATs");
+			Globals.Logger.User("Initializing all output DATs");
 
 			DatFile[] outDatsArray = new DatFile[inputs.Count];
 
@@ -350,16 +341,16 @@ namespace SabreTools.Helper.Dats
 			});
 
 			outDats = outDatsArray.ToList();
-			logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
-			logger.User("Populating all output DATs");
+			Globals.Logger.User("Populating all output DATs");
 			List<string> keys = Keys.ToList();
 
 			foreach (string key in keys)
 			{
-				List<DatItem> roms = DatItem.Merge(this[key], logger);
+				List<DatItem> roms = DatItem.Merge(this[key]);
 
 				if (roms != null && roms.Count > 0)
 				{
@@ -368,7 +359,7 @@ namespace SabreTools.Helper.Dats
 						// There's odd cases where there are items with System ID < 0. Skip them for now
 						if (rom.SystemID < 0)
 						{
-							logger.Warning("Item found with a <0 SystemID: " + rom.Name);
+							Globals.Logger.Warning("Item found with a <0 SystemID: " + rom.Name);
 							continue;
 						}
 
@@ -376,11 +367,11 @@ namespace SabreTools.Helper.Dats
 					}
 				}
 			}
-			logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Finally, loop through and output each of the DATs
 			start = DateTime.Now;
-			logger.User("Outputting all created DATs");
+			Globals.Logger.User("Outputting all created DATs");
 			for (int j = (skip ? 1 : 0); j < inputs.Count; j++)
 			{
 				// If we have an output directory set, replace the path
@@ -398,9 +389,9 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Try to output the file
-				outDats[j].WriteToFile(path, maxDegreeOfParallelism, logger);
+				outDats[j].WriteToFile(path);
 			}
-			logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
 
 		/// <summary>
@@ -409,9 +400,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="outDir">Output directory to write the DATs to</param>
 		/// <param name="inputs">List of inputs to write out from</param>
 		/// <param name="datHeaders">Dat headers used optionally</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logging object for console and file output</param>
-		public void MergeNoDiff(string outDir, List<string> inputs, List<DatFile> datHeaders, int maxDegreeOfParallelism, Logger logger)
+		public void MergeNoDiff(string outDir, List<string> inputs, List<DatFile> datHeaders)
 		{
 			// If we're in SuperDAT mode, prefix all games with their respective DATs
 			if (Type == "SuperDAT")
@@ -438,17 +427,16 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Try to output the file
-			WriteToFile(outDir, maxDegreeOfParallelism, logger);
+			WriteToFile(outDir);
 		}
 
 		/// <summary>
 		/// Strip the given hash types from the DAT
 		/// </summary>
-		/// <param name="logger">Logging object for console and file output</param>
-		private void StripHashesFromItems(Logger logger)
+		private void StripHashesFromItems()
 		{
 			// Output the logging statement
-			logger.User("Stripping requested hashes");
+			Globals.Logger.User("Stripping requested hashes");
 
 			// Now process all of the roms
 			List<string> keys = Keys.ToList();
@@ -532,13 +520,11 @@ namespace SabreTools.Helper.Dats
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		/// <param name="logger">Logging object for console and file output</param>
 		public void Update(List<string> inputFileNames, string outDir, bool clean, bool descAsName, Filter filter,
-			SplitType splitType, bool trim, bool single, string root, int maxDegreeOfParallelism, Logger logger)
+			SplitType splitType, bool trim, bool single, string root)
 		{
 			Parallel.ForEach(inputFileNames,
-				new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+				new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 				inputFileName =>
 				{
 					// Clean the input string
@@ -550,36 +536,36 @@ namespace SabreTools.Helper.Dats
 					if (File.Exists(inputFileName))
 					{
 						DatFile innerDatdata = new DatFile(this);
-						logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
+						Globals.Logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
 						innerDatdata.Parse(inputFileName, 0, 0, filter, splitType, trim, single,
-							root, maxDegreeOfParallelism, logger, true, clean, descAsName,
+							root, true, clean, descAsName,
 							keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 
 						// Try to output the file
-						innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), maxDegreeOfParallelism, logger, overwrite: (outDir != ""));
+						innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), overwrite: (outDir != ""));
 					}
 					else if (Directory.Exists(inputFileName))
 					{
 						inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
 
 						Parallel.ForEach(Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories),
-							new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism },
+							new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 							file =>
 							{
-								logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
+								Globals.Logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 								DatFile innerDatdata = new DatFile(this);
 								innerDatdata.Parse(file, 0, 0, filter, splitType,
-									trim, single, root, maxDegreeOfParallelism, logger, true, clean, descAsName,
+									trim, single, root, true, clean, descAsName,
 									keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 
 								// Try to output the file
 								innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)),
-									maxDegreeOfParallelism, logger, overwrite: (outDir != ""));
+									overwrite: (outDir != ""));
 							});
 					}
 					else
 					{
-						logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
+						Globals.Logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
 						return;
 					}
 				});

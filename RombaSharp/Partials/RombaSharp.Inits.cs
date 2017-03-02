@@ -41,12 +41,12 @@ namespace RombaSharp
 			DatFile df = new DatFile();
 			foreach (string dir in onlyDirs)
 			{
-				df.PopulateFromDir(dir, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, false, true, false, false, _tmpdir, false, null, _workers, _logger);
+				df.PopulateFromDir(dir, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, false, true, false, false, _tmpdir, false, null);
 
 				// If we're looking for only needed, consider the zipfiles themselves too
 				if (onlyNeeded)
 				{
-					df.PopulateFromDir(dir, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, true, true, false, false, _tmpdir, false, null, _workers, _logger);
+					df.PopulateFromDir(dir, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, true, true, false, false, _tmpdir, false, null);
 				}
 			}
 
@@ -176,7 +176,7 @@ namespace RombaSharp
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers((onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1));
 			need.RebuildGeneric(onlyDirs, _depots.Keys.ToList()[0], _tmpdir, false /*quickScan*/, false /*date*/,
 				false /*delete*/, false /*inverse*/, OutputFormat.TorrentGzip, true /*romba*/, asl, false /*updateDat*/,
-				null /*headerToCheckAgainst*/, _workers /*maxDegreeOfParallelism*/, _logger);
+				null /*headerToCheckAgainst*/);
 		}
 
 		/// <summary>
@@ -200,7 +200,7 @@ namespace RombaSharp
 			{
 				// Get the DAT file associated with the key
 				DatFile datFile = new DatFile();
-				datFile.Parse(Path.Combine(_dats, foundDats[key]), 0, 0, _logger);
+				datFile.Parse(Path.Combine(_dats, foundDats[key]), 0, 0);
 
 				// Create the new output directory if it doesn't exist
 				string outputFolder = Path.Combine("out", Path.GetFileNameWithoutExtension(foundDats[key]));
@@ -216,7 +216,7 @@ namespace RombaSharp
 				ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
 				datFile.RebuildDepot(onlineDepots, outputFolder, _tmpdir, false /*date*/,
 					false /*delete*/, false /*inverse*/, (copy ? OutputFormat.TorrentGzip : OutputFormat.TorrentZip), copy,
-					false /*updateDat*/, null /*headerToCheckAgainst*/, _workers /*maxDegreeOfParallelism*/, _logger);
+					false /*updateDat*/, null /*headerToCheckAgainst*/);
 			}
 		}
 
@@ -226,7 +226,7 @@ namespace RombaSharp
 		/// <param name="newdat"></param>
 		private static void InitDiffDat(string newdat)
 		{
-			_logger.User("This feature is not yet implemented: diffdat");
+			Globals.Logger.User("This feature is not yet implemented: diffdat");
 
 			// First, we want to read in the DAT. Then for each file listed in the DAT, we check if it's in there or not.
 			// If it is in there, we add it to an output DAT. If it's not, we skip. Then we output the DAT.
@@ -247,15 +247,13 @@ namespace RombaSharp
 				DatFormat = DatFormat.Logiqx,
 			};
 
-			Logger logger = new Logger();
 			foreach (string input in inputs)
 			{
 				datdata.PopulateFromDir(input, Hash.SHA256 & Hash.SHA384 & Hash.SHA512 /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
-					null /* headerToCheckAgainst */, _workers /* maxDegreeOfParallelism */, _logger);
-				datdata.WriteToFile("", _workers, logger);
+					null /* headerToCheckAgainst */);
+				datdata.WriteToFile("");
 			}
-			logger.Close();
 		}
 
 		/// <summary>
@@ -264,7 +262,7 @@ namespace RombaSharp
 		/// <param name="inputs"></param>
 		private static void InitFixdat(List<string> inputs)
 		{
-			_logger.User("This feature is not yet implemented: fixdat");
+			Globals.Logger.User("This feature is not yet implemented: fixdat");
 
 			// Verify the filenames
 			Dictionary<string, string> foundDats = GetValidDats(inputs);
@@ -281,7 +279,7 @@ namespace RombaSharp
 		/// <param name="inputs"></param>
 		private static void InitImport(List<string> inputs)
 		{
-			_logger.User("This feature is not yet implemented: import");
+			Globals.Logger.User("This feature is not yet implemented: import");
 		}
 
 		/// <summary>
@@ -334,11 +332,11 @@ namespace RombaSharp
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
 				{
-					_logger.User("For hash '" + input + "' there were " + sldr.RecordsAffected + " matches in the database");
+					Globals.Logger.User("For hash '" + input + "' there were " + sldr.RecordsAffected + " matches in the database");
 				}
 				else
 				{
-					_logger.User("Hash '" + input + "' had no matches in the database");
+					Globals.Logger.User("Hash '" + input + "' had no matches in the database");
 				}
 
 				sldr.Dispose();
@@ -351,11 +349,11 @@ namespace RombaSharp
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
 				{
-					_logger.User("For hash '" + input + "' there were " + sldr.RecordsAffected + " matches in the database");
+					Globals.Logger.User("For hash '" + input + "' there were " + sldr.RecordsAffected + " matches in the database");
 				}
 				else
 				{
-					_logger.User("Hash '" + input + "' had no matches in the database");
+					Globals.Logger.User("Hash '" + input + "' had no matches in the database");
 				}
 
 				sldr.Dispose();
@@ -368,11 +366,11 @@ namespace RombaSharp
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
 				{
-					_logger.User("For hash '" + input + "' there were " + sldr.RecordsAffected + " matches in the database");
+					Globals.Logger.User("For hash '" + input + "' there were " + sldr.RecordsAffected + " matches in the database");
 				}
 				else
 				{
-					_logger.User("Hash '" + input + "' had no matches in the database");
+					Globals.Logger.User("Hash '" + input + "' had no matches in the database");
 				}
 
 				sldr.Dispose();
@@ -390,7 +388,7 @@ namespace RombaSharp
 		/// <param name="onlyNeeded"></param>
 		private static void InitMerge(List<string> inputs, string depotPath, bool onlyNeeded)
 		{
-			_logger.User("This feature is not yet implemented: merge");
+			Globals.Logger.User("This feature is not yet implemented: merge");
 		}
 
 		/// <summary>
@@ -399,7 +397,7 @@ namespace RombaSharp
 		/// <param name="inputs"></param>
 		private static void InitMiss(List<string> inputs)
 		{
-			_logger.User("This feature is not yet implemented: miss");
+			Globals.Logger.User("This feature is not yet implemented: miss");
 
 			// Verify the filenames
 			Dictionary<string, string> foundDats = GetValidDats(inputs);

@@ -257,9 +257,8 @@ namespace SabreTools.Helper.Dats
 		/// Check to see if a DatItem passes the filter
 		/// </summary>
 		/// <param name="item">DatItem to check</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the file passed the filter, false otherwise</returns>
-		public bool ItemPasses(DatItem item, Logger logger)
+		public bool ItemPasses(DatItem item)
 		{
 			// If the item is null, we automatically fail it
 			if (item == null)
@@ -650,9 +649,8 @@ namespace SabreTools.Helper.Dats
 		/// Get the machine type from a string
 		/// </summary>
 		/// <param name="gametype">Machine type as a string</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>A machine type based on the input</returns>
-		public static MachineType GetMachineTypeFromString(string gametype, Logger logger)
+		public static MachineType GetMachineTypeFromString(string gametype)
 		{
 			MachineType machineType = MachineType.NULL;
 			switch (gametype.ToLowerInvariant())
@@ -672,7 +670,7 @@ namespace SabreTools.Helper.Dats
 					machineType |= MachineType.Mechanical;
 					break;
 				default:
-					logger.Warning(gametype + " is not a valid type");
+					Globals.Logger.Warning(gametype + " is not a valid type");
 					break;
 			}
 
@@ -683,9 +681,8 @@ namespace SabreTools.Helper.Dats
 		/// Get the item status from a string
 		/// </summary>
 		/// <param name="status">Item status as a string</param>
-		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>An item status based on the input</returns>
-		public static ItemStatus GetStatusFromString(string status, Logger logger)
+		public static ItemStatus GetStatusFromString(string status)
 		{
 			ItemStatus itemStatus = ItemStatus.NULL;
 			switch (status.ToLowerInvariant())
@@ -706,7 +703,7 @@ namespace SabreTools.Helper.Dats
 					itemStatus |= ItemStatus.Verified;
 					break;
 				default:
-					logger.Warning(status + " is not a valid status");
+					Globals.Logger.Warning(status + " is not a valid status");
 					break;
 			}
 
