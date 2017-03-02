@@ -45,7 +45,6 @@ namespace SabreTools
 		/// <param name="outDir">Name of the directory to output the DAT to (blank is the current directory)</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitDatFromDir(List<string> inputs,
 			string filename,
 			string name,
@@ -67,8 +66,7 @@ namespace SabreTools
 			string tempDir,
 			string outDir,
 			bool copyFiles,
-			string headerToCheckAgainst,
-			int maxDegreeOfParallelism)
+			string headerToCheckAgainst)
 		{
 			ForcePacking fp = ForcePacking.None;
 			switch (forcepack?.ToLowerInvariant())
@@ -115,12 +113,12 @@ namespace SabreTools
 
 					string basePath = Path.GetFullPath(path);
 					bool success = datdata.PopulateFromDir(basePath, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,
-						addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
+						addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, headerToCheckAgainst, _maxDegreeOfParallelism, _logger);
 
 					// If it was a success, write the DAT out
 					if (success)
 					{
-						datdata.WriteToFile(outDir, maxDegreeOfParallelism, _logger);
+						datdata.WriteToFile(outDir, _maxDegreeOfParallelism, _logger);
 					}
 
 					// Otherwise, show the help
@@ -163,8 +161,7 @@ namespace SabreTools
 		/// <param name="exta">First extension to split on</param>
 		/// <param name="extb">Second extension to split on</param>
 		/// <param name="outDir">Output directory for the split files</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		private static void InitExtSplit(List<string> inputs, List<string> exta, List<string> extb, string outDir, int maxDegreeOfParallelism)
+		private static void InitExtSplit(List<string> inputs, List<string> exta, List<string> extb, string outDir)
 		{
 			// Loop over the input files
 			foreach (string input in inputs)
@@ -173,7 +170,7 @@ namespace SabreTools
 				{
 					DatFile datFile = new DatFile();
 					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger);
-					datFile.SplitByExt(outDir, Path.GetDirectoryName(input), exta, extb, maxDegreeOfParallelism, _logger);
+					datFile.SplitByExt(outDir, Path.GetDirectoryName(input), exta, extb, _maxDegreeOfParallelism, _logger);
 				}
 				else if (Directory.Exists(input))
 				{
@@ -182,7 +179,7 @@ namespace SabreTools
 						DatFile datFile = new DatFile();
 						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger);
 						datFile.SplitByExt(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar),
-							exta, extb, maxDegreeOfParallelism, _logger);
+							exta, extb, _maxDegreeOfParallelism, _logger);
 					}
 				}
 				else
@@ -200,8 +197,7 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
 		/// <param name="outDir">Output directory for the split files</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		private static void InitHashSplit(List<string> inputs, string outDir, int maxDegreeOfParallelism)
+		private static void InitHashSplit(List<string> inputs, string outDir)
 		{
 			// Loop over the input files
 			foreach (string input in inputs)
@@ -210,7 +206,7 @@ namespace SabreTools
 				{
 					DatFile datFile = new DatFile();
 					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger);
-					datFile.SplitByHash(outDir, Path.GetDirectoryName(input), maxDegreeOfParallelism, _logger);
+					datFile.SplitByHash(outDir, Path.GetDirectoryName(input), _maxDegreeOfParallelism, _logger);
 				}
 				else if (Directory.Exists(input))
 				{
@@ -219,7 +215,7 @@ namespace SabreTools
 						DatFile datFile = new DatFile();
 						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger);
 						datFile.SplitByHash(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar),
-							maxDegreeOfParallelism, _logger);
+							_maxDegreeOfParallelism, _logger);
 					}
 				}
 				else
@@ -262,8 +258,7 @@ namespace SabreTools
 		/// <param name="outDir">Output directory for the split files</param>
 		/// <param name="shortname">True if short filenames should be used, false otherwise</param>
 		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		private static void InitLevelSplit(List<string> inputs, string outDir, bool shortname, bool basedat, int maxDegreeOfParallelism)
+		private static void InitLevelSplit(List<string> inputs, string outDir, bool shortname, bool basedat)
 		{
 			// Loop over the input files
 			foreach (string input in inputs)
@@ -272,7 +267,7 @@ namespace SabreTools
 				{
 					DatFile datFile = new DatFile();
 					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger, keep: true);
-					datFile.SplitByLevel(outDir, Path.GetDirectoryName(input), shortname, basedat, maxDegreeOfParallelism, _logger);
+					datFile.SplitByLevel(outDir, Path.GetDirectoryName(input), shortname, basedat, _maxDegreeOfParallelism, _logger);
 				}
 				else if (Directory.Exists(input))
 				{
@@ -281,7 +276,7 @@ namespace SabreTools
 						DatFile datFile = new DatFile();
 						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger, keep: true);
 						datFile.SplitByLevel(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar),
-							shortname, basedat, maxDegreeOfParallelism, _logger);
+							shortname, basedat, _maxDegreeOfParallelism, _logger);
 					}
 				}
 				else
@@ -314,10 +309,9 @@ namespace SabreTools
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date, bool delete,
 			bool inverse, OutputFormat outputFormat, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst,
-			SplitType splitType, int maxDegreeOfParallelism)
+			SplitType splitType)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
@@ -330,12 +324,12 @@ namespace SabreTools
 			foreach (string datfile in datfiles)
 			{
 				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */,
-					maxDegreeOfParallelism, _logger, keep: true, useTags: true);
+					_maxDegreeOfParallelism, _logger, keep: true, useTags: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			datdata.RebuildGeneric(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
-				updateDat, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
+				updateDat, headerToCheckAgainst, _maxDegreeOfParallelism, _logger);
 		}
 
 		/// <summary>
@@ -353,9 +347,8 @@ namespace SabreTools
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitSortDepot(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool date, bool delete,
-			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, string headerToCheckAgainst, SplitType splitType, int maxDegreeOfParallelism)
+			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, string headerToCheckAgainst, SplitType splitType)
 		{
 			DateTime start = DateTime.Now;
 			_logger.User("Populating internal DAT...");
@@ -365,12 +358,12 @@ namespace SabreTools
 			foreach (string datfile in datfiles)
 			{
 				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */,
-					maxDegreeOfParallelism, _logger, keep: true, useTags: true);
+					_maxDegreeOfParallelism, _logger, keep: true, useTags: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			datdata.RebuildDepot(inputs, outDir, tempDir, date, delete, inverse, outputFormat, romba,
-				updateDat, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
+				updateDat, headerToCheckAgainst, _maxDegreeOfParallelism, _logger);
 		}
 
 		/// <summary>
@@ -383,11 +376,10 @@ namespace SabreTools
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
 		/// <param name="statDatFormat">Set the statistics output format to use</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitStats(List<string> inputs, string filename, string outDir, bool single, bool baddumpCol, bool nodumpCol,
-			StatDatFormat statDatFormat, int maxDegreeOfParallelism)
+			StatDatFormat statDatFormat)
 		{
-			DatFile.OutputStats(inputs, filename, outDir, single, baddumpCol, nodumpCol, statDatFormat, maxDegreeOfParallelism, _logger);
+			DatFile.OutputStats(inputs, filename, outDir, single, baddumpCol, nodumpCol, statDatFormat, _maxDegreeOfParallelism, _logger);
 		}
 
 		/// <summary>
@@ -395,8 +387,7 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
 		/// <param name="outDir">Output directory for the split files</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
-		private static void InitTypeSplit(List<string> inputs, string outDir, int maxDegreeOfParallelism)
+		private static void InitTypeSplit(List<string> inputs, string outDir)
 		{
 			// Loop over the input files
 			foreach (string input in inputs)
@@ -405,7 +396,7 @@ namespace SabreTools
 				{
 					DatFile datFile = new DatFile();
 					datFile.Parse(Path.GetFullPath(input), 0, 0, _logger);
-					datFile.SplitByType(outDir, Path.GetFullPath(Path.GetDirectoryName(input)), maxDegreeOfParallelism, _logger);
+					datFile.SplitByType(outDir, Path.GetFullPath(Path.GetDirectoryName(input)), _maxDegreeOfParallelism, _logger);
 				}
 				else if (Directory.Exists(input))
 				{
@@ -414,7 +405,7 @@ namespace SabreTools
 						DatFile datFile = new DatFile();
 						datFile.Parse(Path.GetFullPath(file), 0, 0, _logger);
 						datFile.SplitByType(outDir, Path.GetFullPath((input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar)),
-							maxDegreeOfParallelism, _logger);
+							_maxDegreeOfParallelism, _logger);
 					}
 				}
 				else
@@ -482,8 +473,6 @@ namespace SabreTools
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="dedup">True to dedupe the roms in the DAT, false otherwise (default)</param>
 		/// <param name="stripHash">StripHash that represents the hash(es) that you want to remove from the output</param>
-		/// /* Multithreading info */
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitUpdate(List<string> inputs,
 			/* Normal DAT header info */
 			string filename,
@@ -540,10 +529,7 @@ namespace SabreTools
 			bool clean,
 			bool descAsName,
 			bool dedup,
-			Hash stripHash,
-
-			/* Multithreading info */
-			int maxDegreeOfParallelism)
+			Hash stripHash)
 		{
 			// Set the special flags
 			ForceMerging fm = ForceMerging.None;
@@ -711,7 +697,7 @@ namespace SabreTools
 			};
 			
 			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, descAsName,
-				filter, splitType, trim, single, root, maxDegreeOfParallelism, _logger);
+				filter, splitType, trim, single, root, _maxDegreeOfParallelism, _logger);
 		}
 
 		/// <summary>
@@ -724,9 +710,8 @@ namespace SabreTools
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitVerify(List<string> datfiles, List<string> inputs, string tempDir,
-			bool hashOnly, bool quickScan, string headerToCheckAgainst, SplitType splitType, int maxDegreeOfParallelism)
+			bool hashOnly, bool quickScan, string headerToCheckAgainst, SplitType splitType)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
@@ -739,11 +724,11 @@ namespace SabreTools
 			foreach (string datfile in datfiles)
 			{
 				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */,
-					maxDegreeOfParallelism, _logger, keep: true, useTags: true);
+					_maxDegreeOfParallelism, _logger, keep: true, useTags: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			datdata.VerifyGeneric(inputs, tempDir, hashOnly, quickScan, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
+			datdata.VerifyGeneric(inputs, tempDir, hashOnly, quickScan, headerToCheckAgainst, _maxDegreeOfParallelism, _logger);
 		}
 
 		/// <summary>
@@ -754,9 +739,8 @@ namespace SabreTools
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		private static void InitVerifyDepot(List<string> datfiles, List<string> inputs, string tempDir,
-			string headerToCheckAgainst, SplitType splitType, int maxDegreeOfParallelism)
+			string headerToCheckAgainst, SplitType splitType)
 		{
 			DateTime start = DateTime.Now;
 			_logger.User("Populating internal DAT...");
@@ -766,11 +750,11 @@ namespace SabreTools
 			foreach (string datfile in datfiles)
 			{
 				datdata.Parse(datfile, 99, 99, new Filter(), splitType, false /* trim */, false /* single */, null /* root */,
-					maxDegreeOfParallelism, _logger, keep: true, useTags: true);
+					_maxDegreeOfParallelism, _logger, keep: true, useTags: true);
 			}
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
-			datdata.VerifyDepot(inputs, tempDir, headerToCheckAgainst, maxDegreeOfParallelism, _logger);
+			datdata.VerifyDepot(inputs, tempDir, headerToCheckAgainst, _maxDegreeOfParallelism, _logger);
 		}
 
 		#endregion

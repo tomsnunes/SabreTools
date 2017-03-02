@@ -28,6 +28,7 @@ namespace SabreTools
 		// Private required variables
 		private static Logger _logger;
 		private static Help _help;
+		private static int _maxDegreeOfParallelism;
 
 		/// <summary>
 		/// Start menu or use supplied parameters
@@ -133,7 +134,6 @@ namespace SabreTools
 
 			// User inputs
 			int gz = 2,
-				maxParallelism = 4,
 				rar = 2,
 				sevenzip = 1,
 				zip = 1;
@@ -714,7 +714,7 @@ namespace SabreTools
 						break;
 					case "-mt":
 					case "--mt":
-						Int32.TryParse(args[++i], out maxParallelism);
+						Int32.TryParse(args[++i], out _maxDegreeOfParallelism);
 						break;
 					case "-n":
 					case "--name":
@@ -982,7 +982,7 @@ namespace SabreTools
 									break;
 								case "-mt":
 								case "--mt":
-									Int32.TryParse(split[1], out maxParallelism);
+									Int32.TryParse(split[1], out _maxDegreeOfParallelism);
 									break;
 								case "-n":
 								case "--name":
@@ -1186,7 +1186,7 @@ namespace SabreTools
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, forcepack, excludeOf,
 					datFormat, romba, superdat, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,
-					addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header, maxParallelism);
+					addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header);
 			}
 
 			// If we're in header extract and remove mode
@@ -1205,44 +1205,44 @@ namespace SabreTools
 			else if (sort)
 			{
 				InitSort(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, delete, inverse,
-					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, splitType, maxParallelism);
+					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, splitType);
 			}
 
 			// If we're using the sorter from depot
 			else if (sortDepot)
 			{
 				InitSortDepot(datfiles, inputs, outDir, tempDir, addFileDates, delete, inverse,
-					outputFormat, romba, updateDat, header, splitType, maxParallelism);
+					outputFormat, romba, updateDat, header, splitType);
 			}
 
 			// Split a DAT by extension
 			else if (splitByExt)
 			{
-				InitExtSplit(inputs, exta, extb, outDir, maxParallelism);
+				InitExtSplit(inputs, exta, extb, outDir);
 			}
 
 			// Split a DAT by available hashes
 			else if (splitByHash)
 			{
-				InitHashSplit(inputs, outDir, maxParallelism);
+				InitHashSplit(inputs, outDir);
 			}
 
 			// Split a SuperDAT by lowest available level
 			else if (splitByLevel)
 			{
-				InitLevelSplit(inputs, outDir, shortname, basedat, maxParallelism);
+				InitLevelSplit(inputs, outDir, shortname, basedat);
 			}
 
 			// Split a DAT by item type
 			else if (splitByType)
 			{
-				InitTypeSplit(inputs, outDir, maxParallelism);
+				InitTypeSplit(inputs, outDir);
 			}
 
 			// Get statistics on input files
 			else if (stats)
 			{
-				InitStats(inputs, filename, outDir, single, showBaddumpColumn, showNodumpColumn, statDatFormat, maxParallelism);
+				InitStats(inputs, filename, outDir, single, showBaddumpColumn, showNodumpColumn, statDatFormat);
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
@@ -1251,19 +1251,19 @@ namespace SabreTools
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix, postfix, quotes, repext, addext, remext,
 					datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName, filter, oneGameOneRegion, regions,
-					splitType, trim, single, root, outDir, cleanGameNames, descAsName, dedup, stripHash, maxParallelism);
+					splitType, trim, single, root, outDir, cleanGameNames, descAsName, dedup, stripHash);
 			}
 
 			// If we're using the verifier
 			else if (verify)
 			{
-				InitVerify(datfiles, inputs, tempDir, hashOnly, quickScan, header, splitType, maxParallelism);
+				InitVerify(datfiles, inputs, tempDir, hashOnly, quickScan, header, splitType);
 			}
 
 			// If we're using the depot verifier
 			else if (verifyDepot)
 			{
-				InitVerifyDepot(datfiles, inputs, tempDir, header, splitType, maxParallelism);
+				InitVerifyDepot(datfiles, inputs, tempDir, header, splitType);
 			}
 
 			// If nothing is set, show the help
