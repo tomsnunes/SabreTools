@@ -122,18 +122,29 @@ namespace SabreTools.Helper.Dats
 			Globals.Logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			Globals.Logger.User("Populating internal DAT");
-			for (int i = 0; i < inputs.Count; i++)
+			Parallel.For(0, inputs.Count,
+				new ParallelOptions() { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+				i =>
 			{
+				// Get the list of keys from the DAT
 				List<string> keys = datHeaders[i].Keys.ToList();
 				Parallel.ForEach(keys,
-					new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+					new ParallelOptions() { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 					key =>
 				{
+					// Add everything from the key to the internal DAT
 					AddRange(key, datHeaders[i][key]);
-					datHeaders[i].Remove(key);
+
+					// Now remove the key from the source DAT
+					lock (datHeaders)
+					{
+						datHeaders[i].Remove(key);
+					}
 				});
+
+				// Now remove the file dictionary from the souce DAT to save memory
 				datHeaders[i].Delete();
-			}
+			});
 
 			Globals.Logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
