@@ -26,9 +26,10 @@ namespace SabreTools.Helper.Dats
 		/// <param name="basepath">Parent path for replacement</param>
 		/// <param name="extA">List of extensions to split on (first DAT)</param>
 		/// <param name="extB">List of extensions to split on (second DAT)</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file writing</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByExt(string outDir, string basepath, List<string> extA, List<string> extB, Logger logger)
+		public bool SplitByExt(string outDir, string basepath, List<string> extA, List<string> extB, int maxDegreeOfParallelism, Logger logger)
 		{
 			// Make sure all of the extensions have a dot at the beginning
 			List<string> newExtA = new List<string>();
@@ -115,8 +116,8 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Then write out both files
-			bool success = datdataA.WriteToFile(outDir, logger);
-			success &= datdataB.WriteToFile(outDir, logger);
+			bool success = datdataA.WriteToFile(outDir, maxDegreeOfParallelism, logger);
+			success &= datdataB.WriteToFile(outDir, maxDegreeOfParallelism, logger);
 
 			return success;
 		}
@@ -126,9 +127,10 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
 		/// <param name="basepath">Parent path for replacement</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file writing</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByHash(string outDir, string basepath, Logger logger)
+		public bool SplitByHash(string outDir, string basepath, int maxDegreeOfParallelism, Logger logger)
 		{
 			// Sanitize the basepath to be more predictable
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
@@ -299,10 +301,10 @@ namespace SabreTools.Helper.Dats
 			// Now, output all of the files to the output directory
 			logger.User("DAT information created, outputting new files");
 			bool success = true;
-			success &= nodump.WriteToFile(outDir, logger);
-			success &= sha1.WriteToFile(outDir, logger);
-			success &= md5.WriteToFile(outDir, logger);
-			success &= crc.WriteToFile(outDir, logger);
+			success &= nodump.WriteToFile(outDir, maxDegreeOfParallelism, logger);
+			success &= sha1.WriteToFile(outDir, maxDegreeOfParallelism, logger);
+			success &= md5.WriteToFile(outDir, maxDegreeOfParallelism, logger);
+			success &= crc.WriteToFile(outDir, maxDegreeOfParallelism, logger);
 
 			return success;
 		}
@@ -314,15 +316,16 @@ namespace SabreTools.Helper.Dats
 		/// <param name="basepath">Parent path for replacement</param>
 		/// <param name="shortname">True if short names should be used, false otherwise</param>
 		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file writing</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByLevel(string outDir, string basepath, bool shortname, bool basedat, Logger logger)
+		public bool SplitByLevel(string outDir, string basepath, bool shortname, bool basedat, int maxDegreeOfParallelism, Logger logger)
 		{
 			// Sanitize the basepath to be more predictable
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
 			// First, organize by games so that we can do the right thing
-			BucketBy(SortedBy.Game, false /* mergeroms */, logger, lower: false, norename: true);
+			BucketBy(SortedBy.Game, false /* mergeroms */, maxDegreeOfParallelism, logger, lower: false, norename: true);
 
 			// Create a temporary DAT to add things to
 			DatFile tempDat = new DatFile(this)
@@ -341,7 +344,7 @@ namespace SabreTools.Helper.Dats
 				if (tempDat.Name != null && tempDat.Name != Style.GetDirectoryName(key))
 				{
 					// Process and output the DAT
-					SplitByLevelHelper(tempDat, outDir, shortname, basedat, logger);
+					SplitByLevelHelper(tempDat, outDir, shortname, basedat, maxDegreeOfParallelism, logger);
 
 					// Reset the DAT for the next items
 					tempDat = new DatFile(this)
@@ -363,7 +366,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Then we write the last DAT out since it would be skipped otherwise
-			SplitByLevelHelper(tempDat, outDir, shortname, basedat, logger);
+			SplitByLevelHelper(tempDat, outDir, shortname, basedat, maxDegreeOfParallelism, logger);
 
 			return true;
 		}
@@ -394,8 +397,9 @@ namespace SabreTools.Helper.Dats
 		/// <param name="outDir">Directory to write out to</param>
 		/// <param name="shortname">True if short naming scheme should be used, false otherwise</param>
 		/// <param name="restore">True if original filenames should be used as the base for output filename, false otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		private void SplitByLevelHelper(DatFile datFile, string outDir, bool shortname, bool restore, Logger logger)
+		private void SplitByLevelHelper(DatFile datFile, string outDir, bool shortname, bool restore, int maxDegreeOfParallelism, Logger logger)
 		{
 			// Get the name from the DAT to use separately
 			string name = datFile.Name;
@@ -420,7 +424,7 @@ namespace SabreTools.Helper.Dats
 			datFile.Type = null;
 
 			// Write out the temporary DAT to the proper directory
-			datFile.WriteToFile(path, logger);
+			datFile.WriteToFile(path, maxDegreeOfParallelism, logger);
 		}
 
 		/// <summary>
@@ -428,9 +432,10 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
 		/// <param name="basepath">Parent path for replacement</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and file writing</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByType(string outDir, string basepath, Logger logger)
+		public bool SplitByType(string outDir, string basepath, int maxDegreeOfParallelism, Logger logger)
 		{
 			// Sanitize the basepath to be more predictable
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
@@ -539,9 +544,9 @@ namespace SabreTools.Helper.Dats
 			// Now, output all of the files to the output directory
 			logger.User("DAT information created, outputting new files");
 			bool success = true;
-			success &= romdat.WriteToFile(outDir, logger);
-			success &= diskdat.WriteToFile(outDir, logger);
-			success &= sampledat.WriteToFile(outDir, logger);
+			success &= romdat.WriteToFile(outDir, maxDegreeOfParallelism, logger);
+			success &= diskdat.WriteToFile(outDir, maxDegreeOfParallelism, logger);
+			success &= sampledat.WriteToFile(outDir, maxDegreeOfParallelism, logger);
 
 			return success;
 		}
