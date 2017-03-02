@@ -125,11 +125,13 @@ namespace SabreTools.Helper.Dats
 			for (int i = 0; i < inputs.Count; i++)
 			{
 				List<string> keys = datHeaders[i].Keys.ToList();
-				foreach (string key in keys)
+				Parallel.ForEach(keys,
+					new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+					key =>
 				{
 					AddRange(key, datHeaders[i][key]);
 					datHeaders[i].Remove(key);
-				}
+				});
 				datHeaders[i].Delete();
 			}
 
