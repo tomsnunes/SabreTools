@@ -243,9 +243,10 @@ namespace SabreTools.Helper.Dats
 		/// Check if a DAT contains the given rom
 		/// </summary>
 		/// <param name="datdata">Dat to match against</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>True if it contains the rom, false otherwise</returns>
-		public bool HasDuplicates(DatFile datdata, Logger logger)
+		public bool HasDuplicates(DatFile datdata, int maxDegreeOfParallelism, Logger logger)
 		{
 			// Check for an empty rom list first
 			if (datdata.Count == 0)
@@ -254,7 +255,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// We want to get the proper key for the DatItem
-			string key = SortAndGetKey(datdata, logger);
+			string key = SortAndGetKey(datdata, maxDegreeOfParallelism, logger);
 
 			// If the key doesn't exist, return the empty list
 			if (!datdata.ContainsKey(key))
@@ -280,10 +281,11 @@ namespace SabreTools.Helper.Dats
 		/// List all duplicates found in a DAT based on a rom
 		/// </summary>
 		/// <param name="datdata">Dat to match against</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="remove">True to remove matched roms from the input, false otherwise (default)</param>
 		/// <returns>List of matched DatItem objects</returns>
-		public List<DatItem> GetDuplicates(DatFile datdata, Logger logger, bool remove = false)
+		public List<DatItem> GetDuplicates(DatFile datdata, int maxDegreeOfParallelism, Logger logger, bool remove = false)
 		{
 			List<DatItem> output = new List<DatItem>();
 
@@ -294,7 +296,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// We want to get the proper key for the DatItem
-			string key = SortAndGetKey(datdata, logger);
+			string key = SortAndGetKey(datdata, maxDegreeOfParallelism, logger);
 
 			// If the key doesn't exist, return the empty list
 			if (!datdata.ContainsKey(key))
@@ -333,7 +335,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="datdata">Dat to match against</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <returns>Key to try to use</returns>
-		private string SortAndGetKey(DatFile datdata, Logger logger)
+		private string SortAndGetKey(DatFile datdata, int maxDegreeOfParallelism, Logger logger)
 		{
 			string key = null;
 
@@ -345,12 +347,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).SHA512;
-					datdata.BucketBy(SortedBy.SHA512, false /* mergeroms */, logger);
+					datdata.BucketBy(SortedBy.SHA512, false /* mergeroms */, maxDegreeOfParallelism, logger);
 				}
 				else
 				{
 					key = ((Disk)this).SHA512;
-					datdata.BucketBy(SortedBy.SHA512, false /* mergeroms */, logger);
+					datdata.BucketBy(SortedBy.SHA512, false /* mergeroms */, maxDegreeOfParallelism, logger);
 				}
 			}
 
@@ -362,12 +364,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).SHA384;
-					datdata.BucketBy(SortedBy.SHA384, false /* mergeroms */, logger);
+					datdata.BucketBy(SortedBy.SHA384, false /* mergeroms */, maxDegreeOfParallelism, logger);
 				}
 				else
 				{
 					key = ((Disk)this).SHA384;
-					datdata.BucketBy(SortedBy.SHA384, false /* mergeroms */, logger);
+					datdata.BucketBy(SortedBy.SHA384, false /* mergeroms */, maxDegreeOfParallelism, logger);
 				}
 			}
 
@@ -379,12 +381,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).SHA256;
-					datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */, logger);
+					datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */, maxDegreeOfParallelism, logger);
 				}
 				else
 				{
 					key = ((Disk)this).SHA256;
-					datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */, logger);
+					datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */, maxDegreeOfParallelism, logger);
 				}
 			}
 
@@ -396,12 +398,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).SHA1;
-					datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */, logger);
+					datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */, maxDegreeOfParallelism, logger);
 				}
 				else
 				{
 					key = ((Disk)this).SHA1;
-					datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */, logger);
+					datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */, maxDegreeOfParallelism, logger);
 				}
 			}
 
@@ -413,12 +415,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).MD5;
-					datdata.BucketBy(SortedBy.MD5, false /* mergeroms */, logger);
+					datdata.BucketBy(SortedBy.MD5, false /* mergeroms */, maxDegreeOfParallelism, logger);
 				}
 				else
 				{
 					key = ((Disk)this).MD5;
-					datdata.BucketBy(SortedBy.MD5, false /* mergeroms */, logger);
+					datdata.BucketBy(SortedBy.MD5, false /* mergeroms */, maxDegreeOfParallelism, logger);
 				}
 			}
 
@@ -426,21 +428,21 @@ namespace SabreTools.Helper.Dats
 			else if (_itemType == ItemType.Disk)
 			{
 				key = ((Disk)this).MD5;
-				datdata.BucketBy(SortedBy.MD5, false /* mergeroms */, logger);
+				datdata.BucketBy(SortedBy.MD5, false /* mergeroms */, maxDegreeOfParallelism, logger);
 			}
 
 			// If we've gotten here and we have a Rom, sort by CRC
 			else if (_itemType == ItemType.Rom)
 			{
 				key = ((Rom)this).CRC;
-				datdata.BucketBy(SortedBy.CRC, false /* mergeroms */, logger);
+				datdata.BucketBy(SortedBy.CRC, false /* mergeroms */, maxDegreeOfParallelism, logger);
 			}
 
 			// Otherwise, we use -1 as the key
 			else
 			{
 				key = "-1";
-				datdata.BucketBy(SortedBy.Size, false /* mergeroms */, logger);
+				datdata.BucketBy(SortedBy.Size, false /* mergeroms */, maxDegreeOfParallelism, logger);
 			}
 
 			return key;

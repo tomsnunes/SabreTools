@@ -38,7 +38,7 @@ namespace SabreTools.Helper.Dats
 		public void Parse(string filename, int sysid, int srcid, Logger logger,
 			bool keep = false, bool clean = false, bool descAsName = false, bool keepext = false, bool useTags = false)
 		{
-			Parse(filename, sysid, srcid, new Filter(), SplitType.None, false, false, "", logger,
+			Parse(filename, sysid, srcid, new Filter(), SplitType.None, false, false, "", 4, logger,
 				keep: keep, clean: clean, descAsName: descAsName, keepext: keepext, useTags: useTags);
 		}
 
@@ -54,6 +54,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
@@ -75,6 +76,7 @@ namespace SabreTools.Helper.Dats
 			string root,
 
 			// Miscellaneous
+			int maxDegreeOfParallelism,
 			Logger logger,
 			bool keep = false,
 			bool clean = false,
@@ -181,16 +183,16 @@ namespace SabreTools.Helper.Dats
 			switch (splitType)
 			{
 				case SplitType.FullNonMerged:
-					CreateFullyNonMergedSets(false, logger);
+					CreateFullyNonMergedSets(false, maxDegreeOfParallelism, logger);
 					break;
 				case SplitType.NonMerged:
-					CreateNonMergedSets(false, logger);
+					CreateNonMergedSets(false, maxDegreeOfParallelism, logger);
 					break;
 				case SplitType.Merged:
-					CreateMergedSets(false, logger);
+					CreateMergedSets(false, maxDegreeOfParallelism, logger);
 					break;
 				case SplitType.Split:
-					CreateSplitSets(false, logger);
+					CreateSplitSets(false, maxDegreeOfParallelism, logger);
 					break;
 			}
 		}

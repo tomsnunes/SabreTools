@@ -19,10 +19,11 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="bucketBy">SortedBy enum representing how to sort the individual items</param>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="lower">True if the key should be lowercased (default), false otherwise</param>
 		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
-		public void BucketBy(SortedBy bucketBy, bool mergeroms, Logger logger, bool lower = true, bool norename = true)
+		public void BucketBy(SortedBy bucketBy, bool mergeroms, int maxDegreeOfParallelism, Logger logger, bool lower = true, bool norename = true)
 		{
 			// If we already have the right sorting, trust it
 			if (_sortedBy == bucketBy)
@@ -41,6 +42,7 @@ namespace SabreTools.Helper.Dats
 			// First do the initial sort of all of the roms
 			List<string> keys = Keys.ToList();
 			Parallel.ForEach(keys,
+				new ParallelOptions() { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 				key =>
 				{
 					List<DatItem> roms = this[key];
@@ -129,6 +131,7 @@ namespace SabreTools.Helper.Dats
 			// Now go through and sort all of the individual lists
 			keys = sortable.Keys.ToList();
 			Parallel.ForEach(keys,
+				new ParallelOptions() { MaxDegreeOfParallelism = maxDegreeOfParallelism },
 				key =>
 			{
 				List<DatItem> sortedlist = sortable[key];
@@ -152,13 +155,14 @@ namespace SabreTools.Helper.Dats
 		/// Use cloneof tags to create non-merged sets and remove the tags plus using the device_ref tags to get full sets
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public void CreateFullyNonMergedSets(bool mergeroms, Logger logger)
+		public void CreateFullyNonMergedSets(bool mergeroms, int maxDegreeOfParallelism, Logger logger)
 		{
 			logger.User("Creating fully non-merged sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketBy(SortedBy.Game, mergeroms, logger, norename: true);
+			BucketBy(SortedBy.Game, mergeroms, maxDegreeOfParallelism, logger, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
@@ -179,13 +183,14 @@ namespace SabreTools.Helper.Dats
 		/// Use cloneof tags to create merged sets and remove the tags
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public void CreateMergedSets(bool mergeroms, Logger logger)
+		public void CreateMergedSets(bool mergeroms, int maxDegreeOfParallelism, Logger logger)
 		{
 			logger.User("Creating merged sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketBy(SortedBy.Game, mergeroms, logger, norename: true);
+			BucketBy(SortedBy.Game, mergeroms, maxDegreeOfParallelism, logger, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
@@ -202,13 +207,14 @@ namespace SabreTools.Helper.Dats
 		/// Use cloneof tags to create non-merged sets and remove the tags
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public void CreateNonMergedSets(bool mergeroms, Logger logger)
+		public void CreateNonMergedSets(bool mergeroms, int maxDegreeOfParallelism, Logger logger)
 		{
 			logger.User("Creating non-merged sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketBy(SortedBy.Game, mergeroms, logger, norename: true);
+			BucketBy(SortedBy.Game, mergeroms, maxDegreeOfParallelism, logger, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
@@ -225,13 +231,14 @@ namespace SabreTools.Helper.Dats
 		/// Use cloneof and romof tags to create split sets and remove the tags
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		public void CreateSplitSets(bool mergeroms, Logger logger)
+		public void CreateSplitSets(bool mergeroms, int maxDegreeOfParallelism, Logger logger)
 		{
 			logger.User("Creating split sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketBy(SortedBy.Game, mergeroms, logger, norename: true);
+			BucketBy(SortedBy.Game, mergeroms, maxDegreeOfParallelism, logger, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information

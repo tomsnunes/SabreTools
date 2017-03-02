@@ -29,6 +29,7 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="datdata">All information for creating the datfile header</param>
 		/// <param name="outDir">Set the output directory</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for console and/or file output</param>
 		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
 		/// <param name="stats">True if DAT statistics should be output on write, false otherwise (default)</param>
@@ -39,7 +40,8 @@ namespace SabreTools.Helper.Dats
 		/// The following features have been requested for file output:
 		/// - Have the ability to strip special (non-ASCII) characters from rom information
 		/// </remarks>
-		public bool WriteToFile(string outDir, Logger logger, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
+		public bool WriteToFile(string outDir, int maxDegreeOfParallelism, Logger logger,
+			bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
 		{
 			// If there's nothing there, abort
 			if (Count == 0)
@@ -109,7 +111,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Bucket roms by game name and optionally dedupe
-			BucketBy(SortedBy.Game, MergeRoms, logger, norename: norename);
+			BucketBy(SortedBy.Game, MergeRoms, maxDegreeOfParallelism, logger, norename: norename);
 
 			// Output the number of items we're going to be writing
 			logger.User("A total of " + Count + " items will be written out to file");

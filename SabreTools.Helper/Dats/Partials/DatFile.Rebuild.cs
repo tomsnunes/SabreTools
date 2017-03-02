@@ -145,7 +145,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now that we have a list of depots, we want to sort the input DAT by SHA-1
-			BucketBy(SortedBy.SHA1, false /* mergeroms */, logger);
+			BucketBy(SortedBy.SHA1, false /* mergeroms */, maxDegreeOfParallelism, logger);
 
 			// Then we want to loop through each of the hashes and see if we can rebuild
 			List<string> hashes = Keys.ToList();
@@ -189,7 +189,8 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Otherwise, we rebuild that file to all locations that we need to
-				RebuildIndividualFile(fileinfo, foundpath, outDir, tempDir, date, inverse, outputFormat, romba, updateDat, true /*isZip*/, headerToCheckAgainst, logger);
+				RebuildIndividualFile(fileinfo, foundpath, outDir, tempDir, date, inverse, outputFormat, romba,
+					updateDat, true /*isZip*/, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 			}
 
 			logger.User("Rebuilding complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
@@ -202,7 +203,7 @@ namespace SabreTools.Helper.Dats
 				_fileName = "fixDAT_" + _fileName;
 				_name = "fixDAT_" + _name;
 				_description = "fixDAT_" + _description;
-				WriteToFile(outDir, logger);
+				WriteToFile(outDir, maxDegreeOfParallelism, logger);
 			}
 
 			return success;
@@ -347,7 +348,7 @@ namespace SabreTools.Helper.Dats
 				_fileName = "fixDAT_" + _fileName;
 				_name = "fixDAT_" + _name;
 				_description = "fixDAT_" + _description;
-				WriteToFile(outDir, logger);
+				WriteToFile(outDir, maxDegreeOfParallelism, logger);
 			}
 
 			return success;
@@ -395,7 +396,7 @@ namespace SabreTools.Helper.Dats
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				Rom rom = FileTools.GetFileInfo(file, logger, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), header: headerToCheckAgainst);
 				usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
-					romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
+					romba, updateDat, false /* isZip */, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 			}
 
 			// If we're supposed to scan the file internally
@@ -410,7 +411,7 @@ namespace SabreTools.Helper.Dats
 					foreach (Rom rom in extracted)
 					{
 						usedInternally &= RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
-							romba, updateDat, true /* isZip */, headerToCheckAgainst, logger);
+							romba, updateDat, true /* isZip */, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 					}
 				}
 				// Otherwise, attempt to extract the files to the temporary directory
@@ -430,7 +431,7 @@ namespace SabreTools.Helper.Dats
 							// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 							Rom rom = FileTools.GetFileInfo(entry, logger, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
 							usedInternally &= RebuildIndividualFile(rom, entry, outDir, tempSubDir, date, inverse, outputFormat,
-								romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
+								romba, updateDat, false /* isZip */, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 						}
 					}
 					// Otherwise, just get the info on the file itself
@@ -439,7 +440,7 @@ namespace SabreTools.Helper.Dats
 						// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 						Rom rom = FileTools.GetFileInfo(file, logger, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
 						usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
-							romba, updateDat, false /* isZip */, headerToCheckAgainst, logger);
+							romba, updateDat, false /* isZip */, headerToCheckAgainst, maxDegreeOfParallelism, logger);
 					}
 				}
 			}
@@ -481,25 +482,27 @@ namespace SabreTools.Helper.Dats
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="isZip">True if the input file is an archive, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if the file was able to be rebuilt, false otherwise</returns>
 		/// <remarks>
 		/// TODO: If going from a TGZ file to a TGZ file, don't extract, just copy
 		/// </remarks>
 		private bool RebuildIndividualFile(Rom rom, string file, string outDir, string tempDir, bool date,
-			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool isZip, string headerToCheckAgainst, Logger logger)
+			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool isZip, string headerToCheckAgainst,
+			int maxDegreeOfParallelism, Logger logger)
 		{
 			// Set the output value
 			bool rebuilt = false;
 
 			// Find if the file has duplicates in the DAT
-			bool hasDuplicates = rom.HasDuplicates(this, logger);
+			bool hasDuplicates = rom.HasDuplicates(this, maxDegreeOfParallelism, logger);
 
 			// If it has duplicates and we're not filtering, rebuild it
 			if (hasDuplicates && !inverse)
 			{
 				// Get the list of duplicates to rebuild to
-				List<DatItem> dupes = rom.GetDuplicates(this, logger, remove: updateDat);
+				List<DatItem> dupes = rom.GetDuplicates(this, maxDegreeOfParallelism, logger, remove: updateDat);
 
 				// If we don't have any duplicates, continue
 				if (dupes.Count == 0)
@@ -672,13 +675,13 @@ namespace SabreTools.Helper.Dats
 						Rom headerless = FileTools.GetFileInfo(file + ".new", logger);
 
 						// Find if the file has duplicates in the DAT
-						hasDuplicates = headerless.HasDuplicates(this, logger);
+						hasDuplicates = headerless.HasDuplicates(this, maxDegreeOfParallelism, logger);
 
 						// If it has duplicates and we're not filtering, rebuild it
 						if (hasDuplicates && !inverse)
 						{
 							// Get the list of duplicates to rebuild to
-							List<DatItem> dupes = headerless.GetDuplicates(this, logger, remove: updateDat);
+							List<DatItem> dupes = headerless.GetDuplicates(this, maxDegreeOfParallelism, logger, remove: updateDat);
 
 							// If we don't have any duplicates, continue
 							if (dupes.Count == 0)
@@ -786,9 +789,10 @@ namespace SabreTools.Helper.Dats
 		/// <param name="hashOnly">True if only hashes should be checked, false for full file information</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if verification was a success, false otherwise</returns>
-		public bool VerifyDepot(List<string> inputs, string tempDir, string headerToCheckAgainst, Logger logger)
+		public bool VerifyDepot(List<string> inputs, string tempDir, string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
 		{
 			// Check the temp directory
 			if (String.IsNullOrEmpty(tempDir))
@@ -830,7 +834,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now that we have a list of depots, we want to sort the input DAT by SHA-1
-			BucketBy(SortedBy.SHA1, false /* mergeroms */, logger);
+			BucketBy(SortedBy.SHA1, false /* mergeroms */, maxDegreeOfParallelism, logger);
 
 			// Then we want to loop through each of the hashes and see if we can rebuild
 			List<string> hashes = Keys.ToList();
@@ -874,7 +878,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Now we want to remove all duplicates from the DAT
-				fileinfo.GetDuplicates(this, logger, remove: true);
+				fileinfo.GetDuplicates(this, maxDegreeOfParallelism, logger, remove: true);
 			}
 
 			logger.User("Verifying complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
@@ -883,7 +887,7 @@ namespace SabreTools.Helper.Dats
 			_fileName = "fixDAT_" + _fileName;
 			_name = "fixDAT_" + _name;
 			_description = "fixDAT_" + _description;
-			WriteToFile(null, logger);
+			WriteToFile(null, maxDegreeOfParallelism, logger);
 
 			return success;
 		}
@@ -896,9 +900,11 @@ namespace SabreTools.Helper.Dats
 		/// <param name="hashOnly">True if only hashes should be checked, false for full file information</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="maxDegreeOfParallelism">Integer representing the maximum amount of parallelization to be used</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <returns>True if verification was a success, false otherwise</returns>
-		public bool VerifyGeneric(List<string> inputs, string tempDir, bool hashOnly, bool quickScan, string headerToCheckAgainst, Logger logger)
+		public bool VerifyGeneric(List<string> inputs, string tempDir, bool hashOnly, bool quickScan,
+			string headerToCheckAgainst, int maxDegreeOfParallelism, Logger logger)
 		{
 			// Check the temp directory exists
 			if (String.IsNullOrEmpty(tempDir))
@@ -941,7 +947,7 @@ namespace SabreTools.Helper.Dats
 			if (hashOnly)
 			{
 				// First we need to sort by hash to get duplicates
-				BucketBy(SortedBy.SHA1, false /* mergeroms */, logger);
+				BucketBy(SortedBy.SHA1, false /* mergeroms */, maxDegreeOfParallelism, logger);
 
 				// Then follow the same tactics as before
 				foreach (string key in Keys)
@@ -977,7 +983,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now output the fixdat to the main folder
-			success &= matched.WriteToFile("", logger, stats: true);
+			success &= matched.WriteToFile("", maxDegreeOfParallelism, logger, stats: true);
 
 			return success;
 		}

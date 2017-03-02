@@ -1130,10 +1130,8 @@ namespace SabreTools.Helper.Tools
 		public static bool WriteTAR(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
 		{
 			// Wrap the individual inputs into lists
-			List<string> inputFiles = new List<string>();
-			inputFiles.Add(inputFile);
-			List<Rom> roms = new List<Rom>();
-			roms.Add(rom);
+			List<string> inputFiles = new List<string>() { inputFile };
+			List<Rom> roms = new List<Rom>() { rom };
 
 			return WriteTAR(inputFiles, outDir, roms, logger, date: date);
 		}
@@ -1316,10 +1314,8 @@ namespace SabreTools.Helper.Tools
 		public static bool WriteTorrent7Zip(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
 		{
 			// Wrap the individual inputs into lists
-			List<string> inputFiles = new List<string>();
-			inputFiles.Add(inputFile);
-			List<Rom> roms = new List<Rom>();
-			roms.Add(rom);
+			List<string> inputFiles = new List<string>() { inputFile };
+			List<Rom> roms = new List<Rom>() { rom };
 
 			return WriteTorrent7Zip(inputFiles, outDir, roms, logger, date: date);
 		}
@@ -1378,9 +1374,11 @@ namespace SabreTools.Helper.Tools
 				// If the archive doesn't exist, create it and put the single file
 				if (!File.Exists(archiveFileName))
 				{
-					zipFile = new SevenZipCompressor();
-					zipFile.ArchiveFormat = OutArchiveFormat.SevenZip;
-					zipFile.CompressionLevel = SevenZip.CompressionLevel.Normal;
+					zipFile = new SevenZipCompressor()
+					{
+						ArchiveFormat = OutArchiveFormat.SevenZip,
+						CompressionLevel = SevenZip.CompressionLevel.Normal,
+					};
 
 					// Map all inputs to index
 					Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
@@ -1452,9 +1450,11 @@ namespace SabreTools.Helper.Tools
 					}
 
 					// Otherwise, process the old zipfile
-					zipFile = new SevenZipCompressor();
-					zipFile.ArchiveFormat = OutArchiveFormat.SevenZip;
-					zipFile.CompressionLevel = SevenZip.CompressionLevel.Normal;
+					zipFile = new SevenZipCompressor()
+					{
+						ArchiveFormat = OutArchiveFormat.SevenZip,
+						CompressionLevel = SevenZip.CompressionLevel.Normal,
+					};
 					Stream zipFileStream = File.OpenWrite(tempFile);
 
 					// Get the order for the entries with the new file
@@ -1640,10 +1640,8 @@ namespace SabreTools.Helper.Tools
 		public static bool WriteTorrentLRZ(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
 		{
 			// Wrap the individual inputs into lists
-			List<string> inputFiles = new List<string>();
-			inputFiles.Add(inputFile);
-			List<Rom> roms = new List<Rom>();
-			roms.Add(rom);
+			List<string> inputFiles = new List<string>() { inputFile };
+			List<Rom> roms = new List<Rom>() { rom };
 
 			return WriteTorrentLRZ(inputFiles, outDir, roms, logger, date: date);
 		}
@@ -1674,10 +1672,8 @@ namespace SabreTools.Helper.Tools
 		public static bool WriteTorrentRAR(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
 		{
 			// Wrap the individual inputs into lists
-			List<string> inputFiles = new List<string>();
-			inputFiles.Add(inputFile);
-			List<Rom> roms = new List<Rom>();
-			roms.Add(rom);
+			List<string> inputFiles = new List<string>() { inputFile };
+			List<Rom> roms = new List<Rom>() { rom };
 
 			return WriteTorrentRAR(inputFiles, outDir, roms, logger, date: date);
 		}
@@ -1708,10 +1704,8 @@ namespace SabreTools.Helper.Tools
 		public static bool WriteTorrentXZ(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
 		{
 			// Wrap the individual inputs into lists
-			List<string> inputFiles = new List<string>();
-			inputFiles.Add(inputFile);
-			List<Rom> roms = new List<Rom>();
-			roms.Add(rom);
+			List<string> inputFiles = new List<string>() { inputFile };
+			List<Rom> roms = new List<Rom>() { rom };
 
 			return WriteTorrentXZ(inputFiles, outDir, roms, logger, date: date);
 		}
@@ -1742,10 +1736,8 @@ namespace SabreTools.Helper.Tools
 		public static bool WriteTorrentZip(string inputFile, string outDir, Rom rom, Logger logger, bool date = false)
 		{
 			// Wrap the individual inputs into lists
-			List<string> inputFiles = new List<string>();
-			inputFiles.Add(inputFile);
-			List<Rom> roms = new List<Rom>();
-			roms.Add(rom);
+			List<string> inputFiles = new List<string>() { inputFile };
+			List<Rom> roms = new List<Rom>() { rom };
 
 			return WriteTorrentZip(inputFiles, outDir, roms, logger, date: date);
 		}
