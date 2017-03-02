@@ -181,16 +181,16 @@ namespace SabreTools.Helper.Dats
 			switch (splitType)
 			{
 				case SplitType.FullNonMerged:
-					CreateFullyNonMergedSets(false, logger, output: false);
+					CreateFullyNonMergedSets(false, logger);
 					break;
 				case SplitType.NonMerged:
-					CreateNonMergedSets(false, logger, output: false);
+					CreateNonMergedSets(false, logger);
 					break;
 				case SplitType.Merged:
-					CreateMergedSets(false, logger, output: false);
+					CreateMergedSets(false, logger);
 					break;
 				case SplitType.Split:
-					CreateSplitSets(false, logger, output: false);
+					CreateSplitSets(false, logger);
 					break;
 			}
 		}

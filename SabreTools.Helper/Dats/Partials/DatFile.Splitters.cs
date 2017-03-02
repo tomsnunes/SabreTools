@@ -322,11 +322,13 @@ namespace SabreTools.Helper.Dats
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
 			// First, organize by games so that we can do the right thing
-			BucketBy(SortedBy.Game, false /* mergeroms */, logger, output: false, lower: false, norename: true);
+			BucketBy(SortedBy.Game, false /* mergeroms */, logger, lower: false, norename: true);
 
 			// Create a temporary DAT to add things to
-			DatFile tempDat = new DatFile(this);
-			tempDat.Name = null;
+			DatFile tempDat = new DatFile(this)
+			{
+				Name = null,
+			};
 
 			// Sort the input keys
 			List<string> keys = Keys.ToList();
@@ -342,8 +344,10 @@ namespace SabreTools.Helper.Dats
 					SplitByLevelHelper(tempDat, outDir, shortname, basedat, logger);
 
 					// Reset the DAT for the next items
-					tempDat = new DatFile(this);
-					tempDat.Name = null;
+					tempDat = new DatFile(this)
+					{
+						Name = null,
+					};
 				}
 
 				// Clean the input list and set all games to be pathless
