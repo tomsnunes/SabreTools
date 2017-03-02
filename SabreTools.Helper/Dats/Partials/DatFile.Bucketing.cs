@@ -56,6 +56,7 @@ namespace SabreTools.Helper.Dats
 					{
 						string newkey = "";
 
+						// We want to get the key most appropriate for the given sorting type
 						switch (bucketBy)
 						{
 							case SortedBy.CRC:
@@ -113,11 +114,15 @@ namespace SabreTools.Helper.Dats
 								break;
 						}
 
-						if (!sortable.ContainsKey(newkey))
+						// Add the DatItem to the temp dictionary
+						lock (sortable)
 						{
-							sortable.Add(newkey, new List<DatItem>());
+							if (!sortable.ContainsKey(newkey))
+							{
+								sortable.Add(newkey, new List<DatItem>());
+							}
+							sortable[newkey].Add(rom);
 						}
-						sortable[newkey].Add(rom);
 					}
 				});
 
