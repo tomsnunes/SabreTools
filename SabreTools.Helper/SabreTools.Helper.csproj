@@ -182,7 +182,7 @@
     <Compile Include="Data\Build.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="LICENSE">
+    <None Include="Licenses\LICENSE">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
@@ -192,8 +192,21 @@
     <None Include="README.DEPRECIATED" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="LICENSE.jzlib.txt" />
-    <Content Include="License.zlib.txt" />
+    <None Include="Licenses\LICENSE.alphafs.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\LICENSE.jzlib.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\LICENSE.sevenzipsharp.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\LICENSE.sharpcompress.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Licenses\LICENSE.zlib.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="Skippers\*.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
