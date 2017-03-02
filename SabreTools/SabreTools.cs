@@ -1218,31 +1218,31 @@ namespace SabreTools
 			// Split a DAT by extension
 			else if (splitByExt)
 			{
-				InitExtSplit(inputs, exta, extb, outDir);
+				InitExtSplit(inputs, exta, extb, outDir, maxParallelism);
 			}
 
 			// Split a DAT by available hashes
 			else if (splitByHash)
 			{
-				InitHashSplit(inputs, outDir);
+				InitHashSplit(inputs, outDir, maxParallelism);
 			}
 
 			// Split a SuperDAT by lowest available level
 			else if (splitByLevel)
 			{
-				InitLevelSplit(inputs, outDir, shortname, basedat);
+				InitLevelSplit(inputs, outDir, shortname, basedat, maxParallelism);
 			}
 
 			// Split a DAT by item type
 			else if (splitByType)
 			{
-				InitTypeSplit(inputs, outDir);
+				InitTypeSplit(inputs, outDir, maxParallelism);
 			}
 
 			// Get statistics on input files
 			else if (stats)
 			{
-				InitStats(inputs, filename, outDir, single, showBaddumpColumn, showNodumpColumn, statDatFormat);
+				InitStats(inputs, filename, outDir, single, showBaddumpColumn, showNodumpColumn, statDatFormat, maxParallelism);
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
@@ -1257,13 +1257,13 @@ namespace SabreTools
 			// If we're using the verifier
 			else if (verify)
 			{
-				InitVerify(datfiles, inputs, tempDir, hashOnly, quickScan, header, splitType);
+				InitVerify(datfiles, inputs, tempDir, hashOnly, quickScan, header, splitType, maxParallelism);
 			}
 
 			// If we're using the depot verifier
 			else if (verifyDepot)
 			{
-				InitVerifyDepot(datfiles, inputs, tempDir, header, splitType);
+				InitVerifyDepot(datfiles, inputs, tempDir, header, splitType, maxParallelism);
 			}
 
 			// If nothing is set, show the help

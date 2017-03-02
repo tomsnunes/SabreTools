@@ -176,7 +176,7 @@ namespace RombaSharp
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers((onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1));
 			need.RebuildGeneric(onlyDirs, _depots.Keys.ToList()[0], _tmpdir, false /*quickScan*/, false /*date*/,
 				false /*delete*/, false /*inverse*/, OutputFormat.TorrentGzip, true /*romba*/, asl, false /*updateDat*/,
-				null /*headerToCheckAgainst*/, 4 /*maxDegreeOfParallelism*/, _logger);
+				null /*headerToCheckAgainst*/, _workers /*maxDegreeOfParallelism*/, _logger);
 		}
 
 		/// <summary>
@@ -216,7 +216,7 @@ namespace RombaSharp
 				ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
 				datFile.RebuildDepot(onlineDepots, outputFolder, _tmpdir, false /*date*/,
 					false /*delete*/, false /*inverse*/, (copy ? OutputFormat.TorrentGzip : OutputFormat.TorrentZip), copy,
-					false /*updateDat*/, null /*headerToCheckAgainst*/, 4 /*maxDegreeOfParallelism*/, _logger);
+					false /*updateDat*/, null /*headerToCheckAgainst*/, _workers /*maxDegreeOfParallelism*/, _logger);
 			}
 		}
 
@@ -253,7 +253,7 @@ namespace RombaSharp
 				datdata.PopulateFromDir(input, Hash.SHA256 & Hash.SHA384 & Hash.SHA512 /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
 					null /* headerToCheckAgainst */, _workers /* maxDegreeOfParallelism */, _logger);
-				datdata.WriteToFile("", logger);
+				datdata.WriteToFile("", _workers, logger);
 			}
 			logger.Close();
 		}
