@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 
+using SabreTools.Helper.Data;
+
 namespace SabreTools.Helper
 {
 	/// <summary>
@@ -8,27 +10,15 @@ namespace SabreTools.Helper
 	/// </summary>
 	/// <remarks>
 	/// TODO: Allow for "triggerable" logging done on an interval (async)
-	/// TODO: Log filtering? (#if debug?)
-	/// TODO: Reduce user-verbosity in later builds
 	/// </remarks>
 	public class Logger
 	{
-		/// <summary>
-		/// Severity of the logging statement
-		/// </summary>
-		private enum LogLevel
-		{
-			VERBOSE = 0,
-			USER,
-			WARNING,
-			ERROR,
-		}
-
 		// Private instance variables
 		private bool _tofile;
 		private bool _warnings;
 		private bool _errors;
 		private string _filename;
+		private LogLevel _filter;
 		private DateTime _start;
 		private StreamWriter _log;
 
@@ -44,6 +34,7 @@ namespace SabreTools.Helper
 			_warnings = false;
 			_errors = false;
 			_filename = null;
+			_filter = LogLevel.VERBOSE;
 
 			Start();
 		}
@@ -53,12 +44,14 @@ namespace SabreTools.Helper
 		/// </summary>
 		/// <param name="tofile">True if file should be written to instead of console</param>
 		/// <param name="filename">Filename representing log location</param>
-		public Logger(bool tofile, string filename)
+		/// <param name="filter">Highest filtering level to be kept, default VERBOSE</param>
+		public Logger(bool tofile, string filename, LogLevel filter = LogLevel.VERBOSE)
 		{
 			_tofile = tofile;
 			_warnings = false;
 			_errors = false;
 			_filename = Path.GetFileNameWithoutExtension(filename) + " (" + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ")" + Path.GetExtension(filename);
+			_filter = filter;
 
 			if (!Directory.Exists(_basepath))
 			{
@@ -169,6 +162,12 @@ namespace SabreTools.Helper
 		/// <returns>True if the output could be written, false otherwise</returns>
 		private bool Log(string output, LogLevel loglevel, bool appendPrefix)
 		{
+			// If the log level is less than the filter level, we skip it but claim we didn't
+			if (loglevel < _filter)
+			{
+				return true;
+			}
+
 			// USER and ERROR writes to console
 			if (loglevel == LogLevel.USER || loglevel == LogLevel.ERROR)
 			{

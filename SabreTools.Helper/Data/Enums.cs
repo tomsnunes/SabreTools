@@ -304,6 +304,21 @@
 
 	#endregion
 
+	#region Logging related
+
+	/// <summary>
+	/// Severity of the logging statement
+	/// </summary>
+	public enum LogLevel
+	{
+		VERBOSE = 0,
+		USER,
+		WARNING,
+		ERROR,
+	}
+
+	#endregion
+
 	#region Skippers and Mappers
 
 	/// <summary>

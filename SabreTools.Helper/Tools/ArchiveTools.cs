@@ -36,7 +36,7 @@ using SharpCompress.Writers;
 namespace SabreTools.Helper.Tools
 {
 	/*
-	 * TODO: Full archive support for: 7-Zip, RAR, XZ, LRZip
+	 * TODO: Full archive support for: RAR, XZ, LRZip
 	 */
 	public static class ArchiveTools
 	{
