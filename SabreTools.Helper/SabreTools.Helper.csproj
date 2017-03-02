@@ -206,7 +206,7 @@
     </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>robocopy "$(SolutionDir)$(ProjectName)\$(PlatformName)" "$(SolutionDir)$(ProjectName)" "*.dll"</PreBuildEvent>
+    <PreBuildEvent>copy "$(SolutionDir)$(ProjectName)\$(PlatformName)\*.dll" "$(SolutionDir)$(ProjectName)" || cp "$(SolutionDir)$(ProjectName)\$(PlatformName)\*.dll" "$(SolutionDir)$(ProjectName)"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
