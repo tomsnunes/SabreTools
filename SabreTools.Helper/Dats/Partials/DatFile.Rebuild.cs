@@ -145,7 +145,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now that we have a list of depots, we want to sort the input DAT by SHA-1
-			BucketBySHA1(false, logger, output: false);
+			BucketBy(SortedBy.SHA1, false /* mergeroms */, logger, output: false);
 
 			// Then we want to loop through each of the hashes and see if we can rebuild
 			List<string> hashes = Keys.ToList();
@@ -830,7 +830,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now that we have a list of depots, we want to sort the input DAT by SHA-1
-			BucketBySHA1(false, logger, output: false);
+			BucketBy(SortedBy.SHA1, false /* mergeroms */, logger, output: false);
 
 			// Then we want to loop through each of the hashes and see if we can rebuild
 			List<string> hashes = Keys.ToList();
@@ -941,7 +941,7 @@ namespace SabreTools.Helper.Dats
 			if (hashOnly)
 			{
 				// First we need to sort by hash to get duplicates
-				BucketBySHA1(true, logger, output: false);
+				BucketBy(SortedBy.SHA1, false /* mergeroms */, logger, output: false);
 
 				// Then follow the same tactics as before
 				foreach (string key in Keys)

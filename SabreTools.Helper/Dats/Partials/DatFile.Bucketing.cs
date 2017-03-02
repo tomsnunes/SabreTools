@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 
 using SabreTools.Helper.Data;
@@ -14,570 +15,132 @@ namespace SabreTools.Helper.Dats
 		#region Bucketing [MODULAR DONE]
 
 		/// <summary>
-		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by CRC
+		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by a user-defined method
 		/// </summary>
+		/// <param name="bucketBy">SortedBy enum representing how to sort the individual items</param>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
 		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void BucketByCRC(bool mergeroms, Logger logger, bool output = true)
-		{
-			// If we already have the right sorting, trust it
-			if (_sortedBy == SortedBy.CRC)
-			{
-				return;
-			}
-
-			// Set the sorted type
-			_sortedBy = SortedBy.CRC;
-
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-			long count = 0;
-
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by CRC");
-
-			// Process each all of the roms
-			List<string> keys = Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = this[key];
-
-				// If we're merging the roms, do so
-				if (mergeroms)
-				{
-					roms = DatItem.Merge(roms, logger);
-				}
-
-				// Now add each of the roms to their respective games
-				foreach (DatItem rom in roms)
-				{
-					count++;
-					string newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).CRC : Constants.CRCZero);
-
-					if (!sortable.ContainsKey(newkey))
-					{
-						sortable.Add(newkey, new List<DatItem>());
-					}
-					sortable[newkey].Add(rom);
-				}
-			}
-
-			// Now go through and sort all of the lists
-			keys = sortable.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> sortedlist = sortable[key];
-				DatItem.Sort(ref sortedlist, false);
-				sortable[key] = sortedlist;
-			}
-
-			// Output the count if told to
-			if (output)
-			{
-				logger.User("A total of " + count + " file hashes will be written out to file");
-			}
-
-			// Now assign the dictionary back
-			_files = sortable;
-		}
-
-		/// <summary>
-		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by Game
-		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="lower">True if the key should be lowercased (default), false otherwise</param>
 		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		/// <param name="lower">True if the game should be lowercased (default), false otherwise</param>
-		public void BucketByGame(bool mergeroms, bool norename, Logger logger, bool output = true, bool lower = true)
+		public void BucketBy(SortedBy bucketBy, bool mergeroms, Logger logger, bool output = true, bool lower = true, bool norename = true)
 		{
 			// If we already have the right sorting, trust it
-			if (_sortedBy == SortedBy.Game)
+			if (_sortedBy == bucketBy)
 			{
 				return;
 			}
 
 			// Set the sorted type
-			_sortedBy = SortedBy.Game;
+			_sortedBy = bucketBy;
 
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 			long count = 0;
 
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by game");
+			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by " + bucketBy);
 
-			// Process each all of the roms
+			// First do the initial sort of all of the roms
 			List<string> keys = Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = this[key];
-
-				// If we're merging the roms, do so
-				if (mergeroms)
+			Parallel.ForEach(keys,
+				key =>
 				{
-					roms = DatItem.Merge(roms, logger);
-				}
+					List<DatItem> roms = this[key];
 
-				// Now add each of the roms to their respective games
-				foreach (DatItem rom in roms)
-				{
-					count++;
-					string newkey = (norename ? ""
-							: rom.SystemID.ToString().PadLeft(10, '0')
-								+ "-"
-								+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
-						+ (String.IsNullOrEmpty(rom.Machine.Name)
-								? "Default"
-								: rom.Machine.Name);
-					if (lower)
+					// If we're merging the roms, do so
+					if (mergeroms)
 					{
-						newkey = newkey.ToLowerInvariant();
+						roms = DatItem.Merge(roms, logger);
 					}
 
-					newkey = HttpUtility.HtmlEncode(newkey);
-
-					if (!sortable.ContainsKey(newkey))
+					// Now add each of the roms to their respective games
+					foreach (DatItem rom in roms)
 					{
-						sortable.Add(newkey, new List<DatItem>());
+						count++;
+						string newkey = "";
+
+						switch (bucketBy)
+						{
+							case SortedBy.CRC:
+								newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).CRC : Constants.CRCZero);
+								break;
+							case SortedBy.Game:
+								newkey = (norename ? ""
+									: rom.SystemID.ToString().PadLeft(10, '0')
+										+ "-"
+										+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
+								+ (String.IsNullOrEmpty(rom.Machine.Name)
+										? "Default"
+										: rom.Machine.Name);
+										if (lower)
+										{
+											newkey = newkey.ToLowerInvariant();
+										}
+
+								newkey = HttpUtility.HtmlEncode(newkey);
+								break;
+							case SortedBy.MD5:
+								newkey = (rom.Type == ItemType.Rom
+									? ((Rom)rom).MD5
+									: (rom.Type == ItemType.Disk
+										? ((Disk)rom).MD5
+										: Constants.MD5Zero));
+								break;
+							case SortedBy.SHA1:
+								newkey = (rom.Type == ItemType.Rom
+									? ((Rom)rom).SHA1
+									: (rom.Type == ItemType.Disk
+										? ((Disk)rom).SHA1
+										: Constants.SHA1Zero));
+								break;
+							case SortedBy.SHA256:
+								newkey = (rom.Type == ItemType.Rom
+									? ((Rom)rom).SHA256
+									: (rom.Type == ItemType.Disk
+										? ((Disk)rom).SHA256
+										: Constants.SHA256Zero));
+								break;
+							case SortedBy.SHA384:
+								newkey = (rom.Type == ItemType.Rom
+									? ((Rom)rom).SHA384
+									: (rom.Type == ItemType.Disk
+										? ((Disk)rom).SHA384
+										: Constants.SHA384Zero));
+								break;
+							case SortedBy.SHA512:
+								newkey = (rom.Type == ItemType.Rom
+									? ((Rom)rom).SHA512
+									: (rom.Type == ItemType.Disk
+										? ((Disk)rom).SHA512
+										: Constants.SHA512Zero));
+								break;
+						}
+
+						if (!sortable.ContainsKey(newkey))
+						{
+							sortable.Add(newkey, new List<DatItem>());
+						}
+						sortable[newkey].Add(rom);
 					}
+				});
 
-					sortable[newkey].Add(rom);
-				}
-			}
-
-			// Now go through and sort all of the lists
+			// Now go through and sort all of the individual lists
 			keys = sortable.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> sortedlist = sortable[key];
-				DatItem.Sort(ref sortedlist, norename);
-				sortable[key] = sortedlist;
-			}
-
-			// Output the count if told to
-			if (output)
-			{
-				logger.User("A total of " + count + " file hashes will be written out to file");
-			}
-
-			// Now assign the dictionary back
-			_files = sortable;
-		}
-
-		/// <summary>
-		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by MD5
-		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void BucketByMD5(bool mergeroms, Logger logger, bool output = true)
-		{
-			// If we already have the right sorting, trust it
-			if (_sortedBy == SortedBy.MD5)
-			{
-				return;
-			}
-
-			// Set the sorted type
-			_sortedBy = SortedBy.MD5;
-
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-			long count = 0;
-
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by MD5");
-
-			// Process each all of the roms
-			List<string> keys = Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = this[key];
-
-				// If we're merging the roms, do so
-				if (mergeroms)
-				{
-					roms = DatItem.Merge(roms, logger);
-				}
-
-				// Now add each of the roms to their respective games
-				foreach (DatItem rom in roms)
-				{
-					count++;
-					string newkey = (rom.Type == ItemType.Rom
-						? ((Rom)rom).MD5
-						: (rom.Type == ItemType.Disk
-							? ((Disk)rom).MD5
-							: Constants.MD5Zero));
-
-					if (!sortable.ContainsKey(newkey))
-					{
-						sortable.Add(newkey, new List<DatItem>());
-					}
-					sortable[newkey].Add(rom);
-				}
-			}
-
-			// Now go through and sort all of the lists
-			keys = sortable.Keys.ToList();
-			foreach (string key in keys)
+			Parallel.ForEach(keys,
+				key =>
 			{
 				List<DatItem> sortedlist = sortable[key];
 				DatItem.Sort(ref sortedlist, false);
-				sortable[key] = sortedlist;
-			}
+
+				lock (sortable)
+				{
+					sortable[key] = sortedlist;
+				}
+			});
 
 			// Output the count if told to
 			if (output)
 			{
-				logger.User("A total of " + count + " file hashes will be written out to file");
-			}
-
-			// Now assign the dictionary back
-			_files = sortable;
-		}
-
-		/// <summary>
-		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by SHA1
-		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void BucketBySHA1(bool mergeroms, Logger logger, bool output = true)
-		{
-			// If we already have the right sorting, trust it
-			if (_sortedBy == SortedBy.SHA1)
-			{
-				return;
-			}
-
-			// Set the sorted type
-			_sortedBy = SortedBy.SHA1;
-
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-			long count = 0;
-
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by SHA-1");
-
-			// Process each all of the roms
-			List<string> keys = Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = this[key];
-
-				// If we're merging the roms, do so
-				if (mergeroms)
-				{
-					roms = DatItem.Merge(roms, logger);
-				}
-
-				// Now add each of the roms to their respective games
-				foreach (DatItem rom in roms)
-				{
-					count++;
-					string newkey = (rom.Type == ItemType.Rom
-						? ((Rom)rom).SHA1
-						: (rom.Type == ItemType.Disk
-							? ((Disk)rom).SHA1
-							: Constants.SHA1Zero));
-
-					if (!sortable.ContainsKey(newkey))
-					{
-						sortable.Add(newkey, new List<DatItem>());
-					}
-					sortable[newkey].Add(rom);
-				}
-			}
-
-			// Now go through and sort all of the lists
-			keys = sortable.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> sortedlist = sortable[key];
-				DatItem.Sort(ref sortedlist, false);
-				sortable[key] = sortedlist;
-			}
-
-			// Output the count if told to
-			if (output)
-			{
-				logger.User("A total of " + count + " file hashes will be written out to file");
-			}
-
-			// Now assign the dictionary back
-			_files = sortable;
-		}
-
-		/// <summary>
-		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by SHA256
-		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void BucketBySHA256(bool mergeroms, Logger logger, bool output = true)
-		{
-			// If we already have the right sorting, trust it
-			if (_sortedBy == SortedBy.SHA256)
-			{
-				return;
-			}
-
-			// Set the sorted type
-			_sortedBy = SortedBy.SHA256;
-
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-			long count = 0;
-
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by SHA-256");
-
-			// Process each all of the roms
-			List<string> keys = Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = this[key];
-
-				// If we're merging the roms, do so
-				if (mergeroms)
-				{
-					roms = DatItem.Merge(roms, logger);
-				}
-
-				// Now add each of the roms to their respective games
-				foreach (DatItem rom in roms)
-				{
-					count++;
-					string newkey = (rom.Type == ItemType.Rom
-						? ((Rom)rom).SHA256
-						: (rom.Type == ItemType.Disk
-							? ((Disk)rom).SHA256
-							: Constants.SHA256Zero));
-
-					if (!sortable.ContainsKey(newkey))
-					{
-						sortable.Add(newkey, new List<DatItem>());
-					}
-					sortable[newkey].Add(rom);
-				}
-			}
-
-			// Now go through and sort all of the lists
-			keys = sortable.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> sortedlist = sortable[key];
-				DatItem.Sort(ref sortedlist, false);
-				sortable[key] = sortedlist;
-			}
-
-			// Output the count if told to
-			if (output)
-			{
-				logger.User("A total of " + count + " file hashes will be written out to file");
-			}
-
-			// Now assign the dictionary back
-			_files = sortable;
-		}
-
-		/// <summary>
-		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by SHA384
-		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void BucketBySHA384(bool mergeroms, Logger logger, bool output = true)
-		{
-			// If we already have the right sorting, trust it
-			if (_sortedBy == SortedBy.SHA384)
-			{
-				return;
-			}
-
-			// Set the sorted type
-			_sortedBy = SortedBy.SHA384;
-
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-			long count = 0;
-
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by SHA-384");
-
-			// Process each all of the roms
-			List<string> keys = Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = this[key];
-
-				// If we're merging the roms, do so
-				if (mergeroms)
-				{
-					roms = DatItem.Merge(roms, logger);
-				}
-
-				// Now add each of the roms to their respective games
-				foreach (DatItem rom in roms)
-				{
-					count++;
-					string newkey = (rom.Type == ItemType.Rom
-						? ((Rom)rom).SHA384
-						: (rom.Type == ItemType.Disk
-							? ((Disk)rom).SHA384
-							: Constants.SHA384Zero));
-
-					if (!sortable.ContainsKey(newkey))
-					{
-						sortable.Add(newkey, new List<DatItem>());
-					}
-					sortable[newkey].Add(rom);
-				}
-			}
-
-			// Now go through and sort all of the lists
-			keys = sortable.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> sortedlist = sortable[key];
-				DatItem.Sort(ref sortedlist, false);
-				sortable[key] = sortedlist;
-			}
-
-			// Output the count if told to
-			if (output)
-			{
-				logger.User("A total of " + count + " file hashes will be written out to file");
-			}
-
-			// Now assign the dictionary back
-			_files = sortable;
-		}
-
-		/// <summary>
-		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by SHA512
-		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void BucketBySHA512(bool mergeroms, Logger logger, bool output = true)
-		{
-			// If we already have the right sorting, trust it
-			if (_sortedBy == SortedBy.SHA512)
-			{
-				return;
-			}
-
-			// Set the sorted type
-			_sortedBy = SortedBy.SHA512;
-
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-			long count = 0;
-
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by SHA-512");
-
-			// Process each all of the roms
-			List<string> keys = Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = this[key];
-
-				// If we're merging the roms, do so
-				if (mergeroms)
-				{
-					roms = DatItem.Merge(roms, logger);
-				}
-
-				// Now add each of the roms to their respective games
-				foreach (DatItem rom in roms)
-				{
-					count++;
-					string newkey = (rom.Type == ItemType.Rom
-						? ((Rom)rom).SHA512
-						: (rom.Type == ItemType.Disk
-							? ((Disk)rom).SHA512
-							: Constants.SHA512Zero));
-
-					if (!sortable.ContainsKey(newkey))
-					{
-						sortable.Add(newkey, new List<DatItem>());
-					}
-					sortable[newkey].Add(rom);
-				}
-			}
-
-			// Now go through and sort all of the lists
-			keys = sortable.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> sortedlist = sortable[key];
-				DatItem.Sort(ref sortedlist, false);
-				sortable[key] = sortedlist;
-			}
-
-			// Output the count if told to
-			if (output)
-			{
-				logger.User("A total of " + count + " file hashes will be written out to file");
-			}
-
-			// Now assign the dictionary back
-			_files = sortable;
-		}
-
-		/// <summary>
-		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by Size
-		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void BucketBySize(bool mergeroms, Logger logger, bool output = true)
-		{
-			// If we already have the right sorting, trust it
-			if (_sortedBy == SortedBy.Size)
-			{
-				return;
-			}
-
-			// Set the sorted type
-			_sortedBy = SortedBy.Size;
-
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-			long count = 0;
-
-			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by size");
-
-			// Process each all of the roms
-			List<string> keys = Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> roms = this[key];
-
-				// If we're merging the roms, do so
-				if (mergeroms)
-				{
-					roms = DatItem.Merge(roms, logger);
-				}
-
-				// Now add each of the roms to their respective games
-				foreach (DatItem rom in roms)
-				{
-					count++;
-					string newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).Size.ToString() : "-1");
-
-					if (!sortable.ContainsKey(newkey))
-					{
-						sortable.Add(newkey, new List<DatItem>());
-					}
-					sortable[newkey].Add(rom);
-				}
-			}
-
-			// Now go through and sort all of the lists
-			keys = sortable.Keys.ToList();
-			foreach (string key in keys)
-			{
-				List<DatItem> sortedlist = sortable[key];
-				DatItem.Sort(ref sortedlist, false);
-				sortable[key] = sortedlist;
-			}
-
-			// Output the count if told to
-			if (output)
-			{
-				logger.User("A total of " + count + " file hashes will be written out to file");
+				logger.User("A total of " + count + " items will be written out to file");
 			}
 
 			// Now assign the dictionary back
@@ -599,7 +162,7 @@ namespace SabreTools.Helper.Dats
 			logger.User("Creating fully non-merged sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketByGame(mergeroms, true, logger, output);
+			BucketBy(SortedBy.Game, mergeroms, logger, output: output, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
@@ -627,7 +190,7 @@ namespace SabreTools.Helper.Dats
 			logger.User("Creating merged sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketByGame(mergeroms, true, logger, output);
+			BucketBy(SortedBy.Game, mergeroms, logger, output: output, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
@@ -651,7 +214,7 @@ namespace SabreTools.Helper.Dats
 			logger.User("Creating non-merged sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketByGame(mergeroms, true, logger, output);
+			BucketBy(SortedBy.Game, mergeroms, logger, output: output, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
@@ -675,7 +238,7 @@ namespace SabreTools.Helper.Dats
 			logger.User("Creating split sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketByGame(mergeroms, true, logger, output);
+			BucketBy(SortedBy.Game, mergeroms, logger, output: output, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information

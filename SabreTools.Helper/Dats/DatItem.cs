@@ -345,12 +345,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).SHA512;
-					datdata.BucketBySHA512(false, logger, false);
+					datdata.BucketBy(SortedBy.SHA512, false /* mergeroms */, logger, output: false);
 				}
 				else
 				{
 					key = ((Disk)this).SHA512;
-					datdata.BucketBySHA512(false, logger, false);
+					datdata.BucketBy(SortedBy.SHA512, false /* mergeroms */, logger, output: false);
 				}
 			}
 
@@ -362,12 +362,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).SHA384;
-					datdata.BucketBySHA384(false, logger, false);
+					datdata.BucketBy(SortedBy.SHA384, false /* mergeroms */, logger, output: false);
 				}
 				else
 				{
 					key = ((Disk)this).SHA384;
-					datdata.BucketBySHA384(false, logger, false);
+					datdata.BucketBy(SortedBy.SHA384, false /* mergeroms */, logger, output: false);
 				}
 			}
 
@@ -379,12 +379,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).SHA256;
-					datdata.BucketBySHA256(false, logger, false);
+					datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */, logger, output: false);
 				}
 				else
 				{
 					key = ((Disk)this).SHA256;
-					datdata.BucketBySHA256(false, logger, false);
+					datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */, logger, output: false);
 				}
 			}
 
@@ -396,12 +396,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).SHA1;
-					datdata.BucketBySHA1(false, logger, false);
+					datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */, logger, output: false);
 				}
 				else
 				{
 					key = ((Disk)this).SHA1;
-					datdata.BucketBySHA1(false, logger, false);
+					datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */, logger, output: false);
 				}
 			}
 
@@ -413,12 +413,12 @@ namespace SabreTools.Helper.Dats
 				if (_itemType == ItemType.Rom)
 				{
 					key = ((Rom)this).MD5;
-					datdata.BucketByMD5(false, logger, false);
+					datdata.BucketBy(SortedBy.MD5, false /* mergeroms */, logger, output: false);
 				}
 				else
 				{
 					key = ((Disk)this).MD5;
-					datdata.BucketByMD5(false, logger, false);
+					datdata.BucketBy(SortedBy.MD5, false /* mergeroms */, logger, output: false);
 				}
 			}
 
@@ -426,21 +426,21 @@ namespace SabreTools.Helper.Dats
 			else if (_itemType == ItemType.Disk)
 			{
 				key = ((Disk)this).MD5;
-				datdata.BucketByMD5(false, logger, false);
+				datdata.BucketBy(SortedBy.MD5, false /* mergeroms */, logger, output: false);
 			}
 
 			// If we've gotten here and we have a Rom, sort by CRC
 			else if (_itemType == ItemType.Rom)
 			{
 				key = ((Rom)this).CRC;
-				datdata.BucketByCRC(false, logger, false);
+				datdata.BucketBy(SortedBy.CRC, false /* mergeroms */, logger, output: false);
 			}
 
 			// Otherwise, we use -1 as the key
 			else
 			{
 				key = "-1";
-				datdata.BucketBySize(false, logger, false);
+				datdata.BucketBy(SortedBy.Size, false /* mergeroms */, logger, output: false);
 			}
 
 			return key;

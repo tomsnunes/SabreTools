@@ -116,7 +116,7 @@ namespace SabreTools.Helper.Dats
 				RecalculateStats();
 			}
 
-			BucketByGame(false, true, logger, false);
+			BucketBy(SortedBy.Game, false /* mergeroms */, logger, output: false, norename: true);
 			if (TotalSize < 0)
 			{
 				TotalSize = Int64.MaxValue + TotalSize;
@@ -387,7 +387,7 @@ namespace SabreTools.Helper.Dats
 				List<string> games = new List<string>();
 				DatFile datdata = new DatFile();
 				datdata.Parse(filename.Item1, 0, 0, logger);
-				datdata.BucketByGame(false, true, logger, false);
+				datdata.BucketBy(SortedBy.Game, false /* mergeroms */, logger, output: false, norename: true);
 
 				// Output single DAT stats (if asked)
 				logger.User("Adding stats for file '" + filename.Item1 + "'\n", false);

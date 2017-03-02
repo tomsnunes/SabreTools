@@ -322,7 +322,7 @@ namespace SabreTools.Helper.Dats
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
 			// First, organize by games so that we can do the right thing
-			BucketByGame(false, true, logger, output: false, lower: false);
+			BucketBy(SortedBy.Game, false /* mergeroms */, logger, output: false, lower: false, norename: true);
 
 			// Create a temporary DAT to add things to
 			DatFile tempDat = new DatFile(this);
