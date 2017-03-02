@@ -126,7 +126,7 @@ namespace SabreTools.Helper.Skippers
 				{
 					byte[] buffer = new byte[4];
 					int pos = 0;
-					while (input.Position < (EndOffset != null ? EndOffset : input.Length)
+					while (input.Position < (EndOffset ?? input.Length)
 						&& input.Position < input.Length)
 					{
 						byte b = br.ReadByte();
