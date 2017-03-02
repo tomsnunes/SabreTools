@@ -154,6 +154,69 @@ namespace SabreTools.Helper.Dats
 				DatFormat = this.DatFormat,
 				MergeRoms = this.MergeRoms,
 			};
+			DatFile sha512 = new DatFile
+			{
+				FileName = this.FileName + " (SHA-512)",
+				Name = this.Name + " (SHA-512)",
+				Description = this.Description + " (SHA-512)",
+				Category = this.Category,
+				Version = this.Version,
+				Date = this.Date,
+				Author = this.Author,
+				Email = this.Email,
+				Homepage = this.Homepage,
+				Url = this.Url,
+				Comment = this.Comment,
+				Header = this.Header,
+				Type = this.Type,
+				ForceMerging = this.ForceMerging,
+				ForceNodump = this.ForceNodump,
+				ForcePacking = this.ForcePacking,
+				DatFormat = this.DatFormat,
+				MergeRoms = this.MergeRoms,
+			};
+			DatFile sha384 = new DatFile
+			{
+				FileName = this.FileName + " (SHA-384)",
+				Name = this.Name + " (SHA-384)",
+				Description = this.Description + " (SHA-384)",
+				Category = this.Category,
+				Version = this.Version,
+				Date = this.Date,
+				Author = this.Author,
+				Email = this.Email,
+				Homepage = this.Homepage,
+				Url = this.Url,
+				Comment = this.Comment,
+				Header = this.Header,
+				Type = this.Type,
+				ForceMerging = this.ForceMerging,
+				ForceNodump = this.ForceNodump,
+				ForcePacking = this.ForcePacking,
+				DatFormat = this.DatFormat,
+				MergeRoms = this.MergeRoms,
+			};
+			DatFile sha256 = new DatFile
+			{
+				FileName = this.FileName + " (SHA-256)",
+				Name = this.Name + " (SHA-256)",
+				Description = this.Description + " (SHA-256)",
+				Category = this.Category,
+				Version = this.Version,
+				Date = this.Date,
+				Author = this.Author,
+				Email = this.Email,
+				Homepage = this.Homepage,
+				Url = this.Url,
+				Comment = this.Comment,
+				Header = this.Header,
+				Type = this.Type,
+				ForceMerging = this.ForceMerging,
+				ForceNodump = this.ForceNodump,
+				ForcePacking = this.ForcePacking,
+				DatFormat = this.DatFormat,
+				MergeRoms = this.MergeRoms,
+			};
 			DatFile sha1 = new DatFile
 			{
 				FileName = this.FileName + " (SHA-1)",
@@ -217,7 +280,6 @@ namespace SabreTools.Helper.Dats
 				DatFormat = this.DatFormat,
 				MergeRoms = this.MergeRoms,
 			};
-
 			DatFile other = new DatFile
 			{
 				FileName = this.FileName + " (Other)",
@@ -259,6 +321,24 @@ namespace SabreTools.Helper.Dats
 					{
 						nodump.Add(key, rom);
 					}
+					// If the file has a SHA-512
+					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).SHA512))
+						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).SHA512)))
+					{
+						sha512.Add(key, rom);
+					}
+					// If the file has a SHA-384
+					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).SHA384))
+						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).SHA384)))
+					{
+						sha384.Add(key, rom);
+					}
+					// If the file has a SHA-256
+					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).SHA256))
+						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).SHA256)))
+					{
+						sha256.Add(key, rom);
+					}
 					// If the file has a SHA-1
 					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).SHA1))
 						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).SHA1)))
@@ -298,6 +378,9 @@ namespace SabreTools.Helper.Dats
 			Globals.Logger.User("DAT information created, outputting new files");
 			bool success = true;
 			success &= nodump.WriteToFile(outDir);
+			success &= sha512.WriteToFile(outDir);
+			success &= sha384.WriteToFile(outDir);
+			success &= sha256.WriteToFile(outDir);
 			success &= sha1.WriteToFile(outDir);
 			success &= md5.WriteToFile(outDir);
 			success &= crc.WriteToFile(outDir);
