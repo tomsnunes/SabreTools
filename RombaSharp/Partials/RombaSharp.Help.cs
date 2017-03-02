@@ -2,7 +2,6 @@
 
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Help;
-using SabreTools.Helper.Resources;
 
 namespace RombaSharp
 {
@@ -12,11 +11,13 @@ namespace RombaSharp
 		{
 			// Create and add the header to the Help object
 			string barrier = "-----------------------------------------";
-			List<string> helpHeader = new List<string>();
-			helpHeader.Add(Resources.RombaSharp_Name + " - " + Resources.RombaSharp_Desc);
-			helpHeader.Add(barrier);
-			helpHeader.Add(Resources.Usage + ": " + Resources.RombaSharp_Name + " [option] [filename|dirname] ...");
-			helpHeader.Add("");
+			List<string> helpHeader = new List<string>()
+			{
+				"RombaSharp - C# port of the Romba rom management tool",
+				barrier,
+				"Usage: RombaSharp [option] [filename|dirname] ...",
+				""
+			};
 			Help help = new Help(helpHeader);
 
 			// Create the Help feature

@@ -2,7 +2,6 @@
 
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Help;
-using SabreTools.Helper.Resources;
 
 namespace SabreTools
 {
@@ -15,9 +14,9 @@ namespace SabreTools
 			string barrier = "-----------------------------------------";
 			List<string> helpHeader = new List<string>()
 			{
-				Resources.SabreTools_Name + " - " + Resources.SabreTools_Desc,
+				"SabreTools - Manipulate, convert, and use DAT files",
 				barrier,
-				Resources.Usage + ": " + Resources.SabreTools_Name + " [option] [flags] [filename|dirname] ...",
+				"Usage: SabreTools [option] [flags] [filename|dirname] ...",
 				""
 			};
 			Help help = new Help(helpHeader);
