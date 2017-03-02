@@ -20,10 +20,9 @@ namespace SabreTools.Helper.Dats
 		/// <param name="bucketBy">SortedBy enum representing how to sort the individual items</param>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
 		/// <param name="lower">True if the key should be lowercased (default), false otherwise</param>
 		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
-		public void BucketBy(SortedBy bucketBy, bool mergeroms, Logger logger, bool output = true, bool lower = true, bool norename = true)
+		public void BucketBy(SortedBy bucketBy, bool mergeroms, Logger logger, bool lower = true, bool norename = true)
 		{
 			// If we already have the right sorting, trust it
 			if (_sortedBy == bucketBy)
@@ -34,8 +33,8 @@ namespace SabreTools.Helper.Dats
 			// Set the sorted type
 			_sortedBy = bucketBy;
 
+			// Create the temporary dictionary to sort into
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-			long count = 0;
 
 			logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms by " + bucketBy);
 
@@ -55,7 +54,6 @@ namespace SabreTools.Helper.Dats
 					// Now add each of the roms to their respective games
 					foreach (DatItem rom in roms)
 					{
-						count++;
 						string newkey = "";
 
 						switch (bucketBy)
@@ -137,12 +135,6 @@ namespace SabreTools.Helper.Dats
 				}
 			});
 
-			// Output the count if told to
-			if (output)
-			{
-				logger.User("A total of " + count + " items will be written out to file");
-			}
-
 			// Now assign the dictionary back
 			_files = sortable;
 		}
@@ -156,13 +148,12 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void CreateFullyNonMergedSets(bool mergeroms, Logger logger, bool output = true)
+		public void CreateFullyNonMergedSets(bool mergeroms, Logger logger)
 		{
 			logger.User("Creating fully non-merged sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketBy(SortedBy.Game, mergeroms, logger, output: output, norename: true);
+			BucketBy(SortedBy.Game, mergeroms, logger, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
@@ -184,13 +175,12 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void CreateMergedSets(bool mergeroms, Logger logger, bool output = true)
+		public void CreateMergedSets(bool mergeroms, Logger logger)
 		{
 			logger.User("Creating merged sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketBy(SortedBy.Game, mergeroms, logger, output: output, norename: true);
+			BucketBy(SortedBy.Game, mergeroms, logger, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
@@ -208,13 +198,12 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void CreateNonMergedSets(bool mergeroms, Logger logger, bool output = true)
+		public void CreateNonMergedSets(bool mergeroms, Logger logger)
 		{
 			logger.User("Creating non-merged sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketBy(SortedBy.Game, mergeroms, logger, output: output, norename: true);
+			BucketBy(SortedBy.Game, mergeroms, logger, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
@@ -232,13 +221,12 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
 		/// <param name="logger">Logger object for file and console output</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		public void CreateSplitSets(bool mergeroms, Logger logger, bool output = true)
+		public void CreateSplitSets(bool mergeroms, Logger logger)
 		{
 			logger.User("Creating split sets from the DAT");
 
 			// For sake of ease, the first thing we want to do is sort by game
-			BucketBy(SortedBy.Game, mergeroms, logger, output: output, norename: true);
+			BucketBy(SortedBy.Game, mergeroms, logger, norename: true);
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information

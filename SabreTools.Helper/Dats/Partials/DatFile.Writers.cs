@@ -111,6 +111,9 @@ namespace SabreTools.Helper.Dats
 			// Bucket roms by game name and optionally dedupe
 			BucketBy(SortedBy.Game, MergeRoms, logger, norename: norename);
 
+			// Output the number of items we're going to be writing
+			logger.User("A total of " + Count + " items will be written out to file");
+
 			// Filter the DAT by 1G1R rules, if we're supposed to
 			// TODO: Create 1G1R logic before write
 

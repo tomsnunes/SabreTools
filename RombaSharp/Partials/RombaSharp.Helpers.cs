@@ -405,7 +405,7 @@ namespace RombaSharp
 			// First get a list of SHA-1's from the input DATs
 			DatFile datroot = new DatFile { Type = "SuperDAT", };
 			datroot.PopulateFromDir(_dats, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, false, false, false, false, _tmpdir, false, null, 4, _logger);
-			datroot.BucketBy(SortedBy.SHA1, false /* mergeroms */, logger, output: false);
+			datroot.BucketBy(SortedBy.SHA1, false /* mergeroms */, _logger);
 
 			// Create a List of dat hashes in the database (SHA-1)
 			List<string> databaseDats = new List<string>();
@@ -435,7 +435,7 @@ namespace RombaSharp
 					unneeded.Add(hash);
 				}
 			}
-			datroot.BucketBy(SortedBy.Game, false /* mergeroms */, _logger, output: false, norename: true);
+			datroot.BucketBy(SortedBy.Game, false /* mergeroms */, _logger, norename: true);
 
 			_logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -619,7 +619,7 @@ namespace RombaSharp
 			// Now rescan the depot itself
 			DatFile depot = new DatFile();
 			depot.PopulateFromDir(depotname, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, false, true, false, false, _tmpdir, false, null, _workers, _logger);
-			depot.BucketBy(SortedBy.SHA1, false /* mergeroms */, logger, output: false);
+			depot.BucketBy(SortedBy.SHA1, false /* mergeroms */, _logger);
 
 			// Set the base queries to use
 			string crcquery = "INSERT OR IGNORE INTO crc (crc) VALUES";

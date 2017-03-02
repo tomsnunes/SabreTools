@@ -438,9 +438,9 @@ namespace SabreTools.Helper.Dats
 		}
 
 		/// <summary>
-		/// Get the number of keys in the file dictionary
+		/// Get the number of DatItems in the file dictionary
 		/// </summary>
-		/// <returns>Number of keys in the file dictionary</returns>
+		/// <returns>Number of DatItems in the file dictionary</returns>
 		public long Count
 		{
 			get
