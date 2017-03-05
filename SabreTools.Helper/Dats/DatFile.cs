@@ -431,6 +431,12 @@ namespace SabreTools.Helper.Dats
 				_files = new SortedDictionary<string, List<DatItem>>();
 			}
 
+			// If the key is null, we return false since keys can't be null
+			if (key == null)
+			{
+				return false;
+			}
+
 			lock (_files)
 			{
 				return _files.ContainsKey(key);
