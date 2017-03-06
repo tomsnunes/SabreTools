@@ -27,6 +27,7 @@ using StreamReader = System.IO.StreamReader;
 #endif
 using NaturalSort;
 using OCRC;
+using xxHashSharp;
 
 namespace SabreTools.Helper.Tools
 {
@@ -536,6 +537,8 @@ namespace SabreTools.Helper.Tools
 				SHA256 sha256 = SHA256.Create();
 				SHA384 sha384 = SHA384.Create();
 				SHA512 sha512 = SHA512.Create();
+				xxHash xxHash = new xxHash();
+				xxHash.Init();
 
 				// Seek to the starting position, if one is set
 				if (offset < 0)
@@ -572,6 +575,10 @@ namespace SabreTools.Helper.Tools
 					{
 						sha512.TransformBlock(buffer, 0, read, buffer, 0);
 					}
+					if ((omitFromScan & Hash.xxHash) == 0)
+					{
+						xxHash.Update(buffer, read);
+					}
 				}
 
 				crc.Update(buffer, 0, 0);
@@ -601,6 +608,10 @@ namespace SabreTools.Helper.Tools
 				{
 					sha512.TransformFinalBlock(buffer, 0, 0);
 					rom.SHA512 = BitConverter.ToString(sha512.Hash).Replace("-", "").ToLowerInvariant();
+				}
+				if ((omitFromScan & Hash.xxHash) == 0)
+				{
+					rom.SHA512 = xxHash.Digest().ToString("X").ToLowerInvariant();
 				}
 
 				// Dispose of the hashers

@@ -262,6 +262,7 @@ namespace SabreTools.Helper.Data
         SHA256 = SHA1 << 1,
 		SHA384 = SHA256 << 1,
 		SHA512 = SHA384 << 1,
+		xxHash = SHA512 << 1,
 
 		// Special combinations
 		Standard = CRC | MD5 | SHA1,
