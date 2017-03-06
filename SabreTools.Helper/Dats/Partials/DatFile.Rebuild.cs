@@ -561,6 +561,7 @@ namespace SabreTools.Helper.Dats
 						case OutputFormat.TorrentRar:
 							break;
 						case OutputFormat.TorrentXZ:
+							rebuilt &= ArchiveTools.WriteTorrentXZ(file, outDir, item, date: date);
 							break;
 						case OutputFormat.TorrentZip:
 							rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, item, date: date);
@@ -645,6 +646,7 @@ namespace SabreTools.Helper.Dats
 					case OutputFormat.TorrentRar:
 						break;
 					case OutputFormat.TorrentXZ:
+						rebuilt &= ArchiveTools.WriteTorrentXZ(file, outDir, item, date: date);
 						break;
 					case OutputFormat.TorrentZip:
 						rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, item, date: date);
@@ -749,6 +751,8 @@ namespace SabreTools.Helper.Dats
 									case OutputFormat.TorrentRar:
 										break;
 									case OutputFormat.TorrentXZ:
+										rebuilt &= ArchiveTools.WriteTorrentXZ(file + ".new", outDir, item, date: date);
+										rebuilt &= ArchiveTools.WriteTorrentXZ(file, outDir, rom, date: date);
 										break;
 									case OutputFormat.TorrentZip:
 										rebuilt &= ArchiveTools.WriteTorrentZip(file + ".new", outDir, item, date: date);

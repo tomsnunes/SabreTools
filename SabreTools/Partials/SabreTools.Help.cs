@@ -418,13 +418,11 @@ namespace SabreTools
 				FeatureType.Flag,
 				null));
 			*/
-			/*
 			sort.AddFeature("txz", new Feature(
 				new List<string>() { "-txz", "--txz" },
 				"Enable TorrentXZ output",
 				FeatureType.Flag,
 				null));
-			*/
 			sort.AddFeature("tzip", new Feature(
 				new List<string>() { "-tzip", "--tzip" },
 				"Enable TorrentZip output",
@@ -556,13 +554,11 @@ namespace SabreTools
 				FeatureType.Flag,
 				null));
 			*/
-			/*
 			sortDepot.AddFeature("txz", new Feature(
 				new List<string>() { "-txz", "--txz" },
 				"Enable TorrentXZ output",
 				FeatureType.Flag,
 				null));
-			*/
 			sortDepot.AddFeature("tzip", new Feature(
 				new List<string>() { "-tzip", "--tzip" },
 				"Enable TorrentZip output",

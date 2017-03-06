@@ -435,10 +435,11 @@ Options:
 			invalidate the output files as proper TorrentZip files because the date will not
 			match the standard.
 			
-		-t7z				Enable Torrent 7zip output [NOT IMPLEMENTED]
+		-t7z				Enable Torrent 7zip output
 			Instead of ouputting the files to folder, files will be rebuilt to Torrent7Zip (T7Z)
 			files. This format is based on the LZMA container format 7zip, but with custom header
-			information. This is currently unused by any major application.
+			information. This is currently unused by any major application. Currently does not
+			produce proper Torrent-compatible outputs.
 			
 		-tar				Enable Tape ARchive output
 			Instead of outputting the fiels to folder, files will be rebuilt to Tape ARchive (TAR)
@@ -471,10 +472,11 @@ Options:
 			files. This format is based on the RAR propietary format but with custom header
 			information. This is currently unused by any major application;
 			
-		-txz				Enable Torrent XZ output [NOT IMPLEMENTED]
+		-txz				Enable Torrent XZ output
 			Instead of outputting files to folder, files will be rebuilt to Torrent XZ (TXZ) files.
 			This format is based on the LZMA container format XZ, but with custom header
-			information. This is currently unused by any major application;
+			information. This is currently unused by any major application. Currently does not
+			produce proper Torrent-compatible outputs.
 			
 		-tzip				Enable Torrent Zip output
 			Instead of ouputting files to folder, files will be rebuilt to TorrentZip (TZ) files.
@@ -561,10 +563,11 @@ Options:
 			invalidate the output files as proper TorrentZip files because the date will not
 			match the standard.
 			
-		-t7z				Enable Torrent 7zip output [NOT IMPLEMENTED]
+		-t7z				Enable Torrent 7zip output
 			Instead of ouputting the files to folder, files will be rebuilt to Torrent7Zip (T7Z)
 			files. This format is based on the LZMA container format 7zip, but with custom header
-			information. This is currently unused by any major application.
+			information. This is currently unused by any major application. Currently does not
+			produce proper Torrent-compatible outputs.
 			
 		-tar				Enable Tape ARchive output
 			Instead of outputting the fiels to folder, files will be rebuilt to Tape ARchive (TAR)
@@ -595,12 +598,13 @@ Options:
 		-trar				Enable Torrent RAR output [NOT IMPLEMENTED]
 			Instead of outputting files to folder, files will be rebuilt to Torrent RAR (TRAR)
 			files. This format is based on the RAR propietary format but with custom header
-			information. This is currently unused by any major application;
+			information. This is currently unused by any major application.
 			
-		-txz				Enable Torrent XZ output [NOT IMPLEMENTED]
+		-txz				Enable Torrent XZ output
 			Instead of outputting files to folder, files will be rebuilt to Torrent XZ (TXZ) files.
 			This format is based on the LZMA container format XZ, but with custom header
-			information. This is currently unused by any major application;
+			information. This is currently unused by any major application. Currently does not
+			produce proper Torrent-compatible outputs.
 			
 		-tzip				Enable Torrent Zip output
 			Instead of ouputting files to folder, files will be rebuilt to TorrentZip (TZ) files.

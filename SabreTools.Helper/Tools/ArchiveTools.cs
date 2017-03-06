@@ -1310,7 +1310,7 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
-		/// (UNIMPLEMENTED) Write a set of input files to a torrent7z archive (assuming the same output archive name)
+		/// Write a set of input files to a torrent7z archive (assuming the same output archive name)
 		/// </summary>
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -1693,7 +1693,7 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
-		/// (UNIMPLEMENTED) Write a set of input files to a torrentxz archive (assuming the same output archive name)
+		/// Write a set of input files to a torrentxz archive (assuming the same output archive name)
 		/// </summary>
 		/// <param name="inputFile">Input filenames to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -1702,7 +1702,208 @@ namespace SabreTools.Helper.Tools
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrentXZ(List<string> inputFiles, string outDir, List<Rom> roms, bool date = false)
 		{
-			return false;
+			bool success = false;
+			string tempFile = Path.Combine(outDir, "tmp" + Guid.NewGuid().ToString());
+
+			// If either list of roms is null or empty, return
+			if (inputFiles == null || roms == null || inputFiles.Count == 0 || roms.Count == 0)
+			{
+				return success;
+			}
+
+			// If the number of inputs is less than the number of available roms, return
+			if (inputFiles.Count < roms.Count)
+			{
+				return success;
+			}
+
+			// If one of the files doesn't exist, return
+			foreach (string file in inputFiles)
+			{
+				if (!File.Exists(file))
+				{
+					return success;
+				}
+			}
+
+			// Get the output archive name from the first rebuild rom
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].Machine.Name) + (roms[0].Machine.Name.EndsWith(".7z") ? "" : ".7z"));
+
+			// Set internal variables
+			SevenZipBase.SetLibraryPath("7za.dll");
+			SevenZipExtractor oldZipFile;
+			SevenZipCompressor zipFile;
+
+			try
+			{
+				// If the full output path doesn't exist, create it
+				if (!Directory.Exists(Path.GetDirectoryName(archiveFileName)))
+				{
+					Directory.CreateDirectory(Path.GetDirectoryName(archiveFileName));
+				}
+
+				// If the archive doesn't exist, create it and put the single file
+				if (!File.Exists(archiveFileName))
+				{
+					zipFile = new SevenZipCompressor()
+					{
+						ArchiveFormat = OutArchiveFormat.XZ,
+						CompressionLevel = SevenZip.CompressionLevel.Normal,
+					};
+
+					// Map all inputs to index
+					Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
+					for (int i = 0; i < inputFiles.Count; i++)
+					{
+						inputIndexMap.Add(roms[i].Name.Replace('\\', '/'), i);
+					}
+
+					// Sort the keys in TZIP order
+					List<string> keys = inputIndexMap.Keys.ToList();
+					keys.Sort(ZipFile.TorrentZipStringCompare);
+
+					// Create the temp directory
+					string tempPath = Path.Combine(Path.GetTempPath(), new Guid().ToString());
+					if (!Directory.Exists(tempPath))
+					{
+						Directory.CreateDirectory(tempPath);
+					}
+
+					// Now add all of the files in order
+					foreach (string key in keys)
+					{
+						string newkey = Path.Combine(tempPath, key);
+
+						File.Move(inputFiles[inputIndexMap[key]], newkey);
+						zipFile.CompressFiles(tempFile, newkey);
+						File.Move(newkey, inputFiles[inputIndexMap[key]]);
+					}
+
+					FileTools.CleanDirectory(tempPath);
+					try
+					{
+						Directory.Delete(tempPath);
+					}
+					catch { }
+				}
+
+				// Otherwise, sort the input files and write out in the correct order
+				else
+				{
+					// Open the old archive for reading
+					Stream oldZipFileStream = File.OpenRead(archiveFileName);
+					oldZipFile = new SevenZipExtractor(oldZipFileStream);
+
+					// Map all inputs to index
+					Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
+					for (int i = 0; i < inputFiles.Count; i++)
+					{
+						// If the old one contains the new file, then just skip out
+						if (oldZipFile.ArchiveFileNames.Contains(roms[i].Name.Replace('\\', '/')))
+						{
+							continue;
+						}
+
+						inputIndexMap.Add(roms[i].Name.Replace('\\', '/'), -(i + 1));
+					}
+
+					// Then add all of the old entries to it too
+					for (int i = 0; i < oldZipFile.FilesCount; i++)
+					{
+						inputIndexMap.Add(oldZipFile.ArchiveFileNames[i], i);
+					}
+
+					// If the number of entries is the same as the old archive, skip out
+					if (inputIndexMap.Keys.Count <= oldZipFile.FilesCount)
+					{
+						success = true;
+						return success;
+					}
+
+					// Otherwise, process the old zipfile
+					zipFile = new SevenZipCompressor()
+					{
+						ArchiveFormat = OutArchiveFormat.XZ,
+						CompressionLevel = SevenZip.CompressionLevel.Normal,
+					};
+					Stream zipFileStream = File.OpenWrite(tempFile);
+
+					// Get the order for the entries with the new file
+					List<string> keys = inputIndexMap.Keys.ToList();
+					keys.Sort(ZipFile.TorrentZipStringCompare);
+
+					// Copy over all files to the new archive
+					foreach (string key in keys)
+					{
+						// Get the index mapped to the key
+						int index = inputIndexMap[key];
+
+						// If we have the input file, add it now
+						if (index < 0)
+						{
+							zipFile.CompressFiles(zipFileStream, inputFiles[-index - 1]);
+						}
+
+						// Otherwise, copy the file from the old archive
+						else
+						{
+							Stream oldZipFileEntryStream = File.Open(inputFiles[index], FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+							oldZipFile.ExtractFile(index, oldZipFileEntryStream);
+							zipFile.CompressFiles(zipFileStream, inputFiles[index]);
+
+							oldZipFileEntryStream.Dispose();
+							try
+							{
+								File.Delete(inputFiles[index]);
+							}
+							catch { }
+						}
+					}
+
+					zipFileStream.Dispose();
+					oldZipFile.Dispose();
+				}
+
+				success = true;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+				success = false;
+			}
+
+			// If the old file exists, delete it and replace
+			if (File.Exists(archiveFileName))
+			{
+				File.Delete(archiveFileName);
+			}
+			File.Move(tempFile, archiveFileName);
+
+			// Now make the file TXZ
+			// TODO: Add ACTUAL TXZ compatible code (based on T7z)
+
+			BinaryWriter bw = new BinaryWriter(File.Open(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite));
+			bw.Seek(0, SeekOrigin.Begin);
+			bw.Write(Constants.Torrent7ZipHeader);
+			bw.Seek(0, SeekOrigin.End);
+
+			oldZipFile = new SevenZipExtractor(File.Open(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite));
+
+			// Get the correct signature to use (Default 0, Unicode 1, SingleFile 2, StripFileNames 4)
+			byte[] tempsig = Constants.Torrent7ZipSignature;
+			if (oldZipFile.FilesCount > 1)
+			{
+				tempsig[16] = 0x2;
+			}
+			else
+			{
+				tempsig[16] = 0;
+			}
+
+			bw.Write(tempsig);
+			bw.Dispose();
+
+			return true;
 		}
 
 		/// <summary>
