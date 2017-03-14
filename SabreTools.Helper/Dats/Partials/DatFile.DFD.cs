@@ -279,7 +279,7 @@ namespace SabreTools.Helper.Dats
 						// Get the list of empty directories
 						List<string> empties = Directory
 							.EnumerateDirectories(tempSubDir, "*", SearchOption.AllDirectories)
-							.Where(dir => Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).Count() == 0)
+							.Where(dir => Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories).Count() == 0)
 							.ToList();
 
 						Parallel.ForEach(empties,
