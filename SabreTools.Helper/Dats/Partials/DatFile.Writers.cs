@@ -995,6 +995,9 @@ namespace SabreTools.Helper.Dats
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", string.Empty)
 								.Replace("%sha1%", string.Empty)
+								.Replace("%sha256%", string.Empty)
+								.Replace("%sha384%", string.Empty)
+								.Replace("%sha512%", string.Empty)
 								.Replace("%size%", string.Empty);
 							post = post
 								.Replace("%game%", rom.Machine.Name)
@@ -1002,6 +1005,9 @@ namespace SabreTools.Helper.Dats
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", string.Empty)
 								.Replace("%sha1%", string.Empty)
+								.Replace("%sha256%", string.Empty)
+								.Replace("%sha384%", string.Empty)
+								.Replace("%sha512%", string.Empty)
 								.Replace("%size%", string.Empty);
 						}
 
@@ -1037,36 +1043,40 @@ namespace SabreTools.Helper.Dats
 						}
 
 						// Otherwise, use any flags
-						name = (UseGame ? rom.Machine.Name : rom.Name);
-						if (RepExt != "" || RemExt)
+						else
 						{
-							if (RemExt)
+							name = (UseGame ? rom.Machine.Name : rom.Name);
+							if (RepExt != "" || RemExt)
 							{
-								RepExt = "";
+								if (RemExt)
+								{
+									RepExt = "";
+								}
+
+								string dir = Path.GetDirectoryName(name);
+								dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
+								name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + RepExt);
+							}
+							if (AddExt != "")
+							{
+								name += AddExt;
+							}
+							if (!UseGame && GameName)
+							{
+								name = Path.Combine(rom.Machine.Name, name);
 							}
 
-							string dir = Path.GetDirectoryName(name);
-							dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
-							name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + RepExt);
-						}
-						if (AddExt != "")
-						{
-							name += AddExt;
-						}
-						if (!UseGame && GameName)
-						{
-							name = Path.Combine(rom.Machine.Name, name);
+							if (UseGame && rom.Machine.Name != lastgame)
+							{
+								state += pre + name + post + "\n";
+								lastgame = rom.Machine.Name;
+							}
+							else if (!UseGame)
+							{
+								state += pre + name + post + "\n";
+							}
 						}
 
-						if (UseGame && rom.Machine.Name != lastgame)
-						{
-							state += pre + name + post + "\n";
-							lastgame = rom.Machine.Name;
-						}
-						else if (!UseGame)
-						{
-							state += pre + name + post + "\n";
-						}
 						break;
 					case DatFormat.OfflineList:
 						state += "\t\t<game>\n"
