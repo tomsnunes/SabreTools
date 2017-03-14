@@ -38,7 +38,7 @@ namespace SabreTools.Helper.Tools
 	 * TODO: Full archive support for: RAR, LRZip, ZPAQ?, Zstd?, LZ4?
 	 * Torrent 7-zip: https://sourceforge.net/p/t7z/code/HEAD/tree/
 	 * LRZIP: https://github.com/ckolivas/lrzip
-	 * ZPAQ: https://github.com/zpaq/zpaq
+	 * ZPAQ: https://github.com/zpaq/zpaq - In progress as external DLL
 	 * Zstd: https://github.com/skbkontur/ZstdNet
 	 * LZ4: https://github.com/lz4/lz4
 	 */

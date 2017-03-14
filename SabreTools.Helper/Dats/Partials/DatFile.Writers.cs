@@ -190,11 +190,7 @@ namespace SabreTools.Helper.Dats
 							if (rom.Type == ItemType.Rom
 								&& ((Rom)rom).Size == -1
 								&& ((Rom)rom).CRC == "null"
-								&& ((Rom)rom).MD5 == "null"
-								&& ((Rom)rom).SHA1 == "null"
-								&& ((Rom)rom).SHA256 == "null"
-								&& ((Rom)rom).SHA384 == "null"
-								&& ((Rom)rom).SHA512 == "null")
+								&& ((Rom)rom).MD5 == "null")
 							{
 								Globals.Logger.Verbose("Empty folder found: " + rom.Machine.Name);
 
@@ -206,12 +202,12 @@ namespace SabreTools.Helper.Dats
 								{
 									rom.Name = (rom.Name == "null" ? "-" : rom.Name);
 									((Rom)rom).Size = Constants.SizeZero;
-									((Rom)rom).CRC = Constants.CRCZero;
-									((Rom)rom).MD5 = Constants.MD5Zero;
-									((Rom)rom).SHA1 = Constants.SHA1Zero;
-									((Rom)rom).SHA256 = Constants.SHA256Zero;
-									((Rom)rom).SHA384 = Constants.SHA384Zero;
-									((Rom)rom).SHA512 = Constants.SHA512Zero;
+									((Rom)rom).CRC = ((Rom)rom).CRC == "null" ? Constants.CRCZero : null;
+									((Rom)rom).MD5 = ((Rom)rom).MD5 == "null" ? Constants.MD5Zero : null;
+									((Rom)rom).SHA1 = ((Rom)rom).SHA1 == "null" ? Constants.SHA1Zero : null;
+									((Rom)rom).SHA256 = ((Rom)rom).SHA256 == "null" ? Constants.SHA256Zero : null;
+									((Rom)rom).SHA384 = ((Rom)rom).SHA384 == "null" ? Constants.SHA384Zero : null;
+									((Rom)rom).SHA512 = ((Rom)rom).SHA512 == "null" ? Constants.SHA512Zero : null;
 								}
 
 								// Otherwise, set the new path and such, write out, and continue

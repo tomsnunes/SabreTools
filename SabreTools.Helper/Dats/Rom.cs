@@ -55,17 +55,37 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="name"></param>
 		/// <param name="machineName"></param>
-		public Rom(string name, string machineName)
+		/// <param name="omitFromScan"></param>
+		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
+		public Rom(string name, string machineName, Hash omitFromScan = Hash.DeepHashes)
 		{
 			_name = name;
 			_itemType = ItemType.Rom;
 			_size = -1;
-			_crc = "null";
-			_md5 = "null";
-			_sha1 = "null";
-			_sha256 = "null";
-			_sha384 = "null";
-			_sha512 = "null";
+			if ((omitFromScan & Hash.CRC) == 0)
+			{
+				_crc = "null";
+			}
+			if ((omitFromScan & Hash.MD5) == 0)
+			{
+				_md5 = "null";
+			}
+			if ((omitFromScan & Hash.SHA1) == 0)
+			{
+				_sha1 = "null";
+			}
+			if ((omitFromScan & Hash.SHA256) == 0)
+			{
+				_sha256 = "null";
+			}
+			if ((omitFromScan & Hash.SHA384) == 0)
+			{
+				_sha384 = "null";
+			}
+			if ((omitFromScan & Hash.SHA512) == 0)
+			{
+				_sha512 = "null";
+			}
 			_itemStatus = ItemStatus.None;
 
 			_machine = new Machine

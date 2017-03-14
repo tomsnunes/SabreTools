@@ -272,6 +272,63 @@ namespace SabreTools.Helper.Dats
 								addDate,
 								headerToCheckAgainst);
 						});
+
+					// Now find all folders that are empty, if we are supposed to
+					if (addBlanks)
+					{
+						// Get the list of empty directories
+						List<string> empties = Directory
+							.EnumerateDirectories(tempSubDir, "*", SearchOption.AllDirectories)
+							.Where(dir => Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).Count() == 0)
+							.ToList();
+
+						Parallel.ForEach(empties,
+							new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+							dir =>
+						{
+							// Get the full path for the directory
+							string fulldir = Path.GetFullPath(dir);
+
+							// Set the temporary variables
+							string gamename = "";
+							string romname = "";
+
+							// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
+							if (Type == "SuperDAT")
+							{
+								gamename = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(item)).Remove(0, basePath.Length), Path.GetFileNameWithoutExtension(item));
+								romname = Path.Combine(fulldir.Remove(0, tempSubDir.Length), "-");
+							}
+
+							// Otherwise, we want just the item as the game, and the file as everything else
+							else
+							{
+								gamename = Path.GetFileNameWithoutExtension(item);
+								romname = Path.Combine(fulldir.Remove(0, tempSubDir.Length), "-");
+							}
+
+							// Sanitize the names
+							if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
+							{
+								gamename = gamename.Substring(1);
+							}
+							if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
+							{
+								gamename = gamename.Substring(0, gamename.Length - 1);
+							}
+							if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
+							{
+								romname = romname.Substring(1);
+							}
+							if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
+							{
+								romname = romname.Substring(0, romname.Length - 1);
+							}
+
+							Globals.Logger.Verbose("Adding blank empty folder: " + gamename);
+							this["null"].Add(new Rom(romname, gamename, omitFromScan));
+						});
+					}
 				}
 				// Otherwise, just get the info on the file itself
 				else if (File.Exists(newItem))
