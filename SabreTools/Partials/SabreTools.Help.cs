@@ -196,7 +196,7 @@ namespace SabreTools
 				FeatureType.String,
 				null));
 			datFromDir.AddFeature("desc", new Feature(
-				new List<string>() { "-d", "--desc" },
+				new List<string>() { "-de", "--desc" },
 				"Set the description of the DAT",
 				FeatureType.String,
 				null));
