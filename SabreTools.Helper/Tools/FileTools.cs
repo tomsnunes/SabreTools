@@ -611,7 +611,7 @@ namespace SabreTools.Helper.Tools
 				}
 				if ((omitFromScan & Hash.xxHash) == 0)
 				{
-					rom.SHA512 = xxHash.Digest().ToString("X").ToLowerInvariant(); // TODO: Not sure how long xxHash is supposed to be. Add the length here and in constants later
+					//rom.xxHash = xxHash.Digest().ToString("X8").ToLowerInvariant();
 				}
 
 				// Dispose of the hashers
