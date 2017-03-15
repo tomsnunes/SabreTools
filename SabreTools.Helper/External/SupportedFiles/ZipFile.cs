@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using SabreTools.Helper.Data;
+using SabreTools.Helper.Tools;
 
 #if MONO
 using System.IO;
@@ -758,7 +759,7 @@ namespace ROMVault2.SupportedFiles.Zip
 			_zipstream.Dispose();
 
 			// Delete the failed file
-			File.Delete(_zipFileInfo.FullName);
+			FileTools.SafeTryDeleteFile(_zipFileInfo.FullName);
 			_zipFileInfo = null;
 			_zipOpen = ZipOpenType.Closed;
 		}

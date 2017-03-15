@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using SabreTools.Helper.Data;
+using SabreTools.Helper.Tools;
 
 #if MONO
 using System.IO;
@@ -58,15 +59,8 @@ namespace SabreTools.Helper.Skippers
 			// If the output file has size 0, delete it
 			if (new FileInfo(output).Length == 0)
 			{
-				try
-				{
-					File.Delete(output);
-					success = false;
-				}
-				catch
-				{
-					// Don't log this file deletion error
-				}
+				FileTools.SafeTryDeleteFile(output);
+				success = false;
 			}
 
 			return success;

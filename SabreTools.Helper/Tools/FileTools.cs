@@ -336,19 +336,11 @@ namespace SabreTools.Helper.Tools
 		{
 			foreach (string file in Directory.EnumerateFiles(dirname, "*", SearchOption.TopDirectoryOnly))
 			{
-				try
-				{
-					File.Delete(file);
-				}
-				catch { }
+				SafeTryDeleteFile(file);
 			}
 			foreach (string dir in Directory.EnumerateDirectories(dirname, "*", SearchOption.TopDirectoryOnly))
 			{
-				try
-				{
-					Directory.Delete(dir, true);
-				}
-				catch { }
+				SafeTryDeleteDirectory(dir);
 			}
 		}
 
@@ -526,6 +518,72 @@ namespace SabreTools.Helper.Tools
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Try to safely delete a directory, optionally throwing the error
+		/// </summary>
+		/// <param name="file">Name of the directory to delete</param>
+		/// <param name="throwOnError">True if the error that is thrown should be thrown back to the caller, false otherwise</param>
+		/// <returns>True if the file didn't exist or could be deleted, false otherwise</returns>
+		public static bool SafeTryDeleteDirectory(string file, bool throwOnError = false)
+		{
+			// Check if the file exists first
+			if (!Directory.Exists(file))
+			{
+				return true;
+			}
+
+			// Now wrap deleting the file
+			try
+			{
+				Directory.Delete(file, true);
+				return true;
+			}
+			catch (Exception ex)
+			{
+				if (throwOnError)
+				{
+					throw ex;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Try to safely delete a file, optionally throwing the error
+		/// </summary>
+		/// <param name="file">Name of the file to delete</param>
+		/// <param name="throwOnError">True if the error that is thrown should be thrown back to the caller, false otherwise</param>
+		/// <returns>True if the file didn't exist or could be deleted, false otherwise</returns>
+		public static bool SafeTryDeleteFile(string file, bool throwOnError = false)
+		{
+			// Check if the file exists first
+			if (!File.Exists(file))
+			{
+				return true;
+			}
+
+			// Now wrap deleting the file
+			try
+			{
+				File.Delete(file);
+				return true;
+			}
+			catch (Exception ex)
+			{
+				if (throwOnError)
+				{
+					throw ex;
+				}
+				else
+				{
+					return false;
+				}
+			}
 		}
 
 		#endregion

@@ -149,16 +149,9 @@ namespace SabreTools.Helper.Dats
 
 			// Now that we're done, delete the temp folder (if it's not the default)
 			Globals.Logger.User("Cleaning temp folder");
-			try
+			if (tempDir != Path.GetTempPath())
 			{
-				if (tempDir != Path.GetTempPath())
-				{
-					Directory.Delete(tempDir, true);
-				}
-			}
-			catch
-			{
-				// Just absorb the error for now
+				FileTools.SafeTryDeleteDirectory(tempDir);
 			}
 
 			return true;
@@ -333,18 +326,11 @@ namespace SabreTools.Helper.Dats
 			// Cue to delete the file if it's a copy
 			if (copyFiles && item != newItem)
 			{
-				try
-				{
-					Directory.Delete(newBasePath, true);
-				}
-				catch { }
+				FileTools.SafeTryDeleteDirectory(newBasePath);
 			}
 
 			// Delete the sub temp directory
-			if (Directory.Exists(tempSubDir))
-			{
-				Directory.Delete(tempSubDir, true);
-			}
+			FileTools.SafeTryDeleteDirectory(tempSubDir);
 		}
 
 		/// <summary>

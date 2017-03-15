@@ -1290,7 +1290,7 @@ namespace SabreTools.Helper.Tools
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
 			{
-				File.Delete(archiveFileName);
+				FileTools.SafeTryDeleteFile(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
 
@@ -1402,11 +1402,7 @@ namespace SabreTools.Helper.Tools
 					}
 
 					FileTools.CleanDirectory(tempPath);
-					try
-					{
-						Directory.Delete(tempPath);
-					}
-					catch { }
+					FileTools.SafeTryDeleteDirectory(tempPath);
 				}
 
 				// Otherwise, sort the input files and write out in the correct order
@@ -1474,11 +1470,7 @@ namespace SabreTools.Helper.Tools
 							zipFile.CompressFiles(zipFileStream, inputFiles[index]);
 
 							oldZipFileEntryStream.Dispose();
-							try
-							{
-								File.Delete(inputFiles[index]);
-							}
-							catch { }
+							FileTools.SafeTryDeleteFile(inputFiles[index]);
 						}
 					}
 
@@ -1497,7 +1489,7 @@ namespace SabreTools.Helper.Tools
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
 			{
-				File.Delete(archiveFileName);
+				FileTools.SafeTryDeleteFile(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
 
@@ -1785,11 +1777,7 @@ namespace SabreTools.Helper.Tools
 					}
 
 					FileTools.CleanDirectory(tempPath);
-					try
-					{
-						Directory.Delete(tempPath);
-					}
-					catch { }
+					FileTools.SafeTryDeleteDirectory(tempPath);
 				}
 
 				// Otherwise, sort the input files and write out in the correct order
@@ -1857,11 +1845,7 @@ namespace SabreTools.Helper.Tools
 							zipFile.CompressFiles(zipFileStream, inputFiles[index]);
 
 							oldZipFileEntryStream.Dispose();
-							try
-							{
-								File.Delete(inputFiles[index]);
-							}
-							catch { }
+							FileTools.SafeTryDeleteFile(inputFiles[index]);
 						}
 					}
 
@@ -1880,7 +1864,7 @@ namespace SabreTools.Helper.Tools
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
 			{
-				File.Delete(archiveFileName);
+				FileTools.SafeTryDeleteFile(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
 
@@ -2146,7 +2130,7 @@ namespace SabreTools.Helper.Tools
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
 			{
-				File.Delete(archiveFileName);
+				FileTools.SafeTryDeleteFile(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
 
