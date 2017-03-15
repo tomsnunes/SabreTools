@@ -225,7 +225,7 @@ namespace SabreTools.Helper.Tools
 
 					// Transform the stream and get the information from it
 					rule.TransformStream(inputStream, outputStream, keepReadOpen: false, keepWriteOpen: true);
-					rom = GetStreamInfo(outputStream, outputStream.Length);
+					rom = GetStreamInfo(outputStream, outputStream.Length, omitFromScan: omitFromScan, keepReadOpen: false);
 
 					// Dispose of the streams
 					outputStream.Dispose();
@@ -234,12 +234,14 @@ namespace SabreTools.Helper.Tools
 				// Otherwise, just get the info
 				else
 				{
-					rom = GetStreamInfo(File.OpenRead(input), new FileInfo(input).Length, omitFromScan, offset, false);
+					long length = new FileInfo(input).Length;
+					rom = GetStreamInfo(File.OpenRead(input), length, omitFromScan, offset, false);
 				}
 			}
 			else
 			{
-				rom = GetStreamInfo(File.OpenRead(input), new FileInfo(input).Length, omitFromScan, offset, false);
+				long length = new FileInfo(input).Length;
+				rom = GetStreamInfo(File.OpenRead(input), length, omitFromScan, offset, false);
 			}
 
 			// Add unique data from the file
@@ -550,6 +552,8 @@ namespace SabreTools.Helper.Tools
 				MD5 = string.Empty,
 				SHA1 = string.Empty,
 				SHA256 = string.Empty,
+				SHA384 = string.Empty,
+				SHA512 = string.Empty,
 			};
 
 			try
