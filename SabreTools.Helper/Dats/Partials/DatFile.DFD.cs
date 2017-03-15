@@ -66,28 +66,28 @@ namespace SabreTools.Helper.Dats
 				// Process the files in the main folder
 				List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
 				Parallel.ForEach(files,
-					new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+					Globals.ParallelOptions,
 					item =>
-					{
-						PopulateFromDirCheckFile(item, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
-							tempDir, copyFiles, headerToCheckAgainst);
-					});
+				{
+					PopulateFromDirCheckFile(item, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+						tempDir, copyFiles, headerToCheckAgainst);
+				});
 
 				// Find all top-level subfolders
 				files = Directory.EnumerateDirectories(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
 				Parallel.ForEach(files,
-					new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+					Globals.ParallelOptions,
 					item =>
-					{
-						List<string> subfiles = Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories).ToList();
-						Parallel.ForEach(subfiles,
-							new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
-							subitem =>
-							{
-								PopulateFromDirCheckFile(subitem, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
-								tempDir, copyFiles, headerToCheckAgainst);
-							});
-					});
+				{
+					List<string> subfiles = Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories).ToList();
+					Parallel.ForEach(subfiles,
+						Globals.ParallelOptions,
+						subitem =>
+						{
+							PopulateFromDirCheckFile(subitem, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
+							tempDir, copyFiles, headerToCheckAgainst);
+						});
+				});
 
 				// Now find all folders that are empty, if we are supposed to
 				if (!Romba && addBlanks)
@@ -98,50 +98,50 @@ namespace SabreTools.Helper.Dats
 						.ToList();
 
 					Parallel.ForEach(empties,
-						new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+						Globals.ParallelOptions,
 						dir =>
+					{
+						// Get the full path for the directory
+						string fulldir = Path.GetFullPath(dir);
+
+						// Set the temporary variables
+						string gamename = "";
+						string romname = "";
+
+						// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
+						if (Type == "SuperDAT")
 						{
-							// Get the full path for the directory
-							string fulldir = Path.GetFullPath(dir);
+							gamename = fulldir.Remove(0, basePath.Length + 1);
+							romname = "-";
+						}
 
-							// Set the temporary variables
-							string gamename = "";
-							string romname = "";
+						// Otherwise, we want just the top level folder as the game, and the file as everything else
+						else
+						{
+							gamename = fulldir.Remove(0, basePath.Length + 1).Split(Path.DirectorySeparatorChar)[0];
+							romname = Path.Combine(fulldir.Remove(0, basePath.Length + 1 + gamename.Length), "-");
+						}
 
-							// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
-							if (Type == "SuperDAT")
-							{
-								gamename = fulldir.Remove(0, basePath.Length + 1);
-								romname = "-";
-							}
+						// Sanitize the names
+						if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
+						{
+							gamename = gamename.Substring(1);
+						}
+						if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
+						{
+							gamename = gamename.Substring(0, gamename.Length - 1);
+						}
+						if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
+						{
+							romname = romname.Substring(1);
+						}
+						if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
+						{
+							romname = romname.Substring(0, romname.Length - 1);
+						}
 
-							// Otherwise, we want just the top level folder as the game, and the file as everything else
-							else
-							{
-								gamename = fulldir.Remove(0, basePath.Length + 1).Split(Path.DirectorySeparatorChar)[0];
-								romname = Path.Combine(fulldir.Remove(0, basePath.Length + 1 + gamename.Length), "-");
-							}
-
-							// Sanitize the names
-							if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								gamename = gamename.Substring(1);
-							}
-							if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								gamename = gamename.Substring(0, gamename.Length - 1);
-							}
-							if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								romname = romname.Substring(1);
-							}
-							if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								romname = romname.Substring(0, romname.Length - 1);
-							}
-
-							Globals.Logger.Verbose("Adding blank empty folder: " + gamename);
-							this["null"].Add(new Rom(romname, gamename, omitFromScan));
+						Globals.Logger.Verbose("Adding blank empty folder: " + gamename);
+						this["null"].Add(new Rom(romname, gamename, omitFromScan));
 					});
 				}
 			}
@@ -260,7 +260,7 @@ namespace SabreTools.Helper.Dats
 					Globals.Logger.Verbose(Path.GetFileName(item) + " treated like an archive");
 					List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(extracted,
-						new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+						Globals.ParallelOptions,
 						entry =>
 						{
 							PopulateFromDirProcessFile(entry,
@@ -284,7 +284,7 @@ namespace SabreTools.Helper.Dats
 							.ToList();
 
 						Parallel.ForEach(empties,
-							new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+							Globals.ParallelOptions,
 							dir =>
 						{
 							// Get the full path for the directory

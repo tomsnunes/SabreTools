@@ -1,4 +1,6 @@
-﻿namespace SabreTools.Helper.Data
+﻿using System.Threading.Tasks;
+
+namespace SabreTools.Helper.Data
 {
 	public class Globals
 	{
@@ -25,8 +27,17 @@
 		}
 		public static int MaxDegreeOfParallelism
 		{
-			get { return _maxDegreeOfParallelism; }
 			set { _maxDegreeOfParallelism = value; }
+		}
+		public static ParallelOptions ParallelOptions
+		{
+			get
+			{
+				return new ParallelOptions()
+				{
+					MaxDegreeOfParallelism = _maxDegreeOfParallelism
+				};
+			}
 		}
 
 		#endregion

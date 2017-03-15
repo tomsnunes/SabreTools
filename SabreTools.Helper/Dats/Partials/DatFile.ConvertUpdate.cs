@@ -103,7 +103,7 @@ namespace SabreTools.Helper.Dats
 			// Parse all of the DATs into their own DatFiles in the array
 			Parallel.For(0,
 				inputs.Count,
-				new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+				Globals.ParallelOptions,
 				i =>
 				{
 					string input = inputs[i];
@@ -122,13 +122,13 @@ namespace SabreTools.Helper.Dats
 
 			Globals.Logger.User("Populating internal DAT");
 			Parallel.For(0, inputs.Count,
-				new ParallelOptions() { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+				Globals.ParallelOptions,
 				i =>
 			{
 				// Get the list of keys from the DAT
 				List<string> keys = datHeaders[i].Keys.ToList();
 				Parallel.ForEach(keys,
-					new ParallelOptions() { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+					Globals.ParallelOptions,
 					key =>
 				{
 					// Add everything from the key to the internal DAT
@@ -536,7 +536,7 @@ namespace SabreTools.Helper.Dats
 			SplitType splitType, bool trim, bool single, string root)
 		{
 			Parallel.ForEach(inputFileNames,
-				new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+				Globals.ParallelOptions,
 				inputFileName =>
 				{
 					// Clean the input string
@@ -561,7 +561,7 @@ namespace SabreTools.Helper.Dats
 						inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
 
 						Parallel.ForEach(Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories),
-							new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+							Globals.ParallelOptions,
 							file =>
 							{
 								Globals.Logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");

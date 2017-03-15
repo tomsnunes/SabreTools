@@ -39,7 +39,7 @@ namespace SabreTools.Helper.External
 				subdirs.Clear();
 
 				Parallel.ForEach(dirs,
-					new ParallelOptions() { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+					Globals.ParallelOptions,
 					currentDir =>
 				{
 					string[] subDirs = Directory.GetDirectories(currentDir);
@@ -57,7 +57,7 @@ namespace SabreTools.Helper.External
 					{
 						FileInfo[] files = dir.GetFiles("*.*", SearchOption.TopDirectoryOnly);
 						Parallel.ForEach(files,
-							new ParallelOptions() { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
+							Globals.ParallelOptions,
 							info =>
 						{
 							action(info);
