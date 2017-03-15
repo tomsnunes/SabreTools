@@ -1332,7 +1332,7 @@ namespace SabreTools.Helper.Dats
 						int parentcount = parent.Count;
 						if (parentcount == 0)
 						{
-							Globals.Logger.Verbose("Empty parent: " + String.Join("\\", parent));
+							Globals.Logger.Verbose("Empty parent: " + String.Join("\\", parent) + " found in " + filename);
 							empty = true;
 						}
 
@@ -2091,14 +2091,10 @@ namespace SabreTools.Helper.Dats
 										}
 										if (subreader.GetAttribute("flags") == "baddump" || subreader.GetAttribute("status") == "baddump")
 										{
-											Globals.Logger.Verbose("Bad dump detected: " +
-												(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 											its = ItemStatus.BadDump;
 										}
 										if (subreader.GetAttribute("flags") == "nodump" || subreader.GetAttribute("status") == "nodump")
 										{
-											Globals.Logger.Verbose("Nodump detected: " +
-												(subreader.GetAttribute("name") != null && subreader.GetAttribute("name") != "" ? "\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 											its = ItemStatus.Nodump;
 										}
 										if (subreader.GetAttribute("flags") == "verified" || subreader.GetAttribute("status") == "verified")
@@ -2284,13 +2280,9 @@ namespace SabreTools.Helper.Dats
 													its = ItemStatus.Good;
 													break;
 												case "baddump":
-													Globals.Logger.Verbose("Bad dump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
-														"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 													its = ItemStatus.BadDump;
 													break;
 												case "nodump":
-													Globals.Logger.Verbose("Nodump detected: " + (xtr.GetAttribute("name") != null && xtr.GetAttribute("name") != "" ?
-														"\"" + xtr.GetAttribute("name") + "\"" : "ROM NAME NOT FOUND"));
 													its = ItemStatus.Nodump;
 													break;
 												case "verified":
@@ -2410,7 +2402,7 @@ namespace SabreTools.Helper.Dats
 			}
 			catch (Exception ex)
 			{
-				Globals.Logger.Warning(ex.ToString());
+				Globals.Logger.Warning("Exception found while parsing " + filename + ": " + ex.ToString());
 
 				// For XML errors, just skip the affected node
 				xtr?.Read();
@@ -2962,14 +2954,14 @@ namespace SabreTools.Helper.Dats
 			// If there's no name in the rom, we log and skip it
 			if (item.Name == null)
 			{
-				Globals.Logger.Warning("Rom with no name found! Skipping...");
+				Globals.Logger.Warning(FileName + ": Rom with no name found! Skipping...");
 				return;
 			}
 
 			// If the name ends with a directory separator, we log and skip it (DOSCenter only?)
 			if (item.Name.EndsWith("/") || item.Name.EndsWith("\\"))
 			{
-				Globals.Logger.Warning("Rom ending with directory separator found: '" + item.Name + "'. Skipping...");
+				Globals.Logger.Warning(FileName + ": Rom ending with directory separator found: '" + item.Name + "'. Skipping...");
 				return;
 			}
 
@@ -3009,7 +3001,7 @@ namespace SabreTools.Helper.Dats
 				// If the file has no size and it's not the above case, skip and log
 				else if (itemRom.ItemStatus != ItemStatus.Nodump && (itemRom.Size == 0 || itemRom.Size == -1))
 				{
-					Globals.Logger.Verbose("Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
+					Globals.Logger.Verbose(FileName + ": Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
 					itemRom.ItemStatus = ItemStatus.Nodump;
 				}
 				// If the file has a size but aboslutely no hashes, skip and log
@@ -3022,7 +3014,7 @@ namespace SabreTools.Helper.Dats
 					&& String.IsNullOrEmpty(itemRom.SHA384)
 					&& String.IsNullOrEmpty(itemRom.SHA512))
 				{
-					Globals.Logger.Verbose("Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
+					Globals.Logger.Verbose(FileName + ": Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
 					itemRom.ItemStatus = ItemStatus.Nodump;
 				}
 

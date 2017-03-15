@@ -657,7 +657,6 @@ namespace SabreTools.Helper.Dats
 				// Otherwise, we say that we have a valid named file
 				else
 				{
-					Globals.Logger.Verbose("Adding unmatched file '" + datItem.Name + "'");
 					output.Add(datItem);
 					lastItem = datItem;
 					lastrenamed = null;
