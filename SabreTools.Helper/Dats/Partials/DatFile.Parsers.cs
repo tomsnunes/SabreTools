@@ -2969,7 +2969,7 @@ namespace SabreTools.Helper.Dats
 			// If the name ends with a directory separator, we log and skip it (DOSCenter only?)
 			if (item.Name.EndsWith("/") || item.Name.EndsWith("\\"))
 			{
-				Globals.Logger.Warning("Rom with directory separator found: '" + item.Name + "'. Skipping...");
+				Globals.Logger.Warning("Rom ending with directory separator found: '" + item.Name + "'. Skipping...");
 				return;
 			}
 
