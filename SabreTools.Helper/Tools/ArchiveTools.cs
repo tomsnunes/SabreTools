@@ -27,6 +27,7 @@ using ROMVault2.SupportedFiles.Zip;
 using SevenZip;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Rar;
+using SharpCompress.Archives.SevenZip;
 using SharpCompress.Archives.Tar;
 using SharpCompress.Common;
 using SharpCompress.Readers;
@@ -57,8 +58,6 @@ namespace SabreTools.Helper.Tools
 		/// <returns>True if the extraction was a success, false otherwise</returns>
 		public static bool ExtractArchive(string input, string outDir, ArchiveScanLevel archiveScanLevel)
 		{
-			// Set internal variables
-			SevenZipBase.SetLibraryPath("7za.dll");
 			bool encounteredErrors = true;
 
 			// First get the archive type
@@ -81,21 +80,12 @@ namespace SabreTools.Helper.Tools
 					Directory.CreateDirectory(outDir);
 
 					// Extract all files to the temp directory
-					SevenZipExtractor sza = new SevenZipExtractor(File.OpenRead(input))
+					SevenZipArchive sza = SevenZipArchive.Open(File.OpenRead(input));
+					foreach (SevenZipArchiveEntry entry in sza.Entries)
 					{
-						PreserveDirectoryStructure = true,
-					};
-					
-					try
-					{
-						sza.ExtractArchive(outDir);
-						encounteredErrors = false;
+						entry.WriteToDirectory(outDir, new ExtractionOptions{ PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
 					}
-					catch
-					{
-						encounteredErrors = true;
-					}
-					
+					encounteredErrors = false;
 					sza.Dispose();
 				}
 
@@ -233,8 +223,6 @@ namespace SabreTools.Helper.Tools
 		/// <returns>Name of the extracted file, null on error</returns>
 		public static string ExtractItem(string input, string entryName, string tempDir)
 		{
-			// Set internal variables
-			SevenZipBase.SetLibraryPath("7za.dll");
 			string realEntry = "";
 
 			// Set the real entry name
@@ -254,13 +242,13 @@ namespace SabreTools.Helper.Tools
 				switch (at)
 				{
 					case ArchiveType.SevenZip:
-						SevenZipExtractor sza = new SevenZipExtractor(input);
-						foreach (ArchiveFileInfo entry in sza.ArchiveFileData)
+						SevenZipArchive sza = SevenZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
+						foreach (SevenZipArchiveEntry entry in sza.Entries)
 						{
-							Globals.Logger.Verbose("Current entry name: '" + entry.FileName + "'");
-							if (entry != null && !entry.IsDirectory && entry.FileName.Contains(entryName))
+							Globals.Logger.Verbose("Current entry name: '" + entry.Key + "'");
+							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
 							{
-								realEntry = entry.FileName;
+								realEntry = entry.Key;
 
 								// Get the output path
 								realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
@@ -270,7 +258,7 @@ namespace SabreTools.Helper.Tools
 								}
 
 								// Write the file out
-								sza.ExtractFile(entry.Index, File.OpenWrite(realEntry));
+								entry.WriteToFile(realEntry);
 								break;
 							}
 						}
@@ -415,8 +403,6 @@ namespace SabreTools.Helper.Tools
 		/// <returns>List of RomData objects representing the found data</returns>
 		public static List<Rom> GetArchiveFileInfo(string input)
 		{
-			// Set internal variables
-			SevenZipBase.SetLibraryPath("7za.dll");
 			List<Rom> roms = new List<Rom>();
 			string gamename = Path.GetFileNameWithoutExtension(input);
 
@@ -458,20 +444,20 @@ namespace SabreTools.Helper.Tools
 				switch (at)
 				{
 					case ArchiveType.SevenZip:
-						SevenZipExtractor sza = new SevenZipExtractor(input);
-						foreach (ArchiveFileInfo entry in sza.ArchiveFileData)
+						SevenZipArchive sza = SevenZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
+						foreach (SevenZipArchiveEntry entry in sza.Entries)
 						{
 							if (entry != null && !entry.IsDirectory)
 							{
-								Globals.Logger.Verbose("Entry found: '" + entry.FileName + "': "
-									+ (size == 0 ? (long)entry.Size : size) + ", "
+								Globals.Logger.Verbose("Entry found: '" + entry.Key + "': "
+									+ (size == 0 ? entry.Size : size) + ", "
 									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
 
 								roms.Add(new Rom
 								{
 									Type = ItemType.Rom,
-									Name = entry.FileName,
-									Size = (size == 0 ? (long)entry.Size : size),
+									Name = entry.Key,
+									Size = (size == 0 ? entry.Size : size),
 									CRC = (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
 
 									Machine = new Machine
@@ -1089,8 +1075,6 @@ namespace SabreTools.Helper.Tools
 		/// <returns>0 if the file isn't 7z, 1 if the file is t7z, 2 if the file is 7z</returns>
 		public static int IsT7z(string filename)
 		{
-			// Set internal variables
-			SevenZipBase.SetLibraryPath("7za.dll");
 			int ist7z = 0;
 
 			if (File.Exists(filename))
