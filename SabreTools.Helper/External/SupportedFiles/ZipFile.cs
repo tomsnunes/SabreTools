@@ -427,7 +427,7 @@ namespace ROMVault2.SupportedFiles.Zip
 				}
 
 				// Now try to open the file for reading
-				_zipstream = File.OpenRead(filename);
+				_zipstream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 				int read = _zipstream.Read(new byte[1], 0, 1);
 				if (read != 1)
 				{

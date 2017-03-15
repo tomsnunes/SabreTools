@@ -267,7 +267,7 @@ namespace Ionic.Zlib
 		/// <example>
 		///   This example shows how to use a GZipStream to compress data.
 		/// <code>
-		/// using (System.IO.Stream input = System.IO.File.OpenRead(fileToCompress))
+		/// using (System.IO.Stream input = System.IO.File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 		/// {
 		///	 using (var raw = System.IO.File.Create(outputFile))
 		///	 {
@@ -285,7 +285,7 @@ namespace Ionic.Zlib
 		/// </code>
 		/// <code lang="VB">
 		/// Dim outputFile As String = (fileToCompress &amp; ".compressed")
-		/// Using input As Stream = File.OpenRead(fileToCompress)
+		/// Using input As Stream = File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
 		///	 Using raw As FileStream = File.Create(outputFile)
 		///	 Using compressor As Stream = New GZipStream(raw, CompressionMode.Compress)
 		///		 Dim buffer As Byte() = New Byte(4096) {}
@@ -312,7 +312,7 @@ namespace Ionic.Zlib
 		///	 var DecompressedFile = filename.Substring(0,filename.Length-3);
 		///	 byte[] working = new byte[WORKING_BUFFER_SIZE];
 		///	 int n= 1;
-		///	 using (System.IO.Stream input = System.IO.File.OpenRead(filename))
+		///	 using (System.IO.Stream input = System.IO.File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 		///	 {
 		///		 using (Stream decompressor= new Ionic.Zlib.GZipStream(input, CompressionMode.Decompress, true))
 		///		 {
@@ -340,7 +340,7 @@ namespace Ionic.Zlib
 		///	 Dim DecompressedFile as String = filename.Substring(0,filename.Length-3)
 		///	 Dim working(WORKING_BUFFER_SIZE) as Byte
 		///	 Dim n As Integer = 1
-		///	 Using input As Stream = File.OpenRead(filename)
+		///	 Using input As Stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
 		///		 Using decompressor As Stream = new Ionic.Zlib.GZipStream(input, CompressionMode.Decompress, True)
 		///			 Using output As Stream = File.Create(UncompressedFile)
 		///				 Do
@@ -384,7 +384,7 @@ namespace Ionic.Zlib
 		/// This example shows how to use a <c>GZipStream</c> to compress a file into a .gz file.
 		///
 		/// <code>
-		/// using (System.IO.Stream input = System.IO.File.OpenRead(fileToCompress))
+		/// using (System.IO.Stream input = System.IO.File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 		/// {
 		///	 using (var raw = System.IO.File.Create(fileToCompress + ".gz"))
 		///	 {
@@ -404,7 +404,7 @@ namespace Ionic.Zlib
 		/// </code>
 		///
 		/// <code lang="VB">
-		/// Using input As Stream = File.OpenRead(fileToCompress)
+		/// Using input As Stream = File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
 		///	 Using raw As FileStream = File.Create(fileToCompress &amp; ".gz")
 		///		 Using compressor As Stream = New GZipStream(raw, CompressionMode.Compress, CompressionLevel.BestCompression)
 		///			 Dim buffer As Byte() = New Byte(4096) {}
@@ -512,7 +512,7 @@ namespace Ionic.Zlib
 		/// <example>
 		///   This example shows how to use a <c>GZipStream</c> to compress data.
 		/// <code>
-		/// using (System.IO.Stream input = System.IO.File.OpenRead(fileToCompress))
+		/// using (System.IO.Stream input = System.IO.File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 		/// {
 		///	 using (var raw = System.IO.File.Create(outputFile))
 		///	 {
@@ -530,7 +530,7 @@ namespace Ionic.Zlib
 		/// </code>
 		/// <code lang="VB">
 		/// Dim outputFile As String = (fileToCompress &amp; ".compressed")
-		/// Using input As Stream = File.OpenRead(fileToCompress)
+		/// Using input As Stream = File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
 		///	 Using raw As FileStream = File.Create(outputFile)
 		///	 Using compressor As Stream = New GZipStream(raw, CompressionMode.Compress, CompressionLevel.BestCompression, True)
 		///		 Dim buffer As Byte() = New Byte(4096) {}
@@ -785,7 +785,7 @@ namespace Ionic.Zlib
 		/// <example>
 		/// <code>
 		/// byte[] working = new byte[WORKING_BUFFER_SIZE];
-		/// using (System.IO.Stream input = System.IO.File.OpenRead(_CompressedFile))
+		/// using (System.IO.Stream input = System.IO.File.Open(_CompressedFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 		/// {
 		///	 using (Stream decompressor= new Ionic.Zlib.GZipStream(input, CompressionMode.Decompress, true))
 		///	 {

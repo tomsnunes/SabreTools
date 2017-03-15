@@ -185,7 +185,7 @@ namespace Ionic.Zlib
 		/// byte[] buffer = new byte[WORKING_BUFFER_SIZE];
 		/// int n= -1;
 		/// String outputFile = fileToCompress + ".compressed";
-		/// using (System.IO.Stream input = System.IO.File.OpenRead(fileToCompress))
+		/// using (System.IO.Stream input = System.IO.File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 		/// {
 		///	 using (var raw = System.IO.File.Create(outputFile))
 		///	 {
@@ -203,7 +203,7 @@ namespace Ionic.Zlib
 		/// Dim buffer As Byte() = New Byte(4096) {}
 		/// Dim n As Integer = -1
 		/// Dim outputFile As String = (fileToCompress &amp; ".compressed")
-		/// Using input As Stream = File.OpenRead(fileToCompress)
+		/// Using input As Stream = File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
 		///	 Using raw As FileStream = File.Create(outputFile)
 		///		 Using compressor As Stream = New ParallelDeflateOutputStream(raw)
 		///			 Do While (n &lt;&gt; 0)
@@ -826,7 +826,7 @@ namespace Ionic.Zlib
 		/// foreach (var inputFile in listOfFiles)
 		/// {
 		///	 string outputFile = inputFile + ".compressed";
-		///	 using (System.IO.Stream input = System.IO.File.OpenRead(inputFile))
+		///	 using (System.IO.Stream input = System.IO.File.Open(inputFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 		///	 {
 		///		 using (var outStream = System.IO.File.Create(outputFile))
 		///		 {

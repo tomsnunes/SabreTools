@@ -805,7 +805,7 @@ namespace SabreTools.Helper.Tools
 		{
 			// Read the BOM
 			var bom = new byte[4];
-			FileStream file = File.OpenRead(filename);
+			FileStream file = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 			file.Read(bom, 0, 4);
 			file.Dispose();
 

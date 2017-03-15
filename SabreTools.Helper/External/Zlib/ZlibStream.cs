@@ -89,7 +89,7 @@ namespace Ionic.Zlib
 		/// This example uses a <c>ZlibStream</c> to compress a file, and writes the
 		/// compressed data to another file.
 		/// <code>
-		/// using (System.IO.Stream input = System.IO.File.OpenRead(fileToCompress))
+		/// using (System.IO.Stream input = System.IO.File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 		/// {
 		///	 using (var raw = System.IO.File.Create(fileToCompress + ".zlib"))
 		///	 {
@@ -106,7 +106,7 @@ namespace Ionic.Zlib
 		/// }
 		/// </code>
 		/// <code lang="VB">
-		/// Using input As Stream = File.OpenRead(fileToCompress)
+		/// Using input As Stream = File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
 		///	 Using raw As FileStream = File.Create(fileToCompress &amp; ".zlib")
 		///	 Using compressor As Stream = New ZlibStream(raw, CompressionMode.Compress)
 		///		 Dim buffer As Byte() = New Byte(4096) {}
@@ -149,7 +149,7 @@ namespace Ionic.Zlib
 		///   compressed data to another file.
 		///
 		/// <code>
-		/// using (System.IO.Stream input = System.IO.File.OpenRead(fileToCompress))
+		/// using (System.IO.Stream input = System.IO.File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 		/// {
 		///	 using (var raw = System.IO.File.Create(fileToCompress + ".zlib"))
 		///	 {
@@ -169,7 +169,7 @@ namespace Ionic.Zlib
 		/// </code>
 		///
 		/// <code lang="VB">
-		/// Using input As Stream = File.OpenRead(fileToCompress)
+		/// Using input As Stream = File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
 		///	 Using raw As FileStream = File.Create(fileToCompress &amp; ".zlib")
 		///		 Using compressor As Stream = New ZlibStream(raw, CompressionMode.Compress, CompressionLevel.BestCompression)
 		///			 Dim buffer As Byte() = New Byte(4096) {}
@@ -267,7 +267,7 @@ namespace Ionic.Zlib
 		/// <code>
 		/// using (var output = System.IO.File.Create(fileToCompress + ".zlib"))
 		/// {
-		///	 using (System.IO.Stream input = System.IO.File.OpenRead(fileToCompress))
+		///	 using (System.IO.Stream input = System.IO.File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 		///	 {
 		///		 using (Stream compressor = new ZlibStream(output, CompressionMode.Compress, CompressionLevel.BestCompression, true))
 		///		 {
@@ -284,7 +284,7 @@ namespace Ionic.Zlib
 		/// </code>
 		/// <code lang="VB">
 		/// Using output As FileStream = File.Create(fileToCompress &amp; ".zlib")
-		///	 Using input As Stream = File.OpenRead(fileToCompress)
+		///	 Using input As Stream = File.Open(fileToCompress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
 		///		 Using compressor As Stream = New ZlibStream(output, CompressionMode.Compress, CompressionLevel.BestCompression, True)
 		///			 Dim buffer As Byte() = New Byte(4096) {}
 		///			 Dim n As Integer = -1

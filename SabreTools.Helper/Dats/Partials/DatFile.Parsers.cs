@@ -226,7 +226,7 @@ namespace SabreTools.Helper.Dats
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+			StreamReader sr = new StreamReader(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), enc);
 
 			sr.ReadLine(); // Skip the first line since it's the header
 			while (!sr.EndOfStream)
@@ -317,7 +317,7 @@ namespace SabreTools.Helper.Dats
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+			StreamReader sr = new StreamReader(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), enc);
 
 			bool block = false, superdat = false;
 			string blockname = "", tempgamename = "", gamedesc = "", cloneof = "",
@@ -933,7 +933,7 @@ namespace SabreTools.Helper.Dats
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+			StreamReader sr = new StreamReader(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), enc);
 
 			// Create an empty list of columns to parse though
 			List<string> columns = new List<string>();
@@ -2441,7 +2441,7 @@ namespace SabreTools.Helper.Dats
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+			StreamReader sr = new StreamReader(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), enc);
 
 			while (!sr.EndOfStream)
 			{
@@ -2500,7 +2500,7 @@ namespace SabreTools.Helper.Dats
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+			StreamReader sr = new StreamReader(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), enc);
 
 			while (!sr.EndOfStream)
 			{
@@ -2559,7 +2559,7 @@ namespace SabreTools.Helper.Dats
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+			StreamReader sr = new StreamReader(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), enc);
 
 			while (!sr.EndOfStream)
 			{
@@ -2618,7 +2618,7 @@ namespace SabreTools.Helper.Dats
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+			StreamReader sr = new StreamReader(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), enc);
 
 			while (!sr.EndOfStream)
 			{
@@ -2677,7 +2677,7 @@ namespace SabreTools.Helper.Dats
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+			StreamReader sr = new StreamReader(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), enc);
 
 			while (!sr.EndOfStream)
 			{
@@ -2736,7 +2736,7 @@ namespace SabreTools.Helper.Dats
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+			StreamReader sr = new StreamReader(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), enc);
 
 			while (!sr.EndOfStream)
 			{
@@ -2797,7 +2797,7 @@ namespace SabreTools.Helper.Dats
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(File.OpenRead(filename), enc);
+			StreamReader sr = new StreamReader(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), enc);
 
 			string blocktype = "";
 			while (!sr.EndOfStream)

@@ -221,7 +221,7 @@ namespace SabreTools.Helper.Tools
 				{
 					// Create the input and output streams
 					MemoryStream outputStream = new MemoryStream();
-					FileStream inputStream = File.OpenRead(input);
+					FileStream inputStream = File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
 					// Transform the stream and get the information from it
 					rule.TransformStream(inputStream, outputStream, keepReadOpen: false, keepWriteOpen: true);
@@ -319,8 +319,8 @@ namespace SabreTools.Helper.Tools
 				return;
 			}
 
-			FileStream fsr = File.OpenRead(input);
-			FileStream fsw = File.OpenWrite(output);
+			FileStream fsr = File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+			FileStream fsw = File.Open(output, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
 
 			AppendBytesToStream(fsr, fsw, bytesToAddToHead, bytesToAddToTail);
 
@@ -381,7 +381,7 @@ namespace SabreTools.Helper.Tools
 
 			// Get the header bytes from the file first
 			string hstr = string.Empty;
-			BinaryReader br = new BinaryReader(File.OpenRead(file));
+			BinaryReader br = new BinaryReader(File.Open(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 
 			// Extract the header as a string for the database
 			byte[] hbin = br.ReadBytes((int)rule.StartOffset);

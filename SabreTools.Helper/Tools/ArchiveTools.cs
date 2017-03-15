@@ -80,7 +80,7 @@ namespace SabreTools.Helper.Tools
 					Directory.CreateDirectory(outDir);
 
 					// Extract all files to the temp directory
-					SevenZipArchive sza = SevenZipArchive.Open(File.OpenRead(input));
+					SevenZipArchive sza = SevenZipArchive.Open(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 					foreach (SevenZipArchiveEntry entry in sza.Entries)
 					{
 						entry.WriteToDirectory(outDir, new ExtractionOptions{ PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
@@ -99,7 +99,7 @@ namespace SabreTools.Helper.Tools
 
 					// Decompress the input stream
 					FileStream outstream = File.Create(Path.Combine(outDir, Path.GetFileNameWithoutExtension(input)));
-					GZipStream gzstream = new GZipStream(File.OpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
+					GZipStream gzstream = new GZipStream(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), Ionic.Zlib.CompressionMode.Decompress);
 					gzstream.CopyTo(outstream);
 
 					// Dispose of the streams
@@ -180,7 +180,7 @@ namespace SabreTools.Helper.Tools
 							continue;
 						}
 
-						FileStream writeStream = File.OpenWrite(Path.Combine(outDir, zf.Entries[i].FileName));
+						FileStream writeStream = File.Open(Path.Combine(outDir, zf.Entries[i].FileName), FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
 
 						byte[] ibuffer = new byte[_bufferSize];
 						int ilen;
@@ -268,7 +268,7 @@ namespace SabreTools.Helper.Tools
 					case ArchiveType.GZip:
 						// Decompress the input stream
 						realEntry = Path.GetFileNameWithoutExtension(input);
-						GZipStream gzstream = new GZipStream(File.OpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
+						GZipStream gzstream = new GZipStream(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), Ionic.Zlib.CompressionMode.Decompress);
 
 						// Get the output path
 						realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
@@ -470,7 +470,7 @@ namespace SabreTools.Helper.Tools
 						break;
 
 					case ArchiveType.GZip:// Get the CRC and size from the file
-						BinaryReader br = new BinaryReader(File.OpenRead(input));
+						BinaryReader br = new BinaryReader(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 						br.BaseStream.Seek(-8, SeekOrigin.End);
 						byte[] headercrc = br.ReadBytes(4);
 						crc = BitConverter.ToString(headercrc.Reverse().ToArray()).Replace("-", string.Empty).ToLowerInvariant();
@@ -617,7 +617,7 @@ namespace SabreTools.Helper.Tools
 			byte[] headermd5; // MD5
 			byte[] headercrc; // CRC
 			ulong headersz; // Int64 size
-			BinaryReader br = new BinaryReader(File.OpenRead(input));
+			BinaryReader br = new BinaryReader(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 			header = br.ReadBytes(12);
 			headermd5 = br.ReadBytes(16);
 			headercrc = br.ReadBytes(4);
@@ -696,7 +696,7 @@ namespace SabreTools.Helper.Tools
 			try
 			{
 				byte[] magic = new byte[8];
-				BinaryReader br = new BinaryReader(File.OpenRead(input));
+				BinaryReader br = new BinaryReader(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 				magic = br.ReadBytes(8);
 				br.Dispose();
 
@@ -863,7 +863,7 @@ namespace SabreTools.Helper.Tools
 				return;
 			}
 
-			BinaryReader br = new BinaryReader(File.OpenRead(input));
+			BinaryReader br = new BinaryReader(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 
 			// Check for the signature first (Skipping the SFX Module)
 			byte[] signature = br.ReadBytes(8);
@@ -1413,7 +1413,7 @@ namespace SabreTools.Helper.Tools
 				else
 				{
 					// Open the old archive for reading
-					Stream oldZipFileStream = File.OpenRead(archiveFileName);
+					Stream oldZipFileStream = File.Open(archiveFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 					oldZipFile = new SevenZipExtractor(oldZipFileStream);
 
 					// Map all inputs to index
@@ -1448,7 +1448,7 @@ namespace SabreTools.Helper.Tools
 						ArchiveFormat = OutArchiveFormat.SevenZip,
 						CompressionLevel = SevenZip.CompressionLevel.Normal,
 					};
-					Stream zipFileStream = File.OpenWrite(tempFile);
+					Stream zipFileStream = File.Open(tempFile, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
 
 					// Get the order for the entries with the new file
 					List<string> keys = inputIndexMap.Keys.ToList();
@@ -1580,7 +1580,7 @@ namespace SabreTools.Helper.Tools
 			if (!File.Exists(outfile))
 			{
 				// Compress the input stream
-				FileStream inputStream = File.OpenRead(input);
+				FileStream inputStream = File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 				FileStream outputStream = File.Open(outfile, FileMode.Create, FileAccess.Write);
 
 				// Open the output file for writing
@@ -1796,7 +1796,7 @@ namespace SabreTools.Helper.Tools
 				else
 				{
 					// Open the old archive for reading
-					Stream oldZipFileStream = File.OpenRead(archiveFileName);
+					Stream oldZipFileStream = File.Open(archiveFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 					oldZipFile = new SevenZipExtractor(oldZipFileStream);
 
 					// Map all inputs to index
@@ -1831,7 +1831,7 @@ namespace SabreTools.Helper.Tools
 						ArchiveFormat = OutArchiveFormat.XZ,
 						CompressionLevel = SevenZip.CompressionLevel.Normal,
 					};
-					Stream zipFileStream = File.OpenWrite(tempFile);
+					Stream zipFileStream = File.Open(tempFile, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
 
 					// Get the order for the entries with the new file
 					List<string> keys = inputIndexMap.Keys.ToList();
