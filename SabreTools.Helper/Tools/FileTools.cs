@@ -235,13 +235,13 @@ namespace SabreTools.Helper.Tools
 				else
 				{
 					long length = new FileInfo(input).Length;
-					rom = GetStreamInfo(File.OpenRead(input), length, omitFromScan, offset, false);
+					rom = GetStreamInfo(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), length, omitFromScan, offset, false);
 				}
 			}
 			else
 			{
 				long length = new FileInfo(input).Length;
-				rom = GetStreamInfo(File.OpenRead(input), length, omitFromScan, offset, false);
+				rom = GetStreamInfo(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), length, omitFromScan, offset, false);
 			}
 
 			// Add unique data from the file
