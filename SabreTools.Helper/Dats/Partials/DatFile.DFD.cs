@@ -92,56 +92,57 @@ namespace SabreTools.Helper.Dats
 				// Now find all folders that are empty, if we are supposed to
 				if (!Romba && addBlanks)
 				{
-					List<string> empties = Directory.EnumerateDirectories(basePath, "*", SearchOption.AllDirectories).ToList();
+					List<string> empties = Directory
+						.EnumerateDirectories(basePath, "*", SearchOption.AllDirectories)
+						.Where(dir => Directory.EnumerateFileSystemEntries(dir, "*", SearchOption.AllDirectories).Count() == 0)
+						.ToList();
+
 					Parallel.ForEach(empties,
 						new ParallelOptions { MaxDegreeOfParallelism = Globals.MaxDegreeOfParallelism },
 						dir =>
 						{
-							if (Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).Count() == 0)
+							// Get the full path for the directory
+							string fulldir = Path.GetFullPath(dir);
+
+							// Set the temporary variables
+							string gamename = "";
+							string romname = "";
+
+							// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
+							if (Type == "SuperDAT")
 							{
-								// Get the full path for the directory
-								string fulldir = Path.GetFullPath(dir);
-
-								// Set the temporary variables
-								string gamename = "";
-								string romname = "";
-
-								// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
-								if (Type == "SuperDAT")
-								{
-									gamename = fulldir.Remove(0, basePath.Length + 1);
-									romname = "-";
-								}
-
-								// Otherwise, we want just the top level folder as the game, and the file as everything else
-								else
-								{
-									gamename = fulldir.Remove(0, basePath.Length + 1).Split(Path.DirectorySeparatorChar)[0];
-									romname = Path.Combine(fulldir.Remove(0, basePath.Length + 1 + gamename.Length), "-");
-								}
-
-								// Sanitize the names
-								if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
-								{
-									gamename = gamename.Substring(1);
-								}
-								if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
-								{
-									gamename = gamename.Substring(0, gamename.Length - 1);
-								}
-								if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
-								{
-									romname = romname.Substring(1);
-								}
-								if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
-								{
-									romname = romname.Substring(0, romname.Length - 1);
-								}
-
-								Globals.Logger.Verbose("Adding blank empty folder: " + gamename);
-								this["null"].Add(new Rom(romname, gamename));
+								gamename = fulldir.Remove(0, basePath.Length + 1);
+								romname = "-";
 							}
-						});
+
+							// Otherwise, we want just the top level folder as the game, and the file as everything else
+							else
+							{
+								gamename = fulldir.Remove(0, basePath.Length + 1).Split(Path.DirectorySeparatorChar)[0];
+								romname = Path.Combine(fulldir.Remove(0, basePath.Length + 1 + gamename.Length), "-");
+							}
+
+							// Sanitize the names
+							if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
+							{
+								gamename = gamename.Substring(1);
+							}
+							if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
+							{
+								gamename = gamename.Substring(0, gamename.Length - 1);
+							}
+							if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
+							{
+								romname = romname.Substring(1);
+							}
+							if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
+							{
+								romname = romname.Substring(0, romname.Length - 1);
+							}
+
+							Globals.Logger.Verbose("Adding blank empty folder: " + gamename);
+							this["null"].Add(new Rom(romname, gamename, omitFromScan));
+					});
 				}
 			}
 			else if (File.Exists(basePath))
