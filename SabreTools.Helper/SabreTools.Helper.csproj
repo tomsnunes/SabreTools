@@ -124,6 +124,7 @@
     <Compile Include="External\NaturalSort\NaturalComparer.cs" />
     <Compile Include="External\NaturalSort\NaturalReversedComparer.cs" />
     <Compile Include="External\OptimizedCRC.cs" />
+    <Compile Include="External\Traverse.cs" />
     <Compile Include="External\xxHash.cs" />
     <Compile Include="External\Zlib\CRC32.cs" />
     <Compile Include="External\Zlib\Deflate.cs" />
