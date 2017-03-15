@@ -36,31 +36,6 @@ namespace SabreTools.Helper.Tools
 		#region File Information
 
 		/// <summary>
-		/// Retrieve a list of files from a directory recursively in proper order
-		/// </summary>
-		/// <param name="directory">Directory to parse</param>
-		/// <param name="infiles">List representing existing files</param>
-		/// <returns>List with all new files</returns>
-		public static List<string> RetrieveFiles(string directory, List<string> infiles)
-		{
-			// Take care of the files in the top directory
-			List<string> toadd = Directory.EnumerateFiles(directory, "*", SearchOption.TopDirectoryOnly).ToList();
-			toadd.Sort(new NaturalComparer());
-			infiles.AddRange(toadd);
-
-			// Then recurse through and add from the directories
-			List<string> dirs = Directory.EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly).ToList();
-			dirs = Style.OrderByAlphaNumeric(dirs, s => s).ToList();
-			foreach (string dir in dirs)
-			{
-				infiles = RetrieveFiles(dir, infiles);
-			}
-
-			// Return the new list
-			return infiles;
-		}
-
-		/// <summary>
 		/// Get what type of DAT the input file is
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
@@ -194,6 +169,30 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
+		/// Get all empty folders within a root folder
+		/// </summary>
+		/// <param name="root">Root directory to parse</param>
+		/// <returns>IEumerable containing all directories that are empty, an empty enumerable if the root is empty, null otherwise</returns>
+		public static IEnumerable<string> GetEmptyDirectories(string root)
+		{
+			// Check if the root exists first
+			if (!Directory.Exists(root))
+			{
+				return null;
+			}
+
+			// If it does and it is empty, return a blank enumerable
+			if (Directory.EnumerateFileSystemEntries(root, "*", SearchOption.AllDirectories).Count() == 0)
+			{
+				return new List<string>();
+			}
+
+			// Otherwise, get the complete list
+			return Directory.EnumerateDirectories(root, "*", SearchOption.AllDirectories)
+				.Where(dir => Directory.EnumerateFileSystemEntries(dir, "*", SearchOption.AllDirectories).Count() == 0);
+		}
+
+		/// <summary>
 		/// Retrieve file information for a single file
 		/// </summary>
 		/// <param name="input">Filename to get information from</param>
@@ -248,6 +247,31 @@ namespace SabreTools.Helper.Tools
 			rom.Date = (date ? new FileInfo(input).LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : "");
 
 			return rom;
+		}
+
+		/// <summary>
+		/// Retrieve a list of files from a directory recursively in proper order
+		/// </summary>
+		/// <param name="directory">Directory to parse</param>
+		/// <param name="infiles">List representing existing files</param>
+		/// <returns>List with all new files</returns>
+		public static List<string> RetrieveFiles(string directory, List<string> infiles)
+		{
+			// Take care of the files in the top directory
+			List<string> toadd = Directory.EnumerateFiles(directory, "*", SearchOption.TopDirectoryOnly).ToList();
+			toadd.Sort(new NaturalComparer());
+			infiles.AddRange(toadd);
+
+			// Then recurse through and add from the directories
+			List<string> dirs = Directory.EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly).ToList();
+			dirs = Style.OrderByAlphaNumeric(dirs, s => s).ToList();
+			foreach (string dir in dirs)
+			{
+				infiles = RetrieveFiles(dir, infiles);
+			}
+
+			// Return the new list
+			return infiles;
 		}
 
 		#endregion

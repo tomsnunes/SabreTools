@@ -92,11 +92,7 @@ namespace SabreTools.Helper.Dats
 				// Now find all folders that are empty, if we are supposed to
 				if (!Romba && addBlanks)
 				{
-					List<string> empties = Directory
-						.EnumerateDirectories(basePath, "*", SearchOption.AllDirectories)
-						.Where(dir => Directory.EnumerateFileSystemEntries(dir, "*", SearchOption.AllDirectories).Count() == 0)
-						.ToList();
-
+					List<string> empties = FileTools.GetEmptyDirectories(basePath).ToList();
 					Parallel.ForEach(empties,
 						Globals.ParallelOptions,
 						dir =>
@@ -278,11 +274,7 @@ namespace SabreTools.Helper.Dats
 					if (addBlanks)
 					{
 						// Get the list of empty directories
-						List<string> empties = Directory
-							.EnumerateDirectories(tempSubDir, "*", SearchOption.AllDirectories)
-							.Where(dir => Directory.EnumerateFileSystemEntries(dir, "*", SearchOption.AllDirectories).Count() == 0)
-							.ToList();
-
+						List<string> empties = FileTools.GetEmptyDirectories(tempSubDir).ToList();
 						Parallel.ForEach(empties,
 							Globals.ParallelOptions,
 							dir =>
