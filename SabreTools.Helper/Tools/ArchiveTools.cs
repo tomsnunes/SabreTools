@@ -572,6 +572,187 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
+		/// Generate a list of RomData objects from the header values in an archive
+		/// </summary>
+		/// <param name="input">Input file to get data from</param>
+		/// <returns>List of RomData objects representing the found data</returns>
+		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
+		public static List<Rom> GetExtendedArchiveFileInfo(string input, Hash omitFromScan = Hash.DeepHashes)
+		{
+			List<Rom> found = new List<Rom>();
+
+			// First get the archive type
+			ArchiveType? at = GetCurrentArchiveType(input);
+
+			// If we got back null, then it's not an archive, so we we return
+			if (at == null)
+			{
+				return null;
+			}
+
+			try
+			{
+				Globals.Logger.Verbose("Found archive of type: " + at);
+
+				switch (at)
+				{
+					// 7-zip
+					case ArchiveType.SevenZip:
+						SevenZipArchive sza = SevenZipArchive.Open(FileTools.TryOpenRead(input));
+						foreach (SevenZipArchiveEntry entry in sza.Entries)
+						{
+							// Create and populate the entry stream
+							MemoryStream entryStream = new MemoryStream();
+							entry.WriteTo(entryStream);
+
+							// Get and add the extended Rom information
+							Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
+							sevenZipEntryRom.Name = entry.Key;
+							sevenZipEntryRom.Machine = new Machine()
+							{
+								Name = Path.GetFileNameWithoutExtension(input),
+								Description = Path.GetFileNameWithoutExtension(input),
+							};
+							sevenZipEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
+							found.Add(sevenZipEntryRom);
+						}
+
+						// Dispose of the archive
+						sza.Dispose();
+						break;
+
+					// GZip
+					case ArchiveType.GZip:
+						// Create and populate the entry stream
+						MemoryStream outstream = new MemoryStream();
+						GZipStream gzstream = new GZipStream(FileTools.TryOpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
+						gzstream.CopyTo(outstream);
+
+						// Get and add the extended Rom information
+						Rom gzipEntryRom = FileTools.GetStreamInfo(outstream, outstream.Length, omitFromScan: omitFromScan);
+						gzipEntryRom.Name = gzstream.FileName;
+						gzipEntryRom.Machine = new Machine()
+						{
+							Name = Path.GetFileNameWithoutExtension(input),
+							Description = Path.GetFileNameWithoutExtension(input),
+						};
+						gzipEntryRom.Date = gzstream.LastModified?.ToString("yyyy/MM/dd hh:mm:ss");
+						found.Add(gzipEntryRom);
+
+						// Dispose of the archive
+						gzstream.Dispose();
+						break;
+
+					// RAR
+					case ArchiveType.Rar:
+						RarArchive ra = RarArchive.Open(input);
+						foreach (RarArchiveEntry entry in ra.Entries)
+						{
+							// Create and populate the entry stream
+							MemoryStream entryStream = new MemoryStream();
+							entry.WriteTo(entryStream);
+
+							// Get and add the extended Rom information
+							Rom rarEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
+							rarEntryRom.Name = entry.Key;
+							rarEntryRom.Machine = new Machine()
+							{
+								Name = Path.GetFileNameWithoutExtension(input),
+								Description = Path.GetFileNameWithoutExtension(input),
+							};
+							rarEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
+							found.Add(rarEntryRom);
+						}
+						
+						// Dispose of the archive
+						ra.Dispose();
+						break;
+
+					// TAR
+					case ArchiveType.Tar:
+						// Extract all files to the temp directory
+						TarArchive ta = TarArchive.Open(input);
+						foreach (TarArchiveEntry entry in ta.Entries)
+						{
+							// Create and populate the entry stream
+							MemoryStream entryStream = new MemoryStream();
+							entry.WriteTo(entryStream);
+
+							// Get and add the extended Rom information
+							Rom tarEntryName = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
+							tarEntryName.Name = entry.Key;
+							tarEntryName.Machine = new Machine()
+							{
+								Name = Path.GetFileNameWithoutExtension(input),
+								Description = Path.GetFileNameWithoutExtension(input),
+							};
+							tarEntryName.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
+							found.Add(tarEntryName);
+						}
+
+						// Dispose of the archive
+						ta.Dispose();
+						break;
+
+					// Zip
+					case ArchiveType.Zip:
+						ZipFile zf = new ZipFile();
+						ZipReturn zr = zf.Open(input, new FileInfo(input).LastWriteTime.Ticks, true);
+						if (zr != ZipReturn.ZipGood)
+						{
+							throw new Exception(ZipFile.ZipErrorMessageText(zr));
+						}
+
+						for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
+						{
+							// Open the read stream
+							zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Helper.Data.CompressionMethod cm, out uint lastMod);
+
+							// If the entry ends with a directory separator, continue to the next item, if any
+							if (zf.Entries[i].FileName.EndsWith(Path.DirectorySeparatorChar.ToString())
+								|| zf.Entries[i].FileName.EndsWith(Path.AltDirectorySeparatorChar.ToString())
+								|| zf.Entries[i].FileName.EndsWith(Path.PathSeparator.ToString()))
+							{
+								continue;
+							}
+
+							MemoryStream entryStream = new MemoryStream();
+
+							byte[] ibuffer = new byte[_bufferSize];
+							int ilen;
+							while ((ilen = readStream.Read(ibuffer, 0, _bufferSize)) > 0)
+							{
+								entryStream.Write(ibuffer, 0, ilen);
+								entryStream.Flush();
+							}
+							zr = zf.CloseReadStream();
+
+							// Get and add the extended Rom information
+							Rom rarEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
+							rarEntryRom.Name = zf.Entries[i].FileName;
+							rarEntryRom.Machine = new Machine()
+							{
+								Name = Path.GetFileNameWithoutExtension(input),
+								Description = Path.GetFileNameWithoutExtension(input),
+							};
+							rarEntryRom.Date = zf.Entries[i].LastMod.ToString("yyyy/MM/dd hh:mm:ss"); // TODO: Fix this from ticks
+							found.Add(rarEntryRom);
+						}
+
+						// Dispose of the archive
+						zf.Close();
+						break;
+				}
+			}
+			catch (Exception)
+			{
+				// Don't log file open errors
+			}
+
+			return found;
+		}
+
+		/// <summary>
 		/// Retrieve file information for a single torrent GZ file
 		/// </summary>
 		/// <param name="input">Filename to get information from</param>
