@@ -813,6 +813,13 @@ namespace SabreTools
 					case "--rom-type":
 						filter.RomTypes.Add(args[++i]);
 						break;
+					case "-sa":
+					case "--scan-all":
+						sevenzip = 0;
+						gz = 0;
+						rar = 0;
+						zip = 0;
+						break;
 					case "-seq":
 					case "--equal":
 						filter.SizeEqualTo = GetSizeFromString(args[++i]);

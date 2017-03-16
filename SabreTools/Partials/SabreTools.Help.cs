@@ -453,6 +453,11 @@ namespace SabreTools
 				"Set scanning level for ZIP archives (default 1)",
 				FeatureType.String,
 				null));
+			sort.AddFeature("scan-all", new Feature(
+				new List<string>() { "-sa", "--scan-all" },
+				"Set scanning levels for all archives to 0",
+				FeatureType.Flag,
+				null));
 			sort.AddFeature("dat-merged", new Feature(
 				new List<string>() { "-dm", "--dat-merged" },
 				"Force creating merged sets",

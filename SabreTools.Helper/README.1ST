@@ -501,6 +501,11 @@ Options:
 				1	Only hash contents of the archive
 				2	Only hash archive itself (treat like a regular file)
 				
+		-sa, --scan-all		Set scanning levels for all archives to 0
+			This flag is the short equivalent to -7z=0 -gz=0 -rar=0 -zip=0 wrapped up. Generally
+			this will be helpful in all cases where the content of the rebuild folder is not
+			entirely known or is known to be mixed.
+				
 		-dm, --dat-merged	Force creating merged sets in the output
 			Preprocess the DAT to have parent sets contain all items from the children based
 			on the cloneof tag. This is incompatible with the other --dat-X flags.
