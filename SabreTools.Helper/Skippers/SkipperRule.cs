@@ -11,10 +11,6 @@ using Alphaleonis.Win32.Filesystem;
 
 using BinaryReader = System.IO.BinaryReader;
 using BinaryWriter = System.IO.BinaryWriter;
-using FileAccess = System.IO.FileAccess;
-using FileMode = System.IO.FileMode;
-using FileShare = System.IO.FileShare;
-using FileStream = System.IO.FileStream;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
@@ -54,12 +50,12 @@ namespace SabreTools.Helper.Skippers
 			}
 
 			Globals.Logger.User("Attempting to apply rule to '" + input + "'");
-			success = TransformStream(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), File.Open(output, FileMode.Open, FileAccess.Write, FileShare.ReadWrite));
+			success = TransformStream(FileTools.TryOpenRead(input), FileTools.TryOpenWrite(output));
 
 			// If the output file has size 0, delete it
 			if (new FileInfo(output).Length == 0)
 			{
-				FileTools.SafeTryDeleteFile(output);
+				FileTools.TryDeleteFile(output);
 				success = false;
 			}
 

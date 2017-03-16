@@ -151,7 +151,7 @@ namespace SabreTools.Helper.Dats
 			Globals.Logger.User("Cleaning temp folder");
 			if (tempDir != Path.GetTempPath())
 			{
-				FileTools.SafeTryDeleteDirectory(tempDir);
+				FileTools.TryDeleteDirectory(tempDir);
 			}
 
 			return true;
@@ -326,11 +326,11 @@ namespace SabreTools.Helper.Dats
 			// Cue to delete the file if it's a copy
 			if (copyFiles && item != newItem)
 			{
-				FileTools.SafeTryDeleteDirectory(newBasePath);
+				FileTools.TryDeleteDirectory(newBasePath);
 			}
 
 			// Delete the sub temp directory
-			FileTools.SafeTryDeleteDirectory(tempSubDir);
+			FileTools.TryDeleteDirectory(tempSubDir);
 		}
 
 		/// <summary>

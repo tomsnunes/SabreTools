@@ -14,8 +14,6 @@ using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
 
-using FileAccess = System.IO.FileAccess;
-using FileMode = System.IO.FileMode;
 using SearchOption = System.IO.SearchOption;
 using StreamWriter = System.IO.StreamWriter;
 #endif
@@ -85,7 +83,7 @@ namespace RombaSharp
 		{
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
 			dbc.Open();
-			StreamWriter sw = new StreamWriter(File.Open("export.csv", FileMode.Create, FileAccess.Write));
+			StreamWriter sw = new StreamWriter(FileTools.TryCreate("export.csv"));
 
 			sw.WriteLine("\"ID\",\"Size\",\"CRC\",\"MD5\",\"SHA-1\",\"In Depot\",\"DAT Hash\"");
 

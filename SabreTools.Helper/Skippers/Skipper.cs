@@ -347,7 +347,7 @@ namespace SabreTools.Helper.Skippers
 				return new SkipperRule();
 			}
 
-			return GetMatchingRule(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), skipperName);
+			return GetMatchingRule(FileTools.TryOpenRead(input), skipperName);
 		}
 
 		/// <summary>

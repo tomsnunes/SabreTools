@@ -12,8 +12,6 @@ using Alphaleonis.Win32.Filesystem;
 
 using BinaryReader = System.IO.BinaryReader;
 using BinaryWriter = System.IO.BinaryWriter;
-using FileAccess = System.IO.FileAccess;
-using FileMode = System.IO.FileMode;
 using IOException = System.IO.IOException;
 using MemoryStream = System.IO.MemoryStream;
 using PathTooLongException = System.IO.PathTooLongException;
@@ -428,7 +426,7 @@ namespace ROMVault2.SupportedFiles.Zip
 				}
 
 				// Now try to open the file for reading
-				_zipstream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+				_zipstream = FileTools.TryOpenRead(filename);
 				int read = _zipstream.Read(new byte[1], 0, 1);
 				if (read != 1)
 				{
@@ -646,7 +644,7 @@ namespace ROMVault2.SupportedFiles.Zip
 			_zipFileInfo = new FileInfo(filename);
 
 			// Now try to open the file
-			_zipstream = File.Open(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+			_zipstream = File.Open(filename, System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.ReadWrite);
 			ZipOpen = ZipOpenType.OpenWrite;
 			return ZipReturn.ZipGood;
 		}
@@ -759,7 +757,7 @@ namespace ROMVault2.SupportedFiles.Zip
 			_zipstream.Dispose();
 
 			// Delete the failed file
-			FileTools.SafeTryDeleteFile(_zipFileInfo.FullName);
+			FileTools.TryDeleteFile(_zipFileInfo.FullName);
 			_zipFileInfo = null;
 			_zipOpen = ZipOpenType.Closed;
 		}

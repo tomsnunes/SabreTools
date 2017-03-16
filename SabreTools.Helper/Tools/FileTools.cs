@@ -16,6 +16,9 @@ using Alphaleonis.Win32.Filesystem;
 
 using BinaryReader = System.IO.BinaryReader;
 using BinaryWriter = System.IO.BinaryWriter;
+using FileAccess = System.IO.FileAccess;
+using FileMode = System.IO.FileMode;
+using FileShare = System.IO.FileShare;
 using FileStream = System.IO.FileStream;
 using IOException = System.IO.IOException;
 using MemoryStream = System.IO.MemoryStream;
@@ -221,7 +224,7 @@ namespace SabreTools.Helper.Tools
 				{
 					// Create the input and output streams
 					MemoryStream outputStream = new MemoryStream();
-					FileStream inputStream = File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+					FileStream inputStream = FileTools.TryOpenRead(input);
 
 					// Transform the stream and get the information from it
 					rule.TransformStream(inputStream, outputStream, keepReadOpen: false, keepWriteOpen: true);
@@ -235,13 +238,13 @@ namespace SabreTools.Helper.Tools
 				else
 				{
 					long length = new FileInfo(input).Length;
-					rom = GetStreamInfo(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), length, omitFromScan, offset, false);
+					rom = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, false);
 				}
 			}
 			else
 			{
 				long length = new FileInfo(input).Length;
-				rom = GetStreamInfo(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), length, omitFromScan, offset, false);
+				rom = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, false);
 			}
 
 			// Add unique data from the file
@@ -319,8 +322,8 @@ namespace SabreTools.Helper.Tools
 				return;
 			}
 
-			FileStream fsr = File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-			FileStream fsw = File.Open(output, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
+			FileStream fsr = TryOpenRead(input);
+			FileStream fsw = TryOpenWrite(output);
 
 			AppendBytesToStream(fsr, fsw, bytesToAddToHead, bytesToAddToTail);
 
@@ -336,11 +339,11 @@ namespace SabreTools.Helper.Tools
 		{
 			foreach (string file in Directory.EnumerateFiles(dirname, "*", SearchOption.TopDirectoryOnly))
 			{
-				SafeTryDeleteFile(file);
+				TryDeleteFile(file);
 			}
 			foreach (string dir in Directory.EnumerateDirectories(dirname, "*", SearchOption.TopDirectoryOnly))
 			{
-				SafeTryDeleteDirectory(dir);
+				TryDeleteDirectory(dir);
 			}
 		}
 
@@ -373,7 +376,7 @@ namespace SabreTools.Helper.Tools
 
 			// Get the header bytes from the file first
 			string hstr = string.Empty;
-			BinaryReader br = new BinaryReader(File.Open(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+			BinaryReader br = new BinaryReader(TryOpenRead(file));
 
 			// Extract the header as a string for the database
 			byte[] hbin = br.ReadBytes((int)rule.StartOffset);
@@ -521,12 +524,38 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
+		/// Try to create a file for write, optionally throwing the error
+		/// </summary>
+		/// <param name="file">Name of the file to create</param>
+		/// <param name="throwOnError">True if the error that is thrown should be thrown back to the caller, false otherwise</param>
+		/// <returns>An opened stream representing the file on success, null otherwise</returns>
+		public static FileStream TryCreate(string file, bool throwOnError = false)
+		{
+			// Now wrap opening the file
+			try
+			{
+				return File.Open(file, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+			}
+			catch (Exception ex)
+			{
+				if (throwOnError)
+				{
+					throw ex;
+				}
+				else
+				{
+					return null;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Try to safely delete a directory, optionally throwing the error
 		/// </summary>
 		/// <param name="file">Name of the directory to delete</param>
 		/// <param name="throwOnError">True if the error that is thrown should be thrown back to the caller, false otherwise</param>
 		/// <returns>True if the file didn't exist or could be deleted, false otherwise</returns>
-		public static bool SafeTryDeleteDirectory(string file, bool throwOnError = false)
+		public static bool TryDeleteDirectory(string file, bool throwOnError = false)
 		{
 			// Check if the file exists first
 			if (!Directory.Exists(file))
@@ -559,7 +588,7 @@ namespace SabreTools.Helper.Tools
 		/// <param name="file">Name of the file to delete</param>
 		/// <param name="throwOnError">True if the error that is thrown should be thrown back to the caller, false otherwise</param>
 		/// <returns>True if the file didn't exist or could be deleted, false otherwise</returns>
-		public static bool SafeTryDeleteFile(string file, bool throwOnError = false)
+		public static bool TryDeleteFile(string file, bool throwOnError = false)
 		{
 			// Check if the file exists first
 			if (!File.Exists(file))
@@ -582,6 +611,102 @@ namespace SabreTools.Helper.Tools
 				else
 				{
 					return false;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Try to open a file for read, optionally throwing the error
+		/// </summary>
+		/// <param name="file">Name of the file to open</param>
+		/// <param name="throwOnError">True if the error that is thrown should be thrown back to the caller, false otherwise</param>
+		/// <returns>An opened stream representing the file on success, null otherwise</returns>
+		public static FileStream TryOpenRead(string file, bool throwOnError = false)
+		{
+			// Check if the file exists first
+			if (!File.Exists(file))
+			{
+				return null;
+			}
+
+			// Now wrap opening the file
+			try
+			{
+				return File.Open(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+			}
+			catch (Exception ex)
+			{
+				if (throwOnError)
+				{
+					throw ex;
+				}
+				else
+				{
+					return null;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Try to open a file for read/write, optionally throwing the error
+		/// </summary>
+		/// <param name="file">Name of the file to open</param>
+		/// <param name="throwOnError">True if the error that is thrown should be thrown back to the caller, false otherwise</param>
+		/// <returns>An opened stream representing the file on success, null otherwise</returns>
+		public static FileStream TryOpenReadWrite(string file, bool throwOnError = false)
+		{
+			// Check if the file exists first
+			if (!File.Exists(file))
+			{
+				return null;
+			}
+
+			// Now wrap opening the file
+			try
+			{
+				return File.Open(file, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
+			}
+			catch (Exception ex)
+			{
+				if (throwOnError)
+				{
+					throw ex;
+				}
+				else
+				{
+					return null;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Try to open a file for write, optionally throwing the error
+		/// </summary>
+		/// <param name="file">Name of the file to open</param>
+		/// <param name="throwOnError">True if the error that is thrown should be thrown back to the caller, false otherwise</param>
+		/// <returns>An opened stream representing the file on success, null otherwise</returns>
+		public static FileStream TryOpenWrite(string file, bool throwOnError = false)
+		{
+			// Check if the file exists first
+			if (!File.Exists(file))
+			{
+				return null;
+			}
+
+			// Now wrap opening the file
+			try
+			{
+				return File.Open(file, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
+			}
+			catch (Exception ex)
+			{
+				if (throwOnError)
+				{
+					throw ex;
+				}
+				else
+				{
+					return null;
 				}
 			}
 		}

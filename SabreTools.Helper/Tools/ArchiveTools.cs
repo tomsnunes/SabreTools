@@ -14,11 +14,7 @@ using Alphaleonis.Win32.Filesystem;
 using BinaryReader = System.IO.BinaryReader;
 using BinaryWriter = System.IO.BinaryWriter;
 using EndOfStreamException = System.IO.EndOfStreamException;
-using FileAccess = System.IO.FileAccess;
-using FileMode = System.IO.FileMode;
-using FileShare = System.IO.FileShare;
 using FileStream = System.IO.FileStream;
-using MemoryStream = System.IO.MemoryStream;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
@@ -80,7 +76,7 @@ namespace SabreTools.Helper.Tools
 					Directory.CreateDirectory(outDir);
 
 					// Extract all files to the temp directory
-					SevenZipArchive sza = SevenZipArchive.Open(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+					SevenZipArchive sza = SevenZipArchive.Open(FileTools.TryOpenRead(input));
 					foreach (SevenZipArchiveEntry entry in sza.Entries)
 					{
 						entry.WriteToDirectory(outDir, new ExtractionOptions{ PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
@@ -99,7 +95,7 @@ namespace SabreTools.Helper.Tools
 
 					// Decompress the input stream
 					FileStream outstream = File.Create(Path.Combine(outDir, Path.GetFileNameWithoutExtension(input)));
-					GZipStream gzstream = new GZipStream(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), Ionic.Zlib.CompressionMode.Decompress);
+					GZipStream gzstream = new GZipStream(FileTools.TryOpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
 					gzstream.CopyTo(outstream);
 
 					// Dispose of the streams
@@ -180,7 +176,7 @@ namespace SabreTools.Helper.Tools
 							continue;
 						}
 
-						FileStream writeStream = File.Open(Path.Combine(outDir, zf.Entries[i].FileName), FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
+						FileStream writeStream = FileTools.TryOpenWrite(Path.Combine(outDir, zf.Entries[i].FileName));
 
 						byte[] ibuffer = new byte[_bufferSize];
 						int ilen;
@@ -268,7 +264,7 @@ namespace SabreTools.Helper.Tools
 					case ArchiveType.GZip:
 						// Decompress the input stream
 						realEntry = Path.GetFileNameWithoutExtension(input);
-						GZipStream gzstream = new GZipStream(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), Ionic.Zlib.CompressionMode.Decompress);
+						GZipStream gzstream = new GZipStream(FileTools.TryOpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
 
 						// Get the output path
 						realEntry = Path.Combine(Path.GetFullPath(tempDir), realEntry);
@@ -278,7 +274,7 @@ namespace SabreTools.Helper.Tools
 						}
 
 						// Write the file out
-						FileStream gzfileout = File.Open(realEntry, FileMode.Create, FileAccess.Write);
+						FileStream gzfileout = FileTools.TryCreate(realEntry);
 						byte[] gbuffer = new byte[_bufferSize];
 						int glen;
 						while ((glen = gzstream.Read(gbuffer, 0, _bufferSize)) > 0)
@@ -367,7 +363,7 @@ namespace SabreTools.Helper.Tools
 								}
 
 								// Write the file out
-								FileStream zipfileout = File.Open(realEntry, FileMode.Create, FileAccess.Write);
+								FileStream zipfileout = FileTools.TryCreate(realEntry);
 								byte[] zbuffer = new byte[_bufferSize];
 								int zlen;
 								while ((zlen = readStream.Read(zbuffer, 0, _bufferSize)) > 0)
@@ -470,7 +466,7 @@ namespace SabreTools.Helper.Tools
 						break;
 
 					case ArchiveType.GZip:// Get the CRC and size from the file
-						BinaryReader br = new BinaryReader(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+						BinaryReader br = new BinaryReader(FileTools.TryOpenRead(input));
 						br.BaseStream.Seek(-8, SeekOrigin.End);
 						byte[] headercrc = br.ReadBytes(4);
 						crc = BitConverter.ToString(headercrc.Reverse().ToArray()).Replace("-", string.Empty).ToLowerInvariant();
@@ -617,7 +613,7 @@ namespace SabreTools.Helper.Tools
 			byte[] headermd5; // MD5
 			byte[] headercrc; // CRC
 			ulong headersz; // Int64 size
-			BinaryReader br = new BinaryReader(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+			BinaryReader br = new BinaryReader(FileTools.TryOpenRead(input));
 			header = br.ReadBytes(12);
 			headermd5 = br.ReadBytes(16);
 			headercrc = br.ReadBytes(4);
@@ -696,7 +692,7 @@ namespace SabreTools.Helper.Tools
 			try
 			{
 				byte[] magic = new byte[8];
-				BinaryReader br = new BinaryReader(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+				BinaryReader br = new BinaryReader(FileTools.TryOpenRead(input));
 				magic = br.ReadBytes(8);
 				br.Dispose();
 
@@ -863,7 +859,7 @@ namespace SabreTools.Helper.Tools
 				return;
 			}
 
-			BinaryReader br = new BinaryReader(File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+			BinaryReader br = new BinaryReader(FileTools.TryOpenRead(input));
 
 			// Check for the signature first (Skipping the SFX Module)
 			byte[] signature = br.ReadBytes(8);
@@ -1081,7 +1077,7 @@ namespace SabreTools.Helper.Tools
 			{
 				try
 				{
-					Stream fread = File.Open(filename, FileMode.Open, FileAccess.Read);
+					Stream fread = FileTools.TryOpenRead(filename);
 					uint ar, offs = 0;
 					fread.Seek(0, SeekOrigin.Begin);
 					byte[] buffer = new byte[128];
@@ -1290,7 +1286,7 @@ namespace SabreTools.Helper.Tools
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
 			{
-				FileTools.SafeTryDeleteFile(archiveFileName);
+				FileTools.TryDeleteFile(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
 
@@ -1402,14 +1398,14 @@ namespace SabreTools.Helper.Tools
 					}
 
 					FileTools.CleanDirectory(tempPath);
-					FileTools.SafeTryDeleteDirectory(tempPath);
+					FileTools.TryDeleteDirectory(tempPath);
 				}
 
 				// Otherwise, sort the input files and write out in the correct order
 				else
 				{
 					// Open the old archive for reading
-					Stream oldZipFileStream = File.Open(archiveFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+					Stream oldZipFileStream = FileTools.TryOpenRead(archiveFileName);
 					oldZipFile = new SevenZipExtractor(oldZipFileStream);
 
 					// Map all inputs to index
@@ -1444,7 +1440,7 @@ namespace SabreTools.Helper.Tools
 						ArchiveFormat = OutArchiveFormat.SevenZip,
 						CompressionLevel = SevenZip.CompressionLevel.Normal,
 					};
-					Stream zipFileStream = File.Open(tempFile, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
+					Stream zipFileStream = FileTools.TryOpenWrite(tempFile);
 
 					// Get the order for the entries with the new file
 					List<string> keys = inputIndexMap.Keys.ToList();
@@ -1465,12 +1461,12 @@ namespace SabreTools.Helper.Tools
 						// Otherwise, copy the file from the old archive
 						else
 						{
-							Stream oldZipFileEntryStream = File.Open(inputFiles[index], FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+							Stream oldZipFileEntryStream = FileTools.TryOpenReadWrite(inputFiles[index]);
 							oldZipFile.ExtractFile(index, oldZipFileEntryStream);
 							zipFile.CompressFiles(zipFileStream, inputFiles[index]);
 
 							oldZipFileEntryStream.Dispose();
-							FileTools.SafeTryDeleteFile(inputFiles[index]);
+							FileTools.TryDeleteFile(inputFiles[index]);
 						}
 					}
 
@@ -1489,19 +1485,19 @@ namespace SabreTools.Helper.Tools
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
 			{
-				FileTools.SafeTryDeleteFile(archiveFileName);
+				FileTools.TryDeleteFile(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
 
 			// Now make the file T7Z
 			// TODO: Add ACTUAL T7Z compatible code
 
-			BinaryWriter bw = new BinaryWriter(File.Open(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite));
+			BinaryWriter bw = new BinaryWriter(FileTools.TryOpenReadWrite(archiveFileName));
 			bw.Seek(0, SeekOrigin.Begin);
 			bw.Write(Constants.Torrent7ZipHeader);
 			bw.Seek(0, SeekOrigin.End);
 
-			oldZipFile = new SevenZipExtractor(File.Open(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite));
+			oldZipFile = new SevenZipExtractor(FileTools.TryOpenReadWrite(archiveFileName));
 
 			// Get the correct signature to use (Default 0, Unicode 1, SingleFile 2, StripFileNames 4)
 			byte[] tempsig = Constants.Torrent7ZipSignature;
@@ -1572,8 +1568,8 @@ namespace SabreTools.Helper.Tools
 			if (!File.Exists(outfile))
 			{
 				// Compress the input stream
-				FileStream inputStream = File.Open(input, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-				FileStream outputStream = File.Open(outfile, FileMode.Create, FileAccess.Write);
+				FileStream inputStream = FileTools.TryOpenRead(input);
+				FileStream outputStream = FileTools.TryCreate(outfile);
 
 				// Open the output file for writing
 				BinaryWriter sw = new BinaryWriter(outputStream);
@@ -1777,14 +1773,14 @@ namespace SabreTools.Helper.Tools
 					}
 
 					FileTools.CleanDirectory(tempPath);
-					FileTools.SafeTryDeleteDirectory(tempPath);
+					FileTools.TryDeleteDirectory(tempPath);
 				}
 
 				// Otherwise, sort the input files and write out in the correct order
 				else
 				{
 					// Open the old archive for reading
-					Stream oldZipFileStream = File.Open(archiveFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+					Stream oldZipFileStream = FileTools.TryOpenRead(archiveFileName);
 					oldZipFile = new SevenZipExtractor(oldZipFileStream);
 
 					// Map all inputs to index
@@ -1819,7 +1815,7 @@ namespace SabreTools.Helper.Tools
 						ArchiveFormat = OutArchiveFormat.XZ,
 						CompressionLevel = SevenZip.CompressionLevel.Normal,
 					};
-					Stream zipFileStream = File.Open(tempFile, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
+					Stream zipFileStream = FileTools.TryOpenWrite(tempFile);
 
 					// Get the order for the entries with the new file
 					List<string> keys = inputIndexMap.Keys.ToList();
@@ -1840,12 +1836,12 @@ namespace SabreTools.Helper.Tools
 						// Otherwise, copy the file from the old archive
 						else
 						{
-							Stream oldZipFileEntryStream = File.Open(inputFiles[index], FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+							Stream oldZipFileEntryStream = FileTools.TryCreate(inputFiles[index]);
 							oldZipFile.ExtractFile(index, oldZipFileEntryStream);
 							zipFile.CompressFiles(zipFileStream, inputFiles[index]);
 
 							oldZipFileEntryStream.Dispose();
-							FileTools.SafeTryDeleteFile(inputFiles[index]);
+							FileTools.TryDeleteFile(inputFiles[index]);
 						}
 					}
 
@@ -1864,19 +1860,19 @@ namespace SabreTools.Helper.Tools
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
 			{
-				FileTools.SafeTryDeleteFile(archiveFileName);
+				FileTools.TryDeleteFile(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
 
 			// Now make the file TXZ
 			// TODO: Add ACTUAL TXZ compatible code (based on T7z)
 
-			BinaryWriter bw = new BinaryWriter(File.Open(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite));
+			BinaryWriter bw = new BinaryWriter(FileTools.TryOpenReadWrite(archiveFileName));
 			bw.Seek(0, SeekOrigin.Begin);
 			bw.Write(Constants.Torrent7ZipHeader);
 			bw.Seek(0, SeekOrigin.End);
 
-			oldZipFile = new SevenZipExtractor(File.Open(archiveFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite));
+			oldZipFile = new SevenZipExtractor(FileTools.TryOpenReadWrite(archiveFileName));
 
 			// Get the correct signature to use (Default 0, Unicode 1, SingleFile 2, StripFileNames 4)
 			byte[] tempsig = Constants.Torrent7ZipSignature;
@@ -1986,7 +1982,7 @@ namespace SabreTools.Helper.Tools
 						int index = inputIndexMap[key];
 
 						// Open the input file for reading
-						Stream freadStream = File.Open(inputFiles[index], FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+						Stream freadStream = FileTools.TryOpenRead(inputFiles[index]);
 						ulong istreamSize = (ulong)(new FileInfo(inputFiles[index]).Length);
 
 						DateTime dt = DateTime.Now;
@@ -2063,7 +2059,7 @@ namespace SabreTools.Helper.Tools
 						if (index < 0)
 						{
 							// Open the input file for reading
-							Stream freadStream = File.Open(inputFiles[-index - 1], FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+							Stream freadStream = FileTools.TryOpenRead(inputFiles[-index - 1]);
 							ulong istreamSize = (ulong)(new FileInfo(inputFiles[-index - 1]).Length);
 
 							DateTime dt = DateTime.Now;
@@ -2130,7 +2126,7 @@ namespace SabreTools.Helper.Tools
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
 			{
-				FileTools.SafeTryDeleteFile(archiveFileName);
+				FileTools.TryDeleteFile(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
 

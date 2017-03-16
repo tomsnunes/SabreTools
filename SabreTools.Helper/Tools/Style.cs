@@ -14,8 +14,6 @@ using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
 
-using FileAccess = System.IO.FileAccess;
-using FileMode = System.IO.FileMode;
 using FileStream = System.IO.FileStream;
 #endif
 
@@ -805,7 +803,7 @@ namespace SabreTools.Helper.Tools
 		{
 			// Read the BOM
 			var bom = new byte[4];
-			FileStream file = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+			FileStream file = FileTools.TryOpenRead(filename);
 			file.Read(bom, 0, 4);
 			file.Dispose();
 
@@ -829,7 +827,7 @@ namespace SabreTools.Helper.Tools
 
 			var buffer = new byte[2048];
 
-			using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+			using (var stream = FileTools.TryOpenRead(filePath))
 				stream.Read(buffer, 0, 2048);
 
 			var offset = BitConverter.ToInt32(buffer, c_PeHeaderOffset);

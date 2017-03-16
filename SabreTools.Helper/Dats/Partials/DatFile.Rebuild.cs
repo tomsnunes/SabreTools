@@ -447,7 +447,7 @@ namespace SabreTools.Helper.Dats
 				try
 				{
 					Globals.Logger.Verbose("Attempting to delete input file '" + file + "'");
-					FileTools.SafeTryDeleteFile(file, true);
+					FileTools.TryDeleteFile(file, true);
 					Globals.Logger.Verbose("File '" + file + "' deleted");
 				}
 				catch (Exception ex)
@@ -457,7 +457,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now delete the temp directory
-			FileTools.SafeTryDeleteDirectory(tempSubDir);
+			FileTools.TryDeleteDirectory(tempSubDir);
 		}
 
 		/// <summary>
@@ -764,7 +764,7 @@ namespace SabreTools.Helper.Dats
 			// And now clear the temp folder to get rid of any transient files if we unzipped
 			if (isZip)
 			{
-				FileTools.SafeTryDeleteDirectory(tempDir);
+				FileTools.TryDeleteDirectory(tempDir);
 			}
 
 			return rebuilt;

@@ -11,8 +11,6 @@ using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
 
-using FileAccess = System.IO.FileAccess;
-using FileMode = System.IO.FileMode;
 using SearchOption = System.IO.SearchOption;
 using StreamWriter = System.IO.StreamWriter;
 #endif
@@ -512,7 +510,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 				Path.Combine(outDir, reportName);
 
 				// Create the StreamWriter for this file
-				output.Add(StatDatFormat.None, new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write)));
+				output.Add(StatDatFormat.None, new StreamWriter(FileTools.TryCreate(reportName)));
 			}
 			if ((statDatFormat & StatDatFormat.CSV) != 0)
 			{
@@ -520,7 +518,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 				Path.Combine(outDir, reportName);
 
 				// Create the StreamWriter for this file
-				output.Add(StatDatFormat.CSV, new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write)));
+				output.Add(StatDatFormat.CSV, new StreamWriter(FileTools.TryCreate(reportName)));
 			}
 			if ((statDatFormat & StatDatFormat.HTML) != 0)
 			{
@@ -528,7 +526,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 				Path.Combine(outDir, reportName);
 
 				// Create the StreamWriter for this file
-				output.Add(StatDatFormat.HTML, new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write)));
+				output.Add(StatDatFormat.HTML, new StreamWriter(FileTools.TryCreate(reportName)));
 			}
 			if ((statDatFormat & StatDatFormat.TSV) != 0)
 			{
@@ -536,7 +534,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 				Path.Combine(outDir, reportName);
 
 				// Create the StreamWriter for this file
-				output.Add(StatDatFormat.TSV, new StreamWriter(File.Open(reportName, FileMode.Create, FileAccess.Write)));
+				output.Add(StatDatFormat.TSV, new StreamWriter(FileTools.TryCreate(reportName)));
 			}
 
 			return output;
