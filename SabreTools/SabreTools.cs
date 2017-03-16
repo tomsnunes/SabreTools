@@ -639,13 +639,14 @@ namespace SabreTools
 						break;
 					case "-dat":
 					case "--dat":
-						if (!File.Exists(args[++i]))
+						i++;
+						if (!File.Exists(args[i]) && !Directory.Exists(args[i]))
 						{
-							Globals.Logger.Error("DAT must be a valid file: " + args[i]);
+							Globals.Logger.Error("Must be a valid file or folder of DATs: " + args[i]);
 							Globals.Logger.Close();
 							return;
 						}
-						datfiles.Add(args[++i]);
+						datfiles.Add(args[i]);
 						break;
 					case "-de":
 					case "--desc":
@@ -914,9 +915,9 @@ namespace SabreTools
 									break;
 								case "-dat":
 								case "--dat":
-									if (!File.Exists(split[1]))
+									if (!File.Exists(split[1]) && !Directory.Exists(split[1]))
 									{
-										Globals.Logger.Error("DAT must be a valid file: " + split[1]);
+										Globals.Logger.Error("Must be a valid file or folder of DATs: " + split[1]);
 										Globals.Logger.Close();
 										return;
 									}
