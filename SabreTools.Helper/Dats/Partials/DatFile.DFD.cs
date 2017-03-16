@@ -108,14 +108,14 @@ namespace SabreTools.Helper.Dats
 						if (Type == "SuperDAT")
 						{
 							gamename = fulldir.Remove(0, basePath.Length + 1);
-							romname = "-";
+							romname = "_";
 						}
 
 						// Otherwise, we want just the top level folder as the game, and the file as everything else
 						else
 						{
 							gamename = fulldir.Remove(0, basePath.Length + 1).Split(Path.DirectorySeparatorChar)[0];
-							romname = Path.Combine(fulldir.Remove(0, basePath.Length + 1 + gamename.Length), "-");
+							romname = Path.Combine(fulldir.Remove(0, basePath.Length + 1 + gamename.Length), "_");
 						}
 
 						// Sanitize the names
@@ -283,14 +283,14 @@ namespace SabreTools.Helper.Dats
 							if (Type == "SuperDAT")
 							{
 								gamename = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(item)).Remove(0, basePath.Length), Path.GetFileNameWithoutExtension(item));
-								romname = Path.Combine(fulldir.Remove(0, tempSubDir.Length), "-");
+								romname = Path.Combine(fulldir.Remove(0, tempSubDir.Length), "_");
 							}
 
 							// Otherwise, we want just the item as the game, and the file as everything else
 							else
 							{
 								gamename = Path.GetFileNameWithoutExtension(item);
-								romname = Path.Combine(fulldir.Remove(0, tempSubDir.Length), "-");
+								romname = Path.Combine(fulldir.Remove(0, tempSubDir.Length), "_");
 							}
 
 							// Sanitize the names
