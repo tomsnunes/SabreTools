@@ -405,12 +405,13 @@ namespace SabreTools.Helper.Dats
 				// If we're in quickscan, use the header information
 				if (quickScan)
 				{
-					entries = ArchiveTools.GetArchiveFileInfo(file);
+					entries = ArchiveTools.GetArchiveFileInfo(file, date: date);
 				}
 				// Otherwise get the deeper information
 				else
 				{
-					entries = ArchiveTools.GetExtendedArchiveFileInfo(file);
+					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
+					entries = ArchiveTools.GetExtendedArchiveFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), date: date);
 				}
 
 				// If the entries list is null, we encountered an error and should scan exteranlly

@@ -215,12 +215,12 @@ namespace SabreTools.Helper.Dats
 			// If all deep hash skip flags are set, do a quickscan
 			if (omitFromScan == Hash.SecureHashes)
 			{
-				extracted = ArchiveTools.GetArchiveFileInfo(newItem);
+				extracted = ArchiveTools.GetArchiveFileInfo(newItem, date: addDate);
 			}
 			// Otherwise, get the list with whatever hashes are wanted
 			else
 			{
-				extracted = ArchiveTools.GetExtendedArchiveFileInfo(newItem, omitFromScan: omitFromScan);
+				extracted = ArchiveTools.GetExtendedArchiveFileInfo(newItem, omitFromScan: omitFromScan, date: addDate);
 			}
 
 			// If the extracted list is null, just scan the item itself
