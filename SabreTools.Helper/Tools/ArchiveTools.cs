@@ -641,11 +641,23 @@ namespace SabreTools.Helper.Tools
 				{
 					case ArchiveType.SevenZip:
 						SevenZipArchive sza = SevenZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
-						foreach (SevenZipArchiveEntry entry in sza.Entries)
+						List<SevenZipArchiveEntry> sevenZipEntries = sza.Entries.OrderBy(e => e.Key, new NaturalSort.NaturalReversedComparer()).ToList();
+						string lastSevenZipEntry = null;
+						foreach (SevenZipArchiveEntry entry in sevenZipEntries)
 						{
-							if (entry != null && entry.IsDirectory && entry.Size == 0)
+							if (entry != null)
 							{
-								empties.Add(entry.Key);
+								// If the current is a superset of last, we skip it
+								if (lastSevenZipEntry != null && lastSevenZipEntry.StartsWith(entry.Key))
+								{
+									// No-op
+								}
+								// If the entry is a directory, we add it
+								else if (entry.IsDirectory)
+								{
+									empties.Add(entry.Key);
+									lastSevenZipEntry = entry.Key;
+								}
 							}
 						}
 						break;
@@ -656,33 +668,72 @@ namespace SabreTools.Helper.Tools
 
 					case ArchiveType.Rar:
 						RarArchive ra = RarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
-						foreach (RarArchiveEntry entry in ra.Entries)
+						List<RarArchiveEntry> rarEntries = ra.Entries.OrderBy(e => e.Key, new NaturalSort.NaturalReversedComparer()).ToList();
+						string lastRarEntry = null;
+						foreach (RarArchiveEntry entry in rarEntries)
 						{
-							if (entry != null && entry.IsDirectory && entry.Size == 0)
+							if (entry != null)
 							{
-								empties.Add(entry.Key);
+								// If the current is a superset of last, we skip it
+								if (lastRarEntry != null && lastRarEntry.StartsWith(entry.Key))
+								{
+									// No-op
+								}
+								// If the entry is a directory, we add it
+								else if (entry.IsDirectory)
+								{
+									empties.Add(entry.Key);
+									lastRarEntry = entry.Key;
+								}
 							}
 						}
 						break;
 
 					case ArchiveType.Tar:
 						TarArchive ta = TarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
-						foreach (TarArchiveEntry entry in ta.Entries)
+						List<TarArchiveEntry> tarEntries = ta.Entries.OrderBy(e => e.Key, new NaturalSort.NaturalReversedComparer()).ToList();
+						string lastTarEntry = null;
+						foreach (TarArchiveEntry entry in tarEntries)
 						{
-							if (entry != null && entry.IsDirectory && entry.Size == 0)
+							if (entry != null)
 							{
-								empties.Add(entry.Key);
+								// If the current is a superset of last, we skip it
+								if (lastTarEntry != null && lastTarEntry.StartsWith(entry.Key))
+								{
+									// No-op
+								}
+								// If the entry is a directory, we add it
+								else if (entry.IsDirectory)
+								{
+									empties.Add(entry.Key);
+									lastTarEntry = entry.Key;
+								}
 							}
 						}
 						break;
 
 					case ArchiveType.Zip:
 						SharpCompress.Archives.Zip.ZipArchive za = SharpCompress.Archives.Zip.ZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
-						foreach (SharpCompress.Archives.Zip.ZipArchiveEntry entry in za.Entries)
+						List<SharpCompress.Archives.Zip.ZipArchiveEntry> zipEntries = za.Entries.OrderBy(e => e.Key, new NaturalSort.NaturalReversedComparer()).ToList();
+						string lastZipEntry = null;
+						foreach (SharpCompress.Archives.Zip.ZipArchiveEntry entry in zipEntries)
 						{
-							if (entry != null && entry.IsDirectory && entry.Size == 0)
+							if (entry != null)
 							{
-								empties.Add(entry.Key);
+								// If the current is a superset of last, we skip it
+								if (lastZipEntry != null && lastZipEntry.StartsWith(entry.Key))
+								{
+									// No-op
+								}
+								// If the entry is a directory, we add it
+								else
+								{
+									if (entry.IsDirectory)
+									{
+										empties.Add(entry.Key);
+									}
+									lastZipEntry = entry.Key;
+								}
 							}
 						}
 						break;
@@ -709,6 +760,7 @@ namespace SabreTools.Helper.Tools
 		public static List<Rom> GetExtendedArchiveFileInfo(string input, Hash omitFromScan = Hash.DeepHashes)
 		{
 			List<Rom> found = new List<Rom>();
+			string gamename = Path.GetFileNameWithoutExtension(input);
 
 			// First get the archive type
 			ArchiveType? at = GetCurrentArchiveType(input);
@@ -739,8 +791,7 @@ namespace SabreTools.Helper.Tools
 							sevenZipEntryRom.Name = entry.Key;
 							sevenZipEntryRom.Machine = new Machine()
 							{
-								Name = Path.GetFileNameWithoutExtension(input),
-								Description = Path.GetFileNameWithoutExtension(input),
+								Name = gamename,
 							};
 							sevenZipEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
 							found.Add(sevenZipEntryRom);
@@ -762,8 +813,7 @@ namespace SabreTools.Helper.Tools
 						gzipEntryRom.Name = gzstream.FileName;
 						gzipEntryRom.Machine = new Machine()
 						{
-							Name = Path.GetFileNameWithoutExtension(input),
-							Description = Path.GetFileNameWithoutExtension(input),
+							Name = gamename,
 						};
 						gzipEntryRom.Date = gzstream.LastModified?.ToString("yyyy/MM/dd hh:mm:ss");
 						found.Add(gzipEntryRom);
@@ -786,8 +836,7 @@ namespace SabreTools.Helper.Tools
 							rarEntryRom.Name = entry.Key;
 							rarEntryRom.Machine = new Machine()
 							{
-								Name = Path.GetFileNameWithoutExtension(input),
-								Description = Path.GetFileNameWithoutExtension(input),
+								Name = gamename,
 							};
 							rarEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
 							found.Add(rarEntryRom);
@@ -812,8 +861,7 @@ namespace SabreTools.Helper.Tools
 							tarEntryName.Name = entry.Key;
 							tarEntryName.Machine = new Machine()
 							{
-								Name = Path.GetFileNameWithoutExtension(input),
-								Description = Path.GetFileNameWithoutExtension(input),
+								Name = gamename,
 							};
 							tarEntryName.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
 							found.Add(tarEntryName);
@@ -861,8 +909,7 @@ namespace SabreTools.Helper.Tools
 							rarEntryRom.Name = zf.Entries[i].FileName;
 							rarEntryRom.Machine = new Machine()
 							{
-								Name = Path.GetFileNameWithoutExtension(input),
-								Description = Path.GetFileNameWithoutExtension(input),
+								Name = gamename,
 							};
 							rarEntryRom.Date = zf.Entries[i].LastMod.ToString("yyyy/MM/dd hh:mm:ss"); // TODO: Fix this from ticks
 							found.Add(rarEntryRom);
