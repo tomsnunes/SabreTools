@@ -432,180 +432,11 @@ namespace SabreTools.Helper.Tools
 		/// Generate a list of RomData objects from the header values in an archive
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
+		/// <param name="date">True if entry dates should be included, false otherwise (default)</param>
 		/// <returns>List of RomData objects representing the found data</returns>
-		/// TODO: Can this be merged with the extended one?
-		public static List<Rom> GetArchiveFileInfo(string input)
+		public static List<Rom> GetArchiveFileInfo(string input, bool date = false)
 		{
-			List<Rom> roms = new List<Rom>();
-			string gamename = Path.GetFileNameWithoutExtension(input);
-
-			// First, we check that there is anything being passed as the input
-			if (String.IsNullOrEmpty(input))
-			{
-				return roms;
-			}
-
-			// Next, get the archive type
-			ArchiveType? at = GetCurrentArchiveType(input);
-
-			// If we got back null, then it's not an archive, so we we return
-			if (at == null)
-			{
-				return roms;
-			}
-
-			// If we got back GZip, try to get TGZ info first
-			else if (at == ArchiveType.GZip)
-			{
-				Rom possibleTgz = GetTorrentGZFileInfo(input);
-
-				// If it was, then add it to the outputs and continue
-				if (possibleTgz != null && possibleTgz.Name != null)
-				{
-					roms.Add(possibleTgz);
-					return roms;
-				}
-			}
-
-			IReader reader = null;
-			try
-			{
-				Globals.Logger.Verbose("Found archive of type: " + at);
-				long size = 0;
-				string crc = "";
-
-				switch (at)
-				{
-					case ArchiveType.SevenZip:
-						SevenZipArchive sza = SevenZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
-						foreach (SevenZipArchiveEntry entry in sza.Entries)
-						{
-							if (entry != null && !entry.IsDirectory)
-							{
-								Globals.Logger.Verbose("Entry found: '" + entry.Key + "': "
-									+ (size == 0 ? entry.Size : size) + ", "
-									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
-
-								roms.Add(new Rom
-								{
-									Type = ItemType.Rom,
-									Name = entry.Key,
-									Size = (size == 0 ? entry.Size : size),
-									CRC = (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
-
-									Machine = new Machine
-									{
-										Name = gamename,
-									},
-								});
-							}
-						}
-						break;
-
-					case ArchiveType.GZip:// Get the CRC and size from the file
-						BinaryReader br = new BinaryReader(FileTools.TryOpenRead(input));
-						br.BaseStream.Seek(-8, SeekOrigin.End);
-						byte[] headercrc = br.ReadBytes(4);
-						crc = BitConverter.ToString(headercrc.Reverse().ToArray()).Replace("-", string.Empty).ToLowerInvariant();
-						byte[] headersize = br.ReadBytes(4);
-						size = BitConverter.ToInt32(headersize.Reverse().ToArray(), 0);
-						br.Dispose();
-						break;
-
-					case ArchiveType.Rar:
-						RarArchive ra = RarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
-						foreach (RarArchiveEntry entry in ra.Entries)
-						{
-							if (entry != null && !entry.IsDirectory)
-							{
-								Globals.Logger.Verbose("Entry found: '" + entry.Key + "': "
-									+ (size == 0 ? entry.Size : size) + ", "
-									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
-
-								roms.Add(new Rom
-								{
-									Type = ItemType.Rom,
-									Name = entry.Key,
-									Size = (size == 0 ? entry.Size : size),
-									CRC = (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
-
-									Machine = new Machine
-									{
-										Name = gamename,
-									},
-								});
-							}
-						}
-						break;
-
-					case ArchiveType.Tar:
-						TarArchive ta = TarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
-						foreach (TarArchiveEntry entry in ta.Entries)
-						{
-							if (entry != null && !entry.IsDirectory)
-							{
-								Globals.Logger.Verbose("Entry found: '" + entry.Key + "': "
-									+ (size == 0 ? entry.Size : size) + ", "
-									+ (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc));
-
-								roms.Add(new Rom
-								{
-									Type = ItemType.Rom,
-									Name = entry.Key,
-									Size = (size == 0 ? entry.Size : size),
-									CRC = (crc == "" ? entry.Crc.ToString("X").ToLowerInvariant() : crc),
-
-									Machine = new Machine
-									{
-										Name = gamename,
-									},
-								});
-							}
-						}
-						break;
-
-					case ArchiveType.Zip:
-						ZipFile zf = new ZipFile();
-						ZipReturn zr = zf.Open(input, new FileInfo(input).LastWriteTime.Ticks, true);
-						if (zr != ZipReturn.ZipGood)
-						{
-							throw new Exception(ZipFile.ZipErrorMessageText(zr));
-						}
-
-						for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
-						{
-							string newname = zf.Entries[i].FileName;
-							long newsize = (size == 0 ? (long)zf.Entries[i].UncompressedSize : size);
-							string newcrc = BitConverter.ToString(zf.Entries[i].CRC.Reverse().ToArray(), 0, zf.Entries[i].CRC.Length).Replace("-", string.Empty).ToLowerInvariant();
-
-							Globals.Logger.Verbose("Entry found: '" + newname + "': " + newsize + ", " + newcrc);
-
-							roms.Add(new Rom
-							{
-								Type = ItemType.Rom,
-								Name = newname,
-								Size = newsize,
-								CRC = newcrc,
-
-								Machine = new Machine
-								{
-									Name = gamename,
-								},
-							});
-						}
-						break;
-				}
-			}
-			catch (Exception ex)
-			{
-				Globals.Logger.Error(ex.ToString());
-			}
-			finally
-			{
-				reader?.Dispose();
-			}
-
-			return roms;
+			return GetExtendedArchiveFileInfo(input, Hash.SecureHashes, date: date);
 		}
 
 		/// <summary>
@@ -756,9 +587,11 @@ namespace SabreTools.Helper.Tools
 		/// Generate a list of RomData objects from the header values in an archive
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
+		/// <param name="omitFromScan">Hash representing the hashes that should be skipped</param>
+		/// <param name="date">True if entry dates should be included, false otherwise (default)</param>
 		/// <returns>List of RomData objects representing the found data</returns>
 		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
-		public static List<Rom> GetExtendedArchiveFileInfo(string input, Hash omitFromScan = Hash.DeepHashes)
+		public static List<Rom> GetExtendedArchiveFileInfo(string input, Hash omitFromScan = Hash.DeepHashes, bool date = false)
 		{
 			List<Rom> found = new List<Rom>();
 			string gamename = Path.GetFileNameWithoutExtension(input);
@@ -772,6 +605,19 @@ namespace SabreTools.Helper.Tools
 				return null;
 			}
 
+			// If we got back GZip, try to get TGZ info first
+			else if (at == ArchiveType.GZip)
+			{
+				Rom possibleTgz = GetTorrentGZFileInfo(input);
+
+				// If it was, then add it to the outputs and continue
+				if (possibleTgz != null && possibleTgz.Name != null)
+				{
+					found.Add(possibleTgz);
+					return found;
+				}
+			}
+
 			try
 			{
 				Globals.Logger.Verbose("Found archive of type: " + at);
@@ -781,21 +627,42 @@ namespace SabreTools.Helper.Tools
 					// 7-zip
 					case ArchiveType.SevenZip:
 						SevenZipArchive sza = SevenZipArchive.Open(FileTools.TryOpenRead(input));
-						foreach (SevenZipArchiveEntry entry in sza.Entries)
+						foreach (SevenZipArchiveEntry entry in sza.Entries.Where(e => e != null && !e.IsDirectory))
 						{
-							// Create and populate the entry stream
-							MemoryStream entryStream = new MemoryStream();
-							entry.WriteTo(entryStream);
-
-							// Get and add the extended Rom information
-							Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
-							sevenZipEntryRom.Name = entry.Key;
-							sevenZipEntryRom.Machine = new Machine()
+							// If secure hashes are disabled, do a quickscan
+							if (omitFromScan == Hash.SecureHashes)
 							{
-								Name = gamename,
-							};
-							sevenZipEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
-							found.Add(sevenZipEntryRom);
+								found.Add(new Rom
+								{
+									Type = ItemType.Rom,
+									Name = entry.Key,
+									Size = entry.Size,
+									CRC = entry.Crc.ToString("X").ToLowerInvariant(),
+									Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null),
+
+									Machine = new Machine
+									{
+										Name = gamename,
+									},
+								});
+							}
+							// Otherwise, extract to a stream
+							else
+							{
+								// Create and populate the entry stream
+								MemoryStream entryStream = new MemoryStream();
+								entry.WriteTo(entryStream);
+
+								// Get and add the extended Rom information
+								Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
+								sevenZipEntryRom.Name = entry.Key;
+								sevenZipEntryRom.Machine = new Machine()
+								{
+									Name = gamename,
+								};
+								sevenZipEntryRom.Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null);
+								found.Add(sevenZipEntryRom);
+							}
 						}
 
 						// Dispose of the archive
@@ -804,68 +671,127 @@ namespace SabreTools.Helper.Tools
 
 					// GZip
 					case ArchiveType.GZip:
-						// Create and populate the entry stream
-						MemoryStream outstream = new MemoryStream();
-						GZipStream gzstream = new GZipStream(FileTools.TryOpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
-						gzstream.CopyTo(outstream);
-
-						// Get and add the extended Rom information
-						Rom gzipEntryRom = FileTools.GetStreamInfo(outstream, outstream.Length, omitFromScan: omitFromScan);
-						gzipEntryRom.Name = gzstream.FileName;
-						gzipEntryRom.Machine = new Machine()
+						// If secure hashes are disabled, do a quickscan
+						if (omitFromScan == Hash.SecureHashes)
 						{
-							Name = gamename,
-						};
-						gzipEntryRom.Date = gzstream.LastModified?.ToString("yyyy/MM/dd hh:mm:ss");
-						found.Add(gzipEntryRom);
+							Rom tempRom = new Rom(gamename, gamename, omitFromScan);
+							BinaryReader br = new BinaryReader(FileTools.TryOpenRead(input));
+							br.BaseStream.Seek(-8, SeekOrigin.End);
+							byte[] headercrc = br.ReadBytes(4);
+							tempRom.CRC = BitConverter.ToString(headercrc.Reverse().ToArray()).Replace("-", string.Empty).ToLowerInvariant();
+							byte[] headersize = br.ReadBytes(4);
+							tempRom.Size = BitConverter.ToInt32(headersize.Reverse().ToArray(), 0);
+							br.Dispose();
 
-						// Dispose of the archive
-						gzstream.Dispose();
+							found.Add(tempRom);
+						}
+						// Otherwise, extract to a stream
+						else
+						{
+							// Create and populate the entry stream
+							MemoryStream outstream = new MemoryStream();
+							GZipStream gzstream = new GZipStream(FileTools.TryOpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
+							gzstream.CopyTo(outstream);
+
+							// Get and add the extended Rom information
+							Rom gzipEntryRom = FileTools.GetStreamInfo(outstream, outstream.Length, omitFromScan: omitFromScan);
+							gzipEntryRom.Name = gzstream.FileName;
+							gzipEntryRom.Machine = new Machine()
+							{
+								Name = gamename,
+							};
+							gzipEntryRom.Date = (date && gzstream.LastModified != null ? gzstream.LastModified?.ToString("yyyy/MM/dd hh:mm:ss") : null);
+							found.Add(gzipEntryRom);
+
+							// Dispose of the archive
+							gzstream.Dispose();
+						}
 						break;
 
 					// RAR
 					case ArchiveType.Rar:
-						RarArchive ra = RarArchive.Open(input);
-						foreach (RarArchiveEntry entry in ra.Entries)
+						RarArchive ra = RarArchive.Open(FileTools.TryOpenRead(input));
+						foreach (RarArchiveEntry entry in ra.Entries.Where(e => e != null && !e.IsDirectory))
 						{
-							// Create and populate the entry stream
-							MemoryStream entryStream = new MemoryStream();
-							entry.WriteTo(entryStream);
-
-							// Get and add the extended Rom information
-							Rom rarEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
-							rarEntryRom.Name = entry.Key;
-							rarEntryRom.Machine = new Machine()
+							// If secure hashes are disabled, do a quickscan
+							if (omitFromScan == Hash.SecureHashes)
 							{
-								Name = gamename,
-							};
-							rarEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
-							found.Add(rarEntryRom);
+								found.Add(new Rom
+								{
+									Type = ItemType.Rom,
+									Name = entry.Key,
+									Size = entry.Size,
+									CRC = entry.Crc.ToString("X").ToLowerInvariant(),
+									Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null),
+
+									Machine = new Machine
+									{
+										Name = gamename,
+									},
+								});
+							}
+							// Otherwise, extract to a stream
+							else
+							{
+								// Create and populate the entry stream
+								MemoryStream entryStream = new MemoryStream();
+								entry.WriteTo(entryStream);
+
+								// Get and add the extended Rom information
+								Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
+								sevenZipEntryRom.Name = entry.Key;
+								sevenZipEntryRom.Machine = new Machine()
+								{
+									Name = gamename,
+								};
+								sevenZipEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
+								found.Add(sevenZipEntryRom);
+							}
 						}
-						
+
 						// Dispose of the archive
 						ra.Dispose();
 						break;
 
 					// TAR
 					case ArchiveType.Tar:
-						// Extract all files to the temp directory
-						TarArchive ta = TarArchive.Open(input);
-						foreach (TarArchiveEntry entry in ta.Entries)
+						TarArchive ta = TarArchive.Open(FileTools.TryOpenRead(input));
+						foreach (TarArchiveEntry entry in ta.Entries.Where(e => e != null && !e.IsDirectory))
 						{
-							// Create and populate the entry stream
-							MemoryStream entryStream = new MemoryStream();
-							entry.WriteTo(entryStream);
-
-							// Get and add the extended Rom information
-							Rom tarEntryName = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
-							tarEntryName.Name = entry.Key;
-							tarEntryName.Machine = new Machine()
+							// If secure hashes are disabled, do a quickscan
+							if (omitFromScan == Hash.SecureHashes)
 							{
-								Name = gamename,
-							};
-							tarEntryName.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
-							found.Add(tarEntryName);
+								found.Add(new Rom
+								{
+									Type = ItemType.Rom,
+									Name = entry.Key,
+									Size = entry.Size,
+									CRC = entry.Crc.ToString("X").ToLowerInvariant(),
+									Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null),
+
+									Machine = new Machine
+									{
+										Name = gamename,
+									},
+								});
+							}
+							// Otherwise, extract to a stream
+							else
+							{
+								// Create and populate the entry stream
+								MemoryStream entryStream = new MemoryStream();
+								entry.WriteTo(entryStream);
+
+								// Get and add the extended Rom information
+								Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
+								sevenZipEntryRom.Name = entry.Key;
+								sevenZipEntryRom.Machine = new Machine()
+								{
+									Name = gamename,
+								};
+								sevenZipEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
+								found.Add(sevenZipEntryRom);
+							}
 						}
 
 						// Dispose of the archive
@@ -894,27 +820,55 @@ namespace SabreTools.Helper.Tools
 								continue;
 							}
 
-							MemoryStream entryStream = new MemoryStream();
-
-							byte[] ibuffer = new byte[_bufferSize];
-							int ilen;
-							while ((ilen = readStream.Read(ibuffer, 0, _bufferSize)) > 0)
+							// If secure hashes are disabled, do a quickscan
+							if (omitFromScan == Hash.SecureHashes)
 							{
-								entryStream.Write(ibuffer, 0, ilen);
-								entryStream.Flush();
+								string newname = zf.Entries[i].FileName;
+								long newsize = (long)zf.Entries[i].UncompressedSize;
+								string newcrc = BitConverter.ToString(zf.Entries[i].CRC.Reverse().ToArray(), 0, zf.Entries[i].CRC.Length).Replace("-", string.Empty).ToLowerInvariant();
+								string convertedDate = Style.ConvertMsDosTimeFormatToDateTime(zf.Entries[i].LastMod).ToString("yyyy/MM/dd hh:mm:ss");
+
+								found.Add(new Rom
+								{
+									Type = ItemType.Rom,
+									Name = newname,
+									Size = newsize,
+									CRC = newcrc,
+									Date = (date ? convertedDate : null),
+
+									Machine = new Machine
+									{
+										Name = gamename,
+									},
+								});
 							}
-							zr = zf.CloseReadStream();
-
-							// Get and add the extended Rom information
-							Rom rarEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
-							rarEntryRom.Name = zf.Entries[i].FileName;
-							rarEntryRom.Machine = new Machine()
+							// Otherwise, extract to a stream
+							else
 							{
-								Name = gamename,
-							};
-							rarEntryRom.Date = zf.Entries[i].LastMod.ToString("yyyy/MM/dd hh:mm:ss"); // TODO: Fix this from ticks
-							found.Add(rarEntryRom);
+								MemoryStream entryStream = new MemoryStream();
+
+								byte[] ibuffer = new byte[_bufferSize];
+								int ilen;
+								while ((ilen = readStream.Read(ibuffer, 0, _bufferSize)) > 0)
+								{
+									entryStream.Write(ibuffer, 0, ilen);
+									entryStream.Flush();
+								}
+								zr = zf.CloseReadStream();
+
+								// Get and add the extended Rom information
+								Rom zipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
+								zipEntryRom.Name = zf.Entries[i].FileName;
+								zipEntryRom.Machine = new Machine()
+								{
+									Name = gamename,
+								};
+								string convertedDate = Style.ConvertMsDosTimeFormatToDateTime(zf.Entries[i].LastMod).ToString("yyyy/MM/dd hh:mm:ss");
+								zipEntryRom.Date = (date ? convertedDate : null);
+								found.Add(zipEntryRom);
+							}
 						}
+						
 
 						// Dispose of the archive
 						zf.Close();
