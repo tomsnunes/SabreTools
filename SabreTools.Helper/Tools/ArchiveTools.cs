@@ -94,7 +94,7 @@ namespace SabreTools.Helper.Tools
 					Directory.CreateDirectory(outDir);
 
 					// Decompress the input stream
-					FileStream outstream = File.Create(Path.Combine(outDir, Path.GetFileNameWithoutExtension(input)));
+					FileStream outstream = FileTools.TryCreate(Path.Combine(outDir, Path.GetFileNameWithoutExtension(input)));
 					GZipStream gzstream = new GZipStream(FileTools.TryOpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
 					gzstream.CopyTo(outstream);
 
@@ -176,7 +176,7 @@ namespace SabreTools.Helper.Tools
 							continue;
 						}
 
-						FileStream writeStream = FileTools.TryOpenWrite(Path.Combine(outDir, zf.Entries[i].FileName));
+						FileStream writeStream = FileTools.TryCreate(Path.Combine(outDir, zf.Entries[i].FileName));
 
 						byte[] ibuffer = new byte[_bufferSize];
 						int ilen;
