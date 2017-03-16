@@ -209,117 +209,51 @@ namespace SabreTools.Helper.Dats
 				File.Copy(item, newItem, true);
 			}
 
+			// Create a list for all found items
+			List<Rom> extracted = new List<Rom>();
+
 			// If all deep hash skip flags are set, do a quickscan
 			if (omitFromScan == Hash.SecureHashes)
 			{
-				ArchiveType? type = ArchiveTools.GetCurrentArchiveType(newItem);
-
-				// If we have an archive, scan it
-				if (type != null && !archivesAsFiles)
-				{
-					List<Rom> extracted = ArchiveTools.GetArchiveFileInfo(newItem);
-
-					foreach (Rom rom in extracted)
-					{
-						PopulateFromDirProcessFileHelper(newItem,
-							rom,
-							basePath,
-							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length) + Path.GetFileNameWithoutExtension(item));
-					}
-				}
-				// Otherwise, just get the info on the file itself
-				else if (File.Exists(newItem))
-				{
-					PopulateFromDirProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst);
-				}
+				extracted = ArchiveTools.GetArchiveFileInfo(newItem);
 			}
-			// Otherwise, attempt to extract the files to the temporary directory
+			// Otherwise, get the list with whatever hashes are wanted
 			else
 			{
-				ArchiveScanLevel asl = (archivesAsFiles ? ArchiveScanLevel.SevenZipExternal : ArchiveScanLevel.SevenZipInternal)
-					| (!archivesAsFiles && enableGzip ? ArchiveScanLevel.GZipInternal : ArchiveScanLevel.GZipExternal)
-					| (archivesAsFiles ? ArchiveScanLevel.RarExternal : ArchiveScanLevel.RarInternal)
-					| (archivesAsFiles ? ArchiveScanLevel.ZipExternal : ArchiveScanLevel.ZipInternal);
+				extracted = ArchiveTools.GetExtendedArchiveFileInfo(newItem, omitFromScan: omitFromScan);
+			}
 
-				bool encounteredErrors = ArchiveTools.ExtractArchive(newItem, tempSubDir, asl);
-
-				// If the file was an archive and was extracted successfully, check it
-				if (!encounteredErrors)
+			// If the extracted list is null, just scan the item itself
+			if (extracted == null)
+			{
+				PopulateFromDirProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst);
+			}
+			// Otherwise, add all of the found items
+			else
+			{
+				// First take care of the found items
+				foreach (Rom rom in extracted)
 				{
-					Globals.Logger.Verbose(Path.GetFileName(item) + " treated like an archive");
-					List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
-					Parallel.ForEach(extracted,
-						Globals.ParallelOptions,
-						entry =>
-						{
-							PopulateFromDirProcessFile(entry,
-								Path.Combine((Type == "SuperDAT"
-									? (Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length)
-									: ""),
-								Path.GetFileNameWithoutExtension(item)),
-								tempSubDir,
-								omitFromScan,
-								addDate,
-								headerToCheckAgainst);
-						});
-
-					// Now find all folders that are empty, if we are supposed to
-					if (addBlanks)
-					{
-						// Get the list of empty directories
-						List<string> empties = FileTools.GetEmptyDirectories(tempSubDir).ToList();
-						Parallel.ForEach(empties,
-							Globals.ParallelOptions,
-							dir =>
-						{
-							// Get the full path for the directory
-							string fulldir = Path.GetFullPath(dir);
-
-							// Set the temporary variables
-							string gamename = "";
-							string romname = "";
-
-							// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
-							if (Type == "SuperDAT")
-							{
-								gamename = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(item)).Remove(0, basePath.Length), Path.GetFileNameWithoutExtension(item));
-								romname = Path.Combine(fulldir.Remove(0, tempSubDir.Length), "_");
-							}
-
-							// Otherwise, we want just the item as the game, and the file as everything else
-							else
-							{
-								gamename = Path.GetFileNameWithoutExtension(item);
-								romname = Path.Combine(fulldir.Remove(0, tempSubDir.Length), "_");
-							}
-
-							// Sanitize the names
-							if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								gamename = gamename.Substring(1);
-							}
-							if (gamename.EndsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								gamename = gamename.Substring(0, gamename.Length - 1);
-							}
-							if (romname.StartsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								romname = romname.Substring(1);
-							}
-							if (romname.EndsWith(Path.DirectorySeparatorChar.ToString()))
-							{
-								romname = romname.Substring(0, romname.Length - 1);
-							}
-
-							Globals.Logger.Verbose("Adding blank empty folder: " + gamename);
-							this["null"].Add(new Rom(romname, gamename, omitFromScan));
-						});
-					}
+					PopulateFromDirProcessFileHelper(newItem,
+						rom,
+						basePath,
+						(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length) + Path.GetFileNameWithoutExtension(item));
 				}
-				// Otherwise, just get the info on the file itself
-				else if (File.Exists(newItem))
+
+				// Then, if we're looking for blanks, get all of the blank folders and add them
+				if (addBlanks)
 				{
-					PopulateFromDirProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst);
+					List<string> empties = ArchiveTools.GetEmptyFoldersInArchive(newItem);
+					Parallel.ForEach(empties,
+						Globals.ParallelOptions,
+						empty =>
+					{
+						Rom emptyRom = new Rom(Path.Combine(empty, "_"), newItem, omitFromScan);
+						PopulateFromDirProcessFileHelper(newItem,
+							emptyRom,
+							basePath,
+							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length) + Path.GetFileNameWithoutExtension(item));
+					});
 				}
 			}
 
@@ -419,14 +353,14 @@ namespace SabreTools.Helper.Dats
 					if (Type == "SuperDAT")
 					{
 						gamename = parent;
-						romname = item.Remove(0, basepath.Length);
+						romname = datItem.Name;
 					}
 
 					// Otherwise, we want the archive name as the game, and the file as everything else
 					else
 					{
 						gamename = parent;
-						romname = item.Remove(0, basepath.Length);
+						romname = datItem.Name;
 					}
 				}
 
