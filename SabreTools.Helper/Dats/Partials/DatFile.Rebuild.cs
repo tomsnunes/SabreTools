@@ -398,45 +398,36 @@ namespace SabreTools.Helper.Dats
 			// If we're supposed to scan the file internally
 			if (shouldInternalProcess)
 			{
-				// If quickscan is set, do so
+				// Create an empty list of Roms for archive entries
+				List<Rom> entries = new List<Rom>();
+				usedInternally = true;
+
+				// If we're in quickscan, use the header information
 				if (quickScan)
 				{
-					List<Rom> extracted = ArchiveTools.GetArchiveFileInfo(file);
-					usedInternally = true;
-
-					foreach (Rom rom in extracted)
-					{
-						usedInternally &= RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
-							romba, updateDat, true /* isZip */, headerToCheckAgainst);
-					}
+					entries = ArchiveTools.GetArchiveFileInfo(file);
 				}
-				// Otherwise, attempt to extract the files to the temporary directory
+				// Otherwise get the deeper information
 				else
 				{
-					bool encounteredErrors = ArchiveTools.ExtractArchive(file, tempSubDir, archiveScanLevel);
+					entries = ArchiveTools.GetExtendedArchiveFileInfo(file);
+				}
 
-					// If the file was an archive and was extracted successfully, check it
-					if (!encounteredErrors)
+				// If the entries list is null, we encountered an error and should scan exteranlly
+				if (entries == null && File.Exists(file))
+				{
+					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
+					Rom rom = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
+					usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
+						romba, updateDat, false /* isZip */, headerToCheckAgainst);
+				}
+				// Otherwise, loop through the entries and try to match
+				else
+				{
+					foreach (Rom entry in entries)
 					{
-						usedInternally = true;
-
-						Globals.Logger.Verbose(Path.GetFileName(file) + " treated like an archive");
-						List<string> extracted = Directory.EnumerateFiles(tempSubDir, "*", SearchOption.AllDirectories).ToList();
-						foreach (string entry in extracted)
-						{
-							// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-							Rom rom = FileTools.GetFileInfo(entry, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
-							usedInternally &= RebuildIndividualFile(rom, entry, outDir, tempSubDir, date, inverse, outputFormat,
-								romba, updateDat, false /* isZip */, headerToCheckAgainst);
-						}
-					}
-					// Otherwise, just get the info on the file itself
-					else if (File.Exists(file))
-					{
-						// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-						Rom rom = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
-						usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
-							romba, updateDat, false /* isZip */, headerToCheckAgainst);
+						usedInternally &= RebuildIndividualFile(entry, file, outDir, tempSubDir, date, inverse, outputFormat,
+							romba, updateDat, true /* isZip */, headerToCheckAgainst);
 					}
 				}
 			}
@@ -444,16 +435,7 @@ namespace SabreTools.Helper.Dats
 			// If we are supposed to delete the file, do so
 			if (delete && (usedExternally || usedInternally))
 			{
-				try
-				{
-					Globals.Logger.Verbose("Attempting to delete input file '" + file + "'");
-					FileTools.TryDeleteFile(file, true);
-					Globals.Logger.Verbose("File '" + file + "' deleted");
-				}
-				catch (Exception ex)
-				{
-					Globals.Logger.Error("An error occurred while trying to delete '" + file + "' " + ex.ToString());
-				}
+				FileTools.TryDeleteFile(file);
 			}
 
 			// Now delete the temp directory
@@ -500,6 +482,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// If we have an archive input, get the real name of the file to use
+				// TODO: Remove the need to extract the file first; reimplement ArchiveToArchive?
 				if (isZip)
 				{
 					// Otherwise, extract the file to the temp folder

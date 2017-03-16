@@ -43,6 +43,43 @@ namespace SabreTools.Helper.Tools
 	{
 		private const int _bufferSize = 4096 * 128;
 
+		#region Archive-to-Archive handling
+
+		/// <summary>
+		/// Transfer a single file from one archive to another
+		/// </summary>
+		/// <param name="inputArchive">Input archive name</param>
+		/// <param name="inputEntry">Input entry name</param>
+		/// <param name="outputDir">Output directory</param>
+		/// <param name="outputEntry">Output Rom information</param>
+		/// <param name="date">True if dates are preserved, false otherwise (default)</param>
+		/// <returns>True if the transfer was a success, false otherwise</returns>
+		public static bool Transfer(string inputArchive, string inputEntry, string outputDir, Rom outputEntry, bool date = false)
+		{
+			// Verify inputs
+			// Create list versions
+			// return Transfer(multiple)
+			return false;
+		}
+
+		/// <summary>
+		/// Transfer multiple files from one archive to another
+		/// </summary>
+		/// <param name="inputArchives">Input archive names</param>
+		/// <param name="inputEntries">Input entry names</param>
+		/// <param name="outputDir">Output directory</param>
+		/// <param name="outputEntries">Output Rom informations</param>
+		/// <param name="date">True if dates are preserved, false otherwise (default)</param>
+		/// <returns>True if the transfesr were a success, false otherwise</returns>
+		public static bool Transfer(List<string> inputArchives, List<string> inputEntries, string outputDir, List<Rom> outputEntries, bool date = false)
+		{
+			// Verify inputs
+			// For each item, extract to stream, write to archive
+			return false;
+		}
+
+		#endregion
+
 		#region Extraction
 
 		/// <summary>
@@ -241,7 +278,6 @@ namespace SabreTools.Helper.Tools
 						SevenZipArchive sza = SevenZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
 						foreach (SevenZipArchiveEntry entry in sza.Entries)
 						{
-							Globals.Logger.Verbose("Current entry name: '" + entry.Key + "'");
 							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
 							{
 								realEntry = entry.Key;
@@ -293,7 +329,6 @@ namespace SabreTools.Helper.Tools
 						RarArchive ra = RarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
 						foreach (RarArchiveEntry entry in ra.Entries)
 						{
-							Globals.Logger.Verbose("Current entry name: '" + entry.Key + "'");
 							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
 							{
 								realEntry = entry.Key;
@@ -317,7 +352,6 @@ namespace SabreTools.Helper.Tools
 						TarArchive ta = TarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
 						foreach (TarArchiveEntry entry in ta.Entries)
 						{
-							Globals.Logger.Verbose("Current entry name: '" + entry.Key + "'");
 							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
 							{
 								realEntry = entry.Key;
@@ -347,7 +381,6 @@ namespace SabreTools.Helper.Tools
 
 						for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
 						{
-							Globals.Logger.Verbose("Current entry name: '" + zf.Entries[i].FileName + "'");
 							if (zf.Entries[i].FileName.Contains(entryName))
 							{
 								realEntry = zf.Entries[i].FileName;
@@ -376,6 +409,8 @@ namespace SabreTools.Helper.Tools
 								zipfileout.Dispose();
 							}
 						}
+
+						zf.Dispose();
 						break;
 				}
 			}
@@ -397,6 +432,7 @@ namespace SabreTools.Helper.Tools
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
 		/// <returns>List of RomData objects representing the found data</returns>
+		/// TODO: Can this be merged with the extended one?
 		public static List<Rom> GetArchiveFileInfo(string input)
 		{
 			List<Rom> roms = new List<Rom>();
@@ -747,6 +783,7 @@ namespace SabreTools.Helper.Tools
 			catch (Exception)
 			{
 				// Don't log file open errors
+				return null;
 			}
 
 			return found;
