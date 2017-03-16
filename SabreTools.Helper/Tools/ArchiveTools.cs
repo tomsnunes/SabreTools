@@ -608,6 +608,99 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
+		/// Generate a list of empty folders in an archive
+		/// </summary>
+		/// <param name="input">Input file to get data from</param>
+		/// <returns>List of empty folders in the archive</returns>
+		public static List<string> GetEmptyFoldersInArchive(string input)
+		{
+			List<string> empties = new List<string>();
+			string gamename = Path.GetFileNameWithoutExtension(input);
+
+			// First, we check that there is anything being passed as the input
+			if (String.IsNullOrEmpty(input))
+			{
+				return empties;
+			}
+
+			// Next, get the archive type
+			ArchiveType? at = GetCurrentArchiveType(input);
+
+			// If we got back null, then it's not an archive, so we we return
+			if (at == null)
+			{
+				return empties;
+			}
+
+			IReader reader = null;
+			try
+			{
+				Globals.Logger.Verbose("Found archive of type: " + at);
+
+				switch (at)
+				{
+					case ArchiveType.SevenZip:
+						SevenZipArchive sza = SevenZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
+						foreach (SevenZipArchiveEntry entry in sza.Entries)
+						{
+							if (entry != null && entry.IsDirectory && entry.Size == 0)
+							{
+								empties.Add(entry.Key);
+							}
+						}
+						break;
+
+					case ArchiveType.GZip:
+						// GZip files don't contain directories
+						break;
+
+					case ArchiveType.Rar:
+						RarArchive ra = RarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
+						foreach (RarArchiveEntry entry in ra.Entries)
+						{
+							if (entry != null && entry.IsDirectory && entry.Size == 0)
+							{
+								empties.Add(entry.Key);
+							}
+						}
+						break;
+
+					case ArchiveType.Tar:
+						TarArchive ta = TarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
+						foreach (TarArchiveEntry entry in ta.Entries)
+						{
+							if (entry != null && entry.IsDirectory && entry.Size == 0)
+							{
+								empties.Add(entry.Key);
+							}
+						}
+						break;
+
+					case ArchiveType.Zip:
+						SharpCompress.Archives.Zip.ZipArchive za = SharpCompress.Archives.Zip.ZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false });
+						foreach (SharpCompress.Archives.Zip.ZipArchiveEntry entry in za.Entries)
+						{
+							if (entry != null && entry.IsDirectory && entry.Size == 0)
+							{
+								empties.Add(entry.Key);
+							}
+						}
+						break;
+				}
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+			}
+			finally
+			{
+				reader?.Dispose();
+			}
+
+			return empties;
+		}
+
+		/// <summary>
 		/// Generate a list of RomData objects from the header values in an archive
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
