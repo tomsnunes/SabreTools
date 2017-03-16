@@ -487,6 +487,10 @@ namespace SabreTools.Helper.Dats
 					{
 						outDir = Path.Combine(outDir, Style.GetRombaPath(rom.SHA1));
 					}
+					else
+					{
+						outDir = Path.Combine(outDir, rom.SHA1 + ".gz");
+					}
 
 					// Make sure the output folder is created
 					Directory.CreateDirectory(Path.GetDirectoryName(outDir));
@@ -585,6 +589,10 @@ namespace SabreTools.Helper.Dats
 					if (romba)
 					{
 						outDir = Path.Combine(outDir, Style.GetRombaPath(rom.SHA1));
+					}
+					else
+					{
+						outDir = Path.Combine(outDir, rom.SHA1 + ".gz");
 					}
 
 					// Make sure the output folder is created
