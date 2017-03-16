@@ -15,6 +15,7 @@ using BinaryReader = System.IO.BinaryReader;
 using BinaryWriter = System.IO.BinaryWriter;
 using EndOfStreamException = System.IO.EndOfStreamException;
 using FileStream = System.IO.FileStream;
+using MemoryStream = System.IO.MemoryStream;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
