@@ -189,8 +189,7 @@ namespace SabreTools.Helper.Dats
 							// If we have a "null" game (created by DATFromDir or something similar), log it to file
 							if (rom.Type == ItemType.Rom
 								&& ((Rom)rom).Size == -1
-								&& ((Rom)rom).CRC == "null"
-								&& ((Rom)rom).MD5 == "null")
+								&& ((Rom)rom).CRC == "null")
 							{
 								Globals.Logger.Verbose("Empty folder found: " + rom.Machine.Name);
 
