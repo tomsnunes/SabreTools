@@ -458,9 +458,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="isZip">True if the input file is an archive, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <returns>True if the file was able to be rebuilt, false otherwise</returns>
-		/// <remarks>
-		/// TODO: If going from a TGZ file to a TGZ file, don't extract, just copy
-		/// </remarks>
 		private bool RebuildIndividualFile(Rom rom, string file, string outDir, string tempDir, bool date,
 			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool isZip, string headerToCheckAgainst)
 		{
@@ -479,6 +476,32 @@ namespace SabreTools.Helper.Dats
 				// If we don't have any duplicates, continue
 				if (dupes.Count == 0)
 				{
+					return rebuilt;
+				}
+
+				// If we have a very specifc TGZ->TGZ case, just copy it accordingly
+				if (isZip && ArchiveTools.GetTorrentGZFileInfo(file) != null && outputFormat == OutputFormat.TorrentGzip)
+				{
+					// Get the proper output path
+					if (romba)
+					{
+						outDir = Path.Combine(outDir, Style.GetRombaPath(rom.SHA1));
+					}
+
+					// Make sure the output folder is created
+					Directory.CreateDirectory(Path.GetDirectoryName(outDir));
+
+					// Now copy the file over
+					try
+					{
+						File.Copy(file, outDir);
+						rebuilt &= true;
+					}
+					catch
+					{
+						rebuilt = false;
+					}
+
 					return rebuilt;
 				}
 
@@ -554,6 +577,32 @@ namespace SabreTools.Helper.Dats
 			else if (!hasDuplicates && inverse)
 			{
 				string machinename = null;
+
+				// If we have a very specifc TGZ->TGZ case, just copy it accordingly
+				if (isZip && ArchiveTools.GetTorrentGZFileInfo(file) != null && outputFormat == OutputFormat.TorrentGzip)
+				{
+					// Get the proper output path
+					if (romba)
+					{
+						outDir = Path.Combine(outDir, Style.GetRombaPath(rom.SHA1));
+					}
+
+					// Make sure the output folder is created
+					Directory.CreateDirectory(Path.GetDirectoryName(outDir));
+
+					// Now copy the file over
+					try
+					{
+						File.Copy(file, outDir);
+						rebuilt &= true;
+					}
+					catch
+					{
+						rebuilt = false;
+					}
+
+					return rebuilt;
+				}
 
 				// If we have an archive input, get the real name of the file to use
 				if (isZip)
