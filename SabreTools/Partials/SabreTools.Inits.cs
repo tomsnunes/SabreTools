@@ -315,6 +315,9 @@ namespace SabreTools
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
 
+			// Get a list of files from the input datfiles
+			datfiles = FileTools.GetOnlyFilesFromInputs(datfiles);
+
 			DateTime start = DateTime.Now;
 			Globals.Logger.User("Populating internal DAT...");
 
@@ -350,6 +353,9 @@ namespace SabreTools
 		{
 			DateTime start = DateTime.Now;
 			Globals.Logger.User("Populating internal DAT...");
+
+			// Get a list of files from the input datfiles
+			datfiles = FileTools.GetOnlyFilesFromInputs(datfiles);
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
@@ -712,6 +718,9 @@ namespace SabreTools
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
 
+			// Get a list of files from the input datfiles
+			datfiles = FileTools.GetOnlyFilesFromInputs(datfiles);
+
 			DateTime start = DateTime.Now;
 			Globals.Logger.User("Populating internal DAT...");
 
@@ -739,6 +748,9 @@ namespace SabreTools
 		{
 			DateTime start = DateTime.Now;
 			Globals.Logger.User("Populating internal DAT...");
+
+			// Get a list of files from the input datfiles
+			datfiles = FileTools.GetOnlyFilesFromInputs(datfiles);
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
