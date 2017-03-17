@@ -50,31 +50,75 @@ namespace SabreTools.Helper.Tools
 		/// Transfer a single file from one archive to another
 		/// </summary>
 		/// <param name="inputArchive">Input archive name</param>
+		/// <param name="inputType">Input archive type</param>
 		/// <param name="inputEntry">Input entry name</param>
 		/// <param name="outputDir">Output directory</param>
+		/// <param name="outputType">Output archive type</param>
 		/// <param name="outputEntry">Output Rom information</param>
 		/// <param name="date">True if dates are preserved, false otherwise (default)</param>
 		/// <returns>True if the transfer was a success, false otherwise</returns>
-		public static bool Transfer(string inputArchive, string inputEntry, string outputDir, Rom outputEntry, bool date = false)
+		public static bool Transfer(string inputArchive, ArchiveType? inputType, string inputEntry, string outputDir,
+			ArchiveType? outputType, Rom outputEntry, bool date = false)
 		{
-			// Verify inputs
-			// Create list versions
-			// return Transfer(multiple)
-			return false;
+			List<string> inputEntries = new List<string>() { inputEntry };
+			List<Rom> outputEntries = new List<Rom>() { outputEntry };
+			return Transfer(inputArchive, inputType, inputEntries, outputDir, outputType, outputEntries, date: date);
 		}
 
 		/// <summary>
 		/// Transfer multiple files from one archive to another
 		/// </summary>
-		/// <param name="inputArchives">Input archive names</param>
+		/// <param name="inputArchive">Input archive name</param>
+		/// <param name="inputType">Input archive type</param>
 		/// <param name="inputEntries">Input entry names</param>
 		/// <param name="outputDir">Output directory</param>
+		/// <param name="outputType">Output archive type</param>
 		/// <param name="outputEntries">Output Rom informations</param>
 		/// <param name="date">True if dates are preserved, false otherwise (default)</param>
 		/// <returns>True if the transfesr were a success, false otherwise</returns>
-		public static bool Transfer(List<string> inputArchives, List<string> inputEntries, string outputDir, List<Rom> outputEntries, bool date = false)
+		public static bool Transfer(string inputArchive, ArchiveType? inputType, List<string> inputEntries, string outputDir,
+			ArchiveType? outputType, List<Rom> outputEntries, bool date = false)
 		{
-			// Verify inputs
+			#region Verify inputs
+
+			// If the input archive doesn't exist, return false
+			if (!File.Exists(inputArchive))
+			{
+				return false;
+			}
+
+			// If any input entry is blank, return false
+			foreach (string inputEntry in inputEntries)
+			{
+				if (String.IsNullOrEmpty(inputEntry))
+				{
+					return false;
+				}
+			}
+
+			// If any output entry is null or blank, return false
+			foreach (Rom outputEntry in outputEntries)
+			{
+				if (outputEntry == null || outputEntry.Name == null)
+				{
+					return false;
+				}
+			}
+
+			// If the output directory is null, set the default
+			if (String.IsNullOrEmpty(outputDir))
+			{
+				outputDir = "out";
+			}
+
+			// Verify that the output directory exists
+			if (!Directory.Exists(outputDir))
+			{
+				Directory.CreateDirectory(outputDir);
+			}
+
+			#endregion
+
 			// For each item, extract to stream, write to archive
 			return false;
 		}
