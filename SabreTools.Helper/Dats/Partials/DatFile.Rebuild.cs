@@ -188,7 +188,7 @@ namespace SabreTools.Helper.Dats
 
 				// Otherwise, we rebuild that file to all locations that we need to
 				RebuildIndividualFile(fileinfo, foundpath, outDir, tempDir, date, inverse, outputFormat, romba,
-					updateDat, true /*isZip*/, headerToCheckAgainst);
+					updateDat, false /* isZip */, headerToCheckAgainst);
 			}
 
 			Globals.Logger.User("Rebuilding complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
@@ -392,7 +392,7 @@ namespace SabreTools.Helper.Dats
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				Rom rom = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), header: headerToCheckAgainst);
 				usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
-					romba, updateDat, false /* isZip */, headerToCheckAgainst);
+					romba, updateDat, null /* isZip */, headerToCheckAgainst);
 			}
 
 			// If we're supposed to scan the file internally
@@ -401,6 +401,9 @@ namespace SabreTools.Helper.Dats
 				// Create an empty list of Roms for archive entries
 				List<Rom> entries = new List<Rom>();
 				usedInternally = true;
+
+				// Get the TGZ status for later
+				bool isTorrentGzip = (ArchiveTools.GetTorrentGZFileInfo(file) != null);
 
 				// If we're in quickscan, use the header information
 				if (quickScan)
@@ -420,7 +423,7 @@ namespace SabreTools.Helper.Dats
 					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 					Rom rom = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
 					usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
-						romba, updateDat, false /* isZip */, headerToCheckAgainst);
+						romba, updateDat, null /* isZip */, headerToCheckAgainst);
 				}
 				// Otherwise, loop through the entries and try to match
 				else
@@ -428,7 +431,7 @@ namespace SabreTools.Helper.Dats
 					foreach (Rom entry in entries)
 					{
 						usedInternally &= RebuildIndividualFile(entry, file, outDir, tempSubDir, date, inverse, outputFormat,
-							romba, updateDat, true /* isZip */, headerToCheckAgainst);
+							romba, updateDat, !isTorrentGzip /* isZip */, headerToCheckAgainst);
 					}
 				}
 			}
@@ -455,11 +458,11 @@ namespace SabreTools.Helper.Dats
 		/// <param name="outputFormat">Output format that files should be written to</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
-		/// <param name="isZip">True if the input file is an archive, false otherwise</param>
+		/// <param name="isZip">True if the input file is an archive, false if the file is TGZ, null otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <returns>True if the file was able to be rebuilt, false otherwise</returns>
 		private bool RebuildIndividualFile(Rom rom, string file, string outDir, string tempDir, bool date,
-			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool isZip, string headerToCheckAgainst)
+			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool? isZip, string headerToCheckAgainst)
 		{
 			// Set the output value
 			bool rebuilt = false;
@@ -480,7 +483,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// If we have a very specifc TGZ->TGZ case, just copy it accordingly
-				if (isZip && ArchiveTools.GetTorrentGZFileInfo(file) != null && outputFormat == OutputFormat.TorrentGzip)
+				if (isZip == false && ArchiveTools.GetTorrentGZFileInfo(file) != null && outputFormat == OutputFormat.TorrentGzip)
 				{
 					// Get the proper output path
 					if (romba)
@@ -511,7 +514,7 @@ namespace SabreTools.Helper.Dats
 
 				// If we have an archive input, get the real name of the file to use
 				// TODO: Remove the need to extract the file first; reimplement ArchiveToArchive?
-				if (isZip)
+				if (isZip == true)
 				{
 					// Otherwise, extract the file to the temp folder
 					file = ArchiveTools.ExtractItem(file, rom.Name, tempDir);
@@ -583,7 +586,7 @@ namespace SabreTools.Helper.Dats
 				string machinename = null;
 
 				// If we have a very specifc TGZ->TGZ case, just copy it accordingly
-				if (isZip && ArchiveTools.GetTorrentGZFileInfo(file) != null && outputFormat == OutputFormat.TorrentGzip)
+				if (isZip == false && ArchiveTools.GetTorrentGZFileInfo(file) != null && outputFormat == OutputFormat.TorrentGzip)
 				{
 					// Get the proper output path
 					if (romba)
@@ -613,7 +616,7 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// If we have an archive input, get the real name of the file to use
-				if (isZip)
+				if (isZip == true)
 				{
 					// Otherwise, extract the file to the temp folder
 					machinename = Style.GetFileNameWithoutExtension(file);
@@ -803,7 +806,7 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// And now clear the temp folder to get rid of any transient files if we unzipped
-			if (isZip)
+			if (isZip == true)
 			{
 				FileTools.TryDeleteDirectory(tempDir);
 			}
