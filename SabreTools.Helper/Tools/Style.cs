@@ -89,12 +89,6 @@ namespace SabreTools.Helper.Tools
 				}
 			}
 
-			// Then make sure that it has the correct characters
-			if (!Regex.IsMatch(hash, "[0-9a-f]{" + padding + "}"))
-			{
-				hash = "";
-			}
-
 			return hash;
 		}
 
