@@ -261,12 +261,25 @@ namespace SabreTools.Helper.Tools
 
 						FileStream writeStream = FileTools.TryCreate(Path.Combine(outDir, zf.Entries[i].FileName));
 
-						byte[] ibuffer = new byte[_bufferSize];
-						int ilen;
-						while ((ilen = readStream.Read(ibuffer, 0, _bufferSize)) > 0)
+						// If the stream is smaller than the buffer, just run one loop through to avoid issues
+						if (streamsize < _bufferSize)
 						{
+							byte[] ibuffer = new byte[streamsize];
+							int ilen = readStream.Read(ibuffer, 0, (int)streamsize);
 							writeStream.Write(ibuffer, 0, ilen);
 							writeStream.Flush();
+						}
+						// Otherwise, we do the normal loop
+						else
+						{
+							int realBufferSize = (streamsize < _bufferSize ? (int)streamsize : _bufferSize);
+							byte[] ibuffer = new byte[realBufferSize];
+							int ilen;
+							while ((ilen = readStream.Read(ibuffer, 0, realBufferSize)) > 0)
+							{
+								writeStream.Write(ibuffer, 0, ilen);
+								writeStream.Flush();
+							}
 						}
 
 						zr = zf.CloseReadStream();
@@ -443,13 +456,25 @@ namespace SabreTools.Helper.Tools
 								realEntry = zf.Entries[i].FileName;
 								zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Helper.Data.CompressionMethod cm, out uint lastMod);
 
-								// Write the file out
-								byte[] zbuffer = new byte[_bufferSize];
-								int zlen;
-								while ((zlen = readStream.Read(zbuffer, 0, _bufferSize)) > 0)
+								// If the stream is smaller than the buffer, just run one loop through to avoid issues
+								if (streamsize < _bufferSize)
 								{
-									ms.Write(zbuffer, 0, zlen);
+									byte[] ibuffer = new byte[streamsize];
+									int ilen = readStream.Read(ibuffer, 0, (int)streamsize);
+									ms.Write(ibuffer, 0, ilen);
 									ms.Flush();
+								}
+								// Otherwise, we do the normal loop
+								else
+								{
+									int realBufferSize = (streamsize < _bufferSize ? (int)streamsize : _bufferSize);
+									byte[] ibuffer = new byte[realBufferSize];
+									int ilen;
+									while ((ilen = readStream.Read(ibuffer, 0, realBufferSize)) > 0)
+									{
+										ms.Write(ibuffer, 0, ilen);
+										ms.Flush();
+									}
 								}
 
 								zr = zf.CloseReadStream();
@@ -893,12 +918,25 @@ namespace SabreTools.Helper.Tools
 							{
 								MemoryStream entryStream = new MemoryStream();
 
-								byte[] ibuffer = new byte[_bufferSize];
-								int ilen;
-								while ((ilen = readStream.Read(ibuffer, 0, _bufferSize)) > 0)
+								// If the stream is smaller than the buffer, just run one loop through to avoid issues
+								if (streamsize < _bufferSize)
 								{
+									byte[] ibuffer = new byte[streamsize];
+									int ilen = readStream.Read(ibuffer, 0, (int)streamsize);
 									entryStream.Write(ibuffer, 0, ilen);
 									entryStream.Flush();
+								}
+								// Otherwise, we do the normal loop
+								else
+								{
+									int realBufferSize = (streamsize < _bufferSize ? (int)streamsize : _bufferSize);
+									byte[] ibuffer = new byte[realBufferSize];
+									int ilen;
+									while ((ilen = readStream.Read(ibuffer, 0, realBufferSize)) > 0)
+									{
+										entryStream.Write(ibuffer, 0, ilen);
+										entryStream.Flush();
+									}
 								}
 								zr = zf.CloseReadStream();
 
