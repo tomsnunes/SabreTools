@@ -119,7 +119,8 @@ namespace SabreTools.Helper.Tools
 
 			#endregion
 
-			// For each item, extract to stream, write to archive
+			// If the input archive is 
+
 			return false;
 		}
 
@@ -466,6 +467,129 @@ namespace SabreTools.Helper.Tools
 			}
 
 			return realEntry;
+		}
+
+		/// <summary>
+		/// Attempt to extract a stream from an archive
+		/// </summary>
+		/// <param name="input">Name of the archive to be extracted</param>
+		/// <param name="entryName">Name of the entry to be extracted</param>
+		/// <param name="tempDir">Temporary directory for archive extraction</param>
+		/// <returns>MemoryStream representing the entry, null on error</returns>
+		public static MemoryStream ExtractStream(string input, string entryName, string tempDir)
+		{
+			MemoryStream ms = new MemoryStream();
+
+			// First get the archive type
+			ArchiveType? at = GetCurrentArchiveType(input);
+
+			// If we got back null, then it's not an archive, so we we return
+			if (at == null)
+			{
+				return null;
+			}
+
+			try
+			{
+				switch (at)
+				{
+					case ArchiveType.SevenZip:
+						SevenZipArchive sza = SevenZipArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
+						foreach (SevenZipArchiveEntry entry in sza.Entries)
+						{
+							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
+							{
+								// Write the file out
+								entry.WriteTo(ms);
+								break;
+							}
+						}
+						sza.Dispose();
+						break;
+
+					case ArchiveType.GZip:
+						// Decompress the input stream
+						GZipStream gzstream = new GZipStream(FileTools.TryOpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
+
+						// Write the file out
+						byte[] gbuffer = new byte[_bufferSize];
+						int glen;
+						while ((glen = gzstream.Read(gbuffer, 0, _bufferSize)) > 0)
+						{
+
+							ms.Write(gbuffer, 0, glen);
+							ms.Flush();
+						}
+
+						// Dispose of the streams
+						gzstream.Dispose();
+						break;
+
+					case ArchiveType.Rar:
+						RarArchive ra = RarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
+						foreach (RarArchiveEntry entry in ra.Entries)
+						{
+							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
+							{
+								// Write the file out
+								entry.WriteTo(ms);
+							}
+						}
+						ra.Dispose();
+						break;
+
+					case ArchiveType.Tar:
+						TarArchive ta = TarArchive.Open(input, new ReaderOptions { LeaveStreamOpen = false, });
+						foreach (TarArchiveEntry entry in ta.Entries)
+						{
+							if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
+							{
+								// Write the file out
+								entry.WriteTo(ms);
+							}
+						}
+						ta.Dispose();
+						break;
+
+					case ArchiveType.Zip:
+						ZipFile zf = new ZipFile();
+						ZipReturn zr = zf.Open(input, new FileInfo(input).LastWriteTime.Ticks, true);
+						if (zr != ZipReturn.ZipGood)
+						{
+							throw new Exception(ZipFile.ZipErrorMessageText(zr));
+						}
+
+						for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
+						{
+							if (zf.Entries[i].FileName.Contains(entryName))
+							{
+								// Open the read stream
+								zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Helper.Data.CompressionMethod cm, out uint lastMod);
+
+								// Write the file out
+								byte[] zbuffer = new byte[_bufferSize];
+								int zlen;
+								while ((zlen = readStream.Read(zbuffer, 0, _bufferSize)) > 0)
+								{
+									ms.Write(zbuffer, 0, zlen);
+									ms.Flush();
+								}
+
+								zr = zf.CloseReadStream();
+							}
+						}
+
+						zf.Dispose();
+						break;
+				}
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+				ms = null;
+			}
+
+			return ms;
 		}
 
 		#endregion
