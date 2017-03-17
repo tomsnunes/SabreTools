@@ -5,7 +5,7 @@ using SabreTools.Helper.Data;
 
 namespace SabreTools.Helper.Dats
 {
-	public class Machine
+	public class Machine : ICloneable
 	{
 		#region Protected instance variables
 
@@ -125,6 +125,31 @@ namespace SabreTools.Helper.Dats
 			_name = name;
 			_description = description;
 			_runnable = null;
+		}
+
+		#endregion
+
+		#region Cloneing
+
+		public object Clone()
+		{
+			return new Machine()
+			{
+				Name = _name,
+				Comment = _comment,
+				Description = _description,
+				Year = _year,
+				Manufacturer = _manufacturer,
+				RomOf = _romOf,
+				CloneOf = _cloneOf,
+				SampleOf = _sampleOf,
+				SourceFile = _sourceFile,
+				Runnable = _runnable,
+				Board = _board,
+				RebuildTo = _rebuildTo,
+				Devices = _devices,
+				MachineType = _machineType,
+			};
 		}
 
 		#endregion
