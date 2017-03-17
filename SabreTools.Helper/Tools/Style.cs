@@ -71,6 +71,24 @@ namespace SabreTools.Helper.Tools
 			hash = (String.IsNullOrEmpty(hash) ? "" : hash.PadLeft(padding, '0'));
 			hash = hash.ToLowerInvariant();
 
+			// If the hash still isn't the right length, blank it out
+			if (hash.Length != padding)
+			{
+				hash = "";
+			}
+			// Otherwise, make sure that every character is a proper match
+			else
+			{
+				for (int i = 0; i < hash.Length; i++)
+				{
+					if ((hash[i] < '0' || hash[i] > '9') && (hash[i] < 'a' || hash[i] > 'f'))
+					{
+						hash = "";
+						break;
+					}
+				}
+			}
+
 			// Then make sure that it has the correct characters
 			if (!Regex.IsMatch(hash, "[0-9a-f]{" + padding + "}"))
 			{
