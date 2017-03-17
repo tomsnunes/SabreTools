@@ -64,28 +64,42 @@ namespace SabreTools.Helper.Tools
 		/// <returns>Cleaned string</returns>
 		public static string CleanHashData(string hash, int padding)
 		{
-			// First get the hash to the correct length
-			hash = (String.IsNullOrEmpty(hash) ? "" : hash.Trim());
-			hash = (hash.StartsWith("0x") ? hash.Remove(0, 2) : hash);
-			hash = (hash == "-" ? "" : hash);
-			hash = (String.IsNullOrEmpty(hash) ? "" : hash.PadLeft(padding, '0'));
+			// If we have a known blank hash, return blank
+			if (string.IsNullOrEmpty(hash) || hash == "-" || hash == "_")
+			{
+				return "";
+			}
+
+			// Check to see if it's a "hex" hash
+			hash = hash.Trim().Replace("0x", "");
+
+			// If we have a blank hash now, return blank
+			if (string.IsNullOrEmpty(hash))
+			{
+				return "";
+			}
+
+			// If the hash shorter than the required length, pad it
+			if (hash.Length < padding)
+			{
+				hash = hash.PadLeft(padding, '0');
+			}
+			// If the hash is longer than the required length, it's invalid
+			else if (hash.Length > padding)
+			{
+				return "";
+			}
+			
+			// Now normalize the hash
 			hash = hash.ToLowerInvariant();
 
-			// If the hash still isn't the right length, blank it out
-			if (hash.Length != padding)
-			{
-				hash = "";
-			}
 			// Otherwise, make sure that every character is a proper match
-			else
+			for (int i = 0; i < hash.Length; i++)
 			{
-				for (int i = 0; i < hash.Length; i++)
+				if ((hash[i] < '0' || hash[i] > '9') && (hash[i] < 'a' || hash[i] > 'f'))
 				{
-					if ((hash[i] < '0' || hash[i] > '9') && (hash[i] < 'a' || hash[i] > 'f'))
-					{
-						hash = "";
-						break;
-					}
+					hash = "";
+					break;
 				}
 			}
 
