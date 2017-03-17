@@ -425,7 +425,7 @@ namespace SabreTools.Helper.Tools
 		public static string GetRombaPath(string hash)
 		{
 			// If the hash isn't the right size, then we return null
-			if (hash.Length != Constants.SHA1Length)
+			if (hash.Length != Constants.SHA1Length) // TODO: When updating to SHA-256, this needs to update to Constants.SHA256Length
 			{
 				return null;
 			}
