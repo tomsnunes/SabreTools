@@ -581,9 +581,6 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="infiles">List of File objects representing the roms to be merged</param>
 		/// <returns>A List of RomData objects representing the renamed roms</returns>
-		/// <remarks>
-		/// TODO: Eventually, we want this to use the CRC/MD5/SHA-1 of relavent items instead of just _1
-		/// </remarks>
 		public static List<DatItem> ResolveNames(List<DatItem> infiles)
 		{
 			// Create the output list
@@ -623,16 +620,24 @@ namespace SabreTools.Helper.Dats
 					if (datItem.Type == ItemType.Disk)
 					{
 						Disk disk = (Disk)datItem;
-						disk.Name += "_" + (!String.IsNullOrEmpty(disk.MD5) ? disk.MD5 : disk.SHA1);
+						disk.Name += "_" + (!String.IsNullOrEmpty(disk.MD5)
+							? disk.MD5
+							: !String.IsNullOrEmpty(disk.SHA1)
+								? disk.SHA1
+								: "1");
 						datItem = disk;
 						lastrenamed = lastrenamed ?? datItem.Name;
 					}
 					else if (datItem.Type == ItemType.Rom)
 					{
 						Rom rom = (Rom)datItem;
-						rom.Name += "_" + (!String.IsNullOrEmpty(rom.CRC) ? rom.CRC :
-							!String.IsNullOrEmpty(rom.MD5) ? rom.MD5 :
-								!String.IsNullOrEmpty(rom.SHA1) ? rom.SHA1 : "(alt)");
+						rom.Name += "_" + (!String.IsNullOrEmpty(rom.CRC)
+							? rom.CRC
+							: !String.IsNullOrEmpty(rom.MD5)
+								? rom.MD5
+								: !String.IsNullOrEmpty(rom.SHA1)
+									? rom.SHA1
+									: "1");
 						datItem = rom;
 						lastrenamed = lastrenamed ?? datItem.Name;
 					}

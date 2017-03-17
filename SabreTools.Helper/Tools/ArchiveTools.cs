@@ -2482,7 +2482,7 @@ namespace SabreTools.Helper.Tools
 			File.Move(tempFile, archiveFileName);
 
 			// Now make the file TXZ
-			// TODO: Add ACTUAL T7Z compatible code
+			// TODO: Add ACTUAL TXZ compatible code (based on T7z)
 
 			BinaryWriter bw = new BinaryWriter(FileTools.TryOpenReadWrite(archiveFileName));
 			bw.Seek(0, SeekOrigin.Begin);

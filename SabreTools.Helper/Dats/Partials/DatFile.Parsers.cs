@@ -1271,7 +1271,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="descAsName">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <remrks>
 		/// TODO: Software Lists - sharedfeat tag (read-in, write-out)
-		/// TODO: If updating softlists, is it possible to update cloneof/romof/sampleof tags as well?
+		/// TODO: If replacing name with description, is it possible to update cloneof/romof/sampleof tags as well?
 		/// </remrks>
 		private void ParseGenericXML(
 			// Standard Dat parsing

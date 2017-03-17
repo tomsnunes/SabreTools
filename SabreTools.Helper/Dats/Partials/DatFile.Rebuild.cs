@@ -19,9 +19,6 @@ using Stream = System.IO.Stream;
 
 namespace SabreTools.Helper.Dats
 {
-	/*
-	 * TODO: Delete flags - Remove files from archive if only some are used (rebuild to TZip)
-	 */
 	public partial class DatFile
 	{
 		#region Rebuilding and Verifying [MODULAR DONE, FOR NOW]

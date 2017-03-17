@@ -38,9 +38,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <remarks>
-		/// TODO: Folder-wise output for update (similar to level-split)
-		/// </remarks>
 		public void DetermineUpdateType(List<string> inputPaths, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
 			bool bare, bool clean, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
