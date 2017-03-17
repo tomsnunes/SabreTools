@@ -582,7 +582,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="infiles">List of File objects representing the roms to be merged</param>
 		/// <returns>A List of RomData objects representing the renamed roms</returns>
 		/// <remarks>
-		/// Eventually, we want this to use the CRC/MD5/SHA-1 of relavent items instead of just _1
+		/// TODO: Eventually, we want this to use the CRC/MD5/SHA-1 of relavent items instead of just _1
 		/// </remarks>
 		public static List<DatItem> ResolveNames(List<DatItem> infiles)
 		{
