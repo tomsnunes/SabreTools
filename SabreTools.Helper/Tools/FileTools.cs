@@ -7,6 +7,7 @@ using System.Xml.Schema;
 
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
+using SabreTools.Helper.External;
 using SabreTools.Helper.Skippers;
 
 #if MONO
@@ -30,7 +31,6 @@ using StreamReader = System.IO.StreamReader;
 #endif
 using NaturalSort;
 using OCRC;
-using xxHashSharp;
 
 namespace SabreTools.Helper.Tools
 {

@@ -29,10 +29,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace xxHashSharp
+namespace SabreTools.Helper.External
 {
-	public class xxHash
+	class xxHash
 	{
 		public struct XXH_State
 		{
@@ -247,6 +251,5 @@ namespace xxHashSharp
 		{
 			return (value << count) | (value >> (32 - count));
 		}
-
 	}
 }
