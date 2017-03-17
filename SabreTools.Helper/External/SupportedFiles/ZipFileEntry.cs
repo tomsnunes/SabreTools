@@ -77,12 +77,12 @@ namespace ROMVault2.SupportedFiles.Zip
 		}
 		public string ExtraField
 		{
-			get { return Encoding.ASCII.GetString(_extraField); }
+			get { return Encoding.GetEncoding(858).GetString(_extraField); }
 			set { _extraField = Style.StringToByteArray(Style.ConvertAsciiToHex(value)); }
 		}
 		public string Comment
 		{
-			get { return Encoding.ASCII.GetString(_comment); }
+			get { return Encoding.GetEncoding(858).GetString(_comment); }
 			set { _comment = Style.StringToByteArray(Style.ConvertAsciiToHex(value)); }
 		}
 		public ulong RelativeOffset
@@ -196,7 +196,7 @@ namespace ROMVault2.SupportedFiles.Zip
 				_relativeOffset = br.ReadUInt32();
 				byte[] fileNameBytes = br.ReadBytes(fileNameLength);
 				_fileName = ((_generalPurposeBitFlag & GeneralPurposeBitFlag.LanguageEncodingFlag) == 0
-					? Encoding.ASCII.GetString(fileNameBytes)
+					? Encoding.GetEncoding(858).GetString(fileNameBytes)
 					: Encoding.UTF8.GetString(fileNameBytes, 0, fileNameLength));
 				_extraField = br.ReadBytes(extraFieldLength);
 				_comment = br.ReadBytes(fileCommentLength);
@@ -340,7 +340,7 @@ namespace ROMVault2.SupportedFiles.Zip
 			}
 			else
 			{
-				fileNameBytes = Encoding.ASCII.GetBytes(_fileName);
+				fileNameBytes = Encoding.GetEncoding(858).GetBytes(_fileName);
 			}
 			ushort fileNameLength = (ushort)fileNameBytes.Length;
 
@@ -457,7 +457,7 @@ namespace ROMVault2.SupportedFiles.Zip
 
 				byte[] fileNameBytes = br.ReadBytes(fileNameLength);
 				string tempFileName = ((_generalPurposeBitFlag & GeneralPurposeBitFlag.LanguageEncodingFlag) == 0
-					? Encoding.ASCII.GetString(fileNameBytes)
+					? Encoding.GetEncoding(858).GetString(fileNameBytes)
 					: Encoding.UTF8.GetString(fileNameBytes, 0, fileNameLength));
 
 				byte[] extraField = br.ReadBytes(extraFieldLength);
@@ -618,7 +618,7 @@ namespace ROMVault2.SupportedFiles.Zip
 
 				byte[] fileNameBytes = br.ReadBytes(fileNameLength);
 				_fileName = ((_generalPurposeBitFlag & GeneralPurposeBitFlag.LanguageEncodingFlag) == 0
-					? Encoding.ASCII.GetString(fileNameBytes)
+					? Encoding.GetEncoding(858).GetString(fileNameBytes)
 					: Encoding.UTF8.GetString(fileNameBytes, 0, fileNameLength));
 
 				byte[] extraField = br.ReadBytes(extraFieldLength);
@@ -715,7 +715,7 @@ namespace ROMVault2.SupportedFiles.Zip
 			}
 			else
 			{
-				fileNameBytes = Encoding.ASCII.GetBytes(_fileName);
+				fileNameBytes = Encoding.GetEncoding(858).GetBytes(_fileName);
 			}
 
 			// Set the version needed to extract according to if it's Zip64
