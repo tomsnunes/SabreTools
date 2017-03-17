@@ -512,16 +512,23 @@ namespace SabreTools.Helper.Dats
 					return rebuilt;
 				}
 
-				// If we have an archive input, get the real name of the file to use
-				// TODO: Remove the need to extract the file first; reimplement ArchiveToArchive?
-				if (isZip == true)
-				{
-					// Otherwise, extract the file to the temp folder
-					file = ArchiveTools.ExtractItem(file, rom.Name, tempDir);
-				}				
+				// Get a generic stream for the file
+				Stream fileStream = new MemoryStream();
 
-				// If we couldn't extract the file, then continue,
-				if (String.IsNullOrEmpty(file))
+				// If we have a zipfile, extract the stream to memory
+				if (isZip != null)
+				{
+					string realName = null;
+					(fileStream, realName) = ArchiveTools.ExtractStream(file, rom.Name);
+				}
+				// Otherwise, just open the filestream
+				else
+				{
+					fileStream = FileTools.TryOpenRead(file);
+				}
+
+				// If the stream is null, then continue
+				if (fileStream == null)
 				{
 					return rebuilt;
 				}
@@ -540,10 +547,22 @@ namespace SabreTools.Helper.Dats
 							// Make sure the output folder is created
 							Directory.CreateDirectory(Path.GetDirectoryName(outfile));
 
-							// Now copy the file over
+							// Now write the file over
 							try
 							{
-								File.Copy(file, outfile);
+								FileStream writeStream = FileTools.TryCreate(outfile);
+
+								// Copy the input stream to the output
+								int bufferSize = 4096 * 128;
+								byte[] ibuffer = new byte[bufferSize];
+								int ilen;
+								while ((ilen = fileStream.Read(ibuffer, 0, bufferSize)) > 0)
+								{
+									writeStream.Write(ibuffer, 0, ilen);
+									writeStream.Flush();
+								}
+								writeStream.Dispose();
+
 								if (date && !String.IsNullOrEmpty(item.Date))
 								{
 									File.SetCreationTime(outfile, DateTime.Parse(item.Date));
@@ -558,26 +577,29 @@ namespace SabreTools.Helper.Dats
 
 							break;
 						case OutputFormat.TapeArchive:
-							rebuilt &= ArchiveTools.WriteTAR(file, outDir, item, date: date);
+							rebuilt &= ArchiveTools.WriteTAR(fileStream, outDir, item, date: date);
 							break;
 						case OutputFormat.Torrent7Zip:
-							rebuilt &= ArchiveTools.WriteTorrent7Zip(file, outDir, item, date: date);
+							rebuilt &= ArchiveTools.WriteTorrent7Zip(fileStream, outDir, item, date: date);
 							break;
 						case OutputFormat.TorrentGzip:
-							rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba);
+							rebuilt &= ArchiveTools.WriteTorrentGZ(fileStream, outDir, romba);
 							break;
 						case OutputFormat.TorrentLrzip:
 							break;
 						case OutputFormat.TorrentRar:
 							break;
 						case OutputFormat.TorrentXZ:
-							rebuilt &= ArchiveTools.WriteTorrentXZ(file, outDir, item, date: date);
+							rebuilt &= ArchiveTools.WriteTorrentXZ(fileStream, outDir, item, date: date);
 							break;
 						case OutputFormat.TorrentZip:
-							rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, item, date: date);
+							rebuilt &= ArchiveTools.WriteTorrentZip(fileStream, outDir, item, date: date);
 							break;
 					}
 				}
+
+				// Close the input stream
+				fileStream?.Dispose();
 			}
 
 			// If we have no duplicates and we're filtering, rebuild it
@@ -615,22 +637,29 @@ namespace SabreTools.Helper.Dats
 					return rebuilt;
 				}
 
-				// If we have an archive input, get the real name of the file to use
-				if (isZip == true)
+				// Get a generic stream for the file
+				Stream fileStream = new MemoryStream();
+
+				// If we have a zipfile, extract the stream to memory
+				if (isZip != null)
 				{
-					// Otherwise, extract the file to the temp folder
-					machinename = Style.GetFileNameWithoutExtension(file);
-					file = ArchiveTools.ExtractItem(file, rom.Name, tempDir);
+					string realName = null;
+					(fileStream, realName) = ArchiveTools.ExtractStream(file, rom.Name);
+				}
+				// Otherwise, just open the filestream
+				else
+				{
+					fileStream = FileTools.TryOpenRead(file);
 				}
 
-				// If we couldn't extract the file, then continue,
-				if (String.IsNullOrEmpty(file))
+				// If the stream is null, then continue
+				if (fileStream == null)
 				{
 					return rebuilt;
 				}
 
 				// Get the item from the current file
-				Rom item = FileTools.GetFileInfo(file);
+				Rom item = FileTools.GetStreamInfo(fileStream, fileStream.Length, keepReadOpen: true);
 				item.Machine = new Machine()
 				{
 					Name = Style.GetFileNameWithoutExtension(item.Name),
@@ -658,7 +687,19 @@ namespace SabreTools.Helper.Dats
 						// Now copy the file over
 						try
 						{
-							File.Copy(file, outfile);
+							FileStream writeStream = FileTools.TryCreate(outfile);
+
+							// Copy the input stream to the output
+							int bufferSize = 4096 * 128;
+							byte[] ibuffer = new byte[bufferSize];
+							int ilen;
+							while ((ilen = fileStream.Read(ibuffer, 0, bufferSize)) > 0)
+							{
+								writeStream.Write(ibuffer, 0, ilen);
+								writeStream.Flush();
+							}
+							writeStream.Dispose();
+
 							if (date && !String.IsNullOrEmpty(item.Date))
 							{
 								File.SetCreationTime(outfile, DateTime.Parse(item.Date));
@@ -673,25 +714,28 @@ namespace SabreTools.Helper.Dats
 
 						break;
 					case OutputFormat.TapeArchive:
-						rebuilt &= ArchiveTools.WriteTAR(file, outDir, item, date: date);
+						rebuilt &= ArchiveTools.WriteTAR(fileStream, outDir, item, date: date);
 						break;
 					case OutputFormat.Torrent7Zip:
-						rebuilt &= ArchiveTools.WriteTorrent7Zip(file, outDir, item, date: date);
+						rebuilt &= ArchiveTools.WriteTorrent7Zip(fileStream, outDir, item, date: date);
 						break;
 					case OutputFormat.TorrentGzip:
-						rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba);
+						rebuilt &= ArchiveTools.WriteTorrentGZ(fileStream, outDir, romba);
 						break;
 					case OutputFormat.TorrentLrzip:
 						break;
 					case OutputFormat.TorrentRar:
 						break;
 					case OutputFormat.TorrentXZ:
-						rebuilt &= ArchiveTools.WriteTorrentXZ(file, outDir, item, date: date);
+						rebuilt &= ArchiveTools.WriteTorrentXZ(fileStream, outDir, item, date: date);
 						break;
 					case OutputFormat.TorrentZip:
-						rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, item, date: date);
+						rebuilt &= ArchiveTools.WriteTorrentZip(fileStream, outDir, item, date: date);
 						break;
 				}
+
+				// Close the input stream
+				fileStream?.Dispose();
 			}
 
 			// Now we want to take care of headers, if applicable
