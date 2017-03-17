@@ -533,7 +533,7 @@ namespace SabreTools.Helper.Dats
 					return rebuilt;
 				}
 
-				Globals.Logger.User("Matches found for '" + Style.GetFileName(file) + "', rebuilding accordingly...");
+				Globals.Logger.User("Matches found for '" + Style.GetFileName(rom.Name) + "', rebuilding accordingly...");
 				rebuilt = true;
 
 				// Now loop through the list and rebuild accordingly
@@ -673,7 +673,7 @@ namespace SabreTools.Helper.Dats
 					item.Machine.Description = machinename;
 				}
 
-				Globals.Logger.User("No matches found for '" + Style.GetFileName(file) + "', rebuilding accordingly from inverse flag...");
+				Globals.Logger.User("No matches found for '" + Style.GetFileName(rom.Name) + "', rebuilding accordingly from inverse flag...");
 
 				// Now rebuild to the output file
 				switch (outputFormat)
@@ -741,17 +741,39 @@ namespace SabreTools.Helper.Dats
 			// Now we want to take care of headers, if applicable
 			if (headerToCheckAgainst != null)
 			{
+				// Get a generic stream for the file
+				Stream fileStream = new MemoryStream();
+
+				// If we have a zipfile, extract the stream to memory
+				if (isZip != null)
+				{
+					string realName = null;
+					(fileStream, realName) = ArchiveTools.ExtractStream(file, rom.Name);
+				}
+				// Otherwise, just open the filestream
+				else
+				{
+					fileStream = FileTools.TryOpenRead(file);
+				}
+
+				// If the stream is null, then continue
+				if (fileStream == null)
+				{
+					return rebuilt;
+				}
+
 				// Check to see if we have a matching header first
-				SkipperRule rule = Skipper.GetMatchingRule(file, Path.GetFileNameWithoutExtension(headerToCheckAgainst));
+				SkipperRule rule = Skipper.GetMatchingRule(fileStream, Path.GetFileNameWithoutExtension(headerToCheckAgainst));
 
 				// If there's a match, create the new file to write
 				if (rule.Tests != null && rule.Tests.Count != 0)
 				{
 					// If the file could be transformed correctly
-					if (rule.TransformFile(file, file + ".new"))
+					MemoryStream transformStream = new MemoryStream();
+					if (rule.TransformStream(fileStream, transformStream, keepReadOpen: true, keepWriteOpen: true))
 					{
 						// Get the file informations that we will be using
-						Rom headerless = FileTools.GetFileInfo(file + ".new");
+						Rom headerless = FileTools.GetStreamInfo(transformStream, transformStream.Length, keepReadOpen: true);
 
 						// Find if the file has duplicates in the DAT
 						hasDuplicates = headerless.HasDuplicates(this);
@@ -768,7 +790,7 @@ namespace SabreTools.Helper.Dats
 								return rebuilt;
 							}
 
-							Globals.Logger.User("Headerless matches found for '" + Style.GetFileName(file) + "', rebuilding accordingly...");
+							Globals.Logger.User("Headerless matches found for '" + Style.GetFileName(rom.Name) + "', rebuilding accordingly...");
 							rebuilt = true;
 
 							// Now loop through the list and rebuild accordingly
@@ -793,7 +815,19 @@ namespace SabreTools.Helper.Dats
 										// Now copy the files over
 										try
 										{
-											File.Copy(file + ".new", outfile);
+											FileStream writeStream = FileTools.TryCreate(outfile);
+
+											// Copy the input stream to the output
+											int bufferSize = 4096 * 128;
+											byte[] ibuffer = new byte[bufferSize];
+											int ilen;
+											while ((ilen = transformStream.Read(ibuffer, 0, bufferSize)) > 0)
+											{
+												writeStream.Write(ibuffer, 0, ilen);
+												writeStream.Flush();
+											}
+											writeStream.Dispose();
+
 											if (date && !String.IsNullOrEmpty(item.Date))
 											{
 												File.SetCreationTime(outfile, DateTime.Parse(item.Date));
@@ -804,10 +838,22 @@ namespace SabreTools.Helper.Dats
 										catch { }
 										try
 										{
-											File.Copy(file, headeredOutfile);
-											if (date && !String.IsNullOrEmpty(rom.Date))
+											FileStream writeStream = FileTools.TryCreate(outfile);
+
+											// Copy the input stream to the output
+											int bufferSize = 4096 * 128;
+											byte[] ibuffer = new byte[bufferSize];
+											int ilen;
+											while ((ilen = fileStream.Read(ibuffer, 0, bufferSize)) > 0)
 											{
-												File.SetCreationTime(outfile, DateTime.Parse(rom.Date));
+												writeStream.Write(ibuffer, 0, ilen);
+												writeStream.Flush();
+											}
+											writeStream.Dispose();
+
+											if (date && !String.IsNullOrEmpty(item.Date))
+											{
+												File.SetCreationTime(outfile, DateTime.Parse(item.Date));
 											}
 
 											eitherSuccess |= true;
@@ -819,34 +865,40 @@ namespace SabreTools.Helper.Dats
 
 										break;
 									case OutputFormat.TapeArchive:
-										rebuilt &= ArchiveTools.WriteTAR(file + ".new", outDir, item, date: date);
-										rebuilt &= ArchiveTools.WriteTAR(file, outDir, rom, date: date);
+										rebuilt &= ArchiveTools.WriteTAR(transformStream, outDir, item, date: date);
+										rebuilt &= ArchiveTools.WriteTAR(fileStream, outDir, rom, date: date);
 										break;
 									case OutputFormat.Torrent7Zip:
-										rebuilt &= ArchiveTools.WriteTorrent7Zip(file + ".new", outDir, item, date: date);
-										rebuilt &= ArchiveTools.WriteTorrent7Zip(file, outDir, rom, date: date);
+										rebuilt &= ArchiveTools.WriteTorrent7Zip(transformStream, outDir, item, date: date);
+										rebuilt &= ArchiveTools.WriteTorrent7Zip(fileStream, outDir, rom, date: date);
 										break;
 									case OutputFormat.TorrentGzip:
-										rebuilt &= ArchiveTools.WriteTorrentGZ(file + ".new", outDir, romba);
-										rebuilt &= ArchiveTools.WriteTorrentGZ(file, outDir, romba);
+										rebuilt &= ArchiveTools.WriteTorrentGZ(transformStream, outDir, romba);
+										rebuilt &= ArchiveTools.WriteTorrentGZ(fileStream, outDir, romba);
 										break;
 									case OutputFormat.TorrentLrzip:
 										break;
 									case OutputFormat.TorrentRar:
 										break;
 									case OutputFormat.TorrentXZ:
-										rebuilt &= ArchiveTools.WriteTorrentXZ(file + ".new", outDir, item, date: date);
-										rebuilt &= ArchiveTools.WriteTorrentXZ(file, outDir, rom, date: date);
+										rebuilt &= ArchiveTools.WriteTorrentXZ(transformStream, outDir, item, date: date);
+										rebuilt &= ArchiveTools.WriteTorrentXZ(fileStream, outDir, rom, date: date);
 										break;
 									case OutputFormat.TorrentZip:
-										rebuilt &= ArchiveTools.WriteTorrentZip(file + ".new", outDir, item, date: date);
-										rebuilt &= ArchiveTools.WriteTorrentZip(file, outDir, rom, date: date);
+										rebuilt &= ArchiveTools.WriteTorrentZip(transformStream, outDir, item, date: date);
+										rebuilt &= ArchiveTools.WriteTorrentZip(fileStream, outDir, rom, date: date);
 										break;
 								}
 							}
 						}
 					}
+
+					// Dispose of the stream
+					transformStream?.Dispose();
 				}
+
+				// Dispose of the stream
+				fileStream?.Dispose();
 			}
 
 			// And now clear the temp folder to get rid of any transient files if we unzipped
