@@ -41,12 +41,14 @@ namespace RombaSharp
 			DatFile df = new DatFile();
 			foreach (string dir in onlyDirs)
 			{
-				df.PopulateFromDir(dir, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, false, true, false, false, _tmpdir, false, null);
+				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
+				df.PopulateFromDir(dir, Hash.DeepHashes, false, false, true, false, false, _tmpdir, false, null);
 
 				// If we're looking for only needed, consider the zipfiles themselves too
 				if (onlyNeeded)
 				{
-					df.PopulateFromDir(dir, Hash.SHA256 & Hash.SHA384 & Hash.SHA512, false, true, true, false, false, _tmpdir, false, null);
+					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
+					df.PopulateFromDir(dir, Hash.DeepHashes, false, true, true, false, false, _tmpdir, false, null);
 				}
 			}
 
@@ -249,7 +251,8 @@ namespace RombaSharp
 
 			foreach (string input in inputs)
 			{
-				datdata.PopulateFromDir(input, Hash.SHA256 & Hash.SHA384 & Hash.SHA512 /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
+				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
+				datdata.PopulateFromDir(input, Hash.DeepHashes /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
 					true /* enableGzip */, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
 					null /* headerToCheckAgainst */);
 				datdata.WriteToFile("");

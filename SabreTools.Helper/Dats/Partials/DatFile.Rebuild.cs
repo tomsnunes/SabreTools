@@ -1028,8 +1028,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <returns>True if verification was a success, false otherwise</returns>
-		public bool VerifyGeneric(List<string> inputs, string tempDir, bool hashOnly, bool quickScan,
-			string headerToCheckAgainst)
+		public bool VerifyGeneric(List<string> inputs, string tempDir, bool hashOnly, bool quickScan, string headerToCheckAgainst)
 		{
 			// Check the temp directory exists
 			if (String.IsNullOrEmpty(tempDir))
