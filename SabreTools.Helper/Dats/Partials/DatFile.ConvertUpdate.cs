@@ -19,7 +19,7 @@ namespace SabreTools.Helper.Dats
 {
 	public partial class DatFile
 	{
-		#region Converting and Updating [MODULAR DONE]
+		#region Converting and Updating
 
 		/// <summary>
 		/// Determine if input files should be merged, diffed, or processed invidually

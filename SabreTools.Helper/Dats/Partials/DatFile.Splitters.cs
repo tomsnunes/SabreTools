@@ -17,7 +17,7 @@ namespace SabreTools.Helper.Dats
 {
 	public partial class DatFile
 	{
-		#region Splitting [MODULAR DONE]
+		#region Splitting
 
 		/// <summary>
 		/// Split a DAT by input extensions

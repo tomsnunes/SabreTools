@@ -144,7 +144,7 @@ namespace SabreTools.Helper.Dats
 
 		#region Instance Methods
 
-		#region Comparision Methods [MODULAR DONE]
+		#region Comparision Methods
 
 		public int CompareTo(DatItem other)
 		{
@@ -235,7 +235,7 @@ namespace SabreTools.Helper.Dats
 
 		#endregion
 
-		#region Sorting and Merging [MODULAR DONE]
+		#region Sorting and Merging
 
 		/// <summary>
 		/// Check if a DAT contains the given rom
@@ -447,7 +447,7 @@ namespace SabreTools.Helper.Dats
 
 		#region Static Methods
 
-		#region Sorting and Merging [MODULAR DONE]
+		#region Sorting and Merging
 
 		/// <summary>
 		/// Merge an arbitrary set of ROMs based on the supplied information

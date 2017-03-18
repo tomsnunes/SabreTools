@@ -18,7 +18,7 @@ namespace SabreTools.Helper.Dats
 	{
 #region Instance Methods
 
-#region Bucketing [MODULAR DONE]
+#region Bucketing
 
 		/// <summary>
 		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by a user-defined method
@@ -206,7 +206,7 @@ namespace SabreTools.Helper.Dats
 
 #endregion
 
-#region Merging/Splitting Methods [MODULAR DONE]
+#region Merging/Splitting Methods
 
 		/// <summary>
 		/// Use cloneof tags to create non-merged sets and remove the tags plus using the device_ref tags to get full sets
@@ -302,7 +302,7 @@ namespace SabreTools.Helper.Dats
 
 #endregion
 
-#region Merging/Splitting Helper Methods [MODULAR DONE]
+#region Merging/Splitting Helper Methods
 
 		/// <summary>
 		/// Use romof tags to add roms to the children
@@ -889,7 +889,7 @@ namespace SabreTools.Helper.Dats
 
 #region Static Methods
 
-#region Bucketing [MODULAR DONE]
+#region Bucketing
 
 		/// <summary>
 		/// Take an arbitrarily ordered List and return a Dictionary sorted by Game

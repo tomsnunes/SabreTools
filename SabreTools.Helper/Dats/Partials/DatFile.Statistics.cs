@@ -26,7 +26,7 @@ namespace SabreTools.Helper.Dats
 	{
 		#region Instance Methods
 
-		#region Statistics [MODULAR DONE]
+		#region Statistics
 
 		/// <summary>
 		/// Recalculate the statistics for the Dat
@@ -244,7 +244,7 @@ namespace SabreTools.Helper.Dats
 
 		#region Static Methods
 
-		#region Statistics [MODULAR DONE]
+		#region Statistics
 
 		/// <summary>
 		/// Output the stats for a list of input dats as files in a human-readable format

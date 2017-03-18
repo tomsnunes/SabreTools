@@ -22,7 +22,7 @@ namespace SabreTools.Helper.Dats
 {
 	public partial class DatFile
 	{
-		#region Writing [MODULAR DONE]
+		#region Writing
 
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
