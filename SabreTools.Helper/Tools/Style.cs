@@ -461,7 +461,7 @@ namespace SabreTools.Helper.Tools
 		/// <returns>Cleaned string</returns>
 		public static string RemoveUnicodeCharacters(string s)
 		{
-			return new string(s.Where(c => c > 255).ToArray());
+			return new string(s.Where(c => c <= 255).ToArray());
 		}
 
 		/// <summary>
