@@ -195,7 +195,11 @@ namespace SabreTools.Helper.Dats
 							}
 						}
 
-						newitems.Add(item);
+						// Lock the list and add the item back
+						lock (newitems)
+						{
+							newitems.Add(item);
+						}
 					}
 				});
 
