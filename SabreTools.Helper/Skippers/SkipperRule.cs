@@ -50,7 +50,7 @@ namespace SabreTools.Helper.Skippers
 			}
 
 			Globals.Logger.User("Attempting to apply rule to '" + input + "'");
-			success = TransformStream(FileTools.TryOpenRead(input), FileTools.TryOpenWrite(output));
+			success = TransformStream(FileTools.TryOpenRead(input), FileTools.TryCreate(output));
 
 			// If the output file has size 0, delete it
 			if (new FileInfo(output).Length == 0)
