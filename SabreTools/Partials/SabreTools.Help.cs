@@ -1005,6 +1005,11 @@ namespace SabreTools
 				"Clean game names according to WoD standards",
 				FeatureType.Flag,
 				null));
+			update.AddFeature("rem-uni", new Feature(
+				new List<string>() { "-ru", "--rem-uni" },
+				"Remove unicode characters from names",
+				FeatureType.Flag,
+				null));
 			update.AddFeature("rem-md5", new Feature(
 				new List<string>() { "-rmd5", "--rem-md5" },
 				"Remove MD5 hashes from the output",

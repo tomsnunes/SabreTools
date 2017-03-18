@@ -455,6 +455,16 @@ namespace SabreTools.Helper.Tools
 		}
 
 		/// <summary>
+		/// Remove all unicode-specific chars from a string
+		/// </summary>
+		/// <param name="s">Input string to clean</param>
+		/// <returns>Cleaned string</returns>
+		public static string RemoveUnicodeCharacters(string s)
+		{
+			return new string(s.Where(c => c > 255).ToArray());
+		}
+
+		/// <summary>
 		/// Split a line as if it were a CMP rom line
 		/// </summary>
 		/// <param name="s">Line to split</param>

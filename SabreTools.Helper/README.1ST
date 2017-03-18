@@ -915,9 +915,14 @@ Options:
 			If this flag is enabled, then the romof, cloneof, and sampleof tags will be
 			omitted from the outputted DAT or DATs.
 				
-		-clean			Clean game names according to WoD standards
+		-clean				Clean game names according to WoD standards
 			Game names will be santitized to remove what the original WoD standards
 			deemed as unneeded information, such as parenthized or bracketed strings
+			
+		-ru, --rem-uni		Remove unicode characters from names
+			By default, the character set from the original file(s) will be used for
+			item naming. This flag removes all Unicode characters from the item names,
+			machine names, and machine descriptions.
 			
 		-rmd5, --rem-md5	Remove MD5 hashes from the output
 			By default, all available hashes will be written out to the DAT. This will

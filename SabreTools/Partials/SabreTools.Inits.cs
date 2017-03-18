@@ -472,6 +472,7 @@ namespace SabreTools
 		/// /* Output DAT info */
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="dedup">True to dedupe the roms in the DAT, false otherwise (default)</param>
 		/// <param name="stripHash">StripHash that represents the hash(es) that you want to remove from the output</param>
@@ -529,6 +530,7 @@ namespace SabreTools
 			/* Output DAT info */
 			string outDir,
 			bool clean,
+			bool remUnicode,
 			bool descAsName,
 			bool dedup,
 			Hash stripHash)

@@ -20,7 +20,7 @@ namespace SabreTools.Helper.Dats
 {
 	public partial class DatFile
 	{
-		#region Parsing [MODULAR DONE, FOR NOW]
+		#region Parsing
 
 		/// <summary>
 		/// Parse a DAT and return all found games and roms within
@@ -31,12 +31,15 @@ namespace SabreTools.Helper.Dats
 		/// <param name="datdata">The DatData object representing found roms to this point</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
 		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
-		public void Parse(string filename, int sysid, int srcid, bool keep = false, bool clean = false, bool descAsName = false, bool keepext = false, bool useTags = false)
+		public void Parse(string filename, int sysid, int srcid, bool keep = false, bool clean = false,
+			bool remUnicode = false, bool descAsName = false, bool keepext = false, bool useTags = false)
 		{
-			Parse(filename, sysid, srcid, SplitType.None, keep: keep, clean: clean, descAsName: descAsName, keepext: keepext, useTags: useTags);
+			Parse(filename, sysid, srcid, SplitType.None, keep: keep, clean: clean,
+				remUnicode: remUnicode, descAsName: descAsName, keepext: keepext, useTags: useTags);
 		}
 
 		/// <summary>
@@ -48,6 +51,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
 		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
@@ -64,6 +68,7 @@ namespace SabreTools.Helper.Dats
 			// Miscellaneous
 			bool keep = false,
 			bool clean = false,
+			bool remUnicode = false,
 			bool descAsName = false,
 			bool keepext = false,
 			bool useTags = false)
@@ -92,44 +97,44 @@ namespace SabreTools.Helper.Dats
 				switch (FileTools.GetDatFormat(filename))
 				{
 					case DatFormat.AttractMode:
-						ParseAttractMode(filename, sysid, srcid, keep, clean, descAsName);
+						ParseAttractMode(filename, sysid, srcid, keep, clean, remUnicode, descAsName);
 						break;
 					case DatFormat.ClrMamePro:
 					case DatFormat.DOSCenter:
-						ParseCMP(filename, sysid, srcid, keep, clean, descAsName);
+						ParseCMP(filename, sysid, srcid, keep, clean, remUnicode, descAsName);
 						break;
 					case DatFormat.CSV:
-						ParseCSVTSV(filename, sysid, srcid, ',', keep, clean, descAsName);
+						ParseCSVTSV(filename, sysid, srcid, ',', keep, clean, remUnicode, descAsName);
 						break;
 					case DatFormat.Logiqx:
 					case DatFormat.OfflineList:
 					case DatFormat.SabreDat:
 					case DatFormat.SoftwareList:
-						ParseGenericXML(filename, sysid, srcid, keep, clean, descAsName);
+						ParseGenericXML(filename, sysid, srcid, keep, clean, remUnicode, descAsName);
 						break;
 					case DatFormat.RedumpMD5:
-						ParseRedumpMD5(filename, sysid, srcid, clean);
+						ParseRedumpMD5(filename, sysid, srcid, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSFV:
-						ParseRedumpSFV(filename, sysid, srcid, clean);
+						ParseRedumpSFV(filename, sysid, srcid, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA1:
-						ParseRedumpSHA1(filename, sysid, srcid, clean);
+						ParseRedumpSHA1(filename, sysid, srcid, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA256:
-						ParseRedumpSHA256(filename, sysid, srcid, clean);
+						ParseRedumpSHA256(filename, sysid, srcid, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA384:
-						ParseRedumpSHA384(filename, sysid, srcid, clean);
+						ParseRedumpSHA384(filename, sysid, srcid, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA512:
-						ParseRedumpSHA512(filename, sysid, srcid, clean);
+						ParseRedumpSHA512(filename, sysid, srcid, clean, remUnicode);
 						break;
 					case DatFormat.RomCenter:
-						ParseRC(filename, sysid, srcid, clean, descAsName);
+						ParseRC(filename, sysid, srcid, clean, remUnicode, descAsName);
 						break;
 					case DatFormat.TSV:
-						ParseCSVTSV(filename, sysid, srcid, '\t', keep, clean, descAsName);
+						ParseCSVTSV(filename, sysid, srcid, '\t', keep, clean, remUnicode, descAsName);
 						break;
 					default:
 						return;
@@ -189,6 +194,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		private void ParseAttractMode(
 			// Standard Dat parsing
@@ -199,6 +205,7 @@ namespace SabreTools.Helper.Dats
 			// Miscellaneous
 			bool keep,
 			bool clean,
+			bool remUnicode,
 			bool descAsName)
 		{
 			// Open a file reader
@@ -254,7 +261,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, out string key);
+				ParseAddHelper(rom, clean, remUnicode, out string key);
 			}
 
 			sr.Dispose();
@@ -268,6 +275,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		private void ParseCMP(
 			// Standard Dat parsing
@@ -278,6 +286,7 @@ namespace SabreTools.Helper.Dats
 			// Miscellaneous
 			bool keep,
 			bool clean,
+			bool remUnicode,
 			bool descAsName)
 		{
 			// Open a file reader
@@ -386,7 +395,7 @@ namespace SabreTools.Helper.Dats
 
 						// Now process and add the sample
 						key = "";
-						ParseAddHelper(item, clean, out key);
+						ParseAddHelper(item, clean, remUnicode, out key);
 
 						continue;
 					}
@@ -471,7 +480,7 @@ namespace SabreTools.Helper.Dats
 
 						// Now process and add the rom
 						key = "";
-						ParseAddHelper(item, clean, out key);
+						ParseAddHelper(item, clean, remUnicode, out key);
 						continue;
 					}
 
@@ -684,7 +693,7 @@ namespace SabreTools.Helper.Dats
 
 					// Now process and add the rom
 					key = "";
-					ParseAddHelper(item, clean, out key);
+					ParseAddHelper(item, clean, remUnicode, out key);
 				}
 
 				// If the line is anything but a rom or disk and we're in a block
@@ -871,6 +880,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="delim">Delimiter for parsing individual lines</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True if SL XML names should be kept, false otherwise (default)</param>
 		private void ParseCSVTSV(
 			// Standard Dat parsing
@@ -882,6 +892,7 @@ namespace SabreTools.Helper.Dats
 			// Miscellaneous
 			bool keep,
 			bool clean,
+			bool remUnicode,
 			bool descAsName)
 		{
 			// Open a file reader
@@ -1117,7 +1128,7 @@ namespace SabreTools.Helper.Dats
 							},
 						};
 
-						ParseAddHelper(archive, clean, out key);
+						ParseAddHelper(archive, clean, remUnicode, out key);
 						break;
 					case ItemType.BiosSet:
 						BiosSet biosset = new BiosSet()
@@ -1131,7 +1142,7 @@ namespace SabreTools.Helper.Dats
 							},
 						};
 
-						ParseAddHelper(biosset, clean, out key);
+						ParseAddHelper(biosset, clean, remUnicode, out key);
 						break;
 					case ItemType.Disk:
 						Disk disk = new Disk()
@@ -1152,7 +1163,7 @@ namespace SabreTools.Helper.Dats
 							ItemStatus = status,
 						};
 
-						ParseAddHelper(disk, clean, out key);
+						ParseAddHelper(disk, clean, remUnicode, out key);
 						break;
 					case ItemType.Release:
 						Release release = new Release()
@@ -1166,7 +1177,7 @@ namespace SabreTools.Helper.Dats
 							},
 						};
 
-						ParseAddHelper(release, clean, out key);
+						ParseAddHelper(release, clean, remUnicode, out key);
 						break;
 					case ItemType.Rom:
 						Rom rom = new Rom()
@@ -1189,7 +1200,7 @@ namespace SabreTools.Helper.Dats
 							ItemStatus = status,
 						};
 
-						ParseAddHelper(rom, clean, out key);
+						ParseAddHelper(rom, clean, remUnicode, out key);
 						break;
 					case ItemType.Sample:
 						Sample sample = new Sample()
@@ -1203,7 +1214,7 @@ namespace SabreTools.Helper.Dats
 							},
 						};
 
-						ParseAddHelper(sample, clean, out key);
+						ParseAddHelper(sample, clean, remUnicode, out key);
 						break;
 				}
 			}			
@@ -1217,6 +1228,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <remrks>
 		/// TODO: Software Lists - sharedfeat tag (read-in, write-out)
@@ -1230,6 +1242,7 @@ namespace SabreTools.Helper.Dats
 			// Miscellaneous
 			bool keep,
 			bool clean,
+			bool remUnicode,
 			bool descAsName)
 		{
 			// Prepare all internal variables
@@ -1265,7 +1278,7 @@ namespace SabreTools.Helper.Dats
 							Rom rom = new Rom("null", tempgame);
 
 							// Now process and add the rom
-							ParseAddHelper(rom, clean, out key);
+							ParseAddHelper(rom, clean, remUnicode, out key);
 						}
 
 						// Regardless, end the current folder
@@ -1811,7 +1824,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(olrom, clean, out key);
+										ParseAddHelper(olrom, clean, remUnicode, out key);
 										break;
 
 									// For Software List and MAME listxml only
@@ -1913,7 +1926,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(relrom, clean, out key);
+										ParseAddHelper(relrom, clean, remUnicode, out key);
 
 										subreader.Read();
 										break;
@@ -1956,7 +1969,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(biosrom, clean, out key);
+										ParseAddHelper(biosrom, clean, remUnicode, out key);
 
 										subreader.Read();
 										break;
@@ -1984,7 +1997,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(archiverom, clean, out key);
+										ParseAddHelper(archiverom, clean, remUnicode, out key);
 
 										subreader.Read();
 										break;
@@ -2012,7 +2025,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(samplerom, clean, out key);
+										ParseAddHelper(samplerom, clean, remUnicode, out key);
 
 										subreader.Read();
 										break;
@@ -2155,7 +2168,7 @@ namespace SabreTools.Helper.Dats
 										}
 
 										// Now process and add the rom
-										ParseAddHelper(inrom, clean, out key);
+										ParseAddHelper(inrom, clean, remUnicode, out key);
 
 										subreader.Read();
 										break;
@@ -2330,7 +2343,7 @@ namespace SabreTools.Helper.Dats
 							}
 
 							// Now process and add the rom
-							ParseAddHelper(rom, clean, out key);
+							ParseAddHelper(rom, clean, remUnicode, out key);
 
 							xtr.Read();
 							break;
@@ -2358,6 +2371,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		private void ParseRedumpMD5(
 			// Standard Dat parsing
 			string filename,
@@ -2365,7 +2379,8 @@ namespace SabreTools.Helper.Dats
 			int srcid,
 
 			// Miscellaneous
-			bool clean)
+			bool clean,
+			bool remUnicode)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -2392,7 +2407,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, out string key);
+				ParseAddHelper(rom, clean, remUnicode, out string key);
 			}
 
 			sr.Dispose();
@@ -2405,6 +2420,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		private void ParseRedumpSFV(
 			// Standard Dat parsing
 			string filename,
@@ -2412,7 +2428,8 @@ namespace SabreTools.Helper.Dats
 			int srcid,
 
 			// Miscellaneous
-			bool clean)
+			bool clean,
+			bool remUnicode)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -2439,7 +2456,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, out string key);
+				ParseAddHelper(rom, clean, remUnicode, out string key);
 			}
 
 			sr.Dispose();
@@ -2452,6 +2469,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		private void ParseRedumpSHA1(
 			// Standard Dat parsing
 			string filename,
@@ -2459,7 +2477,8 @@ namespace SabreTools.Helper.Dats
 			int srcid,
 
 			// Miscellaneous
-			bool clean)
+			bool clean,
+			bool remUnicode)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -2486,7 +2505,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, out string key);
+				ParseAddHelper(rom, clean, remUnicode, out string key);
 			}
 
 			sr.Dispose();
@@ -2499,6 +2518,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		private void ParseRedumpSHA256(
 			// Standard Dat parsing
 			string filename,
@@ -2506,7 +2526,8 @@ namespace SabreTools.Helper.Dats
 			int srcid,
 
 			// Miscellaneous
-			bool clean)
+			bool clean,
+			bool remUnicode)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -2533,7 +2554,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, out string key);
+				ParseAddHelper(rom, clean, remUnicode, out string key);
 			}
 
 			sr.Dispose();
@@ -2546,6 +2567,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		private void ParseRedumpSHA384(
 			// Standard Dat parsing
 			string filename,
@@ -2553,7 +2575,8 @@ namespace SabreTools.Helper.Dats
 			int srcid,
 
 			// Miscellaneous
-			bool clean)
+			bool clean,
+			bool remUnicode)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -2580,7 +2603,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, out string key);
+				ParseAddHelper(rom, clean, remUnicode, out string key);
 			}
 
 			sr.Dispose();
@@ -2593,6 +2616,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		private void ParseRedumpSHA512(
 			// Standard Dat parsing
 			string filename,
@@ -2600,7 +2624,8 @@ namespace SabreTools.Helper.Dats
 			int srcid,
 
 			// Miscellaneous
-			bool clean)
+			bool clean,
+			bool remUnicode)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -2627,7 +2652,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, out string key);
+				ParseAddHelper(rom, clean, remUnicode, out string key);
 			}
 
 			sr.Dispose();
@@ -2640,6 +2665,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		private void ParseRC(
 			// Standard Dat parsing
@@ -2649,6 +2675,7 @@ namespace SabreTools.Helper.Dats
 
 			// Miscellaneous
 			bool clean,
+			bool remUnicode,
 			bool descAsName)
 		{
 			// Open a file reader
@@ -2787,7 +2814,7 @@ namespace SabreTools.Helper.Dats
 						};
 
 						// Now process and add the rom
-						ParseAddHelper(rom, clean, out string key);
+						ParseAddHelper(rom, clean, remUnicode, out string key);
 					}
 				}
 			}
@@ -2800,8 +2827,9 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="item">Item data to check against</param>
 		/// <param name="clean">True if the names should be cleaned to WoD standards, false otherwise</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="key">Output param containing the key for the item</param>
-		private void ParseAddHelper(DatItem item, bool clean, out string key)
+		private void ParseAddHelper(DatItem item, bool clean, bool remUnicode, out string key)
 		{
 			key = "";
 
@@ -2821,6 +2849,14 @@ namespace SabreTools.Helper.Dats
 
 			// If we're in cleaning mode, sanitize the game name
 			item.Machine.Name = (clean ? Style.CleanGameName(item.Machine.Name) : item.Machine.Name);
+
+			// If we're stripping unicode characters, do so from all relevant things
+			if (remUnicode)
+			{
+				item.Name = Style.RemoveUnicodeCharacters(item.Name);
+				item.Machine.Name = Style.RemoveUnicodeCharacters(item.Machine.Name);
+				item.Machine.Description = Style.RemoveUnicodeCharacters(item.Machine.Description);
+			}
 
 			// If we have a Rom or a Disk, clean the hash data
 			if (item.Type == ItemType.Rom)

@@ -34,10 +34,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <param name="overwrite">True if files should be overwritten (default), false if they should be renamed instead</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		/// <remarks>
-		/// The following features have been requested for file output:
-		/// - Have the ability to strip special (non-ASCII) characters from rom information
-		/// </remarks>
 		public bool WriteToFile(string outDir, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
 		{
 			// If there's nothing there, abort

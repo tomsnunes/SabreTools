@@ -112,6 +112,7 @@ namespace SabreTools
 				quotes = false,
 				remext = false,
 				removeDateFromAutomaticName = false,
+				removeUnicode = false,
 				romba = false,
 				showBaddumpColumn = false,
 				showNodumpColumn = false,
@@ -538,6 +539,10 @@ namespace SabreTools
 					case "-rsha512":
 					case "--rem-sha512":
 						stripHash |= Hash.SHA512;
+						break;
+					case "-ru":
+					case "--rem-uni":
+						removeUnicode = true;
 						break;
 					case "-run":
 					case "--runnable":
@@ -1271,7 +1276,7 @@ namespace SabreTools
 				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix, postfix, quotes, repext, addext, remext,
 					datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName, filter, oneGameOneRegion, regions,
-					splitType, trim, single, root, outDir, cleanGameNames, descAsName, dedup, stripHash);
+					splitType, trim, single, root, outDir, cleanGameNames, removeUnicode, descAsName, dedup, stripHash);
 			}
 
 			// If we're using the verifier
