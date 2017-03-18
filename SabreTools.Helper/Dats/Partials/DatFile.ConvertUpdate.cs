@@ -32,6 +32,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
@@ -39,7 +40,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		public void DetermineUpdateType(List<string> inputPaths, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
-			bool bare, bool clean, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
+			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || diff != 0)
@@ -54,8 +55,8 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Create a dictionary of all ROMs from the input DATs
-				List<DatFile> datHeaders = PopulateUserData(newInputFileNames, inplace, clean, descAsName,
-					outDir, filter, splitType, trim, single, root);
+				List<DatFile> datHeaders = PopulateUserData(newInputFileNames, inplace, clean,
+					remUnicode, descAsName, outDir, filter, splitType, trim, single, root);
 
 				// Modify the Dictionary if necessary and output the results
 				if (diff != 0 && diff < DiffMode.Cascade)
@@ -76,7 +77,7 @@ namespace SabreTools.Helper.Dats
 			// Otherwise, loop through all of the inputs individually
 			else
 			{
-				Update(inputPaths, outDir, clean, descAsName, filter, splitType, trim, single, root);
+				Update(inputPaths, outDir, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
 			}
 			return;
 		}
@@ -90,8 +91,8 @@ namespace SabreTools.Helper.Dats
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <returns>List of DatData objects representing headers</returns>
-		private List<DatFile> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool descAsName, string outDir,
-			Filter filter, SplitType splitType, bool trim, bool single, string root)
+		private List<DatFile> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool remUnicode, bool descAsName,
+			string outDir, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			DatFile[] datHeaders = new DatFile[inputs.Count];
 			DateTime start = DateTime.Now;
@@ -518,14 +519,15 @@ namespace SabreTools.Helper.Dats
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		public void Update(List<string> inputFileNames, string outDir, bool clean, bool descAsName, Filter filter,
-			SplitType splitType, bool trim, bool single, string root)
+		public void Update(List<string> inputFileNames, string outDir, bool clean, bool remUnicode, bool descAsName,
+			Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			Parallel.ForEach(inputFileNames, Globals.ParallelOptions, inputFileName =>
 			{
@@ -539,7 +541,7 @@ namespace SabreTools.Helper.Dats
 				{
 					DatFile innerDatdata = new DatFile(this);
 					Globals.Logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-					innerDatdata.Parse(inputFileName, 0, 0, splitType, true, clean, descAsName,
+					innerDatdata.Parse(inputFileName, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
 						keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 					innerDatdata.Filter(filter, trim, single, root);
 

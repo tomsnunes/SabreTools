@@ -55,8 +55,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
 		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
-		/// TODO: If replacing name with description, is it possible to update cloneof/romof/sampleof tags as well?
-		/// TODO: If replacing name with description, should this be done in a separate step instead of on parse? It might help the other task
 		public void Parse(
 			// Standard Dat parsing
 			string filename,
@@ -98,20 +96,20 @@ namespace SabreTools.Helper.Dats
 				switch (FileTools.GetDatFormat(filename))
 				{
 					case DatFormat.AttractMode:
-						ParseAttractMode(filename, sysid, srcid, keep, clean, remUnicode, descAsName);
+						ParseAttractMode(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.ClrMamePro:
 					case DatFormat.DOSCenter:
-						ParseCMP(filename, sysid, srcid, keep, clean, remUnicode, descAsName);
+						ParseCMP(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.CSV:
-						ParseCSVTSV(filename, sysid, srcid, ',', keep, clean, remUnicode, descAsName);
+						ParseCSVTSV(filename, sysid, srcid, ',', keep, clean, remUnicode);
 						break;
 					case DatFormat.Logiqx:
 					case DatFormat.OfflineList:
 					case DatFormat.SabreDat:
 					case DatFormat.SoftwareList:
-						ParseGenericXML(filename, sysid, srcid, keep, clean, remUnicode, descAsName);
+						ParseGenericXML(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.RedumpMD5:
 						ParseRedumpMD5(filename, sysid, srcid, clean, remUnicode);
@@ -132,10 +130,10 @@ namespace SabreTools.Helper.Dats
 						ParseRedumpSHA512(filename, sysid, srcid, clean, remUnicode);
 						break;
 					case DatFormat.RomCenter:
-						ParseRC(filename, sysid, srcid, clean, remUnicode, descAsName);
+						ParseRC(filename, sysid, srcid, clean, remUnicode);
 						break;
 					case DatFormat.TSV:
-						ParseCSVTSV(filename, sysid, srcid, '\t', keep, clean, remUnicode, descAsName);
+						ParseCSVTSV(filename, sysid, srcid, '\t', keep, clean, remUnicode);
 						break;
 					default:
 						return;
@@ -144,6 +142,12 @@ namespace SabreTools.Helper.Dats
 			catch (Exception ex)
 			{
 				Globals.Logger.Error("Error with file '" + filename + "': " + ex.ToString());
+			}
+
+			// If we want to use descriptions as names, update everything
+			if (descAsName)
+			{
+				MachineDescriptionToName();
 			}
 
 			// If we are using tags from the DAT, set the proper input for split type unless overridden
@@ -196,7 +200,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		private void ParseAttractMode(
 			// Standard Dat parsing
 			string filename,
@@ -206,8 +209,7 @@ namespace SabreTools.Helper.Dats
 			// Miscellaneous
 			bool keep,
 			bool clean,
-			bool remUnicode,
-			bool descAsName)
+			bool remUnicode)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -252,7 +254,7 @@ namespace SabreTools.Helper.Dats
 
 					Machine = new Machine
 					{
-						Name = (descAsName ? gameinfo[1] : gameinfo[0]),
+						Name = gameinfo[0],
 						Description = gameinfo[1],
 						CloneOf = gameinfo[3],
 						Year = gameinfo[4],
@@ -277,7 +279,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		private void ParseCMP(
 			// Standard Dat parsing
 			string filename,
@@ -287,8 +288,7 @@ namespace SabreTools.Helper.Dats
 			// Miscellaneous
 			bool keep,
 			bool clean,
-			bool remUnicode,
-			bool descAsName)
+			bool remUnicode)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -712,12 +712,6 @@ namespace SabreTools.Helper.Dats
 								break;
 							case "description":
 								gamedesc = itemval;
-
-								// If we want to have the description as the name, do so
-								if (descAsName)
-								{
-									tempgamename = gamedesc.Replace('/', '_').Replace("\"", "''");
-								}
 								break;
 							case "romof":
 								romof = itemval;
@@ -882,7 +876,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// <param name="descAsName">True if SL XML names should be kept, false otherwise (default)</param>
 		private void ParseCSVTSV(
 			// Standard Dat parsing
 			string filename,
@@ -893,8 +886,7 @@ namespace SabreTools.Helper.Dats
 			// Miscellaneous
 			bool keep,
 			bool clean,
-			bool remUnicode,
-			bool descAsName)
+			bool remUnicode)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -1035,7 +1027,6 @@ namespace SabreTools.Helper.Dats
 							break;
 						case "Machine.Description":
 							machineDesc = value;
-							machineName = (descAsName ? value : machineName);
 							break;
 						case "DatItem.Type":
 							switch (value.ToLowerInvariant())
@@ -1230,7 +1221,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// <param name="descAsName">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <remrks>
 		/// TODO: Software Lists - sharedfeat tag (read-in, write-out)
 		/// </remrks>
@@ -1243,8 +1233,7 @@ namespace SabreTools.Helper.Dats
 			// Miscellaneous
 			bool keep,
 			bool clean,
-			bool remUnicode,
-			bool descAsName)
+			bool remUnicode)
 		{
 			// Prepare all internal variables
 			XmlReader subreader, headreader, flagreader;
@@ -1877,12 +1866,6 @@ namespace SabreTools.Helper.Dats
 									// For Logiqx, SabreDAT, and Software List
 									case "description":
 										machine.Description = subreader.ReadElementContentAsString();
-
-										// If we want to have the description as the name, do so
-										if (descAsName)
-										{
-											machine.Name = machine.Description.Replace('/', '_').Replace("\"", "''");
-										}
 										break;
 									case "year":
 										machine.Year = subreader.ReadElementContentAsString();
@@ -2667,7 +2650,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		private void ParseRC(
 			// Standard Dat parsing
 			string filename,
@@ -2676,8 +2658,7 @@ namespace SabreTools.Helper.Dats
 
 			// Miscellaneous
 			bool clean,
-			bool remUnicode,
-			bool descAsName)
+			bool remUnicode)
 		{
 			// Open a file reader
 			Encoding enc = Style.GetEncoding(filename);
@@ -2804,7 +2785,7 @@ namespace SabreTools.Helper.Dats
 
 							Machine = new Machine
 							{
-								Name = (descAsName ? rominfo[4] : rominfo[3]),
+								Name = rominfo[3],
 								Description = rominfo[4],
 								CloneOf = rominfo[1],
 								RomOf = rominfo[8],

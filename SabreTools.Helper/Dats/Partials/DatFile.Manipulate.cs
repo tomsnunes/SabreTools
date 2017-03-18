@@ -208,6 +208,82 @@ namespace SabreTools.Helper.Dats
 			});
 		}
 
+		/// <summary>
+		/// Use game descriptions as names in the DAT, updating cloneof/romof/sampleof
+		/// </summary>
+		public void MachineDescriptionToName()
+		{
+			try
+			{
+				// First we want to get a mapping for all games to description
+				Dictionary<string, string> mapping = new Dictionary<string, string>();
+				List<string> keys = Keys.ToList();
+				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+				{
+					List<DatItem> items = this[key];
+					Parallel.ForEach(items, Globals.ParallelOptions, item =>
+					{
+						lock (mapping)
+						{
+							// If the key mapping doesn't exist, add it
+							if (!mapping.ContainsKey(item.Machine.Name))
+							{
+								mapping.Add(item.Machine.Name, item.Machine.Description.Replace('/', '_').Replace("\"", "''"));
+							}
+						}
+					});
+				});
+
+				// Now we loop through every item and update accordingly
+				keys = Keys.ToList();
+				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+				{
+					List<DatItem> items = this[key];
+					List<DatItem> newItems = new List<DatItem>();
+					Parallel.ForEach(items, Globals.ParallelOptions, item =>
+					{
+						// Update machine name
+						if (item.Machine.Name != null && mapping.ContainsKey(item.Machine.Name))
+						{
+							item.Machine.Name = mapping[item.Machine.Name];
+						}
+
+						// Update cloneof
+						if (item.Machine.CloneOf != null && mapping.ContainsKey(item.Machine.CloneOf))
+						{
+							item.Machine.CloneOf = mapping[item.Machine.CloneOf];
+						}
+
+						// Update romof
+						if (item.Machine.RomOf != null && mapping.ContainsKey(item.Machine.RomOf))
+						{
+							item.Machine.RomOf = mapping[item.Machine.RomOf];
+						}
+
+						// Update sampleof
+						if (item.Machine.SampleOf != null && mapping.ContainsKey(item.Machine.SampleOf))
+						{
+							item.Machine.SampleOf = mapping[item.Machine.SampleOf];
+						}
+
+						// Add the new item to the output list
+						lock (newItems)
+						{
+							newItems.Add(item);
+						}
+					});
+
+					// Replace the old list of roms with the new one
+					Remove(key);
+					AddRange(key, newItems);
+				});
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Warning(ex.ToString());
+			}
+		}
+
 #endregion
 
 #region Merging/Splitting Methods
@@ -890,68 +966,5 @@ namespace SabreTools.Helper.Dats
 #endregion
 
 #endregion // Instance Methods
-
-#region Static Methods
-
-#region Bucketing
-
-		/// <summary>
-		/// Take an arbitrarily ordered List and return a Dictionary sorted by Game
-		/// </summary>
-		/// <param name="list">Input unsorted list</param>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
-		/// <param name="output">True if the number of hashes counted is to be output (default), false otherwise</param>
-		/// <returns>SortedDictionary bucketed by game name</returns>
-		public static SortedDictionary<string, List<DatItem>> BucketListByGame(List<DatItem> list, bool mergeroms, bool norename, bool output = true)
-		{
-			Globals.Logger.User("Organizing " + (mergeroms ? "and merging " : "") + "roms for output");
-
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-			long count = 0;
-
-			// If we have a null dict or an empty one, output a new dictionary
-			if (list == null || list.Count == 0)
-			{
-				return sortable;
-			}
-
-			// If we're merging the roms, do so
-			if (mergeroms)
-			{
-				list = DatItem.Merge(list);
-			}
-
-			// Now add each of the roms to their respective games
-			foreach (DatItem rom in list)
-			{
-				if (rom == null)
-				{
-					continue;
-				}
-
-				count++;
-				string newkey = (norename ? ""
-						: rom.SystemID.ToString().PadLeft(10, '0')
-							+ "-"
-							+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
-					+ (rom.Machine == null || String.IsNullOrEmpty(rom.Machine.Name)
-							? "Default"
-							: rom.Machine.Name.ToLowerInvariant());
-				newkey = HttpUtility.HtmlEncode(newkey);
-
-				if (!sortable.ContainsKey(newkey))
-				{
-					sortable.Add(newkey, new List<DatItem>());
-				}
-				sortable[newkey].Add(rom);
-			}
-
-			return sortable;
-		}
-
-#endregion
-
-#endregion // Static Methods
 	}
 }

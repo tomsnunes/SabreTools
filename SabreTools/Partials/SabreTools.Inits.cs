@@ -700,8 +700,8 @@ namespace SabreTools
 				Romba = romba,
 			};
 			
-			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean, descAsName,
-				filter, splitType, trim, single, root);
+			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean,
+				remUnicode, descAsName, filter, splitType, trim, single, root);
 		}
 
 		/// <summary>
