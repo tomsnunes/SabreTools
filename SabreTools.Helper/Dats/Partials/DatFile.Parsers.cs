@@ -34,11 +34,9 @@ namespace SabreTools.Helper.Dats
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
 		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
-		public void Parse(string filename, int sysid, int srcid,
-			bool keep = false, bool clean = false, bool descAsName = false, bool keepext = false, bool useTags = false)
+		public void Parse(string filename, int sysid, int srcid, bool keep = false, bool clean = false, bool descAsName = false, bool keepext = false, bool useTags = false)
 		{
-			Parse(filename, sysid, srcid, new Filter(), SplitType.None, false, false, "",
-				keep: keep, clean: clean, descAsName: descAsName, keepext: keepext, useTags: useTags);
+			Parse(filename, sysid, srcid, SplitType.None, keep: keep, clean: clean, descAsName: descAsName, keepext: keepext, useTags: useTags);
 		}
 
 		/// <summary>
@@ -46,12 +44,8 @@ namespace SabreTools.Helper.Dats
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
+		/// <param name="srcid">Source ID for the DAT</param>>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
@@ -63,14 +57,8 @@ namespace SabreTools.Helper.Dats
 			int sysid,
 			int srcid,
 
-			// Rom filtering
-			Filter filter,
-
 			// Rom renaming
 			SplitType splitType,
-			bool trim,
-			bool single,
-			string root,
 
 			// Miscellaneous
 			bool keep = false,
@@ -103,44 +91,44 @@ namespace SabreTools.Helper.Dats
 				switch (FileTools.GetDatFormat(filename))
 				{
 					case DatFormat.AttractMode:
-						ParseAttractMode(filename, sysid, srcid, filter, trim, single, root, keep, clean, descAsName);
+						ParseAttractMode(filename, sysid, srcid, keep, clean, descAsName);
 						break;
 					case DatFormat.ClrMamePro:
 					case DatFormat.DOSCenter:
-						ParseCMP(filename, sysid, srcid, filter, trim, single, root, keep, clean, descAsName);
+						ParseCMP(filename, sysid, srcid, keep, clean, descAsName);
 						break;
 					case DatFormat.CSV:
-						ParseCSVTSV(filename, sysid, srcid, ',', filter, trim, single, root, keep, clean, descAsName);
+						ParseCSVTSV(filename, sysid, srcid, ',', keep, clean, descAsName);
 						break;
 					case DatFormat.Logiqx:
 					case DatFormat.OfflineList:
 					case DatFormat.SabreDat:
 					case DatFormat.SoftwareList:
-						ParseGenericXML(filename, sysid, srcid, filter, trim, single, root, keep, clean, descAsName);
+						ParseGenericXML(filename, sysid, srcid, keep, clean, descAsName);
 						break;
 					case DatFormat.RedumpMD5:
-						ParseRedumpMD5(filename, sysid, srcid, filter, trim, single, root, clean);
+						ParseRedumpMD5(filename, sysid, srcid, clean);
 						break;
 					case DatFormat.RedumpSFV:
-						ParseRedumpSFV(filename, sysid, srcid, filter, trim, single, root, clean);
+						ParseRedumpSFV(filename, sysid, srcid, clean);
 						break;
 					case DatFormat.RedumpSHA1:
-						ParseRedumpSHA1(filename, sysid, srcid, filter, trim, single, root, clean);
+						ParseRedumpSHA1(filename, sysid, srcid, clean);
 						break;
 					case DatFormat.RedumpSHA256:
-						ParseRedumpSHA256(filename, sysid, srcid, filter, trim, single, root, clean);
+						ParseRedumpSHA256(filename, sysid, srcid, clean);
 						break;
 					case DatFormat.RedumpSHA384:
-						ParseRedumpSHA384(filename, sysid, srcid, filter, trim, single, root, clean);
+						ParseRedumpSHA384(filename, sysid, srcid, clean);
 						break;
 					case DatFormat.RedumpSHA512:
-						ParseRedumpSHA512(filename, sysid, srcid, filter, trim, single, root, clean);
+						ParseRedumpSHA512(filename, sysid, srcid, clean);
 						break;
 					case DatFormat.RomCenter:
-						ParseRC(filename, sysid, srcid, filter, trim, single, root, clean, descAsName);
+						ParseRC(filename, sysid, srcid, clean, descAsName);
 						break;
 					case DatFormat.TSV:
-						ParseCSVTSV(filename, sysid, srcid, '\t', filter, trim, single, root, keep, clean, descAsName);
+						ParseCSVTSV(filename, sysid, srcid, '\t', keep, clean, descAsName);
 						break;
 					default:
 						return;
@@ -198,10 +186,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
@@ -210,14 +194,6 @@ namespace SabreTools.Helper.Dats
 			string filename,
 			int sysid,
 			int srcid,
-
-			// Rom filtering
-			Filter filter,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
 
 			// Miscellaneous
 			bool keep,
@@ -277,7 +253,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, filter, trim, single, root, clean, out string key);
+				ParseAddHelper(rom, clean, out string key);
 			}
 
 			sr.Dispose();
@@ -289,10 +265,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
@@ -301,14 +273,6 @@ namespace SabreTools.Helper.Dats
 			string filename,
 			int sysid,
 			int srcid,
-
-			// Rom filtering
-			Filter filter,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
 
 			// Miscellaneous
 			bool keep,
@@ -421,7 +385,7 @@ namespace SabreTools.Helper.Dats
 
 						// Now process and add the sample
 						key = "";
-						ParseAddHelper(item, filter, trim, single, root, clean, out key);
+						ParseAddHelper(item, clean, out key);
 
 						continue;
 					}
@@ -506,7 +470,7 @@ namespace SabreTools.Helper.Dats
 
 						// Now process and add the rom
 						key = "";
-						ParseAddHelper(item, filter, trim, single, root, clean, out key);
+						ParseAddHelper(item, clean, out key);
 						continue;
 					}
 
@@ -719,7 +683,7 @@ namespace SabreTools.Helper.Dats
 
 					// Now process and add the rom
 					key = "";
-					ParseAddHelper(item, filter, trim, single, root, clean, out key);
+					ParseAddHelper(item, clean, out key);
 				}
 
 				// If the line is anything but a rom or disk and we're in a block
@@ -904,10 +868,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="delim">Delimiter for parsing individual lines</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="descAsName">True if SL XML names should be kept, false otherwise (default)</param>
@@ -917,14 +877,6 @@ namespace SabreTools.Helper.Dats
 			int sysid,
 			int srcid,
 			char delim,
-
-			// Rom filtering
-			Filter filter,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
 
 			// Miscellaneous
 			bool keep,
@@ -1164,7 +1116,7 @@ namespace SabreTools.Helper.Dats
 							},
 						};
 
-						ParseAddHelper(archive, filter, trim, single, root, clean, out key);
+						ParseAddHelper(archive, clean, out key);
 						break;
 					case ItemType.BiosSet:
 						BiosSet biosset = new BiosSet()
@@ -1178,7 +1130,7 @@ namespace SabreTools.Helper.Dats
 							},
 						};
 
-						ParseAddHelper(biosset, filter, trim, single, root, clean, out key);
+						ParseAddHelper(biosset, clean, out key);
 						break;
 					case ItemType.Disk:
 						Disk disk = new Disk()
@@ -1199,7 +1151,7 @@ namespace SabreTools.Helper.Dats
 							ItemStatus = status,
 						};
 
-						ParseAddHelper(disk, filter, trim, single, root, clean, out key);
+						ParseAddHelper(disk, clean, out key);
 						break;
 					case ItemType.Release:
 						Release release = new Release()
@@ -1213,7 +1165,7 @@ namespace SabreTools.Helper.Dats
 							},
 						};
 
-						ParseAddHelper(release, filter, trim, single, root, clean, out key);
+						ParseAddHelper(release, clean, out key);
 						break;
 					case ItemType.Rom:
 						Rom rom = new Rom()
@@ -1236,7 +1188,7 @@ namespace SabreTools.Helper.Dats
 							ItemStatus = status,
 						};
 
-						ParseAddHelper(rom, filter, trim, single, root, clean, out key);
+						ParseAddHelper(rom, clean, out key);
 						break;
 					case ItemType.Sample:
 						Sample sample = new Sample()
@@ -1250,7 +1202,7 @@ namespace SabreTools.Helper.Dats
 							},
 						};
 
-						ParseAddHelper(sample, filter, trim, single, root, clean, out key);
+						ParseAddHelper(sample, clean, out key);
 						break;
 				}
 			}			
@@ -1262,10 +1214,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="descAsName">True if SL XML names should be kept, false otherwise (default)</param>
@@ -1278,14 +1226,6 @@ namespace SabreTools.Helper.Dats
 			string filename,
 			int sysid,
 			int srcid,
-
-			// Rom filtering
-			Filter filter,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
 
 			// Miscellaneous
 			bool keep,
@@ -1325,7 +1265,7 @@ namespace SabreTools.Helper.Dats
 							Rom rom = new Rom("null", tempgame);
 
 							// Now process and add the rom
-							ParseAddHelper(rom, filter, trim, single, root, clean, out key);
+							ParseAddHelper(rom, clean, out key);
 						}
 
 						// Regardless, end the current folder
@@ -1871,7 +1811,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(olrom, filter, trim, single, root, clean, out key);
+										ParseAddHelper(olrom, clean, out key);
 										break;
 
 									// For Software List and MAME listxml only
@@ -1973,7 +1913,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(relrom, filter, trim, single, root, clean, out key);
+										ParseAddHelper(relrom, clean, out key);
 
 										subreader.Read();
 										break;
@@ -2016,7 +1956,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(biosrom, filter, trim, single, root, clean, out key);
+										ParseAddHelper(biosrom, clean, out key);
 
 										subreader.Read();
 										break;
@@ -2044,7 +1984,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(archiverom, filter, trim, single, root, clean, out key);
+										ParseAddHelper(archiverom, clean, out key);
 
 										subreader.Read();
 										break;
@@ -2072,7 +2012,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(samplerom, filter, trim, single, root, clean, out key);
+										ParseAddHelper(samplerom, clean, out key);
 
 										subreader.Read();
 										break;
@@ -2215,7 +2155,7 @@ namespace SabreTools.Helper.Dats
 										}
 
 										// Now process and add the rom
-										ParseAddHelper(inrom, filter, trim, single, root, clean, out key);
+										ParseAddHelper(inrom, clean, out key);
 
 										subreader.Read();
 										break;
@@ -2390,7 +2330,7 @@ namespace SabreTools.Helper.Dats
 							}
 
 							// Now process and add the rom
-							ParseAddHelper(rom, filter, trim, single, root, clean, out key);
+							ParseAddHelper(rom, clean, out key);
 
 							xtr.Read();
 							break;
@@ -2417,24 +2357,12 @@ namespace SabreTools.Helper.Dats
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		private void ParseRedumpMD5(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
-
-			// Rom filtering
-			Filter filter,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
 
 			// Miscellaneous
 			bool clean)
@@ -2464,7 +2392,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, filter, trim, single, root, clean, out string key);
+				ParseAddHelper(rom, clean, out string key);
 			}
 
 			sr.Dispose();
@@ -2476,24 +2404,12 @@ namespace SabreTools.Helper.Dats
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		private void ParseRedumpSFV(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
-
-			// Rom filtering
-			Filter filter,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
 
 			// Miscellaneous
 			bool clean)
@@ -2523,7 +2439,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, filter, trim, single, root, clean, out string key);
+				ParseAddHelper(rom, clean, out string key);
 			}
 
 			sr.Dispose();
@@ -2535,24 +2451,12 @@ namespace SabreTools.Helper.Dats
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		private void ParseRedumpSHA1(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
-
-			// Rom filtering
-			Filter filter,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
 
 			// Miscellaneous
 			bool clean)
@@ -2582,7 +2486,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, filter, trim, single, root, clean, out string key);
+				ParseAddHelper(rom, clean, out string key);
 			}
 
 			sr.Dispose();
@@ -2594,24 +2498,12 @@ namespace SabreTools.Helper.Dats
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		private void ParseRedumpSHA256(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
-
-			// Rom filtering
-			Filter filter,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
 
 			// Miscellaneous
 			bool clean)
@@ -2641,7 +2533,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, filter, trim, single, root, clean, out string key);
+				ParseAddHelper(rom, clean, out string key);
 			}
 
 			sr.Dispose();
@@ -2653,24 +2545,12 @@ namespace SabreTools.Helper.Dats
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		private void ParseRedumpSHA384(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
-
-			// Rom filtering
-			Filter filter,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
 
 			// Miscellaneous
 			bool clean)
@@ -2700,7 +2580,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, filter, trim, single, root, clean, out string key);
+				ParseAddHelper(rom, clean, out string key);
 			}
 
 			sr.Dispose();
@@ -2712,24 +2592,12 @@ namespace SabreTools.Helper.Dats
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		private void ParseRedumpSHA512(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
-
-			// Rom filtering
-			Filter filter,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
 
 			// Miscellaneous
 			bool clean)
@@ -2759,7 +2627,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, filter, trim, single, root, clean, out string key);
+				ParseAddHelper(rom, clean, out string key);
 			}
 
 			sr.Dispose();
@@ -2771,10 +2639,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		private void ParseRC(
@@ -2782,14 +2646,6 @@ namespace SabreTools.Helper.Dats
 			string filename,
 			int sysid,
 			int srcid,
-
-			// Rom filtering
-			Filter filter,
-
-			// Rom renaming
-			bool trim,
-			bool single,
-			string root,
 
 			// Miscellaneous
 			bool clean,
@@ -2931,7 +2787,7 @@ namespace SabreTools.Helper.Dats
 						};
 
 						// Now process and add the rom
-						ParseAddHelper(rom, filter, trim, single, root, clean, out string key);
+						ParseAddHelper(rom, clean, out string key);
 					}
 				}
 			}
@@ -2943,11 +2799,9 @@ namespace SabreTools.Helper.Dats
 		/// Add a rom to the Dat after checking
 		/// </summary>
 		/// <param name="item">Item data to check against</param>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		private void ParseAddHelper(DatItem item, Filter filter, bool trim, bool single, string root, bool clean, out string key)
+		/// <param name="clean">True if the names should be cleaned to WoD standards, false otherwise</param>
+		/// <param name="key">Output param containing the key for the item</param>
+		private void ParseAddHelper(DatItem item, bool clean, out string key)
 		{
 			key = "";
 
@@ -3046,80 +2900,57 @@ namespace SabreTools.Helper.Dats
 				item = itemDisk;
 			}
 
-			// If the rom passes the filter, include it
-			if (filter.ItemPasses(item))
+			// Get the key and add statistical data
+			switch (item.Type)
 			{
-				// If we are in single game mode, rename all games
-				if (single)
-				{
-					item.Machine.Name = "!";
-				}
+				case ItemType.Archive:
+				case ItemType.BiosSet:
+				case ItemType.Release:
+				case ItemType.Sample:
+					key = item.Type.ToString();
+					break;
+				case ItemType.Disk:
+					key = ((Disk)item).MD5;
 
-				// If we are in NTFS trim mode, trim the game name
-				if (trim)
-				{
-					// Windows max name length is 260
-					int usableLength = 260 - item.Machine.Name.Length - root.Length;
-					if (item.Name.Length > usableLength)
+					// Add statistical data
+					DiskCount += 1;
+					if (((Disk)item).ItemStatus != ItemStatus.Nodump)
 					{
-						string ext = Path.GetExtension(item.Name);
-						item.Name = item.Name.Substring(0, usableLength - ext.Length);
-						item.Name += ext;
+						TotalSize += 0;
+						MD5Count += (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
+						SHA1Count += (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
+						SHA256Count += (String.IsNullOrEmpty(((Disk)item).SHA256) ? 0 : 1);
+						SHA384Count += (String.IsNullOrEmpty(((Disk)item).SHA384) ? 0 : 1);
+						SHA512Count += (String.IsNullOrEmpty(((Disk)item).SHA512) ? 0 : 1);
 					}
-				}
+					BaddumpCount += (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
+					NodumpCount += (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
+					break;
+				case ItemType.Rom:
+					key = ((Rom)item).Size + "-" + ((Rom)item).CRC;
 
-				// Get the key and add statistical data
-				switch (item.Type)
-				{
-					case ItemType.Archive:
-					case ItemType.BiosSet:
-					case ItemType.Release:
-					case ItemType.Sample:
-						key = item.Type.ToString();
-						break;
-					case ItemType.Disk:
-						key = ((Disk)item).MD5;
-
-						// Add statistical data
-						DiskCount += 1;
-						if (((Disk)item).ItemStatus != ItemStatus.Nodump)
-						{
-							TotalSize += 0;
-							MD5Count += (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
-							SHA1Count += (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
-							SHA256Count += (String.IsNullOrEmpty(((Disk)item).SHA256) ? 0 : 1);
-							SHA384Count += (String.IsNullOrEmpty(((Disk)item).SHA384) ? 0 : 1);
-							SHA512Count += (String.IsNullOrEmpty(((Disk)item).SHA512) ? 0 : 1);
-						}
-						BaddumpCount += (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
-						NodumpCount += (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
-						break;
-					case ItemType.Rom:
-						key = ((Rom)item).Size + "-" + ((Rom)item).CRC;
-
-						// Add statistical data
-						RomCount += 1;
-						if (((Rom)item).ItemStatus != ItemStatus.Nodump)
-						{
-							TotalSize += ((Rom)item).Size;
-							CRCCount += (String.IsNullOrEmpty(((Rom)item).CRC) ? 0 : 1);
-							MD5Count += (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
-							SHA1Count += (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
-							SHA256Count += (String.IsNullOrEmpty(((Rom)item).SHA256) ? 0 : 1);
-							SHA384Count += (String.IsNullOrEmpty(((Rom)item).SHA384) ? 0 : 1);
-							SHA512Count += (String.IsNullOrEmpty(((Rom)item).SHA512) ? 0 : 1);
-						}
-						BaddumpCount += (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
-						NodumpCount += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
-						break;
-					default:
-						key = "default";
-						break;
-				}
-
-				// Add the item to the DAT
-				Add(key, item);
+					// Add statistical data
+					RomCount += 1;
+					if (((Rom)item).ItemStatus != ItemStatus.Nodump)
+					{
+						TotalSize += ((Rom)item).Size;
+						CRCCount += (String.IsNullOrEmpty(((Rom)item).CRC) ? 0 : 1);
+						MD5Count += (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
+						SHA1Count += (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
+						SHA256Count += (String.IsNullOrEmpty(((Rom)item).SHA256) ? 0 : 1);
+						SHA384Count += (String.IsNullOrEmpty(((Rom)item).SHA384) ? 0 : 1);
+						SHA512Count += (String.IsNullOrEmpty(((Rom)item).SHA512) ? 0 : 1);
+					}
+					BaddumpCount += (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
+					NodumpCount += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
+					break;
+				default:
+					key = "default";
+					break;
 			}
+
+			// Add the item to the DAT
+			Add(key, item);
 		}
 
 		#endregion

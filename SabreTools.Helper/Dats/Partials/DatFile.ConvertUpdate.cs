@@ -111,22 +111,17 @@ namespace SabreTools.Helper.Dats
 						MergeRoms = MergeRoms,
 					};
 
-					datHeaders[i].Parse(input.Split('¬')[0], i, 0, filter, splitType, trim, single,
-						root, true, clean, descAsName);
+					datHeaders[i].Parse(input.Split('¬')[0], i, 0, splitType, true, clean, descAsName);
 				});
 
 			Globals.Logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			Globals.Logger.User("Populating internal DAT");
-			Parallel.For(0, inputs.Count,
-				Globals.ParallelOptions,
-				i =>
+			Parallel.For(0, inputs.Count, Globals.ParallelOptions, i =>
 			{
 				// Get the list of keys from the DAT
 				List<string> keys = datHeaders[i].Keys.ToList();
-				Parallel.ForEach(keys,
-					Globals.ParallelOptions,
-					key =>
+				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
 					// Add everything from the key to the internal DAT
 					AddRange(key, datHeaders[i][key]);
@@ -141,6 +136,9 @@ namespace SabreTools.Helper.Dats
 				// Now remove the file dictionary from the souce DAT to save memory
 				datHeaders[i].Delete();
 			});
+
+			// Now that we have a merged DAT, filter it
+			Filter(filter, single, trim, root);
 
 			Globals.Logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -532,52 +530,49 @@ namespace SabreTools.Helper.Dats
 		public void Update(List<string> inputFileNames, string outDir, bool clean, bool descAsName, Filter filter,
 			SplitType splitType, bool trim, bool single, string root)
 		{
-			Parallel.ForEach(inputFileNames,
-				Globals.ParallelOptions,
-				inputFileName =>
+			Parallel.ForEach(inputFileNames, Globals.ParallelOptions, inputFileName =>
+			{
+				// Clean the input string
+				if (inputFileName != "")
 				{
-					// Clean the input string
-					if (inputFileName != "")
-					{
-						inputFileName = Path.GetFullPath(inputFileName);
-					}
+					inputFileName = Path.GetFullPath(inputFileName);
+				}
 
-					if (File.Exists(inputFileName))
+				if (File.Exists(inputFileName))
+				{
+					DatFile innerDatdata = new DatFile(this);
+					Globals.Logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
+					innerDatdata.Parse(inputFileName, 0, 0, splitType, true, clean, descAsName,
+						keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
+					innerDatdata.Filter(filter, trim, single, root);
+
+					// Try to output the file
+					innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), overwrite: (outDir != ""));
+				}
+				else if (Directory.Exists(inputFileName))
+				{
+					inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
+
+					List<string> subFiles = Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories).ToList();
+					Parallel.ForEach(subFiles, Globals.ParallelOptions, file =>
 					{
+						Globals.Logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 						DatFile innerDatdata = new DatFile(this);
-						Globals.Logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
-						innerDatdata.Parse(inputFileName, 0, 0, filter, splitType, trim, single,
-							root, true, clean, descAsName,
+						innerDatdata.Parse(file, 0, 0, splitType, true, clean, descAsName,
 							keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
+						innerDatdata.Filter(filter, trim, single, root);
 
 						// Try to output the file
-						innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), overwrite: (outDir != ""));
-					}
-					else if (Directory.Exists(inputFileName))
-					{
-						inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
-
-						Parallel.ForEach(Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories),
-							Globals.ParallelOptions,
-							file =>
-							{
-								Globals.Logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
-								DatFile innerDatdata = new DatFile(this);
-								innerDatdata.Parse(file, 0, 0, filter, splitType,
-									trim, single, root, true, clean, descAsName,
-									keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
-
-								// Try to output the file
-								innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)),
-									overwrite: (outDir != ""));
-							});
-					}
-					else
-					{
-						Globals.Logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
-						return;
-					}
-				});
+						innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)),
+							overwrite: (outDir != ""));
+					});
+				}
+				else
+				{
+					Globals.Logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
+					return;
+				}
+			});
 		}
 
 		#endregion

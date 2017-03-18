@@ -6,13 +6,19 @@ using System.Web;
 
 using SabreTools.Helper.Data;
 
+#if MONO
+using System.IO;
+#else
+using Alphaleonis.Win32.Filesystem;
+#endif
+
 namespace SabreTools.Helper.Dats
 {
 	public partial class DatFile
 	{
-		#region Instance Methods
+#region Instance Methods
 
-		#region Bucketing [MODULAR DONE]
+#region Bucketing [MODULAR DONE]
 
 		/// <summary>
 		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by a user-defined method
@@ -151,9 +157,62 @@ namespace SabreTools.Helper.Dats
 			_files = sortable;
 		}
 
-		#endregion
+#endregion
 
-		#region Merging/Splitting Methods [MODULAR DONE]
+#region Filtering
+
+		/// <summary>
+		/// Filter a DAT based on input parameters and modify the items
+		/// </summary>
+		/// <param name="filter">Filter object for passing to the DatItem level</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		public void Filter(Filter filter, bool single, bool trim, string root)
+		{
+			// Loop over every key in the dictionary
+			List<string> keys = Keys.ToList();
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+			{
+				// For every item in the current key
+				List<DatItem> items = this[key];
+				List<DatItem> newitems = new List<DatItem>();
+				Parallel.ForEach(items, Globals.ParallelOptions, item =>
+				{
+					// If the rom passes the filter, include it
+					if (filter.ItemPasses(item))
+					{
+						// If we are in single game mode, rename all games
+						if (single)
+						{
+							item.Machine.Name = "!";
+						}
+
+						// If we are in NTFS trim mode, trim the game name
+						if (trim)
+						{
+							// Windows max name length is 260
+							int usableLength = 260 - item.Machine.Name.Length - root.Length;
+							if (item.Name.Length > usableLength)
+							{
+								string ext = Path.GetExtension(item.Name);
+								item.Name = item.Name.Substring(0, usableLength - ext.Length);
+								item.Name += ext;
+							}
+						}
+
+						newitems.Add(item);
+					}
+				});
+
+				Remove(key);
+				AddRange(key, newitems);
+			});
+		}
+
+#endregion
+
+#region Merging/Splitting Methods [MODULAR DONE]
 
 		/// <summary>
 		/// Use cloneof tags to create non-merged sets and remove the tags plus using the device_ref tags to get full sets
@@ -247,9 +306,9 @@ namespace SabreTools.Helper.Dats
 			RemoveTagsFromChild();
 		}
 
-		#endregion
+#endregion
 
-		#region Merging/Splitting Helper Methods [MODULAR DONE]
+#region Merging/Splitting Helper Methods [MODULAR DONE]
 
 		/// <summary>
 		/// Use romof tags to add roms to the children
@@ -830,13 +889,13 @@ namespace SabreTools.Helper.Dats
 			}
 		}
 
-		#endregion
+#endregion
 
-		#endregion // Instance Methods
+#endregion // Instance Methods
 
-		#region Static Methods
+#region Static Methods
 
-		#region Bucketing [MODULAR DONE]
+#region Bucketing [MODULAR DONE]
 
 		/// <summary>
 		/// Take an arbitrarily ordered List and return a Dictionary sorted by Game
@@ -893,8 +952,8 @@ namespace SabreTools.Helper.Dats
 			return sortable;
 		}
 
-		#endregion
+#endregion
 
-		#endregion // Static Methods
+#endregion // Static Methods
 	}
 }
