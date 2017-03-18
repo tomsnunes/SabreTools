@@ -98,21 +98,18 @@ namespace SabreTools.Helper.Dats
 			Globals.Logger.User("Processing individual DATs");
 
 			// Parse all of the DATs into their own DatFiles in the array
-			Parallel.For(0,
-				inputs.Count,
-				Globals.ParallelOptions,
-				i =>
+			Parallel.For(0, inputs.Count, Globals.ParallelOptions, i =>
+			{
+				string input = inputs[i];
+				Globals.Logger.User("Adding DAT: " + input.Split('¬')[0]);
+				datHeaders[i] = new DatFile
 				{
-					string input = inputs[i];
-					Globals.Logger.User("Adding DAT: " + input.Split('¬')[0]);
-					datHeaders[i] = new DatFile
-					{
-						DatFormat = (DatFormat != 0 ? DatFormat : 0),
-						MergeRoms = MergeRoms,
-					};
+					DatFormat = (DatFormat != 0 ? DatFormat : 0),
+					MergeRoms = MergeRoms,
+				};
 
-					datHeaders[i].Parse(input.Split('¬')[0], i, 0, splitType, true, clean, descAsName);
-				});
+				datHeaders[i].Parse(input.Split('¬')[0], i, 0, splitType, true, clean, descAsName);
+			});
 
 			Globals.Logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -205,7 +202,7 @@ namespace SabreTools.Helper.Dats
 			{
 				DatFile[] outDatsArray = new DatFile[inputs.Count];
 
-				Parallel.For(0, inputs.Count, j =>
+				Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
 				{
 					string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
 					DatFile diffData = new DatFile(this);
@@ -325,7 +322,7 @@ namespace SabreTools.Helper.Dats
 
 			DatFile[] outDatsArray = new DatFile[inputs.Count];
 
-			Parallel.For(0, inputs.Count, j =>
+			Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
 			{
 				string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
 				DatFile diffData;

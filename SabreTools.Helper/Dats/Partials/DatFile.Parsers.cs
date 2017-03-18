@@ -51,6 +51,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
 		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
+		/// TODO: If replacing name with description, is it possible to update cloneof/romof/sampleof tags as well?
 		public void Parse(
 			// Standard Dat parsing
 			string filename,
@@ -1219,7 +1220,6 @@ namespace SabreTools.Helper.Dats
 		/// <param name="descAsName">True if SL XML names should be kept, false otherwise (default)</param>
 		/// <remrks>
 		/// TODO: Software Lists - sharedfeat tag (read-in, write-out)
-		/// TODO: If replacing name with description, is it possible to update cloneof/romof/sampleof tags as well?
 		/// </remrks>
 		private void ParseGenericXML(
 			// Standard Dat parsing

@@ -45,16 +45,12 @@ namespace SabreTools.Helper.Dats
 
 			// First do the initial sort of all of the roms
 			List<string> keys = Keys.ToList();
-			Parallel.ForEach(keys,
-				Globals.ParallelOptions,
-				key =>
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> roms = this[key];
 
 				// Now add each of the roms to their respective games
-				Parallel.ForEach(roms,
-					Globals.ParallelOptions,
-					rom =>
+				Parallel.ForEach(roms, Globals.ParallelOptions, rom =>
 				{
 					string newkey = "";
 
@@ -130,9 +126,7 @@ namespace SabreTools.Helper.Dats
 
 			// Now go through and sort all of the individual lists
 			keys = sortable.Keys.ToList();
-			Parallel.ForEach(keys,
-				Globals.ParallelOptions,
-				key =>
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				// Get the possibly unsorted list
 				List<DatItem> sortedlist = sortable[key];
