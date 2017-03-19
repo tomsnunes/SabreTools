@@ -19,8 +19,6 @@ namespace SabreTools
 	/// Entry class for the DATabase application
 	/// </summary>
 	/// <remarks>
-	/// TODO: Wrap Parallel.ForEach loops in try/catch
-	/// TODO: Find more foreach loops that are good candidates for Parallel.ForEach
 	/// TODO: Look into async read/write to make things quicker. Ask edc for help?
 	/// </remarks>
 	public partial class SabreTools
