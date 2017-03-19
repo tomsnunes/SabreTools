@@ -221,51 +221,57 @@ namespace SabreTools.Helper.Dats
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
 			Globals.Logger.User("Populating all output DATs");
+
 			List<string> keys = Keys.ToList();
-			foreach (string key in keys)
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
-				List<DatItem> roms = DatItem.Merge(this[key]);
+				List<DatItem> items = DatItem.Merge(this[key]);
 
-				if (roms != null && roms.Count > 0)
+				// If the rom list is empty or null, just skip it
+				if (items == null || items.Count == 0)
 				{
-					foreach (DatItem rom in roms)
+					return;
+				}
+
+				// Loop through and add the items correctly
+				Parallel.ForEach(items, Globals.ParallelOptions, item =>
+				{
+					// No duplicates
+					if ((diff & DiffMode.NoDupes) != 0 || (diff & DiffMode.Individuals) != 0)
 					{
-						// No duplicates
-						if ((diff & DiffMode.NoDupes) != 0 || (diff & DiffMode.Individuals) != 0)
+						if ((item.Dupe & DupeType.Internal) != 0)
 						{
-							if ((rom.Dupe & DupeType.Internal) != 0)
+							// Individual DATs that are output
+							if ((diff & DiffMode.Individuals) != 0)
 							{
-								// Individual DATs that are output
-								if ((diff & DiffMode.Individuals) != 0)
-								{
-									outDats[rom.SystemID].Add(key, rom);
-								}
-
-								// Merged no-duplicates DAT
-								if ((diff & DiffMode.NoDupes) != 0)
-								{
-									DatItem newrom = rom;
-									newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
-
-									outerDiffData.Add(key, newrom);
-								}
+								outDats[item.SystemID].Add(key, item);
 							}
-						}
 
-						// Duplicates only
-						if ((diff & DiffMode.Dupes) != 0)
-						{
-							if ((rom.Dupe & DupeType.External) != 0)
+							// Merged no-duplicates DAT
+							if ((diff & DiffMode.NoDupes) != 0)
 							{
-								DatItem newrom = rom;
+								DatItem newrom = item;
 								newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
 
-								dupeData.Add(key, newrom);
+								outerDiffData.Add(key, newrom);
 							}
 						}
 					}
-				}
-			}
+
+					// Duplicates only
+					if ((diff & DiffMode.Dupes) != 0)
+					{
+						if ((item.Dupe & DupeType.External) != 0)
+						{
+							DatItem newrom = item;
+							newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
+
+							dupeData.Add(key, newrom);
+						}
+					}
+				});
+			});
+
 			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Finally, loop through and output each of the DATs
@@ -287,7 +293,7 @@ namespace SabreTools.Helper.Dats
 			// Output the individual (a-b) DATs
 			if ((diff & DiffMode.Individuals) != 0)
 			{
-				for (int j = 0; j < inputs.Count; j++)
+				Parallel.For(0, inputs.Count, j =>
 				{
 					// If we have an output directory set, replace the path
 					string[] split = inputs[j].Split('¬');
@@ -297,7 +303,7 @@ namespace SabreTools.Helper.Dats
 
 					// Try to output the file
 					outDats[j].WriteToFile(path);
-				}
+				});
 			}
 			Globals.Logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
@@ -353,31 +359,36 @@ namespace SabreTools.Helper.Dats
 			Globals.Logger.User("Populating all output DATs");
 			List<string> keys = Keys.ToList();
 
-			foreach (string key in keys)
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
-				List<DatItem> roms = DatItem.Merge(this[key]);
+				List<DatItem> items = DatItem.Merge(this[key]);
 
-				if (roms != null && roms.Count > 0)
+				// If the rom list is empty or null, just skip it
+				if (items == null || items.Count == 0)
 				{
-					foreach (DatItem rom in roms)
-					{
-						// There's odd cases where there are items with System ID < 0. Skip them for now
-						if (rom.SystemID < 0)
-						{
-							Globals.Logger.Warning("Item found with a <0 SystemID: " + rom.Name);
-							continue;
-						}
-
-						outDats[rom.SystemID].Add(key, rom);
-					}
+					return;
 				}
-			}
+
+				Parallel.ForEach(items, Globals.ParallelOptions, item =>
+				{
+					// There's odd cases where there are items with System ID < 0. Skip them for now
+					if (item.SystemID < 0)
+					{
+						Globals.Logger.Warning("Item found with a <0 SystemID: " + item.Name);
+						return;
+					}
+
+					outDats[item.SystemID].Add(key, item);
+				});
+			});
+
 			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Finally, loop through and output each of the DATs
 			start = DateTime.Now;
 			Globals.Logger.User("Outputting all created DATs");
-			for (int j = (skip ? 1 : 0); j < inputs.Count; j++)
+
+			Parallel.For((skip ? 1 : 0), inputs.Count, j =>
 			{
 				// If we have an output directory set, replace the path
 				string path = "";
@@ -395,7 +406,8 @@ namespace SabreTools.Helper.Dats
 
 				// Try to output the file
 				outDats[j].WriteToFile(path);
-			}
+			});
+
 			Globals.Logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
 
@@ -411,101 +423,35 @@ namespace SabreTools.Helper.Dats
 			if (Type == "SuperDAT")
 			{
 				List<string> keys = Keys.ToList();
-				foreach (string key in keys)
+				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
-					List<DatItem> newroms = new List<DatItem>();
-					foreach (DatItem rom in this[key])
+					List<DatItem> items = this[key].ToList();
+					List<DatItem> newItems = new List<DatItem>();
+					Parallel.ForEach(items, Globals.ParallelOptions, item =>
 					{
-						DatItem newrom = rom;
-						string filename = inputs[newrom.SystemID].Split('¬')[0];
-						string rootpath = inputs[newrom.SystemID].Split('¬')[1];
+						DatItem newItem = item;
+						string filename = inputs[newItem.SystemID].Split('¬')[0];
+						string rootpath = inputs[newItem.SystemID].Split('¬')[1];
 
 						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
 						filename = filename.Remove(0, rootpath.Length);
-						newrom.Machine.Name = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
+						newItem.Machine.Name = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
 							+ Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar
-							+ newrom.Machine.Name;
-						newroms.Add(newrom);
-					}
-					this[key] = newroms;
-				}
+							+ newItem.Machine.Name;
+
+						lock (newItems)
+						{
+							newItems.Add(newItem);
+						}
+					});
+
+					Remove(key);
+					AddRange(key, newItems);
+				});
 			}
 
 			// Try to output the file
 			WriteToFile(outDir);
-		}
-
-		/// <summary>
-		/// Strip the given hash types from the DAT
-		/// </summary>
-		private void StripHashesFromItems()
-		{
-			// Output the logging statement
-			Globals.Logger.User("Stripping requested hashes");
-
-			// Now process all of the roms
-			List<string> keys = Keys.ToList();
-			for (int i = 0; i < keys.Count; i++)
-			{
-				List<DatItem> items = this[keys[i]];
-				for (int j = 0; j < items.Count; j++)
-				{
-					DatItem item = items[j];
-					if (item.Type == ItemType.Rom)
-					{
-						Rom rom = (Rom)item;
-						if ((StripHash & Hash.MD5) != 0)
-						{
-							rom.MD5 = null;
-						}
-						if ((StripHash & Hash.SHA1) != 0)
-						{
-							rom.SHA1 = null;
-						}
-						if ((StripHash & Hash.SHA256) != 0)
-						{
-							rom.SHA256 = null;
-						}
-						if ((StripHash & Hash.SHA384) != 0)
-						{
-							rom.SHA384 = null;
-						}
-						if ((StripHash & Hash.SHA512) != 0)
-						{
-							rom.SHA512 = null;
-						}
-
-						items[j] = rom;
-					}
-					else if (item.Type == ItemType.Disk)
-					{
-						Disk disk = (Disk)item;
-						if ((StripHash & Hash.MD5) != 0)
-						{
-							disk.MD5 = null;
-						}
-						if ((StripHash & Hash.SHA1) != 0)
-						{
-							disk.SHA1 = null;
-						}
-						if ((StripHash & Hash.SHA256) != 0)
-						{
-							disk.SHA256 = null;
-						}
-						if ((StripHash & Hash.SHA384) != 0)
-						{
-							disk.SHA384 = null;
-						}
-						if ((StripHash & Hash.SHA512) != 0)
-						{
-							disk.SHA512 = null;
-						}
-						items[j] = disk;
-					}
-				}
-
-				this[keys[i]] = items;
-			}
 		}
 
 		/// <summary>

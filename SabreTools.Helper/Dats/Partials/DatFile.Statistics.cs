@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 
 using SabreTools.Helper.Data;
@@ -51,10 +52,11 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Loop through and add
-			foreach (string key in Keys)
+			List<string> keys = Keys.ToList();
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];
-				foreach (DatItem item in items)
+				Parallel.ForEach(items, Globals.ParallelOptions, item =>
 				{
 					switch (item.Type)
 					{
@@ -68,6 +70,8 @@ namespace SabreTools.Helper.Dats
 							MD5Count += (String.IsNullOrEmpty(disk.MD5) ? 0 : 1);
 							SHA1Count += (String.IsNullOrEmpty(disk.SHA1) ? 0 : 1);
 							SHA256Count += (String.IsNullOrEmpty(disk.SHA256) ? 0 : 1);
+							SHA384Count += (String.IsNullOrEmpty(disk.SHA384) ? 0 : 1);
+							SHA512Count += (String.IsNullOrEmpty(disk.SHA512) ? 0 : 1);
 							BaddumpCount += (disk.ItemStatus == ItemStatus.BadDump ? 1 : 0);
 							NodumpCount += (disk.ItemStatus == ItemStatus.Nodump ? 1 : 0);
 							break;
@@ -81,14 +85,16 @@ namespace SabreTools.Helper.Dats
 							MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
 							SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
 							SHA256Count += (String.IsNullOrEmpty(rom.SHA256) ? 0 : 1);
+							SHA384Count += (String.IsNullOrEmpty(rom.SHA384) ? 0 : 1);
+							SHA512Count += (String.IsNullOrEmpty(rom.SHA512) ? 0 : 1);
 							BaddumpCount += (rom.ItemStatus == ItemStatus.BadDump ? 1 : 0);
 							NodumpCount += (rom.ItemStatus == ItemStatus.Nodump ? 1 : 0);
 							break;
 						case ItemType.Sample:
 							break;
 					}
-				}
-			}
+				});
+			});
 		}
 
 		/// <summary>

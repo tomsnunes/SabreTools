@@ -16,144 +16,144 @@ namespace SabreTools.Helper.Dats
 {
 	public partial class DatFile
 	{
-#region Instance Methods
+		#region Instance Methods
 
-#region Bucketing
+		#region Bucketing
 
-		/// <summary>
-		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by a user-defined method
-		/// </summary>
-		/// <param name="bucketBy">SortedBy enum representing how to sort the individual items</param>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		/// <param name="lower">True if the key should be lowercased (default), false otherwise</param>
-		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
-		public void BucketBy(SortedBy bucketBy, bool mergeroms, bool lower = true, bool norename = true)
-		{
-			// If we already have the right sorting, trust it
-			if (_sortedBy == bucketBy)
-			{
-				return;
-			}
-
-			// Set the sorted type
-			_sortedBy = bucketBy;
-
-			// Create the temporary dictionary to sort into
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
-
-			Globals.Logger.User("Organizing roms by " + bucketBy +(mergeroms ? " and merging" : ""));
-
-			// First do the initial sort of all of the roms
-			List<string> keys = Keys.ToList();
-			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
-			{
-				List<DatItem> roms = this[key];
-
-				// Now add each of the roms to their respective games
-				Parallel.ForEach(roms, Globals.ParallelOptions, rom =>
+				/// <summary>
+				/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by a user-defined method
+				/// </summary>
+				/// <param name="bucketBy">SortedBy enum representing how to sort the individual items</param>
+				/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+				/// <param name="lower">True if the key should be lowercased (default), false otherwise</param>
+				/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
+				public void BucketBy(SortedBy bucketBy, bool mergeroms, bool lower = true, bool norename = true)
 				{
-					string newkey = "";
-
-					// We want to get the key most appropriate for the given sorting type
-					switch (bucketBy)
+					// If we already have the right sorting, trust it
+					if (_sortedBy == bucketBy)
 					{
-						case SortedBy.CRC:
-							newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).CRC : Constants.CRCZero);
-							break;
-						case SortedBy.Game:
-							newkey = (norename ? ""
-								: rom.SystemID.ToString().PadLeft(10, '0')
-									+ "-"
-									+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
-							+ (String.IsNullOrEmpty(rom.Machine.Name)
-									? "Default"
-									: rom.Machine.Name);
-							if (lower)
+						return;
+					}
+
+					// Set the sorted type
+					_sortedBy = bucketBy;
+
+					// Create the temporary dictionary to sort into
+					SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
+
+					Globals.Logger.User("Organizing roms by " + bucketBy +(mergeroms ? " and merging" : ""));
+
+					// First do the initial sort of all of the roms
+					List<string> keys = Keys.ToList();
+					Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+					{
+						List<DatItem> roms = this[key];
+
+						// Now add each of the roms to their respective games
+						Parallel.ForEach(roms, Globals.ParallelOptions, rom =>
+						{
+							string newkey = "";
+
+							// We want to get the key most appropriate for the given sorting type
+							switch (bucketBy)
 							{
-								newkey = newkey.ToLowerInvariant();
+								case SortedBy.CRC:
+									newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).CRC : Constants.CRCZero);
+									break;
+								case SortedBy.Game:
+									newkey = (norename ? ""
+										: rom.SystemID.ToString().PadLeft(10, '0')
+											+ "-"
+											+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
+									+ (String.IsNullOrEmpty(rom.Machine.Name)
+											? "Default"
+											: rom.Machine.Name);
+									if (lower)
+									{
+										newkey = newkey.ToLowerInvariant();
+									}
+
+									newkey = HttpUtility.HtmlEncode(newkey);
+									break;
+								case SortedBy.MD5:
+									newkey = (rom.Type == ItemType.Rom
+										? ((Rom)rom).MD5
+										: (rom.Type == ItemType.Disk
+											? ((Disk)rom).MD5
+											: Constants.MD5Zero));
+									break;
+								case SortedBy.SHA1:
+									newkey = (rom.Type == ItemType.Rom
+										? ((Rom)rom).SHA1
+										: (rom.Type == ItemType.Disk
+											? ((Disk)rom).SHA1
+											: Constants.SHA1Zero));
+									break;
+								case SortedBy.SHA256:
+									newkey = (rom.Type == ItemType.Rom
+										? ((Rom)rom).SHA256
+										: (rom.Type == ItemType.Disk
+											? ((Disk)rom).SHA256
+											: Constants.SHA256Zero));
+									break;
+								case SortedBy.SHA384:
+									newkey = (rom.Type == ItemType.Rom
+										? ((Rom)rom).SHA384
+										: (rom.Type == ItemType.Disk
+											? ((Disk)rom).SHA384
+											: Constants.SHA384Zero));
+									break;
+								case SortedBy.SHA512:
+									newkey = (rom.Type == ItemType.Rom
+										? ((Rom)rom).SHA512
+										: (rom.Type == ItemType.Disk
+											? ((Disk)rom).SHA512
+											: Constants.SHA512Zero));
+									break;
 							}
 
-							newkey = HttpUtility.HtmlEncode(newkey);
-							break;
-						case SortedBy.MD5:
-							newkey = (rom.Type == ItemType.Rom
-								? ((Rom)rom).MD5
-								: (rom.Type == ItemType.Disk
-									? ((Disk)rom).MD5
-									: Constants.MD5Zero));
-							break;
-						case SortedBy.SHA1:
-							newkey = (rom.Type == ItemType.Rom
-								? ((Rom)rom).SHA1
-								: (rom.Type == ItemType.Disk
-									? ((Disk)rom).SHA1
-									: Constants.SHA1Zero));
-							break;
-						case SortedBy.SHA256:
-							newkey = (rom.Type == ItemType.Rom
-								? ((Rom)rom).SHA256
-								: (rom.Type == ItemType.Disk
-									? ((Disk)rom).SHA256
-									: Constants.SHA256Zero));
-							break;
-						case SortedBy.SHA384:
-							newkey = (rom.Type == ItemType.Rom
-								? ((Rom)rom).SHA384
-								: (rom.Type == ItemType.Disk
-									? ((Disk)rom).SHA384
-									: Constants.SHA384Zero));
-							break;
-						case SortedBy.SHA512:
-							newkey = (rom.Type == ItemType.Rom
-								? ((Rom)rom).SHA512
-								: (rom.Type == ItemType.Disk
-									? ((Disk)rom).SHA512
-									: Constants.SHA512Zero));
-							break;
-					}
+							// Add the DatItem to the temp dictionary
+							lock (sortable)
+							{
+								if (!sortable.ContainsKey(newkey))
+								{
+									sortable.Add(newkey, new List<DatItem>());
+								}
+								sortable[newkey].Add(rom);
+							}
+						});
+					});
 
-					// Add the DatItem to the temp dictionary
-					lock (sortable)
+					// Now go through and sort all of the individual lists
+					keys = sortable.Keys.ToList();
+					Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 					{
-						if (!sortable.ContainsKey(newkey))
+						// Get the possibly unsorted list
+						List<DatItem> sortedlist = sortable[key];
+
+						// Sort the list of items to be consistent
+						DatItem.Sort(ref sortedlist, false);
+
+						// If we're merging the roms, do so
+						if (mergeroms)
 						{
-							sortable.Add(newkey, new List<DatItem>());
+							sortedlist = DatItem.Merge(sortedlist);
 						}
-						sortable[newkey].Add(rom);
-					}
-				});
-			});
 
-			// Now go through and sort all of the individual lists
-			keys = sortable.Keys.ToList();
-			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
-			{
-				// Get the possibly unsorted list
-				List<DatItem> sortedlist = sortable[key];
+						// Add the list back to the temp dictionary
+						lock (sortable)
+						{
+							sortable[key] = sortedlist;
+						}
+					});
 
-				// Sort the list of items to be consistent
-				DatItem.Sort(ref sortedlist, false);
-
-				// If we're merging the roms, do so
-				if (mergeroms)
-				{
-					sortedlist = DatItem.Merge(sortedlist);
+					// Now assign the dictionary back
+					_files = sortable;
 				}
 
-				// Add the list back to the temp dictionary
-				lock (sortable)
-				{
-					sortable[key] = sortedlist;
-				}
-			});
+		#endregion
 
-			// Now assign the dictionary back
-			_files = sortable;
-		}
-
-#endregion
-
-#region Filtering
+		#region Filtering
 
 		/// <summary>
 		/// Filter a DAT based on input parameters and modify the items
@@ -284,9 +284,90 @@ namespace SabreTools.Helper.Dats
 			}
 		}
 
-#endregion
+		/// <summary>
+		/// Strip the given hash types from the DAT
+		/// </summary>
+		public void StripHashesFromItems()
+		{
+			// Output the logging statement
+			Globals.Logger.User("Stripping requested hashes");
 
-#region Merging/Splitting Methods
+			// Now process all of the roms
+			List<string> keys = Keys.ToList();
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+			{
+				List<DatItem> items = this[key];
+				Parallel.For(0, items.Count, Globals.ParallelOptions, j =>
+				{
+					DatItem item = items[j];
+					if (item.Type == ItemType.Rom)
+					{
+						Rom rom = (Rom)item;
+						if ((StripHash & Hash.MD5) != 0)
+						{
+							rom.MD5 = null;
+						}
+						if ((StripHash & Hash.SHA1) != 0)
+						{
+							rom.SHA1 = null;
+						}
+						if ((StripHash & Hash.SHA256) != 0)
+						{
+							rom.SHA256 = null;
+						}
+						if ((StripHash & Hash.SHA384) != 0)
+						{
+							rom.SHA384 = null;
+						}
+						if ((StripHash & Hash.SHA512) != 0)
+						{
+							rom.SHA512 = null;
+						}
+
+						lock (items)
+						{
+							items[j] = rom;
+						}
+					}
+					else if (item.Type == ItemType.Disk)
+					{
+						Disk disk = (Disk)item;
+						if ((StripHash & Hash.MD5) != 0)
+						{
+							disk.MD5 = null;
+						}
+						if ((StripHash & Hash.SHA1) != 0)
+						{
+							disk.SHA1 = null;
+						}
+						if ((StripHash & Hash.SHA256) != 0)
+						{
+							disk.SHA256 = null;
+						}
+						if ((StripHash & Hash.SHA384) != 0)
+						{
+							disk.SHA384 = null;
+						}
+						if ((StripHash & Hash.SHA512) != 0)
+						{
+							disk.SHA512 = null;
+						}
+
+						lock (items)
+						{
+							items[j] = disk;
+						}
+					}
+				});
+
+				Remove(key);
+				AddRange(key, items);
+			});
+		}
+
+		#endregion
+
+		#region Merging/Splitting Methods
 
 		/// <summary>
 		/// Use cloneof tags to create non-merged sets and remove the tags plus using the device_ref tags to get full sets
@@ -382,7 +463,7 @@ namespace SabreTools.Helper.Dats
 
 #endregion
 
-#region Merging/Splitting Helper Methods
+		#region Merging/Splitting Helper Methods
 
 		/// <summary>
 		/// Use romof tags to add roms to the children
@@ -965,6 +1046,6 @@ namespace SabreTools.Helper.Dats
 
 #endregion
 
-#endregion // Instance Methods
+		#endregion // Instance Methods
 	}
 }

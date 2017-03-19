@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using SabreTools.Helper.Data;
 
@@ -460,10 +460,10 @@ namespace SabreTools.Helper.Dats
 				lock (_files)
 				{
 					int count = 0;
-					foreach (string key in _files.Keys)
+					Parallel.ForEach(_files.Keys, Globals.ParallelOptions, key =>
 					{
 						count += _files[key].Count;
-					}
+					});
 
 					return count;
 				}

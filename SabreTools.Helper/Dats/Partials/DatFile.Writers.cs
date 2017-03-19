@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 
 using SabreTools.Helper.Data;
@@ -134,7 +135,8 @@ namespace SabreTools.Helper.Dats
 				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
-				foreach (DatFormat datFormat in outfiles.Keys)
+				// Write out all required formats
+				Parallel.ForEach(outfiles.Keys, Globals.ParallelOptions, datFormat =>
 				{
 					string outfile = outfiles[datFormat];
 
@@ -229,7 +231,7 @@ namespace SabreTools.Helper.Dats
 					Globals.Logger.Verbose("File written!" + Environment.NewLine);
 					sw.Dispose();
 					fs.Dispose();
-				}
+				});
 			}
 			catch (Exception ex)
 			{

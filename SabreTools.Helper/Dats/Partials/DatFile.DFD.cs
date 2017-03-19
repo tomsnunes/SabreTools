@@ -224,13 +224,13 @@ namespace SabreTools.Helper.Dats
 			else
 			{
 				// First take care of the found items
-				foreach (Rom rom in extracted)
+				Parallel.ForEach(extracted, Globals.ParallelOptions, rom =>
 				{
 					PopulateFromDirProcessFileHelper(newItem,
 						rom,
 						basePath,
 						(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length) + Path.GetFileNameWithoutExtension(item));
-				}
+				});
 
 				// Then, if we're looking for blanks, get all of the blank folders and add them
 				if (addBlanks)

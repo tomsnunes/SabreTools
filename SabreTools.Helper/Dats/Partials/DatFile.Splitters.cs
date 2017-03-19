@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 
 using SabreTools.Helper.Data;
@@ -31,17 +32,23 @@ namespace SabreTools.Helper.Dats
 		{
 			// Make sure all of the extensions have a dot at the beginning
 			List<string> newExtA = new List<string>();
-			foreach (string s in extA)
+			Parallel.ForEach(extA, Globals.ParallelOptions, s =>
 			{
-				newExtA.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
-			}
+				lock (newExtA)
+				{
+					newExtA.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
+				}
+			});
 			string newExtAString = string.Join(",", newExtA);
 
 			List<string> newExtB = new List<string>();
-			foreach (string s in extB)
+			Parallel.ForEach(extB, Globals.ParallelOptions, s =>
 			{
-				newExtB.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
-			}
+				lock (newExtB)
+				{
+					newExtB.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
+				}
+			});
 			string newExtBString = string.Join(",", newExtB);
 
 			// Set all of the appropriate outputs for each of the subsets
@@ -83,25 +90,27 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Now separate the roms accordingly
-			foreach (string key in Keys)
+			List<string> keys = Keys.ToList();
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
-				foreach (DatItem rom in this[key])
+				List<DatItem> items = this[key];
+				Parallel.ForEach(items, Globals.ParallelOptions, item =>
 				{
-					if (newExtA.Contains(Path.GetExtension(rom.Name.ToUpperInvariant())))
+					if (newExtA.Contains(Path.GetExtension(item.Name.ToUpperInvariant())))
 					{
-						datdataA.Add(key, rom);
+						datdataA.Add(key, item);
 					}
-					else if (newExtB.Contains(Path.GetExtension(rom.Name.ToUpperInvariant())))
+					else if (newExtB.Contains(Path.GetExtension(item.Name.ToUpperInvariant())))
 					{
-						datdataB.Add(key, rom);
+						datdataB.Add(key, item);
 					}
 					else
 					{
-						datdataA.Add(key, rom);
-						datdataB.Add(key, rom);
+						datdataA.Add(key, item);
+						datdataB.Add(key, item);
 					}
-				}
-			}
+				});
+			});
 
 			// Get the output directory
 			if (outDir != "")
@@ -304,65 +313,65 @@ namespace SabreTools.Helper.Dats
 
 			// Now populate each of the DAT objects in turn
 			List<string> keys = Keys.ToList();
-			foreach (string key in keys)
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
-				List<DatItem> roms = this[key];
-				foreach (DatItem rom in roms)
+				List<DatItem> items = this[key];
+				Parallel.ForEach(items, Globals.ParallelOptions, item =>
 				{
 					// If the file is not a Rom or Disk, continue
-					if (rom.Type != ItemType.Disk && rom.Type != ItemType.Rom)
+					if (item.Type != ItemType.Disk && item.Type != ItemType.Rom)
 					{
-						continue;
+						return;
 					}
 
 					// If the file is a nodump
-					if ((rom.Type == ItemType.Rom && ((Rom)rom).ItemStatus == ItemStatus.Nodump)
-						|| (rom.Type == ItemType.Disk && ((Disk)rom).ItemStatus == ItemStatus.Nodump))
+					if ((item.Type == ItemType.Rom && ((Rom)item).ItemStatus == ItemStatus.Nodump)
+						|| (item.Type == ItemType.Disk && ((Disk)item).ItemStatus == ItemStatus.Nodump))
 					{
-						nodump.Add(key, rom);
+						nodump.Add(key, item);
 					}
 					// If the file has a SHA-512
-					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).SHA512))
-						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).SHA512)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)item).SHA512))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)item).SHA512)))
 					{
-						sha512.Add(key, rom);
+						sha512.Add(key, item);
 					}
 					// If the file has a SHA-384
-					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).SHA384))
-						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).SHA384)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)item).SHA384))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)item).SHA384)))
 					{
-						sha384.Add(key, rom);
+						sha384.Add(key, item);
 					}
 					// If the file has a SHA-256
-					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).SHA256))
-						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).SHA256)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)item).SHA256))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)item).SHA256)))
 					{
-						sha256.Add(key, rom);
+						sha256.Add(key, item);
 					}
 					// If the file has a SHA-1
-					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).SHA1))
-						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).SHA1)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)item).SHA1))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)item).SHA1)))
 					{
-						sha1.Add(key, rom);
+						sha1.Add(key, item);
 					}
 					// If the file has no SHA-1 but has an MD5
-					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).MD5))
-						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).MD5)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)item).MD5))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)item).MD5)))
 					{
-						md5.Add(key, rom);
+						md5.Add(key, item);
 					}
 					// If the file has no MD5 but a CRC
-					else if ((rom.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)rom).SHA1))
-						|| (rom.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)rom).SHA1)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)item).SHA1))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)item).SHA1)))
 					{
-						crc.Add(key, rom);
+						crc.Add(key, item);
 					}
 					else
 					{
-						other.Add(key, rom);
+						other.Add(key, item);
 					}
-				}
-			}
+				});
+			});
 
 			// Get the output directory
 			if (outDir != "")
@@ -415,7 +424,7 @@ namespace SabreTools.Helper.Dats
 			keys.Sort(SplitByLevelSort);
 
 			// Then, we loop over the games
-			foreach (string key in keys)
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				// Here, the key is the name of the game to be used for comparison
 				if (tempDat.Name != null && tempDat.Name != Style.GetDirectoryName(key))
@@ -440,7 +449,7 @@ namespace SabreTools.Helper.Dats
 
 				// Then set the DAT name to be the parent directory name
 				tempDat.Name = Style.GetDirectoryName(key);
-			}
+			});
 
 			// Then we write the last DAT out since it would be skipped otherwise
 			SplitByLevelHelper(tempDat, outDir, shortname, basedat);
@@ -581,28 +590,28 @@ namespace SabreTools.Helper.Dats
 
 			// Now populate each of the DAT objects in turn
 			List<string> keys = Keys.ToList();
-			foreach (string key in keys)
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
-				List<DatItem> roms = this[key];
-				foreach (DatItem rom in roms)
+				List<DatItem> items = this[key];
+				Parallel.ForEach(items, Globals.ParallelOptions, item =>
 				{
 					// If the file is a Rom
-					if (rom.Type == ItemType.Rom)
+					if (item.Type == ItemType.Rom)
 					{
-						romdat.Add(key, rom);
+						romdat.Add(key, item);
 					}
 					// If the file is a Disk
-					else if (rom.Type == ItemType.Disk)
+					else if (item.Type == ItemType.Disk)
 					{
-						diskdat.Add(key, rom);
+						diskdat.Add(key, item);
 					}
 					// If the file is a Sample
-					else if (rom.Type == ItemType.Sample)
+					else if (item.Type == ItemType.Sample)
 					{
-						sampledat.Add(key, rom);
+						sampledat.Add(key, item);
 					}
-				}
-			}
+				});
+			});
 
 			// Get the output directory
 			if (outDir != "")

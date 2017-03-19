@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Skippers;
@@ -126,15 +127,18 @@ namespace SabreTools.Helper.Dats
 
 			// Now loop through and get only directories from the input paths
 			List<string> directories = new List<string>();
-			foreach (string input in inputs)
+			Parallel.ForEach(inputs, Globals.ParallelOptions, input =>
 			{
 				// Add to the list if the input is a directory
 				if (Directory.Exists(input))
 				{
 					Globals.Logger.Verbose("Adding depot: '" + input + "'");
-					directories.Add(input);
+					lock (directories)
+					{
+						directories.Add(input);
+					}
 				}
-			}
+			});
 
 			// If we don't have any directories, we want to exit
 			if (directories.Count == 0)
