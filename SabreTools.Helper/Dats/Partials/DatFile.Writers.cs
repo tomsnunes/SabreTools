@@ -115,7 +115,7 @@ namespace SabreTools.Helper.Dats
 			BucketBy(SortedBy.Game, false /* mergeRoms */, norename: norename);
 
 			// Output the number of items we're going to be writing
-			Globals.Logger.User("A total of " + Count + " items will be written out to file");
+			Globals.Logger.User("A total of " + Count + " items will be written out to \"" + FileName + "\"");
 
 			// Filter the DAT by 1G1R rules, if we're supposed to
 			// TODO: Create 1G1R logic before write
