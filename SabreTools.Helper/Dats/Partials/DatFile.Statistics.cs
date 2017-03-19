@@ -21,7 +21,6 @@ namespace SabreTools.Helper.Dats
 	/*
 	 * TODO: Make output standard width (HTML, without making the entire thing a table)
 	 * TODO: Multithreading? Either StringBuilder or locking
-	 * TODO: Fix alignment for stats output (text)
 	 */
 	public partial class DatFile
 	{
@@ -131,7 +130,9 @@ namespace SabreTools.Helper.Dats
     Roms with CRC:           " + CRCCount + @"
     Roms with MD5:           " + MD5Count + @"
     Roms with SHA-1:         " + SHA1Count + @"
-    Roms with SHA-256:       " + SHA256Count + "\n";
+    Roms with SHA-256:       " + SHA256Count + @"
+    Roms with SHA-384:       " + SHA384Count + @"
+    Roms with SHA-512:       " + SHA512Count + "\n";
 
 			if (baddumpCol)
 			{
@@ -156,7 +157,9 @@ namespace SabreTools.Helper.Dats
     Disks found:             " + DiskCount + @"
     Roms with CRC:           " + CRCCount + @"
     Roms with SHA-1:         " + SHA1Count + @"
-    Roms with SHA-256:       " + SHA256Count + "\n";
+    Roms with SHA-256:       " + SHA256Count + @"
+    Roms with SHA-384:       " + SHA384Count + @"
+    Roms with SHA-512:       " + SHA512Count + "\n";
 
 				if (baddumpCol)
 				{
@@ -171,14 +174,16 @@ namespace SabreTools.Helper.Dats
 			if (outputs.ContainsKey(StatDatFormat.CSV))
 			{
 				line = "\"" + FileName + "\","
-						+ "\"" + TotalSize + "\","
-						+ "\"" + (game == -1 ? Count : game) + "\","
-						+ "\"" + RomCount + "\","
-						+ "\"" + DiskCount + "\","
-						+ "\"" + CRCCount + "\","
-						+ "\"" + MD5Count + "\","
-						+ "\"" + SHA1Count + "\","
-						+ "\"" + SHA256Count + "\"";
+					+ "\"" + TotalSize + "\","
+					+ "\"" + (game == -1 ? Count : game) + "\","
+					+ "\"" + RomCount + "\","
+					+ "\"" + DiskCount + "\","
+					+ "\"" + CRCCount + "\","
+					+ "\"" + MD5Count + "\","
+					+ "\"" + SHA1Count + "\","
+					+ "\"" + SHA256Count + "\","
+					+ "\"" + SHA384Count + "\","
+					+ "\"" + SHA512Count + "\"";
 
 				if (baddumpCol)
 				{
@@ -228,7 +233,9 @@ namespace SabreTools.Helper.Dats
 						+ "\"" + CRCCount + "\"\t"
 						+ "\"" + MD5Count + "\"\t"
 						+ "\"" + SHA1Count + "\"\t"
-						+ "\"" + SHA256Count + "\"";
+						+ "\"" + SHA256Count + "\"\t"
+						+ "\"" + SHA384Count + "\"\t"
+						+ "\"" + SHA512Count + "\"";
 
 				if (baddumpCol)
 				{
