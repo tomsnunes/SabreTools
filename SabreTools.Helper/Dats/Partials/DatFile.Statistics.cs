@@ -286,20 +286,27 @@ namespace SabreTools.Helper.Dats
 
 			// Make sure we have all files
 			List<Tuple<string, string>> newinputs = new List<Tuple<string, string>>(); // item, basepath
-			foreach (string input in inputs)
+			Parallel.ForEach(inputs, Globals.ParallelOptions, input =>
 			{
 				if (File.Exists(input))
 				{
-					newinputs.Add(Tuple.Create(Path.GetFullPath(input), Path.GetDirectoryName(Path.GetFullPath(input))));
+					lock (newinputs)
+					{
+						newinputs.Add(Tuple.Create(Path.GetFullPath(input), Path.GetDirectoryName(Path.GetFullPath(input))));
+					}
 				}
 				if (Directory.Exists(input))
 				{
 					foreach (string file in Directory.GetFiles(input, "*", SearchOption.AllDirectories))
 					{
-						newinputs.Add(Tuple.Create(Path.GetFullPath(file), Path.GetFullPath(input)));
+						lock (newinputs)
+						{
+							newinputs.Add(Tuple.Create(Path.GetFullPath(file), Path.GetFullPath(input)));
+						}
 					}
 				}
-			}
+			});
+
 			newinputs = newinputs
 				.OrderBy(i => Path.GetDirectoryName(i.Item1))
 				.ThenBy(i => Path.GetFileName(i.Item1))
