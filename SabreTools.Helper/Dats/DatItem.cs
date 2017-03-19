@@ -166,28 +166,12 @@ namespace SabreTools.Helper.Dats
 			return ret;
 		}
 
-		public abstract bool Equals(DatItem other);
-
 		/// <summary>
 		/// Determine if an item is a duplicate using partial matching logic
 		/// </summary>
-		/// <param name="lastItem">DatItem to use as a baseline</param>
+		/// <param name="other">DatItem to use as a baseline</param>
 		/// <returns>True if the roms are duplicates, false otherwise</returns>
-		public bool IsDuplicate(DatItem lastItem)
-		{
-			bool dupefound = this.Equals(lastItem);
-
-			// More wonderful SHA-1 logging that has to be done
-			if (_itemType == ItemType.Rom && lastItem.Type == ItemType.Rom)
-			{
-				if (!String.IsNullOrEmpty(((Rom)this).SHA1) && ((Rom)this).SHA1 == ((Rom)lastItem).SHA1 && ((Rom)this).Size != ((Rom)lastItem).Size)
-				{
-					Globals.Logger.User("SHA-1 mismatch - Hash: " + ((Rom)this).SHA1);
-				}
-			}
-
-			return dupefound;
-		}
+		public abstract bool Equals(DatItem other);
 
 		/// <summary>
 		/// Return the duplicate status of two items
@@ -199,7 +183,7 @@ namespace SabreTools.Helper.Dats
 			DupeType output = 0x00;
 
 			// If we don't have a duplicate at all, return none
-			if (!this.IsDuplicate(lastItem))
+			if (!this.Equals(lastItem))
 			{
 				return output;
 			}
@@ -264,7 +248,7 @@ namespace SabreTools.Helper.Dats
 
 			foreach (DatItem rom in roms)
 			{
-				if (IsDuplicate(rom))
+				if (this.Equals(rom))
 				{
 					return true;
 				}
@@ -304,7 +288,7 @@ namespace SabreTools.Helper.Dats
 
 			foreach (DatItem rom in roms)
 			{
-				if (IsDuplicate(rom))
+				if (this.Equals(rom))
 				{
 					output.Add(rom);
 				}
