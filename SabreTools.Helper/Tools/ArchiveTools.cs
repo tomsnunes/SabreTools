@@ -385,14 +385,19 @@ namespace SabreTools.Helper.Tools
 								// Otherwise, we do the normal loop
 								else
 								{
-									int realBufferSize = (streamsize < _bufferSize ? (int)streamsize : _bufferSize);
-									byte[] ibuffer = new byte[realBufferSize];
+									byte[] ibuffer = new byte[_bufferSize];
 									int ilen;
-									while ((ilen = readStream.Read(ibuffer, 0, realBufferSize)) > 0)
+									while (streamsize > _bufferSize)
 									{
+										ilen = readStream.Read(ibuffer, 0, _bufferSize);
 										ms.Write(ibuffer, 0, ilen);
 										ms.Flush();
+										streamsize -= _bufferSize;
 									}
+
+									ilen = readStream.Read(ibuffer, 0, (int)streamsize);
+									ms.Write(ibuffer, 0, ilen);
+									ms.Flush();
 								}
 
 								zr = zf.CloseReadStream();
@@ -847,14 +852,19 @@ namespace SabreTools.Helper.Tools
 								// Otherwise, we do the normal loop
 								else
 								{
-									int realBufferSize = (streamsize < _bufferSize ? (int)streamsize : _bufferSize);
-									byte[] ibuffer = new byte[realBufferSize];
+									byte[] ibuffer = new byte[_bufferSize];
 									int ilen;
-									while ((ilen = readStream.Read(ibuffer, 0, realBufferSize)) > 0)
+									while (streamsize > _bufferSize)
 									{
+										ilen = readStream.Read(ibuffer, 0, _bufferSize);
 										entryStream.Write(ibuffer, 0, ilen);
 										entryStream.Flush();
+										streamsize -= _bufferSize;
 									}
+
+									ilen = readStream.Read(ibuffer, 0, (int)streamsize);
+									entryStream.Write(ibuffer, 0, ilen);
+									entryStream.Flush();
 								}
 								zr = zf.CloseReadStream();
 
