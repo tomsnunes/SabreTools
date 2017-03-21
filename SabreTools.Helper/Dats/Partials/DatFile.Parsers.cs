@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml;
 
 using SabreTools.Helper.Data;
@@ -2803,7 +2804,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="item">Item data to check against</param>
 		/// <param name="clean">True if the names should be cleaned to WoD standards, false otherwise</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// <param name="key">Output param containing the key for the item</param>
+		/// <returns>The key for the item</returns>
 		private string ParseAddHelper(DatItem item, bool clean, bool remUnicode)
 		{
 			string key = "";
@@ -2964,6 +2965,18 @@ namespace SabreTools.Helper.Dats
 			Add(key, item);
 
 			return key;
+		}
+
+		/// <summary>
+		/// Add a rom to the Dat after checking
+		/// </summary>
+		/// <param name="item">Item data to check against</param>
+		/// <param name="clean">True if the names should be cleaned to WoD standards, false otherwise</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// <returns>The key for the item</returns>
+		private async Task<string> ParseAddHelperAsync(DatItem item, bool clean, bool remUnicode)
+		{
+			return await Task.Run(() => ParseAddHelper(item, clean, remUnicode));
 		}
 
 		#endregion
