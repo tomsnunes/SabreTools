@@ -264,7 +264,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode, out string key);
+				ParseAddHelper(rom, clean, remUnicode);
 			}
 
 			sr.Dispose();
@@ -385,9 +385,6 @@ namespace SabreTools.Helper.Dats
 					item.SystemID = sysid;
 					item.SourceID = srcid;
 
-					// Get the blank key to write to
-					string key = "";
-
 					// If we have a sample, treat it special
 					if (temptype == ItemType.Sample)
 					{
@@ -395,8 +392,7 @@ namespace SabreTools.Helper.Dats
 						item.Name = line;
 
 						// Now process and add the sample
-						key = "";
-						ParseAddHelper(item, clean, remUnicode, out key);
+						ParseAddHelper(item, clean, remUnicode);
 
 						continue;
 					}
@@ -480,8 +476,7 @@ namespace SabreTools.Helper.Dats
 						}
 
 						// Now process and add the rom
-						key = "";
-						ParseAddHelper(item, clean, remUnicode, out key);
+						ParseAddHelper(item, clean, remUnicode);
 						continue;
 					}
 
@@ -693,8 +688,7 @@ namespace SabreTools.Helper.Dats
 					}
 
 					// Now process and add the rom
-					key = "";
-					ParseAddHelper(item, clean, remUnicode, out key);
+					ParseAddHelper(item, clean, remUnicode);
 				}
 
 				// If the line is anything but a rom or disk and we're in a block
@@ -1105,7 +1099,6 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// And now we populate and add the new item
-				string key = "";
 				switch (itemType)
 				{
 					case ItemType.Archive:
@@ -1120,7 +1113,7 @@ namespace SabreTools.Helper.Dats
 							},
 						};
 
-						ParseAddHelper(archive, clean, remUnicode, out key);
+						ParseAddHelper(archive, clean, remUnicode);
 						break;
 					case ItemType.BiosSet:
 						BiosSet biosset = new BiosSet()
@@ -1134,7 +1127,7 @@ namespace SabreTools.Helper.Dats
 							},
 						};
 
-						ParseAddHelper(biosset, clean, remUnicode, out key);
+						ParseAddHelper(biosset, clean, remUnicode);
 						break;
 					case ItemType.Disk:
 						Disk disk = new Disk()
@@ -1155,7 +1148,7 @@ namespace SabreTools.Helper.Dats
 							ItemStatus = status,
 						};
 
-						ParseAddHelper(disk, clean, remUnicode, out key);
+						ParseAddHelper(disk, clean, remUnicode);
 						break;
 					case ItemType.Release:
 						Release release = new Release()
@@ -1169,7 +1162,7 @@ namespace SabreTools.Helper.Dats
 							},
 						};
 
-						ParseAddHelper(release, clean, remUnicode, out key);
+						ParseAddHelper(release, clean, remUnicode);
 						break;
 					case ItemType.Rom:
 						Rom rom = new Rom()
@@ -1192,7 +1185,7 @@ namespace SabreTools.Helper.Dats
 							ItemStatus = status,
 						};
 
-						ParseAddHelper(rom, clean, remUnicode, out key);
+						ParseAddHelper(rom, clean, remUnicode);
 						break;
 					case ItemType.Sample:
 						Sample sample = new Sample()
@@ -1206,7 +1199,7 @@ namespace SabreTools.Helper.Dats
 							},
 						};
 
-						ParseAddHelper(sample, clean, remUnicode, out key);
+						ParseAddHelper(sample, clean, remUnicode);
 						break;
 				}
 			}			
@@ -1268,7 +1261,7 @@ namespace SabreTools.Helper.Dats
 							Rom rom = new Rom("null", tempgame);
 
 							// Now process and add the rom
-							ParseAddHelper(rom, clean, remUnicode, out key);
+							key = ParseAddHelper(rom, clean, remUnicode);
 						}
 
 						// Regardless, end the current folder
@@ -1814,7 +1807,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(olrom, clean, remUnicode, out key);
+										key = ParseAddHelper(olrom, clean, remUnicode);
 										break;
 
 									// For Software List and MAME listxml only
@@ -1910,7 +1903,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(relrom, clean, remUnicode, out key);
+										key = ParseAddHelper(relrom, clean, remUnicode);
 
 										subreader.Read();
 										break;
@@ -1953,7 +1946,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(biosrom, clean, remUnicode, out key);
+										key = ParseAddHelper(biosrom, clean, remUnicode);
 
 										subreader.Read();
 										break;
@@ -1981,7 +1974,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(archiverom, clean, remUnicode, out key);
+										key = ParseAddHelper(archiverom, clean, remUnicode);
 
 										subreader.Read();
 										break;
@@ -2009,7 +2002,7 @@ namespace SabreTools.Helper.Dats
 										};
 
 										// Now process and add the rom
-										ParseAddHelper(samplerom, clean, remUnicode, out key);
+										key = ParseAddHelper(samplerom, clean, remUnicode);
 
 										subreader.Read();
 										break;
@@ -2152,7 +2145,7 @@ namespace SabreTools.Helper.Dats
 										}
 
 										// Now process and add the rom
-										ParseAddHelper(inrom, clean, remUnicode, out key);
+										key = ParseAddHelper(inrom, clean, remUnicode);
 
 										subreader.Read();
 										break;
@@ -2327,7 +2320,7 @@ namespace SabreTools.Helper.Dats
 							}
 
 							// Now process and add the rom
-							ParseAddHelper(rom, clean, remUnicode, out key);
+							key = ParseAddHelper(rom, clean, remUnicode);
 
 							xtr.Read();
 							break;
@@ -2391,7 +2384,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode, out string key);
+				ParseAddHelper(rom, clean, remUnicode);
 			}
 
 			sr.Dispose();
@@ -2440,7 +2433,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode, out string key);
+				ParseAddHelper(rom, clean, remUnicode);
 			}
 
 			sr.Dispose();
@@ -2489,7 +2482,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode, out string key);
+				ParseAddHelper(rom, clean, remUnicode);
 			}
 
 			sr.Dispose();
@@ -2538,7 +2531,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode, out string key);
+				ParseAddHelper(rom, clean, remUnicode);
 			}
 
 			sr.Dispose();
@@ -2587,7 +2580,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode, out string key);
+				ParseAddHelper(rom, clean, remUnicode);
 			}
 
 			sr.Dispose();
@@ -2636,7 +2629,7 @@ namespace SabreTools.Helper.Dats
 				};
 
 				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode, out string key);
+				ParseAddHelper(rom, clean, remUnicode);
 			}
 
 			sr.Dispose();
@@ -2796,7 +2789,7 @@ namespace SabreTools.Helper.Dats
 						};
 
 						// Now process and add the rom
-						ParseAddHelper(rom, clean, remUnicode, out string key);
+						ParseAddHelper(rom, clean, remUnicode);
 					}
 				}
 			}
@@ -2811,22 +2804,22 @@ namespace SabreTools.Helper.Dats
 		/// <param name="clean">True if the names should be cleaned to WoD standards, false otherwise</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="key">Output param containing the key for the item</param>
-		private void ParseAddHelper(DatItem item, bool clean, bool remUnicode, out string key)
+		private string ParseAddHelper(DatItem item, bool clean, bool remUnicode)
 		{
-			key = "";
+			string key = "";
 
 			// If there's no name in the rom, we log and skip it
 			if (item.Name == null)
 			{
 				Globals.Logger.Warning(FileName + ": Rom with no name found! Skipping...");
-				return;
+				return key;
 			}
 
 			// If the name ends with a directory separator, we log and skip it (DOSCenter only?)
 			if (item.Name.EndsWith("/") || item.Name.EndsWith("\\"))
 			{
 				Globals.Logger.Warning(FileName + ": Rom ending with directory separator found: '" + item.Name + "'. Skipping...");
-				return;
+				return key;
 			}
 
 			// If we're in cleaning mode, sanitize the game name
@@ -2969,6 +2962,8 @@ namespace SabreTools.Helper.Dats
 
 			// Add the item to the DAT
 			Add(key, item);
+
+			return key;
 		}
 
 		#endregion
