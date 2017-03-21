@@ -2763,6 +2763,9 @@ namespace SabreTools.Helper.Tools
 				return success;
 			}
 
+			// Set the stream position
+			inputStream.Seek(0, SeekOrigin.Begin);
+
 			// Get the output archive name from the first rebuild rom
 			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.Machine.Name) + (rom.Machine.Name.EndsWith(".zip") ? "" : ".zip"));
 
@@ -2823,7 +2826,7 @@ namespace SabreTools.Helper.Tools
 					Dictionary<string, int> inputIndexMap = new Dictionary<string, int>();
 
 					// If the old one doesn't contain the new file, then add it
-					if (oldZipFile.Contains(rom.Name.Replace('\\', '/')))
+					if (!oldZipFile.Contains(rom.Name.Replace('\\', '/')))
 					{
 						inputIndexMap.Add(rom.Name.Replace('\\', '/'), -1);
 					}
@@ -2917,6 +2920,7 @@ namespace SabreTools.Helper.Tools
 			}
 			finally
 			{
+				inputStream?.Dispose();
 				zipFile.Dispose();
 				oldZipFile.Dispose();
 			}
