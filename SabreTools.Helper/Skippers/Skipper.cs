@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Xml;
 
 using SabreTools.Helper.Data;
@@ -30,7 +31,7 @@ namespace SabreTools.Helper.Skippers
 		public string SourceFile;
 
 		// Local paths
-		public const string LocalPath = "Skippers";
+		public static string LocalPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase), "Skippers") + Path.DirectorySeparatorChar;
 
 		// Header skippers represented by a list of skipper objects
 		private static List<Skipper> _list;

@@ -1,7 +1,17 @@
 ﻿using System;
-using System.IO;
+using System.Reflection;
 
 using SabreTools.Helper.Data;
+
+#if MONO
+using System.IO;
+#else
+using Alphaleonis.Win32.Filesystem;
+
+using FileAccess = System.IO.FileAccess;
+using FileMode = System.IO.FileMode;
+using StreamWriter = System.IO.StreamWriter;
+#endif
 
 namespace SabreTools.Helper
 {
@@ -23,7 +33,7 @@ namespace SabreTools.Helper
 		private StreamWriter _log;
 
 		// Private required variables
-		private string _basepath = "logs" + Path.DirectorySeparatorChar;
+		private string _basepath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase), "logs") + Path.DirectorySeparatorChar;
 
 		/// <summary>
 		/// Initialize a console-only logger object
