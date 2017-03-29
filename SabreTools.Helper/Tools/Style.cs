@@ -558,6 +558,10 @@ namespace SabreTools.Helper.Tools
 		{
 			s = GetFileName(s);
 			string[] tempkey = s.Split('.');
+			if (tempkey.Count() == 1)
+			{
+				return s;
+			}
 			return String.Join(".", tempkey.Take(tempkey.Length - 1));
 		}
 
