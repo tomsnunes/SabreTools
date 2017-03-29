@@ -143,6 +143,9 @@ namespace SabreTools.Helper.Dats
 				results += "	Roms with Nodump status: " + NodumpCount + "\n";
 			}
 
+			// For spacing between DATs
+			results += "\n\n";
+
 			Globals.Logger.User(results);
 
 			// Now write it out to file as well
@@ -169,6 +172,10 @@ namespace SabreTools.Helper.Dats
 				{
 					line += "	Roms with Nodump status: " + NodumpCount + "\n";
 				}
+
+				// For spacing between DATs
+				line += "\n\n";
+
 				outputs[StatDatFormat.None].Write(line);
 			}
 			if (outputs.ContainsKey(StatDatFormat.CSV))
