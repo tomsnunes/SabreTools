@@ -124,7 +124,7 @@ namespace SabreTools.Helper.Dats
 			string results = @"For '" + FileName + @"':
 --------------------------------------------------
     Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
-    Games found:             " + (game == -1 ? Count : game) + @"
+    Games found:             " + (game == -1 ? Keys.Count() : game) + @"
     Roms found:              " + RomCount + @"
     Disks found:             " + DiskCount + @"
     Roms with CRC:           " + CRCCount + @"
@@ -152,7 +152,7 @@ namespace SabreTools.Helper.Dats
 				line = @"'" + FileName + @"':
 --------------------------------------------------
     Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
-    Games found:             " + (game == -1 ? Count : game) + @"
+    Games found:             " + (game == -1 ? Keys.Count() : game) + @"
     Roms found:              " + RomCount + @"
     Disks found:             " + DiskCount + @"
     Roms with CRC:           " + CRCCount + @"
@@ -175,7 +175,7 @@ namespace SabreTools.Helper.Dats
 			{
 				line = "\"" + FileName + "\","
 					+ "\"" + TotalSize + "\","
-					+ "\"" + (game == -1 ? Count : game) + "\","
+					+ "\"" + (game == -1 ? Keys.Count() : game) + "\","
 					+ "\"" + RomCount + "\","
 					+ "\"" + DiskCount + "\","
 					+ "\"" + CRCCount + "\","
@@ -203,7 +203,7 @@ namespace SabreTools.Helper.Dats
 							? " class=\"dir\"><td>" + HttpUtility.HtmlEncode(FileName.Remove(0, 5))
 							: "><td>" + HttpUtility.HtmlEncode(FileName)) + "</td>"
 						+ "<td align=\"right\">" + Style.GetBytesReadable(TotalSize) + "</td>"
-						+ "<td align=\"right\">" + (game == -1 ? Count : game) + "</td>"
+						+ "<td align=\"right\">" + (game == -1 ? Keys.Count() : game) + "</td>"
 						+ "<td align=\"right\">" + RomCount + "</td>"
 						+ "<td align=\"right\">" + DiskCount + "</td>"
 						+ "<td align=\"right\">" + CRCCount + "</td>"
@@ -227,7 +227,7 @@ namespace SabreTools.Helper.Dats
 			{
 				line = "\"" + FileName + "\"\t"
 						+ "\"" + TotalSize + "\"\t"
-						+ "\"" + (game == -1 ? Count : game) + "\"\t"
+						+ "\"" + (game == -1 ? Keys.Count() : game) + "\"\t"
 						+ "\"" + RomCount + "\"\t"
 						+ "\"" + DiskCount + "\"\t"
 						+ "\"" + CRCCount + "\"\t"
