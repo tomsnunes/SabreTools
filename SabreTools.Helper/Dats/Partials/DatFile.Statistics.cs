@@ -522,7 +522,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			// First try to create the output directory if we need to
 			if (!Directory.Exists(outDir))
 			{
-				Directory.CreateDirectory(outDir));
+				Directory.CreateDirectory(outDir);
 			}
 
 			// For each output format, get the appropriate stream writer
