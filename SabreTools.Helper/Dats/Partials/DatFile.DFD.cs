@@ -202,21 +202,31 @@ namespace SabreTools.Helper.Dats
 			}
 
 			// Create a list for all found items
-			List<Rom> extracted = new List<Rom>();
+			List<Rom> extracted = null;
 
-			// If all deep hash skip flags are set, do a quickscan
-			if (omitFromScan == Hash.SecureHashes)
+			// Temporarily set the archivesAsFiles if we have a GZip archive and we're not supposed to use it as one
+			if (archivesAsFiles && !enableGzip && newItem.EndsWith(".gz"))
 			{
-				extracted = ArchiveTools.GetArchiveFileInfo(newItem, date: addDate);
+				archivesAsFiles = false;
 			}
-			// Otherwise, get the list with whatever hashes are wanted
-			else
+			
+			// If we don't have archives as files, try to scan the file as an archive
+			if (!archivesAsFiles)
 			{
-				extracted = ArchiveTools.GetExtendedArchiveFileInfo(newItem, omitFromScan: omitFromScan, date: addDate);
+				// If all deep hash skip flags are set, do a quickscan
+				if (omitFromScan == Hash.SecureHashes)
+				{
+					extracted = ArchiveTools.GetArchiveFileInfo(newItem, date: addDate);
+				}
+				// Otherwise, get the list with whatever hashes are wanted
+				else
+				{
+					extracted = ArchiveTools.GetExtendedArchiveFileInfo(newItem, omitFromScan: omitFromScan, date: addDate);
+				}
 			}
 
 			// If the extracted list is null, just scan the item itself
-			if (extracted == null)
+			if (extracted == null || archivesAsFiles)
 			{
 				PopulateFromDirProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst);
 			}
