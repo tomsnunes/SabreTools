@@ -517,13 +517,19 @@ Please check the log folder if the stats scrolled offscreen", false);
 		/// <returns>Dictionary of file types to StreamWriters</returns>
 		private static Dictionary<StatDatFormat, StreamWriter> OutputStatsGetOutputWriters(StatDatFormat statDatFormat, string reportName, string outDir)
 		{
-			Dictionary<StatDatFormat, StreamWriter> output = new Dictionary<StatDatFormat, System.IO.StreamWriter>();
+			Dictionary<StatDatFormat, StreamWriter> output = new Dictionary<StatDatFormat, StreamWriter>();
+
+			// First try to create the output directory if we need to
+			if (!Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir));
+			}
 
 			// For each output format, get the appropriate stream writer
 			if ((statDatFormat & StatDatFormat.None) != 0)
 			{
 				reportName = Style.GetFileNameWithoutExtension(reportName) + ".txt";
-				Path.Combine(outDir, reportName);
+				reportName = Path.Combine(outDir, reportName);
 
 				// Create the StreamWriter for this file
 				output.Add(StatDatFormat.None, new StreamWriter(FileTools.TryCreate(reportName)));
@@ -531,7 +537,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			if ((statDatFormat & StatDatFormat.CSV) != 0)
 			{
 				reportName = Style.GetFileNameWithoutExtension(reportName) + ".csv";
-				Path.Combine(outDir, reportName);
+				reportName = Path.Combine(outDir, reportName);
 
 				// Create the StreamWriter for this file
 				output.Add(StatDatFormat.CSV, new StreamWriter(FileTools.TryCreate(reportName)));
@@ -539,7 +545,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			if ((statDatFormat & StatDatFormat.HTML) != 0)
 			{
 				reportName = Style.GetFileNameWithoutExtension(reportName) + ".html";
-				Path.Combine(outDir, reportName);
+				reportName = Path.Combine(outDir, reportName);
 
 				// Create the StreamWriter for this file
 				output.Add(StatDatFormat.HTML, new StreamWriter(FileTools.TryCreate(reportName)));
@@ -547,7 +553,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			if ((statDatFormat & StatDatFormat.TSV) != 0)
 			{
 				reportName = Style.GetFileNameWithoutExtension(reportName) + ".csv";
-				Path.Combine(outDir, reportName);
+				reportName = Path.Combine(outDir, reportName);
 
 				// Create the StreamWriter for this file
 				output.Add(StatDatFormat.TSV, new StreamWriter(FileTools.TryCreate(reportName)));
