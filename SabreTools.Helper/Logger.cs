@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 
 using SabreTools.Helper.Data;
 
@@ -33,7 +32,7 @@ namespace SabreTools.Helper
 		private StreamWriter _log;
 
 		// Private required variables
-		private string _basepath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase), "logs") + Path.DirectorySeparatorChar;
+		private string _basepath = Path.Combine(Globals.ExeDir, "logs") + Path.DirectorySeparatorChar;
 
 		/// <summary>
 		/// Initialize a console-only logger object
