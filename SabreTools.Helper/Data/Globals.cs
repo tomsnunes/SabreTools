@@ -16,8 +16,8 @@ namespace SabreTools.Helper.Data
 		private static Logger _logger = null;
 		private static int _maxDegreeOfParallelism = 4;
 		private static string _exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase)
-			.Replace("file:\\", "")
-			.Replace("file:/", "");
+			.Replace("file:", "")
+			.TrimStart('\\');
 
 		#endregion
 
