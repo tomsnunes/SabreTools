@@ -460,10 +460,10 @@ namespace SabreTools.Helper.Dats
 				lock (_files)
 				{
 					int count = 0;
-					Parallel.ForEach(_files.Keys, Globals.ParallelOptions, key =>
+					foreach (string key in _files.Keys)
 					{
 						count += _files[key].Count;
-					});
+					}
 
 					return count;
 				}
