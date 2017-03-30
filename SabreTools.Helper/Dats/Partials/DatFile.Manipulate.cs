@@ -801,9 +801,16 @@ namespace SabreTools.Helper.Dats
 					// Otherwise, if the parent doesn't already contain the non-disk, add it
 					else if (item.Type != ItemType.Disk && !this[parent].Contains(item))
 					{
-						item.Name = item.Machine.Name + "\\" + item.Name;
+						// If we already have the same name in the parent set, rename the child
+						if (this[parent].Select(i => i.Name).Contains(item.Name))
+						{
+							item.Name = item.Machine.Name + "\\" + item.Name; // TODO: Go back to this for all roms in the future
+						}
+
+						// Update the machine to be the new parent
 						item.Machine = parentMachine;
 
+						// Add the rom to the parent set
 						this[parent].Add(item);
 					}
 				}
