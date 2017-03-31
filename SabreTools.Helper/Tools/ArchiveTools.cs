@@ -1437,6 +1437,88 @@ namespace SabreTools.Helper.Tools
 		#region Writing
 
 		/// <summary>
+		/// Write an input stream to file
+		/// </summary>
+		/// <param name="inputFile">Input filename to be moved</param>
+		/// <param name="outDir">Output directory to build to</param>
+		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
+		/// <param name="overwrite">True if we should overwrite the file if it exists, false otherwise</param>
+		/// <returns>True if the file was written properly, false otherwise</returns>
+		public static bool WriteFile(Stream inputStream, string outDir, Rom rom, bool date = false, bool overwrite = false)
+		{
+			bool success = false;
+
+			// If either input is null or empty, return
+			if (inputStream == null || rom == null || rom.Name == null)
+			{
+				return success;
+			}
+
+			// If the stream is not readable, return
+			if (!inputStream.CanRead)
+			{
+				return success;
+			}
+
+			// Set internal variables
+			FileStream outputStream = null;
+
+			// Get the output folder name from the first rebuild rom
+			string fileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.Machine.Name), Style.RemovePathUnsafeCharacters(rom.Name));
+
+			try
+			{
+				// If the full output path doesn't exist, create it
+				if (!Directory.Exists(Path.GetDirectoryName(fileName)))
+				{
+					Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+				}
+
+				// If the file exists and we're supposed to overwrite or the file doesn't exist at all
+				if ((File.Exists(fileName) && overwrite) || !File.Exists(fileName))
+				{
+					outputStream = FileTools.TryCreate(fileName);
+				}
+
+				// If the output stream isn't null
+				if (outputStream != null)
+				{
+					// Copy the input stream to the output
+					inputStream.Seek(0, SeekOrigin.Begin);
+					int bufferSize = 4096 * 128;
+					byte[] ibuffer = new byte[bufferSize];
+					int ilen;
+					while ((ilen = inputStream.Read(ibuffer, 0, bufferSize)) > 0)
+					{
+						outputStream.Write(ibuffer, 0, ilen);
+						outputStream.Flush();
+					}
+					outputStream.Dispose();
+
+					if (date && !String.IsNullOrEmpty(rom.Date))
+					{
+						File.SetCreationTime(fileName, DateTime.Parse(rom.Date));
+					}
+
+					success = true;
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+				success = false;
+			}
+			finally
+			{
+				inputStream.Dispose();
+				outputStream?.Dispose();
+			}
+
+			return success;
+		}
+
+		/// <summary>
 		/// Write an input file to a tape archive
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
@@ -1582,7 +1664,7 @@ namespace SabreTools.Helper.Tools
 			}
 			File.Move(tempFile, archiveFileName);
 
-			return true;
+			return success;
 		}
 
 		/// <summary>
