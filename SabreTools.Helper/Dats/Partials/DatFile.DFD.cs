@@ -365,6 +365,10 @@ namespace SabreTools.Helper.Dats
 				}
 
 				// Sanitize the names
+				if (romname == null)
+				{
+					romname = "";
+				}
 				if (gamename.StartsWith(Path.DirectorySeparatorChar.ToString()))
 				{
 					gamename = gamename.Substring(1);
