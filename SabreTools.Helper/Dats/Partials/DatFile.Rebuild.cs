@@ -557,6 +557,7 @@ namespace SabreTools.Helper.Dats
 								FileStream writeStream = FileTools.TryCreate(outfile);
 
 								// Copy the input stream to the output
+								fileStream.Seek(0, SeekOrigin.Begin);
 								int bufferSize = 4096 * 128;
 								byte[] ibuffer = new byte[bufferSize];
 								int ilen;
@@ -822,6 +823,7 @@ namespace SabreTools.Helper.Dats
 											FileStream writeStream = FileTools.TryCreate(outfile);
 
 											// Copy the input stream to the output
+											transformStream.Seek(0, SeekOrigin.Begin);
 											int bufferSize = 4096 * 128;
 											byte[] ibuffer = new byte[bufferSize];
 											int ilen;
@@ -845,6 +847,7 @@ namespace SabreTools.Helper.Dats
 											FileStream writeStream = FileTools.TryCreate(outfile);
 
 											// Copy the input stream to the output
+											fileStream.Seek(0, SeekOrigin.Begin);
 											int bufferSize = 4096 * 128;
 											byte[] ibuffer = new byte[bufferSize];
 											int ilen;
