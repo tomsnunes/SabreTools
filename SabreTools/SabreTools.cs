@@ -45,6 +45,7 @@ namespace SabreTools
 			if (!Console.IsOutputRedirected && scriptLocation == -1)
 			{
 				Console.Clear();
+				Build.Start("SabreTools");
 			}
 
 			// Now we remove the script tag because it messes things up
@@ -54,8 +55,6 @@ namespace SabreTools
 				newargs.RemoveAt(scriptLocation);
 				args = newargs.ToArray();
 			}
-
-			Build.Start("SabreTools");
 
 			// Credits take precidence over all
 			if ((new List<string>(args)).Contains("--credits"))
