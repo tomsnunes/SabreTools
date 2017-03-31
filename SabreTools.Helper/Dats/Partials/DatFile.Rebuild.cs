@@ -546,40 +546,7 @@ namespace SabreTools.Helper.Dats
 					switch (outputFormat)
 					{
 						case OutputFormat.Folder:
-							string outfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(item.Machine.Name), item.Name);
-
-							// Make sure the output folder is created
-							Directory.CreateDirectory(Path.GetDirectoryName(outfile));
-
-							// Now write the file over
-							try
-							{
-								FileStream writeStream = FileTools.TryCreate(outfile);
-
-								// Copy the input stream to the output
-								fileStream.Seek(0, SeekOrigin.Begin);
-								int bufferSize = 4096 * 128;
-								byte[] ibuffer = new byte[bufferSize];
-								int ilen;
-								while ((ilen = fileStream.Read(ibuffer, 0, bufferSize)) > 0)
-								{
-									writeStream.Write(ibuffer, 0, ilen);
-									writeStream.Flush();
-								}
-								writeStream.Dispose();
-
-								if (date && !String.IsNullOrEmpty(item.Date))
-								{
-									File.SetCreationTime(outfile, DateTime.Parse(item.Date));
-								}
-
-								rebuilt &= true;
-							}
-							catch
-							{
-								rebuilt = false;
-							}
-
+							rebuilt &= ArchiveTools.WriteFile(fileStream, outDir, item, date: date, overwrite: true);
 							break;
 						case OutputFormat.TapeArchive:
 							rebuilt &= ArchiveTools.WriteTAR(fileStream, outDir, item, date: date);
@@ -808,64 +775,11 @@ namespace SabreTools.Helper.Dats
 								switch (outputFormat)
 								{
 									case OutputFormat.Folder:
-										string outfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(item.Machine.Name), item.Name);
-										string headeredOutfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.Machine.Name), rom.Name);
-
-										// Make sure the output folder is created
-										Directory.CreateDirectory(Path.GetDirectoryName(outfile));
-
 										// If either copy succeeds, then we want to set rebuilt to true
 										bool eitherSuccess = false;
 
-										// Now copy the files over
-										try
-										{
-											FileStream writeStream = FileTools.TryCreate(outfile);
-
-											// Copy the input stream to the output
-											transformStream.Seek(0, SeekOrigin.Begin);
-											int bufferSize = 4096 * 128;
-											byte[] ibuffer = new byte[bufferSize];
-											int ilen;
-											while ((ilen = transformStream.Read(ibuffer, 0, bufferSize)) > 0)
-											{
-												writeStream.Write(ibuffer, 0, ilen);
-												writeStream.Flush();
-											}
-											writeStream.Dispose();
-
-											if (date && !String.IsNullOrEmpty(item.Date))
-											{
-												File.SetCreationTime(outfile, DateTime.Parse(item.Date));
-											}
-
-											eitherSuccess |= true;
-										}
-										catch { }
-										try
-										{
-											FileStream writeStream = FileTools.TryCreate(outfile);
-
-											// Copy the input stream to the output
-											fileStream.Seek(0, SeekOrigin.Begin);
-											int bufferSize = 4096 * 128;
-											byte[] ibuffer = new byte[bufferSize];
-											int ilen;
-											while ((ilen = fileStream.Read(ibuffer, 0, bufferSize)) > 0)
-											{
-												writeStream.Write(ibuffer, 0, ilen);
-												writeStream.Flush();
-											}
-											writeStream.Dispose();
-
-											if (date && !String.IsNullOrEmpty(item.Date))
-											{
-												File.SetCreationTime(outfile, DateTime.Parse(item.Date));
-											}
-
-											eitherSuccess |= true;
-										}
-										catch { }
+										eitherSuccess |= ArchiveTools.WriteFile(transformStream, outDir, item, date: date, overwrite: true);
+										eitherSuccess |= ArchiveTools.WriteFile(fileStream, outDir, rom, date: date, overwrite: true);
 
 										// Now add the success of either rebuild
 										rebuilt &= eitherSuccess;
