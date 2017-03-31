@@ -250,6 +250,11 @@ namespace SabreTools
 				"Set the temporary directory to use",
 				FeatureType.String,
 				null));
+			datFromDir.AddFeature("out", new Feature(
+				new List<string>() { "-out", "--out" },
+				"Output directory",
+				FeatureType.String,
+				null));
 			datFromDir.AddFeature("mt", new Feature(
 				new List<string>() { "-mt", "--mt" },
 				"Amount of threads to use (default 4, -1 unlimted)",
