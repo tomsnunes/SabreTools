@@ -772,44 +772,42 @@ namespace SabreTools.Helper.Dats
 								rom.Machine = item.Machine;
 								rom.Name += "_" + rom.CRC;
 
+								// If either copy succeeds, then we want to set rebuilt to true
+								bool eitherSuccess = false;
 								switch (outputFormat)
 								{
 									case OutputFormat.Folder:
-										// If either copy succeeds, then we want to set rebuilt to true
-										bool eitherSuccess = false;
-
 										eitherSuccess |= ArchiveTools.WriteFile(transformStream, outDir, item, date: date, overwrite: true);
 										eitherSuccess |= ArchiveTools.WriteFile(fileStream, outDir, rom, date: date, overwrite: true);
-
-										// Now add the success of either rebuild
-										rebuilt &= eitherSuccess;
-
 										break;
 									case OutputFormat.TapeArchive:
-										rebuilt &= ArchiveTools.WriteTAR(transformStream, outDir, item, date: date);
-										rebuilt &= ArchiveTools.WriteTAR(fileStream, outDir, rom, date: date);
+										eitherSuccess |=  ArchiveTools.WriteTAR(transformStream, outDir, item, date: date);
+										eitherSuccess |=  ArchiveTools.WriteTAR(fileStream, outDir, rom, date: date);
 										break;
 									case OutputFormat.Torrent7Zip:
-										rebuilt &= ArchiveTools.WriteTorrent7Zip(transformStream, outDir, item, date: date);
-										rebuilt &= ArchiveTools.WriteTorrent7Zip(fileStream, outDir, rom, date: date);
+										eitherSuccess |=  ArchiveTools.WriteTorrent7Zip(transformStream, outDir, item, date: date);
+										eitherSuccess |=  ArchiveTools.WriteTorrent7Zip(fileStream, outDir, rom, date: date);
 										break;
 									case OutputFormat.TorrentGzip:
-										rebuilt &= ArchiveTools.WriteTorrentGZ(transformStream, outDir, romba);
-										rebuilt &= ArchiveTools.WriteTorrentGZ(fileStream, outDir, romba);
+										eitherSuccess |=  ArchiveTools.WriteTorrentGZ(transformStream, outDir, romba);
+										eitherSuccess |=  ArchiveTools.WriteTorrentGZ(fileStream, outDir, romba);
 										break;
 									case OutputFormat.TorrentLrzip:
 										break;
 									case OutputFormat.TorrentRar:
 										break;
 									case OutputFormat.TorrentXZ:
-										rebuilt &= ArchiveTools.WriteTorrentXZ(transformStream, outDir, item, date: date);
-										rebuilt &= ArchiveTools.WriteTorrentXZ(fileStream, outDir, rom, date: date);
+										eitherSuccess |=  ArchiveTools.WriteTorrentXZ(transformStream, outDir, item, date: date);
+										eitherSuccess |=  ArchiveTools.WriteTorrentXZ(fileStream, outDir, rom, date: date);
 										break;
 									case OutputFormat.TorrentZip:
-										rebuilt &= ArchiveTools.WriteTorrentZip(transformStream, outDir, item, date: date);
-										rebuilt &= ArchiveTools.WriteTorrentZip(fileStream, outDir, rom, date: date);
+										eitherSuccess |=  ArchiveTools.WriteTorrentZip(transformStream, outDir, item, date: date);
+										eitherSuccess |=  ArchiveTools.WriteTorrentZip(fileStream, outDir, rom, date: date);
 										break;
 								}
+
+								// Now add the success of either rebuild
+								rebuilt &= eitherSuccess;
 							}
 						}
 					}
