@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 
 #if MONO
@@ -15,9 +16,9 @@ namespace SabreTools.Helper.Data
 
 		private static Logger _logger = null;
 		private static int _maxDegreeOfParallelism = 4;
-		private static string _exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase)
-			.Replace("file:", "")
-			.TrimStart('\\');
+		private static string _exeName = new Uri(Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath;
+		private static string _exeDir = Path.GetDirectoryName(_exeName);
+		private static string _args = string.Join(" ", Environment.GetCommandLineArgs());
 
 		#endregion
 
@@ -49,11 +50,25 @@ namespace SabreTools.Helper.Data
 				};
 			}
 		}
+		public static string ExeName
+		{
+			get
+			{
+				return _exeName;
+			}
+		}
 		public static string ExeDir
 		{
 			get
 			{
 				return _exeDir;
+			}
+		}
+		public static string CommandLineArgs
+		{
+			get
+			{
+				return _args;
 			}
 		}
 

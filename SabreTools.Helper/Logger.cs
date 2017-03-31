@@ -88,7 +88,7 @@ namespace SabreTools.Helper
 				_log.AutoFlush = true;
 
 				_log.WriteLine("Logging started " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-				_log.WriteLine(Environment.CommandLine);
+				_log.WriteLine(string.Format("Command run: {0}", Globals.CommandLineArgs));
 			}
 			catch
 			{
