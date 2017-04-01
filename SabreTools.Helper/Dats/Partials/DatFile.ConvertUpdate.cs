@@ -486,9 +486,10 @@ namespace SabreTools.Helper.Dats
 				if (File.Exists(inputFileName))
 				{
 					// If inplace is set, override the output dir
+					string realOutDir = outDir;
 					if (inplace)
 					{
-						outDir = Path.GetDirectoryName(inputFileName);
+						realOutDir = Path.GetDirectoryName(inputFileName);
 					}
 
 					DatFile innerDatdata = new DatFile(this);
@@ -498,21 +499,22 @@ namespace SabreTools.Helper.Dats
 					innerDatdata.Filter(filter, trim, single, root);
 
 					// Try to output the file
-					innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(inputFileName) : outDir), overwrite: (outDir != ""));
+					innerDatdata.WriteToFile((realOutDir == "" ? Path.GetDirectoryName(inputFileName) : realOutDir), overwrite: (realOutDir != ""));
 				}
 				else if (Directory.Exists(inputFileName))
 				{
 					inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
 
+					// If inplace is set, override the output dir
+					string realOutDir = outDir;
+					if (inplace)
+					{
+						realOutDir = Path.GetDirectoryName(inputFileName);
+					}
+
 					List<string> subFiles = Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(subFiles, Globals.ParallelOptions, file =>
 					{
-						// If inplace is set, override the output dir
-						if (inplace)
-						{
-							outDir = Path.GetDirectoryName(file);
-						}
-
 						Globals.Logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 						DatFile innerDatdata = new DatFile(this);
 						innerDatdata.Parse(file, 0, 0, splitType, true, clean, descAsName,
@@ -520,8 +522,8 @@ namespace SabreTools.Helper.Dats
 						innerDatdata.Filter(filter, trim, single, root);
 
 						// Try to output the file
-						innerDatdata.WriteToFile((outDir == "" ? Path.GetDirectoryName(file) : outDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)),
-							overwrite: (outDir != ""));
+						innerDatdata.WriteToFile((realOutDir == "" ? Path.GetDirectoryName(file) : realOutDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)),
+							overwrite: (realOutDir != ""));
 					});
 				}
 				else
