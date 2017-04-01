@@ -483,14 +483,14 @@ namespace SabreTools.Helper.Dats
 					inputFileName = Path.GetFullPath(inputFileName);
 				}
 
-				// If inplace is set, override the output dir
-				if (inplace)
-				{
-					outDir = Path.GetDirectoryName(inputFileName);
-				}
-
 				if (File.Exists(inputFileName))
 				{
+					// If inplace is set, override the output dir
+					if (inplace)
+					{
+						outDir = Path.GetDirectoryName(inputFileName);
+					}
+
 					DatFile innerDatdata = new DatFile(this);
 					Globals.Logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
 					innerDatdata.Parse(inputFileName, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
@@ -507,6 +507,12 @@ namespace SabreTools.Helper.Dats
 					List<string> subFiles = Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(subFiles, Globals.ParallelOptions, file =>
 					{
+						// If inplace is set, override the output dir
+						if (inplace)
+						{
+							outDir = Path.GetDirectoryName(file);
+						}
+
 						Globals.Logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 						DatFile innerDatdata = new DatFile(this);
 						innerDatdata.Parse(file, 0, 0, splitType, true, clean, descAsName,
