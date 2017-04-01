@@ -1110,11 +1110,6 @@ namespace SabreTools
 					"Enable cascaded diffing",
 					FeatureType.Flag,
 					null));
-					update["diff"]["cascade"].AddFeature("inplace", new Feature(
-						new List<string>() { "-ip", "--inplace" },
-						"Enable inplace, cascaded diff",
-						FeatureType.Flag,
-						null));
 					update["diff"]["cascade"].AddFeature("skip", new Feature(
 						new List<string>() { "-sf", "--skip" },
 						"Skip output of first DAT",
@@ -1123,11 +1118,6 @@ namespace SabreTools
 				update["diff"].AddFeature("rev-cascade", new Feature(
 						new List<string>() { "-rc", "--rev-cascade" },
 						"Enable reverse cascaded diffing",
-						FeatureType.Flag,
-						null));
-					update["diff"]["rev-cascade"].AddFeature("inplace", new Feature(
-						new List<string>() { "-ip", "--inplace" },
-						"Enable inplace, cascaded diff",
 						FeatureType.Flag,
 						null));
 					update["diff"]["rev-cascade"].AddFeature("skip", new Feature(
@@ -1325,6 +1315,11 @@ namespace SabreTools
 				new List<string>() { "-out", "--out" },
 				"Output directory (overridden by --inplace)",
 				FeatureType.String,
+				null));
+			update.AddFeature("inplace", new Feature(
+				new List<string>() { "-ip", "--inplace" },
+				"Enable overwriting of source files (update, cascade only)",
+				FeatureType.Flag,
 				null));
 			update.AddFeature("mt", new Feature(
 				new List<string>() { "-mt", "--mt" },

@@ -1098,7 +1098,7 @@ Options:
 			This sets an output folder to be used when the files are created. If a path
 			is not defined, the application directory is used instead.
 			
-		-ip, --inplace		Enable overwriting in the source file
+		-ip, --inplace		Enable overwriting of source files (update, cascade only)
 			This will overwrite the source files instead of writing them out to the runtime folder
 			by default (or the output folder if overridden). Note that this only works for
 			regular updates and cascaded diffs due to how file are expected to be written.
