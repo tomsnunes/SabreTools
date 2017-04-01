@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Text;
 
 using SabreTools.Helper.Data;
+using SabreTools.Helper.Tools;
 
 #if MONO
 using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
 
-using FileAccess = System.IO.FileAccess;
-using FileMode = System.IO.FileMode;
+using FileStream = System.IO.FileStream;
 using StreamWriter = System.IO.StreamWriter;
 #endif
 
@@ -84,7 +85,8 @@ namespace SabreTools.Helper
 
 			try
 			{
-				_log = new StreamWriter(File.Open(_basepath + _filename, FileMode.OpenOrCreate | FileMode.Append, FileAccess.Write));
+				FileStream logfile = FileTools.TryCreate(Path.Combine(_basepath, _filename));
+				_log = new StreamWriter(logfile, Encoding.UTF8, (int)(4 * Constants.KibiByte), true);
 				_log.AutoFlush = true;
 
 				_log.WriteLine("Logging started " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -190,8 +192,9 @@ namespace SabreTools.Helper
 				{
 					_log.WriteLine((appendPrefix ? loglevel.ToString() + " - " + DateTime.Now + " - " : "" ) + output);
 				}
-				catch
+				catch (Exception ex)
 				{
+					Console.WriteLine(ex);
 					Console.WriteLine("Could not write to log file!");
 					return false;
 				}
