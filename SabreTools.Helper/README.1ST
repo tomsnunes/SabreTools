@@ -1023,10 +1023,6 @@ Options:
 				leaves the files that are not in one of the previous DATs. This can allow for
 				the creation of rollback sets or even just reduce the amount of duplicates 
 				across multiple sets
-				
-				-ip, --inplace		Enable inplace, cascaded diff
-					This will overwrite the source files instead of writing them out to the
-					program folder by default (or the output folder if overridden)
 					
 				-sf, --skip		Skip output of first DAT
 					In times where the first DAT does not need to be written out a second time,
@@ -1101,6 +1097,11 @@ Options:
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If a path
 			is not defined, the application directory is used instead.
+			
+		-ip, --inplace		Enable overwriting in the source file
+			This will overwrite the source files instead of writing them out to the runtime folder
+			by default (or the output folder if overridden). Note that this only works for
+			regular updates and cascaded diffs due to how file are expected to be written.
 			
 		-mt={4}			Amount of threads to use
 			Optionally, set the number of threads to use for the multithreaded operations.

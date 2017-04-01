@@ -28,7 +28,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
 		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
-		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
+		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
@@ -77,7 +77,7 @@ namespace SabreTools.Helper.Dats
 			// Otherwise, loop through all of the inputs individually
 			else
 			{
-				Update(inputPaths, outDir, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
+				Update(inputPaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
 			}
 			return;
 		}
@@ -461,7 +461,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
 		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
-		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
+		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
@@ -472,7 +472,7 @@ namespace SabreTools.Helper.Dats
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		public void Update(List<string> inputFileNames, string outDir, bool clean, bool remUnicode, bool descAsName,
+		public void Update(List<string> inputFileNames, string outDir, bool inplace, bool clean, bool remUnicode, bool descAsName,
 			Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			Parallel.ForEach(inputFileNames, Globals.ParallelOptions, inputFileName =>
@@ -481,6 +481,12 @@ namespace SabreTools.Helper.Dats
 				if (inputFileName != "")
 				{
 					inputFileName = Path.GetFullPath(inputFileName);
+				}
+
+				// If inplace is set, override the output dir
+				if (inplace)
+				{
+					outDir = Path.GetDirectoryName(inputFileName);
 				}
 
 				if (File.Exists(inputFileName))
