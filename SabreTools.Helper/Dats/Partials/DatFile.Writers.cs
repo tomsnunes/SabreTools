@@ -141,7 +141,15 @@ namespace SabreTools.Helper.Dats
 					string outfile = outfiles[datFormat];
 
 					Globals.Logger.User("Opening file for writing: " + outfile);
-					FileStream fs = File.Create(outfile);
+					FileStream fs = FileTools.TryCreate(outfile);
+
+					// If we get back null for some reason, just log and return
+					if (fs == null)
+					{
+						Globals.Logger.Warning("File '" + outfile + "' could not be created for writing! Please check to see if the file is writable");
+						return;
+					}
+
 					StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
 
 					// Write out the header
