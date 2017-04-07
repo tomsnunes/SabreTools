@@ -122,7 +122,6 @@
   <ItemGroup>
     <Compile Include="Partials\SabreTools.Help.cs" />
     <Compile Include="SabreTools.cs" />
-    <Compile Include="Partials\SabreTools.Helpers.cs" />
     <Compile Include="Partials\SabreTools.Inits.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

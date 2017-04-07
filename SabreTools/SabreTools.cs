@@ -6,6 +6,7 @@ using SabreTools.Helper;
 using SabreTools.Helper.Data;
 using SabreTools.Helper.Dats;
 using SabreTools.Helper.Help;
+using SabreTools.Helper.Tools;
 
 #if MONO
 using System.IO;
@@ -824,11 +825,11 @@ namespace SabreTools
 						break;
 					case "-seq":
 					case "--equal":
-						filter.SizeEqualTo = GetSizeFromString(args[++i]);
+						filter.SizeEqualTo = Style.GetSizeFromString(args[++i]);
 						break;
 					case "-sgt":
 					case "--greater":
-						filter.SizeGreaterThanOrEqual = GetSizeFromString(args[++i]);
+						filter.SizeGreaterThanOrEqual = Style.GetSizeFromString(args[++i]);
 						break;
 					case "-sha1":
 					case "--sha1":
@@ -848,7 +849,7 @@ namespace SabreTools
 						break;
 					case "-slt":
 					case "--less":
-						filter.SizeLessThanOrEqual = GetSizeFromString(args[++i]);
+						filter.SizeLessThanOrEqual = Style.GetSizeFromString(args[++i]);
 						break;
 					case "-t":
 					case "--temp":
@@ -1099,11 +1100,11 @@ namespace SabreTools
 									break;
 								case "-seq":
 								case "--equal":
-									filter.SizeEqualTo = GetSizeFromString(split[1]);
+									filter.SizeEqualTo = Style.GetSizeFromString(split[1]);
 									break;
 								case "-sgt":
 								case "--greater":
-									filter.SizeGreaterThanOrEqual = GetSizeFromString(split[1]);
+									filter.SizeGreaterThanOrEqual = Style.GetSizeFromString(split[1]);
 									break;
 								case "-sha1":
 								case "--sha1":
@@ -1123,7 +1124,7 @@ namespace SabreTools
 									break;
 								case "-slt":
 								case "--less":
-									filter.SizeLessThanOrEqual = GetSizeFromString(split[1]);
+									filter.SizeLessThanOrEqual = Style.GetSizeFromString(split[1]);
 									break;
 								case "-t":
 								case "--temp":
