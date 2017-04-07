@@ -419,7 +419,7 @@ namespace SabreTools.Helper.Dats
 
 				// Add single DAT stats to dir
 				dirSize += datdata.TotalSize;
-				dirGame += datdata.Count;
+				dirGame += datdata.Keys.Count();
 				dirRom += datdata.RomCount;
 				dirDisk += datdata.DiskCount;
 				dirCRC += datdata.CRCCount;
@@ -431,7 +431,7 @@ namespace SabreTools.Helper.Dats
 
 				// Add single DAT stats to totals
 				totalSize += datdata.TotalSize;
-				totalGame += datdata.Count;
+				totalGame += datdata.Keys.Count();
 				totalRom += datdata.RomCount;
 				totalDisk += datdata.DiskCount;
 				totalCRC += datdata.CRCCount;
