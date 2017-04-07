@@ -24,15 +24,21 @@ namespace SabreTools
 		/// Wrap creating a DAT file from files or a directory in parallel
 		/// </summary>
 		/// <param name="inputs">List of input filenames</param>
+		/// /* Normal DAT header info */
 		/// <param name="filename">New filename</param>
 		/// <param name="name">New name</param>
 		/// <param name="description">New description</param>
 		/// <param name="category">New category</param>
 		/// <param name="version">New version</param>
 		/// <param name="author">New author</param>
+		/// <param name="email">New email</param>
+		/// <param name="homepage">New homepage</param>
+		/// <param name="url">New URL</param>
+		/// <param name="comment">New comment</param>
 		/// <param name="forcepack">String representing the forcepacking flag</param>
 		/// <param name="excludeOf">True if cloneof, romof, and sampleof fields should be omitted from output, false otherwise</param>
 		/// <param name="datFormat">DatFormat to be used for outputting the DAT</param>
+		/// /* Standard DFD info */
 		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
 		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
@@ -41,20 +47,28 @@ namespace SabreTools
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
 		/// <param name="addBlankFilesForEmptyFolder">True if blank items should be created for empty folders, false otherwise</param>
 		/// <param name="addFileDates">True if dates should be archived for all files, false otherwise</param>
+		/// /* Output DAT info */
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is default temp directory)</param>
 		/// <param name="outDir">Name of the directory to output the DAT to (blank is the current directory)</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		private static void InitDatFromDir(List<string> inputs,
+			/* Normal DAT header info */
 			string filename,
 			string name,
 			string description,
 			string category,
 			string version,
 			string author,
+			string email,
+			string homepage,
+			string url,
+			string comment,
 			string forcepack,
 			bool excludeOf,
 			DatFormat datFormat,
+
+			/* Standard DFD info */
 			bool romba,
 			bool superdat,
 			Hash omitFromScan,
@@ -63,6 +77,8 @@ namespace SabreTools
 			bool enableGzip,
 			bool addBlankFilesForEmptyFolder,
 			bool addFileDates,
+
+			/* Output DAT info */
 			string tempDir,
 			string outDir,
 			bool copyFiles,
@@ -93,6 +109,10 @@ namespace SabreTools
 				Version = version,
 				Date = DateTime.Now.ToString("yyyy-MM-dd"),
 				Author = author,
+				Email = email,
+				Homepage = homepage,
+				Url = url,
+				Comment = comment,
 				ForcePacking = fp,
 				DatFormat = (datFormat == 0 ? DatFormat.Logiqx : datFormat),
 				Romba = romba,

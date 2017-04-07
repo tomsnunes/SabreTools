@@ -266,6 +266,18 @@ Options:
 		-au=, --author=		Set the author of the DAT
 			Set the author for the output DAT(s) [default is blank]
 			
+		-em=, --email=		Set a new email
+			Set the email for the output DAT(s) [default is blank]
+			
+		-hp=, --homepage=	Set a new homepage
+			Set the homepage for the output DAT(s) [default is blank]
+			
+		-u=, --url=		Set a new URL
+			Set the URL for the output DAT(s) [default is blank]
+			
+		-co=, --comment=	Set a new comment
+			Set the comment for the output DAT(s) [default is blank]
+			
 		-sd, --superdat		Enable SuperDAT creation
 			Set the type flag to "SuperDAT" for the output DAT as well as preserving the
 			directory structure of the inputted folder, if applicable

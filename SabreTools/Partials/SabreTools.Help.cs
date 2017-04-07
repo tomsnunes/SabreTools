@@ -215,6 +215,26 @@ namespace SabreTools
 				"Set the author of the DAT",
 				FeatureType.String,
 				null));
+			datFromDir.AddFeature("email", new Feature(
+				new List<string>() { "-em", "--email" },
+				"Set a new email of the DAT",
+				FeatureType.String,
+				null));
+			datFromDir.AddFeature("homepage", new Feature(
+				new List<string>() { "-hp", "--homepage" },
+				"Set a new homepage of the DAT",
+				FeatureType.String,
+				null));
+			datFromDir.AddFeature("url", new Feature(
+				new List<string>() { "-u", "--url" },
+				"Set a new URL of the DAT",
+				FeatureType.String,
+				null));
+			datFromDir.AddFeature("comment", new Feature(
+				new List<string>() { "-co", "--comment" },
+				"Set a new comment of the DAT",
+				FeatureType.String,
+				null));
 			datFromDir.AddFeature("superdat", new Feature(
 				new List<string>() { "-sd", "--superdat" },
 				"Enable SuperDAT creation",
