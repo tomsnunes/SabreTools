@@ -1576,6 +1576,7 @@ namespace SabreTools.Helper.Tools
 				if (!File.Exists(archiveFileName))
 				{
 					// Copy the input stream to the output
+					inputStream.Seek(0, SeekOrigin.Begin);
 					tarFile.AddEntry(rom.Name, inputStream);
 				}
 
@@ -1624,6 +1625,7 @@ namespace SabreTools.Helper.Tools
 						if (index < 0)
 						{
 							// Copy the input file to the output
+							inputStream.Seek(0, SeekOrigin.Begin);
 							tarFile.AddEntry(rom.Name, inputStream);
 						}
 
@@ -1870,6 +1872,9 @@ namespace SabreTools.Helper.Tools
 			{
 				return success;
 			}
+
+			// Seek to the beginning of the stream
+			inputStream.Seek(0, SeekOrigin.Begin);
 
 			// Get the output archive name from the first rebuild rom
 			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.Machine.Name) + (rom.Machine.Name.EndsWith(".7z") ? "" : ".7z"));
@@ -2273,7 +2278,7 @@ namespace SabreTools.Helper.Tools
 			if (!inputStream.CanRead)
 			{
 				return success;
-			}
+			}			
 
 			// Make sure the output directory exists
 			if (!Directory.Exists(outDir))
@@ -2441,6 +2446,9 @@ namespace SabreTools.Helper.Tools
 			{
 				return success;
 			}
+
+			// Seek to the beginning of the stream
+			inputStream.Seek(0, SeekOrigin.Begin);
 
 			// Get the output archive name from the first rebuild rom
 			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.Machine.Name) + (rom.Machine.Name.EndsWith(".xz") ? "" : ".xz"));
@@ -2845,7 +2853,7 @@ namespace SabreTools.Helper.Tools
 				return success;
 			}
 
-			// Set the stream position
+			// Seek to the beginning of the stream
 			inputStream.Seek(0, SeekOrigin.Begin);
 
 			// Get the output archive name from the first rebuild rom

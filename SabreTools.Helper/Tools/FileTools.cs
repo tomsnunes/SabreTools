@@ -839,6 +839,9 @@ namespace SabreTools.Helper.Tools
 			}
 			finally
 			{
+				// Seek to the beginning of the stream
+				input.Seek(0, SeekOrigin.Begin);
+
 				if (!keepReadOpen)
 				{
 					input.Dispose();

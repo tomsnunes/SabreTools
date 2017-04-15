@@ -537,6 +537,9 @@ namespace SabreTools.Helper.Dats
 					return rebuilt;
 				}
 
+				// Seek to the beginning of the stream
+				fileStream.Seek(0, SeekOrigin.Begin);
+
 				Globals.Logger.User("Matches found for '" + Style.GetFileName(rom.Name) + "', rebuilding accordingly...");
 				rebuilt = true;
 
