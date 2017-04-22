@@ -116,6 +116,12 @@ namespace SabreTools.Helper.Dats
 									break;
 							}
 
+							// Double and triple check the key
+							if (newkey == null)
+							{
+								newkey = "";
+							}
+
 							// Add the DatItem to the temp dictionary
 							lock (sortable)
 							{
