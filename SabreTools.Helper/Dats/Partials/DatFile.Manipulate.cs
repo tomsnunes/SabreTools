@@ -72,6 +72,10 @@ namespace SabreTools.Helper.Dats
 									{
 										newkey = newkey.ToLowerInvariant();
 									}
+									if (newkey == null)
+									{
+										newkey = "null";
+									}
 
 									newkey = HttpUtility.HtmlEncode(newkey);
 									break;
