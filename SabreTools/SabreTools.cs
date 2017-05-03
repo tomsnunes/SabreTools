@@ -126,6 +126,7 @@ namespace SabreTools
 			Hash omitFromScan = Hash.SHA256 | Hash.SHA384 | Hash.SHA512; // Should be set to 0x0 later
 			Hash stripHash = 0x0;
 			OutputFormat outputFormat = OutputFormat.Folder;
+			SkipFileType skipFileType = SkipFileType.None;
 			SplitType splitType = SplitType.None;
 			StatDatFormat statDatFormat = 0x0;
 
@@ -561,6 +562,14 @@ namespace SabreTools
 					case "-si":
 					case "--single":
 						single = true;
+						break;
+					case "-ska":
+					case "--skiparc":
+						skipFileType = SkipFileType.Archive;
+						break;
+					case "-skf":
+					case "--skipfile":
+						skipFileType = SkipFileType.File;
 						break;
 					case "-t7z":
 					case "--t7z":
@@ -1209,7 +1218,7 @@ namespace SabreTools
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, email, homepage, url, comment, 
 					forcepack, excludeOf, datFormat, romba, superdat, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles,
-					enableGzip, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header);
+					enableGzip, skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header);
 			}
 
 			// If we're in header extract and remove mode

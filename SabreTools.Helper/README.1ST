@@ -248,6 +248,12 @@ Options:
 			implies that the files will be in the TorrentGZ format as well, including
 			naming convention.
 			
+		-ska, --skiparc		Skip archive files
+			Skip any files that are treated like archives
+			
+		-skf, --skipfile	Skip non-archive files
+			Skip any files that are not treated like archives
+			
 		-f=, --filename=	Set the external name of the DAT
 			Set the base filename for the output DAT(s) [default is folder name plus date]
 			

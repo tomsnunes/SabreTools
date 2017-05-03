@@ -30,14 +30,15 @@ namespace SabreTools.Helper.Dats
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
+		/// <param name="skipFileType">Type of files that should be skipped</param>
 		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
 		/// <param name="outDir">Output directory to </param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		public bool PopulateFromDir(string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles,
-			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst)
+		public bool PopulateFromDir(string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles, bool enableGzip,
+			 SkipFileType skipFileType, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst)
 		{
 			// If the description is defined but not the name, set the name from the description
 			if (String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
@@ -67,8 +68,8 @@ namespace SabreTools.Helper.Dats
 				List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
 				Parallel.ForEach(files, Globals.ParallelOptions, item =>
 				{
-					PopulateFromDirCheckFile(item, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
-						tempDir, copyFiles, headerToCheckAgainst);
+					PopulateFromDirCheckFile(item, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, skipFileType,
+						addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst);
 				});
 
 				// Find all top-level subfolders
@@ -78,8 +79,8 @@ namespace SabreTools.Helper.Dats
 					List<string> subfiles = Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(subfiles, Globals.ParallelOptions, subitem =>
 					{
-						PopulateFromDirCheckFile(subitem, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
-						tempDir, copyFiles, headerToCheckAgainst);
+						PopulateFromDirCheckFile(subitem, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, skipFileType,
+							addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst);
 					});
 				});
 
@@ -135,8 +136,8 @@ namespace SabreTools.Helper.Dats
 			}
 			else if (File.Exists(basePath))
 			{
-				PopulateFromDirCheckFile(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), omitFromScan, bare, archivesAsFiles, enableGzip, addBlanks, addDate,
-					tempDir, copyFiles, headerToCheckAgainst);
+				PopulateFromDirCheckFile(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), omitFromScan, bare, archivesAsFiles, enableGzip,
+					skipFileType, addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst);
 			}
 
 			// Now that we're done, delete the temp folder (if it's not the default)
@@ -158,13 +159,14 @@ namespace SabreTools.Helper.Dats
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
 		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
+		/// <param name="skipFileType">Type of files that should be skipped</param>
 		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		private void PopulateFromDirCheckFile(string item, string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles,
-			bool enableGzip, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst)
+			bool enableGzip, SkipFileType skipFileType, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst)
 		{
 			// Define the temporary directory
 			string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
@@ -223,6 +225,13 @@ namespace SabreTools.Helper.Dats
 				{
 					extracted = ArchiveTools.GetExtendedArchiveFileInfo(newItem, omitFromScan: omitFromScan, date: addDate);
 				}
+			}
+
+			// If the file should be skipped based on type, do so now
+			if ((extracted != null && skipFileType == SkipFileType.Archive)
+				|| (extracted == null && skipFileType == SkipFileType.File))
+			{
+				return;
 			}
 
 			// If the extracted list is null, just scan the item itself

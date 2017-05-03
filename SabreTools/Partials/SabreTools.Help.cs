@@ -185,6 +185,16 @@ namespace SabreTools
 				"Read files from a Romba input",
 				FeatureType.Flag,
 				null));
+			datFromDir.AddFeature("skiparc", new Feature(
+				new List<string>() { "-ska", "--skiparc" },
+				"Skip any files that are treated like archives",
+				FeatureType.Flag,
+				null));
+			datFromDir.AddFeature("skipfile", new Feature(
+				new List<string>() { "-skf", "--skipfile" },
+				"Skip any files that are not treated like archives",
+				FeatureType.Flag,
+				null));
 			datFromDir.AddFeature("filename", new Feature(
 				new List<string>() { "-f", "--filename" },
 				"Set the external name of the DAT",
