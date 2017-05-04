@@ -34,7 +34,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SabreTools.Helper.External
+namespace SabreTools.Library.External
 {
 	class xxHash
 	{

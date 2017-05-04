@@ -5,10 +5,10 @@ using System.Security.Cryptography;
 using System.Xml;
 using System.Xml.Schema;
 
-using SabreTools.Helper.Data;
-using SabreTools.Helper.Dats;
-using SabreTools.Helper.External;
-using SabreTools.Helper.Skippers;
+using SabreTools.Library.Data;
+using SabreTools.Library.Dats;
+using SabreTools.Library.External;
+using SabreTools.Library.Skippers;
 
 #if MONO
 using System.IO;
@@ -32,7 +32,7 @@ using StreamReader = System.IO.StreamReader;
 using NaturalSort;
 using OCRC;
 
-namespace SabreTools.Helper.Tools
+namespace SabreTools.Library.Tools
 {
 	public static class FileTools
 	{

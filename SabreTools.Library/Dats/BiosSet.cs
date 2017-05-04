@@ -1,7 +1,7 @@
 ﻿using System;
-using SabreTools.Helper.Data;
+using SabreTools.Library.Data;
 
-namespace SabreTools.Helper.Dats
+namespace SabreTools.Library.Dats
 {
 	public class BiosSet : DatItem, ICloneable
 	{

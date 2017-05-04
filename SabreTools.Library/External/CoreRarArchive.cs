@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 
-using SabreTools.Helper.Data;
+using SabreTools.Library.Data;
 
 /// <summary>
 /// http://www.rarlab.com/technote.htm#srvheaders
 /// </summary>
-namespace SabreTools.Helper.Tools
+namespace SabreTools.Library.Tools
 {
 	public class CoreRarArchive
 	{

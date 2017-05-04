@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SabreTools.Helper.Data
+namespace SabreTools.Library.Data
 {
 	#region Archival
 

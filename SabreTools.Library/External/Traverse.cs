@@ -10,9 +10,9 @@ using Alphaleonis.Win32.Filesystem;
 using IOException = System.IO.IOException;
 using SearchOption = System.IO.SearchOption;
 #endif
-using SabreTools.Helper.Data;
+using SabreTools.Library.Data;
 
-namespace SabreTools.Helper.External
+namespace SabreTools.Library.External
 {
 	public class Traverse
 	{

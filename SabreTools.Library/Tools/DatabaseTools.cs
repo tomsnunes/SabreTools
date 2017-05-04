@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-using SabreTools.Helper.Data;
+using SabreTools.Library.Data;
 
 #if MONO
 using System.IO;
@@ -10,7 +10,7 @@ using System.IO;
 using Alphaleonis.Win32.Filesystem;
 #endif
 
-namespace SabreTools.Helper.Tools
+namespace SabreTools.Library.Tools
 {
 	/// <summary>
 	/// All general database operations

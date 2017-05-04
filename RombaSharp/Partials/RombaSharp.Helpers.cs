@@ -5,9 +5,9 @@ using System.Linq;
 using System.Xml;
 using Mono.Data.Sqlite;
 
-using SabreTools.Helper.Data;
-using SabreTools.Helper.Dats;
-using SabreTools.Helper.Tools;
+using SabreTools.Library.Data;
+using SabreTools.Library.Dats;
+using SabreTools.Library.Tools;
 
 #if MONO
 using System.IO;

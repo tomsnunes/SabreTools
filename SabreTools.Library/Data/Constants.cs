@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
 
-using SabreTools.Helper.Tools;
+using SabreTools.Library.Tools;
 
-namespace SabreTools.Helper.Data
+namespace SabreTools.Library.Data
 {
 	public static class Constants
 	{

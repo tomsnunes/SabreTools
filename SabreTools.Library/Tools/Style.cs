@@ -6,8 +6,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 
-using SabreTools.Helper.Data;
-using SabreTools.Helper.Dats;
+using SabreTools.Library.Data;
+using SabreTools.Library.Dats;
 
 #if MONO
 using System.IO;
@@ -17,7 +17,7 @@ using Alphaleonis.Win32.Filesystem;
 using FileStream = System.IO.FileStream;
 #endif
 
-namespace SabreTools.Helper.Tools
+namespace SabreTools.Library.Tools
 {
 	/// <summary>
 	/// Include character normalization and replacement mappings

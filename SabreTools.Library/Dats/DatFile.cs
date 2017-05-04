@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using SabreTools.Helper.Data;
+using SabreTools.Library.Data;
 
-namespace SabreTools.Helper.Dats
+namespace SabreTools.Library.Dats
 {
 	public partial class DatFile
 	{

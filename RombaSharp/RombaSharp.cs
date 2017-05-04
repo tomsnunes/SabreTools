@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using SabreTools.Helper;
-using SabreTools.Helper.Data;
-using SabreTools.Helper.Help;
-using SabreTools.Helper.Tools;
+using SabreTools.Library;
+using SabreTools.Library.Data;
+using SabreTools.Library.Help;
+using SabreTools.Library.Tools;
 
 namespace RombaSharp
 {

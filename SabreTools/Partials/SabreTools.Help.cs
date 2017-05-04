@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
-using SabreTools.Helper.Data;
-using SabreTools.Helper.Help;
+using SabreTools.Library.Data;
+using SabreTools.Library.Help;
 
 namespace SabreTools
 {

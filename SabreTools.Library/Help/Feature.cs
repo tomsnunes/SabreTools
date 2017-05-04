@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 
-using SabreTools.Helper.Data;
+using SabreTools.Library.Data;
 
-namespace SabreTools.Helper.Help
+namespace SabreTools.Library.Help
 {
 	public class Feature
 	{

@@ -4,8 +4,8 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-using SabreTools.Helper.Data;
-using SabreTools.Helper.Tools;
+using SabreTools.Library.Data;
+using SabreTools.Library.Tools;
 
 using Ionic.Zlib;
 using OCRC;

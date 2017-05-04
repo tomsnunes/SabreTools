@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using SabreTools.Helper.Data;
-using SabreTools.Helper.Tools;
+using SabreTools.Library.Data;
+using SabreTools.Library.Tools;
 
 #if MONO
 using System.IO;
@@ -15,7 +15,7 @@ using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
 
-namespace SabreTools.Helper.Skippers
+namespace SabreTools.Library.Skippers
 {
 	public class SkipperRule
 	{

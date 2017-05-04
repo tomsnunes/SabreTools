@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using SabreTools.Helper.Tools;
+using SabreTools.Library.Tools;
 
 namespace NaturalSort
 {

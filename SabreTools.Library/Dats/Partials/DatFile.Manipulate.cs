@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 
-using SabreTools.Helper.Data;
+using SabreTools.Library.Data;
 
 #if MONO
 using System.IO;
@@ -12,7 +12,7 @@ using System.IO;
 using Alphaleonis.Win32.Filesystem;
 #endif
 
-namespace SabreTools.Helper.Dats
+namespace SabreTools.Library.Dats
 {
 	public partial class DatFile
 	{

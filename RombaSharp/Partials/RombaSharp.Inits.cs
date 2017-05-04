@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Mono.Data.Sqlite;
 
-using SabreTools.Helper;
-using SabreTools.Helper.Data;
-using SabreTools.Helper.Dats;
-using SabreTools.Helper.Tools;
+using SabreTools.Library;
+using SabreTools.Library.Data;
+using SabreTools.Library.Dats;
+using SabreTools.Library.Tools;
 
 #if MONO
 using System.IO;

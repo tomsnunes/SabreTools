@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using SabreTools.Helper.Data;
-using SabreTools.Helper.Dats;
+using SabreTools.Library.Data;
+using SabreTools.Library.Dats;
 
 #if MONO
 using System.IO;
@@ -30,7 +30,7 @@ using SharpCompress.Common;
 using SharpCompress.Readers;
 using SharpCompress.Writers;
 
-namespace SabreTools.Helper.Tools
+namespace SabreTools.Library.Tools
 {
 	/*
 	 * TODO: Full archive support for: RAR, LRZip, ZPAQ?, Zstd?, LZ4?
@@ -161,7 +161,7 @@ namespace SabreTools.Helper.Tools
 					for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
 					{
 						// Open the read stream
-						zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Helper.Data.CompressionMethod cm, out uint lastMod);
+						zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Library.Data.CompressionMethod cm, out uint lastMod);
 
 						// Create the rest of the path, if needed
 						if (!String.IsNullOrEmpty(Path.GetDirectoryName(zf.Entries[i].FileName)))
@@ -372,7 +372,7 @@ namespace SabreTools.Helper.Tools
 							{
 								// Open the read stream
 								realEntry = zf.Entries[i].FileName;
-								zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Helper.Data.CompressionMethod cm, out uint lastMod);
+								zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Library.Data.CompressionMethod cm, out uint lastMod);
 
 								// If the stream is smaller than the buffer, just run one loop through to avoid issues
 								if (streamsize < _bufferSize)
@@ -804,7 +804,7 @@ namespace SabreTools.Helper.Tools
 						for (int i = 0; i < zf.EntriesCount && zr == ZipReturn.ZipGood; i++)
 						{
 							// Open the read stream
-							zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Helper.Data.CompressionMethod cm, out uint lastMod);
+							zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Library.Data.CompressionMethod cm, out uint lastMod);
 
 							// If the entry ends with a directory separator, continue to the next item, if any
 							if (zf.Entries[i].FileName.EndsWith(Path.DirectorySeparatorChar.ToString())
@@ -2887,11 +2887,11 @@ namespace SabreTools.Helper.Tools
 					{
 						uint msDosDateTime = Style.ConvertDateTimeToMsDosTimeFormat(dt);
 						zipFile.OpenWriteStream(false, false, rom.Name.Replace('\\', '/'), istreamSize,
-							SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
+							SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
 					}
 					else
 					{
-						zipFile.OpenWriteStream(false, true, rom.Name.Replace('\\', '/'), istreamSize, SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream);
+						zipFile.OpenWriteStream(false, true, rom.Name.Replace('\\', '/'), istreamSize, SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream);
 					}
 
 					// Copy the input stream to the output
@@ -2958,11 +2958,11 @@ namespace SabreTools.Helper.Tools
 							{
 								uint msDosDateTime = Style.ConvertDateTimeToMsDosTimeFormat(dt);
 								zipFile.OpenWriteStream(false, false, rom.Name.Replace('\\', '/'), istreamSize,
-									SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
+									SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
 							}
 							else
 							{
-								zipFile.OpenWriteStream(false, true, rom.Name.Replace('\\', '/'), istreamSize, SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream);
+								zipFile.OpenWriteStream(false, true, rom.Name.Replace('\\', '/'), istreamSize, SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream);
 							}
 
 							// Copy the input stream to the output
@@ -2981,9 +2981,9 @@ namespace SabreTools.Helper.Tools
 						else
 						{
 							// Instantiate the streams
-							oldZipFile.OpenReadStream(index, false, out Stream zreadStream, out ulong istreamSize, out SabreTools.Helper.Data.CompressionMethod icompressionMethod, out uint lastMod);
+							oldZipFile.OpenReadStream(index, false, out Stream zreadStream, out ulong istreamSize, out SabreTools.Library.Data.CompressionMethod icompressionMethod, out uint lastMod);
 							zipFile.OpenWriteStream(false, lastMod == Constants.TorrentZipFileDateTime, oldZipFile.Filename(index),
-								istreamSize, SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream, lastMod: lastMod);
+								istreamSize, SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream, lastMod: lastMod);
 
 							// Copy the input stream to the output
 							byte[] ibuffer = new byte[_bufferSize];
@@ -3107,11 +3107,11 @@ namespace SabreTools.Helper.Tools
 						{
 							uint msDosDateTime = Style.ConvertDateTimeToMsDosTimeFormat(dt);
 							zipFile.OpenWriteStream(false, false, roms[index].Name.Replace('\\', '/'), istreamSize,
-								SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
+								SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
 						}
 						else
 						{
-							zipFile.OpenWriteStream(false, true, roms[index].Name.Replace('\\', '/'), istreamSize, SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream);
+							zipFile.OpenWriteStream(false, true, roms[index].Name.Replace('\\', '/'), istreamSize, SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream);
 						}
 
 						// Copy the input stream to the output
@@ -3184,11 +3184,11 @@ namespace SabreTools.Helper.Tools
 							{
 								uint msDosDateTime = Style.ConvertDateTimeToMsDosTimeFormat(dt);
 								zipFile.OpenWriteStream(false, false, roms[-index - 1].Name.Replace('\\', '/'), istreamSize,
-									SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
+									SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
 							}
 							else
 							{
-								zipFile.OpenWriteStream(false, true, roms[-index - 1].Name.Replace('\\', '/'), istreamSize, SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream);
+								zipFile.OpenWriteStream(false, true, roms[-index - 1].Name.Replace('\\', '/'), istreamSize, SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream);
 							}
 
 							// Copy the input stream to the output
@@ -3207,9 +3207,9 @@ namespace SabreTools.Helper.Tools
 						else
 						{
 							// Instantiate the streams
-							oldZipFile.OpenReadStream(index, false, out Stream zreadStream, out ulong istreamSize, out SabreTools.Helper.Data.CompressionMethod icompressionMethod, out uint lastMod);
+							oldZipFile.OpenReadStream(index, false, out Stream zreadStream, out ulong istreamSize, out SabreTools.Library.Data.CompressionMethod icompressionMethod, out uint lastMod);
 							zipFile.OpenWriteStream(false, lastMod == Constants.TorrentZipFileDateTime, oldZipFile.Filename(index),
-								istreamSize, SabreTools.Helper.Data.CompressionMethod.Deflated, out writeStream, lastMod: lastMod);
+								istreamSize, SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream, lastMod: lastMod);
 
 							// Copy the input stream to the output
 							byte[] ibuffer = new byte[_bufferSize];

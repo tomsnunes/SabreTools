@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-using SabreTools.Helper.Data;
+using SabreTools.Library.Data;
 
-namespace SabreTools.Helper.Dats
+namespace SabreTools.Library.Dats
 {
 	public class Filter
 	{

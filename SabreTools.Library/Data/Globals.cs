@@ -8,7 +8,7 @@ using System.IO;
 using Alphaleonis.Win32.Filesystem;
 #endif
 
-namespace SabreTools.Helper.Data
+namespace SabreTools.Library.Data
 {
 	public class Globals
 	{

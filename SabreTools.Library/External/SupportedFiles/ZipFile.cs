@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-using SabreTools.Helper.Data;
-using SabreTools.Helper.Tools;
+using SabreTools.Library.Data;
+using SabreTools.Library.Tools;
 
 #if MONO
 using System.IO;

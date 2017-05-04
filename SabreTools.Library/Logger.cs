@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text;
 
-using SabreTools.Helper.Data;
-using SabreTools.Helper.Tools;
+using SabreTools.Library.Data;
+using SabreTools.Library.Tools;
 
 #if MONO
 using System.IO;
@@ -13,7 +13,7 @@ using FileStream = System.IO.FileStream;
 using StreamWriter = System.IO.StreamWriter;
 #endif
 
-namespace SabreTools.Helper
+namespace SabreTools.Library
 {
 	/// <summary>
 	/// Log either to file or to the console

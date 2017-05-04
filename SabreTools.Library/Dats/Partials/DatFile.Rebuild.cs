@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using SabreTools.Helper.Data;
-using SabreTools.Helper.Skippers;
-using SabreTools.Helper.Tools;
+using SabreTools.Library.Data;
+using SabreTools.Library.Skippers;
+using SabreTools.Library.Tools;
 
 #if MONO
 using System.IO;
@@ -18,7 +18,7 @@ using SearchOption = System.IO.SearchOption;
 using Stream = System.IO.Stream;
 #endif
 
-namespace SabreTools.Helper.Dats
+namespace SabreTools.Library.Dats
 {
 	public partial class DatFile
 	{
