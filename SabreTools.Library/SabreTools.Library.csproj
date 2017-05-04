@@ -7,8 +7,8 @@
     <ProjectGuid>{225A1AFD-0890-44E8-B779-7502665C23A5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SabreTools.Helper</RootNamespace>
-    <AssemblyName>SabreTools.Helper</AssemblyName>
+    <RootNamespace>SabreTools.Library</RootNamespace>
+    <AssemblyName>SabreTools.Library</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
