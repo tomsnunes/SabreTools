@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SabreTools.Library", "SabreTools.Helper\SabreTools.Library.csproj", "{225A1AFD-0890-44E8-B779-7502665C23A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SabreTools.Library", "SabreTools.Library\SabreTools.Library.csproj", "{225A1AFD-0890-44E8-B779-7502665C23A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SabreTools", "SabreTools\SabreTools.csproj", "{3B615702-1866-4D7B-8AF1-7B43FD0CC1D0}"
 EndProject
