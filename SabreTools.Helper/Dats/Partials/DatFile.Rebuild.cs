@@ -977,7 +977,7 @@ namespace SabreTools.Helper.Dats
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				PopulateFromDir(input, (quickScan ? Hash.SecureHashes : Hash.DeepHashes) /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
-					true /* enableGzip */, false /* addBlanks */, false /* addDate */, tempDir /* tempDir */, false /* copyFiles */,
+					true /* enableGzip */, SkipFileType.None, false /* addBlanks */, false /* addDate */, tempDir /* tempDir */, false /* copyFiles */,
 					headerToCheckAgainst);
 			}
 

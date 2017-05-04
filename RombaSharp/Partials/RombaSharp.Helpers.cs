@@ -403,7 +403,7 @@ namespace RombaSharp
 			// First get a list of SHA-1's from the input DATs
 			DatFile datroot = new DatFile { Type = "SuperDAT", };
 			// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-			datroot.PopulateFromDir(_dats, Hash.DeepHashes, false, false, false, false, false, _tmpdir, false, null);
+			datroot.PopulateFromDir(_dats, Hash.DeepHashes, false, false, false, SkipFileType.None, false, false, _tmpdir, false, null);
 			datroot.BucketBy(SortedBy.SHA1, false /* mergeroms */);
 
 			// Create a List of dat hashes in the database (SHA-1)
@@ -618,7 +618,7 @@ namespace RombaSharp
 			// Now rescan the depot itself
 			DatFile depot = new DatFile();
 			// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-			depot.PopulateFromDir(depotname, Hash.DeepHashes, false, false, true, false, false, _tmpdir, false, null);
+			depot.PopulateFromDir(depotname, Hash.DeepHashes, false, false, true, SkipFileType.None, false, false, _tmpdir, false, null);
 			depot.BucketBy(SortedBy.SHA1, false /* mergeroms */);
 
 			// Set the base queries to use

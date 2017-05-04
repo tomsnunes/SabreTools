@@ -42,13 +42,13 @@ namespace RombaSharp
 			foreach (string dir in onlyDirs)
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-				df.PopulateFromDir(dir, Hash.DeepHashes, false, false, true, false, false, _tmpdir, false, null);
+				df.PopulateFromDir(dir, Hash.DeepHashes, false, false, true, SkipFileType.None, false, false, _tmpdir, false, null);
 
 				// If we're looking for only needed, consider the zipfiles themselves too
 				if (onlyNeeded)
 				{
 					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-					df.PopulateFromDir(dir, Hash.DeepHashes, false, true, true, false, false, _tmpdir, false, null);
+					df.PopulateFromDir(dir, Hash.DeepHashes, false, true, true, SkipFileType.None, false, false, _tmpdir, false, null);
 				}
 			}
 
@@ -253,7 +253,7 @@ namespace RombaSharp
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				datdata.PopulateFromDir(input, Hash.DeepHashes /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
-					true /* enableGzip */, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
+					true /* enableGzip */, SkipFileType.None, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
 					null /* headerToCheckAgainst */);
 				datdata.WriteToFile("");
 			}
