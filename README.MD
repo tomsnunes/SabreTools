@@ -1,4 +1,4 @@
-# ![](images\sabretools-rect.png)
+# ![](images/sabretools-rect.png)
 
 ## Introduction
 
