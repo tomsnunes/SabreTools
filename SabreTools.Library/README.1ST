@@ -15,6 +15,8 @@ Table of Contents
 
 ** Section 1.0 - Introduction and History
 
+*** History of the Project
+
 Hello and welcome to the latest release of SabreTools! We are happy that you
 chose to use our software for your DAT management needs. But what exactly is
 SabreTools? How did it get started? Why is it named so weirdly? Why should we
@@ -23,48 +25,59 @@ care? Well, the first two can be answered, though the last one is up to you.
 SabreTools has its roots in an internal tool developed by RomShepherd member
 The Wizard of DATz (WoD). The aim of the PHP-based program was to collate data
 from multiple sources and create new DAT files for custom sources as well as
-DAT files that have duplicate data removed. WoD maintained this software and
-used it to create near-monthly releases for quite a while.
+DAT files that have duplicate data removed, called merged DATs. WoD maintained
+this software and used it to create near-monthly releases for quite a while.
 
 Around the middle-end of 2015, WoD announced that they would be taking a break
 from the process of creating and releasing new files. A couple of months went
 by with no information. Finally, WoD finally told the community that they would
 no longer be able to maintain either the project or the software involved,
-releasing the source code of the internal project in the process. During that time,
-RomShepherd member darksabre76 picked it up to see how the program even worked.
+releasing the source code of the internal project in the process. During that
+time, RomShepherd member darksabre76 picked it up to see how the program worked.
 
 After updating the code to the newest version of PHP and trying to figure out
 what each page did, he announced that it was going to be easier to do a complete
 rewrite while maintaining functionality. He was given a lot of support and got
 started with the aim to keep the code completely open source so that anyone can
 help. It took a lot of work and help from fellow user emuLOAD, but the code
-finally started to shape up in the form of WoD Redux. This project is still
-partially active and can be found at https://github.com/mnadareski/wizzardRedux.
+finally started to shape up in the form of WoD Redux.
 
-After about a month of work on this, and continued support from the community,
-a relatively new user to the site, now known as @tractivo, sent him a message
-and asked if a desktop port of some of the core features was possible. It was
-difficult for most people to run the PHP code locally, so it made sense. With
-the aim for people to use the web version primarily, the desktop version,
-originally called DATabase, was written. Pretty soon, this got even more support
-and soon became the main focus. For a while, code parity between the C# and PHP
-versions was attempted, but it became apparent that the desktop version was going
-to be the better option.
+DAT import and export was working on a basic level after a couple of weeks.
+Numerous other features and pages were added over the next month, progressing
+toward more a more mature codebase. DAT parsing ended up being the main barrier
+during that time, leading to many frustrations. RomVault was used as the basis
+for DAT parsing quality, leading to a mock rivalry and darksabre76 dubbing it
+"project nemesis" of wizzardRedux. These have long since been cleared up but the
+rivalry still stands. This original project can be found at
+https://github.com/SabreTools/wizzardRedux.
 
-Development accelerated, soon leaving the PHP version in the dust. Once the basics
-were implemented, more features were requested, including better merging and DAT
-management. Spurred on by an increasing number of community members, DATabase
-accrued a lot of features and helper programs. The accuracy of the program also
-increased, soon matching or surpassing existing options in functionality. At some
-point during this development, some of the smaller tools got wrapped into DATabase,
-slowly getting further from just a desktop port of WoD Redux.
+Around the end of March 2016, a relatively new user to the site, now known as
+@tractivo, sent darksabre76 a message and asked if a desktop port of some of the
+core features was possible. It was difficult for most people to run the PHP code
+locally, so it made sense to port some core features. With the aim for people to
+use the web version primarily, a sister project called wizzardDesktop, was born.
+A few days later, with rigorous testing by @tractivo, version 0.0.0.1a was put
+out as the first official release. Pretty soon, this got even more support than
+the web version and soon became the main focus. For a while, code parity between
+the two versions was attempted. It became quickly apparent that the desktop
+version was going to be the better option due to the higher accessiblity and
+willingness to be tested.
+
+Development accelerated, soon leaving the PHP version in the dust. Once the
+basics were implemented, more features were requested, including better merging
+and DAT management. Spurred on by an increasing number of community members,
+DATabase accrued a lot of features and helper programs. The accuracy of the
+program also increased, soon matching or surpassing existing options in
+functionality. At some point during this development, some of the smaller tools
+got wrapped into DATabase, slowly getting further from just a desktop port.
 
 With these changes, some external prodding, and a little bit of ego, darksabre76
 decided to rechristen the set of programs to SabreTools. This freed the program
 from being just about DAT management and allowed it to be more of a Swiss Army
 Knife of DAT tools. Development has been on and off since then, and is still
-constantly evolving to this day (assuming that at this very moment development is
-still active).
+constantly evolving to the day of this writing. In the mean time, most of the
+DAT management features were stripped from the original web application due to
+the inability to keep them updated to any large degree.
 
 ** Section 2.0 - Included Programs
 
@@ -74,10 +87,11 @@ desciptions of all flags.
 
 ** Section 2.1 - RombaSharp
 
-RombaSharp is an ongoing "spiritual port" of the Romba tool (https://github.com/uwedeportivo/romba).
-The code is not based on the actual source, rather taking the features and using the code
-already written for a lot of other features. The following descriptions are based on what WILL
-be done with each flag. Not all features are currently available.
+RombaSharp is an ongoing "spiritual port" of the Romba tool that can be found at
+https://github.com/uwedeportivo/romba. The code is not based on the actual
+source, rather taking the features and using the code already written for a lot
+of other features. The following descriptions are based on what WILL be done
+with each flag. Not all features are currently available.
 
 Usage:
 	RombaSharp.exe [options] [filename|dirname] ...
@@ -109,29 +123,31 @@ Options:
 
 ** Section 2.2 - SabreTools
 
-SabreTools is the main application of the SabreTools suite. It is mostly just a frontend
-to a lot of features that are available in the DLL and can be considered the reference
-implementation. As such, it has a lot of possible flags and options that a user can select
-from.
+SabreTools is the main application of the SabreTools suite. It is mostly just a
+frontend to a lot of features that are available in the Library and can be
+considered the reference implementation. As such, it has a lot of possible flags
+and options that a user can select from.
 
 Included within this tool are a few former standalone executables:
 	- Convert/DATToMiss: Convert an arbitrary input DAT to a different format
-	- DATFromDir: Create a DAT file from a folder or file, sometimes called dir2dat
+	- DATFromDir: Create a DAT file from a set of folders and files
 	- DatSplit: Split a DAT based on 2 different file extensions
-	- Filter: Filter a DAT based on various user-defined criteria, optionally using wildcards
-	- HashSplit: Split a DAT based on the best available hash (No-dump, SHA-1, MD5, CRC)
+	- Filter: Filter a DAT based on various user-defined criteria
+	- HashSplit: Split a DAT based on the best available hash
 	- MergeDAT: Merge and optionally dedupe an arbitrary number of DAT files
-	- SimpleSort: Convert input files to new output format, do a simple rebuild using a DAT,
-		and verify a folder using a given DAT
-	- SingleGame: Trim game and rom names to fit NTFS length standards, optionally merging
-		all roms to a single game named "!" and forcing unpack
-	- UncompressedSize: Get statistics from one or more input DATs, including number of
-		roms, disks, files with available hash, and size
+	- SimpleSort: Convert input files to new output format, do a simple rebuild
+		using a DAT, and verify a folder using a given DAT
+	- SingleGame: Trim game and rom names to fit NTFS length standards,
+		optionally merging all roms to a single game and forcing unpack
+	- UncompressedSize: Get statistics from one or more input DATs, including
+		number of roms, disks, files with available hash, and size
 		
 Formerly included within this tool is a former standalone executable:
-	- DATabase/DATabaseTwo: A managed DAT tool that allows for creating automatically merged
-		DATs based on one or more systems, sources, or a combination thereof
-	- OfflineMerge: Use merged DATs to create DATs used for managing offline arrays
+	- DATabase/DATabaseTwo: A managed DAT tool that allows for creating
+		automatically merged DATs based on one or more systems, sources, or a
+		combination thereof
+	- OfflineMerge: Use merged DATs to create DATs used for managing offline
+		arrays
 
 Usage:
 	SabreTools.exe [options] [filename|dirname] ...
@@ -141,52 +157,56 @@ Options:
 		Built-in to most of the programs is a basic help text
 		
 	--script			Enable script mode (no clear screen)
-		For times when SabreTools is being used in a scripted environement, the user may
-		not want the screen to be cleared every time that it is called. This flag allows
-		the user to skip clearing the screen on run just like if the console was being
-		redirected.
+		For times when SabreTools is being used in a scripted environement, the
+		user may not want the screen to be cleared every time that it is called.
+		This flag allows the user to skip clearing the screen on run just like
+		if the console was being redirected.
 	
 	-d, --dfd, --d2d	Create a DAT from each input directory
-		Create a DAT file from an input directory or set of files. By default, this will
-		output a DAT named based on the input directory and the current date. It will also
-		treat all archives as possible games and add all three hashes for each file.
+		Create a DAT file from an input directory or set of files. By default,
+		this will output a DAT named based on the input directory and the
+		current date. It will also treat all archives as possible games and add
+		all three hashes for each file.
 		
 		-nm, --noMD5		Don't include MD5 in output
-			This allows the user to skip calculating the MD5 for each of the files which will
-			speed up the creation of the DAT.
+			This allows the user to skip calculating the MD5 for each of the
+			files which will speed up the creation of the DAT.
 			
 		-ns, --noSHA1		Don't include SHA1 in output
-			This allows the user to skip calculating the SHA-1 for each of the files which will
-			speed up the creation of the DAT.
+			This allows the user to skip calculating the SHA-1 for each of the
+			files which will speed up the creation of the DAT.
 
 		-ns256, --noSHA256	Include SHA-256 in output
-			This allows the user to include calculating the SHA-256 for each of the files which will
-			speed up the creation of the DAT. (Will be inverted later)
+			This allows the user to include calculating the SHA-256 for each of
+			the files which will speed up the creation of the DAT.
+			(Will be inverted later)
 			
 		-ns384, --noSHA384	Include SHA-384 in output
-			This allows the user to include calculating the SHA-384 for each of the files which will
-			speed up the creation of the DAT. (Will be inverted later)
+			This allows the user to include calculating the SHA-384 for each of
+			the files which will speed up the creation of the DAT.
+			(Will be inverted later)
 			
 		-ns512, --noSHA512	Include SHA-512 in output
-			This allows the user to include calculating the SHA-512 for each of the files which will
-			speed up the creation of the DAT. (Will be inverted later)
+			This allows the user to include calculating the SHA-512 for each of
+			the files which will speed up the creation of the DAT.
+			(Will be inverted later)
 			
 		-b, --bare			Don't include date in file name
-			Normally, the DAT will be created with the date in the file name. This flag removes
-			that but keeps the date tag intact.
+			Normally, the DAT will be created with the date in the file name.
+			This flag removes that but keeps the date tag intact.
 			
 		-fp=, --forcepack=	Set force packing
 			Set the forcepacking flag to one of the supported values:
 				None, Zip, Unzip
 			
 		-f, --files			Treat archives as files
-			Instead of trying to enumerate the files within archives, treat the archives as
-			files themselves. This is good for uncompressed sets that include archives that
-			should be read as-is.
+			Instead of trying to enumerate the files within archives, treat the
+			archives as files themselves. This is good for uncompressed sets
+			that include archives that should be read as-is.
 			
 		-oa, --output-all	Output in all available formats
-			Add outputting the created DAT in all available formats. See specific formats for
-			additional flags that may be used.
+			Add outputting the created DAT in all available formats. See
+			specific formats for additional flags that may be used.
 			
 		-oam, --output-am	Output in AttractMode format
 			Add outputting the created DAT to AttractMode format
@@ -240,13 +260,13 @@ Options:
 			Add outputting the created DAT to Logiqx XML format
 		
 		-gzf, --gz-files		Allow reading of GZIP files as archives
-			Since GZip files are not commonly used for file storage, this flag allows for
-			any GZip archives to have their contents hashed instead.
+			Since GZip files are not commonly used for file storage, this flag
+			allows for any GZip archives to have their contents hashed instead.
 			
 		-ro, --romba		Read files from a Romba input
-			Allow for reading of GZipped files as if they were from a Romba depot. This
-			implies that the files will be in the TorrentGZ format as well, including
-			naming convention.
+			Allow for reading of GZipped files as if they were from a Romba
+			depot. This implies that the files will be in the TorrentGZ format
+			as well, including naming convention.
 			
 		-ska, --skiparc		Skip archive files
 			Skip any files that are treated like archives
@@ -255,13 +275,16 @@ Options:
 			Skip any files that are not treated like archives
 			
 		-f=, --filename=	Set the external name of the DAT
-			Set the base filename for the output DAT(s) [default is folder name plus date]
+			Set the base filename for the output DAT(s) [default is folder name
+			plus date]
 			
 		-n=, --name=		Set the internal name of the DAT
-			Set the internal name for the output DAT(s) [default is folder name plus date]
+			Set the internal name for the output DAT(s) [default is folder name
+			plus date]
 			
 		-de=, --desc=		Set the description of the DAT
-			Set the description for the output DAT(s) [default is the folder name]
+			Set the description for the output DAT(s) [default is the folder
+			name]
 			
 		-c=, --cat=		Set the category of the DAT
 			Set the category for the output DAT(s) [default is blank]
@@ -285,71 +308,78 @@ Options:
 			Set the comment for the output DAT(s) [default is blank]
 			
 		-sd, --superdat		Enable SuperDAT creation
-			Set the type flag to "SuperDAT" for the output DAT as well as preserving the
-			directory structure of the inputted folder, if applicable
+			Set the type flag to "SuperDAT" for the output DAT as well as
+			preserving the directory structure of the inputted folder, if
+			applicable
 			
 		-xof, --exclude-of	Exclude romof, cloneof, sampleof tags
-			If this flag is enabled, then the romof, cloneof, and sampleof tags will be
-			omitted from the outputted DAT or DATs.
+			If this flag is enabled, then the romof, cloneof, and sampleof tags
+			will be omitted from the outputted DAT or DATs.
 			
 		-ab, --add-blank	Output blank files for folders
-			If this flag is set, then blank entries will be created for each of the empty
-			directories in the source. This is useful for tools that require all folders
-			be accounted for in the output DAT.
+			If this flag is set, then blank entries will be created for each of
+			the empty directories in the source. This is useful for tools that
+			require all folders be accounted for in the output DAT.
 		
 		-ad, --add-date		Output dates for each file parsed
-			If this flag is set, then the Date will be appended to each file information
-			in the output DAT. The output format is standardized as "yyyy/MM/dd HH:mm:ss".
+			If this flag is set, then the Date will be appended to each file
+			information in the output DAT. The output format is standardized as
+			"yyyy/MM/dd HH:mm:ss".
 			
 		-cf, --copy-files	Copy files to the temp directory before parsing
-			If this flag is set, then all files that are going to be parsed are moved to the temporary directory before being hashed. This can be helpful in cases where the
-			temp folder is located on an SSD and the user wants to take advantage of this.
+			If this flag is set, then all files that are going to be parsed are
+			moved to the temporary directory before being hashed. This can be
+			helpful in cases where the temp folder is located on an SSD and the
+			user wants to take advantage of this.
 			
 		-h=, --header=		Remove headers from hash calculations
-			If this is set, then all files that have copier headers that are detected will
-			have them removed from the hash calculation. This will allow for a headered collection
-			to be hashed without possibly variant information. If a particular header skipper is
-			defined, and that skipper exists, then it will be used instead of trying to find one
-			that matches.
+			If this is set, then all files that have copier headers that are
+			detected will have them removed from the hash calculation. This will
+			allow for a headered collection to be hashed without possibly
+			variant information. If a particular header skipper is defined, and
+			that skipper exists, then it will be used instead of trying to find
+			one that matches.
 			
 		-t=, --temp=		Set the name of the temporary directory
-			Optionally, a temp folder can be supplied in the case the default temp directory
-			(inside the running folder) is not preferred. This is used for any operations
-			that require an archive to be extracted.
+			Optionally, a temp folder can be supplied in the case the default
+			temp directory (inside the running folder) is not preferred. This is
+			used for any operations that require an archive to be extracted.
 			
 		-out=			Set the name of the output directory
-			This sets an output folder to be used when the files are created. If a path
-			is not defined, the application directory is used instead.
+			This sets an output folder to be used when the files are created. If
+			a path is not defined, the application directory is used instead.
 		
 		-mt={4}			Amount of threads to use
-			Optionally, set the number of threads to use for the multithreaded operations.
-			The default is 4 threads; -1 means unlimited threads created. If the user specifies
-			that only 1 thread is to be used, it defaults to the original, serial implementation
-			of the DFD code.
+			Optionally, set the number of threads to use for the multithreaded
+			operations. The default is 4 threads; -1 means unlimited threads
+			created. If the user specifies that only 1 thread is to be used, it
+			defaults to the original, serial implementation of the DFD code.
 			
 	-es, --ext-split	Split a DAT by two file extensions
-		For a DAT, or set of DATs, allow for splitting based on a list of input extensions.
-		This can allow for combined DAT files, such as those combining two separate systems,
-		to be split. Files with any extensions not listed in the input lists will be included
-		in both outputted DAT files.
+		For a DAT, or set of DATs, allow for splitting based on a list of input
+		extensions. This can allow for combined DAT files, such as those
+		combining two separate systems, to be split. Files with any extensions
+		not listed in the input lists will be included in both outputted DAT
+		files.
 		
 		-exta=			First extension (multiple allowed)
-			Set the extensions to be used to populate the first DAT. If more than one
-			extension is defined, they must be placed in separate flags.
+			Set the extensions to be used to populate the first DAT. If more
+			than one extension is defined, they must be placed in separate flags
 			
 		-extb=			Second extension (multiple allowed)
-			Set the extensions to be used to populate the second DAT. If more than one
-			extension is defined, they must be placed in separate flags.
+			Set the extensions to be used to populate the second DAT. If more
+			than one extension is defined, they must be placed in separate flags
 			
 		-out=			Set the name of the output directory
-			This sets an output folder to be used when the files are created. If a path
-			is not defined, the application directory is used instead.
+			This sets an output folder to be used when the files are created. If
+			a path is not defined, the application directory is used instead.
 			
-	-ex, --extract		Backup and remove copier headers from a variety of file types
+	-ex, --extract		Backup and remove copier headers
 		This will detect, store, and remove copier headers from a file or folder
-		of files. The headers are backed up and collated by the hash of the unheadered file.
-		Files are then output without the detected copier header alongside the originals with
-		the suffix .new. No input files are altered in the process.
+		of files. The headers are backed up and collated by the hash of the
+		unheadered file. Files are then output without the detected copier
+		header alongside the originals with the suffix .new. No input files are
+		altered in the process.
 		
 		The following systems have headers that this program can work with:
 			- Atari 7800
@@ -359,50 +389,57 @@ Options:
 			- Nintendo Famicom / Nintendo Entertainment System
 			- Nintendo Famicom Disk System
 			- Nintendo Super Famicom / Super Nintendo Entertainment System
-			- Nintendo Super Famicom / Super Nintendo Entertainment System SPC Music
+			- Nintendo Super Famicom / Super Nintendo Entertainment System SPC 
 			
 		-out=			Set the name of the output directory
-			This sets an output folder to be used when the files are created. If a path
-			is not defined, the application directory is used instead.
+			This sets an output folder to be used when the files are created. If
+			a path is not defined, the application directory is used instead.
 		
 	-hs, --hash-split		Split a DAT or folder by best-available hashes
-		For a DAT, or set of DATs, allow for splitting based on the best available hash for
-		each file within. The order of preference for the outputted DATs is as follows:
+		For a DAT, or set of DATs, allow for splitting based on the best
+		available hash for each file within. The order of preference for the
+		outputted DATs is as follows:
 			- Nodump
+			- SHA-512 available
+			- SHA-386 available
+			- SHA-256 available
 			- SHA-1 available
 			- MD5 available
 			- CRC or worse available
 		
 		-out=			Set the name of the output directory
-			This sets an output folder to be used when the files are created. If a path
-			is not defined, the application directory is used instead.
+			This sets an output folder to be used when the files are created. If
+			a path is not defined, the application directory is used instead.
 			
 	-ls, --lvl-split		Split a SuperDAT or folder by lowest available level
-		For a DAT, or set of DATs, allow for splitting based on the lowest available level
-		of game name. That is, if a game name is top/mid/last, then it will create
-		an output DAT for the parent directory "mid" in a folder called "top" with a game
-		called "last".
+		For a DAT, or set of DATs, allow for splitting based on the lowest
+		available level of game name. That is, if a game name is top/mid/last,
+		then it will create an output DAT for the parent directory "mid" in a
+		folder called "top" with a game called "last".
 		
 		-out=			Set the name of the output directory
-			This sets an output folder to be used when the files are created. If a path
-			is not defined, the application directory is used instead.
+			This sets an output folder to be used when the files are created. If
+			a path is not defined, the application directory is used instead.
 			
 		-s, --short		Use short names for outputted DATs
-			Instead of using ClrMamePro-style long names for DATs, use just the name of the
-			folder as the name of the DAT. This can be used inc onjunction with --base to
-			output in the format of "Original Name (Name)" instead.
+			Instead of using ClrMamePro-style long names for DATs, use just the
+			name of the folder as the name of the DAT. This can be used in
+			conjunction with --base to output in the format of "Original Name
+			(Name)" instead.
 			
 		-ba, --base		Use source DAT as base name for outputs
-			If splitting an entire folder of DATs, some output files may be normally overwritten
-			since the names would be the same. With this flag, the original DAT name is used in
-			the output name, in the format of "Original Name (Dir - Name)". This can be used in
-			conjunction with --short to output in the format of "Original Name (Name)" instead.
+			If splitting an entire folder of DATs, some output files may be
+			normally overwritten since the names would be the same. With this
+			flag, the original DAT name is used in the output name, in the
+			format of "Original Name (Dir - Name)". This can be used in
+			conjunction with --short to output in the format of "Original Name
+			(Name)" instead.
 			
 	-re, --restore		Restore copier headers from a variety of file types
-		This will make use of stored copier headers and reapply them to files if they match the
-		included hash. More than one header can be applied to a file, so they will be output to
-		new files, suffixed with .newX, where X is a number. No input files are altered in the
-		process.
+		This will make use of stored copier headers and reapply them to files if
+		they match the included hash. More than one header can be applied to a
+		file, so they will be output to new files, suffixed with .newX, where X
+		is a number. No input files are altered in the process.
 		
 		The following systems have headers that this program can work with:
 			- Atari 7800
@@ -412,270 +449,301 @@ Options:
 			- Nintendo Famicom / Nintendo Entertainment System
 			- Nintendo Famicom Disk System
 			- Nintendo Super Famicom / Super Nintendo Entertainment System
-			- Nintendo Super Famicom / Super Nintendo Entertainment System SPC Music
+			- Nintendo Super Famicom / Super Nintendo Entertainment System SPC
 			
 		-out=			Set the name of the output directory
-			This sets an output folder to be used when the files are created. If a path
-			is not defined, the application directory is used instead.
+			This sets an output folder to be used when the files are created. If
+			a path is not defined, the application directory is used instead.
 		
 	-ss, --sort			Sort input files by a set of DATs
-		This feature allows the user to quickly rebuild based on a supplied DAT file(s). By
-		default all files will be rebuilt to uncompressed folders in the output directory.
+		This feature allows the user to quickly rebuild based on a supplied DAT
+		file(s). By default all files will be rebuilt to uncompressed folders in
+		the output directory.
 		
 		-dat=				Name of the DAT to be used for the various options
-			The user-supplied DAT used to check which files need to be rebuilt. Multiple
-			occurrences of this flag are allowed.
+			The user-supplied DAT used to check which files need to be rebuilt.
+			Multiple occurrences of this flag are allowed.
 		
 		-out=				Set the name of the output directory
-			This sets an output folder to be used when the files are created. If a path
-			is not defined, the application directory is used instead.
+			This sets an output folder to be used when the files are created. If
+			a path is not defined, the application directory is used instead.
 			
 		-t=, --temp=		Set the name of the temporary directory
-			Optionally, a temp folder can be supplied in the case the default temp directory
-			(inside the running folder) is not preferred. This is used for any operations that
-			require an archive to be extracted.
+			Optionally, a temp folder can be supplied in the case the default
+			temp directory (inside the running folder) is not preferred. This is
+			used for any operations that require an archive to be extracted.
 			
 		-d, --delete		Delete fully rebuilt input files
-			Optionally, the input files, once processed and fully matched, can be deleted. This
-			can be useful when the original file structure is no longer needed or if there is
-			limited space on the source drive.
+			Optionally, the input files, once processed and fully matched, can
+			be deleted. This can be useful when the original file structure is
+			no longer needed or if there is limited space on the source drive.
 			
 		-in, --inverse		Match files not in the DAT
-			Instead of the normal behavior of rebuilding using a DAT, this flag allows the user
-			to use the DAT as a filter instead. All files that are found in the DAT will be
-			skipped and everything else will be output in the selected format.
+			Instead of the normal behavior of rebuilding using a DAT, this flag
+			allows the user to use the DAT as a filter instead. All files that
+			are found in the DAT will be skipped and everything else will be
+			output in the selected format.
 			
 		-qs, --quick		Enable quick scanning of archives
-			For all archives, if this flag is enabled, it will only use the header information
-			to get the archive entries' file information. The upside to this is that it is much
-			quicker than extracting all files to the temp folder. On the downside, it can only
-			get the CRC and size from most archive formats, leading to possible issues.
+			For all archives, if this flag is enabled, it will only use the
+			header information to get the archive entries' file information. The
+			upside to this is that it is much quicker than extracting all files
+			to the temp folder. On the downside, it can only get the CRC and
+			size from most archive formats, leading to possible issues.
 			
 		-ad, --add-date		Write dates for each file parsed, if available
-			If this flag is set, the the date in the DAT will be used for the output file
-			instead of the standard date and time for TorrentZip. This will technically
-			invalidate the output files as proper TorrentZip files because the date will not
-			match the standard.
+			If this flag is set, the the date in the DAT will be used for the
+			output file instead of the standard date and time for TorrentZip.
+			This will technically invalidate the output files as proper
+			TorrentZip files because the date will not match the standard.
 			
 		-t7z				Enable Torrent 7zip output
-			Instead of ouputting the files to folder, files will be rebuilt to Torrent7Zip (T7Z)
-			files. This format is based on the LZMA container format 7zip, but with custom header
-			information. This is currently unused by any major application. Currently does not
-			produce proper Torrent-compatible outputs.
+			Instead of ouputting the files to folder, files will be rebuilt to
+			Torrent7Zip (T7Z) files. This format is based on the LZMA container
+			format 7zip, but with custom header information. This is currently
+			unused by any major application. Currently does not produce proper
+			Torrent-compatible outputs.
 			
 		-tar				Enable Tape ARchive output
-			Instead of outputting the fiels to folder, files will be rebuilt to Tape ARchive (TAR)
-			files. This format is a standardized storage archive without any compression, usually
-			used with other compression formats around it. It is widely used in backup applications
-			and source code archives.
+			Instead of outputting the fiels to folder, files will be rebuilt to
+			Tape ARchive (TAR) files. This format is a standardized storage
+			archive without any compression, usually used with other compression
+			formats around it. It is widely used in backup applications and
+			source code archives.
 		
 		-tgz				Enable Torrent GZ output
-			Instead of outputting the files to folder, files will be rebuilt to TorrentGZ (TGZ)
-			files. This format is based on the GZip archive format, but with custom header
-			information and a file name replaced by the SHA-1 of the file inside. This is
-			primarily used by external tool Romba (https://github.com/uwedeportivo/romba), but
-			may be used more widely in the future.
+			Instead of outputting the files to folder, files will be rebuilt to
+			TorrentGZ (TGZ) files. This format is based on the GZip archive
+			format, but with custom header information and a file name replaced
+			by the SHA-1 of the file inside. This is primarily used by external
+			tool Romba (https://github.com/uwedeportivo/romba), but may be used
+			more widely in the future.
 		
 			-r, --romba			Enable Romba depot directory output
-				As an extension of the parent flag, this outputs the TGZ files into directories
-				based on the structure used by Romba. This uses nested folders using the first
-				4 bytes of the SHA-1, 1 byte for each layer of the directory name. It also
-				includes two auxilary files, .romba_size and .romba_size.backup, that have the
+				As an extension of the parent flag, this outputs the TGZ files
+				into directories based on the structure used by Romba. This uses
+				nested folders using the first 4 bytes of the SHA-1, 1 byte for
+				each layer of the directory name. It also includes two auxilary
+				files, .romba_size and .romba_size.backup, that have the
 				compressed size of the folder inside for use with Romba.
 				
-		-tlrz				Enable Torrent Long-Range Zip output [NOT IMPLEMENTED]
-			Instead of ouputting the files to folder, files will be rebuilt to Torrent Long-Range
-			Zip (TLRZ) files. This format is based on the LRZip file format as defined at
-			https://github.com/ckolivas/lrzip but with custom header information. This is currently
-			unused by any major application.
+		-tlrz				Enable Torrent Long-Range Zip output [UNIMPLEMENTED]
+			Instead of ouputting the files to folder, files will be rebuilt to
+			Torrent Long-Range Zip (TLRZ) files. This format is based on the
+			LRZip file format as defined at https://github.com/ckolivas/lrzip
+			but with custom header information. This is currently unused by any
+			major application.
 			
-		-trar				Enable Torrent RAR output [NOT IMPLEMENTED]
-			Instead of outputting files to folder, files will be rebuilt to Torrent RAR (TRAR)
-			files. This format is based on the RAR propietary format but with custom header
-			information. This is currently unused by any major application;
+		-trar				Enable Torrent RAR output [UNIMPLEMENTED]
+			Instead of outputting files to folder, files will be rebuilt to
+			Torrent RAR (TRAR) files. This format is based on the RAR propietary
+			format but with custom header information. This is currently unused
+			by any major application.
 			
 		-txz				Enable Torrent XZ output
-			Instead of outputting files to folder, files will be rebuilt to Torrent XZ (TXZ) files.
-			This format is based on the LZMA container format XZ, but with custom header
-			information. This is currently unused by any major application. Currently does not
-			produce proper Torrent-compatible outputs.
+			Instead of outputting files to folder, files will be rebuilt to
+			Torrent XZ (TXZ) files. This format is based on the LZMA container
+			format XZ, but with custom header information. This is currently
+			unused by any major application. Currently does not produce proper
+			Torrent-compatible outputs.
 			
 		-tzip				Enable Torrent Zip output
-			Instead of ouputting files to folder, files will be rebuilt to TorrentZip (TZ) files.
-			This format is based on the ZIP archive format, but with custom header information.
-			This is primarily used by external tool RomVault (http://www.romvault.com/) and is
-			already widely used.
+			Instead of ouputting files to folder, files will be rebuilt to
+			TorrentZip (TZip) files. This format is based on the ZIP archive
+			format, but with custom header information. This is primarily used
+			by external tool RomVault (http://www.romvault.com/) and is already
+			widely used.
 			
 		-h=, --header=		Remove headers from hash calculations
-			If this is set, then all files that have copier headers that are detected will
-			have them removed from the hash calculation. This will allow for a headered collection
-			to be hashed without possibly variant information. If a particular header skipper is
-			defined, and that skipper exists, then it will be used instead of trying to find one
-			that matches.
+			If this is set, then all files that have copier headers that are
+			detected will have them removed from the hash calculation. This will
+			allow for a headered collection to be hashed without possibly
+			variant information. If a particular header skipper is defined, and
+			that skipper exists, then it will be used instead of trying to find
+			one that matches.
 			
 		-7z={1}				Set scanning level for 7z archives
 		-gz={2}				Set scanning level for GZip archives
 		-rar={2}			Set scanning level for RAR archives
 		-zip={1}			Set scanning level for ZIP archives
-			For each of the major archive types recognized by the libraries used by this
-			program, scan the archive in one of the following ways:
+			For each of the major archive types recognized by the libraries used
+			by this program, scan the archive in one of the following ways:
 				0	Hash both archive and its contents
 				1	Only hash contents of the archive
 				2	Only hash archive itself (treat like a regular file)
 				
 		-sa, --scan-all		Set scanning levels for all archives to 0
-			This flag is the short equivalent to -7z=0 -gz=0 -rar=0 -zip=0 wrapped up. Generally
-			this will be helpful in all cases where the content of the rebuild folder is not
-			entirely known or is known to be mixed.
+			This flag is the short equivalent to -7z=0 -gz=0 -rar=0 -zip=0
+			wrapped up. Generally this will be helpful in all cases where the
+			content of the rebuild folder is not entirely known or is known to
+			be mixed.
 				
-		-dm, --dat-merged	Force creating merged sets in the output
-			Preprocess the DAT to have parent sets contain all items from the children based
-			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		-dm, --dat-merged	Force creating merged sets
+			Preprocess the DAT to have parent sets contain all items from the
+			children based on the cloneof tag. This is incompatible with the
+			other --dat-X flags.
 		
-		-ds, --dat-split	Force creating split sets in the output
-			Preprocess the DAT to remove redundant files between parents and children based
-			on the romof and cloneof tags. This is incompatible with the other --dat-X flags.
+		-ds, --dat-split	Force creating split sets
+			Preprocess the DAT to remove redundant files between parents and
+			children based on the romof and cloneof tags. This is incompatible
+			with the other --dat-X flags.
 		
-		-dnm, --dat-nonmerged Force creating non-merged sets in the output
-			Preprocess the DAT to have child sets contain all items from the parent set based
-			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		-dnm, --dat-nonmerged Force creating non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			parent set based on the cloneof tag. This is incompatible with the
+			other --dat-X flags.
 		
-		-df, --dat-fullnonmerged Force creating fully non-merged sets in the output
-			Preprocess the DAT to have child sets contain all items from the parent sets based
-			on the cloneof and romof tags as well as device references. This is incompatible with
-			the other --dat-X flags.
+		-df, --dat-fullnonmerged Force creating fully non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			parent sets based on the cloneof and romof tags as well as device
+			references. This is incompatible with the other --dat-X flags.
 				
 		-mt={4}			Amount of threads to use
-			Optionally, set the number of threads to use for the multithreaded operations.
-			The default is 4 threads; -1 means unlimited threads created. If the user specifies
-			that only 1 thread is to be used, it defaults to the original, serial implementation
-			of the DFD code.
+			Optionally, set the number of threads to use for the multithreaded
+			operations. The default is 4 threads; -1 means unlimited threads
+			created. If the user specifies that only 1 thread is to be used, it
+			defaults to the original, serial implementation of the DFD code.
 			
 		-upd, --update-dat	Output updated DAT
-			Once the files that were able to rebuilt are taken care of, a DAT of the files
-			that could not be matched will be output to the output directory.
+			Once the files that were able to rebuilt are taken care of, a DAT of
+			the files that could not be matched will be output to the output
+			directory.
 			
 	-ssd, --sort-depot		Sort input depots by a set of DATs
-		This feature allows the user to quickly rebuild based on a supplied DAT file(s). By
-		default all files will be rebuilt to uncompressed folders in the output directory.
-		This is different than the generic sort above as it requires that all inputs are
-		Romba-compatible depots.
+		This feature allows the user to quickly rebuild based on a supplied DAT
+		file(s). By default all files will be rebuilt to uncompressed folders in
+		the output directory. This is different than the generic sort above as
+		it requires that all inputs are Romba-compatible depots.
 		
 		-dat=				Name of the DAT to be used for the various options
-			The user-supplied DAT used to check which files need to be rebuilt. Multiple
-			occurrences of this flag are allowed.
+			The user-supplied DAT used to check which files need to be rebuilt.
+			Multiple occurrences of this flag are allowed.
 		
 		-out=				Set the name of the output directory
-			This sets an output folder to be used when the files are created. If a path
-			is not defined, the application directory is used instead.
+			This sets an output folder to be used when the files are created. If
+			a path is not defined, the application directory is used instead.
 			
 		-t=, --temp=		Set the name of the temporary directory
-			Optionally, a temp folder can be supplied in the case the default temp directory
-			(inside the running folder) is not preferred. This is used for any operations that
-			require an archive to be extracted.
+			Optionally, a temp folder can be supplied in the case the default
+			temp directory (inside the running folder) is not preferred. This is
+			used for any operations that require an archive to be extracted.
 			
 		-d, --delete		Delete fully rebuilt input files
-			Optionally, the input files, once processed and fully matched, can be deleted. This
-			can be useful when the original file structure is no longer needed or if there is
-			limited space on the source drive.
+			Optionally, the input files, once processed and fully matched, can
+			be deleted. This can be useful when the original file structure is
+			no longer needed or if there is limited space on the source drive.
 			
 		-in, --inverse		Match files not in the DAT
-			Instead of the normal behavior of rebuilding using a DAT, this flag allows the user
-			to use the DAT as a filter instead. All files that are found in the DAT will be
-			skipped and everything else will be output in the selected format.
+			Instead of the normal behavior of rebuilding using a DAT, this flag
+			allows the user to use the DAT as a filter instead. All files that
+			are found in the DAT will be skipped and everything else will be
+			output in the selected format.
 			
 		-ad, --add-date		Write dates for each file parsed, if available
-			If this flag is set, the the date in the DAT will be used for the output file
-			instead of the standard date and time for TorrentZip. This will technically
-			invalidate the output files as proper TorrentZip files because the date will not
-			match the standard.
+			If this flag is set, the the date in the DAT will be used for the
+			output file instead of the standard date and time for TorrentZip.
+			This will technically invalidate the output files as proper
+			TorrentZip files because the date will not match the standard.
 			
 		-t7z				Enable Torrent 7zip output
-			Instead of ouputting the files to folder, files will be rebuilt to Torrent7Zip (T7Z)
-			files. This format is based on the LZMA container format 7zip, but with custom header
-			information. This is currently unused by any major application. Currently does not
-			produce proper Torrent-compatible outputs.
+			Instead of ouputting the files to folder, files will be rebuilt to
+			Torrent7Zip (T7Z) files. This format is based on the LZMA container
+			format 7zip, but with custom header information. This is currently
+			unused by any major application. Currently does not produce proper
+			Torrent-compatible outputs.
 			
 		-tar				Enable Tape ARchive output
-			Instead of outputting the fiels to folder, files will be rebuilt to Tape ARchive (TAR)
-			files. This format is a standardized storage archive without any compression, usually
-			used with other compression formats around it. It is widely used in backup applications
-			and source code archives.
+			Instead of outputting the fiels to folder, files will be rebuilt to
+			Tape ARchive (TAR) files. This format is a standardized storage
+			archive without any compression, usually used with other compression
+			formats around it. It is widely used in backup applications and
+			source code archives.
 		
 		-tgz				Enable Torrent GZ output
-			Instead of outputting the files to folder, files will be rebuilt to TorrentGZ (TGZ)
-			files. This format is based on the GZip archive format, but with custom header
-			information and a file name replaced by the SHA-1 of the file inside. This is
-			primarily used by external tool Romba (https://github.com/uwedeportivo/romba), but
-			may be used more widely in the future.
+			Instead of outputting the files to folder, files will be rebuilt to
+			TorrentGZ (TGZ) files. This format is based on the GZip archive
+			format, but with custom header information and a file name replaced
+			by the SHA-1 of the file inside. This is primarily used by external
+			tool Romba (https://github.com/uwedeportivo/romba), but may be used
+			more widely in the future.
 		
 			-r, --romba			Enable Romba depot directory output
-				As an extension of the parent flag, this outputs the TGZ files into directories
-				based on the structure used by Romba. This uses nested folders using the first
-				4 bytes of the SHA-1, 1 byte for each layer of the directory name. It also
-				includes two auxilary files, .romba_size and .romba_size.backup, that have the
+				As an extension of the parent flag, this outputs the TGZ files
+				into directories based on the structure used by Romba. This uses
+				nested folders using the first 4 bytes of the SHA-1, 1 byte for
+				each layer of the directory name. It also includes two auxilary
+				files, .romba_size and .romba_size.backup, that have the
 				compressed size of the folder inside for use with Romba.
 				
-		-tlrz				Enable Torrent Long-Range Zip output [NOT IMPLEMENTED]
-			Instead of ouputting the files to folder, files will be rebuilt to Torrent Long-Range
-			Zip (TLRZ) files. This format is based on the LRZip file format as defined at
-			https://github.com/ckolivas/lrzip but with custom header information. This is currently
-			unused by any major application.
+		-tlrz				Enable Torrent Long-Range Zip output [UNIMPLEMENTED]
+			Instead of ouputting the files to folder, files will be rebuilt to
+			Torrent Long-Range Zip (TLRZ) files. This format is based on the
+			LRZip file format as defined at https://github.com/ckolivas/lrzip
+			but with custom header information. This is currently unused by any
+			major application.
 			
-		-trar				Enable Torrent RAR output [NOT IMPLEMENTED]
-			Instead of outputting files to folder, files will be rebuilt to Torrent RAR (TRAR)
-			files. This format is based on the RAR propietary format but with custom header
-			information. This is currently unused by any major application.
+		-trar				Enable Torrent RAR output [UNIMPLEMENTED]
+			Instead of outputting files to folder, files will be rebuilt to
+			Torrent RAR (TRAR) files. This format is based on the RAR propietary
+			format but with custom header information. This is currently unused
+			by any major application.
 			
 		-txz				Enable Torrent XZ output
-			Instead of outputting files to folder, files will be rebuilt to Torrent XZ (TXZ) files.
-			This format is based on the LZMA container format XZ, but with custom header
-			information. This is currently unused by any major application. Currently does not
-			produce proper Torrent-compatible outputs.
+			Instead of outputting files to folder, files will be rebuilt to
+			Torrent XZ (TXZ) files. This format is based on the LZMA container
+			format XZ, but with custom header information. This is currently
+			unused by any major application. Currently does not produce proper
+			Torrent-compatible outputs.
 			
 		-tzip				Enable Torrent Zip output
-			Instead of ouputting files to folder, files will be rebuilt to TorrentZip (TZ) files.
-			This format is based on the ZIP archive format, but with custom header information.
-			This is primarily used by external tool RomVault (http://www.romvault.com/) and is
-			already widely used.
+			Instead of ouputting files to folder, files will be rebuilt to
+			TorrentZip (TZip) files. This format is based on the ZIP archive
+			format, but with custom header information. This is primarily used
+			by external tool RomVault (http://www.romvault.com/) and is already
+			widely used.
 			
 		-h=, --header=		Remove headers from hash calculations
-			If this is set, then all files that have copier headers that are detected will
-			have them removed from the hash calculation. This will allow for a headered collection
-			to be hashed without possibly variant information. If a particular header skipper is
-			defined, and that skipper exists, then it will be used instead of trying to find one
-			that matches.
+			If this is set, then all files that have copier headers that are
+			detected will have them removed from the hash calculation. This will
+			allow for a headered collection to be hashed without possibly
+			variant information. If a particular header skipper is defined, and
+			that skipper exists, then it will be used instead of trying to find
+			one that matches.
 			
-		-dm, --dat-merged	Force creating merged sets in the output
-			Preprocess the DAT to have parent sets contain all items from the children based
-			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		-dm, --dat-merged	Force creating merged sets
+			Preprocess the DAT to have parent sets contain all items from the
+			children based on the cloneof tag. This is incompatible with the
+			other --dat-X flags.
 		
-		-ds, --dat-split	Force creating split sets in the output
-			Preprocess the DAT to remove redundant files between parents and children based
-			on the romof and cloneof tags. This is incompatible with the other --dat-X flags.
+		-ds, --dat-split	Force creating split sets
+			Preprocess the DAT to remove redundant files between parents and
+			children based on the romof and cloneof tags. This is incompatible
+			with the other --dat-X flags.
 		
-		-dnm, --dat-nonmerged Force creating non-merged sets in the output
-			Preprocess the DAT to have child sets contain all items from the parent set based
-			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		-dnm, --dat-nonmerged Force creating non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			parent set based on the cloneof tag. This is incompatible with the
+			other --dat-X flags.
 		
-		-df, --dat-fullnonmerged Force creating fully non-merged sets in the output
-			Preprocess the DAT to have child sets contain all items from the parent sets based
-			on the cloneof and romof tags as well as device references. This is incompatible with
-			the other --dat-X flags.
+		-df, --dat-fullnonmerged Force creating fully non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			parent sets based on the cloneof and romof tags as well as device
+			references. This is incompatible with the other --dat-X flags.
 				
 		-mt={4}			Amount of threads to use
-			Optionally, set the number of threads to use for the multithreaded operations.
-			The default is 4 threads; -1 means unlimited threads created. If the user specifies
-			that only 1 thread is to be used, it defaults to the original, serial implementation
-			of the DFD code.
+			Optionally, set the number of threads to use for the multithreaded
+			operations. The default is 4 threads; -1 means unlimited threads
+			created. If the user specifies that only 1 thread is to be used, it
+			defaults to the original, serial implementation of the DFD code.
 			
 		-upd, --update-dat	Output updated DAT
-			Once the files that were able to rebuilt are taken care of, a DAT of the files
-			that could not be matched will be output to the output directory.
+			Once the files that were able to rebuilt are taken care of, a DAT of
+			the files that could not be matched will be output to the output
+			directory.
 		
 	-st, --stats		Get statistics on all input DATs
-		This will output by default the combined statistics for all input DAT files. The stats
-		that are outputted are as follows:
+		This will output by default the combined statistics for all input DAT
+		files. The stats that are outputted are as follows:
 			- Total uncompressed size
 			- Number of games found
 			- Number of roms found
@@ -686,7 +754,8 @@ Options:
 			- Roms with Nodump status
 			
 		-bc, --baddump-col	Add statistics for baddumps to output
-			Add a new column or field for counting the number of baddumps in the DAT
+			Add a new column or field for counting the number of baddumps in the
+			DAT
 			
 		-csv, --csv			Write all statistics to CSV
 			Output all rom information in standardized CSV format
@@ -695,39 +764,42 @@ Options:
 			Set the filename (without extension) for the outputted report
 			
 		-out=			Set the name of the output directory
-			This sets an output folder to be used when the files are created. If a path
-			is not defined, the application directory is used instead.
+			This sets an output folder to be used when the files are created. If
+			a path is not defined, the application directory is used instead.
 			
 		-html, --html		Write all statistics to HTML
-			This will output by default the combined statistics for all input DAT files.
+			This will output by default the combined statistics for all input
+			DAT files.
 			
 		-nc, --nodump-col	Add statistics for nodumps to output
-			Add a new column or field for counting the number of nodumps in the DAT
+			Add a new column or field for counting the number of nodumps in the
+			DAT
 			
 		-si, --single		Show individual statistics
-			Optionally, the statistics for each of the individual input DATs can be output
-			as well. This can be useful to show where the size or amount of files found
-			in the combined totals can be broken down from.
+			Optionally, the statistics for each of the individual input DATs can
+			be output as well. This can be useful to show where the size or
+			amount of files found in the combined totals can be broken down from
 			
 		-tsv, --tsv			Output in Tab-Separated Value format
 			Output all rom information in standardized TSV format
 			
 	-ts, --type-split		Split a DAT or folder by file types (rom/disk)
-		For a DAT, or set of DATs, allow for splitting based on the types of the files,
-		specifically if the type is a rom or a disk.
+		For a DAT, or set of DATs, allow for splitting based on the types of the
+		files, specifically if the type is a rom or a disk.
 		
 		-out=			Set the name of the output directory
-			This sets an output folder to be used when the files are created. If a path
-			is not defined, the application directory is used instead.
+			This sets an output folder to be used when the files are created. If
+			a path is not defined, the application directory is used instead.
 
 	-ud, --update		Update a DAT file
-		This is the multitool part of the program, allowing for almost every manipulation
-		to a DAT, or set of DATs. This is also a combination of many different programs
-		that performed DAT manipulation that work better together.
+		This is the multitool part of the program, allowing for almost every
+		manipulation to a DAT, or set of DATs. This is also a combination of
+		many different programs that performed DAT manipulation that work better
+		together.
 			
 		-oa, --output-all	Output in all available formats
-			Add outputting the created DAT in all available formats. See specific formats for
-			additional flags that may be used.
+			Add outputting the created DAT in all available formats. See
+			specific formats for additional flags that may be used.
 			
 		-oam, --output-am	Output in AttractMode format
 			Add outputting the created DAT to AttractMode format
@@ -744,7 +816,7 @@ Options:
 			-post=, --postfix=		Set postfix for all lines
 				Set a generic postfix to be appended to all outputted lines
 				
-				Both prefix and postfix can use one of the following special strings:
+				Both prefix and postfix can use one of the following strings:
 					- %game% - Replaced with the Game/Machine name
 					- %name% - Replaced with the Rom name
 					- %crc% - Replaced with the CRC
@@ -765,12 +837,12 @@ Options:
 			Add outputting the created DAT to GoodTools miss format
 			
 			-r, --roms			Output roms to miss instead of sets
-				By default, the outputted file will include the name of the game, so this
-				flag allows for the name of the rom to be output instead.
+				By default, the outputted file will include the name of the game
+				so this flag allows for the name of the rom to be output instead.
 				
 			-gp, --game-prefix		Add game name as a prefix
-				Mainly used with the previous flag, this allows for the name of the game
-				to be used as a prefix to each file.
+				Mainly used with the previous flag, this allows for the name of
+				the game to be used as a prefix to each file.
 			
 			-pre=, --prefix=		Set prefix for all lines
 				Set a generic prefix to be prepended to all outputted lines
@@ -778,7 +850,7 @@ Options:
 			-post=, --postfix=		Set postfix for all lines
 				Set a generic postfix to be appended to all outputted lines
 				
-				Both prefix and postfix can use one of the following special strings:
+				Both prefix and postfix can use one of the following strings:
 					- %game% - Replaced with the Game/Machine name
 					- %name% - Replaced with the Rom name
 					- %crc% - Replaced with the CRC
@@ -802,14 +874,16 @@ Options:
 				For each item, the extension is removed
 			
 			-ro, --romba			Output in Romba format (requires SHA-1)
-				Instead of outputting the game or rom name, output the SHA-1 of the files
-				instead. This requires the source DAT to have SHA-1 hashes.
+				Instead of outputting the game or rom name, output the SHA-1 of
+				the files instead. This requires the source DAT to have SHA-1
+				hashes.
 			
 		-omd5, --output-md5	Output in MD5 format
 			Add outputting the created DAT to MD5 format
 			
 			-gp, --game-prefix		Add game name as a prefix
-				This allows for the name of the game to be used as a prefix to each file
+				This allows for the name of the game to be used as a prefix to
+				each file
 			
 		-ool, --output-ol	Output in OfflineList format
 			Add outputting the created DAT to OfflineList XML format
@@ -824,31 +898,36 @@ Options:
 			Add outputting the created DAT to SFV format
 			
 			-gp, --game-prefix		Add game name as a prefix
-				This allows for the name of the game to be used as a prefix to each file
+				This allows for the name of the game to be used as a prefix to
+				each file
 			
 		-osha1, --output-sha1	Output in SHA-1 format
 			Add outputting the created DAT to SHA1 format
 			
 			-gp, --game-prefix		Add game name as a prefix
-				This allows for the name of the game to be used as a prefix to each file
+				This allows for the name of the game to be used as a prefix to
+				each file
 
 		-osha256, --output-sha256	Output in SHA-256 format
 			Add outputting the created DAT to SHA-256 format
 
 			-gp, --game-prefix		Add game name as a prefix
-				This allows for the name of the game to be used as a prefix to each file
+				This allows for the name of the game to be used as a prefix to
+				each file
 				
 		-osha384, --output-sha384	Output in SHA-384 format
 			Add outputting the created DAT to SHA-384 format
 
 			-gp, --game-prefix		Add game name as a prefix
-				This allows for the name of the game to be used as a prefix to each file
+				This allows for the name of the game to be used as a prefix to
+				each file
 				
 		-osha512, --output-sha512	Output in SHA-512 format
 			Add outputting the created DAT to SHA-512 format
 
 			-gp, --game-prefix		Add game name as a prefix
-				This allows for the name of the game to be used as a prefix to each file
+				This allows for the name of the game to be used as a prefix to
+				each file
 			
 		-osl, --output-sl	Output in Software List format
 			Add outputting the created DAT to Software List XML format
@@ -862,7 +941,7 @@ Options:
 			-post=, --postfix=		Set postfix for all lines
 				Set a generic postfix to be appended to all outputted lines
 				
-				Both prefix and postfix can use one of the following special strings:
+				Both prefix and postfix can use one of the following strings:
 					- %game% - Replaced with the Game/Machine name
 					- %name% - Replaced with the Rom name
 					- %crc% - Replaced with the CRC
@@ -934,117 +1013,128 @@ Options:
 				None, Zip, Unzip
 		
 		-xof, --exclude-of	Exclude romof, cloneof, sampleof tags
-			If this flag is enabled, then the romof, cloneof, and sampleof tags will be
-			omitted from the outputted DAT or DATs.
+			If this flag is enabled, then the romof, cloneof, and sampleof tags
+			will be omitted from the outputted DAT or DATs.
 				
 		-clean				Clean game names according to WoD standards
-			Game names will be santitized to remove what the original WoD standards
-			deemed as unneeded information, such as parenthized or bracketed strings
+			Game names will be santitized to remove what the original WoD
+			standards deemed as unneeded information, such as parenthized or
+			bracketed strings
 			
 		-ru, --rem-uni		Remove unicode characters from names
-			By default, the character set from the original file(s) will be used for
-			item naming. This flag removes all Unicode characters from the item names,
-			machine names, and machine descriptions.
+			By default, the character set from the original file(s) will be used
+			for item naming. This flag removes all Unicode characters from the
+			item names, machine names, and machine descriptions.
 			
 		-rmd5, --rem-md5	Remove MD5 hashes from the output
-			By default, all available hashes will be written out to the DAT. This will
-			remove all MD5 hashes from the output file(s).
+			By default, all available hashes will be written out to the DAT.
+			This will remove all MD5 hashes from the output file(s).
 			
 		-rsha1, --rem-sha1	Remove SHA-1 hashes from the output
-			By default, all available hashes will be written out to the DAT. This will
-			remove all SHA-1 hashes from the output file(s).
+			By default, all available hashes will be written out to the DAT.
+			This will remove all SHA-1 hashes from the output file(s).
 		
 		-rsha256, --rem-sha256	Remove SHA-256 hashes from the output
-			By default, all available hashes will be written out to the DAT. This will
-			remove all SHA-256 hashes from the output file(s).
+			By default, all available hashes will be written out to the DAT.
+			This will remove all SHA-256 hashes from the output file(s).
 			
 		-rsha384, --rem-sha384	Remove SHA-384 hashes from the output
-			By default, all available hashes will be written out to the DAT. This will
-			remove all SHA-384 hashes from the output file(s).
+			By default, all available hashes will be written out to the DAT.
+			This will remove all SHA-384 hashes from the output file(s).
 			
 		-rsha512, --rem-sha512	Remove SHA-512 hashes from the output
-			By default, all available hashes will be written out to the DAT. This will
-			remove all SHA-512 hashes from the output file(s).
+			By default, all available hashes will be written out to the DAT.
+			This will remove all SHA-512 hashes from the output file(s).
 			
 		-dan, --desc-name	Use Software List name instead of description
-			By default, all DATs are converted exactly as they are input. Enabling this flag
-			allows for the machine names in the DAT to be replaced by the machine description
-			instead. In most cases, this will result in no change in the output DAT, but a
-			notable example would be a software list DAT where the machine names are
-			generally DOS-friendly while the description is more complete.
+			By default, all DATs are converted exactly as they are input.
+			Enabling this flag allows for the machine names in the DAT to be
+			replaced by the machine description instead. In most cases, this
+			will result in no change in the output DAT, but a notable example
+			would be a software list DAT where the machine names are generally
+			DOS-friendly while the description is more complete.
 			
-		-dm, --dat-merged	Create merged sets in the output DAT
-			Preprocess the DAT to have parent sets contain all items from the children based
-			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		-dm, --dat-merged	Create merged sets
+			Preprocess the DAT to have parent sets contain all items from the
+			children based on the cloneof tag. This is incompatible with the
+			other --dat-X flags.
 		
-		-ds, --dat-split	Create split sets in the output DAT
-			Preprocess the DAT to remove redundant files between parents and children based
-			on the romof and cloneof tags. This is incompatible with the other --dat-X flags.
+		-ds, --dat-split	Create split sets
+			Preprocess the DAT to remove redundant files between parents and
+			children based on the romof and cloneof tags. This is incompatible
+			with the other --dat-X flags.
 		
-		-dnm, --dat-nonmerged Create non-merged sets in the output DAT
-			Preprocess the DAT to have child sets contain all items from the parent set based
-			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		-dnm, --dat-nonmerged Create non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			parent set based on the cloneof tag. This is incompatible with the
+			other --dat-X flags.
 		
-		-df, --dat-fullnonmerged Create fully non-merged sets in the output DAT
-			Preprocess the DAT to have child sets contain all items from the parent sets based
-			on the cloneof and romof tags as well as device references. This is incompatible with
-			the other --dat-X flags.
+		-df, --dat-fullnonmerged Create fully non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			parent sets based on the cloneof and romof tags as well as device
+			references. This is incompatible with the other --dat-X flags.
 			
 		-trim			Trim file names to fit NTFS length
-			In the cases where files will have too long a name, this allows for trimming
-			the name of the files to the NTFS maximum length at most
+			In the cases where files will have too long a name, this allows for
+			trimming the name of the files to the NTFS maximum length at most
 			
 			-rd=, --root-dir=	Set the root directory for calculation
-				In the case that the files will not be stored from the root directory, 
-				a new root can be set for path length calculations
+				In the case that the files will not be stored from the root
+				directory, a new root can be set for path length calculations
 				
 		-si, --single		All game names replaced by '!'
-			This is useful for keeping all roms in a DAT in the same archive or folder
+			This is useful for keeping all roms in a DAT in the same archive or
+			folder
 			
 		-dd, --dedup		Enable deduping in the created DAT
-			For all outputted DATs, allow for hash deduping. This makes sure that there
-			are effectively no duplicates in the output files.
+			For all outputted DATs, allow for hash deduping. This makes sure
+			that there are effectively no duplicates in the output files.
 			
 		-m, --merge		Merge the input DATs
-			By default, all DATs are processed individually with the user-specified flags.
-			With this flag enabled, all of the input DATs are merged into a single output.
-			This is best used with the dedupe flag.
+			By default, all DATs are processed individually with the user-
+			specified flags. With this flag enabled, all of the input DATs are
+			merged into a single output. This is best used with the dedupe flag.
 			
 			-b, --bare			Don't include date in file name
-				Normally, the DAT will be created with the date in the file name. This flag
-				removes that instead of the default.
+				Normally, the DAT will be created with the date in the file name
+				in brackets. This flag removes that instead of the default.
 				
 		-di, --diff		Create diffdats from inputs (all outputs)
-			By default, all DATs are processed individually with the user-specified flags.
-			With this flag enabled, input DATs are diffed against each other in one of the
-			following ways (flags below are used for specific diff files to be output instead
-			of all types at once):
+			By default, all DATs are processed individually with the user-
+			specified flags. With this flag enabled, input DATs are diffed
+			against each other in one of the following ways (flags below are
+			used for specific diff files to be output instead of all types at
+			once):
 			
 				-did, --diff-du		Create diffdat containing just duplicates
-					All files that have duplicates outside of the original DAT are included
+					All files that have duplicates outside of the original DAT
+					are included
 				
 				-dii, --diff-in		Create diffdats for individual DATs
-					All files that have no duplicates outside of the original DATs are put
-					into DATs that are named after the source DAT
+					All files that have no duplicates outside of the original
+					DATs are put into DATs that are named after the source DAT
 				
 				-din, --diff-nd		Create diffdat containing no duplicates
-					All files that have no duplicates outside of the original DATs are included
+					All files that have no duplicates outside of the original
+					DATs are included
 					
 			-b, --bare			Don't include date in file name
-				Normally, the DAT will be created with the date in the file name. This flag
-				removes that instead of the default.
+				Normally, the DAT will be created with the date in the file name
+				in brackets. This flag removes that instead of the default.
 				
 			-c, --cascade		Enable cascaded diffing
 			-rc, --rev-cascade	Enable reverse cascaded diffing
-				Each of the above flags allow for a special type of diffing in which the first
-				(or last) DAT is considered a base, and for each additional input DAT, it only
-				leaves the files that are not in one of the previous DATs. This can allow for
-				the creation of rollback sets or even just reduce the amount of duplicates 
+				Each of the above flags allow for a special type of diffing in
+				which the first (or last) DAT is considered a base, and for each
+				additional input DAT, it only leaves the files that are not in
+				one of the previous DATs. This can allow for the creation of
+				rollback sets or even just reduce the amount of duplicates
 				across multiple sets
 					
 				-sf, --skip		Skip output of first DAT
-					In times where the first DAT does not need to be written out a second time,
-					this will skip writing it. This can often speed up the output process.
+					In times where the first DAT does not need to be written out
+					a second time, this will skip writing it. This can often
+					speed up the output process.
 		
 		-gn=, --not-game=	Filter by game name
 		-ngn=, --game-name=	Exclude by game name
@@ -1062,28 +1152,29 @@ Options:
 		-nsha384=, --not-sha384  Exclude by SHA-384 hash
 		-sha512=, --sha512=	Filter by SHA-512 hash
 		-nsha512=, --not-sha512  Exclude by SHA-512 hash
-			For each of the flags above, the user can specify either an exact match or can use
-			full C#-style regex for pattern matching. Multiples of each of the above inputs are
-			allowed.
+			For each of the flags above, the user can specify either an exact
+			match or can use full C#-style regex for pattern matching. Multiples
+			of each of the above inputs are allowed.
 			
-		-ofg, --of-as-game	Allow cloneof and romof tags to match game name filters
-			If filter or exclude by game name is used, this flag will allow those filters to
-			be checked against the romof and cloneof tags as well. This can allow for more
-			advanced set-building, especially in arcade-based sets.
+		-ofg, --of-as-game	Allow cloneof and romof tags to match game name
+			If filter or exclude by game name is used, this flag will allow
+			those filters to be checked against the romof and cloneof tags as
+			well. This can allow for more advanced set-building, especially in
+			arcade-based sets.
 		
 		-rt=, --rom-type=	Filter by rom type
-			This allows users to only include roms or disks to their liking. Multiples of this
-			input are allowed.
+			This allows users to only include roms or disks to their liking.
+			Multiples of this input are allowed.
 		
 		-nrt=, --not-type=	Exclude by rom type
-			This allows users to only exclude roms or disks to their liking. Multiples of this
-			input are allowed.
+			This allows users to only exclude roms or disks to their liking.
+			Multiples of this input are allowed.
 		
 		-sgt=, --greater=	Filter by size >=
 		-slt=, --less=		Filter by size <=
 		-seq=, --equal=		Filter by size ==
-			For each of the flags above, the user can specify a standard integer or one of the
-			various standard postfixes for size:
+			For each of the flags above, the user can specify a standard integer
+			or one of the various standard postfixes for size:
 				e.g. 8kb => 8000 or 8kib => 8192
 		
 		-is=, --status=		Include only items with a given status
@@ -1113,107 +1204,120 @@ Options:
 			This allows users to include only unrunnable games
 		
 		-out=			Set the name of the output directory
-			This sets an output folder to be used when the files are created. If a path
-			is not defined, the application directory is used instead.
+			This sets an output folder to be used when the files are created. If
+			a path is not defined, the application directory is used instead.
 			
-		-ip, --inplace		Enable overwriting of source files (update, cascade only)
-			This will overwrite the source files instead of writing them out to the runtime folder
-			by default (or the output folder if overridden). Note that this only works for
-			regular updates and cascaded diffs due to how file are expected to be written.
+		-ip, --inplace		Enable overwriting of source files
+			This will overwrite the source files instead of writing them out to
+			the runtime folder by default (or the output folder if overridden).
+			Note that this only works for regular updates and cascaded diffs due
+			to how file are expected to be written. This flag is only valid for
+			Update and Cascade operations.
 			
 		-mt={4}			Amount of threads to use
-			Optionally, set the number of threads to use for the multithreaded operations.
-			The default is 4 threads; -1 means unlimited threads created. If the user specifies
-			that only 1 thread is to be used, it defaults to the original, serial implementation
-			of the DFD code.
+			Optionally, set the number of threads to use for the multithreaded
+			operations. The default is 4 threads; -1 means unlimited threads
+			created. If the user specifies that only 1 thread is to be used, it
+			defaults to the original, serial implementation of the DFD code.
 			
 	-ve, --verify		Verify a folder against an input DAT
-		When used, this will use an input DAT or set of DATs to blindly check against an input
-		folder. The base of the folder is considered the base for the combined DATs and games are
-		either the directories or archives within. This will only do a direct verification of the
-		items within and will create a fixdat afterwards for missing files.
+		When used, this will use an input DAT or set of DATs to blindly check
+		against an input folder. The base of the folder is considered the base
+		for the combined DATs and games are either the directories or archives
+		within. This will only do a direct verification of the items within and
+		will create a fixdat afterwards for missing files.
 		
 		-dat=				Name of the DAT to be used for the various options
-			The user-supplied DAT used to check which files need to be verified. Multiple
-			occurrences of this flag are allowed.
+			The user-supplied DAT used to check which files need to be verified.
+			Multiple occurrences of this flag are allowed.
 			
 		-t=, --temp=		Set the name of the temporary directory
-			Optionally, a temp folder can be supplied in the case the default temp directory
-			(inside the running folder) is not preferred. This is used for any operations that
-			require an archive to be extracted.
+			Optionally, a temp folder can be supplied in the case the default
+			temp directory (inside the running folder) is not preferred. This is
+			used for any operations that require an archive to be extracted.
 			
 		-ho, --hash-only	Check files by hash only
-			This sets a mode where files are not checked based on name but rather hash alone.
-			This allows verification of (possibly) incorrectly named folders and sets to be
-			verified without worrying about the proper set structure to be there.
+			This sets a mode where files are not checked based on name but
+			rather hash alone. This allows verification of (possibly)
+			incorrectly named folders and sets to be verified without worrying
+			about the proper set structure to be there.
 			
 		-qs, --quick		Enable quick scanning of archives
-			For all archives, if this flag is enabled, it will only use the header information
-			to get the archive entries' file information. The upside to this is that it is much
-			quicker than extracting all files to the temp folder. On the downside, it can only
-			get the CRC and size from most archive formats, leading to possible issues.
+			For all archives, if this flag is enabled, it will only use the
+			header information to get the archive entries' file information. The
+			upside to this is that it is much quicker than extracting all files
+			to the temp folder. On the downside, it can only get the CRC and
+			size from most archive formats, leading to possible issues.
 			
 		-h=, --header=		Remove headers from hash calculations
-			If this is set, then all files that have copier headers that are detected will
-			have them removed from the hash calculation. This will allow for a headered collection
-			to be hashed without possibly variant information. If a particular header skipper is
-			defined, and that skipper exists, then it will be used instead of trying to find one
-			that matches.
+			If this is set, then all files that have copier headers that are
+			detected will have them removed from the hash calculation. This will
+			allow for a headered collection to be hashed without possibly
+			variant information. If a particular header skipper is defined, and
+			that skipper exists, then it will be used instead of trying to find
+			one that matches.
 			
-		-dm, --dat-merged	Force checking merged sets in the output
-			Preprocess the DAT to have parent sets contain all items from the children based
-			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		-dm, --dat-merged	Force checking merged sets
+			Preprocess the DAT to have parent sets contain all items from the
+			children based on the cloneof tag. This is incompatible with the
+			other --dat-X flags.
 		
-		-ds, --dat-split	Force checking split sets in the output
-			Preprocess the DAT to remove redundant files between parents and children based
-			on the romof and cloneof tags. This is incompatible with the other --dat-X flags.
+		-ds, --dat-split	Force checking split sets
+			Preprocess the DAT to remove redundant files between parents and
+			children based on the romof and cloneof tags. This is incompatible
+			with the other --dat-X flags.
 		
-		-dnm, --dat-nonmerged Force checking non-merged sets in the output
-			Preprocess the DAT to have child sets contain all items from the parent set based
-			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		-dnm, --dat-nonmerged Force checking non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			parent set based on the cloneof tag. This is incompatible with the
+			other --dat-X flags.
 		
-		-df, --dat-fullnonmerged Force checking fully non-merged sets in the output
-			Preprocess the DAT to have child sets contain all items from the parent sets based
-			on the cloneof and romof tags as well as device references. This is incompatible with
-			the other --dat-X flags.
+		-df, --dat-fullnonmerged Force checking fully non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			parent sets based on the cloneof and romof tags as well as device
+			references. This is incompatible with the other --dat-X flags.
 			
 	-ved, --verify-depot	Verify a depot against an input DAT
-		When used, this will use an input DAT or set of DATs to blindly check against an input
-		depot. This is based on the sort-depot code in which the base directories are assumed
-		to be romba-style depots.
+		When used, this will use an input DAT or set of DATs to blindly check
+		against an input depot. This is based on the sort-depot code in which
+		the base directories are assumed to be romba-style depots.
 		
 		-dat=				Name of the DAT to be used for the various options
-			The user-supplied DAT used to check which files need to be verified. Multiple
-			occurrences of this flag are allowed.
+			The user-supplied DAT used to check which files need to be verified.
+			Multiple occurrences of this flag are allowed.
 			
 		-t=, --temp=		Set the name of the temporary directory
-			Optionally, a temp folder can be supplied in the case the default temp directory
-			(inside the running folder) is not preferred. This is used for any operations that
-			require an archive to be extracted.
+			Optionally, a temp folder can be supplied in the case the default
+			temp directory (inside the running folder) is not preferred. This is
+			used for any operations that require an archive to be extracted.
 			
 		-h=, --header=		Remove headers from hash calculations
-			If this is set, then all files that have copier headers that are detected will
-			have them removed from the hash calculation. This will allow for a headered collection
-			to be hashed without possibly variant information. If a particular header skipper is
-			defined, and that skipper exists, then it will be used instead of trying to find one
-			that matches.
+			If this is set, then all files that have copier headers that are
+			detected will have them removed from the hash calculation. This will
+			allow for a headered collection to be hashed without possibly
+			variant information. If a particular header skipper is defined, and
+			that skipper exists, then it will be used instead of trying to find
+			one that matches.
 			
-		-dm, --dat-merged	Force checking merged sets in the output
-			Preprocess the DAT to have parent sets contain all items from the children based
-			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		-dm, --dat-merged	Force checking merged sets
+			Preprocess the DAT to have parent sets contain all items from the
+			children based on the cloneof tag. This is incompatible with the
+			other --dat-X flags.
 		
-		-ds, --dat-split	Force checking split sets in the output
-			Preprocess the DAT to remove redundant files between parents and children based
-			on the romof and cloneof tags. This is incompatible with the other --dat-X flags.
+		-ds, --dat-split	Force checking split sets
+			Preprocess the DAT to remove redundant files between parents and
+			children based on the romof and cloneof tags. This is incompatible
+			with the other --dat-X flags.
 		
-		-dnm, --dat-nonmerged Force checking non-merged sets in the output
-			Preprocess the DAT to have child sets contain all items from the parent set based
-			on the cloneof tag. This is incompatible with the other --dat-X flags.
+		-dnm, --dat-nonmerged Force checking non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			parent set based on the cloneof tag. This is incompatible with the
+			other --dat-X flags.
 		
-		-df, --dat-fullnonmerged Force checking fully non-merged sets in the output
-			Preprocess the DAT to have child sets contain all items from the parent sets based
-			on the cloneof and romof tags as well as device references. This is incompatible with
-			the other --dat-X flags.
+		-df, --dat-fullnonmerged Force checking fully non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			parent sets based on the cloneof and romof tags as well as device
+			references. This is incompatible with the other --dat-X flags.
 
 ** Section 3.0 - Examples
 
@@ -1235,7 +1339,9 @@ heckling, abject anger, praise, and/or apathy.
 This program uses, in part or in whole, code, libraries, and/or applications
 from the 7-zip project (www.7-zip.org). 7-zip is licenced under the GNU LGPL.
 
-The preceeding programs use, in part or in whole, code, libraries, and/or applications from DotNetSharp (https://dotnetzip.codeplex.com). DotNetSharp is licensed under the Microsoft Public License of October 2006.
+The preceeding programs use, in part or in whole, code, libraries, and/or
+applications from DotNetSharp (https://dotnetzip.codeplex.com). DotNetSharp is
+licensed under the Microsoft Public License of October 2006.
 
 All other external code is marked as such within the source and correctly
 attributed to the site and/or person(s) that originally wrote the code. All
