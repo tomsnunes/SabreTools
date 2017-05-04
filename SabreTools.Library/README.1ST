@@ -15,12 +15,12 @@ Table of Contents
 
 ** Section 1.0 - Introduction and History
 
-*** History of the Project
-
 Hello and welcome to the latest release of SabreTools! We are happy that you
 chose to use our software for your DAT management needs. But what exactly is
 SabreTools? How did it get started? Why is it named so weirdly? Why should we
 care? Well, the first two can be answered, though the last one is up to you.
+
+*** History of the Project
 
 SabreTools has its roots in an internal tool developed by RomShepherd member
 The Wizard of DATz (WoD). The aim of the PHP-based program was to collate data
@@ -28,7 +28,7 @@ from multiple sources and create new DAT files for custom sources as well as
 DAT files that have duplicate data removed, called merged DATs. WoD maintained
 this software and used it to create near-monthly releases for quite a while.
 
-Around the middle-end of 2015, WoD announced that they would be taking a break
+Around the middle-end of 2016, WoD announced that they would be taking a break
 from the process of creating and releasing new files. A couple of months went
 by with no information. Finally, WoD finally told the community that they would
 no longer be able to maintain either the project or the software involved,
@@ -47,7 +47,7 @@ Numerous other features and pages were added over the next month, progressing
 toward more a more mature codebase. DAT parsing ended up being the main barrier
 during that time, leading to many frustrations. RomVault was used as the basis
 for DAT parsing quality, leading to a mock rivalry and darksabre76 dubbing it
-"project nemesis" of wizzardRedux. These have long since been cleared up but the
+"project nemesis" of WoD Redux. These have long since been cleared up but the
 rivalry still stands. This original project can be found at
 https://github.com/SabreTools/wizzardRedux.
 
@@ -61,7 +61,8 @@ out as the first official release. Pretty soon, this got even more support than
 the web version and soon became the main focus. For a while, code parity between
 the two versions was attempted. It became quickly apparent that the desktop
 version was going to be the better option due to the higher accessiblity and
-willingness to be tested.
+willingness to be tested. This project is currently hosted at
+https://github.com/SabreTools/SabreTools.
 
 Development accelerated, soon leaving the PHP version in the dust. Once the
 basics were implemented, more features were requested, including better merging
