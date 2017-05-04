@@ -109,9 +109,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SabreTools.Helper\SabreTools.Helper.csproj">
+    <ProjectReference Include="..\SabreTools.Helper\SabreTools.Library.csproj">
       <Project>{225a1afd-0890-44e8-b779-7502665c23a5}</Project>
-      <Name>SabreTools.Helper</Name>
+      <Name>SabreTools.Library</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
