@@ -68,7 +68,7 @@ namespace SabreTools.Library.Tools
 				return 0;
 			}
 
-			// Some formats only require the extension to know
+			// Some formats should only require the extension to know
 			if (ext == "md5")
 			{
 				return DatFormat.RedumpMD5;
@@ -92,6 +92,14 @@ namespace SabreTools.Library.Tools
 			if (ext == "sha512")
 			{
 				return DatFormat.RedumpSHA512;
+			}
+			if (ext == "csv")
+			{
+				return DatFormat.CSV;
+			}
+			if (ext == "tsv")
+			{
+				return DatFormat.TSV;
 			}
 
 			// For everything else, we need to read it
@@ -151,14 +159,6 @@ namespace SabreTools.Library.Tools
 				else if (first.Contains("#Name;Title;Emulator;CloneOf;Year;Manufacturer;Category;Players;Rotation;Control;Status;DisplayCount;DisplayType;AltRomname;AltTitle;Extra"))
 				{
 					return DatFormat.AttractMode;
-				}
-				else if (first.Contains("\"File Name\",\"Internal Name\",\"Description\""))
-				{
-					return DatFormat.CSV;
-				}
-				else if (first.Contains("\"File Name\"\t\"Internal Name\"\t\"Description\""))
-				{
-					return DatFormat.TSV;
 				}
 				else
 				{
