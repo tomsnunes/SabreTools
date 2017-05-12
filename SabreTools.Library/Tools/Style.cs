@@ -546,7 +546,7 @@ namespace SabreTools.Library.Tools
 			// Preprocess the string
 			s = s.Trim();
 			s = Regex.Replace(s, @"^\S* \(", ""); // Remove item identifier and opening brace
-			s = Regex.Replace(s, @"\)\S*#.*$", ""); // Remove trailing comments
+			s = Regex.Replace(s, @"\)\s*#.*$", ""); // Remove trailing comments
 			s = s.TrimEnd(')'); // Remove closing brace
 			s = s.Trim(); // Remove leading and trailing whitespace
 
