@@ -517,7 +517,7 @@ namespace SabreTools.Library.Dats
 					{
 						Globals.Logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
 						DatFile innerDatdata = new DatFile(this);
-						innerDatdata.Parse(file, 0, 0, splitType, true, clean, descAsName,
+						innerDatdata.Parse(file, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
 							keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 						innerDatdata.Filter(filter, trim, single, root);
 
