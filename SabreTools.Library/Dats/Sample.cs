@@ -4,7 +4,7 @@ using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Dats
 {
-	public class Sample : DatItem, ICloneable
+	public class Sample : DatItem
 	{
 		#region Constructors
 
@@ -21,7 +21,7 @@ namespace SabreTools.Library.Dats
 
 		#region Cloning Methods
 
-		public object Clone()
+		public new object Clone()
 		{
 			return new Sample()
 			{
@@ -29,7 +29,7 @@ namespace SabreTools.Library.Dats
 				Type = this.Type,
 				Dupe = this.Dupe,
 
-				Machine = this.Machine,
+				Machine = (Machine)this.Machine.Clone(),
 
 				Supported = this.Supported,
 				Publisher = this.Publisher,

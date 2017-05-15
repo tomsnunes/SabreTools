@@ -14,7 +14,7 @@ using NaturalSort;
 
 namespace SabreTools.Library.Dats
 {
-	public abstract class DatItem : IEquatable<DatItem>, IComparable<DatItem>
+	public abstract class DatItem : IEquatable<DatItem>, IComparable<DatItem>, ICloneable
 	{
 		#region Protected instance variables
 
@@ -143,6 +143,31 @@ namespace SabreTools.Library.Dats
 		#endregion
 
 		#region Instance Methods
+
+		#region Cloning Methods
+
+		public object Clone()
+		{
+			switch (_itemType)
+			{
+				case ItemType.Archive:
+					return ((Archive)this).Clone();
+				case ItemType.BiosSet:
+					return ((BiosSet)this).Clone();
+				case ItemType.Disk:
+					return ((Disk)this).Clone();
+				case ItemType.Release:
+					return ((Release)this).Clone();
+				case ItemType.Rom:
+					return ((Rom)this).Clone();
+				case ItemType.Sample:
+					return ((Sample)this).Clone();
+			}
+			
+			return null;
+		}
+
+		#endregion
 
 		#region Comparision Methods
 

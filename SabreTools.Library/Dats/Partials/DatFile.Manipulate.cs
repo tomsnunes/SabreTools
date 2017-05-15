@@ -250,41 +250,37 @@ namespace SabreTools.Library.Dats
 					List<DatItem> newItems = new List<DatItem>();
 					Parallel.ForEach(items, Globals.ParallelOptions, item =>
 					{
-						try
+						// Clone the item first for easier working
+						DatItem newItem = (DatItem)item.Clone();
+
+						// Update machine name
+						if (!String.IsNullOrEmpty(newItem.Machine.Name) && mapping.ContainsKey(newItem.Machine.Name))
 						{
-							// Update machine name
-							if (item.Machine.Name != null && mapping.ContainsKey(item.Machine.Name))
-							{
-								item.Machine.Name = mapping[item.Machine.Name];
-							}
-
-							// Update cloneof
-							if (item.Machine.CloneOf != null && mapping.ContainsKey(item.Machine.CloneOf))
-							{
-								item.Machine.CloneOf = mapping[item.Machine.CloneOf];
-							}
-
-							// Update romof
-							if (item.Machine.RomOf != null && mapping.ContainsKey(item.Machine.RomOf))
-							{
-								item.Machine.RomOf = mapping[item.Machine.RomOf];
-							}
-
-							// Update sampleof
-							if (item.Machine.SampleOf != null && mapping.ContainsKey(item.Machine.SampleOf))
-							{
-								item.Machine.SampleOf = mapping[item.Machine.SampleOf];
-							}
-
-							// Add the new item to the output list
-							lock (newItems)
-							{
-								newItems.Add(item);
-							}
+							newItem.Machine.Name = mapping[newItem.Machine.Name];
 						}
-						catch (Exception ex)
+
+						// Update cloneof
+						if (!String.IsNullOrEmpty(newItem.Machine.CloneOf) && mapping.ContainsKey(newItem.Machine.CloneOf))
 						{
-							Globals.Logger.Warning(ex.ToString());
+							newItem.Machine.CloneOf = mapping[newItem.Machine.CloneOf];
+						}
+
+						// Update romof
+						if (!String.IsNullOrEmpty(newItem.Machine.RomOf) && mapping.ContainsKey(newItem.Machine.RomOf))
+						{
+							newItem.Machine.RomOf = mapping[newItem.Machine.RomOf];
+						}
+
+						// Update sampleof
+						if (!String.IsNullOrEmpty(newItem.Machine.SampleOf) && mapping.ContainsKey(newItem.Machine.SampleOf))
+						{
+							newItem.Machine.SampleOf = mapping[newItem.Machine.SampleOf];
+						}
+
+						// Add the new newItem to the output list
+						lock (newItems)
+						{
+							newItems.Add(newItem);
 						}
 					});
 

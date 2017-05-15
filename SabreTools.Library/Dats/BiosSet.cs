@@ -3,7 +3,7 @@ using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Dats
 {
-	public class BiosSet : DatItem, ICloneable
+	public class BiosSet : DatItem
 	{
 		#region Private instance variables
 
@@ -42,7 +42,7 @@ namespace SabreTools.Library.Dats
 
 		#region Cloning Methods
 
-		public object Clone()
+		public new object Clone()
 		{
 			return new BiosSet()
 			{
@@ -50,7 +50,7 @@ namespace SabreTools.Library.Dats
 				Type = this.Type,
 				Dupe = this.Dupe,
 
-				Machine = this.Machine,
+				Machine = (Machine)this.Machine.Clone(),
 
 				Supported = this.Supported,
 				Publisher = this.Publisher,
