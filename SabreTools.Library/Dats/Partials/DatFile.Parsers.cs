@@ -1259,7 +1259,7 @@ namespace SabreTools.Library.Dats
 						if (empty)
 						{
 							string tempgame = String.Join("\\", parent);
-							Rom rom = new Rom("null", tempgame);
+							Rom rom = new Rom("null", tempgame, omitFromScan: Hash.DeepHashes); // TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 
 							// Now process and add the rom
 							key = ParseAddHelper(rom, clean, remUnicode);
@@ -2856,13 +2856,17 @@ namespace SabreTools.Library.Dats
 						|| itemRom.SHA384 == Constants.SHA384Zero
 						|| itemRom.SHA512 == Constants.SHA512Zero))
 				{
+					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 					itemRom.Size = Constants.SizeZero;
 					itemRom.CRC = Constants.CRCZero;
 					itemRom.MD5 = Constants.MD5Zero;
 					itemRom.SHA1 = Constants.SHA1Zero;
-					itemRom.SHA256 = Constants.SHA256Zero;
-					itemRom.SHA384 = Constants.SHA384Zero;
-					itemRom.SHA512 = Constants.SHA512Zero;
+					itemRom.SHA256 = null;
+					itemRom.SHA384 = null;
+					itemRom.SHA512 = null;
+					//itemRom.SHA256 = Constants.SHA256Zero;
+					//itemRom.SHA384 = Constants.SHA384Zero;
+					//itemRom.SHA512 = Constants.SHA512Zero;
 				}
 				// If the file has no size and it's not the above case, skip and log
 				else if (itemRom.ItemStatus != ItemStatus.Nodump && (itemRom.Size == 0 || itemRom.Size == -1))
