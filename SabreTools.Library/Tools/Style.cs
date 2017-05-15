@@ -543,12 +543,13 @@ namespace SabreTools.Library.Tools
 		/// <remarks>Uses code from http://stackoverflow.com/questions/554013/regular-expression-to-split-on-spaces-unless-in-quotes</remarks>
 		public static string[] SplitLineAsCMP(string s)
 		{
-			// Preprocess the string
+			// Get the opening and closing brace locations
+			int openParenLoc = s.IndexOf('(');
+			int closeParenLoc = s.LastIndexOf(')');
+
+			// Now remove anything outside of those braces, including the braces
+			s = s.Substring(openParenLoc + 1, closeParenLoc - openParenLoc - 1);
 			s = s.Trim();
-			s = Regex.Replace(s, @"^\S* \(", ""); // Remove item identifier and opening brace
-			s = Regex.Replace(s, @"\)\s*#.*$", ""); // Remove trailing comments
-			s = s.TrimEnd(')'); // Remove closing brace
-			s = s.Trim(); // Remove leading and trailing whitespace
 
 			// Now we get each string, divided up as cleanly as possible
 			string[] matches = Regex
