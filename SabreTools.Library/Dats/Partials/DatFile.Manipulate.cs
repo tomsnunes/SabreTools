@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -226,20 +227,17 @@ namespace SabreTools.Library.Dats
 			try
 			{
 				// First we want to get a mapping for all games to description
-				Dictionary<string, string> mapping = new Dictionary<string, string>();
+				ConcurrentDictionary<string, string> mapping = new ConcurrentDictionary<string, string>();
 				List<string> keys = Keys.ToList();
 				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
 					List<DatItem> items = this[key];
 					Parallel.ForEach(items, Globals.ParallelOptions, item =>
 					{
-						lock (mapping)
+						// If the key mapping doesn't exist, add it
+						if (!mapping.ContainsKey(item.Machine.Name))
 						{
-							// If the key mapping doesn't exist, add it
-							if (!mapping.ContainsKey(item.Machine.Name))
-							{
-								mapping.Add(item.Machine.Name, item.Machine.Description.Replace('/', '_').Replace("\"", "''"));
-							}
+							mapping.TryAdd(item.Machine.Name, item.Machine.Description.Replace('/', '_').Replace("\"", "''"));
 						}
 					});
 				});
@@ -252,34 +250,41 @@ namespace SabreTools.Library.Dats
 					List<DatItem> newItems = new List<DatItem>();
 					Parallel.ForEach(items, Globals.ParallelOptions, item =>
 					{
-						// Update machine name
-						if (item.Machine.Name != null && mapping.ContainsKey(item.Machine.Name))
+						try
 						{
-							item.Machine.Name = mapping[item.Machine.Name];
-						}
+							// Update machine name
+							if (item.Machine.Name != null && mapping.ContainsKey(item.Machine.Name))
+							{
+								item.Machine.Name = mapping[item.Machine.Name];
+							}
 
-						// Update cloneof
-						if (item.Machine.CloneOf != null && mapping.ContainsKey(item.Machine.CloneOf))
-						{
-							item.Machine.CloneOf = mapping[item.Machine.CloneOf];
-						}
+							// Update cloneof
+							if (item.Machine.CloneOf != null && mapping.ContainsKey(item.Machine.CloneOf))
+							{
+								item.Machine.CloneOf = mapping[item.Machine.CloneOf];
+							}
 
-						// Update romof
-						if (item.Machine.RomOf != null && mapping.ContainsKey(item.Machine.RomOf))
-						{
-							item.Machine.RomOf = mapping[item.Machine.RomOf];
-						}
+							// Update romof
+							if (item.Machine.RomOf != null && mapping.ContainsKey(item.Machine.RomOf))
+							{
+								item.Machine.RomOf = mapping[item.Machine.RomOf];
+							}
 
-						// Update sampleof
-						if (item.Machine.SampleOf != null && mapping.ContainsKey(item.Machine.SampleOf))
-						{
-							item.Machine.SampleOf = mapping[item.Machine.SampleOf];
-						}
+							// Update sampleof
+							if (item.Machine.SampleOf != null && mapping.ContainsKey(item.Machine.SampleOf))
+							{
+								item.Machine.SampleOf = mapping[item.Machine.SampleOf];
+							}
 
-						// Add the new item to the output list
-						lock (newItems)
+							// Add the new item to the output list
+							lock (newItems)
+							{
+								newItems.Add(item);
+							}
+						}
+						catch (Exception ex)
 						{
-							newItems.Add(item);
+							Globals.Logger.Warning(ex.ToString());
 						}
 					});
 
