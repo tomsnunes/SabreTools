@@ -87,6 +87,12 @@ namespace NaturalSort
 				return Style.CompareNumeric(left, right);
 			}
 
+			// If we have an equal part, then make sure that "longer" ones are taken into account
+			if (x.CompareTo(y) == 0)
+			{
+				return left.Length - right.Length;
+			}
+
 			return x.CompareTo(y);
 		}
 	}
