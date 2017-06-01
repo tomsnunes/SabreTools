@@ -407,9 +407,10 @@ namespace SabreTools.Library.Tools
 		/// Retrieve a list of just files from inputs
 		/// </summary>
 		/// <param name="inputs">List of strings representing directories and files</param>
-		/// <param name="appendparent">True if the parent name should be appended after the special character "¬", false otherwise</param>
+		/// <param name="appendparent">True if the parent name should be appended after the special character "¬", false otherwise (default)</param>
+		/// <param name="reverse">True if the order output should be reversed, false otherwise (default)</param>
 		/// <returns>List of strings representing just files from the inputs</returns>
-		public static List<string> GetOnlyFilesFromInputs(List<string> inputs, bool appendparent = false)
+		public static List<string> GetOnlyFilesFromInputs(List<string> inputs, bool appendparent = false, bool reverse = false)
 		{
 			List<string> outputs = new List<string>();
 			foreach (string input in inputs)
@@ -417,9 +418,6 @@ namespace SabreTools.Library.Tools
 				if (Directory.Exists(input))
 				{
 					List<string> files = FileTools.RetrieveFiles(input, new List<string>());
-
-					// Make sure the files in the directory are ordered correctly
-					files = Style.OrderByAlphaNumeric(files, s => s).ToList();
 					foreach (string file in files)
 					{
 						try
@@ -451,6 +449,16 @@ namespace SabreTools.Library.Tools
 						Globals.Logger.Error(ex.ToString());
 					}
 				}
+			}
+
+			// Make sure the outputs are ordered correctly
+			if (reverse)
+			{
+				outputs.Sort(new NaturalReversedComparer());
+			}
+			else
+			{
+				outputs.Sort(new NaturalComparer());
 			}
 
 			return outputs;

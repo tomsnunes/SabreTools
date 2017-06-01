@@ -47,13 +47,7 @@ namespace SabreTools.Library.Dats
 			if (merge || (diff != 0 && (diff & DiffMode.Against) == 0))
 			{
 				// Make sure there are no folders in inputs
-				List<string> newInputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
-
-				// If we're in inverse cascade, reverse the list
-				if ((diff & DiffMode.ReverseCascade) != 0)
-				{
-					newInputFileNames.Reverse();
-				}
+				List<string> newInputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true, reverse: (diff & DiffMode.ReverseCascade) != 0);
 
 				// Create a dictionary of all ROMs from the input DATs
 				List<DatFile> datHeaders = PopulateUserData(newInputFileNames, inplace, clean,

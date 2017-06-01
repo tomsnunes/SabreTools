@@ -954,18 +954,6 @@ namespace SabreTools.Library.Tools
 			return localTime;
 		}
 
-		/// <summary>
-		/// http://stackoverflow.com/questions/248603/natural-sort-order-in-c-sharp
-		/// </summary>
-		public static IEnumerable<T> OrderByAlphaNumeric<T>(this IEnumerable<T> source, Func<T, string> selector)
-		{
-			int max = source
-				.SelectMany(i => Regex.Matches(selector(i), @"\d+").Cast<Match>().Select(m => (int?)m.Value.Length))
-				.Max() ?? 0;
-
-			return source.OrderBy(i => Regex.Replace(selector(i), @"\d+", m => m.Value.PadLeft(max, '0')));
-		}
-
 		#endregion
 	}
 }
