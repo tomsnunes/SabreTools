@@ -1136,7 +1136,7 @@ namespace SabreTools
 					FeatureType.Flag,
 					null));
 					update["diff"]["against"].AddFeature("base-dat", new Feature(
-						new List<string() { "-bd", "--base-dat" },
+						new List<string>() { "-bd", "--base-dat" },
 						"Add a base DAT for diffing",
 						FeatureType.List,
 						null));
