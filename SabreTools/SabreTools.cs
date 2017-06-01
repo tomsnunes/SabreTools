@@ -149,7 +149,7 @@ namespace SabreTools
 				header = null,
 				homepage = null,
 				name = null,
-				outDir = "",
+				outDir = Environment.CurrentDirectory,
 				postfix = "",
 				prefix = "",
 				repext = "",
