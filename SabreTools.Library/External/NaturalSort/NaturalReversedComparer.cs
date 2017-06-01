@@ -87,7 +87,7 @@ namespace NaturalSort
 				return Style.CompareNumeric(right, left);
 			}
 
-			return -x.CompareTo(y);
+			return y.CompareTo(x);
 		}
 	}
 }
