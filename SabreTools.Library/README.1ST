@@ -1119,6 +1119,18 @@ Options:
 					All files that have no duplicates outside of the original
 					DATs are included
 					
+			-ag, --against		Diff all inputs against a set of base DATs
+				This flag will enable a special type of diffing in which a set
+				of base DATs are used as a comparison point for each of the
+				input DATs. This allows users to get a slightly different
+				output to cascaded diffing, which may be more useful in
+				some cases. This is heavily influenced by the diffing model
+				used by Romba
+				
+				-bd=, --base-dat=	Add a base DAT for diffing
+					Add a DAT or folder of DATs to the base set to be used in
+					comparison against all inputs
+				
 			-b, --bare			Don't include date in file name
 				Normally, the DAT will be created with the date in the file name
 				in brackets. This flag removes that instead of the default.

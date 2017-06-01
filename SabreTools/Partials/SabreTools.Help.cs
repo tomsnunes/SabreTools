@@ -710,7 +710,7 @@ namespace SabreTools
 					"All -diX, --diff-XX flags can be used with each other",
 
 					"",
-					"Filter parameters game name, rom name, CRC, MD5, SHA-1 can",
+					"Filter parameters game name, rom name, all hashes can",
 					"be matched using full C#-style regex.",
 
 					"",
@@ -1130,6 +1130,16 @@ namespace SabreTools
 				"Create diffdats from inputs (all outputs)",
 				FeatureType.Flag,
 				null));
+				update["diff"].AddFeature("against", new Feature(
+					new List<string>() { "-ag", "--against" },
+					"Diff all inputs against a set of base DATs",
+					FeatureType.Flag,
+					null));
+					update["diff"]["against"].AddFeature("base-dat", new Feature(
+						new List<string() { "-bd", "--base-dat" },
+						"Add a base DAT for diffing",
+						FeatureType.List,
+						null));
 				update["diff"].AddFeature("bare", new Feature(
 					new List<string>() { "-b", "--bare" },
 					"Don't include the date in automatic name",

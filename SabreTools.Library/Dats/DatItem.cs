@@ -250,8 +250,9 @@ namespace SabreTools.Library.Dats
 		/// Check if a DAT contains the given rom
 		/// </summary>
 		/// <param name="datdata">Dat to match against</param>
+		/// <param name="sorted">True if the DAT is already sorted accordingly, false otherwise (default)</param>
 		/// <returns>True if it contains the rom, false otherwise</returns>
-		public bool HasDuplicates(DatFile datdata)
+		public bool HasDuplicates(DatFile datdata, bool sorted = false)
 		{
 			// Check for an empty rom list first
 			if (datdata.Count == 0)
@@ -260,7 +261,7 @@ namespace SabreTools.Library.Dats
 			}
 
 			// We want to get the proper key for the DatItem
-			string key = SortAndGetKey(datdata);
+			string key = SortAndGetKey(datdata, sorted);
 
 			// If the key doesn't exist, return the empty list
 			if (!datdata.ContainsKey(key))
@@ -336,115 +337,176 @@ namespace SabreTools.Library.Dats
 		/// Sort the input DAT and get the key to be used by the item
 		/// </summary>
 		/// <param name="datdata">Dat to match against</param>
+		/// <param name="sorted">True if the DAT is already sorted accordingly, false otherwise (default)</param>
 		/// <returns>Key to try to use</returns>
-		private string SortAndGetKey(DatFile datdata)
+		private string SortAndGetKey(DatFile datdata, bool sorted = false)
 		{
 			string key = null;
 
-			// If all items are supposed to have a SHA-512, we sort by that
-			if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA512Count
-				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA512))
-					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA512))))
+			// If we're not already sorted, take care of it
+			if (!sorted)
 			{
-				if (_itemType == ItemType.Rom)
+				// If all items are supposed to have a SHA-512, we sort by that
+				if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA512Count
+					&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA512))
+						|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA512))))
 				{
-					key = ((Rom)this).SHA512;
 					datdata.BucketBy(SortedBy.SHA512, false /* mergeroms */);
 				}
-				else
-				{
-					key = ((Disk)this).SHA512;
-					datdata.BucketBy(SortedBy.SHA512, false /* mergeroms */);
-				}
-			}
 
-			// If all items are supposed to have a SHA-384, we sort by that
-			else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA384Count
-				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA384))
-					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA384))))
-			{
-				if (_itemType == ItemType.Rom)
+				// If all items are supposed to have a SHA-384, we sort by that
+				else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA384Count
+					&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA384))
+						|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA384))))
 				{
-					key = ((Rom)this).SHA384;
 					datdata.BucketBy(SortedBy.SHA384, false /* mergeroms */);
 				}
-				else
+
+				// If all items are supposed to have a SHA-256, we sort by that
+				else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA256Count
+					&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA256))
+						|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA256))))
 				{
-					key = ((Disk)this).SHA384;
-					datdata.BucketBy(SortedBy.SHA384, false /* mergeroms */);
+					if (_itemType == ItemType.Rom)
+					{
+						key = ((Rom)this).SHA256;
+						datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */);
+					}
+					else
+					{
+						key = ((Disk)this).SHA256;
+						datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */);
+					}
 				}
+
+				// If all items are supposed to have a SHA-1, we sort by that
+				else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA1Count
+					&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA1))
+						|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA1))))
+				{
+					if (_itemType == ItemType.Rom)
+					{
+						key = ((Rom)this).SHA1;
+						datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */);
+					}
+					else
+					{
+						key = ((Disk)this).SHA1;
+						datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */);
+					}
+				}
+
+				// If all items are supposed to have an MD5, we sort by that
+				else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.MD5Count
+					&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).MD5))
+						|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).MD5))))
+				{
+					if (_itemType == ItemType.Rom)
+					{
+						key = ((Rom)this).MD5;
+						datdata.BucketBy(SortedBy.MD5, false /* mergeroms */);
+					}
+					else
+					{
+						key = ((Disk)this).MD5;
+						datdata.BucketBy(SortedBy.MD5, false /* mergeroms */);
+					}
+				}
+			}			
+
+			// Now that we have the sorted type, we get the proper key
+			switch (datdata.SortedBy)
+			{
+				case SortedBy.SHA512:
+					if (_itemType == ItemType.Rom)
+					{
+						key = ((Rom)this).SHA512;
+					}
+					else if (_itemType == ItemType.Disk)
+					{
+						key = ((Disk)this).SHA512;
+					}
+					break;
+				case SortedBy.SHA384:
+					if (_itemType == ItemType.Rom)
+					{
+						key = ((Rom)this).SHA384;
+					}
+					else if (_itemType == ItemType.Disk)
+					{
+						key = ((Disk)this).SHA384;
+					}
+					break;
+				case SortedBy.SHA256:
+					if (_itemType == ItemType.Rom)
+					{
+						key = ((Rom)this).SHA256;
+					}
+					else if (_itemType == ItemType.Disk)
+					{
+						key = ((Disk)this).SHA256;
+					}
+					break;
+				case SortedBy.SHA1:
+					if (_itemType == ItemType.Rom)
+					{
+						key = ((Rom)this).SHA1;
+					}
+					else if (_itemType == ItemType.Disk)
+					{
+						key = ((Disk)this).SHA1;
+					}
+					break;
+				case SortedBy.MD5:
+					if (_itemType == ItemType.Rom)
+					{
+						key = ((Rom)this).MD5;
+					}
+					else if (_itemType == ItemType.Disk)
+					{
+						key = ((Disk)this).MD5;
+					}
+					break;
+				case SortedBy.CRC:
+					if (_itemType == ItemType.Rom)
+					{
+						key = ((Rom)this).CRC;
+					}
+					break;
+				case SortedBy.Game:
+					key = this.Machine.Name;
+					break;
+				case SortedBy.Size:
+					if (_itemType == ItemType.Rom)
+					{
+						key = ((Rom)this).Size.ToString();
+					}
+					break;
 			}
 
-			// If all items are supposed to have a SHA-256, we sort by that
-			else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA256Count
-				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA256))
-					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA256))))
+			// If we got here and the key is still null...
+			if (key == null)
 			{
-				if (_itemType == ItemType.Rom)
-				{
-					key = ((Rom)this).SHA256;
-					datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */);
-				}
-				else
-				{
-					key = ((Disk)this).SHA256;
-					datdata.BucketBy(SortedBy.SHA256, false /* mergeroms */);
-				}
-			}
-
-			// If all items are supposed to have a SHA-1, we sort by that
-			else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA1Count
-				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA1))
-					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA1))))
-			{
-				if (_itemType == ItemType.Rom)
-				{
-					key = ((Rom)this).SHA1;
-					datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */);
-				}
-				else
-				{
-					key = ((Disk)this).SHA1;
-					datdata.BucketBy(SortedBy.SHA1, false /* mergeroms */);
-				}
-			}
-
-			// If all items are supposed to have an MD5, we sort by that
-			else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.MD5Count
-				&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).MD5))
-					|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).MD5))))
-			{
-				if (_itemType == ItemType.Rom)
-				{
-					key = ((Rom)this).MD5;
-					datdata.BucketBy(SortedBy.MD5, false /* mergeroms */);
-				}
-				else
+				// If we've gotten here and we have a Disk, sort by MD5
+				if (_itemType == ItemType.Disk)
 				{
 					key = ((Disk)this).MD5;
 					datdata.BucketBy(SortedBy.MD5, false /* mergeroms */);
 				}
-			}
 
-			// If we've gotten here and we have a Disk, sort by MD5
-			else if (_itemType == ItemType.Disk)
-			{
-				key = ((Disk)this).MD5;
-				datdata.BucketBy(SortedBy.MD5, false /* mergeroms */);
-			}
+				// If we've gotten here and we have a Rom, sort by CRC
+				else if (_itemType == ItemType.Rom)
+				{
+					key = ((Rom)this).CRC;
+					datdata.BucketBy(SortedBy.CRC, false /* mergeroms */);
+				}
 
-			// If we've gotten here and we have a Rom, sort by CRC
-			else if (_itemType == ItemType.Rom)
-			{
-				key = ((Rom)this).CRC;
-				datdata.BucketBy(SortedBy.CRC, false /* mergeroms */);
-			}
-
-			// Otherwise, we use -1 as the key
-			else
-			{
-				key = "-1";
-				datdata.BucketBy(SortedBy.Size, false /* mergeroms */);
+				// Otherwise, we use -1 as the key
+				else
+				{
+					key = "-1";
+					datdata.BucketBy(SortedBy.Size, false /* mergeroms */);
+				}
 			}
 
 			return key;

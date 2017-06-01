@@ -236,6 +236,9 @@ namespace SabreTools.Library.Data
 		// Cascaded diffs
 		Cascade = Individuals << 1,
 		ReverseCascade = Cascade << 1,
+
+		// Base diffs
+		Against = ReverseCascade << 1,
 	}
 
 	/// <summary>

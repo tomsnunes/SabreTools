@@ -25,6 +25,7 @@ namespace SabreTools.Library.Dats
 		/// Determine if input files should be merged, diffed, or processed invidually
 		/// </summary>
 		/// <param name="inputPaths">Names of the input files and/or folders</param>
+		/// <param name="basePaths">Names of base files and/or folders</param>
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
 		/// <param name="diff">Non-zero flag for diffing mode, zero otherwise</param>
@@ -39,11 +40,11 @@ namespace SabreTools.Library.Dats
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		public void DetermineUpdateType(List<string> inputPaths, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
+		public void DetermineUpdateType(List<string> inputPaths, List<string> basePaths, string outDir, bool merge, DiffMode diff, bool inplace, bool skip,
 			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
-			if (merge || diff != 0)
+			if (merge || (diff != 0 && (diff & DiffMode.Against) == 0))
 			{
 				// Make sure there are no folders in inputs
 				List<string> newInputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
@@ -74,6 +75,11 @@ namespace SabreTools.Library.Dats
 					MergeNoDiff(outDir, newInputFileNames, datHeaders);
 				}
 			}
+			// If we're in "diff against" mode, we treat the inputs differently
+			else if ((diff & DiffMode.Against) != 0)
+			{
+				DiffAgainst(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
+			}
 			// Otherwise, loop through all of the inputs individually
 			else
 			{
@@ -85,8 +91,15 @@ namespace SabreTools.Library.Dats
 		/// <summary>
 		/// Populate the user DatData object from the input files
 		/// </summary>
+		/// <param name="inputs">Paths to DATs to parse</param>
+		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
+		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
+		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
@@ -109,7 +122,7 @@ namespace SabreTools.Library.Dats
 					MergeRoms = MergeRoms,
 				};
 
-				datHeaders[i].Parse(input.Split('¬')[0], i, 0, splitType, true, clean, descAsName);
+				datHeaders[i].Parse(input.Split('¬')[0], i, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 			});
 
 			Globals.Logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
@@ -141,6 +154,201 @@ namespace SabreTools.Library.Dats
 			Globals.Logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			return datHeaders.ToList();
+		}
+
+		/// <summary>
+		/// Output diffs against a base set
+		/// </summary>
+		/// <param name="inputPaths">Names of the input files and/or folders</param>
+		/// <param name="basePaths">Names of base files and/or folders</param>
+		/// <param name="outDir">Optional param for output directory</param>
+		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
+		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
+		/// <param name="filter">Filter object to be passed to the DatItem level</param>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		public void DiffAgainst(List<string> inputPaths, List<string> basePaths, string outDir, bool inplace, bool clean, bool remUnicode,
+			bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
+		{
+			// First we want to parse all of the base DATs into the input
+			List<string> baseFileNames = FileTools.GetOnlyFilesFromInputs(basePaths);
+			Parallel.ForEach(baseFileNames,
+				Globals.ParallelOptions,
+				path =>
+			{
+				Parse(path, 0, 0, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
+			});
+
+			// For comparison's sake, we want to use CRC as the base ordering
+			BucketBy(SortedBy.CRC, true);
+
+			// Now we want to compare each input DAT against the base
+			List<string> inputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
+			Parallel.ForEach(inputFileNames,
+				Globals.ParallelOptions,
+				path =>
+			{
+				// First we parse in the DAT internally
+				DatFile intDat = new DatFile();
+				intDat.Parse(path.Split('¬')[0], 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
+
+				// For comparison's sake, we want to use CRC as the base ordering
+				BucketBy(SortedBy.CRC, true);
+
+				// Then we do a hashwise comparison against the base DAT
+				List<string> keys = intDat.Keys.ToList();
+				Parallel.ForEach(keys,
+					Globals.ParallelOptions,
+					key =>
+				{
+					List<DatItem> datItems = intDat[key];
+					List<DatItem> keepDatItems = new List<DatItem>();
+					Parallel.ForEach(datItems,
+						Globals.ParallelOptions,
+						datItem =>
+					{
+						if (!datItem.HasDuplicates(this))
+						{
+							lock (keepDatItems)
+							{
+								keepDatItems.Add(datItem);
+							}
+						}
+					});
+
+					// Now add the new list to the key
+					intDat.Remove(key);
+					intDat.AddRange(key, keepDatItems);
+				});
+
+				// Determine the output path for the DAT
+				string interOutDir = outDir;
+				if (inplace)
+				{
+					interOutDir = Path.GetDirectoryName(path);
+				}
+				else if (!String.IsNullOrEmpty(interOutDir))
+				{
+					interOutDir = Path.Combine(interOutDir, path.Split('¬')[1]);
+				}
+				else
+				{
+					interOutDir = Path.Combine(Environment.CurrentDirectory, path.Split('¬')[1]);
+				}
+
+				// Once we're done, we check to see if there's anything to write out
+				if (intDat.Count > 0)
+				{
+					intDat.WriteToFile(interOutDir);
+				}
+			});
+		}
+
+		/// <summary>
+		/// Output cascading diffs
+		/// </summary>
+		/// <param name="outDir">Output directory to write the DATs to</param>
+		/// <param name="inplace">True if cascaded diffs are outputted in-place, false otherwise</param>
+		/// <param name="inputs">List of inputs to write out from</param>
+		/// <param name="datHeaders">Dat headers used optionally</param>
+		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
+		public void DiffCascade(string outDir, bool inplace, List<string> inputs, List<DatFile> datHeaders, bool skip)
+		{
+			string post = "";
+
+			// Create a list of DatData objects representing output files
+			List<DatFile> outDats = new List<DatFile>();
+
+			// Loop through each of the inputs and get or create a new DatData object
+			DateTime start = DateTime.Now;
+			Globals.Logger.User("Initializing all output DATs");
+
+			DatFile[] outDatsArray = new DatFile[inputs.Count];
+
+			Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
+			{
+				string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
+				DatFile diffData;
+
+				// If we're in inplace mode, take the appropriate DatData object already stored
+				if (inplace || !String.IsNullOrEmpty(outDir))
+				{
+					diffData = datHeaders[j];
+				}
+				else
+				{
+					diffData = new DatFile(this);
+					diffData.FileName += post;
+					diffData.Name += post;
+					diffData.Description += post;
+				}
+				diffData.Reset();
+
+				outDatsArray[j] = diffData;
+			});
+
+			outDats = outDatsArray.ToList();
+			Globals.Logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// Now, loop through the dictionary and populate the correct DATs
+			start = DateTime.Now;
+			Globals.Logger.User("Populating all output DATs");
+			List<string> keys = Keys.ToList();
+
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+			{
+				List<DatItem> items = DatItem.Merge(this[key]);
+
+				// If the rom list is empty or null, just skip it
+				if (items == null || items.Count == 0)
+				{
+					return;
+				}
+
+				Parallel.ForEach(items, Globals.ParallelOptions, item =>
+				{
+					// There's odd cases where there are items with System ID < 0. Skip them for now
+					if (item.SystemID < 0)
+					{
+						Globals.Logger.Warning("Item found with a <0 SystemID: " + item.Name);
+						return;
+					}
+
+					outDats[item.SystemID].Add(key, item);
+				});
+			});
+
+			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			// Finally, loop through and output each of the DATs
+			start = DateTime.Now;
+			Globals.Logger.User("Outputting all created DATs");
+
+			Parallel.For((skip ? 1 : 0), inputs.Count, j =>
+			{
+				// If we have an output directory set, replace the path
+				string path = "";
+				if (inplace)
+				{
+					path = Path.GetDirectoryName(inputs[j].Split('¬')[0]);
+				}
+				else if (!String.IsNullOrEmpty(outDir))
+				{
+					string[] split = inputs[j].Split('¬');
+					path = outDir + (split[0] == split[1]
+						? Path.GetFileName(split[0])
+						: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length))); ;
+				}
+
+				// Try to output the file
+				outDats[j].WriteToFile(path);
+			});
+
+			Globals.Logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
 
 		/// <summary>
@@ -305,109 +513,6 @@ namespace SabreTools.Library.Dats
 					outDats[j].WriteToFile(path);
 				});
 			}
-			Globals.Logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-		}
-
-		/// <summary>
-		/// Output cascading diffs
-		/// </summary>
-		/// <param name="outDir">Output directory to write the DATs to</param>
-		/// <param name="inplace">True if cascaded diffs are outputted in-place, false otherwise</param>
-		/// <param name="inputs">List of inputs to write out from</param>
-		/// <param name="datHeaders">Dat headers used optionally</param>
-		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
-		public void DiffCascade(string outDir, bool inplace, List<string> inputs, List<DatFile> datHeaders, bool skip)
-		{
-			string post = "";
-
-			// Create a list of DatData objects representing output files
-			List<DatFile> outDats = new List<DatFile>();
-
-			// Loop through each of the inputs and get or create a new DatData object
-			DateTime start = DateTime.Now;
-			Globals.Logger.User("Initializing all output DATs");
-
-			DatFile[] outDatsArray = new DatFile[inputs.Count];
-
-			Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
-			{
-				string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
-				DatFile diffData;
-
-				// If we're in inplace mode, take the appropriate DatData object already stored
-				if (inplace || !String.IsNullOrEmpty(outDir))
-				{
-					diffData = datHeaders[j];
-				}
-				else
-				{
-					diffData = new DatFile(this);
-					diffData.FileName += post;
-					diffData.Name += post;
-					diffData.Description += post;
-				}
-				diffData.Reset();
-
-				outDatsArray[j] = diffData;
-			});
-
-			outDats = outDatsArray.ToList();
-			Globals.Logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			// Now, loop through the dictionary and populate the correct DATs
-			start = DateTime.Now;
-			Globals.Logger.User("Populating all output DATs");
-			List<string> keys = Keys.ToList();
-
-			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
-			{
-				List<DatItem> items = DatItem.Merge(this[key]);
-
-				// If the rom list is empty or null, just skip it
-				if (items == null || items.Count == 0)
-				{
-					return;
-				}
-
-				Parallel.ForEach(items, Globals.ParallelOptions, item =>
-				{
-					// There's odd cases where there are items with System ID < 0. Skip them for now
-					if (item.SystemID < 0)
-					{
-						Globals.Logger.Warning("Item found with a <0 SystemID: " + item.Name);
-						return;
-					}
-
-					outDats[item.SystemID].Add(key, item);
-				});
-			});
-
-			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
-
-			// Finally, loop through and output each of the DATs
-			start = DateTime.Now;
-			Globals.Logger.User("Outputting all created DATs");
-
-			Parallel.For((skip ? 1 : 0), inputs.Count, j =>
-			{
-				// If we have an output directory set, replace the path
-				string path = "";
-				if (inplace)
-				{
-					path = Path.GetDirectoryName(inputs[j].Split('¬')[0]);
-				}
-				else if (!String.IsNullOrEmpty(outDir))
-				{
-					string[] split = inputs[j].Split('¬');
-					path = outDir + (split[0] == split[1]
-						? Path.GetFileName(split[0])
-						: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length))); ;
-				}
-
-				// Try to output the file
-				outDats[j].WriteToFile(path);
-			});
-
 			Globals.Logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
 

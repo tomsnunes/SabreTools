@@ -445,7 +445,8 @@ namespace SabreTools
 		/// <summary>
 		/// Wrap converting and updating DAT file from any format to any format
 		/// </summary>
-		/// <param name="inputs">List of input filenames</param>
+		/// <param name="inputPaths">List of input filenames</param>
+		/// <param name="basePaths">List of base filenames</param>
 		/// /* Normal DAT header info */
 		/// <param name="filename">New filename</param>
 		/// <param name="name">New name</param>
@@ -498,7 +499,10 @@ namespace SabreTools
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="dedup">True to dedupe the roms in the DAT, false otherwise (default)</param>
 		/// <param name="stripHash">StripHash that represents the hash(es) that you want to remove from the output</param>
-		private static void InitUpdate(List<string> inputs,
+		private static void InitUpdate(
+			List<string> inputPaths,
+			List<string> basePaths,
+
 			/* Normal DAT header info */
 			string filename,
 			string name,
@@ -722,7 +726,7 @@ namespace SabreTools
 				Romba = romba,
 			};
 			
-			userInputDat.DetermineUpdateType(inputs, outDir, merge, diffMode, inplace, skip, bare, clean,
+			userInputDat.DetermineUpdateType(inputPaths, basePaths, outDir, merge, diffMode, inplace, skip, bare, clean,
 				remUnicode, descAsName, filter, splitType, trim, single, root);
 		}
 

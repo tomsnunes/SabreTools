@@ -159,6 +159,7 @@ namespace SabreTools
 				url = null,
 				version = null;
 			Filter filter = new Filter();
+			List<string> basePaths = new List<string>();
 			List<string> datfiles = new List<string>();
 			List<string> exta = new List<string>();
 			List<string> extb = new List<string>();
@@ -286,6 +287,10 @@ namespace SabreTools
 					case "-ad":
 					case "--add-date":
 						addFileDates = true;
+						break;
+					case "-ag":
+					case "--against":
+						diffMode |= DiffMode.Against;
 						break;
 					case "-b":
 					case "--bare":
@@ -632,6 +637,10 @@ namespace SabreTools
 					case "--author":
 						author = args[++i];
 						break;
+					case "-bd":
+					case "--base-dat":
+						basePaths.Add(args[++i]);
+						break;
 					case "-ca":
 					case "--category=":
 						category = args[++i];
@@ -915,6 +924,10 @@ namespace SabreTools
 								case "-au":
 								case "--author":
 									author = split[1];
+									break;
+								case "-bd":
+								case "--base-dat":
+									basePaths.Add(split[1]);
 									break;
 								case "-ca":
 								case "--category=":
@@ -1280,7 +1293,7 @@ namespace SabreTools
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
 			else if (update)
 			{
-				InitUpdate(inputs, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
+				InitUpdate(inputs, basePaths, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix, postfix, quotes, repext, addext, remext,
 					datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName, filter, oneGameOneRegion, regions,
 					splitType, trim, single, root, outDir, cleanGameNames, removeUnicode, descAsName, dedup, stripHash);
