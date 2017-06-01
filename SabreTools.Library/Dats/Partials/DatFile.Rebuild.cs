@@ -15,6 +15,7 @@ using Alphaleonis.Win32.Filesystem;
 using FileStream = System.IO.FileStream;
 using MemoryStream = System.IO.MemoryStream;
 using SearchOption = System.IO.SearchOption;
+using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
 
