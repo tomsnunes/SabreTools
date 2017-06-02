@@ -35,9 +35,9 @@ namespace NaturalSort
 
 		public override int Compare(string x, string y)
 		{
-			if (x == y)
+			if (x.ToLowerInvariant() == y.ToLowerInvariant())
 			{
-				return 0;
+				return x.CompareTo(y);
 			}
 			string[] x1, y1;
 			if (!table.TryGetValue(x, out x1))
