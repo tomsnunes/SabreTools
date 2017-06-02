@@ -285,10 +285,6 @@ namespace SabreTools.Library.Dats
 			}
 
 			// Get the proper output file name
-			if (String.IsNullOrEmpty(outDir))
-			{
-				outDir = Environment.CurrentDirectory;
-			}
 			if (String.IsNullOrEmpty(reportName))
 			{
 				reportName = "report";

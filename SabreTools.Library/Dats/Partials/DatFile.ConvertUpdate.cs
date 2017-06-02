@@ -269,7 +269,7 @@ namespace SabreTools.Library.Dats
 				DatFile diffData;
 
 				// If we're in inplace mode, take the appropriate DatData object already stored
-				if (inplace || !String.IsNullOrEmpty(outDir))
+				if (inplace || outDir != Environment.CurrentDirectory)
 				{
 					diffData = datHeaders[j];
 				}
@@ -330,7 +330,7 @@ namespace SabreTools.Library.Dats
 				{
 					path = Path.GetDirectoryName(inputs[j].Split('¬')[0]);
 				}
-				else if (!String.IsNullOrEmpty(outDir))
+				else if (outDir != Environment.CurrentDirectory)
 				{
 					string[] split = inputs[j].Split('¬');
 					path = outDir + (split[0] == split[1]
@@ -598,7 +598,7 @@ namespace SabreTools.Library.Dats
 					innerDatdata.Filter(filter, trim, single, root);
 
 					// Try to output the file
-					innerDatdata.WriteToFile((realOutDir == "" ? Path.GetDirectoryName(inputFileName) : realOutDir), overwrite: (realOutDir != ""));
+						innerDatdata.WriteToFile((realOutDir == Environment.CurrentDirectory ? Path.GetDirectoryName(inputFileName) : realOutDir), overwrite: (realOutDir != Environment.CurrentDirectory));
 				}
 				else if (Directory.Exists(inputFileName))
 				{
@@ -621,8 +621,8 @@ namespace SabreTools.Library.Dats
 						innerDatdata.Filter(filter, trim, single, root);
 
 						// Try to output the file
-						innerDatdata.WriteToFile((realOutDir == "" ? Path.GetDirectoryName(file) : realOutDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)),
-							overwrite: (realOutDir != ""));
+						innerDatdata.WriteToFile((realOutDir == Environment.CurrentDirectory ? Path.GetDirectoryName(file) : realOutDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)),
+							overwrite: (realOutDir != Environment.CurrentDirectory));
 					});
 				}
 				else
