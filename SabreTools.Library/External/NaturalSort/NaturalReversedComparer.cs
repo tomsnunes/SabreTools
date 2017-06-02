@@ -70,7 +70,7 @@ namespace NaturalSort
 			}
 			else
 			{
-				return 0;
+				return y.CompareTo(x);
 			}
 		}
 
