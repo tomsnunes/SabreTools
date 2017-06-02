@@ -305,6 +305,10 @@ namespace SabreTools.Library.Tools
 		/// <remarks>I want to be able to handle paths properly with no issue, can I do a recursive call based on separated by path separator?</remarks>
 		public static int CompareNumeric(string s1, string s2)
 		{
+			// Save the orginal strings, for later comparison
+			string s1orig = s1;
+			string s2orig = s2;
+
 			// We want to normalize the strings, so we set both to lower case
 			s1 = s1.ToLowerInvariant();
 			s2 = s2.ToLowerInvariant();
@@ -312,7 +316,7 @@ namespace SabreTools.Library.Tools
 			// If the strings are the same exactly, return
 			if (s1 == s2)
 			{
-				return 0;
+				return s1orig.CompareTo(s2orig);
 			}
 
 			// If one is null, then say that's less than
@@ -351,7 +355,7 @@ namespace SabreTools.Library.Tools
 				return -1;
 			}
 
-			return 0;
+			return s1orig.CompareTo(s2orig);
 		}
 
 		/// <summary>
