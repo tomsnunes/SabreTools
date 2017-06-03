@@ -740,6 +740,9 @@ namespace SabreTools.Library.Dats
 				}
 			}
 
+			// One last sort to make sure this is ordered
+			Sort(ref output, true);
+
 			return output;
 		}
 
