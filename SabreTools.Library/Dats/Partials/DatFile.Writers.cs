@@ -326,9 +326,9 @@ namespace SabreTools.Library.Dats
 									(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
 									(ForceMerging == ForceMerging.Merged ? " forcemerging=\"merged\"" : "") +
 									(ForceMerging == ForceMerging.NonMerged ? " forcemerging=\"nonmerged\"" : "") +
-									(ForceNodump == ForceNodump.Ignore ? " forceitemStatus=\"ignore\"" : "") +
-									(ForceNodump == ForceNodump.Obsolete ? " forceitemStatus=\"obsolete\"" : "") +
-									(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : "") +
+									(ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
+									(ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"obsolete\"" : "") +
+									(ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
 									" />\n"
 							: "") +
 							"\t</header>\n";
@@ -417,9 +417,9 @@ namespace SabreTools.Library.Dats
 									(ForceMerging == ForceMerging.Split ? "\t\t\t<flag name=\"forcemerging\" value=\"split\"/>\n" : "") +
 									(ForceMerging == ForceMerging.Merged ? "\t\t\t<flag name=\"forcemerging\" value=\"merged\"/>\n" : "") +
 									(ForceMerging == ForceMerging.NonMerged ? "\t\t\t<flag name=\"forcemerging\" value=\"nonmerged\"/>\n" : "") +
-									(ForceNodump == ForceNodump.Ignore ? "\t\t\t<flag name=\"forceitemStatus\" value=\"ignore\"/>\n" : "") +
-									(ForceNodump == ForceNodump.Obsolete ? "\t\t\t<flag name=\"forceitemStatus\" value=\"obsolete\"/>\n" : "") +
-									(ForceNodump == ForceNodump.Required ? "\t\t\t<flag name=\"forceitemStatus\" value=\"required\"/>\n" : "") +
+									(ForceNodump == ForceNodump.Ignore ? "\t\t\t<flag name=\"forcenodump\" value=\"ignore\"/>\n" : "") +
+									(ForceNodump == ForceNodump.Obsolete ? "\t\t\t<flag name=\"forcenodump\" value=\"obsolete\"/>\n" : "") +
+									(ForceNodump == ForceNodump.Required ? "\t\t\t<flag name=\"forcenodump\" value=\"required\"/>\n" : "") +
 									"\t\t</flags>\n"
 							: "") +
 							"\t</header>\n" +
@@ -436,9 +436,9 @@ namespace SabreTools.Library.Dats
 								(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
 								(ForceMerging == ForceMerging.Merged ? " forcemerging=\"merged\"" : "") +
 								(ForceMerging == ForceMerging.NonMerged ? " forcemerging=\"nonmerged\"" : "") +
-								(ForceNodump == ForceNodump.Ignore ? " forceitemStatus=\"ignore\"" : "") +
-								(ForceNodump == ForceNodump.Obsolete ? " forceitemStatus=\"obsolete\"" : "") +
-								(ForceNodump == ForceNodump.Required ? " forceitemStatus=\"required\"" : "") +
+								(ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
+								(ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"obsolete\"" : "") +
+								(ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
 								">\n\n";
 						break;
 				}
