@@ -76,13 +76,13 @@ namespace NaturalSort
 
 		private static int PartCompare(string left, string right)
 		{
-			int x, y;
-			if (!int.TryParse(left, out x))
+			long x, y;
+			if (!long.TryParse(left, out x))
 			{
 				return Style.CompareNumeric(left, right);
 			}
 
-			if (!int.TryParse(right, out y))
+			if (!long.TryParse(right, out y))
 			{
 				return Style.CompareNumeric(left, right);
 			}
