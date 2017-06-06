@@ -505,9 +505,10 @@ namespace SabreTools.Library.Dats
 				{
 					// If we have an output directory set, replace the path
 					string[] split = inputs[j].Split('¬');
-					string path = outDir + (split[0] == split[1]
-						? Path.GetFileName(split[0])
-						: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length)));
+					string path = Path.Combine(outDir,
+						(split[0] == split[1]
+							? Path.GetFileName(split[0])
+							: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length))));
 
 					// Try to output the file
 					outDats[j].WriteToFile(path);
