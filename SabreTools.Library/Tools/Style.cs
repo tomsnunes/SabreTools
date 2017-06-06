@@ -107,6 +107,25 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Clean a hash string from a Listrom DAT
+		/// </summary>
+		/// <param name="hash">Hash string to sanitize</param>
+		/// <returns>Cleaned string</returns>
+		public static string CleanListromHashData(string hash)
+		{
+			if (hash.StartsWith("CRC"))
+			{
+				return hash.Substring(4, 8).ToLowerInvariant();
+			}
+			else if (hash.StartsWith("SHA1"))
+			{
+				return hash.Substring(5, 40).ToLowerInvariant();
+			}
+
+			return hash;
+		}
+
+		/// <summary>
 		/// Generate a proper outfile name based on a DAT and output directory
 		/// </summary>
 		/// <param name="outDir">Output directory</param>
@@ -156,25 +175,37 @@ namespace SabreTools.Library.Tools
 					|| (datdata.DatFormat & DatFormat.RomCenter) != 0))
 			{
 				outfileNames.Add(DatFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", datdata, overwrite));
-			};
+			}
+
+			//MAME Listroms
+			if ((datdata.DatFormat & DatFormat.Listroms) != 0
+				&& (datdata.DatFormat & DatFormat.AttractMode) == 0)
+			{
+				outfileNames.Add(DatFormat.Listroms, CreateOutfileNamesHelper(outDir, ".txt", datdata, overwrite));
+			}
+			if ((datdata.DatFormat & DatFormat.Listroms) != 0
+				&& (datdata.DatFormat & DatFormat.AttractMode) != 0)
+			{
+				outfileNames.Add(DatFormat.Listroms, CreateOutfileNamesHelper(outDir, ".lr.txt", datdata, overwrite));
+			}
 
 			// Logiqx XML
 			if ((datdata.DatFormat & DatFormat.Logiqx) != 0)
 			{
 				outfileNames.Add(DatFormat.Logiqx, CreateOutfileNamesHelper(outDir, ".xml", datdata, overwrite));
-			};
+			}
 
 			// Missfile
 			if ((datdata.DatFormat & DatFormat.MissFile) != 0
 				&& (datdata.DatFormat & DatFormat.AttractMode) == 0)
 			{
 				outfileNames.Add(DatFormat.MissFile, CreateOutfileNamesHelper(outDir, ".txt", datdata, overwrite));
-			};
+			}
 			if ((datdata.DatFormat & DatFormat.MissFile) != 0
 				&& (datdata.DatFormat & DatFormat.AttractMode) != 0)
 			{
 				outfileNames.Add(DatFormat.MissFile, CreateOutfileNamesHelper(outDir, ".miss.txt", datdata, overwrite));
-			};
+			}
 
 			// OfflineList
 			if (((datdata.DatFormat & DatFormat.OfflineList) != 0)

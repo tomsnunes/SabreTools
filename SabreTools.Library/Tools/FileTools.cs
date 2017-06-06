@@ -143,6 +143,12 @@ namespace SabreTools.Library.Tools
 					return DatFormat.RomCenter;
 				}
 
+				// If we have a listroms DAT
+				else if (first.StartsWith("roms required for driver"))
+				{
+					return DatFormat.Listroms;
+				}
+
 				// If we have a CMP-based DAT
 				else if (first.Contains("clrmamepro"))
 				{

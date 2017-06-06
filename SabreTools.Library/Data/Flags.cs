@@ -208,9 +208,10 @@ namespace SabreTools.Library.Data
 		MissFile = AttractMode << 1,
 		CSV = MissFile << 1,
 		TSV = CSV << 1,
+		Listroms = TSV << 1,
 
 		// SFV-similar Formats
-		RedumpSFV = TSV << 1,
+		RedumpSFV = Listroms << 1,
 		RedumpMD5 = RedumpSFV << 1,
 		RedumpSHA1 = RedumpMD5 << 1,
 		RedumpSHA256 = RedumpSHA1 << 1,
@@ -218,7 +219,7 @@ namespace SabreTools.Library.Data
 		RedumpSHA512 = RedumpSHA384 << 1,
 
 		// Specialty combinations
-        ALL = 0xFFFFF,
+        ALL = 0xFFFFFFF,
     }
 
     /// <summary>

@@ -221,6 +221,9 @@ Options:
 		-od, --output-dc	Output in DOSCenter format
 			Add outputting the created DAT to DOSCenter format
 			
+		-olr, --output-lr	Output in MAME Listrom format
+			Add outputting the created DAT to MAME Listrom format
+			
 		-om, --output-miss	Output in Missfile format
 			Add outputting the created DAT to GoodTools miss format
 			
@@ -833,6 +836,9 @@ Options:
 		
 		-od, --output-dc	Output in DOSCenter format
 			Add outputting the created DAT to DOSCenter format
+			
+		-olr, --output-lr	Output in MAME Listrom format
+			Add outputting the created DAT to MAME Listrom format
 			
 		-om, --output-miss	Output in Missfile format
 			Add outputting the created DAT to GoodTools miss format

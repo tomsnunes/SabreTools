@@ -110,6 +110,11 @@ namespace SabreTools
 				"Output in DOSCenter format",
 				FeatureType.Flag,
 				null));
+			datFromDir.AddFeature("output-lr", new Feature(
+				new List<string>() { "-olr", "--output-lr" },
+				"Output in MAME Listrom format",
+				FeatureType.Flag,
+				null));
 			datFromDir.AddFeature("output-miss", new Feature(
 				new List<string>() { "-om", "--output-miss" },
 				"Output in Missfile format",
@@ -759,6 +764,11 @@ namespace SabreTools
 			update.AddFeature("output-dc", new Feature(
 				new List<string>() { "-od", "--output-dc" },
 				"Output in DOSCenter format",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("output-lr", new Feature(
+				new List<string>() { "-olr", "--output-lr" },
+				"Output in MAME Listrom format",
 				FeatureType.Flag,
 				null));
 			update.AddFeature("output-miss", new Feature(

@@ -513,6 +513,10 @@ namespace SabreTools.Library.Dats
 					case DatFormat.DOSCenter:
 						state += "game (\n\tname \"" + rom.Machine.Name + ".zip\"\n";
 						break;
+					case DatFormat.Listroms:
+						state += "ROMs required for driver \"" + rom.Machine.Name + "\".\n" +
+							"Name                                   Size Checksum\n";
+						break;
 					case DatFormat.Logiqx:
 						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Machine.Name) + "\"" +
 								(ExcludeOf ? "" :
@@ -610,6 +614,9 @@ namespace SabreTools.Library.Dats
 					case DatFormat.ClrMamePro:
 					case DatFormat.DOSCenter:
 						state += (String.IsNullOrEmpty(rom.Machine.SampleOf) ? "" : "\tsampleof \"" + rom.Machine.SampleOf + "\"\n") + ")\n";
+						break;
+					case DatFormat.Listroms:
+						state += "\n";
 						break;
 					case DatFormat.Logiqx:
 						state += "\t</machine>\n";
@@ -878,6 +885,96 @@ namespace SabreTools.Library.Dats
 									+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date " + ((Rom)rom).Date : "")
 									+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
 									+ " )\n";
+								break;
+						}
+						break;
+					case DatFormat.Listroms:
+						switch (rom.Type)
+						{
+							case ItemType.Archive:
+							case ItemType.BiosSet:
+							case ItemType.Release:
+							case ItemType.Sample:
+								// We don't output these at all
+								break;
+							case ItemType.Disk:
+								// The name is padded out to a particular length
+								if (rom.Name.Length < 43)
+								{
+									state += rom.Name.PadRight(43, ' ');
+								}
+								else
+								{
+									state += rom.Name + "          ";
+								}
+
+								// If we have a baddump, put the first indicator
+								if (((Disk)rom).ItemStatus == ItemStatus.BadDump)
+								{
+									state += " BAD";
+								}
+
+								// If we have a nodump, write out the indicator
+								if (((Disk)rom).ItemStatus == ItemStatus.Nodump)
+								{
+									state += " NO GOOD DUMP KNOWN";
+								}
+								// Otherwise, write out the SHA-1 hash
+								else
+								{
+									state += " SHA1(" + ((Disk)rom).SHA1 + ")";
+								}
+
+								// If we have a baddump, put the second indicator
+								if (((Disk)rom).ItemStatus == ItemStatus.BadDump)
+								{
+									state += " BAD_DUMP";
+								}
+
+								state += "\n";
+								break;
+							case ItemType.Rom:
+								// The name is padded out to a particular length
+								if (rom.Name.Length < 40)
+								{
+									state += rom.Name.PadRight(43 - (((Rom)rom).Size.ToString().Length), ' ');
+								}
+								else
+								{
+									state += rom.Name + "          ";
+								}
+
+								// If we don't have a nodump, write out the size
+								if (((Rom)rom).ItemStatus != ItemStatus.Nodump)
+								{
+									state += ((Rom)rom).Size;
+								}
+
+								// If we have a baddump, put the first indicator
+								if (((Rom)rom).ItemStatus == ItemStatus.BadDump)
+								{
+									state += " BAD";
+								}
+
+								// If we have a nodump, write out the indicator
+								if (((Rom)rom).ItemStatus == ItemStatus.Nodump)
+								{
+									state += " NO GOOD DUMP KNOWN";
+								}
+								// Otherwise, write out the CRC and SHA-1 hashes
+								else
+								{
+									state += " CRC(" + ((Rom)rom).CRC + ")";
+									state += " SHA1(" + ((Rom)rom).SHA1 + ")";
+								}
+
+								// If we have a baddump, put the second indicator
+								if (((Rom)rom).ItemStatus == ItemStatus.BadDump)
+								{
+									state += " BAD_DUMP";
+								}
+
+								state += "\n";
 								break;
 						}
 						break;

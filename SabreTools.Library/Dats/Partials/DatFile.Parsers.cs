@@ -106,6 +106,9 @@ namespace SabreTools.Library.Dats
 					case DatFormat.CSV:
 						ParseCSVTSV(filename, sysid, srcid, ',', keep, clean, remUnicode);
 						break;
+					case DatFormat.Listroms:
+						ParseListroms(filename, sysid, srcid, keep, clean, remUnicode);
+						break;
 					case DatFormat.Logiqx:
 					case DatFormat.OfflineList:
 					case DatFormat.SabreDat:
@@ -2340,6 +2343,197 @@ namespace SabreTools.Library.Dats
 			}
 
 			xtr.Dispose();
+		}
+
+		/// <summary>
+		/// Parse a MAME Listroms DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// <remarks>
+		/// In a new style MAME listroms DAT, each game has the following format:
+		/// 
+		/// ROMs required for driver "005".
+		/// Name                                   Size Checksum
+		/// 1346b.cpu-u25                          2048 CRC(8e68533e) SHA1(a257c556d31691068ed5c991f1fb2b51da4826db)
+		/// 6331.sound-u8                            32 BAD CRC(1d298cb0) SHA1(bb0bb62365402543e3154b9a77be9c75010e6abc) BAD_DUMP
+		/// 
+		/// </remarks>
+		private void ParseListroms(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Miscellaneous
+			bool keep,
+			bool clean,
+			bool remUnicode)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
+
+			string gamename = "";
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine().Trim();
+
+				// If we have a blank line, we just skip it
+				if (String.IsNullOrEmpty(line))
+				{
+					continue;
+				}
+
+				// If we have the descriptor line, ignore it
+				else if (line == "Name                                   Size Checksum")
+				{
+					continue;
+				}
+
+				// If we have the beginning of a game, set the name of the game
+				else if (line.StartsWith("ROMs required for driver"))
+				{
+					gamename = Regex.Match(line, @"^ROMs required for driver ""(.*?)""\.").Groups[1].Value;
+				}
+
+				// Otherwise, we assume we have a rom that we need to add
+				else
+				{
+					// First we separate the ROM into pieces
+					string[] split = line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+
+					// Standard Disks have 2 pieces (name, sha1)
+					if (split.Length == 2)
+					{
+						Disk disk = new Disk()
+						{
+							Name = split[0],
+							SHA1 = Style.CleanListromHashData(split[1]),
+
+							Machine = new Machine()
+							{
+								Name = gamename,
+							},
+						};
+
+						ParseAddHelper(disk, clean, remUnicode);
+					}
+
+					// Baddump Disks have 4 pieces (name, BAD, sha1, BAD_DUMP)
+					else if (split.Length == 4 && line.EndsWith("BAD_DUMP"))
+					{
+						Disk disk = new Disk()
+						{
+							Name = split[0],
+							SHA1 = Style.CleanListromHashData(split[2]),
+							ItemStatus = ItemStatus.BadDump,
+
+							Machine = new Machine()
+							{
+								Name = gamename,
+							},
+						};
+
+						ParseAddHelper(disk, clean, remUnicode);
+					}
+
+					// Standard ROMs have 4 pieces (name, size, crc, sha1)
+					else if (split.Length == 4)
+					{
+						if (!Int64.TryParse(split[1], out long size))
+						{
+							size = 0;
+						}
+
+						Rom rom = new Rom()
+						{
+							Name = split[0],
+							Size = size,
+							CRC = Style.CleanListromHashData(split[2]),
+							SHA1 = Style.CleanListromHashData(split[3]),
+
+							Machine = new Machine()
+							{
+								Name = gamename,
+							},
+						};
+
+						ParseAddHelper(rom, clean, remUnicode);
+					}
+
+					// Nodump Disks have 5 pieces (name, NO, GOOD, DUMP, KNOWN)
+					else if (split.Length == 5 && line.EndsWith("NO GOOD DUMP KNOWN"))
+					{
+						Disk disk = new Disk()
+						{
+							Name = split[0],
+							ItemStatus = ItemStatus.Nodump,
+
+							Machine = new Machine()
+							{
+								Name = gamename,
+							},
+						};
+
+						ParseAddHelper(disk, clean, remUnicode);
+					}
+
+					// Baddump ROMs have 6 pieces (name, size, BAD, crc, sha1, BAD_DUMP)
+					else if (split.Length == 6 && line.EndsWith("BAD_DUMP"))
+					{
+						if (!Int64.TryParse(split[1], out long size))
+						{
+							size = 0;
+						}
+
+						Rom rom = new Rom()
+						{
+							Name = split[0],
+							Size = size,
+							CRC = Style.CleanListromHashData(split[3]),
+							SHA1 = Style.CleanListromHashData(split[4]),
+							ItemStatus = ItemStatus.BadDump,
+
+							Machine = new Machine()
+							{
+								Name = gamename,
+							},
+						};
+					}
+
+					// Nodump ROMs have 6 pieces (name, size, NO, GOOD, DUMP, KNOWN)
+					else if (split.Length == 6 && line.EndsWith("NO GOOD DUMP KNOWN"))
+					{
+						if (!Int64.TryParse(split[1], out long size))
+						{
+							size = 0;
+						}
+
+						Rom rom = new Rom()
+						{
+							Name = split[0],
+							Size = size,
+							ItemStatus = ItemStatus.Nodump,
+
+							Machine = new Machine()
+							{
+								Name = gamename,
+							},
+						};
+					}
+
+					// If we have something else, it's invalid
+					else
+					{
+						Globals.Logger.Warning("Invalid line detected: '" + line + "'");
+					}
+				}
+			}
 		}
 
 		/// <summary>

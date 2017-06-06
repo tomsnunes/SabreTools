@@ -448,6 +448,10 @@ namespace SabreTools
 					case "--of-as-game":
 						filter.IncludeOfInGame = true;
 						break;
+					case "-olr":
+					case "--output-lr":
+						datFormat |= DatFormat.Listroms;
+						break;
 					case "-om":
 					case "--output-miss":
 						datFormat |= DatFormat.MissFile;
