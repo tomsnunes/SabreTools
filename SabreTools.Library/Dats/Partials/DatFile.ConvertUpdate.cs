@@ -458,7 +458,7 @@ namespace SabreTools.Library.Dats
 							// Merged no-duplicates DAT
 							if ((diff & DiffMode.NoDupes) != 0)
 							{
-								DatItem newrom = item;
+								DatItem newrom = item.Clone() as DatItem;
 								newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
 
 								outerDiffData.Add(key, newrom);
@@ -471,7 +471,7 @@ namespace SabreTools.Library.Dats
 					{
 						if ((item.Dupe & DupeType.External) != 0)
 						{
-							DatItem newrom = item;
+							DatItem newrom = item.Clone() as DatItem;
 							newrom.Machine.Name += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
 
 							dupeData.Add(key, newrom);
