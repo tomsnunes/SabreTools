@@ -211,7 +211,7 @@ namespace SabreTools.Library.Dats
 						Globals.ParallelOptions,
 						datItem =>
 					{
-						if (!datItem.HasDuplicates(this))
+						if (!datItem.HasDuplicates(this, true))
 						{
 							lock (keepDatItems)
 							{
