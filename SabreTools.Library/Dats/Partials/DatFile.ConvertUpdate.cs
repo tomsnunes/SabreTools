@@ -175,6 +175,9 @@ namespace SabreTools.Library.Dats
 			bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			// First we want to parse all of the base DATs into the input
+			DateTime start = DateTime.Now;
+			Globals.Logger.User("Populating base DAT for comparison...");
+
 			List<string> baseFileNames = FileTools.GetOnlyFilesFromInputs(basePaths);
 			Parallel.ForEach(baseFileNames,
 				Globals.ParallelOptions,
@@ -182,6 +185,8 @@ namespace SabreTools.Library.Dats
 			{
 				Parse(path, 0, 0, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 			});
+
+			Globals.Logger.User("Populating base DAT complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// For comparison's sake, we want to use CRC as the base ordering
 			BucketBy(SortedBy.CRC, true);
