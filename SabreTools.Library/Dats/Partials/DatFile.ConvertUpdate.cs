@@ -197,7 +197,7 @@ namespace SabreTools.Library.Dats
 				Globals.ParallelOptions,
 				path =>
 			{
-				Globals.Logger.User("Comparing '" + path + "' to base DAT");
+				Globals.Logger.User("Comparing '" + path.Split('¬')[0] + "' to base DAT");
 
 				// First we parse in the DAT internally
 				DatFile intDat = new DatFile();

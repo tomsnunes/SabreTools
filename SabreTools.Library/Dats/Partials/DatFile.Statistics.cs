@@ -29,20 +29,145 @@ namespace SabreTools.Library.Dats
 		#region Statistics
 
 		/// <summary>
+		/// Add to the internal statistics given a DatItem
+		/// </summary>
+		/// <param name="item">Item to add info from</param>
+		private void AddItemStatistics(DatItem item)
+		{
+			// No matter what the item is, we increate the count
+			lock (_statslock)
+			{
+				_count += 1;
+
+				// Now we do different things for each item type
+
+				switch (item.Type)
+				{
+					case ItemType.Archive:
+						break;
+					case ItemType.BiosSet:
+						break;
+					case ItemType.Disk:
+						_diskCount += 1;
+						if (((Disk)item).ItemStatus != ItemStatus.Nodump)
+						{
+							_md5Count += (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
+							_sha1Count += (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
+							_sha256Count += (String.IsNullOrEmpty(((Disk)item).SHA256) ? 0 : 1);
+							_sha384Count += (String.IsNullOrEmpty(((Disk)item).SHA384) ? 0 : 1);
+							_sha512Count += (String.IsNullOrEmpty(((Disk)item).SHA512) ? 0 : 1);
+						}
+
+						_baddumpCount += (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
+						_nodumpCount += (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
+						break;
+					case ItemType.Release:
+						break;
+					case ItemType.Rom:
+						_romCount += 1;
+						if (((Rom)item).ItemStatus != ItemStatus.Nodump)
+						{
+							_totalSize += ((Rom)item).Size;
+							_crcCount += (String.IsNullOrEmpty(((Rom)item).CRC) ? 0 : 1);
+							_md5Count += (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
+							_sha1Count += (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
+							_sha256Count += (String.IsNullOrEmpty(((Rom)item).SHA256) ? 0 : 1);
+							_sha384Count += (String.IsNullOrEmpty(((Rom)item).SHA384) ? 0 : 1);
+							_sha512Count += (String.IsNullOrEmpty(((Rom)item).SHA512) ? 0 : 1);
+						}
+
+						_baddumpCount += (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
+						_nodumpCount += (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
+						break;
+					case ItemType.Sample:
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Remove from the internal statistics given a DatItem
+		/// </summary>
+		/// <param name="item">Item to remove info for</param>
+		private void RemoveItemStatistics(DatItem item)
+		{
+			// No matter what the item is, we increate the count
+			lock (_statslock)
+			{
+				_count -= 1;
+
+				// Now we do different things for each item type
+
+				switch (item.Type)
+				{
+					case ItemType.Archive:
+						break;
+					case ItemType.BiosSet:
+						break;
+					case ItemType.Disk:
+						_diskCount -= 1;
+						if (((Disk)item).ItemStatus != ItemStatus.Nodump)
+						{
+							_md5Count -= (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
+							_sha1Count -= (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
+							_sha256Count -= (String.IsNullOrEmpty(((Disk)item).SHA256) ? 0 : 1);
+							_sha384Count -= (String.IsNullOrEmpty(((Disk)item).SHA384) ? 0 : 1);
+							_sha512Count -= (String.IsNullOrEmpty(((Disk)item).SHA512) ? 0 : 1);
+						}
+
+						_baddumpCount -= (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
+						_nodumpCount -= (((Disk)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
+						break;
+					case ItemType.Release:
+						break;
+					case ItemType.Rom:
+						_romCount -= 1;
+						if (((Rom)item).ItemStatus != ItemStatus.Nodump)
+						{
+							_totalSize -= ((Rom)item).Size;
+							_crcCount -= (String.IsNullOrEmpty(((Rom)item).CRC) ? 0 : 1);
+							_md5Count -= (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
+							_sha1Count -= (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
+							_sha256Count -= (String.IsNullOrEmpty(((Rom)item).SHA256) ? 0 : 1);
+							_sha384Count -= (String.IsNullOrEmpty(((Rom)item).SHA384) ? 0 : 1);
+							_sha512Count -= (String.IsNullOrEmpty(((Rom)item).SHA512) ? 0 : 1);
+						}
+
+						_baddumpCount -= (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
+						_nodumpCount -= (((Rom)item).ItemStatus == ItemStatus.Nodump ? 1 : 0);
+						break;
+					case ItemType.Sample:
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Reset all statistics
+		/// </summary>
+		private void ResetStatistics()
+		{
+			_count = 0;
+			_romCount = 0;
+			_diskCount = 0;
+			_totalSize = 0;
+			_crcCount = 0;
+			_md5Count = 0;
+			_sha1Count = 0;
+			_sha256Count = 0;
+			_sha384Count = 0;
+			_sha512Count = 0;
+			_baddumpCount = 0;
+			_nodumpCount = 0;
+		}
+
+		/// <summary>
 		/// Recalculate the statistics for the Dat
 		/// </summary>
 		public void RecalculateStats()
 		{
 			// Wipe out any stats already there
-			RomCount = 0;
-			DiskCount = 0;
-			TotalSize = 0;
-			CRCCount = 0;
-			MD5Count = 0;
-			SHA1Count = 0;
-			SHA256Count = 0;
-			BaddumpCount = 0;
-			NodumpCount = 0;
+			ResetStatistics();
 
 			// If we have a blank Dat in any way, return
 			if (this == null || Count == 0)
@@ -57,41 +182,7 @@ namespace SabreTools.Library.Dats
 				List<DatItem> items = this[key];
 				Parallel.ForEach(items, Globals.ParallelOptions, item =>
 				{
-					switch (item.Type)
-					{
-						case ItemType.Archive:
-							break;
-						case ItemType.BiosSet:
-							break;
-						case ItemType.Disk:
-							Disk disk = (Disk)item;
-							DiskCount += 1;
-							MD5Count += (String.IsNullOrEmpty(disk.MD5) ? 0 : 1);
-							SHA1Count += (String.IsNullOrEmpty(disk.SHA1) ? 0 : 1);
-							SHA256Count += (String.IsNullOrEmpty(disk.SHA256) ? 0 : 1);
-							SHA384Count += (String.IsNullOrEmpty(disk.SHA384) ? 0 : 1);
-							SHA512Count += (String.IsNullOrEmpty(disk.SHA512) ? 0 : 1);
-							BaddumpCount += (disk.ItemStatus == ItemStatus.BadDump ? 1 : 0);
-							NodumpCount += (disk.ItemStatus == ItemStatus.Nodump ? 1 : 0);
-							break;
-						case ItemType.Release:
-							break;
-						case ItemType.Rom:
-							Rom rom = (Rom)item;
-							RomCount += 1;
-							TotalSize += (rom.ItemStatus == ItemStatus.Nodump ? 0 : rom.Size);
-							CRCCount += (String.IsNullOrEmpty(rom.CRC) ? 0 : 1);
-							MD5Count += (String.IsNullOrEmpty(rom.MD5) ? 0 : 1);
-							SHA1Count += (String.IsNullOrEmpty(rom.SHA1) ? 0 : 1);
-							SHA256Count += (String.IsNullOrEmpty(rom.SHA256) ? 0 : 1);
-							SHA384Count += (String.IsNullOrEmpty(rom.SHA384) ? 0 : 1);
-							SHA512Count += (String.IsNullOrEmpty(rom.SHA512) ? 0 : 1);
-							BaddumpCount += (rom.ItemStatus == ItemStatus.BadDump ? 1 : 0);
-							NodumpCount += (rom.ItemStatus == ItemStatus.Nodump ? 1 : 0);
-							break;
-						case ItemType.Sample:
-							break;
-					}
+					AddItemStatistics(item);
 				});
 			});
 		}
@@ -115,32 +206,32 @@ namespace SabreTools.Library.Dats
 			}
 
 			BucketBy(SortedBy.Game, false /* mergeroms */, norename: true);
-			if (TotalSize < 0)
+			if (_totalSize < 0)
 			{
-				TotalSize = Int64.MaxValue + TotalSize;
+				_totalSize = Int64.MaxValue + _totalSize;
 			}
 
 			// Log the results to screen
-			string results = @"For '" + FileName + @"':
+			string results = @"For '" + _fileName + @"':
 --------------------------------------------------
-    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
+    Uncompressed size:       " + Style.GetBytesReadable(_totalSize) + @"
     Games found:             " + (game == -1 ? Keys.Count() : game) + @"
-    Roms found:              " + RomCount + @"
-    Disks found:             " + DiskCount + @"
-    Roms with CRC:           " + CRCCount + @"
-    Roms with MD5:           " + MD5Count + @"
-    Roms with SHA-1:         " + SHA1Count + @"
-    Roms with SHA-256:       " + SHA256Count + @"
-    Roms with SHA-384:       " + SHA384Count + @"
-    Roms with SHA-512:       " + SHA512Count + "\n";
+    Roms found:              " + _romCount + @"
+    Disks found:             " + _diskCount + @"
+    Roms with CRC:           " + _crcCount + @"
+    Roms with MD5:           " + _md5Count + @"
+    Roms with SHA-1:         " + _sha1Count + @"
+    Roms with SHA-256:       " + _sha256Count + @"
+    Roms with SHA-384:       " + _sha384Count + @"
+    Roms with SHA-512:       " + _sha512Count + "\n";
 
 			if (baddumpCol)
 			{
-				results += "	Roms with BadDump status: " + BaddumpCount + "\n";
+				results += "	Roms with BadDump status: " + _baddumpCount + "\n";
 			}
 			if (nodumpCol)
 			{
-				results += "	Roms with Nodump status: " + NodumpCount + "\n";
+				results += "	Roms with Nodump status: " + _nodumpCount + "\n";
 			}
 
 			// For spacing between DATs
@@ -152,25 +243,25 @@ namespace SabreTools.Library.Dats
 			string line = "";
 			if (outputs.ContainsKey(StatDatFormat.None))
 			{
-				line = @"'" + FileName + @"':
+				line = @"'" + _fileName + @"':
 --------------------------------------------------
-    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
+    Uncompressed size:       " + Style.GetBytesReadable(_totalSize) + @"
     Games found:             " + (game == -1 ? Keys.Count() : game) + @"
-    Roms found:              " + RomCount + @"
-    Disks found:             " + DiskCount + @"
-    Roms with CRC:           " + CRCCount + @"
-    Roms with SHA-1:         " + SHA1Count + @"
-    Roms with SHA-256:       " + SHA256Count + @"
-    Roms with SHA-384:       " + SHA384Count + @"
-    Roms with SHA-512:       " + SHA512Count + "\n";
+    Roms found:              " + _romCount + @"
+    Disks found:             " + _diskCount + @"
+    Roms with CRC:           " + _crcCount + @"
+    Roms with SHA-1:         " + _sha1Count + @"
+    Roms with SHA-256:       " + _sha256Count + @"
+    Roms with SHA-384:       " + _sha384Count + @"
+    Roms with SHA-512:       " + _sha512Count + "\n";
 
 				if (baddumpCol)
 				{
-					line += "	Roms with BadDump status: " + BaddumpCount + "\n";
+					line += "	Roms with BadDump status: " + _baddumpCount + "\n";
 				}
 				if (nodumpCol)
 				{
-					line += "	Roms with Nodump status: " + NodumpCount + "\n";
+					line += "	Roms with Nodump status: " + _nodumpCount + "\n";
 				}
 
 				// For spacing between DATs
@@ -180,25 +271,25 @@ namespace SabreTools.Library.Dats
 			}
 			if (outputs.ContainsKey(StatDatFormat.CSV))
 			{
-				line = "\"" + FileName + "\","
-					+ "\"" + TotalSize + "\","
+				line = "\"" + _fileName + "\","
+					+ "\"" + _totalSize + "\","
 					+ "\"" + (game == -1 ? Keys.Count() : game) + "\","
-					+ "\"" + RomCount + "\","
-					+ "\"" + DiskCount + "\","
-					+ "\"" + CRCCount + "\","
-					+ "\"" + MD5Count + "\","
-					+ "\"" + SHA1Count + "\","
-					+ "\"" + SHA256Count + "\","
-					+ "\"" + SHA384Count + "\","
-					+ "\"" + SHA512Count + "\"";
+					+ "\"" + _romCount + "\","
+					+ "\"" + _diskCount + "\","
+					+ "\"" + _crcCount + "\","
+					+ "\"" + _md5Count + "\","
+					+ "\"" + _sha1Count + "\","
+					+ "\"" + _sha256Count + "\","
+					+ "\"" + _sha384Count + "\","
+					+ "\"" + _sha512Count + "\"";
 
 				if (baddumpCol)
 				{
-					line += ",\"" + BaddumpCount + "\"";
+					line += ",\"" + _baddumpCount + "\"";
 				}
 				if (nodumpCol)
 				{
-					line += ",\"" + NodumpCount + "\"";
+					line += ",\"" + _nodumpCount + "\"";
 				}
 
 				line += "\n";
@@ -206,25 +297,25 @@ namespace SabreTools.Library.Dats
 			}
 			if (outputs.ContainsKey(StatDatFormat.HTML))
 			{
-				line = "\t\t\t<tr" + (FileName.StartsWith("DIR: ")
-							? " class=\"dir\"><td>" + HttpUtility.HtmlEncode(FileName.Remove(0, 5))
-							: "><td>" + HttpUtility.HtmlEncode(FileName)) + "</td>"
-						+ "<td align=\"right\">" + Style.GetBytesReadable(TotalSize) + "</td>"
+				line = "\t\t\t<tr" + (_fileName.StartsWith("DIR: ")
+							? " class=\"dir\"><td>" + HttpUtility.HtmlEncode(_fileName.Remove(0, 5))
+							: "><td>" + HttpUtility.HtmlEncode(_fileName)) + "</td>"
+						+ "<td align=\"right\">" + Style.GetBytesReadable(_totalSize) + "</td>"
 						+ "<td align=\"right\">" + (game == -1 ? Keys.Count() : game) + "</td>"
-						+ "<td align=\"right\">" + RomCount + "</td>"
-						+ "<td align=\"right\">" + DiskCount + "</td>"
-						+ "<td align=\"right\">" + CRCCount + "</td>"
-						+ "<td align=\"right\">" + MD5Count + "</td>"
-						+ "<td align=\"right\">" + SHA1Count + "</td>"
-						+ "<td align=\"right\">" + SHA256Count + "</td>";
+						+ "<td align=\"right\">" + _romCount + "</td>"
+						+ "<td align=\"right\">" + _diskCount + "</td>"
+						+ "<td align=\"right\">" + _crcCount + "</td>"
+						+ "<td align=\"right\">" + _md5Count + "</td>"
+						+ "<td align=\"right\">" + _sha1Count + "</td>"
+						+ "<td align=\"right\">" + _sha256Count + "</td>";
 
 				if (baddumpCol)
 				{
-					line += "<td align=\"right\">" + BaddumpCount + "</td>";
+					line += "<td align=\"right\">" + _baddumpCount + "</td>";
 				}
 				if (nodumpCol)
 				{
-					line += "<td align=\"right\">" + NodumpCount + "</td>";
+					line += "<td align=\"right\">" + _nodumpCount + "</td>";
 				}
 
 				line += "</tr>\n";
@@ -232,25 +323,25 @@ namespace SabreTools.Library.Dats
 			}
 			if (outputs.ContainsKey(StatDatFormat.TSV))
 			{
-				line = "\"" + FileName + "\"\t"
-						+ "\"" + TotalSize + "\"\t"
+				line = "\"" + _fileName + "\"\t"
+						+ "\"" + _totalSize + "\"\t"
 						+ "\"" + (game == -1 ? Keys.Count() : game) + "\"\t"
-						+ "\"" + RomCount + "\"\t"
-						+ "\"" + DiskCount + "\"\t"
-						+ "\"" + CRCCount + "\"\t"
-						+ "\"" + MD5Count + "\"\t"
-						+ "\"" + SHA1Count + "\"\t"
-						+ "\"" + SHA256Count + "\"\t"
-						+ "\"" + SHA384Count + "\"\t"
-						+ "\"" + SHA512Count + "\"";
+						+ "\"" + _romCount + "\"\t"
+						+ "\"" + _diskCount + "\"\t"
+						+ "\"" + _crcCount + "\"\t"
+						+ "\"" + _md5Count + "\"\t"
+						+ "\"" + _sha1Count + "\"\t"
+						+ "\"" + _sha256Count + "\"\t"
+						+ "\"" + _sha384Count + "\"\t"
+						+ "\"" + _sha512Count + "\"";
 
 				if (baddumpCol)
 				{
-					line += "\t\"" + BaddumpCount + "\"";
+					line += "\t\"" + _baddumpCount + "\"";
 				}
 				if (nodumpCol)
 				{
-					line += "\t\"" + NodumpCount + "\"";
+					line += "\t\"" + _nodumpCount + "\"";
 				}
 
 				line += "\n";
@@ -334,6 +425,8 @@ namespace SabreTools.Library.Dats
 			long totalMD5 = 0;
 			long totalSHA1 = 0;
 			long totalSHA256 = 0;
+			long totalSHA384 = 0;
+			long totalSHA512 = 0;
 			long totalBaddump = 0;
 			long totalNodump = 0;
 
@@ -348,6 +441,8 @@ namespace SabreTools.Library.Dats
 			long dirMD5 = 0;
 			long dirSHA1 = 0;
 			long dirSHA256 = 0;
+			long dirSHA384 = 0;
+			long dirSHA512 = 0;
 			long dirBaddump = 0;
 			long dirNodump = 0;
 
@@ -366,16 +461,18 @@ namespace SabreTools.Library.Dats
 
 					DatFile lastdirdat = new DatFile
 					{
-						FileName = "DIR: " + HttpUtility.HtmlEncode(lastdir.Remove(0, basepath.Length + (basepath.Length == 0 ? 0 : 1))),
-						TotalSize = dirSize,
-						RomCount = dirRom,
-						DiskCount = dirDisk,
-						CRCCount = dirCRC,
-						MD5Count = dirMD5,
-						SHA1Count = dirSHA1,
-						SHA256Count = dirSHA256,
-						BaddumpCount = dirBaddump,
-						NodumpCount = dirNodump,
+						_fileName = "DIR: " + HttpUtility.HtmlEncode(lastdir.Remove(0, basepath.Length + (basepath.Length == 0 ? 0 : 1))),
+						_totalSize = dirSize,
+						_romCount = dirRom,
+						_diskCount = dirDisk,
+						_crcCount = dirCRC,
+						_md5Count = dirMD5,
+						_sha1Count = dirSHA1,
+						_sha256Count = dirSHA256,
+						_sha384Count = dirSHA384,
+						_sha512Count = dirSHA512,
+						_baddumpCount = dirBaddump,
+						_nodumpCount = dirNodump,
 					};
 					lastdirdat.OutputStats(outputs, statDatFormat,
 						game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
@@ -395,6 +492,8 @@ namespace SabreTools.Library.Dats
 					dirMD5 = 0;
 					dirSHA1 = 0;
 					dirSHA256 = 0;
+					dirSHA384 = 0;
+					dirSHA512 = 0;
 					dirBaddump = 0;
 					dirNodump = 0;
 				}
@@ -422,6 +521,8 @@ namespace SabreTools.Library.Dats
 				dirMD5 += datdata.MD5Count;
 				dirSHA1 += datdata.SHA1Count;
 				dirSHA256 += datdata.SHA256Count;
+				dirSHA384 += datdata.SHA384Count;
+				dirSHA512 += datdata.SHA512Count;
 				dirBaddump += datdata.BaddumpCount;
 				dirNodump += datdata.NodumpCount;
 
@@ -434,6 +535,8 @@ namespace SabreTools.Library.Dats
 				totalMD5 += datdata.MD5Count;
 				totalSHA1 += datdata.SHA1Count;
 				totalSHA256 += datdata.SHA256Count;
+				totalSHA384 += datdata.SHA384Count;
+				totalSHA512 += datdata.SHA512Count;
 				totalBaddump += datdata.BaddumpCount;
 				totalNodump += datdata.NodumpCount;
 
@@ -448,16 +551,18 @@ namespace SabreTools.Library.Dats
 			{
 				DatFile dirdat = new DatFile
 				{
-					FileName = "DIR: " + HttpUtility.HtmlEncode(lastdir.Remove(0, basepath.Length + (basepath.Length == 0 ? 0 : 1))),
-					TotalSize = dirSize,
-					RomCount = dirRom,
-					DiskCount = dirDisk,
-					CRCCount = dirCRC,
-					MD5Count = dirMD5,
-					SHA1Count = dirSHA1,
-					SHA256Count = dirSHA256,
-					BaddumpCount = dirBaddump,
-					NodumpCount = dirNodump,
+					_fileName = "DIR: " + HttpUtility.HtmlEncode(lastdir.Remove(0, basepath.Length + (basepath.Length == 0 ? 0 : 1))),
+					_totalSize = dirSize,
+					_romCount = dirRom,
+					_diskCount = dirDisk,
+					_crcCount = dirCRC,
+					_md5Count = dirMD5,
+					_sha1Count = dirSHA1,
+					_sha256Count = dirSHA256,
+					_sha384Count = dirSHA384,
+					_sha512Count = dirSHA512,
+					_baddumpCount = dirBaddump,
+					_nodumpCount = dirNodump,
 				};
 				dirdat.OutputStats(outputs, statDatFormat,
 					game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
@@ -478,21 +583,25 @@ namespace SabreTools.Library.Dats
 			dirMD5 = 0;
 			dirSHA1 = 0;
 			dirSHA256 = 0;
+			dirSHA384 = 0;
+			dirSHA512 = 0;
 			dirNodump = 0;
 
 			// Output total DAT stats
 			DatFile totaldata = new DatFile
 			{
-				FileName = "DIR: All DATs",
-				TotalSize = totalSize,
-				RomCount = totalRom,
-				DiskCount = totalDisk,
-				CRCCount = totalCRC,
-				MD5Count = totalMD5,
-				SHA1Count = totalSHA1,
-				SHA256Count = totalSHA256,
-				BaddumpCount = totalBaddump,
-				NodumpCount = totalNodump,
+				_fileName = "DIR: All DATs",
+				_totalSize = totalSize,
+				_romCount = totalRom,
+				_diskCount = totalDisk,
+				_crcCount = totalCRC,
+				_md5Count = totalMD5,
+				_sha1Count = totalSHA1,
+				_sha256Count = totalSHA256,
+				_sha384Count = totalSHA384,
+				_sha512Count = totalSHA512,
+				_baddumpCount = totalBaddump,
+				_nodumpCount = totalNodump,
 			};
 			totaldata.OutputStats(outputs, statDatFormat,
 				game: totalGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);

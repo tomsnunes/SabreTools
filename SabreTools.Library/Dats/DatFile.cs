@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
 
 using SabreTools.Library.Data;
 
@@ -48,6 +48,8 @@ namespace SabreTools.Library.Dats
 		private bool _romba;
 
 		// Statistical data related to the DAT
+		private object _statslock = new object();
+		private long _count;
 		private long _romCount;
 		private long _diskCount;
 		private long _totalSize;
@@ -183,7 +185,6 @@ namespace SabreTools.Library.Dats
 		public SortedBy SortedBy
 		{
 			get { return _sortedBy; }
-			set { _sortedBy = value; }
 		}
 
 		// Data specific to the Miss DAT type
@@ -234,60 +235,53 @@ namespace SabreTools.Library.Dats
 		}
 
 		// Statistical data related to the DAT
+		public long Count
+		{
+			get { return _count; }
+		}
 		public long RomCount
 		{
 			get { return _romCount; }
-			set { _romCount = value; }
 		}
 		public long DiskCount
 		{
 			get { return _diskCount; }
-			set { _diskCount = value; }
 		}
 		public long TotalSize
 		{
 			get { return _totalSize; }
-			set { _totalSize = value; }
 		}
 		public long CRCCount
 		{
 			get { return _crcCount; }
-			set { _crcCount = value; }
 		}
 		public long MD5Count
 		{
 			get { return _md5Count; }
-			set { _md5Count = value; }
 		}
 		public long SHA1Count
 		{
 			get { return _sha1Count; }
-			set { _sha1Count = value; }
 		}
 		public long SHA256Count
 		{
 			get { return _sha256Count; }
-			set { _sha256Count = value; }
 		}
 		public long SHA384Count
 		{
 			get { return _sha384Count; }
-			set { _sha384Count = value; }
 		}
 		public long SHA512Count
 		{
 			get { return _sha512Count; }
-			set { _sha512Count = value; }
 		}
 		public long BaddumpCount
 		{
 			get { return _baddumpCount; }
-			set { _baddumpCount = value; }
 		}
 		public long NodumpCount
 		{
 			get { return _nodumpCount; }
-			set { _nodumpCount = value; }
 		}
 
 		#endregion
@@ -347,7 +341,7 @@ namespace SabreTools.Library.Dats
 		/// <summary>
 		/// Add a new key to the file dictionary
 		/// </summary>
-		/// <param name="key">Key in the dictionary to add to</param>
+		/// <param name="key">Key in the dictionary to add</param>
 		public void Add(string key)
 		{
 			// If the dictionary is null, create it
@@ -379,16 +373,16 @@ namespace SabreTools.Library.Dats
 				_files = new SortedDictionary<string, List<DatItem>>();
 			}
 
+			// Add the key, if necessary
+			Add(key);
+
 			lock (_files)
 			{
-				// If the key is missing from the dictionary, add it
-				if (!_files.ContainsKey(key))
-				{
-					_files.Add(key, new List<DatItem>());
-				}
-
 				// Now add the value
 				_files[key].Add(value);
+
+				// Now update the statistics
+				AddItemStatistics(value);
 			}
 		}
 
@@ -405,16 +399,19 @@ namespace SabreTools.Library.Dats
 				_files = new SortedDictionary<string, List<DatItem>>();
 			}
 
+			// Add the key, if necessary
+			Add(key);
+
 			lock (_files)
 			{
-				// If the key is missing from the dictionary, add it
-				if (!_files.ContainsKey(key))
-				{
-					_files.Add(key, new List<DatItem>());
-				}
-
 				// Now add the value
 				_files[key].AddRange(value);
+
+				// Now update the statistics
+				foreach (DatItem item in value)
+				{
+					AddItemStatistics(item);
+				}
 			}
 		}
 
@@ -444,38 +441,14 @@ namespace SabreTools.Library.Dats
 		}
 
 		/// <summary>
-		/// Get the number of DatItems in the file dictionary
-		/// </summary>
-		/// <returns>Number of DatItems in the file dictionary</returns>
-		public long Count
-		{
-			get
-			{
-				// If the dictionary is null, create it
-				if (_files == null)
-				{
-					_files = new SortedDictionary<string, List<DatItem>>();
-				}
-
-				lock (_files)
-				{
-					int count = 0;
-					foreach (string key in _files.Keys)
-					{
-						count += _files[key].Count;
-					}
-
-					return count;
-				}
-			}
-		}
-
-		/// <summary>
 		/// Delete the file dictionary
 		/// </summary>
 		public void Delete()
 		{
 			_files = null;
+
+			// Reset statistics
+			ResetStatistics();
 		}
 
 		/// <summary>
@@ -516,6 +489,12 @@ namespace SabreTools.Library.Dats
 				// If the key is in the dictionary, remove it
 				if (_files.ContainsKey(key))
 				{
+					// Remove the statistics first
+					foreach (DatItem item in _files[key])
+					{
+						RemoveItemStatistics(item);
+					}
+
 					_files.Remove(key);
 				}
 			}
@@ -527,15 +506,9 @@ namespace SabreTools.Library.Dats
 		public void Reset()
 		{
 			_files = new SortedDictionary<string, List<DatItem>>();
-		}
 
-		/// <summary>
-		/// Set a new file dictionary from an existing one
-		/// </summary>
-		/// <param name="newdict"></param>
-		public void Set(SortedDictionary<string, List<DatItem>> newdict)
-		{
-			_files = newdict;
+			// Reset statistics
+			ResetStatistics();
 		}
 
 		#endregion
