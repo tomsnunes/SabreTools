@@ -197,12 +197,14 @@ namespace SabreTools.Library.Dats
 				Globals.ParallelOptions,
 				path =>
 			{
+				Globals.Logger.User("Comparing '" + path + "' to base DAT");
+
 				// First we parse in the DAT internally
 				DatFile intDat = new DatFile();
 				intDat.Parse(path.Split('¬')[0], 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 
 				// For comparison's sake, we want to use CRC as the base ordering
-				BucketBy(SortedBy.CRC, true);
+				intDat.BucketBy(SortedBy.CRC, true);
 
 				// Then we do a hashwise comparison against the base DAT
 				List<string> keys = intDat.Keys.ToList();
