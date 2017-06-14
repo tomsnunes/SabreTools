@@ -32,23 +32,17 @@ namespace SabreTools.Library.Dats
 		{
 			// Make sure all of the extensions have a dot at the beginning
 			List<string> newExtA = new List<string>();
-			Parallel.ForEach(extA, Globals.ParallelOptions, s =>
+			foreach (string s in extA)
 			{
-				lock (newExtA)
-				{
-					newExtA.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
-				}
-			});
+				newExtA.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
+			}
 			string newExtAString = string.Join(",", newExtA);
 
 			List<string> newExtB = new List<string>();
-			Parallel.ForEach(extB, Globals.ParallelOptions, s =>
+			foreach (string s in extB)
 			{
-				lock (newExtB)
-				{
-					newExtB.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
-				}
-			});
+				newExtB.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
+			}
 			string newExtBString = string.Join(",", newExtB);
 
 			// Set all of the appropriate outputs for each of the subsets
@@ -94,7 +88,7 @@ namespace SabreTools.Library.Dats
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];
-				Parallel.ForEach(items, Globals.ParallelOptions, item =>
+				foreach (DatItem item in items)
 				{
 					if (newExtA.Contains(Path.GetExtension(item.Name.ToUpperInvariant())))
 					{
@@ -109,7 +103,7 @@ namespace SabreTools.Library.Dats
 						datdataA.Add(key, item);
 						datdataB.Add(key, item);
 					}
-				});
+				}
 			});
 
 			// Get the output directory
@@ -316,7 +310,7 @@ namespace SabreTools.Library.Dats
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];
-				Parallel.ForEach(items, Globals.ParallelOptions, item =>
+				foreach (DatItem item in items)
 				{
 					// If the file is not a Rom or Disk, continue
 					if (item.Type != ItemType.Disk && item.Type != ItemType.Rom)
@@ -370,7 +364,7 @@ namespace SabreTools.Library.Dats
 					{
 						other.Add(key, item);
 					}
-				});
+				}
 			});
 
 			// Get the output directory
@@ -593,7 +587,7 @@ namespace SabreTools.Library.Dats
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];
-				Parallel.ForEach(items, Globals.ParallelOptions, item =>
+				foreach(DatItem item in items)
 				{
 					// If the file is a Rom
 					if (item.Type == ItemType.Rom)
@@ -610,7 +604,7 @@ namespace SabreTools.Library.Dats
 					{
 						sampledat.Add(key, item);
 					}
-				});
+				}
 			});
 
 			// Get the output directory

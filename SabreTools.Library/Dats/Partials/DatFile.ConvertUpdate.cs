@@ -541,7 +541,7 @@ namespace SabreTools.Library.Dats
 				{
 					List<DatItem> items = this[key].ToList();
 					List<DatItem> newItems = new List<DatItem>();
-					Parallel.ForEach(items, Globals.ParallelOptions, item =>
+					foreach (DatItem item in items)
 					{
 						DatItem newItem = item;
 						string filename = inputs[newItem.SystemID].Split('¬')[0];
@@ -553,11 +553,8 @@ namespace SabreTools.Library.Dats
 							+ Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar
 							+ newItem.Machine.Name;
 
-						lock (newItems)
-						{
-							newItems.Add(newItem);
-						}
-					});
+						newItems.Add(newItem);
+					}
 
 					Remove(key);
 					AddRange(key, newItems);

@@ -51,7 +51,7 @@ namespace SabreTools.Library.Dats
 						List<DatItem> roms = this[key];
 
 						// Now add each of the roms to their respective games
-						Parallel.ForEach(roms, Globals.ParallelOptions, rom =>
+						foreach (DatItem rom in roms)
 						{
 							string newkey = "";
 
@@ -132,7 +132,7 @@ namespace SabreTools.Library.Dats
 								}
 								sortable[newkey].Add(rom);
 							}
-						});
+						}
 					});
 
 					// Now go through and sort all of the individual lists
@@ -182,7 +182,7 @@ namespace SabreTools.Library.Dats
 				// For every item in the current key
 				List<DatItem> items = this[key];
 				List<DatItem> newitems = new List<DatItem>();
-				Parallel.ForEach(items, Globals.ParallelOptions, item =>
+				foreach (DatItem item in items)
 				{
 					// If the rom passes the filter, include it
 					if (filter.ItemPasses(item))
@@ -212,7 +212,7 @@ namespace SabreTools.Library.Dats
 							newitems.Add(item);
 						}
 					}
-				});
+				}
 
 				Remove(key);
 				AddRange(key, newitems);
@@ -232,14 +232,14 @@ namespace SabreTools.Library.Dats
 				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
 					List<DatItem> items = this[key];
-					Parallel.ForEach(items, Globals.ParallelOptions, item =>
+					foreach (DatItem item in items)
 					{
 						// If the key mapping doesn't exist, add it
 						if (!mapping.ContainsKey(item.Machine.Name))
 						{
 							mapping.TryAdd(item.Machine.Name, item.Machine.Description.Replace('/', '_').Replace("\"", "''"));
 						}
-					});
+					}
 				});
 
 				// Now we loop through every item and update accordingly
@@ -248,41 +248,35 @@ namespace SabreTools.Library.Dats
 				{
 					List<DatItem> items = this[key];
 					List<DatItem> newItems = new List<DatItem>();
-					Parallel.ForEach(items, Globals.ParallelOptions, item =>
+					foreach (DatItem item in items)
 					{
-						// Clone the item first for easier working
-						DatItem newItem = (DatItem)item.Clone();
-
 						// Update machine name
-						if (!String.IsNullOrEmpty(newItem.Machine.Name) && mapping.ContainsKey(newItem.Machine.Name))
+						if (!String.IsNullOrEmpty(item.Machine.Name) && mapping.ContainsKey(item.Machine.Name))
 						{
-							newItem.Machine.Name = mapping[newItem.Machine.Name];
+							item.Machine.Name = mapping[item.Machine.Name];
 						}
 
 						// Update cloneof
-						if (!String.IsNullOrEmpty(newItem.Machine.CloneOf) && mapping.ContainsKey(newItem.Machine.CloneOf))
+						if (!String.IsNullOrEmpty(item.Machine.CloneOf) && mapping.ContainsKey(item.Machine.CloneOf))
 						{
-							newItem.Machine.CloneOf = mapping[newItem.Machine.CloneOf];
+							item.Machine.CloneOf = mapping[item.Machine.CloneOf];
 						}
 
 						// Update romof
-						if (!String.IsNullOrEmpty(newItem.Machine.RomOf) && mapping.ContainsKey(newItem.Machine.RomOf))
+						if (!String.IsNullOrEmpty(item.Machine.RomOf) && mapping.ContainsKey(item.Machine.RomOf))
 						{
-							newItem.Machine.RomOf = mapping[newItem.Machine.RomOf];
+							item.Machine.RomOf = mapping[item.Machine.RomOf];
 						}
 
 						// Update sampleof
-						if (!String.IsNullOrEmpty(newItem.Machine.SampleOf) && mapping.ContainsKey(newItem.Machine.SampleOf))
+						if (!String.IsNullOrEmpty(item.Machine.SampleOf) && mapping.ContainsKey(item.Machine.SampleOf))
 						{
-							newItem.Machine.SampleOf = mapping[newItem.Machine.SampleOf];
+							item.Machine.SampleOf = mapping[item.Machine.SampleOf];
 						}
 
-						// Add the new newItem to the output list
-						lock (newItems)
-						{
-							newItems.Add(newItem);
-						}
-					});
+						// Add the new item to the output list
+						items.Add(item);
+					}
 
 					// Replace the old list of roms with the new one
 					Remove(key);
@@ -308,7 +302,7 @@ namespace SabreTools.Library.Dats
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];
-				Parallel.For(0, items.Count, Globals.ParallelOptions, j =>
+				for (int j = 0; j < items.Count; j++)
 				{
 					DatItem item = items[j];
 					if (item.Type == ItemType.Rom)
@@ -335,10 +329,7 @@ namespace SabreTools.Library.Dats
 							rom.SHA512 = null;
 						}
 
-						lock (items)
-						{
-							items[j] = rom;
-						}
+						items[j] = rom;
 					}
 					else if (item.Type == ItemType.Disk)
 					{
@@ -364,12 +355,9 @@ namespace SabreTools.Library.Dats
 							disk.SHA512 = null;
 						}
 
-						lock (items)
-						{
-							items[j] = disk;
-						}
+						items[j] = disk;
 					}
-				});
+				}
 
 				Remove(key);
 				AddRange(key, items);
