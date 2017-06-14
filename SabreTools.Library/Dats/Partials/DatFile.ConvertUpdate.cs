@@ -250,6 +250,9 @@ namespace SabreTools.Library.Dats
 				{
 					intDat.WriteToFile(interOutDir);
 				}
+
+				// Due to possible memory requirements, each DAT, after written, will be nulled out
+				intDat = null;
 			});
 		}
 
