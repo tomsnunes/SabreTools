@@ -197,11 +197,14 @@ namespace SabreTools.Library.Dats
 				Globals.ParallelOptions,
 				path =>
 			{
-				Globals.Logger.User("Comparing '" + path.Split('¬')[0] + "' to base DAT");
+				// Get the two halves of the path
+				string[] splitpath = path.Split('¬');
+
+				Globals.Logger.User("Comparing '" + splitpath[0] + "' to base DAT");
 
 				// First we parse in the DAT internally
 				DatFile intDat = new DatFile();
-				intDat.Parse(path.Split('¬')[0], 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
+				intDat.Parse(splitpath[0], 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 
 				// For comparison's sake, we want to use CRC as the base ordering
 				intDat.BucketBy(SortedBy.CRC, true);
@@ -214,18 +217,13 @@ namespace SabreTools.Library.Dats
 				{
 					List<DatItem> datItems = intDat[key];
 					List<DatItem> keepDatItems = new List<DatItem>();
-					Parallel.ForEach(datItems,
-						Globals.ParallelOptions,
-						datItem =>
+					foreach (DatItem datItem in datItems)
 					{
 						if (!datItem.HasDuplicates(this, true))
 						{
-							lock (keepDatItems)
-							{
-								keepDatItems.Add(datItem);
-							}
+							keepDatItems.Add(datItem);
 						}
-					});
+					}
 
 					// Now add the new list to the key
 					intDat.Remove(key);
@@ -240,11 +238,11 @@ namespace SabreTools.Library.Dats
 				}
 				else if (!String.IsNullOrEmpty(interOutDir))
 				{
-					interOutDir = Path.Combine(interOutDir, path.Split('¬')[1]);
+					interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, splitpath[0].Remove(0, splitpath[1].Length + 1)));
 				}
 				else
 				{
-					interOutDir = Path.Combine(Environment.CurrentDirectory, path.Split('¬')[1]);
+					interOutDir = Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, splitpath[0].Remove(0, splitpath[1].Length + 1)));
 				}
 
 				// Once we're done, we check to see if there's anything to write out
@@ -316,17 +314,17 @@ namespace SabreTools.Library.Dats
 					return;
 				}
 
-				Parallel.ForEach(items, Globals.ParallelOptions, item =>
+				foreach (DatItem item in items)
 				{
 					// There's odd cases where there are items with System ID < 0. Skip them for now
 					if (item.SystemID < 0)
 					{
 						Globals.Logger.Warning("Item found with a <0 SystemID: " + item.Name);
-						return;
+						continue;
 					}
 
 					outDats[item.SystemID].Add(key, item);
-				});
+				}
 			});
 
 			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
@@ -449,7 +447,7 @@ namespace SabreTools.Library.Dats
 				}
 
 				// Loop through and add the items correctly
-				Parallel.ForEach(items, Globals.ParallelOptions, item =>
+				foreach(DatItem item in items)
 				{
 					// No duplicates
 					if ((diff & DiffMode.NoDupes) != 0 || (diff & DiffMode.Individuals) != 0)
@@ -484,7 +482,7 @@ namespace SabreTools.Library.Dats
 							dupeData.Add(key, newrom);
 						}
 					}
-				});
+				}
 			});
 
 			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));

@@ -180,10 +180,10 @@ namespace SabreTools.Library.Dats
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];
-				Parallel.ForEach(items, Globals.ParallelOptions, item =>
+				foreach(DatItem item in items)
 				{
 					AddItemStatistics(item);
-				});
+				}
 			});
 		}
 
