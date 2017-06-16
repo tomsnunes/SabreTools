@@ -3018,14 +3018,14 @@ namespace SabreTools.Library.Dats
 			}
 
 			// If we're in cleaning mode, sanitize the game name
-			item.Machine.Name = (clean ? Style.CleanGameName(item.Machine.Name) : item.Machine.Name);
+			item.Machine.UpdateName((clean ? Style.CleanGameName(item.Machine.Name) : item.Machine.Name));
 
 			// If we're stripping unicode characters, do so from all relevant things
 			if (remUnicode)
 			{
 				item.Name = Style.RemoveUnicodeCharacters(item.Name);
-				item.Machine.Name = Style.RemoveUnicodeCharacters(item.Machine.Name);
-				item.Machine.Description = Style.RemoveUnicodeCharacters(item.Machine.Description);
+				item.Machine.UpdateName(Style.RemoveUnicodeCharacters(item.Machine.Name));
+				item.Machine.UpdateDescription(Style.RemoveUnicodeCharacters(item.Machine.Description));
 			}
 
 			// If we have a Rom or a Disk, clean the hash data

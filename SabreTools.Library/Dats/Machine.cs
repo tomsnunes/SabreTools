@@ -5,25 +5,26 @@ using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Dats
 {
-	public class Machine : ICloneable
+	public struct Machine
 	{
 		#region Protected instance variables
 
 		// Machine information
-		protected string _name;
-		protected string _comment;
-		protected string _description;
-		protected string _year;
-		protected string _manufacturer;
-		protected string _romOf;
-		protected string _cloneOf;
-		protected string _sampleOf;
-		protected string _sourceFile;
-		protected bool? _runnable;
-		protected string _board;
-		protected string _rebuildTo;
-		protected List<string> _devices;
-		protected MachineType _machineType;
+		private string _name;
+		private string _comment;
+		private string _description;
+		private string _year;
+		private string _manufacturer;
+		private string _romOf;
+		private string _cloneOf;
+		private string _sampleOf;
+		private string _sourceFile;
+		private bool? _runnable;
+		private string _board;
+		private string _rebuildTo;
+		private List<string> _devices;
+		private MachineType _machineType;
+		private Guid _guid;
 
 		#endregion
 
@@ -106,16 +107,6 @@ namespace SabreTools.Library.Dats
 		#region Constructors
 
 		/// <summary>
-		/// Create a default, empty Machine object
-		/// </summary>
-		public Machine()
-		{
-			_name = "";
-			_description = "";
-			_runnable = null;
-		}
-
-		/// <summary>
 		/// Create a new Machine object with the included information
 		/// </summary>
 		/// <param name="name">Name of the machine</param>
@@ -123,33 +114,134 @@ namespace SabreTools.Library.Dats
 		public Machine(string name, string description)
 		{
 			_name = name;
+			_comment = null;
 			_description = description;
+			_year = null;
+			_manufacturer = null;
+			_romOf = null;
+			_cloneOf = null;
+			_sampleOf = null;
+			_sourceFile = null;
 			_runnable = null;
+			_board = null;
+			_rebuildTo = null;
+			_devices = null;
+			_machineType = MachineType.NULL;
+			_guid = new Guid();
 		}
 
 		#endregion
 
-		#region Cloneing
+		#region Equality comparerers
 
-		public object Clone()
+		/// <summary>
+		/// Override the equality comparer
+		/// </summary>
+		public static bool operator ==(Machine a, Machine b)
 		{
-			return new Machine()
+			return (a.Name == b.Name
+				&& a.Comment == b.Comment
+				&& a.Description == b.Description
+				&& a.Year == b.Year
+				&& a.Manufacturer == b.Manufacturer
+				&& a.RomOf == b.RomOf
+				&& a.CloneOf == b.CloneOf
+				&& a.SampleOf == b.SampleOf
+				&& a.SourceFile == b.SourceFile
+				&& a.Runnable == b.Runnable
+				&& a.Board == b.Board
+				&& a.RebuildTo == b.RebuildTo
+				&& a.Devices == b.Devices
+				&& a.MachineType == b.MachineType);
+		}
+
+		/// <summary>
+		/// Override the inequality comparer
+		/// </summary>
+		public static bool operator !=(Machine a, Machine b)
+		{
+			return !(a == b);
+		}
+
+		/// <summary>
+		/// Override the Equals method
+		/// </summary>
+		public override bool Equals(object o)
+		{
+			if (o.GetType() != typeof(Machine))
 			{
-				Name = _name,
-				Comment = _comment,
-				Description = _description,
-				Year = _year,
-				Manufacturer = _manufacturer,
-				RomOf = _romOf,
-				CloneOf = _cloneOf,
-				SampleOf = _sampleOf,
-				SourceFile = _sourceFile,
-				Runnable = _runnable,
-				Board = _board,
-				RebuildTo = _rebuildTo,
-				Devices = _devices,
-				MachineType = _machineType,
-			};
+				return false;
+			}
+
+			return this == (Machine)o;
+		}
+
+		/// <summary>
+		/// Override the GetHashCode method
+		/// </summary>
+		public override int GetHashCode()
+		{
+			return OCRC.OptimizedCRC.Compute(_guid.ToByteArray());
+		}
+
+		#endregion
+
+		#region Update fields
+
+		/// <summary>
+		/// Append a string to the description
+		/// </summary>
+		public void AppendDescription(string append)
+		{
+			UpdateDescription(this.Description + append);
+		}
+
+		/// <summary>
+		/// Append a string to the name
+		/// </summary>
+		public void AppendName(string append)
+		{
+			UpdateName(this.Name + append);
+		}
+
+		/// <summary>
+		/// Update the cloneof
+		/// </summary>
+		public void UpdateCloneOf(string update)
+		{
+			_cloneOf = update;
+		}
+
+		/// <summary>
+		/// Update the description
+		/// </summary>
+		public void UpdateDescription(string update)
+		{
+			_description = update;
+		}
+
+		/// <summary>
+		/// Update the romof
+		/// </summary>
+		public void UpdateRomOf(string update)
+		{
+			_romOf = update;
+		}
+
+		/// <summary>
+		/// Update the sampleof
+		/// </summary>
+		public void UpdateSampleOf(string update)
+		{
+			_sampleOf = update;
+		}
+
+		/// <summary>
+		/// Update the name
+		/// </summary>
+		public void UpdateName(string update)
+		{
+			_name = update;
 		}
 
 		#endregion

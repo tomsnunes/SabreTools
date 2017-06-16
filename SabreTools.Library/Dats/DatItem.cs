@@ -608,7 +608,7 @@ namespace SabreTools.Library.Dats
 							{
 								saveditem.SystemID = file.SystemID;
 								saveditem.System = file.System;
-								saveditem.Machine = (Machine)file.Machine.Clone();
+								saveditem.Machine = file.Machine;
 								saveditem.Name = file.Name;
 							}
 
@@ -617,7 +617,7 @@ namespace SabreTools.Library.Dats
 							{
 								saveditem.SourceID = file.SourceID;
 								saveditem.Source = file.Source;
-								saveditem.Machine = (Machine)file.Machine.Clone();
+								saveditem.Machine = file.Machine;
 								saveditem.Name = file.Name;
 							}
 

@@ -645,8 +645,8 @@ namespace SabreTools.Library.Dats
 				// If we are coming from an archive, set the correct machine name
 				if (machinename != null)
 				{
-					item.Machine.Name = machinename;
-					item.Machine.Description = machinename;
+					item.Machine.UpdateName(machinename);
+					item.Machine.UpdateDescription(machinename);
 				}
 
 				Globals.Logger.User("No matches found for '" + Style.GetFileName(rom.Name) + "', rebuilding accordingly from inverse flag...");

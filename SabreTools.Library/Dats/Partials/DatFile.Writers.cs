@@ -474,7 +474,7 @@ namespace SabreTools.Library.Dats
 				// No game should start with a path separator
 				if (rom.Machine.Name.StartsWith(Path.DirectorySeparatorChar.ToString()))
 				{
-					rom.Machine.Name = rom.Machine.Name.Substring(1);
+					rom.Machine.UpdateName(rom.Machine.Name.Substring(1));
 				}
 
 				string state = "";
