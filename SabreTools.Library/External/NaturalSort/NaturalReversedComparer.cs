@@ -39,14 +39,13 @@ namespace NaturalSort
 			{
 				return y.CompareTo(x);
 			}
-			string[] x1, y1;
-			if (!table.TryGetValue(x, out x1))
+			if (!table.TryGetValue(x, out string[] x1))
 			{
 				//x1 = Regex.Split(x.Replace(" ", ""), "([0-9]+)");
 				x1 = Regex.Split(x.ToLowerInvariant(), "([0-9]+)").Where(s => s != "").ToArray();
 				table.Add(x, x1);
 			}
-			if (!table.TryGetValue(y, out y1))
+			if (!table.TryGetValue(y, out string[] y1))
 			{
 				//y1 = Regex.Split(y.Replace(" ", ""), "([0-9]+)");
 				y1 = Regex.Split(y.ToLowerInvariant(), "([0-9]+)").Where(s => s != "").ToArray();
@@ -76,13 +75,12 @@ namespace NaturalSort
 
 		private static int PartCompare(string left, string right)
 		{
-			long x, y;
-			if (!long.TryParse(left, out x))
+			if (!long.TryParse(left, out long x))
 			{
 				return Style.CompareNumeric(right, left);
 			}
 
-			if (!long.TryParse(right, out y))
+			if (!long.TryParse(right, out long y))
 			{
 				return Style.CompareNumeric(right, left);
 			}
