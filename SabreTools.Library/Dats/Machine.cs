@@ -114,5 +114,44 @@ namespace SabreTools.Library.Dats
 		}
 
 		#endregion
+
+		#region Property updaters
+
+		public void AppendName(string append)
+		{
+			Name += append;
+		}
+
+		public void AppendDescription(string append)
+		{
+			Description += append;
+		}
+
+		public void UpdateName(string update)
+		{
+			Name = update;
+		}
+
+		public void UpdateDescription(string update)
+		{
+			Description = update;
+		}
+
+		public void UpdateCloneOf(string update)
+		{
+			CloneOf = update;
+		}
+
+		public void UpdateRomOf(string update)
+		{
+			RomOf = update;
+		}
+
+		public void UpdateSampleOf(string update)
+		{
+			SampleOf = update;
+		}
+
+		#endregion
 	}
 }
