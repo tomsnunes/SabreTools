@@ -740,11 +740,11 @@ namespace SabreTools
 					case "--mt":
 						if (Int32.TryParse(args[++i], out int mdop))
 						{
-							Globals.MaxDegreeOfParallelism = mdop;
+							Globals.MaxThreads = mdop;
 						}
 						else
 						{
-							Globals.MaxDegreeOfParallelism = 4;
+							Globals.MaxThreads = 4;
 						}
 						break;
 					case "-n":
@@ -1026,11 +1026,11 @@ namespace SabreTools
 								case "--mt":
 									if (Int32.TryParse(split[1], out int odop))
 									{
-										Globals.MaxDegreeOfParallelism = odop;
+										Globals.MaxThreads = odop;
 									}
 									else
 									{
-										Globals.MaxDegreeOfParallelism = 4;
+										Globals.MaxThreads = 4;
 									}
 									break;
 								case "-n":

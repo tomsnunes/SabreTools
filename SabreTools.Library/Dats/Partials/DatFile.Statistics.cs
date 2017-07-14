@@ -177,7 +177,7 @@ namespace SabreTools.Library.Dats
 
 			// Loop through and add
 			List<string> keys = Keys.ToList();
-			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+			Parallel.ForEach(keys, key =>
 			{
 				List<DatItem> items = this[key];
 				foreach(DatItem item in items)
@@ -387,7 +387,7 @@ namespace SabreTools.Library.Dats
 
 			// Make sure we have all files
 			List<Tuple<string, string>> newinputs = new List<Tuple<string, string>>(); // item, basepath
-			Parallel.ForEach(inputs, Globals.ParallelOptions, input =>
+			Parallel.ForEach(inputs, input =>
 			{
 				if (File.Exists(input))
 				{

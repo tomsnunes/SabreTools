@@ -36,9 +36,14 @@ namespace SabreTools.Library.Data
 			}
 			set { _logger = value; }
 		}
-		public static int MaxDegreeOfParallelism
+		public static int MaxThreads
 		{
-			set { _maxDegreeOfParallelism = value; }
+			get { return _maxDegreeOfParallelism; }
+			set
+			{
+				_maxDegreeOfParallelism = value;
+				System.Threading.ThreadPool.SetMaxThreads(_maxDegreeOfParallelism, _maxDegreeOfParallelism);
+			}
 		}
 		public static ParallelOptions ParallelOptions
 		{

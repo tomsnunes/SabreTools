@@ -337,7 +337,7 @@ namespace RombaSharp
 			}
 
 			// Finally set all of the fields
-			Globals.MaxDegreeOfParallelism = workers;
+			Globals.MaxThreads = workers;
 			_logdir = logdir;
 			_tmpdir = tmpdir;
 			_webdir = webdir;

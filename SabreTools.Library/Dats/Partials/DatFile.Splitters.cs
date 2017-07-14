@@ -85,7 +85,7 @@ namespace SabreTools.Library.Dats
 
 			// Now separate the roms accordingly
 			List<string> keys = Keys.ToList();
-			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+			Parallel.ForEach(keys, key =>
 			{
 				List<DatItem> items = this[key];
 				foreach (DatItem item in items)
@@ -307,7 +307,7 @@ namespace SabreTools.Library.Dats
 
 			// Now populate each of the DAT objects in turn
 			List<string> keys = Keys.ToList();
-			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+			Parallel.ForEach(keys, key =>
 			{
 				List<DatItem> items = this[key];
 				foreach (DatItem item in items)
@@ -418,7 +418,7 @@ namespace SabreTools.Library.Dats
 			keys.Sort(SplitByLevelSort);
 
 			// Then, we loop over the games
-			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+			Parallel.ForEach(keys, key =>
 			{
 				// Here, the key is the name of the game to be used for comparison
 				if (tempDat.Name != null && tempDat.Name != Style.GetDirectoryName(key))
@@ -584,7 +584,7 @@ namespace SabreTools.Library.Dats
 
 			// Now populate each of the DAT objects in turn
 			List<string> keys = Keys.ToList();
-			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+			Parallel.ForEach(keys, key =>
 			{
 				List<DatItem> items = this[key];
 				foreach(DatItem item in items)
