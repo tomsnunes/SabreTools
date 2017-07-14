@@ -905,7 +905,7 @@ namespace SabreTools.Library.Dats
 					string[] parsedColumns = line.Split(delim);
 					foreach (string parsed in parsedColumns)
 					{
-						switch (parsed.ToLowerInvariant())
+						switch (parsed.ToLowerInvariant().Trim('"'))
 						{
 							case "file":
 							case "filename":
@@ -982,6 +982,9 @@ namespace SabreTools.Library.Dats
 							case "item status":
 								columns.Add("DatItem.Nodump");
 								break;
+							default:
+								columns.Add("INVALID");
+								break;
 						}
 					}
 
@@ -1008,7 +1011,7 @@ namespace SabreTools.Library.Dats
 				// Now we loop through and get values for everything
 				for (int i = 0; i < columns.Count; i++)
 				{
-					string value = parsedLine[i];
+					string value = parsedLine[i].Trim('"');
 					switch (columns[i])
 					{
 						case "DatFile.FileName":
@@ -1051,7 +1054,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case "Rom.Name":
 						case "Disk.Name":
-							name = value;
+							name = value == "" ? name : value;
 							break;
 						case "DatItem.Size":
 							if (!Int64.TryParse(value, out size))

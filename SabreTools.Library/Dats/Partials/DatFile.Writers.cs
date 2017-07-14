@@ -288,7 +288,7 @@ namespace SabreTools.Library.Dats
 						break;
 					case DatFormat.CSV:
 						header = "\"File Name\",\"Internal Name\",\"Description\",\"Game Name\",\"Game Description\",\"Type\",\"" +
-								"Rom Name\",\"Disk Name\",\"Size\",\"CRC\",\"MD5\",\"SHA1\"\"SHA256\",\"Nodump\"\n";
+								"Rom Name\",\"Disk Name\",\"Size\",\"CRC\",\"MD5\",\"SHA1\",\"SHA256\",\"Nodump\"\n";
 						break;
 					case DatFormat.DOSCenter:
 						header = "DOSCenter (\n" +
