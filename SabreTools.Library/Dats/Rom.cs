@@ -123,14 +123,14 @@ namespace SabreTools.Library.Dats
 				SourceID = this.SourceID,
 				Source = this.Source,
 
-				MD5 = this.MD5,
-				SHA1 = this.SHA1,
-				SHA256 = this.SHA256,
-				SHA384 = this.SHA384,
-				SHA512 = this.SHA512,
+				MD5 = _md5,
+				SHA1 = _sha1,
+				SHA256 = _sha256,
+				SHA384 = _sha384,
+				SHA512 = _sha512,
 				ItemStatus = this.ItemStatus,
 				Size = this.Size,
-				CRC = this.CRC,
+				CRC = _crc,
 				Date = this.Date,
 			};
 		}
@@ -158,13 +158,23 @@ namespace SabreTools.Library.Dats
 				return dupefound;
 			}
 
-			if ((this.Size == newOther.Size)
-				&& ((String.IsNullOrEmpty(this.CRC) || String.IsNullOrEmpty(newOther.CRC)) || this.CRC == newOther.CRC)
-				&& ((String.IsNullOrEmpty(this.MD5) || String.IsNullOrEmpty(newOther.MD5)) || this.MD5 == newOther.MD5)
-				&& ((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(newOther.SHA1)) || this.SHA1 == newOther.SHA1)
-				&& ((String.IsNullOrEmpty(this.SHA256) || String.IsNullOrEmpty(newOther.SHA256)) || this.SHA256 == newOther.SHA256)
-				&& ((String.IsNullOrEmpty(this.SHA384) || String.IsNullOrEmpty(newOther.SHA384)) || this.SHA384 == newOther.SHA384)
-				&& ((String.IsNullOrEmpty(this.SHA512) || String.IsNullOrEmpty(newOther.SHA512)) || this.SHA512 == newOther.SHA512))
+			// If we can determine that the roms have no non-empty hashes in common, we return false
+			if (((String.IsNullOrEmpty(_crc) && !String.IsNullOrEmpty(newOther.CRC)) || (!String.IsNullOrEmpty(_crc) && String.IsNullOrEmpty(newOther.CRC)))
+					&& ((String.IsNullOrEmpty(_md5) && !String.IsNullOrEmpty(newOther.MD5)) || (!String.IsNullOrEmpty(_md5) && String.IsNullOrEmpty(newOther.MD5)))
+					&& ((String.IsNullOrEmpty(_sha1) && !String.IsNullOrEmpty(newOther.SHA1)) || (!String.IsNullOrEmpty(_sha1) && String.IsNullOrEmpty(newOther.SHA1)))
+					&& ((String.IsNullOrEmpty(_sha256) && !String.IsNullOrEmpty(newOther.SHA256)) || (!String.IsNullOrEmpty(_sha256) && String.IsNullOrEmpty(newOther.SHA256)))
+					&& ((String.IsNullOrEmpty(_sha384) && !String.IsNullOrEmpty(newOther.SHA384)) || (!String.IsNullOrEmpty(_sha384) && String.IsNullOrEmpty(newOther.SHA384)))
+					&& ((String.IsNullOrEmpty(_sha512) && !String.IsNullOrEmpty(newOther.SHA512)) || (!String.IsNullOrEmpty(_sha512) && String.IsNullOrEmpty(newOther.SHA512))))
+			{
+				dupefound = false;
+			}
+			else if ((this.Size == newOther.Size)
+				&& ((String.IsNullOrEmpty(_crc) || String.IsNullOrEmpty(newOther.CRC)) || _crc == newOther.CRC)
+				&& ((String.IsNullOrEmpty(_md5) || String.IsNullOrEmpty(newOther.MD5)) || _md5 == newOther.MD5)
+				&& ((String.IsNullOrEmpty(_sha1) || String.IsNullOrEmpty(newOther.SHA1)) || _sha1 == newOther.SHA1)
+				&& ((String.IsNullOrEmpty(_sha256) || String.IsNullOrEmpty(newOther.SHA256)) || _sha256 == newOther.SHA256)
+				&& ((String.IsNullOrEmpty(_sha384) || String.IsNullOrEmpty(newOther.SHA384)) || _sha384 == newOther.SHA384)
+				&& ((String.IsNullOrEmpty(_sha512) || String.IsNullOrEmpty(newOther.SHA512)) || _sha512 == newOther.SHA512))
 			{
 				dupefound = true;
 			}

@@ -127,11 +127,20 @@ namespace SabreTools.Library.Dats
 				return dupefound;
 			}
 
-			if (((String.IsNullOrEmpty(_md5) || String.IsNullOrEmpty(newOther.MD5)) || this.MD5 == newOther.MD5)
-					&& ((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(newOther.SHA1)) || this.SHA1 == newOther.SHA1)
-					&& ((String.IsNullOrEmpty(this.SHA256) || String.IsNullOrEmpty(newOther.SHA256)) || this.SHA256 == newOther.SHA256)
-					&& ((String.IsNullOrEmpty(this.SHA384) || String.IsNullOrEmpty(newOther.SHA384)) || this.SHA384 == newOther.SHA384)
-					&& ((String.IsNullOrEmpty(this.SHA512) || String.IsNullOrEmpty(newOther.SHA512)) || this.SHA256 == newOther.SHA512))
+			// If we can determine that the disks have no non-empty hashes in common, we return false
+			if (((String.IsNullOrEmpty(_md5) && !String.IsNullOrEmpty(newOther.MD5)) || (!String.IsNullOrEmpty(_md5) && String.IsNullOrEmpty(newOther.MD5)))
+					&& ((String.IsNullOrEmpty(_sha1) && !String.IsNullOrEmpty(newOther.SHA1)) || (!String.IsNullOrEmpty(_sha1) && String.IsNullOrEmpty(newOther.SHA1)))
+					&& ((String.IsNullOrEmpty(_sha256) && !String.IsNullOrEmpty(newOther.SHA256)) || (!String.IsNullOrEmpty(_sha256) && String.IsNullOrEmpty(newOther.SHA256)))
+					&& ((String.IsNullOrEmpty(_sha384) && !String.IsNullOrEmpty(newOther.SHA384)) || (!String.IsNullOrEmpty(_sha384) && String.IsNullOrEmpty(newOther.SHA384)))
+					&& ((String.IsNullOrEmpty(_sha512) && !String.IsNullOrEmpty(newOther.SHA512)) || (!String.IsNullOrEmpty(_sha512) && String.IsNullOrEmpty(newOther.SHA512))))
+			{
+				dupefound = false;
+			}
+			else if (((String.IsNullOrEmpty(_md5) || String.IsNullOrEmpty(newOther.MD5)) || this.MD5 == newOther.MD5)
+				&& ((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(newOther.SHA1)) || this.SHA1 == newOther.SHA1)
+				&& ((String.IsNullOrEmpty(this.SHA256) || String.IsNullOrEmpty(newOther.SHA256)) || this.SHA256 == newOther.SHA256)
+				&& ((String.IsNullOrEmpty(this.SHA384) || String.IsNullOrEmpty(newOther.SHA384)) || this.SHA384 == newOther.SHA384)
+				&& ((String.IsNullOrEmpty(this.SHA512) || String.IsNullOrEmpty(newOther.SHA512)) || this.SHA256 == newOther.SHA512))
 			{
 				dupefound = true;
 			}
