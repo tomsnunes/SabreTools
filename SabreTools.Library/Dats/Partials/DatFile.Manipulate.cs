@@ -181,48 +181,55 @@ namespace SabreTools.Library.Dats
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		public void Filter(Filter filter, bool single, bool trim, string root)
 		{
-			// Loop over every key in the dictionary
-			List<string> keys = Keys.ToList();
-			Parallel.ForEach(keys, key =>
+			try
 			{
-				// For every item in the current key
-				List<DatItem> items = this[key];
-				List<DatItem> newitems = new List<DatItem>();
-				foreach (DatItem item in items)
+				// Loop over every key in the dictionary
+				List<string> keys = Keys.ToList();
+				foreach (string key in keys)
 				{
-					// If the rom passes the filter, include it
-					if (filter.ItemPasses(item))
+					// For every item in the current key
+					List<DatItem> items = this[key];
+					List<DatItem> newitems = new List<DatItem>();
+					foreach (DatItem item in items)
 					{
-						// If we are in single game mode, rename all games
-						if (single)
+						// If the rom passes the filter, include it
+						if (filter.ItemPasses(item))
 						{
-							item.Machine.UpdateName("!");
-						}
-
-						// If we are in NTFS trim mode, trim the game name
-						if (trim)
-						{
-							// Windows max name length is 260
-							int usableLength = 260 - item.Machine.Name.Length - root.Length;
-							if (item.Name.Length > usableLength)
+							// If we are in single game mode, rename all games
+							if (single)
 							{
-								string ext = Path.GetExtension(item.Name);
-								item.Name = item.Name.Substring(0, usableLength - ext.Length);
-								item.Name += ext;
+								item.Machine.UpdateName("!");
+							}
+
+							// If we are in NTFS trim mode, trim the game name
+							if (trim)
+							{
+								// Windows max name length is 260
+								int usableLength = 260 - item.Machine.Name.Length - root.Length;
+								if (item.Name.Length > usableLength)
+								{
+									string ext = Path.GetExtension(item.Name);
+									item.Name = item.Name.Substring(0, usableLength - ext.Length);
+									item.Name += ext;
+								}
+							}
+
+							// Lock the list and add the item back
+							lock (newitems)
+							{
+								newitems.Add(item);
 							}
 						}
-
-						// Lock the list and add the item back
-						lock (newitems)
-						{
-							newitems.Add(item);
-						}
 					}
-				}
 
-				Remove(key);
-				AddRange(key, newitems);
-			});
+					Remove(key);
+					AddRange(key, newitems);
+				}
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+			}
 		}
 
 		/// <summary>
@@ -281,7 +288,7 @@ namespace SabreTools.Library.Dats
 						}
 
 						// Add the new item to the output list
-						items.Add(item);
+						newItems.Add(item);
 					}
 
 					// Replace the old list of roms with the new one

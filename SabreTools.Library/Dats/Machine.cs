@@ -5,7 +5,7 @@ using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Dats
 {
-	public struct Machine
+	public class Machine
 	{
 		#region Protected instance variables
 
@@ -36,6 +36,28 @@ namespace SabreTools.Library.Dats
 		#region Constructors
 
 		/// <summary>
+		/// Create a new Machine object
+		/// </summary>
+		public Machine()
+		{
+			Name = null;
+			Comment = null;
+			Description = null;
+			Year = null;
+			Manufacturer = null;
+			RomOf = null;
+			CloneOf = null;
+			SampleOf = null;
+			SourceFile = null;
+			Runnable = null;
+			Board = null;
+			RebuildTo = null;
+			Devices = null;
+			MachineType = MachineType.NULL;
+			_guid = new Guid();
+		}
+
+		/// <summary>
 		/// Create a new Machine object with the included information
 		/// </summary>
 		/// <param name="name">Name of the machine</param>
@@ -64,53 +86,39 @@ namespace SabreTools.Library.Dats
 		#region Equality comparerers
 
 		/// <summary>
-		/// Override the equality comparer
-		/// </summary>
-		public static bool operator ==(Machine a, Machine b)
-		{
-			return (a.Name == b.Name
-				&& a.Comment == b.Comment
-				&& a.Description == b.Description
-				&& a.Year == b.Year
-				&& a.Manufacturer == b.Manufacturer
-				&& a.RomOf == b.RomOf
-				&& a.CloneOf == b.CloneOf
-				&& a.SampleOf == b.SampleOf
-				&& a.SourceFile == b.SourceFile
-				&& a.Runnable == b.Runnable
-				&& a.Board == b.Board
-				&& a.RebuildTo == b.RebuildTo
-				&& a.Devices == b.Devices
-				&& a.MachineType == b.MachineType);
-		}
-
-		/// <summary>
-		/// Override the inequality comparer
-		/// </summary>
-		public static bool operator !=(Machine a, Machine b)
-		{
-			return !(a == b);
-		}
-
-		/// <summary>
 		/// Override the Equals method
 		/// </summary>
 		public override bool Equals(object o)
 		{
-			if (o.GetType() != typeof(Machine))
+			if (this == null && o == null)
+			{
+				return true;
+			}
+			else if (this == null || o == null)
+			{
+				return false;
+			}
+			else if (o.GetType() != typeof(Machine))
 			{
 				return false;
 			}
 
-			return this == (Machine)o;
-		}
+			Machine b = (Machine)o;
 
-		/// <summary>
-		/// Override the GetHashCode method
-		/// </summary>
-		public override int GetHashCode()
-		{
-			return OCRC.OptimizedCRC.Compute(_guid.ToByteArray());
+			return (this.Name == b.Name
+				&& this.Comment == b.Comment
+				&& this.Description == b.Description
+				&& this.Year == b.Year
+				&& this.Manufacturer == b.Manufacturer
+				&& this.RomOf == b.RomOf
+				&& this.CloneOf == b.CloneOf
+				&& this.SampleOf == b.SampleOf
+				&& this.SourceFile == b.SourceFile
+				&& this.Runnable == b.Runnable
+				&& this.Board == b.Board
+				&& this.RebuildTo == b.RebuildTo
+				&& this.Devices == b.Devices
+				&& this.MachineType == b.MachineType);
 		}
 
 		#endregion

@@ -604,7 +604,7 @@ namespace SabreTools.Library.Dats
 					innerDatdata.Filter(filter, trim, single, root);
 
 					// Try to output the file
-						innerDatdata.WriteToFile((realOutDir == Environment.CurrentDirectory ? Path.GetDirectoryName(inputFileName) : realOutDir), overwrite: (realOutDir != Environment.CurrentDirectory));
+					innerDatdata.WriteToFile((realOutDir == Environment.CurrentDirectory ? Path.GetDirectoryName(inputFileName) : realOutDir), overwrite: (realOutDir != Environment.CurrentDirectory));
 				}
 				else if (Directory.Exists(inputFileName))
 				{
