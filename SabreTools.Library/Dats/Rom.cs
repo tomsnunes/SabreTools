@@ -159,13 +159,13 @@ namespace SabreTools.Library.Dats
 			}
 
 			// If we can determine that the roms have no non-empty hashes in common, we return false
-			if (((String.IsNullOrEmpty(_crc) && !String.IsNullOrEmpty(newOther.CRC)) || (!String.IsNullOrEmpty(_crc) && String.IsNullOrEmpty(newOther.CRC)))
-					&& ((String.IsNullOrEmpty(_md5) && !String.IsNullOrEmpty(newOther.MD5)) || (!String.IsNullOrEmpty(_md5) && String.IsNullOrEmpty(newOther.MD5)))
-					&& ((String.IsNullOrEmpty(_sha1) && !String.IsNullOrEmpty(newOther.SHA1)) || (!String.IsNullOrEmpty(_sha1) && String.IsNullOrEmpty(newOther.SHA1)))
-					&& ((String.IsNullOrEmpty(_sha256) && !String.IsNullOrEmpty(newOther.SHA256)) || (!String.IsNullOrEmpty(_sha256) && String.IsNullOrEmpty(newOther.SHA256)))
-					&& ((String.IsNullOrEmpty(_sha384) && !String.IsNullOrEmpty(newOther.SHA384)) || (!String.IsNullOrEmpty(_sha384) && String.IsNullOrEmpty(newOther.SHA384)))
-					&& ((String.IsNullOrEmpty(_sha512) && !String.IsNullOrEmpty(newOther.SHA512)) || (!String.IsNullOrEmpty(_sha512) && String.IsNullOrEmpty(newOther.SHA512))))
-			{
+			if (!(String.IsNullOrEmpty(_crc) && String.IsNullOrEmpty(newOther.CRC))
+				|| !(String.IsNullOrEmpty(_md5) && String.IsNullOrEmpty(newOther.MD5))
+				|| !(String.IsNullOrEmpty(_sha1) && String.IsNullOrEmpty(newOther.SHA1))
+				|| !(String.IsNullOrEmpty(_sha256) && String.IsNullOrEmpty(newOther.SHA256))
+				|| !(String.IsNullOrEmpty(_sha384) && String.IsNullOrEmpty(newOther.SHA384))
+				|| !(String.IsNullOrEmpty(_sha512) && String.IsNullOrEmpty(newOther.SHA512)))
+		{
 				dupefound = false;
 			}
 			else if ((this.Size == newOther.Size)
