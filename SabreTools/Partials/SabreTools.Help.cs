@@ -38,7 +38,7 @@ namespace SabreTools
 			// Create the DATFromDir feature
 			Feature datFromDir = new Feature(
 				new List<string>() { "-d", "--d2d", "--dfd" },
-				"Create a DAT from an input directory",
+				"Create DAT(s) from an input directory",
 				FeatureType.Flag,
 				null);
 			datFromDir.AddFeature("noMD5", new Feature(
@@ -311,7 +311,7 @@ namespace SabreTools
 			// Create the Extension Split feature
 			Feature extSplit = new Feature(
 				new List<string>() { "-es", "--ext-split" },
-				"Split a DAT by two file extensions",
+				"Split DAT(s) by two file extensions",
 				FeatureType.Flag,
 				null);
 			extSplit.AddFeature("exta", new Feature(
@@ -333,7 +333,7 @@ namespace SabreTools
 			// Create the Hash Split feature
 			Feature hashSplit = new Feature(
 				new List<string>() { "-hs", "--hash-split" },
-				"Split a DAT or folder by best-available hashes",
+				"Split DAT(s) or folder by best-available hashes",
 				FeatureType.Flag,
 				null);
 			hashSplit.AddFeature("out", new Feature(
@@ -695,7 +695,7 @@ namespace SabreTools
 			// Create the Type Split feature
 			Feature typeSplit = new Feature(
 				new List<string>() { "-ts", "--type-split" },
-				"Split a DAT or folder by file types (rom/disk)",
+				"Split DAT(s) or folder by file types (rom/disk)",
 				FeatureType.Flag,
 				null);
 			typeSplit.AddFeature("out", new Feature(
@@ -707,7 +707,7 @@ namespace SabreTools
 			// Create the Update feature
 			Feature update = new Feature(
 				new List<string>() { "-ud", "--update" },
-				"Update a DAT file",
+				"Update and manipulate DAT file(s)",
 				FeatureType.Flag,
 				new List<string>()
 				{

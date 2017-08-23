@@ -787,7 +787,7 @@ Options:
 		-tsv, --tsv			Output in Tab-Separated Value format
 			Output all rom information in standardized TSV format
 			
-	-ts, --type-split		Split a DAT or folder by file types (rom/disk)
+	-ts, --type-split		Split DAT(s) or folder by file types (rom/disk)
 		For a DAT, or set of DATs, allow for splitting based on the types of the
 		files, specifically if the type is a rom or a disk.
 		
@@ -795,7 +795,7 @@ Options:
 			This sets an output folder to be used when the files are created. If
 			a path is not defined, the application directory is used instead.
 
-	-ud, --update		Update a DAT file
+	-ud, --update		Update and manipulate DAT(s)
 		This is the multitool part of the program, allowing for almost every
 		manipulation to a DAT, or set of DATs. This is also a combination of
 		many different programs that performed DAT manipulation that work better
