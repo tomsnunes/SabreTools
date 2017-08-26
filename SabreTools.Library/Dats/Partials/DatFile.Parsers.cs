@@ -2532,6 +2532,8 @@ namespace SabreTools.Library.Dats
 								Name = gamename,
 							},
 						};
+
+						ParseAddHelper(rom, clean, remUnicode);
 					}
 
 					// Nodump ROMs have 6 pieces (name, size, NO, GOOD, DUMP, KNOWN)
@@ -2553,6 +2555,8 @@ namespace SabreTools.Library.Dats
 								Name = gamename,
 							},
 						};
+
+						ParseAddHelper(rom, clean, remUnicode);
 					}
 
 					// If we have something else, it's invalid
