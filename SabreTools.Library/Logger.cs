@@ -259,7 +259,7 @@ namespace SabreTools.Library
 		/// <returns>True if the output could be written, false otherwise</returns>
 		public bool Verbose(string output, bool appendPrefix = true, params object[] args)
 		{
-			return Log(output, LogLevel.VERBOSE, appendPrefix);
+			return Log(string.Format(output, args), LogLevel.VERBOSE, appendPrefix);
 		}
 
 		/// <summary>
@@ -282,7 +282,7 @@ namespace SabreTools.Library
 		/// <returns>True if the output could be written, false otherwise</returns>
 		public bool User(string output, bool appendPrefix = true, params object[] args)
 		{
-			return Log(output, LogLevel.USER, appendPrefix);
+			return Log(string.Format(output, args), LogLevel.USER, appendPrefix);
 		}
 
 		/// <summary>
@@ -307,7 +307,7 @@ namespace SabreTools.Library
 		public bool Warning(string output, bool appendPrefix = true, params object[] args)
 		{
 			_warnings = true;
-			return Log(output, LogLevel.WARNING, appendPrefix);
+			return Log(string.Format(output, args), LogLevel.WARNING, appendPrefix);
 		}
 
 		/// <summary>
@@ -332,7 +332,7 @@ namespace SabreTools.Library
 		public bool Error(string output, bool appendPrefix = true, params object[] args)
 		{
 			_errors = true;
-			return Log(output, LogLevel.ERROR, appendPrefix);
+			return Log(string.Format(output, args), LogLevel.ERROR, appendPrefix);
 		}
 
 		/// <summary>
