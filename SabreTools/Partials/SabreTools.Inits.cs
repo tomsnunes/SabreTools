@@ -206,7 +206,7 @@ namespace SabreTools
 				}
 				else
 				{
-					Globals.Logger.Error(input + " is not a valid file or folder!");
+					Globals.Logger.Error("'{0}' is not a valid file or folder!", input);
 					Console.WriteLine();
 					_help.OutputIndividualFeature("Extension Split");
 					return;
@@ -241,7 +241,7 @@ namespace SabreTools
 				}
 				else
 				{
-					Globals.Logger.Error(input + " is not a valid file or folder!");
+					Globals.Logger.Error("'{0}' is not a valid file or folder!", input);
 					Console.WriteLine();
 					_help.OutputIndividualFeature("Hash Split");
 					return;
@@ -302,7 +302,7 @@ namespace SabreTools
 				}
 				else
 				{
-					Globals.Logger.Error(input + " is not a valid file or folder!");
+					Globals.Logger.Error("'{0}' is not a valid file or folder!", input);
 					Console.WriteLine();
 					_help.OutputIndividualFeature("Level Split");
 					return;
@@ -349,7 +349,7 @@ namespace SabreTools
 			{
 				datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
 			}
-			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			datdata.RebuildGeneric(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
 				updateDat, headerToCheckAgainst);
@@ -385,7 +385,7 @@ namespace SabreTools
 			{
 				datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
 			}
-			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			datdata.RebuildDepot(inputs, outDir, tempDir, date, delete, inverse, outputFormat, romba,
 				updateDat, headerToCheckAgainst);
@@ -434,7 +434,7 @@ namespace SabreTools
 				}
 				else
 				{
-					Globals.Logger.Error(input + " is not a valid file or folder!");
+					Globals.Logger.Error("{0} is not a valid file or folder!", input);
 					Console.WriteLine();
 					_help.OutputIndividualFeature("Type Split");
 					return;
@@ -577,7 +577,7 @@ namespace SabreTools
 						fm = ForceMerging.Full;
 						break;
 					default:
-						Globals.Logger.Warning(forcemerge + " is not a valid merge flag");
+						Globals.Logger.Warning("{0} is not a valid merge flag", forcemerge);
 						break;
 				}
 			}
@@ -600,7 +600,7 @@ namespace SabreTools
 						fn = ForceNodump.Ignore;
 						break;
 					default:
-						Globals.Logger.Warning(forcend + " is not a valid nodump flag");
+						Globals.Logger.Warning("{0} is not a valid nodump flag", forcend);
 						break;
 				}
 			}
@@ -620,7 +620,7 @@ namespace SabreTools
 						fp = ForcePacking.Unzip;
 						break;
 					default:
-						Globals.Logger.Warning(forcepack + " is not a valid packing flag");
+						Globals.Logger.Warning("{0} is not a valid packing flag", forcepack);
 						break;
 				}
 			}
@@ -758,7 +758,7 @@ namespace SabreTools
 			{
 				datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
 			}
-			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			datdata.VerifyGeneric(inputs, tempDir, hashOnly, quickScan, headerToCheckAgainst);
 		}
@@ -786,7 +786,7 @@ namespace SabreTools
 			{
 				datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
 			}
-			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			datdata.VerifyDepot(inputs, tempDir, headerToCheckAgainst);
 		}

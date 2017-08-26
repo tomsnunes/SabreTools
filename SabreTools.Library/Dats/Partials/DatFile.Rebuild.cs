@@ -133,7 +133,7 @@ namespace SabreTools.Library.Dats
 				// Add to the list if the input is a directory
 				if (Directory.Exists(input))
 				{
-					Globals.Logger.Verbose("Adding depot: '" + input + "'");
+					Globals.Logger.Verbose("Adding depot: {0}", input);
 					lock (directories)
 					{
 						directories.Add(input);
@@ -160,7 +160,7 @@ namespace SabreTools.Library.Dats
 					continue;
 				}
 
-				Globals.Logger.User("Checking hash '" + hash + "'");
+				Globals.Logger.User("Checking hash '{0}'", hash);
 
 				// Get the extension path for the hash
 				string subpath = Style.GetRombaPath(hash);
@@ -196,7 +196,7 @@ namespace SabreTools.Library.Dats
 					updateDat, false /* isZip */, headerToCheckAgainst);
 			}
 
-			Globals.Logger.User("Rebuilding complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Rebuilding complete in: {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			#endregion
 
@@ -322,7 +322,7 @@ namespace SabreTools.Library.Dats
 				// If the input is a file
 				if (File.Exists(input))
 				{
-					Globals.Logger.User("Checking file: '" + input + "'");
+					Globals.Logger.User("Checking file: {0}", input);
 					RebuildGenericHelper(input, outDir, tempDir, quickScan, date, delete, inverse,
 						outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst);
 				}
@@ -330,17 +330,17 @@ namespace SabreTools.Library.Dats
 				// If the input is a directory
 				else if (Directory.Exists(input))
 				{
-					Globals.Logger.Verbose("Checking directory: '" + input + "'");
+					Globals.Logger.Verbose("Checking directory: {0}", input);
 					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						Globals.Logger.User("Checking file: '" + file + "'");
+						Globals.Logger.User("Checking file: {0}", file);
 						RebuildGenericHelper(file, outDir, tempDir, quickScan, date, delete, inverse,
 							outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst);
 					}
 				}
 			}
 
-			Globals.Logger.User("Rebuilding complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Rebuilding complete in: {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			#endregion
 
@@ -541,7 +541,7 @@ namespace SabreTools.Library.Dats
 				// Seek to the beginning of the stream
 				fileStream.Seek(0, SeekOrigin.Begin);
 
-				Globals.Logger.User("Matches found for '" + Style.GetFileName(rom.Name) + "', rebuilding accordingly...");
+				Globals.Logger.User("Matches found for '{0}', rebuilding accordingly...", Style.GetFileName(rom.Name));
 				rebuilt = true;
 
 				// Now loop through the list and rebuild accordingly
@@ -649,7 +649,7 @@ namespace SabreTools.Library.Dats
 					item.Machine.UpdateDescription(machinename);
 				}
 
-				Globals.Logger.User("No matches found for '" + Style.GetFileName(rom.Name) + "', rebuilding accordingly from inverse flag...");
+				Globals.Logger.User("No matches found for '{0}', rebuilding accordingly from inverse flag...", Style.GetFileName(rom.Name));
 
 				// Now rebuild to the output file
 				switch (outputFormat)
@@ -766,7 +766,7 @@ namespace SabreTools.Library.Dats
 								return rebuilt;
 							}
 
-							Globals.Logger.User("Headerless matches found for '" + Style.GetFileName(rom.Name) + "', rebuilding accordingly...");
+							Globals.Logger.User("Headerless matches found for '{0}', rebuilding accordingly...", Style.GetFileName(rom.Name));
 							rebuilt = true;
 
 							// Now loop through the list and rebuild accordingly
@@ -872,7 +872,7 @@ namespace SabreTools.Library.Dats
 				// Add to the list if the input is a directory
 				if (Directory.Exists(input))
 				{
-					Globals.Logger.Verbose("Adding depot: '" + input + "'");
+					Globals.Logger.Verbose("Adding depot: {0}", input);
 					directories.Add(input);
 				}
 			}
@@ -896,7 +896,7 @@ namespace SabreTools.Library.Dats
 					continue;
 				}
 
-				Globals.Logger.User("Checking hash '" + hash + "'");
+				Globals.Logger.User("Checking hash '{0}'", hash);
 
 				// Get the extension path for the hash
 				string subpath = Style.GetRombaPath(hash);
@@ -931,7 +931,7 @@ namespace SabreTools.Library.Dats
 				fileinfo.GetDuplicates(this, remove: true);
 			}
 
-			Globals.Logger.User("Verifying complete in: " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Verifying complete in: {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// If there are any entries in the DAT, output to the rebuild directory
 			_fileName = "fixDAT_" + _fileName;

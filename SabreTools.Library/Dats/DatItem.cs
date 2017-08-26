@@ -679,14 +679,14 @@ namespace SabreTools.Library.Dats
 				// If the current item exactly matches the last item, then we don't add it
 				if ((datItem.GetDuplicateStatus(lastItem) & DupeType.All) != 0)
 				{
-					Globals.Logger.Verbose("Exact duplicate found for '" + datItem.Name + "'");
+					Globals.Logger.Verbose("Exact duplicate found for '{0}'", datItem.Name);
 					continue;
 				}
 
 				// If the current name matches the previous name, rename the current item
 				else if (datItem.Name == lastItem.Name)
 				{
-					Globals.Logger.Verbose("Name duplicate found for '" + datItem.Name + "'");
+					Globals.Logger.Verbose("Name duplicate found for '{0}'", datItem.Name);
 
 					if (datItem.Type == ItemType.Disk)
 					{

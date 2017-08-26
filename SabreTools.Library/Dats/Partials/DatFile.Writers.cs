@@ -115,7 +115,7 @@ namespace SabreTools.Library.Dats
 			BucketBy(SortedBy.Game, false /* mergeRoms */, norename: norename);
 
 			// Output the number of items we're going to be writing
-			Globals.Logger.User("A total of " + Count + " items will be written out to \"" + FileName + "\"");
+			Globals.Logger.User("A total of {0} items will be written out to '{1}'", Count, FileName);
 
 			// Filter the DAT by 1G1R rules, if we're supposed to
 			// TODO: Create 1G1R logic before write
@@ -140,13 +140,13 @@ namespace SabreTools.Library.Dats
 				{
 					string outfile = outfiles[datFormat];
 
-					Globals.Logger.User("Opening file for writing: " + outfile);
+					Globals.Logger.User("Opening file for writing: {0}", outfile);
 					FileStream fs = FileTools.TryCreate(outfile);
 
 					// If we get back null for some reason, just log and return
 					if (fs == null)
 					{
-						Globals.Logger.Warning("File '" + outfile + "' could not be created for writing! Please check to see if the file is writable");
+						Globals.Logger.Warning("File '{0}' could not be created for writing! Please check to see if the file is writable", outfile);
 						return;
 					}
 
@@ -197,7 +197,7 @@ namespace SabreTools.Library.Dats
 								&& ((Rom)rom).Size == -1
 								&& ((Rom)rom).CRC == "null")
 							{
-								Globals.Logger.Verbose("Empty folder found: " + rom.Machine.Name);
+								Globals.Logger.Verbose("Empty folder found: {0}", rom.Machine.Name);
 
 								// If we're in a mode that doesn't allow for actual empty folders, add the blank info
 								if (datFormat != DatFormat.CSV

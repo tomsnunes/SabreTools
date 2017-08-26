@@ -145,7 +145,7 @@ namespace SabreTools.Library.Dats
 			}
 			catch (Exception ex)
 			{
-				Globals.Logger.Error("Error with file '" + filename + "': " + ex.ToString());
+				Globals.Logger.Error("Error with file '{0}': {1}", filename, ex);
 			}
 
 			// If we want to use descriptions as names, update everything
@@ -997,7 +997,7 @@ namespace SabreTools.Library.Dats
 				// If the line doesn't have the correct number of columns, we log and skip
 				if (parsedLine.Length != columns.Count)
 				{
-					Globals.Logger.Warning("Malformed line found in '" + filename + " at line " + linenum);
+					Globals.Logger.Warning("Malformed line found in '{0}' at line {1}", filename, linenum);
 					continue;
 				}
 
@@ -1275,7 +1275,7 @@ namespace SabreTools.Library.Dats
 						int parentcount = parent.Count;
 						if (parentcount == 0)
 						{
-							Globals.Logger.Verbose("Empty parent: " + String.Join("\\", parent) + " found in " + filename);
+							Globals.Logger.Verbose("Empty parent '{0}' found in '{1}'", String.Join("\\", parent), filename);
 							empty = true;
 						}
 
@@ -2339,7 +2339,7 @@ namespace SabreTools.Library.Dats
 			}
 			catch (Exception ex)
 			{
-				Globals.Logger.Warning("Exception found while parsing " + filename + ": " + ex.ToString());
+				Globals.Logger.Warning("Exception found while parsing '{0}': {1}", filename, ex);
 
 				// For XML errors, just skip the affected node
 				xtr?.Read();
@@ -3038,14 +3038,14 @@ namespace SabreTools.Library.Dats
 			// If there's no name in the rom, we log and skip it
 			if (item.Name == null)
 			{
-				Globals.Logger.Warning(FileName + ": Rom with no name found! Skipping...");
+				Globals.Logger.Warning("{0}: Rom with no name found! Skipping...", FileName);
 				return key;
 			}
 
 			// If the name ends with a directory separator, we log and skip it (DOSCenter only?)
 			if (item.Name.EndsWith("/") || item.Name.EndsWith("\\"))
 			{
-				Globals.Logger.Warning(FileName + ": Rom ending with directory separator found: '" + item.Name + "'. Skipping...");
+				Globals.Logger.Warning("{0}: Rom ending with directory separator found: '{1}'. Skipping...", FileName, item.Name);
 				return key;
 			}
 
@@ -3097,7 +3097,7 @@ namespace SabreTools.Library.Dats
 				// If the file has no size and it's not the above case, skip and log
 				else if (itemRom.ItemStatus != ItemStatus.Nodump && (itemRom.Size == 0 || itemRom.Size == -1))
 				{
-					Globals.Logger.Verbose(FileName + ": Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
+					Globals.Logger.Verbose("{0}: Incomplete entry for '{1}' will be output as nodump", FileName, itemRom.Name);
 					itemRom.ItemStatus = ItemStatus.Nodump;
 				}
 				// If the file has a size but aboslutely no hashes, skip and log
@@ -3110,7 +3110,7 @@ namespace SabreTools.Library.Dats
 					&& String.IsNullOrEmpty(itemRom.SHA384)
 					&& String.IsNullOrEmpty(itemRom.SHA512))
 				{
-					Globals.Logger.Verbose(FileName + ": Incomplete entry for \"" + itemRom.Name + "\" will be output as nodump");
+					Globals.Logger.Verbose("{0}: Incomplete entry for '{1}' will be output as nodump", FileName, itemRom.Name);
 					itemRom.ItemStatus = ItemStatus.Nodump;
 				}
 
@@ -3135,7 +3135,7 @@ namespace SabreTools.Library.Dats
 					&& String.IsNullOrEmpty(itemDisk.SHA384)
 					&& String.IsNullOrEmpty(itemDisk.SHA512))
 				{
-					Globals.Logger.Verbose("Incomplete entry for \"" + itemDisk.Name + "\" will be output as nodump");
+					Globals.Logger.Verbose("Incomplete entry for '{0}' will be output as nodump", itemDisk.Name);
 					itemDisk.ItemStatus = ItemStatus.Nodump;
 				}
 

@@ -670,7 +670,7 @@ namespace SabreTools.Library.Dats
 					machineType |= MachineType.Mechanical;
 					break;
 				default:
-					Globals.Logger.Warning(gametype + " is not a valid type");
+					Globals.Logger.Warning("{0} is not a valid type", gametype);
 					break;
 			}
 
@@ -703,7 +703,7 @@ namespace SabreTools.Library.Dats
 					itemStatus |= ItemStatus.Verified;
 					break;
 				default:
-					Globals.Logger.Warning(status + " is not a valid status");
+					Globals.Logger.Warning("{0} is not a valid status", status);
 					break;
 			}
 

@@ -172,7 +172,7 @@ namespace SabreTools
 			// Verify that the flag is valid
 			if (!_help.TopLevelFlag(feature))
 			{
-				Globals.Logger.User("\"" + feature + "\" is not valid feature flag");
+				Globals.Logger.User("'{0}' is not valid feature flag", feature);
 				_help.OutputIndividualFeature(feature);
 				Globals.Logger.Close();
 				return;
@@ -267,7 +267,7 @@ namespace SabreTools
 				// Verify that the current flag is proper for the feature
 				if (!_help[feature].ValidateInput(args[i]))
 				{
-					Globals.Logger.Error("Invalid input detected: " + args[i]);
+					Globals.Logger.Error("Invalid input detected: {0}", args[i]);
 					_help.OutputIndividualFeature(feature);
 					Globals.Logger.Close();
 					return;
@@ -667,7 +667,7 @@ namespace SabreTools
 						i++;
 						if (!File.Exists(args[i]) && !Directory.Exists(args[i]))
 						{
-							Globals.Logger.Error("Must be a valid file or folder of DATs: " + args[i]);
+							Globals.Logger.Error("Must be a valid file or folder of DATs: {0}", args[i]);
 							Globals.Logger.Close();
 							return;
 						}
@@ -953,7 +953,7 @@ namespace SabreTools
 								case "--dat":
 									if (!File.Exists(split[1]) && !Directory.Exists(split[1]))
 									{
-										Globals.Logger.Error("Must be a valid file or folder of DATs: " + split[1]);
+										Globals.Logger.Error("Must be a valid file or folder of DATs: {0}", split[1]);
 										Globals.Logger.Close();
 										return;
 									}
@@ -1179,7 +1179,7 @@ namespace SabreTools
 									}
 									else
 									{
-										Globals.Logger.Error("Invalid input detected: " + args[i]);
+										Globals.Logger.Error("Invalid input detected: {0}", args[i]);
 										Globals.Logger.Close();
 										return;
 									}
@@ -1192,7 +1192,7 @@ namespace SabreTools
 						}
 						else
 						{
-							Globals.Logger.Error("Invalid input detected: " + args[i]);
+							Globals.Logger.Error("Invalid input detected: {0}", args[i]);
 							Globals.Logger.Close();
 							return;
 						}

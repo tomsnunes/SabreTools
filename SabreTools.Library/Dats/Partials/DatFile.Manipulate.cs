@@ -48,7 +48,7 @@ namespace SabreTools.Library.Dats
 			// Create the temporary dictionary to sort into
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 
-			Globals.Logger.User("Organizing roms by " + bucketBy +(mergeroms ? " and merging" : ""));
+			Globals.Logger.User("Organizing roms by {0}" + (mergeroms ? " and merging" : ""), bucketBy);
 
 			// First do the initial sort of all of the roms
 			List<string> keys = Keys.ToList();

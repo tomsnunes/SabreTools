@@ -46,7 +46,7 @@ namespace SabreTools.Library.Tools
 				"'" + header + "', " +
 				"'" + source + "')";
 				slc = new SqliteCommand(query, dbc);
-				Globals.Logger.Verbose("Result of inserting header: " + slc.ExecuteNonQuery());
+				Globals.Logger.Verbose("Result of inserting header: {0}", slc.ExecuteNonQuery());
 			}
 
 			// Dispose of database objects
@@ -182,7 +182,7 @@ CREATE TABLE IF NOT EXISTS data (
 			{
 				while (sldr.Read())
 				{
-					Globals.Logger.Verbose("Found match with rom type " + sldr.GetString(1));
+					Globals.Logger.Verbose("Found match with rom type '{0}'", sldr.GetString(1));
 					headers.Add(sldr.GetString(0));
 				}
 			}

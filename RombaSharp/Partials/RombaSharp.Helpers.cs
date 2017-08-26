@@ -35,22 +35,22 @@ namespace RombaSharp
 			// Total number of CRCs
 			string query = "SELECT COUNT(*) FROM crc";
 			SqliteCommand slc = new SqliteCommand(query, dbc);
-			Globals.Logger.User("Total CRCs: " + (long)slc.ExecuteScalar());
+			Globals.Logger.User("Total CRCs: {0}", (long)slc.ExecuteScalar());
 
 			// Total number of MD5s
 			query = "SELECT COUNT(*) FROM md5";
 			slc = new SqliteCommand(query, dbc);
-			Globals.Logger.User("Total MD5s: " + (long)slc.ExecuteScalar());
+			Globals.Logger.User("Total MD5s: {0}", (long)slc.ExecuteScalar());
 
 			// Total number of SHA1s
 			query = "SELECT COUNT(*) FROM sha1";
 			slc = new SqliteCommand(query, dbc);
-			Globals.Logger.User("Total SHA1s: " + (long)slc.ExecuteScalar());
+			Globals.Logger.User("Total SHA1s: {0}", (long)slc.ExecuteScalar());
 
 			// Total number of DATs
 			query = "SELECT COUNT(*) FROM dat";
 			slc = new SqliteCommand(query, dbc);
-			Globals.Logger.User("Total DATs: " + (long)slc.ExecuteScalar());
+			Globals.Logger.User("Total DATs: {0}", (long)slc.ExecuteScalar());
 
 			slc.Dispose();
 			dbc.Dispose();
@@ -63,16 +63,16 @@ namespace RombaSharp
 		{
 			Process proc = Process.GetCurrentProcess();
 
-			Globals.Logger.User("Current Nonpaged Memory: " + Style.GetBytesReadable(proc.NonpagedSystemMemorySize64));
-			Globals.Logger.User("Current Paged Memory: " + Style.GetBytesReadable(proc.PagedMemorySize64));
-			Globals.Logger.User("Peak Paged Memory: " + Style.GetBytesReadable(proc.PeakPagedMemorySize64));
-			Globals.Logger.User("Peak Virtual Memory: " + Style.GetBytesReadable(proc.PeakVirtualMemorySize64));
-			Globals.Logger.User("Peak Working Memory: " + Style.GetBytesReadable(proc.PeakWorkingSet64));
-			Globals.Logger.User("Private Memory: " + Style.GetBytesReadable(proc.PrivateMemorySize64));
-			Globals.Logger.User("Virtual Memory: " + Style.GetBytesReadable(proc.VirtualMemorySize64));
-			Globals.Logger.User("Working Memory: " + Style.GetBytesReadable(proc.WorkingSet64));
-			Globals.Logger.User("Total Processor Time: " + proc.TotalProcessorTime);
-			Globals.Logger.User("User Processor Time: " + proc.UserProcessorTime);
+			Globals.Logger.User("Current Nonpaged Memory: {0}", Style.GetBytesReadable(proc.NonpagedSystemMemorySize64));
+			Globals.Logger.User("Current Paged Memory: {0}", Style.GetBytesReadable(proc.PagedMemorySize64));
+			Globals.Logger.User("Peak Paged Memory: {0}", Style.GetBytesReadable(proc.PeakPagedMemorySize64));
+			Globals.Logger.User("Peak Virtual Memory: {0}", Style.GetBytesReadable(proc.PeakVirtualMemorySize64));
+			Globals.Logger.User("Peak Working Memory: {0}", Style.GetBytesReadable(proc.PeakWorkingSet64));
+			Globals.Logger.User("Private Memory: {0}", Style.GetBytesReadable(proc.PrivateMemorySize64));
+			Globals.Logger.User("Virtual Memory: {0}", Style.GetBytesReadable(proc.VirtualMemorySize64));
+			Globals.Logger.User("Working Memory: {0}", Style.GetBytesReadable(proc.WorkingSet64));
+			Globals.Logger.User("Total Processor Time: {0}", proc.TotalProcessorTime);
+			Globals.Logger.User("User Processor Time: {0}", proc.UserProcessorTime);
 		}
 
 		/// <summary>
@@ -133,7 +133,7 @@ namespace RombaSharp
 				}
 				else
 				{
-					Globals.Logger.Warning("The file '" + input + "' could not be found in the DAT root");
+					Globals.Logger.Warning("The file '{0}' could not be found in the DAT root", input);
 				}
 			}
 
@@ -436,7 +436,7 @@ namespace RombaSharp
 			}
 			datroot.BucketBy(SortedBy.Game, false /* mergeroms */, norename: true);
 
-			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			slc.Dispose();
 			sldr.Dispose();
@@ -452,7 +452,7 @@ namespace RombaSharp
 				}
 			}
 
-			Globals.Logger.User("Adding complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Adding complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Now loop through and remove all references to old Dats
 			Globals.Logger.User("Removing unmatched DAT information");
@@ -465,7 +465,7 @@ namespace RombaSharp
 				slc.ExecuteNonQuery();
 				slc.Dispose();
 			}
-			Globals.Logger.User("Removing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Removing complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			dbc.Dispose();
 		}
@@ -495,7 +495,7 @@ namespace RombaSharp
 				{
 					foreach (DatItem datItem in tempdat[romkey])
 					{
-						Globals.Logger.Verbose("Checking and adding file '" + datItem.Name);
+						Globals.Logger.Verbose("Checking and adding file '{0}'", datItem.Name);
 
 						if (datItem.Type == ItemType.Rom)
 						{
@@ -587,14 +587,14 @@ namespace RombaSharp
 			// Check that it's a valid depot first
 			if (!_depots.ContainsKey(depotname))
 			{
-				Globals.Logger.User("'" + depotname + "' is not a recognized depot. Please add it to your configuration file and try again");
+				Globals.Logger.User("'{0}' is not a recognized depot. Please add it to your configuration file and try again", depotname);
 				return;
 			}
 
 			// Then check that the depot is online
 			if (!Directory.Exists(depotname))
 			{
-				Globals.Logger.User("'" + depotname + "' does not appear to be online. Please check its status and try again");
+				Globals.Logger.User("'{0}' does not appear to be online. Please check its status and try again", depotname);
 				return;
 			}
 

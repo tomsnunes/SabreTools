@@ -115,7 +115,7 @@ namespace SabreTools.Library.Dats
 			Parallel.For(0, inputs.Count, i =>
 			{
 				string input = inputs[i];
-				Globals.Logger.User("Adding DAT: " + input.Split('¬')[0]);
+				Globals.Logger.User("Adding DAT: {0}", input.Split('¬')[0]);
 				datHeaders[i] = new DatFile
 				{
 					DatFormat = (DatFormat != 0 ? DatFormat : 0),
@@ -125,7 +125,7 @@ namespace SabreTools.Library.Dats
 				datHeaders[i].Parse(input.Split('¬')[0], i, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 			});
 
-			Globals.Logger.User("Processing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Processing complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			Globals.Logger.User("Populating internal DAT");
 			Parallel.For(0, inputs.Count, i =>
@@ -151,7 +151,7 @@ namespace SabreTools.Library.Dats
 			// Now that we have a merged DAT, filter it
 			Filter(filter, single, trim, root);
 
-			Globals.Logger.User("Processing and populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Processing and populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			return datHeaders.ToList();
 		}
@@ -184,7 +184,7 @@ namespace SabreTools.Library.Dats
 				Parse(path, 0, 0, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 			});
 
-			Globals.Logger.User("Populating base DAT complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating base DAT complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// For comparison's sake, we want to use CRC as the base ordering
 			BucketBy(SortedBy.CRC, true);
@@ -196,7 +196,7 @@ namespace SabreTools.Library.Dats
 				// Get the two halves of the path
 				string[] splitpath = path.Split('¬');
 
-				Globals.Logger.User("Comparing '" + splitpath[0] + "' to base DAT");
+				Globals.Logger.User("Comparing '{0}'' to base DAT", splitpath[0]);
 
 				// First we parse in the DAT internally
 				DatFile intDat = new DatFile();
@@ -294,7 +294,7 @@ namespace SabreTools.Library.Dats
 			});
 
 			outDats = outDatsArray.ToList();
-			Globals.Logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Initializing complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
@@ -316,7 +316,7 @@ namespace SabreTools.Library.Dats
 					// There's odd cases where there are items with System ID < 0. Skip them for now
 					if (item.SystemID < 0)
 					{
-						Globals.Logger.Warning("Item found with a <0 SystemID: " + item.Name);
+						Globals.Logger.Warning("Item found with a <0 SystemID: {0}", item.Name);
 						continue;
 					}
 
@@ -324,7 +324,7 @@ namespace SabreTools.Library.Dats
 				}
 			});
 
-			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Finally, loop through and output each of the DATs
 			start = DateTime.Now;
@@ -350,7 +350,7 @@ namespace SabreTools.Library.Dats
 				outDats[j].WriteToFile(path);
 			});
 
-			Globals.Logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Outputting complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
 
 		/// <summary>
@@ -426,7 +426,7 @@ namespace SabreTools.Library.Dats
 
 				outDats = outDatsArray.ToList();
 			}
-			Globals.Logger.User("Initializing complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Initializing complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Now, loop through the dictionary and populate the correct DATs
 			start = DateTime.Now;
@@ -482,7 +482,7 @@ namespace SabreTools.Library.Dats
 				}
 			});
 
-			Globals.Logger.User("Populating complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// Finally, loop through and output each of the DATs
 			start = DateTime.Now;
@@ -516,7 +516,7 @@ namespace SabreTools.Library.Dats
 					outDats[j].WriteToFile(path);
 				});
 			}
-			Globals.Logger.User("Outputting complete in " + DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			Globals.Logger.User("Outputting complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 		}
 
 		/// <summary>
@@ -598,7 +598,7 @@ namespace SabreTools.Library.Dats
 					}
 
 					DatFile innerDatdata = new DatFile(this);
-					Globals.Logger.User("Processing \"" + Path.GetFileName(inputFileName) + "\"");
+					Globals.Logger.User("Processing '{0}'", Path.GetFileName(inputFileName));
 					innerDatdata.Parse(inputFileName, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
 						keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 					innerDatdata.Filter(filter, trim, single, root);
@@ -620,7 +620,7 @@ namespace SabreTools.Library.Dats
 					List<string> subFiles = Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(subFiles, file =>
 					{
-						Globals.Logger.User("Processing \"" + Path.GetFullPath(file).Remove(0, inputFileName.Length) + "\"");
+						Globals.Logger.User("Processing '{0}'", Path.GetFullPath(file).Remove(0, inputFileName.Length));
 						DatFile innerDatdata = new DatFile(this);
 						innerDatdata.Parse(file, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
 							keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
@@ -633,7 +633,7 @@ namespace SabreTools.Library.Dats
 				}
 				else
 				{
-					Globals.Logger.Error("I'm sorry but " + inputFileName + " doesn't exist!");
+					Globals.Logger.Error("I'm sorry but '{0}' doesn't exist!", inputFileName);
 					return;
 				}
 			});

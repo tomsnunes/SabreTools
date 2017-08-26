@@ -71,7 +71,7 @@ namespace SabreTools.Library.Tools
 				// 7-zip
 				if (at == ArchiveType.SevenZip && (archiveScanLevel & ArchiveScanLevel.SevenZipInternal) != 0)
 				{
-					Globals.Logger.Verbose("Found archive of type: " + at);
+					Globals.Logger.Verbose("Found archive of type: {0}", at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(outDir);
@@ -89,7 +89,7 @@ namespace SabreTools.Library.Tools
 				// GZip
 				else if (at == ArchiveType.GZip && (archiveScanLevel & ArchiveScanLevel.GZipInternal) != 0)
 				{
-					Globals.Logger.Verbose("Found archive of type: " + at);
+					Globals.Logger.Verbose("Found archive of type: {0}", at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(outDir);
@@ -109,7 +109,7 @@ namespace SabreTools.Library.Tools
 				// RAR
 				else if (at == ArchiveType.Rar && (archiveScanLevel & ArchiveScanLevel.RarInternal) != 0)
 				{
-					Globals.Logger.Verbose("Found archive of type: " + at);
+					Globals.Logger.Verbose("Found archive of type: {0}", at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(outDir);
@@ -127,7 +127,7 @@ namespace SabreTools.Library.Tools
 				// TAR
 				else if (at == ArchiveType.Tar && (archiveScanLevel & ArchiveScanLevel.TarInternal) != 0)
 				{
-					Globals.Logger.Verbose("Found archive of type: " + at);
+					Globals.Logger.Verbose("Found archive of type: {0}", at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(outDir);
@@ -145,7 +145,7 @@ namespace SabreTools.Library.Tools
 				// Zip
 				else if (at == ArchiveType.Zip && (archiveScanLevel & ArchiveScanLevel.ZipInternal) != 0)
 				{
-					Globals.Logger.Verbose("Found archive of type: " + at);
+					Globals.Logger.Verbose("Found archive of type: {0}", at);
 
 					// Create the temp directory
 					Directory.CreateDirectory(outDir);
@@ -461,7 +461,7 @@ namespace SabreTools.Library.Tools
 			IReader reader = null;
 			try
 			{
-				Globals.Logger.Verbose("Found archive of type: " + at);
+				Globals.Logger.Verbose("Found archive of type: {0}", at);
 
 				switch (at)
 				{
@@ -614,7 +614,7 @@ namespace SabreTools.Library.Tools
 
 			try
 			{
-				Globals.Logger.Verbose("Found archive of type: " + at);
+				Globals.Logger.Verbose("Found archive of type: {0}", at);
 
 				switch (at)
 				{
@@ -915,21 +915,21 @@ namespace SabreTools.Library.Tools
 			// If we have the romba depot files, just skip them gracefully
 			if (datum == ".romba_size" || datum == ".romba_size.backup")
 			{
-				Globals.Logger.Verbose("Romba depot file found, skipping: " + input);
+				Globals.Logger.Verbose("Romba depot file found, skipping: {0}", input);
 				return null;
 			}
 
 			// Check if the name is the right length
 			if (!Regex.IsMatch(datum, @"^[0-9a-f]{" + Constants.SHA1Length + @"}\.gz")) // TODO: When updating to SHA-256, this needs to update to Constants.SHA256Length
 			{
-				Globals.Logger.Warning("Non SHA-1 filename found, skipping: '" + Path.GetFullPath(input) + "'");
+				Globals.Logger.Warning("Non SHA-1 filename found, skipping: '{0}'", Path.GetFullPath(input));
 				return null;
 			}
 
 			// Check if the file is at least the minimum length
 			if (filesize < 40 /* bytes */)
 			{
-				Globals.Logger.Warning("Possibly corrupt file '" + Path.GetFullPath(input) + "' with size " + Style.GetBytesReadable(filesize));
+				Globals.Logger.Warning("Possibly corrupt file '{0}' with size {1}", Path.GetFullPath(input), Style.GetBytesReadable(filesize));
 				return null;
 			}
 
@@ -1424,7 +1424,7 @@ namespace SabreTools.Library.Tools
 				}
 				catch
 				{
-					Globals.Logger.Warning("File '" + filename + "' could not be opened");
+					Globals.Logger.Warning("File '{0}' could not be opened", filename);
 					ist7z = 0;
 				}
 			}
@@ -2253,7 +2253,7 @@ namespace SabreTools.Library.Tools
 			// Check that the input file exists
 			if (!File.Exists(inputFile))
 			{
-				Globals.Logger.Warning("File " + inputFile + " does not exist!");
+				Globals.Logger.Warning("File '{0}' does not exist!", inputFile);
 				return false;
 			}
 			inputFile = Path.GetFullPath(inputFile);

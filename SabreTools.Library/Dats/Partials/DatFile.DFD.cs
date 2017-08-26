@@ -62,7 +62,7 @@ namespace SabreTools.Library.Dats
 			// Process the input
 			if (Directory.Exists(basePath))
 			{
-				Globals.Logger.Verbose("Folder found: " + basePath);
+				Globals.Logger.Verbose("Folder found: {0}", basePath);
 
 				// Process the files in the main folder
 				List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
@@ -129,7 +129,7 @@ namespace SabreTools.Library.Dats
 							romname = romname.Substring(0, romname.Length - 1);
 						}
 
-						Globals.Logger.Verbose("Adding blank empty folder: " + gamename);
+						Globals.Logger.Verbose("Adding blank empty folder: {0}", gamename);
 						this["null"].Add(new Rom(romname, gamename, omitFromScan));
 					});
 				}
@@ -181,11 +181,11 @@ namespace SabreTools.Library.Dats
 				{
 					// Add the list if it doesn't exist already
 					Add(rom.Size + "-" + rom.CRC, rom);
-					Globals.Logger.User("File added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
+					Globals.Logger.User("File added: {0}", Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 				}
 				else
 				{
-					Globals.Logger.User("File not added: " + Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
+					Globals.Logger.User("File not added: {0}", Path.GetFileNameWithoutExtension(item) + Environment.NewLine);
 					return;
 				}
 
@@ -288,7 +288,7 @@ namespace SabreTools.Library.Dats
 		private void PopulateFromDirProcessFile(string item, string parent, string basePath, Hash omitFromScan,
 			bool addDate, string headerToCheckAgainst)
 		{
-			Globals.Logger.Verbose(Path.GetFileName(item) + " treated like a file");
+			Globals.Logger.Verbose("'{0}' treated like a file", Path.GetFileName(item));
 			Rom rom = FileTools.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst);
 
 			PopulateFromDirProcessFileHelper(item, rom, basePath, parent);
@@ -419,7 +419,7 @@ namespace SabreTools.Library.Dats
 				// Add the file information to the DAT
 				Add(key, datItem);
 
-				Globals.Logger.User("File added: " + romname + Environment.NewLine);
+				Globals.Logger.User("File added: {0}", romname + Environment.NewLine);
 			}
 			catch (IOException ex)
 			{

@@ -335,11 +335,11 @@ namespace RombaSharp
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
 				{
-					Globals.Logger.User("For hash '" + input + "' there were " + sldr.RecordsAffected + " matches in the database");
+					Globals.Logger.User("For hash '{0}' there were {1} matches in the database", input, sldr.RecordsAffected);
 				}
 				else
 				{
-					Globals.Logger.User("Hash '" + input + "' had no matches in the database");
+					Globals.Logger.User("Hash '{0}' had no matches in the database", input);
 				}
 
 				sldr.Dispose();
@@ -352,11 +352,11 @@ namespace RombaSharp
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
 				{
-					Globals.Logger.User("For hash '" + input + "' there were " + sldr.RecordsAffected + " matches in the database");
+					Globals.Logger.User("For hash '{0}' there were {1} matches in the database", input, sldr.RecordsAffected);
 				}
 				else
 				{
-					Globals.Logger.User("Hash '" + input + "' had no matches in the database");
+					Globals.Logger.User("Hash '{0}' had no matches in the database", input);
 				}
 
 				sldr.Dispose();
@@ -369,11 +369,11 @@ namespace RombaSharp
 				SqliteDataReader sldr = slc.ExecuteReader();
 				if (sldr.HasRows)
 				{
-					Globals.Logger.User("For hash '" + input + "' there were " + sldr.RecordsAffected + " matches in the database");
+					Globals.Logger.User("For hash '{0}' there were {1} matches in the database", input, sldr.RecordsAffected);
 				}
 				else
 				{
-					Globals.Logger.User("Hash '" + input + "' had no matches in the database");
+					Globals.Logger.User("Hash '{0}' had no matches in the database", input);
 				}
 
 				sldr.Dispose();

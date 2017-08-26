@@ -39,7 +39,7 @@ namespace SabreTools.Library.Skippers
 			// If the input file doesn't exist, fail
 			if (!File.Exists(input))
 			{
-				Globals.Logger.Error("I'm sorry but '" + input + "' doesn't exist!");
+				Globals.Logger.Error("I'm sorry but '{0}' doesn't exist!", input);
 				return false;
 			}
 
@@ -49,7 +49,7 @@ namespace SabreTools.Library.Skippers
 				Directory.CreateDirectory(Path.GetDirectoryName(output));
 			}
 
-			Globals.Logger.User("Attempting to apply rule to '" + input + "'");
+			Globals.Logger.User("Attempting to apply rule to '{0}'", input);
 			success = TransformStream(FileTools.TryOpenRead(input), FileTools.TryCreate(output));
 
 			// If the output file has size 0, delete it

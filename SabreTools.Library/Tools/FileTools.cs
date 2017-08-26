@@ -59,12 +59,12 @@ namespace SabreTools.Library.Tools
 			}
 
 			// Read the input file, if possible
-			Globals.Logger.Verbose("Attempting to read file to get format: \"" + filename + "\"");
+			Globals.Logger.Verbose("Attempting to read file to get format: {0}", filename);
 
 			// Check if file exists
 			if (!File.Exists(filename))
 			{
-				Globals.Logger.Warning("File '" + filename + "' could not read from!");
+				Globals.Logger.Warning("File '{0}' could not read from!", filename);
 				return 0;
 			}
 
@@ -367,7 +367,7 @@ namespace SabreTools.Library.Tools
 				Directory.CreateDirectory(outDir);
 			}
 
-			Globals.Logger.User("\nGetting skipper information for '" + file + "'");
+			Globals.Logger.User("\nGetting skipper information for '{0}'", file);
 
 			// Get the skipper rule that matches the file, if any
 			SkipperRule rule = Skipper.GetMatchingRule(file, "");
@@ -431,7 +431,7 @@ namespace SabreTools.Library.Tools
 						}
 						catch (PathTooLongException)
 						{
-							Globals.Logger.Warning("The path for " + file + " was too long");
+							Globals.Logger.Warning("The path for '{0}' was too long", file);
 						}
 						catch (Exception ex)
 						{
@@ -447,7 +447,7 @@ namespace SabreTools.Library.Tools
 					}
 					catch (PathTooLongException)
 					{
-						Globals.Logger.Warning("The path for " + input + " was too long");
+						Globals.Logger.Warning("The path for '{0}' was too long", input);
 					}
 					catch (Exception ex)
 					{
@@ -466,12 +466,12 @@ namespace SabreTools.Library.Tools
 		/// <returns>The XmlTextReader representing the (possibly converted) file, null otherwise</returns>
 		public static XmlReader GetXmlTextReader(string filename)
 		{
-			Globals.Logger.Verbose("Attempting to read file: \"" + filename + "\"");
+			Globals.Logger.Verbose("Attempting to read file: {0}", filename);
 
 			// Check if file exists
 			if (!File.Exists(filename))
 			{
-				Globals.Logger.Warning("File '" + filename + "' could not read from!");
+				Globals.Logger.Warning("File '{0}' could not read from!", filename);
 				return null;
 			}
 
