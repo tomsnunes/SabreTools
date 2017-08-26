@@ -2364,7 +2364,7 @@ namespace SabreTools.Library.Dats
 		/// Name                                   Size Checksum
 		/// 1346b.cpu-u25                          2048 CRC(8e68533e) SHA1(a257c556d31691068ed5c991f1fb2b51da4826db)
 		/// 6331.sound-u8                            32 BAD CRC(1d298cb0) SHA1(bb0bb62365402543e3154b9a77be9c75010e6abc) BAD_DUMP
-		/// 
+		/// 16v8h-blue.u24                          279 NO GOOD DUMP KNOWN
 		/// </remarks>
 		private void ParseListroms(
 			// Standard Dat parsing
@@ -2399,24 +2399,49 @@ namespace SabreTools.Library.Dats
 				}
 
 				// If we have the beginning of a game, set the name of the game
-				else if (line.StartsWith("ROMs required for driver"))
+				else if (line.StartsWith("ROMs required for"))
 				{
-					gamename = Regex.Match(line, @"^ROMs required for driver ""(.*?)""\.").Groups[1].Value;
+					gamename = Regex.Match(line, @"^ROMs required for \S*? ""(.*?)""\.").Groups[1].Value;
+				}
+
+				// If we have a machine with no required roms (usually internal devices), skip it
+				else if (line.StartsWith("No ROMs required for"))
+				{
+					continue;
 				}
 
 				// Otherwise, we assume we have a rom that we need to add
 				else
 				{
-					// First we separate the ROM into pieces
-					string[] split = line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+					// First, we preprocess the line so that the rom name is consistently correct
+					string romname = "";
+					string[] split = line.Split(new string[] { "    " }, StringSplitOptions.RemoveEmptyEntries);
+
+					// If the line doesn't have the 4 spaces of padding, check for 3
+					if (split.Length == 1)
+					{
+						split = line.Split(new string[] { "   " }, StringSplitOptions.RemoveEmptyEntries);
+					}
+
+					// If the split is still unsuccessful, log it and skip
+					if (split.Length == 1)
+					{
+						Globals.Logger.Warning("Possibly malformed line: '{0}'", line);
+					}
+
+					romname = split[0];
+					line = line.Substring(romname.Length);
+
+					// Next we separate the ROM into pieces
+					split = line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
 
 					// Standard Disks have 2 pieces (name, sha1)
-					if (split.Length == 2)
+					if (split.Length == 1)
 					{
 						Disk disk = new Disk()
 						{
-							Name = split[0],
-							SHA1 = Style.CleanListromHashData(split[1]),
+							Name = romname,
+							SHA1 = Style.CleanListromHashData(split[0]),
 
 							Machine = new Machine()
 							{
@@ -2428,12 +2453,12 @@ namespace SabreTools.Library.Dats
 					}
 
 					// Baddump Disks have 4 pieces (name, BAD, sha1, BAD_DUMP)
-					else if (split.Length == 4 && line.EndsWith("BAD_DUMP"))
+					else if (split.Length == 3 && line.EndsWith("BAD_DUMP"))
 					{
 						Disk disk = new Disk()
 						{
-							Name = split[0],
-							SHA1 = Style.CleanListromHashData(split[2]),
+							Name = romname,
+							SHA1 = Style.CleanListromHashData(split[1]),
 							ItemStatus = ItemStatus.BadDump,
 
 							Machine = new Machine()
@@ -2446,19 +2471,19 @@ namespace SabreTools.Library.Dats
 					}
 
 					// Standard ROMs have 4 pieces (name, size, crc, sha1)
-					else if (split.Length == 4)
+					else if (split.Length == 3)
 					{
-						if (!Int64.TryParse(split[1], out long size))
+						if (!Int64.TryParse(split[0], out long size))
 						{
 							size = 0;
 						}
 
 						Rom rom = new Rom()
 						{
-							Name = split[0],
+							Name = romname,
 							Size = size,
-							CRC = Style.CleanListromHashData(split[2]),
-							SHA1 = Style.CleanListromHashData(split[3]),
+							CRC = Style.CleanListromHashData(split[1]),
+							SHA1 = Style.CleanListromHashData(split[2]),
 
 							Machine = new Machine()
 							{
@@ -2470,11 +2495,11 @@ namespace SabreTools.Library.Dats
 					}
 
 					// Nodump Disks have 5 pieces (name, NO, GOOD, DUMP, KNOWN)
-					else if (split.Length == 5 && line.EndsWith("NO GOOD DUMP KNOWN"))
+					else if (split.Length == 4 && line.EndsWith("NO GOOD DUMP KNOWN"))
 					{
 						Disk disk = new Disk()
 						{
-							Name = split[0],
+							Name = romname,
 							ItemStatus = ItemStatus.Nodump,
 
 							Machine = new Machine()
@@ -2487,19 +2512,19 @@ namespace SabreTools.Library.Dats
 					}
 
 					// Baddump ROMs have 6 pieces (name, size, BAD, crc, sha1, BAD_DUMP)
-					else if (split.Length == 6 && line.EndsWith("BAD_DUMP"))
+					else if (split.Length == 5 && line.EndsWith("BAD_DUMP"))
 					{
-						if (!Int64.TryParse(split[1], out long size))
+						if (!Int64.TryParse(split[0], out long size))
 						{
 							size = 0;
 						}
 
 						Rom rom = new Rom()
 						{
-							Name = split[0],
+							Name = romname,
 							Size = size,
-							CRC = Style.CleanListromHashData(split[3]),
-							SHA1 = Style.CleanListromHashData(split[4]),
+							CRC = Style.CleanListromHashData(split[2]),
+							SHA1 = Style.CleanListromHashData(split[3]),
 							ItemStatus = ItemStatus.BadDump,
 
 							Machine = new Machine()
@@ -2510,16 +2535,16 @@ namespace SabreTools.Library.Dats
 					}
 
 					// Nodump ROMs have 6 pieces (name, size, NO, GOOD, DUMP, KNOWN)
-					else if (split.Length == 6 && line.EndsWith("NO GOOD DUMP KNOWN"))
+					else if (split.Length == 5 && line.EndsWith("NO GOOD DUMP KNOWN"))
 					{
-						if (!Int64.TryParse(split[1], out long size))
+						if (!Int64.TryParse(split[0], out long size))
 						{
 							size = 0;
 						}
 
 						Rom rom = new Rom()
 						{
-							Name = split[0],
+							Name = romname,
 							Size = size,
 							ItemStatus = ItemStatus.Nodump,
 
@@ -2533,7 +2558,7 @@ namespace SabreTools.Library.Dats
 					// If we have something else, it's invalid
 					else
 					{
-						Globals.Logger.Warning("Invalid line detected: '" + line + "'");
+						Globals.Logger.Warning("Invalid line detected: '{0} {1}'", romname, line);
 					}
 				}
 			}
