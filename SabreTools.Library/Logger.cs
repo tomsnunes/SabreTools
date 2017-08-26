@@ -251,6 +251,17 @@ namespace SabreTools.Library
 		}
 
 		/// <summary>
+		/// Write the given string as a verbose message to the log output
+		/// </summary>
+		/// <param name="output">String to be written log</param>
+		/// <param name="args">Optional arguments for string formatting</param>
+		/// <returns>True if the output could be written, false otherwise</returns>s
+		public bool Verbose(string output, params object[] args)
+		{
+			return Log(string.Format(output, args), LogLevel.VERBOSE, true);
+		}
+
+		/// <summary>
 		/// Write the given string as a user message to the log output
 		/// </summary>
 		/// <param name="output">String to be written log</param>
@@ -259,6 +270,17 @@ namespace SabreTools.Library
 		public bool User(string output, bool appendPrefix = true)
 		{
 			return Log(output, LogLevel.USER, appendPrefix);
+		}
+
+		/// <summary>
+		/// Write the given string as a user message to the log output
+		/// </summary>
+		/// <param name="output">String to be written log</param>
+		/// <param name="args">Optional arguments for string formatting</param>
+		/// <returns>True if the output could be written, false otherwise</returns>
+		public bool User(string output, params object[] args)
+		{
+			return Log(string.Format(output, args), LogLevel.USER, true);
 		}
 
 		/// <summary>
@@ -274,6 +296,18 @@ namespace SabreTools.Library
 		}
 
 		/// <summary>
+		/// Write the given string as a warning to the log output
+		/// </summary>
+		/// <param name="output">String to be written log</param>
+		/// <param name="args">Optional arguments for string formatting</param>
+		/// <returns>True if the output could be written, false otherwise</returns>
+		public bool Warning(string output, params object[] args)
+		{
+			_warnings = true;
+			return Log(string.Format(output, args), LogLevel.WARNING, true);
+		}
+
+		/// <summary>
 		/// Writes the given string as an error in the log
 		/// </summary>
 		/// <param name="output">String to be written log</param>
@@ -283,6 +317,18 @@ namespace SabreTools.Library
 		{
 			_errors = true;
 			return Log(output, LogLevel.ERROR, appendPrefix);
+		}
+
+		/// <summary>
+		/// Writes the given string as an error in the log
+		/// </summary>
+		/// <param name="output">String to be written log</param>
+		/// <param name="args">Optional arguments for string formatting</param>
+		/// <returns>True if the output could be written, false otherwise</returns>
+		public bool Error(string output, params object[] args)
+		{
+			_errors = true;
+			return Log(string.Format(output, args), LogLevel.ERROR, true);
 		}
 
 		/// <summary>
