@@ -498,14 +498,14 @@ namespace SabreTools.Library.Dats
 					dirNodump = 0;
 				}
 
-				Globals.Logger.Verbose("Beginning stat collection for '" + filename.Item1 + "'", false);
+				Globals.Logger.Verbose("Beginning stat collection for '{0}'", false, filename.Item1);
 				List<string> games = new List<string>();
 				DatFile datdata = new DatFile();
 				datdata.Parse(filename.Item1, 0, 0);
 				datdata.BucketBy(SortedBy.Game, false /* mergeroms */, norename: true);
 
 				// Output single DAT stats (if asked)
-				Globals.Logger.User("Adding stats for file '" + filename.Item1 + "'\n", false);
+				Globals.Logger.User("Adding stats for file '{0}'\n", false, filename.Item1);
 				if (single)
 				{
 					datdata.OutputStats(outputs, statDatFormat,

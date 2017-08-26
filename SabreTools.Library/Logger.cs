@@ -243,17 +243,6 @@ namespace SabreTools.Library
 		/// Write the given string as a verbose message to the log output
 		/// </summary>
 		/// <param name="output">String to be written log</param>
-		/// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
-		/// <returns>True if the output could be written, false otherwise</returns>s
-		public bool Verbose(string output, bool appendPrefix = true)
-		{
-			return Log(output, LogLevel.VERBOSE, appendPrefix);
-		}
-
-		/// <summary>
-		/// Write the given string as a verbose message to the log output
-		/// </summary>
-		/// <param name="output">String to be written log</param>
 		/// <param name="args">Optional arguments for string formatting</param>
 		/// <returns>True if the output could be written, false otherwise</returns>s
 		public bool Verbose(string output, params object[] args)
@@ -262,14 +251,15 @@ namespace SabreTools.Library
 		}
 
 		/// <summary>
-		/// Write the given string as a user message to the log output
+		/// Write the given string as a verbose message to the log output
 		/// </summary>
 		/// <param name="output">String to be written log</param>
 		/// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
+		/// <param name="args">Optional arguments for string formatting</param>
 		/// <returns>True if the output could be written, false otherwise</returns>
-		public bool User(string output, bool appendPrefix = true)
+		public bool Verbose(string output, bool appendPrefix = true, params object[] args)
 		{
-			return Log(output, LogLevel.USER, appendPrefix);
+			return Log(output, LogLevel.VERBOSE, appendPrefix);
 		}
 
 		/// <summary>
@@ -284,15 +274,15 @@ namespace SabreTools.Library
 		}
 
 		/// <summary>
-		/// Write the given string as a warning to the log output
+		/// Write the given string as a user message to the log output
 		/// </summary>
 		/// <param name="output">String to be written log</param>
 		/// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
+		/// <param name="args">Optional arguments for string formatting</param>
 		/// <returns>True if the output could be written, false otherwise</returns>
-		public bool Warning(string output, bool appendPrefix = true)
+		public bool User(string output, bool appendPrefix = true, params object[] args)
 		{
-			_warnings = true;
-			return Log(output, LogLevel.WARNING, appendPrefix);
+			return Log(output, LogLevel.USER, appendPrefix);
 		}
 
 		/// <summary>
@@ -308,15 +298,16 @@ namespace SabreTools.Library
 		}
 
 		/// <summary>
-		/// Writes the given string as an error in the log
+		/// Write the given string as a warning to the log output
 		/// </summary>
 		/// <param name="output">String to be written log</param>
 		/// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
+		/// <param name="args">Optional arguments for string formatting</param>
 		/// <returns>True if the output could be written, false otherwise</returns>
-		public bool Error(string output, bool appendPrefix = true)
+		public bool Warning(string output, bool appendPrefix = true, params object[] args)
 		{
-			_errors = true;
-			return Log(output, LogLevel.ERROR, appendPrefix);
+			_warnings = true;
+			return Log(output, LogLevel.WARNING, appendPrefix);
 		}
 
 		/// <summary>
@@ -329,6 +320,19 @@ namespace SabreTools.Library
 		{
 			_errors = true;
 			return Log(string.Format(output, args), LogLevel.ERROR, true);
+		}
+
+		/// <summary>
+		/// Writes the given string as an error in the log
+		/// </summary>
+		/// <param name="output">String to be written log</param>
+		/// <param name="appendPrefix">True if the level and datetime should be prepended to each statement (default), false otherwise</param>
+		/// <param name="args">Optional arguments for string formatting</param>
+		/// <returns>True if the output could be written, false otherwise</returns>
+		public bool Error(string output, bool appendPrefix = true, params object[] args)
+		{
+			_errors = true;
+			return Log(output, LogLevel.ERROR, appendPrefix);
 		}
 
 		/// <summary>
