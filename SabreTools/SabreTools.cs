@@ -356,6 +356,10 @@ namespace SabreTools
 					case "--dat-merged":
 						splitType = SplitType.Merged;
 						break;
+					case "-dnd":
+					case "--dat-devnonmerged":
+						splitType = SplitType.DeviceNonMerged;
+						break;
 					case "-dnm":
 					case "--dat-nonmerged":
 						splitType = SplitType.NonMerged;

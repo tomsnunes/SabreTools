@@ -597,6 +597,11 @@ Options:
 			parent set based on the cloneof tag. This is incompatible with the
 			other --dat-X flags.
 		
+		-dnd, --dat-devnonmerged Force creating device non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			device references. This is incompatible with the other --dat-X
+			flags.
+		
 		-df, --dat-fullnonmerged Force creating fully non-merged sets
 			Preprocess the DAT to have child sets contain all items from the
 			parent sets based on the cloneof and romof tags as well as device

@@ -382,6 +382,28 @@ namespace SabreTools.Library.Dats
 		#region Merging/Splitting Methods
 
 		/// <summary>
+		/// Use cdevice_ref tags to get full non-merged sets and remove parenting tags
+		/// </summary>
+		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		public void CreateDeviceNonMergedSets(bool mergeroms)
+		{
+			Globals.Logger.User("Creating device non-merged sets from the DAT");
+
+			// For sake of ease, the first thing we want to do is sort by game
+			BucketBy(SortedBy.Game, mergeroms, norename: true);
+			_sortedBy = SortedBy.Default;
+
+			// Now we want to loop through all of the games and set the correct information
+			AddRomsFromDevices();
+
+			// Then, remove the romof and cloneof tags so it's not picked up by the manager
+			RemoveTagsFromChild();
+
+			// Finally, remove all sets that are labeled as bios or device
+			//RemoveBiosAndDeviceSets(logger);
+		}
+
+		/// <summary>
 		/// Use cloneof tags to create non-merged sets and remove the tags plus using the device_ref tags to get full sets
 		/// </summary>
 		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>

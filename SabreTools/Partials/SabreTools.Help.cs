@@ -1100,6 +1100,11 @@ namespace SabreTools
 				"Create non-merged sets",
 				FeatureType.Flag,
 				null));
+			update.AddFeature("dat-devnonmerged", new Feature(
+				new List<string>() { "-dnd", "--dat-devnonmerged" },
+				"Create device non-merged sets",
+				FeatureType.Flag,
+				null));
 			update.AddFeature("dat-fullnonmerged", new Feature(
 				new List<string>() { "-df", "--dat-fullnonmerged" },
 				"Create fully non-merged sets",

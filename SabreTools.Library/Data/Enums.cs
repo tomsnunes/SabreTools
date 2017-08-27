@@ -279,6 +279,7 @@
 		Merged,
 		FullNonMerged,
 		Split,
+		DeviceNonMerged
 	}
 
 	#endregion
