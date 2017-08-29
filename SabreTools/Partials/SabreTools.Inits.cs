@@ -497,7 +497,7 @@ namespace SabreTools
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
-		/// <param name="dedup">True to dedupe the roms in the DAT, false otherwise (default)</param>
+		/// <param name="dedup">Dedupe type to use for DAT processing</param>
 		/// <param name="stripHash">StripHash that represents the hash(es) that you want to remove from the output</param>
 		private static void InitUpdate(
 			List<string> inputPaths,
@@ -558,7 +558,7 @@ namespace SabreTools
 			bool clean,
 			bool remUnicode,
 			bool descAsName,
-			bool dedup,
+			DedupeType dedup,
 			Hash stripHash)
 		{
 			// Set the special flags
@@ -668,11 +668,11 @@ namespace SabreTools
 				}
 				if (name == "")
 				{
-					name = (diffMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup ? "-deduped" : "");
+					name = (diffMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup != DedupeType.None ? "-deduped" : "");
 				}
 				if (description == "")
 				{
-					description = (diffMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup ? " - deduped" : "");
+					description = (diffMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup != DedupeType.None ? " - deduped" : "");
 					if (!bare)
 					{
 						description += " (" + date + ")";
@@ -708,7 +708,7 @@ namespace SabreTools
 				ForceMerging = fm,
 				ForceNodump = fn,
 				ForcePacking = fp,
-				MergeRoms = dedup,
+				DedupeRoms = dedup,
 				ExcludeOf = excludeOf,
 				DatFormat = datFormat,
 				StripHash = stripHash,

@@ -1130,6 +1130,11 @@ namespace SabreTools
 				"Enable deduping in the created DAT",
 				FeatureType.Flag,
 				null));
+			update.AddFeature("game-dedup", new Feature(
+				new List<string>() { "-gdd", "--game-dedup" },
+				"Enable in-game deduping in the created DAT",
+				FeatureType.Flag,
+				null));
 			update.AddFeature("merge", new Feature(
 				new List<string>() { "-m", "--merge" },
 				"Merge the input DATs",

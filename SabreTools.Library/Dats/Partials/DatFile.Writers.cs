@@ -105,14 +105,18 @@ namespace SabreTools.Library.Dats
 					recalculate: (RomCount + DiskCount == 0), baddumpCol: true, nodumpCol: true);
 			}
 
-			// First bucket by CRC to dedupe if required
-			if (MergeRoms)
+			// Bucket and dedupe according to the flag
+			if (DedupeRoms == DedupeType.Full)
 			{
-				BucketBy(SortedBy.CRC, MergeRoms, norename: norename);
+				BucketBy(SortedBy.CRC, DedupeRoms, norename: norename);
+			}
+			else if (DedupeRoms == DedupeType.Game)
+			{
+				BucketBy(SortedBy.Game, DedupeRoms, norename: norename);
 			}
 
-			// Bucket roms by game name
-			BucketBy(SortedBy.Game, false /* mergeRoms */, norename: norename);
+			// Bucket roms by game name, if not already
+			BucketBy(SortedBy.Game, DedupeType.None, norename: norename);
 
 			// Output the number of items we're going to be writing
 			Globals.Logger.User("A total of {0} items will be written out to '{1}'", Count, FileName);

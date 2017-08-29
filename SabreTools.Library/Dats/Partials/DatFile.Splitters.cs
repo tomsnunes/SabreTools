@@ -155,7 +155,7 @@ namespace SabreTools.Library.Dats
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
-				MergeRoms = this.MergeRoms,
+				DedupeRoms = this.DedupeRoms,
 			};
 			DatFile sha512 = new DatFile
 			{
@@ -176,7 +176,7 @@ namespace SabreTools.Library.Dats
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
-				MergeRoms = this.MergeRoms,
+				DedupeRoms = this.DedupeRoms,
 			};
 			DatFile sha384 = new DatFile
 			{
@@ -197,7 +197,7 @@ namespace SabreTools.Library.Dats
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
-				MergeRoms = this.MergeRoms,
+				DedupeRoms = this.DedupeRoms,
 			};
 			DatFile sha256 = new DatFile
 			{
@@ -218,7 +218,7 @@ namespace SabreTools.Library.Dats
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
-				MergeRoms = this.MergeRoms,
+				DedupeRoms = this.DedupeRoms,
 			};
 			DatFile sha1 = new DatFile
 			{
@@ -239,7 +239,7 @@ namespace SabreTools.Library.Dats
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
-				MergeRoms = this.MergeRoms,
+				DedupeRoms = this.DedupeRoms,
 			};
 			DatFile md5 = new DatFile
 			{
@@ -260,7 +260,7 @@ namespace SabreTools.Library.Dats
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
-				MergeRoms = this.MergeRoms,
+				DedupeRoms = this.DedupeRoms,
 			};
 			DatFile crc = new DatFile
 			{
@@ -281,7 +281,7 @@ namespace SabreTools.Library.Dats
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
-				MergeRoms = this.MergeRoms,
+				DedupeRoms = this.DedupeRoms,
 			};
 			DatFile other = new DatFile
 			{
@@ -302,7 +302,7 @@ namespace SabreTools.Library.Dats
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
-				MergeRoms = this.MergeRoms,
+				DedupeRoms = this.DedupeRoms,
 			};
 
 			// Now populate each of the DAT objects in turn
@@ -405,7 +405,7 @@ namespace SabreTools.Library.Dats
 			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
 
 			// First, organize by games so that we can do the right thing
-			BucketBy(SortedBy.Game, false /* mergeroms */, lower: false, norename: true);
+			BucketBy(SortedBy.Game, DedupeType.None, lower: false, norename: true);
 
 			// Create a temporary DAT to add things to
 			DatFile tempDat = new DatFile(this)
@@ -537,7 +537,7 @@ namespace SabreTools.Library.Dats
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
-				MergeRoms = this.MergeRoms,
+				DedupeRoms = this.DedupeRoms,
 			};
 			DatFile diskdat = new DatFile
 			{
@@ -558,7 +558,7 @@ namespace SabreTools.Library.Dats
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
-				MergeRoms = this.MergeRoms,
+				DedupeRoms = this.DedupeRoms,
 			};
 			DatFile sampledat = new DatFile
 			{
@@ -579,7 +579,7 @@ namespace SabreTools.Library.Dats
 				ForceNodump = this.ForceNodump,
 				ForcePacking = this.ForcePacking,
 				DatFormat = this.DatFormat,
-				MergeRoms = this.MergeRoms,
+				DedupeRoms = this.DedupeRoms,
 			};
 
 			// Now populate each of the DAT objects in turn

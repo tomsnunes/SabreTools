@@ -95,7 +95,6 @@ namespace SabreTools
 				cleanGameNames = false,
 				copyFiles = false,
 				datPrefix = false,
-				dedup = false,
 				delete = false,
 				descAsName = false,
 				enableGzip = false,
@@ -122,6 +121,7 @@ namespace SabreTools
 				updateDat = false,
 				usegame = true;
 			DatFormat datFormat = 0x0;
+			DedupeType dedup = DedupeType.None;
 			DiffMode diffMode = 0x0;
 			Hash omitFromScan = Hash.SHA256 | Hash.SHA384 | Hash.SHA512; // Should be set to 0x0 later
 			Hash stripHash = 0x0;
@@ -326,7 +326,7 @@ namespace SabreTools
 						break;
 					case "-dd":
 					case "--dedup":
-						dedup = true;
+						dedup = DedupeType.Full;
 						break;
 					case "-del":
 					case "--delete":
@@ -371,6 +371,10 @@ namespace SabreTools
 					case "-f":
 					case "--files":
 						parseArchivesAsFiles = true;
+						break;
+					case "-gdd":
+					case "--game-dedup":
+						dedup = DedupeType.Game;
 						break;
 					case "-gp":
 					case "--game-prefix":

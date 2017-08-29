@@ -25,10 +25,10 @@ namespace SabreTools.Library.Dats
 		/// Take the arbitrarily sorted Files Dictionary and convert to one sorted by a user-defined method
 		/// </summary>
 		/// <param name="bucketBy">SortedBy enum representing how to sort the individual items</param>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
+		/// <param name="deduperoms">Dedupe type that should be used</param>
 		/// <param name="lower">True if the key should be lowercased (default), false otherwise</param>
 		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
-		public void BucketBy(SortedBy bucketBy, bool mergeroms, bool lower = true, bool norename = true)
+		public void BucketBy(SortedBy bucketBy, DedupeType deduperoms, bool lower = true, bool norename = true)
 		{
 			// If we already have the right sorting, trust it
 			if (_sortedBy == bucketBy)
@@ -48,7 +48,7 @@ namespace SabreTools.Library.Dats
 			// Create the temporary dictionary to sort into
 			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
 
-			Globals.Logger.User("Organizing roms by {0}" + (mergeroms ? " and merging" : ""), bucketBy);
+			Globals.Logger.User("Organizing roms by {0}" + (deduperoms != DedupeType.None ? " and merging" : ""), bucketBy);
 
 			// First do the initial sort of all of the roms
 			List<string> keys = Keys.ToList();
@@ -152,7 +152,7 @@ namespace SabreTools.Library.Dats
 				DatItem.Sort(ref sortedlist, false);
 
 				// If we're merging the roms, do so
-				if (mergeroms)
+				if (deduperoms == DedupeType.Full || (deduperoms == DedupeType.Game && bucketBy == SortedBy.Game))
 				{
 					sortedlist = DatItem.Merge(sortedlist);
 				}
@@ -384,8 +384,8 @@ namespace SabreTools.Library.Dats
 		/// <summary>
 		/// Use cdevice_ref tags to get full non-merged sets and remove parenting tags
 		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		public void CreateDeviceNonMergedSets(bool mergeroms)
+		/// <param name="mergeroms">Dedupe type to be used</param>
+		public void CreateDeviceNonMergedSets(DedupeType mergeroms)
 		{
 			Globals.Logger.User("Creating device non-merged sets from the DAT");
 
@@ -406,8 +406,8 @@ namespace SabreTools.Library.Dats
 		/// <summary>
 		/// Use cloneof tags to create non-merged sets and remove the tags plus using the device_ref tags to get full sets
 		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		public void CreateFullyNonMergedSets(bool mergeroms)
+		/// <param name="mergeroms">Dedupe type to be used</param>
+		public void CreateFullyNonMergedSets(DedupeType mergeroms)
 		{
 			Globals.Logger.User("Creating fully non-merged sets from the DAT");
 
@@ -432,8 +432,8 @@ namespace SabreTools.Library.Dats
 		/// <summary>
 		/// Use cloneof tags to create merged sets and remove the tags
 		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		public void CreateMergedSets(bool mergeroms)
+		/// <param name="mergeroms">Dedupe type to be used</param>
+		public void CreateMergedSets(DedupeType mergeroms)
 		{
 			Globals.Logger.User("Creating merged sets from the DAT");
 
@@ -454,8 +454,8 @@ namespace SabreTools.Library.Dats
 		/// <summary>
 		/// Use cloneof tags to create non-merged sets and remove the tags
 		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		public void CreateNonMergedSets(bool mergeroms)
+		/// <param name="mergeroms">Dedupe type to be used</param>
+		public void CreateNonMergedSets(DedupeType mergeroms)
 		{
 			Globals.Logger.User("Creating non-merged sets from the DAT");
 
@@ -476,8 +476,8 @@ namespace SabreTools.Library.Dats
 		/// <summary>
 		/// Use cloneof and romof tags to create split sets and remove the tags
 		/// </summary>
-		/// <param name="mergeroms">True if roms should be deduped, false otherwise</param>
-		public void CreateSplitSets(bool mergeroms)
+		/// <param name="mergeroms">Dedupe type to be used</param>
+		public void CreateSplitSets(DedupeType mergeroms)
 		{
 			Globals.Logger.User("Creating split sets from the DAT");
 

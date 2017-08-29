@@ -119,7 +119,7 @@ namespace SabreTools.Library.Dats
 				datHeaders[i] = new DatFile
 				{
 					DatFormat = (DatFormat != 0 ? DatFormat : 0),
-					MergeRoms = MergeRoms,
+					DedupeRoms = DedupeRoms,
 				};
 
 				datHeaders[i].Parse(input.Split('¬')[0], i, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
@@ -187,7 +187,7 @@ namespace SabreTools.Library.Dats
 			Globals.Logger.User("Populating base DAT complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			// For comparison's sake, we want to use CRC as the base ordering
-			BucketBy(SortedBy.CRC, true);
+			BucketBy(SortedBy.CRC, DedupeType.Full);
 
 			// Now we want to compare each input DAT against the base
 			List<string> inputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
@@ -203,7 +203,7 @@ namespace SabreTools.Library.Dats
 				intDat.Parse(splitpath[0], 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 
 				// For comparison's sake, we want to use CRC as the base ordering
-				intDat.BucketBy(SortedBy.CRC, true);
+				intDat.BucketBy(SortedBy.CRC, DedupeType.Full);
 
 				// Then we do a hashwise comparison against the base DAT
 				List<string> keys = intDat.Keys.ToList();

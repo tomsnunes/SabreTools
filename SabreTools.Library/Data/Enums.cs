@@ -211,6 +211,16 @@
 	#region DatFile related
 
 	/// <summary>
+	/// Determines the DAT deduplication type
+	/// </summary>
+	public enum DedupeType
+	{
+		None = 0,
+		Full,
+		Game
+	}
+
+	/// <summary>
 	/// Determines forcemerging tag for DAT output
 	/// </summary>
 	public enum ForceMerging

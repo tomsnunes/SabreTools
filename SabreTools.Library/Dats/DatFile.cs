@@ -29,7 +29,7 @@ namespace SabreTools.Library.Dats
 		private ForcePacking _forcePacking;
 		private DatFormat _datFormat;
 		private bool _excludeOf;
-		private bool _mergeRoms;
+		private DedupeType _dedupeRoms;
 		private Hash _stripHash;
 		private bool _oneGameOneRegion;
 		private List<string> _regions = new List<string>();
@@ -162,10 +162,10 @@ namespace SabreTools.Library.Dats
 			get { return _excludeOf; }
 			set { _excludeOf = value; }
 		}
-		public bool MergeRoms
+		public DedupeType DedupeRoms
 		{
-			get { return _mergeRoms; }
-			set { _mergeRoms = value; }
+			get { return _dedupeRoms; }
+			set { _dedupeRoms = value; }
 		}
 		public Hash StripHash
 		{
@@ -548,7 +548,7 @@ namespace SabreTools.Library.Dats
 			_forcePacking = datFile.ForcePacking;
 			_excludeOf = datFile.ExcludeOf;
 			_datFormat = datFile.DatFormat;
-			_mergeRoms = datFile.MergeRoms;
+			_dedupeRoms = datFile.DedupeRoms;
 			_stripHash = datFile.StripHash;
 			_sortedBy = SortedBy.Default;
 			_useGame = datFile.UseGame;

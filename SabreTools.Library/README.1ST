@@ -1102,6 +1102,11 @@ Options:
 			For all outputted DATs, allow for hash deduping. This makes sure
 			that there are effectively no duplicates in the output files.
 			
+		-gdd, --game-dedup	Enable deduping within games in the created DAT
+			For all outputted DATs, allow for hash deduping but only within the
+			games, and not across the entire DAT. This makes sure that there
+			are effectively no duplicates within each of the output sets.
+			
 		-m, --merge		Merge the input DATs
 			By default, all DATs are processed individually with the user-
 			specified flags. With this flag enabled, all of the input DATs are

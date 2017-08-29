@@ -404,7 +404,7 @@ namespace RombaSharp
 			DatFile datroot = new DatFile { Type = "SuperDAT", };
 			// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 			datroot.PopulateFromDir(_dats, Hash.DeepHashes, false, false, false, SkipFileType.None, false, false, _tmpdir, false, null);
-			datroot.BucketBy(SortedBy.SHA1, false /* mergeroms */);
+			datroot.BucketBy(SortedBy.SHA1, DedupeType.None);
 
 			// Create a List of dat hashes in the database (SHA-1)
 			List<string> databaseDats = new List<string>();
@@ -434,7 +434,7 @@ namespace RombaSharp
 					unneeded.Add(hash);
 				}
 			}
-			datroot.BucketBy(SortedBy.Game, false /* mergeroms */, norename: true);
+			datroot.BucketBy(SortedBy.Game, DedupeType.None, norename: true);
 
 			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
@@ -619,7 +619,7 @@ namespace RombaSharp
 			DatFile depot = new DatFile();
 			// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 			depot.PopulateFromDir(depotname, Hash.DeepHashes, false, false, true, SkipFileType.None, false, false, _tmpdir, false, null);
-			depot.BucketBy(SortedBy.SHA1, false /* mergeroms */);
+			depot.BucketBy(SortedBy.SHA1, DedupeType.None);
 
 			// Set the base queries to use
 			string crcquery = "INSERT OR IGNORE INTO crc (crc) VALUES";
