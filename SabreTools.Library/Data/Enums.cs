@@ -217,7 +217,15 @@
 	{
 		None = 0,
 		Full,
-		Game
+
+		// Force only deduping with certain types
+		Game,
+		CRC,
+		MD5,
+		SHA1,
+		SHA256,
+		SHA384,
+		SHA512,
 	}
 
 	/// <summary>
