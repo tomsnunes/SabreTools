@@ -66,6 +66,22 @@ This tool has a comprehensive list of command line parameters that can be used t
 
 An in-progress tool that will try to act as a C# port of the Go-based [Romba](https://github.com/uwedeportivo/romba/) program. All features that are not already a part of SabreTools will be attempted to be added to this program. It is NOT ready for use yet. For any inquiries into the full features of this tool, please contact the project.
 
+## Builds
+
+In the most technical sense, the best way to get the newest version is to build it yourself. There's no guarantee that I will release intermediate builds based on incremental code updates. Combined with the fact that I don't know how to set up a continuous build system, we get an odd situation for those users who want the bleeding edge releases. For the time being, you can find all test and intermediate builds at [this link](https://mega.nz/#F!8JUhWZxT!h4DnCsgcBsMH3RRDKv27CA).
+
+### Some Things to Note
+
+I have to say these because I know how some users are.
+
+1. These builds have no guarantee of working for all features. For best experiences, please use the latest stable build.
+2. These builds may contain features that will be replaced or removed in the future. Do NOT take a dependency on any flags or naming conventions that you see.
+3. The names of the builds generally have to do with what each new change tests. Do NOT ask for names of these to be changed; they are named exactly how they will stay, no matter how odd or stupid it is.
+4. Not all versions will be built each time. This means that some test builds and prereleases will ONLY have a Mono x64 build or a Debug x64 build. Unless there is a specific need to test one of these and you have no way of building yourself, please do not request alternate versions of these.
+5. No, I won't be hosting them on another hoster. MEGA does its job here and that's all that is needed. Yes, I know that some multiple uploaders include MEGA. No, I don't care. Sorry.
+
+The day that a continuous build system is set up (read: never), these links will be archived, possibly on a third party host instead of relying on MEGA.
+
 ## Licensing
 
 The preceding programs use, in part or in whole, code, libraries, and/or applications from the [7-zip project](http://www.7-zip.org). 7-zip is licensed under the GNU LGPL.
