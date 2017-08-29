@@ -181,19 +181,19 @@ namespace SabreTools.Library.Dats
 			switch (splitType)
 			{
 				case SplitType.DeviceNonMerged:
-					CreateDeviceNonMergedSets(false);
+					CreateDeviceNonMergedSets(DedupeType.None);
 					break;
 				case SplitType.FullNonMerged:
-					CreateFullyNonMergedSets(false);
+					CreateFullyNonMergedSets(DedupeType.None);
 					break;
 				case SplitType.NonMerged:
-					CreateNonMergedSets(false);
+					CreateNonMergedSets(DedupeType.None);
 					break;
 				case SplitType.Merged:
-					CreateMergedSets(false);
+					CreateMergedSets(DedupeType.None);
 					break;
 				case SplitType.Split:
-					CreateSplitSets(false);
+					CreateSplitSets(DedupeType.None);
 					break;
 			}
 		}
