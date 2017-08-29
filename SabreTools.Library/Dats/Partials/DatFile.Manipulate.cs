@@ -1006,7 +1006,7 @@ namespace SabreTools.Library.Dats
 					{
 						case ItemType.Archive:
 							Archive archive = ((Archive)item).Clone() as Archive;
-							if (this[game].Contains(archive))
+							while (this[game].Contains(archive))
 							{
 								this[game].Remove(archive);
 							}
@@ -1014,7 +1014,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.BiosSet:
 							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							if (this[game].Contains(biosSet))
+							while (this[game].Contains(biosSet))
 							{
 								this[game].Remove(biosSet);
 							}
@@ -1022,7 +1022,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Disk:
 							Disk disk = ((Disk)item).Clone() as Disk;
-							if (this[game].Contains(disk))
+							while (this[game].Contains(disk))
 							{
 								this[game].Remove(disk);
 							}
@@ -1030,7 +1030,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Release:
 							Release release = ((Release)item).Clone() as Release;
-							if (this[game].Contains(release))
+							while (this[game].Contains(release))
 							{
 								this[game].Remove(release);
 							}
@@ -1038,7 +1038,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Rom:
 							Rom rom = ((Rom)item).Clone() as Rom;
-							if (this[game].Contains(rom))
+							while (this[game].Contains(rom))
 							{
 								this[game].Remove(rom);
 							}
@@ -1046,7 +1046,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Sample:
 							Sample sample = ((Sample)item).Clone() as Sample;
-							if (this[game].Contains(sample))
+							while (this[game].Contains(sample))
 							{
 								this[game].Remove(sample);
 							}
