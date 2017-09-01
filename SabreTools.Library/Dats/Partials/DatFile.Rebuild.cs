@@ -993,8 +993,8 @@ namespace SabreTools.Library.Dats
 			// If we are checking hashes only, essentially diff the inputs
 			if (hashOnly)
 			{
-				// First we need to sort by hash to get duplicates
-				BucketBy(SortedBy.SHA1, DedupeType.None);
+				// First we need to sort and dedupe by hash to get duplicates
+				BucketBy(SortedBy.CRC, DedupeType.Full);
 
 				// Then follow the same tactics as before
 				foreach (string key in Keys)
