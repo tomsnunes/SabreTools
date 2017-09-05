@@ -636,7 +636,7 @@ namespace SabreTools.Library.Dats
 					Globals.Logger.Error("I'm sorry but '{0}' doesn't exist!", inputFileName);
 					return;
 				}
-			});
+			}
 		}
 
 		#endregion
