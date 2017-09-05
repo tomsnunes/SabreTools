@@ -38,7 +38,7 @@ namespace SabreTools.Library.External
 				}
 				subdirs.Clear();
 
-				Parallel.ForEach(dirs, currentDir =>
+				foreach (string currentDir in dirs)
 				{
 					string[] subDirs = Directory.GetDirectories(currentDir);
 
@@ -54,13 +54,14 @@ namespace SabreTools.Library.External
 					try
 					{
 						FileInfo[] files = dir.GetFiles("*.*", SearchOption.TopDirectoryOnly);
-						Parallel.ForEach(files, info =>
+						Parallel.ForEach(files, Globals.ParallelOptions, info =>
 						{
 							action(info);
 						});
 					}
 					catch { }
-				});
+				}
+
 				dirs.Clear();
 			}
 		}

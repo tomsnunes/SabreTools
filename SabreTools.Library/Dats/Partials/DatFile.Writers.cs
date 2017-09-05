@@ -140,7 +140,7 @@ namespace SabreTools.Library.Dats
 				keys.Sort(new NaturalComparer());
 
 				// Write out all required formats
-				Parallel.ForEach(outfiles.Keys, datFormat =>
+				Parallel.ForEach(outfiles.Keys, Globals.ParallelOptions, datFormat =>
 				{
 					string outfile = outfiles[datFormat];
 

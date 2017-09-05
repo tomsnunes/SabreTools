@@ -66,7 +66,7 @@ namespace SabreTools.Library.Dats
 
 				// Process the files in the main folder
 				List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
-				Parallel.ForEach(files, item =>
+				Parallel.ForEach(files, Globals.ParallelOptions, item =>
 				{
 					PopulateFromDirCheckFile(item, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, skipFileType,
 						addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst);
@@ -74,21 +74,21 @@ namespace SabreTools.Library.Dats
 
 				// Find all top-level subfolders
 				files = Directory.EnumerateDirectories(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
-				Parallel.ForEach(files, item =>
+				foreach (string item in files)
 				{
 					List<string> subfiles = Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories).ToList();
-					Parallel.ForEach(subfiles, subitem =>
+					Parallel.ForEach(subfiles, Globals.ParallelOptions, subitem =>
 					{
 						PopulateFromDirCheckFile(subitem, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, skipFileType,
 							addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst);
 					});
-				});
+				}
 
 				// Now find all folders that are empty, if we are supposed to
 				if (!Romba && addBlanks)
 				{
 					List<string> empties = FileTools.GetEmptyDirectories(basePath).ToList();
-					Parallel.ForEach(empties, dir =>
+					Parallel.ForEach(empties, Globals.ParallelOptions, dir =>
 					{
 						// Get the full path for the directory
 						string fulldir = Path.GetFullPath(dir);
@@ -243,7 +243,7 @@ namespace SabreTools.Library.Dats
 			else
 			{
 				// First take care of the found items
-				Parallel.ForEach(extracted, rom =>
+				Parallel.ForEach(extracted, Globals.ParallelOptions, rom =>
 				{
 					PopulateFromDirProcessFileHelper(newItem,
 						rom,
@@ -255,7 +255,7 @@ namespace SabreTools.Library.Dats
 				if (addBlanks)
 				{
 					List<string> empties = ArchiveTools.GetEmptyFoldersInArchive(newItem);
-					Parallel.ForEach(empties, empty =>
+					Parallel.ForEach(empties, Globals.ParallelOptions, empty =>
 					{
 						Rom emptyRom = new Rom(Path.Combine(empty, "_"), newItem, omitFromScan);
 						PopulateFromDirProcessFileHelper(newItem,

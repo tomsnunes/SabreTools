@@ -128,7 +128,7 @@ namespace SabreTools.Library.Dats
 
 			// Now loop through and get only directories from the input paths
 			List<string> directories = new List<string>();
-			Parallel.ForEach(inputs, input =>
+			Parallel.ForEach(inputs, Globals.ParallelOptions, input =>
 			{
 				// Add to the list if the input is a directory
 				if (Directory.Exists(input))

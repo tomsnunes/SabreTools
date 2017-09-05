@@ -112,7 +112,7 @@ namespace SabreTools.Library.Dats
 			Globals.Logger.User("Processing individual DATs");
 
 			// Parse all of the DATs into their own DatFiles in the array
-			Parallel.For(0, inputs.Count, i =>
+			Parallel.For(0, inputs.Count, Globals.ParallelOptions, i =>
 			{
 				string input = inputs[i];
 				Globals.Logger.User("Adding DAT: {0}", input.Split('¬')[0]);
@@ -128,21 +128,18 @@ namespace SabreTools.Library.Dats
 			Globals.Logger.User("Processing complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
 
 			Globals.Logger.User("Populating internal DAT");
-			Parallel.For(0, inputs.Count, i =>
+			Parallel.For(0, inputs.Count, Globals.ParallelOptions, i =>
 			{
 				// Get the list of keys from the DAT
 				List<string> keys = datHeaders[i].Keys.ToList();
-				Parallel.ForEach(keys, key =>
+				foreach (string key in keys)
 				{
 					// Add everything from the key to the internal DAT
 					AddRange(key, datHeaders[i][key]);
 
 					// Now remove the key from the source DAT
-					lock (datHeaders)
-					{
-						datHeaders[i].Remove(key);
-					}
-				});
+					datHeaders[i].Remove(key);
+				}
 
 				// Now remove the file dictionary from the souce DAT to save memory
 				datHeaders[i].Delete();
@@ -179,7 +176,7 @@ namespace SabreTools.Library.Dats
 			Globals.Logger.User("Populating base DAT for comparison...");
 
 			List<string> baseFileNames = FileTools.GetOnlyFilesFromInputs(basePaths);
-			Parallel.ForEach(baseFileNames, path =>
+			Parallel.ForEach(baseFileNames, Globals.ParallelOptions, path =>
 			{
 				Parse(path, 0, 0, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 			});
@@ -191,7 +188,7 @@ namespace SabreTools.Library.Dats
 
 			// Now we want to compare each input DAT against the base
 			List<string> inputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
-			Parallel.ForEach(inputFileNames, path =>
+			foreach (string path in inputFileNames)
 			{
 				// Get the two halves of the path
 				string[] splitpath = path.Split('¬');
@@ -207,7 +204,7 @@ namespace SabreTools.Library.Dats
 
 				// Then we do a hashwise comparison against the base DAT
 				List<string> keys = intDat.Keys.ToList();
-				Parallel.ForEach(keys, key =>
+				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
 					List<DatItem> datItems = intDat[key];
 					List<DatItem> keepDatItems = new List<DatItem>();
@@ -247,7 +244,7 @@ namespace SabreTools.Library.Dats
 
 				// Due to possible memory requirements, we force a garbage collection
 				GC.Collect();
-			});
+			}
 		}
 
 		/// <summary>
@@ -271,7 +268,7 @@ namespace SabreTools.Library.Dats
 
 			DatFile[] outDatsArray = new DatFile[inputs.Count];
 
-			Parallel.For(0, inputs.Count, j =>
+			Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
 			{
 				string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
 				DatFile diffData;
@@ -301,7 +298,7 @@ namespace SabreTools.Library.Dats
 			Globals.Logger.User("Populating all output DATs");
 			List<string> keys = Keys.ToList();
 
-			Parallel.ForEach(keys, key =>
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = DatItem.Merge(this[key]);
 
@@ -330,7 +327,7 @@ namespace SabreTools.Library.Dats
 			start = DateTime.Now;
 			Globals.Logger.User("Outputting all created DATs");
 
-			Parallel.For((skip ? 1 : 0), inputs.Count, j =>
+			Parallel.For((skip ? 1 : 0), inputs.Count, Globals.ParallelOptions, j =>
 			{
 				// If we have an output directory set, replace the path
 				string path = "";
@@ -413,7 +410,7 @@ namespace SabreTools.Library.Dats
 			{
 				DatFile[] outDatsArray = new DatFile[inputs.Count];
 
-				Parallel.For(0, inputs.Count, j =>
+				Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
 				{
 					string innerpost = " (" + Path.GetFileNameWithoutExtension(inputs[j].Split('¬')[0]) + " Only)";
 					DatFile diffData = new DatFile(this);
@@ -433,7 +430,7 @@ namespace SabreTools.Library.Dats
 			Globals.Logger.User("Populating all output DATs");
 
 			List<string> keys = Keys.ToList();
-			Parallel.ForEach(keys, key =>
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = DatItem.Merge(this[key]);
 
@@ -503,7 +500,7 @@ namespace SabreTools.Library.Dats
 			// Output the individual (a-b) DATs
 			if ((diff & DiffMode.Individuals) != 0)
 			{
-				Parallel.For(0, inputs.Count, j =>
+				Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
 				{
 					// If we have an output directory set, replace the path
 					string[] split = inputs[j].Split('¬');
@@ -531,7 +528,7 @@ namespace SabreTools.Library.Dats
 			if (Type == "SuperDAT")
 			{
 				List<string> keys = Keys.ToList();
-				Parallel.ForEach(keys, key =>
+				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
 					List<DatItem> items = this[key].ToList();
 					List<DatItem> newItems = new List<DatItem>();
@@ -580,8 +577,11 @@ namespace SabreTools.Library.Dats
 		public void Update(List<string> inputFileNames, string outDir, bool inplace, bool clean, bool remUnicode, bool descAsName,
 			Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
-			Parallel.ForEach(inputFileNames, inputFileName =>
+			for (int i = 0; i < inputFileNames.Count; i++)
 			{
+				// Get the input file name
+				string inputFileName = inputFileNames[i];
+
 				// Clean the input string
 				if (inputFileName != "")
 				{
@@ -618,7 +618,7 @@ namespace SabreTools.Library.Dats
 					}
 
 					List<string> subFiles = Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories).ToList();
-					Parallel.ForEach(subFiles, file =>
+					Parallel.ForEach(subFiles, Globals.ParallelOptions, file =>
 					{
 						Globals.Logger.User("Processing '{0}'", Path.GetFullPath(file).Remove(0, inputFileName.Length));
 						DatFile innerDatdata = new DatFile(this);

@@ -52,7 +52,7 @@ namespace SabreTools.Library.Dats
 
 			// First do the initial sort of all of the roms
 			List<string> keys = Keys.ToList();
-			Parallel.ForEach(keys, key =>
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> roms = this[key];
 
@@ -143,7 +143,7 @@ namespace SabreTools.Library.Dats
 
 			// Now go through and sort all of the individual lists
 			keys = sortable.Keys.ToList();
-			Parallel.ForEach(keys, key =>
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				// Get the possibly unsorted list
 				List<DatItem> sortedlist = sortable[key];
@@ -242,7 +242,7 @@ namespace SabreTools.Library.Dats
 				// First we want to get a mapping for all games to description
 				ConcurrentDictionary<string, string> mapping = new ConcurrentDictionary<string, string>();
 				List<string> keys = Keys.ToList();
-				Parallel.ForEach(keys, key =>
+				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
 					List<DatItem> items = this[key];
 					foreach (DatItem item in items)
@@ -257,7 +257,7 @@ namespace SabreTools.Library.Dats
 
 				// Now we loop through every item and update accordingly
 				keys = Keys.ToList();
-				Parallel.ForEach(keys, key =>
+				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
 					List<DatItem> items = this[key];
 					List<DatItem> newItems = new List<DatItem>();
@@ -312,7 +312,7 @@ namespace SabreTools.Library.Dats
 
 			// Now process all of the roms
 			List<string> keys = Keys.ToList();
-			Parallel.ForEach(keys, key =>
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];
 				for (int j = 0; j < items.Count; j++)

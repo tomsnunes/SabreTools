@@ -15,7 +15,7 @@ namespace SabreTools.Library.Data
 		#region Private implementations
 
 		private static Logger _logger = null;
-		private static int _maxDegreeOfParallelism = 4;
+		private static int _maxDegreeOfParallelism = System.Environment.ProcessorCount;
 		private static string _exeName = new Uri(Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath;
 		private static string _exeDir = Path.GetDirectoryName(_exeName);
 		private static string _args = string.Join(" ", Environment.GetCommandLineArgs());
@@ -39,11 +39,7 @@ namespace SabreTools.Library.Data
 		public static int MaxThreads
 		{
 			get { return _maxDegreeOfParallelism; }
-			set
-			{
-				_maxDegreeOfParallelism = value;
-				System.Threading.ThreadPool.SetMaxThreads(_maxDegreeOfParallelism, _maxDegreeOfParallelism);
-			}
+			set { _maxDegreeOfParallelism = value; }
 		}
 		public static ParallelOptions ParallelOptions
 		{
