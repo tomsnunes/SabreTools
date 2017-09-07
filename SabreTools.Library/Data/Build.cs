@@ -18,9 +18,6 @@ namespace SabreTools.Library.Data
 		/// <param name="name">The name to be displayed as the program</param>B
 		public static void Start(string name)
 		{
-			// Set the maximum number of threads right off the bat
-			System.Threading.ThreadPool.SetMaxThreads(Globals.MaxThreads, Globals.MaxThreads);
-
 			// Dynamically create the header string, adapted from http://stackoverflow.com/questions/8200661/how-to-align-string-in-fixed-length-string
 			int width = Console.WindowWidth - 3;
 			string border = "+" + new string('-', width) + "+";
