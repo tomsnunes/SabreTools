@@ -236,11 +236,8 @@ namespace SabreTools.Library.Dats
 					interOutDir = Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, splitpath[0].Remove(0, splitpath[1].Length + 1)));
 				}
 
-				// Once we're done, we check to see if there's anything to write out
-				if (intDat.Count > 0)
-				{
-					intDat.WriteToFile(interOutDir);
-				}
+				// Once we're done, try writing out
+				intDat.WriteToFile(interOutDir);
 
 				// Due to possible memory requirements, we force a garbage collection
 				GC.Collect();

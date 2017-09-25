@@ -1604,70 +1604,42 @@ namespace SabreTools.Library.Dats
 			{
 				string footer = "";
 
-				// If we have roms, output the full footer
-				if (Count > 0)
+				// Output the proper footer
+				switch (datFormat)
 				{
-					switch (datFormat)
-					{
-						case DatFormat.ClrMamePro:
-						case DatFormat.DOSCenter:
-							footer = ")\n";
-							break;
-						case DatFormat.Logiqx:
-							footer = "\t</machine>\n</datafile>\n";
-							break;
-						case DatFormat.OfflineList:
-							footer = "\t\t</game>"
-								+ "\t</games>\n"
-								+ "\t<gui>\n"
-								+ "\t\t<images width=\"487\" height=\"162\">\n"
-								+ "\t\t\t<image x=\"0\" y=\"0\" width=\"240\" height=\"160\"/>\n"
-								+ "\t\t\t<image x=\"245\" y=\"0\" width=\"240\" height=\"160\"/>\n"
-								+ "\t\t</images>\n"
-								+ "\t</gui>\n"
-								+ "</dat>";
-							break;
-						case DatFormat.SabreDat:
-							for (int i = depth - 1; i >= 2; i--)
+					case DatFormat.ClrMamePro:
+					case DatFormat.DOSCenter:
+						footer = ")\n";
+						break;
+					case DatFormat.Logiqx:
+						footer = "\t</machine>\n</datafile>\n";
+						break;
+					case DatFormat.OfflineList:
+						footer = "\t\t</game>"
+							+ "\t</games>\n"
+							+ "\t<gui>\n"
+							+ "\t\t<images width=\"487\" height=\"162\">\n"
+							+ "\t\t\t<image x=\"0\" y=\"0\" width=\"240\" height=\"160\"/>\n"
+							+ "\t\t\t<image x=\"245\" y=\"0\" width=\"240\" height=\"160\"/>\n"
+							+ "\t\t</images>\n"
+							+ "\t</gui>\n"
+							+ "</dat>";
+						break;
+					case DatFormat.SabreDat:
+						for (int i = depth - 1; i >= 2; i--)
+						{
+							// Print out the number of tabs and the end folder
+							for (int j = 0; j < i; j++)
 							{
-								// Print out the number of tabs and the end folder
-								for (int j = 0; j < i; j++)
-								{
-									footer += "\t";
-								}
-								footer += "</directory>\n";
+								footer += "\t";
 							}
-							footer += "\t</data>\n</datafile>\n";
-							break;
-						case DatFormat.SoftwareList:
-							footer = "\t</software>\n\n</softwarelist>\n";
-							break;
-					}
-				}
-
-				// Otherwise, output the abbreviated form
-				else
-				{
-					switch (datFormat)
-					{
-						case DatFormat.Logiqx:
-						case DatFormat.SabreDat:
-							footer = "</datafile>\n";
-							break;
-						case DatFormat.OfflineList:
-							footer = "\t</games>\n"
-								+ "\t<gui>\n"
-								+ "\t\t<images width=\"487\" height=\"162\">\n"
-								+ "\t\t\t<image x=\"0\" y=\"0\" width=\"240\" height=\"160\"/>\n"
-								+ "\t\t\t<image x=\"245\" y=\"0\" width=\"240\" height=\"160\"/>\n"
-								+ "\t\t</images>\n"
-								+ "\t</gui>\n"
-								+ "</dat>";
-							break;
-						case DatFormat.SoftwareList:
-							footer = "</softwarelist>\n";
-							break;
-					}
+							footer += "</directory>\n";
+						}
+						footer += "\t</data>\n</datafile>\n";
+						break;
+					case DatFormat.SoftwareList:
+						footer = "\t</software>\n\n</softwarelist>\n";
+						break;
 				}
 
 				// Write the footer out
