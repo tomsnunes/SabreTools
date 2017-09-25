@@ -45,8 +45,9 @@ namespace SabreTools.Library.Dats
 			// Set the sorted type
 			_sortedBy = bucketBy;
 
-			// Create the temporary dictionary to sort into
-			SortedDictionary<string, List<DatItem>> sortable = new SortedDictionary<string, List<DatItem>>();
+			// Clone the current dictionary into a new one for sorting then reset the internal one
+			SortedDictionary<string, List<DatItem>> sortable = this.CloneFiles();
+			this.Reset();
 
 			Globals.Logger.User("Organizing roms by {0}" + (deduperoms != DedupeType.None ? " and merging" : ""), bucketBy);
 
@@ -129,24 +130,17 @@ namespace SabreTools.Library.Dats
 						newkey = "";
 					}
 
-					// Add the DatItem to the temp dictionary
-					lock (sortable)
-					{
-						if (!sortable.ContainsKey(newkey))
-						{
-							sortable.Add(newkey, new List<DatItem>());
-						}
-						sortable[newkey].Add(rom);
-					}
+					// Add the DatItem to the dictionary
+					Add(newkey, rom);
 				}
 			});
 
 			// Now go through and sort all of the individual lists
-			keys = sortable.Keys.ToList();
+			keys = Keys.ToList();
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				// Get the possibly unsorted list
-				List<DatItem> sortedlist = sortable[key];
+				List<DatItem> sortedlist = this[key];
 
 				// Sort the list of items to be consistent
 				DatItem.Sort(ref sortedlist, false);
@@ -157,15 +151,10 @@ namespace SabreTools.Library.Dats
 					sortedlist = DatItem.Merge(sortedlist);
 				}
 
-				// Add the list back to the temp dictionary
-				lock (sortable)
-				{
-					sortable[key] = sortedlist;
-				}
+				// Add the list back to the dictionary
+				Remove(key);
+				AddRange(key, sortedlist);
 			});
-
-			// Now assign the dictionary back
-			_files = sortable;
 		}
 
 		#endregion
@@ -545,7 +534,7 @@ namespace SabreTools.Library.Dats
 							archive.Machine = currentMachine;
 							if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
 							{
-								this[game].Add(archive);
+								Add(game, archive);
 							}
 
 							break;
@@ -554,7 +543,7 @@ namespace SabreTools.Library.Dats
 							biosSet.Machine = currentMachine;
 							if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
 							{
-								this[game].Add(biosSet);
+								Add(game, biosSet);
 							}
 
 							break;
@@ -563,7 +552,7 @@ namespace SabreTools.Library.Dats
 							disk.Machine = currentMachine;
 							if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
 							{
-								this[game].Add(disk);
+								Add(game, disk);
 							}
 
 							break;
@@ -572,7 +561,7 @@ namespace SabreTools.Library.Dats
 							release.Machine = currentMachine;
 							if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
 							{
-								this[game].Add(release);
+								Add(game, release);
 							}
 
 							break;
@@ -581,7 +570,7 @@ namespace SabreTools.Library.Dats
 							rom.Machine = currentMachine;
 							if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
 							{
-								this[game].Add(rom);
+								Add(game, rom);
 							}
 
 							break;
@@ -590,7 +579,7 @@ namespace SabreTools.Library.Dats
 							sample.Machine = currentMachine;
 							if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
 							{
-								this[game].Add(sample);
+								Add(game, sample);
 							}
 
 							break;
@@ -636,7 +625,7 @@ namespace SabreTools.Library.Dats
 								archive.Machine = musheen;
 								if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
 								{
-									this[game].Add(archive);
+									Add(game, archive);
 								}
 
 								break;
@@ -645,7 +634,7 @@ namespace SabreTools.Library.Dats
 								biosSet.Machine = musheen;
 								if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
 								{
-									this[game].Add(biosSet);
+									Add(game, biosSet);
 								}
 
 								break;
@@ -654,7 +643,7 @@ namespace SabreTools.Library.Dats
 								disk.Machine = musheen;
 								if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
 								{
-									this[game].Add(disk);
+									Add(game, disk);
 								}
 
 								break;
@@ -663,7 +652,7 @@ namespace SabreTools.Library.Dats
 								release.Machine = musheen;
 								if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
 								{
-									this[game].Add(release);
+									Add(game, release);
 								}
 
 								break;
@@ -672,7 +661,7 @@ namespace SabreTools.Library.Dats
 								rom.Machine = musheen;
 								if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
 								{
-									this[game].Add(rom);
+									Add(game, rom);
 								}
 
 								break;
@@ -681,7 +670,7 @@ namespace SabreTools.Library.Dats
 								sample.Machine = musheen;
 								if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
 								{
-									this[game].Add(sample);
+									Add(game, sample);
 								}
 
 								break;
@@ -737,7 +726,7 @@ namespace SabreTools.Library.Dats
 							archive.Machine = currentMachine;
 							if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
 							{
-								this[game].Add(archive);
+								Add(game, archive);
 							}
 
 							break;
@@ -746,7 +735,7 @@ namespace SabreTools.Library.Dats
 							biosSet.Machine = currentMachine;
 							if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
 							{
-								this[game].Add(biosSet);
+								Add(game, biosSet);
 							}
 
 							break;
@@ -755,7 +744,7 @@ namespace SabreTools.Library.Dats
 							disk.Machine = currentMachine;
 							if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
 							{
-								this[game].Add(disk);
+								Add(game, disk);
 							}
 
 							break;
@@ -764,7 +753,7 @@ namespace SabreTools.Library.Dats
 							release.Machine = currentMachine;
 							if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
 							{
-								this[game].Add(release);
+								Add(game, release);
 							}
 
 							break;
@@ -773,7 +762,7 @@ namespace SabreTools.Library.Dats
 							rom.Machine = currentMachine;
 							if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
 							{
-								this[game].Add(rom);
+								Add(game, rom);
 							}
 
 							break;
@@ -782,7 +771,7 @@ namespace SabreTools.Library.Dats
 							sample.Machine = currentMachine;
 							if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
 							{
-								this[game].Add(sample);
+								Add(game, sample);
 							}
 
 							break;
@@ -829,7 +818,7 @@ namespace SabreTools.Library.Dats
 					if (item.Type == ItemType.Disk && (item.MergeTag == null || !this[parent].Select(i => i.Name).Contains(item.MergeTag)))
 					{
 						item.Machine = parentMachine;
-						this[parent].Add(item);
+						Add(parent, item);
 					}
 
 					// Otherwise, if the parent doesn't already contain the non-disk, add it
@@ -842,7 +831,7 @@ namespace SabreTools.Library.Dats
 						item.Machine = parentMachine;
 
 						// Add the rom to the parent set
-						this[parent].Add(item);
+						Add(parent, item);
 					}
 				}
 
@@ -907,56 +896,32 @@ namespace SabreTools.Library.Dats
 				List<DatItem> parentItems = this[parent];
 				foreach (DatItem item in parentItems)
 				{
-					// Figure out the type of the item and add it accordingly
+					// Figure out the type of the item and remove it accordingly
 					switch (item.Type)
 					{
 						case ItemType.Archive:
 							Archive archive = ((Archive)item).Clone() as Archive;
-							if (this[game].Contains(archive))
-							{
-								this[game].Remove(archive);
-							}
-
+							Remove(game, archive);
 							break;
 						case ItemType.BiosSet:
 							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							if (this[game].Contains(biosSet))
-							{
-								this[game].Remove(biosSet);
-							}
-
+							Remove(game, biosSet);
 							break;
 						case ItemType.Disk:
 							Disk disk = ((Disk)item).Clone() as Disk;
-							if (this[game].Contains(disk))
-							{
-								this[game].Remove(disk);
-							}
-
+							Remove(game, disk);
 							break;
 						case ItemType.Release:
 							Release release = ((Release)item).Clone() as Release;
-							if (this[game].Contains(release))
-							{
-								this[game].Remove(release);
-							}
-
+							Remove(game, release);
 							break;
 						case ItemType.Rom:
 							Rom rom = ((Rom)item).Clone() as Rom;
-							if (this[game].Contains(rom))
-							{
-								this[game].Remove(rom);
-							}
-
+							Remove(game, rom);
 							break;
 						case ItemType.Sample:
 							Sample sample = ((Sample)item).Clone() as Sample;
-							if (this[game].Contains(sample))
-							{
-								this[game].Remove(sample);
-							}
-
+							Remove(game, sample);
 							break;
 					}
 				}
@@ -1006,51 +971,27 @@ namespace SabreTools.Library.Dats
 					{
 						case ItemType.Archive:
 							Archive archive = ((Archive)item).Clone() as Archive;
-							while (this[game].Contains(archive))
-							{
-								this[game].Remove(archive);
-							}
-
+							Remove(game, archive);
 							break;
 						case ItemType.BiosSet:
 							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							while (this[game].Contains(biosSet))
-							{
-								this[game].Remove(biosSet);
-							}
-
+							Remove(game, biosSet);
 							break;
 						case ItemType.Disk:
 							Disk disk = ((Disk)item).Clone() as Disk;
-							while (this[game].Contains(disk))
-							{
-								this[game].Remove(disk);
-							}
-
+							Remove(game, disk);
 							break;
 						case ItemType.Release:
 							Release release = ((Release)item).Clone() as Release;
-							while (this[game].Contains(release))
-							{
-								this[game].Remove(release);
-							}
-
+							Remove(game, release);
 							break;
 						case ItemType.Rom:
 							Rom rom = ((Rom)item).Clone() as Rom;
-							while (this[game].Contains(rom))
-							{
-								this[game].Remove(rom);
-							}
-
+							Remove(game, rom);
 							break;
 						case ItemType.Sample:
 							Sample sample = ((Sample)item).Clone() as Sample;
-							while (this[game].Contains(sample))
-							{
-								this[game].Remove(sample);
-							}
-
+							Remove(game, sample);
 							break;
 					}
 				}

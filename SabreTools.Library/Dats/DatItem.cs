@@ -327,7 +327,8 @@ namespace SabreTools.Library.Dats
 			// If we're in removal mode, replace the list with the new one
 			if (remove)
 			{
-				datdata[key] = left;
+				datdata.Remove(key);
+				datdata.AddRange(key, left);
 			}
 
 			return output;

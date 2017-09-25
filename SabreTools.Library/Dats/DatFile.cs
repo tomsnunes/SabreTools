@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using SabreTools.Library.Data;
 
@@ -294,6 +295,7 @@ namespace SabreTools.Library.Dats
 		/// Passthrough to access the file dictionary
 		/// </summary>
 		/// <param name="key">Key in the dictionary to reference</param>
+		/// <remarks>We don't want to allow direct setting of values because it bypasses the statistics</remarks>
 		public List<DatItem> this[string key]
 		{
 			get
@@ -314,26 +316,6 @@ namespace SabreTools.Library.Dats
 
 					// Now return the value
 					return _files[key];
-				}
-			}
-			set
-			{
-				// If the dictionary is null, create it
-				if (_files == null)
-				{
-					_files = new SortedDictionary<string, List<DatItem>>();
-				}
-
-				lock (_files)
-				{
-					// If the key is missing from the dictionary, add it
-					if (!_files.ContainsKey(key))
-					{
-						_files.Add(key, new List<DatItem>());
-					}
-
-					// Now set the value
-					_files[key] = value;
 				}
 			}
 		}
@@ -475,7 +457,7 @@ namespace SabreTools.Library.Dats
 		/// <summary>
 		/// Remove a key from the file dictionary
 		/// </summary>
-		/// <param name="key"></param>
+		/// <param name="key">Key in the dictionary to remove</param>
 		public void Remove(string key)
 		{
 			// If the dictionary is null, create it
@@ -497,6 +479,45 @@ namespace SabreTools.Library.Dats
 
 					_files.Remove(key);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Remove a value from the file dictionary
+		/// </summary>
+		/// <param name="key">Key in the dictionary to remove from</param>
+		/// <param name="value">Value to remove from the dictionary</param>
+		public void Remove(string key, DatItem value)
+		{
+			// If the dictionary is null, create it
+			if (_files == null)
+			{
+				_files = new SortedDictionary<string, List<DatItem>>();
+			}
+
+			lock (_files)
+			{
+				// While the key is in the dictionary and the item is there, remove it
+				while (_files.ContainsKey(key) && _files[key].Contains(value))
+				{
+					// Remove the statistics first
+					RemoveItemStatistics(value);
+
+					_files[key].Remove(value);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Remove a range of values from the file dictionary
+		/// </summary>
+		/// <param name="key">Key in the dictionary to remove from</param>
+		/// <param name="value">Value to remove from the dictionary</param>
+		public void RemoveRange(string key, List<DatItem> value)
+		{
+			foreach(DatItem item in value)
+			{
+				Remove(key, item);
 			}
 		}
 
@@ -560,6 +581,44 @@ namespace SabreTools.Library.Dats
 			_remExt = datFile.RemExt;
 			_gameName = datFile.GameName;
 			_romba = datFile.Romba;
+		}
+
+		#endregion
+
+		#region Dictionary Manipulation
+
+		/// <summary>
+		/// Clones the files dictionary
+		/// </summary>
+		/// <returns>A new files dictionary instance</returns>
+		public SortedDictionary<string, List<DatItem>> CloneFiles()
+		{
+			// Create the placeholder dictionary to be used
+			SortedDictionary<string, List<DatItem>> sorted = new SortedDictionary<string, List<DatItem>>();
+
+			// Now perform a deep clone on the entire dictionary
+			List<string> keys = Keys.ToList();
+			foreach (string key in keys)
+			{
+				// Clone each list of DATs in the dictionary
+				List<DatItem> olditems = this[key];
+				List<DatItem> newitems = new List<DatItem>();
+				foreach (DatItem item in olditems)
+				{
+					newitems.Add((DatItem)item.Clone());
+				}
+
+				// If the key is missing from the new dictionary, add it
+				if (!sorted.ContainsKey(key))
+				{
+					sorted.Add(key, new List<DatItem>());
+				}
+
+				// Now add the list of items
+				sorted[key].AddRange(newitems);
+			}
+
+			return sorted;
 		}
 
 		#endregion

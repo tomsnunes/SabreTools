@@ -426,7 +426,7 @@ namespace RombaSharp
 				string hash = sldr.GetString(0);
 				if (datroot.ContainsKey(hash))
 				{
-					datroot[hash] = null;
+					datroot.Remove(hash);
 					databaseDats.Add(hash);
 				}
 				else if (!databaseDats.Contains(hash))
