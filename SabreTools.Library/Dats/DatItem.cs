@@ -264,7 +264,7 @@ namespace SabreTools.Library.Dats
 			string key = SortAndGetKey(datdata, sorted);
 
 			// If the key doesn't exist, return the empty list
-			if (!datdata.ContainsKey(key))
+			if (!datdata.Contains(key))
 			{
 				return false;
 			}
@@ -303,7 +303,7 @@ namespace SabreTools.Library.Dats
 			string key = SortAndGetKey(datdata);
 
 			// If the key doesn't exist, return the empty list
-			if (!datdata.ContainsKey(key))
+			if (!datdata.Contains(key))
 			{
 				return output;
 			}

@@ -402,8 +402,10 @@ namespace SabreTools.Library.Dats
 		/// </summary>
 		/// <param name="key">Key in the dictionary to check</param>
 		/// <returns>True if the key exists, false otherwise</returns>
-		public bool ContainsKey(string key)
+		public bool Contains(string key)
 		{
+			bool contains = false;
+
 			// If the dictionary is null, create it
 			if (_items == null)
 			{
@@ -413,13 +415,48 @@ namespace SabreTools.Library.Dats
 			// If the key is null, we return false since keys can't be null
 			if (key == null)
 			{
-				return false;
+				return contains;
 			}
 
 			lock (_items)
 			{
-				return _items.ContainsKey(key);
+				contains = _items.ContainsKey(key);
 			}
+
+			return contains;
+		}
+
+		/// <summary>
+		/// Get if the file dictionary contains the key and value
+		/// </summary>
+		/// <param name="key">Key in the dictionary to check</param>
+		/// <param name="value">Value in the dictionary to check</param>
+		/// <returns>True if the key exists, false otherwise</returns>
+		public bool Contains(string key, DatItem value)
+		{
+			bool contains = false;
+
+			// If the dictionary is null, create it
+			if (_items == null)
+			{
+				_items = new SortedDictionary<string, List<DatItem>>();
+			}
+
+			// If the key is null, we return false since keys can't be null
+			if (key == null)
+			{
+				return contains;
+			}
+
+			lock (_items)
+			{
+				if (_items.ContainsKey(key))
+				{
+					contains = _items.ContainsKey(key);
+				}
+			}
+
+			return contains;
 		}
 
 		/// <summary>
@@ -466,19 +503,22 @@ namespace SabreTools.Library.Dats
 				_items = new SortedDictionary<string, List<DatItem>>();
 			}
 
+			// If the key doesn't exist, return
+			if (!Contains(key))
+			{
+				return;
+			}
+
 			lock (_items)
 			{
-				// If the key is in the dictionary, remove it
-				if (_items.ContainsKey(key))
+				// Remove the statistics first
+				foreach (DatItem item in _items[key])
 				{
-					// Remove the statistics first
-					foreach (DatItem item in _items[key])
-					{
-						RemoveItemStatistics(item);
-					}
-
-					_items.Remove(key);
+					RemoveItemStatistics(item);
 				}
+
+				// Remove the key from the dictionary
+				_items.Remove(key);
 			}
 		}
 
@@ -493,6 +533,12 @@ namespace SabreTools.Library.Dats
 			if (_items == null)
 			{
 				_items = new SortedDictionary<string, List<DatItem>>();
+			}
+
+			// If the key and value doesn't exist, return
+			if (!Contains(key, value))
+			{
+				return;
 			}
 
 			lock (_items)
