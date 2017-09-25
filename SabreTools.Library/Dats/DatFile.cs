@@ -34,7 +34,7 @@ namespace SabreTools.Library.Dats
 		private Hash _stripHash;
 		private bool _oneGameOneRegion;
 		private List<string> _regions = new List<string>();
-		private SortedDictionary<string, List<DatItem>> _files = new SortedDictionary<string, List<DatItem>>();
+		private SortedDictionary<string, List<DatItem>> _items = new SortedDictionary<string, List<DatItem>>();
 		private SortedBy _sortedBy;
 
 		// Data specific to the Miss DAT type
@@ -301,21 +301,21 @@ namespace SabreTools.Library.Dats
 			get
 			{
 				// If the dictionary is null, create it
-				if (_files == null)
+				if (_items == null)
 				{
-					_files = new SortedDictionary<string, List<DatItem>>();
+					_items = new SortedDictionary<string, List<DatItem>>();
 				}
 
-				lock (_files)
+				lock (_items)
 				{
 					// If the key is missing from the dictionary, add it
-					if (!_files.ContainsKey(key))
+					if (!_items.ContainsKey(key))
 					{
-						_files.Add(key, new List<DatItem>());
+						_items.Add(key, new List<DatItem>());
 					}
 
 					// Now return the value
-					return _files[key];
+					return _items[key];
 				}
 			}
 		}
@@ -327,17 +327,17 @@ namespace SabreTools.Library.Dats
 		public void Add(string key)
 		{
 			// If the dictionary is null, create it
-			if (_files == null)
+			if (_items == null)
 			{
-				_files = new SortedDictionary<string, List<DatItem>>();
+				_items = new SortedDictionary<string, List<DatItem>>();
 			}
 
-			lock (_files)
+			lock (_items)
 			{
 				// If the key is missing from the dictionary, add it
-				if (!_files.ContainsKey(key))
+				if (!_items.ContainsKey(key))
 				{
-					_files.Add(key, new List<DatItem>());
+					_items.Add(key, new List<DatItem>());
 				}
 			}
 		}
@@ -350,18 +350,18 @@ namespace SabreTools.Library.Dats
 		public void Add(string key, DatItem value)
 		{
 			// If the dictionary is null, create it
-			if (_files == null)
+			if (_items == null)
 			{
-				_files = new SortedDictionary<string, List<DatItem>>();
+				_items = new SortedDictionary<string, List<DatItem>>();
 			}
 
 			// Add the key, if necessary
 			Add(key);
 
-			lock (_files)
+			lock (_items)
 			{
 				// Now add the value
-				_files[key].Add(value);
+				_items[key].Add(value);
 
 				// Now update the statistics
 				AddItemStatistics(value);
@@ -376,18 +376,18 @@ namespace SabreTools.Library.Dats
 		public void AddRange(string key, List<DatItem> value)
 		{
 			// If the dictionary is null, create it
-			if (_files == null)
+			if (_items == null)
 			{
-				_files = new SortedDictionary<string, List<DatItem>>();
+				_items = new SortedDictionary<string, List<DatItem>>();
 			}
 
 			// Add the key, if necessary
 			Add(key);
 
-			lock (_files)
+			lock (_items)
 			{
 				// Now add the value
-				_files[key].AddRange(value);
+				_items[key].AddRange(value);
 
 				// Now update the statistics
 				foreach (DatItem item in value)
@@ -405,9 +405,9 @@ namespace SabreTools.Library.Dats
 		public bool ContainsKey(string key)
 		{
 			// If the dictionary is null, create it
-			if (_files == null)
+			if (_items == null)
 			{
-				_files = new SortedDictionary<string, List<DatItem>>();
+				_items = new SortedDictionary<string, List<DatItem>>();
 			}
 
 			// If the key is null, we return false since keys can't be null
@@ -416,9 +416,9 @@ namespace SabreTools.Library.Dats
 				return false;
 			}
 
-			lock (_files)
+			lock (_items)
 			{
-				return _files.ContainsKey(key);
+				return _items.ContainsKey(key);
 			}
 		}
 
@@ -427,7 +427,7 @@ namespace SabreTools.Library.Dats
 		/// </summary>
 		public void Delete()
 		{
-			_files = null;
+			_items = null;
 
 			// Reset statistics
 			ResetStatistics();
@@ -442,14 +442,14 @@ namespace SabreTools.Library.Dats
 			get
 			{
 				// If the dictionary is null, create it
-				if (_files == null)
+				if (_items == null)
 				{
-					_files = new SortedDictionary<string, List<DatItem>>();
+					_items = new SortedDictionary<string, List<DatItem>>();
 				}
 
-				lock (_files)
+				lock (_items)
 				{
-					return _files.Keys;
+					return _items.Keys;
 				}
 			}
 		}
@@ -461,23 +461,23 @@ namespace SabreTools.Library.Dats
 		public void Remove(string key)
 		{
 			// If the dictionary is null, create it
-			if (_files == null)
+			if (_items == null)
 			{
-				_files = new SortedDictionary<string, List<DatItem>>();
+				_items = new SortedDictionary<string, List<DatItem>>();
 			}
 
-			lock (_files)
+			lock (_items)
 			{
 				// If the key is in the dictionary, remove it
-				if (_files.ContainsKey(key))
+				if (_items.ContainsKey(key))
 				{
 					// Remove the statistics first
-					foreach (DatItem item in _files[key])
+					foreach (DatItem item in _items[key])
 					{
 						RemoveItemStatistics(item);
 					}
 
-					_files.Remove(key);
+					_items.Remove(key);
 				}
 			}
 		}
@@ -490,20 +490,20 @@ namespace SabreTools.Library.Dats
 		public void Remove(string key, DatItem value)
 		{
 			// If the dictionary is null, create it
-			if (_files == null)
+			if (_items == null)
 			{
-				_files = new SortedDictionary<string, List<DatItem>>();
+				_items = new SortedDictionary<string, List<DatItem>>();
 			}
 
-			lock (_files)
+			lock (_items)
 			{
 				// While the key is in the dictionary and the item is there, remove it
-				while (_files.ContainsKey(key) && _files[key].Contains(value))
+				while (_items.ContainsKey(key) && _items[key].Contains(value))
 				{
 					// Remove the statistics first
 					RemoveItemStatistics(value);
 
-					_files[key].Remove(value);
+					_items[key].Remove(value);
 				}
 			}
 		}
@@ -526,7 +526,7 @@ namespace SabreTools.Library.Dats
 		/// </summary>
 		public void Reset()
 		{
-			_files = new SortedDictionary<string, List<DatItem>>();
+			_items = new SortedDictionary<string, List<DatItem>>();
 
 			// Reset statistics
 			ResetStatistics();
@@ -541,7 +541,7 @@ namespace SabreTools.Library.Dats
 		/// </summary>
 		public DatFile()
 		{
-			_files = new SortedDictionary<string, List<DatItem>>();
+			_items = new SortedDictionary<string, List<DatItem>>();
 		}
 
 		/// <summary>

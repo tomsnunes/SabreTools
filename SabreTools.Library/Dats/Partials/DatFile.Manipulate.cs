@@ -37,7 +37,7 @@ namespace SabreTools.Library.Dats
 			}
 
 			// If we have a situation where there's no dictionary or no keys at all, we skip
-			if (_files == null || _files.Count == 0)
+			if (_items == null || _items.Count == 0)
 			{
 				return;
 			}
