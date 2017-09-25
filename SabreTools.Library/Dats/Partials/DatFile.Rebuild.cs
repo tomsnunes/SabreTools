@@ -984,7 +984,7 @@ namespace SabreTools.Library.Dats
 
 			// Setup the fixdat
 			DatFile matched = new DatFile(this);
-			matched.Reset();
+			matched.ResetDictionary();
 			matched.FileName = "fixDat_" + matched.FileName;
 			matched.Name = "fixDat_" + matched.Name;
 			matched.Description = "fixDat_" + matched.Description;

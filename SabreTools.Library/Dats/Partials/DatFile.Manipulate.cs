@@ -46,8 +46,8 @@ namespace SabreTools.Library.Dats
 			_sortedBy = bucketBy;
 
 			// Clone the current dictionary into a new one for sorting then reset the internal one
-			SortedDictionary<string, List<DatItem>> sortable = this.CloneFiles();
-			this.Reset();
+			SortedDictionary<string, List<DatItem>> sortable = this.CloneDictionary();
+			this.ResetDictionary();
 
 			Globals.Logger.User("Organizing roms by {0}" + (deduperoms != DedupeType.None ? " and merging" : ""), bucketBy);
 

@@ -142,7 +142,7 @@ namespace SabreTools.Library.Dats
 				}
 
 				// Now remove the file dictionary from the souce DAT to save memory
-				datHeaders[i].Delete();
+				datHeaders[i].DeleteDictionary();
 			});
 
 			// Now that we have a merged DAT, filter it
@@ -282,7 +282,7 @@ namespace SabreTools.Library.Dats
 					diffData.Name += post;
 					diffData.Description += post;
 				}
-				diffData.Reset();
+				diffData.ResetDictionary();
 
 				outDatsArray[j] = diffData;
 			});
@@ -385,7 +385,7 @@ namespace SabreTools.Library.Dats
 				outerDiffData.FileName += post;
 				outerDiffData.Name += post;
 				outerDiffData.Description += post;
-				outerDiffData.Reset();
+				outerDiffData.ResetDictionary();
 			}
 
 			// Have External dupes
@@ -396,7 +396,7 @@ namespace SabreTools.Library.Dats
 				dupeData.FileName += post;
 				dupeData.Name += post;
 				dupeData.Description += post;
-				dupeData.Reset();
+				dupeData.ResetDictionary();
 			}
 
 			// Create a list of DatData objects representing individual output files
@@ -414,7 +414,7 @@ namespace SabreTools.Library.Dats
 					diffData.FileName += innerpost;
 					diffData.Name += innerpost;
 					diffData.Description += innerpost;
-					diffData.Reset();
+					diffData.ResetDictionary();
 					outDatsArray[j] = diffData;
 				});
 

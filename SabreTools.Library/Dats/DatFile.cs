@@ -460,17 +460,6 @@ namespace SabreTools.Library.Dats
 		}
 
 		/// <summary>
-		/// Delete the file dictionary
-		/// </summary>
-		public void Delete()
-		{
-			_items = null;
-
-			// Reset statistics
-			ResetStatistics();
-		}
-
-		/// <summary>
 		/// Get the keys from the file dictionary
 		/// </summary>
 		/// <returns>IEnumerable of the keys</returns>
@@ -567,17 +556,6 @@ namespace SabreTools.Library.Dats
 			}
 		}
 
-		/// <summary>
-		/// Reset the file dictionary
-		/// </summary>
-		public void Reset()
-		{
-			_items = new SortedDictionary<string, List<DatItem>>();
-
-			// Reset statistics
-			ResetStatistics();
-		}
-
 		#endregion
 
 		#region Constructors
@@ -637,7 +615,7 @@ namespace SabreTools.Library.Dats
 		/// Clones the files dictionary
 		/// </summary>
 		/// <returns>A new files dictionary instance</returns>
-		public SortedDictionary<string, List<DatItem>> CloneFiles()
+		public SortedDictionary<string, List<DatItem>> CloneDictionary()
 		{
 			// Create the placeholder dictionary to be used
 			SortedDictionary<string, List<DatItem>> sorted = new SortedDictionary<string, List<DatItem>>();
@@ -665,6 +643,28 @@ namespace SabreTools.Library.Dats
 			}
 
 			return sorted;
+		}
+
+		/// <summary>
+		/// Delete the file dictionary
+		/// </summary>
+		public void DeleteDictionary()
+		{
+			_items = null;
+
+			// Reset statistics
+			ResetStatistics();
+		}
+
+		/// <summary>
+		/// Reset the file dictionary
+		/// </summary>
+		public void ResetDictionary()
+		{
+			_items = new SortedDictionary<string, List<DatItem>>();
+
+			// Reset statistics
+			ResetStatistics();
 		}
 
 		#endregion
