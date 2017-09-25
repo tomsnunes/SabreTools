@@ -52,10 +52,10 @@ namespace SabreTools.Library.Dats
 			Globals.Logger.User("Organizing roms by {0}" + (deduperoms != DedupeType.None ? " and merging" : ""), bucketBy);
 
 			// First do the initial sort of all of the roms
-			List<string> keys = Keys.ToList();
+			List<string> keys = sortable.Keys.ToList();
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
-				List<DatItem> roms = this[key];
+				List<DatItem> roms = sortable[key];
 
 				// Now add each of the roms to their respective games
 				foreach (DatItem rom in roms)
