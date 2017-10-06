@@ -116,6 +116,7 @@
     <Compile Include="Data\Flags.cs" />
     <Compile Include="Data\Globals.cs" />
     <Compile Include="Dats\DatHeader.cs" />
+    <Compile Include="Dats\DatStats.cs" />
     <Compile Include="Dats\Partials\DatFile.Manipulate.cs" />
     <Compile Include="Dats\Partials\DatFile.ConvertUpdate.cs" />
     <Compile Include="Dats\Partials\DatFile.DFD.cs" />
