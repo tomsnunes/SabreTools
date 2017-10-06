@@ -36,100 +36,33 @@ namespace SabreTools.Library.Dats
 				return;
 			}
 
+			Globals.Logger.User("Organizing roms by {0}" + (deduperoms != DedupeType.None ? " and merging" : ""), bucketBy);
+
 			// If the sorted type isn't the same, we want to sort the dictionary accordingly
-			if  (_sortedBy != bucketBy)
+			if (_sortedBy != bucketBy)
 			{
 				// Set the sorted type
 				_sortedBy = bucketBy;
 
-				// Clone the current dictionary into a new one for sorting then reset the internal one
-				SortedDictionary<string, List<DatItem>> sortable = this.CloneDictionary();
-				this.ResetDictionary();
-
-				Globals.Logger.User("Organizing roms by {0}" + (deduperoms != DedupeType.None ? " and merging" : ""), bucketBy);
-
-				// First do the initial sort of all of the roms
-				List<string> oldkeys = sortable.Keys.ToList();
+				// First do the initial sort of all of the roms inplace
+				List<string> oldkeys = Keys.ToList();
 				Parallel.ForEach(oldkeys, Globals.ParallelOptions, key =>
 				{
-					List<DatItem> roms = sortable[key];
+					// Get the unsorted current list
+					List<DatItem> roms = this[key];
 
 					// Now add each of the roms to their respective games
 					foreach (DatItem rom in roms)
 					{
-						string newkey = "";
-
 						// We want to get the key most appropriate for the given sorting type
-						switch (bucketBy)
-						{
-							case SortedBy.CRC:
-								newkey = (rom.Type == ItemType.Rom ? ((Rom)rom).CRC : Constants.CRCZero);
-								break;
-							case SortedBy.Game:
-								newkey = (norename ? ""
-									: rom.SystemID.ToString().PadLeft(10, '0')
-										+ "-"
-										+ rom.SourceID.ToString().PadLeft(10, '0') + "-")
-								+ (String.IsNullOrEmpty(rom.Machine.Name)
-										? "Default"
-										: rom.Machine.Name);
-								if (lower)
-								{
-									newkey = newkey.ToLowerInvariant();
-								}
-								if (newkey == null)
-								{
-									newkey = "null";
-								}
-
-								newkey = HttpUtility.HtmlEncode(newkey);
-								break;
-							case SortedBy.MD5:
-								newkey = (rom.Type == ItemType.Rom
-									? ((Rom)rom).MD5
-									: (rom.Type == ItemType.Disk
-										? ((Disk)rom).MD5
-										: Constants.MD5Zero));
-								break;
-							case SortedBy.SHA1:
-								newkey = (rom.Type == ItemType.Rom
-									? ((Rom)rom).SHA1
-									: (rom.Type == ItemType.Disk
-										? ((Disk)rom).SHA1
-										: Constants.SHA1Zero));
-								break;
-							case SortedBy.SHA256:
-								newkey = (rom.Type == ItemType.Rom
-									? ((Rom)rom).SHA256
-									: (rom.Type == ItemType.Disk
-										? ((Disk)rom).SHA256
-										: Constants.SHA256Zero));
-								break;
-							case SortedBy.SHA384:
-								newkey = (rom.Type == ItemType.Rom
-									? ((Rom)rom).SHA384
-									: (rom.Type == ItemType.Disk
-										? ((Disk)rom).SHA384
-										: Constants.SHA384Zero));
-								break;
-							case SortedBy.SHA512:
-								newkey = (rom.Type == ItemType.Rom
-									? ((Rom)rom).SHA512
-									: (rom.Type == ItemType.Disk
-										? ((Disk)rom).SHA512
-										: Constants.SHA512Zero));
-								break;
-						}
-
-						// Double and triple check the key
-						if (newkey == null)
-						{
-							newkey = "";
-						}
+						string newkey = GetKey(rom, bucketBy, lower, norename);
 
 						// Add the DatItem to the dictionary
 						Add(newkey, rom);
 					}
+
+					// Finally, remove the entire original key
+					Remove(key);
 				});
 			}			
 
@@ -153,6 +86,90 @@ namespace SabreTools.Library.Dats
 				Remove(key);
 				AddRange(key, sortedlist);
 			});
+		}
+
+		/// <summary>
+		/// Get the dictionary key that should be used for a given item and sorting type
+		/// </summary>
+		/// <param name="item">DatItem to get the key for</param>
+		/// <param name="sortedBy">SortedBy enum representing what key to get</param>
+		/// <param name="lower">True if the key should be lowercased (default), false otherwise</param>
+		/// <param name="norename">True if games should only be compared on game and file name, false if system and source are counted</param>
+		/// <returns>String representing the key to be used for the DatItem</returns>
+		private string GetKey(DatItem item, SortedBy sortedBy, bool lower = true, bool norename = true)
+		{
+			// Set the output key as the default blank string
+			string key = "";
+
+			// Now determine what the key should be based on the sortedBy value
+			switch (sortedBy)
+			{
+				case SortedBy.CRC:
+					key = (item.Type == ItemType.Rom ? ((Rom)item).CRC : Constants.CRCZero);
+					break;
+				case SortedBy.Game:
+					key = (norename ? ""
+						: item.SystemID.ToString().PadLeft(10, '0')
+							+ "-"
+							+ item.SourceID.ToString().PadLeft(10, '0') + "-")
+					+ (String.IsNullOrEmpty(item.Machine.Name)
+							? "Default"
+							: item.Machine.Name);
+					if (lower)
+					{
+						key = key.ToLowerInvariant();
+					}
+					if (key == null)
+					{
+						key = "null";
+					}
+
+					key = HttpUtility.HtmlEncode(key);
+					break;
+				case SortedBy.MD5:
+					key = (item.Type == ItemType.Rom
+						? ((Rom)item).MD5
+						: (item.Type == ItemType.Disk
+							? ((Disk)item).MD5
+							: Constants.MD5Zero));
+					break;
+				case SortedBy.SHA1:
+					key = (item.Type == ItemType.Rom
+						? ((Rom)item).SHA1
+						: (item.Type == ItemType.Disk
+							? ((Disk)item).SHA1
+							: Constants.SHA1Zero));
+					break;
+				case SortedBy.SHA256:
+					key = (item.Type == ItemType.Rom
+						? ((Rom)item).SHA256
+						: (item.Type == ItemType.Disk
+							? ((Disk)item).SHA256
+							: Constants.SHA256Zero));
+					break;
+				case SortedBy.SHA384:
+					key = (item.Type == ItemType.Rom
+						? ((Rom)item).SHA384
+						: (item.Type == ItemType.Disk
+							? ((Disk)item).SHA384
+							: Constants.SHA384Zero));
+					break;
+				case SortedBy.SHA512:
+					key = (item.Type == ItemType.Rom
+						? ((Rom)item).SHA512
+						: (item.Type == ItemType.Disk
+							? ((Disk)item).SHA512
+							: Constants.SHA512Zero));
+					break;
+			}
+
+			// Double and triple check the key for corner cases
+			if (key == null)
+			{
+				key = "";
+			}
+
+			return key;
 		}
 
 		#endregion
@@ -482,7 +499,7 @@ namespace SabreTools.Library.Dats
 			RemoveTagsFromChild();
 		}
 
-#endregion
+		#endregion
 
 		#region Merging/Splitting Helper Methods
 
