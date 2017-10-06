@@ -446,7 +446,7 @@ namespace SabreTools.Library.Dats
 			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
-			AddRomsToParent();
+			AddRomsFromChildren();
 
 			// Now that we have looped through the cloneof tags, we loop through the romof tags
 			RemoveBiosRomsFromChild();
@@ -806,7 +806,7 @@ namespace SabreTools.Library.Dats
 		/// <summary>
 		/// Use cloneof tags to add roms to the parents, removing the child sets in the process
 		/// </summary>
-		private void AddRomsToParent()
+		private void AddRomsFromChildren()
 		{
 			List<string> games = Keys.ToList();
 			foreach (string game in games)
