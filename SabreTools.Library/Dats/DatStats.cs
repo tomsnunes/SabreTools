@@ -47,82 +47,100 @@ namespace SabreTools.Library.Dats
 		public long Count
 		{
 			get { return _count; }
+			set { _count = value; }
 		}
 
 		// Individual DatItem type counts
 		public long ArchiveCount
 		{
 			get { return _archiveCount; }
+			set { _archiveCount = value; }
 		}
 		public long BiosSetCount
 		{
 			get { return _biosSetCount; }
+			set { _biosSetCount = value; }
 		}
 		public long DiskCount
 		{
 			get { return _diskCount; }
+			set { _diskCount = value; }
 		}
 		public long ReleaseCount
 		{
 			get { return _releaseCount; }
+			set { _releaseCount = value; }
 		}
 		public long RomCount
 		{
 			get { return _romCount; }
+			set { _romCount = value; }
 		}
 		public long SampleCount
 		{
 			get { return _sampleCount; }
+			set { _sampleCount = value; }
 		}
 
 		// Total reported size
 		public long TotalSize
 		{
 			get { return _totalSize; }
+			set { _totalSize = value; }
 		}
 
 		// Individual hash counts
 		public long CRCCount
 		{
 			get { return _crcCount; }
+			set { _crcCount = value; }
 		}
 		public long MD5Count
 		{
 			get { return _md5Count; }
+			set { _md5Count = value; }
 		}
 		public long SHA1Count
 		{
 			get { return _sha1Count; }
+			set { _sha1Count = value; }
 		}
 		public long SHA256Count
 		{
 			get { return _sha256Count; }
+			set { _sha256Count = value; }
 		}
 		public long SHA384Count
 		{
 			get { return _sha384Count; }
+			set { _sha384Count = value; }
 		}
 		public long SHA512Count
 		{
 			get { return _sha512Count; }
+			set { _sha512Count = value; }
 		}
 
 		// Individual status counts
 		public long BaddumpCount
 		{
 			get { return _baddumpCount; }
+			set { _baddumpCount = value; }
 		}
 		public long GoodCount
 		{
 			get { return _goodCount; }
+			set { _goodCount = value; }
 		}
 		public long NodumpCount
 		{
 			get { return _nodumpCount; }
+			set { _nodumpCount = value; }
 		}
 		public long VerifiedCount
 		{
 			get { return _verifiedCount; }
+			set { _verifiedCount = value; }
 		}
 
 		#endregion
