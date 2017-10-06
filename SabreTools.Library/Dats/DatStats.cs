@@ -12,32 +12,32 @@ namespace SabreTools.Library.Dats
 		private object _lockObject = new object();
 
 		// Overall item count
-		private long _count;
+		private long _count = 0;
 
 		// Individual DatItem type counts
-		private long _archiveCount;
-		private long _biosSetCount;
-		private long _diskCount;
-		private long _releaseCount;
-		private long _romCount;
-		private long _sampleCount;
+		private long _archiveCount = 0;
+		private long _biosSetCount = 0;
+		private long _diskCount = 0;
+		private long _releaseCount = 0;
+		private long _romCount = 0;
+		private long _sampleCount = 0;
 
 		// Total reported size
-		private long _totalSize;
+		private long _totalSize = 0;
 
 		// Individual hash counts
-		private long _crcCount;
-		private long _md5Count;
-		private long _sha1Count;
-		private long _sha256Count;
-		private long _sha384Count;
-		private long _sha512Count;
+		private long _crcCount = 0;
+		private long _md5Count = 0;
+		private long _sha1Count = 0;
+		private long _sha256Count = 0;
+		private long _sha384Count = 0;
+		private long _sha512Count = 0;
 
 		// Individual status counts
-		private long _baddumpCount;
-		private long _goodCount;
-		private long _nodumpCount;
-		private long _verifiedCount;
+		private long _baddumpCount = 0;
+		private long _goodCount = 0;
+		private long _nodumpCount = 0;
+		private long _verifiedCount = 0;
 
 		#endregion
 
