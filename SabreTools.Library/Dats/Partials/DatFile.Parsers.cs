@@ -101,10 +101,10 @@ namespace SabreTools.Library.Dats
 						break;
 					case DatFormat.ClrMamePro:
 					case DatFormat.DOSCenter:
-						ParseCMP(filename, sysid, srcid, keep, clean, remUnicode);
+						ParseClrMamePro(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.CSV:
-						ParseCSVTSV(filename, sysid, srcid, ',', keep, clean, remUnicode);
+						ParseSeparatedValue(filename, sysid, srcid, ',', keep, clean, remUnicode);
 						break;
 					case DatFormat.Listroms:
 						ParseListroms(filename, sysid, srcid, keep, clean, remUnicode);
@@ -113,7 +113,7 @@ namespace SabreTools.Library.Dats
 					case DatFormat.OfflineList:
 					case DatFormat.SabreDat:
 					case DatFormat.SoftwareList:
-						ParseGenericXML(filename, sysid, srcid, keep, clean, remUnicode);
+						ParseXML(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.RedumpMD5:
 						ParseHashfile(filename, sysid, srcid, Hash.MD5, clean, remUnicode);
@@ -134,10 +134,10 @@ namespace SabreTools.Library.Dats
 						ParseHashfile(filename, sysid, srcid, Hash.SHA512, clean, remUnicode);
 						break;
 					case DatFormat.RomCenter:
-						ParseRC(filename, sysid, srcid, clean, remUnicode);
+						ParseRomCenter(filename, sysid, srcid, clean, remUnicode);
 						break;
 					case DatFormat.TSV:
-						ParseCSVTSV(filename, sysid, srcid, '\t', keep, clean, remUnicode);
+						ParseSeparatedValue(filename, sysid, srcid, '\t', keep, clean, remUnicode);
 						break;
 					default:
 						return;
@@ -289,7 +289,7 @@ namespace SabreTools.Library.Dats
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		private void ParseCMP(
+		private void ParseClrMamePro(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -871,7 +871,466 @@ namespace SabreTools.Library.Dats
 		}
 
 		/// <summary>
-		/// Parse a CSV or a TSV and return all found games and roms within
+		/// Parse a hashfile or SFV and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="hashtype">Hash type that should be assumed</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		private void ParseHashfile(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Specific to hash files
+			Hash hashtype,
+
+			// Miscellaneous
+			bool clean,
+			bool remUnicode)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
+
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				// Split the line and get the name and hash
+				string[] split = line.Split(' ');
+				string name = "";
+				string hash = "";
+
+				// If we have CRC, then it's an SFV file and the name is first are
+				if ((hashtype & Hash.CRC) != 0)
+				{
+					name = split[0].Replace("*", String.Empty);
+					hash = split[1];
+				}
+				// Otherwise, the name is second
+				else
+				{
+					name = split[1].Replace("*", String.Empty);
+					hash = split[0];
+				}
+
+				Rom rom = new Rom
+				{
+					Name = name,
+					Size = -1,
+					CRC = ((hashtype & Hash.CRC) != 0 ? hash : null),
+					MD5 = ((hashtype & Hash.MD5) != 0 ? hash : null),
+					SHA1 = ((hashtype & Hash.SHA1) != 0 ? hash : null),
+					SHA256 = ((hashtype & Hash.SHA256) != 0 ? hash : null),
+					SHA384 = ((hashtype & Hash.SHA384) != 0 ? hash : null),
+					SHA512 = ((hashtype & Hash.SHA512) != 0 ? hash : null),
+					ItemStatus = ItemStatus.None,
+
+					Machine = new Machine
+					{
+						Name = Path.GetFileNameWithoutExtension(filename),
+					},
+
+					SystemID = sysid,
+					SourceID = srcid,
+				};
+
+				// Now process and add the rom
+				ParseAddHelper(rom, clean, remUnicode);
+			}
+
+			sr.Dispose();
+		}
+
+
+		/// <summary>
+		/// Parse a MAME Listroms DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// <remarks>
+		/// In a new style MAME listroms DAT, each game has the following format:
+		/// 
+		/// ROMs required for driver "005".
+		/// Name                                   Size Checksum
+		/// 1346b.cpu-u25                          2048 CRC(8e68533e) SHA1(a257c556d31691068ed5c991f1fb2b51da4826db)
+		/// 6331.sound-u8                            32 BAD CRC(1d298cb0) SHA1(bb0bb62365402543e3154b9a77be9c75010e6abc) BAD_DUMP
+		/// 16v8h-blue.u24                          279 NO GOOD DUMP KNOWN
+		/// </remarks>
+		private void ParseListroms(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Miscellaneous
+			bool keep,
+			bool clean,
+			bool remUnicode)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
+
+			string gamename = "";
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine().Trim();
+
+				// If we have a blank line, we just skip it
+				if (String.IsNullOrEmpty(line))
+				{
+					continue;
+				}
+
+				// If we have the descriptor line, ignore it
+				else if (line == "Name                                   Size Checksum")
+				{
+					continue;
+				}
+
+				// If we have the beginning of a game, set the name of the game
+				else if (line.StartsWith("ROMs required for"))
+				{
+					gamename = Regex.Match(line, @"^ROMs required for \S*? ""(.*?)""\.").Groups[1].Value;
+				}
+
+				// If we have a machine with no required roms (usually internal devices), skip it
+				else if (line.StartsWith("No ROMs required for"))
+				{
+					continue;
+				}
+
+				// Otherwise, we assume we have a rom that we need to add
+				else
+				{
+					// First, we preprocess the line so that the rom name is consistently correct
+					string romname = "";
+					string[] split = line.Split(new string[] { "    " }, StringSplitOptions.RemoveEmptyEntries);
+
+					// If the line doesn't have the 4 spaces of padding, check for 3
+					if (split.Length == 1)
+					{
+						split = line.Split(new string[] { "   " }, StringSplitOptions.RemoveEmptyEntries);
+					}
+
+					// If the split is still unsuccessful, log it and skip
+					if (split.Length == 1)
+					{
+						Globals.Logger.Warning("Possibly malformed line: '{0}'", line);
+					}
+
+					romname = split[0];
+					line = line.Substring(romname.Length);
+
+					// Next we separate the ROM into pieces
+					split = line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+
+					// Standard Disks have 2 pieces (name, sha1)
+					if (split.Length == 1)
+					{
+						Disk disk = new Disk()
+						{
+							Name = romname,
+							SHA1 = Style.CleanListromHashData(split[0]),
+
+							Machine = new Machine()
+							{
+								Name = gamename,
+							},
+						};
+
+						ParseAddHelper(disk, clean, remUnicode);
+					}
+
+					// Baddump Disks have 4 pieces (name, BAD, sha1, BAD_DUMP)
+					else if (split.Length == 3 && line.EndsWith("BAD_DUMP"))
+					{
+						Disk disk = new Disk()
+						{
+							Name = romname,
+							SHA1 = Style.CleanListromHashData(split[1]),
+							ItemStatus = ItemStatus.BadDump,
+
+							Machine = new Machine()
+							{
+								Name = gamename,
+							},
+						};
+
+						ParseAddHelper(disk, clean, remUnicode);
+					}
+
+					// Standard ROMs have 4 pieces (name, size, crc, sha1)
+					else if (split.Length == 3)
+					{
+						if (!Int64.TryParse(split[0], out long size))
+						{
+							size = 0;
+						}
+
+						Rom rom = new Rom()
+						{
+							Name = romname,
+							Size = size,
+							CRC = Style.CleanListromHashData(split[1]),
+							SHA1 = Style.CleanListromHashData(split[2]),
+
+							Machine = new Machine()
+							{
+								Name = gamename,
+							},
+						};
+
+						ParseAddHelper(rom, clean, remUnicode);
+					}
+
+					// Nodump Disks have 5 pieces (name, NO, GOOD, DUMP, KNOWN)
+					else if (split.Length == 4 && line.EndsWith("NO GOOD DUMP KNOWN"))
+					{
+						Disk disk = new Disk()
+						{
+							Name = romname,
+							ItemStatus = ItemStatus.Nodump,
+
+							Machine = new Machine()
+							{
+								Name = gamename,
+							},
+						};
+
+						ParseAddHelper(disk, clean, remUnicode);
+					}
+
+					// Baddump ROMs have 6 pieces (name, size, BAD, crc, sha1, BAD_DUMP)
+					else if (split.Length == 5 && line.EndsWith("BAD_DUMP"))
+					{
+						if (!Int64.TryParse(split[0], out long size))
+						{
+							size = 0;
+						}
+
+						Rom rom = new Rom()
+						{
+							Name = romname,
+							Size = size,
+							CRC = Style.CleanListromHashData(split[2]),
+							SHA1 = Style.CleanListromHashData(split[3]),
+							ItemStatus = ItemStatus.BadDump,
+
+							Machine = new Machine()
+							{
+								Name = gamename,
+							},
+						};
+
+						ParseAddHelper(rom, clean, remUnicode);
+					}
+
+					// Nodump ROMs have 6 pieces (name, size, NO, GOOD, DUMP, KNOWN)
+					else if (split.Length == 5 && line.EndsWith("NO GOOD DUMP KNOWN"))
+					{
+						if (!Int64.TryParse(split[0], out long size))
+						{
+							size = 0;
+						}
+
+						Rom rom = new Rom()
+						{
+							Name = romname,
+							Size = size,
+							ItemStatus = ItemStatus.Nodump,
+
+							Machine = new Machine()
+							{
+								Name = gamename,
+							},
+						};
+
+						ParseAddHelper(rom, clean, remUnicode);
+					}
+
+					// If we have something else, it's invalid
+					else
+					{
+						Globals.Logger.Warning("Invalid line detected: '{0} {1}'", romname, line);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Parse a RomCenter DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		private void ParseRomCenter(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Miscellaneous
+			bool clean,
+			bool remUnicode)
+		{
+			// Open a file reader
+			Encoding enc = Style.GetEncoding(filename);
+			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
+
+			string blocktype = "";
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				// If the line is the start of the credits section
+				if (line.ToLowerInvariant().StartsWith("[credits]"))
+				{
+					blocktype = "credits";
+				}
+				// If the line is the start of the dat section
+				else if (line.ToLowerInvariant().StartsWith("[dat]"))
+				{
+					blocktype = "dat";
+				}
+				// If the line is the start of the emulator section
+				else if (line.ToLowerInvariant().StartsWith("[emulator]"))
+				{
+					blocktype = "emulator";
+				}
+				// If the line is the start of the game section
+				else if (line.ToLowerInvariant().StartsWith("[games]"))
+				{
+					blocktype = "games";
+				}
+				// Otherwise, it's not a section and it's data, so get out all data
+				else
+				{
+					// If we have an author
+					if (line.ToLowerInvariant().StartsWith("author="))
+					{
+						Author = (String.IsNullOrEmpty(Author) ? line.Split('=')[1] : Author);
+					}
+					// If we have one of the three version tags
+					else if (line.ToLowerInvariant().StartsWith("version="))
+					{
+						switch (blocktype)
+						{
+							case "credits":
+								Version = (String.IsNullOrEmpty(Version) ? line.Split('=')[1] : Version);
+								break;
+							case "emulator":
+								Description = (String.IsNullOrEmpty(Description) ? line.Split('=')[1] : Description);
+								break;
+						}
+					}
+					// If we have a URL
+					else if (line.ToLowerInvariant().StartsWith("url="))
+					{
+						Url = (String.IsNullOrEmpty(Url) ? line.Split('=')[1] : Url);
+					}
+					// If we have a comment
+					else if (line.ToLowerInvariant().StartsWith("comment="))
+					{
+						Comment = (String.IsNullOrEmpty(Comment) ? line.Split('=')[1] : Comment);
+					}
+					// If we have the split flag
+					else if (line.ToLowerInvariant().StartsWith("split="))
+					{
+						if (Int32.TryParse(line.Split('=')[1], out int split))
+						{
+							if (split == 1 && ForcePacking == ForcePacking.None)
+							{
+								ForceMerging = ForceMerging.Split;
+							}
+						}
+					}
+					// If we have the merge tag
+					else if (line.ToLowerInvariant().StartsWith("merge="))
+					{
+						if (Int32.TryParse(line.Split('=')[1], out int merge))
+						{
+							if (merge == 1 && ForceMerging == ForceMerging.None)
+							{
+								ForceMerging = ForceMerging.Full;
+							}
+						}
+					}
+					// If we have the refname tag
+					else if (line.ToLowerInvariant().StartsWith("refname="))
+					{
+						Name = (String.IsNullOrEmpty(Name) ? line.Split('=')[1] : Name);
+					}
+					// If we have a rom
+					else if (line.StartsWith("¬"))
+					{
+						// Some old RC DATs have this behavior
+						if (line.Contains("¬N¬O"))
+						{
+							line = line.Replace("¬N¬O", "") + "¬¬";
+						}
+
+						/*
+						The rominfo order is as follows:
+						1 - parent name
+						2 - parent description
+						3 - game name
+						4 - game description
+						5 - rom name
+						6 - rom crc
+						7 - rom size
+						8 - romof name
+						9 - merge name
+						*/
+						string[] rominfo = line.Split('¬');
+
+						// Try getting the size separately
+						if (!Int64.TryParse(rominfo[7], out long size))
+						{
+							size = 0;
+						}
+
+						Rom rom = new Rom
+						{
+							Name = rominfo[5],
+							Size = size,
+							CRC = rominfo[6],
+							ItemStatus = ItemStatus.None,
+
+							Machine = new Machine
+							{
+								Name = rominfo[3],
+								Description = rominfo[4],
+								CloneOf = rominfo[1],
+								RomOf = rominfo[8],
+							},
+
+							SystemID = sysid,
+							SourceID = srcid,
+						};
+
+						// Now process and add the rom
+						ParseAddHelper(rom, clean, remUnicode);
+					}
+				}
+			}
+
+			sr.Dispose();
+		}
+
+		/// <summary>
+		/// Parse a character-separated value DAT and return all found games and roms within
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
@@ -880,7 +1339,7 @@ namespace SabreTools.Library.Dats
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		private void ParseCSVTSV(
+		private void ParseSeparatedValue(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -999,7 +1458,7 @@ namespace SabreTools.Library.Dats
 
 				// Otherwise, we want to split the line and parse
 				string[] parsedLine = line.Split(delim);
-				
+
 				// If the line doesn't have the correct number of columns, we log and skip
 				if (parsedLine.Length != columns.Count)
 				{
@@ -1215,8 +1674,9 @@ namespace SabreTools.Library.Dats
 						ParseAddHelper(sample, clean, remUnicode);
 						break;
 				}
-			}			
+			}
 		}
+
 
 		/// <summary>
 		/// Parse an XML DAT (Logiqx, OfflineList, SabreDAT, and Software List) and return all found games and roms within
@@ -1230,7 +1690,7 @@ namespace SabreTools.Library.Dats
 		/// <remrks>
 		/// TODO: Software Lists - sharedfeat tag (read-in, write-out)
 		/// </remrks>
-		private void ParseGenericXML(
+		private void ParseXML(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -2352,464 +2812,6 @@ namespace SabreTools.Library.Dats
 			}
 
 			xtr.Dispose();
-		}
-
-		/// <summary>
-		/// Parse a MAME Listroms DAT and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// <remarks>
-		/// In a new style MAME listroms DAT, each game has the following format:
-		/// 
-		/// ROMs required for driver "005".
-		/// Name                                   Size Checksum
-		/// 1346b.cpu-u25                          2048 CRC(8e68533e) SHA1(a257c556d31691068ed5c991f1fb2b51da4826db)
-		/// 6331.sound-u8                            32 BAD CRC(1d298cb0) SHA1(bb0bb62365402543e3154b9a77be9c75010e6abc) BAD_DUMP
-		/// 16v8h-blue.u24                          279 NO GOOD DUMP KNOWN
-		/// </remarks>
-		private void ParseListroms(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Miscellaneous
-			bool keep,
-			bool clean,
-			bool remUnicode)
-		{
-			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
-
-			string gamename = "";
-			while (!sr.EndOfStream)
-			{
-				string line = sr.ReadLine().Trim();
-
-				// If we have a blank line, we just skip it
-				if (String.IsNullOrEmpty(line))
-				{
-					continue;
-				}
-
-				// If we have the descriptor line, ignore it
-				else if (line == "Name                                   Size Checksum")
-				{
-					continue;
-				}
-
-				// If we have the beginning of a game, set the name of the game
-				else if (line.StartsWith("ROMs required for"))
-				{
-					gamename = Regex.Match(line, @"^ROMs required for \S*? ""(.*?)""\.").Groups[1].Value;
-				}
-
-				// If we have a machine with no required roms (usually internal devices), skip it
-				else if (line.StartsWith("No ROMs required for"))
-				{
-					continue;
-				}
-
-				// Otherwise, we assume we have a rom that we need to add
-				else
-				{
-					// First, we preprocess the line so that the rom name is consistently correct
-					string romname = "";
-					string[] split = line.Split(new string[] { "    " }, StringSplitOptions.RemoveEmptyEntries);
-
-					// If the line doesn't have the 4 spaces of padding, check for 3
-					if (split.Length == 1)
-					{
-						split = line.Split(new string[] { "   " }, StringSplitOptions.RemoveEmptyEntries);
-					}
-
-					// If the split is still unsuccessful, log it and skip
-					if (split.Length == 1)
-					{
-						Globals.Logger.Warning("Possibly malformed line: '{0}'", line);
-					}
-
-					romname = split[0];
-					line = line.Substring(romname.Length);
-
-					// Next we separate the ROM into pieces
-					split = line.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
-
-					// Standard Disks have 2 pieces (name, sha1)
-					if (split.Length == 1)
-					{
-						Disk disk = new Disk()
-						{
-							Name = romname,
-							SHA1 = Style.CleanListromHashData(split[0]),
-
-							Machine = new Machine()
-							{
-								Name = gamename,
-							},
-						};
-
-						ParseAddHelper(disk, clean, remUnicode);
-					}
-
-					// Baddump Disks have 4 pieces (name, BAD, sha1, BAD_DUMP)
-					else if (split.Length == 3 && line.EndsWith("BAD_DUMP"))
-					{
-						Disk disk = new Disk()
-						{
-							Name = romname,
-							SHA1 = Style.CleanListromHashData(split[1]),
-							ItemStatus = ItemStatus.BadDump,
-
-							Machine = new Machine()
-							{
-								Name = gamename,
-							},
-						};
-
-						ParseAddHelper(disk, clean, remUnicode);
-					}
-
-					// Standard ROMs have 4 pieces (name, size, crc, sha1)
-					else if (split.Length == 3)
-					{
-						if (!Int64.TryParse(split[0], out long size))
-						{
-							size = 0;
-						}
-
-						Rom rom = new Rom()
-						{
-							Name = romname,
-							Size = size,
-							CRC = Style.CleanListromHashData(split[1]),
-							SHA1 = Style.CleanListromHashData(split[2]),
-
-							Machine = new Machine()
-							{
-								Name = gamename,
-							},
-						};
-
-						ParseAddHelper(rom, clean, remUnicode);
-					}
-
-					// Nodump Disks have 5 pieces (name, NO, GOOD, DUMP, KNOWN)
-					else if (split.Length == 4 && line.EndsWith("NO GOOD DUMP KNOWN"))
-					{
-						Disk disk = new Disk()
-						{
-							Name = romname,
-							ItemStatus = ItemStatus.Nodump,
-
-							Machine = new Machine()
-							{
-								Name = gamename,
-							},
-						};
-
-						ParseAddHelper(disk, clean, remUnicode);
-					}
-
-					// Baddump ROMs have 6 pieces (name, size, BAD, crc, sha1, BAD_DUMP)
-					else if (split.Length == 5 && line.EndsWith("BAD_DUMP"))
-					{
-						if (!Int64.TryParse(split[0], out long size))
-						{
-							size = 0;
-						}
-
-						Rom rom = new Rom()
-						{
-							Name = romname,
-							Size = size,
-							CRC = Style.CleanListromHashData(split[2]),
-							SHA1 = Style.CleanListromHashData(split[3]),
-							ItemStatus = ItemStatus.BadDump,
-
-							Machine = new Machine()
-							{
-								Name = gamename,
-							},
-						};
-
-						ParseAddHelper(rom, clean, remUnicode);
-					}
-
-					// Nodump ROMs have 6 pieces (name, size, NO, GOOD, DUMP, KNOWN)
-					else if (split.Length == 5 && line.EndsWith("NO GOOD DUMP KNOWN"))
-					{
-						if (!Int64.TryParse(split[0], out long size))
-						{
-							size = 0;
-						}
-
-						Rom rom = new Rom()
-						{
-							Name = romname,
-							Size = size,
-							ItemStatus = ItemStatus.Nodump,
-
-							Machine = new Machine()
-							{
-								Name = gamename,
-							},
-						};
-
-						ParseAddHelper(rom, clean, remUnicode);
-					}
-
-					// If we have something else, it's invalid
-					else
-					{
-						Globals.Logger.Warning("Invalid line detected: '{0} {1}'", romname, line);
-					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// Parse a hashfile or SFV and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="hashtype">Hash type that should be assumed</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		private void ParseHashfile(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Specific to hash files
-			Hash hashtype,
-
-			// Miscellaneous
-			bool clean,
-			bool remUnicode)
-		{
-			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
-
-			while (!sr.EndOfStream)
-			{
-				string line = sr.ReadLine();
-
-				// Split the line and get the name and hash
-				string[] split = line.Split(' ');
-				string name = "";
-				string hash = "";
-
-				// If we have CRC, then it's an SFV file and the name is first are
-				if ((hashtype & Hash.CRC) != 0)
-				{
-					name = split[0].Replace("*", String.Empty);
-					hash = split[1];
-				}
-				// Otherwise, the name is second
-				else
-				{
-					name = split[1].Replace("*", String.Empty);
-					hash = split[0];
-				}
-
-				Rom rom = new Rom
-				{
-					Name = name,
-					Size = -1,
-					CRC = ((hashtype & Hash.CRC) != 0 ? hash : null),
-					MD5 = ((hashtype & Hash.MD5) != 0 ? hash : null),
-					SHA1 = ((hashtype & Hash.SHA1) != 0 ? hash : null),
-					SHA256 = ((hashtype & Hash.SHA256) != 0 ? hash : null),
-					SHA384 = ((hashtype & Hash.SHA384) != 0 ? hash : null),
-					SHA512 = ((hashtype & Hash.SHA512) != 0 ? hash : null),
-					ItemStatus = ItemStatus.None,
-
-					Machine = new Machine
-					{
-						Name = Path.GetFileNameWithoutExtension(filename),
-					},
-
-					SystemID = sysid,
-					SourceID = srcid,
-				};
-
-				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode);
-			}
-
-			sr.Dispose();
-		}
-
-		/// <summary>
-		/// Parse a RomCenter DAT and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		private void ParseRC(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Miscellaneous
-			bool clean,
-			bool remUnicode)
-		{
-			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
-
-			string blocktype = "";
-			while (!sr.EndOfStream)
-			{
-				string line = sr.ReadLine();
-
-				// If the line is the start of the credits section
-				if (line.ToLowerInvariant().StartsWith("[credits]"))
-				{
-					blocktype = "credits";
-				}
-				// If the line is the start of the dat section
-				else if (line.ToLowerInvariant().StartsWith("[dat]"))
-				{
-					blocktype = "dat";
-				}
-				// If the line is the start of the emulator section
-				else if (line.ToLowerInvariant().StartsWith("[emulator]"))
-				{
-					blocktype = "emulator";
-				}
-				// If the line is the start of the game section
-				else if (line.ToLowerInvariant().StartsWith("[games]"))
-				{
-					blocktype = "games";
-				}
-				// Otherwise, it's not a section and it's data, so get out all data
-				else
-				{
-					// If we have an author
-					if (line.ToLowerInvariant().StartsWith("author="))
-					{
-						Author = (String.IsNullOrEmpty(Author) ? line.Split('=')[1] : Author);
-					}
-					// If we have one of the three version tags
-					else if (line.ToLowerInvariant().StartsWith("version="))
-					{
-						switch (blocktype)
-						{
-							case "credits":
-								Version = (String.IsNullOrEmpty(Version) ? line.Split('=')[1] : Version);
-								break;
-							case "emulator":
-								Description = (String.IsNullOrEmpty(Description) ? line.Split('=')[1] : Description);
-								break;
-						}
-					}
-					// If we have a URL
-					else if (line.ToLowerInvariant().StartsWith("url="))
-					{
-						Url = (String.IsNullOrEmpty(Url) ? line.Split('=')[1] : Url);
-					}
-					// If we have a comment
-					else if (line.ToLowerInvariant().StartsWith("comment="))
-					{
-						Comment = (String.IsNullOrEmpty(Comment) ? line.Split('=')[1] : Comment);
-					}
-					// If we have the split flag
-					else if (line.ToLowerInvariant().StartsWith("split="))
-					{
-						if (Int32.TryParse(line.Split('=')[1], out int split))
-						{
-							if (split == 1 && ForcePacking == ForcePacking.None)
-							{
-								ForceMerging = ForceMerging.Split;
-							}
-						}
-					}
-					// If we have the merge tag
-					else if (line.ToLowerInvariant().StartsWith("merge="))
-					{
-						if (Int32.TryParse(line.Split('=')[1], out int merge))
-						{
-							if (merge == 1 && ForceMerging == ForceMerging.None)
-							{
-								ForceMerging = ForceMerging.Full;
-							}
-						}
-					}
-					// If we have the refname tag
-					else if (line.ToLowerInvariant().StartsWith("refname="))
-					{
-						Name = (String.IsNullOrEmpty(Name) ? line.Split('=')[1] : Name);
-					}
-					// If we have a rom
-					else if (line.StartsWith("¬"))
-					{
-						// Some old RC DATs have this behavior
-						if (line.Contains("¬N¬O"))
-						{
-							line = line.Replace("¬N¬O", "") + "¬¬";
-						}
-
-						/*
-						The rominfo order is as follows:
-						1 - parent name
-						2 - parent description
-						3 - game name
-						4 - game description
-						5 - rom name
-						6 - rom crc
-						7 - rom size
-						8 - romof name
-						9 - merge name
-						*/
-						string[] rominfo = line.Split('¬');
-
-						// Try getting the size separately
-						if (!Int64.TryParse(rominfo[7], out long size))
-						{
-							size = 0;
-						}
-
-						Rom rom = new Rom
-						{
-							Name = rominfo[5],
-							Size = size,
-							CRC = rominfo[6],
-							ItemStatus = ItemStatus.None,
-
-							Machine = new Machine
-							{
-								Name = rominfo[3],
-								Description = rominfo[4],
-								CloneOf = rominfo[1],
-								RomOf = rominfo[8],
-							},
-
-							SystemID = sysid,
-							SourceID = srcid,
-						};
-
-						// Now process and add the rom
-						ParseAddHelper(rom, clean, remUnicode);
-					}
-				}
-			}
-
-			sr.Dispose();
 		}
 
 		/// <summary>
