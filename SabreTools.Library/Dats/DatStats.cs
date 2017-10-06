@@ -133,7 +133,7 @@ namespace SabreTools.Library.Dats
 		/// Add to the statistics given a DatItem
 		/// </summary>
 		/// <param name="item">Item to add info from</param>
-		private void AddItem(DatItem item)
+		public void AddItem(DatItem item)
 		{
 			// No matter what the item is, we increate the count
 			lock (_lockObject)
@@ -198,7 +198,7 @@ namespace SabreTools.Library.Dats
 		/// Remove from the statistics given a DatItem
 		/// </summary>
 		/// <param name="item">Item to remove info for</param>
-		private void RemoveItem(DatItem item)
+		public void RemoveItem(DatItem item)
 		{
 			// No matter what the item is, we increate the count
 			lock (_lockObject)
@@ -262,7 +262,7 @@ namespace SabreTools.Library.Dats
 		/// <summary>
 		/// Reset all statistics
 		/// </summary>
-		private void Reset()
+		public void Reset()
 		{
 			_count = 0;
 
