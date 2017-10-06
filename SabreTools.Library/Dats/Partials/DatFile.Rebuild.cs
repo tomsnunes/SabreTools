@@ -777,7 +777,7 @@ namespace SabreTools.Library.Dats
 							foreach (Rom item in dupes)
 							{
 								// Create a headered item to use as well
-								rom.Machine = item.Machine;
+								rom.Machine = (Machine)item.Machine.Clone();
 								rom.Name += "_" + rom.CRC;
 
 								// If either copy succeeds, then we want to set rebuilt to true

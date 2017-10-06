@@ -107,7 +107,7 @@ namespace SabreTools.Library.Dats
 				Type = this.Type,
 				Dupe = this.Dupe,
 
-				Machine = this.Machine,
+				Machine = (Machine)this.Machine.Clone(),
 
 				Supported = this.Supported,
 				Publisher = this.Publisher,

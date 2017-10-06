@@ -2761,7 +2761,7 @@ namespace SabreTools.Library.Dats
 										SHA512 = xtr.GetAttribute("sha512")?.ToLowerInvariant(),
 										ItemStatus = its,
 
-										Machine = dir,
+										Machine = (Machine)dir.Clone(),
 
 										SystemID = sysid,
 										System = filename,
@@ -2783,7 +2783,7 @@ namespace SabreTools.Library.Dats
 										ItemStatus = its,
 										Date = date,
 
-										Machine = dir,
+										Machine = (Machine)dir.Clone(),
 
 										SystemID = sysid,
 										System = filename,

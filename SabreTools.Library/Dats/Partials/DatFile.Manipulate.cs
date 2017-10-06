@@ -546,7 +546,7 @@ namespace SabreTools.Library.Dats
 					{
 						case ItemType.Archive:
 							Archive archive = ((Archive)item).Clone() as Archive;
-							archive.Machine = currentMachine;
+							archive.Machine = (Machine)currentMachine.Clone();
 							if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
 							{
 								Add(game, archive);
@@ -555,7 +555,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.BiosSet:
 							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							biosSet.Machine = currentMachine;
+							biosSet.Machine = (Machine)currentMachine.Clone();
 							if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
 							{
 								Add(game, biosSet);
@@ -564,7 +564,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Disk:
 							Disk disk = ((Disk)item).Clone() as Disk;
-							disk.Machine = currentMachine;
+							disk.Machine = (Machine)currentMachine.Clone();
 							if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
 							{
 								Add(game, disk);
@@ -573,7 +573,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Release:
 							Release release = ((Release)item).Clone() as Release;
-							release.Machine = currentMachine;
+							release.Machine = (Machine)currentMachine.Clone();
 							if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
 							{
 								Add(game, release);
@@ -582,7 +582,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Rom:
 							Rom rom = ((Rom)item).Clone() as Rom;
-							rom.Machine = currentMachine;
+							rom.Machine = (Machine)currentMachine.Clone();
 							if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
 							{
 								Add(game, rom);
@@ -591,7 +591,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Sample:
 							Sample sample = ((Sample)item).Clone() as Sample;
-							sample.Machine = currentMachine;
+							sample.Machine = (Machine)currentMachine.Clone();
 							if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
 							{
 								Add(game, sample);
@@ -637,7 +637,7 @@ namespace SabreTools.Library.Dats
 						{
 							case ItemType.Archive:
 								Archive archive = ((Archive)item).Clone() as Archive;
-								archive.Machine = musheen;
+								archive.Machine = (Machine)musheen.Clone();
 								if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
 								{
 									Add(game, archive);
@@ -646,7 +646,7 @@ namespace SabreTools.Library.Dats
 								break;
 							case ItemType.BiosSet:
 								BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-								biosSet.Machine = musheen;
+								biosSet.Machine = (Machine)musheen.Clone();
 								if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
 								{
 									Add(game, biosSet);
@@ -655,7 +655,7 @@ namespace SabreTools.Library.Dats
 								break;
 							case ItemType.Disk:
 								Disk disk = ((Disk)item).Clone() as Disk;
-								disk.Machine = musheen;
+								disk.Machine = (Machine)musheen.Clone();
 								if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
 								{
 									Add(game, disk);
@@ -664,7 +664,7 @@ namespace SabreTools.Library.Dats
 								break;
 							case ItemType.Release:
 								Release release = ((Release)item).Clone() as Release;
-								release.Machine = musheen;
+								release.Machine = (Machine)musheen.Clone();
 								if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
 								{
 									Add(game, release);
@@ -673,7 +673,7 @@ namespace SabreTools.Library.Dats
 								break;
 							case ItemType.Rom:
 								Rom rom = ((Rom)item).Clone() as Rom;
-								rom.Machine = musheen;
+								rom.Machine = (Machine)musheen.Clone();
 								if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
 								{
 									Add(game, rom);
@@ -682,7 +682,7 @@ namespace SabreTools.Library.Dats
 								break;
 							case ItemType.Sample:
 								Sample sample = ((Sample)item).Clone() as Sample;
-								sample.Machine = musheen;
+								sample.Machine = (Machine)musheen.Clone();
 								if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
 								{
 									Add(game, sample);
@@ -738,7 +738,7 @@ namespace SabreTools.Library.Dats
 					{
 						case ItemType.Archive:
 							Archive archive = ((Archive)item).Clone() as Archive;
-							archive.Machine = currentMachine;
+							archive.Machine = (Machine)currentMachine.Clone();
 							if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
 							{
 								Add(game, archive);
@@ -747,7 +747,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.BiosSet:
 							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							biosSet.Machine = currentMachine;
+							biosSet.Machine = (Machine)currentMachine.Clone();
 							if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
 							{
 								Add(game, biosSet);
@@ -756,7 +756,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Disk:
 							Disk disk = ((Disk)item).Clone() as Disk;
-							disk.Machine = currentMachine;
+							disk.Machine = (Machine)currentMachine.Clone();
 							if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
 							{
 								Add(game, disk);
@@ -765,7 +765,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Release:
 							Release release = ((Release)item).Clone() as Release;
-							release.Machine = currentMachine;
+							release.Machine = (Machine)currentMachine.Clone();
 							if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
 							{
 								Add(game, release);
@@ -774,7 +774,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Rom:
 							Rom rom = ((Rom)item).Clone() as Rom;
-							rom.Machine = currentMachine;
+							rom.Machine = (Machine)currentMachine.Clone();
 							if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
 							{
 								Add(game, rom);
@@ -783,7 +783,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Sample:
 							Sample sample = ((Sample)item).Clone() as Sample;
-							sample.Machine = currentMachine;
+							sample.Machine = (Machine)currentMachine.Clone();
 							if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
 							{
 								Add(game, sample);
@@ -832,7 +832,7 @@ namespace SabreTools.Library.Dats
 					// If the disk doesn't have a valid merge tag OR the merged file doesn't exist in the parent, then add it
 					if (item.Type == ItemType.Disk && (item.MergeTag == null || !this[parent].Select(i => i.Name).Contains(item.MergeTag)))
 					{
-						item.Machine = parentMachine;
+						item.Machine = (Machine)parentMachine.Clone();
 						Add(parent, item);
 					}
 
@@ -843,7 +843,7 @@ namespace SabreTools.Library.Dats
 						item.Name = item.Machine.Name + "\\" + item.Name;
 
 						// Update the machine to be the new parent
-						item.Machine = parentMachine;
+						item.Machine = (Machine)parentMachine.Clone();
 
 						// Add the rom to the parent set
 						Add(parent, item);
