@@ -1813,7 +1813,7 @@ namespace SabreTools.Library.Dats
 											CRC = subreader.ReadElementContentAsString(),
 											ItemStatus = ItemStatus.None,
 
-											Machine = machine,
+											Machine = (Machine)machine.Clone(),
 										};
 
 										// Now process and add the rom
@@ -1900,7 +1900,7 @@ namespace SabreTools.Library.Dats
 											Date = date,
 											Default = defaultrel,
 
-											Machine = machine,
+											Machine = (Machine)machine.Clone(),
 
 											Supported = supported,
 											Publisher = publisher,
@@ -1939,7 +1939,7 @@ namespace SabreTools.Library.Dats
 											Description = subreader.GetAttribute("description"),
 											Default = defaultbios,
 
-											Machine = machine,
+											Machine = (Machine)machine.Clone(),
 
 											Supported = supported,
 											Publisher = publisher,
@@ -1967,7 +1967,7 @@ namespace SabreTools.Library.Dats
 										{
 											Name = subreader.GetAttribute("name"),
 
-											Machine = machine,
+											Machine = (Machine)machine.Clone(),
 
 											Supported = supported,
 											Publisher = publisher,
@@ -1995,7 +1995,7 @@ namespace SabreTools.Library.Dats
 										{
 											Name = subreader.GetAttribute("name"),
 
-											Machine = machine,
+											Machine = (Machine)machine.Clone(),
 
 											Supported = supported,
 											Publisher = publisher,
@@ -2104,7 +2104,7 @@ namespace SabreTools.Library.Dats
 													MergeTag = merge,
 													ItemStatus = its,
 
-													Machine = machine,
+													Machine = (Machine)machine.Clone(),
 
 													Supported = supported,
 													Publisher = publisher,
@@ -2136,7 +2136,7 @@ namespace SabreTools.Library.Dats
 													MergeTag = merge,
 													Date = date,
 
-													Machine = machine,
+													Machine = (Machine)machine.Clone(),
 
 													Supported = supported,
 													Publisher = publisher,

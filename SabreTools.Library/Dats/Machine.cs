@@ -5,7 +5,7 @@ using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Dats
 {
-	public class Machine
+	public class Machine : ICloneable
 	{
 		#region Protected instance variables
 
@@ -79,6 +79,35 @@ namespace SabreTools.Library.Dats
 			Devices = null;
 			MachineType = MachineType.NULL;
 			_guid = new Guid();
+		}
+
+		#endregion
+
+		#region Cloning methods
+
+		/// <summary>
+		/// Create a clone of the current machine
+		/// </summary>
+		/// <returns>New machine with the same values as the current one</returns>
+		public object Clone()
+		{
+			return new Machine()
+			{
+				Name = this.Name,
+				Comment = this.Comment,
+				Description = this.Description,
+				Year = this.Year,
+				Manufacturer = this.Manufacturer,
+				RomOf = this.RomOf,
+				CloneOf = this.CloneOf,
+				SampleOf = this.SampleOf,
+				SourceFile = this.SourceFile,
+				Runnable = this.Runnable,
+				Board = this.Board,
+				RebuildTo = this.RebuildTo,
+				Devices = this.Devices,
+				MachineType = this.MachineType,
+			};
 		}
 
 		#endregion
