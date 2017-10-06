@@ -116,22 +116,22 @@ namespace SabreTools.Library.Dats
 						ParseGenericXML(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.RedumpMD5:
-						ParseRedumpMD5(filename, sysid, srcid, clean, remUnicode);
+						ParseHashfile(filename, sysid, srcid, Hash.MD5, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSFV:
-						ParseRedumpSFV(filename, sysid, srcid, clean, remUnicode);
+						ParseHashfile(filename, sysid, srcid, Hash.CRC, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA1:
-						ParseRedumpSHA1(filename, sysid, srcid, clean, remUnicode);
+						ParseHashfile(filename, sysid, srcid, Hash.SHA1, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA256:
-						ParseRedumpSHA256(filename, sysid, srcid, clean, remUnicode);
+						ParseHashfile(filename, sysid, srcid, Hash.SHA256, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA384:
-						ParseRedumpSHA384(filename, sysid, srcid, clean, remUnicode);
+						ParseHashfile(filename, sysid, srcid, Hash.SHA384, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA512:
-						ParseRedumpSHA512(filename, sysid, srcid, clean, remUnicode);
+						ParseHashfile(filename, sysid, srcid, Hash.SHA512, clean, remUnicode);
 						break;
 					case DatFormat.RomCenter:
 						ParseRC(filename, sysid, srcid, clean, remUnicode);
@@ -2572,18 +2572,22 @@ namespace SabreTools.Library.Dats
 		}
 
 		/// <summary>
-		/// Parse a Redump MD5 and return all found games and roms within
+		/// Parse a hashfile or SFV and return all found games and roms within
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="hashtype">Hash type that should be assumed</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		private void ParseRedumpMD5(
+		private void ParseHashfile(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
+
+			// Specific to hash files
+			Hash hashtype,
 
 			// Miscellaneous
 			bool clean,
@@ -2597,256 +2601,34 @@ namespace SabreTools.Library.Dats
 			{
 				string line = sr.ReadLine();
 
-				Rom rom = new Rom
+				// Split the line and get the name and hash
+				string[] split = line.Split(' ');
+				string name = "";
+				string hash = "";
+
+				// If we have CRC, then it's an SFV file and the name is first are
+				if ((hashtype & Hash.CRC) != 0)
 				{
-					Name = line.Split(' ')[1].Replace("*", String.Empty),
-					Size = -1,
-					MD5 = line.Split(' ')[0],
-					ItemStatus = ItemStatus.None,
-
-					Machine = new Machine
-					{
-						Name = Path.GetFileNameWithoutExtension(filename),
-					},
-
-					SystemID = sysid,
-					SourceID = srcid,
-				};
-
-				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode);
-			}
-
-			sr.Dispose();
-		}
-
-		/// <summary>
-		/// Parse a Redump SFV and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		private void ParseRedumpSFV(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Miscellaneous
-			bool clean,
-			bool remUnicode)
-		{
-			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
-
-			while (!sr.EndOfStream)
-			{
-				string line = sr.ReadLine();
+					name = split[0].Replace("*", String.Empty);
+					hash = split[1];
+				}
+				// Otherwise, the name is second
+				else
+				{
+					name = split[1].Replace("*", String.Empty);
+					hash = split[0];
+				}
 
 				Rom rom = new Rom
 				{
-					Name = line.Split(' ')[0].Replace("*", String.Empty),
+					Name = name,
 					Size = -1,
-					CRC = line.Split(' ')[1],
-					ItemStatus = ItemStatus.None,
-
-					Machine = new Machine
-					{
-						Name = Path.GetFileNameWithoutExtension(filename),
-					},
-
-					SystemID = sysid,
-					SourceID = srcid,
-				};
-
-				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode);
-			}
-
-			sr.Dispose();
-		}
-
-		/// <summary>
-		/// Parse a Redump SHA-1 and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		private void ParseRedumpSHA1(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Miscellaneous
-			bool clean,
-			bool remUnicode)
-		{
-			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
-
-			while (!sr.EndOfStream)
-			{
-				string line = sr.ReadLine();
-
-				Rom rom = new Rom
-				{
-					Name = line.Split(' ')[1].Replace("*", String.Empty),
-					Size = -1,
-					SHA1 = line.Split(' ')[0],
-					ItemStatus = ItemStatus.None,
-
-					Machine = new Machine
-					{
-						Name = Path.GetFileNameWithoutExtension(filename),
-					},
-
-					SystemID = sysid,
-					SourceID = srcid,
-				};
-
-				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode);
-			}
-
-			sr.Dispose();
-		}
-
-		/// <summary>
-		/// Parse a Redump SHA-256 and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		private void ParseRedumpSHA256(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Miscellaneous
-			bool clean,
-			bool remUnicode)
-		{
-			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
-
-			while (!sr.EndOfStream)
-			{
-				string line = sr.ReadLine();
-
-				Rom rom = new Rom
-				{
-					Name = line.Split(' ')[1].Replace("*", String.Empty),
-					Size = -1,
-					SHA256 = line.Split(' ')[0],
-					ItemStatus = ItemStatus.None,
-
-					Machine = new Machine
-					{
-						Name = Path.GetFileNameWithoutExtension(filename),
-					},
-
-					SystemID = sysid,
-					SourceID = srcid,
-				};
-
-				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode);
-			}
-
-			sr.Dispose();
-		}
-
-		/// <summary>
-		/// Parse a Redump SHA-256 and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		private void ParseRedumpSHA384(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Miscellaneous
-			bool clean,
-			bool remUnicode)
-		{
-			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
-
-			while (!sr.EndOfStream)
-			{
-				string line = sr.ReadLine();
-
-				Rom rom = new Rom
-				{
-					Name = line.Split(' ')[1].Replace("*", String.Empty),
-					Size = -1,
-					SHA384 = line.Split(' ')[0],
-					ItemStatus = ItemStatus.None,
-
-					Machine = new Machine
-					{
-						Name = Path.GetFileNameWithoutExtension(filename),
-					},
-
-					SystemID = sysid,
-					SourceID = srcid,
-				};
-
-				// Now process and add the rom
-				ParseAddHelper(rom, clean, remUnicode);
-			}
-
-			sr.Dispose();
-		}
-
-		/// <summary>
-		/// Parse a Redump SHA-512 and return all found games and roms within
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		private void ParseRedumpSHA512(
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Miscellaneous
-			bool clean,
-			bool remUnicode)
-		{
-			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
-
-			while (!sr.EndOfStream)
-			{
-				string line = sr.ReadLine();
-
-				Rom rom = new Rom
-				{
-					Name = line.Split(' ')[1].Replace("*", String.Empty),
-					Size = -1,
-					SHA512 = line.Split(' ')[0],
+					CRC = ((hashtype & Hash.CRC) != 0 ? hash : null),
+					MD5 = ((hashtype & Hash.MD5) != 0 ? hash : null),
+					SHA1 = ((hashtype & Hash.SHA1) != 0 ? hash : null),
+					SHA256 = ((hashtype & Hash.SHA256) != 0 ? hash : null),
+					SHA384 = ((hashtype & Hash.SHA384) != 0 ? hash : null),
+					SHA512 = ((hashtype & Hash.SHA512) != 0 ? hash : null),
 					ItemStatus = ItemStatus.None,
 
 					Machine = new Machine
