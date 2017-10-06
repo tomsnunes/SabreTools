@@ -180,6 +180,9 @@ namespace SabreTools.Library.Dats
 			// Now we pre-process the DAT with the splitting/merging mode
 			switch (splitType)
 			{
+				case SplitType.None:
+					// No-op
+					break;
 				case SplitType.DeviceNonMerged:
 					CreateDeviceNonMergedSets(DedupeType.None);
 					break;
