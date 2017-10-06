@@ -358,17 +358,17 @@ namespace SabreTools.Library.Dats
 			DatFile dupeData = new DatFile();
 
 			// Fill in any information not in the base DAT
-			if (String.IsNullOrEmpty(_fileName))
+			if (String.IsNullOrEmpty(FileName))
 			{
-				_fileName = "All DATs";
+				FileName = "All DATs";
 			}
-			if (String.IsNullOrEmpty(_name))
+			if (String.IsNullOrEmpty(Name))
 			{
-				_name = "All DATs";
+				Name = "All DATs";
 			}
-			if (String.IsNullOrEmpty(_description))
+			if (String.IsNullOrEmpty(Description))
 			{
-				_description = "All DATs";
+				Description = "All DATs";
 			}
 
 			// Don't have External dupes

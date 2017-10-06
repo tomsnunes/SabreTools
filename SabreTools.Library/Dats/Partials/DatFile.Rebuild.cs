@@ -205,9 +205,9 @@ namespace SabreTools.Library.Dats
 			// If we're updating the DAT, output to the rebuild directory
 			if (updateDat)
 			{
-				_fileName = "fixDAT_" + _fileName;
-				_name = "fixDAT_" + _name;
-				_description = "fixDAT_" + _description;
+				FileName = "fixDAT_" + FileName;
+				Name = "fixDAT_" + Name;
+				Description = "fixDAT_" + Description;
 				WriteToFile(outDir);
 			}
 
@@ -351,9 +351,9 @@ namespace SabreTools.Library.Dats
 			// If we're updating the DAT, output to the rebuild directory
 			if (updateDat)
 			{
-				_fileName = "fixDAT_" + _fileName;
-				_name = "fixDAT_" + _name;
-				_description = "fixDAT_" + _description;
+				FileName = "fixDAT_" + FileName;
+				Name = "fixDAT_" + Name;
+				Description = "fixDAT_" + Description;
 				WriteToFile(outDir);
 			}
 
@@ -937,9 +937,9 @@ namespace SabreTools.Library.Dats
 			watch.Stop();
 
 			// If there are any entries in the DAT, output to the rebuild directory
-			_fileName = "fixDAT_" + _fileName;
-			_name = "fixDAT_" + _name;
-			_description = "fixDAT_" + _description;
+			FileName = "fixDAT_" + FileName;
+			Name = "fixDAT_" + Name;
+			Description = "fixDAT_" + Description;
 			WriteToFile(null);
 
 			return success;

@@ -125,7 +125,7 @@ namespace SabreTools.Library.Dats
 			// TODO: Create 1G1R logic before write
 
 			// If we are removing hashes, do that now
-			if (_stripHash != 0x0)
+			if (StripHash != 0x0)
 			{
 				StripHashesFromItems();
 			}

@@ -157,7 +157,7 @@ namespace SabreTools.Library.Dats
 			// If we are using tags from the DAT, set the proper input for split type unless overridden
 			if (useTags && splitType == SplitType.None)
 			{
-				switch (_forceMerging)
+				switch (ForceMerging)
 				{
 					case ForceMerging.None:
 						// No-op

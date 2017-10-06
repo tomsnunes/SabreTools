@@ -10,58 +10,15 @@ namespace SabreTools.Library.Dats
 	{
 		#region Private instance variables
 
-		// Data common to most DAT types
-		private string _fileName;
-		private string _name;
-		private string _description;
-		private string _rootDir;
-		private string _category;
-		private string _version;
-		private string _date;
-		private string _author;
-		private string _email;
-		private string _homepage;
-		private string _url;
-		private string _comment;
-		private string _header;
-		private string _type; // Generally only used for SuperDAT
-		private ForceMerging _forceMerging;
-		private ForceNodump _forceNodump;
-		private ForcePacking _forcePacking;
-		private DatFormat _datFormat;
-		private bool _excludeOf;
-		private DedupeType _dedupeRoms;
-		private Hash _stripHash;
-		private bool _oneGameOneRegion;
-		private List<string> _regions = new List<string>();
+		// Internal DatHeader values
+		private DatHeader _datHeader = new DatHeader();
+
+		// DatItems dictionary
 		private SortedDictionary<string, List<DatItem>> _items = new SortedDictionary<string, List<DatItem>>();
 		private SortedBy _sortedBy;
 
-		// Data specific to the Miss DAT type
-		private bool _useGame;
-		private string _prefix;
-		private string _postfix;
-		private bool _quotes;
-		private string _repExt;
-		private string _addExt;
-		private bool _remExt;
-		private bool _gameName;
-		private bool _romba;
-
-		// Statistical data related to the DAT
-		private object _statslock = new object();
-		private long _count;
-		private long _romCount;
-		private long _diskCount;
-		private long _totalSize;
-		private long _crcCount;
-		private long _md5Count;
-		private long _sha1Count;
-		private long _sha256Count;
-		private long _sha384Count;
-		private long _sha512Count;
-		private long _baddumpCount;
-		private long _nodumpCount;
+		// Internal statistical data
+		DatStats _datStats = new DatStats();
 
 		#endregion
 
@@ -70,118 +27,118 @@ namespace SabreTools.Library.Dats
 		// Data common to most DAT types
 		public string FileName
 		{
-			get { return _fileName; }
-			set { _fileName = value; }
+			get { return _datHeader.FileName; }
+			set { _datHeader.FileName = value; }
 		}
 		public string Name
 		{
-			get { return _name; }
-			set { _name = value; }
+			get { return _datHeader.Name; }
+			set { _datHeader.Name = value; }
 		}
 		public string Description
 		{
-			get { return _description; }
-			set { _description = value; }
+			get { return _datHeader.Description; }
+			set { _datHeader.Description = value; }
 		}
 		public string RootDir
 		{
-			get { return _rootDir; }
-			set { _rootDir = value; }
+			get { return _datHeader.RootDir; }
+			set { _datHeader.RootDir = value; }
 		}
 		public string Category
 		{
-			get { return _category; }
-			set { _category = value; }
+			get { return _datHeader.Category; }
+			set { _datHeader.Category = value; }
 		}
 		public string Version
 		{
-			get { return _version; }
-			set { _version = value; }
+			get { return _datHeader.Version; }
+			set { _datHeader.Version = value; }
 		}
 		public string Date
 		{
-			get { return _date; }
-			set { _date = value; }
+			get { return _datHeader.Date; }
+			set { _datHeader.Date = value; }
 		}
 		public string Author
 		{
-			get { return _author; }
-			set { _author = value; }
+			get { return _datHeader.Author; }
+			set { _datHeader.Author = value; }
 		}
 		public string Email
 		{
-			get { return _email; }
-			set { _email = value; }
+			get { return _datHeader.Email; }
+			set { _datHeader.Email = value; }
 		}
 		public string Homepage
 		{
-			get { return _homepage; }
-			set { _homepage = value; }
+			get { return _datHeader.Homepage; }
+			set { _datHeader.Homepage = value; }
 		}
 		public string Url
 		{
-			get { return _url; }
-			set { _url = value; }
+			get { return _datHeader.Url; }
+			set { _datHeader.Url = value; }
 		}
 		public string Comment
 		{
-			get { return _comment; }
-			set { _comment = value; }
+			get { return _datHeader.Comment; }
+			set { _datHeader.Comment = value; }
 		}
 		public string Header
 		{
-			get { return _header; }
-			set { _header = value; }
+			get { return _datHeader.Header; }
+			set { _datHeader.Header = value; }
 		}
 		public string Type // Generally only used for SuperDAT
 		{
-			get { return _type; }
-			set { _type = value; }
+			get { return _datHeader.Type; }
+			set { _datHeader.Type = value; }
 		}
 		public ForceMerging ForceMerging
 		{
-			get { return _forceMerging; }
-			set { _forceMerging = value; }
+			get { return _datHeader.ForceMerging; }
+			set { _datHeader.ForceMerging = value; }
 		}
 		public ForceNodump ForceNodump
 		{
-			get { return _forceNodump; }
-			set { _forceNodump = value; }
+			get { return _datHeader.ForceNodump; }
+			set { _datHeader.ForceNodump = value; }
 		}
 		public ForcePacking ForcePacking
 		{
-			get { return _forcePacking; }
-			set { _forcePacking = value; }
+			get { return _datHeader.ForcePacking; }
+			set { _datHeader.ForcePacking = value; }
 		}
 		public DatFormat DatFormat
 		{
-			get { return _datFormat; }
-			set { _datFormat = value; }
+			get { return _datHeader.DatFormat; }
+			set { _datHeader.DatFormat = value; }
 		}
 		public bool ExcludeOf
 		{
-			get { return _excludeOf; }
-			set { _excludeOf = value; }
+			get { return _datHeader.ExcludeOf; }
+			set { _datHeader.ExcludeOf = value; }
 		}
 		public DedupeType DedupeRoms
 		{
-			get { return _dedupeRoms; }
-			set { _dedupeRoms = value; }
+			get { return _datHeader.DedupeRoms; }
+			set { _datHeader.DedupeRoms = value; }
 		}
 		public Hash StripHash
 		{
-			get { return _stripHash; }
-			set { _stripHash = value; }
+			get { return _datHeader.StripHash; }
+			set { _datHeader.StripHash = value; }
 		}
 		public bool OneGameOneRegion
 		{
-			get { return _oneGameOneRegion; }
-			set { _oneGameOneRegion = value; }
+			get { return _datHeader.OneGameOneRegion; }
+			set { _datHeader.OneGameOneRegion = value; }
 		}
 		public List<string> Regions
 		{
-			get { return _regions; }
-			set { _regions = value; }
+			get { return _datHeader.Regions; }
+			set { _datHeader.Regions = value; }
 		}
 		public SortedBy SortedBy
 		{
@@ -191,98 +148,140 @@ namespace SabreTools.Library.Dats
 		// Data specific to the Miss DAT type
 		public bool UseGame
 		{
-			get { return _useGame; }
-			set { _useGame = value; }
+			get { return _datHeader.UseGame; }
+			set { _datHeader.UseGame = value; }
 		}
 		public string Prefix
 		{
-			get { return _prefix; }
-			set { _prefix = value; }
+			get { return _datHeader.Prefix; }
+			set { _datHeader.Prefix = value; }
 		}
 		public string Postfix
 		{
-			get { return _postfix; }
-			set { _postfix = value; }
+			get { return _datHeader.Postfix; }
+			set { _datHeader.Postfix = value; }
 		}
 		public bool Quotes
 		{
-			get { return _quotes; }
-			set { _quotes = value; }
+			get { return _datHeader.Quotes; }
+			set { _datHeader.Quotes = value; }
 		}
 		public string RepExt
 		{
-			get { return _repExt; }
-			set { _repExt = value; }
+			get { return _datHeader.RepExt; }
+			set { _datHeader.RepExt = value; }
 		}
 		public string AddExt
 		{
-			get { return _addExt; }
-			set { _addExt = value; }
+			get { return _datHeader.AddExt; }
+			set { _datHeader.AddExt = value; }
 		}
 		public bool RemExt
 		{
-			get { return _remExt; }
-			set { _remExt = value; }
+			get { return _datHeader.RemExt; }
+			set { _datHeader.RemExt = value; }
 		}
 		public bool GameName
 		{
-			get { return _gameName; }
-			set { _gameName = value; }
+			get { return _datHeader.GameName; }
+			set { _datHeader.GameName = value; }
 		}
 		public bool Romba
 		{
-			get { return _romba; }
-			set { _romba = value; }
+			get { return _datHeader.Romba; }
+			set { _datHeader.Romba = value; }
 		}
 
 		// Statistical data related to the DAT
 		public long Count
 		{
-			get { return _count; }
+			get { return _datStats.Count; }
+			private set { _datStats.Count = value; }
 		}
-		public long RomCount
+		public long ArchiveCount
 		{
-			get { return _romCount; }
+			get { return _datStats.ArchiveCount; }
+			private set { _datStats.ArchiveCount = value; }
+		}
+		public long BiosSetCount
+		{
+			get { return _datStats.BiosSetCount; }
+			private set { _datStats.BiosSetCount = value; }
 		}
 		public long DiskCount
 		{
-			get { return _diskCount; }
+			get { return _datStats.DiskCount; }
+			private set { _datStats.DiskCount = value; }
+		}
+		public long ReleaseCount
+		{
+			get { return _datStats.ReleaseCount; }
+			private set { _datStats.ReleaseCount = value; }
+		}
+		public long RomCount
+		{
+			get { return _datStats.RomCount; }
+			private set { _datStats.RomCount = value; }
+		}
+		public long SampleCount
+		{
+			get { return _datStats.SampleCount; }
+			private set { _datStats.SampleCount = value; }
 		}
 		public long TotalSize
 		{
-			get { return _totalSize; }
+			get { return _datStats.TotalSize; }
+			private set { _datStats.TotalSize = value; }
 		}
 		public long CRCCount
 		{
-			get { return _crcCount; }
+			get { return _datStats.CRCCount; }
+			private set { _datStats.CRCCount = value; }
 		}
 		public long MD5Count
 		{
-			get { return _md5Count; }
+			get { return _datStats.MD5Count; }
+			private set { _datStats.MD5Count = value; }
 		}
 		public long SHA1Count
 		{
-			get { return _sha1Count; }
+			get { return _datStats.SHA1Count; }
+			private set { _datStats.SHA1Count = value; }
 		}
 		public long SHA256Count
 		{
-			get { return _sha256Count; }
+			get { return _datStats.SHA256Count; }
+			private set { _datStats.SHA256Count = value; }
 		}
 		public long SHA384Count
 		{
-			get { return _sha384Count; }
+			get { return _datStats.SHA384Count; }
+			private set { _datStats.SHA384Count = value; }
 		}
 		public long SHA512Count
 		{
-			get { return _sha512Count; }
+			get { return _datStats.SHA512Count; }
+			private set { _datStats.SHA512Count = value; }
 		}
 		public long BaddumpCount
 		{
-			get { return _baddumpCount; }
+			get { return _datStats.BaddumpCount; }
+			private set { _datStats.BaddumpCount = value; }
+		}
+		public long GoodCount
+		{
+			get { return _datStats.GoodCount; }
+			private set { _datStats.GoodCount = value; }
 		}
 		public long NodumpCount
 		{
-			get { return _nodumpCount; }
+			get { return _datStats.NodumpCount; }
+			private set { _datStats.NodumpCount = value; }
+		}
+		public long VerifiedCount
+		{
+			get { return _datStats.VerifiedCount; }
+			private set { _datStats.VerifiedCount = value; }
 		}
 
 		#endregion
@@ -364,7 +363,7 @@ namespace SabreTools.Library.Dats
 				_items[key].Add(value);
 
 				// Now update the statistics
-				AddItemStatistics(value);
+				_datStats.AddItem(value);
 			}
 		}
 
@@ -392,7 +391,7 @@ namespace SabreTools.Library.Dats
 				// Now update the statistics
 				foreach (DatItem item in value)
 				{
-					AddItemStatistics(item);
+					_datStats.AddItem(item);
 				}
 			}
 		}
@@ -503,7 +502,7 @@ namespace SabreTools.Library.Dats
 				// Remove the statistics first
 				foreach (DatItem item in _items[key])
 				{
-					RemoveItemStatistics(item);
+					_datStats.RemoveItem(item);
 				}
 
 				// Remove the key from the dictionary
@@ -536,7 +535,7 @@ namespace SabreTools.Library.Dats
 				while (_items.ContainsKey(key) && _items[key].Contains(value))
 				{
 					// Remove the statistics first
-					RemoveItemStatistics(value);
+					_datStats.RemoveItem(value);
 
 					_items[key].Remove(value);
 				}
@@ -569,42 +568,12 @@ namespace SabreTools.Library.Dats
 		}
 
 		/// <summary>
-		/// Create a new DatFile from an existing one
+		/// Create a new DatFile from an existing one using the header values only
 		/// </summary>
 		/// <param name="df"></param>
 		public DatFile(DatFile datFile)
 		{
-			_fileName = datFile.FileName;
-			_name = datFile.Name;
-			_description = datFile.Description;
-			_rootDir = datFile.RootDir;
-			_category = datFile.Category;
-			_version = datFile.Version;
-			_date = datFile.Date;
-			_author = datFile.Author;
-			_email = datFile.Email;
-			_homepage = datFile.Homepage;
-			_url = datFile.Url;
-			_comment = datFile.Comment;
-			_header = datFile.Header;
-			_type = datFile.Type;
-			_forceMerging = datFile.ForceMerging;
-			_forceNodump = datFile.ForceNodump;
-			_forcePacking = datFile.ForcePacking;
-			_excludeOf = datFile.ExcludeOf;
-			_datFormat = datFile.DatFormat;
-			_dedupeRoms = datFile.DedupeRoms;
-			_stripHash = datFile.StripHash;
-			_sortedBy = SortedBy.Default;
-			_useGame = datFile.UseGame;
-			_prefix = datFile.Prefix;
-			_postfix = datFile.Postfix;
-			_quotes = datFile.Quotes;
-			_repExt = datFile.RepExt;
-			_addExt = datFile.AddExt;
-			_remExt = datFile.RemExt;
-			_gameName = datFile.GameName;
-			_romba = datFile.Romba;
+			_datHeader = (DatHeader)datFile._datHeader.Clone();
 		}
 
 		#endregion
@@ -653,7 +622,7 @@ namespace SabreTools.Library.Dats
 			_items = null;
 
 			// Reset statistics
-			ResetStatistics();
+			_datStats.Reset();
 		}
 
 		/// <summary>
@@ -664,7 +633,7 @@ namespace SabreTools.Library.Dats
 			_items = new SortedDictionary<string, List<DatItem>>();
 
 			// Reset statistics
-			ResetStatistics();
+			_datStats.Reset();
 		}
 
 		#endregion
