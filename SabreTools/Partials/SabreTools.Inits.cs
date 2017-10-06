@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using SabreTools.Library;
 using SabreTools.Library.Data;
 using SabreTools.Library.Dats;
 using SabreTools.Library.Tools;
@@ -340,8 +341,7 @@ namespace SabreTools
 			// Get a list of files from the input datfiles
 			datfiles = FileTools.GetOnlyFilesFromInputs(datfiles);
 
-			DateTime start = DateTime.Now;
-			Globals.Logger.User("Populating internal DAT...");
+			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
@@ -349,7 +349,8 @@ namespace SabreTools
 			{
 				datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
 			}
-			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			watch.Stop();
 
 			datdata.RebuildGeneric(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
 				updateDat, headerToCheckAgainst);
@@ -373,8 +374,7 @@ namespace SabreTools
 		private static void InitSortDepot(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool date, bool delete,
 			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, string headerToCheckAgainst, SplitType splitType)
 		{
-			DateTime start = DateTime.Now;
-			Globals.Logger.User("Populating internal DAT...");
+			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
 
 			// Get a list of files from the input datfiles
 			datfiles = FileTools.GetOnlyFilesFromInputs(datfiles);
@@ -385,7 +385,8 @@ namespace SabreTools
 			{
 				datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
 			}
-			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			watch.Stop();
 
 			datdata.RebuildDepot(inputs, outDir, tempDir, date, delete, inverse, outputFormat, romba,
 				updateDat, headerToCheckAgainst);
@@ -749,8 +750,7 @@ namespace SabreTools
 			// Get a list of files from the input datfiles
 			datfiles = FileTools.GetOnlyFilesFromInputs(datfiles);
 
-			DateTime start = DateTime.Now;
-			Globals.Logger.User("Populating internal DAT...");
+			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
@@ -758,7 +758,8 @@ namespace SabreTools
 			{
 				datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
 			}
-			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			watch.Stop();
 
 			datdata.VerifyGeneric(inputs, tempDir, hashOnly, quickScan, headerToCheckAgainst);
 		}
@@ -774,8 +775,7 @@ namespace SabreTools
 		private static void InitVerifyDepot(List<string> datfiles, List<string> inputs, string tempDir,
 			string headerToCheckAgainst, SplitType splitType)
 		{
-			DateTime start = DateTime.Now;
-			Globals.Logger.User("Populating internal DAT...");
+			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
 
 			// Get a list of files from the input datfiles
 			datfiles = FileTools.GetOnlyFilesFromInputs(datfiles);
@@ -786,7 +786,8 @@ namespace SabreTools
 			{
 				datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
 			}
-			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			watch.Stop();
 
 			datdata.VerifyDepot(inputs, tempDir, headerToCheckAgainst);
 		}

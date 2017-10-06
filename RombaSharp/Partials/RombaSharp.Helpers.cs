@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using Mono.Data.Sqlite;
 
+using SabreTools.Library;
 using SabreTools.Library.Data;
 using SabreTools.Library.Dats;
 using SabreTools.Library.Tools;
@@ -414,8 +415,7 @@ namespace RombaSharp
 			dbc.Open();
 
 			// Populate the List from the database
-			Globals.Logger.User("Populating the list of existing DATs");
-			DateTime start = DateTime.Now;
+			InternalStopwatch watch = new InternalStopwatch("Populating the list of existing DATs");
 
 			string query = "SELECT DISTINCT hash FROM dat";
 			SqliteCommand slc = new SqliteCommand(query, dbc);
@@ -436,14 +436,13 @@ namespace RombaSharp
 			}
 			datroot.BucketBy(SortedBy.Game, DedupeType.None, norename: true);
 
-			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			watch.Stop();
 
 			slc.Dispose();
 			sldr.Dispose();
 
 			// Loop through the Dictionary and add all data
-			Globals.Logger.User("Adding new DAT information");
-			start = DateTime.Now;
+			watch.Start("Adding new DAT information");
 			foreach (string key in datroot.Keys)
 			{
 				foreach (Rom value in datroot[key])
@@ -452,11 +451,10 @@ namespace RombaSharp
 				}
 			}
 
-			Globals.Logger.User("Adding complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			watch.Stop();
 
 			// Now loop through and remove all references to old Dats
-			Globals.Logger.User("Removing unmatched DAT information");
-			start = DateTime.Now;
+			watch.Start("Removing unmatched DAT information");
 
 			foreach (string dathash in unneeded)
 			{
@@ -465,7 +463,8 @@ namespace RombaSharp
 				slc.ExecuteNonQuery();
 				slc.Dispose();
 			}
-			Globals.Logger.User("Removing complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			watch.Stop();
 
 			dbc.Dispose();
 		}

@@ -97,34 +97,36 @@ namespace SabreTools.Library.Dats
 
 			#region Rebuild from depots in order
 
+			string format = "";
 			switch (outputFormat)
 			{
 				case OutputFormat.Folder:
-					Globals.Logger.User("Rebuilding all files to directory");
+					format = "directory";
 					break;
 				case OutputFormat.TapeArchive:
-					Globals.Logger.User("Rebuilding all files to TAR");
+					format = "TAR";
 					break;
 				case OutputFormat.Torrent7Zip:
-					Globals.Logger.User("Rebuilding all files to Torrent7Z");
+					format = "Torrent7Z";
 					break;
 				case OutputFormat.TorrentGzip:
-					Globals.Logger.User("Rebuilding all files to TorrentGZ");
+					format = "TorrentGZ";
 					break;
 				case OutputFormat.TorrentLrzip:
-					Globals.Logger.User("Rebuilding all files to TorrentLRZ");
+					format = "TorrentLRZ";
 					break;
 				case OutputFormat.TorrentRar:
-					Globals.Logger.User("Rebuilding all files to TorrentRAR");
+					format = "TorrentRAR";
 					break;
 				case OutputFormat.TorrentXZ:
-					Globals.Logger.User("Rebuilding all files to TorrentXZ");
+					format = "TorrentXZ";
 					break;
 				case OutputFormat.TorrentZip:
-					Globals.Logger.User("Rebuilding all files to TorrentZip");
+					format = "TorrentZip";
 					break;
 			}
-			DateTime start = DateTime.Now;
+
+			InternalStopwatch watch = new InternalStopwatch("Rebuilding all files to {0}", format);
 
 			// Now loop through and get only directories from the input paths
 			List<string> directories = new List<string>();
@@ -196,7 +198,7 @@ namespace SabreTools.Library.Dats
 					updateDat, false /* isZip */, headerToCheckAgainst);
 			}
 
-			Globals.Logger.User("Rebuilding complete in: {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			watch.Stop();
 
 			#endregion
 
@@ -287,34 +289,36 @@ namespace SabreTools.Library.Dats
 
 			#region Rebuild from sources in order
 
+			string format = "";
 			switch (outputFormat)
 			{
 				case OutputFormat.Folder:
-					Globals.Logger.User("Rebuilding all files to directory");
+					format = "directory";
 					break;
 				case OutputFormat.TapeArchive:
-					Globals.Logger.User("Rebuilding all files to TAR");
+					format = "TAR";
 					break;
 				case OutputFormat.Torrent7Zip:
-					Globals.Logger.User("Rebuilding all files to Torrent7Z");
+					format = "Torrent7Z";
 					break;
 				case OutputFormat.TorrentGzip:
-					Globals.Logger.User("Rebuilding all files to TorrentGZ");
+					format = "TorrentGZ";
 					break;
 				case OutputFormat.TorrentLrzip:
-					Globals.Logger.User("Rebuilding all files to TorrentLRZ");
+					format = "TorrentLRZ";
 					break;
 				case OutputFormat.TorrentRar:
-					Globals.Logger.User("Rebuilding all files to TorrentRAR");
+					format = "TorrentRAR";
 					break;
 				case OutputFormat.TorrentXZ:
-					Globals.Logger.User("Rebuilding all files to TorrentXZ");
+					format = "TorrentXZ";
 					break;
 				case OutputFormat.TorrentZip:
-					Globals.Logger.User("Rebuilding all files to TorrentZip");
+					format = "TorrentZip";
 					break;
 			}
-			DateTime start = DateTime.Now;
+
+			InternalStopwatch watch = new InternalStopwatch("Rebuilding all files to {0}", format);
 
 			// Now loop through all of the files in all of the inputs
 			foreach (string input in inputs)
@@ -340,7 +344,7 @@ namespace SabreTools.Library.Dats
 				}
 			}
 
-			Globals.Logger.User("Rebuilding complete in: {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			watch.Stop();
 
 			#endregion
 
@@ -862,8 +866,7 @@ namespace SabreTools.Library.Dats
 
 			bool success = true;
 
-			Globals.Logger.User("Verifying all from supplied depots");
-			DateTime start = DateTime.Now;
+			InternalStopwatch watch = new InternalStopwatch("Verifying all from supplied depots");
 
 			// Now loop through and get only directories from the input paths
 			List<string> directories = new List<string>();
@@ -931,7 +934,7 @@ namespace SabreTools.Library.Dats
 				fileinfo.GetDuplicates(this, remove: true);
 			}
 
-			Globals.Logger.User("Verifying complete in: {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			watch.Stop();
 
 			// If there are any entries in the DAT, output to the rebuild directory
 			_fileName = "fixDAT_" + _fileName;

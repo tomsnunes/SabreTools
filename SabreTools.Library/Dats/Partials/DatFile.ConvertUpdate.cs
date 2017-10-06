@@ -108,8 +108,7 @@ namespace SabreTools.Library.Dats
 			string outDir, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			DatFile[] datHeaders = new DatFile[inputs.Count];
-			DateTime start = DateTime.Now;
-			Globals.Logger.User("Processing individual DATs");
+			InternalStopwatch watch = new InternalStopwatch("Processing individual DATs");
 
 			// Parse all of the DATs into their own DatFiles in the array
 			Parallel.For(0, inputs.Count, Globals.ParallelOptions, i =>
@@ -125,9 +124,9 @@ namespace SabreTools.Library.Dats
 				datHeaders[i].Parse(input.Split('¬')[0], i, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 			});
 
-			Globals.Logger.User("Processing complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			watch.Stop();
 
-			Globals.Logger.User("Populating internal DAT");
+			watch.Start("Populating internal DAT");
 			Parallel.For(0, inputs.Count, Globals.ParallelOptions, i =>
 			{
 				// Get the list of keys from the DAT
@@ -148,7 +147,7 @@ namespace SabreTools.Library.Dats
 			// Now that we have a merged DAT, filter it
 			Filter(filter, single, trim, root);
 
-			Globals.Logger.User("Processing and populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			watch.Stop();
 
 			return datHeaders.ToList();
 		}
@@ -172,8 +171,7 @@ namespace SabreTools.Library.Dats
 			bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			// First we want to parse all of the base DATs into the input
-			DateTime start = DateTime.Now;
-			Globals.Logger.User("Populating base DAT for comparison...");
+			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for comparison...");
 
 			List<string> baseFileNames = FileTools.GetOnlyFilesFromInputs(basePaths);
 			Parallel.ForEach(baseFileNames, Globals.ParallelOptions, path =>
@@ -181,7 +179,7 @@ namespace SabreTools.Library.Dats
 				Parse(path, 0, 0, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 			});
 
-			Globals.Logger.User("Populating base DAT complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			watch.Stop();
 
 			// For comparison's sake, we want to use CRC as the base ordering
 			BucketBy(SortedBy.CRC, DedupeType.Full);
@@ -260,8 +258,7 @@ namespace SabreTools.Library.Dats
 			List<DatFile> outDats = new List<DatFile>();
 
 			// Loop through each of the inputs and get or create a new DatData object
-			DateTime start = DateTime.Now;
-			Globals.Logger.User("Initializing all output DATs");
+			InternalStopwatch watch = new InternalStopwatch("Initializing all output DATs");
 
 			DatFile[] outDatsArray = new DatFile[inputs.Count];
 
@@ -288,11 +285,10 @@ namespace SabreTools.Library.Dats
 			});
 
 			outDats = outDatsArray.ToList();
-			Globals.Logger.User("Initializing complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			watch.Stop();
 
 			// Now, loop through the dictionary and populate the correct DATs
-			start = DateTime.Now;
-			Globals.Logger.User("Populating all output DATs");
+			watch.Start("Populating all output DATs");
 			List<string> keys = Keys.ToList();
 
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
@@ -317,12 +313,11 @@ namespace SabreTools.Library.Dats
 					outDats[item.SystemID].Add(key, item);
 				}
 			});
-
-			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			
+			watch.Stop();
 
 			// Finally, loop through and output each of the DATs
-			start = DateTime.Now;
-			Globals.Logger.User("Outputting all created DATs");
+			watch.Start("Outputting all created DATs");
 
 			Parallel.For((skip ? 1 : 0), inputs.Count, Globals.ParallelOptions, j =>
 			{
@@ -344,7 +339,7 @@ namespace SabreTools.Library.Dats
 				outDats[j].WriteToFile(path);
 			});
 
-			Globals.Logger.User("Outputting complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			watch.Stop();
 		}
 
 		/// <summary>
@@ -355,8 +350,7 @@ namespace SabreTools.Library.Dats
 		/// <param name="inputs">List of inputs to write out from</param>
 		public void DiffNoCascade(DiffMode diff, string outDir, List<string> inputs)
 		{
-			DateTime start = DateTime.Now;
-			Globals.Logger.User("Initializing all output DATs");
+			InternalStopwatch watch = new InternalStopwatch("Initializing all output DATs");
 
 			// Default vars for use
 			string post = "";
@@ -420,11 +414,11 @@ namespace SabreTools.Library.Dats
 
 				outDats = outDatsArray.ToList();
 			}
-			Globals.Logger.User("Initializing complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			watch.Stop();
 
 			// Now, loop through the dictionary and populate the correct DATs
-			start = DateTime.Now;
-			Globals.Logger.User("Populating all output DATs");
+			watch.Start("Populating all output DATs");
 
 			List<string> keys = Keys.ToList();
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
@@ -476,11 +470,10 @@ namespace SabreTools.Library.Dats
 				}
 			});
 
-			Globals.Logger.User("Populating complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+			watch.Stop();
 
 			// Finally, loop through and output each of the DATs
-			start = DateTime.Now;
-			Globals.Logger.User("Outputting all created DATs");
+			watch.Start("Outputting all created DATs");
 
 			// Output the difflist (a-b)+(b-a) diff
 			if ((diff & DiffMode.NoDupes) != 0)
@@ -510,7 +503,8 @@ namespace SabreTools.Library.Dats
 					outDats[j].WriteToFile(path);
 				});
 			}
-			Globals.Logger.User("Outputting complete in {0}", DateTime.Now.Subtract(start).ToString(@"hh\:mm\:ss\.fffff"));
+
+			watch.Stop();
 		}
 
 		/// <summary>

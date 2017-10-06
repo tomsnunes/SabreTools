@@ -159,6 +159,7 @@
     <Compile Include="Help\Help.cs" />
     <Compile Include="Skippers\Skipper.cs" />
     <Compile Include="Skippers\SkipperRule.cs" />
+    <Compile Include="InternalStopwatch.cs" />
     <Compile Include="Tools\ArchiveTools.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\DatabaseTools.cs" />

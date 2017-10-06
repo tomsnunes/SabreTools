@@ -1038,7 +1038,7 @@ namespace SabreTools.Library.Dats
 			}
 		}
 
-#endregion
+		#endregion
 
 		#endregion // Instance Methods
 	}
