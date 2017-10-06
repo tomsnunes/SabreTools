@@ -213,6 +213,38 @@ namespace SabreTools.Library.Dats
 		}
 
 		/// <summary>
+		/// Add statistics from another DatStats object
+		/// </summary>
+		/// <param name="stats">DatStats object to add from</param>
+		public void AddStats(DatStats stats)
+		{
+			_count += stats.Count;
+
+			_archiveCount += stats.ArchiveCount;
+			_biosSetCount += stats.BiosSetCount;
+			_diskCount += stats.DiskCount;
+			_releaseCount += stats.ReleaseCount;
+			_romCount += stats.RomCount;
+			_sampleCount += stats.SampleCount;
+
+			_totalSize += stats.TotalSize;
+
+			// Individual hash counts
+			_crcCount += stats.CRCCount;
+			_md5Count += stats.MD5Count;
+			_sha1Count += stats.SHA1Count;
+			_sha256Count += stats.SHA256Count;
+			_sha384Count += stats.SHA384Count;
+			_sha512Count += stats.SHA512Count;
+
+			// Individual status counts
+			_baddumpCount += stats.BaddumpCount;
+			_goodCount += stats.GoodCount;
+			_nodumpCount += stats.NodumpCount;
+			_verifiedCount += stats.VerifiedCount;
+	}
+
+		/// <summary>
 		/// Remove from the statistics given a DatItem
 		/// </summary>
 		/// <param name="item">Item to remove info for</param>
