@@ -33,7 +33,6 @@ namespace SabreTools.Library.Dats
 		private Hash _stripHash;
 		private bool _oneGameOneRegion;
 		private List<string> _regions;
-		private SortedBy _sortedBy;
 
 		// Data specific to the Miss DAT type
 		private bool _useGame;
@@ -174,10 +173,6 @@ namespace SabreTools.Library.Dats
 			}
 			set { _regions = value; }
 		}
-		public SortedBy SortedBy
-		{
-			get { return _sortedBy; }
-		}
 
 		// Data specific to the Miss DAT type
 		public bool UseGame
@@ -263,7 +258,6 @@ namespace SabreTools.Library.Dats
 				_stripHash = this._stripHash,
 				_oneGameOneRegion = this._oneGameOneRegion,
 				_regions = this._regions,
-				_sortedBy = this._sortedBy,
 
 				_useGame = this._useGame,
 				_prefix = this._prefix,
