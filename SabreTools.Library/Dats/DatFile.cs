@@ -27,118 +27,486 @@ namespace SabreTools.Library.Dats
 		// Data common to most DAT types
 		public string FileName
 		{
-			get { return _datHeader.FileName; }
-			set { _datHeader.FileName = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.FileName;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.FileName = value;
+			}
 		}
 		public string Name
 		{
-			get { return _datHeader.Name; }
-			set { _datHeader.Name = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Name;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Name = value;
+			}
 		}
 		public string Description
 		{
-			get { return _datHeader.Description; }
-			set { _datHeader.Description = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Description;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Description = value;
+			}
 		}
 		public string RootDir
 		{
-			get { return _datHeader.RootDir; }
-			set { _datHeader.RootDir = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.RootDir;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.RootDir = value;
+			}
 		}
 		public string Category
 		{
-			get { return _datHeader.Category; }
-			set { _datHeader.Category = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Category;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Category = value;
+			}
 		}
 		public string Version
 		{
-			get { return _datHeader.Version; }
-			set { _datHeader.Version = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Version;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Version = value;
+			}
 		}
 		public string Date
 		{
-			get { return _datHeader.Date; }
-			set { _datHeader.Date = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Date;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Date = value;
+			}
 		}
 		public string Author
 		{
-			get { return _datHeader.Author; }
-			set { _datHeader.Author = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Author;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Author = value;
+			}
 		}
 		public string Email
 		{
-			get { return _datHeader.Email; }
-			set { _datHeader.Email = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Email;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Email = value;
+			}
 		}
 		public string Homepage
 		{
-			get { return _datHeader.Homepage; }
-			set { _datHeader.Homepage = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Homepage;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Homepage = value;
+			}
 		}
 		public string Url
 		{
-			get { return _datHeader.Url; }
-			set { _datHeader.Url = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Url;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Url = value;
+			}
 		}
 		public string Comment
 		{
-			get { return _datHeader.Comment; }
-			set { _datHeader.Comment = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Comment;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Comment = value;
+			}
 		}
 		public string Header
 		{
-			get { return _datHeader.Header; }
-			set { _datHeader.Header = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Header;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Header = value;
+			}
 		}
 		public string Type // Generally only used for SuperDAT
 		{
-			get { return _datHeader.Type; }
-			set { _datHeader.Type = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Type;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Type = value;
+			}
 		}
 		public ForceMerging ForceMerging
 		{
-			get { return _datHeader.ForceMerging; }
-			set { _datHeader.ForceMerging = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.ForceMerging;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.ForceMerging = value;
+			}
 		}
 		public ForceNodump ForceNodump
 		{
-			get { return _datHeader.ForceNodump; }
-			set { _datHeader.ForceNodump = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.ForceNodump;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.ForceNodump = value;
+			}
 		}
 		public ForcePacking ForcePacking
 		{
-			get { return _datHeader.ForcePacking; }
-			set { _datHeader.ForcePacking = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.ForcePacking;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.ForcePacking = value;
+			}
 		}
 		public DatFormat DatFormat
 		{
-			get { return _datHeader.DatFormat; }
-			set { _datHeader.DatFormat = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.DatFormat;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.DatFormat = value;
+			}
 		}
 		public bool ExcludeOf
 		{
-			get { return _datHeader.ExcludeOf; }
-			set { _datHeader.ExcludeOf = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.ExcludeOf;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.ExcludeOf = value;
+			}
 		}
 		public DedupeType DedupeRoms
 		{
-			get { return _datHeader.DedupeRoms; }
-			set { _datHeader.DedupeRoms = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.DedupeRoms;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.DedupeRoms = value;
+			}
 		}
 		public Hash StripHash
 		{
-			get { return _datHeader.StripHash; }
-			set { _datHeader.StripHash = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.StripHash;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.StripHash = value;
+			}
 		}
 		public bool OneGameOneRegion
 		{
-			get { return _datHeader.OneGameOneRegion; }
-			set { _datHeader.OneGameOneRegion = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.OneGameOneRegion;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.OneGameOneRegion = value;
+			}
 		}
 		public List<string> Regions
 		{
-			get { return _datHeader.Regions; }
-			set { _datHeader.Regions = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Regions;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Regions = value;
+			}
 		}
 		public SortedBy SortedBy
 		{
@@ -148,140 +516,572 @@ namespace SabreTools.Library.Dats
 		// Data specific to the Miss DAT type
 		public bool UseGame
 		{
-			get { return _datHeader.UseGame; }
-			set { _datHeader.UseGame = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.UseGame;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.UseGame = value;
+			}
 		}
 		public string Prefix
 		{
-			get { return _datHeader.Prefix; }
-			set { _datHeader.Prefix = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Prefix;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Prefix = value;
+			}
 		}
 		public string Postfix
 		{
-			get { return _datHeader.Postfix; }
-			set { _datHeader.Postfix = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Postfix;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Postfix = value;
+			}
 		}
 		public bool Quotes
 		{
-			get { return _datHeader.Quotes; }
-			set { _datHeader.Quotes = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Quotes;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Quotes = value;
+			}
 		}
 		public string RepExt
 		{
-			get { return _datHeader.RepExt; }
-			set { _datHeader.RepExt = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.RepExt;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.RepExt = value;
+			}
 		}
 		public string AddExt
 		{
-			get { return _datHeader.AddExt; }
-			set { _datHeader.AddExt = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.AddExt;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.AddExt = value;
+			}
 		}
 		public bool RemExt
 		{
-			get { return _datHeader.RemExt; }
-			set { _datHeader.RemExt = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.RemExt;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.RemExt = value;
+			}
 		}
 		public bool GameName
 		{
-			get { return _datHeader.GameName; }
-			set { _datHeader.GameName = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.GameName;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.GameName = value;
+			}
 		}
 		public bool Romba
 		{
-			get { return _datHeader.Romba; }
-			set { _datHeader.Romba = value; }
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.Romba;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.Romba = value;
+			}
 		}
 
 		// Statistical data related to the DAT
 		public long Count
 		{
-			get { return _datStats.Count; }
-			private set { _datStats.Count = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.Count;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.Count = value;
+			}
 		}
 		public long ArchiveCount
 		{
-			get { return _datStats.ArchiveCount; }
-			private set { _datStats.ArchiveCount = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.ArchiveCount;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.ArchiveCount = value;
+			}
 		}
 		public long BiosSetCount
 		{
-			get { return _datStats.BiosSetCount; }
-			private set { _datStats.BiosSetCount = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.BiosSetCount;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.BiosSetCount = value;
+			}
 		}
 		public long DiskCount
 		{
-			get { return _datStats.DiskCount; }
-			private set { _datStats.DiskCount = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.DiskCount;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.DiskCount = value;
+			}
 		}
 		public long ReleaseCount
 		{
-			get { return _datStats.ReleaseCount; }
-			private set { _datStats.ReleaseCount = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.ReleaseCount;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.ReleaseCount = value;
+			}
 		}
 		public long RomCount
 		{
-			get { return _datStats.RomCount; }
-			private set { _datStats.RomCount = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.RomCount;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.RomCount = value;
+			}
 		}
 		public long SampleCount
 		{
-			get { return _datStats.SampleCount; }
-			private set { _datStats.SampleCount = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.SampleCount;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.SampleCount = value;
+			}
 		}
 		public long TotalSize
 		{
-			get { return _datStats.TotalSize; }
-			private set { _datStats.TotalSize = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.TotalSize;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.TotalSize = value;
+			}
 		}
 		public long CRCCount
 		{
-			get { return _datStats.CRCCount; }
-			private set { _datStats.CRCCount = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.CRCCount;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.CRCCount = value;
+			}
 		}
 		public long MD5Count
 		{
-			get { return _datStats.MD5Count; }
-			private set { _datStats.MD5Count = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.MD5Count;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.MD5Count = value;
+			}
 		}
 		public long SHA1Count
 		{
-			get { return _datStats.SHA1Count; }
-			private set { _datStats.SHA1Count = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.SHA1Count;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.SHA1Count = value;
+			}
 		}
 		public long SHA256Count
 		{
-			get { return _datStats.SHA256Count; }
-			private set { _datStats.SHA256Count = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.SHA256Count;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.SHA256Count = value;
+			}
 		}
 		public long SHA384Count
 		{
-			get { return _datStats.SHA384Count; }
-			private set { _datStats.SHA384Count = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.SHA384Count;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.SHA384Count = value;
+			}
 		}
 		public long SHA512Count
 		{
-			get { return _datStats.SHA512Count; }
-			private set { _datStats.SHA512Count = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.SHA512Count;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.SHA512Count = value;
+			}
 		}
 		public long BaddumpCount
 		{
-			get { return _datStats.BaddumpCount; }
-			private set { _datStats.BaddumpCount = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.BaddumpCount;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.BaddumpCount = value;
+			}
 		}
 		public long GoodCount
 		{
-			get { return _datStats.GoodCount; }
-			private set { _datStats.GoodCount = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.GoodCount;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.GoodCount = value;
+			}
 		}
 		public long NodumpCount
 		{
-			get { return _datStats.NodumpCount; }
-			private set { _datStats.NodumpCount = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.NodumpCount;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.NodumpCount = value;
+			}
 		}
 		public long VerifiedCount
 		{
-			get { return _datStats.VerifiedCount; }
-			private set { _datStats.VerifiedCount = value; }
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.VerifiedCount;
+			}
+			private set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.VerifiedCount = value;
+			}
 		}
 
 		#endregion
