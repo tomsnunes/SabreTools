@@ -449,7 +449,7 @@ namespace SabreTools.Library.Dats
 							if ((diff & DiffMode.NoDupes) != 0)
 							{
 								DatItem newrom = item.Clone() as DatItem;
-								newrom.Machine.AppendName(" (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")");
+								newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
 
 								outerDiffData.Add(key, newrom);
 							}
@@ -462,7 +462,7 @@ namespace SabreTools.Library.Dats
 						if ((item.Dupe & DupeType.External) != 0)
 						{
 							DatItem newrom = item.Clone() as DatItem;
-							newrom.Machine.AppendName(" (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")");
+							newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
 
 							dupeData.Add(key, newrom);
 						}
@@ -531,9 +531,9 @@ namespace SabreTools.Library.Dats
 
 						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
 						filename = filename.Remove(0, rootpath.Length);
-						newItem.Machine.UpdateName(Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
+						newItem.MachineName = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
 							+ Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar
-							+ newItem.Machine.Name);
+							+ newItem.MachineName;
 
 						newItems.Add(newItem);
 					}

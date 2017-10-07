@@ -266,24 +266,18 @@ namespace SabreTools.Library.Dats
 				return false;
 			}
 
-			// If the item's machine is null, we automatically fail it
-			if (item.Machine == null)
-			{
-				return false;
-			}
-
 			// Filter on machine type
-			if (_machineTypes != MachineType.NULL && (item.Machine.MachineType & _machineTypes) == 0)
+			if (_machineTypes != MachineType.NULL && (item.MachineType & _machineTypes) == 0)
 			{
 				return false;
 			}
-			if (_machineNotTypes != MachineType.NULL && (item.Machine.MachineType & _machineNotTypes) != 0)
+			if (_machineNotTypes != MachineType.NULL && (item.MachineType & _machineNotTypes) != 0)
 			{
 				return false;
 			}
 
 			// Filter on machine runability
-			if (_runnable != null && item.Machine.Runnable != _runnable)
+			if (_runnable != null && item.Runnable != _runnable)
 			{
 				return false;
 			}
@@ -536,13 +530,13 @@ namespace SabreTools.Library.Dats
 			// Filter on game name
 			if (_gameNames.Count > 0)
 			{
-				bool found = FindValueInList(_gameNames, item.Machine.Name);
+				bool found = FindValueInList(_gameNames, item.MachineName);
 
 				// If we are checking CloneOf and RomOf, add them in as well
 				if (_includeOfInGame)
 				{
-					found |= FindValueInList(_gameNames, item.Machine.CloneOf);
-					found |= FindValueInList(_gameNames, item.Machine.RomOf);
+					found |= FindValueInList(_gameNames, item.CloneOf);
+					found |= FindValueInList(_gameNames, item.RomOf);
 				}
 
 				// If the game name was not found in the list, return false
@@ -553,13 +547,13 @@ namespace SabreTools.Library.Dats
 			}
 			if (_notGameNames.Count > 0)
 			{
-				bool found = FindValueInList(_gameNames, item.Machine.Name);
+				bool found = FindValueInList(_gameNames, item.MachineName);
 
 				// If we are checking CloneOf and RomOf, add them in as well
 				if (_includeOfInGame)
 				{
-					found |= FindValueInList(_gameNames, item.Machine.CloneOf);
-					found |= FindValueInList(_gameNames, item.Machine.RomOf);
+					found |= FindValueInList(_gameNames, item.CloneOf);
+					found |= FindValueInList(_gameNames, item.RomOf);
 				}
 
 				// If the game name was found in the list, return false

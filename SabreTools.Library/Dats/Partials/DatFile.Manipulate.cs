@@ -112,9 +112,9 @@ namespace SabreTools.Library.Dats
 						: item.SystemID.ToString().PadLeft(10, '0')
 							+ "-"
 							+ item.SourceID.ToString().PadLeft(10, '0') + "-")
-					+ (String.IsNullOrEmpty(item.Machine.Name)
+					+ (String.IsNullOrEmpty(item.MachineName)
 							? "Default"
-							: item.Machine.Name);
+							: item.MachineName);
 					if (lower)
 					{
 						key = key.ToLowerInvariant();
@@ -202,14 +202,14 @@ namespace SabreTools.Library.Dats
 							// If we are in single game mode, rename all games
 							if (single)
 							{
-								item.Machine.UpdateName("!");
+								item.MachineName = "!";
 							}
 
 							// If we are in NTFS trim mode, trim the game name
 							if (trim)
 							{
 								// Windows max name length is 260
-								int usableLength = 260 - item.Machine.Name.Length - root.Length;
+								int usableLength = 260 - item.MachineName.Length - root.Length;
 								if (item.Name.Length > usableLength)
 								{
 									string ext = Path.GetExtension(item.Name);
@@ -252,9 +252,9 @@ namespace SabreTools.Library.Dats
 					foreach (DatItem item in items)
 					{
 						// If the key mapping doesn't exist, add it
-						if (!mapping.ContainsKey(item.Machine.Name))
+						if (!mapping.ContainsKey(item.MachineName))
 						{
-							mapping.TryAdd(item.Machine.Name, item.Machine.Description.Replace('/', '_').Replace("\"", "''"));
+							mapping.TryAdd(item.MachineName, item.Description.Replace('/', '_').Replace("\"", "''"));
 						}
 					}
 				});
@@ -268,27 +268,27 @@ namespace SabreTools.Library.Dats
 					foreach (DatItem item in items)
 					{
 						// Update machine name
-						if (!String.IsNullOrEmpty(item.Machine.Name) && mapping.ContainsKey(item.Machine.Name))
+						if (!String.IsNullOrEmpty(item.MachineName) && mapping.ContainsKey(item.MachineName))
 						{
-							item.Machine.UpdateName(mapping[item.Machine.Name]);
+							item.MachineName = mapping[item.MachineName];
 						}
 
 						// Update cloneof
-						if (!String.IsNullOrEmpty(item.Machine.CloneOf) && mapping.ContainsKey(item.Machine.CloneOf))
+						if (!String.IsNullOrEmpty(item.CloneOf) && mapping.ContainsKey(item.CloneOf))
 						{
-							item.Machine.UpdateCloneOf(mapping[item.Machine.CloneOf]);
+							item.CloneOf = mapping[item.CloneOf];
 						}
 
 						// Update romof
-						if (!String.IsNullOrEmpty(item.Machine.RomOf) && mapping.ContainsKey(item.Machine.RomOf))
+						if (!String.IsNullOrEmpty(item.RomOf) && mapping.ContainsKey(item.RomOf))
 						{
-							item.Machine.UpdateRomOf(mapping[item.Machine.RomOf]);
+							item.RomOf = mapping[item.RomOf];
 						}
 
 						// Update sampleof
-						if (!String.IsNullOrEmpty(item.Machine.SampleOf) && mapping.ContainsKey(item.Machine.SampleOf))
+						if (!String.IsNullOrEmpty(item.SampleOf) && mapping.ContainsKey(item.SampleOf))
 						{
-							item.Machine.UpdateSampleOf(mapping[item.Machine.SampleOf]);
+							item.SampleOf = mapping[item.SampleOf];
 						}
 
 						// Add the new item to the output list
@@ -519,9 +519,9 @@ namespace SabreTools.Library.Dats
 
 				// Determine if the game has a parent or not
 				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].Machine.RomOf))
+				if (!String.IsNullOrEmpty(this[game][0].RomOf))
 				{
-					parent = this[game][0].Machine.RomOf;
+					parent = this[game][0].RomOf;
 				}
 
 				// If the parent doesnt exist, we want to continue
@@ -537,7 +537,7 @@ namespace SabreTools.Library.Dats
 				}
 
 				// If the parent exists and has items, we copy the items from the parent to the current game
-				Machine currentMachine = this[game][0].Machine;
+				DatItem copyFrom = this[game][0];
 				List<DatItem> parentItems = this[parent];
 				foreach (DatItem item in parentItems)
 				{
@@ -546,7 +546,7 @@ namespace SabreTools.Library.Dats
 					{
 						case ItemType.Archive:
 							Archive archive = ((Archive)item).Clone() as Archive;
-							archive.Machine = (Machine)currentMachine.Clone();
+							archive.CopyMachineInformation(copyFrom);
 							if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
 							{
 								Add(game, archive);
@@ -555,7 +555,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.BiosSet:
 							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							biosSet.Machine = (Machine)currentMachine.Clone();
+							biosSet.CopyMachineInformation(copyFrom);
 							if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
 							{
 								Add(game, biosSet);
@@ -564,7 +564,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Disk:
 							Disk disk = ((Disk)item).Clone() as Disk;
-							disk.Machine = (Machine)currentMachine.Clone();
+							disk.CopyMachineInformation(copyFrom);
 							if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
 							{
 								Add(game, disk);
@@ -573,7 +573,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Release:
 							Release release = ((Release)item).Clone() as Release;
-							release.Machine = (Machine)currentMachine.Clone();
+							release.CopyMachineInformation(copyFrom);
 							if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
 							{
 								Add(game, release);
@@ -582,7 +582,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Rom:
 							Rom rom = ((Rom)item).Clone() as Rom;
-							rom.Machine = (Machine)currentMachine.Clone();
+							rom.CopyMachineInformation(copyFrom);
 							if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
 							{
 								Add(game, rom);
@@ -591,7 +591,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Sample:
 							Sample sample = ((Sample)item).Clone() as Sample;
-							sample.Machine = (Machine)currentMachine.Clone();
+							sample.CopyMachineInformation(copyFrom);
 							if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
 							{
 								Add(game, sample);
@@ -612,13 +612,13 @@ namespace SabreTools.Library.Dats
 			foreach (string game in games)
 			{
 				// If the game has no devices, we continue
-				if (this[game][0].Machine.Devices == null || this[game][0].Machine.Devices.Count == 0)
+				if (this[game][0].Devices == null || this[game][0].Devices.Count == 0)
 				{
 					continue;
 				}
 
 				// Determine if the game has any devices or not
-				List<string> devices = this[game][0].Machine.Devices;
+				List<string> devices = this[game][0].Devices;
 				foreach (string device in devices)
 				{
 					// If the device doesn't exist then we continue
@@ -628,7 +628,7 @@ namespace SabreTools.Library.Dats
 					}
 
 					// Otherwise, copy the items from the device to the current game
-					Machine musheen = this[game][0].Machine;
+					DatItem copyFrom = this[game][0];
 					List<DatItem> devItems = this[device];
 					foreach (DatItem item in devItems)
 					{
@@ -637,7 +637,7 @@ namespace SabreTools.Library.Dats
 						{
 							case ItemType.Archive:
 								Archive archive = ((Archive)item).Clone() as Archive;
-								archive.Machine = (Machine)musheen.Clone();
+								archive.CopyMachineInformation(copyFrom);
 								if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
 								{
 									Add(game, archive);
@@ -646,7 +646,7 @@ namespace SabreTools.Library.Dats
 								break;
 							case ItemType.BiosSet:
 								BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-								biosSet.Machine = (Machine)musheen.Clone();
+								biosSet.CopyMachineInformation(copyFrom);
 								if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
 								{
 									Add(game, biosSet);
@@ -655,7 +655,7 @@ namespace SabreTools.Library.Dats
 								break;
 							case ItemType.Disk:
 								Disk disk = ((Disk)item).Clone() as Disk;
-								disk.Machine = (Machine)musheen.Clone();
+								disk.CopyMachineInformation(copyFrom);
 								if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
 								{
 									Add(game, disk);
@@ -664,7 +664,7 @@ namespace SabreTools.Library.Dats
 								break;
 							case ItemType.Release:
 								Release release = ((Release)item).Clone() as Release;
-								release.Machine = (Machine)musheen.Clone();
+								release.CopyMachineInformation(copyFrom);
 								if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
 								{
 									Add(game, release);
@@ -673,7 +673,7 @@ namespace SabreTools.Library.Dats
 								break;
 							case ItemType.Rom:
 								Rom rom = ((Rom)item).Clone() as Rom;
-								rom.Machine = (Machine)musheen.Clone();
+								rom.CopyMachineInformation(copyFrom);
 								if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
 								{
 									Add(game, rom);
@@ -682,7 +682,7 @@ namespace SabreTools.Library.Dats
 								break;
 							case ItemType.Sample:
 								Sample sample = ((Sample)item).Clone() as Sample;
-								sample.Machine = (Machine)musheen.Clone();
+								sample.CopyMachineInformation(copyFrom);
 								if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
 								{
 									Add(game, sample);
@@ -711,9 +711,9 @@ namespace SabreTools.Library.Dats
 
 				// Determine if the game has a parent or not
 				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].Machine.CloneOf))
+				if (!String.IsNullOrEmpty(this[game][0].CloneOf))
 				{
-					parent = this[game][0].Machine.CloneOf;
+					parent = this[game][0].CloneOf;
 				}
 
 				// If the parent doesnt exist, we want to continue
@@ -729,7 +729,7 @@ namespace SabreTools.Library.Dats
 				}
 
 				// If the parent exists and has items, we copy the items from the parent to the current game
-				Machine currentMachine = this[game][0].Machine;
+				DatItem copyFrom = this[game][0];
 				List<DatItem> parentItems = this[parent];
 				foreach (DatItem item in parentItems)
 				{
@@ -738,7 +738,7 @@ namespace SabreTools.Library.Dats
 					{
 						case ItemType.Archive:
 							Archive archive = ((Archive)item).Clone() as Archive;
-							archive.Machine = (Machine)currentMachine.Clone();
+							archive.CopyMachineInformation(copyFrom);
 							if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
 							{
 								Add(game, archive);
@@ -747,7 +747,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.BiosSet:
 							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							biosSet.Machine = (Machine)currentMachine.Clone();
+							biosSet.CopyMachineInformation(copyFrom);
 							if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
 							{
 								Add(game, biosSet);
@@ -756,7 +756,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Disk:
 							Disk disk = ((Disk)item).Clone() as Disk;
-							disk.Machine = (Machine)currentMachine.Clone();
+							disk.CopyMachineInformation(copyFrom);
 							if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
 							{
 								Add(game, disk);
@@ -765,7 +765,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Release:
 							Release release = ((Release)item).Clone() as Release;
-							release.Machine = (Machine)currentMachine.Clone();
+							release.CopyMachineInformation(copyFrom);
 							if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
 							{
 								Add(game, release);
@@ -774,7 +774,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Rom:
 							Rom rom = ((Rom)item).Clone() as Rom;
-							rom.Machine = (Machine)currentMachine.Clone();
+							rom.CopyMachineInformation(copyFrom);
 							if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
 							{
 								Add(game, rom);
@@ -783,7 +783,7 @@ namespace SabreTools.Library.Dats
 							break;
 						case ItemType.Sample:
 							Sample sample = ((Sample)item).Clone() as Sample;
-							sample.Machine = (Machine)currentMachine.Clone();
+							sample.CopyMachineInformation(copyFrom);
 							if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
 							{
 								Add(game, sample);
@@ -795,10 +795,10 @@ namespace SabreTools.Library.Dats
 
 				// Now we want to get the parent romof tag and put it in each of the items
 				List<DatItem> items = this[game];
-				string romof = this[parent][0].Machine.RomOf;
+				string romof = this[parent][0].RomOf;
 				foreach (DatItem item in items)
 				{
-					item.Machine.UpdateRomOf(romof);
+					item.RomOf = romof;
 				}
 			}
 		}
@@ -813,9 +813,9 @@ namespace SabreTools.Library.Dats
 			{
 				// Determine if the game has a parent or not
 				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].Machine.CloneOf))
+				if (!String.IsNullOrEmpty(this[game][0].CloneOf))
 				{
-					parent = this[game][0].Machine.CloneOf;
+					parent = this[game][0].CloneOf;
 				}
 
 				// If there is no parent, then we continue
@@ -825,14 +825,14 @@ namespace SabreTools.Library.Dats
 				}
 
 				// Otherwise, move the items from the current game to a subfolder of the parent game
-				Machine parentMachine = this[parent].Count == 0 ? new Machine { Name = parent, Description = parent } : this[parent][0].Machine;
+				DatItem copyFrom = this[parent].Count == 0 ? new Rom { MachineName = parent, Description = parent } : this[parent][0];
 				List<DatItem> items = this[game];
 				foreach (DatItem item in items)
 				{
 					// If the disk doesn't have a valid merge tag OR the merged file doesn't exist in the parent, then add it
 					if (item.Type == ItemType.Disk && (item.MergeTag == null || !this[parent].Select(i => i.Name).Contains(item.MergeTag)))
 					{
-						item.Machine = (Machine)parentMachine.Clone();
+						item.CopyMachineInformation(copyFrom);
 						Add(parent, item);
 					}
 
@@ -840,10 +840,10 @@ namespace SabreTools.Library.Dats
 					else if (item.Type != ItemType.Disk && !this[parent].Contains(item))
 					{
 						// Rename the child so it's in a subfolder
-						item.Name = item.Machine.Name + "\\" + item.Name;
+						item.Name = item.Name + "\\" + item.Name;
 
 						// Update the machine to be the new parent
-						item.Machine = (Machine)parentMachine.Clone();
+						item.CopyMachineInformation(copyFrom);
 
 						// Add the rom to the parent set
 						Add(parent, item);
@@ -864,8 +864,8 @@ namespace SabreTools.Library.Dats
 			foreach (string game in games)
 			{
 				if (this[game].Count > 0
-					&& (this[game][0].Machine.MachineType == MachineType.Bios
-						|| this[game][0].Machine.MachineType == MachineType.Device))
+					&& (this[game][0].MachineType == MachineType.Bios
+						|| this[game][0].MachineType == MachineType.Device))
 				{
 					Remove(game);
 				}
@@ -889,9 +889,9 @@ namespace SabreTools.Library.Dats
 
 				// Determine if the game has a parent or not
 				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].Machine.RomOf))
+				if (!String.IsNullOrEmpty(this[game][0].RomOf))
 				{
-					parent = this[game][0].Machine.RomOf;
+					parent = this[game][0].RomOf;
 				}
 
 				// If the parent doesnt exist, we want to continue
@@ -907,7 +907,6 @@ namespace SabreTools.Library.Dats
 				}
 
 				// If the parent exists and has items, we remove the items that are in the parent from the current game
-				Machine currentMachine = this[game][0].Machine;
 				List<DatItem> parentItems = this[parent];
 				foreach (DatItem item in parentItems)
 				{
@@ -959,9 +958,9 @@ namespace SabreTools.Library.Dats
 
 				// Determine if the game has a parent or not
 				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].Machine.CloneOf))
+				if (!String.IsNullOrEmpty(this[game][0].CloneOf))
 				{
-					parent = this[game][0].Machine.CloneOf;
+					parent = this[game][0].CloneOf;
 				}
 
 				// If the parent doesnt exist, we want to continue
@@ -977,7 +976,6 @@ namespace SabreTools.Library.Dats
 				}
 
 				// If the parent exists and has items, we copy the items from the parent to the current game
-				Machine currentMachine = this[game][0].Machine;
 				List<DatItem> parentItems = this[parent];
 				foreach (DatItem item in parentItems)
 				{
@@ -1013,10 +1011,10 @@ namespace SabreTools.Library.Dats
 
 				// Now we want to get the parent romof tag and put it in each of the items
 				List<DatItem> items = this[game];
-				string romof = this[parent][0].Machine.RomOf;
+				string romof = this[parent][0].RomOf;
 				foreach (DatItem item in items)
 				{
-					item.Machine.UpdateRomOf(romof);
+					item.RomOf = romof;
 				}
 			}
 		}
@@ -1032,8 +1030,8 @@ namespace SabreTools.Library.Dats
 				List<DatItem> items = this[game];
 				foreach (DatItem item in items)
 				{
-					item.Machine.UpdateCloneOf(null);
-					item.Machine.UpdateRomOf(null);
+					item.CloneOf = null;
+					item.RomOf = null;
 				}
 			}
 		}

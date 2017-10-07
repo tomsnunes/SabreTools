@@ -176,22 +176,22 @@ namespace SabreTools.Library.Dats
 							DatItem rom = roms[index];
 
 							// There are apparently times when a null rom can skip by, skip them
-							if (rom.Name == null || rom.Machine.Name == null)
+							if (rom.Name == null || rom.MachineName == null)
 							{
 								Globals.Logger.Warning("Null rom found!");
 								continue;
 							}
 
-							List<string> newsplit = rom.Machine.Name.Split('\\').ToList();
+							List<string> newsplit = rom.MachineName.Split('\\').ToList();
 
 							// If we have a different game and we're not at the start of the list, output the end of last item
-							if (lastgame != null && lastgame.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
+							if (lastgame != null && lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
 							{
 								depth = WriteEndGame(sw, datFormat, rom, splitpath, newsplit, lastgame, depth, out last);
 							}
 
 							// If we have a new game, output the beginning of the new item
-							if (lastgame == null || lastgame.ToLowerInvariant() != rom.Machine.Name.ToLowerInvariant())
+							if (lastgame == null || lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
 							{
 								depth = WriteStartGame(sw, datFormat, rom, newsplit, lastgame, depth, last);
 							}
@@ -201,7 +201,7 @@ namespace SabreTools.Library.Dats
 								&& ((Rom)rom).Size == -1
 								&& ((Rom)rom).CRC == "null")
 							{
-								Globals.Logger.Verbose("Empty folder found: {0}", rom.Machine.Name);
+								Globals.Logger.Verbose("Empty folder found: {0}", rom.MachineName);
 
 								// If we're in a mode that doesn't allow for actual empty folders, add the blank info
 								if (datFormat != DatFormat.CSV
@@ -223,7 +223,7 @@ namespace SabreTools.Library.Dats
 								else
 								{
 									splitpath = newsplit;
-									lastgame = rom.Machine.Name;
+									lastgame = rom.MachineName;
 									continue;
 								}
 							}
@@ -233,7 +233,7 @@ namespace SabreTools.Library.Dats
 
 							// Set the new data to compare against
 							splitpath = newsplit;
-							lastgame = rom.Machine.Name;
+							lastgame = rom.MachineName;
 						}
 					}
 
@@ -476,73 +476,73 @@ namespace SabreTools.Library.Dats
 			try
 			{
 				// No game should start with a path separator
-				if (rom.Machine.Name.StartsWith(Path.DirectorySeparatorChar.ToString()))
+				if (rom.MachineName.StartsWith(Path.DirectorySeparatorChar.ToString()))
 				{
-					rom.Machine.UpdateName(rom.Machine.Name.Substring(1));
+					rom.MachineName = rom.MachineName.Substring(1);
 				}
 
 				string state = "";
 				switch (datFormat)
 				{
 					case DatFormat.AttractMode:
-						state += rom.Machine.Name + ";"
-							+ rom.Machine.Description + ";"
+						state += rom.MachineName + ";"
+							+ rom.Description + ";"
 							+ FileName + ";"
-							+ rom.Machine.CloneOf + ";"
-							+ rom.Machine.Year + ";"
-							+ rom.Machine.Manufacturer + ";"
-							/* + rom.Machine.Category */ + ";"
-							/* + rom.Machine.Players */ + ";"
-							/* + rom.Machine.Rotation */ + ";"
-							/* + rom.Machine.Control */ + ";"
-							/* + rom.Machine.Status */ + ";"
-							/* + rom.Machine.DisplayCount */ + ";"
-							/* + rom.Machine.DisplayType */ + ";"
-							/* + rom.Machine.AltRomname */ + ";"
-							/* + rom.Machine.AltTitle */ + ";"
-							+ rom.Machine.Comment + ";"
-							/* + rom.Machine.Buttons */ + "\n";
+							+ rom.CloneOf + ";"
+							+ rom.Year + ";"
+							+ rom.Manufacturer + ";"
+							/* + rom.Category */ + ";"
+							/* + rom.Players */ + ";"
+							/* + rom.Rotation */ + ";"
+							/* + rom.Control */ + ";"
+							/* + rom.Status */ + ";"
+							/* + rom.DisplayCount */ + ";"
+							/* + rom.DisplayType */ + ";"
+							/* + rom.AltRomname */ + ";"
+							/* + rom.AltTitle */ + ";"
+							+ rom.Comment + ";"
+							/* + rom.Buttons */ + "\n";
 						break;
 					case DatFormat.ClrMamePro:
-						state += "game (\n\tname \"" + rom.Machine.Name + "\"\n" +
+						state += "game (\n\tname \"" + rom.MachineName + "\"\n" +
 							(ExcludeOf ? "" :
-								(String.IsNullOrEmpty(rom.Machine.RomOf) ? "" : "\tromof \"" + rom.Machine.RomOf + "\"\n") +
-								(String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : "\tcloneof \"" + rom.Machine.CloneOf + "\"\n") +
-								(String.IsNullOrEmpty(rom.Machine.SampleOf) ? "" : "\tsampleof \"" + rom.Machine.SampleOf + "\"\n")
+								(String.IsNullOrEmpty(rom.RomOf) ? "" : "\tromof \"" + rom.RomOf + "\"\n") +
+								(String.IsNullOrEmpty(rom.CloneOf) ? "" : "\tcloneof \"" + rom.CloneOf + "\"\n") +
+								(String.IsNullOrEmpty(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n")
 							) +
-							"\tdescription \"" + (String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description) + "\"\n" +
-							(String.IsNullOrEmpty(rom.Machine.Year) ? "" : "\tyear " + rom.Machine.Year + "\n") +
-							(String.IsNullOrEmpty(rom.Machine.Manufacturer) ? "" : "\tmanufacturer \"" + rom.Machine.Manufacturer + "\"\n");
+							"\tdescription \"" + (String.IsNullOrEmpty(rom.Description) ? rom.MachineName : rom.Description) + "\"\n" +
+							(String.IsNullOrEmpty(rom.Year) ? "" : "\tyear " + rom.Year + "\n") +
+							(String.IsNullOrEmpty(rom.Manufacturer) ? "" : "\tmanufacturer \"" + rom.Manufacturer + "\"\n");
 						break;
 					case DatFormat.DOSCenter:
-						state += "game (\n\tname \"" + rom.Machine.Name + ".zip\"\n";
+						state += "game (\n\tname \"" + rom.MachineName + ".zip\"\n";
 						break;
 					case DatFormat.Listroms:
-						state += "ROMs required for driver \"" + rom.Machine.Name + "\".\n" +
+						state += "ROMs required for driver \"" + rom.MachineName + "\".\n" +
 							"Name                                   Size Checksum\n";
 						break;
 					case DatFormat.Logiqx:
-						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.Machine.Name) + "\"" +
+						state += "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
 								(ExcludeOf ? "" :
-									(rom.Machine.MachineType == MachineType.Bios ? " isbios=\"yes\"" : "") +
-									(rom.Machine.MachineType == MachineType.Device ? " isdevice=\"yes\"" : "") +
-									(rom.Machine.MachineType == MachineType.Mechanical ? " ismechanical=\"yes\"" : "") +
-									(rom.Machine.Runnable == true ? " runnable=\"yes\"" : "") +
-									(String.IsNullOrEmpty(rom.Machine.CloneOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.CloneOf.ToLowerInvariant())
+									(rom.MachineType == MachineType.Bios ? " isbios=\"yes\"" : "") +
+									(rom.MachineType == MachineType.Device ? " isdevice=\"yes\"" : "") +
+									(rom.MachineType == MachineType.Mechanical ? " ismechanical=\"yes\"" : "") +
+									(rom.Runnable == true ? " runnable=\"yes\"" : "") +
+									(String.IsNullOrEmpty(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
 										? ""
-										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.Machine.CloneOf) + "\"") +
-									(String.IsNullOrEmpty(rom.Machine.RomOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.RomOf.ToLowerInvariant())
+										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
+									(String.IsNullOrEmpty(rom.RomOf) || (rom.MachineName.ToLowerInvariant() == rom.RomOf.ToLowerInvariant())
 										? ""
-										: " romof=\"" + HttpUtility.HtmlEncode(rom.Machine.RomOf) + "\"") +
-									(String.IsNullOrEmpty(rom.Machine.SampleOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.SampleOf.ToLowerInvariant())
+										: " romof=\"" + HttpUtility.HtmlEncode(rom.RomOf) + "\"") +
+									(String.IsNullOrEmpty(rom.SampleOf) || (rom.MachineName.ToLowerInvariant() == rom.SampleOf.ToLowerInvariant())
 										? ""
-										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.Machine.SampleOf) + "\"")
+										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.SampleOf) + "\"")
 								) +
 								">\n" +
-							(String.IsNullOrEmpty(rom.Machine.Comment) ? "" : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Machine.Comment) + "</comment>\n") +
-							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) + "</description>\n" +
-							(String.IsNullOrEmpty(rom.Machine.Year) ? "" : "\t\t<year>" + HttpUtility.HtmlEncode(rom.Machine.Year) + "</year>\n") +
-							(String.IsNullOrEmpty(rom.Machine.Manufacturer) ? "" : "\t\t<manufacturer>" + HttpUtility.HtmlEncode(rom.Machine.Manufacturer) + "</manufacturer>\n");
+							(String.IsNullOrEmpty(rom.Comment) ? "" : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Comment) + "</comment>\n") +
+							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Description) ? rom.MachineName : rom.Description)) + "</description>\n" +
+							(String.IsNullOrEmpty(rom.Year) ? "" : "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n") +
+							(String.IsNullOrEmpty(rom.Manufacturer) ? "" : "\t\t<manufacturer>" + HttpUtility.HtmlEncode(rom.Manufacturer) + "</manufacturer>\n");
 						break;
 					case DatFormat.SabreDat:
 						for (int i = (last == -1 ? 0 : last); i < newsplit.Count; i++)
@@ -557,21 +557,21 @@ namespace SabreTools.Library.Dats
 						depth = depth - (last == -1 ? 0 : last) + newsplit.Count;
 						break;
 					case DatFormat.SoftwareList:
-						state += "\t<software name=\"" + HttpUtility.HtmlEncode(rom.Machine.Name) + "\""
+						state += "\t<software name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\""
 							+ (rom.Supported != null ? " supported=\"" + (rom.Supported == true ? "yes" : "no") + "\"" : "") +
 							(ExcludeOf ? "" :
-									(String.IsNullOrEmpty(rom.Machine.CloneOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.CloneOf.ToLowerInvariant())
+									(String.IsNullOrEmpty(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
 										? ""
-										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.Machine.CloneOf) + "\"") +
-									(String.IsNullOrEmpty(rom.Machine.RomOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.RomOf.ToLowerInvariant())
+										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
+									(String.IsNullOrEmpty(rom.RomOf) || (rom.MachineName.ToLowerInvariant() == rom.RomOf.ToLowerInvariant())
 										? ""
-										: " romof=\"" + HttpUtility.HtmlEncode(rom.Machine.RomOf) + "\"") +
-									(String.IsNullOrEmpty(rom.Machine.SampleOf) || (rom.Machine.Name.ToLowerInvariant() == rom.Machine.SampleOf.ToLowerInvariant())
+										: " romof=\"" + HttpUtility.HtmlEncode(rom.RomOf) + "\"") +
+									(String.IsNullOrEmpty(rom.SampleOf) || (rom.MachineName.ToLowerInvariant() == rom.SampleOf.ToLowerInvariant())
 										? ""
-										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.Machine.SampleOf) + "\"")
+										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.SampleOf) + "\"")
 								) + ">\n"
-							+ "\t\t<description>" + HttpUtility.HtmlEncode(rom.Machine.Description) + "</description>\n"
-							+ (rom.Machine.Year != null ? "\t\t<year>" + HttpUtility.HtmlEncode(rom.Machine.Year) + "</year>\n" : "")
+							+ "\t\t<description>" + HttpUtility.HtmlEncode(rom.Description) + "</description>\n"
+							+ (rom.Year != null ? "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n" : "")
 							+ (rom.Publisher != null ? "\t\t<publisher>" + HttpUtility.HtmlEncode(rom.Publisher) + "</publisher>\n" : "");
 
 						foreach (Tuple<string, string> kvp in rom.Infos)
@@ -617,7 +617,7 @@ namespace SabreTools.Library.Dats
 				{
 					case DatFormat.ClrMamePro:
 					case DatFormat.DOSCenter:
-						state += (String.IsNullOrEmpty(rom.Machine.SampleOf) ? "" : "\tsampleof \"" + rom.Machine.SampleOf + "\"\n") + ")\n";
+						state += (String.IsNullOrEmpty(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n") + ")\n";
 						break;
 					case DatFormat.Listroms:
 						state += "\n";
@@ -769,7 +769,7 @@ namespace SabreTools.Library.Dats
 						{
 							// Check for special strings in prefix and postfix
 							pre = pre
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", ((Rom)rom).CRC)
 								.Replace("%md5%", ((Rom)rom).MD5)
@@ -779,7 +779,7 @@ namespace SabreTools.Library.Dats
 								.Replace("%sha512%", ((Rom)rom).SHA512)
 								.Replace("%size%", ((Rom)rom).Size.ToString());
 							post = post
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", ((Rom)rom).CRC)
 								.Replace("%md5%", ((Rom)rom).MD5)
@@ -793,7 +793,7 @@ namespace SabreTools.Library.Dats
 						{
 							// Check for special strings in prefix and postfix
 							pre = pre
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", ((Disk)rom).MD5)
@@ -803,7 +803,7 @@ namespace SabreTools.Library.Dats
 								.Replace("%sha512%", ((Disk)rom).SHA512)
 								.Replace("%size%", string.Empty);;
 							post = post
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", ((Disk)rom).MD5)
@@ -817,14 +817,14 @@ namespace SabreTools.Library.Dats
 						{
 							// Check for special strings in prefix and postfix
 							pre = pre
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", string.Empty)
 								.Replace("%sha1%", string.Empty)
 								.Replace("%size%", string.Empty);
 							post = post
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", string.Empty)
@@ -837,8 +837,8 @@ namespace SabreTools.Library.Dats
 							string inline = "\"" + FileName + "\""
 								+ ",\"" + Name + "\""
 								+ ",\"" + Description + "\""
-								+ ",\"" + rom.Machine.Name + "\""
-								+ ",\"" + rom.Machine.Description + "\""
+								+ ",\"" + rom.MachineName + "\""
+								+ ",\"" + rom.Description + "\""
 								+ "," + "\"rom\""
 								+ ",\"" + rom.Name + "\""
 								+ "," + "\"\""
@@ -857,8 +857,8 @@ namespace SabreTools.Library.Dats
 							string inline = "\"" + FileName + "\""
 								+ ",\"" + Name + "\""
 								+ ",\"" + Description + "\""
-								+ ",\"" + rom.Machine.Name + "\""
-								+ ",\"" + rom.Machine.Description + "\""
+								+ ",\"" + rom.MachineName + "\""
+								+ ",\"" + rom.Description + "\""
 								+ "," + "\"disk\""
 								+ "," + "\"\""
 								+ ",\"" + rom.Name + "\""
@@ -1044,7 +1044,7 @@ namespace SabreTools.Library.Dats
 						{
 							// Check for special strings in prefix and postfix
 							pre = pre
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", ((Rom)rom).CRC)
 								.Replace("%md5%", ((Rom)rom).MD5)
@@ -1054,7 +1054,7 @@ namespace SabreTools.Library.Dats
 								.Replace("%sha512%", ((Rom)rom).SHA512)
 								.Replace("%size%", ((Rom)rom).Size.ToString());
 							post = post
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", ((Rom)rom).CRC)
 								.Replace("%md5%", ((Rom)rom).MD5)
@@ -1068,7 +1068,7 @@ namespace SabreTools.Library.Dats
 						{
 							// Check for special strings in prefix and postfix
 							pre = pre
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", ((Disk)rom).MD5)
@@ -1078,7 +1078,7 @@ namespace SabreTools.Library.Dats
 								.Replace("%sha512%", ((Disk)rom).SHA512)
 								.Replace("%size%", string.Empty);
 							post = post
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", ((Disk)rom).MD5)
@@ -1092,7 +1092,7 @@ namespace SabreTools.Library.Dats
 						{
 							// Check for special strings in prefix and postfix
 							pre = pre
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", string.Empty)
@@ -1102,7 +1102,7 @@ namespace SabreTools.Library.Dats
 								.Replace("%sha512%", string.Empty)
 								.Replace("%size%", string.Empty);
 							post = post
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", string.Empty)
@@ -1147,7 +1147,7 @@ namespace SabreTools.Library.Dats
 						// Otherwise, use any flags
 						else
 						{
-							name = (UseGame ? rom.Machine.Name : rom.Name);
+							name = (UseGame ? rom.MachineName : rom.Name);
 							if (RepExt != "" || RemExt)
 							{
 								if (RemExt)
@@ -1165,13 +1165,13 @@ namespace SabreTools.Library.Dats
 							}
 							if (!UseGame && GameName)
 							{
-								name = Path.Combine(rom.Machine.Name, name);
+								name = Path.Combine(rom.MachineName, name);
 							}
 
-							if (UseGame && rom.Machine.Name != lastgame)
+							if (UseGame && rom.MachineName != lastgame)
 							{
 								state += pre + name + post + "\n";
-								lastgame = rom.Machine.Name;
+								lastgame = rom.MachineName;
 							}
 							else if (!UseGame)
 							{
@@ -1231,76 +1231,76 @@ namespace SabreTools.Library.Dats
 					case DatFormat.RedumpMD5:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).MD5 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Rom)rom).MD5 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).MD5 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Disk)rom).MD5 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case DatFormat.RedumpSFV:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + " " + ((Rom)rom).CRC + "\n";
+							state += (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + " " + ((Rom)rom).CRC + "\n";
 						}
 						break;
 					case DatFormat.RedumpSHA1:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA1 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Rom)rom).SHA1 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA1 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Disk)rom).SHA1 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case DatFormat.RedumpSHA256:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA256 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Rom)rom).SHA256 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA256 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Disk)rom).SHA256 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case DatFormat.RedumpSHA384:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA384 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Rom)rom).SHA384 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA384 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Disk)rom).SHA384 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case DatFormat.RedumpSHA512:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA512 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Rom)rom).SHA512 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA512 + " *" + (GameName ? rom.Machine.Name + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Disk)rom).SHA512 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case DatFormat.RomCenter:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += "¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
-							"¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
-							"¬" + HttpUtility.HtmlEncode(rom.Machine.Name) +
-							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) +
+							state += "¬" + (String.IsNullOrEmpty(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
+							"¬" + (String.IsNullOrEmpty(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
+							"¬" + HttpUtility.HtmlEncode(rom.MachineName) +
+							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Description) ? rom.MachineName : rom.Description)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
 							"¬" + ((Rom)rom).CRC.ToLowerInvariant() +
 							"¬" + (((Rom)rom).Size != -1 ? ((Rom)rom).Size.ToString() : "") + "¬¬¬\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += "¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
-							"¬" + (String.IsNullOrEmpty(rom.Machine.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.Machine.CloneOf)) +
-							"¬" + HttpUtility.HtmlEncode(rom.Machine.Name) +
-							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Machine.Description) ? rom.Machine.Name : rom.Machine.Description)) +
+							state += "¬" + (String.IsNullOrEmpty(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
+							"¬" + (String.IsNullOrEmpty(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
+							"¬" + HttpUtility.HtmlEncode(rom.MachineName) +
+							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Description) ? rom.MachineName : rom.Description)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
 							"¬¬¬¬¬\n";
 						}
@@ -1466,7 +1466,7 @@ namespace SabreTools.Library.Dats
 						{
 							// Check for special strings in prefix and postfix
 							pre = pre
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", ((Rom)rom).CRC)
 								.Replace("%md5%", ((Rom)rom).MD5)
@@ -1476,7 +1476,7 @@ namespace SabreTools.Library.Dats
 								.Replace("%sha512%", ((Rom)rom).SHA512)
 								.Replace("%size%", ((Rom)rom).Size.ToString());
 							post = post
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", ((Rom)rom).CRC)
 								.Replace("%md5%", ((Rom)rom).MD5)
@@ -1490,7 +1490,7 @@ namespace SabreTools.Library.Dats
 						{
 							// Check for special strings in prefix and postfix
 							pre = pre
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", ((Disk)rom).MD5)
@@ -1500,7 +1500,7 @@ namespace SabreTools.Library.Dats
 								.Replace("%sha512%", ((Disk)rom).SHA512)
 								.Replace("%size%", string.Empty);
 							post = post
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", ((Disk)rom).MD5)
@@ -1514,7 +1514,7 @@ namespace SabreTools.Library.Dats
 						{
 							// Check for special strings in prefix and postfix
 							pre = pre
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", string.Empty)
@@ -1524,7 +1524,7 @@ namespace SabreTools.Library.Dats
 								.Replace("%sha512%", string.Empty)
 								.Replace("%size%", string.Empty);
 							post = post
-								.Replace("%game%", rom.Machine.Name)
+								.Replace("%game%", rom.MachineName)
 								.Replace("%name%", rom.Name)
 								.Replace("%crc%", string.Empty)
 								.Replace("%md5%", string.Empty)
@@ -1541,8 +1541,8 @@ namespace SabreTools.Library.Dats
 							string inline = "\"" + FileName + "\""
 								+ "\t\"" + Name + "\""
 								+ "\t\"" + Description + "\""
-								+ "\t\"" + rom.Machine.Name + "\""
-								+ "\t\"" + rom.Machine.Description + "\""
+								+ "\t\"" + rom.MachineName + "\""
+								+ "\t\"" + rom.Description + "\""
 								+ "\t" + "\"rom\""
 								+ "\t\"" + rom.Name + "\""
 								+ "\t" + "\"\""
@@ -1561,8 +1561,8 @@ namespace SabreTools.Library.Dats
 							string inline = "\"" + FileName + "\""
 								+ "\t\"" + Name + "\""
 								+ "\t\"" + Description + "\""
-								+ "\t\"" + rom.Machine.Name + "\""
-								+ "\t\"" + rom.Machine.Description + "\""
+								+ "\t\"" + rom.MachineName + "\""
+								+ "\t\"" + rom.Description + "\""
 								+ "\t" + "\"disk\""
 								+ "\t" + "\"\""
 								+ "\t\"" + rom.Name + "\""

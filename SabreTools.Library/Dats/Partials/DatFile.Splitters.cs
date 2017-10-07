@@ -435,8 +435,8 @@ namespace SabreTools.Library.Dats
 
 				// Clean the input list and set all games to be pathless
 				List<DatItem> items = this[key];
-				items.ForEach(item => item.Machine.UpdateName(Style.GetFileName(item.Machine.Name)));
-				items.ForEach(item => item.Machine.UpdateDescription(Style.GetFileName(item.Machine.Description)));
+				items.ForEach(item => item.MachineName = Style.GetFileName(item.MachineName));
+				items.ForEach(item => item.Description = Style.GetFileName(item.Description));
 
 				// Now add the game to the output DAT
 				tempDat.AddRange(key, items);

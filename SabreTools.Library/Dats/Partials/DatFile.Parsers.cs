@@ -262,15 +262,12 @@ namespace SabreTools.Library.Dats
 					SHA1 = Constants.SHA1Zero,
 					ItemStatus = ItemStatus.None,
 
-					Machine = new Machine
-					{
-						Name = gameinfo[0],
-						Description = gameinfo[1],
-						CloneOf = gameinfo[3],
-						Year = gameinfo[4],
-						Manufacturer = gameinfo[5],
-						Comment = gameinfo[15],
-					}
+					MachineName = gameinfo[0],
+					Description = gameinfo[1],
+					CloneOf = gameinfo[3],
+					Year = gameinfo[4],
+					Manufacturer = gameinfo[5],
+					Comment = gameinfo[15],
 				};
 
 				// Now process and add the rom
@@ -381,16 +378,13 @@ namespace SabreTools.Library.Dats
 					}
 
 					// Then populate it with information
-					item.Machine = new Machine
-					{
-						Name = tempgamename,
-						Description = gamedesc,
-						CloneOf = cloneof,
-						RomOf = romof,
-						SampleOf = sampleof,
-						Manufacturer = manufacturer,
-						Year = year,
-					};
+					item.MachineName = tempgamename;
+					item.Description = gamedesc;
+					item.CloneOf = cloneof;
+					item.RomOf = romof;
+					item.SampleOf = sampleof;
+					item.Manufacturer = manufacturer;
+					item.Year = year;
 
 					item.SystemID = sysid;
 					item.SourceID = srcid;
@@ -930,10 +924,7 @@ namespace SabreTools.Library.Dats
 					SHA512 = ((hashtype & Hash.SHA512) != 0 ? hash : null),
 					ItemStatus = ItemStatus.None,
 
-					Machine = new Machine
-					{
-						Name = Path.GetFileNameWithoutExtension(filename),
-					},
+					MachineName = Path.GetFileNameWithoutExtension(filename),
 
 					SystemID = sysid,
 					SourceID = srcid,
@@ -1042,10 +1033,7 @@ namespace SabreTools.Library.Dats
 							Name = romname,
 							SHA1 = Style.CleanListromHashData(split[0]),
 
-							Machine = new Machine()
-							{
-								Name = gamename,
-							},
+							MachineName = gamename,
 						};
 
 						ParseAddHelper(disk, clean, remUnicode);
@@ -1060,10 +1048,7 @@ namespace SabreTools.Library.Dats
 							SHA1 = Style.CleanListromHashData(split[1]),
 							ItemStatus = ItemStatus.BadDump,
 
-							Machine = new Machine()
-							{
-								Name = gamename,
-							},
+							MachineName = gamename,
 						};
 
 						ParseAddHelper(disk, clean, remUnicode);
@@ -1084,10 +1069,7 @@ namespace SabreTools.Library.Dats
 							CRC = Style.CleanListromHashData(split[1]),
 							SHA1 = Style.CleanListromHashData(split[2]),
 
-							Machine = new Machine()
-							{
-								Name = gamename,
-							},
+							MachineName = gamename,
 						};
 
 						ParseAddHelper(rom, clean, remUnicode);
@@ -1101,10 +1083,7 @@ namespace SabreTools.Library.Dats
 							Name = romname,
 							ItemStatus = ItemStatus.Nodump,
 
-							Machine = new Machine()
-							{
-								Name = gamename,
-							},
+							MachineName = gamename,
 						};
 
 						ParseAddHelper(disk, clean, remUnicode);
@@ -1126,10 +1105,7 @@ namespace SabreTools.Library.Dats
 							SHA1 = Style.CleanListromHashData(split[3]),
 							ItemStatus = ItemStatus.BadDump,
 
-							Machine = new Machine()
-							{
-								Name = gamename,
-							},
+							MachineName = gamename,
 						};
 
 						ParseAddHelper(rom, clean, remUnicode);
@@ -1149,10 +1125,7 @@ namespace SabreTools.Library.Dats
 							Size = size,
 							ItemStatus = ItemStatus.Nodump,
 
-							Machine = new Machine()
-							{
-								Name = gamename,
-							},
+							MachineName = gamename,
 						};
 
 						ParseAddHelper(rom, clean, remUnicode);
@@ -1308,13 +1281,10 @@ namespace SabreTools.Library.Dats
 							CRC = rominfo[6],
 							ItemStatus = ItemStatus.None,
 
-							Machine = new Machine
-							{
-								Name = rominfo[3],
-								Description = rominfo[4],
-								CloneOf = rominfo[1],
-								RomOf = rominfo[8],
-							},
+							MachineName = rominfo[3],
+							Description = rominfo[4],
+							CloneOf = rominfo[1],
+							RomOf = rominfo[8],
 
 							SystemID = sysid,
 							SourceID = srcid,
@@ -1390,7 +1360,7 @@ namespace SabreTools.Library.Dats
 								columns.Add("Machine.Name");
 								break;
 							case "game description":
-								columns.Add("Machine.Description");
+								columns.Add("Description");
 								break;
 							case "type":
 								columns.Add("DatItem.Type");
@@ -1491,7 +1461,7 @@ namespace SabreTools.Library.Dats
 						case "Machine.Name":
 							machineName = value;
 							break;
-						case "Machine.Description":
+						case "Description":
 							machineDesc = value;
 							break;
 						case "DatItem.Type":
@@ -1578,11 +1548,8 @@ namespace SabreTools.Library.Dats
 						{
 							Name = name,
 
-							Machine = new Machine()
-							{
-								Name = machineName,
-								Description = machineDesc,
-							},
+							MachineName = machineName,
+							Description = machineDesc,
 						};
 
 						ParseAddHelper(archive, clean, remUnicode);
@@ -1592,11 +1559,8 @@ namespace SabreTools.Library.Dats
 						{
 							Name = name,
 
-							Machine = new Machine()
-							{
-								Name = machineName,
-								Description = machineDesc,
-							},
+							MachineName = machineName,
+							Description = machineDesc,
 						};
 
 						ParseAddHelper(biosset, clean, remUnicode);
@@ -1611,11 +1575,8 @@ namespace SabreTools.Library.Dats
 							SHA384 = sha384,
 							SHA512 = sha512,
 
-							Machine = new Machine()
-							{
-								Name = machineName,
-								Description = machineDesc,
-							},
+							MachineName = machineName,
+							Description = machineDesc,
 
 							ItemStatus = status,
 						};
@@ -1627,11 +1588,8 @@ namespace SabreTools.Library.Dats
 						{
 							Name = name,
 
-							Machine = new Machine()
-							{
-								Name = machineName,
-								Description = machineDesc,
-							},
+							MachineName = machineName,
+							Description = machineDesc,
 						};
 
 						ParseAddHelper(release, clean, remUnicode);
@@ -1648,11 +1606,8 @@ namespace SabreTools.Library.Dats
 							SHA384 = sha384,
 							SHA512 = sha512,
 
-							Machine = new Machine()
-							{
-								Name = machineName,
-								Description = machineDesc,
-							},
+							MachineName = machineName,
+							Description = machineDesc,
 
 							ItemStatus = status,
 						};
@@ -1664,11 +1619,8 @@ namespace SabreTools.Library.Dats
 						{
 							Name = name,
 
-							Machine = new Machine()
-							{
-								Name = machineName,
-								Description = machineDesc,
-							},
+							MachineName = machineName,
+							Description = machineDesc,
 						};
 
 						ParseAddHelper(sample, clean, remUnicode);
@@ -2275,9 +2227,9 @@ namespace SabreTools.Library.Dats
 											Size = size,
 											CRC = subreader.ReadElementContentAsString(),
 											ItemStatus = ItemStatus.None,
-
-											Machine = (Machine)machine.Clone(),
 										};
+
+										olrom.CopyMachineInformation(machine);
 
 										// Now process and add the rom
 										key = ParseAddHelper(olrom, clean, remUnicode);
@@ -2363,8 +2315,6 @@ namespace SabreTools.Library.Dats
 											Date = date,
 											Default = defaultrel,
 
-											Machine = (Machine)machine.Clone(),
-
 											Supported = supported,
 											Publisher = publisher,
 											Infos = infos,
@@ -2374,6 +2324,8 @@ namespace SabreTools.Library.Dats
 											AreaName = areaname,
 											AreaSize = areasize,
 										};
+
+										relrom.CopyMachineInformation(machine);
 
 										// Now process and add the rom
 										key = ParseAddHelper(relrom, clean, remUnicode);
@@ -2402,8 +2354,6 @@ namespace SabreTools.Library.Dats
 											Description = subreader.GetAttribute("description"),
 											Default = defaultbios,
 
-											Machine = (Machine)machine.Clone(),
-
 											Supported = supported,
 											Publisher = publisher,
 											Infos = infos,
@@ -2417,6 +2367,8 @@ namespace SabreTools.Library.Dats
 											System = filename,
 											SourceID = srcid,
 										};
+
+										biosrom.CopyMachineInformation(machine);
 
 										// Now process and add the rom
 										key = ParseAddHelper(biosrom, clean, remUnicode);
@@ -2430,8 +2382,6 @@ namespace SabreTools.Library.Dats
 										{
 											Name = subreader.GetAttribute("name"),
 
-											Machine = (Machine)machine.Clone(),
-
 											Supported = supported,
 											Publisher = publisher,
 											Infos = infos,
@@ -2445,6 +2395,8 @@ namespace SabreTools.Library.Dats
 											System = filename,
 											SourceID = srcid,
 										};
+
+										archiverom.CopyMachineInformation(machine);
 
 										// Now process and add the rom
 										key = ParseAddHelper(archiverom, clean, remUnicode);
@@ -2458,8 +2410,6 @@ namespace SabreTools.Library.Dats
 										{
 											Name = subreader.GetAttribute("name"),
 
-											Machine = (Machine)machine.Clone(),
-
 											Supported = supported,
 											Publisher = publisher,
 											Infos = infos,
@@ -2473,6 +2423,8 @@ namespace SabreTools.Library.Dats
 											System = filename,
 											SourceID = srcid,
 										};
+
+										samplerom.CopyMachineInformation(machine);
 
 										// Now process and add the rom
 										key = ParseAddHelper(samplerom, clean, remUnicode);
@@ -2567,8 +2519,6 @@ namespace SabreTools.Library.Dats
 													MergeTag = merge,
 													ItemStatus = its,
 
-													Machine = (Machine)machine.Clone(),
-
 													Supported = supported,
 													Publisher = publisher,
 													Infos = infos,
@@ -2599,8 +2549,6 @@ namespace SabreTools.Library.Dats
 													MergeTag = merge,
 													Date = date,
 
-													Machine = (Machine)machine.Clone(),
-
 													Supported = supported,
 													Publisher = publisher,
 													Infos = infos,
@@ -2616,6 +2564,8 @@ namespace SabreTools.Library.Dats
 												};
 												break;
 										}
+
+										inrom.CopyMachineInformation(machine);
 
 										// Now process and add the rom
 										key = ParseAddHelper(inrom, clean, remUnicode);
@@ -2761,8 +2711,6 @@ namespace SabreTools.Library.Dats
 										SHA512 = xtr.GetAttribute("sha512")?.ToLowerInvariant(),
 										ItemStatus = its,
 
-										Machine = (Machine)dir.Clone(),
-
 										SystemID = sysid,
 										System = filename,
 										SourceID = srcid,
@@ -2783,14 +2731,14 @@ namespace SabreTools.Library.Dats
 										ItemStatus = its,
 										Date = date,
 
-										Machine = (Machine)dir.Clone(),
-
 										SystemID = sysid,
 										System = filename,
 										SourceID = srcid,
 									};
 									break;
 							}
+
+							rom.CopyMachineInformation(dir);
 
 							// Now process and add the rom
 							key = ParseAddHelper(rom, clean, remUnicode);
@@ -2840,14 +2788,14 @@ namespace SabreTools.Library.Dats
 			}
 
 			// If we're in cleaning mode, sanitize the game name
-			item.Machine.UpdateName((clean ? Style.CleanGameName(item.Machine.Name) : item.Machine.Name));
+			item.MachineName = (clean ? Style.CleanGameName(item.MachineName) : item.MachineName);
 
 			// If we're stripping unicode characters, do so from all relevant things
 			if (remUnicode)
 			{
 				item.Name = Style.RemoveUnicodeCharacters(item.Name);
-				item.Machine.UpdateName(Style.RemoveUnicodeCharacters(item.Machine.Name));
-				item.Machine.UpdateDescription(Style.RemoveUnicodeCharacters(item.Machine.Description));
+				item.MachineName = Style.RemoveUnicodeCharacters(item.MachineName);
+				item.Description = Style.RemoveUnicodeCharacters(item.Description);
 			}
 
 			// If we have a Rom or a Disk, clean the hash data

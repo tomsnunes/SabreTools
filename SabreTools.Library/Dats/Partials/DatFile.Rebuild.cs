@@ -640,17 +640,14 @@ namespace SabreTools.Library.Dats
 
 				// Get the item from the current file
 				Rom item = FileTools.GetStreamInfo(fileStream, fileStream.Length, keepReadOpen: true);
-				item.Machine = new Machine()
-				{
-					Name = Style.GetFileNameWithoutExtension(item.Name),
-					Description = Style.GetFileNameWithoutExtension(item.Name),
-				};
+				item.MachineName = Style.GetFileNameWithoutExtension(item.Name);
+				item.Description = Style.GetFileNameWithoutExtension(item.Name);
 
 				// If we are coming from an archive, set the correct machine name
 				if (machinename != null)
 				{
-					item.Machine.UpdateName(machinename);
-					item.Machine.UpdateDescription(machinename);
+					item.MachineName = machinename;
+					item.Description = machinename;
 				}
 
 				Globals.Logger.User("No matches found for '{0}', rebuilding accordingly from inverse flag...", Style.GetFileName(rom.Name));
@@ -659,7 +656,7 @@ namespace SabreTools.Library.Dats
 				switch (outputFormat)
 				{
 					case OutputFormat.Folder:
-						string outfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(item.Machine.Name), item.Name);
+						string outfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(item.MachineName), item.Name);
 
 						// Make sure the output folder is created
 						Directory.CreateDirectory(Path.GetDirectoryName(outfile));
@@ -777,7 +774,7 @@ namespace SabreTools.Library.Dats
 							foreach (Rom item in dupes)
 							{
 								// Create a headered item to use as well
-								rom.Machine = (Machine)item.Machine.Clone();
+								rom.CopyMachineInformation(item);
 								rom.Name += "_" + rom.CRC;
 
 								// If either copy succeeds, then we want to set rebuilt to true

@@ -634,10 +634,7 @@ namespace SabreTools.Library.Tools
 									CRC = entry.Crc.ToString("X").ToLowerInvariant(),
 									Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null),
 
-									Machine = new Machine
-									{
-										Name = gamename,
-									},
+									MachineName = gamename,
 								});
 							}
 							// Otherwise, extract to a stream
@@ -650,10 +647,7 @@ namespace SabreTools.Library.Tools
 								// Get and add the extended Rom information
 								Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
 								sevenZipEntryRom.Name = entry.Key;
-								sevenZipEntryRom.Machine = new Machine()
-								{
-									Name = gamename,
-								};
+								sevenZipEntryRom.MachineName = gamename;
 								sevenZipEntryRom.Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null);
 								found.Add(sevenZipEntryRom);
 							}
@@ -690,10 +684,7 @@ namespace SabreTools.Library.Tools
 							// Get and add the extended Rom information
 							Rom gzipEntryRom = FileTools.GetStreamInfo(outstream, outstream.Length, omitFromScan: omitFromScan);
 							gzipEntryRom.Name = gzstream.FileName;
-							gzipEntryRom.Machine = new Machine()
-							{
-								Name = gamename,
-							};
+							gzipEntryRom.MachineName = gamename;
 							gzipEntryRom.Date = (date && gzstream.LastModified != null ? gzstream.LastModified?.ToString("yyyy/MM/dd hh:mm:ss") : null);
 							found.Add(gzipEntryRom);
 
@@ -718,10 +709,7 @@ namespace SabreTools.Library.Tools
 									CRC = entry.Crc.ToString("X").ToLowerInvariant(),
 									Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null),
 
-									Machine = new Machine
-									{
-										Name = gamename,
-									},
+									MachineName = gamename,
 								});
 							}
 							// Otherwise, extract to a stream
@@ -734,10 +722,7 @@ namespace SabreTools.Library.Tools
 								// Get and add the extended Rom information
 								Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
 								sevenZipEntryRom.Name = entry.Key;
-								sevenZipEntryRom.Machine = new Machine()
-								{
-									Name = gamename,
-								};
+								sevenZipEntryRom.MachineName = gamename;
 								sevenZipEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
 								found.Add(sevenZipEntryRom);
 							}
@@ -763,10 +748,7 @@ namespace SabreTools.Library.Tools
 									CRC = entry.Crc.ToString("X").ToLowerInvariant(),
 									Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null),
 
-									Machine = new Machine
-									{
-										Name = gamename,
-									},
+									MachineName = gamename,
 								});
 							}
 							// Otherwise, extract to a stream
@@ -779,10 +761,7 @@ namespace SabreTools.Library.Tools
 								// Get and add the extended Rom information
 								Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
 								sevenZipEntryRom.Name = entry.Key;
-								sevenZipEntryRom.Machine = new Machine()
-								{
-									Name = gamename,
-								};
+								sevenZipEntryRom.MachineName = gamename;
 								sevenZipEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
 								found.Add(sevenZipEntryRom);
 							}
@@ -830,10 +809,7 @@ namespace SabreTools.Library.Tools
 									CRC = newcrc,
 									Date = (date ? convertedDate : null),
 
-									Machine = new Machine
-									{
-										Name = gamename,
-									},
+									MachineName = gamename,
 								});
 							}
 							// Otherwise, extract to a stream
@@ -871,10 +847,7 @@ namespace SabreTools.Library.Tools
 								// Get and add the extended Rom information
 								Rom zipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
 								zipEntryRom.Name = zf.Entries[i].FileName;
-								zipEntryRom.Machine = new Machine()
-								{
-									Name = gamename,
-								};
+								zipEntryRom.MachineName = gamename;
 								string convertedDate = Style.ConvertMsDosTimeFormatToDateTime(zf.Entries[i].LastMod).ToString("yyyy/MM/dd hh:mm:ss");
 								zipEntryRom.Date = (date ? convertedDate : null);
 								found.Add(zipEntryRom);
@@ -975,10 +948,7 @@ namespace SabreTools.Library.Tools
 				MD5 = gzmd5.ToLowerInvariant(),
 				SHA1 = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(), // TODO: When updating to SHA-256, this needs to update to SHA256
 
-				Machine = new Machine
-				{
-					Name = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
-				},
+				MachineName = Path.GetFileNameWithoutExtension(input).ToLowerInvariant(),
 			};
 
 			return rom;
@@ -1465,7 +1435,7 @@ namespace SabreTools.Library.Tools
 			FileStream outputStream = null;
 
 			// Get the output folder name from the first rebuild rom
-			string fileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.Machine.Name), Style.RemovePathUnsafeCharacters(rom.Name));
+			string fileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.MachineName), Style.RemovePathUnsafeCharacters(rom.Name));
 
 			try
 			{
@@ -1558,7 +1528,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.Machine.Name) + (rom.Machine.Name.EndsWith(".tar") ? "" : ".tar"));
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".tar") ? "" : ".tar"));
 
 			// Set internal variables
 			TarArchive oldTarFile = TarArchive.Create();
@@ -1704,7 +1674,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].Machine.Name) + (roms[0].Machine.Name.EndsWith(".tar") ? "" : ".tar"));
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".tar") ? "" : ".tar"));
 
 			// Set internal variables
 			TarArchive oldTarFile = TarArchive.Create();
@@ -1877,7 +1847,7 @@ namespace SabreTools.Library.Tools
 			inputStream.Seek(0, SeekOrigin.Begin);
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.Machine.Name) + (rom.Machine.Name.EndsWith(".7z") ? "" : ".7z"));
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".7z") ? "" : ".7z"));
 
 			// Set internal variables
 			SevenZipBase.SetLibraryPath("7za.dll");
@@ -2069,7 +2039,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].Machine.Name) + (roms[0].Machine.Name.EndsWith(".7z") ? "" : ".7z"));
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".7z") ? "" : ".7z"));
 
 			// Set internal variables
 			SevenZipBase.SetLibraryPath("7za.dll");
@@ -2451,7 +2421,7 @@ namespace SabreTools.Library.Tools
 			inputStream.Seek(0, SeekOrigin.Begin);
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.Machine.Name) + (rom.Machine.Name.EndsWith(".xz") ? "" : ".xz"));
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".xz") ? "" : ".xz"));
 
 			// Set internal variables
 			SevenZipBase.SetLibraryPath("7za.dll");
@@ -2643,7 +2613,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].Machine.Name) + (roms[0].Machine.Name.EndsWith(".7z") ? "" : ".7z"));
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".7z") ? "" : ".7z"));
 
 			// Set internal variables
 			SevenZipBase.SetLibraryPath("7za.dll");
@@ -2857,7 +2827,7 @@ namespace SabreTools.Library.Tools
 			inputStream.Seek(0, SeekOrigin.Begin);
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.Machine.Name) + (rom.Machine.Name.EndsWith(".zip") ? "" : ".zip"));
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".zip") ? "" : ".zip"));
 
 			// Set internal variables
 			Stream writeStream = null;
@@ -3060,7 +3030,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].Machine.Name) + (roms[0].Machine.Name.EndsWith(".zip") ? "" : ".zip"));
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".zip") ? "" : ".zip"));
 
 			// Set internal variables
 			Stream writeStream = null;

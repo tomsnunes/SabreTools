@@ -25,7 +25,7 @@ namespace SabreTools.Library.Dats
 		protected DupeType _dupeType;
 
 		// Machine information
-		protected Machine _machine;
+		protected Machine _machine = new Machine();
 
 		// Software list information
 		protected bool? _supported;
@@ -70,10 +70,299 @@ namespace SabreTools.Library.Dats
 		}
 
 		// Machine information
-		public Machine Machine
+		public string MachineName
 		{
-			get { return _machine; }
-			set { _machine = value; }
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.Name;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.Name = value;
+			}
+		}
+		public string Comment
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.Comment;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.Comment = value;
+			}
+		}
+		public string Description
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.Description;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.Description = value;
+			}
+		}
+		public string Year
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.Year;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.Year = value;
+			}
+		}
+		public string Manufacturer
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.Manufacturer;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.Manufacturer = value;
+			}
+		}
+		public string RomOf
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.RomOf;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.RomOf = value;
+			}
+		}
+		public string CloneOf
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.CloneOf;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.CloneOf = value;
+			}
+		}
+		public string SampleOf
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.SampleOf;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.SampleOf = value;
+			}
+		}
+		public string SourceFile
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.SourceFile;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.SourceFile = value;
+			}
+		}
+		public bool? Runnable
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.Runnable;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.Runnable = value;
+			}
+		}
+		public string Board
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.Board;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.Board = value;
+			}
+		}
+		public string RebuildTo
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.RebuildTo;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.RebuildTo = value;
+			}
+		}
+		public List<string> Devices
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.Devices;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.Devices = value;
+			}
+		}
+		public MachineType MachineType
+		{
+			get
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				return _machine.MachineType;
+			}
+			set
+			{
+				if (_machine == null)
+				{
+					_machine = new Machine();
+				}
+
+				_machine.MachineType = value;
+			}
 		}
 
 		// Software list information
@@ -167,6 +456,24 @@ namespace SabreTools.Library.Dats
 			return null;
 		}
 
+		/// <summary>
+		/// Copy all machine information over in one shot
+		/// </summary>
+		/// <param name="item">Existing item to copy information from</param>
+		public void CopyMachineInformation(DatItem item)
+		{
+			_machine = (Machine)item._machine.Clone();
+		}
+
+		/// <summary>
+		/// Copy all machine information over in one shot
+		/// </summary>
+		/// <param name="machine">Existing machine to copy information from</param>
+		public void CopyMachineInformation(Machine machine)
+		{
+			_machine = (Machine)machine.Clone();
+		}
+
 		#endregion
 
 		#region Comparision Methods
@@ -216,7 +523,7 @@ namespace SabreTools.Library.Dats
 			// If the duplicate is external already or should be, set it
 			if ((lastItem.Dupe & DupeType.External) != 0 || lastItem.SystemID != this.SystemID || lastItem.SourceID != this.SourceID)
 			{
-				if (lastItem.Machine.Name == this.Machine.Name && lastItem.Name == this.Name)
+				if (lastItem.MachineName == this.MachineName && lastItem.Name == this.Name)
 				{
 					output = DupeType.External | DupeType.All;
 				}
@@ -229,7 +536,7 @@ namespace SabreTools.Library.Dats
 			// Otherwise, it's considered an internal dupe
 			else
 			{
-				if (lastItem.Machine.Name == this.Machine.Name && lastItem.Name == this.Name)
+				if (lastItem.MachineName == this.MachineName && lastItem.Name == this.Name)
 				{
 					output = DupeType.Internal | DupeType.All;
 				}
@@ -475,7 +782,7 @@ namespace SabreTools.Library.Dats
 					}
 					break;
 				case SortedBy.Game:
-					key = this.Machine.Name;
+					key = this.MachineName;
 					break;
 				case SortedBy.Size:
 					if (_itemType == ItemType.Rom)
@@ -609,7 +916,7 @@ namespace SabreTools.Library.Dats
 							{
 								saveditem.SystemID = file.SystemID;
 								saveditem.System = file.System;
-								saveditem.Machine = (Machine)file.Machine.Clone();
+								saveditem.CopyMachineInformation(file);
 								saveditem.Name = file.Name;
 							}
 
@@ -618,7 +925,7 @@ namespace SabreTools.Library.Dats
 							{
 								saveditem.SourceID = file.SourceID;
 								saveditem.Source = file.Source;
-								saveditem.Machine = (Machine)file.Machine.Clone();
+								saveditem.CopyMachineInformation(file);
 								saveditem.Name = file.Name;
 							}
 
@@ -764,7 +1071,7 @@ namespace SabreTools.Library.Dats
 					{
 						if (x.SourceID == y.SourceID)
 						{
-							if (x.Machine != null && y.Machine != null && x.Machine.Name == y.Machine.Name)
+							if (x.MachineName == y.MachineName)
 							{
 								if ((x.Type == ItemType.Rom || x.Type == ItemType.Disk) && (y.Type == ItemType.Rom || y.Type == ItemType.Disk))
 								{
@@ -791,11 +1098,11 @@ namespace SabreTools.Library.Dats
 									return nc.Compare(Path.GetDirectoryName(x.Name), Path.GetDirectoryName(y.Name));
 								}
 							}
-							return nc.Compare(x.Machine.Name, y.Machine.Name);
+							return nc.Compare(x.MachineName, y.MachineName);
 						}
-						return (norename ? nc.Compare(x.Machine.Name, y.Machine.Name) : x.SourceID - y.SourceID);
+						return (norename ? nc.Compare(x.MachineName, y.MachineName) : x.SourceID - y.SourceID);
 					}
-					return (norename ? nc.Compare(x.Machine.Name, y.Machine.Name) : x.SystemID - y.SystemID);
+					return (norename ? nc.Compare(x.MachineName, y.MachineName) : x.SystemID - y.SystemID);
 				}
 				catch (Exception)
 				{
