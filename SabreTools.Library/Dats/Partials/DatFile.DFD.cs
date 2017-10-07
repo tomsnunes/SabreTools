@@ -402,19 +402,8 @@ namespace SabreTools.Library.Dats
 
 				// Update rom information
 				datItem.Name = romname;
-				if (datItem.Machine == default(Machine))
-				{
-					datItem.Machine = new Machine
-					{
-						Name = gamename,
-						Description = gamename,
-					};
-				}
-				else
-				{
-					datItem.Machine.UpdateName(gamename);
-					datItem.Machine.UpdateDescription(gamename);
-				}
+				datItem.MachineName = gamename;
+				datItem.Description = gamename;
 
 				// Add the file information to the DAT
 				Add(key, datItem);
