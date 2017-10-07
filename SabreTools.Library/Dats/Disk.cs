@@ -73,13 +73,11 @@ namespace SabreTools.Library.Dats
 
 		public new object Clone()
 		{
-			return new Disk()
+			Disk item = new Disk()
 			{
 				Name = this.Name,
 				Type = this.Type,
 				Dupe = this.Dupe,
-
-				Machine = (Machine)this.Machine.Clone(),
 
 				Supported = this.Supported,
 				Publisher = this.Publisher,
@@ -102,6 +100,9 @@ namespace SabreTools.Library.Dats
 				SHA512 = this.SHA512,
 				ItemStatus = this.ItemStatus,
 			};
+
+			item.CopyMachineInformation(this);
+			return item;
 		}
 
 		#endregion

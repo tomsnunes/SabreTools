@@ -44,13 +44,11 @@ namespace SabreTools.Library.Dats
 
 		public new object Clone()
 		{
-			return new BiosSet()
+			BiosSet item =  new BiosSet()
 			{
 				Name = this.Name,
 				Type = this.Type,
 				Dupe = this.Dupe,
-
-				Machine = (Machine)this.Machine.Clone(),
 
 				Supported = this.Supported,
 				Publisher = this.Publisher,
@@ -69,6 +67,9 @@ namespace SabreTools.Library.Dats
 				Description = this.Description,
 				Default = this.Default,
 			};
+
+			item.CopyMachineInformation(this);
+			return item;
 		}
 
 		#endregion

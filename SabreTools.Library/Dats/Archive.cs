@@ -22,13 +22,11 @@ namespace SabreTools.Library.Dats
 
 		public new object Clone()
 		{
-			return new Archive()
+			Archive item = new Archive()
 			{
 				Name = this.Name,
 				Type = this.Type,
 				Dupe = this.Dupe,
-
-				Machine = (Machine)this.Machine.Clone(),
 
 				Supported = this.Supported,
 				Publisher = this.Publisher,
@@ -44,6 +42,9 @@ namespace SabreTools.Library.Dats
 				SourceID = this.SourceID,
 				Source = this.Source,
 			};
+
+			item.CopyMachineInformation(this);
+			return item;
 		}
 
 		#endregion

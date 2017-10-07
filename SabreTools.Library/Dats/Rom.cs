@@ -101,13 +101,11 @@ namespace SabreTools.Library.Dats
 
 		public new object Clone()
 		{
-			return new Rom()
+			Rom item = new Rom()
 			{
 				Name = this.Name,
 				Type = this.Type,
 				Dupe = this.Dupe,
-
-				Machine = (Machine)this.Machine.Clone(),
 
 				Supported = this.Supported,
 				Publisher = this.Publisher,
@@ -133,6 +131,9 @@ namespace SabreTools.Library.Dats
 				CRC = _crc,
 				Date = this.Date,
 			};
+
+			item.CopyMachineInformation(this);
+			return item;
 		}
 
 		#endregion
