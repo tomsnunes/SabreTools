@@ -1352,7 +1352,46 @@ Options:
 
 ** Section 3.0 - Examples
 
-Here, any user-requested examples will go
+Here are a few usage examples based on features that are commonly used by most
+users of SabreTools. Thanks to Kludge for most of these suggestions!
+
+-- Example 1 --
+	Convert a DAT file to XML and put it in a new folder
+
+	Long form:
+		SabreTools.exe --update --output-xml --out=OutDir Path\To\DatFile.dat
+
+	Short form:
+		SabreTools.exe -ud -ox -out=OutDir DatFile.dat Path\To\DatFile.dat
+
+-- Example 2 --
+	Convert a folder of DAT files to ClrMamePro and strip parent tags
+	Note: This would output the created files to the SabreTools folder
+
+	Long form:
+		SabreTools.exe --update --output-cmp --exclude-of Path\To\Dats
+
+	Short form:
+		SabreTools.exe -ud -oc -xof Path\To\Dats
+
+-- Example 3 --
+	Create an XML DAT from a folder of zipped sets setting a custom name
+
+	Long form:
+		SabreTools.exe --dfd --output-xml --name=DatName Path\To\Files
+
+	Short form:
+		SabreTools.exe -d -ox -n=DatName Path\To\Files
+
+-- Example 4 --
+	Run a fixdat for a friend based on a couple folders the files can be in
+	and outputting in TorrentZip format
+
+	Long form:
+		SabreTools.exe --sort --dat=Fix.dat --tzip --out=FixDir InDir1 InDir2
+
+	Short form:
+		SabreTools.exe -ss -dat=Fix.dat -tzip -out=FixDir InDir2 InDir2
 
 ** Section 4.0 - Contributors
 
