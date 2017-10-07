@@ -121,9 +121,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Partials\SabreTools.Help.cs" />
+    <Compile Include="SabreTools.Help.cs" />
     <Compile Include="SabreTools.cs" />
-    <Compile Include="Partials\SabreTools.Inits.cs" />
+    <Compile Include="SabreTools.Inits.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

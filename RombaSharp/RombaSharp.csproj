@@ -114,9 +114,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Partials\RombaSharp.Help.cs" />
-    <Compile Include="Partials\RombaSharp.Helpers.cs" />
-    <Compile Include="Partials\RombaSharp.Inits.cs" />
+    <Compile Include="RombaSharp.Help.cs" />
+    <Compile Include="RombaSharp.Helpers.cs" />
+    <Compile Include="RombaSharp.Inits.cs" />
     <Compile Include="RombaSharp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -147,6 +147,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Mono.Data.Sqlite.Portable.1.0.3.5\tools\Mono.Data.Sqlite.Portable.targets" Condition="Exists('..\packages\Mono.Data.Sqlite.Portable.1.0.3.5\tools\Mono.Data.Sqlite.Portable.targets')" />
   <Target Name="EnsureMonoDataSqlitePortableImported" BeforeTargets="BeforeBuild" Condition="'$(MonoDataSqlitePortableImported)' == ''">
