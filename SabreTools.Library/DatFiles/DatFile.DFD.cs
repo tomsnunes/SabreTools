@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using SabreTools.Library.Data;
+using SabreTools.Library.Items;
 using SabreTools.Library.Tools;
 
 #if MONO
@@ -16,7 +17,7 @@ using SearchOption = System.IO.SearchOption;
 #endif
 using SharpCompress.Common;
 
-namespace SabreTools.Library.Dats
+namespace SabreTools.Library.DatFiles
 {
 	public partial class DatFile
 	{

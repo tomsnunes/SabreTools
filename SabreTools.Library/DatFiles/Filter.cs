@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 using SabreTools.Library.Data;
+using SabreTools.Library.Items;
 
-namespace SabreTools.Library.Dats
+namespace SabreTools.Library.DatFiles
 {
 	public class Filter
 	{

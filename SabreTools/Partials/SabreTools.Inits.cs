@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
-using SabreTools.Library;
 using SabreTools.Library.Data;
-using SabreTools.Library.Dats;
+using SabreTools.Library.DatFiles;
 using SabreTools.Library.Tools;
 
 #if MONO

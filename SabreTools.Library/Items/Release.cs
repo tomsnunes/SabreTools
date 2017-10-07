@@ -2,7 +2,7 @@
 
 using SabreTools.Library.Data;
 
-namespace SabreTools.Library.Dats
+namespace SabreTools.Library.Items
 {
 	public class Release : DatItem
 	{

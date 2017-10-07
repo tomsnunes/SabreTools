@@ -2,7 +2,7 @@
 
 using SabreTools.Library.Data;
 
-namespace SabreTools.Library
+namespace SabreTools.Library.Tools
 {
 	/// <summary>
 	/// Stopwatch class for keeping track of duration in the code

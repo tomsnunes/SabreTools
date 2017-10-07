@@ -2,6 +2,8 @@
 using System.Reflection;
 using System.Threading.Tasks;
 
+using SabreTools.Library.Tools;
+
 #if MONO
 using System.IO;
 #else

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web;
 
 using SabreTools.Library.Data;
+using SabreTools.Library.Items;
 using SabreTools.Library.Tools;
 
 #if MONO
@@ -16,7 +17,7 @@ using SearchOption = System.IO.SearchOption;
 using StreamWriter = System.IO.StreamWriter;
 #endif
 
-namespace SabreTools.Library.Dats
+namespace SabreTools.Library.DatFiles
 {
 	/*
 	 * TODO: Make output standard width (HTML, without making the entire thing a table)

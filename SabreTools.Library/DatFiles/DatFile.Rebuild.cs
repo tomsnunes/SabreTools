@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using SabreTools.Library.Data;
+using SabreTools.Library.Items;
 using SabreTools.Library.Skippers;
 using SabreTools.Library.Tools;
 
@@ -19,7 +20,7 @@ using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
 
-namespace SabreTools.Library.Dats
+namespace SabreTools.Library.DatFiles
 {
 	public partial class DatFile
 	{

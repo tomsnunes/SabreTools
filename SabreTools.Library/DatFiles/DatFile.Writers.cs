@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web;
 
 using SabreTools.Library.Data;
+using SabreTools.Library.Items;
 using SabreTools.Library.Tools;
 
 #if MONO
@@ -19,7 +20,7 @@ using StreamWriter = System.IO.StreamWriter;
 #endif
 using NaturalSort;
 
-namespace SabreTools.Library.Dats
+namespace SabreTools.Library.DatFiles
 {
 	public partial class DatFile
 	{

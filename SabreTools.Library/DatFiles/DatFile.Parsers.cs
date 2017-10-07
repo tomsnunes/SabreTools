@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 
 using SabreTools.Library.Data;
+using SabreTools.Library.Items;
 using SabreTools.Library.Tools;
 
 #if MONO
@@ -17,7 +18,7 @@ using Alphaleonis.Win32.Filesystem;
 using StreamReader = System.IO.StreamReader;
 #endif
 
-namespace SabreTools.Library.Dats
+namespace SabreTools.Library.DatFiles
 {
 	public partial class DatFile
 	{

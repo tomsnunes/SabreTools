@@ -13,7 +13,7 @@ using FileStream = System.IO.FileStream;
 using StreamWriter = System.IO.StreamWriter;
 #endif
 
-namespace SabreTools.Library
+namespace SabreTools.Library.Tools
 {
 	/// <summary>
 	/// Log either to file or to the console

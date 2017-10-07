@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using SabreTools.Library.Data;
 
-namespace SabreTools.Library.Dats
+namespace SabreTools.Library.Items
 {
 	public class Machine : ICloneable
 	{

@@ -1,19 +1,20 @@
 ﻿using System;
+
 using SabreTools.Library.Data;
 
-namespace SabreTools.Library.Dats
+namespace SabreTools.Library.Items
 {
-	public class Archive : DatItem
+	public class Sample : DatItem
 	{
 		#region Constructors
 
 		/// <summary>
-		/// Create a default, empty Archive object
+		/// Create a default, empty Sample object
 		/// </summary>
-		public Archive()
+		public Sample()
 		{
 			_name = "";
-			_itemType = ItemType.Archive;
+			_itemType = ItemType.Sample;
 		}
 
 		#endregion
@@ -22,7 +23,7 @@ namespace SabreTools.Library.Dats
 
 		public new object Clone()
 		{
-			Archive item = new Archive()
+			Sample item = new Sample()
 			{
 				Name = this.Name,
 				Type = this.Type,
@@ -53,14 +54,14 @@ namespace SabreTools.Library.Dats
 
 		public override bool Equals(DatItem other)
 		{
-			// If we don't have an archive, return false
+			// If we don't have a sample, return false
 			if (_itemType != other.Type)
 			{
 				return false;
 			}
 
-			// Otherwise, treat it as an archive
-			Archive newOther = (Archive)other;
+			// Otherwise, treat it as a sample
+			Sample newOther = (Sample)other;
 
 			// If the archive information matches
 			return (_name == newOther.Name);

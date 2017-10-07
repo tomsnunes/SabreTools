@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using SabreTools.Library.Data;
+using SabreTools.Library.DatFiles;
 using SabreTools.Library.Tools;
 
 #if MONO
@@ -12,7 +12,7 @@ using Alphaleonis.Win32.Filesystem;
 #endif
 using NaturalSort;
 
-namespace SabreTools.Library.Dats
+namespace SabreTools.Library.Items
 {
 	public abstract class DatItem : IEquatable<DatItem>, IComparable<DatItem>, ICloneable
 	{
