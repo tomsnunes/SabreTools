@@ -112,7 +112,7 @@ namespace SabreTools.Library.Items
 				_machine.Comment = value;
 			}
 		}
-		public string Description
+		public string MachineDescription
 		{
 			get
 			{

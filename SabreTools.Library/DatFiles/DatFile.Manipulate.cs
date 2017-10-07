@@ -255,7 +255,7 @@ namespace SabreTools.Library.DatFiles
 						// If the key mapping doesn't exist, add it
 						if (!mapping.ContainsKey(item.MachineName))
 						{
-							mapping.TryAdd(item.MachineName, item.Description.Replace('/', '_').Replace("\"", "''"));
+							mapping.TryAdd(item.MachineName, item.MachineDescription.Replace('/', '_').Replace("\"", "''"));
 						}
 					}
 				});
@@ -826,7 +826,7 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// Otherwise, move the items from the current game to a subfolder of the parent game
-				DatItem copyFrom = this[parent].Count == 0 ? new Rom { MachineName = parent, Description = parent } : this[parent][0];
+				DatItem copyFrom = this[parent].Count == 0 ? new Rom { MachineName = parent, MachineDescription = parent } : this[parent][0];
 				List<DatItem> items = this[game];
 				foreach (DatItem item in items)
 				{

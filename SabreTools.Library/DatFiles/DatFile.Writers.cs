@@ -487,7 +487,7 @@ namespace SabreTools.Library.DatFiles
 				{
 					case DatFormat.AttractMode:
 						state += rom.MachineName + ";"
-							+ rom.Description + ";"
+							+ rom.MachineDescription + ";"
 							+ FileName + ";"
 							+ rom.CloneOf + ";"
 							+ rom.Year + ";"
@@ -511,7 +511,7 @@ namespace SabreTools.Library.DatFiles
 								(String.IsNullOrEmpty(rom.CloneOf) ? "" : "\tcloneof \"" + rom.CloneOf + "\"\n") +
 								(String.IsNullOrEmpty(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n")
 							) +
-							"\tdescription \"" + (String.IsNullOrEmpty(rom.Description) ? rom.MachineName : rom.Description) + "\"\n" +
+							"\tdescription \"" + (String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription) + "\"\n" +
 							(String.IsNullOrEmpty(rom.Year) ? "" : "\tyear " + rom.Year + "\n") +
 							(String.IsNullOrEmpty(rom.Manufacturer) ? "" : "\tmanufacturer \"" + rom.Manufacturer + "\"\n");
 						break;
@@ -541,7 +541,7 @@ namespace SabreTools.Library.DatFiles
 								) +
 								">\n" +
 							(String.IsNullOrEmpty(rom.Comment) ? "" : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Comment) + "</comment>\n") +
-							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Description) ? rom.MachineName : rom.Description)) + "</description>\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) + "</description>\n" +
 							(String.IsNullOrEmpty(rom.Year) ? "" : "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n") +
 							(String.IsNullOrEmpty(rom.Manufacturer) ? "" : "\t\t<manufacturer>" + HttpUtility.HtmlEncode(rom.Manufacturer) + "</manufacturer>\n");
 						break;
@@ -571,7 +571,7 @@ namespace SabreTools.Library.DatFiles
 										? ""
 										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.SampleOf) + "\"")
 								) + ">\n"
-							+ "\t\t<description>" + HttpUtility.HtmlEncode(rom.Description) + "</description>\n"
+							+ "\t\t<description>" + HttpUtility.HtmlEncode(rom.MachineDescription) + "</description>\n"
 							+ (rom.Year != null ? "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n" : "")
 							+ (rom.Publisher != null ? "\t\t<publisher>" + HttpUtility.HtmlEncode(rom.Publisher) + "</publisher>\n" : "");
 
@@ -839,7 +839,7 @@ namespace SabreTools.Library.DatFiles
 								+ ",\"" + Name + "\""
 								+ ",\"" + Description + "\""
 								+ ",\"" + rom.MachineName + "\""
-								+ ",\"" + rom.Description + "\""
+								+ ",\"" + rom.MachineDescription + "\""
 								+ "," + "\"rom\""
 								+ ",\"" + rom.Name + "\""
 								+ "," + "\"\""
@@ -859,7 +859,7 @@ namespace SabreTools.Library.DatFiles
 								+ ",\"" + Name + "\""
 								+ ",\"" + Description + "\""
 								+ ",\"" + rom.MachineName + "\""
-								+ ",\"" + rom.Description + "\""
+								+ ",\"" + rom.MachineDescription + "\""
 								+ "," + "\"disk\""
 								+ "," + "\"\""
 								+ ",\"" + rom.Name + "\""
@@ -1291,7 +1291,7 @@ namespace SabreTools.Library.DatFiles
 							state += "¬" + (String.IsNullOrEmpty(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
 							"¬" + (String.IsNullOrEmpty(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
 							"¬" + HttpUtility.HtmlEncode(rom.MachineName) +
-							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Description) ? rom.MachineName : rom.Description)) +
+							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
 							"¬" + ((Rom)rom).CRC.ToLowerInvariant() +
 							"¬" + (((Rom)rom).Size != -1 ? ((Rom)rom).Size.ToString() : "") + "¬¬¬\n";
@@ -1301,7 +1301,7 @@ namespace SabreTools.Library.DatFiles
 							state += "¬" + (String.IsNullOrEmpty(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
 							"¬" + (String.IsNullOrEmpty(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
 							"¬" + HttpUtility.HtmlEncode(rom.MachineName) +
-							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.Description) ? rom.MachineName : rom.Description)) +
+							"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) +
 							"¬" + HttpUtility.HtmlEncode(rom.Name) +
 							"¬¬¬¬¬\n";
 						}
@@ -1543,7 +1543,7 @@ namespace SabreTools.Library.DatFiles
 								+ "\t\"" + Name + "\""
 								+ "\t\"" + Description + "\""
 								+ "\t\"" + rom.MachineName + "\""
-								+ "\t\"" + rom.Description + "\""
+								+ "\t\"" + rom.MachineDescription + "\""
 								+ "\t" + "\"rom\""
 								+ "\t\"" + rom.Name + "\""
 								+ "\t" + "\"\""
@@ -1563,7 +1563,7 @@ namespace SabreTools.Library.DatFiles
 								+ "\t\"" + Name + "\""
 								+ "\t\"" + Description + "\""
 								+ "\t\"" + rom.MachineName + "\""
-								+ "\t\"" + rom.Description + "\""
+								+ "\t\"" + rom.MachineDescription + "\""
 								+ "\t" + "\"disk\""
 								+ "\t" + "\"\""
 								+ "\t\"" + rom.Name + "\""

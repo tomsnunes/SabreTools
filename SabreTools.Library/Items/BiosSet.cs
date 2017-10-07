@@ -1,5 +1,4 @@
-﻿using System;
-using SabreTools.Library.Data;
+﻿using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Items
 {

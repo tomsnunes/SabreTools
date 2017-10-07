@@ -264,7 +264,7 @@ namespace SabreTools.Library.DatFiles
 					ItemStatus = ItemStatus.None,
 
 					MachineName = gameinfo[0],
-					Description = gameinfo[1],
+					MachineDescription = gameinfo[1],
 					CloneOf = gameinfo[3],
 					Year = gameinfo[4],
 					Manufacturer = gameinfo[5],
@@ -380,7 +380,7 @@ namespace SabreTools.Library.DatFiles
 
 					// Then populate it with information
 					item.MachineName = tempgamename;
-					item.Description = gamedesc;
+					item.MachineDescription = gamedesc;
 					item.CloneOf = cloneof;
 					item.RomOf = romof;
 					item.SampleOf = sampleof;
@@ -1283,7 +1283,7 @@ namespace SabreTools.Library.DatFiles
 							ItemStatus = ItemStatus.None,
 
 							MachineName = rominfo[3],
-							Description = rominfo[4],
+							MachineDescription = rominfo[4],
 							CloneOf = rominfo[1],
 							RomOf = rominfo[8],
 
@@ -1550,7 +1550,7 @@ namespace SabreTools.Library.DatFiles
 							Name = name,
 
 							MachineName = machineName,
-							Description = machineDesc,
+							MachineDescription = machineDesc,
 						};
 
 						ParseAddHelper(archive, clean, remUnicode);
@@ -1577,7 +1577,7 @@ namespace SabreTools.Library.DatFiles
 							SHA512 = sha512,
 
 							MachineName = machineName,
-							Description = machineDesc,
+							MachineDescription = machineDesc,
 
 							ItemStatus = status,
 						};
@@ -1590,7 +1590,7 @@ namespace SabreTools.Library.DatFiles
 							Name = name,
 
 							MachineName = machineName,
-							Description = machineDesc,
+							MachineDescription = machineDesc,
 						};
 
 						ParseAddHelper(release, clean, remUnicode);
@@ -1608,7 +1608,7 @@ namespace SabreTools.Library.DatFiles
 							SHA512 = sha512,
 
 							MachineName = machineName,
-							Description = machineDesc,
+							MachineDescription = machineDesc,
 
 							ItemStatus = status,
 						};
@@ -1621,7 +1621,7 @@ namespace SabreTools.Library.DatFiles
 							Name = name,
 
 							MachineName = machineName,
-							Description = machineDesc,
+							MachineDescription = machineDesc,
 						};
 
 						ParseAddHelper(sample, clean, remUnicode);
@@ -2796,7 +2796,7 @@ namespace SabreTools.Library.DatFiles
 			{
 				item.Name = Style.RemoveUnicodeCharacters(item.Name);
 				item.MachineName = Style.RemoveUnicodeCharacters(item.MachineName);
-				item.Description = Style.RemoveUnicodeCharacters(item.Description);
+				item.MachineDescription = Style.RemoveUnicodeCharacters(item.MachineDescription);
 			}
 
 			// If we have a Rom or a Disk, clean the hash data

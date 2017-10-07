@@ -642,13 +642,13 @@ namespace SabreTools.Library.DatFiles
 				// Get the item from the current file
 				Rom item = FileTools.GetStreamInfo(fileStream, fileStream.Length, keepReadOpen: true);
 				item.MachineName = Style.GetFileNameWithoutExtension(item.Name);
-				item.Description = Style.GetFileNameWithoutExtension(item.Name);
+				item.MachineDescription = Style.GetFileNameWithoutExtension(item.Name);
 
 				// If we are coming from an archive, set the correct machine name
 				if (machinename != null)
 				{
 					item.MachineName = machinename;
-					item.Description = machinename;
+					item.MachineDescription = machinename;
 				}
 
 				Globals.Logger.User("No matches found for '{0}', rebuilding accordingly from inverse flag...", Style.GetFileName(rom.Name));
