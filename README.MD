@@ -8,7 +8,7 @@ The SabreTools project started as a desktop port of some core features of Wizard
 
 ## Features
 
-For the most complete set of information, see the [README.1ST](https://raw.githubusercontent.com/SabreTools/SabreTools/master/SabreTools.Helper/README.1ST) file. Currently, the SabreTools suite consists of the following programs:
+For the most complete set of information, see the [README.1ST](https://raw.githubusercontent.com/SabreTools/SabreTools/master/SabreTools.Library/README.1ST) file. Currently, the SabreTools suite consists of the following programs:
 
 ### SabreTools / SabreTools.Library
 
