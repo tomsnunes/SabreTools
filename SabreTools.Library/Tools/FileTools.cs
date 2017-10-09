@@ -34,6 +34,9 @@ using OCRC;
 
 namespace SabreTools.Library.Tools
 {
+	/// <summary>
+	/// Tools for working with non-archive files and stream
+	/// </summary>
 	public static class FileTools
 	{
 		#region File Information

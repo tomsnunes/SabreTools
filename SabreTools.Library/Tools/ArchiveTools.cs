@@ -32,14 +32,17 @@ using SharpCompress.Writers;
 
 namespace SabreTools.Library.Tools
 {
-	/*
-	 * TODO: Full archive support for: RAR, LRZip, ZPAQ?, Zstd?, LZ4?
-	 * Torrent 7-zip: https://sourceforge.net/p/t7z/code/HEAD/tree/
-	 * LRZIP: https://github.com/ckolivas/lrzip
-	 * ZPAQ: https://github.com/zpaq/zpaq - In progress as external DLL
-	 * Zstd: https://github.com/skbkontur/ZstdNet
-	 * LZ4: https://github.com/lz4/lz4
-	 */
+	/// <summary>
+	/// Tools for working with archives
+	/// </summary>
+	/// <remarks>
+	/// TODO: Full archive support for: RAR, LRZip, ZPAQ?, Zstd?, LZ4?
+	/// Torrent 7-zip: https://sourceforge.net/p/t7z/code/HEAD/tree/
+	/// LRZIP: https://github.com/ckolivas/lrzip
+	/// ZPAQ: https://github.com/zpaq/zpaq - In progress as external DLL
+	/// Zstd: https://github.com/skbkontur/ZstdNet
+	/// LZ4: https://github.com/lz4/lz4
+	/// </remarks>
 	public static class ArchiveTools
 	{
 		private const int _bufferSize = 4096 * 128;
