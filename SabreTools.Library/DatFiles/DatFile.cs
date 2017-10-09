@@ -1283,7 +1283,7 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Remove a key from the file dictionary
+		/// Remove a key from the file dictionary if it exists
 		/// </summary>
 		/// <param name="key">Key in the dictionary to remove</param>
 		public void Remove(string key)
@@ -1314,7 +1314,7 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Remove a value from the file dictionary
+		/// Remove a value from the file dictionary if it exists
 		/// </summary>
 		/// <param name="key">Key in the dictionary to remove from</param>
 		/// <param name="value">Value to remove from the dictionary</param>
@@ -1346,7 +1346,7 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Remove a range of values from the file dictionary
+		/// Remove a range of values from the file dictionary if they exists
 		/// </summary>
 		/// <param name="key">Key in the dictionary to remove from</param>
 		/// <param name="value">Value to remove from the dictionary</param>

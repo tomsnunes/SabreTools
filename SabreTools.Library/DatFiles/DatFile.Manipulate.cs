@@ -545,63 +545,11 @@ namespace SabreTools.Library.DatFiles
 				List<DatItem> parentItems = this[parent];
 				foreach (DatItem item in parentItems)
 				{
-					// Figure out the type of the item and add it accordingly
-					switch (item.Type)
+					DatItem datItem = (DatItem)item.Clone();
+					datItem.CopyMachineInformation(copyFrom);
+					if (this[game].Where(i => i.Name == datItem.Name).Count() == 0 && !this[game].Contains(datItem))
 					{
-						case ItemType.Archive:
-							Archive archive = ((Archive)item).Clone() as Archive;
-							archive.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
-							{
-								Add(game, archive);
-							}
-
-							break;
-						case ItemType.BiosSet:
-							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							biosSet.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
-							{
-								Add(game, biosSet);
-							}
-
-							break;
-						case ItemType.Disk:
-							Disk disk = ((Disk)item).Clone() as Disk;
-							disk.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
-							{
-								Add(game, disk);
-							}
-
-							break;
-						case ItemType.Release:
-							Release release = ((Release)item).Clone() as Release;
-							release.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
-							{
-								Add(game, release);
-							}
-
-							break;
-						case ItemType.Rom:
-							Rom rom = ((Rom)item).Clone() as Rom;
-							rom.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
-							{
-								Add(game, rom);
-							}
-
-							break;
-						case ItemType.Sample:
-							Sample sample = ((Sample)item).Clone() as Sample;
-							sample.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
-							{
-								Add(game, sample);
-							}
-
-							break;
+						Add(game, datItem);
 					}
 				}
 			}
@@ -636,63 +584,11 @@ namespace SabreTools.Library.DatFiles
 					List<DatItem> devItems = this[device];
 					foreach (DatItem item in devItems)
 					{
-						// Figure out the type of the item and add it accordingly
-						switch (item.Type)
+						DatItem datItem = (DatItem)item.Clone();
+						datItem.CopyMachineInformation(copyFrom);
+						if (this[game].Where(i => i.Name == datItem.Name).Count() == 0 && !this[game].Contains(datItem))
 						{
-							case ItemType.Archive:
-								Archive archive = ((Archive)item).Clone() as Archive;
-								archive.CopyMachineInformation(copyFrom);
-								if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
-								{
-									Add(game, archive);
-								}
-
-								break;
-							case ItemType.BiosSet:
-								BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-								biosSet.CopyMachineInformation(copyFrom);
-								if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
-								{
-									Add(game, biosSet);
-								}
-
-								break;
-							case ItemType.Disk:
-								Disk disk = ((Disk)item).Clone() as Disk;
-								disk.CopyMachineInformation(copyFrom);
-								if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
-								{
-									Add(game, disk);
-								}
-
-								break;
-							case ItemType.Release:
-								Release release = ((Release)item).Clone() as Release;
-								release.CopyMachineInformation(copyFrom);
-								if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
-								{
-									Add(game, release);
-								}
-
-								break;
-							case ItemType.Rom:
-								Rom rom = ((Rom)item).Clone() as Rom;
-								rom.CopyMachineInformation(copyFrom);
-								if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
-								{
-									Add(game, rom);
-								}
-
-								break;
-							case ItemType.Sample:
-								Sample sample = ((Sample)item).Clone() as Sample;
-								sample.CopyMachineInformation(copyFrom);
-								if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
-								{
-									Add(game, sample);
-								}
-
-								break;
+							Add(game, datItem);
 						}
 					}
 				}
@@ -737,63 +633,11 @@ namespace SabreTools.Library.DatFiles
 				List<DatItem> parentItems = this[parent];
 				foreach (DatItem item in parentItems)
 				{
-					// Figure out the type of the item and add it accordingly
-					switch (item.Type)
+					DatItem datItem = (DatItem)item.Clone();
+					datItem.CopyMachineInformation(copyFrom);
+					if (this[game].Where(i => i.Name == datItem.Name).Count() == 0 && !this[game].Contains(datItem))
 					{
-						case ItemType.Archive:
-							Archive archive = ((Archive)item).Clone() as Archive;
-							archive.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name == archive.Name).Count() == 0 && !this[game].Contains(archive))
-							{
-								Add(game, archive);
-							}
-
-							break;
-						case ItemType.BiosSet:
-							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							biosSet.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name == biosSet.Name).Count() == 0 && !this[game].Contains(biosSet))
-							{
-								Add(game, biosSet);
-							}
-
-							break;
-						case ItemType.Disk:
-							Disk disk = ((Disk)item).Clone() as Disk;
-							disk.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name == disk.Name).Count() == 0 && !this[game].Contains(disk))
-							{
-								Add(game, disk);
-							}
-
-							break;
-						case ItemType.Release:
-							Release release = ((Release)item).Clone() as Release;
-							release.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name == release.Name).Count() == 0 && !this[game].Contains(release))
-							{
-								Add(game, release);
-							}
-
-							break;
-						case ItemType.Rom:
-							Rom rom = ((Rom)item).Clone() as Rom;
-							rom.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name == rom.Name).Count() == 0 && !this[game].Contains(rom))
-							{
-								Add(game, rom);
-							}
-
-							break;
-						case ItemType.Sample:
-							Sample sample = ((Sample)item).Clone() as Sample;
-							sample.CopyMachineInformation(copyFrom);
-							if (this[game].Where(i => i.Name == sample.Name).Count() == 0 && !this[game].Contains(sample))
-							{
-								Add(game, sample);
-							}
-
-							break;
+						Add(game, datItem);
 					}
 				}
 
@@ -914,34 +758,8 @@ namespace SabreTools.Library.DatFiles
 				List<DatItem> parentItems = this[parent];
 				foreach (DatItem item in parentItems)
 				{
-					// Figure out the type of the item and remove it accordingly
-					switch (item.Type)
-					{
-						case ItemType.Archive:
-							Archive archive = ((Archive)item).Clone() as Archive;
-							Remove(game, archive);
-							break;
-						case ItemType.BiosSet:
-							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							Remove(game, biosSet);
-							break;
-						case ItemType.Disk:
-							Disk disk = ((Disk)item).Clone() as Disk;
-							Remove(game, disk);
-							break;
-						case ItemType.Release:
-							Release release = ((Release)item).Clone() as Release;
-							Remove(game, release);
-							break;
-						case ItemType.Rom:
-							Rom rom = ((Rom)item).Clone() as Rom;
-							Remove(game, rom);
-							break;
-						case ItemType.Sample:
-							Sample sample = ((Sample)item).Clone() as Sample;
-							Remove(game, sample);
-							break;
-					}
+					DatItem datItem = (DatItem)item.Clone();
+					Remove(game, datItem);
 				}
 			}
 		}
@@ -983,34 +801,8 @@ namespace SabreTools.Library.DatFiles
 				List<DatItem> parentItems = this[parent];
 				foreach (DatItem item in parentItems)
 				{
-					// Figure out the type of the item and remove it accordingly
-					switch (item.Type)
-					{
-						case ItemType.Archive:
-							Archive archive = ((Archive)item).Clone() as Archive;
-							Remove(game, archive);
-							break;
-						case ItemType.BiosSet:
-							BiosSet biosSet = ((BiosSet)item).Clone() as BiosSet;
-							Remove(game, biosSet);
-							break;
-						case ItemType.Disk:
-							Disk disk = ((Disk)item).Clone() as Disk;
-							Remove(game, disk);
-							break;
-						case ItemType.Release:
-							Release release = ((Release)item).Clone() as Release;
-							Remove(game, release);
-							break;
-						case ItemType.Rom:
-							Rom rom = ((Rom)item).Clone() as Rom;
-							Remove(game, rom);
-							break;
-						case ItemType.Sample:
-							Sample sample = ((Sample)item).Clone() as Sample;
-							Remove(game, sample);
-							break;
-					}
+					DatItem datItem = (DatItem)item.Clone();
+					Remove(game, datItem);
 				}
 
 				// Now we want to get the parent romof tag and put it in each of the items
