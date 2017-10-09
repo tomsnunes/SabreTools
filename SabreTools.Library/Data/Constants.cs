@@ -5,6 +5,9 @@ using SabreTools.Library.Tools;
 
 namespace SabreTools.Library.Data
 {
+	/// <summary>
+	/// Constants that are used throughout the library
+	/// </summary>
 	public static class Constants
 	{
 		/// <summary>

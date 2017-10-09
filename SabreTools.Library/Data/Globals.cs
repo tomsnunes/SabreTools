@@ -12,6 +12,9 @@ using Alphaleonis.Win32.Filesystem;
 
 namespace SabreTools.Library.Data
 {
+	/// <summary>
+	/// Globally-accessible objects for the library
+	/// </summary>
 	public class Globals
 	{
 		#region Private implementations

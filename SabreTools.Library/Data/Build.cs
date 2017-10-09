@@ -2,6 +2,9 @@
 
 namespace SabreTools.Library.Data
 {
+	/// <summary>
+	/// Generic console preparation for program output
+	/// </summary>
 	public static class Build
 	{
 		/// <summary>
