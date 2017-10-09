@@ -22,6 +22,9 @@ using NaturalSort;
 
 namespace SabreTools.Library.DatFiles
 {
+	/// <summary>
+	/// Represents a format-agnostic DAT
+	/// </summary>
 	public partial class DatFile
 	{
 		#region Writing

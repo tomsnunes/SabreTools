@@ -5,6 +5,9 @@ using SabreTools.Library.Items;
 
 namespace SabreTools.Library.DatFiles
 {
+	/// <summary>
+	/// Represents statistical data associated with a DAT
+	/// </summary>
 	public class DatStats
 	{
 		#region Private instance variables

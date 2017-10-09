@@ -22,6 +22,9 @@ using Stream = System.IO.Stream;
 
 namespace SabreTools.Library.DatFiles
 {
+	/// <summary>
+	/// Represents a format-agnostic DAT
+	/// </summary>
 	public partial class DatFile
 	{
 		#region Rebuilding and Verifying [MODULAR DONE, FOR NOW]

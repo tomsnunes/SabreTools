@@ -16,6 +16,9 @@ using Alphaleonis.Win32.Filesystem;
 
 namespace SabreTools.Library.DatFiles
 {
+	/// <summary>
+	/// Represents a format-agnostic DAT
+	/// </summary>
 	public partial class DatFile
 	{
 		#region Instance Methods

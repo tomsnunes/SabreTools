@@ -7,6 +7,9 @@ using SabreTools.Library.Items;
 
 namespace SabreTools.Library.DatFiles
 {
+	/// <summary>
+	/// Represents the filtering operations that need to be performed on a set of items, usually a DAT
+	/// </summary>
 	public class Filter
 	{
 		#region Private instance variables

@@ -19,6 +19,9 @@ using SharpCompress.Common;
 
 namespace SabreTools.Library.DatFiles
 {
+	/// <summary>
+	/// Represents a format-agnostic DAT
+	/// </summary>
 	public partial class DatFile
 	{
 		#region Populate DAT from Directory [MODULAR DONE, FOR NOW]

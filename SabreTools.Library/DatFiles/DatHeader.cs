@@ -5,6 +5,9 @@ using SabreTools.Library.Data;
 
 namespace SabreTools.Library.DatFiles
 {
+	/// <summary>
+	/// Represents all possible DAT header information
+	/// </summary>
 	public class DatHeader : ICloneable
 	{
 		#region Private instance variables

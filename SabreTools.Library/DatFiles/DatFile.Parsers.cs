@@ -20,6 +20,9 @@ using StreamReader = System.IO.StreamReader;
 
 namespace SabreTools.Library.DatFiles
 {
+	/// <summary>
+	/// Represents a format-agnostic DAT
+	/// </summary>
 	public partial class DatFile
 	{
 		#region Parsing

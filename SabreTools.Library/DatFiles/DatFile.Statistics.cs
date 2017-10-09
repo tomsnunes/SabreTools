@@ -19,10 +19,13 @@ using StreamWriter = System.IO.StreamWriter;
 
 namespace SabreTools.Library.DatFiles
 {
-	/*
-	 * TODO: Make output standard width (HTML, without making the entire thing a table)
-	 * TODO: Multithreading? Either StringBuilder or locking
-	 */
+	/// <summary>
+	/// Represents a format-agnostic DAT
+	/// </summary>
+	/// <remarks>
+	/// TODO: Make output standard width (HTML, without making the entire thing a table)
+	/// TODO: Multithreading? Either StringBuilder or locking
+	/// </remarks>
 	public partial class DatFile
 	{
 		#region Instance Methods
