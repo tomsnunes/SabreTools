@@ -45,7 +45,7 @@ namespace SabreTools
 			if (!Console.IsOutputRedirected && scriptLocation == -1)
 			{
 				Console.Clear();
-				Build.Start("SabreTools");
+				Build.PrepareConsole("SabreTools");
 			}
 
 			// Now we remove the script tag because it messes things up
