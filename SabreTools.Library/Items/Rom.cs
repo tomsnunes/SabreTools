@@ -4,14 +4,23 @@ using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Items
 {
-	public class Rom : Disk, ICloneable
+	/// <summary>
+	/// Represents a generic file within a set
+	/// </summary>
+	public class Rom : DatItem
 	{
 		#region Private instance variables
 
 		// Rom information
-		protected long _size;
-		protected string _crc;
+		private long _size;
+		private string _crc;
+		private string _md5;
+		private string _sha1;
+		private string _sha256;
+		private string _sha384;
+		private string _sha512;
 		private string _date;
+		private ItemStatus _itemStatus;
 
 		#endregion
 
@@ -28,10 +37,40 @@ namespace SabreTools.Library.Items
 			get { return _crc; }
 			set { _crc = value; }
 		}
+		public string MD5
+		{
+			get { return _md5; }
+			set { _md5 = value; }
+		}
+		public string SHA1
+		{
+			get { return _sha1; }
+			set { _sha1 = value; }
+		}
+		public string SHA256
+		{
+			get { return _sha256; }
+			set { _sha256 = value; }
+		}
+		public string SHA384
+		{
+			get { return _sha384; }
+			set { _sha384 = value; }
+		}
+		public string SHA512
+		{
+			get { return _sha512; }
+			set { _sha512 = value; }
+		}
 		public string Date
 		{
 			get { return _date; }
 			set { _date = value; }
+		}
+		public ItemStatus ItemStatus
+		{
+			get { return _itemStatus; }
+			set { _itemStatus = value; }
 		}
 
 		#endregion

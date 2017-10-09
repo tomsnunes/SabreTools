@@ -2,6 +2,9 @@
 
 namespace SabreTools.Library.Items
 {
+	/// <summary>
+	/// Represents which BIOS(es) is associated with a set
+	/// </summary>
 	public class BiosSet : DatItem
 	{
 		#region Private instance variables

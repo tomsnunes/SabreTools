@@ -5,6 +5,9 @@ using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Items
 {
+	/// <summary>
+	/// Represents the information specific to a set/game/machine
+	/// </summary>
 	public class Machine : ICloneable
 	{
 		#region Protected instance variables

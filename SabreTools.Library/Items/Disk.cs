@@ -4,6 +4,9 @@ using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Items
 {
+	/// <summary>
+	/// Represents Compressed Hunks of Data (CHD) formatted disks which use internal hashes
+	/// </summary>
 	public class Disk : DatItem
 	{
 		#region Private instance variables

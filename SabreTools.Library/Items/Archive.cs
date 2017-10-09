@@ -1,8 +1,10 @@
-﻿using System;
-using SabreTools.Library.Data;
+﻿using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Items
 {
+	/// <summary>
+	/// Represents generic archive files to be included in a set
+	/// </summary>
 	public class Archive : DatItem
 	{
 		#region Constructors

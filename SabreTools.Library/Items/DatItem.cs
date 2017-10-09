@@ -14,6 +14,9 @@ using NaturalSort;
 
 namespace SabreTools.Library.Items
 {
+	/// <summary>
+	/// Base class for all items included in a set
+	/// </summary>
 	public abstract class DatItem : IEquatable<DatItem>, IComparable<DatItem>, ICloneable
 	{
 		#region Protected instance variables

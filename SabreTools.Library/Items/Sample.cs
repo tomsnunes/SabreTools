@@ -1,9 +1,10 @@
-﻿using System;
-
-using SabreTools.Library.Data;
+﻿using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Items
 {
+	/// <summary>
+	/// Represents a (usually WAV-formatted) sample to be included for use in the set
+	/// </summary>
 	public class Sample : DatItem
 	{
 		#region Constructors

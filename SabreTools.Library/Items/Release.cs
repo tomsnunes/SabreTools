@@ -1,9 +1,10 @@
-﻿using System;
-
-using SabreTools.Library.Data;
+﻿using SabreTools.Library.Data;
 
 namespace SabreTools.Library.Items
 {
+	/// <summary>
+	/// Represents release information about a set
+	/// </summary>
 	public class Release : DatItem
 	{
 		#region Private instance variables
