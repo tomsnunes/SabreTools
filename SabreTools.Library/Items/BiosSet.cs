@@ -44,7 +44,7 @@ namespace SabreTools.Library.Items
 
 		#region Cloning Methods
 
-		public new object Clone()
+		public override object Clone()
 		{
 			BiosSet item =  new BiosSet()
 			{

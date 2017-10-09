@@ -438,26 +438,11 @@ namespace SabreTools.Library.Items
 
 		#region Cloning Methods
 
-		public object Clone()
-		{
-			switch (_itemType)
-			{
-				case ItemType.Archive:
-					return ((Archive)this).Clone();
-				case ItemType.BiosSet:
-					return ((BiosSet)this).Clone();
-				case ItemType.Disk:
-					return ((Disk)this).Clone();
-				case ItemType.Release:
-					return ((Release)this).Clone();
-				case ItemType.Rom:
-					return ((Rom)this).Clone();
-				case ItemType.Sample:
-					return ((Sample)this).Clone();
-			}
-			
-			return null;
-		}
+		/// <summary>
+		/// Clone the DatItem
+		/// </summary>
+		/// <returns>Clone of the DatItem</returns>
+		public abstract object Clone();
 
 		/// <summary>
 		/// Copy all machine information over in one shot
