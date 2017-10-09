@@ -10,12 +10,6 @@ namespace SabreTools.Library.Items
 	/// </summary>
 	public class Machine : ICloneable
 	{
-		#region Protected instance variables
-
-		private Guid _guid;
-
-		#endregion
-
 		#region Publicly facing variables
 
 		// Machine information
@@ -57,7 +51,6 @@ namespace SabreTools.Library.Items
 			RebuildTo = null;
 			Devices = null;
 			MachineType = MachineType.NULL;
-			_guid = new Guid();
 		}
 
 		/// <summary>
@@ -81,7 +74,6 @@ namespace SabreTools.Library.Items
 			RebuildTo = null;
 			Devices = null;
 			MachineType = MachineType.NULL;
-			_guid = new Guid();
 		}
 
 		#endregion
@@ -111,46 +103,6 @@ namespace SabreTools.Library.Items
 				Devices = this.Devices,
 				MachineType = this.MachineType,
 			};
-		}
-
-		#endregion
-
-		#region Equality comparerers
-
-		/// <summary>
-		/// Override the Equals method
-		/// </summary>
-		public override bool Equals(object o)
-		{
-			if (this == null && o == null)
-			{
-				return true;
-			}
-			else if (this == null || o == null)
-			{
-				return false;
-			}
-			else if (o.GetType() != typeof(Machine))
-			{
-				return false;
-			}
-
-			Machine b = (Machine)o;
-
-			return (this.Name == b.Name
-				&& this.Comment == b.Comment
-				&& this.Description == b.Description
-				&& this.Year == b.Year
-				&& this.Manufacturer == b.Manufacturer
-				&& this.RomOf == b.RomOf
-				&& this.CloneOf == b.CloneOf
-				&& this.SampleOf == b.SampleOf
-				&& this.SourceFile == b.SourceFile
-				&& this.Runnable == b.Runnable
-				&& this.Board == b.Board
-				&& this.RebuildTo == b.RebuildTo
-				&& this.Devices == b.Devices
-				&& this.MachineType == b.MachineType);
 		}
 
 		#endregion
