@@ -76,7 +76,7 @@ namespace SabreTools.Library.Items
 
 		public override object Clone()
 		{
-			Disk item = new Disk()
+			return new Disk()
 			{
 				Name = this.Name,
 				Type = this.Type,
@@ -91,6 +91,21 @@ namespace SabreTools.Library.Items
 				AreaName = this.AreaName,
 				AreaSize = this.AreaSize,
 
+				MachineName = this.MachineName,
+				Comment = this.Comment,
+				MachineDescription = this.MachineDescription,
+				Year = this.Year,
+				Manufacturer = this.Manufacturer,
+				RomOf = this.RomOf,
+				CloneOf = this.CloneOf,
+				SampleOf = this.SampleOf,
+				SourceFile = this.SourceFile,
+				Runnable = this.Runnable,
+				Board = this.Board,
+				RebuildTo = this.RebuildTo,
+				Devices = this.Devices,
+				MachineType = this.MachineType,
+
 				SystemID = this.SystemID,
 				System = this.System,
 				SourceID = this.SourceID,
@@ -103,9 +118,6 @@ namespace SabreTools.Library.Items
 				SHA512 = this.SHA512,
 				ItemStatus = this.ItemStatus,
 			};
-
-			item.CopyMachineInformation(this);
-			return item;
 		}
 
 		#endregion

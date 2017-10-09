@@ -24,7 +24,7 @@ namespace SabreTools.Library.Items
 
 		public override object Clone()
 		{
-			Archive item = new Archive()
+			return new Archive()
 			{
 				Name = this.Name,
 				Type = this.Type,
@@ -39,14 +39,26 @@ namespace SabreTools.Library.Items
 				AreaName = this.AreaName,
 				AreaSize = this.AreaSize,
 
+				MachineName = this.MachineName,
+				Comment = this.Comment,
+				MachineDescription = this.MachineDescription,
+				Year = this.Year,
+				Manufacturer = this.Manufacturer,
+				RomOf = this.RomOf,
+				CloneOf = this.CloneOf,
+				SampleOf = this.SampleOf,
+				SourceFile = this.SourceFile,
+				Runnable = this.Runnable,
+				Board = this.Board,
+				RebuildTo = this.RebuildTo,
+				Devices = this.Devices,
+				MachineType = this.MachineType,
+
 				SystemID = this.SystemID,
 				System = this.System,
 				SourceID = this.SourceID,
 				Source = this.Source,
 			};
-
-			item.CopyMachineInformation(this);
-			return item;
 		}
 
 		#endregion

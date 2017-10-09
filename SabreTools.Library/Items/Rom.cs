@@ -140,7 +140,7 @@ namespace SabreTools.Library.Items
 
 		public override object Clone()
 		{
-			Rom item = new Rom()
+			return new Rom()
 			{
 				Name = this.Name,
 				Type = this.Type,
@@ -155,24 +155,36 @@ namespace SabreTools.Library.Items
 				AreaName = this.AreaName,
 				AreaSize = this.AreaSize,
 
+				MachineName = this.MachineName,
+				Comment = this.Comment,
+				MachineDescription = this.MachineDescription,
+				Year = this.Year,
+				Manufacturer = this.Manufacturer,
+				RomOf = this.RomOf,
+				CloneOf = this.CloneOf,
+				SampleOf = this.SampleOf,
+				SourceFile = this.SourceFile,
+				Runnable = this.Runnable,
+				Board = this.Board,
+				RebuildTo = this.RebuildTo,
+				Devices = this.Devices,
+				MachineType = this.MachineType,
+
 				SystemID = this.SystemID,
 				System = this.System,
 				SourceID = this.SourceID,
 				Source = this.Source,
 
-				MD5 = _md5,
-				SHA1 = _sha1,
-				SHA256 = _sha256,
-				SHA384 = _sha384,
-				SHA512 = _sha512,
-				ItemStatus = this.ItemStatus,
 				Size = this.Size,
-				CRC = _crc,
+				CRC = this.CRC,
+				MD5 = this.MD5,
+				SHA1 = this.SHA1,
+				SHA256 = this.SHA256,
+				SHA384 = this.SHA384,
+				SHA512 = this.SHA512,
+				ItemStatus = this.ItemStatus,
 				Date = this.Date,
 			};
-
-			item.CopyMachineInformation(this);
-			return item;
 		}
 
 		#endregion
