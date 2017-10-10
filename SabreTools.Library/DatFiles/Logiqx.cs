@@ -1,0 +1,1508 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Web;
+using System.Xml;
+
+using SabreTools.Library.Data;
+using SabreTools.Library.Items;
+using SabreTools.Library.Tools;
+
+#if MONO
+using System.IO;
+#else
+using Alphaleonis.Win32.Filesystem;
+
+using FileStream = System.IO.FileStream;
+using StreamWriter = System.IO.StreamWriter;
+#endif
+using NaturalSort;
+
+namespace SabreTools.Library.DatFiles
+{
+	/// <summary>
+	/// Represents parsing and writing of a Logiqx-derived DAT
+	/// </summary>
+	public class Logiqx
+	{
+		/// <summary>
+		/// Parse a Logiqx XML DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="datFile">DatFile to populate with the read information</param>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// <remarks>
+		/// </remarks>
+		public static void Parse(
+			DatFile datFile,
+
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Miscellaneous
+			bool keep,
+			bool clean,
+			bool remUnicode)
+		{
+			// Prepare all internal variables
+			XmlReader subreader, headreader, flagreader;
+			bool superdat = false, empty = true;
+			string key = "", date = "";
+			long size = -1;
+			ItemStatus its = ItemStatus.None;
+			List<string> parent = new List<string>();
+
+			Encoding enc = Style.GetEncoding(filename);
+			XmlReader xtr = FileTools.GetXmlTextReader(filename);
+
+			// If we got a null reader, just return
+			if (xtr == null)
+			{
+				return;
+			}
+
+			// Otherwise, read the file to the end
+			try
+			{
+				xtr.MoveToContent();
+				while (!xtr.EOF)
+				{
+					// If we're ending a folder or game, take care of possibly empty games and removing from the parent
+					if (xtr.NodeType == XmlNodeType.EndElement && (xtr.Name == "directory" || xtr.Name == "dir"))
+					{
+						// If we didn't find any items in the folder, make sure to add the blank rom
+						if (empty)
+						{
+							string tempgame = String.Join("\\", parent);
+							Rom rom = new Rom("null", tempgame, omitFromScan: Hash.DeepHashes); // TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
+
+							// Now process and add the rom
+							key = datFile.ParseAddHelper(rom, clean, remUnicode);
+						}
+
+						// Regardless, end the current folder
+						int parentcount = parent.Count;
+						if (parentcount == 0)
+						{
+							Globals.Logger.Verbose("Empty parent '{0}' found in '{1}'", String.Join("\\", parent), filename);
+							empty = true;
+						}
+
+						// If we have an end folder element, remove one item from the parent, if possible
+						if (parentcount > 0)
+						{
+							parent.RemoveAt(parent.Count - 1);
+							if (keep && parentcount > 1)
+							{
+								datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? "SuperDAT" : datFile.Type);
+								superdat = true;
+							}
+						}
+					}
+
+					// We only want elements
+					if (xtr.NodeType != XmlNodeType.Element)
+					{
+						xtr.Read();
+						continue;
+					}
+
+					switch (xtr.Name)
+					{
+						// Handle MAME listxml since they're halfway between a SL and a Logiqx XML
+						case "mame":
+							if (xtr.GetAttribute("build") != null)
+							{
+								datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? xtr.GetAttribute("build") : datFile.Name);
+								datFile.Description = (String.IsNullOrEmpty(datFile.Description) ? datFile.Name : datFile.Name);
+							}
+							xtr.Read();
+							break;
+						// New software lists have this behavior
+						case "softwarelist":
+							if (xtr.GetAttribute("name") != null)
+							{
+								datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? xtr.GetAttribute("name") : datFile.Name);
+							}
+							if (xtr.GetAttribute("description") != null)
+							{
+								datFile.Description = (String.IsNullOrEmpty(datFile.Description) ? xtr.GetAttribute("description") : datFile.Description);
+							}
+							if (xtr.GetAttribute("forcemerging") != null && datFile.ForceMerging == ForceMerging.None)
+							{
+								switch (xtr.GetAttribute("forcemerging"))
+								{
+									case "none":
+										datFile.ForceMerging = ForceMerging.None;
+										break;
+									case "split":
+										datFile.ForceMerging = ForceMerging.Split;
+										break;
+									case "merged":
+										datFile.ForceMerging = ForceMerging.Merged;
+										break;
+									case "nonmerged":
+										datFile.ForceMerging = ForceMerging.NonMerged;
+										break;
+									case "full":
+										datFile.ForceMerging = ForceMerging.Full;
+										break;
+								}
+							}
+							if (xtr.GetAttribute("forcenodump") != null && datFile.ForceNodump == ForceNodump.None)
+							{
+								switch (xtr.GetAttribute("forcenodump"))
+								{
+									case "obsolete":
+										datFile.ForceNodump = ForceNodump.Obsolete;
+										break;
+									case "required":
+										datFile.ForceNodump = ForceNodump.Required;
+										break;
+									case "ignore":
+										datFile.ForceNodump = ForceNodump.Ignore;
+										break;
+								}
+							}
+							if (xtr.GetAttribute("forcepacking") != null && datFile.ForcePacking == ForcePacking.None)
+							{
+								switch (xtr.GetAttribute("forcepacking"))
+								{
+									case "zip":
+										datFile.ForcePacking = ForcePacking.Zip;
+										break;
+									case "unzip":
+										datFile.ForcePacking = ForcePacking.Unzip;
+										break;
+								}
+							}
+							xtr.Read();
+							break;
+						// Handle M1 DATs since they're 99% the same as a SL DAT
+						case "m1":
+							datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? "M1" : datFile.Name);
+							datFile.Description = (String.IsNullOrEmpty(datFile.Description) ? "M1" : datFile.Description);
+							if (xtr.GetAttribute("version") != null)
+							{
+								datFile.Version = (String.IsNullOrEmpty(datFile.Version) ? xtr.GetAttribute("version") : datFile.Version);
+							}
+							xtr.Read();
+							break;
+						// OfflineList has a different header format
+						case "configuration":
+							headreader = xtr.ReadSubtree();
+
+							// If there's no subtree to the header, skip it
+							if (headreader == null)
+							{
+								xtr.Skip();
+								continue;
+							}
+
+							// Otherwise, read what we can from the header
+							while (!headreader.EOF)
+							{
+								// We only want elements
+								if (headreader.NodeType != XmlNodeType.Element || headreader.Name == "configuration")
+								{
+									headreader.Read();
+									continue;
+								}
+
+								// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
+								string content = "";
+								switch (headreader.Name.ToLowerInvariant())
+								{
+									case "datname":
+										content = headreader.ReadElementContentAsString(); ;
+										datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? content : datFile.Name);
+										superdat = superdat || content.Contains(" - SuperDAT");
+										if (keep && superdat)
+										{
+											datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? "SuperDAT" : datFile.Type);
+										}
+										break;
+									case "datversionurl":
+										content = headreader.ReadElementContentAsString(); ;
+										datFile.Url = (String.IsNullOrEmpty(datFile.Name) ? content : datFile.Url);
+										break;
+									default:
+										headreader.Read();
+										break;
+								}
+							}
+
+							break;
+						// We want to process the entire subtree of the header
+						case "header":
+							headreader = xtr.ReadSubtree();
+
+							// If there's no subtree to the header, skip it
+							if (headreader == null)
+							{
+								xtr.Skip();
+								continue;
+							}
+
+							// Otherwise, read what we can from the header
+							while (!headreader.EOF)
+							{
+								// We only want elements
+								if (headreader.NodeType != XmlNodeType.Element || headreader.Name == "header")
+								{
+									headreader.Read();
+									continue;
+								}
+
+								// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
+								string content = "";
+								switch (headreader.Name)
+								{
+									case "name":
+										content = headreader.ReadElementContentAsString(); ;
+										datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? content : datFile.Name);
+										superdat = superdat || content.Contains(" - SuperDAT");
+										if (keep && superdat)
+										{
+											datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? "SuperDAT" : datFile.Type);
+										}
+										break;
+									case "description":
+										content = headreader.ReadElementContentAsString();
+										datFile.Description = (String.IsNullOrEmpty(datFile.Description) ? content : datFile.Description);
+										break;
+									case "rootdir":
+										content = headreader.ReadElementContentAsString();
+										datFile.RootDir = (String.IsNullOrEmpty(datFile.RootDir) ? content : datFile.RootDir);
+										break;
+									case "category":
+										content = headreader.ReadElementContentAsString();
+										datFile.Category = (String.IsNullOrEmpty(datFile.Category) ? content : datFile.Category);
+										break;
+									case "version":
+										content = headreader.ReadElementContentAsString();
+										datFile.Version = (String.IsNullOrEmpty(datFile.Version) ? content : datFile.Version);
+										break;
+									case "date":
+										content = headreader.ReadElementContentAsString();
+										datFile.Date = (String.IsNullOrEmpty(datFile.Date) ? content.Replace(".", "/") : datFile.Date);
+										break;
+									case "author":
+										content = headreader.ReadElementContentAsString();
+										datFile.Author = (String.IsNullOrEmpty(datFile.Author) ? content : datFile.Author);
+
+										// Special cases for SabreDAT
+										datFile.Email = (String.IsNullOrEmpty(datFile.Email) && !String.IsNullOrEmpty(headreader.GetAttribute("email")) ?
+											headreader.GetAttribute("email") : datFile.Email);
+										datFile.Homepage = (String.IsNullOrEmpty(datFile.Homepage) && !String.IsNullOrEmpty(headreader.GetAttribute("homepage")) ?
+											headreader.GetAttribute("homepage") : datFile.Homepage);
+										datFile.Url = (String.IsNullOrEmpty(datFile.Url) && !String.IsNullOrEmpty(headreader.GetAttribute("url")) ?
+											headreader.GetAttribute("url") : datFile.Url);
+										break;
+									case "email":
+										content = headreader.ReadElementContentAsString();
+										datFile.Email = (String.IsNullOrEmpty(datFile.Email) ? content : datFile.Email);
+										break;
+									case "homepage":
+										content = headreader.ReadElementContentAsString();
+										datFile.Homepage = (String.IsNullOrEmpty(datFile.Homepage) ? content : datFile.Homepage);
+										break;
+									case "url":
+										content = headreader.ReadElementContentAsString();
+										datFile.Url = (String.IsNullOrEmpty(datFile.Url) ? content : datFile.Url);
+										break;
+									case "comment":
+										content = headreader.ReadElementContentAsString();
+										datFile.Comment = (String.IsNullOrEmpty(datFile.Comment) ? content : datFile.Comment);
+										break;
+									case "type":
+										content = headreader.ReadElementContentAsString();
+										datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? content : datFile.Type);
+										superdat = superdat || content.Contains("SuperDAT");
+										break;
+									case "clrmamepro":
+									case "romcenter":
+										if (headreader.GetAttribute("header") != null)
+										{
+											datFile.Header = (String.IsNullOrEmpty(datFile.Header) ? headreader.GetAttribute("header") : datFile.Header);
+										}
+										if (headreader.GetAttribute("plugin") != null)
+										{
+											datFile.Header = (String.IsNullOrEmpty(datFile.Header) ? headreader.GetAttribute("plugin") : datFile.Header);
+										}
+										if (headreader.GetAttribute("forcemerging") != null && datFile.ForceMerging == ForceMerging.None)
+										{
+											switch (headreader.GetAttribute("forcemerging"))
+											{
+												case "none":
+													datFile.ForceMerging = ForceMerging.None;
+													break;
+												case "split":
+													datFile.ForceMerging = ForceMerging.Split;
+													break;
+												case "merged":
+													datFile.ForceMerging = ForceMerging.Merged;
+													break;
+												case "nonmerged":
+													datFile.ForceMerging = ForceMerging.NonMerged;
+													break;
+												case "full":
+													datFile.ForceMerging = ForceMerging.Full;
+													break;
+											}
+										}
+										if (headreader.GetAttribute("forcenodump") != null && datFile.ForceNodump == ForceNodump.None)
+										{
+											switch (headreader.GetAttribute("forcenodump"))
+											{
+												case "obsolete":
+													datFile.ForceNodump = ForceNodump.Obsolete;
+													break;
+												case "required":
+													datFile.ForceNodump = ForceNodump.Required;
+													break;
+												case "ignore":
+													datFile.ForceNodump = ForceNodump.Ignore;
+													break;
+											}
+										}
+										if (headreader.GetAttribute("forcepacking") != null && datFile.ForcePacking == ForcePacking.None)
+										{
+											switch (headreader.GetAttribute("forcepacking"))
+											{
+												case "zip":
+													datFile.ForcePacking = ForcePacking.Zip;
+													break;
+												case "unzip":
+													datFile.ForcePacking = ForcePacking.Unzip;
+													break;
+											}
+										}
+										headreader.Read();
+										break;
+									case "flags":
+										flagreader = xtr.ReadSubtree();
+
+										// If we somehow have a null flag section, skip it
+										if (flagreader == null)
+										{
+											xtr.Skip();
+											continue;
+										}
+
+										while (!flagreader.EOF)
+										{
+											// We only want elements
+											if (flagreader.NodeType != XmlNodeType.Element || flagreader.Name == "flags")
+											{
+												flagreader.Read();
+												continue;
+											}
+
+											switch (flagreader.Name)
+											{
+												case "flag":
+													if (flagreader.GetAttribute("name") != null && flagreader.GetAttribute("value") != null)
+													{
+														content = flagreader.GetAttribute("value");
+														switch (flagreader.GetAttribute("name"))
+														{
+															case "type":
+																datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? content : datFile.Type);
+																superdat = superdat || content.Contains("SuperDAT");
+																break;
+															case "forcemerging":
+																if (datFile.ForceMerging == ForceMerging.None)
+																{
+																	switch (content)
+																	{
+																		case "split":
+																			datFile.ForceMerging = ForceMerging.Split;
+																			break;
+																		case "none":
+																			datFile.ForceMerging = ForceMerging.None;
+																			break;
+																		case "full":
+																			datFile.ForceMerging = ForceMerging.Full;
+																			break;
+																	}
+																}
+																break;
+															case "forcenodump":
+																if (datFile.ForceNodump == ForceNodump.None)
+																{
+																	switch (content)
+																	{
+																		case "obsolete":
+																			datFile.ForceNodump = ForceNodump.Obsolete;
+																			break;
+																		case "required":
+																			datFile.ForceNodump = ForceNodump.Required;
+																			break;
+																		case "ignore":
+																			datFile.ForceNodump = ForceNodump.Ignore;
+																			break;
+																	}
+																}
+																break;
+															case "forcepacking":
+																if (datFile.ForcePacking == ForcePacking.None)
+																{
+																	switch (content)
+																	{
+																		case "zip":
+																			datFile.ForcePacking = ForcePacking.Zip;
+																			break;
+																		case "unzip":
+																			datFile.ForcePacking = ForcePacking.Unzip;
+																			break;
+																	}
+																}
+																break;
+														}
+													}
+													flagreader.Read();
+													break;
+												default:
+													flagreader.Read();
+													break;
+											}
+										}
+										headreader.Skip();
+										break;
+									default:
+										headreader.Read();
+										break;
+								}
+							}
+
+							// Skip the header node now that we've processed it
+							xtr.Skip();
+							break;
+						case "machine":
+						case "game":
+						case "software":
+							string temptype = xtr.Name, publisher = "", partname = "", partinterface = "", areaname = "";
+							bool? supported = null;
+							long? areasize = null;
+							List<Tuple<string, string>> infos = new List<Tuple<string, string>>();
+							List<Tuple<string, string>> features = new List<Tuple<string, string>>();
+
+							// We want to process the entire subtree of the game
+							subreader = xtr.ReadSubtree();
+
+							// Safeguard for interesting case of "software" without anything except roms
+							bool software = false;
+
+							// If we have an empty machine, skip it
+							if (subreader == null)
+							{
+								xtr.Skip();
+								continue;
+							}
+
+							// Otherwise, add what is possible
+							subreader.MoveToContent();
+
+							// Create a new machine
+							Machine machine = new Machine
+							{
+								Name = xtr.GetAttribute("name"),
+								Description = xtr.GetAttribute("name"),
+
+								RomOf = xtr.GetAttribute("romof") ?? "",
+								CloneOf = xtr.GetAttribute("cloneof") ?? "",
+								SampleOf = xtr.GetAttribute("sampleof") ?? "",
+
+								Devices = new List<string>(),
+								MachineType =
+									xtr.GetAttribute("isbios") == "yes" ? MachineType.Bios :
+									xtr.GetAttribute("isdevice") == "yes" ? MachineType.Device :
+									xtr.GetAttribute("ismechanical") == "yes" ? MachineType.Mechanical :
+									MachineType.None,
+							};
+
+							// Get the supported value from the reader
+							if (subreader.GetAttribute("supported") != null)
+							{
+								switch (subreader.GetAttribute("supported"))
+								{
+									case "no":
+										supported = false;
+										break;
+									case "yes":
+										supported = true;
+										break;
+								}
+							}
+
+							// Get the runnable value from the reader
+							if (subreader.GetAttribute("runnable") != null)
+							{
+								switch (subreader.GetAttribute("runnable"))
+								{
+									case "no":
+										machine.Runnable = false;
+										break;
+									case "yes":
+										machine.Runnable = true;
+										break;
+								}
+							}
+
+							if (superdat && !keep)
+							{
+								string tempout = Regex.Match(machine.Name, @".*?\\(.*)").Groups[1].Value;
+								if (tempout != "")
+								{
+									machine.Name = tempout;
+								}
+							}
+							// Get the name of the game from the parent
+							else if (superdat && keep && parent.Count > 0)
+							{
+								machine.Name = String.Join("\\", parent) + "\\" + machine.Name;
+							}
+
+							// Special offline list parts
+							string ext = "";
+							string releaseNumber = "";
+
+							while (software || !subreader.EOF)
+							{
+								software = false;
+
+								// We only want elements
+								if (subreader.NodeType != XmlNodeType.Element)
+								{
+									if (subreader.NodeType == XmlNodeType.EndElement && subreader.Name == "part")
+									{
+										partname = "";
+										partinterface = "";
+										features = new List<Tuple<string, string>>();
+									}
+									if (subreader.NodeType == XmlNodeType.EndElement && (subreader.Name == "dataarea" || subreader.Name == "diskarea"))
+									{
+										areaname = "";
+										areasize = null;
+									}
+
+									subreader.Read();
+									continue;
+								}
+
+								// Get the roms from the machine
+								switch (subreader.Name)
+								{
+									// For OfflineList only
+									case "title":
+										machine.Name = subreader.ReadElementContentAsString();
+										break;
+									case "releaseNumber":
+										releaseNumber = subreader.ReadElementContentAsString();
+										break;
+									case "romSize":
+										if (!Int64.TryParse(subreader.ReadElementContentAsString(), out size))
+										{
+											size = -1;
+										}
+										break;
+									case "romCRC":
+										empty = false;
+
+										ext = (subreader.GetAttribute("extension") ?? "");
+
+										DatItem olrom = new Rom
+										{
+											Name = releaseNumber + " - " + machine.Name + ext,
+											Size = size,
+											CRC = subreader.ReadElementContentAsString(),
+											ItemStatus = ItemStatus.None,
+										};
+
+										olrom.CopyMachineInformation(machine);
+
+										// Now process and add the rom
+										key = datFile.ParseAddHelper(olrom, clean, remUnicode);
+										break;
+
+									// For Software List and MAME listxml only
+									case "device_ref":
+										string device = subreader.GetAttribute("name");
+										if (!machine.Devices.Contains(device))
+										{
+											machine.Devices.Add(device);
+										}
+
+										subreader.Read();
+										break;
+									case "slotoption":
+										string slotoption = subreader.GetAttribute("devname");
+										if (!machine.Devices.Contains(slotoption))
+										{
+											machine.Devices.Add(slotoption);
+										}
+
+										subreader.Read();
+										break;
+									case "publisher":
+										publisher = subreader.ReadElementContentAsString();
+										break;
+									case "info":
+										infos.Add(Tuple.Create(subreader.GetAttribute("name"), subreader.GetAttribute("value")));
+										subreader.Read();
+										break;
+									case "part":
+										partname = subreader.GetAttribute("name");
+										partinterface = subreader.GetAttribute("interface");
+										subreader.Read();
+										break;
+									case "feature":
+										features.Add(Tuple.Create(subreader.GetAttribute("name"), subreader.GetAttribute("value")));
+										subreader.Read();
+										break;
+									case "dataarea":
+									case "diskarea":
+										areaname = subreader.GetAttribute("name");
+										long areasizetemp = -1;
+										if (Int64.TryParse(subreader.GetAttribute("size"), out areasizetemp))
+										{
+											areasize = areasizetemp;
+										}
+										subreader.Read();
+										break;
+
+									// For Logiqx, SabreDAT, and Software List
+									case "description":
+										machine.Description = subreader.ReadElementContentAsString();
+										break;
+									case "year":
+										machine.Year = subreader.ReadElementContentAsString();
+										break;
+									case "manufacturer":
+										machine.Manufacturer = subreader.ReadElementContentAsString();
+										break;
+									case "release":
+										empty = false;
+
+										bool? defaultrel = null;
+										if (subreader.GetAttribute("default") != null)
+										{
+											if (subreader.GetAttribute("default") == "yes")
+											{
+												defaultrel = true;
+											}
+											else if (subreader.GetAttribute("default") == "no")
+											{
+												defaultrel = false;
+											}
+										}
+
+										DatItem relrom = new Release
+										{
+											Name = subreader.GetAttribute("name"),
+											Region = subreader.GetAttribute("region"),
+											Language = subreader.GetAttribute("language"),
+											Date = date,
+											Default = defaultrel,
+
+											Supported = supported,
+											Publisher = publisher,
+											Infos = infos,
+											PartName = partname,
+											PartInterface = partinterface,
+											Features = features,
+											AreaName = areaname,
+											AreaSize = areasize,
+										};
+
+										relrom.CopyMachineInformation(machine);
+
+										// Now process and add the rom
+										key = datFile.ParseAddHelper(relrom, clean, remUnicode);
+
+										subreader.Read();
+										break;
+									case "biosset":
+										empty = false;
+
+										bool? defaultbios = null;
+										if (subreader.GetAttribute("default") != null)
+										{
+											if (subreader.GetAttribute("default") == "yes")
+											{
+												defaultbios = true;
+											}
+											else if (subreader.GetAttribute("default") == "no")
+											{
+												defaultbios = false;
+											}
+										}
+
+										DatItem biosrom = new BiosSet
+										{
+											Name = subreader.GetAttribute("name"),
+											Description = subreader.GetAttribute("description"),
+											Default = defaultbios,
+
+											Supported = supported,
+											Publisher = publisher,
+											Infos = infos,
+											PartName = partname,
+											PartInterface = partinterface,
+											Features = features,
+											AreaName = areaname,
+											AreaSize = areasize,
+
+											SystemID = sysid,
+											System = filename,
+											SourceID = srcid,
+										};
+
+										biosrom.CopyMachineInformation(machine);
+
+										// Now process and add the rom
+										key = datFile.ParseAddHelper(biosrom, clean, remUnicode);
+
+										subreader.Read();
+										break;
+									case "archive":
+										empty = false;
+
+										DatItem archiverom = new Archive
+										{
+											Name = subreader.GetAttribute("name"),
+
+											Supported = supported,
+											Publisher = publisher,
+											Infos = infos,
+											PartName = partname,
+											PartInterface = partinterface,
+											Features = features,
+											AreaName = areaname,
+											AreaSize = areasize,
+
+											SystemID = sysid,
+											System = filename,
+											SourceID = srcid,
+										};
+
+										archiverom.CopyMachineInformation(machine);
+
+										// Now process and add the rom
+										key = datFile.ParseAddHelper(archiverom, clean, remUnicode);
+
+										subreader.Read();
+										break;
+									case "sample":
+										empty = false;
+
+										DatItem samplerom = new Sample
+										{
+											Name = subreader.GetAttribute("name"),
+
+											Supported = supported,
+											Publisher = publisher,
+											Infos = infos,
+											PartName = partname,
+											PartInterface = partinterface,
+											Features = features,
+											AreaName = areaname,
+											AreaSize = areasize,
+
+											SystemID = sysid,
+											System = filename,
+											SourceID = srcid,
+										};
+
+										samplerom.CopyMachineInformation(machine);
+
+										// Now process and add the rom
+										key = datFile.ParseAddHelper(samplerom, clean, remUnicode);
+
+										subreader.Read();
+										break;
+									case "rom":
+									case "disk":
+										empty = false;
+
+										// If the rom has a merge tag, add it
+										string merge = subreader.GetAttribute("merge");
+
+										// If the rom has a status, flag it
+										its = ItemStatus.None;
+										if (subreader.GetAttribute("flags") == "good" || subreader.GetAttribute("status") == "good")
+										{
+											its = ItemStatus.Good;
+										}
+										if (subreader.GetAttribute("flags") == "baddump" || subreader.GetAttribute("status") == "baddump")
+										{
+											its = ItemStatus.BadDump;
+										}
+										if (subreader.GetAttribute("flags") == "nodump" || subreader.GetAttribute("status") == "nodump")
+										{
+											its = ItemStatus.Nodump;
+										}
+										if (subreader.GetAttribute("flags") == "verified" || subreader.GetAttribute("status") == "verified")
+										{
+											its = ItemStatus.Verified;
+										}
+
+										// If the rom has a Date attached, read it in and then sanitize it
+										date = "";
+										if (subreader.GetAttribute("date") != null)
+										{
+											DateTime dateTime = DateTime.Now;
+											if (DateTime.TryParse(subreader.GetAttribute("date"), out dateTime))
+											{
+												date = dateTime.ToString();
+											}
+											else
+											{
+												date = subreader.GetAttribute("date");
+											}
+										}
+
+										// Take care of hex-sized files
+										size = -1;
+										if (subreader.GetAttribute("size") != null && subreader.GetAttribute("size").Contains("0x"))
+										{
+											size = Convert.ToInt64(subreader.GetAttribute("size"), 16);
+										}
+										else if (subreader.GetAttribute("size") != null)
+										{
+											Int64.TryParse(subreader.GetAttribute("size"), out size);
+										}
+
+										// If the rom is continue or ignore, add the size to the previous rom
+										if (subreader.GetAttribute("loadflag") == "continue" || subreader.GetAttribute("loadflag") == "ignore")
+										{
+											int index = datFile[key].Count() - 1;
+											DatItem lastrom = datFile[key][index];
+											if (lastrom.Type == ItemType.Rom)
+											{
+												((Rom)lastrom).Size += size;
+											}
+											datFile[key].RemoveAt(index);
+											datFile[key].Add(lastrom);
+											subreader.Read();
+											continue;
+										}
+
+										// If we're in clean mode, sanitize the game name
+										if (clean)
+										{
+											machine.Name = Style.CleanGameName(machine.Name.Split(Path.DirectorySeparatorChar));
+										}
+
+										DatItem inrom;
+										switch (subreader.Name.ToLowerInvariant())
+										{
+											case "disk":
+												inrom = new Disk
+												{
+													Name = subreader.GetAttribute("name"),
+													MD5 = subreader.GetAttribute("md5")?.ToLowerInvariant(),
+													SHA1 = subreader.GetAttribute("sha1")?.ToLowerInvariant(),
+													SHA256 = subreader.GetAttribute("sha256")?.ToLowerInvariant(),
+													SHA384 = subreader.GetAttribute("sha384")?.ToLowerInvariant(),
+													SHA512 = subreader.GetAttribute("sha512")?.ToLowerInvariant(),
+													MergeTag = merge,
+													ItemStatus = its,
+
+													Supported = supported,
+													Publisher = publisher,
+													Infos = infos,
+													PartName = partname,
+													PartInterface = partinterface,
+													Features = features,
+													AreaName = areaname,
+													AreaSize = areasize,
+
+													SystemID = sysid,
+													System = filename,
+													SourceID = srcid,
+												};
+												break;
+											case "rom":
+											default:
+												inrom = new Rom
+												{
+													Name = subreader.GetAttribute("name"),
+													Size = size,
+													CRC = subreader.GetAttribute("crc"),
+													MD5 = subreader.GetAttribute("md5")?.ToLowerInvariant(),
+													SHA1 = subreader.GetAttribute("sha1")?.ToLowerInvariant(),
+													SHA256 = subreader.GetAttribute("sha256")?.ToLowerInvariant(),
+													SHA384 = subreader.GetAttribute("sha384")?.ToLowerInvariant(),
+													SHA512 = subreader.GetAttribute("sha512")?.ToLowerInvariant(),
+													ItemStatus = its,
+													MergeTag = merge,
+													Date = date,
+
+													Supported = supported,
+													Publisher = publisher,
+													Infos = infos,
+													PartName = partname,
+													PartInterface = partinterface,
+													Features = features,
+													AreaName = areaname,
+													AreaSize = areasize,
+
+													SystemID = sysid,
+													System = filename,
+													SourceID = srcid,
+												};
+												break;
+										}
+
+										inrom.CopyMachineInformation(machine);
+
+										// Now process and add the rom
+										key = datFile.ParseAddHelper(inrom, clean, remUnicode);
+
+										subreader.Read();
+										break;
+									default:
+										subreader.Read();
+										break;
+								}
+							}
+
+							xtr.Skip();
+							break;
+						case "dir":
+						case "directory":
+							// Set SuperDAT flag for all SabreDAT inputs, regardless of depth
+							superdat = true;
+							if (keep)
+							{
+								datFile.Type = (datFile.Type == "" ? "SuperDAT" : datFile.Type);
+							}
+
+							string foldername = (xtr.GetAttribute("name") ?? "");
+							if (foldername != "")
+							{
+								parent.Add(foldername);
+							}
+
+							xtr.Read();
+							break;
+						case "file":
+							empty = false;
+
+							// If the rom is itemStatus, flag it
+							its = ItemStatus.None;
+							flagreader = xtr.ReadSubtree();
+
+							// If the subtree is empty, skip it
+							if (flagreader == null)
+							{
+								xtr.Skip();
+								continue;
+							}
+
+							while (!flagreader.EOF)
+							{
+								// We only want elements
+								if (flagreader.NodeType != XmlNodeType.Element || flagreader.Name == "flags")
+								{
+									flagreader.Read();
+									continue;
+								}
+
+								switch (flagreader.Name)
+								{
+									case "flag":
+									case "status":
+										if (flagreader.GetAttribute("name") != null && flagreader.GetAttribute("value") != null)
+										{
+											string content = flagreader.GetAttribute("value");
+											switch (flagreader.GetAttribute("name"))
+											{
+												case "good":
+													its = ItemStatus.Good;
+													break;
+												case "baddump":
+													its = ItemStatus.BadDump;
+													break;
+												case "nodump":
+													its = ItemStatus.Nodump;
+													break;
+												case "verified":
+													its = ItemStatus.Verified;
+													break;
+											}
+										}
+										break;
+								}
+
+								flagreader.Read();
+							}
+
+							// If the rom has a Date attached, read it in and then sanitize it
+							date = "";
+							if (xtr.GetAttribute("date") != null)
+							{
+								date = DateTime.Parse(xtr.GetAttribute("date")).ToString();
+							}
+
+							// Take care of hex-sized files
+							size = -1;
+							if (xtr.GetAttribute("size") != null && xtr.GetAttribute("size").Contains("0x"))
+							{
+								size = Convert.ToInt64(xtr.GetAttribute("size"), 16);
+							}
+							else if (xtr.GetAttribute("size") != null)
+							{
+								Int64.TryParse(xtr.GetAttribute("size"), out size);
+							}
+
+							// If the rom is continue or ignore, add the size to the previous rom
+							if (xtr.GetAttribute("loadflag") == "continue" || xtr.GetAttribute("loadflag") == "ignore")
+							{
+								int index = datFile[key].Count() - 1;
+								DatItem lastrom = datFile[key][index];
+								if (lastrom.Type == ItemType.Rom)
+								{
+									((Rom)lastrom).Size += size;
+								}
+								datFile[key].RemoveAt(index);
+								datFile[key].Add(lastrom);
+								continue;
+							}
+
+							Machine dir = new Machine();
+
+							// Get the name of the game from the parent
+							dir.Name = String.Join("\\", parent);
+							dir.Description = dir.Name;
+
+							// If we aren't keeping names, trim out the path
+							if (!keep || !superdat)
+							{
+								string tempout = Regex.Match(dir.Name, @".*?\\(.*)").Groups[1].Value;
+								if (tempout != "")
+								{
+									dir.Name = tempout;
+								}
+							}
+
+							DatItem rom;
+							switch (xtr.GetAttribute("type").ToLowerInvariant())
+							{
+								case "disk":
+									rom = new Disk
+									{
+										Name = xtr.GetAttribute("name"),
+										MD5 = xtr.GetAttribute("md5")?.ToLowerInvariant(),
+										SHA1 = xtr.GetAttribute("sha1")?.ToLowerInvariant(),
+										SHA256 = xtr.GetAttribute("sha256")?.ToLowerInvariant(),
+										SHA384 = xtr.GetAttribute("sha384")?.ToLowerInvariant(),
+										SHA512 = xtr.GetAttribute("sha512")?.ToLowerInvariant(),
+										ItemStatus = its,
+
+										SystemID = sysid,
+										System = filename,
+										SourceID = srcid,
+									};
+									break;
+								case "rom":
+								default:
+									rom = new Rom
+									{
+										Name = xtr.GetAttribute("name"),
+										Size = size,
+										CRC = xtr.GetAttribute("crc")?.ToLowerInvariant(),
+										MD5 = xtr.GetAttribute("md5")?.ToLowerInvariant(),
+										SHA1 = xtr.GetAttribute("sha1")?.ToLowerInvariant(),
+										SHA256 = xtr.GetAttribute("sha256")?.ToLowerInvariant(),
+										SHA384 = xtr.GetAttribute("sha384")?.ToLowerInvariant(),
+										SHA512 = xtr.GetAttribute("sha512")?.ToLowerInvariant(),
+										ItemStatus = its,
+										Date = date,
+
+										SystemID = sysid,
+										System = filename,
+										SourceID = srcid,
+									};
+									break;
+							}
+
+							rom.CopyMachineInformation(dir);
+
+							// Now process and add the rom
+							key = datFile.ParseAddHelper(rom, clean, remUnicode);
+
+							xtr.Read();
+							break;
+						default:
+							xtr.Read();
+							break;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Warning("Exception found while parsing '{0}': {1}", filename, ex);
+
+				// For XML errors, just skip the affected node
+				xtr?.Read();
+			}
+
+			xtr.Dispose();
+		}
+
+		/// <summary>
+		/// Create and open an output file for writing direct from a dictionary
+		/// </summary>
+		/// <param name="datFile">DatFile to write out from</param>
+		/// <param name="outfile">Name of the file to write to</param>
+		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
+		/// <param name="stats">True if DAT statistics should be output on write, false otherwise (default)</param>
+		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
+		/// <param name="overwrite">True if files should be overwritten (default), false if they should be renamed instead</param>
+		/// <returns>True if the DAT was written correctly, false otherwise</returns>
+		public static bool WriteToFile(DatFile datFile, string outfile, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
+		{
+			try
+			{
+				Globals.Logger.User("Opening file for writing: {0}", outfile);
+				FileStream fs = FileTools.TryCreate(outfile);
+
+				// If we get back null for some reason, just log and return
+				if (fs == null)
+				{
+					Globals.Logger.Warning("File '{0}' could not be created for writing! Please check to see if the file is writable", outfile);
+					return false;
+				}
+
+				StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
+
+				// Write out the header
+				WriteHeader(datFile, sw);
+
+				// Write out each of the machines and roms
+				string lastgame = null;
+
+				// Get a properly sorted set of keys
+				List<string> keys = datFile.Keys.ToList();
+				keys.Sort(new NaturalComparer());
+
+				foreach (string key in keys)
+				{
+					List<DatItem> roms = datFile[key];
+
+					// Resolve the names in the block
+					roms = DatItem.ResolveNames(roms);
+
+					for (int index = 0; index < roms.Count; index++)
+					{
+						DatItem rom = roms[index];
+
+						// There are apparently times when a null rom can skip by, skip them
+						if (rom.Name == null || rom.MachineName == null)
+						{
+							Globals.Logger.Warning("Null rom found!");
+							continue;
+						}
+
+						// If we have a different game and we're not at the start of the list, output the end of last item
+						if (lastgame != null && lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
+						{
+							WriteEndGame(sw);
+						}
+
+						// If we have a new game, output the beginning of the new item
+						if (lastgame == null || lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
+						{
+							WriteStartGame(datFile, sw, rom);
+						}
+
+						// If we have a "null" game (created by DATFromDir or something similar), log it to file
+						if (rom.Type == ItemType.Rom
+							&& ((Rom)rom).Size == -1
+							&& ((Rom)rom).CRC == "null")
+						{
+							Globals.Logger.Verbose("Empty folder found: {0}", rom.MachineName);
+
+							rom.Name = (rom.Name == "null" ? "-" : rom.Name);
+							((Rom)rom).Size = Constants.SizeZero;
+							((Rom)rom).CRC = ((Rom)rom).CRC == "null" ? Constants.CRCZero : null;
+							((Rom)rom).MD5 = ((Rom)rom).MD5 == "null" ? Constants.MD5Zero : null;
+							((Rom)rom).SHA1 = ((Rom)rom).SHA1 == "null" ? Constants.SHA1Zero : null;
+							((Rom)rom).SHA256 = ((Rom)rom).SHA256 == "null" ? Constants.SHA256Zero : null;
+							((Rom)rom).SHA384 = ((Rom)rom).SHA384 == "null" ? Constants.SHA384Zero : null;
+							((Rom)rom).SHA512 = ((Rom)rom).SHA512 == "null" ? Constants.SHA512Zero : null;
+						}
+
+						// Now, output the rom data
+						WriteRomData(sw, rom, ignoreblanks);
+
+						// Set the new data to compare against
+						lastgame = rom.MachineName;
+					}
+				}
+
+				// Write the file footer out
+				WriteFooter(sw);
+
+				Globals.Logger.Verbose("File written!" + Environment.NewLine);
+				sw.Dispose();
+				fs.Dispose();
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Write out DAT header using the supplied StreamWriter
+		/// </summary>
+		/// <param name="datFile">DatFile to write out from</param>
+		/// <param name="sw">StreamWriter to output to</param>
+		/// <returns>True if the data was written, false on error</returns>
+		private static bool WriteHeader(DatFile datFile, StreamWriter sw)
+		{
+			try
+			{
+				string header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
+							"<datafile>\n" +
+							"\t<header>\n" +
+							"\t\t<name>" + HttpUtility.HtmlEncode(datFile.Name) + "</name>\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode(datFile.Description) + "</description>\n" +
+							(!String.IsNullOrEmpty(datFile.RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(datFile.RootDir) + "</rootdir>\n" : "") +
+							(!String.IsNullOrEmpty(datFile.Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(datFile.Category) + "</category>\n" : "") +
+							"\t\t<version>" + HttpUtility.HtmlEncode(datFile.Version) + "</version>\n" +
+							(!String.IsNullOrEmpty(datFile.Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(datFile.Date) + "</date>\n" : "") +
+							"\t\t<author>" + HttpUtility.HtmlEncode(datFile.Author) + "</author>\n" +
+							(!String.IsNullOrEmpty(datFile.Email) ? "\t\t<email>" + HttpUtility.HtmlEncode(datFile.Email) + "</email>\n" : "") +
+							(!String.IsNullOrEmpty(datFile.Homepage) ? "\t\t<homepage>" + HttpUtility.HtmlEncode(datFile.Homepage) + "</homepage>\n" : "") +
+							(!String.IsNullOrEmpty(datFile.Url) ? "\t\t<url>" + HttpUtility.HtmlEncode(datFile.Url) + "</url>\n" : "") +
+							(!String.IsNullOrEmpty(datFile.Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(datFile.Comment) + "</comment>\n" : "") +
+							(!String.IsNullOrEmpty(datFile.Type) ? "\t\t<type>" + HttpUtility.HtmlEncode(datFile.Type) + "</type>\n" : "") +
+							(datFile.ForcePacking != ForcePacking.None || datFile.ForceMerging != ForceMerging.None || datFile.ForceNodump != ForceNodump.None ?
+								"\t\t<clrmamepro" +
+									(datFile.ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
+									(datFile.ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
+									(datFile.ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
+									(datFile.ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
+									(datFile.ForceMerging == ForceMerging.Merged ? " forcemerging=\"merged\"" : "") +
+									(datFile.ForceMerging == ForceMerging.NonMerged ? " forcemerging=\"nonmerged\"" : "") +
+									(datFile.ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
+									(datFile.ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"obsolete\"" : "") +
+									(datFile.ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
+									" />\n"
+							: "") +
+							"\t</header>\n";
+
+				// Write the header out
+				sw.Write(header);
+				sw.Flush();
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Write out Game start using the supplied StreamWriter
+		/// </summary>
+		/// <param name="datFile">DatFile to write out from</param>
+		/// <param name="sw">StreamWriter to output to</param>
+		/// <param name="rom">RomData object to be output</param>
+		/// <returns>True if the data was written, false on error</returns>
+		private static bool WriteStartGame(DatFile datFile, StreamWriter sw, DatItem rom)
+		{
+			try
+			{
+				// No game should start with a path separator
+				if (rom.MachineName.StartsWith(Path.DirectorySeparatorChar.ToString()))
+				{
+					rom.MachineName = rom.MachineName.Substring(1);
+				}
+
+				string state = "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
+								(datFile.ExcludeOf ? "" :
+									(rom.MachineType == MachineType.Bios ? " isbios=\"yes\"" : "") +
+									(rom.MachineType == MachineType.Device ? " isdevice=\"yes\"" : "") +
+									(rom.MachineType == MachineType.Mechanical ? " ismechanical=\"yes\"" : "") +
+									(rom.Runnable == true ? " runnable=\"yes\"" : "") +
+									(String.IsNullOrEmpty(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
+										? ""
+										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
+									(String.IsNullOrEmpty(rom.RomOf) || (rom.MachineName.ToLowerInvariant() == rom.RomOf.ToLowerInvariant())
+										? ""
+										: " romof=\"" + HttpUtility.HtmlEncode(rom.RomOf) + "\"") +
+									(String.IsNullOrEmpty(rom.SampleOf) || (rom.MachineName.ToLowerInvariant() == rom.SampleOf.ToLowerInvariant())
+										? ""
+										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.SampleOf) + "\"")
+								) +
+								">\n" +
+							(String.IsNullOrEmpty(rom.Comment) ? "" : "\t\t<comment>" + HttpUtility.HtmlEncode(rom.Comment) + "</comment>\n") +
+							"\t\t<description>" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) + "</description>\n" +
+							(String.IsNullOrEmpty(rom.Year) ? "" : "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n") +
+							(String.IsNullOrEmpty(rom.Manufacturer) ? "" : "\t\t<manufacturer>" + HttpUtility.HtmlEncode(rom.Manufacturer) + "</manufacturer>\n");
+
+				sw.Write(state);
+				sw.Flush();
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Write out Game end using the supplied StreamWriter
+		/// </summary>
+		/// <param name="sw">StreamWriter to output to</param>
+		/// <returns>True if the data was written, false on error</returns>
+		private static bool WriteEndGame(StreamWriter sw)
+		{
+			try
+			{
+				string state = "\t</machine>\n";
+
+				sw.Write(state);
+				sw.Flush();
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Write out RomData using the supplied StreamWriter
+		/// </summary>
+		/// <param name="sw">StreamWriter to output to</param>
+		/// <param name="rom">RomData object to be output</param>
+		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
+		/// <returns>True if the data was written, false on error</returns>
+		private static bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
+		{
+			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
+			if (ignoreblanks
+				&& (rom.Type == ItemType.Rom
+				&& (((Rom)rom).Size == 0 || ((Rom)rom).Size == -1)))
+			{
+				return true;
+			}
+
+			try
+			{
+				string state = "";
+				switch (rom.Type)
+				{
+					case ItemType.Archive:
+						state += "\t\t<archive name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+							+ "/>\n";
+						break;
+					case ItemType.BiosSet:
+						state += "\t\t<biosset name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+							+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
+							+ (((BiosSet)rom).Default != null
+								? ((BiosSet)rom).Default.ToString().ToLowerInvariant()
+								: "")
+							+ "/>\n";
+						break;
+					case ItemType.Disk:
+						state += "\t\t<disk name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+							+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Disk)rom).SHA256) ? " sha256=\"" + ((Disk)rom).SHA256.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Disk)rom).SHA384) ? " sha384=\"" + ((Disk)rom).SHA384.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Disk)rom).SHA512) ? " sha512=\"" + ((Disk)rom).SHA512.ToLowerInvariant() + "\"" : "")
+							+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
+							+ "/>\n";
+						break;
+					case ItemType.Release:
+						state += "\t\t<release name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+							+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : "")
+							+ (((Release)rom).Default != null
+								? ((Release)rom).Default.ToString().ToLowerInvariant()
+								: "")
+							+ "/>\n";
+						break;
+					case ItemType.Rom:
+						state += "\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+							+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Rom)rom).SHA256) ? " sha256=\"" + ((Rom)rom).SHA256.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Rom)rom).SHA384) ? " sha384=\"" + ((Rom)rom).SHA384.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Rom)rom).SHA512) ? " sha512=\"" + ((Rom)rom).SHA512.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
+							+ (((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
+							+ "/>\n";
+						break;
+					case ItemType.Sample:
+						state += "\t\t<sample name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+							+ "/>\n";
+						break;
+				}
+
+				sw.Write(state);
+				sw.Flush();
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Write out DAT footer using the supplied StreamWriter
+		/// </summary>
+		/// <param name="sw">StreamWriter to output to</param>
+		/// <returns>True if the data was written, false on error</returns>
+		private static bool WriteFooter(StreamWriter sw)
+		{
+			try
+			{
+				string footer = "\t</machine>\n</datafile>\n";
+
+				// Write the footer out
+				sw.Write(footer);
+				sw.Flush();
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+				return false;
+			}
+
+			return true;
+		}
+	}
+}

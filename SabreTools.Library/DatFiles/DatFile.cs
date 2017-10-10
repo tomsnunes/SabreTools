@@ -1,8 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.Items;
+using SabreTools.Library.Tools;
+
+#if MONO
+using System.IO;
+#else
+using Alphaleonis.Win32.Filesystem;
+
+using FileStream = System.IO.FileStream;
+using StreamWriter = System.IO.StreamWriter;
+#endif
 
 namespace SabreTools.Library.DatFiles
 {
@@ -1437,6 +1449,538 @@ namespace SabreTools.Library.DatFiles
 
 			// Reset statistics
 			_datStats.Reset();
+		}
+
+		#endregion
+
+		#region Parsing
+
+		/// <summary>
+		/// Parse a DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="datdata">The DatData object representing found roms to this point</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
+		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
+		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
+		public void Parse(string filename, int sysid, int srcid, bool keep = false, bool clean = false,
+			bool remUnicode = false, bool descAsName = false, bool keepext = false, bool useTags = false)
+		{
+			Parse(filename, sysid, srcid, SplitType.None, keep: keep, clean: clean,
+				remUnicode: remUnicode, descAsName: descAsName, keepext: keepext, useTags: useTags);
+		}
+
+		/// <summary>
+		/// Parse a DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
+		/// <param name="keepext">True if original extension should be kept, false otherwise (default)</param>
+		/// <param name="useTags">True if tags from the DAT should be used to merge the output, false otherwise (default)</param>
+		public void Parse(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Rom renaming
+			SplitType splitType,
+
+			// Miscellaneous
+			bool keep = false,
+			bool clean = false,
+			bool remUnicode = false,
+			bool descAsName = false,
+			bool keepext = false,
+			bool useTags = false)
+		{
+			// Check the file extension first as a safeguard
+			string ext = Path.GetExtension(filename).ToLowerInvariant();
+			if (ext.StartsWith("."))
+			{
+				ext = ext.Substring(1);
+			}
+			if (ext != "dat" && ext != "csv" && ext != "md5" && ext != "sfv" && ext != "sha1" && ext != "sha256"
+				&& ext != "sha384" && ext != "sha512" && ext != "tsv" && ext != "txt" && ext != "xml")
+			{
+				return;
+			}
+
+			// If the output filename isn't set already, get the internal filename
+			FileName = (String.IsNullOrEmpty(FileName) ? (keepext ? Path.GetFileName(filename) : Path.GetFileNameWithoutExtension(filename)) : FileName);
+
+			// If the output type isn't set already, get the internal output type
+			DatFormat = (DatFormat == 0 ? FileTools.GetDatFormat(filename) : DatFormat);
+
+			// Now parse the correct type of DAT
+			try
+			{
+				switch (FileTools.GetDatFormat(filename))
+				{
+					case DatFormat.AttractMode:
+						AttractMode.Parse(this, filename, sysid, srcid, keep, clean, remUnicode);
+						break;
+					case DatFormat.ClrMamePro:
+						ClrMamePro.Parse(this, filename, sysid, srcid, keep, clean, remUnicode);
+						break;
+					case DatFormat.CSV:
+						SeparatedValue.Parse(this, filename, sysid, srcid, ',', keep, clean, remUnicode);
+						break;
+					case DatFormat.DOSCenter:
+						DosCenter.Parse(this, filename, sysid, srcid, keep, clean, remUnicode);
+						break;
+					case DatFormat.Listroms:
+						Listroms.Parse(this, filename, sysid, srcid, keep, clean, remUnicode);
+						break;
+					case DatFormat.Logiqx:
+						Logiqx.Parse(this, filename, sysid, srcid, keep, clean, remUnicode);
+						break;
+					case DatFormat.OfflineList:
+						OfflineList.Parse(this, filename, sysid, srcid, keep, clean, remUnicode);
+						break;
+					case DatFormat.RedumpMD5:
+						Hashfile.Parse(this, filename, sysid, srcid, Hash.MD5, clean, remUnicode);
+						break;
+					case DatFormat.RedumpSFV:
+						Hashfile.Parse(this, filename, sysid, srcid, Hash.CRC, clean, remUnicode);
+						break;
+					case DatFormat.RedumpSHA1:
+						Hashfile.Parse(this, filename, sysid, srcid, Hash.SHA1, clean, remUnicode);
+						break;
+					case DatFormat.RedumpSHA256:
+						Hashfile.Parse(this, filename, sysid, srcid, Hash.SHA256, clean, remUnicode);
+						break;
+					case DatFormat.RedumpSHA384:
+						Hashfile.Parse(this, filename, sysid, srcid, Hash.SHA384, clean, remUnicode);
+						break;
+					case DatFormat.RedumpSHA512:
+						Hashfile.Parse(this, filename, sysid, srcid, Hash.SHA512, clean, remUnicode);
+						break;
+					case DatFormat.RomCenter:
+						RomCenter.Parse(this, filename, sysid, srcid, clean, remUnicode);
+						break;
+					case DatFormat.SabreDat:
+						SabreDat.Parse(this, filename, sysid, srcid, keep, clean, remUnicode);
+						break;
+					case DatFormat.SoftwareList:
+						SoftwareList.Parse(this, filename, sysid, srcid, keep, clean, remUnicode);
+						break;
+					case DatFormat.TSV:
+						SeparatedValue.Parse(this, filename, sysid, srcid, '\t', keep, clean, remUnicode);
+						break;
+					default:
+						return;
+				}
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error("Error with file '{0}': {1}", filename, ex);
+			}
+
+			// If we want to use descriptions as names, update everything
+			if (descAsName)
+			{
+				MachineDescriptionToName();
+			}
+
+			// If we are using tags from the DAT, set the proper input for split type unless overridden
+			if (useTags && splitType == SplitType.None)
+			{
+				switch (ForceMerging)
+				{
+					case ForceMerging.None:
+						// No-op
+						break;
+					case ForceMerging.Split:
+						splitType = SplitType.Split;
+						break;
+					case ForceMerging.Merged:
+						splitType = SplitType.Merged;
+						break;
+					case ForceMerging.NonMerged:
+						splitType = SplitType.NonMerged;
+						break;
+					case ForceMerging.Full:
+						splitType = SplitType.FullNonMerged;
+						break;
+				}
+			}
+
+			// Now we pre-process the DAT with the splitting/merging mode
+			switch (splitType)
+			{
+				case SplitType.None:
+					// No-op
+					break;
+				case SplitType.DeviceNonMerged:
+					CreateDeviceNonMergedSets(DedupeType.None);
+					break;
+				case SplitType.FullNonMerged:
+					CreateFullyNonMergedSets(DedupeType.None);
+					break;
+				case SplitType.NonMerged:
+					CreateNonMergedSets(DedupeType.None);
+					break;
+				case SplitType.Merged:
+					CreateMergedSets(DedupeType.None);
+					break;
+				case SplitType.Split:
+					CreateSplitSets(DedupeType.None);
+					break;
+			}
+		}
+
+		/// <summary>
+		/// Add a rom to the Dat after checking
+		/// </summary>
+		/// <param name="item">Item data to check against</param>
+		/// <param name="clean">True if the names should be cleaned to WoD standards, false otherwise</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// <returns>The key for the item</returns>
+		public string ParseAddHelper(DatItem item, bool clean, bool remUnicode)
+		{
+			string key = "";
+
+			// If there's no name in the rom, we log and skip it
+			if (item.Name == null)
+			{
+				Globals.Logger.Warning("{0}: Rom with no name found! Skipping...", FileName);
+				return key;
+			}
+
+			// If the name ends with a directory separator, we log and skip it (DOSCenter only?)
+			if (item.Name.EndsWith("/") || item.Name.EndsWith("\\"))
+			{
+				Globals.Logger.Warning("{0}: Rom ending with directory separator found: '{1}'. Skipping...", FileName, item.Name);
+				return key;
+			}
+
+			// If we're in cleaning mode, sanitize the game name
+			item.MachineName = (clean ? Style.CleanGameName(item.MachineName) : item.MachineName);
+
+			// If we're stripping unicode characters, do so from all relevant things
+			if (remUnicode)
+			{
+				item.Name = Style.RemoveUnicodeCharacters(item.Name);
+				item.MachineName = Style.RemoveUnicodeCharacters(item.MachineName);
+				item.MachineDescription = Style.RemoveUnicodeCharacters(item.MachineDescription);
+			}
+
+			// If we have a Rom or a Disk, clean the hash data
+			if (item.Type == ItemType.Rom)
+			{
+				Rom itemRom = (Rom)item;
+
+				// Sanitize the hashes from null, hex sizes, and "true blank" strings
+				itemRom.CRC = Style.CleanHashData(itemRom.CRC, Constants.CRCLength);
+				itemRom.MD5 = Style.CleanHashData(itemRom.MD5, Constants.MD5Length);
+				itemRom.SHA1 = Style.CleanHashData(itemRom.SHA1, Constants.SHA1Length);
+				itemRom.SHA256 = Style.CleanHashData(itemRom.SHA256, Constants.SHA256Length);
+				itemRom.SHA384 = Style.CleanHashData(itemRom.SHA384, Constants.SHA384Length);
+				itemRom.SHA512 = Style.CleanHashData(itemRom.SHA512, Constants.SHA512Length);
+
+				// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
+				if ((itemRom.Size == 0 || itemRom.Size == -1)
+					&& ((itemRom.CRC == Constants.CRCZero || String.IsNullOrEmpty(itemRom.CRC))
+						|| itemRom.MD5 == Constants.MD5Zero
+						|| itemRom.SHA1 == Constants.SHA1Zero
+						|| itemRom.SHA256 == Constants.SHA256Zero
+						|| itemRom.SHA384 == Constants.SHA384Zero
+						|| itemRom.SHA512 == Constants.SHA512Zero))
+				{
+					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
+					itemRom.Size = Constants.SizeZero;
+					itemRom.CRC = Constants.CRCZero;
+					itemRom.MD5 = Constants.MD5Zero;
+					itemRom.SHA1 = Constants.SHA1Zero;
+					itemRom.SHA256 = null;
+					itemRom.SHA384 = null;
+					itemRom.SHA512 = null;
+					//itemRom.SHA256 = Constants.SHA256Zero;
+					//itemRom.SHA384 = Constants.SHA384Zero;
+					//itemRom.SHA512 = Constants.SHA512Zero;
+				}
+				// If the file has no size and it's not the above case, skip and log
+				else if (itemRom.ItemStatus != ItemStatus.Nodump && (itemRom.Size == 0 || itemRom.Size == -1))
+				{
+					Globals.Logger.Verbose("{0}: Incomplete entry for '{1}' will be output as nodump", FileName, itemRom.Name);
+					itemRom.ItemStatus = ItemStatus.Nodump;
+				}
+				// If the file has a size but aboslutely no hashes, skip and log
+				else if (itemRom.ItemStatus != ItemStatus.Nodump
+					&& itemRom.Size > 0
+					&& String.IsNullOrEmpty(itemRom.CRC)
+					&& String.IsNullOrEmpty(itemRom.MD5)
+					&& String.IsNullOrEmpty(itemRom.SHA1)
+					&& String.IsNullOrEmpty(itemRom.SHA256)
+					&& String.IsNullOrEmpty(itemRom.SHA384)
+					&& String.IsNullOrEmpty(itemRom.SHA512))
+				{
+					Globals.Logger.Verbose("{0}: Incomplete entry for '{1}' will be output as nodump", FileName, itemRom.Name);
+					itemRom.ItemStatus = ItemStatus.Nodump;
+				}
+
+				item = itemRom;
+			}
+			else if (item.Type == ItemType.Disk)
+			{
+				Disk itemDisk = (Disk)item;
+
+				// Sanitize the hashes from null, hex sizes, and "true blank" strings
+				itemDisk.MD5 = Style.CleanHashData(itemDisk.MD5, Constants.MD5Length);
+				itemDisk.SHA1 = Style.CleanHashData(itemDisk.SHA1, Constants.SHA1Length);
+				itemDisk.SHA256 = Style.CleanHashData(itemDisk.SHA256, Constants.SHA256Length);
+				itemDisk.SHA384 = Style.CleanHashData(itemDisk.SHA384, Constants.SHA384Length);
+				itemDisk.SHA512 = Style.CleanHashData(itemDisk.SHA512, Constants.SHA512Length);
+
+				// If the file has aboslutely no hashes, skip and log
+				if (itemDisk.ItemStatus != ItemStatus.Nodump
+					&& String.IsNullOrEmpty(itemDisk.MD5)
+					&& String.IsNullOrEmpty(itemDisk.SHA1)
+					&& String.IsNullOrEmpty(itemDisk.SHA256)
+					&& String.IsNullOrEmpty(itemDisk.SHA384)
+					&& String.IsNullOrEmpty(itemDisk.SHA512))
+				{
+					Globals.Logger.Verbose("Incomplete entry for '{0}' will be output as nodump", itemDisk.Name);
+					itemDisk.ItemStatus = ItemStatus.Nodump;
+				}
+
+				item = itemDisk;
+			}
+
+			// Get the key and add statistical data
+			switch (item.Type)
+			{
+				case ItemType.Archive:
+				case ItemType.BiosSet:
+				case ItemType.Release:
+				case ItemType.Sample:
+					key = item.Type.ToString();
+					break;
+				case ItemType.Disk:
+					key = ((Disk)item).MD5;
+					break;
+				case ItemType.Rom:
+					key = ((Rom)item).Size + "-" + ((Rom)item).CRC;
+					break;
+				default:
+					key = "default";
+					break;
+			}
+
+			// Add the item to the DAT
+			Add(key, item);
+
+			return key;
+		}
+
+		/// <summary>
+		/// Add a rom to the Dat after checking
+		/// </summary>
+		/// <param name="item">Item data to check against</param>
+		/// <param name="clean">True if the names should be cleaned to WoD standards, false otherwise</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// <returns>The key for the item</returns>
+		public async Task<string> ParseAddHelperAsync(DatItem item, bool clean, bool remUnicode)
+		{
+			return await Task.Run(() => ParseAddHelper(item, clean, remUnicode));
+		}
+
+		#endregion
+
+		#region Writing
+
+		/// <summary>
+		/// Create and open an output file for writing direct from a dictionary
+		/// </summary>
+		/// <param name="datdata">All information for creating the datfile header</param>
+		/// <param name="outDir">Set the output directory</param>
+		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
+		/// <param name="stats">True if DAT statistics should be output on write, false otherwise (default)</param>
+		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
+		/// <param name="overwrite">True if files should be overwritten (default), false if they should be renamed instead</param>
+		/// <returns>True if the DAT was written correctly, false otherwise</returns>
+		public bool WriteToFile(string outDir, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
+		{
+			// If there's nothing there, abort
+			if (Count == 0)
+			{
+				Globals.Logger.User("There were no items to write out!");
+				return false;
+			}
+
+			// If output directory is empty, use the current folder
+			if (outDir == null || outDir.Trim() == "")
+			{
+				Globals.Logger.Verbose("No output directory defined, defaulting to curent folder");
+				outDir = Environment.CurrentDirectory;
+			}
+
+			// Create the output directory if it doesn't already exist
+			if (!Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir);
+			}
+
+			// If the DAT has no output format, default to XML
+			if (DatFormat == 0)
+			{
+				Globals.Logger.Verbose("No DAT format defined, defaulting to XML");
+				DatFormat = DatFormat.Logiqx;
+			}
+
+			// Make sure that the three essential fields are filled in
+			if (String.IsNullOrEmpty(FileName) && String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
+			{
+				FileName = Name = Description = "Default";
+			}
+			else if (String.IsNullOrEmpty(FileName) && String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
+			{
+				FileName = Name = Description;
+			}
+			else if (String.IsNullOrEmpty(FileName) && !String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
+			{
+				FileName = Description = Name;
+			}
+			else if (String.IsNullOrEmpty(FileName) && !String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
+			{
+				FileName = Description;
+			}
+			else if (!String.IsNullOrEmpty(FileName) && String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
+			{
+				Name = Description = FileName;
+			}
+			else if (!String.IsNullOrEmpty(FileName) && String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
+			{
+				Name = Description;
+			}
+			else if (!String.IsNullOrEmpty(FileName) && !String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
+			{
+				Description = Name;
+			}
+			else if (!String.IsNullOrEmpty(FileName) && !String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
+			{
+				// Nothing is needed
+			}
+
+			// Output initial statistics, for kicks
+			if (stats)
+			{
+				OutputStats(new Dictionary<StatDatFormat, StreamWriter>(), StatDatFormat.None,
+					recalculate: (RomCount + DiskCount == 0), baddumpCol: true, nodumpCol: true);
+			}
+
+			// Bucket and dedupe according to the flag
+			if (DedupeRoms == DedupeType.Full)
+			{
+				BucketBy(SortedBy.CRC, DedupeRoms, norename: norename);
+			}
+			else if (DedupeRoms == DedupeType.Game)
+			{
+				BucketBy(SortedBy.Game, DedupeRoms, norename: norename);
+			}
+
+			// Bucket roms by game name, if not already
+			BucketBy(SortedBy.Game, DedupeType.None, norename: norename);
+
+			// Output the number of items we're going to be writing
+			Globals.Logger.User("A total of {0} items will be written out to '{1}'", Count, FileName);
+
+			// Filter the DAT by 1G1R rules, if we're supposed to
+			// TODO: Create 1G1R logic before write
+
+			// If we are removing hashes, do that now
+			if (StripHash != 0x0)
+			{
+				StripHashesFromItems();
+			}
+
+			// Get the outfile names
+			Dictionary<DatFormat, string> outfiles = Style.CreateOutfileNames(outDir, this, overwrite);
+
+			try
+			{
+				// Write out all required formats
+				Parallel.ForEach(outfiles.Keys, Globals.ParallelOptions, datFormat =>
+				{
+					string outfile = outfiles[datFormat];
+					switch (datFormat)
+					{
+						case DatFormat.AttractMode:
+							AttractMode.WriteToFile(this, outfile);
+							break;
+						case DatFormat.ClrMamePro:
+							ClrMamePro.WriteToFile(this, outfile, ignoreblanks);
+							break;
+						case DatFormat.CSV:
+							SeparatedValue.WriteToFile(this, outfile, ',', ignoreblanks);
+							break;
+						case DatFormat.DOSCenter:
+							DosCenter.WriteToFile(this, outfile, ignoreblanks);
+							break;
+						case DatFormat.Listroms:
+							Listroms.WriteToFile(this, outfile, ignoreblanks);
+							break;
+						case DatFormat.Logiqx:
+							Logiqx.WriteToFile(this, outfile, ignoreblanks);
+							break;
+						case DatFormat.MissFile:
+							Missfile.WriteToFile(this, outfile, ignoreblanks);
+							break;
+						case DatFormat.OfflineList:
+							OfflineList.WriteToFile(this, outfile, ignoreblanks);
+							break;
+						case DatFormat.RedumpMD5:
+							Hashfile.WriteToFile(this, outfile, Hash.MD5, ignoreblanks);
+							break;
+						case DatFormat.RedumpSFV:
+							Hashfile.WriteToFile(this, outfile, Hash.CRC, ignoreblanks);
+							break;
+						case DatFormat.RedumpSHA1:
+							Hashfile.WriteToFile(this, outfile, Hash.SHA1, ignoreblanks);
+							break;
+						case DatFormat.RedumpSHA256:
+							Hashfile.WriteToFile(this, outfile, Hash.SHA256, ignoreblanks);
+							break;
+						case DatFormat.RedumpSHA384:
+							Hashfile.WriteToFile(this, outfile, Hash.SHA384, ignoreblanks);
+							break;
+						case DatFormat.RedumpSHA512:
+							Hashfile.WriteToFile(this, outfile, Hash.SHA512, ignoreblanks);
+							break;
+						case DatFormat.RomCenter:
+							RomCenter.WriteToFile(this, outfile, ignoreblanks);
+							break;
+						case DatFormat.SabreDat:
+							SabreDat.WriteToFile(this, outfile, ignoreblanks);
+							break;
+						case DatFormat.SoftwareList:
+							SoftwareList.WriteToFile(this, outfile, ignoreblanks);
+							break;
+						case DatFormat.TSV:
+							SeparatedValue.WriteToFile(this, outfile, '\t', ignoreblanks);
+							break;
+					}
+				});
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+				return false;
+			}
+
+			return true;
 		}
 
 		#endregion
