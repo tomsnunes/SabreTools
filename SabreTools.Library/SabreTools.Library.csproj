@@ -119,14 +119,8 @@
     <Compile Include="DatFiles\ClrMamePro.cs" />
     <Compile Include="DatFiles\DatHeader.cs" />
     <Compile Include="DatFiles\DatStats.cs" />
-    <Compile Include="DatFiles\DatFile.Manipulate.cs" />
-    <Compile Include="DatFiles\DatFile.ConvertUpdate.cs" />
-    <Compile Include="DatFiles\DatFile.DFD.cs" />
     <Compile Include="DatFiles\DosCenter.cs" />
     <Compile Include="DatFiles\Filter.cs" />
-    <Compile Include="DatFiles\DatFile.Rebuild.cs" />
-    <Compile Include="DatFiles\DatFile.Splitters.cs" />
-    <Compile Include="DatFiles\DatFile.Statistics.cs" />
     <Compile Include="DatFiles\Hashfile.cs" />
     <Compile Include="DatFiles\Listroms.cs" />
     <Compile Include="DatFiles\Logiqx.cs" />
