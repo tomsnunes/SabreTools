@@ -26,6 +26,9 @@ namespace SabreTools.Library.DatFiles
 		private long _romCount = 0;
 		private long _sampleCount = 0;
 
+		// Special count only used by statistics output
+		private long _gameCount = 0;
+
 		// Total reported size
 		private long _totalSize = 0;
 
@@ -84,6 +87,13 @@ namespace SabreTools.Library.DatFiles
 		{
 			get { return _sampleCount; }
 			set { _sampleCount = value; }
+		}
+
+		// Special count only used by statistics output
+		public long GameCount
+		{
+			get { return _gameCount; }
+			set { _gameCount = value; }
 		}
 
 		// Total reported size
@@ -231,6 +241,8 @@ namespace SabreTools.Library.DatFiles
 			_romCount += stats.RomCount;
 			_sampleCount += stats.SampleCount;
 
+			_gameCount += stats.GameCount;
+
 			_totalSize += stats.TotalSize;
 
 			// Individual hash counts
@@ -326,6 +338,8 @@ namespace SabreTools.Library.DatFiles
 			_releaseCount = 0;
 			_romCount = 0;
 			_sampleCount = 0;
+
+			_gameCount = 0;
 
 			_totalSize = 0;
 

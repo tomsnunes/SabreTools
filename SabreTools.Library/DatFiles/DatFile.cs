@@ -2299,7 +2299,7 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Use game descriptions as names in the DAT, updating cloneof/romof/sampleof
 		/// </summary>
-		public void MachineDescriptionToName()
+		private void MachineDescriptionToName()
 		{
 			try
 			{
@@ -2369,7 +2369,7 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Strip the given hash types from the DAT
 		/// </summary>
-		public void StripHashesFromItems()
+		private void StripHashesFromItems()
 		{
 			// Output the logging statement
 			Globals.Logger.User("Stripping requested hashes");
@@ -2443,7 +2443,7 @@ namespace SabreTools.Library.DatFiles
 
 		#endregion
 
-		#region Merging/Splitting Methods
+		#region Merging/Splitting
 
 		/// <summary>
 		/// Use cdevice_ref tags to get full non-merged sets and remove parenting tags
@@ -2558,10 +2558,6 @@ namespace SabreTools.Library.DatFiles
 			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
 			RemoveTagsFromChild();
 		}
-
-		#endregion
-
-		#region Merging/Splitting Helper Methods
 
 		/// <summary>
 		/// Use romof tags to add roms to the children
@@ -3284,7 +3280,7 @@ namespace SabreTools.Library.DatFiles
 				List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
 				Parallel.ForEach(files, Globals.ParallelOptions, item =>
 				{
-					PopulateFromDirCheckFile(item, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, skipFileType,
+					CheckFileForHashes(item, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, skipFileType,
 						addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst);
 				});
 
@@ -3295,7 +3291,7 @@ namespace SabreTools.Library.DatFiles
 					List<string> subfiles = Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(subfiles, Globals.ParallelOptions, subitem =>
 					{
-						PopulateFromDirCheckFile(subitem, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, skipFileType,
+						CheckFileForHashes(subitem, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, skipFileType,
 							addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst);
 					});
 				}
@@ -3352,7 +3348,7 @@ namespace SabreTools.Library.DatFiles
 			}
 			else if (File.Exists(basePath))
 			{
-				PopulateFromDirCheckFile(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), omitFromScan, bare, archivesAsFiles, enableGzip,
+				CheckFileForHashes(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), omitFromScan, bare, archivesAsFiles, enableGzip,
 					skipFileType, addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst);
 			}
 
@@ -3381,7 +3377,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		private void PopulateFromDirCheckFile(string item, string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles,
+		private void CheckFileForHashes(string item, string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles,
 			bool enableGzip, SkipFileType skipFileType, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst)
 		{
 			// Define the temporary directory
@@ -3453,7 +3449,7 @@ namespace SabreTools.Library.DatFiles
 			// If the extracted list is null, just scan the item itself
 			if (extracted == null || archivesAsFiles)
 			{
-				PopulateFromDirProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst);
+				ProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst);
 			}
 			// Otherwise, add all of the found items
 			else
@@ -3461,7 +3457,7 @@ namespace SabreTools.Library.DatFiles
 				// First take care of the found items
 				Parallel.ForEach(extracted, Globals.ParallelOptions, rom =>
 				{
-					PopulateFromDirProcessFileHelper(newItem,
+					ProcessFileHelper(newItem,
 						rom,
 						basePath,
 						(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length) + Path.GetFileNameWithoutExtension(item));
@@ -3474,7 +3470,7 @@ namespace SabreTools.Library.DatFiles
 					Parallel.ForEach(empties, Globals.ParallelOptions, empty =>
 					{
 						Rom emptyRom = new Rom(Path.Combine(empty, "_"), newItem, omitFromScan);
-						PopulateFromDirProcessFileHelper(newItem,
+						ProcessFileHelper(newItem,
 							emptyRom,
 							basePath,
 							(Path.GetDirectoryName(Path.GetFullPath(item)) + Path.DirectorySeparatorChar).Remove(0, basePath.Length) + Path.GetFileNameWithoutExtension(item));
@@ -3501,13 +3497,13 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		private void PopulateFromDirProcessFile(string item, string parent, string basePath, Hash omitFromScan,
+		private void ProcessFile(string item, string parent, string basePath, Hash omitFromScan,
 			bool addDate, string headerToCheckAgainst)
 		{
 			Globals.Logger.Verbose("'{0}' treated like a file", Path.GetFileName(item));
 			Rom rom = FileTools.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst);
 
-			PopulateFromDirProcessFileHelper(item, rom, basePath, parent);
+			ProcessFileHelper(item, rom, basePath, parent);
 		}
 
 		/// <summary>
@@ -3517,7 +3513,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="item">Rom data to be used to write to file</param>
 		/// <param name="basepath">Path the represents the parent directory</param>
 		/// <param name="parent">Parent game to be used</param>
-		private void PopulateFromDirProcessFileHelper(string item, DatItem datItem, string basepath, string parent)
+		private void ProcessFileHelper(string item, DatItem datItem, string basepath, string parent)
 		{
 			// If the datItem isn't a Rom or Disk, return
 			if (datItem.Type != ItemType.Rom && datItem.Type != ItemType.Disk)
@@ -4659,7 +4655,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="extA">List of extensions to split on (first DAT)</param>
 		/// <param name="extB">List of extensions to split on (second DAT)</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByExt(string outDir, string basepath, List<string> extA, List<string> extB)
+		public bool SplitByExtension(string outDir, string basepath, List<string> extA, List<string> extB)
 		{
 			// Make sure all of the extensions have a dot at the beginning
 			List<string> newExtA = new List<string>();
@@ -5263,32 +5259,6 @@ namespace SabreTools.Library.DatFiles
 		#region Statistics
 
 		/// <summary>
-		/// Recalculate the statistics for the Dat
-		/// </summary>
-		public void RecalculateStats()
-		{
-			// Wipe out any stats already there
-			_datStats.Reset();
-
-			// If we have a blank Dat in any way, return
-			if (this == null || Count == 0)
-			{
-				return;
-			}
-
-			// Loop through and add
-			List<string> keys = Keys.ToList();
-			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
-			{
-				List<DatItem> items = this[key];
-				foreach (DatItem item in items)
-				{
-					_datStats.AddItem(item);
-				}
-			});
-		}
-
-		/// <summary>
 		/// Output the stats for the Dat in a human-readable format
 		/// </summary>
 		/// <param name="outputs">Dictionary representing the outputs</param>
@@ -5448,6 +5418,32 @@ namespace SabreTools.Library.DatFiles
 				line += "\n";
 				outputs[StatDatFormat.TSV].Write(line);
 			}
+		}
+
+		/// <summary>
+		/// Recalculate the statistics for the Dat
+		/// </summary>
+		private void RecalculateStats()
+		{
+			// Wipe out any stats already there
+			_datStats.Reset();
+
+			// If we have a blank Dat in any way, return
+			if (this == null || Count == 0)
+			{
+				return;
+			}
+
+			// Loop through and add
+			List<string> keys = Keys.ToList();
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+			{
+				List<DatItem> items = this[key];
+				foreach (DatItem item in items)
+				{
+					_datStats.AddItem(item);
+				}
+			});
 		}
 
 		#endregion
@@ -5669,62 +5665,46 @@ namespace SabreTools.Library.DatFiles
 			}
 			outDir = Path.GetFullPath(outDir);
 
-			// Get the dictionary of desired outputs
-			Dictionary<StatDatFormat, StreamWriter> outputs = OutputStatsGetOutputWriters(statDatFormat, reportName, outDir);
+			// Get the dictionary of desired output report names
+			Dictionary<StatDatFormat, string> outputs = Style.CreateOutStatsNames(outDir, statDatFormat, reportName);
 
-			// Make sure we have all files
-			List<Tuple<string, string>> newinputs = new List<Tuple<string, string>>(); // item, basepath
-			Parallel.ForEach(inputs, Globals.ParallelOptions, input =>
-			{
-				if (File.Exists(input))
-				{
-					lock (newinputs)
-					{
-						newinputs.Add(Tuple.Create(Path.GetFullPath(input), Path.GetDirectoryName(Path.GetFullPath(input))));
-					}
-				}
-				if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.GetFiles(input, "*", SearchOption.AllDirectories))
-					{
-						lock (newinputs)
-						{
-							newinputs.Add(Tuple.Create(Path.GetFullPath(file), Path.GetFullPath(input)));
-						}
-					}
-				}
-			});
-
-			newinputs = newinputs
-				.OrderBy(i => Path.GetDirectoryName(i.Item1))
-				.ThenBy(i => Path.GetFileName(i.Item1))
+			// Make sure we have all files and then order them
+			List<string> files = FileTools.GetOnlyFilesFromInputs(inputs);
+			files = files
+				.OrderBy(i => Path.GetDirectoryName(i))
+				.ThenBy(i => Path.GetFileName(i))
 				.ToList();
 
+			// Create output writers based on filenames
+			Dictionary<StatDatFormat, StreamWriter> writers = new Dictionary<StatDatFormat, StreamWriter>();
+			foreach (KeyValuePair<StatDatFormat, string> kvp in outputs)
+			{
+				writers.Add(kvp.Key, new StreamWriter(FileTools.TryOpenWrite(kvp.Value)));
+			}
+
 			// Write the header, if any
-			OutputStatsWriteHeader(outputs, statDatFormat, baddumpCol, nodumpCol);
+			WriteStatsHeader(writers, statDatFormat, baddumpCol, nodumpCol);
 
 			// Init all total variables
 			DatStats totalStats = new DatStats();
-			long totalGame = 0;
 
 			// Init directory-level variables
 			string lastdir = null;
 			string basepath = null;
 			DatStats dirStats = new DatStats();
-			long dirGame = 0;
 
 			// Now process each of the input files
-			foreach (Tuple<string, string> filename in newinputs)
+			foreach (string file in files)
 			{
 				// Get the directory for the current file
-				string thisdir = Path.GetDirectoryName(filename.Item1);
-				basepath = Path.GetDirectoryName(filename.Item2);
+				string thisdir = Path.GetDirectoryName(file);
+				basepath = Path.GetDirectoryName(Path.GetDirectoryName(file));
 
 				// If we don't have the first file and the directory has changed, show the previous directory stats and reset
 				if (lastdir != null && thisdir != lastdir)
 				{
 					// Output separator if needed
-					OutputStatsWriteMidSeparator(outputs, statDatFormat, baddumpCol, nodumpCol);
+					WriteStatsMidSeparator(writers, statDatFormat, baddumpCol, nodumpCol);
 
 					DatFile lastdirdat = new DatFile
 					{
@@ -5732,48 +5712,46 @@ namespace SabreTools.Library.DatFiles
 						_datStats = dirStats,
 					};
 
-					lastdirdat.OutputStats(outputs, statDatFormat,
-						game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
+					lastdirdat.OutputStats(writers, statDatFormat, game: dirStats.GameCount, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 
 					// Write the mid-footer, if any
-					OutputStatsWriteMidFooter(outputs, statDatFormat, baddumpCol, nodumpCol);
+					WriteStatsFooterSeparator(writers, statDatFormat, baddumpCol, nodumpCol);
 
 					// Write the header, if any
-					OutputStatsWriteMidHeader(outputs, statDatFormat, baddumpCol, nodumpCol);
+					WriteStatsMidHeader(writers, statDatFormat, baddumpCol, nodumpCol);
 
 					// Reset the directory stats
 					dirStats.Reset();
-					dirGame = 0;
 				}
 
-				Globals.Logger.Verbose("Beginning stat collection for '{0}'", false, filename.Item1);
+				Globals.Logger.Verbose("Beginning stat collection for '{0}'", false, file);
 				List<string> games = new List<string>();
 				DatFile datdata = new DatFile();
-				datdata.Parse(filename.Item1, 0, 0);
+				datdata.Parse(file, 0, 0);
 				datdata.BucketBy(SortedBy.Game, DedupeType.None, norename: true);
 
 				// Output single DAT stats (if asked)
-				Globals.Logger.User("Adding stats for file '{0}'\n", false, filename.Item1);
+				Globals.Logger.User("Adding stats for file '{0}'\n", false, file);
 				if (single)
 				{
-					datdata.OutputStats(outputs, statDatFormat,
+					datdata.OutputStats(writers, statDatFormat,
 						baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 				}
 
 				// Add single DAT stats to dir
 				dirStats.AddStats(datdata._datStats);
-				dirGame += datdata.Keys.Count();
+				dirStats.GameCount += datdata.Keys.Count();
 
 				// Add single DAT stats to totals
 				totalStats.AddStats(datdata._datStats);
-				totalGame += datdata.Keys.Count();
+				totalStats.GameCount += datdata.Keys.Count();
 
 				// Make sure to assign the new directory
 				lastdir = thisdir;
 			}
 
 			// Output the directory stats one last time
-			OutputStatsWriteMidSeparator(outputs, statDatFormat, baddumpCol, nodumpCol);
+			WriteStatsMidSeparator(writers, statDatFormat, baddumpCol, nodumpCol);
 
 			if (single)
 			{
@@ -5783,19 +5761,17 @@ namespace SabreTools.Library.DatFiles
 					_datStats = dirStats,
 				};
 
-				dirdat.OutputStats(outputs, statDatFormat,
-					game: dirGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
+				dirdat.OutputStats(writers, statDatFormat, game: dirStats.GameCount, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 			}
 
 			// Write the mid-footer, if any
-			OutputStatsWriteMidFooter(outputs, statDatFormat, baddumpCol, nodumpCol);
+			WriteStatsFooterSeparator(writers, statDatFormat, baddumpCol, nodumpCol);
 
 			// Write the header, if any
-			OutputStatsWriteMidHeader(outputs, statDatFormat, baddumpCol, nodumpCol);
+			WriteStatsMidHeader(writers, statDatFormat, baddumpCol, nodumpCol);
 
 			// Reset the directory stats
 			dirStats.Reset();
-			dirGame = 0;
 
 			// Output total DAT stats
 			DatFile totaldata = new DatFile
@@ -5804,75 +5780,20 @@ namespace SabreTools.Library.DatFiles
 				_datStats = totalStats,
 			};
 
-			totaldata.OutputStats(outputs, statDatFormat,
-				game: totalGame, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
+			totaldata.OutputStats(writers, statDatFormat, game: totalStats.GameCount, baddumpCol: baddumpCol, nodumpCol: nodumpCol);
 
 			// Output footer if needed
-			OutputStatsWriteFooter(outputs, statDatFormat);
+			WriteStatsFooter(writers, statDatFormat);
 
 			// Flush and dispose of the stream writers
 			foreach (StatDatFormat format in outputs.Keys)
 			{
-				outputs[format].Flush();
-				outputs[format].Dispose();
+				writers[format].Flush();
+				writers[format].Dispose();
 			}
 
 			Globals.Logger.User(@"
 Please check the log folder if the stats scrolled offscreen", false);
-		}
-
-		/// <summary>
-		/// Get the proper extension for the stat output format
-		/// </summary>
-		/// <param name="statDatFormat">StatDatFormat to get the extension for</param>
-		/// <param name="reportName">Name of the input file to use</param>
-		/// <param name="outDir">Output path to use</param>
-		/// <returns>Dictionary of file types to StreamWriters</returns>
-		private static Dictionary<StatDatFormat, StreamWriter> OutputStatsGetOutputWriters(StatDatFormat statDatFormat, string reportName, string outDir)
-		{
-			Dictionary<StatDatFormat, StreamWriter> output = new Dictionary<StatDatFormat, StreamWriter>();
-
-			// First try to create the output directory if we need to
-			if (!Directory.Exists(outDir))
-			{
-				Directory.CreateDirectory(outDir);
-			}
-
-			// For each output format, get the appropriate stream writer
-			if ((statDatFormat & StatDatFormat.None) != 0)
-			{
-				reportName = Style.GetFileNameWithoutExtension(reportName) + ".txt";
-				reportName = Path.Combine(outDir, reportName);
-
-				// Create the StreamWriter for this file
-				output.Add(StatDatFormat.None, new StreamWriter(FileTools.TryCreate(reportName)));
-			}
-			if ((statDatFormat & StatDatFormat.CSV) != 0)
-			{
-				reportName = Style.GetFileNameWithoutExtension(reportName) + ".csv";
-				reportName = Path.Combine(outDir, reportName);
-
-				// Create the StreamWriter for this file
-				output.Add(StatDatFormat.CSV, new StreamWriter(FileTools.TryCreate(reportName)));
-			}
-			if ((statDatFormat & StatDatFormat.HTML) != 0)
-			{
-				reportName = Style.GetFileNameWithoutExtension(reportName) + ".html";
-				reportName = Path.Combine(outDir, reportName);
-
-				// Create the StreamWriter for this file
-				output.Add(StatDatFormat.HTML, new StreamWriter(FileTools.TryCreate(reportName)));
-			}
-			if ((statDatFormat & StatDatFormat.TSV) != 0)
-			{
-				reportName = Style.GetFileNameWithoutExtension(reportName) + ".csv";
-				reportName = Path.Combine(outDir, reportName);
-
-				// Create the StreamWriter for this file
-				output.Add(StatDatFormat.TSV, new StreamWriter(FileTools.TryCreate(reportName)));
-			}
-
-			return output;
 		}
 
 		/// <summary>
@@ -5882,7 +5803,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 		/// <param name="statDatFormat">StatDatFormat representing output format</param>
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-		private static void OutputStatsWriteHeader(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
+		private static void WriteStatsHeader(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
 		{
 			if (outputs.ContainsKey(StatDatFormat.None))
 			{
@@ -5923,7 +5844,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 			}
 
 			// Now write the mid header for those who need it
-			OutputStatsWriteMidHeader(outputs, statDatFormat, baddumpCol, nodumpCol);
+			WriteStatsMidHeader(outputs, statDatFormat, baddumpCol, nodumpCol);
 		}
 
 		/// <summary>
@@ -5933,7 +5854,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 		/// <param name="statDatFormat">StatDatFormat representing output format</param>
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-		private static void OutputStatsWriteMidHeader(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
+		private static void WriteStatsMidHeader(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
 		{
 			if (outputs.ContainsKey(StatDatFormat.None))
 			{
@@ -5962,7 +5883,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 		/// <param name="statDatFormat">StatDatFormat representing output format</param>
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-		private static void OutputStatsWriteMidSeparator(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
+		private static void WriteStatsMidSeparator(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
 		{
 			if (outputs.ContainsKey(StatDatFormat.None))
 			{
@@ -5996,7 +5917,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 		/// <param name="statDatFormat">StatDatFormat representing output format</param>
 		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-		private static void OutputStatsWriteMidFooter(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
+		private static void WriteStatsFooterSeparator(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat, bool baddumpCol, bool nodumpCol)
 		{
 			if (outputs.ContainsKey(StatDatFormat.None))
 			{
@@ -6028,7 +5949,7 @@ Please check the log folder if the stats scrolled offscreen", false);
 		/// </summary>
 		/// <param name="sw">StreamWriter representing the output</param>
 		/// <param name="statDatFormat">StatDatFormat representing output format</param>
-		private static void OutputStatsWriteFooter(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat)
+		private static void WriteStatsFooter(Dictionary<StatDatFormat, StreamWriter> outputs, StatDatFormat statDatFormat)
 		{
 			if (outputs.ContainsKey(StatDatFormat.None))
 			{

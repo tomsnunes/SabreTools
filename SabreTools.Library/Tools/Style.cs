@@ -323,6 +323,74 @@ namespace SabreTools.Library.Tools
 			return outfile;
 		}
 
+		/// <summary>
+		/// Get the proper extension for the stat output format
+		/// </summary>
+		/// <param name="outDir">Output path to use</param>
+		/// <param name="statDatFormat">StatDatFormat to get the extension for</param>
+		/// <param name="reportName">Name of the input file to use</param>
+		/// <returns>Dictionary of output formats mapped to file names</returns>
+		public static Dictionary<StatDatFormat, string> CreateOutStatsNames(string outDir, StatDatFormat statDatFormat, string reportName, bool overwrite = true)
+		{
+			Dictionary<StatDatFormat, string> output = new Dictionary<StatDatFormat, string>();
+
+			// First try to create the output directory if we need to
+			if (!Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir);
+			}
+
+			// For each output format, get the appropriate stream writer
+			if ((statDatFormat & StatDatFormat.None) != 0)
+			{
+				output.Add(StatDatFormat.None, CreateOutStatsNamesHelper(outDir, ".txt", reportName, overwrite));
+			}
+			if ((statDatFormat & StatDatFormat.CSV) != 0)
+			{
+				output.Add(StatDatFormat.CSV, CreateOutStatsNamesHelper(outDir, ".csv", reportName, overwrite));
+			}
+			if ((statDatFormat & StatDatFormat.HTML) != 0)
+			{
+				output.Add(StatDatFormat.HTML, CreateOutStatsNamesHelper(outDir, ".html", reportName, overwrite));
+			}
+			if ((statDatFormat & StatDatFormat.TSV) != 0)
+			{
+				output.Add(StatDatFormat.TSV, CreateOutStatsNamesHelper(outDir, ".tsv", reportName, overwrite));
+			}
+
+			return output;
+		}
+
+		/// <summary>
+		/// Help generating the outstats name
+		/// </summary>
+		/// <param name="outDir">Output directory</param>
+		/// <param name="extension">Extension to use for the file</param>
+		/// <param name="reportName">Name of the input file to use</param>
+		/// <param name="overwrite">True if we ignore existing files, false otherwise</param>
+		/// <returns>String containing the new filename</returns>
+		private static string CreateOutStatsNamesHelper(string outDir, string extension, string reportName, bool overwrite)
+		{
+			string outfile = outDir + reportName + extension;
+			outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
+				outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
+				outfile);
+			if (!overwrite)
+			{
+				int i = 1;
+				while (File.Exists(outfile))
+				{
+					outfile = outDir + reportName + "_" + i + extension;
+					outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
+						outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
+						outfile);
+					i++;
+				}
+			}
+
+			return outfile;
+		}
+
 		#endregion
 
 		#region String Manipulation

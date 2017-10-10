@@ -191,7 +191,7 @@ namespace SabreTools
 				{
 					DatFile datFile = new DatFile();
 					datFile.Parse(Path.GetFullPath(input), 0, 0);
-					datFile.SplitByExt(outDir, Path.GetDirectoryName(input), exta, extb);
+					datFile.SplitByExtension(outDir, Path.GetDirectoryName(input), exta, extb);
 				}
 				else if (Directory.Exists(input))
 				{
@@ -199,7 +199,7 @@ namespace SabreTools
 					{
 						DatFile datFile = new DatFile();
 						datFile.Parse(Path.GetFullPath(file), 0, 0);
-						datFile.SplitByExt(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar),
+						datFile.SplitByExtension(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar),
 							exta, extb);
 					}
 				}
