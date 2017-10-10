@@ -21,12 +21,11 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a value-separated DAT
 	/// </summary>
-	public class SeparatedValue
+	public class SeparatedValue : DatFile
 	{
 		/// <summary>
 		/// Parse a character-separated value DAT and return all found games and roms within
 		/// </summary>
-		/// <param name="datFile">DatFile to populate with the read information</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
@@ -34,9 +33,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		public static void Parse(
-			DatFile datFile,
-
+		public void Parse(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -177,13 +174,13 @@ namespace SabreTools.Library.DatFiles
 					switch (columns[i])
 					{
 						case "DatFile.FileName":
-							datFile.FileName = (String.IsNullOrEmpty(datFile.FileName) ? value : datFile.FileName);
+							FileName = (String.IsNullOrEmpty(FileName) ? value : FileName);
 							break;
 						case "DatFile.Name":
-							datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? value : datFile.Name);
+							Name = (String.IsNullOrEmpty(Name) ? value : Name);
 							break;
 						case "DatFile.Description":
-							datFile.Description = (String.IsNullOrEmpty(datFile.Description) ? value : datFile.Description);
+							Description = (String.IsNullOrEmpty(Description) ? value : Description);
 							break;
 						case "Machine.Name":
 							machineName = value;
@@ -279,7 +276,7 @@ namespace SabreTools.Library.DatFiles
 							MachineDescription = machineDesc,
 						};
 
-						datFile.ParseAddHelper(archive, clean, remUnicode);
+						ParseAddHelper(archive, clean, remUnicode);
 						break;
 					case ItemType.BiosSet:
 						BiosSet biosset = new BiosSet()
@@ -290,7 +287,7 @@ namespace SabreTools.Library.DatFiles
 							Description = machineDesc,
 						};
 
-						datFile.ParseAddHelper(biosset, clean, remUnicode);
+						ParseAddHelper(biosset, clean, remUnicode);
 						break;
 					case ItemType.Disk:
 						Disk disk = new Disk()
@@ -308,7 +305,7 @@ namespace SabreTools.Library.DatFiles
 							ItemStatus = status,
 						};
 
-						datFile.ParseAddHelper(disk, clean, remUnicode);
+						ParseAddHelper(disk, clean, remUnicode);
 						break;
 					case ItemType.Release:
 						Release release = new Release()
@@ -319,7 +316,7 @@ namespace SabreTools.Library.DatFiles
 							MachineDescription = machineDesc,
 						};
 
-						datFile.ParseAddHelper(release, clean, remUnicode);
+						ParseAddHelper(release, clean, remUnicode);
 						break;
 					case ItemType.Rom:
 						Rom rom = new Rom()
@@ -339,7 +336,7 @@ namespace SabreTools.Library.DatFiles
 							ItemStatus = status,
 						};
 
-						datFile.ParseAddHelper(rom, clean, remUnicode);
+						ParseAddHelper(rom, clean, remUnicode);
 						break;
 					case ItemType.Sample:
 						Sample sample = new Sample()
@@ -350,7 +347,7 @@ namespace SabreTools.Library.DatFiles
 							MachineDescription = machineDesc,
 						};
 
-						datFile.ParseAddHelper(sample, clean, remUnicode);
+						ParseAddHelper(sample, clean, remUnicode);
 						break;
 				}
 			}
@@ -359,12 +356,11 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="outfile">Name of the file to write to</param>
 		/// <param name="delim">Delimiter for parsing individual lines</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToFile(DatFile datFile, string outfile, char delim, bool ignoreblanks = false)
+		public bool WriteToFile(string outfile, char delim, bool ignoreblanks = false)
 		{
 			try
 			{
@@ -384,12 +380,12 @@ namespace SabreTools.Library.DatFiles
 				WriteHeader(sw, delim);
 
 				// Get a properly sorted set of keys
-				List<string> keys = datFile.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)
 				{
-					List<DatItem> roms = datFile[key];
+					List<DatItem> roms = this[key];
 
 					// Resolve the names in the block
 					roms = DatItem.ResolveNames(roms);
@@ -414,7 +410,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// Now, output the rom data
-						WriteRomData(datFile, sw, delim, rom, ignoreblanks);
+						WriteRomData(sw, delim, rom, ignoreblanks);
 					}
 				}
 
@@ -437,7 +433,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="delim">Delimiter for parsing individual lines</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteHeader(StreamWriter sw, char delim)
+		private bool WriteHeader(StreamWriter sw, char delim)
 		{
 			try
 			{
@@ -460,13 +456,12 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out RomData using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="delim">Delimiter for parsing individual lines</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteRomData(DatFile datFile, StreamWriter sw, char delim, DatItem rom, bool ignoreblanks = false)
+		private bool WriteRomData(StreamWriter sw, char delim, DatItem rom, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
@@ -478,7 +473,7 @@ namespace SabreTools.Library.DatFiles
 
 			try
 			{
-				string state = "", name = "", pre = "", post = "";
+				string state = "", pre = "", post = "";
 
 				// Separated values should only output Rom and Disk
 				if (rom.Type != ItemType.Disk && rom.Type != ItemType.Rom)
@@ -486,8 +481,8 @@ namespace SabreTools.Library.DatFiles
 					return true;
 				}
 
-				pre = datFile.Prefix + (datFile.Quotes ? "\"" : "");
-				post = (datFile.Quotes ? "\"" : "") + datFile.Postfix;
+				pre = Prefix + (Quotes ? "\"" : "");
+				post = (Quotes ? "\"" : "") + Postfix;
 
 				if (rom.Type == ItemType.Rom)
 				{
@@ -558,9 +553,9 @@ namespace SabreTools.Library.DatFiles
 
 				if (rom.Type == ItemType.Rom)
 				{
-					string inline = string.Format("\"" + datFile.FileName + "\""
-						+ "{0}\"" + datFile.Name + "\""
-						+ "{0}\"" + datFile.Description + "\""
+					string inline = string.Format("\"" + FileName + "\""
+						+ "{0}\"" + Name + "\""
+						+ "{0}\"" + Description + "\""
 						+ "{0}\"" + rom.MachineName + "\""
 						+ "{0}\"" + rom.MachineDescription + "\""
 						+ "{0}" + "\"rom\""
@@ -578,9 +573,9 @@ namespace SabreTools.Library.DatFiles
 				}
 				else if (rom.Type == ItemType.Disk)
 				{
-					string inline = string.Format("\"" + datFile.FileName + "\""
-						+ "{0}\"" + datFile.Name + "\""
-						+ "{0}\"" + datFile.Description + "\""
+					string inline = string.Format("\"" + FileName + "\""
+						+ "{0}\"" + Name + "\""
+						+ "{0}\"" + Description + "\""
 						+ "{0}\"" + rom.MachineName + "\""
 						+ "{0}\"" + rom.MachineDescription + "\""
 						+ "{0}" + "\"disk\""

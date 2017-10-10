@@ -22,12 +22,11 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a Missfile
 	/// </summary>
-	public class Missfile
+	public class Missfile : DatFile
 	{
 		/// <summary>
 		/// Parse a Missfileand return all found games and roms within
 		/// </summary>
-		/// <param name="datFile">DatFile to populate with the read information</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
@@ -36,9 +35,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <remarks>
 		/// </remarks>
-		public static void Parse(
-			DatFile datFile,
-
+		public void Parse(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -56,11 +53,10 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="outfile">Name of the file to write to</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToFile(DatFile datFile, string outfile, bool ignoreblanks = false)
+		public bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
 			{
@@ -80,12 +76,12 @@ namespace SabreTools.Library.DatFiles
 				string lastgame = null;
 
 				// Get a properly sorted set of keys
-				List<string> keys = datFile.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)
 				{
-					List<DatItem> roms = datFile[key];
+					List<DatItem> roms = this[key];
 
 					// Resolve the names in the block
 					roms = DatItem.ResolveNames(roms);
@@ -112,7 +108,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// Now, output the rom data
-						WriteRomData(datFile, sw, rom, lastgame, ignoreblanks);
+						WriteRomData(sw, rom, lastgame, ignoreblanks);
 
 						// Set the new data to compare against
 						lastgame = rom.MachineName;
@@ -135,13 +131,12 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out RomData using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="lastgame">The name of the last game to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteRomData(DatFile datFile, StreamWriter sw, DatItem rom, string lastgame, bool ignoreblanks = false)
+		private bool WriteRomData(StreamWriter sw, DatItem rom, string lastgame, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
@@ -154,8 +149,8 @@ namespace SabreTools.Library.DatFiles
 			try
 			{
 				string state = "", name = "", pre = "", post = "";
-				pre = datFile.Prefix + (datFile.Quotes ? "\"" : "");
-				post = (datFile.Quotes ? "\"" : "") + datFile.Postfix;
+				pre = Prefix + (Quotes ? "\"" : "");
+				post = (Quotes ? "\"" : "") + Postfix;
 
 				if (rom.Type == ItemType.Rom)
 				{
@@ -231,7 +226,7 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// If we're in Romba mode, the state is consistent
-				if (datFile.Romba)
+				if (Romba)
 				{
 					if (rom.Type == ItemType.Rom)
 					{
@@ -264,33 +259,33 @@ namespace SabreTools.Library.DatFiles
 				// Otherwise, use any flags
 				else
 				{
-					name = (datFile.UseGame ? rom.MachineName : rom.Name);
-					if (datFile.RepExt != "" || datFile.RemExt)
+					name = (UseGame ? rom.MachineName : rom.Name);
+					if (RepExt != "" || RemExt)
 					{
-						if (datFile.RemExt)
+						if (RemExt)
 						{
-							datFile.RepExt = "";
+							RepExt = "";
 						}
 
 						string dir = Path.GetDirectoryName(name);
 						dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
-						name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + datFile.RepExt);
+						name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + RepExt);
 					}
-					if (datFile.AddExt != "")
+					if (AddExt != "")
 					{
-						name += datFile.AddExt;
+						name += AddExt;
 					}
-					if (!datFile.UseGame && datFile.GameName)
+					if (!UseGame && GameName)
 					{
 						name = Path.Combine(rom.MachineName, name);
 					}
 
-					if (datFile.UseGame && rom.MachineName != lastgame)
+					if (UseGame && rom.MachineName != lastgame)
 					{
 						state += pre + name + post + "\n";
 						lastgame = rom.MachineName;
 					}
-					else if (!datFile.UseGame)
+					else if (!UseGame)
 					{
 						state += pre + name + post + "\n";
 					}

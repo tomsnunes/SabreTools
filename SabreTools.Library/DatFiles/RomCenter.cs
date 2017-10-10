@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Web;
-using System.Xml;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.Items;
@@ -26,20 +24,17 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a RomCenter DAT
 	/// </summary>
-	public class RomCenter
+	public class RomCenter : DatFile
 	{
 		/// <summary>
 		/// Parse a RomCenter DAT and return all found games and roms within
 		/// </summary>
-		/// <param name="datFile">DatFile to populate with the read information</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		public static void Parse(
-			DatFile datFile,
-
+		public void Parse(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -84,7 +79,7 @@ namespace SabreTools.Library.DatFiles
 					// If we have an author
 					if (line.ToLowerInvariant().StartsWith("author="))
 					{
-						datFile.Author = (String.IsNullOrEmpty(datFile.Author) ? line.Split('=')[1] : datFile.Author);
+						Author = (String.IsNullOrEmpty(Author) ? line.Split('=')[1] : Author);
 					}
 					// If we have one of the three version tags
 					else if (line.ToLowerInvariant().StartsWith("version="))
@@ -92,31 +87,31 @@ namespace SabreTools.Library.DatFiles
 						switch (blocktype)
 						{
 							case "credits":
-								datFile.Version = (String.IsNullOrEmpty(datFile.Version) ? line.Split('=')[1] : datFile.Version);
+								Version = (String.IsNullOrEmpty(Version) ? line.Split('=')[1] : Version);
 								break;
 							case "emulator":
-								datFile.Description = (String.IsNullOrEmpty(datFile.Description) ? line.Split('=')[1] : datFile.Description);
+								Description = (String.IsNullOrEmpty(Description) ? line.Split('=')[1] : Description);
 								break;
 						}
 					}
 					// If we have a URL
 					else if (line.ToLowerInvariant().StartsWith("url="))
 					{
-						datFile.Url = (String.IsNullOrEmpty(datFile.Url) ? line.Split('=')[1] : datFile.Url);
+						Url = (String.IsNullOrEmpty(Url) ? line.Split('=')[1] : Url);
 					}
 					// If we have a comment
 					else if (line.ToLowerInvariant().StartsWith("comment="))
 					{
-						datFile.Comment = (String.IsNullOrEmpty(datFile.Comment) ? line.Split('=')[1] : datFile.Comment);
+						Comment = (String.IsNullOrEmpty(Comment) ? line.Split('=')[1] : Comment);
 					}
 					// If we have the split flag
 					else if (line.ToLowerInvariant().StartsWith("split="))
 					{
 						if (Int32.TryParse(line.Split('=')[1], out int split))
 						{
-							if (split == 1 && datFile.ForceMerging == ForceMerging.None)
+							if (split == 1 && ForceMerging == ForceMerging.None)
 							{
-								datFile.ForceMerging = ForceMerging.Split;
+								ForceMerging = ForceMerging.Split;
 							}
 						}
 					}
@@ -125,16 +120,16 @@ namespace SabreTools.Library.DatFiles
 					{
 						if (Int32.TryParse(line.Split('=')[1], out int merge))
 						{
-							if (merge == 1 && datFile.ForceMerging == ForceMerging.None)
+							if (merge == 1 && ForceMerging == ForceMerging.None)
 							{
-								datFile.ForceMerging = ForceMerging.Full;
+								ForceMerging = ForceMerging.Full;
 							}
 						}
 					}
 					// If we have the refname tag
 					else if (line.ToLowerInvariant().StartsWith("refname="))
 					{
-						datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? line.Split('=')[1] : datFile.Name);
+						Name = (String.IsNullOrEmpty(Name) ? line.Split('=')[1] : Name);
 					}
 					// If we have a rom
 					else if (line.StartsWith("¬"))
@@ -182,7 +177,7 @@ namespace SabreTools.Library.DatFiles
 						};
 
 						// Now process and add the rom
-						datFile.ParseAddHelper(rom, clean, remUnicode);
+						ParseAddHelper(rom, clean, remUnicode);
 					}
 				}
 			}
@@ -193,11 +188,10 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="outfile">Name of the file to write to</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToFile(DatFile datFile, string outfile, bool ignoreblanks = false)
+		public bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
 			{
@@ -214,19 +208,19 @@ namespace SabreTools.Library.DatFiles
 				StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
 
 				// Write out the header
-				WriteHeader(datFile, sw);
+				WriteHeader(sw);
 
 				// Write out each of the machines and roms
 				string lastgame = null;
 				List<string> splitpath = new List<string>();
 
 				// Get a properly sorted set of keys
-				List<string> keys = datFile.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)
 				{
-					List<DatItem> roms = datFile[key];
+					List<DatItem> roms = this[key];
 
 					// Resolve the names in the block
 					roms = DatItem.ResolveNames(roms);
@@ -283,24 +277,23 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out DAT header using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteHeader(DatFile datFile, StreamWriter sw)
+		private bool WriteHeader(StreamWriter sw)
 		{
 			try
 			{
 				string header = header = "[CREDITS]\n" +
-							"author=" + datFile.Author + "\n" +
-							"version=" + datFile.Version + "\n" +
-							"comment=" + datFile.Comment + "\n" +
+							"author=" + Author + "\n" +
+							"version=" + Version + "\n" +
+							"comment=" + Comment + "\n" +
 							"[DAT]\n" +
 							"version=2.50\n" +
-							"split=" + (datFile.ForceMerging == ForceMerging.Split ? "1" : "0") + "\n" +
-							"merge=" + (datFile.ForceMerging == ForceMerging.Full || datFile.ForceMerging == ForceMerging.Merged ? "1" : "0") + "\n" +
+							"split=" + (ForceMerging == ForceMerging.Split ? "1" : "0") + "\n" +
+							"merge=" + (ForceMerging == ForceMerging.Full || ForceMerging == ForceMerging.Merged ? "1" : "0") + "\n" +
 							"[EMULATOR]\n" +
-							"refname=" + datFile.Name + "\n" +
-							"version=" + datFile.Description + "\n" +
+							"refname=" + Name + "\n" +
+							"version=" + Description + "\n" +
 							"[GAMES]\n";
 
 				// Write the header out
@@ -323,7 +316,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
+		private bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks

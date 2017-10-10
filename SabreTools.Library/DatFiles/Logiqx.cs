@@ -25,12 +25,11 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a Logiqx-derived DAT
 	/// </summary>
-	public class Logiqx
+	public class Logiqx : DatFile
 	{
 		/// <summary>
 		/// Parse a Logiqx XML DAT and return all found games and roms within
 		/// </summary>
-		/// <param name="datFile">DatFile to populate with the read information</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
@@ -39,9 +38,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <remarks>
 		/// </remarks>
-		public static void Parse(
-			DatFile datFile,
-
+		public void Parse(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -85,7 +82,7 @@ namespace SabreTools.Library.DatFiles
 							Rom rom = new Rom("null", tempgame, omitFromScan: Hash.DeepHashes); // TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 
 							// Now process and add the rom
-							key = datFile.ParseAddHelper(rom, clean, remUnicode);
+							key = ParseAddHelper(rom, clean, remUnicode);
 						}
 
 						// Regardless, end the current folder
@@ -102,7 +99,7 @@ namespace SabreTools.Library.DatFiles
 							parent.RemoveAt(parent.Count - 1);
 							if (keep && parentcount > 1)
 							{
-								datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? "SuperDAT" : datFile.Type);
+								Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
 								superdat = true;
 							}
 						}
@@ -121,8 +118,8 @@ namespace SabreTools.Library.DatFiles
 						case "mame":
 							if (xtr.GetAttribute("build") != null)
 							{
-								datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? xtr.GetAttribute("build") : datFile.Name);
-								datFile.Description = (String.IsNullOrEmpty(datFile.Description) ? datFile.Name : datFile.Name);
+								Name = (String.IsNullOrEmpty(Name) ? xtr.GetAttribute("build") : Name);
+								Description = (String.IsNullOrEmpty(Description) ? Name : Name);
 							}
 							xtr.Read();
 							break;
@@ -130,57 +127,57 @@ namespace SabreTools.Library.DatFiles
 						case "softwarelist":
 							if (xtr.GetAttribute("name") != null)
 							{
-								datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? xtr.GetAttribute("name") : datFile.Name);
+								Name = (String.IsNullOrEmpty(Name) ? xtr.GetAttribute("name") : Name);
 							}
 							if (xtr.GetAttribute("description") != null)
 							{
-								datFile.Description = (String.IsNullOrEmpty(datFile.Description) ? xtr.GetAttribute("description") : datFile.Description);
+								Description = (String.IsNullOrEmpty(Description) ? xtr.GetAttribute("description") : Description);
 							}
-							if (xtr.GetAttribute("forcemerging") != null && datFile.ForceMerging == ForceMerging.None)
+							if (xtr.GetAttribute("forcemerging") != null && ForceMerging == ForceMerging.None)
 							{
 								switch (xtr.GetAttribute("forcemerging"))
 								{
 									case "none":
-										datFile.ForceMerging = ForceMerging.None;
+										ForceMerging = ForceMerging.None;
 										break;
 									case "split":
-										datFile.ForceMerging = ForceMerging.Split;
+										ForceMerging = ForceMerging.Split;
 										break;
 									case "merged":
-										datFile.ForceMerging = ForceMerging.Merged;
+										ForceMerging = ForceMerging.Merged;
 										break;
 									case "nonmerged":
-										datFile.ForceMerging = ForceMerging.NonMerged;
+										ForceMerging = ForceMerging.NonMerged;
 										break;
 									case "full":
-										datFile.ForceMerging = ForceMerging.Full;
+										ForceMerging = ForceMerging.Full;
 										break;
 								}
 							}
-							if (xtr.GetAttribute("forcenodump") != null && datFile.ForceNodump == ForceNodump.None)
+							if (xtr.GetAttribute("forcenodump") != null && ForceNodump == ForceNodump.None)
 							{
 								switch (xtr.GetAttribute("forcenodump"))
 								{
 									case "obsolete":
-										datFile.ForceNodump = ForceNodump.Obsolete;
+										ForceNodump = ForceNodump.Obsolete;
 										break;
 									case "required":
-										datFile.ForceNodump = ForceNodump.Required;
+										ForceNodump = ForceNodump.Required;
 										break;
 									case "ignore":
-										datFile.ForceNodump = ForceNodump.Ignore;
+										ForceNodump = ForceNodump.Ignore;
 										break;
 								}
 							}
-							if (xtr.GetAttribute("forcepacking") != null && datFile.ForcePacking == ForcePacking.None)
+							if (xtr.GetAttribute("forcepacking") != null && ForcePacking == ForcePacking.None)
 							{
 								switch (xtr.GetAttribute("forcepacking"))
 								{
 									case "zip":
-										datFile.ForcePacking = ForcePacking.Zip;
+										ForcePacking = ForcePacking.Zip;
 										break;
 									case "unzip":
-										datFile.ForcePacking = ForcePacking.Unzip;
+										ForcePacking = ForcePacking.Unzip;
 										break;
 								}
 							}
@@ -188,11 +185,11 @@ namespace SabreTools.Library.DatFiles
 							break;
 						// Handle M1 DATs since they're 99% the same as a SL DAT
 						case "m1":
-							datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? "M1" : datFile.Name);
-							datFile.Description = (String.IsNullOrEmpty(datFile.Description) ? "M1" : datFile.Description);
+							Name = (String.IsNullOrEmpty(Name) ? "M1" : Name);
+							Description = (String.IsNullOrEmpty(Description) ? "M1" : Description);
 							if (xtr.GetAttribute("version") != null)
 							{
-								datFile.Version = (String.IsNullOrEmpty(datFile.Version) ? xtr.GetAttribute("version") : datFile.Version);
+								Version = (String.IsNullOrEmpty(Version) ? xtr.GetAttribute("version") : Version);
 							}
 							xtr.Read();
 							break;
@@ -223,16 +220,16 @@ namespace SabreTools.Library.DatFiles
 								{
 									case "datname":
 										content = headreader.ReadElementContentAsString(); ;
-										datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? content : datFile.Name);
+										Name = (String.IsNullOrEmpty(Name) ? content : Name);
 										superdat = superdat || content.Contains(" - SuperDAT");
 										if (keep && superdat)
 										{
-											datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? "SuperDAT" : datFile.Type);
+											Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
 										}
 										break;
 									case "datversionurl":
 										content = headreader.ReadElementContentAsString(); ;
-										datFile.Url = (String.IsNullOrEmpty(datFile.Name) ? content : datFile.Url);
+										Url = (String.IsNullOrEmpty(Name) ? content : Url);
 										break;
 									default:
 										headreader.Read();
@@ -268,121 +265,121 @@ namespace SabreTools.Library.DatFiles
 								{
 									case "name":
 										content = headreader.ReadElementContentAsString(); ;
-										datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? content : datFile.Name);
+										Name = (String.IsNullOrEmpty(Name) ? content : Name);
 										superdat = superdat || content.Contains(" - SuperDAT");
 										if (keep && superdat)
 										{
-											datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? "SuperDAT" : datFile.Type);
+											Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
 										}
 										break;
 									case "description":
 										content = headreader.ReadElementContentAsString();
-										datFile.Description = (String.IsNullOrEmpty(datFile.Description) ? content : datFile.Description);
+										Description = (String.IsNullOrEmpty(Description) ? content : Description);
 										break;
 									case "rootdir":
 										content = headreader.ReadElementContentAsString();
-										datFile.RootDir = (String.IsNullOrEmpty(datFile.RootDir) ? content : datFile.RootDir);
+										RootDir = (String.IsNullOrEmpty(RootDir) ? content : RootDir);
 										break;
 									case "category":
 										content = headreader.ReadElementContentAsString();
-										datFile.Category = (String.IsNullOrEmpty(datFile.Category) ? content : datFile.Category);
+										Category = (String.IsNullOrEmpty(Category) ? content : Category);
 										break;
 									case "version":
 										content = headreader.ReadElementContentAsString();
-										datFile.Version = (String.IsNullOrEmpty(datFile.Version) ? content : datFile.Version);
+										Version = (String.IsNullOrEmpty(Version) ? content : Version);
 										break;
 									case "date":
 										content = headreader.ReadElementContentAsString();
-										datFile.Date = (String.IsNullOrEmpty(datFile.Date) ? content.Replace(".", "/") : datFile.Date);
+										Date = (String.IsNullOrEmpty(Date) ? content.Replace(".", "/") : Date);
 										break;
 									case "author":
 										content = headreader.ReadElementContentAsString();
-										datFile.Author = (String.IsNullOrEmpty(datFile.Author) ? content : datFile.Author);
+										Author = (String.IsNullOrEmpty(Author) ? content : Author);
 
 										// Special cases for SabreDAT
-										datFile.Email = (String.IsNullOrEmpty(datFile.Email) && !String.IsNullOrEmpty(headreader.GetAttribute("email")) ?
-											headreader.GetAttribute("email") : datFile.Email);
-										datFile.Homepage = (String.IsNullOrEmpty(datFile.Homepage) && !String.IsNullOrEmpty(headreader.GetAttribute("homepage")) ?
-											headreader.GetAttribute("homepage") : datFile.Homepage);
-										datFile.Url = (String.IsNullOrEmpty(datFile.Url) && !String.IsNullOrEmpty(headreader.GetAttribute("url")) ?
-											headreader.GetAttribute("url") : datFile.Url);
+										Email = (String.IsNullOrEmpty(Email) && !String.IsNullOrEmpty(headreader.GetAttribute("email")) ?
+											headreader.GetAttribute("email") : Email);
+										Homepage = (String.IsNullOrEmpty(Homepage) && !String.IsNullOrEmpty(headreader.GetAttribute("homepage")) ?
+											headreader.GetAttribute("homepage") : Homepage);
+										Url = (String.IsNullOrEmpty(Url) && !String.IsNullOrEmpty(headreader.GetAttribute("url")) ?
+											headreader.GetAttribute("url") : Url);
 										break;
 									case "email":
 										content = headreader.ReadElementContentAsString();
-										datFile.Email = (String.IsNullOrEmpty(datFile.Email) ? content : datFile.Email);
+										Email = (String.IsNullOrEmpty(Email) ? content : Email);
 										break;
 									case "homepage":
 										content = headreader.ReadElementContentAsString();
-										datFile.Homepage = (String.IsNullOrEmpty(datFile.Homepage) ? content : datFile.Homepage);
+										Homepage = (String.IsNullOrEmpty(Homepage) ? content : Homepage);
 										break;
 									case "url":
 										content = headreader.ReadElementContentAsString();
-										datFile.Url = (String.IsNullOrEmpty(datFile.Url) ? content : datFile.Url);
+										Url = (String.IsNullOrEmpty(Url) ? content : Url);
 										break;
 									case "comment":
 										content = headreader.ReadElementContentAsString();
-										datFile.Comment = (String.IsNullOrEmpty(datFile.Comment) ? content : datFile.Comment);
+										Comment = (String.IsNullOrEmpty(Comment) ? content : Comment);
 										break;
 									case "type":
 										content = headreader.ReadElementContentAsString();
-										datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? content : datFile.Type);
+										Type = (String.IsNullOrEmpty(Type) ? content : Type);
 										superdat = superdat || content.Contains("SuperDAT");
 										break;
 									case "clrmamepro":
 									case "romcenter":
 										if (headreader.GetAttribute("header") != null)
 										{
-											datFile.Header = (String.IsNullOrEmpty(datFile.Header) ? headreader.GetAttribute("header") : datFile.Header);
+											Header = (String.IsNullOrEmpty(Header) ? headreader.GetAttribute("header") : Header);
 										}
 										if (headreader.GetAttribute("plugin") != null)
 										{
-											datFile.Header = (String.IsNullOrEmpty(datFile.Header) ? headreader.GetAttribute("plugin") : datFile.Header);
+											Header = (String.IsNullOrEmpty(Header) ? headreader.GetAttribute("plugin") : Header);
 										}
-										if (headreader.GetAttribute("forcemerging") != null && datFile.ForceMerging == ForceMerging.None)
+										if (headreader.GetAttribute("forcemerging") != null && ForceMerging == ForceMerging.None)
 										{
 											switch (headreader.GetAttribute("forcemerging"))
 											{
 												case "none":
-													datFile.ForceMerging = ForceMerging.None;
+													ForceMerging = ForceMerging.None;
 													break;
 												case "split":
-													datFile.ForceMerging = ForceMerging.Split;
+													ForceMerging = ForceMerging.Split;
 													break;
 												case "merged":
-													datFile.ForceMerging = ForceMerging.Merged;
+													ForceMerging = ForceMerging.Merged;
 													break;
 												case "nonmerged":
-													datFile.ForceMerging = ForceMerging.NonMerged;
+													ForceMerging = ForceMerging.NonMerged;
 													break;
 												case "full":
-													datFile.ForceMerging = ForceMerging.Full;
+													ForceMerging = ForceMerging.Full;
 													break;
 											}
 										}
-										if (headreader.GetAttribute("forcenodump") != null && datFile.ForceNodump == ForceNodump.None)
+										if (headreader.GetAttribute("forcenodump") != null && ForceNodump == ForceNodump.None)
 										{
 											switch (headreader.GetAttribute("forcenodump"))
 											{
 												case "obsolete":
-													datFile.ForceNodump = ForceNodump.Obsolete;
+													ForceNodump = ForceNodump.Obsolete;
 													break;
 												case "required":
-													datFile.ForceNodump = ForceNodump.Required;
+													ForceNodump = ForceNodump.Required;
 													break;
 												case "ignore":
-													datFile.ForceNodump = ForceNodump.Ignore;
+													ForceNodump = ForceNodump.Ignore;
 													break;
 											}
 										}
-										if (headreader.GetAttribute("forcepacking") != null && datFile.ForcePacking == ForcePacking.None)
+										if (headreader.GetAttribute("forcepacking") != null && ForcePacking == ForcePacking.None)
 										{
 											switch (headreader.GetAttribute("forcepacking"))
 											{
 												case "zip":
-													datFile.ForcePacking = ForcePacking.Zip;
+													ForcePacking = ForcePacking.Zip;
 													break;
 												case "unzip":
-													datFile.ForcePacking = ForcePacking.Unzip;
+													ForcePacking = ForcePacking.Unzip;
 													break;
 											}
 										}
@@ -416,53 +413,53 @@ namespace SabreTools.Library.DatFiles
 														switch (flagreader.GetAttribute("name"))
 														{
 															case "type":
-																datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? content : datFile.Type);
+																Type = (String.IsNullOrEmpty(Type) ? content : Type);
 																superdat = superdat || content.Contains("SuperDAT");
 																break;
 															case "forcemerging":
-																if (datFile.ForceMerging == ForceMerging.None)
+																if (ForceMerging == ForceMerging.None)
 																{
 																	switch (content)
 																	{
 																		case "split":
-																			datFile.ForceMerging = ForceMerging.Split;
+																			ForceMerging = ForceMerging.Split;
 																			break;
 																		case "none":
-																			datFile.ForceMerging = ForceMerging.None;
+																			ForceMerging = ForceMerging.None;
 																			break;
 																		case "full":
-																			datFile.ForceMerging = ForceMerging.Full;
+																			ForceMerging = ForceMerging.Full;
 																			break;
 																	}
 																}
 																break;
 															case "forcenodump":
-																if (datFile.ForceNodump == ForceNodump.None)
+																if (ForceNodump == ForceNodump.None)
 																{
 																	switch (content)
 																	{
 																		case "obsolete":
-																			datFile.ForceNodump = ForceNodump.Obsolete;
+																			ForceNodump = ForceNodump.Obsolete;
 																			break;
 																		case "required":
-																			datFile.ForceNodump = ForceNodump.Required;
+																			ForceNodump = ForceNodump.Required;
 																			break;
 																		case "ignore":
-																			datFile.ForceNodump = ForceNodump.Ignore;
+																			ForceNodump = ForceNodump.Ignore;
 																			break;
 																	}
 																}
 																break;
 															case "forcepacking":
-																if (datFile.ForcePacking == ForcePacking.None)
+																if (ForcePacking == ForcePacking.None)
 																{
 																	switch (content)
 																	{
 																		case "zip":
-																			datFile.ForcePacking = ForcePacking.Zip;
+																			ForcePacking = ForcePacking.Zip;
 																			break;
 																		case "unzip":
-																			datFile.ForcePacking = ForcePacking.Unzip;
+																			ForcePacking = ForcePacking.Unzip;
 																			break;
 																	}
 																}
@@ -631,7 +628,7 @@ namespace SabreTools.Library.DatFiles
 										olrom.CopyMachineInformation(machine);
 
 										// Now process and add the rom
-										key = datFile.ParseAddHelper(olrom, clean, remUnicode);
+										key = ParseAddHelper(olrom, clean, remUnicode);
 										break;
 
 									// For Software List and MAME listxml only
@@ -727,7 +724,7 @@ namespace SabreTools.Library.DatFiles
 										relrom.CopyMachineInformation(machine);
 
 										// Now process and add the rom
-										key = datFile.ParseAddHelper(relrom, clean, remUnicode);
+										key = ParseAddHelper(relrom, clean, remUnicode);
 
 										subreader.Read();
 										break;
@@ -770,7 +767,7 @@ namespace SabreTools.Library.DatFiles
 										biosrom.CopyMachineInformation(machine);
 
 										// Now process and add the rom
-										key = datFile.ParseAddHelper(biosrom, clean, remUnicode);
+										key = ParseAddHelper(biosrom, clean, remUnicode);
 
 										subreader.Read();
 										break;
@@ -798,7 +795,7 @@ namespace SabreTools.Library.DatFiles
 										archiverom.CopyMachineInformation(machine);
 
 										// Now process and add the rom
-										key = datFile.ParseAddHelper(archiverom, clean, remUnicode);
+										key = ParseAddHelper(archiverom, clean, remUnicode);
 
 										subreader.Read();
 										break;
@@ -826,7 +823,7 @@ namespace SabreTools.Library.DatFiles
 										samplerom.CopyMachineInformation(machine);
 
 										// Now process and add the rom
-										key = datFile.ParseAddHelper(samplerom, clean, remUnicode);
+										key = ParseAddHelper(samplerom, clean, remUnicode);
 
 										subreader.Read();
 										break;
@@ -885,14 +882,14 @@ namespace SabreTools.Library.DatFiles
 										// If the rom is continue or ignore, add the size to the previous rom
 										if (subreader.GetAttribute("loadflag") == "continue" || subreader.GetAttribute("loadflag") == "ignore")
 										{
-											int index = datFile[key].Count() - 1;
-											DatItem lastrom = datFile[key][index];
+											int index = this[key].Count() - 1;
+											DatItem lastrom = this[key][index];
 											if (lastrom.Type == ItemType.Rom)
 											{
 												((Rom)lastrom).Size += size;
 											}
-											datFile[key].RemoveAt(index);
-											datFile[key].Add(lastrom);
+											this[key].RemoveAt(index);
+											this[key].Add(lastrom);
 											subreader.Read();
 											continue;
 										}
@@ -967,7 +964,7 @@ namespace SabreTools.Library.DatFiles
 										inrom.CopyMachineInformation(machine);
 
 										// Now process and add the rom
-										key = datFile.ParseAddHelper(inrom, clean, remUnicode);
+										key = ParseAddHelper(inrom, clean, remUnicode);
 
 										subreader.Read();
 										break;
@@ -985,7 +982,7 @@ namespace SabreTools.Library.DatFiles
 							superdat = true;
 							if (keep)
 							{
-								datFile.Type = (datFile.Type == "" ? "SuperDAT" : datFile.Type);
+								Type = (Type == "" ? "SuperDAT" : Type);
 							}
 
 							string foldername = (xtr.GetAttribute("name") ?? "");
@@ -1069,14 +1066,14 @@ namespace SabreTools.Library.DatFiles
 							// If the rom is continue or ignore, add the size to the previous rom
 							if (xtr.GetAttribute("loadflag") == "continue" || xtr.GetAttribute("loadflag") == "ignore")
 							{
-								int index = datFile[key].Count() - 1;
-								DatItem lastrom = datFile[key][index];
+								int index = this[key].Count() - 1;
+								DatItem lastrom = this[key][index];
 								if (lastrom.Type == ItemType.Rom)
 								{
 									((Rom)lastrom).Size += size;
 								}
-								datFile[key].RemoveAt(index);
-								datFile[key].Add(lastrom);
+								this[key].RemoveAt(index);
+								this[key].Add(lastrom);
 								continue;
 							}
 
@@ -1140,7 +1137,7 @@ namespace SabreTools.Library.DatFiles
 							rom.CopyMachineInformation(dir);
 
 							// Now process and add the rom
-							key = datFile.ParseAddHelper(rom, clean, remUnicode);
+							key = ParseAddHelper(rom, clean, remUnicode);
 
 							xtr.Read();
 							break;
@@ -1164,14 +1161,10 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="outfile">Name of the file to write to</param>
-		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
-		/// <param name="stats">True if DAT statistics should be output on write, false otherwise (default)</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
-		/// <param name="overwrite">True if files should be overwritten (default), false if they should be renamed instead</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToFile(DatFile datFile, string outfile, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
+		public bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
 			{
@@ -1188,18 +1181,18 @@ namespace SabreTools.Library.DatFiles
 				StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
 
 				// Write out the header
-				WriteHeader(datFile, sw);
+				WriteHeader(sw);
 
 				// Write out each of the machines and roms
 				string lastgame = null;
 
 				// Get a properly sorted set of keys
-				List<string> keys = datFile.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)
 				{
-					List<DatItem> roms = datFile[key];
+					List<DatItem> roms = this[key];
 
 					// Resolve the names in the block
 					roms = DatItem.ResolveNames(roms);
@@ -1224,7 +1217,7 @@ namespace SabreTools.Library.DatFiles
 						// If we have a new game, output the beginning of the new item
 						if (lastgame == null || lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
 						{
-							WriteStartGame(datFile, sw, rom);
+							WriteStartGame(sw, rom);
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
@@ -1271,10 +1264,9 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out DAT header using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteHeader(DatFile datFile, StreamWriter sw)
+		private bool WriteHeader(StreamWriter sw)
 		{
 			try
 			{
@@ -1282,29 +1274,29 @@ namespace SabreTools.Library.DatFiles
 							"<!DOCTYPE datafile PUBLIC \"-//Logiqx//DTD ROM Management Datafile//EN\" \"http://www.logiqx.com/Dats/datafile.dtd\">\n\n" +
 							"<datafile>\n" +
 							"\t<header>\n" +
-							"\t\t<name>" + HttpUtility.HtmlEncode(datFile.Name) + "</name>\n" +
-							"\t\t<description>" + HttpUtility.HtmlEncode(datFile.Description) + "</description>\n" +
-							(!String.IsNullOrEmpty(datFile.RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(datFile.RootDir) + "</rootdir>\n" : "") +
-							(!String.IsNullOrEmpty(datFile.Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(datFile.Category) + "</category>\n" : "") +
-							"\t\t<version>" + HttpUtility.HtmlEncode(datFile.Version) + "</version>\n" +
-							(!String.IsNullOrEmpty(datFile.Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(datFile.Date) + "</date>\n" : "") +
-							"\t\t<author>" + HttpUtility.HtmlEncode(datFile.Author) + "</author>\n" +
-							(!String.IsNullOrEmpty(datFile.Email) ? "\t\t<email>" + HttpUtility.HtmlEncode(datFile.Email) + "</email>\n" : "") +
-							(!String.IsNullOrEmpty(datFile.Homepage) ? "\t\t<homepage>" + HttpUtility.HtmlEncode(datFile.Homepage) + "</homepage>\n" : "") +
-							(!String.IsNullOrEmpty(datFile.Url) ? "\t\t<url>" + HttpUtility.HtmlEncode(datFile.Url) + "</url>\n" : "") +
-							(!String.IsNullOrEmpty(datFile.Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(datFile.Comment) + "</comment>\n" : "") +
-							(!String.IsNullOrEmpty(datFile.Type) ? "\t\t<type>" + HttpUtility.HtmlEncode(datFile.Type) + "</type>\n" : "") +
-							(datFile.ForcePacking != ForcePacking.None || datFile.ForceMerging != ForceMerging.None || datFile.ForceNodump != ForceNodump.None ?
+							"\t\t<name>" + HttpUtility.HtmlEncode(Name) + "</name>\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode(Description) + "</description>\n" +
+							(!String.IsNullOrEmpty(RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(RootDir) + "</rootdir>\n" : "") +
+							(!String.IsNullOrEmpty(Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(Category) + "</category>\n" : "") +
+							"\t\t<version>" + HttpUtility.HtmlEncode(Version) + "</version>\n" +
+							(!String.IsNullOrEmpty(Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(Date) + "</date>\n" : "") +
+							"\t\t<author>" + HttpUtility.HtmlEncode(Author) + "</author>\n" +
+							(!String.IsNullOrEmpty(Email) ? "\t\t<email>" + HttpUtility.HtmlEncode(Email) + "</email>\n" : "") +
+							(!String.IsNullOrEmpty(Homepage) ? "\t\t<homepage>" + HttpUtility.HtmlEncode(Homepage) + "</homepage>\n" : "") +
+							(!String.IsNullOrEmpty(Url) ? "\t\t<url>" + HttpUtility.HtmlEncode(Url) + "</url>\n" : "") +
+							(!String.IsNullOrEmpty(Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(Comment) + "</comment>\n" : "") +
+							(!String.IsNullOrEmpty(Type) ? "\t\t<type>" + HttpUtility.HtmlEncode(Type) + "</type>\n" : "") +
+							(ForcePacking != ForcePacking.None || ForceMerging != ForceMerging.None || ForceNodump != ForceNodump.None ?
 								"\t\t<clrmamepro" +
-									(datFile.ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
-									(datFile.ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
-									(datFile.ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
-									(datFile.ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
-									(datFile.ForceMerging == ForceMerging.Merged ? " forcemerging=\"merged\"" : "") +
-									(datFile.ForceMerging == ForceMerging.NonMerged ? " forcemerging=\"nonmerged\"" : "") +
-									(datFile.ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
-									(datFile.ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"obsolete\"" : "") +
-									(datFile.ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
+									(ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
+									(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
+									(ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
+									(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
+									(ForceMerging == ForceMerging.Merged ? " forcemerging=\"merged\"" : "") +
+									(ForceMerging == ForceMerging.NonMerged ? " forcemerging=\"nonmerged\"" : "") +
+									(ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
+									(ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"obsolete\"" : "") +
+									(ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
 									" />\n"
 							: "") +
 							"\t</header>\n";
@@ -1325,11 +1317,10 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out Game start using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteStartGame(DatFile datFile, StreamWriter sw, DatItem rom)
+		private bool WriteStartGame(StreamWriter sw, DatItem rom)
 		{
 			try
 			{
@@ -1340,7 +1331,7 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				string state = "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
-								(datFile.ExcludeOf ? "" :
+								(ExcludeOf ? "" :
 									(rom.MachineType == MachineType.Bios ? " isbios=\"yes\"" : "") +
 									(rom.MachineType == MachineType.Device ? " isdevice=\"yes\"" : "") +
 									(rom.MachineType == MachineType.Mechanical ? " ismechanical=\"yes\"" : "") +
@@ -1378,7 +1369,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteEndGame(StreamWriter sw)
+		private bool WriteEndGame(StreamWriter sw)
 		{
 			try
 			{
@@ -1403,7 +1394,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
+		private bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
@@ -1486,7 +1477,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteFooter(StreamWriter sw)
+		private bool WriteFooter(StreamWriter sw)
 		{
 			try
 			{

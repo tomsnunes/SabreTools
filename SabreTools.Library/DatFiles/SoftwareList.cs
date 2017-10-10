@@ -23,12 +23,11 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of an SabreDat XML DAT
 	/// </summary>
-	public class SoftwareList
+	public class SoftwareList : DatFile
 	{
 		/// <summary>
 		/// Parse an SabreDat XML DAT and return all found games and roms within
 		/// </summary>
-		/// <param name="datFile">DatFile to populate with the read information</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
@@ -37,7 +36,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <remarks>
 		/// </remarks>
-		public static void Parse(
+		public void Parse(
 			DatFile datFile,
 
 			// Standard Dat parsing
@@ -51,17 +50,16 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// All XML-derived DATs share a lot in common so it just calls one implementation
-			Logiqx.Parse(datFile, filename, sysid, srcid, keep, clean, remUnicode);
+			(this as DatFile as Logiqx).Parse(filename, sysid, srcid, keep, clean, remUnicode);
 		}
 
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="outfile">Name of the file to write to</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToFile(DatFile datFile, string outfile, bool ignoreblanks = false)
+		public bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
 			{
@@ -78,18 +76,18 @@ namespace SabreTools.Library.DatFiles
 				StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
 
 				// Write out the header
-				WriteHeader(datFile, sw);
+				WriteHeader(sw);
 
 				// Write out each of the machines and roms
 				string lastgame = null;
 
 				// Get a properly sorted set of keys
-				List<string> keys = datFile.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)
 				{
-					List<DatItem> roms = datFile[key];
+					List<DatItem> roms = this[key];
 
 					// Resolve the names in the block
 					roms = DatItem.ResolveNames(roms);
@@ -114,7 +112,7 @@ namespace SabreTools.Library.DatFiles
 						// If we have a new game, output the beginning of the new item
 						if (lastgame == null || lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
 						{
-							WriteStartGame(datFile, sw, rom);
+							WriteStartGame(sw, rom);
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
@@ -155,26 +153,25 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out DAT header using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteHeader(DatFile datFile, StreamWriter sw)
+		private bool WriteHeader(StreamWriter sw)
 		{
 			try
 			{
 				string header = "<?xml version=\"1.0\"?>\n" +
 							"<!DOCTYPE softwarelist SYSTEM \"softwarelist.dtd\">\n\n" +
-							"<softwarelist name=\"" + HttpUtility.HtmlEncode(datFile.Name) + "\"" +
-								" description=\"" + HttpUtility.HtmlEncode(datFile.Description) + "\"" +
-								(datFile.ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
-								(datFile.ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
-								(datFile.ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
-								(datFile.ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
-								(datFile.ForceMerging == ForceMerging.Merged ? " forcemerging=\"merged\"" : "") +
-								(datFile.ForceMerging == ForceMerging.NonMerged ? " forcemerging=\"nonmerged\"" : "") +
-								(datFile.ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
-								(datFile.ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"obsolete\"" : "") +
-								(datFile.ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
+							"<softwarelist name=\"" + HttpUtility.HtmlEncode(Name) + "\"" +
+								" description=\"" + HttpUtility.HtmlEncode(Description) + "\"" +
+								(ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
+								(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
+								(ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
+								(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
+								(ForceMerging == ForceMerging.Merged ? " forcemerging=\"merged\"" : "") +
+								(ForceMerging == ForceMerging.NonMerged ? " forcemerging=\"nonmerged\"" : "") +
+								(ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
+								(ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"obsolete\"" : "") +
+								(ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
 								">\n\n";
 
 				// Write the header out
@@ -193,11 +190,10 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out Game start using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteStartGame(DatFile datFile, StreamWriter sw, DatItem rom)
+		private bool WriteStartGame(StreamWriter sw, DatItem rom)
 		{
 			try
 			{
@@ -209,7 +205,7 @@ namespace SabreTools.Library.DatFiles
 
 				string state = "\t<software name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\""
 							+ (rom.Supported != null ? " supported=\"" + (rom.Supported == true ? "yes" : "no") + "\"" : "") +
-							(datFile.ExcludeOf ? "" :
+							(ExcludeOf ? "" :
 									(String.IsNullOrEmpty(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
 										? ""
 										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
@@ -246,7 +242,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteEndGame(StreamWriter sw)
+		private bool WriteEndGame(StreamWriter sw)
 		{
 			try
 			{
@@ -271,7 +267,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
+		private bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
@@ -381,7 +377,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteFooter(StreamWriter sw)
+		private bool WriteFooter(StreamWriter sw)
 		{
 			try
 			{

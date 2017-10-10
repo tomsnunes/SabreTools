@@ -23,21 +23,18 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a hashfile such as an SFV, MD5, or SHA-1 file
 	/// </summary>
-	public class Hashfile
+	public class Hashfile : DatFile
 	{
 		/// <summary>
 		/// Parse a hashfile or SFV and return all found games and roms within
 		/// </summary>
-		/// <param name="datFile">DatFile to populate with the read information</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="hashtype">Hash type that should be assumed</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		public static void Parse(
-			DatFile datFile,
-
+		public void Parse(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -95,7 +92,7 @@ namespace SabreTools.Library.DatFiles
 				};
 
 				// Now process and add the rom
-				datFile.ParseAddHelper(rom, clean, remUnicode);
+				ParseAddHelper(rom, clean, remUnicode);
 			}
 
 			sr.Dispose();
@@ -104,12 +101,11 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="outfile">Name of the file to write to</param>
 		/// <param name="hash">Hash that should be written out</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToFile(DatFile datFile, string outfile, Hash hash, bool ignoreblanks = false)
+		public bool WriteToFile(string outfile, Hash hash, bool ignoreblanks = false)
 		{
 			try
 			{
@@ -126,12 +122,12 @@ namespace SabreTools.Library.DatFiles
 				StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
 
 				// Get a properly sorted set of keys
-				List<string> keys = datFile.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)
 				{
-					List<DatItem> roms = datFile[key];
+					List<DatItem> roms = this[key];
 
 					// Resolve the names in the block
 					roms = DatItem.ResolveNames(roms);
@@ -156,7 +152,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// Now, output the rom data
-						WriteRomData(datFile, sw, hash, rom, ignoreblanks);
+						WriteRomData( sw, hash, rom, ignoreblanks);
 					}
 				}
 
@@ -176,13 +172,12 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out RomData using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="hash">Hash that should be written out</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteRomData(DatFile datFile, StreamWriter sw, Hash hash, DatItem rom, bool ignoreblanks = false)
+		private bool WriteRomData(StreamWriter sw, Hash hash, DatItem rom, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
@@ -200,57 +195,57 @@ namespace SabreTools.Library.DatFiles
 					case Hash.MD5:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).MD5 + " *" + (datFile.GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Rom)rom).MD5 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).MD5 + " *" + (datFile.GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Disk)rom).MD5 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case Hash.CRC:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += (datFile.GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + " " + ((Rom)rom).CRC + "\n";
+							state += (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + " " + ((Rom)rom).CRC + "\n";
 						}
 						break;
 					case Hash.SHA1:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA1 + " *" + (datFile.GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Rom)rom).SHA1 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA1 + " *" + (datFile.GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Disk)rom).SHA1 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case Hash.SHA256:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA256 + " *" + (datFile.GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Rom)rom).SHA256 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA256 + " *" + (datFile.GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Disk)rom).SHA256 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case Hash.SHA384:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA384 + " *" + (datFile.GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Rom)rom).SHA384 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA384 + " *" + (datFile.GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Disk)rom).SHA384 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 					case Hash.SHA512:
 						if (rom.Type == ItemType.Rom)
 						{
-							state += ((Rom)rom).SHA512 + " *" + (datFile.GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Rom)rom).SHA512 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						else if (rom.Type == ItemType.Disk)
 						{
-							state += ((Disk)rom).SHA512 + " *" + (datFile.GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
+							state += ((Disk)rom).SHA512 + " *" + (GameName ? rom.MachineName + Path.DirectorySeparatorChar : "") + rom.Name + "\n";
 						}
 						break;
 				}

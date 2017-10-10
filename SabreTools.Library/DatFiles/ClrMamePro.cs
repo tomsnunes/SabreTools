@@ -24,21 +24,18 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a ClrMamePro DAT
 	/// </summary>
-	public class ClrMamePro
+	public class ClrMamePro : DatFile
 	{
 		/// <summary>
 		/// Parse a ClrMamePro DAT and return all found games and roms within
 		/// </summary>
-		/// <param name="datFile">DatFile to populate with the read information</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		public static void Parse(
-			DatFile datFile,
-
+		public void Parse(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -148,7 +145,7 @@ namespace SabreTools.Library.DatFiles
 						item.Name = line;
 
 						// Now process and add the sample
-						datFile.ParseAddHelper(item, clean, remUnicode);
+						ParseAddHelper(item, clean, remUnicode);
 
 						continue;
 					}
@@ -232,7 +229,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// Now process and add the rom
-						datFile.ParseAddHelper(item, clean, remUnicode);
+						ParseAddHelper(item, clean, remUnicode);
 						continue;
 					}
 
@@ -444,7 +441,7 @@ namespace SabreTools.Library.DatFiles
 					}
 
 					// Now process and add the rom
-					datFile.ParseAddHelper(item, clean, remUnicode);
+					ParseAddHelper(item, clean, remUnicode);
 				}
 
 				// If the line is anything but a rom or disk and we're in a block
@@ -486,11 +483,11 @@ namespace SabreTools.Library.DatFiles
 
 						if (line.Trim().StartsWith("Name:"))
 						{
-							datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? line.Substring(6) : datFile.Name);
+							Name = (String.IsNullOrEmpty(Name) ? line.Substring(6) : Name);
 							superdat = superdat || itemval.Contains(" - SuperDAT");
 							if (keep && superdat)
 							{
-								datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? "SuperDAT" : datFile.Type);
+								Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
 							}
 							continue;
 						}
@@ -499,103 +496,103 @@ namespace SabreTools.Library.DatFiles
 						{
 							case "name":
 							case "Name:":
-								datFile.Name = (String.IsNullOrEmpty(datFile.Name) ? itemval : datFile.Name);
+								Name = (String.IsNullOrEmpty(Name) ? itemval : Name);
 								superdat = superdat || itemval.Contains(" - SuperDAT");
 								if (keep && superdat)
 								{
-									datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? "SuperDAT" : datFile.Type);
+									Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
 								}
 								break;
 							case "description":
 							case "Description:":
-								datFile.Description = (String.IsNullOrEmpty(datFile.Description) ? itemval : datFile.Description);
+								Description = (String.IsNullOrEmpty(Description) ? itemval : Description);
 								break;
 							case "rootdir":
-								datFile.RootDir = (String.IsNullOrEmpty(datFile.RootDir) ? itemval : datFile.RootDir);
+								RootDir = (String.IsNullOrEmpty(RootDir) ? itemval : RootDir);
 								break;
 							case "category":
-								datFile.Category = (String.IsNullOrEmpty(datFile.Category) ? itemval : datFile.Category);
+								Category = (String.IsNullOrEmpty(Category) ? itemval : Category);
 								break;
 							case "version":
 							case "Version:":
-								datFile.Version = (String.IsNullOrEmpty(datFile.Version) ? itemval : datFile.Version);
+								Version = (String.IsNullOrEmpty(Version) ? itemval : Version);
 								break;
 							case "date":
 							case "Date:":
-								datFile.Date = (String.IsNullOrEmpty(datFile.Date) ? itemval : datFile.Date);
+								Date = (String.IsNullOrEmpty(Date) ? itemval : Date);
 								break;
 							case "author":
 							case "Author:":
-								datFile.Author = (String.IsNullOrEmpty(datFile.Author) ? itemval : datFile.Author);
+								Author = (String.IsNullOrEmpty(Author) ? itemval : Author);
 								break;
 							case "email":
-								datFile.Email = (String.IsNullOrEmpty(datFile.Email) ? itemval : datFile.Email);
+								Email = (String.IsNullOrEmpty(Email) ? itemval : Email);
 								break;
 							case "homepage":
 							case "Homepage:":
-								datFile.Homepage = (String.IsNullOrEmpty(datFile.Homepage) ? itemval : datFile.Homepage);
+								Homepage = (String.IsNullOrEmpty(Homepage) ? itemval : Homepage);
 								break;
 							case "url":
-								datFile.Url = (String.IsNullOrEmpty(datFile.Url) ? itemval : datFile.Url);
+								Url = (String.IsNullOrEmpty(Url) ? itemval : Url);
 								break;
 							case "comment":
 							case "Comment:":
-								datFile.Comment = (String.IsNullOrEmpty(datFile.Comment) ? itemval : datFile.Comment);
+								Comment = (String.IsNullOrEmpty(Comment) ? itemval : Comment);
 								break;
 							case "header":
-								datFile.Header = (String.IsNullOrEmpty(datFile.Header) ? itemval : datFile.Header);
+								Header = (String.IsNullOrEmpty(Header) ? itemval : Header);
 								break;
 							case "type":
-								datFile.Type = (String.IsNullOrEmpty(datFile.Type) ? itemval : datFile.Type);
+								Type = (String.IsNullOrEmpty(Type) ? itemval : Type);
 								superdat = superdat || itemval.Contains("SuperDAT");
 								break;
 							case "forcemerging":
-								if (datFile.ForceMerging == ForceMerging.None)
+								if (ForceMerging == ForceMerging.None)
 								{
 									switch (itemval)
 									{
 										case "none":
-											datFile.ForceMerging = ForceMerging.None;
+											ForceMerging = ForceMerging.None;
 											break;
 										case "split":
-											datFile.ForceMerging = ForceMerging.Split;
+											ForceMerging = ForceMerging.Split;
 											break;
 										case "merged":
-											datFile.ForceMerging = ForceMerging.Merged;
+											ForceMerging = ForceMerging.Merged;
 											break;
 										case "nonmerged":
-											datFile.ForceMerging = ForceMerging.NonMerged;
+											ForceMerging = ForceMerging.NonMerged;
 											break;
 										case "full":
-											datFile.ForceMerging = ForceMerging.Full;
+											ForceMerging = ForceMerging.Full;
 											break;
 									}
 								}
 								break;
 							case "forcezipping":
-								if (datFile.ForcePacking == ForcePacking.None)
+								if (ForcePacking == ForcePacking.None)
 								{
 									switch (itemval)
 									{
 										case "yes":
-											datFile.ForcePacking = ForcePacking.Zip;
+											ForcePacking = ForcePacking.Zip;
 											break;
 										case "no":
-											datFile.ForcePacking = ForcePacking.Unzip;
+											ForcePacking = ForcePacking.Unzip;
 											break;
 									}
 								}
 								break;
 							case "forcepacking":
-								if (datFile.ForcePacking == ForcePacking.None)
+								if (ForcePacking == ForcePacking.None)
 								{
 									switch (itemval)
 									{
 										case "zip":
-											datFile.ForcePacking = ForcePacking.Zip;
+											ForcePacking = ForcePacking.Zip;
 											break;
 										case "unzip":
-											datFile.ForcePacking = ForcePacking.Unzip;
+											ForcePacking = ForcePacking.Unzip;
 											break;
 									}
 								}
@@ -619,11 +616,10 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="outfile">Name of the file to write to</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToFile(DatFile datFile, string outfile, bool ignoreblanks = false)
+		public bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
 			{
@@ -640,18 +636,18 @@ namespace SabreTools.Library.DatFiles
 				StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
 
 				// Write out the header
-				WriteHeader(datFile, sw);
+				WriteHeader(sw);
 
 				// Write out each of the machines and roms
 				string lastgame = null;
 
 				// Get a properly sorted set of keys
-				List<string> keys = datFile.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)
 				{
-					List<DatItem> roms = datFile[key];
+					List<DatItem> roms = this[key];
 
 					// Resolve the names in the block
 					roms = DatItem.ResolveNames(roms);
@@ -676,7 +672,7 @@ namespace SabreTools.Library.DatFiles
 						// If we have a new game, output the beginning of the new item
 						if (lastgame == null || lastgame.ToLowerInvariant() != rom.MachineName.ToLowerInvariant())
 						{
-							WriteStartGame(datFile, sw, rom);
+							WriteStartGame(sw, rom);
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
@@ -724,30 +720,29 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out DAT header using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteHeader(DatFile datFile, StreamWriter sw)
+		private bool WriteHeader(StreamWriter sw)
 		{
 			try
 			{
 				string header = "clrmamepro (\n" +
-							"\tname \"" + datFile.Name + "\"\n" +
-							"\tdescription \"" + datFile.Description + "\"\n" +
-							(!String.IsNullOrEmpty(datFile.Category) ? "\tcategory \"" + datFile.Category + "\"\n" : "") +
-							"\tversion \"" + datFile.Version + "\"\n" +
-							(!String.IsNullOrEmpty(datFile.Date) ? "\tdate \"" + datFile.Date + "\"\n" : "") +
-							"\tauthor \"" + datFile.Author + "\"\n" +
-							(!String.IsNullOrEmpty(datFile.Email) ? "\temail \"" + datFile.Email + "\"\n" : "") +
-							(!String.IsNullOrEmpty(datFile.Homepage) ? "\thomepage \"" + datFile.Homepage + "\"\n" : "") +
-							(!String.IsNullOrEmpty(datFile.Url) ? "\turl \"" + datFile.Url + "\"\n" : "") +
-							(!String.IsNullOrEmpty(datFile.Comment) ? "\tcomment \"" + datFile.Comment + "\"\n" : "") +
-							(datFile.ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
-							(datFile.ForcePacking == ForcePacking.Zip ? "\tforcezipping yes\n" : "") +
-							(datFile.ForceMerging == ForceMerging.Full ? "\tforcemerging full\n" : "") +
-							(datFile.ForceMerging == ForceMerging.Split ? "\tforcemerging split\n" : "") +
-							(datFile.ForceMerging == ForceMerging.Merged ? "\tforcemerging merged\n" : "") +
-							(datFile.ForceMerging == ForceMerging.NonMerged ? "\tforcemerging nonmerged\n" : "") +
+							"\tname \"" + Name + "\"\n" +
+							"\tdescription \"" + Description + "\"\n" +
+							(!String.IsNullOrEmpty(Category) ? "\tcategory \"" + Category + "\"\n" : "") +
+							"\tversion \"" + Version + "\"\n" +
+							(!String.IsNullOrEmpty(Date) ? "\tdate \"" + Date + "\"\n" : "") +
+							"\tauthor \"" + Author + "\"\n" +
+							(!String.IsNullOrEmpty(Email) ? "\temail \"" + Email + "\"\n" : "") +
+							(!String.IsNullOrEmpty(Homepage) ? "\thomepage \"" + Homepage + "\"\n" : "") +
+							(!String.IsNullOrEmpty(Url) ? "\turl \"" + Url + "\"\n" : "") +
+							(!String.IsNullOrEmpty(Comment) ? "\tcomment \"" + Comment + "\"\n" : "") +
+							(ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
+							(ForcePacking == ForcePacking.Zip ? "\tforcezipping yes\n" : "") +
+							(ForceMerging == ForceMerging.Full ? "\tforcemerging full\n" : "") +
+							(ForceMerging == ForceMerging.Split ? "\tforcemerging split\n" : "") +
+							(ForceMerging == ForceMerging.Merged ? "\tforcemerging merged\n" : "") +
+							(ForceMerging == ForceMerging.NonMerged ? "\tforcemerging nonmerged\n" : "") +
 							")\n";
 
 				// Write the header out
@@ -766,11 +761,10 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out Game start using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteStartGame(DatFile datFile, StreamWriter sw, DatItem rom)
+		private bool WriteStartGame(StreamWriter sw, DatItem rom)
 		{
 			try
 			{
@@ -781,7 +775,7 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				string state = "game (\n\tname \"" + rom.MachineName + "\"\n" +
-							(datFile.ExcludeOf ? "" :
+							(ExcludeOf ? "" :
 								(String.IsNullOrEmpty(rom.RomOf) ? "" : "\tromof \"" + rom.RomOf + "\"\n") +
 								(String.IsNullOrEmpty(rom.CloneOf) ? "" : "\tcloneof \"" + rom.CloneOf + "\"\n") +
 								(String.IsNullOrEmpty(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n")
@@ -808,7 +802,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteEndGame(StreamWriter sw, DatItem rom)
+		private bool WriteEndGame(StreamWriter sw, DatItem rom)
 		{
 			try
 			{
@@ -834,7 +828,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
+		private bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
@@ -917,7 +911,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteFooter(StreamWriter sw)
+		private bool WriteFooter(StreamWriter sw)
 		{
 			try
 			{

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Web;
-using System.Xml;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.Items;
@@ -16,7 +14,6 @@ using System.IO;
 using Alphaleonis.Win32.Filesystem;
 
 using FileStream = System.IO.FileStream;
-using StreamReader = System.IO.StreamReader;
 using StreamWriter = System.IO.StreamWriter;
 #endif
 using NaturalSort;
@@ -26,12 +23,11 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of an SabreDat XML DAT
 	/// </summary>
-	public class SabreDat
+	public class SabreDat : DatFile
 	{
 		/// <summary>
 		/// Parse an SabreDat XML DAT and return all found games and roms within
 		/// </summary>
-		/// <param name="datFile">DatFile to populate with the read information</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
@@ -40,9 +36,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <remarks>
 		/// </remarks>
-		public static void Parse(
-			DatFile datFile,
-
+		public void Parse(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -54,20 +48,16 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// All XML-derived DATs share a lot in common so it just calls one implementation
-			Logiqx.Parse(datFile, filename, sysid, srcid, keep, clean, remUnicode);
+			(this as DatFile as Logiqx).Parse(filename, sysid, srcid, keep, clean, remUnicode);
 		}
 
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="outfile">Name of the file to write to</param>
-		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
-		/// <param name="stats">True if DAT statistics should be output on write, false otherwise (default)</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
-		/// <param name="overwrite">True if files should be overwritten (default), false if they should be renamed instead</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToFile(DatFile datFile, string outfile, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
+		public bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
 			{
@@ -84,7 +74,7 @@ namespace SabreTools.Library.DatFiles
 				StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
 
 				// Write out the header
-				WriteHeader(datFile, sw);
+				WriteHeader(sw);
 
 				// Write out each of the machines and roms
 				int depth = 2, last = -1;
@@ -92,12 +82,12 @@ namespace SabreTools.Library.DatFiles
 				List<string> splitpath = new List<string>();
 
 				// Get a properly sorted set of keys
-				List<string> keys = datFile.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)
 				{
-					List<DatItem> roms = datFile[key];
+					List<DatItem> roms = this[key];
 
 					// Resolve the names in the block
 					roms = DatItem.ResolveNames(roms);
@@ -167,10 +157,9 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out DAT header using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteHeader(DatFile datFile, StreamWriter sw)
+		private bool WriteHeader(StreamWriter sw)
 		{
 			try
 			{
@@ -178,26 +167,26 @@ namespace SabreTools.Library.DatFiles
 							"<!DOCTYPE sabredat SYSTEM \"newdat.xsd\">\n\n" +
 							"<datafile>\n" +
 							"\t<header>\n" +
-							"\t\t<name>" + HttpUtility.HtmlEncode(datFile.Name) + "</name>\n" +
-							"\t\t<description>" + HttpUtility.HtmlEncode(datFile.Description) + "</description>\n" +
-							(!String.IsNullOrEmpty(datFile.RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(datFile.RootDir) + "</rootdir>\n" : "") +
-							(!String.IsNullOrEmpty(datFile.Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(datFile.Category) + "</category>\n" : "") +
-							"\t\t<version>" + HttpUtility.HtmlEncode(datFile.Version) + "</version>\n" +
-							(!String.IsNullOrEmpty(datFile.Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(datFile.Date) + "</date>\n" : "") +
-							"\t\t<author>" + HttpUtility.HtmlEncode(datFile.Author) + "</author>\n" +
-							(!String.IsNullOrEmpty(datFile.Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(datFile.Comment) + "</comment>\n" : "") +
-							(!String.IsNullOrEmpty(datFile.Type) || datFile.ForcePacking != ForcePacking.None || datFile.ForceMerging != ForceMerging.None || datFile.ForceNodump != ForceNodump.None ?
+							"\t\t<name>" + HttpUtility.HtmlEncode(Name) + "</name>\n" +
+							"\t\t<description>" + HttpUtility.HtmlEncode(Description) + "</description>\n" +
+							(!String.IsNullOrEmpty(RootDir) ? "\t\t<rootdir>" + HttpUtility.HtmlEncode(RootDir) + "</rootdir>\n" : "") +
+							(!String.IsNullOrEmpty(Category) ? "\t\t<category>" + HttpUtility.HtmlEncode(Category) + "</category>\n" : "") +
+							"\t\t<version>" + HttpUtility.HtmlEncode(Version) + "</version>\n" +
+							(!String.IsNullOrEmpty(Date) ? "\t\t<date>" + HttpUtility.HtmlEncode(Date) + "</date>\n" : "") +
+							"\t\t<author>" + HttpUtility.HtmlEncode(Author) + "</author>\n" +
+							(!String.IsNullOrEmpty(Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(Comment) + "</comment>\n" : "") +
+							(!String.IsNullOrEmpty(Type) || ForcePacking != ForcePacking.None || ForceMerging != ForceMerging.None || ForceNodump != ForceNodump.None ?
 								"\t\t<flags>\n" +
-									(!String.IsNullOrEmpty(datFile.Type) ? "\t\t\t<flag name=\"type\" value=\"" + HttpUtility.HtmlEncode(datFile.Type) + "\"/>\n" : "") +
-									(datFile.ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : "") +
-									(datFile.ForcePacking == ForcePacking.Zip ? "\t\t\t<flag name=\"forcepacking\" value=\"zip\"/>\n" : "") +
-									(datFile.ForceMerging == ForceMerging.Full ? "\t\t\t<flag name=\"forcemerging\" value=\"full\"/>\n" : "") +
-									(datFile.ForceMerging == ForceMerging.Split ? "\t\t\t<flag name=\"forcemerging\" value=\"split\"/>\n" : "") +
-									(datFile.ForceMerging == ForceMerging.Merged ? "\t\t\t<flag name=\"forcemerging\" value=\"merged\"/>\n" : "") +
-									(datFile.ForceMerging == ForceMerging.NonMerged ? "\t\t\t<flag name=\"forcemerging\" value=\"nonmerged\"/>\n" : "") +
-									(datFile.ForceNodump == ForceNodump.Ignore ? "\t\t\t<flag name=\"forcenodump\" value=\"ignore\"/>\n" : "") +
-									(datFile.ForceNodump == ForceNodump.Obsolete ? "\t\t\t<flag name=\"forcenodump\" value=\"obsolete\"/>\n" : "") +
-									(datFile.ForceNodump == ForceNodump.Required ? "\t\t\t<flag name=\"forcenodump\" value=\"required\"/>\n" : "") +
+									(!String.IsNullOrEmpty(Type) ? "\t\t\t<flag name=\"type\" value=\"" + HttpUtility.HtmlEncode(Type) + "\"/>\n" : "") +
+									(ForcePacking == ForcePacking.Unzip ? "\t\t\t<flag name=\"forcepacking\" value=\"unzip\"/>\n" : "") +
+									(ForcePacking == ForcePacking.Zip ? "\t\t\t<flag name=\"forcepacking\" value=\"zip\"/>\n" : "") +
+									(ForceMerging == ForceMerging.Full ? "\t\t\t<flag name=\"forcemerging\" value=\"full\"/>\n" : "") +
+									(ForceMerging == ForceMerging.Split ? "\t\t\t<flag name=\"forcemerging\" value=\"split\"/>\n" : "") +
+									(ForceMerging == ForceMerging.Merged ? "\t\t\t<flag name=\"forcemerging\" value=\"merged\"/>\n" : "") +
+									(ForceMerging == ForceMerging.NonMerged ? "\t\t\t<flag name=\"forcemerging\" value=\"nonmerged\"/>\n" : "") +
+									(ForceNodump == ForceNodump.Ignore ? "\t\t\t<flag name=\"forcenodump\" value=\"ignore\"/>\n" : "") +
+									(ForceNodump == ForceNodump.Obsolete ? "\t\t\t<flag name=\"forcenodump\" value=\"obsolete\"/>\n" : "") +
+									(ForceNodump == ForceNodump.Required ? "\t\t\t<flag name=\"forcenodump\" value=\"required\"/>\n" : "") +
 									"\t\t</flags>\n"
 							: "") +
 							"\t</header>\n" +
@@ -226,7 +215,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
 		/// <returns>The new depth of the tag</returns>
-		private static int WriteStartGame(StreamWriter sw, DatItem rom, List<string> newsplit, string lastgame, int depth, int last)
+		private int WriteStartGame(StreamWriter sw, DatItem rom, List<string> newsplit, string lastgame, int depth, int last)
 		{
 			try
 			{
@@ -269,7 +258,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="last">Last known depth to cycle back from (SabreDAT only)</param>
 		/// <returns>The new depth of the tag</returns>
-		private static int WriteEndGame(StreamWriter sw, List<string> splitpath, List<string> newsplit, int depth, out int last)
+		private int WriteEndGame(StreamWriter sw, List<string> splitpath, List<string> newsplit, int depth, out int last)
 		{
 			last = 0;
 
@@ -325,7 +314,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteRomData(StreamWriter sw, DatItem rom, int depth, bool ignoreblanks = false)
+		private bool WriteRomData(StreamWriter sw, DatItem rom, int depth, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
@@ -419,7 +408,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="depth">Current depth to output file at (SabreDAT only)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteFooter(StreamWriter sw, int depth)
+		private bool WriteFooter(StreamWriter sw, int depth)
 		{
 			try
 			{

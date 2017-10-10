@@ -23,21 +23,18 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of an AttractMode DAT
 	/// </summary>
-	public class AttractMode
+	public class AttractMode : DatFile
 	{
 		/// <summary>
 		/// Parse an AttractMode DAT and return all found games within
 		/// </summary>
-		/// <param name="datFile">DatFile to populate with the read information</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		public static void Parse(
-			DatFile datFile,
-
+		public void Parse(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -98,7 +95,7 @@ namespace SabreTools.Library.DatFiles
 				};
 
 				// Now process and add the rom
-				datFile.ParseAddHelper(rom, clean, remUnicode);
+				ParseAddHelper(rom, clean, remUnicode);
 			}
 
 			sr.Dispose();
@@ -107,10 +104,9 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="outfile">Name of the file to write to</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToFile(DatFile datFile, string outfile)
+		public bool WriteToFile(string outfile)
 		{
 			try
 			{
@@ -133,12 +129,12 @@ namespace SabreTools.Library.DatFiles
 				string lastgame = null;
 
 				// Get a properly sorted set of keys
-				List<string> keys = datFile.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)
 				{
-					List<DatItem> roms = datFile[key];
+					List<DatItem> roms = this[key];
 
 					// Resolve the names in the block
 					roms = DatItem.ResolveNames(roms);
@@ -157,7 +153,7 @@ namespace SabreTools.Library.DatFiles
 						// If we have a new game, output the beginning of the new item
 						if (lastgame == null || lastgame.ToLowerInvariant() != item.MachineName.ToLowerInvariant())
 						{
-							WriteStartGame(datFile, sw, item);
+							WriteStartGame(sw, item);
 						}
 
 						// If we have a "null" game (created by DATFromDir or something similar), log it to file
@@ -200,7 +196,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteHeader(StreamWriter sw)
+		private bool WriteHeader(StreamWriter sw)
 		{
 			try
 			{
@@ -222,11 +218,10 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out Game start using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteStartGame(DatFile datFile, StreamWriter sw, DatItem rom)
+		private bool WriteStartGame(StreamWriter sw, DatItem rom)
 		{
 			try
 			{
@@ -238,7 +233,7 @@ namespace SabreTools.Library.DatFiles
 
 				string state = rom.MachineName + ";"
 							+ rom.MachineDescription + ";"
-							+ datFile.FileName + ";"
+							+ FileName + ";"
 							+ rom.CloneOf + ";"
 							+ rom.Year + ";"
 							+ rom.Manufacturer + ";"

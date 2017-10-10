@@ -22,21 +22,18 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a DosCenter DAT
 	/// </summary>
-	public class DosCenter
+	public class DosCenter : DatFile
 	{
 		/// <summary>
 		/// Parse a DosCenter DAT and return all found games and roms within
 		/// </summary>
-		/// <param name="datFile">DatFile to populate with the read information</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		public static void Parse(
-			DatFile datFile,
-
+		public void Parse(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -48,18 +45,17 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// ClrMamePro and DosCenter parsing are identical so it just calls one implementation
-			ClrMamePro.Parse(datFile, filename, sysid, srcid, keep, clean, remUnicode);
+			(this as DatFile as ClrMamePro).Parse(filename, sysid, srcid, keep, clean, remUnicode);
 		}
 
 
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="outfile">Name of the file to write to</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToFile(DatFile datFile, string outfile, bool ignoreblanks = false)
+		public bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
 			{
@@ -76,18 +72,18 @@ namespace SabreTools.Library.DatFiles
 				StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
 
 				// Write out the header
-				WriteHeader(datFile, sw);
+				WriteHeader(sw);
 
 				// Write out each of the machines and roms
 				string lastgame = null;
 
 				// Get a properly sorted set of keys
-				List<string> keys = datFile.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)
 				{
-					List<DatItem> roms = datFile[key];
+					List<DatItem> roms = this[key];
 
 					// Resolve the names in the block
 					roms = DatItem.ResolveNames(roms);
@@ -161,21 +157,20 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Write out DAT header using the supplied StreamWriter
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteHeader(DatFile datFile, StreamWriter sw)
+		private bool WriteHeader(StreamWriter sw)
 		{
 			try
 			{
 				string header = "DOSCenter (\n" +
-							"\tName: " + datFile.Name + "\n" +
-							"\tDescription: " + datFile.Description + "\n" +
-							"\tVersion: " + datFile.Version + "\n" +
-							"\tDate: " + datFile.Date + "\n" +
-							"\tAuthor: " + datFile.Author + "\n" +
-							"\tHomepage: " + datFile.Homepage + "\n" +
-							"\tComment: " + datFile.Comment + "\n" +
+							"\tName: " + Name + "\n" +
+							"\tDescription: " + Description + "\n" +
+							"\tVersion: " + Version + "\n" +
+							"\tDate: " + Date + "\n" +
+							"\tAuthor: " + Author + "\n" +
+							"\tHomepage: " + Homepage + "\n" +
+							"\tComment: " + Comment + "\n" +
 							")\n";
 
 				// Write the header out
@@ -197,7 +192,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteStartGame(StreamWriter sw, DatItem rom)
+		private bool WriteStartGame(StreamWriter sw, DatItem rom)
 		{
 			try
 			{
@@ -227,7 +222,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteEndGame(StreamWriter sw, DatItem rom)
+		private bool WriteEndGame(StreamWriter sw, DatItem rom)
 		{
 			try
 			{
@@ -252,7 +247,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
+		private bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
@@ -300,7 +295,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteFooter(StreamWriter sw)
+		private bool WriteFooter(StreamWriter sw)
 		{
 			try
 			{

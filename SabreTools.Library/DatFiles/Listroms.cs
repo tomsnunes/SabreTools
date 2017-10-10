@@ -24,12 +24,11 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a MAME Listroms DAT
 	/// </summary>
-	public class Listroms
+	public class Listroms : DatFile
 	{
 		/// <summary>
 		/// Parse a MAME Listroms DAT and return all found games and roms within
 		/// </summary>
-		/// <param name="datFile">DatFile to populate with the read information</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
@@ -45,9 +44,7 @@ namespace SabreTools.Library.DatFiles
 		/// 6331.sound-u8                            32 BAD CRC(1d298cb0) SHA1(bb0bb62365402543e3154b9a77be9c75010e6abc) BAD_DUMP
 		/// 16v8h-blue.u24                          279 NO GOOD DUMP KNOWN
 		/// </remarks>
-		public static void Parse(
-			DatFile datFile,
-
+		public void Parse(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -127,7 +124,7 @@ namespace SabreTools.Library.DatFiles
 							MachineName = gamename,
 						};
 
-						datFile.ParseAddHelper(disk, clean, remUnicode);
+						ParseAddHelper(disk, clean, remUnicode);
 					}
 
 					// Baddump Disks have 4 pieces (name, BAD, sha1, BAD_DUMP)
@@ -142,7 +139,7 @@ namespace SabreTools.Library.DatFiles
 							MachineName = gamename,
 						};
 
-						datFile.ParseAddHelper(disk, clean, remUnicode);
+						ParseAddHelper(disk, clean, remUnicode);
 					}
 
 					// Standard ROMs have 4 pieces (name, size, crc, sha1)
@@ -163,7 +160,7 @@ namespace SabreTools.Library.DatFiles
 							MachineName = gamename,
 						};
 
-						datFile.ParseAddHelper(rom, clean, remUnicode);
+						ParseAddHelper(rom, clean, remUnicode);
 					}
 
 					// Nodump Disks have 5 pieces (name, NO, GOOD, DUMP, KNOWN)
@@ -177,7 +174,7 @@ namespace SabreTools.Library.DatFiles
 							MachineName = gamename,
 						};
 
-						datFile.ParseAddHelper(disk, clean, remUnicode);
+						ParseAddHelper(disk, clean, remUnicode);
 					}
 
 					// Baddump ROMs have 6 pieces (name, size, BAD, crc, sha1, BAD_DUMP)
@@ -199,7 +196,7 @@ namespace SabreTools.Library.DatFiles
 							MachineName = gamename,
 						};
 
-						datFile.ParseAddHelper(rom, clean, remUnicode);
+						ParseAddHelper(rom, clean, remUnicode);
 					}
 
 					// Nodump ROMs have 6 pieces (name, size, NO, GOOD, DUMP, KNOWN)
@@ -219,7 +216,7 @@ namespace SabreTools.Library.DatFiles
 							MachineName = gamename,
 						};
 
-						datFile.ParseAddHelper(rom, clean, remUnicode);
+						ParseAddHelper(rom, clean, remUnicode);
 					}
 
 					// If we have something else, it's invalid
@@ -235,11 +232,10 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="outfile">Name of the file to write to</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public static bool WriteToFile(DatFile datFile, string outfile, bool ignoreblanks = false)
+		public bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
 			{
@@ -259,12 +255,12 @@ namespace SabreTools.Library.DatFiles
 				string lastgame = null;
 
 				// Get a properly sorted set of keys
-				List<string> keys = datFile.Keys.ToList();
+				List<string> keys = Keys.ToList();
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)
 				{
-					List<DatItem> roms = datFile[key];
+					List<DatItem> roms = this[key];
 
 					// Resolve the names in the block
 					roms = DatItem.ResolveNames(roms);
@@ -336,7 +332,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="rom">RomData object to be output</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteStartGame(StreamWriter sw, DatItem rom)
+		private bool WriteStartGame(StreamWriter sw, DatItem rom)
 		{
 			try
 			{
@@ -366,7 +362,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteEndGame(StreamWriter sw)
+		private bool WriteEndGame(StreamWriter sw)
 		{
 			try
 			{
@@ -391,7 +387,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="rom">RomData object to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private static bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
+		private bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
