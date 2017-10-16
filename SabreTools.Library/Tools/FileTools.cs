@@ -758,13 +758,20 @@ namespace SabreTools.Library.Tools
 				xxHash.Init();
 
 				// Seek to the starting position, if one is set
-				if (offset < 0)
+				try
 				{
-					input.Seek(offset, SeekOrigin.End);
+					if (offset < 0)
+					{
+						input.Seek(offset, SeekOrigin.End);
+					}
+					else if (offset > 0)
+					{
+						input.Seek(offset, SeekOrigin.Begin);
+					}
 				}
-				else
+				catch (NotImplementedException)
 				{
-					input.Seek(offset, SeekOrigin.Begin);
+					Globals.Logger.Warning("Stream does not support seeking. Stream position not changed");
 				}
 
 				byte[] buffer = new byte[8 * 1024];
@@ -845,8 +852,15 @@ namespace SabreTools.Library.Tools
 			}
 			finally
 			{
-				// Seek to the beginning of the stream
-				input.Seek(0, SeekOrigin.Begin);
+				// Seek to the beginning of the stream if possible
+				try
+				{
+					input.Seek(0, SeekOrigin.Begin);
+				}
+				catch (NotImplementedException)
+				{
+					Globals.Logger.Verbose("Stream does not support seeking. Stream position not changed");
+				}
 
 				if (!keepReadOpen)
 				{

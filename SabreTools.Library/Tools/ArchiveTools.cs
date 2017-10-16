@@ -815,45 +815,17 @@ namespace SabreTools.Library.Tools
 									MachineName = gamename,
 								});
 							}
-							// Otherwise, extract to a stream
+							// Otherwise, use the stream directly
 							else
 							{
-								MemoryStream entryStream = new MemoryStream();
-
-								// If the stream is smaller than the buffer, just run one loop through to avoid issues
-								if (streamsize < _bufferSize)
-								{
-									byte[] ibuffer = new byte[streamsize];
-									int ilen = readStream.Read(ibuffer, 0, (int)streamsize);
-									entryStream.Write(ibuffer, 0, ilen);
-									entryStream.Flush();
-								}
-								// Otherwise, we do the normal loop
-								else
-								{
-									byte[] ibuffer = new byte[_bufferSize];
-									int ilen;
-									while (streamsize > _bufferSize)
-									{
-										ilen = readStream.Read(ibuffer, 0, _bufferSize);
-										entryStream.Write(ibuffer, 0, ilen);
-										entryStream.Flush();
-										streamsize -= _bufferSize;
-									}
-
-									ilen = readStream.Read(ibuffer, 0, (int)streamsize);
-									entryStream.Write(ibuffer, 0, ilen);
-									entryStream.Flush();
-								}
-								zr = zf.CloseReadStream();
-
 								// Get and add the extended Rom information
-								Rom zipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
+								Rom zipEntryRom = FileTools.GetStreamInfo(readStream, (long)zf.Entries[i].UncompressedSize, omitFromScan: omitFromScan);
 								zipEntryRom.Name = zf.Entries[i].FileName;
 								zipEntryRom.MachineName = gamename;
 								string convertedDate = Style.ConvertMsDosTimeFormatToDateTime(zf.Entries[i].LastMod).ToString("yyyy/MM/dd hh:mm:ss");
 								zipEntryRom.Date = (date ? convertedDate : null);
 								found.Add(zipEntryRom);
+								zr = zf.CloseReadStream();
 							}
 						}
 						

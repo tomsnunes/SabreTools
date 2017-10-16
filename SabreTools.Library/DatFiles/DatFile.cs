@@ -31,22 +31,22 @@ namespace SabreTools.Library.DatFiles
 	/// Represents a format-agnostic DAT
 	/// </summary>
 	/// <remarks>
-	/// TODO: Make output standard width (HTML, without making the entire thing a table)
-	/// TODO: Multithreading? Either StringBuilder or locking
+	/// TODO: Make stats output standard width (HTML, without making the entire thing a table)
+	/// TODO: Stats multithreading? Either StringBuilder or locking
 	/// </remarks>
 	public partial class DatFile
 	{
 		#region Private instance variables
 
 		// Internal DatHeader values
-		private DatHeader _datHeader = new DatHeader();
+		internal DatHeader _datHeader = new DatHeader();
 
 		// DatItems dictionary
-		private SortedDictionary<string, List<DatItem>> _items = new SortedDictionary<string, List<DatItem>>();
-		private SortedBy _sortedBy;
+		internal SortedDictionary<string, List<DatItem>> _items = new SortedDictionary<string, List<DatItem>>();
+		internal SortedBy _sortedBy;
 
 		// Internal statistical data
-		DatStats _datStats = new DatStats();
+		internal DatStats _datStats = new DatStats();
 
 		#endregion
 
@@ -2962,55 +2962,55 @@ namespace SabreTools.Library.DatFiles
 				switch (FileTools.GetDatFormat(filename))
 				{
 					case DatFormat.AttractMode:
-						(this as AttractMode).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new AttractMode(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.ClrMamePro:
-						(this as ClrMamePro).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new ClrMamePro(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.CSV:
-						(this as SeparatedValue).Parse(filename, sysid, srcid, ',', keep, clean, remUnicode);
+						new SeparatedValue(this).Parse(filename, sysid, srcid, ',', keep, clean, remUnicode);
 						break;
 					case DatFormat.DOSCenter:
-						(this as DosCenter).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new DosCenter(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.Listroms:
-						(this as Listroms).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new Listroms(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.Logiqx:
-						(this as Logiqx).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new Logiqx(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.OfflineList:
-						(this as OfflineList).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new OfflineList(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.RedumpMD5:
-						(this as Hashfile).Parse(filename, sysid, srcid, Hash.MD5, clean, remUnicode);
+						new Hashfile(this).Parse(filename, sysid, srcid, Hash.MD5, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSFV:
-						(this as Hashfile).Parse(filename, sysid, srcid, Hash.CRC, clean, remUnicode);
+						new Hashfile(this).Parse(filename, sysid, srcid, Hash.CRC, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA1:
-						(this as Hashfile).Parse(filename, sysid, srcid, Hash.SHA1, clean, remUnicode);
+						new Hashfile(this).Parse(filename, sysid, srcid, Hash.SHA1, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA256:
-						(this as Hashfile).Parse(filename, sysid, srcid, Hash.SHA256, clean, remUnicode);
+						new Hashfile(this).Parse(filename, sysid, srcid, Hash.SHA256, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA384:
-						(this as Hashfile).Parse(filename, sysid, srcid, Hash.SHA384, clean, remUnicode);
+						new Hashfile(this).Parse(filename, sysid, srcid, Hash.SHA384, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA512:
-						(this as Hashfile).Parse(filename, sysid, srcid, Hash.SHA512, clean, remUnicode);
+						new Hashfile(this).Parse(filename, sysid, srcid, Hash.SHA512, clean, remUnicode);
 						break;
 					case DatFormat.RomCenter:
-						(this as RomCenter).Parse(filename, sysid, srcid, clean, remUnicode);
+						new RomCenter(this).Parse(filename, sysid, srcid, clean, remUnicode);
 						break;
 					case DatFormat.SabreDat:
-						(this as SabreDat).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new SabreDat(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.SoftwareList:
-						(this as SoftwareList).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new SoftwareList(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.TSV:
-						(this as SeparatedValue).Parse(filename, sysid, srcid, '\t', keep, clean, remUnicode);
+						new SeparatedValue(this).Parse(filename, sysid, srcid, '\t', keep, clean, remUnicode);
 						break;
 					default:
 						return;
@@ -5564,63 +5564,71 @@ namespace SabreTools.Library.DatFiles
 				Parallel.ForEach(outfiles.Keys, Globals.ParallelOptions, datFormat =>
 				{
 					string outfile = outfiles[datFormat];
-					switch (datFormat)
+					try
 					{
-						case DatFormat.AttractMode:
-							(this as AttractMode).WriteToFile(outfile);
-							break;
-						case DatFormat.ClrMamePro:
-							(this as ClrMamePro).WriteToFile(outfile, ignoreblanks);
-							break;
-						case DatFormat.CSV:
-							(this as SeparatedValue).WriteToFile(outfile, ',', ignoreblanks);
-							break;
-						case DatFormat.DOSCenter:
-							(this as DosCenter).WriteToFile(outfile, ignoreblanks);
-							break;
-						case DatFormat.Listroms:
-							(this as Listroms).WriteToFile(outfile, ignoreblanks);
-							break;
-						case DatFormat.Logiqx:
-							(this as Logiqx).WriteToFile(outfile, ignoreblanks);
-							break;
-						case DatFormat.MissFile:
-							(this as Missfile).WriteToFile(outfile, ignoreblanks);
-							break;
-						case DatFormat.OfflineList:
-							(this as OfflineList).WriteToFile(outfile, ignoreblanks);
-							break;
-						case DatFormat.RedumpMD5:
-							(this as Hashfile).WriteToFile(outfile, Hash.MD5, ignoreblanks);
-							break;
-						case DatFormat.RedumpSFV:
-							(this as Hashfile).WriteToFile(outfile, Hash.CRC, ignoreblanks);
-							break;
-						case DatFormat.RedumpSHA1:
-							(this as Hashfile).WriteToFile(outfile, Hash.SHA1, ignoreblanks);
-							break;
-						case DatFormat.RedumpSHA256:
-							(this as Hashfile).WriteToFile(outfile, Hash.SHA256, ignoreblanks);
-							break;
-						case DatFormat.RedumpSHA384:
-							(this as Hashfile).WriteToFile(outfile, Hash.SHA384, ignoreblanks);
-							break;
-						case DatFormat.RedumpSHA512:
-							(this as Hashfile).WriteToFile(outfile, Hash.SHA512, ignoreblanks);
-							break;
-						case DatFormat.RomCenter:
-							(this as RomCenter).WriteToFile(outfile, ignoreblanks);
-							break;
-						case DatFormat.SabreDat:
-							(this as SabreDat).WriteToFile(outfile, ignoreblanks);
-							break;
-						case DatFormat.SoftwareList:
-							(this as SoftwareList).WriteToFile(outfile, ignoreblanks);
-							break;
-						case DatFormat.TSV:
-							(this as SeparatedValue).WriteToFile(outfile, '\t', ignoreblanks);
-							break;
+						switch (datFormat)
+						{
+							case DatFormat.AttractMode:
+								new AttractMode(this).WriteToFile(outfile);
+								break;
+							case DatFormat.ClrMamePro:
+								new ClrMamePro(this).WriteToFile(outfile, ignoreblanks);
+								break;
+							case DatFormat.CSV:
+								new SeparatedValue(this).WriteToFile(outfile, ',', ignoreblanks);
+								break;
+							case DatFormat.DOSCenter:
+								new DosCenter(this).WriteToFile(outfile, ignoreblanks);
+								break;
+							case DatFormat.Listroms:
+								new Listroms(this).WriteToFile(outfile, ignoreblanks);
+								break;
+							case DatFormat.Logiqx:
+								new Logiqx(this).WriteToFile(outfile, ignoreblanks);
+								break;
+							case DatFormat.MissFile:
+								new Missfile(this).WriteToFile(outfile, ignoreblanks);
+								break;
+							case DatFormat.OfflineList:
+								new OfflineList(this).WriteToFile(outfile, ignoreblanks);
+								break;
+							case DatFormat.RedumpMD5:
+								new Hashfile(this).WriteToFile(outfile, Hash.MD5, ignoreblanks);
+								break;
+							case DatFormat.RedumpSFV:
+								new Hashfile(this).WriteToFile(outfile, Hash.CRC, ignoreblanks);
+								break;
+							case DatFormat.RedumpSHA1:
+								new Hashfile(this).WriteToFile(outfile, Hash.SHA1, ignoreblanks);
+								break;
+							case DatFormat.RedumpSHA256:
+								new Hashfile(this).WriteToFile(outfile, Hash.SHA256, ignoreblanks);
+								break;
+							case DatFormat.RedumpSHA384:
+								new Hashfile(this).WriteToFile(outfile, Hash.SHA384, ignoreblanks);
+								break;
+							case DatFormat.RedumpSHA512:
+								new Hashfile(this).WriteToFile(outfile, Hash.SHA512, ignoreblanks);
+								break;
+							case DatFormat.RomCenter:
+								new RomCenter(this).WriteToFile(outfile, ignoreblanks);
+								break;
+							case DatFormat.SabreDat:
+								new SabreDat(this).WriteToFile(outfile, ignoreblanks);
+								break;
+							case DatFormat.SoftwareList:
+								new SoftwareList(this).WriteToFile(outfile, ignoreblanks);
+								break;
+							case DatFormat.TSV:
+								new SeparatedValue(this).WriteToFile(outfile, '\t', ignoreblanks);
+								break;
+						}
 					}
+					catch (Exception ex)
+					{
+						Globals.Logger.Error("Datfile {0} could not be written out: {1}", outfile, ex.ToString());
+					}
+					
 				});
 			}
 			catch (Exception ex)
