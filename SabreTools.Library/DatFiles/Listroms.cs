@@ -27,6 +27,18 @@ namespace SabreTools.Library.DatFiles
 	public class Listroms : DatFile
 	{
 		/// <summary>
+		/// Constructor designed for casting a base DatFile
+		/// </summary>
+		/// <param name="datFile">Parent DatFile to copy from</param>
+		public Listroms(DatFile datFile)
+		{
+			this._datHeader = datFile._datHeader;
+			this._items = datFile._items;
+			this._sortedBy = datFile._sortedBy;
+			this._datStats = datFile._datStats;
+		}
+
+		/// <summary>
 		/// Parse a MAME Listroms DAT and return all found games and roms within
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>

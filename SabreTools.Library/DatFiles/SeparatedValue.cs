@@ -24,6 +24,18 @@ namespace SabreTools.Library.DatFiles
 	public class SeparatedValue : DatFile
 	{
 		/// <summary>
+		/// Constructor designed for casting a base DatFile
+		/// </summary>
+		/// <param name="datFile">Parent DatFile to copy from</param>
+		public SeparatedValue(DatFile datFile)
+		{
+			this._datHeader = datFile._datHeader;
+			this._items = datFile._items;
+			this._sortedBy = datFile._sortedBy;
+			this._datStats = datFile._datStats;
+		}
+
+		/// <summary>
 		/// Parse a character-separated value DAT and return all found games and roms within
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
