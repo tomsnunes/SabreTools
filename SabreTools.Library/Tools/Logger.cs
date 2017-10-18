@@ -31,6 +31,7 @@ namespace SabreTools.Library.Tools
 		private LogLevel _filter;
 		private DateTime _start;
 		private StreamWriter _log;
+		private object _lock = new object(); // This is used during multithreaded logging
 
 		// Private required variables
 		private string _basepath = Path.Combine(Globals.ExeDir, "logs") + Path.DirectorySeparatorChar;
@@ -190,7 +191,10 @@ namespace SabreTools.Library.Tools
 			{
 				try
 				{
-					_log.WriteLine((appendPrefix ? loglevel.ToString() + " - " + DateTime.Now + " - " : "" ) + output);
+					lock(_lock)
+					{
+						_log.WriteLine((appendPrefix ? loglevel.ToString() + " - " + DateTime.Now + " - " : "") + output);
+					}
 				}
 				catch (Exception ex)
 				{
@@ -227,7 +231,10 @@ namespace SabreTools.Library.Tools
 			{
 				try
 				{
-					_log.Write(DateTime.Now + " - " + output);
+					lock (_lock)
+					{
+						_log.Write(DateTime.Now + " - " + output);
+					}
 				}
 				catch
 				{
