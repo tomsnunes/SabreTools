@@ -640,19 +640,16 @@ namespace SabreTools.Library.Tools
 									MachineName = gamename,
 								});
 							}
-							// Otherwise, extract to a stream
+							// Otherwise, use the stream directly
 							else
 							{
-								// Create and populate the entry stream
-								MemoryStream entryStream = new MemoryStream();
-								entry.WriteTo(entryStream);
-
-								// Get and add the extended Rom information
-								Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
+								Stream entryStream = entry.OpenEntryStream();
+								Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
 								sevenZipEntryRom.Name = entry.Key;
 								sevenZipEntryRom.MachineName = gamename;
 								sevenZipEntryRom.Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null);
 								found.Add(sevenZipEntryRom);
+								entryStream.Dispose();
 							}
 						}
 
@@ -676,22 +673,15 @@ namespace SabreTools.Library.Tools
 
 							found.Add(tempRom);
 						}
-						// Otherwise, extract to a stream
+						// Otherwise, use the stream directly
 						else
 						{
-							// Create and populate the entry stream
-							MemoryStream outstream = new MemoryStream();
 							GZipStream gzstream = new GZipStream(FileTools.TryOpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
-							gzstream.CopyTo(outstream);
-
-							// Get and add the extended Rom information
-							Rom gzipEntryRom = FileTools.GetStreamInfo(outstream, outstream.Length, omitFromScan: omitFromScan);
+							Rom gzipEntryRom = FileTools.GetStreamInfo(gzstream, gzstream.Length, omitFromScan: omitFromScan);
 							gzipEntryRom.Name = gzstream.FileName;
 							gzipEntryRom.MachineName = gamename;
 							gzipEntryRom.Date = (date && gzstream.LastModified != null ? gzstream.LastModified?.ToString("yyyy/MM/dd hh:mm:ss") : null);
 							found.Add(gzipEntryRom);
-
-							// Dispose of the archive
 							gzstream.Dispose();
 						}
 						break;
@@ -715,19 +705,16 @@ namespace SabreTools.Library.Tools
 									MachineName = gamename,
 								});
 							}
-							// Otherwise, extract to a stream
+							// Otherwise, use the stream directly
 							else
 							{
-								// Create and populate the entry stream
-								MemoryStream entryStream = new MemoryStream();
-								entry.WriteTo(entryStream);
-
-								// Get and add the extended Rom information
-								Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
-								sevenZipEntryRom.Name = entry.Key;
-								sevenZipEntryRom.MachineName = gamename;
-								sevenZipEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
-								found.Add(sevenZipEntryRom);
+								Stream entryStream = entry.OpenEntryStream();
+								Rom rarEntryRom = FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
+								rarEntryRom.Name = entry.Key;
+								rarEntryRom.MachineName = gamename;
+								rarEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
+								found.Add(rarEntryRom);
+								entryStream.Dispose();
 							}
 						}
 
@@ -754,19 +741,16 @@ namespace SabreTools.Library.Tools
 									MachineName = gamename,
 								});
 							}
-							// Otherwise, extract to a stream
+							// Otherwise, use the stream directly
 							else
 							{
-								// Create and populate the entry stream
-								MemoryStream entryStream = new MemoryStream();
-								entry.WriteTo(entryStream);
-
-								// Get and add the extended Rom information
-								Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entryStream.Length, omitFromScan: omitFromScan);
-								sevenZipEntryRom.Name = entry.Key;
-								sevenZipEntryRom.MachineName = gamename;
-								sevenZipEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
-								found.Add(sevenZipEntryRom);
+								Stream entryStream = entry.OpenEntryStream();
+								Rom tarEntryRom = FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
+								tarEntryRom.Name = entry.Key;
+								tarEntryRom.MachineName = gamename;
+								tarEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
+								found.Add(tarEntryRom);
+								entryStream.Dispose();
 							}
 						}
 
@@ -818,7 +802,6 @@ namespace SabreTools.Library.Tools
 							// Otherwise, use the stream directly
 							else
 							{
-								// Get and add the extended Rom information
 								Rom zipEntryRom = FileTools.GetStreamInfo(readStream, (long)zf.Entries[i].UncompressedSize, omitFromScan: omitFromScan);
 								zipEntryRom.Name = zf.Entries[i].FileName;
 								zipEntryRom.MachineName = gamename;

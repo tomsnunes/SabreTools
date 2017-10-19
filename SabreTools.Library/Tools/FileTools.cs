@@ -769,6 +769,10 @@ namespace SabreTools.Library.Tools
 						input.Seek(offset, SeekOrigin.Begin);
 					}
 				}
+				catch (NotSupportedException)
+				{
+					Globals.Logger.Verbose("Stream does not support seeking. Stream position not changed");
+				}
 				catch (NotImplementedException)
 				{
 					Globals.Logger.Warning("Stream does not support seeking. Stream position not changed");
@@ -856,6 +860,10 @@ namespace SabreTools.Library.Tools
 				try
 				{
 					input.Seek(0, SeekOrigin.Begin);
+				}
+				catch (NotSupportedException)
+				{
+					Globals.Logger.Verbose("Stream does not support seeking. Stream position not changed");
 				}
 				catch (NotImplementedException)
 				{
