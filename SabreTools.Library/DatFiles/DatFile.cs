@@ -5687,7 +5687,11 @@ namespace SabreTools.Library.DatFiles
 			Dictionary<StatDatFormat, StreamWriter> writers = new Dictionary<StatDatFormat, StreamWriter>();
 			foreach (KeyValuePair<StatDatFormat, string> kvp in outputs)
 			{
-				writers.Add(kvp.Key, new StreamWriter(FileTools.TryOpenWrite(kvp.Value)));
+				FileStream fs = FileTools.TryCreate(kvp.Value);
+				if (fs != null)
+				{
+					writers.Add(kvp.Key, new StreamWriter(fs));
+				}
 			}
 
 			// Write the header, if any

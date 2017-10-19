@@ -340,6 +340,12 @@ namespace SabreTools.Library.Tools
 				Directory.CreateDirectory(outDir);
 			}
 
+			// Double check the outDir for the end delim
+			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				outDir += Path.DirectorySeparatorChar;
+			}
+
 			// For each output format, get the appropriate stream writer
 			if ((statDatFormat & StatDatFormat.None) != 0)
 			{
