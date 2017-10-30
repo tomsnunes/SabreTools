@@ -222,12 +222,46 @@ namespace SabreTools.Library.Data
         ALL = 0xFFFFFFF,
     }
 
-    /// <summary>
-    /// Determines which diffs should be created
-    /// </summary>
-    [Flags]
-	public enum DiffMode
+	/// <summary>
+	/// Determine what hashes to strip from the DAT
+	/// </summary>
+	[Flags]
+	public enum Hash
 	{
+		CRC = 0x0001,
+		MD5 = CRC << 1,
+		SHA1 = MD5 << 1,
+		SHA256 = SHA1 << 1,
+		SHA384 = SHA256 << 1,
+		SHA512 = SHA384 << 1,
+		xxHash = SHA512 << 1,
+
+		// Special combinations
+		Standard = CRC | MD5 | SHA1,
+		DeepHashes = SHA256 | SHA384 | SHA512 | xxHash,
+		SecureHashes = MD5 | SHA1 | SHA256 | SHA384 | SHA512 | xxHash,
+	}
+
+	/// <summary>
+	/// Determine which format to output Stats to
+	/// </summary>
+	/// [Flags]
+	public enum StatDatFormat
+	{
+		None = 0x01,
+		HTML = None << 1,
+		CSV = HTML << 1,
+		TSV = CSV << 1,
+	}
+
+	/// <summary>
+	/// Determines special update modes
+	/// </summary>
+	[Flags]
+	public enum UpdateMode
+	{
+		None = 0x00,
+
 		// Standard diffs
 		Dupes = 0x01,
 		NoDupes = Dupes << 1,
@@ -245,38 +279,6 @@ namespace SabreTools.Library.Data
 		BaseReplace = Against << 1,
 		ReverseBaseReplace = BaseReplace << 1,
 	}
-
-	/// <summary>
-	/// Determine which format to output Stats to
-	/// </summary>
-	/// [Flags]
-	public enum StatDatFormat
-	{
-		None = 0x01,
-		HTML = None << 1,
-		CSV = HTML << 1,
-		TSV = CSV << 1,
-	}
-
-    /// <summary>
-    /// Determine what hashes to strip from the DAT
-    /// </summary>
-    [Flags]
-    public enum Hash
-    {
-		CRC = 0x0001,
-        MD5 = CRC << 1,
-        SHA1 = MD5 << 1,
-        SHA256 = SHA1 << 1,
-		SHA384 = SHA256 << 1,
-		SHA512 = SHA384 << 1,
-		xxHash = SHA512 << 1,
-
-		// Special combinations
-		Standard = CRC | MD5 | SHA1,
-		DeepHashes = SHA256 | SHA384 | SHA512 | xxHash,
-		SecureHashes = MD5 | SHA1 | SHA256 | SHA384 | SHA512 | xxHash,
-    }
 
     #endregion
 

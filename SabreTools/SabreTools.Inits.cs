@@ -541,7 +541,7 @@ namespace SabreTools
 
 			/* Merging and Diffing info */
 			bool merge,
-			DiffMode diffMode,
+			UpdateMode diffMode,
 			bool inplace,
 			bool skip,
 			bool bare,

@@ -122,13 +122,13 @@ namespace SabreTools
 				usegame = true;
 			DatFormat datFormat = 0x0;
 			DedupeType dedup = DedupeType.None;
-			DiffMode diffMode = 0x0;
 			Hash omitFromScan = Hash.SHA256 | Hash.SHA384 | Hash.SHA512; // Should be set to 0x0 later
 			Hash stripHash = 0x0;
 			OutputFormat outputFormat = OutputFormat.Folder;
 			SkipFileType skipFileType = SkipFileType.None;
 			SplitType splitType = SplitType.None;
 			StatDatFormat statDatFormat = 0x0;
+			UpdateMode updateMode = UpdateMode.None;
 
 			// User inputs
 			int gz = 2,
@@ -290,7 +290,7 @@ namespace SabreTools
 						break;
 					case "-ag":
 					case "--against":
-						diffMode |= DiffMode.Against;
+						updateMode |= UpdateMode.Against;
 						break;
 					case "-b":
 					case "--bare":
@@ -306,11 +306,11 @@ namespace SabreTools
 						break;
 					case "-bn":
 					case "--base-name":
-						diffMode |= DiffMode.BaseReplace;
+						updateMode |= UpdateMode.BaseReplace;
 						break;
 					case "-c":
 					case "--cascade":
-						diffMode |= DiffMode.Cascade;
+						updateMode |= UpdateMode.Cascade;
 						break;
 					case "-cf":
 					case "--copy-files":
@@ -342,19 +342,19 @@ namespace SabreTools
 						break;
 					case "-di":
 					case "--diff":
-						diffMode |= DiffMode.All;
+						updateMode |= UpdateMode.All;
 						break;
 					case "-did":
 					case "--diff-du":
-						diffMode |= DiffMode.Dupes;
+						updateMode |= UpdateMode.Dupes;
 						break;
 					case "-dii":
 					case "--diff-in":
-						diffMode |= DiffMode.Individuals;
+						updateMode |= UpdateMode.Individuals;
 						break;
 					case "-din":
 					case "--diff-nd":
-						diffMode |= DiffMode.NoDupes;
+						updateMode |= UpdateMode.NoDupes;
 						break;
 					case "-dm":
 					case "--dat-merged":
@@ -530,7 +530,7 @@ namespace SabreTools
 						break;
 					case "-rc":
 					case "--rev-cascade":
-						diffMode |= DiffMode.ReverseCascade;
+						updateMode |= UpdateMode.ReverseCascade;
 						break;
 					case "-rmd5":
 					case "--rem-md5":
@@ -832,7 +832,7 @@ namespace SabreTools
 						break;
 					case "-rbn":
 					case "--reverse-base-name":
-						diffMode |= DiffMode.ReverseBaseReplace;
+						updateMode |= UpdateMode.ReverseBaseReplace;
 						break;
 					case "-rd":
 					case "--root-dir":
@@ -1319,7 +1319,7 @@ namespace SabreTools
 			{
 				InitUpdate(inputs, basePaths, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, sceneDateStrip, datFormat, usegame, prefix, postfix, quotes, repext, addext, remext,
-					datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName, filter, oneGameOneRegion, regions,
+					datPrefix, romba, merge, updateMode, inplace, skip, removeDateFromAutomaticName, filter, oneGameOneRegion, regions,
 					splitType, trim, single, root, outDir, cleanGameNames, removeUnicode, descAsName, dedup, stripHash);
 			}
 
