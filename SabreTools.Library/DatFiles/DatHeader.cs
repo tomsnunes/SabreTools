@@ -263,6 +263,7 @@ namespace SabreTools.Library.DatFiles
 				_forcePacking = this._forcePacking,
 				_datFormat = this._datFormat,
 				_excludeOf = this._excludeOf,
+				_sceneDateStrip = this._sceneDateStrip,
 				_dedupeRoms = this._dedupeRoms,
 				_stripHash = this._stripHash,
 				_oneGameOneRegion = this._oneGameOneRegion,
