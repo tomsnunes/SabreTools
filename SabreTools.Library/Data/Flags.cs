@@ -240,6 +240,9 @@ namespace SabreTools.Library.Data
 
 		// Base diffs
 		Against = ReverseCascade << 1,
+
+		// Not technically diffs
+		BaseReplace = Against << 1,
 	}
 
 	/// <summary>

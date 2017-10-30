@@ -1177,6 +1177,17 @@ Options:
 					a second time, this will skip writing it. This can often
 					speed up the output process.
 		
+		-bn, --base-name	Replace matching item names from base DAT
+			By default, no item names are changed except when there is a merge
+			occurring. This flag enables users to define a DAT or set of base
+			DATs to use as "replacement names" for all input DATs. Note that
+			the first found instance of an item in the base DAT(s) will be
+			used and all others will be disgarded.
+			
+			-bd=, --base-dat=	Add a base DAT for replacing
+				Add a DAT or folder of DATs to the base set to be used in
+				item name replacement
+		
 		-gn=, --not-game=	Filter by game name
 		-ngn=, --game-name=	Exclude by game name
 		-rn=, --rom-name=	Filter by rom name

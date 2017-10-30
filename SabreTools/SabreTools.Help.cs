@@ -1225,6 +1225,16 @@ namespace SabreTools
 					"Don't include the date in automatic name",
 					FeatureType.Flag,
 					null));
+			update.AddFeature("base-name", new Feature(
+				new List<string>() { "-bn", "--base-name" },
+				"Replace matching item names from a base DAT",
+				FeatureType.Flag,
+				null));
+				update["base-name"].AddFeature("base-dat", new Feature(
+					new List<string>() { "-bd", "--base-dat" },
+					"Add a base DAT for replacing",
+					FeatureType.List,
+					null));
 			update.AddFeature("game-name", new Feature(
 				new List<string>() { "-gn", "--game-name" },
 				"Filter by game name",

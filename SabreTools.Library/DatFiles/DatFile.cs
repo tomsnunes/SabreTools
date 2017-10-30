@@ -1608,7 +1608,7 @@ namespace SabreTools.Library.DatFiles
 			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
-			if (merge || (diff != 0 && (diff & DiffMode.Against) == 0))
+			if (merge || (diff != 0 && (diff & DiffMode.Against) == 0) && (diff & DiffMode.BaseReplace) == 0)
 			{
 				// Make sure there are no folders in inputs
 				List<string> newInputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
@@ -1643,6 +1643,11 @@ namespace SabreTools.Library.DatFiles
 			else if ((diff & DiffMode.Against) != 0)
 			{
 				DiffAgainst(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
+			}
+			// If we're in "base replacement" mode, we treat the inputs differently
+			else if ((diff & DiffMode.BaseReplace) != 0)
+			{
+				BaseReplace(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
 			}
 			// Otherwise, loop through all of the inputs individually
 			else
@@ -1714,6 +1719,122 @@ namespace SabreTools.Library.DatFiles
 			watch.Stop();
 
 			return datHeaders.ToList();
+		}
+
+		/// <summary>
+		/// Replace item names from on a base set
+		/// </summary>
+		/// <param name="inputPaths">Names of the input files and/or folders</param>
+		/// <param name="basePaths">Names of base files and/or folders</param>
+		/// <param name="outDir">Optional param for output directory</param>
+		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
+		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
+		/// <param name="filter">Filter object to be passed to the DatItem level</param>
+		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
+		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
+		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
+		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		public void BaseReplace(List<string> inputPaths, List<string> basePaths, string outDir, bool inplace, bool clean, bool remUnicode,
+			bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
+		{
+			// First we want to parse all of the base DATs into the input
+			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for replacement...");
+
+			List<string> baseFileNames = FileTools.GetOnlyFilesFromInputs(basePaths);
+			Parallel.For(0, baseFileNames.Count, Globals.ParallelOptions, i =>
+			{
+				string path = "";
+				int id = 0;
+
+				lock (baseFileNames)
+				{
+					path = baseFileNames[i];
+					id = baseFileNames.Count - i; // Inverse because larger numbers take precedence
+				}
+
+				Parse(path, id, id, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
+			});
+
+			watch.Stop();
+
+			// For comparison's sake, we want to use CRC as the base ordering
+			BucketBy(SortedBy.CRC, DedupeType.Full);
+
+			// Now we want to try to replace each item in each input DAT from the base
+			List<string> inputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
+			foreach (string path in inputFileNames)
+			{
+				// Get the two halves of the path
+				string[] splitpath = path.Split('¬');
+
+				Globals.Logger.User("Replacing items in '{0}'' from the base DAT", splitpath[0]);
+
+				// First we parse in the DAT internally
+				DatFile intDat = new DatFile();
+				intDat.Parse(splitpath[0], 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
+
+				// For comparison's sake, we want to use CRC as the base ordering
+				intDat.BucketBy(SortedBy.CRC, DedupeType.Full);
+
+				// Then we do a hashwise comparison against the base DAT
+				List<string> keys = intDat.Keys.ToList();
+				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+				{
+					List<DatItem> datItems = intDat[key];
+					List<DatItem> newDatItems = new List<DatItem>();
+					foreach (DatItem datItem in datItems)
+					{
+						List<DatItem> dupes = datItem.GetDuplicates(this);
+						if (dupes.Count > 0)
+						{
+							datItem.Name = dupes[0].Name;
+						}
+
+						newDatItems.Add(datItem);
+					}
+
+					// Now add the new list to the key
+					intDat.Remove(key);
+					intDat.AddRange(key, newDatItems);
+				});
+
+				// Determine the output path for the DAT
+				string interOutDir = outDir;
+				if (inplace)
+				{
+					interOutDir = Path.GetDirectoryName(path);
+				}
+				else if (!String.IsNullOrEmpty(interOutDir))
+				{
+					if (splitpath[0].Length == splitpath[1].Length)
+					{
+						interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, Path.GetFileName(splitpath[0])));
+					}
+					else
+					{
+						interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, splitpath[0].Remove(0, splitpath[1].Length + 1)));
+					}
+				}
+				else
+				{
+					if (splitpath[0].Length == splitpath[1].Length)
+					{
+						interOutDir = Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, Path.GetFileName(splitpath[0])));
+					}
+					else
+					{
+						interOutDir = Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, splitpath[0].Remove(0, splitpath[1].Length + 1)));
+					}
+				}
+
+				// Once we're done, try writing out
+				intDat.WriteToFile(interOutDir);
+
+				// Due to possible memory requirements, we force a garbage collection
+				GC.Collect();
+			}
 		}
 
 		/// <summary>
@@ -1791,11 +1912,25 @@ namespace SabreTools.Library.DatFiles
 				}
 				else if (!String.IsNullOrEmpty(interOutDir))
 				{
-					interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, splitpath[0].Remove(0, splitpath[1].Length + 1)));
+					if (splitpath[0].Length == splitpath[1].Length)
+					{
+						interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, Path.GetFileName(splitpath[0])));
+					}
+					else
+					{
+						interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, splitpath[0].Remove(0, splitpath[1].Length + 1)));
+					}
 				}
 				else
 				{
-					interOutDir = Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, splitpath[0].Remove(0, splitpath[1].Length + 1)));
+					if (splitpath[0].Length == splitpath[1].Length)
+					{
+						interOutDir = Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, Path.GetFileName(splitpath[0])));
+					}
+					else
+					{
+						interOutDir = Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, splitpath[0].Remove(0, splitpath[1].Length + 1)));
+					}
 				}
 
 				// Once we're done, try writing out

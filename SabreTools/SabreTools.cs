@@ -304,6 +304,10 @@ namespace SabreTools
 					case "--baddump-col":
 						showBaddumpColumn = true;
 						break;
+					case "-bn":
+					case "--base-name":
+						diffMode |= DiffMode.BaseReplace;
+						break;
 					case "-c":
 					case "--cascade":
 						diffMode |= DiffMode.Cascade;
