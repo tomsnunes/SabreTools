@@ -243,6 +243,7 @@ namespace SabreTools.Library.Data
 
 		// Not technically diffs
 		BaseReplace = Against << 1,
+		ReverseBaseReplace = BaseReplace << 1,
 	}
 
 	/// <summary>

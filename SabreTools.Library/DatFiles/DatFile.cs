@@ -1608,7 +1608,10 @@ namespace SabreTools.Library.DatFiles
 			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
-			if (merge || (diff != 0 && (diff & DiffMode.Against) == 0) && (diff & DiffMode.BaseReplace) == 0)
+			if (merge || (diff != 0
+				&& (diff & DiffMode.Against) == 0)
+				&& (diff & DiffMode.BaseReplace) == 0
+				&& (diff & DiffMode.ReverseBaseReplace) == 0)
 			{
 				// Make sure there are no folders in inputs
 				List<string> newInputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
@@ -1647,7 +1650,12 @@ namespace SabreTools.Library.DatFiles
 			// If we're in "base replacement" mode, we treat the inputs differently
 			else if ((diff & DiffMode.BaseReplace) != 0)
 			{
-				BaseReplace(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
+				BaseReplace(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root, false);
+			}
+			// If we're in "reverse base replacement" mode, we treat the inputs differently
+			else if ((diff & DiffMode.ReverseBaseReplace) != 0)
+			{
+				BaseReplace(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root, true);
 			}
 			// Otherwise, loop through all of the inputs individually
 			else
@@ -1736,8 +1744,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="reverse">True if the base DATs should be reverse-ordered, false otherwise</param>
 		public void BaseReplace(List<string> inputPaths, List<string> basePaths, string outDir, bool inplace, bool clean, bool remUnicode,
-			bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
+			bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root, bool reverse)
 		{
 			// First we want to parse all of the base DATs into the input
 			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for replacement...");
@@ -1751,7 +1760,7 @@ namespace SabreTools.Library.DatFiles
 				lock (baseFileNames)
 				{
 					path = baseFileNames[i];
-					id = baseFileNames.Count - i; // Inverse because larger numbers take precedence
+					id = (reverse ? i : baseFileNames.Count - i);
 				}
 
 				Parse(path, id, id, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);

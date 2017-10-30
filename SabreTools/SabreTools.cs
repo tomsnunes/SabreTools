@@ -830,6 +830,10 @@ namespace SabreTools
 							rar = 2;
 						}
 						break;
+					case "-rbn":
+					case "--reverse-base-name":
+						diffMode |= DiffMode.ReverseBaseReplace;
+						break;
 					case "-rd":
 					case "--root-dir":
 						root = args[++i];
