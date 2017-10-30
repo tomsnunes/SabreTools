@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -450,6 +451,27 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				_datHeader.ExcludeOf = value;
+			}
+		}
+		public bool SceneDateStrip
+		{
+			get
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				return _datHeader.SceneDateStrip;
+			}
+			set
+			{
+				if (_datHeader == null)
+				{
+					_datHeader = new DatHeader();
+				}
+
+				_datHeader.SceneDateStrip = value;
 			}
 		}
 		public DedupeType DedupeRoms
@@ -2434,6 +2456,42 @@ namespace SabreTools.Library.DatFiles
 
 						items[j] = disk;
 					}
+				}
+
+				Remove(key);
+				AddRange(key, items);
+			});
+		}
+
+		/// <summary>
+		/// Strip the dates from the beginning of scene-style set names
+		/// </summary>
+		private void StripSceneDatesFromItems()
+		{
+			// Output the logging statement
+			Globals.Logger.User("Stripping scene-style dates");
+
+			// Set the regex pattern to use
+			string pattern = @"([0-9]{2}\.[0-9]{2}\.[0-9]{2}-)(.*?-.*?)";
+
+			// Now process all of the roms
+			List<string> keys = Keys.ToList();
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+			{
+				List<DatItem> items = this[key];
+				for (int j = 0; j < items.Count; j++)
+				{
+					DatItem item = items[j];
+					if (Regex.IsMatch(item.MachineName, pattern))
+					{
+						Regex.Replace(item.MachineName, pattern, "$2");
+					}
+					if (Regex.IsMatch(item.MachineDescription, pattern))
+					{
+						Regex.Replace(item.MachineDescription, pattern, "$2");
+					}
+
+					items[j] = item;
 				}
 
 				Remove(key);
@@ -5553,6 +5611,12 @@ namespace SabreTools.Library.DatFiles
 			if (StripHash != 0x0)
 			{
 				StripHashesFromItems();
+			}
+
+			// If we are removing scene dates, do that now
+			if (SceneDateStrip)
+			{
+
 			}
 
 			// Get the outfile names

@@ -260,6 +260,11 @@ namespace SabreTools
 				"Exclude romof, cloneof, sampleof tags",
 				FeatureType.Flag,
 				null));
+			datFromDir.AddFeature("scene-date-strip", new Feature(
+				new List<string>() { "-sds", "--scene-date-strip" },
+				"Remove date from scene-named sets",
+				FeatureType.Flag,
+				null));
 			datFromDir.AddFeature("add-blank", new Feature(
 				new List<string>() { "-ab", "--add-blank" },
 				"Output blank files for folders",
@@ -1043,6 +1048,11 @@ namespace SabreTools
 			update.AddFeature("exclude-of", new Feature(
 				new List<string>() { "-xof", "--exclude-of" },
 				"Exclude romof, cloneof, sampleof tags",
+				FeatureType.Flag,
+				null));
+			update.AddFeature("scene-date-strip", new Feature(
+				new List<string>() { "-sds", "--scene-date-strip" },
+				"Remove date from scene-named sets",
 				FeatureType.Flag,
 				null));
 			update.AddFeature("clean", new Feature(

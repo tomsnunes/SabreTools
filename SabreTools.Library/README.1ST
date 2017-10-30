@@ -320,6 +320,11 @@ Options:
 			If this flag is enabled, then the romof, cloneof, and sampleof tags
 			will be omitted from the outputted DAT or DATs.
 			
+		-sds, --scene-date-strip	Remove date from scene-named sets
+			If this flag is enabled, sets with "scene" names will have the date
+			removed from the beginning. For example "01.01.01-Game_Name-GROUP"
+			would become "Game_Name-Group".
+			
 		-ab, --add-blank	Output blank files for folders
 			If this flag is set, then blank entries will be created for each of
 			the empty directories in the source. This is useful for tools that
@@ -1027,7 +1032,12 @@ Options:
 		-xof, --exclude-of	Exclude romof, cloneof, sampleof tags
 			If this flag is enabled, then the romof, cloneof, and sampleof tags
 			will be omitted from the outputted DAT or DATs.
-				
+		
+		-sds, --scene-date-strip	Remove date from scene-named sets
+			If this flag is enabled, sets with "scene" names will have the date
+			removed from the beginning. For example "01.01.01-Game_Name-GROUP"
+			would become "Game_Name-Group".
+		
 		-clean				Clean game names according to WoD standards
 			Game names will be santitized to remove what the original WoD
 			standards deemed as unneeded information, such as parenthized or

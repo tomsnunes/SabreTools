@@ -36,6 +36,7 @@ namespace SabreTools
 		/// <param name="comment">New comment</param>
 		/// <param name="forcepack">String representing the forcepacking flag</param>
 		/// <param name="excludeOf">True if cloneof, romof, and sampleof fields should be omitted from output, false otherwise</param>
+		/// <param name="sceneDateStrip">True if scene-named sets have the date stripped from the beginning, false otherwise</param>
 		/// <param name="datFormat">DatFormat to be used for outputting the DAT</param>
 		/// /* Standard DFD info */
 		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
@@ -66,6 +67,7 @@ namespace SabreTools
 			string comment,
 			string forcepack,
 			bool excludeOf,
+			bool sceneDateStrip,
 			DatFormat datFormat,
 
 			/* Standard DFD info */
@@ -118,6 +120,7 @@ namespace SabreTools
 				DatFormat = (datFormat == 0 ? DatFormat.Logiqx : datFormat),
 				Romba = romba,
 				ExcludeOf = excludeOf,
+				SceneDateStrip = sceneDateStrip,
 				Type = (superdat ? "SuperDAT" : ""),
 			};
 
@@ -465,6 +468,7 @@ namespace SabreTools
 		/// <param name="forcend">None, Obsolete, Required, Ignore</param>
 		/// <param name="forcepack">None, Zip, Unzip</param>
 		/// <param name="excludeOf">True if cloneof, romof, and sampleof fields should be omitted from output, false otherwise</param>
+		/// <param name="sceneDateStrip">True if scene-named sets have the date stripped from the beginning, false otherwise</param>
 		/// <param name="datFormat">Non-zero flag for output format, zero otherwise for default</param>
 		/// /* Missfile-specific DAT info */
 		/// <param name="usegame">True if games are to be used in output, false if roms are</param>
@@ -521,6 +525,7 @@ namespace SabreTools
 			string forcend,
 			string forcepack,
 			bool excludeOf,
+			bool sceneDateStrip,
 			DatFormat datFormat,
 
 			/* Missfile-specific DAT info */
@@ -709,6 +714,7 @@ namespace SabreTools
 				ForcePacking = fp,
 				DedupeRoms = dedup,
 				ExcludeOf = excludeOf,
+				SceneDateStrip = sceneDateStrip,
 				DatFormat = datFormat,
 				StripHash = stripHash,
 				OneGameOneRegion = oneGameOneRegion,

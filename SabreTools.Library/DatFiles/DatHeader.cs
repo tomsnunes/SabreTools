@@ -32,6 +32,7 @@ namespace SabreTools.Library.DatFiles
 		private ForcePacking _forcePacking;
 		private DatFormat _datFormat;
 		private bool _excludeOf;
+		private bool _sceneDateStrip;
 		private DedupeType _dedupeRoms;
 		private Hash _stripHash;
 		private bool _oneGameOneRegion;
@@ -147,6 +148,11 @@ namespace SabreTools.Library.DatFiles
 		{
 			get { return _excludeOf; }
 			set { _excludeOf = value; }
+		}
+		public bool SceneDateStrip
+		{
+			get { return _sceneDateStrip; }
+			set { _sceneDateStrip = value; }
 		}
 		public DedupeType DedupeRoms
 		{

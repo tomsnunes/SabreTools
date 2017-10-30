@@ -110,6 +110,7 @@ namespace SabreTools
 				removeDateFromAutomaticName = false,
 				removeUnicode = false,
 				romba = false,
+				sceneDateStrip = false,
 				showBaddumpColumn = false,
 				showNodumpColumn = false,
 				shortname = false,
@@ -570,6 +571,10 @@ namespace SabreTools
 					case "-sd":
 					case "--superdat":
 						superdat = true;
+						break;
+					case "-sds":
+					case "--scene-date-strip":
+						sceneDateStrip = true;
 						break;
 					case "-sf":
 					case "--skip":
@@ -1241,7 +1246,7 @@ namespace SabreTools
 			if (datFromDir)
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, email, homepage, url, comment, 
-					forcepack, excludeOf, datFormat, romba, superdat, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles,
+					forcepack, excludeOf, sceneDateStrip, datFormat, romba, superdat, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles,
 					enableGzip, skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header);
 			}
 
@@ -1305,7 +1310,7 @@ namespace SabreTools
 			else if (update)
 			{
 				InitUpdate(inputs, basePaths, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
-					superdat, forcemerge, forcend, forcepack, excludeOf, datFormat, usegame, prefix, postfix, quotes, repext, addext, remext,
+					superdat, forcemerge, forcend, forcepack, excludeOf, sceneDateStrip, datFormat, usegame, prefix, postfix, quotes, repext, addext, remext,
 					datPrefix, romba, merge, diffMode, inplace, skip, removeDateFromAutomaticName, filter, oneGameOneRegion, regions,
 					splitType, trim, single, root, outDir, cleanGameNames, removeUnicode, descAsName, dedup, stripHash);
 			}
