@@ -5616,7 +5616,7 @@ namespace SabreTools.Library.DatFiles
 			// If we are removing scene dates, do that now
 			if (SceneDateStrip)
 			{
-
+				StripSceneDatesFromItems();
 			}
 
 			// Get the outfile names
