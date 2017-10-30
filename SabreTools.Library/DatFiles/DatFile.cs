@@ -2484,11 +2484,11 @@ namespace SabreTools.Library.DatFiles
 					DatItem item = items[j];
 					if (Regex.IsMatch(item.MachineName, pattern))
 					{
-						Regex.Replace(item.MachineName, pattern, "$2");
+						item.MachineName = Regex.Replace(item.MachineName, pattern, "$2");
 					}
 					if (Regex.IsMatch(item.MachineDescription, pattern))
 					{
-						Regex.Replace(item.MachineDescription, pattern, "$2");
+						item.MachineDescription = Regex.Replace(item.MachineDescription, pattern, "$2");
 					}
 
 					items[j] = item;
