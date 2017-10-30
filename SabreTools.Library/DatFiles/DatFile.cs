@@ -1609,7 +1609,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || (updateMode != UpdateMode.None
-				&& (updateMode & UpdateMode.Against) == 0)
+				&& (updateMode & UpdateMode.DiffAgainst) == 0)
 				&& (updateMode & UpdateMode.BaseReplace) == 0
 				&& (updateMode & UpdateMode.ReverseBaseReplace) == 0)
 			{
@@ -1617,7 +1617,7 @@ namespace SabreTools.Library.DatFiles
 				List<string> newInputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
 
 				// Reverse if we have to
-				if ((updateMode & UpdateMode.ReverseCascade) != 0)
+				if ((updateMode & UpdateMode.DiffReverseCascade) != 0)
 				{
 					newInputFileNames.Reverse();
 				}
@@ -1627,12 +1627,12 @@ namespace SabreTools.Library.DatFiles
 					remUnicode, descAsName, outDir, filter, splitType, trim, single, root);
 
 				// Modify the Dictionary if necessary and output the results
-				if (updateMode != 0 && updateMode < UpdateMode.Cascade)
+				if (updateMode != 0 && updateMode < UpdateMode.DiffCascade)
 				{
 					DiffNoCascade(updateMode, outDir, newInputFileNames);
 				}
 				// If we're in cascade and diff, output only cascaded diffs
-				else if (updateMode != 0 && updateMode >= UpdateMode.Cascade)
+				else if (updateMode != 0 && updateMode >= UpdateMode.DiffCascade)
 				{
 					DiffCascade(outDir, inplace, newInputFileNames, datHeaders, skip);
 				}
@@ -1643,7 +1643,7 @@ namespace SabreTools.Library.DatFiles
 				}
 			}
 			// If we're in "diff against" mode, we treat the inputs differently
-			else if ((updateMode & UpdateMode.Against) != 0)
+			else if ((updateMode & UpdateMode.DiffAgainst) != 0)
 			{
 				DiffAgainst(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
 			}
@@ -2080,7 +2080,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Don't have External dupes
-			if ((diff & UpdateMode.NoDupes) != 0)
+			if ((diff & UpdateMode.DiffNoDupesOnly) != 0)
 			{
 				post = " (No Duplicates)";
 				outerDiffData = new DatFile(this);
@@ -2091,7 +2091,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Have External dupes
-			if ((diff & UpdateMode.Dupes) != 0)
+			if ((diff & UpdateMode.DiffDupesOnly) != 0)
 			{
 				post = " (Duplicates)";
 				dupeData = new DatFile(this);
@@ -2105,7 +2105,7 @@ namespace SabreTools.Library.DatFiles
 			List<DatFile> outDats = new List<DatFile>();
 
 			// Loop through each of the inputs and get or create a new DatData object
-			if ((diff & UpdateMode.Individuals) != 0)
+			if ((diff & UpdateMode.DiffIndividualsOnly) != 0)
 			{
 				DatFile[] outDatsArray = new DatFile[inputs.Count];
 
@@ -2143,18 +2143,18 @@ namespace SabreTools.Library.DatFiles
 				foreach (DatItem item in items)
 				{
 					// No duplicates
-					if ((diff & UpdateMode.NoDupes) != 0 || (diff & UpdateMode.Individuals) != 0)
+					if ((diff & UpdateMode.DiffNoDupesOnly) != 0 || (diff & UpdateMode.DiffIndividualsOnly) != 0)
 					{
 						if ((item.Dupe & DupeType.Internal) != 0)
 						{
 							// Individual DATs that are output
-							if ((diff & UpdateMode.Individuals) != 0)
+							if ((diff & UpdateMode.DiffIndividualsOnly) != 0)
 							{
 								outDats[item.SystemID].Add(key, item);
 							}
 
 							// Merged no-duplicates DAT
-							if ((diff & UpdateMode.NoDupes) != 0)
+							if ((diff & UpdateMode.DiffNoDupesOnly) != 0)
 							{
 								DatItem newrom = item.Clone() as DatItem;
 								newrom.MachineName += " (" + Path.GetFileNameWithoutExtension(inputs[newrom.SystemID].Split('¬')[0]) + ")";
@@ -2165,7 +2165,7 @@ namespace SabreTools.Library.DatFiles
 					}
 
 					// Duplicates only
-					if ((diff & UpdateMode.Dupes) != 0)
+					if ((diff & UpdateMode.DiffDupesOnly) != 0)
 					{
 						if ((item.Dupe & DupeType.External) != 0)
 						{
@@ -2184,19 +2184,19 @@ namespace SabreTools.Library.DatFiles
 			watch.Start("Outputting all created DATs");
 
 			// Output the difflist (a-b)+(b-a) diff
-			if ((diff & UpdateMode.NoDupes) != 0)
+			if ((diff & UpdateMode.DiffNoDupesOnly) != 0)
 			{
 				outerDiffData.WriteToFile(outDir);
 			}
 
 			// Output the (ab) diff
-			if ((diff & UpdateMode.Dupes) != 0)
+			if ((diff & UpdateMode.DiffDupesOnly) != 0)
 			{
 				dupeData.WriteToFile(outDir);
 			}
 
 			// Output the individual (a-b) DATs
-			if ((diff & UpdateMode.Individuals) != 0)
+			if ((diff & UpdateMode.DiffIndividualsOnly) != 0)
 			{
 				Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
 				{

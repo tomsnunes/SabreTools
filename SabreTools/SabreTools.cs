@@ -290,7 +290,7 @@ namespace SabreTools
 						break;
 					case "-ag":
 					case "--against":
-						updateMode |= UpdateMode.Against;
+						updateMode |= UpdateMode.DiffAgainst;
 						break;
 					case "-b":
 					case "--bare":
@@ -310,7 +310,7 @@ namespace SabreTools
 						break;
 					case "-c":
 					case "--cascade":
-						updateMode |= UpdateMode.Cascade;
+						updateMode |= UpdateMode.DiffCascade;
 						break;
 					case "-cf":
 					case "--copy-files":
@@ -342,19 +342,19 @@ namespace SabreTools
 						break;
 					case "-di":
 					case "--diff":
-						updateMode |= UpdateMode.All;
+						updateMode |= UpdateMode.AllDiffs;
 						break;
 					case "-did":
 					case "--diff-du":
-						updateMode |= UpdateMode.Dupes;
+						updateMode |= UpdateMode.DiffDupesOnly;
 						break;
 					case "-dii":
 					case "--diff-in":
-						updateMode |= UpdateMode.Individuals;
+						updateMode |= UpdateMode.DiffIndividualsOnly;
 						break;
 					case "-din":
 					case "--diff-nd":
-						updateMode |= UpdateMode.NoDupes;
+						updateMode |= UpdateMode.DiffNoDupesOnly;
 						break;
 					case "-dm":
 					case "--dat-merged":
@@ -530,7 +530,7 @@ namespace SabreTools
 						break;
 					case "-rc":
 					case "--rev-cascade":
-						updateMode |= UpdateMode.ReverseCascade;
+						updateMode |= UpdateMode.DiffReverseCascade;
 						break;
 					case "-rmd5":
 					case "--rem-md5":

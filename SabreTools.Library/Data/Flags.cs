@@ -263,20 +263,20 @@ namespace SabreTools.Library.Data
 		None = 0x00,
 
 		// Standard diffs
-		Dupes = 0x01,
-		NoDupes = Dupes << 1,
-		Individuals = NoDupes << 1,
-		All = Dupes | NoDupes | Individuals,
+		DiffDupesOnly = 0x01,
+		DiffNoDupesOnly = DiffDupesOnly << 1,
+		DiffIndividualsOnly = DiffNoDupesOnly << 1,
+		AllDiffs = DiffDupesOnly | DiffNoDupesOnly | DiffIndividualsOnly,
 
 		// Cascaded diffs
-		Cascade = Individuals << 1,
-		ReverseCascade = Cascade << 1,
+		DiffCascade = DiffIndividualsOnly << 1,
+		DiffReverseCascade = DiffCascade << 1,
 
 		// Base diffs
-		Against = ReverseCascade << 1,
+		DiffAgainst = DiffReverseCascade << 1,
 
-		// Not technically diffs
-		BaseReplace = Against << 1,
+		// Special update modes
+		BaseReplace = DiffAgainst << 1,
 		ReverseBaseReplace = BaseReplace << 1,
 	}
 
