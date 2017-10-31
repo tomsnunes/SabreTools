@@ -120,6 +120,9 @@ namespace SabreTools.Library.External
 		/// <returns>Unsigned int containing the version number, null if invalid</returns>
 		public uint? ValidateHeaderVersion()
 		{
+			// Seek to the beginning to make sure we're reading the correct bytes
+			m_br.BaseStream.Seek(0, SeekOrigin.Begin);
+
 			// Read and verify the CHD signature
 			m_signature = m_br.ReadUInt64();
 			if (m_signature != Constants.CHDSignature)
@@ -146,11 +149,47 @@ namespace SabreTools.Library.External
 		}
 
 		/// <summary>
+		/// Get the internal SHA-1 from the CHD
+		/// </summary>
+		/// <returns>SHA-1 as a byte array, null on error</returns>
+		public byte[] GetSHA1FromHeader()
+		{
+			// Validate the header by default just in case
+			uint? version = ValidateHeaderVersion();
+
+			// Now get the SHA-1 hash, if possible
+			byte[] sha1 = new byte[20];
+
+			// Now parse the rest of the header according to the version
+			switch (version)
+			{
+				case 3:
+					sha1 = ParseCHDv3Header();
+					break;
+				case 4:
+					sha1 = ParseCHDv4Header();
+					break;
+				case 5:
+					sha1 = ParseCHDv5Header();
+					break;
+				case null:
+				default:
+					// throw CHDERR_INVALID_FILE;
+					return null;
+			}
+
+			return sha1;
+		}
+
+		/// <summary>
 		/// Parse a CHD v3 header
 		/// </summary>
 		/// <returns>The extracted SHA-1 on success, null otherwise</returns>
-		public byte[] ParseCHDv3Header()
+		private byte[] ParseCHDv3Header()
 		{
+			// Seek to after the signature to make sure we're reading the correct bytes
+			m_br.BaseStream.Seek(8, SeekOrigin.Begin);
+
 			// Set the blank SHA-1 hash
 			byte[] sha1 = new byte[20];
 
@@ -194,8 +233,11 @@ namespace SabreTools.Library.External
 		/// Parse a CHD v4 header
 		/// </summary>
 		/// <returns>The extracted SHA-1 on success, null otherwise</returns>
-		public byte[] ParseCHDv4Header()
+		private byte[] ParseCHDv4Header()
 		{
+			// Seek to after the signature to make sure we're reading the correct bytes
+			m_br.BaseStream.Seek(8, SeekOrigin.Begin);
+
 			// Set the blank SHA-1 hash
 			byte[] sha1 = new byte[20];
 
@@ -238,8 +280,11 @@ namespace SabreTools.Library.External
 		/// Parse a CHD v5 header
 		/// </summary>
 		/// <returns>The extracted SHA-1 on success, null otherwise</returns>
-		public byte[] ParseCHDv5Header()
+		private byte[] ParseCHDv5Header()
 		{
+			// Seek to after the signature to make sure we're reading the correct bytes
+			m_br.BaseStream.Seek(8, SeekOrigin.Begin);
+
 			// Set the blank SHA-1 hash
 			byte[] sha1 = new byte[20];
 
@@ -324,32 +369,11 @@ namespace SabreTools.Library.External
 			// Get a CHD object to store the data
 			CHDFile chd = new CHDFile(fs);
 
-			// Get and validate the header version
-			uint? version = chd.ValidateHeaderVersion();
-
-			// Create a placeholder for the extracted SHA-1
-			byte[] sha1 = new byte[20];
-
-			// Now parse the rest of the header according to the version
-			switch (version)
-			{
-				case 3:
-					sha1 = chd.ParseCHDv3Header();
-					break;
-				case 4:
-					sha1 = chd.ParseCHDv4Header();
-					break;
-				case 5:
-					sha1 = chd.ParseCHDv5Header();
-					break;
-				case null:
-				default:
-					// throw CHDERR_INVALID_FILE;
-					return null;
-			}
+			// Get the SHA-1 from the chd
+			byte[] sha1 = chd.GetSHA1FromHeader();
 
 			// Set the SHA-1 of the Disk to return
-			datItem.SHA1 = BitConverter.ToString(sha1).Replace("-", string.Empty).ToLowerInvariant();
+			datItem.SHA1 = (sha1 == null ? null : BitConverter.ToString(sha1).Replace("-", string.Empty).ToLowerInvariant());
 
 			return datItem;
 		}
