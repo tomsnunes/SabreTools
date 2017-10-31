@@ -231,7 +231,7 @@ namespace SabreTools.Library.DatFiles
 		/// Write out Game start using the supplied StreamWriter
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
-		/// <param name="rom">RomData object to be output</param>
+		/// <param name="rom">DatItem object to be output</param>
 		/// <returns>True if the data was written, false on error</returns>
 		private bool WriteStartGame(StreamWriter sw, DatItem rom)
 		{

@@ -212,7 +212,10 @@ namespace SabreTools.Library.Tools
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="date">True if the file Date should be included, false otherwise (default)</param>
 		/// <param name="header">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <returns>Populated RomData object if success, empty one on error</returns>
+		/// <returns>Populated DatItem object if success, empty one on error</returns>
+		/// <remarks>
+		/// TODO: Add CHD parsing logic here to get internal hash data
+		/// </remarks>
 		public static Rom GetFileInfo(string input, Hash omitFromScan = 0x0,
 			long offset = 0, bool date = false, string header = null)
 		{
@@ -729,7 +732,7 @@ namespace SabreTools.Library.Tools
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated (defaults to none)</param>
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
-		/// <returns>Populated RomData object if success, empty one on error</returns>
+		/// <returns>Populated DatItem object if success, empty one on error</returns>
 		public static Rom GetStreamInfo(Stream input, long size, Hash omitFromScan = 0x0,
 			long offset = 0, bool keepReadOpen = false)
 		{

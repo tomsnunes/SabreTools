@@ -706,7 +706,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// Now, output the rom data
-						WriteRomData(sw, rom, ignoreblanks);
+						WriteDatItem(sw, rom, ignoreblanks);
 
 						// Set the new data to compare against
 						lastgame = rom.MachineName;
@@ -774,7 +774,7 @@ namespace SabreTools.Library.DatFiles
 		/// Write out Game start using the supplied StreamWriter
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
-		/// <param name="rom">RomData object to be output</param>
+		/// <param name="rom">DatItem object to be output</param>
 		/// <returns>True if the data was written, false on error</returns>
 		private bool WriteStartGame(StreamWriter sw, DatItem rom)
 		{
@@ -812,7 +812,7 @@ namespace SabreTools.Library.DatFiles
 		/// Write out Game end using the supplied StreamWriter
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
-		/// <param name="rom">RomData object to be output</param>
+		/// <param name="rom">DatItem object to be output</param>
 		/// <returns>True if the data was written, false on error</returns>
 		private bool WriteEndGame(StreamWriter sw, DatItem rom)
 		{
@@ -833,14 +833,14 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Write out RomData using the supplied StreamWriter
+		/// Write out DatItem using the supplied StreamWriter
 		/// </summary>
 		/// <param name="datFile">DatFile to write out from</param>
 		/// <param name="sw">StreamWriter to output to</param>
-		/// <param name="rom">RomData object to be output</param>
+		/// <param name="rom">DatItem object to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private bool WriteRomData(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
+		private bool WriteDatItem(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks

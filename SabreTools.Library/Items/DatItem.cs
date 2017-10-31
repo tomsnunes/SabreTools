@@ -821,7 +821,7 @@ namespace SabreTools.Library.Items
 		/// Merge an arbitrary set of ROMs based on the supplied information
 		/// </summary>
 		/// <param name="infiles">List of File objects representing the roms to be merged</param>
-		/// <returns>A List of RomData objects representing the merged roms</returns>
+		/// <returns>A List of DatItem objects representing the merged roms</returns>
 		public static List<DatItem> Merge(List<DatItem> infiles)
 		{
 			// Check for null or blank roms first
@@ -948,7 +948,7 @@ namespace SabreTools.Library.Items
 		/// Resolve name duplicates in an arbitrary set of ROMs based on the supplied information
 		/// </summary>
 		/// <param name="infiles">List of File objects representing the roms to be merged</param>
-		/// <returns>A List of RomData objects representing the renamed roms</returns>
+		/// <returns>A List of DatItem objects representing the renamed roms</returns>
 		public static List<DatItem> ResolveNames(List<DatItem> infiles)
 		{
 			// Create the output list

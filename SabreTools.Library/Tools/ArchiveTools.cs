@@ -426,11 +426,11 @@ namespace SabreTools.Library.Tools
 		#region Information
 
 		/// <summary>
-		/// Generate a list of RomData objects from the header values in an archive
+		/// Generate a list of DatItem objects from the header values in an archive
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
 		/// <param name="date">True if entry dates should be included, false otherwise (default)</param>
-		/// <returns>List of RomData objects representing the found data</returns>
+		/// <returns>List of DatItem objects representing the found data</returns>
 		public static List<Rom> GetArchiveFileInfo(string input, bool date = false)
 		{
 			return GetExtendedArchiveFileInfo(input, Hash.SecureHashes, date: date);
@@ -581,12 +581,12 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// Generate a list of RomData objects from the header values in an archive
+		/// Generate a list of DatItem objects from the header values in an archive
 		/// </summary>
 		/// <param name="input">Input file to get data from</param>
 		/// <param name="omitFromScan">Hash representing the hashes that should be skipped</param>
 		/// <param name="date">True if entry dates should be included, false otherwise (default)</param>
-		/// <returns>List of RomData objects representing the found data</returns>
+		/// <returns>List of DatItem objects representing the found data</returns>
 		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
 		public static List<Rom> GetExtendedArchiveFileInfo(string input, Hash omitFromScan = Hash.DeepHashes, bool date = false)
 		{
@@ -831,7 +831,7 @@ namespace SabreTools.Library.Tools
 		/// Retrieve file information for a single torrent GZ file
 		/// </summary>
 		/// <param name="input">Filename to get information from</param>
-		/// <returns>Populated RomData object if success, empty one on error</returns>
+		/// <returns>Populated DatItem object if success, empty one on error</returns>
 		public static Rom GetTorrentGZFileInfo(string input)
 		{
 			// Check for the file existing first
@@ -1369,7 +1369,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <param name="overwrite">True if we should overwrite the file if it exists, false otherwise</param>
 		/// <returns>True if the file was written properly, false otherwise</returns>
@@ -1451,7 +1451,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTAR(string inputFile, string outDir, Rom rom, bool date = false)
@@ -1465,7 +1465,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputStream">Input stream to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTAR(Stream inputStream, string outDir, Rom rom, bool date = false)
@@ -1767,7 +1767,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrent7Zip(string inputFile, string outDir, Rom rom, bool date = false)
@@ -1781,7 +1781,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputStream">Input stream to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrent7Zip(Stream inputStream, string outDir, Rom rom, bool date = false)
@@ -2286,7 +2286,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrentLRZ(string inputFile, string outDir, Rom rom, bool date = false)
@@ -2300,7 +2300,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputStream">Input stream to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrentLRZ(Stream inputStream, string outDir, Rom rom, bool date = false)
@@ -2313,7 +2313,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrentRAR(string inputFile, string outDir, Rom rom, bool date = false)
@@ -2327,7 +2327,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputStream">Input stream to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrentRAR(Stream inputStream, string outDir, Rom rom, bool date = false)
@@ -2340,7 +2340,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrentXZ(string inputFile, string outDir, Rom rom, bool date = false)
@@ -2354,7 +2354,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputStream">Input stream to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrentXZ(Stream inputStream, string outDir, Rom rom, bool date = false)
@@ -2747,7 +2747,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrentZip(string inputFile, string outDir, Rom rom, bool date = false)
@@ -2761,7 +2761,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputStream">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">RomData representing the new information</param>
+		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public static bool WriteTorrentZip(Stream inputStream, string outDir, Rom rom, bool date = false)

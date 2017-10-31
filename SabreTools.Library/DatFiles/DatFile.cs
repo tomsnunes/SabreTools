@@ -4211,8 +4211,8 @@ namespace SabreTools.Library.DatFiles
 			if (shouldExternalProcess)
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-				Rom rom = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), header: headerToCheckAgainst);
-				usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
+				Rom fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), header: headerToCheckAgainst);
+				usedExternally = RebuildIndividualFile(fileinfo, file, outDir, tempSubDir, date, inverse, outputFormat,
 					romba, updateDat, null /* isZip */, headerToCheckAgainst);
 			}
 
@@ -4242,8 +4242,8 @@ namespace SabreTools.Library.DatFiles
 				if (entries == null && File.Exists(file))
 				{
 					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-					Rom rom = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
-					usedExternally = RebuildIndividualFile(rom, file, outDir, tempSubDir, date, inverse, outputFormat,
+					Rom fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
+					usedExternally = RebuildIndividualFile(fileinfo, file, outDir, tempSubDir, date, inverse, outputFormat,
 						romba, updateDat, null /* isZip */, headerToCheckAgainst);
 				}
 				// Otherwise, loop through the entries and try to match
@@ -4270,7 +4270,7 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Find duplicates and rebuild individual files to output
 		/// </summary>
-		/// <param name="rom">Information for the current file to rebuild from</param>
+		/// <param name="datItem">Information for the current file to rebuild from</param>
 		/// <param name="file">Name of the file to process</param>
 		/// <param name="outDir">Output directory to use to build to</param>
 		/// <param name="tempDir">Temporary directory for archive extraction</param>
@@ -4282,20 +4282,23 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="isZip">True if the input file is an archive, false if the file is TGZ, null otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <returns>True if the file was able to be rebuilt, false otherwise</returns>
-		private bool RebuildIndividualFile(Rom rom, string file, string outDir, string tempDir, bool date,
+		private bool RebuildIndividualFile(DatItem datItem, string file, string outDir, string tempDir, bool date,
 			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool? isZip, string headerToCheckAgainst)
 		{
+			// TODO: Don't assume this is a Rom once Disk parsing is created
+			Rom rom = (Rom)datItem;
+
 			// Set the output value
 			bool rebuilt = false;
 
 			// Find if the file has duplicates in the DAT
-			bool hasDuplicates = rom.HasDuplicates(this);
+			bool hasDuplicates = datItem.HasDuplicates(this);
 
 			// If it has duplicates and we're not filtering, rebuild it
 			if (hasDuplicates && !inverse)
 			{
 				// Get the list of duplicates to rebuild to
-				List<DatItem> dupes = rom.GetDuplicates(this, remove: updateDat);
+				List<DatItem> dupes = datItem.GetDuplicates(this, remove: updateDat);
 
 				// If we don't have any duplicates, continue
 				if (dupes.Count == 0)
@@ -4340,7 +4343,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					(fileStream, realName) = ArchiveTools.ExtractStream(file, rom.Name);
+					(fileStream, realName) = ArchiveTools.ExtractStream(file, datItem.Name);
 				}
 				// Otherwise, just open the filestream
 				else
@@ -4357,7 +4360,7 @@ namespace SabreTools.Library.DatFiles
 				// Seek to the beginning of the stream
 				fileStream.Seek(0, SeekOrigin.Begin);
 
-				Globals.Logger.User("Matches found for '{0}', rebuilding accordingly...", Style.GetFileName(rom.Name));
+				Globals.Logger.User("Matches found for '{0}', rebuilding accordingly...", Style.GetFileName(datItem.Name));
 				rebuilt = true;
 
 				// Now loop through the list and rebuild accordingly
@@ -4436,7 +4439,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					(fileStream, realName) = ArchiveTools.ExtractStream(file, rom.Name);
+					(fileStream, realName) = ArchiveTools.ExtractStream(file, datItem.Name);
 				}
 				// Otherwise, just open the filestream
 				else
@@ -4462,7 +4465,7 @@ namespace SabreTools.Library.DatFiles
 					item.MachineDescription = machinename;
 				}
 
-				Globals.Logger.User("No matches found for '{0}', rebuilding accordingly from inverse flag...", Style.GetFileName(rom.Name));
+				Globals.Logger.User("No matches found for '{0}', rebuilding accordingly from inverse flag...", Style.GetFileName(datItem.Name));
 
 				// Now rebuild to the output file
 				switch (outputFormat)
@@ -4537,7 +4540,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					(fileStream, realName) = ArchiveTools.ExtractStream(file, rom.Name);
+					(fileStream, realName) = ArchiveTools.ExtractStream(file, datItem.Name);
 				}
 				// Otherwise, just open the filestream
 				else
@@ -4579,15 +4582,15 @@ namespace SabreTools.Library.DatFiles
 								return rebuilt;
 							}
 
-							Globals.Logger.User("Headerless matches found for '{0}', rebuilding accordingly...", Style.GetFileName(rom.Name));
+							Globals.Logger.User("Headerless matches found for '{0}', rebuilding accordingly...", Style.GetFileName(datItem.Name));
 							rebuilt = true;
 
 							// Now loop through the list and rebuild accordingly
 							foreach (Rom item in dupes)
 							{
 								// Create a headered item to use as well
-								rom.CopyMachineInformation(item);
-								rom.Name += "_" + rom.CRC;
+								datItem.CopyMachineInformation(item);
+								datItem.Name += "_" + rom.CRC;
 
 								// If either copy succeeds, then we want to set rebuilt to true
 								bool eitherSuccess = false;

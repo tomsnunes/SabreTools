@@ -164,7 +164,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// Now, output the rom data
-						WriteRomData( sw, hash, rom, ignoreblanks);
+						WriteDatItem( sw, hash, rom, ignoreblanks);
 					}
 				}
 
@@ -182,14 +182,14 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Write out RomData using the supplied StreamWriter
+		/// Write out DatItem using the supplied StreamWriter
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
 		/// <param name="hash">Hash that should be written out</param>
-		/// <param name="rom">RomData object to be output</param>
+		/// <param name="rom">DatItem object to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private bool WriteRomData(StreamWriter sw, Hash hash, DatItem rom, bool ignoreblanks = false)
+		private bool WriteDatItem(StreamWriter sw, Hash hash, DatItem rom, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
