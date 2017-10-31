@@ -53,6 +53,7 @@ namespace SabreTools
 		/// <param name="outDir">Name of the directory to output the DAT to (blank is the current directory)</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
 		private static void InitDatFromDir(List<string> inputs,
 			/* Normal DAT header info */
 			string filename,
@@ -85,7 +86,8 @@ namespace SabreTools
 			string tempDir,
 			string outDir,
 			bool copyFiles,
-			string headerToCheckAgainst)
+			string headerToCheckAgainst,
+			bool ignorechd)
 		{
 			ForcePacking fp = ForcePacking.None;
 			switch (forcepack?.ToLowerInvariant())
@@ -137,7 +139,7 @@ namespace SabreTools
 
 					string basePath = Path.GetFullPath(path);
 					bool success = datdata.PopulateFromDir(basePath, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,
-						skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, headerToCheckAgainst);
+						skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, headerToCheckAgainst, ignorechd);
 
 					// If it was a success, write the DAT out
 					if (success)
@@ -332,9 +334,10 @@ namespace SabreTools
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
+		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
 		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date, bool delete,
 			bool inverse, OutputFormat outputFormat, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst,
-			SplitType splitType)
+			SplitType splitType, bool ignorechd)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
@@ -354,7 +357,7 @@ namespace SabreTools
 			watch.Stop();
 
 			datdata.RebuildGeneric(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
-				updateDat, headerToCheckAgainst, true /* ignorechd */);
+				updateDat, headerToCheckAgainst, ignorechd);
 		}
 
 		/// <summary>
@@ -745,8 +748,9 @@ namespace SabreTools
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
+		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
 		private static void InitVerify(List<string> datfiles, List<string> inputs, string tempDir,
-			bool hashOnly, bool quickScan, string headerToCheckAgainst, SplitType splitType)
+			bool hashOnly, bool quickScan, string headerToCheckAgainst, SplitType splitType, bool ignorechd)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
@@ -765,7 +769,7 @@ namespace SabreTools
 
 			watch.Stop();
 
-			datdata.VerifyGeneric(inputs, tempDir, hashOnly, quickScan, headerToCheckAgainst);
+			datdata.VerifyGeneric(inputs, tempDir, hashOnly, quickScan, headerToCheckAgainst, ignorechd);
 		}
 
 		/// <summary>

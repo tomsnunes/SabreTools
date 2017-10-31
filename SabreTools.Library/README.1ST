@@ -349,6 +349,11 @@ Options:
 			that skipper exists, then it will be used instead of trying to find
 			one that matches.
 			
+		-ic, --ignore-chd	Treat CHDs as regular files
+			Normally, CHDs would be processed using their internal hash to
+			compare against the input DATs. This flag forces all CHDs to
+			be treated like regular files.
+			
 		-t=, --temp=		Set the name of the temporary directory
 			Optionally, a temp folder can be supplied in the case the default
 			temp directory (inside the running folder) is not preferred. This is
@@ -499,6 +504,11 @@ Options:
 			upside to this is that it is much quicker than extracting all files
 			to the temp folder. On the downside, it can only get the CRC and
 			size from most archive formats, leading to possible issues.
+			
+		-ic, --ignore-chd	Treat CHDs as regular files
+			Normally, CHDs would be processed using their internal hash to
+			compare against the input DATs. This flag forces all CHDs to
+			be treated like regular files.
 			
 		-ad, --add-date		Write dates for each file parsed, if available
 			If this flag is set, the the date in the DAT will be used for the
@@ -1310,6 +1320,11 @@ Options:
 			variant information. If a particular header skipper is defined, and
 			that skipper exists, then it will be used instead of trying to find
 			one that matches.
+			
+		-ic, --ignore-chd	Treat CHDs as regular files
+			Normally, CHDs would be processed using their internal hash to
+			compare against the input DATs. This flag forces all CHDs to
+			be treated like regular files.
 			
 		-dm, --dat-merged	Force checking merged sets
 			Preprocess the DAT to have parent sets contain all items from the

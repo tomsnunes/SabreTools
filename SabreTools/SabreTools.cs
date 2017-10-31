@@ -99,7 +99,8 @@ namespace SabreTools
 				enableGzip = false,
 				excludeOf = false,
 				hashOnly = false,
-				inplace = false,
+				ignorechd = false,
+				inplace = true,
 				inverse = false,
 				merge = false,
 				oneGameOneRegion = false,
@@ -395,6 +396,10 @@ namespace SabreTools
 					case "-html":
 					case "--html":
 						statDatFormat |= StatDatFormat.HTML;
+						break;
+					case "-ic":
+					case "--ignore-chd":
+						ignorechd = true;
 						break;
 					case "-in":
 					case "--inverse":
@@ -1255,7 +1260,7 @@ namespace SabreTools
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, email, homepage, url, comment, 
 					forcepack, excludeOf, sceneDateStrip, datFormat, romba, superdat, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles,
-					enableGzip, skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header);
+					enableGzip, skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header, ignorechd);
 			}
 
 			// If we're in header extract and remove mode
@@ -1274,7 +1279,7 @@ namespace SabreTools
 			else if (sort)
 			{
 				InitSort(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, delete, inverse,
-					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, splitType);
+					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, splitType, ignorechd);
 			}
 
 			// If we're using the sorter from depot
@@ -1326,7 +1331,7 @@ namespace SabreTools
 			// If we're using the verifier
 			else if (verify)
 			{
-				InitVerify(datfiles, inputs, tempDir, hashOnly, quickScan, header, splitType);
+				InitVerify(datfiles, inputs, tempDir, hashOnly, quickScan, header, splitType, ignorechd);
 			}
 
 			// If we're using the depot verifier

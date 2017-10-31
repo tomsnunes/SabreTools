@@ -285,6 +285,11 @@ namespace SabreTools
 				"Set a header skipper to use, blank means all",
 				FeatureType.Flag,
 				null));
+			datFromDir.AddFeature("ignore-chd", new Feature(
+				new List<string>() { "-ic", "--ignore-chd" },
+				"Treat CHDs as regular files",
+				FeatureType.Flag,
+				null));
 			datFromDir.AddFeature("temp", new Feature(
 				new List<string>() { "-t", "--temp" },
 				"Set the temporary directory to use",
@@ -422,6 +427,11 @@ namespace SabreTools
 			sort.AddFeature("quick", new Feature(
 				new List<string>() { "-qs", "--quick" },
 				"Enable quick scanning of archives",
+				FeatureType.Flag,
+				null));
+			sort.AddFeature("ignore-chd", new Feature(
+				new List<string>() { "-ic", "--ignore-chd" },
+				"Treat CHDs as regular files",
 				FeatureType.Flag,
 				null));
 			sort.AddFeature("add-date", new Feature(
@@ -1447,6 +1457,11 @@ namespace SabreTools
 				new List<string>() { "-h", "--header" },
 				"Set a header skipper to use, blank means all",
 				FeatureType.String,
+				null));
+			verify.AddFeature("ignore-chd", new Feature(
+				new List<string>() { "-ic", "--ignore-chd" },
+				"Treat CHDs as regular files",
+				FeatureType.Flag,
 				null));
 			verify.AddFeature("dat-merged", new Feature(
 				new List<string>() { "-dm", "--dat-merged" },
