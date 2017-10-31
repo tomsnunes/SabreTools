@@ -66,152 +66,21 @@ namespace SabreTools.Library.External
 	/// </remrks>
 	public class CHDFile
 	{
-		/// <summary>
-		/// Information regarding the CHD, mostly unused
-		/// </summary>
-		private class CHD
-		{
-			// Core parameters from the header
-			public ulong m_signature;       // signature
-			public uint m_headersize;       // size of the header
-			public uint m_version;          // version of the header
-			public ulong m_logicalbytes;    // logical size of the raw CHD data in bytes
-			public ulong m_mapoffset;       // offset of map
-			public ulong m_metaoffset;      // offset to first metadata bit
-			public uint m_hunkbytes;        // size of each raw hunk in bytes
-			private ulong m_hunkcount;       // number of hunks represented
-			public uint m_unitbytes;        // size of each unit in bytes
-			public ulong m_unitcount;       // number of units represented
-			public CHDCodecType[] m_compression = new CHDCodecType[4];   // array of compression types used
+		// Core parameters from the header
+		public ulong m_signature;       // signature
+		public uint m_headersize;       // size of the header
+		public uint m_version;          // version of the header
+		public ulong m_logicalbytes;    // logical size of the raw CHD data in bytes
+		public ulong m_mapoffset;       // offset of map
+		public ulong m_metaoffset;      // offset to first metadata bit
+		public uint m_hunkbytes;        // size of each raw hunk in bytes
+		private ulong m_hunkcount;       // number of hunks represented
+		public uint m_unitbytes;        // size of each unit in bytes
+		public ulong m_unitcount;       // number of units represented
+		public CHDCodecType[] m_compression = new CHDCodecType[4];   // array of compression types used
 
-			// map information
-			public uint m_mapentrybytes;            // length of each entry in a map
-
-			/// <summary>
-			/// Parse a CHD v3 header
-			/// </summary>
-			/// <param name="br">Binary reader representing the input stream</param>
-			/// <returns>The extracted SHA-1 on success, null otherwise</returns>
-			public byte[] ParseCHDv3Header(BinaryReader br)
-			{
-				// Set the blank SHA-1 hash
-				byte[] sha1 = new byte[20];
-
-				// Set offsets and defaults
-				m_mapoffset = 120;
-				m_mapentrybytes = 16;
-
-				// Read the CHD flags
-				uint flags = br.ReadUInt32();
-
-				// Determine compression
-				switch (br.ReadUInt32())
-				{
-					case 0: m_compression[0] = CHDCodecType.CHD_CODEC_NONE; break;
-					case 1: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
-					case 2: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
-					case 3: m_compression[0] = CHDCodecType.CHD_CODEC_AVHUFF; break;
-					default: /* throw CHDERR_UNKNOWN_COMPRESSION; */ return null;
-				}
-
-				m_compression[1] = m_compression[2] = m_compression[3] = CHDCodecType.CHD_CODEC_NONE;
-
-				m_hunkcount = br.ReadUInt32();
-				m_logicalbytes = br.ReadUInt64();
-				m_metaoffset = br.ReadUInt64();
-
-				br.BaseStream.Seek(76, SeekOrigin.Begin);
-				m_hunkbytes = br.ReadUInt32();
-
-				br.BaseStream.Seek(Constants.CHDv3SHA1Offset, SeekOrigin.Begin);
-				sha1 = br.ReadBytes(20);
-
-				// guess at the units based on snooping the metadata
-				// m_unitbytes = guess_unitbytes();
-				m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
-
-				return sha1;
-			}
-
-			/// <summary>
-			/// Parse a CHD v4 header
-			/// </summary>
-			/// <param name="br">Binary reader representing the input stream</param>
-			/// <returns>The extracted SHA-1 on success, null otherwise</returns>
-			public byte[] ParseCHDv4Header(BinaryReader br)
-			{
-				// Set the blank SHA-1 hash
-				byte[] sha1 = new byte[20];
-
-				// Set offsets and defaults
-				m_mapoffset = 108;
-				m_mapentrybytes = 16;
-
-				// Read the CHD flags
-				uint flags = br.ReadUInt32();
-
-				// Determine compression
-				switch (br.ReadUInt32())
-				{
-					case 0: m_compression[0] = CHDCodecType.CHD_CODEC_NONE; break;
-					case 1: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
-					case 2: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
-					case 3: m_compression[0] = CHDCodecType.CHD_CODEC_AVHUFF; break;
-					default: /* throw CHDERR_UNKNOWN_COMPRESSION; */ return null;
-				}
-
-				m_compression[1] = m_compression[2] = m_compression[3] = CHDCodecType.CHD_CODEC_NONE;
-
-				m_hunkcount = br.ReadUInt32();
-				m_logicalbytes = br.ReadUInt64();
-				m_metaoffset = br.ReadUInt64();
-
-				br.BaseStream.Seek(44, SeekOrigin.Begin);
-				m_hunkbytes = br.ReadUInt32();
-
-				br.BaseStream.Seek(Constants.CHDv4SHA1Offset, SeekOrigin.Begin);
-				sha1 = br.ReadBytes(20);
-
-				// guess at the units based on snooping the metadata
-				// m_unitbytes = guess_unitbytes();
-				m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
-				return sha1;
-			}
-
-			/// <summary>
-			/// Parse a CHD v5 header
-			/// </summary>
-			/// <param name="br">Binary reader representing the input stream</param>
-			/// <returns>The extracted SHA-1 on success, null otherwise</returns>
-			public byte[] ParseCHDv5Header(BinaryReader br)
-			{
-				// Set the blank SHA-1 hash
-				byte[] sha1 = new byte[20];
-
-				// Determine compression
-				m_compression[0] = (CHDCodecType)br.ReadUInt32();
-				m_compression[1] = (CHDCodecType)br.ReadUInt32();
-				m_compression[2] = (CHDCodecType)br.ReadUInt32();
-				m_compression[3] = (CHDCodecType)br.ReadUInt32();
-
-				m_logicalbytes = br.ReadUInt64();
-				m_mapoffset = br.ReadUInt64();
-				m_metaoffset = br.ReadUInt64();
-				m_hunkbytes = br.ReadUInt32();
-				m_hunkcount = (m_logicalbytes + m_hunkbytes - 1) / m_hunkbytes;
-				m_unitbytes = br.ReadUInt32();
-				m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
-
-				// m_allow_writes = !compressed();
-
-				// determine properties of map entries
-				// m_mapentrybytes = compressed() ? 12 : 4;
-
-				br.BaseStream.Seek(Constants.CHDv5SHA1Offset, SeekOrigin.Begin);
-				sha1 = br.ReadBytes(20);
-				return sha1;
-			}
-		}
+		// map information
+		public uint m_mapentrybytes;            // length of each entry in a map
 
 		/// <summary>
 		/// Get internal metadata from a CHD
@@ -243,7 +112,7 @@ namespace SabreTools.Library.External
 			Disk datItem = new Disk();
 
 			// Get a CHD object to store the data
-			CHD chd = new CHD();
+			CHDFile chd = new CHDFile();
 
 			// Get a binary reader to make life easier
 			BinaryReader br = new BinaryReader(fs);
@@ -316,6 +185,131 @@ namespace SabreTools.Library.External
 			return datItem != null
 				&& datItem.Type == ItemType.Disk
 				&& ((Disk)datItem).SHA1 != null;
+		}
+
+		/// <summary>
+		/// Parse a CHD v3 header
+		/// </summary>
+		/// <param name="br">Binary reader representing the input stream</param>
+		/// <returns>The extracted SHA-1 on success, null otherwise</returns>
+		public byte[] ParseCHDv3Header(BinaryReader br)
+		{
+			// Set the blank SHA-1 hash
+			byte[] sha1 = new byte[20];
+
+			// Set offsets and defaults
+			m_mapoffset = 120;
+			m_mapentrybytes = 16;
+
+			// Read the CHD flags
+			uint flags = br.ReadUInt32();
+
+			// Determine compression
+			switch (br.ReadUInt32())
+			{
+				case 0: m_compression[0] = CHDCodecType.CHD_CODEC_NONE; break;
+				case 1: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
+				case 2: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
+				case 3: m_compression[0] = CHDCodecType.CHD_CODEC_AVHUFF; break;
+				default: /* throw CHDERR_UNKNOWN_COMPRESSION; */ return null;
+			}
+
+			m_compression[1] = m_compression[2] = m_compression[3] = CHDCodecType.CHD_CODEC_NONE;
+
+			m_hunkcount = br.ReadUInt32();
+			m_logicalbytes = br.ReadUInt64();
+			m_metaoffset = br.ReadUInt64();
+
+			br.BaseStream.Seek(76, SeekOrigin.Begin);
+			m_hunkbytes = br.ReadUInt32();
+
+			br.BaseStream.Seek(Constants.CHDv3SHA1Offset, SeekOrigin.Begin);
+			sha1 = br.ReadBytes(20);
+
+			// guess at the units based on snooping the metadata
+			// m_unitbytes = guess_unitbytes();
+			m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
+
+			return sha1;
+		}
+
+		/// <summary>
+		/// Parse a CHD v4 header
+		/// </summary>
+		/// <param name="br">Binary reader representing the input stream</param>
+		/// <returns>The extracted SHA-1 on success, null otherwise</returns>
+		public byte[] ParseCHDv4Header(BinaryReader br)
+		{
+			// Set the blank SHA-1 hash
+			byte[] sha1 = new byte[20];
+
+			// Set offsets and defaults
+			m_mapoffset = 108;
+			m_mapentrybytes = 16;
+
+			// Read the CHD flags
+			uint flags = br.ReadUInt32();
+
+			// Determine compression
+			switch (br.ReadUInt32())
+			{
+				case 0: m_compression[0] = CHDCodecType.CHD_CODEC_NONE; break;
+				case 1: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
+				case 2: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
+				case 3: m_compression[0] = CHDCodecType.CHD_CODEC_AVHUFF; break;
+				default: /* throw CHDERR_UNKNOWN_COMPRESSION; */ return null;
+			}
+
+			m_compression[1] = m_compression[2] = m_compression[3] = CHDCodecType.CHD_CODEC_NONE;
+
+			m_hunkcount = br.ReadUInt32();
+			m_logicalbytes = br.ReadUInt64();
+			m_metaoffset = br.ReadUInt64();
+
+			br.BaseStream.Seek(44, SeekOrigin.Begin);
+			m_hunkbytes = br.ReadUInt32();
+
+			br.BaseStream.Seek(Constants.CHDv4SHA1Offset, SeekOrigin.Begin);
+			sha1 = br.ReadBytes(20);
+
+			// guess at the units based on snooping the metadata
+			// m_unitbytes = guess_unitbytes();
+			m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
+			return sha1;
+		}
+
+		/// <summary>
+		/// Parse a CHD v5 header
+		/// </summary>
+		/// <param name="br">Binary reader representing the input stream</param>
+		/// <returns>The extracted SHA-1 on success, null otherwise</returns>
+		public byte[] ParseCHDv5Header(BinaryReader br)
+		{
+			// Set the blank SHA-1 hash
+			byte[] sha1 = new byte[20];
+
+			// Determine compression
+			m_compression[0] = (CHDCodecType)br.ReadUInt32();
+			m_compression[1] = (CHDCodecType)br.ReadUInt32();
+			m_compression[2] = (CHDCodecType)br.ReadUInt32();
+			m_compression[3] = (CHDCodecType)br.ReadUInt32();
+
+			m_logicalbytes = br.ReadUInt64();
+			m_mapoffset = br.ReadUInt64();
+			m_metaoffset = br.ReadUInt64();
+			m_hunkbytes = br.ReadUInt32();
+			m_hunkcount = (m_logicalbytes + m_hunkbytes - 1) / m_hunkbytes;
+			m_unitbytes = br.ReadUInt32();
+			m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
+
+			// m_allow_writes = !compressed();
+
+			// determine properties of map entries
+			// m_mapentrybytes = compressed() ? 12 : 4;
+
+			br.BaseStream.Seek(Constants.CHDv5SHA1Offset, SeekOrigin.Begin);
+			sha1 = br.ReadBytes(20);
+			return sha1;
 		}
 	}
 }
