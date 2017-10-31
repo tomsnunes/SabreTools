@@ -3710,9 +3710,9 @@ namespace SabreTools.Library.DatFiles
 			bool addDate, string headerToCheckAgainst, bool ignorechd)
 		{
 			Globals.Logger.Verbose("'{0}' treated like a file", Path.GetFileName(item));
-			DatItem rom = FileTools.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst, ignorechd: ignorechd);
+			DatItem datItem = FileTools.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst, ignorechd: ignorechd);
 
-			ProcessFileHelper(item, rom, basePath, parent);
+			ProcessFileHelper(item, datItem, basePath, parent);
 		}
 
 		/// <summary>

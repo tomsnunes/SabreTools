@@ -812,6 +812,8 @@ namespace SabreTools.Library.Tools
 				{
 					input.Dispose();
 				}
+
+				return disk;
 			}
 
 			Rom rom = new Rom
