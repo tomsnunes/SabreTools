@@ -216,7 +216,7 @@ namespace SabreTools.Library.Tools
 		/// <remarks>
 		/// TODO: Add CHD parsing logic here to get internal hash data
 		/// </remarks>
-		public static Rom GetFileInfo(string input, Hash omitFromScan = 0x0,
+		public static DatItem GetFileInfo(string input, Hash omitFromScan = 0x0,
 			long offset = 0, bool date = false, string header = null)
 		{
 			// Add safeguard if file doesn't exist
@@ -240,7 +240,7 @@ namespace SabreTools.Library.Tools
 
 					// Transform the stream and get the information from it
 					rule.TransformStream(inputStream, outputStream, keepReadOpen: false, keepWriteOpen: true);
-					rom = GetStreamInfo(outputStream, outputStream.Length, omitFromScan: omitFromScan, keepReadOpen: false);
+					rom = (Rom)GetStreamInfo(outputStream, outputStream.Length, omitFromScan: omitFromScan, keepReadOpen: false);
 
 					// Dispose of the streams
 					outputStream.Dispose();
@@ -250,13 +250,13 @@ namespace SabreTools.Library.Tools
 				else
 				{
 					long length = new FileInfo(input).Length;
-					rom = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, false);
+					rom = (Rom)GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, false);
 				}
 			}
 			else
 			{
 				long length = new FileInfo(input).Length;
-				rom = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, false);
+				rom = (Rom)GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, false);
 			}
 
 			// Add unique data from the file
@@ -409,7 +409,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// Now add the information to the database if it's not already there
-			Rom rom = GetFileInfo(newfile);
+			Rom rom = (Rom)GetFileInfo(newfile);
 			DatabaseTools.AddHeaderToDatabase(hstr, rom.SHA1, rule.SourceFile);
 
 			return true;
@@ -508,7 +508,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// First, get the SHA-1 hash of the file
-			Rom rom = GetFileInfo(file);
+			Rom rom = (Rom)GetFileInfo(file);
 
 			// Retrieve a list of all related headers from the database
 			List<string> headers = DatabaseTools.RetrieveHeadersFromDatabase(rom.SHA1);
@@ -733,7 +733,7 @@ namespace SabreTools.Library.Tools
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
 		/// <returns>Populated DatItem object if success, empty one on error</returns>
-		public static Rom GetStreamInfo(Stream input, long size, Hash omitFromScan = 0x0,
+		public static DatItem GetStreamInfo(Stream input, long size, Hash omitFromScan = 0x0,
 			long offset = 0, bool keepReadOpen = false)
 		{
 			Rom rom = new Rom

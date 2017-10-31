@@ -3705,7 +3705,7 @@ namespace SabreTools.Library.DatFiles
 			bool addDate, string headerToCheckAgainst)
 		{
 			Globals.Logger.Verbose("'{0}' treated like a file", Path.GetFileName(item));
-			Rom rom = FileTools.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst);
+			DatItem rom = FileTools.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst);
 
 			ProcessFileHelper(item, rom, basePath, parent);
 		}
@@ -4211,7 +4211,7 @@ namespace SabreTools.Library.DatFiles
 			if (shouldExternalProcess)
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-				Rom fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), header: headerToCheckAgainst);
+				DatItem fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), header: headerToCheckAgainst);
 				usedExternally = RebuildIndividualFile(fileinfo, file, outDir, tempSubDir, date, inverse, outputFormat,
 					romba, updateDat, null /* isZip */, headerToCheckAgainst);
 			}
@@ -4242,7 +4242,7 @@ namespace SabreTools.Library.DatFiles
 				if (entries == null && File.Exists(file))
 				{
 					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-					Rom fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
+					DatItem fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
 					usedExternally = RebuildIndividualFile(fileinfo, file, outDir, tempSubDir, date, inverse, outputFormat,
 						romba, updateDat, null /* isZip */, headerToCheckAgainst);
 				}
@@ -4454,7 +4454,7 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// Get the item from the current file
-				Rom item = FileTools.GetStreamInfo(fileStream, fileStream.Length, keepReadOpen: true);
+				Rom item = (Rom)FileTools.GetStreamInfo(fileStream, fileStream.Length, keepReadOpen: true);
 				item.MachineName = Style.GetFileNameWithoutExtension(item.Name);
 				item.MachineDescription = Style.GetFileNameWithoutExtension(item.Name);
 
@@ -4565,7 +4565,7 @@ namespace SabreTools.Library.DatFiles
 					if (rule.TransformStream(fileStream, transformStream, keepReadOpen: true, keepWriteOpen: true))
 					{
 						// Get the file informations that we will be using
-						Rom headerless = FileTools.GetStreamInfo(transformStream, transformStream.Length, keepReadOpen: true);
+						Rom headerless = (Rom)FileTools.GetStreamInfo(transformStream, transformStream.Length, keepReadOpen: true);
 
 						// Find if the file has duplicates in the DAT
 						hasDuplicates = headerless.HasDuplicates(this);

@@ -644,7 +644,7 @@ namespace SabreTools.Library.Tools
 							else
 							{
 								Stream entryStream = entry.OpenEntryStream();
-								Rom sevenZipEntryRom = FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
+								Rom sevenZipEntryRom = (Rom)FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
 								sevenZipEntryRom.Name = entry.Key;
 								sevenZipEntryRom.MachineName = gamename;
 								sevenZipEntryRom.Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null);
@@ -677,7 +677,7 @@ namespace SabreTools.Library.Tools
 						else
 						{
 							GZipStream gzstream = new GZipStream(FileTools.TryOpenRead(input), Ionic.Zlib.CompressionMode.Decompress);
-							Rom gzipEntryRom = FileTools.GetStreamInfo(gzstream, gzstream.Length, omitFromScan: omitFromScan);
+							Rom gzipEntryRom = (Rom)FileTools.GetStreamInfo(gzstream, gzstream.Length, omitFromScan: omitFromScan);
 							gzipEntryRom.Name = gzstream.FileName;
 							gzipEntryRom.MachineName = gamename;
 							gzipEntryRom.Date = (date && gzstream.LastModified != null ? gzstream.LastModified?.ToString("yyyy/MM/dd hh:mm:ss") : null);
@@ -709,7 +709,7 @@ namespace SabreTools.Library.Tools
 							else
 							{
 								Stream entryStream = entry.OpenEntryStream();
-								Rom rarEntryRom = FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
+								Rom rarEntryRom = (Rom)FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
 								rarEntryRom.Name = entry.Key;
 								rarEntryRom.MachineName = gamename;
 								rarEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
@@ -745,7 +745,7 @@ namespace SabreTools.Library.Tools
 							else
 							{
 								Stream entryStream = entry.OpenEntryStream();
-								Rom tarEntryRom = FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
+								Rom tarEntryRom = (Rom)FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
 								tarEntryRom.Name = entry.Key;
 								tarEntryRom.MachineName = gamename;
 								tarEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
@@ -802,7 +802,7 @@ namespace SabreTools.Library.Tools
 							// Otherwise, use the stream directly
 							else
 							{
-								Rom zipEntryRom = FileTools.GetStreamInfo(readStream, (long)zf.Entries[i].UncompressedSize, omitFromScan: omitFromScan);
+								Rom zipEntryRom = (Rom)FileTools.GetStreamInfo(readStream, (long)zf.Entries[i].UncompressedSize, omitFromScan: omitFromScan);
 								zipEntryRom.Name = zf.Entries[i].FileName;
 								zipEntryRom.MachineName = gamename;
 								string convertedDate = Style.ConvertMsDosTimeFormatToDateTime(zf.Entries[i].LastMod).ToString("yyyy/MM/dd hh:mm:ss");
@@ -2216,7 +2216,7 @@ namespace SabreTools.Library.Tools
 			outDir = Path.GetFullPath(outDir);
 
 			// Now get the Rom info for the file so we have hashes and size
-			Rom rom = FileTools.GetStreamInfo(inputStream, inputStream.Length, keepReadOpen: true);
+			Rom rom = (Rom)FileTools.GetStreamInfo(inputStream, inputStream.Length, keepReadOpen: true);
 
 			// Get the output file name
 			string outfile = null;

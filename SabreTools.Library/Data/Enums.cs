@@ -32,6 +32,33 @@
 	}
 
 	/// <summary>
+	/// Availible CHD codec formats
+	/// </summary>
+	public enum CHDCodecType : uint
+	{
+		CHD_CODEC_NONE = 0,
+
+		// general codecs
+		CHD_CODEC_ZLIB = 0x7a6c6962, // zlib
+		CHD_CODEC_LZMA = 0x6c7a6d61, // lzma
+		CHD_CODEC_HUFFMAN = 0x68756666, // huff
+		CHD_CODEC_FLAC = 0x666c6163, // flac
+
+		// general codecs with CD frontend
+		CHD_CODEC_CD_ZLIB = 0x63647a6c, // cdzl
+		CHD_CODEC_CD_LZMA = 0x63646c7a, // cdlz
+		CHD_CODEC_CD_FLAC = 0x6364666c, // cdfl
+
+		// A/V codecs
+		CHD_CODEC_AVHUFF = 0x61766875, // avhu
+
+		// pseudo-codecs returned by hunk_info
+		CHD_CODEC_SELF = 1,    // copy of another hunk
+		CHD_CODEC_PARENT = 2,  // copy of a parent's hunk
+		CHD_CODEC_MINI = 3,    // legacy "mini" 8-byte repeat
+	}
+
+	/// <summary>
 	/// Compression method based on flag
 	/// </summary>
 	public enum CompressionMethod : ushort

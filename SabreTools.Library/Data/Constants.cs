@@ -13,7 +13,7 @@ namespace SabreTools.Library.Data
 		/// <summary>
 		/// The current toolset version to be used by all child applications
 		/// </summary>
-		public static string Version = "v0.9.8.1-" + Assembly.GetExecutingAssembly().GetLinkerTime().ToString("yyyy-MM-dd HH:mm:ss");
+		public readonly static string Version = "v0.9.8.1-" + Assembly.GetExecutingAssembly().GetLinkerTime().ToString("yyyy-MM-dd HH:mm:ss");
 		public const int HeaderHeight = 3;
 
 		#region 0-byte file constants
@@ -31,26 +31,36 @@ namespace SabreTools.Library.Data
 		#region Byte (1000-based) size comparisons
 
 		public const long KiloByte = 1000;
-		public static long MegaByte = (long)Math.Pow(KiloByte, 2);
-		public static long GigaByte = (long)Math.Pow(KiloByte, 3);
-		public static long TeraByte = (long)Math.Pow(KiloByte, 4);
-		public static long PetaByte = (long)Math.Pow(KiloByte, 5);
-		public static long ExaByte = (long)Math.Pow(KiloByte, 6);
-		public static long ZettaByte = (long)Math.Pow(KiloByte, 7);
-		public static long YottaByte = (long)Math.Pow(KiloByte, 8);
+		public readonly static long MegaByte = (long)Math.Pow(KiloByte, 2);
+		public readonly static long GigaByte = (long)Math.Pow(KiloByte, 3);
+		public readonly static long TeraByte = (long)Math.Pow(KiloByte, 4);
+		public readonly static long PetaByte = (long)Math.Pow(KiloByte, 5);
+		public readonly static long ExaByte = (long)Math.Pow(KiloByte, 6);
+		public readonly static long ZettaByte = (long)Math.Pow(KiloByte, 7);
+		public readonly static long YottaByte = (long)Math.Pow(KiloByte, 8);
 
 		#endregion
 
 		#region Byte (1024-based) size comparisons
 
 		public const long KibiByte = 1024;
-		public static long MibiByte = (long)Math.Pow(KibiByte, 2);
-		public static long GibiByte = (long)Math.Pow(KibiByte, 3);
-		public static long TibiByte = (long)Math.Pow(KibiByte, 4);
-		public static long PibiByte = (long)Math.Pow(KibiByte, 5);
-		public static long ExiByte = (long)Math.Pow(KibiByte, 6);
-		public static long ZittiByte = (long)Math.Pow(KibiByte, 7);
-		public static long YittiByte = (long)Math.Pow(KibiByte, 8);
+		public readonly static long MibiByte = (long)Math.Pow(KibiByte, 2);
+		public readonly static long GibiByte = (long)Math.Pow(KibiByte, 3);
+		public readonly static long TibiByte = (long)Math.Pow(KibiByte, 4);
+		public readonly static long PibiByte = (long)Math.Pow(KibiByte, 5);
+		public readonly static long ExiByte = (long)Math.Pow(KibiByte, 6);
+		public readonly static long ZittiByte = (long)Math.Pow(KibiByte, 7);
+		public readonly static long YittiByte = (long)Math.Pow(KibiByte, 8);
+
+		#endregion
+
+		#region CHD header values
+
+		public readonly static byte[] CHDSignature = { 0x4d, 0x43, 0x6f, 0x6d, 0x70, 0x72, 0x48, 0x44 }; // "MComprHD"
+		public const int CHD_HEADER_VERSION = 5;
+		public const int CHD_V3_HEADER_SIZE = 120;
+		public const int CHD_V4_HEADER_SIZE = 108;
+		public const int CHD_V5_HEADER_SIZE = 124;
 
 		#endregion
 
@@ -109,7 +119,7 @@ namespace SabreTools.Library.Data
 			0A-0B		Last mod file time (0x00, 0xBC)
 			0C-0D		Last mod file date (0x98, 0x21)
 		*/
-		public static byte[] TorrentZipHeader = new byte[] { 0x50, 0x4b, 0x03, 0x04, 0x14, 0x00, 0x02, 0x00, 0x08, 0x00, 0x00, 0xbc, 0x98, 0x21 };
+		public readonly static byte[] TorrentZipHeader = new byte[] { 0x50, 0x4b, 0x03, 0x04, 0x14, 0x00, 0x02, 0x00, 0x08, 0x00, 0x00, 0xbc, 0x98, 0x21 };
 
 		/* Torrent7z Header Format
 			http://cpansearch.perl.org/src/BJOERN/Compress-Deflate7-1.0/7zip/DOC/7zFormat.txt
@@ -118,8 +128,8 @@ namespace SabreTools.Library.Data
 			06-07		ArchiveVersion (0x00, 0x03)
 			The rest is unknown
 		*/
-		public static byte[] Torrent7ZipHeader = new byte[] { 0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c, 0x00, 0x03 };
-		public static byte[] Torrent7ZipSignature = new byte[] { 0xa9, 0xa9, 0x9f, 0xd1, 0x57, 0x08, 0xa9, 0xd7, 0xea, 0x29, 0x64, 0xb2,
+		public readonly static byte[] Torrent7ZipHeader = new byte[] { 0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c, 0x00, 0x03 };
+		public readonly static byte[] Torrent7ZipSignature = new byte[] { 0xa9, 0xa9, 0x9f, 0xd1, 0x57, 0x08, 0xa9, 0xd7, 0xea, 0x29, 0x64, 0xb2,
 			0x36, 0x1b, 0x83, 0x52, 0x33, 0x00, 0x74, 0x6f, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x37, 0x7a, 0x5f, 0x30, 0x2e, 0x39, 0x62, 0x65, 0x74, 0x61 };
 
 		/* (Torrent)GZ Header Format
@@ -138,7 +148,7 @@ namespace SabreTools.Library.Data
 				1C-1F	CRC hash
 				20-27	Int64 size (mirrored)
 		*/
-		public static byte[] TorrentGZHeader = new byte[] { 0x1f, 0x8b, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1c, 0x00 };
+		public readonly static byte[] TorrentGZHeader = new byte[] { 0x1f, 0x8b, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1c, 0x00 };
 
 		#endregion
 
