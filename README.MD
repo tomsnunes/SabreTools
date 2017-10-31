@@ -12,7 +12,7 @@ For the most complete set of information, see the [README.1ST](https://raw.githu
 
 ### SabreTools / SabreTools.Library
 
-As the core of the SabreTools suite, C# library provides nearly all of the functionality, while the main executable acts as a reference implementation. Below is a list of features included in the library and exposed though the executable:
+As the core of the SabreTools suite, the C# library provides nearly all of the functionality, while the main executable acts as a reference implementation. Below is a list of features included in the library and exposed though the executable:
 
 * **Dir2DAT / DATFromDir** - Create a DAT from a file, folder, or mix of both
 	* Archives and files can be filtered selectively
