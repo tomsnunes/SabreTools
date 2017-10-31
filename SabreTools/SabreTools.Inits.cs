@@ -44,7 +44,6 @@ namespace SabreTools
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
 		/// <param name="removeDateFromAutomaticName">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="parseArchivesAsFiles">True if archives should be treated as files, false otherwise</param>
-		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
 		/// <param name="skipFileType">Type of files that should be skipped on scan</param>
 		/// <param name="addBlankFilesForEmptyFolder">True if blank items should be created for empty folders, false otherwise</param>
 		/// <param name="addFileDates">True if dates should be archived for all files, false otherwise</param>
@@ -77,7 +76,6 @@ namespace SabreTools
 			Hash omitFromScan,
 			bool removeDateFromAutomaticName,
 			bool parseArchivesAsFiles,
-			bool enableGzip,
 			SkipFileType skipFileType,
 			bool addBlankFilesForEmptyFolder,
 			bool addFileDates,
@@ -138,7 +136,7 @@ namespace SabreTools
 					DatFile datdata = new DatFile(basedat);
 
 					string basePath = Path.GetFullPath(path);
-					bool success = datdata.PopulateFromDir(basePath, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles, enableGzip,
+					bool success = datdata.PopulateFromDir(basePath, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles,
 						skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, headerToCheckAgainst, ignorechd);
 
 					// If it was a success, write the DAT out

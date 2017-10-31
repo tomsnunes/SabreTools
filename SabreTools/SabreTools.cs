@@ -96,7 +96,6 @@ namespace SabreTools
 				datPrefix = false,
 				delete = false,
 				descAsName = false,
-				enableGzip = false,
 				excludeOf = false,
 				hashOnly = false,
 				ignorechd = false,
@@ -384,10 +383,6 @@ namespace SabreTools
 					case "-gp":
 					case "--game-prefix":
 						datPrefix = true;
-						break;
-					case "-gzf":
-					case "--gz-files":
-						enableGzip = true;
 						break;
 					case "-ho":
 					case "--hash-only":
@@ -1260,7 +1255,7 @@ namespace SabreTools
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, email, homepage, url, comment, 
 					forcepack, excludeOf, sceneDateStrip, datFormat, romba, superdat, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles,
-					enableGzip, skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header, ignorechd);
+					skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header, ignorechd);
 			}
 
 			// If we're in header extract and remove mode

@@ -180,11 +180,6 @@ namespace SabreTools
 				"Output in Logiqx XML format [default]",
 				FeatureType.Flag,
 				null));
-			datFromDir.AddFeature("gz-files", new Feature(
-				new List<string>() { "-gzf", "--gz-files" },
-				"Allow reading of GZIP files as archives",
-				FeatureType.Flag,
-				null));
 			datFromDir.AddFeature("romba", new Feature(
 				new List<string>() { "-ro", "--romba" },
 				"Read files from a Romba input",

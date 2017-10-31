@@ -3468,7 +3468,6 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
-		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
 		/// <param name="skipFileType">Type of files that should be skipped</param>
 		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
@@ -3477,9 +3476,8 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
-		public bool PopulateFromDir(string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles, bool enableGzip,
-			SkipFileType skipFileType, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst,
-			bool ignorechd)
+		public bool PopulateFromDir(string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles, SkipFileType skipFileType,
+			bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst, bool ignorechd)
 		{
 			// If the description is defined but not the name, set the name from the description
 			if (String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
@@ -3509,7 +3507,7 @@ namespace SabreTools.Library.DatFiles
 				List<string> files = Directory.EnumerateFiles(basePath, "*", SearchOption.TopDirectoryOnly).ToList();
 				Parallel.ForEach(files, Globals.ParallelOptions, item =>
 				{
-					CheckFileForHashes(item, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, skipFileType,
+					CheckFileForHashes(item, basePath, omitFromScan, bare, archivesAsFiles, skipFileType,
 						addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst, ignorechd);
 				});
 
@@ -3520,7 +3518,7 @@ namespace SabreTools.Library.DatFiles
 					List<string> subfiles = Directory.EnumerateFiles(item, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(subfiles, Globals.ParallelOptions, subitem =>
 					{
-						CheckFileForHashes(subitem, basePath, omitFromScan, bare, archivesAsFiles, enableGzip, skipFileType,
+						CheckFileForHashes(subitem, basePath, omitFromScan, bare, archivesAsFiles, skipFileType,
 							addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst, ignorechd);
 					});
 				}
@@ -3577,7 +3575,7 @@ namespace SabreTools.Library.DatFiles
 			}
 			else if (File.Exists(basePath))
 			{
-				CheckFileForHashes(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), omitFromScan, bare, archivesAsFiles, enableGzip,
+				CheckFileForHashes(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), omitFromScan, bare, archivesAsFiles,
 					skipFileType, addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst, ignorechd);
 			}
 
@@ -3599,7 +3597,6 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
 		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
-		/// <param name="enableGzip">True if GZIP archives should be treated as files, false otherwise</param>
 		/// <param name="skipFileType">Type of files that should be skipped</param>
 		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
@@ -3608,8 +3605,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
 		private void CheckFileForHashes(string item, string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles,
-			bool enableGzip, SkipFileType skipFileType, bool addBlanks, bool addDate, string tempDir, bool copyFiles,
-			string headerToCheckAgainst, bool ignorechd)
+			SkipFileType skipFileType, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst, bool ignorechd)
 		{
 			// Define the temporary directory
 			string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
@@ -3648,12 +3644,6 @@ namespace SabreTools.Library.DatFiles
 
 			// Create a list for all found items
 			List<Rom> extracted = null;
-
-			// Temporarily set the archivesAsFiles if we have a GZip archive and we're not supposed to use it as one
-			if (archivesAsFiles && !enableGzip && newItem.EndsWith(".gz"))
-			{
-				archivesAsFiles = false;
-			}
 
 			// If we don't have archives as files, try to scan the file as an archive
 			if (!archivesAsFiles)
@@ -4766,8 +4756,7 @@ namespace SabreTools.Library.DatFiles
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				PopulateFromDir(input, (quickScan ? Hash.SecureHashes : Hash.DeepHashes) /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
-					true /* enableGzip */, SkipFileType.None, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */,
-					headerToCheckAgainst, ignorechd);
+					SkipFileType.None, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */, headerToCheckAgainst, ignorechd);
 			}
 
 			// Setup the fixdat

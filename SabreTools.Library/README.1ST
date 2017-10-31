@@ -262,10 +262,6 @@ Options:
 			
 		-ox, -output-xml	Output in Logiqx XML format (default)
 			Add outputting the created DAT to Logiqx XML format
-		
-		-gzf, --gz-files		Allow reading of GZIP files as archives
-			Since GZip files are not commonly used for file storage, this flag
-			allows for any GZip archives to have their contents hashed instead.
 			
 		-ro, --romba		Read files from a Romba input
 			Allow for reading of GZipped files as if they were from a Romba
