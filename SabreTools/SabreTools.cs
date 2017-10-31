@@ -131,8 +131,8 @@ namespace SabreTools
 			UpdateMode updateMode = UpdateMode.None;
 
 			// User inputs
-			int gz = 2,
-				rar = 2,
+			int gz = 1,
+				rar = 1,
 				sevenzip = 1,
 				zip = 1;
 			string addext = "",

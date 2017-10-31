@@ -485,12 +485,12 @@ namespace SabreTools
 				null));
 			sort.AddFeature("gz", new Feature(
 				new List<string>() { "-gz", "--gz" },
-				"Set scanning level for GZip archives (default 2)",
+				"Set scanning level for GZip archives (default 1)",
 				FeatureType.String,
 				null));
 			sort.AddFeature("rar", new Feature(
 				new List<string>() { "-rar", "--rar" },
-				"Set scanning level for RAR archives (default 2)",
+				"Set scanning level for RAR archives (default 1)",
 				FeatureType.String,
 				null));
 			sort.AddFeature("zip", new Feature(

@@ -573,8 +573,8 @@ Options:
 			one that matches.
 			
 		-7z={1}				Set scanning level for 7z archives
-		-gz={2}				Set scanning level for GZip archives
-		-rar={2}			Set scanning level for RAR archives
+		-gz={1}				Set scanning level for GZip archives
+		-rar={1}			Set scanning level for RAR archives
 		-zip={1}			Set scanning level for ZIP archives
 			For each of the major archive types recognized by the libraries used
 			by this program, scan the archive in one of the following ways:
