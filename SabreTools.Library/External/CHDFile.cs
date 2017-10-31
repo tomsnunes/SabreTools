@@ -64,7 +64,7 @@ namespace SabreTools.Library.External
 	/// 0x68-0x7b - Parent SHA-1
 	/// ----------------------------------------------
 	/// </remrks>
-	public class CHDFile
+	public class CHDFile : IDisposable
 	{
 		#region Private instance variables
 
@@ -82,20 +82,74 @@ namespace SabreTools.Library.External
 		private CHDCodecType[] m_compression = new CHDCodecType[4];   // array of compression types used
 
 		// map information
-		private uint m_mapentrybytes;            // length of each entry in a map
+		private uint m_mapentrybytes;    // length of each entry in a map
+
+		// additional required vars
+		private BinaryReader m_br;       // Binary reader representing the CHD stream
 
 		#endregion
 
 		#region Instance Methods
 
+		#region Constructors
+
+		/// <summary>
+		/// Create a new CHDFile from an input stream
+		/// </summary>
+		/// <param name="chdstream">Stream representing the CHD file</param>
+		public CHDFile(Stream chdstream)
+		{
+			BinaryReader br = new BinaryReader(chdstream);
+		}
+
+		/// <summary>
+		/// Dispose of the CHDFile
+		/// </summary>
+		public void Dispose()
+		{
+			m_br.Dispose();
+		}
+
+		#endregion
+
 		#region Header Parsing
+
+		/// <summary>
+		/// Validate the initial signature, version, and header size
+		/// </summary>
+		/// <returns>Unsigned int containing the version number, null if invalid</returns>
+		public uint? ValidateHeaderVersion()
+		{
+			// Read and verify the CHD signature
+			m_signature = m_br.ReadUInt64();
+			if (m_signature != Constants.CHDSignature)
+			{
+				// throw CHDERR_INVALID_FILE;
+				return null;
+			}
+
+			// Get the header size and version
+			m_headersize = m_br.ReadUInt32();
+			m_version = m_br.ReadUInt32();
+
+			// If we have an invalid combination of size and version
+			if ((m_version == 3 && m_headersize != Constants.CHD_V3_HEADER_SIZE)
+				|| (m_version == 4 && m_headersize != Constants.CHD_V4_HEADER_SIZE)
+				|| (m_version == 5 && m_headersize == Constants.CHD_V5_HEADER_SIZE)
+				|| (m_version < 3 || m_version > 5))
+			{
+				// throw CHDERR_UNSUPPORTED_VERSION;
+				return null;
+			}
+
+			return m_version;
+		}
 
 		/// <summary>
 		/// Parse a CHD v3 header
 		/// </summary>
-		/// <param name="br">Binary reader representing the input stream</param>
 		/// <returns>The extracted SHA-1 on success, null otherwise</returns>
-		public byte[] ParseCHDv3Header(BinaryReader br)
+		public byte[] ParseCHDv3Header()
 		{
 			// Set the blank SHA-1 hash
 			byte[] sha1 = new byte[20];
@@ -105,10 +159,10 @@ namespace SabreTools.Library.External
 			m_mapentrybytes = 16;
 
 			// Read the CHD flags
-			uint flags = br.ReadUInt32();
+			uint flags = m_br.ReadUInt32();
 
 			// Determine compression
-			switch (br.ReadUInt32())
+			switch (m_br.ReadUInt32())
 			{
 				case 0: m_compression[0] = CHDCodecType.CHD_CODEC_NONE; break;
 				case 1: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
@@ -119,15 +173,15 @@ namespace SabreTools.Library.External
 
 			m_compression[1] = m_compression[2] = m_compression[3] = CHDCodecType.CHD_CODEC_NONE;
 
-			m_hunkcount = br.ReadUInt32();
-			m_logicalbytes = br.ReadUInt64();
-			m_metaoffset = br.ReadUInt64();
+			m_hunkcount = m_br.ReadUInt32();
+			m_logicalbytes = m_br.ReadUInt64();
+			m_metaoffset = m_br.ReadUInt64();
 
-			br.BaseStream.Seek(76, SeekOrigin.Begin);
-			m_hunkbytes = br.ReadUInt32();
+			m_br.BaseStream.Seek(76, SeekOrigin.Begin);
+			m_hunkbytes = m_br.ReadUInt32();
 
-			br.BaseStream.Seek(Constants.CHDv3SHA1Offset, SeekOrigin.Begin);
-			sha1 = br.ReadBytes(20);
+			m_br.BaseStream.Seek(Constants.CHDv3SHA1Offset, SeekOrigin.Begin);
+			sha1 = m_br.ReadBytes(20);
 
 			// guess at the units based on snooping the metadata
 			// m_unitbytes = guess_unitbytes();
@@ -139,9 +193,8 @@ namespace SabreTools.Library.External
 		/// <summary>
 		/// Parse a CHD v4 header
 		/// </summary>
-		/// <param name="br">Binary reader representing the input stream</param>
 		/// <returns>The extracted SHA-1 on success, null otherwise</returns>
-		public byte[] ParseCHDv4Header(BinaryReader br)
+		public byte[] ParseCHDv4Header()
 		{
 			// Set the blank SHA-1 hash
 			byte[] sha1 = new byte[20];
@@ -151,10 +204,10 @@ namespace SabreTools.Library.External
 			m_mapentrybytes = 16;
 
 			// Read the CHD flags
-			uint flags = br.ReadUInt32();
+			uint flags = m_br.ReadUInt32();
 
 			// Determine compression
-			switch (br.ReadUInt32())
+			switch (m_br.ReadUInt32())
 			{
 				case 0: m_compression[0] = CHDCodecType.CHD_CODEC_NONE; break;
 				case 1: m_compression[0] = CHDCodecType.CHD_CODEC_ZLIB; break;
@@ -165,15 +218,15 @@ namespace SabreTools.Library.External
 
 			m_compression[1] = m_compression[2] = m_compression[3] = CHDCodecType.CHD_CODEC_NONE;
 
-			m_hunkcount = br.ReadUInt32();
-			m_logicalbytes = br.ReadUInt64();
-			m_metaoffset = br.ReadUInt64();
+			m_hunkcount = m_br.ReadUInt32();
+			m_logicalbytes = m_br.ReadUInt64();
+			m_metaoffset = m_br.ReadUInt64();
 
-			br.BaseStream.Seek(44, SeekOrigin.Begin);
-			m_hunkbytes = br.ReadUInt32();
+			m_br.BaseStream.Seek(44, SeekOrigin.Begin);
+			m_hunkbytes = m_br.ReadUInt32();
 
-			br.BaseStream.Seek(Constants.CHDv4SHA1Offset, SeekOrigin.Begin);
-			sha1 = br.ReadBytes(20);
+			m_br.BaseStream.Seek(Constants.CHDv4SHA1Offset, SeekOrigin.Begin);
+			sha1 = m_br.ReadBytes(20);
 
 			// guess at the units based on snooping the metadata
 			// m_unitbytes = guess_unitbytes();
@@ -184,25 +237,24 @@ namespace SabreTools.Library.External
 		/// <summary>
 		/// Parse a CHD v5 header
 		/// </summary>
-		/// <param name="br">Binary reader representing the input stream</param>
 		/// <returns>The extracted SHA-1 on success, null otherwise</returns>
-		public byte[] ParseCHDv5Header(BinaryReader br)
+		public byte[] ParseCHDv5Header()
 		{
 			// Set the blank SHA-1 hash
 			byte[] sha1 = new byte[20];
 
 			// Determine compression
-			m_compression[0] = (CHDCodecType)br.ReadUInt32();
-			m_compression[1] = (CHDCodecType)br.ReadUInt32();
-			m_compression[2] = (CHDCodecType)br.ReadUInt32();
-			m_compression[3] = (CHDCodecType)br.ReadUInt32();
+			m_compression[0] = (CHDCodecType)m_br.ReadUInt32();
+			m_compression[1] = (CHDCodecType)m_br.ReadUInt32();
+			m_compression[2] = (CHDCodecType)m_br.ReadUInt32();
+			m_compression[3] = (CHDCodecType)m_br.ReadUInt32();
 
-			m_logicalbytes = br.ReadUInt64();
-			m_mapoffset = br.ReadUInt64();
-			m_metaoffset = br.ReadUInt64();
-			m_hunkbytes = br.ReadUInt32();
+			m_logicalbytes = m_br.ReadUInt64();
+			m_mapoffset = m_br.ReadUInt64();
+			m_metaoffset = m_br.ReadUInt64();
+			m_hunkbytes = m_br.ReadUInt32();
 			m_hunkcount = (m_logicalbytes + m_hunkbytes - 1) / m_hunkbytes;
-			m_unitbytes = br.ReadUInt32();
+			m_unitbytes = m_br.ReadUInt32();
 			m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
 
 			// m_allow_writes = !compressed();
@@ -210,8 +262,8 @@ namespace SabreTools.Library.External
 			// determine properties of map entries
 			// m_mapentrybytes = compressed() ? 12 : 4;
 
-			br.BaseStream.Seek(Constants.CHDv5SHA1Offset, SeekOrigin.Begin);
-			sha1 = br.ReadBytes(20);
+			m_br.BaseStream.Seek(Constants.CHDv5SHA1Offset, SeekOrigin.Begin);
+			sha1 = m_br.ReadBytes(20);
 			return sha1;
 		}
 
@@ -270,47 +322,30 @@ namespace SabreTools.Library.External
 			Disk datItem = new Disk();
 
 			// Get a CHD object to store the data
-			CHDFile chd = new CHDFile();
+			CHDFile chd = new CHDFile(fs);
 
-			// Get a binary reader to make life easier
-			BinaryReader br = new BinaryReader(fs);
-
-			// Read and verify the CHD signature
-			chd.m_signature = br.ReadUInt64();
-			if (chd.m_signature != Constants.CHDSignature)
-			{
-				// throw CHDERR_INVALID_FILE;
-				return null;
-			}
-
-			// Get the header size and version
-			chd.m_headersize = br.ReadUInt32();
-			chd.m_version = br.ReadUInt32();
+			// Get and validate the header version
+			uint? version = chd.ValidateHeaderVersion();
 
 			// Create a placeholder for the extracted SHA-1
 			byte[] sha1 = new byte[20];
 
-			// If we have a CHD v3 file, parse it accordingly
-			if (chd.m_headersize == Constants.CHD_V3_HEADER_SIZE && chd.m_version == 3)
+			// Now parse the rest of the header according to the version
+			switch (version)
 			{
-				sha1 = chd.ParseCHDv3Header(br);
-			}
-			// If we have a CHD v4 file, parse it accordingly
-			else if (chd.m_headersize == Constants.CHD_V4_HEADER_SIZE && chd.m_version == 4)
-			{
-				sha1 = chd.ParseCHDv4Header(br);
-			}
-			// If we have a CHD v5 file, parse it accordingly
-			else if (chd.m_headersize == Constants.CHD_V5_HEADER_SIZE && chd.m_version == 5)
-			{
-				sha1 = chd.ParseCHDv5Header(br);
-			}
-			// If we don't have a valid combination, return null
-			else
-			{
-				// throw CHDERR_UNSUPPORTED_VERSION;
-				// throw CHDERR_INVALID_FILE;
-				return null;
+				case 3:
+					sha1 = chd.ParseCHDv3Header();
+					break;
+				case 4:
+					sha1 = chd.ParseCHDv4Header();
+					break;
+				case 5:
+					sha1 = chd.ParseCHDv5Header();
+					break;
+				case null:
+				default:
+					// throw CHDERR_INVALID_FILE;
+					return null;
 			}
 
 			// Set the SHA-1 of the Disk to return
