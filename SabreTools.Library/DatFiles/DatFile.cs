@@ -4285,11 +4285,28 @@ namespace SabreTools.Library.DatFiles
 		private bool RebuildIndividualFile(DatItem datItem, string file, string outDir, string tempDir, bool date,
 			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, bool? isZip, string headerToCheckAgainst)
 		{
-			// TODO: Don't assume this is a Rom once Disk parsing is created
-			Rom rom = (Rom)datItem;
-
 			// Set the output value
 			bool rebuilt = false;
+
+			// If the DatItem is a Disk, force rebuilding to a folder except if TGZ
+			if (datItem.Type == ItemType.Disk && outputFormat != OutputFormat.TorrentGzip)
+			{
+				outputFormat = OutputFormat.Folder;
+			}
+
+			// Prepopluate a few key strings based on DatItem type
+			string crc = null;
+			string sha1 = null;
+			if (datItem.Type == ItemType.Rom)
+			{
+				crc = ((Rom)datItem).CRC;
+				sha1 = ((Rom)datItem).SHA1;
+			}
+			else if (datItem.Type == ItemType.Disk)
+			{
+				crc = "";
+				sha1 = ((Disk)datItem).SHA1;
+			}
 
 			// Find if the file has duplicates in the DAT
 			bool hasDuplicates = datItem.HasDuplicates(this);
@@ -4312,11 +4329,11 @@ namespace SabreTools.Library.DatFiles
 					// Get the proper output path
 					if (romba)
 					{
-						outDir = Path.Combine(outDir, Style.GetRombaPath(rom.SHA1));
+						outDir = Path.Combine(outDir, Style.GetRombaPath(sha1));
 					}
 					else
 					{
-						outDir = Path.Combine(outDir, rom.SHA1 + ".gz");
+						outDir = Path.Combine(outDir, sha1 + ".gz");
 					}
 
 					// Make sure the output folder is created
@@ -4408,11 +4425,11 @@ namespace SabreTools.Library.DatFiles
 					// Get the proper output path
 					if (romba)
 					{
-						outDir = Path.Combine(outDir, Style.GetRombaPath(rom.SHA1));
+						outDir = Path.Combine(outDir, Style.GetRombaPath(sha1));
 					}
 					else
 					{
-						outDir = Path.Combine(outDir, rom.SHA1 + ".gz");
+						outDir = Path.Combine(outDir, sha1 + ".gz");
 					}
 
 					// Make sure the output folder is created
@@ -4590,7 +4607,7 @@ namespace SabreTools.Library.DatFiles
 							{
 								// Create a headered item to use as well
 								datItem.CopyMachineInformation(item);
-								datItem.Name += "_" + rom.CRC;
+								datItem.Name += "_" + crc;
 
 								// If either copy succeeds, then we want to set rebuilt to true
 								bool eitherSuccess = false;
@@ -4598,15 +4615,15 @@ namespace SabreTools.Library.DatFiles
 								{
 									case OutputFormat.Folder:
 										eitherSuccess |= ArchiveTools.WriteFile(transformStream, outDir, item, date: date, overwrite: true);
-										eitherSuccess |= ArchiveTools.WriteFile(fileStream, outDir, rom, date: date, overwrite: true);
+										eitherSuccess |= ArchiveTools.WriteFile(fileStream, outDir, (Rom)datItem, date: date, overwrite: true);
 										break;
 									case OutputFormat.TapeArchive:
 										eitherSuccess |= ArchiveTools.WriteTAR(transformStream, outDir, item, date: date);
-										eitherSuccess |= ArchiveTools.WriteTAR(fileStream, outDir, rom, date: date);
+										eitherSuccess |= ArchiveTools.WriteTAR(fileStream, outDir, (Rom)datItem, date: date);
 										break;
 									case OutputFormat.Torrent7Zip:
 										eitherSuccess |= ArchiveTools.WriteTorrent7Zip(transformStream, outDir, item, date: date);
-										eitherSuccess |= ArchiveTools.WriteTorrent7Zip(fileStream, outDir, rom, date: date);
+										eitherSuccess |= ArchiveTools.WriteTorrent7Zip(fileStream, outDir, (Rom)datItem, date: date);
 										break;
 									case OutputFormat.TorrentGzip:
 										eitherSuccess |= ArchiveTools.WriteTorrentGZ(transformStream, outDir, romba);
@@ -4618,11 +4635,11 @@ namespace SabreTools.Library.DatFiles
 										break;
 									case OutputFormat.TorrentXZ:
 										eitherSuccess |= ArchiveTools.WriteTorrentXZ(transformStream, outDir, item, date: date);
-										eitherSuccess |= ArchiveTools.WriteTorrentXZ(fileStream, outDir, rom, date: date);
+										eitherSuccess |= ArchiveTools.WriteTorrentXZ(fileStream, outDir, (Rom)datItem, date: date);
 										break;
 									case OutputFormat.TorrentZip:
 										eitherSuccess |= ArchiveTools.WriteTorrentZip(transformStream, outDir, item, date: date);
-										eitherSuccess |= ArchiveTools.WriteTorrentZip(fileStream, outDir, rom, date: date);
+										eitherSuccess |= ArchiveTools.WriteTorrentZip(fileStream, outDir, (Rom)datItem, date: date);
 										break;
 								}
 
