@@ -410,7 +410,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// Now add the information to the database if it's not already there
-			Rom rom = (Rom)GetFileInfo(newfile);
+			Rom rom = (Rom)GetFileInfo(newfile, ignorechd: true);
 			DatabaseTools.AddHeaderToDatabase(hstr, rom.SHA1, rule.SourceFile);
 
 			return true;
@@ -509,7 +509,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// First, get the SHA-1 hash of the file
-			Rom rom = (Rom)GetFileInfo(file);
+			Rom rom = (Rom)GetFileInfo(file, ignorechd: true);
 
 			// Retrieve a list of all related headers from the database
 			List<string> headers = DatabaseTools.RetrieveHeadersFromDatabase(rom.SHA1);
