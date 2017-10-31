@@ -549,8 +549,6 @@ namespace SabreTools.Library.Tools
 		/// <returns>Tuple of multiplier to use on final size and fixed size string</returns>
 		public static long GetSizeFromString(string sizestring)
 		{
-			long size = 0;
-
 			// Make sure the string is in lower case
 			sizestring = sizestring.ToLowerInvariant();
 
@@ -601,7 +599,7 @@ namespace SabreTools.Library.Tools
 			sizestring = sizestring.TrimEnd(new char[] { 'k', 'm', 'g', 't', 'p', 'i', 'b', ' ' });
 
 			// Now try to get the size from the string
-			if (!Int64.TryParse(sizestring, out size))
+			if (!Int64.TryParse(sizestring, out long size))
 			{
 				size = -1;
 			}
