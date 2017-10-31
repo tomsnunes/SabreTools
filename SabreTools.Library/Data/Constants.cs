@@ -56,11 +56,36 @@ namespace SabreTools.Library.Data
 
 		#region CHD header values
 
-		public readonly static byte[] CHDSignature = { 0x4d, 0x43, 0x6f, 0x6d, 0x70, 0x72, 0x48, 0x44 }; // "MComprHD"
+		// CHD signature - "MComprHD"
+		public readonly static byte[] CHDSignatureBytes = { 0x4d, 0x43, 0x6f, 0x6d, 0x70, 0x72, 0x48, 0x44 };
+		public const ulong CHDSignature = 0x4d436f6d70724844;
+
+		// Header versions and sizes
 		public const int CHD_HEADER_VERSION = 5;
 		public const int CHD_V3_HEADER_SIZE = 120;
 		public const int CHD_V4_HEADER_SIZE = 108;
 		public const int CHD_V5_HEADER_SIZE = 124;
+
+		// Key offsets within the header (V3)
+		public const long CHDv3MapOffsetOffset = 0;    // offset of map offset field
+		public const long CHDv3MetaOffsetOffset = 36;  // offset of metaoffset field
+		public const long CHDv3SHA1Offset = 80;        // offset of SHA1 field
+		public const long CHDv3RawSHA1Offset = 0;      // offset of raw SHA1 field
+		public const long CHDv3ParentSHA1Offset = 100; // offset of parent SHA1 field
+
+		// Key offsets within the header (V4)
+		public const long CHDv4MapOffsetOffset = 0;    // offset of map offset field
+		public const long CHDv4MetaOffsetOffset = 36;  // offset of metaoffset field
+		public const long CHDv4SHA1Offset = 48;        // offset of SHA1 field
+		public const long CHDv4RawSHA1Offset = 88;     // offset of raw SHA1 field
+		public const long CHDv4ParentSHA1Offset = 68;  // offset of parent SHA1 field
+
+		// Key offsets within the header (V5)
+		public const long CHDv5MapOffsetOffset = 40;   // offset of map offset field
+		public const long CHDv5MetaOffsetOffset = 48;  // offset of metaoffset field
+		public const long CHDv5SHA1Offset = 84;        // offset of SHA1 field
+		public const long CHDv5RawSHA1Offset = 64;     // offset of raw SHA1 field
+		public const long CHDv5ParentSHA1Offset = 104; // offset of parent SHA1 field
 
 		#endregion
 
