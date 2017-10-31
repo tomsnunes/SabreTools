@@ -268,6 +268,35 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get internal metadata from a CHD
+		/// </summary>
+		/// <param name="input">Filename of possible CHD</param>
+		/// <returns>A Disk object with internal SHA-1 on success, null on error, empty Disk otherwise</returns>
+		/// <remarks>
+		/// Original code had a "writable" param. This is not required for metadata checking
+		/// </remarks>
+		public static DatItem GetCHDInfo(string input)
+		{
+			FileStream fs = FileTools.TryOpenRead(input);
+			DatItem datItem = GetCHDInfo(fs);
+			fs.Dispose();
+			return datItem;
+		}
+
+		/// <summary>
+		/// Get if file is a valid CHD
+		/// </summary>
+		/// <param name="input">Filename of possible CHD</param>
+		/// <returns>True if a the file is a valid CHD, false otherwise</returns>
+		public static bool IsValidCHD(string input)
+		{
+			DatItem datItem = GetCHDInfo(input);
+			return datItem != null
+				&& datItem.Type == ItemType.Disk
+				&& ((Disk)datItem).SHA1 != null;
+		}
+
+		/// <summary>
 		/// Retrieve a list of files from a directory recursively in proper order
 		/// </summary>
 		/// <param name="directory">Directory to parse</param>
@@ -739,7 +768,7 @@ namespace SabreTools.Library.Tools
 			long offset = 0, bool keepReadOpen = false, bool ignorechd = true)
 		{
 			// We first check to see if it's a CHD
-			if (ignorechd == false && CHDFile.IsValidCHD(input))
+			if (ignorechd == false && IsValidCHD(input))
 			{
 				// Seek to the starting position, if one is set
 				try
@@ -763,7 +792,7 @@ namespace SabreTools.Library.Tools
 				}
 
 				// Get the Disk from the information
-				DatItem disk = CHDFile.GetCHDInfo(input);
+				DatItem disk = GetCHDInfo(input);
 
 				// Seek to the beginning of the stream if possible
 				try
@@ -929,6 +958,44 @@ namespace SabreTools.Library.Tools
 			}
 
 			return rom;
+		}
+
+		/// <summary>
+		/// Get internal metadata from a CHD
+		/// </summary>
+		/// <param name="input">Stream of possible CHD</param>
+		/// <returns>A Disk object with internal SHA-1 on success, null on error, empty Disk otherwise</returns>
+		/// <remarks>
+		/// Original code had a "writable" param. This is not required for metadata checking
+		/// </remarks>
+		public static DatItem GetCHDInfo(Stream input)
+		{
+			// Create a blank Disk to populate and return
+			Disk datItem = new Disk();
+
+			// Get a CHD object to store the data
+			CHDFile chd = new CHDFile(input);
+
+			// Get the SHA-1 from the chd
+			byte[] sha1 = chd.GetSHA1FromHeader();
+
+			// Set the SHA-1 of the Disk to return
+			datItem.SHA1 = (sha1 == null ? null : BitConverter.ToString(sha1).Replace("-", string.Empty).ToLowerInvariant());
+
+			return datItem;
+		}
+
+		/// <summary>
+		/// Get if stream is a valid CHD
+		/// </summary>
+		/// <param name="input">Stream of possible CHD</param>
+		/// <returns>True if a the file is a valid CHD, false otherwise</returns>
+		public static bool IsValidCHD(Stream input)
+		{
+			DatItem datItem = GetCHDInfo(input);
+			return datItem != null
+				&& datItem.Type == ItemType.Disk
+				&& ((Disk)datItem).SHA1 != null;
 		}
 
 		#endregion

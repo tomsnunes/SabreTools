@@ -1,15 +1,13 @@
 ﻿using System;
 
 using SabreTools.Library.Data;
-using SabreTools.Library.Items;
-using SabreTools.Library.Tools;
 
 #if MONO
 using System.IO;
 #else
 using BinaryReader = System.IO.BinaryReader;
-using FileStream = System.IO.FileStream;
 using SeekOrigin = System.IO.SeekOrigin;
+using Stream = System.IO.Stream;
 #endif
 
 namespace SabreTools.Library.External
@@ -88,8 +86,6 @@ namespace SabreTools.Library.External
 		private BinaryReader m_br;       // Binary reader representing the CHD stream
 
 		#endregion
-
-		#region Instance Methods
 
 		#region Constructors
 
@@ -313,86 +309,5 @@ namespace SabreTools.Library.External
 		}
 
 		#endregion
-
-		#endregion // Instance Methods
-
-		#region Static Methods
-
-		#region File Information
-
-		/// <summary>
-		/// Get internal metadata from a CHD
-		/// </summary>
-		/// <param name="filename">Filename of possible CHD</param>
-		/// <returns>A Disk object with internal SHA-1 on success, null on error, empty Disk otherwise</returns>
-		/// <remarks>
-		/// Original code had a "writable" param. This is not required for metadata checking
-		/// </remarks>
-		public static DatItem GetCHDInfo(string filename)
-		{
-			FileStream fs = FileTools.TryOpenRead(filename);
-			DatItem datItem = GetCHDInfo(fs);
-			fs.Dispose();
-			return datItem;
-		}
-
-		/// <summary>
-		/// Get if file is a valid CHD
-		/// </summary>
-		/// <param name="filename">Filename of possible CHD</param>
-		/// <returns>True if a the file is a valid CHD, false otherwise</returns>
-		public static bool IsValidCHD(string filename)
-		{
-			DatItem datItem = GetCHDInfo(filename);
-			return datItem != null
-				&& datItem.Type == ItemType.Disk
-				&& ((Disk)datItem).SHA1 != null;
-		}
-
-		#endregion
-
-		#region Stream Information
-
-		/// <summary>
-		/// Get internal metadata from a CHD
-		/// </summary>
-		/// <param name="fs">Stream of possible CHD</param>
-		/// <returns>A Disk object with internal SHA-1 on success, null on error, empty Disk otherwise</returns>
-		/// <remarks>
-		/// Original code had a "writable" param. This is not required for metadata checking
-		/// </remarks>
-		public static DatItem GetCHDInfo(Stream fs)
-		{
-			// Create a blank Disk to populate and return
-			Disk datItem = new Disk();
-
-			// Get a CHD object to store the data
-			CHDFile chd = new CHDFile(fs);
-
-			// Get the SHA-1 from the chd
-			byte[] sha1 = chd.GetSHA1FromHeader();
-
-			// Set the SHA-1 of the Disk to return
-			datItem.SHA1 = (sha1 == null ? null : BitConverter.ToString(sha1).Replace("-", string.Empty).ToLowerInvariant());
-
-			return datItem;
-		}
-
-		/// <summary>
-		/// Get if stream is a valid CHD
-		/// </summary>
-		/// <param name="fs">Stream of possible CHD</param>
-		/// <returns>True if a the file is a valid CHD, false otherwise</returns>
-		public static bool IsValidCHD(Stream fs)
-		{
-			DatItem datItem = GetCHDInfo(fs);
-			return datItem != null
-				&& datItem.Type == ItemType.Disk
-				&& ((Disk)datItem).SHA1 != null;
-		}
-
-		#endregion
-
-		#endregion //Static Methods
 	}
 }
