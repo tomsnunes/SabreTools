@@ -66,126 +66,29 @@ namespace SabreTools.Library.External
 	/// </remrks>
 	public class CHDFile
 	{
+		#region Private instance variables
+
 		// Core parameters from the header
-		public ulong m_signature;       // signature
-		public uint m_headersize;       // size of the header
-		public uint m_version;          // version of the header
-		public ulong m_logicalbytes;    // logical size of the raw CHD data in bytes
-		public ulong m_mapoffset;       // offset of map
-		public ulong m_metaoffset;      // offset to first metadata bit
-		public uint m_hunkbytes;        // size of each raw hunk in bytes
+		private ulong m_signature;       // signature
+		private uint m_headersize;       // size of the header
+		private uint m_version;          // version of the header
+		private ulong m_logicalbytes;    // logical size of the raw CHD data in bytes
+		private ulong m_mapoffset;       // offset of map
+		private ulong m_metaoffset;      // offset to first metadata bit
+		private uint m_hunkbytes;        // size of each raw hunk in bytes
 		private ulong m_hunkcount;       // number of hunks represented
-		public uint m_unitbytes;        // size of each unit in bytes
-		public ulong m_unitcount;       // number of units represented
-		public CHDCodecType[] m_compression = new CHDCodecType[4];   // array of compression types used
+		private uint m_unitbytes;        // size of each unit in bytes
+		private ulong m_unitcount;       // number of units represented
+		private CHDCodecType[] m_compression = new CHDCodecType[4];   // array of compression types used
 
 		// map information
-		public uint m_mapentrybytes;            // length of each entry in a map
+		private uint m_mapentrybytes;            // length of each entry in a map
 
-		/// <summary>
-		/// Get internal metadata from a CHD
-		/// </summary>
-		/// <param name="filename">Filename of possible CHD</param>
-		/// <returns>A Disk object with internal SHA-1 on success, null on error, empty Disk otherwise</returns>
-		/// <remarks>
-		/// Original code had a "writable" param. This is not required for metadata checking
-		/// </remarks>
-		public static DatItem GetCHDInfo(string filename)
-		{
-			FileStream fs = FileTools.TryOpenRead(filename);
-			DatItem datItem = GetCHDInfo(fs);
-			fs.Dispose();
-			return datItem;
-		}
+		#endregion
 
-		/// <summary>
-		/// Get internal metadata from a CHD
-		/// </summary>
-		/// <param name="fs">Stream of possible CHD</param>
-		/// <returns>A Disk object with internal SHA-1 on success, null on error, empty Disk otherwise</returns>
-		/// <remarks>
-		/// Original code had a "writable" param. This is not required for metadata checking
-		/// </remarks>
-		public static DatItem GetCHDInfo(Stream fs)
-		{
-			// Create a blank Disk to populate and return
-			Disk datItem = new Disk();
+		#region Instance Methods
 
-			// Get a CHD object to store the data
-			CHDFile chd = new CHDFile();
-
-			// Get a binary reader to make life easier
-			BinaryReader br = new BinaryReader(fs);
-
-			// Read and verify the CHD signature
-			chd.m_signature = br.ReadUInt64(); 
-			if (chd.m_signature != Constants.CHDSignature)
-			{
-				// throw CHDERR_INVALID_FILE;
-				return null;
-			}
-
-			// Get the header size and version
-			chd.m_headersize = br.ReadUInt32();
-			chd.m_version = br.ReadUInt32();
-
-			// Create a placeholder for the extracted SHA-1
-			byte[] sha1 = new byte[20];
-
-			// If we have a CHD v3 file, parse it accordingly
-			if (chd.m_headersize == Constants.CHD_V3_HEADER_SIZE && chd.m_version == 3)
-			{
-				sha1 = chd.ParseCHDv3Header(br);
-			}
-			// If we have a CHD v4 file, parse it accordingly
-			else if (chd.m_headersize == Constants.CHD_V4_HEADER_SIZE && chd.m_version == 4)
-			{
-				sha1 = chd.ParseCHDv4Header(br);
-			}
-			// If we have a CHD v5 file, parse it accordingly
-			else if (chd.m_headersize == Constants.CHD_V5_HEADER_SIZE && chd.m_version == 5)
-			{
-				sha1 = chd.ParseCHDv5Header(br);
-			}
-			// If we don't have a valid combination, return null
-			else
-			{
-				// throw CHDERR_UNSUPPORTED_VERSION;
-				// throw CHDERR_INVALID_FILE;
-				return null;
-			}
-
-			// Set the SHA-1 of the Disk to return
-			datItem.SHA1 = BitConverter.ToString(sha1).Replace("-", string.Empty).ToLowerInvariant();
-
-			return datItem;
-		}
-
-		/// <summary>
-		/// Get if file is a valid CHD
-		/// </summary>
-		/// <param name="filename">Filename of possible CHD</param>
-		/// <returns>True if a the file is a valid CHD, false otherwise</returns>
-		public static bool IsValidCHD(string filename)
-		{
-			DatItem datItem = GetCHDInfo(filename);
-			return datItem != null
-				&& datItem.Type == ItemType.Disk 
-				&& ((Disk)datItem).SHA1 != null;
-		}
-
-		/// <summary>
-		/// Get if stream is a valid CHD
-		/// </summary>
-		/// <param name="fs">Stream of possible CHD</param>
-		/// <returns>True if a the file is a valid CHD, false otherwise</returns>
-		public static bool IsValidCHD(Stream fs)
-		{
-			DatItem datItem = GetCHDInfo(fs);
-			return datItem != null
-				&& datItem.Type == ItemType.Disk
-				&& ((Disk)datItem).SHA1 != null;
-		}
+		#region Header Parsing
 
 		/// <summary>
 		/// Parse a CHD v3 header
@@ -311,5 +214,126 @@ namespace SabreTools.Library.External
 			sha1 = br.ReadBytes(20);
 			return sha1;
 		}
+
+		#endregion
+
+		#endregion // Instance Methods
+
+		#region Static Methods
+
+		#region File Information
+
+		/// <summary>
+		/// Get internal metadata from a CHD
+		/// </summary>
+		/// <param name="filename">Filename of possible CHD</param>
+		/// <returns>A Disk object with internal SHA-1 on success, null on error, empty Disk otherwise</returns>
+		/// <remarks>
+		/// Original code had a "writable" param. This is not required for metadata checking
+		/// </remarks>
+		public static DatItem GetCHDInfo(string filename)
+		{
+			FileStream fs = FileTools.TryOpenRead(filename);
+			DatItem datItem = GetCHDInfo(fs);
+			fs.Dispose();
+			return datItem;
+		}
+
+		/// <summary>
+		/// Get if file is a valid CHD
+		/// </summary>
+		/// <param name="filename">Filename of possible CHD</param>
+		/// <returns>True if a the file is a valid CHD, false otherwise</returns>
+		public static bool IsValidCHD(string filename)
+		{
+			DatItem datItem = GetCHDInfo(filename);
+			return datItem != null
+				&& datItem.Type == ItemType.Disk
+				&& ((Disk)datItem).SHA1 != null;
+		}
+
+		#endregion
+
+		#region Stream Information
+
+		/// <summary>
+		/// Get internal metadata from a CHD
+		/// </summary>
+		/// <param name="fs">Stream of possible CHD</param>
+		/// <returns>A Disk object with internal SHA-1 on success, null on error, empty Disk otherwise</returns>
+		/// <remarks>
+		/// Original code had a "writable" param. This is not required for metadata checking
+		/// </remarks>
+		public static DatItem GetCHDInfo(Stream fs)
+		{
+			// Create a blank Disk to populate and return
+			Disk datItem = new Disk();
+
+			// Get a CHD object to store the data
+			CHDFile chd = new CHDFile();
+
+			// Get a binary reader to make life easier
+			BinaryReader br = new BinaryReader(fs);
+
+			// Read and verify the CHD signature
+			chd.m_signature = br.ReadUInt64();
+			if (chd.m_signature != Constants.CHDSignature)
+			{
+				// throw CHDERR_INVALID_FILE;
+				return null;
+			}
+
+			// Get the header size and version
+			chd.m_headersize = br.ReadUInt32();
+			chd.m_version = br.ReadUInt32();
+
+			// Create a placeholder for the extracted SHA-1
+			byte[] sha1 = new byte[20];
+
+			// If we have a CHD v3 file, parse it accordingly
+			if (chd.m_headersize == Constants.CHD_V3_HEADER_SIZE && chd.m_version == 3)
+			{
+				sha1 = chd.ParseCHDv3Header(br);
+			}
+			// If we have a CHD v4 file, parse it accordingly
+			else if (chd.m_headersize == Constants.CHD_V4_HEADER_SIZE && chd.m_version == 4)
+			{
+				sha1 = chd.ParseCHDv4Header(br);
+			}
+			// If we have a CHD v5 file, parse it accordingly
+			else if (chd.m_headersize == Constants.CHD_V5_HEADER_SIZE && chd.m_version == 5)
+			{
+				sha1 = chd.ParseCHDv5Header(br);
+			}
+			// If we don't have a valid combination, return null
+			else
+			{
+				// throw CHDERR_UNSUPPORTED_VERSION;
+				// throw CHDERR_INVALID_FILE;
+				return null;
+			}
+
+			// Set the SHA-1 of the Disk to return
+			datItem.SHA1 = BitConverter.ToString(sha1).Replace("-", string.Empty).ToLowerInvariant();
+
+			return datItem;
+		}
+
+		/// <summary>
+		/// Get if stream is a valid CHD
+		/// </summary>
+		/// <param name="fs">Stream of possible CHD</param>
+		/// <returns>True if a the file is a valid CHD, false otherwise</returns>
+		public static bool IsValidCHD(Stream fs)
+		{
+			DatItem datItem = GetCHDInfo(fs);
+			return datItem != null
+				&& datItem.Type == ItemType.Disk
+				&& ((Disk)datItem).SHA1 != null;
+		}
+
+		#endregion
+
+		#endregion //Static Methods
 	}
 }
