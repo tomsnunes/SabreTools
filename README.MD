@@ -16,7 +16,7 @@ As the core of the SabreTools suite, C# library provides nearly all of the funct
 
 * **Dir2DAT / DATFromDir** - Create a DAT from a file, folder, or mix of both
 	* Archives and files can be filtered selectively
-	* Archives can be treated like files, that is, it will get an external hash only
+	* Archives and CHDs can be treated like files, that is, it will get an external hash only
 	* Multiple input archive formats are supported: 7zip, GZip, RAR, TAR, and ZIP/ZIP64
 	* Multiple hashing algorithms available, up to SHA-512
 	* Created DATs can be output in multiple formats at once, including ClrMamePro, Logiqx XML, and RomCenter
@@ -54,11 +54,13 @@ As the core of the SabreTools suite, C# library provides nearly all of the funct
 	* Can rebuild from multiple DATs at the same time
 	* Cross-check with multiple hashing algorithms, up to SHA-512
 	* Can output a fixdat based on the rebuilt files
+	* CHDs can be rebuilt either to folders or to TorrentGZ archives
 * **Verify From DAT** - Act as a simple verifier for files
 	* Two options for verification target: standard folder and Romba depot
 	* Exact verification and hash-only verification both available
 	* Can verify from multiple DATs at the same time
 	* Cross-check with mutliple hashing algorithms, up to SHA-512
+	* CHDs can be treated like files
 
 This tool has a comprehensive list of command line parameters that can be used to do the above and much more.
 
