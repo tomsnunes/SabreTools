@@ -4041,10 +4041,11 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
 		/// <returns>True if rebuilding was a success, false otherwise</returns>
 		public bool RebuildGeneric(List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
 			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
-			string headerToCheckAgainst)
+			string headerToCheckAgainst, bool ignorechd = true)
 		{
 			#region Perform setup
 
@@ -4140,7 +4141,7 @@ namespace SabreTools.Library.DatFiles
 				{
 					Globals.Logger.User("Checking file: {0}", input);
 					RebuildGenericHelper(input, outDir, tempDir, quickScan, date, delete, inverse,
-						outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst);
+						outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, ignorechd);
 				}
 
 				// If the input is a directory
@@ -4151,7 +4152,7 @@ namespace SabreTools.Library.DatFiles
 					{
 						Globals.Logger.User("Checking file: {0}", file);
 						RebuildGenericHelper(file, outDir, tempDir, quickScan, date, delete, inverse,
-							outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst);
+							outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, ignorechd);
 					}
 				}
 			}
@@ -4187,9 +4188,10 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
 		private void RebuildGenericHelper(string file, string outDir, string tempDir, bool quickScan, bool date,
 			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
-			string headerToCheckAgainst)
+			string headerToCheckAgainst, bool ignorechd)
 		{
 			// If we somehow have a null filename, return
 			if (file == null)
@@ -4211,7 +4213,8 @@ namespace SabreTools.Library.DatFiles
 			if (shouldExternalProcess)
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-				DatItem fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), header: headerToCheckAgainst);
+				DatItem fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes),
+					header: headerToCheckAgainst, ignorechd: ignorechd);
 				usedExternally = RebuildIndividualFile(fileinfo, file, outDir, tempSubDir, date, inverse, outputFormat,
 					romba, updateDat, null /* isZip */, headerToCheckAgainst);
 			}
@@ -4242,7 +4245,7 @@ namespace SabreTools.Library.DatFiles
 				if (entries == null && File.Exists(file))
 				{
 					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-					DatItem fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes));
+					DatItem fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), ignorechd: ignorechd);
 					usedExternally = RebuildIndividualFile(fileinfo, file, outDir, tempSubDir, date, inverse, outputFormat,
 						romba, updateDat, null /* isZip */, headerToCheckAgainst);
 				}
