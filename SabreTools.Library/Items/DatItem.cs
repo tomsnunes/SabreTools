@@ -23,7 +23,7 @@ namespace SabreTools.Library.Items
 
 		// Standard item information
 		protected string _name;
-		private string _merge;
+		protected string _merge;
 		protected ItemType _itemType;
 		protected DupeType _dupeType;
 
@@ -45,6 +45,7 @@ namespace SabreTools.Library.Items
 		protected string _systemName;
 		protected int _sourceId;
 		protected string _sourceName;
+		protected bool _remove;
 
 		#endregion
 
@@ -431,6 +432,11 @@ namespace SabreTools.Library.Items
 			get { return _sourceName; }
 			set { _sourceName = value; }
 		}
+		public bool Remove
+		{
+			get { return _remove; }
+			set { _remove = value; }
+		}
 
 		#endregion
 
@@ -582,7 +588,7 @@ namespace SabreTools.Library.Items
 		/// List all duplicates found in a DAT based on a rom
 		/// </summary>
 		/// <param name="datdata">Dat to match against</param>
-		/// <param name="remove">True to remove matched roms from the input, false otherwise (default)</param>
+		/// <param name="remove">True to mark matched roms for removal from the input, false otherwise (default)</param>
 		/// <param name="sorted">True if the DAT is already sorted accordingly, false otherwise (default)</param>
 		/// <returns>List of matched DatItem objects</returns>
 		public List<DatItem> GetDuplicates(DatFile datdata, bool remove = false, bool sorted = false)
@@ -607,23 +613,26 @@ namespace SabreTools.Library.Items
 			// Try to find duplicates
 			List<DatItem> roms = datdata[key];
 			List<DatItem> left = new List<DatItem>();
-
-			foreach (DatItem rom in roms)
+			for (int i = 0; i < roms.Count; i++)
 			{
-				if (this.Equals(rom))
+				DatItem datItem = roms[i];
+
+				if (this.Equals(datItem))
 				{
-					output.Add(rom);
+					datItem.Remove = true;
+					output.Add(datItem);
 				}
 				else
 				{
-					left.Add(rom);
+					left.Add(datItem);
 				}
 			}
 
-			// If we're in removal mode, replace the list with the new one
+			// If we're in removal mode, add back all roms with the proper flags
 			if (remove)
 			{
 				datdata.Remove(key);
+				datdata.AddRange(key, output);
 				datdata.AddRange(key, left);
 			}
 

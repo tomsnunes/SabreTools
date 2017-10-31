@@ -2535,6 +2535,29 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
+		/// Remove all items marked for removal from the DAT
+		/// </summary>
+		private void RemoveMarkedItems()
+		{
+			List<string> keys = Keys;
+			foreach (string key in keys)
+			{
+				List<DatItem> items = this[key];
+				List<DatItem> newItems = new List<DatItem>();
+				foreach (DatItem item in items)
+				{
+					if (!item.Remove)
+					{
+						newItems.Add(item);
+					}
+				}
+
+				Remove(key);
+				AddRange(key, newItems);
+			}
+		}
+
+		/// <summary>
 		/// Strip the given hash types from the DAT
 		/// </summary>
 		private void StripHashesFromItems()
@@ -4031,6 +4054,7 @@ namespace SabreTools.Library.DatFiles
 				FileName = "fixDAT_" + FileName;
 				Name = "fixDAT_" + Name;
 				Description = "fixDAT_" + Description;
+				RemoveMarkedItems();
 				WriteToFile(outDir);
 			}
 
@@ -4178,6 +4202,7 @@ namespace SabreTools.Library.DatFiles
 				FileName = "fixDAT_" + FileName;
 				Name = "fixDAT_" + Name;
 				Description = "fixDAT_" + Description;
+				RemoveMarkedItems();
 				WriteToFile(outDir);
 			}
 
