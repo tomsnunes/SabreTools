@@ -734,8 +734,55 @@ namespace SabreTools.Library.Tools
 		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
 		/// <returns>Populated DatItem object if success, empty one on error</returns>
 		public static DatItem GetStreamInfo(Stream input, long size, Hash omitFromScan = 0x0,
-			long offset = 0, bool keepReadOpen = false)
+			long offset = 0, bool keepReadOpen = false, bool ignorechd = true)
 		{
+			// We first check to see if it's a CHD
+			if (ignorechd == false && CHDFile.IsValidCHD(input))
+			{
+				// Seek to the starting position, if one is set
+				try
+				{
+					if (offset < 0)
+					{
+						input.Seek(offset, SeekOrigin.End);
+					}
+					else if (offset > 0)
+					{
+						input.Seek(offset, SeekOrigin.Begin);
+					}
+				}
+				catch (NotSupportedException)
+				{
+					Globals.Logger.Verbose("Stream does not support seeking. Stream position not changed");
+				}
+				catch (NotImplementedException)
+				{
+					Globals.Logger.Warning("Stream does not support seeking. Stream position not changed");
+				}
+
+				// Get the Disk from the information
+				DatItem disk = CHDFile.GetCHDInfo(input);
+
+				// Seek to the beginning of the stream if possible
+				try
+				{
+					input.Seek(0, SeekOrigin.Begin);
+				}
+				catch (NotSupportedException)
+				{
+					Globals.Logger.Verbose("Stream does not support seeking. Stream position not changed");
+				}
+				catch (NotImplementedException)
+				{
+					Globals.Logger.Verbose("Stream does not support seeking. Stream position not changed");
+				}
+
+				if (!keepReadOpen)
+				{
+					input.Dispose();
+				}
+			}
+
 			Rom rom = new Rom
 			{
 				Type = ItemType.Rom,
