@@ -1312,7 +1312,7 @@ namespace SabreTools.Library.DatFiles
 		/// Get the keys from the file dictionary
 		/// </summary>
 		/// <returns>IEnumerable of the keys</returns>
-		public IEnumerable<string> Keys
+		public List<string> Keys
 		{
 			get
 			{
@@ -1324,7 +1324,7 @@ namespace SabreTools.Library.DatFiles
 
 				lock (_items)
 				{
-					return _items.Keys;
+					return _items.Keys.ToList();
 				}
 			}
 		}
@@ -1433,7 +1433,7 @@ namespace SabreTools.Library.DatFiles
 				_sortedBy = bucketBy;
 
 				// First do the initial sort of all of the roms inplace
-				List<string> oldkeys = Keys.ToList();
+				List<string> oldkeys = Keys;
 				Parallel.ForEach(oldkeys, Globals.ParallelOptions, key =>
 				{
 					// Get the unsorted current list
@@ -1455,7 +1455,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Now go through and sort all of the individual lists
-			List<string> keys = Keys.ToList();
+			List<string> keys = Keys;
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				// Get the possibly unsorted list
@@ -1707,7 +1707,7 @@ namespace SabreTools.Library.DatFiles
 			Parallel.For(0, inputs.Count, Globals.ParallelOptions, i =>
 			{
 				// Get the list of keys from the DAT
-				List<string> keys = datHeaders[i].Keys.ToList();
+				List<string> keys = datHeaders[i].Keys;
 				foreach (string key in keys)
 				{
 					// Add everything from the key to the internal DAT
@@ -1788,20 +1788,22 @@ namespace SabreTools.Library.DatFiles
 				intDat.BucketBy(SortedBy.CRC, DedupeType.Full);
 
 				// Then we do a hashwise comparison against the base DAT
-				List<string> keys = intDat.Keys.ToList();
+				List<string> keys = intDat.Keys;
 				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
 					List<DatItem> datItems = intDat[key];
 					List<DatItem> newDatItems = new List<DatItem>();
 					foreach (DatItem datItem in datItems)
 					{
-						List<DatItem> dupes = datItem.GetDuplicates(this);
+						List<DatItem> dupes = datItem.GetDuplicates(this, sorted: true);
+						DatItem newDatItem = (DatItem)datItem.Clone();
+
 						if (dupes.Count > 0)
 						{
-							datItem.Name = dupes[0].Name;
+							newDatItem.Name = dupes[0].Name;
 						}
 
-						newDatItems.Add(datItem);
+						newDatItems.Add(newDatItem);
 					}
 
 					// Now add the new list to the key
@@ -1895,7 +1897,7 @@ namespace SabreTools.Library.DatFiles
 				intDat.BucketBy(SortedBy.CRC, DedupeType.Full);
 
 				// Then we do a hashwise comparison against the base DAT
-				List<string> keys = intDat.Keys.ToList();
+				List<string> keys = intDat.Keys;
 				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
 					List<DatItem> datItems = intDat[key];
@@ -1997,7 +1999,7 @@ namespace SabreTools.Library.DatFiles
 
 			// Now, loop through the dictionary and populate the correct DATs
 			watch.Start("Populating all output DATs");
-			List<string> keys = Keys.ToList();
+			List<string> keys = Keys;
 
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
@@ -2128,7 +2130,7 @@ namespace SabreTools.Library.DatFiles
 			// Now, loop through the dictionary and populate the correct DATs
 			watch.Start("Populating all output DATs");
 
-			List<string> keys = Keys.ToList();
+			List<string> keys = Keys;
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = DatItem.Merge(this[key]);
@@ -2226,7 +2228,7 @@ namespace SabreTools.Library.DatFiles
 			// If we're in SuperDAT mode, prefix all games with their respective DATs
 			if (Type == "SuperDAT")
 			{
-				List<string> keys = Keys.ToList();
+				List<string> keys = Keys;
 				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
 					List<DatItem> items = this[key].ToList();
@@ -2352,7 +2354,7 @@ namespace SabreTools.Library.DatFiles
 			SortedDictionary<string, List<DatItem>> sorted = new SortedDictionary<string, List<DatItem>>();
 
 			// Now perform a deep clone on the entire dictionary
-			List<string> keys = Keys.ToList();
+			List<string> keys = Keys;
 			foreach (string key in keys)
 			{
 				// Clone each list of DATs in the dictionary
@@ -2414,7 +2416,7 @@ namespace SabreTools.Library.DatFiles
 			try
 			{
 				// Loop over every key in the dictionary
-				List<string> keys = Keys.ToList();
+				List<string> keys = Keys;
 				foreach (string key in keys)
 				{
 					// For every item in the current key
@@ -2471,7 +2473,7 @@ namespace SabreTools.Library.DatFiles
 			{
 				// First we want to get a mapping for all games to description
 				ConcurrentDictionary<string, string> mapping = new ConcurrentDictionary<string, string>();
-				List<string> keys = Keys.ToList();
+				List<string> keys = Keys;
 				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
 					List<DatItem> items = this[key];
@@ -2486,7 +2488,7 @@ namespace SabreTools.Library.DatFiles
 				});
 
 				// Now we loop through every item and update accordingly
-				keys = Keys.ToList();
+				keys = Keys;
 				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
 					List<DatItem> items = this[key];
@@ -2541,7 +2543,7 @@ namespace SabreTools.Library.DatFiles
 			Globals.Logger.User("Stripping requested hashes");
 
 			// Now process all of the roms
-			List<string> keys = Keys.ToList();
+			List<string> keys = Keys;
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];
@@ -2619,7 +2621,7 @@ namespace SabreTools.Library.DatFiles
 			string pattern = @"([0-9]{2}\.[0-9]{2}\.[0-9]{2}-)(.*?-.*?)";
 
 			// Now process all of the roms
-			List<string> keys = Keys.ToList();
+			List<string> keys = Keys;
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];
@@ -2766,7 +2768,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		private void AddRomsFromBios()
 		{
-			List<string> games = Keys.ToList();
+			List<string> games = Keys;
 			foreach (string game in games)
 			{
 				// If the game has no items in it, we want to continue
@@ -2814,7 +2816,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		private void AddRomsFromDevices()
 		{
-			List<string> games = Keys.ToList();
+			List<string> games = Keys;
 			foreach (string game in games)
 			{
 				// If the game has no devices, we continue
@@ -2854,7 +2856,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		private void AddRomsFromParent()
 		{
-			List<string> games = Keys.ToList();
+			List<string> games = Keys;
 			foreach (string game in games)
 			{
 				// If the game has no items in it, we want to continue
@@ -2910,7 +2912,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		private void AddRomsFromChildren()
 		{
-			List<string> games = Keys.ToList();
+			List<string> games = Keys;
 			foreach (string game in games)
 			{
 				// Determine if the game has a parent or not
@@ -2962,7 +2964,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		private void RemoveBiosAndDeviceSets()
 		{
-			List<string> games = Keys.ToList();
+			List<string> games = Keys;
 			foreach (string game in games)
 			{
 				if (this[game].Count > 0
@@ -2980,7 +2982,7 @@ namespace SabreTools.Library.DatFiles
 		private void RemoveBiosRomsFromChild()
 		{
 			// Loop through the romof tags
-			List<string> games = Keys.ToList();
+			List<string> games = Keys;
 			foreach (string game in games)
 			{
 				// If the game has no items in it, we want to continue
@@ -3023,7 +3025,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		private void RemoveRomsFromChild()
 		{
-			List<string> games = Keys.ToList();
+			List<string> games = Keys;
 			foreach (string game in games)
 			{
 				// If the game has no items in it, we want to continue
@@ -3074,7 +3076,7 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		private void RemoveTagsFromChild()
 		{
-			List<string> games = Keys.ToList();
+			List<string> games = Keys;
 			foreach (string game in games)
 			{
 				List<DatItem> items = this[game];
@@ -3963,7 +3965,7 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.SHA1, DedupeType.None);
 
 			// Then we want to loop through each of the hashes and see if we can rebuild
-			List<string> hashes = Keys.ToList();
+			List<string> hashes = Keys;
 			foreach (string hash in hashes)
 			{
 				// Pre-empt any issues that could arise from string length
@@ -4697,7 +4699,7 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.SHA1, DedupeType.None);
 
 			// Then we want to loop through each of the hashes and see if we can rebuild
-			List<string> hashes = Keys.ToList();
+			List<string> hashes = Keys;
 			foreach (string hash in hashes)
 			{
 				// Pre-empt any issues that could arise from string length
@@ -4913,7 +4915,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Now separate the roms accordingly
-			List<string> keys = Keys.ToList();
+			List<string> keys = Keys;
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];
@@ -5135,7 +5137,7 @@ namespace SabreTools.Library.DatFiles
 			};
 
 			// Now populate each of the DAT objects in turn
-			List<string> keys = Keys.ToList();
+			List<string> keys = Keys;
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];
@@ -5243,7 +5245,7 @@ namespace SabreTools.Library.DatFiles
 			};
 
 			// Sort the input keys
-			List<string> keys = Keys.ToList();
+			List<string> keys = Keys;
 			keys.Sort(SplitByLevelSort);
 
 			// Then, we loop over the games
@@ -5412,7 +5414,7 @@ namespace SabreTools.Library.DatFiles
 			};
 
 			// Now populate each of the DAT objects in turn
-			List<string> keys = Keys.ToList();
+			List<string> keys = Keys;
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];
@@ -5637,7 +5639,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Loop through and add
-			List<string> keys = Keys.ToList();
+			List<string> keys = Keys;
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				List<DatItem> items = this[key];

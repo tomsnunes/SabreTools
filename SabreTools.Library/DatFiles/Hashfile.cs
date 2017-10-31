@@ -134,7 +134,7 @@ namespace SabreTools.Library.DatFiles
 				StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
 
 				// Get a properly sorted set of keys
-				List<string> keys = Keys.ToList();
+				List<string> keys = Keys;
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)

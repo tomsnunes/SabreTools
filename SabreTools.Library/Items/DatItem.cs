@@ -583,8 +583,9 @@ namespace SabreTools.Library.Items
 		/// </summary>
 		/// <param name="datdata">Dat to match against</param>
 		/// <param name="remove">True to remove matched roms from the input, false otherwise (default)</param>
+		/// <param name="sorted">True if the DAT is already sorted accordingly, false otherwise (default)</param>
 		/// <returns>List of matched DatItem objects</returns>
-		public List<DatItem> GetDuplicates(DatFile datdata, bool remove = false)
+		public List<DatItem> GetDuplicates(DatFile datdata, bool remove = false, bool sorted = false)
 		{
 			List<DatItem> output = new List<DatItem>();
 
@@ -595,7 +596,7 @@ namespace SabreTools.Library.Items
 			}
 
 			// We want to get the proper key for the DatItem
-			string key = SortAndGetKey(datdata);
+			string key = SortAndGetKey(datdata, sorted);
 
 			// If the key doesn't exist, return the empty list
 			if (!datdata.Contains(key))

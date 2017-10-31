@@ -629,7 +629,7 @@ namespace RombaSharp
 
 			// Once we have both, check for any new files
 			List<string> dupehashes = new List<string>();
-			List<string> keys = depot.Keys.ToList();
+			List<string> keys = depot.Keys;
 			foreach (string key in keys)
 			{
 				List<DatItem> roms = depot[key];

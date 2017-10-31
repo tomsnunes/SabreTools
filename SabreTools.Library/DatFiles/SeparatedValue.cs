@@ -392,7 +392,7 @@ namespace SabreTools.Library.DatFiles
 				WriteHeader(sw, delim);
 
 				// Get a properly sorted set of keys
-				List<string> keys = Keys.ToList();
+				List<string> keys = Keys;
 				keys.Sort(new NaturalComparer());
 
 				foreach (string key in keys)
