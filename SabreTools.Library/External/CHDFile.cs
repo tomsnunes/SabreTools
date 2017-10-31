@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 using SabreTools.Library.Data;
 
@@ -67,7 +68,7 @@ namespace SabreTools.Library.External
 		#region Private instance variables
 
 		// Core parameters from the header
-		private ulong m_signature;       // signature
+		private byte[] m_signature;       // signature
 		private uint m_headersize;       // size of the header
 		private uint m_version;          // version of the header
 		private ulong m_logicalbytes;    // logical size of the raw CHD data in bytes
@@ -120,21 +121,26 @@ namespace SabreTools.Library.External
 			m_br.BaseStream.Seek(0, SeekOrigin.Begin);
 
 			// Read and verify the CHD signature
-			m_signature = m_br.ReadUInt64();
-			if (m_signature != Constants.CHDSignature)
+			m_signature = m_br.ReadBytes(8);
+			for(int i = 0; i < 8; i++)
 			{
-				// throw CHDERR_INVALID_FILE;
-				return null;
+				if (m_signature[i] != Constants.CHDSignatureBytes[i])
+				{
+					// throw CHDERR_INVALID_FILE;
+					return null;
+				}
 			}
 
 			// Get the header size and version
-			m_headersize = m_br.ReadUInt32();
-			m_version = m_br.ReadUInt32();
+			byte[] headersizebytes = m_br.ReadBytes(4).Reverse().ToArray();
+			m_headersize = BitConverter.ToUInt32(headersizebytes, 0);
+			byte[] versionbytes = m_br.ReadBytes(4).Reverse().ToArray();
+			m_version = BitConverter.ToUInt32(versionbytes, 0);
 
 			// If we have an invalid combination of size and version
 			if ((m_version == 3 && m_headersize != Constants.CHD_V3_HEADER_SIZE)
 				|| (m_version == 4 && m_headersize != Constants.CHD_V4_HEADER_SIZE)
-				|| (m_version == 5 && m_headersize == Constants.CHD_V5_HEADER_SIZE)
+				|| (m_version == 5 && m_headersize != Constants.CHD_V5_HEADER_SIZE)
 				|| (m_version < 3 || m_version > 5))
 			{
 				// throw CHDERR_UNSUPPORTED_VERSION;
