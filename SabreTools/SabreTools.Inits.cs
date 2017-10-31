@@ -354,7 +354,7 @@ namespace SabreTools
 			watch.Stop();
 
 			datdata.RebuildGeneric(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
-				updateDat, headerToCheckAgainst);
+				updateDat, headerToCheckAgainst, true /* ignorechd */);
 		}
 
 		/// <summary>

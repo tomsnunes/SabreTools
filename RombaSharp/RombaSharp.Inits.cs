@@ -178,7 +178,7 @@ namespace RombaSharp
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers((onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1));
 			need.RebuildGeneric(onlyDirs, _depots.Keys.ToList()[0], _tmpdir, false /*quickScan*/, false /*date*/,
 				false /*delete*/, false /*inverse*/, OutputFormat.TorrentGzip, true /*romba*/, asl, false /*updateDat*/,
-				null /*headerToCheckAgainst*/);
+				null /*headerToCheckAgainst*/, true /* ignorechd */);
 		}
 
 		/// <summary>

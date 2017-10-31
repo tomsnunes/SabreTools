@@ -4045,7 +4045,7 @@ namespace SabreTools.Library.DatFiles
 		/// <returns>True if rebuilding was a success, false otherwise</returns>
 		public bool RebuildGeneric(List<string> inputs, string outDir, string tempDir, bool quickScan, bool date,
 			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
-			string headerToCheckAgainst, bool ignorechd = true)
+			string headerToCheckAgainst, bool ignorechd)
 		{
 			#region Perform setup
 
