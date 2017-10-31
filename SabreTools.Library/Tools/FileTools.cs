@@ -264,6 +264,12 @@ namespace SabreTools.Library.Tools
 				((Rom)datItem).Date = (date ? new FileInfo(input).LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : "");
 			}
 
+			// If we have a Disk, then the ".chd" extension needs to be removed
+			if (datItem.Type == ItemType.Disk)
+			{
+				datItem.Name = datItem.Name.Replace(".chd", "");
+			}
+
 			return datItem;
 		}
 
