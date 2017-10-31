@@ -3826,6 +3826,12 @@ namespace SabreTools.Library.DatFiles
 				datItem.MachineName = gamename;
 				datItem.MachineDescription = gamename;
 
+				// If we have a Disk, then the ".chd" extension needs to be removed
+				if (datItem.Type == ItemType.Disk)
+				{
+					datItem.Name = datItem.Name.Replace(".chd", "");
+				}
+
 				// Add the file information to the DAT
 				Add(key, datItem);
 
