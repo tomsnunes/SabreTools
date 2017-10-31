@@ -409,11 +409,6 @@ namespace SabreTools
 				"Output directory",
 				FeatureType.String,
 				null));
-			sort.AddFeature("temp", new Feature(
-				new List<string>() { "-temp", "--temp" },
-				"Set the temporary directory to use",
-				FeatureType.String,
-				null));
 			sort.AddFeature("delete", new Feature(
 				new List<string>() { "-del", "--delete" },
 				"Delete fully rebuilt input files",
@@ -558,11 +553,6 @@ namespace SabreTools
 			sortDepot.AddFeature("out", new Feature(
 				new List<string>() { "-out", "--out" },
 				"Output directory",
-				FeatureType.String,
-				null));
-			sortDepot.AddFeature("temp", new Feature(
-				new List<string>() { "-temp", "--temp" },
-				"Set the temporary directory to use",
 				FeatureType.String,
 				null));
 			sortDepot.AddFeature("delete", new Feature(

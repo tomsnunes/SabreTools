@@ -320,7 +320,6 @@ namespace SabreTools
 		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">List of input files/folders to check</param>
 		/// <param name="outDir">Output directory to use to build to</param>
-		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
@@ -335,7 +334,7 @@ namespace SabreTools
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
-		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool quickScan, bool date, bool delete,
+		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, bool quickScan, bool date, bool delete,
 			bool inverse, OutputFormat outputFormat, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst,
 			SplitType splitType, bool ignorechd)
 		{
@@ -356,7 +355,7 @@ namespace SabreTools
 
 			watch.Stop();
 
-			datdata.RebuildGeneric(inputs, outDir, tempDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
+			datdata.RebuildGeneric(inputs, outDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
 				updateDat, headerToCheckAgainst, ignorechd);
 		}
 
@@ -366,7 +365,6 @@ namespace SabreTools
 		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">List of input files/folders to check</param>
 		/// <param name="outDir">Output directory to use to build to</param>
-		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
 		/// <param name="inverse">True if the DAT should be used as a filter instead of a template, false otherwise</param>
@@ -375,7 +373,7 @@ namespace SabreTools
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		private static void InitSortDepot(List<string> datfiles, List<string> inputs, string outDir, string tempDir, bool date, bool delete,
+		private static void InitSortDepot(List<string> datfiles, List<string> inputs, string outDir, bool date, bool delete,
 			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, string headerToCheckAgainst, SplitType splitType)
 		{
 			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
@@ -392,7 +390,7 @@ namespace SabreTools
 
 			watch.Stop();
 
-			datdata.RebuildDepot(inputs, outDir, tempDir, date, delete, inverse, outputFormat, romba,
+			datdata.RebuildDepot(inputs, outDir, date, delete, inverse, outputFormat, romba,
 				updateDat, headerToCheckAgainst);
 		}
 
@@ -743,14 +741,13 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">Input directories to compare against</param>
-		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="hashOnly">True if only hashes should be checked, false for full file information</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
-		private static void InitVerify(List<string> datfiles, List<string> inputs, string tempDir,
-			bool hashOnly, bool quickScan, string headerToCheckAgainst, SplitType splitType, bool ignorechd)
+		private static void InitVerify(List<string> datfiles, List<string> inputs, bool hashOnly, bool quickScan,
+			string headerToCheckAgainst, SplitType splitType, bool ignorechd)
 		{
 			// Get the archive scanning level
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
@@ -769,7 +766,7 @@ namespace SabreTools
 
 			watch.Stop();
 
-			datdata.VerifyGeneric(inputs, tempDir, hashOnly, quickScan, headerToCheckAgainst, ignorechd);
+			datdata.VerifyGeneric(inputs, hashOnly, quickScan, headerToCheckAgainst, ignorechd);
 		}
 
 		/// <summary>
@@ -777,11 +774,9 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">Input directories to compare against</param>
-		/// <param name="tempDir">Temporary directory for archive extraction</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		private static void InitVerifyDepot(List<string> datfiles, List<string> inputs, string tempDir,
-			string headerToCheckAgainst, SplitType splitType)
+		private static void InitVerifyDepot(List<string> datfiles, List<string> inputs, string headerToCheckAgainst, SplitType splitType)
 		{
 			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
 
@@ -797,7 +792,7 @@ namespace SabreTools
 
 			watch.Stop();
 
-			datdata.VerifyDepot(inputs, tempDir, headerToCheckAgainst);
+			datdata.VerifyDepot(inputs, headerToCheckAgainst);
 		}
 
 		#endregion

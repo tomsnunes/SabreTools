@@ -482,11 +482,6 @@ Options:
 			This sets an output folder to be used when the files are created. If
 			a path is not defined, the application directory is used instead.
 			
-		-t=, --temp=		Set the name of the temporary directory
-			Optionally, a temp folder can be supplied in the case the default
-			temp directory (inside the running folder) is not preferred. This is
-			used for any operations that require an archive to be extracted.
-			
 		-d, --delete		Delete fully rebuilt input files
 			Optionally, the input files, once processed and fully matched, can
 			be deleted. This can be useful when the original file structure is
@@ -646,11 +641,6 @@ Options:
 		-out=				Set the name of the output directory
 			This sets an output folder to be used when the files are created. If
 			a path is not defined, the application directory is used instead.
-			
-		-t=, --temp=		Set the name of the temporary directory
-			Optionally, a temp folder can be supplied in the case the default
-			temp directory (inside the running folder) is not preferred. This is
-			used for any operations that require an archive to be extracted.
 			
 		-d, --delete		Delete fully rebuilt input files
 			Optionally, the input files, once processed and fully matched, can
@@ -1295,11 +1285,6 @@ Options:
 			The user-supplied DAT used to check which files need to be verified.
 			Multiple occurrences of this flag are allowed.
 			
-		-t=, --temp=		Set the name of the temporary directory
-			Optionally, a temp folder can be supplied in the case the default
-			temp directory (inside the running folder) is not preferred. This is
-			used for any operations that require an archive to be extracted.
-			
 		-ho, --hash-only	Check files by hash only
 			This sets a mode where files are not checked based on name but
 			rather hash alone. This allows verification of (possibly)
@@ -1354,11 +1339,6 @@ Options:
 		-dat=				Name of the DAT to be used for the various options
 			The user-supplied DAT used to check which files need to be verified.
 			Multiple occurrences of this flag are allowed.
-			
-		-t=, --temp=		Set the name of the temporary directory
-			Optionally, a temp folder can be supplied in the case the default
-			temp directory (inside the running folder) is not preferred. This is
-			used for any operations that require an archive to be extracted.
 			
 		-h=, --header=		Remove headers from hash calculations
 			If this is set, then all files that have copier headers that are

@@ -1278,14 +1278,14 @@ namespace SabreTools
 			// If we're using the sorter
 			else if (sort)
 			{
-				InitSort(datfiles, inputs, outDir, tempDir, quickScan, addFileDates, delete, inverse,
+				InitSort(datfiles, inputs, outDir, quickScan, addFileDates, delete, inverse,
 					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, splitType, ignorechd);
 			}
 
 			// If we're using the sorter from depot
 			else if (sortDepot)
 			{
-				InitSortDepot(datfiles, inputs, outDir, tempDir, addFileDates, delete, inverse,
+				InitSortDepot(datfiles, inputs, outDir, addFileDates, delete, inverse,
 					outputFormat, romba, updateDat, header, splitType);
 			}
 
@@ -1331,13 +1331,13 @@ namespace SabreTools
 			// If we're using the verifier
 			else if (verify)
 			{
-				InitVerify(datfiles, inputs, tempDir, hashOnly, quickScan, header, splitType, ignorechd);
+				InitVerify(datfiles, inputs, hashOnly, quickScan, header, splitType, ignorechd);
 			}
 
 			// If we're using the depot verifier
 			else if (verifyDepot)
 			{
-				InitVerifyDepot(datfiles, inputs, tempDir, header, splitType);
+				InitVerifyDepot(datfiles, inputs, header, splitType);
 			}
 
 			// If nothing is set, show the help
