@@ -212,12 +212,10 @@ namespace SabreTools.Library.Tools
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="date">True if the file Date should be included, false otherwise (default)</param>
 		/// <param name="header">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
 		/// <returns>Populated DatItem object if success, empty one on error</returns>
-		/// <remarks>
-		/// TODO: Add CHD parsing logic here to get internal hash data
-		/// </remarks>
 		public static DatItem GetFileInfo(string input, Hash omitFromScan = 0x0,
-			long offset = 0, bool date = false, string header = null)
+			long offset = 0, bool date = false, string header = null, bool ignorechd = true)
 		{
 			// Add safeguard if file doesn't exist
 			if (!File.Exists(input))
@@ -226,7 +224,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// Get the information from the file stream
-			Rom rom = new Rom();
+			DatItem datItem = new Rom();
 			if (header != null)
 			{
 				SkipperRule rule = Skipper.GetMatchingRule(input, Path.GetFileNameWithoutExtension(header));
@@ -240,7 +238,7 @@ namespace SabreTools.Library.Tools
 
 					// Transform the stream and get the information from it
 					rule.TransformStream(inputStream, outputStream, keepReadOpen: false, keepWriteOpen: true);
-					rom = (Rom)GetStreamInfo(outputStream, outputStream.Length, omitFromScan: omitFromScan, keepReadOpen: false);
+					datItem = GetStreamInfo(outputStream, outputStream.Length, omitFromScan: omitFromScan, keepReadOpen: false, ignorechd: ignorechd);
 
 					// Dispose of the streams
 					outputStream.Dispose();
@@ -250,20 +248,23 @@ namespace SabreTools.Library.Tools
 				else
 				{
 					long length = new FileInfo(input).Length;
-					rom = (Rom)GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, false);
+					datItem = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, keepReadOpen: false, ignorechd: ignorechd);
 				}
 			}
 			else
 			{
 				long length = new FileInfo(input).Length;
-				rom = (Rom)GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, false);
+				datItem = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, keepReadOpen: false, ignorechd: ignorechd);
 			}
 
 			// Add unique data from the file
-			rom.Name = Path.GetFileName(input);
-			rom.Date = (date ? new FileInfo(input).LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : "");
+			datItem.Name = Path.GetFileName(input);
+			if (datItem.Type == ItemType.Rom)
+			{
+				((Rom)datItem).Date = (date ? new FileInfo(input).LastWriteTime.ToString("yyyy/MM/dd HH:mm:ss") : "");
+			}
 
-			return rom;
+			return datItem;
 		}
 
 		/// <summary>
@@ -732,6 +733,7 @@ namespace SabreTools.Library.Tools
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated (defaults to none)</param>
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
+		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
 		/// <returns>Populated DatItem object if success, empty one on error</returns>
 		public static DatItem GetStreamInfo(Stream input, long size, Hash omitFromScan = 0x0,
 			long offset = 0, bool keepReadOpen = false, bool ignorechd = true)
