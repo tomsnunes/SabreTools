@@ -1369,16 +1369,16 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
-		/// <param name="rom">DatItem representing the new information</param>
+		/// <param name="datItem">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <param name="overwrite">True if we should overwrite the file if it exists, false otherwise</param>
 		/// <returns>True if the file was written properly, false otherwise</returns>
-		public static bool WriteFile(Stream inputStream, string outDir, Rom rom, bool date = false, bool overwrite = false)
+		public static bool WriteFile(Stream inputStream, string outDir, DatItem datItem, bool date = false, bool overwrite = false)
 		{
 			bool success = false;
 
 			// If either input is null or empty, return
-			if (inputStream == null || rom == null || rom.Name == null)
+			if (inputStream == null || datItem == null || datItem.Name == null)
 			{
 				return success;
 			}
@@ -1393,7 +1393,7 @@ namespace SabreTools.Library.Tools
 			FileStream outputStream = null;
 
 			// Get the output folder name from the first rebuild rom
-			string fileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.MachineName), Style.RemovePathUnsafeCharacters(rom.Name));
+			string fileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(datItem.MachineName), Style.RemovePathUnsafeCharacters(datItem.Name));
 
 			try
 			{
@@ -1424,9 +1424,12 @@ namespace SabreTools.Library.Tools
 					}
 					outputStream.Dispose();
 
-					if (date && !String.IsNullOrEmpty(rom.Date))
+					if (datItem.Type == ItemType.Rom)
 					{
-						File.SetCreationTime(fileName, DateTime.Parse(rom.Date));
+						if (date && !String.IsNullOrEmpty(((Rom)datItem).Date))
+						{
+							File.SetCreationTime(fileName, DateTime.Parse(((Rom)datItem).Date));
+						}
 					}
 
 					success = true;

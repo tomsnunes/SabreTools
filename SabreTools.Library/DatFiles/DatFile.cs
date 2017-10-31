@@ -4389,7 +4389,7 @@ namespace SabreTools.Library.DatFiles
 				rebuilt = true;
 
 				// Now loop through the list and rebuild accordingly
-				foreach (Rom item in dupes)
+				foreach (DatItem item in dupes)
 				{
 					switch (outputFormat)
 					{
@@ -4397,10 +4397,10 @@ namespace SabreTools.Library.DatFiles
 							rebuilt &= ArchiveTools.WriteFile(fileStream, outDir, item, date: date, overwrite: true);
 							break;
 						case OutputFormat.TapeArchive:
-							rebuilt &= ArchiveTools.WriteTAR(fileStream, outDir, item, date: date);
+							rebuilt &= ArchiveTools.WriteTAR(fileStream, outDir, (Rom)item, date: date);
 							break;
 						case OutputFormat.Torrent7Zip:
-							rebuilt &= ArchiveTools.WriteTorrent7Zip(fileStream, outDir, item, date: date);
+							rebuilt &= ArchiveTools.WriteTorrent7Zip(fileStream, outDir, (Rom)item, date: date);
 							break;
 						case OutputFormat.TorrentGzip:
 							rebuilt &= ArchiveTools.WriteTorrentGZ(fileStream, outDir, romba);
@@ -4410,10 +4410,10 @@ namespace SabreTools.Library.DatFiles
 						case OutputFormat.TorrentRar:
 							break;
 						case OutputFormat.TorrentXZ:
-							rebuilt &= ArchiveTools.WriteTorrentXZ(fileStream, outDir, item, date: date);
+							rebuilt &= ArchiveTools.WriteTorrentXZ(fileStream, outDir, (Rom)item, date: date);
 							break;
 						case OutputFormat.TorrentZip:
-							rebuilt &= ArchiveTools.WriteTorrentZip(fileStream, outDir, item, date: date);
+							rebuilt &= ArchiveTools.WriteTorrentZip(fileStream, outDir, (Rom)item, date: date);
 							break;
 					}
 				}
@@ -4611,7 +4611,7 @@ namespace SabreTools.Library.DatFiles
 							rebuilt = true;
 
 							// Now loop through the list and rebuild accordingly
-							foreach (Rom item in dupes)
+							foreach (DatItem item in dupes)
 							{
 								// Create a headered item to use as well
 								datItem.CopyMachineInformation(item);
@@ -4623,14 +4623,14 @@ namespace SabreTools.Library.DatFiles
 								{
 									case OutputFormat.Folder:
 										eitherSuccess |= ArchiveTools.WriteFile(transformStream, outDir, item, date: date, overwrite: true);
-										eitherSuccess |= ArchiveTools.WriteFile(fileStream, outDir, (Rom)datItem, date: date, overwrite: true);
+										eitherSuccess |= ArchiveTools.WriteFile(fileStream, outDir, datItem, date: date, overwrite: true);
 										break;
 									case OutputFormat.TapeArchive:
-										eitherSuccess |= ArchiveTools.WriteTAR(transformStream, outDir, item, date: date);
+										eitherSuccess |= ArchiveTools.WriteTAR(transformStream, outDir, (Rom)item, date: date);
 										eitherSuccess |= ArchiveTools.WriteTAR(fileStream, outDir, (Rom)datItem, date: date);
 										break;
 									case OutputFormat.Torrent7Zip:
-										eitherSuccess |= ArchiveTools.WriteTorrent7Zip(transformStream, outDir, item, date: date);
+										eitherSuccess |= ArchiveTools.WriteTorrent7Zip(transformStream, outDir, (Rom)item, date: date);
 										eitherSuccess |= ArchiveTools.WriteTorrent7Zip(fileStream, outDir, (Rom)datItem, date: date);
 										break;
 									case OutputFormat.TorrentGzip:
@@ -4642,11 +4642,11 @@ namespace SabreTools.Library.DatFiles
 									case OutputFormat.TorrentRar:
 										break;
 									case OutputFormat.TorrentXZ:
-										eitherSuccess |= ArchiveTools.WriteTorrentXZ(transformStream, outDir, item, date: date);
+										eitherSuccess |= ArchiveTools.WriteTorrentXZ(transformStream, outDir, (Rom)item, date: date);
 										eitherSuccess |= ArchiveTools.WriteTorrentXZ(fileStream, outDir, (Rom)datItem, date: date);
 										break;
 									case OutputFormat.TorrentZip:
-										eitherSuccess |= ArchiveTools.WriteTorrentZip(transformStream, outDir, item, date: date);
+										eitherSuccess |= ArchiveTools.WriteTorrentZip(transformStream, outDir, (Rom)item, date: date);
 										eitherSuccess |= ArchiveTools.WriteTorrentZip(fileStream, outDir, (Rom)datItem, date: date);
 										break;
 								}
