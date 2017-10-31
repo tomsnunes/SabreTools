@@ -95,7 +95,7 @@ namespace SabreTools.Library.External
 		/// <param name="chdstream">Stream representing the CHD file</param>
 		public CHDFile(Stream chdstream)
 		{
-			BinaryReader br = new BinaryReader(chdstream);
+			m_br = new BinaryReader(chdstream);
 		}
 
 		/// <summary>
