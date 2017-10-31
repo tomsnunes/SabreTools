@@ -42,13 +42,13 @@ namespace RombaSharp
 			foreach (string dir in onlyDirs)
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-				df.PopulateFromDir(dir, Hash.DeepHashes, false, false, true, SkipFileType.None, false, false, _tmpdir, false, null, true);
+				df.PopulateFromDir(dir, Hash.DeepHashes, false, false, SkipFileType.None, false, false, _tmpdir, false, null, true);
 
 				// If we're looking for only needed, consider the zipfiles themselves too
 				if (onlyNeeded)
 				{
 					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-					df.PopulateFromDir(dir, Hash.DeepHashes, false, true, true, SkipFileType.None, false, false, _tmpdir, false, null, true);
+					df.PopulateFromDir(dir, Hash.DeepHashes, false, true, SkipFileType.None, false, false, _tmpdir, false, null, true);
 				}
 			}
 
@@ -176,7 +176,7 @@ namespace RombaSharp
 
 			// Create the sorting object to use and rebuild the needed files
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers((onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1));
-			need.RebuildGeneric(onlyDirs, _depots.Keys.ToList()[0], _tmpdir, false /*quickScan*/, false /*date*/,
+			need.RebuildGeneric(onlyDirs, _depots.Keys.ToList()[0], false /*quickScan*/, false /*date*/,
 				false /*delete*/, false /*inverse*/, OutputFormat.TorrentGzip, true /*romba*/, asl, false /*updateDat*/,
 				null /*headerToCheckAgainst*/, true /* ignorechd */);
 		}
@@ -216,7 +216,7 @@ namespace RombaSharp
 
 				// Now scan all of those depots and rebuild
 				ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
-				datFile.RebuildDepot(onlineDepots, outputFolder, _tmpdir, false /*date*/,
+				datFile.RebuildDepot(onlineDepots, outputFolder, false /*date*/,
 					false /*delete*/, false /*inverse*/, (copy ? OutputFormat.TorrentGzip : OutputFormat.TorrentZip), copy,
 					false /*updateDat*/, null /*headerToCheckAgainst*/);
 			}
@@ -253,7 +253,7 @@ namespace RombaSharp
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				datdata.PopulateFromDir(input, Hash.DeepHashes /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
-					true /* enableGzip */, SkipFileType.None, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
+					SkipFileType.None, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
 					null /* headerToCheckAgainst */, true /* ignorechd */);
 				datdata.WriteToFile("");
 			}

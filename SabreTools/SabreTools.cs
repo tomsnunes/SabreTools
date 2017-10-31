@@ -122,7 +122,7 @@ namespace SabreTools
 				usegame = true;
 			DatFormat datFormat = 0x0;
 			DedupeType dedup = DedupeType.None;
-			Hash omitFromScan = Hash.SHA256 | Hash.SHA384 | Hash.SHA512; // Should be set to 0x0 later
+			Hash omitFromScan = Hash.DeepHashes; // TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 			Hash stripHash = 0x0;
 			OutputFormat outputFormat = OutputFormat.Folder;
 			SkipFileType skipFileType = SkipFileType.None;
