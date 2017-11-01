@@ -212,10 +212,10 @@ namespace SabreTools.Library.Tools
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="date">True if the file Date should be included, false otherwise (default)</param>
 		/// <param name="header">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
+		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
 		/// <returns>Populated DatItem object if success, empty one on error</returns>
 		public static DatItem GetFileInfo(string input, Hash omitFromScan = 0x0,
-			long offset = 0, bool date = false, string header = null, bool ignorechd = true)
+			long offset = 0, bool date = false, string header = null, bool chdsAsFiles = true)
 		{
 			// Add safeguard if file doesn't exist
 			if (!File.Exists(input))
@@ -238,7 +238,7 @@ namespace SabreTools.Library.Tools
 
 					// Transform the stream and get the information from it
 					rule.TransformStream(inputStream, outputStream, keepReadOpen: false, keepWriteOpen: true);
-					datItem = GetStreamInfo(outputStream, outputStream.Length, omitFromScan: omitFromScan, keepReadOpen: false, ignorechd: ignorechd);
+					datItem = GetStreamInfo(outputStream, outputStream.Length, omitFromScan: omitFromScan, keepReadOpen: false, chdsAsFiles: chdsAsFiles);
 
 					// Dispose of the streams
 					outputStream.Dispose();
@@ -248,13 +248,13 @@ namespace SabreTools.Library.Tools
 				else
 				{
 					long length = new FileInfo(input).Length;
-					datItem = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, keepReadOpen: false, ignorechd: ignorechd);
+					datItem = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, keepReadOpen: false, chdsAsFiles: chdsAsFiles);
 				}
 			}
 			else
 			{
 				long length = new FileInfo(input).Length;
-				datItem = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, keepReadOpen: false, ignorechd: ignorechd);
+				datItem = GetStreamInfo(TryOpenRead(input), length, omitFromScan, offset, keepReadOpen: false, chdsAsFiles: chdsAsFiles);
 			}
 
 			// Add unique data from the file
@@ -439,7 +439,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// Now add the information to the database if it's not already there
-			Rom rom = (Rom)GetFileInfo(newfile, ignorechd: true);
+			Rom rom = (Rom)GetFileInfo(newfile, chdsAsFiles: true);
 			DatabaseTools.AddHeaderToDatabase(hstr, rom.SHA1, rule.SourceFile);
 
 			return true;
@@ -538,7 +538,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// First, get the SHA-1 hash of the file
-			Rom rom = (Rom)GetFileInfo(file, ignorechd: true);
+			Rom rom = (Rom)GetFileInfo(file, chdsAsFiles: true);
 
 			// Retrieve a list of all related headers from the database
 			List<string> headers = DatabaseTools.RetrieveHeadersFromDatabase(rom.SHA1);
@@ -762,13 +762,13 @@ namespace SabreTools.Library.Tools
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated (defaults to none)</param>
 		/// <param name="offset">Set a >0 number for getting hash for part of the file, 0 otherwise (default)</param>
 		/// <param name="keepReadOpen">True if the underlying read stream should be kept open, false otherwise</param>
-		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
+		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
 		/// <returns>Populated DatItem object if success, empty one on error</returns>
 		public static DatItem GetStreamInfo(Stream input, long size, Hash omitFromScan = 0x0,
-			long offset = 0, bool keepReadOpen = false, bool ignorechd = true)
+			long offset = 0, bool keepReadOpen = false, bool chdsAsFiles = true)
 		{
 			// We first check to see if it's a CHD
-			if (ignorechd == false && IsValidCHD(input))
+			if (chdsAsFiles == false && IsValidCHD(input))
 			{
 				// Seek to the starting position, if one is set
 				try

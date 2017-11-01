@@ -90,7 +90,9 @@ namespace SabreTools
 			// User flags
 			bool addBlankFilesForEmptyFolder = false,
 				addFileDates = false,
+				archivesAsFiles = false,
 				basedat = false,
+				chdsAsFiles = false,
 				cleanGameNames = false,
 				copyFiles = false,
 				datPrefix = false,
@@ -98,12 +100,10 @@ namespace SabreTools
 				descAsName = false,
 				excludeOf = false,
 				hashOnly = false,
-				ignorechd = false,
 				inplace = true,
 				inverse = false,
 				merge = false,
 				oneGameOneRegion = false,
-				parseArchivesAsFiles = false,
 				quickScan = false,
 				quotes = false,
 				remext = false,
@@ -374,7 +374,7 @@ namespace SabreTools
 						break;
 					case "-f":
 					case "--files":
-						parseArchivesAsFiles = true;
+						archivesAsFiles = true;
 						break;
 					case "-gdd":
 					case "--game-dedup":
@@ -394,7 +394,7 @@ namespace SabreTools
 						break;
 					case "-ic":
 					case "--ignore-chd":
-						ignorechd = true;
+						chdsAsFiles = true;
 						break;
 					case "-in":
 					case "--inverse":
@@ -1254,8 +1254,8 @@ namespace SabreTools
 			if (datFromDir)
 			{
 				InitDatFromDir(inputs, filename, name, description, category, version, author, email, homepage, url, comment, 
-					forcepack, excludeOf, sceneDateStrip, datFormat, romba, superdat, omitFromScan, removeDateFromAutomaticName, parseArchivesAsFiles,
-					skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header, ignorechd);
+					forcepack, excludeOf, sceneDateStrip, datFormat, romba, superdat, omitFromScan, removeDateFromAutomaticName, archivesAsFiles,
+					skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header, chdsAsFiles);
 			}
 
 			// If we're in header extract and remove mode
@@ -1274,7 +1274,7 @@ namespace SabreTools
 			else if (sort)
 			{
 				InitSort(datfiles, inputs, outDir, quickScan, addFileDates, delete, inverse,
-					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, splitType, ignorechd);
+					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, splitType, chdsAsFiles);
 			}
 
 			// If we're using the sorter from depot
@@ -1326,7 +1326,7 @@ namespace SabreTools
 			// If we're using the verifier
 			else if (verify)
 			{
-				InitVerify(datfiles, inputs, hashOnly, quickScan, header, splitType, ignorechd);
+				InitVerify(datfiles, inputs, hashOnly, quickScan, header, splitType, chdsAsFiles);
 			}
 
 			// If we're using the depot verifier

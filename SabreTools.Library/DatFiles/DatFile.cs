@@ -3475,9 +3475,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="outDir">Output directory to </param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
+		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
 		public bool PopulateFromDir(string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles, SkipFileType skipFileType,
-			bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst, bool ignorechd)
+			bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst, bool chdsAsFiles)
 		{
 			// If the description is defined but not the name, set the name from the description
 			if (String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
@@ -3508,7 +3508,7 @@ namespace SabreTools.Library.DatFiles
 				Parallel.ForEach(files, Globals.ParallelOptions, item =>
 				{
 					CheckFileForHashes(item, basePath, omitFromScan, bare, archivesAsFiles, skipFileType,
-						addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst, ignorechd);
+						addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst, chdsAsFiles);
 				});
 
 				// Find all top-level subfolders
@@ -3519,7 +3519,7 @@ namespace SabreTools.Library.DatFiles
 					Parallel.ForEach(subfiles, Globals.ParallelOptions, subitem =>
 					{
 						CheckFileForHashes(subitem, basePath, omitFromScan, bare, archivesAsFiles, skipFileType,
-							addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst, ignorechd);
+							addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst, chdsAsFiles);
 					});
 				}
 
@@ -3576,7 +3576,7 @@ namespace SabreTools.Library.DatFiles
 			else if (File.Exists(basePath))
 			{
 				CheckFileForHashes(basePath, Path.GetDirectoryName(Path.GetDirectoryName(basePath)), omitFromScan, bare, archivesAsFiles,
-					skipFileType, addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst, ignorechd);
+					skipFileType, addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst, chdsAsFiles);
 			}
 
 			// Now that we're done, delete the temp folder (if it's not the default)
@@ -3603,9 +3603,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
+		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
 		private void CheckFileForHashes(string item, string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles,
-			SkipFileType skipFileType, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst, bool ignorechd)
+			SkipFileType skipFileType, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst, bool chdsAsFiles)
 		{
 			// Define the temporary directory
 			string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
@@ -3670,7 +3670,7 @@ namespace SabreTools.Library.DatFiles
 			// If the extracted list is null, just scan the item itself
 			if (extracted == null || archivesAsFiles)
 			{
-				ProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst, ignorechd);
+				ProcessFile(newItem, "", newBasePath, omitFromScan, addDate, headerToCheckAgainst, chdsAsFiles);
 			}
 			// Otherwise, add all of the found items
 			else
@@ -3718,12 +3718,12 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
 		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
+		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
 		private void ProcessFile(string item, string parent, string basePath, Hash omitFromScan,
-			bool addDate, string headerToCheckAgainst, bool ignorechd)
+			bool addDate, string headerToCheckAgainst, bool chdsAsFiles)
 		{
 			Globals.Logger.Verbose("'{0}' treated like a file", Path.GetFileName(item));
-			DatItem datItem = FileTools.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst, ignorechd: ignorechd);
+			DatItem datItem = FileTools.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst, chdsAsFiles: chdsAsFiles);
 
 			ProcessFileHelper(item, datItem, basePath, parent);
 		}
@@ -4048,11 +4048,11 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
+		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
 		/// <returns>True if rebuilding was a success, false otherwise</returns>
 		public bool RebuildGeneric(List<string> inputs, string outDir, bool quickScan, bool date,
 			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
-			string headerToCheckAgainst, bool ignorechd)
+			string headerToCheckAgainst, bool chdsAsFiles)
 		{
 			#region Perform setup
 
@@ -4132,7 +4132,7 @@ namespace SabreTools.Library.DatFiles
 				{
 					Globals.Logger.User("Checking file: {0}", input);
 					RebuildGenericHelper(input, outDir, quickScan, date, delete, inverse,
-						outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, ignorechd);
+						outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, chdsAsFiles);
 				}
 
 				// If the input is a directory
@@ -4143,7 +4143,7 @@ namespace SabreTools.Library.DatFiles
 					{
 						Globals.Logger.User("Checking file: {0}", file);
 						RebuildGenericHelper(file, outDir, quickScan, date, delete, inverse,
-							outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, ignorechd);
+							outputFormat, romba, archiveScanLevel, updateDat, headerToCheckAgainst, chdsAsFiles);
 					}
 				}
 			}
@@ -4179,10 +4179,10 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="archiveScanLevel">ArchiveScanLevel representing the archive handling levels</param>
 		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
+		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
 		private void RebuildGenericHelper(string file, string outDir, bool quickScan, bool date,
 			bool delete, bool inverse, OutputFormat outputFormat, bool romba, ArchiveScanLevel archiveScanLevel, bool updateDat,
-			string headerToCheckAgainst, bool ignorechd)
+			string headerToCheckAgainst, bool chdsAsFiles)
 		{
 			// If we somehow have a null filename, return
 			if (file == null)
@@ -4202,7 +4202,7 @@ namespace SabreTools.Library.DatFiles
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				DatItem fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes),
-					header: headerToCheckAgainst, ignorechd: ignorechd);
+					header: headerToCheckAgainst, chdsAsFiles: chdsAsFiles);
 				usedExternally = RebuildIndividualFile(fileinfo, file, outDir, date, inverse, outputFormat,
 					romba, updateDat, null /* isZip */, headerToCheckAgainst);
 			}
@@ -4233,7 +4233,7 @@ namespace SabreTools.Library.DatFiles
 				if (entries == null && File.Exists(file))
 				{
 					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-					DatItem fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), ignorechd: ignorechd);
+					DatItem fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), chdsAsFiles: chdsAsFiles);
 					usedExternally = RebuildIndividualFile(fileinfo, file, outDir, date, inverse, outputFormat,
 						romba, updateDat, null /* isZip */, headerToCheckAgainst);
 				}
@@ -4743,9 +4743,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="hashOnly">True if only hashes should be checked, false for full file information</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="ignorechd">True if CHDs should be treated like regular files, false otherwise</param>
+		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
 		/// <returns>True if verification was a success, false otherwise</returns>
-		public bool VerifyGeneric(List<string> inputs, bool hashOnly, bool quickScan, string headerToCheckAgainst, bool ignorechd)
+		public bool VerifyGeneric(List<string> inputs, bool hashOnly, bool quickScan, string headerToCheckAgainst, bool chdsAsFiles)
 		{
 			// TODO: We want the cross section of what's the folder and what's in the DAT. Right now, it just has what's in the DAT that's not in the folder
 			bool success = true;
@@ -4756,7 +4756,7 @@ namespace SabreTools.Library.DatFiles
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				PopulateFromDir(input, (quickScan ? Hash.SecureHashes : Hash.DeepHashes) /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
-					SkipFileType.None, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */, headerToCheckAgainst, ignorechd);
+					SkipFileType.None, false /* addBlanks */, false /* addDate */, "" /* tempDir */, false /* copyFiles */, headerToCheckAgainst, chdsAsFiles);
 			}
 
 			// Setup the fixdat

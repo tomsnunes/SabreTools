@@ -178,7 +178,7 @@ namespace RombaSharp
 			ArchiveScanLevel asl = ArchiveTools.GetArchiveScanLevelFromNumbers((onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1));
 			need.RebuildGeneric(onlyDirs, _depots.Keys.ToList()[0], false /*quickScan*/, false /*date*/,
 				false /*delete*/, false /*inverse*/, OutputFormat.TorrentGzip, true /*romba*/, asl, false /*updateDat*/,
-				null /*headerToCheckAgainst*/, true /* ignorechd */);
+				null /*headerToCheckAgainst*/, true /* chdsAsFiles */);
 		}
 
 		/// <summary>
@@ -254,7 +254,7 @@ namespace RombaSharp
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 				datdata.PopulateFromDir(input, Hash.DeepHashes /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
 					SkipFileType.None, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
-					null /* headerToCheckAgainst */, true /* ignorechd */);
+					null /* headerToCheckAgainst */, true /* chdsAsFiles */);
 				datdata.WriteToFile("");
 			}
 		}
