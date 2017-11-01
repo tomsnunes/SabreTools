@@ -394,8 +394,9 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="file">Name of the file to be parsed</param>
 		/// <param name="outDir">Output directory to write the file to, empty means the same directory as the input file</param>
+		/// <param name="nostore">True if headers should not be stored in the database, false otherwise</param>
 		/// <returns>True if the output file was created, false otherwise</returns>
-		public static bool DetectSkipperAndTransform(string file, string outDir)
+		public static bool DetectSkipperAndTransform(string file, string outDir, bool nostore)
 		{
 			// Create the output directory if it doesn't exist
 			if (outDir != "" && !Directory.Exists(outDir))
@@ -439,8 +440,11 @@ namespace SabreTools.Library.Tools
 			}
 
 			// Now add the information to the database if it's not already there
-			Rom rom = (Rom)GetFileInfo(newfile, chdsAsFiles: true);
-			DatabaseTools.AddHeaderToDatabase(hstr, rom.SHA1, rule.SourceFile);
+			if (!nostore)
+			{
+				Rom rom = (Rom)GetFileInfo(newfile, chdsAsFiles: true);
+				DatabaseTools.AddHeaderToDatabase(hstr, rom.SHA1, rule.SourceFile);
+			}
 
 			return true;
 		}

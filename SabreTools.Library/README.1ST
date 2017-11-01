@@ -405,6 +405,11 @@ Options:
 			This sets an output folder to be used when the files are created. If
 			a path is not defined, the application directory is used instead.
 		
+		-nsh, --no-store-header	Don't store the extracted header
+			By default, all headers that are removed from files are backed up in
+			the database. This flag allows users to skip that step entirely,
+			avoiding caching the headers at all.
+		
 	-hs, --hash-split		Split a DAT or folder by best-available hashes
 		For a DAT, or set of DATs, allow for splitting based on the best
 		available hash for each file within. The order of preference for the

@@ -312,6 +312,11 @@ namespace SabreTools
 				"Output directory",
 				FeatureType.String,
 				null));
+			extract.AddFeature("no-store-header", new Feature(
+				new List<string>() { "-nsh", "--no-store-header" },
+				"Don't store the extracted header",
+				FeatureType.Flag,
+				null));
 
 			// Create the Extension Split feature
 			Feature extSplit = new Feature(

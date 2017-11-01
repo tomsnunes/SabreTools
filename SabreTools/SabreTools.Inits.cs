@@ -160,19 +160,20 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">Input file or folder names</param>
 		/// <param name="outDir">Output directory to write new files to, blank defaults to rom folder</param>
-		private static void InitExtractRemoveHeader(List<string> inputs, string outDir)
+		/// <param name="nostore">True if headers should not be stored in the database, false otherwise</param>
+		private static void InitExtractRemoveHeader(List<string> inputs, string outDir, bool nostore)
 		{
 			foreach (string input in inputs)
 			{
 				if (File.Exists(input))
 				{
-					FileTools.DetectSkipperAndTransform(input, outDir);
+					FileTools.DetectSkipperAndTransform(input, outDir, nostore);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string sub in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						FileTools.DetectSkipperAndTransform(sub, outDir);
+						FileTools.DetectSkipperAndTransform(sub, outDir, nostore);
 					}
 				}
 			}

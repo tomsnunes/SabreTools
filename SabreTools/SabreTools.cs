@@ -103,6 +103,7 @@ namespace SabreTools
 				inplace = true,
 				inverse = false,
 				merge = false,
+				nostore = false,
 				oneGameOneRegion = false,
 				quickScan = false,
 				quotes = false,
@@ -435,6 +436,10 @@ namespace SabreTools
 					case "-ns512":
 					case "--noSHA512":
 						omitFromScan &= ~Hash.SHA512; // This needs to be inverted later
+						break;
+					case "-nsh":
+					case "--no-store-header":
+						nostore = true;
 						break;
 					case "-oa":
 					case "--output-all":
@@ -1261,7 +1266,7 @@ namespace SabreTools
 			// If we're in header extract and remove mode
 			else if (extract)
 			{
-				InitExtractRemoveHeader(inputs, outDir);
+				InitExtractRemoveHeader(inputs, outDir, nostore);
 			}
 
 			// If we're in header restore mode
