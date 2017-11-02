@@ -3942,7 +3942,7 @@ namespace SabreTools.Library.DatFiles
 				case OutputFormat.TorrentGzip:
 					format = "TorrentGZ";
 					break;
-				case OutputFormat.TorrentLrzip:
+				case OutputFormat.TorrentLRZip:
 					format = "TorrentLRZ";
 					break;
 				case OutputFormat.TorrentRar:
@@ -4120,7 +4120,7 @@ namespace SabreTools.Library.DatFiles
 				case OutputFormat.TorrentGzip:
 					format = "TorrentGZ";
 					break;
-				case OutputFormat.TorrentLrzip:
+				case OutputFormat.TorrentLRZip:
 					format = "TorrentLRZ";
 					break;
 				case OutputFormat.TorrentRar:

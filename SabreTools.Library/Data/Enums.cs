@@ -100,11 +100,14 @@
 		TorrentGzip = 2,
 		TapeArchive = 5,
 
-		// Currently unimplemented
+		// Currently unimplemented fully
 		Torrent7Zip = 3,
 		TorrentRar = 4,
 		TorrentXZ = 6,
-		TorrentLrzip = 7,
+		TorrentLRZip = 7,
+		TorrentLZ4 = 8,
+		TorrentZstd = 9,
+		TorrentZPAQ = 10,
 	}
 
 	/// <summary>

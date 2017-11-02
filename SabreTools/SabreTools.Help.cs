@@ -462,6 +462,13 @@ namespace SabreTools
 				null));
 			*/
 			/*
+			sort.AddFeature("tlz4", new Feature(
+				new List<string>() { "-tlz4", "--tlz4" },
+				"Enable TorrentLZ4 output",
+				FeatureType.Flag,
+				null));
+			*/
+			/*
 			sort.AddFeature("trar", new Feature(
 				new List<string>() { "-trar", "--trar" },
 				"Enable TorrentRAR output",
@@ -480,6 +487,20 @@ namespace SabreTools
 				"Enable TorrentZip output",
 				FeatureType.Flag,
 				null));
+			/*
+			sort.AddFeature("tzpaq", new Feature(
+				new List<string>() { "-tzpaq", "--tzpaq" },
+				"Enable TorrentZPAQ output",
+				FeatureType.Flag,
+				null));
+			*/
+			/*
+			sort.AddFeature("tzstd", new Feature(
+				new List<string>() { "-tzstd", "--tzstd" },
+				"Enable TorrentZstd output",
+				FeatureType.Flag,
+				null));
+			*/
 			sort.AddFeature("header", new Feature(
 				new List<string>() { "-h", "--header" },
 				"Set a header skipper to use, blank means all",
@@ -600,6 +621,13 @@ namespace SabreTools
 				null));
 			*/
 			/*
+			sortDepot.AddFeature("tlz4", new Feature(
+				new List<string>() { "-tlz4", "--tlz4" },
+				"Enable TorrentLZ4 output",
+				FeatureType.Flag,
+				null));
+			*/
+			/*
 			sortDepot.AddFeature("trar", new Feature(
 				new List<string>() { "-trar", "--trar" },
 				"Enable TorrentRAR output",
@@ -618,6 +646,20 @@ namespace SabreTools
 				"Enable TorrentZip output",
 				FeatureType.Flag,
 				null));
+			/*
+			sortDepot.AddFeature("tzpaq", new Feature(
+				new List<string>() { "-tzpaq", "--tzpaq" },
+				"Enable TorrentZPAQ output",
+				FeatureType.Flag,
+				null));
+			*/
+			/*
+			sortDepot.AddFeature("tzstd", new Feature(
+				new List<string>() { "-tzstd", "--tzstd" },
+				"Enable TorrentZstd output",
+				FeatureType.Flag,
+				null));
+			*/
 			sortDepot.AddFeature("header", new Feature(
 				new List<string>() { "-h", "--header" },
 				"Set a header skipper to use, blank means all",

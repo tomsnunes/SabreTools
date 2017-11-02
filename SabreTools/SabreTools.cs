@@ -615,7 +615,11 @@ namespace SabreTools
 						break;
 					case "-tlrz":
 					case "--tlrz":
-						outputFormat = OutputFormat.TorrentLrzip;
+						outputFormat = OutputFormat.TorrentLRZip;
+						break;
+					case "-lz4":
+					case "--tlz4":
+						outputFormat = OutputFormat.TorrentLZ4;
 						break;
 					case "-trar":
 					case "--trar":
@@ -636,6 +640,14 @@ namespace SabreTools
 					case "-tzip":
 					case "--tzip":
 						outputFormat = OutputFormat.TorrentZip;
+						break;
+					case "-tzpaq":
+					case "--tzpaq":
+						outputFormat = OutputFormat.TorrentZPAQ;
+						break;
+					case "-tzstd":
+					case "--tzstd":
+						outputFormat = OutputFormat.TorrentZstd;
 						break;
 					case "-upd":
 					case "--update-dat":

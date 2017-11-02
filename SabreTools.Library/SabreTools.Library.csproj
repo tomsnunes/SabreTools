@@ -153,12 +153,15 @@
     <Compile Include="FileTypes\BaseArchive.cs" />
     <Compile Include="FileTypes\Folder.cs" />
     <Compile Include="FileTypes\GZipArchive.cs" />
-    <Compile Include="FileTypes\LRZArchive.cs" />
+    <Compile Include="FileTypes\LRZipArchive.cs" />
+    <Compile Include="FileTypes\LZ4Archive.cs" />
     <Compile Include="FileTypes\RarArchive.cs" />
     <Compile Include="FileTypes\SevenZipArchive.cs" />
     <Compile Include="FileTypes\TapeArchive.cs" />
     <Compile Include="FileTypes\XZArchive.cs" />
     <Compile Include="FileTypes\TorrentZipArchive.cs" />
+    <Compile Include="FileTypes\ZPAQArchive.cs" />
+    <Compile Include="FileTypes\ZstdArchive.cs" />
     <Compile Include="Items\Archive.cs" />
     <Compile Include="Items\BiosSet.cs" />
     <Compile Include="DatFiles\DatFile.cs" />

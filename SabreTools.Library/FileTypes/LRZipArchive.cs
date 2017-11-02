@@ -16,25 +16,24 @@ namespace SabreTools.Library.FileTypes
 	/// <summary>
 	/// Represents a TorrentLRZip archive for reading and writing
 	/// </summary>
-	/// TODO: LRZIP: https://github.com/ckolivas/lrzip
-	public class LRZArchive : BaseArchive
+	/// TODO: Implement from source at https://github.com/ckolivas/lrzip
+	public class LRZipArchive : BaseArchive
 	{
 		#region Constructors
 
 		/// <summary>
-		/// Create a new TorrentGZipArchive with no base file
+		/// Create a new LRZipArchive with no base file
 		/// </summary>
-		public LRZArchive()
+		public LRZipArchive()
 			: base()
 		{
 		}
 
 		/// <summary>
-		/// Create a new TorrentGZipArchive from the given file
+		/// Create a new LRZipArchive from the given file
 		/// </summary>
 		/// <param name="filename">Name of the file to use as an archive</param>
-		/// <param name="read">True for opening file as read, false for opening file as write</param>
-		public LRZArchive(string filename)
+		public LRZipArchive(string filename)
 			: base(filename)
 		{
 			//_archiveType = ArchiveType.LRZip;

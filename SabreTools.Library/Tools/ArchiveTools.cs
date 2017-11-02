@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.FileTypes;
-using SabreTools.Library.Items;
 
 #if MONO
 using System.IO;
@@ -21,15 +19,9 @@ namespace SabreTools.Library.Tools
 	/// <summary>
 	/// Tools for working with archives
 	/// </summary>
-	/// <remarks>
-	/// TODO: Full archive support for: RAR, LRZip, ZPAQ?, Zstd?, LZ4?
-	/// ZPAQ: https://github.com/zpaq/zpaq - In progress as external DLL
-	/// Zstd: https://github.com/skbkontur/ZstdNet
-	/// LZ4: https://github.com/lz4/lz4
-	/// </remarks>
 	public static class ArchiveTools
 	{
-		#region Factory
+		#region Factories
 
 		/// <summary>
 		/// Create an archive of the specified type, if possible
@@ -114,8 +106,8 @@ namespace SabreTools.Library.Tools
 					return new SevenZipArchive();
 				case OutputFormat.TorrentGzip:
 					return new GZipArchive();
-				case OutputFormat.TorrentLrzip:
-					return new LRZArchive();
+				case OutputFormat.TorrentLRZip:
+					return new LRZipArchive();
 				case OutputFormat.TorrentRar:
 					return new RarArchive();
 				case OutputFormat.TorrentXZ:

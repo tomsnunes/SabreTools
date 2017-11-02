@@ -549,6 +549,13 @@ Options:
 			but with custom header information. This is currently unused by any
 			major application.
 			
+		-tlz4				Enable Torrent LZ4 output [UNIMPLEMENTED]
+			Instead of ouputting the files to folder, files will be rebuilt to
+			Torrent LZ4 (TLZ4) files. This format is based on the LZ4 file
+			format as defined at https://github.com/lz4/lz4 but with custom
+			header information. This is currently unused by any major
+			application.
+			
 		-trar				Enable Torrent RAR output [UNIMPLEMENTED]
 			Instead of outputting files to folder, files will be rebuilt to
 			Torrent RAR (TRAR) files. This format is based on the RAR propietary
@@ -568,6 +575,20 @@ Options:
 			format, but with custom header information. This is primarily used
 			by external tool RomVault (http://www.romvault.com/) and is already
 			widely used.
+		
+		-tzpaq				Enable Torrent ZPAQ output [UNIMPLEMENTED]
+			Instead of ouputting the files to folder, files will be rebuilt to
+			Torrent ZPAQ (TZPAQ) files. This format is based on the ZPAQ file
+			format as defined at https://github.com/zpaq/zpaq but with custom
+			header information. This is currently unused by any major
+			application.
+			
+		-tzstd				Enable Torrent Zstd output [UNIMPLEMENTED]
+			Instead of ouputting the files to folder, files will be rebuilt to
+			Torrent Zstd (TZstd) files. This format is based on the Zstd file
+			format as defined at https://github.com/skbkontur/ZstdNet but with
+			custom header information. This is currently unused by any major
+			application.
 			
 		-h=, --header=		Remove headers from hash calculations
 			If this is set, then all files that have copier headers that are
@@ -697,6 +718,13 @@ Options:
 			but with custom header information. This is currently unused by any
 			major application.
 			
+		-tlz4				Enable Torrent LZ4 output [UNIMPLEMENTED]
+			Instead of ouputting the files to folder, files will be rebuilt to
+			Torrent LZ4 (TLZ4) files. This format is based on the LZ4 file
+			format as defined at https://github.com/lz4/lz4 but with custom
+			header information. This is currently unused by any major
+			application.
+			
 		-trar				Enable Torrent RAR output [UNIMPLEMENTED]
 			Instead of outputting files to folder, files will be rebuilt to
 			Torrent RAR (TRAR) files. This format is based on the RAR propietary
@@ -716,6 +744,20 @@ Options:
 			format, but with custom header information. This is primarily used
 			by external tool RomVault (http://www.romvault.com/) and is already
 			widely used.
+			
+		-tzpaq				Enable Torrent ZPAQ output [UNIMPLEMENTED]
+			Instead of ouputting the files to folder, files will be rebuilt to
+			Torrent ZPAQ (TZPAQ) files. This format is based on the ZPAQ file
+			format as defined at https://github.com/zpaq/zpaq but with custom
+			header information. This is currently unused by any major
+			application.
+			
+		-tzstd				Enable Torrent Zstd output [UNIMPLEMENTED]
+			Instead of ouputting the files to folder, files will be rebuilt to
+			Torrent Zstd (TZstd) files. This format is based on the Zstd file
+			format as defined at https://github.com/skbkontur/ZstdNet but with
+			custom header information. This is currently unused by any major
+			application.
 			
 		-h=, --header=		Remove headers from hash calculations
 			If this is set, then all files that have copier headers that are
