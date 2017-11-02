@@ -108,12 +108,18 @@ namespace SabreTools.Library.Tools
 					return new GZipArchive();
 				case OutputFormat.TorrentLRZip:
 					return new LRZipArchive();
+				case OutputFormat.TorrentLZ4:
+					return new LZ4Archive();
 				case OutputFormat.TorrentRar:
 					return new RarArchive();
 				case OutputFormat.TorrentXZ:
 					return new XZArchive();
 				case OutputFormat.TorrentZip:
 					return new TorrentZipArchive();
+				case OutputFormat.TorrentZPAQ:
+					return new ZPAQArchive();
+				case OutputFormat.TorrentZstd:
+					return new ZstdArchive();
 				default:
 					return null;
 			}
