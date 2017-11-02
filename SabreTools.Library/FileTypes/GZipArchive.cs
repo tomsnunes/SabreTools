@@ -11,43 +11,43 @@ using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
 
+using BinaryReader = System.IO.BinaryReader;
+using BinaryWriter = System.IO.BinaryWriter;
 using EndOfStreamException = System.IO.EndOfStreamException;
 using FileStream = System.IO.FileStream;
 using MemoryStream = System.IO.MemoryStream;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
-using SharpCompress.Archives;
-using SharpCompress.Archives.Rar;
+using Ionic.Zlib;
 using SharpCompress.Common;
-using SharpCompress.Readers;
 
 namespace SabreTools.Library.FileTypes
 {
 	/// <summary>
-	/// Represents a TorrentRAR archive for reading and writing
+	/// Represents a TorrentGZip archive for reading and writing
 	/// </summary>
-	public class TorrentRARArchive : BaseArchive
+	public class GZipArchive : BaseArchive
 	{
 		#region Constructors
 
 		/// <summary>
-		/// Create a new TorrentRARArchive with no base file
+		/// Create a new TorrentGZipArchive with no base file
 		/// </summary>
-		public TorrentRARArchive()
+		public GZipArchive()
 			: base()
 		{
 		}
 
 		/// <summary>
-		/// Create a new TorrentRARArchive from the given file
+		/// Create a new TorrentGZipArchive from the given file
 		/// </summary>
 		/// <param name="filename">Name of the file to use as an archive</param>
 		/// <param name="read">True for opening file as read, false for opening file as write</param>
-		public TorrentRARArchive(string filename)
+		public GZipArchive(string filename)
 			: base(filename)
 		{
-			_archiveType = ArchiveType.Rar;
+			_archiveType = ArchiveType.GZip;
 		}
 
 		#endregion
@@ -68,14 +68,16 @@ namespace SabreTools.Library.FileTypes
 				// Create the temp directory
 				Directory.CreateDirectory(outDir);
 
-				// Extract all files to the temp directory
-				RarArchive ra = RarArchive.Open(_filename);
-				foreach (RarArchiveEntry entry in ra.Entries)
-				{
-					entry.WriteToDirectory(outDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
-				}
+				// Decompress the _filename stream
+				FileStream outstream = FileTools.TryCreate(Path.Combine(outDir, Path.GetFileNameWithoutExtension(_filename)));
+				GZipStream gzstream = new GZipStream(FileTools.TryOpenRead(_filename), Ionic.Zlib.CompressionMode.Decompress);
+				gzstream.CopyTo(outstream);
+
+				// Dispose of the streams
+				outstream.Dispose();
+				gzstream.Dispose();
+
 				encounteredErrors = false;
-				ra.Dispose();
 			}
 			catch (EndOfStreamException)
 			{
@@ -90,7 +92,7 @@ namespace SabreTools.Library.FileTypes
 				// Don't log file open errors
 				encounteredErrors = true;
 			}
-
+			
 			return encounteredErrors;
 		}
 
@@ -153,17 +155,22 @@ namespace SabreTools.Library.FileTypes
 
 			try
 			{
-				RarArchive ra = RarArchive.Open(_filename, new ReaderOptions { LeaveStreamOpen = false, });
-				foreach (RarArchiveEntry entry in ra.Entries)
+				// Decompress the _filename stream
+				realEntry = Path.GetFileNameWithoutExtension(_filename);
+				GZipStream gzstream = new GZipStream(FileTools.TryOpenRead(_filename), Ionic.Zlib.CompressionMode.Decompress);
+
+				// Write the file out
+				byte[] gbuffer = new byte[_bufferSize];
+				int glen;
+				while ((glen = gzstream.Read(gbuffer, 0, _bufferSize)) > 0)
 				{
-					if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
-					{
-						// Write the file out
-						realEntry = entry.Key;
-						entry.WriteTo(ms);
-					}
+
+					ms.Write(gbuffer, 0, glen);
+					ms.Flush();
 				}
-				ra.Dispose();
+
+				// Dispose of the streams
+				gzstream.Dispose();
 			}
 			catch (Exception ex)
 			{
@@ -191,40 +198,42 @@ namespace SabreTools.Library.FileTypes
 			List<Rom> found = new List<Rom>();
 			string gamename = Path.GetFileNameWithoutExtension(_filename);
 
+			Rom possibleTgz = ArchiveTools.GetTorrentGZFileInfo(_filename);
+
+			// If it was, then add it to the outputs and continue
+			if (possibleTgz != null && possibleTgz.Name != null)
+			{
+				found.Add(possibleTgz);
+				return found;
+			}
+
 			try
 			{
-				RarArchive ra = RarArchive.Open(FileTools.TryOpenRead(_filename));
-				foreach (RarArchiveEntry entry in ra.Entries.Where(e => e != null && !e.IsDirectory))
+				// If secure hashes are disabled, do a quickscan
+				if (omitFromScan == Hash.SecureHashes)
 				{
-					// If secure hashes are disabled, do a quickscan
-					if (omitFromScan == Hash.SecureHashes)
-					{
-						found.Add(new Rom
-						{
-							Type = ItemType.Rom,
-							Name = entry.Key,
-							Size = entry.Size,
-							CRC = entry.Crc.ToString("X").ToLowerInvariant(),
-							Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null),
+					Rom tempRom = new Rom(gamename, gamename, omitFromScan);
+					BinaryReader br = new BinaryReader(FileTools.TryOpenRead(_filename));
+					br.BaseStream.Seek(-8, SeekOrigin.End);
+					byte[] headercrc = br.ReadBytes(4);
+					tempRom.CRC = BitConverter.ToString(headercrc.Reverse().ToArray()).Replace("-", string.Empty).ToLowerInvariant();
+					byte[] headersize = br.ReadBytes(4);
+					tempRom.Size = BitConverter.ToInt32(headersize.Reverse().ToArray(), 0);
+					br.Dispose();
 
-							MachineName = gamename,
-						});
-					}
-					// Otherwise, use the stream directly
-					else
-					{
-						Stream entryStream = entry.OpenEntryStream();
-						Rom rarEntryRom = (Rom)FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
-						rarEntryRom.Name = entry.Key;
-						rarEntryRom.MachineName = gamename;
-						rarEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
-						found.Add(rarEntryRom);
-						entryStream.Dispose();
-					}
+					found.Add(tempRom);
 				}
-
-				// Dispose of the archive
-				ra.Dispose();
+				// Otherwise, use the stream directly
+				else
+				{
+					GZipStream gzstream = new GZipStream(FileTools.TryOpenRead(_filename), Ionic.Zlib.CompressionMode.Decompress);
+					Rom gzipEntryRom = (Rom)FileTools.GetStreamInfo(gzstream, gzstream.Length, omitFromScan: omitFromScan);
+					gzipEntryRom.Name = gzstream.FileName;
+					gzipEntryRom.MachineName = gamename;
+					gzipEntryRom.Date = (date && gzstream.LastModified != null ? gzstream.LastModified?.ToString("yyyy/MM/dd hh:mm:ss") : null);
+					found.Add(gzipEntryRom);
+					gzstream.Dispose();
+				}
 			}
 			catch (Exception)
 			{
@@ -242,37 +251,8 @@ namespace SabreTools.Library.FileTypes
 		/// <returns>List of empty folders in the archive</returns>
 		public override List<string> GetEmptyFolders()
 		{
-			List<string> empties = new List<string>();
-
-			try
-			{
-				RarArchive ra = RarArchive.Open(_filename, new ReaderOptions { LeaveStreamOpen = false });
-				List<RarArchiveEntry> rarEntries = ra.Entries.OrderBy(e => e.Key, new NaturalSort.NaturalReversedComparer()).ToList();
-				string lastRarEntry = null;
-				foreach (RarArchiveEntry entry in rarEntries)
-				{
-					if (entry != null)
-					{
-						// If the current is a superset of last, we skip it
-						if (lastRarEntry != null && lastRarEntry.StartsWith(entry.Key))
-						{
-							// No-op
-						}
-						// If the entry is a directory, we add it
-						else if (entry.IsDirectory)
-						{
-							empties.Add(entry.Key);
-							lastRarEntry = entry.Key;
-						}
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				Globals.Logger.Error(ex.ToString());
-			}
-
-			return empties;
+			// GZip files don't contain directories
+			return new List<string>();
 		}
 
 		#endregion
@@ -280,36 +260,124 @@ namespace SabreTools.Library.FileTypes
 		#region Writing
 
 		/// <summary>
-		/// Write an input file to a torrentrar archive
+		/// Write an input file to a torrent GZ file
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
-		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public override bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
+		/// <returns>True if the write was a success, false otherwise</returns>
+		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
+		public override bool Write(string inputFile, string outDir, Rom rom = null, bool date = false, bool romba = false)
 		{
+			// Check that the input file exists
+			if (!File.Exists(inputFile))
+			{
+				Globals.Logger.Warning("File '{0}' does not exist!", inputFile);
+				return false;
+			}
+			inputFile = Path.GetFullPath(inputFile);
+
 			// Get the file stream for the file and write out
 			return Write(FileTools.TryOpenRead(inputFile), outDir, rom, date, romba);
 		}
 
 		/// <summary>
-		/// Write an input stream to a torrentrar archive
+		/// Write an input stream to a torrent GZ file
 		/// </summary>
 		/// <param name="inputStream">Input stream to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
-		/// <returns>True if the archive was written properly, false otherwise</returns>
-		public override bool Write(Stream inputStream, string outDir, Rom rom, bool date = false, bool romba = false)
+		/// <returns>True if the write was a success, false otherwise</returns>
+		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
+		public override bool Write(Stream inputStream, string outDir, Rom rom = null, bool date = false, bool romba = false)
 		{
-			throw new NotImplementedException();
+			bool success = false;
+
+			// If the stream is not readable, return
+			if (!inputStream.CanRead)
+			{
+				return success;
+			}
+
+			// Make sure the output directory exists
+			if (!Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir);
+			}
+			outDir = Path.GetFullPath(outDir);
+
+			// Now get the Rom info for the file so we have hashes and size
+			rom = (Rom)FileTools.GetStreamInfo(inputStream, inputStream.Length, keepReadOpen: true);
+
+			// Get the output file name
+			string outfile = null;
+
+			// If we have a romba output, add the romba path
+			if (romba)
+			{
+				outfile = Path.Combine(outDir, Style.GetRombaPath(rom.SHA1)); // TODO: When updating to SHA-256, this needs to update to SHA256
+
+				// Check to see if the folder needs to be created
+				if (!Directory.Exists(Path.GetDirectoryName(outfile)))
+				{
+					Directory.CreateDirectory(Path.GetDirectoryName(outfile));
+				}
+			}
+			// Otherwise, we're just rebuilding to the main directory
+			else
+			{
+				outfile = Path.Combine(outDir, rom.SHA1 + ".gz"); // TODO: When updating to SHA-256, this needs to update to SHA256
+			}
+
+			// If the output file exists, don't try to write again
+			if (!File.Exists(outfile))
+			{
+				// Compress the input stream
+				FileStream outputStream = FileTools.TryCreate(outfile);
+
+				// Open the output file for writing
+				BinaryWriter sw = new BinaryWriter(outputStream);
+
+				// Write standard header and TGZ info
+				byte[] data = Constants.TorrentGZHeader
+								.Concat(Style.StringToByteArray(rom.MD5)) // MD5
+								.Concat(Style.StringToByteArray(rom.CRC)) // CRC
+							.ToArray();
+				sw.Write(data);
+				sw.Write((ulong)rom.Size); // Long size (Unsigned, Mirrored)
+
+				// Now create a deflatestream from the input file
+				DeflateStream ds = new DeflateStream(outputStream, Ionic.Zlib.CompressionMode.Compress, Ionic.Zlib.CompressionLevel.BestCompression, true);
+
+				// Copy the input stream to the output
+				byte[] ibuffer = new byte[_bufferSize];
+				int ilen;
+				while ((ilen = inputStream.Read(ibuffer, 0, _bufferSize)) > 0)
+				{
+					ds.Write(ibuffer, 0, ilen);
+					ds.Flush();
+				}
+				ds.Dispose();
+
+				// Now write the standard footer
+				sw.Write(Style.StringToByteArray(rom.CRC).Reverse().ToArray());
+				sw.Write((uint)rom.Size);
+
+				// Dispose of everything
+				sw.Dispose();
+				outputStream.Dispose();
+				inputStream.Dispose();
+			}
+
+			return true;
 		}
 
 		/// <summary>
-		/// Write a set of input files to a torrentrar archive (assuming the same output archive name)
+		/// Write a set of input files to a torrent GZ archive (assuming the same output archive name)
 		/// </summary>
 		/// <param name="inputFiles">Input files to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>

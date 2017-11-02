@@ -12,6 +12,7 @@ using System.IO;
 using Alphaleonis.Win32.Filesystem;
 
 using BinaryWriter = System.IO.BinaryWriter;
+using EndOfStreamException = System.IO.EndOfStreamException;
 using FileStream = System.IO.FileStream;
 using MemoryStream = System.IO.MemoryStream;
 using SeekOrigin = System.IO.SeekOrigin;
@@ -19,34 +20,38 @@ using Stream = System.IO.Stream;
 #endif
 using ROMVault2.SupportedFiles.Zip;
 using SevenZip;
+using SharpCompress.Archives;
+using SharpCompress.Archives.SevenZip;
+using SharpCompress.Common;
+using SharpCompress.Readers;
 
 namespace SabreTools.Library.FileTypes
 {
 	/// <summary>
-	/// Represents a TorrentXZ archive for reading and writing
+	/// Represents a Torrent7zip archive for reading and writing
 	/// </summary>
-	/// TODO: Wait for XZ write to be enabled by SevenZipSharp library
-	public class TorrentXZArchive : BaseArchive
+	/// TODO: Torrent 7-zip: https://sourceforge.net/p/t7z/code/HEAD/tree/
+	public class SevenZipArchive : BaseArchive
 	{
 		#region Constructors
 
 		/// <summary>
-		/// Create a new TorrentGZipArchive with no base file
+		/// Create a new TorrentSevenZipArchive with no base file
 		/// </summary>
-		public TorrentXZArchive()
+		public SevenZipArchive()
 			: base()
 		{
 		}
 
 		/// <summary>
-		/// Create a new TorrentGZipArchive from the given file
+		/// Create a new TorrentSevenZipArchive from the given file
 		/// </summary>
 		/// <param name="filename">Name of the file to use as an archive</param>
 		/// <param name="read">True for opening file as read, false for opening file as write</param>
-		public TorrentXZArchive(string filename)
+		public SevenZipArchive(string filename)
 			: base(filename)
 		{
-			//_archiveType = ArchiveType.XZip;
+			_archiveType = ArchiveType.SevenZip;
 		}
 
 		#endregion
@@ -60,7 +65,37 @@ namespace SabreTools.Library.FileTypes
 		/// <returns>True if the extraction was a success, false otherwise</returns>
 		public override bool ExtractAll(string outDir)
 		{
-			throw new NotImplementedException();
+			bool encounteredErrors = true;
+
+			try
+			{
+				// Create the temp directory
+				Directory.CreateDirectory(outDir);
+
+				// Extract all files to the temp directory
+				SharpCompress.Archives.SevenZip.SevenZipArchive sza = SharpCompress.Archives.SevenZip.SevenZipArchive.Open(FileTools.TryOpenRead(_filename));
+				foreach (SevenZipArchiveEntry entry in sza.Entries)
+				{
+					entry.WriteToDirectory(outDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
+				}
+				encounteredErrors = false;
+				sza.Dispose();
+			}
+			catch (EndOfStreamException)
+			{
+				// Catch this but don't count it as an error because SharpCompress is unsafe
+			}
+			catch (InvalidOperationException)
+			{
+				encounteredErrors = true;
+			}
+			catch (Exception)
+			{
+				// Don't log file open errors
+				encounteredErrors = true;
+			}
+
+			return encounteredErrors;
 		}
 
 		/// <summary>
@@ -71,7 +106,42 @@ namespace SabreTools.Library.FileTypes
 		/// <returns>Name of the extracted file, null on error</returns>
 		public override string ExtractEntry(string entryName, string outDir)
 		{
-			throw new NotImplementedException();
+			// Try to extract a stream using the given information
+			(MemoryStream ms, string realEntry) = ExtractEntryStream(entryName);
+
+			// If the memory stream and the entry name are both non-null, we write to file
+			if (ms != null && realEntry != null)
+			{
+				realEntry = Path.Combine(outDir, realEntry);
+
+				// Create the output subfolder now
+				Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
+
+				// Now open and write the file if possible
+				FileStream fs = FileTools.TryCreate(realEntry);
+				if (fs != null)
+				{
+					ms.Seek(0, SeekOrigin.Begin);
+					byte[] zbuffer = new byte[_bufferSize];
+					int zlen;
+					while ((zlen = ms.Read(zbuffer, 0, _bufferSize)) > 0)
+					{
+						fs.Write(zbuffer, 0, zlen);
+						fs.Flush();
+					}
+
+					ms?.Dispose();
+					fs?.Dispose();
+				}
+				else
+				{
+					ms?.Dispose();
+					fs?.Dispose();
+					realEntry = null;
+				}
+			}
+
+			return realEntry;
 		}
 
 		/// <summary>
@@ -82,7 +152,32 @@ namespace SabreTools.Library.FileTypes
 		/// <returns>MemoryStream representing the entry, null on error</returns>
 		public override (MemoryStream, string) ExtractEntryStream(string entryName)
 		{
-			throw new NotImplementedException();
+			MemoryStream ms = new MemoryStream();
+			string realEntry = null;
+
+			try
+			{
+				SharpCompress.Archives.SevenZip.SevenZipArchive sza = SharpCompress.Archives.SevenZip.SevenZipArchive.Open(_filename, new ReaderOptions { LeaveStreamOpen = false, });
+				foreach (SevenZipArchiveEntry entry in sza.Entries)
+				{
+					if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
+					{
+						// Write the file out
+						realEntry = entry.Key;
+						entry.WriteTo(ms);
+						break;
+					}
+				}
+				sza.Dispose();
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+				ms = null;
+				realEntry = null;
+			}
+
+			return (ms, realEntry);
 		}
 
 		#endregion
@@ -98,7 +193,51 @@ namespace SabreTools.Library.FileTypes
 		/// <remarks>TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually</remarks>
 		public override List<Rom> GetArchiveFileInfo(Hash omitFromScan = Hash.DeepHashes, bool date = false)
 		{
-			throw new NotImplementedException();
+			List<Rom> found = new List<Rom>();
+			string gamename = Path.GetFileNameWithoutExtension(_filename);
+
+			try
+			{
+				SharpCompress.Archives.SevenZip.SevenZipArchive sza = SharpCompress.Archives.SevenZip.SevenZipArchive.Open(FileTools.TryOpenRead(_filename));
+				foreach (SevenZipArchiveEntry entry in sza.Entries.Where(e => e != null && !e.IsDirectory))
+				{
+					// If secure hashes are disabled, do a quickscan
+					if (omitFromScan == Hash.SecureHashes)
+					{
+						found.Add(new Rom
+						{
+							Type = ItemType.Rom,
+							Name = entry.Key,
+							Size = entry.Size,
+							CRC = entry.Crc.ToString("X").ToLowerInvariant(),
+							Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null),
+
+							MachineName = gamename,
+						});
+					}
+					// Otherwise, use the stream directly
+					else
+					{
+						Stream entryStream = entry.OpenEntryStream();
+						Rom sevenZipEntryRom = (Rom)FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
+						sevenZipEntryRom.Name = entry.Key;
+						sevenZipEntryRom.MachineName = gamename;
+						sevenZipEntryRom.Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null);
+						found.Add(sevenZipEntryRom);
+						entryStream.Dispose();
+					}
+				}
+
+				// Dispose of the archive
+				sza.Dispose();
+			}
+			catch (Exception)
+			{
+				// Don't log file open errors
+				return null;
+			}
+
+			return found;
 		}
 
 		/// <summary>
@@ -108,7 +247,37 @@ namespace SabreTools.Library.FileTypes
 		/// <returns>List of empty folders in the archive</returns>
 		public override List<string> GetEmptyFolders()
 		{
-			throw new NotImplementedException();
+			List<string> empties = new List<string>();
+
+			try
+			{
+				SharpCompress.Archives.SevenZip.SevenZipArchive sza = SharpCompress.Archives.SevenZip.SevenZipArchive.Open(_filename, new ReaderOptions { LeaveStreamOpen = false });
+				List<SevenZipArchiveEntry> sevenZipEntries = sza.Entries.OrderBy(e => e.Key, new NaturalSort.NaturalReversedComparer()).ToList();
+				string lastSevenZipEntry = null;
+				foreach (SevenZipArchiveEntry entry in sevenZipEntries)
+				{
+					if (entry != null)
+					{
+						// If the current is a superset of last, we skip it
+						if (lastSevenZipEntry != null && lastSevenZipEntry.StartsWith(entry.Key))
+						{
+							// No-op
+						}
+						// If the entry is a directory, we add it
+						else if (entry.IsDirectory)
+						{
+							empties.Add(entry.Key);
+							lastSevenZipEntry = entry.Key;
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+			}
+
+			return empties;
 		}
 
 		#endregion
@@ -116,15 +285,14 @@ namespace SabreTools.Library.FileTypes
 		#region Writing
 
 		/// <summary>
-		/// Write an input file to a torrent XZ file
+		/// Write an input file to a torrent7z archive
 		/// </summary>
 		/// <param name="inputFile">Input filename to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
 		/// <param name="rom">DatItem representing the new information</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise (default)</param>
 		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
-		/// <returns>True if the write was a success, false otherwise</returns>
-		/// <remarks>This works for now, but it can be sped up by using Ionic.Zip or another zlib wrapper that allows for header values built-in. See edc's code.</remarks>
+		/// <returns>True if the archive was written properly, false otherwise</returns>
 		public override bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
 		{
 			// Get the file stream for the file and write out
@@ -132,7 +300,7 @@ namespace SabreTools.Library.FileTypes
 		}
 
 		/// <summary>
-		/// Write an input file to a torrent XZ archive
+		/// Write an input file to a torrent7z archive
 		/// </summary>
 		/// <param name="inputStream">Input stream to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -161,7 +329,7 @@ namespace SabreTools.Library.FileTypes
 			inputStream.Seek(0, SeekOrigin.Begin);
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".xz") ? "" : ".xz"));
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".7z") ? "" : ".7z"));
 
 			// Set internal variables
 			SevenZipBase.SetLibraryPath("7za.dll");
@@ -181,7 +349,7 @@ namespace SabreTools.Library.FileTypes
 				{
 					zipFile = new SevenZipCompressor()
 					{
-						ArchiveFormat = OutArchiveFormat.XZ,
+						ArchiveFormat = OutArchiveFormat.SevenZip,
 						CompressionLevel = CompressionLevel.Normal,
 					};
 
@@ -231,7 +399,7 @@ namespace SabreTools.Library.FileTypes
 						// Otherwise, process the old zipfile
 						zipFile = new SevenZipCompressor()
 						{
-							ArchiveFormat = OutArchiveFormat.XZ,
+							ArchiveFormat = OutArchiveFormat.SevenZip,
 							CompressionLevel = CompressionLevel.Normal,
 						};
 
@@ -328,7 +496,7 @@ namespace SabreTools.Library.FileTypes
 		}
 
 		/// <summary>
-		/// Write a set of input files to a torrent XZ archive (assuming the same output archive name)
+		/// Write a set of input files to a torrent7z archive (assuming the same output archive name)
 		/// </summary>
 		/// <param name="inputFiles">Input files to be moved</param>
 		/// <param name="outDir">Output directory to build to</param>
@@ -363,7 +531,7 @@ namespace SabreTools.Library.FileTypes
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".xz") ? "" : ".xz"));
+			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".7z") ? "" : ".7z"));
 
 			// Set internal variables
 			SevenZipBase.SetLibraryPath("7za.dll");
@@ -383,7 +551,7 @@ namespace SabreTools.Library.FileTypes
 				{
 					zipFile = new SevenZipCompressor()
 					{
-						ArchiveFormat = OutArchiveFormat.XZ,
+						ArchiveFormat = OutArchiveFormat.SevenZip,
 						CompressionLevel = CompressionLevel.Normal,
 					};
 
@@ -457,7 +625,7 @@ namespace SabreTools.Library.FileTypes
 						// Otherwise, process the old zipfile
 						zipFile = new SevenZipCompressor()
 						{
-							ArchiveFormat = OutArchiveFormat.XZ,
+							ArchiveFormat = OutArchiveFormat.SevenZip,
 							CompressionLevel = CompressionLevel.Normal,
 						};
 

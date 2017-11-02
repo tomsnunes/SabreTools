@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 using SabreTools.Library.Data;
@@ -12,8 +11,6 @@ using System.IO;
 using Alphaleonis.Win32.Filesystem;
 
 using BinaryReader = System.IO.BinaryReader;
-using FileStream = System.IO.FileStream;
-using MemoryStream = System.IO.MemoryStream;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
@@ -57,16 +54,16 @@ namespace SabreTools.Library.Tools
 			switch (at)
 			{
 				case ArchiveType.GZip:
-					archive = new TorrentGZipArchive(input);
+					archive = new GZipArchive(input);
 					break;
 				case ArchiveType.Rar:
-					archive = new TorrentRARArchive(input);
+					archive = new RarArchive(input);
 					break;
 				case ArchiveType.SevenZip:
-					archive = new TorrentSevenZipArchive(input);
+					archive = new SevenZipArchive(input);
 					break;
 				case ArchiveType.Tar:
-					archive = new TorrentTarArchive(input);
+					archive = new TapeArchive(input);
 					break;
 				case ArchiveType.Zip:
 					archive = new TorrentZipArchive(input);
@@ -86,13 +83,13 @@ namespace SabreTools.Library.Tools
 			switch(archiveType)
 			{
 				case ArchiveType.GZip:
-					return new TorrentGZipArchive();
+					return new GZipArchive();
 				case ArchiveType.Rar:
-					return new TorrentRARArchive();
+					return new RarArchive();
 				case ArchiveType.SevenZip:
-					return new TorrentSevenZipArchive();
+					return new SevenZipArchive();
 				case ArchiveType.Tar:
-					return new TorrentTarArchive();
+					return new TapeArchive();
 				case ArchiveType.Zip:
 					return new TorrentZipArchive();
 				default:
@@ -112,17 +109,17 @@ namespace SabreTools.Library.Tools
 				case OutputFormat.Folder:
 					return new Folder();
 				case OutputFormat.TapeArchive:
-					return new TorrentTarArchive();
+					return new TapeArchive();
 				case OutputFormat.Torrent7Zip:
-					return new TorrentSevenZipArchive();
+					return new SevenZipArchive();
 				case OutputFormat.TorrentGzip:
-					return new TorrentGZipArchive();
+					return new GZipArchive();
 				case OutputFormat.TorrentLrzip:
-					return new TorrentLRZArchive();
+					return new LRZArchive();
 				case OutputFormat.TorrentRar:
-					return new TorrentRARArchive();
+					return new RarArchive();
 				case OutputFormat.TorrentXZ:
-					return new TorrentXZArchive();
+					return new XZArchive();
 				case OutputFormat.TorrentZip:
 					return new TorrentZipArchive();
 				default:

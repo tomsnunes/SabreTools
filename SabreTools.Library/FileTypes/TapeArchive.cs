@@ -30,14 +30,14 @@ namespace SabreTools.Library.FileTypes
 	/// Represents a Torrent7zip archive for reading and writing
 	/// </summary>
 	/// TODO: Don't try to read entries to MemoryStream during write
-	public class TorrentTarArchive : BaseArchive
+	public class TapeArchive : BaseArchive
 	{
 		#region Constructors
 
 		/// <summary>
 		/// Create a new TorrentTarArchive with no base file
 		/// </summary>
-		public TorrentTarArchive()
+		public TapeArchive()
 			: base()
 		{
 		}
@@ -47,7 +47,7 @@ namespace SabreTools.Library.FileTypes
 		/// </summary>
 		/// <param name="filename">Name of the file to use as an archive</param>
 		/// <param name="read">True for opening file as read, false for opening file as write</param>
-		public TorrentTarArchive(string filename)
+		public TapeArchive(string filename)
 			: base(filename)
 		{
 			_archiveType = ArchiveType.Tar;
