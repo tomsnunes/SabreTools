@@ -3651,7 +3651,7 @@ namespace SabreTools.Library.DatFiles
 			if (!archivesAsFiles)
 			{
 				// Get the base archive first
-				BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(newItem);
+				BaseArchive archive = FileTools.CreateArchiveFromExistingInput(newItem);
 
 				// Now get all extracted items from the archive
 				if (archive != null)
@@ -3690,7 +3690,7 @@ namespace SabreTools.Library.DatFiles
 					List<string> empties = new List<string>();
 
 					// Get the base archive first
-					BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(newItem);
+					BaseArchive archive = FileTools.CreateArchiveFromExistingInput(newItem);
 
 					// Now get all blank folders from the archive
 					if (archive != null)
@@ -4207,7 +4207,7 @@ namespace SabreTools.Library.DatFiles
 			bool usedInternally = false;
 
 			// Get the required scanning level for the file
-			ArchiveTools.GetInternalExternalProcess(file, archiveScanLevel, out bool shouldExternalProcess, out bool shouldInternalProcess);
+			FileTools.GetInternalExternalProcess(file, archiveScanLevel, out bool shouldExternalProcess, out bool shouldInternalProcess);
 
 			// If we're supposed to scan the file externally
 			if (shouldExternalProcess)
@@ -4231,7 +4231,7 @@ namespace SabreTools.Library.DatFiles
 				bool isTorrentGzip = tgz.IsTorrent();
 
 				// Get the base archive first
-				BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(file);
+				BaseArchive archive = FileTools.CreateArchiveFromExistingInput(file);
 
 				// Now get all extracted items from the archive
 				if (archive != null)
@@ -4360,7 +4360,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(file);
+					BaseArchive archive = FileTools.CreateArchiveFromExistingInput(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
@@ -4388,7 +4388,7 @@ namespace SabreTools.Library.DatFiles
 				foreach (DatItem item in dupes)
 				{
 					// Get the output archive, if possible
-					BaseArchive outputArchive = ArchiveTools.CreateArchiveFromOutputFormat(outputFormat);
+					BaseArchive outputArchive = FileTools.CreateArchiveFromOutputFormat(outputFormat);
 
 					// Now rebuild to the output file
 					outputArchive.Write(fileStream, outDir, (Rom)item, date: date, romba: romba);
@@ -4442,7 +4442,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(file);
+					BaseArchive archive = FileTools.CreateArchiveFromExistingInput(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
@@ -4475,7 +4475,7 @@ namespace SabreTools.Library.DatFiles
 				Globals.Logger.User("No matches found for '{0}', rebuilding accordingly from inverse flag...", Style.GetFileName(datItem.Name));
 
 				// Get the output archive, if possible
-				BaseArchive outputArchive = ArchiveTools.CreateArchiveFromOutputFormat(outputFormat);
+				BaseArchive outputArchive = FileTools.CreateArchiveFromOutputFormat(outputFormat);
 
 				// Now rebuild to the output file
 				if (outputArchive == null)
@@ -4532,7 +4532,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(file);
+					BaseArchive archive = FileTools.CreateArchiveFromExistingInput(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
@@ -4592,7 +4592,7 @@ namespace SabreTools.Library.DatFiles
 								bool eitherSuccess = false;
 
 								// Get the output archive, if possible
-								BaseArchive outputArchive = ArchiveTools.CreateArchiveFromOutputFormat(outputFormat);
+								BaseArchive outputArchive = FileTools.CreateArchiveFromOutputFormat(outputFormat);
 
 								// Now rebuild to the output file
 								eitherSuccess |= outputArchive.Write(transformStream, outDir, (Rom)item, date: date, romba: romba);
