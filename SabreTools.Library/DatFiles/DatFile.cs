@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 
 using SabreTools.Library.Data;
+using SabreTools.Library.FileTypes;
 using SabreTools.Library.Items;
 using SabreTools.Library.Skippers;
 using SabreTools.Library.Tools;
@@ -3648,15 +3649,13 @@ namespace SabreTools.Library.DatFiles
 			// If we don't have archives as files, try to scan the file as an archive
 			if (!archivesAsFiles)
 			{
-				// If all deep hash skip flags are set, do a quickscan
-				if (omitFromScan == Hash.SecureHashes)
+				// Get the base archive first
+				BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(newItem);
+
+				// Now get all extracted items from the archive
+				if (archive != null)
 				{
-					extracted = ArchiveTools.GetArchiveFileInfo(newItem, date: addDate);
-				}
-				// Otherwise, get the list with whatever hashes are wanted
-				else
-				{
-					extracted = ArchiveTools.GetExtendedArchiveFileInfo(newItem, omitFromScan: omitFromScan, date: addDate);
+					extracted = archive.GetArchiveFileInfo(omitFromScan: omitFromScan, date: addDate);
 				}
 			}
 
@@ -3687,7 +3686,18 @@ namespace SabreTools.Library.DatFiles
 				// Then, if we're looking for blanks, get all of the blank folders and add them
 				if (addBlanks)
 				{
-					List<string> empties = ArchiveTools.GetEmptyFoldersInArchive(newItem);
+					List<string> empties = new List<string>();
+
+					// Get the base archive first
+					BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(newItem);
+
+					// Now get all blank folders from the archive
+					if (archive != null)
+					{
+						empties = archive.GetEmptyFolders();
+					}
+					
+					// Add add all of the found empties to the DAT
 					Parallel.ForEach(empties, Globals.ParallelOptions, empty =>
 					{
 						Rom emptyRom = new Rom(Path.Combine(empty, "_"), newItem, omitFromScan);
@@ -4211,22 +4221,20 @@ namespace SabreTools.Library.DatFiles
 			if (shouldInternalProcess)
 			{
 				// Create an empty list of Roms for archive entries
-				List<Rom> entries = new List<Rom>();
+				List<Rom> entries = null;
 				usedInternally = true;
 
 				// Get the TGZ status for later
 				bool isTorrentGzip = (ArchiveTools.GetTorrentGZFileInfo(file) != null);
 
-				// If we're in quickscan, use the header information
-				if (quickScan)
-				{
-					entries = ArchiveTools.GetArchiveFileInfo(file, date: date);
-				}
-				// Otherwise get the deeper information
-				else
+				// Get the base archive first
+				BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(file);
+
+				// Now get all extracted items from the archive
+				if (archive != null)
 				{
 					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-					entries = ArchiveTools.GetExtendedArchiveFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), date: date);
+					entries = archive.GetArchiveFileInfo(omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), date: date);
 				}
 
 				// If the entries list is null, we encountered an error and should scan exteranlly
@@ -4347,7 +4355,11 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					(fileStream, realName) = ArchiveTools.ExtractStream(file, datItem.Name);
+					BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(file);
+					if (archive != null)
+					{
+						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
+					}
 				}
 				// Otherwise, just open the filestream
 				else
@@ -4370,31 +4382,11 @@ namespace SabreTools.Library.DatFiles
 				// Now loop through the list and rebuild accordingly
 				foreach (DatItem item in dupes)
 				{
-					switch (outputFormat)
-					{
-						case OutputFormat.Folder:
-							rebuilt &= ArchiveTools.WriteFile(fileStream, outDir, item, date: date, overwrite: true);
-							break;
-						case OutputFormat.TapeArchive:
-							rebuilt &= ArchiveTools.WriteTAR(fileStream, outDir, (Rom)item, date: date);
-							break;
-						case OutputFormat.Torrent7Zip:
-							rebuilt &= ArchiveTools.WriteTorrent7Zip(fileStream, outDir, (Rom)item, date: date);
-							break;
-						case OutputFormat.TorrentGzip:
-							rebuilt &= ArchiveTools.WriteTorrentGZ(fileStream, outDir, romba);
-							break;
-						case OutputFormat.TorrentLrzip:
-							break;
-						case OutputFormat.TorrentRar:
-							break;
-						case OutputFormat.TorrentXZ:
-							rebuilt &= ArchiveTools.WriteTorrentXZ(fileStream, outDir, (Rom)item, date: date);
-							break;
-						case OutputFormat.TorrentZip:
-							rebuilt &= ArchiveTools.WriteTorrentZip(fileStream, outDir, (Rom)item, date: date);
-							break;
-					}
+					// Get the output archive, if possible
+					BaseArchive outputArchive = ArchiveTools.CreateArchiveFromOutputFormat(outputFormat);
+
+					// Now rebuild to the output file
+					outputArchive.Write(fileStream, outDir, (Rom)item, date: date, romba: romba);
 				}
 
 				// Close the input stream
@@ -4443,7 +4435,11 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					(fileStream, realName) = ArchiveTools.ExtractStream(file, datItem.Name);
+					BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(file);
+					if (archive != null)
+					{
+						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
+					}
 				}
 				// Otherwise, just open the filestream
 				else
@@ -4471,63 +4467,48 @@ namespace SabreTools.Library.DatFiles
 
 				Globals.Logger.User("No matches found for '{0}', rebuilding accordingly from inverse flag...", Style.GetFileName(datItem.Name));
 
+				// Get the output archive, if possible
+				BaseArchive outputArchive = ArchiveTools.CreateArchiveFromOutputFormat(outputFormat);
+
 				// Now rebuild to the output file
-				switch (outputFormat)
+				if (outputArchive == null)
 				{
-					case OutputFormat.Folder:
-						string outfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(item.MachineName), item.Name);
+					string outfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(item.MachineName), item.Name);
 
-						// Make sure the output folder is created
-						Directory.CreateDirectory(Path.GetDirectoryName(outfile));
+					// Make sure the output folder is created
+					Directory.CreateDirectory(Path.GetDirectoryName(outfile));
 
-						// Now copy the file over
-						try
+					// Now copy the file over
+					try
+					{
+						FileStream writeStream = FileTools.TryCreate(outfile);
+
+						// Copy the input stream to the output
+						int bufferSize = 4096 * 128;
+						byte[] ibuffer = new byte[bufferSize];
+						int ilen;
+						while ((ilen = fileStream.Read(ibuffer, 0, bufferSize)) > 0)
 						{
-							FileStream writeStream = FileTools.TryCreate(outfile);
-
-							// Copy the input stream to the output
-							int bufferSize = 4096 * 128;
-							byte[] ibuffer = new byte[bufferSize];
-							int ilen;
-							while ((ilen = fileStream.Read(ibuffer, 0, bufferSize)) > 0)
-							{
-								writeStream.Write(ibuffer, 0, ilen);
-								writeStream.Flush();
-							}
-							writeStream.Dispose();
-
-							if (date && !String.IsNullOrEmpty(item.Date))
-							{
-								File.SetCreationTime(outfile, DateTime.Parse(item.Date));
-							}
-
-							rebuilt &= true;
+							writeStream.Write(ibuffer, 0, ilen);
+							writeStream.Flush();
 						}
-						catch
+						writeStream.Dispose();
+
+						if (date && !String.IsNullOrEmpty(item.Date))
 						{
-							rebuilt &= false;
+							File.SetCreationTime(outfile, DateTime.Parse(item.Date));
 						}
 
-						break;
-					case OutputFormat.TapeArchive:
-						rebuilt &= ArchiveTools.WriteTAR(fileStream, outDir, item, date: date);
-						break;
-					case OutputFormat.Torrent7Zip:
-						rebuilt &= ArchiveTools.WriteTorrent7Zip(fileStream, outDir, item, date: date);
-						break;
-					case OutputFormat.TorrentGzip:
-						rebuilt &= ArchiveTools.WriteTorrentGZ(fileStream, outDir, romba);
-						break;
-					case OutputFormat.TorrentLrzip:
-						break;
-					case OutputFormat.TorrentRar:
-						break;
-					case OutputFormat.TorrentXZ:
-						rebuilt &= ArchiveTools.WriteTorrentXZ(fileStream, outDir, item, date: date);
-						break;
-					case OutputFormat.TorrentZip:
-						rebuilt &= ArchiveTools.WriteTorrentZip(fileStream, outDir, item, date: date);
-						break;
+						rebuilt &= true;
+					}
+					catch
+					{
+						rebuilt &= false;
+					}
+				}
+				else
+				{
+					rebuilt &= outputArchive.Write(fileStream, outDir, item, date: date, romba: romba);
 				}
 
 				// Close the input stream
@@ -4544,7 +4525,11 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					(fileStream, realName) = ArchiveTools.ExtractStream(file, datItem.Name);
+					BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(file);
+					if (archive != null)
+					{
+						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
+					}
 				}
 				// Otherwise, just open the filestream
 				else
@@ -4598,37 +4583,13 @@ namespace SabreTools.Library.DatFiles
 
 								// If either copy succeeds, then we want to set rebuilt to true
 								bool eitherSuccess = false;
-								switch (outputFormat)
-								{
-									case OutputFormat.Folder:
-										eitherSuccess |= ArchiveTools.WriteFile(transformStream, outDir, item, date: date, overwrite: true);
-										eitherSuccess |= ArchiveTools.WriteFile(fileStream, outDir, datItem, date: date, overwrite: true);
-										break;
-									case OutputFormat.TapeArchive:
-										eitherSuccess |= ArchiveTools.WriteTAR(transformStream, outDir, (Rom)item, date: date);
-										eitherSuccess |= ArchiveTools.WriteTAR(fileStream, outDir, (Rom)datItem, date: date);
-										break;
-									case OutputFormat.Torrent7Zip:
-										eitherSuccess |= ArchiveTools.WriteTorrent7Zip(transformStream, outDir, (Rom)item, date: date);
-										eitherSuccess |= ArchiveTools.WriteTorrent7Zip(fileStream, outDir, (Rom)datItem, date: date);
-										break;
-									case OutputFormat.TorrentGzip:
-										eitherSuccess |= ArchiveTools.WriteTorrentGZ(transformStream, outDir, romba);
-										eitherSuccess |= ArchiveTools.WriteTorrentGZ(fileStream, outDir, romba);
-										break;
-									case OutputFormat.TorrentLrzip:
-										break;
-									case OutputFormat.TorrentRar:
-										break;
-									case OutputFormat.TorrentXZ:
-										eitherSuccess |= ArchiveTools.WriteTorrentXZ(transformStream, outDir, (Rom)item, date: date);
-										eitherSuccess |= ArchiveTools.WriteTorrentXZ(fileStream, outDir, (Rom)datItem, date: date);
-										break;
-									case OutputFormat.TorrentZip:
-										eitherSuccess |= ArchiveTools.WriteTorrentZip(transformStream, outDir, (Rom)item, date: date);
-										eitherSuccess |= ArchiveTools.WriteTorrentZip(fileStream, outDir, (Rom)datItem, date: date);
-										break;
-								}
+
+								// Get the output archive, if possible
+								BaseArchive outputArchive = ArchiveTools.CreateArchiveFromOutputFormat(outputFormat);
+
+								// Now rebuild to the output file
+								eitherSuccess |= outputArchive.Write(transformStream, outDir, (Rom)item, date: date, romba: romba);
+								eitherSuccess |= outputArchive.Write(fileStream, outDir, (Rom)datItem, date: date, romba: romba);
 
 								// Now add the success of either rebuild
 								rebuilt &= eitherSuccess;

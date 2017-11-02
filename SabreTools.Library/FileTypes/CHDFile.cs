@@ -11,7 +11,7 @@ using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
 
-namespace SabreTools.Library.External
+namespace SabreTools.Library.FileTypes
 {
 	/// <summary>
 	/// This is code adapted from chd.h and chd.cpp in MAME

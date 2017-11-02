@@ -130,7 +130,7 @@
     <Compile Include="DatFiles\SabreDat.cs" />
     <Compile Include="DatFiles\SeparatedValue.cs" />
     <Compile Include="DatFiles\SoftwareList.cs" />
-    <Compile Include="External\CHDFile.cs" />
+    <Compile Include="FileTypes\CHDFile.cs" />
     <Compile Include="External\CoreRarArchive.cs" />
     <Compile Include="External\NaturalSort\NaturalComparer.cs" />
     <Compile Include="External\NaturalSort\NaturalReversedComparer.cs" />
@@ -150,6 +150,15 @@
     <Compile Include="External\Zlib\ZlibCodec.cs" />
     <Compile Include="External\Zlib\ZlibConstants.cs" />
     <Compile Include="External\Zlib\ZlibStream.cs" />
+    <Compile Include="FileTypes\BaseArchive.cs" />
+    <Compile Include="FileTypes\Folder.cs" />
+    <Compile Include="FileTypes\TorrentGZipArchive.cs" />
+    <Compile Include="FileTypes\TorrentLRZArchive.cs" />
+    <Compile Include="FileTypes\TorrentRARArchive.cs" />
+    <Compile Include="FileTypes\TorrentSevenZipArchive.cs" />
+    <Compile Include="FileTypes\TorrentTarArchive.cs" />
+    <Compile Include="FileTypes\TorrentXZArchive.cs" />
+    <Compile Include="FileTypes\TorrentZipArchive.cs" />
     <Compile Include="Items\Archive.cs" />
     <Compile Include="Items\BiosSet.cs" />
     <Compile Include="DatFiles\DatFile.cs" />

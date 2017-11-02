@@ -555,7 +555,7 @@ Options:
 			format but with custom header information. This is currently unused
 			by any major application.
 			
-		-txz				Enable Torrent XZ output
+		-txz				Enable Torrent XZ output [UNSUPPORTED]
 			Instead of outputting files to folder, files will be rebuilt to
 			Torrent XZ (TXZ) files. This format is based on the LZMA container
 			format XZ, but with custom header information. This is currently
@@ -703,7 +703,7 @@ Options:
 			format but with custom header information. This is currently unused
 			by any major application.
 			
-		-txz				Enable Torrent XZ output
+		-txz				Enable Torrent XZ output [UNSUPPORTED]
 			Instead of outputting files to folder, files will be rebuilt to
 			Torrent XZ (TXZ) files. This format is based on the LZMA container
 			format XZ, but with custom header information. This is currently
