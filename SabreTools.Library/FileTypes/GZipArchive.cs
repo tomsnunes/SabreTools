@@ -216,10 +216,9 @@ namespace SabreTools.Library.FileTypes
 					Rom tempRom = new Rom(gamename, gamename, omitFromScan);
 					BinaryReader br = new BinaryReader(FileTools.TryOpenRead(_filename));
 					br.BaseStream.Seek(-8, SeekOrigin.End);
-					byte[] headercrc = br.ReadBytes(4);
-					tempRom.CRC = BitConverter.ToString(headercrc.Reverse().ToArray()).Replace("-", string.Empty).ToLowerInvariant();
-					byte[] headersize = br.ReadBytes(4);
-					tempRom.Size = BitConverter.ToInt32(headersize.Reverse().ToArray(), 0);
+					byte[] headercrc = br.ReadBytesReverse(4);
+					tempRom.CRC = Style.ByteArrayToString(headercrc);
+					tempRom.Size = br.ReadInt32Reverse();
 					br.Dispose();
 
 					found.Add(tempRom);
@@ -387,8 +386,8 @@ namespace SabreTools.Library.FileTypes
 			}
 
 			// Now convert the data and get the right position
-			string gzmd5 = BitConverter.ToString(headermd5).Replace("-", string.Empty);
-			string gzcrc = BitConverter.ToString(headercrc).Replace("-", string.Empty);
+			string gzmd5 = Style.ByteArrayToString(headermd5);
+			string gzcrc = Style.ByteArrayToString(headercrc);
 			long extractedsize = (long)headersz;
 
 			Rom rom = new Rom

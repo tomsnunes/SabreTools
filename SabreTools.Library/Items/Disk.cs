@@ -1,6 +1,7 @@
-﻿using System;
+﻿using System.Linq;
 
 using SabreTools.Library.Data;
+using SabreTools.Library.Tools;
 
 namespace SabreTools.Library.Items
 {
@@ -12,12 +13,12 @@ namespace SabreTools.Library.Items
 		#region Private instance variables
 
 		// Disk information
-		protected string _md5;
-		protected string _sha1;
-		protected string _sha256;
-		protected string _sha384;
-		protected string _sha512;
-		protected ItemStatus _itemStatus;
+		private byte[] _md5; // 16 bytes
+		private byte[] _sha1; // 20 bytes
+		private byte[] _sha256; // 32 bytes
+		private byte[] _sha384; // 48 bytes
+		private byte[] _sha512; // 64 bytes
+		private ItemStatus _itemStatus;
 
 		#endregion
 
@@ -26,28 +27,28 @@ namespace SabreTools.Library.Items
 		// Disk information
 		public string MD5
 		{
-			get { return _md5; }
-			set { _md5 = value; }
+			get { return _md5.IsNullOrEmpty() ? null : Style.ByteArrayToString(_md5); }
+			set { _md5 = Style.StringToByteArray(value); }
 		}
 		public string SHA1
 		{
-			get { return _sha1; }
-			set { _sha1 = value; }
+			get { return _sha1.IsNullOrEmpty() ? null : Style.ByteArrayToString(_sha1); }
+			set { _sha1 = Style.StringToByteArray(value); }
 		}
 		public string SHA256
 		{
-			get { return _sha256; }
-			set { _sha256 = value; }
+			get { return _sha256.IsNullOrEmpty() ? null : Style.ByteArrayToString(_sha256); }
+			set { _sha256 = Style.StringToByteArray(value); }
 		}
 		public string SHA384
 		{
-			get { return _sha384; }
-			set { _sha384 = value; }
+			get { return _sha384.IsNullOrEmpty() ? null : Style.ByteArrayToString(_sha384); }
+			set { _sha384 = Style.StringToByteArray(value); }
 		}
 		public string SHA512
 		{
-			get { return _sha512; }
-			set { _sha512 = value; }
+			get { return _sha512.IsNullOrEmpty() ? null : Style.ByteArrayToString(_sha512); }
+			set { _sha512 = Style.StringToByteArray(value); }
 		}
 		public ItemStatus ItemStatus
 		{
@@ -111,11 +112,11 @@ namespace SabreTools.Library.Items
 				SourceID = this.SourceID,
 				Source = this.Source,
 
-				MD5 = this.MD5,
-				SHA1 = this.SHA1,
-				SHA256 = this.SHA256,
-				SHA384 = this.SHA384,
-				SHA512 = this.SHA512,
+				_md5 = this._md5,
+				_sha1 = this._sha1,
+				_sha256 = this._sha256,
+				_sha384 = this._sha384,
+				_sha512 = this._sha512,
 				ItemStatus = this.ItemStatus,
 			};
 		}
@@ -144,19 +145,19 @@ namespace SabreTools.Library.Items
 			}
 
 			// If we can determine that the disks have no non-empty hashes in common, we return false
-			if ((String.IsNullOrEmpty(_md5) || String.IsNullOrEmpty(newOther.MD5))
-				&& (String.IsNullOrEmpty(_sha1) || String.IsNullOrEmpty(newOther.SHA1))
-				&& (String.IsNullOrEmpty(_sha256) || String.IsNullOrEmpty(newOther.SHA256))
-				&& (String.IsNullOrEmpty(_sha384) || String.IsNullOrEmpty(newOther.SHA384))
-				&& (String.IsNullOrEmpty(_sha512) || String.IsNullOrEmpty(newOther.SHA512)))
+			if ((this._md5.IsNullOrEmpty() || newOther._md5.IsNullOrEmpty())
+				&& (this._sha1.IsNullOrEmpty() || newOther._sha1.IsNullOrEmpty())
+				&& (this._sha256.IsNullOrEmpty() || newOther._sha256.IsNullOrEmpty())
+				&& (this._sha384.IsNullOrEmpty() || newOther._sha384.IsNullOrEmpty())
+				&& (this._sha512.IsNullOrEmpty() || newOther._sha512.IsNullOrEmpty()))
 			{
 				dupefound = false;
 			}
-			else if (((String.IsNullOrEmpty(_md5) || String.IsNullOrEmpty(newOther.MD5)) || this.MD5 == newOther.MD5)
-				&& ((String.IsNullOrEmpty(this.SHA1) || String.IsNullOrEmpty(newOther.SHA1)) || this.SHA1 == newOther.SHA1)
-				&& ((String.IsNullOrEmpty(this.SHA256) || String.IsNullOrEmpty(newOther.SHA256)) || this.SHA256 == newOther.SHA256)
-				&& ((String.IsNullOrEmpty(this.SHA384) || String.IsNullOrEmpty(newOther.SHA384)) || this.SHA384 == newOther.SHA384)
-				&& ((String.IsNullOrEmpty(this.SHA512) || String.IsNullOrEmpty(newOther.SHA512)) || this.SHA256 == newOther.SHA512))
+			else if (((this._md5.IsNullOrEmpty() || newOther._md5.IsNullOrEmpty()) || Enumerable.SequenceEqual(this._md5, newOther._md5))
+				&& ((this._sha1.IsNullOrEmpty() || newOther._sha1.IsNullOrEmpty()) || Enumerable.SequenceEqual(this._sha1, newOther._sha1))
+				&& ((this._sha256.IsNullOrEmpty() || newOther._sha256.IsNullOrEmpty()) || Enumerable.SequenceEqual(this._sha256, newOther._sha256))
+				&& ((this._sha384.IsNullOrEmpty() || newOther._sha384.IsNullOrEmpty()) || Enumerable.SequenceEqual(this._sha384, newOther._sha384))
+				&& ((this._sha512.IsNullOrEmpty() || newOther._sha512.IsNullOrEmpty()) || Enumerable.SequenceEqual(this._sha512, newOther._sha512)))
 			{
 				dupefound = true;
 			}
