@@ -3614,7 +3614,8 @@ namespace SabreTools.Library.DatFiles
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (Romba)
 			{
-				Rom rom = ArchiveTools.GetTorrentGZFileInfo(item);
+				GZipArchive archive = new GZipArchive(item);
+				Rom rom = archive.GetTorrentGZFileInfo();
 
 				// If the rom is valid, write it out
 				if (rom != null && rom.Name != null)
@@ -4014,7 +4015,8 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// If we have a path, we want to try to get the rom information
-				Rom fileinfo = ArchiveTools.GetTorrentGZFileInfo(foundpath);
+				GZipArchive archive = new GZipArchive(foundpath);
+				Rom fileinfo = archive.GetTorrentGZFileInfo();
 
 				// If the file information is null, then we continue
 				if (fileinfo == null)
@@ -4225,7 +4227,8 @@ namespace SabreTools.Library.DatFiles
 				usedInternally = true;
 
 				// Get the TGZ status for later
-				bool isTorrentGzip = (ArchiveTools.GetTorrentGZFileInfo(file) != null);
+				GZipArchive tgz = new GZipArchive(file);
+				bool isTorrentGzip = tgz.IsTorrent();
 
 				// Get the base archive first
 				BaseArchive archive = ArchiveTools.CreateArchiveFromExistingInput(file);
@@ -4319,7 +4322,9 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// If we have a very specifc TGZ->TGZ case, just copy it accordingly
-				if (isZip == false && ArchiveTools.GetTorrentGZFileInfo(file) != null && outputFormat == OutputFormat.TorrentGzip)
+				GZipArchive tgz = new GZipArchive(file);
+				Rom rom = tgz.GetTorrentGZFileInfo();
+				if (isZip == false && rom != null && outputFormat == OutputFormat.TorrentGzip)
 				{
 					// Get the proper output path
 					if (romba)
@@ -4399,7 +4404,9 @@ namespace SabreTools.Library.DatFiles
 				string machinename = null;
 
 				// If we have a very specifc TGZ->TGZ case, just copy it accordingly
-				if (isZip == false && ArchiveTools.GetTorrentGZFileInfo(file) != null && outputFormat == OutputFormat.TorrentGzip)
+				GZipArchive tgz = new GZipArchive(file);
+				Rom rom = tgz.GetTorrentGZFileInfo();
+				if (isZip == false && rom != null && outputFormat == OutputFormat.TorrentGzip)
 				{
 					// Get the proper output path
 					if (romba)
@@ -4674,7 +4681,8 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// If we have a path, we want to try to get the rom information
-				Rom fileinfo = ArchiveTools.GetTorrentGZFileInfo(foundpath);
+				GZipArchive tgz = new GZipArchive(foundpath);
+				Rom fileinfo = tgz.GetTorrentGZFileInfo();
 
 				// If the file information is null, then we continue
 				if (fileinfo == null)

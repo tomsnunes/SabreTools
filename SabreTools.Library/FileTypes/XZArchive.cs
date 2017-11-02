@@ -111,6 +111,14 @@ namespace SabreTools.Library.FileTypes
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Check whether the input file is a standardized format
+		/// </summary>
+		public override bool IsTorrent()
+		{
+			throw new NotImplementedException();
+		}
+
 		#endregion
 
 		#region Writing

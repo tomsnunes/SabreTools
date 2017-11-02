@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using SabreTools.Library.Data;
 using SabreTools.Library.Items;
@@ -198,7 +199,7 @@ namespace SabreTools.Library.FileTypes
 			List<Rom> found = new List<Rom>();
 			string gamename = Path.GetFileNameWithoutExtension(_filename);
 
-			Rom possibleTgz = ArchiveTools.GetTorrentGZFileInfo(_filename);
+			Rom possibleTgz = GetTorrentGZFileInfo();
 
 			// If it was, then add it to the outputs and continue
 			if (possibleTgz != null && possibleTgz.Name != null)
@@ -253,6 +254,156 @@ namespace SabreTools.Library.FileTypes
 		{
 			// GZip files don't contain directories
 			return new List<string>();
+		}
+
+		/// <summary>
+		/// Check whether the input file is a standardized format
+		/// </summary>
+		public override bool IsTorrent()
+		{
+			// Check for the file existing first
+			if (!File.Exists(_filename))
+			{
+				return false;
+			}
+
+			string datum = Path.GetFileName(_filename).ToLowerInvariant();
+			long filesize = new FileInfo(_filename).Length;
+
+			// If we have the romba depot files, just skip them gracefully
+			if (datum == ".romba_size" || datum == ".romba_size.backup")
+			{
+				Globals.Logger.Verbose("Romba depot file found, skipping: {0}", _filename);
+				return false;
+			}
+
+			// Check if the name is the right length
+			if (!Regex.IsMatch(datum, @"^[0-9a-f]{" + Constants.SHA1Length + @"}\.gz")) // TODO: When updating to SHA-256, this needs to update to Constants.SHA256Length
+			{
+				Globals.Logger.Warning("Non SHA-1 filename found, skipping: '{0}'", Path.GetFullPath(_filename));
+				return false;
+			}
+
+			// Check if the file is at least the minimum length
+			if (filesize < 40 /* bytes */)
+			{
+				Globals.Logger.Warning("Possibly corrupt file '{0}' with size {1}", Path.GetFullPath(_filename), Style.GetBytesReadable(filesize));
+				return false;
+			}
+
+			// Get the Romba-specific header data
+			byte[] header; // Get preamble header for checking
+			byte[] headermd5; // MD5
+			byte[] headercrc; // CRC
+			ulong headersz; // Int64 size
+			BinaryReader br = new BinaryReader(FileTools.TryOpenRead(_filename));
+			header = br.ReadBytes(12);
+			headermd5 = br.ReadBytes(16);
+			headercrc = br.ReadBytes(4);
+			headersz = br.ReadUInt64();
+			br.Dispose();
+
+			// If the header is not correct, return a blank rom
+			bool correct = true;
+			for (int i = 0; i < header.Length; i++)
+			{
+				// This is a temp fix to ignore the modification time and OS until romba can be fixed
+				if (i == 4 || i == 5 || i == 6 || i == 7 || i == 9)
+				{
+					continue;
+				}
+				correct &= (header[i] == Constants.TorrentGZHeader[i]);
+			}
+			if (!correct)
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Retrieve file information for a single torrent GZ file
+		/// </summary>
+		/// <returns>Populated DatItem object if success, empty one on error</returns>
+		public Rom GetTorrentGZFileInfo()
+		{
+			// Check for the file existing first
+			if (!File.Exists(_filename))
+			{
+				return null;
+			}
+
+			string datum = Path.GetFileName(_filename).ToLowerInvariant();
+			long filesize = new FileInfo(_filename).Length;
+
+			// If we have the romba depot files, just skip them gracefully
+			if (datum == ".romba_size" || datum == ".romba_size.backup")
+			{
+				Globals.Logger.Verbose("Romba depot file found, skipping: {0}", _filename);
+				return null;
+			}
+
+			// Check if the name is the right length
+			if (!Regex.IsMatch(datum, @"^[0-9a-f]{" + Constants.SHA1Length + @"}\.gz")) // TODO: When updating to SHA-256, this needs to update to Constants.SHA256Length
+			{
+				Globals.Logger.Warning("Non SHA-1 filename found, skipping: '{0}'", Path.GetFullPath(_filename));
+				return null;
+			}
+
+			// Check if the file is at least the minimum length
+			if (filesize < 40 /* bytes */)
+			{
+				Globals.Logger.Warning("Possibly corrupt file '{0}' with size {1}", Path.GetFullPath(_filename), Style.GetBytesReadable(filesize));
+				return null;
+			}
+
+			// Get the Romba-specific header data
+			byte[] header; // Get preamble header for checking
+			byte[] headermd5; // MD5
+			byte[] headercrc; // CRC
+			ulong headersz; // Int64 size
+			BinaryReader br = new BinaryReader(FileTools.TryOpenRead(_filename));
+			header = br.ReadBytes(12);
+			headermd5 = br.ReadBytes(16);
+			headercrc = br.ReadBytes(4);
+			headersz = br.ReadUInt64();
+			br.Dispose();
+
+			// If the header is not correct, return a blank rom
+			bool correct = true;
+			for (int i = 0; i < header.Length; i++)
+			{
+				// This is a temp fix to ignore the modification time and OS until romba can be fixed
+				if (i == 4 || i == 5 || i == 6 || i == 7 || i == 9)
+				{
+					continue;
+				}
+				correct &= (header[i] == Constants.TorrentGZHeader[i]);
+			}
+			if (!correct)
+			{
+				return null;
+			}
+
+			// Now convert the data and get the right position
+			string gzmd5 = BitConverter.ToString(headermd5).Replace("-", string.Empty);
+			string gzcrc = BitConverter.ToString(headercrc).Replace("-", string.Empty);
+			long extractedsize = (long)headersz;
+
+			Rom rom = new Rom
+			{
+				Type = ItemType.Rom,
+				Name = Path.GetFileNameWithoutExtension(_filename).ToLowerInvariant(),
+				Size = extractedsize,
+				CRC = gzcrc.ToLowerInvariant(),
+				MD5 = gzmd5.ToLowerInvariant(),
+				SHA1 = Path.GetFileNameWithoutExtension(_filename).ToLowerInvariant(), // TODO: When updating to SHA-256, this needs to update to SHA256
+
+				MachineName = Path.GetFileNameWithoutExtension(_filename).ToLowerInvariant(),
+			};
+
+			return rom;
 		}
 
 		#endregion

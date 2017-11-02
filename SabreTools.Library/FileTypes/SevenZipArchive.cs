@@ -280,6 +280,48 @@ namespace SabreTools.Library.FileTypes
 			return empties;
 		}
 
+		/// <summary>
+		/// Check whether the input file is a standardized format
+		/// </summary>
+		/// TODO: Finish reading T7z information
+		public override bool IsTorrent()
+		{
+			bool ist7z = false;
+
+			if (File.Exists(_filename))
+			{
+				try
+				{
+					Stream fread = FileTools.TryOpenRead(_filename);
+					uint ar, offs = 0;
+					fread.Seek(0, SeekOrigin.Begin);
+					byte[] buffer = new byte[128];
+					ar = (uint)fread.Read(buffer, 0, 4 + Constants.Torrent7ZipSignature.Length + 4);
+					if (ar < (4 + Constants.Torrent7ZipSignature.Length + 4))
+					{
+						if (ar >= Constants.Torrent7ZipSignature.Length + 4)
+						{
+							ar -= (uint)(Constants.Torrent7ZipSignature.Length + 4);
+						}
+						if (ar <= Constants.Torrent7ZipHeader.Length)
+						{
+							ar = (uint)Constants.Torrent7ZipHeader.Length;
+						}
+						// memset(buffer+offs+ar,0,crcsz-ar)
+					}
+
+					fread.Dispose();
+				}
+				catch
+				{
+					Globals.Logger.Warning("File '{0}' could not be opened", _filename);
+					ist7z = false;
+				}
+			}
+
+			return ist7z;
+		}
+
 		#endregion
 
 		#region Writing

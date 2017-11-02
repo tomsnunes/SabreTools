@@ -275,6 +275,14 @@ namespace SabreTools.Library.FileTypes
 			return empties;
 		}
 
+		/// <summary>
+		/// Check whether the input file is a standardized format
+		/// </summary>
+		public override bool IsTorrent()
+		{
+			throw new NotImplementedException();
+		}
+
 		#endregion
 
 		#region Writing

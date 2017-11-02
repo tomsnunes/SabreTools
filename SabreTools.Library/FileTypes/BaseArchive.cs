@@ -90,6 +90,11 @@ namespace SabreTools.Library.FileTypes
 		/// <returns>List of empty folders in the archive</returns>
 		public abstract List<string> GetEmptyFolders();
 
+		/// <summary>
+		/// Check whether the input file is a standardized format
+		/// </summary>
+		public abstract bool IsTorrent();
+
 		#endregion
 
 		#region Writing
