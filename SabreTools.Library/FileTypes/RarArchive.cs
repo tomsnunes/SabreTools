@@ -11,6 +11,7 @@ using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
 
+using BinaryReader = System.IO.BinaryReader;
 using EndOfStreamException = System.IO.EndOfStreamException;
 using FileStream = System.IO.FileStream;
 using MemoryStream = System.IO.MemoryStream;
