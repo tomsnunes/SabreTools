@@ -8,7 +8,7 @@ using System.Xml.Schema;
 using SabreTools.Library.Data;
 using SabreTools.Library.External;
 using SabreTools.Library.FileTypes;
-using SabreTools.Library.Items;
+using SabreTools.Library.DatItems;
 using SabreTools.Library.Skippers;
 
 #if MONO

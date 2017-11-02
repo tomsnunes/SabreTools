@@ -12,7 +12,7 @@ using Alphaleonis.Win32.Filesystem;
 #endif
 using NaturalSort;
 
-namespace SabreTools.Library.Items
+namespace SabreTools.Library.DatItems
 {
 	/// <summary>
 	/// Base class for all items included in a set

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using SabreTools.Library.Data;
 
-namespace SabreTools.Library.Items
+namespace SabreTools.Library.DatItems
 {
 	/// <summary>
 	/// Represents the information specific to a set/game/machine

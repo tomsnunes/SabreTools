@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 using SabreTools.Library.Data;
-using SabreTools.Library.Items;
+using SabreTools.Library.DatItems;
 using SabreTools.Library.Tools;
 
 #if MONO

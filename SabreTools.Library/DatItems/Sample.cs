@@ -1,43 +1,21 @@
 ﻿using SabreTools.Library.Data;
 
-namespace SabreTools.Library.Items
+namespace SabreTools.Library.DatItems
 {
 	/// <summary>
-	/// Represents which BIOS(es) is associated with a set
+	/// Represents a (usually WAV-formatted) sample to be included for use in the set
 	/// </summary>
-	public class BiosSet : DatItem
+	public class Sample : DatItem
 	{
-		#region Private instance variables
-
-		private string _description;
-		private bool? _default;
-
-		#endregion
-
-		#region Publicly facing variables
-
-		public string Description
-		{
-			get { return _description; }
-			set { _description = value; }
-		}
-		public bool? Default
-		{
-			get { return _default; }
-			set { _default = value; }
-		}
-
-		#endregion
-
 		#region Constructors
 
 		/// <summary>
 		/// Create a default, empty Sample object
 		/// </summary>
-		public BiosSet()
+		public Sample()
 		{
 			_name = "";
-			_itemType = ItemType.BiosSet;
+			_itemType = ItemType.Sample;
 		}
 
 		#endregion
@@ -46,7 +24,7 @@ namespace SabreTools.Library.Items
 
 		public override object Clone()
 		{
-			return new BiosSet()
+			return new Sample()
 			{
 				Name = this.Name,
 				Type = this.Type,
@@ -80,9 +58,6 @@ namespace SabreTools.Library.Items
 				System = this.System,
 				SourceID = this.SourceID,
 				Source = this.Source,
-
-				Description = this.Description,
-				Default = this.Default,
 			};
 		}
 
@@ -92,17 +67,17 @@ namespace SabreTools.Library.Items
 
 		public override bool Equals(DatItem other)
 		{
-			// If we don't have a biosset, return false
+			// If we don't have a sample, return false
 			if (_itemType != other.Type)
 			{
 				return false;
 			}
 
-			// Otherwise, treat it as a biosset
-			BiosSet newOther = (BiosSet)other;
+			// Otherwise, treat it as a sample
+			Sample newOther = (Sample)other;
 
 			// If the archive information matches
-			return (_name == newOther.Name && _description == newOther.Description && _default == newOther.Default);
+			return (_name == newOther.Name);
 		}
 
 		#endregion

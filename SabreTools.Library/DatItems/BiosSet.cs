@@ -1,37 +1,25 @@
 ﻿using SabreTools.Library.Data;
 
-namespace SabreTools.Library.Items
+namespace SabreTools.Library.DatItems
 {
 	/// <summary>
-	/// Represents release information about a set
+	/// Represents which BIOS(es) is associated with a set
 	/// </summary>
-	public class Release : DatItem
+	public class BiosSet : DatItem
 	{
 		#region Private instance variables
 
-		private string _region;
-		private string _language;
-		private string _date;
+		private string _description;
 		private bool? _default;
 
 		#endregion
 
 		#region Publicly facing variables
 
-		public string Region
+		public string Description
 		{
-			get { return _region; }
-			set { _region = value; }
-		}
-		public string Language
-		{
-			get { return _language; }
-			set { _language = value; }
-		}
-		public string Date
-		{
-			get { return _date; }
-			set { _date = value; }
+			get { return _description; }
+			set { _description = value; }
 		}
 		public bool? Default
 		{
@@ -44,16 +32,12 @@ namespace SabreTools.Library.Items
 		#region Constructors
 
 		/// <summary>
-		/// Create a default, empty Release object
+		/// Create a default, empty Sample object
 		/// </summary>
-		public Release()
+		public BiosSet()
 		{
 			_name = "";
-			_itemType = ItemType.Release;
-			_region = "";
-			_language = "";
-			_date = "";
-			_default = null;
+			_itemType = ItemType.BiosSet;
 		}
 
 		#endregion
@@ -62,7 +46,7 @@ namespace SabreTools.Library.Items
 
 		public override object Clone()
 		{
-			return new Release()
+			return new BiosSet()
 			{
 				Name = this.Name,
 				Type = this.Type,
@@ -97,9 +81,7 @@ namespace SabreTools.Library.Items
 				SourceID = this.SourceID,
 				Source = this.Source,
 
-				Region = this.Region,
-				Language = this.Language,
-				Date = this.Date,
+				Description = this.Description,
 				Default = this.Default,
 			};
 		}
@@ -110,21 +92,17 @@ namespace SabreTools.Library.Items
 
 		public override bool Equals(DatItem other)
 		{
-			// If we don't have a release return false
+			// If we don't have a biosset, return false
 			if (_itemType != other.Type)
 			{
 				return false;
 			}
 
-			// Otherwise, treat it as a reease
-			Release newOther = (Release)other;
+			// Otherwise, treat it as a biosset
+			BiosSet newOther = (BiosSet)other;
 
 			// If the archive information matches
-			return (_name == newOther.Name
-				&& _region == newOther.Region
-				&& _language == newOther.Language
-				&& _date == newOther.Date
-				&& _default == newOther.Default);
+			return (_name == newOther.Name && _description == newOther.Description && _default == newOther.Default);
 		}
 
 		#endregion

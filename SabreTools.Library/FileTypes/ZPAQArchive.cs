@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 using SabreTools.Library.Data;
-using SabreTools.Library.Items;
+using SabreTools.Library.DatItems;
 
 #if MONO
 using System.IO;

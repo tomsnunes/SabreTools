@@ -1,7 +1,7 @@
 ﻿using System;
 
 using SabreTools.Library.Data;
-using SabreTools.Library.Items;
+using SabreTools.Library.DatItems;
 
 namespace SabreTools.Library.DatFiles
 {
