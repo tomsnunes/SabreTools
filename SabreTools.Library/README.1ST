@@ -1453,6 +1453,17 @@ users of SabreTools. Thanks to Kludge for most of these suggestions!
 
 	Short form:
 		SabreTools.exe -ss -dat=Fix.dat -tzip -out=FixDir InDir2 InDir2
+		
+-- Example 5 --
+	Remove all files found in a base set of DATs from another set. This example
+	is useful for getting ride of cross-set duplicates without touching similar
+	files in the same set.
+	
+	Long form:
+		SabreTools.exe --update --diff --against --base-dat="Path\To\Base" InDr
+		
+	Short form:
+		SabreTools.exe -ud -di -ag -bd="Path\To\Base" InDr
 
 ** Section 4.0 - Contributors
 
