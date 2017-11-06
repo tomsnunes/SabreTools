@@ -1920,7 +1920,7 @@ namespace SabreTools.Library.DatFiles
 				string interOutDir = outDir;
 				if (inplace)
 				{
-					interOutDir = Path.GetDirectoryName(path);
+					interOutDir = Path.GetDirectoryName(splitpath[1]);
 				}
 				else if (!String.IsNullOrEmpty(interOutDir))
 				{

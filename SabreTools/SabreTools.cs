@@ -100,7 +100,7 @@ namespace SabreTools
 				descAsName = false,
 				excludeOf = false,
 				hashOnly = false,
-				inplace = true,
+				inplace = false,
 				inverse = false,
 				merge = false,
 				nostore = false,
