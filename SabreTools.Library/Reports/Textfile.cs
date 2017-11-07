@@ -8,13 +8,7 @@ using System.IO;
 #else
 using Alphaleonis.Win32.Filesystem;
 
-using FileStream = System.IO.FileStream;
-using IOException = System.IO.IOException;
-using MemoryStream = System.IO.MemoryStream;
-using SearchOption = System.IO.SearchOption;
-using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
-using StreamWriter = System.IO.StreamWriter;
 #endif
 
 namespace SabreTools.Library.Reports
