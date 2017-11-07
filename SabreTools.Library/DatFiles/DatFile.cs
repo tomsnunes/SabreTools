@@ -32,9 +32,6 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents a format-agnostic DAT
 	/// </summary>
-	/// <remarks>
-	/// TODO: Make stats output standard width (HTML, without making the entire thing a table)
-	/// </remarks>
 	public class DatFile
 	{
 		#region Private instance variables

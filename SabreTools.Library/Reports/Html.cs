@@ -18,6 +18,7 @@ namespace SabreTools.Library.Reports
 	/// <summary>
 	/// HTML report format
 	/// </summary>
+	/// TODO: Make output standard width, without making the entire thing a table
 	public class Html : BaseReport
 	{
 		/// <summary>
