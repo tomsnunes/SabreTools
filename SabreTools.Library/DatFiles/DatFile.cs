@@ -24,7 +24,6 @@ using MemoryStream = System.IO.MemoryStream;
 using SearchOption = System.IO.SearchOption;
 using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
-using StreamWriter = System.IO.StreamWriter;
 #endif
 using NaturalSort;
 
