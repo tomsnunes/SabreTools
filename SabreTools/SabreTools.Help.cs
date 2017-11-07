@@ -702,6 +702,11 @@ namespace SabreTools
 				"Get statistics on all input DATs",
 				FeatureType.Flag,
 				null);
+			stats.AddFeature("all-stats", new Feature(
+				new List<string>() { "-as", "--all-stats" },
+				"Write all statistics to all available formats",
+				FeatureType.Flag,
+				null));
 			stats.AddFeature("baddump-col", new Feature(
 				new List<string>() { "-bc", "--baddump-col" },
 				"Add baddump stats to output",
