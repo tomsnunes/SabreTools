@@ -131,7 +131,7 @@ namespace SabreTools.Library.DatFiles
 					return false;
 				}
 
-				StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(true));
+				StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
 
 				// Get a properly sorted set of keys
 				List<string> keys = Keys;
