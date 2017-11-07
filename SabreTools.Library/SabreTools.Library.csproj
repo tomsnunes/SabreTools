@@ -175,6 +175,10 @@
     <Compile Include="External\SupportedFiles\ZipFile.cs" />
     <Compile Include="Help\Feature.cs" />
     <Compile Include="Help\Help.cs" />
+    <Compile Include="Reports\BaseReport.cs" />
+    <Compile Include="Reports\Html.cs" />
+    <Compile Include="Reports\SeparatedValue.cs" />
+    <Compile Include="Reports\Textfile.cs" />
     <Compile Include="Skippers\Skipper.cs" />
     <Compile Include="Skippers\SkipperRule.cs" />
     <Compile Include="Tools\InternalStopwatch.cs" />

@@ -738,8 +738,13 @@ namespace SabreTools
 				FeatureType.Flag,
 				null));
 			stats.AddFeature("tsv", new Feature(
-				new List<string>() { "-tsv", "--csv" },
+				new List<string>() { "-tsv", "--tsv" },
 				"Output in Tab-Separated Value format",
+				FeatureType.Flag,
+				null));
+			stats.AddFeature("text", new Feature(
+				new List<string>() { "-txt", "--text" },
+				"Output in generic text format",
 				FeatureType.Flag,
 				null));
 

@@ -128,7 +128,7 @@ namespace SabreTools
 			OutputFormat outputFormat = OutputFormat.Folder;
 			SkipFileType skipFileType = SkipFileType.None;
 			SplitType splitType = SplitType.None;
-			StatDatFormat statDatFormat = 0x0;
+			StatReportFormat statDatFormat = 0x0;
 			UpdateMode updateMode = UpdateMode.None;
 
 			// User inputs
@@ -293,6 +293,10 @@ namespace SabreTools
 					case "--against":
 						updateMode |= UpdateMode.DiffAgainst;
 						break;
+					case "-as":
+					case "--all-stats":
+						statDatFormat = StatReportFormat.All;
+						break;
 					case "-b":
 					case "--bare":
 						removeDateFromAutomaticName = true;
@@ -323,7 +327,7 @@ namespace SabreTools
 						break;
 					case "-csv":
 					case "--csv":
-						statDatFormat |= StatDatFormat.CSV;
+						statDatFormat |= StatReportFormat.CSV;
 						break;
 					case "-dan":
 					case "--desc-name":
@@ -391,7 +395,7 @@ namespace SabreTools
 						break;
 					case "-html":
 					case "--html":
-						statDatFormat |= StatDatFormat.HTML;
+						statDatFormat |= StatReportFormat.HTML;
 						break;
 					case "-ic":
 					case "--ignore-chd":
@@ -631,11 +635,15 @@ namespace SabreTools
 						break;
 					case "-tsv":
 					case "--tsv":
-						statDatFormat |= StatDatFormat.TSV;
+						statDatFormat |= StatReportFormat.TSV;
 						break;
 					case "-txz":
 					case "--txz":
 						outputFormat = OutputFormat.TorrentXZ;
+						break;
+					case "-txt":
+					case "--text":
+						statDatFormat |= StatReportFormat.None;
 						break;
 					case "-tzip":
 					case "--tzip":

@@ -331,9 +331,9 @@ namespace SabreTools.Library.Tools
 		/// <param name="statDatFormat">StatDatFormat to get the extension for</param>
 		/// <param name="reportName">Name of the input file to use</param>
 		/// <returns>Dictionary of output formats mapped to file names</returns>
-		public static Dictionary<StatDatFormat, string> CreateOutStatsNames(string outDir, StatDatFormat statDatFormat, string reportName, bool overwrite = true)
+		public static Dictionary<StatReportFormat, string> CreateOutStatsNames(string outDir, StatReportFormat statDatFormat, string reportName, bool overwrite = true)
 		{
-			Dictionary<StatDatFormat, string> output = new Dictionary<StatDatFormat, string>();
+			Dictionary<StatReportFormat, string> output = new Dictionary<StatReportFormat, string>();
 
 			// First try to create the output directory if we need to
 			if (!Directory.Exists(outDir))
@@ -348,21 +348,21 @@ namespace SabreTools.Library.Tools
 			}
 
 			// For each output format, get the appropriate stream writer
-			if ((statDatFormat & StatDatFormat.None) != 0)
+			if ((statDatFormat & StatReportFormat.None) != 0)
 			{
-				output.Add(StatDatFormat.None, CreateOutStatsNamesHelper(outDir, ".txt", reportName, overwrite));
+				output.Add(StatReportFormat.None, CreateOutStatsNamesHelper(outDir, ".txt", reportName, overwrite));
 			}
-			if ((statDatFormat & StatDatFormat.CSV) != 0)
+			if ((statDatFormat & StatReportFormat.CSV) != 0)
 			{
-				output.Add(StatDatFormat.CSV, CreateOutStatsNamesHelper(outDir, ".csv", reportName, overwrite));
+				output.Add(StatReportFormat.CSV, CreateOutStatsNamesHelper(outDir, ".csv", reportName, overwrite));
 			}
-			if ((statDatFormat & StatDatFormat.HTML) != 0)
+			if ((statDatFormat & StatReportFormat.HTML) != 0)
 			{
-				output.Add(StatDatFormat.HTML, CreateOutStatsNamesHelper(outDir, ".html", reportName, overwrite));
+				output.Add(StatReportFormat.HTML, CreateOutStatsNamesHelper(outDir, ".html", reportName, overwrite));
 			}
-			if ((statDatFormat & StatDatFormat.TSV) != 0)
+			if ((statDatFormat & StatReportFormat.TSV) != 0)
 			{
-				output.Add(StatDatFormat.TSV, CreateOutStatsNamesHelper(outDir, ".tsv", reportName, overwrite));
+				output.Add(StatReportFormat.TSV, CreateOutStatsNamesHelper(outDir, ".tsv", reportName, overwrite));
 			}
 
 			return output;

@@ -246,12 +246,14 @@ namespace SabreTools.Library.Data
 	/// Determine which format to output Stats to
 	/// </summary>
 	/// [Flags]
-	public enum StatDatFormat
+	public enum StatReportFormat
 	{
 		None = 0x01,
 		HTML = None << 1,
 		CSV = HTML << 1,
 		TSV = CSV << 1,
+
+		All = None | HTML | CSV | TSV,
 	}
 
 	/// <summary>

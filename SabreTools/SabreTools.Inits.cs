@@ -404,7 +404,7 @@ namespace SabreTools
 		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
 		/// <param name="statDatFormat">Set the statistics output format to use</param>
 		private static void InitStats(List<string> inputs, string filename, string outDir, bool single, bool baddumpCol, bool nodumpCol,
-			StatDatFormat statDatFormat)
+			StatReportFormat statDatFormat)
 		{
 			DatFile.OutputStats(inputs, filename, outDir, single, baddumpCol, nodumpCol, statDatFormat);
 		}

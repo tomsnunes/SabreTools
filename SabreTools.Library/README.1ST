@@ -810,6 +810,9 @@ Options:
 			- Roms that include a SHA-1
 			- Roms with Nodump status
 			
+		-as, --all-stats	Write all statistics to all available formats
+			Output all rom information to all available formats
+			
 		-bc, --baddump-col	Add statistics for baddumps to output
 			Add a new column or field for counting the number of baddumps in the
 			DAT
@@ -839,6 +842,10 @@ Options:
 			
 		-tsv, --tsv			Output in Tab-Separated Value format
 			Output all rom information in standardized TSV format
+		
+		-txt, --text		Output in generic text format
+			Output all rom information in generic text format. If no other format
+			flags are enabled, this is the default output.
 			
 	-ts, --type-split		Split DAT(s) or folder by file types (rom/disk)
 		For a DAT, or set of DATs, allow for splitting based on the types of the
