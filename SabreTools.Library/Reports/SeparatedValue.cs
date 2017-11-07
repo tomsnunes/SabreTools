@@ -75,7 +75,7 @@ namespace SabreTools.Library.Reports
 		/// <summary>
 		/// Write out the header to the stream, if any exists
 		/// </summary>
-		public override void WriteStatsHeader()
+		public override void WriteHeader()
 		{
 			_writer.Write(string.Format("\"File Name\"{0}\"Total Size\"{0}\"Games\"{0}\"Roms\"{0}\"Disks\"{0}\"# with CRC\"{0}\"# with MD5\"{0}\"# with SHA-1\"{0}\"# with SHA-256\""
 				+ (_baddumpCol ? "{0}\"BadDumps\"" : "") + (_nodumpCol ? "{0}\"Nodumps\"" : "") + "\n", _separator));
@@ -85,7 +85,7 @@ namespace SabreTools.Library.Reports
 		/// <summary>
 		/// Write out the mid-header to the stream, if any exists
 		/// </summary>
-		public override void WriteStatsMidHeader()
+		public override void WriteMidHeader()
 		{
 			// This call is a no-op for separated value formats
 		}
@@ -93,7 +93,7 @@ namespace SabreTools.Library.Reports
 		/// <summary>
 		/// Write out the separator to the stream, if any exists
 		/// </summary>
-		public override void WriteStatsMidSeparator()
+		public override void WriteMidSeparator()
 		{
 			// This call is a no-op for separated value formats
 		}
@@ -101,7 +101,7 @@ namespace SabreTools.Library.Reports
 		/// <summary>
 		/// Write out the footer-separator to the stream, if any exists
 		/// </summary>
-		public override void WriteStatsFooterSeparator()
+		public override void WriteFooterSeparator()
 		{
 			_writer.Write("\n");
 			_writer.Flush();
@@ -110,7 +110,7 @@ namespace SabreTools.Library.Reports
 		/// <summary>
 		/// Write out the footer to the stream, if any exists
 		/// </summary>
-		public override void WriteStatsFooter()
+		public override void WriteFooter()
 		{
 			// This call is a no-op for separated value formats
 		}

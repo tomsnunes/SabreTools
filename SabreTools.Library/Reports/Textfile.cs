@@ -79,7 +79,7 @@ namespace SabreTools.Library.Reports
 		/// <summary>
 		/// Write out the header to the stream, if any exists
 		/// </summary>
-		public override void WriteStatsHeader()
+		public override void WriteHeader()
 		{
 			// This call is a no-op for textfile output
 		}
@@ -87,7 +87,7 @@ namespace SabreTools.Library.Reports
 		/// <summary>
 		/// Write out the mid-header to the stream, if any exists
 		/// </summary>
-		public override void WriteStatsMidHeader()
+		public override void WriteMidHeader()
 		{
 			// This call is a no-op for textfile output
 		}
@@ -95,7 +95,7 @@ namespace SabreTools.Library.Reports
 		/// <summary>
 		/// Write out the separator to the stream, if any exists
 		/// </summary>
-		public override void WriteStatsMidSeparator()
+		public override void WriteMidSeparator()
 		{
 			// This call is a no-op for textfile output
 		}
@@ -103,7 +103,7 @@ namespace SabreTools.Library.Reports
 		/// <summary>
 		/// Write out the footer-separator to the stream, if any exists
 		/// </summary>
-		public override void WriteStatsFooterSeparator()
+		public override void WriteFooterSeparator()
 		{
 			_writer.Write("\n");
 			_writer.Flush();
@@ -112,7 +112,7 @@ namespace SabreTools.Library.Reports
 		/// <summary>
 		/// Write out the footer to the stream, if any exists
 		/// </summary>
-		public override void WriteStatsFooter()
+		public override void WriteFooter()
 		{
 			// This call is a no-op for textfile output
 		}

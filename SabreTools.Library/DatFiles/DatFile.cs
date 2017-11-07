@@ -5738,7 +5738,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Write the header, if any
-			reports.ForEach(report => report.WriteStatsHeader());
+			reports.ForEach(report => report.WriteHeader());
 
 			// Init all total variables
 			DatStats totalStats = new DatStats();
@@ -5759,7 +5759,7 @@ namespace SabreTools.Library.DatFiles
 				if (lastdir != null && thisdir != lastdir)
 				{
 					// Output separator if needed
-					reports.ForEach(report => report.WriteStatsMidSeparator());
+					reports.ForEach(report => report.WriteMidSeparator());
 
 					DatFile lastdirdat = new DatFile
 					{
@@ -5772,10 +5772,10 @@ namespace SabreTools.Library.DatFiles
 					reports.ForEach(report => report.Write(game: dirStats.GameCount));
 
 					// Write the mid-footer, if any
-					reports.ForEach(report => report.WriteStatsFooterSeparator());
+					reports.ForEach(report => report.WriteFooterSeparator());
 
 					// Write the header, if any
-					reports.ForEach(report => report.WriteStatsMidHeader());
+					reports.ForEach(report => report.WriteMidHeader());
 
 					// Reset the directory stats
 					dirStats.Reset();
@@ -5809,7 +5809,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Output the directory stats one last time
-			reports.ForEach(report => report.WriteStatsMidSeparator());
+			reports.ForEach(report => report.WriteMidSeparator());
 
 			if (single)
 			{
@@ -5825,10 +5825,10 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Write the mid-footer, if any
-			reports.ForEach(report => report.WriteStatsFooterSeparator());
+			reports.ForEach(report => report.WriteFooterSeparator());
 
 			// Write the header, if any
-			reports.ForEach(report => report.WriteStatsMidHeader());
+			reports.ForEach(report => report.WriteMidHeader());
 
 			// Reset the directory stats
 			dirStats.Reset();
@@ -5845,7 +5845,7 @@ namespace SabreTools.Library.DatFiles
 			reports.ForEach(report => report.Write(totalStats.GameCount));
 
 			// Output footer if needed
-			reports.ForEach(report => report.WriteStatsFooter());
+			reports.ForEach(report => report.WriteFooter());
 
 			Globals.Logger.User(@"
 Please check the log folder if the stats scrolled offscreen", false);

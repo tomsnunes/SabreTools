@@ -78,26 +78,26 @@ namespace SabreTools.Library.Reports
 		/// <summary>
 		/// Write out the header to the stream, if any exists
 		/// </summary>
-		public abstract void WriteStatsHeader();
+		public abstract void WriteHeader();
 
 		/// <summary>
 		/// Write out the mid-header to the stream, if any exists
 		/// </summary>
-		public abstract void WriteStatsMidHeader();
+		public abstract void WriteMidHeader();
 
 		/// <summary>
 		/// Write out the separator to the stream, if any exists
 		/// </summary>
-		public abstract void WriteStatsMidSeparator();
+		public abstract void WriteMidSeparator();
 
 		/// <summary>
 		/// Write out the footer-separator to the stream, if any exists
 		/// </summary>
-		public abstract void WriteStatsFooterSeparator();
+		public abstract void WriteFooterSeparator();
 
 		/// <summary>
 		/// Write out the footer to the stream, if any exists
 		/// </summary>
-		public abstract void WriteStatsFooter();
+		public abstract void WriteFooter();
 	}
 }
