@@ -34,9 +34,8 @@ namespace SabreTools.Library.DatFiles
 	/// </summary>
 	/// <remarks>
 	/// TODO: Make stats output standard width (HTML, without making the entire thing a table)
-	/// TODO: Stats multithreading? Either StringBuilder or locking
 	/// </remarks>
-	public partial class DatFile
+	public class DatFile
 	{
 		#region Private instance variables
 
