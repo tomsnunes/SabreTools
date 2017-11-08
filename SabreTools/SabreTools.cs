@@ -1300,25 +1300,25 @@ namespace SabreTools
 			// Split a DAT by extension
 			else if (splitByExt)
 			{
-				InitExtSplit(inputs, exta, extb, outDir, inplace);
+				InitSplit(inputs, outDir, inplace, ExternalSplitType.Extension, exta, extb, shortname, basedat);
 			}
 
 			// Split a DAT by available hashes
 			else if (splitByHash)
 			{
-				InitHashSplit(inputs, outDir, inplace);
+				InitSplit(inputs, outDir, inplace, ExternalSplitType.Hash, exta, extb, shortname, basedat);
 			}
 
 			// Split a SuperDAT by lowest available level
 			else if (splitByLevel)
 			{
-				InitLevelSplit(inputs, outDir, inplace, shortname, basedat);
+				InitSplit(inputs, outDir, inplace, ExternalSplitType.Level, exta, extb, shortname, basedat);
 			}
 
 			// Split a DAT by item type
 			else if (splitByType)
 			{
-				InitTypeSplit(inputs, outDir, inplace);
+				InitSplit(inputs, outDir, inplace, ExternalSplitType.Type, exta, extb, shortname, basedat);
 			}
 
 			// Get statistics on input files

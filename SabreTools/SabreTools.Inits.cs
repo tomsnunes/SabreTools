@@ -173,66 +173,6 @@ namespace SabreTools
 		}
 
 		/// <summary>
-		/// Wrap splitting a DAT by 2 extensions
-		/// </summary>
-		/// <param name="inputs">Input files or folders to be split</param>
-		/// <param name="exta">First extension to split on</param>
-		/// <param name="extb">Second extension to split on</param>
-		/// <param name="outDir">Output directory for the split files</param>
-		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
-		private static void InitExtSplit(List<string> inputs, List<string> exta, List<string> extb, string outDir, bool inplace)
-		{
-			// Get only files from the inputs
-			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs, appendparent: true);
-
-			// Loop over the input files
-			foreach (string file in files)
-			{
-				// Split the input filename
-				string[] splitpath = file.Split('¬');
-
-				// Create and fill the new DAT
-				DatFile datFile = new DatFile();
-				datFile.Parse(splitpath[0], 0, 0);
-
-				// Get the output directory
-				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
-
-				// Split and write the DAT
-				datFile.SplitByExtension(outDir, inplace, exta, extb);
-			}
-		}
-
-		/// <summary>
-		/// Wrap splitting a DAT by best available hashes
-		/// </summary>
-		/// <param name="inputs">List of inputs to be used</param>
-		/// <param name="outDir">Output directory for the split files</param>
-		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
-		private static void InitHashSplit(List<string> inputs, string outDir, bool inplace)
-		{
-			// Get only files from the inputs
-			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs, appendparent: true);
-
-			// Loop over the input files
-			foreach (string file in files)
-			{
-				// Split the input filename
-				string[] splitpath = file.Split('¬');
-
-				// Create and fill the new DAT
-				DatFile datFile = new DatFile();
-				datFile.Parse(splitpath[0], 0, 0);
-
-				// Get the output directory
-				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
-
-				// Split and write the DAT
-				datFile.SplitByHash(outDir, inplace);
-			}
-		}
-
-		/// <summary>
 		/// Wrap replacing headers
 		/// </summary>
 		/// <param name="inputs">Input file or folder names</param>
@@ -245,37 +185,6 @@ namespace SabreTools
 			foreach (string file in files)
 			{
 				Utilities.RestoreHeader(file, outDir);
-			}
-		}
-
-		/// <summary>
-		/// Wrap splitting a SuperDAT by lowest available level
-		/// </summary>
-		/// <param name="inputs">List of inputs to be used</param>
-		/// <param name="outDir">Output directory for the split files</param>
-		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
-		/// <param name="shortname">True if short filenames should be used, false otherwise</param>
-		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise</param>
-		private static void InitLevelSplit(List<string> inputs, string outDir, bool inplace, bool shortname, bool basedat)
-		{
-			// Get only files from the inputs
-			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs, appendparent: true);
-
-			// Loop over the input files
-			foreach (string file in files)
-			{
-				// Split the input filename
-				string[] splitpath = file.Split('¬');
-
-				// Create and fill the new DAT
-				DatFile datFile = new DatFile();
-				datFile.Parse(splitpath[0], 0, 0);
-
-				// Get the output directory
-				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
-
-				// Split and write the DAT
-				datFile.SplitByLevel(outDir, inplace, shortname, basedat);
 			}
 		}
 
@@ -335,29 +244,25 @@ namespace SabreTools
 		}
 
 		/// <summary>
-		/// Wrap getting statistics on a DAT or folder of DATs
-		/// </summary>
-		/// <param name="inputs">List of inputs to be used</param>
-		/// <param name="filename">Name of the file to output to, blank for default</param>
-		/// <param name="outDir">Output directory for the report files</param>
-		/// <param name="single">True to show individual DAT statistics, false otherwise</param>
-		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
-		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-		/// <param name="statDatFormat">Set the statistics output format to use</param>
-		private static void InitStats(List<string> inputs, string filename, string outDir, bool single, bool baddumpCol, bool nodumpCol,
-			StatReportFormat statDatFormat)
-		{
-			DatFile.OutputStats(inputs, filename, outDir, single, baddumpCol, nodumpCol, statDatFormat);
-		}
-
-		/// <summary>
-		/// Wrap splitting a DAT by item type
+		/// Wrap splitting a DAT by any known type
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
 		/// <param name="outDir">Output directory for the split files</param>
 		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
-		private static void InitTypeSplit(List<string> inputs, string outDir, bool inplace)
+		/// <param name="splitType">Type of split to perform, if any</param>
+		/// <param name="exta">First extension to split on (Extension Split only)</param>
+		/// <param name="extb">Second extension to split on (Extension Split only)</param>
+		/// <param name="shortname">True if short filenames should be used, false otherwise (Level Split only)</param>
+		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise (Level Split only)</param>
+		private static void InitSplit(List<string> inputs, string outDir, bool inplace, ExternalSplitType splitType,
+			List<string> exta, List<string> extb, bool shortname, bool basedat)
 		{
+			// If we somehow have the "none" split type, return
+			if (splitType == ExternalSplitType.None)
+			{
+				return;
+			}
+
 			// Get only files from the inputs
 			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs, appendparent: true);
 
@@ -375,8 +280,38 @@ namespace SabreTools
 				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
 
 				// Split and write the DAT
-				datFile.SplitByType(outDir, inplace);
+				switch (splitType)
+				{
+					case ExternalSplitType.Extension:
+						datFile.SplitByExtension(outDir, inplace, exta, extb);
+						break;
+					case ExternalSplitType.Hash:
+						datFile.SplitByHash(outDir, inplace);
+						break;
+					case ExternalSplitType.Level:
+						datFile.SplitByLevel(outDir, inplace, shortname, basedat);
+						break;
+					case ExternalSplitType.Type:
+						datFile.SplitByType(outDir, inplace);
+						break;
+				}
 			}
+		}
+
+		/// <summary>
+		/// Wrap getting statistics on a DAT or folder of DATs
+		/// </summary>
+		/// <param name="inputs">List of inputs to be used</param>
+		/// <param name="filename">Name of the file to output to, blank for default</param>
+		/// <param name="outDir">Output directory for the report files</param>
+		/// <param name="single">True to show individual DAT statistics, false otherwise</param>
+		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
+		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
+		/// <param name="statDatFormat">Set the statistics output format to use</param>
+		private static void InitStats(List<string> inputs, string filename, string outDir, bool single, bool baddumpCol, bool nodumpCol,
+			StatReportFormat statDatFormat)
+		{
+			DatFile.OutputStats(inputs, filename, outDir, single, baddumpCol, nodumpCol, statDatFormat);
 		}
 
 		/// <summary>

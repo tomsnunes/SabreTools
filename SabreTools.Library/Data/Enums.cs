@@ -259,6 +259,18 @@
 	}
 
 	/// <summary>
+	/// Determines how the DAT will be split on output
+	/// </summary>
+	public enum ExternalSplitType
+	{
+		None = 0,
+		Extension,
+		Hash,
+		Level,
+		Type,
+	}
+
+	/// <summary>
 	/// Determines forcemerging tag for DAT output
 	/// </summary>
 	public enum ForceMerging
