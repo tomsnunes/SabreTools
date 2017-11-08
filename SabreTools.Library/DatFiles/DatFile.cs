@@ -5583,7 +5583,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Get the outfile names
-			Dictionary<DatFormat, string> outfiles = Style.CreateOutfileNames(outDir, this, overwrite);
+			Dictionary<DatFormat, string> outfiles = CreateOutfileNames(outDir, overwrite);
 
 			try
 			{
@@ -5667,6 +5667,202 @@ namespace SabreTools.Library.DatFiles
 			return true;
 		}
 
+		/// <summary>
+		/// Generate a proper outfile name based on a DAT and output directory
+		/// </summary>
+		/// <param name="outDir">Output directory</param>
+		/// <param name="overwrite">True if we ignore existing files (default), false otherwise</param>
+		/// <returns>Dictionary of output formats mapped to file names</returns>
+		private Dictionary<DatFormat, string> CreateOutfileNames(string outDir, bool overwrite = true)
+		{
+			// Create the output dictionary
+			Dictionary<DatFormat, string> outfileNames = new Dictionary<DatFormat, string>();
+
+			// Double check the outDir for the end delim
+			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				outDir += Path.DirectorySeparatorChar;
+			}
+
+			// Get the extensions from the output type
+
+			// AttractMode
+			if ((DatFormat & DatFormat.AttractMode) != 0)
+			{
+				outfileNames.Add(DatFormat.AttractMode, CreateOutfileNamesHelper(outDir, ".txt", overwrite));
+			}
+
+			// ClrMamePro
+			if ((DatFormat & DatFormat.ClrMamePro) != 0)
+			{
+				outfileNames.Add(DatFormat.ClrMamePro, CreateOutfileNamesHelper(outDir, ".dat", overwrite));
+			};
+
+			// CSV
+			if ((DatFormat & DatFormat.CSV) != 0)
+			{
+				outfileNames.Add(DatFormat.CSV, CreateOutfileNamesHelper(outDir, ".csv", overwrite));
+			};
+
+			// DOSCenter
+			if ((DatFormat & DatFormat.DOSCenter) != 0
+				&& (DatFormat & DatFormat.ClrMamePro) == 0
+				&& (DatFormat & DatFormat.RomCenter) == 0)
+			{
+				outfileNames.Add(DatFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dat", overwrite));
+			};
+			if ((DatFormat & DatFormat.DOSCenter) != 0
+				&& ((DatFormat & DatFormat.ClrMamePro) != 0
+					|| (DatFormat & DatFormat.RomCenter) != 0))
+			{
+				outfileNames.Add(DatFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", overwrite));
+			}
+
+			//MAME Listroms
+			if ((DatFormat & DatFormat.Listroms) != 0
+				&& (DatFormat & DatFormat.AttractMode) == 0)
+			{
+				outfileNames.Add(DatFormat.Listroms, CreateOutfileNamesHelper(outDir, ".txt", overwrite));
+			}
+			if ((DatFormat & DatFormat.Listroms) != 0
+				&& (DatFormat & DatFormat.AttractMode) != 0)
+			{
+				outfileNames.Add(DatFormat.Listroms, CreateOutfileNamesHelper(outDir, ".lr.txt", overwrite));
+			}
+
+			// Logiqx XML
+			if ((DatFormat & DatFormat.Logiqx) != 0)
+			{
+				outfileNames.Add(DatFormat.Logiqx, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
+			}
+
+			// Missfile
+			if ((DatFormat & DatFormat.MissFile) != 0
+				&& (DatFormat & DatFormat.AttractMode) == 0)
+			{
+				outfileNames.Add(DatFormat.MissFile, CreateOutfileNamesHelper(outDir, ".txt", overwrite));
+			}
+			if ((DatFormat & DatFormat.MissFile) != 0
+				&& (DatFormat & DatFormat.AttractMode) != 0)
+			{
+				outfileNames.Add(DatFormat.MissFile, CreateOutfileNamesHelper(outDir, ".miss.txt", overwrite));
+			}
+
+			// OfflineList
+			if (((DatFormat & DatFormat.OfflineList) != 0)
+				&& (DatFormat & DatFormat.Logiqx) == 0
+				&& (DatFormat & DatFormat.SabreDat) == 0
+				&& (DatFormat & DatFormat.SoftwareList) == 0)
+			{
+				outfileNames.Add(DatFormat.OfflineList, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
+			}
+			if (((DatFormat & DatFormat.OfflineList) != 0
+				&& ((DatFormat & DatFormat.Logiqx) != 0
+					|| (DatFormat & DatFormat.SabreDat) != 0
+					|| (DatFormat & DatFormat.SoftwareList) != 0)))
+			{
+				outfileNames.Add(DatFormat.OfflineList, CreateOutfileNamesHelper(outDir, ".ol.xml", overwrite));
+			}
+
+			// Redump MD5
+			if ((DatFormat & DatFormat.RedumpMD5) != 0)
+			{
+				outfileNames.Add(DatFormat.RedumpMD5, CreateOutfileNamesHelper(outDir, ".md5", overwrite));
+			};
+
+			// Redump SFV
+			if ((DatFormat & DatFormat.RedumpSFV) != 0)
+			{
+				outfileNames.Add(DatFormat.RedumpSFV, CreateOutfileNamesHelper(outDir, ".sfv", overwrite));
+			};
+
+			// Redump SHA-1
+			if ((DatFormat & DatFormat.RedumpSHA1) != 0)
+			{
+				outfileNames.Add(DatFormat.RedumpSHA1, CreateOutfileNamesHelper(outDir, ".sha1", overwrite));
+			};
+
+			// Redump SHA-256
+			if ((DatFormat & DatFormat.RedumpSHA256) != 0)
+			{
+				outfileNames.Add(DatFormat.RedumpSHA256, CreateOutfileNamesHelper(outDir, ".sha256", overwrite));
+			};
+
+			// RomCenter
+			if ((DatFormat & DatFormat.RomCenter) != 0
+				&& (DatFormat & DatFormat.ClrMamePro) == 0)
+			{
+				outfileNames.Add(DatFormat.RomCenter, CreateOutfileNamesHelper(outDir, ".dat", overwrite));
+			};
+			if ((DatFormat & DatFormat.RomCenter) != 0
+				&& (DatFormat & DatFormat.ClrMamePro) != 0)
+			{
+				outfileNames.Add(DatFormat.RomCenter, CreateOutfileNamesHelper(outDir, ".rc.dat", overwrite));
+			};
+
+			// SabreDAT
+			if ((DatFormat & DatFormat.SabreDat) != 0 && (DatFormat & DatFormat.Logiqx) == 0)
+			{
+				outfileNames.Add(DatFormat.SabreDat, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
+			};
+			if ((DatFormat & DatFormat.SabreDat) != 0 && (DatFormat & DatFormat.Logiqx) != 0)
+			{
+				outfileNames.Add(DatFormat.SabreDat, CreateOutfileNamesHelper(outDir, ".sd.xml", overwrite));
+			};
+
+			// Software List
+			if ((DatFormat & DatFormat.SoftwareList) != 0
+				&& (DatFormat & DatFormat.Logiqx) == 0
+				&& (DatFormat & DatFormat.SabreDat) == 0)
+			{
+				outfileNames.Add(DatFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
+			}
+			if ((DatFormat & DatFormat.SoftwareList) != 0
+				&& ((DatFormat & DatFormat.Logiqx) != 0
+					|| (DatFormat & DatFormat.SabreDat) != 0))
+			{
+				outfileNames.Add(DatFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".sl.xml", overwrite));
+			}
+
+			// TSV
+			if ((DatFormat & DatFormat.TSV) != 0)
+			{
+				outfileNames.Add(DatFormat.TSV, CreateOutfileNamesHelper(outDir, ".tsv", overwrite));
+			};
+
+			return outfileNames;
+		}
+
+		/// <summary>
+		/// Help generating the outfile name
+		/// </summary>
+		/// <param name="outDir">Output directory</param>
+		/// <param name="extension">Extension to use for the file</param>
+		/// <param name="overwrite">True if we ignore existing files, false otherwise</param>
+		/// <returns>String containing the new filename</returns>
+		private string CreateOutfileNamesHelper(string outDir, string extension, bool overwrite)
+		{
+			string filename = (String.IsNullOrEmpty(FileName) ? Description : FileName);
+			string outfile = outDir + filename + extension;
+			outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
+				outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
+				outfile);
+			if (!overwrite)
+			{
+				int i = 1;
+				while (File.Exists(outfile))
+				{
+					outfile = outDir + filename + "_" + i + extension;
+					outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
+						outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
+						outfile);
+					i++;
+				}
+			}
+
+			return outfile;
+		}
+
 		#endregion
 
 		#endregion // Instance Methods
@@ -5701,7 +5897,7 @@ namespace SabreTools.Library.DatFiles
 			outDir = Path.GetFullPath(outDir);
 
 			// Get the dictionary of desired output report names
-			Dictionary<StatReportFormat, string> outputs = Style.CreateOutStatsNames(outDir, statDatFormat, reportName);
+			Dictionary<StatReportFormat, string> outputs = CreateOutStatsNames(outDir, statDatFormat, reportName);
 
 			// Make sure we have all files and then order them
 			List<string> files = FileTools.GetOnlyFilesFromInputs(inputs);
@@ -5849,6 +6045,80 @@ namespace SabreTools.Library.DatFiles
 
 			Globals.Logger.User(@"
 Please check the log folder if the stats scrolled offscreen", false);
+		}
+
+		/// <summary>
+		/// Get the proper extension for the stat output format
+		/// </summary>
+		/// <param name="outDir">Output path to use</param>
+		/// <param name="statDatFormat">StatDatFormat to get the extension for</param>
+		/// <param name="reportName">Name of the input file to use</param>
+		/// <returns>Dictionary of output formats mapped to file names</returns>
+		private static Dictionary<StatReportFormat, string> CreateOutStatsNames(string outDir, StatReportFormat statDatFormat, string reportName, bool overwrite = true)
+		{
+			Dictionary<StatReportFormat, string> output = new Dictionary<StatReportFormat, string>();
+
+			// First try to create the output directory if we need to
+			if (!Directory.Exists(outDir))
+			{
+				Directory.CreateDirectory(outDir);
+			}
+
+			// Double check the outDir for the end delim
+			if (!outDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
+			{
+				outDir += Path.DirectorySeparatorChar;
+			}
+
+			// For each output format, get the appropriate stream writer
+			if ((statDatFormat & StatReportFormat.None) != 0)
+			{
+				output.Add(StatReportFormat.None, CreateOutStatsNamesHelper(outDir, ".txt", reportName, overwrite));
+			}
+			if ((statDatFormat & StatReportFormat.CSV) != 0)
+			{
+				output.Add(StatReportFormat.CSV, CreateOutStatsNamesHelper(outDir, ".csv", reportName, overwrite));
+			}
+			if ((statDatFormat & StatReportFormat.HTML) != 0)
+			{
+				output.Add(StatReportFormat.HTML, CreateOutStatsNamesHelper(outDir, ".html", reportName, overwrite));
+			}
+			if ((statDatFormat & StatReportFormat.TSV) != 0)
+			{
+				output.Add(StatReportFormat.TSV, CreateOutStatsNamesHelper(outDir, ".tsv", reportName, overwrite));
+			}
+
+			return output;
+		}
+
+		/// <summary>
+		/// Help generating the outstats name
+		/// </summary>
+		/// <param name="outDir">Output directory</param>
+		/// <param name="extension">Extension to use for the file</param>
+		/// <param name="reportName">Name of the input file to use</param>
+		/// <param name="overwrite">True if we ignore existing files, false otherwise</param>
+		/// <returns>String containing the new filename</returns>
+		private static string CreateOutStatsNamesHelper(string outDir, string extension, string reportName, bool overwrite)
+		{
+			string outfile = outDir + reportName + extension;
+			outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
+				outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
+				outfile);
+			if (!overwrite)
+			{
+				int i = 1;
+				while (File.Exists(outfile))
+				{
+					outfile = outDir + reportName + "_" + i + extension;
+					outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
+						outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
+						outfile);
+					i++;
+				}
+			}
+
+			return outfile;
 		}
 
 		#endregion
