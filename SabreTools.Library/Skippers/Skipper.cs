@@ -72,7 +72,7 @@ namespace SabreTools.Library.Skippers
 			SourceFile = Path.GetFileNameWithoutExtension(filename);
 
 			Logger logger = new Logger();
-			XmlReader xtr = FileTools.GetXmlTextReader(filename);
+			XmlReader xtr = Utilities.GetXmlTextReader(filename);
 
 			if (xtr == null)
 			{
@@ -347,7 +347,7 @@ namespace SabreTools.Library.Skippers
 				return new SkipperRule();
 			}
 
-			return GetMatchingRule(FileTools.TryOpenRead(input), skipperName);
+			return GetMatchingRule(Utilities.TryOpenRead(input), skipperName);
 		}
 
 		/// <summary>

@@ -69,8 +69,8 @@ namespace SabreTools.Library.DatFiles
 			ItemStatus its = ItemStatus.None;
 			List<string> parent = new List<string>();
 
-			Encoding enc = Style.GetEncoding(filename);
-			XmlReader xtr = FileTools.GetXmlTextReader(filename);
+			Encoding enc = Utilities.GetEncoding(filename);
+			XmlReader xtr = Utilities.GetXmlTextReader(filename);
 
 			// If we got a null reader, just return
 			if (xtr == null)
@@ -909,7 +909,7 @@ namespace SabreTools.Library.DatFiles
 										// If we're in clean mode, sanitize the game name
 										if (clean)
 										{
-											machine.Name = Style.CleanGameName(machine.Name.Split(Path.DirectorySeparatorChar));
+											machine.Name = Utilities.CleanGameName(machine.Name.Split(Path.DirectorySeparatorChar));
 										}
 
 										DatItem inrom;
@@ -1181,7 +1181,7 @@ namespace SabreTools.Library.DatFiles
 			try
 			{
 				Globals.Logger.User("Opening file for writing: {0}", outfile);
-				FileStream fs = FileTools.TryCreate(outfile);
+				FileStream fs = Utilities.TryCreate(outfile);
 
 				// If we get back null for some reason, just log and return
 				if (fs == null)

@@ -50,12 +50,12 @@ namespace SabreTools.Library.Skippers
 			}
 
 			Globals.Logger.User("Attempting to apply rule to '{0}'", input);
-			success = TransformStream(FileTools.TryOpenRead(input), FileTools.TryCreate(output));
+			success = TransformStream(Utilities.TryOpenRead(input), Utilities.TryCreate(output));
 
 			// If the output file has size 0, delete it
 			if (new FileInfo(output).Length == 0)
 			{
-				FileTools.TryDeleteFile(output);
+				Utilities.TryDeleteFile(output);
 				success = false;
 			}
 

@@ -77,12 +77,12 @@ namespace NaturalSort
 		{
 			if (!long.TryParse(left, out long x))
 			{
-				return Style.CompareNumeric(right, left);
+				return Utilities.CompareNumeric(right, left);
 			}
 
 			if (!long.TryParse(right, out long y))
 			{
-				return Style.CompareNumeric(right, left);
+				return Utilities.CompareNumeric(right, left);
 			}
 
 			// If we have an equal part, then make sure that "longer" ones are taken into account

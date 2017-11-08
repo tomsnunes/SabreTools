@@ -58,8 +58,8 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
+			Encoding enc = Utilities.GetEncoding(filename);
+			StreamReader sr = new StreamReader(Utilities.TryOpenRead(filename), enc);
 
 			sr.ReadLine(); // Skip the first line since it's the header
 			while (!sr.EndOfStream)
@@ -123,7 +123,7 @@ namespace SabreTools.Library.DatFiles
 			try
 			{
 				Globals.Logger.User("Opening file for writing: {0}", outfile);
-				FileStream fs = FileTools.TryCreate(outfile);
+				FileStream fs = Utilities.TryCreate(outfile);
 
 				// If we get back null for some reason, just log and return
 				if (fs == null)

@@ -115,7 +115,7 @@ namespace SabreTools.Library.FileTypes
 				Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
 
 				// Now open and write the file if possible
-				FileStream fs = FileTools.TryCreate(realEntry);
+				FileStream fs = Utilities.TryCreate(realEntry);
 				if (fs != null)
 				{
 					ms.Seek(0, SeekOrigin.Begin);
@@ -194,7 +194,7 @@ namespace SabreTools.Library.FileTypes
 
 			try
 			{
-				SharpCompress.Archives.Rar.RarArchive ra = SharpCompress.Archives.Rar.RarArchive.Open(FileTools.TryOpenRead(_filename));
+				SharpCompress.Archives.Rar.RarArchive ra = SharpCompress.Archives.Rar.RarArchive.Open(Utilities.TryOpenRead(_filename));
 				foreach (RarArchiveEntry entry in ra.Entries.Where(e => e != null && !e.IsDirectory))
 				{
 					// If secure hashes are disabled, do a quickscan
@@ -215,7 +215,7 @@ namespace SabreTools.Library.FileTypes
 					else
 					{
 						Stream entryStream = entry.OpenEntryStream();
-						Rom rarEntryRom = (Rom)FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
+						Rom rarEntryRom = (Rom)Utilities.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
 						rarEntryRom.Name = entry.Key;
 						rarEntryRom.MachineName = gamename;
 						rarEntryRom.Date = entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss");
@@ -247,7 +247,7 @@ namespace SabreTools.Library.FileTypes
 				return;
 			}
 
-			BinaryReader br = new BinaryReader(FileTools.TryOpenRead(_filename));
+			BinaryReader br = new BinaryReader(Utilities.TryOpenRead(_filename));
 
 			// Check for the signature first (Skipping the SFX Module)
 			byte[] signature = br.ReadBytes(8);
@@ -517,7 +517,7 @@ namespace SabreTools.Library.FileTypes
 		public override bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
 		{
 			// Get the file stream for the file and write out
-			return Write(FileTools.TryOpenRead(inputFile), outDir, rom, date, romba);
+			return Write(Utilities.TryOpenRead(inputFile), outDir, rom, date, romba);
 		}
 
 		/// <summary>

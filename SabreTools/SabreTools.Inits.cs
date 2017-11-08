@@ -167,13 +167,13 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					FileTools.DetectSkipperAndTransform(input, outDir, nostore);
+					Utilities.DetectSkipperAndTransform(input, outDir, nostore);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string sub in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						FileTools.DetectSkipperAndTransform(sub, outDir, nostore);
+						Utilities.DetectSkipperAndTransform(sub, outDir, nostore);
 					}
 				}
 			}
@@ -263,13 +263,13 @@ namespace SabreTools
 			{
 				if (File.Exists(input))
 				{
-					FileTools.RestoreHeader(input, outDir);
+					Utilities.RestoreHeader(input, outDir);
 				}
 				else if (Directory.Exists(input))
 				{
 					foreach (string sub in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
 					{
-						FileTools.RestoreHeader(sub, outDir);
+						Utilities.RestoreHeader(sub, outDir);
 					}
 				}
 			}
@@ -338,10 +338,10 @@ namespace SabreTools
 			SplitType splitType, bool chdsAsFiles)
 		{
 			// Get the archive scanning level
-			ArchiveScanLevel asl = FileTools.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
+			ArchiveScanLevel asl = Utilities.GetArchiveScanLevelFromNumbers(sevenzip, gz, rar, zip);
 
 			// Get a list of files from the input datfiles
-			datfiles = FileTools.GetOnlyFilesFromInputs(datfiles);
+			datfiles = Utilities.GetOnlyFilesFromInputs(datfiles);
 
 			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
 
@@ -378,7 +378,7 @@ namespace SabreTools
 			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
 
 			// Get a list of files from the input datfiles
-			datfiles = FileTools.GetOnlyFilesFromInputs(datfiles);
+			datfiles = Utilities.GetOnlyFilesFromInputs(datfiles);
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();
@@ -749,10 +749,10 @@ namespace SabreTools
 			string headerToCheckAgainst, SplitType splitType, bool chdsAsFiles)
 		{
 			// Get the archive scanning level
-			ArchiveScanLevel asl = FileTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
+			ArchiveScanLevel asl = Utilities.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
 
 			// Get a list of files from the input datfiles
-			datfiles = FileTools.GetOnlyFilesFromInputs(datfiles);
+			datfiles = Utilities.GetOnlyFilesFromInputs(datfiles);
 
 			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
 
@@ -780,7 +780,7 @@ namespace SabreTools
 			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
 
 			// Get a list of files from the input datfiles
-			datfiles = FileTools.GetOnlyFilesFromInputs(datfiles);
+			datfiles = Utilities.GetOnlyFilesFromInputs(datfiles);
 
 			// Add all of the input DATs into one huge internal DAT
 			DatFile datdata = new DatFile();

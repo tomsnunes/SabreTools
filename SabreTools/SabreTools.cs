@@ -892,11 +892,11 @@ namespace SabreTools
 						break;
 					case "-seq":
 					case "--equal":
-						filter.SizeEqualTo = Style.GetSizeFromString(args[++i]);
+						filter.SizeEqualTo = Utilities.GetSizeFromString(args[++i]);
 						break;
 					case "-sgt":
 					case "--greater":
-						filter.SizeGreaterThanOrEqual = Style.GetSizeFromString(args[++i]);
+						filter.SizeGreaterThanOrEqual = Utilities.GetSizeFromString(args[++i]);
 						break;
 					case "-sha1":
 					case "--sha1":
@@ -916,7 +916,7 @@ namespace SabreTools
 						break;
 					case "-slt":
 					case "--less":
-						filter.SizeLessThanOrEqual = Style.GetSizeFromString(args[++i]);
+						filter.SizeLessThanOrEqual = Utilities.GetSizeFromString(args[++i]);
 						break;
 					case "-t":
 					case "--temp":
@@ -1171,11 +1171,11 @@ namespace SabreTools
 									break;
 								case "-seq":
 								case "--equal":
-									filter.SizeEqualTo = Style.GetSizeFromString(split[1]);
+									filter.SizeEqualTo = Utilities.GetSizeFromString(split[1]);
 									break;
 								case "-sgt":
 								case "--greater":
-									filter.SizeGreaterThanOrEqual = Style.GetSizeFromString(split[1]);
+									filter.SizeGreaterThanOrEqual = Utilities.GetSizeFromString(split[1]);
 									break;
 								case "-sha1":
 								case "--sha1":
@@ -1195,7 +1195,7 @@ namespace SabreTools
 									break;
 								case "-slt":
 								case "--less":
-									filter.SizeLessThanOrEqual = Style.GetSizeFromString(split[1]);
+									filter.SizeLessThanOrEqual = Utilities.GetSizeFromString(split[1]);
 									break;
 								case "-t":
 								case "--temp":

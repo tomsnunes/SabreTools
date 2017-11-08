@@ -175,7 +175,7 @@ namespace RombaSharp
 			}
 
 			// Create the sorting object to use and rebuild the needed files
-			ArchiveScanLevel asl = FileTools.GetArchiveScanLevelFromNumbers((onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1));
+			ArchiveScanLevel asl = Utilities.GetArchiveScanLevelFromNumbers((onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1), (onlyNeeded ? 0 : 1));
 			need.RebuildGeneric(onlyDirs, _depots.Keys.ToList()[0], false /*quickScan*/, false /*date*/,
 				false /*delete*/, false /*inverse*/, OutputFormat.TorrentGzip, true /*romba*/, asl, false /*updateDat*/,
 				null /*headerToCheckAgainst*/, true /* chdsAsFiles */);
@@ -215,7 +215,7 @@ namespace RombaSharp
 				List<string> onlineDepots = _depots.Where(d => d.Value.Item2).Select(d => d.Key).ToList();
 
 				// Now scan all of those depots and rebuild
-				ArchiveScanLevel asl = FileTools.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
+				ArchiveScanLevel asl = Utilities.GetArchiveScanLevelFromNumbers(1, 1, 1, 1);
 				datFile.RebuildDepot(onlineDepots, outputFolder, false /*date*/,
 					false /*delete*/, false /*inverse*/, (copy ? OutputFormat.TorrentGzip : OutputFormat.TorrentZip), copy,
 					false /*updateDat*/, null /*headerToCheckAgainst*/);
@@ -300,7 +300,7 @@ namespace RombaSharp
 				string temp = "";
 				if (input.Length == Constants.CRCLength)
 				{
-					temp = Style.CleanHashData(input, Constants.CRCLength);
+					temp = Utilities.CleanHashData(input, Constants.CRCLength);
 					if (temp != "")
 					{
 						crc.Add(temp);
@@ -308,7 +308,7 @@ namespace RombaSharp
 				}
 				else if (input.Length == Constants.MD5Length)
 				{
-					temp = Style.CleanHashData(input, Constants.MD5Length);
+					temp = Utilities.CleanHashData(input, Constants.MD5Length);
 					if (temp != "")
 					{
 						md5.Add(temp);
@@ -316,7 +316,7 @@ namespace RombaSharp
 				}
 				else if (input.Length == Constants.SHA1Length)
 				{
-					temp = Style.CleanHashData(input, Constants.SHA1Length);
+					temp = Utilities.CleanHashData(input, Constants.SHA1Length);
 					if (temp != "")
 					{
 						sha1.Add(temp);

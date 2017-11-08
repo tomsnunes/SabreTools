@@ -94,7 +94,7 @@ namespace SabreTools.Library.FileTypes
 						continue;
 					}
 
-					FileStream writeStream = FileTools.TryCreate(Path.Combine(outDir, zf.Entries[i].FileName));
+					FileStream writeStream = Utilities.TryCreate(Path.Combine(outDir, zf.Entries[i].FileName));
 
 					// If the stream is smaller than the buffer, just run one loop through to avoid issues
 					if (streamsize < _bufferSize)
@@ -160,7 +160,7 @@ namespace SabreTools.Library.FileTypes
 				Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
 
 				// Now open and write the file if possible
-				FileStream fs = FileTools.TryCreate(realEntry);
+				FileStream fs = Utilities.TryCreate(realEntry);
 				if (fs != null)
 				{
 					ms.Seek(0, SeekOrigin.Begin);
@@ -300,7 +300,7 @@ namespace SabreTools.Library.FileTypes
 						string newname = zf.Entries[i].FileName;
 						long newsize = (long)zf.Entries[i].UncompressedSize;
 						string newcrc = BitConverter.ToString(zf.Entries[i].CRC.Reverse().ToArray(), 0, zf.Entries[i].CRC.Length).Replace("-", string.Empty).ToLowerInvariant();
-						string convertedDate = Style.ConvertMsDosTimeFormatToDateTime(zf.Entries[i].LastMod).ToString("yyyy/MM/dd hh:mm:ss");
+						string convertedDate = Utilities.ConvertMsDosTimeFormatToDateTime(zf.Entries[i].LastMod).ToString("yyyy/MM/dd hh:mm:ss");
 
 						found.Add(new Rom
 						{
@@ -316,10 +316,10 @@ namespace SabreTools.Library.FileTypes
 					// Otherwise, use the stream directly
 					else
 					{
-						Rom zipEntryRom = (Rom)FileTools.GetStreamInfo(readStream, (long)zf.Entries[i].UncompressedSize, omitFromScan: omitFromScan);
+						Rom zipEntryRom = (Rom)Utilities.GetStreamInfo(readStream, (long)zf.Entries[i].UncompressedSize, omitFromScan: omitFromScan);
 						zipEntryRom.Name = zf.Entries[i].FileName;
 						zipEntryRom.MachineName = gamename;
-						string convertedDate = Style.ConvertMsDosTimeFormatToDateTime(zf.Entries[i].LastMod).ToString("yyyy/MM/dd hh:mm:ss");
+						string convertedDate = Utilities.ConvertMsDosTimeFormatToDateTime(zf.Entries[i].LastMod).ToString("yyyy/MM/dd hh:mm:ss");
 						zipEntryRom.Date = (date ? convertedDate : null);
 						found.Add(zipEntryRom);
 						zr = zf.CloseReadStream();
@@ -406,7 +406,7 @@ namespace SabreTools.Library.FileTypes
 		public override bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
 		{
 			// Get the file stream for the file and write out
-			return Write(FileTools.TryOpenRead(inputFile), outDir, rom, date: date);
+			return Write(Utilities.TryOpenRead(inputFile), outDir, rom, date: date);
 		}
 
 		/// <summary>
@@ -439,7 +439,7 @@ namespace SabreTools.Library.FileTypes
 			inputStream.Seek(0, SeekOrigin.Begin);
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".zip") ? "" : ".zip"));
+			string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".zip") ? "" : ".zip"));
 
 			// Set internal variables
 			Stream writeStream = null;
@@ -467,7 +467,7 @@ namespace SabreTools.Library.FileTypes
 					DateTime dt = DateTime.Now;
 					if (date && !String.IsNullOrEmpty(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out dt))
 					{
-						uint msDosDateTime = Style.ConvertDateTimeToMsDosTimeFormat(dt);
+						uint msDosDateTime = Utilities.ConvertDateTimeToMsDosTimeFormat(dt);
 						zipFile.OpenWriteStream(false, false, rom.Name.Replace('\\', '/'), istreamSize,
 							SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
 					}
@@ -538,7 +538,7 @@ namespace SabreTools.Library.FileTypes
 							DateTime dt = DateTime.Now;
 							if (date && !String.IsNullOrEmpty(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out dt))
 							{
-								uint msDosDateTime = Style.ConvertDateTimeToMsDosTimeFormat(dt);
+								uint msDosDateTime = Utilities.ConvertDateTimeToMsDosTimeFormat(dt);
 								zipFile.OpenWriteStream(false, false, rom.Name.Replace('\\', '/'), istreamSize,
 									SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
 							}
@@ -600,7 +600,7 @@ namespace SabreTools.Library.FileTypes
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
 			{
-				FileTools.TryDeleteFile(archiveFileName);
+				Utilities.TryDeleteFile(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
 
@@ -643,7 +643,7 @@ namespace SabreTools.Library.FileTypes
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".zip") ? "" : ".zip"));
+			string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".zip") ? "" : ".zip"));
 
 			// Set internal variables
 			Stream writeStream = null;
@@ -682,13 +682,13 @@ namespace SabreTools.Library.FileTypes
 						int index = inputIndexMap[key];
 
 						// Open the input file for reading
-						Stream freadStream = FileTools.TryOpenRead(inputFiles[index]);
+						Stream freadStream = Utilities.TryOpenRead(inputFiles[index]);
 						ulong istreamSize = (ulong)(new FileInfo(inputFiles[index]).Length);
 
 						DateTime dt = DateTime.Now;
 						if (date && !String.IsNullOrEmpty(roms[index].Date) && DateTime.TryParse(roms[index].Date.Replace('\\', '/'), out dt))
 						{
-							uint msDosDateTime = Style.ConvertDateTimeToMsDosTimeFormat(dt);
+							uint msDosDateTime = Utilities.ConvertDateTimeToMsDosTimeFormat(dt);
 							zipFile.OpenWriteStream(false, false, roms[index].Name.Replace('\\', '/'), istreamSize,
 								SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
 						}
@@ -759,13 +759,13 @@ namespace SabreTools.Library.FileTypes
 						if (index < 0)
 						{
 							// Open the input file for reading
-							Stream freadStream = FileTools.TryOpenRead(inputFiles[-index - 1]);
+							Stream freadStream = Utilities.TryOpenRead(inputFiles[-index - 1]);
 							ulong istreamSize = (ulong)(new FileInfo(inputFiles[-index - 1]).Length);
 
 							DateTime dt = DateTime.Now;
 							if (date && !String.IsNullOrEmpty(roms[-index - 1].Date) && DateTime.TryParse(roms[-index - 1].Date.Replace('\\', '/'), out dt))
 							{
-								uint msDosDateTime = Style.ConvertDateTimeToMsDosTimeFormat(dt);
+								uint msDosDateTime = Utilities.ConvertDateTimeToMsDosTimeFormat(dt);
 								zipFile.OpenWriteStream(false, false, roms[-index - 1].Name.Replace('\\', '/'), istreamSize,
 									SabreTools.Library.Data.CompressionMethod.Deflated, out writeStream, lastMod: msDosDateTime);
 							}
@@ -826,7 +826,7 @@ namespace SabreTools.Library.FileTypes
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
 			{
-				FileTools.TryDeleteFile(archiveFileName);
+				Utilities.TryDeleteFile(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
 

@@ -78,12 +78,12 @@ namespace ROMVault2.SupportedFiles.Zip
 		public string ExtraField
 		{
 			get { return Encoding.GetEncoding(858).GetString(_extraField); }
-			set { _extraField = Style.StringToByteArray(Style.ConvertAsciiToHex(value)); }
+			set { _extraField = Utilities.StringToByteArray(Utilities.ConvertAsciiToHex(value)); }
 		}
 		public string Comment
 		{
 			get { return Encoding.GetEncoding(858).GetString(_comment); }
-			set { _comment = Style.StringToByteArray(Style.ConvertAsciiToHex(value)); }
+			set { _comment = Utilities.StringToByteArray(Utilities.ConvertAsciiToHex(value)); }
 		}
 		public ulong RelativeOffset
 		{
@@ -333,7 +333,7 @@ namespace ROMVault2.SupportedFiles.Zip
 
 			// Now check for a unicode filename and set the flag accordingly
 			byte[] fileNameBytes;
-			if (Style.IsUnicode(_fileName))
+			if (Utilities.IsUnicode(_fileName))
 			{
 				_generalPurposeBitFlag |= GeneralPurposeBitFlag.LanguageEncodingFlag;
 				fileNameBytes = Encoding.UTF8.GetBytes(_fileName);
@@ -708,7 +708,7 @@ namespace ROMVault2.SupportedFiles.Zip
 
 			// Now check for a unicode filename and set the flag accordingly
 			byte[] fileNameBytes;
-			if (Style.IsUnicode(_fileName))
+			if (Utilities.IsUnicode(_fileName))
 			{
 				_generalPurposeBitFlag |= GeneralPurposeBitFlag.LanguageEncodingFlag;
 				fileNameBytes = Encoding.UTF8.GetBytes(_fileName);

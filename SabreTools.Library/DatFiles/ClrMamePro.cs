@@ -59,8 +59,8 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// Open a file reader
-			Encoding enc = Style.GetEncoding(filename);
-			StreamReader sr = new StreamReader(FileTools.TryOpenRead(filename), enc);
+			Encoding enc = Utilities.GetEncoding(filename);
+			StreamReader sr = new StreamReader(Utilities.TryOpenRead(filename), enc);
 
 			bool block = false, superdat = false;
 			string blockname = "", tempgamename = "", gamedesc = "", cloneof = "",
@@ -163,7 +163,7 @@ namespace SabreTools.Library.DatFiles
 					}
 
 					// Get the line split by spaces and quotes
-					string[] gc = Style.SplitLineAsCMP(line);
+					string[] gc = Utilities.SplitLineAsCMP(line);
 
 					// Special cases for DOSCenter DATs only because of how the lines are arranged
 					if (line.Trim().StartsWith("file ("))
@@ -636,7 +636,7 @@ namespace SabreTools.Library.DatFiles
 			try
 			{
 				Globals.Logger.User("Opening file for writing: {0}", outfile);
-				FileStream fs = FileTools.TryCreate(outfile);
+				FileStream fs = Utilities.TryCreate(outfile);
 
 				// If we get back null for some reason, just log and return
 				if (fs == null)

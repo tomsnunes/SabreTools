@@ -1611,7 +1611,7 @@ namespace SabreTools.Library.DatFiles
 				&& (updateMode & UpdateMode.ReverseBaseReplace) == 0)
 			{
 				// Make sure there are no folders in inputs
-				List<string> newInputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
+				List<string> newInputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
 
 				// Reverse if we have to
 				if ((updateMode & UpdateMode.DiffReverseCascade) != 0)
@@ -1748,7 +1748,7 @@ namespace SabreTools.Library.DatFiles
 			// First we want to parse all of the base DATs into the input
 			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for replacement...");
 
-			List<string> baseFileNames = FileTools.GetOnlyFilesFromInputs(basePaths);
+			List<string> baseFileNames = Utilities.GetOnlyFilesFromInputs(basePaths);
 			Parallel.For(0, baseFileNames.Count, Globals.ParallelOptions, i =>
 			{
 				string path = "";
@@ -1769,7 +1769,7 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.CRC, DedupeType.Full);
 
 			// Now we want to try to replace each item in each input DAT from the base
-			List<string> inputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
+			List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
 			foreach (string path in inputFileNames)
 			{
 				// Get the two halves of the path
@@ -1866,7 +1866,7 @@ namespace SabreTools.Library.DatFiles
 			// First we want to parse all of the base DATs into the input
 			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for comparison...");
 
-			List<string> baseFileNames = FileTools.GetOnlyFilesFromInputs(basePaths);
+			List<string> baseFileNames = Utilities.GetOnlyFilesFromInputs(basePaths);
 			Parallel.ForEach(baseFileNames, Globals.ParallelOptions, path =>
 			{
 				Parse(path, 0, 0, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
@@ -1878,7 +1878,7 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.CRC, DedupeType.Full);
 
 			// Now we want to compare each input DAT against the base
-			List<string> inputFileNames = FileTools.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
+			List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
 			foreach (string path in inputFileNames)
 			{
 				// Get the two halves of the path
@@ -3178,12 +3178,12 @@ namespace SabreTools.Library.DatFiles
 			FileName = (String.IsNullOrEmpty(FileName) ? (keepext ? Path.GetFileName(filename) : Path.GetFileNameWithoutExtension(filename)) : FileName);
 
 			// If the output type isn't set already, get the internal output type
-			DatFormat = (DatFormat == 0 ? FileTools.GetDatFormat(filename) : DatFormat);
+			DatFormat = (DatFormat == 0 ? Utilities.GetDatFormat(filename) : DatFormat);
 
 			// Now parse the correct type of DAT
 			try
 			{
-				switch (FileTools.GetDatFormat(filename))
+				switch (Utilities.GetDatFormat(filename))
 				{
 					case DatFormat.AttractMode:
 						new AttractMode(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
@@ -3324,14 +3324,14 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// If we're in cleaning mode, sanitize the game name
-			item.MachineName = (clean ? Style.CleanGameName(item.MachineName) : item.MachineName);
+			item.MachineName = (clean ? Utilities.CleanGameName(item.MachineName) : item.MachineName);
 
 			// If we're stripping unicode characters, do so from all relevant things
 			if (remUnicode)
 			{
-				item.Name = Style.RemoveUnicodeCharacters(item.Name);
-				item.MachineName = Style.RemoveUnicodeCharacters(item.MachineName);
-				item.MachineDescription = Style.RemoveUnicodeCharacters(item.MachineDescription);
+				item.Name = Utilities.RemoveUnicodeCharacters(item.Name);
+				item.MachineName = Utilities.RemoveUnicodeCharacters(item.MachineName);
+				item.MachineDescription = Utilities.RemoveUnicodeCharacters(item.MachineDescription);
 			}
 
 			// If we have a Rom or a Disk, clean the hash data
@@ -3340,12 +3340,12 @@ namespace SabreTools.Library.DatFiles
 				Rom itemRom = (Rom)item;
 
 				// Sanitize the hashes from null, hex sizes, and "true blank" strings
-				itemRom.CRC = Style.CleanHashData(itemRom.CRC, Constants.CRCLength);
-				itemRom.MD5 = Style.CleanHashData(itemRom.MD5, Constants.MD5Length);
-				itemRom.SHA1 = Style.CleanHashData(itemRom.SHA1, Constants.SHA1Length);
-				itemRom.SHA256 = Style.CleanHashData(itemRom.SHA256, Constants.SHA256Length);
-				itemRom.SHA384 = Style.CleanHashData(itemRom.SHA384, Constants.SHA384Length);
-				itemRom.SHA512 = Style.CleanHashData(itemRom.SHA512, Constants.SHA512Length);
+				itemRom.CRC = Utilities.CleanHashData(itemRom.CRC, Constants.CRCLength);
+				itemRom.MD5 = Utilities.CleanHashData(itemRom.MD5, Constants.MD5Length);
+				itemRom.SHA1 = Utilities.CleanHashData(itemRom.SHA1, Constants.SHA1Length);
+				itemRom.SHA256 = Utilities.CleanHashData(itemRom.SHA256, Constants.SHA256Length);
+				itemRom.SHA384 = Utilities.CleanHashData(itemRom.SHA384, Constants.SHA384Length);
+				itemRom.SHA512 = Utilities.CleanHashData(itemRom.SHA512, Constants.SHA512Length);
 
 				// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 				if ((itemRom.Size == 0 || itemRom.Size == -1)
@@ -3395,11 +3395,11 @@ namespace SabreTools.Library.DatFiles
 				Disk itemDisk = (Disk)item;
 
 				// Sanitize the hashes from null, hex sizes, and "true blank" strings
-				itemDisk.MD5 = Style.CleanHashData(itemDisk.MD5, Constants.MD5Length);
-				itemDisk.SHA1 = Style.CleanHashData(itemDisk.SHA1, Constants.SHA1Length);
-				itemDisk.SHA256 = Style.CleanHashData(itemDisk.SHA256, Constants.SHA256Length);
-				itemDisk.SHA384 = Style.CleanHashData(itemDisk.SHA384, Constants.SHA384Length);
-				itemDisk.SHA512 = Style.CleanHashData(itemDisk.SHA512, Constants.SHA512Length);
+				itemDisk.MD5 = Utilities.CleanHashData(itemDisk.MD5, Constants.MD5Length);
+				itemDisk.SHA1 = Utilities.CleanHashData(itemDisk.SHA1, Constants.SHA1Length);
+				itemDisk.SHA256 = Utilities.CleanHashData(itemDisk.SHA256, Constants.SHA256Length);
+				itemDisk.SHA384 = Utilities.CleanHashData(itemDisk.SHA384, Constants.SHA384Length);
+				itemDisk.SHA512 = Utilities.CleanHashData(itemDisk.SHA512, Constants.SHA512Length);
 
 				// If the file has aboslutely no hashes, skip and log
 				if (itemDisk.ItemStatus != ItemStatus.Nodump
@@ -3523,7 +3523,7 @@ namespace SabreTools.Library.DatFiles
 				// Now find all folders that are empty, if we are supposed to
 				if (!Romba && addBlanks)
 				{
-					List<string> empties = FileTools.GetEmptyDirectories(basePath).ToList();
+					List<string> empties = Utilities.GetEmptyDirectories(basePath).ToList();
 					Parallel.ForEach(empties, Globals.ParallelOptions, dir =>
 					{
 						// Get the full path for the directory
@@ -3580,7 +3580,7 @@ namespace SabreTools.Library.DatFiles
 			Globals.Logger.User("Cleaning temp folder");
 			if (tempDir != Path.GetTempPath())
 			{
-				FileTools.TryDeleteDirectory(tempDir);
+				Utilities.TryDeleteDirectory(tempDir);
 			}
 
 			return true;
@@ -3647,7 +3647,7 @@ namespace SabreTools.Library.DatFiles
 			if (!archivesAsFiles)
 			{
 				// Get the base archive first
-				BaseArchive archive = FileTools.CreateArchiveFromExistingInput(newItem);
+				BaseArchive archive = Utilities.CreateArchiveFromExistingInput(newItem);
 
 				// Now get all extracted items from the archive
 				if (archive != null)
@@ -3686,7 +3686,7 @@ namespace SabreTools.Library.DatFiles
 					List<string> empties = new List<string>();
 
 					// Get the base archive first
-					BaseArchive archive = FileTools.CreateArchiveFromExistingInput(newItem);
+					BaseArchive archive = Utilities.CreateArchiveFromExistingInput(newItem);
 
 					// Now get all blank folders from the archive
 					if (archive != null)
@@ -3709,11 +3709,11 @@ namespace SabreTools.Library.DatFiles
 			// Cue to delete the file if it's a copy
 			if (copyFiles && item != newItem)
 			{
-				FileTools.TryDeleteDirectory(newBasePath);
+				Utilities.TryDeleteDirectory(newBasePath);
 			}
 
 			// Delete the sub temp directory
-			FileTools.TryDeleteDirectory(tempSubDir);
+			Utilities.TryDeleteDirectory(tempSubDir);
 		}
 
 		/// <summary>
@@ -3730,7 +3730,7 @@ namespace SabreTools.Library.DatFiles
 			bool addDate, string headerToCheckAgainst, bool chdsAsFiles)
 		{
 			Globals.Logger.Verbose("'{0}' treated like a file", Path.GetFileName(item));
-			DatItem datItem = FileTools.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst, chdsAsFiles: chdsAsFiles);
+			DatItem datItem = Utilities.GetFileInfo(item, omitFromScan: omitFromScan, date: addDate, header: headerToCheckAgainst, chdsAsFiles: chdsAsFiles);
 
 			ProcessFileHelper(item, datItem, basePath, parent);
 		}
@@ -3991,7 +3991,7 @@ namespace SabreTools.Library.DatFiles
 				Globals.Logger.User("Checking hash '{0}'", hash);
 
 				// Get the extension path for the hash
-				string subpath = Style.GetRombaPath(hash);
+				string subpath = Utilities.GetRombaPath(hash);
 
 				// Find the first depot that includes the hash
 				string foundpath = null;
@@ -4203,13 +4203,13 @@ namespace SabreTools.Library.DatFiles
 			bool usedInternally = false;
 
 			// Get the required scanning level for the file
-			FileTools.GetInternalExternalProcess(file, archiveScanLevel, out bool shouldExternalProcess, out bool shouldInternalProcess);
+			Utilities.GetInternalExternalProcess(file, archiveScanLevel, out bool shouldExternalProcess, out bool shouldInternalProcess);
 
 			// If we're supposed to scan the file externally
 			if (shouldExternalProcess)
 			{
 				// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-				DatItem fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes),
+				DatItem fileinfo = Utilities.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes),
 					header: headerToCheckAgainst, chdsAsFiles: chdsAsFiles);
 				usedExternally = RebuildIndividualFile(fileinfo, file, outDir, date, inverse, outputFormat,
 					romba, updateDat, null /* isZip */, headerToCheckAgainst);
@@ -4227,7 +4227,7 @@ namespace SabreTools.Library.DatFiles
 				bool isTorrentGzip = tgz.IsTorrent();
 
 				// Get the base archive first
-				BaseArchive archive = FileTools.CreateArchiveFromExistingInput(file);
+				BaseArchive archive = Utilities.CreateArchiveFromExistingInput(file);
 
 				// Now get all extracted items from the archive
 				if (archive != null)
@@ -4240,7 +4240,7 @@ namespace SabreTools.Library.DatFiles
 				if (entries == null && File.Exists(file))
 				{
 					// TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-					DatItem fileinfo = FileTools.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), chdsAsFiles: chdsAsFiles);
+					DatItem fileinfo = Utilities.GetFileInfo(file, omitFromScan: (quickScan ? Hash.SecureHashes : Hash.DeepHashes), chdsAsFiles: chdsAsFiles);
 					usedExternally = RebuildIndividualFile(fileinfo, file, outDir, date, inverse, outputFormat,
 						romba, updateDat, null /* isZip */, headerToCheckAgainst);
 				}
@@ -4258,7 +4258,7 @@ namespace SabreTools.Library.DatFiles
 			// If we are supposed to delete the file, do so
 			if (delete && (usedExternally || usedInternally))
 			{
-				FileTools.TryDeleteFile(file);
+				Utilities.TryDeleteFile(file);
 			}
 		}
 
@@ -4325,7 +4325,7 @@ namespace SabreTools.Library.DatFiles
 					// Get the proper output path
 					if (romba)
 					{
-						outDir = Path.Combine(outDir, Style.GetRombaPath(sha1));
+						outDir = Path.Combine(outDir, Utilities.GetRombaPath(sha1));
 					}
 					else
 					{
@@ -4356,7 +4356,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					BaseArchive archive = FileTools.CreateArchiveFromExistingInput(file);
+					BaseArchive archive = Utilities.CreateArchiveFromExistingInput(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
@@ -4365,7 +4365,7 @@ namespace SabreTools.Library.DatFiles
 				// Otherwise, just open the filestream
 				else
 				{
-					fileStream = FileTools.TryOpenRead(file);
+					fileStream = Utilities.TryOpenRead(file);
 				}
 
 				// If the stream is null, then continue
@@ -4384,7 +4384,7 @@ namespace SabreTools.Library.DatFiles
 				foreach (DatItem item in dupes)
 				{
 					// Get the output archive, if possible
-					BaseArchive outputArchive = FileTools.CreateArchiveFromOutputFormat(outputFormat);
+					BaseArchive outputArchive = Utilities.CreateArchiveFromOutputFormat(outputFormat);
 
 					// Now rebuild to the output file
 					outputArchive.Write(fileStream, outDir, (Rom)item, date: date, romba: romba);
@@ -4407,7 +4407,7 @@ namespace SabreTools.Library.DatFiles
 					// Get the proper output path
 					if (romba)
 					{
-						outDir = Path.Combine(outDir, Style.GetRombaPath(sha1));
+						outDir = Path.Combine(outDir, Utilities.GetRombaPath(sha1));
 					}
 					else
 					{
@@ -4438,7 +4438,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					BaseArchive archive = FileTools.CreateArchiveFromExistingInput(file);
+					BaseArchive archive = Utilities.CreateArchiveFromExistingInput(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
@@ -4447,7 +4447,7 @@ namespace SabreTools.Library.DatFiles
 				// Otherwise, just open the filestream
 				else
 				{
-					fileStream = FileTools.TryOpenRead(file);
+					fileStream = Utilities.TryOpenRead(file);
 				}
 
 				// If the stream is null, then continue
@@ -4457,7 +4457,7 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// Get the item from the current file
-				Rom item = (Rom)FileTools.GetStreamInfo(fileStream, fileStream.Length, keepReadOpen: true);
+				Rom item = (Rom)Utilities.GetStreamInfo(fileStream, fileStream.Length, keepReadOpen: true);
 				item.MachineName = Path.GetFileNameWithoutExtension(item.Name);
 				item.MachineDescription = Path.GetFileNameWithoutExtension(item.Name);
 
@@ -4471,12 +4471,12 @@ namespace SabreTools.Library.DatFiles
 				Globals.Logger.User("No matches found for '{0}', rebuilding accordingly from inverse flag...", Path.GetFileName(datItem.Name));
 
 				// Get the output archive, if possible
-				BaseArchive outputArchive = FileTools.CreateArchiveFromOutputFormat(outputFormat);
+				BaseArchive outputArchive = Utilities.CreateArchiveFromOutputFormat(outputFormat);
 
 				// Now rebuild to the output file
 				if (outputArchive == null)
 				{
-					string outfile = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(item.MachineName), item.Name);
+					string outfile = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(item.MachineName), item.Name);
 
 					// Make sure the output folder is created
 					Directory.CreateDirectory(Path.GetDirectoryName(outfile));
@@ -4484,7 +4484,7 @@ namespace SabreTools.Library.DatFiles
 					// Now copy the file over
 					try
 					{
-						FileStream writeStream = FileTools.TryCreate(outfile);
+						FileStream writeStream = Utilities.TryCreate(outfile);
 
 						// Copy the input stream to the output
 						int bufferSize = 4096 * 128;
@@ -4528,7 +4528,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					BaseArchive archive = FileTools.CreateArchiveFromExistingInput(file);
+					BaseArchive archive = Utilities.CreateArchiveFromExistingInput(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
@@ -4537,7 +4537,7 @@ namespace SabreTools.Library.DatFiles
 				// Otherwise, just open the filestream
 				else
 				{
-					fileStream = FileTools.TryOpenRead(file);
+					fileStream = Utilities.TryOpenRead(file);
 				}
 
 				// If the stream is null, then continue
@@ -4557,7 +4557,7 @@ namespace SabreTools.Library.DatFiles
 					if (rule.TransformStream(fileStream, transformStream, keepReadOpen: true, keepWriteOpen: true))
 					{
 						// Get the file informations that we will be using
-						Rom headerless = (Rom)FileTools.GetStreamInfo(transformStream, transformStream.Length, keepReadOpen: true);
+						Rom headerless = (Rom)Utilities.GetStreamInfo(transformStream, transformStream.Length, keepReadOpen: true);
 
 						// Find if the file has duplicates in the DAT
 						hasDuplicates = headerless.HasDuplicates(this);
@@ -4588,7 +4588,7 @@ namespace SabreTools.Library.DatFiles
 								bool eitherSuccess = false;
 
 								// Get the output archive, if possible
-								BaseArchive outputArchive = FileTools.CreateArchiveFromOutputFormat(outputFormat);
+								BaseArchive outputArchive = Utilities.CreateArchiveFromOutputFormat(outputFormat);
 
 								// Now rebuild to the output file
 								eitherSuccess |= outputArchive.Write(transformStream, outDir, (Rom)item, date: date, romba: romba);
@@ -4657,7 +4657,7 @@ namespace SabreTools.Library.DatFiles
 				Globals.Logger.User("Checking hash '{0}'", hash);
 
 				// Get the extension path for the hash
-				string subpath = Style.GetRombaPath(hash);
+				string subpath = Utilities.GetRombaPath(hash);
 
 				// Find the first depot that includes the hash
 				string foundpath = null;
@@ -5416,7 +5416,7 @@ namespace SabreTools.Library.DatFiles
 			// Log the results to screen
 			string results = @"For '" + FileName + @"':
 --------------------------------------------------
-    Uncompressed size:       " + Style.GetBytesReadable(TotalSize) + @"
+    Uncompressed size:       " + Utilities.GetBytesReadable(TotalSize) + @"
     Games found:             " + (game == -1 ? Keys.Count() : game) + @"
     Roms found:              " + RomCount + @"
     Disks found:             " + DiskCount + @"
@@ -5900,7 +5900,7 @@ namespace SabreTools.Library.DatFiles
 			Dictionary<StatReportFormat, string> outputs = CreateOutStatsNames(outDir, statDatFormat, reportName);
 
 			// Make sure we have all files and then order them
-			List<string> files = FileTools.GetOnlyFilesFromInputs(inputs);
+			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs);
 			files = files
 				.OrderBy(i => Path.GetDirectoryName(i))
 				.ThenBy(i => Path.GetFileName(i))

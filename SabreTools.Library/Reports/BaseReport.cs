@@ -34,7 +34,7 @@ namespace SabreTools.Library.Reports
 		public BaseReport(DatFile datfile, string filename, bool baddumpCol = false, bool nodumpCol = false)
 		{
 			_datFile = datfile;
-			_writer = new StreamWriter(FileTools.TryCreate(filename));
+			_writer = new StreamWriter(Utilities.TryCreate(filename));
 			_baddumpCol = baddumpCol;
 			_nodumpCol = nodumpCol;
 		}

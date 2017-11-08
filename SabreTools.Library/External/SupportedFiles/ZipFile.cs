@@ -426,7 +426,7 @@ namespace ROMVault2.SupportedFiles.Zip
 				}
 
 				// Now try to open the file for reading
-				_zipstream = FileTools.TryOpenRead(filename);
+				_zipstream = Utilities.TryOpenRead(filename);
 				int read = _zipstream.Read(new byte[1], 0, 1);
 				if (read != 1)
 				{
@@ -757,7 +757,7 @@ namespace ROMVault2.SupportedFiles.Zip
 			_zipstream.Dispose();
 
 			// Delete the failed file
-			FileTools.TryDeleteFile(_zipFileInfo.FullName);
+			Utilities.TryDeleteFile(_zipFileInfo.FullName);
 			_zipFileInfo = null;
 			_zipOpen = ZipOpenType.Closed;
 		}

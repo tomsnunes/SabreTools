@@ -96,7 +96,7 @@ namespace SabreTools.Library.FileTypes
 				Directory.CreateDirectory(outDir);
 
 				// Get all files from the input directory
-				List<string> files = FileTools.RetrieveFiles(_filename, new List<string>());
+				List<string> files = Utilities.RetrieveFiles(_filename, new List<string>());
 
 				// Now sort through to find the first file that matches
 				string match = files.Where(s => s.EndsWith(entryName)).FirstOrDefault();
@@ -135,7 +135,7 @@ namespace SabreTools.Library.FileTypes
 				Directory.CreateDirectory(_filename);
 
 				// Get all files from the input directory
-				List<string> files = FileTools.RetrieveFiles(_filename, new List<string>());
+				List<string> files = Utilities.RetrieveFiles(_filename, new List<string>());
 
 				// Now sort through to find the first file that matches
 				string match = files.Where(s => s.EndsWith(entryName)).FirstOrDefault();
@@ -143,7 +143,7 @@ namespace SabreTools.Library.FileTypes
 				// If we had a file, copy that over to the new name
 				if (!String.IsNullOrEmpty(match))
 				{
-					FileTools.TryOpenRead(match).CopyTo(ms);
+					Utilities.TryOpenRead(match).CopyTo(ms);
 					realentry = match;
 				}
 			}
@@ -239,7 +239,7 @@ namespace SabreTools.Library.FileTypes
 			FileStream outputStream = null;
 
 			// Get the output folder name from the first rebuild rom
-			string fileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.MachineName), Style.RemovePathUnsafeCharacters(rom.Name));
+			string fileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(rom.MachineName), Utilities.RemovePathUnsafeCharacters(rom.Name));
 
 			try
 			{
@@ -250,7 +250,7 @@ namespace SabreTools.Library.FileTypes
 				}
 
 				// Overwrite output files by default
-				outputStream = FileTools.TryCreate(fileName);
+				outputStream = Utilities.TryCreate(fileName);
 
 				// If the output stream isn't null
 				if (outputStream != null)

@@ -86,7 +86,7 @@ namespace SabreTools.Library.Tools
 
 			try
 			{
-				FileStream logfile = FileTools.TryCreate(Path.Combine(_basepath, _filename));
+				FileStream logfile = Utilities.TryCreate(Path.Combine(_basepath, _filename));
 				_log = new StreamWriter(logfile, Encoding.UTF8, (int)(4 * Constants.KibiByte), true);
 				_log.AutoFlush = true;
 

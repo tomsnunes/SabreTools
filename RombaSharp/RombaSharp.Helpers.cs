@@ -64,14 +64,14 @@ namespace RombaSharp
 		{
 			Process proc = Process.GetCurrentProcess();
 
-			Globals.Logger.User("Current Nonpaged Memory: {0}", Style.GetBytesReadable(proc.NonpagedSystemMemorySize64));
-			Globals.Logger.User("Current Paged Memory: {0}", Style.GetBytesReadable(proc.PagedMemorySize64));
-			Globals.Logger.User("Peak Paged Memory: {0}", Style.GetBytesReadable(proc.PeakPagedMemorySize64));
-			Globals.Logger.User("Peak Virtual Memory: {0}", Style.GetBytesReadable(proc.PeakVirtualMemorySize64));
-			Globals.Logger.User("Peak Working Memory: {0}", Style.GetBytesReadable(proc.PeakWorkingSet64));
-			Globals.Logger.User("Private Memory: {0}", Style.GetBytesReadable(proc.PrivateMemorySize64));
-			Globals.Logger.User("Virtual Memory: {0}", Style.GetBytesReadable(proc.VirtualMemorySize64));
-			Globals.Logger.User("Working Memory: {0}", Style.GetBytesReadable(proc.WorkingSet64));
+			Globals.Logger.User("Current Nonpaged Memory: {0}", Utilities.GetBytesReadable(proc.NonpagedSystemMemorySize64));
+			Globals.Logger.User("Current Paged Memory: {0}", Utilities.GetBytesReadable(proc.PagedMemorySize64));
+			Globals.Logger.User("Peak Paged Memory: {0}", Utilities.GetBytesReadable(proc.PeakPagedMemorySize64));
+			Globals.Logger.User("Peak Virtual Memory: {0}", Utilities.GetBytesReadable(proc.PeakVirtualMemorySize64));
+			Globals.Logger.User("Peak Working Memory: {0}", Utilities.GetBytesReadable(proc.PeakWorkingSet64));
+			Globals.Logger.User("Private Memory: {0}", Utilities.GetBytesReadable(proc.PrivateMemorySize64));
+			Globals.Logger.User("Virtual Memory: {0}", Utilities.GetBytesReadable(proc.VirtualMemorySize64));
+			Globals.Logger.User("Working Memory: {0}", Utilities.GetBytesReadable(proc.WorkingSet64));
 			Globals.Logger.User("Total Processor Time: {0}", proc.TotalProcessorTime);
 			Globals.Logger.User("User Processor Time: {0}", proc.UserProcessorTime);
 		}
@@ -84,7 +84,7 @@ namespace RombaSharp
 		{
 			SqliteConnection dbc = new SqliteConnection(_connectionString);
 			dbc.Open();
-			StreamWriter sw = new StreamWriter(FileTools.TryCreate("export.csv"));
+			StreamWriter sw = new StreamWriter(Utilities.TryCreate("export.csv"));
 
 			sw.WriteLine("\"ID\",\"Size\",\"CRC\",\"MD5\",\"SHA-1\",\"In Depot\",\"DAT Hash\"");
 
@@ -129,7 +129,7 @@ namespace RombaSharp
 				if (lowerCaseDats.Contains(input.ToLowerInvariant()))
 				{
 					string fullpath = Path.GetFullPath(datRootDats[lowerCaseDats.IndexOf(input.ToLowerInvariant())]);
-					string sha1 = ((Rom)FileTools.GetFileInfo(fullpath)).SHA1;
+					string sha1 = ((Rom)Utilities.GetFileInfo(fullpath)).SHA1;
 					foundDats.Add(sha1, fullpath);
 				}
 				else
@@ -161,7 +161,7 @@ namespace RombaSharp
 			Dictionary<string, Tuple<long, bool>> depots = new Dictionary<string, Tuple<long, bool>>();
 
 			// Get the XML text reader for the configuration file, if possible
-			XmlReader xtr = FileTools.GetXmlTextReader(_config);
+			XmlReader xtr = Utilities.GetXmlTextReader(_config);
 
 			// Now parse the XML file for settings
 			if (xtr != null)

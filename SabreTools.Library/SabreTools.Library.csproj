@@ -182,12 +182,11 @@
     <Compile Include="Skippers\Skipper.cs" />
     <Compile Include="Skippers\SkipperRule.cs" />
     <Compile Include="Tools\InternalStopwatch.cs" />
-    <Compile Include="Tools\FileTools.cs" />
+    <Compile Include="Tools\Utilities.cs" />
     <Compile Include="Tools\DatabaseTools.cs" />
     <Compile Include="Data\Enums.cs" />
     <Compile Include="Tools\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tools\Style.cs" />
     <Compile Include="Data\Build.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -35,33 +35,33 @@ namespace SabreTools.Library.DatItems
 		}
 		public string CRC
 		{
-			get { return _crc.IsNullOrEmpty() ? null : Style.ByteArrayToString(_crc); }
-			set { _crc = Style.StringToByteArray(value); }
+			get { return _crc.IsNullOrEmpty() ? null : Utilities.ByteArrayToString(_crc); }
+			set { _crc = Utilities.StringToByteArray(value); }
 		}
 		public string MD5
 		{
-			get { return _md5.IsNullOrEmpty() ? null : Style.ByteArrayToString(_md5); }
-			set { _md5 = Style.StringToByteArray(value); }
+			get { return _md5.IsNullOrEmpty() ? null : Utilities.ByteArrayToString(_md5); }
+			set { _md5 = Utilities.StringToByteArray(value); }
 		}
 		public string SHA1
 		{
-			get { return _sha1.IsNullOrEmpty() ? null : Style.ByteArrayToString(_sha1); }
-			set { _sha1 = Style.StringToByteArray(value); }
+			get { return _sha1.IsNullOrEmpty() ? null : Utilities.ByteArrayToString(_sha1); }
+			set { _sha1 = Utilities.StringToByteArray(value); }
 		}
 		public string SHA256
 		{
-			get { return _sha256.IsNullOrEmpty() ? null : Style.ByteArrayToString(_sha256); }
-			set { _sha256 = Style.StringToByteArray(value); }
+			get { return _sha256.IsNullOrEmpty() ? null : Utilities.ByteArrayToString(_sha256); }
+			set { _sha256 = Utilities.StringToByteArray(value); }
 		}
 		public string SHA384
 		{
-			get { return _sha384.IsNullOrEmpty() ? null : Style.ByteArrayToString(_sha384); }
-			set { _sha384 = Style.StringToByteArray(value); }
+			get { return _sha384.IsNullOrEmpty() ? null : Utilities.ByteArrayToString(_sha384); }
+			set { _sha384 = Utilities.StringToByteArray(value); }
 		}
 		public string SHA512
 		{
-			get { return _sha512.IsNullOrEmpty() ? null : Style.ByteArrayToString(_sha512); }
-			set { _sha512 = Style.StringToByteArray(value); }
+			get { return _sha512.IsNullOrEmpty() ? null : Utilities.ByteArrayToString(_sha512); }
+			set { _sha512 = Utilities.StringToByteArray(value); }
 		}
 		public string Date
 		{

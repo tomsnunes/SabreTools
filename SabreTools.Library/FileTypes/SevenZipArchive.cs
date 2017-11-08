@@ -73,7 +73,7 @@ namespace SabreTools.Library.FileTypes
 				Directory.CreateDirectory(outDir);
 
 				// Extract all files to the temp directory
-				SharpCompress.Archives.SevenZip.SevenZipArchive sza = SharpCompress.Archives.SevenZip.SevenZipArchive.Open(FileTools.TryOpenRead(_filename));
+				SharpCompress.Archives.SevenZip.SevenZipArchive sza = SharpCompress.Archives.SevenZip.SevenZipArchive.Open(Utilities.TryOpenRead(_filename));
 				foreach (SevenZipArchiveEntry entry in sza.Entries)
 				{
 					entry.WriteToDirectory(outDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
@@ -118,7 +118,7 @@ namespace SabreTools.Library.FileTypes
 				Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
 
 				// Now open and write the file if possible
-				FileStream fs = FileTools.TryCreate(realEntry);
+				FileStream fs = Utilities.TryCreate(realEntry);
 				if (fs != null)
 				{
 					ms.Seek(0, SeekOrigin.Begin);
@@ -198,7 +198,7 @@ namespace SabreTools.Library.FileTypes
 
 			try
 			{
-				SharpCompress.Archives.SevenZip.SevenZipArchive sza = SharpCompress.Archives.SevenZip.SevenZipArchive.Open(FileTools.TryOpenRead(_filename));
+				SharpCompress.Archives.SevenZip.SevenZipArchive sza = SharpCompress.Archives.SevenZip.SevenZipArchive.Open(Utilities.TryOpenRead(_filename));
 				foreach (SevenZipArchiveEntry entry in sza.Entries.Where(e => e != null && !e.IsDirectory))
 				{
 					// If secure hashes are disabled, do a quickscan
@@ -219,7 +219,7 @@ namespace SabreTools.Library.FileTypes
 					else
 					{
 						Stream entryStream = entry.OpenEntryStream();
-						Rom sevenZipEntryRom = (Rom)FileTools.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
+						Rom sevenZipEntryRom = (Rom)Utilities.GetStreamInfo(entryStream, entry.Size, omitFromScan: omitFromScan);
 						sevenZipEntryRom.Name = entry.Key;
 						sevenZipEntryRom.MachineName = gamename;
 						sevenZipEntryRom.Date = (date && entry.LastModifiedTime != null ? entry.LastModifiedTime?.ToString("yyyy/MM/dd hh:mm:ss") : null);
@@ -292,7 +292,7 @@ namespace SabreTools.Library.FileTypes
 			{
 				try
 				{
-					Stream fread = FileTools.TryOpenRead(_filename);
+					Stream fread = Utilities.TryOpenRead(_filename);
 					uint ar, offs = 0;
 					fread.Seek(0, SeekOrigin.Begin);
 					byte[] buffer = new byte[128];
@@ -338,7 +338,7 @@ namespace SabreTools.Library.FileTypes
 		public override bool Write(string inputFile, string outDir, Rom rom, bool date = false, bool romba = false)
 		{
 			// Get the file stream for the file and write out
-			return Write(FileTools.TryOpenRead(inputFile), outDir, rom, date: date);
+			return Write(Utilities.TryOpenRead(inputFile), outDir, rom, date: date);
 		}
 
 		/// <summary>
@@ -371,7 +371,7 @@ namespace SabreTools.Library.FileTypes
 			inputStream.Seek(0, SeekOrigin.Begin);
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".7z") ? "" : ".7z"));
+			string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(rom.MachineName) + (rom.MachineName.EndsWith(".7z") ? "" : ".7z"));
 
 			// Set internal variables
 			SevenZipBase.SetLibraryPath("7za.dll");
@@ -503,19 +503,19 @@ namespace SabreTools.Library.FileTypes
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
 			{
-				FileTools.TryDeleteFile(archiveFileName);
+				Utilities.TryDeleteFile(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
 
 			// Now make the file T7Z
 			// TODO: Add ACTUAL T7Z compatible code
 
-			BinaryWriter bw = new BinaryWriter(FileTools.TryOpenReadWrite(archiveFileName));
+			BinaryWriter bw = new BinaryWriter(Utilities.TryOpenReadWrite(archiveFileName));
 			bw.Seek(0, SeekOrigin.Begin);
 			bw.Write(Constants.Torrent7ZipHeader);
 			bw.Seek(0, SeekOrigin.End);
 
-			using (oldZipFile = new SevenZipExtractor(FileTools.TryOpenReadWrite(archiveFileName)))
+			using (oldZipFile = new SevenZipExtractor(Utilities.TryOpenReadWrite(archiveFileName)))
 			{
 
 				// Get the correct signature to use (Default 0, Unicode 1, SingleFile 2, StripFileNames 4)
@@ -573,7 +573,7 @@ namespace SabreTools.Library.FileTypes
 			}
 
 			// Get the output archive name from the first rebuild rom
-			string archiveFileName = Path.Combine(outDir, Style.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".7z") ? "" : ".7z"));
+			string archiveFileName = Path.Combine(outDir, Utilities.RemovePathUnsafeCharacters(roms[0].MachineName) + (roms[0].MachineName.EndsWith(".7z") ? "" : ".7z"));
 
 			// Set internal variables
 			SevenZipBase.SetLibraryPath("7za.dll");
@@ -628,8 +628,8 @@ namespace SabreTools.Library.FileTypes
 						zipFile.CompressionMode = CompressionMode.Append;
 					}
 
-					FileTools.CleanDirectory(tempPath);
-					FileTools.TryDeleteDirectory(tempPath);
+					Utilities.CleanDirectory(tempPath);
+					Utilities.TryDeleteDirectory(tempPath);
 				}
 
 				// Otherwise, sort the input files and write out in the correct order
@@ -684,7 +684,7 @@ namespace SabreTools.Library.FileTypes
 							// If we have the input file, add it now
 							if (index < 0)
 							{
-								FileStream inputStream = FileTools.TryOpenRead(inputFiles[-index - 1]);
+								FileStream inputStream = Utilities.TryOpenRead(inputFiles[-index - 1]);
 
 								// Create a stream dictionary
 								Dictionary<string, Stream> dict = new Dictionary<string, Stream>();
@@ -727,19 +727,19 @@ namespace SabreTools.Library.FileTypes
 			// If the old file exists, delete it and replace
 			if (File.Exists(archiveFileName))
 			{
-				FileTools.TryDeleteFile(archiveFileName);
+				Utilities.TryDeleteFile(archiveFileName);
 			}
 			File.Move(tempFile, archiveFileName);
 
 			// Now make the file T7Z
 			// TODO: Add ACTUAL T7Z compatible code
 
-			BinaryWriter bw = new BinaryWriter(FileTools.TryOpenReadWrite(archiveFileName));
+			BinaryWriter bw = new BinaryWriter(Utilities.TryOpenReadWrite(archiveFileName));
 			bw.Seek(0, SeekOrigin.Begin);
 			bw.Write(Constants.Torrent7ZipHeader);
 			bw.Seek(0, SeekOrigin.End);
 
-			using (oldZipFile = new SevenZipExtractor(FileTools.TryOpenReadWrite(archiveFileName)))
+			using (oldZipFile = new SevenZipExtractor(Utilities.TryOpenReadWrite(archiveFileName)))
 			{
 				// Get the correct signature to use (Default 0, Unicode 1, SingleFile 2, StripFileNames 4)
 				byte[] tempsig = Constants.Torrent7ZipSignature;

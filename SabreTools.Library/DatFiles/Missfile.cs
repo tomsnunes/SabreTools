@@ -73,7 +73,7 @@ namespace SabreTools.Library.DatFiles
 			try
 			{
 				Globals.Logger.User("Opening file for writing: {0}", outfile);
-				FileStream fs = FileTools.TryCreate(outfile);
+				FileStream fs = Utilities.TryCreate(outfile);
 
 				// If we get back null for some reason, just log and return
 				if (fs == null)

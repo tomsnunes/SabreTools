@@ -54,7 +54,7 @@ namespace SabreTools.Library.Reports
 			string line = "\t\t\t<tr" + (_datFile.FileName.StartsWith("DIR: ")
 							? " class=\"dir\"><td>" + HttpUtility.HtmlEncode(_datFile.FileName.Remove(0, 5))
 							: "><td>" + HttpUtility.HtmlEncode(_datFile.FileName)) + "</td>"
-						+ "<td align=\"right\">" + Style.GetBytesReadable(_datFile.TotalSize) + "</td>"
+						+ "<td align=\"right\">" + Utilities.GetBytesReadable(_datFile.TotalSize) + "</td>"
 						+ "<td align=\"right\">" + (game == -1 ? _datFile.Keys.Count() : game) + "</td>"
 						+ "<td align=\"right\">" + _datFile.RomCount + "</td>"
 						+ "<td align=\"right\">" + _datFile.DiskCount + "</td>"
