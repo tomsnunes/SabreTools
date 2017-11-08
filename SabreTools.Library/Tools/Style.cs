@@ -530,7 +530,7 @@ namespace SabreTools.Library.Tools
 		#region Externally sourced methods
 
 		/// <summary>
-		///  Returns the human-readable file size for an arbitrary, 64-bit file size 
+		/// Returns the human-readable file size for an arbitrary, 64-bit file size 
 		/// The default format is "0.### XB", e.g. "4.2 KB" or "1.434 GB"
 		/// </summary>
 		/// <param name="input"></param>
@@ -584,8 +584,11 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
+		/// Convert a byte array to a hex string
 		/// </summary>
+		/// <param name="bytes">Byte array to convert</param>
+		/// <returns>Hex string representing the byte array</returns>
+		/// <link>http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa</link>
 		public static string ByteArrayToString(byte[] bytes)
 		{
 			try
@@ -600,8 +603,11 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa
+		/// Convert a hex string to a byte array
 		/// </summary>
+		/// <param name="hex">Hex string to convert</param>
+		/// <returns>Byte array represenging the hex string</returns>
+		/// <link>http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa</link>
 		public static byte[] StringToByteArray(string hex)
 		{
 			try
@@ -619,8 +625,11 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// http://stackoverflow.com/questions/5613279/c-sharp-hex-to-ascii
+		/// Convert a hex string to an ASCII one
 		/// </summary>
+		/// <param name="hexString">Hex string to convert</param>
+		/// <returns>ASCII string representing the hex string</returns>
+		/// <link>http://stackoverflow.com/questions/5613279/c-sharp-hex-to-ascii</link>
 		public static string ConvertHexToAscii(string hexString)
 		{
 			if (hexString.Contains("-"))
@@ -640,8 +649,11 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// http://stackoverflow.com/questions/15920741/convert-from-string-ascii-to-string-hex
+		/// Convert an ASCII string to a hex one
 		/// </summary>
+		/// <param name="asciiString">ASCII string to convert</param>
+		/// <returns>Hex string representing the ASCII string</returns>
+		/// <link>http://stackoverflow.com/questions/15920741/convert-from-string-ascii-to-string-hex</link>
 		public static string ConvertAsciiToHex(string asciiString)
 		{
 			string hexOutput = "";
@@ -659,8 +671,13 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// Adapted from 7-zip Source Code: CPP/Windows/TimeUtils.cpp:FileTimeToDosTime
+		/// Convert .NET DateTime to MS-DOS date format
 		/// </summary>
+		/// <param name="dateTime">.NET DateTime object to convert</param>
+		/// <returns>UInt32 representing the MS-DOS date</returns>
+		/// <remarks>
+		/// Adapted from 7-zip Source Code: CPP/Windows/TimeUtils.cpp:FileTimeToDosTime
+		/// </remarks>
 		public static uint ConvertDateTimeToMsDosTimeFormat(DateTime dateTime)
 		{
 			uint year = (uint)((dateTime.Year - 1980) % 128);
@@ -674,8 +691,13 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// Adapted from 7-zip Source Code: CPP/Windows/TimeUtils.cpp:DosTimeToFileTime
+		/// Convert MS-DOS date format to .NET DateTime
 		/// </summary>
+		/// <param name="msDosDateTime">UInt32 representing the MS-DOS date to convert</param>
+		/// <returns>.NET DateTime object representing the converted date</returns>
+		/// <remarks>
+		/// Adapted from 7-zip Source Code: CPP/Windows/TimeUtils.cpp:DosTimeToFileTime
+		/// </remarks>
 		public static DateTime ConvertMsDosTimeFormatToDateTime(uint msDosDateTime)
 		{
 			return new DateTime((int)(1980 + (msDosDateTime >> 25)), (int)((msDosDateTime >> 21) & 0xF), (int)((msDosDateTime >> 16) & 0x1F),
@@ -685,10 +707,10 @@ namespace SabreTools.Library.Tools
 		/// <summary>
 		/// Determines a text file's encoding by analyzing its byte order mark (BOM).
 		/// Defaults to ASCII when detection of the text file's endianness fails.
-		/// http://stackoverflow.com/questions/3825390/effective-way-to-find-any-files-encoding
 		/// </summary>
 		/// <param name="filename">The text file to analyze.</param>
 		/// <returns>The detected encoding.</returns>
+		/// <link>http://stackoverflow.com/questions/3825390/effective-way-to-find-any-files-encoding</link>
 		public static Encoding GetEncoding(string filename)
 		{
 			// Read the BOM
@@ -707,8 +729,12 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// http://stackoverflow.com/questions/1600962/displaying-the-build-date
+		/// Extension method to get the DateTime that an assembly was linked
 		/// </summary>
+		/// <param name="assembly">Assembly to get linker time from</param>
+		/// <param name="target">Target timezone to convert the time to (default null)</param>
+		/// <returns>DateTime that the assembly was linked</returns>
+		/// <link>http://stackoverflow.com/questions/1600962/displaying-the-build-date</link>
 		public static DateTime GetLinkerTime(this Assembly assembly, TimeZoneInfo target = null)
 		{
 			var filePath = assembly.Location;
@@ -733,11 +759,11 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// Indicates whether the specified array is null or has a length of zero.
-		/// https://stackoverflow.com/questions/8560106/isnullorempty-equivalent-for-array-c-sharp
+		/// Indicates whether the specified array is null or has a length of zero
 		/// </summary>
-		/// <param name="array">The array to test.</param>
+		/// <param name="array">The array to test</param>
 		/// <returns>true if the array parameter is null or has a length of zero; otherwise, false.</returns>
+		/// <link>https://stackoverflow.com/questions/8560106/isnullorempty-equivalent-for-array-c-sharp</link>
 		public static bool IsNullOrEmpty(this Array array)
 		{
 			return (array == null || array.Length == 0);
