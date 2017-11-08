@@ -1889,6 +1889,62 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get the proper output path for a given input file and output directory
+		/// </summary>
+		/// <param name="outDir">Output directory to use</param>
+		/// <param name="inputpath">Input path to create output for</param>
+		/// <param name="inplace">True if the output file should go to the same input folder, false otherwise</param>
+		/// <param name="splitpath">True if the input path should be treated as an appended parent directory, false otherwise (default)</param>
+		/// <returns>Complete output path</returns>
+		public static string GetOutputPath(string outDir, string inputpath, bool inplace, bool splitpath = false)
+		{
+			// First, we need to ensure the output directory
+			outDir = EnsureOutputDirectory(outDir);
+
+			// If we have a split path, we need to treat the input separately
+			if (splitpath)
+			{
+				string[] split = inputpath.Split('¬');
+
+				// If we have an inplace output, use the directory name from the input path
+				if (inplace)
+				{
+					outDir = Path.GetDirectoryName(split[1]);
+				}
+
+				// If we are processing a path that is coming from a directory, we want to get the subfolder to write to
+				else if (split[0].Length != split[1].Length)
+				{
+					outDir = Path.GetDirectoryName(Path.Combine(outDir, split[0].Remove(0, split[1].Length + 1)));
+				}
+
+				// If we are processing a single file from the root of a directory, we just use the output directory
+				else
+				{
+					// No-op
+				}
+			}
+			// Otherwise, assume the input path is just a filename
+			else
+			{
+				// If we have an inplace output, use the directory name from the input path
+				if (inplace)
+				{
+					outDir = Path.GetDirectoryName(inputpath);
+				}
+
+				// Otherwise, just use the supplied output directory
+				else
+				{
+					// No-op
+				}
+			}
+
+			// Finally, return the output directory
+			return outDir;
+		}
+
+		/// <summary>
 		/// Get a proper romba sub path
 		/// </summary>
 		/// <param name="hash">SHA-1 hash to get the path for</param>
