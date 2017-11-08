@@ -5051,8 +5051,8 @@ namespace SabreTools.Library.DatFiles
 						md5.Add(key, item);
 					}
 					// If the file has no MD5 but a CRC
-					else if ((item.Type == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)item).SHA1))
-						|| (item.Type == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)item).SHA1)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)item).CRC))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)item).CRC)))
 					{
 						crc.Add(key, item);
 					}
