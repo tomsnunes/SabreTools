@@ -319,6 +319,7 @@ namespace SabreTools
 		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">List of input files/folders to check</param>
 		/// <param name="outDir">Output directory to use to build to</param>
+		/// <param name="depot">True if the input direcories are treated as romba depots, false otherwise</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
 		/// <param name="delete">True if input files should be deleted, false otherwise</param>
@@ -333,7 +334,7 @@ namespace SabreTools
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
-		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, bool quickScan, bool date, bool delete,
+		private static void InitSort(List<string> datfiles, List<string> inputs, string outDir, bool depot, bool quickScan, bool date, bool delete,
 			bool inverse, OutputFormat outputFormat, bool romba, int sevenzip, int gz, int rar, int zip, bool updateDat, string headerToCheckAgainst,
 			SplitType splitType, bool chdsAsFiles)
 		{
@@ -354,43 +355,17 @@ namespace SabreTools
 
 			watch.Stop();
 
-			datdata.RebuildGeneric(inputs, outDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
-				updateDat, headerToCheckAgainst, chdsAsFiles);
-		}
-
-		/// <summary>
-		/// Wrap sorting files from a depot using an input DAT
-		/// </summary>
-		/// <param name="datfiles">Names of the DATs to compare against</param>
-		/// <param name="inputs">List of input files/folders to check</param>
-		/// <param name="outDir">Output directory to use to build to</param>
-		/// <param name="date">True if the date from the DAT should be used if available, false otherwise</param>
-		/// <param name="delete">True if input files should be deleted, false otherwise</param>
-		/// <param name="inverse">True if the DAT should be used as a filter instead of a template, false otherwise</param>
-		/// <param name="outputFormat">Output format that files should be written to</param>
-		/// <param name="romba">True if files should be output in Romba depot folders, false otherwise</param>
-		/// <param name="updateDat">True if the updated DAT should be output, false otherwise</param>
-		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		private static void InitSortDepot(List<string> datfiles, List<string> inputs, string outDir, bool date, bool delete,
-			bool inverse, OutputFormat outputFormat, bool romba, bool updateDat, string headerToCheckAgainst, SplitType splitType)
-		{
-			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
-
-			// Get a list of files from the input datfiles
-			datfiles = Utilities.GetOnlyFilesFromInputs(datfiles);
-
-			// Add all of the input DATs into one huge internal DAT
-			DatFile datdata = new DatFile();
-			foreach (string datfile in datfiles)
+			// If we have the depot flag, repsect it
+			if (depot)
 			{
-				datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
-			}
-
-			watch.Stop();
-
-			datdata.RebuildDepot(inputs, outDir, date, delete, inverse, outputFormat, romba,
+				datdata.RebuildDepot(inputs, outDir, date, delete, inverse, outputFormat, romba,
 				updateDat, headerToCheckAgainst);
+			}
+			else
+			{
+				datdata.RebuildGeneric(inputs, outDir, quickScan, date, delete, inverse, outputFormat, romba, asl,
+				updateDat, headerToCheckAgainst, chdsAsFiles);
+			}
 		}
 
 		/// <summary>
@@ -740,12 +715,13 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="datfiles">Names of the DATs to compare against</param>
 		/// <param name="inputs">Input directories to compare against</param>
+		/// <param name="depot">True if the input direcories are treated as romba depots, false otherwise</param>
 		/// <param name="hashOnly">True if only hashes should be checked, false for full file information</param>
 		/// <param name="quickScan">True to enable external scanning of archives, false otherwise</param>
 		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
-		private static void InitVerify(List<string> datfiles, List<string> inputs, bool hashOnly, bool quickScan,
+		private static void InitVerify(List<string> datfiles, List<string> inputs, bool depot, bool hashOnly, bool quickScan,
 			string headerToCheckAgainst, SplitType splitType, bool chdsAsFiles)
 		{
 			// Get the archive scanning level
@@ -765,33 +741,15 @@ namespace SabreTools
 
 			watch.Stop();
 
-			datdata.VerifyGeneric(inputs, hashOnly, quickScan, headerToCheckAgainst, chdsAsFiles);
-		}
-
-		/// <summary>
-		/// Wrap verifying files from a depot using an input DAT
-		/// </summary>
-		/// <param name="datfiles">Names of the DATs to compare against</param>
-		/// <param name="inputs">Input directories to compare against</param>
-		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
-		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		private static void InitVerifyDepot(List<string> datfiles, List<string> inputs, string headerToCheckAgainst, SplitType splitType)
-		{
-			InternalStopwatch watch = new InternalStopwatch("Populating internal DAT");
-
-			// Get a list of files from the input datfiles
-			datfiles = Utilities.GetOnlyFilesFromInputs(datfiles);
-
-			// Add all of the input DATs into one huge internal DAT
-			DatFile datdata = new DatFile();
-			foreach (string datfile in datfiles)
+			// If we have the depot flag, repsect it
+			if (depot)
 			{
-				datdata.Parse(datfile, 99, 99, splitType, keep: true, useTags: true);
+				datdata.VerifyDepot(inputs, headerToCheckAgainst);
 			}
-
-			watch.Stop();
-
-			datdata.VerifyDepot(inputs, headerToCheckAgainst);
+			else
+			{
+				datdata.VerifyGeneric(inputs, hashOnly, quickScan, headerToCheckAgainst, chdsAsFiles);
+			}
 		}
 
 		#endregion

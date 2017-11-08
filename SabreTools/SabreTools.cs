@@ -77,15 +77,13 @@ namespace SabreTools
 				extract = false,
 				restore = false,
 				sort = false,
-				sortDepot = false,
 				splitByExt = false,
 				splitByHash = false,
 				splitByLevel = false,
 				splitByType = false,
 				stats = false,
 				update = false,
-				verify = false,
-				verifyDepot = false;
+				verify = false;
 
 			// User flags
 			bool addBlankFilesForEmptyFolder = false,
@@ -97,6 +95,7 @@ namespace SabreTools
 				copyFiles = false,
 				datPrefix = false,
 				delete = false,
+				depot = false,
 				descAsName = false,
 				excludeOf = false,
 				hashOnly = false,
@@ -227,10 +226,6 @@ namespace SabreTools
 				case "--sort":
 					sort = true;
 					break;
-				case "-ssd":
-				case "--sort-depot":
-					sortDepot = true;
-					break;
 				case "-st":
 				case "--stats":
 					stats = true;
@@ -246,10 +241,6 @@ namespace SabreTools
 				case "-ve":
 				case "--verify":
 					verify = true;
-					break;
-				case "-ved":
-				case "--verify-depot":
-					verifyDepot = true;
 					break;
 
 				// If we don't have a valid flag, feed it through the help system
@@ -340,6 +331,10 @@ namespace SabreTools
 					case "-del":
 					case "--delete":
 						delete = true;
+						break;
+					case "-dep":
+					case "--depot":
+						depot = true;
 						break;
 					case "-df":
 					case "--dat-fullnonmerged":
@@ -1246,7 +1241,7 @@ namespace SabreTools
 			}
 
 			// If none of the feature flags is enabled, show the help screen
-			if (!(datFromDir | extract | restore | sort | sortDepot | splitByExt | splitByHash | splitByLevel | splitByType | stats | update | verify | verifyDepot))
+			if (!(datFromDir | extract | restore | sort | splitByExt | splitByHash | splitByLevel | splitByType | stats | update | verify))
 			{
 				Globals.Logger.Error("At least one feature switch must be enabled");
 				_help.OutputGenericHelp();
@@ -1255,7 +1250,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(datFromDir ^ extract ^ restore ^ sort ^ sortDepot ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify ^ verifyDepot))
+			if (!(datFromDir ^ extract ^ restore ^ sort ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify))
 			{
 				Globals.Logger.Error("Only one feature switch is allowed at a time");
 				_help.OutputGenericHelp();
@@ -1265,7 +1260,7 @@ namespace SabreTools
 
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (inputs.Count == 0
-				&& (datFromDir || extract || restore || splitByExt || splitByHash || splitByLevel || splitByType || stats || update || verify || verifyDepot))
+				&& (datFromDir || extract || restore || splitByExt || splitByHash || splitByLevel || splitByType || stats || update || verify))
 			{
 				Globals.Logger.Error("This feature requires at least one input");
 				_help.OutputIndividualFeature(feature);
@@ -1298,15 +1293,8 @@ namespace SabreTools
 			// If we're using the sorter
 			else if (sort)
 			{
-				InitSort(datfiles, inputs, outDir, quickScan, addFileDates, delete, inverse,
+				InitSort(datfiles, inputs, outDir, depot, quickScan, addFileDates, delete, inverse,
 					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, splitType, chdsAsFiles);
-			}
-
-			// If we're using the sorter from depot
-			else if (sortDepot)
-			{
-				InitSortDepot(datfiles, inputs, outDir, addFileDates, delete, inverse,
-					outputFormat, romba, updateDat, header, splitType);
 			}
 
 			// Split a DAT by extension
@@ -1351,13 +1339,7 @@ namespace SabreTools
 			// If we're using the verifier
 			else if (verify)
 			{
-				InitVerify(datfiles, inputs, hashOnly, quickScan, header, splitType, chdsAsFiles);
-			}
-
-			// If we're using the depot verifier
-			else if (verifyDepot)
-			{
-				InitVerifyDepot(datfiles, inputs, header, splitType);
+				InitVerify(datfiles, inputs, depot, hashOnly, quickScan, header, splitType, chdsAsFiles);
 			}
 
 			// If nothing is set, show the help

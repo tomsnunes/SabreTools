@@ -409,6 +409,11 @@ namespace SabreTools
 				"Output directory",
 				FeatureType.String,
 				null));
+			sort.AddFeature("depot", new Feature(
+				new List<string>() { "-dep", "--depot" },
+				"Assume directories are romba depots",
+				FeatureType.Flag,
+				null));
 			sort.AddFeature("delete", new Feature(
 				new List<string>() { "-del", "--delete" },
 				"Delete fully rebuilt input files",
@@ -561,140 +566,6 @@ namespace SabreTools
 				"Amount of threads to use (default 4, -1 unlimted)",
 				FeatureType.String,
 				null));	
-
-			// Create the Sort Depot feature
-			Feature sortDepot = new Feature(
-				new List<string>() { "-ssd", "--sort-depot" },
-				"Sort romba depots by a set of DATs",
-				FeatureType.Flag,
-				null);
-			sortDepot.AddFeature("dat", new Feature(
-				new List<string>() { "-dat", "--dat" },
-				"Input DAT to rebuild against",
-				FeatureType.List,
-				null));
-			sortDepot.AddFeature("out", new Feature(
-				new List<string>() { "-out", "--out" },
-				"Output directory",
-				FeatureType.String,
-				null));
-			sortDepot.AddFeature("delete", new Feature(
-				new List<string>() { "-del", "--delete" },
-				"Delete fully rebuilt input files",
-				FeatureType.Flag,
-				null));
-			sortDepot.AddFeature("inverse", new Feature(
-				new List<string>() { "-in", "--inverse" },
-				"Rebuild only files not in DAT",
-				FeatureType.Flag,
-				null));
-			sortDepot.AddFeature("add-date", new Feature(
-				new List<string>() { "-ad", "--add-date" },
-				"Add original dates from DAT, if possible",
-				FeatureType.Flag,
-				null));
-			sortDepot.AddFeature("t7z", new Feature(
-				new List<string>() { "-t7z", "--t7z" },
-				"Enable Torrent7z output",
-				FeatureType.Flag,
-				null));
-			sortDepot.AddFeature("tar", new Feature(
-				new List<string>() { "-tar", "--tar" },
-				"Enable TAR output",
-				FeatureType.Flag,
-				null));
-			sortDepot.AddFeature("tgz", new Feature(
-				new List<string>() { "-tgz", "--tgz" },
-				"Enable TorrentGZ output",
-				FeatureType.Flag,
-				null));
-			sortDepot["tgz"].AddFeature("romba", new Feature(
-				new List<string>() { "-r", "--romba" },
-				"Enable Romba depot dir output",
-				FeatureType.Flag,
-				null));
-			/*
-			sortDepot.AddFeature("tlrz", new Feature(
-				new List<string>() { "-tlrz", "--tlrz" },
-				"Enable TorrentLRZ output",
-				FeatureType.Flag,
-				null));
-			*/
-			/*
-			sortDepot.AddFeature("tlz4", new Feature(
-				new List<string>() { "-tlz4", "--tlz4" },
-				"Enable TorrentLZ4 output",
-				FeatureType.Flag,
-				null));
-			*/
-			/*
-			sortDepot.AddFeature("trar", new Feature(
-				new List<string>() { "-trar", "--trar" },
-				"Enable TorrentRAR output",
-				FeatureType.Flag,
-				null));
-			*/
-			/*
-			sortDepot.AddFeature("txz", new Feature(
-				new List<string>() { "-txz", "--txz" },
-				"Enable TorrentXZ output",
-				FeatureType.Flag,
-				null));
-			*/
-			sortDepot.AddFeature("tzip", new Feature(
-				new List<string>() { "-tzip", "--tzip" },
-				"Enable TorrentZip output",
-				FeatureType.Flag,
-				null));
-			/*
-			sortDepot.AddFeature("tzpaq", new Feature(
-				new List<string>() { "-tzpaq", "--tzpaq" },
-				"Enable TorrentZPAQ output",
-				FeatureType.Flag,
-				null));
-			*/
-			/*
-			sortDepot.AddFeature("tzstd", new Feature(
-				new List<string>() { "-tzstd", "--tzstd" },
-				"Enable TorrentZstd output",
-				FeatureType.Flag,
-				null));
-			*/
-			sortDepot.AddFeature("header", new Feature(
-				new List<string>() { "-h", "--header" },
-				"Set a header skipper to use, blank means all",
-				FeatureType.String,
-				null));
-			sortDepot.AddFeature("dat-merged", new Feature(
-				new List<string>() { "-dm", "--dat-merged" },
-				"Force creating merged sets",
-				FeatureType.Flag,
-				null));
-			sortDepot.AddFeature("dat-split", new Feature(
-				new List<string>() { "-ds", "--dat-split" },
-				"Force creating split sets",
-				FeatureType.Flag,
-				null));
-			sortDepot.AddFeature("dat-nonmerged", new Feature(
-				new List<string>() { "-dnm", "--dat-nonmerged" },
-				"Force creating non-merged sets",
-				FeatureType.Flag,
-				null));
-			sortDepot.AddFeature("dat-fullnonmerged", new Feature(
-				new List<string>() { "-df", "--dat-fullnonmerged" },
-				"Force creating fully non-merged sets",
-				FeatureType.Flag,
-				null));
-			sortDepot.AddFeature("update-dat", new Feature(
-				new List<string>() { "-ud", "--update-dat" },
-				"Output updated DAT to output directory",
-				FeatureType.Flag,
-				null));
-			sortDepot.AddFeature("mt", new Feature(
-				new List<string>() { "-mt", "--mt" },
-				"Amount of threads to use (default 4, -1 unlimted)",
-				FeatureType.String,
-				null));
 
 			// Create the Stats feature
 			Feature stats = new Feature(
@@ -1484,6 +1355,11 @@ namespace SabreTools
 				"Input DAT to verify against",
 				FeatureType.List,
 				null));
+			verify.AddFeature("depot", new Feature(
+				new List<string>() { "-dep", "--depot" },
+				"Assume directories are romba depots",
+				FeatureType.Flag,
+				null));
 			verify.AddFeature("temp", new Feature(
 				new List<string>() { "-t", "--temp" },
 				"Set the temporary directory to use",
@@ -1530,48 +1406,6 @@ namespace SabreTools
 				FeatureType.Flag,
 				null));
 
-			// Create the Verify Depot feature
-			Feature verifyDepot = new Feature(
-				new List<string>() { "-ved", "--verify-depot" },
-				"Verify a depot against DATs",
-				FeatureType.Flag,
-				null);
-			verifyDepot.AddFeature("dat", new Feature(
-				new List<string>() { "-dat", "--dat" },
-				"Input DAT to verify against",
-				FeatureType.List,
-				null));
-			verifyDepot.AddFeature("temp", new Feature(
-				new List<string>() { "-t", "--temp" },
-				"Set the temporary directory to use",
-				FeatureType.String,
-				null));
-			verifyDepot.AddFeature("header", new Feature(
-				new List<string>() { "-h", "--header" },
-				"Set a header skipper to use, blank means all",
-				FeatureType.String,
-				null));
-			verifyDepot.AddFeature("dat-merged", new Feature(
-				new List<string>() { "-dm", "--dat-merged" },
-				"Force checking merged sets",
-				FeatureType.Flag,
-				null));
-			verifyDepot.AddFeature("dat-split", new Feature(
-				new List<string>() { "-ds", "--dat-split" },
-				"Force checking split sets",
-				FeatureType.Flag,
-				null));
-			verifyDepot.AddFeature("dat-nonmerged", new Feature(
-				new List<string>() { "-dnm", "--dat-nonmerged" },
-				"Force checking non-merged sets",
-				FeatureType.Flag,
-				null));
-			verifyDepot.AddFeature("dat-fullnonmerged", new Feature(
-				new List<string>() { "-df", "--dat-fullnonmerged" },
-				"Force checking fully non-merged sets",
-				FeatureType.Flag,
-				null));
-
 			// Now, add all of the main features to the Help object
 			help.Add("Help", helpFeature);
 			help.Add("Script", script);
@@ -1582,12 +1416,10 @@ namespace SabreTools
 			help.Add("Level Split", levelSplit);
 			help.Add("Restore", restore);
 			help.Add("Sort", sort);
-			help.Add("Sort Depot", sortDepot);
 			help.Add("Stats", stats);
 			help.Add("Type Split", typeSplit);
 			help.Add("Update", update);
 			help.Add("Verify", verify);
-			help.Add("Verify Depot", verifyDepot);
 
 			return help;
 		}

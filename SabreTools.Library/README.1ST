@@ -483,6 +483,11 @@ Options:
 			This sets an output folder to be used when the files are created. If
 			a path is not defined, the application directory is used instead.
 			
+		-dep, --depot		Assume directories are romba depots
+			Normally, input directories will be treated with no special format.
+			If this flag is used, all input directories will be assumed to be
+			romba-style depots.
+			
 		-d, --delete		Delete fully rebuilt input files
 			Optionally, the input files, once processed and fully matched, can
 			be deleted. This can be useful when the original file structure is
@@ -633,154 +638,6 @@ Options:
 			Preprocess the DAT to have child sets contain all items from the
 			device references. This is incompatible with the other --dat-X
 			flags.
-		
-		-df, --dat-fullnonmerged Force creating fully non-merged sets
-			Preprocess the DAT to have child sets contain all items from the
-			parent sets based on the cloneof and romof tags as well as device
-			references. This is incompatible with the other --dat-X flags.
-				
-		-mt={4}			Amount of threads to use
-			Optionally, set the number of threads to use for the multithreaded
-			operations. The default is 4 threads; -1 means unlimited threads
-			created. If the user specifies that only 1 thread is to be used, it
-			defaults to the original, serial implementation of the DFD code.
-			
-		-upd, --update-dat	Output updated DAT
-			Once the files that were able to rebuilt are taken care of, a DAT of
-			the files that could not be matched will be output to the output
-			directory.
-			
-	-ssd, --sort-depot		Sort input depots by a set of DATs
-		This feature allows the user to quickly rebuild based on a supplied DAT
-		file(s). By default all files will be rebuilt to uncompressed folders in
-		the output directory. This is different than the generic sort above as
-		it requires that all inputs are Romba-compatible depots.
-		
-		-dat=				Name of the DAT to be used for the various options
-			The user-supplied DAT used to check which files need to be rebuilt.
-			Multiple occurrences of this flag are allowed.
-		
-		-out=				Set the name of the output directory
-			This sets an output folder to be used when the files are created. If
-			a path is not defined, the application directory is used instead.
-			
-		-d, --delete		Delete fully rebuilt input files
-			Optionally, the input files, once processed and fully matched, can
-			be deleted. This can be useful when the original file structure is
-			no longer needed or if there is limited space on the source drive.
-			
-		-in, --inverse		Match files not in the DAT
-			Instead of the normal behavior of rebuilding using a DAT, this flag
-			allows the user to use the DAT as a filter instead. All files that
-			are found in the DAT will be skipped and everything else will be
-			output in the selected format.
-			
-		-ad, --add-date		Write dates for each file parsed, if available
-			If this flag is set, the the date in the DAT will be used for the
-			output file instead of the standard date and time for TorrentZip.
-			This will technically invalidate the output files as proper
-			TorrentZip files because the date will not match the standard.
-			
-		-t7z				Enable Torrent 7zip output
-			Instead of ouputting the files to folder, files will be rebuilt to
-			Torrent7Zip (T7Z) files. This format is based on the LZMA container
-			format 7zip, but with custom header information. This is currently
-			unused by any major application. Currently does not produce proper
-			Torrent-compatible outputs.
-			
-		-tar				Enable Tape ARchive output
-			Instead of outputting the fiels to folder, files will be rebuilt to
-			Tape ARchive (TAR) files. This format is a standardized storage
-			archive without any compression, usually used with other compression
-			formats around it. It is widely used in backup applications and
-			source code archives.
-		
-		-tgz				Enable Torrent GZ output
-			Instead of outputting the files to folder, files will be rebuilt to
-			TorrentGZ (TGZ) files. This format is based on the GZip archive
-			format, but with custom header information and a file name replaced
-			by the SHA-1 of the file inside. This is primarily used by external
-			tool Romba (https://github.com/uwedeportivo/romba), but may be used
-			more widely in the future.
-		
-			-r, --romba			Enable Romba depot directory output
-				As an extension of the parent flag, this outputs the TGZ files
-				into directories based on the structure used by Romba. This uses
-				nested folders using the first 4 bytes of the SHA-1, 1 byte for
-				each layer of the directory name. It also includes two auxilary
-				files, .romba_size and .romba_size.backup, that have the
-				compressed size of the folder inside for use with Romba.
-				
-		-tlrz				Enable Torrent Long-Range Zip output [UNIMPLEMENTED]
-			Instead of ouputting the files to folder, files will be rebuilt to
-			Torrent Long-Range Zip (TLRZ) files. This format is based on the
-			LRZip file format as defined at https://github.com/ckolivas/lrzip
-			but with custom header information. This is currently unused by any
-			major application.
-			
-		-tlz4				Enable Torrent LZ4 output [UNIMPLEMENTED]
-			Instead of ouputting the files to folder, files will be rebuilt to
-			Torrent LZ4 (TLZ4) files. This format is based on the LZ4 file
-			format as defined at https://github.com/lz4/lz4 but with custom
-			header information. This is currently unused by any major
-			application.
-			
-		-trar				Enable Torrent RAR output [UNIMPLEMENTED]
-			Instead of outputting files to folder, files will be rebuilt to
-			Torrent RAR (TRAR) files. This format is based on the RAR propietary
-			format but with custom header information. This is currently unused
-			by any major application.
-			
-		-txz				Enable Torrent XZ output [UNSUPPORTED]
-			Instead of outputting files to folder, files will be rebuilt to
-			Torrent XZ (TXZ) files. This format is based on the LZMA container
-			format XZ, but with custom header information. This is currently
-			unused by any major application. Currently does not produce proper
-			Torrent-compatible outputs.
-			
-		-tzip				Enable Torrent Zip output
-			Instead of ouputting files to folder, files will be rebuilt to
-			TorrentZip (TZip) files. This format is based on the ZIP archive
-			format, but with custom header information. This is primarily used
-			by external tool RomVault (http://www.romvault.com/) and is already
-			widely used.
-			
-		-tzpaq				Enable Torrent ZPAQ output [UNIMPLEMENTED]
-			Instead of ouputting the files to folder, files will be rebuilt to
-			Torrent ZPAQ (TZPAQ) files. This format is based on the ZPAQ file
-			format as defined at https://github.com/zpaq/zpaq but with custom
-			header information. This is currently unused by any major
-			application.
-			
-		-tzstd				Enable Torrent Zstd output [UNIMPLEMENTED]
-			Instead of ouputting the files to folder, files will be rebuilt to
-			Torrent Zstd (TZstd) files. This format is based on the Zstd file
-			format as defined at https://github.com/skbkontur/ZstdNet but with
-			custom header information. This is currently unused by any major
-			application.
-			
-		-h=, --header=		Remove headers from hash calculations
-			If this is set, then all files that have copier headers that are
-			detected will have them removed from the hash calculation. This will
-			allow for a headered collection to be hashed without possibly
-			variant information. If a particular header skipper is defined, and
-			that skipper exists, then it will be used instead of trying to find
-			one that matches.
-			
-		-dm, --dat-merged	Force creating merged sets
-			Preprocess the DAT to have parent sets contain all items from the
-			children based on the cloneof tag. This is incompatible with the
-			other --dat-X flags.
-		
-		-ds, --dat-split	Force creating split sets
-			Preprocess the DAT to remove redundant files between parents and
-			children based on the romof and cloneof tags. This is incompatible
-			with the other --dat-X flags.
-		
-		-dnm, --dat-nonmerged Force creating non-merged sets
-			Preprocess the DAT to have child sets contain all items from the
-			parent set based on the cloneof tag. This is incompatible with the
-			other --dat-X flags.
 		
 		-df, --dat-fullnonmerged Force creating fully non-merged sets
 			Preprocess the DAT to have child sets contain all items from the
@@ -1334,7 +1191,12 @@ Options:
 		-dat=				Name of the DAT to be used for the various options
 			The user-supplied DAT used to check which files need to be verified.
 			Multiple occurrences of this flag are allowed.
-			
+		
+		-dep, --depot		Assume directories are romba depots
+			Normally, input directories will be treated with no special format.
+			If this flag is used, all input directories will be assumed to be
+			romba-style depots.
+		
 		-ho, --hash-only	Check files by hash only
 			This sets a mode where files are not checked based on name but
 			rather hash alone. This allows verification of (possibly)
@@ -1380,44 +1242,7 @@ Options:
 			Preprocess the DAT to have child sets contain all items from the
 			parent sets based on the cloneof and romof tags as well as device
 			references. This is incompatible with the other --dat-X flags.
-			
-	-ved, --verify-depot	Verify a depot against an input DAT
-		When used, this will use an input DAT or set of DATs to blindly check
-		against an input depot. This is based on the sort-depot code in which
-		the base directories are assumed to be romba-style depots.
 		
-		-dat=				Name of the DAT to be used for the various options
-			The user-supplied DAT used to check which files need to be verified.
-			Multiple occurrences of this flag are allowed.
-			
-		-h=, --header=		Remove headers from hash calculations
-			If this is set, then all files that have copier headers that are
-			detected will have them removed from the hash calculation. This will
-			allow for a headered collection to be hashed without possibly
-			variant information. If a particular header skipper is defined, and
-			that skipper exists, then it will be used instead of trying to find
-			one that matches.
-			
-		-dm, --dat-merged	Force checking merged sets
-			Preprocess the DAT to have parent sets contain all items from the
-			children based on the cloneof tag. This is incompatible with the
-			other --dat-X flags.
-		
-		-ds, --dat-split	Force checking split sets
-			Preprocess the DAT to remove redundant files between parents and
-			children based on the romof and cloneof tags. This is incompatible
-			with the other --dat-X flags.
-		
-		-dnm, --dat-nonmerged Force checking non-merged sets
-			Preprocess the DAT to have child sets contain all items from the
-			parent set based on the cloneof tag. This is incompatible with the
-			other --dat-X flags.
-		
-		-df, --dat-fullnonmerged Force checking fully non-merged sets
-			Preprocess the DAT to have child sets contain all items from the
-			parent sets based on the cloneof and romof tags as well as device
-			references. This is incompatible with the other --dat-X flags.
-
 ** Section 3.0 - Examples
 
 Here are a few usage examples based on features that are commonly used by most
