@@ -186,34 +186,27 @@ namespace SabreTools
 		/// <param name="exta">First extension to split on</param>
 		/// <param name="extb">Second extension to split on</param>
 		/// <param name="outDir">Output directory for the split files</param>
-		private static void InitExtSplit(List<string> inputs, List<string> exta, List<string> extb, string outDir)
+		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
+		private static void InitExtSplit(List<string> inputs, List<string> exta, List<string> extb, string outDir, bool inplace)
 		{
+			// Get only files from the inputs
+			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs, appendparent: true);
+
 			// Loop over the input files
-			foreach (string input in inputs)
+			foreach (string file in files)
 			{
-				if (File.Exists(input))
-				{
-					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0);
-					datFile.SplitByExtension(outDir, Path.GetDirectoryName(input), exta, extb);
-				}
-				else if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-					{
-						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0);
-						datFile.SplitByExtension(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar),
-							exta, extb);
-					}
-				}
-				else
-				{
-					Globals.Logger.Error("'{0}' is not a valid file or folder!", input);
-					Console.WriteLine();
-					_help.OutputIndividualFeature("Extension Split");
-					return;
-				}
+				// Split the input filename
+				string[] splitpath = file.Split('¬');
+
+				// Create and fill the new DAT
+				DatFile datFile = new DatFile();
+				datFile.Parse(splitpath[0], 0, 0);
+
+				// Get the output directory
+				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
+
+				// Split and write the DAT
+				datFile.SplitByExtension(outDir, inplace, exta, extb);
 			}
 		}
 
@@ -222,33 +215,27 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
 		/// <param name="outDir">Output directory for the split files</param>
-		private static void InitHashSplit(List<string> inputs, string outDir)
+		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
+		private static void InitHashSplit(List<string> inputs, string outDir, bool inplace)
 		{
+			// Get only files from the inputs
+			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs, appendparent: true);
+
 			// Loop over the input files
-			foreach (string input in inputs)
+			foreach (string file in files)
 			{
-				if (File.Exists(input))
-				{
-					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0);
-					datFile.SplitByHash(outDir, Path.GetDirectoryName(input));
-				}
-				else if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-					{
-						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0);
-						datFile.SplitByHash(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar));
-					}
-				}
-				else
-				{
-					Globals.Logger.Error("'{0}' is not a valid file or folder!", input);
-					Console.WriteLine();
-					_help.OutputIndividualFeature("Hash Split");
-					return;
-				}
+				// Split the input filename
+				string[] splitpath = file.Split('¬');
+
+				// Create and fill the new DAT
+				DatFile datFile = new DatFile();
+				datFile.Parse(splitpath[0], 0, 0);
+
+				// Get the output directory
+				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
+
+				// Split and write the DAT
+				datFile.SplitByHash(outDir, inplace);
 			}
 		}
 
@@ -280,36 +267,29 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
 		/// <param name="outDir">Output directory for the split files</param>
+		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
 		/// <param name="shortname">True if short filenames should be used, false otherwise</param>
 		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise</param>
-		private static void InitLevelSplit(List<string> inputs, string outDir, bool shortname, bool basedat)
+		private static void InitLevelSplit(List<string> inputs, string outDir, bool inplace, bool shortname, bool basedat)
 		{
+			// Get only files from the inputs
+			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs, appendparent: true);
+
 			// Loop over the input files
-			foreach (string input in inputs)
+			foreach (string file in files)
 			{
-				if (File.Exists(input))
-				{
-					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0, keep: true);
-					datFile.SplitByLevel(outDir, Path.GetDirectoryName(input), shortname, basedat);
-				}
-				else if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-					{
-						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0, keep: true);
-						datFile.SplitByLevel(outDir, (input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar),
-							shortname, basedat);
-					}
-				}
-				else
-				{
-					Globals.Logger.Error("'{0}' is not a valid file or folder!", input);
-					Console.WriteLine();
-					_help.OutputIndividualFeature("Level Split");
-					return;
-				}
+				// Split the input filename
+				string[] splitpath = file.Split('¬');
+
+				// Create and fill the new DAT
+				DatFile datFile = new DatFile();
+				datFile.Parse(splitpath[0], 0, 0);
+
+				// Get the output directory
+				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
+
+				// Split and write the DAT
+				datFile.SplitByLevel(outDir, inplace, shortname, basedat);
 			}
 		}
 
@@ -389,33 +369,27 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">List of inputs to be used</param>
 		/// <param name="outDir">Output directory for the split files</param>
-		private static void InitTypeSplit(List<string> inputs, string outDir)
+		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
+		private static void InitTypeSplit(List<string> inputs, string outDir, bool inplace)
 		{
+			// Get only files from the inputs
+			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs, appendparent: true);
+
 			// Loop over the input files
-			foreach (string input in inputs)
+			foreach (string file in files)
 			{
-				if (File.Exists(input))
-				{
-					DatFile datFile = new DatFile();
-					datFile.Parse(Path.GetFullPath(input), 0, 0);
-					datFile.SplitByType(outDir, Path.GetFullPath(Path.GetDirectoryName(input)));
-				}
-				else if (Directory.Exists(input))
-				{
-					foreach (string file in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-					{
-						DatFile datFile = new DatFile();
-						datFile.Parse(Path.GetFullPath(file), 0, 0);
-						datFile.SplitByType(outDir, Path.GetFullPath((input.EndsWith(Path.DirectorySeparatorChar.ToString()) ? input : input + Path.DirectorySeparatorChar)));
-					}
-				}
-				else
-				{
-					Globals.Logger.Error("{0} is not a valid file or folder!", input);
-					Console.WriteLine();
-					_help.OutputIndividualFeature("Type Split");
-					return;
-				}
+				// Split the input filename
+				string[] splitpath = file.Split('¬');
+
+				// Create and fill the new DAT
+				DatFile datFile = new DatFile();
+				datFile.Parse(splitpath[0], 0, 0);
+
+				// Get the output directory
+				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
+
+				// Split and write the DAT
+				datFile.SplitByType(outDir, inplace);
 			}
 		}
 

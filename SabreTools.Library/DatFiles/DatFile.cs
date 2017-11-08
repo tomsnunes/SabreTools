@@ -1625,9 +1625,6 @@ namespace SabreTools.Library.DatFiles
 		public void DetermineUpdateType(List<string> inputPaths, List<string> basePaths, string outDir, bool merge, UpdateMode updateMode, bool inplace, bool skip,
 			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
-			// First, we want to ensure the output directory
-			outDir = Utilities.EnsureOutputDirectory(outDir);
-
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || (updateMode != UpdateMode.None
 				&& (updateMode & UpdateMode.DiffAgainst) == 0)
@@ -1833,19 +1830,7 @@ namespace SabreTools.Library.DatFiles
 				});
 
 				// Determine the output path for the DAT
-				string interOutDir = Utilities.EnsureOutputDirectory(outDir);
-				if (inplace)
-				{
-					interOutDir = Path.GetDirectoryName(splitpath[1]);
-				}
-				else if (splitpath[0].Length == splitpath[1].Length)
-				{
-					interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, Path.GetFileName(splitpath[0])));
-				}
-				else
-				{
-					interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, splitpath[0].Remove(0, splitpath[1].Length + 1)));
-				}
+				string interOutDir = Utilities.GetOutputPath(outDir, path, inplace, splitpath: true);
 
 				// Once we're done, try writing out
 				intDat.WriteToFile(interOutDir);
@@ -1923,19 +1908,7 @@ namespace SabreTools.Library.DatFiles
 				});
 
 				// Determine the output path for the DAT
-				string interOutDir = Utilities.EnsureOutputDirectory(outDir);
-				if (inplace)
-				{
-					interOutDir = Path.GetDirectoryName(splitpath[1]);
-				}
-				else if (splitpath[0].Length == splitpath[1].Length)
-				{
-					interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, Path.GetFileName(splitpath[0])));
-				}
-				else
-				{
-					interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, splitpath[0].Remove(0, splitpath[1].Length + 1)));
-				}
+				string interOutDir = Utilities.GetOutputPath(outDir, path, inplace, splitpath: true);
 
 				// Once we're done, try writing out
 				intDat.WriteToFile(interOutDir);
@@ -2024,19 +1997,7 @@ namespace SabreTools.Library.DatFiles
 
 			Parallel.For((skip ? 1 : 0), inputs.Count, Globals.ParallelOptions, j =>
 			{
-				// If we have an output directory set, replace the path
-				string path = "";
-				if (inplace)
-				{
-					path = Path.GetDirectoryName(inputs[j].Split('¬')[0]);
-				}
-				else if (outDir != Environment.CurrentDirectory)
-				{
-					string[] split = inputs[j].Split('¬');
-					path = outDir + (split[0] == split[1]
-						? Path.GetFileName(split[0])
-						: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length))); ;
-				}
+				string path = Utilities.GetOutputPath(outDir, inputs[j], inplace, splitpath: true);
 
 				// Try to output the file
 				outDats[j].WriteToFile(path);
@@ -2195,12 +2156,7 @@ namespace SabreTools.Library.DatFiles
 			{
 				Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
 				{
-					// If we have an output directory set, replace the path
-					string[] split = inputs[j].Split('¬');
-					string path = Path.Combine(outDir,
-						(split[0] == split[1]
-							? Path.GetFileName(split[0])
-							: (Path.GetDirectoryName(split[0]).Remove(0, split[1].Length))));
+					string path = Utilities.GetOutputPath(outDir, inputs[j], false /* inplace */, splitpath: true);
 
 					// Try to output the file
 					outDats[j].WriteToFile(path);
@@ -2274,60 +2230,53 @@ namespace SabreTools.Library.DatFiles
 			for (int i = 0; i < inputFileNames.Count; i++)
 			{
 				// Get the input file name
-				string inputFileName = inputFileNames[i];
+				string inputPath = inputFileNames[i];
 
 				// Clean the input string
-				if (inputFileName != "")
+				if (inputPath != "")
 				{
-					inputFileName = Path.GetFullPath(inputFileName);
+					inputPath = Path.GetFullPath(inputPath);
 				}
 
-				if (File.Exists(inputFileName))
+				if (File.Exists(inputPath))
 				{
-					// If inplace is set, override the output dir
-					string realOutDir = outDir;
-					if (inplace)
-					{
-						realOutDir = Path.GetDirectoryName(inputFileName);
-					}
-
 					DatFile innerDatdata = new DatFile(this);
-					Globals.Logger.User("Processing '{0}'", Path.GetFileName(inputFileName));
-					innerDatdata.Parse(inputFileName, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
+					Globals.Logger.User("Processing '{0}'", Path.GetFileName(inputPath));
+					innerDatdata.Parse(inputPath, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
 						keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 					innerDatdata.Filter(filter, trim, single, root);
 
-					// Try to output the file
-					innerDatdata.WriteToFile((realOutDir == Environment.CurrentDirectory ? Path.GetDirectoryName(inputFileName) : realOutDir), overwrite: (realOutDir != Environment.CurrentDirectory));
+					// Get the correct output path
+					string realOutDir = Utilities.GetOutputPath(outDir, inputPath, inplace, splitpath: false);
+
+					// Try to output the file, overwriting only if it's not in the current directory
+					// TODO: Figure out if overwriting should always happen of if there should be a user flag
+					innerDatdata.WriteToFile(realOutDir, overwrite: (realOutDir != Environment.CurrentDirectory));
 				}
-				else if (Directory.Exists(inputFileName))
+				else if (Directory.Exists(inputPath))
 				{
-					inputFileName = Path.GetFullPath(inputFileName) + Path.DirectorySeparatorChar;
+					inputPath = Path.GetFullPath(inputPath) + Path.DirectorySeparatorChar;
 
-					// If inplace is set, override the output dir
-					string realOutDir = outDir;
-					if (inplace)
-					{
-						realOutDir = Path.GetDirectoryName(inputFileName);
-					}
-
-					List<string> subFiles = Directory.EnumerateFiles(inputFileName, "*", SearchOption.AllDirectories).ToList();
+					List<string> subFiles = Directory.EnumerateFiles(inputPath, "*", SearchOption.AllDirectories).ToList();
 					Parallel.ForEach(subFiles, Globals.ParallelOptions, file =>
 					{
-						Globals.Logger.User("Processing '{0}'", Path.GetFullPath(file).Remove(0, inputFileName.Length));
+						Globals.Logger.User("Processing '{0}'", Path.GetFullPath(file).Remove(0, inputPath.Length));
 						DatFile innerDatdata = new DatFile(this);
 						innerDatdata.Parse(file, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
 							keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 						innerDatdata.Filter(filter, trim, single, root);
 
-						// Try to output the file
-						innerDatdata.WriteToFile((realOutDir == Environment.CurrentDirectory ? Path.GetDirectoryName(file) : realOutDir + Path.GetDirectoryName(file).Remove(0, inputFileName.Length - 1)),
-							overwrite: (realOutDir != Environment.CurrentDirectory));
+						// Get the correct output path
+						string realOutDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: false);
+
+						// Try to output the file, overwriting only if it's not in the current directory
+						// TODO: Figure out if overwriting should always happen of if there should be a user flag
+						innerDatdata.WriteToFile(realOutDir, overwrite: (realOutDir != Environment.CurrentDirectory));
 					});
 				}
 				else
 				{
-					Globals.Logger.Error("I'm sorry but '{0}' doesn't exist!", inputFileName);
+					Globals.Logger.Error("I'm sorry but '{0}' doesn't exist!", inputPath);
 					return;
 				}
 			}
@@ -4692,7 +4641,7 @@ namespace SabreTools.Library.DatFiles
 			FileName = "fixDAT_" + FileName;
 			Name = "fixDAT_" + Name;
 			Description = "fixDAT_" + Description;
-			WriteToFile(null);
+			WriteToFile();
 
 			return success;
 		}
@@ -4768,7 +4717,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Now output the fixdat to the main folder
-			success &= matched.WriteToFile("", stats: true);
+			success &= matched.WriteToFile(stats: true);
 
 			return success;
 		}
@@ -4781,11 +4730,11 @@ namespace SabreTools.Library.DatFiles
 		/// Split a DAT by input extensions
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
-		/// <param name="basepath">Parent path for replacement</param>
+		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
 		/// <param name="extA">List of extensions to split on (first DAT)</param>
 		/// <param name="extB">List of extensions to split on (second DAT)</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByExtension(string outDir, string basepath, List<string> extA, List<string> extB)
+		public bool SplitByExtension(string outDir, bool inplace, List<string> extA, List<string> extB)
 		{
 			// Make sure all of the extensions have a dot at the beginning
 			List<string> newExtA = new List<string>();
@@ -4864,14 +4813,7 @@ namespace SabreTools.Library.DatFiles
 			});
 
 			// Get the output directory
-			if (outDir != "")
-			{
-				outDir = outDir + Path.GetDirectoryName(this.FileName).Remove(0, basepath.Length - 1);
-			}
-			else
-			{
-				outDir = Path.GetDirectoryName(this.FileName);
-			}
+			outDir = Utilities.GetOutputPath(outDir, FileName, inplace);
 
 			// Then write out both files
 			bool success = datdataA.WriteToFile(outDir);
@@ -4884,13 +4826,10 @@ namespace SabreTools.Library.DatFiles
 		/// Split a DAT by best available hashes
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
-		/// <param name="basepath">Parent path for replacement</param>
+		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByHash(string outDir, string basepath)
+		public bool SplitByHash(string outDir, bool inplace)
 		{
-			// Sanitize the basepath to be more predictable
-			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
-
 			// Create each of the respective output DATs
 			Globals.Logger.User("Creating and populating new DATs");
 			DatFile nodump = new DatFile
@@ -5125,14 +5064,7 @@ namespace SabreTools.Library.DatFiles
 			});
 
 			// Get the output directory
-			if (outDir != "")
-			{
-				outDir = outDir + Path.GetDirectoryName(this.FileName).Remove(0, basepath.Length - 1);
-			}
-			else
-			{
-				outDir = Path.GetDirectoryName(this.FileName);
-			}
+			outDir = Utilities.GetOutputPath(outDir, FileName, inplace);
 
 			// Now, output all of the files to the output directory
 			Globals.Logger.User("DAT information created, outputting new files");
@@ -5152,15 +5084,12 @@ namespace SabreTools.Library.DatFiles
 		/// Split a SuperDAT by lowest available directory level
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
-		/// <param name="basepath">Parent path for replacement</param>
+		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
 		/// <param name="shortname">True if short names should be used, false otherwise</param>
 		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByLevel(string outDir, string basepath, bool shortname, bool basedat)
+		public bool SplitByLevel(string outDir, bool inplace, bool shortname, bool basedat)
 		{
-			// Sanitize the basepath to be more predictable
-			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
-
 			// First, organize by games so that we can do the right thing
 			BucketBy(SortedBy.Game, DedupeType.None, lower: false, norename: true);
 
@@ -5181,7 +5110,7 @@ namespace SabreTools.Library.DatFiles
 				if (tempDat.Name != null && tempDat.Name != Path.GetDirectoryName(key))
 				{
 					// Process and output the DAT
-					SplitByLevelHelper(tempDat, outDir, shortname, basedat);
+					SplitByLevelHelper(tempDat, outDir, shortname, basedat, inplace);
 
 					// Reset the DAT for the next items
 					tempDat = new DatFile(this)
@@ -5203,7 +5132,7 @@ namespace SabreTools.Library.DatFiles
 			});
 
 			// Then we write the last DAT out since it would be skipped otherwise
-			SplitByLevelHelper(tempDat, outDir, shortname, basedat);
+			SplitByLevelHelper(tempDat, outDir, shortname, basedat, inplace);
 
 			return true;
 		}
@@ -5234,16 +5163,15 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="outDir">Directory to write out to</param>
 		/// <param name="shortname">True if short naming scheme should be used, false otherwise</param>
 		/// <param name="restore">True if original filenames should be used as the base for output filename, false otherwise</param>
-		private void SplitByLevelHelper(DatFile datFile, string outDir, bool shortname, bool restore)
+		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
+		private void SplitByLevelHelper(DatFile datFile, string outDir, bool shortname, bool restore, bool inplace)
 		{
 			// Get the name from the DAT to use separately
 			string name = datFile.Name;
 			string expName = name.Replace("/", " - ").Replace("\\", " - ");
 
-			// Get the path that the file will be written out to
-			string path = HttpUtility.HtmlDecode(String.IsNullOrWhiteSpace(name)
-				? outDir
-				: Path.Combine(outDir, name));
+			// Get the output directory
+			outDir = Utilities.GetOutputPath(outDir, FileName, inplace);
 
 			// Now set the new output values
 			datFile.FileName = HttpUtility.HtmlDecode(String.IsNullOrWhiteSpace(name)
@@ -5259,20 +5187,17 @@ namespace SabreTools.Library.DatFiles
 			datFile.Type = null;
 
 			// Write out the temporary DAT to the proper directory
-			datFile.WriteToFile(path);
+			datFile.WriteToFile(outDir);
 		}
 
 		/// <summary>
 		/// Split a DAT by type of Rom
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
-		/// <param name="basepath">Parent path for replacement</param>
+		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByType(string outDir, string basepath)
+		public bool SplitByType(string outDir, bool inplace)
 		{
-			// Sanitize the basepath to be more predictable
-			basepath = (basepath.EndsWith(Path.DirectorySeparatorChar.ToString()) ? basepath : basepath + Path.DirectorySeparatorChar);
-
 			// Create each of the respective output DATs
 			Globals.Logger.User("Creating and populating new DATs");
 			DatFile romdat = new DatFile
@@ -5365,14 +5290,7 @@ namespace SabreTools.Library.DatFiles
 			});
 
 			// Get the output directory
-			if (outDir != "")
-			{
-				outDir = outDir + Path.GetDirectoryName(this.FileName).Remove(0, basepath.Length - 1);
-			}
-			else
-			{
-				outDir = Path.GetDirectoryName(this.FileName);
-			}
+			outDir = Utilities.GetOutputPath(outDir, FileName, inplace);
 
 			// Now, output all of the files to the output directory
 			Globals.Logger.User("DAT information created, outputting new files");
@@ -5471,14 +5389,13 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
-		/// <param name="datdata">All information for creating the datfile header</param>
-		/// <param name="outDir">Set the output directory</param>
+		/// <param name="outDir">Set the output directory (default current directory)</param>
 		/// <param name="norename">True if games should only be compared on game and file name (default), false if system and source are counted</param>
 		/// <param name="stats">True if DAT statistics should be output on write, false otherwise (default)</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <param name="overwrite">True if files should be overwritten (default), false if they should be renamed instead</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public bool WriteToFile(string outDir, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
+		public bool WriteToFile(string outDir = null, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
 		{
 			// If there's nothing there, abort
 			if (Count == 0)

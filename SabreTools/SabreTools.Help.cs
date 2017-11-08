@@ -339,6 +339,11 @@ namespace SabreTools
 				"Output directory",
 				FeatureType.String,
 				null));
+			extSplit.AddFeature("inplace", new Feature(
+				new List<string>() { "-ip", "--inplace" },
+				"Write to the input directories",
+				FeatureType.Flag,
+				null));
 
 			// Create the Hash Split feature
 			Feature hashSplit = new Feature(
@@ -351,6 +356,11 @@ namespace SabreTools
 				"Output directory",
 				FeatureType.String,
 				null));
+			hashSplit.AddFeature("inplace", new Feature(
+				new List<string>() { "-ip", "--inplace" },
+				"Write to the input directories",
+				FeatureType.Flag,
+				null));
 
 			// Create the Level Split feature
 			Feature levelSplit = new Feature(
@@ -362,6 +372,11 @@ namespace SabreTools
 				new List<string>() { "-out", "--out" },
 				"Output directory",
 				FeatureType.String,
+				null));
+			levelSplit.AddFeature("inplace", new Feature(
+				new List<string>() { "-ip", "--inplace" },
+				"Write to the input directories",
+				FeatureType.Flag,
 				null));
 			levelSplit.AddFeature("short", new Feature(
 				new List<string>() { "-s", "--short" },
@@ -634,6 +649,11 @@ namespace SabreTools
 				new List<string>() { "-out", "--out" },
 				"Output directory",
 				FeatureType.String,
+				null));
+			typeSplit.AddFeature("inplace", new Feature(
+				new List<string>() { "-ip", "--inplace" },
+				"Write to the input directories",
+				FeatureType.Flag,
 				null));
 
 			// Create the Update feature

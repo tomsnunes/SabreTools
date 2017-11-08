@@ -384,6 +384,11 @@ Options:
 			This sets an output folder to be used when the files are created. If
 			a path is not defined, the application directory is used instead.
 			
+		-ip, --inplace		Write to the input directories
+			This will write out the split files to the source folder instead of
+			writing them out to the runtime folder by default (or the output
+			folder if overridden).
+			
 	-ex, --extract		Backup and remove copier headers
 		This will detect, store, and remove copier headers from a file or folder
 		of files. The headers are backed up and collated by the hash of the
@@ -426,6 +431,11 @@ Options:
 			This sets an output folder to be used when the files are created. If
 			a path is not defined, the application directory is used instead.
 			
+		-ip, --inplace		Write to the input directories
+			This will write out the split files to the source folder instead of
+			writing them out to the runtime folder by default (or the output
+			folder if overridden).
+			
 	-ls, --lvl-split		Split a SuperDAT or folder by lowest available level
 		For a DAT, or set of DATs, allow for splitting based on the lowest
 		available level of game name. That is, if a game name is top/mid/last,
@@ -435,6 +445,11 @@ Options:
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If
 			a path is not defined, the application directory is used instead.
+			
+		-ip, --inplace		Write to the input directories
+			This will write out the split files to the source folder instead of
+			writing them out to the runtime folder by default (or the output
+			folder if overridden).
 			
 		-s, --short		Use short names for outputted DATs
 			Instead of using ClrMamePro-style long names for DATs, use just the
@@ -711,6 +726,11 @@ Options:
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If
 			a path is not defined, the application directory is used instead.
+		
+		-ip, --inplace		Write to the input directories
+			This will write out the split files to the source folder instead of
+			writing them out to the runtime folder by default (or the output
+			folder if overridden).
 
 	-ud, --update		Update and manipulate DAT(s)
 		This is the multitool part of the program, allowing for almost every
