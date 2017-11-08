@@ -3131,55 +3131,55 @@ namespace SabreTools.Library.DatFiles
 				switch (Utilities.GetDatFormat(filename))
 				{
 					case DatFormat.AttractMode:
-						new AttractMode(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new AttractMode(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.ClrMamePro:
-						new ClrMamePro(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new ClrMamePro(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.CSV:
-						new SeparatedValue(this).Parse(filename, sysid, srcid, ',', keep, clean, remUnicode);
+						new SeparatedValue(this).ParseFile(filename, sysid, srcid, ',', keep, clean, remUnicode);
 						break;
 					case DatFormat.DOSCenter:
-						new DosCenter(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new DosCenter(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.Listroms:
-						new Listroms(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new Listroms(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.Logiqx:
-						new Logiqx(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new Logiqx(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.OfflineList:
-						new OfflineList(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new OfflineList(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.RedumpMD5:
-						new Hashfile(this).Parse(filename, sysid, srcid, Hash.MD5, clean, remUnicode);
+						new Hashfile(this).ParseFile(filename, sysid, srcid, Hash.MD5, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSFV:
-						new Hashfile(this).Parse(filename, sysid, srcid, Hash.CRC, clean, remUnicode);
+						new Hashfile(this).ParseFile(filename, sysid, srcid, Hash.CRC, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA1:
-						new Hashfile(this).Parse(filename, sysid, srcid, Hash.SHA1, clean, remUnicode);
+						new Hashfile(this).ParseFile(filename, sysid, srcid, Hash.SHA1, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA256:
-						new Hashfile(this).Parse(filename, sysid, srcid, Hash.SHA256, clean, remUnicode);
+						new Hashfile(this).ParseFile(filename, sysid, srcid, Hash.SHA256, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA384:
-						new Hashfile(this).Parse(filename, sysid, srcid, Hash.SHA384, clean, remUnicode);
+						new Hashfile(this).ParseFile(filename, sysid, srcid, Hash.SHA384, clean, remUnicode);
 						break;
 					case DatFormat.RedumpSHA512:
-						new Hashfile(this).Parse(filename, sysid, srcid, Hash.SHA512, clean, remUnicode);
+						new Hashfile(this).ParseFile(filename, sysid, srcid, Hash.SHA512, clean, remUnicode);
 						break;
 					case DatFormat.RomCenter:
-						new RomCenter(this).Parse(filename, sysid, srcid, clean, remUnicode);
+						new RomCenter(this).ParseFile(filename, sysid, srcid, clean, remUnicode);
 						break;
 					case DatFormat.SabreDat:
-						new SabreDat(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new SabreDat(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.SoftwareList:
-						new SoftwareList(this).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+						new SoftwareList(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.TSV:
-						new SeparatedValue(this).Parse(filename, sysid, srcid, '\t', keep, clean, remUnicode);
+						new SeparatedValue(this).ParseFile(filename, sysid, srcid, '\t', keep, clean, remUnicode);
 						break;
 					default:
 						return;

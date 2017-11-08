@@ -48,9 +48,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <remarks>
 		/// </remarks>
-		public void Parse(
-			DatFile datFile,
-
+		public void ParseFile(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -62,7 +60,7 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// All XML-derived DATs share a lot in common so it just calls one implementation
-			(this as DatFile as Logiqx).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+			(this as DatFile as Logiqx).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 		}
 
 		/// <summary>

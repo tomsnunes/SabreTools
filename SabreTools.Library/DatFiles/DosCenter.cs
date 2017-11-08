@@ -45,7 +45,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		public void Parse(
+		public void ParseFile(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -57,7 +57,7 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// ClrMamePro and DosCenter parsing are identical so it just calls one implementation
-			(this as DatFile as ClrMamePro).Parse(filename, sysid, srcid, keep, clean, remUnicode);
+			(this as DatFile as ClrMamePro).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 		}
 
 
