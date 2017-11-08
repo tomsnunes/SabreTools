@@ -5915,6 +5915,12 @@ namespace SabreTools.Library.DatFiles
 			{
 				reportName = "report";
 			}
+
+			// Get the proper output directory name
+			if (outDir == null)
+			{
+				outDir = Environment.CurrentDirectory;
+			}
 			outDir = Path.GetFullPath(outDir);
 
 			// Get the dictionary of desired output report names
