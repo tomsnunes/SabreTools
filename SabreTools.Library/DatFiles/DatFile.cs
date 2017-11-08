@@ -4377,7 +4377,7 @@ namespace SabreTools.Library.DatFiles
 				// Seek to the beginning of the stream
 				fileStream.Seek(0, SeekOrigin.Begin);
 
-				Globals.Logger.User("Matches found for '{0}', rebuilding accordingly...", Style.GetFileName(datItem.Name));
+				Globals.Logger.User("Matches found for '{0}', rebuilding accordingly...", Path.GetFileName(datItem.Name));
 				rebuilt = true;
 
 				// Now loop through the list and rebuild accordingly
@@ -4458,8 +4458,8 @@ namespace SabreTools.Library.DatFiles
 
 				// Get the item from the current file
 				Rom item = (Rom)FileTools.GetStreamInfo(fileStream, fileStream.Length, keepReadOpen: true);
-				item.MachineName = Style.GetFileNameWithoutExtension(item.Name);
-				item.MachineDescription = Style.GetFileNameWithoutExtension(item.Name);
+				item.MachineName = Path.GetFileNameWithoutExtension(item.Name);
+				item.MachineDescription = Path.GetFileNameWithoutExtension(item.Name);
 
 				// If we are coming from an archive, set the correct machine name
 				if (machinename != null)
@@ -4468,7 +4468,7 @@ namespace SabreTools.Library.DatFiles
 					item.MachineDescription = machinename;
 				}
 
-				Globals.Logger.User("No matches found for '{0}', rebuilding accordingly from inverse flag...", Style.GetFileName(datItem.Name));
+				Globals.Logger.User("No matches found for '{0}', rebuilding accordingly from inverse flag...", Path.GetFileName(datItem.Name));
 
 				// Get the output archive, if possible
 				BaseArchive outputArchive = FileTools.CreateArchiveFromOutputFormat(outputFormat);
@@ -4574,7 +4574,7 @@ namespace SabreTools.Library.DatFiles
 								return rebuilt;
 							}
 
-							Globals.Logger.User("Headerless matches found for '{0}', rebuilding accordingly...", Style.GetFileName(datItem.Name));
+							Globals.Logger.User("Headerless matches found for '{0}', rebuilding accordingly...", Path.GetFileName(datItem.Name));
 							rebuilt = true;
 
 							// Now loop through the list and rebuild accordingly
@@ -5182,7 +5182,7 @@ namespace SabreTools.Library.DatFiles
 			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 			{
 				// Here, the key is the name of the game to be used for comparison
-				if (tempDat.Name != null && tempDat.Name != Style.GetDirectoryName(key))
+				if (tempDat.Name != null && tempDat.Name != Path.GetDirectoryName(key))
 				{
 					// Process and output the DAT
 					SplitByLevelHelper(tempDat, outDir, shortname, basedat);
@@ -5196,14 +5196,14 @@ namespace SabreTools.Library.DatFiles
 
 				// Clean the input list and set all games to be pathless
 				List<DatItem> items = this[key];
-				items.ForEach(item => item.MachineName = Style.GetFileName(item.MachineName));
-				items.ForEach(item => item.MachineDescription = Style.GetFileName(item.MachineDescription));
+				items.ForEach(item => item.MachineName = Path.GetFileName(item.MachineName));
+				items.ForEach(item => item.MachineDescription = Path.GetFileName(item.MachineDescription));
 
 				// Now add the game to the output DAT
 				tempDat.AddRange(key, items);
 
 				// Then set the DAT name to be the parent directory name
-				tempDat.Name = Style.GetDirectoryName(key);
+				tempDat.Name = Path.GetDirectoryName(key);
 			});
 
 			// Then we write the last DAT out since it would be skipped otherwise
@@ -5253,7 +5253,7 @@ namespace SabreTools.Library.DatFiles
 			datFile.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(name)
 				? FileName
 				: (shortname
-					? Style.GetFileName(name)
+					? Path.GetFileName(name)
 					: expName
 					)
 				);
