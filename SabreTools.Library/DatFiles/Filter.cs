@@ -621,7 +621,7 @@ namespace SabreTools.Library.DatFiles
 			bool found = false;
 			foreach (string straw in haystack)
 			{
-				if (!String.IsNullOrEmpty(straw))
+				if (!String.IsNullOrWhiteSpace(straw))
 				{
 					string regexStraw = straw;
 

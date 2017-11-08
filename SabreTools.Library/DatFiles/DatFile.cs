@@ -1518,7 +1518,7 @@ namespace SabreTools.Library.DatFiles
 						: item.SystemID.ToString().PadLeft(10, '0')
 							+ "-"
 							+ item.SourceID.ToString().PadLeft(10, '0') + "-")
-					+ (String.IsNullOrEmpty(item.MachineName)
+					+ (String.IsNullOrWhiteSpace(item.MachineName)
 							? "Default"
 							: item.MachineName);
 					if (lower)
@@ -1625,6 +1625,9 @@ namespace SabreTools.Library.DatFiles
 		public void DetermineUpdateType(List<string> inputPaths, List<string> basePaths, string outDir, bool merge, UpdateMode updateMode, bool inplace, bool skip,
 			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
+			// First, we want to ensure the output directory
+			outDir = Utilities.EnsureOutputDirectory(outDir);
+
 			// If we're in merging or diffing mode, use the full list of inputs
 			if (merge || (updateMode != UpdateMode.None
 				&& (updateMode & UpdateMode.DiffAgainst) == 0)
@@ -1830,32 +1833,18 @@ namespace SabreTools.Library.DatFiles
 				});
 
 				// Determine the output path for the DAT
-				string interOutDir = outDir;
+				string interOutDir = Utilities.EnsureOutputDirectory(outDir);
 				if (inplace)
 				{
 					interOutDir = Path.GetDirectoryName(splitpath[1]);
 				}
-				else if (!String.IsNullOrEmpty(interOutDir))
+				else if (splitpath[0].Length == splitpath[1].Length)
 				{
-					if (splitpath[0].Length == splitpath[1].Length)
-					{
-						interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, Path.GetFileName(splitpath[0])));
-					}
-					else
-					{
-						interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, splitpath[0].Remove(0, splitpath[1].Length + 1)));
-					}
+					interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, Path.GetFileName(splitpath[0])));
 				}
 				else
 				{
-					if (splitpath[0].Length == splitpath[1].Length)
-					{
-						interOutDir = Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, Path.GetFileName(splitpath[0])));
-					}
-					else
-					{
-						interOutDir = Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, splitpath[0].Remove(0, splitpath[1].Length + 1)));
-					}
+					interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, splitpath[0].Remove(0, splitpath[1].Length + 1)));
 				}
 
 				// Once we're done, try writing out
@@ -1934,32 +1923,18 @@ namespace SabreTools.Library.DatFiles
 				});
 
 				// Determine the output path for the DAT
-				string interOutDir = outDir;
+				string interOutDir = Utilities.EnsureOutputDirectory(outDir);
 				if (inplace)
 				{
 					interOutDir = Path.GetDirectoryName(splitpath[1]);
 				}
-				else if (!String.IsNullOrEmpty(interOutDir))
+				else if (splitpath[0].Length == splitpath[1].Length)
 				{
-					if (splitpath[0].Length == splitpath[1].Length)
-					{
-						interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, Path.GetFileName(splitpath[0])));
-					}
-					else
-					{
-						interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, splitpath[0].Remove(0, splitpath[1].Length + 1)));
-					}
+					interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, Path.GetFileName(splitpath[0])));
 				}
 				else
 				{
-					if (splitpath[0].Length == splitpath[1].Length)
-					{
-						interOutDir = Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, Path.GetFileName(splitpath[0])));
-					}
-					else
-					{
-						interOutDir = Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, splitpath[0].Remove(0, splitpath[1].Length + 1)));
-					}
+					interOutDir = Path.GetDirectoryName(Path.Combine(interOutDir, splitpath[0].Remove(0, splitpath[1].Length + 1)));
 				}
 
 				// Once we're done, try writing out
@@ -2086,15 +2061,15 @@ namespace SabreTools.Library.DatFiles
 			DatFile dupeData = new DatFile();
 
 			// Fill in any information not in the base DAT
-			if (String.IsNullOrEmpty(FileName))
+			if (String.IsNullOrWhiteSpace(FileName))
 			{
 				FileName = "All DATs";
 			}
-			if (String.IsNullOrEmpty(Name))
+			if (String.IsNullOrWhiteSpace(Name))
 			{
 				Name = "All DATs";
 			}
-			if (String.IsNullOrEmpty(Description))
+			if (String.IsNullOrWhiteSpace(Description))
 			{
 				Description = "All DATs";
 			}
@@ -2514,25 +2489,25 @@ namespace SabreTools.Library.DatFiles
 					foreach (DatItem item in items)
 					{
 						// Update machine name
-						if (!String.IsNullOrEmpty(item.MachineName) && mapping.ContainsKey(item.MachineName))
+						if (!String.IsNullOrWhiteSpace(item.MachineName) && mapping.ContainsKey(item.MachineName))
 						{
 							item.MachineName = mapping[item.MachineName];
 						}
 
 						// Update cloneof
-						if (!String.IsNullOrEmpty(item.CloneOf) && mapping.ContainsKey(item.CloneOf))
+						if (!String.IsNullOrWhiteSpace(item.CloneOf) && mapping.ContainsKey(item.CloneOf))
 						{
 							item.CloneOf = mapping[item.CloneOf];
 						}
 
 						// Update romof
-						if (!String.IsNullOrEmpty(item.RomOf) && mapping.ContainsKey(item.RomOf))
+						if (!String.IsNullOrWhiteSpace(item.RomOf) && mapping.ContainsKey(item.RomOf))
 						{
 							item.RomOf = mapping[item.RomOf];
 						}
 
 						// Update sampleof
-						if (!String.IsNullOrEmpty(item.SampleOf) && mapping.ContainsKey(item.SampleOf))
+						if (!String.IsNullOrWhiteSpace(item.SampleOf) && mapping.ContainsKey(item.SampleOf))
 						{
 							item.SampleOf = mapping[item.SampleOf];
 						}
@@ -2820,13 +2795,13 @@ namespace SabreTools.Library.DatFiles
 
 				// Determine if the game has a parent or not
 				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].RomOf))
+				if (!String.IsNullOrWhiteSpace(this[game][0].RomOf))
 				{
 					parent = this[game][0].RomOf;
 				}
 
 				// If the parent doesnt exist, we want to continue
-				if (String.IsNullOrEmpty(parent))
+				if (String.IsNullOrWhiteSpace(parent))
 				{
 					continue;
 				}
@@ -2908,13 +2883,13 @@ namespace SabreTools.Library.DatFiles
 
 				// Determine if the game has a parent or not
 				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].CloneOf))
+				if (!String.IsNullOrWhiteSpace(this[game][0].CloneOf))
 				{
 					parent = this[game][0].CloneOf;
 				}
 
 				// If the parent doesnt exist, we want to continue
-				if (String.IsNullOrEmpty(parent))
+				if (String.IsNullOrWhiteSpace(parent))
 				{
 					continue;
 				}
@@ -2958,13 +2933,13 @@ namespace SabreTools.Library.DatFiles
 			{
 				// Determine if the game has a parent or not
 				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].CloneOf))
+				if (!String.IsNullOrWhiteSpace(this[game][0].CloneOf))
 				{
 					parent = this[game][0].CloneOf;
 				}
 
 				// If there is no parent, then we continue
-				if (String.IsNullOrEmpty(parent))
+				if (String.IsNullOrWhiteSpace(parent))
 				{
 					continue;
 				}
@@ -3034,13 +3009,13 @@ namespace SabreTools.Library.DatFiles
 
 				// Determine if the game has a parent or not
 				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].RomOf))
+				if (!String.IsNullOrWhiteSpace(this[game][0].RomOf))
 				{
 					parent = this[game][0].RomOf;
 				}
 
 				// If the parent doesnt exist, we want to continue
-				if (String.IsNullOrEmpty(parent))
+				if (String.IsNullOrWhiteSpace(parent))
 				{
 					continue;
 				}
@@ -3077,13 +3052,13 @@ namespace SabreTools.Library.DatFiles
 
 				// Determine if the game has a parent or not
 				string parent = null;
-				if (!String.IsNullOrEmpty(this[game][0].CloneOf))
+				if (!String.IsNullOrWhiteSpace(this[game][0].CloneOf))
 				{
 					parent = this[game][0].CloneOf;
 				}
 
 				// If the parent doesnt exist, we want to continue
-				if (String.IsNullOrEmpty(parent))
+				if (String.IsNullOrWhiteSpace(parent))
 				{
 					continue;
 				}
@@ -3196,7 +3171,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// If the output filename isn't set already, get the internal filename
-			FileName = (String.IsNullOrEmpty(FileName) ? (keepext ? Path.GetFileName(filename) : Path.GetFileNameWithoutExtension(filename)) : FileName);
+			FileName = (String.IsNullOrWhiteSpace(FileName) ? (keepext ? Path.GetFileName(filename) : Path.GetFileNameWithoutExtension(filename)) : FileName);
 
 			// If the output type isn't set already, get the internal output type
 			DatFormat = (DatFormat == 0 ? Utilities.GetDatFormat(filename) : DatFormat);
@@ -3370,7 +3345,7 @@ namespace SabreTools.Library.DatFiles
 
 				// If we have a rom and it's missing size AND the hashes match a 0-byte file, fill in the rest of the info
 				if ((itemRom.Size == 0 || itemRom.Size == -1)
-					&& ((itemRom.CRC == Constants.CRCZero || String.IsNullOrEmpty(itemRom.CRC))
+					&& ((itemRom.CRC == Constants.CRCZero || String.IsNullOrWhiteSpace(itemRom.CRC))
 						|| itemRom.MD5 == Constants.MD5Zero
 						|| itemRom.SHA1 == Constants.SHA1Zero
 						|| itemRom.SHA256 == Constants.SHA256Zero
@@ -3398,12 +3373,12 @@ namespace SabreTools.Library.DatFiles
 				// If the file has a size but aboslutely no hashes, skip and log
 				else if (itemRom.ItemStatus != ItemStatus.Nodump
 					&& itemRom.Size > 0
-					&& String.IsNullOrEmpty(itemRom.CRC)
-					&& String.IsNullOrEmpty(itemRom.MD5)
-					&& String.IsNullOrEmpty(itemRom.SHA1)
-					&& String.IsNullOrEmpty(itemRom.SHA256)
-					&& String.IsNullOrEmpty(itemRom.SHA384)
-					&& String.IsNullOrEmpty(itemRom.SHA512))
+					&& String.IsNullOrWhiteSpace(itemRom.CRC)
+					&& String.IsNullOrWhiteSpace(itemRom.MD5)
+					&& String.IsNullOrWhiteSpace(itemRom.SHA1)
+					&& String.IsNullOrWhiteSpace(itemRom.SHA256)
+					&& String.IsNullOrWhiteSpace(itemRom.SHA384)
+					&& String.IsNullOrWhiteSpace(itemRom.SHA512))
 				{
 					Globals.Logger.Verbose("{0}: Incomplete entry for '{1}' will be output as nodump", FileName, itemRom.Name);
 					itemRom.ItemStatus = ItemStatus.Nodump;
@@ -3424,11 +3399,11 @@ namespace SabreTools.Library.DatFiles
 
 				// If the file has aboslutely no hashes, skip and log
 				if (itemDisk.ItemStatus != ItemStatus.Nodump
-					&& String.IsNullOrEmpty(itemDisk.MD5)
-					&& String.IsNullOrEmpty(itemDisk.SHA1)
-					&& String.IsNullOrEmpty(itemDisk.SHA256)
-					&& String.IsNullOrEmpty(itemDisk.SHA384)
-					&& String.IsNullOrEmpty(itemDisk.SHA512))
+					&& String.IsNullOrWhiteSpace(itemDisk.MD5)
+					&& String.IsNullOrWhiteSpace(itemDisk.SHA1)
+					&& String.IsNullOrWhiteSpace(itemDisk.SHA256)
+					&& String.IsNullOrWhiteSpace(itemDisk.SHA384)
+					&& String.IsNullOrWhiteSpace(itemDisk.SHA512))
 				{
 					Globals.Logger.Verbose("Incomplete entry for '{0}' will be output as nodump", itemDisk.Name);
 					itemDisk.ItemStatus = ItemStatus.Nodump;
@@ -3498,19 +3473,19 @@ namespace SabreTools.Library.DatFiles
 			bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst, bool chdsAsFiles)
 		{
 			// If the description is defined but not the name, set the name from the description
-			if (String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
+			if (String.IsNullOrWhiteSpace(Name) && !String.IsNullOrWhiteSpace(Description))
 			{
 				Name = Description;
 			}
 
 			// If the name is defined but not the description, set the description from the name
-			else if (!String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
+			else if (!String.IsNullOrWhiteSpace(Name) && String.IsNullOrWhiteSpace(Description))
 			{
 				Description = Name + (bare ? "" : " (" + Date + ")");
 			}
 
 			// If neither the name or description are defined, set them from the automatic values
-			else if (String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
+			else if (String.IsNullOrWhiteSpace(Name) && String.IsNullOrWhiteSpace(Description))
 			{
 				Name = basePath.Split(Path.DirectorySeparatorChar).Last();
 				Description = Name + (bare ? "" : " (" + Date + ")");
@@ -3856,7 +3831,7 @@ namespace SabreTools.Library.DatFiles
 				{
 					romname = romname.Substring(0, romname.Length - 1);
 				}
-				if (!String.IsNullOrEmpty(gamename) && String.IsNullOrEmpty(romname))
+				if (!String.IsNullOrWhiteSpace(gamename) && String.IsNullOrWhiteSpace(romname))
 				{
 					romname = gamename;
 					gamename = "Default";
@@ -4518,7 +4493,7 @@ namespace SabreTools.Library.DatFiles
 						}
 						writeStream.Dispose();
 
-						if (date && !String.IsNullOrEmpty(item.Date))
+						if (date && !String.IsNullOrWhiteSpace(item.Date))
 						{
 							File.SetCreationTime(outfile, DateTime.Parse(item.Date));
 						}
@@ -5107,38 +5082,38 @@ namespace SabreTools.Library.DatFiles
 						nodump.Add(key, item);
 					}
 					// If the file has a SHA-512
-					else if ((item.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)item).SHA512))
-						|| (item.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)item).SHA512)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)item).SHA512))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)item).SHA512)))
 					{
 						sha512.Add(key, item);
 					}
 					// If the file has a SHA-384
-					else if ((item.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)item).SHA384))
-						|| (item.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)item).SHA384)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)item).SHA384))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)item).SHA384)))
 					{
 						sha384.Add(key, item);
 					}
 					// If the file has a SHA-256
-					else if ((item.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)item).SHA256))
-						|| (item.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)item).SHA256)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)item).SHA256))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)item).SHA256)))
 					{
 						sha256.Add(key, item);
 					}
 					// If the file has a SHA-1
-					else if ((item.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)item).SHA1))
-						|| (item.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)item).SHA1)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)item).SHA1))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)item).SHA1)))
 					{
 						sha1.Add(key, item);
 					}
 					// If the file has no SHA-1 but has an MD5
-					else if ((item.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)item).MD5))
-						|| (item.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)item).MD5)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)item).MD5))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)item).MD5)))
 					{
 						md5.Add(key, item);
 					}
 					// If the file has no MD5 but a CRC
-					else if ((item.Type == ItemType.Rom && !String.IsNullOrEmpty(((Rom)item).SHA1))
-						|| (item.Type == ItemType.Disk && !String.IsNullOrEmpty(((Disk)item).SHA1)))
+					else if ((item.Type == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)item).SHA1))
+						|| (item.Type == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)item).SHA1)))
 					{
 						crc.Add(key, item);
 					}
@@ -5266,12 +5241,12 @@ namespace SabreTools.Library.DatFiles
 			string expName = name.Replace("/", " - ").Replace("\\", " - ");
 
 			// Get the path that the file will be written out to
-			string path = HttpUtility.HtmlDecode(String.IsNullOrEmpty(name)
+			string path = HttpUtility.HtmlDecode(String.IsNullOrWhiteSpace(name)
 				? outDir
 				: Path.Combine(outDir, name));
 
 			// Now set the new output values
-			datFile.FileName = HttpUtility.HtmlDecode(String.IsNullOrEmpty(name)
+			datFile.FileName = HttpUtility.HtmlDecode(String.IsNullOrWhiteSpace(name)
 				? FileName
 				: (shortname
 					? Path.GetFileName(name)
@@ -5280,7 +5255,7 @@ namespace SabreTools.Library.DatFiles
 				);
 			datFile.FileName = (restore ? FileName + " (" + datFile.FileName + ")" : datFile.FileName);
 			datFile.Name = Name + " (" + expName + ")";
-			datFile.Description = (String.IsNullOrEmpty(Description) ? datFile.Name : Description + " (" + expName + ")");
+			datFile.Description = (String.IsNullOrWhiteSpace(Description) ? datFile.Name : Description + " (" + expName + ")");
 			datFile.Type = null;
 
 			// Write out the temporary DAT to the proper directory
@@ -5512,18 +5487,8 @@ namespace SabreTools.Library.DatFiles
 				return false;
 			}
 
-			// If output directory is empty, use the current folder
-			if (outDir == null || outDir.Trim() == "")
-			{
-				Globals.Logger.Verbose("No output directory defined, defaulting to curent folder");
-				outDir = Environment.CurrentDirectory;
-			}
-
-			// Create the output directory if it doesn't already exist
-			if (!Directory.Exists(outDir))
-			{
-				Directory.CreateDirectory(outDir);
-			}
+			// Ensure the output directory is set and created
+			outDir = Utilities.EnsureOutputDirectory(outDir, create: true);
 
 			// If the DAT has no output format, default to XML
 			if (DatFormat == 0)
@@ -5533,35 +5498,35 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Make sure that the three essential fields are filled in
-			if (String.IsNullOrEmpty(FileName) && String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
+			if (String.IsNullOrWhiteSpace(FileName) && String.IsNullOrWhiteSpace(Name) && String.IsNullOrWhiteSpace(Description))
 			{
 				FileName = Name = Description = "Default";
 			}
-			else if (String.IsNullOrEmpty(FileName) && String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
+			else if (String.IsNullOrWhiteSpace(FileName) && String.IsNullOrWhiteSpace(Name) && !String.IsNullOrWhiteSpace(Description))
 			{
 				FileName = Name = Description;
 			}
-			else if (String.IsNullOrEmpty(FileName) && !String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
+			else if (String.IsNullOrWhiteSpace(FileName) && !String.IsNullOrWhiteSpace(Name) && String.IsNullOrWhiteSpace(Description))
 			{
 				FileName = Description = Name;
 			}
-			else if (String.IsNullOrEmpty(FileName) && !String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
+			else if (String.IsNullOrWhiteSpace(FileName) && !String.IsNullOrWhiteSpace(Name) && !String.IsNullOrWhiteSpace(Description))
 			{
 				FileName = Description;
 			}
-			else if (!String.IsNullOrEmpty(FileName) && String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
+			else if (!String.IsNullOrWhiteSpace(FileName) && String.IsNullOrWhiteSpace(Name) && String.IsNullOrWhiteSpace(Description))
 			{
 				Name = Description = FileName;
 			}
-			else if (!String.IsNullOrEmpty(FileName) && String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
+			else if (!String.IsNullOrWhiteSpace(FileName) && String.IsNullOrWhiteSpace(Name) && !String.IsNullOrWhiteSpace(Description))
 			{
 				Name = Description;
 			}
-			else if (!String.IsNullOrEmpty(FileName) && !String.IsNullOrEmpty(Name) && String.IsNullOrEmpty(Description))
+			else if (!String.IsNullOrWhiteSpace(FileName) && !String.IsNullOrWhiteSpace(Name) && String.IsNullOrWhiteSpace(Description))
 			{
 				Description = Name;
 			}
-			else if (!String.IsNullOrEmpty(FileName) && !String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Description))
+			else if (!String.IsNullOrWhiteSpace(FileName) && !String.IsNullOrWhiteSpace(Name) && !String.IsNullOrWhiteSpace(Description))
 			{
 				// Nothing is needed
 			}
@@ -5863,7 +5828,7 @@ namespace SabreTools.Library.DatFiles
 		/// <returns>String containing the new filename</returns>
 		private string CreateOutfileNamesHelper(string outDir, string extension, bool overwrite)
 		{
-			string filename = (String.IsNullOrEmpty(FileName) ? Description : FileName);
+			string filename = (String.IsNullOrWhiteSpace(FileName) ? Description : FileName);
 			string outfile = outDir + filename + extension;
 			outfile = (outfile.Contains(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString()) ?
 				outfile.Replace(Path.DirectorySeparatorChar.ToString() + Path.DirectorySeparatorChar.ToString(), Path.DirectorySeparatorChar.ToString()) :
@@ -5911,17 +5876,13 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Get the proper output file name
-			if (String.IsNullOrEmpty(reportName))
+			if (String.IsNullOrWhiteSpace(reportName))
 			{
 				reportName = "report";
 			}
 
 			// Get the proper output directory name
-			if (outDir == null)
-			{
-				outDir = Environment.CurrentDirectory;
-			}
-			outDir = Path.GetFullPath(outDir);
+			outDir = Utilities.EnsureOutputDirectory(outDir);
 
 			// Get the dictionary of desired output report names
 			Dictionary<StatReportFormat, string> outputs = CreateOutStatsNames(outDir, statDatFormat, reportName);

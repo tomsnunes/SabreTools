@@ -238,7 +238,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			try
 			{
-				string state = (String.IsNullOrEmpty(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n") + ")\n";
+				string state = (String.IsNullOrWhiteSpace(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n") + ")\n";
 
 				sw.Write(state);
 				sw.Flush();
@@ -284,8 +284,8 @@ namespace SabreTools.Library.DatFiles
 					case ItemType.Rom:
 						state += "\tfile ( name " + ((Rom)rom).Name
 							+ (((Rom)rom).Size != -1 ? " size " + ((Rom)rom).Size : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date " + ((Rom)rom).Date : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).Date) ? " date " + ((Rom)rom).Date : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
 							+ " )\n";
 						break;
 				}

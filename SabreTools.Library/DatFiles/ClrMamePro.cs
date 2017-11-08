@@ -495,11 +495,11 @@ namespace SabreTools.Library.DatFiles
 
 						if (line.Trim().StartsWith("Name:"))
 						{
-							Name = (String.IsNullOrEmpty(Name) ? line.Substring(6) : Name);
+							Name = (String.IsNullOrWhiteSpace(Name) ? line.Substring(6) : Name);
 							superdat = superdat || itemval.Contains(" - SuperDAT");
 							if (keep && superdat)
 							{
-								Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
+								Type = (String.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
 							}
 							continue;
 						}
@@ -508,54 +508,54 @@ namespace SabreTools.Library.DatFiles
 						{
 							case "name":
 							case "Name:":
-								Name = (String.IsNullOrEmpty(Name) ? itemval : Name);
+								Name = (String.IsNullOrWhiteSpace(Name) ? itemval : Name);
 								superdat = superdat || itemval.Contains(" - SuperDAT");
 								if (keep && superdat)
 								{
-									Type = (String.IsNullOrEmpty(Type) ? "SuperDAT" : Type);
+									Type = (String.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
 								}
 								break;
 							case "description":
 							case "Description:":
-								Description = (String.IsNullOrEmpty(Description) ? itemval : Description);
+								Description = (String.IsNullOrWhiteSpace(Description) ? itemval : Description);
 								break;
 							case "rootdir":
-								RootDir = (String.IsNullOrEmpty(RootDir) ? itemval : RootDir);
+								RootDir = (String.IsNullOrWhiteSpace(RootDir) ? itemval : RootDir);
 								break;
 							case "category":
-								Category = (String.IsNullOrEmpty(Category) ? itemval : Category);
+								Category = (String.IsNullOrWhiteSpace(Category) ? itemval : Category);
 								break;
 							case "version":
 							case "Version:":
-								Version = (String.IsNullOrEmpty(Version) ? itemval : Version);
+								Version = (String.IsNullOrWhiteSpace(Version) ? itemval : Version);
 								break;
 							case "date":
 							case "Date:":
-								Date = (String.IsNullOrEmpty(Date) ? itemval : Date);
+								Date = (String.IsNullOrWhiteSpace(Date) ? itemval : Date);
 								break;
 							case "author":
 							case "Author:":
-								Author = (String.IsNullOrEmpty(Author) ? itemval : Author);
+								Author = (String.IsNullOrWhiteSpace(Author) ? itemval : Author);
 								break;
 							case "email":
-								Email = (String.IsNullOrEmpty(Email) ? itemval : Email);
+								Email = (String.IsNullOrWhiteSpace(Email) ? itemval : Email);
 								break;
 							case "homepage":
 							case "Homepage:":
-								Homepage = (String.IsNullOrEmpty(Homepage) ? itemval : Homepage);
+								Homepage = (String.IsNullOrWhiteSpace(Homepage) ? itemval : Homepage);
 								break;
 							case "url":
-								Url = (String.IsNullOrEmpty(Url) ? itemval : Url);
+								Url = (String.IsNullOrWhiteSpace(Url) ? itemval : Url);
 								break;
 							case "comment":
 							case "Comment:":
-								Comment = (String.IsNullOrEmpty(Comment) ? itemval : Comment);
+								Comment = (String.IsNullOrWhiteSpace(Comment) ? itemval : Comment);
 								break;
 							case "header":
-								Header = (String.IsNullOrEmpty(Header) ? itemval : Header);
+								Header = (String.IsNullOrWhiteSpace(Header) ? itemval : Header);
 								break;
 							case "type":
-								Type = (String.IsNullOrEmpty(Type) ? itemval : Type);
+								Type = (String.IsNullOrWhiteSpace(Type) ? itemval : Type);
 								superdat = superdat || itemval.Contains("SuperDAT");
 								break;
 							case "forcemerging":
@@ -741,14 +741,14 @@ namespace SabreTools.Library.DatFiles
 				string header = "clrmamepro (\n" +
 							"\tname \"" + Name + "\"\n" +
 							"\tdescription \"" + Description + "\"\n" +
-							(!String.IsNullOrEmpty(Category) ? "\tcategory \"" + Category + "\"\n" : "") +
+							(!String.IsNullOrWhiteSpace(Category) ? "\tcategory \"" + Category + "\"\n" : "") +
 							"\tversion \"" + Version + "\"\n" +
-							(!String.IsNullOrEmpty(Date) ? "\tdate \"" + Date + "\"\n" : "") +
+							(!String.IsNullOrWhiteSpace(Date) ? "\tdate \"" + Date + "\"\n" : "") +
 							"\tauthor \"" + Author + "\"\n" +
-							(!String.IsNullOrEmpty(Email) ? "\temail \"" + Email + "\"\n" : "") +
-							(!String.IsNullOrEmpty(Homepage) ? "\thomepage \"" + Homepage + "\"\n" : "") +
-							(!String.IsNullOrEmpty(Url) ? "\turl \"" + Url + "\"\n" : "") +
-							(!String.IsNullOrEmpty(Comment) ? "\tcomment \"" + Comment + "\"\n" : "") +
+							(!String.IsNullOrWhiteSpace(Email) ? "\temail \"" + Email + "\"\n" : "") +
+							(!String.IsNullOrWhiteSpace(Homepage) ? "\thomepage \"" + Homepage + "\"\n" : "") +
+							(!String.IsNullOrWhiteSpace(Url) ? "\turl \"" + Url + "\"\n" : "") +
+							(!String.IsNullOrWhiteSpace(Comment) ? "\tcomment \"" + Comment + "\"\n" : "") +
 							(ForcePacking == ForcePacking.Unzip ? "\tforcezipping no\n" : "") +
 							(ForcePacking == ForcePacking.Zip ? "\tforcezipping yes\n" : "") +
 							(ForceMerging == ForceMerging.Full ? "\tforcemerging full\n" : "") +
@@ -788,13 +788,13 @@ namespace SabreTools.Library.DatFiles
 
 				string state = "game (\n\tname \"" + rom.MachineName + "\"\n" +
 							(ExcludeOf ? "" :
-								(String.IsNullOrEmpty(rom.RomOf) ? "" : "\tromof \"" + rom.RomOf + "\"\n") +
-								(String.IsNullOrEmpty(rom.CloneOf) ? "" : "\tcloneof \"" + rom.CloneOf + "\"\n") +
-								(String.IsNullOrEmpty(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n")
+								(String.IsNullOrWhiteSpace(rom.RomOf) ? "" : "\tromof \"" + rom.RomOf + "\"\n") +
+								(String.IsNullOrWhiteSpace(rom.CloneOf) ? "" : "\tcloneof \"" + rom.CloneOf + "\"\n") +
+								(String.IsNullOrWhiteSpace(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n")
 							) +
-							"\tdescription \"" + (String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription) + "\"\n" +
-							(String.IsNullOrEmpty(rom.Year) ? "" : "\tyear " + rom.Year + "\n") +
-							(String.IsNullOrEmpty(rom.Manufacturer) ? "" : "\tmanufacturer \"" + rom.Manufacturer + "\"\n");
+							"\tdescription \"" + (String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription) + "\"\n" +
+							(String.IsNullOrWhiteSpace(rom.Year) ? "" : "\tyear " + rom.Year + "\n") +
+							(String.IsNullOrWhiteSpace(rom.Manufacturer) ? "" : "\tmanufacturer \"" + rom.Manufacturer + "\"\n");
 
 				sw.Write(state);
 				sw.Flush();
@@ -818,7 +818,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			try
 			{
-				string state = (String.IsNullOrEmpty(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n") + ")\n";
+				string state = (String.IsNullOrWhiteSpace(rom.SampleOf) ? "" : "\tsampleof \"" + rom.SampleOf + "\"\n") + ")\n";
 
 				sw.Write(state);
 				sw.Flush();
@@ -861,7 +861,7 @@ namespace SabreTools.Library.DatFiles
 						break;
 					case ItemType.BiosSet:
 						state += "\tbiosset ( name\"" + rom.Name + "\""
-							+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description \"" + ((BiosSet)rom).Description + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((BiosSet)rom).Description) ? " description \"" + ((BiosSet)rom).Description + "\"" : "")
 							+ (((BiosSet)rom).Default != null
 								? "default " + ((BiosSet)rom).Default.ToString().ToLowerInvariant()
 								: "")
@@ -869,19 +869,19 @@ namespace SabreTools.Library.DatFiles
 						break;
 					case ItemType.Disk:
 						state += "\tdisk ( name \"" + rom.Name + "\""
-							+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5 " + ((Disk)rom).MD5.ToLowerInvariant() : "")
-							+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1 " + ((Disk)rom).SHA1.ToLowerInvariant() : "")
-							+ (!String.IsNullOrEmpty(((Disk)rom).SHA256) ? " sha256 " + ((Disk)rom).SHA256.ToLowerInvariant() : "")
-							+ (!String.IsNullOrEmpty(((Disk)rom).SHA384) ? " sha384 " + ((Disk)rom).SHA384.ToLowerInvariant() : "")
-							+ (!String.IsNullOrEmpty(((Disk)rom).SHA512) ? " sha512 " + ((Disk)rom).SHA512.ToLowerInvariant() : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).MD5) ? " md5 " + ((Disk)rom).MD5.ToLowerInvariant() : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).SHA1) ? " sha1 " + ((Disk)rom).SHA1.ToLowerInvariant() : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).SHA256) ? " sha256 " + ((Disk)rom).SHA256.ToLowerInvariant() : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).SHA384) ? " sha384 " + ((Disk)rom).SHA384.ToLowerInvariant() : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).SHA512) ? " sha512 " + ((Disk)rom).SHA512.ToLowerInvariant() : "")
 							+ (((Disk)rom).ItemStatus != ItemStatus.None ? " flags " + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() : "")
 							+ " )\n";
 						break;
 					case ItemType.Release:
 						state += "\trelease ( name\"" + rom.Name + "\""
-							+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region \"" + ((Release)rom).Region + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language \"" + ((Release)rom).Language + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date \"" + ((Release)rom).Date + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Release)rom).Region) ? " region \"" + ((Release)rom).Region + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Release)rom).Language) ? " language \"" + ((Release)rom).Language + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Release)rom).Date) ? " date \"" + ((Release)rom).Date + "\"" : "")
 							+ (((Release)rom).Default != null
 								? "default " + ((Release)rom).Default.ToString().ToLowerInvariant()
 								: "")
@@ -890,13 +890,13 @@ namespace SabreTools.Library.DatFiles
 					case ItemType.Rom:
 						state += "\trom ( name \"" + rom.Name + "\""
 							+ (((Rom)rom).Size != -1 ? " size " + ((Rom)rom).Size : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5 " + ((Rom)rom).MD5.ToLowerInvariant() : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1 " + ((Rom)rom).SHA1.ToLowerInvariant() : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).SHA256) ? " sha256 " + ((Rom)rom).SHA256.ToLowerInvariant() : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).SHA384) ? " sha384 " + ((Rom)rom).SHA384.ToLowerInvariant() : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).SHA512) ? " sha512 " + ((Rom)rom).SHA512.ToLowerInvariant() : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date \"" + ((Rom)rom).Date + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).CRC) ? " crc " + ((Rom)rom).CRC.ToLowerInvariant() : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).MD5) ? " md5 " + ((Rom)rom).MD5.ToLowerInvariant() : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).SHA1) ? " sha1 " + ((Rom)rom).SHA1.ToLowerInvariant() : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).SHA256) ? " sha256 " + ((Rom)rom).SHA256.ToLowerInvariant() : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).SHA384) ? " sha384 " + ((Rom)rom).SHA384.ToLowerInvariant() : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).SHA512) ? " sha512 " + ((Rom)rom).SHA512.ToLowerInvariant() : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).Date) ? " date \"" + ((Rom)rom).Date + "\"" : "")
 							+ (((Rom)rom).ItemStatus != ItemStatus.None ? " flags " + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() : "")
 							+ " )\n";
 						break;

@@ -77,7 +77,7 @@ namespace SabreTools.Library.DatFiles
 				string line = sr.ReadLine().Trim();
 
 				// If we have a blank line, we just skip it
-				if (String.IsNullOrEmpty(line))
+				if (String.IsNullOrWhiteSpace(line))
 				{
 					continue;
 				}

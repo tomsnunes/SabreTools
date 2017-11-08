@@ -242,7 +242,7 @@ namespace SabreTools.Library.Tools
 		public static string CleanHashData(string hash, int padding)
 		{
 			// If we have a known blank hash, return blank
-			if (string.IsNullOrEmpty(hash) || hash == "-" || hash == "_")
+			if (string.IsNullOrWhiteSpace(hash) || hash == "-" || hash == "_")
 			{
 				return "";
 			}
@@ -251,7 +251,7 @@ namespace SabreTools.Library.Tools
 			hash = hash.Trim().Replace("0x", "");
 
 			// If we have a blank hash now, return blank
-			if (string.IsNullOrEmpty(hash))
+			if (string.IsNullOrWhiteSpace(hash))
 			{
 				return "";
 			}
@@ -1863,6 +1863,32 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Ensure the output directory is a proper format and can be created
+		/// </summary>
+		/// <param name="outDir">Output directory to check</param>
+		/// <param name="create">True if the output directory should be created, false otherwise (default)</param>
+		/// <returns>Full path to the proper output directory</returns>
+		public static string EnsureOutputDirectory(string outDir, bool create = false)
+		{
+			// If the output directory is invalid
+			if (string.IsNullOrWhiteSpace(outDir))
+			{
+				outDir = Environment.CurrentDirectory;
+			}
+
+			// Get the full path for the output directory
+			outDir = Path.GetFullPath(outDir);
+
+			// If we're creating the output folder, do so
+			if (create)
+			{
+				Directory.CreateDirectory(outDir);
+			}
+
+			return outDir;
+		}
+
+		/// <summary>
 		/// Get a proper romba sub path
 		/// </summary>
 		/// <param name="hash">SHA-1 hash to get the path for</param>
@@ -2244,7 +2270,7 @@ namespace SabreTools.Library.Tools
 		/// <param name="array">The array to test</param>
 		/// <returns>true if the array parameter is null or has a length of zero; otherwise, false.</returns>
 		/// <link>https://stackoverflow.com/questions/8560106/isnullorempty-equivalent-for-array-c-sharp</link>
-		public static bool IsNullOrEmpty(this Array array)
+		public static bool IsNullOrWhiteSpace(this Array array)
 		{
 			return (array == null || array.Length == 0);
 		}

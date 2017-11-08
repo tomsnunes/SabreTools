@@ -218,13 +218,13 @@ namespace SabreTools.Library.DatFiles
 				string state = "\t<software name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\""
 							+ (rom.Supported != null ? " supported=\"" + (rom.Supported == true ? "yes" : "no") + "\"" : "") +
 							(ExcludeOf ? "" :
-									(String.IsNullOrEmpty(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
+									(String.IsNullOrWhiteSpace(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
 										? ""
 										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
-									(String.IsNullOrEmpty(rom.RomOf) || (rom.MachineName.ToLowerInvariant() == rom.RomOf.ToLowerInvariant())
+									(String.IsNullOrWhiteSpace(rom.RomOf) || (rom.MachineName.ToLowerInvariant() == rom.RomOf.ToLowerInvariant())
 										? ""
 										: " romof=\"" + HttpUtility.HtmlEncode(rom.RomOf) + "\"") +
-									(String.IsNullOrEmpty(rom.SampleOf) || (rom.MachineName.ToLowerInvariant() == rom.SampleOf.ToLowerInvariant())
+									(String.IsNullOrWhiteSpace(rom.SampleOf) || (rom.MachineName.ToLowerInvariant() == rom.SampleOf.ToLowerInvariant())
 										? ""
 										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.SampleOf) + "\"")
 								) + ">\n"
@@ -302,17 +302,17 @@ namespace SabreTools.Library.DatFiles
 				switch (rom.Type)
 				{
 					case ItemType.Archive:
-						state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "archive" : rom.AreaName) + "\""
+						state += "\t\t\t<dataarea name=\"" + (String.IsNullOrWhiteSpace(rom.AreaName) ? "archive" : rom.AreaName) + "\""
 								+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 							+ "\t\t\t\t<archive name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 							+ "/>\n"
 							+ "\t\t\t</dataarea>\n";
 						break;
 					case ItemType.BiosSet:
-						state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "biosset" : rom.AreaName) + "\""
+						state += "\t\t\t<dataarea name=\"" + (String.IsNullOrWhiteSpace(rom.AreaName) ? "biosset" : rom.AreaName) + "\""
 								+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 							+ "\t\t\t\t<biosset name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-							+ (!String.IsNullOrEmpty(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
 							+ (((BiosSet)rom).Default != null
 								? ((BiosSet)rom).Default.ToString().ToLowerInvariant()
 								: "")
@@ -320,25 +320,25 @@ namespace SabreTools.Library.DatFiles
 							+ "\t\t\t</dataarea>\n";
 						break;
 					case ItemType.Disk:
-						state += "\t\t\t<diskarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "cdrom" : rom.AreaName) + "\""
+						state += "\t\t\t<diskarea name=\"" + (String.IsNullOrWhiteSpace(rom.AreaName) ? "cdrom" : rom.AreaName) + "\""
 								+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 							+ "\t\t\t\t<disk name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-							+ (!String.IsNullOrEmpty(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Disk)rom).SHA256) ? " sha256=\"" + ((Disk)rom).SHA256.ToLowerInvariant() + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Disk)rom).SHA384) ? " sha384=\"" + ((Disk)rom).SHA384.ToLowerInvariant() + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Disk)rom).SHA512) ? " sha512=\"" + ((Disk)rom).SHA512.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).SHA256) ? " sha256=\"" + ((Disk)rom).SHA256.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).SHA384) ? " sha384=\"" + ((Disk)rom).SHA384.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).SHA512) ? " sha512=\"" + ((Disk)rom).SHA512.ToLowerInvariant() + "\"" : "")
 							+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 							+ "/>\n"
 							+ "\t\t\t</diskarea>\n";
 						break;
 					case ItemType.Release:
-						state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "release" : rom.AreaName) + "\""
+						state += "\t\t\t<dataarea name=\"" + (String.IsNullOrWhiteSpace(rom.AreaName) ? "release" : rom.AreaName) + "\""
 								+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 							+ "\t\t\t\t<release name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
-							+ (!String.IsNullOrEmpty(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : "")
 							+ (((Release)rom).Default != null
 								? ((Release)rom).Default.ToString().ToLowerInvariant()
 								: "")
@@ -346,23 +346,23 @@ namespace SabreTools.Library.DatFiles
 							+ "\t\t\t</dataarea>\n";
 						break;
 					case ItemType.Rom:
-						state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "rom" : rom.AreaName) + "\""
+						state += "\t\t\t<dataarea name=\"" + (String.IsNullOrWhiteSpace(rom.AreaName) ? "rom" : rom.AreaName) + "\""
 								+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 							+ "\t\t\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 							+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).SHA256) ? " sha256=\"" + ((Rom)rom).SHA256.ToLowerInvariant() + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).SHA384) ? " sha384=\"" + ((Rom)rom).SHA384.ToLowerInvariant() + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).SHA512) ? " sha512=\"" + ((Rom)rom).SHA512.ToLowerInvariant() + "\"" : "")
-							+ (!String.IsNullOrEmpty(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).SHA1) ? " sha1=\"" + ((Rom)rom).SHA1.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).SHA256) ? " sha256=\"" + ((Rom)rom).SHA256.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).SHA384) ? " sha384=\"" + ((Rom)rom).SHA384.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).SHA512) ? " sha512=\"" + ((Rom)rom).SHA512.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).Date) ? " date=\"" + ((Rom)rom).Date + "\"" : "")
 							+ (((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
 							+ "/>\n"
 							+ "\t\t\t</dataarea>\n";
 						break;
 					case ItemType.Sample:
-						state += "\t\t\t<dataarea name=\"" + (String.IsNullOrEmpty(rom.AreaName) ? "sample" : rom.AreaName) + "\""
+						state += "\t\t\t<dataarea name=\"" + (String.IsNullOrWhiteSpace(rom.AreaName) ? "sample" : rom.AreaName) + "\""
 								+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
 							+ "\t\t\t\t<sample type=\"sample\" name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 							+ "/>\n"

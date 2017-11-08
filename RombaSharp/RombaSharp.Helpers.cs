@@ -377,7 +377,7 @@ namespace RombaSharp
 		private static void RefreshDatabase()
 		{
 			// Make sure the db is set
-			if (String.IsNullOrEmpty(_db))
+			if (String.IsNullOrWhiteSpace(_db))
 			{
 				_db = "db.sqlite";
 				_connectionString = "Data Source=" + _db + ";Version = 3;";
@@ -390,7 +390,7 @@ namespace RombaSharp
 			}
 
 			// Make sure the dats dir is set
-			if (String.IsNullOrEmpty(_dats))
+			if (String.IsNullOrWhiteSpace(_dats))
 			{
 				_dats = "dats";
 			}
@@ -500,23 +500,23 @@ namespace RombaSharp
 						{
 							Rom rom = (Rom)datItem;
 
-							if (!String.IsNullOrEmpty(rom.CRC))
+							if (!String.IsNullOrWhiteSpace(rom.CRC))
 							{
 								crcquery += " (\"" + rom.CRC + "\"),";
 							}
-							if (!String.IsNullOrEmpty(rom.MD5))
+							if (!String.IsNullOrWhiteSpace(rom.MD5))
 							{
 								md5query += " (\"" + rom.MD5 + "\"),";
 							}
-							if (!String.IsNullOrEmpty(rom.SHA1))
+							if (!String.IsNullOrWhiteSpace(rom.SHA1))
 							{
 								sha1query += " (\"" + rom.SHA1 + "\"),";
 
-								if (!String.IsNullOrEmpty(rom.CRC))
+								if (!String.IsNullOrWhiteSpace(rom.CRC))
 								{
 									crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
 								}
-								if (!String.IsNullOrEmpty(rom.MD5))
+								if (!String.IsNullOrWhiteSpace(rom.MD5))
 								{
 									md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
 								}
@@ -526,15 +526,15 @@ namespace RombaSharp
 						{
 							Disk disk = (Disk)datItem;
 
-							if (!String.IsNullOrEmpty(disk.MD5))
+							if (!String.IsNullOrWhiteSpace(disk.MD5))
 							{
 								md5query += " (\"" + disk.MD5 + "\"),";
 							}
-							if (!String.IsNullOrEmpty(disk.SHA1))
+							if (!String.IsNullOrWhiteSpace(disk.SHA1))
 							{
 								sha1query += " (\"" + disk.SHA1 + "\"),";
 
-								if (!String.IsNullOrEmpty(disk.MD5))
+								if (!String.IsNullOrWhiteSpace(disk.MD5))
 								{
 									md5sha1query += " (\"" + disk.MD5 + "\", \"" + disk.SHA1 + "\"),";
 								}
@@ -642,23 +642,23 @@ namespace RombaSharp
 					}
 					else if (!dupehashes.Contains(rom.SHA1))
 					{
-						if (!String.IsNullOrEmpty(rom.CRC))
+						if (!String.IsNullOrWhiteSpace(rom.CRC))
 						{
 							crcquery += " (\"" + rom.CRC + "\"),";
 						}
-						if (!String.IsNullOrEmpty(rom.MD5))
+						if (!String.IsNullOrWhiteSpace(rom.MD5))
 						{
 							md5query += " (\"" + rom.MD5 + "\"),";
 						}
-						if (!String.IsNullOrEmpty(rom.SHA1))
+						if (!String.IsNullOrWhiteSpace(rom.SHA1))
 						{
 							sha1query += " (\"" + rom.SHA1 + "\", \"" + depotname + "\"),";
 
-							if (!String.IsNullOrEmpty(rom.CRC))
+							if (!String.IsNullOrWhiteSpace(rom.CRC))
 							{
 								crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
 							}
-							if (!String.IsNullOrEmpty(rom.MD5))
+							if (!String.IsNullOrWhiteSpace(rom.MD5))
 							{
 								md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
 							}

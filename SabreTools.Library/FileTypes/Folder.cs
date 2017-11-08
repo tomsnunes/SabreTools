@@ -102,7 +102,7 @@ namespace SabreTools.Library.FileTypes
 				string match = files.Where(s => s.EndsWith(entryName)).FirstOrDefault();
 
 				// If we had a file, copy that over to the new name
-				if (!String.IsNullOrEmpty(match))
+				if (!String.IsNullOrWhiteSpace(match))
 				{
 					realentry = match;
 					File.Copy(match, Path.Combine(outDir, entryName));
@@ -141,7 +141,7 @@ namespace SabreTools.Library.FileTypes
 				string match = files.Where(s => s.EndsWith(entryName)).FirstOrDefault();
 
 				// If we had a file, copy that over to the new name
-				if (!String.IsNullOrEmpty(match))
+				if (!String.IsNullOrWhiteSpace(match))
 				{
 					Utilities.TryOpenRead(match).CopyTo(ms);
 					realentry = match;
@@ -269,7 +269,7 @@ namespace SabreTools.Library.FileTypes
 
 					if (rom.Type == ItemType.Rom)
 					{
-						if (date && !String.IsNullOrEmpty(((Rom)rom).Date))
+						if (date && !String.IsNullOrWhiteSpace(((Rom)rom).Date))
 						{
 							File.SetCreationTime(fileName, DateTime.Parse(((Rom)rom).Date));
 						}

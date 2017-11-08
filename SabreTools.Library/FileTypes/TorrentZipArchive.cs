@@ -81,7 +81,7 @@ namespace SabreTools.Library.FileTypes
 					zr = zf.OpenReadStream(i, false, out Stream readStream, out ulong streamsize, out SabreTools.Library.Data.CompressionMethod cm, out uint lastMod);
 
 					// Create the rest of the path, if needed
-					if (!String.IsNullOrEmpty(Path.GetDirectoryName(zf.Entries[i].FileName)))
+					if (!String.IsNullOrWhiteSpace(Path.GetDirectoryName(zf.Entries[i].FileName)))
 					{
 						Directory.CreateDirectory(Path.Combine(outDir, Path.GetDirectoryName(zf.Entries[i].FileName)));
 					}
@@ -465,7 +465,7 @@ namespace SabreTools.Library.FileTypes
 					ulong istreamSize = (ulong)(inputStream.Length);
 
 					DateTime dt = DateTime.Now;
-					if (date && !String.IsNullOrEmpty(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out dt))
+					if (date && !String.IsNullOrWhiteSpace(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out dt))
 					{
 						uint msDosDateTime = Utilities.ConvertDateTimeToMsDosTimeFormat(dt);
 						zipFile.OpenWriteStream(false, false, rom.Name.Replace('\\', '/'), istreamSize,
@@ -536,7 +536,7 @@ namespace SabreTools.Library.FileTypes
 							ulong istreamSize = (ulong)(inputStream.Length);
 
 							DateTime dt = DateTime.Now;
-							if (date && !String.IsNullOrEmpty(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out dt))
+							if (date && !String.IsNullOrWhiteSpace(rom.Date) && DateTime.TryParse(rom.Date.Replace('\\', '/'), out dt))
 							{
 								uint msDosDateTime = Utilities.ConvertDateTimeToMsDosTimeFormat(dt);
 								zipFile.OpenWriteStream(false, false, rom.Name.Replace('\\', '/'), istreamSize,
@@ -686,7 +686,7 @@ namespace SabreTools.Library.FileTypes
 						ulong istreamSize = (ulong)(new FileInfo(inputFiles[index]).Length);
 
 						DateTime dt = DateTime.Now;
-						if (date && !String.IsNullOrEmpty(roms[index].Date) && DateTime.TryParse(roms[index].Date.Replace('\\', '/'), out dt))
+						if (date && !String.IsNullOrWhiteSpace(roms[index].Date) && DateTime.TryParse(roms[index].Date.Replace('\\', '/'), out dt))
 						{
 							uint msDosDateTime = Utilities.ConvertDateTimeToMsDosTimeFormat(dt);
 							zipFile.OpenWriteStream(false, false, roms[index].Name.Replace('\\', '/'), istreamSize,
@@ -763,7 +763,7 @@ namespace SabreTools.Library.FileTypes
 							ulong istreamSize = (ulong)(new FileInfo(inputFiles[-index - 1]).Length);
 
 							DateTime dt = DateTime.Now;
-							if (date && !String.IsNullOrEmpty(roms[-index - 1].Date) && DateTime.TryParse(roms[-index - 1].Date.Replace('\\', '/'), out dt))
+							if (date && !String.IsNullOrWhiteSpace(roms[-index - 1].Date) && DateTime.TryParse(roms[-index - 1].Date.Replace('\\', '/'), out dt))
 							{
 								uint msDosDateTime = Utilities.ConvertDateTimeToMsDosTimeFormat(dt);
 								zipFile.OpenWriteStream(false, false, roms[-index - 1].Name.Replace('\\', '/'), istreamSize,

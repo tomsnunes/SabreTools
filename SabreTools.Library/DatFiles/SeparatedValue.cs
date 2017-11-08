@@ -186,13 +186,13 @@ namespace SabreTools.Library.DatFiles
 					switch (columns[i])
 					{
 						case "DatFile.FileName":
-							FileName = (String.IsNullOrEmpty(FileName) ? value : FileName);
+							FileName = (String.IsNullOrWhiteSpace(FileName) ? value : FileName);
 							break;
 						case "DatFile.Name":
-							Name = (String.IsNullOrEmpty(Name) ? value : Name);
+							Name = (String.IsNullOrWhiteSpace(Name) ? value : Name);
 							break;
 						case "DatFile.Description":
-							Description = (String.IsNullOrEmpty(Description) ? value : Description);
+							Description = (String.IsNullOrWhiteSpace(Description) ? value : Description);
 							break;
 						case "Machine.Name":
 							machineName = value;

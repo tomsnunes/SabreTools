@@ -654,24 +654,24 @@ namespace SabreTools.Library.DatItems
 			{
 				// If all items are supposed to have a SHA-512, we sort by that
 				if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA512Count
-					&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA512))
-						|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA512))))
+					&& ((_itemType == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)this).SHA512))
+						|| (_itemType == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)this).SHA512))))
 				{
 					datdata.BucketBy(SortedBy.SHA512, DedupeType.None);
 				}
 
 				// If all items are supposed to have a SHA-384, we sort by that
 				else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA384Count
-					&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA384))
-						|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA384))))
+					&& ((_itemType == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)this).SHA384))
+						|| (_itemType == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)this).SHA384))))
 				{
 					datdata.BucketBy(SortedBy.SHA384, DedupeType.None);
 				}
 
 				// If all items are supposed to have a SHA-256, we sort by that
 				else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA256Count
-					&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA256))
-						|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA256))))
+					&& ((_itemType == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)this).SHA256))
+						|| (_itemType == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)this).SHA256))))
 				{
 					if (_itemType == ItemType.Rom)
 					{
@@ -687,8 +687,8 @@ namespace SabreTools.Library.DatItems
 
 				// If all items are supposed to have a SHA-1, we sort by that
 				else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.SHA1Count
-					&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).SHA1))
-						|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).SHA1))))
+					&& ((_itemType == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)this).SHA1))
+						|| (_itemType == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)this).SHA1))))
 				{
 					if (_itemType == ItemType.Rom)
 					{
@@ -704,8 +704,8 @@ namespace SabreTools.Library.DatItems
 
 				// If all items are supposed to have an MD5, we sort by that
 				else if (datdata.RomCount + datdata.DiskCount - datdata.NodumpCount == datdata.MD5Count
-					&& ((_itemType == ItemType.Rom && !String.IsNullOrEmpty(((Rom)this).MD5))
-						|| (_itemType == ItemType.Disk && !String.IsNullOrEmpty(((Disk)this).MD5))))
+					&& ((_itemType == ItemType.Rom && !String.IsNullOrWhiteSpace(((Rom)this).MD5))
+						|| (_itemType == ItemType.Disk && !String.IsNullOrWhiteSpace(((Disk)this).MD5))))
 				{
 					if (_itemType == ItemType.Rom)
 					{
@@ -887,22 +887,22 @@ namespace SabreTools.Library.DatItems
 							if (file.Type == ItemType.Rom)
 							{
 								((Rom)saveditem).Size = ((Rom)saveditem).Size;
-								((Rom)saveditem).CRC = (String.IsNullOrEmpty(((Rom)saveditem).CRC) && !String.IsNullOrEmpty(((Rom)file).CRC)
+								((Rom)saveditem).CRC = (String.IsNullOrWhiteSpace(((Rom)saveditem).CRC) && !String.IsNullOrWhiteSpace(((Rom)file).CRC)
 									? ((Rom)file).CRC
 									: ((Rom)saveditem).CRC);
-								((Rom)saveditem).MD5 = (String.IsNullOrEmpty(((Rom)saveditem).MD5) && !String.IsNullOrEmpty(((Rom)file).MD5)
+								((Rom)saveditem).MD5 = (String.IsNullOrWhiteSpace(((Rom)saveditem).MD5) && !String.IsNullOrWhiteSpace(((Rom)file).MD5)
 									? ((Rom)file).MD5
 									: ((Rom)saveditem).MD5);
-								((Rom)saveditem).SHA1 = (String.IsNullOrEmpty(((Rom)saveditem).SHA1) && !String.IsNullOrEmpty(((Rom)file).SHA1)
+								((Rom)saveditem).SHA1 = (String.IsNullOrWhiteSpace(((Rom)saveditem).SHA1) && !String.IsNullOrWhiteSpace(((Rom)file).SHA1)
 									? ((Rom)file).SHA1
 									: ((Rom)saveditem).SHA1);
 							}
 							else
 							{
-								((Disk)saveditem).MD5 = (String.IsNullOrEmpty(((Disk)saveditem).MD5) && !String.IsNullOrEmpty(((Disk)file).MD5)
+								((Disk)saveditem).MD5 = (String.IsNullOrWhiteSpace(((Disk)saveditem).MD5) && !String.IsNullOrWhiteSpace(((Disk)file).MD5)
 									? ((Disk)file).MD5
 									: ((Disk)saveditem).MD5);
-								((Disk)saveditem).SHA1 = (String.IsNullOrEmpty(((Disk)saveditem).SHA1) && !String.IsNullOrEmpty(((Disk)file).SHA1)
+								((Disk)saveditem).SHA1 = (String.IsNullOrWhiteSpace(((Disk)saveditem).SHA1) && !String.IsNullOrWhiteSpace(((Disk)file).SHA1)
 									? ((Disk)file).SHA1
 									: ((Disk)saveditem).SHA1);
 							}
@@ -997,9 +997,9 @@ namespace SabreTools.Library.DatItems
 					if (datItem.Type == ItemType.Disk)
 					{
 						Disk disk = (Disk)datItem;
-						disk.Name += "_" + (!String.IsNullOrEmpty(disk.MD5)
+						disk.Name += "_" + (!String.IsNullOrWhiteSpace(disk.MD5)
 							? disk.MD5
-							: !String.IsNullOrEmpty(disk.SHA1)
+							: !String.IsNullOrWhiteSpace(disk.SHA1)
 								? disk.SHA1
 								: "1");
 						datItem = disk;
@@ -1008,11 +1008,11 @@ namespace SabreTools.Library.DatItems
 					else if (datItem.Type == ItemType.Rom)
 					{
 						Rom rom = (Rom)datItem;
-						rom.Name += "_" + (!String.IsNullOrEmpty(rom.CRC)
+						rom.Name += "_" + (!String.IsNullOrWhiteSpace(rom.CRC)
 							? rom.CRC
-							: !String.IsNullOrEmpty(rom.MD5)
+							: !String.IsNullOrWhiteSpace(rom.MD5)
 								? rom.MD5
-								: !String.IsNullOrEmpty(rom.SHA1)
+								: !String.IsNullOrWhiteSpace(rom.SHA1)
 									? rom.SHA1
 									: "1");
 						datItem = rom;

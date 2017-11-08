@@ -84,23 +84,23 @@ namespace RombaSharp
 						if (sldr.HasRows)
 						{
 							// Add to the queries
-							if (!String.IsNullOrEmpty(rom.CRC))
+							if (!String.IsNullOrWhiteSpace(rom.CRC))
 							{
 								crcquery += " (\"" + rom.CRC + "\"),";
 							}
-							if (!String.IsNullOrEmpty(rom.MD5))
+							if (!String.IsNullOrWhiteSpace(rom.MD5))
 							{
 								md5query += " (\"" + rom.MD5 + "\"),";
 							}
-							if (!String.IsNullOrEmpty(rom.SHA1))
+							if (!String.IsNullOrWhiteSpace(rom.SHA1))
 							{
 								sha1query += " (\"" + rom.SHA1 + "\", \"" + _depots.Keys.ToList()[0] + "\"),";
 
-								if (!String.IsNullOrEmpty(rom.CRC))
+								if (!String.IsNullOrWhiteSpace(rom.CRC))
 								{
 									crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
 								}
-								if (!String.IsNullOrEmpty(rom.MD5))
+								if (!String.IsNullOrWhiteSpace(rom.MD5))
 								{
 									md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
 								}
@@ -114,23 +114,23 @@ namespace RombaSharp
 					else
 					{
 						// Add to the queries
-						if (!String.IsNullOrEmpty(rom.CRC))
+						if (!String.IsNullOrWhiteSpace(rom.CRC))
 						{
 							crcquery += " (\"" + rom.CRC + "\"),";
 						}
-						if (!String.IsNullOrEmpty(rom.MD5))
+						if (!String.IsNullOrWhiteSpace(rom.MD5))
 						{
 							md5query += " (\"" + rom.MD5 + "\"),";
 						}
-						if (!String.IsNullOrEmpty(rom.SHA1))
+						if (!String.IsNullOrWhiteSpace(rom.SHA1))
 						{
 							sha1query += " (\"" + rom.SHA1 + "\", \"" + _depots.Keys.ToList()[0] + "\"),";
 
-							if (!String.IsNullOrEmpty(rom.CRC))
+							if (!String.IsNullOrWhiteSpace(rom.CRC))
 							{
 								crcsha1query += " (\"" + rom.CRC + "\", \"" + rom.SHA1 + "\"),";
 							}
-							if (!String.IsNullOrEmpty(rom.MD5))
+							if (!String.IsNullOrWhiteSpace(rom.MD5))
 							{
 								md5sha1query += " (\"" + rom.MD5 + "\", \"" + rom.SHA1 + "\"),";
 							}

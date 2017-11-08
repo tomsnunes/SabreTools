@@ -125,7 +125,7 @@ namespace SabreTools
 			};
 
 			// Clean the temp directory
-			tempDir = (String.IsNullOrEmpty(tempDir) ? Path.GetTempPath() : tempDir);
+			tempDir = (String.IsNullOrWhiteSpace(tempDir) ? Path.GetTempPath() : tempDir);
 
 			// For each input directory, create a DAT
 			foreach (string path in inputs)
@@ -542,7 +542,7 @@ namespace SabreTools
 		{
 			// Set the special flags
 			ForceMerging fm = ForceMerging.None;
-			if (!String.IsNullOrEmpty(forcemerge))
+			if (!String.IsNullOrWhiteSpace(forcemerge))
 			{
 				switch (forcemerge.ToLowerInvariant())
 				{
@@ -562,7 +562,7 @@ namespace SabreTools
 			}
 
 			ForceNodump fn = ForceNodump.None;
-			if (!String.IsNullOrEmpty(forcend))
+			if (!String.IsNullOrWhiteSpace(forcend))
 			{
 				switch (forcend.ToLowerInvariant())
 				{
@@ -585,7 +585,7 @@ namespace SabreTools
 			}
 
 			ForcePacking fp = ForcePacking.None;
-			if (!String.IsNullOrEmpty(forcepack))
+			if (!String.IsNullOrWhiteSpace(forcepack))
 			{
 				switch (forcepack.ToLowerInvariant())
 				{

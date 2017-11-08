@@ -376,9 +376,9 @@ namespace SabreTools.Library.Skippers
 			foreach (Skipper skipper in tempList)
 			{
 				// If we're searching for the skipper OR we have a match to an inputted one
-				if (String.IsNullOrEmpty(skipperName)
-					|| (!String.IsNullOrEmpty(skipper.Name) && skipperName.ToLowerInvariant() == skipper.Name.ToLowerInvariant())
-					|| (!String.IsNullOrEmpty(skipper.Name) && skipperName.ToLowerInvariant() == skipper.SourceFile.ToLowerInvariant()))
+				if (String.IsNullOrWhiteSpace(skipperName)
+					|| (!String.IsNullOrWhiteSpace(skipper.Name) && skipperName.ToLowerInvariant() == skipper.Name.ToLowerInvariant())
+					|| (!String.IsNullOrWhiteSpace(skipper.Name) && skipperName.ToLowerInvariant() == skipper.SourceFile.ToLowerInvariant()))
 				{
 					// Loop through the rules until one is found that works
 					BinaryReader br = new BinaryReader(input);

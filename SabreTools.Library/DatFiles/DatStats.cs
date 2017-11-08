@@ -196,11 +196,11 @@ namespace SabreTools.Library.DatFiles
 						_diskCount += 1;
 						if (((Disk)item).ItemStatus != ItemStatus.Nodump)
 						{
-							_md5Count += (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
-							_sha1Count += (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
-							_sha256Count += (String.IsNullOrEmpty(((Disk)item).SHA256) ? 0 : 1);
-							_sha384Count += (String.IsNullOrEmpty(((Disk)item).SHA384) ? 0 : 1);
-							_sha512Count += (String.IsNullOrEmpty(((Disk)item).SHA512) ? 0 : 1);
+							_md5Count += (String.IsNullOrWhiteSpace(((Disk)item).MD5) ? 0 : 1);
+							_sha1Count += (String.IsNullOrWhiteSpace(((Disk)item).SHA1) ? 0 : 1);
+							_sha256Count += (String.IsNullOrWhiteSpace(((Disk)item).SHA256) ? 0 : 1);
+							_sha384Count += (String.IsNullOrWhiteSpace(((Disk)item).SHA384) ? 0 : 1);
+							_sha512Count += (String.IsNullOrWhiteSpace(((Disk)item).SHA512) ? 0 : 1);
 						}
 
 						_baddumpCount += (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
@@ -216,12 +216,12 @@ namespace SabreTools.Library.DatFiles
 						if (((Rom)item).ItemStatus != ItemStatus.Nodump)
 						{
 							_totalSize += ((Rom)item).Size;
-							_crcCount += (String.IsNullOrEmpty(((Rom)item).CRC) ? 0 : 1);
-							_md5Count += (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
-							_sha1Count += (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
-							_sha256Count += (String.IsNullOrEmpty(((Rom)item).SHA256) ? 0 : 1);
-							_sha384Count += (String.IsNullOrEmpty(((Rom)item).SHA384) ? 0 : 1);
-							_sha512Count += (String.IsNullOrEmpty(((Rom)item).SHA512) ? 0 : 1);
+							_crcCount += (String.IsNullOrWhiteSpace(((Rom)item).CRC) ? 0 : 1);
+							_md5Count += (String.IsNullOrWhiteSpace(((Rom)item).MD5) ? 0 : 1);
+							_sha1Count += (String.IsNullOrWhiteSpace(((Rom)item).SHA1) ? 0 : 1);
+							_sha256Count += (String.IsNullOrWhiteSpace(((Rom)item).SHA256) ? 0 : 1);
+							_sha384Count += (String.IsNullOrWhiteSpace(((Rom)item).SHA384) ? 0 : 1);
+							_sha512Count += (String.IsNullOrWhiteSpace(((Rom)item).SHA512) ? 0 : 1);
 						}
 
 						_baddumpCount += (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
@@ -295,11 +295,11 @@ namespace SabreTools.Library.DatFiles
 						_diskCount -= 1;
 						if (((Disk)item).ItemStatus != ItemStatus.Nodump)
 						{
-							_md5Count -= (String.IsNullOrEmpty(((Disk)item).MD5) ? 0 : 1);
-							_sha1Count -= (String.IsNullOrEmpty(((Disk)item).SHA1) ? 0 : 1);
-							_sha256Count -= (String.IsNullOrEmpty(((Disk)item).SHA256) ? 0 : 1);
-							_sha384Count -= (String.IsNullOrEmpty(((Disk)item).SHA384) ? 0 : 1);
-							_sha512Count -= (String.IsNullOrEmpty(((Disk)item).SHA512) ? 0 : 1);
+							_md5Count -= (String.IsNullOrWhiteSpace(((Disk)item).MD5) ? 0 : 1);
+							_sha1Count -= (String.IsNullOrWhiteSpace(((Disk)item).SHA1) ? 0 : 1);
+							_sha256Count -= (String.IsNullOrWhiteSpace(((Disk)item).SHA256) ? 0 : 1);
+							_sha384Count -= (String.IsNullOrWhiteSpace(((Disk)item).SHA384) ? 0 : 1);
+							_sha512Count -= (String.IsNullOrWhiteSpace(((Disk)item).SHA512) ? 0 : 1);
 						}
 
 						_baddumpCount -= (((Disk)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);
@@ -315,12 +315,12 @@ namespace SabreTools.Library.DatFiles
 						if (((Rom)item).ItemStatus != ItemStatus.Nodump)
 						{
 							_totalSize -= ((Rom)item).Size;
-							_crcCount -= (String.IsNullOrEmpty(((Rom)item).CRC) ? 0 : 1);
-							_md5Count -= (String.IsNullOrEmpty(((Rom)item).MD5) ? 0 : 1);
-							_sha1Count -= (String.IsNullOrEmpty(((Rom)item).SHA1) ? 0 : 1);
-							_sha256Count -= (String.IsNullOrEmpty(((Rom)item).SHA256) ? 0 : 1);
-							_sha384Count -= (String.IsNullOrEmpty(((Rom)item).SHA384) ? 0 : 1);
-							_sha512Count -= (String.IsNullOrEmpty(((Rom)item).SHA512) ? 0 : 1);
+							_crcCount -= (String.IsNullOrWhiteSpace(((Rom)item).CRC) ? 0 : 1);
+							_md5Count -= (String.IsNullOrWhiteSpace(((Rom)item).MD5) ? 0 : 1);
+							_sha1Count -= (String.IsNullOrWhiteSpace(((Rom)item).SHA1) ? 0 : 1);
+							_sha256Count -= (String.IsNullOrWhiteSpace(((Rom)item).SHA256) ? 0 : 1);
+							_sha384Count -= (String.IsNullOrWhiteSpace(((Rom)item).SHA384) ? 0 : 1);
+							_sha512Count -= (String.IsNullOrWhiteSpace(((Rom)item).SHA512) ? 0 : 1);
 						}
 
 						_baddumpCount -= (((Rom)item).ItemStatus == ItemStatus.BadDump ? 1 : 0);

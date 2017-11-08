@@ -91,7 +91,7 @@ namespace SabreTools.Library.DatFiles
 					// If we have an author
 					if (line.ToLowerInvariant().StartsWith("author="))
 					{
-						Author = (String.IsNullOrEmpty(Author) ? line.Split('=')[1] : Author);
+						Author = (String.IsNullOrWhiteSpace(Author) ? line.Split('=')[1] : Author);
 					}
 					// If we have one of the three version tags
 					else if (line.ToLowerInvariant().StartsWith("version="))
@@ -99,22 +99,22 @@ namespace SabreTools.Library.DatFiles
 						switch (blocktype)
 						{
 							case "credits":
-								Version = (String.IsNullOrEmpty(Version) ? line.Split('=')[1] : Version);
+								Version = (String.IsNullOrWhiteSpace(Version) ? line.Split('=')[1] : Version);
 								break;
 							case "emulator":
-								Description = (String.IsNullOrEmpty(Description) ? line.Split('=')[1] : Description);
+								Description = (String.IsNullOrWhiteSpace(Description) ? line.Split('=')[1] : Description);
 								break;
 						}
 					}
 					// If we have a URL
 					else if (line.ToLowerInvariant().StartsWith("url="))
 					{
-						Url = (String.IsNullOrEmpty(Url) ? line.Split('=')[1] : Url);
+						Url = (String.IsNullOrWhiteSpace(Url) ? line.Split('=')[1] : Url);
 					}
 					// If we have a comment
 					else if (line.ToLowerInvariant().StartsWith("comment="))
 					{
-						Comment = (String.IsNullOrEmpty(Comment) ? line.Split('=')[1] : Comment);
+						Comment = (String.IsNullOrWhiteSpace(Comment) ? line.Split('=')[1] : Comment);
 					}
 					// If we have the split flag
 					else if (line.ToLowerInvariant().StartsWith("split="))
@@ -141,7 +141,7 @@ namespace SabreTools.Library.DatFiles
 					// If we have the refname tag
 					else if (line.ToLowerInvariant().StartsWith("refname="))
 					{
-						Name = (String.IsNullOrEmpty(Name) ? line.Split('=')[1] : Name);
+						Name = (String.IsNullOrWhiteSpace(Name) ? line.Split('=')[1] : Name);
 					}
 					// If we have a rom
 					else if (line.StartsWith("¬"))
@@ -343,20 +343,20 @@ namespace SabreTools.Library.DatFiles
 				string state = "";
 				if (rom.Type == ItemType.Rom)
 				{
-					state += "¬" + (String.IsNullOrEmpty(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
-					"¬" + (String.IsNullOrEmpty(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
+					state += "¬" + (String.IsNullOrWhiteSpace(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
+					"¬" + (String.IsNullOrWhiteSpace(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
 					"¬" + HttpUtility.HtmlEncode(rom.MachineName) +
-					"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) +
+					"¬" + HttpUtility.HtmlEncode((String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) +
 					"¬" + HttpUtility.HtmlEncode(rom.Name) +
 					"¬" + ((Rom)rom).CRC.ToLowerInvariant() +
 					"¬" + (((Rom)rom).Size != -1 ? ((Rom)rom).Size.ToString() : "") + "¬¬¬\n";
 				}
 				else if (rom.Type == ItemType.Disk)
 				{
-					state += "¬" + (String.IsNullOrEmpty(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
-					"¬" + (String.IsNullOrEmpty(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
+					state += "¬" + (String.IsNullOrWhiteSpace(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
+					"¬" + (String.IsNullOrWhiteSpace(rom.CloneOf) ? "" : HttpUtility.HtmlEncode(rom.CloneOf)) +
 					"¬" + HttpUtility.HtmlEncode(rom.MachineName) +
-					"¬" + HttpUtility.HtmlEncode((String.IsNullOrEmpty(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) +
+					"¬" + HttpUtility.HtmlEncode((String.IsNullOrWhiteSpace(rom.MachineDescription) ? rom.MachineName : rom.MachineDescription)) +
 					"¬" + HttpUtility.HtmlEncode(rom.Name) +
 					"¬¬¬¬¬\n";
 				}
