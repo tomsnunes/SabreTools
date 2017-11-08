@@ -127,7 +127,7 @@ namespace SabreTools
 			OutputFormat outputFormat = OutputFormat.Folder;
 			SkipFileType skipFileType = SkipFileType.None;
 			SplitType splitType = SplitType.None;
-			StatReportFormat statDatFormat = 0x0;
+			StatReportFormat statDatFormat = StatReportFormat.None;
 			UpdateMode updateMode = UpdateMode.None;
 
 			// User inputs
@@ -638,7 +638,7 @@ namespace SabreTools
 						break;
 					case "-txt":
 					case "--text":
-						statDatFormat |= StatReportFormat.None;
+						statDatFormat |= StatReportFormat.Textfile;
 						break;
 					case "-tzip":
 					case "--tzip":

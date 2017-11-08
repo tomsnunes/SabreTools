@@ -752,6 +752,27 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		// Statistical data related to the DAT
+		public StatReportFormat ReportFormat
+		{
+			get
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				return _datStats.ReportFormat;
+			}
+			set
+			{
+				if (_datStats == null)
+				{
+					_datStats = new DatStats();
+				}
+
+				_datStats.ReportFormat = value;
+			}
+		}
 		public long Count
 		{
 			get
@@ -5884,9 +5905,9 @@ namespace SabreTools.Library.DatFiles
 			bool baddumpCol, bool nodumpCol, StatReportFormat statDatFormat)
 		{
 			// If there's no output format, set the default
-			if (statDatFormat == 0x0)
+			if (statDatFormat == StatReportFormat.None)
 			{
-				statDatFormat = StatReportFormat.None;
+				statDatFormat = StatReportFormat.Textfile;
 			}
 
 			// Get the proper output file name
@@ -5916,7 +5937,7 @@ namespace SabreTools.Library.DatFiles
 				BaseReport report = null;
 				switch (kvp.Key)
 				{
-					case StatReportFormat.None:
+					case StatReportFormat.Textfile:
 						report = new Textfile(null, kvp.Value, baddumpCol, nodumpCol);
 						break;
 					case StatReportFormat.CSV:
@@ -6071,9 +6092,9 @@ Please check the log folder if the stats scrolled offscreen", false);
 			}
 
 			// For each output format, get the appropriate stream writer
-			if ((statDatFormat & StatReportFormat.None) != 0)
+			if ((statDatFormat & StatReportFormat.Textfile) != 0)
 			{
-				output.Add(StatReportFormat.None, CreateOutStatsNamesHelper(outDir, ".txt", reportName, overwrite));
+				output.Add(StatReportFormat.Textfile, CreateOutStatsNamesHelper(outDir, ".txt", reportName, overwrite));
 			}
 			if ((statDatFormat & StatReportFormat.CSV) != 0)
 			{

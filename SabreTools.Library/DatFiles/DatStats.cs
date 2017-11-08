@@ -12,6 +12,9 @@ namespace SabreTools.Library.DatFiles
 	{
 		#region Private instance variables
 
+		// Statistics report format
+		private StatReportFormat _reportFormat = StatReportFormat.None;
+
 		// Object used to lock stats updates
 		private object _lockObject = new object();
 
@@ -49,6 +52,13 @@ namespace SabreTools.Library.DatFiles
 		#endregion
 
 		#region Publicly facing variables
+
+		// Statistics report format
+		public StatReportFormat ReportFormat
+		{
+			get { return _reportFormat; }
+			set { _reportFormat = value; }
+		}
 
 		// Overall item count
 		public long Count
