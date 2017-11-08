@@ -163,19 +163,12 @@ namespace SabreTools
 		/// <param name="nostore">True if headers should not be stored in the database, false otherwise</param>
 		private static void InitExtractRemoveHeader(List<string> inputs, string outDir, bool nostore)
 		{
-			foreach (string input in inputs)
+			// Get only files from the inputs
+			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs);
+
+			foreach (string file in files)
 			{
-				if (File.Exists(input))
-				{
-					Utilities.DetectSkipperAndTransform(input, outDir, nostore);
-				}
-				else if (Directory.Exists(input))
-				{
-					foreach (string sub in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-					{
-						Utilities.DetectSkipperAndTransform(sub, outDir, nostore);
-					}
-				}
+				Utilities.DetectSkipperAndTransform(file, outDir, nostore);
 			}
 		}
 
@@ -246,19 +239,12 @@ namespace SabreTools
 		/// <param name="outDir">Output directory to write new files to, blank defaults to rom folder</param>
 		private static void InitReplaceHeader(List<string> inputs, string outDir)
 		{
-			foreach (string input in inputs)
+			// Get only files from the inputs
+			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs);
+
+			foreach (string file in files)
 			{
-				if (File.Exists(input))
-				{
-					Utilities.RestoreHeader(input, outDir);
-				}
-				else if (Directory.Exists(input))
-				{
-					foreach (string sub in Directory.EnumerateFiles(input, "*", SearchOption.AllDirectories))
-					{
-						Utilities.RestoreHeader(sub, outDir);
-					}
-				}
+				Utilities.RestoreHeader(file, outDir);
 			}
 		}
 
