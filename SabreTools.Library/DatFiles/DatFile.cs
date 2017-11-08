@@ -4727,6 +4727,64 @@ namespace SabreTools.Library.DatFiles
 		#region Splitting
 
 		/// <summary>
+		/// Split a set of input DATs based on the given information
+		/// </summary>
+		/// <param name="inputs">List of inputs to be used</param>
+		/// <param name="outDir">Output directory for the split files</param>
+		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
+		/// <param name="splitType">Type of split to perform, if any</param>
+		/// <param name="exta">First extension to split on (Extension Split only)</param>
+		/// <param name="extb">Second extension to split on (Extension Split only)</param>
+		/// <param name="shortname">True if short filenames should be used, false otherwise (Level Split only)</param>
+		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise (Level Split only)</param>
+		public void DetermineSplitType(List<string> inputs, string outDir, bool inplace, ExternalSplitType splitType,
+			List<string> exta, List<string> extb, bool shortname, bool basedat)
+		{
+			// If we somehow have the "none" split type, return
+			if (splitType == ExternalSplitType.None)
+			{
+				return;
+			}
+
+			// Get only files from the inputs
+			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs, appendparent: true);
+
+			// Loop over the input files
+			foreach (string file in files)
+			{
+				// Split the input filename
+				string[] splitpath = file.Split('¬');
+
+				// Create and fill the new DAT
+				Parse(splitpath[0], 0, 0);
+
+				// Get the output directory
+				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
+
+				// Split and write the DAT
+				switch (splitType)
+				{
+					case ExternalSplitType.Extension:
+						SplitByExtension(outDir, inplace, exta, extb);
+						break;
+					case ExternalSplitType.Hash:
+						SplitByHash(outDir, inplace);
+						break;
+					case ExternalSplitType.Level:
+						SplitByLevel(outDir, inplace, shortname, basedat);
+						break;
+					case ExternalSplitType.Type:
+						SplitByType(outDir, inplace);
+						break;
+				}
+
+				// Now re-empty the DAT to make room for the next one
+				_datHeader = new DatHeader();
+				ResetDictionary();
+			}
+		}
+
+		/// <summary>
 		/// Split a DAT by input extensions
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>

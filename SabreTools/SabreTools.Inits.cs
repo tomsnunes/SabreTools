@@ -257,45 +257,8 @@ namespace SabreTools
 		private static void InitSplit(List<string> inputs, string outDir, bool inplace, ExternalSplitType splitType,
 			List<string> exta, List<string> extb, bool shortname, bool basedat)
 		{
-			// If we somehow have the "none" split type, return
-			if (splitType == ExternalSplitType.None)
-			{
-				return;
-			}
-
-			// Get only files from the inputs
-			List<string> files = Utilities.GetOnlyFilesFromInputs(inputs, appendparent: true);
-
-			// Loop over the input files
-			foreach (string file in files)
-			{
-				// Split the input filename
-				string[] splitpath = file.Split('¬');
-
-				// Create and fill the new DAT
-				DatFile datFile = new DatFile();
-				datFile.Parse(splitpath[0], 0, 0);
-
-				// Get the output directory
-				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
-
-				// Split and write the DAT
-				switch (splitType)
-				{
-					case ExternalSplitType.Extension:
-						datFile.SplitByExtension(outDir, inplace, exta, extb);
-						break;
-					case ExternalSplitType.Hash:
-						datFile.SplitByHash(outDir, inplace);
-						break;
-					case ExternalSplitType.Level:
-						datFile.SplitByLevel(outDir, inplace, shortname, basedat);
-						break;
-					case ExternalSplitType.Type:
-						datFile.SplitByType(outDir, inplace);
-						break;
-				}
-			}
+			DatFile datfile = new DatFile();
+			datfile.DetermineSplitType(inputs, outDir, inplace, splitType, exta, extb, shortname, basedat);
 		}
 
 		/// <summary>
