@@ -4768,19 +4768,19 @@ namespace SabreTools.Library.DatFiles
 				// Split and write the DAT
 				if ((splittingMode & SplittingMode.Extension) != 0)
 				{
-					SplitByExtension(outDir, inplace, exta, extb);
+					SplitByExtension(outDir, exta, extb);
 				}
 				if ((splittingMode & SplittingMode.Hash) != 0)
 				{
-					SplitByHash(outDir, inplace);
+					SplitByHash(outDir);
 				}
 				if ((splittingMode & SplittingMode.Level) != 0)
 				{
-					SplitByLevel(outDir, inplace, shortname, basedat);
+					SplitByLevel(outDir, shortname, basedat);
 				}
 				if ((splittingMode & SplittingMode.Type) != 0)
 				{
-					SplitByType(outDir, inplace);
+					SplitByType(outDir);
 				}
 
 				// Now re-empty the DAT to make room for the next one
@@ -4795,11 +4795,10 @@ namespace SabreTools.Library.DatFiles
 		/// Split a DAT by input extensions
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
-		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
 		/// <param name="extA">List of extensions to split on (first DAT)</param>
 		/// <param name="extB">List of extensions to split on (second DAT)</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByExtension(string outDir, bool inplace, List<string> extA, List<string> extB)
+		public bool SplitByExtension(string outDir, List<string> extA, List<string> extB)
 		{
 			// Make sure all of the extensions have a dot at the beginning
 			List<string> newExtA = new List<string>();
@@ -4877,9 +4876,6 @@ namespace SabreTools.Library.DatFiles
 				}
 			});
 
-			// Get the output directory
-			outDir = Utilities.GetOutputPath(outDir, FileName, inplace);
-
 			// Then write out both files
 			bool success = datdataA.WriteToFile(outDir);
 			success &= datdataB.WriteToFile(outDir);
@@ -4891,9 +4887,8 @@ namespace SabreTools.Library.DatFiles
 		/// Split a DAT by best available hashes
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
-		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByHash(string outDir, bool inplace)
+		public bool SplitByHash(string outDir)
 		{
 			// Create each of the respective output DATs
 			Globals.Logger.User("Creating and populating new DATs");
@@ -5127,9 +5122,6 @@ namespace SabreTools.Library.DatFiles
 				}
 			});
 
-			// Get the output directory
-			outDir = Utilities.GetOutputPath(outDir, FileName, inplace);
-
 			// Now, output all of the files to the output directory
 			Globals.Logger.User("DAT information created, outputting new files");
 			bool success = true;
@@ -5148,11 +5140,10 @@ namespace SabreTools.Library.DatFiles
 		/// Split a SuperDAT by lowest available directory level
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
-		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
 		/// <param name="shortname">True if short names should be used, false otherwise</param>
 		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByLevel(string outDir, bool inplace, bool shortname, bool basedat)
+		public bool SplitByLevel(string outDir, bool shortname, bool basedat)
 		{
 			// First, organize by games so that we can do the right thing
 			BucketBy(SortedBy.Game, DedupeType.None, lower: false, norename: true);
@@ -5173,9 +5164,6 @@ namespace SabreTools.Library.DatFiles
 				// Here, the key is the name of the game to be used for comparison
 				if (tempDat.Name != null && tempDat.Name != Path.GetDirectoryName(key))
 				{
-					// Process and output the DAT
-					SplitByLevelHelper(tempDat, outDir, shortname, basedat, inplace);
-
 					// Reset the DAT for the next items
 					tempDat = new DatFile(this)
 					{
@@ -5194,9 +5182,6 @@ namespace SabreTools.Library.DatFiles
 				// Then set the DAT name to be the parent directory name
 				tempDat.Name = Path.GetDirectoryName(key);
 			});
-
-			// Then we write the last DAT out since it would be skipped otherwise
-			SplitByLevelHelper(tempDat, outDir, shortname, basedat, inplace);
 
 			return true;
 		}
@@ -5227,15 +5212,11 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="outDir">Directory to write out to</param>
 		/// <param name="shortname">True if short naming scheme should be used, false otherwise</param>
 		/// <param name="restore">True if original filenames should be used as the base for output filename, false otherwise</param>
-		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
-		private void SplitByLevelHelper(DatFile datFile, string outDir, bool shortname, bool restore, bool inplace)
+		private void SplitByLevelHelper(DatFile datFile, string outDir, bool shortname, bool restore)
 		{
 			// Get the name from the DAT to use separately
 			string name = datFile.Name;
 			string expName = name.Replace("/", " - ").Replace("\\", " - ");
-
-			// Get the output directory
-			outDir = Utilities.GetOutputPath(outDir, FileName, inplace);
 
 			// Now set the new output values
 			datFile.FileName = HttpUtility.HtmlDecode(String.IsNullOrWhiteSpace(name)
@@ -5258,9 +5239,8 @@ namespace SabreTools.Library.DatFiles
 		/// Split a DAT by type of Rom
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
-		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
 		/// <returns>True if split succeeded, false otherwise</returns>
-		public bool SplitByType(string outDir, bool inplace)
+		public bool SplitByType(string outDir)
 		{
 			// Create each of the respective output DATs
 			Globals.Logger.User("Creating and populating new DATs");
@@ -5352,9 +5332,6 @@ namespace SabreTools.Library.DatFiles
 					}
 				}
 			});
-
-			// Get the output directory
-			outDir = Utilities.GetOutputPath(outDir, FileName, inplace);
 
 			// Now, output all of the files to the output directory
 			Globals.Logger.User("DAT information created, outputting new files");
