@@ -23,9 +23,8 @@
 */
 
 using System;
-using System.IO;
 
-namespace OCRC
+namespace SabreTools.Library.Tools
 {
 	public class OptimizedCRC : IDisposable
 	{

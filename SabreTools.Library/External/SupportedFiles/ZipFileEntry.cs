@@ -8,7 +8,6 @@ using SabreTools.Library.Data;
 using SabreTools.Library.Tools;
 
 using Ionic.Zlib;
-using OCRC;
 
 namespace ROMVault2.SupportedFiles.Zip
 {

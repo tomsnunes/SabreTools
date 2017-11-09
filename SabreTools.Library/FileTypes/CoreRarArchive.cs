@@ -5,7 +5,7 @@ using SabreTools.Library.Data;
 /// <summary>
 /// http://www.rarlab.com/technote.htm#srvheaders
 /// </summary>
-namespace SabreTools.Library.Tools
+namespace SabreTools.Library.FileTypes
 {
 	public class CoreRarArchive
 	{

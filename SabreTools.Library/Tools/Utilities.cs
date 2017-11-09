@@ -35,7 +35,6 @@ using Stream = System.IO.Stream;
 using StreamReader = System.IO.StreamReader;
 #endif
 using NaturalSort;
-using OCRC;
 using SharpCompress.Common;
 
 namespace SabreTools.Library.Tools
