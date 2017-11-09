@@ -2616,7 +2616,7 @@ namespace SabreTools.Library.DatFiles
 
 		#endregion
 
-		#region Merging/Splitting
+		#region Internal Merging/Splitting
 
 		/// <summary>
 		/// Use cdevice_ref tags to get full non-merged sets and remove parenting tags
