@@ -2152,6 +2152,12 @@ namespace SabreTools.Library.Tools
 		/// <link>http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa</link>
 		public static string ByteArrayToString(byte[] bytes)
 		{
+			// If we get null in, we send null out
+			if (bytes == null)
+			{
+				return null;
+			}
+
 			try
 			{
 				string hex = BitConverter.ToString(bytes);
@@ -2171,6 +2177,12 @@ namespace SabreTools.Library.Tools
 		/// <link>http://stackoverflow.com/questions/311165/how-do-you-convert-byte-array-to-hexadecimal-string-and-vice-versa</link>
 		public static byte[] StringToByteArray(string hex)
 		{
+			// If we get null in, we send null out
+			if (hex == null)
+			{
+				return null;
+			}
+
 			try
 			{
 				int NumberChars = hex.Length;
@@ -2193,6 +2205,12 @@ namespace SabreTools.Library.Tools
 		/// <link>http://stackoverflow.com/questions/5613279/c-sharp-hex-to-ascii</link>
 		public static string ConvertHexToAscii(string hexString)
 		{
+			// If we get null in, we send null out
+			if (hexString == null)
+			{
+				return null;
+			}
+
 			if (hexString.Contains("-"))
 			{
 				hexString = hexString.Replace("-", "");
@@ -2217,6 +2235,12 @@ namespace SabreTools.Library.Tools
 		/// <link>http://stackoverflow.com/questions/15920741/convert-from-string-ascii-to-string-hex</link>
 		public static string ConvertAsciiToHex(string asciiString)
 		{
+			// If we get null in, we send null out
+			if (asciiString == null)
+			{
+				return null;
+			}
+
 			string hexOutput = "";
 			foreach (char _eachChar in asciiString.ToCharArray())
 			{
