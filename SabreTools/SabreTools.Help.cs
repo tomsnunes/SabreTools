@@ -1161,7 +1161,7 @@ namespace SabreTools
 				"Trim file names to fit NTFS length",
 				FeatureType.Flag,
 				null));
-				split["trim"].AddFeature("root-dir", new Feature(
+				update["trim"].AddFeature("root-dir", new Feature(
 					new List<string>() { "-rd", "--root-dir" },
 					"Set the root directory for calc",
 					FeatureType.String,
