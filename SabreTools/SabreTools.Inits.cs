@@ -250,17 +250,17 @@ namespace SabreTools
 		/// <param name="outDir">Output directory for the split files</param>
 		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
 		/// <param name="datFormat">DatFormat to be used for outputting the DAT</param>
-		/// <param name="splitType">Type of split to perform, if any</param>
+		/// <param name="splittingMode">Type of split to perform, if any</param>
 		/// <param name="exta">First extension to split on (Extension Split only)</param>
 		/// <param name="extb">Second extension to split on (Extension Split only)</param>
 		/// <param name="shortname">True if short filenames should be used, false otherwise (Level Split only)</param>
 		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise (Level Split only)</param>
 		private static void InitSplit(List<string> inputs, string outDir, bool inplace, DatFormat datFormat,
-			ExternalSplitType splitType, List<string> exta, List<string> extb, bool shortname, bool basedat)
+			SplittingMode splittingMode, List<string> exta, List<string> extb, bool shortname, bool basedat)
 		{
 			DatFile datfile = new DatFile();
 			datfile.DatFormat = datFormat;
-			datfile.DetermineSplitType(inputs, outDir, inplace, splitType, exta, extb, shortname, basedat);
+			datfile.DetermineSplitType(inputs, outDir, inplace, splittingMode, exta, extb, shortname, basedat);
 		}
 
 		/// <summary>

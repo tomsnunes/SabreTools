@@ -4736,16 +4736,16 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="inputs">List of inputs to be used</param>
 		/// <param name="outDir">Output directory for the split files</param>
 		/// <param name="inplace">True if files should be written to the source folders, false otherwise</param>
-		/// <param name="splitType">Type of split to perform, if any</param>
+		/// <param name="splittingMode">Type of split to perform, if any</param>
 		/// <param name="exta">First extension to split on (Extension Split only)</param>
 		/// <param name="extb">Second extension to split on (Extension Split only)</param>
 		/// <param name="shortname">True if short filenames should be used, false otherwise (Level Split only)</param>
 		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise (Level Split only)</param>
-		public void DetermineSplitType(List<string> inputs, string outDir, bool inplace, ExternalSplitType splitType,
+		public void DetermineSplitType(List<string> inputs, string outDir, bool inplace, SplittingMode splittingMode,
 			List<string> exta, List<string> extb, bool shortname, bool basedat)
 		{
 			// If we somehow have the "none" split type, return
-			if (splitType == ExternalSplitType.None)
+			if (splittingMode == SplittingMode.None)
 			{
 				return;
 			}
@@ -4766,19 +4766,19 @@ namespace SabreTools.Library.DatFiles
 				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
 
 				// Split and write the DAT
-				if ((splitType & ExternalSplitType.Extension) != 0)
+				if ((splittingMode & SplittingMode.Extension) != 0)
 				{
 					SplitByExtension(outDir, inplace, exta, extb);
 				}
-				if ((splitType & ExternalSplitType.Hash) != 0)
+				if ((splittingMode & SplittingMode.Hash) != 0)
 				{
 					SplitByHash(outDir, inplace);
 				}
-				if ((splitType & ExternalSplitType.Level) != 0)
+				if ((splittingMode & SplittingMode.Level) != 0)
 				{
 					SplitByLevel(outDir, inplace, shortname, basedat);
 				}
-				if ((splitType & ExternalSplitType.Type) != 0)
+				if ((splittingMode & SplittingMode.Type) != 0)
 				{
 					SplitByType(outDir, inplace);
 				}

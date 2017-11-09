@@ -119,11 +119,11 @@ namespace SabreTools
 				usegame = true;
 			DatFormat datFormat = 0x0;
 			DedupeType dedup = DedupeType.None;
-			ExternalSplitType externalSplitType = ExternalSplitType.None;
 			Hash omitFromScan = Hash.DeepHashes; // TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 			Hash stripHash = 0x0;
 			OutputFormat outputFormat = OutputFormat.Folder;
 			SkipFileType skipFileType = SkipFileType.None;
+			SplittingMode splittingMode = SplittingMode.None;
 			SplitType splitType = SplitType.None;
 			StatReportFormat statDatFormat = StatReportFormat.None;
 			UpdateMode updateMode = UpdateMode.None;
@@ -360,7 +360,7 @@ namespace SabreTools
 						break;
 					case "-es":
 					case "--ext":
-						externalSplitType |= ExternalSplitType.Extension;
+						splittingMode |= SplittingMode.Extension;
 						break;
 					case "-f":
 					case "--files":
@@ -384,7 +384,7 @@ namespace SabreTools
 						break;
 					case "-hs":
 					case "--hash":
-						externalSplitType |= ExternalSplitType.Hash;
+						splittingMode |= SplittingMode.Hash;
 						break;
 					case "-ic":
 					case "--ignore-chd":
@@ -400,7 +400,7 @@ namespace SabreTools
 						break;
 					case "-ls":
 					case "--level":
-						externalSplitType |= ExternalSplitType.Level;
+						splittingMode |= SplittingMode.Level;
 						break;
 					case "-m":
 					case "--merge":
@@ -628,7 +628,7 @@ namespace SabreTools
 						break;
 					case "-ts":
 					case "--type":
-						externalSplitType |= ExternalSplitType.Type;
+						splittingMode |= SplittingMode.Type;
 						break;
 					case "-tsv":
 					case "--tsv":
@@ -1302,7 +1302,7 @@ namespace SabreTools
 			// Split a DAT by the split type
 			else if (split)
 			{
-				InitSplit(inputs, outDir, inplace, datFormat, externalSplitType, exta, extb, shortname, basedat);
+				InitSplit(inputs, outDir, inplace, datFormat, splittingMode, exta, extb, shortname, basedat);
 			}
 
 			// Get statistics on input files
