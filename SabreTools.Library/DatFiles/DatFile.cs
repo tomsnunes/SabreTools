@@ -4780,8 +4780,10 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// Now re-empty the DAT to make room for the next one
+				DatFormat tempFormat = DatFormat;
 				_datHeader = new DatHeader();
 				ResetDictionary();
+				DatFormat = tempFormat;
 			}
 		}
 

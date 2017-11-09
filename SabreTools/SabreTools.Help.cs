@@ -21,21 +21,28 @@ namespace SabreTools
 			};
 			Help help = new Help(helpHeader);
 
-			// Create the Help feature
+			#region Help
+
 			Feature helpFeature = new Feature(
 				new List<string>() { "-?", "-h", "--help" },
 				"Show this help",
 				FeatureType.Flag,
 				null);
 
-			// Create the Script feature
+			#endregion
+
+			#region Script
+
 			Feature script = new Feature(
 				"--script",
 				"Enable script mode (no clear screen)",
 				FeatureType.Flag,
 				null);
 
-			// Create the DATFromDir feature
+			#endregion
+
+			#region DATFromDir
+
 			Feature datFromDir = new Feature(
 				new List<string>() { "-d", "--d2d", "--dfd" },
 				"Create DAT(s) from an input directory",
@@ -301,7 +308,10 @@ namespace SabreTools
 				FeatureType.String,
 				null));
 
-			// Create the Extract feature
+			#endregion
+
+			#region Extract
+
 			Feature extract = new Feature(
 				new List<string>() { "-ex", "--extract" },
 				"Extract and remove copier headers",
@@ -318,7 +328,10 @@ namespace SabreTools
 				FeatureType.Flag,
 				null));
 
-			// Create the Restore feature
+			#endregion
+
+			#region Restore
+
 			Feature restore = new Feature(
 				new List<string>() { "-re", "--restore" },
 				"Restore header to file based on SHA-1",
@@ -330,7 +343,10 @@ namespace SabreTools
 				FeatureType.String,
 				null));
 
-			// Create the Sort feature
+			#endregion
+
+			#region Sort
+
 			Feature sort = new Feature(
 				new List<string>() { "-ss", "--sort" },
 				"Sort inputs by a set of DATs",
@@ -511,12 +527,110 @@ namespace SabreTools
 				FeatureType.String,
 				null));
 
-			// Create the Split feature
+			#endregion
+
+			#region Split
+
 			Feature split = new Feature(
 				new List<string>() { "-sp", "--split" },
 				"Split input DATs by a given criteria",
 				FeatureType.Flag,
 				null);
+			split.AddFeature("output-all", new Feature(
+				new List<string>() { "-oa", "--output-all" },
+				"Output in all formats",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-am", new Feature(
+				new List<string>() { "-oam", "--output-am" },
+				"Output in AttractMode format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-cmp", new Feature(
+				new List<string>() { "-oc", "--output-cmp" },
+				"Output in CMP format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-csv", new Feature(
+				new List<string>() { "-ocsv", "--output-csv" },
+				"Output in CSV format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-dc", new Feature(
+				new List<string>() { "-od", "--output-dc" },
+				"Output in DOSCenter format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-lr", new Feature(
+				new List<string>() { "-olr", "--output-lr" },
+				"Output in MAME Listrom format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-miss", new Feature(
+				new List<string>() { "-om", "--output-miss" },
+				"Output in Missfile format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-md5", new Feature(
+				new List<string>() { "-omd5", "--output-md5" },
+				"Output in MD5 format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-ol", new Feature(
+				new List<string>() { "-ool", "--output-ol" },
+				"Output in OfflineList format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-rc", new Feature(
+				new List<string>() { "-or", "--output-rc" },
+				"Output in RomCenter format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-sd", new Feature(
+				new List<string>() { "-os", "--output-sd" },
+				"Output in SabreDat format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-sfv", new Feature(
+				new List<string>() { "-osfv", "--output-sfv" },
+				"Output in SFV format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-sha1", new Feature(
+				new List<string>() { "-osha1", "--output-sha1" },
+				"Output in SHA-1 format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-sha256", new Feature(
+				new List<string>() { "-osha256", "--output-sha256" },
+				"Output in SHA-256 format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-sha384", new Feature(
+				new List<string>() { "-osha384", "--output-sha384" },
+				"Output in SHA-384 format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-sha512", new Feature(
+				new List<string>() { "-osha512", "--output-sha512" },
+				"Output in SHA-512 format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-sl", new Feature(
+				new List<string>() { "-osl", "--output-sl" },
+				"Output in Softwarelist format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-tsv", new Feature(
+				new List<string>() { "-otsv", "--output-tsv" },
+				"Output in TSV format",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("output-xml", new Feature(
+				new List<string>() { "-ox", "--output-xml" },
+				"Output in Logiqx XML format",
+				FeatureType.Flag,
+				null));
 			split.AddFeature("out", new Feature(
 				new List<string>() { "-out", "--out" },
 				"Output directory",
@@ -568,7 +682,10 @@ namespace SabreTools
 				FeatureType.Flag,
 				null));
 
-			// Create the Stats feature
+			#endregion
+
+			#region Stats
+
 			Feature stats = new Feature(
 				new List<string>() { "-st", "--stats" },
 				"Get statistics on all input DATs",
@@ -625,7 +742,10 @@ namespace SabreTools
 				FeatureType.Flag,
 				null));
 
-			// Create the Update feature
+			#endregion
+
+			#region Update
+
 			Feature update = new Feature(
 				new List<string>() { "-ud", "--update" },
 				"Update and manipulate DAT file(s)",
@@ -667,17 +787,17 @@ namespace SabreTools
 				"Output in CSV format",
 				FeatureType.Flag,
 				null));
-				update["output-csv"].AddFeature("prefix", new Feature(
+				split["output-csv"].AddFeature("prefix", new Feature(
 					new List<string>() { "-pre", "--prefix" },
 					"Set prefix for all lines",
 					FeatureType.String,
 					null));
-				update["output-csv"].AddFeature("postfix", new Feature(
+				split["output-csv"].AddFeature("postfix", new Feature(
 					new List<string>() { "-post", "--postfix" },
 					"Set postfix for all lines",
 					FeatureType.String,
 					null));
-				update["output-csv"].AddFeature("quotes", new Feature(
+				split["output-csv"].AddFeature("quotes", new Feature(
 					new List<string>() { "-q", "--quotes" },
 					"Put double-quotes around each item",
 					FeatureType.Flag,
@@ -704,57 +824,57 @@ namespace SabreTools
 					"A list of features that can be used are:",
 					"  game, name, crc, md5, sha1, sha256, sha384, sha512, size",
 				}));
-				update["output-miss"].AddFeature("roms", new Feature(
+				split["output-miss"].AddFeature("roms", new Feature(
 					new List<string>() { "-r", "--roms" },
 					"Output roms to miss instead of sets",
 					FeatureType.Flag,
 					null));
-				update["output-miss"].AddFeature("game-prefix", new Feature(
+				split["output-miss"].AddFeature("game-prefix", new Feature(
 					new List<string>() { "-gp", "--game-prefix" },
 					"Add game name as a prefix",
 					FeatureType.Flag,
 					null));
-				update["output-miss"].AddFeature("prefix", new Feature(
+				split["output-miss"].AddFeature("prefix", new Feature(
 					new List<string>() { "-pre", "--prefix" },
 					"Set prefix for all lines",
 					FeatureType.String,
 					null));
-				update["output-miss"].AddFeature("postfix", new Feature(
+				split["output-miss"].AddFeature("postfix", new Feature(
 					new List<string>() { "-post", "--postfix" },
 					"Set postfix for all lines",
 					FeatureType.String,
 					null));
-				update["output-miss"].AddFeature("quotes", new Feature(
+				split["output-miss"].AddFeature("quotes", new Feature(
 					new List<string>() { "-q", "--quotes" },
 					"Put double-quotes around each item",
 					FeatureType.Flag,
 					null));
-				update["output-miss"].AddFeature("add-ext", new Feature(
+				split["output-miss"].AddFeature("add-ext", new Feature(
 					new List<string>() { "-ae", "--add-ext" },
 					"Add an extension to each item",
 					FeatureType.String,
 					null));
-				update["output-miss"].AddFeature("rep-ext", new Feature(
+				split["output-miss"].AddFeature("rep-ext", new Feature(
 					new List<string>() { "-rep", "--rep-ext" },
 					"Replace all extensions with specified",
 					FeatureType.String,
 					null));
-				update["output-miss"].AddFeature("rem-ext", new Feature(
+				split["output-miss"].AddFeature("rem-ext", new Feature(
 					new List<string>() { "-rme", "--rem-ext" },
 					"Remove all extensions from each item",
 					FeatureType.String,
 					null));
-				update["output-miss"].AddFeature("romba", new Feature(
+				split["output-miss"].AddFeature("romba", new Feature(
 					new List<string>() { "-ro", "--romba" },
 					"Output in Romba format (requires SHA-1)",
 					FeatureType.Flag,
 					null));
-				update["output-miss"].AddFeature("tsv", new Feature(
+				split["output-miss"].AddFeature("tsv", new Feature(
 					new List<string>() { "-tsv", "--tsv" },
 					"Output in Tab-Separated Value format",
 					FeatureType.Flag,
 					null));
-				update["output-miss"].AddFeature("csv", new Feature(
+				split["output-miss"].AddFeature("csv", new Feature(
 					new List<string>() { "-csv", "--csv" },
 					"Output in Comma-Separated Value format",
 					FeatureType.Flag,
@@ -764,7 +884,7 @@ namespace SabreTools
 				"Output in MD5 format",
 				FeatureType.Flag,
 				null));
-				update["output-md5"].AddFeature("game-prefix", new Feature(
+				split["output-md5"].AddFeature("game-prefix", new Feature(
 					new List<string>() { "-gp", "--game-prefix" },
 					"Add game name as a prefix",
 					FeatureType.Flag,
@@ -789,7 +909,7 @@ namespace SabreTools
 				"Output in SFV format",
 				FeatureType.Flag,
 				null));
-				update["output-sfv"].AddFeature("game-prefix", new Feature(
+				split["output-sfv"].AddFeature("game-prefix", new Feature(
 					new List<string>() { "-gp", "--game-prefix" },
 					"Add game name as a prefix",
 					FeatureType.Flag,
@@ -799,7 +919,7 @@ namespace SabreTools
 				"Output in SHA-1 format",
 				FeatureType.Flag,
 				null));
-				update["output-sha1"].AddFeature("game-prefix", new Feature(
+				split["output-sha1"].AddFeature("game-prefix", new Feature(
 					new List<string>() { "-gp", "--game-prefix" },
 					"Add game name as a prefix",
 					FeatureType.Flag,
@@ -809,7 +929,7 @@ namespace SabreTools
 				"Output in SHA-256 format",
 				FeatureType.Flag,
 				null));
-				update["output-sha256"].AddFeature("game-prefix", new Feature(
+				split["output-sha256"].AddFeature("game-prefix", new Feature(
 					new List<string>() { "-gp", "--game-prefix" },
 					"Add game name as a prefix",
 					FeatureType.Flag,
@@ -819,7 +939,7 @@ namespace SabreTools
 				"Output in SHA-384 format",
 				FeatureType.Flag,
 				null));
-				update["output-sha384"].AddFeature("game-prefix", new Feature(
+				split["output-sha384"].AddFeature("game-prefix", new Feature(
 					new List<string>() { "-gp", "--game-prefix" },
 					"Add game name as a prefix",
 					FeatureType.Flag,
@@ -829,7 +949,7 @@ namespace SabreTools
 				"Output in SHA-512 format",
 				FeatureType.Flag,
 				null));
-				update["output-sha512"].AddFeature("game-prefix", new Feature(
+				split["output-sha512"].AddFeature("game-prefix", new Feature(
 					new List<string>() { "-gp", "--game-prefix" },
 					"Add game name as a prefix",
 					FeatureType.Flag,
@@ -844,17 +964,17 @@ namespace SabreTools
 				"Output in TSV format",
 				FeatureType.Flag,
 				null));
-				update["output-tsv"].AddFeature("prefix", new Feature(
+				split["output-tsv"].AddFeature("prefix", new Feature(
 					new List<string>() { "-pre", "--prefix" },
 					"Set prefix for all lines",
 					FeatureType.String,
 					null));
-				update["output-tsv"].AddFeature("postfix", new Feature(
+				split["output-tsv"].AddFeature("postfix", new Feature(
 					new List<string>() { "-post", "--postfix" },
 					"Set postfix for all lines",
 					FeatureType.String,
 					null));
-				update["output-tsv"].AddFeature("quotes", new Feature(
+				split["output-tsv"].AddFeature("quotes", new Feature(
 					new List<string>() { "-q", "--quotes" },
 					"Put double-quotes around each item",
 					FeatureType.Flag,
@@ -1041,7 +1161,7 @@ namespace SabreTools
 				"Trim file names to fit NTFS length",
 				FeatureType.Flag,
 				null));
-				update["trim"].AddFeature("root-dir", new Feature(
+				split["trim"].AddFeature("root-dir", new Feature(
 					new List<string>() { "-rd", "--root-dir" },
 					"Set the root directory for calc",
 					FeatureType.String,
@@ -1066,7 +1186,7 @@ namespace SabreTools
 				"Merge the input DATs",
 				FeatureType.Flag,
 				null));
-				update["merge"].AddFeature("bare", new Feature(
+				split["merge"].AddFeature("bare", new Feature(
 					new List<string>() { "-b", "--bare" },
 					"Don't include the date in automatic name",
 					FeatureType.Flag,
@@ -1076,37 +1196,37 @@ namespace SabreTools
 				"Create diffdats from inputs (all outputs)",
 				FeatureType.Flag,
 				null));
-				update["diff"].AddFeature("against", new Feature(
+				split["diff"].AddFeature("against", new Feature(
 					new List<string>() { "-ag", "--against" },
 					"Diff all inputs against a set of base DATs",
 					FeatureType.Flag,
 					null));
-					update["diff"]["against"].AddFeature("base-dat", new Feature(
+					split["diff"]["against"].AddFeature("base-dat", new Feature(
 						new List<string>() { "-bd", "--base-dat" },
 						"Add a base DAT for diffing",
 						FeatureType.List,
 						null));
-				update["diff"].AddFeature("bare", new Feature(
+				split["diff"].AddFeature("bare", new Feature(
 					new List<string>() { "-b", "--bare" },
 					"Don't include the date in automatic name",
 					FeatureType.Flag,
 					null));
-				update["diff"].AddFeature("cascade", new Feature(
+				split["diff"].AddFeature("cascade", new Feature(
 					new List<string>() { "-c", "--cascade" },
 					"Enable cascaded diffing",
 					FeatureType.Flag,
 					null));
-					update["diff"]["cascade"].AddFeature("skip", new Feature(
+					split["diff"]["cascade"].AddFeature("skip", new Feature(
 						new List<string>() { "-sf", "--skip" },
 						"Skip output of first DAT",
 						FeatureType.Flag,
 						null));
-				update["diff"].AddFeature("rev-cascade", new Feature(
+				split["diff"].AddFeature("rev-cascade", new Feature(
 						new List<string>() { "-rc", "--rev-cascade" },
 						"Enable reverse cascaded diffing",
 						FeatureType.Flag,
 						null));
-					update["diff"]["rev-cascade"].AddFeature("skip", new Feature(
+					split["diff"]["rev-cascade"].AddFeature("skip", new Feature(
 						new List<string>() { "-sf", "--skip" },
 						"Skip output of first DAT",
 						FeatureType.Flag,
@@ -1116,7 +1236,7 @@ namespace SabreTools
 				"Create diffdat containing just duplicates",
 				FeatureType.Flag,
 				null));
-				update["diff-du"].AddFeature("bare", new Feature(
+				split["diff-du"].AddFeature("bare", new Feature(
 					new List<string>() { "-b", "--bare" },
 					"Don't include the date in automatic name",
 					FeatureType.Flag,
@@ -1126,7 +1246,7 @@ namespace SabreTools
 				"Create diffdats for individual DATs",
 				FeatureType.Flag,
 				null));
-				update["diff-in"].AddFeature("bare", new Feature(
+				split["diff-in"].AddFeature("bare", new Feature(
 					new List<string>() { "-b", "--bare" },
 					"Don't include the date in automatic name",
 					FeatureType.Flag,
@@ -1136,7 +1256,7 @@ namespace SabreTools
 				"Create diffdat containing no duplicates",
 				FeatureType.Flag,
 				null));
-				update["diff-nd"].AddFeature("bare", new Feature(
+				split["diff-nd"].AddFeature("bare", new Feature(
 					new List<string>() { "-b", "--bare" },
 					"Don't include the date in automatic name",
 					FeatureType.Flag,
@@ -1146,7 +1266,7 @@ namespace SabreTools
 				"Replace item names from base DATs in order",
 				FeatureType.Flag,
 				null));
-				update["base-name"].AddFeature("base-dat", new Feature(
+				split["base-name"].AddFeature("base-dat", new Feature(
 					new List<string>() { "-bd", "--base-dat" },
 					"Add a base DAT for replacing",
 					FeatureType.List,
@@ -1156,7 +1276,7 @@ namespace SabreTools
 				"Replace item names from base DATs in reverse",
 				FeatureType.Flag,
 				null));
-				update["reverse-base-name"].AddFeature("base-dat", new Feature(
+				split["reverse-base-name"].AddFeature("base-dat", new Feature(
 					new List<string>() { "-bd", "--base-dat" },
 					"Add a base DAT for replacing",
 					FeatureType.List,
@@ -1333,7 +1453,10 @@ namespace SabreTools
 				FeatureType.String,
 				null));
 
-			// Create the Verify feature
+			#endregion
+
+			#region Verify
+
 			Feature verify = new Feature(
 				new List<string>() { "-ve", "--verify" },
 				"Verify a folder against DATs",
@@ -1394,6 +1517,8 @@ namespace SabreTools
 				"Force checking fully non-merged sets",
 				FeatureType.Flag,
 				null));
+
+			#endregion
 
 			// Now, add all of the main features to the Help object
 			help.Add("Help", helpFeature);

@@ -416,6 +416,64 @@ Options:
 		possible criteria. See the individual input information for details. More
 		than one split type is allowed at a time.
 		
+		-oa, --output-all	Output in all available formats
+			Add outputting the created DAT in all available formats. See
+			specific formats for additional flags that may be used.
+			
+		-oam, --output-am	Output in AttractMode format
+			Add outputting the created DAT to AttractMode format
+		
+		-oc, --output-cmp	Output in CMP format
+			Add outputting the created DAT to clrmamepro format
+			
+		-ocsv, --output-csv	Output in Comma-Separated Value format
+			Add outputting the created DAT to standardized CSV format
+		
+		-od, --output-dc	Output in DOSCenter format
+			Add outputting the created DAT to DOSCenter format
+			
+		-olr, --output-lr	Output in MAME Listrom format
+			Add outputting the created DAT to MAME Listrom format
+			
+		-om, --output-miss	Output in Missfile format
+			Add outputting the created DAT to GoodTools miss format
+			
+		-omd5, --output-md5	Output in MD5 format
+			Add outputting the created DAT to MD5 format
+			
+		-ool, --output-ol	Output in OfflineList format
+			Add outputting the created DAT to OfflineList XML format
+			
+		-or, --output-rc	Output in RomCenter format
+			Add outputting the created DAT to RomCenter format
+			
+		-os, --output-sd	Output in SabreDAT format
+			Add outputting the created DAT to SabreDAT XML format
+			
+		-osfv, --output-sfv	Output in SFV format
+			Add outputting the created DAT to SFV format
+			
+		-osha1, --output-sha1	Output in SHA-1 format
+			Add outputting the created DAT to SHA1 format
+
+		-osha256, --output-sha256	Output in SHA-256 format
+			Add outputting the created DAT to SHA-256 format
+				
+		-osha384, --output-sha384	Output in SHA-384 format
+			Add outputting the created DAT to SHA-384 format
+				
+		-osha512, --output-sha512	Output in SHA-512 format
+			Add outputting the created DAT to SHA-512 format
+			
+		-osl, --output-sl	Output in Software List format
+			Add outputting the created DAT to Software List XML format
+			
+		-otsv, --output-tsv	Output in Tab-Separated Value format
+			Add outputting the created DAT to standardized TSV format
+			
+		-ox, -output-xml	Output in Logiqx XML format
+			Add outputting the created DAT to Logiqx XML format
+		
 		-out=			Set the name of the output directory
 			This sets an output folder to be used when the files are created. If
 			a path is not defined, the application directory is used instead.

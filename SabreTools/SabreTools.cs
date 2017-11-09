@@ -1302,7 +1302,7 @@ namespace SabreTools
 			// Split a DAT by the split type
 			else if (split)
 			{
-				InitSplit(inputs, outDir, inplace, externalSplitType, exta, extb, shortname, basedat);
+				InitSplit(inputs, outDir, inplace, datFormat, externalSplitType, exta, extb, shortname, basedat);
 			}
 
 			// Get statistics on input files
