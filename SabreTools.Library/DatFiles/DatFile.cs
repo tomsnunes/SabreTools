@@ -1457,18 +1457,22 @@ namespace SabreTools.Library.DatFiles
 					// Get the unsorted current list
 					List<DatItem> roms = this[key];
 
-					// Now add each of the roms to their respective games
-					foreach (DatItem rom in roms)
+					// Now add each of the roms to their respective keys
+					for (int i = 0; i < roms.Count; i++)
 					{
+						DatItem rom = roms[i];
+
 						// We want to get the key most appropriate for the given sorting type
 						string newkey = GetKey(rom, bucketBy, lower, norename);
 
-						// Add the DatItem to the dictionary
-						Add(newkey, rom);
+						// If the key is different, move the item to the new key
+						if (newkey != key)
+						{
+							Add(newkey, rom);
+							Remove(key, rom);
+							i--; // This make sure that the pointer stays on the correct since one was removed
+						}
 					}
-
-					// Finally, remove the entire original key
-					Remove(key);
 				});
 			}
 
@@ -3371,7 +3375,7 @@ namespace SabreTools.Library.DatFiles
 					key = item.Type.ToString();
 					break;
 				case ItemType.Disk:
-					key = ((Disk)item).MD5;
+					key = ((Disk)item).MD5 ?? ((Disk)item).SHA1;
 					break;
 				case ItemType.Rom:
 					key = ((Rom)item).Size + "-" + ((Rom)item).CRC;
