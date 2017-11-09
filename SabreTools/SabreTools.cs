@@ -77,10 +77,7 @@ namespace SabreTools
 				extract = false,
 				restore = false,
 				sort = false,
-				splitByExt = false,
-				splitByHash = false,
-				splitByLevel = false,
-				splitByType = false,
+				split = false,
 				stats = false,
 				update = false,
 				verify = false;
@@ -122,6 +119,7 @@ namespace SabreTools
 				usegame = true;
 			DatFormat datFormat = 0x0;
 			DedupeType dedup = DedupeType.None;
+			ExternalSplitType externalSplitType = ExternalSplitType.None;
 			Hash omitFromScan = Hash.DeepHashes; // TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 			Hash stripHash = 0x0;
 			OutputFormat outputFormat = OutputFormat.Folder;
@@ -199,21 +197,9 @@ namespace SabreTools
 				case "--dfd":
 					datFromDir = true;
 					break;
-				case "-es":
-				case "--ext-split":
-					splitByExt = true;
-					break;
 				case "-ex":
 				case "--extract":
 					extract = true;
-					break;
-				case "-hs":
-				case "--hash-split":
-					splitByHash = true;
-					break;
-				case "-ls":
-				case "--lvl-split":
-					splitByLevel = true;
 					break;
 				case "-re":
 				case "--restore":
@@ -222,6 +208,10 @@ namespace SabreTools
 				case "--script":
 					// No-op for script mode, allowing for retaining the screen
 					break;
+				case "-sp":
+				case "--split":
+					split = true;
+					break;
 				case "-ss":
 				case "--sort":
 					sort = true;
@@ -229,10 +219,6 @@ namespace SabreTools
 				case "-st":
 				case "--stats":
 					stats = true;
-					break;
-				case "-ts":
-				case "--type-split":
-					splitByType = true;
 					break;
 				case "-ud":
 				case "--update":
@@ -372,6 +358,10 @@ namespace SabreTools
 					case "--dat-split":
 						splitType = SplitType.Split;
 						break;
+					case "-es":
+					case "--ext":
+						externalSplitType |= ExternalSplitType.Extension;
+						break;
 					case "-f":
 					case "--files":
 						archivesAsFiles = true;
@@ -392,6 +382,10 @@ namespace SabreTools
 					case "--html":
 						statDatFormat |= StatReportFormat.HTML;
 						break;
+					case "-hs":
+					case "--hash":
+						externalSplitType |= ExternalSplitType.Hash;
+						break;
 					case "-ic":
 					case "--ignore-chd":
 						chdsAsFiles = true;
@@ -403,6 +397,10 @@ namespace SabreTools
 					case "-ip":
 					case "--inplace":
 						inplace = true;
+						break;
+					case "-ls":
+					case "--level":
+						externalSplitType |= ExternalSplitType.Level;
 						break;
 					case "-m":
 					case "--merge":
@@ -627,6 +625,10 @@ namespace SabreTools
 					case "-trim":
 					case "--trim":
 						trim = true;
+						break;
+					case "-ts":
+					case "--type":
+						externalSplitType |= ExternalSplitType.Type;
 						break;
 					case "-tsv":
 					case "--tsv":
@@ -939,132 +941,132 @@ namespace SabreTools
 						if (temparg.StartsWith("-") && temparg.Contains("="))
 						{
 							// Split the argument
-							string[] split = temparg.Split('=');
+							string[] argsplit = temparg.Split('=');
 							
 							// If we have a null second argument, we set it to be a blank
-							if (split[1] == null)
+							if (argsplit[1] == null)
 							{
-								split[1] = "";
+								argsplit[1] = "";
 							}
 							// If we have more than 2 items in the split, we want to combine the other parts again
-							else if (split.Length > 2)
+							else if (argsplit.Length > 2)
 							{
-								split[1] = string.Join("=", split.Skip(1));
+								argsplit[1] = string.Join("=", argsplit.Skip(1));
 							}
 
-							switch (split[0])
+							switch (argsplit[0])
 							{
 								case "-7z":
 								case "--7z":
-									if (!Int32.TryParse(split[1], out sevenzip))
+									if (!Int32.TryParse(argsplit[1], out sevenzip))
 									{
 										sevenzip = 1;
 									}
 									break;
 								case "-ae":
 								case "--add-ext":
-									addext = split[1];
+									addext = argsplit[1];
 									break;
 								case "-au":
 								case "--author":
-									author = split[1];
+									author = argsplit[1];
 									break;
 								case "-bd":
 								case "--base-dat":
-									basePaths.Add(split[1]);
+									basePaths.Add(argsplit[1]);
 									break;
 								case "-ca":
 								case "--category=":
-									category = split[1];
+									category = argsplit[1];
 									break;
 								case "-co":
 								case "--comment":
-									comment = split[1];
+									comment = argsplit[1];
 									break;
 								case "-crc":
 								case "--crc":
-									filter.CRCs.Add(split[1]);
+									filter.CRCs.Add(argsplit[1]);
 									break;
 								case "-da":
 								case "--date":
-									date = split[1];
+									date = argsplit[1];
 									break;
 								case "-dat":
 								case "--dat":
-									if (!File.Exists(split[1]) && !Directory.Exists(split[1]))
+									if (!File.Exists(argsplit[1]) && !Directory.Exists(argsplit[1]))
 									{
-										Globals.Logger.Error("Must be a valid file or folder of DATs: {0}", split[1]);
+										Globals.Logger.Error("Must be a valid file or folder of DATs: {0}", argsplit[1]);
 										Globals.Logger.Close();
 										return;
 									}
-									datfiles.Add(split[1]);
+									datfiles.Add(argsplit[1]);
 									break;
 								case "-de":
 								case "--desc":
-									description = split[1];
+									description = argsplit[1];
 									break;
 								case "-em":
 								case "--email":
-									email = split[1];
+									email = argsplit[1];
 									break;
 								case "-exta":
 								case "--exta":
-									exta.Add(split[1]);
+									exta.Add(argsplit[1]);
 									break;
 								case "-extb":
 								case "--extb":
-									extb.Add(split[1]);
+									extb.Add(argsplit[1]);
 									break;
 								case "-f":
 								case "--filename":
-									filename = split[1];
+									filename = argsplit[1];
 									break;
 								case "-fm":
 								case "--forcemerge":
-									forcemerge = split[1];
+									forcemerge = argsplit[1];
 									break;
 								case "-fn":
 								case "--forcend":
-									forcend = split[1];
+									forcend = argsplit[1];
 									break;
 								case "-fp":
 								case "--forcepack":
-									forcepack = split[1];
+									forcepack = argsplit[1];
 									break;
 								case "-gn":
 								case "--game-name":
-									filter.GameNames.Add(split[1]);
+									filter.GameNames.Add(argsplit[1]);
 									break;
 								case "-gt":
 								case "--game-type":
-									filter.MachineTypes |= Filter.GetMachineTypeFromString(split[1]);
+									filter.MachineTypes |= Filter.GetMachineTypeFromString(argsplit[1]);
 									break;
 								case "-gz":
 								case "--gz":
-									if (!Int32.TryParse(split[1], out gz))
+									if (!Int32.TryParse(argsplit[1], out gz))
 									{
 										gz = 2;
 									}
 									break;
 								case "-h":
 								case "--header":
-									header = split[1];
+									header = argsplit[1];
 									break;
 								case "-hp":
 								case "--homepage":
-									homepage = split[1];
+									homepage = argsplit[1];
 									break;
 								case "-is":
 								case "--status":
-									filter.ItemStatuses |= Filter.GetStatusFromString(split[1]);
+									filter.ItemStatuses |= Filter.GetStatusFromString(argsplit[1]);
 									break;
 								case "-md5":
 								case "--md5":
-									filter.MD5s.Add(split[1]);
+									filter.MD5s.Add(argsplit[1]);
 									break;
 								case "-mt":
 								case "--mt":
-									if (Int32.TryParse(split[1], out int odop))
+									if (Int32.TryParse(argsplit[1], out int odop))
 									{
 										Globals.MaxThreads = odop;
 									}
@@ -1075,139 +1077,139 @@ namespace SabreTools
 									break;
 								case "-n":
 								case "--name":
-									name = split[1];
+									name = argsplit[1];
 									break;
 								case "-ncrc":
 								case "--not-crc":
-									filter.NotCRCs.Add(split[i]);
+									filter.NotCRCs.Add(argsplit[i]);
 									break;
 								case "-ngn":
 								case "--not-game":
-									filter.NotGameNames.Add(split[1]);
+									filter.NotGameNames.Add(argsplit[1]);
 									break;
 								case "-ngt":
 								case "--not-gtype":
-									filter.NotMachineTypes |= Filter.GetMachineTypeFromString(split[1]);
+									filter.NotMachineTypes |= Filter.GetMachineTypeFromString(argsplit[1]);
 									break;
 								case "-nis":
 								case "--not-status":
-									filter.NotItemStatuses |= Filter.GetStatusFromString(split[1]);
+									filter.NotItemStatuses |= Filter.GetStatusFromString(argsplit[1]);
 									break;
 								case "-nmd5":
 								case "--not-md5":
-									filter.NotMD5s.Add(split[1]);
+									filter.NotMD5s.Add(argsplit[1]);
 									break;
 								case "-nrn":
 								case "--not-rom":
-									filter.NotRomNames.Add(split[1]);
+									filter.NotRomNames.Add(argsplit[1]);
 									break;
 								case "-nrt":
 								case "--not-type":
-									filter.NotRomTypes.Add(split[1]);
+									filter.NotRomTypes.Add(argsplit[1]);
 									break;
 								case "-nsha1":
 								case "--not-sha1":
-									filter.NotSHA1s.Add(split[1]);
+									filter.NotSHA1s.Add(argsplit[1]);
 									break;
 								case "-nsha256":
 								case "--not-sha256":
-									filter.NotSHA256s.Add(split[1]);
+									filter.NotSHA256s.Add(argsplit[1]);
 									break;
 								case "-nsha384":
 								case "--not-sha384":
-									filter.NotSHA384s.Add(split[1]);
+									filter.NotSHA384s.Add(argsplit[1]);
 									break;
 								case "-nsha512":
 								case "--not-sha512":
-									filter.NotSHA512s.Add(split[1]);
+									filter.NotSHA512s.Add(argsplit[1]);
 									break;
 								case "-out":
 								case "--out":
-									outDir = split[1];
+									outDir = argsplit[1];
 									break;
 								case "-post":
 								case "--postfix":
-									postfix = split[1];
+									postfix = argsplit[1];
 									break;
 								case "-pre":
 								case "--prefix":
-									prefix = split[1];
+									prefix = argsplit[1];
 									break;
 								case "-r":
 								case "--root":
-									rootdir = split[1];
+									rootdir = argsplit[1];
 									break;
 								case "-rar":
 								case "--rar":
-									if (!Int32.TryParse(split[1], out rar))
+									if (!Int32.TryParse(argsplit[1], out rar))
 									{
 										rar = 2;
 									}
 									break;
 								case "-rd":
 								case "--root-dir":
-									root = split[1];
+									root = argsplit[1];
 									break;
 								case "-reg":
 								case "--region":
-									regions.Add(split[1]);
+									regions.Add(argsplit[1]);
 									break;
 								case "-rep":
 								case "--rep-ext":
-									repext = split[1];
+									repext = argsplit[1];
 									break;
 								case "-rn":
 								case "--rom-name":
-									filter.RomNames.Add(split[1]);
+									filter.RomNames.Add(argsplit[1]);
 									break;
 								case "-rt":
 								case "--rom-type":
-									filter.RomTypes.Add(split[1]);
+									filter.RomTypes.Add(argsplit[1]);
 									break;
 								case "-seq":
 								case "--equal":
-									filter.SizeEqualTo = Utilities.GetSizeFromString(split[1]);
+									filter.SizeEqualTo = Utilities.GetSizeFromString(argsplit[1]);
 									break;
 								case "-sgt":
 								case "--greater":
-									filter.SizeGreaterThanOrEqual = Utilities.GetSizeFromString(split[1]);
+									filter.SizeGreaterThanOrEqual = Utilities.GetSizeFromString(argsplit[1]);
 									break;
 								case "-sha1":
 								case "--sha1":
-									filter.SHA1s.Add(split[1]);
+									filter.SHA1s.Add(argsplit[1]);
 									break;
 								case "-sha256":
 								case "--sha256":
-									filter.SHA256s.Add(split[1]);
+									filter.SHA256s.Add(argsplit[1]);
 									break;
 								case "-sha384":
 								case "--sha384":
-									filter.SHA384s.Add(split[1]);
+									filter.SHA384s.Add(argsplit[1]);
 									break;
 								case "-sha512":
 								case "--sha512":
-									filter.SHA512s.Add(split[1]);
+									filter.SHA512s.Add(argsplit[1]);
 									break;
 								case "-slt":
 								case "--less":
-									filter.SizeLessThanOrEqual = Utilities.GetSizeFromString(split[1]);
+									filter.SizeLessThanOrEqual = Utilities.GetSizeFromString(argsplit[1]);
 									break;
 								case "-t":
 								case "--temp":
-									tempDir = split[1];
+									tempDir = argsplit[1];
 									break;
 								case "-u":
 								case "-url":
 								case "--url":
-									url = split[1];
+									url = argsplit[1];
 									break;
 								case "-v":
 								case "--version":
-									version = split[1];
+									version = argsplit[1];
 									break;
 								case "-zip":
 								case "--zip":
-									if (!Int32.TryParse(split[1], out zip))
+									if (!Int32.TryParse(argsplit[1], out zip))
 									{
 										zip = 1;
 									}
@@ -1241,7 +1243,7 @@ namespace SabreTools
 			}
 
 			// If none of the feature flags is enabled, show the help screen
-			if (!(datFromDir | extract | restore | sort | splitByExt | splitByHash | splitByLevel | splitByType | stats | update | verify))
+			if (!(datFromDir | extract | restore | sort | split | stats | update | verify))
 			{
 				Globals.Logger.Error("At least one feature switch must be enabled");
 				_help.OutputGenericHelp();
@@ -1250,7 +1252,7 @@ namespace SabreTools
 			}
 
 			// If more than one switch is enabled, show the help screen
-			if (!(datFromDir ^ extract ^ restore ^ sort ^ splitByExt ^ splitByHash ^ splitByLevel ^ splitByType ^ stats ^ update ^ verify))
+			if (!(datFromDir ^ extract ^ restore ^ sort ^ split ^ stats ^ update ^ verify))
 			{
 				Globals.Logger.Error("Only one feature switch is allowed at a time");
 				_help.OutputGenericHelp();
@@ -1260,7 +1262,7 @@ namespace SabreTools
 
 			// If a switch that requires a filename is set and no file is, show the help screen
 			if (inputs.Count == 0
-				&& (datFromDir || extract || restore || splitByExt || splitByHash || splitByLevel || splitByType || stats || update || verify))
+				&& (datFromDir || extract || restore || split || stats || update || verify))
 			{
 				Globals.Logger.Error("This feature requires at least one input");
 				_help.OutputIndividualFeature(feature);
@@ -1297,28 +1299,10 @@ namespace SabreTools
 					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, splitType, chdsAsFiles);
 			}
 
-			// Split a DAT by extension
-			else if (splitByExt)
+			// Split a DAT by the split type
+			else if (split)
 			{
-				InitSplit(inputs, outDir, inplace, ExternalSplitType.Extension, exta, extb, shortname, basedat);
-			}
-
-			// Split a DAT by available hashes
-			else if (splitByHash)
-			{
-				InitSplit(inputs, outDir, inplace, ExternalSplitType.Hash, exta, extb, shortname, basedat);
-			}
-
-			// Split a SuperDAT by lowest available level
-			else if (splitByLevel)
-			{
-				InitSplit(inputs, outDir, inplace, ExternalSplitType.Level, exta, extb, shortname, basedat);
-			}
-
-			// Split a DAT by item type
-			else if (splitByType)
-			{
-				InitSplit(inputs, outDir, inplace, ExternalSplitType.Type, exta, extb, shortname, basedat);
+				InitSplit(inputs, outDir, inplace, externalSplitType, exta, extb, shortname, basedat);
 			}
 
 			// Get statistics on input files

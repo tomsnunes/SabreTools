@@ -223,6 +223,20 @@ namespace SabreTools.Library.Data
     }
 
 	/// <summary>
+	/// Determines how the DAT will be split on output
+	/// </summary>
+	[Flags]
+	public enum ExternalSplitType
+	{
+		None = 0x0,
+
+		Extension = 0x01,
+		Hash = Extension << 1,
+		Level = Hash << 1,
+		Type = Level << 1,
+	}
+
+	/// <summary>
 	/// Determine what hashes to strip from the DAT
 	/// </summary>
 	[Flags]

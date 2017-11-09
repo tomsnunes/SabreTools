@@ -318,77 +318,6 @@ namespace SabreTools
 				FeatureType.Flag,
 				null));
 
-			// Create the Extension Split feature
-			Feature extSplit = new Feature(
-				new List<string>() { "-es", "--ext-split" },
-				"Split DAT(s) by two file extensions",
-				FeatureType.Flag,
-				null);
-			extSplit.AddFeature("exta", new Feature(
-				new List<string>() { "-exta", "--exta" },
-				"First extension (multiple allowed)",
-				FeatureType.List,
-				null));
-			extSplit.AddFeature("extb", new Feature(
-				new List<string>() { "-extb", "--extb" },
-				"Second extension (multiple allowed)",
-				FeatureType.List,
-				null));
-			extSplit.AddFeature("out", new Feature(
-				new List<string>() { "-out", "--out" },
-				"Output directory",
-				FeatureType.String,
-				null));
-			extSplit.AddFeature("inplace", new Feature(
-				new List<string>() { "-ip", "--inplace" },
-				"Write to the input directories",
-				FeatureType.Flag,
-				null));
-
-			// Create the Hash Split feature
-			Feature hashSplit = new Feature(
-				new List<string>() { "-hs", "--hash-split" },
-				"Split DAT(s) or folder by best-available hashes",
-				FeatureType.Flag,
-				null);
-			hashSplit.AddFeature("out", new Feature(
-				new List<string>() { "-out", "--out" },
-				"Output directory",
-				FeatureType.String,
-				null));
-			hashSplit.AddFeature("inplace", new Feature(
-				new List<string>() { "-ip", "--inplace" },
-				"Write to the input directories",
-				FeatureType.Flag,
-				null));
-
-			// Create the Level Split feature
-			Feature levelSplit = new Feature(
-				new List<string>() { "-ls", "--lvl-split" },
-				"Split a SuperDAT or folder by internal path",
-				FeatureType.Flag,
-				null);
-			levelSplit.AddFeature("out", new Feature(
-				new List<string>() { "-out", "--out" },
-				"Output directory",
-				FeatureType.String,
-				null));
-			levelSplit.AddFeature("inplace", new Feature(
-				new List<string>() { "-ip", "--inplace" },
-				"Write to the input directories",
-				FeatureType.Flag,
-				null));
-			levelSplit.AddFeature("short", new Feature(
-				new List<string>() { "-s", "--short" },
-				"Use short output names",
-				FeatureType.Flag,
-				null));
-			levelSplit.AddFeature("base", new Feature(
-				new List<string>() { "-ba", "--base" },
-				"Use source DAT as base name for outputs",
-				FeatureType.Flag,
-				null));
-
 			// Create the Restore feature
 			Feature restore = new Feature(
 				new List<string>() { "-re", "--restore" },
@@ -580,7 +509,64 @@ namespace SabreTools
 				new List<string>() { "-mt", "--mt" },
 				"Amount of threads to use (default 4, -1 unlimted)",
 				FeatureType.String,
-				null));	
+				null));
+
+			// Create the Split feature
+			Feature split = new Feature(
+				new List<string>() { "-sp", "--split" },
+				"Split input DATs by a given criteria",
+				FeatureType.Flag,
+				null);
+			split.AddFeature("out", new Feature(
+				new List<string>() { "-out", "--out" },
+				"Output directory",
+				FeatureType.String,
+				null));
+			split.AddFeature("inplace", new Feature(
+				new List<string>() { "-ip", "--inplace" },
+				"Write to the input directories",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("ext", new Feature(
+				new List<string>() { "-es", "--ext" },
+				"Split DAT(s) by two file extensions",
+				FeatureType.Flag,
+				null));
+				split["ext"].AddFeature("exta", new Feature(
+					new List<string>() { "-exta", "--exta" },
+					"First extension (multiple allowed)",
+					FeatureType.List,
+					null));
+				split["ext"].AddFeature("extb", new Feature(
+					new List<string>() { "-extb", "--extb" },
+					"Second extension (multiple allowed)",
+					FeatureType.List,
+					null));
+			split.AddFeature("hash", new Feature(
+				new List<string>() { "-hs", "--hash" },
+				"Split DAT(s) or folder by best-available hashes",
+				FeatureType.Flag,
+				null));
+			split.AddFeature("level", new Feature(
+				new List<string>() { "-ls", "--level" },
+				"Split a SuperDAT or folder by internal path",
+				FeatureType.Flag,
+				null));
+				split["level"].AddFeature("short", new Feature(
+					new List<string>() { "-s", "--short" },
+					"Use short output names",
+					FeatureType.Flag,
+					null));
+				split["level"].AddFeature("base", new Feature(
+					new List<string>() { "-ba", "--base" },
+					"Use source DAT as base name for outputs",
+					FeatureType.Flag,
+					null));
+			split.AddFeature("type", new Feature(
+				new List<string>() { "-ts", "--type" },
+				"Split DAT(s) or folder by file types (rom/disk)",
+				FeatureType.Flag,
+				null));
 
 			// Create the Stats feature
 			Feature stats = new Feature(
@@ -636,23 +622,6 @@ namespace SabreTools
 			stats.AddFeature("text", new Feature(
 				new List<string>() { "-txt", "--text" },
 				"Output in generic text format",
-				FeatureType.Flag,
-				null));
-
-			// Create the Type Split feature
-			Feature typeSplit = new Feature(
-				new List<string>() { "-ts", "--type-split" },
-				"Split DAT(s) or folder by file types (rom/disk)",
-				FeatureType.Flag,
-				null);
-			typeSplit.AddFeature("out", new Feature(
-				new List<string>() { "-out", "--out" },
-				"Output directory",
-				FeatureType.String,
-				null));
-			typeSplit.AddFeature("inplace", new Feature(
-				new List<string>() { "-ip", "--inplace" },
-				"Write to the input directories",
 				FeatureType.Flag,
 				null));
 
@@ -1431,13 +1400,10 @@ namespace SabreTools
 			help.Add("Script", script);
 			help.Add("DATFromDir", datFromDir);
 			help.Add("Extract", extract);
-			help.Add("Extension Split", extSplit);
-			help.Add("Hash Split", hashSplit);
-			help.Add("Level Split", levelSplit);
 			help.Add("Restore", restore);
 			help.Add("Sort", sort);
+			help.Add("Split", split);
 			help.Add("Stats", stats);
-			help.Add("Type Split", typeSplit);
 			help.Add("Update", update);
 			help.Add("Verify", verify);
 

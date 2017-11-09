@@ -4762,20 +4762,21 @@ namespace SabreTools.Library.DatFiles
 				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
 
 				// Split and write the DAT
-				switch (splitType)
+				if ((splitType & ExternalSplitType.Extension) != 0)
 				{
-					case ExternalSplitType.Extension:
-						SplitByExtension(outDir, inplace, exta, extb);
-						break;
-					case ExternalSplitType.Hash:
-						SplitByHash(outDir, inplace);
-						break;
-					case ExternalSplitType.Level:
-						SplitByLevel(outDir, inplace, shortname, basedat);
-						break;
-					case ExternalSplitType.Type:
-						SplitByType(outDir, inplace);
-						break;
+					SplitByExtension(outDir, inplace, exta, extb);
+				}
+				if ((splitType & ExternalSplitType.Hash) != 0)
+				{
+					SplitByHash(outDir, inplace);
+				}
+				if ((splitType & ExternalSplitType.Level) != 0)
+				{
+					SplitByLevel(outDir, inplace, shortname, basedat);
+				}
+				if ((splitType & ExternalSplitType.Type) != 0)
+				{
+					SplitByType(outDir, inplace);
 				}
 
 				// Now re-empty the DAT to make room for the next one
