@@ -205,14 +205,21 @@ namespace SabreTools.Library.DatItems
 			// Otherwise, treat it as a rom
 			Rom newOther = (Rom)other;
 
-			// If either is a nodump, it's never a match
-			if (_itemStatus == ItemStatus.Nodump || newOther.ItemStatus == ItemStatus.Nodump)
+			// If all hashes are empty but they're both nodump and the names match, then they're dupes
+			if ((this._itemStatus == ItemStatus.Nodump && newOther._itemStatus == ItemStatus.Nodump)
+				&& (this._name == newOther._name)
+				&& (this._crc.IsNullOrWhiteSpace() && newOther._crc.IsNullOrWhiteSpace())
+				&& (this._md5.IsNullOrWhiteSpace() && newOther._md5.IsNullOrWhiteSpace())
+				&& (this._sha1.IsNullOrWhiteSpace() && newOther._sha1.IsNullOrWhiteSpace())
+				&& (this._sha256.IsNullOrWhiteSpace() && newOther._sha256.IsNullOrWhiteSpace())
+				&& (this._sha384.IsNullOrWhiteSpace() && newOther._sha384.IsNullOrWhiteSpace())
+				&& (this._sha512.IsNullOrWhiteSpace() && newOther._sha512.IsNullOrWhiteSpace()))
 			{
-				return dupefound;
+				dupefound = true;
 			}
 
 			// If we can determine that the roms have no non-empty hashes in common, we return false
-			if ((_crc.IsNullOrWhiteSpace() || newOther._crc.IsNullOrWhiteSpace())
+			else if ((this._crc.IsNullOrWhiteSpace() || newOther._crc.IsNullOrWhiteSpace())
 				&& (this._md5.IsNullOrWhiteSpace() || newOther._md5.IsNullOrWhiteSpace())
 				&& (this._sha1.IsNullOrWhiteSpace() || newOther._sha1.IsNullOrWhiteSpace())
 				&& (this._sha256.IsNullOrWhiteSpace() || newOther._sha256.IsNullOrWhiteSpace())
@@ -221,6 +228,8 @@ namespace SabreTools.Library.DatItems
 			{
 				dupefound = false;
 			}
+
+			// Otherwise if we get a partial match
 			else if ((this.Size == newOther.Size)
 				&& ((this._crc.IsNullOrWhiteSpace() || newOther._crc.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._crc, newOther._crc))
 				&& ((this._md5.IsNullOrWhiteSpace() || newOther._md5.IsNullOrWhiteSpace()) || Enumerable.SequenceEqual(this._md5, newOther._md5))

@@ -1468,19 +1468,8 @@ namespace SabreTools.Library.DatFiles
 						// If the key is different, move the item to the new key
 						if (newkey != key)
 						{
-							// We have to circumvent the proper process here because of issues with nodumps
-							// TODO: Properly handle nodumps in key-to-key transfers
-							if (_items.ContainsKey(newkey))
-							{
-								_items[newkey].Add(rom);
-							}
-							else
-							{
-								_items.Add(newkey, new List<DatItem>() { rom });
-							}
-
-							// Now remove the rom from its original location
-							roms.RemoveAt(i);
+							Add(newkey, rom);
+							Remove(key, rom);
 							i--; // This make sure that the pointer stays on the correct since one was removed
 						}
 					}
