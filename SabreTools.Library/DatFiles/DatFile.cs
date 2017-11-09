@@ -1468,8 +1468,19 @@ namespace SabreTools.Library.DatFiles
 						// If the key is different, move the item to the new key
 						if (newkey != key)
 						{
-							Add(newkey, rom);
-							Remove(key, rom);
+							// We have to circumvent the proper process here because of issues with nodumps
+							// TODO: Properly handle nodumps in key-to-key transfers
+							if (_items.ContainsKey(newkey))
+							{
+								_items[newkey].Add(rom);
+							}
+							else
+							{
+								_items.Add(newkey, new List<DatItem>() { rom });
+							}
+
+							// Now remove the rom from its original location
+							roms.RemoveAt(i);
 							i--; // This make sure that the pointer stays on the correct since one was removed
 						}
 					}
@@ -2231,58 +2242,24 @@ namespace SabreTools.Library.DatFiles
 		public void Update(List<string> inputFileNames, string outDir, bool inplace, bool clean, bool remUnicode, bool descAsName,
 			Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
-			for (int i = 0; i < inputFileNames.Count; i++)
+			// Get only files from the input first
+			inputFileNames = Utilities.GetOnlyFilesFromInputs(inputFileNames);
+
+			// Iterate over the files
+			foreach (string file in inputFileNames)
 			{
-				// Get the input file name
-				string inputPath = inputFileNames[i];
+				DatFile innerDatdata = new DatFile(this);
+				Globals.Logger.User("Processing '{0}'", Path.GetFileName(file));
+				innerDatdata.Parse(file, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
+					keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
+				innerDatdata.Filter(filter, trim, single, root);
 
-				// Clean the input string
-				if (inputPath != "")
-				{
-					inputPath = Path.GetFullPath(inputPath);
-				}
+				// Get the correct output path
+				string realOutDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: false);
 
-				if (File.Exists(inputPath))
-				{
-					DatFile innerDatdata = new DatFile(this);
-					Globals.Logger.User("Processing '{0}'", Path.GetFileName(inputPath));
-					innerDatdata.Parse(inputPath, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
-						keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
-					innerDatdata.Filter(filter, trim, single, root);
-
-					// Get the correct output path
-					string realOutDir = Utilities.GetOutputPath(outDir, inputPath, inplace, splitpath: false);
-
-					// Try to output the file, overwriting only if it's not in the current directory
-					// TODO: Figure out if overwriting should always happen of if there should be a user flag
-					innerDatdata.WriteToFile(realOutDir, overwrite: (realOutDir != Environment.CurrentDirectory));
-				}
-				else if (Directory.Exists(inputPath))
-				{
-					inputPath = Path.GetFullPath(inputPath) + Path.DirectorySeparatorChar;
-
-					List<string> subFiles = Directory.EnumerateFiles(inputPath, "*", SearchOption.AllDirectories).ToList();
-					Parallel.ForEach(subFiles, Globals.ParallelOptions, file =>
-					{
-						Globals.Logger.User("Processing '{0}'", Path.GetFullPath(file).Remove(0, inputPath.Length));
-						DatFile innerDatdata = new DatFile(this);
-						innerDatdata.Parse(file, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
-							keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
-						innerDatdata.Filter(filter, trim, single, root);
-
-						// Get the correct output path
-						string realOutDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: false);
-
-						// Try to output the file, overwriting only if it's not in the current directory
-						// TODO: Figure out if overwriting should always happen of if there should be a user flag
-						innerDatdata.WriteToFile(realOutDir, overwrite: (realOutDir != Environment.CurrentDirectory));
-					});
-				}
-				else
-				{
-					Globals.Logger.Error("I'm sorry but '{0}' doesn't exist!", inputPath);
-					return;
-				}
+				// Try to output the file, overwriting only if it's not in the current directory
+				// TODO: Figure out if overwriting should always happen of if there should be a user flag
+				innerDatdata.WriteToFile(realOutDir, overwrite: (realOutDir != Environment.CurrentDirectory));
 			}
 		}
 
