@@ -1329,7 +1329,7 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Get the keys from the file dictionary
 		/// </summary>
-		/// <returns>IEnumerable of the keys</returns>
+		/// <returns>List of the keys</returns>
 		public List<string> Keys
 		{
 			get
@@ -1342,7 +1342,7 @@ namespace SabreTools.Library.DatFiles
 
 				lock (_items)
 				{
-					return _items.Keys.ToList();
+					return _items.Keys.Select(item => (String)item.Clone()).ToList();
 				}
 			}
 		}
