@@ -35,8 +35,6 @@ namespace SabreTools.Library.DatFiles
 		private bool _sceneDateStrip;
 		private DedupeType _dedupeRoms;
 		private Hash _stripHash;
-		private bool _oneGameOneRegion;
-		private List<string> _regions;
 
 		// Data specific to the Miss DAT type
 		private bool _useGame;
@@ -164,24 +162,6 @@ namespace SabreTools.Library.DatFiles
 			get { return _stripHash; }
 			set { _stripHash = value; }
 		}
-		public bool OneGameOneRegion
-		{
-			get { return _oneGameOneRegion; }
-			set { _oneGameOneRegion = value; }
-		}
-		public List<string> Regions
-		{
-			get
-			{
-				if (_regions == null)
-				{
-					_regions = new List<string>();
-				}
-
-				return _regions;
-			}
-			set { _regions = value; }
-		}
 
 		// Data specific to the Miss DAT type
 		public bool UseGame
@@ -266,8 +246,6 @@ namespace SabreTools.Library.DatFiles
 				_sceneDateStrip = this._sceneDateStrip,
 				_dedupeRoms = this._dedupeRoms,
 				_stripHash = this._stripHash,
-				_oneGameOneRegion = this._oneGameOneRegion,
-				_regions = this._regions,
 
 				_useGame = this._useGame,
 				_prefix = this._prefix,

@@ -100,7 +100,6 @@ namespace SabreTools
 				inverse = false,
 				merge = false,
 				nostore = false,
-				oneGameOneRegion = false,
 				quickScan = false,
 				quotes = false,
 				remext = false,
@@ -162,7 +161,6 @@ namespace SabreTools
 			List<string> exta = new List<string>();
 			List<string> extb = new List<string>();
 			List<string> inputs = new List<string>();
-			List<string> regions = new List<string>();
 
 			// Get the first argument as a feature flag
 			string feature = args[0];
@@ -254,10 +252,6 @@ namespace SabreTools
 				switch (args[i])
 				{
 					// User flags
-					case "-1g1r":
-					case "--1g1r":
-						oneGameOneRegion = true;
-						break;
 					case "-ab":
 					case "--add-blank":
 						addBlankFilesForEmptyFolder = true;
@@ -860,10 +854,6 @@ namespace SabreTools
 					case "--root-dir":
 						root = args[++i];
 						break;
-					case "-reg":
-					case "--region":
-						regions.Add(args[++i]);
-						break;
 					case "-rep":
 					case "--rep-ext":
 						repext = args[++i];
@@ -1150,10 +1140,6 @@ namespace SabreTools
 								case "--root-dir":
 									root = argsplit[1];
 									break;
-								case "-reg":
-								case "--region":
-									regions.Add(argsplit[1]);
-									break;
 								case "-rep":
 								case "--rep-ext":
 									repext = argsplit[1];
@@ -1316,8 +1302,8 @@ namespace SabreTools
 			{
 				InitUpdate(inputs, basePaths, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, sceneDateStrip, datFormat, usegame, prefix, postfix, quotes, repext, addext, remext,
-					datPrefix, romba, merge, updateMode, inplace, skip, removeDateFromAutomaticName, filter, oneGameOneRegion, regions,
-					splitType, trim, single, root, outDir, cleanGameNames, removeUnicode, descAsName, dedup, stripHash);
+					datPrefix, romba, merge, updateMode, inplace, skip, removeDateFromAutomaticName, filter, splitType, trim, single, root, outDir,
+					cleanGameNames, removeUnicode, descAsName, dedup, stripHash);
 			}
 
 			// If we're using the verifier

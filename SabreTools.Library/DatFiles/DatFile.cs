@@ -513,48 +513,6 @@ namespace SabreTools.Library.DatFiles
 				_datHeader.StripHash = value;
 			}
 		}
-		public bool OneGameOneRegion
-		{
-			get
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				return _datHeader.OneGameOneRegion;
-			}
-			set
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				_datHeader.OneGameOneRegion = value;
-			}
-		}
-		public List<string> Regions
-		{
-			get
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				return _datHeader.Regions;
-			}
-			set
-			{
-				if (_datHeader == null)
-				{
-					_datHeader = new DatHeader();
-				}
-
-				_datHeader.Regions = value;
-			}
-		}
 		public SortedBy SortedBy
 		{
 			get { return _sortedBy; }
@@ -5476,9 +5434,6 @@ namespace SabreTools.Library.DatFiles
 
 			// Output the number of items we're going to be writing
 			Globals.Logger.User("A total of {0} items will be written out to '{1}'", Count, FileName);
-
-			// Filter the DAT by 1G1R rules, if we're supposed to
-			// TODO: Create 1G1R logic before write
 
 			// If we are removing hashes, do that now
 			if (StripHash != 0x0)

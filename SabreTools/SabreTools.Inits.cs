@@ -323,8 +323,6 @@ namespace SabreTools
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// /* Filtering info */
 		/// <param name="filter">Pre-populated filter object for DAT filtering</param>
-		/// <param name="oneGameOneRegion">True if the outputs should be created in 1G1R mode, false otherwise</param>
-		/// <param name="regions">List of regions in the order they should be used, blank for default</param>
 		/// /* Trimming info */
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
@@ -383,8 +381,6 @@ namespace SabreTools
 
 			/* Filtering info */
 			Filter filter,
-			bool oneGameOneRegion,
-			List<string> regions,
 
 			/* Trimming info */
 			SplitType splitType,
@@ -464,35 +460,6 @@ namespace SabreTools
 				}
 			}
 
-			// Set the 1G1R regions alphabetically if not already set
-			if (regions == null || regions.Count == 0)
-			{
-				regions = new List<string>()
-				{
-					"australia",
-					"canada",
-					"china",
-					"denmark",
-					"europe",
-					"finland",
-					"france",
-					"germany",
-					"greece",
-					"italy",
-					"japan",
-					"korea",
-					"netherlands",
-					"norway",
-					"russia",
-					"spain",
-					"sweden",
-					"usa",
-					"usa, australia",
-					"usa, europe",
-					"world",
-				};
-			}
-
 			// Normalize the extensions
 			addext = (addext == "" || addext.StartsWith(".") ? addext : "." + addext);
 			repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
@@ -552,8 +519,6 @@ namespace SabreTools
 				SceneDateStrip = sceneDateStrip,
 				DatFormat = datFormat,
 				StripHash = stripHash,
-				OneGameOneRegion = oneGameOneRegion,
-				Regions = regions,
 
 				UseGame = usegame,
 				Prefix = prefix,

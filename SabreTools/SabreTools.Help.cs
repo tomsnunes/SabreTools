@@ -7,7 +7,6 @@ namespace SabreTools
 {
 	public partial class SabreTools
 	{
-		// TODO: Add 1G1R to the flags for update
 		public static Help RetrieveHelp()
 		{
 			// Create and add the header to the Help object
