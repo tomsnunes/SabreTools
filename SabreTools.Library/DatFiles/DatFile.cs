@@ -5826,7 +5826,7 @@ namespace SabreTools.Library.DatFiles
 
 					DatFile lastdirdat = new DatFile
 					{
-						FileName = "DIR: " + HttpUtility.HtmlEncode(lastdir.Remove(0, basepath.Length + (basepath.Length == 0 ? 0 : 1))),
+						FileName = "DIR: " + HttpUtility.HtmlEncode(lastdir),
 						_datStats = dirStats,
 					};
 
@@ -5878,7 +5878,7 @@ namespace SabreTools.Library.DatFiles
 			{
 				DatFile dirdat = new DatFile
 				{
-					FileName = "DIR: " + HttpUtility.HtmlEncode(lastdir.Remove(0, basepath.Length + (basepath.Length == 0 ? 0 : 1))),
+					FileName = "DIR: " + HttpUtility.HtmlEncode(lastdir),
 					_datStats = dirStats,
 				};
 
