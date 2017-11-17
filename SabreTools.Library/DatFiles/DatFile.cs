@@ -3056,7 +3056,7 @@ namespace SabreTools.Library.DatFiles
 			// Now parse the correct type of DAT
 			try
 			{
-				Utilities.GetDatFile(Utilities.GetDatFormat(filename), this)?.ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
+				Utilities.GetDatFile(filename, this)?.ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 			}
 			catch (Exception ex)
 			{

@@ -538,7 +538,6 @@ namespace SabreTools.Library.Tools
 			}
 		}
 
-
 		/// <summary>
 		/// Create a specific type of BaseReport to be used based on a format and user inputs
 		/// </summary>
@@ -562,6 +561,18 @@ namespace SabreTools.Library.Tools
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Create a specific type of DatFile to be used based on an input file and a base DAT
+		/// </summary>
+		/// <param name="input">Name of the file to determine the DAT format from</param>
+		/// <param name="baseDat">DatFile containing the information to use in specific operations</param>
+		/// <returns>DatFile of the specific internal type that corresponds to the inputs</returns>
+		public static DatFile GetDatFile(string input, DatFile baseDat)
+		{
+			DatFormat datFormat = GetDatFormat(input);
+			return GetDatFile(datFormat, baseDat);
 		}
 
 		/// <summary>
