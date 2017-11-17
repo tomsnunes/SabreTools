@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Web;
 
@@ -23,7 +22,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of an OfflineList XML DAT
 	/// </summary>
-	public class OfflineList : DatFile
+	internal class OfflineList : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile

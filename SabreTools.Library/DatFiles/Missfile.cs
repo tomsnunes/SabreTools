@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 using SabreTools.Library.Data;
@@ -22,7 +21,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a Missfile
 	/// </summary>
-	public class Missfile : DatFile
+	internal class Missfile : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Web;
 
@@ -24,7 +23,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a RomCenter DAT
 	/// </summary>
-	public class RomCenter : DatFile
+	internal class RomCenter : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile

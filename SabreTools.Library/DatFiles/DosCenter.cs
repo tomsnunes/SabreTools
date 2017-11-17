@@ -22,7 +22,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a DosCenter DAT
 	/// </summary>
-	public class DosCenter : DatFile
+	internal class DosCenter : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile
@@ -57,7 +57,7 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// ClrMamePro and DosCenter parsing are identical so it just calls one implementation
-			(this as DatFile as ClrMamePro).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
+			new ClrMamePro(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 		}
 
 

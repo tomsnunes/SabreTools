@@ -25,7 +25,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a Logiqx-derived DAT
 	/// </summary>
-	public class Logiqx : DatFile
+	internal class Logiqx : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile

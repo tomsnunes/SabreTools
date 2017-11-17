@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Web;
 
@@ -23,7 +22,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of an SabreDat XML DAT
 	/// </summary>
-	public class SoftwareList : DatFile
+	internal class SoftwareList : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile
@@ -37,6 +36,7 @@ namespace SabreTools.Library.DatFiles
 			this._datStats = datFile._datStats;
 
 		}
+
 		/// <summary>
 		/// Parse an SabreDat XML DAT and return all found games and roms within
 		/// </summary>

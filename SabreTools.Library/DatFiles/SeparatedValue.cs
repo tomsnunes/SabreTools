@@ -21,18 +21,23 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a value-separated DAT
 	/// </summary>
-	public class SeparatedValue : DatFile
+	internal class SeparatedValue : DatFile
 	{
+		// Private instance variables specific to Separated Value DATs
+		char _delim;
+
 		/// <summary>
 		/// Constructor designed for casting a base DatFile
 		/// </summary>
 		/// <param name="datFile">Parent DatFile to copy from</param>
-		public SeparatedValue(DatFile datFile)
+		/// <param name="delim">Delimiter for parsing individual lines</param>
+		public SeparatedValue(DatFile datFile, char delim)
 		{
 			this._datHeader = datFile._datHeader;
 			this._items = datFile._items;
 			this._sortedBy = datFile._sortedBy;
 			this._datStats = datFile._datStats;
+			_delim = delim;
 		}
 
 		/// <summary>
@@ -41,7 +46,6 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="delim">Delimiter for parsing individual lines</param>
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
@@ -50,7 +54,6 @@ namespace SabreTools.Library.DatFiles
 			string filename,
 			int sysid,
 			int srcid,
-			char delim,
 
 			// Miscellaneous
 			bool keep,
@@ -73,7 +76,7 @@ namespace SabreTools.Library.DatFiles
 				// Parse the first line, getting types from the column names
 				if (linenum == 0)
 				{
-					string[] parsedColumns = line.Split(delim);
+					string[] parsedColumns = line.Split(_delim);
 					foreach (string parsed in parsedColumns)
 					{
 						switch (parsed.ToLowerInvariant().Trim('"'))
@@ -163,7 +166,7 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// Otherwise, we want to split the line and parse
-				string[] parsedLine = line.Split(delim);
+				string[] parsedLine = line.Split(_delim);
 
 				// If the line doesn't have the correct number of columns, we log and skip
 				if (parsedLine.Length != columns.Count)
@@ -369,10 +372,9 @@ namespace SabreTools.Library.DatFiles
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
 		/// <param name="outfile">Name of the file to write to</param>
-		/// <param name="delim">Delimiter for parsing individual lines</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public bool WriteToFile(string outfile, char delim, bool ignoreblanks = false)
+		public bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
 			{
@@ -389,7 +391,7 @@ namespace SabreTools.Library.DatFiles
 				StreamWriter sw = new StreamWriter(fs, new UTF8Encoding(false));
 
 				// Write out the header
-				WriteHeader(sw, delim);
+				WriteHeader(sw);
 
 				// Get a properly sorted set of keys
 				List<string> keys = Keys;
@@ -422,7 +424,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// Now, output the rom data
-						WriteDatItem(sw, delim, rom, ignoreblanks);
+						WriteDatItem(sw, rom, ignoreblanks);
 					}
 				}
 
@@ -443,14 +445,13 @@ namespace SabreTools.Library.DatFiles
 		/// Write out DAT header using the supplied StreamWriter
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
-		/// <param name="delim">Delimiter for parsing individual lines</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private bool WriteHeader(StreamWriter sw, char delim)
+		private bool WriteHeader(StreamWriter sw)
 		{
 			try
 			{
 				string header = string.Format("\"File Name\"{0}\"Internal Name\"{0}\"Description\"{0}\"Game Name\"{0}\"Game Description\"{0}\"Type\"{0}\"" +
-								"Rom Name\"{0}\"Disk Name\"{0}\"Size\"{0}\"CRC\"{0}\"MD5\"{0}\"SHA1\"{0}\"SHA256\"{0}\"Nodump\"\n", delim);
+								"Rom Name\"{0}\"Disk Name\"{0}\"Size\"{0}\"CRC\"{0}\"MD5\"{0}\"SHA1\"{0}\"SHA256\"{0}\"Nodump\"\n", _delim);
 
 				// Write the header out
 				sw.Write(header);
@@ -469,11 +470,10 @@ namespace SabreTools.Library.DatFiles
 		/// Write out DatItem using the supplied StreamWriter
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
-		/// <param name="delim">Delimiter for parsing individual lines</param>
 		/// <param name="rom">DatItem object to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private bool WriteDatItem(StreamWriter sw, char delim, DatItem rom, bool ignoreblanks = false)
+		private bool WriteDatItem(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
@@ -580,7 +580,7 @@ namespace SabreTools.Library.DatFiles
 						+ "{0}\"" + ((Rom)rom).SHA256 + "\""
 						// + "{0}\"" + ((Rom)rom).SHA384 + "\""
 						// + "{0}\"" + ((Rom)rom).SHA512 + "\""
-						+ "{0}" + (((Rom)rom).ItemStatus != ItemStatus.None ? "\"" + ((Rom)rom).ItemStatus.ToString() + "\"" : "\"\""), delim);
+						+ "{0}" + (((Rom)rom).ItemStatus != ItemStatus.None ? "\"" + ((Rom)rom).ItemStatus.ToString() + "\"" : "\"\""), _delim);
 					state += pre + inline + post + "\n";
 				}
 				else if (rom.Type == ItemType.Disk)
@@ -600,7 +600,7 @@ namespace SabreTools.Library.DatFiles
 						+ "{0}\"" + ((Disk)rom).SHA256 + "\""
 						// + "{0}\"" + ((Rom)rom).SHA384 + "\""
 						// + "{0}\"" + ((Rom)rom).SHA512 + "\""
-						+ "{0}" + (((Disk)rom).ItemStatus != ItemStatus.None ? "\"" + ((Disk)rom).ItemStatus.ToString() + "\"" : "\"\""), delim);
+						+ "{0}" + (((Disk)rom).ItemStatus != ItemStatus.None ? "\"" + ((Disk)rom).ItemStatus.ToString() + "\"" : "\"\""), _delim);
 					state += pre + inline + post + "\n";
 				}
 

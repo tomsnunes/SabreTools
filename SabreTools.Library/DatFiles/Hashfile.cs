@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 using SabreTools.Library.Data;
@@ -23,7 +22,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a hashfile such as an SFV, MD5, or SHA-1 file
 	/// </summary>
-	public class Hashfile : DatFile
+	internal class Hashfile : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile

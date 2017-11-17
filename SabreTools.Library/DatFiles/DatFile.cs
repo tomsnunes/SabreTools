@@ -3065,7 +3065,7 @@ namespace SabreTools.Library.DatFiles
 						new ClrMamePro(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.CSV:
-						new SeparatedValue(this).ParseFile(filename, sysid, srcid, ',', keep, clean, remUnicode);
+						new SeparatedValue(this, ',').ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.DOSCenter:
 						new DosCenter(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
@@ -3107,7 +3107,7 @@ namespace SabreTools.Library.DatFiles
 						new SoftwareList(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					case DatFormat.TSV:
-						new SeparatedValue(this).ParseFile(filename, sysid, srcid, '\t', keep, clean, remUnicode);
+						new SeparatedValue(this, '\t').ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 						break;
 					default:
 						return;
@@ -5467,7 +5467,7 @@ namespace SabreTools.Library.DatFiles
 								new ClrMamePro(this).WriteToFile(outfile, ignoreblanks);
 								break;
 							case DatFormat.CSV:
-								new SeparatedValue(this).WriteToFile(outfile, ',', ignoreblanks);
+								new SeparatedValue(this, ',').WriteToFile(outfile, ignoreblanks);
 								break;
 							case DatFormat.DOSCenter:
 								new DosCenter(this).WriteToFile(outfile, ignoreblanks);
@@ -5512,7 +5512,7 @@ namespace SabreTools.Library.DatFiles
 								new SoftwareList(this).WriteToFile(outfile, ignoreblanks);
 								break;
 							case DatFormat.TSV:
-								new SeparatedValue(this).WriteToFile(outfile, '\t', ignoreblanks);
+								new SeparatedValue(this, '\t').WriteToFile(outfile, ignoreblanks);
 								break;
 						}
 					}

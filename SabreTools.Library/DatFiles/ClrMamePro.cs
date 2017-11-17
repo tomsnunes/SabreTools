@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -24,7 +23,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a ClrMamePro DAT
 	/// </summary>
-	public class ClrMamePro : DatFile
+	internal class ClrMamePro : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile

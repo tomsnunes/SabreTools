@@ -23,7 +23,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of an SabreDat XML DAT
 	/// </summary>
-	public class SabreDat : DatFile
+	internal class SabreDat : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile

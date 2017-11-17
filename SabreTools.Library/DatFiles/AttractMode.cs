@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 using SabreTools.Library.Data;
@@ -23,7 +22,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of an AttractMode DAT
 	/// </summary>
-	public class AttractMode : DatFile
+	internal class AttractMode : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile
