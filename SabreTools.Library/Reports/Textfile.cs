@@ -16,7 +16,7 @@ namespace SabreTools.Library.Reports
 	/// <summary>
 	/// Textfile report format
 	/// </summary>
-	public class Textfile : BaseReport
+	internal class Textfile : BaseReport
 	{
 		/// <summary>
 		/// Create a new report from the input DatFile and the filename

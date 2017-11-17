@@ -5702,25 +5702,7 @@ namespace SabreTools.Library.DatFiles
 			// Loop through and output based on the inputs
 			foreach (KeyValuePair<StatReportFormat, string> kvp in outputs)
 			{
-				// Create the proper report for this format
-				BaseReport report = null;
-				switch (kvp.Key)
-				{
-					case StatReportFormat.Textfile:
-						report = new Textfile(null, kvp.Value, baddumpCol, nodumpCol);
-						break;
-					case StatReportFormat.CSV:
-						report = new Reports.SeparatedValue(null, kvp.Value, ',', baddumpCol, nodumpCol);
-						break;
-					case StatReportFormat.HTML:
-						report = new Html(null, kvp.Value, baddumpCol, nodumpCol);
-						break;
-					case StatReportFormat.TSV:
-						report = new Reports.SeparatedValue(null, kvp.Value, '\t', baddumpCol, nodumpCol);
-						break;
-				}
-
-				reports.Add(report);
+				reports.Add(Utilities.CreateBaseReportFromType(kvp.Key, kvp.Value, baddumpCol, nodumpCol));
 			}
 
 			// Write the header, if any

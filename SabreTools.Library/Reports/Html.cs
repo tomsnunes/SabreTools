@@ -19,7 +19,7 @@ namespace SabreTools.Library.Reports
 	/// HTML report format
 	/// </summary>
 	/// TODO: Make output standard width, without making the entire thing a table
-	public class Html : BaseReport
+	internal class Html : BaseReport
 	{
 		/// <summary>
 		/// Create a new report from the input DatFile and the filename

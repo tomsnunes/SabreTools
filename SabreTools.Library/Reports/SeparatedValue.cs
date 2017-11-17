@@ -15,7 +15,7 @@ namespace SabreTools.Library.Reports
 	/// <summary>
 	/// Separated-Value report format
 	/// </summary>
-	public class SeparatedValue : BaseReport
+	internal class SeparatedValue : BaseReport
 	{
 		private char _separator;
 
