@@ -255,7 +255,7 @@ namespace RombaSharp
 				datdata.PopulateFromDir(input, Hash.DeepHashes /* omitFromScan */, true /* bare */, false /* archivesAsFiles */,
 					SkipFileType.None, false /* addBlanks */, false /* addDate */, _tmpdir /* tempDir */, false /* copyFiles */,
 					null /* headerToCheckAgainst */, true /* chdsAsFiles */);
-				datdata.WriteToFile();
+				datdata.Write();
 			}
 		}
 
