@@ -10,6 +10,7 @@ using System.Xml;
 using System.Xml.Schema;
 
 using SabreTools.Library.Data;
+using SabreTools.Library.DatFiles;
 using SabreTools.Library.External;
 using SabreTools.Library.FileTypes;
 using SabreTools.Library.DatItems;
@@ -534,6 +535,57 @@ namespace SabreTools.Library.Tools
 				default:
 					return null;
 			}
+		}
+
+		/// <summary>
+		/// Create a specific type of DatFile to be used based on a format and a base DAT
+		/// </summary>
+		/// <param name="datFormat">Format of the DAT to be created</param>
+		/// <param name="baseDat">DatFile containing the information to use in specific operations</param>
+		/// <returns>DatFile of the specific internal type that corresponds to the inputs</returns>
+		public static DatFile CreateDatFileFromTypeAndBase(DatFormat datFormat, DatFile baseDat)
+		{
+			switch (datFormat)
+			{
+				case DatFormat.AttractMode:
+					return new AttractMode(baseDat);
+				case DatFormat.ClrMamePro:
+					return new ClrMamePro(baseDat);
+				case DatFormat.CSV:
+					return new SeparatedValue(baseDat, ',');
+				case DatFormat.DOSCenter:
+					return new DosCenter(baseDat);
+				case DatFormat.Listroms:
+					return new Listroms(baseDat);
+				case DatFormat.Logiqx:
+					return new Logiqx(baseDat);
+				case DatFormat.MissFile:
+					return new Missfile(baseDat);
+				case DatFormat.OfflineList:
+					return new OfflineList(baseDat);
+				case DatFormat.RedumpMD5:
+					return new Hashfile(baseDat, Hash.MD5);
+				case DatFormat.RedumpSFV:
+					return new Hashfile(baseDat, Hash.CRC);
+				case DatFormat.RedumpSHA1:
+					return new Hashfile(baseDat, Hash.SHA1);
+				case DatFormat.RedumpSHA256:
+					return new Hashfile(baseDat, Hash.SHA256);
+				case DatFormat.RedumpSHA384:
+					return new Hashfile(baseDat, Hash.SHA384);
+				case DatFormat.RedumpSHA512:
+					return new Hashfile(baseDat, Hash.SHA512);
+				case DatFormat.RomCenter:
+					return new RomCenter(baseDat);
+				case DatFormat.SabreDat:
+					return new SabreDat(baseDat);
+				case DatFormat.SoftwareList:
+					return new SoftwareList(baseDat);
+				case DatFormat.TSV:
+					return new SeparatedValue(baseDat, '\t');
+			}
+
+			return null;
 		}
 
 		#endregion

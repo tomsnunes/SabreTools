@@ -24,16 +24,21 @@ namespace SabreTools.Library.DatFiles
 	/// </summary>
 	internal class Hashfile : DatFile
 	{
+		// Private instance variables specific to Hashfile DATs
+		Hash _hash;
+
 		/// <summary>
 		/// Constructor designed for casting a base DatFile
 		/// </summary>
 		/// <param name="datFile">Parent DatFile to copy from</param>
-		public Hashfile(DatFile datFile)
+		/// <param name="hash">Type of hash that is associated with this DAT</param> 
+		public Hashfile(DatFile datFile, Hash hash)
 		{
 			this._datHeader = datFile._datHeader;
 			this._items = datFile._items;
 			this._sortedBy = datFile._sortedBy;
 			this._datStats = datFile._datStats;
+			_hash = hash;
 		}
 
 		/// <summary>
@@ -42,19 +47,17 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="hashtype">Hash type that should be assumed</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		public void ParseFile(
+		public override void ParseFile(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
 
-			// Specific to hash files
-			Hash hashtype,
-
 			// Miscellaneous
+			bool keep,
 			bool clean,
 			bool remUnicode)
 		{
@@ -72,7 +75,7 @@ namespace SabreTools.Library.DatFiles
 				string hash = "";
 
 				// If we have CRC, then it's an SFV file and the name is first are
-				if ((hashtype & Hash.CRC) != 0)
+				if ((_hash & Hash.CRC) != 0)
 				{
 					name = split[0].Replace("*", String.Empty);
 					hash = split[1];
@@ -88,12 +91,12 @@ namespace SabreTools.Library.DatFiles
 				{
 					Name = name,
 					Size = -1,
-					CRC = ((hashtype & Hash.CRC) != 0 ? hash : null),
-					MD5 = ((hashtype & Hash.MD5) != 0 ? hash : null),
-					SHA1 = ((hashtype & Hash.SHA1) != 0 ? hash : null),
-					SHA256 = ((hashtype & Hash.SHA256) != 0 ? hash : null),
-					SHA384 = ((hashtype & Hash.SHA384) != 0 ? hash : null),
-					SHA512 = ((hashtype & Hash.SHA512) != 0 ? hash : null),
+					CRC = ((_hash & Hash.CRC) != 0 ? hash : null),
+					MD5 = ((_hash & Hash.MD5) != 0 ? hash : null),
+					SHA1 = ((_hash & Hash.SHA1) != 0 ? hash : null),
+					SHA256 = ((_hash & Hash.SHA256) != 0 ? hash : null),
+					SHA384 = ((_hash & Hash.SHA384) != 0 ? hash : null),
+					SHA512 = ((_hash & Hash.SHA512) != 0 ? hash : null),
 					ItemStatus = ItemStatus.None,
 
 					MachineName = Path.GetFileNameWithoutExtension(filename),
@@ -113,10 +116,9 @@ namespace SabreTools.Library.DatFiles
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
 		/// <param name="outfile">Name of the file to write to</param>
-		/// <param name="hash">Hash that should be written out</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public bool WriteToFile(string outfile, Hash hash, bool ignoreblanks = false)
+		public override bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
 			{
@@ -163,7 +165,7 @@ namespace SabreTools.Library.DatFiles
 						}
 
 						// Now, output the rom data
-						WriteDatItem( sw, hash, rom, ignoreblanks);
+						WriteDatItem(sw, rom, ignoreblanks);
 					}
 				}
 
@@ -184,11 +186,10 @@ namespace SabreTools.Library.DatFiles
 		/// Write out DatItem using the supplied StreamWriter
 		/// </summary>
 		/// <param name="sw">StreamWriter to output to</param>
-		/// <param name="hash">Hash that should be written out</param>
 		/// <param name="rom">DatItem object to be output</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the data was written, false on error</returns>
-		private bool WriteDatItem(StreamWriter sw, Hash hash, DatItem rom, bool ignoreblanks = false)
+		private bool WriteDatItem(StreamWriter sw, DatItem rom, bool ignoreblanks = false)
 		{
 			// If we are in ignore blanks mode AND we have a blank (0-size) rom, skip
 			if (ignoreblanks
@@ -201,7 +202,7 @@ namespace SabreTools.Library.DatFiles
 			try
 			{
 				string state = "";
-				switch (hash)
+				switch (_hash)
 				{
 					case Hash.MD5:
 						if (rom.Type == ItemType.Rom)

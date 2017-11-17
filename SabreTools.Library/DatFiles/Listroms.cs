@@ -55,7 +55,7 @@ namespace SabreTools.Library.DatFiles
 		/// 6331.sound-u8                            32 BAD CRC(1d298cb0) SHA1(bb0bb62365402543e3154b9a77be9c75010e6abc) BAD_DUMP
 		/// 16v8h-blue.u24                          279 NO GOOD DUMP KNOWN
 		/// </remarks>
-		public void ParseFile(
+		public override void ParseFile(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
@@ -246,7 +246,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="outfile">Name of the file to write to</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public bool WriteToFile(string outfile, bool ignoreblanks = false)
+		public override bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
 			{

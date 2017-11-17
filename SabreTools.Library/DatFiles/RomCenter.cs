@@ -43,15 +43,17 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		public void ParseFile(
+		public override void ParseFile(
 			// Standard Dat parsing
 			string filename,
 			int sysid,
 			int srcid,
 
 			// Miscellaneous
+			bool keep,
 			bool clean,
 			bool remUnicode)
 		{
@@ -202,7 +204,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="outfile">Name of the file to write to</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public bool WriteToFile(string outfile, bool ignoreblanks = false)
+		public override bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
 			{

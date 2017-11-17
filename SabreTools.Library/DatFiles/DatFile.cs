@@ -1795,7 +1795,7 @@ namespace SabreTools.Library.DatFiles
 				string interOutDir = Utilities.GetOutputPath(outDir, path, inplace, splitpath: true);
 
 				// Once we're done, try writing out
-				intDat.WriteToFile(interOutDir);
+				intDat.Write(interOutDir);
 
 				// Due to possible memory requirements, we force a garbage collection
 				GC.Collect();
@@ -1873,7 +1873,7 @@ namespace SabreTools.Library.DatFiles
 				string interOutDir = Utilities.GetOutputPath(outDir, path, inplace, splitpath: true);
 
 				// Once we're done, try writing out
-				intDat.WriteToFile(interOutDir);
+				intDat.Write(interOutDir);
 
 				// Due to possible memory requirements, we force a garbage collection
 				GC.Collect();
@@ -1962,7 +1962,7 @@ namespace SabreTools.Library.DatFiles
 				string path = Utilities.GetOutputPath(outDir, inputs[j], inplace, splitpath: true);
 
 				// Try to output the file
-				outDats[j].WriteToFile(path);
+				outDats[j].Write(path);
 			});
 
 			watch.Stop();
@@ -2104,13 +2104,13 @@ namespace SabreTools.Library.DatFiles
 			// Output the difflist (a-b)+(b-a) diff
 			if ((diff & UpdateMode.DiffNoDupesOnly) != 0)
 			{
-				outerDiffData.WriteToFile(outDir);
+				outerDiffData.Write(outDir);
 			}
 
 			// Output the (ab) diff
 			if ((diff & UpdateMode.DiffDupesOnly) != 0)
 			{
-				dupeData.WriteToFile(outDir);
+				dupeData.Write(outDir);
 			}
 
 			// Output the individual (a-b) DATs
@@ -2121,7 +2121,7 @@ namespace SabreTools.Library.DatFiles
 					string path = Utilities.GetOutputPath(outDir, inputs[j], false /* inplace */, splitpath: true);
 
 					// Try to output the file
-					outDats[j].WriteToFile(path);
+					outDats[j].Write(path);
 				});
 			}
 
@@ -2165,7 +2165,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Try to output the file
-			WriteToFile(outDir);
+			Write(outDir);
 		}
 
 		/// <summary>
@@ -2206,7 +2206,7 @@ namespace SabreTools.Library.DatFiles
 
 				// Try to output the file, overwriting only if it's not in the current directory
 				// TODO: Figure out if overwriting should always happen of if there should be a user flag
-				innerDatdata.WriteToFile(realOutDir, overwrite: (realOutDir != Environment.CurrentDirectory));
+				innerDatdata.Write(realOutDir, overwrite: (realOutDir != Environment.CurrentDirectory));
 			}
 		}
 
@@ -3056,62 +3056,7 @@ namespace SabreTools.Library.DatFiles
 			// Now parse the correct type of DAT
 			try
 			{
-				switch (Utilities.GetDatFormat(filename))
-				{
-					case DatFormat.AttractMode:
-						new AttractMode(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-						break;
-					case DatFormat.ClrMamePro:
-						new ClrMamePro(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-						break;
-					case DatFormat.CSV:
-						new SeparatedValue(this, ',').ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-						break;
-					case DatFormat.DOSCenter:
-						new DosCenter(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-						break;
-					case DatFormat.Listroms:
-						new Listroms(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-						break;
-					case DatFormat.Logiqx:
-						new Logiqx(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-						break;
-					case DatFormat.OfflineList:
-						new OfflineList(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-						break;
-					case DatFormat.RedumpMD5:
-						new Hashfile(this).ParseFile(filename, sysid, srcid, Hash.MD5, clean, remUnicode);
-						break;
-					case DatFormat.RedumpSFV:
-						new Hashfile(this).ParseFile(filename, sysid, srcid, Hash.CRC, clean, remUnicode);
-						break;
-					case DatFormat.RedumpSHA1:
-						new Hashfile(this).ParseFile(filename, sysid, srcid, Hash.SHA1, clean, remUnicode);
-						break;
-					case DatFormat.RedumpSHA256:
-						new Hashfile(this).ParseFile(filename, sysid, srcid, Hash.SHA256, clean, remUnicode);
-						break;
-					case DatFormat.RedumpSHA384:
-						new Hashfile(this).ParseFile(filename, sysid, srcid, Hash.SHA384, clean, remUnicode);
-						break;
-					case DatFormat.RedumpSHA512:
-						new Hashfile(this).ParseFile(filename, sysid, srcid, Hash.SHA512, clean, remUnicode);
-						break;
-					case DatFormat.RomCenter:
-						new RomCenter(this).ParseFile(filename, sysid, srcid, clean, remUnicode);
-						break;
-					case DatFormat.SabreDat:
-						new SabreDat(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-						break;
-					case DatFormat.SoftwareList:
-						new SoftwareList(this).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-						break;
-					case DatFormat.TSV:
-						new SeparatedValue(this, '\t').ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-						break;
-					default:
-						return;
-				}
+				Utilities.CreateDatFileFromTypeAndBase(Utilities.GetDatFormat(filename), this)?.ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 			}
 			catch (Exception ex)
 			{
@@ -3325,6 +3270,29 @@ namespace SabreTools.Library.DatFiles
 		public async Task<string> ParseAddHelperAsync(DatItem item, bool clean, bool remUnicode)
 		{
 			return await Task.Run(() => ParseAddHelper(item, clean, remUnicode));
+		}
+
+		/// <summary>
+		/// Parse DatFile and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		public virtual void ParseFile(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Miscellaneous
+			bool keep,
+			bool clean,
+			bool remUnicode)
+		{
+			throw new NotImplementedException();
 		}
 
 		#endregion
@@ -3909,7 +3877,7 @@ namespace SabreTools.Library.DatFiles
 				Name = "fixDAT_" + Name;
 				Description = "fixDAT_" + Description;
 				RemoveMarkedItems();
-				WriteToFile(outDir);
+				Write(outDir);
 			}
 
 			return success;
@@ -4040,7 +4008,7 @@ namespace SabreTools.Library.DatFiles
 				Name = "fixDAT_" + Name;
 				Description = "fixDAT_" + Description;
 				RemoveMarkedItems();
-				WriteToFile(outDir);
+				Write(outDir);
 			}
 
 			return success;
@@ -4569,7 +4537,7 @@ namespace SabreTools.Library.DatFiles
 			FileName = "fixDAT_" + FileName;
 			Name = "fixDAT_" + Name;
 			Description = "fixDAT_" + Description;
-			WriteToFile();
+			Write();
 
 			return success;
 		}
@@ -4645,7 +4613,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Now output the fixdat to the main folder
-			success &= matched.WriteToFile(stats: true);
+			success &= matched.Write(stats: true);
 
 			return success;
 		}
@@ -4801,8 +4769,8 @@ namespace SabreTools.Library.DatFiles
 			});
 
 			// Then write out both files
-			bool success = datdataA.WriteToFile(outDir);
-			success &= datdataB.WriteToFile(outDir);
+			bool success = datdataA.Write(outDir);
+			success &= datdataB.Write(outDir);
 
 			return success;
 		}
@@ -5049,13 +5017,13 @@ namespace SabreTools.Library.DatFiles
 			// Now, output all of the files to the output directory
 			Globals.Logger.User("DAT information created, outputting new files");
 			bool success = true;
-			success &= nodump.WriteToFile(outDir);
-			success &= sha512.WriteToFile(outDir);
-			success &= sha384.WriteToFile(outDir);
-			success &= sha256.WriteToFile(outDir);
-			success &= sha1.WriteToFile(outDir);
-			success &= md5.WriteToFile(outDir);
-			success &= crc.WriteToFile(outDir);
+			success &= nodump.Write(outDir);
+			success &= sha512.Write(outDir);
+			success &= sha384.Write(outDir);
+			success &= sha256.Write(outDir);
+			success &= sha1.Write(outDir);
+			success &= md5.Write(outDir);
+			success &= crc.Write(outDir);
 
 			return success;
 		}
@@ -5156,7 +5124,7 @@ namespace SabreTools.Library.DatFiles
 			datFile.Type = null;
 
 			// Write out the temporary DAT to the proper directory
-			datFile.WriteToFile(outDir);
+			datFile.Write(outDir);
 		}
 
 		/// <summary>
@@ -5260,9 +5228,9 @@ namespace SabreTools.Library.DatFiles
 			// Now, output all of the files to the output directory
 			Globals.Logger.User("DAT information created, outputting new files");
 			bool success = true;
-			success &= romdat.WriteToFile(outDir);
-			success &= diskdat.WriteToFile(outDir);
-			success &= sampledat.WriteToFile(outDir);
+			success &= romdat.Write(outDir);
+			success &= diskdat.Write(outDir);
+			success &= sampledat.Write(outDir);
 
 			return success;
 		}
@@ -5360,7 +5328,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <param name="overwrite">True if files should be overwritten (default), false if they should be renamed instead</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
-		public bool WriteToFile(string outDir = null, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
+		public bool Write(string outDir = null, bool norename = true, bool stats = false, bool ignoreblanks = false, bool overwrite = true)
 		{
 			// If there's nothing there, abort
 			if (Count == 0)
@@ -5458,63 +5426,7 @@ namespace SabreTools.Library.DatFiles
 					string outfile = outfiles[datFormat];
 					try
 					{
-						switch (datFormat)
-						{
-							case DatFormat.AttractMode:
-								new AttractMode(this).WriteToFile(outfile);
-								break;
-							case DatFormat.ClrMamePro:
-								new ClrMamePro(this).WriteToFile(outfile, ignoreblanks);
-								break;
-							case DatFormat.CSV:
-								new SeparatedValue(this, ',').WriteToFile(outfile, ignoreblanks);
-								break;
-							case DatFormat.DOSCenter:
-								new DosCenter(this).WriteToFile(outfile, ignoreblanks);
-								break;
-							case DatFormat.Listroms:
-								new Listroms(this).WriteToFile(outfile, ignoreblanks);
-								break;
-							case DatFormat.Logiqx:
-								new Logiqx(this).WriteToFile(outfile, ignoreblanks);
-								break;
-							case DatFormat.MissFile:
-								new Missfile(this).WriteToFile(outfile, ignoreblanks);
-								break;
-							case DatFormat.OfflineList:
-								new OfflineList(this).WriteToFile(outfile, ignoreblanks);
-								break;
-							case DatFormat.RedumpMD5:
-								new Hashfile(this).WriteToFile(outfile, Hash.MD5, ignoreblanks);
-								break;
-							case DatFormat.RedumpSFV:
-								new Hashfile(this).WriteToFile(outfile, Hash.CRC, ignoreblanks);
-								break;
-							case DatFormat.RedumpSHA1:
-								new Hashfile(this).WriteToFile(outfile, Hash.SHA1, ignoreblanks);
-								break;
-							case DatFormat.RedumpSHA256:
-								new Hashfile(this).WriteToFile(outfile, Hash.SHA256, ignoreblanks);
-								break;
-							case DatFormat.RedumpSHA384:
-								new Hashfile(this).WriteToFile(outfile, Hash.SHA384, ignoreblanks);
-								break;
-							case DatFormat.RedumpSHA512:
-								new Hashfile(this).WriteToFile(outfile, Hash.SHA512, ignoreblanks);
-								break;
-							case DatFormat.RomCenter:
-								new RomCenter(this).WriteToFile(outfile, ignoreblanks);
-								break;
-							case DatFormat.SabreDat:
-								new SabreDat(this).WriteToFile(outfile, ignoreblanks);
-								break;
-							case DatFormat.SoftwareList:
-								new SoftwareList(this).WriteToFile(outfile, ignoreblanks);
-								break;
-							case DatFormat.TSV:
-								new SeparatedValue(this, '\t').WriteToFile(outfile, ignoreblanks);
-								break;
-						}
+						Utilities.CreateDatFileFromTypeAndBase(datFormat, this)?.WriteToFile(outfile, ignoreblanks);
 					}
 					catch (Exception ex)
 					{
@@ -5530,6 +5442,17 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Create and open an output file for writing direct from a dictionary
+		/// </summary>
+		/// <param name="outfile">Name of the file to write to</param>
+		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
+		/// <returns>True if the DAT was written correctly, false otherwise</returns>
+		public virtual bool WriteToFile(string outfile, bool ignoreblanks = false)
+		{
+			throw new NotImplementedException();
 		}
 
 		/// <summary>
