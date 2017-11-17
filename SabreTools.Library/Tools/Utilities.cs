@@ -441,7 +441,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="input">Name of the file to create the archive from</param>
 		/// <returns>Archive object representing the inputs</returns>
-		public static BaseArchive CreateArchiveFromExistingInput(string input)
+		public static BaseArchive GetArchive(string input)
 		{
 			BaseArchive archive = null;
 
@@ -483,7 +483,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="archiveType">SharpCompress.Common.ArchiveType representing the archive to create</param>
 		/// <returns>Archive object representing the inputs</returns>
-		public static BaseArchive CreateArchiveFromArchiveType(ArchiveType archiveType)
+		public static BaseArchive GetArchive(ArchiveType archiveType)
 		{
 			switch (archiveType)
 			{
@@ -507,7 +507,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="archiveType">SabreTools.Library.Data.SharpCompress.OutputFormat representing the archive to create</param>
 		/// <returns>Archive object representing the inputs</returns>
-		public static BaseArchive CreateArchiveFromOutputFormat(OutputFormat outputFormat)
+		public static BaseArchive GetArchive(OutputFormat outputFormat)
 		{
 			switch (outputFormat)
 			{
@@ -538,13 +538,39 @@ namespace SabreTools.Library.Tools
 			}
 		}
 
+
+		/// <summary>
+		/// Create a specific type of BaseReport to be used based on a format and user inputs
+		/// </summary>
+		/// <param name="statReportFormat">Format of the Statistics Report to be created</param>
+		/// <param name="filename">Name of the file to write out to</param>
+		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
+		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
+		/// <returns>BaseReport of the specific internal type that corresponds to the inputs</returns>
+		public static BaseReport GetBaseReport(StatReportFormat statReportFormat, string filename, bool baddumpCol, bool nodumpCol)
+		{
+			switch (statReportFormat)
+			{
+				case StatReportFormat.Textfile:
+					return new Textfile(null, filename, baddumpCol, nodumpCol);
+				case StatReportFormat.CSV:
+					return new Reports.SeparatedValue(null, filename, ',', baddumpCol, nodumpCol);
+				case StatReportFormat.HTML:
+					return new Html(null, filename, baddumpCol, nodumpCol);
+				case StatReportFormat.TSV:
+					return new Reports.SeparatedValue(null, filename, '\t', baddumpCol, nodumpCol);
+			}
+
+			return null;
+		}
+
 		/// <summary>
 		/// Create a specific type of DatFile to be used based on a format and a base DAT
 		/// </summary>
 		/// <param name="datFormat">Format of the DAT to be created</param>
 		/// <param name="baseDat">DatFile containing the information to use in specific operations</param>
 		/// <returns>DatFile of the specific internal type that corresponds to the inputs</returns>
-		public static DatFile CreateDatFileFromTypeAndBase(DatFormat datFormat, DatFile baseDat)
+		public static DatFile GetDatFile(DatFormat datFormat, DatFile baseDat)
 		{
 			switch (datFormat)
 			{
@@ -584,31 +610,6 @@ namespace SabreTools.Library.Tools
 					return new SoftwareList(baseDat);
 				case DatFormat.TSV:
 					return new DatFiles.SeparatedValue(baseDat, '\t');
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Create a specific type of BaseReport to be used based on a format and user inputs
-		/// </summary>
-		/// <param name="statReportFormat">Format of the Statistics Report to be created</param>
-		/// <param name="filename">Name of the file to write out to</param>
-		/// <param name="baddumpCol">True if baddumps should be included in output, false otherwise</param>
-		/// <param name="nodumpCol">True if nodumps should be included in output, false otherwise</param>
-		/// <returns>BaseReport of the specific internal type that corresponds to the inputs</returns>
-		public static BaseReport CreateBaseReportFromType(StatReportFormat statReportFormat, string filename, bool baddumpCol, bool nodumpCol)
-		{
-			switch (statReportFormat)
-			{
-				case StatReportFormat.Textfile:
-					return new Textfile(null, filename, baddumpCol, nodumpCol);
-				case StatReportFormat.CSV:
-					return new Reports.SeparatedValue(null, filename, ',', baddumpCol, nodumpCol);
-				case StatReportFormat.HTML:
-					return new Html(null, filename, baddumpCol, nodumpCol);
-				case StatReportFormat.TSV:
-					return new Reports.SeparatedValue(null, filename, '\t', baddumpCol, nodumpCol);
 			}
 
 			return null;

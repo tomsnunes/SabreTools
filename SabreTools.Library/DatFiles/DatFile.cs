@@ -3056,7 +3056,7 @@ namespace SabreTools.Library.DatFiles
 			// Now parse the correct type of DAT
 			try
 			{
-				Utilities.CreateDatFileFromTypeAndBase(Utilities.GetDatFormat(filename), this)?.ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
+				Utilities.GetDatFile(Utilities.GetDatFormat(filename), this)?.ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 			}
 			catch (Exception ex)
 			{
@@ -3488,7 +3488,7 @@ namespace SabreTools.Library.DatFiles
 			if (!archivesAsFiles)
 			{
 				// Get the base archive first
-				BaseArchive archive = Utilities.CreateArchiveFromExistingInput(newItem);
+				BaseArchive archive = Utilities.GetArchive(newItem);
 
 				// Now get all extracted items from the archive
 				if (archive != null)
@@ -3527,7 +3527,7 @@ namespace SabreTools.Library.DatFiles
 					List<string> empties = new List<string>();
 
 					// Get the base archive first
-					BaseArchive archive = Utilities.CreateArchiveFromExistingInput(newItem);
+					BaseArchive archive = Utilities.GetArchive(newItem);
 
 					// Now get all blank folders from the archive
 					if (archive != null)
@@ -4068,7 +4068,7 @@ namespace SabreTools.Library.DatFiles
 				bool isTorrentGzip = tgz.IsTorrent();
 
 				// Get the base archive first
-				BaseArchive archive = Utilities.CreateArchiveFromExistingInput(file);
+				BaseArchive archive = Utilities.GetArchive(file);
 
 				// Now get all extracted items from the archive
 				if (archive != null)
@@ -4197,7 +4197,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					BaseArchive archive = Utilities.CreateArchiveFromExistingInput(file);
+					BaseArchive archive = Utilities.GetArchive(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
@@ -4225,7 +4225,7 @@ namespace SabreTools.Library.DatFiles
 				foreach (DatItem item in dupes)
 				{
 					// Get the output archive, if possible
-					BaseArchive outputArchive = Utilities.CreateArchiveFromOutputFormat(outputFormat);
+					BaseArchive outputArchive = Utilities.GetArchive(outputFormat);
 
 					// Now rebuild to the output file
 					outputArchive.Write(fileStream, outDir, (Rom)item, date: date, romba: romba);
@@ -4279,7 +4279,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					BaseArchive archive = Utilities.CreateArchiveFromExistingInput(file);
+					BaseArchive archive = Utilities.GetArchive(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
@@ -4312,7 +4312,7 @@ namespace SabreTools.Library.DatFiles
 				Globals.Logger.User("No matches found for '{0}', rebuilding accordingly from inverse flag...", Path.GetFileName(datItem.Name));
 
 				// Get the output archive, if possible
-				BaseArchive outputArchive = Utilities.CreateArchiveFromOutputFormat(outputFormat);
+				BaseArchive outputArchive = Utilities.GetArchive(outputFormat);
 
 				// Now rebuild to the output file
 				if (outputArchive == null)
@@ -4369,7 +4369,7 @@ namespace SabreTools.Library.DatFiles
 				if (isZip != null)
 				{
 					string realName = null;
-					BaseArchive archive = Utilities.CreateArchiveFromExistingInput(file);
+					BaseArchive archive = Utilities.GetArchive(file);
 					if (archive != null)
 					{
 						(fileStream, realName) = archive.ExtractEntryStream(datItem.Name);
@@ -4429,7 +4429,7 @@ namespace SabreTools.Library.DatFiles
 								bool eitherSuccess = false;
 
 								// Get the output archive, if possible
-								BaseArchive outputArchive = Utilities.CreateArchiveFromOutputFormat(outputFormat);
+								BaseArchive outputArchive = Utilities.GetArchive(outputFormat);
 
 								// Now rebuild to the output file
 								eitherSuccess |= outputArchive.Write(transformStream, outDir, (Rom)item, date: date, romba: romba);
@@ -5426,7 +5426,7 @@ namespace SabreTools.Library.DatFiles
 					string outfile = outfiles[datFormat];
 					try
 					{
-						Utilities.CreateDatFileFromTypeAndBase(datFormat, this)?.WriteToFile(outfile, ignoreblanks);
+						Utilities.GetDatFile(datFormat, this)?.WriteToFile(outfile, ignoreblanks);
 					}
 					catch (Exception ex)
 					{
@@ -5702,7 +5702,7 @@ namespace SabreTools.Library.DatFiles
 			// Loop through and output based on the inputs
 			foreach (KeyValuePair<StatReportFormat, string> kvp in outputs)
 			{
-				reports.Add(Utilities.CreateBaseReportFromType(kvp.Key, kvp.Value, baddumpCol, nodumpCol));
+				reports.Add(Utilities.GetBaseReport(kvp.Key, kvp.Value, baddumpCol, nodumpCol));
 			}
 
 			// Write the header, if any
