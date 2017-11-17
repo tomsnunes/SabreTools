@@ -155,7 +155,7 @@ namespace RombaSharp
 				slc.ExecuteNonQuery();
 				slc.Dispose();
 			}
-			if (sha1query != "INSERT OR IGNORE INTO sha1 (sha1) VALUES")
+			if (sha1query != "INSERT OR IGNORE INTO sha1 (sha1, depot) VALUES")
 			{
 				SqliteCommand slc = new SqliteCommand(sha1query.TrimEnd(','), dbc);
 				slc.ExecuteNonQuery();
