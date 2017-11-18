@@ -3336,6 +3336,9 @@ namespace SabreTools.Library.DatFiles
 				Description = Name + (bare ? "" : " (" + Date + ")");
 			}
 
+			// Clean the temp directory path
+			tempDir = (String.IsNullOrWhiteSpace(tempDir) ? Path.GetTempPath() : tempDir);
+
 			// Process the input
 			if (Directory.Exists(basePath))
 			{

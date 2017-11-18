@@ -124,9 +124,6 @@ namespace SabreTools
 				Type = (superdat ? "SuperDAT" : ""),
 			};
 
-			// Clean the temp directory
-			tempDir = (String.IsNullOrWhiteSpace(tempDir) ? Path.GetTempPath() : tempDir);
-
 			// For each input directory, create a DAT
 			foreach (string path in inputs)
 			{
