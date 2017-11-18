@@ -124,34 +124,15 @@ namespace SabreTools
 				Type = (superdat ? "SuperDAT" : ""),
 			};
 
-			// Clean the temp directory
-			tempDir = (String.IsNullOrWhiteSpace(tempDir) ? Path.GetTempPath() : tempDir);
+			// Attempt to create all of the DatFiles
+			bool success = DatFile.PopulateDatsFromDirs(basedat, inputs, omitFromScan, removeDateFromAutomaticName, archivesAsFiles,
+				skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, headerToCheckAgainst, chdsAsFiles);
 
-			// For each input directory, create a DAT
-			foreach (string path in inputs)
+			// If it was not successful, show the help
+			if (!success)
 			{
-				if (Directory.Exists(path) || File.Exists(path))
-				{
-					// Clone the base Dat for information
-					DatFile datdata = new DatFile(basedat);
-
-					string basePath = Path.GetFullPath(path);
-					bool success = datdata.PopulateFromDir(basePath, omitFromScan, removeDateFromAutomaticName, archivesAsFiles,
-						skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, headerToCheckAgainst, chdsAsFiles);
-
-					// If it was a success, write the DAT out
-					if (success)
-					{
-						datdata.WriteToFile(outDir);
-					}
-
-					// Otherwise, show the help
-					else
-					{
-						Console.WriteLine();
-						_help.OutputIndividualFeature("DATFromDir");
-					}
-				}
+				Console.WriteLine();
+				_help.OutputIndividualFeature("DATFromDir");
 			}
 		}
 

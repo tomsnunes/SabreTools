@@ -5657,6 +5657,59 @@ namespace SabreTools.Library.DatFiles
 
 		#region Static Methods
 
+		#region Populate DAT from Directory
+
+		/// <summary>
+		/// Populate and output DatFiles based on a base DatFile and user inputs
+		/// </summary>
+		/// <param name="basedat">Base DAT that contains special header information to use</param>
+		/// <param name="inputs">List of inputs to attempt to make DatFiles from</param>
+		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
+		/// <param name="bare">True if the date should be omitted from the DAT, false otherwise</param>
+		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
+		/// <param name="skipFileType">Type of files that should be skipped</param>
+		/// <param name="addBlanks">True if blank items should be created for empty folders, false otherwise</param>
+		/// <param name="addDate">True if dates should be archived for all files, false otherwise</param>
+		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is current directory)</param>
+		/// <param name="outDir">Output directory to write created DatFiles</param>
+		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
+		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
+		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
+		/// <returns>True if all DatFiles have been populated successfully, false otherwise</returns>
+		public static bool PopulateDatsFromDirs(DatFile basedat, List<string> inputs, Hash omitFromScan, bool bare, bool archivesAsFiles, SkipFileType skipFileType,
+			bool addBlanks, bool addDate, string tempDir, string outDir, bool copyFiles, string headerToCheckAgainst, bool chdsAsFiles)
+		{
+			// Clean the temp directory
+			tempDir = (String.IsNullOrWhiteSpace(tempDir) ? Path.GetTempPath() : tempDir);
+
+			// Set the output variable
+			bool success = true;
+
+			// For each input directory, create a DAT
+			foreach (string path in inputs)
+			{
+				if (Directory.Exists(path) || File.Exists(path))
+				{
+					// Clone the base Dat for information
+					DatFile datdata = new DatFile(basedat);
+
+					string basePath = Path.GetFullPath(path);
+					success &= datdata.PopulateFromDir(basePath, omitFromScan, bare, archivesAsFiles,
+						skipFileType, addBlanks, addDate, tempDir, copyFiles, headerToCheckAgainst, chdsAsFiles);
+
+					// If it was a success, write the DAT out
+					if (success)
+					{
+						datdata.WriteToFile(outDir);
+					}
+				}
+			}
+
+			return success;
+		}
+
+		#endregion
+
 		#region Statistics
 
 		/// <summary>
