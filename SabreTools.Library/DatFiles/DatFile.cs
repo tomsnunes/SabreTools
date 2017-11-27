@@ -3332,7 +3332,8 @@ namespace SabreTools.Library.DatFiles
 			// If neither the name or description are defined, set them from the automatic values
 			else if (String.IsNullOrWhiteSpace(Name) && String.IsNullOrWhiteSpace(Description))
 			{
-				Name = basePath.Split(Path.DirectorySeparatorChar).Last();
+				string[] splitpath = basePath.Split(Path.DirectorySeparatorChar);
+				Name = String.IsNullOrWhiteSpace(splitpath.Last()) ? splitpath[splitpath.Length - 2] : splitpath.Last();
 				Description = Name + (bare ? "" : " (" + Date + ")");
 			}
 

@@ -1560,6 +1560,10 @@ namespace SabreTools.Library.Tools
 					{
 						input.Seek(offset, SeekOrigin.Begin);
 					}
+					else
+					{
+						input.Seek(0, SeekOrigin.Begin);
+					}
 				}
 				catch (NotSupportedException)
 				{
@@ -1629,6 +1633,10 @@ namespace SabreTools.Library.Tools
 					else if (offset > 0)
 					{
 						input.Seek(offset, SeekOrigin.Begin);
+					}
+					else
+					{
+						input.Seek(0, SeekOrigin.Begin);
 					}
 				}
 				catch (NotSupportedException)

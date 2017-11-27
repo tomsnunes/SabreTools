@@ -139,7 +139,7 @@ namespace SabreTools
 					// If it was a success, write the DAT out
 					if (success)
 					{
-						datdata.WriteToFile(outDir);
+						datdata.Write(outDir);
 					}
 
 					// Otherwise, show the help
