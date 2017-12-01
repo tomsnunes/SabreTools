@@ -2050,12 +2050,14 @@ namespace SabreTools.Library.Tools
 		/// <param name="outDir">Output directory to use</param>
 		/// <param name="inputpath">Input path to create output for</param>
 		/// <param name="inplace">True if the output file should go to the same input folder, false otherwise</param>
-		/// <param name="splitpath">True if the input path should be treated as an appended parent directory, false otherwise (default)</param>
 		/// <returns>Complete output path</returns>
-		public static string GetOutputPath(string outDir, string inputpath, bool inplace, bool splitpath = false)
+		public static string GetOutputPath(string outDir, string inputpath, bool inplace)
 		{
 			// First, we need to ensure the output directory
 			outDir = EnsureOutputDirectory(outDir);
+
+			// Check if we have a split path or not
+			bool splitpath = inputpath.Contains("¬");
 
 			// If we have a split path, we need to treat the input separately
 			if (splitpath)

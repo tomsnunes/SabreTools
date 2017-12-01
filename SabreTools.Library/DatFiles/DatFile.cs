@@ -1678,7 +1678,7 @@ namespace SabreTools.Library.DatFiles
 					DedupeRoms = DedupeRoms,
 				};
 
-				datHeaders[i].Parse(input.Split('¬')[0], i, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
+				datHeaders[i].Parse(input, i, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 			});
 
 			watch.Stop();
@@ -1755,14 +1755,11 @@ namespace SabreTools.Library.DatFiles
 			List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
 			foreach (string path in inputFileNames)
 			{
-				// Get the two halves of the path
-				string[] splitpath = path.Split('¬');
-
-				Globals.Logger.User("Replacing items in '{0}'' from the base DAT", splitpath[0]);
+				Globals.Logger.User("Replacing items in '{0}'' from the base DAT", path.Split('¬')[0]);
 
 				// First we parse in the DAT internally
 				DatFile intDat = new DatFile();
-				intDat.Parse(splitpath[0], 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
+				intDat.Parse(path, 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 
 				// For comparison's sake, we want to use CRC as the base ordering
 				intDat.BucketBy(SortedBy.CRC, DedupeType.Full);
@@ -1792,7 +1789,7 @@ namespace SabreTools.Library.DatFiles
 				});
 
 				// Determine the output path for the DAT
-				string interOutDir = Utilities.GetOutputPath(outDir, path, inplace, splitpath: true);
+				string interOutDir = Utilities.GetOutputPath(outDir, path, inplace);
 
 				// Once we're done, try writing out
 				intDat.Write(interOutDir);
@@ -1838,14 +1835,11 @@ namespace SabreTools.Library.DatFiles
 			List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
 			foreach (string path in inputFileNames)
 			{
-				// Get the two halves of the path
-				string[] splitpath = path.Split('¬');
-
-				Globals.Logger.User("Comparing '{0}'' to base DAT", splitpath[0]);
+				Globals.Logger.User("Comparing '{0}'' to base DAT", path.Split('¬')[0]);
 
 				// First we parse in the DAT internally
 				DatFile intDat = new DatFile();
-				intDat.Parse(splitpath[0], 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
+				intDat.Parse(path, 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 
 				// For comparison's sake, we want to use CRC as the base ordering
 				intDat.BucketBy(SortedBy.CRC, DedupeType.Full);
@@ -1870,7 +1864,7 @@ namespace SabreTools.Library.DatFiles
 				});
 
 				// Determine the output path for the DAT
-				string interOutDir = Utilities.GetOutputPath(outDir, path, inplace, splitpath: true);
+				string interOutDir = Utilities.GetOutputPath(outDir, path, inplace);
 
 				// Once we're done, try writing out
 				intDat.Write(interOutDir);
@@ -1959,7 +1953,7 @@ namespace SabreTools.Library.DatFiles
 
 			Parallel.For((skip ? 1 : 0), inputs.Count, Globals.ParallelOptions, j =>
 			{
-				string path = Utilities.GetOutputPath(outDir, inputs[j], inplace, splitpath: true);
+				string path = Utilities.GetOutputPath(outDir, inputs[j], inplace);
 
 				// Try to output the file
 				outDats[j].Write(path);
@@ -2118,7 +2112,7 @@ namespace SabreTools.Library.DatFiles
 			{
 				Parallel.For(0, inputs.Count, Globals.ParallelOptions, j =>
 				{
-					string path = Utilities.GetOutputPath(outDir, inputs[j], false /* inplace */, splitpath: true);
+					string path = Utilities.GetOutputPath(outDir, inputs[j], false /* inplace */);
 
 					// Try to output the file
 					outDats[j].Write(path);
@@ -2190,19 +2184,19 @@ namespace SabreTools.Library.DatFiles
 			Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			// Get only files from the input first
-			inputFileNames = Utilities.GetOnlyFilesFromInputs(inputFileNames);
+			inputFileNames = Utilities.GetOnlyFilesFromInputs(inputFileNames, appendparent: true);
 
 			// Iterate over the files
 			foreach (string file in inputFileNames)
 			{
 				DatFile innerDatdata = new DatFile(this);
-				Globals.Logger.User("Processing '{0}'", Path.GetFileName(file));
+				Globals.Logger.User("Processing '{0}'", Path.GetFileName(file.Split('¬')[0]));
 				innerDatdata.Parse(file, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
 					keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
 				innerDatdata.Filter(filter, trim, single, root);
 
 				// Get the correct output path
-				string realOutDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: false);
+				string realOutDir = Utilities.GetOutputPath(outDir, file, inplace);
 
 				// Try to output the file, overwriting only if it's not in the current directory
 				// TODO: Figure out if overwriting should always happen of if there should be a user flag
@@ -3035,6 +3029,12 @@ namespace SabreTools.Library.DatFiles
 			bool keepext = false,
 			bool useTags = false)
 		{
+			// Check if we have a split path and get the filename accordingly
+			if (filename.Contains("¬"))
+			{
+				filename = filename.Split('¬')[0];
+			}
+
 			// Check the file extension first as a safeguard
 			string ext = Path.GetExtension(filename).ToLowerInvariant();
 			if (ext.StartsWith("."))
@@ -4652,14 +4652,11 @@ namespace SabreTools.Library.DatFiles
 			// Loop over the input files
 			foreach (string file in files)
 			{
-				// Split the input filename
-				string[] splitpath = file.Split('¬');
-
 				// Create and fill the new DAT
-				Parse(splitpath[0], 0, 0);
+				Parse(file, 0, 0);
 
 				// Get the output directory
-				outDir = Utilities.GetOutputPath(outDir, file, inplace, splitpath: true);
+				outDir = Utilities.GetOutputPath(outDir, file, inplace);
 
 				// Split and write the DAT
 				if ((splittingMode & SplittingMode.Extension) != 0)
