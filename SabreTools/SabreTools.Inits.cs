@@ -87,20 +87,7 @@ namespace SabreTools
 			string headerToCheckAgainst,
 			bool chdsAsFiles)
 		{
-			ForcePacking fp = ForcePacking.None;
-			switch (forcepack?.ToLowerInvariant())
-			{
-				case "none":
-				default:
-					fp = ForcePacking.None;
-					break;
-				case "zip":
-					fp = ForcePacking.Zip;
-					break;
-				case "unzip":
-					fp = ForcePacking.Unzip;
-					break;
-			}
+			ForcePacking fp = Utilities.GetForcePacking(forcepack);
 
 			// Create a new DATFromDir object and process the inputs
 			DatFile basedat = new DatFile
@@ -394,68 +381,9 @@ namespace SabreTools
 			Hash stripHash)
 		{
 			// Set the special flags
-			ForceMerging fm = ForceMerging.None;
-			if (!String.IsNullOrWhiteSpace(forcemerge))
-			{
-				switch (forcemerge.ToLowerInvariant())
-				{
-					case "none":
-						fm = ForceMerging.None;
-						break;
-					case "split":
-						fm = ForceMerging.Split;
-						break;
-					case "full":
-						fm = ForceMerging.Full;
-						break;
-					default:
-						Globals.Logger.Warning("{0} is not a valid merge flag", forcemerge);
-						break;
-				}
-			}
-
-			ForceNodump fn = ForceNodump.None;
-			if (!String.IsNullOrWhiteSpace(forcend))
-			{
-				switch (forcend.ToLowerInvariant())
-				{
-					case "none":
-						fn = ForceNodump.None;
-						break;
-					case "obsolete":
-						fn = ForceNodump.Obsolete;
-						break;
-					case "required":
-						fn = ForceNodump.Required;
-						break;
-					case "ignore":
-						fn = ForceNodump.Ignore;
-						break;
-					default:
-						Globals.Logger.Warning("{0} is not a valid nodump flag", forcend);
-						break;
-				}
-			}
-
-			ForcePacking fp = ForcePacking.None;
-			if (!String.IsNullOrWhiteSpace(forcepack))
-			{
-				switch (forcepack.ToLowerInvariant())
-				{
-					case "none":
-						fp = ForcePacking.None;
-						break;
-					case "zip":
-						fp = ForcePacking.Zip;
-						break;
-					case "unzip":
-						fp = ForcePacking.Unzip;
-						break;
-					default:
-						Globals.Logger.Warning("{0} is not a valid packing flag", forcepack);
-						break;
-				}
-			}
+			ForceMerging fm = Utilities.GetForceMerging(forcemerge);
+			ForceNodump fn = Utilities.GetForceNodump(forcend);
+			ForcePacking fp = Utilities.GetForcePacking(forcepack);
 
 			// Normalize the extensions
 			addext = (addext == "" || addext.StartsWith(".") ? addext : "." + addext);

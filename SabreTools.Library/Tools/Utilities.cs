@@ -304,6 +304,65 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get ForceMerging value from input string
+		/// </summary>
+		/// <param name="forcemerge">String to get value from</param>
+		/// <returns>ForceMerging value corresponding to the string</returns>
+		public static ForceMerging GetForceMerging(string forcemerge)
+		{
+			switch (forcemerge?.ToLowerInvariant())
+			{
+				case "none":
+				default:
+					return ForceMerging.None;
+				case "split":
+					return ForceMerging.Split;
+				case "full":
+					return ForceMerging.Full;
+			}
+		}
+
+		/// <summary>
+		/// Get ForceNodump value from input string
+		/// </summary>
+		/// <param name="forcend">String to get value from</param>
+		/// <returns>ForceNodump value corresponding to the string</returns>
+		public static ForceNodump GetForceNodump(string forcend)
+		{
+			switch (forcend?.ToLowerInvariant())
+			{
+				case "none":
+				default:
+					return ForceNodump.None;
+				case "obsolete":
+					return ForceNodump.Obsolete;
+				case "required":
+					return ForceNodump.Required;
+				case "ignore":
+					return ForceNodump.Ignore;
+			}
+		}
+
+		/// <summary>
+		/// Get ForcePacking value from input string
+		/// </summary>
+		/// <param name="forcepack">String to get value from</param>
+		/// <returns>ForcePacking value corresponding to the string</returns>
+		public static ForcePacking GetForcePacking(string forcepack)
+		{
+			switch (forcepack?.ToLowerInvariant())
+			{
+				case "none":
+				default:
+					return ForcePacking.None;
+				case "zip":
+					return ForcePacking.Zip;
+				case "unzip":
+					return ForcePacking.Unzip;
+			}
+		}
+
+		/// <summary>
 		/// Replace accented characters
 		/// </summary>
 		/// <param name="input">String to be parsed</param>
