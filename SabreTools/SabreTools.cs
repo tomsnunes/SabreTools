@@ -740,7 +740,7 @@ namespace SabreTools
 						break;
 					case "-gt":
 					case "--game-type":
-						filter.MachineTypes |= Filter.GetMachineTypeFromString(args[++i]);
+						filter.MachineTypes |= Utilities.GetMachineType(args[++i]);
 						break;
 					case "-gz":
 					case "--gz":
@@ -759,7 +759,7 @@ namespace SabreTools
 						break;
 					case "-is":
 					case "--status":
-						filter.ItemStatuses |= Filter.GetStatusFromString(args[++i]);
+						filter.ItemStatuses |= Utilities.GetItemStatus(args[++i]);
 						break;
 					case "-md5":
 					case "--md5":
@@ -790,11 +790,11 @@ namespace SabreTools
 						break;
 					case "-ngt":
 					case "--not-gtype":
-						filter.NotMachineTypes |= Filter.GetMachineTypeFromString(args[++i]);
+						filter.NotMachineTypes |= Utilities.GetMachineType(args[++i]);
 						break;
 					case "-nis":
 					case "--not-status":
-						filter.NotItemStatuses |= Filter.GetStatusFromString(args[++i]);
+						filter.NotItemStatuses |= Utilities.GetItemStatus(args[++i]);
 						break;
 					case "-nmd5":
 					case "--not-md5":
@@ -1026,7 +1026,7 @@ namespace SabreTools
 									break;
 								case "-gt":
 								case "--game-type":
-									filter.MachineTypes |= Filter.GetMachineTypeFromString(argsplit[1]);
+									filter.MachineTypes |= Utilities.GetMachineType(argsplit[1]);
 									break;
 								case "-gz":
 								case "--gz":
@@ -1045,7 +1045,7 @@ namespace SabreTools
 									break;
 								case "-is":
 								case "--status":
-									filter.ItemStatuses |= Filter.GetStatusFromString(argsplit[1]);
+									filter.ItemStatuses |= Utilities.GetItemStatus(argsplit[1]);
 									break;
 								case "-md5":
 								case "--md5":
@@ -1076,11 +1076,11 @@ namespace SabreTools
 									break;
 								case "-ngt":
 								case "--not-gtype":
-									filter.NotMachineTypes |= Filter.GetMachineTypeFromString(argsplit[1]);
+									filter.NotMachineTypes |= Utilities.GetMachineType(argsplit[1]);
 									break;
 								case "-nis":
 								case "--not-status":
-									filter.NotItemStatuses |= Filter.GetStatusFromString(argsplit[1]);
+									filter.NotItemStatuses |= Utilities.GetItemStatus(argsplit[1]);
 									break;
 								case "-nmd5":
 								case "--not-md5":

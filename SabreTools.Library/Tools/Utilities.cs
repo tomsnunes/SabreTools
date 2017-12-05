@@ -363,6 +363,52 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get MachineType value from input string
+		/// </summary>
+		/// <param name="gametype">String to get value from</param>
+		/// <returns>MachineType value corresponding to the string</returns>
+		public static MachineType GetMachineType(string gametype)
+		{
+			switch (gametype?.ToLowerInvariant())
+			{
+				case "none":
+				default:
+					return MachineType.None;
+				case "bios":
+					return MachineType.Bios;
+				case "dev":
+				case "device":
+					return MachineType.Device;
+				case "mech":
+				case "mechanical":
+					return MachineType.Mechanical;
+			}
+		}
+
+		/// <summary>
+		/// Get ItemStatus value from input string
+		/// </summary>
+		/// <param name="status">String to get value from</param>
+		/// <returns>ItemStatus value corresponding to the string</returns>
+		public static ItemStatus GetItemStatus(string status)
+		{
+			switch (status?.ToLowerInvariant())
+			{
+				case "none":
+				default:
+					return ItemStatus.None;
+				case "good":
+					return ItemStatus.Good;
+				case "baddump":
+					return ItemStatus.BadDump;
+				case "nodump":
+					return ItemStatus.Nodump;
+				case "verified":
+					return ItemStatus.Verified;
+			}
+		}
+
+		/// <summary>
 		/// Replace accented characters
 		/// </summary>
 		/// <param name="input">String to be parsed</param>
