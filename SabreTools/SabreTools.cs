@@ -147,7 +147,6 @@ namespace SabreTools
 				postfix = "",
 				prefix = "",
 				repext = "",
-				root = "",
 				rootdir = null,
 				tempDir = "",
 				url = null,
@@ -521,6 +520,10 @@ namespace SabreTools
 					case "--roms":
 						usegame = false;
 						break;
+					case "-rbn":
+					case "--reverse-base-name":
+						updateMode |= UpdateMode.ReverseBaseReplace;
+						break;
 					case "-rc":
 					case "--rev-cascade":
 						updateMode |= UpdateMode.DiffReverseCascade;
@@ -564,6 +567,13 @@ namespace SabreTools
 					case "-s":
 					case "--short":
 						shortname = true;
+						break;
+					case "-sa":
+					case "--scan-all":
+						sevenzip = 0;
+						gz = 0;
+						rar = 0;
+						zip = 0;
 						break;
 					case "-sd":
 					case "--superdat":
@@ -655,273 +665,6 @@ namespace SabreTools
 						break;
 
 					// User inputs
-					case "-7z":
-					case "--7z":
-						if (!Int32.TryParse(args[++i], out sevenzip))
-						{
-							sevenzip = 1;
-						}
-						break;
-					case "-ae":
-					case "--add-ext":
-						addext = args[++i];
-						break;
-					case "-au":
-					case "--author":
-						author = args[++i];
-						break;
-					case "-bd":
-					case "--base-dat":
-						basePaths.Add(args[++i]);
-						break;
-					case "-ca":
-					case "--category=":
-						category = args[++i];
-						break;
-					case "-co":
-					case "--comment":
-						comment = args[++i];
-						break;
-					case "-crc":
-					case "--crc":
-						filter.CRCs.Add(args[++i]);
-						break;
-					case "-da":
-					case "--date":
-						i++;
-						date = args[++i];
-						break;
-					case "-dat":
-					case "--dat":
-						i++;
-						if (!File.Exists(args[i]) && !Directory.Exists(args[i]))
-						{
-							Globals.Logger.Error("Must be a valid file or folder of DATs: {0}", args[i]);
-							Globals.Logger.Close();
-							return;
-						}
-						datfiles.Add(args[i]);
-						break;
-					case "-de":
-					case "--desc":
-						description = args[++i];
-						break;
-					case "-em":
-					case "--email":
-						email = args[++i];
-						break;
-					case "-exta":
-					case "--exta":
-						exta.Add(args[++i]);
-						break;
-					case "-extb":
-					case "--extb":
-						extb.Add(args[++i]);
-						break;
-					case "-fi":
-					case "--filename":
-						filename = args[++i];
-						break;
-					case "-fm":
-					case "--forcemerge":
-						forcemerge = args[++i];
-						break;
-					case "-fn":
-					case "--forcend":
-						forcend = args[++i];
-						break;
-					case "-fp":
-					case "--forcepack":
-						forcepack = args[++i];
-						break;
-					case "-gn":
-					case "--game-name":
-						filter.GameNames.Add(args[++i]);
-						break;
-					case "-gt":
-					case "--game-type":
-						filter.MachineTypes |= Utilities.GetMachineType(args[++i]);
-						break;
-					case "-gz":
-					case "--gz":
-						if (!Int32.TryParse(args[++i], out gz))
-						{
-							gz = 2;
-						}
-						break;
-					case "-he":
-					case "--header":
-						header = args[++i];
-						break;
-					case "-hp":
-					case "--homepage":
-						homepage = args[++i];
-						break;
-					case "-is":
-					case "--status":
-						filter.ItemStatuses |= Utilities.GetItemStatus(args[++i]);
-						break;
-					case "-md5":
-					case "--md5":
-						filter.MD5s.Add(args[++i]);
-						break;
-					case "-mt":
-					case "--mt":
-						if (Int32.TryParse(args[++i], out int mdop))
-						{
-							Globals.MaxThreads = mdop;
-						}
-						else
-						{
-							Globals.MaxThreads = 4;
-						}
-						break;
-					case "-n":
-					case "--name":
-						name = args[++i];
-						break;
-					case "-ncrc":
-					case "--not-crc":
-						filter.NotCRCs.Add(args[++i]);
-						break;
-					case "-ngn":
-					case "--not-game":
-						filter.NotGameNames.Add(args[++i]);
-						break;
-					case "-ngt":
-					case "--not-gtype":
-						filter.NotMachineTypes |= Utilities.GetMachineType(args[++i]);
-						break;
-					case "-nis":
-					case "--not-status":
-						filter.NotItemStatuses |= Utilities.GetItemStatus(args[++i]);
-						break;
-					case "-nmd5":
-					case "--not-md5":
-						filter.NotMD5s.Add(args[++i]);
-						break;
-					case "-nrn":
-					case "--not-rom":
-						filter.NotRomNames.Add(args[++i]);
-						break;
-					case "-nrt":
-					case "--not-type":
-						filter.NotRomTypes.Add(args[++i]);
-						break;
-					case "-nsha1":
-					case "--not-sha1":
-						filter.NotSHA1s.Add(args[++i]);
-						break;
-					case "-nsha256":
-					case "--not-sha256":
-						filter.NotSHA256s.Add(args[++i]);
-						break;
-					case "-nsha384":
-					case "--not-sha384":
-						filter.NotSHA384s.Add(args[++i]);
-						break;
-					case "-nsha512":
-					case "--not-sha512":
-						filter.NotSHA512s.Add(args[++i]);
-						break;
-					case "-out":
-					case "--out":
-						outDir = args[++i];
-						break;
-					case "-post":
-					case "--postfix":
-						postfix = args[++i];
-						break;
-					case "-pre":
-					case "--prefix":
-						prefix = args[++i];
-						break;
-					case "-rar":
-					case "--rar":
-						if (!Int32.TryParse(args[++i], out rar))
-						{
-							rar = 2;
-						}
-						break;
-					case "-rbn":
-					case "--reverse-base-name":
-						updateMode |= UpdateMode.ReverseBaseReplace;
-						break;
-					case "-rd":
-					case "--root-dir":
-						filter.Root = args[++i];
-						break;
-					case "-rep":
-					case "--rep-ext":
-						repext = args[++i];
-						break;
-					case "-rn":
-					case "--rom-name":
-						filter.RomNames.Add(args[++i]);
-						break;
-					case "-root":
-					case "--root":
-						rootdir = args[++i];
-						break;
-					case "-rt":
-					case "--rom-type":
-						filter.RomTypes.Add(args[++i]);
-						break;
-					case "-sa":
-					case "--scan-all":
-						sevenzip = 0;
-						gz = 0;
-						rar = 0;
-						zip = 0;
-						break;
-					case "-seq":
-					case "--equal":
-						filter.SizeEqualTo = Utilities.GetSizeFromString(args[++i]);
-						break;
-					case "-sgt":
-					case "--greater":
-						filter.SizeGreaterThanOrEqual = Utilities.GetSizeFromString(args[++i]);
-						break;
-					case "-sha1":
-					case "--sha1":
-						filter.SHA1s.Add(args[++i]);
-						break;
-					case "-sha256":
-					case "--sha256":
-						filter.SHA256s.Add(args[++i]);
-						break;
-					case "-sha384":
-					case "--sha384":
-						filter.SHA384s.Add(args[++i]);
-						break;
-					case "-sha512":
-					case "--sha512":
-						filter.SHA512s.Add(args[++i]);
-						break;
-					case "-slt":
-					case "--less":
-						filter.SizeLessThanOrEqual = Utilities.GetSizeFromString(args[++i]);
-						break;
-					case "-t":
-					case "--temp":
-						tempDir = args[++i];
-						break;
-					case "-u":
-					case "-url":
-					case "--url":
-						url = args[++i];
-						break;
-					case "-v":
-					case "--version":
-						version = args[++i];
-						break;
-					case "-zip":
-					case "--zip":
-						if (!Int32.TryParse(args[++i], out zip))
-						{
-							zip = 1;
-						}
-						break;
 					default:
 						string temparg = args[i].Replace("\"", "").Replace("file://", "");
 
@@ -1053,13 +796,9 @@ namespace SabreTools
 									break;
 								case "-mt":
 								case "--mt":
-									if (Int32.TryParse(argsplit[1], out int odop))
+									if (Int32.TryParse(argsplit[1], out int mdop))
 									{
-										Globals.MaxThreads = odop;
-									}
-									else
-									{
-										Globals.MaxThreads = 4;
+										Globals.MaxThreads = mdop;
 									}
 									break;
 								case "-n":
@@ -1135,7 +874,7 @@ namespace SabreTools
 									break;
 								case "-rd":
 								case "--root-dir":
-									root = argsplit[1];
+									filter.Root = argsplit[1];
 									break;
 								case "-rep":
 								case "--rep-ext":
