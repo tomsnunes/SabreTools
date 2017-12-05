@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
+#if MONO
+using System.IO;
+#else
+using Alphaleonis.Win32.Filesystem;
+#endif
+
 using SabreTools.Library.Data;
 using SabreTools.Library.DatItems;
 
@@ -53,6 +59,9 @@ namespace SabreTools.Library.DatFiles
 		private long _sizeEqualTo;
 		private bool _includeOfInGame;
 		private bool? _runnable;
+		private bool _single;
+		private bool _trim;
+		private string _root;
 
 		#endregion
 
@@ -207,6 +216,21 @@ namespace SabreTools.Library.DatFiles
 			get { return _runnable; }
 			set { _runnable = value; }
 		}
+		public bool Single
+		{
+			get { return _single; }
+			set { _single = value; }
+		}
+		public bool Trim
+		{
+			get { return _trim; }
+			set { _trim = value; }
+		}
+		public string Root
+		{
+			get { return _root; }
+			set { _root = value; }
+		}
 
 		#endregion
 
@@ -251,11 +275,75 @@ namespace SabreTools.Library.DatFiles
 			_sizeEqualTo = -1;
 			_includeOfInGame = false;
 			_runnable = null;
+			_single = false;
+			_trim = false;
+			_root = null;
 		}
 
 		#endregion
 
 		#region Instance methods
+
+		/// <summary>
+		/// Filter a DatFile using the inputs
+		/// </summary>
+		/// <param name="datFile"></param>
+		/// <returns>True if the DatFile was filtered, false on error</returns>
+		public bool FilterDatFile(DatFile datFile)
+		{
+			try
+			{
+				// Loop over every key in the dictionary
+				List<string> keys = datFile.Keys;
+				foreach (string key in keys)
+				{
+					// For every item in the current key
+					List<DatItem> items = datFile[key];
+					List<DatItem> newitems = new List<DatItem>();
+					foreach (DatItem item in items)
+					{
+						// If the rom passes the filter, include it
+						if (ItemPasses(item))
+						{
+							// If we are in single game mode, rename all games
+							if (_single)
+							{
+								item.MachineName = "!";
+							}
+
+							// If we are in NTFS trim mode, trim the game name
+							if (_trim)
+							{
+								// Windows max name length is 260
+								int usableLength = 260 - item.MachineName.Length - _root.Length;
+								if (item.Name.Length > usableLength)
+								{
+									string ext = Path.GetExtension(item.Name);
+									item.Name = item.Name.Substring(0, usableLength - ext.Length);
+									item.Name += ext;
+								}
+							}
+
+							// Lock the list and add the item back
+							lock (newitems)
+							{
+								newitems.Add(item);
+							}
+						}
+					}
+
+					datFile.Remove(key);
+					datFile.AddRange(key, newitems);
+				}
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+				return false;
+			}
+
+			return true;
+		}
 
 		/// <summary>
 		/// Check to see if a DatItem passes the filter

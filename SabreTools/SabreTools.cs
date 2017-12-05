@@ -109,9 +109,7 @@ namespace SabreTools
 				showBaddumpColumn = false,
 				showNodumpColumn = false,
 				shortname = false,
-				single = false,
 				superdat = false,
-				trim = false,
 				skip = false,
 				updateDat = false,
 				usegame = true;
@@ -581,7 +579,7 @@ namespace SabreTools
 						break;
 					case "-si":
 					case "--single":
-						single = true;
+						filter.Single = true;
 						break;
 					case "-ska":
 					case "--skiparc":
@@ -617,7 +615,7 @@ namespace SabreTools
 						break;
 					case "-trim":
 					case "--trim":
-						trim = true;
+						filter.Trim = true;
 						break;
 					case "-ts":
 					case "--type":
@@ -851,7 +849,7 @@ namespace SabreTools
 						break;
 					case "-rd":
 					case "--root-dir":
-						root = args[++i];
+						filter.Root = args[++i];
 						break;
 					case "-rep":
 					case "--rep-ext":
@@ -1293,7 +1291,7 @@ namespace SabreTools
 			// Get statistics on input files
 			else if (stats)
 			{
-				InitStats(inputs, filename, outDir, single, showBaddumpColumn, showNodumpColumn, statDatFormat);
+				InitStats(inputs, filename, outDir, filter.Single, showBaddumpColumn, showNodumpColumn, statDatFormat);
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
@@ -1301,8 +1299,8 @@ namespace SabreTools
 			{
 				InitUpdate(inputs, basePaths, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, sceneDateStrip, datFormat, usegame, prefix, postfix, quotes, repext, addext, remext,
-					datPrefix, romba, updateMode, inplace, skip, removeDateFromAutomaticName, filter, splitType, trim, single, root, outDir,
-					cleanGameNames, removeUnicode, descAsName, dedup, stripHash);
+					datPrefix, romba, updateMode, inplace, skip, removeDateFromAutomaticName, filter, splitType, outDir, cleanGameNames, removeUnicode,
+					descAsName, dedup, stripHash);
 			}
 
 			// If we're using the verifier

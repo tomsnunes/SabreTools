@@ -306,11 +306,7 @@ namespace SabreTools
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
 		/// /* Filtering info */
 		/// <param name="filter">Pre-populated filter object for DAT filtering</param>
-		/// /* Trimming info */
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// /* Output DAT info */
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
@@ -363,12 +359,7 @@ namespace SabreTools
 
 			/* Filtering info */
 			Filter filter,
-
-			/* Trimming info */
 			SplitType splitType,
-			bool trim,
-			bool single,
-			string root,
 
 			/* Output DAT info */
 			string outDir,
@@ -455,7 +446,7 @@ namespace SabreTools
 			};
 			
 			userInputDat.DetermineUpdateType(inputPaths, basePaths, outDir, updateMode, inplace, skip, bare, clean,
-				remUnicode, descAsName, filter, splitType, trim, single, root);
+				remUnicode, descAsName, filter, splitType);
 		}
 
 		/// <summary>

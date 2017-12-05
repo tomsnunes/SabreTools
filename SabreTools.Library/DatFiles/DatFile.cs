@@ -1572,11 +1572,8 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		public void DetermineUpdateType(List<string> inputPaths, List<string> basePaths, string outDir, UpdateMode updateMode, bool inplace, bool skip,
-			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
+			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType)
 		{
 			// Ensure we only have files in the inputs
 			List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
@@ -1585,7 +1582,7 @@ namespace SabreTools.Library.DatFiles
 			// If we're in standard update mode, run through all of the inputs
 			if (updateMode == UpdateMode.None)
 			{
-				Update(inputFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
+				Update(inputFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType);
 				return;
 			}
 
@@ -1601,7 +1598,7 @@ namespace SabreTools.Library.DatFiles
 
 			// Populate the combined data and get the headers
 			List<DatFile> datHeaders = PopulateUserData(inputFileNames, inplace, clean,
-				   remUnicode, descAsName, outDir, filter, splitType, trim, single, root);
+				   remUnicode, descAsName, outDir, filter, splitType);
 
 			// If we're in merging mode
 			if ((updateMode & UpdateMode.Merge) != 0)
@@ -1624,13 +1621,13 @@ namespace SabreTools.Library.DatFiles
 			// If we have diff against mode
 			else if ((updateMode & UpdateMode.DiffAgainst) != 0)
 			{
-				DiffAgainst(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
+				DiffAgainst(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType);
 			}
 			// If we have one of the base replacement modes
 			else if ((updateMode & UpdateMode.BaseReplace) != 0
 				|| (updateMode & UpdateMode.ReverseBaseReplace) != 0)
 			{
-				BaseReplace(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
+				BaseReplace(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType);
 			}
 
 			return;
@@ -1648,12 +1645,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <returns>List of DatData objects representing headers</returns>
 		private List<DatFile> PopulateUserData(List<string> inputs, bool inplace, bool clean, bool remUnicode, bool descAsName,
-			string outDir, Filter filter, SplitType splitType, bool trim, bool single, string root)
+			string outDir, Filter filter, SplitType splitType)
 		{
 			DatFile[] datHeaders = new DatFile[inputs.Count];
 			InternalStopwatch watch = new InternalStopwatch("Processing individual DATs");
@@ -1693,7 +1687,7 @@ namespace SabreTools.Library.DatFiles
 			});
 
 			// Now that we have a merged DAT, filter it
-			Filter(filter, single, trim, root);
+			filter.FilterDatFile(this);
 
 			watch.Stop();
 
@@ -1716,7 +1710,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		public void BaseReplace(List<string> inputFileNames, List<string> baseFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
-			bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
+			bool descAsName, Filter filter, SplitType splitType)
 		{
 			// First we want to parse all of the base DATs into the input
 			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for replacement...");
@@ -1803,7 +1797,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		public void DiffAgainst(List<string> inputFileNames, List<string> baseFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
-			bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
+			bool descAsName, Filter filter, SplitType splitType)
 		{
 			// First we want to parse all of the base DATs into the input
 			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for comparison...");
@@ -2167,7 +2161,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		public void Update(List<string> inputFileNames, string outDir, bool inplace, bool clean, bool remUnicode, bool descAsName,
-			Filter filter, SplitType splitType, bool trim, bool single, string root)
+			Filter filter, SplitType splitType)
 		{
 			// Iterate over the files
 			foreach (string file in inputFileNames)
@@ -2176,7 +2170,7 @@ namespace SabreTools.Library.DatFiles
 				Globals.Logger.User("Processing '{0}'", Path.GetFileName(file.Split('¬')[0]));
 				innerDatdata.Parse(file, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
 					keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
-				innerDatdata.Filter(filter, trim, single, root);
+				filter.FilterDatFile(innerDatdata);
 
 				// Get the correct output path
 				string realOutDir = Utilities.GetOutputPath(outDir, file, inplace);
@@ -2250,66 +2244,6 @@ namespace SabreTools.Library.DatFiles
 		#endregion
 
 		#region Filtering
-
-		/// <summary>
-		/// Filter a DAT based on input parameters and modify the items
-		/// </summary>
-		/// <param name="filter">Filter object for passing to the DatItem level</param>
-		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
-		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
-		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		public void Filter(Filter filter, bool single, bool trim, string root)
-		{
-			try
-			{
-				// Loop over every key in the dictionary
-				List<string> keys = Keys;
-				foreach (string key in keys)
-				{
-					// For every item in the current key
-					List<DatItem> items = this[key];
-					List<DatItem> newitems = new List<DatItem>();
-					foreach (DatItem item in items)
-					{
-						// If the rom passes the filter, include it
-						if (filter.ItemPasses(item))
-						{
-							// If we are in single game mode, rename all games
-							if (single)
-							{
-								item.MachineName = "!";
-							}
-
-							// If we are in NTFS trim mode, trim the game name
-							if (trim)
-							{
-								// Windows max name length is 260
-								int usableLength = 260 - item.MachineName.Length - root.Length;
-								if (item.Name.Length > usableLength)
-								{
-									string ext = Path.GetExtension(item.Name);
-									item.Name = item.Name.Substring(0, usableLength - ext.Length);
-									item.Name += ext;
-								}
-							}
-
-							// Lock the list and add the item back
-							lock (newitems)
-							{
-								newitems.Add(item);
-							}
-						}
-					}
-
-					Remove(key);
-					AddRange(key, newitems);
-				}
-			}
-			catch (Exception ex)
-			{
-				Globals.Logger.Error(ex.ToString());
-			}
-		}
 
 		/// <summary>
 		/// Use game descriptions as names in the DAT, updating cloneof/romof/sampleof
