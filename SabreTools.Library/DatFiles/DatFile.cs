@@ -2989,24 +2989,7 @@ namespace SabreTools.Library.DatFiles
 			// If we are using tags from the DAT, set the proper input for split type unless overridden
 			if (useTags && splitType == SplitType.None)
 			{
-				switch (ForceMerging)
-				{
-					case ForceMerging.None:
-						// No-op
-						break;
-					case ForceMerging.Split:
-						splitType = SplitType.Split;
-						break;
-					case ForceMerging.Merged:
-						splitType = SplitType.Merged;
-						break;
-					case ForceMerging.NonMerged:
-						splitType = SplitType.NonMerged;
-						break;
-					case ForceMerging.Full:
-						splitType = SplitType.FullNonMerged;
-						break;
-				}
+				splitType = Utilities.GetSplitType(ForceMerging);
 			}
 
 			// Now we pre-process the DAT with the splitting/merging mode

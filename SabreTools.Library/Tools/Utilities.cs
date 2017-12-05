@@ -363,6 +363,29 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get ItemStatus value from input string
+		/// </summary>
+		/// <param name="status">String to get value from</param>
+		/// <returns>ItemStatus value corresponding to the string</returns>
+		public static ItemStatus GetItemStatus(string status)
+		{
+			switch (status?.ToLowerInvariant())
+			{
+				case "none":
+				default:
+					return ItemStatus.None;
+				case "good":
+					return ItemStatus.Good;
+				case "baddump":
+					return ItemStatus.BadDump;
+				case "nodump":
+					return ItemStatus.Nodump;
+				case "verified":
+					return ItemStatus.Verified;
+			}
+		}
+
+		/// <summary>
 		/// Get MachineType value from input string
 		/// </summary>
 		/// <param name="gametype">String to get value from</param>
@@ -386,25 +409,25 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// Get ItemStatus value from input string
+		/// Get SplitType value from input ForceMerging
 		/// </summary>
-		/// <param name="status">String to get value from</param>
-		/// <returns>ItemStatus value corresponding to the string</returns>
-		public static ItemStatus GetItemStatus(string status)
+		/// <param name="forceMerging">ForceMerging to get value from</param>
+		/// <returns>SplitType value corresponding to the string</returns>
+		public static SplitType GetSplitType(ForceMerging forceMerging)
 		{
-			switch (status?.ToLowerInvariant())
+			switch (forceMerging)
 			{
-				case "none":
+				case ForceMerging.None:
 				default:
-					return ItemStatus.None;
-				case "good":
-					return ItemStatus.Good;
-				case "baddump":
-					return ItemStatus.BadDump;
-				case "nodump":
-					return ItemStatus.Nodump;
-				case "verified":
-					return ItemStatus.Verified;
+					return SplitType.None;
+				case ForceMerging.Split:
+					return SplitType.Split;
+				case ForceMerging.Merged:
+					return SplitType.Merged;
+				case ForceMerging.NonMerged:
+					return SplitType.NonMerged;
+				case ForceMerging.Full:
+					return SplitType.FullNonMerged;
 			}
 		}
 
