@@ -3343,9 +3343,6 @@ namespace SabreTools.Library.DatFiles
 		private void CheckFileForHashes(string item, string basePath, Hash omitFromScan, bool bare, bool archivesAsFiles,
 			SkipFileType skipFileType, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst, bool chdsAsFiles)
 		{
-			// Define the temporary directory
-			string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, new Guid().ToString())) + Path.DirectorySeparatorChar;
-
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (Romba)
 			{
@@ -3450,9 +3447,6 @@ namespace SabreTools.Library.DatFiles
 			{
 				Utilities.TryDeleteDirectory(newBasePath);
 			}
-
-			// Delete the sub temp directory
-			Utilities.TryDeleteDirectory(tempSubDir);
 		}
 
 		/// <summary>
