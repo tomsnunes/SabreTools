@@ -2953,13 +2953,7 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			// Check the file extension first as a safeguard
-			string ext = Path.GetExtension(filename).ToLowerInvariant();
-			if (ext.StartsWith("."))
-			{
-				ext = ext.Substring(1);
-			}
-			if (ext != "dat" && ext != "csv" && ext != "md5" && ext != "sfv" && ext != "sha1" && ext != "sha256"
-				&& ext != "sha384" && ext != "sha512" && ext != "tsv" && ext != "txt" && ext != "xml")
+			if (!Utilities.HasValidDatExtension(filename))
 			{
 				return;
 			}
@@ -4597,14 +4591,14 @@ namespace SabreTools.Library.DatFiles
 			List<string> newExtA = new List<string>();
 			foreach (string s in extA)
 			{
-				newExtA.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
+				newExtA.Add((s.StartsWith(".") ? s.Substring(1) : s).ToUpperInvariant());
 			}
 			string newExtAString = string.Join(",", newExtA);
 
 			List<string> newExtB = new List<string>();
 			foreach (string s in extB)
 			{
-				newExtB.Add((s.StartsWith(".") ? s : "." + s).ToUpperInvariant());
+				newExtB.Add((s.StartsWith(".") ? s.Substring(1) : s).ToUpperInvariant());
 			}
 			string newExtBString = string.Join(",", newExtB);
 
@@ -4653,11 +4647,11 @@ namespace SabreTools.Library.DatFiles
 				List<DatItem> items = this[key];
 				foreach (DatItem item in items)
 				{
-					if (newExtA.Contains(Path.GetExtension(item.Name.ToUpperInvariant())))
+					if (newExtA.Contains(Utilities.GetExtension(item.Name.ToUpperInvariant())))
 					{
 						datdataA.Add(key, item);
 					}
-					else if (newExtB.Contains(Path.GetExtension(item.Name.ToUpperInvariant())))
+					else if (newExtB.Contains(Utilities.GetExtension(item.Name.ToUpperInvariant())))
 					{
 						datdataB.Add(key, item);
 					}

@@ -293,11 +293,7 @@ namespace SabreTools.Library.DatFiles
 				}
 				else if (rom.Type == ItemType.Rom)
 				{
-					string tempext = Path.GetExtension(((Rom)rom).Name);
-					if (!tempext.StartsWith("."))
-					{
-						tempext = "." + tempext;
-					}
+					string tempext = "." + Utilities.GetExtension(((Rom)rom).Name);
 
 					state += "\t\t\t<files>\n"
 						+ (((Rom)rom).CRC != null

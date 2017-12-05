@@ -61,7 +61,7 @@ namespace SabreTools.Library.Tools
 			_tofile = tofile;
 			_warnings = false;
 			_errors = false;
-			_filename = Path.GetFileNameWithoutExtension(filename) + " (" + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ")" + Path.GetExtension(filename);
+			_filename = Path.GetFileNameWithoutExtension(filename) + " (" + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ")." + Utilities.GetExtension(filename);
 			_filter = filter;
 
 			if (!Directory.Exists(_basepath))

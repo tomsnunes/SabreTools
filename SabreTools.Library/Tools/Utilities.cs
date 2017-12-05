@@ -865,15 +865,7 @@ namespace SabreTools.Library.Tools
 			}
 
 			// First line of defense is going to be the extension, for better or worse
-			string ext = Path.GetExtension(input).ToLowerInvariant();
-			if (ext.StartsWith("."))
-			{
-				ext = ext.Substring(1);
-			}
-
-			if (ext != "7z" && ext != "gz" && ext != "lzma" && ext != "rar"
-				&& ext != "rev" && ext != "r00" && ext != "r01" && ext != "tar"
-				&& ext != "tgz" && ext != "tlz" && ext != "zip" && ext != "zipx")
+			if (!HasValidArchiveExtension(input))
 			{
 				return outtype;
 			}
@@ -933,16 +925,13 @@ namespace SabreTools.Library.Tools
 		public static DatFormat GetDatFormat(string filename)
 		{
 			// Limit the output formats based on extension
-			string ext = Path.GetExtension(filename).ToLowerInvariant();
-			if (ext.StartsWith("."))
-			{
-				ext = ext.Substring(1);
-			}
-			if (ext != "csv" && ext != "dat" && ext != "md5" && ext != "sfv" && ext != "sha1"
-				&& ext != "sha384" && ext != "sha512" && ext != "tsv" && ext != "txt" && ext != "xml")
+			if (!HasValidDatExtension(filename))
 			{
 				return 0;
 			}
+
+			// Get the extension from the filename
+			string ext = GetExtension(filename);
 
 			// Read the input file, if possible
 			Globals.Logger.Verbose("Attempting to read file to get format: {0}", filename);
@@ -2114,6 +2103,37 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get the extension from the path, if possible
+		/// </summary>
+		/// <param name="path">Path to get extension from</param>
+		/// <returns>Extension, if possible</returns>
+		public static string GetExtension(string path)
+		{
+			// Check null or empty first
+			if (String.IsNullOrWhiteSpace(path))
+			{
+				return null;
+			}
+
+			// Get the extension from the path, if possible
+			string ext = Path.GetExtension(path)?.ToLowerInvariant();
+
+			// Check if the extension is null or empty
+			if (String.IsNullOrWhiteSpace(ext))
+			{
+				return null;
+			}
+
+			// Make sure that extensions are valid
+			if (ext.StartsWith("."))
+			{
+				ext = ext.Substring(1);
+			}
+
+			return ext;
+		}
+
+		/// <summary>
 		/// Get the proper output path for a given input file and output directory
 		/// </summary>
 		/// <param name="outDir">Output directory to use</param>
@@ -2254,6 +2274,67 @@ namespace SabreTools.Library.Tools
 			}
 
 			return size;
+		}
+
+		/// <summary>
+		/// Get if the given path has a valid DAT extension
+		/// </summary>
+		/// <param name="path">Path to check</param>
+		/// <returns>True if the extension is valid, false otherwise</returns>
+		public static bool HasValidArchiveExtension(string path)
+		{
+			// Get the extension from the path, if possible
+			string ext = GetExtension(path);
+
+			// Check against the list of known archive extensions
+			switch (ext)
+			{
+				case "7z":
+				case "gz":
+				case "lzma":
+				case "rar":
+				case "rev":
+				case "r00":
+				case "r01":
+				case "tar":
+				case "tgz":
+				case "tlz":
+				case "zip":
+				case "zipx":
+					return true;
+				default:
+					return false;
+			}
+		}
+
+		/// <summary>
+		/// Get if the given path has a valid archive extension
+		/// </summary>
+		/// <param name="path">Path to check</param>
+		/// <returns>True if the extension is valid, false otherwise</returns>
+		public static bool HasValidDatExtension(string path)
+		{
+			// Get the extension from the path, if possible
+			string ext = GetExtension(path);
+
+			// Check against the list of known DAT extensions
+			switch (ext)
+			{
+				case "csv":
+				case "dat":
+				case "md5":
+				case "sfv":
+				case "sha1":
+				case "sha256":
+				case "sha384":
+				case "sha512":
+				case "tsv":
+				case "txt":
+				case "xml":
+					return true;
+				default:
+					return false;
+			}
 		}
 
 		/// <summary>
