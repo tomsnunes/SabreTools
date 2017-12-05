@@ -1392,11 +1392,11 @@ namespace SabreTools.Library.DatFiles
 				return;
 			}
 
-			Globals.Logger.User("Organizing roms by {0}" + (deduperoms != DedupeType.None ? " and merging" : ""), bucketBy);
-
 			// If the sorted type isn't the same, we want to sort the dictionary accordingly
 			if (_sortedBy != bucketBy)
 			{
+				Globals.Logger.User("Organizing roms by {0}" + (deduperoms != DedupeType.None ? " and merging" : ""), bucketBy);
+
 				// Set the sorted type
 				_sortedBy = bucketBy;
 
