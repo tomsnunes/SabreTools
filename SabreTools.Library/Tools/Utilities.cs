@@ -997,37 +997,24 @@ namespace SabreTools.Library.Tools
 			}
 
 			// Some formats should only require the extension to know
-			if (ext == "md5")
+			switch (ext)
 			{
-				return DatFormat.RedumpMD5;
-			}
-			if (ext == "sfv")
-			{
-				return DatFormat.RedumpSFV;
-			}
-			if (ext == "sha1")
-			{
-				return DatFormat.RedumpSHA1;
-			}
-			if (ext == "sha256")
-			{
-				return DatFormat.RedumpSHA256;
-			}
-			if (ext == "sha384")
-			{
-				return DatFormat.RedumpSHA384;
-			}
-			if (ext == "sha512")
-			{
-				return DatFormat.RedumpSHA512;
-			}
-			if (ext == "csv")
-			{
-				return DatFormat.CSV;
-			}
-			if (ext == "tsv")
-			{
-				return DatFormat.TSV;
+				case "csv":
+					return DatFormat.CSV;
+				case "md5":
+					return DatFormat.RedumpMD5;
+				case "sfv":
+					return DatFormat.RedumpSFV;
+				case "sha1":
+					return DatFormat.RedumpSHA1;
+				case "sha256":
+					return DatFormat.RedumpSHA256;
+				case "sha384":
+					return DatFormat.RedumpSHA384;
+				case "sha512":
+					return DatFormat.RedumpSHA512;
+				case "tsv":
+					return DatFormat.TSV;
 			}
 
 			// For everything else, we need to read it
