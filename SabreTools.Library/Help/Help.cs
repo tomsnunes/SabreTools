@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace SabreTools.Library.Help
 {
+	// TODO: Parse and return flags from arguments
+	// TODO: Perform partial matching to find potentially similar features
 	public class Help
 	{
 		#region Private variables
@@ -288,12 +290,6 @@ namespace SabreTools.Library.Help
 				Console.ReadLine();
 			}
 		}
-
-		/*
-		 * Here is a non-comprehensive list of things we want a help method to do:
-		 * - Parse and return flags from arguments
-		 * - Perform partial matching to find potentially similar features
-		 */
 
 		#endregion
 	}
