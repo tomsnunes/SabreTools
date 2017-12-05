@@ -974,7 +974,6 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <returns>The DatFormat corresponding to the DAT</returns>
-		/// <remarks>There is currently no differentiation between XML and SabreDAT here</remarks>
 		public static DatFormat GetDatFormat(string filename)
 		{
 			// Limit the output formats based on extension
