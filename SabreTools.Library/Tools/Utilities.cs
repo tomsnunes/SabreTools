@@ -446,7 +446,7 @@ namespace SabreTools.Library.Tools
 			BaseArchive archive = null;
 
 			// First get the archive type
-			ArchiveType? at = GetCurrentArchiveType(input);
+			ArchiveType? at = GetArchiveType(input);
 
 			// If we got back null, then it's not an archive, so we we return
 			if (at == null)
@@ -907,7 +907,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="input">Input file to check</param>
 		/// <returns>ArchiveType of inputted file (null on error)</returns>
-		public static ArchiveType? GetCurrentArchiveType(string input)
+		public static ArchiveType? GetArchiveType(string input)
 		{
 			ArchiveType? outtype = null;
 
@@ -1192,7 +1192,7 @@ namespace SabreTools.Library.Tools
 			shouldExternalProcess = true;
 			shouldInternalProcess = true;
 
-			ArchiveType? archiveType = GetCurrentArchiveType(input);
+			ArchiveType? archiveType = GetArchiveType(input);
 			switch (archiveType)
 			{
 				case null:
