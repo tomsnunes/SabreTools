@@ -372,6 +372,7 @@ namespace SabreTools.Library.Tools
 			switch (status?.ToLowerInvariant())
 			{
 				case "none":
+				case "no":
 				default:
 					return ItemStatus.None;
 				case "good":
@@ -379,9 +380,36 @@ namespace SabreTools.Library.Tools
 				case "baddump":
 					return ItemStatus.BadDump;
 				case "nodump":
+				case "yes":
 					return ItemStatus.Nodump;
 				case "verified":
 					return ItemStatus.Verified;
+			}
+		}
+
+		/// <summary>
+		/// Get ItemType? value from input string
+		/// </summary>
+		/// <param name="itemType">String to get value from</param>
+		/// <returns>ItemType? value corresponding to the string</returns>
+		public static ItemType? GetItemType(string itemType)
+		{
+			switch (itemType?.ToLowerInvariant())
+			{
+				case "archive":
+					return ItemType.Archive;
+				case "biosset":
+					return ItemType.BiosSet;
+				case "disk":
+					return ItemType.Disk;
+				case "release":
+					return ItemType.Release;
+				case "rom":
+					return ItemType.Rom;
+				case "sample":
+					return ItemType.Sample;
+				default:
+					return null;
 			}
 		}
 
@@ -752,6 +780,31 @@ namespace SabreTools.Library.Tools
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Create a specific type of DatItem to be used based on an ItemType
+		/// </summary>
+		/// <param name="itemType">Type of the DatItem to be created</param>
+		/// <returns>DatItem of the specific internal type that corresponds to the inputs</returns>
+		public static DatItem GetDatItem(ItemType itemType)
+		{
+			switch (itemType)
+			{
+				case ItemType.Archive:
+					return new Archive();
+				case ItemType.BiosSet:
+					return new BiosSet();
+				case ItemType.Disk:
+					return new Disk();
+				case ItemType.Release:
+					return new Release();
+				case ItemType.Sample:
+					return new Sample();
+				case ItemType.Rom:
+				default:
+					return new Rom();
+			}
 		}
 
 		#endregion

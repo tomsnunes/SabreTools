@@ -204,27 +204,7 @@ namespace SabreTools.Library.DatFiles
 							machineDesc = value;
 							break;
 						case "DatItem.Type":
-							switch (value.ToLowerInvariant())
-							{
-								case "archive":
-									itemType = ItemType.Archive;
-									break;
-								case "biosset":
-									itemType = ItemType.BiosSet;
-									break;
-								case "disk":
-									itemType = ItemType.Disk;
-									break;
-								case "release":
-									itemType = ItemType.Release;
-									break;
-								case "rom":
-									itemType = ItemType.Rom;
-									break;
-								case "sample":
-									itemType = ItemType.Sample;
-									break;
-							}
+							itemType = Utilities.GetItemType(value) ?? ItemType.Rom;
 							break;
 						case "Rom.Name":
 						case "Disk.Name":
@@ -255,26 +235,7 @@ namespace SabreTools.Library.DatFiles
 							sha512 = value;
 							break;
 						case "DatItem.Nodump":
-							switch (value.ToLowerInvariant())
-							{
-								case "baddump":
-									status = ItemStatus.BadDump;
-									break;
-								case "good":
-									status = ItemStatus.Good;
-									break;
-								case "no":
-								case "none":
-									status = ItemStatus.None;
-									break;
-								case "nodump":
-								case "yes":
-									status = ItemStatus.Nodump;
-									break;
-								case "verified":
-									status = ItemStatus.Verified;
-									break;
-							}
+							status = Utilities.GetItemStatus(value);
 							break;
 					}
 				}

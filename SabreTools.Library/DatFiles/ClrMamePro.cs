@@ -113,29 +113,7 @@ namespace SabreTools.Library.DatFiles
 					}
 
 					// Create the proper DatItem based on the type
-					DatItem item;
-					switch (temptype)
-					{
-						case ItemType.Archive:
-							item = new Archive();
-							break;
-						case ItemType.BiosSet:
-							item = new BiosSet();
-							break;
-						case ItemType.Disk:
-							item = new Disk();
-							break;
-						case ItemType.Release:
-							item = new Release();
-							break;
-						case ItemType.Sample:
-							item = new Sample();
-							break;
-						case ItemType.Rom:
-						default:
-							item = new Rom();
-							break;
-					}
+					DatItem item = Utilities.GetDatItem(temptype);
 
 					// Then populate it with information
 					item.MachineName = tempgamename;
