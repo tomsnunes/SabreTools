@@ -1589,10 +1589,14 @@ namespace SabreTools.Library.DatFiles
 				return;
 			}
 
-			// Reverse if we're in a required mode
+			// Reverse inputs if we're in a required mode
 			if ((updateMode & UpdateMode.DiffReverseCascade) != 0)
 			{
 				inputFileNames.Reverse();
+			}
+			if ((updateMode & UpdateMode.ReverseBaseReplace) != 0)
+			{
+				baseFileNames.Reverse();
 			}
 
 			// Populate the combined data and get the headers
@@ -1626,8 +1630,7 @@ namespace SabreTools.Library.DatFiles
 			else if ((updateMode & UpdateMode.BaseReplace) != 0
 				|| (updateMode & UpdateMode.ReverseBaseReplace) != 0)
 			{
-				bool brrev = (updateMode & UpdateMode.ReverseBaseReplace) != 0;
-				BaseReplace(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root, brrev);
+				BaseReplace(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
 			}
 
 			return;
@@ -1712,9 +1715,8 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="reverse">True if the base DATs should be reverse-ordered, false otherwise</param>
 		public void BaseReplace(List<string> inputFileNames, List<string> baseFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
-			bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root, bool reverse)
+			bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			// First we want to parse all of the base DATs into the input
 			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for replacement...");
@@ -1727,7 +1729,7 @@ namespace SabreTools.Library.DatFiles
 				lock (baseFileNames)
 				{
 					path = baseFileNames[i];
-					id = (reverse ? i : baseFileNames.Count - i);
+					id = baseFileNames.Count - i;
 				}
 
 				Parse(path, id, id, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
