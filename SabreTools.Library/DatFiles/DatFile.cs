@@ -1578,57 +1578,56 @@ namespace SabreTools.Library.DatFiles
 		public void DetermineUpdateType(List<string> inputPaths, List<string> basePaths, string outDir, UpdateMode updateMode, bool inplace, bool skip,
 			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
+			// Ensure we only have files in the inputs
+			List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
+			List<string> baseFileNames = Utilities.GetOnlyFilesFromInputs(basePaths);
+
 			// If we're in standard update mode, run through all of the inputs
 			if (updateMode == UpdateMode.None)
 			{
-				Update(inputPaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
+				Update(inputFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
+				return;
 			}
-			// Otherwise, we're in one of the special modes
-			else
+
+			// Reverse if we're in a required mode
+			if ((updateMode & UpdateMode.DiffReverseCascade) != 0)
 			{
-				// Make sure there are no folders in inputs
-				List<string> newInputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
+				inputFileNames.Reverse();
+			}
 
-				// Reverse if we're in a required mode
-				if ((updateMode & UpdateMode.DiffReverseCascade) != 0)
-				{
-					newInputFileNames.Reverse();
-				}
+			// Populate the combined data and get the headers
+			List<DatFile> datHeaders = PopulateUserData(inputFileNames, inplace, clean,
+				   remUnicode, descAsName, outDir, filter, splitType, trim, single, root);
 
-				// Populate the combined data and get the headers
-				List<DatFile> datHeaders = PopulateUserData(newInputFileNames, inplace, clean,
-					   remUnicode, descAsName, outDir, filter, splitType, trim, single, root);
-
-				// If we're in merging mode
-				if ((updateMode & UpdateMode.Merge) != 0)
-				{
-					MergeNoDiff(outDir, newInputFileNames, datHeaders);
-				}
-				// If we have one of the standard diffing modes
-				else if ((updateMode & UpdateMode.DiffDupesOnly) != 0
-					|| (updateMode & UpdateMode.DiffNoDupesOnly) != 0
-					|| (updateMode & UpdateMode.DiffIndividualsOnly) != 0)
-				{
-					DiffNoCascade(updateMode, outDir, newInputFileNames);
-				}
-				// If we have one of the cascaded diffing modes
-				else if ((updateMode & UpdateMode.DiffCascade) != 0
-					|| (updateMode & UpdateMode.DiffReverseCascade) != 0)
-				{
-					DiffCascade(outDir, inplace, newInputFileNames, datHeaders, skip);
-				}
-				// If we have diff against mode
-				else if ((updateMode & UpdateMode.DiffAgainst) != 0)
-				{
-					DiffAgainst(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
-				}
-				// If we have one of the base replacement modes
-				else if ((updateMode & UpdateMode.BaseReplace) != 0
-					|| (updateMode & UpdateMode.ReverseBaseReplace) != 0)
-				{
-					bool brrev = (updateMode & UpdateMode.ReverseBaseReplace) != 0;
-					BaseReplace(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root, brrev);
-				}
+			// If we're in merging mode
+			if ((updateMode & UpdateMode.Merge) != 0)
+			{
+				MergeNoDiff(outDir, inputFileNames, datHeaders);
+			}
+			// If we have one of the standard diffing modes
+			else if ((updateMode & UpdateMode.DiffDupesOnly) != 0
+				|| (updateMode & UpdateMode.DiffNoDupesOnly) != 0
+				|| (updateMode & UpdateMode.DiffIndividualsOnly) != 0)
+			{
+				DiffNoCascade(updateMode, outDir, inputFileNames);
+			}
+			// If we have one of the cascaded diffing modes
+			else if ((updateMode & UpdateMode.DiffCascade) != 0
+				|| (updateMode & UpdateMode.DiffReverseCascade) != 0)
+			{
+				DiffCascade(outDir, inplace, inputFileNames, datHeaders, skip);
+			}
+			// If we have diff against mode
+			else if ((updateMode & UpdateMode.DiffAgainst) != 0)
+			{
+				DiffAgainst(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
+			}
+			// If we have one of the base replacement modes
+			else if ((updateMode & UpdateMode.BaseReplace) != 0
+				|| (updateMode & UpdateMode.ReverseBaseReplace) != 0)
+			{
+				bool brrev = (updateMode & UpdateMode.ReverseBaseReplace) != 0;
+				BaseReplace(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root, brrev);
 			}
 
 			return;
@@ -1701,8 +1700,8 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Replace item names from on a base set
 		/// </summary>
-		/// <param name="inputPaths">Names of the input files and/or folders</param>
-		/// <param name="basePaths">Names of base files and/or folders</param>
+		/// <param name="inputFileNames">Names of the input files</param>
+		/// <param name="baseFileNames">Names of base files</param>
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
@@ -1714,13 +1713,12 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="reverse">True if the base DATs should be reverse-ordered, false otherwise</param>
-		public void BaseReplace(List<string> inputPaths, List<string> basePaths, string outDir, bool inplace, bool clean, bool remUnicode,
+		public void BaseReplace(List<string> inputFileNames, List<string> baseFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
 			bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root, bool reverse)
 		{
 			// First we want to parse all of the base DATs into the input
 			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for replacement...");
 
-			List<string> baseFileNames = Utilities.GetOnlyFilesFromInputs(basePaths);
 			Parallel.For(0, baseFileNames.Count, Globals.ParallelOptions, i =>
 			{
 				string path = "";
@@ -1741,7 +1739,6 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.CRC, DedupeType.Full);
 
 			// Now we want to try to replace each item in each input DAT from the base
-			List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
 			foreach (string path in inputFileNames)
 			{
 				Globals.Logger.User("Replacing items in '{0}'' from the base DAT", path.Split('¬')[0]);
@@ -1791,8 +1788,8 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Output diffs against a base set
 		/// </summary>
-		/// <param name="inputPaths">Names of the input files and/or folders</param>
-		/// <param name="basePaths">Names of base files and/or folders</param>
+		/// <param name="inputFileNames">Names of the input files</param>
+		/// <param name="baseFileNames">Names of base files</param>
 		/// <param name="outDir">Optional param for output directory</param>
 		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
@@ -1803,13 +1800,12 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		public void DiffAgainst(List<string> inputPaths, List<string> basePaths, string outDir, bool inplace, bool clean, bool remUnicode,
+		public void DiffAgainst(List<string> inputFileNames, List<string> baseFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
 			bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
 			// First we want to parse all of the base DATs into the input
 			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for comparison...");
 
-			List<string> baseFileNames = Utilities.GetOnlyFilesFromInputs(basePaths);
 			Parallel.ForEach(baseFileNames, Globals.ParallelOptions, path =>
 			{
 				Parse(path, 0, 0, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
@@ -1821,7 +1817,6 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.CRC, DedupeType.Full);
 
 			// Now we want to compare each input DAT against the base
-			List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
 			foreach (string path in inputFileNames)
 			{
 				Globals.Logger.User("Comparing '{0}'' to base DAT", path.Split('¬')[0]);
@@ -2172,9 +2167,6 @@ namespace SabreTools.Library.DatFiles
 		public void Update(List<string> inputFileNames, string outDir, bool inplace, bool clean, bool remUnicode, bool descAsName,
 			Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
-			// Get only files from the input first
-			inputFileNames = Utilities.GetOnlyFilesFromInputs(inputFileNames, appendparent: true);
-
 			// Iterate over the files
 			foreach (string file in inputFileNames)
 			{
