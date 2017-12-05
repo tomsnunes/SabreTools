@@ -300,8 +300,7 @@ namespace SabreTools
 		/// <param name="datprefix">Add the dat name as a directory prefix</param>
 		/// <param name="romba">Output files in romba format</param>
 		/// /* Merging and Diffing info */
-		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
-		/// <param name="diffMode">Non-zero flag for diffing mode, zero otherwise</param>
+		/// <param name="updateMode">Non-zero flag for diffing mode, zero otherwise</param>
 		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
 		/// <param name="bare">True if the date should not be appended to the default name, false otherwise [OBSOLETE]</param>
@@ -357,8 +356,7 @@ namespace SabreTools
 			bool romba,
 
 			/* Merging and Diffing info */
-			bool merge,
-			UpdateMode diffMode,
+			UpdateMode updateMode,
 			bool inplace,
 			bool skip,
 			bool bare,
@@ -389,8 +387,8 @@ namespace SabreTools
 			addext = (addext == "" || addext.StartsWith(".") ? addext : "." + addext);
 			repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
 
-			// If we're in merge or diff mode and the names aren't set, set defaults
-			if (merge || diffMode != 0)
+			// If we're in a special update mode and the names aren't set, set defaults
+			if (updateMode != 0)
 			{
 				// Get the values that will be used
 				if (date == "")
@@ -399,17 +397,17 @@ namespace SabreTools
 				}
 				if (name == "")
 				{
-					name = (diffMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup != DedupeType.None ? "-deduped" : "");
+					name = (updateMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup != DedupeType.None ? "-deduped" : "");
 				}
 				if (description == "")
 				{
-					description = (diffMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup != DedupeType.None ? " - deduped" : "");
+					description = (updateMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup != DedupeType.None ? " - deduped" : "");
 					if (!bare)
 					{
 						description += " (" + date + ")";
 					}
 				}
-				if (category == "" && diffMode != 0)
+				if (category == "" && updateMode != 0)
 				{
 					category = "DiffDAT";
 				}
@@ -456,7 +454,7 @@ namespace SabreTools
 				Romba = romba,
 			};
 			
-			userInputDat.DetermineUpdateType(inputPaths, basePaths, outDir, merge, diffMode, inplace, skip, bare, clean,
+			userInputDat.DetermineUpdateType(inputPaths, basePaths, outDir, updateMode, inplace, skip, bare, clean,
 				remUnicode, descAsName, filter, splitType, trim, single, root);
 		}
 

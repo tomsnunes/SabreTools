@@ -293,7 +293,8 @@ namespace SabreTools.Library.Data
 		DiffAgainst = DiffReverseCascade << 1,
 
 		// Special update modes
-		BaseReplace = DiffAgainst << 1,
+		Merge = DiffAgainst << 1,
+		BaseReplace = Merge << 1,
 		ReverseBaseReplace = BaseReplace << 1,
 	}
 

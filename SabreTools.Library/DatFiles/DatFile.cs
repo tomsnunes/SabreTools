@@ -1563,7 +1563,6 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="inputPaths">Names of the input files and/or folders</param>
 		/// <param name="basePaths">Names of base files and/or folders</param>
 		/// <param name="outDir">Optional param for output directory</param>
-		/// <param name="merge">True if input files should be merged into a single file, false otherwise</param>
 		/// <param name="updateMode">Non-zero flag for diffing mode, zero otherwise</param>
 		/// <param name="inplace">True if the output files should overwrite their inputs, false otherwise</param>
 		/// <param name="skip">True if the first cascaded diff file should be skipped on output, false otherwise</param>
@@ -1576,64 +1575,62 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		public void DetermineUpdateType(List<string> inputPaths, List<string> basePaths, string outDir, bool merge, UpdateMode updateMode, bool inplace, bool skip,
+		public void DetermineUpdateType(List<string> inputPaths, List<string> basePaths, string outDir, UpdateMode updateMode, bool inplace, bool skip,
 			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, bool trim, bool single, string root)
 		{
-			// If we're in merging or diffing mode, use the full list of inputs
-			if (merge || (updateMode != UpdateMode.None
-				&& (updateMode & UpdateMode.DiffAgainst) == 0)
-				&& (updateMode & UpdateMode.BaseReplace) == 0
-				&& (updateMode & UpdateMode.ReverseBaseReplace) == 0)
+			// If we're in standard update mode, run through all of the inputs
+			if (updateMode == UpdateMode.None)
+			{
+				Update(inputPaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
+			}
+			// Otherwise, we're in one of the special modes
+			else
 			{
 				// Make sure there are no folders in inputs
 				List<string> newInputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
 
-				// Reverse if we have to
+				// Reverse if we're in a required mode
 				if ((updateMode & UpdateMode.DiffReverseCascade) != 0)
 				{
 					newInputFileNames.Reverse();
 				}
 
-				// Create a dictionary of all ROMs from the input DATs
+				// Populate the combined data and get the headers
 				List<DatFile> datHeaders = PopulateUserData(newInputFileNames, inplace, clean,
-					remUnicode, descAsName, outDir, filter, splitType, trim, single, root);
+					   remUnicode, descAsName, outDir, filter, splitType, trim, single, root);
 
-				// Modify the Dictionary if necessary and output the results
-				if (updateMode != 0 && updateMode < UpdateMode.DiffCascade)
-				{
-					DiffNoCascade(updateMode, outDir, newInputFileNames);
-				}
-				// If we're in cascade and diff, output only cascaded diffs
-				else if (updateMode != 0 && updateMode >= UpdateMode.DiffCascade)
-				{
-					DiffCascade(outDir, inplace, newInputFileNames, datHeaders, skip);
-				}
-				// Output all entries with user-defined merge
-				else
+				// If we're in merging mode
+				if ((updateMode & UpdateMode.Merge) != 0)
 				{
 					MergeNoDiff(outDir, newInputFileNames, datHeaders);
 				}
+				// If we have one of the standard diffing modes
+				else if ((updateMode & UpdateMode.DiffDupesOnly) != 0
+					|| (updateMode & UpdateMode.DiffNoDupesOnly) != 0
+					|| (updateMode & UpdateMode.DiffIndividualsOnly) != 0)
+				{
+					DiffNoCascade(updateMode, outDir, newInputFileNames);
+				}
+				// If we have one of the cascaded diffing modes
+				else if ((updateMode & UpdateMode.DiffCascade) != 0
+					|| (updateMode & UpdateMode.DiffReverseCascade) != 0)
+				{
+					DiffCascade(outDir, inplace, newInputFileNames, datHeaders, skip);
+				}
+				// If we have diff against mode
+				else if ((updateMode & UpdateMode.DiffAgainst) != 0)
+				{
+					DiffAgainst(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
+				}
+				// If we have one of the base replacement modes
+				else if ((updateMode & UpdateMode.BaseReplace) != 0
+					|| (updateMode & UpdateMode.ReverseBaseReplace) != 0)
+				{
+					bool brrev = (updateMode & UpdateMode.ReverseBaseReplace) != 0;
+					BaseReplace(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root, brrev);
+				}
 			}
-			// If we're in "diff against" mode, we treat the inputs differently
-			else if ((updateMode & UpdateMode.DiffAgainst) != 0)
-			{
-				DiffAgainst(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
-			}
-			// If we're in "base replacement" mode, we treat the inputs differently
-			else if ((updateMode & UpdateMode.BaseReplace) != 0)
-			{
-				BaseReplace(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root, false);
-			}
-			// If we're in "reverse base replacement" mode, we treat the inputs differently
-			else if ((updateMode & UpdateMode.ReverseBaseReplace) != 0)
-			{
-				BaseReplace(inputPaths, basePaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root, true);
-			}
-			// Otherwise, loop through all of the inputs individually
-			else
-			{
-				Update(inputPaths, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, trim, single, root);
-			}
+
 			return;
 		}
 

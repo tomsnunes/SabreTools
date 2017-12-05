@@ -98,7 +98,6 @@ namespace SabreTools
 				hashOnly = false,
 				inplace = false,
 				inverse = false,
-				merge = false,
 				nostore = false,
 				quickScan = false,
 				quotes = false,
@@ -398,7 +397,7 @@ namespace SabreTools
 						break;
 					case "-m":
 					case "--merge":
-						merge = true;
+						updateMode |= UpdateMode.Merge;
 						break;
 					case "-nc":
 					case "--nodump-col":
@@ -1302,7 +1301,7 @@ namespace SabreTools
 			{
 				InitUpdate(inputs, basePaths, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
 					superdat, forcemerge, forcend, forcepack, excludeOf, sceneDateStrip, datFormat, usegame, prefix, postfix, quotes, repext, addext, remext,
-					datPrefix, romba, merge, updateMode, inplace, skip, removeDateFromAutomaticName, filter, splitType, trim, single, root, outDir,
+					datPrefix, romba, updateMode, inplace, skip, removeDateFromAutomaticName, filter, splitType, trim, single, root, outDir,
 					cleanGameNames, removeUnicode, descAsName, dedup, stripHash);
 			}
 
