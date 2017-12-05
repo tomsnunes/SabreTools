@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using SabreTools.Library.Data;
+
 namespace SabreTools.Library.Help
 {
 	// TODO: Parse and return flags from arguments
@@ -251,6 +253,47 @@ namespace SabreTools.Library.Help
 			}
 
 			return success;
+		}
+
+		/// <summary>
+		/// Retrieve a list of enabled features
+		/// </summary>
+		/// <returns>List of Features representing what is enabled</returns>
+		public List<Feature> GetEnabledFeatures()
+		{
+			List<Feature> enabled = new List<Feature>();
+
+			// Loop through the features
+			foreach(KeyValuePair<string, Feature> feature in _features)
+			{
+				enabled.AddRange(GetEnabledSubfeatures(feature.Value));
+			}
+
+			return enabled;
+		}
+
+		/// <summary>
+		/// Retrieve a nested list of subfeatures from the current feature
+		/// </summary>
+		/// <param name="feature">Feature with possible subfeatures to test</param>
+		/// <returns>List of Features representing what is enabled</returns>
+		private List<Feature> GetEnabledSubfeatures(Feature feature)
+		{
+			List<Feature> enabled = new List<Feature>();
+
+			// First determine if the current feature is enabled
+			if (feature.IsEnabled())
+			{
+				enabled.Add(feature);
+			}
+
+			// Now loop through the subfeatures recursively
+			foreach (KeyValuePair<string, Feature> sub in _features)
+			{
+				enabled.AddRange(GetEnabledSubfeatures(sub.Value));
+			}
+
+			return enabled;
 		}
 
 		/// <summary>

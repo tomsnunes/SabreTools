@@ -8,7 +8,7 @@ namespace SabreTools.Library.Help
 {
 	public class Feature
 	{
-		#region Private variables
+		#region Private instance variables
 
 		private List<string> _flags;
 		private string _description;
@@ -16,6 +16,11 @@ namespace SabreTools.Library.Help
 		private Dictionary<string, Feature> _features;
 		private List<string> _additionalNotes;
 		private bool _foundOnce = false;
+
+		// Specific value types
+		private bool _valueBool = false;
+		private string _valueString = null;
+		private List<string> _valueList = null;
 
 		#endregion
 
@@ -342,12 +347,33 @@ namespace SabreTools.Library.Help
 				// If we have a flag, make sure it doesn't have an equal sign in it 
 				case FeatureType.Flag:
 					valid = !input.Contains("=") && _flags.Contains(input);
+					if (valid)
+					{
+						_valueBool = true;
+						_foundOnce = true;
+					}
 					break;
 
 				// If we have an input, make sure it has an equals sign in it
 				case FeatureType.List:
+					valid = input.Contains("=") && _flags.Contains(input.Split('=')[0]);
+					if (valid)
+					{
+						if (_valueList == null)
+						{
+							_valueList = new List<string>();
+						}
+
+						_valueList.Add(input.Split('=')[1]);
+					}
+					break;
 				case FeatureType.String:
 					valid = input.Contains("=") && _flags.Contains(input.Split('=')[0]);
+					if (valid)
+					{
+						_valueString = input.Split('=')[1];
+						_foundOnce = true;
+					}
 					break;
 			}
 
@@ -379,6 +405,46 @@ namespace SabreTools.Library.Help
 			}
 
 			return valid;
+		}
+
+		/// <summary>
+		/// Get the proper value associated with this feature
+		/// </summary>
+		/// <returns>Value associated with this feature</returns>
+		public object GetValue()
+		{
+			switch (_featureType)
+			{
+				case FeatureType.Flag:
+					return _valueBool;
+				case FeatureType.List:
+					return _valueList;
+				case FeatureType.String:
+					return _valueString;
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Returns if this feature has a valid value or not
+		/// </summary>
+		/// <returns>True if the feature is enabled, false otherwise</returns>
+		public bool IsEnabled()
+		{
+			object obj = GetValue();
+
+			switch (_featureType)
+			{
+				case FeatureType.Flag:
+					return (bool)obj;
+				case FeatureType.List:
+					return obj != null;
+				case FeatureType.String:
+					return obj != null;
+			}
+
+			return false;
 		}
 
 		#endregion
