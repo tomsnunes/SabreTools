@@ -3344,7 +3344,7 @@ namespace SabreTools.Library.DatFiles
 			SkipFileType skipFileType, bool addBlanks, bool addDate, string tempDir, bool copyFiles, string headerToCheckAgainst, bool chdsAsFiles)
 		{
 			// Define the temporary directory
-			string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, Path.GetRandomFileName())) + Path.DirectorySeparatorChar;
+			string tempSubDir = Path.GetFullPath(Path.Combine(tempDir, new Guid().ToString())) + Path.DirectorySeparatorChar;
 
 			// Special case for if we are in Romba mode (all names are supposed to be SHA-1 hashes)
 			if (Romba)
@@ -3373,7 +3373,7 @@ namespace SabreTools.Library.DatFiles
 			string newBasePath = basePath;
 			if (copyFiles)
 			{
-				newBasePath = Path.Combine(tempDir, Path.GetRandomFileName());
+				newBasePath = Path.Combine(tempDir, new Guid().ToString());
 				newItem = Path.GetFullPath(Path.Combine(newBasePath, Path.GetFullPath(item).Remove(0, basePath.Length + 1)));
 				Directory.CreateDirectory(Path.GetDirectoryName(newItem));
 				File.Copy(item, newItem, true);
