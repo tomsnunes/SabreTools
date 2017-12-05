@@ -304,162 +304,6 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// Get ForceMerging value from input string
-		/// </summary>
-		/// <param name="forcemerge">String to get value from</param>
-		/// <returns>ForceMerging value corresponding to the string</returns>
-		public static ForceMerging GetForceMerging(string forcemerge)
-		{
-			switch (forcemerge?.ToLowerInvariant())
-			{
-				case "none":
-				default:
-					return ForceMerging.None;
-				case "split":
-					return ForceMerging.Split;
-				case "full":
-					return ForceMerging.Full;
-			}
-		}
-
-		/// <summary>
-		/// Get ForceNodump value from input string
-		/// </summary>
-		/// <param name="forcend">String to get value from</param>
-		/// <returns>ForceNodump value corresponding to the string</returns>
-		public static ForceNodump GetForceNodump(string forcend)
-		{
-			switch (forcend?.ToLowerInvariant())
-			{
-				case "none":
-				default:
-					return ForceNodump.None;
-				case "obsolete":
-					return ForceNodump.Obsolete;
-				case "required":
-					return ForceNodump.Required;
-				case "ignore":
-					return ForceNodump.Ignore;
-			}
-		}
-
-		/// <summary>
-		/// Get ForcePacking value from input string
-		/// </summary>
-		/// <param name="forcepack">String to get value from</param>
-		/// <returns>ForcePacking value corresponding to the string</returns>
-		public static ForcePacking GetForcePacking(string forcepack)
-		{
-			switch (forcepack?.ToLowerInvariant())
-			{
-				case "none":
-				default:
-					return ForcePacking.None;
-				case "zip":
-					return ForcePacking.Zip;
-				case "unzip":
-					return ForcePacking.Unzip;
-			}
-		}
-
-		/// <summary>
-		/// Get ItemStatus value from input string
-		/// </summary>
-		/// <param name="status">String to get value from</param>
-		/// <returns>ItemStatus value corresponding to the string</returns>
-		public static ItemStatus GetItemStatus(string status)
-		{
-			switch (status?.ToLowerInvariant())
-			{
-				case "none":
-				case "no":
-				default:
-					return ItemStatus.None;
-				case "good":
-					return ItemStatus.Good;
-				case "baddump":
-					return ItemStatus.BadDump;
-				case "nodump":
-				case "yes":
-					return ItemStatus.Nodump;
-				case "verified":
-					return ItemStatus.Verified;
-			}
-		}
-
-		/// <summary>
-		/// Get ItemType? value from input string
-		/// </summary>
-		/// <param name="itemType">String to get value from</param>
-		/// <returns>ItemType? value corresponding to the string</returns>
-		public static ItemType? GetItemType(string itemType)
-		{
-			switch (itemType?.ToLowerInvariant())
-			{
-				case "archive":
-					return ItemType.Archive;
-				case "biosset":
-					return ItemType.BiosSet;
-				case "disk":
-					return ItemType.Disk;
-				case "release":
-					return ItemType.Release;
-				case "rom":
-					return ItemType.Rom;
-				case "sample":
-					return ItemType.Sample;
-				default:
-					return null;
-			}
-		}
-
-		/// <summary>
-		/// Get MachineType value from input string
-		/// </summary>
-		/// <param name="gametype">String to get value from</param>
-		/// <returns>MachineType value corresponding to the string</returns>
-		public static MachineType GetMachineType(string gametype)
-		{
-			switch (gametype?.ToLowerInvariant())
-			{
-				case "none":
-				default:
-					return MachineType.None;
-				case "bios":
-					return MachineType.Bios;
-				case "dev":
-				case "device":
-					return MachineType.Device;
-				case "mech":
-				case "mechanical":
-					return MachineType.Mechanical;
-			}
-		}
-
-		/// <summary>
-		/// Get SplitType value from input ForceMerging
-		/// </summary>
-		/// <param name="forceMerging">ForceMerging to get value from</param>
-		/// <returns>SplitType value corresponding to the string</returns>
-		public static SplitType GetSplitType(ForceMerging forceMerging)
-		{
-			switch (forceMerging)
-			{
-				case ForceMerging.None:
-				default:
-					return SplitType.None;
-				case ForceMerging.Split:
-					return SplitType.Split;
-				case ForceMerging.Merged:
-					return SplitType.Merged;
-				case ForceMerging.NonMerged:
-					return SplitType.NonMerged;
-				case ForceMerging.Full:
-					return SplitType.FullNonMerged;
-			}
-		}
-
-		/// <summary>
 		/// Replace accented characters
 		/// </summary>
 		/// <param name="input">String to be parsed</param>
@@ -804,6 +648,162 @@ namespace SabreTools.Library.Tools
 				case ItemType.Rom:
 				default:
 					return new Rom();
+			}
+		}
+
+		/// <summary>
+		/// Get ForceMerging value from input string
+		/// </summary>
+		/// <param name="forcemerge">String to get value from</param>
+		/// <returns>ForceMerging value corresponding to the string</returns>
+		public static ForceMerging GetForceMerging(string forcemerge)
+		{
+			switch (forcemerge?.ToLowerInvariant())
+			{
+				case "none":
+				default:
+					return ForceMerging.None;
+				case "split":
+					return ForceMerging.Split;
+				case "full":
+					return ForceMerging.Full;
+			}
+		}
+
+		/// <summary>
+		/// Get ForceNodump value from input string
+		/// </summary>
+		/// <param name="forcend">String to get value from</param>
+		/// <returns>ForceNodump value corresponding to the string</returns>
+		public static ForceNodump GetForceNodump(string forcend)
+		{
+			switch (forcend?.ToLowerInvariant())
+			{
+				case "none":
+				default:
+					return ForceNodump.None;
+				case "obsolete":
+					return ForceNodump.Obsolete;
+				case "required":
+					return ForceNodump.Required;
+				case "ignore":
+					return ForceNodump.Ignore;
+			}
+		}
+
+		/// <summary>
+		/// Get ForcePacking value from input string
+		/// </summary>
+		/// <param name="forcepack">String to get value from</param>
+		/// <returns>ForcePacking value corresponding to the string</returns>
+		public static ForcePacking GetForcePacking(string forcepack)
+		{
+			switch (forcepack?.ToLowerInvariant())
+			{
+				case "none":
+				default:
+					return ForcePacking.None;
+				case "zip":
+					return ForcePacking.Zip;
+				case "unzip":
+					return ForcePacking.Unzip;
+			}
+		}
+
+		/// <summary>
+		/// Get ItemStatus value from input string
+		/// </summary>
+		/// <param name="status">String to get value from</param>
+		/// <returns>ItemStatus value corresponding to the string</returns>
+		public static ItemStatus GetItemStatus(string status)
+		{
+			switch (status?.ToLowerInvariant())
+			{
+				case "none":
+				case "no":
+				default:
+					return ItemStatus.None;
+				case "good":
+					return ItemStatus.Good;
+				case "baddump":
+					return ItemStatus.BadDump;
+				case "nodump":
+				case "yes":
+					return ItemStatus.Nodump;
+				case "verified":
+					return ItemStatus.Verified;
+			}
+		}
+
+		/// <summary>
+		/// Get ItemType? value from input string
+		/// </summary>
+		/// <param name="itemType">String to get value from</param>
+		/// <returns>ItemType? value corresponding to the string</returns>
+		public static ItemType? GetItemType(string itemType)
+		{
+			switch (itemType?.ToLowerInvariant())
+			{
+				case "archive":
+					return ItemType.Archive;
+				case "biosset":
+					return ItemType.BiosSet;
+				case "disk":
+					return ItemType.Disk;
+				case "release":
+					return ItemType.Release;
+				case "rom":
+					return ItemType.Rom;
+				case "sample":
+					return ItemType.Sample;
+				default:
+					return null;
+			}
+		}
+
+		/// <summary>
+		/// Get MachineType value from input string
+		/// </summary>
+		/// <param name="gametype">String to get value from</param>
+		/// <returns>MachineType value corresponding to the string</returns>
+		public static MachineType GetMachineType(string gametype)
+		{
+			switch (gametype?.ToLowerInvariant())
+			{
+				case "none":
+				default:
+					return MachineType.None;
+				case "bios":
+					return MachineType.Bios;
+				case "dev":
+				case "device":
+					return MachineType.Device;
+				case "mech":
+				case "mechanical":
+					return MachineType.Mechanical;
+			}
+		}
+
+		/// <summary>
+		/// Get SplitType value from input ForceMerging
+		/// </summary>
+		/// <param name="forceMerging">ForceMerging to get value from</param>
+		/// <returns>SplitType value corresponding to the string</returns>
+		public static SplitType GetSplitType(ForceMerging forceMerging)
+		{
+			switch (forceMerging)
+			{
+				case ForceMerging.None:
+				default:
+					return SplitType.None;
+				case ForceMerging.Split:
+					return SplitType.Split;
+				case ForceMerging.Merged:
+					return SplitType.Merged;
+				case ForceMerging.NonMerged:
+					return SplitType.NonMerged;
+				case ForceMerging.Full:
+					return SplitType.FullNonMerged;
 			}
 		}
 
