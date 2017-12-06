@@ -24,23 +24,8 @@ namespace SabreTools
 		/// </summary>
 		/// <param name="inputs">List of input filenames</param>
 		/// /* Normal DAT header info */
-		/// <param name="filename">New filename</param>
-		/// <param name="name">New name</param>
-		/// <param name="description">New description</param>
-		/// <param name="category">New category</param>
-		/// <param name="version">New version</param>
-		/// <param name="author">New author</param>
-		/// <param name="email">New email</param>
-		/// <param name="homepage">New homepage</param>
-		/// <param name="url">New URL</param>
-		/// <param name="comment">New comment</param>
-		/// <param name="forcepack">String representing the forcepacking flag</param>
-		/// <param name="excludeOf">True if cloneof, romof, and sampleof fields should be omitted from output, false otherwise</param>
-		/// <param name="sceneDateStrip">True if scene-named sets have the date stripped from the beginning, false otherwise</param>
-		/// <param name="datFormat">DatFormat to be used for outputting the DAT</param>
+		/// <param name="datHeader">All DatHeader info to be used</param>
 		/// /* Standard DFD info */
-		/// <param name="romba">True to enable reading a directory like a Romba depot, false otherwise</param>
-		/// <param name="superdat">True to enable SuperDAT-style reading, false otherwise</param>
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
 		/// <param name="removeDateFromAutomaticName">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
@@ -51,28 +36,12 @@ namespace SabreTools
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is default temp directory)</param>
 		/// <param name="outDir">Name of the directory to output the DAT to (blank is the current directory)</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
-		/// <param name="headerToCheckAgainst">Populated string representing the name of the skipper to use, a blank string to use the first available checker, null otherwise</param>
 		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
 		private static void InitDatFromDir(List<string> inputs,
 			/* Normal DAT header info */
-			string filename,
-			string name,
-			string description,
-			string category,
-			string version,
-			string author,
-			string email,
-			string homepage,
-			string url,
-			string comment,
-			string forcepack,
-			bool excludeOf,
-			bool sceneDateStrip,
-			DatFormat datFormat,
+			DatHeader datHeader,
 
 			/* Standard DFD info */
-			bool romba,
-			bool superdat,
 			Hash omitFromScan,
 			bool removeDateFromAutomaticName,
 			bool archivesAsFiles,
@@ -84,31 +53,12 @@ namespace SabreTools
 			string tempDir,
 			string outDir,
 			bool copyFiles,
-			string headerToCheckAgainst,
 			bool chdsAsFiles)
 		{
-			ForcePacking fp = Utilities.GetForcePacking(forcepack);
-
 			// Create a new DATFromDir object and process the inputs
-			DatFile basedat = new DatFile
+			DatFile basedat = new DatFile(datHeader)
 			{
-				FileName = filename,
-				Name = name,
-				Description = description,
-				Category = category,
-				Version = version,
 				Date = DateTime.Now.ToString("yyyy-MM-dd"),
-				Author = author,
-				Email = email,
-				Homepage = homepage,
-				Url = url,
-				Comment = comment,
-				ForcePacking = fp,
-				DatFormat = (datFormat == 0 ? DatFormat.Logiqx : datFormat),
-				Romba = romba,
-				ExcludeOf = excludeOf,
-				SceneDateStrip = sceneDateStrip,
-				Type = (superdat ? "SuperDAT" : ""),
 			};
 
 			// For each input directory, create a DAT
@@ -121,7 +71,7 @@ namespace SabreTools
 
 					string basePath = Path.GetFullPath(path);
 					bool success = datdata.PopulateFromDir(basePath, omitFromScan, removeDateFromAutomaticName, archivesAsFiles,
-						skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, headerToCheckAgainst, chdsAsFiles);
+						skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, copyFiles, datHeader.Header, chdsAsFiles);
 
 					// If it was a success, write the DAT out
 					if (success)
@@ -269,36 +219,7 @@ namespace SabreTools
 		/// <param name="inputPaths">List of input filenames</param>
 		/// <param name="basePaths">List of base filenames</param>
 		/// /* Normal DAT header info */
-		/// <param name="filename">New filename</param>
-		/// <param name="name">New name</param>
-		/// <param name="description">New description</param>
-		/// <param name="rootdir">New rootdir</param>
-		/// <param name="category">New category</param>
-		/// <param name="version">New version</param>
-		/// <param name="date">New date</param>
-		/// <param name="author">New author</param>
-		/// <param name="email">New email</param>
-		/// <param name="homepage">New homepage</param>
-		/// <param name="url">New URL</param>
-		/// <param name="comment">New comment</param>
-		/// <param name="header">New header</param>
-		/// <param name="superdat">True to set SuperDAT type, false otherwise</param>
-		/// <param name="forcemerge">None, Split, Full</param>
-		/// <param name="forcend">None, Obsolete, Required, Ignore</param>
-		/// <param name="forcepack">None, Zip, Unzip</param>
-		/// <param name="excludeOf">True if cloneof, romof, and sampleof fields should be omitted from output, false otherwise</param>
-		/// <param name="sceneDateStrip">True if scene-named sets have the date stripped from the beginning, false otherwise</param>
-		/// <param name="datFormat">Non-zero flag for output format, zero otherwise for default</param>
-		/// /* Missfile-specific DAT info */
-		/// <param name="usegame">True if games are to be used in output, false if roms are</param>
-		/// <param name="prefix">Generic prefix to be added to each line</param>
-		/// <param name="postfix">Generic postfix to be added to each line</param>
-		/// <param name="quotes">Add quotes to each item</param>
-		/// <param name="repext">Replace all extensions with another</param>
-		/// <param name="addext">Add an extension to all items</param>
-		/// <param name="remext">Remove all extensions</param>
-		/// <param name="datprefix">Add the dat name as a directory prefix</param>
-		/// <param name="romba">Output files in romba format</param>
+		/// <param name="datHeader">All DatHeader info to be used</param>
 		/// /* Merging and Diffing info */
 		/// <param name="updateMode">Non-zero flag for diffing mode, zero otherwise</param>
 		/// <param name="inplace">True if the cascade-diffed files should overwrite their inputs, false otherwise</param>
@@ -312,44 +233,12 @@ namespace SabreTools
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
-		/// <param name="dedup">Dedupe type to use for DAT processing</param>
-		/// <param name="stripHash">StripHash that represents the hash(es) that you want to remove from the output</param>
 		private static void InitUpdate(
 			List<string> inputPaths,
 			List<string> basePaths,
 
 			/* Normal DAT header info */
-			string filename,
-			string name,
-			string description,
-			string rootdir,
-			string category,
-			string version,
-			string date,
-			string author,
-			string email,
-			string homepage,
-			string url,
-			string comment,
-			string header,
-			bool superdat,
-			string forcemerge,
-			string forcend,
-			string forcepack,
-			bool excludeOf,
-			bool sceneDateStrip,
-			DatFormat datFormat,
-
-			/* Missfile-specific DAT info */
-			bool usegame,
-			string prefix,
-			string postfix,
-			bool quotes,
-			string repext,
-			string addext,
-			bool remext,
-			bool datprefix,
-			bool romba,
+			DatHeader datHeader,
 
 			/* Merging and Diffing info */
 			UpdateMode updateMode,
@@ -365,85 +254,52 @@ namespace SabreTools
 			string outDir,
 			bool clean,
 			bool remUnicode,
-			bool descAsName,
-			DedupeType dedup,
-			Hash stripHash)
+			bool descAsName)
 		{
-			// Set the special flags
-			ForceMerging fm = Utilities.GetForceMerging(forcemerge);
-			ForceNodump fn = Utilities.GetForceNodump(forcend);
-			ForcePacking fp = Utilities.GetForcePacking(forcepack);
-
 			// Normalize the extensions
-			addext = (addext == "" || addext.StartsWith(".") ? addext : "." + addext);
-			repext = (repext == "" || repext.StartsWith(".") ? repext : "." + repext);
+			datHeader.AddExtension = (datHeader.AddExtension == "" || datHeader.AddExtension.StartsWith(".")
+				? datHeader.AddExtension
+				: "." + datHeader.AddExtension);
+			datHeader.ReplaceExtension = (datHeader.ReplaceExtension == "" || datHeader.ReplaceExtension.StartsWith(".")
+				? datHeader.ReplaceExtension
+				: "." + datHeader.ReplaceExtension);
 
 			// If we're in a special update mode and the names aren't set, set defaults
 			if (updateMode != 0)
 			{
 				// Get the values that will be used
-				if (date == "")
+				if (datHeader.Date == "")
 				{
-					date = DateTime.Now.ToString("yyyy-MM-dd");
+					datHeader.Date = DateTime.Now.ToString("yyyy-MM-dd");
 				}
-				if (name == "")
+				if (datHeader.Name == "")
 				{
-					name = (updateMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup != DedupeType.None ? "-deduped" : "");
+					datHeader.Name = (updateMode != 0 ? "DiffDAT" : "MergeDAT")
+						+ (datHeader.Type == "SuperDAT" ? "-SuperDAT" : "")
+						+ (datHeader.DedupeRoms != DedupeType.None ? "-deduped" : "");
 				}
-				if (description == "")
+				if (datHeader.Description == "")
 				{
-					description = (updateMode != 0 ? "DiffDAT" : "MergeDAT") + (superdat ? "-SuperDAT" : "") + (dedup != DedupeType.None ? " - deduped" : "");
+					datHeader.Description = (updateMode != 0 ? "DiffDAT" : "MergeDAT")
+						+ (datHeader.Type == "SuperDAT" ? "-SuperDAT" : "")
+						+ (datHeader.DedupeRoms != DedupeType.None ? " - deduped" : "");
 					if (!bare)
 					{
-						description += " (" + date + ")";
+						datHeader.Description += " (" + datHeader.Date + ")";
 					}
 				}
-				if (category == "" && updateMode != 0)
+				if (datHeader.Category == "" && updateMode != 0)
 				{
-					category = "DiffDAT";
+					datHeader.Category = "DiffDAT";
 				}
-				if (author == "")
+				if (datHeader.Author == "")
 				{
-					author = "SabreTools";
+					datHeader.Author = "SabreTools";
 				}
 			}
 
 			// Populate the DatData object
-			DatFile userInputDat = new DatFile
-			{
-				FileName = filename,
-				Name = name,
-				Description = description,
-				RootDir = rootdir,
-				Category = category,
-				Version = version,
-				Date = date,
-				Author = author,
-				Email = email,
-				Homepage = homepage,
-				Url = url,
-				Comment = comment,
-				Header = header,
-				Type = (superdat ? "SuperDAT" : null),
-				ForceMerging = fm,
-				ForceNodump = fn,
-				ForcePacking = fp,
-				DedupeRoms = dedup,
-				ExcludeOf = excludeOf,
-				SceneDateStrip = sceneDateStrip,
-				DatFormat = datFormat,
-				StripHash = stripHash,
-
-				UseGame = usegame,
-				Prefix = prefix,
-				Postfix = postfix,
-				Quotes = quotes,
-				RepExt = repext,
-				AddExt = addext,
-				RemExt = remext,
-				GameName = datprefix,
-				Romba = romba,
-			};
+			DatFile userInputDat = new DatFile(datHeader);
 			
 			userInputDat.DetermineUpdateType(inputPaths, basePaths, outDir, updateMode, inplace, skip, bare, clean,
 				remUnicode, descAsName, filter, splitType);

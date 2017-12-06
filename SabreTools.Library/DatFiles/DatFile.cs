@@ -603,7 +603,7 @@ namespace SabreTools.Library.DatFiles
 				_datHeader.Quotes = value;
 			}
 		}
-		public string RepExt
+		public string ReplaceExtension
 		{
 			get
 			{
@@ -612,7 +612,7 @@ namespace SabreTools.Library.DatFiles
 					_datHeader = new DatHeader();
 				}
 
-				return _datHeader.RepExt;
+				return _datHeader.ReplaceExtension;
 			}
 			set
 			{
@@ -621,10 +621,10 @@ namespace SabreTools.Library.DatFiles
 					_datHeader = new DatHeader();
 				}
 
-				_datHeader.RepExt = value;
+				_datHeader.ReplaceExtension = value;
 			}
 		}
-		public string AddExt
+		public string AddExtension
 		{
 			get
 			{
@@ -633,7 +633,7 @@ namespace SabreTools.Library.DatFiles
 					_datHeader = new DatHeader();
 				}
 
-				return _datHeader.AddExt;
+				return _datHeader.AddExtension;
 			}
 			set
 			{
@@ -642,10 +642,10 @@ namespace SabreTools.Library.DatFiles
 					_datHeader = new DatHeader();
 				}
 
-				_datHeader.AddExt = value;
+				_datHeader.AddExtension = value;
 			}
 		}
-		public bool RemExt
+		public bool RemoveExtension
 		{
 			get
 			{
@@ -654,7 +654,7 @@ namespace SabreTools.Library.DatFiles
 					_datHeader = new DatHeader();
 				}
 
-				return _datHeader.RemExt;
+				return _datHeader.RemoveExtension;
 			}
 			set
 			{
@@ -663,7 +663,7 @@ namespace SabreTools.Library.DatFiles
 					_datHeader = new DatHeader();
 				}
 
-				_datHeader.RemExt = value;
+				_datHeader.RemoveExtension = value;
 			}
 		}
 		public bool GameName
@@ -1551,6 +1551,15 @@ namespace SabreTools.Library.DatFiles
 		public DatFile(DatFile datFile)
 		{
 			_datHeader = (DatHeader)datFile._datHeader.Clone();
+		}
+
+		/// <summary>
+		/// Create a new DatFile from an existing DatHeader
+		/// </summary>
+		/// <param name="datHeader"></param>
+		public DatFile(DatHeader datHeader)
+		{
+			_datHeader = (DatHeader)datHeader.Clone();
 		}
 
 		#endregion

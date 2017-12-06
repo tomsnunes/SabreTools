@@ -184,17 +184,17 @@ namespace SabreTools.Library.DatFiles
 			get { return _quotes; }
 			set { _quotes = value; }
 		}
-		public string RepExt
+		public string ReplaceExtension
 		{
 			get { return _repExt; }
 			set { _repExt = value; }
 		}
-		public string AddExt
+		public string AddExtension
 		{
 			get { return _addExt; }
 			set { _addExt = value; }
 		}
-		public bool RemExt
+		public bool RemoveExtension
 		{
 			get { return _remExt; }
 			set { _remExt = value; }

@@ -269,20 +269,20 @@ namespace SabreTools.Library.DatFiles
 				else
 				{
 					name = (UseGame ? rom.MachineName : rom.Name);
-					if (RepExt != "" || RemExt)
+					if (ReplaceExtension != "" || RemoveExtension)
 					{
-						if (RemExt)
+						if (RemoveExtension)
 						{
-							RepExt = "";
+							ReplaceExtension = "";
 						}
 
 						string dir = Path.GetDirectoryName(name);
 						dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
-						name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + RepExt);
+						name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + ReplaceExtension);
 					}
-					if (AddExt != "")
+					if (AddExtension != "")
 					{
-						name += AddExt;
+						name += AddExtension;
 					}
 					if (!UseGame && GameName)
 					{

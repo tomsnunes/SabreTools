@@ -90,33 +90,22 @@ namespace SabreTools
 				chdsAsFiles = false,
 				cleanGameNames = false,
 				copyFiles = false,
-				datPrefix = false,
 				delete = false,
 				depot = false,
 				descAsName = false,
-				excludeOf = false,
 				hashOnly = false,
 				inplace = false,
 				inverse = false,
 				nostore = false,
 				quickScan = false,
-				quotes = false,
-				remext = false,
 				removeDateFromAutomaticName = false,
 				removeUnicode = false,
-				romba = false,
-				sceneDateStrip = false,
 				showBaddumpColumn = false,
 				showNodumpColumn = false,
 				shortname = false,
-				superdat = false,
 				skip = false,
-				updateDat = false,
-				usegame = true;
-			DatFormat datFormat = 0x0;
-			DedupeType dedup = DedupeType.None;
+				updateDat = false;
 			Hash omitFromScan = Hash.DeepHashes; // TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
-			Hash stripHash = 0x0;
 			OutputFormat outputFormat = OutputFormat.Folder;
 			SkipFileType skipFileType = SkipFileType.None;
 			SplittingMode splittingMode = SplittingMode.None;
@@ -129,28 +118,9 @@ namespace SabreTools
 				rar = 1,
 				sevenzip = 1,
 				zip = 1;
-			string addext = "",
-				author = null,
-				category = null,
-				comment = null,
-				date = null,
-				description = null,
-				email = null,
-				filename = null,
-				forcemerge = "",
-				forcend = "",
-				forcepack = "",
-				header = null,
-				homepage = null,
-				name = null,
-				outDir = null,
-				postfix = "",
-				prefix = "",
-				repext = "",
-				rootdir = null,
-				tempDir = "",
-				url = null,
-				version = null;
+			string outDir = null,
+				tempDir = "";
+			DatHeader datHeader = new DatHeader();
 			Filter filter = new Filter();
 			List<string> basePaths = new List<string>();
 			List<string> datfiles = new List<string>();
@@ -291,7 +261,7 @@ namespace SabreTools
 						descAsName = true;
 						break;
 					case "dedup":
-						dedup = DedupeType.Full;
+						datHeader.DedupeRoms = DedupeType.Full;
 						break;
 					case "delete":
 						delete = true;
@@ -333,10 +303,10 @@ namespace SabreTools
 						archivesAsFiles = true;
 						break;
 					case "game-dedup":
-						dedup = DedupeType.Game;
+						datHeader.DedupeRoms = DedupeType.Game;
 						break;
 					case "game-prefix":
-						datPrefix = true;
+						datHeader.GameName = true;
 						break;
 					case "hash-only":
 						hashOnly = true;
@@ -387,73 +357,73 @@ namespace SabreTools
 						nostore = true;
 						break;
 					case "output-all":
-						datFormat |= DatFormat.ALL;
+						datHeader.DatFormat |= DatFormat.ALL;
 						break;
 					case "output-am":
-						datFormat |= DatFormat.AttractMode;
+						datHeader.DatFormat |= DatFormat.AttractMode;
 						break;
 					case "output-cmp":
-						datFormat |= DatFormat.ClrMamePro;
+						datHeader.DatFormat |= DatFormat.ClrMamePro;
 						break;
 					case "output-csv":
-						datFormat |= DatFormat.CSV;
+						datHeader.DatFormat |= DatFormat.CSV;
 						break;
 					case "output-dc":
-						datFormat |= DatFormat.DOSCenter;
+						datHeader.DatFormat |= DatFormat.DOSCenter;
 						break;
 					case "of-as-game":
 						filter.IncludeOfInGame = true;
 						break;
 					case "output-lr":
-						datFormat |= DatFormat.Listroms;
+						datHeader.DatFormat |= DatFormat.Listroms;
 						break;
 					case "output-miss":
-						datFormat |= DatFormat.MissFile;
+						datHeader.DatFormat |= DatFormat.MissFile;
 						break;
 					case "output-md5":
-						datFormat |= DatFormat.RedumpMD5;
+						datHeader.DatFormat |= DatFormat.RedumpMD5;
 						break;
 					case "output-ol":
-						datFormat |= DatFormat.OfflineList;
+						datHeader.DatFormat |= DatFormat.OfflineList;
 						break;
 					case "output-rc":
-						datFormat |= DatFormat.RomCenter;
+						datHeader.DatFormat |= DatFormat.RomCenter;
 						break;
 					case "output-sd":
-						datFormat |= DatFormat.SabreDat;
+						datHeader.DatFormat |= DatFormat.SabreDat;
 						break;
 					case "output-sfv":
-						datFormat |= DatFormat.RedumpSFV;
+						datHeader.DatFormat |= DatFormat.RedumpSFV;
 						break;
 					case "output-sha1":
-						datFormat |= DatFormat.RedumpSHA1;
+						datHeader.DatFormat |= DatFormat.RedumpSHA1;
 						break;
 					case "output-sha256":
-						datFormat |= DatFormat.RedumpSHA256;
+						datHeader.DatFormat |= DatFormat.RedumpSHA256;
 						break;
 					case "output-sha384":
-						datFormat |= DatFormat.RedumpSHA384;
+						datHeader.DatFormat |= DatFormat.RedumpSHA384;
 						break;
 					case "output-sha512":
-						datFormat |= DatFormat.RedumpSHA512;
+						datHeader.DatFormat |= DatFormat.RedumpSHA512;
 						break;
 					case "output-sl":
-						datFormat |= DatFormat.SoftwareList;
+						datHeader.DatFormat |= DatFormat.SoftwareList;
 						break;
 					case "output-tsv":
-						datFormat |= DatFormat.TSV;
+						datHeader.DatFormat |= DatFormat.TSV;
 						break;
 					case "output-xml":
-						datFormat |= DatFormat.Logiqx;
+						datHeader.DatFormat |= DatFormat.Logiqx;
 						break;
 					case "quotes":
-						quotes = true;
+						datHeader.Quotes = true;
 						break;
 					case "quick":
 						quickScan = true;
 						break;
 					case "roms":
-						usegame = false;
+						datHeader.UseGame = false;
 						break;
 					case "reverse-base-name":
 						updateMode |= UpdateMode.ReverseBaseReplace;
@@ -462,25 +432,25 @@ namespace SabreTools
 						updateMode |= UpdateMode.DiffReverseCascade;
 						break;
 					case "rem-md5":
-						stripHash |= Hash.MD5;
+						datHeader.StripHash |= Hash.MD5;
 						break;
 					case "rem-ext":
-						remext = true;
+						datHeader.RemoveExtension = true;
 						break;
 					case "romba":
-						romba = true;
+						datHeader.Romba = true;
 						break;
 					case "rem-sha1":
-						stripHash |= Hash.SHA1;
+						datHeader.StripHash |= Hash.SHA1;
 						break;
 					case "rem-sha256":
-						stripHash |= Hash.SHA256;
+						datHeader.StripHash |= Hash.SHA256;
 						break;
 					case "rem-sha384":
-						stripHash |= Hash.SHA384;
+						datHeader.StripHash |= Hash.SHA384;
 						break;
 					case "rem-sha512":
-						stripHash |= Hash.SHA512;
+						datHeader.StripHash |= Hash.SHA512;
 						break;
 					case "rem-uni":
 						removeUnicode = true;
@@ -498,10 +468,10 @@ namespace SabreTools
 						zip = 0;
 						break;
 					case "superdat":
-						superdat = true;
+						datHeader.Type = "SuperDAT";
 						break;
 					case "scene-date-strip":
-						sceneDateStrip = true;
+						datHeader.SceneDateStrip = true;
 						break;
 					case "skip":
 						skip = true;
@@ -561,7 +531,7 @@ namespace SabreTools
 						updateDat = true;
 						break;
 					case "exclude-of":
-						excludeOf = true;
+						datHeader.ExcludeOf = true;
 						break;
 
 					// User inputs
@@ -569,25 +539,25 @@ namespace SabreTools
 						sevenzip = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
 						break;
 					case "-add-ext":
-						addext = (string)feat.Value.GetValue();
+						datHeader.AddExtension = (string)feat.Value.GetValue();
 						break;
 					case "author":
-						author = (string)feat.Value.GetValue();
+						datHeader.Author = (string)feat.Value.GetValue();
 						break;
 					case "base-dat":
 						basePaths.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "category":
-						category = (string)feat.Value.GetValue();
+						datHeader.Category = (string)feat.Value.GetValue();
 						break;
 					case "comment":
-						comment = (string)feat.Value.GetValue();
+						datHeader.Comment = (string)feat.Value.GetValue();
 						break;
 					case "crc":
 						filter.CRCs.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "date":
-						date = (string)feat.Value.GetValue();
+						datHeader.Date = (string)feat.Value.GetValue();
 						break;
 					case "dat":
 						if (!File.Exists((string)feat.Value.GetValue()) && !Directory.Exists((string)feat.Value.GetValue()))
@@ -599,10 +569,10 @@ namespace SabreTools
 						datfiles.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "desc":
-						description = (string)feat.Value.GetValue();
+						datHeader.Description = (string)feat.Value.GetValue();
 						break;
 					case "email":
-						email = (string)feat.Value.GetValue();
+						datHeader.Email = (string)feat.Value.GetValue();
 						break;
 					case "exta":
 						exta.AddRange((List<string>)feat.Value.GetValue());
@@ -611,16 +581,16 @@ namespace SabreTools
 						extb.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "filename":
-						filename = (string)feat.Value.GetValue();
+						datHeader.FileName = (string)feat.Value.GetValue();
 						break;
 					case "forcemerge":
-						forcemerge = (string)feat.Value.GetValue();
+						datHeader.ForceMerging = Utilities.GetForceMerging((string)feat.Value.GetValue());
 						break;
 					case "forcend":
-						forcend = (string)feat.Value.GetValue();
+						datHeader.ForceNodump = Utilities.GetForceNodump((string)feat.Value.GetValue());
 						break;
 					case "forcepack":
-						forcepack = (string)feat.Value.GetValue();
+						datHeader.ForcePacking = Utilities.GetForcePacking((string)feat.Value.GetValue());
 						break;
 					case "game-name":
 						filter.GameNames.AddRange((List<string>)feat.Value.GetValue());
@@ -632,10 +602,10 @@ namespace SabreTools
 						gz = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
 						break;
 					case "header":
-						header = (string)feat.Value.GetValue();
+						datHeader.Header = (string)feat.Value.GetValue();
 						break;
 					case "homepage":
-						homepage = (string)feat.Value.GetValue();
+						datHeader.Homepage = (string)feat.Value.GetValue();
 						break;
 					case "status":
 						filter.ItemStatuses |= Utilities.GetItemStatus((string)feat.Value.GetValue());
@@ -647,7 +617,7 @@ namespace SabreTools
 						Globals.MaxThreads = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : Globals.MaxThreads;
 						break;
 					case "name":
-						name = (string)feat.Value.GetValue();
+						datHeader.Name = (string)feat.Value.GetValue();
 						break;
 					case "not-crc":
 						filter.NotCRCs.AddRange((List<string>)feat.Value.GetValue());
@@ -686,13 +656,13 @@ namespace SabreTools
 						outDir = (string)feat.Value.GetValue();
 						break;
 					case "postfix":
-						postfix = (string)feat.Value.GetValue();
+						datHeader.Postfix = (string)feat.Value.GetValue();
 						break;
 					case "prefix":
-						prefix = (string)feat.Value.GetValue();
+						datHeader.Prefix = (string)feat.Value.GetValue();
 						break;
 					case "root":
-						rootdir = (string)feat.Value.GetValue();
+						datHeader.RootDir = (string)feat.Value.GetValue();
 						break;
 					case "rar":
 						rar = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
@@ -701,7 +671,7 @@ namespace SabreTools
 						filter.Root = (string)feat.Value.GetValue();
 						break;
 					case "rep-ext":
-						repext = (string)feat.Value.GetValue();
+						datHeader.ReplaceExtension = (string)feat.Value.GetValue();
 						break;
 					case "rom-name":
 						filter.RomNames.AddRange((List<string>)feat.Value.GetValue());
@@ -734,10 +704,10 @@ namespace SabreTools
 						tempDir = (string)feat.Value.GetValue();
 						break;
 					case "url":
-						url = (string)feat.Value.GetValue();
+						datHeader.Url = (string)feat.Value.GetValue();
 						break;
 					case "version":
-						version = (string)feat.Value.GetValue();
+						datHeader.Version = (string)feat.Value.GetValue();
 						break;
 					case "zip":
 						zip = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
@@ -760,9 +730,8 @@ namespace SabreTools
 			// Create a DAT from a directory or set of directories
 			if (datFromDir)
 			{
-				InitDatFromDir(inputs, filename, name, description, category, version, author, email, homepage, url, comment,
-					forcepack, excludeOf, sceneDateStrip, datFormat, romba, superdat, omitFromScan, removeDateFromAutomaticName, archivesAsFiles,
-					skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, header, chdsAsFiles);
+				InitDatFromDir(inputs, datHeader, omitFromScan, removeDateFromAutomaticName, archivesAsFiles,
+					skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, chdsAsFiles);
 			}
 
 			// If we're in header extract and remove mode
@@ -781,34 +750,32 @@ namespace SabreTools
 			else if (sort)
 			{
 				InitSort(datfiles, inputs, outDir, depot, quickScan, addFileDates, delete, inverse,
-					outputFormat, romba, sevenzip, gz, rar, zip, updateDat, header, splitType, chdsAsFiles);
+					outputFormat, datHeader.Romba, sevenzip, gz, rar, zip, updateDat, datHeader.Header, splitType, chdsAsFiles);
 			}
 
 			// Split a DAT by the split type
 			else if (split)
 			{
-				InitSplit(inputs, outDir, inplace, datFormat, splittingMode, exta, extb, shortname, basedat);
+				InitSplit(inputs, outDir, inplace, datHeader.DatFormat, splittingMode, exta, extb, shortname, basedat);
 			}
 
 			// Get statistics on input files
 			else if (stats)
 			{
-				InitStats(inputs, filename, outDir, filter.Single, showBaddumpColumn, showNodumpColumn, statDatFormat);
+				InitStats(inputs, datHeader.FileName, outDir, filter.Single, showBaddumpColumn, showNodumpColumn, statDatFormat);
 			}
 
 			// Convert, update, merge, diff, and filter a DAT or folder of DATs
 			else if (update)
 			{
-				InitUpdate(inputs, basePaths, filename, name, description, rootdir, category, version, date, author, email, homepage, url, comment, header,
-					superdat, forcemerge, forcend, forcepack, excludeOf, sceneDateStrip, datFormat, usegame, prefix, postfix, quotes, repext, addext, remext,
-					datPrefix, romba, updateMode, inplace, skip, removeDateFromAutomaticName, filter, splitType, outDir, cleanGameNames, removeUnicode,
-					descAsName, dedup, stripHash);
+				InitUpdate(inputs, basePaths, datHeader, updateMode, inplace, skip, removeDateFromAutomaticName, filter,
+					splitType, outDir, cleanGameNames, removeUnicode, descAsName);
 			}
 
 			// If we're using the verifier
 			else if (verify)
 			{
-				InitVerify(datfiles, inputs, depot, hashOnly, quickScan, header, splitType, chdsAsFiles);
+				InitVerify(datfiles, inputs, depot, hashOnly, quickScan, datHeader.Header, splitType, chdsAsFiles);
 			}
 
 			// If nothing is set, show the help
