@@ -304,7 +304,7 @@ namespace SabreTools
 			datFromDir.AddFeature("mt", new Feature(
 				new List<string>() { "-mt", "--mt" },
 				"Amount of threads to use (default 4, -1 unlimted)",
-				FeatureType.String,
+				FeatureType.Int32,
 				null));
 
 			#endregion
@@ -473,22 +473,22 @@ namespace SabreTools
 			sort.AddFeature("7z", new Feature(
 				new List<string>() { "-7z", "--7z" },
 				"Set scanning level for 7z archives (default 1)",
-				FeatureType.String,
+				FeatureType.Int32,
 				null));
 			sort.AddFeature("gz", new Feature(
 				new List<string>() { "-gz", "--gz" },
 				"Set scanning level for GZip archives (default 1)",
-				FeatureType.String,
+				FeatureType.Int32,
 				null));
 			sort.AddFeature("rar", new Feature(
 				new List<string>() { "-rar", "--rar" },
 				"Set scanning level for RAR archives (default 1)",
-				FeatureType.String,
+				FeatureType.Int32,
 				null));
 			sort.AddFeature("zip", new Feature(
 				new List<string>() { "-zip", "--zip" },
 				"Set scanning level for ZIP archives (default 1)",
-				FeatureType.String,
+				FeatureType.Int32,
 				null));
 			sort.AddFeature("scan-all", new Feature(
 				new List<string>() { "-sa", "--scan-all" },
@@ -523,7 +523,7 @@ namespace SabreTools
 			sort.AddFeature("mt", new Feature(
 				new List<string>() { "-mt", "--mt" },
 				"Amount of threads to use (default 4, -1 unlimted)",
-				FeatureType.String,
+				FeatureType.Int32,
 				null));
 
 			#endregion
@@ -1318,17 +1318,17 @@ namespace SabreTools
 			update.AddFeature("greater", new Feature(
 				new List<string>() { "-sgt", "--greater" },
 				"Filter by size >=",
-				FeatureType.String,
+				FeatureType.Int32,
 				null));
 			update.AddFeature("less", new Feature(
 				new List<string>() { "-slt", "--less" },
 				"Filter by size =<",
-				FeatureType.String,
+				FeatureType.Int32,
 				null));
 			update.AddFeature("equal", new Feature(
 				new List<string>() { "-seq", "--equal" },
 				"Filter by size ==",
-				FeatureType.String,
+				FeatureType.Int32,
 				null));
 			update.AddFeature("crc", new Feature(
 				new List<string>() { "-crc", "--crc" },
@@ -1449,7 +1449,7 @@ namespace SabreTools
 			update.AddFeature("mt", new Feature(
 				new List<string>() { "-mt", "--mt" },
 				"Amount of threads to use (default 4, -1 unlimited)",
-				FeatureType.String,
+				FeatureType.Int32,
 				null));
 
 			#endregion

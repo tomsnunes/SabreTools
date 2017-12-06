@@ -102,7 +102,7 @@ namespace SabreTools.Library.Help
 			// Loop through the features
 			foreach (string featureName in _features.Keys)
 			{
-				if (_features[featureName].ValidateInput(name, exact: true))
+				if (_features[featureName].ValidateInput(name, exact: true, ignore: true))
 				{
 					feature = featureName;
 					break;
@@ -259,14 +259,22 @@ namespace SabreTools.Library.Help
 		/// Retrieve a list of enabled features
 		/// </summary>
 		/// <returns>List of Features representing what is enabled</returns>
-		public List<Feature> GetEnabledFeatures()
+		public Dictionary<string, Feature> GetEnabledFeatures()
 		{
-			List<Feature> enabled = new List<Feature>();
+			Dictionary<string, Feature> enabled = new Dictionary<string, Feature>();
 
 			// Loop through the features
 			foreach(KeyValuePair<string, Feature> feature in _features)
 			{
-				enabled.AddRange(GetEnabledSubfeatures(feature.Value));
+				Dictionary<string, Feature> temp = GetEnabledSubfeatures(feature.Key, feature.Value);
+				foreach (KeyValuePair<string, Feature> tempfeat in temp)
+				{
+					if (!enabled.ContainsKey(tempfeat.Key))
+					{
+						enabled.Add(tempfeat.Key, null);
+					}
+					enabled[tempfeat.Key] = tempfeat.Value;
+				}
 			}
 
 			return enabled;
@@ -275,22 +283,31 @@ namespace SabreTools.Library.Help
 		/// <summary>
 		/// Retrieve a nested list of subfeatures from the current feature
 		/// </summary>
+		/// <param name="key">Name that should be assigned to the feature</param>
 		/// <param name="feature">Feature with possible subfeatures to test</param>
 		/// <returns>List of Features representing what is enabled</returns>
-		private List<Feature> GetEnabledSubfeatures(Feature feature)
+		private Dictionary<string, Feature> GetEnabledSubfeatures(string key, Feature feature)
 		{
-			List<Feature> enabled = new List<Feature>();
+			Dictionary<string, Feature> enabled = new Dictionary<string, Feature>();
 
 			// First determine if the current feature is enabled
 			if (feature.IsEnabled())
 			{
-				enabled.Add(feature);
+				enabled.Add(key, feature);
 			}
 
 			// Now loop through the subfeatures recursively
-			foreach (KeyValuePair<string, Feature> sub in _features)
+			foreach (KeyValuePair<string, Feature> sub in feature.Features)
 			{
-				enabled.AddRange(GetEnabledSubfeatures(sub.Value));
+				Dictionary<string, Feature> temp = GetEnabledSubfeatures(sub.Key, sub.Value);
+				foreach (KeyValuePair<string, Feature> tempfeat in temp)
+				{
+					if (!enabled.ContainsKey(tempfeat.Key))
+					{
+						enabled.Add(tempfeat.Key, null);
+					}
+					enabled[tempfeat.Key] = tempfeat.Value;
+				}
 			}
 
 			return enabled;

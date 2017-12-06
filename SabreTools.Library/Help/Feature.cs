@@ -19,8 +19,23 @@ namespace SabreTools.Library.Help
 
 		// Specific value types
 		private bool _valueBool = false;
+		private int _valueInt32 = Int32.MinValue;
+		private long _valueInt64 = Int64.MinValue;
 		private string _valueString = null;
 		private List<string> _valueList = null;
+
+		#endregion
+
+		#region Publicly facing variables
+
+		public string Description
+		{
+			get { return _description; }
+		}
+		public Dictionary<string, Feature> Features
+		{
+			get { return _features; }
+		}
 
 		#endregion
 
@@ -336,8 +351,9 @@ namespace SabreTools.Library.Help
 		/// </summary>
 		/// <param name="input">Input to check against</param>
 		/// <param name="exact">True if just this feature should be checked, false if all subfeatures are checked as well</param>
+		/// <param name="ignore">True if the existing flag should be ignored, false otherwise</param>
 		/// <returns>True if the flag was valid, false otherwise</returns>
-		public bool ValidateInput(string input, bool exact = false)
+		public bool ValidateInput(string input, bool exact = false, bool ignore = false)
 		{
 			bool valid = false;
 
@@ -350,10 +366,56 @@ namespace SabreTools.Library.Help
 					if (valid)
 					{
 						_valueBool = true;
+
+						// If we've already found this feature before
+						if (_foundOnce && !ignore)
+						{
+							valid = false;
+						}
+
 						_foundOnce = true;
 					}
 					break;
+				// If we have an Int32, try to parse it if at all possible
+				case FeatureType.Int32:
+					valid = input.Contains("=") && _flags.Contains(input.Split('=')[0]);
+					if (valid)
+					{
+						if (!Int32.TryParse(input.Split('=')[1], out int value))
+						{
+							value = Int32.MinValue;
+						}
+						_valueInt32 = value;
 
+						// If we've already found this feature before
+						if (_foundOnce && !ignore)
+						{
+							valid = false;
+						}
+
+						_foundOnce = true;
+					}
+					break;
+				// If we have an Int32, try to parse it if at all possible
+				case FeatureType.Int64:
+					valid = input.Contains("=") && _flags.Contains(input.Split('=')[0]);
+					if (valid)
+					{
+						if (!Int64.TryParse(input.Split('=')[1], out long value))
+						{
+							value = Int64.MinValue;
+						}
+						_valueInt64 = value;
+
+						// If we've already found this feature before
+						if (_foundOnce && !ignore)
+						{
+							valid = false;
+						}
+
+						_foundOnce = true;
+					}
+					break;
 				// If we have an input, make sure it has an equals sign in it
 				case FeatureType.List:
 					valid = input.Contains("=") && _flags.Contains(input.Split('=')[0]);
@@ -372,6 +434,13 @@ namespace SabreTools.Library.Help
 					if (valid)
 					{
 						_valueString = input.Split('=')[1];
+
+						// If we've already found this feature before
+						if (_foundOnce && !ignore)
+						{
+							valid = false;
+						}
+
 						_foundOnce = true;
 					}
 					break;
@@ -390,12 +459,6 @@ namespace SabreTools.Library.Help
 						break;
 					}
 				}
-			}
-
-			// If we've already found this flag before and we don't allow duplicates, set valid to false
-			if (valid && _foundOnce && _featureType != FeatureType.List)
-			{
-				valid = false;
 			}
 
 			// If we're not valid at this point, we want to check if this flag is a file or a folder
@@ -417,6 +480,10 @@ namespace SabreTools.Library.Help
 			{
 				case FeatureType.Flag:
 					return _valueBool;
+				case FeatureType.Int32:
+					return _valueInt32;
+				case FeatureType.Int64:
+					return _valueInt64;
 				case FeatureType.List:
 					return _valueList;
 				case FeatureType.String:
@@ -438,6 +505,10 @@ namespace SabreTools.Library.Help
 			{
 				case FeatureType.Flag:
 					return (bool)obj;
+				case FeatureType.Int32:
+					return (int)obj != Int32.MinValue;
+				case FeatureType.Int64:
+					return (long)obj != Int64.MinValue;
 				case FeatureType.List:
 					return obj != null;
 				case FeatureType.String:

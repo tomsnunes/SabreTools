@@ -358,6 +358,8 @@
 	{
 		Flag = 0,
 		String,
+		Int32,
+		Int64,
 		List,
 	}
 
