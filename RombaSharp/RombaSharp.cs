@@ -5,6 +5,12 @@ using SabreTools.Library.Data;
 using SabreTools.Library.Help;
 using SabreTools.Library.Tools;
 
+#if MONO
+using System.IO;
+#else
+using Alphaleonis.Win32.Filesystem;
+#endif
+
 namespace RombaSharp
 {
 	/// <summary>
@@ -108,157 +114,147 @@ namespace RombaSharp
 				outdat = "";
 			List<string> inputs = new List<string>();
 
-			// Determine which switches are enabled (with values if necessary)
-			for (int i = 0; i < args.Length; i++)
+			// Get the first argument as a feature flag
+			string feature = args[0];
+
+			// Verify that the flag is valid
+			if (!_help.TopLevelFlag(feature))
 			{
-				switch (args[i])
+				Globals.Logger.User("'{0}' is not valid feature flag", feature);
+				_help.OutputIndividualFeature(feature);
+				Globals.Logger.Close();
+				return;
+			}
+
+			// Now get the proper name for the feature
+			feature = _help.GetFeatureName(feature);
+
+			// If we had the help feature first
+			if (feature == "Help")
+			{
+				// If we had something else after help
+				if (args.Length > 1)
 				{
-					// Feature flags
-					case "-?":
-					case "-h":
-					case "--help":
-						if (i + 1 < args.Length)
-						{
-							_help.OutputIndividualFeature(args[i + 1]);
-						}
-						else
-						{
-							_help.OutputGenericHelp();
-						}
-						return;
-					case "archive":
+					_help.OutputIndividualFeature(args[1]);
+					Globals.Logger.Close();
+					return;
+				}
+				// Otherwise, show generic help
+				else
+				{
+					_help.OutputGenericHelp();
+					Globals.Logger.Close();
+					return;
+				}
+			}
+
+			// Now verify that all other flags are valid
+			for (int i = 1; i < args.Length; i++)
+			{
+				// Verify that the current flag is proper for the feature
+				if (!_help[feature].ValidateInput(args[i]))
+				{
+					Globals.Logger.Error("Invalid input detected: {0}", args[i]);
+					_help.OutputIndividualFeature(feature);
+					Globals.Logger.Close();
+					return;
+				}
+
+				// Special precautions for files and directories
+				if (File.Exists(args[i]) || Directory.Exists(args[i]))
+				{
+					inputs.Add(args[i]);
+				}
+			}
+
+			// Now loop through all inputs
+			Dictionary<string, Feature> features = _help.GetEnabledFeatures();
+			foreach (KeyValuePair<string, Feature> feat in features)
+			{
+				// Check all of the flag names and translate to arguments
+				switch (feat.Key)
+				{
+					// Top-level features
+					case "Help":
+						// No-op as this should be caught
+						break;
+					case "Archive":
 						archive = true;
 						break;
-					case "build":
+					case "Build":
 						build = true;
 						break;
-					case "dbstats":
+					case "Stats":
 						dbstats = true;
 						break;
-					case "depot-rescan":
+					case "Rescan Depots":
 						depotRescan = true;
 						break;
-					case "diffdat":
+					case "Diffdat":
 						diffdat = true;
 						break;
-					case "dir2dat":
+					case "Dir2Dat":
 						dir2dat = true;
 						break;
-					case "export":
+					case "Export":
 						export = true;
 						break;
-					case "fixdat":
+					case "Fixdat":
 						fixdat = true;
 						break;
-					case "import":
+					case "Import":
 						import = true;
 						break;
-					case "lookup":
+					case "Lookup":
 						lookup = true;
 						break;
-					case "memstats":
+					case "Memstats":
 						memstats = true;
 						break;
-					case "merge":
+					case "Merge":
 						merge = true;
 						break;
-					case "miss":
+					case "Miss":
 						miss = true;
 						break;
-					case "purge-backup":
+					case "Purge Backup":
 						purgeBackup = true;
 						break;
-					case "purge-delete":
+					case "Purge Delete":
 						purgeDelete = true;
 						break;
-					case "progress":
-						progress = true;
-						break;
-					case "refresh-dats":
+					case "Refresh DATs":
 						refreshDats = true;
 						break;
-					case "shutdown":
+					case "Progress":
+						progress = true;
+						break;
+					case "Shutdown":
 						shutdown = true;
 						break;
 
 					// User flags
-					case "-copy":
-					case "--copy":
+					case "copy":
 						copy = true;
 						break;
-					case "-log-only":
-					case "--log-only":
+					case "log-only":
 						logOnly = true;
 						break;
-					case "-only-needed":
-					case "--only-needed":
+					case "only-needed":
 						onlyNeeded = true;
 						break;
 
 					// User inputs
-					case "-depot":
-					case "--depot":
-						i++;
-						depotPath = args[i];
+					case "depot":
+						depotPath = (string)feat.Value.GetValue();
 						break;
-					case "-new":
-					case "--new":
-						i++;
-						newdat = args[i];
+					case "new":
+						newdat = (string)feat.Value.GetValue();
 						break;
-					case "-out":
-					case "--out":
-						i++;
-						outdat = args[i];
-						break;
-					default:
-						string temparg = args[i].Replace("\"", "").Replace("file://", "");
-
-						if (temparg.StartsWith("-") && temparg.Contains("="))
-						{
-							// Split the argument
-							string[] split = temparg.Split('=');
-							if (split[1] == null)
-							{
-								split[1] = "";
-							}
-
-							switch (split[0])
-							{
-								case "-depot":
-								case "--depot":
-									i++;
-									depotPath = split[1];
-									break;
-								case "-new":
-								case "--new":
-									newdat = split[1];
-									break;
-								case "-out":
-								case "--out":
-									outdat = split[i];
-									break;
-								default:
-									inputs.Add(temparg);
-									break;
-							}
-						}
-						else
-						{
-							inputs.Add(temparg);
-						}
+					case "out":
+						outdat = (string)feat.Value.GetValue();
 						break;
 				}
-			}
-
-			// If more than one switch is enabled, show the help screen
-			if (!(archive ^ build ^ dbstats ^ depotRescan ^ diffdat ^ dir2dat ^ export ^ fixdat ^ import ^ lookup ^
-				memstats ^ merge ^ miss ^ progress ^ purgeBackup ^ purgeDelete ^ refreshDats ^ shutdown))
-			{
-				Globals.Logger.Error("Only one feature switch is allowed at a time");
-				_help.OutputGenericHelp();
-				Globals.Logger.Close();
-				return;
 			}
 
 			// If a switch that requires a filename is set and no file is, show the help screen
