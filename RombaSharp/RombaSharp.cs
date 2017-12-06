@@ -174,65 +174,6 @@ namespace RombaSharp
 				// Check all of the flag names and translate to arguments
 				switch (feat.Key)
 				{
-					// Top-level features
-					case "Help":
-						// No-op as this should be caught
-						break;
-					case "Archive":
-						archive = true;
-						break;
-					case "Build":
-						build = true;
-						break;
-					case "Stats":
-						dbstats = true;
-						break;
-					case "Rescan Depots":
-						depotRescan = true;
-						break;
-					case "Diffdat":
-						diffdat = true;
-						break;
-					case "Dir2Dat":
-						dir2dat = true;
-						break;
-					case "Export":
-						export = true;
-						break;
-					case "Fixdat":
-						fixdat = true;
-						break;
-					case "Import":
-						import = true;
-						break;
-					case "Lookup":
-						lookup = true;
-						break;
-					case "Memstats":
-						memstats = true;
-						break;
-					case "Merge":
-						merge = true;
-						break;
-					case "Miss":
-						miss = true;
-						break;
-					case "Purge Backup":
-						purgeBackup = true;
-						break;
-					case "Purge Delete":
-						purgeDelete = true;
-						break;
-					case "Refresh DATs":
-						refreshDats = true;
-						break;
-					case "Progress":
-						progress = true;
-						break;
-					case "Shutdown":
-						shutdown = true;
-						break;
-
 					// User flags
 					case "copy":
 						copy = true;
@@ -257,133 +198,143 @@ namespace RombaSharp
 				}
 			}
 
-			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0 && (archive || build || depotRescan || dir2dat || fixdat || 
-				import || lookup || merge || miss))
-			{
-				Globals.Logger.Error("This feature requires at least one input");
-				_help.OutputGenericHelp();
-				Globals.Logger.Close();
-				return;
-			}
-
 			// Now take care of each mode in succesion
-
-			// Adds ROM files from the specified directories to the ROM archive
-			if (archive)
+			switch(feature)
 			{
-				InitArchive(inputs, onlyNeeded);
-			}
-
-			// For each specified DAT file it creates the torrentzip files
-			else if (build)
-			{
-				InitBuild(inputs, copy);
-			}
-
-			// Prints db stats
-			else if (dbstats)
-			{
-				DisplayDBStats();
-			}
-
-			// Rescan a specific depot
-			else if (depotRescan)
-			{
-				foreach (string input in inputs)
-				{
-					Rescan(input);
-				}
-			}
-
-			// Creates a DAT file with those entries that are in new DAT
-			else if (diffdat)
-			{
-				InitDiffDat(newdat);
-			}
-
-			// Creates a DAT file for the specified input directory
-			else if (dir2dat)
-			{
-				InitDir2Dat(inputs);
-			}
-
-			// Export the database to file
-			else if (export)
-			{
-				ExportDatabase();
-			}
-
-			// For each specified DAT file it creates a fix DAT
-			else if (fixdat)
-			{
-				InitFixdat(inputs);
-			}
-
-			// Import a CSV into the database
-			else if (import)
-			{
-				InitImport(inputs);
-			}
-
-			// For each specified hash it looks up any available information
-			else if (lookup)
-			{
-				InitLookup(inputs);
-			}
-
-			// Prints memory stats
-			else if (memstats)
-			{
-				DisplayMemoryStats();
-			}
-
-			// Merges depots
-			else if (merge)
-			{
-				InitMerge(inputs, depotPath, onlyNeeded);
-			}
-
-			// For each specified DAT file it creates a miss file and a have file
-			else if (miss)
-			{
-				InitMiss(inputs);
-			}
-
-			// Shows progress of the currently running command
-			else if (progress)
-			{
-				Globals.Logger.User("This feature is not used in RombaSharp: progress");
-			}
-
-			// Moves DAT index entries for orphaned DATs
-			else if (purgeBackup)
-			{
-				PurgeBackup(logOnly);
-			}
-
-			// Deletes DAT index entries for orphaned DATs
-			else if (purgeDelete)
-			{
-				PurgeDelete(logOnly);
-			}
-
-			// Refreshes the DAT index from the files in the DAT master directory tree
-			else if (refreshDats)
-			{
-				RefreshDatabase();
-			}
-
-			// Gracefully shuts down server
-			else if (shutdown)
-			{
-				Globals.Logger.User("This feature is not used in RombaSharp: shutdown");
-			}
-
-			// If nothing is set, show the help
-			else
-			{
-				_help.OutputGenericHelp();
+				case "Help":
+					// No-op as this should be caught
+					break;
+				// Adds ROM files from the specified directories to the ROM archive
+				case "Archive":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitArchive(inputs, onlyNeeded);
+					break;
+				// For each specified DAT file it creates the torrentzip files
+				case "Build":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitBuild(inputs, copy);
+					break;
+				// Prints db stats
+				case "Stats":
+					DisplayDBStats();
+					break;
+				// Rescan a specific depot
+				case "Rescan Depots":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					foreach (string input in inputs)
+					{
+						Rescan(input);
+					}
+					break;
+				// Creates a DAT file with those entries that are in new DAT
+				case "Diffdat":
+					InitDiffDat(newdat);
+					break;
+				// Creates a DAT file for the specified input directory
+				case "Dir2Dat":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitDir2Dat(inputs);
+					break;
+				// Export the database to file
+				case "Export":
+					ExportDatabase();
+					break;
+				// For each specified DAT file it creates a fix DAT
+				case "Fixdat":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitFixdat(inputs);
+					break;
+				// Import a CSV into the database
+				case "Import":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitImport(inputs);
+					break;
+				// For each specified hash it looks up any available information
+				case "Lookup":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitLookup(inputs);
+					break;
+				// Prints memory stats
+				case "Memstats":
+					DisplayMemoryStats();
+					break;
+				// Merges depots
+				case "Merge":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitMerge(inputs, depotPath, onlyNeeded);
+					break;
+				// For each specified DAT file it creates a miss file and a have file
+				case "Miss":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitMiss(inputs);
+					break;
+				// Moves DAT index entries for orphaned DATs
+				case "Purge Backup":
+					PurgeBackup(logOnly);
+					break;
+				// Deletes DAT index entries for orphaned DATs
+				case "Purge Delete":
+					PurgeDelete(logOnly);
+					break;
+				// Refreshes the DAT index from the files in the DAT master directory tree
+				case "Refresh DATs":
+					RefreshDatabase();
+					break;
+				// Shows progress of the currently running command
+				case "Progress":
+					Globals.Logger.User("This feature is not used in RombaSharp: progress");
+					break;
+				case "Shutdown":
+					Globals.Logger.User("This feature is not used in RombaSharp: shutdown");
+					break;
+				default:
+					_help.OutputGenericHelp();
+					break;
 			}
 
 			Globals.Logger.Close();

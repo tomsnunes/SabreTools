@@ -71,16 +71,6 @@ namespace SabreTools
 				return;
 			}
 
-			// Feature flags
-			bool datFromDir = false,
-				extract = false,
-				restore = false,
-				sort = false,
-				split = false,
-				stats = false,
-				update = false,
-				verify = false;
-
 			// User flags
 			bool addBlankFilesForEmptyFolder = false,
 				addFileDates = false,
@@ -187,38 +177,6 @@ namespace SabreTools
 				// Check all of the flag names and translate to arguments
 				switch (feat.Key)
 				{
-					// Top-level features
-					case "Help":
-						// No-op as this should be caught
-						break;
-					case "DATFromDir":
-						datFromDir = true;
-						break;
-					case "Extract":
-						extract = true;
-						break;
-					case "Restore":
-						restore = true;
-						break;
-					case "Script":
-						// No-op as this should be caught
-						break;
-					case "Split":
-						split = true;
-						break;
-					case "Sort":
-						sort = true;
-						break;
-					case "Stats":
-						stats = true;
-						break;
-					case "Update":
-						update = true;
-						break;
-					case "Verify":
-						verify = true;
-						break;
-
 					// User flags
 					case "add-blank":
 						addBlankFilesForEmptyFolder = true;
@@ -714,73 +672,96 @@ namespace SabreTools
 				}
 			}
 
-			// If a switch that requires a filename is set and no file is, show the help screen
-			if (inputs.Count == 0
-				&& (datFromDir || extract || restore || split || stats || update || verify))
-			{
-				Globals.Logger.Error("This feature requires at least one input");
-				_help.OutputIndividualFeature(feature);
-				Globals.Logger.Close();
-				return;
-			}
-
 			// Now take care of each mode in succesion
-
-			// Create a DAT from a directory or set of directories
-			if (datFromDir)
+			switch (feature)
 			{
-				InitDatFromDir(inputs, datHeader, omitFromScan, removeDateFromAutomaticName, archivesAsFiles, chdsAsFiles,
-					skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles);
-			}
-
-			// If we're in header extract and remove mode
-			else if (extract)
-			{
-				InitExtractRemoveHeader(inputs, outDir, nostore);
-			}
-
-			// If we're in header restore mode
-			else if (restore)
-			{
-				InitReplaceHeader(inputs, outDir);
-			}
-
-			// If we're using the sorter
-			else if (sort)
-			{
-				InitSort(datfiles, inputs, outDir, depot, quickScan, addFileDates, delete, inverse,
-					outputFormat, datHeader.Romba, sevenzip, gz, rar, zip, updateDat, datHeader.Header, splitType, chdsAsFiles);
-			}
-
-			// Split a DAT by the split type
-			else if (split)
-			{
-				InitSplit(inputs, outDir, inplace, datHeader.DatFormat, splittingMode, exta, extb, shortname, basedat);
-			}
-
-			// Get statistics on input files
-			else if (stats)
-			{
-				InitStats(inputs, datHeader.FileName, outDir, filter.Single, showBaddumpColumn, showNodumpColumn, statDatFormat);
-			}
-
-			// Convert, update, merge, diff, and filter a DAT or folder of DATs
-			else if (update)
-			{
-				InitUpdate(inputs, basePaths, datHeader, updateMode, inplace, skip, removeDateFromAutomaticName, filter,
-					splitType, outDir, cleanGameNames, removeUnicode, descAsName);
-			}
-
-			// If we're using the verifier
-			else if (verify)
-			{
-				InitVerify(datfiles, inputs, depot, hashOnly, quickScan, datHeader.Header, splitType, chdsAsFiles);
-			}
-
-			// If nothing is set, show the help
-			else
-			{
-				_help.OutputGenericHelp();
+				case "Help":
+					// No-op as this should be caught
+					break;
+				// Create a DAT from a directory or set of directories
+				case "DATFromDir":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitDatFromDir(inputs, datHeader, omitFromScan, removeDateFromAutomaticName, archivesAsFiles, chdsAsFiles,
+						skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles);
+					break;
+				// If we're in header extract and remove mode
+				case "Extract":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitExtractRemoveHeader(inputs, outDir, nostore);
+					break;
+				// If we're in header restore mode
+				case "Restore":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitReplaceHeader(inputs, outDir);
+					break;
+				case "Script":
+					// No-op as this should be caught
+					break;
+				// If we're using the sorter
+				case "Sort":
+					InitSort(datfiles, inputs, outDir, depot, quickScan, addFileDates, delete, inverse,
+						outputFormat, datHeader.Romba, sevenzip, gz, rar, zip, updateDat, datHeader.Header, splitType, chdsAsFiles);
+					break;
+				// Split a DAT by the split type
+				case "Split":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitSplit(inputs, outDir, inplace, datHeader.DatFormat, splittingMode, exta, extb, shortname, basedat);
+					break;
+				// Get statistics on input files
+				case "Stats":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitStats(inputs, datHeader.FileName, outDir, filter.Single, showBaddumpColumn, showNodumpColumn, statDatFormat);
+					break;
+				// Convert, update, merge, diff, and filter a DAT or folder of DATs
+				case "Update":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitUpdate(inputs, basePaths, datHeader, updateMode, inplace, skip, removeDateFromAutomaticName, filter,
+						splitType, outDir, cleanGameNames, removeUnicode, descAsName);
+					break;
+				// If we're using the verifier
+				case "Verify":
+					if (inputs.Count == 0)
+					{
+						Globals.Logger.Error("This feature requires at least one input");
+						_help.OutputIndividualFeature(feature);
+						break;
+					}
+					InitVerify(datfiles, inputs, depot, hashOnly, quickScan, datHeader.Header, splitType, chdsAsFiles);
+					break;
+				// If nothing is set, show the help
+				default:
+					_help.OutputGenericHelp();
+					break;
 			}
 
 			Globals.Logger.Close();
