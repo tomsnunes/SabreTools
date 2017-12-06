@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using SabreTools.Library.Data;
-
 namespace SabreTools.Library.Help
 {
-	// TODO: Parse and return flags from arguments
-	// TODO: Perform partial matching to find potentially similar features
 	public class Help
 	{
 		#region Private variables
@@ -206,7 +202,7 @@ namespace SabreTools.Library.Help
 				}
 
 				// Otherwise, we want to get features with the same start
-				else if (_features[feature].StartsWith(featurename[0]))
+				else if (_features[feature].StartsWith(featurename.TrimStart('-')[0]))
 				{
 					startsWith.Add(feature);
 				}
