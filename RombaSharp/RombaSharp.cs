@@ -206,22 +206,12 @@ namespace RombaSharp
 					break;
 				// Adds ROM files from the specified directories to the ROM archive
 				case "Archive":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitArchive(inputs, onlyNeeded);
 					break;
 				// For each specified DAT file it creates the torrentzip files
 				case "Build":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitBuild(inputs, copy);
 					break;
 				// Prints db stats
@@ -230,12 +220,7 @@ namespace RombaSharp
 					break;
 				// Rescan a specific depot
 				case "Rescan Depots":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					foreach (string input in inputs)
 					{
 						Rescan(input);
@@ -247,12 +232,7 @@ namespace RombaSharp
 					break;
 				// Creates a DAT file for the specified input directory
 				case "Dir2Dat":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitDir2Dat(inputs);
 					break;
 				// Export the database to file
@@ -261,32 +241,17 @@ namespace RombaSharp
 					break;
 				// For each specified DAT file it creates a fix DAT
 				case "Fixdat":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitFixdat(inputs);
 					break;
 				// Import a CSV into the database
 				case "Import":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitImport(inputs);
 					break;
 				// For each specified hash it looks up any available information
 				case "Lookup":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitLookup(inputs);
 					break;
 				// Prints memory stats
@@ -295,22 +260,12 @@ namespace RombaSharp
 					break;
 				// Merges depots
 				case "Merge":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitMerge(inputs, depotPath, onlyNeeded);
 					break;
 				// For each specified DAT file it creates a miss file and a have file
 				case "Miss":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitMiss(inputs);
 					break;
 				// Moves DAT index entries for orphaned DATs
@@ -339,6 +294,16 @@ namespace RombaSharp
 
 			Globals.Logger.Close();
 			return;
+		}
+
+		private static void VerifyInputs(List<string> inputs, string feature)
+		{
+			if (inputs.Count == 0)
+			{
+				Globals.Logger.Error("This feature requires at least one input");
+				_help.OutputIndividualFeature(feature);
+				Environment.Exit(0);
+			}
 		}
 	}
 }

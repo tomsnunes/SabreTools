@@ -680,33 +680,18 @@ namespace SabreTools
 					break;
 				// Create a DAT from a directory or set of directories
 				case "DATFromDir":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitDatFromDir(inputs, datHeader, omitFromScan, removeDateFromAutomaticName, archivesAsFiles, chdsAsFiles,
 						skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles);
 					break;
 				// If we're in header extract and remove mode
 				case "Extract":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitExtractRemoveHeader(inputs, outDir, nostore);
 					break;
 				// If we're in header restore mode
 				case "Restore":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitReplaceHeader(inputs, outDir);
 					break;
 				case "Script":
@@ -719,43 +704,23 @@ namespace SabreTools
 					break;
 				// Split a DAT by the split type
 				case "Split":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitSplit(inputs, outDir, inplace, datHeader.DatFormat, splittingMode, exta, extb, shortname, basedat);
 					break;
 				// Get statistics on input files
 				case "Stats":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitStats(inputs, datHeader.FileName, outDir, filter.Single, showBaddumpColumn, showNodumpColumn, statDatFormat);
 					break;
 				// Convert, update, merge, diff, and filter a DAT or folder of DATs
 				case "Update":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitUpdate(inputs, basePaths, datHeader, updateMode, inplace, skip, removeDateFromAutomaticName, filter,
 						splitType, outDir, cleanGameNames, removeUnicode, descAsName);
 					break;
 				// If we're using the verifier
 				case "Verify":
-					if (inputs.Count == 0)
-					{
-						Globals.Logger.Error("This feature requires at least one input");
-						_help.OutputIndividualFeature(feature);
-						break;
-					}
+					VerifyInputs(inputs, feature);
 					InitVerify(datfiles, inputs, depot, hashOnly, quickScan, datHeader.Header, splitType, chdsAsFiles);
 					break;
 				// If nothing is set, show the help
@@ -766,6 +731,16 @@ namespace SabreTools
 
 			Globals.Logger.Close();
 			return;
+		}
+
+		private static void VerifyInputs(List<string> inputs, string feature)
+		{
+			if (inputs.Count == 0)
+			{
+				Globals.Logger.Error("This feature requires at least one input");
+				_help.OutputIndividualFeature(feature);
+				Environment.Exit(0);
+			}
 		}
 	}
 }
