@@ -729,8 +729,8 @@ namespace SabreTools
 			// Create a DAT from a directory or set of directories
 			if (datFromDir)
 			{
-				InitDatFromDir(inputs, datHeader, omitFromScan, removeDateFromAutomaticName, archivesAsFiles,
-					skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles, chdsAsFiles);
+				InitDatFromDir(inputs, datHeader, omitFromScan, removeDateFromAutomaticName, archivesAsFiles, chdsAsFiles,
+					skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles);
 			}
 
 			// If we're in header extract and remove mode

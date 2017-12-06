@@ -29,6 +29,7 @@ namespace SabreTools
 		/// <param name="omitFromScan">Hash flag saying what hashes should not be calculated</param>
 		/// <param name="removeDateFromAutomaticName">True if the date should be omitted from the DAT, false otherwise</param>
 		/// <param name="archivesAsFiles">True if archives should be treated as files, false otherwise</param>
+		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
 		/// <param name="skipFileType">Type of files that should be skipped on scan</param>
 		/// <param name="addBlankFilesForEmptyFolder">True if blank items should be created for empty folders, false otherwise</param>
 		/// <param name="addFileDates">True if dates should be archived for all files, false otherwise</param>
@@ -36,7 +37,6 @@ namespace SabreTools
 		/// <param name="tempDir">Name of the directory to create a temp folder in (blank is default temp directory)</param>
 		/// <param name="outDir">Name of the directory to output the DAT to (blank is the current directory)</param>
 		/// <param name="copyFiles">True if files should be copied to the temp directory before hashing, false otherwise</param>
-		/// <param name="chdsAsFiles">True if CHDs should be treated like regular files, false otherwise</param>
 		private static void InitDatFromDir(List<string> inputs,
 			/* Normal DAT header info */
 			DatHeader datHeader,
@@ -45,6 +45,7 @@ namespace SabreTools
 			Hash omitFromScan,
 			bool removeDateFromAutomaticName,
 			bool archivesAsFiles,
+			bool chdsAsFiles,
 			SkipFileType skipFileType,
 			bool addBlankFilesForEmptyFolder,
 			bool addFileDates,
@@ -52,8 +53,7 @@ namespace SabreTools
 			/* Output DAT info */
 			string tempDir,
 			string outDir,
-			bool copyFiles,
-			bool chdsAsFiles)
+			bool copyFiles)
 		{
 			// Create a new DATFromDir object and process the inputs
 			DatFile basedat = new DatFile(datHeader)
