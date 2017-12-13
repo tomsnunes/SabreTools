@@ -1261,7 +1261,7 @@ namespace SabreTools
 					FeatureType.Flag,
 					null));
 			update.AddFeature("base-name", new Feature(
-				new List<string>() { "-bn", "--base-name" },
+				new List<string>() { "-bn", "-br", "--base-name", "--base-replace" },
 				"Replace item names from base DATs in order",
 				FeatureType.Flag,
 				null));
@@ -1276,7 +1276,7 @@ namespace SabreTools
 					FeatureType.Flag,
 					null));
 			update.AddFeature("reverse-base-name", new Feature(
-				new List<string>() { "-rbn", "--reverse-base-name" },
+				new List<string>() { "-rbn", "-rbr", "--reverse-base-name", "--reverse-base-replace" },
 				"Replace item names from base DATs in reverse",
 				FeatureType.Flag,
 				null));
