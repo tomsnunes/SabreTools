@@ -1154,6 +1154,10 @@ Options:
 			-bd=, --base-dat=	Add a base DAT for replacing
 				Add a DAT or folder of DATs to the base set to be used in
 				item name replacement
+				
+			-uh, --update-hashes	Update hashes along with the names
+				By default, only names are updated during the replacement. This
+				flag also allows updating of missing hashes at the same time.
 		
 		-gn=, --not-game=	Filter by game name
 		-ngn=, --game-name=	Exclude by game name

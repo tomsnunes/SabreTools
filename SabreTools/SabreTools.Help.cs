@@ -1270,6 +1270,11 @@ namespace SabreTools
 					"Add a base DAT for replacing",
 					FeatureType.List,
 					null));
+				update["base-name"].AddFeature("update-hashes", new Feature(
+					new List<string>() { "-uh", "--update-hashes" },
+					"Update hashes along with the names",
+					FeatureType.Flag,
+					null));
 			update.AddFeature("reverse-base-name", new Feature(
 				new List<string>() { "-rbn", "--reverse-base-name" },
 				"Replace item names from base DATs in reverse",
@@ -1279,6 +1284,11 @@ namespace SabreTools
 					new List<string>() { "-bd", "--base-dat" },
 					"Add a base DAT for replacing",
 					FeatureType.List,
+					null));
+				update["reverse-base-name"].AddFeature("update-hashes", new Feature(
+					new List<string>() { "-uh", "--update-hashes" },
+					"Update hashes along with the names",
+					FeatureType.Flag,
 					null));
 			update.AddFeature("game-name", new Feature(
 				new List<string>() { "-gn", "--game-name" },

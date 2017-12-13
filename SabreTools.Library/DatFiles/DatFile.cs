@@ -1581,8 +1581,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
+		/// <param name="updateHashes">True if hashes should be updated along with names, false otherwise [Only for base replacement]</param>
 		public void DetermineUpdateType(List<string> inputPaths, List<string> basePaths, string outDir, UpdateMode updateMode, bool inplace, bool skip,
-			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType)
+			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, bool updateHashes)
 		{
 			// Ensure we only have files in the inputs
 			List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
@@ -1636,7 +1637,7 @@ namespace SabreTools.Library.DatFiles
 			else if ((updateMode & UpdateMode.BaseReplace) != 0
 				|| (updateMode & UpdateMode.ReverseBaseReplace) != 0)
 			{
-				BaseReplace(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType);
+				BaseReplace(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, updateHashes);
 			}
 
 			return;
@@ -1718,8 +1719,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
+		/// <param name="updateHashes">True if hashes should be updated along with names, false otherwise</param>
 		public void BaseReplace(List<string> inputFileNames, List<string> baseFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
-			bool descAsName, Filter filter, SplitType splitType)
+			bool descAsName, Filter filter, SplitType splitType, bool updateHashes)
 		{
 			// First we want to parse all of the base DATs into the input
 			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for replacement...");
@@ -1769,6 +1771,67 @@ namespace SabreTools.Library.DatFiles
 						if (dupes.Count > 0)
 						{
 							newDatItem.Name = dupes[0].Name;
+
+							// If we're updating hashes too, only replace if the current item doesn't have them
+							if (updateHashes)
+							{
+								if (newDatItem.Type == ItemType.Rom)
+								{
+									Rom newRomItem = (Rom)newDatItem;
+									if (String.IsNullOrEmpty(newRomItem.CRC) && !String.IsNullOrEmpty(((Rom)dupes[0]).CRC))
+									{
+										newRomItem.CRC = ((Rom)dupes[0]).CRC;
+									}
+									if (String.IsNullOrEmpty(newRomItem.MD5) && !String.IsNullOrEmpty(((Rom)dupes[0]).MD5))
+									{
+										newRomItem.MD5 = ((Rom)dupes[0]).MD5;
+									}
+									if (String.IsNullOrEmpty(newRomItem.SHA1) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA1))
+									{
+										newRomItem.SHA1 = ((Rom)dupes[0]).SHA1;
+									}
+									if (String.IsNullOrEmpty(newRomItem.SHA256) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA256))
+									{
+										newRomItem.SHA256 = ((Rom)dupes[0]).SHA256;
+									}
+									if (String.IsNullOrEmpty(newRomItem.SHA384) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA384))
+									{
+										newRomItem.SHA384 = ((Rom)dupes[0]).SHA384;
+									}
+									if (String.IsNullOrEmpty(newRomItem.SHA512) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA512))
+									{
+										newRomItem.SHA512 = ((Rom)dupes[0]).SHA512;
+									}
+
+									newDatItem = (Rom)newRomItem.Clone();
+								}
+								else if (newDatItem.Type == ItemType.Disk)
+								{
+									Disk newDiskItem = (Disk)newDatItem;
+									if (String.IsNullOrEmpty(newDiskItem.MD5) && !String.IsNullOrEmpty(((Rom)dupes[0]).MD5))
+									{
+										newDiskItem.MD5 = ((Rom)dupes[0]).MD5;
+									}
+									if (String.IsNullOrEmpty(newDiskItem.SHA1) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA1))
+									{
+										newDiskItem.SHA1 = ((Rom)dupes[0]).SHA1;
+									}
+									if (String.IsNullOrEmpty(newDiskItem.SHA256) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA256))
+									{
+										newDiskItem.SHA256 = ((Rom)dupes[0]).SHA256;
+									}
+									if (String.IsNullOrEmpty(newDiskItem.SHA384) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA384))
+									{
+										newDiskItem.SHA384 = ((Rom)dupes[0]).SHA384;
+									}
+									if (String.IsNullOrEmpty(newDiskItem.SHA512) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA512))
+									{
+										newDiskItem.SHA512 = ((Rom)dupes[0]).SHA512;
+									}
+
+									newDatItem = (Disk)newDiskItem.Clone();
+								}
+							}
 						}
 
 						newDatItems.Add(newDatItem);
