@@ -42,6 +42,7 @@ namespace SabreTools.Library.DatFiles
 		// DatItems dictionary
 		internal SortedDictionary<string, List<DatItem>> _items = new SortedDictionary<string, List<DatItem>>();
 		internal SortedBy _sortedBy;
+		internal DedupeType _mergedBy;
 
 		// Internal statistical data
 		internal DatStats _datStats = new DatStats();
@@ -1395,7 +1396,7 @@ namespace SabreTools.Library.DatFiles
 			// If the sorted type isn't the same, we want to sort the dictionary accordingly
 			if (_sortedBy != bucketBy)
 			{
-				Globals.Logger.User("Organizing roms by {0}" + (deduperoms != DedupeType.None ? " and merging" : ""), bucketBy);
+				Globals.Logger.User("Organizing roms by {0}", bucketBy);
 
 				// Set the sorted type
 				_sortedBy = bucketBy;
@@ -1426,26 +1427,34 @@ namespace SabreTools.Library.DatFiles
 				});
 			}
 
-			// Now go through and sort all of the individual lists
-			List<string> keys = Keys;
-			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+			// If the merge type isn't the same, we want to merge the dictionary accordingly
+			if (_mergedBy != deduperoms)
 			{
-				// Get the possibly unsorted list
-				List<DatItem> sortedlist = this[key];
+				Globals.Logger.User("Deduping roms by {0}", deduperoms);
 
-				// Sort the list of items to be consistent
-				DatItem.Sort(ref sortedlist, false);
+				// Set the sorted type
+				_mergedBy = deduperoms;
 
-				// If we're merging the roms, do so
-				if (deduperoms == DedupeType.Full || (deduperoms == DedupeType.Game && bucketBy == SortedBy.Game))
+				List<string> keys = Keys;
+				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 				{
-					sortedlist = DatItem.Merge(sortedlist);
-				}
+					// Get the possibly unsorted list
+					List<DatItem> sortedlist = this[key];
 
-				// Add the list back to the dictionary
-				Remove(key);
-				AddRange(key, sortedlist);
-			});
+					// Sort the list of items to be consistent
+					DatItem.Sort(ref sortedlist, false);
+
+					// If we're merging the roms, do so
+					if (deduperoms == DedupeType.Full || (deduperoms == DedupeType.Game && bucketBy == SortedBy.Game))
+					{
+						sortedlist = DatItem.Merge(sortedlist);
+					}
+
+					// Add the list back to the dictionary
+					Remove(key);
+					AddRange(key, sortedlist);
+				});
+			}
 		}
 
 		/// <summary>
@@ -1607,13 +1616,11 @@ namespace SabreTools.Library.DatFiles
 				baseFileNames.Reverse();
 			}
 
-			// Populate the combined data and get the headers
-			List<DatFile> datHeaders = PopulateUserData(inputFileNames, inplace, clean,
-				   remUnicode, descAsName, outDir, filter, splitType);
-
 			// If we're in merging mode
 			if ((updateMode & UpdateMode.Merge) != 0)
 			{
+				// Populate the combined data and get the headers
+				List<DatFile> datHeaders = PopulateUserData(inputFileNames, inplace, clean, remUnicode, descAsName, outDir, filter, splitType);
 				MergeNoDiff(outDir, inputFileNames, datHeaders);
 			}
 			// If we have one of the standard diffing modes
@@ -1627,6 +1634,8 @@ namespace SabreTools.Library.DatFiles
 			else if ((updateMode & UpdateMode.DiffCascade) != 0
 				|| (updateMode & UpdateMode.DiffReverseCascade) != 0)
 			{
+				// Populate the combined data and get the headers
+				List<DatFile> datHeaders = PopulateUserData(inputFileNames, inplace, clean, remUnicode, descAsName, outDir, filter, splitType);
 				DiffCascade(outDir, inplace, inputFileNames, datHeaders, skip);
 			}
 			// If we have diff against mode
@@ -1750,14 +1759,14 @@ namespace SabreTools.Library.DatFiles
 			// Now we want to try to replace each item in each input DAT from the base
 			foreach (string path in inputFileNames)
 			{
-				Globals.Logger.User("Replacing items in '{0}'' from the base DAT", path.Split('¬')[0]);
+				Globals.Logger.User("Replacing items in '{0}' from the base DAT", path.Split('¬')[0]);
 
 				// First we parse in the DAT internally
 				DatFile intDat = new DatFile();
 				intDat.Parse(path, 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 
 				// For comparison's sake, we want to use CRC as the base ordering
-				intDat.BucketBy(SortedBy.CRC, DedupeType.Full);
+				intDat.BucketBy(SortedBy.CRC, DedupeType.None);
 
 				// Then we do a hashwise comparison against the base DAT
 				List<string> keys = intDat.Keys;

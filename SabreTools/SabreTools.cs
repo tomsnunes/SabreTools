@@ -579,7 +579,11 @@ namespace SabreTools
 						filter.MD5s.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "mt":
-						Globals.MaxThreads = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : Globals.MaxThreads;
+						int val = (int)feat.Value.GetValue();
+						if (val != Int32.MinValue)
+						{
+							Globals.MaxThreads = val;
+						}
 						break;
 					case "name":
 						datHeader.Name = (string)feat.Value.GetValue();
