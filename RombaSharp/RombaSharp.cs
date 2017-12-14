@@ -83,26 +83,6 @@ namespace RombaSharp
 				return;
 			}
 
-			// Feature flags
-			bool archive = false,
-				build = false,
-				dbstats = false,
-				depotRescan = false,
-				diffdat = false,
-				dir2dat = false,
-				export = false,
-				fixdat = false,
-				import = false,
-				lookup = false,
-				memstats = false,
-				merge = false,
-				miss = false,
-				progress = false,
-				purgeBackup = false,
-				purgeDelete = false,
-				refreshDats = false,
-				shutdown = false;
-
 			// User flags
 			bool copy = false,
 				logOnly = false,
