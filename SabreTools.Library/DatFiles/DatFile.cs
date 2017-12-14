@@ -1767,6 +1767,13 @@ namespace SabreTools.Library.DatFiles
 					List<DatItem> newDatItems = new List<DatItem>();
 					foreach (DatItem datItem in datItems)
 					{
+						// If we have something other than a Rom or Disk, then this doesn't do anything
+						if (datItem.Type != ItemType.Disk && datItem.Type != ItemType.Rom)
+						{
+							newDatItems.Add((DatItem)datItem.Clone());
+							continue;
+						}
+
 						List<DatItem> dupes = datItem.GetDuplicates(this, sorted: true);
 						DatItem newDatItem = (DatItem)datItem.Clone();
 
