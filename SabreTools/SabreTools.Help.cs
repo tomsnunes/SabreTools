@@ -1260,36 +1260,46 @@ namespace SabreTools
 					"Don't include the date in automatic name",
 					FeatureType.Flag,
 					null));
-			update.AddFeature("base-name", new Feature(
-				new List<string>() { "-bn", "-br", "--base-name", "--base-replace" },
-				"Replace item names from base DATs in order",
+			update.AddFeature("base-replace", new Feature(
+				new List<string>() { "-br", "--base-replace" },
+				"Replace from base DATs in order",
 				FeatureType.Flag,
 				null));
-				update["base-name"].AddFeature("base-dat", new Feature(
+				update["base-replace"].AddFeature("base-dat", new Feature(
 					new List<string>() { "-bd", "--base-dat" },
 					"Add a base DAT for replacing",
 					FeatureType.List,
 					null));
-				update["base-name"].AddFeature("update-hashes", new Feature(
-					new List<string>() { "-uh", "--update-hashes" },
-					"Update hashes along with the names",
-					FeatureType.Flag,
-					null));
-			update.AddFeature("reverse-base-name", new Feature(
-				new List<string>() { "-rbn", "-rbr", "--reverse-base-name", "--reverse-base-replace" },
+				update["base-replace"].AddFeature("update-names", new Feature(
+						new List<string>() { "-un", "--update-names" },
+						"Update names from base DATs",
+						FeatureType.Flag,
+						null));
+				update["base-replace"].AddFeature("update-hashes", new Feature(
+						new List<string>() { "-uh", "--update-hashes" },
+						"Update hashes from base DATs",
+						FeatureType.Flag,
+						null));
+			update.AddFeature("reverse-base-replace", new Feature(
+				new List<string>() { "-rbr", "--reverse-base-replace" },
 				"Replace item names from base DATs in reverse",
 				FeatureType.Flag,
 				null));
-				update["reverse-base-name"].AddFeature("base-dat", new Feature(
+				update["reverse-base-replace"].AddFeature("base-dat", new Feature(
 					new List<string>() { "-bd", "--base-dat" },
 					"Add a base DAT for replacing",
 					FeatureType.List,
 					null));
-				update["reverse-base-name"].AddFeature("update-hashes", new Feature(
-					new List<string>() { "-uh", "--update-hashes" },
-					"Update hashes along with the names",
-					FeatureType.Flag,
-					null));
+				update["reverse-base-replace"].AddFeature("update-names", new Feature(
+						new List<string>() { "-un", "--update-names" },
+						"Update names from base DATs",
+						FeatureType.Flag,
+						null));
+				update["reverse-base-replace"].AddFeature("update-hashes", new Feature(
+						new List<string>() { "-uh", "--update-hashes" },
+						"Update hashes from base DATs",
+						FeatureType.Flag,
+						null));
 			update.AddFeature("game-name", new Feature(
 				new List<string>() { "-gn", "--game-name" },
 				"Filter by game name",

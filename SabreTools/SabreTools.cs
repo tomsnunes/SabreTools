@@ -94,7 +94,8 @@ namespace SabreTools
 				shortname = false,
 				skip = false,
 				updateDat = false,
-				updateHashes = false;
+				updateHashes = false,
+				updateNames = false;
 			Hash omitFromScan = Hash.DeepHashes; // TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 			OutputFormat outputFormat = OutputFormat.Folder;
 			SkipFileType skipFileType = SkipFileType.None;
@@ -200,7 +201,7 @@ namespace SabreTools
 					case "baddump-col":
 						showBaddumpColumn = true;
 						break;
-					case "base-name":
+					case "base-replace":
 						updateMode |= UpdateMode.BaseReplace;
 						break;
 					case "cascade":
@@ -491,6 +492,9 @@ namespace SabreTools
 					case "update-hashes":
 						updateHashes = true;
 						break;
+					case "update-names":
+						updateNames = true;
+						break;
 					case "exclude-of":
 						datHeader.ExcludeOf = true;
 						break;
@@ -720,7 +724,7 @@ namespace SabreTools
 				case "Update":
 					VerifyInputs(inputs, feature);
 					InitUpdate(inputs, basePaths, datHeader, updateMode, inplace, skip, removeDateFromAutomaticName, filter,
-						splitType, outDir, cleanGameNames, removeUnicode, descAsName, updateHashes);
+						splitType, outDir, cleanGameNames, removeUnicode, descAsName, updateNames, updateHashes);
 					break;
 				// If we're using the verifier
 				case "Verify":

@@ -1142,22 +1142,25 @@ Options:
 					a second time, this will skip writing it. This can often
 					speed up the output process.
 		
-		-bn, --base-name	Replace item names from base DATs in order
-		-rbn, --reverse-base-name	Replace item names from base DATs in reverse
+		-bn, --base-replace	Replace item from base DATs in order
+		-rbn, --reverse-base-replace	Replace item from base DATs in reverse
 			By default, no item names are changed except when there is a merge
 			occurring. This flag enables users to define a DAT or set of base
-			DATs to use as "replacement names" for all input DATs. Note that
+			DATs to use as "replacements" for all input DATs. Note that
 			the first found instance of an item in the base DAT(s) will be
 			used and all others will be disgarded. For reverse, the first
-			instance found in the last DAT inputted will be used.
+			instance found in the last DAT inputted will be used. If no
+			additional flag is given, it will default to updating names.
 			
 			-bd=, --base-dat=	Add a base DAT for replacing
 				Add a DAT or folder of DATs to the base set to be used in
 				item name replacement
-				
-			-uh, --update-hashes	Update hashes along with the names
-				By default, only names are updated during the replacement. This
-				flag also allows updating of missing hashes at the same time.
+
+			-un, --update-names		Update names from base DATs
+				This flag enables updating of names from base DATs.
+
+			-uh, --update-hashes	Update hashes from base DATs
+				This flag enables updating of hashes from base DATs.
 		
 		-gn=, --not-game=	Filter by game name
 		-ngn=, --game-name=	Exclude by game name
