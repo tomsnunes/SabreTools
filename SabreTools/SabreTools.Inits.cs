@@ -259,10 +259,10 @@ namespace SabreTools
 			bool updateHashes)
 		{
 			// Normalize the extensions
-			datHeader.AddExtension = (datHeader.AddExtension == "" || datHeader.AddExtension.StartsWith(".")
+			datHeader.AddExtension = (String.IsNullOrWhiteSpace(datHeader.AddExtension) || datHeader.AddExtension.StartsWith(".")
 				? datHeader.AddExtension
 				: "." + datHeader.AddExtension);
-			datHeader.ReplaceExtension = (datHeader.ReplaceExtension == "" || datHeader.ReplaceExtension.StartsWith(".")
+			datHeader.ReplaceExtension = (String.IsNullOrWhiteSpace(datHeader.ReplaceExtension) || datHeader.ReplaceExtension.StartsWith(".")
 				? datHeader.ReplaceExtension
 				: "." + datHeader.ReplaceExtension);
 
@@ -270,17 +270,17 @@ namespace SabreTools
 			if (updateMode != 0)
 			{
 				// Get the values that will be used
-				if (datHeader.Date == "")
+				if (String.IsNullOrWhiteSpace(datHeader.Date))
 				{
 					datHeader.Date = DateTime.Now.ToString("yyyy-MM-dd");
 				}
-				if (datHeader.Name == "")
+				if (String.IsNullOrWhiteSpace(datHeader.Name))
 				{
 					datHeader.Name = (updateMode != 0 ? "DiffDAT" : "MergeDAT")
 						+ (datHeader.Type == "SuperDAT" ? "-SuperDAT" : "")
 						+ (datHeader.DedupeRoms != DedupeType.None ? "-deduped" : "");
 				}
-				if (datHeader.Description == "")
+				if (String.IsNullOrWhiteSpace(datHeader.Description))
 				{
 					datHeader.Description = (updateMode != 0 ? "DiffDAT" : "MergeDAT")
 						+ (datHeader.Type == "SuperDAT" ? "-SuperDAT" : "")
@@ -290,11 +290,11 @@ namespace SabreTools
 						datHeader.Description += " (" + datHeader.Date + ")";
 					}
 				}
-				if (datHeader.Category == "" && updateMode != 0)
+				if (String.IsNullOrWhiteSpace(datHeader.Category) && updateMode != 0)
 				{
 					datHeader.Category = "DiffDAT";
 				}
-				if (datHeader.Author == "")
+				if (String.IsNullOrWhiteSpace(datHeader.Author))
 				{
 					datHeader.Author = "SabreTools";
 				}

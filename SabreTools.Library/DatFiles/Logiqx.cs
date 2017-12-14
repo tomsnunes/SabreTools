@@ -570,7 +570,7 @@ namespace SabreTools.Library.DatFiles
 							if (superdat && !keep)
 							{
 								string tempout = Regex.Match(machine.Name, @".*?\\(.*)").Groups[1].Value;
-								if (tempout != "")
+								if (!String.IsNullOrWhiteSpace(tempout))
 								{
 									machine.Name = tempout;
 								}
@@ -994,11 +994,11 @@ namespace SabreTools.Library.DatFiles
 							superdat = true;
 							if (keep)
 							{
-								Type = (Type == "" ? "SuperDAT" : Type);
+								Type = (String.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
 							}
 
 							string foldername = (xtr.GetAttribute("name") ?? "");
-							if (foldername != "")
+							if (!String.IsNullOrWhiteSpace(foldername))
 							{
 								parent.Add(foldername);
 							}
@@ -1099,7 +1099,7 @@ namespace SabreTools.Library.DatFiles
 							if (!keep || !superdat)
 							{
 								string tempout = Regex.Match(dir.Name, @".*?\\(.*)").Groups[1].Value;
-								if (tempout != "")
+								if (!String.IsNullOrWhiteSpace(tempout))
 								{
 									dir.Name = tempout;
 								}

@@ -2196,7 +2196,7 @@ namespace SabreTools.Library.DatFiles
 						string filename = inputs[newItem.SystemID].Split('¬')[0];
 						string rootpath = inputs[newItem.SystemID].Split('¬')[1];
 
-						rootpath += (rootpath == "" ? "" : Path.DirectorySeparatorChar.ToString());
+						rootpath += (String.IsNullOrWhiteSpace(rootpath) ? "" : Path.DirectorySeparatorChar.ToString());
 						filename = filename.Remove(0, rootpath.Length);
 						newItem.MachineName = Path.GetDirectoryName(filename) + Path.DirectorySeparatorChar
 							+ Path.GetFileNameWithoutExtension(filename) + Path.DirectorySeparatorChar
@@ -3584,7 +3584,7 @@ namespace SabreTools.Library.DatFiles
 				string romname = "";
 
 				// If the parent is blank, then we have a non-archive file
-				if (parent == "")
+				if (String.IsNullOrWhiteSpace(parent))
 				{
 					// If we have a SuperDAT, we want anything that's not the base path as the game, and the file as the rom
 					if (Type == "SuperDAT")

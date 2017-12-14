@@ -301,7 +301,7 @@ namespace RombaSharp
 				if (input.Length == Constants.CRCLength)
 				{
 					temp = Utilities.CleanHashData(input, Constants.CRCLength);
-					if (temp != "")
+					if (!String.IsNullOrWhiteSpace(temp))
 					{
 						crc.Add(temp);
 					}
@@ -309,7 +309,7 @@ namespace RombaSharp
 				else if (input.Length == Constants.MD5Length)
 				{
 					temp = Utilities.CleanHashData(input, Constants.MD5Length);
-					if (temp != "")
+					if (!String.IsNullOrWhiteSpace(temp))
 					{
 						md5.Add(temp);
 					}
@@ -317,7 +317,7 @@ namespace RombaSharp
 				else if (input.Length == Constants.SHA1Length)
 				{
 					temp = Utilities.CleanHashData(input, Constants.SHA1Length);
-					if (temp != "")
+					if (!String.IsNullOrWhiteSpace(temp))
 					{
 						sha1.Add(temp);
 					}

@@ -1333,7 +1333,7 @@ namespace SabreTools.Library.Tools
 		public static bool DetectSkipperAndTransform(string file, string outDir, bool nostore)
 		{
 			// Create the output directory if it doesn't exist
-			if (outDir != "" && !Directory.Exists(outDir))
+			if (!String.IsNullOrWhiteSpace(outDir) && !Directory.Exists(outDir))
 			{
 				Directory.CreateDirectory(outDir);
 			}
@@ -1361,7 +1361,7 @@ namespace SabreTools.Library.Tools
 			br.Dispose();
 
 			// Apply the rule to the file
-			string newfile = (outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file)));
+			string newfile = (String.IsNullOrWhiteSpace(outDir) ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file)));
 			rule.TransformFile(file, newfile);
 
 			// If the output file doesn't exist, return false
@@ -1467,7 +1467,7 @@ namespace SabreTools.Library.Tools
 		public static bool RestoreHeader(string file, string outDir)
 		{
 			// Create the output directory if it doesn't exist
-			if (outDir != "" && !Directory.Exists(outDir))
+			if (!String.IsNullOrWhiteSpace(outDir) && !Directory.Exists(outDir))
 			{
 				Directory.CreateDirectory(outDir);
 			}
@@ -1488,9 +1488,9 @@ namespace SabreTools.Library.Tools
 			for (int i = 0; i < headers.Count; i++)
 			{
 				Globals.Logger.User("Creating reheadered file: " +
-						(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i);
+						(String.IsNullOrWhiteSpace(outDir) ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i);
 				AppendBytesToFile(file,
-					(outDir == "" ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i, headers[i], string.Empty);
+					(String.IsNullOrWhiteSpace(outDir) ? Path.GetFullPath(file) + ".new" : Path.Combine(outDir, Path.GetFileName(file))) + i, headers[i], string.Empty);
 				Globals.Logger.User("Reheadered file created!");
 			}
 

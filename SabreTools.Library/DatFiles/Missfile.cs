@@ -240,7 +240,7 @@ namespace SabreTools.Library.DatFiles
 					if (rom.Type == ItemType.Rom)
 					{
 						// We can only write out if there's a SHA-1
-						if (((Rom)rom).SHA1 != "")
+						if (!String.IsNullOrWhiteSpace(((Rom)rom).SHA1))
 						{
 							name = ((Rom)rom).SHA1.Substring(0, 2)
 								+ "/" + ((Rom)rom).SHA1.Substring(2, 2)
@@ -253,7 +253,7 @@ namespace SabreTools.Library.DatFiles
 					else if (rom.Type == ItemType.Disk)
 					{
 						// We can only write out if there's a SHA-1
-						if (((Disk)rom).SHA1 != "")
+						if (!String.IsNullOrWhiteSpace(((Disk)rom).SHA1))
 						{
 							name = ((Disk)rom).SHA1.Substring(0, 2)
 								+ "/" + ((Disk)rom).SHA1.Substring(2, 2)
@@ -269,7 +269,7 @@ namespace SabreTools.Library.DatFiles
 				else
 				{
 					name = (UseGame ? rom.MachineName : rom.Name);
-					if (ReplaceExtension != "" || RemoveExtension)
+					if (!String.IsNullOrWhiteSpace(ReplaceExtension) || RemoveExtension)
 					{
 						if (RemoveExtension)
 						{
@@ -280,7 +280,7 @@ namespace SabreTools.Library.DatFiles
 						dir = (dir.StartsWith(Path.DirectorySeparatorChar.ToString()) ? dir.Remove(0, 1) : dir);
 						name = Path.Combine(dir, Path.GetFileNameWithoutExtension(name) + ReplaceExtension);
 					}
-					if (AddExtension != "")
+					if (!String.IsNullOrWhiteSpace(AddExtension))
 					{
 						name += AddExtension;
 					}

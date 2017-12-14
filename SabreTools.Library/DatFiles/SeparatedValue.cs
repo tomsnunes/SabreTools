@@ -208,7 +208,7 @@ namespace SabreTools.Library.DatFiles
 							break;
 						case "Rom.Name":
 						case "Disk.Name":
-							name = value == "" ? name : value;
+							name = String.IsNullOrWhiteSpace(value) ? name : value;
 							break;
 						case "DatItem.Size":
 							if (!Int64.TryParse(value, out size))
