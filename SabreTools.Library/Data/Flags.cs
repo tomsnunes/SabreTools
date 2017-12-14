@@ -243,6 +243,17 @@ namespace SabreTools.Library.Data
 	}
 
 	/// <summary>
+	/// Determine what to replace from base DATs
+	/// </summary>
+	[Flags]
+	public enum ReplaceMode
+	{
+		None = 0x0,
+		Names = 0x1,
+		Hashes = Names << 1,
+	}
+
+	/// <summary>
 	/// Determine which format to output Stats to
 	/// </summary>
 	[Flags]
