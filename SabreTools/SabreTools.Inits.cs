@@ -233,8 +233,7 @@ namespace SabreTools
 		/// <param name="clean">True to clean the game names to WoD standard, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
-		/// <param name="updateNames">True if names should be updated, false otherwise [only for base replacement]</param>
-		/// <param name="updateHashes">True if hashes should be updated, false otherwise [only for base replacement]</param>
+		/// <param name="replaceMode">ReplaceMode representing what should be updated [only for base replacement]</param>
 		private static void InitUpdate(
 			List<string> inputPaths,
 			List<string> basePaths,
@@ -257,8 +256,7 @@ namespace SabreTools
 			bool clean,
 			bool remUnicode,
 			bool descAsName,
-			bool updateNames,
-			bool updateHashes)
+			ReplaceMode replaceMode)
 		{
 			// Normalize the extensions
 			datHeader.AddExtension = (String.IsNullOrWhiteSpace(datHeader.AddExtension) || datHeader.AddExtension.StartsWith(".")
@@ -302,17 +300,17 @@ namespace SabreTools
 				}
 			}
 
-			// If neither the names or hashes are set, select names
-			if (!updateNames && !updateHashes)
+			// If no replacement mode is set, default to Names
+			if (replaceMode == ReplaceMode.None)
 			{
-				updateNames = true;
+				replaceMode = ReplaceMode.Names;
 			}
 
 			// Populate the DatData object
 			DatFile userInputDat = new DatFile(datHeader);
 			
 			userInputDat.DetermineUpdateType(inputPaths, basePaths, outDir, updateMode, inplace, skip, bare, clean,
-				remUnicode, descAsName, filter, splitType, updateNames, updateHashes);
+				remUnicode, descAsName, filter, splitType, replaceMode);
 		}
 
 		/// <summary>

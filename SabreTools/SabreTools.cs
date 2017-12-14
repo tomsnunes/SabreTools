@@ -93,11 +93,10 @@ namespace SabreTools
 				showNodumpColumn = false,
 				shortname = false,
 				skip = false,
-				updateDat = false,
-				updateHashes = false,
-				updateNames = false;
+				updateDat = false;
 			Hash omitFromScan = Hash.DeepHashes; // TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 			OutputFormat outputFormat = OutputFormat.Folder;
+			ReplaceMode replaceMode = ReplaceMode.None;
 			SkipFileType skipFileType = SkipFileType.None;
 			SplittingMode splittingMode = SplittingMode.None;
 			SplitType splitType = SplitType.None;
@@ -490,10 +489,10 @@ namespace SabreTools
 						updateDat = true;
 						break;
 					case "update-hashes":
-						updateHashes = true;
+						replaceMode |= ReplaceMode.Hashes;
 						break;
 					case "update-names":
-						updateNames = true;
+						replaceMode |= ReplaceMode.Names;
 						break;
 					case "exclude-of":
 						datHeader.ExcludeOf = true;
@@ -728,7 +727,7 @@ namespace SabreTools
 				case "Update":
 					VerifyInputs(inputs, feature);
 					InitUpdate(inputs, basePaths, datHeader, updateMode, inplace, skip, removeDateFromAutomaticName, filter,
-						splitType, outDir, cleanGameNames, removeUnicode, descAsName, updateNames, updateHashes);
+						splitType, outDir, cleanGameNames, removeUnicode, descAsName, replaceMode);
 					break;
 				// If we're using the verifier
 				case "Verify":

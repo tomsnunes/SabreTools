@@ -1590,10 +1590,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="descAsName">True to allow SL DATs to have game names used instead of descriptions, false otherwise (default)</param>
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
-		/// <param name="updateNames">True if names should be updated, false otherwise [only for base replacement]</param>
-		/// <param name="updateHashes">True if hashes should be updated, false otherwise [only for base replacement]</param>
+		/// <param name="replaceMode">ReplaceMode representing what should be updated [only for base replacement]</param>
 		public void DetermineUpdateType(List<string> inputPaths, List<string> basePaths, string outDir, UpdateMode updateMode, bool inplace, bool skip,
-			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, bool updateNames, bool updateHashes)
+			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, ReplaceMode replaceMode)
 		{
 			// Ensure we only have files in the inputs
 			List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
@@ -1647,7 +1646,7 @@ namespace SabreTools.Library.DatFiles
 			else if ((updateMode & UpdateMode.BaseReplace) != 0
 				|| (updateMode & UpdateMode.ReverseBaseReplace) != 0)
 			{
-				BaseReplace(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, updateNames, updateHashes);
+				BaseReplace(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, replaceMode);
 			}
 
 			return;
@@ -1729,10 +1728,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="trim">True if we are supposed to trim names to NTFS length, false otherwise</param>
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
-		/// <param name="updateNames">True if names should be updated, false otherwise</param>
-		/// <param name="updateHashes">True if hashes should be updated, false otherwise</param>
+		/// <param name="replaceMode">ReplaceMode representing what should be updated</param>
 		public void BaseReplace(List<string> inputFileNames, List<string> baseFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
-			bool descAsName, Filter filter, SplitType splitType, bool updateNames, bool updateHashes)
+			bool descAsName, Filter filter, SplitType splitType, ReplaceMode replaceMode)
 		{
 			// First we want to parse all of the base DATs into the input
 			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for replacement...");
@@ -1789,13 +1787,13 @@ namespace SabreTools.Library.DatFiles
 						if (dupes.Count > 0)
 						{
 							// If we're updating names, replace using the first found name
-							if (updateNames)
+							if ((replaceMode & ReplaceMode.Names) != 0)
 							{
 								newDatItem.Name = dupes[0].Name;
 							}
 
 							// If we're updating hashes, only replace if the current item doesn't have them
-							if (updateHashes)
+							if ((replaceMode & ReplaceMode.Hashes) != 0)
 							{
 								if (newDatItem.Type == ItemType.Rom)
 								{
