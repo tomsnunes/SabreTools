@@ -123,6 +123,13 @@ namespace SabreTools.Library.FileTypes
 
 			// Read and verify the CHD signature
 			m_signature = m_br.ReadBytes(8);
+
+			// If no signature could be read, return null
+			if (m_signature == null || m_signature.Length == 0)
+			{
+				return null;
+			}
+
 			for(int i = 0; i < 8; i++)
 			{
 				if (m_signature[i] != Constants.CHDSignatureBytes[i])

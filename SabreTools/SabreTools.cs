@@ -524,12 +524,6 @@ namespace SabreTools
 						datHeader.Date = (string)feat.Value.GetValue();
 						break;
 					case "dat":
-						if (!File.Exists((string)feat.Value.GetValue()) && !Directory.Exists((string)feat.Value.GetValue()))
-						{
-							Globals.Logger.Error("Must be a valid file or folder of DATs: {0}", (string)feat.Value.GetValue());
-							Globals.Logger.Close();
-							return;
-						}
 						datfiles.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "desc":
