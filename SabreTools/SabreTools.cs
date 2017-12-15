@@ -381,7 +381,7 @@ namespace SabreTools
 						quickScan = true;
 						break;
 					case "roms":
-						datHeader.UseGame = false;
+						datHeader.UseRomName = true;
 						break;
 					case "reverse-base-name":
 						updateMode |= UpdateMode.ReverseBaseReplace;

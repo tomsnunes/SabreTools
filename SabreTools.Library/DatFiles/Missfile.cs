@@ -265,7 +265,7 @@ namespace SabreTools.Library.DatFiles
 				// Otherwise, use any flags
 				else
 				{
-					name = (UseGame ? rom.MachineName : rom.Name);
+					name = (UseRomName ? rom.Name : rom.MachineName);
 					if (!String.IsNullOrWhiteSpace(ReplaceExtension) || RemoveExtension)
 					{
 						if (RemoveExtension)
@@ -281,17 +281,17 @@ namespace SabreTools.Library.DatFiles
 					{
 						name += AddExtension;
 					}
-					if (!UseGame && GameName)
+					if (UseRomName && GameName)
 					{
 						name = Path.Combine(rom.MachineName, name);
 					}
 
-					if (UseGame && rom.MachineName != lastgame)
+					if (!UseRomName && rom.MachineName != lastgame)
 					{
 						state += pre + name + post + "\n";
 						lastgame = rom.MachineName;
 					}
-					else if (!UseGame)
+					else if (UseRomName)
 					{
 						state += pre + name + post + "\n";
 					}

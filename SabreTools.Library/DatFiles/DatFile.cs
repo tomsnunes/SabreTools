@@ -524,7 +524,7 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		// Data specific to the Miss DAT type
-		public bool UseGame
+		public bool UseRomName
 		{
 			get
 			{
@@ -533,7 +533,7 @@ namespace SabreTools.Library.DatFiles
 					_datHeader = new DatHeader();
 				}
 
-				return _datHeader.UseGame;
+				return _datHeader.UseRomName;
 			}
 			set
 			{
@@ -542,7 +542,7 @@ namespace SabreTools.Library.DatFiles
 					_datHeader = new DatHeader();
 				}
 
-				_datHeader.UseGame = value;
+				_datHeader.UseRomName = value;
 			}
 		}
 		public string Prefix

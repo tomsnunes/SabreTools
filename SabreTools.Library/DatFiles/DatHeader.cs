@@ -37,7 +37,7 @@ namespace SabreTools.Library.DatFiles
 		private Hash _stripHash;
 
 		// Data specific to the Miss DAT type
-		private bool _useGame;
+		private bool _useRomName;
 		private string _prefix;
 		private string _postfix;
 		private bool _quotes;
@@ -164,10 +164,10 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		// Data specific to the Miss DAT type
-		public bool UseGame
+		public bool UseRomName
 		{
-			get { return _useGame; }
-			set { _useGame = value; }
+			get { return _useRomName; }
+			set { _useRomName = value; }
 		}
 		public string Prefix
 		{
@@ -247,7 +247,7 @@ namespace SabreTools.Library.DatFiles
 				_dedupeRoms = this._dedupeRoms,
 				_stripHash = this._stripHash,
 
-				_useGame = this._useGame,
+				_useRomName = this._useRomName,
 				_prefix = this._prefix,
 				_postfix = this._postfix,
 				_quotes = this._quotes,
