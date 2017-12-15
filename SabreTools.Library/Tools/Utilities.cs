@@ -1218,10 +1218,23 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get if file has a known CHD header
+		/// </summary>
+		/// <param name="input">Filename of possible CHD</param>
+		/// <returns>True if the file has a valid CHD header, false otherwise</returns>
+		public static bool HasCHDHeader(string input)
+		{
+			FileStream fs = TryOpenRead(input);
+			bool output = HasCHDHeader(fs);
+			fs.Dispose();
+			return output;
+		}
+
+		/// <summary>
 		/// Get if file is a valid CHD
 		/// </summary>
 		/// <param name="input">Filename of possible CHD</param>
-		/// <returns>True if a the file is a valid CHD, false otherwise</returns>
+		/// <returns>True if the file is a valid CHD, false otherwise</returns>
 		public static bool IsValidCHD(string input)
 		{
 			DatItem datItem = GetCHDInfo(input);
@@ -1703,7 +1716,7 @@ namespace SabreTools.Library.Tools
 			long offset = 0, bool keepReadOpen = false, bool chdsAsFiles = true)
 		{
 			// We first check to see if it's a CHD
-			if (chdsAsFiles == false && IsValidCHD(input))
+			if (chdsAsFiles == false && HasCHDHeader(input))
 			{
 				// Seek to the starting position, if one is set
 				try
@@ -1931,10 +1944,26 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get if stream has a known CHD header
+		/// </summary>
+		/// <param name="input">Stream of possible CHD</param>
+		/// <returns>True if the stream has a valid CHD header, false otherwise</returns>
+		public static bool HasCHDHeader(Stream input)
+		{
+			// Get a CHD object to store the data
+			CHDFile chd = new CHDFile(input);
+
+			// Now try to get the header version
+			uint? version = chd.ValidateHeaderVersion();
+
+			return version != null;
+		}
+
+		/// <summary>
 		/// Get if stream is a valid CHD
 		/// </summary>
 		/// <param name="input">Stream of possible CHD</param>
-		/// <returns>True if a the file is a valid CHD, false otherwise</returns>
+		/// <returns>True if the stream is a valid CHD, false otherwise</returns>
 		public static bool IsValidCHD(Stream input)
 		{
 			DatItem datItem = GetCHDInfo(input);
@@ -2347,7 +2376,7 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
-		/// Get if the given path has a valid archive extension
+		/// Get if the given path has a valid DAT extension
 		/// </summary>
 		/// <param name="path">Path to check</param>
 		/// <returns>True if the extension is valid, false otherwise</returns>
