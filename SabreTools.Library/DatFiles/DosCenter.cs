@@ -29,12 +29,8 @@ namespace SabreTools.Library.DatFiles
 		/// </summary>
 		/// <param name="datFile">Parent DatFile to copy from</param>
 		public DosCenter(DatFile datFile)
+			: base(datFile, cloneHeader: false)
 		{
-			this._datHeader = datFile._datHeader;
-			this._items = datFile._items;
-			this._sortedBy = datFile._sortedBy;
-			this._mergedBy = datFile._mergedBy;
-			this._datStats = datFile._datStats;
 		}
 
 		/// <summary>

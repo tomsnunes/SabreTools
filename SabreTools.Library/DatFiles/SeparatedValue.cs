@@ -32,12 +32,8 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="datFile">Parent DatFile to copy from</param>
 		/// <param name="delim">Delimiter for parsing individual lines</param>
 		public SeparatedValue(DatFile datFile, char delim)
+			: base(datFile, cloneHeader: false)
 		{
-			this._datHeader = datFile._datHeader;
-			this._items = datFile._items;
-			this._sortedBy = datFile._sortedBy;
-			this._mergedBy = datFile._mergedBy;
-			this._datStats = datFile._datStats;
 			_delim = delim;
 		}
 

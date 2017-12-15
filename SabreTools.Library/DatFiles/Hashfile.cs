@@ -33,12 +33,8 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="datFile">Parent DatFile to copy from</param>
 		/// <param name="hash">Type of hash that is associated with this DAT</param> 
 		public Hashfile(DatFile datFile, Hash hash)
+			: base(datFile, cloneHeader: false)
 		{
-			this._datHeader = datFile._datHeader;
-			this._items = datFile._items;
-			this._sortedBy = datFile._sortedBy;
-			this._mergedBy = datFile._mergedBy;
-			this._datStats = datFile._datStats;
 			_hash = hash;
 		}
 

@@ -1557,9 +1557,21 @@ namespace SabreTools.Library.DatFiles
 		/// Create a new DatFile from an existing one using the header values only
 		/// </summary>
 		/// <param name="df"></param>
-		public DatFile(DatFile datFile)
+		/// <param name="cloneHeader">True if only the header should be cloned (default), false if this should be a reference to another DatFile</param>
+		public DatFile(DatFile datFile, bool cloneHeader = true)
 		{
-			_datHeader = (DatHeader)datFile._datHeader.Clone();
+			if (cloneHeader)
+			{
+				this._datHeader = (DatHeader)datFile._datHeader.Clone();
+			}
+			else
+			{
+				this._datHeader = datFile._datHeader;
+				this._items = datFile._items;
+				this._sortedBy = datFile._sortedBy;
+				this._mergedBy = datFile._mergedBy;
+				this._datStats = datFile._datStats;
+			}
 		}
 
 		/// <summary>
