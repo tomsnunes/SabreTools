@@ -518,6 +518,10 @@ namespace SabreTools.Library.DatFiles
 		{
 			get { return _sortedBy; }
 		}
+		public DedupeType MergedBy
+		{
+			get { return _mergedBy; }
+		}
 
 		// Data specific to the Miss DAT type
 		public bool UseGame
@@ -1401,6 +1405,9 @@ namespace SabreTools.Library.DatFiles
 				// Set the sorted type
 				_sortedBy = bucketBy;
 
+				// Reset the merged type since this might change the merge
+				_mergedBy = DedupeType.None;
+
 				// First do the initial sort of all of the roms inplace
 				List<string> oldkeys = Keys;
 				Parallel.ForEach(oldkeys, Globals.ParallelOptions, key =>
@@ -1554,9 +1561,9 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Create a new DatFile from an existing one using the header values only
+		/// Create a new DatFile from an existing one
 		/// </summary>
-		/// <param name="df"></param>
+		/// <param name="datFile">DatFile to get the values from</param>
 		/// <param name="cloneHeader">True if only the header should be cloned (default), false if this should be a reference to another DatFile</param>
 		public DatFile(DatFile datFile, bool cloneHeader = true)
 		{
@@ -1577,7 +1584,7 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Create a new DatFile from an existing DatHeader
 		/// </summary>
-		/// <param name="datHeader"></param>
+		/// <param name="datHeader">DatHeader to get the values from</param>
 		public DatFile(DatHeader datHeader)
 		{
 			_datHeader = (DatHeader)datHeader.Clone();
