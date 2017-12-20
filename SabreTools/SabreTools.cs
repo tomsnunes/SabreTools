@@ -554,7 +554,10 @@ namespace SabreTools
 						filter.GameNames.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "game-type":
-						filter.MachineTypes |= Utilities.GetMachineType((string)feat.Value.GetValue());
+						foreach (string mach in (List<string>)feat.Value.GetValue())
+						{
+							filter.MachineTypes |= Utilities.GetMachineType(mach);
+						}
 						break;
 					case "gz":
 						gz = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
@@ -564,9 +567,6 @@ namespace SabreTools
 						break;
 					case "homepage":
 						datHeader.Homepage = (string)feat.Value.GetValue();
-						break;
-					case "status":
-						filter.ItemStatuses |= Utilities.GetItemStatus((string)feat.Value.GetValue());
 						break;
 					case "md5":
 						filter.MD5s.AddRange((List<string>)feat.Value.GetValue());
@@ -588,10 +588,16 @@ namespace SabreTools
 						filter.NotGameNames.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "not-gtype":
-						filter.NotMachineTypes |= Utilities.GetMachineType((string)feat.Value.GetValue());
+						foreach (string nmach in (List<string>)feat.Value.GetValue())
+						{
+							filter.NotMachineTypes |= Utilities.GetMachineType(nmach);
+						}
 						break;
 					case "not-status":
-						filter.NotItemStatuses |= Utilities.GetItemStatus((string)feat.Value.GetValue());
+						foreach (string nstat in (List<string>)feat.Value.GetValue())
+						{
+							filter.NotItemStatuses |= Utilities.GetItemStatus(nstat);
+						}
 						break;
 					case "not-md5":
 						filter.NotMD5s.AddRange((List<string>)feat.Value.GetValue());
@@ -658,6 +664,12 @@ namespace SabreTools
 						break;
 					case "sha512":
 						filter.SHA512s.AddRange((List<string>)feat.Value.GetValue());
+						break;
+					case "status":
+						foreach (string stat in (List<string>)feat.Value.GetValue())
+						{
+							filter.ItemStatuses |= Utilities.GetItemStatus(stat);
+						}
 						break;
 					case "less":
 						filter.SizeLessThanOrEqual = Utilities.GetSizeFromString((string)feat.Value.GetValue());
