@@ -1410,10 +1410,13 @@ namespace SabreTools.Library.DatFiles
 
 				// First do the initial sort of all of the roms inplace
 				List<string> oldkeys = Keys;
-				Parallel.ForEach(oldkeys, Globals.ParallelOptions, key =>
+				for (int k = 0; k < oldkeys.Count; k++)
 				{
+					string key = oldkeys[k];
+
 					// Get the unsorted current list
 					List<DatItem> roms = this[key];
+					bool currentkey = false;
 
 					// Now add each of the roms to their respective keys
 					for (int i = 0; i < roms.Count; i++)
@@ -1426,12 +1429,19 @@ namespace SabreTools.Library.DatFiles
 						// If the key is different, move the item to the new key
 						if (newkey != key)
 						{
+							currentkey = true;
 							Add(newkey, rom);
 							Remove(key, rom);
 							i--; // This make sure that the pointer stays on the correct since one was removed
 						}
 					}
-				});
+
+					// Now remove the old key (if different than the current key)
+					if (!currentkey)
+					{
+						Remove(key);
+					}
+				}
 			}
 
 			// If the merge type isn't the same, we want to merge the dictionary accordingly
@@ -2574,7 +2584,6 @@ namespace SabreTools.Library.DatFiles
 
 			// For sake of ease, the first thing we want to do is sort by game
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
-			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
 			AddRomsFromDevices();
@@ -2596,7 +2605,6 @@ namespace SabreTools.Library.DatFiles
 
 			// For sake of ease, the first thing we want to do is sort by game
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
-			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
 			AddRomsFromDevices();
@@ -2622,7 +2630,6 @@ namespace SabreTools.Library.DatFiles
 
 			// For sake of ease, the first thing we want to do is sort by game
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
-			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
 			AddRomsFromChildren();
@@ -2644,7 +2651,6 @@ namespace SabreTools.Library.DatFiles
 
 			// For sake of ease, the first thing we want to do is sort by game
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
-			_sortedBy = SortedBy.Default;
 
 			// Now we want to loop through all of the games and set the correct information
 			AddRomsFromParent();
@@ -2666,7 +2672,9 @@ namespace SabreTools.Library.DatFiles
 
 			// For sake of ease, the first thing we want to do is sort by game
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
-			_sortedBy = SortedBy.Default;
+
+			// First, we need to get parent bios sets into their children
+			AddRomsFromParentBios();
 
 			// Now we want to loop through all of the games and set the correct information
 			RemoveRomsFromChild();
@@ -2688,6 +2696,60 @@ namespace SabreTools.Library.DatFiles
 			{
 				// If the game has no items in it, we want to continue
 				if (this[game].Count == 0)
+				{
+					continue;
+				}
+
+				// Determine if the game has a parent or not
+				string parent = null;
+				if (!String.IsNullOrWhiteSpace(this[game][0].RomOf))
+				{
+					parent = this[game][0].RomOf;
+				}
+
+				// If the parent doesnt exist, we want to continue
+				if (String.IsNullOrWhiteSpace(parent))
+				{
+					continue;
+				}
+
+				// If the parent doesn't have any items, we want to continue
+				if (this[parent].Count == 0)
+				{
+					continue;
+				}
+
+				// If the parent exists and has items, we copy the items from the parent to the current game
+				DatItem copyFrom = this[game][0];
+				List<DatItem> parentItems = this[parent];
+				foreach (DatItem item in parentItems)
+				{
+					DatItem datItem = (DatItem)item.Clone();
+					datItem.CopyMachineInformation(copyFrom);
+					if (this[game].Where(i => i.Name == datItem.Name).Count() == 0 && !this[game].Contains(datItem))
+					{
+						Add(game, datItem);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Use romof tags and isbios properties to add roms to children bios
+		/// </summary>
+		private void AddRomsFromParentBios()
+		{
+			List<string> games = Keys;
+			foreach (string game in games)
+			{
+				// If the game has no items in it, we want to continue
+				if (this[game].Count == 0)
+				{
+					continue;
+				}
+
+				// If the current game is not a bios set, we want to continue
+				if (this[game][0].MachineType != MachineType.Bios)
 				{
 					continue;
 				}
@@ -2892,7 +2954,7 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Use romof tags to remove roms from the children
+		/// Use romof tags to remove bios roms from children
 		/// </summary>
 		private void RemoveBiosRomsFromChild()
 		{
@@ -3249,7 +3311,7 @@ namespace SabreTools.Library.DatFiles
 					key = item.Type.ToString();
 					break;
 				case ItemType.Disk:
-					key = ((Disk)item).MD5 ?? ((Disk)item).SHA1;
+					key = ((Disk)item).MD5 ?? (((Disk)item).SHA1 ?? "nodump");
 					break;
 				case ItemType.Rom:
 					key = ((Rom)item).Size + "-" + ((Rom)item).CRC;
@@ -4166,6 +4228,8 @@ namespace SabreTools.Library.DatFiles
 				Rom rom = tgz.GetTorrentGZFileInfo();
 				if (isZip == false && rom != null && outputFormat == OutputFormat.TorrentGzip)
 				{
+					Globals.Logger.User("Matches found for '{0}', rebuilding accordingly...", Path.GetFileName(datItem.Name));
+
 					// Get the proper output path
 					if (romba)
 					{
@@ -4248,6 +4312,8 @@ namespace SabreTools.Library.DatFiles
 				Rom rom = tgz.GetTorrentGZFileInfo();
 				if (isZip == false && rom != null && outputFormat == OutputFormat.TorrentGzip)
 				{
+					Globals.Logger.User("Matches found for '{0}', rebuilding accordingly...", Path.GetFileName(datItem.Name));
+
 					// Get the proper output path
 					if (romba)
 					{
