@@ -2796,6 +2796,12 @@ namespace SabreTools.Library.DatFiles
 			List<string> games = Keys;
 			foreach (string game in games)
 			{
+				// If the game doesn't have items, we continue
+				if (this[game] == null || this[game].Count == 0)
+				{
+					continue;
+				}
+
 				// If the game has no devices, we continue
 				if (this[game][0].Devices == null || this[game][0].Devices.Count == 0)
 				{
