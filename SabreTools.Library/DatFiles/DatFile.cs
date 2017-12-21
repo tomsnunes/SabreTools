@@ -1435,12 +1435,6 @@ namespace SabreTools.Library.DatFiles
 							i--; // This make sure that the pointer stays on the correct since one was removed
 						}
 					}
-
-					// Now remove the old key (if different than the current key)
-					if (!currentkey)
-					{
-						Remove(key);
-					}
 				}
 			}
 
@@ -1472,6 +1466,9 @@ namespace SabreTools.Library.DatFiles
 					AddRange(key, sortedlist);
 				});
 			}
+
+			// Now clean up all empty keys
+			CleanEmptyKeys();
 		}
 
 		/// <summary>
@@ -1556,6 +1553,21 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			return key;
+		}
+
+		/// <summary>
+		/// Clean out all empty keys in the dictionary
+		/// </summary>
+		private void CleanEmptyKeys()
+		{
+			List<string> keys = Keys;
+			foreach(string key in keys)
+			{
+				if (this[key].Count == 0)
+				{
+					Remove(key);
+				}
+			}
 		}
 
 		#endregion
