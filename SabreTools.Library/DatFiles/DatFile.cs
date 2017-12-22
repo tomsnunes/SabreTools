@@ -2683,14 +2683,12 @@ namespace SabreTools.Library.DatFiles
 			// For sake of ease, the first thing we want to do is sort by game
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
 
-			// First, we need to get parent bios sets into their children
-			AddRomsFromParentBios();
-
 			// Now we want to loop through all of the games and set the correct information
 			RemoveRomsFromChild();
 
 			// Now that we have looped through the cloneof tags, we loop through the romof tags
-			RemoveBiosRomsFromChild();
+			RemoveBiosRomsFromChild(false);
+			RemoveBiosRomsFromChild(true);
 
 			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
 			RemoveTagsFromChild();
@@ -2706,60 +2704,6 @@ namespace SabreTools.Library.DatFiles
 			{
 				// If the game has no items in it, we want to continue
 				if (this[game].Count == 0)
-				{
-					continue;
-				}
-
-				// Determine if the game has a parent or not
-				string parent = null;
-				if (!String.IsNullOrWhiteSpace(this[game][0].RomOf))
-				{
-					parent = this[game][0].RomOf;
-				}
-
-				// If the parent doesnt exist, we want to continue
-				if (String.IsNullOrWhiteSpace(parent))
-				{
-					continue;
-				}
-
-				// If the parent doesn't have any items, we want to continue
-				if (this[parent].Count == 0)
-				{
-					continue;
-				}
-
-				// If the parent exists and has items, we copy the items from the parent to the current game
-				DatItem copyFrom = this[game][0];
-				List<DatItem> parentItems = this[parent];
-				foreach (DatItem item in parentItems)
-				{
-					DatItem datItem = (DatItem)item.Clone();
-					datItem.CopyMachineInformation(copyFrom);
-					if (this[game].Where(i => i.Name == datItem.Name).Count() == 0 && !this[game].Contains(datItem))
-					{
-						Add(game, datItem);
-					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// Use romof tags and isbios properties to add roms to children bios
-		/// </summary>
-		private void AddRomsFromParentBios()
-		{
-			List<string> games = Keys;
-			foreach (string game in games)
-			{
-				// If the game has no items in it, we want to continue
-				if (this[game].Count == 0)
-				{
-					continue;
-				}
-
-				// If the current game is not a bios set, we want to continue
-				if (this[game][0].MachineType != MachineType.Bios)
 				{
 					continue;
 				}
@@ -2972,7 +2916,8 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Use romof tags to remove bios roms from children
 		/// </summary>
-		private void RemoveBiosRomsFromChild()
+		/// <param name="bios">True if only child Bios sets are touched, false for non-bios sets (default)</param>
+		private void RemoveBiosRomsFromChild(bool bios = false)
 		{
 			// Loop through the romof tags
 			List<string> games = Keys;
@@ -2980,6 +2925,12 @@ namespace SabreTools.Library.DatFiles
 			{
 				// If the game has no items in it, we want to continue
 				if (this[game].Count == 0)
+				{
+					continue;
+				}
+
+				// If the game (is/is not) a bios, we want to continue
+				if (bios ^ this[game][0].MachineType == MachineType.Bios)
 				{
 					continue;
 				}
