@@ -1312,7 +1312,7 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Remove a value from the file dictionary if it exists
+		/// Remove the first instance of a value from the file dictionary if it exists
 		/// </summary>
 		/// <param name="key">Key in the dictionary to remove from</param>
 		/// <param name="value">Value to remove from the dictionary</param>
@@ -1330,7 +1330,7 @@ namespace SabreTools.Library.DatFiles
 			lock (_items)
 			{
 				// While the key is in the dictionary and the item is there, remove it
-				while (_items.ContainsKey(key) && _items[key].Contains(value))
+				if (_items.ContainsKey(key) && _items[key].Contains(value))
 				{
 					// Remove the statistics first
 					_datStats.RemoveItem(value);
@@ -1416,7 +1416,6 @@ namespace SabreTools.Library.DatFiles
 
 					// Get the unsorted current list
 					List<DatItem> roms = this[key];
-					bool currentkey = false;
 
 					// Now add each of the roms to their respective keys
 					for (int i = 0; i < roms.Count; i++)
@@ -1429,7 +1428,6 @@ namespace SabreTools.Library.DatFiles
 						// If the key is different, move the item to the new key
 						if (newkey != key)
 						{
-							currentkey = true;
 							Add(newkey, rom);
 							Remove(key, rom);
 							i--; // This make sure that the pointer stays on the correct since one was removed
