@@ -2879,7 +2879,7 @@ namespace SabreTools.Library.DatFiles
 					else if (item.Type != ItemType.Disk && !this[parent].Contains(item))
 					{
 						// Rename the child so it's in a subfolder
-						item.Name = item.Name + "\\" + item.Name;
+						item.Name = item.MachineName + "\\" + item.Name;
 
 						// Update the machine to be the new parent
 						item.CopyMachineInformation(copyFrom);
@@ -2995,7 +2995,7 @@ namespace SabreTools.Library.DatFiles
 					continue;
 				}
 
-				// If the parent exists and has items, we copy the items from the parent to the current game
+				// If the parent exists and has items, we remove the parent items from the current game
 				List<DatItem> parentItems = this[parent];
 				foreach (DatItem item in parentItems)
 				{
@@ -3006,7 +3006,7 @@ namespace SabreTools.Library.DatFiles
 					}
 				}
 
-				// Now we want to get the parent romof tag and put it in each of the items
+				// Now we want to get the parent romof tag and put it in each of the remaining items
 				List<DatItem> items = this[game];
 				string romof = this[parent][0].RomOf;
 				foreach (DatItem item in items)
