@@ -1258,7 +1258,7 @@ namespace SabreTools.Library.DatFiles
 			{
 				if (_items.ContainsKey(key))
 				{
-					contains = _items.ContainsKey(key);
+					contains = _items[key].Contains(value);
 				}
 			}
 
@@ -1329,14 +1329,10 @@ namespace SabreTools.Library.DatFiles
 
 			lock (_items)
 			{
-				// While the key is in the dictionary and the item is there, remove it
-				if (_items.ContainsKey(key) && _items[key].Contains(value))
-				{
-					// Remove the statistics first
-					_datStats.RemoveItem(value);
+				// Remove the statistics first
+				_datStats.RemoveItem(value);
 
-					_items[key].Remove(value);
-				}
+				_items[key].Remove(value);
 			}
 		}
 
@@ -3004,7 +3000,10 @@ namespace SabreTools.Library.DatFiles
 				foreach (DatItem item in parentItems)
 				{
 					DatItem datItem = (DatItem)item.Clone();
-					Remove(game, datItem);
+					while (this[game].Contains(datItem))
+					{
+						Remove(game, datItem);
+					}
 				}
 
 				// Now we want to get the parent romof tag and put it in each of the items
