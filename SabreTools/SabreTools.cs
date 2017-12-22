@@ -242,7 +242,7 @@ namespace SabreTools
 					case "diff-nd":
 						updateMode |= UpdateMode.DiffNoDupesOnly;
 						break;
-					case "-dat-merged":
+					case "dat-merged":
 						splitType = SplitType.Merged;
 						break;
 					case "dat-devnonmerged":
@@ -311,7 +311,7 @@ namespace SabreTools
 					case "noSHA512":
 						omitFromScan &= ~Hash.SHA512; // This needs to be inverted later
 						break;
-					case "-no-store-header":
+					case "no-store-header":
 						nostore = true;
 						break;
 					case "output-all":
@@ -502,7 +502,7 @@ namespace SabreTools
 					case "7z":
 						sevenzip = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
 						break;
-					case "-add-ext":
+					case "add-ext":
 						datHeader.AddExtension = (string)feat.Value.GetValue();
 						break;
 					case "author":
