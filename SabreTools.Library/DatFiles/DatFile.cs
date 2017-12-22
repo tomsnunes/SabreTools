@@ -2645,7 +2645,8 @@ namespace SabreTools.Library.DatFiles
 			AddRomsFromChildren();
 
 			// Now that we have looped through the cloneof tags, we loop through the romof tags
-			RemoveBiosRomsFromChild();
+			RemoveBiosRomsFromChild(false);
+			RemoveBiosRomsFromChild(true);
 
 			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
 			RemoveTagsFromChild();
@@ -2666,7 +2667,8 @@ namespace SabreTools.Library.DatFiles
 			AddRomsFromParent();
 
 			// Now that we have looped through the cloneof tags, we loop through the romof tags
-			RemoveBiosRomsFromChild();
+			RemoveBiosRomsFromChild(false);
+			RemoveBiosRomsFromChild(true);
 
 			// Finally, remove the romof and cloneof tags so it's not picked up by the manager
 			RemoveTagsFromChild();
