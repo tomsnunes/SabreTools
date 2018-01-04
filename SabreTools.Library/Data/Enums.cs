@@ -345,6 +345,8 @@
 		Release = 3,
 		BiosSet = 4,
 		Archive = 5,
+
+		Blank = 99, // This is not a real type, only used internally
 	}
 
 	#endregion

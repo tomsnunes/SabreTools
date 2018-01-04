@@ -130,6 +130,7 @@
     <Compile Include="DatFiles\SabreDat.cs" />
     <Compile Include="DatFiles\SeparatedValue.cs" />
     <Compile Include="DatFiles\SoftwareList.cs" />
+    <Compile Include="DatItems\Blank.cs" />
     <Compile Include="FileTypes\CHDFile.cs" />
     <Compile Include="FileTypes\CoreRarArchive.cs" />
     <Compile Include="External\NaturalSort\NaturalComparer.cs" />
