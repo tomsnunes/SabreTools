@@ -580,7 +580,7 @@ namespace SabreTools.Library.DatFiles
 						ParseAddHelper(blank, clean, remUnicode);
 					}
 
-					block = false, containsItems = false;
+					block = false; containsItems = false;
 					blockname = ""; tempgamename = ""; gamedesc = ""; cloneof = "";
 					romof = ""; sampleof = ""; year = ""; manufacturer = "";
 				}

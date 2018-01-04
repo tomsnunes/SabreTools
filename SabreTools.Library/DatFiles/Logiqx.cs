@@ -1007,7 +1007,7 @@ namespace SabreTools.Library.DatFiles
 									SystemID = sysid,
 									System = filename,
 									SourceID = srcid,
-								}
+								};
 
 								blank.CopyMachineInformation(machine);
 
