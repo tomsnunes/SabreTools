@@ -501,6 +501,7 @@ namespace SabreTools.Library.DatFiles
 							long? areasize = null;
 							List<Tuple<string, string>> infos = new List<Tuple<string, string>>();
 							List<Tuple<string, string>> features = new List<Tuple<string, string>>();
+							bool containsItems = false;
 
 							// We want to process the entire subtree of the game
 							subreader = xtr.ReadSubtree();
@@ -623,6 +624,7 @@ namespace SabreTools.Library.DatFiles
 										break;
 									case "romCRC":
 										empty = false;
+										containsItems = true;
 
 										ext = (subreader.GetAttribute("extension") ?? "");
 
@@ -698,6 +700,7 @@ namespace SabreTools.Library.DatFiles
 										break;
 									case "release":
 										empty = false;
+										containsItems = true;
 
 										bool? defaultrel = null;
 										if (subreader.GetAttribute("default") != null)
@@ -739,6 +742,7 @@ namespace SabreTools.Library.DatFiles
 										break;
 									case "biosset":
 										empty = false;
+										containsItems = true;
 
 										bool? defaultbios = null;
 										if (subreader.GetAttribute("default") != null)
@@ -782,6 +786,7 @@ namespace SabreTools.Library.DatFiles
 										break;
 									case "archive":
 										empty = false;
+										containsItems = true;
 
 										DatItem archiverom = new Archive
 										{
@@ -810,6 +815,7 @@ namespace SabreTools.Library.DatFiles
 										break;
 									case "sample":
 										empty = false;
+										containsItems = true;
 
 										DatItem samplerom = new Sample
 										{
@@ -839,6 +845,7 @@ namespace SabreTools.Library.DatFiles
 									case "rom":
 									case "disk":
 										empty = false;
+										containsItems = true;
 
 										// If the rom has a merge tag, add it
 										string merge = subreader.GetAttribute("merge");
@@ -983,6 +990,31 @@ namespace SabreTools.Library.DatFiles
 								}
 							}
 
+							// If no items were found for this machine, add a Blank placeholder
+							if (!containsItems)
+							{
+								Blank blank = new Blank()
+								{
+									Supported = supported,
+									Publisher = publisher,
+									Infos = infos,
+									PartName = partname,
+									PartInterface = partinterface,
+									Features = features,
+									AreaName = areaname,
+									AreaSize = areasize,
+
+									SystemID = sysid,
+									System = filename,
+									SourceID = srcid,
+								}
+
+								blank.CopyMachineInformation(machine);
+
+								// Now process and add the rom
+								key = ParseAddHelper(blank, clean, remUnicode);
+							}
+
 							xtr.Skip();
 							break;
 						case "dir":
@@ -1004,6 +1036,7 @@ namespace SabreTools.Library.DatFiles
 							break;
 						case "file":
 							empty = false;
+							containsItems = true;
 
 							// If the rom is itemStatus, flag it
 							its = ItemStatus.None;

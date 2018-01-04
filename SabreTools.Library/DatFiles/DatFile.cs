@@ -2957,7 +2957,10 @@ namespace SabreTools.Library.DatFiles
 				foreach (DatItem item in parentItems)
 				{
 					DatItem datItem = (DatItem)item.Clone();
-					Remove(game, datItem);
+					while (this[game].Contains(datItem))
+					{
+						Remove(game, datItem);
+					}
 				}
 			}
 		}
@@ -3274,6 +3277,7 @@ namespace SabreTools.Library.DatFiles
 			{
 				case ItemType.Archive:
 				case ItemType.BiosSet:
+				case ItemType.Blank:
 				case ItemType.Release:
 				case ItemType.Sample:
 					key = item.Type.ToString();

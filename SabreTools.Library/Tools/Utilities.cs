@@ -665,6 +665,10 @@ namespace SabreTools.Library.Tools
 					return ForceMerging.None;
 				case "split":
 					return ForceMerging.Split;
+				case "merged":
+					return ForceMerging.Merged;
+				case "nonmerged":
+					return ForceMerging.NonMerged;
 				case "full":
 					return ForceMerging.Full;
 			}
@@ -703,8 +707,10 @@ namespace SabreTools.Library.Tools
 				case "none":
 				default:
 					return ForcePacking.None;
+				case "yes":
 				case "zip":
 					return ForcePacking.Zip;
+				case "no":
 				case "unzip":
 					return ForcePacking.Unzip;
 			}

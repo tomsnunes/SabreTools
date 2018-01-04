@@ -58,7 +58,7 @@ namespace SabreTools.Library.DatFiles
 			Encoding enc = Utilities.GetEncoding(filename);
 			StreamReader sr = new StreamReader(Utilities.TryOpenRead(filename), enc);
 
-			bool block = false, superdat = false;
+			bool block = false, superdat = false, containsItems = false;
 			string blockname = "", tempgamename = "", gamedesc = "", cloneof = "",
 				romof = "", sampleof = "", year = "", manufacturer = "";
 			while (!sr.EndOfStream)
@@ -82,6 +82,7 @@ namespace SabreTools.Library.DatFiles
 					}
 
 					block = true;
+					containsItems = false;
 				}
 
 				// If the line is a rom-like item and we're in a block
@@ -91,6 +92,7 @@ namespace SabreTools.Library.DatFiles
 						|| (line.Trim().StartsWith("sample") && !line.Trim().StartsWith("sampleof"))
 					) && block)
 				{
+					containsItems = true;
 					ItemType temptype = ItemType.Rom;
 					if (line.Trim().StartsWith("rom ("))
 					{
@@ -535,52 +537,19 @@ namespace SabreTools.Library.DatFiles
 							case "forcemerging":
 								if (ForceMerging == ForceMerging.None)
 								{
-									switch (itemval)
-									{
-										case "none":
-											ForceMerging = ForceMerging.None;
-											break;
-										case "split":
-											ForceMerging = ForceMerging.Split;
-											break;
-										case "merged":
-											ForceMerging = ForceMerging.Merged;
-											break;
-										case "nonmerged":
-											ForceMerging = ForceMerging.NonMerged;
-											break;
-										case "full":
-											ForceMerging = ForceMerging.Full;
-											break;
-									}
+									ForceMerging = Utilities.GetForceMerging(itemval);
 								}
 								break;
 							case "forcezipping":
 								if (ForcePacking == ForcePacking.None)
 								{
-									switch (itemval)
-									{
-										case "yes":
-											ForcePacking = ForcePacking.Zip;
-											break;
-										case "no":
-											ForcePacking = ForcePacking.Unzip;
-											break;
-									}
+									ForcePacking = Utilities.GetForcePacking(itemval);
 								}
 								break;
 							case "forcepacking":
 								if (ForcePacking == ForcePacking.None)
 								{
-									switch (itemval)
-									{
-										case "zip":
-											ForcePacking = ForcePacking.Zip;
-											break;
-										case "unzip":
-											ForcePacking = ForcePacking.Unzip;
-											break;
-									}
+									ForcePacking = Utilities.GetForcePacking(itemval);
 								}
 								break;
 						}
@@ -590,7 +559,28 @@ namespace SabreTools.Library.DatFiles
 				// If we find an end bracket that's not associated with anything else, the block is done
 				else if (Regex.IsMatch(line, Constants.EndPatternCMP) && block)
 				{
-					block = false;
+					// If no items were found for this machine, add a Blank placeholder
+					if (!containsItems)
+					{
+						Blank blank = new Blank()
+						{
+							MachineName = tempgamename,
+							MachineDescription = gamedesc,
+							CloneOf = cloneof,
+							RomOf = romof,
+							SampleOf = sampleof,
+							Manufacturer = manufacturer,
+							Year = year,
+
+							SystemID = sysid,
+							SourceID = srcid,
+						};
+
+						// Now process and add the rom
+						ParseAddHelper(blank, clean, remUnicode);
+					}
+
+					block = false, containsItems = false;
 					blockname = ""; tempgamename = ""; gamedesc = ""; cloneof = "";
 					romof = ""; sampleof = ""; year = ""; manufacturer = "";
 				}
