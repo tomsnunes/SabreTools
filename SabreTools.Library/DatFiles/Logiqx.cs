@@ -144,51 +144,15 @@ namespace SabreTools.Library.DatFiles
 							}
 							if (xtr.GetAttribute("forcemerging") != null && ForceMerging == ForceMerging.None)
 							{
-								switch (xtr.GetAttribute("forcemerging"))
-								{
-									case "none":
-										ForceMerging = ForceMerging.None;
-										break;
-									case "split":
-										ForceMerging = ForceMerging.Split;
-										break;
-									case "merged":
-										ForceMerging = ForceMerging.Merged;
-										break;
-									case "nonmerged":
-										ForceMerging = ForceMerging.NonMerged;
-										break;
-									case "full":
-										ForceMerging = ForceMerging.Full;
-										break;
-								}
+								ForceMerging = Utilities.GetForceMerging(xtr.GetAttribute("forcemerging"));
 							}
 							if (xtr.GetAttribute("forcenodump") != null && ForceNodump == ForceNodump.None)
 							{
-								switch (xtr.GetAttribute("forcenodump"))
-								{
-									case "obsolete":
-										ForceNodump = ForceNodump.Obsolete;
-										break;
-									case "required":
-										ForceNodump = ForceNodump.Required;
-										break;
-									case "ignore":
-										ForceNodump = ForceNodump.Ignore;
-										break;
-								}
+								ForceNodump = Utilities.GetForceNodump(xtr.GetAttribute("forcenodump"));
 							}
 							if (xtr.GetAttribute("forcepacking") != null && ForcePacking == ForcePacking.None)
 							{
-								switch (xtr.GetAttribute("forcepacking"))
-								{
-									case "zip":
-										ForcePacking = ForcePacking.Zip;
-										break;
-									case "unzip":
-										ForcePacking = ForcePacking.Unzip;
-										break;
-								}
+								ForcePacking = Utilities.GetForcePacking(xtr.GetAttribute("forcepacking"));
 							}
 							xtr.Read();
 							break;
@@ -346,51 +310,15 @@ namespace SabreTools.Library.DatFiles
 										}
 										if (headreader.GetAttribute("forcemerging") != null && ForceMerging == ForceMerging.None)
 										{
-											switch (headreader.GetAttribute("forcemerging"))
-											{
-												case "none":
-													ForceMerging = ForceMerging.None;
-													break;
-												case "split":
-													ForceMerging = ForceMerging.Split;
-													break;
-												case "merged":
-													ForceMerging = ForceMerging.Merged;
-													break;
-												case "nonmerged":
-													ForceMerging = ForceMerging.NonMerged;
-													break;
-												case "full":
-													ForceMerging = ForceMerging.Full;
-													break;
-											}
+											ForceMerging = Utilities.GetForceMerging(headreader.GetAttribute("forcemerging"));
 										}
 										if (headreader.GetAttribute("forcenodump") != null && ForceNodump == ForceNodump.None)
 										{
-											switch (headreader.GetAttribute("forcenodump"))
-											{
-												case "obsolete":
-													ForceNodump = ForceNodump.Obsolete;
-													break;
-												case "required":
-													ForceNodump = ForceNodump.Required;
-													break;
-												case "ignore":
-													ForceNodump = ForceNodump.Ignore;
-													break;
-											}
+											ForceNodump = Utilities.GetForceNodump(headreader.GetAttribute("forcenodump"));
 										}
 										if (headreader.GetAttribute("forcepacking") != null && ForcePacking == ForcePacking.None)
 										{
-											switch (headreader.GetAttribute("forcepacking"))
-											{
-												case "zip":
-													ForcePacking = ForcePacking.Zip;
-													break;
-												case "unzip":
-													ForcePacking = ForcePacking.Unzip;
-													break;
-											}
+											ForcePacking = Utilities.GetForcePacking(headreader.GetAttribute("forcepacking"));
 										}
 										headreader.Read();
 										break;
@@ -428,49 +356,19 @@ namespace SabreTools.Library.DatFiles
 															case "forcemerging":
 																if (ForceMerging == ForceMerging.None)
 																{
-																	switch (content)
-																	{
-																		case "split":
-																			ForceMerging = ForceMerging.Split;
-																			break;
-																		case "none":
-																			ForceMerging = ForceMerging.None;
-																			break;
-																		case "full":
-																			ForceMerging = ForceMerging.Full;
-																			break;
-																	}
+																	ForceMerging = Utilities.GetForceMerging(content);
 																}
 																break;
 															case "forcenodump":
 																if (ForceNodump == ForceNodump.None)
 																{
-																	switch (content)
-																	{
-																		case "obsolete":
-																			ForceNodump = ForceNodump.Obsolete;
-																			break;
-																		case "required":
-																			ForceNodump = ForceNodump.Required;
-																			break;
-																		case "ignore":
-																			ForceNodump = ForceNodump.Ignore;
-																			break;
-																	}
+																	ForceNodump = Utilities.GetForceNodump(content);
 																}
 																break;
 															case "forcepacking":
 																if (ForcePacking == ForcePacking.None)
 																{
-																	switch (content)
-																	{
-																		case "zip":
-																			ForcePacking = ForcePacking.Zip;
-																			break;
-																		case "unzip":
-																			ForcePacking = ForcePacking.Unzip;
-																			break;
-																	}
+																	ForcePacking = Utilities.GetForcePacking(content);
 																}
 																break;
 														}
@@ -540,29 +438,13 @@ namespace SabreTools.Library.DatFiles
 							// Get the supported value from the reader
 							if (subreader.GetAttribute("supported") != null)
 							{
-								switch (subreader.GetAttribute("supported"))
-								{
-									case "no":
-										supported = false;
-										break;
-									case "yes":
-										supported = true;
-										break;
-								}
+								supported = Utilities.GetYesNo(subreader.GetAttribute("supported"));
 							}
 
 							// Get the runnable value from the reader
 							if (subreader.GetAttribute("runnable") != null)
 							{
-								switch (subreader.GetAttribute("runnable"))
-								{
-									case "no":
-										machine.Runnable = false;
-										break;
-									case "yes":
-										machine.Runnable = true;
-										break;
-								}
+								machine.Runnable = Utilities.GetYesNo(subreader.GetAttribute("runnable"));
 							}
 
 							if (superdat && !keep)
@@ -705,14 +587,7 @@ namespace SabreTools.Library.DatFiles
 										bool? defaultrel = null;
 										if (subreader.GetAttribute("default") != null)
 										{
-											if (subreader.GetAttribute("default") == "yes")
-											{
-												defaultrel = true;
-											}
-											else if (subreader.GetAttribute("default") == "no")
-											{
-												defaultrel = false;
-											}
+											defaultrel = Utilities.GetYesNo(subreader.GetAttribute("default"));
 										}
 
 										DatItem relrom = new Release
@@ -747,14 +622,7 @@ namespace SabreTools.Library.DatFiles
 										bool? defaultbios = null;
 										if (subreader.GetAttribute("default") != null)
 										{
-											if (subreader.GetAttribute("default") == "yes")
-											{
-												defaultbios = true;
-											}
-											else if (subreader.GetAttribute("default") == "no")
-											{
-												defaultbios = false;
-											}
+											defaultbios = Utilities.GetYesNo(subreader.GetAttribute("default"));
 										}
 
 										DatItem biosrom = new BiosSet
@@ -851,22 +719,10 @@ namespace SabreTools.Library.DatFiles
 										string merge = subreader.GetAttribute("merge");
 
 										// If the rom has a status, flag it
-										its = ItemStatus.None;
-										if (subreader.GetAttribute("flags") == "good" || subreader.GetAttribute("status") == "good")
+										its = Utilities.GetItemStatus(subreader.GetAttribute("status"));
+										if (its == ItemStatus.None)
 										{
-											its = ItemStatus.Good;
-										}
-										if (subreader.GetAttribute("flags") == "baddump" || subreader.GetAttribute("status") == "baddump")
-										{
-											its = ItemStatus.BadDump;
-										}
-										if (subreader.GetAttribute("flags") == "nodump" || subreader.GetAttribute("status") == "nodump")
-										{
-											its = ItemStatus.Nodump;
-										}
-										if (subreader.GetAttribute("flags") == "verified" || subreader.GetAttribute("status") == "verified")
-										{
-											its = ItemStatus.Verified;
+											its = Utilities.GetItemStatus(subreader.GetAttribute("flags"));
 										}
 
 										// If the rom has a Date attached, read it in and then sanitize it
@@ -1065,21 +921,7 @@ namespace SabreTools.Library.DatFiles
 										if (flagreader.GetAttribute("name") != null && flagreader.GetAttribute("value") != null)
 										{
 											string content = flagreader.GetAttribute("value");
-											switch (flagreader.GetAttribute("name"))
-											{
-												case "good":
-													its = ItemStatus.Good;
-													break;
-												case "baddump":
-													its = ItemStatus.BadDump;
-													break;
-												case "nodump":
-													its = ItemStatus.Nodump;
-													break;
-												case "verified":
-													its = ItemStatus.Verified;
-													break;
-											}
+											its = Utilities.GetItemStatus(flagreader.GetAttribute("name"));
 										}
 										break;
 								}

@@ -813,6 +813,23 @@ namespace SabreTools.Library.Tools
 			}
 		}
 
+		/// <summary>
+		/// Get bool value from input string
+		/// </summary>
+		/// <param name="yesno">String to get value from</param>
+		/// <returns>Bool corresponding to the string</returns>
+		public static bool GetYesNo(string yesno)
+		{
+			switch (yesno?.ToLowerInvariant())
+			{
+				case "yes":
+					return true;
+				default:
+				case "no":
+					return false;				
+			}
+		}
+
 		#endregion
 
 		#region File Information
