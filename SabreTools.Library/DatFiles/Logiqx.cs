@@ -142,15 +142,15 @@ namespace SabreTools.Library.DatFiles
 							{
 								Description = (String.IsNullOrWhiteSpace(Description) ? xtr.GetAttribute("description") : Description);
 							}
-							if (xtr.GetAttribute("forcemerging") != null && ForceMerging == ForceMerging.None)
+							if (ForceMerging == ForceMerging.None)
 							{
 								ForceMerging = Utilities.GetForceMerging(xtr.GetAttribute("forcemerging"));
 							}
-							if (xtr.GetAttribute("forcenodump") != null && ForceNodump == ForceNodump.None)
+							if (ForceNodump == ForceNodump.None)
 							{
 								ForceNodump = Utilities.GetForceNodump(xtr.GetAttribute("forcenodump"));
 							}
-							if (xtr.GetAttribute("forcepacking") != null && ForcePacking == ForcePacking.None)
+							if (ForcePacking == ForcePacking.None)
 							{
 								ForcePacking = Utilities.GetForcePacking(xtr.GetAttribute("forcepacking"));
 							}
