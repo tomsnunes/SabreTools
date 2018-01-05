@@ -308,15 +308,15 @@ namespace SabreTools.Library.DatFiles
 										{
 											Header = (String.IsNullOrWhiteSpace(Header) ? headreader.GetAttribute("plugin") : Header);
 										}
-										if (headreader.GetAttribute("forcemerging") != null && ForceMerging == ForceMerging.None)
+										if (ForceMerging == ForceMerging.None)
 										{
 											ForceMerging = Utilities.GetForceMerging(headreader.GetAttribute("forcemerging"));
 										}
-										if (headreader.GetAttribute("forcenodump") != null && ForceNodump == ForceNodump.None)
+										if (ForceNodump == ForceNodump.None)
 										{
 											ForceNodump = Utilities.GetForceNodump(headreader.GetAttribute("forcenodump"));
 										}
-										if (headreader.GetAttribute("forcepacking") != null && ForcePacking == ForcePacking.None)
+										if (ForcePacking == ForcePacking.None)
 										{
 											ForcePacking = Utilities.GetForcePacking(headreader.GetAttribute("forcepacking"));
 										}
