@@ -503,7 +503,7 @@ namespace SabreTools
 					case "update-names":
 						replaceMode |= ReplaceMode.ItemName;
 						break;
-					case "update-years":
+					case "update-year":
 						replaceMode |= ReplaceMode.Year;
 						break;
 

@@ -1285,8 +1285,8 @@ namespace SabreTools
 					"Update machine descriptions from base DATs",
 					FeatureType.Flag,
 					null));
-				update["base-replace"].AddFeature("update-years", new Feature(
-					new List<string>() { "-uy", "--update-years" },
+				update["base-replace"].AddFeature("update-year", new Feature(
+					new List<string>() { "-uy", "--update-year" },
 					"Update machine years from base DATs",
 					FeatureType.Flag,
 					null));
@@ -1320,8 +1320,8 @@ namespace SabreTools
 					"Update machine descriptions from base DATs",
 					FeatureType.Flag,
 					null));
-				update["reverse-base-replace"].AddFeature("update-years", new Feature(
-					new List<string>() { "-uy", "--update-years" },
+				update["reverse-base-replace"].AddFeature("update-year", new Feature(
+					new List<string>() { "-uy", "--update-year" },
 					"Update machine years from base DATs",
 					FeatureType.Flag,
 					null));
