@@ -1796,8 +1796,8 @@ namespace SabreTools.Library.DatFiles
 				intDat.Parse(path, 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 
 				// If we are matching based on hashes of any sort
-				if ((replaceMode & ReplaceMode.Names) != 0
-					|| (replaceMode & ReplaceMode.Hashes) != 0)
+				if ((replaceMode & ReplaceMode.ItemName) != 0
+					|| (replaceMode & ReplaceMode.Hash) != 0)
 				{
 					// For comparison's sake, we want to use CRC as the base ordering
 					BucketBy(SortedBy.CRC, DedupeType.Full);
@@ -1824,13 +1824,13 @@ namespace SabreTools.Library.DatFiles
 							if (dupes.Count > 0)
 							{
 								// If we're updating names, replace using the first found name
-								if ((replaceMode & ReplaceMode.Names) != 0)
+								if ((replaceMode & ReplaceMode.ItemName) != 0)
 								{
 									newDatItem.Name = dupes[0].Name;
 								}
 
 								// If we're updating hashes, only replace if the current item doesn't have them
-								if ((replaceMode & ReplaceMode.Hashes) != 0)
+								if ((replaceMode & ReplaceMode.Hash) != 0)
 								{
 									if (newDatItem.Type == ItemType.Rom)
 									{
@@ -1901,7 +1901,9 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// If we are matching based on names of any sort
-				if ((replaceMode & ReplaceMode.Descriptions) != 0)
+				if ((replaceMode & ReplaceMode.Description) != 0
+					|| (replaceMode & ReplaceMode.Year) != 0
+					|| (replaceMode & ReplaceMode.Manufacturer) != 0)
 				{
 					// For comparison's sake, we want to use Machine Name as the base ordering
 					BucketBy(SortedBy.Game, DedupeType.Full);
@@ -1918,7 +1920,18 @@ namespace SabreTools.Library.DatFiles
 							DatItem newDatItem = (DatItem)datItem.Clone();
 							if (Contains(key) && this[key].Count() > 0)
 							{
-								newDatItem.MachineDescription = this[key][0].MachineDescription;
+								if ((replaceMode & ReplaceMode.Description) != 0)
+								{
+									newDatItem.MachineDescription = this[key][0].MachineDescription;
+								}
+								if ((replaceMode & ReplaceMode.Year) != 0)
+								{
+									newDatItem.Year = this[key][0].Year;
+								}
+								if ((replaceMode & ReplaceMode.Manufacturer) != 0)
+								{
+									newDatItem.Manufacturer = this[key][0].Manufacturer;
+								}
 							}
 
 							newDatItems.Add(newDatItem);

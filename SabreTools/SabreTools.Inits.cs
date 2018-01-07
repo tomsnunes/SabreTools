@@ -303,7 +303,7 @@ namespace SabreTools
 			// If no replacement mode is set, default to Names
 			if (replaceMode == ReplaceMode.None)
 			{
-				replaceMode = ReplaceMode.Names;
+				replaceMode = ReplaceMode.ItemName;
 			}
 
 			// Populate the DatData object

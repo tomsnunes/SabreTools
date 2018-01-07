@@ -254,6 +254,9 @@ namespace SabreTools
 					case "dat-split":
 						splitType = SplitType.Split;
 						break;
+					case "exclude-of":
+						datHeader.ExcludeOf = true;
+						break;
 					case "ext":
 						splittingMode |= SplittingMode.Extension;
 						break;
@@ -489,16 +492,19 @@ namespace SabreTools
 						updateDat = true;
 						break;
 					case "update-desc":
-						replaceMode |= ReplaceMode.Descriptions;
+						replaceMode |= ReplaceMode.Description;
 						break;
 					case "update-hashes":
-						replaceMode |= ReplaceMode.Hashes;
+						replaceMode |= ReplaceMode.Hash;
+						break;
+					case "update-manu":
+						replaceMode |= ReplaceMode.Manufacturer;
 						break;
 					case "update-names":
-						replaceMode |= ReplaceMode.Names;
+						replaceMode |= ReplaceMode.ItemName;
 						break;
-					case "exclude-of":
-						datHeader.ExcludeOf = true;
+					case "update-years":
+						replaceMode |= ReplaceMode.Year;
 						break;
 
 					// User inputs

@@ -1159,12 +1159,20 @@ Options:
 			-un, --update-names		Update item names from base DATs
 				This flag enables updating of item names from base DATs.
 			
+			-uh, --update-hashes	Update hashes from base DATs
+				This flag enables updating of hashes from base DATs.
+				
 			-udd, --update-desc		Update machine descriptions from base DATs
 				This flag enables updating of machine descriptions from base
 				DATs
-
-			-uh, --update-hashes	Update hashes from base DATs
-				This flag enables updating of hashes from base DATs.
+			
+			-udd, --update-years		Update machine years from base DATs
+				This flag enables updating of machine years from base
+				DATs
+				
+			-udd, --update-manu		Update machine manufacturers from base DATs
+				This flag enables updating of machine manufacturers from base
+				DATs
 		
 		-gn=, --not-game=	Filter by game name
 		-ngn=, --game-name=	Exclude by game name

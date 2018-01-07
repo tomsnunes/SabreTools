@@ -249,9 +249,15 @@ namespace SabreTools.Library.Data
 	public enum ReplaceMode
 	{
 		None = 0x0,
-		Names = 0x1,
-		Hashes = Names << 1,
-		Descriptions = Hashes << 1,
+
+		// Sorted by hash
+		ItemName = 0x1,
+		Hash = ItemName << 1,
+
+		// Sorted by machine name
+		Description = Hash << 1,
+		Year = Description << 1,
+		Manufacturer = Year << 1,
 	}
 
 	/// <summary>

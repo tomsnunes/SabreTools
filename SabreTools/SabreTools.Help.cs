@@ -1275,14 +1275,24 @@ namespace SabreTools
 					"Update item names from base DATs",
 					FeatureType.Flag,
 					null));
+				update["base-replace"].AddFeature("update-hashes", new Feature(
+					new List<string>() { "-uh", "--update-hashes" },
+					"Update hashes from base DATs",
+					FeatureType.Flag,
+					null));
 				update["base-replace"].AddFeature("update-desc", new Feature(
 					new List<string>() { "-udd", "--update-desc" },
 					"Update machine descriptions from base DATs",
 					FeatureType.Flag,
 					null));
-				update["base-replace"].AddFeature("update-hashes", new Feature(
-					new List<string>() { "-uh", "--update-hashes" },
-					"Update hashes from base DATs",
+				update["base-replace"].AddFeature("update-year", new Feature(
+					new List<string>() { "-uy", "--update-year" },
+					"Update machine years from base DATs",
+					FeatureType.Flag,
+					null));
+				update["base-replace"].AddFeature("update-manu", new Feature(
+					new List<string>() { "-um", "--update-manu" },
+					"Update machine manufacturers from base DATs",
 					FeatureType.Flag,
 					null));
 			update.AddFeature("reverse-base-replace", new Feature(
@@ -1297,12 +1307,27 @@ namespace SabreTools
 					null));
 				update["reverse-base-replace"].AddFeature("update-names", new Feature(
 					new List<string>() { "-un", "--update-names" },
-					"Update names from base DATs",
+					"Update item names from base DATs",
 					FeatureType.Flag,
 					null));
 				update["reverse-base-replace"].AddFeature("update-hashes", new Feature(
 					new List<string>() { "-uh", "--update-hashes" },
 					"Update hashes from base DATs",
+					FeatureType.Flag,
+					null));
+				update["reverse-base-replace"].AddFeature("update-desc", new Feature(
+					new List<string>() { "-udd", "--update-desc" },
+					"Update machine descriptions from base DATs",
+					FeatureType.Flag,
+					null));
+				update["reverse-base-replace"].AddFeature("update-years", new Feature(
+					new List<string>() { "-uy", "--update-years" },
+					"Update machine years from base DATs",
+					FeatureType.Flag,
+					null));
+				update["reverse-base-replace"].AddFeature("update-manu", new Feature(
+					new List<string>() { "-um", "--update-manu" },
+					"Update machine manufacturers from base DATs",
 					FeatureType.Flag,
 					null));
 			update.AddFeature("game-name", new Feature(
