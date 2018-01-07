@@ -191,14 +191,14 @@ namespace SabreTools
 					case "all-stats":
 						statDatFormat = StatReportFormat.All;
 						break;
+					case "baddump-col":
+						showBaddumpColumn = true;
+						break;
 					case "bare":
 						removeDateFromAutomaticName = true;
 						break;
 					case "base":
 						basedat = true;
-						break;
-					case "baddump-col":
-						showBaddumpColumn = true;
 						break;
 					case "base-replace":
 						updateMode |= UpdateMode.BaseReplace;
@@ -215,8 +215,20 @@ namespace SabreTools
 					case "csv":
 						statDatFormat |= StatReportFormat.CSV;
 						break;
-					case "desc-name":
-						descAsName = true;
+					case "dat-devnonmerged":
+						splitType = SplitType.DeviceNonMerged;
+						break;
+					case "dat-fullnonmerged":
+						splitType = SplitType.FullNonMerged;
+						break;
+					case "dat-merged":
+						splitType = SplitType.Merged;
+						break;
+					case "dat-nonmerged":
+						splitType = SplitType.NonMerged;
+						break;
+					case "dat-split":
+						splitType = SplitType.Split;
 						break;
 					case "dedup":
 						datHeader.DedupeRoms = DedupeType.Full;
@@ -227,8 +239,8 @@ namespace SabreTools
 					case "depot":
 						depot = true;
 						break;
-					case "dat-fullnonmerged":
-						splitType = SplitType.FullNonMerged;
+					case "desc-name":
+						descAsName = true;
 						break;
 					case "diff":
 						updateMode |= UpdateMode.AllDiffs;
@@ -241,18 +253,6 @@ namespace SabreTools
 						break;
 					case "diff-nd":
 						updateMode |= UpdateMode.DiffNoDupesOnly;
-						break;
-					case "dat-merged":
-						splitType = SplitType.Merged;
-						break;
-					case "dat-devnonmerged":
-						splitType = SplitType.DeviceNonMerged;
-						break;
-					case "dat-nonmerged":
-						splitType = SplitType.NonMerged;
-						break;
-					case "dat-split":
-						splitType = SplitType.Split;
 						break;
 					case "exclude-of":
 						datHeader.ExcludeOf = true;
@@ -269,23 +269,23 @@ namespace SabreTools
 					case "game-prefix":
 						datHeader.GameName = true;
 						break;
+					case "hash":
+						splittingMode |= SplittingMode.Hash;
+						break; 
 					case "hash-only":
 						hashOnly = true;
 						break;
 					case "html":
 						statDatFormat |= StatReportFormat.HTML;
 						break;
-					case "hash":
-						splittingMode |= SplittingMode.Hash;
-						break;
 					case "ignore-chd":
 						chdsAsFiles = true;
 						break;
-					case "inverse":
-						inverse = true;
-						break;
 					case "inplace":
 						inplace = true;
+						break;
+					case "inverse":
+						inverse = true;
 						break;
 					case "level":
 						splittingMode |= SplittingMode.Level;
@@ -299,9 +299,6 @@ namespace SabreTools
 					case "noMD5":
 						omitFromScan |= Hash.MD5;
 						break;
-					case "not-run":
-						filter.Runnable = false;
-						break;
 					case "noSHA1":
 						omitFromScan |= Hash.SHA1;
 						break;
@@ -314,8 +311,14 @@ namespace SabreTools
 					case "noSHA512":
 						omitFromScan &= ~Hash.SHA512; // This needs to be inverted later
 						break;
+					case "not-run":
+						filter.Runnable = false;
+						break;
 					case "no-store-header":
 						nostore = true;
+						break;
+					case "of-as-game":
+						filter.IncludeOfInGame = true;
 						break;
 					case "output-all":
 						datHeader.DatFormat |= DatFormat.ALL;
@@ -331,9 +334,6 @@ namespace SabreTools
 						break;
 					case "output-dc":
 						datHeader.DatFormat |= DatFormat.DOSCenter;
-						break;
-					case "of-as-game":
-						filter.IncludeOfInGame = true;
 						break;
 					case "output-lr":
 						datHeader.DatFormat |= DatFormat.Listroms;
@@ -377,29 +377,14 @@ namespace SabreTools
 					case "output-xml":
 						datHeader.DatFormat |= DatFormat.Logiqx;
 						break;
-					case "quotes":
-						datHeader.Quotes = true;
-						break;
 					case "quick":
 						quickScan = true;
 						break;
-					case "roms":
-						datHeader.UseRomName = true;
-						break;
-					case "reverse-base-name":
-						updateMode |= UpdateMode.ReverseBaseReplace;
-						break;
-					case "rev-cascade":
-						updateMode |= UpdateMode.DiffReverseCascade;
+					case "quotes":
+						datHeader.Quotes = true;
 						break;
 					case "rem-md5":
 						datHeader.StripHash |= Hash.MD5;
-						break;
-					case "rem-ext":
-						datHeader.RemoveExtension = true;
-						break;
-					case "romba":
-						datHeader.Romba = true;
 						break;
 					case "rem-sha1":
 						datHeader.StripHash |= Hash.SHA1;
@@ -416,6 +401,21 @@ namespace SabreTools
 					case "rem-uni":
 						removeUnicode = true;
 						break;
+					case "reverse-base-name":
+						updateMode |= UpdateMode.ReverseBaseReplace;
+						break;
+					case "rev-cascade":
+						updateMode |= UpdateMode.DiffReverseCascade;
+						break;
+					case "rem-ext":
+						datHeader.RemoveExtension = true;
+						break;
+					case "romba":
+						datHeader.Romba = true;
+						break;
+					case "roms":
+						datHeader.UseRomName = true;
+						break;
 					case "runnable":
 						filter.Runnable = true;
 						break;
@@ -428,17 +428,11 @@ namespace SabreTools
 						rar = 0;
 						zip = 0;
 						break;
-					case "superdat":
-						datHeader.Type = "SuperDAT";
-						break;
 					case "scene-date-strip":
 						datHeader.SceneDateStrip = true;
 						break;
 					case "skip":
 						skip = true;
-						break;
-					case "single":
-						filter.Single = true;
 						break;
 					case "skiparc":
 						skipFileType = SkipFileType.Archive;
@@ -446,11 +440,20 @@ namespace SabreTools
 					case "skipfile":
 						skipFileType = SkipFileType.File;
 						break;
+					case "single":
+						filter.Single = true;
+						break;
+					case "superdat":
+						datHeader.Type = "SuperDAT";
+						break;
 					case "t7z":
 						outputFormat = OutputFormat.Torrent7Zip;
 						break;
 					case "tar":
 						outputFormat = OutputFormat.TapeArchive;
+						break;
+					case "text":
+						statDatFormat |= StatReportFormat.Textfile;
 						break;
 					case "tgz":
 						outputFormat = OutputFormat.TorrentGzip;
@@ -467,17 +470,14 @@ namespace SabreTools
 					case "trim":
 						filter.Trim = true;
 						break;
-					case "type":
-						splittingMode |= SplittingMode.Type;
-						break;
 					case "tsv":
 						statDatFormat |= StatReportFormat.TSV;
 						break;
+					case "type":
+						splittingMode |= SplittingMode.Type;
+						break;
 					case "txz":
 						outputFormat = OutputFormat.TorrentXZ;
-						break;
-					case "text":
-						statDatFormat |= StatReportFormat.Textfile;
 						break;
 					case "tzip":
 						outputFormat = OutputFormat.TorrentZip;
@@ -529,17 +529,20 @@ namespace SabreTools
 					case "crc":
 						filter.CRCs.AddRange((List<string>)feat.Value.GetValue());
 						break;
-					case "date":
-						datHeader.Date = (string)feat.Value.GetValue();
-						break;
 					case "dat":
 						datfiles.AddRange((List<string>)feat.Value.GetValue());
+						break;
+					case "date":
+						datHeader.Date = (string)feat.Value.GetValue();
 						break;
 					case "desc":
 						datHeader.Description = (string)feat.Value.GetValue();
 						break;
 					case "email":
 						datHeader.Email = (string)feat.Value.GetValue();
+						break;
+					case "equal":
+						filter.SizeEqualTo = Utilities.GetSizeFromString((string)feat.Value.GetValue());
 						break;
 					case "exta":
 						exta.AddRange((List<string>)feat.Value.GetValue());
@@ -568,6 +571,9 @@ namespace SabreTools
 							filter.MachineTypes |= Utilities.GetMachineType(mach);
 						}
 						break;
+					case "greater":
+						filter.SizeGreaterThanOrEqual = Utilities.GetSizeFromString((string)feat.Value.GetValue());
+						break;
 					case "gz":
 						gz = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
 						break;
@@ -576,6 +582,9 @@ namespace SabreTools
 						break;
 					case "homepage":
 						datHeader.Homepage = (string)feat.Value.GetValue();
+						break;
+					case "less":
+						filter.SizeLessThanOrEqual = Utilities.GetSizeFromString((string)feat.Value.GetValue());
 						break;
 					case "md5":
 						filter.MD5s.AddRange((List<string>)feat.Value.GetValue());
@@ -638,17 +647,14 @@ namespace SabreTools
 					case "prefix":
 						datHeader.Prefix = (string)feat.Value.GetValue();
 						break;
-					case "root":
-						datHeader.RootDir = (string)feat.Value.GetValue();
-						break;
 					case "rar":
 						rar = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
 						break;
-					case "root-dir":
-						filter.Root = (string)feat.Value.GetValue();
-						break;
 					case "rep-ext":
 						datHeader.ReplaceExtension = (string)feat.Value.GetValue();
+						break;
+					case "root":
+						datHeader.RootDir = (string)feat.Value.GetValue();
 						break;
 					case "rom-name":
 						filter.RomNames.AddRange((List<string>)feat.Value.GetValue());
@@ -656,11 +662,8 @@ namespace SabreTools
 					case "rom-type":
 						filter.RomTypes.AddRange((List<string>)feat.Value.GetValue());
 						break;
-					case "equal":
-						filter.SizeEqualTo = Utilities.GetSizeFromString((string)feat.Value.GetValue());
-						break;
-					case "greater":
-						filter.SizeGreaterThanOrEqual = Utilities.GetSizeFromString((string)feat.Value.GetValue());
+					case "root-dir":
+						filter.Root = (string)feat.Value.GetValue();
 						break;
 					case "sha1":
 						filter.SHA1s.AddRange((List<string>)feat.Value.GetValue());
@@ -679,9 +682,6 @@ namespace SabreTools
 						{
 							filter.ItemStatuses |= Utilities.GetItemStatus(stat);
 						}
-						break;
-					case "less":
-						filter.SizeLessThanOrEqual = Utilities.GetSizeFromString((string)feat.Value.GetValue());
 						break;
 					case "temp":
 						tempDir = (string)feat.Value.GetValue();
