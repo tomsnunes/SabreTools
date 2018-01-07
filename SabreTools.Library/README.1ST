@@ -1166,11 +1166,11 @@ Options:
 				This flag enables updating of machine descriptions from base
 				DATs
 			
-			-udd, --update-years		Update machine years from base DATs
+			-uy, --update-years		Update machine years from base DATs
 				This flag enables updating of machine years from base
 				DATs
 				
-			-udd, --update-manu		Update machine manufacturers from base DATs
+			-um, --update-manu		Update machine manufacturers from base DATs
 				This flag enables updating of machine manufacturers from base
 				DATs
 		
