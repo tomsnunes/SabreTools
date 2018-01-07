@@ -251,6 +251,7 @@ namespace SabreTools.Library.Data
 		None = 0x0,
 		Names = 0x1,
 		Hashes = Names << 1,
+		Descriptions = Hashes << 1,
 	}
 
 	/// <summary>

@@ -1786,9 +1786,6 @@ namespace SabreTools.Library.DatFiles
 
 			watch.Stop();
 
-			// For comparison's sake, we want to use CRC as the base ordering
-			BucketBy(SortedBy.CRC, DedupeType.Full);
-
 			// Now we want to try to replace each item in each input DAT from the base
 			foreach (string path in inputFileNames)
 			{
@@ -1798,104 +1795,140 @@ namespace SabreTools.Library.DatFiles
 				DatFile intDat = new DatFile();
 				intDat.Parse(path, 1, 1, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName);
 
-				// For comparison's sake, we want to use CRC as the base ordering
-				intDat.BucketBy(SortedBy.CRC, DedupeType.None);
-
-				// Then we do a hashwise comparison against the base DAT
-				List<string> keys = intDat.Keys;
-				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+				// If we are matching based on hashes of any sort
+				if ((replaceMode & ReplaceMode.Names) != 0
+					|| (replaceMode & ReplaceMode.Hashes) != 0)
 				{
-					List<DatItem> datItems = intDat[key];
-					List<DatItem> newDatItems = new List<DatItem>();
-					foreach (DatItem datItem in datItems)
+					// For comparison's sake, we want to use CRC as the base ordering
+					BucketBy(SortedBy.CRC, DedupeType.Full);
+					intDat.BucketBy(SortedBy.CRC, DedupeType.None);
+
+					// Then we do a hashwise comparison against the base DAT
+					List<string> keys = intDat.Keys;
+					Parallel.ForEach(keys, Globals.ParallelOptions, key =>
 					{
-						// If we have something other than a Rom or Disk, then this doesn't do anything
-						if (datItem.Type != ItemType.Disk && datItem.Type != ItemType.Rom)
+						List<DatItem> datItems = intDat[key];
+						List<DatItem> newDatItems = new List<DatItem>();
+						foreach (DatItem datItem in datItems)
 						{
-							newDatItems.Add((DatItem)datItem.Clone());
-							continue;
-						}
-
-						List<DatItem> dupes = datItem.GetDuplicates(this, sorted: true);
-						DatItem newDatItem = (DatItem)datItem.Clone();
-
-						if (dupes.Count > 0)
-						{
-							// If we're updating names, replace using the first found name
-							if ((replaceMode & ReplaceMode.Names) != 0)
+							// If we have something other than a Rom or Disk, then this doesn't do anything
+							if (datItem.Type != ItemType.Disk && datItem.Type != ItemType.Rom)
 							{
-								newDatItem.Name = dupes[0].Name;
+								newDatItems.Add((DatItem)datItem.Clone());
+								continue;
 							}
 
-							// If we're updating hashes, only replace if the current item doesn't have them
-							if ((replaceMode & ReplaceMode.Hashes) != 0)
+							List<DatItem> dupes = datItem.GetDuplicates(this, sorted: true);
+							DatItem newDatItem = (DatItem)datItem.Clone();
+
+							if (dupes.Count > 0)
 							{
-								if (newDatItem.Type == ItemType.Rom)
+								// If we're updating names, replace using the first found name
+								if ((replaceMode & ReplaceMode.Names) != 0)
 								{
-									Rom newRomItem = (Rom)newDatItem;
-									if (String.IsNullOrEmpty(newRomItem.CRC) && !String.IsNullOrEmpty(((Rom)dupes[0]).CRC))
-									{
-										newRomItem.CRC = ((Rom)dupes[0]).CRC;
-									}
-									if (String.IsNullOrEmpty(newRomItem.MD5) && !String.IsNullOrEmpty(((Rom)dupes[0]).MD5))
-									{
-										newRomItem.MD5 = ((Rom)dupes[0]).MD5;
-									}
-									if (String.IsNullOrEmpty(newRomItem.SHA1) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA1))
-									{
-										newRomItem.SHA1 = ((Rom)dupes[0]).SHA1;
-									}
-									if (String.IsNullOrEmpty(newRomItem.SHA256) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA256))
-									{
-										newRomItem.SHA256 = ((Rom)dupes[0]).SHA256;
-									}
-									if (String.IsNullOrEmpty(newRomItem.SHA384) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA384))
-									{
-										newRomItem.SHA384 = ((Rom)dupes[0]).SHA384;
-									}
-									if (String.IsNullOrEmpty(newRomItem.SHA512) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA512))
-									{
-										newRomItem.SHA512 = ((Rom)dupes[0]).SHA512;
-									}
-
-									newDatItem = (Rom)newRomItem.Clone();
+									newDatItem.Name = dupes[0].Name;
 								}
-								else if (newDatItem.Type == ItemType.Disk)
-								{
-									Disk newDiskItem = (Disk)newDatItem;
-									if (String.IsNullOrEmpty(newDiskItem.MD5) && !String.IsNullOrEmpty(((Rom)dupes[0]).MD5))
-									{
-										newDiskItem.MD5 = ((Rom)dupes[0]).MD5;
-									}
-									if (String.IsNullOrEmpty(newDiskItem.SHA1) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA1))
-									{
-										newDiskItem.SHA1 = ((Rom)dupes[0]).SHA1;
-									}
-									if (String.IsNullOrEmpty(newDiskItem.SHA256) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA256))
-									{
-										newDiskItem.SHA256 = ((Rom)dupes[0]).SHA256;
-									}
-									if (String.IsNullOrEmpty(newDiskItem.SHA384) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA384))
-									{
-										newDiskItem.SHA384 = ((Rom)dupes[0]).SHA384;
-									}
-									if (String.IsNullOrEmpty(newDiskItem.SHA512) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA512))
-									{
-										newDiskItem.SHA512 = ((Rom)dupes[0]).SHA512;
-									}
 
-									newDatItem = (Disk)newDiskItem.Clone();
+								// If we're updating hashes, only replace if the current item doesn't have them
+								if ((replaceMode & ReplaceMode.Hashes) != 0)
+								{
+									if (newDatItem.Type == ItemType.Rom)
+									{
+										Rom newRomItem = (Rom)newDatItem;
+										if (String.IsNullOrEmpty(newRomItem.CRC) && !String.IsNullOrEmpty(((Rom)dupes[0]).CRC))
+										{
+											newRomItem.CRC = ((Rom)dupes[0]).CRC;
+										}
+										if (String.IsNullOrEmpty(newRomItem.MD5) && !String.IsNullOrEmpty(((Rom)dupes[0]).MD5))
+										{
+											newRomItem.MD5 = ((Rom)dupes[0]).MD5;
+										}
+										if (String.IsNullOrEmpty(newRomItem.SHA1) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA1))
+										{
+											newRomItem.SHA1 = ((Rom)dupes[0]).SHA1;
+										}
+										if (String.IsNullOrEmpty(newRomItem.SHA256) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA256))
+										{
+											newRomItem.SHA256 = ((Rom)dupes[0]).SHA256;
+										}
+										if (String.IsNullOrEmpty(newRomItem.SHA384) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA384))
+										{
+											newRomItem.SHA384 = ((Rom)dupes[0]).SHA384;
+										}
+										if (String.IsNullOrEmpty(newRomItem.SHA512) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA512))
+										{
+											newRomItem.SHA512 = ((Rom)dupes[0]).SHA512;
+										}
+
+										newDatItem = (Rom)newRomItem.Clone();
+									}
+									else if (newDatItem.Type == ItemType.Disk)
+									{
+										Disk newDiskItem = (Disk)newDatItem;
+										if (String.IsNullOrEmpty(newDiskItem.MD5) && !String.IsNullOrEmpty(((Rom)dupes[0]).MD5))
+										{
+											newDiskItem.MD5 = ((Rom)dupes[0]).MD5;
+										}
+										if (String.IsNullOrEmpty(newDiskItem.SHA1) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA1))
+										{
+											newDiskItem.SHA1 = ((Rom)dupes[0]).SHA1;
+										}
+										if (String.IsNullOrEmpty(newDiskItem.SHA256) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA256))
+										{
+											newDiskItem.SHA256 = ((Rom)dupes[0]).SHA256;
+										}
+										if (String.IsNullOrEmpty(newDiskItem.SHA384) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA384))
+										{
+											newDiskItem.SHA384 = ((Rom)dupes[0]).SHA384;
+										}
+										if (String.IsNullOrEmpty(newDiskItem.SHA512) && !String.IsNullOrEmpty(((Rom)dupes[0]).SHA512))
+										{
+											newDiskItem.SHA512 = ((Rom)dupes[0]).SHA512;
+										}
+
+										newDatItem = (Disk)newDiskItem.Clone();
+									}
 								}
 							}
+
+							newDatItems.Add(newDatItem);
 						}
 
-						newDatItems.Add(newDatItem);
-					}
+						// Now add the new list to the key
+						intDat.Remove(key);
+						intDat.AddRange(key, newDatItems);
+					});
+				}
 
-					// Now add the new list to the key
-					intDat.Remove(key);
-					intDat.AddRange(key, newDatItems);
-				});
+				// If we are matching based on names of any sort
+				if ((replaceMode & ReplaceMode.Descriptions) != 0)
+				{
+					// For comparison's sake, we want to use Machine Name as the base ordering
+					BucketBy(SortedBy.Game, DedupeType.Full);
+					intDat.BucketBy(SortedBy.Game, DedupeType.None);
+
+					// Then we do a namewise comparison against the base DAT
+					List<string> keys = intDat.Keys;
+					Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+					{
+						List<DatItem> datItems = intDat[key];
+						List<DatItem> newDatItems = new List<DatItem>();
+						foreach (DatItem datItem in datItems)
+						{
+							DatItem newDatItem = (DatItem)datItem.Clone();
+							if (Contains(key) && this[key].Count() > 0)
+							{
+								newDatItem.MachineDescription = this[key][0].MachineDescription;
+							}
+
+							newDatItems.Add(newDatItem);
+						}
+
+						// Now add the new list to the key
+						intDat.Remove(key);
+						intDat.AddRange(key, newDatItems);
+					});
+				}
 
 				// Determine the output path for the DAT
 				string interOutDir = Utilities.GetOutputPath(outDir, path, inplace);

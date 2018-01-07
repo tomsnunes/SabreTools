@@ -1272,7 +1272,12 @@ namespace SabreTools
 					null));
 				update["base-replace"].AddFeature("update-names", new Feature(
 					new List<string>() { "-un", "--update-names" },
-					"Update names from base DATs",
+					"Update item names from base DATs",
+					FeatureType.Flag,
+					null));
+				update["base-replace"].AddFeature("update-desc", new Feature(
+					new List<string>() { "-udd", "--update-desc" },
+					"Update machine descriptions from base DATs",
 					FeatureType.Flag,
 					null));
 				update["base-replace"].AddFeature("update-hashes", new Feature(

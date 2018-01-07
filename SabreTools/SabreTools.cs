@@ -488,6 +488,9 @@ namespace SabreTools
 					case "update-dat":
 						updateDat = true;
 						break;
+					case "update-desc":
+						replaceMode |= ReplaceMode.Descriptions;
+						break;
 					case "update-hashes":
 						replaceMode |= ReplaceMode.Hashes;
 						break;

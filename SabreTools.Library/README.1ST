@@ -1156,8 +1156,12 @@ Options:
 				Add a DAT or folder of DATs to the base set to be used in
 				item name replacement
 
-			-un, --update-names		Update names from base DATs
-				This flag enables updating of names from base DATs.
+			-un, --update-names		Update item names from base DATs
+				This flag enables updating of item names from base DATs.
+			
+			-udd, --update-desc		Update machine descriptions from base DATs
+				This flag enables updating of machine descriptions from base
+				DATs
 
 			-uh, --update-hashes	Update hashes from base DATs
 				This flag enables updating of hashes from base DATs.
