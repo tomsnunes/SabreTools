@@ -896,6 +896,17 @@ namespace SabreTools
 					null);
 			}
 		}
+		private static Feature sizeFlag
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-szs", "--size" },
+					"Split DAT(s) or folder by file sizes",
+					FeatureType.Flag,
+					null);
+			}
+		}
 		private static Feature skipFirstOutputFlag
 		{
 			get
@@ -1280,6 +1291,17 @@ namespace SabreTools
 
 		#region Private Int64 features
 
+		private static Feature radixInt64Input
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-rad", "--radix" },
+					"Set the midpoint to split at",
+					FeatureType.Int64,
+					null);
+			}
+		}
 
 		#endregion
 
@@ -2095,6 +2117,8 @@ namespace SabreTools
 			split.AddFeature("level", levelFlag);
 				split["level"].AddFeature("short", shortFlag);
 				split["level"].AddFeature("base", baseFlag);
+			split.AddFeature("size", sizeFlag);
+				split["size"].AddFeature("radix", radixInt64Input);
 			split.AddFeature("type", typeFlag);
 
 			#endregion

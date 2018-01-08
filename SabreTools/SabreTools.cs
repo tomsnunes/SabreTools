@@ -109,6 +109,7 @@ namespace SabreTools
 				rar = 1,
 				sevenzip = 1,
 				zip = 1;
+			long radix = 0;
 			string outDir = null,
 				tempDir = "";
 			DatHeader datHeader = new DatHeader();
@@ -421,6 +422,9 @@ namespace SabreTools
 					case "short":
 						shortname = true;
 						break;
+					case "size":
+						splittingMode |= SplittingMode.Size;
+						break;
 					case "skip-archives":
 						skipFileType = SkipFileType.Archive;
 						break;
@@ -539,6 +543,10 @@ namespace SabreTools
 					#endregion
 
 					#region User Int64 Inputs
+
+					case "radix":
+						radix = (long)feat.Value.GetValue() == Int64.MinValue ? (long)feat.Value.GetValue() : 0;
+						break;
 
 					#endregion
 
@@ -755,7 +763,7 @@ namespace SabreTools
 				// Split a DAT by the split type
 				case "Split":
 					VerifyInputs(inputs, feature);
-					InitSplit(inputs, outDir, inplace, datHeader.DatFormat, splittingMode, exta, extb, shortname, basedat);
+					InitSplit(inputs, outDir, inplace, datHeader.DatFormat, splittingMode, exta, extb, shortname, basedat, radix);
 					break;
 				// Get statistics on input files
 				case "Stats":

@@ -4720,8 +4720,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="extb">Second extension to split on (Extension Split only)</param>
 		/// <param name="shortname">True if short filenames should be used, false otherwise (Level Split only)</param>
 		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise (Level Split only)</param>
+		/// <param name="radix">Long value representing the split point (Size Split only)</param>
 		public void DetermineSplitType(List<string> inputs, string outDir, bool inplace, SplittingMode splittingMode,
-			List<string> exta, List<string> extb, bool shortname, bool basedat)
+			List<string> exta, List<string> extb, bool shortname, bool basedat, long radix)
 		{
 			// If we somehow have the "none" split type, return
 			if (splittingMode == SplittingMode.None)
@@ -4753,6 +4754,10 @@ namespace SabreTools.Library.DatFiles
 				if ((splittingMode & SplittingMode.Level) != 0)
 				{
 					SplitByLevel(outDir, shortname, basedat);
+				}
+				if ((splittingMode & SplittingMode.Size) != 0)
+				{
+					SplitBySize(outDir, radix);
 				}
 				if ((splittingMode & SplittingMode.Type) != 0)
 				{
@@ -5212,7 +5217,94 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Split a DAT by type of Rom
+		/// Split a DAT by size of Rom
+		/// </summary>
+		/// <param name="outDir">Name of the directory to write the DATs out to</param>
+		/// <param name="radix">Long value representing the split point</param>
+		/// <returns>True if split succeeded, false otherwise</returns>
+		public bool SplitBySize(string outDir, long radix)
+		{
+			// Create each of the respective output DATs
+			Globals.Logger.User("Creating and populating new DATs");
+			DatFile lessDat = new DatFile
+			{
+				FileName = this.FileName + " (less than " + radix + " )",
+				Name = this.Name + " (less than " + radix + " )",
+				Description = this.Description + " (less than " + radix + " )",
+				Category = this.Category,
+				Version = this.Version,
+				Date = this.Date,
+				Author = this.Author,
+				Email = this.Email,
+				Homepage = this.Homepage,
+				Url = this.Url,
+				Comment = this.Comment,
+				Header = this.Header,
+				Type = this.Type,
+				ForceMerging = this.ForceMerging,
+				ForceNodump = this.ForceNodump,
+				ForcePacking = this.ForcePacking,
+				DatFormat = this.DatFormat,
+				DedupeRoms = this.DedupeRoms,
+			};
+			DatFile greaterEqualDat = new DatFile
+			{
+				FileName = this.FileName + " (equal-greater than " + radix + " )",
+				Name = this.Name + " (equal-greater than " + radix + " )",
+				Description = this.Description + " (equal-greater than " + radix + " )",
+				Category = this.Category,
+				Version = this.Version,
+				Date = this.Date,
+				Author = this.Author,
+				Email = this.Email,
+				Homepage = this.Homepage,
+				Url = this.Url,
+				Comment = this.Comment,
+				Header = this.Header,
+				Type = this.Type,
+				ForceMerging = this.ForceMerging,
+				ForceNodump = this.ForceNodump,
+				ForcePacking = this.ForcePacking,
+				DatFormat = this.DatFormat,
+				DedupeRoms = this.DedupeRoms,
+			};
+
+			// Now populate each of the DAT objects in turn
+			List<string> keys = Keys;
+			Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+			{
+				List<DatItem> items = this[key];
+				foreach (DatItem item in items)
+				{
+					// If the file is not a Rom, it automatically goes in the "lesser" dat
+					if (item.Type != ItemType.Rom)
+					{
+						lessDat.Add(key, item);
+					}
+					// If the file is a Rom and less than the radix, put it in the "lesser" dat
+					else if (item.Type == ItemType.Rom && ((Rom)item).Size < radix)
+					{
+						lessDat.Add(key, item);
+					}
+					// If the file is a Rom and greater than or equal to the radix, put it in the "greater" dat
+					else if (item.Type == ItemType.Rom && ((Rom)item).Size >= radix)
+					{
+						greaterEqualDat.Add(key, item);
+					}
+				}
+			});
+
+			// Now, output all of the files to the output directory
+			Globals.Logger.User("DAT information created, outputting new files");
+			bool success = true;
+			success &= lessDat.Write(outDir);
+			success &= greaterEqualDat.Write(outDir);
+
+			return success;
+		}
+
+		/// <summary>
+		/// Split a DAT by type of DatItem
 		/// </summary>
 		/// <param name="outDir">Name of the directory to write the DATs out to</param>
 		/// <returns>True if split succeeded, false otherwise</returns>

@@ -531,6 +531,15 @@ Options:
 				the format of "Original Name (Dir - Name)". This can be used in
 				conjunction with --short to output in the format of "Original
 				Name (Name)" instead.
+		
+		-szs, --size		Split DAT(s) or folder by file sizes
+			For a DAT, or set of DATs, allow for splitting based on the sizes
+			of the files, specificially if the type is a rom (disks don't have
+			sizes)
+			
+			-rad, --radix	Set the midpoint to split at
+				Set the size at which all roms less than the size are put in the
+				first DAT, and everything greater than or equal goes in the second
 					
 		-ts, --type			Split DAT(s) or folder by file types (rom/disk)
 			For a DAT, or set of DATs, allow for splitting based on the types of

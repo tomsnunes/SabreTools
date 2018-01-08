@@ -287,6 +287,7 @@ namespace SabreTools.Library.Data
 		Hash = Extension << 1,
 		Level = Hash << 1,
 		Type = Level << 1,
+		Size = Type << 1,
 	}
 
 	/// <summary>

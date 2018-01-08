@@ -189,12 +189,13 @@ namespace SabreTools
 		/// <param name="extb">Second extension to split on (Extension Split only)</param>
 		/// <param name="shortname">True if short filenames should be used, false otherwise (Level Split only)</param>
 		/// <param name="basedat">True if original filenames should be used as the base for output filename, false otherwise (Level Split only)</param>
+		/// <param name="radix">Long value representing the split point (Size Split only)</param>
 		private static void InitSplit(List<string> inputs, string outDir, bool inplace, DatFormat datFormat,
-			SplittingMode splittingMode, List<string> exta, List<string> extb, bool shortname, bool basedat)
+			SplittingMode splittingMode, List<string> exta, List<string> extb, bool shortname, bool basedat, long radix)
 		{
 			DatFile datfile = new DatFile();
 			datfile.DatFormat = datFormat;
-			datfile.DetermineSplitType(inputs, outDir, inplace, splittingMode, exta, extb, shortname, basedat);
+			datfile.DetermineSplitType(inputs, outDir, inplace, splittingMode, exta, extb, shortname, basedat, radix);
 		}
 
 		/// <summary>
