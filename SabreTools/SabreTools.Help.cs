@@ -7,8 +7,7 @@ namespace SabreTools
 {
 	public partial class SabreTools
 	{
-		// TODO: Split this by feature type
-		#region Private flag and input features
+		#region Private Flag features
 
 		private static Feature addBlankFeature
 		{
@@ -32,17 +31,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature addExtFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-ae", "--add-ext" },
-					"Add an extension to each item",
-					FeatureType.String,
-					null);
-			}
-		}
 		private static Feature againstFeature
 		{
 			get
@@ -62,17 +50,6 @@ namespace SabreTools
 					new List<string>() { "-as", "--all-stats" },
 					"Write all statistics to all available formats",
 					FeatureType.Flag,
-					null);
-			}
-		}
-		private static Feature authorFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-au", "--author" },
-					"Set the author of the DAT",
-					FeatureType.String,
 					null);
 			}
 		}
@@ -109,17 +86,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature baseDatFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-bd", "--base-dat" },
-					"Add a base DAT for processing",
-					FeatureType.List,
-					null);
-			}
-		}
 		private static Feature baseReplaceFeature
 		{
 			get
@@ -142,17 +108,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature categoryFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-c", "--cat", "--category" },
-					"Set the category of the DAT",
-					FeatureType.String,
-					null);
-			}
-		}
 		private static Feature cleanFeature
 		{
 			get
@@ -161,17 +116,6 @@ namespace SabreTools
 					new List<string>() { "-clean", "--clean" },
 					"Clean game names according to WoD standards",
 					FeatureType.Flag,
-					null);
-			}
-		}
-		private static Feature commentFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-co", "--comment" },
-					"Set a new comment of the DAT",
-					FeatureType.String,
 					null);
 			}
 		}
@@ -186,17 +130,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature crcFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-crc", "--crc" },
-					"Filter by CRC hash",
-					FeatureType.List,
-					null);
-			}
-		}
 		private static Feature csvFeature
 		{
 			get
@@ -208,17 +141,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature datFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-dat", "--dat" },
-					"Input DAT",
-					FeatureType.List,
-					null);
-			}
-		}
 		private static Feature datDevnonmergedFeature
 		{
 			get
@@ -227,17 +149,6 @@ namespace SabreTools
 					new List<string>() { "-dnd", "--dat-devnonmerged" },
 					"Create device non-merged sets",
 					FeatureType.Flag,
-					null);
-			}
-		}
-		private static Feature dateFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-da", "--date" },
-					"Set a new date",
-					FeatureType.String,
 					null);
 			}
 		}
@@ -318,17 +229,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature descriptionFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-de", "--desc", "--description" },
-					"Set the description of the DAT",
-					FeatureType.String,
-					null);
-			}
-		}
 		private static Feature descNameFeature
 		{
 			get
@@ -384,28 +284,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature emailFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-em", "--email" },
-					"Set a new email of the DAT",
-					FeatureType.String,
-					null);
-			}
-		}
-		private static Feature equalFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-seq", "--equal" },
-					"Filter by size ==",
-					FeatureType.Int32,
-					null);
-			}
-		}
 		private static Feature excludeOfFeature
 		{
 			get
@@ -428,39 +306,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature extaFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-exta", "--exta" },
-					"First extension (multiple allowed)",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature extbFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-extb", "--extb" },
-					"Second extension (multiple allowed)",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature filenameFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-f", "--filename" },
-					"Set the external name of the DAT",
-					FeatureType.String,
-					null);
-			}
-		}
 		private static Feature filesFeature
 		{
 			get
@@ -470,51 +315,6 @@ namespace SabreTools
 					"Treat archives as files",
 					FeatureType.Flag,
 					null);
-			}
-		}
-		private static Feature forcemergeFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-fm", "--forcemerge" },
-					"Set force merging",
-					FeatureType.String,
-					new List<string>()
-					{
-						"			    Supported values are:",
-						"			        None, Split, Merged, Nonmerged, Full",
-					});
-			}
-		}
-		private static Feature forcendFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-fn", "--forcend" },
-					"Set force nodump",
-					FeatureType.String,
-					new List<string>()
-					{
-						"			    Supported values are:",
-						"			        None, Obsolete, Required, Ignore",
-					});
-			}
-		}
-		private static Feature forcepackFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-fp", "--forcepack" },
-					"Set force packing",
-					FeatureType.String,
-					new List<string>()
-					{
-						"Supported values are:",
-						"	None, Zip, Unzip",
-					});
 			}
 		}
 		private static Feature gameDedupFeature
@@ -528,17 +328,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature gameNameFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-gn", "--game-name" },
-					"Filter by game name",
-					FeatureType.List,
-					null);
-			}
-		}
 		private static Feature gamePrefixFeature
 		{
 			get
@@ -547,43 +336,6 @@ namespace SabreTools
 					new List<string>() { "-gp", "--game-prefix" },
 					"Add game name as a prefix",
 					FeatureType.Flag,
-					null);
-			}
-		}
-		private static Feature gameTypeFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-gt", "--game-type" },
-					"Include only games with a given type",
-					FeatureType.List,
-					new List<string>()
-					{
-						"			    Supported values are:",
-						"			        None, Bios, Device, Mechanical",
-					});
-			}
-		}
-		private static Feature greaterFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-sgt", "--greater" },
-					"Filter by size >=",
-					FeatureType.Int32,
-					null);
-			}
-		}
-		private static Feature gzFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-gz", "--gz" },
-					"Set scanning level for GZip archives (default 1)",
-					FeatureType.Int32,
 					null);
 			}
 		}
@@ -606,29 +358,6 @@ namespace SabreTools
 					new List<string>() { "-ho", "--hash-only" },
 					"Check files by hash only",
 					FeatureType.Flag,
-					null);
-			}
-		}
-		private static Feature headerFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-h", "--header" },
-					"Set a header skipper to use, blank means all",
-					FeatureType.Flag,
-					null);
-
-			}
-		}
-		private static Feature homepageFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-hp", "--homepage" },
-					"Set a new homepage of the DAT",
-					FeatureType.String,
 					null);
 			}
 		}
@@ -687,17 +416,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature lessFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-slt", "--less" },
-					"Filter by size =<",
-					FeatureType.Int32,
-					null);
-			}
-		}
 		private static Feature levelFeature
 		{
 			get
@@ -709,17 +427,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature md5Feature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-md5", "--md5" },
-					"Filter by MD5 hash",
-					FeatureType.List,
-					null);
-			}
-		}
 		private static Feature mergeFeature
 		{
 			get
@@ -728,28 +435,6 @@ namespace SabreTools
 					new List<string>() { "-m", "--merge" },
 					"Merge the input DATs",
 					FeatureType.Flag,
-					null);
-			}
-		}
-		private static Feature mtFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-mt", "--mt" },
-					"Amount of threads to use (default 4, -1 unlimted)",
-					FeatureType.Int32,
-					null);
-			}
-		}
-		private static Feature nameFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-n", "--name" },
-					"Set the internal name of the DAT",
-					FeatureType.String,
 					null);
 			}
 		}
@@ -830,65 +515,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature notCrcFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-ncrc", "--not-crc" },
-					"Filter by not CRC hash",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature notGameFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-ngn", "--not-game" },
-					"Filter by not game name",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature notGtypeFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-ngt", "--not-gtype" },
-					"Exclude only games with a given type",
-					FeatureType.List,
-					new List<string>()
-					{
-						"			    Supported values are:",
-						"			        None, Bios, Device, Mechanical",
-					});
-			}
-		}
-		private static Feature notMd5Feature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-nmd5", "--not-md5" },
-					"Filter by not MD5 hash",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature notRomFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-nrn", "--not-rom" },
-					"Filter by not rom name",
-					FeatureType.List,
-					null);
-			}
-		}
 		private static Feature notRunFeature
 		{
 			get
@@ -900,76 +526,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature notSha1Feature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-nsha1", "--not-sha1" },
-					"Filter by not SHA-1 hash",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature notSha256Feature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-nsha256", "--not-sha256" },
-					"Filter by not SHA-256 hash",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature notSha384Feature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-nsha384", "--not-sha384" },
-					"Filter by not SHA-384 hash",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature notSha512Feature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-nsha512", "--not-sha512" },
-					"Filter by not SHA-512 hash",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature notStatusFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-nis", "--not-status" },
-					"Exclude only items with a given status",
-					FeatureType.List,
-					new List<string>()
-					{
-						"			    Supported values are:",
-						"			        None, Good, BadDump, Nodump, Verified",
-					});
-			}
-		}
-		private static Feature notTypeFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-nrt", "--not-type" },
-					"Filter by not rom type",
-					FeatureType.List,
-					null);
-			}
-		}
 		private static Feature ofAsGameFeature
 		{
 			get
@@ -978,17 +534,6 @@ namespace SabreTools
 					new List<string>() { "-ofg", "--of-as-game" },
 					"Allow cloneof and romof tags to match game name filters",
 					FeatureType.Flag,
-					null);
-			}
-		}
-		private static Feature outFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-out", "--out" },
-					"Output directory",
-					FeatureType.String,
 					null);
 			}
 		}
@@ -1208,28 +753,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature prefixFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-pre", "--prefix" },
-					"Set prefix for all lines",
-					FeatureType.String,
-					null);
-			}
-		}
-		private static Feature postfixFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-post", "--postfix" },
-					"Set postfix for all lines",
-					FeatureType.String,
-					null);
-			}
-		}
 		private static Feature quickFeature
 		{
 			get
@@ -1252,17 +775,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature rarFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-rar", "--rar" },
-					"Set scanning level for RAR archives (default 1)",
-					FeatureType.Int32,
-					null);
-			}
-		}
 		private static Feature remExtFeature
 		{
 			get
@@ -1270,7 +782,7 @@ namespace SabreTools
 				return new Feature(
 					new List<string>() { "-rme", "--rem-ext" },
 					"Remove all extensions from each item",
-					FeatureType.String,
+					FeatureType.Flag,
 					null);
 			}
 		}
@@ -1340,17 +852,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature repExtFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-rep", "--rep-ext" },
-					"Replace all extensions with specified",
-					FeatureType.String,
-					null);
-			}
-		}
 		private static Feature revCascadeFeature
 		{
 			get
@@ -1384,17 +885,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature romNameFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-rn", "--rom-name" },
-					"Filter by rom name",
-					FeatureType.List,
-					null);
-			}
-		}
 		private static Feature romsFeature
 		{
 			get
@@ -1403,39 +893,6 @@ namespace SabreTools
 					new List<string>() { "-r", "--roms" },
 					"Output roms to miss instead of sets",
 					FeatureType.Flag,
-					null);
-			}
-		}
-		private static Feature romTypeFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-rt", "--rom-type" },
-					"Filter by rom type",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature rootDirFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-rd", "--root-dir" },
-					"Set the root directory for calc",
-					FeatureType.String,
-					null);
-			}
-		}
-		private static Feature rootFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-r", "--root" },
-					"Set a new rootdir",
-					FeatureType.String,
 					null);
 			}
 		}
@@ -1469,61 +926,6 @@ namespace SabreTools
 					new List<string>() { "-sds", "--scene-date-strip" },
 					"Remove date from scene-named sets",
 					FeatureType.Flag,
-					null);
-			}
-		}
-		private static Feature sevenZipFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-7z", "--7z" },
-					"Set scanning level for 7z archives (default 1)",
-					FeatureType.Int32,
-					null);
-			}
-		}
-		private static Feature sha1Feature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-sha1", "--sha1" },
-					"Filter by SHA-1 hash",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature sha256Feature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-sha256", "--sha256" },
-					"Filter by SHA-256 hash",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature sha384Feature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-sha384", "--sha384" },
-					"Filter by SHA-384 hash",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature sha512Feature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-sha512", "--sha512" },
-					"Filter by SHA-512 hash",
-					FeatureType.List,
 					null);
 			}
 		}
@@ -1582,21 +984,6 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature statusFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-is", "--status" },
-					"Include only items with a given status",
-					FeatureType.List,
-					new List<string>()
-					{
-						"			    Supported values are:",
-						"			        None, Good, BadDump, Nodump, Verified",
-					});
-			}
-		}
 		private static Feature superdatFeature
 		{
 			get
@@ -1627,17 +1014,6 @@ namespace SabreTools
 					new List<string>() { "-tar", "--tar" },
 					"Enable TAR output",
 					FeatureType.Flag,
-					null);
-			}
-		}
-		private static Feature tempFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-t", "--temp" },
-					"Set the temporary directory to use",
-					FeatureType.String,
 					null);
 			}
 		}
@@ -1839,6 +1215,660 @@ namespace SabreTools
 					null);
 			}
 		}
+
+		#endregion
+
+		#region Private Int32 features
+
+		private static Feature gzFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-gz", "--gz" },
+					"Set scanning level for GZip archives (default 1)",
+					FeatureType.Int32,
+					null);
+			}
+		}
+		private static Feature mtFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-mt", "--mt" },
+					"Amount of threads to use (default = # cores, -1 unlimted)",
+					FeatureType.Int32,
+					null);
+			}
+		}
+		private static Feature rarFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-rar", "--rar" },
+					"Set scanning level for RAR archives (default 1)",
+					FeatureType.Int32,
+					null);
+			}
+		}
+		private static Feature sevenZipFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-7z", "--7z" },
+					"Set scanning level for 7z archives (default 1)",
+					FeatureType.Int32,
+					null);
+			}
+		}
+		private static Feature zipFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-zip", "--zip" },
+					"Set scanning level for ZIP archives (default 1)",
+					FeatureType.Int32,
+					null);
+			}
+		}
+
+		#endregion
+
+		#region Private Int64 features
+
+
+		#endregion
+
+		#region Private List<string> features
+
+		private static Feature baseDatFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-bd", "--base-dat" },
+					"Add a base DAT for processing",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature crcFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-crc", "--crc" },
+					"Filter by CRC hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature datFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-dat", "--dat" },
+					"Input DAT",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature extaFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-exta", "--exta" },
+					"First extension (multiple allowed)",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature extbFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-extb", "--extb" },
+					"Second extension (multiple allowed)",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature gameNameFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-gn", "--game-name" },
+					"Filter by game name",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature gameTypeFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-gt", "--game-type" },
+					"Include only games with a given type",
+					FeatureType.List,
+					new List<string>()
+					{
+						"			    Supported values are:",
+						"			        None, Bios, Device, Mechanical",
+					});
+			}
+		}
+		private static Feature md5Feature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-md5", "--md5" },
+					"Filter by MD5 hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature notCrcFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-ncrc", "--not-crc" },
+					"Filter by not CRC hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature notGameFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-ngn", "--not-game" },
+					"Filter by not game name",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature notGtypeFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-ngt", "--not-gtype" },
+					"Exclude only games with a given type",
+					FeatureType.List,
+					new List<string>()
+					{
+						"			    Supported values are:",
+						"			        None, Bios, Device, Mechanical",
+					});
+			}
+		}
+		private static Feature notMd5Feature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-nmd5", "--not-md5" },
+					"Filter by not MD5 hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature notRomFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-nrn", "--not-rom" },
+					"Filter by not rom name",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature notSha1Feature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-nsha1", "--not-sha1" },
+					"Filter by not SHA-1 hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature notSha256Feature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-nsha256", "--not-sha256" },
+					"Filter by not SHA-256 hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature notSha384Feature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-nsha384", "--not-sha384" },
+					"Filter by not SHA-384 hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature notSha512Feature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-nsha512", "--not-sha512" },
+					"Filter by not SHA-512 hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature notStatusFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-nis", "--not-status" },
+					"Exclude only items with a given status",
+					FeatureType.List,
+					new List<string>()
+					{
+						"			    Supported values are:",
+						"			        None, Good, BadDump, Nodump, Verified",
+					});
+			}
+		}
+		private static Feature notTypeFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-nrt", "--not-type" },
+					"Filter by not rom type",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature romNameFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-rn", "--rom-name" },
+					"Filter by rom name",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature romTypeFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-rt", "--rom-type" },
+					"Filter by rom type",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature sha1Feature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-sha1", "--sha1" },
+					"Filter by SHA-1 hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature sha256Feature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-sha256", "--sha256" },
+					"Filter by SHA-256 hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature sha384Feature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-sha384", "--sha384" },
+					"Filter by SHA-384 hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature sha512Feature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-sha512", "--sha512" },
+					"Filter by SHA-512 hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature statusFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-is", "--status" },
+					"Include only items with a given status",
+					FeatureType.List,
+					new List<string>()
+					{
+						"			    Supported values are:",
+						"			        None, Good, BadDump, Nodump, Verified",
+					});
+			}
+		}
+
+		#endregion
+
+		#region Private String features
+
+		private static Feature addExtFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-ae", "--add-ext" },
+					"Add an extension to each item",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature authorFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-au", "--author" },
+					"Set the author of the DAT",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature categoryFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-c", "--cat", "--category" },
+					"Set the category of the DAT",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature commentFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-co", "--comment" },
+					"Set a new comment of the DAT",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature dateFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-da", "--date" },
+					"Set a new date",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature descriptionFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-de", "--desc", "--description" },
+					"Set the description of the DAT",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature emailFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-em", "--email" },
+					"Set a new email of the DAT",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature equalFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-seq", "--equal" },
+					"Filter by size ==",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature filenameFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-f", "--filename" },
+					"Set the external name of the DAT",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature forcemergeFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-fm", "--forcemerge" },
+					"Set force merging",
+					FeatureType.String,
+					new List<string>()
+					{
+						"			    Supported values are:",
+						"			        None, Split, Merged, Nonmerged, Full",
+					});
+			}
+		}
+		private static Feature forcendFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-fn", "--forcend" },
+					"Set force nodump",
+					FeatureType.String,
+					new List<string>()
+					{
+						"			    Supported values are:",
+						"			        None, Obsolete, Required, Ignore",
+					});
+			}
+		}
+		private static Feature forcepackFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-fp", "--forcepack" },
+					"Set force packing",
+					FeatureType.String,
+					new List<string>()
+					{
+						"Supported values are:",
+						"	None, Zip, Unzip",
+					});
+			}
+		}
+		private static Feature greaterFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-sgt", "--greater" },
+					"Filter by size >=",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature headerFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-h", "--header" },
+					"Set a header skipper to use, blank means all",
+					FeatureType.String,
+					null);
+
+			}
+		}
+		private static Feature homepageFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-hp", "--homepage" },
+					"Set a new homepage of the DAT",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature lessFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-slt", "--less" },
+					"Filter by size =<",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature nameFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-n", "--name" },
+					"Set the internal name of the DAT",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature outFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-out", "--out" },
+					"Output directory",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature prefixFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-pre", "--prefix" },
+					"Set prefix for all lines",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature postfixFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-post", "--postfix" },
+					"Set postfix for all lines",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature repExtFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-rep", "--rep-ext" },
+					"Replace all extensions with specified",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature rootDirFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-rd", "--root-dir" },
+					"Set the root directory for calc",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature rootFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-r", "--root" },
+					"Set a new rootdir",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature tempFeature
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-t", "--temp" },
+					"Set the temporary directory to use",
+					FeatureType.String,
+					null);
+			}
+		}
 		private static Feature urlFeature
 		{
 			get
@@ -1861,21 +1891,9 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature zipFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-zip", "--zip" },
-					"Set scanning level for ZIP archives (default 1)",
-					FeatureType.Int32,
-					null);
-			}
-		}
 
 		#endregion
 
-		// TODO: Create features ahead of time so that features can be more easily maintained
 		public static Help RetrieveHelp()
 		{
 			// Create and add the header to the Help object
