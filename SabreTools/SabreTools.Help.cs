@@ -1220,7 +1220,7 @@ namespace SabreTools
 
 		#region Private Int32 features
 
-		private static Feature gzFeature
+		private static Feature gzInt32Input
 		{
 			get
 			{
@@ -1231,18 +1231,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature mtFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-mt", "--mt" },
-					"Amount of threads to use (default = # cores, -1 unlimted)",
-					FeatureType.Int32,
-					null);
-			}
-		}
-		private static Feature rarFeature
+		private static Feature rarInt32Input
 		{
 			get
 			{
@@ -1253,7 +1242,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature sevenZipFeature
+		private static Feature sevenZipInt32Input
 		{
 			get
 			{
@@ -1264,7 +1253,18 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature zipFeature
+		private static Feature threadsInt32Input
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-mt", "--threads" },
+					"Amount of threads to use (default = # cores, -1 unlimted)",
+					FeatureType.Int32,
+					null);
+			}
+		}
+		private static Feature zipInt32Input
 		{
 			get
 			{
@@ -1285,7 +1285,7 @@ namespace SabreTools
 
 		#region Private List<string> features
 
-		private static Feature baseDatFeature
+		private static Feature baseDatListInput
 		{
 			get
 			{
@@ -1296,7 +1296,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature crcFeature
+		private static Feature crcListInput
 		{
 			get
 			{
@@ -1307,7 +1307,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature datFeature
+		private static Feature datListInput
 		{
 			get
 			{
@@ -1318,7 +1318,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature extaFeature
+		private static Feature extaListInput
 		{
 			get
 			{
@@ -1329,7 +1329,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature extbFeature
+		private static Feature extbListInput
 		{
 			get
 			{
@@ -1340,7 +1340,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature gameNameFeature
+		private static Feature gameNameListInput
 		{
 			get
 			{
@@ -1351,7 +1351,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature gameTypeFeature
+		private static Feature gameTypeListInput
 		{
 			get
 			{
@@ -1366,7 +1366,29 @@ namespace SabreTools
 					});
 			}
 		}
-		private static Feature md5Feature
+		private static Feature itemNameListInput
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-rn", "--item-name" },
+					"Filter by item name",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature itemTypeListInput
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-rt", "--item-type" },
+					"Filter by item type",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature md5ListInput
 		{
 			get
 			{
@@ -1377,7 +1399,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature notCrcFeature
+		private static Feature notCrcListInput
 		{
 			get
 			{
@@ -1388,23 +1410,23 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature notGameFeature
+		private static Feature notGameNameListInput
 		{
 			get
 			{
 				return new Feature(
-					new List<string>() { "-ngn", "--not-game" },
+					new List<string>() { "-ngn", "--not-game-name" },
 					"Filter by not game name",
 					FeatureType.List,
 					null);
 			}
 		}
-		private static Feature notGtypeFeature
+		private static Feature notGameTypeListInput
 		{
 			get
 			{
 				return new Feature(
-					new List<string>() { "-ngt", "--not-gtype" },
+					new List<string>() { "-ngt", "--not-game-type" },
 					"Exclude only games with a given type",
 					FeatureType.List,
 					new List<string>()
@@ -1414,7 +1436,29 @@ namespace SabreTools
 					});
 			}
 		}
-		private static Feature notMd5Feature
+		private static Feature notItemNameListInput
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-nrn", "--not-item-name" },
+					"Filter by not rom name",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature notItemTypeListInput
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-nrt", "--not-item-type" },
+					"Filter by not item type",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature notMd5ListInput
 		{
 			get
 			{
@@ -1425,18 +1469,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature notRomFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-nrn", "--not-rom" },
-					"Filter by not rom name",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature notSha1Feature
+		private static Feature notSha1ListInput
 		{
 			get
 			{
@@ -1447,7 +1480,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature notSha256Feature
+		private static Feature notSha256ListInput
 		{
 			get
 			{
@@ -1458,7 +1491,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature notSha384Feature
+		private static Feature notSha384ListInput
 		{
 			get
 			{
@@ -1469,7 +1502,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature notSha512Feature
+		private static Feature notSha512ListInput
 		{
 			get
 			{
@@ -1480,7 +1513,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature notStatusFeature
+		private static Feature notStatusListInput
 		{
 			get
 			{
@@ -1495,40 +1528,7 @@ namespace SabreTools
 					});
 			}
 		}
-		private static Feature notTypeFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-nrt", "--not-type" },
-					"Filter by not rom type",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature romNameFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-rn", "--rom-name" },
-					"Filter by rom name",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature romTypeFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-rt", "--rom-type" },
-					"Filter by rom type",
-					FeatureType.List,
-					null);
-			}
-		}
-		private static Feature sha1Feature
+		private static Feature sha1ListInput
 		{
 			get
 			{
@@ -1539,7 +1539,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature sha256Feature
+		private static Feature sha256ListInput
 		{
 			get
 			{
@@ -1550,7 +1550,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature sha384Feature
+		private static Feature sha384ListInput
 		{
 			get
 			{
@@ -1561,7 +1561,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature sha512Feature
+		private static Feature sha512ListInput
 		{
 			get
 			{
@@ -1572,7 +1572,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature statusFeature
+		private static Feature statusListInput
 		{
 			get
 			{
@@ -1592,18 +1592,18 @@ namespace SabreTools
 
 		#region Private String features
 
-		private static Feature addExtFeature
+		private static Feature addExtensionStringInput
 		{
 			get
 			{
 				return new Feature(
-					new List<string>() { "-ae", "--add-ext" },
+					new List<string>() { "-ae", "--add-extension" },
 					"Add an extension to each item",
 					FeatureType.String,
 					null);
 			}
 		}
-		private static Feature authorFeature
+		private static Feature authorStringInput
 		{
 			get
 			{
@@ -1614,18 +1614,18 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature categoryFeature
+		private static Feature categoryStringInput
 		{
 			get
 			{
 				return new Feature(
-					new List<string>() { "-c", "--cat", "--category" },
+					new List<string>() { "-c", "--category" },
 					"Set the category of the DAT",
 					FeatureType.String,
 					null);
 			}
 		}
-		private static Feature commentFeature
+		private static Feature commentStringInput
 		{
 			get
 			{
@@ -1636,7 +1636,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature dateFeature
+		private static Feature dateStringInput
 		{
 			get
 			{
@@ -1647,18 +1647,18 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature descriptionFeature
+		private static Feature descriptionStringInput
 		{
 			get
 			{
 				return new Feature(
-					new List<string>() { "-de", "--desc", "--description" },
+					new List<string>() { "-de", "--description" },
 					"Set the description of the DAT",
 					FeatureType.String,
 					null);
 			}
 		}
-		private static Feature emailFeature
+		private static Feature emailStringInput
 		{
 			get
 			{
@@ -1669,7 +1669,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature equalFeature
+		private static Feature equalStringInput
 		{
 			get
 			{
@@ -1680,7 +1680,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature filenameFeature
+		private static Feature filenameStringInput
 		{
 			get
 			{
@@ -1691,12 +1691,12 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature forcemergeFeature
+		private static Feature forcemergingStringInput
 		{
 			get
 			{
 				return new Feature(
-					new List<string>() { "-fm", "--forcemerge" },
+					new List<string>() { "-fm", "--forcemerging" },
 					"Set force merging",
 					FeatureType.String,
 					new List<string>()
@@ -1706,12 +1706,12 @@ namespace SabreTools
 					});
 			}
 		}
-		private static Feature forcendFeature
+		private static Feature forcenodumpStringInput
 		{
 			get
 			{
 				return new Feature(
-					new List<string>() { "-fn", "--forcend" },
+					new List<string>() { "-fn", "--forcenodump" },
 					"Set force nodump",
 					FeatureType.String,
 					new List<string>()
@@ -1721,12 +1721,12 @@ namespace SabreTools
 					});
 			}
 		}
-		private static Feature forcepackFeature
+		private static Feature forcepackingStringInput
 		{
 			get
 			{
 				return new Feature(
-					new List<string>() { "-fp", "--forcepack" },
+					new List<string>() { "-fp", "--forcepacking" },
 					"Set force packing",
 					FeatureType.String,
 					new List<string>()
@@ -1736,7 +1736,7 @@ namespace SabreTools
 					});
 			}
 		}
-		private static Feature greaterFeature
+		private static Feature greaterStringInput
 		{
 			get
 			{
@@ -1747,7 +1747,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature headerFeature
+		private static Feature headerStringInput
 		{
 			get
 			{
@@ -1759,7 +1759,7 @@ namespace SabreTools
 
 			}
 		}
-		private static Feature homepageFeature
+		private static Feature homepageStringInput
 		{
 			get
 			{
@@ -1770,7 +1770,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature lessFeature
+		private static Feature lessStringInput
 		{
 			get
 			{
@@ -1781,7 +1781,7 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature nameFeature
+		private static Feature nameStringInput
 		{
 			get
 			{
@@ -1792,29 +1792,18 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature outFeature
+		private static Feature outputDirStringInput
 		{
 			get
 			{
 				return new Feature(
-					new List<string>() { "-out", "--out" },
+					new List<string>() { "-out", "--output-dir" },
 					"Output directory",
 					FeatureType.String,
 					null);
 			}
 		}
-		private static Feature prefixFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-pre", "--prefix" },
-					"Set prefix for all lines",
-					FeatureType.String,
-					null);
-			}
-		}
-		private static Feature postfixFeature
+		private static Feature postfixStringInput
 		{
 			get
 			{
@@ -1825,13 +1814,35 @@ namespace SabreTools
 					null);
 			}
 		}
-		private static Feature repExtFeature
+		private static Feature prefixStringInput
 		{
 			get
 			{
 				return new Feature(
-					new List<string>() { "-rep", "--rep-ext" },
+					new List<string>() { "-pre", "--prefix" },
+					"Set prefix for all lines",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature replaceExtensionStringInput
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-rep", "--replace-extension" },
 					"Replace all extensions with specified",
+					FeatureType.String,
+					null);
+			}
+		}
+		private static Feature rootStringInput
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-r", "--root" },
+					"Set a new rootdir",
 					FeatureType.String,
 					null);
 			}
@@ -1843,17 +1854,6 @@ namespace SabreTools
 				return new Feature(
 					new List<string>() { "-rd", "--root-dir" },
 					"Set the root directory for calc",
-					FeatureType.String,
-					null);
-			}
-		}
-		private static Feature rootFeature
-		{
-			get
-			{
-				return new Feature(
-					new List<string>() { "-r", "--root" },
-					"Set a new rootdir",
 					FeatureType.String,
 					null);
 			}
@@ -1940,7 +1940,7 @@ namespace SabreTools
 			datFromDir.AddFeature("skip-sha384", skipSha384Flag);
 			datFromDir.AddFeature("skip-sha512", skipSha512Flag);
 			datFromDir.AddFeature("no-automatic-date", noAutomaticDateFlag);
-			datFromDir.AddFeature("forcepack", forcepackFeature);
+			datFromDir.AddFeature("forcepacking", forcepackingStringInput);
 			datFromDir.AddFeature("archives-as-files", archivesAsFilesFlag);
 			datFromDir.AddFeature("output-all", outputAllFlag);
 			datFromDir.AddFeature("output-attractmode", outputAttractmodeFlag);
@@ -1964,27 +1964,27 @@ namespace SabreTools
 			datFromDir.AddFeature("romba", rombaFlag);
 			datFromDir.AddFeature("skip-archives", skipArchivesFlag);
 			datFromDir.AddFeature("skip-files", skipFilesFlag);
-			datFromDir.AddFeature("filename", filenameFeature);
-			datFromDir.AddFeature("name", nameFeature);
-			datFromDir.AddFeature("desc", descriptionFeature);
-			datFromDir.AddFeature("category", categoryFeature);
+			datFromDir.AddFeature("filename", filenameStringInput);
+			datFromDir.AddFeature("name", nameStringInput);
+			datFromDir.AddFeature("description", descriptionStringInput);
+			datFromDir.AddFeature("category", categoryStringInput);
 			datFromDir.AddFeature("version", versionFeature);
-			datFromDir.AddFeature("author", authorFeature);
-			datFromDir.AddFeature("email", emailFeature);
-			datFromDir.AddFeature("homepage", homepageFeature);
+			datFromDir.AddFeature("author", authorStringInput);
+			datFromDir.AddFeature("email", emailStringInput);
+			datFromDir.AddFeature("homepage", homepageStringInput);
 			datFromDir.AddFeature("url", urlFeature);
-			datFromDir.AddFeature("comment", commentFeature);
+			datFromDir.AddFeature("comment", commentStringInput);
 			datFromDir.AddFeature("superdat", superdatFlag);
 			datFromDir.AddFeature("exclude-of", excludeOfFlag);
 			datFromDir.AddFeature("scene-date-strip", sceneDateStripFlag);
 			datFromDir.AddFeature("add-blank-files", addBlankFilesFlag);
 			datFromDir.AddFeature("add-date", addDateFlag);
 			datFromDir.AddFeature("copy-files", copyFilesFlag);
-			datFromDir.AddFeature("header", headerFeature);
+			datFromDir.AddFeature("header", headerStringInput);
 			datFromDir.AddFeature("chds-as-files", chdsAsFilesFlag);
 			datFromDir.AddFeature("temp", tempFeature);
-			datFromDir.AddFeature("out", outFeature);
-			datFromDir.AddFeature("mt", mtFeature);
+			datFromDir.AddFeature("output-dir", outputDirStringInput);
+			datFromDir.AddFeature("threads", threadsInt32Input);
 
 			#endregion
 
@@ -1995,7 +1995,7 @@ namespace SabreTools
 				"Extract and remove copier headers",
 				FeatureType.Flag,
 				null);
-			extract.AddFeature("out", outFeature);
+			extract.AddFeature("output-dir", outputDirStringInput);
 			extract.AddFeature("no-store-header", noStoreHeaderFlag);
 
 			#endregion
@@ -2007,7 +2007,7 @@ namespace SabreTools
 				"Restore header to file based on SHA-1",
 				FeatureType.Flag,
 				null);
-			restore.AddFeature("out", outFeature);
+			restore.AddFeature("output-dir", outputDirStringInput);
 
 			#endregion
 
@@ -2025,8 +2025,8 @@ namespace SabreTools
 					"  1	Only hash contents",
 					"  2	Only hash archive",
 				});
-			sort.AddFeature("dat", datFeature);
-			sort.AddFeature("out", outFeature);
+			sort.AddFeature("dat", datListInput);
+			sort.AddFeature("output-dir", outputDirStringInput);
 			sort.AddFeature("depot", depotFlag);
 			sort.AddFeature("delete", deleteFlag);
 			sort.AddFeature("inverse", inverseFlag);
@@ -2044,11 +2044,11 @@ namespace SabreTools
 			sort.AddFeature("torrent-zip", torrentZipFlag);
 			//sort.AddFeature("torrent-zpaq", tzpaqFeature);
 			//sort.AddFeature("torrent-zstd", tzstdFeature);
-			sort.AddFeature("header", headerFeature);
-			sort.AddFeature("7z", sevenZipFeature);
-			sort.AddFeature("gz", gzFeature);
-			sort.AddFeature("rar", rarFeature);
-			sort.AddFeature("zip", zipFeature);
+			sort.AddFeature("header", headerStringInput);
+			sort.AddFeature("7z", sevenZipInt32Input);
+			sort.AddFeature("gz", gzInt32Input);
+			sort.AddFeature("rar", rarInt32Input);
+			sort.AddFeature("zip", zipInt32Input);
 			sort.AddFeature("scan-all", scanAllFlag);
 			sort.AddFeature("dat-merged", datMergedFlag);
 			sort.AddFeature("dat-split", datSplitFlag);
@@ -2056,7 +2056,7 @@ namespace SabreTools
 			sort.AddFeature("dat-device-non-merged", datDeviceNonMergedFlag);
 			sort.AddFeature("dat-full-non-merged", datFullNonMergedFlag);
 			sort.AddFeature("update-dat", updateDatFlag);
-			sort.AddFeature("mt", mtFeature);
+			sort.AddFeature("threads", threadsInt32Input);
 
 			#endregion
 
@@ -2086,11 +2086,11 @@ namespace SabreTools
 			split.AddFeature("output-softwarelist", outputSoftwarelistFlag);
 			split.AddFeature("output-tsv", outputTsvFlag);
 			split.AddFeature("output-xml", outputXmlFlag);
-			split.AddFeature("out", outFeature);
+			split.AddFeature("output-dir", outputDirStringInput);
 			split.AddFeature("inplace", inplaceFlag);
 			split.AddFeature("extension", extensionFlag);
-				split["ext"].AddFeature("exta", extaFeature);
-				split["ext"].AddFeature("extb", extbFeature);
+				split["ext"].AddFeature("exta", extaListInput);
+				split["ext"].AddFeature("extb", extbListInput);
 			split.AddFeature("hash", hashFlag);
 			split.AddFeature("level", levelFlag);
 				split["level"].AddFeature("short", shortFlag);
@@ -2109,8 +2109,8 @@ namespace SabreTools
 			stats.AddFeature("all-stats", allStatsFlag);
 			stats.AddFeature("baddump-column", baddumpColumnFlag);
 			stats.AddFeature("csv", csvFlag);
-			stats.AddFeature("filename", filenameFeature);
-			stats.AddFeature("out", outFeature);
+			stats.AddFeature("filename", filenameStringInput);
+			stats.AddFeature("output-dir", outputDirStringInput);
 			stats.AddFeature("html", htmlFlag);
 			stats.AddFeature("nodump-col", nodumpColumnFlag);
 			stats.AddFeature("individual", individualFlag);
@@ -2143,19 +2143,19 @@ namespace SabreTools
 			update.AddFeature("output-attractmode", outputAttractmodeFlag);
 			update.AddFeature("output-cmp", outputCmpFlag);
 			update.AddFeature("output-csv", outputCsvFlag);
-				update["output-csv"].AddFeature("prefix", prefixFeature);
-				update["output-csv"].AddFeature("postfix", postfixFeature);
+				update["output-csv"].AddFeature("prefix", prefixStringInput);
+				update["output-csv"].AddFeature("postfix", postfixStringInput);
 				update["output-csv"].AddFeature("quotes", quotesFlag);
 			update.AddFeature("output-doscenter", outputDoscenterFlag);
 			update.AddFeature("output-listrom", outputListromFlag);
 			update.AddFeature("output-miss", outputMissFlag);
 				update["output-miss"].AddFeature("roms", romsFlag);
 				update["output-miss"].AddFeature("game-prefix", gamePrefixFlag);
-				update["output-miss"].AddFeature("prefix", prefixFeature);
-				update["output-miss"].AddFeature("postfix", postfixFeature);
+				update["output-miss"].AddFeature("prefix", prefixStringInput);
+				update["output-miss"].AddFeature("postfix", postfixStringInput);
 				update["output-miss"].AddFeature("quotes", quotesFlag);
-				update["output-miss"].AddFeature("add-ext", addExtFeature);
-				update["output-miss"].AddFeature("rep-ext", repExtFeature);
+				update["output-miss"].AddFeature("add-extension", addExtensionStringInput);
+				update["output-miss"].AddFeature("replace-extension", replaceExtensionStringInput);
 				update["output-miss"].AddFeature("remove-extensions", removeExtensionsFlag);
 				update["output-miss"].AddFeature("romba", rombaFlag);
 			update.AddFeature("output-md5", outputMd5Flag);
@@ -2175,27 +2175,27 @@ namespace SabreTools
 				update["output-sha512"].AddFeature("game-prefix", gamePrefixFlag);
 			update.AddFeature("output-softwarelist", outputSoftwarelistFlag);
 			update.AddFeature("output-tsv", outputTsvFlag);
-				update["output-tsv"].AddFeature("prefix", prefixFeature);
-				update["output-tsv"].AddFeature("postfix", postfixFeature);
+				update["output-tsv"].AddFeature("prefix", prefixStringInput);
+				update["output-tsv"].AddFeature("postfix", postfixStringInput);
 				update["output-tsv"].AddFeature("quotes", quotesFlag);
 			update.AddFeature("output-xml", outputXmlFlag);
-			update.AddFeature("filename", filenameFeature);
-			update.AddFeature("name", nameFeature);
-			update.AddFeature("desc", descriptionFeature);
-			update.AddFeature("rootdir", rootFeature);
-			update.AddFeature("category", categoryFeature);
+			update.AddFeature("filename", filenameStringInput);
+			update.AddFeature("name", nameStringInput);
+			update.AddFeature("description", descriptionStringInput);
+			update.AddFeature("rootdir", rootStringInput);
+			update.AddFeature("category", categoryStringInput);
 			update.AddFeature("version", versionFeature);
-			update.AddFeature("date", dateFeature);
-			update.AddFeature("author", authorFeature);
-			update.AddFeature("email", emailFeature);
-			update.AddFeature("homepage", homepageFeature);
+			update.AddFeature("date", dateStringInput);
+			update.AddFeature("author", authorStringInput);
+			update.AddFeature("email", emailStringInput);
+			update.AddFeature("homepage", homepageStringInput);
 			update.AddFeature("url", urlFeature);
-			update.AddFeature("comment", commentFeature);
-			update.AddFeature("header", headerFeature);
+			update.AddFeature("comment", commentStringInput);
+			update.AddFeature("header", headerStringInput);
 			update.AddFeature("superdat", superdatFlag);
-			update.AddFeature("forcemerge", forcemergeFeature);
-			update.AddFeature("forcend", forcendFeature);
-			update.AddFeature("forcepack", forcepackFeature);
+			update.AddFeature("forcemerging", forcemergingStringInput);
+			update.AddFeature("forcenodump", forcenodumpStringInput);
+			update.AddFeature("forcepacking", forcepackingStringInput);
 			update.AddFeature("exclude-of", excludeOfFlag);
 			update.AddFeature("scene-date-strip", sceneDateStripFlag);
 			update.AddFeature("clean", cleanFlag);
@@ -2220,7 +2220,7 @@ namespace SabreTools
 				update["merge"].AddFeature("no-automatic-date", noAutomaticDateFlag);
 			update.AddFeature("diff", diffFlag);
 				update["diff"].AddFeature("against", againstFlag);
-					update["diff"]["against"].AddFeature("base-dat", baseDatFeature);
+					update["diff"]["against"].AddFeature("base-dat", baseDatListInput);
 				update["diff"].AddFeature("no-automatic-date", noAutomaticDateFlag);
 				update["diff"].AddFeature("cascade", cascadeFlag);
 					update["diff"]["cascade"].AddFeature("skip-first-output", skipFirstOutputFlag);
@@ -2233,50 +2233,50 @@ namespace SabreTools
 			update.AddFeature("diff-nd", diffNdFlag);
 				update["diff-nd"].AddFeature("no-automatic-date", noAutomaticDateFlag);
 			update.AddFeature("base-replace", baseReplaceFlag);
-				update["base-replace"].AddFeature("base-dat", baseDatFeature);
+				update["base-replace"].AddFeature("base-dat", baseDatListInput);
 				update["base-replace"].AddFeature("update-names", updateNamesFlag);
 				update["base-replace"].AddFeature("update-hashes", updateHashesFlag);
 				update["base-replace"].AddFeature("update-description", updateDescriptionFlag);
 				update["base-replace"].AddFeature("update-year", updateYearFlag);
 				update["base-replace"].AddFeature("update-manufacturer", updateManufacturerFlag);
 			update.AddFeature("reverse-base-replace", reverseBaseReplaceFlag);
-				update["reverse-base-replace"].AddFeature("base-dat", baseDatFeature);
+				update["reverse-base-replace"].AddFeature("base-dat", baseDatListInput);
 				update["reverse-base-replace"].AddFeature("update-names", updateNamesFlag);
 				update["reverse-base-replace"].AddFeature("update-hashes", updateHashesFlag);
 				update["reverse-base-replace"].AddFeature("update-description", updateDescriptionFlag);
 				update["reverse-base-replace"].AddFeature("update-year", updateYearFlag);
 				update["reverse-base-replace"].AddFeature("update-manufacturer", updateManufacturerFlag);
-			update.AddFeature("game-name", gameNameFeature);
-			update.AddFeature("not-game", notGameFeature);
+			update.AddFeature("game-name", gameNameListInput);
+			update.AddFeature("not-game-name", notGameNameListInput);
 			update.AddFeature("match-of-tags", matchOfTagsFlag);
-			update.AddFeature("rom-name", romNameFeature);
-			update.AddFeature("not-rom", notRomFeature);
-			update.AddFeature("rom-type", romTypeFeature);
-			update.AddFeature("not-type", notTypeFeature);
-			update.AddFeature("greater", greaterFeature);
-			update.AddFeature("less", lessFeature);
-			update.AddFeature("equal", equalFeature);
-			update.AddFeature("crc", crcFeature);
-			update.AddFeature("not-crc", notCrcFeature);
-			update.AddFeature("md5", md5Feature);
-			update.AddFeature("not-md5", notMd5Feature);
-			update.AddFeature("sha1", sha1Feature);
-			update.AddFeature("not-sha1", notSha1Feature);
-			update.AddFeature("sha256", sha256Feature);
-			update.AddFeature("not-sha256", notSha256Feature);
-			update.AddFeature("sha384", sha384Feature);
-			update.AddFeature("not-sha384", notSha384Feature);
-			update.AddFeature("sha512", sha512Feature);
-			update.AddFeature("not-sha512", notSha512Feature);
-			update.AddFeature("status", statusFeature);
-			update.AddFeature("not-status", notStatusFeature);
-			update.AddFeature("game-type", gameTypeFeature);
-			update.AddFeature("not-gtype", notGtypeFeature);
+			update.AddFeature("rom-name", itemNameListInput);
+			update.AddFeature("not-rom-name", notItemNameListInput);
+			update.AddFeature("rom-type", itemTypeListInput);
+			update.AddFeature("not-type", notItemTypeListInput);
+			update.AddFeature("greater", greaterStringInput);
+			update.AddFeature("less", lessStringInput);
+			update.AddFeature("equal", equalStringInput);
+			update.AddFeature("crc", crcListInput);
+			update.AddFeature("not-crc", notCrcListInput);
+			update.AddFeature("md5", md5ListInput);
+			update.AddFeature("not-md5", notMd5ListInput);
+			update.AddFeature("sha1", sha1ListInput);
+			update.AddFeature("not-sha1", notSha1ListInput);
+			update.AddFeature("sha256", sha256ListInput);
+			update.AddFeature("not-sha256", notSha256ListInput);
+			update.AddFeature("sha384", sha384ListInput);
+			update.AddFeature("not-sha384", notSha384ListInput);
+			update.AddFeature("sha512", sha512ListInput);
+			update.AddFeature("not-sha512", notSha512ListInput);
+			update.AddFeature("status", statusListInput);
+			update.AddFeature("not-status", notStatusListInput);
+			update.AddFeature("game-type", gameTypeListInput);
+			update.AddFeature("not-game-type", notGameTypeListInput);
 			update.AddFeature("runnable", runnableFlag);
 			update.AddFeature("not-runnable", notRunnableFlag);
-			update.AddFeature("out", outFeature);
+			update.AddFeature("output-dir", outputDirStringInput);
 			update.AddFeature("inplace", inplaceFlag);
-			update.AddFeature("mt", mtFeature);
+			update.AddFeature("threads", threadsInt32Input);
 
 			#endregion
 
@@ -2287,12 +2287,12 @@ namespace SabreTools
 				"Verify a folder against DATs",
 				FeatureType.Flag,
 				null);
-			verify.AddFeature("dat", datFeature);
+			verify.AddFeature("dat", datListInput);
 			verify.AddFeature("depot", depotFlag);
 			verify.AddFeature("temp", tempFeature);
 			verify.AddFeature("hash-only", hashOnlyFlag);
 			verify.AddFeature("quick", quickFlag);
-			verify.AddFeature("header", headerFeature);
+			verify.AddFeature("header", headerStringInput);
 			verify.AddFeature("chds-as-files", chdsAsFilesFlag);
 			verify.AddFeature("dat-merged", datMergedFlag);
 			verify.AddFeature("dat-split", datSplitFlag);

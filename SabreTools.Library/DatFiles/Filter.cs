@@ -71,17 +71,17 @@ namespace SabreTools.Library.DatFiles
 
 		#region Positive
 
-		public List<string> GameNames
+		public List<string> MachineNames
 		{
 			get { return _gameNames; }
 			set { _gameNames = value; }
 		}
-		public List<string> RomNames
+		public List<string> ItemNames
 		{
 			get { return _romNames; }
 			set { _romNames = value; }
 		}
-		public List<string> RomTypes
+		public List<string> ItemTypes
 		{
 			get { return _romTypes; }
 			set { _romTypes = value; }
@@ -131,17 +131,17 @@ namespace SabreTools.Library.DatFiles
 
 		#region Negative
 
-		public List<string> NotGameNames
+		public List<string> NotMachineNames
 		{
 			get { return _notGameNames; }
 			set { _notGameNames = value; }
 		}
-		public List<string> NotRomNames
+		public List<string> NotItemNames
 		{
 			get { return _notRomNames; }
 			set { _notRomNames = value; }
 		}
-		public List<string> NotRomTypes
+		public List<string> NotItemTypes
 		{
 			get { return _notRomTypes; }
 			set { _notRomTypes = value; }

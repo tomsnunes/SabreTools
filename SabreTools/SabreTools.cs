@@ -179,7 +179,8 @@ namespace SabreTools
 				// Check all of the flag names and translate to arguments
 				switch (feat.Key)
 				{
-					// User flags
+					#region User Flags
+
 					case "add-blank-files":
 						addBlankFiles = true;
 						break;
@@ -511,24 +512,40 @@ namespace SabreTools
 						replaceMode |= ReplaceMode.Year;
 						break;
 
-					// User inputs
+					#endregion
+
+					#region User Int32 Inputs
+
 					case "7z":
 						sevenzip = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
 						break;
-					case "add-ext":
-						datHeader.AddExtension = (string)feat.Value.GetValue();
+					case "gz":
+						gz = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
 						break;
-					case "author":
-						datHeader.Author = (string)feat.Value.GetValue();
+					case "rar":
+						rar = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
 						break;
+					case "threads":
+						int val = (int)feat.Value.GetValue();
+						if (val != Int32.MinValue)
+						{
+							Globals.MaxThreads = val;
+						}
+						break;
+					case "zip":
+						zip = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
+						break;
+
+					#endregion
+
+					#region User Int64 Inputs
+
+					#endregion
+
+					#region User List<string> Inputs
+
 					case "base-dat":
 						basePaths.AddRange((List<string>)feat.Value.GetValue());
-						break;
-					case "category":
-						datHeader.Category = (string)feat.Value.GetValue();
-						break;
-					case "comment":
-						datHeader.Comment = (string)feat.Value.GetValue();
 						break;
 					case "crc":
 						filter.CRCs.AddRange((List<string>)feat.Value.GetValue());
@@ -536,38 +553,14 @@ namespace SabreTools
 					case "dat":
 						datfiles.AddRange((List<string>)feat.Value.GetValue());
 						break;
-					case "date":
-						datHeader.Date = (string)feat.Value.GetValue();
-						break;
-					case "desc":
-						datHeader.Description = (string)feat.Value.GetValue();
-						break;
-					case "email":
-						datHeader.Email = (string)feat.Value.GetValue();
-						break;
-					case "equal":
-						filter.SizeEqualTo = Utilities.GetSizeFromString((string)feat.Value.GetValue());
-						break;
 					case "exta":
 						exta.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "extb":
 						extb.AddRange((List<string>)feat.Value.GetValue());
 						break;
-					case "filename":
-						datHeader.FileName = (string)feat.Value.GetValue();
-						break;
-					case "forcemerge":
-						datHeader.ForceMerging = Utilities.GetForceMerging((string)feat.Value.GetValue());
-						break;
-					case "forcend":
-						datHeader.ForceNodump = Utilities.GetForceNodump((string)feat.Value.GetValue());
-						break;
-					case "forcepack":
-						datHeader.ForcePacking = Utilities.GetForcePacking((string)feat.Value.GetValue());
-						break;
 					case "game-name":
-						filter.GameNames.AddRange((List<string>)feat.Value.GetValue());
+						filter.MachineNames.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "game-type":
 						foreach (string mach in (List<string>)feat.Value.GetValue())
@@ -575,60 +568,35 @@ namespace SabreTools
 							filter.MachineTypes |= Utilities.GetMachineType(mach);
 						}
 						break;
-					case "greater":
-						filter.SizeGreaterThanOrEqual = Utilities.GetSizeFromString((string)feat.Value.GetValue());
+					case "item-name":
+						filter.ItemNames.AddRange((List<string>)feat.Value.GetValue());
 						break;
-					case "gz":
-						gz = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
-						break;
-					case "header":
-						datHeader.Header = (string)feat.Value.GetValue();
-						break;
-					case "homepage":
-						datHeader.Homepage = (string)feat.Value.GetValue();
-						break;
-					case "less":
-						filter.SizeLessThanOrEqual = Utilities.GetSizeFromString((string)feat.Value.GetValue());
+					case "item-type":
+						filter.ItemTypes.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "md5":
 						filter.MD5s.AddRange((List<string>)feat.Value.GetValue());
 						break;
-					case "mt":
-						int val = (int)feat.Value.GetValue();
-						if (val != Int32.MinValue)
-						{
-							Globals.MaxThreads = val;
-						}
-						break;
-					case "name":
-						datHeader.Name = (string)feat.Value.GetValue();
-						break;
 					case "not-crc":
 						filter.NotCRCs.AddRange((List<string>)feat.Value.GetValue());
 						break;
-					case "not-game":
-						filter.NotGameNames.AddRange((List<string>)feat.Value.GetValue());
+					case "not-game-name":
+						filter.NotMachineNames.AddRange((List<string>)feat.Value.GetValue());
 						break;
-					case "not-gtype":
+					case "not-game-type":
 						foreach (string nmach in (List<string>)feat.Value.GetValue())
 						{
 							filter.NotMachineTypes |= Utilities.GetMachineType(nmach);
 						}
 						break;
-					case "not-status":
-						foreach (string nstat in (List<string>)feat.Value.GetValue())
-						{
-							filter.NotItemStatuses |= Utilities.GetItemStatus(nstat);
-						}
+					case "not-item-name":
+						filter.NotItemNames.AddRange((List<string>)feat.Value.GetValue());
+						break;
+					case "not-item-type":
+						filter.NotItemTypes.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "not-md5":
 						filter.NotMD5s.AddRange((List<string>)feat.Value.GetValue());
-						break;
-					case "not-rom":
-						filter.NotRomNames.AddRange((List<string>)feat.Value.GetValue());
-						break;
-					case "not-type":
-						filter.NotRomTypes.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "not-sha1":
 						filter.NotSHA1s.AddRange((List<string>)feat.Value.GetValue());
@@ -642,32 +610,11 @@ namespace SabreTools
 					case "not-sha512":
 						filter.NotSHA512s.AddRange((List<string>)feat.Value.GetValue());
 						break;
-					case "out":
-						outDir = (string)feat.Value.GetValue();
-						break;
-					case "postfix":
-						datHeader.Postfix = (string)feat.Value.GetValue();
-						break;
-					case "prefix":
-						datHeader.Prefix = (string)feat.Value.GetValue();
-						break;
-					case "rar":
-						rar = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
-						break;
-					case "rep-ext":
-						datHeader.ReplaceExtension = (string)feat.Value.GetValue();
-						break;
-					case "root":
-						datHeader.RootDir = (string)feat.Value.GetValue();
-						break;
-					case "rom-name":
-						filter.RomNames.AddRange((List<string>)feat.Value.GetValue());
-						break;
-					case "rom-type":
-						filter.RomTypes.AddRange((List<string>)feat.Value.GetValue());
-						break;
-					case "root-dir":
-						filter.Root = (string)feat.Value.GetValue();
+					case "not-status":
+						foreach (string nstat in (List<string>)feat.Value.GetValue())
+						{
+							filter.NotItemStatuses |= Utilities.GetItemStatus(nstat);
+						}
 						break;
 					case "sha1":
 						filter.SHA1s.AddRange((List<string>)feat.Value.GetValue());
@@ -687,6 +634,80 @@ namespace SabreTools
 							filter.ItemStatuses |= Utilities.GetItemStatus(stat);
 						}
 						break;
+
+					#endregion
+
+					#region User String Inputs
+
+					case "add-extension":
+						datHeader.AddExtension = (string)feat.Value.GetValue();
+						break;
+					case "author":
+						datHeader.Author = (string)feat.Value.GetValue();
+						break;
+					case "category":
+						datHeader.Category = (string)feat.Value.GetValue();
+						break;
+					case "comment":
+						datHeader.Comment = (string)feat.Value.GetValue();
+						break;
+					case "date":
+						datHeader.Date = (string)feat.Value.GetValue();
+						break;
+					case "description":
+						datHeader.Description = (string)feat.Value.GetValue();
+						break;
+					case "email":
+						datHeader.Email = (string)feat.Value.GetValue();
+						break;
+					case "equal":
+						filter.SizeEqualTo = Utilities.GetSizeFromString((string)feat.Value.GetValue());
+						break;
+					case "filename":
+						datHeader.FileName = (string)feat.Value.GetValue();
+						break;
+					case "forcemerging":
+						datHeader.ForceMerging = Utilities.GetForceMerging((string)feat.Value.GetValue());
+						break;
+					case "forcenodump":
+						datHeader.ForceNodump = Utilities.GetForceNodump((string)feat.Value.GetValue());
+						break;
+					case "forcepacking":
+						datHeader.ForcePacking = Utilities.GetForcePacking((string)feat.Value.GetValue());
+						break;
+					case "greater":
+						filter.SizeGreaterThanOrEqual = Utilities.GetSizeFromString((string)feat.Value.GetValue());
+						break;
+					case "header":
+						datHeader.Header = (string)feat.Value.GetValue();
+						break;
+					case "homepage":
+						datHeader.Homepage = (string)feat.Value.GetValue();
+						break;
+					case "less":
+						filter.SizeLessThanOrEqual = Utilities.GetSizeFromString((string)feat.Value.GetValue());
+						break;
+					case "name":
+						datHeader.Name = (string)feat.Value.GetValue();
+						break;
+					case "output-dir":
+						outDir = (string)feat.Value.GetValue();
+						break;
+					case "postfix":
+						datHeader.Postfix = (string)feat.Value.GetValue();
+						break;
+					case "prefix":
+						datHeader.Prefix = (string)feat.Value.GetValue();
+						break;
+					case "replace-extension":
+						datHeader.ReplaceExtension = (string)feat.Value.GetValue();
+						break;
+					case "root":
+						datHeader.RootDir = (string)feat.Value.GetValue();
+						break;
+					case "root-dir":
+						filter.Root = (string)feat.Value.GetValue();
+						break;
 					case "temp":
 						tempDir = (string)feat.Value.GetValue();
 						break;
@@ -696,9 +717,8 @@ namespace SabreTools
 					case "version":
 						datHeader.Version = (string)feat.Value.GetValue();
 						break;
-					case "zip":
-						zip = (int)feat.Value.GetValue() == Int32.MinValue ? (int)feat.Value.GetValue() : 1;
-						break;
+
+						#endregion
 				}
 			}
 
