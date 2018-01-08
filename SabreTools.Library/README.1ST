@@ -1179,6 +1179,12 @@ Options:
 			-udd, --update-description	Update machine descriptions from base DATs
 				This flag enables updating of machine descriptions from base
 				DATs
+				
+				-ons, --only-same	Only update description if machine name matches
+				description
+					Normally, updating the description will always overwrite if the
+					machine names are the same. With this flag, descriptions will
+					only be overwritten if they are the same as the machine names.
 			
 			-uy, --update-year		Update machine years from base DATs
 				This flag enables updating of machine years from base
