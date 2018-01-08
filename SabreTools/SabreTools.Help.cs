@@ -482,6 +482,17 @@ namespace SabreTools
 					null);
 			}
 		}
+		private static Feature onlySameFlag
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-ons", "--only-same" },
+					"Only update description if machine name matches description",
+					FeatureType.Flag,
+					null);
+			}
+		}
 		private static Feature outputAllFlag
 		{
 			get
@@ -2261,6 +2272,7 @@ namespace SabreTools
 				update["base-replace"].AddFeature("update-names", updateNamesFlag);
 				update["base-replace"].AddFeature("update-hashes", updateHashesFlag);
 				update["base-replace"].AddFeature("update-description", updateDescriptionFlag);
+					update["base-replace"]["update-description"].AddFeature("only-same", onlySameFlag);
 				update["base-replace"].AddFeature("update-year", updateYearFlag);
 				update["base-replace"].AddFeature("update-manufacturer", updateManufacturerFlag);
 			update.AddFeature("reverse-base-replace", reverseBaseReplaceFlag);
@@ -2268,6 +2280,7 @@ namespace SabreTools
 				update["reverse-base-replace"].AddFeature("update-names", updateNamesFlag);
 				update["reverse-base-replace"].AddFeature("update-hashes", updateHashesFlag);
 				update["reverse-base-replace"].AddFeature("update-description", updateDescriptionFlag);
+					update["reverse-base-replace"]["update-description"].AddFeature("only-same", onlySameFlag);
 				update["reverse-base-replace"].AddFeature("update-year", updateYearFlag);
 				update["reverse-base-replace"].AddFeature("update-manufacturer", updateManufacturerFlag);
 			update.AddFeature("game-name", gameNameListInput);

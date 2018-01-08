@@ -235,6 +235,7 @@ namespace SabreTools
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <param name="descAsName">True if descriptions should be used as names, false otherwise (default)</param>
 		/// <param name="replaceMode">ReplaceMode representing what should be updated [only for base replacement]</param>
+		/// <param name="onlySame">True if descriptions should only be replaced if the game name is the same, false otherwise [only for base replacement]</param>
 		private static void InitUpdate(
 			List<string> inputPaths,
 			List<string> basePaths,
@@ -257,7 +258,8 @@ namespace SabreTools
 			bool clean,
 			bool remUnicode,
 			bool descAsName,
-			ReplaceMode replaceMode)
+			ReplaceMode replaceMode,
+			bool onlySame)
 		{
 			// Normalize the extensions
 			datHeader.AddExtension = (String.IsNullOrWhiteSpace(datHeader.AddExtension) || datHeader.AddExtension.StartsWith(".")
@@ -311,7 +313,7 @@ namespace SabreTools
 			DatFile userInputDat = new DatFile(datHeader);
 			
 			userInputDat.DetermineUpdateType(inputPaths, basePaths, outDir, updateMode, inplace, skip, bare, clean,
-				remUnicode, descAsName, filter, splitType, replaceMode);
+				remUnicode, descAsName, filter, splitType, replaceMode, onlySame);
 		}
 
 		/// <summary>

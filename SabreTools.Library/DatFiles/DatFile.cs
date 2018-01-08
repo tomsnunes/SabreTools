@@ -1626,8 +1626,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="filter">Filter object to be passed to the DatItem level</param>
 		/// <param name="splitType">Type of the split that should be performed (split, merged, fully merged)</param>
 		/// <param name="replaceMode">ReplaceMode representing what should be updated [only for base replacement]</param>
+		/// <param name="onlySame">True if descriptions should only be replaced if the game name is the same, false otherwise [only for base replacement]</param>
 		public void DetermineUpdateType(List<string> inputPaths, List<string> basePaths, string outDir, UpdateMode updateMode, bool inplace, bool skip,
-			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, ReplaceMode replaceMode)
+			bool bare, bool clean, bool remUnicode, bool descAsName, Filter filter, SplitType splitType, ReplaceMode replaceMode, bool onlySame)
 		{
 			// Ensure we only have files in the inputs
 			List<string> inputFileNames = Utilities.GetOnlyFilesFromInputs(inputPaths, appendparent: true);
@@ -1681,7 +1682,7 @@ namespace SabreTools.Library.DatFiles
 			else if ((updateMode & UpdateMode.BaseReplace) != 0
 				|| (updateMode & UpdateMode.ReverseBaseReplace) != 0)
 			{
-				BaseReplace(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, replaceMode);
+				BaseReplace(inputFileNames, baseFileNames, outDir, inplace, clean, remUnicode, descAsName, filter, splitType, replaceMode, onlySame);
 			}
 
 			return;
@@ -1764,8 +1765,9 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="single">True if all games should be replaced by '!', false otherwise</param>
 		/// <param name="root">String representing root directory to compare against for length calculation</param>
 		/// <param name="replaceMode">ReplaceMode representing what should be updated</param>
+		/// <param name="onlySame">True if descriptions should only be replaced if the game name is the same, false otherwise</param>
 		public void BaseReplace(List<string> inputFileNames, List<string> baseFileNames, string outDir, bool inplace, bool clean, bool remUnicode,
-			bool descAsName, Filter filter, SplitType splitType, ReplaceMode replaceMode)
+			bool descAsName, Filter filter, SplitType splitType, ReplaceMode replaceMode, bool onlySame)
 		{
 			// First we want to parse all of the base DATs into the input
 			InternalStopwatch watch = new InternalStopwatch("Populating base DAT for replacement...");
@@ -1922,7 +1924,10 @@ namespace SabreTools.Library.DatFiles
 							{
 								if ((replaceMode & ReplaceMode.Description) != 0)
 								{
-									newDatItem.MachineDescription = this[key][0].MachineDescription;
+									if (!onlySame || (onlySame && newDatItem.MachineName == newDatItem.MachineDescription))
+									{
+										newDatItem.MachineDescription = this[key][0].MachineDescription;
+									}
 								}
 								if ((replaceMode & ReplaceMode.Year) != 0)
 								{

@@ -88,6 +88,7 @@ namespace SabreTools
 				inverse = false,
 				noAutomaticDate = false,
 				nostore = false,
+				onlySame = false,
 				quickScan = false,
 				removeUnicode = false,
 				showBaddumpColumn = false,
@@ -310,6 +311,9 @@ namespace SabreTools
 						break;
 					case "no-store-header":
 						nostore = true;
+						break;
+					case "only-same":
+						onlySame = true;
 						break;
 					case "output-all":
 						datHeader.DatFormat |= DatFormat.ALL;
@@ -774,7 +778,7 @@ namespace SabreTools
 				case "Update":
 					VerifyInputs(inputs, feature);
 					InitUpdate(inputs, basePaths, datHeader, updateMode, inplace, skipFirstOutput, noAutomaticDate, filter,
-						splitType, outDir, cleanGameNames, removeUnicode, descAsName, replaceMode);
+						splitType, outDir, cleanGameNames, removeUnicode, descAsName, replaceMode, onlySame);
 					break;
 				// If we're using the verifier
 				case "Verify":
