@@ -208,10 +208,10 @@ namespace SabreTools.Library.Data
 		MissFile = AttractMode << 1,
 		CSV = MissFile << 1,
 		TSV = CSV << 1,
-		Listroms = TSV << 1,
+		Listrom = TSV << 1,
 
 		// SFV-similar Formats
-		RedumpSFV = Listroms << 1,
+		RedumpSFV = Listrom << 1,
 		RedumpMD5 = RedumpSFV << 1,
 		RedumpSHA1 = RedumpMD5 << 1,
 		RedumpSHA256 = RedumpSHA1 << 1,

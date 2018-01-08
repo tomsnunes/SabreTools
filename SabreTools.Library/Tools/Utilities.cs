@@ -593,8 +593,8 @@ namespace SabreTools.Library.Tools
 					return new DatFiles.SeparatedValue(baseDat, ',');
 				case DatFormat.DOSCenter:
 					return new DosCenter(baseDat);
-				case DatFormat.Listroms:
-					return new Listroms(baseDat);
+				case DatFormat.Listrom:
+					return new Listrom(baseDat);
 				case DatFormat.Logiqx:
 					return new Logiqx(baseDat);
 				case DatFormat.MissFile:
@@ -1083,7 +1083,7 @@ namespace SabreTools.Library.Tools
 				// If we have a listroms DAT
 				else if (first.StartsWith("roms required for driver"))
 				{
-					return DatFormat.Listroms;
+					return DatFormat.Listrom;
 				}
 
 				// If we have a CMP-based DAT

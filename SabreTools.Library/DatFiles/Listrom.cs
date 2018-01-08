@@ -21,21 +21,21 @@ using NaturalSort;
 namespace SabreTools.Library.DatFiles
 {
 	/// <summary>
-	/// Represents parsing and writing of a MAME Listroms DAT
+	/// Represents parsing and writing of a MAME Listrom DAT
 	/// </summary>
-	internal class Listroms : DatFile
+	internal class Listrom : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile
 		/// </summary>
 		/// <param name="datFile">Parent DatFile to copy from</param>
-		public Listroms(DatFile datFile)
+		public Listrom(DatFile datFile)
 			: base(datFile, cloneHeader: false)
 		{
 		}
 
 		/// <summary>
-		/// Parse a MAME Listroms DAT and return all found games and roms within
+		/// Parse a MAME Listrom DAT and return all found games and roms within
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
@@ -44,7 +44,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		/// <remarks>
-		/// In a new style MAME listroms DAT, each game has the following format:
+		/// In a new style MAME listrom DAT, each game has the following format:
 		/// 
 		/// ROMs required for driver "005".
 		/// Name                                   Size Checksum

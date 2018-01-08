@@ -72,7 +72,7 @@ namespace SabreTools
 			}
 
 			// User flags
-			bool addBlankFilesForEmptyFolder = false,
+			bool addBlankFiles = false,
 				addFileDates = false,
 				archivesAsFiles = false,
 				basedat = false,
@@ -86,14 +86,14 @@ namespace SabreTools
 				individual = false,
 				inplace = false,
 				inverse = false,
+				noAutomaticDate = false,
 				nostore = false,
 				quickScan = false,
-				removeDateFromAutomaticName = false,
 				removeUnicode = false,
 				showBaddumpColumn = false,
 				showNodumpColumn = false,
 				shortname = false,
-				skip = false,
+				skipFirstOutput = false,
 				updateDat = false;
 			Hash omitFromScan = Hash.DeepHashes; // TODO: All instances of Hash.DeepHashes should be made into 0x0 eventually
 			OutputFormat outputFormat = OutputFormat.Folder;
@@ -180,8 +180,8 @@ namespace SabreTools
 				switch (feat.Key)
 				{
 					// User flags
-					case "add-blank":
-						addBlankFilesForEmptyFolder = true;
+					case "add-blank-files":
+						addBlankFiles = true;
 						break;
 					case "add-date":
 						addFileDates = true;
@@ -192,11 +192,11 @@ namespace SabreTools
 					case "all-stats":
 						statDatFormat = StatReportFormat.All;
 						break;
-					case "baddump-col":
-						showBaddumpColumn = true;
+					case "archives-as-files":
+						archivesAsFiles = true;
 						break;
-					case "bare":
-						removeDateFromAutomaticName = true;
+					case "baddump-column":
+						showBaddumpColumn = true;
 						break;
 					case "base":
 						basedat = true;
@@ -207,6 +207,9 @@ namespace SabreTools
 					case "cascade":
 						updateMode |= UpdateMode.DiffCascade;
 						break;
+					case "chds-as-Files":
+						chdsAsFiles = true;
+						break;
 					case "copy-files":
 						copyFiles = true;
 						break;
@@ -216,16 +219,16 @@ namespace SabreTools
 					case "csv":
 						statDatFormat |= StatReportFormat.CSV;
 						break;
-					case "dat-devnonmerged":
+					case "dat-device-non-merged":
 						splitType = SplitType.DeviceNonMerged;
 						break;
-					case "dat-fullnonmerged":
+					case "dat-full-non-merged":
 						splitType = SplitType.FullNonMerged;
 						break;
 					case "dat-merged":
 						splitType = SplitType.Merged;
 						break;
-					case "dat-nonmerged":
+					case "dat-non-merged":
 						splitType = SplitType.NonMerged;
 						break;
 					case "dat-split":
@@ -240,7 +243,7 @@ namespace SabreTools
 					case "depot":
 						depot = true;
 						break;
-					case "desc-name":
+					case "description-as-name":
 						descAsName = true;
 						break;
 					case "diff":
@@ -258,11 +261,8 @@ namespace SabreTools
 					case "exclude-of":
 						datHeader.ExcludeOf = true;
 						break;
-					case "ext":
+					case "extension":
 						splittingMode |= SplittingMode.Extension;
-						break;
-					case "files":
-						archivesAsFiles = true;
 						break;
 					case "game-dedup":
 						datHeader.DedupeRoms = DedupeType.Game;
@@ -279,9 +279,6 @@ namespace SabreTools
 					case "html":
 						statDatFormat |= StatReportFormat.HTML;
 						break;
-					case "ignore-chd":
-						chdsAsFiles = true;
-						break;
 					case "individual":
 						individual = true;
 						break;
@@ -294,40 +291,28 @@ namespace SabreTools
 					case "level":
 						splittingMode |= SplittingMode.Level;
 						break;
+					case "match-of-tags":
+						filter.IncludeOfInGame = true;
+						break;
 					case "merge":
 						updateMode |= UpdateMode.Merge;
 						break;
-					case "nodump-col":
+					case "no-automatic-date":
+						noAutomaticDate = true;
+						break;
+					case "nodump-column":
 						showNodumpColumn = true;
 						break;
-					case "noMD5":
-						omitFromScan |= Hash.MD5;
-						break;
-					case "noSHA1":
-						omitFromScan |= Hash.SHA1;
-						break;
-					case "noSHA256":
-						omitFromScan &= ~Hash.SHA256; // This needs to be inverted later
-						break;
-					case "noSHA384":
-						omitFromScan &= ~Hash.SHA384; // This needs to be inverted later
-						break;
-					case "noSHA512":
-						omitFromScan &= ~Hash.SHA512; // This needs to be inverted later
-						break;
-					case "not-run":
+					case "not-runnable":
 						filter.Runnable = false;
 						break;
 					case "no-store-header":
 						nostore = true;
 						break;
-					case "of-as-game":
-						filter.IncludeOfInGame = true;
-						break;
 					case "output-all":
 						datHeader.DatFormat |= DatFormat.ALL;
 						break;
-					case "output-am":
+					case "output-attractmode":
 						datHeader.DatFormat |= DatFormat.AttractMode;
 						break;
 					case "output-cmp":
@@ -336,11 +321,11 @@ namespace SabreTools
 					case "output-csv":
 						datHeader.DatFormat |= DatFormat.CSV;
 						break;
-					case "output-dc":
+					case "output-doscenter":
 						datHeader.DatFormat |= DatFormat.DOSCenter;
 						break;
-					case "output-lr":
-						datHeader.DatFormat |= DatFormat.Listroms;
+					case "output-listrom":
+						datHeader.DatFormat |= DatFormat.Listrom;
 						break;
 					case "output-miss":
 						datHeader.DatFormat |= DatFormat.MissFile;
@@ -348,13 +333,13 @@ namespace SabreTools
 					case "output-md5":
 						datHeader.DatFormat |= DatFormat.RedumpMD5;
 						break;
-					case "output-ol":
+					case "output-offlinelist":
 						datHeader.DatFormat |= DatFormat.OfflineList;
 						break;
-					case "output-rc":
+					case "output-romcenter":
 						datHeader.DatFormat |= DatFormat.RomCenter;
 						break;
-					case "output-sd":
+					case "output-sabredat":
 						datHeader.DatFormat |= DatFormat.SabreDat;
 						break;
 					case "output-sfv":
@@ -372,7 +357,7 @@ namespace SabreTools
 					case "output-sha512":
 						datHeader.DatFormat |= DatFormat.RedumpSHA512;
 						break;
-					case "output-sl":
+					case "output-softwarelist":
 						datHeader.DatFormat |= DatFormat.SoftwareList;
 						break;
 					case "output-tsv":
@@ -387,32 +372,32 @@ namespace SabreTools
 					case "quotes":
 						datHeader.Quotes = true;
 						break;
-					case "rem-md5":
+					case "remove-extensions":
+						datHeader.RemoveExtension = true;
+						break;
+					case "remove-md5":
 						datHeader.StripHash |= Hash.MD5;
 						break;
-					case "rem-sha1":
+					case "remove-sha1":
 						datHeader.StripHash |= Hash.SHA1;
 						break;
-					case "rem-sha256":
+					case "remove-sha256":
 						datHeader.StripHash |= Hash.SHA256;
 						break;
-					case "rem-sha384":
+					case "remove-sha384":
 						datHeader.StripHash |= Hash.SHA384;
 						break;
-					case "rem-sha512":
+					case "remremovesha512":
 						datHeader.StripHash |= Hash.SHA512;
 						break;
-					case "rem-uni":
+					case "remove-unicode":
 						removeUnicode = true;
 						break;
 					case "reverse-base-name":
 						updateMode |= UpdateMode.ReverseBaseReplace;
 						break;
-					case "rev-cascade":
+					case "reverse-cascade":
 						updateMode |= UpdateMode.DiffReverseCascade;
-						break;
-					case "rem-ext":
-						datHeader.RemoveExtension = true;
 						break;
 					case "romba":
 						datHeader.Romba = true;
@@ -423,9 +408,6 @@ namespace SabreTools
 					case "runnable":
 						filter.Runnable = true;
 						break;
-					case "short":
-						shortname = true;
-						break;
 					case "scan-all":
 						sevenzip = 0;
 						gz = 0;
@@ -435,23 +417,38 @@ namespace SabreTools
 					case "scene-date-strip":
 						datHeader.SceneDateStrip = true;
 						break;
-					case "skip":
-						skip = true;
+					case "short":
+						shortname = true;
 						break;
-					case "skiparc":
+					case "skip-archives":
 						skipFileType = SkipFileType.Archive;
 						break;
-					case "skipfile":
+					case "skip-files":
 						skipFileType = SkipFileType.File;
 						break;
-					case "single":
+					case "skip-first-output":
+						skipFirstOutput = true;
+						break;
+					case "skip-md5":
+						omitFromScan |= Hash.MD5;
+						break;
+					case "skip-sha1":
+						omitFromScan |= Hash.SHA1;
+						break;
+					case "skip-sha256":
+						omitFromScan &= ~Hash.SHA256; // This needs to be inverted later
+						break;
+					case "skip-sha384":
+						omitFromScan &= ~Hash.SHA384; // This needs to be inverted later
+						break;
+					case "skip-sha512":
+						omitFromScan &= ~Hash.SHA512; // This needs to be inverted later
+						break;
+					case "single-set":
 						filter.Single = true;
 						break;
 					case "superdat":
 						datHeader.Type = "SuperDAT";
-						break;
-					case "t7z":
-						outputFormat = OutputFormat.Torrent7Zip;
 						break;
 					case "tar":
 						outputFormat = OutputFormat.TapeArchive;
@@ -459,17 +456,32 @@ namespace SabreTools
 					case "text":
 						statDatFormat |= StatReportFormat.Textfile;
 						break;
-					case "tgz":
+					case "torrent-7zip":
+						outputFormat = OutputFormat.Torrent7Zip;
+						break;
+					case "torrent-gzip":
 						outputFormat = OutputFormat.TorrentGzip;
 						break;
-					case "tlrz":
+					case "torrent-lrzip":
 						outputFormat = OutputFormat.TorrentLRZip;
 						break;
-					case "tlz4":
+					case "torrent-lz4":
 						outputFormat = OutputFormat.TorrentLZ4;
 						break;
-					case "trar":
+					case "torrent-rar":
 						outputFormat = OutputFormat.TorrentRar;
+						break;
+					case "torrent-xz":
+						outputFormat = OutputFormat.TorrentXZ;
+						break;
+					case "torrent-zip":
+						outputFormat = OutputFormat.TorrentZip;
+						break;
+					case "torrent-zpaq":
+						outputFormat = OutputFormat.TorrentZPAQ;
+						break;
+					case "torrent-zstd":
+						outputFormat = OutputFormat.TorrentZstd;
 						break;
 					case "trim":
 						filter.Trim = true;
@@ -480,28 +492,16 @@ namespace SabreTools
 					case "type":
 						splittingMode |= SplittingMode.Type;
 						break;
-					case "txz":
-						outputFormat = OutputFormat.TorrentXZ;
-						break;
-					case "tzip":
-						outputFormat = OutputFormat.TorrentZip;
-						break;
-					case "tzpaq":
-						outputFormat = OutputFormat.TorrentZPAQ;
-						break;
-					case "tzstd":
-						outputFormat = OutputFormat.TorrentZstd;
-						break;
 					case "update-dat":
 						updateDat = true;
 						break;
-					case "update-desc":
+					case "update-description":
 						replaceMode |= ReplaceMode.Description;
 						break;
 					case "update-hashes":
 						replaceMode |= ReplaceMode.Hash;
 						break;
-					case "update-manu":
+					case "update-manufacturer":
 						replaceMode |= ReplaceMode.Manufacturer;
 						break;
 					case "update-names":
@@ -711,8 +711,8 @@ namespace SabreTools
 				// Create a DAT from a directory or set of directories
 				case "DATFromDir":
 					VerifyInputs(inputs, feature);
-					InitDatFromDir(inputs, datHeader, omitFromScan, removeDateFromAutomaticName, archivesAsFiles, chdsAsFiles,
-						skipFileType, addBlankFilesForEmptyFolder, addFileDates, tempDir, outDir, copyFiles);
+					InitDatFromDir(inputs, datHeader, omitFromScan, noAutomaticDate, archivesAsFiles, chdsAsFiles,
+						skipFileType, addBlankFiles, addFileDates, tempDir, outDir, copyFiles);
 					break;
 				// If we're in header extract and remove mode
 				case "Extract":
@@ -745,7 +745,7 @@ namespace SabreTools
 				// Convert, update, merge, diff, and filter a DAT or folder of DATs
 				case "Update":
 					VerifyInputs(inputs, feature);
-					InitUpdate(inputs, basePaths, datHeader, updateMode, inplace, skip, removeDateFromAutomaticName, filter,
+					InitUpdate(inputs, basePaths, datHeader, updateMode, inplace, skipFirstOutput, noAutomaticDate, filter,
 						splitType, outDir, cleanGameNames, removeUnicode, descAsName, replaceMode);
 					break;
 				// If we're using the verifier

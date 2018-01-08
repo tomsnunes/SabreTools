@@ -169,30 +169,30 @@ Options:
 		current date. It will also treat all archives as possible games and add
 		all three hashes for each file.
 		
-		-nm, --noMD5		Don't include MD5 in output
+		-nm, --skip-md5		Don't include MD5 in output
 			This allows the user to skip calculating the MD5 for each of the
 			files which will speed up the creation of the DAT.
 			
-		-ns, --noSHA1		Don't include SHA1 in output
+		-ns, --skip-sha1	Don't include SHA1 in output
 			This allows the user to skip calculating the SHA-1 for each of the
 			files which will speed up the creation of the DAT.
 
-		-ns256, --noSHA256	Include SHA-256 in output
+		-ns256, --skip-sha256	Include SHA-256 in output
 			This allows the user to include calculating the SHA-256 for each of
 			the files which will speed up the creation of the DAT.
 			(Will be inverted later)
 			
-		-ns384, --noSHA384	Include SHA-384 in output
+		-ns384, --skip-sha384	Include SHA-384 in output
 			This allows the user to include calculating the SHA-384 for each of
 			the files which will speed up the creation of the DAT.
 			(Will be inverted later)
 			
-		-ns512, --noSHA512	Include SHA-512 in output
+		-ns512, --skip-sha512	Include SHA-512 in output
 			This allows the user to include calculating the SHA-512 for each of
 			the files which will speed up the creation of the DAT.
 			(Will be inverted later)
 			
-		-b, --bare			Don't include date in file name
+		-b, --no-automatic-date		Don't include date in file name
 			Normally, the DAT will be created with the date in the file name.
 			This flag removes that but keeps the date tag intact.
 			
@@ -200,7 +200,7 @@ Options:
 			Set the forcepacking flag to one of the supported values:
 				None, Zip, Unzip
 			
-		-f, --files			Treat archives as files
+		-f, --archives-as-files			Treat archives as files
 			Instead of trying to enumerate the files within archives, treat the
 			archives as files themselves. This is good for uncompressed sets
 			that include archives that should be read as-is.
@@ -209,7 +209,7 @@ Options:
 			Add outputting the created DAT in all available formats. See
 			specific formats for additional flags that may be used.
 			
-		-oam, --output-am	Output in AttractMode format
+		-oam, --output-attractmode	Output in AttractMode format
 			Add outputting the created DAT to AttractMode format
 			
 		-oc, --output-cmp	Output in CMP format
@@ -218,10 +218,10 @@ Options:
 		-ocsv, --output-csv	Output in Comma-Separated Value format
 			Add outputting the created DAT to standardized CSV format
 		
-		-od, --output-dc	Output in DOSCenter format
+		-od, --output-doscenter	Output in DOSCenter format
 			Add outputting the created DAT to DOSCenter format
 			
-		-olr, --output-lr	Output in MAME Listrom format
+		-olr, --output-listrom	Output in MAME Listrom format
 			Add outputting the created DAT to MAME Listrom format
 			
 		-om, --output-miss	Output in Missfile format
@@ -230,13 +230,13 @@ Options:
 		-omd5, --output-md5	Output in MD5 format
 			Add outputting the created DAT to MD5 format
 			
-		-ool, --output-ol	Output in OfflineList format
+		-ool, --output-offlinelist	Output in OfflineList format
 			Add outputting the created DAT to OfflineList XML format
 			
-		-or, --output-rc	Output in RomCenter format
+		-or, --output-romcenter	Output in RomCenter format
 			Add outputting the created DAT to RomCenter format
 			
-		-os, --output-sd	Output in SabreDAT format
+		-os, --output-sabredat	Output in SabreDAT format
 			Add outputting the created DAT to SabreDAT XML format
 			
 		-osfv, --output-sfv	Output in SFV format
@@ -254,7 +254,7 @@ Options:
 		-osha512, --output-sha512	Output in SHA-512 format
 			Add outputting the created DAT to SHA-512 format
 			
-		-osl, --output-sl	Output in Software List format
+		-osl, --output-softwarelist	Output in Software List format
 			Add outputting the created DAT to Software List XML format
 			
 		-otsv, --output-tsv	Output in Tab-Separated Value format
@@ -268,10 +268,10 @@ Options:
 			depot. This implies that the files will be in the TorrentGZ format
 			as well, including naming convention.
 			
-		-ska, --skiparc		Skip archive files
+		-ska, --skip-archives	Skip archive files
 			Skip any files that are treated like archives
 			
-		-skf, --skipfile	Skip non-archive files
+		-skf, --skip-files	Skip non-archive files
 			Skip any files that are not treated like archives
 			
 		-f=, --filename=	Set the external name of the DAT
@@ -321,7 +321,7 @@ Options:
 			removed from the beginning. For example "01.01.01-Game_Name-GROUP"
 			would become "Game_Name-Group".
 			
-		-ab, --add-blank	Output blank files for folders
+		-ab, --add-blank-files	Output blank files for folders
 			If this flag is set, then blank entries will be created for each of
 			the empty directories in the source. This is useful for tools that
 			require all folders be accounted for in the output DAT.
@@ -345,7 +345,7 @@ Options:
 			that skipper exists, then it will be used instead of trying to find
 			one that matches.
 			
-		-ic, --ignore-chd	Treat CHDs as regular files
+		-ic, --chds-as-files	Treat CHDs as regular files
 			Normally, CHDs would be processed using their internal hash to
 			compare against the input DATs. This flag forces all CHDs to
 			be treated like regular files.
@@ -420,7 +420,7 @@ Options:
 			Add outputting the created DAT in all available formats. See
 			specific formats for additional flags that may be used.
 			
-		-oam, --output-am	Output in AttractMode format
+		-oam, --output-attractmode	Output in AttractMode format
 			Add outputting the created DAT to AttractMode format
 		
 		-oc, --output-cmp	Output in CMP format
@@ -429,10 +429,10 @@ Options:
 		-ocsv, --output-csv	Output in Comma-Separated Value format
 			Add outputting the created DAT to standardized CSV format
 		
-		-od, --output-dc	Output in DOSCenter format
+		-od, --output-doscenter	Output in DOSCenter format
 			Add outputting the created DAT to DOSCenter format
 			
-		-olr, --output-lr	Output in MAME Listrom format
+		-olr, --output-listrom	Output in MAME Listrom format
 			Add outputting the created DAT to MAME Listrom format
 			
 		-om, --output-miss	Output in Missfile format
@@ -441,13 +441,13 @@ Options:
 		-omd5, --output-md5	Output in MD5 format
 			Add outputting the created DAT to MD5 format
 			
-		-ool, --output-ol	Output in OfflineList format
+		-ool, --output-offlinelist	Output in OfflineList format
 			Add outputting the created DAT to OfflineList XML format
 			
-		-or, --output-rc	Output in RomCenter format
+		-or, --output-romcenter	Output in RomCenter format
 			Add outputting the created DAT to RomCenter format
 			
-		-os, --output-sd	Output in SabreDAT format
+		-os, --output-sabredat	Output in SabreDAT format
 			Add outputting the created DAT to SabreDAT XML format
 			
 		-osfv, --output-sfv	Output in SFV format
@@ -465,7 +465,7 @@ Options:
 		-osha512, --output-sha512	Output in SHA-512 format
 			Add outputting the created DAT to SHA-512 format
 			
-		-osl, --output-sl	Output in Software List format
+		-osl, --output-softwarelist	Output in Software List format
 			Add outputting the created DAT to Software List XML format
 			
 		-otsv, --output-tsv	Output in Tab-Separated Value format
@@ -483,7 +483,7 @@ Options:
 			writing them out to the runtime folder by default (or the output
 			folder if overridden).
 		
-		-es, --ext			Split a DAT by two file extensions
+		-es, --extension			Split a DAT by two file extensions
 			For a DAT, or set of DATs, allow for splitting based on a list of
 			input extensions. This can allow for combined DAT files, such as
 			those combining two separate systems, to be split. Files with any
@@ -572,7 +572,7 @@ Options:
 			to the temp folder. On the downside, it can only get the CRC and
 			size from most archive formats, leading to possible issues.
 			
-		-ic, --ignore-chd	Treat CHDs as regular files
+		-ic, --chds-as-files	Treat CHDs as regular files
 			Normally, CHDs would be processed using their internal hash to
 			compare against the input DATs. This flag forces all CHDs to
 			be treated like regular files.
@@ -583,7 +583,7 @@ Options:
 			This will technically invalidate the output files as proper
 			TorrentZip files because the date will not match the standard.
 			
-		-t7z				Enable Torrent 7zip output
+		-t7z, --torrent-7zip	Enable Torrent 7zip output
 			Instead of ouputting the files to folder, files will be rebuilt to
 			Torrent7Zip (T7Z) files. This format is based on the LZMA container
 			format 7zip, but with custom header information. This is currently
@@ -597,7 +597,7 @@ Options:
 			formats around it. It is widely used in backup applications and
 			source code archives.
 		
-		-tgz				Enable Torrent GZ output
+		-tgz, --torrent-gzip	Enable Torrent GZ output
 			Instead of outputting the files to folder, files will be rebuilt to
 			TorrentGZ (TGZ) files. This format is based on the GZip archive
 			format, but with custom header information and a file name replaced
@@ -613,48 +613,48 @@ Options:
 				files, .romba_size and .romba_size.backup, that have the
 				compressed size of the folder inside for use with Romba.
 				
-		-tlrz				Enable Torrent Long-Range Zip output [UNIMPLEMENTED]
+		-tlrz, --torrent-lrzip	Enable Torrent Long-Range Zip output [UNIMPLEMENTED]
 			Instead of ouputting the files to folder, files will be rebuilt to
 			Torrent Long-Range Zip (TLRZ) files. This format is based on the
 			LRZip file format as defined at https://github.com/ckolivas/lrzip
 			but with custom header information. This is currently unused by any
 			major application.
 			
-		-tlz4				Enable Torrent LZ4 output [UNIMPLEMENTED]
+		-tlz4, --torrent-lz4	Enable Torrent LZ4 output [UNIMPLEMENTED]
 			Instead of ouputting the files to folder, files will be rebuilt to
 			Torrent LZ4 (TLZ4) files. This format is based on the LZ4 file
 			format as defined at https://github.com/lz4/lz4 but with custom
 			header information. This is currently unused by any major
 			application.
 			
-		-trar				Enable Torrent RAR output [UNIMPLEMENTED]
+		-trar, --torrent-rar	Enable Torrent RAR output [UNIMPLEMENTED]
 			Instead of outputting files to folder, files will be rebuilt to
 			Torrent RAR (TRAR) files. This format is based on the RAR propietary
 			format but with custom header information. This is currently unused
 			by any major application.
 			
-		-txz				Enable Torrent XZ output [UNSUPPORTED]
+		-txz, --torrent-xz	Enable Torrent XZ output [UNSUPPORTED]
 			Instead of outputting files to folder, files will be rebuilt to
 			Torrent XZ (TXZ) files. This format is based on the LZMA container
 			format XZ, but with custom header information. This is currently
 			unused by any major application. Currently does not produce proper
 			Torrent-compatible outputs.
 			
-		-tzip				Enable Torrent Zip output
+		-tzip, --torrent-zip	Enable Torrent Zip output
 			Instead of ouputting files to folder, files will be rebuilt to
 			TorrentZip (TZip) files. This format is based on the ZIP archive
 			format, but with custom header information. This is primarily used
 			by external tool RomVault (http://www.romvault.com/) and is already
 			widely used.
 		
-		-tzpaq				Enable Torrent ZPAQ output [UNIMPLEMENTED]
+		-tzpaq, --torrent-zpaq	Enable Torrent ZPAQ output [UNIMPLEMENTED]
 			Instead of ouputting the files to folder, files will be rebuilt to
 			Torrent ZPAQ (TZPAQ) files. This format is based on the ZPAQ file
 			format as defined at https://github.com/zpaq/zpaq but with custom
 			header information. This is currently unused by any major
 			application.
 			
-		-tzstd				Enable Torrent Zstd output [UNIMPLEMENTED]
+		-tzstd, --torrent-zstd	Enable Torrent Zstd output [UNIMPLEMENTED]
 			Instead of ouputting the files to folder, files will be rebuilt to
 			Torrent Zstd (TZstd) files. This format is based on the Zstd file
 			format as defined at https://github.com/skbkontur/ZstdNet but with
@@ -695,17 +695,17 @@ Options:
 			children based on the romof and cloneof tags. This is incompatible
 			with the other --dat-X flags.
 		
-		-dnm, --dat-nonmerged Force creating non-merged sets
+		-dnm, --dat-non-merged Force creating non-merged sets
 			Preprocess the DAT to have child sets contain all items from the
 			parent set based on the cloneof tag. This is incompatible with the
 			other --dat-X flags.
 		
-		-dnd, --dat-devnonmerged Force creating device non-merged sets
+		-dnd, --dat-device-non-merged Force creating device non-merged sets
 			Preprocess the DAT to have child sets contain all items from the
 			device references. This is incompatible with the other --dat-X
 			flags.
 		
-		-df, --dat-fullnonmerged Force creating fully non-merged sets
+		-df, --dat-full-non-merged Force creating fully non-merged sets
 			Preprocess the DAT to have child sets contain all items from the
 			parent sets based on the cloneof and romof tags as well as device
 			references. This is incompatible with the other --dat-X flags.
@@ -736,7 +736,7 @@ Options:
 		-as, --all-stats	Write all statistics to all available formats
 			Output all rom information to all available formats
 			
-		-bc, --baddump-col	Add statistics for baddumps to output
+		-bc, --baddump-column	Add statistics for baddumps to output
 			Add a new column or field for counting the number of baddumps in the
 			DAT
 			
@@ -754,7 +754,7 @@ Options:
 			This will output by default the combined statistics for all input
 			DAT files.
 			
-		-nc, --nodump-col	Add statistics for nodumps to output
+		-nc, --nodump-column	Add statistics for nodumps to output
 			Add a new column or field for counting the number of nodumps in the
 			DAT
 			
@@ -780,7 +780,7 @@ Options:
 			Add outputting the created DAT in all available formats. See
 			specific formats for additional flags that may be used.
 			
-		-oam, --output-am	Output in AttractMode format
+		-oam, --output-attractmode	Output in AttractMode format
 			Add outputting the created DAT to AttractMode format
 		
 		-oc, --output-cmp	Output in CMP format
@@ -809,10 +809,10 @@ Options:
 			-q, --quotes			Put double-quotes around each item
 				This quotes only the item and not the prefix and postfix
 		
-		-od, --output-dc	Output in DOSCenter format
+		-od, --output-doscenter	Output in DOSCenter format
 			Add outputting the created DAT to DOSCenter format
 			
-		-olr, --output-lr	Output in MAME Listrom format
+		-olr, --output-listrom	Output in MAME Listrom format
 			Add outputting the created DAT to MAME Listrom format
 			
 		-om, --output-miss	Output in Missfile format
@@ -852,7 +852,7 @@ Options:
 			-re=, --rep-ext=		Replace all extensions with specified
 				When an extension exists, replace it with the provided instead
 				
-			-rme, --rem-ext			Remove all extensions from all items
+			-rme, --remove-extensions	Remove all extensions from all items
 				For each item, the extension is removed
 			
 			-ro, --romba			Output in Romba format (requires SHA-1)
@@ -867,13 +867,13 @@ Options:
 				This allows for the name of the game to be used as a prefix to
 				each file
 			
-		-ool, --output-ol	Output in OfflineList format
+		-ool, --output-offlinelist	Output in OfflineList format
 			Add outputting the created DAT to OfflineList XML format
 			
-		-or, --output-rc	Output in RomCenter format
+		-or, --output-romcenter	Output in RomCenter format
 			Add outputting the created DAT to RomCenter format
 			
-		-os, --output-sd	Output in SabreDAT format
+		-os, --output-sabredat	Output in SabreDAT format
 			Add outputting the created DAT to SabreDAT XML format
 			
 		-osfv, --output-sfv	Output in SFV format
@@ -911,7 +911,7 @@ Options:
 				This allows for the name of the game to be used as a prefix to
 				each file
 			
-		-osl, --output-sl	Output in Software List format
+		-osl, --output-softwarelist	Output in Software List format
 			Add outputting the created DAT to Software List XML format
 			
 		-otsv, --output-tsv	Output in Tab-Separated Value format
@@ -1008,32 +1008,32 @@ Options:
 			standards deemed as unneeded information, such as parenthized or
 			bracketed strings
 			
-		-ru, --rem-uni		Remove unicode characters from names
+		-ru, --remove-unicode	Remove unicode characters from names
 			By default, the character set from the original file(s) will be used
 			for item naming. This flag removes all Unicode characters from the
 			item names, machine names, and machine descriptions.
 			
-		-rmd5, --rem-md5	Remove MD5 hashes from the output
+		-rmd5, --remove-md5	Remove MD5 hashes from the output
 			By default, all available hashes will be written out to the DAT.
 			This will remove all MD5 hashes from the output file(s).
 			
-		-rsha1, --rem-sha1	Remove SHA-1 hashes from the output
+		-rsha1, --remove-sha1	Remove SHA-1 hashes from the output
 			By default, all available hashes will be written out to the DAT.
 			This will remove all SHA-1 hashes from the output file(s).
 		
-		-rsha256, --rem-sha256	Remove SHA-256 hashes from the output
+		-rsha256, --remove-sha256	Remove SHA-256 hashes from the output
 			By default, all available hashes will be written out to the DAT.
 			This will remove all SHA-256 hashes from the output file(s).
 			
-		-rsha384, --rem-sha384	Remove SHA-384 hashes from the output
+		-rsha384, --remove-sha384	Remove SHA-384 hashes from the output
 			By default, all available hashes will be written out to the DAT.
 			This will remove all SHA-384 hashes from the output file(s).
 			
-		-rsha512, --rem-sha512	Remove SHA-512 hashes from the output
+		-rsha512, --remove-sha512	Remove SHA-512 hashes from the output
 			By default, all available hashes will be written out to the DAT.
 			This will remove all SHA-512 hashes from the output file(s).
 			
-		-dan, --desc-name	Use Software List name instead of description
+		-dan, --description-as-name		Use Software List name instead of description
 			By default, all DATs are converted exactly as they are input.
 			Enabling this flag allows for the machine names in the DAT to be
 			replaced by the machine description instead. In most cases, this
@@ -1051,12 +1051,17 @@ Options:
 			children based on the romof and cloneof tags. This is incompatible
 			with the other --dat-X flags.
 		
-		-dnm, --dat-nonmerged Create non-merged sets
+		-dnm, --dat-non-merged Create non-merged sets
 			Preprocess the DAT to have child sets contain all items from the
 			parent set based on the cloneof tag. This is incompatible with the
 			other --dat-X flags.
 		
-		-df, --dat-fullnonmerged Create fully non-merged sets
+		-dnd, --dat-device-non-merged Force creating device non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			device references. This is incompatible with the other --dat-X
+			flags.
+		
+		-df, --dat-full-non-merged Create fully non-merged sets
 			Preprocess the DAT to have child sets contain all items from the
 			parent sets based on the cloneof and romof tags as well as device
 			references. This is incompatible with the other --dat-X flags.
@@ -1069,7 +1074,7 @@ Options:
 				In the case that the files will not be stored from the root
 				directory, a new root can be set for path length calculations
 				
-		-si, --single		All game names replaced by '!'
+		-si, --single-set	All game names replaced by '!'
 			This is useful for keeping all roms in a DAT in the same archive or
 			folder
 			
@@ -1089,7 +1094,7 @@ Options:
 			specified flags. With this flag enabled, all of the input DATs are
 			merged into a single output. This is best used with the dedupe flag.
 			
-			-b, --bare			Don't include date in file name
+			-b, --no-automatic-date		Don't include date in file name
 				Normally, the DAT will be created with the date in the file name
 				in brackets. This flag removes that instead of the default.
 				
@@ -1124,12 +1129,12 @@ Options:
 					Add a DAT or folder of DATs to the base set to be used in
 					comparison against all inputs
 				
-			-b, --bare			Don't include date in file name
+			-b, --no-automatic-date		Don't include date in file name
 				Normally, the DAT will be created with the date in the file name
 				in brackets. This flag removes that instead of the default.
 				
 			-c, --cascade		Enable cascaded diffing
-			-rc, --rev-cascade	Enable reverse cascaded diffing
+			-rc, --reverse-cascade	Enable reverse cascaded diffing
 				Each of the above flags allow for a special type of diffing in
 				which the first (or last) DAT is considered a base, and for each
 				additional input DAT, it only leaves the files that are not in
@@ -1137,7 +1142,7 @@ Options:
 				rollback sets or even just reduce the amount of duplicates
 				across multiple sets
 					
-				-sf, --skip		Skip output of first DAT
+				-sf, --skip-first-output	Skip output of first DAT
 					In times where the first DAT does not need to be written out
 					a second time, this will skip writing it. This can often
 					speed up the output process.
@@ -1162,7 +1167,7 @@ Options:
 			-uh, --update-hashes	Update hashes from base DATs
 				This flag enables updating of hashes from base DATs.
 				
-			-udd, --update-desc		Update machine descriptions from base DATs
+			-udd, --update-description	Update machine descriptions from base DATs
 				This flag enables updating of machine descriptions from base
 				DATs
 			
@@ -1170,7 +1175,7 @@ Options:
 				This flag enables updating of machine years from base
 				DATs
 				
-			-um, --update-manu		Update machine manufacturers from base DATs
+			-um, --update-manufacturer	Update machine manufacturers from base DATs
 				This flag enables updating of machine manufacturers from base
 				DATs
 		
@@ -1194,7 +1199,7 @@ Options:
 			match or can use full C#-style regex for pattern matching. Multiples
 			of each of the above inputs are allowed.
 			
-		-ofg, --of-as-game	Allow cloneof and romof tags to match game name
+		-ofg, --match-of-tags	Allow cloneof and romof tags to match game name
 			If filter or exclude by game name is used, this flag will allow
 			those filters to be checked against the romof and cloneof tags as
 			well. This can allow for more advanced set-building, especially in
@@ -1238,7 +1243,7 @@ Options:
 		-run, --runnable	Include only items that are marked runnable
 			This allows users to include only verified runnable games
 			
-		-nrun, --not-run	Include only items that are not marked runnable
+		-nrun, --not-runnable	Include only items that are not marked runnable
 			This allows users to include only unrunnable games
 		
 		-out=			Set the name of the output directory
@@ -1295,7 +1300,7 @@ Options:
 			that skipper exists, then it will be used instead of trying to find
 			one that matches.
 			
-		-ic, --ignore-chd	Treat CHDs as regular files
+		-ic, --chds-as-files	Treat CHDs as regular files
 			Normally, CHDs would be processed using their internal hash to
 			compare against the input DATs. This flag forces all CHDs to
 			be treated like regular files.
@@ -1310,12 +1315,17 @@ Options:
 			children based on the romof and cloneof tags. This is incompatible
 			with the other --dat-X flags.
 		
-		-dnm, --dat-nonmerged Force checking non-merged sets
+		-dnm, --dat-non-merged Force checking non-merged sets
 			Preprocess the DAT to have child sets contain all items from the
 			parent set based on the cloneof tag. This is incompatible with the
 			other --dat-X flags.
+			
+		-dnd, --dat-device-non-merged Force creating device non-merged sets
+			Preprocess the DAT to have child sets contain all items from the
+			device references. This is incompatible with the other --dat-X
+			flags.
 		
-		-df, --dat-fullnonmerged Force checking fully non-merged sets
+		-df, --dat-full-non-merged Force checking fully non-merged sets
 			Preprocess the DAT to have child sets contain all items from the
 			parent sets based on the cloneof and romof tags as well as device
 			references. This is incompatible with the other --dat-X flags.
@@ -1398,3 +1408,57 @@ All other external code is marked as such within the source and correctly
 attributed to the site and/or person(s) that originally wrote the code. All
 code written by project members is licensed under GPL v3. See LICENSE for
 more details.
+
+** Section 20.0 - TEMPORARY REMAPPINGS
+
+This section contains remappings from old flag names to new ones for the purposes of testing
+
+-ab, --add-blank -> -ab, --add-blank-files
+-bc, --baddump-col -> -bc, --baddump-column
+-b, --bare -> -b, --no-automatic-date
+-dnd, --dat-devnonmerged -> -dnd, --dat-device-non-merged
+-df, --dat-fullnonmerged -> -df, --dat-full-non-merged
+-dnm, --dat-nonmerged -> -dnm, --dat-non-merged
+-dan, --desc-name -> -dan, --description-as-name
+-es, --ext -> -es, --extension
+-f, --files -> -f, --archives-as-files
+-ic, --ignore-chd -> -ic, --chds-as-files
+-nc, --nodump-col -> -nc, --nodump-column
+-nm, --noMD5 -> -nm, --skip-md5
+-ns, --noSHA1 -> -ns, --skip-sha1
+-ns256, --noSHA256 -> -ns256, --skip-sha256
+-ns384, --noSHA384 -> -nm, --skip-sha384
+-ns512, --noSHA512 -> -nm, --skip-sha512
+-nrun, --not-run -> -nrun, --not-runnable
+-ofg, --of-as-game -> -ofg, --match-of-tags
+-oam, --output-am -> -oam, --output-attractmode
+-od, --output-dc -> -od, --output-doscenter
+-olr, --output-lr -> -olr, --output-listrom
+-ool, --output-ol -> -ol, --output-offlinelist
+-or, --output-rc -> -or, --output-romcenter
+-os, --output-sd -> -os, --output-sabredat
+-osl, --output-sl -> -osl, --output-softwarelist
+-rme, --rem-ext -> -rme, --remove-extensions
+-rmd5, --rem-md5 -> -rmd5, --remove-md5
+-rsha1, --rem-sha1 -> -rsha1, --remove-sha1
+-rsha256, --rem-sha256 -> -rsha256, --remove-sha256
+-rsha384, --rem-sha384 -> -rsha384, --remove-sha384
+-rsha512, --rem-sha512 -> -rsha512, --remove-sha512
+-ru, --rem-uni -> -ru, --remove-unicode
+-rc, --rev-cascade -> -rc, --reverse-cascade
+-si, --single -> -ind, --individual [For stat output case]
+-si, --single -> -si, --single-set [For '!' case]
+-sf, --skip -> -sf, --skip-first-output
+-ska, --skiparc -> -ska, --skip-archives
+-skf, --skipfile -> -skf, --skip-files
+-t7z, --t7z -> -t7z, --torrent-7zip
+-tgz, --tgz -> -tgz, --torrent-gzip
+-tlrz, --tlrz -> -tlrz, --torrent-lrzip
+-tlz4, --tlz4 -> -tlz4, --torrent-lz4
+-trar, --trar -> -trar, --torrent-rar
+-txz, --txz -> -txz, --torrent-xz
+-tzip, --tzip -> -tzip, --torrent-zip
+-tzpaq, --tzpaq -> -tzpaq, --torrent-zpaq
+-tzstd, --tzstd -> -tzstd, --torrent-zstd
+-udd, --update-desc -> -udd, --update-description
+-um, --update-manu -> -um, --update-manufacturer

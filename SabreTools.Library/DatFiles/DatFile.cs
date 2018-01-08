@@ -5591,15 +5591,15 @@ namespace SabreTools.Library.DatFiles
 			}
 
 			//MAME Listroms
-			if ((DatFormat & DatFormat.Listroms) != 0
+			if ((DatFormat & DatFormat.Listrom) != 0
 				&& (DatFormat & DatFormat.AttractMode) == 0)
 			{
-				outfileNames.Add(DatFormat.Listroms, CreateOutfileNamesHelper(outDir, ".txt", overwrite));
+				outfileNames.Add(DatFormat.Listrom, CreateOutfileNamesHelper(outDir, ".txt", overwrite));
 			}
-			if ((DatFormat & DatFormat.Listroms) != 0
+			if ((DatFormat & DatFormat.Listrom) != 0
 				&& (DatFormat & DatFormat.AttractMode) != 0)
 			{
-				outfileNames.Add(DatFormat.Listroms, CreateOutfileNamesHelper(outDir, ".lr.txt", overwrite));
+				outfileNames.Add(DatFormat.Listrom, CreateOutfileNamesHelper(outDir, ".lr.txt", overwrite));
 			}
 
 			// Logiqx XML
