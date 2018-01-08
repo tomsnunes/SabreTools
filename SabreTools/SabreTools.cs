@@ -83,6 +83,7 @@ namespace SabreTools
 				depot = false,
 				descAsName = false,
 				hashOnly = false,
+				individual = false,
 				inplace = false,
 				inverse = false,
 				nostore = false,
@@ -280,6 +281,9 @@ namespace SabreTools
 						break;
 					case "ignore-chd":
 						chdsAsFiles = true;
+						break;
+					case "individual":
+						individual = true;
 						break;
 					case "inplace":
 						inplace = true;
@@ -736,7 +740,7 @@ namespace SabreTools
 				// Get statistics on input files
 				case "Stats":
 					VerifyInputs(inputs, feature);
-					InitStats(inputs, datHeader.FileName, outDir, filter.Single, showBaddumpColumn, showNodumpColumn, statDatFormat);
+					InitStats(inputs, datHeader.FileName, outDir, individual, showBaddumpColumn, showNodumpColumn, statDatFormat);
 					break;
 				// Convert, update, merge, diff, and filter a DAT or folder of DATs
 				case "Update":

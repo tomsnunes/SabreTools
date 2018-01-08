@@ -758,7 +758,7 @@ Options:
 			Add a new column or field for counting the number of nodumps in the
 			DAT
 			
-		-si, --single		Show individual statistics
+		-ind, --individual		Show individual statistics
 			Optionally, the statistics for each of the individual input DATs can
 			be output as well. This can be useful to show where the size or
 			amount of files found in the combined totals can be broken down from
@@ -1166,7 +1166,7 @@ Options:
 				This flag enables updating of machine descriptions from base
 				DATs
 			
-			-uy, --update-years		Update machine years from base DATs
+			-uy, --update-year		Update machine years from base DATs
 				This flag enables updating of machine years from base
 				DATs
 				
