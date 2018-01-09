@@ -2069,7 +2069,7 @@ namespace SabreTools
 			sort.AddFeature("torrent-7zip", torrent7zipFlag);
 			sort.AddFeature("tar", tarFlag);
 			sort.AddFeature("torrent-gzip", torrentGzipFlag);
-				sort["tgz"].AddFeature("romba", rombaFlag);
+				sort["torrent-gzip"].AddFeature("romba", rombaFlag);
 			//sort.AddFeature("torrent-lrzip", tlrzFeature);
 			//sort.AddFeature("torrent-lz4", tlz4Feature);
 			//sort.AddFeature("torrent-rar", trarFeature);
@@ -2122,8 +2122,8 @@ namespace SabreTools
 			split.AddFeature("output-dir", outputDirStringInput);
 			split.AddFeature("inplace", inplaceFlag);
 			split.AddFeature("extension", extensionFlag);
-				split["ext"].AddFeature("exta", extaListInput);
-				split["ext"].AddFeature("extb", extbListInput);
+				split["extension"].AddFeature("exta", extaListInput);
+				split["extension"].AddFeature("extb", extbListInput);
 			split.AddFeature("hash", hashFlag);
 			split.AddFeature("level", levelFlag);
 				split["level"].AddFeature("short", shortFlag);
@@ -2260,7 +2260,7 @@ namespace SabreTools
 				update["diff"].AddFeature("cascade", cascadeFlag);
 					update["diff"]["cascade"].AddFeature("skip-first-output", skipFirstOutputFlag);
 				update["diff"].AddFeature("reverse-cascade", reverseCascadeFlag);
-					update["diff"]["rev-cascade"].AddFeature("skip-first-output", skipFirstOutputFlag);
+					update["diff"]["reverse-cascade"].AddFeature("skip-first-output", skipFirstOutputFlag);
 			update.AddFeature("diff-du", diffDuFlag);
 				update["diff-du"].AddFeature("no-automatic-date", noAutomaticDateFlag);
 			update.AddFeature("diff-in", diffInFlag);
