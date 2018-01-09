@@ -2135,6 +2135,20 @@ namespace SabreTools.Library.DatFiles
 			DatFile outerDiffData = new DatFile();
 			DatFile dupeData = new DatFile();
 
+			Parallel.For(0, inputs.Count, Globals.ParallelOptions, i =>
+			{
+				string path = "";
+				int id = 0;
+
+				lock (inputs)
+				{
+					path = inputs[i];
+					id = inputs.Count - i;
+				}
+
+				Parse(path, id, id, keep: true);
+			});
+
 			// Fill in any information not in the base DAT
 			if (String.IsNullOrWhiteSpace(FileName))
 			{

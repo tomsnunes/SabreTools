@@ -153,6 +153,9 @@ namespace SabreTools.Library.DatFiles
 							case "item status":
 								columns.Add("DatItem.Nodump");
 								break;
+							case "date":
+								columns.Add("DatItem.Date");
+								break;
 							default:
 								columns.Add("INVALID");
 								break;
@@ -174,7 +177,7 @@ namespace SabreTools.Library.DatFiles
 
 				// Set the output item information
 				string machineName = null, machineDesc = null, name = null, crc = null, md5 = null, sha1 = null,
-					sha256 = null, sha384 = null, sha512 = null;
+					sha256 = null, sha384 = null, sha512 = null, date = null;
 				long size = -1;
 				ItemType itemType = ItemType.Rom;
 				ItemStatus status = ItemStatus.None;
@@ -233,6 +236,9 @@ namespace SabreTools.Library.DatFiles
 							break;
 						case "DatItem.Nodump":
 							status = Utilities.GetItemStatus(value);
+							break;
+						case "DatItem.Date":
+							date = value;
 							break;
 					}
 				}
@@ -302,6 +308,7 @@ namespace SabreTools.Library.DatFiles
 							SHA256 = sha256,
 							SHA384 = sha384,
 							SHA512 = sha512,
+							Date = date,
 
 							MachineName = machineName,
 							MachineDescription = machineDesc,

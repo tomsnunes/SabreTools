@@ -2423,6 +2423,7 @@ namespace SabreTools.Library.Tools
 				case "sha256":
 				case "sha384":
 				case "sha512":
+				case "ssv":
 				case "tsv":
 				case "txt":
 				case "xml":
