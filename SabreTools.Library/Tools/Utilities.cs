@@ -619,6 +619,8 @@ namespace SabreTools.Library.Tools
 					return new SabreDat(baseDat);
 				case DatFormat.SoftwareList:
 					return new SoftwareList(baseDat);
+				case DatFormat.SSV:
+					return new DatFiles.SeparatedValue(baseDat, ';');
 				case DatFormat.TSV:
 					return new DatFiles.SeparatedValue(baseDat, '\t');
 			}
@@ -1035,6 +1037,8 @@ namespace SabreTools.Library.Tools
 					return DatFormat.RedumpSHA384;
 				case "sha512":
 					return DatFormat.RedumpSHA512;
+				case "ssv":
+					return DatFormat.SSV;
 				case "tsv":
 					return DatFormat.TSV;
 			}

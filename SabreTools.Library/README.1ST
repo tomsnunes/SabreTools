@@ -256,7 +256,10 @@ Options:
 			
 		-osl, --output-softwarelist	Output in Software List format
 			Add outputting the created DAT to Software List XML format
-			
+		
+		-ossv, --output-ssv	Output in Semicolon-Separated Value format
+			Add outputting the created DAT to standardized SSV format
+		
 		-otsv, --output-tsv	Output in Tab-Separated Value format
 			Add outputting the created DAT to standardized TSV format
 			
@@ -467,7 +470,10 @@ Options:
 			
 		-osl, --output-softwarelist	Output in Software List format
 			Add outputting the created DAT to Software List XML format
-			
+		
+		-ossv, --output-ssv	Output in Semicolon-Separated Value format
+			Add outputting the created DAT to standardized SSV format
+		
 		-otsv, --output-tsv	Output in Tab-Separated Value format
 			Add outputting the created DAT to standardized TSV format
 			
@@ -922,7 +928,30 @@ Options:
 			
 		-osl, --output-softwarelist	Output in Software List format
 			Add outputting the created DAT to Software List XML format
+		
+		-ossv, --output-ssv	Output in Semicolon-Separated Value format
+			Add outputting the created DAT to standardized SSV format
 			
+			-pre=, --prefix=		Set prefix for all lines
+				Set a generic prefix to be prepended to all outputted lines
+				
+			-post=, --postfix=		Set postfix for all lines
+				Set a generic postfix to be appended to all outputted lines
+				
+				Both prefix and postfix can use one of the following strings:
+					- %game% - Replaced with the Game/Machine name
+					- %name% - Replaced with the Rom name
+					- %crc% - Replaced with the CRC
+					- %md5% - Replaced with the MD5
+					- %sha1% - Replaced with the SHA-1
+					- %sha256% - Replaced with the SHA-256
+					- %sha384% - Replaced with the SHA-384
+					- %sha512% - Replaced with the SHA-512
+					- %size% - Replaced with the size
+			
+			-q, --quotes			Put double-quotes around each item
+				This quotes only the item and not the prefix and postfix
+		
 		-otsv, --output-tsv	Output in Tab-Separated Value format
 			Add outputting the created DAT to standardized TSV format
 			

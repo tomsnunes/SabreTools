@@ -687,6 +687,17 @@ namespace SabreTools
 					null);
 			}
 		}
+		private static Feature outputSsvFlag
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-ossv", "--output-ssv" },
+					"Output in SSV format",
+					FeatureType.Flag,
+					null);
+			}
+		}
 		private static Feature outputTsvFlag
 		{
 			get
@@ -1992,6 +2003,7 @@ namespace SabreTools
 			datFromDir.AddFeature("output-sha384", outputSha384Flag);
 			datFromDir.AddFeature("output-sha512", outputSha512Flag);
 			datFromDir.AddFeature("output-softwarelist", outputSoftwarelistFlag);
+			datFromDir.AddFeature("output-ssv", outputSsvFlag);
 			datFromDir.AddFeature("output-tsv", outputTsvFlag);
 			datFromDir.AddFeature("output-xml", outputXmlFlag);
 			datFromDir.AddFeature("romba", rombaFlag);
@@ -2117,6 +2129,7 @@ namespace SabreTools
 			split.AddFeature("output-sha384", outputSha384Flag);
 			split.AddFeature("output-sha512", outputSha512Flag);
 			split.AddFeature("output-softwarelist", outputSoftwarelistFlag);
+			split.AddFeature("output-ssv", outputSsvFlag);
 			split.AddFeature("output-tsv", outputTsvFlag);
 			split.AddFeature("output-xml", outputXmlFlag);
 			split.AddFeature("output-dir", outputDirStringInput);
@@ -2209,6 +2222,10 @@ namespace SabreTools
 			update.AddFeature("output-sha512", outputSha512Flag);
 				update["output-sha512"].AddFeature("game-prefix", gamePrefixFlag);
 			update.AddFeature("output-softwarelist", outputSoftwarelistFlag);
+			update.AddFeature("output-ssv", outputSsvFlag);
+				update["output-ssv"].AddFeature("prefix", prefixStringInput);
+				update["output-ssv"].AddFeature("postfix", postfixStringInput);
+				update["output-ssv"].AddFeature("quotes", quotesFlag);
 			update.AddFeature("output-tsv", outputTsvFlag);
 				update["output-tsv"].AddFeature("prefix", prefixStringInput);
 				update["output-tsv"].AddFeature("postfix", postfixStringInput);

@@ -2347,7 +2347,9 @@ namespace SabreTools.Library.DatFiles
 				DatFile innerDatdata = new DatFile(this);
 				Globals.Logger.User("Processing '{0}'", Path.GetFileName(file.Split('¬')[0]));
 				innerDatdata.Parse(file, 0, 0, splitType, keep: true, clean: clean, remUnicode: remUnicode, descAsName: descAsName,
-					keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0 || (innerDatdata.DatFormat & DatFormat.CSV) != 0));
+					keepext: ((innerDatdata.DatFormat & DatFormat.TSV) != 0
+						|| (innerDatdata.DatFormat & DatFormat.CSV) != 0
+						|| (innerDatdata.DatFormat & DatFormat.SSV) != 0));
 				filter.FilterDatFile(innerDatdata);
 
 				// Get the correct output path
@@ -5792,6 +5794,12 @@ namespace SabreTools.Library.DatFiles
 			{
 				outfileNames.Add(DatFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".sl.xml", overwrite));
 			}
+
+			// SSV
+			if ((DatFormat & DatFormat.SSV) != 0)
+			{
+				outfileNames.Add(DatFormat.SSV, CreateOutfileNamesHelper(outDir, ".ssv", overwrite));
+			};
 
 			// TSV
 			if ((DatFormat & DatFormat.TSV) != 0)

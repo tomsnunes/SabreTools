@@ -366,6 +366,9 @@ namespace SabreTools
 					case "output-softwarelist":
 						datHeader.DatFormat |= DatFormat.SoftwareList;
 						break;
+					case "output-ssv":
+						datHeader.DatFormat |= DatFormat.SSV;
+						break;
 					case "output-tsv":
 						datHeader.DatFormat |= DatFormat.TSV;
 						break;

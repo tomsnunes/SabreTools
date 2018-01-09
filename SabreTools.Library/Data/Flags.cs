@@ -206,8 +206,9 @@ namespace SabreTools.Library.Data
 
 		// Standardized Text Formats
 		MissFile = AttractMode << 1,
-		CSV = MissFile << 1,
-		TSV = CSV << 1,
+		CSV = MissFile << 1, // Comma-separated
+		SSV = CSV << 1, // Semicolon-separated
+		TSV = SSV << 1, // Tab-separated
 		Listrom = TSV << 1,
 
 		// SFV-similar Formats
