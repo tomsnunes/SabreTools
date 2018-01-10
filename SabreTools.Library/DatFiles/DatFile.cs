@@ -2917,6 +2917,12 @@ namespace SabreTools.Library.DatFiles
 			List<string> games = Keys;
 			foreach (string game in games)
 			{
+				// If the game has no items in it, we want to continue
+				if (this[game].Count == 0)
+				{
+					continue;
+				}
+
 				// Determine if the game has a parent or not
 				string parent = null;
 				if (!String.IsNullOrWhiteSpace(this[game][0].CloneOf))
