@@ -2160,7 +2160,7 @@ namespace SabreTools
 			stats.AddFeature("filename", filenameStringInput);
 			stats.AddFeature("output-dir", outputDirStringInput);
 			stats.AddFeature("html", htmlFlag);
-			stats.AddFeature("nodump-col", nodumpColumnFlag);
+			stats.AddFeature("nodump-column", nodumpColumnFlag);
 			stats.AddFeature("individual", individualFlag);
 			stats.AddFeature("tsv", tsvFlag);
 			stats.AddFeature("text", textFlag);
@@ -2303,10 +2303,10 @@ namespace SabreTools
 			update.AddFeature("game-name", gameNameListInput);
 			update.AddFeature("not-game-name", notGameNameListInput);
 			update.AddFeature("match-of-tags", matchOfTagsFlag);
-			update.AddFeature("rom-name", itemNameListInput);
-			update.AddFeature("not-rom-name", notItemNameListInput);
-			update.AddFeature("rom-type", itemTypeListInput);
-			update.AddFeature("not-type", notItemTypeListInput);
+			update.AddFeature("item-name", itemNameListInput);
+			update.AddFeature("not-item-name", notItemNameListInput);
+			update.AddFeature("item-type", itemTypeListInput);
+			update.AddFeature("not-item-type", notItemTypeListInput);
 			update.AddFeature("greater", greaterStringInput);
 			update.AddFeature("less", lessStringInput);
 			update.AddFeature("equal", equalStringInput);
