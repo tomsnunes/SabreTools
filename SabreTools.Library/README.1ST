@@ -263,8 +263,13 @@ Options:
 		-otsv, --output-tsv	Output in Tab-Separated Value format
 			Add outputting the created DAT to standardized TSV format
 			
-		-ox, -output-xml	Output in Logiqx XML format (default)
+		-ox, --output-xml	Output in Logiqx XML format (default)
 			Add outputting the created DAT to Logiqx XML format
+			
+			-dpc, --depreciated		Output 'game' instead of 'machine'
+				By default, XML DATs output with the more modern "machine" tag
+				for each set. This flag allows users to output the older "game"
+				tag instead, for compatibility reasons.
 			
 		-ro, --romba		Read files from a Romba input
 			Allow for reading of GZipped files as if they were from a Romba
@@ -477,8 +482,13 @@ Options:
 		-otsv, --output-tsv	Output in Tab-Separated Value format
 			Add outputting the created DAT to standardized TSV format
 			
-		-ox, -output-xml	Output in Logiqx XML format
+		-ox, --output-xml	Output in Logiqx XML format
 			Add outputting the created DAT to Logiqx XML format
+			
+			-dpc, --depreciated		Output 'game' instead of 'machine'
+				By default, XML DATs output with the more modern "machine" tag
+				for each set. This flag allows users to output the older "game"
+				tag instead, for compatibility reasons.
 		
 		-out=, --output-dir=	Set the name of the output directory
 			This sets an output folder to be used when the files are created. If
@@ -975,8 +985,13 @@ Options:
 			-q, --quotes			Put double-quotes around each item
 				This quotes only the item and not the prefix and postfix
 			
-		-ox, -output-xml	Output in Logiqx XML format
+		-ox, --output-xml	Output in Logiqx XML format
 			Add outputting the created DAT to Logiqx XML format
+			
+			-dpc, --depreciated		Output 'game' instead of 'machine'
+				By default, XML DATs output with the more modern "machine" tag
+				for each set. This flag allows users to output the older "game"
+				tag instead, for compatibility reasons.
 			
 		-f=, --filename=	Set the external name of the DAT
 			Set the base filename for the output DAT(s)

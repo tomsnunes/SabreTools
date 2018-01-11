@@ -246,6 +246,14 @@ namespace SabreTools
 					case "depot":
 						depot = true;
 						break;
+					case "depreciated":
+						// Remove the Logiqx standard output if this is included
+						if ((datHeader.DatFormat & DatFormat.Logiqx) != 0)
+						{
+							datHeader.DatFormat &= ~DatFormat.Logiqx;
+						}
+						datHeader.DatFormat |= DatFormat.LogiqxDepreciated;
+						break;
 					case "description-as-name":
 						descAsName = true;
 						break;
@@ -373,7 +381,11 @@ namespace SabreTools
 						datHeader.DatFormat |= DatFormat.TSV;
 						break;
 					case "output-xml":
-						datHeader.DatFormat |= DatFormat.Logiqx;
+						// Only set this flag if the depreciated flag is not already
+						if ((datHeader.DatFormat & DatFormat.LogiqxDepreciated) == 0)
+						{
+							datHeader.DatFormat |= DatFormat.Logiqx;
+						}						
 						break;
 					case "quick":
 						quickScan = true;

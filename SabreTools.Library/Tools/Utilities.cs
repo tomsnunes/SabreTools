@@ -596,7 +596,9 @@ namespace SabreTools.Library.Tools
 				case DatFormat.Listrom:
 					return new Listrom(baseDat);
 				case DatFormat.Logiqx:
-					return new Logiqx(baseDat);
+					return new Logiqx(baseDat, false);
+				case DatFormat.LogiqxDepreciated:
+					return new Logiqx(baseDat, true);
 				case DatFormat.MissFile:
 					return new Missfile(baseDat);
 				case DatFormat.OfflineList:

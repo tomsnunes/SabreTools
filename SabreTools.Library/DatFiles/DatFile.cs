@@ -5726,6 +5726,10 @@ namespace SabreTools.Library.DatFiles
 			{
 				outfileNames.Add(DatFormat.Logiqx, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
 			}
+			if ((DatFormat & DatFormat.LogiqxDepreciated) != 0)
+			{
+				outfileNames.Add(DatFormat.LogiqxDepreciated, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
+			}
 
 			// Missfile
 			if ((DatFormat & DatFormat.MissFile) != 0
@@ -5742,6 +5746,7 @@ namespace SabreTools.Library.DatFiles
 			// OfflineList
 			if (((DatFormat & DatFormat.OfflineList) != 0)
 				&& (DatFormat & DatFormat.Logiqx) == 0
+				&& (DatFormat & DatFormat.LogiqxDepreciated) == 0
 				&& (DatFormat & DatFormat.SabreDat) == 0
 				&& (DatFormat & DatFormat.SoftwareList) == 0)
 			{
@@ -5749,6 +5754,7 @@ namespace SabreTools.Library.DatFiles
 			}
 			if (((DatFormat & DatFormat.OfflineList) != 0
 				&& ((DatFormat & DatFormat.Logiqx) != 0
+					|| (DatFormat & DatFormat.LogiqxDepreciated) != 0
 					|| (DatFormat & DatFormat.SabreDat) != 0
 					|| (DatFormat & DatFormat.SoftwareList) != 0)))
 			{
@@ -5792,11 +5798,11 @@ namespace SabreTools.Library.DatFiles
 			};
 
 			// SabreDAT
-			if ((DatFormat & DatFormat.SabreDat) != 0 && (DatFormat & DatFormat.Logiqx) == 0)
+			if ((DatFormat & DatFormat.SabreDat) != 0 && ((DatFormat & DatFormat.Logiqx) == 0 || (DatFormat & DatFormat.LogiqxDepreciated) == 0))
 			{
 				outfileNames.Add(DatFormat.SabreDat, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
 			};
-			if ((DatFormat & DatFormat.SabreDat) != 0 && (DatFormat & DatFormat.Logiqx) != 0)
+			if ((DatFormat & DatFormat.SabreDat) != 0 && ((DatFormat & DatFormat.Logiqx) != 0 || (DatFormat & DatFormat.LogiqxDepreciated) != 0))
 			{
 				outfileNames.Add(DatFormat.SabreDat, CreateOutfileNamesHelper(outDir, ".sd.xml", overwrite));
 			};
@@ -5804,12 +5810,14 @@ namespace SabreTools.Library.DatFiles
 			// Software List
 			if ((DatFormat & DatFormat.SoftwareList) != 0
 				&& (DatFormat & DatFormat.Logiqx) == 0
+				&& (DatFormat & DatFormat.LogiqxDepreciated) == 0
 				&& (DatFormat & DatFormat.SabreDat) == 0)
 			{
 				outfileNames.Add(DatFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
 			}
 			if ((DatFormat & DatFormat.SoftwareList) != 0
 				&& ((DatFormat & DatFormat.Logiqx) != 0
+					|| (DatFormat & DatFormat.LogiqxDepreciated) != 0
 					|| (DatFormat & DatFormat.SabreDat) != 0))
 			{
 				outfileNames.Add(DatFormat.SoftwareList, CreateOutfileNamesHelper(outDir, ".sl.xml", overwrite));

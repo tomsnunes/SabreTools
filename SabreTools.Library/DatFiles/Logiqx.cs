@@ -27,13 +27,18 @@ namespace SabreTools.Library.DatFiles
 	/// </summary>
 	internal class Logiqx : DatFile
 	{
+		// Private instance variables specific to Logiqx DATs
+		bool _depreciated;
+
 		/// <summary>
 		/// Constructor designed for casting a base DatFile
 		/// </summary>
 		/// <param name="datFile">Parent DatFile to copy from</param>
-		public Logiqx(DatFile datFile)
+		/// <param name="depreciated">True if the output uses "game", false if the output uses "machine"</param>
+		public Logiqx(DatFile datFile, bool depreciated)
 			: base(datFile, cloneHeader: false)
 		{
+			_depreciated = depreciated;
 		}
 
 		/// <summary>
@@ -1214,7 +1219,7 @@ namespace SabreTools.Library.DatFiles
 					rom.MachineName = rom.MachineName.Substring(1);
 				}
 
-				string state = "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
+				string state = "\t<" + (_depreciated ? "game" : "machine") + " name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
 								(ExcludeOf ? "" :
 									(rom.MachineType == MachineType.Bios ? " isbios=\"yes\"" : "") +
 									(rom.MachineType == MachineType.Device ? " isdevice=\"yes\"" : "") +
@@ -1257,7 +1262,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			try
 			{
-				string state = "\t</machine>\n";
+				string state = "\t</" + (_depreciated ? "game" : "machine") + ">\n";
 
 				sw.Write(state);
 				sw.Flush();

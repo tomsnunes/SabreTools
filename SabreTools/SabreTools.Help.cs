@@ -240,6 +240,17 @@ namespace SabreTools
 					null);
 			}
 		}
+		private static Feature depreciatedFlag
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-dpc", "--depreciated" },
+					"Output 'game' instead of 'machine'",
+					FeatureType.Flag,
+					null);
+			}
+		}
 		private static Feature descriptionAsNameFlag
 		{
 			get
@@ -2006,6 +2017,7 @@ namespace SabreTools
 			datFromDir.AddFeature("output-ssv", outputSsvFlag);
 			datFromDir.AddFeature("output-tsv", outputTsvFlag);
 			datFromDir.AddFeature("output-xml", outputXmlFlag);
+				datFromDir["output-xml"].AddFeature("depreciated", depreciatedFlag);
 			datFromDir.AddFeature("romba", rombaFlag);
 			datFromDir.AddFeature("skip-archives", skipArchivesFlag);
 			datFromDir.AddFeature("skip-files", skipFilesFlag);
@@ -2132,6 +2144,7 @@ namespace SabreTools
 			split.AddFeature("output-ssv", outputSsvFlag);
 			split.AddFeature("output-tsv", outputTsvFlag);
 			split.AddFeature("output-xml", outputXmlFlag);
+				split["output-xml"].AddFeature("depreciated", depreciatedFlag);
 			split.AddFeature("output-dir", outputDirStringInput);
 			split.AddFeature("inplace", inplaceFlag);
 			split.AddFeature("extension", extensionFlag);
@@ -2231,6 +2244,7 @@ namespace SabreTools
 				update["output-tsv"].AddFeature("postfix", postfixStringInput);
 				update["output-tsv"].AddFeature("quotes", quotesFlag);
 			update.AddFeature("output-xml", outputXmlFlag);
+				update["output-xml"].AddFeature("depreciated", depreciatedFlag);
 			update.AddFeature("filename", filenameStringInput);
 			update.AddFeature("name", nameStringInput);
 			update.AddFeature("description", descriptionStringInput);
