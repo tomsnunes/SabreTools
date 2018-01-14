@@ -1429,6 +1429,12 @@ namespace SabreTools.Library.DatFiles
 							i--; // This make sure that the pointer stays on the correct since one was removed
 						}
 					}
+
+					// If the key is now empty, remove it
+					if (this[key].Count == 0)
+					{
+						Remove(key);
+					}
 				}
 			}
 
@@ -1458,6 +1464,19 @@ namespace SabreTools.Library.DatFiles
 					// Add the list back to the dictionary
 					Remove(key);
 					AddRange(key, sortedlist);
+				});
+			}
+			// If the merge type is the same, we want to sort the dictionary to be consistent
+			else
+			{
+				List<string> keys = Keys;
+				Parallel.ForEach(keys, Globals.ParallelOptions, key =>
+				{
+					// Get the possibly unsorted list
+					List<DatItem> sortedlist = this[key];
+
+					// Sort the list of items to be consistent
+					DatItem.Sort(ref sortedlist, false);
 				});
 			}
 
@@ -2659,7 +2678,8 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
 
 			// Now we want to loop through all of the games and set the correct information
-			AddRomsFromDevices();
+			AddRomsFromDevices(true);
+			AddRomsFromDevices(false);
 
 			// Then, remove the romof and cloneof tags so it's not picked up by the manager
 			RemoveTagsFromChild();
@@ -2680,7 +2700,8 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
 
 			// Now we want to loop through all of the games and set the correct information
-			AddRomsFromDevices();
+			AddRomsFromDevices(true);
+			AddRomsFromDevices(false);
 			AddRomsFromParent();
 
 			// Now that we have looped through the cloneof tags, we loop through the romof tags
@@ -2808,15 +2829,22 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Use device_ref tags to add roms to the children
+		/// Use device_ref and slotoption tags to add roms to the children
 		/// </summary>
-		private void AddRomsFromDevices()
+		/// <param name="dev">True if only child device sets are touched, false for non-device sets (default)</param>
+		private void AddRomsFromDevices(bool dev = false)
 		{
 			List<string> games = Keys;
 			foreach (string game in games)
 			{
 				// If the game doesn't have items, we continue
 				if (this[game] == null || this[game].Count == 0)
+				{
+					continue;
+				}
+
+				// If the game (is/is not) a bios, we want to continue
+				if (dev ^ (this[game][0].MachineType & MachineType.Device) != 0)
 				{
 					continue;
 				}
@@ -2942,7 +2970,7 @@ namespace SabreTools.Library.DatFiles
 				foreach (DatItem item in items)
 				{
 					// If the disk doesn't have a valid merge tag OR the merged file doesn't exist in the parent, then add it
-					if (item.Type == ItemType.Disk && (item.MergeTag == null || !this[parent].Select(i => i.Name).Contains(item.MergeTag)))
+					if (item.Type == ItemType.Disk && (((Disk)item).MergeTag == null || !this[parent].Select(i => i.Name).Contains(((Disk)item).MergeTag)))
 					{
 						item.CopyMachineInformation(copyFrom);
 						Add(parent, item);
@@ -2976,8 +3004,8 @@ namespace SabreTools.Library.DatFiles
 			foreach (string game in games)
 			{
 				if (this[game].Count > 0
-					&& (this[game][0].MachineType == MachineType.Bios
-						|| this[game][0].MachineType == MachineType.Device))
+					&& ((this[game][0].MachineType & MachineType.Bios) != 0
+						|| (this[game][0].MachineType & MachineType.Device) != 0))
 				{
 					Remove(game);
 				}
@@ -3001,7 +3029,7 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// If the game (is/is not) a bios, we want to continue
-				if (bios ^ this[game][0].MachineType == MachineType.Bios)
+				if (bios ^ (this[game][0].MachineType & MachineType.Bios) != 0)
 				{
 					continue;
 				}

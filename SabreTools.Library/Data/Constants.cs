@@ -97,6 +97,332 @@ namespace SabreTools.Library.Data
 
 		#endregion
 
+		#region DTDs
+
+		public const string LogiqxDTD = @"<!--
+   ROM Management Datafile - DTD
+
+   For further information, see: http://www.logiqx.com/
+
+   This DTD module is identified by the PUBLIC and SYSTEM identifiers:
+
+   PUBLIC "" -//Logiqx//DTD ROM Management Datafile//EN""
+   SYSTEM ""http://www.logiqx.com/Dats/datafile.dtd""
+
+   $Revision: 1.5 $
+   $Date: 2008/10/28 21:39:16 $
+
+-->
+
+<!ELEMENT datafile(header?, game*, machine*)>
+	<!ATTLIST datafile build CDATA #IMPLIED>
+	<!ATTLIST datafile debug (yes|no) ""no"">
+	<!ELEMENT header(name, description, category?, version, date?, author, email?, homepage?, url?, comment?, clrmamepro?, romcenter?)>
+		<!ELEMENT name(#PCDATA)>
+		<!ELEMENT description (#PCDATA)>
+		<!ELEMENT category (#PCDATA)>
+		<!ELEMENT version (#PCDATA)>
+		<!ELEMENT date (#PCDATA)>
+		<!ELEMENT author (#PCDATA)>
+		<!ELEMENT email (#PCDATA)>
+		<!ELEMENT homepage (#PCDATA)>
+		<!ELEMENT url (#PCDATA)>
+		<!ELEMENT comment (#PCDATA)>
+		<!ELEMENT clrmamepro EMPTY>
+			<!ATTLIST clrmamepro header CDATA #IMPLIED>
+			<!ATTLIST clrmamepro forcemerging (none|split|full) ""split"">
+			<!ATTLIST clrmamepro forcenodump(obsolete|required|ignore) ""obsolete"">
+			<!ATTLIST clrmamepro forcepacking(zip|unzip) ""zip"">
+		<!ELEMENT romcenter EMPTY>
+			<!ATTLIST romcenter plugin CDATA #IMPLIED>
+			<!ATTLIST romcenter rommode (merged|split|unmerged) ""split"">
+			<!ATTLIST romcenter biosmode(merged|split|unmerged) ""split"">
+			<!ATTLIST romcenter samplemode(merged|unmerged) ""merged"">
+			<!ATTLIST romcenter lockrommode(yes|no) ""no"">
+			<!ATTLIST romcenter lockbiosmode(yes|no) ""no"">
+			<!ATTLIST romcenter locksamplemode(yes|no) ""no"">
+	<!ELEMENT game(comment*, description, year?, manufacturer?, release*, biosset*, rom*, disk*, sample*, archive*)>
+		<!ATTLIST game name CDATA #REQUIRED>
+		<!ATTLIST game sourcefile CDATA #IMPLIED>
+		<!ATTLIST game isbios (yes|no) ""no"">
+		<!ATTLIST game cloneof CDATA #IMPLIED>
+		<!ATTLIST game romof CDATA #IMPLIED>
+		<!ATTLIST game sampleof CDATA #IMPLIED>
+		<!ATTLIST game board CDATA #IMPLIED>
+		<!ATTLIST game rebuildto CDATA #IMPLIED>
+		<!ELEMENT year (#PCDATA)>
+		<!ELEMENT manufacturer (#PCDATA)>
+		<!ELEMENT release EMPTY>
+			<!ATTLIST release name CDATA #REQUIRED>
+			<!ATTLIST release region CDATA #REQUIRED>
+			<!ATTLIST release language CDATA #IMPLIED>
+			<!ATTLIST release date CDATA #IMPLIED>
+			<!ATTLIST release default (yes|no) ""no"">
+		<!ELEMENT biosset EMPTY>
+			<!ATTLIST biosset name CDATA #REQUIRED>
+			<!ATTLIST biosset description CDATA #REQUIRED>
+			<!ATTLIST biosset default (yes|no) ""no"">
+		<!ELEMENT rom EMPTY>
+			<!ATTLIST rom name CDATA #REQUIRED>
+			<!ATTLIST rom size CDATA #REQUIRED>
+			<!ATTLIST rom crc CDATA #IMPLIED>
+			<!ATTLIST rom md5 CDATA #IMPLIED>
+			<!ATTLIST rom sha1 CDATA #IMPLIED>
+			<!ATTLIST rom sha256 CDATA #IMPLIED>
+			<!ATTLIST rom sha384 CDATA #IMPLIED>
+			<!ATTLIST rom sha512 CDATA #IMPLIED>
+			<!ATTLIST rom merge CDATA #IMPLIED>
+			<!ATTLIST rom status (baddump|nodump|good|verified) ""good"">
+			<!ATTLIST rom date CDATA #IMPLIED>
+		<!ELEMENT disk EMPTY>
+			<!ATTLIST disk name CDATA #REQUIRED>
+			<!ATTLIST disk md5 CDATA #IMPLIED>
+			<!ATTLIST disk sha1 CDATA #IMPLIED>
+			<!ATTLIST disk sha256 CDATA #IMPLIED>
+			<!ATTLIST disk sha384 CDATA #IMPLIED>
+			<!ATTLIST disk sha512 CDATA #IMPLIED>
+			<!ATTLIST disk merge CDATA #IMPLIED>
+			<!ATTLIST disk status (baddump|nodump|good|verified) ""good"">
+		<!ELEMENT sample EMPTY>
+			<!ATTLIST sample name CDATA #REQUIRED>
+		<!ELEMENT archive EMPTY>
+			<!ATTLIST archive name CDATA #REQUIRED>
+	<!ELEMENT machine (comment*, description, year?, manufacturer?, release*, biosset*, rom*, disk*, sample*, archive*)>
+		<!ATTLIST machine name CDATA #REQUIRED>
+		<!ATTLIST machine sourcefile CDATA #IMPLIED>
+		<!ATTLIST machine isbios (yes|no) ""no"">
+		<!ATTLIST machine cloneof CDATA #IMPLIED>
+		<!ATTLIST machine romof CDATA #IMPLIED>
+		<!ATTLIST machine sampleof CDATA #IMPLIED>
+		<!ATTLIST machine board CDATA #IMPLIED>
+		<!ATTLIST machine rebuildto CDATA #IMPLIED>
+";
+		public const string MAMEDTD = @"<!ELEMENT mame (machine+)>
+	<!ATTLIST mame build CDATA #IMPLIED>
+	<!ATTLIST mame debug (yes|no) ""no"">
+	<!ATTLIST mame mameconfig CDATA #REQUIRED>
+	<!ELEMENT machine (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, feature*, device*, slot*, softwarelist*, ramoption*)>
+		<!ATTLIST machine name CDATA #REQUIRED>
+		<!ATTLIST machine sourcefile CDATA #IMPLIED>
+		<!ATTLIST machine isbios (yes|no) ""no"">
+		<!ATTLIST machine isdevice (yes|no) ""no"">
+		<!ATTLIST machine ismechanical (yes|no) ""no"">
+		<!ATTLIST machine runnable (yes|no) ""yes"">
+		<!ATTLIST machine cloneof CDATA #IMPLIED>
+		<!ATTLIST machine romof CDATA #IMPLIED>
+		<!ATTLIST machine sampleof CDATA #IMPLIED>
+		<!ELEMENT description (#PCDATA)>
+		<!ELEMENT year (#PCDATA)>
+		<!ELEMENT manufacturer (#PCDATA)>
+		<!ELEMENT biosset EMPTY>
+			<!ATTLIST biosset name CDATA #REQUIRED>
+			<!ATTLIST biosset description CDATA #REQUIRED>
+			<!ATTLIST biosset default (yes|no) ""no"">
+		<!ELEMENT rom EMPTY>
+			<!ATTLIST rom name CDATA #REQUIRED>
+			<!ATTLIST rom bios CDATA #IMPLIED>
+			<!ATTLIST rom size CDATA #REQUIRED>
+			<!ATTLIST rom crc CDATA #IMPLIED>
+			<!ATTLIST rom md5 CDATA #IMPLIED>
+			<!ATTLIST rom sha1 CDATA #IMPLIED>
+			<!ATTLIST rom sha256 CDATA #IMPLIED>
+			<!ATTLIST rom sha384 CDATA #IMPLIED>
+			<!ATTLIST rom sha512 CDATA #IMPLIED>
+			<!ATTLIST rom merge CDATA #IMPLIED>
+			<!ATTLIST rom region CDATA #IMPLIED>
+			<!ATTLIST rom offset CDATA #IMPLIED>
+			<!ATTLIST rom status (baddump|nodump|good) ""good"">
+			<!ATTLIST rom optional (yes|no) ""no"">
+		<!ELEMENT disk EMPTY>
+			<!ATTLIST disk name CDATA #REQUIRED>
+			<!ATTLIST disk md5 CDATA #IMPLIED>
+			<!ATTLIST disk sha1 CDATA #IMPLIED>
+			<!ATTLIST disk sha256 CDATA #IMPLIED>
+			<!ATTLIST disk sha384 CDATA #IMPLIED>
+			<!ATTLIST disk sha512 CDATA #IMPLIED>
+			<!ATTLIST disk merge CDATA #IMPLIED>
+			<!ATTLIST disk region CDATA #IMPLIED>
+			<!ATTLIST disk index CDATA #IMPLIED>
+			<!ATTLIST disk writable (yes|no) ""no"">
+			<!ATTLIST disk status (baddump|nodump|good) ""good"">
+			<!ATTLIST disk optional (yes|no) ""no"">
+		<!ELEMENT device_ref EMPTY>
+			<!ATTLIST device_ref name CDATA #REQUIRED>
+		<!ELEMENT sample EMPTY>
+			<!ATTLIST sample name CDATA #REQUIRED>
+		<!ELEMENT chip EMPTY>
+			<!ATTLIST chip name CDATA #REQUIRED>
+			<!ATTLIST chip tag CDATA #IMPLIED>
+			<!ATTLIST chip type (cpu|audio) #REQUIRED>
+			<!ATTLIST chip clock CDATA #IMPLIED>
+		<!ELEMENT display EMPTY>
+			<!ATTLIST display tag CDATA #IMPLIED>
+			<!ATTLIST display type (raster|vector|lcd|svg|unknown) #REQUIRED>
+			<!ATTLIST display rotate (0|90|180|270) #IMPLIED>
+			<!ATTLIST display flipx (yes|no) ""no"">
+			<!ATTLIST display width CDATA #IMPLIED>
+			<!ATTLIST display height CDATA #IMPLIED>
+			<!ATTLIST display refresh CDATA #REQUIRED>
+			<!ATTLIST display pixclock CDATA #IMPLIED>
+			<!ATTLIST display htotal CDATA #IMPLIED>
+			<!ATTLIST display hbend CDATA #IMPLIED>
+			<!ATTLIST display hbstart CDATA #IMPLIED>
+			<!ATTLIST display vtotal CDATA #IMPLIED>
+			<!ATTLIST display vbend CDATA #IMPLIED>
+			<!ATTLIST display vbstart CDATA #IMPLIED>
+		<!ELEMENT sound EMPTY>
+			<!ATTLIST sound channels CDATA #REQUIRED>
+		<!ELEMENT condition EMPTY>
+			<!ATTLIST condition tag CDATA #REQUIRED>
+			<!ATTLIST condition mask CDATA #REQUIRED>
+			<!ATTLIST condition relation (eq|ne|gt|le|lt|ge) #REQUIRED>
+			<!ATTLIST condition value CDATA #REQUIRED>
+		<!ELEMENT input (control*)>
+			<!ATTLIST input service (yes|no) ""no"">
+			<!ATTLIST input tilt (yes|no) ""no"">
+			<!ATTLIST input players CDATA #REQUIRED>
+			<!ATTLIST input coins CDATA #IMPLIED>
+			<!ELEMENT control EMPTY>
+				<!ATTLIST control type CDATA #REQUIRED>
+				<!ATTLIST control player CDATA #IMPLIED>
+				<!ATTLIST control buttons CDATA #IMPLIED>
+				<!ATTLIST control reqbuttons CDATA #IMPLIED>
+				<!ATTLIST control minimum CDATA #IMPLIED>
+				<!ATTLIST control maximum CDATA #IMPLIED>
+				<!ATTLIST control sensitivity CDATA #IMPLIED>
+				<!ATTLIST control keydelta CDATA #IMPLIED>
+				<!ATTLIST control reverse (yes|no) ""no"">
+				<!ATTLIST control ways CDATA #IMPLIED>
+				<!ATTLIST control ways2 CDATA #IMPLIED>
+				<!ATTLIST control ways3 CDATA #IMPLIED>
+		<!ELEMENT dipswitch (condition?, diplocation*, dipvalue*)>
+			<!ATTLIST dipswitch name CDATA #REQUIRED>
+			<!ATTLIST dipswitch tag CDATA #REQUIRED>
+			<!ATTLIST dipswitch mask CDATA #REQUIRED>
+			<!ELEMENT diplocation EMPTY>
+				<!ATTLIST diplocation name CDATA #REQUIRED>
+				<!ATTLIST diplocation number CDATA #REQUIRED>
+				<!ATTLIST diplocation inverted (yes|no) ""no"">
+			<!ELEMENT dipvalue (condition?)>
+				<!ATTLIST dipvalue name CDATA #REQUIRED>
+				<!ATTLIST dipvalue value CDATA #REQUIRED>
+				<!ATTLIST dipvalue default (yes|no) ""no"">
+		<!ELEMENT configuration (condition?, conflocation*, confsetting*)>
+			<!ATTLIST configuration name CDATA #REQUIRED>
+			<!ATTLIST configuration tag CDATA #REQUIRED>
+			<!ATTLIST configuration mask CDATA #REQUIRED>
+			<!ELEMENT conflocation EMPTY>
+				<!ATTLIST conflocation name CDATA #REQUIRED>
+				<!ATTLIST conflocation number CDATA #REQUIRED>
+				<!ATTLIST conflocation inverted (yes|no) ""no"">
+			<!ELEMENT confsetting (condition?)>
+				<!ATTLIST confsetting name CDATA #REQUIRED>
+				<!ATTLIST confsetting value CDATA #REQUIRED>
+				<!ATTLIST confsetting default (yes|no) ""no"">
+		<!ELEMENT port (analog*)>
+			<!ATTLIST port tag CDATA #REQUIRED>
+			<!ELEMENT analog EMPTY>
+				<!ATTLIST analog mask CDATA #REQUIRED>
+		<!ELEMENT adjuster (condition?)>
+			<!ATTLIST adjuster name CDATA #REQUIRED>
+			<!ATTLIST adjuster default CDATA #REQUIRED>
+		<!ELEMENT driver EMPTY>
+			<!ATTLIST driver status (good|imperfect|preliminary) #REQUIRED>
+			<!ATTLIST driver emulation (good|imperfect|preliminary) #REQUIRED>
+			<!ATTLIST driver cocktail (good|imperfect|preliminary) #IMPLIED>
+			<!ATTLIST driver savestate (supported|unsupported) #REQUIRED>
+		<!ELEMENT feature EMPTY>
+			<!ATTLIST feature type (protection|palette|graphics|sound|controls|keyboard|mouse|microphone|camera|disk|printer|lan|wan|timing) #REQUIRED>
+			<!ATTLIST feature status (unemulated|imperfect) #IMPLIED>
+			<!ATTLIST feature overall (unemulated|imperfect) #IMPLIED>
+		<!ELEMENT device (instance?, extension*)>
+			<!ATTLIST device type CDATA #REQUIRED>
+			<!ATTLIST device tag CDATA #IMPLIED>
+			<!ATTLIST device fixed_image CDATA #IMPLIED>
+			<!ATTLIST device mandatory CDATA #IMPLIED>
+			<!ATTLIST device interface CDATA #IMPLIED>
+			<!ELEMENT instance EMPTY>
+				<!ATTLIST instance name CDATA #REQUIRED>
+				<!ATTLIST instance briefname CDATA #REQUIRED>
+			<!ELEMENT extension EMPTY>
+				<!ATTLIST extension name CDATA #REQUIRED>
+		<!ELEMENT slot (slotoption*)>
+			<!ATTLIST slot name CDATA #REQUIRED>
+			<!ELEMENT slotoption EMPTY>
+				<!ATTLIST slotoption name CDATA #REQUIRED>
+				<!ATTLIST slotoption devname CDATA #REQUIRED>
+				<!ATTLIST slotoption default (yes|no) ""no"">
+		<!ELEMENT softwarelist EMPTY>
+			<!ATTLIST softwarelist name CDATA #REQUIRED>
+			<!ATTLIST softwarelist status (original|compatible) #REQUIRED>
+			<!ATTLIST softwarelist filter CDATA #IMPLIED>
+		<!ELEMENT ramoption (#PCDATA)>
+			<!ATTLIST ramoption default CDATA #IMPLIED>
+";
+		public const string SoftwareListDTD = @"<!ELEMENT softwarelist (software+)>
+	<!ATTLIST softwarelist name CDATA #REQUIRED>
+	<!ATTLIST softwarelist description CDATA #IMPLIED>
+	<!ELEMENT software (description, year, publisher, info*, sharedfeat*, part*)>
+		<!ATTLIST software name CDATA #REQUIRED>
+		<!ATTLIST software cloneof CDATA #IMPLIED>
+		<!ATTLIST software supported (yes|partial|no) ""yes"">
+		<!ELEMENT description (#PCDATA)>
+		<!ELEMENT year (#PCDATA)>
+		<!ELEMENT publisher (#PCDATA)>
+		<!ELEMENT info EMPTY>
+			<!ATTLIST info name CDATA #REQUIRED>
+			<!ATTLIST info value CDATA #IMPLIED>
+		<!ELEMENT sharedfeat EMPTY>
+			<!ATTLIST sharedfeat name CDATA #REQUIRED>
+			<!ATTLIST sharedfeat value CDATA #IMPLIED>
+		<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>
+			<!ATTLIST part name CDATA #REQUIRED>
+			<!ATTLIST part interface CDATA #REQUIRED>
+			<!-- feature is used to store things like pcb-type, mapper type, etc. Specific values depend on the system. -->
+			<!ELEMENT feature EMPTY>
+				<!ATTLIST feature name CDATA #REQUIRED>
+				<!ATTLIST feature value CDATA #IMPLIED>
+			<!ELEMENT dataarea (rom*)>
+				<!ATTLIST dataarea name CDATA #REQUIRED>
+				<!ATTLIST dataarea size CDATA #REQUIRED>
+				<!ATTLIST dataarea width (8|16|32|64) ""8"">
+				<!ATTLIST dataarea endianness (big|little) ""little"">
+				<!ELEMENT rom EMPTY>
+					<!ATTLIST rom name CDATA #IMPLIED>
+					<!ATTLIST rom size CDATA #IMPLIED>
+					<!ATTLIST rom crc CDATA #IMPLIED>
+					<!ATTLIST rom md5 CDATA #IMPLIED>
+					<!ATTLIST rom sha1 CDATA #IMPLIED>
+					<!ATTLIST rom sha256 CDATA #IMPLIED>
+					<!ATTLIST rom sha384 CDATA #IMPLIED>
+					<!ATTLIST rom sha512 CDATA #IMPLIED>
+					<!ATTLIST rom offset CDATA #IMPLIED>
+					<!ATTLIST rom value CDATA #IMPLIED>
+					<!ATTLIST rom status (baddump|nodump|good) ""good"">
+					<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload|fill|continue|reload_plain|ignore) #IMPLIED>
+			<!ELEMENT diskarea (disk*)>
+				<!ATTLIST diskarea name CDATA #REQUIRED>
+				<!ELEMENT disk EMPTY>
+					<!ATTLIST disk name CDATA #REQUIRED>
+					<!ATTLIST disk md5 CDATA #IMPLIED>
+					<!ATTLIST disk sha1 CDATA #IMPLIED>
+					<!ATTLIST disk sha256 CDATA #IMPLIED>
+					<!ATTLIST disk sha384 CDATA #IMPLIED>
+					<!ATTLIST disk sha512 CDATA #IMPLIED>
+					<!ATTLIST disk status (baddump|nodump|good) ""good"">
+					<!ATTLIST disk writeable (yes|no) ""no"">
+			<!ELEMENT dipswitch (dipvalue*)>
+				<!ATTLIST dipswitch name CDATA #REQUIRED>
+				<!ATTLIST dipswitch tag CDATA #REQUIRED>
+				<!ATTLIST dipswitch mask CDATA #REQUIRED>
+				<!ELEMENT dipvalue EMPTY>
+					<!ATTLIST dipvalue name CDATA #REQUIRED>
+					<!ATTLIST dipvalue value CDATA #REQUIRED>
+					<!ATTLIST dipvalue default (yes|no) ""no"">
+";
+
+		#endregion
+
 		#region Hash string length constants
 
 		public const int CRCLength = 8;

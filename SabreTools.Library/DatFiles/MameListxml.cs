@@ -21,22 +21,22 @@ using NaturalSort;
 namespace SabreTools.Library.DatFiles
 {
 	/// <summary>
-	/// Represents parsing and writing of a SofwareList, M1, or MAME XML DAT
+	/// Represents parsing and writing of a MAME XML DAT
 	/// </summary>
 	/// TODO: Verify that all read/write for this DatFile type is correct
-	internal class SoftwareList : DatFile
+	internal class MameListxml : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile
 		/// </summary>
 		/// <param name="datFile">Parent DatFile to copy from</param>
-		public SoftwareList(DatFile datFile)
+		public MameListxml(DatFile datFile)
 			: base(datFile, cloneHeader: false)
 		{
 		}
 
 		/// <summary>
-		/// Parse an SofwareList XML DAT and return all found games and roms within
+		/// Parse a MAME XML DAT and return all found games and roms within
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
@@ -85,28 +85,25 @@ namespace SabreTools.Library.DatFiles
 
 					switch (xtr.Name)
 					{
-						case "softwarelist":
-							Name = (String.IsNullOrWhiteSpace(Name) ? xtr.GetAttribute("name") ?? "" : Name);
-							Description = (String.IsNullOrWhiteSpace(Description) ? xtr.GetAttribute("description") ?? "" : Description);
-							if (ForceMerging == ForceMerging.None)
-							{
-								ForceMerging = Utilities.GetForceMerging(xtr.GetAttribute("forcemerging"));
-							}
-							if (ForceNodump == ForceNodump.None)
-							{
-								ForceNodump = Utilities.GetForceNodump(xtr.GetAttribute("forcenodump"));
-							}
-							if (ForcePacking == ForcePacking.None)
-							{
-								ForcePacking = Utilities.GetForcePacking(xtr.GetAttribute("forcepacking"));
-							}
+						case "mame":
+							Name = (String.IsNullOrWhiteSpace(Name) ? xtr.GetAttribute("build") : Name);
+							Description = (String.IsNullOrWhiteSpace(Description) ? Name : Name);
+							// string debug = xtr.GetAttribute("debug"); // (yes|no) "no"
+							// string mameconfig = xtr.GetAttribute("mameconfig"); CDATA
+							xtr.Read();
+							break;
+						// Handle M1 DATs since they're 99% the same as a SL DAT
+						case "m1":
+							Name = (String.IsNullOrWhiteSpace(Name) ? "M1" : Name);
+							Description = (String.IsNullOrWhiteSpace(Description) ? "M1" : Description);
+							Version = (String.IsNullOrWhiteSpace(Version) ? xtr.GetAttribute("version") ?? "" : Version);
 							xtr.Read();
 							break;
 						// We want to process the entire subtree of the machine
-						case "software":
-							ReadSoftware(xtr.ReadSubtree(), filename, sysid, srcid, keep, clean, remUnicode);
+						case "machine":
+							ReadMachine(xtr.ReadSubtree(), filename, sysid, srcid, keep, clean, remUnicode);
 
-							// Skip the software now that we've processed it
+							// Skip the machine now that we've processed it
 							xtr.Skip();
 							break;
 						default:
@@ -127,7 +124,7 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
-		/// Read software information
+		/// Read machine information
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
@@ -135,7 +132,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		private void ReadSoftware(
+		private void ReadMachine(
 			XmlReader reader,
 
 			// Standard Dat parsing
@@ -148,7 +145,7 @@ namespace SabreTools.Library.DatFiles
 			bool clean,
 			bool remUnicode)
 		{
-			// If we have an empty software, skip it
+			// If we have an empty machine, skip it
 			if (reader == null)
 			{
 				return;
@@ -180,9 +177,14 @@ namespace SabreTools.Library.DatFiles
 			{
 				Name = reader.GetAttribute("name"),
 				Description = reader.GetAttribute("name"),
-				Supported = Utilities.GetYesNo(reader.GetAttribute("supported")), // (yes|partial|no) "yes"
+				SourceFile = reader.GetAttribute("sourcefile"),
+				Runnable = Utilities.GetYesNo(reader.GetAttribute("runnable")),
+
+				Comment = "",
 
 				CloneOf = reader.GetAttribute("cloneof") ?? "",
+				RomOf = reader.GetAttribute("romof") ?? "",
+				SampleOf = reader.GetAttribute("sampleof") ?? "",
 
 				MachineType = (machineType == MachineType.NULL ? MachineType.None : machineType),
 			};
@@ -196,7 +198,7 @@ namespace SabreTools.Library.DatFiles
 					continue;
 				}
 
-				// Get the elements from the software
+				// Get the roms from the machine
 				switch (reader.Name)
 				{
 					case "description":
@@ -205,25 +207,283 @@ namespace SabreTools.Library.DatFiles
 					case "year":
 						machine.Year = reader.ReadElementContentAsString();
 						break;
-					case "publisher":
-						machine.Publisher = reader.ReadElementContentAsString();
+					case "manufacturer":
+						machine.Manufacturer = reader.ReadElementContentAsString();
 						break;
-					case "info":
-						machine.Infos.Add(new Tuple<string, string>(reader.GetAttribute("name"), reader.GetAttribute("value")));
+					case "biosset":
+						containsItems = true;
+
+						DatItem biosset = new BiosSet
+						{
+							Name = reader.GetAttribute("name"),
+							Description = reader.GetAttribute("description"),
+							Default = Utilities.GetYesNo(reader.GetAttribute("default")),
+
+							SystemID = sysid,
+							System = filename,
+							SourceID = srcid,
+						};
+
+						biosset.CopyMachineInformation(machine);
+
+						// Now process and add the rom
+						key = ParseAddHelper(biosset, clean, remUnicode);
 
 						reader.Read();
 						break;
-					case "sharedfeat":
+					case "rom":
+						containsItems = true;
+
+						DatItem rom = new Rom
+						{
+							Name = reader.GetAttribute("name"),
+							Bios = reader.GetAttribute("bios"),
+							Size = Utilities.GetSize(reader.GetAttribute("size")),
+							CRC = reader.GetAttribute("crc")?.ToLowerInvariant(),
+							MD5 = reader.GetAttribute("md5")?.ToLowerInvariant(),
+							SHA1 = reader.GetAttribute("sha1")?.ToLowerInvariant(),
+							SHA256 = reader.GetAttribute("sha256")?.ToLowerInvariant(),
+							SHA384 = reader.GetAttribute("sha384")?.ToLowerInvariant(),
+							SHA512 = reader.GetAttribute("sha512")?.ToLowerInvariant(),
+							MergeTag = reader.GetAttribute("merge"),
+							Region = reader.GetAttribute("region"),
+							Offset = reader.GetAttribute("offset"),
+							ItemStatus = Utilities.GetItemStatus(reader.GetAttribute("status")),
+							Optional = Utilities.GetYesNo(reader.GetAttribute("optional")),
+
+							SystemID = sysid,
+							System = filename,
+							SourceID = srcid,
+						};
+
+						rom.CopyMachineInformation(machine);
+
+						// Now process and add the rom
+						key = ParseAddHelper(rom, clean, remUnicode);
+
+						reader.Read();
+						break;
+					case "disk":
+						containsItems = true;
+
+						DatItem disk = new Disk
+						{
+							Name = reader.GetAttribute("name"),
+							MD5 = reader.GetAttribute("md5")?.ToLowerInvariant(),
+							SHA1 = reader.GetAttribute("sha1")?.ToLowerInvariant(),
+							SHA256 = reader.GetAttribute("sha256")?.ToLowerInvariant(),
+							SHA384 = reader.GetAttribute("sha384")?.ToLowerInvariant(),
+							SHA512 = reader.GetAttribute("sha512")?.ToLowerInvariant(),
+							MergeTag = reader.GetAttribute("merge"),
+							Region = reader.GetAttribute("region"),
+							Index = reader.GetAttribute("index"),
+							Writable = Utilities.GetYesNo(reader.GetAttribute("writable")),
+							ItemStatus = Utilities.GetItemStatus(reader.GetAttribute("status")),
+							Optional = Utilities.GetYesNo(reader.GetAttribute("optional")),
+
+							SystemID = sysid,
+							System = filename,
+							SourceID = srcid,
+						};
+
+						disk.CopyMachineInformation(machine);
+
+						// Now process and add the rom
+						key = ParseAddHelper(disk, clean, remUnicode);
+
+						reader.Read();
+						break;
+					case "device_ref":
+						machine.Devices.Add(reader.ReadElementContentAsString());
+
+						reader.Read();
+						break;
+					case "sample":
+						containsItems = true;
+
+						DatItem samplerom = new Sample
+						{
+							Name = reader.GetAttribute("name"),
+
+							SystemID = sysid,
+							System = filename,
+							SourceID = srcid,
+						};
+
+						samplerom.CopyMachineInformation(machine);
+
+						// Now process and add the rom
+						key = ParseAddHelper(samplerom, clean, remUnicode);
+
+						reader.Read();
+						break;
+					case "chip":
 						// string name = reader.GetAttribute("name");
+						// string tag = reader.GetAttribute("tag");
+						// string type = reader.GetAttribute("type"); // (cpu|audio)
+						// string clock = reader.GetAttribute("clock");
+
+						reader.Read();
+						break;
+					case "display":
+						// string tag = reader.GetAttribute("tag");
+						// string type = reader.GetAttribute("type"); // (raster|vector|lcd|svg|unknown)
+						// string rotate = reader.GetAttribute("rotate"); // (0|90|180|270)
+						// bool? flipx = Utilities.GetYesNo(reader.GetAttribute("flipx"));
+						// string width = reader.GetAttribute("width");
+						// string height = reader.GetAttribute("height");
+						// string refresh = reader.GetAttribute("refresh");
+						// string pixclock = reader.GetAttribute("pixclock");
+						// string htotal = reader.GetAttribute("htotal");
+						// string hbend = reader.GetAttribute("hbend");
+						// string hbstart = reader.GetAttribute("hbstart");
+						// string vtotal = reader.GetAttribute("vtotal");
+						// string vbend = reader.GetAttribute("vbend");
+						// string vbstart = reader.GetAttribute("vbstart");
+
+						reader.Read();
+						break;
+					case "sound":
+						// string channels = reader.GetAttribute("channels");
+
+						reader.Read();
+						break;
+					case "condition":
+						// string tag = reader.GetAttribute("tag");
+						// string mask = reader.GetAttribute("mask");
+						// string relation = reader.GetAttribute("relation"); // (eq|ne|gt|le|lt|ge)
 						// string value = reader.GetAttribute("value");
 
 						reader.Read();
 						break;
-					case "part": // Contains all rom and disk information
-						containsItems = ReadPart(reader.ReadSubtree(), machine, filename, sysid, srcid, keep, clean, remUnicode);
+					case "input":
+						// bool? service = Utilities.GetYesNo(reader.GetAttribute("service"));
+						// bool? tilt = Utilities.GetYesNo(reader.GetAttribute("tilt"));
+						// string players = reader.GetAttribute("players");
+						// string coins = reader.GetAttribute("coins");
 
-						// Skip the part now that we've processed it
-						reader.Skip();
+						// // While the subtree contains <control> elements...
+						// string type = reader.GetAttribute("type");
+						// string player = reader.GetAttribute("player");
+						// string buttons = reader.GetAttribute("buttons");
+						// string regbuttons = reader.GetAttribute("regbuttons");
+						// string minimum = reader.GetAttribute("minimum");
+						// string maximum = reader.GetAttribute("maximum");
+						// string sensitivity = reader.GetAttribute("sensitivity");
+						// string keydelta = reader.GetAttribute("keydelta");
+						// bool? reverse = Utilities.GetYesNo(reader.GetAttribute("reverse"));
+						// string ways = reader.GetAttribute("ways");
+						// string ways2 = reader.GetAttribute("ways2");
+						// string ways3 = reader.GetAttribute("ways3");
+
+						reader.Read();
+						break;
+					case "dipswitch":
+						// string name = reader.GetAttribute("name");
+						// string tag = reader.GetAttribute("tag");
+						// string mask = reader.GetAttribute("mask");
+
+						// // While the subtree contains <diplocation> elements...
+						// string name = reader.GetAttribute("name");
+						// string number = reader.GetAttribute("number");
+						// bool? inverted = Utilities.GetYesNo(reader.GetAttribute("inverted"));
+
+						// // While the subtree contains <dipvalue> elements...
+						// string name = reader.GetAttribute("name");
+						// string value = reader.GetAttribute("value");
+						// bool? default = Utilities.GetYesNo(reader.GetAttribute("default"));
+
+						reader.Read();
+						break;
+					case "configuration":
+						// string name = reader.GetAttribute("name");
+						// string tag = reader.GetAttribute("tag");
+						// string mask = reader.GetAttribute("mask");
+
+						// // While the subtree contains <conflocation> elements...
+						// string name = reader.GetAttribute("name");
+						// string number = reader.GetAttribute("number");
+						// bool? inverted = Utilities.GetYesNo(reader.GetAttribute("inverted"));
+
+						// // While the subtree contains <confsetting> elements...
+						// string name = reader.GetAttribute("name");
+						// string value = reader.GetAttribute("value");
+						// bool? default = Utilities.GetYesNo(reader.GetAttribute("default"));
+
+						reader.Read();
+						break;
+					case "port":
+						// string tag = reader.GetAttribute("tag");
+
+						// // While the subtree contains <analog> elements...
+						// string mask = reader.GetAttribute("mask");
+
+						reader.Read();
+						break;
+					case "adjuster":
+						// string name = reader.GetAttribute("name");
+						// bool? default = Utilities.GetYesNo(reader.GetAttribute("default"));
+
+						// // For the one possible <condition> element...
+						// string tag = reader.GetAttribute("tag");
+						// string mask = reader.GetAttribute("mask");
+						// string relation = reader.GetAttribute("relation"); // (eq|ne|gt|le|lt|ge)
+						// string value = reader.GetAttribute("value");
+
+						reader.Read();
+						break;
+					case "driver":
+						// string status = reader.GetAttribute("status"); // (good|imperfect|preliminary)
+						// string emulation = reader.GetAttribute("emulation"); // (good|imperfect|preliminary)
+						// string cocktail = reader.GetAttribute("cocktail"); // (good|imperfect|preliminary)
+						// string savestate = reader.GetAttribute("savestate"); // (supported|unsupported)
+
+						reader.Read();
+						break;
+					case "feature":
+						// string type = reader.GetAttribute("type"); // (protection|palette|graphics|sound|controls|keyboard|mouse|microphone|camera|disk|printer|lan|wan|timing)
+						// string status = reader.GetAttribute("status"); // (unemulated|imperfect)
+						// string overall = reader.GetAttribute("overall"); // (unemulated|imperfect)
+
+						reader.Read();
+						break;
+					case "device":
+						// string type = reader.GetAttribute("type");
+						// string tag = reader.GetAttribute("tag");
+						// string fixed_image = reader.GetAttribute("fixed_image");
+						// string mandatory = reader.GetAttribute("mandatory");
+						// string interface = reader.GetAttribute("interface");
+
+						// // For the one possible <instance> element...
+						// string name = reader.GetAttribute("name");
+						// string briefname = reader.GetAttribute("briefname");
+
+						// // While the subtree contains <extension> elements...
+						// string name = reader.GetAttribute("name");
+
+						reader.Read();
+						break;
+					case "slot":
+						// string name = reader.GetAttribute("name");
+
+						// // While the subtree contains <slotoption> elements... (These get added as devices currently)
+						// string name = reader.GetAttribute("name");
+						// string devname = reader.GetAttribute("devname");
+						// bool? default = Utilities.GetYesNo(reader.GetAttribute("default"));
+
+						reader.Read();
+						break;
+					case "softwarelist":
+						// string name = reader.GetAttribute("name");
+						// string status = reader.GetAttribute("status"); // (original|compatible)
+						// string filter = reader.GetAttribute("filter");
+
+						reader.Read();
+						break;
+					case "ramoption":
+						// string default = reader.GetAttribute("default");
+
+						reader.Read();
 						break;
 					default:
 						reader.Read();
@@ -246,193 +506,6 @@ namespace SabreTools.Library.DatFiles
 				// Now process and add the rom
 				key = ParseAddHelper(blank, clean, remUnicode);
 			}
-		}
-
-		/// <summary>
-		/// Read part information
-		/// </summary>
-		/// <param name="filename">Name of the file to be parsed</param>
-		/// <param name="sysid">System ID for the DAT</param>
-		/// <param name="srcid">Source ID for the DAT</param>
-		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
-		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
-		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		private bool ReadPart(
-			XmlReader reader,
-			Machine machine,
-
-			// Standard Dat parsing
-			string filename,
-			int sysid,
-			int srcid,
-
-			// Miscellaneous
-			bool keep,
-			bool clean,
-			bool remUnicode)
-		{
-			string key = "", areaname = "", partname = "", partinterface = "";
-			string temptype = reader.Name;
-			long? areasize = null;
-			List<Tuple<string, string>> features = new List<Tuple<string, string>>();
-			bool containsItems = false;
-
-			while (!reader.EOF)
-			{
-				// We only want elements
-				if (reader.NodeType != XmlNodeType.Element)
-				{
-					if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "part")
-					{
-						partname = "";
-						partinterface = "";
-						features = new List<Tuple<string, string>>();
-					}
-					if (reader.NodeType == XmlNodeType.EndElement && (reader.Name == "dataarea" || reader.Name == "diskarea"))
-					{
-						areaname = "";
-						areasize = null;
-					}
-
-					reader.Read();
-					continue;
-				}
-
-				// Get the elements from the software
-				switch (reader.Name)
-				{
-					case "part":
-						partname = reader.GetAttribute("name");
-						partinterface = reader.GetAttribute("interface");
-
-						reader.Read();
-						break;
-					case "feature":
-						features.Add(new Tuple<string, string>(reader.GetAttribute("name"), reader.GetAttribute("feature")));
-
-						reader.Read();
-						break;
-					case "dataarea":
-						areaname = reader.GetAttribute("name");
-						if (reader.GetAttribute("size") != null)
-						{
-							if (Int64.TryParse(reader.GetAttribute("size"), out long tempas))
-							{
-								areasize = tempas;
-							}
-						}
-						// string width = reader.GetAttribute("width"); // (8|16|32|64) "8"
-						// string endianness = reader.GetAttribute("endianness"); // endianness (big|little) "little"
-						
-						reader.Read();
-						break;
-					case "rom": // TODO: Put this in a proper subreader under dataarea
-						containsItems = true;
-
-						// If the rom is continue or ignore, add the size to the previous rom
-						if (reader.GetAttribute("loadflag") == "continue" || reader.GetAttribute("loadflag") == "ignore")
-						{
-							int index = this[key].Count - 1;
-							DatItem lastrom = this[key][index];
-							if (lastrom.Type == ItemType.Rom)
-							{
-								((Rom)lastrom).Size += Utilities.GetSize(reader.GetAttribute("size"));
-							}
-							this[key].RemoveAt(index);
-							this[key].Add(lastrom);
-							reader.Read();
-							continue;
-						}
-
-						DatItem rom = new Rom
-						{
-							Name = reader.GetAttribute("name"),
-							Size = Utilities.GetSize(reader.GetAttribute("size")),
-							CRC = reader.GetAttribute("crc")?.ToLowerInvariant(),
-							MD5 = reader.GetAttribute("md5")?.ToLowerInvariant(),
-							SHA1 = reader.GetAttribute("sha1")?.ToLowerInvariant(),
-							SHA256 = reader.GetAttribute("sha256")?.ToLowerInvariant(),
-							SHA384 = reader.GetAttribute("sha384")?.ToLowerInvariant(),
-							SHA512 = reader.GetAttribute("sha512")?.ToLowerInvariant(),
-							Offset = reader.GetAttribute("offset"),
-							// Value = reader.GetAttribute("value");
-							ItemStatus = Utilities.GetItemStatus(reader.GetAttribute("status")),
-							// LoadFlag = reader.GetAttribute("loadflag"), // (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload|fill|continue|reload_plain|ignore)
-
-							AreaName = areaname,
-							AreaSize = areasize,
-							Features = features,
-							PartName = partname,
-							PartInterface = partinterface,
-
-							SystemID = sysid,
-							System = filename,
-							SourceID = srcid,
-						};
-
-						rom.CopyMachineInformation(machine);
-
-						// Now process and add the rom
-						key = ParseAddHelper(rom, clean, remUnicode);
-
-						reader.Read();
-						break;
-					case "diskarea":
-						areaname = reader.GetAttribute("name");
-
-						reader.Read();
-						break;
-					case "disk": // TODO: Put this in a proper subreader under diskarea
-						containsItems = true;
-
-						DatItem disk = new Disk
-						{
-							Name = reader.GetAttribute("name"),
-							MD5 = reader.GetAttribute("md5")?.ToLowerInvariant(),
-							SHA1 = reader.GetAttribute("sha1")?.ToLowerInvariant(),
-							SHA256 = reader.GetAttribute("sha256")?.ToLowerInvariant(),
-							SHA384 = reader.GetAttribute("sha384")?.ToLowerInvariant(),
-							SHA512 = reader.GetAttribute("sha512")?.ToLowerInvariant(),
-							ItemStatus = Utilities.GetItemStatus(reader.GetAttribute("status")),
-							Writable = Utilities.GetYesNo(reader.GetAttribute("writable")),
-
-							AreaName = areaname,
-							AreaSize = areasize,
-							Features = features,
-							PartName = partname,
-							PartInterface = partinterface,
-
-							SystemID = sysid,
-							System = filename,
-							SourceID = srcid,
-						};
-
-						disk.CopyMachineInformation(machine);
-
-						// Now process and add the rom
-						key = ParseAddHelper(disk, clean, remUnicode);
-
-						reader.Read();
-						break;
-					case "dipswitch":
-						// string name = reader.GetAttribute("name");
-						// string tag = reader.GetAttribute("tag");
-						// string mask = reader.GetAttribute("mask");
-
-						// For every <dipvalue> element...
-						// string name = reader.GetAttribute("name");
-						// string value = reader.GetAttribute("value");
-						// bool? default = Utilities.GetYesNo(reader.GetAttribute("default")); // (yes|no) "no"
-
-						reader.Read();
-						break;
-					default:
-						reader.Read();
-						break;
-				}
-			}
-
-			return containsItems;
 		}
 
 		/// <summary>
@@ -542,18 +615,9 @@ namespace SabreTools.Library.DatFiles
 			try
 			{
 				string header = "<?xml version=\"1.0\"?>\n" +
-							"<!DOCTYPE softwarelist SYSTEM \"softwarelist.dtd\">\n\n" +
-							"<softwarelist name=\"" + HttpUtility.HtmlEncode(Name) + "\"" +
-								" description=\"" + HttpUtility.HtmlEncode(Description) + "\"" +
-								(ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
-								(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
-								(ForceMerging == ForceMerging.Full ? " forcemerging=\"full\"" : "") +
-								(ForceMerging == ForceMerging.Split ? " forcemerging=\"split\"" : "") +
-								(ForceMerging == ForceMerging.Merged ? " forcemerging=\"merged\"" : "") +
-								(ForceMerging == ForceMerging.NonMerged ? " forcemerging=\"nonmerged\"" : "") +
-								(ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
-								(ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"obsolete\"" : "") +
-								(ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
+							"<mame build=\"" + HttpUtility.HtmlEncode(Name) + "\"" +
+								// " debug=\"" + Debug + "\"" +
+								// " mameconfig=\"" + MameConfig + "\"" +
 								">\n\n";
 
 				// Write the header out
@@ -585,13 +649,23 @@ namespace SabreTools.Library.DatFiles
 					rom.MachineName = rom.MachineName.Substring(1);
 				}
 
-				string state = "\t<software name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\""
+				string state = "\t<machine name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\""
+							+ (rom.SourceFile != null ? " sourcefile=\"" + rom.SourceFile + "\"" : "")
+							+ ((rom.MachineType & MachineType.Bios) != 0 ? " isbios=\"yes\"" : "")
+							+ ((rom.MachineType & MachineType.Device) != 0 ? " isdevice=\"yes\"" : "")
+							+ ((rom.MachineType & MachineType.Mechanical) != 0 ? " ismechanical=\"yes\"" : "")
+							+ (rom.Runnable != null ? " runnable=\"" + rom.Runnable + "\"" : "")
 							+ (ExcludeOf ? "" :
 									(String.IsNullOrWhiteSpace(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
 										? ""
-										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"")
-								)
-							+ " supported=\"" + (rom.Supported == true ? "yes" : rom.Supported == false ? "no" : "partial") + "\">\n"
+										: " cloneof=\"" + HttpUtility.HtmlEncode(rom.CloneOf) + "\"") +
+									(String.IsNullOrWhiteSpace(rom.RomOf) || (rom.MachineName.ToLowerInvariant() == rom.RomOf.ToLowerInvariant())
+										? ""
+										: " romof=\"" + HttpUtility.HtmlEncode(rom.RomOf) + "\"") +
+									(String.IsNullOrWhiteSpace(rom.SampleOf) || (rom.MachineName.ToLowerInvariant() == rom.SampleOf.ToLowerInvariant())
+										? ""
+										: " sampleof=\"" + HttpUtility.HtmlEncode(rom.SampleOf) + "\"")
+								) + ">\n"
 							+ "\t\t<description>" + HttpUtility.HtmlEncode(rom.MachineDescription) + "</description>\n"
 							+ (rom.Year != null ? "\t\t<year>" + HttpUtility.HtmlEncode(rom.Year) + "</year>\n" : "")
 							+ (rom.Publisher != null ? "\t\t<publisher>" + HttpUtility.HtmlEncode(rom.Publisher) + "</publisher>\n" : "");
@@ -622,7 +696,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			try
 			{
-				string state = "\t</software>\n\n";
+				string state = "\t</machine>\n";
 
 				sw.Write(state);
 				sw.Flush();
@@ -656,33 +730,35 @@ namespace SabreTools.Library.DatFiles
 			try
 			{
 				string state = "";
-				state += "\t\t<part name=\"" + rom.PartName + "\" interface=\"" + rom.PartInterface + "\">\n";
-
-				foreach (Tuple<string, string> kvp in rom.Features)
-				{
-					state += "\t\t\t<feature name=\"" + HttpUtility.HtmlEncode(kvp.Item1) + "\" value=\"" + HttpUtility.HtmlEncode(kvp.Item2) + "\"/>\n";
-				}
-
 				switch (rom.Type)
 				{
+					case ItemType.Archive:
+						break;
+					case ItemType.BiosSet:
+						state += "\t\t<biosset name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+							+ (!String.IsNullOrWhiteSpace(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
+							+ (((BiosSet)rom).Default != null
+								? ((BiosSet)rom).Default.ToString().ToLowerInvariant()
+								: "")
+							+ "/>\n";
+						break;
 					case ItemType.Disk:
-						state += "\t\t\t<diskarea name=\"" + (String.IsNullOrWhiteSpace(rom.AreaName) ? "cdrom" : rom.AreaName) + "\""
-								+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
-							+ "\t\t\t\t<disk name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+						state += "\t\t<disk name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 							+ (!String.IsNullOrWhiteSpace(((Disk)rom).MD5) ? " md5=\"" + ((Disk)rom).MD5.ToLowerInvariant() + "\"" : "")
 							+ (!String.IsNullOrWhiteSpace(((Disk)rom).SHA1) ? " sha1=\"" + ((Disk)rom).SHA1.ToLowerInvariant() + "\"" : "")
 							+ (!String.IsNullOrWhiteSpace(((Disk)rom).SHA256) ? " sha256=\"" + ((Disk)rom).SHA256.ToLowerInvariant() + "\"" : "")
 							+ (!String.IsNullOrWhiteSpace(((Disk)rom).SHA384) ? " sha384=\"" + ((Disk)rom).SHA384.ToLowerInvariant() + "\"" : "")
 							+ (!String.IsNullOrWhiteSpace(((Disk)rom).SHA512) ? " sha512=\"" + ((Disk)rom).SHA512.ToLowerInvariant() + "\"" : "")
-							+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).MergeTag) ? " merge=\"" + ((Disk)rom).MergeTag + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).Region) ? " region=\"" + ((Disk)rom).Region + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Disk)rom).Index) ? " index=\"" + ((Disk)rom).Index + "\"" : "")
 							+ (((Disk)rom).Writable != null ? " writable=\"" + (((Disk)rom).Writable == true ? "yes" : "no") + "\"" : "")
-							+ "/>\n"
-							+ "\t\t\t</diskarea>\n";
+							+ (((Disk)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Disk)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
+							+ (((Disk)rom).Optional != null ? " optional=\"" + (((Disk)rom).Optional == true ? "yes" : "no") + "\"" : "")
+							+ "/>\n";
 						break;
 					case ItemType.Rom:
-						state += "\t\t\t<dataarea name=\"" + (String.IsNullOrWhiteSpace(rom.AreaName) ? "rom" : rom.AreaName) + "\""
-								+ (rom.AreaSize != null ? " size=\"" + rom.AreaSize + "\"" : "") + ">\n"
-							+ "\t\t\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+						state += "\t\t<rom name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 							+ (((Rom)rom).Size != -1 ? " size=\"" + ((Rom)rom).Size + "\"" : "")
 							+ (!String.IsNullOrWhiteSpace(((Rom)rom).CRC) ? " crc=\"" + ((Rom)rom).CRC.ToLowerInvariant() + "\"" : "")
 							+ (!String.IsNullOrWhiteSpace(((Rom)rom).MD5) ? " md5=\"" + ((Rom)rom).MD5.ToLowerInvariant() + "\"" : "")
@@ -690,16 +766,19 @@ namespace SabreTools.Library.DatFiles
 							+ (!String.IsNullOrWhiteSpace(((Rom)rom).SHA256) ? " sha256=\"" + ((Rom)rom).SHA256.ToLowerInvariant() + "\"" : "")
 							+ (!String.IsNullOrWhiteSpace(((Rom)rom).SHA384) ? " sha384=\"" + ((Rom)rom).SHA384.ToLowerInvariant() + "\"" : "")
 							+ (!String.IsNullOrWhiteSpace(((Rom)rom).SHA512) ? " sha512=\"" + ((Rom)rom).SHA512.ToLowerInvariant() + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).Bios) ? " bios=\"" + ((Rom)rom).Bios + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).MergeTag) ? " merge=\"" + ((Rom)rom).MergeTag + "\"" : "")
+							+ (!String.IsNullOrWhiteSpace(((Rom)rom).Region) ? " region=\"" + ((Rom)rom).Region + "\"" : "")
 							+ (!String.IsNullOrWhiteSpace(((Rom)rom).Offset) ? " offset=\"" + ((Rom)rom).Offset + "\"" : "")
-							// + (!String.IsNullOrWhiteSpace(((Rom)rom).Value) ? " value=\"" + ((Rom)rom).Value + "\"" : "")
 							+ (((Rom)rom).ItemStatus != ItemStatus.None ? " status=\"" + ((Rom)rom).ItemStatus.ToString().ToLowerInvariant() + "\"" : "")
-							// + (!String.IsNullOrWhiteSpace(((Rom)rom).Loadflag) ? " loadflag=\"" + ((Rom)rom).Loadflag + "\"" : "")
-							+ "/>\n"
-							+ "\t\t\t</dataarea>\n";
+							+ (((Rom)rom).Optional != null ? " optional=\"" + (((Rom)rom).Optional == true ? "yes" : "no") + "\"" : "")
+							+ "/>\n";
+						break;
+					case ItemType.Sample:
+						state += "\t\t<sample name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+							+ "/>\n";
 						break;
 				}
-
-				state += "\t\t</part>\n";
 
 				sw.Write(state);
 				sw.Flush();
@@ -722,7 +801,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			try
 			{
-				string footer = "\t</software>\n\n</softwarelist>\n";
+				string footer = "\t</machine>\n</mame>\n";
 
 				// Write the footer out
 				sw.Write(footer);

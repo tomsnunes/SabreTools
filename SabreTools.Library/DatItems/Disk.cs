@@ -18,7 +18,12 @@ namespace SabreTools.Library.DatItems
 		private byte[] _sha256; // 32 bytes
 		private byte[] _sha384; // 48 bytes
 		private byte[] _sha512; // 64 bytes
+		private string _merge;
+		private string _region;
+		private string _index;
+		private bool? _writable;
 		private ItemStatus _itemStatus;
+		private bool? _optional;
 
 		#endregion
 
@@ -50,10 +55,35 @@ namespace SabreTools.Library.DatItems
 			get { return _sha512.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha512); }
 			set { _sha512 = Utilities.StringToByteArray(value); }
 		}
+		public string MergeTag
+		{
+			get { return _merge; }
+			set { _merge = value; }
+		}
+		public string Region
+		{
+			get { return _region; }
+			set { _region = value; }
+		}
+		public string Index
+		{
+			get { return _index; }
+			set { _index = value; }
+		}
+		public bool? Writable
+		{
+			get { return _writable; }
+			set { _writable = value; }
+		}
 		public ItemStatus ItemStatus
 		{
 			get { return _itemStatus; }
 			set { _itemStatus = value; }
+		}
+		public bool? Optional
+		{
+			get { return _optional; }
+			set { _optional = value; }
 		}
 
 		#endregion

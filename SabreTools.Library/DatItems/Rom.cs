@@ -13,6 +13,7 @@ namespace SabreTools.Library.DatItems
 		#region Private instance variables
 
 		// Rom information
+		private string _bios;
 		private long _size;
 		private byte[] _crc; // 8 bytes
 		private byte[] _md5; // 16 bytes
@@ -20,14 +21,23 @@ namespace SabreTools.Library.DatItems
 		private byte[] _sha256; // 32 bytes
 		private byte[] _sha384; // 48 bytes
 		private byte[] _sha512; // 64 bytes
+		private string _merge;
+		private string _region;
+		private string _offset;
 		private string _date;
 		private ItemStatus _itemStatus;
+		private bool? _optional;
 
 		#endregion
 
 		#region Publicly facing variables
 
 		// Rom information
+		public string Bios
+		{
+			get { return _bios; }
+			set { _bios = value; }
+		}
 		public long Size
 		{
 			get { return _size; }
@@ -63,6 +73,21 @@ namespace SabreTools.Library.DatItems
 			get { return _sha512.IsNullOrWhiteSpace() ? null : Utilities.ByteArrayToString(_sha512); }
 			set { _sha512 = Utilities.StringToByteArray(value); }
 		}
+		public string MergeTag
+		{
+			get { return _merge; }
+			set { _merge = value; }
+		}
+		public string Region
+		{
+			get { return _region; }
+			set { _region = value; }
+		}
+		public string Offset
+		{
+			get { return _offset; }
+			set { _offset = value; }
+		}
 		public string Date
 		{
 			get { return _date; }
@@ -72,6 +97,11 @@ namespace SabreTools.Library.DatItems
 		{
 			get { return _itemStatus; }
 			set { _itemStatus = value; }
+		}
+		public bool? Optional
+		{
+			get { return _optional; }
+			set { _optional = value; }
 		}
 
 		#endregion

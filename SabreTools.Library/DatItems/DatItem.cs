@@ -23,7 +23,6 @@ namespace SabreTools.Library.DatItems
 
 		// Standard item information
 		protected string _name;
-		protected string _merge;
 		protected ItemType _itemType;
 		protected DupeType _dupeType;
 
@@ -32,8 +31,6 @@ namespace SabreTools.Library.DatItems
 
 		// Software list information
 		protected bool? _supported;
-		protected string _publisher;
-		protected List<Tuple<string, string>> _infos;
 		protected string _partName;
 		protected string _partInterface;
 		protected List<Tuple<string, string>> _features;
@@ -56,11 +53,6 @@ namespace SabreTools.Library.DatItems
 		{
 			get { return _name; }
 			set { _name = value; }
-		}
-		public string MergeTag
-		{
-			get { return _merge; }
-			set { _merge = value; }
 		}
 		public ItemType Type
 		{
@@ -370,20 +362,20 @@ namespace SabreTools.Library.DatItems
 		}
 
 		// Software list information
-		public bool? Supported
+		public bool? Supported // yes = true, partial = null, no = false
 		{
-			get { return _supported; }
-			set { _supported = value; }
+			get { return _machine.Supported; }
+			set { _machine.Supported = value; }
 		}
 		public string Publisher
 		{
-			get { return _publisher; }
-			set { _publisher = value; }
+			get { return _machine.Publisher; }
+			set { _machine.Publisher = value; }
 		}
 		public List<Tuple<string, string>> Infos
 		{
-			get { return _infos; }
-			set { _infos = value; }
+			get { return _machine.Infos; }
+			set { _machine.Infos = value; }
 		}
 		public string PartName
 		{

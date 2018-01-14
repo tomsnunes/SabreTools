@@ -564,6 +564,30 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get a sanitized Date from an input string
+		/// </summary>
+		/// <param name="input">String to get value from</param>
+		/// <returns>Date as a string, if possible</returns>
+		public static string GetDate(string input)
+		{
+			string date = "";
+			if (input != null)
+			{
+				DateTime dateTime = DateTime.Now;
+				if (DateTime.TryParse(input, out dateTime))
+				{
+					date = dateTime.ToString();
+				}
+				else
+				{
+					date = input;
+				}
+			}
+
+			return date;
+		}
+
+		/// <summary>
 		/// Create a specific type of DatFile to be used based on an input file and a base DAT
 		/// </summary>
 		/// <param name="input">Name of the file to determine the DAT format from</param>
@@ -795,6 +819,26 @@ namespace SabreTools.Library.Tools
 		}
 
 		/// <summary>
+		/// Get a sanitized size from an input string
+		/// </summary>
+		/// <param name="input">String to get value from</param>
+		/// <returns>Size as a long, if possible</returns>
+		public static long GetSize(string input)
+		{
+			long size = -1;
+			if (input != null && input.Contains("0x"))
+			{
+				size = Convert.ToInt64(input, 16);
+			}
+			else if (input != null)
+			{
+				Int64.TryParse(input, out size);
+			}
+
+			return size;
+		}
+
+		/// <summary>
 		/// Get SplitType value from input ForceMerging
 		/// </summary>
 		/// <param name="forceMerging">ForceMerging to get value from</param>
@@ -822,15 +866,16 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="yesno">String to get value from</param>
 		/// <returns>Bool corresponding to the string</returns>
-		public static bool GetYesNo(string yesno)
+		public static bool? GetYesNo(string yesno)
 		{
 			switch (yesno?.ToLowerInvariant())
 			{
 				case "yes":
 					return true;
-				default:
 				case "no":
-					return false;				
+					return false;
+				default:
+					return null;
 			}
 		}
 

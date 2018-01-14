@@ -124,6 +124,7 @@
     <Compile Include="DatFiles\Hashfile.cs" />
     <Compile Include="DatFiles\Listrom.cs" />
     <Compile Include="DatFiles\Logiqx.cs" />
+    <Compile Include="DatFiles\MameListxml.cs" />
     <Compile Include="DatFiles\Missfile.cs" />
     <Compile Include="DatFiles\OfflineList.cs" />
     <Compile Include="DatFiles\RomCenter.cs" />

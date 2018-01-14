@@ -25,6 +25,8 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a Logiqx-derived DAT
 	/// </summary>
+	/// TODO: Separate out reading of other DAT types into their own classes
+	/// TODO: Add XSD validation for all XML DAT types
 	internal class Logiqx : DatFile
 	{
 		// Private instance variables specific to Logiqx DATs
@@ -423,6 +425,20 @@ namespace SabreTools.Library.DatFiles
 							subreader.MoveToContent();
 
 							// Create a new machine
+							MachineType machineType = MachineType.NULL;
+							if (Utilities.GetYesNo(xtr.GetAttribute("isbios")) == true)
+							{
+								machineType |= MachineType.Bios;
+							}
+							if (Utilities.GetYesNo(xtr.GetAttribute("isdevice")) == true)
+							{
+								machineType |= MachineType.Device;
+							}
+							if (Utilities.GetYesNo(xtr.GetAttribute("ismechanical")) == true)
+							{
+								machineType |= MachineType.Mechanical;
+							}
+
 							Machine machine = new Machine
 							{
 								Name = xtr.GetAttribute("name"),
@@ -433,11 +449,7 @@ namespace SabreTools.Library.DatFiles
 								SampleOf = xtr.GetAttribute("sampleof") ?? "",
 
 								Devices = new List<string>(),
-								MachineType =
-									xtr.GetAttribute("isbios") == "yes" ? MachineType.Bios :
-									xtr.GetAttribute("isdevice") == "yes" ? MachineType.Device :
-									xtr.GetAttribute("ismechanical") == "yes" ? MachineType.Mechanical :
-									MachineType.None,
+								MachineType = (machineType == MachineType.NULL ? MachineType.None : machineType),
 							};
 
 							// Get the supported value from the reader
@@ -1048,6 +1060,492 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
+		/// Parse a Logiqx XML DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		public void ParseFileStripped(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Miscellaneous
+			bool keep,
+			bool clean,
+			bool remUnicode)
+		{
+			// Prepare all internal variables
+			Encoding enc = Utilities.GetEncoding(filename);
+			XmlReader xtr = Utilities.GetXmlTextReader(filename);
+
+			// If we got a null reader, just return
+			if (xtr == null)
+			{
+				return;
+			}
+
+			// Otherwise, read the file to the end
+			try
+			{
+				xtr.MoveToContent();
+				while (!xtr.EOF)
+				{
+					// We only want elements
+					if (xtr.NodeType != XmlNodeType.Element)
+					{
+						xtr.Read();
+						continue;
+					}
+
+					switch (xtr.Name)
+					{
+						// The datafile tag can have some attributes
+						case "datafile":
+							// string build = xtr.GetAttribute("build");
+							// string debug = xtr.GetAttribute("debug"); // (yes|no) "no"
+							xtr.Read();
+							break;
+						// We want to process the entire subtree of the header
+						case "header":
+							ReadHeader(xtr.ReadSubtree(), keep);
+
+							// Skip the header node now that we've processed it
+							xtr.Skip();
+							break;
+						// We want to process the entire subtree of the game
+						case "machine": // New-style Logiqx
+						case "game": // Old-style Logiqx
+							ReadMachine(xtr.ReadSubtree(), filename, sysid, srcid, keep, clean, remUnicode);							
+
+							// Skip the machine now that we've processed it
+							xtr.Skip();
+							break;
+						default:
+							xtr.Read();
+							break;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Warning("Exception found while parsing '{0}': {1}", filename, ex);
+
+				// For XML errors, just skip the affected node
+				xtr?.Read();
+			}
+
+			xtr.Dispose();
+		}
+
+		/// <summary>
+		/// Read header information
+		/// </summary>
+		/// <param name="reader">XmlReader to use to parse the header</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		private void ReadHeader(XmlReader reader, bool keep)
+		{
+			bool superdat = false;
+
+			// If there's no subtree to the header, skip it
+			if (reader == null)
+			{
+				return;
+			}
+
+			// Otherwise, add what is possible
+			reader.MoveToContent();
+
+			while (!reader.EOF)
+			{
+				// We only want elements
+				if (reader.NodeType != XmlNodeType.Element || reader.Name == "header")
+				{
+					reader.Read();
+					continue;
+				}
+
+				// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
+				string content = "";
+				switch (reader.Name)
+				{
+					case "name":
+						content = reader.ReadElementContentAsString(); ;
+						Name = (String.IsNullOrWhiteSpace(Name) ? content : Name);
+						superdat = superdat || content.Contains(" - SuperDAT");
+						if (keep && superdat)
+						{
+							Type = (String.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
+						}
+						break;
+					case "description":
+						content = reader.ReadElementContentAsString();
+						Description = (String.IsNullOrWhiteSpace(Description) ? content : Description);
+						break;
+					case "rootdir": // TODO: Is this Logiqx?
+						content = reader.ReadElementContentAsString();
+						RootDir = (String.IsNullOrWhiteSpace(RootDir) ? content : RootDir);
+						break;
+					case "category":
+						content = reader.ReadElementContentAsString();
+						Category = (String.IsNullOrWhiteSpace(Category) ? content : Category);
+						break;
+					case "version":
+						content = reader.ReadElementContentAsString();
+						Version = (String.IsNullOrWhiteSpace(Version) ? content : Version);
+						break;
+					case "date":
+						content = reader.ReadElementContentAsString();
+						Date = (String.IsNullOrWhiteSpace(Date) ? content.Replace(".", "/") : Date);
+						break;
+					case "author":
+						content = reader.ReadElementContentAsString();
+						Author = (String.IsNullOrWhiteSpace(Author) ? content : Author);
+						break;
+					case "email":
+						content = reader.ReadElementContentAsString();
+						Email = (String.IsNullOrWhiteSpace(Email) ? content : Email);
+						break;
+					case "homepage":
+						content = reader.ReadElementContentAsString();
+						Homepage = (String.IsNullOrWhiteSpace(Homepage) ? content : Homepage);
+						break;
+					case "url":
+						content = reader.ReadElementContentAsString();
+						Url = (String.IsNullOrWhiteSpace(Url) ? content : Url);
+						break;
+					case "comment":
+						content = reader.ReadElementContentAsString();
+						Comment = (String.IsNullOrWhiteSpace(Comment) ? content : Comment);
+						break;
+					case "type": // TODO: Is this Logiqx?
+						content = reader.ReadElementContentAsString();
+						Type = (String.IsNullOrWhiteSpace(Type) ? content : Type);
+						superdat = superdat || content.Contains("SuperDAT");
+						break;
+					case "clrmamepro":
+						if (String.IsNullOrWhiteSpace(Header))
+						{
+							Header = reader.GetAttribute("header");
+						}
+						if (ForceMerging == ForceMerging.None)
+						{
+							ForceMerging = Utilities.GetForceMerging(reader.GetAttribute("forcemerging"));
+						}
+						if (ForceNodump == ForceNodump.None)
+						{
+							ForceNodump = Utilities.GetForceNodump(reader.GetAttribute("forcenodump"));
+						}
+						if (ForcePacking == ForcePacking.None)
+						{
+							ForcePacking = Utilities.GetForcePacking(reader.GetAttribute("forcepacking"));
+						}
+						break;
+					case "romcenter":
+						if (reader.GetAttribute("plugin") != null)
+						{
+							// CDATA
+						}
+						if (reader.GetAttribute("rommode") != null)
+						{
+							// (merged|split|unmerged) "split"
+						}
+						if (reader.GetAttribute("biosmode") != null)
+						{
+							// merged|split|unmerged) "split"
+						}
+						if (reader.GetAttribute("samplemode") != null)
+						{
+							// (merged|unmerged) "merged"
+						}
+						if (reader.GetAttribute("lockrommode") != null)
+						{
+							// (yes|no) "no"
+						}
+						if (reader.GetAttribute("lockbiosmode") != null)
+						{
+							// (yes|no) "no"
+						}
+						if (reader.GetAttribute("locksamplemode") != null)
+						{
+							// (yes|no) "no"
+						}
+						reader.Read();
+						break;
+					default:
+						reader.Read();
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Read game/machine information
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		private void ReadMachine(
+			XmlReader reader,
+
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Miscellaneous
+			bool keep,
+			bool clean,
+			bool remUnicode)
+		{
+			// If we have an empty machine, skip it
+			if (reader == null)
+			{
+				return;
+			}
+
+			// Otherwise, add what is possible
+			reader.MoveToContent();
+
+			string key = "";
+			string temptype = reader.Name;
+			bool containsItems = false;
+			List<string> parent = new List<string>();
+
+			// Create a new machine
+			MachineType machineType = MachineType.NULL;
+			if (Utilities.GetYesNo(reader.GetAttribute("isbios")) == true)
+			{
+				machineType |= MachineType.Bios;
+			}
+			if (Utilities.GetYesNo(reader.GetAttribute("isdevice")) == true)
+			{
+				machineType |= MachineType.Device;
+			}
+			if (Utilities.GetYesNo(reader.GetAttribute("ismechanical")) == true)
+			{
+				machineType |= MachineType.Mechanical;
+			}
+
+			Machine machine = new Machine
+			{
+				Name = reader.GetAttribute("name"),
+				Description = reader.GetAttribute("name"),
+				SourceFile = reader.GetAttribute("sourcefile"),
+				Board = reader.GetAttribute("board"),
+				RebuildTo = reader.GetAttribute("rebuildto"),
+
+				Comment = "",
+
+				CloneOf = reader.GetAttribute("cloneof") ?? "",
+				RomOf = reader.GetAttribute("romof") ?? "",
+				SampleOf = reader.GetAttribute("sampleof") ?? "",
+
+				MachineType = (machineType == MachineType.NULL ? MachineType.None : machineType),
+			};
+
+			if (Type == "SuperDAT" && !keep)
+			{
+				string tempout = Regex.Match(machine.Name, @".*?\\(.*)").Groups[1].Value;
+				if (!String.IsNullOrWhiteSpace(tempout))
+				{
+					machine.Name = tempout;
+				}
+			}
+			// Get the name of the game from the parent
+			else if (Type == "SuperDAT" && keep && parent.Count > 0)
+			{
+				machine.Name = String.Join("\\", parent) + "\\" + machine.Name;
+			}
+
+			while (!reader.EOF)
+			{
+				// We only want elements
+				if (reader.NodeType != XmlNodeType.Element)
+				{
+					reader.Read();
+					continue;
+				}
+
+				// Get the roms from the machine
+				switch (reader.Name)
+				{
+					case "comment": // There can be multiple comments by spec
+						machine.Comment += reader.ReadElementContentAsString();
+						break;
+					case "description":
+						machine.Description = reader.ReadElementContentAsString();
+						break;
+					case "year":
+						machine.Year = reader.ReadElementContentAsString();
+						break;
+					case "manufacturer":
+						machine.Manufacturer = reader.ReadElementContentAsString();
+						break;
+					case "release":
+						containsItems = true;
+
+						DatItem release = new Release
+						{
+							Name = reader.GetAttribute("name"),
+							Region = reader.GetAttribute("region"),
+							Language = reader.GetAttribute("language"),
+							Date = reader.GetAttribute("date"),
+							Default = Utilities.GetYesNo(reader.GetAttribute("default")),
+						};
+
+						release.CopyMachineInformation(machine);
+
+						// Now process and add the rom
+						key = ParseAddHelper(release, clean, remUnicode);
+
+						reader.Read();
+						break;
+					case "biosset":
+						containsItems = true;
+
+						DatItem biosset = new BiosSet
+						{
+							Name = reader.GetAttribute("name"),
+							Description = reader.GetAttribute("description"),
+							Default = Utilities.GetYesNo(reader.GetAttribute("default")),
+
+							SystemID = sysid,
+							System = filename,
+							SourceID = srcid,
+						};
+
+						biosset.CopyMachineInformation(machine);
+
+						// Now process and add the rom
+						key = ParseAddHelper(biosset, clean, remUnicode);
+
+						reader.Read();
+						break;
+					case "rom":
+						containsItems = true;
+
+						DatItem rom = new Rom
+						{
+							Name = reader.GetAttribute("name"),
+							Size = Utilities.GetSize(reader.GetAttribute("size")),
+							CRC = reader.GetAttribute("crc")?.ToLowerInvariant(),
+							MD5 = reader.GetAttribute("md5")?.ToLowerInvariant(),
+							SHA1 = reader.GetAttribute("sha1")?.ToLowerInvariant(),
+							SHA256 = reader.GetAttribute("sha256")?.ToLowerInvariant(),
+							SHA384 = reader.GetAttribute("sha384")?.ToLowerInvariant(),
+							SHA512 = reader.GetAttribute("sha512")?.ToLowerInvariant(),
+							MergeTag = reader.GetAttribute("merge"),
+							ItemStatus = Utilities.GetItemStatus(reader.GetAttribute("status")),
+							Date = Utilities.GetDate(reader.GetAttribute("date")),
+
+							SystemID = sysid,
+							System = filename,
+							SourceID = srcid,
+						};
+
+						rom.CopyMachineInformation(machine);
+
+						// Now process and add the rom
+						key = ParseAddHelper(rom, clean, remUnicode);
+
+						reader.Read();
+						break;
+					case "disk":
+						containsItems = true;
+
+						DatItem disk = new Disk
+						{
+							Name = reader.GetAttribute("name"),
+							MD5 = reader.GetAttribute("md5")?.ToLowerInvariant(),
+							SHA1 = reader.GetAttribute("sha1")?.ToLowerInvariant(),
+							SHA256 = reader.GetAttribute("sha256")?.ToLowerInvariant(),
+							SHA384 = reader.GetAttribute("sha384")?.ToLowerInvariant(),
+							SHA512 = reader.GetAttribute("sha512")?.ToLowerInvariant(),
+							MergeTag = reader.GetAttribute("merge"),
+							ItemStatus = Utilities.GetItemStatus(reader.GetAttribute("status")),
+
+							SystemID = sysid,
+							System = filename,
+							SourceID = srcid,
+						};
+
+						disk.CopyMachineInformation(machine);
+
+						// Now process and add the rom
+						key = ParseAddHelper(disk, clean, remUnicode);
+
+						reader.Read();
+						break;
+					case "sample":
+						containsItems = true;
+
+						DatItem samplerom = new Sample
+						{
+							Name = reader.GetAttribute("name"),
+
+							SystemID = sysid,
+							System = filename,
+							SourceID = srcid,
+						};
+
+						samplerom.CopyMachineInformation(machine);
+
+						// Now process and add the rom
+						key = ParseAddHelper(samplerom, clean, remUnicode);
+
+						reader.Read();
+						break;
+					case "archive":
+						containsItems = true;
+
+						DatItem archiverom = new Archive
+						{
+							Name = reader.GetAttribute("name"),
+
+							SystemID = sysid,
+							System = filename,
+							SourceID = srcid,
+						};
+
+						archiverom.CopyMachineInformation(machine);
+
+						// Now process and add the rom
+						key = ParseAddHelper(archiverom, clean, remUnicode);
+
+						reader.Read();
+						break;
+					default:
+						reader.Read();
+						break;
+				}
+			}
+
+			// If no items were found for this machine, add a Blank placeholder
+			if (!containsItems)
+			{
+				Blank blank = new Blank()
+				{
+					SystemID = sysid,
+					System = filename,
+					SourceID = srcid,
+				};
+
+				blank.CopyMachineInformation(machine);
+
+				// Now process and add the rom
+				key = ParseAddHelper(blank, clean, remUnicode);
+			}
+		}
+
+		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
 		/// <param name="outfile">Name of the file to write to</param>
@@ -1221,9 +1719,9 @@ namespace SabreTools.Library.DatFiles
 
 				string state = "\t<" + (_depreciated ? "game" : "machine") + " name=\"" + HttpUtility.HtmlEncode(rom.MachineName) + "\"" +
 								(ExcludeOf ? "" :
-									(rom.MachineType == MachineType.Bios ? " isbios=\"yes\"" : "") +
-									(rom.MachineType == MachineType.Device ? " isdevice=\"yes\"" : "") +
-									(rom.MachineType == MachineType.Mechanical ? " ismechanical=\"yes\"" : "") +
+									((rom.MachineType & MachineType.Bios) != 0 ? " isbios=\"yes\"" : "") +
+									((rom.MachineType & MachineType.Device) != 0 ? " isdevice=\"yes\"" : "") +
+									((rom.MachineType & MachineType.Mechanical) != 0 ? " ismechanical=\"yes\"" : "") +
 									(rom.Runnable == true ? " runnable=\"yes\"" : "") +
 									(String.IsNullOrWhiteSpace(rom.CloneOf) || (rom.MachineName.ToLowerInvariant() == rom.CloneOf.ToLowerInvariant())
 										? ""

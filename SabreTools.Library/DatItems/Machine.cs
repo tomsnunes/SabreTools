@@ -18,14 +18,17 @@ namespace SabreTools.Library.DatItems
 		public string Description;
 		public string Year;
 		public string Manufacturer;
+		public string Publisher;
 		public string RomOf;
 		public string CloneOf;
 		public string SampleOf;
+		public bool? Supported;
 		public string SourceFile;
 		public bool? Runnable;
 		public string Board;
 		public string RebuildTo;
 		public List<string> Devices;
+		public List<Tuple<string, string>> Infos;
 		public MachineType MachineType;
 
 		#endregion
@@ -42,9 +45,11 @@ namespace SabreTools.Library.DatItems
 			Description = null;
 			Year = null;
 			Manufacturer = null;
+			Publisher = null;
 			RomOf = null;
 			CloneOf = null;
 			SampleOf = null;
+			Supported = true;
 			SourceFile = null;
 			Runnable = null;
 			Board = null;
@@ -65,9 +70,11 @@ namespace SabreTools.Library.DatItems
 			Description = description;
 			Year = null;
 			Manufacturer = null;
+			Publisher = null;
 			RomOf = null;
 			CloneOf = null;
 			SampleOf = null;
+			Supported = true;
 			SourceFile = null;
 			Runnable = null;
 			Board = null;
@@ -93,9 +100,11 @@ namespace SabreTools.Library.DatItems
 				Description = this.Description,
 				Year = this.Year,
 				Manufacturer = this.Manufacturer,
+				Publisher = this.Publisher,
 				RomOf = this.RomOf,
 				CloneOf = this.CloneOf,
 				SampleOf = this.SampleOf,
+				Supported = this.Supported,
 				SourceFile = this.SourceFile,
 				Runnable = this.Runnable,
 				Board = this.Board,
