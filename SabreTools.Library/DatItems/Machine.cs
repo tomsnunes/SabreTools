@@ -55,6 +55,7 @@ namespace SabreTools.Library.DatItems
 			Board = null;
 			RebuildTo = null;
 			Devices = null;
+			Infos = null;
 			MachineType = MachineType.NULL;
 		}
 
@@ -80,6 +81,7 @@ namespace SabreTools.Library.DatItems
 			Board = null;
 			RebuildTo = null;
 			Devices = null;
+			Infos = null;
 			MachineType = MachineType.NULL;
 		}
 
@@ -110,6 +112,7 @@ namespace SabreTools.Library.DatItems
 				Board = this.Board,
 				RebuildTo = this.RebuildTo,
 				Devices = this.Devices,
+				Infos = this.Infos,
 				MachineType = this.MachineType,
 			};
 		}
