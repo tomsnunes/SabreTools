@@ -1801,7 +1801,7 @@ namespace SabreTools.Library.DatFiles
 							+ "/>\n";
 						break;
 					case ItemType.BiosSet:
-						state += "\t\t<biosset name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+						state += "\t\t<biosset name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 							+ (!String.IsNullOrWhiteSpace(((BiosSet)rom).Description) ? " description=\"" + HttpUtility.HtmlEncode(((BiosSet)rom).Description) + "\"" : "")
 							+ (((BiosSet)rom).Default != null
 								? ((BiosSet)rom).Default.ToString().ToLowerInvariant()
@@ -1819,7 +1819,7 @@ namespace SabreTools.Library.DatFiles
 							+ "/>\n";
 						break;
 					case ItemType.Release:
-						state += "\t\t<release name\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
+						state += "\t\t<release name=\"" + HttpUtility.HtmlEncode(rom.Name) + "\""
 							+ (!String.IsNullOrWhiteSpace(((Release)rom).Region) ? " region=\"" + HttpUtility.HtmlEncode(((Release)rom).Region) + "\"" : "")
 							+ (!String.IsNullOrWhiteSpace(((Release)rom).Language) ? " language=\"" + HttpUtility.HtmlEncode(((Release)rom).Language) + "\"" : "")
 							+ (!String.IsNullOrWhiteSpace(((Release)rom).Date) ? " date=\"" + HttpUtility.HtmlEncode(((Release)rom).Date) + "\"" : "")
