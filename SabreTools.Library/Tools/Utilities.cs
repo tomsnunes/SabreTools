@@ -619,6 +619,8 @@ namespace SabreTools.Library.Tools
 					return new DosCenter(baseDat);
 				case DatFormat.Listrom:
 					return new Listrom(baseDat);
+				case DatFormat.Listxml:
+					return new Listxml(baseDat);
 				case DatFormat.Logiqx:
 					return new Logiqx(baseDat, false);
 				case DatFormat.LogiqxDepreciated:
@@ -1096,7 +1098,15 @@ namespace SabreTools.Library.Tools
 				// Get the first two lines to check
 				StreamReader sr = File.OpenText(filename);
 				string first = sr.ReadLine().ToLowerInvariant();
+				while (String.IsNullOrWhiteSpace(first))
+				{
+					first = sr.ReadLine();
+				}
 				string second = sr.ReadLine().ToLowerInvariant();
+				while (String.IsNullOrWhiteSpace(second))
+				{
+					second = sr.ReadLine();
+				}
 				sr.Dispose();
 
 				// If we have an XML-based DAT
@@ -1105,6 +1115,12 @@ namespace SabreTools.Library.Tools
 					if (second.StartsWith("<!doctype datafile"))
 					{
 						return DatFormat.Logiqx;
+					}
+					else if (second.StartsWith("<!DOCTYPE mame")
+						|| second.StartsWith("<mame")
+						|| second.StartsWith("<m1"))
+					{
+						return DatFormat.Listxml;
 					}
 					else if (second.StartsWith("<!doctype softwarelist"))
 					{

@@ -194,9 +194,10 @@ namespace SabreTools.Library.Data
     {
 		// XML Formats
 		Logiqx = 0x01,
-		LogiqxDepreciated = Logiqx << 1,
-		SoftwareList = LogiqxDepreciated << 1, // Special internal type for "game" instead of "machine"
-		OfflineList = SoftwareList << 1,
+		LogiqxDepreciated = Logiqx << 1, // Special internal type for "game" instead of "machine"
+		SoftwareList = LogiqxDepreciated << 1,
+		Listxml = SoftwareList << 1,
+		OfflineList = Listxml << 1,
 		SabreDat = OfflineList << 1,
 
 		// Propietary Formats

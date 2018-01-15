@@ -5737,7 +5737,17 @@ namespace SabreTools.Library.DatFiles
 				outfileNames.Add(DatFormat.DOSCenter, CreateOutfileNamesHelper(outDir, ".dc.dat", overwrite));
 			}
 
-			//MAME Listroms
+			// Logiqx XML
+			if ((DatFormat & DatFormat.Logiqx) != 0)
+			{
+				outfileNames.Add(DatFormat.Logiqx, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
+			}
+			if ((DatFormat & DatFormat.LogiqxDepreciated) != 0)
+			{
+				outfileNames.Add(DatFormat.LogiqxDepreciated, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
+			}
+
+			// MAME Listroms
 			if ((DatFormat & DatFormat.Listrom) != 0
 				&& (DatFormat & DatFormat.AttractMode) == 0)
 			{
@@ -5749,14 +5759,22 @@ namespace SabreTools.Library.DatFiles
 				outfileNames.Add(DatFormat.Listrom, CreateOutfileNamesHelper(outDir, ".lr.txt", overwrite));
 			}
 
-			// Logiqx XML
-			if ((DatFormat & DatFormat.Logiqx) != 0)
+			// MAME Listxml
+			if (((DatFormat & DatFormat.Listxml) != 0)
+				&& (DatFormat & DatFormat.Logiqx) == 0
+				&& (DatFormat & DatFormat.LogiqxDepreciated) == 0
+				&& (DatFormat & DatFormat.SabreDat) == 0
+				&& (DatFormat & DatFormat.SoftwareList) == 0)
 			{
-				outfileNames.Add(DatFormat.Logiqx, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
+				outfileNames.Add(DatFormat.Listxml, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
 			}
-			if ((DatFormat & DatFormat.LogiqxDepreciated) != 0)
+			if (((DatFormat & DatFormat.Listxml) != 0
+				&& ((DatFormat & DatFormat.Logiqx) != 0
+					|| (DatFormat & DatFormat.LogiqxDepreciated) != 0
+					|| (DatFormat & DatFormat.SabreDat) != 0
+					|| (DatFormat & DatFormat.SoftwareList) != 0)))
 			{
-				outfileNames.Add(DatFormat.LogiqxDepreciated, CreateOutfileNamesHelper(outDir, ".xml", overwrite));
+				outfileNames.Add(DatFormat.Listxml, CreateOutfileNamesHelper(outDir, ".mame.xml", overwrite));
 			}
 
 			// Missfile
@@ -5775,6 +5793,7 @@ namespace SabreTools.Library.DatFiles
 			if (((DatFormat & DatFormat.OfflineList) != 0)
 				&& (DatFormat & DatFormat.Logiqx) == 0
 				&& (DatFormat & DatFormat.LogiqxDepreciated) == 0
+				&& (DatFormat & DatFormat.Listxml) == 0
 				&& (DatFormat & DatFormat.SabreDat) == 0
 				&& (DatFormat & DatFormat.SoftwareList) == 0)
 			{
@@ -5783,6 +5802,7 @@ namespace SabreTools.Library.DatFiles
 			if (((DatFormat & DatFormat.OfflineList) != 0
 				&& ((DatFormat & DatFormat.Logiqx) != 0
 					|| (DatFormat & DatFormat.LogiqxDepreciated) != 0
+					|| (DatFormat & DatFormat.Listxml) != 0
 					|| (DatFormat & DatFormat.SabreDat) != 0
 					|| (DatFormat & DatFormat.SoftwareList) != 0)))
 			{
