@@ -58,7 +58,9 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// All XML-derived DATs share a lot in common so it just calls one implementation
-			// new Logiqx(this, false).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
+			// TODO: Use the following implementation instead of passing to Logiqx
+			new Logiqx(this, false).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
+			return;
 
 			// Prepare all internal variables
 			Encoding enc = Utilities.GetEncoding(filename);
