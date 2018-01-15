@@ -60,7 +60,7 @@ namespace SabreTools.Library.DatFiles
 			// All XML-derived DATs share a lot in common so it just calls one implementation
 			// TODO: Use the following implementation instead of passing to Logiqx
 			new Logiqx(this, false).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-			return;
+			 return;
 
 			// Prepare all internal variables
 			Encoding enc = Utilities.GetEncoding(filename);
@@ -128,6 +128,7 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Read machine information
 		/// </summary>
+		/// <param name="reader">XmlReader representing a machine block</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
@@ -187,6 +188,7 @@ namespace SabreTools.Library.DatFiles
 				CloneOf = reader.GetAttribute("cloneof") ?? "",
 				RomOf = reader.GetAttribute("romof") ?? "",
 				SampleOf = reader.GetAttribute("sampleof") ?? "",
+				Devices = new List<string>(),
 
 				MachineType = (machineType == MachineType.NULL ? MachineType.None : machineType),
 			};
