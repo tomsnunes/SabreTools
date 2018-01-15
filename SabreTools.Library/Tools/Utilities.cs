@@ -1095,15 +1095,15 @@ namespace SabreTools.Library.Tools
 			// For everything else, we need to read it
 			try
 			{
-				// Get the first two lines to check
+				// Get the first two non-whitespace, non-comment lines to check
 				StreamReader sr = File.OpenText(filename);
 				string first = sr.ReadLine().ToLowerInvariant();
-				while (String.IsNullOrWhiteSpace(first))
+				while (String.IsNullOrWhiteSpace(first) || first.StartsWith("<!--"))
 				{
 					first = sr.ReadLine().ToLowerInvariant();
 				}
 				string second = sr.ReadLine().ToLowerInvariant();
-				while (String.IsNullOrWhiteSpace(second))
+				while (String.IsNullOrWhiteSpace(second) || second.StartsWith("<!--"))
 				{
 					second = sr.ReadLine().ToLowerInvariant();
 				}
