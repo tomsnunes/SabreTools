@@ -26,7 +26,7 @@ namespace SabreTools.Library.DatFiles
 	/// Represents parsing and writing of a Logiqx-derived DAT
 	/// </summary>
 	/// TODO: Separate out reading of other DAT types into their own classes
-	/// TODO: Add XSD validation for all XML DAT types
+	/// TODO: Add XSD validation for all XML DAT types (maybe?)
 	internal class Logiqx : DatFile
 	{
 		// Private instance variables specific to Logiqx DATs
@@ -1120,7 +1120,7 @@ namespace SabreTools.Library.DatFiles
 						// We want to process the entire subtree of the game
 						case "machine": // New-style Logiqx
 						case "game": // Old-style Logiqx
-							ReadMachine(xtr.ReadSubtree(), filename, sysid, srcid, keep, clean, remUnicode);							
+							ReadMachine(xtr.ReadSubtree(), filename, sysid, srcid, keep, clean, remUnicode);
 
 							// Skip the machine now that we've processed it
 							xtr.Skip();
@@ -1186,7 +1186,7 @@ namespace SabreTools.Library.DatFiles
 						content = reader.ReadElementContentAsString();
 						Description = (String.IsNullOrWhiteSpace(Description) ? content : Description);
 						break;
-					case "rootdir": // TODO: Is this Logiqx?
+					case "rootdir": // This is exclusive to TruRip XML
 						content = reader.ReadElementContentAsString();
 						RootDir = (String.IsNullOrWhiteSpace(RootDir) ? content : RootDir);
 						break;
@@ -1222,7 +1222,7 @@ namespace SabreTools.Library.DatFiles
 						content = reader.ReadElementContentAsString();
 						Comment = (String.IsNullOrWhiteSpace(Comment) ? content : Comment);
 						break;
-					case "type": // TODO: Is this Logiqx?
+					case "type": // This is exclusive to TruRip XML
 						content = reader.ReadElementContentAsString();
 						Type = (String.IsNullOrWhiteSpace(Type) ? content : Type);
 						superdat = superdat || content.Contains("SuperDAT");
@@ -1389,6 +1389,12 @@ namespace SabreTools.Library.DatFiles
 					case "manufacturer":
 						machine.Manufacturer = reader.ReadElementContentAsString();
 						break;
+					case "trurip": // This is special metadata unique to TruRip
+						ReadTruRip(reader.ReadSubtree(), machine);
+
+						// Skip the trurip node now that we've processed it
+						reader.Skip();
+						break;
 					case "release":
 						containsItems = true;
 
@@ -1542,6 +1548,94 @@ namespace SabreTools.Library.DatFiles
 
 				// Now process and add the rom
 				key = ParseAddHelper(blank, clean, remUnicode);
+			}
+		}
+
+		/// <summary>
+		/// Read TruRip information
+		/// </summary>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="machine">Machine information to pass to contained items</param>
+		private void ReadTruRip(XmlReader reader, Machine machine)
+		{
+			// If we have an empty trurip, skip it
+			if (reader == null)
+			{
+				return;
+			}
+
+			// Otherwise, add what is possible
+			reader.MoveToContent();
+
+			while (!reader.EOF)
+			{
+				// We only want elements
+				if (reader.NodeType != XmlNodeType.Element)
+				{
+					reader.Read();
+					continue;
+				}
+
+				// Get the information from the trurip
+				string content = "";
+				switch (reader.Name)
+				{
+					case "titleid":
+						content = reader.ReadElementContentAsString();
+						// string titleid = content;
+						break;
+					case "publisher":
+						machine.Publisher = reader.ReadElementContentAsString();
+						break;
+					case "developer": // Manufacturer is as close as this gets
+						machine.Manufacturer = reader.ReadElementContentAsString();
+						break;
+					case "year":
+						machine.Year = reader.ReadElementContentAsString();
+						break;
+					case "genre":
+						content = reader.ReadElementContentAsString();
+						// string genre = content;
+						break;
+					case "subgenre":
+						content = reader.ReadElementContentAsString();
+						// string subgenre = content;
+						break;
+					case "ratings":
+						content = reader.ReadElementContentAsString();
+						// string ratings = content;
+						break;
+					case "score":
+						content = reader.ReadElementContentAsString();
+						// string score = content;
+						break;
+					case "players":
+						content = reader.ReadElementContentAsString();
+						// string players = content;
+						break;
+					case "enabled":
+						content = reader.ReadElementContentAsString();
+						// string enabled = content;
+						break;
+					case "crc":
+						content = reader.ReadElementContentAsString();
+						// string crc = Utilities.GetYesNo(content);
+						break;
+					case "source":
+						content = reader.ReadElementContentAsString();
+						// string source = content;
+						break;
+					case "cloneof":
+						machine.CloneOf = reader.ReadElementContentAsString();
+						break;
+					case "relatedto":
+						content = reader.ReadElementContentAsString();
+						// string relatedto = content;
+						break;
+					default:
+						reader.Read();
+						break;
+				}
 			}
 		}
 
