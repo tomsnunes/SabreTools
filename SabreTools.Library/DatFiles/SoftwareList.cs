@@ -44,8 +44,6 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
 		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
-		/// <remarks>
-		/// </remarks>
 		public override void ParseFile(
 			// Standard Dat parsing
 			string filename,
@@ -131,6 +129,7 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Read software information
 		/// </summary>
+		/// <param name="reader">XmlReader representing a software block</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
@@ -185,6 +184,7 @@ namespace SabreTools.Library.DatFiles
 				Supported = Utilities.GetYesNo(reader.GetAttribute("supported")), // (yes|partial|no) "yes"
 
 				CloneOf = reader.GetAttribute("cloneof") ?? "",
+				Infos = new List<Tuple<string, string>>(),
 
 				MachineType = (machineType == MachineType.NULL ? MachineType.None : machineType),
 			};
@@ -253,6 +253,8 @@ namespace SabreTools.Library.DatFiles
 		/// <summary>
 		/// Read part information
 		/// </summary>
+		/// <param name="reader">XmlReader representing a part block</param>
+		/// <param name="machine">Machine information to pass to contained items</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
@@ -325,10 +327,95 @@ namespace SabreTools.Library.DatFiles
 						}
 						// string width = reader.GetAttribute("width"); // (8|16|32|64) "8"
 						// string endianness = reader.GetAttribute("endianness"); // endianness (big|little) "little"
-						
+
+						containsItems = ReadDataArea(reader.ReadSubtree(), machine, features, areaname, areasize, 
+							partname, partinterface, filename, sysid, srcid, keep, clean, remUnicode);
+
+						// Skip the dataarea now that we've processed it
+						reader.Skip();
+						break;
+					case "diskarea":
+						areaname = reader.GetAttribute("name");
+
+						containsItems = ReadDiskArea(reader.ReadSubtree(), machine, features, areaname, areasize,
+							partname, partinterface, filename, sysid, srcid, keep, clean, remUnicode);
+
+						// Skip the diskarea now that we've processed it
+						reader.Skip();
+						break;
+					case "dipswitch":
+						// string name = reader.GetAttribute("name");
+						// string tag = reader.GetAttribute("tag");
+						// string mask = reader.GetAttribute("mask");
+
+						// For every <dipvalue> element...
+						// string name = reader.GetAttribute("name");
+						// string value = reader.GetAttribute("value");
+						// bool? default = Utilities.GetYesNo(reader.GetAttribute("default")); // (yes|no) "no"
+
 						reader.Read();
 						break;
-					case "rom": // TODO: Put this in a proper subreader under dataarea
+					default:
+						reader.Read();
+						break;
+				}
+			}
+
+			return containsItems;
+		}
+
+		/// <summary>
+		/// Read dataarea information
+		/// </summary>
+		/// <param name="reader">XmlReader representing a dataarea block</param>
+		/// <param name="machine">Machine information to pass to contained items</param>
+		/// <param name="features">List of features from the parent part</param>
+		/// <param name="areaname">Name of the containing area</param>
+		/// <param name="areasize">Size of the containing area</param>
+		/// <param name="partname">Name of the containing part</param>
+		/// <param name="partinterface">Interface of the containing part</param>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		private bool ReadDataArea(
+			XmlReader reader,
+			Machine machine,
+			List<Tuple<string, string>> features,
+			string areaname,
+			long? areasize,
+			string partname,
+			string partinterface,
+
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Miscellaneous
+			bool keep,
+			bool clean,
+			bool remUnicode)
+		{
+			string key = "";
+			string temptype = reader.Name;
+			bool containsItems = false;
+
+			while (!reader.EOF)
+			{
+				// We only want elements
+				if (reader.NodeType != XmlNodeType.Element)
+				{
+					reader.Read();
+					continue;
+				}
+
+				// Get the elements from the software
+				switch (reader.Name)
+				{
+					case "rom":
 						containsItems = true;
 
 						// If the rom is continue or ignore, add the size to the previous rom
@@ -379,12 +466,67 @@ namespace SabreTools.Library.DatFiles
 
 						reader.Read();
 						break;
-					case "diskarea":
-						areaname = reader.GetAttribute("name");
-
+					default:
 						reader.Read();
 						break;
-					case "disk": // TODO: Put this in a proper subreader under diskarea
+				}
+			}
+
+			return containsItems;
+		}
+
+		/// <summary>
+		/// Read diskarea information
+		/// </summary>
+		/// <param name="reader">XmlReader representing a diskarea block</param>
+		/// <param name="machine">Machine information to pass to contained items</param>
+		/// <param name="features">List of features from the parent part</param>
+		/// <param name="areaname">Name of the containing area</param>
+		/// <param name="areasize">Size of the containing area</param>
+		/// <param name="partname">Name of the containing part</param>
+		/// <param name="partinterface">Interface of the containing part</param>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		private bool ReadDiskArea(
+			XmlReader reader,
+			Machine machine,
+			List<Tuple<string, string>> features,
+			string areaname,
+			long? areasize,
+			string partname,
+			string partinterface,
+
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Miscellaneous
+			bool keep,
+			bool clean,
+			bool remUnicode)
+		{
+			string key = "";
+			string temptype = reader.Name;
+			bool containsItems = false;
+
+			while (!reader.EOF)
+			{
+				// We only want elements
+				if (reader.NodeType != XmlNodeType.Element)
+				{
+					reader.Read();
+					continue;
+				}
+
+				// Get the elements from the software
+				switch (reader.Name)
+				{
+					case "disk":
 						containsItems = true;
 
 						DatItem disk = new Disk
@@ -413,18 +555,6 @@ namespace SabreTools.Library.DatFiles
 
 						// Now process and add the rom
 						key = ParseAddHelper(disk, clean, remUnicode);
-
-						reader.Read();
-						break;
-					case "dipswitch":
-						// string name = reader.GetAttribute("name");
-						// string tag = reader.GetAttribute("tag");
-						// string mask = reader.GetAttribute("mask");
-
-						// For every <dipvalue> element...
-						// string name = reader.GetAttribute("name");
-						// string value = reader.GetAttribute("value");
-						// bool? default = Utilities.GetYesNo(reader.GetAttribute("default")); // (yes|no) "no"
 
 						reader.Read();
 						break;
