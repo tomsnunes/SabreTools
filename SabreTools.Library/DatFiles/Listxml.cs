@@ -24,13 +24,13 @@ namespace SabreTools.Library.DatFiles
 	/// Represents parsing and writing of a MAME XML DAT
 	/// </summary>
 	/// TODO: Verify that all read/write for this DatFile type is correct
-	internal class MameListxml : DatFile
+	internal class Listxml : DatFile
 	{
 		/// <summary>
 		/// Constructor designed for casting a base DatFile
 		/// </summary>
 		/// <param name="datFile">Parent DatFile to copy from</param>
-		public MameListxml(DatFile datFile)
+		public Listxml(DatFile datFile)
 			: base(datFile, cloneHeader: false)
 		{
 		}
