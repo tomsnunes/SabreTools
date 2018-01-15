@@ -18,9 +18,6 @@ namespace SabreTools.Library.Tools
 	/// <summary>
 	/// Log either to file or to the console
 	/// </summary>
-	/// <remarks>
-	/// TODO: Allow for "triggerable" logging done on an interval (async)
-	/// </remarks>
 	public class Logger
 	{
 		// Private instance variables

@@ -555,6 +555,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="outfile">Name of the file to write to</param>
 		/// <param name="ignoreblanks">True if blank roms should be skipped on output, false otherwise (default)</param>
 		/// <returns>True if the DAT was written correctly, false otherwise</returns>
+		/// TODO: Fix writing out files that have a path in the name
 		public override bool WriteToFile(string outfile, bool ignoreblanks = false)
 		{
 			try
