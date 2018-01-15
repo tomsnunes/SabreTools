@@ -1100,12 +1100,12 @@ namespace SabreTools.Library.Tools
 				string first = sr.ReadLine().ToLowerInvariant();
 				while (String.IsNullOrWhiteSpace(first))
 				{
-					first = sr.ReadLine();
+					first = sr.ReadLine().ToLowerInvariant();
 				}
 				string second = sr.ReadLine().ToLowerInvariant();
 				while (String.IsNullOrWhiteSpace(second))
 				{
-					second = sr.ReadLine();
+					second = sr.ReadLine().ToLowerInvariant();
 				}
 				sr.Dispose();
 
@@ -1116,7 +1116,8 @@ namespace SabreTools.Library.Tools
 					{
 						return DatFormat.Logiqx;
 					}
-					else if (second.StartsWith("<!DOCTYPE mame")
+					else if (second.StartsWith("<!doctype mame")
+						|| second.StartsWith("<!doctype m1")
 						|| second.StartsWith("<mame")
 						|| second.StartsWith("<m1"))
 					{
