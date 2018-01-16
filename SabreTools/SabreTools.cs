@@ -341,7 +341,7 @@ namespace SabreTools
 					case "output-listrom":
 						datHeader.DatFormat |= DatFormat.Listrom;
 						break;
-					case "output-listxml": // TODO: Not added to help at all
+					case "output-listxml": // TODO: Not added to readme yet
 						datHeader.DatFormat |= DatFormat.Listxml;
 						break;
 					case "output-miss":
