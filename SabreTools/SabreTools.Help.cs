@@ -570,6 +570,17 @@ namespace SabreTools
 					null);
 			}
 		}
+		private static Feature outputListxmlFlag
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-olx", "--output-listxml" },
+					"Output in MAME Listxml format",
+					FeatureType.Flag,
+					null);
+			}
+		}
 		private static Feature outputMd5Flag
 		{
 			get
@@ -2003,6 +2014,7 @@ namespace SabreTools
 			datFromDir.AddFeature("output-csv", outputCsvFlag);
 			datFromDir.AddFeature("output-doscenter", outputDoscenterFlag);
 			datFromDir.AddFeature("output-listrom", outputListromFlag);
+			datFromDir.AddFeature("output-listxml", outputListxmlFlag);
 			datFromDir.AddFeature("output-miss", outputMissFlag);
 			datFromDir.AddFeature("output-md5", outputMd5Flag);
 			datFromDir.AddFeature("output-offlinelist", outputOfflinelistFlag);
@@ -2130,6 +2142,7 @@ namespace SabreTools
 			split.AddFeature("output-csv", outputCsvFlag);
 			split.AddFeature("output-doscenter", outputDoscenterFlag);
 			split.AddFeature("output-listrom", outputListromFlag);
+			split.AddFeature("output-listxml", outputListxmlFlag);
 			split.AddFeature("output-miss", outputMissFlag);
 			split.AddFeature("output-md5", outputMd5Flag);
 			split.AddFeature("output-offlinelist", outputOfflinelistFlag);
@@ -2209,6 +2222,7 @@ namespace SabreTools
 				update["output-csv"].AddFeature("quotes", quotesFlag);
 			update.AddFeature("output-doscenter", outputDoscenterFlag);
 			update.AddFeature("output-listrom", outputListromFlag);
+			update.AddFeature("output-listxml", outputListxmlFlag);
 			update.AddFeature("output-miss", outputMissFlag);
 				update["output-miss"].AddFeature("roms", romsFlag);
 				update["output-miss"].AddFeature("game-prefix", gamePrefixFlag);
