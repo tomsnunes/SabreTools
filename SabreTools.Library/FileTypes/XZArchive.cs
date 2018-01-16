@@ -19,6 +19,9 @@ using Stream = System.IO.Stream;
 #endif
 using ROMVault2.SupportedFiles.Zip;
 using SevenZip;
+using SharpCompress.Archives;
+using SharpCompress.Archives.SevenZip;
+using SharpCompress.Readers;
 
 namespace SabreTools.Library.FileTypes
 {
@@ -60,7 +63,37 @@ namespace SabreTools.Library.FileTypes
 		/// <returns>True if the extraction was a success, false otherwise</returns>
 		public override bool ExtractAll(string outDir)
 		{
-			throw new NotImplementedException();
+			bool encounteredErrors = true;
+
+			try
+			{
+				// Create the temp directory
+				Directory.CreateDirectory(outDir);
+
+				// Extract all files to the temp directory
+				SharpCompress.Archives.SevenZip.SevenZipArchive sza = SharpCompress.Archives.SevenZip.SevenZipArchive.Open(Utilities.TryOpenRead(_filename));
+				foreach (SevenZipArchiveEntry entry in sza.Entries)
+				{
+					entry.WriteToDirectory(outDir, new ExtractionOptions { PreserveFileTime = true, ExtractFullPath = true, Overwrite = true });
+				}
+				encounteredErrors = false;
+				sza.Dispose();
+			}
+			catch (EndOfStreamException)
+			{
+				// Catch this but don't count it as an error because SharpCompress is unsafe
+			}
+			catch (InvalidOperationException)
+			{
+				encounteredErrors = true;
+			}
+			catch (Exception)
+			{
+				// Don't log file open errors
+				encounteredErrors = true;
+			}
+
+			return encounteredErrors;
 		}
 
 		/// <summary>
@@ -71,7 +104,42 @@ namespace SabreTools.Library.FileTypes
 		/// <returns>Name of the extracted file, null on error</returns>
 		public override string ExtractEntry(string entryName, string outDir)
 		{
-			throw new NotImplementedException();
+			// Try to extract a stream using the given information
+			(MemoryStream ms, string realEntry) = ExtractEntryStream(entryName);
+
+			// If the memory stream and the entry name are both non-null, we write to file
+			if (ms != null && realEntry != null)
+			{
+				realEntry = Path.Combine(outDir, realEntry);
+
+				// Create the output subfolder now
+				Directory.CreateDirectory(Path.GetDirectoryName(realEntry));
+
+				// Now open and write the file if possible
+				FileStream fs = Utilities.TryCreate(realEntry);
+				if (fs != null)
+				{
+					ms.Seek(0, SeekOrigin.Begin);
+					byte[] zbuffer = new byte[_bufferSize];
+					int zlen;
+					while ((zlen = ms.Read(zbuffer, 0, _bufferSize)) > 0)
+					{
+						fs.Write(zbuffer, 0, zlen);
+						fs.Flush();
+					}
+
+					ms?.Dispose();
+					fs?.Dispose();
+				}
+				else
+				{
+					ms?.Dispose();
+					fs?.Dispose();
+					realEntry = null;
+				}
+			}
+
+			return realEntry;
 		}
 
 		/// <summary>
@@ -82,7 +150,32 @@ namespace SabreTools.Library.FileTypes
 		/// <returns>MemoryStream representing the entry, null on error</returns>
 		public override (MemoryStream, string) ExtractEntryStream(string entryName)
 		{
-			throw new NotImplementedException();
+			MemoryStream ms = new MemoryStream();
+			string realEntry = null;
+
+			try
+			{
+				SharpCompress.Archives.SevenZip.SevenZipArchive sza = SharpCompress.Archives.SevenZip.SevenZipArchive.Open(_filename, new ReaderOptions { LeaveStreamOpen = false, });
+				foreach (SevenZipArchiveEntry entry in sza.Entries)
+				{
+					if (entry != null && !entry.IsDirectory && entry.Key.Contains(entryName))
+					{
+						// Write the file out
+						realEntry = entry.Key;
+						entry.WriteTo(ms);
+						break;
+					}
+				}
+				sza.Dispose();
+			}
+			catch (Exception ex)
+			{
+				Globals.Logger.Error(ex.ToString());
+				ms = null;
+				realEntry = null;
+			}
+
+			return (ms, realEntry);
 		}
 
 		#endregion

@@ -19,7 +19,7 @@ using SeekOrigin = System.IO.SeekOrigin;
 using Stream = System.IO.Stream;
 #endif
 using ROMVault2.SupportedFiles.Zip;
-using SevenZip;
+using SevenZip; // TODO: Remove this when 7zip write is implemented in SharpCompress
 using SharpCompress.Archives;
 using SharpCompress.Archives.SevenZip;
 using SharpCompress.Common;
