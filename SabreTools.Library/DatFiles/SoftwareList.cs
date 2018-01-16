@@ -56,7 +56,6 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// All XML-derived DATs share a lot in common so it just calls one implementation
-			// TODO: Use the following implementation instead of passing to Logiqx
 			new Logiqx(this, false).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 			return;
 
@@ -216,8 +215,8 @@ namespace SabreTools.Library.DatFiles
 						reader.Read();
 						break;
 					case "sharedfeat":
-						// string name = reader.GetAttribute("name");
-						// string value = reader.GetAttribute("value");
+						// string sharedfeat_name = reader.GetAttribute("name");
+						// string sharedfeat_value = reader.GetAttribute("value");
 
 						reader.Read();
 						break;
@@ -325,8 +324,8 @@ namespace SabreTools.Library.DatFiles
 								areasize = tempas;
 							}
 						}
-						// string width = reader.GetAttribute("width"); // (8|16|32|64) "8"
-						// string endianness = reader.GetAttribute("endianness"); // endianness (big|little) "little"
+						// string dataarea_width = reader.GetAttribute("width"); // (8|16|32|64) "8"
+						// string dataarea_endianness = reader.GetAttribute("endianness"); // endianness (big|little) "little"
 
 						containsItems = ReadDataArea(reader.ReadSubtree(), machine, features, areaname, areasize, 
 							partname, partinterface, filename, sysid, srcid, keep, clean, remUnicode);
@@ -344,16 +343,16 @@ namespace SabreTools.Library.DatFiles
 						reader.Skip();
 						break;
 					case "dipswitch":
-						// string name = reader.GetAttribute("name");
-						// string tag = reader.GetAttribute("tag");
-						// string mask = reader.GetAttribute("mask");
+						// string dipswitch_name = reader.GetAttribute("name");
+						// string dipswitch_tag = reader.GetAttribute("tag");
+						// string dipswitch_mask = reader.GetAttribute("mask");
 
 						// For every <dipvalue> element...
-						// string name = reader.GetAttribute("name");
-						// string value = reader.GetAttribute("value");
-						// bool? default = Utilities.GetYesNo(reader.GetAttribute("default")); // (yes|no) "no"
+						// string dipvalue_name = reader.GetAttribute("name");
+						// string dipvalue_value = reader.GetAttribute("value");
+						// bool? dipvalue_default = Utilities.GetYesNo(reader.GetAttribute("default")); // (yes|no) "no"
 
-						reader.Read();
+						reader.Skip();
 						break;
 					default:
 						reader.Read();

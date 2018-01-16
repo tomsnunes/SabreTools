@@ -58,7 +58,6 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// All XML-derived DATs share a lot in common so it just calls one implementation
-			// TODO: Use the following implementation instead of passing to Logiqx
 			new Logiqx(this, false).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 			return;
 
@@ -90,8 +89,8 @@ namespace SabreTools.Library.DatFiles
 						case "mame":
 							Name = (String.IsNullOrWhiteSpace(Name) ? xtr.GetAttribute("build") : Name);
 							Description = (String.IsNullOrWhiteSpace(Description) ? Name : Name);
-							// string debug = xtr.GetAttribute("debug"); // (yes|no) "no"
-							// string mameconfig = xtr.GetAttribute("mameconfig"); CDATA
+							// string mame_debug = xtr.GetAttribute("debug"); // (yes|no) "no"
+							// string mame_mameconfig = xtr.GetAttribute("mameconfig"); CDATA
 							xtr.Read();
 							break;
 						// Handle M1 DATs since they're 99% the same as a SL DAT
@@ -298,7 +297,11 @@ namespace SabreTools.Library.DatFiles
 						reader.Read();
 						break;
 					case "device_ref":
-						machine.Devices.Add(reader.ReadElementContentAsString());
+						string device_ref_name = reader.GetAttribute("name");
+						if (!machine.Devices.Contains(device_ref_name))
+						{
+							machine.Devices.Add(device_ref_name);
+						}
 
 						reader.Read();
 						break;
@@ -322,170 +325,167 @@ namespace SabreTools.Library.DatFiles
 						reader.Read();
 						break;
 					case "chip":
-						// string name = reader.GetAttribute("name");
-						// string tag = reader.GetAttribute("tag");
-						// string type = reader.GetAttribute("type"); // (cpu|audio)
-						// string clock = reader.GetAttribute("clock");
+						// string chip_name = reader.GetAttribute("name");
+						// string chip_tag = reader.GetAttribute("tag");
+						// string chip_type = reader.GetAttribute("type"); // (cpu|audio)
+						// string chip_clock = reader.GetAttribute("clock");
 
 						reader.Read();
 						break;
 					case "display":
-						// string tag = reader.GetAttribute("tag");
-						// string type = reader.GetAttribute("type"); // (raster|vector|lcd|svg|unknown)
-						// string rotate = reader.GetAttribute("rotate"); // (0|90|180|270)
-						// bool? flipx = Utilities.GetYesNo(reader.GetAttribute("flipx"));
-						// string width = reader.GetAttribute("width");
-						// string height = reader.GetAttribute("height");
-						// string refresh = reader.GetAttribute("refresh");
-						// string pixclock = reader.GetAttribute("pixclock");
-						// string htotal = reader.GetAttribute("htotal");
-						// string hbend = reader.GetAttribute("hbend");
-						// string hbstart = reader.GetAttribute("hbstart");
-						// string vtotal = reader.GetAttribute("vtotal");
-						// string vbend = reader.GetAttribute("vbend");
-						// string vbstart = reader.GetAttribute("vbstart");
+						// string display_tag = reader.GetAttribute("tag");
+						// string display_type = reader.GetAttribute("type"); // (raster|vector|lcd|svg|unknown)
+						// string display_rotate = reader.GetAttribute("rotate"); // (0|90|180|270)
+						// bool? display_flipx = Utilities.GetYesNo(reader.GetAttribute("flipx"));
+						// string display_width = reader.GetAttribute("width");
+						// string display_height = reader.GetAttribute("height");
+						// string display_refresh = reader.GetAttribute("refresh");
+						// string display_pixclock = reader.GetAttribute("pixclock");
+						// string display_htotal = reader.GetAttribute("htotal");
+						// string display_hbend = reader.GetAttribute("hbend");
+						// string display_hbstart = reader.GetAttribute("hbstart");
+						// string display_vtotal = reader.GetAttribute("vtotal");
+						// string display_vbend = reader.GetAttribute("vbend");
+						// string display_vbstart = reader.GetAttribute("vbstart");
 
 						reader.Read();
 						break;
 					case "sound":
-						// string channels = reader.GetAttribute("channels");
+						// string sound_channels = reader.GetAttribute("channels");
 
 						reader.Read();
 						break;
 					case "condition":
-						// string tag = reader.GetAttribute("tag");
-						// string mask = reader.GetAttribute("mask");
-						// string relation = reader.GetAttribute("relation"); // (eq|ne|gt|le|lt|ge)
-						// string value = reader.GetAttribute("value");
+						// string condition_tag = reader.GetAttribute("tag");
+						// string condition_mask = reader.GetAttribute("mask");
+						// string condition_relation = reader.GetAttribute("relation"); // (eq|ne|gt|le|lt|ge)
+						// string condition_value = reader.GetAttribute("value");
 
 						reader.Read();
 						break;
 					case "input":
-						// bool? service = Utilities.GetYesNo(reader.GetAttribute("service"));
-						// bool? tilt = Utilities.GetYesNo(reader.GetAttribute("tilt"));
-						// string players = reader.GetAttribute("players");
-						// string coins = reader.GetAttribute("coins");
+						// bool? input_service = Utilities.GetYesNo(reader.GetAttribute("service"));
+						// bool? input_tilt = Utilities.GetYesNo(reader.GetAttribute("tilt"));
+						// string input_players = reader.GetAttribute("players");
+						// string input_coins = reader.GetAttribute("coins");
 
 						// // While the subtree contains <control> elements...
-						// string type = reader.GetAttribute("type");
-						// string player = reader.GetAttribute("player");
-						// string buttons = reader.GetAttribute("buttons");
-						// string regbuttons = reader.GetAttribute("regbuttons");
-						// string minimum = reader.GetAttribute("minimum");
-						// string maximum = reader.GetAttribute("maximum");
-						// string sensitivity = reader.GetAttribute("sensitivity");
-						// string keydelta = reader.GetAttribute("keydelta");
-						// bool? reverse = Utilities.GetYesNo(reader.GetAttribute("reverse"));
-						// string ways = reader.GetAttribute("ways");
-						// string ways2 = reader.GetAttribute("ways2");
-						// string ways3 = reader.GetAttribute("ways3");
+						// string control_type = reader.GetAttribute("type");
+						// string control_player = reader.GetAttribute("player");
+						// string control_buttons = reader.GetAttribute("buttons");
+						// string control_regbuttons = reader.GetAttribute("regbuttons");
+						// string control_minimum = reader.GetAttribute("minimum");
+						// string control_maximum = reader.GetAttribute("maximum");
+						// string control_sensitivity = reader.GetAttribute("sensitivity");
+						// string control_keydelta = reader.GetAttribute("keydelta");
+						// bool? control_reverse = Utilities.GetYesNo(reader.GetAttribute("reverse"));
+						// string control_ways = reader.GetAttribute("ways");
+						// string control_ways2 = reader.GetAttribute("ways2");
+						// string control_ways3 = reader.GetAttribute("ways3");
 
-						reader.Read();
+						reader.Skip();
 						break;
 					case "dipswitch":
-						// string name = reader.GetAttribute("name");
-						// string tag = reader.GetAttribute("tag");
-						// string mask = reader.GetAttribute("mask");
+						// string dipswitch_name = reader.GetAttribute("name");
+						// string dipswitch_tag = reader.GetAttribute("tag");
+						// string dipswitch_mask = reader.GetAttribute("mask");
 
 						// // While the subtree contains <diplocation> elements...
-						// string name = reader.GetAttribute("name");
-						// string number = reader.GetAttribute("number");
-						// bool? inverted = Utilities.GetYesNo(reader.GetAttribute("inverted"));
+						// string diplocation_name = reader.GetAttribute("name");
+						// string diplocation_number = reader.GetAttribute("number");
+						// bool? diplocation_inverted = Utilities.GetYesNo(reader.GetAttribute("inverted"));
 
 						// // While the subtree contains <dipvalue> elements...
-						// string name = reader.GetAttribute("name");
-						// string value = reader.GetAttribute("value");
-						// bool? default = Utilities.GetYesNo(reader.GetAttribute("default"));
+						// string dipvalue_name = reader.GetAttribute("name");
+						// string dipvalue_value = reader.GetAttribute("value");
+						// bool? dipvalue_default = Utilities.GetYesNo(reader.GetAttribute("default"));
 
-						reader.Read();
+						reader.Skip();
 						break;
 					case "configuration":
-						// string name = reader.GetAttribute("name");
-						// string tag = reader.GetAttribute("tag");
-						// string mask = reader.GetAttribute("mask");
+						// string configuration_name = reader.GetAttribute("name");
+						// string configuration_tag = reader.GetAttribute("tag");
+						// string configuration_mask = reader.GetAttribute("mask");
 
 						// // While the subtree contains <conflocation> elements...
-						// string name = reader.GetAttribute("name");
-						// string number = reader.GetAttribute("number");
-						// bool? inverted = Utilities.GetYesNo(reader.GetAttribute("inverted"));
+						// string conflocation_name = reader.GetAttribute("name");
+						// string conflocation_number = reader.GetAttribute("number");
+						// bool? conflocation_inverted = Utilities.GetYesNo(reader.GetAttribute("inverted"));
 
 						// // While the subtree contains <confsetting> elements...
-						// string name = reader.GetAttribute("name");
-						// string value = reader.GetAttribute("value");
-						// bool? default = Utilities.GetYesNo(reader.GetAttribute("default"));
+						// string confsetting_name = reader.GetAttribute("name");
+						// string confsetting_value = reader.GetAttribute("value");
+						// bool? confsetting_default = Utilities.GetYesNo(reader.GetAttribute("default"));
 
-						reader.Read();
+						reader.Skip();
 						break;
 					case "port":
-						// string tag = reader.GetAttribute("tag");
+						// string port_tag = reader.GetAttribute("tag");
 
 						// // While the subtree contains <analog> elements...
-						// string mask = reader.GetAttribute("mask");
+						// string analog_mask = reader.GetAttribute("mask");
 
-						reader.Read();
+						reader.Skip();
 						break;
 					case "adjuster":
-						// string name = reader.GetAttribute("name");
-						// bool? default = Utilities.GetYesNo(reader.GetAttribute("default"));
+						// string adjuster_name = reader.GetAttribute("name");
+						// bool? adjuster_default = Utilities.GetYesNo(reader.GetAttribute("default"));
 
 						// // For the one possible <condition> element...
-						// string tag = reader.GetAttribute("tag");
-						// string mask = reader.GetAttribute("mask");
-						// string relation = reader.GetAttribute("relation"); // (eq|ne|gt|le|lt|ge)
-						// string value = reader.GetAttribute("value");
+						// string condition_tag = reader.GetAttribute("tag");
+						// string condition_mask = reader.GetAttribute("mask");
+						// string condition_relation = reader.GetAttribute("relation"); // (eq|ne|gt|le|lt|ge)
+						// string condition_value = reader.GetAttribute("value");
 
-						reader.Read();
+						reader.Skip();
 						break;
 					case "driver":
-						// string status = reader.GetAttribute("status"); // (good|imperfect|preliminary)
-						// string emulation = reader.GetAttribute("emulation"); // (good|imperfect|preliminary)
-						// string cocktail = reader.GetAttribute("cocktail"); // (good|imperfect|preliminary)
-						// string savestate = reader.GetAttribute("savestate"); // (supported|unsupported)
+						// string driver_status = reader.GetAttribute("status"); // (good|imperfect|preliminary)
+						// string driver_emulation = reader.GetAttribute("emulation"); // (good|imperfect|preliminary)
+						// string driver_cocktail = reader.GetAttribute("cocktail"); // (good|imperfect|preliminary)
+						// string driver_savestate = reader.GetAttribute("savestate"); // (supported|unsupported)
 
 						reader.Read();
 						break;
 					case "feature":
-						// string type = reader.GetAttribute("type"); // (protection|palette|graphics|sound|controls|keyboard|mouse|microphone|camera|disk|printer|lan|wan|timing)
-						// string status = reader.GetAttribute("status"); // (unemulated|imperfect)
-						// string overall = reader.GetAttribute("overall"); // (unemulated|imperfect)
+						// string feature_type = reader.GetAttribute("type"); // (protection|palette|graphics|sound|controls|keyboard|mouse|microphone|camera|disk|printer|lan|wan|timing)
+						// string feature_status = reader.GetAttribute("status"); // (unemulated|imperfect)
+						// string feature_overall = reader.GetAttribute("overall"); // (unemulated|imperfect)
 
 						reader.Read();
 						break;
 					case "device":
-						// string type = reader.GetAttribute("type");
-						// string tag = reader.GetAttribute("tag");
-						// string fixed_image = reader.GetAttribute("fixed_image");
-						// string mandatory = reader.GetAttribute("mandatory");
-						// string interface = reader.GetAttribute("interface");
+						// string device_type = reader.GetAttribute("type");
+						// string device_tag = reader.GetAttribute("tag");
+						// string device_fixed_image = reader.GetAttribute("fixed_image");
+						// string device_mandatory = reader.GetAttribute("mandatory");
+						// string device_interface = reader.GetAttribute("interface");
 
 						// // For the one possible <instance> element...
-						// string name = reader.GetAttribute("name");
-						// string briefname = reader.GetAttribute("briefname");
+						// string instance_name = reader.GetAttribute("name");
+						// string instance_briefname = reader.GetAttribute("briefname");
 
 						// // While the subtree contains <extension> elements...
-						// string name = reader.GetAttribute("name");
+						// string extension_name = reader.GetAttribute("name");
 
-						reader.Read();
+						reader.Skip();
 						break;
 					case "slot":
-						// string name = reader.GetAttribute("name");
+						// string slot_name = reader.GetAttribute("name");
+						ReadSlot(reader.ReadSubtree(), machine);
 
-						// // While the subtree contains <slotoption> elements... (These get added as devices currently)
-						// string name = reader.GetAttribute("name");
-						// string devname = reader.GetAttribute("devname");
-						// bool? default = Utilities.GetYesNo(reader.GetAttribute("default"));
-
-						reader.Read();
+						// Skip the slot now that we've processed it
+						reader.Skip();
 						break;
 					case "softwarelist":
-						// string name = reader.GetAttribute("name");
-						// string status = reader.GetAttribute("status"); // (original|compatible)
-						// string filter = reader.GetAttribute("filter");
+						// string softwarelist_name = reader.GetAttribute("name");
+						// string softwarelist_status = reader.GetAttribute("status"); // (original|compatible)
+						// string softwarelist_filter = reader.GetAttribute("filter");
 
 						reader.Read();
 						break;
 					case "ramoption":
-						// string default = reader.GetAttribute("default");
+						// string ramoption_default = reader.GetAttribute("default");
 
 						reader.Read();
 						break;
@@ -509,6 +509,50 @@ namespace SabreTools.Library.DatFiles
 
 				// Now process and add the rom
 				key = ParseAddHelper(blank, clean, remUnicode);
+			}
+		}
+
+		/// <summary>
+		/// Read slot information
+		/// </summary>
+		/// <param name="reader">XmlReader representing a machine block</param>
+		/// <param name="machine">Machine information to pass to contained items</param>
+		private void ReadSlot(XmlReader reader,	Machine machine)
+		{
+			// If we have an empty machine, skip it
+			if (reader == null)
+			{
+				return;
+			}
+
+			// Otherwise, add what is possible
+			reader.MoveToContent();
+
+			while (!reader.EOF)
+			{
+				// We only want elements
+				if (reader.NodeType != XmlNodeType.Element)
+				{
+					reader.Read();
+					continue;
+				}
+
+				// Get the roms from the machine
+				switch (reader.Name)
+				{
+					case "slotoption": // These get added as devices currently
+						// string slotoption_name = reader.GetAttribute("name");
+						string devname = reader.GetAttribute("devname");
+						if (!machine.Devices.Contains(devname))
+						{
+							machine.Devices.Add(devname);
+						}
+						// bool? slotoption_default = Utilities.GetYesNo(reader.GetAttribute("default"));
+						break;
+					default:
+						reader.Read();
+						break;
+				}
 			}
 		}
 
