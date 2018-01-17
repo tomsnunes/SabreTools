@@ -85,10 +85,13 @@ namespace SabreTools.Library.DatFiles
 					// If we have a known set type
 					else if (normalizedValue == "set"      // Used by the most ancient DATs
 						|| normalizedValue == "game"       // Used by most CMP DATs
-						|| normalizedValue == "machine"    // Possibly used by MAME CMP DATs
-						|| normalizedValue == "resource")  // Used by some other DATs to denote a BIOS set
+						|| normalizedValue == "machine")   // Possibly used by MAME CMP DATs
 					{
-						ReadSet(sr, filename, sysid, srcid, keep, clean, remUnicode);
+						ReadSet(sr, false, filename, sysid, srcid, keep, clean, remUnicode);
+					}
+					else if (normalizedValue == "resource")  // Used by some other DATs to denote a BIOS set
+					{
+						ReadSet(sr, true, filename, sysid, srcid, keep, clean, remUnicode);
 					}
 				}
 			}
@@ -227,6 +230,7 @@ namespace SabreTools.Library.DatFiles
 		/// Read set information
 		/// </summary>
 		/// <param name="reader">StreamReader to use to parse the header</param>
+		/// <param name="resource">True if the item is a resource (bios), false otherwise</param>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <param name="sysid">System ID for the DAT</param>
 		/// <param name="srcid">Source ID for the DAT</param>
@@ -235,6 +239,7 @@ namespace SabreTools.Library.DatFiles
 		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
 		private void ReadSet(
 			StreamReader reader,
+			bool resource,
 
 			// Standard Dat parsing
 			string filename,
@@ -248,7 +253,10 @@ namespace SabreTools.Library.DatFiles
 		{
 			// Prepare all internal variables
 			bool containsItems = false;
-			Machine machine = new Machine();
+			Machine machine = new Machine()
+			{
+				MachineType = (resource ? MachineType.Bios : MachineType.None),
+			};
 
 			// If there's no subtree to the header, skip it
 			if (reader == null || reader.EndOfStream)
@@ -818,7 +826,7 @@ namespace SabreTools.Library.DatFiles
 					rom.MachineName = rom.MachineName.Substring(1);
 				}
 
-				string state = "game (\n\tname \"" + rom.MachineName + "\"\n" +
+				string state = (rom.MachineType == MachineType.Bios ? "resource" : "game") + " (\n\tname \"" + rom.MachineName + "\"\n" +
 							(ExcludeOf ? "" :
 								(String.IsNullOrWhiteSpace(rom.RomOf) ? "" : "\tromof \"" + rom.RomOf + "\"\n") +
 								(String.IsNullOrWhiteSpace(rom.CloneOf) ? "" : "\tcloneof \"" + rom.CloneOf + "\"\n") +
