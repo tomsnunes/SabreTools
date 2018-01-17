@@ -753,7 +753,7 @@ namespace SabreTools.Library.DatFiles
 							(!String.IsNullOrWhiteSpace(Url) ? "\t\t<url>" + HttpUtility.HtmlEncode(Url) + "</url>\n" : "") +
 							(!String.IsNullOrWhiteSpace(Comment) ? "\t\t<comment>" + HttpUtility.HtmlEncode(Comment) + "</comment>\n" : "") +
 							(!String.IsNullOrWhiteSpace(Type) ? "\t\t<type>" + HttpUtility.HtmlEncode(Type) + "</type>\n" : "") +
-							(ForcePacking != ForcePacking.None || ForceMerging != ForceMerging.None || ForceNodump != ForceNodump.None ?
+							(ForcePacking != ForcePacking.None || ForceMerging != ForceMerging.None || ForceNodump != ForceNodump.None || !String.IsNullOrWhiteSpace(Header) ?
 								"\t\t<clrmamepro" +
 									(ForcePacking == ForcePacking.Unzip ? " forcepacking=\"unzip\"" : "") +
 									(ForcePacking == ForcePacking.Zip ? " forcepacking=\"zip\"" : "") +
@@ -764,6 +764,7 @@ namespace SabreTools.Library.DatFiles
 									(ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
 									(ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"obsolete\"" : "") +
 									(ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
+									(!String.IsNullOrWhiteSpace(Header) ? "header=\"" + Header + "\"" : "") +
 									" />\n"
 							: "") +
 							"\t</header>\n";
