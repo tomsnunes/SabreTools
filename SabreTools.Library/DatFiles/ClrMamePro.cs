@@ -23,6 +23,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a ClrMamePro DAT
 	/// </summary>
+	/// TODO: Separate Parse out into multiple parts, similar to the XML-derived dats
 	internal class ClrMamePro : DatFile
 	{
 		/// <summary>
