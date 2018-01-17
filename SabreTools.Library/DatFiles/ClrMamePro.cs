@@ -591,6 +591,628 @@ namespace SabreTools.Library.DatFiles
 		}
 
 		/// <summary>
+		/// Parse a ClrMamePro DAT and return all found games and roms within
+		/// </summary>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		public void ParseFileStripped(
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Miscellaneous
+			bool keep,
+			bool clean,
+			bool remUnicode)
+		{
+			// Open a file reader
+			Encoding enc = Utilities.GetEncoding(filename);
+			StreamReader sr = new StreamReader(Utilities.TryOpenRead(filename), enc);
+
+			while (!sr.EndOfStream)
+			{
+				string line = sr.ReadLine();
+
+				// Comments in CMP DATs start with a #
+				if (line.Trim().StartsWith("#"))
+				{
+					continue;
+				}
+
+				// If the line is the header or a game
+				if (Regex.IsMatch(line, Constants.HeaderPatternCMP))
+				{
+					GroupCollection gc = Regex.Match(line, Constants.HeaderPatternCMP).Groups;
+
+					// If we have a known header
+					if (gc[1].Value == "clrmamepro"
+						|| gc[1].Value == "romvault"
+						|| gc[1].Value.ToLowerInvariant() == "doscenter")
+					{
+						ReadHeader(sr, keep);
+					}
+					// If we have a known set type
+					else if (gc[1].Value == "set"
+						|| gc[1].Value == "game"
+						|| gc[1].Value == "machine")
+					{
+						ReadSet(sr, filename, sysid, srcid, keep, clean, remUnicode);
+					}
+				}
+			}
+
+			sr.Dispose();
+		}
+
+		/// <summary>
+		/// Read header information
+		/// </summary>
+		/// <param name="reader">StreamReader to use to parse the header</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// TODO: Make sure this only is called if the block is "clrmamepro", "doscenter", "romcenter"
+		private void ReadHeader(StreamReader reader, bool keep)
+		{
+			bool superdat = false;
+
+			// If there's no subtree to the header, skip it
+			if (reader == null || reader.EndOfStream)
+			{
+				return;
+			}
+
+			// Otherwise, add what is possible
+			string line = reader.ReadLine();
+			while (!Regex.IsMatch(line, Constants.EndPatternCMP))
+			{
+				// We only want elements
+				if (line.Trim().StartsWith("#"))
+				{
+					line = reader.ReadLine();
+					continue;
+				}
+
+				// Get all header items (ONLY OVERWRITE IF THERE'S NO DATA)
+				GroupCollection gc = Regex.Match(line, Constants.ItemPatternCMP).Groups;
+				string itemval = gc[2].Value.Replace("\"", "");
+
+				if (line.Trim().StartsWith("Name:"))
+				{
+					Name = (String.IsNullOrWhiteSpace(Name) ? line.Substring(6) : Name);
+					superdat = superdat || itemval.Contains(" - SuperDAT");
+					if (keep && superdat)
+					{
+						Type = (String.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
+					}
+
+					line = reader.ReadLine();
+					continue;
+				}
+
+				switch (gc[1].Value)
+				{
+					case "name":
+					case "Name:":
+						Name = (String.IsNullOrWhiteSpace(Name) ? itemval : Name);
+						superdat = superdat || itemval.Contains(" - SuperDAT");
+						if (keep && superdat)
+						{
+							Type = (String.IsNullOrWhiteSpace(Type) ? "SuperDAT" : Type);
+						}
+						break;
+					case "description":
+					case "Description:":
+						Description = (String.IsNullOrWhiteSpace(Description) ? itemval : Description);
+						break;
+					case "rootdir":
+					case "Rootdir:":
+						RootDir = (String.IsNullOrWhiteSpace(RootDir) ? itemval : RootDir);
+						break;
+					case "category":
+					case "Category:":
+						Category = (String.IsNullOrWhiteSpace(Category) ? itemval : Category);
+						break;
+					case "version":
+					case "Version:":
+						Version = (String.IsNullOrWhiteSpace(Version) ? itemval : Version);
+						break;
+					case "date":
+					case "Date:":
+						Date = (String.IsNullOrWhiteSpace(Date) ? itemval : Date);
+						break;
+					case "author":
+					case "Author:":
+						Author = (String.IsNullOrWhiteSpace(Author) ? itemval : Author);
+						break;
+					case "email":
+					case "Email:":
+						Email = (String.IsNullOrWhiteSpace(Email) ? itemval : Email);
+						break;
+					case "homepage":
+					case "Homepage:":
+						Homepage = (String.IsNullOrWhiteSpace(Homepage) ? itemval : Homepage);
+						break;
+					case "url":
+					case "Url:":
+						Url = (String.IsNullOrWhiteSpace(Url) ? itemval : Url);
+						break;
+					case "comment":
+					case "Comment:":
+						Comment = (String.IsNullOrWhiteSpace(Comment) ? itemval : Comment);
+						break;
+					case "header":
+					case "Header:":
+						Header = (String.IsNullOrWhiteSpace(Header) ? itemval : Header);
+						break;
+					case "type":
+					case "Type:":
+						Type = (String.IsNullOrWhiteSpace(Type) ? itemval : Type);
+						superdat = superdat || itemval.Contains("SuperDAT");
+						break;
+					case "forcemerging":
+						if (ForceMerging == ForceMerging.None)
+						{
+							ForceMerging = Utilities.GetForceMerging(itemval);
+						}
+						break;
+					case "forcezipping":
+						if (ForcePacking == ForcePacking.None)
+						{
+							ForcePacking = Utilities.GetForcePacking(itemval);
+						}
+						break;
+					case "forcepacking":
+						if (ForcePacking == ForcePacking.None)
+						{
+							ForcePacking = Utilities.GetForcePacking(itemval);
+						}
+						break;
+				}
+
+				line = reader.ReadLine();
+			}
+		}
+
+		/// <summary>
+		/// Read set information
+		/// </summary>
+		/// <param name="reader">StreamReader to use to parse the header</param>
+		/// <param name="filename">Name of the file to be parsed</param>
+		/// <param name="sysid">System ID for the DAT</param>
+		/// <param name="srcid">Source ID for the DAT</param>
+		/// <param name="keep">True if full pathnames are to be kept, false otherwise (default)</param>
+		/// <param name="clean">True if game names are sanitized, false otherwise (default)</param>
+		/// <param name="remUnicode">True if we should remove non-ASCII characters from output, false otherwise (default)</param>
+		/// TODO: Make sure this is only called if the block is "set", "game", "machine"
+		private void ReadSet(
+			StreamReader reader,
+
+			// Standard Dat parsing
+			string filename,
+			int sysid,
+			int srcid,
+
+			// Miscellaneous
+			bool keep,
+			bool clean,
+			bool remUnicode)
+		{
+			// Prepare all internal variables
+			bool containsItems = false;
+			Machine machine = new Machine();
+
+			// If there's no subtree to the header, skip it
+			if (reader == null || reader.EndOfStream)
+			{
+				return;
+			}
+
+			// Otherwise, add what is possible
+			string line = reader.ReadLine();
+			while (!Regex.IsMatch(line, Constants.EndPatternCMP))
+			{
+				// We only want elements
+				if (line.Trim().StartsWith("#"))
+				{
+					line = reader.ReadLine();
+					continue;
+				}
+
+				// Item-specific lines have a known pattern
+				string trimmedline = line.Trim();
+				if (trimmedline.StartsWith("archive (")
+					|| trimmedline.StartsWith("biosset (")
+					|| trimmedline.StartsWith("disk (")
+					|| trimmedline.StartsWith("file (") // This is a DOSCenter file, not a SabreDAT file
+					|| trimmedline.StartsWith("release (")
+					|| trimmedline.StartsWith("rom (")
+					|| (trimmedline.StartsWith("sample") && !trimmedline.StartsWith("sampleof")))
+				{
+					containsItems = true;
+					ItemType temptype = ItemType.Rom;
+					if (line.Trim().StartsWith("rom ("))
+					{
+						temptype = ItemType.Rom;
+					}
+					else if (line.Trim().StartsWith("disk ("))
+					{
+						temptype = ItemType.Disk;
+					}
+					else if (line.Trim().StartsWith("file ("))
+					{
+						temptype = ItemType.Rom;
+					}
+					else if (line.Trim().StartsWith("sample"))
+					{
+						temptype = ItemType.Sample;
+					}
+
+					// Create the proper DatItem based on the type
+					DatItem item = Utilities.GetDatItem(temptype);
+
+					// Then populate it with information
+					item.CopyMachineInformation(machine);
+
+					item.SourceFile = filename;
+					item.SystemID = sysid;
+					item.SourceID = srcid;
+
+					// If we have a sample, treat it special
+					if (temptype == ItemType.Sample)
+					{
+						line = line.Trim().Remove(0, 6).Trim().Replace("\"", ""); // Remove "sample" from the input string
+						item.Name = line;
+
+						// Now process and add the sample
+						ParseAddHelper(item, clean, remUnicode);
+						line = reader.ReadLine();
+						continue;
+					}
+
+					// Get the line split by spaces and quotes
+					string[] linegc = Utilities.SplitLineAsCMP(line);
+
+					// Special cases for DOSCenter DATs only because of how the lines are arranged
+					if (line.Trim().StartsWith("file ("))
+					{
+						// Loop over the specifics
+						for (int i = 0; i < linegc.Length; i++)
+						{
+							// Names are not quoted, for some stupid reason
+							if (linegc[i] == "name")
+							{
+								// Get the name in order until we find the next flag
+								while (++i < linegc.Length && linegc[i] != "size"
+									&& linegc[i] != "date"
+									&& linegc[i] != "crc"
+									&& linegc[i] != "md5"
+									&& linegc[i] != "sha1"
+									&& linegc[i] != "sha256"
+									&& linegc[i] != "sha384"
+									&& linegc[i] != "sha512")
+								{
+									item.Name += " " + linegc[i];
+								}
+
+								// Perform correction
+								item.Name = item.Name.TrimStart();
+								i--;
+							}
+
+							// Get the size from the next part
+							else if (linegc[i] == "size")
+							{
+								long tempsize = -1;
+								if (!Int64.TryParse(linegc[++i], out tempsize))
+								{
+									tempsize = 0;
+								}
+								((Rom)item).Size = tempsize;
+							}
+
+							// Get the date from the next part
+							else if (linegc[i] == "date")
+							{
+								((Rom)item).Date = linegc[++i].Replace("\"", "") + " " + linegc[++i].Replace("\"", "");
+							}
+
+							// Get the CRC from the next part
+							else if (linegc[i] == "crc")
+							{
+								((Rom)item).CRC = linegc[++i].Replace("\"", "").ToLowerInvariant();
+							}
+
+							// Get the MD5 from the next part
+							else if (linegc[i] == "md5")
+							{
+								((Rom)item).MD5 = linegc[++i].Replace("\"", "").ToLowerInvariant();
+							}
+
+							// Get the SHA1 from the next part
+							else if (linegc[i] == "sha1")
+							{
+								((Rom)item).SHA1 = linegc[++i].Replace("\"", "").ToLowerInvariant();
+							}
+
+							// Get the SHA256 from the next part
+							else if (linegc[i] == "sha256")
+							{
+								((Rom)item).SHA256 = linegc[++i].Replace("\"", "").ToLowerInvariant();
+							}
+
+							// Get the SHA384 from the next part
+							else if (linegc[i] == "sha384")
+							{
+								((Rom)item).SHA384 = linegc[++i].Replace("\"", "").ToLowerInvariant();
+							}
+
+							// Get the SHA512 from the next part
+							else if (linegc[i] == "sha512")
+							{
+								((Rom)item).SHA512 = linegc[++i].Replace("\"", "").ToLowerInvariant();
+							}
+						}
+
+						// Now process and add the rom
+						ParseAddHelper(item, clean, remUnicode);
+						line = reader.ReadLine();
+						continue;
+					}
+
+					// Loop over all attributes normally and add them if possible
+					for (int i = 0; i < linegc.Length; i++)
+					{
+						// Look at the current item and use it if possible
+						string quoteless = linegc[i].Replace("\"", "");
+						switch (quoteless)
+						{
+							//If the item is empty, we automatically skip it because it's a fluke
+							case "":
+								continue;
+
+							// Special cases for standalone item statuses
+							case "baddump":
+							case "good":
+							case "nodump":
+							case "verified":
+								ItemStatus tempStandaloneStatus = Utilities.GetItemStatus(quoteless);
+								if (item.Type == ItemType.Rom)
+								{
+									((Rom)item).ItemStatus = tempStandaloneStatus;
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									((Disk)item).ItemStatus = tempStandaloneStatus;
+								}
+								break;
+
+							// Regular attributes
+							case "name":
+								quoteless = linegc[++i].Replace("\"", "");
+								item.Name = quoteless;
+								break;
+							case "size":
+								if (item.Type == ItemType.Rom)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									if (Int64.TryParse(quoteless, out long size))
+									{
+										((Rom)item).Size = size;
+									}
+									else
+									{
+										((Rom)item).Size = -1;
+									}
+								}
+								break;
+							case "crc":
+								if (item.Type == ItemType.Rom)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Rom)item).CRC = quoteless.ToLowerInvariant();
+								}
+								break;
+							case "md5":
+								if (item.Type == ItemType.Rom)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Rom)item).MD5 = quoteless.ToLowerInvariant();
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									i++;
+									quoteless = linegc[i].Replace("\"", "");
+									((Disk)item).MD5 = quoteless.ToLowerInvariant();
+								}
+								break;
+							case "sha1":
+								if (item.Type == ItemType.Rom)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Rom)item).SHA1 = quoteless.ToLowerInvariant();
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Disk)item).SHA1 = quoteless.ToLowerInvariant();
+								}
+								break;
+							case "sha256":
+								if (item.Type == ItemType.Rom)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Rom)item).SHA256 = quoteless.ToLowerInvariant();
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Disk)item).SHA256 = quoteless.ToLowerInvariant();
+								}
+								break;
+							case "sha384":
+								if (item.Type == ItemType.Rom)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Rom)item).SHA384 = quoteless.ToLowerInvariant();
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Disk)item).SHA384 = quoteless.ToLowerInvariant();
+								}
+								break;
+							case "sha512":
+								if (item.Type == ItemType.Rom)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Rom)item).SHA512 = quoteless.ToLowerInvariant();
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Disk)item).SHA512 = quoteless.ToLowerInvariant();
+								}
+								break;
+							case "status":
+							case "flags":
+								quoteless = linegc[++i].Replace("\"", "");
+								ItemStatus tempFlagStatus = Utilities.GetItemStatus(quoteless);
+								if (item.Type == ItemType.Rom)
+								{
+									((Rom)item).ItemStatus = tempFlagStatus;
+								}
+								else if (item.Type == ItemType.Disk)
+								{
+									((Disk)item).ItemStatus = tempFlagStatus;
+								}
+								break;
+							case "date":
+								if (item.Type == ItemType.Rom)
+								{
+									// If we have quotes in the next item, assume only one item
+									if (linegc[i + 1].Contains("\""))
+									{
+										quoteless = linegc[++i].Replace("\"", "");
+									}
+									// Otherwise, we assume we need to read the next two items
+									else
+									{
+										quoteless = linegc[++i].Replace("\"", "") + " " + linegc[++i].Replace("\"", "");
+									}
+									((Rom)item).Date = quoteless;
+								}
+								else if (item.Type == ItemType.Release)
+								{
+									// If we have quotes in the next item, assume only one item
+									if (linegc[i + 1].Contains("\""))
+									{
+										quoteless = linegc[++i].Replace("\"", "");
+									}
+									// Otherwise, we assume we need to read the next two items
+									else
+									{
+										quoteless = linegc[++i].Replace("\"", "") + " " + linegc[++i].Replace("\"", "");
+									}
+									((Release)item).Date = quoteless;
+								}
+								break;
+							case "default":
+								if (item.Type == ItemType.BiosSet)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((BiosSet)item).Default = Utilities.GetYesNo(quoteless.ToLowerInvariant());
+								}
+								else if (item.Type == ItemType.Release)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Release)item).Default = Utilities.GetYesNo(quoteless.ToLowerInvariant());
+								}
+								break;
+							case "description":
+								if (item.Type == ItemType.BiosSet)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((BiosSet)item).Description = quoteless.ToLowerInvariant();
+								}
+								break;
+							case "region":
+								if (item.Type == ItemType.Release)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Release)item).Region = quoteless.ToLowerInvariant();
+								}
+								break;
+							case "language":
+								if (item.Type == ItemType.Release)
+								{
+									quoteless = linegc[++i].Replace("\"", "");
+									((Release)item).Language = quoteless.ToLowerInvariant();
+								}
+								break;
+						}
+					}
+
+					// Now process and add the rom
+					ParseAddHelper(item, clean, remUnicode);
+
+					line = reader.ReadLine();
+					continue;
+				}
+
+				// Set-specific lines have a known pattern
+				GroupCollection setgc = Regex.Match(line, Constants.ItemPatternCMP).Groups;
+				string itemval = setgc[2].Value.Replace("\"", "");
+
+				switch (setgc[1].Value)
+				{
+					case "name":
+						machine.Name = (itemval.ToLowerInvariant().EndsWith(".zip") ? itemval.Remove(itemval.Length - 4) : itemval);
+						machine.Description = (itemval.ToLowerInvariant().EndsWith(".zip") ? itemval.Remove(itemval.Length - 4) : itemval);
+						break;
+					case "description":
+						machine.Description = itemval;
+						break;
+					case "year":
+						machine.Year = itemval;
+						break;
+					case "manufacturer":
+						machine.Manufacturer = itemval;
+						break;
+					case "cloneof":
+						machine.CloneOf = itemval;
+						break;
+					case "romof":
+						machine.RomOf = itemval;
+						break;
+					case "sampleof":
+						machine.SampleOf = itemval;
+						break;
+				}
+
+				line = reader.ReadLine();
+			}
+
+			// If no items were found for this machine, add a Blank placeholder
+			if (!containsItems)
+			{
+				Blank blank = new Blank()
+				{
+					SourceFile = filename,
+					SystemID = sysid,
+					SourceID = srcid,
+				};
+				blank.CopyMachineInformation(machine);
+
+				// Now process and add the rom
+				ParseAddHelper(blank, clean, remUnicode);
+			}
+		}
+
+		/// <summary>
 		/// Create and open an output file for writing direct from a dictionary
 		/// </summary>
 		/// <param name="outfile">Name of the file to write to</param>
