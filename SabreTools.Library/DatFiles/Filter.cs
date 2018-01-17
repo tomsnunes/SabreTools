@@ -639,13 +639,13 @@ namespace SabreTools.Library.DatFiles
 			}
 			if (_notGameNames.Count > 0)
 			{
-				bool found = FindValueInList(_gameNames, item.MachineName);
+				bool found = FindValueInList(_notGameNames, item.MachineName);
 
 				// If we are checking CloneOf and RomOf, add them in as well
 				if (_includeOfInGame)
 				{
-					found |= FindValueInList(_gameNames, item.CloneOf);
-					found |= FindValueInList(_gameNames, item.RomOf);
+					found |= FindValueInList(_notGameNames, item.CloneOf);
+					found |= FindValueInList(_notGameNames, item.RomOf);
 				}
 
 				// If the game name was found in the list, return false
