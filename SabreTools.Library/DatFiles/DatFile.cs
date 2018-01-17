@@ -2678,7 +2678,7 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
 
 			// Now we want to loop through all of the games and set the correct information
-			AddRomsFromDevices(true);
+			while (AddRomsFromDevices(true));
 			AddRomsFromDevices(false);
 
 			// Then, remove the romof and cloneof tags so it's not picked up by the manager
@@ -2700,7 +2700,7 @@ namespace SabreTools.Library.DatFiles
 			BucketBy(SortedBy.Game, mergeroms, norename: true);
 
 			// Now we want to loop through all of the games and set the correct information
-			AddRomsFromDevices(true);
+			while (AddRomsFromDevices(true));
 			AddRomsFromDevices(false);
 			AddRomsFromParent();
 
@@ -2832,8 +2832,9 @@ namespace SabreTools.Library.DatFiles
 		/// Use device_ref and slotoption tags to add roms to the children
 		/// </summary>
 		/// <param name="dev">True if only child device sets are touched, false for non-device sets (default)</param>
-		private void AddRomsFromDevices(bool dev = false)
+		private bool AddRomsFromDevices(bool dev = false)
 		{
+			bool foundnew = false;
 			List<string> games = Keys;
 			foreach (string game in games)
 			{
@@ -2857,6 +2858,7 @@ namespace SabreTools.Library.DatFiles
 
 				// Determine if the game has any devices or not
 				List<string> devices = this[game][0].Devices;
+				List<string> newdevs = new List<string>();
 				foreach (string device in devices)
 				{
 					// If the device doesn't exist then we continue
@@ -2871,14 +2873,27 @@ namespace SabreTools.Library.DatFiles
 					foreach (DatItem item in devItems)
 					{
 						DatItem datItem = (DatItem)item.Clone();
+						newdevs.AddRange(datItem.Devices ?? new List<string>());
 						datItem.CopyMachineInformation(copyFrom);
 						if (this[game].Where(i => i.Name == datItem.Name).Count() == 0 && !this[game].Contains(datItem))
 						{
+							foundnew = true;
 							Add(game, datItem);
 						}
 					}
 				}
+
+				// Now that every device is accounted for, add the new list of devices, if they don't already exist
+				foreach (string device in newdevs)
+				{
+					if (!this[game][0].Devices.Contains(device))
+					{
+						this[game][0].Devices.Add(device);
+					}
+				}
 			}
+
+			return foundnew;
 		}
 
 		/// <summary>

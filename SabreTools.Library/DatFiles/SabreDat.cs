@@ -25,6 +25,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of an SabreDat XML DAT
 	/// </summary>
+	/// TODO: Verify that all read/write for this DatFile type is correct
 	internal class SabreDat : DatFile
 	{
 		/// <summary>
@@ -57,7 +58,6 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// All XML-derived DATs share a lot in common so it just calls one implementation
-			// TODO: Use the following implementation instead of passing to Logiqx
 			new Logiqx(this, false).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
 			return;
 
