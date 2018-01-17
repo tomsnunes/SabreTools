@@ -608,8 +608,7 @@ namespace SabreTools.Library.DatFiles
 						// string crc = Utilities.GetYesNo(content);
 						break;
 					case "source":
-						content = reader.ReadElementContentAsString();
-						// string source = content;
+						machine.SourceFile = reader.ReadElementContentAsString();
 						break;
 					case "cloneof":
 						machine.CloneOf = reader.ReadElementContentAsString();

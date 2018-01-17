@@ -310,8 +310,8 @@ namespace SabreTools.Library.DatFiles
 					// Then populate it with information
 					item.CopyMachineInformation(machine);
 
-					item.SourceFile = filename;
 					item.SystemID = sysid;
+					item.System = filename;
 					item.SourceID = srcid;
 
 					// If we have a sample, treat it special
@@ -654,8 +654,8 @@ namespace SabreTools.Library.DatFiles
 			{
 				Blank blank = new Blank()
 				{
-					SourceFile = filename,
 					SystemID = sysid,
+					System = filename,
 					SourceID = srcid,
 				};
 				blank.CopyMachineInformation(machine);
