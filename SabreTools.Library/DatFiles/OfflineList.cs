@@ -24,7 +24,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of an OfflineList XML DAT
 	/// </summary>
-	/// TODO: Verify that all read/write for this DatFile type is correct
+	/// TODO: Verify that all write for this DatFile type is correct
 	internal class OfflineList : DatFile
 	{
 		/// <summary>
@@ -58,10 +58,6 @@ namespace SabreTools.Library.DatFiles
 			bool clean,
 			bool remUnicode)
 		{
-			// All XML-derived DATs share a lot in common so it just calls one implementation
-			new Logiqx(this, false).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-			return;
-
 			Encoding enc = Utilities.GetEncoding(filename);
 			XmlReader xtr = Utilities.GetXmlTextReader(filename);
 
@@ -563,7 +559,7 @@ namespace SabreTools.Library.DatFiles
 			bool remUnicode)
 		{
 			// Prepare all internal variables
-			string releaseNumber = "", key = "", publisher = "";
+			string releaseNumber = "", key = "", publisher = "", duplicateid = "";
 			long size = -1;
 			List<Rom> roms = new List<Rom>();
 			Machine machine = new Machine();
@@ -657,7 +653,11 @@ namespace SabreTools.Library.DatFiles
 
 						break;
 					case "duplicateid":
-						machine.CloneOf = reader.ReadElementContentAsString();
+						duplicateid = reader.ReadElementContentAsString();
+						if (duplicateid != "0")
+						{
+							machine.CloneOf = duplicateid;
+						}
 
 						break;
 					default:
