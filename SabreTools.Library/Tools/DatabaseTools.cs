@@ -67,6 +67,7 @@ namespace SabreTools.Library.Tools
 			type = type.ToLowerInvariant();
 
 			// Make sure the file exists
+			db = Path.Combine(Globals.ExeDir, db);
 			if (!File.Exists(db))
 			{
 				SqliteConnection.CreateFile(db);
