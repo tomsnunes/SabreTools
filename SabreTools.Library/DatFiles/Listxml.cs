@@ -57,10 +57,6 @@ namespace SabreTools.Library.DatFiles
 			bool clean,
 			bool remUnicode)
 		{
-			// All XML-derived DATs share a lot in common so it just calls one implementation
-			new Logiqx(this, false).ParseFile(filename, sysid, srcid, keep, clean, remUnicode);
-			return;
-
 			// Prepare all internal variables
 			Encoding enc = Utilities.GetEncoding(filename);
 			XmlReader xtr = Utilities.GetXmlTextReader(filename);
@@ -548,6 +544,7 @@ namespace SabreTools.Library.DatFiles
 							machine.Devices.Add(devname);
 						}
 						// bool? slotoption_default = Utilities.GetYesNo(reader.GetAttribute("default"));
+						reader.Read();
 						break;
 					default:
 						reader.Read();
