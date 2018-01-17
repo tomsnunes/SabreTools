@@ -23,7 +23,7 @@ namespace SabreTools.Library.DatFiles
 	/// <summary>
 	/// Represents parsing and writing of a MAME XML DAT
 	/// </summary>
-	/// TODO: Verify that all read/write for this DatFile type is correct
+	/// TODO: Verify that all write for this DatFile type is correct
 	internal class Listxml : DatFile
 	{
 		/// <summary>
