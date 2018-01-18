@@ -1406,6 +1406,17 @@ namespace SabreTools
 					null);
 			}
 		}
+		private static Feature gameDescriptionListInput
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-gd", "--game-description" },
+					"Filter by game description",
+					FeatureType.List,
+					null);
+			}
+		}
 		private static Feature gameNameListInput
 		{
 			get
@@ -1472,6 +1483,17 @@ namespace SabreTools
 				return new Feature(
 					new List<string>() { "-ncrc", "--not-crc" },
 					"Filter by not CRC hash",
+					FeatureType.List,
+					null);
+			}
+		}
+		private static Feature notGameDescriptionListInput
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-ngd", "--not-game-description" },
+					"Filter by not game description",
 					FeatureType.List,
 					null);
 			}
@@ -2330,6 +2352,8 @@ namespace SabreTools
 				update["reverse-base-replace"].AddFeature("update-manufacturer", updateManufacturerFlag);
 			update.AddFeature("game-name", gameNameListInput);
 			update.AddFeature("not-game-name", notGameNameListInput);
+			update.AddFeature("game-description", gameDescriptionListInput);
+			update.AddFeature("not-game-description", notGameDescriptionListInput);
 			update.AddFeature("match-of-tags", matchOfTagsFlag);
 			update.AddFeature("item-name", itemNameListInput);
 			update.AddFeature("not-item-name", notItemNameListInput);

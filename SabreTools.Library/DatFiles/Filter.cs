@@ -23,6 +23,7 @@ namespace SabreTools.Library.DatFiles
 		#region Positive
 		
 		private List<string> _gameNames;
+		private List<string> _gameDescriptions;
 		private List<string> _romNames;
 		private List<string> _romTypes;
 		private List<string> _crcs;
@@ -39,6 +40,7 @@ namespace SabreTools.Library.DatFiles
 		#region Negative
 
 		private List<string> _notGameNames;
+		private List<string> _notGameDescriptions;
 		private List<string> _notRomNames;
 		private List<string> _notRomTypes;
 		private List<string> _notCrcs;
@@ -75,6 +77,11 @@ namespace SabreTools.Library.DatFiles
 		{
 			get { return _gameNames; }
 			set { _gameNames = value; }
+		}
+		public List<string> MachineDescriptions
+		{
+			get { return _gameDescriptions; }
+			set { _gameDescriptions = value; }
 		}
 		public List<string> ItemNames
 		{
@@ -135,6 +142,11 @@ namespace SabreTools.Library.DatFiles
 		{
 			get { return _notGameNames; }
 			set { _notGameNames = value; }
+		}
+		public List<string> NotMachineDescriptions
+		{
+			get { return _notGameDescriptions; }
+			set { _notGameDescriptions = value; }
 		}
 		public List<string> NotItemNames
 		{
@@ -649,6 +661,28 @@ namespace SabreTools.Library.DatFiles
 				}
 
 				// If the game name was found in the list, return false
+				if (found)
+				{
+					return false;
+				}
+			}
+
+			// Filter on game description
+			if (_gameDescriptions.Count > 0)
+			{
+				bool found = FindValueInList(_gameDescriptions, item.MachineDescription);
+
+				// If the game description was not found in the list, return false
+				if (!found)
+				{
+					return false;
+				}
+			}
+			if (_notGameDescriptions.Count > 0)
+			{
+				bool found = FindValueInList(_notGameDescriptions, item.MachineDescription);
+
+				// If the game description was found in the list, return false
 				if (found)
 				{
 					return false;

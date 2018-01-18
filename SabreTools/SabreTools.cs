@@ -589,6 +589,9 @@ namespace SabreTools
 					case "extb":
 						extb.AddRange((List<string>)feat.Value.GetValue());
 						break;
+					case "game-description":
+						filter.MachineDescriptions.AddRange((List<string>)feat.Value.GetValue());
+						break;
 					case "game-name":
 						filter.MachineNames.AddRange((List<string>)feat.Value.GetValue());
 						break;
@@ -609,6 +612,9 @@ namespace SabreTools
 						break;
 					case "not-crc":
 						filter.NotCRCs.AddRange((List<string>)feat.Value.GetValue());
+						break;
+					case "not-game-description":
+						filter.NotMachineDescriptions.AddRange((List<string>)feat.Value.GetValue());
 						break;
 					case "not-game-name":
 						filter.NotMachineNames.AddRange((List<string>)feat.Value.GetValue());
