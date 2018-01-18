@@ -1240,6 +1240,8 @@ Options:
 		
 		-gn=, --game-name=	Filter by game name
 		-ngn=, --not-game-name=	Exclude by game name
+		-gd=, --game-description=	Filter by game description
+		-ngd=, --not-game-description=	Exclude by game description
 		-rn=, --item-name=	Filter by item name
 		-nrn=, --not-item-name=	Exclude by item name
 		-crc=, --crc=		Filter by CRC hash
