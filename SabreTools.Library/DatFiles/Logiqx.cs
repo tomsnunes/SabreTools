@@ -763,7 +763,7 @@ namespace SabreTools.Library.DatFiles
 									(ForceNodump == ForceNodump.Ignore ? " forcenodump=\"ignore\"" : "") +
 									(ForceNodump == ForceNodump.Obsolete ? " forcenodump=\"obsolete\"" : "") +
 									(ForceNodump == ForceNodump.Required ? " forcenodump=\"required\"" : "") +
-									(!String.IsNullOrWhiteSpace(Header) ? "header=\"" + Header + "\"" : "") +
+									(!String.IsNullOrWhiteSpace(Header) ? " header=\"" + Header + "\"" : "") +
 									" />\n"
 							: "") +
 							"\t</header>\n";
