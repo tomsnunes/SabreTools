@@ -257,6 +257,7 @@ namespace SabreTools.Library.DatFiles
 		{
 			// Positive
 			_gameNames = new List<string>();
+			_gameDescriptions = new List<string>();
 			_romNames = new List<string>();
 			_romTypes = new List<string>();
 			_crcs = new List<string>();
@@ -270,6 +271,7 @@ namespace SabreTools.Library.DatFiles
 
 			// Negative
 			_notGameNames = new List<string>();
+			_notGameDescriptions = new List<string>();
 			_notRomNames = new List<string>();
 			_notRomTypes = new List<string>();
 			_notCrcs = new List<string>();
