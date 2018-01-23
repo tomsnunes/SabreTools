@@ -2050,6 +2050,8 @@ namespace SabreTools
 			datFromDir.AddFeature("no-automatic-date", noAutomaticDateFlag);
 			datFromDir.AddFeature("forcepacking", forcepackingStringInput);
 			datFromDir.AddFeature("archives-as-files", archivesAsFilesFlag);
+			//datFromDir.AddFeature("output-type", outputTypeListInput);
+			//	datFromDir["output-type"].AddFeature("depreciated", depreciatedFlag); // TODO: Add note about XML
 			datFromDir.AddFeature("output-all", outputAllFlag);
 			datFromDir.AddFeature("output-attractmode", outputAttractmodeFlag);
 			datFromDir.AddFeature("output-cmp", outputCmpFlag);
@@ -2178,6 +2180,8 @@ namespace SabreTools
 				"Split input DATs by a given criteria",
 				FeatureType.Flag,
 				null);
+			//split.AddFeature("output-type", outputTypeListInput);
+			//	split["output-type"].AddFeature("depreciated", depreciatedFlag); // TODO: Add note about XML
 			split.AddFeature("output-all", outputAllFlag);
 			split.AddFeature("output-attractmode", outputAttractmodeFlag);
 			split.AddFeature("output-cmp", outputCmpFlag);
@@ -2255,6 +2259,17 @@ namespace SabreTools
 					"Most of the filter parameters allow for multiple inputs:",
 					"  e.g. --game-name=foo --game-name=bar",
 				});
+			//update.AddFeature("output-type", outputTypeListInput);
+			//	update["output-type"].AddFeature("prefix", prefixStringInput); // TODO: Add note about CSV, Missfile, SSV, TSV
+			//	update["output-type"].AddFeature("postfix", postfixStringInput); // TODO: Add note about CSV, Missfile, SSV, TSV
+			//	update["output-type"].AddFeature("quotes", quotesFlag); // TODO: Add note about CSV, Missfile, SSV, TSV
+			//	update["output-type"].AddFeature("roms", romsFlag); // TODO: Add note about Missfile
+			//	update["output-type"].AddFeature("game-prefix", gamePrefixFlag); // TODO: Add note about Missfile, MD5, SFV, SHA1, SHA256, SHA384, SHA512
+			//	update["output-type"].AddFeature("add-extension", addExtensionStringInput); // TODO: Add note about Missfile
+			//	update["output-type"].AddFeature("replace-extension", replaceExtensionStringInput); // TODO: Add note about Missfile
+			//	update["output-type"].AddFeature("remove-extensions", removeExtensionsFlag); // TODO: Add note about Missfile
+			//	update["output-type"].AddFeature("romba", rombaFlag); // TODO: Add note about Missfile
+			//	update["output-type"].AddFeature("depreciated", depreciatedFlag); // TODO: Add note about XML
 			update.AddFeature("output-all", outputAllFlag);
 			update.AddFeature("output-attractmode", outputAttractmodeFlag);
 			update.AddFeature("output-cmp", outputCmpFlag);
