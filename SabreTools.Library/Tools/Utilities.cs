@@ -736,6 +736,10 @@ namespace SabreTools.Library.Tools
 				case "sl":
 				case "softwarelist":
 					return DatFormat.SoftwareList;
+				case "ssv":
+					return DatFormat.SSV;
+				case "tsv":
+					return DatFormat.TSV;
 				case "xml":
 				case "logiqx":
 					return DatFormat.Logiqx;

@@ -65,12 +65,45 @@ namespace SabreTools.Library.Help
 			}
 		}
 
+		public Feature this[Feature subfeature]
+		{
+			get
+			{
+				if (_features == null)
+				{
+					_features = new Dictionary<string, Feature>();
+				}
+
+				if (!_features.ContainsKey(subfeature.Name))
+				{
+					return null;
+				}
+
+				return _features[subfeature.Name];
+			}
+			set
+			{
+				if (_features == null)
+				{
+					_features = new Dictionary<string, Feature>();
+				}
+
+				if (_features.ContainsKey(subfeature.Name))
+				{
+					_features[subfeature.Name] = value;
+				}
+				else
+				{
+					_features.Add(subfeature.Name, value);
+				}
+			}
+		}
+
 		/// <summary>
 		/// Add a new feature to the help
 		/// </summary>
-		/// <param name="name">Name of the feature to add</param>
 		/// <param name="feature">Feature object to map to</param>
-		public void Add(string name, Feature feature)
+		public void Add(Feature feature)
 		{
 			if (_features == null)
 			{
@@ -79,7 +112,7 @@ namespace SabreTools.Library.Help
 
 			lock (_features)
 			{
-				_features.Add(name, feature);
+				_features.Add(feature.Name, feature);
 			}
 		}
 

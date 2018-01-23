@@ -10,8 +10,10 @@ namespace SabreTools.Library.Help
 	{
 		#region Private instance variables
 
+		private string _name;
 		private List<string> _flags;
 		private string _description;
+		private string _longDescription; // TODO: Use this to generate README.1ST?
 		private FeatureType _featureType;
 		private Dictionary<string, Feature> _features;
 		private List<string> _additionalNotes;
@@ -28,9 +30,21 @@ namespace SabreTools.Library.Help
 
 		#region Publicly facing variables
 
+		public string Name
+		{
+			get { return _name; }
+		}
+		public List<string> Flags
+		{
+			get { return _flags; }
+		}
 		public string Description
 		{
 			get { return _description; }
+		}
+		public string LongDescription
+		{
+			get { return _longDescription; }
 		}
 		public Dictionary<string, Feature> Features
 		{
@@ -43,28 +57,34 @@ namespace SabreTools.Library.Help
 
 		public Feature()
 		{
+			_name = null;
 			_flags = new List<string>();
 			_description = null;
+			_longDescription = null;
 			_featureType = FeatureType.Flag;
 			_features = new Dictionary<string, Feature>();
 			_additionalNotes = new List<string>();
 		}
 
-		public Feature(string flag, string description, FeatureType featureType, List<string> additionalNotes)
+		public Feature(string name, string flag, string description, FeatureType featureType, string longDescription = null, List<string> additionalNotes = null)
 		{
+			_name = name;
 			List<string> flags = new List<string>();
 			flags.Add(flag);
 			_flags = flags;
 			_description = description;
+			_longDescription = longDescription;
 			_featureType = featureType;
 			_features = new Dictionary<string, Feature>();
 			_additionalNotes = additionalNotes;
 		}
 
-		public Feature(List<string> flags, string description, FeatureType featureType, List<string> additionalNotes)
+		public Feature(string name, List<string> flags, string description, FeatureType featureType, string longDescription = null, List<string> additionalNotes = null)
 		{
+			_name = name;
 			_flags = flags;
 			_description = description;
+			_longDescription = longDescription;
 			_featureType = featureType;
 			_features = new Dictionary<string, Feature>();
 			_additionalNotes = additionalNotes;
@@ -84,11 +104,19 @@ namespace SabreTools.Library.Help
 		}
 
 		/// <summary>
+		/// Directly address a given subfeature
+		/// </summary>
+		public Feature this[Feature subfeature]
+		{
+			get { return _features[subfeature.Name]; }
+			set { _features[subfeature.Name] = value; }
+		}
+
+		/// <summary>
 		/// Add a new feature for this feature
 		/// </summary>
-		/// <param name="name">Name of the feature to add</param>
 		/// <param name="feature"></param>
-		public void AddFeature(string name, Feature feature)
+		public void AddFeature(Feature feature)
 		{
 			if (_features == null)
 			{
@@ -97,13 +125,13 @@ namespace SabreTools.Library.Help
 
 			lock(_features)
 			{
-				if (!_features.ContainsKey(name))
+				if (!_features.ContainsKey(feature.Name))
 				{
-					_features.Add(name, feature);
+					_features.Add(feature.Name, feature);
 				}
 				else
 				{
-					_features[name] = feature;
+					_features[feature.Name] = feature;
 				}
 			}
 		}
