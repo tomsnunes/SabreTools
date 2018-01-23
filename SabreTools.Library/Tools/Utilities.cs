@@ -740,7 +740,7 @@ namespace SabreTools.Library.Tools
 				case "logiqx":
 					return DatFormat.Logiqx;
 				default:
-					return DatFormat.Logiqx; // TODO: Placeholder until DatFormat.None
+					return 0x0;
 			}
 		}
 
