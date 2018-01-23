@@ -388,7 +388,7 @@ namespace SabreTools
 						if ((datHeader.DatFormat & DatFormat.LogiqxDepreciated) == 0)
 						{
 							datHeader.DatFormat |= DatFormat.Logiqx;
-						}						
+						}
 						break;
 					case "quick":
 						quickScan = true;
@@ -650,6 +650,17 @@ namespace SabreTools
 						foreach (string nstat in (List<string>)feat.Value.GetValue())
 						{
 							filter.NotItemStatuses |= Utilities.GetItemStatus(nstat);
+						}
+						break;
+					case "output-type":
+						foreach (string ot in (List<string>)feat.Value.GetValue())
+						{
+							DatFormat dftemp = Utilities.GetDatFormat(ot);
+							if (dftemp != DatFormat.Logiqx
+								|| (dftemp == DatFormat.Logiqx && (datHeader.DatFormat & DatFormat.LogiqxDepreciated) == 0))
+							{
+								datHeader.DatFormat |= dftemp;
+							}
 						}
 						break;
 					case "sha1":

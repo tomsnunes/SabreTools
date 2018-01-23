@@ -3222,7 +3222,7 @@ namespace SabreTools.Library.DatFiles
 			FileName = (String.IsNullOrWhiteSpace(FileName) ? (keepext ? Path.GetFileName(filename) : Path.GetFileNameWithoutExtension(filename)) : FileName);
 
 			// If the output type isn't set already, get the internal output type
-			DatFormat = (DatFormat == 0 ? Utilities.GetDatFormat(filename) : DatFormat);
+			DatFormat = (DatFormat == 0 ? Utilities.GetDatFormatFromFile(filename) : DatFormat);
 
 			// Now parse the correct type of DAT
 			try

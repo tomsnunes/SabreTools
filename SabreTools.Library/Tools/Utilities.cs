@@ -595,7 +595,7 @@ namespace SabreTools.Library.Tools
 		/// <returns>DatFile of the specific internal type that corresponds to the inputs</returns>
 		public static DatFile GetDatFile(string input, DatFile baseDat)
 		{
-			DatFormat datFormat = GetDatFormat(input);
+			DatFormat datFormat = GetDatFormatFromFile(input);
 			return GetDatFile(datFormat, baseDat);
 		}
 
@@ -678,6 +678,69 @@ namespace SabreTools.Library.Tools
 				case ItemType.Rom:
 				default:
 					return new Rom();
+			}
+		}
+
+		/// <summary>
+		/// Get DatFormat value from input string
+		/// </summary>
+		/// <param name="input">String to get value from</param>
+		/// <returns>DatFormat value corresponding to the string</returns>
+		public static DatFormat GetDatFormat(string input)
+		{
+			switch (input?.ToLowerInvariant())
+			{
+				case "all":
+					return DatFormat.ALL;
+				case "am":
+				case "attractmode":
+					return DatFormat.AttractMode;
+				case "cmp":
+				case "clrmamepro":
+					return DatFormat.ClrMamePro;
+				case "csv":
+					return DatFormat.CSV;
+				case "dc":
+				case "doscenter":
+					return DatFormat.DOSCenter;
+				case "lr":
+				case "listrom":
+					return DatFormat.Listrom;
+				case "lx":
+				case "listxml":
+					return DatFormat.Listxml;
+				case "miss":
+				case "missfile":
+					return DatFormat.MissFile;
+				case "md5":
+					return DatFormat.RedumpMD5;
+				case "ol":
+				case "offlinelist":
+					return DatFormat.OfflineList;
+				case "rc":
+				case "romcenter":
+					return DatFormat.RomCenter;
+				case "sd":
+				case "sabredat":
+					return DatFormat.SabreDat;
+				case "sfv":
+					return DatFormat.RedumpSFV;
+				case "sha1":
+					return DatFormat.RedumpSHA1;
+				case "sha256":
+					return DatFormat.RedumpSHA256;
+				case "sha384":
+					return DatFormat.RedumpSHA384;
+				case "sha512":
+					return DatFormat.RedumpSHA512;
+				case "sl":
+				case "softwarelist":
+					return DatFormat.SoftwareList;
+				case "xml":
+				case "logiqx":
+					return DatFormat.Logiqx;
+				default:
+					return DatFormat.Logiqx; // TODO: Placeholder until DatFormat.None
 			}
 		}
 
@@ -1048,7 +1111,7 @@ namespace SabreTools.Library.Tools
 		/// </summary>
 		/// <param name="filename">Name of the file to be parsed</param>
 		/// <returns>The DatFormat corresponding to the DAT</returns>
-		public static DatFormat GetDatFormat(string filename)
+		public static DatFormat GetDatFormatFromFile(string filename)
 		{
 			// Limit the output formats based on extension
 			if (!HasValidDatExtension(filename))

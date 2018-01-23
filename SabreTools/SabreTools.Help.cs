@@ -1616,6 +1616,26 @@ namespace SabreTools
 					});
 			}
 		}
+		private static Feature outputTypeListInput
+		{
+			get
+			{
+				return new Feature(
+					new List<string>() { "-ot", "--output-type" },
+					"Output DATs to a given type or types",
+					FeatureType.List,
+					new List<string>()
+					{
+						"			    Supported values are:",
+						"			        all, am/attractmode, cmp/clrmamepro, csv,",
+						"			        dc/doscenter, lr/listrom, lx/listxml,",
+						"			        miss/missfile, md5, ol/offlinelist,",
+						"			        rc/romcenter, sd/sabredat, sfv, sha1,",
+						"			        sha256, sha384, sha512, sl/softwarelist",
+						"			        xml/logiqx",
+					});
+			}
+		}
 		private static Feature sha1ListInput
 		{
 			get
