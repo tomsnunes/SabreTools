@@ -1437,10 +1437,7 @@ namespace SabreTools.Library.Tools
 		public static bool DetectSkipperAndTransform(string file, string outDir, bool nostore)
 		{
 			// Create the output directory if it doesn't exist
-			if (!String.IsNullOrWhiteSpace(outDir) && !Directory.Exists(outDir))
-			{
-				Directory.CreateDirectory(outDir);
-			}
+			EnsureOutputDirectory(outDir, create: true);
 
 			Globals.Logger.User("\nGetting skipper information for '{0}'", file);
 

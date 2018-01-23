@@ -44,10 +44,7 @@ namespace SabreTools.Library.Skippers
 			}
 
 			// Create the output directory if it doesn't already
-			if (!Directory.Exists(Path.GetDirectoryName(output)))
-			{
-				Directory.CreateDirectory(Path.GetDirectoryName(output));
-			}
+			Utilities.EnsureOutputDirectory(Path.GetDirectoryName(output));
 
 			Globals.Logger.User("Attempting to apply rule to '{0}'", input);
 			success = TransformStream(Utilities.TryOpenRead(input), Utilities.TryCreate(output));

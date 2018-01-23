@@ -3,6 +3,12 @@ using System.Reflection;
 
 using SabreTools.Library.Tools;
 
+#if MONO
+using System.IO;
+#else
+using Alphaleonis.Win32.Filesystem;
+#endif
+
 namespace SabreTools.Library.Data
 {
 	/// <summary>
@@ -92,8 +98,8 @@ namespace SabreTools.Library.Data
 		#region Database schema
 
 		public const string HeadererDbSchema = "Headerer";
-		public const string HeadererFileName = "Headerer.sqlite";
-		public const string HeadererConnectionString = "Data Source=" + HeadererFileName + ";Version = 3;";
+		public static string HeadererFileName = Path.Combine(Globals.ExeDir, "Headerer.sqlite");
+		public static string HeadererConnectionString = "Data Source=" + HeadererFileName + ";Version = 3;";
 
 		#endregion
 

@@ -107,8 +107,8 @@ namespace SabreTools.Library.Skippers
 						// Get the information from the rule first
 						SkipperRule rule = new SkipperRule
 						{
-							StartOffset = 0,
-							EndOffset = 0,
+							StartOffset = null,
+							EndOffset = null,
 							Operation = HeaderSkipOperation.None,
 							Tests = new List<SkipperTest>(),
 							SourceFile = Path.GetFileNameWithoutExtension(filename),
