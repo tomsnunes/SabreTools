@@ -156,7 +156,7 @@ namespace SabreTools.Library.Help
 			output.Add("Available options:");
 			foreach (string feature in _features.Keys)
 			{
-				output.AddRange(_features[feature].Output(pre: 2, midpoint: 25));
+				output.AddRange(_features[feature].Output(pre: 2, midpoint: 30));
 			}
 
 			// And append the generic ending
@@ -182,7 +182,7 @@ namespace SabreTools.Library.Help
 			output.Add("Available options:");
 			foreach (string feature in _features.Keys)
 			{
-				output.AddRange(_features[feature].OutputRecursive(0, pre: 2, midpoint: 25));
+				output.AddRange(_features[feature].OutputRecursive(0, pre: 2, midpoint: 30, includeLongDescription: true));
 			}
 
 			// Now write out everything in a staged manner
@@ -210,7 +210,9 @@ namespace SabreTools.Library.Help
 		/// <summary>
 		/// Output a single feature recursively
 		/// </summary>
-		public void OutputIndividualFeature(string featurename)
+		/// <param name="featurename">Name of the feature to output information for, if possible</param>
+		/// <param name="includeLongDescription">True if the long description should be formatted and output, false otherwise</param>
+		public void OutputIndividualFeature(string featurename, bool includeLongDescription = false)
 		{
 			// Start building the output list
 			List<string> output = new List<string>();
@@ -245,7 +247,7 @@ namespace SabreTools.Library.Help
 			if (realname != null)
 			{
 				output.Add("Available options for " + realname + ":");
-				output.AddRange(_features[realname].OutputRecursive(0, pre: 2, midpoint: 25));
+				output.AddRange(_features[realname].OutputRecursive(0, pre: 2, midpoint: 30, includeLongDescription: includeLongDescription));
 			}
 
 			// If no name was found but we have possible matches, show them
@@ -254,7 +256,7 @@ namespace SabreTools.Library.Help
 				output.Add("\"" + featurename + "\" not found. Did you mean:");
 				foreach (string possible in startsWith)
 				{
-					output.AddRange(_features[possible].Output(pre: 2, midpoint: 25));
+					output.AddRange(_features[possible].Output(pre: 2, midpoint: 30, includeLongDescription: includeLongDescription));
 				}
 			}
 

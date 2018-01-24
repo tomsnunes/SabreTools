@@ -1391,7 +1391,10 @@ namespace SabreTools
 					new List<string>() { "-gz", "--gz" },
 					"Set scanning level for GZip archives (default 1)",
 					FeatureType.Int32,
-					longDescription: "Scan GZip archives in one of the following ways: 0 - Hash both archive and its contents; 1 - Only hash contents of the archive; 2 - Only hash archive itself (treat like a regular file).");
+					longDescription: @"Scan GZip archives in one of the following ways:
+0 - Hash both archive and its contents
+1 - Only hash contents of the archive
+2 - Only hash archive itself (treat like a regular file)");
 			}
 		}
 		private static Feature rarInt32Input
@@ -1403,7 +1406,10 @@ namespace SabreTools
 					new List<string>() { "-rar", "--rar" },
 					"Set scanning level for RAR archives (default 1)",
 					FeatureType.Int32,
-					longDescription: "Scan RAR archives in one of the following ways: 0 - Hash both archive and its contents; 1 - Only hash contents of the archive; 2 - Only hash archive itself (treat like a regular file).");
+					longDescription: @"Scan RAR archives in one of the following ways:
+0 - Hash both archive and its contents
+1 - Only hash contents of the archive
+2 - Only hash archive itself (treat like a regular file)");
 			}
 		}
 		private static Feature sevenZipInt32Input
@@ -1415,7 +1421,10 @@ namespace SabreTools
 					new List<string>() { "-7z", "--7z" },
 					"Set scanning level for 7zip archives (default 1)",
 					FeatureType.Int32,
-					longDescription: "Scan 7Zip archives in one of the following ways: 0 - Hash both archive and its contents; 1 - Only hash contents of the archive; 2 - Only hash archive itself (treat like a regular file).");
+					longDescription: @"Scan 7Zip archives in one of the following ways:
+0 - Hash both archive and its contents
+1 - Only hash contents of the archive
+2 - Only hash archive itself (treat like a regular file)");
 			}
 		}
 		private static Feature threadsInt32Input
@@ -1439,7 +1448,10 @@ namespace SabreTools
 					new List<string>() { "-zip", "--zip" },
 					"Set scanning level for Zip archives (default 1)",
 					FeatureType.Int32,
-					longDescription: "Scan Zip archives in one of the following ways: 0 - Hash both archive and its contents; 1 - Only hash contents of the archive; 2 - Only hash archive itself (treat like a regular file).");
+					longDescription: @"Scan Zip archives in one of the following ways:
+0 - Hash both archive and its contents
+1 - Only hash contents of the archive
+2 - Only hash archive itself (treat like a regular file)");
 			}
 		}
 
@@ -1555,9 +1567,10 @@ namespace SabreTools
 				return new Feature(
 					"game-type",
 					new List<string>() { "-gt", "--game-type" },
-					"Include only games with a given type [None, Bios, Device, Mechanical]",
+					"Include only games with a given type",
 					FeatureType.List,
-					longDescription: "Include only items with this game type in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
+					longDescription: @"Include only items with this game type in the output. Multiple instances of this flag are allowed.
+Possible values are: None, Bios, Device, Mechanical");
 			}
 		}
 		private static Feature itemNameListInput
@@ -1639,9 +1652,10 @@ namespace SabreTools
 				return new Feature(
 					"not-game-type",
 					new List<string>() { "-ngt", "--not-game-type" },
-					"Exclude only games with a given type [None, Bios, Device, Mechanical]",
+					"Exclude only games with a given type",
 					FeatureType.List,
-					longDescription: "Include only items without this game type in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
+					longDescription: @"Include only items without this game type in the output. Multiple instances of this flag are allowed.
+Possible values are: None, Bios, Device, Mechanical");
 			}
 		}
 		private static Feature notItemNameListInput
@@ -1735,9 +1749,10 @@ namespace SabreTools
 				return new Feature(
 					"not-status",
 					new List<string>() { "-nis", "--not-status" },
-					"Exclude only items with a given status [None, Good, BadDump, Nodump, Verified]",
+					"Exclude only items with a given status",
 					FeatureType.List,
-					longDescription: "Include only items without this item status in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
+					longDescription: @"Include only items without this item status in the output. Multiple instances of this flag are allowed.
+Possible values are: None, Good, BadDump, Nodump, Verified");
 			}
 		}
 		private static Feature outputTypeListInput
@@ -1747,9 +1762,31 @@ namespace SabreTools
 				return new Feature(
 					"output-type",
 					new List<string>() { "-ot", "--output-type" },
-					"Output DATs to a given format [all, am/attractmode, cmp/clrmamepro, csv, dc/doscenter, lr/listrom, lx/listxml,  miss/missfile, md5, ol/offlinelist, rc/romcenter, sd/sabredat, sfv, sha1, sha256, sha384, sha512, sl/softwarelist, ssv, tsv, xml/logiqx",
+					"Output DATs to a specified format",
 					FeatureType.List,
-					longDescription: @"Add outputting the created DAT to one of the following formats: all - All available DAT types; am, attractmode - AttractMode XML; cmp, clrmamepro - ClrMamePro; csv - Standardized Comma-Separated Value; dc, doscenter - DOSCenter; lr, listrom - MAME Listrom; lx, listxml - MAME Listxml; miss, missfile - GoodTools Missfile; md5 - MD5; ol, offlinelist - OfflineList XML; rc, romcenter - RomCenter; sd, sabredat - SabreDat XML; sfv - SFV; sha1 - SHA-1; sha256 - SHA-256; sha384 - SHA-384; sha512 - SHA-512; sl, softwarelist - MAME Software List XML; ssv - Standardized Semicolon - Separated Value; tsv - Standardized Tab - Separated Value; xml, logiqx - Logiqx XML. Multiple instances of this flag are allowed.");
+					longDescription: @"Add outputting the created DAT to known format. Multiple instances of this flag are allowed.
+Possible values are:
+all              - All available DAT types
+am, attractmode  - AttractMode XML
+cmp, clrmamepro  - ClrMamePro
+csv              - Standardized Comma-Separated Value
+dc, doscenter    - DOSCenter
+lr, listrom      - MAME Listrom
+lx, listxml      - MAME Listxml
+miss, missfile   - GoodTools Missfile
+md5              - MD5
+ol, offlinelist  - OfflineList XML
+rc, romcenter    - RomCenter
+sd, sabredat     - SabreDat XML
+sfv              - SFV
+sha1             - SHA1
+sha256           - SHA256
+sha384           - SHA384
+sha512           - SHA512
+sl, softwarelist - MAME Software List XML
+ssv              - Standardized Semicolon-Separated Value
+tsv              - Standardized Tab-Separated Value
+xml, logiqx      - Logiqx XML");
 			}
 		}
 		private static Feature sha1ListInput
@@ -1807,9 +1844,10 @@ namespace SabreTools
 				return new Feature(
 					"status",
 					new List<string>() { "-is", "--status" },
-					"Include only items with a given status [None, Good, BadDump, Nodump, Verified]",
+					"Include only items with a given status",
 					FeatureType.List,
-					longDescription: "Include only items with this item status in the output. Additionally, the user can specify an exact match or full C#-style regex for pattern matching. Multiple instances of this flag are allowed.");
+					longDescription: @"Include only items with this item status in the output. Multiple instances of this flag are allowed.
+Possible values are: None, Good, BadDump, Nodump, Verified");
 			}
 		}
 
@@ -1932,9 +1970,10 @@ namespace SabreTools
 				return new Feature(
 					"forcemerging",
 					new List<string>() { "-fm", "--forcemerging" },
-					"Set force merging [None, Split, Merged, Nonmerged, Full]",
+					"Set force merging",
 					FeatureType.String,
-					longDescription: "Set the forcemerging tag to the given value.");
+					longDescription: @"Set the forcemerging tag to the given value.
+Possible values are: None, Split, Merged, Nonmerged, Full");
 			}
 		}
 		private static Feature forcenodumpStringInput
@@ -1944,9 +1983,10 @@ namespace SabreTools
 				return new Feature(
 					"forcenodump",
 					new List<string>() { "-fn", "--forcenodump" },
-					"Set force nodump [None, Obsolete, Required, Ignore]",
+					"Set force nodump",
 					FeatureType.String,
-					longDescription: "Set the forcenodump tag to the given value.");
+					longDescription: @"Set the forcenodump tag to the given value.
+Possible values are: None, Obsolete, Required, Ignore");
 			}
 		}
 		private static Feature forcepackingStringInput
@@ -1956,9 +1996,10 @@ namespace SabreTools
 				return new Feature(
 					"forcepacking",
 					new List<string>() { "-fp", "--forcepacking" },
-					"Set force packing [None, Zip, Unzip]",
+					"Set force packing",
 					FeatureType.String,
-					longDescription: "Set the forcepacking tag to the given value.");
+					longDescription: @"Set the forcepacking tag to the given value.
+Possible values are: None, Zip, Unzip");
 			}
 		}
 		private static Feature greaterStringInput
@@ -2157,6 +2198,17 @@ namespace SabreTools
 
 			#endregion
 
+			#region Detailed Help
+
+			Feature detailedHelpFeature = new Feature(
+				"Help (Detailed)",
+				new List<string>() { "-??", "-hd", "--help-detailed" },
+				"Show this detailed help",
+				FeatureType.Flag,
+				longDescription: "Display a detailed help text to the screen.");
+
+			#endregion
+
 			#region Script
 
 			Feature script = new Feature(
@@ -2244,7 +2296,15 @@ namespace SabreTools
 				new List<string>() { "-ex", "--extract" },
 				"Extract and remove copier headers",
 				FeatureType.Flag,
-				longDescription: "This will detect, store, and remove copier headers from a file or folder of files. The headers are backed up and collated by the hash of the unheadered file. Files are then output without the detected copier header alongside the originals with the suffix .new. No input files are altered in the process. The following systems have headers that this program can work with: Atari 7800; Atari Lynx; Commodore PSID Music; NEC PC - Engine / TurboGrafx 16; Nintendo Famicom / Nintendo Entertainment System; Nintendo Famicom Disk System; Nintendo Super Famicom / Super Nintendo Entertainment System; Nintendo Super Famicom / Super Nintendo Entertainment System SPC.");
+				longDescription: @"This will detect, store, and remove copier headers from a file or folder of files. The headers are backed up and collated by the hash of the unheadered file. Files are then output without the detected copier header alongside the originals with the suffix .new. No input files are altered in the process. The following systems have headers that this program can work with:
+- Atari 7800
+- Atari Lynx
+- Commodore PSID Music
+- NEC PC - Engine / TurboGrafx 16
+- Nintendo Famicom / Nintendo Entertainment System
+- Nintendo Famicom Disk System
+- Nintendo Super Famicom / Super Nintendo Entertainment System
+- Nintendo Super Famicom / Super Nintendo Entertainment System SPC");
 			extract.AddFeature(outputDirStringInput);
 			extract.AddFeature(noStoreHeaderFlag);
 
@@ -2257,7 +2317,15 @@ namespace SabreTools
 				new List<string>() { "-re", "--restore" },
 				"Restore header to file based on SHA-1",
 				FeatureType.Flag,
-				longDescription: "This will make use of stored copier headers and reapply them to files if they match the included hash. More than one header can be applied to a file, so they will be output to new files, suffixed with .newX, where X is a number. No input files are altered in the process. The following systems have headers that this program can work with: Atari 7800; Atari Lynx; Commodore PSID Music; NEC PC - Engine / TurboGrafx 16; Nintendo Famicom / Nintendo Entertainment System; Nintendo Famicom Disk System; Nintendo Super Famicom / Super Nintendo Entertainment System; Nintendo Super Famicom / Super Nintendo Entertainment System SPC.");
+				longDescription: @"This will make use of stored copier headers and reapply them to files if they match the included hash. More than one header can be applied to a file, so they will be output to new files, suffixed with .newX, where X is a number. No input files are altered in the process. The following systems have headers that this program can work with: 
+- Atari 7800
+- Atari Lynx
+- Commodore PSID Music
+- NEC PC - Engine / TurboGrafx 16
+- Nintendo Famicom / Nintendo Entertainment System
+- Nintendo Famicom Disk System
+- Nintendo Super Famicom / Super Nintendo Entertainment System
+- Nintendo Super Famicom / Super Nintendo Entertainment System SPC");
 			restore.AddFeature(outputDirStringInput);
 
 			#endregion
@@ -2361,7 +2429,18 @@ namespace SabreTools
 				new List<string>() { "-st", "--stats" },
 				"Get statistics on all input DATs",
 				FeatureType.Flag,
-				longDescription: "This will output by default the combined statistics for all input DAT files. The stats that are outputted are as follows: Total uncompressed size; Number of games found; Number of roms found; Number of disks found; Roms that include a CRC/MD5/SHA-1/SHA-256/SHA-384/SHA-512; Roms with Nodump status.");
+				longDescription: @"This will output by default the combined statistics for all input DAT files. The stats that are outputted are as follows:
+- Total uncompressed size
+- Number of games found
+- Number of roms found
+- Number of disks found
+- Items that include a CRC
+- Items that include a MD5
+- Items that include a SHA-1
+- Items that include a SHA-256
+- Items that include a SHA-384
+- Items that include a SHA-512
+- Items with Nodump status");
 			stats.AddFeature(allStatsFlag);
 			stats.AddFeature(baddumpColumnFlag);
 			stats.AddFeature(csvFlag);
@@ -2572,6 +2651,7 @@ namespace SabreTools
 
 			// Now, add all of the main features to the Help object
 			help.Add(helpFeature);
+			help.Add(detailedHelpFeature);
 			help.Add(script);
 			help.Add(datFromDir);
 			help.Add(extract);

@@ -154,6 +154,23 @@ namespace SabreTools
 					return;
 				}
 			}
+			else if (feature == "Help (Detailed)")
+			{
+				// If we had something else after help
+				if (args.Length > 1)
+				{
+					_help.OutputIndividualFeature(args[1], includeLongDescription: true);
+					Globals.Logger.Close();
+					return;
+				}
+				// Otherwise, show generic help
+				else
+				{
+					_help.OutputAllHelp();
+					Globals.Logger.Close();
+					return;
+				}
+			}
 
 			// Now verify that all other flags are valid
 			for (int i = 1; i < args.Length; i++)

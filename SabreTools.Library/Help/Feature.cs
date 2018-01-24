@@ -16,7 +16,6 @@ namespace SabreTools.Library.Help
 		private string _longDescription; // TODO: Use this to generate README.1ST?
 		private FeatureType _featureType;
 		private Dictionary<string, Feature> _features;
-		private List<string> _additionalNotes;
 		private bool _foundOnce = false;
 
 		// Specific value types
@@ -63,10 +62,9 @@ namespace SabreTools.Library.Help
 			_longDescription = null;
 			_featureType = FeatureType.Flag;
 			_features = new Dictionary<string, Feature>();
-			_additionalNotes = new List<string>();
 		}
 
-		public Feature(string name, string flag, string description, FeatureType featureType, string longDescription = null, List<string> additionalNotes = null)
+		public Feature(string name, string flag, string description, FeatureType featureType, string longDescription = null)
 		{
 			_name = name;
 			List<string> flags = new List<string>();
@@ -76,10 +74,9 @@ namespace SabreTools.Library.Help
 			_longDescription = longDescription;
 			_featureType = featureType;
 			_features = new Dictionary<string, Feature>();
-			_additionalNotes = additionalNotes;
 		}
 
-		public Feature(string name, List<string> flags, string description, FeatureType featureType, string longDescription = null, List<string> additionalNotes = null)
+		public Feature(string name, List<string> flags, string description, FeatureType featureType, string longDescription = null)
 		{
 			_name = name;
 			_flags = flags;
@@ -87,7 +84,6 @@ namespace SabreTools.Library.Help
 			_longDescription = longDescription;
 			_featureType = featureType;
 			_features = new Dictionary<string, Feature>();
-			_additionalNotes = additionalNotes;
 		}
 
 		#endregion
@@ -171,40 +167,6 @@ namespace SabreTools.Library.Help
 		}
 
 		/// <summary>
-		/// Add a new additional note to this feature
-		/// </summary>
-		/// <param name="note">Note to add for this feature</param>
-		public void AddNote(string note)
-		{
-			if (_additionalNotes == null)
-			{
-				_additionalNotes = new List<string>();
-			}
-
-			lock (_additionalNotes)
-			{
-				_additionalNotes.Add(note);
-			}
-		}
-
-		/// <summary>
-		/// Add a set of new notes for this feature
-		/// </summary>
-		/// <param name="notes">List of notes to add to this feature</param>
-		public void AddNotes(List<string> notes)
-		{
-			if (_additionalNotes == null)
-			{
-				_additionalNotes = new List<string>();
-			}
-
-			lock (_additionalNotes)
-			{
-				_additionalNotes.AddRange(notes);
-			}
-		}
-
-		/// <summary>
 		/// Returns if a flag exists for the current feature
 		/// </summary>
 		/// <param name="name">Name of the flag to check</param>
@@ -262,7 +224,8 @@ namespace SabreTools.Library.Help
 		/// </summary>
 		/// <param name="pre">Positive number representing number of spaces to put in front of the feature</param>
 		/// <param name="midpoint">Positive number representing the column where the description should start</param>
-		public List<string> Output(int pre = 0, int midpoint = 0)
+		/// <param name="includeLongDescription">True if the long description should be formatted and output, false otherwise</param>
+		public List<string> Output(int pre = 0, int midpoint = 0, bool includeLongDescription = false)
 		{
 			// Create the output list
 			List<string> outputList = new List<string>();
@@ -271,12 +234,7 @@ namespace SabreTools.Library.Help
 			string output = "";
 
 			// Add the pre-space first
-			string prespace = "";
-			for (int i = 0; i < pre; i++)
-			{
-				prespace += " ";
-			}
-			output += prespace;
+			output += CreatePadding(pre);
 
 			// Now add all flags
 			output += String.Join(", ", _flags);
@@ -284,10 +242,7 @@ namespace SabreTools.Library.Help
 			// If we have a midpoint set, check to see if the string needs padding
 			if (midpoint > 0 && output.Length < midpoint)
 			{
-				while (output.Length < midpoint)
-				{
-					output += " ";
-				}
+				output += CreatePadding(midpoint - output.Length);
 			}
 			else
 			{
@@ -300,7 +255,78 @@ namespace SabreTools.Library.Help
 			// Now append it to the list
 			outputList.Add(output);
 
+			// If we are outputting the long description, format it and then add it as well
+			if (includeLongDescription)
+			{
+				// Get the width of the console for wrapping reference
+				int width = Console.WindowWidth - 1;
+
+				// Prepare the output string
+				output = CreatePadding(pre + 4);
+
+				// Now split the input description and start processing
+				string[] split = _longDescription.Split(' ');
+				for (int i = 0; i < split.Length; i++)
+				{
+					// If we have a newline character, reset the line and continue
+					if (split[i].Contains("\n"))
+					{
+						string[] subsplit = split[i].Replace("\r", "").Split('\n');
+
+						// Add the next word only if the total length doesn't go above the width of the screen
+						if (output.Length + subsplit[0].Length < width)
+						{
+							output += (output.Length == pre + 4 ? "" : " ") + subsplit[0];
+						}
+						// Otherwise, we want to cache the line to output and create a new blank string
+						else
+						{
+							outputList.Add(output);
+							output = CreatePadding(pre + 4);
+							output += (output.Length == pre + 4 ? "" : " ") + subsplit[0];
+						}
+
+						outputList.Add(output);
+						output = CreatePadding(pre + 4);
+						output += subsplit[1];
+						continue;
+					}
+
+					// Add the next word only if the total length doesn't go above the width of the screen
+					if (output.Length + split[i].Length < width)
+					{
+						output += (output.Length == pre + 4 ? "" : " ") + split[i];
+					}
+					// Otherwise, we want to cache the line to output and create a new blank string
+					else
+					{
+						outputList.Add(output);
+						output = CreatePadding(pre + 4);
+						output += (output.Length == pre + 4 ? "" : " ") + split[i];
+					}
+				}
+
+				// Add the last created output and a blank line for clarity
+				outputList.Add(output);
+				outputList.Add("");
+			}
+
 			return outputList;
+		}
+
+		/// <summary>
+		/// Create a padding space based on the given length
+		/// </summary>
+		/// <param name="spaces">Number of padding spaces to add</param>
+		/// <returns>String with requested number of blank spaces</returns>
+		private string CreatePadding(int spaces)
+		{
+			string blank = "";
+			for (int i = 0; i < spaces; i++)
+			{
+				blank += " ";
+			}
+			return blank;
 		}
 
 		/// <summary>
@@ -309,7 +335,8 @@ namespace SabreTools.Library.Help
 		/// <param name="tabLevel">Level of indentation for this feature</param>
 		/// <param name="pre">Positive number representing number of spaces to put in front of the feature</param>
 		/// <param name="midpoint">Positive number representing the column where the description should start</param>
-		public List<string> OutputRecursive(int tabLevel, int pre = 0, int midpoint = 0)
+		/// <param name="includeLongDescription">True if the long description should be formatted and output, false otherwise</param>
+		public List<string> OutputRecursive(int tabLevel, int pre = 0, int midpoint = 0, bool includeLongDescription = false)
 		{
 			// Create the output list
 			List<string> outputList = new List<string>();
@@ -327,12 +354,7 @@ namespace SabreTools.Library.Help
 			}
 
 			// Add the pre-space first
-			string prespace = "";
-			for (int i = 0; i < preAdjusted; i++)
-			{
-				prespace += " ";
-			}
-			output += prespace;
+			output += CreatePadding(preAdjusted);
 
 			// Now add all flags
 			output += String.Join(", ", _flags);
@@ -340,10 +362,7 @@ namespace SabreTools.Library.Help
 			// If we have a midpoint set, check to see if the string needs padding
 			if (midpoint > 0 && output.Length < midpointAdjusted)
 			{
-				while (output.Length < midpointAdjusted)
-				{
-					output += " ";
-				}
+				output += CreatePadding(midpointAdjusted - output.Length);
 			}
 			else
 			{
@@ -356,19 +375,66 @@ namespace SabreTools.Library.Help
 			// Now append it to the list
 			outputList.Add(output);
 
+			// If we are outputting the long description, format it and then add it as well
+			if (includeLongDescription)
+			{
+				// Get the width of the console for wrapping reference
+				int width = Console.WindowWidth - 1;
+
+				// Prepare the output string
+				output = CreatePadding(preAdjusted + 4);
+
+				// Now split the input description and start processing
+				string[] split = _longDescription.Split(' ');
+				for (int i = 0; i < split.Length; i++)
+				{
+					// If we have a newline character, reset the line and continue
+					if (split[i].Contains("\n"))
+					{
+						string[] subsplit = split[i].Replace("\r", "").Split('\n');
+
+						// Add the next word only if the total length doesn't go above the width of the screen
+						if (output.Length + subsplit[0].Length < width)
+						{
+							output += (output.Length == preAdjusted + 4 ? "" : " ") + subsplit[0];
+						}
+						// Otherwise, we want to cache the line to output and create a new blank string
+						else
+						{
+							outputList.Add(output);
+							output = CreatePadding(preAdjusted + 4);
+							output += (output.Length == preAdjusted + 4 ? "" : " ") + subsplit[0];
+						}
+
+						outputList.Add(output);
+						output = CreatePadding(preAdjusted + 4);
+						output += subsplit[1];
+						continue;
+					}
+
+					// Add the next word only if the total length doesn't go above the width of the screen
+					if (output.Length + split[i].Length < width)
+					{
+						output += (output.Length == preAdjusted + 4 ? "" : " ") + split[i];
+					}
+					// Otherwise, we want to cache the line to output and create a new blank string
+					else
+					{
+						outputList.Add(output);
+						output = CreatePadding(preAdjusted + 4);
+						output += (output.Length == preAdjusted + 4 ? "" : " ") + split[i];
+					}
+				}
+
+				// Add the last created output and a blank line for clarity
+				outputList.Add(output);
+				outputList.Add("");
+			}
+
 			// Now let's append all subfeatures
 			foreach (string feature in _features.Keys)
 			{
-				outputList.AddRange(_features[feature].OutputRecursive(tabLevel + 1, pre, midpoint));
-			}
-
-			// Finally, let's append all additional notes
-			if (_additionalNotes != null && _additionalNotes.Count > 0)
-			{
-				foreach (string note in _additionalNotes)
-				{
-					outputList.Add(prespace + note);
-				}
+				outputList.AddRange(_features[feature].OutputRecursive(tabLevel + 1, pre, midpoint, includeLongDescription));
 			}
 
 			return outputList;
