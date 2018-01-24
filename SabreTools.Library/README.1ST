@@ -158,7 +158,7 @@ Options:
 		Built-in to most of the programs is a basic help text
 		
 	--script			Enable script mode (no clear screen)
-		For times when SabreTools is being used in a scripted environement, the
+		For times when SabreTools is being used in a scripted environment, the
 		user may not want the screen to be cleared every time that it is called.
 		This flag allows the user to skip clearing the screen on run just like
 		if the console was being redirected.
@@ -323,8 +323,7 @@ Options:
 			
 		-t=, --temp=		Set the name of the temporary directory
 			Optionally, a temp folder can be supplied in the case the default
-			temp directory (inside the running folder) is not preferred. This is
-			used for any operations that require an archive to be extracted.
+			temp directory (inside the running folder) is not preferred.
 			
 		-out=, --output-dir=	Set the name of the output directory
 			This sets an output folder to be used when the files are created. If
@@ -332,9 +331,8 @@ Options:
 		
 		-mt=, --threads=	Amount of threads to use
 			Optionally, set the number of threads to use for the multithreaded
-			operations. The default is 4 threads; -1 means unlimited threads
-			created. If the user specifies that only 1 thread is to be used, it
-			defaults to the original, serial implementation of the DFD code.
+			operations. The default is the number of available machine threads;
+			-1 means unlimited threads created.
 			
 	-ex, --extract		Backup and remove copier headers
 		This will detect, store, and remove copier headers from a file or folder
@@ -432,15 +430,13 @@ Options:
 			extensions not listed in the input lists will be included in both
 			outputted DAT files.
 		
-			-exta=			First extension (multiple allowed)
-				Set the extensions to be used to populate the first DAT. If more
-				than one extension is defined, they must be placed in separate
-				flags
+			-exta=			Set extension to be included in first DAT
+				Set the extensions to be used to populate the first DAT.
+				Multiple instances of this flag are allowed.
 				
-			-extb=			Second extension (multiple allowed)
-				Set the extensions to be used to populate the second DAT. If
-				more than one extension is defined, they must be placed in
-				separate flags
+			-extb=			Set extension to be included in second DAT
+				Set the extensions to be used to populate the second DAT.
+				Multiple instances of this flag are allowed.
 				
 		-hs, --hash			Split DAT(s) or folder by best-available hashes
 			For a DAT, or set of DATs, allow for splitting based on the best
@@ -486,9 +482,9 @@ Options:
 		file(s). By default all files will be rebuilt to uncompressed folders in
 		the output directory.
 		
-		-dat=				Name of the DAT to be used for the various options
-			The user-supplied DAT used to check which files need to be rebuilt.
-			Multiple occurrences of this flag are allowed.
+		-dat=				Input DAT to be used
+			User-supplied DAT for use in all operations. Multiple instances of
+			this flag are allowed.
 		
 		-out=, --output-dir=	Set the name of the output directory
 			This sets an output folder to be used when the files are created. If
@@ -614,10 +610,10 @@ Options:
 			that skipper exists, then it will be used instead of trying to find
 			one that matches.
 			
-		-7z={1}				Set scanning level for 7z archives
+		-7z={1}				Set scanning level for 7zip archives
 		-gz={1}				Set scanning level for GZip archives
 		-rar={1}			Set scanning level for RAR archives
-		-zip={1}			Set scanning level for ZIP archives
+		-zip={1}			Set scanning level for Zip archives
 			For each of the major archive types recognized by the libraries used
 			by this program, scan the archive in one of the following ways:
 				0	Hash both archive and its contents
@@ -657,9 +653,8 @@ Options:
 				
 		-mt=, --threads=	Amount of threads to use
 			Optionally, set the number of threads to use for the multithreaded
-			operations. The default is 4 threads; -1 means unlimited threads
-			created. If the user specifies that only 1 thread is to be used, it
-			defaults to the original, serial implementation of the DFD code.
+			operations. The default is the number of available machine threads;
+			-1 means unlimited threads created.
 			
 		-upd, --update-dat	Output updated DAT to output directory
 			Once the files that were able to rebuilt are taken care of, a DAT of
@@ -805,7 +800,7 @@ Options:
 				[*SV, Missfile only]
 			
 			-ae=, --add-extension=		Add an extension to each item
-				To each item, a postfixed extension is added [Missfile only]
+				Add a postfix extension to each full item name. [Missfile only]
 			
 			-re=, --replace-extension=	Replace all extensions with specified
 				When an extension exists, replace it with the provided instead
@@ -1004,9 +999,9 @@ Options:
 				some cases. This is heavily influenced by the diffing model
 				used by Romba
 				
-				-bd=, --base-dat=	Add a base DAT for diffing
-					Add a DAT or folder of DATs to the base set to be used in
-					comparison against all inputs
+				-bd=, --base-dat=	Add a base DAT for processing
+					Add a DAT or folder of DATs to the base set to be used for all
+					operations.
 				
 			-b, --no-automatic-date		Don't include date in file name
 				Normally, the DAT will be created with the date in the file name
@@ -1036,9 +1031,9 @@ Options:
 			instance found in the last DAT inputted will be used. If no
 			additional flag is given, it will default to updating names.
 			
-			-bd=, --base-dat=	Add a base DAT for replacing
-				Add a DAT or folder of DATs to the base set to be used in
-				item name replacement
+			-bd=, --base-dat=	Add a base DAT for processing
+				Add a DAT or folder of DATs to the base set to be used for all
+				operations.
 
 			-un, --update-names		Update item names from base DATs
 				This flag enables updating of item names from base DATs.
@@ -1143,9 +1138,8 @@ Options:
 			
 		-mt=, --threads=	Amount of threads to use
 			Optionally, set the number of threads to use for the multithreaded
-			operations. The default is 4 threads; -1 means unlimited threads
-			created. If the user specifies that only 1 thread is to be used, it
-			defaults to the original, serial implementation of the DFD code.
+			operations. The default is the number of available machine threads;
+			-1 means unlimited threads created.
 			
 	-ve, --verify		Verify a folder against an input DAT
 		When used, this will use an input DAT or set of DATs to blindly check
@@ -1154,9 +1148,9 @@ Options:
 		within. This will only do a direct verification of the items within and
 		will create a fixdat afterwards for missing files.
 		
-		-dat=				Name of the DAT to be used for the various options
-			The user-supplied DAT used to check which files need to be verified.
-			Multiple occurrences of this flag are allowed.
+		-dat=				Input DAT to be used
+			User-supplied DAT for use in all operations. Multiple instances of
+			this flag are allowed.
 		
 		-dep, --depot		Assume directories are romba depots
 			Normally, input directories will be treated with no special format.
