@@ -558,7 +558,7 @@ namespace SabreTools
 					new List<string>() { "-oa", "--output-all" },
 					"Output in all formats [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in all formats [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputAttractmodeFlag
@@ -570,7 +570,7 @@ namespace SabreTools
 					new List<string>() { "-oam", "--output-attractmode" },
 					"Output in AttractMode format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in AttractMode format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputCmpFlag
@@ -582,7 +582,7 @@ namespace SabreTools
 					new List<string>() { "-oc", "--output-cmp" },
 					"Output in CMP format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in ClrMamePro format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputCsvFlag
@@ -594,7 +594,7 @@ namespace SabreTools
 					new List<string>() { "-ocsv", "--output-csv" },
 					"Output in CSV format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in CSV format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputDoscenterFlag
@@ -606,7 +606,7 @@ namespace SabreTools
 					new List<string>() { "-od", "--output-doscenter" },
 					"Output in DOSCenter format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in DOSCenter format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputListromFlag
@@ -618,7 +618,7 @@ namespace SabreTools
 					new List<string>() { "-olr", "--output-listrom" },
 					"Output in MAME Listrom format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in MAME Listrom format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputListxmlFlag
@@ -630,7 +630,7 @@ namespace SabreTools
 					new List<string>() { "-olx", "--output-listxml" },
 					"Output in MAME Listxml format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in MAME Listxml format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputMd5Flag
@@ -642,7 +642,7 @@ namespace SabreTools
 					new List<string>() { "-omd5", "--output-md5" },
 					"Output in MD5 format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in MD5 format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputMissFlag
@@ -654,7 +654,7 @@ namespace SabreTools
 					new List<string>() { "-om", "--output-miss" },
 					"Output in Missfile format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in Missfile format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputOfflinelistFlag
@@ -666,7 +666,7 @@ namespace SabreTools
 					new List<string>() { "-ool", "--output-offlinelist" },
 					"Output in OfflineList format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in OfflineList format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputRomcenterFlag
@@ -678,7 +678,7 @@ namespace SabreTools
 					new List<string>() { "-or", "--output-romcenter" },
 					"Output in RomCenter format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in RomCenter format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputSabredatFlag
@@ -690,7 +690,7 @@ namespace SabreTools
 					new List<string>() { "-os", "--output-sabredat" },
 					"Output in SabreDat format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in SabreDat format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputSfvFlag
@@ -702,7 +702,7 @@ namespace SabreTools
 					new List<string>() { "-osfv", "--output-sfv" },
 					"Output in SFV format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in SFV format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputSha1Flag
@@ -714,7 +714,7 @@ namespace SabreTools
 					new List<string>() { "-osha1", "--output-sha1" },
 					"Output in SHA-1 format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in SHA-1 format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputSha256Flag
@@ -726,7 +726,7 @@ namespace SabreTools
 					new List<string>() { "-osha256", "--output-sha256" },
 					"Output in SHA-256 format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in SHA-256 format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputSha384Flag
@@ -738,7 +738,7 @@ namespace SabreTools
 					new List<string>() { "-osha384", "--output-sha384" },
 					"Output in SHA-256 format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in SHA-256 format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputSha512Flag
@@ -750,7 +750,7 @@ namespace SabreTools
 					new List<string>() { "-osha512", "--output-sha512" },
 					"Output in SHA-256 format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in SHA-256 format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputSoftwarelistFlag
@@ -762,7 +762,7 @@ namespace SabreTools
 					new List<string>() { "-osl", "--output-softwarelist" },
 					"Output in Softwarelist format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in Softwarelist format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputSsvFlag
@@ -774,7 +774,7 @@ namespace SabreTools
 					new List<string>() { "-ossv", "--output-ssv" },
 					"Output in SSV format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in SSV format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputTsvFlag
@@ -786,7 +786,7 @@ namespace SabreTools
 					new List<string>() { "-otsv", "--output-tsv" },
 					"Output in TSV format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in TSV format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature outputXmlFlag
@@ -798,7 +798,7 @@ namespace SabreTools
 					new List<string>() { "-ox", "--output-xml" },
 					"Output in Logiqx XML format [DEPRECIATED]",
 					FeatureType.Flag,
-					longDescription: "");
+					longDescription: "Output in Logiqx XML format [DEPRECIATED]");
 			}
 		} // TODO: Remove
 		private static Feature quickFlag
