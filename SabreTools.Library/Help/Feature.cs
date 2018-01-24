@@ -272,23 +272,26 @@ namespace SabreTools.Library.Help
 					if (split[i].Contains("\n"))
 					{
 						string[] subsplit = split[i].Replace("\r", "").Split('\n');
+						for (int j = 0; j < subsplit.Length - 1; j++)
+						{
+							// Add the next word only if the total length doesn't go above the width of the screen
+							if (output.Length + subsplit[j].Length < width)
+							{
+								output += (output.Length == pre + 4 ? "" : " ") + subsplit[j];
+							}
+							// Otherwise, we want to cache the line to output and create a new blank string
+							else
+							{
+								outputList.Add(output);
+								output = CreatePadding(pre + 4);
+								output += (output.Length == pre + 4 ? "" : " ") + subsplit[j];
+							}
 
-						// Add the next word only if the total length doesn't go above the width of the screen
-						if (output.Length + subsplit[0].Length < width)
-						{
-							output += (output.Length == pre + 4 ? "" : " ") + subsplit[0];
-						}
-						// Otherwise, we want to cache the line to output and create a new blank string
-						else
-						{
 							outputList.Add(output);
 							output = CreatePadding(pre + 4);
-							output += (output.Length == pre + 4 ? "" : " ") + subsplit[0];
 						}
 
-						outputList.Add(output);
-						output = CreatePadding(pre + 4);
-						output += subsplit[1];
+						output += subsplit[subsplit.Length - 1];
 						continue;
 					}
 
@@ -392,23 +395,26 @@ namespace SabreTools.Library.Help
 					if (split[i].Contains("\n"))
 					{
 						string[] subsplit = split[i].Replace("\r", "").Split('\n');
+						for (int j = 0; j < subsplit.Length - 1; j++)
+						{
+							// Add the next word only if the total length doesn't go above the width of the screen
+							if (output.Length + subsplit[j].Length < width)
+							{
+								output += (output.Length == preAdjusted + 4 ? "" : " ") + subsplit[j];
+							}
+							// Otherwise, we want to cache the line to output and create a new blank string
+							else
+							{
+								outputList.Add(output);
+								output = CreatePadding(preAdjusted + 4);
+								output += (output.Length == preAdjusted + 4 ? "" : " ") + subsplit[j];
+							}
 
-						// Add the next word only if the total length doesn't go above the width of the screen
-						if (output.Length + subsplit[0].Length < width)
-						{
-							output += (output.Length == preAdjusted + 4 ? "" : " ") + subsplit[0];
-						}
-						// Otherwise, we want to cache the line to output and create a new blank string
-						else
-						{
 							outputList.Add(output);
 							output = CreatePadding(preAdjusted + 4);
-							output += (output.Length == preAdjusted + 4 ? "" : " ") + subsplit[0];
 						}
 
-						outputList.Add(output);
-						output = CreatePadding(preAdjusted + 4);
-						output += subsplit[1];
+						output += subsplit[subsplit.Length - 1];
 						continue;
 					}
 

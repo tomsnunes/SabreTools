@@ -54,7 +54,7 @@ namespace SabreTools
 					new List<string>() { "-as", "--all-stats" },
 					"Write all statistics to all available formats",
 					FeatureType.Flag,
-					longDescription: "Output all rom information to all available formats.");
+					longDescription: "Output all statistical information to all available formats.");
 			}
 		}
 		private static Feature archivesAsFilesFlag
@@ -1434,7 +1434,7 @@ namespace SabreTools
 				return new Feature(
 					"threads",
 					new List<string>() { "-mt", "--threads" },
-					"Amount of threads to use (default = # cores, -1 unlimted)",
+					"Amount of threads to use (default = # cores)",
 					FeatureType.Int32,
 					longDescription: "Optionally, set the number of threads to use for the multithreaded operations. The default is the number of available machine threads; -1 means unlimited threads created.");
 			}
@@ -1765,28 +1765,29 @@ Possible values are: None, Good, BadDump, Nodump, Verified");
 					"Output DATs to a specified format",
 					FeatureType.List,
 					longDescription: @"Add outputting the created DAT to known format. Multiple instances of this flag are allowed.
+
 Possible values are:
-all              - All available DAT types
-am, attractmode  - AttractMode XML
-cmp, clrmamepro  - ClrMamePro
-csv              - Standardized Comma-Separated Value
-dc, doscenter    - DOSCenter
-lr, listrom      - MAME Listrom
-lx, listxml      - MAME Listxml
-miss, missfile   - GoodTools Missfile
-md5              - MD5
-ol, offlinelist  - OfflineList XML
-rc, romcenter    - RomCenter
-sd, sabredat     - SabreDat XML
-sfv              - SFV
-sha1             - SHA1
-sha256           - SHA256
-sha384           - SHA384
-sha512           - SHA512
-sl, softwarelist - MAME Software List XML
-ssv              - Standardized Semicolon-Separated Value
-tsv              - Standardized Tab-Separated Value
-xml, logiqx      - Logiqx XML");
+    all              - All available DAT types
+    am, attractmode  - AttractMode XML
+    cmp, clrmamepro  - ClrMamePro
+    csv              - Standardized Comma-Separated Value
+    dc, doscenter    - DOSCenter
+    lr, listrom      - MAME Listrom
+    lx, listxml      - MAME Listxml
+    miss, missfile   - GoodTools Missfile
+    md5              - MD5
+    ol, offlinelist  - OfflineList XML
+    rc, romcenter    - RomCenter
+    sd, sabredat     - SabreDat XML
+    sfv              - SFV
+    sha1             - SHA1
+    sha256           - SHA256
+    sha384           - SHA384
+    sha512           - SHA512
+    sl, softwarelist - MAME Software List XML
+    ssv              - Standardized Semicolon-Separated Value
+    tsv              - Standardized Tab-Separated Value
+    xml, logiqx      - Logiqx XML");
 			}
 		}
 		private static Feature sha1ListInput
@@ -2023,7 +2024,7 @@ Possible values are: None, Zip, Unzip");
 					new List<string>() { "-h", "--header" },
 					"Set a header skipper to use, blank means all",
 					FeatureType.String,
-					longDescription: "Set the header special field for the output DAT(s)");
+					longDescription: "Set the header special field for the output DAT(s). In file rebuilding, this flag allows for either all copier headers (using \"\") or specific copier headers by name (such as \"fds.xml\") to determine if a file matches or not.");
 
 			}
 		}
@@ -2084,7 +2085,18 @@ Possible values are: None, Zip, Unzip");
 					new List<string>() { "-post", "--postfix" },
 					"Set postfix for all lines",
 					FeatureType.String,
-					longDescription: "Set a generic postfix to be appended to all outputted lines. [*SV, Missfile only]");
+					longDescription: @"Set a generic postfix to be appended to all outputted lines. [*SV, Missfile only]
+
+Some special strings that can be used:
+- %game% - Replaced with the Game/Machine name
+- %name% - Replaced with the Rom name
+- %crc% - Replaced with the CRC
+- %md5% - Replaced with the MD5
+- %sha1% - Replaced with the SHA-1
+- %sha256% - Replaced with the SHA-256
+- %sha384% - Replaced with the SHA-384
+- %sha512% - Replaced with the SHA-512
+- %size% - Replaced with the size");
 			}
 		}
 		private static Feature prefixStringInput
@@ -2096,7 +2108,18 @@ Possible values are: None, Zip, Unzip");
 					new List<string>() { "-pre", "--prefix" },
 					"Set prefix for all lines",
 					FeatureType.String,
-					longDescription: "Set a generic prefix to be prepended to all outputted lines. [*SV, Missfile only]");
+					longDescription: @"Set a generic prefix to be prepended to all outputted lines. [*SV, Missfile only]
+
+Some special strings that can be used:
+- %game% - Replaced with the Game/Machine name
+- %name% - Replaced with the Rom name
+- %crc% - Replaced with the CRC
+- %md5% - Replaced with the MD5
+- %sha1% - Replaced with the SHA-1
+- %sha256% - Replaced with the SHA-256
+- %sha384% - Replaced with the SHA-384
+- %sha512% - Replaced with the SHA-512
+- %size% - Replaced with the size");
 			}
 		}
 		private static Feature replaceExtensionStringInput
@@ -2296,15 +2319,17 @@ Possible values are: None, Zip, Unzip");
 				new List<string>() { "-ex", "--extract" },
 				"Extract and remove copier headers",
 				FeatureType.Flag,
-				longDescription: @"This will detect, store, and remove copier headers from a file or folder of files. The headers are backed up and collated by the hash of the unheadered file. Files are then output without the detected copier header alongside the originals with the suffix .new. No input files are altered in the process. The following systems have headers that this program can work with:
-- Atari 7800
-- Atari Lynx
-- Commodore PSID Music
-- NEC PC - Engine / TurboGrafx 16
-- Nintendo Famicom / Nintendo Entertainment System
-- Nintendo Famicom Disk System
-- Nintendo Super Famicom / Super Nintendo Entertainment System
-- Nintendo Super Famicom / Super Nintendo Entertainment System SPC");
+				longDescription: @"This will detect, store, and remove copier headers from a file or folder of files. The headers are backed up and collated by the hash of the unheadered file. Files are then output without the detected copier header alongside the originals with the suffix .new. No input files are altered in the process.
+
+The following systems have headers that this program can work with:
+  - Atari 7800
+  - Atari Lynx
+  - Commodore PSID Music
+  - NEC PC - Engine / TurboGrafx 16
+  - Nintendo Famicom / Nintendo Entertainment System
+  - Nintendo Famicom Disk System
+  - Nintendo Super Famicom / Super Nintendo Entertainment System
+  - Nintendo Super Famicom / Super Nintendo Entertainment System SPC");
 			extract.AddFeature(outputDirStringInput);
 			extract.AddFeature(noStoreHeaderFlag);
 
@@ -2317,15 +2342,17 @@ Possible values are: None, Zip, Unzip");
 				new List<string>() { "-re", "--restore" },
 				"Restore header to file based on SHA-1",
 				FeatureType.Flag,
-				longDescription: @"This will make use of stored copier headers and reapply them to files if they match the included hash. More than one header can be applied to a file, so they will be output to new files, suffixed with .newX, where X is a number. No input files are altered in the process. The following systems have headers that this program can work with: 
-- Atari 7800
-- Atari Lynx
-- Commodore PSID Music
-- NEC PC - Engine / TurboGrafx 16
-- Nintendo Famicom / Nintendo Entertainment System
-- Nintendo Famicom Disk System
-- Nintendo Super Famicom / Super Nintendo Entertainment System
-- Nintendo Super Famicom / Super Nintendo Entertainment System SPC");
+				longDescription: @"This will make use of stored copier headers and reapply them to files if they match the included hash. More than one header can be applied to a file, so they will be output to new files, suffixed with .newX, where X is a number. No input files are altered in the process.
+
+The following systems have headers that this program can work with:
+  - Atari 7800
+  - Atari Lynx
+  - Commodore PSID Music
+  - NEC PC - Engine / TurboGrafx 16
+  - Nintendo Famicom / Nintendo Entertainment System
+  - Nintendo Famicom Disk System
+  - Nintendo Super Famicom / Super Nintendo Entertainment System
+  - Nintendo Super Famicom / Super Nintendo Entertainment System SPC");
 			restore.AddFeature(outputDirStringInput);
 
 			#endregion
@@ -2350,13 +2377,13 @@ Possible values are: None, Zip, Unzip");
 			sort.AddFeature(tarFlag);
 			sort.AddFeature(torrentGzipFlag);
 				sort[torrentGzipFlag].AddFeature(rombaFlag);
-			//sort.AddFeature(tlrzFeature);
-			//sort.AddFeature(tlz4Feature);
-			//sort.AddFeature(trarFeature);
-			//sort.AddFeature(txzFeature);
+			sort.AddFeature(torrentLrzipFlag);
+			sort.AddFeature(torrentLz4Flag);
+			sort.AddFeature(torrentRarFlag);
+			sort.AddFeature(torrentXzFlag);
 			sort.AddFeature(torrentZipFlag);
-			//sort.AddFeature(tzpaqFeature);
-			//sort.AddFeature(tzstdFeature);
+			sort.AddFeature(torrentZpaqFlag);
+			sort.AddFeature(torrentZstdFlag);
 			sort.AddFeature(headerStringInput);
 			sort.AddFeature(sevenZipInt32Input);
 			sort.AddFeature(gzInt32Input);
@@ -2429,7 +2456,9 @@ Possible values are: None, Zip, Unzip");
 				new List<string>() { "-st", "--stats" },
 				"Get statistics on all input DATs",
 				FeatureType.Flag,
-				longDescription: @"This will output by default the combined statistics for all input DAT files. The stats that are outputted are as follows:
+				longDescription: @"This will output by default the combined statistics for all input DAT files.
+
+The stats that are outputted are as follows:
 - Total uncompressed size
 - Number of games found
 - Number of roms found
@@ -2442,15 +2471,15 @@ Possible values are: None, Zip, Unzip");
 - Items that include a SHA-512
 - Items with Nodump status");
 			stats.AddFeature(allStatsFlag);
-			stats.AddFeature(baddumpColumnFlag);
 			stats.AddFeature(csvFlag);
-			stats.AddFeature(filenameStringInput);
-			stats.AddFeature(outputDirStringInput);
 			stats.AddFeature(htmlFlag);
-			stats.AddFeature(nodumpColumnFlag);
-			stats.AddFeature(individualFlag);
 			stats.AddFeature(tsvFlag);
 			stats.AddFeature(textFlag);
+			stats.AddFeature(filenameStringInput);
+			stats.AddFeature(outputDirStringInput);
+			stats.AddFeature(baddumpColumnFlag);
+			stats.AddFeature(nodumpColumnFlag);
+			stats.AddFeature(individualFlag);
 
 			#endregion
 
