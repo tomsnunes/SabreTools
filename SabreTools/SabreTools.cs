@@ -17,16 +17,14 @@ namespace SabreTools
 	/// <summary>
 	/// Entry class for the DATabase application
 	/// </summary>
-	/// <remarks>
 	/// TODO: Look into async read/write to make things quicker. Ask edc for help?
-	/// </remarks>
 	public partial class SabreTools
 	{
 		// Private required variables
 		private static Help _help;
 
 		/// <summary>
-		/// Start menu or use supplied parameters
+		/// Entry class for the SabreTools application
 		/// </summary>
 		/// <param name="args">String array representing command line parameters</param>
 		public static void Main(string[] args)
